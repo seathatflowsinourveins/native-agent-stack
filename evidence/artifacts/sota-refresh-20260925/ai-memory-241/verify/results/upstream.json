@@ -1,0 +1,79 @@
+{
+ "at": "2026-09-25T23:10:34Z",
+ "tag_ref": [
+  "tag",
+  "1e11aa43fe04f8d453f5dbbec66c71f081b90dbf"
+ ],
+ "tag_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+ "tag_verified": false,
+ "check_runs": {
+  "total_count": 57,
+  "by_status_conclusion": {
+   "completed/success": 57
+  }
+ },
+ "compare_v2.4.0_to_v2.4.1": {
+  "status": "ahead",
+  "ahead_by": 126,
+  "behind_by": 0
+ },
+ "compare_fix792_to_v2.4.1": {
+  "status": "ahead",
+  "ahead_by": 110,
+  "behind_by": 0
+ },
+ "compare_pr859_to_v2.4.1": {
+  "status": "diverged",
+  "ahead_by": 92,
+  "behind_by": 32
+ },
+ "compare_files": {
+  "count": 105,
+  "added": [
+   "crates/ai-memory-consolidate/src/path_sanitize.rs",
+   "crates/ai-memory-store/migrations/V67__managed_run_session_link.sql",
+   "docs/design-windows-ci.md",
+   "docs/security-boundaries.md"
+  ]
+ },
+ "migration_files_changed": [
+  "crates/ai-memory-store/migrations/V67__managed_run_session_link.sql",
+  "crates/ai-memory-wiki/src/migrations/m2026_09_okf_conformance.rs"
+ ],
+ "v67_sql_statements": [
+  "ALTER TABLE managed_runs ADD COLUMN native_session_linked_at INTEGER;"
+ ],
+ "registry_crates": {
+  "v2.4.0": 492,
+  "v2.4.1": 492
+ },
+ "registry_sets_identical": true,
+ "latest_releases": [
+  [
+   "v2.4.1",
+   "2026-09-25T21:46:32Z",
+   false,
+   false
+  ],
+  [
+   "v2.4.0",
+   "2026-09-21T23:45:13Z",
+   false,
+   false
+  ],
+  [
+   "v2.3.2",
+   "2026-09-20T02:34:33Z",
+   false,
+   false
+  ],
+  [
+   "v2.3.1",
+   "2026-09-17T18:26:44Z",
+   false,
+   false
+  ]
+ ],
+ "advisory_positive_control_rmcp_1.7.0": 3,
+ "advisories_rmcp_2.2.0_socket2_0.6.3": 0
+}

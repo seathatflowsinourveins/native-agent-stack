@@ -65,6 +65,10 @@ release, the note is history and the step is in your checkout (`test -e
    `serena-context` wrapper that nothing installs, and main's runs
    `${ECO_ROOT}/bin/serena`; the tag also registers `jcodemunch` at user
    scope, which main leaves to each project.
+   `adoption/templates/claude.settings.template.json` changed after `v2026.09.25.2`: its eight
+   ai-memory hook commands name `tools/ai-memory-2.4.1`, where the tag's name `tools/ai-memory-2.3.2`.
+   Before using the rendered settings, follow
+   [ai-memory hook paths on macOS](#ai-memory-hook-paths-on-macos).
 4. launchd services and the embedding acceptance ("launchd services" and
    "Embedding backend decision" below).
 5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`
@@ -268,9 +272,13 @@ existing claude-code step. There is no more nested platform package, no
 native binary manages its own version directory and launcher and keeps
 auto-updating on the latest channel afterward. (`adoption/pins-linux-x86_64.json`
 changed after `v2026.09.24.1` in `install_note` text only; its `claude-code`
-pin is unchanged. It changed after `v2026.09.25.2` again, in its `rtk` and
-`markitdown` entries only; neither tool has an entry in
-`adoption/pins-macos-arm64.json`, which is unchanged.)
+pin is unchanged. It changed after `v2026.09.25.2` again: its `rtk`,
+`markitdown`, `ai-memory` and `mcporter` entries moved to newer versions, and
+new `ccusage`, `headroom`, `repomix`, `serena`, `socraticode` and `toon`
+entries were added. Of those ten, only `ai-memory`, `mcporter` and `socraticode`
+have an entry in `adoption/pins-macos-arm64.json`, which is unchanged: it keeps
+ai-memory 2.3.2 and mcporter 0.13.13 until a Mac qualifies the new versions
+itself, and its socraticode entry matches the new Linux one.)
 
 The pin is a floor: when `~/.local/bin/claude --version` already reports the
 pinned version or newer, `install_native` keeps that launcher, downloads and
@@ -290,6 +298,21 @@ no `build/bin` path in this asset), so the bootstrap installs the whole
 directory into `tools/llama-cpp-b11057` and places a wrapper script at
 `bin/llama-server` that exports `DYLD_LIBRARY_PATH` before exec'ing the real
 binary, instead of a bare symlink.
+
+### ai-memory hook paths on macOS
+
+The shared Claude settings template names the Linux pin's ai-memory prefix,
+`${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory`, while this platform's pin stays
+2.3.2 until a Mac qualifies a 2.4.x release itself, so the eight rendered hook commands
+point at a prefix this bootstrap does not install. Rewrite them with the
+installed 2.3.2 binary and the full Claude command from
+[the recipe's project-memory section](../../recipes/README.md#project-memory):
+`install-hooks --agent claude-code --server-url http://<this host's memory server>
+--capture-mode allowlist --no-capture-prompts --apply`. Do not drop
+`--capture-mode allowlist`: with no stored mode, v2.3.2's installer falls back
+to its historical `denylist` default
+([`install_hooks.rs`](https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-cli/src/commands/install_hooks.rs),
+`resolve_capture_mode`) instead of the allowlist this stack uses, where capture is gated by each project's `.ai-memory.toml` marker.
 
 ## What a hosted run proves
 

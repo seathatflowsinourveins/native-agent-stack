@@ -481,7 +481,7 @@
     {
       "component_id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.3.2",
+      "version": "2.4.1",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
       "installation_assessment": "runtime present at retained native operation date",
@@ -603,6 +603,16 @@
             "id": "memory-lifecycle-probe-20260921",
             "path": "evidence/receipts/memory-lifecycle-probe-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ai-memory-240-qualification-20260925",
+            "path": "evidence/receipts/ai-memory-240-qualification-20260925.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ai-memory-241-qualification-20260925",
+            "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -621,7 +631,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "353841d91618d20b110b208de284a74d0b960379",
+      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",
@@ -4940,8 +4950,8 @@
     },
     {
       "component_id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
-      "version": "0.13.13",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "version": "0.14.1",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4985,6 +4995,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "mcporter-0141-qualification-20260925",
+            "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
             "kind": "native_cli_e2e"
           }
         ],

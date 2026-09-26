@@ -1,0 +1,763 @@
+{
+ "schema_version": 1,
+ "id": "sota-refresh-20260925-headroom-039",
+ "unit": "headroom",
+ "host": "nativestack-5975wx-20260925",
+ "date_utc": "2026-09-25",
+ "baseline_version": "0.37.0",
+ "candidate_version": "0.39.0",
+ "decision": "retain 0.37.0; 0.39.0 qualified, not switched",
+ "upstream": {
+  "repository": "https://github.com/headroomlabs-ai/headroom",
+  "release": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.0",
+  "tag_commit": "66f426171bab32692cf93d2b656a8e4be9004186",
+  "published_at": "2026-09-25T19:29:55Z",
+  "wheel": "https://files.pythonhosted.org/packages/a5/a7/0a005ed79752f9230ad749180f8347c76f2e5cf0fb9f53a226ac55ae1c64/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+  "wheel_sha256": "8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74",
+  "wheel_bytes": 14199952,
+  "provenance": "none (PyPI provenance null; GitHub attestations API 404)"
+ },
+ "roles": {
+  "implementer": "Wave-2 qualification unit of the 2026-09-25 SOTA refresh: installed the candidate into a new prefix and ran every step below for both arms without touching production.",
+  "verifier": "A separate agent that re-ran the claims with its own code, checked integrity independently and returned the verdict and defects below.",
+  "writing_worker": "The session that assembled this directory; it performed only the read-only read-back in out/readback.out.",
+  "coordinator": "The coordinating session; it decided to retain 0.37.0 (no switch)."
+ },
+ "sanitization": "Session scratch paths are replaced by $IMPL2 (the wave-2 unit's scratch directory) and <scratchpad>; the home directory by ~ and the account name by <user>; UUID-shaped identifiers by <uuid:first-8-hex>. Session identifiers, tokens, probe nonces, page text and config values are not present. Files marked byte_identical_to_run_copy are the exact bytes that ran or were written; for the others run_copy_sha256 is the digest of the unsanitized run copy, which stays in session scratch.",
+ "fixture_a_source": "The 600-line ISO-timestamped log generator in evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--headroom--use--20260925.json commands[1] at commit 6752ede5 (#262), byte-identical to steps/mcp_session.py's generator; fixture B is blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json (sha256 2b17eb36...).",
+ "files": [
+  {
+   "path": "steps/G",
+   "sha256": "c419b3af27337cf6edb3e21af11d0de3064930f7327d28dbb9314cf3c9f9b129",
+   "bytes": 820,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/steps/G"
+  },
+  {
+   "path": "steps/mcp_retrieve.py",
+   "sha256": "edb7c2d2628bb831ceee9d7df821b63c39d74569ef8064473bfabb9418497068",
+   "bytes": 3272,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/steps/mcp_retrieve.py"
+  },
+  {
+   "path": "steps/mcp_session.py",
+   "sha256": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9",
+   "bytes": 6907,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/steps/mcp_session.py"
+  },
+  {
+   "path": "steps/record_bind.py",
+   "sha256": "819368b66c939501d671d9e112f80e2f0927a282d33429e9a3a074e865cd1ff8",
+   "bytes": 1457,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/steps/record_bind.py"
+  },
+  {
+   "path": "steps/run_upstream_tests.py",
+   "sha256": "29aff31fef58348a082f9b05cb77b3913191180dce328f2ec9921af4df3263b1",
+   "bytes": 1672,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/steps/run_upstream_tests.py"
+  },
+  {
+   "path": "proof/snapshot.sh",
+   "sha256": "7ab9a1aa629411767af23fc15ec94eb08667b6c537f17bdfec3b3969b64e89d5",
+   "bytes": 2055,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/proof/snapshot.sh"
+  },
+  {
+   "path": "out/criteria.json",
+   "sha256": "b270530c8c4bc1bd761b1d76a65c39043b9f7b2a49219b1165bd3a8d26dc3c95",
+   "bytes": 1049,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/out/criteria.json"
+  },
+  {
+   "path": "out/0.39.0/result-session.json",
+   "sha256": "796e1a1cb451eb37e19d99d6e1a2ad4b424c5424942157596788f292268be5e7",
+   "bytes": 1848,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/out/0.39.0/result-session.json"
+  },
+  {
+   "path": "out/0.37.0/result-session.json",
+   "sha256": "76a0a565cabb1676b1fff4380683529608941cdc96c3d3b230636dd5e65f544c",
+   "bytes": 1855,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/out/0.37.0/result-session.json"
+  },
+  {
+   "path": "out/0.39.0/compressed-A.txt",
+   "sha256": "d09c822e7eb7d9a50893a180ec031e8756079a35e8b069d1eba4cc446bd01d86",
+   "bytes": 666,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/out/0.39.0/compressed-A.txt"
+  },
+  {
+   "path": "out/0.39.0/savings.json",
+   "sha256": "63747bf4ff3ae1dafae176ef1db8046f9ac486470de3e6192be2abbd7c82fa63",
+   "bytes": 1949,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL2/out/0.39.0/savings.json",
+   "run_copy_sha256": "ab8e81c0b0f9be4f72f4746eb6edc2a85e234e0b3ead48fd2e7b63334f63d8aa"
+  },
+  {
+   "path": "out/0.37.0/savings.json",
+   "sha256": "7a0f669093d7f39845bcb86d085625402417fb9d6298f4c62ea7a340ff7b8806",
+   "bytes": 1177,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "$IMPL2/out/0.37.0/savings.json",
+   "run_copy_sha256": "98db5c56bac89910bc35badd635e943f2ac57bc3f3747e7f4f5ed6ad23a39b5b"
+  },
+  {
+   "path": "out/0.39.0/telemetry.json",
+   "sha256": "ea060ea1d406848dd37ecf24875fc665e29339c921b4c6c185ab604af7c5e9c8",
+   "bytes": 4381,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/out/0.39.0/telemetry.json"
+  },
+  {
+   "path": "verify/steps/VG",
+   "sha256": "48f36c715aa69b5b427ddaacc020e7991b559785b40a51296b6d572dbccaefbf",
+   "bytes": 436,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/VG"
+  },
+  {
+   "path": "verify/steps/snap.sh",
+   "sha256": "1f3c658a6ebf734675b5b5af1c05f13055cdde71b5471e82ef8d00ddeead040d",
+   "bytes": 2613,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/snap.sh"
+  },
+  {
+   "path": "verify/steps/vbind.py",
+   "sha256": "2313854956d7db3ad6538db4a25e5923bd8a9600276f692455a8e20b0f6f088f",
+   "bytes": 2421,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/vbind.py"
+  },
+  {
+   "path": "verify/steps/vsession.py",
+   "sha256": "a005261f95ce096ddecc6a09abcc996ec8683aa29a4e76a75e96ca32a1adddce",
+   "bytes": 7091,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/vsession.py"
+  },
+  {
+   "path": "verify/steps/vstate.py",
+   "sha256": "657d0997de467f8d7005d3fb8c56ea656a3139ac035cb989431021dd6db1f671",
+   "bytes": 2276,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/vstate.py"
+  },
+  {
+   "path": "verify/steps/vtests.py",
+   "sha256": "0c9d31b7cd15a2c34df562c8350ef7a7501eb75a7c1fa5404e1035cf4955630c",
+   "bytes": 1250,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/vtests.py"
+  },
+  {
+   "path": "verify/steps/vtests_shim.py",
+   "sha256": "e6aaff5de592a0c3212993a51936ceccabaab18c46ba1f9b987b5d927ac91b80",
+   "bytes": 867,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL2/verify/steps/vtests_shim.py"
+  },
+  {
+   "path": "out/run-outputs.json",
+   "sha256": "6b3bb8bcdba5576a91d054c094d7adeea408329126814b8f2468a28735a697a7",
+   "bytes": 117447,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "bundle of 70 files (43 distinct contents) under $IMPL2"
+  },
+  {
+   "path": "verifier/run-outputs.json",
+   "sha256": "f1784028d4afa961f20b44b494676ea0881adba742d2524932e030a318239ec6",
+   "bytes": 129168,
+   "byte_identical_to_run_copy": false,
+   "run_copy": "bundle of 59 files (42 distinct contents) under $IMPL2"
+  },
+  {
+   "path": "out/readback.out",
+   "sha256": "5d1ec3fe191cb3e289a8872ea0a827774d0f06fac933ad648420e2d6d88b9b91",
+   "bytes": 259,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "<writing-worker-scratch>/headroom039-readback.out"
+  }
+ ],
+ "not_published": [
+  {
+   "run_copy": "$IMPL2/proof/after/pinned_prefix.tsv",
+   "sha256": "f7d953151d9a506ef8ecc882cfcc52db21d4ab595c05770d813eed93936f7a5d",
+   "bytes": 1405869,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/proof/before/pinned_prefix.tsv",
+   "sha256": "f7d953151d9a506ef8ecc882cfcc52db21d4ab595c05770d813eed93936f7a5d",
+   "bytes": 1405869,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/proof/before2/pinned_prefix.tsv",
+   "sha256": "f7d953151d9a506ef8ecc882cfcc52db21d4ab595c05770d813eed93936f7a5d",
+   "bytes": 1405869,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/proof/final/pinned_prefix.tsv",
+   "sha256": "f7d953151d9a506ef8ecc882cfcc52db21d4ab595c05770d813eed93936f7a5d",
+   "bytes": 1405869,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-after/candidate_prefix.tsv",
+   "sha256": "ec0bc0a74286a773d317ca1056ae3026082a593c8f7b2f2be786c20e70e12956",
+   "bytes": 1580984,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-after/pinned_prefix.tsv",
+   "sha256": "f7d953151d9a506ef8ecc882cfcc52db21d4ab595c05770d813eed93936f7a5d",
+   "bytes": 1405869,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-before/candidate_prefix.tsv",
+   "sha256": "ec0bc0a74286a773d317ca1056ae3026082a593c8f7b2f2be786c20e70e12956",
+   "bytes": 1580984,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-before/pinned_prefix.tsv",
+   "sha256": "f7d953151d9a506ef8ecc882cfcc52db21d4ab595c05770d813eed93936f7a5d",
+   "bytes": 1405869,
+   "reason": "Full size/mtime/mode listings of the pinned 0.37.0 prefix (13,247 entries) and the candidate prefix; their sha256 prefixes and the IDENTICAL verdicts are in the bundled summary.tsv files."
+  },
+  {
+   "run_copy": "$IMPL2/proof/after/headroom_procs.txt",
+   "sha256": "2cfa3b5e08be74b3ba58f875346eb97e6698bdd59a66fe1ec5c43c267d1b0a87",
+   "bytes": 196,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/proof/before/headroom_procs.txt",
+   "sha256": "ab7607e194ffe2f6ef950d0fa982ba0b402a97d673c9fdadc8541c8b2cf11c35",
+   "bytes": 3948,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/proof/before2/headroom_procs.txt",
+   "sha256": "a04f70bf130d1e03d31d9bce1410b9ff407fd1247fd365f1cb977ad5d583b845",
+   "bytes": 196,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/proof/final/headroom_procs.txt",
+   "sha256": "4bf66ed98eb1cddd511bc06fe9b38134fd3aa50196e50739da64d7a82ba62aef",
+   "bytes": 196,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-after/config_stats.tsv",
+   "sha256": "1f66a5b63b47a1667dce285f574f69430f72730db0e39dfd149e290ad3f7d498",
+   "bytes": 415,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-after/headroom_procs.txt",
+   "sha256": "715302842d87eb2284b9e2252ed9b3e60656c0978c6f5e7e43a6d7e193561c14",
+   "bytes": 392,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-before/config_stats.tsv",
+   "sha256": "6188bd43f704e7d696e32203497e1f376071241d6010ea5f9925ee76d86a0f8a",
+   "bytes": 415,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/verify/proof/v-before/headroom_procs.txt",
+   "sha256": "56638c1c8bb2e814bc022a44850a8976463f84cd1f561b366b69565495232149",
+   "bytes": 588,
+   "reason": "Process listings and client-config stat lines that name other sessions' processes and private config files; the results that depend on them are stated in results.json."
+  },
+  {
+   "run_copy": "$IMPL2/artifact/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+   "sha256": "8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74",
+   "bytes": 14199952,
+   "reason": "The verified upstream wheel headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl (sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74) and its verifier copy; fetch it from PyPI."
+  },
+  {
+   "run_copy": "$IMPL2/verify/artifact/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+   "sha256": "8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74",
+   "bytes": 14199952,
+   "reason": "The verified upstream wheel headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl (sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74) and its verifier copy; fetch it from PyPI."
+  },
+  {
+   "run_copy": "$IMPL2/upstream/",
+   "files": 826,
+   "bytes": 18829146,
+   "sha256_of_sorted_file_listing": "5e12ea4e5dcae1dc08b7c66f36aa88877eb5c261010c2eecd52c924b36196151",
+   "reason": "Upstream metadata, release notes, issue and PR text, a treeless clone and the unchanged upstream test file (tests/test_transforms/test_content_detector_timestamp_search.py, blob 23b66a27 at v0.39.0); reproducible from the repository and APIs."
+  },
+  {
+   "run_copy": "$IMPL2/verify/upstream/",
+   "files": 13,
+   "bytes": 705942,
+   "sha256_of_sorted_file_listing": "3a8259da2298828068b1c56693df126b9b54b32acea8731c247b6e1cf9f4d6cb",
+   "reason": "Upstream metadata, release notes, issue and PR text, a treeless clone and the unchanged upstream test file (tests/test_transforms/test_content_detector_timestamp_search.py, blob 23b66a27 at v0.39.0); reproducible from the repository and APIs."
+  },
+  {
+   "run_copy": "$IMPL2/upstream-tests/",
+   "files": 1,
+   "bytes": 2900,
+   "sha256_of_sorted_file_listing": "c1f6ed1d3e6778ff315d131367285887d960e80294e5a7342f8772d2a7a90253",
+   "reason": "Upstream metadata, release notes, issue and PR text, a treeless clone and the unchanged upstream test file (tests/test_transforms/test_content_detector_timestamp_search.py, blob 23b66a27 at v0.39.0); reproducible from the repository and APIs."
+  },
+  {
+   "run_copy": "$IMPL2/ws-0.39.0/",
+   "files": 3,
+   "bytes": 472396,
+   "sha256_of_sorted_file_listing": "afdbbe18b59fabb6162a242a8cfe61dcb1498a8a563d98da1d10516311b3cb8e",
+   "reason": "Scratch headroom workspaces (CCR SQLite stores and savings ledgers of the synthetic fixtures); the values read from them are in the result files."
+  },
+  {
+   "run_copy": "$IMPL2/ws-0.37.0/",
+   "files": 3,
+   "bytes": 467960,
+   "sha256_of_sorted_file_listing": "b3417da1422662025feefe3c8bcc04c89d8a59cd5fa02efb51e2d0cc93786bf8",
+   "reason": "Scratch headroom workspaces (CCR SQLite stores and savings ledgers of the synthetic fixtures); the values read from them are in the result files."
+  },
+  {
+   "run_copy": "$IMPL2/verify/ws-v039/",
+   "files": 3,
+   "bytes": 476317,
+   "sha256_of_sorted_file_listing": "e9dc8cfb0adff3e84f83736c12422e894ef8c186d289cdbec7b0de12ecbe0778",
+   "reason": "Scratch headroom workspaces (CCR SQLite stores and savings ledgers of the synthetic fixtures); the values read from them are in the result files."
+  },
+  {
+   "run_copy": "$IMPL2/verify/ws-v037/",
+   "files": 3,
+   "bytes": 467959,
+   "sha256_of_sorted_file_listing": "d3dda65e78fae45f60cabd914ed0ff6be97cd15572fa99ab0149ba33f38a917a",
+   "reason": "Scratch headroom workspaces (CCR SQLite stores and savings ledgers of the synthetic fixtures); the values read from them are in the result files."
+  }
+ ],
+ "integrity": {
+  "artifact": "headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl (14199952 bytes), downloaded from https://files.pythonhosted.org/packages/a5/a7/0a005ed79752f9230ad749180f8347c76f2e5cf0fb9f53a226ac55ae1c64/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+  "expected": "sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74",
+  "actual": "sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74: `sha256sum -c` printed OK before the install. The wheel's WHEEL/METADATA show Version 0.39.0, tag cp310-abi3-manylinux_2_28_x86_64, entry points headroom and headroom-cache-ttl. 16 of 16 key modules match the v0.39.0 tag blobs, including content_detector.py blob 45689e84, which carries the #3748 guard. uv re-resolved the package from PyPI, so the install was then bound back to the verified wheel through its RECORD: 555 of 555 headroom/ digests match, 6 of 6 other rows match, 0 missing. The same result came back when re-checked after all runs. Installed _core.abi3.so sha256 is b804d9cc0d01e648fc25167da496b2a45966f8048d5d13e778003b52a4ec2534.",
+  "source": "Three upstream digests agree: the PyPI JSON API (/pypi/headroom-ai/0.39.0/json), the PyPI simple API (PEP 691 JSON), and the GitHub release v0.39.0 asset digest (sha256:8c75...). All were fetched 2026-09-25T22:29Z-22:30Z. There is no build provenance: PyPI provenance is null and the GitHub attestations API returned 404 for this digest.",
+  "verified": true
+ },
+ "steps": [
+  {
+   "name": "Upstream identity and latest release",
+   "arm": "upstream",
+   "command": "gh api repos/headroomlabs-ai/headroom; curl -sI https://github.com/chopratejas/headroom; gh release list -R headroomlabs-ai/headroom --limit 6; gh api repos/headroomlabs-ai/headroom/git/matching-refs/tags/v0.3; curl https://pypi.org/pypi/headroom-ai/json",
+   "exit": 0,
+   "output_excerpt": "headroomlabs-ai/headroom: Apache-2.0, archived=false, pushed_at 2026-09-25T19:29:55Z. chopratejas/headroom returns HTTP/2 301 to https://github.com/headroomlabs-ai/headroom (the API also answers 301). Release list shows 'Release v0.39.0 Latest v0.39.0 2026-09-25T19:29:55Z'. refs/tags/v0.39.0 is commit 66f426171bab32692cf93d2b656a8e4be9004186. PyPI latest is 0.39.0; the last versions are 0.36.4, 0.36.5, 0.37.0, 0.38.0, 0.39.0; nothing is yanked.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "#3748 fix (d971f7c3) is in the v0.39.0 tag",
+   "arm": "upstream",
+   "command": "gh api repos/headroomlabs-ai/headroom/compare/d971f7c3983b05653ef1eb88539bbbbc3667eb67...v0.39.0; git merge-base --is-ancestor d971f7c3 v0.39.0 (and v0.38.0) in a treeless clone; release notes v0.39.0",
+   "exit": 0,
+   "output_excerpt": "The compare shows status=ahead, ahead_by=86, behind_by=0. The clone prints 'd971f7c3 IS ancestor of v0.39.0' and 'd971f7c3 NOT ancestor of v0.38.0'. The notes list '**transforms:** stop routing timestamped log rows as grep matches (#3748) (d971f7c)'. c1fc84ad (#3692), 34da21e8 (#3723), 9b8cae84 (#3215) and 5cb87bc3 (#3728) are also behind_by=0. v0.37.0...v0.39.0 is ahead_by=237, behind_by=0. None of the 237 commit messages has a ticked 'Breaking change' box or a type!: marker.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Primary-source diff v0.37.0..v0.39.0 on the stack path",
+   "arm": "upstream",
+   "command": "git diff v0.38.0 v0.39.0 -- headroom/ccr/mcp_server.py headroom/savings_ledger.py headroom/cli/savings.py headroom/cache/backends/sqlite.py headroom/cache/compression_store.py headroom/transforms/content_detector.py pyproject.toml Cargo.lock; git diff --stat v0.38.0 v0.39.0 -- headroom/telemetry headroom/cli/telemetry.py headroom/offline.py headroom/update_check.py headroom/paths.py headroom/cli/mcp.py headroom/_ort.py",
+   "exit": 0,
+   "output_excerpt": "- mcp_server.py: the only change is the headroom_read token estimate (#3688); compress, retrieve and stats are unchanged.\n- telemetry, offline, update_check, paths, cli/mcp and _ort: no diff; BEACON_DEFAULT_ON = True is still set.\n- savings_ledger: SCHEMA_VERSION = 2, unchanged from 0.38.0. Buckets add new_input_tokens and new_input_savings_percent. MCP events are still skipped when before <= after.\n- sqlite backend: _ensure_private creates ccr_store.db as 0600 before connect (#3215). DDL creates idx_ccr_expiry_deadline and drops idx_ccr_expiry.\n- compression_store: CCR payload previews are off by default (#3728).\n- Core dependencies vs 0.37.0 differ only in the litellm floor. The [mcp] extra is unchanged: mcp>=1.28.1,<2.0.0, httpx, starlette, uvicorn.\n- New console script: headroom-cache-ttl.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Advisories",
+   "arm": "upstream",
+   "command": "gh api repos/headroomlabs-ai/headroom/security-advisories; gh api '/advisories?ecosystem=pip&affects=headroom-ai'; POST https://api.osv.dev/v1/query {headroom-ai, PyPI} (no version, 0.39.0, 0.37.0); PyPI JSON vulnerabilities",
+   "exit": 0,
+   "output_excerpt": "The repository has one advisory, GHSA-h46j-26q3-rggf (CVE-2026-71416, high), patched in 0.35.0. The global advisory database returns 0. OSV returns {} for all three queries. PyPI lists vulnerabilities [] for both 0.39.0 and 0.37.0.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Artifact attestation lookup (informational, not an acceptance criterion)",
+   "arm": "upstream",
+   "command": "gh api repos/headroomlabs-ai/headroom/attestations/sha256:8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74",
+   "exit": 1,
+   "output_excerpt": "{\"message\":\"Not Found\",...,\"status\":\"404\"} gh: Not Found (HTTP 404). The PyPI simple API provenance is None.",
+   "pass": false,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Upstream CI on the release commit (observed, not reproduced)",
+   "arm": "upstream",
+   "command": "gh api --paginate repos/headroomlabs-ai/headroom/commits/66f426171bab32692cf93d2b656a8e4be9004186/check-runs; gh run view --job 108227856831 --log-failed",
+   "exit": 0,
+   "output_excerpt": "137 success, 8 skipped, 1 failure. The failure is notify-release: '##[error]SLACK_RELEASES_WEBHOOK_URL is not configured'. These all succeeded: test (1)-(4), test-extras, lint, build-wheels (5 targets), smoke-import-wheels, python-314-wheels and publish-pypi. test (ubuntu) and simulator e2e were skipped.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Issues after the release",
+   "arm": "upstream",
+   "command": "gh search issues --repo headroomlabs-ai/headroom '0.39.0'; gh issue list --search 'created:>=2026-09-25T19:00:00Z'; gh issue view 3736",
+   "exit": 0,
+   "output_excerpt": "#3752 is closed (LiteLLM image blocks, fixed by #3753 in 0.39.0). #3798 is OPEN (Vertex us multi-region upstream hostname; proxy path only). #3736 is CLOSED 2026-09-24T15:48:07Z. No issue reports a 0.39.0 regression on the MCP, CCR or savings path.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Download and sha256 before install",
+   "arm": "candidate",
+   "command": "curl -fsSL -o <W>/artifact/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl https://files.pythonhosted.org/packages/a5/a7/0a005ed79752f9230ad749180f8347c76f2e5cf0fb9f53a226ac55ae1c64/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl && echo '8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74  headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl' | sha256sum -c",
+   "exit": 0,
+   "output_excerpt": "headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl: OK (14199952 bytes)",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Wheel contents match the tag",
+   "arm": "candidate",
+   "command": "extract the wheel; cat WHEEL, METADATA and entry_points.txt; compare git hash-object of 16 key modules with git rev-parse v0.39.0:<path>; sha256sum headroom/_core.abi3.so",
+   "exit": 0,
+   "output_excerpt": "Tag: cp310-abi3-manylinux_2_28_x86_64; Version: 0.39.0; console_scripts headroom and headroom-cache-ttl. 'wheel files matching v0.39.0 tag blobs: 16/16'. _core.abi3.so is b804d9cc0d01e648fc25167da496b2a45966f8048d5d13e778003b52a4ec2534 and contains no rustls or webpki strings.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Install into the new prefix",
+   "arm": "candidate",
+   "command": "test ! -e ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0 && UV_NO_CONFIG=1 UV_PYTHON_DOWNLOADS=never UV_CACHE_DIR=<W>/uv-cache UV_TOOL_DIR=~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/uv-tools UV_TOOL_BIN_DIR=~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin uv tool install --python 3.13 --default-index https://pypi.org/simple --link-mode copy --exclude-newer 2026-09-25T22:00:00Z 'headroom-ai[mcp]==0.39.0'",
+   "exit": 0,
+   "output_excerpt": "'Resolved 73 packages in 498ms' ... 'Installed 2 executables: headroom, headroom-cache-ttl'. uv warned that the prefix bin directory is not on PATH, which is expected. pyvenv.cfg shows version_info = 3.13.15 and uv = 0.12.17.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Version",
+   "arm": "candidate",
+   "command": "<W>/steps/G <W>/ws-0.39.0 ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom --version",
+   "exit": 0,
+   "output_excerpt": "headroom, version 0.39.0",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Bind the whole install to the verified wheel (RECORD)",
+   "arm": "candidate",
+   "command": "python3 -B <W>/steps/record_bind.py <W>/artifact/headroom_ai-0.39.0-cp310-abi3-manylinux_2_28_x86_64.whl ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/uv-tools/headroom-ai/lib/python3.13/site-packages",
+   "exit": 0,
+   "output_excerpt": "headroom/ rows with sha256: 555, mismatches: 0; other rows: 6, mismatches: 0; missing: 0. The same output came back after all acceptance runs, and the prefix has 0 __pycache__ dirs.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Resolved dependency sets, A/B",
+   "arm": "both",
+   "command": "<tool python> -s -B -c 'importlib.metadata ...' for both envs",
+   "exit": 0,
+   "output_excerpt": "Both envs have Python 3.13.15 and the same 73 distribution names: mcp 1.30.0, anyio 4.15.1, litellm 1.102.1, starlette 1.7.0, httpx 0.28.1, tiktoken 0.14.0, pydantic 2.13.5. onnxruntime, torch and transformers are absent. Version differences (0.37.0 env -> 0.39.0 env): boto3 and botocore 1.43.101 -> 1.43.103, huggingface_hub 1.32.0 -> 1.33.0, opentelemetry-api 1.44.0 -> 1.45.0, uvicorn 0.53.0 -> 0.54.0.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Unchanged upstream regression test for #3736 (tests/test_transforms/test_content_detector_timestamp_search.py read at v0.39.0), run with the tool's python",
+   "arm": "candidate",
+   "command": "git show v0.39.0:tests/test_transforms/test_content_detector_timestamp_search.py > <W>/upstream-tests/...; <W>/steps/G <W>/ws-unit-0.39.0 ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/uv-tools/headroom-ai/bin/python -s -B <W>/steps/run_upstream_tests.py <W>/upstream-tests/test_content_detector_timestamp_search.py",
+   "exit": 0,
+   "output_excerpt": "test_file_blob 23b66a27273678b8a3b4236dd6516589cd56a404; headroom-ai 0.39.0 content_detector_blob 45689e84adf600862dab0d3dec4943305b8da499. PASS: test_timestamp_row_is_not_a_search_result_line, test_timestamped_log_does_not_route_to_search, test_space_separated_timestamp_log_does_not_route_to_search, test_genuine_grep_output_still_routes_to_search, test_grep_on_timestamped_file_names_still_routes_to_search, test_extensionless_paths_still_match. passed=6 failed=0",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Same upstream regression test, baseline",
+   "arm": "baseline",
+   "command": "<W>/steps/G <W>/ws-unit-0.37.0 ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/python -s -B <W>/steps/run_upstream_tests.py <W>/upstream-tests/test_content_detector_timestamp_search.py",
+   "exit": 1,
+   "output_excerpt": "headroom-ai 0.37.0 content_detector_blob bb8325e429b9d6b700aecf556c6dfe263e692253. FAIL: test_timestamp_row_is_not_a_search_result_line (AssertionError) and test_timestamped_log_does_not_route_to_search (AssertionError); the other 4 PASS. passed=4 failed=2. This is expected: 0.37.0 also classifies ISO rows as search, but its lossless fold hid that.",
+   "pass": false,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "Stack MCP usage over stdio (headroom mcp serve --proxy-url http://127.0.0.1:1). Calls: list_tools; compress+retrieve fixture A (the receipt's 600-line ISO log with planted line 313); compress+retrieve fixture B (mcp-tool-listing.json); unknown hash; stats",
+   "arm": "candidate",
+   "command": "timeout 900 <W>/steps/G <W>/ws-0.39.0 ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/uv-tools/headroom-ai/bin/python -s -B <W>/steps/mcp_session.py session ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom <W>/ws-0.39.0 blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json <W>/out/0.39.0",
+   "exit": 0,
+   "output_excerpt": "tools ['headroom_compress','headroom_retrieve','headroom_stats'].\n\nFixture A: hash de0bd74888ea1c452c3db505 equals sha256[:24]. 16820 -> 257 tokens, transforms ['router:log:0.02'], retrieve byte-exact True. The compressed text is 7 rows, all verbatim fixture rows; 7 timestamp matches, none altered; planted line 313 verbatim True; nsr-anomaly-7f3a present True. It then prints '[593 lines omitted: 1 ERROR]' and '[600 lines compressed to 7. Retrieve more: hash=f681f64d7ad6f5b3c5fc56c7]'.\n\nFixture B: hash 2b17eb36da607cc8d2f6f0e2, 39064 -> 3292 tokens, ['router:mixed:0.09'], byte-exact True.\n\nUnknown hash: 'Content not found. It may have expired or the hash may be incorrect.' Stats compressions 2. Server stderr: 'WARNING: Native content detection requires ONNX Runtime 1.24+; using pure-Python detection for this process.'\n\nAll 13 of the refuter's step-2 criteria are true, including no router:search transform, timestamps verbatim and the anomaly retained.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/0.39.0/result-session.json"
+  },
+  {
+   "name": "Same stack MCP session, baseline",
+   "arm": "baseline",
+   "command": "timeout 900 <W>/steps/G <W>/ws-0.37.0 ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/python -s -B <W>/steps/mcp_session.py session ~/.local/share/codex-ecosystem/bin/headroom <W>/ws-0.37.0 <fixture B> <W>/out/0.37.0",
+   "exit": 0,
+   "output_excerpt": "Same tools.\n\nFixture A: same hash, 16820 -> 11429 tokens, ['router:search:0.68'], byte-exact True. The compressed text is the heading '2026-09-25T10' followed by 600 folded rows. Rebuilding heading+':'+row gives A byte-exact (True), so the fold is lossless. nsr-anomaly present.\n\nFixture B: 39064 -> 3292 tokens, ['router:mixed:0.09'], compressed-output sha256 52b387c8... is identical to 0.39.0's, byte-exact.\n\nUnknown hash: 'Content not found...'. Stats compressions 2. Same pure-Python detection warning.\n\nAgainst the refuter's criteria, all are true except A_no_router_search, which is false.",
+   "pass": false,
+   "observed_by": "implementer",
+   "output_file": "out/0.37.0/result-session.json"
+  },
+  {
+   "name": "Savings ledger",
+   "arm": "candidate",
+   "command": "<W>/steps/G <W>/ws-0.39.0 ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom savings --json; compare with <W>/ws-0.39.0/savings_events.jsonl",
+   "exit": 0,
+   "output_excerpt": "schema_version 2. lifetime: basis 'list', calls 2, cost_effective_usd present, new_input_tokens 0, tokens_before 55884, tokens_saved 52335. The ledger has 2 lines with v=2 and saved [16563, 35772]; keys are after, before, client, cost_usd, model, pid, saved, source, ts, v. Checks: tokens_saved == sum(saved) True; calls == lines True; one line per compressed fixture True. lifetime.tokens_saved is an int and path is a str, the fields tools/token-report reads.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/0.39.0/savings.json"
+  },
+  {
+   "name": "Savings ledger, baseline",
+   "arm": "baseline",
+   "command": "<W>/steps/G <W>/ws-0.37.0 ~/.local/share/codex-ecosystem/bin/headroom savings --json",
+   "exit": 0,
+   "output_excerpt": "schema_version 1. lifetime: calls 2, tokens_before 55884, tokens_saved 41163; no basis or cost_effective_usd fields. The ledger has 2 lines with v=1 and saved [5391, 35772]. The same consistency checks are True.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/0.37.0/savings.json"
+  },
+  {
+   "name": "CCR state before any cross-version open (read-only sqlite, mode=ro&immutable=1)",
+   "arm": "both",
+   "command": "python3 -B sqlite3.connect('file:<ws>/ccr_store.db?mode=ro&immutable=1'): select name from sqlite_master where type='index' and tbl_name='ccr_entries'; stat -c %a <ws>/ccr_store.db",
+   "exit": 0,
+   "output_excerpt": "ws-0.39.0: mode 600, WAL, indexes [idx_ccr_expiry_deadline, sqlite_autoindex_ccr_entries_1], 4 rows including f681f64d7ad6f5b3c5fc56c7. ws-0.37.0: mode 600, indexes [idx_ccr_expiry, sqlite_autoindex_ccr_entries_1], 3 rows. Both have columns hash, entry_json, created_at, ttl.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "The summary's 'Retrieve more' marker resolves through MCP (same version)",
+   "arm": "candidate",
+   "command": "<W>/steps/G <W>/ws-0.39.0 <0.39.0 python> -s -B <W>/steps/mcp_retrieve.py <0.39.0 headroom> <W>/ws-0.39.0 <fixture B> <W>/out/step4 same-version-0.39.0",
+   "exit": 0,
+   "output_excerpt": "A de0bd74888ea1c452c3db505 exact True. A_marker f681f64d7ad6f5b3c5fc56c7 exact True; this equals md5(A)[:24], which the log compressor stored. B 2b17eb36da607cc8d2f6f0e2 exact True.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (out/step4/)"
+  },
+  {
+   "name": "Rollback probe: pinned 0.37.0 serves the 0.39.0 workspace, run at 22:47:05Z, about 6 min after the 0.39.0 compress calls (within the 3600 s TTL)",
+   "arm": "baseline on candidate state",
+   "command": "<W>/steps/G <W>/ws-0.39.0 ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/python -s -B <W>/steps/mcp_retrieve.py ~/.local/share/codex-ecosystem/bin/headroom <W>/ws-0.39.0 <fixture B> <W>/out/step4 rollback-0.37.0-on-ws-0.39.0; then 0.37.0 savings --json on ws-0.39.0",
+   "exit": 0,
+   "output_excerpt": "B 2b17eb36da607cc8d2f6f0e2 exact True; A exact True; A_marker exact True. Afterwards ws-0.39.0 has indexes [idx_ccr_expiry, idx_ccr_expiry_deadline, sqlite_autoindex_ccr_entries_1] and mode 600. 0.37.0 reads the v2 ledger: schema_version 1, calls 2, tokens_saved 52335.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (out/step4/)"
+  },
+  {
+   "name": "Forward (promotion-direction) probe: 0.39.0 serves the 0.37.0 workspace",
+   "arm": "candidate on baseline state",
+   "command": "<W>/steps/G <W>/ws-0.37.0 <0.39.0 python> -s -B <W>/steps/mcp_retrieve.py <0.39.0 headroom> <W>/ws-0.37.0 <fixture B> <W>/out/step4 forward-0.39.0-on-ws-0.37.0; then 0.39.0 savings --json on ws-0.37.0",
+   "exit": 0,
+   "output_excerpt": "A exact True; B exact True. A_marker returns 'Content not found...', as expected because 0.37.0 wrote no marker. Afterwards ws-0.37.0 has indexes [idx_ccr_expiry_deadline, sqlite_autoindex_ccr_entries_1] and mode 600. 0.39.0 reads the v1 ledger: schema_version 2, calls 2, tokens_saved 41163, basis list.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (out/step4/)"
+  },
+  {
+   "name": "Beacon status",
+   "arm": "candidate",
+   "command": "<W>/steps/G <W>/ws-0.39.0 ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom telemetry --json",
+   "exit": 0,
+   "output_excerpt": "{'beacon_enabled': False, 'schema_version': 2, 'install_id': None}",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/0.39.0/telemetry.json"
+  },
+  {
+   "name": "Beacon status, baseline (0.37.0 has no telemetry command; a non-zero exit is expected)",
+   "arm": "baseline",
+   "command": "<W>/steps/G <W>/ws-0.37.0 ~/.local/share/codex-ecosystem/bin/headroom telemetry --json",
+   "exit": 2,
+   "output_excerpt": "Usage: headroom [OPTIONS] COMMAND [ARGS]... Try 'headroom --help' for help.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (out/0.37.0/telemetry.out)"
+  },
+  {
+   "name": "Isolation of the live ~/.headroom and the workspaces",
+   "arm": "both",
+   "command": "<W>/proof/snapshot.sh at 22:36:02Z (before the install), 22:48:15Z and 22:54:47Z; stat -c '%n %s %Y' ~/.headroom/{ccr_store.db,ccr_store.db-wal,ccr_store.db-shm,savings_events.jsonl,session_stats.jsonl,update_check.json,config/install_id}; find ~/.headroom; test -e <ws>/config/install_id and <ws>/update_check.json",
+   "exit": 0,
+   "output_excerpt": "The 7-file stat is IDENTICAL: 5 files exist, and -wal/-shm were absent every time. The full ~/.headroom tree is IDENTICAL (7 entries). install_id and update_check.json are absent in ws-0.39.0, ws-0.37.0, ws-unit-0.39.0 and ws-unit-0.37.0.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (proof/)"
+  },
+  {
+   "name": "Production untouched",
+   "arm": "both",
+   "command": "The same snapshots cover: find on the pinned prefix (size, mtime, mode); find on bin and on tools; the uv python dir; systemctl --user show -p InvocationID for each running service; ps for headroom processes. Also git status of the worktree and a listing of /tmp/data-gym-cache.",
+   "exit": 0,
+   "output_excerpt": "IDENTICAL pinned_prefix.tsv: 13247 entries, sha256/16 f7d953151d9a506e. IDENTICAL bin.tsv: 63 entries; bin/headroom still points to ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/headroom. IDENTICAL uv_pythons.tsv. IDENTICAL user_services.tsv: 12 running units with the same InvocationIDs. tools/ gained headroom-ai-0.39.0 (this unit) and ai-memory-2.4.1 (another unit). The only headroom process afterwards is a pre-existing 0.37.0 'mcp serve' that another Claude session started around 21:15Z. The worktree has 0 status lines. The tiktoken cache is unchanged.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (proof/)"
+  },
+  {
+   "name": "Post-cleanup standalone check",
+   "arm": "candidate",
+   "command": "rm -rf -- <W>/uv-cache <W>/artifact/wheel-x; <W>/steps/G <W>/ws-unit-0.39.0 ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom --version",
+   "exit": 0,
+   "output_excerpt": "removed uv-cache and wheel-x\nheadroom, version 0.39.0",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/run-outputs.json (logs/)"
+  },
+  {
+   "name": "source check of the omission notice and the Rust detector (writing worker)",
+   "arm": "upstream",
+   "command": "gh api repos/headroomlabs-ai/headroom/contents/headroom/transforms/log_compressor.py?ref=v0.39.0 (and ?ref=v0.38.0, v0.37.0); contents crates/headroom-core/src/transforms/log_compressor.rs and content_detector.rs at v0.39.0 and v0.37.0; gh pr view 3635",
+   "exit": 0,
+   "output_excerpt": "2026-09-26T00:28Z. log_compressor.py (blob 0fc79887, identical at v0.37.0, v0.38.0 and v0.39.0) _format_output lines 461-487 counts ERROR/FAIL/WARN/INFO over all_lines (465-468) and prints them after '[{omitted} lines omitted: ...]' (486). The Rust format_output (log_compressor.rs 1396-1433 at v0.39.0; 1257-1294 at v0.37.0) does the same. #3635 (merged 2026-09-24T16:01:40Z) changed only log_compressor.rs, adding summarize_omitted (excludes kept lines) for the CCR marker; it did not change format_output. content_detector.rs at v0.39.0: try_detect_search (409) filters only through prefix_looks_like_path (102), which rejects '<', '>' and '=' and has no timestamp-row guard; the Python detector imports _TIMESTAMP_ROW_RE.",
+   "pass": true,
+   "observed_by": "writing_worker"
+  },
+  {
+   "name": "read-back (production not switched)",
+   "arm": "production",
+   "command": "readlink bin/headroom; test -e the 0.39.0 prefix",
+   "exit": 0,
+   "output_excerpt": "bin/headroom -> python-tools/headroom-ai/bin/headroom (0.37.0); tools/headroom-ai-0.39.0/bin/headroom present, not switched.",
+   "pass": true,
+   "observed_by": "writing_worker",
+   "output_file": "out/readback.out"
+  }
+ ],
+ "differences": [
+  "**Fixture A summary: this is the decision point.**\n- 0.37.0 produced a lossless grep-heading fold: ['router:search:0.68'], 16820 -> 11429 tokens. The heading '2026-09-25T10' plus 600 rows rebuild A byte-exact.\n- 0.39.0 routes the same log as a log: ['router:log:0.02'], 16820 -> 257 tokens.\n- 0.39.0 shows 7 verbatim rows: the CRITICAL line 313 with 3 rows either side. It adds '[593 lines omitted: 1 ERROR]' and a 'Retrieve more: hash=f681f64d7ad6f5b3c5fc56c7' marker.\n- The summary is faithful: no timestamps or fields are rewritten and the anomaly is kept. The #3736 misbehaviour (router:search, a 5-row sample, '10:0:00Z') is absent.\n- The summary text itself is no longer lossless, while recovery stays lossless: the MCP hash and the in-text marker both return A byte-exact.\n- This is upstream's intended post-#3419/#3748 behaviour. PR #3748: 'The payload now routes as a log ... the original stays retrievable through the hash.'\n- If 'lossless as 0.37.0' is meant to cover the summary text itself, 0.39.0 does not meet it. A consumer reading every row from the summary must now call headroom_retrieve.",
+  "Fixture B: 0.39.0 produces byte-identical compressed output (sha256 52b387c8...), the same token counts (39064 -> 3292) and the same route (['router:mixed:0.09']) as 0.37.0.",
+  "**Savings ledger.**\n- The schema goes from 1 to 2. lifetime and the buckets add basis 'list', cost_effective_usd, new_input_tokens and new_input_savings_percent.\n- Event lines are v=2 with the same key set as v1.\n- Each version reads the other's ledger with the same totals.\n- The two arms' totals differ (52335 vs 41163 saved) only because fixture A compresses differently.",
+  "**CCR SQLite.**\n- On open, 0.39.0 creates idx_ccr_expiry_deadline and drops idx_ccr_expiry. On open, 0.37.0 recreates idx_ccr_expiry and leaves idx_ccr_expiry_deadline in place.\n- Each version retrieved the other's entries byte-exact.\n- 0.39.0 creates ccr_store.db as 0600 before sqlite opens it (#3215). Both arms observed mode 600.",
+  "New CLI surface: `headroom telemetry` exists in 0.39.0; in 0.37.0 it exits 2. A headroom-cache-ttl console script is now installed; it lives only in the new prefix's bin.",
+  "**The fix covers only the pure-Python detector.**\n- Both arms logged 'Native content detection requires ONNX Runtime 1.24+; using pure-Python detection', so the fixed pure-Python detector is what runs on this host.\n- At v0.39.0 the Rust regex search detector (crates/headroom-core content_detector.rs try_detect_search) has no timestamp-row guard; prefix_looks_like_path rejects only '<', '>' and '='.\n- PR #3748 states the Rust side was left untouched. #3736 may therefore recur where onnxruntime>=1.24 is importable in the tool env, or with HEADROOM_DETECT_BACKEND=rust. That case was not executed.",
+  "The '[N lines omitted: ...]' level counts come from all input lines, not only the omitted ones (log_compressor.rs format_output uses all_lines). '593 lines omitted: 1 ERROR' therefore counts the kept CRITICAL line, which can read as if an error was dropped. The format already existed at v0.37.0; this reading is from source only.",
+  "Resolved dependencies are otherwise identical. The differences (0.37.0 env -> 0.39.0 env) are boto3 and botocore 1.43.101 -> 1.43.103, huggingface_hub 1.32.0 -> 1.33.0, opentelemetry-api 1.44.0 -> 1.45.0 and uvicorn 0.53.0 -> 0.54.0. mcp, anyio, litellm, starlette, httpx and tiktoken are equal.",
+  "**Security.**\n- 0.39.0 adds #3215 (credential and CCR files private at creation), #3728 (CCR payload previews off by default), #3724 (binary downloads fail closed without a sha256 pin), and the proxy-only #3316 and #3731.\n- No advisory affects 0.37.0 or 0.39.0.\n- The beacon is still on by default in 0.39.0 (BEACON_DEFAULT_ON = True). The recipe still needs the opt-out variables, whichever version is used.",
+  "Upstream CI: the only failing check on the release commit is notify-release, which failed because a Slack webhook secret is missing. No test failed."
+ ],
+ "production_untouched_during_qualification": "I compared read-only fingerprints taken at 2026-09-25T22:36:02Z (before the install) with ones taken at 22:48:15Z and again at 22:54:47Z. They were identical for:\n- The live headroom workspace. The refuter's 7-file `stat -c '%n %s %Y'` of ~/.headroom matched: 5 files exist, and ccr_store.db-wal/-shm were absent every time. The full ~/.headroom tree (7 entries: type, size, mtime, mode) also matched.\n- The pinned 0.37.0 env ~/.local/share/codex-ecosystem/python-tools/headroom-ai: 13247 entries matched on size, mtime and mode. PYTHONDONTWRITEBYTECODE=1 kept __pycache__ out of it.\n- The shared bin dir: 63 entries. bin/headroom still points to python-tools/headroom-ai/bin/headroom.\n- The uv-managed Python directory: no download happened.\n- The 12 running systemd --user services: their InvocationIDs are unchanged, so nothing was restarted or stopped.\n\nOther checks:\n- The only addition under ~/.local/share/codex-ecosystem/tools/ from this unit is headroom-ai-0.39.0. ai-memory-2.4.1 appeared from another unit.\n- No MCP client config, hook, systemd unit or drop-in, ~/.claude/* or ~/.codex/* file was written.\n- No request went to the embedding or generation servers, Qdrant, ai-memory or dagu.\n- The worktree git status stayed empty, and the tiktoken cache /tmp/data-gym-cache is unchanged.\n- The only headroom process after the run is a pre-existing 0.37.0 `headroom mcp serve` whose parent is another Claude session. It was left untouched and did not change ~/.headroom during the window.\n- Every headroom run used a scratch HEADROOM_WORKSPACE_DIR. Neither workspace gained config/install_id or update_check.json.",
+ "switch": {
+  "method": "Not switched: the coordinator retains 0.37.0 (see decision_reasons).",
+  "planned_procedure": "Not executed; switching needs the coordinator's decision. The main open question is the fixture-A summary change: a lossless fold in 0.37.0 becomes a faithful lossy log summary with a retrievable marker in 0.39.0.\n\n1. Re-verify the prefix: `<W>/steps/G <scratch ws> ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom --version` should print 'headroom, version 0.39.0', and record_bind.py should show 0 mismatches.\n2. Repoint the shared shim atomically, following the tools/<name>-<ver>/bin convention used for markitdown and mcporter:\n   `ln -s ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0/bin/headroom ~/.local/share/codex-ecosystem/bin/headroom.new && mv -T ~/.local/share/codex-ecosystem/bin/headroom.new ~/.local/share/codex-ecosystem/bin/headroom`\n   Do not expose headroom-cache-ttl unless wanted. MCP servers that are already running, such as another session's 0.37.0 server, keep 0.37.0 until their client restarts them. Restart nothing on other sessions' behalf.\n3. Add a beacon opt-out to the recipe and registration env (HEADROOM_OFFLINE=1 or HEADROOM_BEACON=off and DO_NOT_TRACK=1). 0.39.0 still defaults the beacon on.\n4. Expect the first 0.39.0 open of ~/.headroom/ccr_store.db to create idx_ccr_expiry_deadline, drop idx_ccr_expiry and fchmod the file to 0600. New ledger lines will be v=2.\n5. Re-run steps/mcp_session.py through the switched shim against a scratch HEADROOM_WORKSPACE_DIR.\n6. Update the pins per the refuter's list: manifests/stack.json (version and v0.39.0 release URL), recipes/README.md, adoption/lifecycle.md, docs/token-practice.md, tools/token-report/token_manifest.py boundary strings, tools/token-report/README.md, docs/token-efficiency-stack.json, docs/token-session-handbook.md, and the catalogs/landscape winner pin. Document the fixture-A summary change. Run the repository validation before committing.",
+  "rollback": "**Before a switch.** Nothing needs rolling back: production still runs 0.37.0. To discard the trial prefix, run `uv tool uninstall headroom-ai` with UV_TOOL_DIR and UV_TOOL_BIN_DIR set to the prefix's uv-tools and bin, then delete the literal directory ~/.local/share/codex-ecosystem/tools/headroom-ai-0.39.0.\n\n**After a switch.**\n1. Repoint ~/.local/share/codex-ecosystem/bin/headroom back to ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/headroom, atomically as ln -s to .new followed by mv -T. The 0.37.0 env is intact: its 13247-entry fingerprint is unchanged.\n2. Let MCP clients respawn their servers.\n\n**State compatibility.** This was measured on scratch stores, not on the real ~/.headroom store:\n- The 0.37.0 server retrieved fixtures A and B, and the 0.39.0 marker entry, byte-exact from a store 0.39.0 wrote.\n- On open, 0.37.0 recreated idx_ccr_expiry. The leftover idx_ccr_expiry_deadline did no harm.\n- 0.37.0 `savings --json` read the v2 ledger with the same totals: calls 2, tokens_saved 52335.\n\nThe 0.37.0 wheel sha256 is 2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46, per PyPI JSON, in case the env ever has to be rebuilt."
+ },
+ "decision_reasons": [
+  "Omission notice counts the wrong lines: at v0.39.0 both the Python shim (headroom/transforms/log_compressor.py:461-487, _format_output) and the Rust format_output (crates/headroom-core/src/transforms/log_compressor.rs:1396-1433) count ERROR/FAIL/WARN/INFO over all input lines and print them as '[{omitted} lines omitted: ...]'. On fixture A, 0.39.0 printed '[593 lines omitted: 1 ERROR]' although the only error-level row, the CRITICAL line 313, is among the 7 kept rows (out/0.39.0/compressed-A.txt). The same counting is present at v0.37.0; it reaches the stack's timestamped-log path only from 0.39.0, because #3748 now routes such logs to the log compressor instead of the lossless search fold.",
+  "The Rust content detector still lacks the #3736 timestamp guard (content_detector.rs try_detect_search, prefix_looks_like_path); #3736 can recur where onnxruntime>=1.24 or ORT_DYLIB_PATH enables the native path.",
+  "#299 pins headroom 0.37.0 in the Linux bootstrap, and the token-efficiency lane's end-to-end counters (#296) run at 0.37.0."
+ ],
+ "overturn_when": "Upstream counts the levels over the omitted lines only (and the Rust detector gains the timestamp guard), or a measured answer-quality comparison on log inputs shows net value for 0.39.0's log routing.",
+ "beacon": "BEACON_DEFAULT_ON = True in both 0.37.0 and 0.39.0 (telemetry/beacon.py); the opt-out (HEADROOM_OFFLINE=1, DO_NOT_TRACK=1) is owned by the token-efficiency lane and landed in #303 (Codex template) and #304 (recipe).",
+ "verifier": {
+  "verdict": "agree",
+  "production_touched": false,
+  "defects": [
+   {
+    "claim": "production_untouched_proof asserts that no MCP client config, hook, systemd unit or drop-in, ~/.claude/* or ~/.codex/* file was written. The implementer's snapshots never fingerprinted those files, and two of them were in fact written inside its window (22:36:02Z to 22:54:47Z).",
+    "evidence": "~/.claude/settings.json mtime is 22:51:48Z, with a backup ~/.claude/settings.json.bak.20260925T225148Z. A structural diff shows 26 added skillOverrides keys and 0 hook, MCP or headroom changes. ~/.codex/config.toml mtime is 22:51:55Z, and ~/.codex/tmp/arg0 was created in the same second, so a codex process started then. The implementer's file timeline shows no headroom command between 22:47:55Z and 22:54:40Z. The [mcp_servers.headroom] entry in the Codex config points at the 0.37.0 shim; it is absent from the 2026-09-24 backup and matches branch claude/codex-mcp-scope-pinned-versions-20260925 commit 2ad4e4c9 (21:09Z, 'Codex MCP servers at user scope'). Attribution therefore goes to other sessions, but the proof should say 'not written by this unit' and record these concurrent changes. It should not assert that nothing was written.",
+    "severity": "minor"
+   },
+   {
+    "claim": "The limitation and unverified text says #3736 may recur 'where onnxruntime>=1.24 is importable in the tool env, or with HEADROOM_DETECT_BACKEND=rust'. The second condition is imprecise.",
+    "evidence": "In the installed v0.39.0 headroom/transforms/content_router.py, _resolve_detect_backend() already returns 'rust' by default on Linux. _detect_content() still gates the native path on headroom._ort.rust_ort_runtime_compatible(), which returns True only with onnxruntime>=1.24 installed or a caller-supplied ORT_DYLIB_PATH override. Otherwise it logs the observed 'Native content detection requires ONNX Runtime 1.24+' warning and uses the pure-Python detector. The real triggers are onnxruntime>=1.24 in the env (for example via the [proxy] extra) or ORT_DYLIB_PATH, not HEADROOM_DETECT_BACKEND=rust.",
+    "severity": "minor"
+   },
+   {
+    "claim": "The switch procedure and unverified list do not record that headroom is now a persistent user-scope MCP registration. Repointing bin/headroom would therefore move every future Claude and Codex session on this host to 0.39.0 with the beacon on by default, unless both registrations gain the opt-out.",
+    "evidence": "~/.codex/config.toml lines 104-106 are [mcp_servers.headroom] with command '~/.local/share/codex-ecosystem/bin/headroom' and args ['mcp','serve','--proxy-url','http://127.0.0.1:1']. It has no env block, so no beacon opt-out. ~/.claude.json has 2 headroom mentions (count only; not read). BEACON_DEFAULT_ON = True is in telemetry/beacon.py of both the pinned 0.37.0 and the 0.39.0 env, and ~/.headroom/config/install_id exists (mtime 20:51:59Z). The opt-out gap is pre-existing in production and not introduced by 0.39.0. Switch step 3 remedies it but should name both registrations.",
+    "severity": "minor"
+   },
+   {
+    "claim": "The fixture A source is cited as evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--headroom--use--20260925.json without a revision. That file is not present at the checked-out worktree HEAD.",
+    "evidence": "At HEAD 720e294b only ...--headroom--install--20260925.json exists. The use receipt is in 6752ede5 (#262) and some other branches. `git show 6752ede5:<path>` commands[1].cmd contains a generator byte-identical to steps/mcp_session.py, with 0.37.0 reference 16820 -> 11429 ['router:search:0.68']. The receipt should cite 6752ede5.",
+    "severity": "minor"
+   }
+  ],
+  "reproduced": [
+   "Upstream integrity, fetched independently at 23:04:03Z. The sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74 (14199952 bytes) is equal on the PyPI JSON API, the PyPI simple API (PEP 691; provenance None) and the GitHub release v0.39.0 asset digest. Tag v0.39.0 is commit 66f426171bab32692cf93d2b656a8e4be9004186 (lightweight). compare d971f7c3...v0.39.0 is ahead_by 86, behind_by 0; for v0.38.0 it is behind_by 30. PyPI vulnerabilities [] and OSV {} for both 0.39.0 and 0.37.0. CI on 66f42617: 137 success, 8 skipped, 1 failure (notify-release).",
+   "Fresh wheel download from files.pythonhosted.org: `sha256sum -c` printed OK, and the file is byte-identical to the implementer's artifact. Wheel metadata: Version 0.39.0, tag cp310-abi3-manylinux_2_28_x86_64, console scripts headroom and headroom-cache-ttl. Wheel _core.abi3.so sha256 is b804d9cc0d01e648fc25167da496b2a45966f8048d5d13e778003b52a4ec2534.",
+   "Prefix integrity, checked with my own RECORD binder (verify/steps/vbind.py). The 562-row wheel RECORD is self-consistent. 555/555 headroom/ rows and 6/6 other rows match, 0 missing, BIND OK. The only unlisted installed files are dist-info INSTALLER and REQUESTED. There are 0 __pycache__ dirs, and installed _core.abi3.so is b804d9cc.... Seven installed modules equal the v0.39.0 tag blobs from the GitHub contents API: content_detector 45689e84, mcp_server f013e092, savings_ledger 44cd336a, content_router 65ec0b37, cache/backends/sqlite 764b138e, telemetry/beacon 72556e76, _ort 8f10cd7b. The uv-receipt pins headroom-ai[mcp]==0.39.0 with exclude-newer 2026-09-25T22:00:00Z and link-mode copy. pyvenv shows CPython 3.13.15 and uv 0.12.17. The env has 73 distributions and no onnxruntime or torch. _virtualenv.pth and _virtualenv.py are identical to the pinned env's. The prefix was absent from the implementer's 22:36:02Z tools listing.",
+   "Dependency A/B (logs/dists.txt, plus a live importlib.metadata read of the candidate): both envs have the same 73 names. The only differences are boto3 and botocore 1.43.101->1.43.103, huggingface_hub 1.32.0->1.33.0, opentelemetry-api 1.44.0->1.45.0 and uvicorn 0.53.0->0.54.0. mcp is 1.30.0, anyio 4.15.1 and litellm 1.102.1 in both.",
+   "Candidate `headroom --version` under a guard env identical to steps/G printed 'headroom, version 0.39.0' (exit 0).",
+   "Unchanged upstream regression test, fetched independently at v0.39.0 (blob 23b66a27, the same blob as at d971f7c3), run with my own runner. Candidate: 6/6 PASS (detector blob 45689e84, exit 0). Pinned 0.37.0: 4/6, with FAIL on test_timestamp_row_is_not_a_search_result_line and test_timestamped_log_does_not_route_to_search (detector blob bb8325e4, exit 1). The refuter's stdlib shim of the v0.38.0 detector (tag blob 55a85501) gives the same 2 FAIL, and the d971f7c3 shim gives 6/6.",
+   "Candidate MCP stdio session with my own client on a fresh scratch workspace (23:05Z, 47.2 s). Tools are exactly headroom_compress, headroom_retrieve and headroom_stats. Fixture A: 16820 -> 257 with ['router:log:0.02']. Its compressed text sha256 d09c822e... is identical to the implementer's, and it shows 7 verbatim rows including line 313 and nsr-anomaly-7f3a, with 0 rewritten timestamps. Hash de0bd74888ea1c452c3db505 = sha256[:24] and retrieval is byte-exact. The in-text marker f681f64d7ad6f5b3c5fc56c7, parsed from the output, equals md5(A)[:24] and resolves to A byte-exact. Fixture B: 39064 -> 3292 with ['router:mixed:0.09'], compressed sha256 52b387c8... (identical), hash 2b17eb36da607cc8d2f6f0e2, byte-exact. The unknown hash returns 'Content not found...' and stats report compressions 2. All 14 criteria are true.",
+   "Baseline 0.37.0 MCP session with my own client on a fresh workspace. A: 16820 -> 11429 with ['router:search:0.68'], compressed sha256 8d01d806... (identical); heading '2026-09-25T10' plus 600 rows rebuild A byte-exact. B is identical to the candidate. Only A_no_router_search fails, so the acceptance separates the two arms.",
+   "Candidate `savings --json`: schema_version 2, calls 2, tokens_before 55884, tokens_saved 52335 = 16563 + 35772, basis 'list', cost_effective_usd present. The ledger has 2 v=2 lines with the same 10 keys (after, before, client, cost_usd, model, pid, saved, source, ts, v); the sum, count and ts/saved checks are True. `telemetry --json`: beacon_enabled false, schema_version 2, install_id null. The CCR store is mode 600 with indexes [idx_ccr_expiry_deadline, sqlite_autoindex_ccr_entries_1] and 4 rows. The workspace has no config/install_id and no update_check.json.",
+   "Rollback probe at 23:09:28Z, within the TTL: the pinned 0.37.0 served my 0.39.0 workspace, and A, B and the marker hash came back byte-exact. Afterwards the indexes are [idx_ccr_expiry, idx_ccr_expiry_deadline, sqlite_autoindex_ccr_entries_1] and the mode is 600. 0.37.0 `savings --json` reads the v2 ledger as schema 1, calls 2, tokens_saved 52335.",
+   "Forward probe at 23:11:00Z: 0.39.0 served my 0.37.0 workspace, and A and B came back byte-exact. The indexes changed from [idx_ccr_expiry, autoindex] to [idx_ccr_expiry_deadline, autoindex], and the mode stayed 600. 0.39.0 reads the v1 ledger as schema 2, calls 2, tokens_saved 41163, basis list.",
+   "Discrimination. My binder run against the pinned 0.37.0 site-packages with the 0.39.0 wheel prints BIND FAIL (139 mismatches, 23 missing, exit 1). The fixture A timestamp criterion flags a synthetic #3736-style output ('2026-09-25T10:0:00Z', '2026-09-25T10:5:13Z'). A release without d971f7c3 fails the behind_by precondition (v0.38.0: 30), the upstream test (2 FAIL on the v0.38.0 detector) and A_no_router_search.",
+   "Receipt claim cross-check: every value in receipt_draft.claim appears in the implementer's recorded step outputs or files, and I reproduced each one. That covers the tag commit, behind_by 0, the digest agreement, sha256sum OK, 555/555, the version string, test blob 23b66a27 with 6/6 vs 4/6, the tool list, 16820->257 router:log:0.02 vs 16820->11429 router:search:0.68, 7 verbatim rows, 39064->3292 router:mixed:0.09 with the same output, 2b17eb36da607cc8d2f6f0e2, f681f64d7ad6f5b3c5fc56c7, 'Content not found', compressions 2, schema 2 / calls 2 / 52335, beacon false / install_id null, cross-version retrieval and the fingerprinted production items.",
+   "Production untouched. These fingerprints are identical across the implementer's before (22:36:02Z), before2, after and final (22:54:47Z) snapshots and my before (23:01:51Z) and after (about 23:12Z) snapshots: the ~/.headroom 7-file stat (5 present, -wal/-shm absent) and its 7-entry tree; the pinned prefix (13247 entries, sha16 f7d953151d9a506e); shared bin (63 entries; bin/headroom -> ~/.local/share/codex-ecosystem/python-tools/headroom-ai/bin/headroom); uv pythons; and 12 running user services with unchanged InvocationIDs, all ActiveEnterTimestamps before 22:36Z (latest 20:44:37Z). No systemd user unit file is newer than 22:30Z, and no shared-bin entry is newer than 22:36Z. The candidate prefix fingerprint (12378 entries) is unchanged across my runs. tools/ gained only headroom-ai-0.39.0 (this unit) and ai-memory-2.4.1 (another unit). No headroom process of mine or the implementer's remains."
+  ],
+  "notes": "**Verdict: agree.** The implementer's candidate-arm results reproduce exactly on fresh scratch workspaces, using my own client, test runner and binder scripts. Fixture A's compressed output is identical (sha256 d09c822e...), and so is B's (52b387c8...). The integrity chain checks out independently: three agreeing upstream digests, a fresh download that is byte-identical to the implementer's wheel, and 555/555 RECORD rows. The acceptance separates the versions on the known defect #3736: the v0.38.0 detector fails 2 of the upstream tests, behind_by is 30 for v0.38.0, and 0.37.0 fails A_no_router_search. It also fails on a wrong install (139 RECORD mismatches plus 23 missing). All four defects are minor and none affects receipt_draft.claim.\n\n**Observations for the coordinator.**\n- **Omission notice.** The observed 0.39.0 notice '[593 lines omitted: 1 ERROR]' counts the kept CRITICAL line 313, which is the only error-level row in fixture A. The output itself therefore supports the implementer's source-only reading that the notice can suggest a dropped error.\n- **Other sessions' headroom servers.** Other Claude sessions run production 0.37.0 `headroom mcp serve` children from the user-scope registration. PID 869727 predates the window. A second one started at about 23:01Z under another claude/timeout parent and had exited by 23:15Z. ~/.headroom was still unchanged at about 23:12Z.\n- **Beacon default.** Both 0.37.0 and 0.39.0 default the beacon on, and the Codex headroom registration sets no env. A promotion should add HEADROOM_OFFLINE=1 or HEADROOM_BEACON=off plus DO_NOT_TRACK=1 to both the Codex and Claude registrations. This is independent of the version switch.\n- **Native detector not exercised.** It needs onnxruntime>=1.24 or ORT_DYLIB_PATH, and I did not install anything.\n\n**What my verification touched.** It spawned only stdio servers (no listeners) with the same guard environment, wrote only under <scratchpad>/sota-refresh/impl-wave2/headroom/verify/, and made no requests to the embedding, generation, Qdrant, ai-memory or dagu services. Every file-level change seen during my runs outside scratch belongs to other processes: rtk databases, observability data, host-requests state, another actor's uv cache and vLLM usage stats, and ~/.claude.json at unchanged size.\n\n**Where things are.** My working files are in <scratchpad>/sota-refresh/impl-wave2/headroom/verify/ (steps/, logs/, out/, proof/v-before and v-after, upstream/, artifact/, ws-*), where <scratchpad> is this session's scratchpad directory. They are scratch, not evidence, until moved into a sanitized receipt."
+ },
+ "corrections": [
+  {
+   "field": "production_untouched_during_qualification",
+   "original": "No MCP client config, hook, systemd unit or drop-in, ~/.claude/* or ~/.codex/* file was written.",
+   "corrected": "No such file was written by this unit; ~/.claude/settings.json (22:51:48Z, skillOverrides only) and ~/.codex/config.toml (22:51:55Z) were written by other sessions during the window.",
+   "by": "2026-09-26 final round (writing worker, from the verifier's defects)",
+   "reason": "Verifier defect 1; the field keeps the implementer's text."
+  },
+  {
+   "field": "differences[5] and unverified[0]",
+   "original": "#3736 may recur where onnxruntime>=1.24 is importable in the tool env, or with HEADROOM_DETECT_BACKEND=rust",
+   "corrected": "#3736 may recur where onnxruntime>=1.24 is installed in the tool env or ORT_DYLIB_PATH points at a compatible runtime; HEADROOM_DETECT_BACKEND=rust alone still falls back to the pure-Python detector",
+   "by": "2026-09-26 final round (writing worker, from the verifier's defects)",
+   "reason": "Verifier defect 2."
+  },
+  {
+   "field": "differences[6]",
+   "original": "The format already existed at v0.37.0; this reading is from source only.",
+   "corrected": "Source-verified with gh at 2026-09-26T00:28Z: the Python _format_output (log_compressor.py:461-487, same blob at v0.37.0, v0.38.0 and v0.39.0) and the Rust format_output both count over all lines; the fixture A output '[593 lines omitted: 1 ERROR]' shows the effect.",
+   "by": "2026-09-26 final round (writing worker, from the verifier's defects)",
+   "reason": "Writing-worker source check (step 'source check of the omission notice')."
+  }
+ ],
+ "unverified": [
+  "Behaviour of fixture A on the native Rust/Magika detection chain (onnxruntime>=1.24 in the tool env, or HEADROOM_DETECT_BACKEND=rust) was not executed. The v0.39.0 source shows the Rust try_detect_search has no timestamp-row guard, so #3736 could recur on such hosts.",
+  "The in-place migration of the real ~/.headroom/ccr_store.db (1.8 MB) and of its ledger under 0.39.0 was not exercised; only scratch stores were used.",
+  "The broader upstream pytest subset (MCP server, CCR sqlite, savings ledger, beacon schema) was not run locally. CI results on 66f42617 were observed, not reproduced.",
+  "Dependency wheels were not individually hash-verified. uv resolved them from PyPI with exclude-newer 2026-09-25T22:00:00Z.",
+  "The beacon payload content was not audited. The beacon was off in every run. The production MCP registration's environment was not inspected, because that would mean reading another process's environment.",
+  "Reading '[N lines omitted: ...]' as whole-input level counts comes from the log_compressor.rs source only; no fixture with omitted error lines was tested.",
+  "The session wall time was about 47 s on both arms, while each compress call took about 5 s. Where the remaining time goes (startup or shutdown) was not investigated.",
+  "cost_usd and cost_effective_usd values use litellm's bundled price map (LITELLM_LOCAL_MODEL_COST_MAP=True), not the remote map production would fetch.",
+  "The macOS lane and other hosts are not covered, and historical receipts from the other laptop do not certify this host.",
+  "Whether the other Claude session's headroom registration sets any beacon opt-out is unknown."
+ ]
+}

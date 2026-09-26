@@ -78,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -97,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event session-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event session-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       },
@@ -118,7 +118,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-stop --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-stop --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -129,7 +129,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -140,7 +140,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event pre-compact --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event pre-compact --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -151,7 +151,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL}${AI_MEMORY_CAPTURE_ASSISTANT}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL}${AI_MEMORY_CAPTURE_ASSISTANT}"
           }
         ]
       }
@@ -162,7 +162,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event session-end --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event session-end --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       },
@@ -182,7 +182,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }

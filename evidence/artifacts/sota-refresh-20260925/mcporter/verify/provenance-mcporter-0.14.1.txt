@@ -1,0 +1,9 @@
+attestations url https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.1
+predicateType https://github.com/npm/attestation/tree/main/specs/publish/v0.1
+  subject [('pkg:npm/mcporter@0.14.1', {'sha512': 'ffaa6f32314f942b45537361cd6115f2f8f6130bdb6369e2b1cf17603c2d3e2c80a63f2fe80f81d156b9ba5d35f28a92124c3b0622822e86b305ce25fbc42c75'})]
+predicateType https://slsa.dev/provenance/v1
+  subject [('pkg:npm/mcporter@0.14.1', {'sha512': 'ffaa6f32314f942b45537361cd6115f2f8f6130bdb6369e2b1cf17603c2d3e2c80a63f2fe80f81d156b9ba5d35f28a92124c3b0622822e86b305ce25fbc42c75'})]
+  workflow https://github.com/openclaw/mcporter .github/workflows/release.yml refs/tags/v0.14.1
+  resolvedDependencies [('git+https://github.com/openclaw/mcporter@refs/tags/v0.14.1', {'gitCommit': '93e0916cafe2d624b94271e31b75ca681a016514'})]
+  runDetails.builder https://github.com/actions/runner/github-hosted
+  invocationId https://github.com/openclaw/mcporter/actions/runs/36004499308/attempts/1

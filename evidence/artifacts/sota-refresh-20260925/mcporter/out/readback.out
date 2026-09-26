@@ -1,0 +1,8 @@
+# read-only read-back by the writing worker; no production change
+at 2026-09-25T20:54:04Z
+readlink bin/mcporter: ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter
+mcporter --version: 0.14.1
+tools/mcporter-0.13.13/bin/mcporter present (rollback): yes
+installed-versions.txt mcporter record: 0.14.1
+command -v ps (this shell): /usr/bin/ps
+sha256 of tools/mcporter-0.14.1/lib/node_modules/mcporter/package.json: b4c8bb5fe029ec3b35c8e95d0e3ea7a4c7a285890c1fb5e16ca9bae11116625f

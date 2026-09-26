@@ -62,7 +62,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | host_verified, bootstrap 2.8.3 | untested | foundation-cpu, token-efficiency | 5 / 7 |
 |  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.8 | untested | token-efficiency |  |
 |  |  | `poppler` | 26.09.0 | local_integration | host_verified | untested | — |  |
-| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
+| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | host_verified | host_verified | — | 11 / 12 |
 |  |  | `candidate:cli-cli` | unpinned | source_review | not_established, bootstrap 2.101.0 | untested, bootstrap 2.101.0 | — |  |
 |  |  | `difftastic` | 0.71.0 | source_review | host_verified | untested | — |  |
@@ -74,7 +74,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `candidate:openai-skills` | unpinned | local_integration | conditional | untested | — |  |
 | Isolation | retain | `worktrunk` | 0.79.0 | native_proven | host_verified | host_verified | — | 16 / 19 |
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | host_verified | untested | — |  |
-| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.1 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | host_verified | untested | — |  |
 | Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
 |  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
@@ -105,7 +105,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.156.0) | native_proven | accepted | untested | — | 9 / 15 |
-|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
+|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
 |  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted, bootstrap 1.14.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
 | Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | host_verified | untested | trading-nautilus | 8 / 12 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | host_verified | untested | research-runtime |  |

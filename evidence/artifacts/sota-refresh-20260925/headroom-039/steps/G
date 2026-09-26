@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Guard environment G for every headroom run in this qualification (both arms).
+# Usage: G <workspace-dir> <command> [args...]
+# Starts the command with a cleared environment holding only the variables below.
+# Refuter's G plus two behaviour-neutral additions for this host:
+#   PYTHONDONTWRITEBYTECODE=1        - no __pycache__ writes into the pinned 0.37.0 prefix
+#   LITELLM_LOCAL_MODEL_COST_MAP=True - litellm reads its bundled price map instead of fetching one
+set -eu
+ws="$1"
+shift
+exec /usr/bin/env -i \
+  HOME="$HOME" \
+  PATH=/usr/bin:/bin \
+  HEADROOM_WORKSPACE_DIR="$ws" \
+  HEADROOM_OFFLINE=1 \
+  HEADROOM_BEACON=off \
+  DO_NOT_TRACK=1 \
+  HEADROOM_TELEMETRY=off \
+  HF_HUB_OFFLINE=1 \
+  TRANSFORMERS_OFFLINE=1 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  LITELLM_LOCAL_MODEL_COST_MAP=True \
+  "$@"

@@ -31,8 +31,8 @@ gh release download v0.50.0 --repo rtk-ai/rtk \
 uv venv "$REPORT_TOOLS/headroom-0.37.0"
 uv pip install --python "$REPORT_TOOLS/headroom-0.37.0/bin/python" headroom-ai==0.37.0
 uv tool install jcodemunch-mcp==1.108.319
-npm install --prefix "$REPORT_TOOLS/mcporter-0.13.13" mcporter@0.13.13
-export PATH="$REPORT_TOOLS/rtk-0.50.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.13.13/node_modules/.bin:$HOME/.local/bin:$PATH"
+npm install --prefix "$REPORT_TOOLS/mcporter-0.14.1" mcporter@0.14.1
+export PATH="$REPORT_TOOLS/rtk-0.50.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.14.1/node_modules/.bin:$HOME/.local/bin:$PATH"
 ```
 
 The checksum command must report the selected archive as `OK`. Other operating

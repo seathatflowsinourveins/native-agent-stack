@@ -1,0 +1,44 @@
+{
+ "label": "before",
+ "at": "2026-09-25T18:57:01Z",
+ "service": {
+  "MainPID": "465",
+  "NRestarts": "0",
+  "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+  "ActiveState": "active",
+  "SubState": "running",
+  "InvocationID": "sha256:6e1272d6c960"
+ },
+ "bin_link_target": "~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+ "old_bin_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+ "new_prefix_exists": false,
+ "claude_settings": {
+  "sha256": "ddfcbf6dabc375b8e926800a94573c225c7262e1e1a0416a0416fcce79e45ddf",
+  "mtime": "2026-09-25T18:33:47Z",
+  "cmds_2.3.2": 8,
+  "cmds_2.4.0": 0
+ },
+ "codex_hooks": {
+  "sha256": "e705a4b181687a5de9908ad376bee5d20e0027fe9275c4a04b8b08aa0ac247b5",
+  "mtime": "2026-09-24T03:42:37Z",
+  "cmds_2.3.2": 7,
+  "cmds_2.4.0": 0
+ },
+ "live_db": "schema V64 (64 rows) quick_check=ok pages=35 observations=71265",
+ "live_probe_scope_rows": {
+  "workspaces_nsr_probe": 0,
+  "projects_ai_memory_acceptance": 0
+ },
+ "live_pre_migration_receipt_present": false,
+ "home_backup_archives": 0,
+ "live_ai_memory_procs_by_subcommand": {
+  "serve": 1
+ },
+ "live_endpoints": {
+  "healthz_code": 404,
+  "healthz_body": null,
+  "get_mcp_code": 405,
+  "get_mcp_allow": "POST"
+ },
+ "scratch_procs": []
+}

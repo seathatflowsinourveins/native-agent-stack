@@ -173,12 +173,33 @@ class PinsSchemaTests(unittest.TestCase):
                     f"{tool['id']} asset {asset} does not name a darwin/arm64 build",
                 )
 
+    # A shared component whose Linux pin moved after a Linux-host qualification while the
+    # Mac keeps its own qualified version until a Mac qualifies the new one
+    # (docs/decisions/2026-09-25-workstation-sota-refresh.md). Each entry names both versions
+    # exactly, so a move on either side fails here until this table is reviewed again.
+    MAC_PIN_LAGS_LINUX = {
+        "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
+        "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
+    }
+
     def test_shared_components_keep_the_linux_pinned_version(self):
         linux = {tool["id"]: tool["version"] for tool in load(LINUX_PINS_PATH)["tools"]}
         for tool in self.pins["tools"]:
-            if tool["id"] in linux:
-                self.assertEqual(tool["version"], linux[tool["id"]],
-                                 f"{tool['id']} version differs from the linux-x86_64 pin")
+            if tool["id"] not in linux:
+                continue
+            lag = self.MAC_PIN_LAGS_LINUX.get(tool["id"])
+            if lag is not None:
+                self.assertEqual((tool["version"], linux[tool["id"]]), lag[:2],
+                                 f"{tool['id']}: the recorded Mac/Linux lag no longer matches the pins")
+                self.assertTrue((ROOT / lag[2]).is_file(), f"{tool['id']}: {lag[2]} is missing")
+                continue
+            self.assertEqual(tool["version"], linux[tool["id"]],
+                             f"{tool['id']} version differs from the linux-x86_64 pin")
+
+    def test_a_recorded_lag_names_a_shared_component(self):
+        linux = {tool["id"] for tool in load(LINUX_PINS_PATH)["tools"]}
+        mac = {tool["id"] for tool in self.pins["tools"]}
+        self.assertLessEqual(set(self.MAC_PIN_LAGS_LINUX), linux & mac)
 
     def test_npm_pins_reuse_the_linux_registry_tarball_hash(self):
         linux = {tool["id"]: tool for tool in load(LINUX_PINS_PATH)["tools"]}
@@ -186,6 +207,10 @@ class PinsSchemaTests(unittest.TestCase):
         self.assertTrue(npm_ids)
         for tool in self.pins["tools"]:
             if tool["kind"] == "npm" and tool["id"] in linux:
+                if tool["version"] != linux[tool["id"]]["version"]:
+                    # Only the same version is the same registry tarball; the lag is checked above.
+                    self.assertIn(tool["id"], self.MAC_PIN_LAGS_LINUX)
+                    continue
                 self.assertEqual(tool["sha256"], linux[tool["id"]]["sha256"],
                                  f"{tool['id']} is the same registry tarball; hash must match")
 

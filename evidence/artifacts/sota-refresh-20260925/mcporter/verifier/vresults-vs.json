@@ -1,0 +1,103 @@
+{
+ "arm": "vs",
+ "version": "0.14.1",
+ "started_at": "2026-09-25T19:26:35Z",
+ "snapshot_rev": "7783682fe6c9f10675d930b021f125028f21d8f1",
+ "scratch_config_equals_implementer_x_after_path_mapping": true,
+ "cleanup": {
+  "final_stop_exit": 0,
+  "terminated_in_cleanup": [],
+  "alive_after_cleanup": [],
+  "arm_daemons_after_cleanup": [],
+  "listeners_under_daemon_dir_after_cleanup": []
+ },
+ "ended_at": "2026-09-25T19:26:39Z",
+ "steps": [
+  {
+   "name": "R-socraticode-use-0",
+   "arm": "vs (0.14.1)",
+   "cmd": "C=\"$SCRATCH_CFG\" && echo \"mcporter $(mcporter --version)\" && mcporter --config \"$C\" list socraticode --json --no-oauth | python3 -c 'import glob,json,os,sys;d=json.load(sys.stdin);t=d[\"transport\"];e=[x for x in t.split() if x.endswith(\"/dist/index.js\")][0];v=json.load(open(os.path.join(os.path.dirname(os.path.dirname(e)),\"package.json\")))[\"version\"];s=[x[\"version\"] for x in json.load(open(\"manifests/stack.json\"))[\"components\"] if x[\"id\"]==\"socraticode\"];w=sorted({y[\"pin\"] for f in glob.glob(\"catalogs/landscape/*.json\") for l in json.load(open(f)).get(\"layers\",[]) for y in (l.get(\"winners\") or []) if y.get(\"component_id\")==\"socraticode\"});print(\"server\",d[\"name\"],\"status\",d[\"status\"]);print(\"transport\",t);print(\"package.json beside that entry point:\",v,\"| stack\",s,\"| winner pins\",w);sys.exit(0 if d[\"status\"]==\"ok\" and v in w else 1)'",
+   "exit": 0,
+   "output_excerpt": "mcporter 0.14.1\nserver socraticode status ok\ntransport STDIO ~/.local/share/codex-ecosystem/bin/node ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\npackage.json beside that entry point: 1.14.0 | stack ['1.14.0'] | winner pins ['1.14.0']",
+   "pass": true,
+   "wall_s": 1.1,
+   "at_utc": "2026-09-25T19:26:36Z"
+  },
+  {
+   "name": "S3-ctx_doctor",
+   "arm": "vs (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode doctor\n\n[OK] Runtimes: 4/11 (36%) \u2014 javascript, shell, python, perl\n[WARN] Performance: NORMAL \u2014 install Bun for 3-5x speed boost\n[OK] Storage sessions: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/cm/sessions (via CONTEXT_MODE_DIR)\n[OK] Storage content: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/cm/content (via CONTEXT_MODE_DIR)\n[OK] Storage stats: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/cm/sessions (via CONTEXT_MODE_DIR)\n[OK] Server test: PASS\n[OK] FTS5 /  ... t-mode upgrade\n[FAIL] Hooks config: No readable ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/codex/hooks.json found \u2014 fix: Copy configs/codex/hooks.json to hooks.json or run context-mode upgrade\n[OK] Hook scripts: no direct .mjs script paths to verify\n[OK] Version: v1.0.169",
+   "pass": true,
+   "wall_s": 0.6,
+   "at_utc": "2026-09-25T19:26:37Z"
+  },
+  {
+   "name": "S6a-daemon-status-check",
+   "arm": "vs (0.14.1)",
+   "cmd": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcporter-0.14.1/\" in c and len(d[\"servers\"])>=2 and all(s[\"connected\"] and s[\"activeCalls\"]==0 for s in d[\"servers\"]);print(sorted((s[\"connectionId\"],s[\"connectionGeneration\"]) for s in d[\"servers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:03148079>', 1), ('<uuid:f67c77f4>', 1)]",
+   "pass": true,
+   "wall_s": 0.2,
+   "at_utc": "2026-09-25T19:26:37Z"
+  },
+  {
+   "name": "S6b-repeat-socraticode-health",
+   "arm": "vs (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "SocratiCode \u2014 Infrastructure Health Check:\n\nQdrant mode: external\nQdrant endpoint: http://127.0.0.1:26333\n[OK] External Qdrant (http://127.0.0.1:26333): Reachable\n\nEmbedding provider: lmstudio\n[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\n\nExternal Qdrant mode \u2014 Docker is not required for the vector database.",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:26:38Z"
+  },
+  {
+   "name": "S6c-daemon-status-recheck",
+   "arm": "vs (0.14.1)",
+   "cmd": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcporter-0.14.1/\" in c and len(d[\"servers\"])>=2 and all(s[\"connected\"] and s[\"activeCalls\"]==0 for s in d[\"servers\"]);print(sorted((s[\"connectionId\"],s[\"connectionGeneration\"]) for s in d[\"servers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:03148079>', 1), ('<uuid:f67c77f4>', 1)]",
+   "pass": true,
+   "wall_s": 0.2,
+   "at_utc": "2026-09-25T19:26:38Z",
+   "identical_connection_list": true
+  },
+  {
+   "name": "S6d-daemon-ownership",
+   "arm": "vs (0.14.1)",
+   "cmd": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 4016347, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 4016347, \"kernel_socket_owner_pids\": [4016347], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:26:38Z",
+   "ownership": {
+    "status_pid": 4016347,
+    "status_socket_is_arm_socket": true,
+    "protocolVersion": 3,
+    "metadata_pid": 4016347,
+    "kernel_socket_owner_pids": [
+     4016347
+    ],
+    "cmdline_is_arm_prefix_daemon": true,
+    "cwd_is_arm_snapshot": true,
+    "owned": true
+   }
+  },
+  {
+   "name": "F-daemon-stop-no-leftovers",
+   "arm": "vs (0.14.1)",
+   "cmd": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "wall_s": 0.5,
+   "at_utc": "2026-09-25T19:26:39Z",
+   "tracked_processes": 4,
+   "leftover_tracked": []
+  }
+ ],
+ "passed": true
+}

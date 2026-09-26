@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "sota-refresh-20260925-mcporter-cutover",
+  "unit": "mcporter",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-25",
+  "observed_by": "coordinator",
+  "evidence_class": "Coordinator observations of the production switch, exported as aggregate facts only.",
+  "from_version": "0.13.13",
+  "to_version": "0.14.1",
+  "sequence": [
+    {
+      "step": "precondition",
+      "facts": "No mcporter daemon was running before the switch, so there was no 0.13.13 daemon host to drain or stop."
+    },
+    {
+      "at_utc": "about 2026-09-25T20:12Z",
+      "step": "switch the binary",
+      "facts": "bin/mcporter relinked to tools/mcporter-0.14.1/bin/mcporter, the prefix installed from the verified tarball during qualification."
+    },
+    {
+      "step": "post-switch use",
+      "facts": "`mcporter --config ~/.local/share/codex-ecosystem/config/mcporter.json list socraticode --brief --no-oauth` listed 26 tools; `mcporter call socraticode.codebase_health` printed the health check with Qdrant reachable; the next call started a 0.14.1 daemon."
+    }
+  ],
+  "host_precondition": "0.14.1 runs `ps` from PATH (0.13.13 ran /bin/ps). The verifier measured that a 0.14.1 daemon whose PATH lacks `ps` cannot connect keep-alive servers and `mcporter daemon stop` refuses; on this host the daemon inherits the launching shell's PATH, where `command -v ps` prints /usr/bin/ps, and no systemd unit, crontab or client hook launches mcporter (verifier grep).",
+  "rollback": "Drain the 0.14.1 daemon (`mcporter daemon status --json` until every server shows activeCalls 0, then `mcporter daemon stop`; a daemon started without `ps` on its PATH must be retired by signal, because `daemon stop` refuses), relink bin/mcporter to tools/mcporter-0.13.13/bin/mcporter and set the installed-versions.txt mcporter record back to 0.13.13. There is no config or state migration: the config only gains optional fields and the daemon protocol is 3 in both versions.",
+  "writing_worker_readback": "out/readback.out (2026-09-25T20:54:04Z, read-only): bin/mcporter resolves to tools/mcporter-0.14.1/bin/mcporter, `mcporter --version` prints 0.14.1, the 0.13.13 prefix is still installed for rollback, the installed-versions.txt mcporter record reads 0.14.1, and `command -v ps` prints /usr/bin/ps in the worker's shell."
+}

@@ -1,0 +1,637 @@
+{
+ "schema_version": 1,
+ "note": "Per-step outputs of the verifier's arms vf and vs (0.14.1 re-run) and pa (0.14.1) / pb (0.13.13) without ps on the daemon's PATH, bundled; identical contents are stored once under their sha256. Contents larger than 32 KiB that differ from an earlier stored output of the same step are stored in deltas as a zero-context unified diff against that output.",
+ "files": [
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/01-S1-command-v.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/01-S1-command-v.out",
+   "bytes": 66,
+   "run_copy_sha256": "1c4385db87a5f575c6d7efc1556ba52e219c1d4e2ab97df5aae59e62e99151de",
+   "content_sha256": "1c4385db87a5f575c6d7efc1556ba52e219c1d4e2ab97df5aae59e62e99151de",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/02-R-mcporter-install-1.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/02-R-mcporter-install-1.out",
+   "bytes": 7,
+   "run_copy_sha256": "c6fb87657a4ee72e2b549cdd39c12854fdbecbdfef033c04f523d4bfcb02aa4c",
+   "content_sha256": "c6fb87657a4ee72e2b549cdd39c12854fdbecbdfef033c04f523d4bfcb02aa4c",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/03-R-socraticode-use-0.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/03-R-socraticode-use-0.out",
+   "bytes": 289,
+   "run_copy_sha256": "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19",
+   "content_sha256": "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/04-R-socraticode-use-1.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/04-R-socraticode-use-1.out",
+   "bytes": 351,
+   "run_copy_sha256": "a39e4b277e1a5c755565269975124a3ae2fc4dd6c7e4c2c7e8221fc5c09a6952",
+   "content_sha256": "a39e4b277e1a5c755565269975124a3ae2fc4dd6c7e4c2c7e8221fc5c09a6952",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/05-R-socraticode-use-2.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/05-R-socraticode-use-2.out",
+   "bytes": 409,
+   "run_copy_sha256": "da315d198fb51044484c323ab32b159847a796a5a1323e2cb26be8dbcb99113e",
+   "content_sha256": "da315d198fb51044484c323ab32b159847a796a5a1323e2cb26be8dbcb99113e",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/06-R-socraticode-use-3.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/06-R-socraticode-use-3.out",
+   "bytes": 343,
+   "run_copy_sha256": "7a9fd9ab8e5144dcb1e1e46e7ea826a7d74f881fb92837e4181c1a9b154a4dd1",
+   "content_sha256": "7a9fd9ab8e5144dcb1e1e46e7ea826a7d74f881fb92837e4181c1a9b154a4dd1",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/07-S4-list-ai-memory.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/07-S4-list-ai-memory.out",
+   "bytes": 127240,
+   "run_copy_sha256": "567069ea260864838e16e78acb468ece7cbeef8d3d386cb9471ce72559e8b5cb",
+   "content_sha256": "567069ea260864838e16e78acb468ece7cbeef8d3d386cb9471ce72559e8b5cb",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/08-S4-list-jcodemunch.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/08-S4-list-jcodemunch.out",
+   "bytes": 9781,
+   "run_copy_sha256": "396e5978b574b7d268f963479a7901bb68e102eec7da5c854307ba351e04d0da",
+   "content_sha256": "396e5978b574b7d268f963479a7901bb68e102eec7da5c854307ba351e04d0da",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/09-S5-token-report-oneoff.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/09-S5-token-report-oneoff.out",
+   "bytes": 3225,
+   "run_copy_sha256": "91fd9f060c0ad3fd782cf16dec924c7adf4375b7280f1377f2c6e5bf23b6d448",
+   "content_sha256": "91fd9f060c0ad3fd782cf16dec924c7adf4375b7280f1377f2c6e5bf23b6d448",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/10-R-jcodemunch-use-0.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/10-R-jcodemunch-use-0.out",
+   "bytes": 331,
+   "run_copy_sha256": "e53941168b7eb40dcb453443e5e61da107afd5d75dd824ac59cadd16bc96ba68",
+   "content_sha256": "e53941168b7eb40dcb453443e5e61da107afd5d75dd824ac59cadd16bc96ba68",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/11-R-jcodemunch-use-1.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/11-R-jcodemunch-use-1.out",
+   "bytes": 302,
+   "run_copy_sha256": "ef1e5c079756218dafaf5cd6cc4a63fce7378a206fed3a4b72458915dca95828",
+   "content_sha256": "ef1e5c079756218dafaf5cd6cc4a63fce7378a206fed3a4b72458915dca95828",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/12-R-context-mode-use-1.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/12-R-context-mode-use-1.out",
+   "bytes": 312,
+   "run_copy_sha256": "08524a548cbc852fee34c74eba781ee8a9c83e74e714de95314773a68411cdbf",
+   "content_sha256": "08524a548cbc852fee34c74eba781ee8a9c83e74e714de95314773a68411cdbf",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/14-S6a-daemon-status-check.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/14-S6a-daemon-status-check.out",
+   "bytes": 25,
+   "run_copy_sha256": "73b8622a68774c4238ff846506a201c2ec478f73f68e6ab343df5a9e5605f2e6",
+   "content_sha256": "73b8622a68774c4238ff846506a201c2ec478f73f68e6ab343df5a9e5605f2e6",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/15-S6b-repeat-socraticode-health.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/15-S6b-repeat-socraticode-health.out",
+   "bytes": 387,
+   "run_copy_sha256": "6a4d289aa2eddbf9503fea7aa29d50c8e2e1e88bf3cc1c4327df25ae69f2e02f",
+   "content_sha256": "6a4d289aa2eddbf9503fea7aa29d50c8e2e1e88bf3cc1c4327df25ae69f2e02f",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/16-S6c-daemon-status-recheck.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/16-S6c-daemon-status-recheck.out",
+   "bytes": 25,
+   "run_copy_sha256": "73b8622a68774c4238ff846506a201c2ec478f73f68e6ab343df5a9e5605f2e6",
+   "content_sha256": "73b8622a68774c4238ff846506a201c2ec478f73f68e6ab343df5a9e5605f2e6",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/18-A1-ctx_execute_file-project-read.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/18-A1-ctx_execute_file-project-read.out",
+   "bytes": 333,
+   "run_copy_sha256": "d8ec3d69626f4218bebe135282029d4be9520d8897787823838139cabcdf0104",
+   "content_sha256": "d8ec3d69626f4218bebe135282029d4be9520d8897787823838139cabcdf0104",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/19-A2-ctx_execute-42.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/19-A2-ctx_execute-42.out",
+   "bytes": 40,
+   "run_copy_sha256": "26bbd9002a05bd58cf42f16186aa2b0bd7e3c77f24d0773a7ee0490c06395541",
+   "content_sha256": "26bbd9002a05bd58cf42f16186aa2b0bd7e3c77f24d0773a7ee0490c06395541",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/20-A3-probe-persistence-and-ppid-chain.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/20-A3-probe-persistence-and-ppid-chain.out",
+   "bytes": 134,
+   "run_copy_sha256": "0da9c86679cfe0b896c5c3233d07506324634daed4d28f513ba07251b241380b",
+   "content_sha256": "0da9c86679cfe0b896c5c3233d07506324634daed4d28f513ba07251b241380b",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/21-B1a-daemon-stop-retires-daemon-and-server.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/21-B1a-daemon-stop-retires-daemon-and-server.out",
+   "bytes": 36,
+   "run_copy_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "content_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/22-B1b-next-probe-relaunches.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/22-B1b-next-probe-relaunches.out",
+   "bytes": 67,
+   "run_copy_sha256": "76dbdaafa8055a5fbd0724e49c0bb3f400ed4be55978d9b318b787cf504a4d96",
+   "content_sha256": "76dbdaafa8055a5fbd0724e49c0bb3f400ed4be55978d9b318b787cf504a4d96",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/23-B1c-daemon-restart.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/23-B1c-daemon-restart.out",
+   "bytes": 64,
+   "run_copy_sha256": "491b010ccea29d859a63ee27ad758b7f640e135beee81d3726421c8727b27f6d",
+   "content_sha256": "491b010ccea29d859a63ee27ad758b7f640e135beee81d3726421c8727b27f6d",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/24-B1d-probe-after-restart.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/24-B1d-probe-after-restart.out",
+   "bytes": 67,
+   "run_copy_sha256": "fd43515f655325b026afed62bd8f796981c1ce792494f0b9a49982de482f8cd3",
+   "content_sha256": "fd43515f655325b026afed62bd8f796981c1ce792494f0b9a49982de482f8cd3",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/25-B2a-probe-refuses-after-daemon-sigkill.err",
+   "bytes": 706,
+   "run_copy_sha256": "cd876f7b3b47383370f3ae440e8b2dbad8e03ae44c1b596dd288c65141c10411",
+   "content_sha256": "cd876f7b3b47383370f3ae440e8b2dbad8e03ae44c1b596dd288c65141c10411",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/25-B2a-probe-refuses-after-daemon-sigkill.out",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/27-B2c-deliberate-daemon-start.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/27-B2c-deliberate-daemon-start.out",
+   "bytes": 28,
+   "run_copy_sha256": "9988029aef45a1c49c6aa3793866e083f8eb6d6e9d436131ae6277a8a79b1bed",
+   "content_sha256": "9988029aef45a1c49c6aa3793866e083f8eb6d6e9d436131ae6277a8a79b1bed",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/28-B2d-list-context-mode-brief.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/28-B2d-list-context-mode-brief.out",
+   "bytes": 1833,
+   "run_copy_sha256": "453b1c25c24c1b63b472da9844951876c1223d72922083c24d703e9eef1a60fd",
+   "content_sha256": "453b1c25c24c1b63b472da9844951876c1223d72922083c24d703e9eef1a60fd",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/29-B2e-bridge-recovered.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/29-B2e-bridge-recovered.out",
+   "bytes": 59,
+   "run_copy_sha256": "8db130f04119a66311bfb70d455b9593a5822c6c0477bf1ffa5b77ce90453207",
+   "content_sha256": "8db130f04119a66311bfb70d455b9593a5822c6c0477bf1ffa5b77ce90453207",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/30-B3a-stop-and-hold-lock.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/30-B3a-stop-and-hold-lock.out",
+   "bytes": 36,
+   "run_copy_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "content_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/31-B3b-probe-while-lock-held-fails.err",
+   "bytes": 1245,
+   "run_copy_sha256": "d978cdddfe1afe41c130b745363df313229bbbd83c5c57292b7a6f15a01ffc54",
+   "content_sha256": "d978cdddfe1afe41c130b745363df313229bbbd83c5c57292b7a6f15a01ffc54",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/31-B3b-probe-while-lock-held-fails.out",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/32-B3c-probe-after-holder-exit-recovers.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/32-B3c-probe-after-holder-exit-recovers.out",
+   "bytes": 67,
+   "run_copy_sha256": "1ad61fa577af6092e3fc9605ca28027707d7a02be2155f04793737b31d7d3676",
+   "content_sha256": "1ad61fa577af6092e3fc9605ca28027707d7a02be2155f04793737b31d7d3676",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/33-F-daemon-stop-no-leftovers.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vf/33-F-daemon-stop-no-leftovers.out",
+   "bytes": 36,
+   "run_copy_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "content_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/01-R-socraticode-use-0.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/01-R-socraticode-use-0.out",
+   "bytes": 289,
+   "run_copy_sha256": "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19",
+   "content_sha256": "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/02-S3-ctx_doctor.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/02-S3-ctx_doctor.out",
+   "bytes": 1125,
+   "run_copy_sha256": "4e34723d92ce23fa85892945ae413d5e667209f6badbf752e381e4d7c78895af",
+   "content_sha256": "4e34723d92ce23fa85892945ae413d5e667209f6badbf752e381e4d7c78895af",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/03-S6a-daemon-status-check.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/03-S6a-daemon-status-check.out",
+   "bytes": 49,
+   "run_copy_sha256": "27324f131d4d1af105f31f72ebb8cf9ff424fea2b987f0601318c6b77b0d6838",
+   "content_sha256": "27324f131d4d1af105f31f72ebb8cf9ff424fea2b987f0601318c6b77b0d6838",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/04-S6b-repeat-socraticode-health.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/04-S6b-repeat-socraticode-health.out",
+   "bytes": 387,
+   "run_copy_sha256": "6a4d289aa2eddbf9503fea7aa29d50c8e2e1e88bf3cc1c4327df25ae69f2e02f",
+   "content_sha256": "6a4d289aa2eddbf9503fea7aa29d50c8e2e1e88bf3cc1c4327df25ae69f2e02f",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/05-S6c-daemon-status-recheck.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/05-S6c-daemon-status-recheck.out",
+   "bytes": 49,
+   "run_copy_sha256": "27324f131d4d1af105f31f72ebb8cf9ff424fea2b987f0601318c6b77b0d6838",
+   "content_sha256": "27324f131d4d1af105f31f72ebb8cf9ff424fea2b987f0601318c6b77b0d6838",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/07-F-daemon-stop-no-leftovers.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/vs/07-F-daemon-stop-no-leftovers.out",
+   "bytes": 36,
+   "run_copy_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "content_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pa/01-M0-minimal-path-resolution.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pa/01-M0-minimal-path-resolution.out",
+   "bytes": 89,
+   "run_copy_sha256": "795eed650b27f11bf6b32d3239e5d8c8a069dc2f9f2b534d4cf9d4bf81d4c452",
+   "content_sha256": "795eed650b27f11bf6b32d3239e5d8c8a069dc2f9f2b534d4cf9d4bf81d4c452",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pa/02-M1-keepalive-probe-without-ps-on-PATH.err",
+   "bytes": 584,
+   "run_copy_sha256": "7a0eaf9da99ac14bcfb88ef17f969bccf078fb8539695bc4670cde0889b1d55e",
+   "content_sha256": "7a0eaf9da99ac14bcfb88ef17f969bccf078fb8539695bc4670cde0889b1d55e",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pa/02-M1-keepalive-probe-without-ps-on-PATH.out",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pa/04-M3-daemon-stop-no-leftovers.err",
+   "bytes": 1008,
+   "run_copy_sha256": "5bae4bf825697f70193e524d8169e74f90a16f22f119870dc9d8688e2d137fec",
+   "content_sha256": "5bae4bf825697f70193e524d8169e74f90a16f22f119870dc9d8688e2d137fec",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pa/04-M3-daemon-stop-no-leftovers.out",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pb/01-M0-minimal-path-resolution.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pb/01-M0-minimal-path-resolution.out",
+   "bytes": 91,
+   "run_copy_sha256": "6b3b14968e8b1d83077e2502385d208c605825f95057b4a2fffc159ba7f3b60f",
+   "content_sha256": "6b3b14968e8b1d83077e2502385d208c605825f95057b4a2fffc159ba7f3b60f",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pb/02-M1-keepalive-probe-without-ps-on-PATH.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pb/02-M1-keepalive-probe-without-ps-on-PATH.out",
+   "bytes": 67,
+   "run_copy_sha256": "7980a3468029d589e292f90457585a4135e8753c293cf31fb3365484f33e439c",
+   "content_sha256": "7980a3468029d589e292f90457585a4135e8753c293cf31fb3365484f33e439c",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pb/04-M3-daemon-stop-no-leftovers.err",
+   "bytes": 0,
+   "run_copy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "encoding": "utf-8"
+  },
+  {
+   "run_copy": "$IMPL/verifier/raw/pb/04-M3-daemon-stop-no-leftovers.out",
+   "bytes": 36,
+   "run_copy_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "content_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+   "encoding": "utf-8"
+  }
+ ],
+ "contents": {
+  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": "",
+  "1c4385db87a5f575c6d7efc1556ba52e219c1d4e2ab97df5aae59e62e99151de": "~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter\n",
+  "c6fb87657a4ee72e2b549cdd39c12854fdbecbdfef033c04f523d4bfcb02aa4c": "0.14.1\n",
+  "6fe93da000bdfe0815674cb3bb2123e254784341a55ebcd06b5d570853deac19": "mcporter 0.14.1\nserver socraticode status ok\ntransport STDIO ~/.local/share/codex-ecosystem/bin/node ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\npackage.json beside that entry point: 1.14.0 | stack ['1.14.0'] | winner pins ['1.14.0']\n",
+  "a39e4b277e1a5c755565269975124a3ae2fc4dd6c7e4c2c7e8221fc5c09a6952": "[OK] External Qdrant (http://127.0.0.1:26333): Reachable\n[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\nProject: ~/code/native-agent-stack-live\nCollection: codebase_9c518b2ee5c8\nStatus: green\nIndexed chunks: 68712\nembedding endpoint: nvidia/Nemotron-3-Embed-1B-BF16 owned_by vllm\n",
+  "da315d198fb51044484c323ab32b159847a796a5a1323e2cb26be8dbcb99113e": "8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2}\n1 catalogs/us-equities/gates-20260922.json:1-31 0.6250\n2 scripts/trading_gates.py:1-38 0.6111\n3 docs/grand-catalog-handbook.md:332-361 0.4500\n4 tests/test_trading_gates.py:488-529 0.4500\n5 evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--use--20260925.json:55-57 0.3333\n",
+  "7a9fd9ab8e5144dcb1e1e46e7ea826a7d74f881fb92837e4181c1a9b154a4dd1": "control (unrelated query): 8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None} (both must be absent)\n1 observability/grand-dashboard/passwordless.md:1-46 0.8333\n2 observability/grand-dashboard/passwordless.json:67-97 0.7500\n3 observability/grand-dashboard/passwordless.json:1-66 0.5000\n",
+  "396e5978b574b7d268f963479a7901bb68e102eec7da5c854307ba351e04d0da": "{\n  \"mode\": \"server\",\n  \"name\": \"jcodemunch\",\n  \"status\": \"ok\",\n  \"durationMs\": 475,\n  \"instructions\": \"This repo can be indexed by jcodemunch. Its whole tool catalog sits behind a 3-verb front door. Prefer it over Read/Grep/Glob/Bash for code navigation.\\n\\n**If these tools are deferred (names shown, schemas withheld), load them in ONE lookup:** ToolSearch \\\"select:mcp__jcodemunch__route,mcp__jcodemunch__menu,mcp__jcodemunch__order\\\". One round trip for the session, never one at a time.\\n\\n- route: start here: the task in plain words, back an action to run.\\n- menu: search the catalog when you know roughly what you want.\\n- order: dispatch any action by name: order(action, args). Read-only by default.\",\n  \"transport\": \"STDIO ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp\",\n  \"source\": {\n    \"kind\": \"local\",\n    \"path\": \"~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vf/mcporter.json\"\n  },\n  \"tools\": [\n    {\n      \"name\": \"set_tool_tier\",\n      \"description\": \"Explicit tier override for the current session. Narrows or widens the exposed tool list to 'core' / 'standard' / 'full'. Prefer plan_turn(model=...) for routine per-task use; use set_tool_tier only for an explicit override (e.g. escalate to 'full' after a capability-gated failure). A narrowing that costs more than it saves is refused.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"tier\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"core\",\n              \"standard\",\n              \"full\"\n            ]\n          }\n        },\n        \"required\": [\n          \"tier\"\n        ]\n      },\n      \"options\": [\n        {\n          \"property\": \"tier\",\n          \"cliName\": \"tier\",\n          \"required\": true,\n          \"type\": \"string\",\n          \"placeholder\": \"<tier:core|standard|full>\",\n          \"exampleValue\": \"core\",\n          \"enumValues\": [\n            \"core\",\n            \"standard\",\n            \"full\"\n          ]\n        }\n      ]\n    },\n    {\n      \"name\": \"announce_model\",\n      \"description\": \"Agent self-reports its active model identifier. Server resolves to a tier via model_tier_map (fuzzy: normalize → exact → glob → substring → '*' → 'full') and narrows the exposed tool list accordingly. Idempotent: a second call with the same model is a cheap no-op. Prefer calling plan_turn(model=...) for routine per-task use; use announce_model as a fallback when plan_turn is not appropriate for the current task.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"model\": {\n            \"type\": \"string\",\n            \"description\": \"Your active model identifier, e.g. 'claude-haiku-4-5'.\"\n          }\n        },\n        \"required\": [\n          \"model\"\n        ]\n      },\n      \"options\": [\n        {\n          \"property\": \"model\",\n          \"cliName\": \"model\",\n          \"description\": \"Your active model identifier, e.g. 'claude-haiku-4-5'.\",\n          \"required\": true,\n          \"type\": \"string\",\n          \"placeholder\": \"<model>\"\n        }\n      ]\n    },\n    {\n      \"name\": \"jcodemunch_guide\",\n      \"description\": \"Return the version-current CLAUDE.md / AGENT.md policy snippet for jcodemunch-mcp — the same text produced by `jcodemunch-mcp claude-md --generate`. Lets an agent keep a one-line CLAUDE.md (e.g. \\\"Call jcodemunch_guide and strictly follow its instructions.\\\") instead of pasting a static snippet that drifts from the installed version. Idempotent, no repo context required. Matches the active tool surface, tier and disabled_tools — list 'jcodemunch_guide' in disabled_tools to hide it.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {}\n      },\n      \"options\": []\n    },\n    {\n      \"name\": \"order\",\n      \"description\": \"Dispatch any jcodemunch action by name: order(action, args). The single-verb front door to the full tool catalog. Read-only by default — actions that change index/session state require allow_state_change=true, and execution/file-write verbs are refused. For exploration questions ('how does X work'), order('get_ranked_context', {repo, query, token_budget}) answers in ONE call — prefer it over chained search/outline/source hops; add compress=true to fit more symbols in the same budget. Call 'menu' to discover actions, or 'route' to pick one from a task.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"action\": {\n            \"type\": \"string\",\n            \"description\": \"Name of the catalog action to run (e.g. 'search_symbols').\"\n          },\n          \"args\": {\n            \"type\": \"object\",\n            \"description\": \"Arguments for that action, exactly as you'd pass them directly.\",\n            \"default\": {}\n          },\n          \"allow_state_change\": {\n            \"type\": \"boolean\",\n            \"description\": \"Opt in to dispatching an index/session state-changing action (e.g. index_repo).\",\n            \"default\": false\n          }\n        },\n        \"required\": [\n          \"action\"\n        ]\n      },\n      \"options\": [\n        {\n          \"property\": \"action\",\n          \"cliName\": \"action\",\n          \"description\": \"Name of the catalog action to run (e.g. 'search_symbols').\",\n          \"required\": true,\n          \"type\": \"string\",\n          \"placeholder\": \"<action>\"\n        },\n        {\n          \"property\": \"args\",\n          \"cliName\": \"args\",\n          \"description\": \"Arguments for that action, exactly as you'd pass them directly.\",\n          \"required\": false,\n          \"type\": \"object\",\n          \"placeholder\": \"<args:json>\",\n          \"exampleValue\": \"{}\",\n          \"defaultValue\": {}\n        },\n        {\n          \"property\": \"allow_state_change\",\n          \"cliName\": \"allow-state-change\",\n          \"description\": \"Opt in to dispatching an index/session state-changing action (e.g. index_repo).\",\n          \"required\": false,\n          \"type\": \"boolean\",\n          \"placeholder\": \"<allow-state-change:true|false>\",\n          \"exampleValue\": \"false\",\n          \"defaultValue\": false\n        }\n      ]\n    },\n    {\n      \"name\": \"menu\",\n      \"description\": \"Discover catalog actions without keeping the full tool catalog resident: menu(query?). Returns compact rows (action, summary, required args, state_changing). With no query, lists the catalog. Pair with 'order' to dispatch the chosen action.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"query\": {\n            \"type\": \"string\",\n            \"description\": \"Optional. Keywords describing what you want to do; ranks matching actions.\"\n          },\n          \"limit\": {\n            \"type\": \"integer\",\n            \"description\": \"Max actions to return.\",\n            \"default\": 25\n          }\n        }\n      },\n      \"options\": [\n        {\n          \"property\": \"query\",\n          \"cliName\": \"query\",\n          \"description\": \"Optional. Keywords describing what you want to do; ranks matching actions.\",\n          \"required\": false,\n          \"type\": \"string\",\n          \"placeholder\": \"<query>\"\n        },\n        {\n          \"property\": \"limit\",\n          \"cliName\": \"limit\",\n          \"description\": \"Max actions to return.\",\n          \"required\": false,\n          \"type\": \"number\",\n          \"placeholder\": \"<limit:number>\",\n          \"exampleValue\": \"25\",\n          \"defaultValue\": 25\n        }\n      ]\n    },\n    {\n      \"name\": \"route\",\n      \"description\": \"Map a natural-language task to the best catalog action(s): route(task, repo?, execute?). Returns ranked recommendations with ready-to-run argument templates. With execute=true, dispatches the top recommendation and returns its result in the same call, collapsing discover-then-call into one round-trip. Recommends assemble_task_context / plan_turn for context-gathering intents.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"task\": {\n            \"type\": \"string\",\n            \"description\": \"What you're trying to do, in plain language.\"\n          },\n          \"repo\": {\n            \"type\": \"string\",\n            \"description\": \"Repository identifier (required to execute repo-scoped actions).\"\n          },\n          \"execute\": {\n            \"type\": \"boolean\",\n            \"description\": \"If true, dispatch the top recommended action and return its result.\",\n            \"default\": false\n          },\n          \"model\": {\n            \"type\": \"string\",\n            \"description\": \"Optional active model id; piggybacks tier-switch like plan_turn(model=...).\"\n          }\n        },\n        \"required\": [\n          \"task\"\n        ]\n      },\n      \"options\": [\n        {\n          \"property\": \"task\",\n          \"cliName\": \"task\",\n          \"description\": \"What you're trying to do, in plain language.\",\n          \"required\": true,\n          \"type\": \"string\",\n          \"placeholder\": \"<task>\"\n        },\n        {\n          \"property\": \"repo\",\n          \"cliName\": \"repo\",\n          \"description\": \"Repository identifier (required to execute repo-scoped actions).\",\n          \"required\": false,\n          \"type\": \"string\",\n          \"placeholder\": \"<repo>\"\n        },\n        {\n          \"property\": \"execute\",\n          \"cliName\": \"execute\",\n          \"description\": \"If true, dispatch the top recommended action and return its result.\",\n          \"required\": false,\n          \"type\": \"boolean\",\n          \"placeholder\": \"<execute:true|false>\",\n          \"exampleValue\": \"false\",\n          \"defaultValue\": false\n        },\n        {\n          \"property\": \"model\",\n          \"cliName\": \"model\",\n          \"description\": \"Optional active model id; piggybacks tier-switch like plan_turn(model=...).\",\n          \"required\": false,\n          \"type\": \"string\",\n          \"placeholder\": \"<model>\"\n        }\n      ]\n    }\n  ]\n}\n",
+  "91fd9f060c0ad3fd782cf16dec924c7adf4375b7280f1377f2c6e5bf23b6d448": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 0,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {},\n  \"lifetime_by_tool_since\": null,\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"total_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"runtime_signal\": {\n    \"rows\": 0,\n    \"by_source\": {}\n  },\n  \"savings_provenance\": {\n    \"token_reduction\": {\n      \"average_pct\": 99.6,\n      \"task_runs\": 15,\n      \"tokenizer\": \"cl100k_base\",\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"methodology\": \"benchmarks/METHODOLOGY.md\"\n    },\n    \"replay_retrieval_quality\": {\n      \"fixture\": \"self_v1_75_0\",\n      \"k\": 10,\n      \"ndcg\": 1,\n      \"mrr\": 1,\n      \"recall\": 1,\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"ci_gated\": true\n    },\n    \"implementation_channel_accuracy\": {\n      \"corpus\": \"authored-scenarios-v2\",\n      \"languages\": [\n        \"python\",\n        \"typescript\",\n        \"go\"\n      ],\n      \"channels\": {\n        \"ast\": {\n          \"precision\": 0.818,\n          \"recall\": 1\n        },\n        \"duck\": {\n          \"precision\": 0.5,\n          \"recall\": 1\n        },\n        \"decorator\": {\n          \"precision\": 0.556,\n          \"recall\": 1\n        }\n      },\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/channel_accuracy.json\",\n      \"ci_gated\": true,\n      \"scope_note\": \"authored gold corpus — channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\"\n    },\n    \"contract\": \"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\"\n  },\n  \"processes\": {\n    \"live\": 1,\n    \"others\": 0,\n    \"this_pid\": 3996503,\n    \"oldest_age_seconds\": 0\n  },\n  \"tool_surface\": {\n    \"surface\": \"counter\",\n    \"profile\": \"full\",\n    \"visible_tools\": 6,\n    \"catalog_tools\": 94,\n    \"schema_tokens_visible\": 1050,\n    \"schema_tokens_catalog\": 27782,\n    \"schema_tokens_avoided\": 26732,\n    \"schema_tokens_basis\": \"one_time_at_full_rate_then_cache_read\",\n    \"schema_tokens_basis_note\": \"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\",\n    \"heaviest_tools\": {\n      \"order\": 260,\n      \"route\": 229,\n      \"announce_model\": 161,\n      \"jcodemunch_guide\": 147,\n      \"menu\": 128,\n      \"set_tool_tier\": 125\n    },\n    \"estimator\": \"bytes/4\"\n  }\n}\n",
+  "e53941168b7eb40dcb453443e5e61da107afd5d75dd824ac59cadd16bc96ba68": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp\njcodemunch-mcp 1.108.319\nstack ['1.108.319'] winner pins []\nlist_repos count 1 [('seathatflowsinourveins/native-agent-stack', 'files', 6, 'symbols', 7, 'indexed', '2026-09-23', 'loadable')]\n",
+  "ef1e5c079756218dafaf5cd6cc4a63fce7378a206fed3a4b72458915dca95828": "search_symbols greeting -> fixtures/after.py::greeting#function fixtures/before.py::greeting#function\nget_symbol_source fixtures/after.py::greeting#function lines 1 - 2 freshness fresh\ndef greeting(name):\n    return \"Hello, \" + name + \"!\"\nequals those lines of fixtures/after.py in this checkout: True\n",
+  "08524a548cbc852fee34c74eba781ee8a9c83e74e714de95314773a68411cdbf": "mcporter exit 0; ctx_execute_file printed: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c\nhost-computed from the checkout: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c\nfiles the server left in the writable temp dir: ./cm/sessions/stats-pid-N.json \nasserted: exact match\n",
+  "73b8622a68774c4238ff846506a201c2ec478f73f68e6ab343df5a9e5605f2e6": "[('<uuid:1d336070>', 1)]\n",
+  "6a4d289aa2eddbf9503fea7aa29d50c8e2e1e88bf3cc1c4327df25ae69f2e02f": "SocratiCode — Infrastructure Health Check:\n\nQdrant mode: external\nQdrant endpoint: http://127.0.0.1:26333\n[OK] External Qdrant (http://127.0.0.1:26333): Reachable\n\nEmbedding provider: lmstudio\n[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\n\nExternal Qdrant mode — Docker is not required for the vector database.\n",
+  "d8ec3d69626f4218bebe135282029d4be9520d8897787823838139cabcdf0104": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"path=~/code/native-agent-stack/AGENTS.md\\n```python\\nimport hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256(b).hexdigest()))\\n```\\n\\nBYTES=10844 SHA256=9b56cee5d4b2a98a2bd6b2a84fdbd272b035f006ee5ef5b92b355e1a6d0f5305\\n\"\n    }\n  ]\n}\n",
+  "26bbd9002a05bd58cf42f16186aa2b0bd7e3c77f24d0773a7ee0490c06395541": "```javascript\nconsole.log(6*7)\n```\n\n42\n\n",
+  "0da9c86679cfe0b896c5c3233d07506324634daed4d28f513ba07251b241380b": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3997357\n\n```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3997357\n\n",
+  "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904": "Daemon stopped (if it was running).\n",
+  "76dbdaafa8055a5fbd0724e49c0bb3f400ed4be55978d9b318b787cf504a4d96": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3998170\n\n",
+  "491b010ccea29d859a63ee27ad758b7f640e135beee81d3726421c8727b27f6d": "Daemon stopped (if it was running).\nSingle-user daemon started.\n",
+  "fd43515f655325b026afed62bd8f796981c1ce792494f0b9a49982de482f8cd3": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3998272\n\n",
+  "cd876f7b3b47383370f3ae440e8b2dbad8e03ae44c1b596dd288c65141c10411": "[mcporter] Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\nError: Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\n    at DaemonClient.ensureDaemon (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:155:19)\n    at async file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:112:17\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:128:26)\n",
+  "9988029aef45a1c49c6aa3793866e083f8eb6d6e9d436131ae6277a8a79b1bed": "Single-user daemon started.\n",
+  "453b1c25c24c1b63b472da9844951876c1223d72922083c24d703e9eef1a60fd": "context-mode\n\n  function ctx_execute(language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: number, background?: boolean, cwd?: string);\n  // optional (1): intent\n\n  function ctx_execute_file(path: string, language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: number, intent?: string);\n\n  function ctx_index(content?: string, path?: string, source?: string, include?: string[], exclude?: string[]);\n  // optional (5): maxDepth, maxFiles, extensions, respectGitignore, followSymlinks\n\n  function ctx_search(queries?: string[], limit?: number, source?: string, contentType?: \"code\" | \"prose\", sort?: \"relevance\" | \"timeline\");\n  // optional (1): project\n\n  function ctx_fetch_and_index(url?: string, source?: string, requests?: Record<string, unknown>[], concurrency?: number, force?: boolean);\n  // optional (1): ttl\n\n  function ctx_batch_execute(commands: Record<string, unknown>[], queries: string[], timeout?: number, concurrency?: number, cwd?: string);\n  // optional (1): query_scope\n\n  function ctx_stats();\n\n  function ctx_doctor();\n\n  function ctx_upgrade();\n\n  function ctx_purge(confirm: boolean, sessionId?: string, scope?: \"session\" | \"project\");\n\n  function ctx_insight();\n\n  Optional parameters hidden; run with --all-parameters to view all fields.\n\n  11 tools · 248ms · STDIO bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --bind ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vf/cm ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vf/cm --die-with-parent --chdir ~/code/native-agent-stack -- node ~/.codex/plugins/cache/context-mode/context-mode/1.0.169/server.bundle.mjs\n\n",
+  "8db130f04119a66311bfb70d455b9593a5822c6c0477bf1ffa5b77ce90453207": "```python\nprint(\"bridge-recovered\")\n```\n\nbridge-recovered\n\n",
+  "d978cdddfe1afe41c130b745363df313229bbbd83c5c57292b7a6f15a01ffc54": "[mcporter] Daemon startup is taking longer than usual; Chrome relay discovery can take up to 30 seconds.\n[mcporter] MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\nError: MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\n    at daemonStartupTimeoutError (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/startup-readiness.js:40:12)\n    at waitForDaemonReady (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/startup-readiness.js:14:19)\n    at async file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:163:13\n    at async DaemonClient.ensureDaemon (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:167:9)\n    at async file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:112:17\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:128:26)\n",
+  "1ad61fa577af6092e3fc9605ca28027707d7a02be2155f04793737b31d7d3676": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=4009075\n\n",
+  "4e34723d92ce23fa85892945ae413d5e667209f6badbf752e381e4d7c78895af": "context-mode doctor\n\n[OK] Runtimes: 4/11 (36%) — javascript, shell, python, perl\n[WARN] Performance: NORMAL — install Bun for 3-5x speed boost\n[OK] Storage sessions: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/cm/sessions (via CONTEXT_MODE_DIR)\n[OK] Storage content: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/cm/content (via CONTEXT_MODE_DIR)\n[OK] Storage stats: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/cm/sessions (via CONTEXT_MODE_DIR)\n[OK] Server test: PASS\n[OK] FTS5 / SQLite: PASS — native module works\n[OK] Codex CLI binary: codex --version resolved to codex-cli 0.155.1\n[WARN] Codex hooks feature flag: Could not read ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/codex/config.toml — fix: context-mode upgrade\n[FAIL] Hooks config: No readable ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vs/cm/codex/hooks.json found — fix: Copy configs/codex/hooks.json to hooks.json or run context-mode upgrade\n[OK] Hook scripts: no direct .mjs script paths to verify\n[OK] Version: v1.0.169\n",
+  "27324f131d4d1af105f31f72ebb8cf9ff424fea2b987f0601318c6b77b0d6838": "[('<uuid:03148079>', 1), ('<uuid:f67c77f4>', 1)]\n",
+  "795eed650b27f11bf6b32d3239e5d8c8a069dc2f9f2b534d4cf9d4bf81d4c452": "~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter\nps: not on PATH\n0.14.1\n",
+  "7a0eaf9da99ac14bcfb88ef17f969bccf078fb8539695bc4670cde0889b1d55e": "[mcporter] Transport ownership could not be verified; inspect it before recovery.\nError: Transport ownership could not be verified; inspect it before recovery.\n    at DaemonClient.sendRequest (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:206:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:134:20) {\n  code: 'transport_retirement_failed'\n}\n",
+  "5bae4bf825697f70193e524d8169e74f90a16f22f119870dc9d8688e2d137fec": "[mcporter] Retirement is unverified; inspect the previous transport before stopping this owner.\nError: Retirement is unverified; inspect the previous transport before stopping this owner.\n    at DaemonClient.sendRequest (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:206:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async DaemonClient.stop (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:55:13)\n    at async handleDaemonCli (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli/daemon-command.js:44:9)\n    at async runCli (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js:151:9)\n    at async main (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js:379:5) {\n  code: 'transport_retirement_failed'\n}\n",
+  "6b3b14968e8b1d83077e2502385d208c605825f95057b4a2fffc159ba7f3b60f": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13/bin/mcporter\nps: not on PATH\n0.13.13\n",
+  "7980a3468029d589e292f90457585a4135e8753c293cf31fb3365484f33e439c": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=4062622\n\n"
+ },
+ "deltas": {
+  "567069ea260864838e16e78acb468ece7cbeef8d3d386cb9471ce72559e8b5cb": {
+   "base_content_sha256": "6f5cc631af4351097d65a41ff4e34d0cea6a37614ad3ed3623c9123359f95680",
+   "base_bundle": "out/raw-outputs.json",
+   "unified_diff_n0": "--- \n+++ \n@@ -5 +5 @@\n-  \"durationMs\": 67,\n+  \"durationMs\": 79,\n@@ -10 +10 @@\n-    \"path\": \"~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/mcporter.json\"\n+    \"path\": \"~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/vf/mcporter.json\"\n"
+  }
+ }
+}

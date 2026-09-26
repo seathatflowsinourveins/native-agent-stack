@@ -103,6 +103,7 @@ itself evidence the WSL UVA gap closed.
    `headroom`, `ccusage`, `serena` and `socraticode` too, completing the
    `token-efficiency` profile's Linux coverage (step 2 of
    [`adoption/bootstrap.md`](../bootstrap.md) has the details).
+   Its `ai-memory` and `mcporter` pins also changed after `v2026.09.25.2` (2.3.2 to 2.4.1 and 0.13.13 to 0.14.1); before an existing ai-memory service restarts on 2.4.1, follow [upgrading an existing store](../../recipes/README.md#upgrading-an-existing-store).
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

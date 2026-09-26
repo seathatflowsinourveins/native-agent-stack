@@ -1,0 +1,116 @@
+{
+ "at": "2026-09-25T23:13:06Z",
+ "rc": 0,
+ "inner": {
+  "arm": "base",
+  "uid_in_ns": 0,
+  "ready": {
+   "ready": true,
+   "seconds": 0.6
+  },
+  "s0": {
+   "t": 0.0,
+   "fds": 22,
+   "vanished_after_response": {
+    "est": 0,
+    "keepalive": 0,
+    "ka_when_min_max": null
+   },
+   "vanished_connect_only": {
+    "est": 0,
+    "keepalive": 0,
+    "ka_when_min_max": null
+   },
+   "live_idle": {
+    "est": 0,
+    "keepalive": 0,
+    "ka_when_min_max": null
+   }
+  },
+  "samples": [
+   {
+    "t": 3.0,
+    "fds": 87,
+    "vanished_after_response": {
+     "est": 40,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "vanished_connect_only": {
+     "est": 20,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    }
+   },
+   {
+    "t": 50.0,
+    "fds": 87,
+    "vanished_after_response": {
+     "est": 40,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "vanished_connect_only": {
+     "est": 20,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    }
+   },
+   {
+    "t": 70.0,
+    "fds": 87,
+    "vanished_after_response": {
+     "est": 40,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "vanished_connect_only": {
+     "est": 20,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    }
+   },
+   {
+    "t": 100.1,
+    "fds": 87,
+    "vanished_after_response": {
+     "est": 40,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "vanished_connect_only": {
+     "est": 20,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    },
+    "live_idle": {
+     "est": 5,
+     "keepalive": 0,
+     "ka_when_min_max": null
+    }
+   }
+  ],
+  "healthz_after": 200,
+  "stop": {
+   "rc": 0,
+   "pid_gone": true,
+   "port_closed": true
+  }
+ },
+ "leftovers": []
+}

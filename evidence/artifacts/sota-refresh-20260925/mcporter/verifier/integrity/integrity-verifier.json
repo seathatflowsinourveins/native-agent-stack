@@ -1,0 +1,20 @@
+{
+ "bytes": 464028,
+ "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+ "sha512": "sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==",
+ "sha1": "8dbc86c05013e4dfbfdc155555202a36a3936015",
+ "registry_version": "0.14.1",
+ "registry_tarball": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
+ "dist.integrity==sha512": true,
+ "dist.shasum==sha1": true,
+ "gh_tag": "v0.14.1",
+ "gh_prerelease": false,
+ "gh_published_at": "2026-09-24T13:16:08Z",
+ "gh_asset_digest": "sha256:8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+ "gh_asset_digest==sha256": true,
+ "checksums.txt==sha256": true,
+ "impl_expected_sha256": true,
+ "impl_expected_sha512": true,
+ "impl_expected_sha1": true,
+ "slsa_subject_hex==sha512": true
+}

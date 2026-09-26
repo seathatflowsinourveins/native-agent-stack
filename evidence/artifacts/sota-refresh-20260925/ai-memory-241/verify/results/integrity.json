@@ -1,0 +1,45 @@
+{
+ "at": "2026-09-25T23:10:24Z",
+ "release": {
+  "published_at": "2026-09-25T21:46:32Z",
+  "immutable": false,
+  "prerelease": false,
+  "draft": false
+ },
+ "api_digest": "sha256:15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+ "api_size": 16026020,
+ "api_asset_updated_at": "2026-09-25T21:46:31Z",
+ "sidecar": [
+  "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+  "ai-memory-linux-x86_64.tar.gz"
+ ],
+ "body_lines": [
+  [
+   "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+   "ai-memory-linux-x86_64.tar.gz"
+  ]
+ ],
+ "attestation_api": "404",
+ "fresh_download": {
+  "sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+  "bytes": 16026020
+ },
+ "implementer_tarball_sha256": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+ "all_agree": true,
+ "prefix_vs_tarball": {
+  "members": 196,
+  "content_mismatch": 0,
+  "missing": 0,
+  "mode_mismatch": 0,
+  "extra_in_prefix": 0,
+  "extra_names": [],
+  "setuid_or_world_writable": 0
+ },
+ "installed_bin_sha256": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd",
+ "installed_version": [
+  0,
+  "ai-memory 2.4.1"
+ ],
+ "prefix_owner_is_me": true,
+ "prefix_ctime": "2026-09-25T22:43:37Z"
+}

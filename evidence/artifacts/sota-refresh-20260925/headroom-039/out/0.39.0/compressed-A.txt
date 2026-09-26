@@ -1,0 +1,9 @@
+2026-09-25T10:05:10Z request=310 status=200 path=/api/items latency_ms=22
+2026-09-25T10:05:11Z request=311 status=200 path=/api/items latency_ms=23
+2026-09-25T10:05:12Z request=312 status=200 path=/api/items latency_ms=24
+2026-09-25T10:05:13Z request=313 status=503 path=/api/items latency_ms=30000 CRITICAL upstream timeout nsr-anomaly-7f3a
+2026-09-25T10:05:14Z request=314 status=200 path=/api/items latency_ms=26
+2026-09-25T10:05:15Z request=315 status=200 path=/api/items latency_ms=20
+2026-09-25T10:05:16Z request=316 status=200 path=/api/items latency_ms=21
+[593 lines omitted: 1 ERROR]
+[600 lines compressed to 7. Retrieve more: hash=f681f64d7ad6f5b3c5fc56c7]

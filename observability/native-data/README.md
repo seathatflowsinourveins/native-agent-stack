@@ -25,7 +25,7 @@ their existing account and configuration behavior.
 | Source | Supported native read | Published scope |
 | --- | --- | --- |
 | RTK 0.50.0 | `rtk gain --format json`; `rtk gain --project --format json` | Global retained history and the explicit project working directory, separately (the JSON keys are unchanged from 0.49.0; 0.50.0 clamps negative savings rows to 0) |
-| ai-memory 2.3.2 | `ai-memory --data-dir <configured-db> status --json` | Entire configured database: current pages, all versions, sessions, observations; allowlisted embedding mode and native completeness counts; memory LLM status |
+| ai-memory 2.4.1 | `ai-memory --data-dir <configured-db> status --json` | Entire configured database: current pages, all versions, sessions, observations; allowlisted embedding mode and native completeness counts; memory LLM status |
 | QMD 2.8.3 | `qmd --index <configured-index> status` | Selected collection file count; index file/vector totals kept separately |
 | Qdrant | `GET /collections/<allowlisted-collection>` | Native `points_count`, segments and collection status |
 | Other token tools | Existing report `native[].latest` | Three Context Mode runtime roots, Headroom and jCodeMunch |

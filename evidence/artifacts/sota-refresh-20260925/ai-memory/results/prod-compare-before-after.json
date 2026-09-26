@@ -1,0 +1,35 @@
+{
+ "at": "2026-09-25T19:03:42Z",
+ "fingerprint_superset_compare": "V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=35 | observations before=71265 missing=0 after=71812 | PASS",
+ "checks": {
+  "service_same_main_pid": true,
+  "service_same_start": true,
+  "service_same_invocation": true,
+  "service_no_restarts": true,
+  "bin_link_unchanged_old": true,
+  "old_bin_unchanged": true,
+  "claude_settings_unchanged": false,
+  "codex_hooks_unchanged": true,
+  "hooks_still_2.3.2_8_7": true,
+  "live_schema_still_v64": true,
+  "live_existing_rows_unchanged": true,
+  "live_probe_scope_rows_unchanged": true,
+  "no_live_pre_migration_receipt": true,
+  "no_home_archives_added": true,
+  "live_endpoints_same": true,
+  "no_nonce_in_live_db": true,
+  "no_nonce_in_live_wiki": true,
+  "no_probe_session_in_live_db": true,
+  "no_scratch_procs": true
+ },
+ "live_nonce_hits": {
+  "observations": 0,
+  "pages": 0
+ },
+ "live_wiki_nonce_hits": 0,
+ "live_probe_session_rows": 0,
+ "nonces_checked": 10,
+ "sessions_checked": 7,
+ "scratch_procs_alive": [],
+ "pass": false
+}

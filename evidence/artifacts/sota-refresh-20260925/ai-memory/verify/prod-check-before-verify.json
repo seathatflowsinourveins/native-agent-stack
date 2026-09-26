@@ -1,0 +1,28 @@
+{
+ "label": "before-verify",
+ "at": "2026-09-25T19:18:32Z",
+ "live_now": "schema V64 (64 rows) quick_check=ok pages=35 observations=73296",
+ "fp-live-before.json": "fp-live-before.json: V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 now=35 | observations before=71265 missing=0 now=73296",
+ "fp-live-after.json": "fp-live-after.json: V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 now=35 | observations before=71812 missing=0 now=73296",
+ "probe_scope_rows": {
+  "workspaces_nsr_probe": 0,
+  "projects_ai_memory_acceptance": 0
+ },
+ "tokens_checked": {
+  "implementer": 10,
+  "verifier": 0
+ },
+ "sessions_checked": {
+  "implementer": 7,
+  "verifier": 0
+ },
+ "live_db_token_hits": {
+  "observations": 0,
+  "pages": 0,
+  "probe_sessions": 0
+ },
+ "live_wiki_token_hits": 0,
+ "live_pre_migration_receipt_present": false,
+ "home_backup_archives": 0,
+ "live_backups_dir_entries": "absent"
+}

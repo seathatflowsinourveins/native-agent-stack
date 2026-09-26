@@ -93,7 +93,7 @@
     {
       "id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.3.2",
+      "version": "2.4.1",
       "license": "MIT",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
@@ -123,14 +123,16 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "memory-lifecycle-probe-20260921"
+        "memory-lifecycle-probe-20260921",
+        "ai-memory-240-qualification-20260925",
+        "ai-memory-241-qualification-20260925"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
-        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2"
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
       ],
-      "source_pin": "353841d91618d20b110b208de284a74d0b960379",
-      "freshness": "Official 2.3.2 release and supported native status/search/direct MCP checked 2026-09-20. Older native-model receipts retain their original version and scope. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import. Separate Mac arm64 synthetic patch acceptance passed on September20; production adoption remains host-scoped."
+      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
     },
     {
       "id": "ast-grep",
@@ -613,13 +615,13 @@
     },
     {
       "id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
-      "version": "0.13.13",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "version": "0.14.1",
       "license": "MIT",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
       "commands": [
-        "mcporter --config \"${MCPORTER_CONFIG}\" list --brief --no-oauth"
+        "mcporter --config \"${MCPORTER_CONFIG}\" list socraticode --brief --no-oauth"
       ],
       "evidence_ids": [
         "component-history",
@@ -627,13 +629,14 @@
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "mcporter-0141-qualification-20260925"
       ],
       "upstream_sources": [
-        "https://github.com/openclaw/mcporter/tree/v0.13.13"
+        "https://github.com/openclaw/mcporter/tree/v0.14.1"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "0.14.1 serves bin/mcporter on the NativeStack WSL2 host since 2026-09-25 after a matched 37-step comparison against 0.13.13 (independent review). 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.13.13 is kept for rollback. The Mac pin stays 0.13.13, and the landscape winner pin stays 0.13.13 until a new verdict wave."
     },
     {
       "id": "openresearch",
