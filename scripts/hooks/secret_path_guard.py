@@ -555,6 +555,8 @@ def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
     found = []
     for words in words_list:
         for position in range(1, len(words)):
+            if "://" in words[position]:
+                continue  # a URL argument (`tvly extract https://.../env`) is never a program a launcher runs
             program = program_of(words[position:position + 1])
             if program in LAUNCHED_PROGRAMS or INTERPRETER.fullmatch(program):
                 found.extend(expand(shlex.join(words[position:])))

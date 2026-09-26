@@ -378,6 +378,9 @@ ALLOWED = [
     "tvly-keyring search \"<query>\" --json",
     "tvly-keyring research run \"<question>\" --model pro --json",
     "tvly-keyring auth --json",
+    # A URL whose last path segment is env or printenv is an argument, not a launched program.
+    "tvly-keyring extract \"https://www.gnu.org/software/coreutils/env\" --json",
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly extract https://man7.org/linux/man-pages/man1/printenv.1.html/printenv --json",
     "tvly auth --json",
     "tvly auth --help",
     "tvly --status",
