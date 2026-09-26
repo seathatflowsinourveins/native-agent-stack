@@ -670,7 +670,8 @@
   "repository_followups_after_the_switch": [
     "adoption/pins-linux-x86_64.json codex: url https://registry.npmjs.org/@openai/codex/-/codex-0.157.1.tgz, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73, integrity above",
     "manifests/stack.json codex version 0.157.1 and this receipt in evidence_ids; recipes/README.md codex row and the codex-package archive row (API digest above)",
-    "adoption/pins-macos-arm64.json keeps 0.155.1 until a Mac qualifies 0.157.1 with its darwin-arm64 platform dependency; tests/test_adoption_bootstrap_macos.py then needs a codex Mac-lag entry"
+    "adoption/pins-macos-arm64.json keeps 0.155.1 until a Mac qualifies 0.157.1 with its darwin-arm64 platform dependency; tests/test_adoption_bootstrap_macos.py then needs a codex Mac-lag entry",
+    "with the pin move to 0.157.x, add daemon_auto_start = false under a [features] table in adoption/templates/codex.config.template.toml (the bootstrap's user-level ~/.codex/config.toml) and say so in the recipes/README.md codex row, so a new host's first interactive launch does not start a self-updating server outside the pinned prefix; 0.155.1 accepts that key (results/daemon.json T8, T9)"
   ],
   "not_published": [
     "the npm tarballs, the GitHub asset and extracted trees (public at the URLs above)",

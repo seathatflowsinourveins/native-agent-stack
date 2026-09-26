@@ -62,7 +62,7 @@
       "sed -i '/^-- codex --$/{n;s/^codex-cli .*/codex-cli 0.155.1/}' ~/.local/share/codex-ecosystem/installed-versions.txt"
     ],
     "sweep_finding": "codex --search exec keeps web_search cached on 0.155.1 and 0.157.1; add -c web_search=\"live\" to the lane argv (tools/sota-convergence/landscape-sweep/codex_job.py codex_argv) if live search is intended",
-    "after_switch_repository_followups": "move adoption/pins-linux-x86_64.json codex to the wrapper above, manifests/stack.json codex to 0.157.1 with this receipt, the recipes/README.md codex rows (codex-package asset API digest sha256:0e211868c9fd73cb49ad35ac675b5eafdf6b9f453df8a493df980c59a590fe5f); the Mac pin waits for its own qualification",
+    "after_switch_repository_followups": "move adoption/pins-linux-x86_64.json codex to the wrapper above, manifests/stack.json codex to 0.157.1 with this receipt, the recipes/README.md codex rows (codex-package asset API digest sha256:0e211868c9fd73cb49ad35ac675b5eafdf6b9f453df8a493df980c59a590fe5f); the Mac pin waits for its own qualification; with the pin move to 0.157.x, add daemon_auto_start = false under a [features] table in adoption/templates/codex.config.template.toml (the bootstrap's user-level ~/.codex/config.toml) and say so in the recipes/README.md codex row, so a new host's first interactive launch does not start a self-updating server outside the pinned prefix; 0.155.1 accepts that key (results/daemon.json T8, T9)",
     "overturn_when": "the post-switch live GPT-6 probe fails or differs from 0.155.1, a later stable release changes exec --json events, the flags the lanes use or the background server's start or update defaults, or an advisory lands against 0.157.1",
     "artifacts": "evidence/artifacts/sota-refresh-20260926/codex/",
     "background_server": {
@@ -184,7 +184,7 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260926/codex/results.json",
-      "sha256": "34ff3f1a949224269c9829af4b233e69ddfeb3d9cf2f5c506d671f9ba968b78d",
+      "sha256": "c4e3ae97b0ac7e212ae63942508db55847fd3099cf925a97f514e7ec83fa2499",
       "byte_identical_to_run_copy": false
     },
     {
