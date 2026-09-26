@@ -360,6 +360,134 @@ no need for it.
 example by `hf auth token`, and follow
 [Rotation and incidents](#rotation-and-incidents).
 
+## Memory-only option: Linux kernel keyring (2026-09-26)
+
+On 2026-09-26 the operator supplied a Tavily API key and decided that later
+sessions and workflows should use it without it being stored in a file.
+[`scripts/kernel_keyring.py`](../scripts/kernel_keyring.py) keeps such a key
+in the Linux kernel's user keyring and hands it to one command at a time. Use
+it for Tavily, and for any other provider key that the operator wants kept
+off disk on a Linux or WSL2 host. It does not replace the file store: the
+Alpaca paper pair and the other inventory entries stay in their files,
+because their loaders read `--env-file` and because an unattended or
+scheduled run cannot rely on a key that a kernel restart erases.
+
+**Store it** in your own terminal, never through an agent. The value goes in
+on standard input, never on a command line:
+
+```sh
+read -rs K && printf %s "$K" | python3 scripts/kernel_keyring.py store tavily_api_key; unset K
+python3 scripts/kernel_keyring.py status tavily_api_key    # tavily_api_key: present
+```
+
+`read -rs` reads without echo, and `printf` is a shell builtin in bash and
+zsh, so the value never appears in any process's arguments. Run without a
+pipe, `store` turns echo off and then prompts for the value. It refuses a name
+that is already stored; `--replace` revokes the old key and then stores the
+new one, which is also how to rotate. Names use lowercase letters, digits,
+`.`, `_` and `-`.
+
+**Use it** through `exec`, which reads the key and starts the command with
+one variable set, in that command's environment only:
+
+```sh
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly search "<query>" --json
+python3 scripts/kernel_keyring.py revoke tavily_api_key    # remove it
+```
+
+Agents and workflow steps run the same line from the checkout root, so
+nothing goes into a shell startup file, a unit file or a prompt. `exec`
+refuses a variable name that is not `[A-Z_][A-Z0-9_]*`, or that the dynamic
+loader or a shell reads at startup (`LD_*`, `DYLD_*`, `PATH`, `IFS`, `ENV`,
+`BASH_ENV`, `PS4`, `SHELLOPTS`, `BASHOPTS`): ld.so prints a value it cannot
+use in its error message, and a shell sources, traces or splits on the
+others. No subcommand prints the value; errors name the key or an errno only. `scripts/credential_status.py` inspects files, so it
+does not report keyring entries; `status` is the check. The Tavily commands
+are in [`recipes/tavily.md`](../recipes/tavily.md).
+
+**Lifetime.** The key stays until it is revoked or the kernel stops. The
+kernel keeps a user keyring for as long as its user namespace exists, whether
+or not a process of that uid is running (upstream
+`security/keys/process_keys.c`, `get_user_register()`; the user-keyring(7)
+page in man-pages 6.19 still describes the older rule that tied it to running
+processes), so a distribution stopping on its own does not erase it while
+the VM runs. On WSL2 the kernel stops with `wsl --shutdown`, with a Windows
+restart or update, and when WSL shuts the VM down after it has been idle for
+`vmIdleTimeout` (default 60 seconds, Windows 11 only); a distribution itself
+stops after it has been idle for `instanceIdleTimeout` (default 15 seconds)
+([WSL configuration](https://learn.microsoft.com/en-us/windows/wsl/wsl-config),
+updated 2026-09-16). After that, `status` prints `absent`, `exec` refuses to
+start the command, and the operator stores the key again.
+
+**Scope.** The key is a `user` key named `native-agent-stack:<name>` in the
+user keyring of one uid on one kernel, with permissions `0x3F0B0000`: all for
+a process that possesses it; view, read and search for any process of the
+same uid; nothing for anyone else. It is not shared with other hosts, and
+each host stores its own. WSL2 runs every distribution on the same kernel.
+This distribution runs in the kernel's initial user namespace (measured:
+`readlink /proc/self/ns/user` gives `user:[4026531837]`), so another
+distribution that also does would see the same user keyring for the same uid.
+That was not measured across distributions.
+
+**macOS** has no kernel keyring. Use the login Keychain through the
+operator's `secret` helper, as the Alpaca paper lane does
+([`adaptive-paper/README.md`](../blueprints/us-equities/adaptive-paper/README.md)
+and the 2026-09-25 addendum to
+[`decisions/2026-09-22-broker-credential-handling.md`](decisions/2026-09-22-broker-credential-handling.md)):
+`secret set TAVILY_API_KEY` once, then
+`secret run TAVILY_API_KEY -- tvly search "<query>" --json`, which exports
+the value only in that command's process. The helper is the operator's own
+tool, not part of this repository, and this use for Tavily has not been run
+on a Mac.
+
+**What it does not protect against.**
+
+- Any process of the same uid can read the key: `exec` with any command, a
+  few lines of Python, or `keyctl print` where keyutils is installed. That
+  includes every agent session running as you, and the guard hook and the
+  deny rules do not cover the keyring. It is the residual risk the file store
+  already has (see [the threat model](#threat-model-and-what-each-guard-stops)),
+  without the file: nothing to commit, back up, sync or read through
+  `\\wsl.localhost` from Windows. A Windows process can still start a command
+  in the distribution as you with `wsl.exe`. Root can read the key too.
+- While the command started by `exec` runs, its environment holds the value,
+  readable by the same uid and root through `/proc/<pid>/environ`, as with
+  the subshell pattern in [Picking up in a new session](#picking-up-in-a-new-session).
+- Memory only does not mean no disk ever holds the value: the guest can swap
+  a running command's memory, its environment included, to the WSL swap file
+  (`swap`, default 25% of memory).
+- A value that was pasted into a chat, a prompt or a tool call is already in
+  the stores that keep output: Claude Code transcripts, ai-memory
+  observations and the others under
+  [Telemetry and pasted values](#telemetry-and-pasted-values). The keyring
+  does not remove those copies. The Tavily key stored on 2026-09-26 arrived
+  that way, and the operator accepted it for this practice use. If that exposure
+  matters, rotate the key at Tavily, run `store --replace` with the new
+  value, and purge the copies as in
+  [Rotation and incidents](#rotation-and-incidents).
+
+**Checked on this host (2026-09-26, WSL2 kernel 6.18.33.2, x86_64).** These
+are local integration checks, not an upstream test.
+[`tests/test_kernel_keyring.py`](../tests/test_kernel_keyring.py) stores
+generated throwaway values under names unique to each run and covers: the
+store, status, exec and revoke round trip; that the child gets the value in
+its environment and not on its command line; that no subcommand prints a test
+value; `--replace`; refused names and variables; hidden terminal input; and a
+session keyring that does not link the user keyring (as with systemd
+`KeyringMode=private`). Such a session does not possess keys in the user
+keyring. `store` still sets the permissions there, because it creates the key
+in its own process keyring and links it into the user keyring only
+afterwards; `revoke` invalidates the key, because only a process that
+possesses a key may revoke it. The first prototype of the script ignored the
+permission call's result: in such a session its key kept the kernel default
+(same uid: view only), and a later `exec` failed with `EACCES`. The
+committed script finds the key stored on 2026-09-26:
+`exec tavily_api_key TAVILY_API_KEY -- tvly auth --json` returned
+`"authenticated": true, "method": "env"`, and `tvly auth --json` without
+`exec` returned `"authenticated": false`, so this host holds no Tavily
+credential file. Not run: another distribution, macOS, aarch64. CI runs the
+tests where the keyring system calls are allowed and skips them otherwise.
+
 ## Threat model and what each guard stops
 
 | Layer | Stops | Does not stop |

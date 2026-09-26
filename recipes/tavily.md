@@ -39,3 +39,48 @@ selected skill operations in this task, not execution of all eight skills or a
 provider-token savings total.
 
 Use Search and Extract for the task at hand. Map, Crawl and Research remain separately selected capabilities; this receipt does not qualify them or a full research report. No lifetime token-saving counter is claimed. [Exact native evidence](../evidence/receipts/native-tavily-cli-20260920.json).
+
+## Memory-only key on Linux and WSL2 (2026-09-26)
+
+On 2026-09-26 the operator chose to keep the Tavily API key in memory only,
+never in a file. On a Linux or WSL2 host it lives in the kernel user keyring
+under the name `tavily_api_key`. How to store it, how long it lasts and what
+it does not protect against are in
+[secret-storage.md](../docs/secret-storage.md#memory-only-option-linux-kernel-keyring-2026-09-26).
+tavily-cli 0.1.8 reads `TAVILY_API_KEY` before its own file (`get_api_key()`
+in `tavily_cli/config.py`: the environment, then `~/.tavily/config.json`,
+then OAuth), so each command gets the key through `exec`, run from the
+checkout root:
+
+```sh
+python3 scripts/kernel_keyring.py status tavily_api_key
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly auth --json
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly search "<query>" --depth basic --max-results 5 --json
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly extract "<url>" --extract-depth basic --json
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly research run "<question>" --model pro --json
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly research poll "<request_id>" --json
+```
+
+- `tvly auth --json` prints only `authenticated`, `method` and `source`;
+  through `exec` it reports `"method": "env"`. Plain `tvly auth` also prints
+  the first eight and last four characters of the key, so use `--json`.
+- Do not run `tvly login` on such a host: `tvly login --api-key` and the
+  browser login both write the credential to `~/.tavily/config.json`, and
+  `--api-key` also puts the key on a command line. Never give `exec` a
+  command that prints the environment, such as `env`, `printenv` or an `echo`
+  of the variable.
+- Without `exec`, `search` and `extract` still run, in keyless mode with a
+  rate-limit cap, while `map`, `crawl` and `research` stop and ask for a key.
+  A missing key therefore shows up as capped searches rather than an error.
+  Check `status` first, and store the key again after the kernel restarts.
+- `research run` waits and polls until the report is ready (`--timeout`,
+  default 600 seconds). `--no-wait` returns a request id for
+  `research status` or `research poll`.
+- On macOS use the login Keychain instead:
+  `secret run TAVILY_API_KEY -- tvly ...` (see secret-storage.md).
+
+The Research endpoint (`tvly research run --model pro`) was first used on
+2026-09-26, for the Alpaca platform landscape. Its qualification receipt will
+be recorded separately; this recipe does not claim that Research qualified.
+Map, Crawl and Research remain separately selected capabilities, as stated
+above.
