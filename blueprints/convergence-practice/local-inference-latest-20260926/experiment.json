@@ -3,7 +3,7 @@
   "kind": "convergence_experiment",
   "status": "planned",
   "lane": "local-inference",
-  "task_and_failure": "The production local generation endpoint (Qwen3.8-27B UD-Q4_K_M on llama.cpp b11146, 36 of 65 layers on the GPU) decodes near 5 tokens/s under partial offload. Newer Qwen3.8-family serving profiles and releases from the past weeks may be faster at equal quality on the north-star 8-K item-extraction workload, but no frozen, paired comparison exists on this workstation.",
+  "task_and_failure": "The production local generation endpoint (Qwen3.8-27B UD-Q4_K_M on llama.cpp b11146, 36 of 65 layers on the GPU) decodes at a median 4.79 tokens/s (its own journal, 70 replies) under partial offload. Newer Qwen3.8-family serving profiles and releases from the past weeks may be faster at equal quality on the north-star 8-K item-extraction workload, but no frozen, paired comparison exists on this workstation.",
   "primary_sources_and_pins": [
     {
       "url": "https://github.com/ggml-org/llama.cpp",
@@ -45,12 +45,14 @@
   "discovery_provenance": [
     "Coordinator landscape sweep landscape-sweep-20260926, restricted to the Qwen3.8 family and releases from the past weeks; the sweep itself is not a repository artifact in this change.",
     "Hugging Face model API reads (revision/main and tree with LFS oids) on 2026-09-26 UTC for every pinned repository; no adoption by stars, downloads or leaderboard position.",
-    "Read-only local evidence on 2026-09-26: llama-server --help and --version for b11146, the installed runtime hashes, the production GGUF header and a SHA-256 of the production model file."
+    "Read-only local evidence on 2026-09-26: llama-server --help and --version for b11146, argv parse checks, the installed runtime hashes, the production GGUF header and tensor table, a SHA-256 of the production model file, whole-device nvidia-smi memory, the embeddings and production unit definitions, and the production unit's journal timing lines.",
+    "llama.cpp sources at 7fe450e (server error paths, --n-cpu-ffn, MTP drafting on the target model) and the SDK's EdgarTools 5.58.0 source, whose co-filer header failure was reproduced offline on synthetic headers.",
+    "Independent review of the first freeze (Claude Opus and GPT-6-Astra), repaired in one round before any run."
   ],
-  "license_and_compatibility": "Runtime llama.cpp b11146 is MIT. C0, C1 and C2 use unsloth/Qwen3.8-27B-GGUF (Apache-2.0; base Qwen/Qwen3.8-27B Apache-2.0), including its MTP draft file; the main file already carries one MTP layer. M uses ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF Q8_0 (MIT; base XiaomiMiMo MIT on Qwen3.5-9B Apache-2.0), architecture qwen35 as in production. B, PrismML Ternary Bonsai 2 27B PTQ1_0 (Apache-2.0), is runtime_unsupported: b11146's type table has no ptq1_0/pq2_0 and the card requires the PrismML fork. X, Xing4.0-29B-A4B IQ4_NL (Apache-2.0), is runtime_unsupported: b11146 has no xing4_0 architecture. Qwen3.8-Flash-Next (qwen-community-1.0) is resource_infeasible, not an arm. SEC EDGAR content is public but retained privately under the repository's data policy; EdgarTools 5.58.0 is MIT.",
+  "license_and_compatibility": "Runtime llama.cpp b11146 is MIT. C0, C1 and C2 use unsloth/Qwen3.8-27B-GGUF UD-Q4_K_M (Apache-2.0; base Qwen/Qwen3.8-27B Apache-2.0); C2 drafts from the MTP layer inside that file, so no draft file is used. The tasked profiles (-ngl 99 without FFN offload, and the MTP draft file MTP/mtp-Qwen3.8-27B-Q4_0.gguf, same license) are resource_infeasible on this host and stay pinned. M uses ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF Q8_0 (MIT; base XiaomiMiMo MIT on Qwen3.5-9B Apache-2.0), architecture qwen35 as in production. B, PrismML Ternary Bonsai 2 27B PTQ1_0 (Apache-2.0), is runtime_unsupported: b11146's type table has no ptq1_0/pq2_0 and the card requires the PrismML fork. X, Xing4.0-29B-A4B IQ4_NL (Apache-2.0), is runtime_unsupported: b11146 has no xing4_0 architecture. Qwen3.8-Flash-Next (qwen-community-1.0) is resource_infeasible, not an arm. SEC EDGAR content is public but retained privately under the repository's data policy; EdgarTools 5.58.0 is MIT.",
   "baseline_and_candidate": {
     "baseline": "C0: production Qwen3.8-27B UD-Q4_K_M, llama.cpp b11146, 36 GPU layers, 8192 context, frozen non-thinking greedy request.",
-    "candidate": "C1 (same model, all layers on the GPU), C2 (C1 plus the official MTP draft) and M (MiMo-V2.6-Distill-Qwen-9B Q8_0, all layers on the GPU), each scored on the same filings with the same request; B and X are predeclared runtime_unsupported."
+    "candidate": "C1 (same model, every layer and the output head on the GPU, dense FFN of blocks 0-19 on the CPU), C2 (C1 plus MTP drafting from the file's own MTP layer) and M (MiMo-V2.6-Distill-Qwen-9B Q8_0, all layers on the GPU), each scored on the same filings with the same request; B and X are predeclared runtime_unsupported."
   },
   "frozen_inputs": {
     "base_revision": "ff20470b8fc00fee288916f309123586b15668ec",
@@ -73,7 +75,7 @@
     "inputs": [
       {
         "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
-        "sha256": "da78d150feafaf8875e4faf5959d3aec8dddc776e4b282110541cbef637a74de"
+        "sha256": "b90db46f20624895089cee5bbce27b0c8df2f3c783b1873cea5920a0f8e18b95"
       },
       {
         "path": "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt",
@@ -81,21 +83,21 @@
       },
       {
         "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
-        "sha256": "e17c6ba368febff43f22f57f3bbc6a841eb64b3b29cb2f9d7de3582cb8c4d200"
+        "sha256": "9e949e2db789b55f8c6145aaa382ed3fee02c15a8c4ca60499e775a92adbfe51"
       },
       {
         "path": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
-        "sha256": "71c73ce3edd9916d497e00724d1863de443a955121769547e5542c6c1c525b62"
+        "sha256": "7b60e7c82f3cc3cbbf867fc122fdb1ad72d2c6ee6d7b915d0b76942fd8e1f066"
       }
     ],
     "evaluation": [
       {
         "path": "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py",
-        "sha256": "40699cd89bcfa2703c57b3f65caf49bfd6fad8f29807890502208ab41a1b0b61"
+        "sha256": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc"
       },
       {
         "path": "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py",
-        "sha256": "ea6e0ee157c451c636c36ca28bf0b3e46b30d017f5af0a8ceb6eadf992be46e6"
+        "sha256": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be"
       }
     ]
   },
@@ -123,15 +125,14 @@
         "version": "255 user manager (transient scopes with MemoryMax)"
       }
     ],
-    "isolation": "One arm at a time on 127.0.0.1:18299 in its own systemd user scope (MemoryMax 20G, no swap) with a 1 Hz whole-device GPU-memory guard; the production unit is stopped for the window and restarted by the exit trap. Filing text, raw replies and server logs stay private; not an OS sandbox."
+    "isolation": "One arm segment at a time on 127.0.0.1:18299 in its own systemd user scope (MemoryMax 20G, no swap, verified) with a 1 Hz whole-device GPU-memory guard whose queries are bounded; the production unit is stopped for the window, a transient restore timer is armed first, and the exit trap restores production with bounded steps. Filing text, raw replies, error bodies and server logs stay private; not an OS sandbox."
   },
   "commands": [
     "\"$CATALYST_SDK_PY\" blueprints/convergence-practice/local-inference-latest-20260926/acquire.py --env-file \"$SEC_CONTACT_ENV\" --state-dir \"$LI26_STATE\" --run-id <fresh run id>",
-    "hf download unsloth/Qwen3.8-27B-GGUF MTP/mtp-Qwen3.8-27B-Q4_0.gguf --revision 4ca720788d1e01f1bff70c033e0d0028fd02e502 --local-dir \"$MODELS_DIR/qwen3.8-27b-4ca7207\"",
     "hf download ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf --revision 81baddc39bc48924a88e87b8d31aceb03058e559 --local-dir \"$MODELS_DIR/mimo-v2.6-distill-qwen-9b-81baddc\"",
     "bash blueprints/convergence-practice/local-inference-latest-20260926/window.sh --arms C0 --acquisition \"$LI26_STATE/sec/<run id>\" --inputs-sha256 <inputs_sha256> --runtime-dir \"$LLAMA_B11146\" --models-dir \"$MODELS_DIR\" --state-dir \"$LI26_STATE\"",
     "bash blueprints/convergence-practice/local-inference-latest-20260926/window.sh --arms C1,C2,M --acquisition \"$LI26_STATE/sec/<run id>\" --inputs-sha256 <inputs_sha256> --runtime-dir \"$LLAMA_B11146\" --models-dir \"$MODELS_DIR\" --state-dir \"$LI26_STATE\"",
-    "python3 blueprints/convergence-practice/local-inference-latest-20260926/analyze.py --arm-dir <C0 arm dir> --arm-dir <C1 arm dir> --arm-dir <C2 arm dir> --arm-dir <M arm dir> --out <decision.json>",
+    "python3 blueprints/convergence-practice/local-inference-latest-20260926/analyze.py --state-dir \"$LI26_STATE\" --out <decision.json>",
     "uv run --no-project --with jsonschema --with pyyaml python -m unittest tests.test_local_inference_latest_20260926 -v"
   ],
   "observations": [],
@@ -141,18 +142,20 @@
     "Labels are filer-declared header ITEMS, not hand-checked or frontier-model labels; the task is a proxy for catalyst extraction and does not meet that catalog trial's gate.",
     "One day of filings (at most 360 accessions from 2020-03-02); not a representative sample of 8-K forms or years.",
     "Inputs are capped at 16,000 characters (head and tail); items in a dropped middle are unreachable for every arm alike.",
-    "Timing and memory are shared-host, whole-device observations on a WSL2 desktop with other GPU users; windows run at different times.",
+    "C0 needs an expected two segments (windows) at the production profile; segments run at different times on a shared WSL2 desktop, so timing and memory are shared-host, whole-device observations.",
+    "Admission needs Windows-side GPU applications closed first (at most 3,829 MiB there for C0 and M, 3,062 for C1, 2,678 for C2); the Windows-side residual after closing them was not measured, so C1 or C2 may still be refused.",
+    "C1 and C2 differ from the tasked profiles (-ngl 99 without FFN offload; the MTP draft file), which cannot be admitted beside the embeddings service on this host; those profiles have no result.",
+    "Device-memory estimates are planning figures from the GGUF tensor table and a fixed overhead; the measured guard protects other GPU users.",
     "B and X are excluded by pinned-runtime evidence, not by a load attempt; Qwen3.8-Flash-Next is excluded by size.",
-    "Greedy non-thinking decoding is a fixed protocol, not each publisher's recommended setting.",
-    "C1 and C2 need more free device memory than the 16 GiB floor and may be refused at admission; a refusal is a recorded outcome, not a pass."
+    "Greedy non-thinking decoding is a fixed protocol, not each publisher's recommended setting."
   ],
   "decision_and_scope": {
     "decision": "trial",
-    "scope": "Frozen paired comparison of C1, C2 and M against C0 for non-thinking 8-K item extraction on the 2020-03-02 cohort on nativestack-5975wx-20260925; B and X runtime_unsupported on b11146.",
+    "scope": "Frozen paired comparison of C1, C2 and M against C0 for non-thinking 8-K item extraction on the 2020-03-02 cohort on nativestack-5975wx-20260925, in resumable segments of at most one 3-hour window each; B and X runtime_unsupported on b11146.",
     "qualification_run_ids": []
   },
-  "rollback": "Nothing changes in production unless the frozen rule passes. The window only stops nativestack-generation.service and its exit trap starts it again and waits for /health 200; the unit file is untouched and no drop-in is written. If a later adoption adds a serving-profile or model drop-in, rollback removes that drop-in, runs systemctl --user daemon-reload, restarts nativestack-generation.service and checks /health 200, keeping the current model files for that purpose.",
-  "next_decision_changing_test": "Run the acquisition once, then window 1 (C0) and window 2 (C1, C2, M) after the coordination line reads TRIALS DONE, and apply analyze.py. A passing C1 or C2 changes only the serving profile; a passing M replaces the model. B or X re-enter only under a new plan with a pinned runtime that supports them.",
+  "rollback": "Nothing changes in production unless the frozen rule passes. A window only stops nativestack-generation.service; its exit trap starts it again and waits for /health 200, and a transient restore timer armed before the stop does the same if the script hangs or is killed. The unit file is untouched and no drop-in is written. If a later adoption adds a serving-profile or model drop-in, rollback removes that drop-in, runs systemctl --user daemon-reload, restarts nativestack-generation.service and checks /health 200, keeping the current model files for that purpose.",
+  "next_decision_changing_test": "Run the acquisition once, then C0 windows until C0's segment chain completes and a window for C1, C2 and M, after the coordination line reads TRIALS DONE and Windows-side GPU applications are closed; apply analyze.py --state-dir. A passing C1 or C2 changes only the serving profile; a passing M replaces the model. B or X re-enter only under a new plan with a pinned runtime that supports them.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

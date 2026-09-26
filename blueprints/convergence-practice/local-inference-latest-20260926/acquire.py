@@ -325,14 +325,37 @@ def fetch(get, url, limit, pacer):
     return raw
 
 
+ENTITY_BLOCK = re.compile(r"^<(?:FILER|FILED-BY|SUBJECT-COMPANY|REPORTING-OWNER|ISSUER)>[ \t]*\r?$",
+                          re.MULTILINE)
+
+
+def header_before_entities(text):
+    """The top-level part of a tag-format .hdr.sgml header, before its first entity block.
+
+    ITEMS precede the FILER blocks. EdgarTools 5.58.0 FilingHeader.parse_from_sgml_text
+    raises AttributeError on a header with two or more FILER blocks (co-filings), so the
+    native parser reads only this part.
+    """
+    match = ENTITY_BLOCK.search(text)
+    return text if match is None else text[:match.start()]
+
+
 def native_labels(header_bytes):
+    """ITEMS from the native parser on the top-level header, cross-checked with EdgarTools'
+    own repeated-tag reader over the whole header; any disagreement is an acquisition failure."""
     from edgar.sgml import FilingHeader
+    from edgar.sgml.sgml_header import collect_repeated_tags
     try:
-        tagged = FilingHeader.parse_from_sgml_text(header_bytes.decode("utf-8"))
+        text = header_bytes.decode("utf-8")
+        tagged = FilingHeader.parse_from_sgml_text(header_before_entities(text))
         declared = tagged.filing_metadata.get("ITEMS")
+        repeated = collect_repeated_tags(text, "ITEMS")
     except Exception as error:  # noqa: BLE001 - any native parse failure is an acquisition failure
         raise ValueError("native_header_parse_failed:" + type(error).__name__) from None
-    return item_codes(declared)
+    labels = item_codes(declared)
+    if labels != item_codes(repeated or None):
+        raise ValueError("native_items_disagree")
+    return labels
 
 
 def native_primary_filename(submission):
@@ -508,6 +531,7 @@ def public_summary(manifest, rows, agreement, manifest_sha256):
             "truncated_inputs": sum(row["truncated"] for row in rows),
             "input_chars_median": statistics.median(chars) if chars else None,
             "input_chars_max": max(chars) if chars else None,
+            "input_chars_total": sum(len(row["input"]) for row in rows),
             "label_counts": dict(sorted(labels.items())),
             "native_primary_agreement": dict(sorted(agreement.items())),
             "inputs_sha256": (manifest.get("inputs") or {}).get("sha256"),

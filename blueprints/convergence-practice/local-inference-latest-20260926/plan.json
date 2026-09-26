@@ -12,7 +12,22 @@
     "cpu": "AMD Ryzen Threadripper PRO 5975WX, 32 cores, 48 WSL processors, AVX2 without AVX-512",
     "memory": "104,613 MiB WSL total and 74,027 MiB available at planning (2026-09-26T01:45Z), shared with the Polaris distribution",
     "gpu": "NVIDIA GeForce RTX 4090, 24,564 MiB, compute capability 8.9 (Ada: FP8 yes, NVFP4 no), Windows driver 616.64",
-    "observation_scope": "Read-only facts seen while planning. Each window measures memory again and relies on nothing here."
+    "observation_scope": "Read-only facts seen while planning. Each window measures memory again and relies on nothing here.",
+    "gpu_memory_at_planning": {
+      "observed_utc": "2026-09-26T03:24Z",
+      "query": "nvidia-smi --query-gpu=memory.total,memory.reserved,memory.used,memory.free",
+      "total_mib": 24564,
+      "reserved_mib": 422,
+      "used_mib": 19174,
+      "free_mib": 4969,
+      "reportable_mib": 24143,
+      "note": "memory.used + memory.free = 24,143 MiB; the 422 MiB the driver reserves is never reported free."
+    },
+    "resident_gpu_services": {
+      "native-stack-embeddings.service": "vLLM 0.30.0 with --gpu-memory-utilization 0.16: a configured 3,930 MiB of the 24,564 MiB device. Never touched by a window.",
+      "nativestack-generation.service": "The production unit: the C0 profile, estimated at 9,478 MiB. Stopped for a window and restarted by its exit trap."
+    },
+    "windows_side_gpu_memory": "Not attributable per process under WSL. At planning it was about 5,766 MiB (19,174 used - 9,478 production estimate - 3,930 embeddings) with desktop applications open."
   },
   "runtime": {
     "repository": "ggml-org/llama.cpp",
@@ -34,6 +49,7 @@
     "help_evidence": [
       "llama-server --help (b11146, read 2026-09-26 with CUDA hidden, read-only):",
       "-ngl,  --gpu-layers, --n-gpu-layers N   max. number of layers to store in VRAM, either an exact number, 'auto', or 'all' (default: auto)",
+      "-ncffn, --n-cpu-ffn N   keep the dense FFN weights of the first N layers in the CPU (dense models; for MoE expert weights use --n-cpu-moe)",
       "-fit,  --fit [on|off]   whether to adjust unset arguments to fit in device memory ('on' or 'off', default: 'on')",
       "-cram, --cache-ram N   set the maximum cache size in MiB (default: 8192, -1 - no limit, 0 - disable)",
       "--offline   Offline mode: forces use of cache, prevents network access",
@@ -41,7 +57,8 @@
       "--spec-draft-model, -md, --model-draft FNAME   draft model for speculative decoding (default: unused)",
       "--spec-draft-ngl, -ngld, --gpu-layers-draft, --n-gpu-layers-draft N   max. number of draft model layers to store in VRAM, either an exact number, 'auto', or 'all' (default: auto)",
       "--spec-draft-n-max N   number of tokens to draft for speculative decoding (default: 3)",
-      "-rea,  --reasoning [on|off|auto]   Use reasoning/thinking in the chat ('on', 'off', or 'auto', default: 'auto' (detect from template))"
+      "-rea,  --reasoning [on|off|auto]   Use reasoning/thinking in the chat ('on', 'off', or 'auto', default: 'auto' (detect from template))",
+      "-fitt, --fit-target MiB0,MiB1,MiB2,...   target margin per device for --fit, comma-separated list of values, single value is broadcast across all devices, default: 1024"
     ],
     "source_evidence": [
       "docs/speculative.md at 7fe450e: draft-mtp is 'Use Multi Token Prediction (MTP) heads from the main model'.",
@@ -51,9 +68,13 @@
       "tools/server/server-http.cpp at 7fe450e: /health is a public endpoint that needs no API key.",
       "ggml/src/ggml.c at 7fe450e: the type-name table has q1_0, q2_0, tq1_0, tq2_0, mxfp4 and nvfp4 and no pq2_0 or ptq1_0; the installed libggml-base.so.0.25.1 string table agrees.",
       "src/llama-arch.cpp at 7fe450e: architecture names include qwen35 and qwen35moe and no xing4_0.",
-      "Production GGUF header (read-only parse, 2026-09-26): architecture qwen35, block_count 65, qwen35.nextn_predict_layers 1 with blk.64.nextn tensors; its chat template emits an empty think block when enable_thinking is false."
+      "Production GGUF header (read-only parse, 2026-09-26): architecture qwen35, block_count 65, qwen35.nextn_predict_layers 1 with blk.64.nextn tensors; its chat template emits an empty think block when enable_thinking is false.",
+      "common/arg.cpp and common/common.h at 7fe450e: --n-cpu-ffn N adds CPU buffer overrides for the tensors matching blk\\.i\\.ffn_(up|down|gate)\\. for i < N.",
+      "common/speculative.cpp at 7fe450e (common_speculative_init_result) and tools/server/server-context.cpp: with --spec-type draft-mtp and no --spec-draft-model the server creates an LLAMA_CONTEXT_TYPE_MTP context against the target model; a failure logs 'failed to create MTP context' and the server does not start. For qwen35 one trained MTP head drafts up to n_max tokens.",
+      "tools/server/server-context.cpp at 7fe450e: a llama_decode failure ('Compute error.', 'Invalid input batch.') or an exception in a slot is sent to that request as a server_error (HTTP 500) and the server keeps serving; a prompt larger than the slot context is an HTTP 400 of type exceed_context_size_error.",
+      "tools/server/server-task.cpp at 7fe450e: an error reply is {\"error\": {\"code\", \"message\", \"type\"}} plus n_prompt_tokens and n_ctx for exceed_context_size_error."
     ],
-    "argv_parse_check": "2026-09-26, installed b11146 with CUDA hidden: each runnable arm's argv from eval_arm.py (nonexistent model paths, --help appended) exits 0; the negative controls --spec-draft-ngl-bogus 1, --spec-type draft-bogus and --fit maybe exit 1. The parser validates flags and values before --help exits; no model was loaded and no server started."
+    "argv_parse_check": "2026-09-26 (repair round), installed b11146 with CUDA hidden: the argv of C0, C1, C2 and M from eval_arm.py (nonexistent model paths, --help appended) each exit 0; the negative controls --n-cpu-ffn -1, --spec-type draft-bogus, --fit maybe and --n-cpu-ffn-bogus 1 appended to C2 each exit 1. The parser validates flags and values before --help exits; no model was loaded and no server started."
   },
   "serving": {
     "host": "127.0.0.1",
@@ -118,11 +139,12 @@
       },
       "profile": {
         "gpu_layers": 36,
+        "n_cpu_ffn": 0,
         "draft": null,
         "summary": "The production model and runtime with 36 of 65 layers on the GPU and an 8192-token context."
       },
-      "estimated_device_mib": 9728,
-      "estimate_basis": "Blocks 29-64 hold 8,052.7 MiB of weights (GGUF header offsets); about 1.6 GiB more for KV and recurrent state, compute buffers and the CUDA context.",
+      "estimated_device_mib": 9478,
+      "estimate_basis": "Blocks 29-64 hold 8,052.8 MiB of weights; KV for 10 full-attention layers 320 MiB; recurrent state for 26 layers 81 MiB; plus 1,024 MiB.",
       "admission_free_mib": 16384
     },
     {
@@ -147,12 +169,15 @@
       },
       "profile": {
         "gpu_layers": 99,
+        "n_cpu_ffn": 20,
         "draft": null,
-        "summary": "C0 with every layer and the output head on the GPU (--gpu-layers 99)."
+        "summary": "Every layer, the output head, all attention and recurrent state on the GPU; the dense FFN weights of blocks 0-19 (2,648.8 MiB) stay on the CPU (--gpu-layers 99 --n-cpu-ffn 20)."
       },
-      "estimated_device_mib": 16896,
-      "estimate_basis": "All 65 blocks (14,014.5 MiB) and the output head (994.6 MiB); about 1.9 GiB more for state, buffers and context.",
-      "admission_free_mib": 19968
+      "estimated_device_mib": 14079,
+      "estimate_basis": "All blocks and the output head (15,009.4 MiB) less the FFN weights of blocks 0-19 (2,648.8 MiB); KV 544 MiB; recurrent state 150 MiB; plus 1,024 MiB.",
+      "admission_free_mib": 17151,
+      "fit_rule": "The fewest CPU FFN blocks for which C2 is admitted when the Windows side holds at most 2,560 MiB: 20,213 - 2,560 = 17,653 MiB free; C2 needs 17,535 MiB at 20 blocks and 17,805 at 18. C1 keeps the same 20 so that C2 - C1 isolates MTP drafting.",
+      "differs_from_task": "The task named --gpu-layers 99 with no FFN offload; that profile needs 19,799 MiB free and is recorded in not_arms."
     },
     {
       "id": "C2",
@@ -176,25 +201,19 @@
       },
       "profile": {
         "gpu_layers": 99,
+        "n_cpu_ffn": 20,
         "draft": {
           "type": "draft-mtp",
-          "repository": "unsloth/Qwen3.8-27B-GGUF",
-          "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
-          "filename": "MTP/mtp-Qwen3.8-27B-Q4_0.gguf",
-          "sha256": "50d9ce5a6da381bbcfb31061cf73df94a90e6faf8efeddee379a9cb8f1501c6e",
-          "bytes": 1369590656,
-          "local_dir": "qwen3.8-27b-4ca7207",
-          "gpu_layers": 99,
-          "n_max": 3,
-          "license": "Apache-2.0 (same repository)"
+          "source": "main-model-mtp-layer",
+          "n_max": 3
         },
-        "summary": "C1 plus the official MTP draft file: --spec-type draft-mtp --spec-draft-model <MTP file> --spec-draft-ngl 99 --spec-draft-n-max 3."
+        "summary": "C1 plus MTP drafting from the main file's own MTP layer (blk.64.nextn): --spec-type draft-mtp --spec-draft-n-max 3, no --spec-draft-model."
       },
-      "estimated_device_mib": 18944,
-      "estimate_basis": "C1 plus the 1,306 MiB draft file and about 0.7 GiB for the draft context.",
-      "admission_free_mib": 22016,
-      "load_check": "At run time. A failure to load the draft or to create the MTP context is recorded as runtime-unsupported-draft and not retried.",
-      "note": "The main UD-Q4_K_M file already carries one MTP layer, so b11146 can also run draft-mtp without a draft file. That cheaper profile is not an arm of this plan."
+      "estimated_device_mib": 14463,
+      "estimate_basis": "C1 plus 384 MiB for the MTP context; the MTP layer's weights are already in C1.",
+      "admission_free_mib": 17535,
+      "load_check": "At run time. A failure to create the MTP context stops the server at startup; it is recorded as runtime-unsupported-draft and not retried.",
+      "differs_from_task": "The task named the official draft file MTP/mtp-Qwen3.8-27B-Q4_0.gguf. With it, C2 needs more free memory than this host can ever report beside the embeddings service (not_arms). The same repository's main file carries the trained MTP head, which b11146 drafts from without extra weights."
     },
     {
       "id": "B",
@@ -218,6 +237,7 @@
       "file_choice": "PTQ1_0 rather than PQ2_0: the card's RTX 4090 row gives PTQ1_0 the faster decode (91.1 against 81.2 tokens/s, tg128) and the smaller file (5.95 against 7.21 GB). Both need the same kernels.",
       "profile": {
         "gpu_layers": null,
+        "n_cpu_ffn": null,
         "draft": null,
         "summary": "Not run."
       },
@@ -253,6 +273,7 @@
       "file_choice": "Q8_0 is the only language-model quant in the official ggml-org repository; Q4_K_M exists only in third-party repositories. Q8_0 is near-lossless and its 9,086 MiB fit entirely on the GPU within the 16,384 MiB admission floor.",
       "profile": {
         "gpu_layers": 99,
+        "n_cpu_ffn": 0,
         "draft": null,
         "summary": "Every layer on the GPU."
       },
@@ -283,6 +304,7 @@
       "file_choice": "The repository's only GGUF (IQ4_NL).",
       "profile": {
         "gpu_layers": null,
+        "n_cpu_ffn": null,
         "draft": null,
         "summary": "Not run."
       },
@@ -318,13 +340,29 @@
         "bytes": 72546461344
       },
       "reason": "The smallest 4-bit file (93.7 GB) exceeds the 77.6 GB of available WSL memory (74,027 MiB, shared with the Polaris distribution) plus what the 24 GiB GPU can hold beside the other services and the 3 GiB reserve; UD-Q4_K_XL (111.3 GB) exceeds WSL's total memory (104,613 MiB). Serving would page weights from disk. Not an arm."
+    },
+    {
+      "name": "C1 as tasked: --gpu-layers 99 with no FFN offload",
+      "status": "resource_infeasible_on_host",
+      "estimated_device_mib": 16727,
+      "admission_free_mib": 19799,
+      "reason": "With production stopped, at most 24,143 - 3,930 = 20,213 MiB can be free beside the embeddings service, less every Windows-side allocation. Admission would need the Windows side to hold at most 414 MiB while the display runs on this GPU. Replaced by C1 with --n-cpu-ffn 20."
+    },
+    {
+      "name": "C2 as tasked: the tasked C1 plus the official MTP draft file",
+      "status": "resource_infeasible_on_host",
+      "draft_file": {
+        "repository": "unsloth/Qwen3.8-27B-GGUF",
+        "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+        "filename": "MTP/mtp-Qwen3.8-27B-Q4_0.gguf",
+        "sha256": "50d9ce5a6da381bbcfb31061cf73df94a90e6faf8efeddee379a9cb8f1501c6e",
+        "bytes": 1369590656,
+        "license": "Apache-2.0 (same repository)"
+      },
+      "reason": "It needs the 19,799 MiB of the tasked C1 plus up to 1,306 MiB of draft weights and a draft context: above the 20,213 MiB that could ever be free here. Replaced by C2 on the main file's MTP layer. The draft-file profile stays pinned for a host with more device memory."
     }
   ],
   "downloads": [
-    {
-      "arm": "C2",
-      "command": "hf download unsloth/Qwen3.8-27B-GGUF MTP/mtp-Qwen3.8-27B-Q4_0.gguf --revision 4ca720788d1e01f1bff70c033e0d0028fd02e502 --local-dir \"$MODELS_DIR/qwen3.8-27b-4ca7207\""
-    },
     {
       "arm": "M",
       "command": "hf download ggml-org/MiMo-V2.6-Distill-Qwen-9B-GGUF MiMo-V2.6-Distill-Qwen-9B-Q8_0.gguf --revision 81baddc39bc48924a88e87b8d31aceb03058e559 --local-dir \"$MODELS_DIR/mimo-v2.6-distill-qwen-9b-81baddc\""
@@ -361,12 +399,14 @@
       "contact": "Read from the file named by the SEC_CONTACT_ENV pointer (--env-file); owner-only regular file; never printed, stored or hashed into outputs",
       "retention": "~/.local/state/native-agent-stack/local-inference-latest-20260926/sec/<run-id>/ (0700 directories, 0600 files); manifest.json lists SHA-256, bytes and first observation per file",
       "max_acquisition_failures": 36,
-      "complete_when": "the index hash and cohort counts match, no refusal stopped the run, at most 36 acquisition failures, and at least one eligible filing"
+      "complete_when": "the index hash and cohort counts match, no refusal stopped the run, at most 36 acquisition failures, and at least one eligible filing",
+      "summary_counts": "summary.json adds input_chars_total, from which the expected C0 duration is computed before any window."
     },
     "labels": {
-      "source": "FilingHeader.parse_from_sgml_text(<.hdr.sgml text>).filing_metadata['ITEMS'], split on commas",
+      "source": "FilingHeader.parse_from_sgml_text(<.hdr.sgml text before its first FILER, FILED-BY, SUBJECT-COMPANY, REPORTING-OWNER or ISSUER block>).filing_metadata['ITEMS'], split on commas, and equal to edgar.sgml.sgml_header.collect_repeated_tags(<whole header>, 'ITEMS'); a disagreement is an acquisition failure",
       "format": "unique codes matching ^[1-9]\\.[0-9]{2}$, sorted",
-      "caveat": "Filer-declared header metadata: not hand-checked and not frontier-model labels."
+      "caveat": "Filer-declared header metadata: not hand-checked and not frontier-model labels.",
+      "cofiling_reason": "EdgarTools 5.58.0 parse_from_sgml_text raises AttributeError on a header with two or more FILER blocks (reproduced offline 2026-09-26); ITEMS precede the entity blocks. The frozen cohort has 9 co-filing groups."
     },
     "input": {
       "document": "The first SGML <DOCUMENT> after </SEC-HEADER> whose <TYPE> equals the filing's form (8-K or 8-K/A).",
@@ -402,11 +442,13 @@
     "macro_f1": "Mean per-code F1 over the codes declared by at least 5 eligible filings; the code set comes from the labels and is the same for every arm",
     "json_valid_rate": "Share of eligible filings whose whole reply is exactly one JSON object {\"items\": [...]} of unique code strings",
     "fenced_json": "A reply wrapped in one markdown code fence is scored for F1 but does not count as JSON-valid",
-    "invalid_output": "Unparseable, wrong schema, server error or not attempted: the predicted set is empty",
+    "invalid_output": "Unparseable, wrong schema, context overflow or not attempted: the predicted set is empty",
     "decode_tokens_per_second": "timings.predicted_per_second per filing; the median over filings with an HTTP 200 reply and predicted_n >= 1",
     "ttft_ms": "timings.prompt_ms, the prompt processing time before the first generated token",
-    "cold_load_seconds": "From starting the server process to its first /health 200",
-    "peak_device_memory": "The largest whole-device memory.used in the 1 Hz nvidia-smi samples while the arm's server runs; shared-device observation, not per-process attribution"
+    "cold_load_seconds": "From starting the server process to its first /health 200, per segment; the first segment's is reported as the arm's",
+    "peak_device_memory": "The largest whole-device memory.used in the 1 Hz nvidia-smi samples of all of the arm's segments; shared-device observation, not per-process attribution",
+    "context_overflow": "HTTP 400 of type exceed_context_size_error: a per-filing invalid output, counted separately; not an arm failure",
+    "server_errors": "Any other HTTP error, a malformed or oversized reply, a request deadline or an unreachable server: an event that stops the arm and fails criterion (4); the raw error body stays private"
   },
   "decision_rule": {
     "text": "An arm replaces C0 as the production generation model only if (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(C0) is at least -0.02, (2) its median decode tokens/s exceeds C0's, (3) its JSON-valid rate is at least 0.98, and (4) it had no memory or deadline failure. Inference speed alone does not pass. C1 or C2 passing means keep the model and change only the serving profile.",
@@ -419,14 +461,15 @@
       "method": "Paired percentile bootstrap over filings in accession order: each resample is random.Random(20260926).choices over the filing indices, applied to both arms; micro-F1 is recomputed for each.",
       "lower_bound": "Nearest-rank 2.5th percentile: the 250th smallest of the 10,000 differences."
     },
-    "failure_free": "No guard event (device reserve, monitor failure, memory limit not verified, startup failure or deadline), no request or arm deadline, no server exit or unavailability, and both the window record and the evaluation completed",
-    "control_validity": "If C0 is not evaluated or has any failure, no arm replaces it and the result is inconclusive.",
+    "failure_free": "Criterion (4) is scored as: the arm's segment chain is complete (every eligible filing attempted, the last segment completed) and consistent, and it has no guard event (device reserve, monitor failure, memory limit not verified, startup failure), no request or server error event, no server exit or interruption, and for every started segment valid memory evidence: memory.csv present and well formed, samples at most 30 s apart covering the server's run, none below 3,072 MiB free, and MemoryMax verified",
+    "control_validity": "If C0 has not run, the result is inconclusive_control_not_evaluated; while C0 still has segments to run it is inconclusive_control_incomplete; if C0 failed or has any failure it is inconclusive_control_invalid. No arm replaces C0 in any of these cases.",
     "selection": "Among passing arms the highest median decode tokens/s is selected; ties go to the higher micro-F1, then to plan order.",
     "outcomes": {
       "C1": "change_serving_profile",
       "C2": "change_serving_profile",
       "M": "replace_model"
-    }
+    },
+    "incomplete_arms": "An arm that reached a segment boundary and may still continue has outcome incomplete and cannot pass; the decision file marks final false until no arm is incomplete."
   },
   "window": {
     "coordination_line": "GPU trials: TRIALS DONE",
@@ -436,19 +479,21 @@
     "untouched": "native-stack-embeddings.service and every other unit, Windows applications and WSL distributions (never wsl --terminate or --shutdown; never the Polaris distribution)",
     "admission_floor_mib": 16384,
     "minimum_free_mib": 3072,
-    "admission_rule": "Whole-device memory.free >= max(16384, estimated_device_mib + 3072) MiB immediately before load, else the arm is recorded as admission-refused.",
-    "guard": "nvidia-smi whole-device memory.free every second; below 3,072 MiB only the arm's own scope is stopped.",
+    "guard": "nvidia-smi whole-device memory.free every second, each query bounded by 10 s; a failed or timed-out query or free memory below 3,072 MiB stops only the arm's own scope.",
     "memory_max": "20G",
     "memory_swap_max": "0",
     "isolation": "systemd-run --user --scope with MemoryMax and MemorySwapMax, verified through systemctl show before the arm counts",
     "window_seconds": 10800,
-    "arm_seconds": 9000,
+    "arm_seconds": 9600,
     "startup_seconds": 300,
-    "request_seconds": 180,
+    "request_seconds": 600,
     "restore_reserve_seconds": 900,
     "suggested_windows": [
       [
         "C0"
+      ],
+      [
+        "C0 (continues automatically if needed)"
       ],
       [
         "C1",
@@ -456,9 +501,49 @@
         "M"
       ]
     ],
-    "retention": "~/.local/state/native-agent-stack/local-inference-latest-20260926/runs/<window>/ holds private server logs and raw replies; window-summary.json, window.json, memory.csv, eval/metrics.json and the analysis output carry no document text."
+    "retention": "~/.local/state/native-agent-stack/local-inference-latest-20260926/runs/<window>/ holds private server logs, raw replies and error bodies; window-summary.json, window.json, memory.csv, eval/metrics.json and the analysis output carry no document text.",
+    "production_unit_rule": "window.sh accepts only nativestack-generation.service or none and refuses any other name before its preflight.",
+    "production_estimated_device_mib": 9478,
+    "windows_side_prestep": "Required before every window: the coordinator closes Windows-side GPU applications from the README list by exact image name and PID. window.sh never does this.",
+    "admission_prediction": "Before stopping production, window.sh predicts free memory as the current memory.free plus production_estimated_device_mib when the unit is active, and refuses the window, touching nothing, if that is below any listed arm's admission threshold.",
+    "host_admission_arithmetic": {
+      "most_free_mib_with_production_stopped": "24,143 reportable - 3,930 embeddings = 20,213 MiB, less every Windows-side allocation",
+      "windows_side_mib_allowed": {
+        "C0": 3829,
+        "M": 3829,
+        "C1": 3062,
+        "C2": 2678
+      },
+      "at_planning": "About 5,766 MiB on the Windows side, so no arm would be admitted without closing applications first."
+    },
+    "query_timeout_seconds": 10,
+    "monitor_max_gap_seconds": 30,
+    "minimum_segment_seconds": 1200,
+    "stop_timeout_seconds": 120,
+    "max_segments": 4,
+    "segments": "An arm runs in segments of at most one window each. A request starts only while at least request_seconds remain before the segment's deadline, so a segment ends between requests (status segment_boundary). window.sh's next window continues that arm from its first unattempted filing, on a fresh server with the same argv, carrying earlier results verbatim and chaining each segment to the previous metrics file by SHA-256. Only a clean boundary continues; after a completed or failed segment the arm never runs again. Admission refusals and window-budget skips start nothing and may be tried in a later window.",
+    "request_deadline_basis": "600 s is a hang detector: the slowest legitimate C0 request, a 7,936-token prompt at 61.5 tokens/s and 256 output tokens at the p10 decode rate of 2.16 tokens/s, takes about 248 s.",
+    "restore_timer": "Before stopping production, window.sh arms a transient user timer li26-restore-<window> that fires window_seconds later, stops this window's arm scopes and starts the production unit. The exit trap cancels it after restoring production, so it acts only if the script hung or was killed.",
+    "interruption": "INT or TERM while a server runs records the segment as interrupted, a terminal failure; the arm is not resumed. Every exit-trap step is bounded (query 10 s, stop and start 120 s, health 330 s).",
+    "expected_duration": {
+      "per_filing_seconds": "(720 + characters / 3.5) / prompt rate + 20 / decode rate",
+      "rates": "C0 central: 100.8 prompt and 4.79 decode tokens/s; slow: 61.5 and 2.16; fast: 146.1 and 5.23 (production_timings)",
+      "c0_350_filings_of_5000_characters": {
+        "central_seconds": 8922,
+        "slow_seconds": 15468,
+        "fast_seconds": 6486
+      },
+      "c0_segments": "Two expected (one to two for 5,000-character inputs); four only if every input were at the 16,000-character cap at the slowest rates (about 34,300 s). Each segment evaluates for at least about 8,900 s (9,600 s less cold load and the final request deadline).",
+      "other_arms": "C1, C2 and M are expected to finish within one window together; any arm left at a boundary continues in the next.",
+      "check_before_windows": "Compute the C0 estimate from the acquisition summary's eligible and input_chars_total before scheduling windows.",
+      "rejected_alternatives": [
+        "A deterministic subsample: the task fixes n as every eligible filing.",
+        "Prompt caching of the shared instruction: for this hybrid recurrent architecture the pinned server reuses a prefix only through context checkpoints whose positions follow spacing and eviction rules driven by earlier requests (tools/server/server-context.cpp create_checkpoint at 7fe450e), so reuse and numerics would depend on filing order; every filing stays order-independent (cache_prompt false, --cache-ram 0)."
+      ]
+    },
+    "admission_rule": "Whole-device memory.free >= max(16384, estimated_device_mib + 3072) MiB immediately before load, else the arm is recorded as admission-refused: 16,384 for C0 and M, 17,151 for C1, 17,535 for C2."
   },
-  "failure_rule": "Retain every refused, failed and stopped attempt. No silent retry, no changed profile and no re-run to improve a result. A guard, host-memory, startup or deadline failure ends that arm and fails criterion (4). Changing any frozen value needs a new plan.",
+  "failure_rule": "Retain every refused, failed, stopped and interrupted attempt. No silent retry, no changed profile and no re-run to improve a result: only a clean segment boundary continues, and only from the first unattempted filing. A guard, memory-evidence, host-memory, startup, server-error, deadline or interruption failure ends that arm and fails criterion (4). Changing any frozen value needs a new plan.",
   "claims_excluded": [
     "frontier-model parity",
     "hand-checked or frontier-label accuracy",
@@ -469,15 +554,57 @@
     "thinking-mode, long-context or general quality",
     "isolated benchmark throughput on an unshared device",
     "token or cost savings",
-    "any result for arms B or X"
+    "any result for arms B or X",
+    "performance of the tasked C1 and C2 profiles (-ngl 99 without FFN offload; the MTP draft file)"
   ],
+  "amended_before_any_run": {
+    "on": "2026-09-26",
+    "reason": "One bounded repair round after independent review (Claude Opus and GPT-6-Astra), before any download, request or GPU window.",
+    "changes": [
+      "C0 cannot cover every filing in one 3-hour window at the production profile's measured rates: every arm now runs in resumable segments of at most one window each (at most 4), continued automatically by window.sh, with the expected C0 duration predeclared.",
+      "Labels: EdgarTools 5.58.0 FilingHeader.parse_from_sgml_text raises on headers with two or more FILER blocks (the cohort has 9 co-filing groups); it now reads the header before the first entity block, cross-checked with EdgarTools collect_repeated_tags.",
+      "C1 (--gpu-layers 99) and C2 (plus the 1.3 GB MTP draft file) can essentially never be admitted beside the embeddings service and the Windows desktop; both keep every layer on the GPU but hold the dense FFN weights of blocks 0-19 on the CPU, and C2 drafts from the main file's own MTP layer. The tasked profiles are recorded in not_arms.",
+      "window.sh accepts only nativestack-generation.service or none, predicts admission before stopping production, bounds every query and wait, and arms an independent restore timer.",
+      "Any server error other than a context overflow now stops the arm and fails criterion (4); raw error bodies are kept privately.",
+      "analyze.py reads every window under the state directory and fails an arm on missing, malformed, gappy or non-covering memory samples, a sampled reserve breach or an unverified memory limit."
+    ]
+  },
+  "production_timings": {
+    "source": "print_timing lines of nativestack-generation.service (journalctl --user --utc, read-only, cut off at 2026-09-26T03:30Z): 118 requests from 2026-09-24T04:07:28Z to 2026-09-26T03:28:08Z; same model file, runtime and 36-layer profile as C0",
+    "prompt_tokens_per_second": {
+      "prompts": "3,486-4,623 tokens",
+      "n": 11,
+      "min": 61.5,
+      "mean": 100.8,
+      "max": 146.1
+    },
+    "decode_tokens_per_second": {
+      "replies": "at least 16 tokens",
+      "n": 70,
+      "min": 0.4,
+      "p10": 2.16,
+      "median": 4.79,
+      "p90": 5.23,
+      "max": 6.0
+    },
+    "scope": "Production requests with server-side prompt caching and thinking enabled; only their timing lines were read. They set the expected duration; they are not results of this plan."
+  },
+  "memory_model": {
+    "source": "Read-only parse of the production GGUF tensor table (2026-09-26): 65 blocks (64 layers and the blk.64 MTP layer) of 14,014.5 MiB, output.weight 994.6 MiB, token_embd.weight 682.0 MiB kept on the CPU, full attention every fourth layer.",
+    "formula": "estimate = weights on the GPU + KV cache + recurrent state + 1,024 MiB for compute buffers, the CUDA context and margin",
+    "kv_cache": "32 MiB per full-attention layer on the GPU at context 8192 (4 KV heads x 256 x K and V x f16); the MTP layer is counted",
+    "recurrent_state": "3.12 MiB per Gated DeltaNet layer on the GPU (48 v-heads x 128 x 128 f32 plus convolution state)",
+    "mtp_context": "384 MiB for C2's MTP context (its KV cache and compute buffer)",
+    "blocks_0_19_ffn_mib": 2648.8,
+    "scope": "Planning estimates; the guard's measured whole-device memory, not the estimate, protects other GPU users."
+  },
   "prompt_sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
   "frozen_inputs": {
-    "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py": "e17c6ba368febff43f22f57f3bbc6a841eb64b3b29cb2f9d7de3582cb8c4d200",
-    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "ea6e0ee157c451c636c36ca28bf0b3e46b30d017f5af0a8ceb6eadf992be46e6",
-    "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "40699cd89bcfa2703c57b3f65caf49bfd6fad8f29807890502208ab41a1b0b61",
+    "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py": "9e949e2db789b55f8c6145aaa382ed3fee02c15a8c4ca60499e775a92adbfe51",
+    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be",
+    "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc",
     "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
-    "blueprints/convergence-practice/local-inference-latest-20260926/window.sh": "71c73ce3edd9916d497e00724d1863de443a955121769547e5542c6c1c525b62",
+    "blueprints/convergence-practice/local-inference-latest-20260926/window.sh": "7b60e7c82f3cc3cbbf867fc122fdb1ad72d2c6ee6d7b915d0b76942fd8e1f066",
     "blueprints/us-equities/catalyst-provenance/catalyst.py": "26a85df727df99a67c800be1c1ed792eec05ec488f65186ac179acb9b1acd13e",
     "scripts/path_safety.py": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
   }

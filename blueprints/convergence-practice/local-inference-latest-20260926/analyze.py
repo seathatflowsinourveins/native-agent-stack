@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Paired analysis of the frozen arms and the preregistered replacement decision.
 
-Standard library only. Reads each arm's public metrics.json (eval_arm.py) and
-window.json/memory.csv (window.sh); writes one public decision file. Inference
-speed alone never passes: quality non-inferiority, faster median decode, JSON
-validity and a clean memory/deadline record are all required.
+Standard library only. Scans every window that window.sh recorded under
+--state-dir, so no attempt can be left out, rebuilds each arm's segment chain
+(eval/metrics.json, window.json, memory.csv) and writes one public decision
+file. Inference speed alone never passes: quality non-inferiority, faster median
+decode, JSON validity and a complete, failure-free record with verified memory
+evidence are all required.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import math
 from pathlib import Path
@@ -20,7 +23,10 @@ import sys
 HERE = Path(__file__).resolve().parent
 PLAN = HERE / "plan.json"
 CONTROL = "C0"
-FAILURE_FREE_STATUS = "completed"
+
+_SPEC = importlib.util.spec_from_file_location("li26_eval_arm_for_analysis", HERE / "eval_arm.py")
+eval_arm = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(eval_arm)
 
 
 def counts(gold, predicted):
@@ -104,21 +110,112 @@ def paired_bootstrap(control, arm, resamples=10000, seed=20260926, alpha=0.05):
             "resamples": resamples, "seed": seed}
 
 
-def memory_summary(path):
-    """Whole-device peak use and minimum free from the 1 Hz `epoch_ms,used_mib,free_mib` samples."""
-    used, free = [], []
-    if path.exists():
-        for line in path.read_text().splitlines():
-            parts = line.split(",")
-            if len(parts) == 3 and all(part.strip().isdigit() for part in parts):
-                used.append(int(parts[1]))
-                free.append(int(parts[2]))
-    return {"samples": len(used), "peak_device_used_mib": max(used, default=None),
-            "min_device_free_mib": min(free, default=None)}
+def memory_evidence(arm_dir, record, window):
+    """1 Hz `epoch_ms,used_mib,free_mib` samples of one started segment, and every problem with them.
+
+    Missing, malformed, unordered, gappy or non-covering samples, a sampled reserve
+    breach and an unverified memory limit are all failures, whatever the events say.
+    """
+    reserve, max_gap_ms = window["minimum_free_mib"], window["monitor_max_gap_seconds"] * 1000
+    problems, samples = [], []
+    try:
+        lines = (Path(arm_dir) / "memory.csv").read_text().splitlines()
+    except (OSError, UnicodeDecodeError):
+        lines = []
+    if not lines:
+        problems.append("memory-samples-missing")
+    for line in lines:
+        parts = line.split(",")
+        if len(parts) != 3 or not all(part.isdigit() for part in parts):
+            problems.append("memory-samples-malformed")
+            break
+        samples.append(tuple(int(part) for part in parts))
+    if samples:
+        times = [sample[0] for sample in samples]
+        if any(later < earlier for earlier, later in zip(times, times[1:])):
+            problems.append("memory-samples-unordered")
+        elif max((later - earlier for earlier, later in zip(times, times[1:])), default=0) > max_gap_ms:
+            problems.append("memory-monitor-gap")
+        started, stopped = record.get("server_started_ms"), record.get("monitor_stopped_ms")
+        if (type(started) is not int or type(stopped) is not int
+                or times[0] - started > max_gap_ms or stopped - times[-1] > max_gap_ms):
+            problems.append("memory-monitor-coverage")
+        if min(sample[2] for sample in samples) < reserve:
+            problems.append("device-memory-reserve-breached-in-samples")
+    if record.get("memory_max_verified") is not True:
+        problems.append("memory-limit-unverified")
+    return {"samples": len(samples), "peak_device_used_mib": max((s[1] for s in samples), default=None),
+            "min_device_free_mib": min((s[2] for s in samples), default=None)}, problems
 
 
-def arm_summary(metrics, window, memory):
-    filings = metrics["filings"]
+def carry_problems(chain):
+    """Each segment must carry every earlier result verbatim and add results only under its own number."""
+    problems, previous = [], None
+    for position, attempt in enumerate(chain, 1):
+        metrics = attempt["metrics"]
+        if metrics is None:
+            previous = None
+            continue
+        filings = metrics.get("filings") or []
+        if any(entry.get("segment") not in (None, *range(1, position + 1)) for entry in filings):
+            problems.append(f"segment-number-in-filings:{attempt['window']}")
+        if previous is not None:
+            before = {entry["accession"]: entry for entry in previous.get("filings") or []}
+            if [entry["accession"] for entry in filings] != list(before):
+                problems.append(f"segment-filings-changed:{attempt['window']}")
+            for entry in filings:
+                old = before.get(entry["accession"])
+                if old is not None and old.get("segment") is not None and old != entry:
+                    problems.append(f"segment-carry-mismatch:{attempt['window']}")
+                    break
+                if (old is None or old.get("segment") is None) and entry.get("segment") not in (None, position):
+                    problems.append(f"segment-carry-mismatch:{attempt['window']}")
+                    break
+        previous = metrics
+    return problems
+
+
+def evaluate_chain(plan, state_dir, arm_id):
+    """An arm's state (not_run, completed, incomplete, failed), its final metrics and all its failures."""
+    window = plan["window"]
+    attempts = eval_arm.arm_attempts(state_dir, arm_id)
+    not_started = [{"window": a["window"], "status": a["status"],
+                    "admission_required_mib": (a["window_record"] or {}).get("admission_required_mib"),
+                    "free_mib_at_admission": (a["window_record"] or {}).get("free_mib_at_admission")}
+                   for a in attempts if a["kind"] == "not_started"]
+    chain, problems = eval_arm.read_chain(plan, state_dir, arm_id)
+    if not chain:
+        return {"arm": arm_id, "state": "not_run", "not_started": not_started, "segments": [], "failures": [],
+                "metrics": None}
+    failures = list(problems) + carry_problems(chain)
+    segments = []
+    for position, attempt in enumerate(chain, 1):
+        record = attempt["window_record"] or {}
+        if attempt["kind"] == "failed":
+            failures.append(f"attempt-{attempt['status'] or 'unrecorded'}:{attempt['window']}")
+        failures += [str(event) for event in record.get("guard_events") or []]
+        failures += [str(event) for event in (attempt["metrics"] or {}).get("events") or []]
+        memory, memory_problems = memory_evidence(attempt["dir"], record, window)
+        failures += memory_problems
+        cold = record.get("cold_load_ms")
+        segments.append({"segment": position, "window": attempt["window"], "status": attempt["status"],
+                         "cold_load_seconds": cold / 1000 if type(cold) is int else None, **memory})
+    last = chain[-1]
+    if last["kind"] == "completed":
+        state = "completed"
+    elif last["kind"] == "boundary" and len(chain) < window["max_segments"]:
+        state = "incomplete"
+    else:
+        state = "failed"
+        if last["kind"] == "boundary":
+            failures.append("segments-exhausted")
+    metrics = next((attempt["metrics"] for attempt in reversed(chain) if attempt["metrics"] is not None), None)
+    return {"arm": arm_id, "state": state, "not_started": not_started, "segments": segments,
+            "failures": list(dict.fromkeys(failures)), "metrics": metrics}
+
+
+def arm_summary(result):
+    filings = result["metrics"]["filings"]
     triples = [counts(f["gold"], f["predicted"]) for f in filings]
     scores = [filing_scores(f["gold"], f["predicted"]) for f in filings]
     macro, per_code = macro_f1([f["gold"] for f in filings], [f["predicted"] for f in filings])
@@ -127,16 +224,13 @@ def arm_summary(metrics, window, memory):
               and isinstance(f.get("predicted_per_second"), (int, float))]
     ttft = [f["prompt_ms"] for f in filings if f.get("http_status") == 200
             and isinstance(f.get("prompt_ms"), (int, float))]
+    segments = result["segments"]
+    peaks = [s["peak_device_used_mib"] for s in segments if s["peak_device_used_mib"] is not None]
+    lows = [s["min_device_free_mib"] for s in segments if s["min_device_free_mib"] is not None]
     n = len(filings)
-    failures = list(metrics.get("events", [])) + list((window or {}).get("guard_events", []))
-    if metrics.get("status") != FAILURE_FREE_STATUS:
-        failures.append("eval-" + str(metrics.get("status")))
-    if window is None:
-        failures.append("window-record-missing")
-    elif window.get("status") != FAILURE_FREE_STATUS:
-        failures.append("window-" + str(window.get("status")))
-    cold = (window or {}).get("cold_load_ms")
-    return {"n": n, "micro_f1": micro_f1(triples), "macro_f1": macro, "macro_codes": sorted(per_code),
+    complete = result["state"] == "completed" and all(f.get("segment") is not None for f in filings)
+    return {"n": n, "state": result["state"], "segments": len(segments),
+            "micro_f1": micro_f1(triples), "macro_f1": macro, "macro_codes": sorted(per_code),
             "per_code_f1": per_code,
             "mean_precision": statistics.fmean(s["precision"] for s in scores) if n else None,
             "mean_recall": statistics.fmean(s["recall"] for s in scores) if n else None,
@@ -144,12 +238,15 @@ def arm_summary(metrics, window, memory):
             "exact_match_rate": sum(s["exact"] for s in scores) / n if n else None,
             "json_valid_rate": sum(f["parse_status"] == "valid" for f in filings) / n if n else 0.0,
             "fenced_valid_rate": sum(f["parse_status"] == "fenced_valid" for f in filings) / n if n else 0.0,
-            "error_count": sum(f.get("error") is not None for f in filings),
+            "context_overflow_count": sum(f.get("error") == "context_overflow" for f in filings),
+            "not_attempted_count": sum(f.get("error") == "not_attempted" for f in filings),
             "median_decode_tokens_per_second": statistics.median(speeds) if speeds else None,
             "median_ttft_ms": statistics.median(ttft) if ttft else None,
-            "cold_load_seconds": None if cold is None else cold / 1000,
-            **memory,
-            "failures": failures, "failure_free": not failures}
+            "cold_load_seconds": segments[0]["cold_load_seconds"] if segments else None,
+            "segment_cold_load_seconds": [s["cold_load_seconds"] for s in segments],
+            "memory_samples": sum(s["samples"] for s in segments),
+            "peak_device_used_mib": max(peaks, default=None), "min_device_free_mib": min(lows, default=None),
+            "failures": result["failures"], "failure_free": complete and not result["failures"]}
 
 
 def criteria(bootstrap, arm, control, rule):
@@ -174,7 +271,7 @@ def outcome(role, passed):
 
 def select(results, order):
     """Fastest passing arm; ties go to higher micro-F1, then to plan order."""
-    passing = [r for r in results if r["outcome"] != "retain_control"]
+    passing = [r for r in results if r["outcome"] in ("change_serving_profile", "replace_model")]
     if not passing:
         return {"arm": None, "outcome": "retain_control"}
     best = max(passing, key=lambda r: (r["summary"]["median_decode_tokens_per_second"],
@@ -182,75 +279,71 @@ def select(results, order):
     return {"arm": best["arm"], "outcome": best["outcome"]}
 
 
-def load_arm(directory):
-    directory = Path(directory)
-    window_path, metrics_path = directory / "window.json", directory / "eval" / "metrics.json"
-    window = json.loads(window_path.read_text()) if window_path.exists() else None
-    metrics = json.loads(metrics_path.read_text()) if metrics_path.exists() else None
-    return metrics, window, memory_summary(directory / "memory.csv")
-
-
-def analyze(plan, plan_sha256, arm_dirs):
+def analyze(plan, plan_sha256, state_dir):
+    eval_arm.check_plan(plan)
     rule = plan["decision_rule"]
-    loaded, not_evaluated = {}, []
-    for directory in arm_dirs:
-        metrics, window, memory = load_arm(directory)
-        if metrics is None:
-            # Refused at admission, failed at startup or stopped before evaluation.
-            not_evaluated.append({"arm": (window or {}).get("arm"), "window_status": (window or {}).get("status"),
-                                  "guard_events": (window or {}).get("guard_events")})
-            continue
-        if metrics["arm"] in loaded:
-            raise ValueError(f"duplicate arm {metrics['arm']}")
-        if metrics["plan_sha256"] != plan_sha256 or metrics["prompt_sha256"] != plan["prompt_sha256"]:
-            raise ValueError(f"arm {metrics['arm']} ran a different plan or prompt")
-        loaded[metrics["arm"]] = (metrics, window, memory)
-    base = {"schema_version": 1, "kind": "local_inference_latest_decision", "plan_sha256": plan_sha256,
-            "rule": rule["text"], "arms_not_evaluated": not_evaluated, "no_document_text": True,
-            "arms_not_run": [arm["id"] for arm in plan["arms"] if arm["id"] not in loaded]}
-    if CONTROL not in loaded:
-        return {**base, "inputs_sha256": None, "n_filings": 0, "control": None, "arms": [],
-                "selected": {"arm": None, "outcome": "inconclusive_control_not_evaluated"}}
-    control_metrics = loaded[CONTROL][0]
-    keys = [(f["accession"], tuple(f["gold"])) for f in control_metrics["filings"]]
-    for arm_id, (metrics, _, _) in loaded.items():
-        if metrics["inputs_sha256"] != control_metrics["inputs_sha256"] or \
-                [(f["accession"], tuple(f["gold"])) for f in metrics["filings"]] != keys:
-            raise ValueError(f"arm {arm_id} is not paired with the control filings")
-    summaries = {arm_id: arm_summary(*values) for arm_id, values in loaded.items()}
-    control = summaries[CONTROL]
     order = [arm["id"] for arm in plan["arms"]]
     roles = {arm["id"]: arm["role"] for arm in plan["arms"]}
-    control_triples = [counts(f["gold"], f["predicted"]) for f in control_metrics["filings"]]
+    chains = {arm_id: evaluate_chain(plan, state_dir, arm_id) for arm_id in order}
+    for arm_id, result in chains.items():
+        metrics = result["metrics"]
+        if metrics is not None and (metrics.get("plan_sha256") != plan_sha256
+                                    or metrics.get("prompt_sha256") != plan["prompt_sha256"]):
+            raise ValueError(f"arm {arm_id} ran a different plan or prompt")
+    base = {"schema_version": 1, "kind": "local_inference_latest_decision", "plan_sha256": plan_sha256,
+            "rule": rule["text"], "no_document_text": True,
+            "arms_not_run": [{"arm": arm_id, "not_started": chains[arm_id]["not_started"]}
+                             for arm_id in order if chains[arm_id]["state"] == "not_run"],
+            "arms_incomplete": [arm_id for arm_id in order if chains[arm_id]["state"] == "incomplete"]}
+    base["final"] = not base["arms_incomplete"]
+    control = chains[CONTROL]
+    if control["metrics"] is None:
+        reason = ("inconclusive_control_not_evaluated" if control["state"] == "not_run"
+                  else "inconclusive_control_invalid")
+        return {**base, "inputs_sha256": None, "n_filings": 0,
+                "control": {"arm": CONTROL, "state": control["state"], "failures": control["failures"]},
+                "arms": [], "selected": {"arm": None, "outcome": reason}}
+    keys = [(f["accession"], tuple(f["gold"])) for f in control["metrics"]["filings"]]
+    for arm_id, result in chains.items():
+        metrics = result["metrics"]
+        if metrics is not None and (metrics["inputs_sha256"] != control["metrics"]["inputs_sha256"]
+                                    or [(f["accession"], tuple(f["gold"])) for f in metrics["filings"]] != keys):
+            raise ValueError(f"arm {arm_id} is not paired with the control filings")
+    summaries = {arm_id: arm_summary(result) for arm_id, result in chains.items() if result["metrics"] is not None}
+    control_summary = summaries[CONTROL]
+    control_triples = [counts(f["gold"], f["predicted"]) for f in control["metrics"]["filings"]]
     results = []
-    for arm_id in [a for a in order if a in loaded and a != CONTROL]:
-        triples = [counts(f["gold"], f["predicted"]) for f in loaded[arm_id][0]["filings"]]
+    for arm_id in [a for a in order if a in summaries and a != CONTROL]:
+        triples = [counts(f["gold"], f["predicted"]) for f in chains[arm_id]["metrics"]["filings"]]
         bootstrap = paired_bootstrap(control_triples, triples, rule["bootstrap"]["resamples"],
                                      rule["bootstrap"]["seed"], rule["bootstrap"]["alpha"])
-        passed = criteria(bootstrap, summaries[arm_id], control, rule)
+        passed = criteria(bootstrap, summaries[arm_id], control_summary, rule)
+        decided = "incomplete" if chains[arm_id]["state"] == "incomplete" else outcome(roles[arm_id], passed)
         results.append({"arm": arm_id, "summary": summaries[arm_id], "bootstrap": bootstrap,
-                        "criteria": passed, "outcome": outcome(roles[arm_id], passed)})
-    if not control["failure_free"]:
+                        "criteria": passed, "outcome": decided})
+    if control["state"] == "incomplete":
+        selected = {"arm": None, "outcome": "inconclusive_control_incomplete"}
+    elif not control_summary["failure_free"]:
         selected = {"arm": None, "outcome": "inconclusive_control_invalid"}
     else:
         selected = select(results, order)
-    return {**base, "inputs_sha256": control_metrics["inputs_sha256"], "n_filings": len(keys),
-            "control": {"arm": CONTROL, "summary": control}, "arms": results, "selected": selected}
+    return {**base, "inputs_sha256": control["metrics"]["inputs_sha256"], "n_filings": len(keys),
+            "control": {"arm": CONTROL, "summary": control_summary}, "arms": results, "selected": selected}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--plan", type=Path, default=PLAN)
-    parser.add_argument("--arm-dir", type=Path, action="append", required=True,
-                        help="one window.sh arm directory (repeat; C0 required)")
+    parser.add_argument("--state-dir", type=Path, required=True,
+                        help="the --state-dir given to window.sh; every window under runs/ is read")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     raw = args.plan.read_bytes()
-    decision = analyze(json.loads(raw), hashlib.sha256(raw).hexdigest(), args.arm_dir)
+    decision = analyze(json.loads(raw), hashlib.sha256(raw).hexdigest(), args.state_dir)
     with args.out.open("x") as stream:
         json.dump(decision, stream, indent=2, sort_keys=True)
         stream.write("\n")
-    print(json.dumps(decision["selected"], sort_keys=True))
+    print(json.dumps({"selected": decision["selected"], "final": decision["final"]}, sort_keys=True))
     return 0
 
 
