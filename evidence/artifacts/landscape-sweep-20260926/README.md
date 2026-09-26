@@ -62,9 +62,12 @@ counts:
 The two kinds of counters below are never summed.
 
 **Claude.** The source is `child-usage-wf_8397ada1-777.json` in the attempts directory. It was measured with
-`child-usage.mjs` at tool commit `1bd2416b` (sha256 `d60d1df4…e056`). That commit adds the per-child WebSearch
-count (`web_search`) and leaves every usage figure as the earlier measurement at `23b2ab06` gave it; the three
-usage records were re-measured together.
+`child-usage.mjs` at tool commit `7760b1da` (sha256 `85b95813…730d`), which keeps a superseded attempt's
+usage-integrity failures (the third review round, under Files). The three usage records were re-measured
+together at that commit, and each `child_usage` is identical to the earlier measurement at `1bd2416b`
+(sha256 `d60d1df4…e056`): none of this run's 8 superseded attempts holds usage that the totals cannot count, so the
+status stays `complete`. `1bd2416b` had added the per-child WebSearch count (`web_search`) and left every usage
+figure as the measurement at `23b2ab06` gave it.
 
 | Resolved model | Attempts | Input | Output | Cache read | Cache creation |
 | --- | --- | --- | --- | --- | --- |
@@ -224,6 +227,11 @@ follows in a separate pull request.
 
 Repositories without a host prefix are on GitHub. `hf:` marks a Hugging Face model repository.
 
+**Correction (lane limit 12).** The execution-broker proposal of wboayue/rust-ibapi calls nautilus_trader#4983 an rc5
+blocker. At source, #4983 reports v1.227.0, and at rc5 the IB execution client's `handles_order_venue` returns true,
+so the engine's `ClientVenueMismatch` denial cannot fire for it. Read instead: rc5 IBKR execution is unqualified (no
+rc5 stock order observed). The proposal text, its votes and its survival are unchanged.
+
 **Why a layer reopened.** Each retained failure gives its layer the reopen entry `retained_failure`, which points at
 `returns.json#/failures/<layer>`.
 
@@ -272,7 +280,7 @@ counting as refuted on merit. These proposals are the first candidates for a sec
 ## Lane limits
 
 The manifest's `lane_limits/landscape-sweep-20260926` holds the four method limits that `convert.py` writes and the
-eleven run-specific limits below. Each was passed as `--limit`.
+twelve run-specific limits below. Each was passed as `--limit`.
 
 1. Harness: this run used the 2026-09-26 scratchpad prototype of the lane, not the packaged
    tools/sota-convergence/landscape-sweep/ harness merged afterwards (#324). Its prompts_sha256
@@ -361,6 +369,16 @@ eleven run-specific limits below. Each was passed as `--limit`.
     and the release and activity facts GPT-6 cited (latest release, release date, pushed_at, stars) may lag upstream.
     Together with limit 10, no lane after 04:10:13Z had live web search except through gh api and WebFetch. Future
     runs pass -c web_search="live"; the fix of the packaged codex_job.py follows in a separate pull request.
+12. Correction, 2026-09-26 (the trading lane's review of #357): the execution-broker proposal of wboayue/rust-ibapi,
+    which compares a re-pin through nautilus_trader PR #5041, says "rc5 also stays blocked by open issue #4983" and
+    "cases rc5 fails (the #4983 local order denial)", and its discovery notes call #4983 an rc5 adapter failure. That
+    is refuted at source (gh api, read 2026-09-26): #4983's body reports Version v1.227.0; at commit 1b0a49d2,
+    identical to tag v2.0.0rc5, the IB execution client overrides handles_order_venue to return true
+    (crates/adapters/interactive_brokers/src/execution/core.rs:493-495), so the ClientVenueMismatch denial behind the
+    execution engine's handles_order_venue check (crates/execution/src/engine/mod.rs:2222) cannot fire for it; and
+    the open PR #280 already reclassifies #4983 in catalogs/us-equities/runtime-target.json as a stale v1.227.0
+    report. Read instead: rc5 IBKR execution is unqualified (no rc5 stock order observed). The proposal text stays as
+    the model wrote it, and its votes and survival are unchanged.
 
 Notes on limit 3:
 
@@ -482,7 +500,8 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
   usage are in the file.
 - **`child-usage-wf_6a6cb7b8-c22.json`.** The lead-vetting run's Claude usage and WebSearch counts, from
   `usage_record.py`.
-- **`independent-review.json`.** The two review rounds' findings and their repairs.
+- **`independent-review.json`.** The three review rounds' findings and their repairs, and the trading lane's
+  correction (lane limit 12).
 - **The attempts directory.**
   - `child-usage-wf_8397ada1-777.json`: this run's usage and per-worker WebSearch counts.
   - `child-usage-wf_a874897e-af1.json` and `wf_a874897e-af1.json`: run 1's lower-bound usage and its compact
@@ -521,11 +540,12 @@ returns list any skill, so these counts do not measure GPT-6 skill use.
 
 **Verification.** After a simulated registration of every new and changed file,
 `scripts/saturation_ledger.py --check --base origin/main` and `scripts/validate.py` passed, and they passed again
-after lane limit 11 and the lead-vetting addendum. The pinned gitleaks 8.30.1 found nothing with the repository
-configuration. The coordinator registers the files in `manifests/evidence.json`.
+after lane limit 11 and the lead-vetting addendum, and after the third round's repairs and lane limit 12. The pinned
+gitleaks 8.30.1 found nothing with the repository configuration. The coordinator registers the files in
+`manifests/evidence.json`.
 
-**Independent review.** There were two review rounds, each followed by one repair round. Both reviews were
-same-family: no Codex review was run.
+**Independent review.** There were three review rounds, each followed by one repair round. The first two were
+same-family; the third was GPT-6-Astra.
 
 1. **First round.** A separate headless Claude session (Opus, read-only tools) reviewed the first version of this
    record and of the tool and allowlist changes. It returned `needs_changes` with six low findings. Codex was not
@@ -543,8 +563,19 @@ runner, so they would not be this run's votes. The verdict wave, which the coord
 and the 27 proposals are listed above as its first candidates. `independent-review.json` records each finding and its
 disposition.
 
-Lane limit 11, the [GPT-6 cached web search](#gpt-6-cached-web-search) section and the lead-vetting addendum were
-added after both rounds and have not been reviewed.
+3. **Third round.** A read-only GPT-6-Astra review (max effort, live web search) of the record's checkout, which
+   held lane limit 11 and the lead-vetting addendum, returned `NOT_READY` with two P2 findings, both in the tools.
+   Each was reproduced by a regression test that failed before the repair, and both were repaired in `7760b1da`:
+   - **A.** `child-usage.mjs` reported a run `complete` although a superseded attempt held an assistant message
+     without provider usage. Such usage-integrity failures of a superseded attempt now make the run incomplete. The
+     three usage records were re-measured at `7760b1da`; each `child_usage` is unchanged, so no status,
+     `lower_bound_usage` or ledger outcome changed.
+   - **B.** `make_result.py` checked failure coverage over all layers at once, so a layer could lose its critic
+     failure and its reopen entry and count as clean. Coverage is now checked per worker and per layer. This record
+     passes the new check: every layer holds the critic's failure, and every other worker's failure is in its layer.
+
+The trading lane's review of #357 found the #4983 attribution of the rust-ibapi proposal refuted at source; it is
+the dated correction in lane limit 12. Lane limit 12 and the third round's repairs have not been reviewed again.
 
 ## Attempts
 

@@ -2732,11 +2732,11 @@
    "workflow_run": "wf_a874897e-af1",
    "status": "stopped",
    "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
-   "manifest_sha256": "96419356fc76839dd833836d3a60ccfdda0293d5d25a291b6512df90ec67db99",
+   "manifest_sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
    "lane": "landscape-sweep-20260926",
    "prompts_sha256": "1b7844800af40911484591d738a86741fd4a68cbb58339bc8126418c4c6a8783",
    "usage_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_a874897e-af1.json",
-   "usage_sha256": "bcd6f3e14b8f2fb53092f2d13944f6b200745cd88749fb181d7ae3c60846c7b4",
+   "usage_sha256": "0fba2967b093025ffea598d8f2c78d806f55006d9d220d87556bd93245625bcb",
    "lower_bound_usage": true,
    "record_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/wf_a874897e-af1.json",
    "lost_workers": [
@@ -2834,11 +2834,11 @@
    "workflow_run": "wf_8397ada1-777",
    "status": "completed",
    "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
-   "manifest_sha256": "96419356fc76839dd833836d3a60ccfdda0293d5d25a291b6512df90ec67db99",
+   "manifest_sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
    "lane": "landscape-sweep-20260926",
    "prompts_sha256": "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4",
    "usage_ref": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_8397ada1-777.json",
-   "usage_sha256": "efd48d9872a88c3e5214eabcc4c64455c3c1eced958794df42b9a03321a9b30f",
+   "usage_sha256": "76890e29fd79298e51bd15e9c2f365b0322075fa6ae703a0bcf19afc502f7c46",
    "lower_bound_usage": false,
    "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
    "returns_sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
@@ -2851,7 +2851,7 @@
     "Earlier attempts: landscape-sweep-20260926-attempt-1 (wf_a874897e-af1, stopped) is its own record; the one-layer smoke wf_1753e674-5dc is retained under evidence/artifacts/landscape-sweep-20260926-attempts/ without a ledger record.",
     "Proposals and refuter votes plus upstream source reviews only: nothing was installed and no winner changed; winner pins move only through the verdict wave."
    ],
-   "prev_sha256": "a223342a5d2387653ae5fdc4df8efe2f5598a8790c17a71bd37ce8a869b22ad5",
+   "prev_sha256": "6abe4a7ba6d0232e557a885c1520efd680d1448cabf7886e0be3fa8a22c22003",
    "layers": [
     {
      "catalog": "foundation",
@@ -7691,5 +7691,5 @@
    ]
   }
  ],
- "head_sha256": "af45a3bba6d9d013f6f53d75c893acbf0ca43588249760b8d5c05bc60741c910"
+ "head_sha256": "7dea7f41b3fd73812e0e43c3b3472df90b3859d01e7a299500f5d65ade059ab6"
 }

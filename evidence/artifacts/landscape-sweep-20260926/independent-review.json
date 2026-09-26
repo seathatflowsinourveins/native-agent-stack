@@ -4,7 +4,7 @@
  "kind": "independent_review",
  "reviewer": "a separate headless Claude Code session (claude -p, model opus) with read-only tools (Read, Grep, Glob, Bash; Edit, Write, Agent and Workflow disallowed)",
  "reviewed": "commits d89265a7 and 3a47b331, and the first versions of the gitleaks allowlist and of this record (both replaced on this branch by the repaired versions)",
- "review_round": "two reviews, each followed by one repair round: the first at the top level of this file, the second under second_round",
+ "review_round": "three reviews, each followed by one repair round: the first at the top level of this file, the second under second_round, the third under third_round; the trading lane's correction is under trading_lane_correction",
  "verdict": "needs_changes",
  "checks_reported": 43,
  "findings": [
@@ -71,5 +71,36 @@
   "limitations": [
    "Same model family as the recorder; no Codex review of the repair was run."
   ]
+ },
+ "third_round": {
+  "reviewer": "a read-only GPT-6-Astra review (Codex CLI, max effort, live web search) run by the coordinator",
+  "reviewed": "the record's checkout on branch claude/landscape-sweep-20260926-record after lane limit 11, the lead-vetting addendum and the registration commit",
+  "verdict": "NOT_READY",
+  "findings": [
+   {
+    "severity": "P2",
+    "file": "examples/claude-native/workflows/child-usage.mjs:179",
+    "claim": "A retry fixture returns status complete although a superseded attempt holds an assistant message without provider usage, so downstream usage can be marked complete falsely.",
+    "verification": "Reproduced: test-child-usage.mjs regressions for a superseded attempt with a message without provider usage, with usage but no resolved model, and without a transcript, and the CLI exit, failed before the repair (4 failed, 47 passed).",
+    "disposition": "repaired in 7760b1da: an attempt's usage-integrity failures are its usage_issues, and a superseded attempt with any makes the run incomplete (an attempt without requests still counts as zero usage). The three usage records were re-measured at 7760b1da: each child_usage is unchanged, wf_8397ada1-777 stays complete (none of its 8 superseded attempts has uncounted usage), so lower_bound_usage and the ledger outcome are unchanged; only the records' measurement fields and the ledger's usage hashes changed."
+   },
+   {
+    "severity": "P2",
+    "file": "tools/sota-convergence/landscape-sweep/make_result.py:98",
+    "claim": "With token-efficiency's critic-cap failure and its reopen entry removed in memory, the check still passes, because another layer's critic failure satisfies a global coverage check; the layer then derives a clean count of 1.",
+    "verification": "Reproduced in tests/test_landscape_sweep_harness.py (test_failure_coverage_is_checked_per_worker_and_per_layer): the critic's cap failure, then its effort deviation, dropped from one of two healthy layers, and a worker's failure moved to the other layer; make_result accepted all three before the repair.",
+    "disposition": "repaired in 7760b1da: effort_deviation and web_search_capped coverage is checked per worker and per layer with convert.py's mapping (deviation_rounds, moved to sweep_common.py); the critic's failure is required in every layer of the record. This record passes it: make_result.py builds the same RESULT.json."
+   }
+  ],
+  "limitations": [
+   "The review's own output is not retained here; the findings are as the coordinator reported them, and each was reproduced in this checkout before its repair.",
+   "No review of this repair round was run."
+  ]
+ },
+ "trading_lane_correction": {
+  "reviewer": "the trading lane's review of #357",
+  "claim": "The execution-broker proposal of wboayue/rust-ibapi (a re-pin through nautilus_trader PR #5041) says \"rc5 also stays blocked by open issue #4983\" and \"cases rc5 fails (the #4983 local order denial)\".",
+  "verification": "gh api, read 2026-09-26: #4983's body reports Version v1.227.0; commit 1b0a49d2 is identical to tag v2.0.0rc5, and there crates/adapters/interactive_brokers/src/execution/core.rs:493-495 overrides handles_order_venue to return true, so the ClientVenueMismatch denial behind crates/execution/src/engine/mod.rs:2222 cannot fire for the IB client; the open PR #280 reclassifies #4983 in catalogs/us-equities/runtime-target.json.",
+  "disposition": "lane limit 12, dated 2026-09-26: read instead that rc5 IBKR execution is unqualified (no rc5 stock order observed); the proposal text, its votes and its survival are unchanged."
  }
 }
