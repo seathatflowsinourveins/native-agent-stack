@@ -211,6 +211,44 @@ class NativeDataTests(unittest.TestCase):
         self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
         self.assertIn("effort", panel["title"].lower())
 
+    def test_savings_trend_draws_each_scope_as_its_own_unsummed_series(self):
+        panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
+        panel = panels[20]
+        target = panel["targets"][0]
+        # Pin the literal expression: grouping by anything but entity_id, summing, or showing a
+        # step whose newest row is not ok must fail here even if the helper agrees with itself.
+        # The value is the step's last ok estimate, kept only where the newest ok row's
+        # observed_unix equals the newest row's: an earlier success in the same step never
+        # replaces a failed or stale newest row (checked on Loki 3.7.8 by the G2 repair round).
+        stream = '{service_name="agent-stack-native-data",record_kind="savings"}'
+        self.assertEqual(
+            R.savings_series(),
+            'last_over_time(' + stream + ' | json entity_id, state, estimated_saved | state="ok"'
+            ' | unwrap estimated_saved | __error__="" [$__interval]) by (entity_id)'
+            ' and on(entity_id) ('
+            'last_over_time(' + stream + ' | json entity_id, state, observed_unix | state="ok"'
+            ' | unwrap observed_unix | __error__="" [$__interval]) by (entity_id)'
+            ' == on(entity_id) '
+            'last_over_time(' + stream + ' | json entity_id, observed_unix'
+            ' | unwrap observed_unix | __error__="" [$__interval]) by (entity_id))')
+        self.assertEqual(target["expr"], R.savings_series())
+        self.assertNotIn("sum", target["expr"])
+        self.assertEqual((target["queryType"], target["legendFormat"]), ("range", "{{entity_id}}"))
+        self.assertEqual((panel["type"], panel["datasource"]["uid"]), ("timeseries", "ecosystem-loki"))
+        custom = panel["fieldConfig"]["defaults"]["custom"]
+        self.assertEqual(custom["stacking"]["mode"], "none")
+        self.assertFalse(custom["spanNulls"])
+        # No legend value: a last-non-null value would keep showing an old success after the
+        # scope fails. The savings table above carries each scope's current value and state.
+        self.assertEqual(panel["options"]["legend"]["calcs"], [])
+        self.assertNotIn("last", json.dumps(panel["options"]["legend"]).lower())
+        # Every step must hold at least one generation of the two-minute timer example.
+        timer = (ROOT / "observability/native-data/native-data.timer.example").read_text().splitlines()
+        self.assertIn("OnUnitActiveSec=2min", timer)
+        self.assertEqual(panel["interval"], "3m")
+        table = panels[5]["gridPos"]
+        self.assertEqual((panel["gridPos"]["x"], panel["gridPos"]["y"]), (0, table["y"] + table["h"]))
+
     def test_dashboard_panel_grid_positions_never_overlap(self):
         panels = R.dashboard()["panels"]
         ids = [panel["id"] for panel in panels]
@@ -296,6 +334,123 @@ class NativeDataTests(unittest.TestCase):
         c = self.config(); del c["ai_memory"]["workspace"]
         with self.assertRaises(ValueError):
             M.validate_config(c)
+
+    def test_configured_report_scopes_select_their_labels_without_publishing_them(self):
+        # Token-report labels observed on the WSL workstation: Context Mode scopes are the
+        # report's context_roots names and Headroom uses the reporter's default label.
+        now = 10000
+        latest = {"observed_at": M.utc(now), "success": True,
+                  "metrics": {"saved": 12, "session_estimated_saved": 3, "raw": {"updated_at": now * 1000}}}
+        report = {"native": [dict(tool=tool, scope=scope, latest=copy.deepcopy(latest)) for tool, scope in (
+            ("context-mode", "Claude Code (Context Mode plugin)"), ("headroom", "Native / last 30 days"),
+            ("jcodemunch", "Linux / upstream default index"), ("context-mode", "Native Codex"))]}
+        scopes = {"jcodemunch": "Linux / upstream default index", "headroom": "Native / last 30 days",
+                  "context-mode-native-claude": "Claude Code (Context Mode plugin)"}
+        c = self.config(); c["report_scopes"] = scopes
+        M.validate_config(c)
+        rows = M.report_rows(report, now, 60, now, scopes)
+        self.assertEqual([r["entity_id"] for r in rows], ["context-mode-native-claude", "headroom", "jcodemunch"])
+        self.assertEqual({r["state"] for r in rows}, {"ok"})
+        self.assertEqual(rows[0]["session_estimated_saved"], 3)
+        self.assertNotIn("Context Mode plugin", json.dumps(M.loki_payload(rows, 123)))
+        self.assertNotIn("Native / last 30 days", json.dumps(M.loki_payload(rows, 123)))
+        # Without the key the authoring host's labels remain: these labels stay unknown.
+        legacy = {r["entity_id"]: r["state"] for r in M.report_rows(report, now, 60, now)}
+        self.assertEqual(legacy, {"context-mode-native-codex": "ok", "context-mode-native-claude": "unknown",
+                                  "context-mode-desktop-wsl": "unknown", "headroom": "unknown", "jcodemunch": "ok"})
+
+    def test_report_scopes_accept_only_known_entities_and_distinct_labels(self):
+        for scopes in ({}, [], {"rtk-global": "Native / all retained projects"}, {"headroom": ""},
+                       {"headroom": 7}, {"headroom": "x" * 201}, {"headroom": "Native\n/ last 30 days"},
+                       {"context-mode-native-codex": "Same root", "context-mode-native-claude": "Same root"}):
+            c = self.config(); c["report_scopes"] = scopes
+            with self.subTest(scopes=scopes), self.assertRaises(ValueError):
+                M.validate_config(c)
+        c = self.config(); c["report_scopes"] = {"headroom": "Same root", "context-mode-native-codex": "Same root"}
+        M.validate_config(c)  # different tools may share a label
+
+    def test_ai_memory_server_url_reaches_only_the_memory_command(self):
+        for url in ("http://localhost:49474", "http://127.0.0.1:49474/", "https://127.0.0.1:49474",
+                    "http://127.0.0.1:0", "http://127.0.0.1:65536", 49474, None):
+            c = self.config(); c["ai_memory"]["server_url"] = url
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                M.validate_config(c)
+        c = self.config(); c["ai_memory"]["extra"] = "x"
+        with self.assertRaises(ValueError):
+            M.validate_config(c)
+        c = self.config(); del c["ai_memory"]["server_url"]
+        M.validate_config(c)  # optional: the child then keeps the caller's environment
+        seen = {}
+
+        class CapturingRecorder:
+            records = []
+
+            def command(self, name, argv, cwd, env=None):
+                seen[name] = env
+                self.records.append({"completed_at": M.utc(time.time())})
+                return None
+        with tempfile.TemporaryDirectory() as directory:
+            c = M.validate_config(self.config()); c["project"] = directory
+            c["ai_memory"]["server_url"] = "http://127.0.0.1:49474"
+            c["token_report"] = str(Path(directory) / "missing.json")
+            M.collect(c, CapturingRecorder(), time.time())
+            self.assertEqual(seen.pop("ai-memory"), {"AI_MEMORY_SERVER_URL": "http://127.0.0.1:49474"})
+            self.assertEqual(set(seen.values()), {None})
+            recorder = M.Recorder(Path(directory), 5)
+            out = recorder.command("env", [sys.executable, "-c", "import os; print(os.environ['AI_MEMORY_SERVER_URL'])"],
+                                   directory, env={"AI_MEMORY_SERVER_URL": "http://127.0.0.1:49474"})
+            self.assertEqual(out, b"http://127.0.0.1:49474\n")
+            self.assertEqual(recorder.records[-1]["environment_overrides"], ["AI_MEMORY_SERVER_URL"])
+            self.assertNotIn("127.0.0.1", json.dumps(recorder.records[-1]))
+
+    def test_scheduled_deployment_documents_the_native_undo(self):
+        text = (ROOT / "observability/native-data/README.md").read_text()
+        section = text.split("## Scheduled deployment", 1)[1].split("\n## ", 1)[0]
+        blocks = [block for block in section.split("```sh")[1:]]
+        commands = [line.strip() for block in blocks for line in block.split("```", 1)[0].splitlines()]
+        # The undo runs through the same native commands: disable the timer the deployment
+        # enabled, remove the installed units and dashboard file, then reload the user manager.
+        undo = commands.index("systemctl --user disable --now ecosystem-native-data.timer")
+        removal = next(i for i, line in enumerate(commands) if line.startswith("rm ")
+                       and "ecosystem-native-data.service" in line and "ecosystem-native-data.timer" in line)
+        dashboard = next(i for i, line in enumerate(commands) if line.startswith("rm ")
+                         and "native-foundation-data.json" in line)
+        reload = max(i for i, line in enumerate(commands) if line == "systemctl --user daemon-reload")
+        self.assertLess(undo, removal)
+        self.assertLess(removal, reload)
+        self.assertGreater(dashboard, undo)
+
+    def test_scheduled_deployment_undoes_timer_enablement_and_activation_separately(self):
+        text = (ROOT / "observability/native-data/README.md").read_text()
+        section = text.split("## Scheduled deployment", 1)[1].split("\n## ", 1)[0]
+        blocks = [block.split("```", 1)[0] for block in section.split("```sh")[1:]]
+        commands = [line.strip() for block in blocks for line in block.splitlines()]
+        # enable --now can change the timer's enablement, its activation or both. Both are read
+        # before it runs and each is undone on its own: a timer that was enabled but inactive is
+        # stopped again rather than left running, and one that was running is not stopped.
+        show = commands.index("systemctl --user show ecosystem-native-data.timer --property=UnitFileState,ActiveState")
+        self.assertLess(show, commands.index("systemctl --user enable --now ecosystem-native-data.timer"))
+        prose = " ".join(section.split())
+        self.assertIn("Disable the timer only if it was not enabled before", prose)
+        self.assertIn("stop it only if it was not active before", prose)
+        self.assertIn("`systemctl --user stop ecosystem-native-data.timer`", prose)
+
+    def test_unit_examples_give_the_collector_node_and_block_rtk_telemetry(self):
+        service = (ROOT / "observability/native-data/native-data.service.example").read_text().splitlines()
+        timer = (ROOT / "observability/native-data/native-data.timer.example").read_text().splitlines()
+        directives = [line for line in service if line and not line.startswith("#")]
+        self.assertIn("ExecStart=/usr/bin/python3 -B @REPOSITORY@/observability/native-data/snapshot.py "
+                      "--config @PRIVATE_CONFIG@ --publish", directives)
+        self.assertEqual({line for line in directives if line.startswith("Environment=")},
+                         {"Environment=PATH=@NODE_DIRECTORY@:/usr/local/bin:/usr/bin:/bin",
+                          "Environment=RTK_TELEMETRY_DISABLED=1"})
+        for setting in ("Type=oneshot", "UMask=0077", "NoNewPrivileges=true", "After=ecosystem-loki.service"):
+            self.assertIn(setting, directives)
+        self.assertNotIn("[Install]", directives)
+        self.assertIn("Unit=ecosystem-native-data.service", timer)
+        self.assertIn("WantedBy=timers.target", timer)
+        # Placeholders only: no systemd specifier or variable expansion to resolve at run time.
+        self.assertFalse([line for line in directives + timer if "%" in line or "$" in line])
 
     def test_original_audit_and_newer_receipts_have_distinct_meanings(self):
         report = self.report(10000)
@@ -411,7 +566,7 @@ class NativeDataTests(unittest.TestCase):
             c["token_report"] = str(Path(directory)/"missing.json")
             class FakeRecorder:
                 records = []
-                def command(self, name, argv, cwd):
+                def command(self, name, argv, cwd, env=None):
                     self.records.append({"completed_at": M.utc(time.time())})
                     return {"rtk-global": RTK, "rtk-project": None, "ai-memory": MEMORY, "qmd": QMD}[name]
             now = time.time(); snapshot = M.collect(c, FakeRecorder(), now)

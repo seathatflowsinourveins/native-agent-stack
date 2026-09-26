@@ -3492,8 +3492,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d21ccec986ffd04713343c7eb1e5e782ad4a9c077a10e5179c591acb622e7b4f",
-      "bytes": 17270
+      "sha256": "0454bf2f7446bd878be521dd54cdc50f7447246e4277269a8661002d4604ee99",
+      "bytes": 17628
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -3572,8 +3572,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "5a89c624516d9983c5da629636555bbc0fa469895bd01235ee8ff6147ea076f1",
-      "bytes": 19228
+      "sha256": "d367e5acb6c8c111cda46ed1b916a4088c255fe3f51b26a35a4e4627b1c6b3d7",
+      "bytes": 19275
     },
     {
       "path": "adoption/paired/README.md",
@@ -13718,8 +13718,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "2de43d9a1e32663614748f54c8aa2efa9c5025c027e09234180f3aee3adbcc73",
-      "bytes": 18698
+      "sha256": "c077a9e15c2bf26c1056dba87b1d5965e9fca751e44139439aaa3e2ba7ff4b1c",
+      "bytes": 19328
     },
     {
       "path": "docs/native-dashboard-operations-resolution.md",
@@ -37563,13 +37563,13 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "082c2466d172de3bf144a1c07ac29a5beef13d2cc9e0b0fba97f72cf45bb3e80",
-      "bytes": 9913
+      "sha256": "c6a235bc53c31d1107cb0a247316197a086e89f6a6de0d902116097f0fc51fe7",
+      "bytes": 16034
     },
     {
       "path": "observability/native-data/config.example.json",
-      "sha256": "b83a79e8bd6659c7840f12d4372deb0951f52a72553559b02df7478392361ba8",
-      "bytes": 664
+      "sha256": "317b80ee3609523b475f379651ad8ebe285c57e9e01c09d6719504c90361d276",
+      "bytes": 1008
     },
     {
       "path": "observability/native-data/grafana-home.ini.example",
@@ -37578,8 +37578,8 @@
     },
     {
       "path": "observability/native-data/native-data.service.example",
-      "sha256": "adeb07ab0074793957432c4cc0f3cdd954076ea85b785fca23e6b964ae8256a8",
-      "bytes": 287
+      "sha256": "d246a8f1c122d36a6b472bc502cfb3184ea6bc91ac29e942467fb21f32ab5a10",
+      "bytes": 650
     },
     {
       "path": "observability/native-data/native-data.timer.example",
@@ -37593,13 +37593,13 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "f2d5bd0c3dd50cc1e9f53dabbea9935f09141bdcb35e966258b5af0cccfe90ff",
-      "bytes": 15715
+      "sha256": "067a0db24b468d0540fcc78df92b175a45a7ef5c5d15d95d8023cba6ad43bd97",
+      "bytes": 18483
     },
     {
       "path": "observability/native-data/snapshot.py",
-      "sha256": "f3dea803152963dde5cf0acb7fb9b02dadb09ffdc32b14f0667e353d09cc5b67",
-      "bytes": 26445
+      "sha256": "bdba7188635e949b4004f97e6fecdb980f36ed253a987ab594f6b6db9c0a2ea4",
+      "bytes": 28729
     },
     {
       "path": "observability/receipt.json",
@@ -38378,8 +38378,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "2626ca6f28a4ffd84dadabefb68f32ef48ab36d61a8683c51436b68501beee3f",
-      "bytes": 24707
+      "sha256": "2a54bd50f950ee268f39e23c898904c2b87b620e13ee9a6d65ca2f9959cd158b",
+      "bytes": 35844
     },
     {
       "path": "tests/test_native_faults_min.py",
