@@ -43,17 +43,9 @@ LAST_OUTPUT = None
 # E4: how long entries wait at startup for the halt seed read (one halts feed request run
 # while the node connects) before the stream alone decides.
 HALT_SEED_WAIT_SECONDS = 3.0
-# A halt only the startup seed asserts (no status message has confirmed or cleared it)
-# expires, because the stream sends changes only and the feed lags (about 65 s p50), so a
-# pause that ended just before the read would otherwise hold its symbol all session: at
-# its resumption trade time when the feed gives one, or, for a LULD trading pause, 12
-# minutes after it began. LULD Plan Amendment 12 (Cboe fact sheet): a pause's first 5-
-# minute halt segment, and a second one when it is extended, run in full, so a pause still
-# closed after 10 minutes is exceptional; 2 minutes are a margin. A longer pause then counts
-# as trading until the stream reports it. Other seeded halts without a resumption time stay
-# until a status message arrives.
-SEEDED_LULD_PAUSE_SECONDS = 12 * 60
-LULD_PAUSE_REASON_CODES = frozenset({"LUDP", "LUDS", "M"})
+# Nasdaq Rule 4120(b)(4)(A)(i)c permits repeated LULD pause extensions.
+# As in transport.active_halts, only an authoritative resumption clears a seed;
+# elapsed time without one leaves the symbol halted.
 
 
 def _seed_failure(exc):
@@ -1005,18 +997,14 @@ class Controller:
 
     @staticmethod
     def _seed_expiry(halt):
-        """When a halt only the startup seed asserts stops counting (epoch ns), and why:
-        its resumption trade time when the feed gives one; else, for a LULD trading pause,
-        SEEDED_LULD_PAUSE_SECONDS after its halt time; else never (None)."""
+        """The authoritative resumption trade time (epoch ns), or no expiry."""
         if halt.get("resumption_trade_ns") is not None:
             return int(halt["resumption_trade_ns"]), "resumption_trade_time"
-        if halt.get("reason_code") in LULD_PAUSE_REASON_CODES:
-            return int(halt["halted_at_ns"]) + SEEDED_LULD_PAUSE_SECONDS * 1_000_000_000, "luld_pause_bound"
         return None, None
 
     def _expire_seeded_halts(self):
-        """Clear each seeded halt whose expiry has passed and that no streamed status has
-        replaced (a stale seed cannot block a symbol for the rest of the session)."""
+        """Clear a seed only at its published resumption time, unless a stream status
+        has replaced it. A pause of unknown duration stays halted."""
         if not self.seeded_halts:
             return
         now_ns = int(self.clock() * 1_000_000_000)
@@ -1068,9 +1056,9 @@ class Controller:
         """Mark each seeded symbol halted from its halt time (state ``seeded_halt``). A
         stream status newer than that time wins, so a resume streamed before the seed
         returned is not undone, and a later streamed resume clears the seeded halt. A
-        seeded halt no status has replaced expires (_seed_expiry); a seed already past its
-        expiry (for example a prior day's pause whose row kept no resumption time) is not
-        applied. Each applied symbol's expiry is recorded in the seed summary."""
+        seeded halt no status has replaced clears at its published resumption time;
+        without one it remains halted, even if old. Each applied symbol's resumption
+        time, or lack of one, is recorded in the seed summary."""
         halts = seed.get("halts") or {}
         now_ns = int(self.clock() * 1_000_000_000)
         applied, expiry, expired = [], {}, []

@@ -969,6 +969,105 @@ class PerExecutionLedger(unittest.TestCase):
         self.assertEqual([e["booking"] for e in self.events("order_observed")], ["executions"] * 4)
         self.assertEqual(self.ledger.intents()[1].average_price, D("5.618966"))   # the broker's own average is kept
 
+    def test_apus_accounting_is_exact_across_delivery_sequences(self):
+        sequences = {
+            "stream_first": [(0, True), (1, True), (2, True), (2, False)],
+            "rest_first": [(2, False), (0, True), (1, True), (2, True)],
+            "duplicates": [(2, False), (2, True), (0, True), (0, True), (1, True), (2, True)],
+            "restart": [(2, False), (2, True), "restart", (0, True), (1, True), "restart", (2, True)],
+            "mixed": [(0, True), (1, False), (1, True), (2, True)],
+            "mixed_gap": [(0, False), (1, True), (2, False), (0, True), (2, True)],
+        }
+        for name, sequence in sequences.items():
+            with self.subTest(delivery=name):
+                self.ledger.close()
+                self.db = self.root / (name + ".sqlite3")
+                self.ledger = s.Ledger(self.db, self.limits)
+                self.ledger.start_trial(self.now)
+                self.hold_29()
+                rows = self.execution_rows()
+                for observation in sequence:
+                    if observation == "restart":
+                        self.ledger.close()
+                        self.ledger = s.Ledger(self.db, self.limits)
+                    else:
+                        index, exact = observation
+                        self.record(rows[index], with_execution=exact)
+                state = self.ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd), (D("-0.03"), D("-0.03")))
+                self.assertEqual(self.ledger.positions(), {})
+                self.assertEqual(self.ledger.unresolved(), [])
+                self.ledger.close()
+                self.ledger = s.Ledger(self.db, self.limits)
+                for row in rows + rows:
+                    self.record(row)
+                self.assertEqual(self.ledger.accounting(), state)
+
+    def test_late_buy_executions_correct_basis_and_already_realized_pnl(self):
+        for sold in (False, True):
+            with self.subTest(sold=sold):
+                self.ledger.close()
+                self.db = self.root / ("late-buy-%s.sqlite3" % sold)
+                self.ledger = s.Ledger(self.db, self.limits)
+                self.ledger.start_trial(self.now)
+                self.reserve("buy-1", "buy", "29", "5.64")
+                self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966")
+                if sold:
+                    self.reserve("sell-1", "sell", "29", "5.60")
+                    self.ledger.record_order("sell-1", "b-sell", "filled", "29", "5.62",
+                        execution={"execution_id": "sale", "qty": "29", "price": "5.62"})
+                self.ledger.close()
+                self.ledger = s.Ledger(self.db, self.limits)
+                for row in self.execution_rows():
+                    self.ledger.record_order("buy-1", "b-buy", row["status"], row["cum"], row["average"],
+                                             execution=row["execution"])
+                state = self.ledger.accounting()
+                expected = (D("0.03"), D("0.03")) if sold else (D("-162.95"), D(0))
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd), expected)
+                if sold:
+                    self.assertEqual(self.ledger.positions(), {})
+                else:
+                    self.assertEqual(self.ledger.positions()["APUS"].cost_basis_usd, D("162.95"))
+
+    def test_accounting_replay_quantity_mismatch_rolls_back_late_execution(self):
+        self.reserve("buy-1", "buy", "29", "5.64")
+        self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966")
+        # A damaged materialized position disagrees with the durable booking journal.
+        self.ledger.db.execute("UPDATE positions SET qty='28' WHERE symbol='APUS'")
+        before = tuple(self.ledger.db.iterdump())
+
+        with self.assertRaisesRegex(s.SafetyError, "^accounting_replay_quantity_mismatch$"):
+            self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966",
+                                     execution={"execution_id": "late-buy", "qty": "29", "price": "5.61"})
+
+        # The new execution, replay checkpoint, accounting and journal all roll back.
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
+    def test_accounting_replay_short_position_rolls_back_late_execution(self):
+        self.reserve("buy-1", "buy", "29", "5.64")
+        self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966")
+        self.reserve("sell-1", "sell", "29", "5.60")
+        self.ledger.record_order("sell-1", "b-sell", "filled", "29", "5.62",
+                                 execution={"execution_id": "sale", "qty": "29", "price": "5.62"})
+        # Corrupt the journal order so the sale precedes its buy. Late execution
+        # coverage must refuse a replay whose first booking would create a short.
+        self.ledger.db.execute(
+            "UPDATE events SET id=(SELECT MAX(id)+1 FROM events) "
+            "WHERE kind='order_observed' AND client_id='buy-1'")
+        before = tuple(self.ledger.db.iterdump())
+
+        with self.assertRaisesRegex(s.SafetyError, "^accounting_replay_would_make_short_position$"):
+            self.ledger.record_order("buy-1", "b-buy", "filled", "29", "5.618966",
+                                     execution={"execution_id": "late-buy", "qty": "29", "price": "5.61"})
+
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
     def test_rounded_average_at_the_limit_does_not_freeze_either_path(self):
         # 26 @ 5.62 then 3 @ 5.60 against a 5.60 sell limit: Alpaca reports 5.617931 (162.92/29
         # rounded), and the old derivation priced the last 3 at 5.599999, below the limit.

@@ -345,6 +345,21 @@ class CancelTimestampResolutionTests(unittest.TestCase):
 
 
 class BuildDecisionsTests(unittest.TestCase):
+    def test_cancel_before_submit_is_rejected(self):
+        order = {"symbol": "AAPL", "side": "BUY", "status": "canceled", "submitted_at_ns": 10,
+                 "client_order_id": "trial-1", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
+                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
+        with self.assertRaisesRegex(ValueError, "^cancel_before_submit:trial-1$"):
+            C.build_decisions([order], {"trial-1": {"cancel_ts_ns": 9}})
+
+    def test_cancel_at_submit_timestamp_is_accepted_after_submit(self):
+        order = {"symbol": "AAPL", "side": "BUY", "status": "canceled", "submitted_at_ns": 10,
+                 "client_order_id": "trial-1", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
+                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
+        self.assertEqual(C.build_decisions([order], {"trial-1": {"cancel_ts_ns": 10}}),
+                         [{"ts_ns": 10, "action": "submit", "order": order},
+                          {"ts_ns": 10, "action": "cancel", "order": order}])
+
     def test_cancel_uses_the_resolved_timestamp(self):
         orders = C.load_paper_orders(json.loads((TRIAL / "broker-orders.json").read_text()))
         paper_output = json.loads((TRIAL / "paper-output.json").read_text())
@@ -1181,6 +1196,25 @@ class PinnedRuntimeTests(unittest.TestCase):
         sim = result["sim_by_id"]["t-cancel-01"]
         self.assertEqual(sim["status"], "CANCELED")
         self.assertEqual(sim["filled_qty"], 0)
+
+    def test_named_cancel_before_submit_is_rejected_by_replay(self):
+        t0 = 3_000_000_000_000
+        paper_orders = [self._order("trial-1", "BUY", t0 + 100_000_000, "10.00",
+                                    status="canceled", filled_qty=0)]
+        paper_output = {"requests": [
+            {"kind": "cancel", "timestamp": 3000.090, "client_id": "trial-1"},
+        ]}
+        quotes = {"ZZZZ": [
+            {"symbol": "ZZZZ", "ts_ns": t0, "bid": "9.80", "ask": "10.20", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 140_000_000, "bid": "9.95", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 200_000_000, "bid": "9.95", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+        ]}
+        cancel_resolution = C.resolve_cancel_timestamps(paper_orders, paper_output, 10)
+        # The old replay recorded this cancel as applied before the order existed,
+        # then filled the supposedly canceled share on the 3000.140s quote.
+        with self.assertRaisesRegex(ValueError, "cancel_before_submit:trial-1"):
+            C.run_replay(paper_orders, quotes, out_dir=self.tmp / "cancel-before-submit",
+                         cancel_resolution=cancel_resolution)
 
     def test_current_no_partial_fill_configuration_ignores_quoted_size(self):
         # This documents, rather than assumes, a real boundary of the declared

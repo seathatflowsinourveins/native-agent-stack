@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render native configs and user units. Does not start services or alter clients."""
 import argparse
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -120,7 +121,20 @@ def main():
     if not fixture.exists(): fixture.write_text('[]\n')
     # adaptive-paper exporters (metrics.py --file-sd) add and remove their own targets; keep what they wrote.
     paper_targets=a.config_root/'adaptive-paper-targets.json'
-    if not paper_targets.exists(): paper_targets.write_text('[]\n')
+    # Match metrics.update_file_sd: check and publish under the same sibling lock as exporter registrations.
+    with open(paper_targets.with_name(paper_targets.name+'.lock'),'a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        if not paper_targets.exists():
+            temporary=paper_targets.with_name(f'.{paper_targets.name}.{os.getpid()}.tmp')
+            try:
+                with open(temporary,'w',encoding='utf-8') as handle:
+                    handle.write('[]\n')
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                os.replace(temporary,paper_targets)
+            except BaseException:
+                temporary.unlink(missing_ok=True)
+                raise
     if not env.exists():
         fd=os.open(env,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
         with os.fdopen(fd,'w') as f:

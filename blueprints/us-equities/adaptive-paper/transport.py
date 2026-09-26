@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 from concurrent.futures import TimeoutError as FutureTimeout
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
@@ -739,7 +740,17 @@ class GuardedSession:
         self._envelopes = {}
         # (lowercase broker order id, client order id) of the DELETE the owner is about to
         # send, so the budget hook can record which order a cancel request was for.
-        self._cancel_expectation = None
+        # asyncio.to_thread copies this context: canceling the awaiting task cannot
+        # clear or overwrite the identity retained by an unfinished HTTP worker.
+        self._cancel_context = ContextVar("cancel_expectation", default=None)
+
+    @property
+    def _cancel_expectation(self):
+        return self._cancel_context.get()
+
+    @_cancel_expectation.setter
+    def _cancel_expectation(self, value):
+        self._cancel_context.set(value)
 
     def expect_submission(self, envelope):
         self._envelopes[envelope["intent"]["client_order_id"]] = envelope
@@ -1461,8 +1472,8 @@ class AlpacaPaperTransport:
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
             try:
-                # The request log records which owned order this DELETE was for (exact
-                # sim-to-paper cancel pairing); the operation lock keeps it to one DELETE.
+                # The worker's copied context retains this DELETE's owned identity
+                # even if task cancellation releases the operation lock early.
                 self._client._session.announce_cancel(order["id"], client_order_id)
                 await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
             except Exception as exc:
