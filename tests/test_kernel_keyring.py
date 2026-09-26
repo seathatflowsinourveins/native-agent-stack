@@ -333,11 +333,17 @@ class KernelKeyringTests(unittest.TestCase):
             with self.subTest(command=args[0]):
                 lock = self.hold_lock(module)
                 try:
-                    process = subprocess.Popen([sys.executable, str(SCRIPT), *args], stdin=subprocess.PIPE,
-                                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    # The input goes through a pipe written and closed before the child starts: closing
+                    # Popen.stdin by hand makes a later communicate() raise "flush of closed file" on Python 3.12.
+                    read_end, write_end = os.pipe()
+                    os.write(write_end, stdin)
+                    os.close(write_end)
+                    try:
+                        process = subprocess.Popen([sys.executable, str(SCRIPT), *args], stdin=read_end,
+                                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    finally:
+                        os.close(read_end)
                     self.addCleanup(stop, process)
-                    process.stdin.write(stdin)
-                    process.stdin.close()
                     time.sleep(HOLD_SECONDS)
                     self.assertIsNone(process.poll(), f"{args[0]} did not wait for the lock")
                     self.assertEqual(self.kernel.search(name) > 0, before)  # nothing changed yet
