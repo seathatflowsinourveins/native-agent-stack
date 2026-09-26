@@ -10826,8 +10826,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "bcd0c1823333f017f586c4bee610650fd7cb39fbd5471d129e429761b674d229",
-      "bytes": 40833
+      "sha256": "2bf718b7ba78826213bc05d4c494f2096795f98049afb3796c3db47e0fc4e031",
+      "bytes": 50995
     },
     {
       "path": "docs/stack.md",
@@ -32551,8 +32551,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "f89a6ac377af1fc8ebdfd2482c749b79cf3fb7f9bcd7d33d5703ff8df275f8e8",
-      "bytes": 3617
+      "sha256": "d142c736a5926c4b1702c790f787276b950ad5ecd51348670d3b6d32495a8833",
+      "bytes": 7447
     },
     {
       "path": "scripts/adoption_status.py",
@@ -32603,6 +32603,11 @@
       "path": "scripts/host_receipts.py",
       "sha256": "90cfe1316bcb2ead4c9bad46b2636341b88cb3b6d38cb1bd8b6364bae22fd20a",
       "bytes": 95432
+    },
+    {
+      "path": "scripts/kernel_keyring.py",
+      "sha256": "fdb72475568f48301b543bf9efc43b45c8bcf730f91c3493a3ce4c858ece864e",
+      "bytes": 16909
     },
     {
       "path": "scripts/landscape.py",
@@ -33113,6 +33118,11 @@
       "path": "tests/test_job_recovery.py",
       "sha256": "a985c9971492a945d8add60abf9fc77c5feab337c7f1fcd413643545024c4c20",
       "bytes": 3534
+    },
+    {
+      "path": "tests/test_kernel_keyring.py",
+      "sha256": "2874d628c1bc513b51cc23329dfa6a7844ac55e43396317b72f0d5e967941b24",
+      "bytes": 29049
     },
     {
       "path": "tests/test_landscape.py",
