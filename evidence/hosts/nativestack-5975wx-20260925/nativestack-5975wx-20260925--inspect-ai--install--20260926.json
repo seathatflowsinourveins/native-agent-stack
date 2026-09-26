@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--inspect-ai--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "inspect-ai",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 -c \"\nimport json, glob\npins = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id')=='inspect-ai'})\nstack = [c['version'] for c in json.load(open('manifests/stack.json'))['components'] if c['id']=='inspect-ai']\nprint('winner pins:', pins, '| stack.json entry:', stack or '(not present; winner-only component)')\nassert pins == ['inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'], pins\nprint('pin cross-check ok: the catalogs/landscape winner pin matches inspect-ai 0.3.266')\n\"\nT=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$T\"' EXIT\ntimeout 20 curl -fsS https://pypi.org/pypi/inspect-ai/0.3.266/json -o \"$T/meta.json\" || { echo \"PyPI metadata fetch failed\"; exit 1; }\npython3 - \"$T/meta.json\" \"$T/wheel_url.txt\" \"$T/wheel_sha.txt\" <<'PYEOF'\nimport json, sys\nmeta_path, url_out, sha_out = sys.argv[1], sys.argv[2], sys.argv[3]\nd = json.load(open(meta_path))\nwheels = [f for f in d[\"urls\"] if f[\"packagetype\"] == \"bdist_wheel\"]\nassert len(wheels) == 1, wheels\nw = wheels[0]\nprint(\"PyPI wheel:\", w[\"filename\"], \"| sha256:\", w[\"digests\"][\"sha256\"])\nopen(url_out, \"w\").write(w[\"url\"])\nopen(sha_out, \"w\").write(w[\"digests\"][\"sha256\"])\nPYEOF\nWHEEL_URL=$(cat \"$T/wheel_url.txt\")\nEXPECT_SHA=$(cat \"$T/wheel_sha.txt\")\ntimeout 60 curl -fsS \"$WHEEL_URL\" -o \"$T/pkg.whl\" || { echo \"wheel download failed\"; exit 1; }\nLOCAL_SHA=$(sha256sum < \"$T/pkg.whl\" | cut -d' ' -f1)\necho \"downloaded wheel sha256 $LOCAL_SHA | PyPI-declared sha256 $EXPECT_SHA\"\ntest \"$LOCAL_SHA\" = \"$EXPECT_SHA\"\n",
+      "exit": 0,
+      "duration_s": 0.709,
+      "output_sha256": "db3dd8b0138d67da532a1647fd6d500df69d5cd94c771485c208cdd2a6cd9f11",
+      "output_excerpt": "winner pins: ['inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'] | stack.json entry: (not present; winner-only component)\npin cross-check ok: the catalogs/landscape winner pin matches inspect-ai 0.3.266\nPyPI wheel: inspect_ai-0.3.266-py3-none-any.whl | sha256: e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6\ndownloaded wheel sha256 e30e1c2abf2844a9db221d5307b9b38"
+    },
+    {
+      "cmd": "export UV_TOOL_DIR=\"$HOME/.local/share/codex-ecosystem/python-tools\"\nexport UV_TOOL_BIN_DIR=\"$HOME/.local/share/codex-ecosystem/bin\"\nDO_NOT_TRACK=1 uv tool list 2>/dev/null | grep -A1 '^inspect-ai ' || { echo \"inspect-ai not registered as a persistent uv tool\"; exit 1; }\np=$(command -v inspect) && r=$(readlink -f \"$p\") && echo \"inspect resolves: $p -> $r\" \\\n&& case \"$r\" in \"$UV_TOOL_DIR\"/inspect-ai/bin/inspect) echo \"resolves into the persistent uv tool venv: yes\" ;; *) echo \"resolves into the persistent uv tool venv: no\"; exit 1 ;; esac\nIV=$(DO_NOT_TRACK=1 timeout 20 inspect --version) && echo \"inspect --version: $IV\" && echo \"$IV\" | grep -q '0\\.3\\.266'\nVENV_IV=$(\"$UV_TOOL_DIR/inspect-ai/bin/python\" -c \"import importlib.metadata as m; print(m.version('inspect-ai'))\")\necho \"importlib.metadata inspect-ai version in the tool venv: $VENV_IV\"\ntest \"$VENV_IV\" = \"0.3.266\"\necho \"uv-receipt.toml requirements line:\"\ngrep -F 'inspect-ai' \"$UV_TOOL_DIR/inspect-ai/uv-receipt.toml\"\n",
+      "exit": 0,
+      "duration_s": 2.141,
+      "output_sha256": "71daf9c54786b00ff68b19c0f18f586345f7463be6e19074e4b0ea6c573140ed",
+      "output_excerpt": "inspect-ai v0.3.266\n- inspect\ninspect resolves: ~/.local/share/codex-ecosystem/bin/inspect -> ~/.local/share/codex-ecosystem/python-tools/inspect-ai/bin/inspect\nresolves into the persistent uv tool venv: yes\ninspect --version: 0.3.266\nimportlib.metadata inspect-ai version in the tool venv: 0.3.266\nuv-receipt.toml requirements line:\nrequirements = [{ name = \"inspect-ai\", specifier = \"==0.3.266\" }]\n"
+    }
+  ],
+  "tool_versions": {
+    "inspect-ai": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26"
+  },
+  "observed_at_utc": "2026-09-26T01:31:59Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), inspect-ai 0.3.266 (catalogs/landscape pin 'inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'), the evaluation-experiments winner, is installed persistently as a uv tool under ~/.local/share/codex-ecosystem/python-tools/inspect-ai (Python 3.13) with uv's own documented uv tool install --python 3.13 inspect-ai==0.3.266 (UV_TOOL_DIR/UV_TOOL_BIN_DIR set to this repository's ecosystem layout), telemetry disabled (DO_NOT_TRACK=1). The catalogs/landscape winner pin for inspect-ai is cross-checked, and PyPI's own JSON API metadata for the pinned release's wheel (inspect_ai-0.3.266-py3-none-any.whl) is fetched, the wheel itself downloaded fresh and sha256-hashed, and the two digests (e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6) are asserted equal, verifying the exact upstream artifact. uv tool list shows inspect-ai v0.3.266 registered with entrypoint inspect; the inspect executable on PATH resolves (fully) into this persistent tool venv; the upstream CLI's own inspect --version reports 0.3.266; importlib.metadata inside that venv agrees; and uv's own uv-receipt.toml records the exact requirement inspect-ai==0.3.266. Readiness only; every command exits 0.",
+  "limitations": [
+    "Install stage: resolved path, pin cross-check, an independently downloaded-and-hashed PyPI wheel, and the version/uv-receipt readback show the pinned build is present and starts; this is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "Functional use, a live Inspect eval against this host's local model with a deliberately-wrong-target positive control, is covered by the separate nativestack-5975wx-20260925--inspect-ai--use--20260925-2 receipt on this host; not repeated here.",
+    "The PyPI digest check covers only the wheel (bdist_wheel); the sdist's own digest is read from the same PyPI metadata but not independently re-downloaded and hashed in this receipt.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision); the install is on the host filesystem under ~/.local/share/codex-ecosystem, outside any repository checkout.",
+    "second_physical_machine is declared, not proven by this file; independent review is what a reader relies on for that, per docs/contributing-evidence.md."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T01:31:59Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent reviewer session (claude-opus-5-5), 2026-09-26; reproduce + adequacy-checked (install stage). Re-ran both commands once with /bin/sh (dash) from the worktree root: exit 0; output_excerpt and raw sha256 identical. DEFECT (fail-closed): both commands mask failing steps. In cmd1, the catalog-pin assertion (python3 -c ...assert...) is a standalone newline-separated step whose failure is ignored; the exit is decided by the final test of the wheel digests. In cmd2, the command -v/readlink/case chain, the inspect --version check, the importlib.metadata assignment and 'test \"$VENV_IV\" = \"0.3.266\"' are non-final unguarded steps; the exit is decided by the final grep -F on uv-receipt.toml. A dash probe (a failing newline-separated step followed by a passing last step) exits 0, consistent with the Codex reproduction of inspect --version forced to exit 73. DEFECT (backed claims): (1) The claim asserts the installer invocation 'uv tool install --python 3.13 inspect-ai==0.3.266', with UV_TOOL_DIR/UV_TOOL_BIN_DIR and DO_NOT_TRACK=1 at install time, without a retained installer command or output. (2) 'Python 3.13' is not in the retained output; the retained uv-receipt.toml line is only the requirements line. (3) The limitation that functional use is 'covered by' the use-2 receipt is misleading: that receipt's retained command runs inspect-ai from a mktemp uv venv --python 3.12 with uv pip install, not from this uv tool. Winner binding holds (tool_versions pin_matches the evaluation-experiments winner pin), and the install exists persistently. Superseded by -2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T02:50:59Z",
+      "reviewer": {
+        "identity_sha256": "7d53892bea622f647629485d3080436dc714f62922f65349e05947ad40e7863f",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

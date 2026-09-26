@@ -1984,12 +1984,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 2,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T19:46:15Z",
-                "pass": 2
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-26T02:27:09Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -3904,12 +3904,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 2,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T19:47:31Z",
-                "pass": 2
+                "independently_reviewed_pass": 2,
+                "latest": "2026-09-26T02:27:15Z",
+                "pass": 4
               },
               "qualified_models": []
             },

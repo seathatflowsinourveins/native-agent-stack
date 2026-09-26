@@ -9919,7 +9919,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "4afa3660af5d3f824d3400f26fb398b793a2c953e782cc633e5504b4db981796",
+      "sha256": "4bc75ced217f30e517bd8e00fb67c5bb0320279054dbfcfe339ce5647b55f3ec",
       "bytes": 188990
     },
     {
@@ -10419,7 +10419,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f6e23298ee21726c08e55bf033426ac4a711e16f47e68c220140da79a43683d6",
+      "sha256": "59eaa693c585ebf45e030b46092d811c54df0efeab0b8b1aa4a6b3ec563f67f8",
       "bytes": 18680
     },
     {
@@ -11321,6 +11321,21 @@
       "path": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
       "sha256": "45104744c02f09434292e5562689426c76543c8a782cf9e3e491947022094025",
       "bytes": 13084
+    },
+    {
+      "path": "evidence/artifacts/eval-install-repairs-20260926/README.md",
+      "sha256": "2320f8f1192dc14cd27a40ea6745d8ce2444341f46bf9f9f1979ac8b32e8cf15",
+      "bytes": 1381
+    },
+    {
+      "path": "evidence/artifacts/eval-install-repairs-20260926/forced-failure-results.txt",
+      "sha256": "fa307a7bdb73418558fa4b351257ac22c18792c5861427e1f2a4f393745f44e6",
+      "bytes": 5191
+    },
+    {
+      "path": "evidence/artifacts/eval-install-repairs-20260926/gpt6-cross-family-review.md",
+      "sha256": "a73e5e919c0c4d94b121cf024d01a21823470be8c71e6dd6fdf7beae04ce193e",
+      "bytes": 1694
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
@@ -30698,6 +30713,16 @@
       "bytes": 8855
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--install--20260926-2.json",
+      "sha256": "fcefd10386a0e6a94bebac1221c41c4896e8a42b138631f8039d9ac1781cee01",
+      "bytes": 14243
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--install--20260926.json",
+      "sha256": "bfc2ea663816f0f6a2c44086957e92b34ffb8ca1d64c175a765aefd89da886ce",
+      "bytes": 9442
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--inspect-ai--use--20260925-2.json",
       "sha256": "75121416f8b4f8e21571c1b70c1bc7bbf1bb45f135ca55fca42f6113137d53f5",
       "bytes": 11320
@@ -30826,6 +30851,16 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--prometheus--use--20260925.json",
       "sha256": "400318969fe62351838f8dfdca467d90dc6a59c1cb72956e9e706a1e28fb76f0",
       "bytes": 7694
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--install--20260926-2.json",
+      "sha256": "f684b491a11451f553dfcbd09160a45984ce4527c3758aa3d273b80bed0bab7a",
+      "bytes": 13038
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--install--20260926.json",
+      "sha256": "2cdb5eec5f8b1229fe640be6fdcf99198bc7e8192fe623e28778af79bcc99fdf",
+      "bytes": 8166
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--promptfoo--use--20260925-2.json",
