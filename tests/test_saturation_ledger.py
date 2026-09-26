@@ -932,7 +932,8 @@ class RepositoryLedgerTests(unittest.TestCase):
         survivors = [entry for layer in completed["layers"] for entry in layer["survived"]]
         self.assertEqual(len(survivors), 11)
         self.assertTrue(all(entry["source_review"] for entry in survivors))
-        state = sl.derive(ledger)
+        # Derived from the two seed records alone: a later sweep's clean layers are its own evidence.
+        state = sl.derive({**ledger, "sweeps": ledger["sweeps"][:2]})
         self.assertTrue(all(entry["count"] == 0 and not entry["saturation_candidate"] for entry in state.values()))
         # The stopped attempt's provenance: its date comes from the superseding run's manifest, and
         # its eight in-flight children are lost workers without a layer entry.
