@@ -413,3 +413,43 @@ in this template, not only on the host. `apply_claude_settings.py` lets template
 a host-only change is overwritten at the next apply, and a key deleted from the template stays on
 every host that already has it. `tests/test_render_config.py` pins both values in the rendered
 template.
+
+## Addendum 2026-09-26: listing state and agent preload
+
+**Question.** Does a skill's `skillOverrides` state change whether an agent's frontmatter
+`skills:` field can preload it? This matters because the listing policy above keeps on-demand
+skills out of the listing to save context, while role agents preload their core skills.
+
+**Upstream source.** Claude Code docs, [Create custom subagents, "Preload skills into
+subagents"](https://code.claude.com/docs/en/sub-agents#preload-skills-into-subagents), read
+2026-09-26: "You can't preload skills that set `disable-model-invocation: true`, since preloading
+draws from the same set of skills Claude can invoke." The same section: "If a listed skill is
+missing or disabled, for example by your organization's policy, Claude Code skips it and logs a
+warning to the debug log."
+
+**Probe.** Native operation on host `nativestack-5975wx-20260925` with Claude Code 2.1.283. Each
+run was a headless `claude -p --model claude-sonnet-5 --settings <overlay> --agents <json>`
+(prompt on stdin, since `--disallowedTools` is variadic) with two `haiku` probe agents. Each agent
+preloaded one skill through `skills:`, had no tools, and was asked to quote the first Markdown
+heading of any skill content in its context, or answer NONE. The overlay set only that skill's
+`skillOverrides` state. The returned lines:
+
+| Run | Skill | Overlay state | Agent's answer |
+| --- | --- | --- | --- |
+| 1 | `tdd` | `name-only` | `# Test-Driven Development` |
+| 1 | `semgrep` | `off` | `NONE` |
+| 2 | `semgrep` | `user-invocable-only` | `NONE` |
+| 2 | `tdd` | `name-only` | `# Test-Driven Development` |
+
+**Decision.** A skill that an agent preloads stays `on` or `name-only`. `name-only` keeps its
+content out of the listing and still preloads. `user-invocable-only` and `off` both block the
+preload, so `user-invocable-only` is kept for skills that no agent preloads: on this host,
+`grill-me`, `improve-codebase-architecture` and `find-skills`. A grep of the user agents
+directory, `.claude/agents/` and `adoption/agents/` found no agent that preloads any of the three,
+so the host needs no change.
+
+**Evidence class.** A native client operation on one host. The observation is the model's quoted
+heading, not a receipt. Another host or client version re-runs the probe.
+
+**Overturn.** Any Claude Code release note or docs change to preload eligibility, or a re-run of
+the probe on a newer client that preloads a `user-invocable-only` skill.

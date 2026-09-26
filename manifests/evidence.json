@@ -3467,8 +3467,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "b4f98393428a07d3235e8ffd53b2ea0d71a1af53f1377de8f661ecbb6f27de3d",
-      "bytes": 11410
+      "sha256": "e59e22ba7dabcbcc53662ae4b14ebbe281e130e6590eb7bec602041dee186f19",
+      "bytes": 11636
     },
     {
       "path": "CLAUDE.md",
@@ -13508,8 +13508,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "4668eb13eb33a7d2b78322453ea29fabbc11b04433d83892bb9af03c10ddb1b0",
-      "bytes": 36103
+      "sha256": "701d9482554ae3f0cbe84499649bd89a2e971598ac959681efcc977d31f8acda",
+      "bytes": 38568
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -13663,8 +13663,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "18c33400e45bfc50dcf43ec83fc2aaf51b19948c814efd32e55e3ac9ca8d95c3",
-      "bytes": 9311
+      "sha256": "dd7395c0dbc4ecb68cb4e6bdc1ca99693d1c51b773b097d40d1e9e59f20c9372",
+      "bytes": 26107
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -37118,8 +37118,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "d6717582b1901b885d29f3be2fc090ed93510791e65095a9d7a5828885896e90",
-      "bytes": 6143
+      "sha256": "b97c5417023f3fd521b7cc5e81f3708d3ad020e3bcb55b493b0bfcd804fa5ca0",
+      "bytes": 6347
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -37643,8 +37643,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "a8a2ba24870d95d379c90bcd7f58dccdfa8bef6e26929c67ac8f3c08a5337c8f",
-      "bytes": 20427
+      "sha256": "804e597a8ca674dd0522c01d8985d9299ff6c7843a47f8207f8302418f005971",
+      "bytes": 20712
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -37668,8 +37668,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "a039d9f50b8f1863c63a4e2d437a1c4d3c1c6af5c82bb6ea460dfe762cc95e6c",
-      "bytes": 8794
+      "sha256": "4d592482e246eb7cf02e34f6ad30322ea9b4b9f5d11e55fe31deda36509baf69",
+      "bytes": 9209
     },
     {
       "path": "scripts/adoption_status.py",
@@ -38037,6 +38037,11 @@
       "bytes": 19976
     },
     {
+      "path": "tests/test_adoption_docs_consistency.py",
+      "sha256": "4631cf79e30db12ac359c09316f8f4ff4b43f684d5853b2415aa780a40c11e70",
+      "bytes": 44824
+    },
+    {
       "path": "tests/test_adoption_guarded_runners.py",
       "sha256": "c8db8b668f3f75c2ef1e13a736223e05ffcdc747861062850aa9eac3049a5f14",
       "bytes": 41460
@@ -38298,8 +38303,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "9061737b6c3ea67e338339788931df462c770624af862360ad687a24f0c3285c",
-      "bytes": 34960
+      "sha256": "1608649b034f36aaf8952302bf14e3e4336a933a0e1d05d84fde5792adbc663c",
+      "bytes": 38723
     },
     {
       "path": "tests/test_install_skills.py",

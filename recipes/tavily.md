@@ -2,9 +2,13 @@
 
 Use the official [agent setup skill](https://tavily.com/agent-setup/SKILL.md) and [CLI](https://github.com/tavily-ai/tavily-cli). The authoring Linux host accepted CLI 0.1.8, a live search/extract and eight official skills. The previous explorer receipt is a separate dated installation scope.
 
-For ordinary work, run the selected Search/Extract command when `tvly` is
-available, as its upstream skills instruct. Since 2026-09-26 the key stays out
-of files: on Linux and WSL2 run every `tvly` command through
+Tavily is not the default web lane. Since 2026-09-26, search, fetch and
+extraction use the free native lanes first: Claude Code WebSearch and
+WebFetch, Context Mode's `ctx_fetch_and_index`, and Codex with
+`-c web_search="live"` ([harness defaults](../docs/harness-defaults.md#use-skills-workers-and-tools-deliberately)).
+Run a `tvly` Search/Extract command only when the user asks for Tavily, or
+when a free lane cannot return the page the task needs, and record which
+lane failed. Since 2026-09-26 the key also stays out of files: on Linux and WSL2 run every `tvly` command through
 `scripts/kernel_keyring.py exec` or the installed `tvly-keyring` wrapper, as in
 [Memory-only key on Linux and WSL2](#memory-only-key-on-linux-and-wsl2-2026-09-26),
 and on macOS through `secret run`. For installation or a concrete
@@ -42,7 +46,7 @@ keeps that search limitation and exact command evidence. This establishes the tw
 selected skill operations in this task, not execution of all eight skills or a
 provider-token savings total.
 
-Use Search and Extract for the task at hand. Map, Crawl and Research remain separately selected capabilities; this receipt does not qualify them or a full research report. No lifetime token-saving counter is claimed. [Exact native evidence](../evidence/receipts/native-tavily-cli-20260920.json).
+When Tavily is selected under the rule above, use Search and Extract for the task at hand. Map, Crawl and Research remain separately selected capabilities; this receipt does not qualify them or a full research report. No lifetime token-saving counter is claimed. [Exact native evidence](../evidence/receipts/native-tavily-cli-20260920.json).
 
 ## Memory-only key on Linux and WSL2 (2026-09-26)
 

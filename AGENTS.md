@@ -2,6 +2,8 @@
 
 **Top rule: research first, and never self-write without a SOTA source.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one.
 
+Check capability claims in the order given in [Upstream verification and compounding learning](docs/harness-defaults.md#upstream-verification-and-compounding-learning), and record each proven mistake in its anti-pattern log.
+
 This is a portable reference stack with evidence, native recipes and examples. The two maintained catalogs start at `catalogs/README.md`: `catalogs/foundation/manifest.json` for general native harness layers and `catalogs/us-equities/README.md` for the separate trading architecture. Catalog inclusion does not install, accept or authorize a candidate, and the complete research catalog is not an instruction to install every alternative or start every optional service; a default is a recommendation with an explicit adoption status.
 
 ## Evidence and completion
