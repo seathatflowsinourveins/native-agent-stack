@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-26T03:28:38Z",
+  "evidence_class": "synthetic_fixture",
+  "evidence_class_note": "Classes follow docs/acceptance-evidence-policy.md. F2 to F6 ran run.py as merged in #293 against a stub qmd that emits scripted responses, so they are synthetic fixtures: they show how that run.py handled the scripted inputs, not how QMD behaves. F1 ran the installed QMD 2.8.3 with decoy caller paths and is a local integration check. F7 reads the committed results-20260925.json and is structural validation. discriminating_controls ran stub-qmd tests against mutated copies of run.py efba31d5 and are synthetic. As recorded, this file labelled every finding local_integration (see corrections).",
+  "subject": {
+    "path": "blueprints/retrieval-quality-v2/run.py",
+    "commit": "39e18ed568b9bd75d573dc92d2d47b95c8ae77a0",
+    "sha256": "594e2d44e218a506f5b8a6f99de80a78c2db5b11648e9dc634c05f02e73fb1b6"
+  },
+  "method": "Each reproduction runs a copy of run.py as merged in #293, with its own copy of queries.json, PREREGISTRATION.md and results-20260925.json as its output directory, so no tracked file is touched. F1 uses the installed QMD 2.8.3 with decoy caller paths under the scratch directory standing in for host state; F2-F6 use a stub qmd that emits the scripted responses. Hugging Face is made unreachable for F2 with a dead HTTPS proxy. Paths are sanitized: <SCRATCH> is the worker scratch directory, <STACK_REPO> the checkout.",
+  "inputs": {
+    "note": "Committed copies of the files these reproductions ran with, in review-293-repro-20260926/. sha256 and bytes describe the committed copy; as_run_sha256 and as_run_bytes the file that ran. The copies differ from the files that ran only as 'sanitization' says: the scratch directory became <SCRATCH> and the host user name <user>.",
+    "run_py": "The subject: repro_record.py copied run.py, queries.json, PREREGISTRATION.md and results-20260925.json from commit 39e18ed5 into <SCRATCH>/repro2/orig with git show.",
+    "files": [
+      {
+        "path": "review-293-repro-20260926/repro_record.py",
+        "role": "driver: ran every reproduction and wrote the receipt",
+        "sha256": "7aba596a37ea3dadf6054e66f8d704d4a37735f6d4aa838f0344614efa245bfc",
+        "bytes": 10251,
+        "as_run_sha256": "de8e61a9dfca01b722e53248b73d27a965e42a3179db76fc99890c67ef123400",
+        "as_run_bytes": 10250,
+        "sanitization": [
+          "host user name -> <user>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/stubqmd.py",
+        "role": "stub qmd for F2-F6",
+        "sha256": "9a4dd8315df54c105dd1b4e8f4b0955f8715d394ff877bdb92960419e8e6235f",
+        "bytes": 1665,
+        "as_run_sha256": "9a4dd8315df54c105dd1b4e8f4b0955f8715d394ff877bdb92960419e8e6235f",
+        "as_run_bytes": 1665,
+        "sanitization": [
+          "none: byte-identical to the file that ran"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f2.json",
+        "role": "stub scenario for F2 (<SCRATCH>/repro2/f2/scenario.json when it ran)",
+        "sha256": "34ee336b815893fd32292cea97f1a0057f85af68b0ead7f30cd314d99f91eb32",
+        "bytes": 12295,
+        "as_run_sha256": "c0403dd0e4ee65dd111db1918b573eebf2a202df3fa2f8013d80b4f87aebe441",
+        "as_run_bytes": 12389,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f3.json",
+        "role": "stub scenario for F3 (<SCRATCH>/repro2/f3/scenario.json when it ran)",
+        "sha256": "9026ccfc508e760598f3483e7db874c82b70d121e75145d4d948d09e054a88af",
+        "bytes": 12150,
+        "as_run_sha256": "78b79c6eecbb31aacbefbf904d3526ca8642573aba8349cafb19fd8f6ecba054",
+        "as_run_bytes": 12244,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f4a.json",
+        "role": "stub scenario for F4A (<SCRATCH>/repro2/f4a/scenario.json when it ran)",
+        "sha256": "ef6dd4fdfae06bd5b633b4dfa5b3bcfabfa8477dcda056b6fe79118d68e804da",
+        "bytes": 12452,
+        "as_run_sha256": "e7c5631f7be36cf7007f6ec7362d771861351ede8b28d7243ecf8b2eaea4c91a",
+        "as_run_bytes": 12546,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f4b.json",
+        "role": "stub scenario for F4B (<SCRATCH>/repro2/f4b/scenario.json when it ran)",
+        "sha256": "4dda22bab41eb46db0333988b6d36e8ebf0687ce860fd807afae98bfc755b8dd",
+        "bytes": 12454,
+        "as_run_sha256": "cdbac05dc0fede1df344d6f577ef5d8acff3d790d8259ea74c47463cf37f9b35",
+        "as_run_bytes": 12548,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f4c.json",
+        "role": "stub scenario for F4C (<SCRATCH>/repro2/f4c/scenario.json when it ran)",
+        "sha256": "523b8406cc293601f52145e7535fb32d4fe9db02baf62f8b71a139fc2ea48ea8",
+        "bytes": 12454,
+        "as_run_sha256": "7a135ba9fa507977cf6da5dd990538c98249c50c8388bdc5f8d30a3ca7e732db",
+        "as_run_bytes": 12548,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f5a.json",
+        "role": "stub scenario for F5A (<SCRATCH>/repro2/f5a/scenario.json when it ran)",
+        "sha256": "aaf75022160f6f8776ce1746303c4e5fc27846ab9247add3e9161ea14f33cdad",
+        "bytes": 12318,
+        "as_run_sha256": "d46d08d5882bb02dd9426302550fb611d6a20b8e8eefa91f080a413a2f97a532",
+        "as_run_bytes": 12412,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f5b.json",
+        "role": "stub scenario for F5B (<SCRATCH>/repro2/f5b/scenario.json when it ran)",
+        "sha256": "923336bf9b42d4094b13eef659a3f133fbc5a66d18fb8b6e5b42a0626a5e1529",
+        "bytes": 12319,
+        "as_run_sha256": "13c3b24cda704b68f6b6c044650daf6323e056c2f97d2177053d2478b7ea117a",
+        "as_run_bytes": 12413,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      },
+      {
+        "path": "review-293-repro-20260926/scenarios/f6.json",
+        "role": "stub scenario for F6 (<SCRATCH>/repro2/f6/scenario.json when it ran)",
+        "sha256": "ccfc3cd401baee51923e371f2aa308852f070289a19e5a7779e8163f9f04d971",
+        "bytes": 12295,
+        "as_run_sha256": "e9ea0119cdff8327c6c127f4d7872175c6b70fdd2e5e842f332849c1079d9ad0",
+        "as_run_bytes": 12389,
+        "sanitization": [
+          "scratch directory -> <SCRATCH>"
+        ]
+      }
+    ],
+    "rerun": "repro_record.py regenerates every scenario and decoy it uses and writes the receipt to its first argument. It expects the layout it ran in: itself in a directory <SCRATCH> that holds the stub at repro/stubqmd.py, a sibling checkout named wt-g5 that contains commit 39e18ed5, and qmd 2.8.3 on PATH for F1. The committed scenarios are the ones it wrote on 2026-09-26, kept so that each scripted response can be read without re-running it. The mutation tool behind discriminating_controls was not committed."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "evidence_class": "local_integration",
+      "summary": "Inherited INDEX_PATH/QMD_CONFIG_DIR route index and configuration writes to caller (host) storage",
+      "argv": [
+        "INDEX_PATH=<SCRATCH>/repro2/f1/decoy/host.sqlite",
+        "QMD_CONFIG_DIR=<SCRATCH>/repro2/f1/decoy/config",
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f1/home",
+        "--qmd-bin",
+        "~/.local/share/codex-ecosystem/bin/qmd",
+        "--skip-arm-b",
+        "--date",
+        "f1"
+      ],
+      "exit_code": 1,
+      "stderr_tail": "",
+      "observed": {
+        "status": "aborted_index_count_mismatch",
+        "abort_reason_head": "qmd status reports 35 indexed files, expected 33 (status output: QMD Status\n\nInd",
+        "decoy_before": {
+          "db_bytes": 122880,
+          "documents_by_collection": {
+            "host-notes": 2
+          },
+          "config_files": [
+            "hostidx.yml"
+          ]
+        },
+        "decoy_after": {
+          "db_bytes": 1552384,
+          "documents_by_collection": {
+            "host-notes": 2,
+            "rqv2-catalog": 10,
+            "rqv2-foundation": 18,
+            "rqv2-observability": 5
+          },
+          "config_files": [
+            "hostidx.yml",
+            "retrieval-quality-v2.yml"
+          ]
+        },
+        "scratch_index_created": false
+      }
+    },
+    {
+      "id": "F2",
+      "evidence_class": "synthetic_fixture",
+      "summary": "Unresolved HF revisions do not stop Arm B",
+      "argv": [
+        "HTTPS_PROXY=http://127.0.0.1:9",
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f2/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--date",
+        "f2"
+      ],
+      "exit_code": 0,
+      "stderr_tail": "",
+      "observed": {
+        "status": "completed_both_arms_evaluated",
+        "arm_b_status": "evaluated",
+        "decision": "Hybrid (Arm B) selected over BM25",
+        "revisions": {
+          "embed": null,
+          "generate": null,
+          "rerank": null
+        },
+        "revision_errors": {
+          "embed": "URLError: <urlopen error timed out>",
+          "generate": "URLError: <urlopen error timed out>",
+          "rerank": "URLError: <urlopen error timed out>"
+        }
+      }
+    },
+    {
+      "id": "F3",
+      "evidence_class": "synthetic_fixture",
+      "summary": "Hits with a wrong or empty docid are still credited",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f3/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--date",
+        "f3"
+      ],
+      "exit_code": 0,
+      "stderr_tail": "",
+      "observed": {
+        "status": "completed_both_arms_evaluated",
+        "per_query": [
+          {
+            "id": "nl-01",
+            "ndcg_at_10": 1.0,
+            "error": null,
+            "resolution_notes": [
+              {
+                "file": "qmd://rqv2-foundation/data/README.md?index=retrieval-quality-v2",
+                "note": "docid #000000 does not match 'blueprints/us-equities/data/README.md''s pinned sha256 prefix '881032'"
+              }
+            ]
+          },
+          {
+            "id": "nl-02",
+            "ndcg_at_10": 0.8262346571285599,
+            "error": null,
+            "resolution_notes": []
+          }
+        ],
+        "scripted_docids": {
+          "nl-01": "#000000",
+          "nl-02": ""
+        }
+      }
+    },
+    {
+      "id": "F4a",
+      "evidence_class": "synthetic_fixture",
+      "summary": "Arm A response {} for nl-01",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f4a/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--skip-arm-b",
+        "--date",
+        "f4a"
+      ],
+      "exit_code": 1,
+      "stderr_tail": "",
+      "observed": {
+        "status": "aborted_unexpected_exception",
+        "abort_reason": "KeyError: slice(None, 10, None)",
+        "first_query": null
+      }
+    },
+    {
+      "id": "F4b",
+      "evidence_class": "synthetic_fixture",
+      "summary": "Arm A response [42] for nl-01",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f4b/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--skip-arm-b",
+        "--date",
+        "f4b"
+      ],
+      "exit_code": 1,
+      "stderr_tail": "",
+      "observed": {
+        "status": "aborted_unexpected_exception",
+        "abort_reason": "AttributeError: 'int' object has no attribute 'get'",
+        "first_query": null
+      }
+    },
+    {
+      "id": "F4c",
+      "evidence_class": "synthetic_fixture",
+      "summary": "Arm A response null for nl-01",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f4c/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--skip-arm-b",
+        "--date",
+        "f4c"
+      ],
+      "exit_code": 0,
+      "stderr_tail": "",
+      "observed": {
+        "status": "completed_arm_b_not_run",
+        "abort_reason": null,
+        "first_query": {
+          "id": "nl-01",
+          "error": null,
+          "ndcg_at_10": 0.0
+        }
+      }
+    },
+    {
+      "id": "F5a",
+      "evidence_class": "synthetic_fixture",
+      "summary": "`qmd pull` timing out",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f5a/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--date",
+        "f5a",
+        "--pull-timeout",
+        "1"
+      ],
+      "exit_code": 1,
+      "stderr_tail": "TypeError: 'NoneType' object is not subscriptable",
+      "observed": {
+        "status": "aborted_unexpected_exception",
+        "decision": null,
+        "abort_reason_head": "TimeoutExpired: Command '['<SCRATCH>/repro/stubqmd.py', 'pul"
+      }
+    },
+    {
+      "id": "F5b",
+      "evidence_class": "synthetic_fixture",
+      "summary": "`qmd embed` timing out",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<STACK_REPO>",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f5b/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py",
+        "--date",
+        "f5b",
+        "--embed-timeout",
+        "1"
+      ],
+      "exit_code": 1,
+      "stderr_tail": "TypeError: 'NoneType' object is not subscriptable",
+      "observed": {
+        "status": "aborted_unexpected_exception",
+        "decision": null,
+        "abort_reason_head": "TimeoutExpired: Command '['<SCRATCH>/repro/stubqmd.py', '--i"
+      }
+    },
+    {
+      "id": "F6",
+      "evidence_class": "synthetic_fixture",
+      "summary": "A run whose seal check fails still writes results-20260925.json",
+      "argv": [
+        "<SCRATCH>/repro2/orig/blueprints/retrieval-quality-v2/run.py",
+        "--repo",
+        "<SCRATCH>/repro2/f6-repo",
+        "--scratch-home",
+        "<SCRATCH>/repro2/f6/home",
+        "--qmd-bin",
+        "<SCRATCH>/repro/stubqmd.py"
+      ],
+      "exit_code": 1,
+      "stderr_tail": "",
+      "observed": {
+        "results_20260925_sha256_before": "4a45bcc24f2da8235ebfb934ff5ce6752363d38fa831f126598527b9a318ca05",
+        "results_20260925_sha256_after": "bd6ca838a190fd92e59e6bc577cfd8cad1d01d6cdee42068869dcae3d27455cb",
+        "status_now_in_that_file": "aborted_seal_mismatch"
+      }
+    },
+    {
+      "id": "F7",
+      "evidence_class": "structural_validation",
+      "summary": "Successful retrieval stdout/stderr is not retained",
+      "argv": null,
+      "exit_code": null,
+      "stderr_tail": "",
+      "observed": {
+        "per_query_fields": [
+          "error",
+          "id",
+          "latency_ms",
+          "mrr",
+          "ndcg_at_10",
+          "query",
+          "ranked_paths",
+          "raw_hit_count",
+          "recall_at_5",
+          "resolution_notes",
+          "style"
+        ],
+        "strong_bm25_signal_mentions_in_results_20260925": 0
+      }
+    }
+  ],
+  "discriminating_controls": {
+    "harness_sha256": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004",
+    "tests_sha256": "8fbd6c4285f810ead6064f24def083db4983ffc208e4a21012b6c7e60db3f1fa",
+    "method": "Each mutant reverts one repair in a copy of the repaired run.py; the named tests from tests/test_retrieval_quality_v2.py then run against that copy and must fail.",
+    "mutants": [
+      {
+        "mutant": "F1-inherit-caller-env",
+        "test": "test_no_qmd_call_follows_the_callers_routing_variables",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F1-inherit-caller-env",
+        "test": "test_env_binds_owned_storage_and_drops_caller_routing",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F2-revision-fail-open",
+        "test": "test_unresolved_revision_fails_arm_b_closed",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F3-docid-unchecked",
+        "test": "test_docid_must_match_the_pinned_content_hash",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F3-docid-unchecked",
+        "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (errors=1)"
+      },
+      {
+        "mutant": "F4-json-shape-unchecked",
+        "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F5a-timeout-propagates",
+        "test": "test_embed_timeout_marks_arm_b_not_evaluated",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (errors=1)"
+      },
+      {
+        "mutant": "F5b-kill-launcher-only",
+        "test": "test_pull_timeout_marks_arm_b_not_evaluated_and_kills_the_process_group",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F6-overwrite-outputs",
+        "test": "test_existing_output_is_never_overwritten",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "F7-no-native-retention",
+        "test": "test_every_scored_query_links_to_its_retained_native_output",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (errors=1)"
+      },
+      {
+        "mutant": "F3b-index-content-unverified",
+        "test": "test_index_content_mismatch_aborts_before_any_arm",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "evidence-receipt-hand-edited",
+        "test": "test_committed_receipts_rederive_from_their_native_output",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      },
+      {
+        "mutant": "bench-audit-trusts-native",
+        "test": "test_bench_runs_on_the_same_index_with_a_derived_fixture_and_an_exact_audit",
+        "result": "failed_as_required",
+        "unittest_summary": "FAILED (failures=1)"
+      }
+    ],
+    "rerunnable": false,
+    "rerun_note": "These controls cannot be re-run. The test file they ran (tests/test_retrieval_quality_v2.py, sha256 8fbd6c42...) was never committed, nor was the tool that applied the mutants, and this record does not keep the mutants' patches. The test file was rewritten before its first commit; restore-0792745e.patch recovers only its later version 75cde979.... They are superseded by the controls in repair-review-20260926.json, which cover run.py 0792745e and its tests with each mutant's patch and a passing baseline, and by those in verification-review-20260926.json, which cover the committed run.py and tests."
+  },
+  "corrections": [
+    {
+      "recorded_at_utc": "2026-09-26T09:51:26Z",
+      "reason": "An independent session's review (needs_changes) found three problems. The F2 to F6 reproductions depended on a stub qmd, scenario files and a driver that were neither committed nor hashed. Stub runs were labelled local_integration. The discriminating controls could no longer be re-run.",
+      "as_recorded_sha256": "38b2da5550a0c98ae662b002c0f0e4f5b1da04367ef67abfcb83a8188af7a42e",
+      "as_recorded_bytes": 12470,
+      "changed": [
+        "evidence_class: local_integration -> synthetic_fixture"
+      ],
+      "added": [
+        "evidence_class_note",
+        "inputs",
+        "findings[].evidence_class",
+        "discriminating_controls.rerunnable",
+        "discriminating_controls.rerun_note",
+        "corrections"
+      ],
+      "unchanged": "Every other key and value, including each finding's argv, exit_code, stderr_tail and observed, is as recorded.",
+      "reconstruct": "Delete the added keys, set evidence_class back to local_integration, and write json.dumps(document, indent=2) followed by a newline. The result is the as-recorded file, byte for byte."
+    }
+  ]
+}

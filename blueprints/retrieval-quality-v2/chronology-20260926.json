@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "evidence_class": "independent_observation",
+  "observed_at_utc": "2026-09-26T02:38:37Z",
+  "observer": "the 2026-09-26 retrieval-quality-v2 repair worker, which neither wrote queries.json nor ran the 2026-09-25 comparison",
+  "claim": "The query author's sealed queries.json existed, with its pinned sha256, before the 2026-09-25 runner started, and the author issued no retrieval command.",
+  "sources": {
+    "workflow_journal": {
+      "description": "append-only event log of Claude Code workflow run wf_eaf5338d-556",
+      "sha256": "62610cf435ad985c94d7ec8390de060ab699f72c164fe0f00386cb80c7efc7ff",
+      "bytes": 42608,
+      "lines": 11
+    },
+    "workflow_run_record": {
+      "description": "Claude Code's run record for wf_eaf5338d-556 (per-agent start, queue and duration times)",
+      "sha256": "08fe6bb72799dda0cc87a03b039c1aa0408597425c07e4fa10aaf73b85134b37",
+      "bytes": 61361
+    },
+    "query_author_transcript": {
+      "description": "native transcript of the w2:query-author agent",
+      "sha256": "e6f89cb714b94549cf48e52b7fc499a987b3ae36310bf1a9f4d9f358270e8b4c",
+      "bytes": 1710648
+    },
+    "runner_transcript": {
+      "description": "native transcript of the w2:runner agent",
+      "sha256": "f11bda93a3fb7f68de9c6446f20e4e61a32b121f7611f2af958b61b68da7f212",
+      "bytes": 4479582
+    },
+    "location": "host-local Claude Code state of the authoring session on nativestack-5975wx-20260925: <claude-projects>/<project>/<session>/workflows/ and .../subagents/workflows/wf_eaf5338d-556/",
+    "retention": "Private and not committed: the records hold full prompts, outputs and host paths. The sha256 values let the check be repeated on that host while the files exist; Claude Code may clean old session files up."
+  },
+  "journal_lines": [
+    {
+      "line": 3,
+      "type": "started",
+      "agentId": "ac40640e537620f5e",
+      "label": "w2:query-author",
+      "phase": "Build"
+    },
+    {
+      "line": 4,
+      "type": "result",
+      "agentId": "ac40640e537620f5e",
+      "result": {
+        "status": "completed",
+        "queries_sha256": "4d0a0eaf0f6fc48b899f6139e7e98a6c1edf4798b1f17ddfbf5ec3e1cc6c5c7a",
+        "preregistration_sha256": "6cae3bdd9f1226ed320d9d3aad3803b3b77cd856e12600c8a7d77df83257af3b"
+      }
+    },
+    {
+      "line": 5,
+      "type": "started",
+      "agentId": "a765ee477716ee2d2",
+      "label": "w2:runner",
+      "phase": "Run"
+    },
+    {
+      "line": 9,
+      "type": "result",
+      "agentId": "a765ee477716ee2d2",
+      "result": {
+        "status": "completed",
+        "queries_sha256": "4d0a0eaf0f6fc48b899f6139e7e98a6c1edf4798b1f17ddfbf5ec3e1cc6c5c7a",
+        "preregistration_sha256": "6cae3bdd9f1226ed320d9d3aad3803b3b77cd856e12600c8a7d77df83257af3b"
+      }
+    }
+  ],
+  "agents": [
+    {
+      "label": "w2:query-author",
+      "agentId": "ac40640e537620f5e",
+      "phase": "Build",
+      "state": "done",
+      "queued_at_utc": "2026-09-25T20:02:50.661Z",
+      "started_at_utc": "2026-09-25T20:02:50.685Z",
+      "duration_ms": 1078487,
+      "completed_at_utc": "2026-09-25T20:20:49.172Z",
+      "tool_calls": 66
+    },
+    {
+      "label": "w2:runner",
+      "agentId": "a765ee477716ee2d2",
+      "phase": "Run",
+      "state": "done",
+      "queued_at_utc": "2026-09-25T20:20:50.102Z",
+      "started_at_utc": "2026-09-25T20:20:50.105Z",
+      "duration_ms": 2832662,
+      "completed_at_utc": "2026-09-25T21:08:02.767Z",
+      "tool_calls": 479
+    }
+  ],
+  "transcript_scans": {
+    "query_author": {
+      "first_event_utc": "2026-09-25T20:02:51.613Z",
+      "last_event_utc": "2026-09-25T20:20:50.098Z",
+      "tool_use_counts": {
+        "Bash": 21,
+        "Read": 41,
+        "StructuredOutput": 1,
+        "Write": 3
+      },
+      "retrieval_invocations": 0,
+      "first_qmd_bash_call_utc": null,
+      "write_or_edit_targets": [
+        "<w2 scratch>/PREREGISTRATION.md",
+        "<w2 scratch>/build_queries.py",
+        "<w2 scratch>/final_check.py"
+      ]
+    },
+    "runner": {
+      "first_event_utc": "2026-09-25T20:20:50.106Z",
+      "last_event_utc": "2026-09-25T21:08:02.765Z",
+      "tool_use_counts": {
+        "Bash": 411,
+        "Edit": 3,
+        "Monitor": 1,
+        "Read": 60,
+        "StructuredOutput": 1,
+        "ToolSearch": 1,
+        "Write": 2
+      },
+      "retrieval_invocations": 17,
+      "first_qmd_bash_call_utc": "2026-09-25T20:21:33.658Z",
+      "write_or_edit_targets": [
+        "<w2 scratch>/verify_results.py",
+        "blueprints/retrieval-quality-v2/run.py"
+      ]
+    },
+    "method": "Every tool_use block in each transcript. retrieval_invocations counts qmd or SocratiCode MCP tool calls and Bash commands that invoke qmd, socraticode, llama-server/llama-cli, an /v1/embeddings or /v1/rerank endpoint, or the host's model/vector ports (:18231, :18232, :26333). first_qmd_bash_call_utc is the first Bash command invoking qmd. A looser scan for the substrings embed/rerank also finds one author match, the text \"embedded hash line\" in an echo, which is not an invocation."
+  },
+  "ordering": {
+    "author_result_line_precedes_runner_start_line": true,
+    "author_completed_at_utc": "2026-09-25T20:20:49.172Z",
+    "runner_started_at_utc": "2026-09-25T20:20:50.105Z",
+    "runner_first_qmd_call_utc": "2026-09-25T20:21:33.658Z",
+    "results_20260925_generated_at_utc": "2026-09-25T20:41:42Z",
+    "author_sealed_hash_equals_pin": true
+  },
+  "runner_run_py_invocations": [
+    {
+      "at_utc": "2026-09-25T20:38:36.440Z",
+      "arguments": "--repo \"$WT\" --scratch-home \"$SCR/qmd-home\" --index-name rqv2-smoketest --skip-arm-b --date 20260925-smoketest",
+      "printed_status": [
+        "completed_arm_b_not_run"
+      ]
+    },
+    {
+      "at_utc": "2026-09-25T20:41:16.954Z",
+      "arguments": "--repo \"$WT\" --scratch-home \"$SCR/qmd-home\" --index-name rqv2-smoketest2 --skip-arm-b --date 20260925-smoketest2",
+      "printed_status": [
+        "completed_arm_b_not_run"
+      ]
+    },
+    {
+      "at_utc": "2026-09-25T20:41:42.090Z",
+      "arguments": "--repo \"$WT\" --scratch-home \"$SCR/qmd-home\"",
+      "printed_status": []
+    }
+  ],
+  "runner_manual_qmd_retrievals": [
+    {
+      "at_utc": "2026-09-25T20:27:27.448Z",
+      "subcommand": "search",
+      "index": "rqv2-explore",
+      "sealed_query_id": "kw-02"
+    },
+    {
+      "at_utc": "2026-09-25T20:30:10.893Z",
+      "subcommand": "query",
+      "index": "rqv2-explore",
+      "sealed_query_id": "kw-02"
+    },
+    {
+      "at_utc": "2026-09-25T20:39:09.985Z",
+      "subcommand": "search",
+      "index": "rqv2-smoketest",
+      "sealed_query_id": "nl-01"
+    },
+    {
+      "at_utc": "2026-09-25T20:39:09.985Z",
+      "subcommand": "search",
+      "index": "rqv2-smoketest",
+      "sealed_query_id": null
+    },
+    {
+      "at_utc": "2026-09-25T20:39:40.035Z",
+      "subcommand": "search",
+      "index": "rqv2-smoketest",
+      "sealed_query_id": "pa-01"
+    },
+    {
+      "at_utc": "2026-09-25T20:39:40.035Z",
+      "subcommand": "search",
+      "index": "rqv2-smoketest",
+      "sealed_query_id": "nl-05"
+    }
+  ],
+  "runner_manual_qmd_retrievals_note": "Before the official run.py invocation (2026-09-25T20:41:42Z) the runner also sent qmd search/query calls by hand while writing run.py: sealed query kw-02 through both `search` and hybrid `query` on an exploration index (rqv2-explore), and nl-01, pa-01 and nl-05 plus one non-sealed probe through `search` on the first smoke-test index. sealed_query_id is null for text that is not one of the 30 sealed queries.",
+  "runner_run_py_invocations_note": "The runner executed run.py three times. The first two were Arm-A-only smoke runs (--skip-arm-b) on separately named indexes, writing results-20260925-smoketest*.json; neither receipt was committed, and their README.md output was overwritten by the official run. Arm A's lexical results were therefore seen twice before the official run. Arm A has no model or tunable parameter in run.py, but those two receipts are not retained. Arm B ran once, in the official invocation (printed status not captured because its output went to a log file).",
+  "limitations": [
+    "Public readers get this extract, not the records; it is an attested observation, not a publicly re-verifiable artifact.",
+    "Timestamps come from the Claude Code harness clock on one host.",
+    "The no-retrieval check covers the author's own tool calls only; it cannot exclude retrieval output reaching the author some other way, such as through its prompt.",
+    "The author's preregistration_sha256 differs from the committed PREREGISTRATION.md because the Sealing section was corrected after the run (2026-09-25) and amended/corrected on 2026-09-26; queries.json is unchanged."
+  ]
+}
