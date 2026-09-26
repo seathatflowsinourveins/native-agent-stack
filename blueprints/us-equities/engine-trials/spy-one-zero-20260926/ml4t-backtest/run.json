@@ -1,0 +1,526 @@
+{
+  "schema_version": 1,
+  "id": "spy-one-zero-engine-trial-ml4t-backtest-run-20260926",
+  "kind": "run_record",
+  "trial": "spy-one-zero-engine-trials-20260926",
+  "arm": "ml4t-backtest",
+  "case": "one_zero",
+  "evidence_class": "HIST",
+  "classification": "local historical replay of bundled LEAN sample data through ml4t-backtest 0.1.12, scored by the unchanged spy-parity compare.py; not an unchanged upstream test, a point-in-time dataset, a strategy result or any broker execution",
+  "recorded_utc": "2026-09-26T05:39:39+00:00",
+  "result": {
+    "primary_attempt": "attempt-01",
+    "verdict": "PASS",
+    "checks": 29,
+    "pass": 29,
+    "fail": 0,
+    "skipped": 0,
+    "complete": true,
+    "attribution_evidence": "converted bars",
+    "blocking_mappings": [],
+    "unattributed_failures": [],
+    "rejected_attributions": [],
+    "native_end_cash_usd": "90734.0800",
+    "scorer_exit_code": 0,
+    "prediction": "PASS, 29 of 29 (preregistration.json predictions.ml4t-backtest)",
+    "prediction_falsifiers_observed": [],
+    "scope": "One historical-simulation case (one_zero) on bundled sample data. It ranks, promotes or adopts no engine and says nothing about one_stress, two_zero, later cases, paper or live operation."
+  },
+  "host": {
+    "id": "nativestack-5975wx-20260925",
+    "compute": "CPU only",
+    "gpu": "none: --dev /dev exposes no GPU device node inside the sandbox and no GPU library is configured",
+    "tools": {
+      "bwrap": "0.9.0",
+      "uv": "0.12.17",
+      "base_interpreter": "/usr/bin/python3.12 (CPython 3.12.3)"
+    }
+  },
+  "scorer_pin": {
+    "main_commit": "5c1961e49b89dd56ef5626950a5448735caabe4c",
+    "compare_py": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec"
+    },
+    "tolerances": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+    },
+    "convert_py": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65"
+    },
+    "fixture_strategy_py": {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1"
+    },
+    "oracle": {
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9"
+    },
+    "plan": {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+    },
+    "equal_to_preregistered_pins": true,
+    "note": "The checkout that ran and scored is main 5c1961e4 plus the preregistration commit and this arm's commits; none touches spy-parity or historical-simulation, and the hashes above were taken there."
+  },
+  "sheet": {
+    "registered": "v1",
+    "tolerances_sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "registered_before_first_run": true,
+    "registered_in_commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c",
+    "same_sheet_for_both_engines": true,
+    "tolerance_changes_after_results": "none"
+  },
+  "preregistration": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+    "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38",
+    "commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c"
+  },
+  "engine": {
+    "package": "ml4t-backtest",
+    "version": "0.1.12",
+    "license": "MIT",
+    "upstream_repository": "https://github.com/ml4t/backtest",
+    "upstream_tag": "v0.1.12",
+    "upstream_commit": "672804b36915742fe18af9cd09b44e9839d39d6f",
+    "annotated_tag_object": "7d8a0fd2a7a4ead255036b13939b6300ee0210a0",
+    "wheel": "ml4t_backtest-0.1.12-py3-none-any.whl",
+    "wheel_sha256": "8f5dfe7c2ab96c497136934448bb3211d0d3bf8ec24e71b34229ca5cf53e393b",
+    "sdist_sha256": "4a5ce7f4f9c10e0fb56cc9ca61b763c897a694a8d94e0f054abbbe2cdc5cff36",
+    "uploaded_utc": "2026-09-24T19:28:52Z",
+    "ml4t_specs": {
+      "version": "0.1.5",
+      "upstream_tag": "v0.1.5",
+      "upstream_commit": "07db811feac5541882201440eae4238c9dd9a39e",
+      "wheel_sha256": "4c8315f5da52674a1132dafa53568f4e1b02bbd6da400399d61b33d459315117"
+    },
+    "checks_2026_09_26": [
+      "PyPI JSON for ml4t-backtest 0.1.12 and ml4t-specs 0.1.5 re-fetched: wheel and sdist digests, sizes and upload times equal the preregistered values (class: primary-source metadata).",
+      "git ls-remote: ml4t/backtest refs/tags/v0.1.12 -> 7d8a0fd2 (peeled 672804b3); ml4t/specs refs/tags/v0.1.5 -> 07db811f (class: primary-source metadata).",
+      "The installed ml4t/backtest and ml4t/specs package files equal the unpacked hash-verified wheels (diff -r, __pycache__ excluded).",
+      "docs/user-guide/profiles.md, execution-semantics.md, market-impact.md and docs/tutorials/costs-and-funding.md fetched at 672804b3 hash to the preregistered values; the cited line ranges hold the cited text."
+    ]
+  },
+  "environment": {
+    "location": "$ENV = ~/.local/share/codex-ecosystem/engine-trials-20260926/ml4t-backtest-0.1.12",
+    "base_interpreter": "/usr/bin/python3.12 (CPython 3.12.3); $ENV/pyvenv.cfg home = /usr/bin",
+    "uv_version": "0.12.17",
+    "create": "uv venv --python /usr/bin/python3.12 \"$ENV\"",
+    "resolve": "uv pip compile lockcheck/ml4t.in --python-version 3.12 --no-build --generate-hashes --exclude-newer 2026-09-26T04:45:00Z --no-header -o lockcheck/ml4t.lock",
+    "install": "uv pip sync --python \"$ENV/bin/python\" --require-hashes --no-build lockcheck/ml4t.lock",
+    "cutoff": "2026-09-26T04:45:00Z",
+    "requirements_input": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.in",
+      "sha256": "48230e98996fb0662bf5fe38cc14cb7cd1c7c69d9440836cd9ae08386a4734f8",
+      "content": "ml4t-backtest==0.1.12"
+    },
+    "lock": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock",
+      "sha256": "e168a18f30b48e50d024b19fd1f734b90dc4cef70627d70e637431fe7505c791",
+      "packages": 15,
+      "equals_preregistered_indicative_lock": true
+    },
+    "resolution_record": "The first resolve used the input path requirements.in and produced lock sha256 19a3df5bec65a87ae899af13158d35d4d609d4fc91e68d070d4eb1adcda83f36. It differs from the preregistered lock only in the '# via -r <input>' comment naming the input file; the packages, versions and hashes are identical. Resolving again from lockcheck/ml4t.in, the input path the preregistered lock names, reproduced e168a18f byte for byte, and that lock was installed. No lock other than the preregistered one was installed.",
+    "installed_packages": [
+      "exchange-calendars==4.13.2",
+      "korean-lunar-calendar==0.4.0",
+      "ml4t-backtest==0.1.12",
+      "ml4t-specs==0.1.5",
+      "numpy==2.5.3",
+      "pandas==3.0.6",
+      "pandas-market-calendars==5.4.0",
+      "polars==1.44.2",
+      "polars-runtime-32==1.44.2",
+      "pyluach==2.3.0",
+      "python-dateutil==2.9.0.post0",
+      "pyyaml==6.0.3",
+      "six==1.17.0",
+      "toolz==1.1.0",
+      "tzdata==2026.4"
+    ],
+    "built_from_source": [],
+    "built_utc": {
+      "started": "2026-09-26T05:13:22Z",
+      "finished": "2026-09-26T05:13:52Z"
+    },
+    "network": "Creation, resolution and installation ran before any run and outside the run sandbox. Nothing was installed or fetched inside it."
+  },
+  "arm_manifest": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/mapping-manifest.json",
+    "sha256": "5d7368b726614988c8e9b0f5eaaceddc2d3a925986d2612ae87b0a372f7d7a3a",
+    "projection_equals_binding": true,
+    "frozen_in_commit": "05412af4249693f745aeadb335b07a12e886f609",
+    "mapping_status": {
+      "instrument_identity": "resolved",
+      "raw_data_decoding": "resolved",
+      "sessions_and_time": "resolved",
+      "decision_visibility": "resolved",
+      "market_on_open_proxy": "resolved",
+      "distributions_and_cash": "resolved",
+      "costs_and_rounding": "resolved",
+      "margin_and_adaptive_state": "blocked"
+    },
+    "unsupported_mappings": []
+  },
+  "port": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/fixture_port.py",
+    "sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+    "frozen_in_commit": "05412af4249693f745aeadb335b07a12e886f609",
+    "equals_receipt_port_source_sha256": true,
+    "decision_hook": "Strategy.on_data at the decision bar's end instant (16:00 New York) submits an ordinary market order; NEXT_BAR processes it at the next bar's open."
+  },
+  "resolved_engine_configuration": {
+    "account": {
+      "allow_leverage": true,
+      "allow_short_selling": true,
+      "fixed_margin_schedule": null,
+      "initial_margin": 0.5,
+      "lock_notional_update_mode": "position_legs",
+      "long_maintenance_margin": 0.5,
+      "margin_pct_schedule": null,
+      "short_cash_policy": "credit",
+      "short_maintenance_margin": 0.5
+    },
+    "calendar": {
+      "calendar": null,
+      "data_frequency": "1h",
+      "enforce_sessions": false,
+      "timezone": "UTC"
+    },
+    "cash": {
+      "buffer_pct": 0.0,
+      "initial": 100000.0
+    },
+    "commission": {
+      "minimum": 0.0,
+      "model": "none",
+      "per_share": 0.0,
+      "per_trade": 0.0,
+      "rate": 0.0
+    },
+    "execution": {
+      "execution_mode": "next_bar",
+      "execution_price": "open",
+      "mark_price": "price"
+    },
+    "feed": {
+      "ask_col": null,
+      "ask_size_col": null,
+      "bar_type": null,
+      "bid_col": null,
+      "bid_size_col": null,
+      "calendar": null,
+      "close_col": "close",
+      "data_frequency": "1h",
+      "entity_col": "asset",
+      "high_col": "high",
+      "low_col": "low",
+      "mid_col": null,
+      "open_col": "open",
+      "price_col": "close",
+      "session_start_time": null,
+      "timestamp_col": "timestamp",
+      "timestamp_semantics": "bar_close",
+      "timezone": "UTC",
+      "volume_col": "volume",
+      "vwap_col": null
+    },
+    "metadata": {},
+    "orders": {
+      "buying_power_reservation": false,
+      "entry_order_priority": "submission",
+      "fill_ordering": "sequential",
+      "immediate_fill": false,
+      "late_asset_min_bars": 1,
+      "late_asset_policy": "allow",
+      "missing_price_policy": "use_last",
+      "next_bar_queue_shadow_validation": true,
+      "next_bar_simple_cash_check": false,
+      "next_bar_submission_precheck": true,
+      "partial_fills_allowed": false,
+      "rebalance_headroom_pct": 0.9975,
+      "rebalance_mode": "snapshot",
+      "reject_on_insufficient_cash": true,
+      "skip_cash_validation": false
+    },
+    "position_sizing": {
+      "share_rounding": "nearest",
+      "share_type": "integer"
+    },
+    "result": {
+      "retain_intent_history": false,
+      "retain_lifecycle_history": false
+    },
+    "settlement": {
+      "delay": 0,
+      "reduces_buying_power": true
+    },
+    "slippage": {
+      "fixed": 0.0,
+      "model": "none",
+      "rate": 0.0,
+      "spread": 0.0,
+      "spread_by_asset": {},
+      "spread_convention": "full_spread",
+      "stop_rate": 0.0
+    },
+    "stops": {
+      "initial_hwm_source": "fill_price",
+      "stop_fill_mode": "stop_price",
+      "stop_level_basis": "fill_price",
+      "trail_hwm_source": "close",
+      "trail_include_entry_bar_extremes": false,
+      "trail_stop_timing": "lagged"
+    }
+  },
+  "resolved_engine_configuration_source": "config.to_dict() of the engine's resolved configuration in run-1 (receipt.json engine_configuration); run-2 is identical",
+  "configuration_facts": {
+    "allow_leverage": true,
+    "allow_short_selling": true,
+    "calendar": null,
+    "commission_model": "NoCommission",
+    "commission_nonzero_fields": [],
+    "commission_type": "none",
+    "data_frequency": "1h",
+    "enforce_sessions": false,
+    "execution_mode": "next_bar",
+    "execution_price": "open",
+    "immediate_fill": false,
+    "initial_cash": 100000.0,
+    "preset_name": "lean",
+    "session_col": null,
+    "share_type": "integer",
+    "slippage_model": "NoSlippage",
+    "slippage_nonzero_fields": [],
+    "slippage_type": "none",
+    "timestamp_semantics": "bar_close"
+  },
+  "sandbox": {
+    "template": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/fixture_port.py --lean-data /data --out /out/port",
+    "placeholders": {
+      "ENV": "~/.local/share/codex-ecosystem/engine-trials-20260926/ml4t-backtest-0.1.12",
+      "REPO": "<worktree> at 05412af4249693f745aeadb335b07a12e886f609 with a clean status",
+      "LEAN": "~/.local/share/codex-ecosystem/lean/Lean/Data",
+      "OUT": "~/.local/state/native-agent-stack/engine-trials-20260926/ml4t-backtest/attempt-NN"
+    },
+    "mirrors": "blueprints/us-equities/engine-nautilus/spy-parity/README.md (Reproduce receipt.json): same flags, mounts and environment, with the port in place of run.py",
+    "added_environment_variables": [],
+    "observed_inside": {
+      "network_interfaces": [
+        [
+          1,
+          "lo"
+        ]
+      ],
+      "environment_names": [
+        "LANG",
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "PATH",
+        "PWD",
+        "PYTHONDONTWRITEBYTECODE"
+      ],
+      "environment_additions": [],
+      "python_flags_isolated": 1,
+      "read_only": {
+        "data_root": true,
+        "port_source": true,
+        "python_prefix": true,
+        "spy_parity_sources": true
+      }
+    },
+    "engine_process_note": "polars sets _RJEM_MALLOC_CONF in its own process environment when it is imported. The port imports polars only in the two child processes, so the parent's recorded environment has no addition; the orchestration smoke test, which imports polars in its parent process, observed the variable there. It is set by the engine's dependency inside the sandbox, not by the sandbox command.",
+    "private_outputs": "outside every checkout, directories 0700 under umask 077"
+  },
+  "mechanism_probes": [
+    {
+      "id": "probe-01",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/mechanism_probe.py",
+      "script_sha256": "88ffef9d0dd7c427b36f8e9d483ab519bdbb265c6ea7580bea7f139f99643a46",
+      "port_sha256": "b5fcac2a850e18fd0a972ba14340340cf1627ae187c6ed686d5d867691cb669e",
+      "utc_start": "2026-09-26T05:29:17Z",
+      "exit_code": 0,
+      "wall_seconds": 2.477,
+      "sandbox": "template without the /data mount",
+      "outcome": "all 12 expectations met on synthetic bars (next-session first-bar open fills stamped at that bar's end; zero FundingPayment when flat and when opened at the event bar; -quantity x amount_per_unit when held)",
+      "classification": "development probe on the pre-freeze port working copy; superseded by probe-02"
+    },
+    {
+      "id": "smoke-01",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/orchestration_smoke.py",
+      "script_sha256": "5df5e9d8c854d51d30044c27d32fbf52acd104d4d081391047016d526ee21eec",
+      "port_sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+      "utc_start": "2026-09-26T05:32:05Z",
+      "exit_code": 0,
+      "wall_seconds": 2.136,
+      "sandbox": "template without the /data mount",
+      "outcome": "all checks passed: a real child launch refused synthetic rows against the frozen row hash; parent_main's synthetic receipt passed compare.bind and a 29-check synthetic comparison",
+      "classification": "development smoke test before the freeze commit, on the port bytes that were frozen; repeated as smoke-02"
+    },
+    {
+      "id": "probe-02",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/mechanism_probe.py",
+      "script_sha256": "88ffef9d0dd7c427b36f8e9d483ab519bdbb265c6ea7580bea7f139f99643a46",
+      "port_sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+      "repository_commit": "05412af4249693f745aeadb335b07a12e886f609",
+      "utc_start": "2026-09-26T05:35:51Z",
+      "exit_code": 0,
+      "wall_seconds": 1.788,
+      "sandbox": "template without the /data mount",
+      "report": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/mechanism-probe.json",
+        "sha256": "a7f0f5ebab7eb3056b310b70248529e84e8e8e3004904f2be2d72833467f935e"
+      },
+      "outcome": "all 12 expectations met and every port guard passed on synthetic bars: entry and exit fills at the next session's first bar open, stamped at its end; FundingPayment 0 when flat, 0 for the position opened at the event bar, and 964 x 0.37 = 356.68 when held"
+    },
+    {
+      "id": "smoke-02",
+      "script": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/orchestration_smoke.py",
+      "script_sha256": "5df5e9d8c854d51d30044c27d32fbf52acd104d4d081391047016d526ee21eec",
+      "port_sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+      "repository_commit": "05412af4249693f745aeadb335b07a12e886f609",
+      "utc_start": "2026-09-26T05:35:52Z",
+      "exit_code": 0,
+      "wall_seconds": 2.036,
+      "sandbox": "template without the /data mount",
+      "report": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/probes/orchestration-smoke.json",
+        "sha256": "73f12707b72c476b006e04a45fa02d3d5b24219b98aae8ad4aa809ff74391020"
+      },
+      "outcome": "all checks passed: child launch path and row pin, two-run determinism, receipt assembly accepted by compare.bind, synthetic comparison PASS 29 of 29"
+    }
+  ],
+  "mechanism_probe_class": "synthetic fixture executed by the pinned engine under the run sandbox; never SPY rows, the frozen inputs or the LEAN data mount; not parity evidence",
+  "attempts": [
+    {
+      "id": "attempt-01",
+      "classification": "primary",
+      "utc_start": "2026-09-26T05:36:10Z",
+      "wall_seconds": 4.101,
+      "repository_commit": "05412af4249693f745aeadb335b07a12e886f609",
+      "worktree_clean_at_start": true,
+      "bwrap_argv": "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind \"$ENV\" \"$ENV\" --ro-bind \"$REPO\" /repo --ro-bind \"$LEAN\" /data --bind \"$OUT\" /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 \"$ENV/bin/python\" -I /repo/blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/fixture_port.py --lean-data /data --out /out/port",
+      "added_environment_variables": [],
+      "port_sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+      "manifest_sha256": "5d7368b726614988c8e9b0f5eaaceddc2d3a925986d2612ae87b0a372f7d7a3a",
+      "lock_sha256": "e168a18f30b48e50d024b19fd1f734b90dc4cef70627d70e637431fe7505c791",
+      "port_exit_code": 0,
+      "sandbox_stderr_bytes": 0,
+      "outcome_class": "receipt",
+      "receipt": {
+        "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/receipt.json",
+        "sha256": "fbd24c9ba92f2555317b230239e4bd2f09099e2874804a7c750a078da8ee1c65",
+        "published_unchanged": true
+      },
+      "runs": [
+        {
+          "label": "run-1",
+          "exit_code": 0,
+          "wall_seconds": 1.89,
+          "normalized_economic_sha256": "667acd395f042d8f39e31cf6c8c4cd883974e94056c566862a83c4b83d02b546",
+          "raw_report_sha256": "0b54c1ff419293def17fcf13504b5668234abc6daea4ddec6ed6537e470db707",
+          "guards_failed": []
+        },
+        {
+          "label": "run-2",
+          "exit_code": 0,
+          "wall_seconds": 1.904,
+          "normalized_economic_sha256": "667acd395f042d8f39e31cf6c8c4cd883974e94056c566862a83c4b83d02b546",
+          "raw_report_sha256": "0b54c1ff419293def17fcf13504b5668234abc6daea4ddec6ed6537e470db707",
+          "guards_failed": []
+        }
+      ],
+      "two_run_records_equal": true,
+      "guards": {
+        "total": 47,
+        "failed": []
+      },
+      "float_projection": {
+        "values_projected": 11,
+        "max_abs_adjustment": "0"
+      },
+      "scorer": {
+        "command": "python3 -B blueprints/us-equities/engine-nautilus/spy-parity/compare.py --receipt blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/receipt.json --manifest blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/mapping-manifest.json --tolerances blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json --lean-data \"$LEAN\" --verdict blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/verdict.json",
+        "run_from": "<worktree> repository root at 05412af4249693f745aeadb335b07a12e886f609 plus the published receipt",
+        "interpreter": "/usr/bin/python3 (standard library only)",
+        "utc_start": "2026-09-26T05:36:38Z",
+        "exit_code": 0,
+        "verdict_line": "VERDICT {\"attribution_evidence\": \"converted bars\", \"blocking_mappings\": [], \"case\": \"one_zero\", \"complete\": true, \"failed\": 0, \"manifest_schema_version\": 1, \"manifest_unsupported_mappings\": [], \"native_end_cash_usd\": \"90734.0800\", \"note\": \"A failure is BLOCKED only when a measured deviation matches a mapping the bound manifest declares unsupported. Any residue stays an unattributed FAIL, and a skipped check or rejected attribution leaves the comparison incomplete.\", \"rejected_attributions\": [], \"skipped\": [], \"unattributed_failures\": [], \"verdict\": \"PASS\"}",
+        "verdict": {
+          "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/verdict.json",
+          "sha256": "10d3146bb467adab2a1a79d4861498187eba84ca7f683e090e1309a4d7215ca7",
+          "written_by": "compare.py --verdict, committed as written"
+        },
+        "stderr_bytes": 0,
+        "bytecode_written": false
+      },
+      "private_outputs": {
+        "directory": "~/.local/state/native-agent-stack/engine-trials-20260926/ml4t-backtest/attempt-01",
+        "sha256": {
+          "port/child-input.private.json": "6c923abbe10c647264164c7e915ecc982ff0bf5798c054009ff48094c357aa7f",
+          "port/converted-rows.private.json": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+          "port/receipt.json": "fbd24c9ba92f2555317b230239e4bd2f09099e2874804a7c750a078da8ee1c65",
+          "port/run-1/raw-report.private.json": "0b54c1ff419293def17fcf13504b5668234abc6daea4ddec6ed6537e470db707",
+          "port/run-1/run-1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-1/run-1.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-1/summary.private.json": "2e900a49ed30e2dec316ba234607b3990e57553e9dd0673f274ad9ee224e16f4",
+          "port/run-2/raw-report.private.json": "0b54c1ff419293def17fcf13504b5668234abc6daea4ddec6ed6537e470db707",
+          "port/run-2/run-2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-2/run-2.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "port/run-2/summary.private.json": "762dd36ec5b2ad4651eed7008efd7caf1b26c0c8df24af6634f1692cb324f424",
+          "sandbox.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sandbox.stdout": "889f6324b9695b241a40a21751a9c67d2e96c81d68789a2ddb73f947149833b6",
+          "scorer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "scorer.stdout": "f3392c1ec0d9bbc3f07192ceebcdfb9f0ef4c1cd8bad131dc53519cffb5473e6"
+        },
+        "note": "Converted rows, raw per-run reports, per-run summaries, child input, logs and captured stdout and stderr stay private; only these hashes are published."
+      }
+    }
+  ],
+  "declared_deviations": [
+    {
+      "id": "D1_per_arm_mapping_manifest",
+      "source": "preregistration.json declared_deviations",
+      "applied": "scored against this arm's schema_version 1 mapping-manifest.json via compare.py --manifest"
+    },
+    {
+      "id": "D2_v1_contract_only",
+      "source": "preregistration.json declared_deviations",
+      "applied": "v1 29-check contract; no v2 manifest or sheet"
+    },
+    {
+      "id": "D4_ml4t_lean_preset_commission",
+      "source": "preregistration.json declared_deviations",
+      "applied": "lean profile with the commission section replaced by {'model': 'none', 'rate': 0.0}"
+    }
+  ],
+  "run_time_deviations": [],
+  "declared_scope_notes": [
+    "The lean profile is documented for daily US equities (docs/user-guide/profiles.md lines 37-40); this arm runs it on hourly bars, outside that documented scope.",
+    "Distribution cash is posted through the funding input documented for perpetual futures, at each ex-date's first bar end (1576854000 and 1584712800) rather than LEAN's 00:00 ex-date instants (1576818000 and 1584676800). The v1 contract compares the distribution total and the receipt's own cash path, so the two cash_ledger check labels differ from the Nautilus v1 verdict's by these instants.",
+    "The account is the lean profile's margin account (MARGIN); the Nautilus arm used a CASH account. one_zero requests 1x, so no leverage, margin call or latch was exercised or claimed."
+  ],
+  "context_nautilus_arm": {
+    "v1": {
+      "verdict": "BLOCKED",
+      "checks": 29,
+      "pass": 25,
+      "fail": 4,
+      "blocking_mappings": [
+        "distributions_and_cash",
+        "market_on_open_proxy"
+      ],
+      "scored": "2026-09-22 by an earlier compare.py (fc0ed683); refused at bind by the pinned compare.py on 2026-09-26, so it is a dated verdict"
+    },
+    "v2": {
+      "verdict": "PASS",
+      "checks": 136,
+      "note": "a different contract (106 execution checks plus 30 preconditions); context only"
+    },
+    "same_check_ids_as_v1": true
+  },
+  "no_paper": "No paper step of any kind: no broker client, adapter, endpoint or credential was constructed, configured, contacted or read; the run sandbox had no network.",
+  "hygiene": "Host paths appear only as placeholders. No UUID-shaped string, engine identifier, credential or log excerpt is recorded here."
+}

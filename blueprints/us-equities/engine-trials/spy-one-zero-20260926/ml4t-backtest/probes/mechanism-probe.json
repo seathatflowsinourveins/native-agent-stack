@@ -1,0 +1,520 @@
+{
+  "all_expectations_met": true,
+  "cash_ledger": [
+    {
+      "cash": "100000.0000",
+      "delta": "0.0000",
+      "kind": "distribution",
+      "utc_seconds": 1925478000
+    },
+    {
+      "cash": "100000.0000",
+      "delta": "0.0000",
+      "kind": "distribution",
+      "utc_seconds": 1925564400
+    },
+    {
+      "cash": "3108.3600",
+      "delta": "-96891.6400",
+      "kind": "fill",
+      "utc_seconds": 1925564400
+    },
+    {
+      "cash": "3465.0400",
+      "delta": "356.6800",
+      "kind": "distribution",
+      "utc_seconds": 1925650800
+    },
+    {
+      "cash": "101320.6800",
+      "delta": "97855.6400",
+      "kind": "fill",
+      "utc_seconds": 1925737200
+    }
+  ],
+  "configuration_facts": {
+    "allow_leverage": true,
+    "allow_short_selling": true,
+    "calendar": null,
+    "commission_model": "NoCommission",
+    "commission_nonzero_fields": [],
+    "commission_type": "none",
+    "data_frequency": "1h",
+    "enforce_sessions": false,
+    "execution_mode": "next_bar",
+    "execution_price": "open",
+    "immediate_fill": false,
+    "initial_cash": 100000.0,
+    "preset_name": "lean",
+    "session_col": null,
+    "share_type": "integer",
+    "slippage_model": "NoSlippage",
+    "slippage_nonzero_fields": [],
+    "slippage_type": "none",
+    "timestamp_semantics": "bar_close"
+  },
+  "distribution_ledger": [
+    {
+      "amount": "0.0000",
+      "amount_engine_repr": "0.0",
+      "amount_per_unit_engine_repr": "-0.21",
+      "engine_posted": true,
+      "ex_date": "2031-01-06",
+      "lean_ex_date_instant_utc_seconds": 1925442000,
+      "per_share": "0.21",
+      "quantity": "0",
+      "source": "engine FundingPayment (Engine funding_df amount_per_unit)",
+      "utc_seconds": 1925478000
+    },
+    {
+      "amount": "0.0000",
+      "amount_engine_repr": "0.0",
+      "amount_per_unit_engine_repr": "-0.29",
+      "engine_posted": true,
+      "ex_date": "2031-01-07",
+      "lean_ex_date_instant_utc_seconds": 1925528400,
+      "per_share": "0.29",
+      "quantity": "0",
+      "source": "engine FundingPayment (Engine funding_df amount_per_unit)",
+      "utc_seconds": 1925564400
+    },
+    {
+      "amount": "356.6800",
+      "amount_engine_repr": "356.68",
+      "amount_per_unit_engine_repr": "-0.37",
+      "engine_posted": true,
+      "ex_date": "2031-01-08",
+      "lean_ex_date_instant_utc_seconds": 1925614800,
+      "per_share": "0.37",
+      "quantity": "964",
+      "source": "engine FundingPayment (Engine funding_df amount_per_unit)",
+      "utc_seconds": 1925650800
+    }
+  ],
+  "engine": {
+    "ml4t_backtest": "0.1.12",
+    "ml4t_specs": "0.1.5",
+    "numpy": "2.5.3",
+    "polars": "1.44.2",
+    "python": "3.12.3"
+  },
+  "evidence_class": "synthetic fixture under the run sandbox (engine executed; no SPY rows, frozen inputs or LEAN data mount)",
+  "expectations": {
+    "entry_fill_at_next_session_first_bar_end": true,
+    "entry_fill_at_that_bar_open": true,
+    "every_port_guard_passes": true,
+    "exit_fill_at_next_session_first_bar_end": true,
+    "exit_fill_at_that_bar_open": true,
+    "fill_price_is_not_the_bar_close": true,
+    "funding_flat_records_zero": true,
+    "funding_held_posts_quantity_times_per_share": true,
+    "funding_opened_same_bar_records_zero": true,
+    "funding_posted_at_event_bar_end": true,
+    "submission_clock_is_decision_bar_end": true,
+    "two_intents_entry_then_exit": true
+  },
+  "fills": [
+    {
+      "currency": "USD",
+      "fee": "0.0000",
+      "fee_engine_repr": "0.0",
+      "kind": "fill",
+      "order_ref": 1,
+      "order_type": "market",
+      "price": "100.5100",
+      "price_engine_repr": "100.51",
+      "price_source": "open",
+      "quantity": 964,
+      "side": "BUY",
+      "slippage_engine_repr": "0.0",
+      "utc_seconds": 1925564400
+    },
+    {
+      "currency": "USD",
+      "fee": "0.0000",
+      "fee_engine_repr": "0.0",
+      "kind": "fill",
+      "order_ref": 2,
+      "order_type": "market",
+      "price": "101.5100",
+      "price_engine_repr": "101.51",
+      "price_source": "open",
+      "quantity": -964,
+      "side": "SELL",
+      "slippage_engine_repr": "0.0",
+      "utc_seconds": 1925737200
+    }
+  ],
+  "funding_input": [
+    {
+      "amount_per_unit": -0.21,
+      "amount_per_unit_repr": "-0.21",
+      "ex_date": "2031-01-06",
+      "lean_ex_date_instant_utc_seconds": 1925442000,
+      "local_start": "09:00",
+      "per_share": "0.21",
+      "probe_label": "flat",
+      "session_date": "2031-01-06",
+      "utc_seconds": 1925478000
+    },
+    {
+      "amount_per_unit": -0.29,
+      "amount_per_unit_repr": "-0.29",
+      "ex_date": "2031-01-07",
+      "lean_ex_date_instant_utc_seconds": 1925528400,
+      "local_start": "09:00",
+      "per_share": "0.29",
+      "probe_label": "opened_same_bar",
+      "session_date": "2031-01-07",
+      "utc_seconds": 1925564400
+    },
+    {
+      "amount_per_unit": -0.37,
+      "amount_per_unit_repr": "-0.37",
+      "ex_date": "2031-01-08",
+      "lean_ex_date_instant_utc_seconds": 1925614800,
+      "local_start": "09:00",
+      "per_share": "0.37",
+      "probe_label": "held",
+      "session_date": "2031-01-08",
+      "utc_seconds": 1925650800
+    }
+  ],
+  "guards": [
+    {
+      "detail": {
+        "ml4t_backtest": "0.1.12",
+        "ml4t_specs": "0.1.5"
+      },
+      "name": "engine_version",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "changed_sections": [
+          "calendar",
+          "commission"
+        ],
+        "preset_commission": {
+          "minimum": 1.0,
+          "model": "per_share",
+          "per_share": 0.005,
+          "rate": 0.0
+        }
+      },
+      "name": "profile_override_only_commission",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "allow_leverage": true,
+        "allow_short_selling": true,
+        "calendar": null,
+        "commission_model": "NoCommission",
+        "commission_nonzero_fields": [],
+        "commission_type": "none",
+        "data_frequency": "1h",
+        "enforce_sessions": false,
+        "execution_mode": "next_bar",
+        "execution_price": "open",
+        "immediate_fill": false,
+        "initial_cash": 100000.0,
+        "preset_name": "lean",
+        "session_col": null,
+        "share_type": "integer",
+        "slippage_model": "NoSlippage",
+        "slippage_nonzero_fields": [],
+        "slippage_type": "none",
+        "timestamp_semantics": "bar_close"
+      },
+      "name": "resolved_configuration",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "lifecycle_callback_counts": {
+          "causal_initialization": 1,
+          "close": 0,
+          "fill_reconciliation": 0,
+          "intrabar": 0,
+          "market_event": 28,
+          "opening_auction": 0,
+          "pre_open": 0,
+          "run_end": 1,
+          "run_start": 1
+        },
+        "on_data_calls": 28,
+        "portfolio_states": 28,
+        "rows": 28,
+        "skipped_bars": 0,
+        "unknown_bars": 0
+      },
+      "name": "bars_processed",
+      "outcome": "pass"
+    },
+    {
+      "detail": "2031-01-06: next row opens 2031-01-07",
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass"
+    },
+    {
+      "detail": "2031-01-06: engine 101.6400, converted 101.6400",
+      "name": "decision_close_matches_converted_row",
+      "outcome": "pass"
+    },
+    {
+      "detail": "2031-01-08: next row opens 2031-01-09",
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass"
+    },
+    {
+      "detail": "2031-01-08: engine 102.6400, converted 102.6400",
+      "name": "decision_close_matches_converted_row",
+      "outcome": "pass"
+    },
+    {
+      "detail": [
+        "2031-01-06",
+        "2031-01-08"
+      ],
+      "name": "decisions_reached",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "events": [
+          "2031-01-06: FundingPayment quantity 0, cash_delta 0.0 at 1925478000",
+          "2031-01-07: FundingPayment quantity 0, cash_delta 0.0 at 1925564400",
+          "2031-01-08: FundingPayment quantity 964, cash_delta 356.68 at 1925650800"
+        ],
+        "payments_recorded": 3,
+        "stray_payments": []
+      },
+      "name": "funding_payment_per_event",
+      "outcome": "pass"
+    },
+    {
+      "detail": "every fill strictly after its own decision instant; unattributed fills: 0",
+      "name": "causality",
+      "outcome": "pass"
+    },
+    {
+      "detail": "flat; no open order; no pending intent",
+      "name": "final_state",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "intents": 2,
+        "orders": 2,
+        "rejected": 0,
+        "statuses": [
+          "filled",
+          "filled"
+        ]
+      },
+      "name": "orders_filled_none_rejected",
+      "outcome": "pass"
+    },
+    {
+      "detail": [
+        {
+          "decision": 1925499600,
+          "fills": [
+            1925564400
+          ],
+          "order_ref": 1,
+          "submitted_engine_clock": 1925499600
+        },
+        {
+          "decision": 1925672400,
+          "fills": [
+            1925737200
+          ],
+          "order_ref": 2,
+          "submitted_engine_clock": 1925672400
+        }
+      ],
+      "name": "submission_clock",
+      "outcome": "pass"
+    },
+    {
+      "detail": [
+        {
+          "fills": [
+            1925564400
+          ],
+          "next_session_first_bar_end": 1925564400,
+          "order_ref": 1
+        },
+        {
+          "fills": [
+            1925737200
+          ],
+          "next_session_first_bar_end": 1925737200,
+          "order_ref": 2
+        }
+      ],
+      "name": "fill_at_next_session_first_bar",
+      "outcome": "pass"
+    },
+    {
+      "detail": [
+        {
+          "fill_bar_open": "100.5100",
+          "fill_price": "100.5100",
+          "order_ref": 1,
+          "price_source": "open"
+        },
+        {
+          "fill_bar_open": "101.5100",
+          "fill_price": "101.5100",
+          "order_ref": 2,
+          "price_source": "open"
+        }
+      ],
+      "name": "fill_price_is_fill_bar_open",
+      "outcome": "pass"
+    },
+    {
+      "detail": [
+        {
+          "fee_engine_repr": "0.0",
+          "order_ref": 1,
+          "slippage_engine_repr": "0.0"
+        },
+        {
+          "fee_engine_repr": "0.0",
+          "order_ref": 2,
+          "slippage_engine_repr": "0.0"
+        }
+      ],
+      "name": "costs_zero",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "bars_with_cash_change": 3,
+        "fill_bars": 2,
+        "mismatches": [],
+        "nonzero_funding_bars": 1
+      },
+      "name": "engine_cash_path",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "broker_cash": "101320.68",
+        "last_portfolio_state_cash": "101320.68"
+      },
+      "name": "native_end_cash_is_last_portfolio_state",
+      "outcome": "pass"
+    },
+    {
+      "detail": {
+        "max_abs_adjustment": "0",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 12
+      },
+      "name": "float_projection_noise_only",
+      "outcome": "pass"
+    }
+  ],
+  "intents": [
+    {
+      "decision_equity": "100000.0000",
+      "decision_equity_engine_repr": "100000.0",
+      "decision_price": "101.6400",
+      "kind": "intent",
+      "order_ref": 1,
+      "order_type": "market",
+      "quantity": 964,
+      "reason": "entry",
+      "session_date": "2031-01-06",
+      "submission_status": "pending",
+      "submitted_engine_clock_utc_seconds": 1925499600,
+      "target": "1",
+      "ts_event_ns": 1925499600000000000,
+      "utc_seconds": 1925499600
+    },
+    {
+      "decision_equity": "102410.0000",
+      "decision_equity_engine_repr": "102410.0",
+      "decision_price": "102.6400",
+      "kind": "intent",
+      "order_ref": 2,
+      "order_type": "market",
+      "quantity": -964,
+      "reason": "exit",
+      "session_date": "2031-01-08",
+      "submission_status": "pending",
+      "submitted_engine_clock_utc_seconds": 1925672400,
+      "target": "0",
+      "ts_event_ns": 1925672400000000000,
+      "utc_seconds": 1925672400
+    }
+  ],
+  "normalized_economic_sha256": "c835d2aadd0501bd50fe45faffc4266f1ff8e409ff296532d91c96d24d4e3e0b",
+  "port_sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+  "probe": "ml4t-backtest mechanism probe (synthetic bars)",
+  "probe_sha256": "88ffef9d0dd7c427b36f8e9d483ab519bdbb265c6ea7580bea7f139f99643a46",
+  "projection": {
+    "max_abs_adjustment": "0",
+    "noise_limit": "0.000001",
+    "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+    "values_projected": 12
+  },
+  "rows": {
+    "asset": "SYN",
+    "bars": 28,
+    "first_bar_of_each_session": [
+      {
+        "c": "100.1400",
+        "o": "100.0100",
+        "session_date": "2031-01-06",
+        "ts_event_ns": 1925478000000000000
+      },
+      {
+        "c": "100.6400",
+        "o": "100.5100",
+        "session_date": "2031-01-07",
+        "ts_event_ns": 1925564400000000000
+      },
+      {
+        "c": "101.1400",
+        "o": "101.0100",
+        "session_date": "2031-01-08",
+        "ts_event_ns": 1925650800000000000
+      },
+      {
+        "c": "101.6400",
+        "o": "101.5100",
+        "session_date": "2031-01-09",
+        "ts_event_ns": 1925737200000000000
+      }
+    ],
+    "sessions": [
+      "2031-01-06",
+      "2031-01-07",
+      "2031-01-08",
+      "2031-01-09"
+    ]
+  },
+  "totals": {
+    "dividend_cash_usd": "356.6800",
+    "engine_final_value_repr": "101320.68",
+    "engine_total_commission_repr": "0.0",
+    "engine_total_funding_repr": "356.68",
+    "fees_usd": "0.0000",
+    "final_quantity": 0,
+    "native_end_cash_usd": "101320.6800",
+    "native_end_cash_usd_engine_repr": "101320.68",
+    "reconciled_end_cash_usd": "101320.6800"
+  },
+  "warnings": {
+    "categories": [],
+    "count": 0,
+    "messages_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  }
+}
