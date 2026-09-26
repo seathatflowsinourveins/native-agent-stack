@@ -1,0 +1,172 @@
+{
+ "schema_version": 1,
+ "kind": "tavily_research_report",
+ "request_id": "uuid-sha256:810355bc30e79707",
+ "created_at": "2026-09-26T03:00:49.112271+00:00",
+ "status": "completed",
+ "response_time_s": 291.57,
+ "model": "pro",
+ "content": "# Alpaca backtesting → Alpaca paper trading: inventory, comparison and ranked recommendations (as of September 2026)\n\nExecutive summary\nAlpaca users run a mix of open-source Python toolkits (Lumibot, vectorbt, Backtrader + alpaca-backtrader-api, PyBroker, Zipline‑Reloaded / pylivetrader) and hosted offerings (QuantConnect LEAN, QuantRocket, Composer, TradingView, Blueshift). Open-source options trade off execution realism and corporate-action provenance for ease of researcher control; vectorbt (Apache‑2.0) and PyBroker provide strong, modern researcher ergonomics and data connectors, while backtrader and Zipline‑Reloaded offer familiar event-driven engines with community Alpaca adapters. QuantConnect LEAN provides the most integrated cloud research → live pathway but requires paid tiers and has an Alpaca brokerage connector implemented in LEAN. Best picks — fastest prototyping: Lumibot; most reproducible/rigorous academic pipeline: QuantRocket; best high‑performance / low‑latency research path: QuantConnect LEAN.\n\nOne-line “best pick” recommendations\n- Fast prototyping to Alpaca paper trading: Lumibot (easy examples, built-in Alpaca paper mode) [1], [2].  \n- Most reproducible / rigorous academic pipeline: QuantRocket (curated historical archives with delist histories and Alpaca feed controls) [19].  \n- Best high‑performance / low‑latency research path: QuantConnect LEAN (official LEAN Alpaca brokerage connector and cloud live support) [16], [17], [22].\n\nEvaluation methodology and weighting\nPlatforms were scored on: data fidelity & provenance (35%), execution realism (slippage/fills) (25%), maintenance/activity & documentation (15%), ease of Alpaca integration (15%), license and academic‑use constraints (10%). Primary sources (official docs, GitHub, Alpaca docs) were used per the brief.\n\n## Short ranked list (top to bottom) with justification\n1. QuantRocket — strongest historical-data provenance (delisted coverage, Alpaca feed options) and production research tooling; well suited for reproducible pipelines feeding Alpaca paper/live accounts [19], [18].  \n2. QuantConnect LEAN — full research → cloud live workflow, official LEAN Alpaca brokerage connector that models order types; best for performance/low latency research if willing to pay for cloud/tiers [16], [17], [22].  \n3. Lumibot — easy researcher prototyping with built-in Alpaca paper/live examples and multiple data-backend choices; strong for quick transition to paper trading [1], [2].  \n4. vectorbt / vectorbt PRO — very fast, vectorized research (Apache‑2.0 for core) with explicit Alpaca data connectors; PRO adds native Rust simulators and paid features for streaming/continuation [3], [4], [5], [6].  \n5. Backtrader + alpaca‑backtrader‑api — mature event‑driven engine with community Alpaca adapter supporting REST and streaming; good for behavioral-fill simulation if extended [7], [8].  \n6. PyBroker — modern, modular slippage/fill models and direct Alpaca data access; strong for experiments that require custom fill models [10], [11], [12].  \n7. Zipline‑Reloaded / pylivetrader — Zipline‑family backtesting with community live adapters; Zipline‑Reloaded is backtesting-focused and requires community tooling for live Alpaca bridging [13], [9].  \n8. TradingView / Composer / Blueshift — no-code/hosted integrations that can deploy to Alpaca for live/paper trading quickly but provide less control over raw provenance and fill‑modeling tradeoffs [20], [23], [24].  \n\n## Per‑platform sections (attributes 1–6, evidence-based)\n\n### Lumibot\n1. Alpaca integration: Official docs and repo show Alpaca supported for paper/live trading and examples default to paper when ALPACA_IS_PAPER=true; Alpaca keys from dashboard required [1], [2].  \n2. Data provenance & corporate actions: Lumibot advertises multiple backtest data sources (Alpaca, Yahoo, ThetaData, DataBento, local CSV); recommendation to use ThetaData for deepest history suggests corporate‑action provenance depends on chosen provider (not centrally adjusted by Lumibot) [2].  \n3. Execution/fill modelling: Lumibot provides live streaming order execution; backtest mode uses data‑backends but explicit fill‑model details are not documented in the cited pages (evidence gap on exact simulated slippage model) [1], [2].  \n4. Data fidelity & bias: Supports Alpaca as a data source (minute/day bars subject to Alpaca limits); corporate‑action handling depends on data provider selection in Lumibot [2].  \n5. Technical metadata: Python project (repo present), examples provided; license not stated in these pages (evidence gap for license & latest release dates in cited docs) [2].  \n6. Usability: Includes example scripts showing Alpaca broker initialization and backtest→live run; low integration effort for Alpaca paper trading with environment flags [2].\n\n### vectorbt / vectorbt PRO\n1. Alpaca integration: vectorbt has Alpaca data access and explicit AlpacaData.download API; vectorbt's Alpaca usage documented in Alpaca learning article and vectorbt API docs [3], [4].  \n2. Data provenance & corporate actions: vectorbt downloads OHLCV from Alpaca (Alpaca market‑data rules apply — free plan uses IEX, premium SIP/unlimited for full exchanges) [3], [14]. Adjustments/corporate‑action handling are governed by the returned Alpaca bars (no separate vectorbt-adjustment authority cited) [4].  \n3. Execution/fill modelling: Core vectorbt is vectorized and uses simplified slippage models; vectorbt PRO adds native Rust simulators and streaming indicators (paid) for more advanced simulation [6], [30].  \n4. Data fidelity & bias: supports bar sampling (e.g., 1m, 15m) via Alpaca connector; limits depend on Alpaca subscription (IEX vs SIP) [3].  \n5. Technical metadata: Core under Apache‑2.0; PRO is paid/licensed with commercial terms [5], [6]. High performance via NumPy/Numba and PRO Rust engines [4], [6].  \n6. Usability: Very low friction for research; Alpaca auth keys set via settings and examples exist; PRO adds more realistic simulation but is paid [3], [6].\n\n### Backtrader + alpaca‑backtrader‑api\n1. Alpaca integration: A dedicated adapter (alpaca‑backtrader‑api) connects Alpaca REST/streaming and AlpacaStore/AlpacaBroker; switching paper/live via environment flags is documented [7], [8].  \n2. Data provenance & corporate actions: Uses Alpaca data when configured; corporate‑action adjustments depend on source feed and backtrader data feed used (no centralized adjustment mechanism documented in cited adapter pages) [7], [8].  \n3. Execution/fill modelling: Backtrader is event‑driven (bar‑by‑bar) and the adapter translates order commands to Alpaca API; adapter supports historical vs live feeds but backtest fill realism depends on user model (adapter does not impose a complex market‑impact model in cited docs) [7], [8].  \n4. Data fidelity & bias: Supports multiple timeframes via AlpacaStore; data limits inherit Alpaca plan constraints [8].  \n5. Technical metadata: Python; adapter supports older Python versions due to alpaca‑trade‑api dependency; maintenance active on GitHub (adapter repo exists) [7].  \n6. Usability: Medium integration effort; adapter and community tutorials available to connect backtests → Alpaca paper accounts [8].\n\n### PyBroker\n1. Alpaca integration: PyBroker can query Alpaca for historical bars and accepts Alpaca API keys from environment variables [10].  \n2. Data provenance & corporate actions: Data comes directly from Alpaca when used as data source; no additional corporate‑action pipeline shown in cited docs (evidence gap on adjustment automation) [10].  \n3. Execution/fill modelling: PyBroker explicitly provides extensible slippage models (Fixed, Volatility, Volume) via SlippageModel API and examples for ATR‑scaled and volume‑aware models [11], [12].  \n4. Data fidelity & bias: Supports intraday 1‑minute bars and caching controls; limits follow Alpaca provider permissions [10].  \n5. Technical metadata: Python library with notebooks and modular design; performance and scaling depend on user code (vectorized parts not emphasized in cited docs) [10].  \n6. Usability: Medium effort to connect to Alpaca; notebooks and examples for Alpaca queries and slippage models lower integration cost [10], [11], [12].\n\n### Zipline‑Reloaded / pylivetrader\n1. Alpaca integration: Zipline‑Reloaded is backtesting‑only; live trading requires community forks/adapters (pylivetrader supports Alpaca broker config via env vars) [13], [9].  \n2. Data provenance & corporate actions: Zipline bundles support CSV/Quandl and minute/daily; corporate‑action handling depends on bundle/data used (no Alpaca‑native corporate‑action pipeline shown) [13].  \n3. Execution/fill modelling: Backtesting engine only; live fills require community connectors (fill realism depends on adapter) [13], [9].  \n4. Technical metadata: Zipline‑Reloaded v3.1.1 (July 2025) supports modern Python/pandas versions; Apache‑2.0 license [13].  \n5. Usability: Additional glue required to reach Alpaca paper trading; pylivetrader provides a simpler live interface [9], [13].\n\n### QuantConnect LEAN (hosted/commercial)\n1. Alpaca integration: LEAN includes an Alpaca brokerage implementation (Lean.Brokerages.Alpaca) supporting common order types; Alpaca support is an integrated brokerage in LEAN with cloud and local live options [16], [17], [22].  \n2. Data provenance & corporate actions: QuantConnect’s Alpaca data provider serves prices directly from Alpaca; QuantConnect curates historical data and supplies auxiliary datasets in cloud workflows [15], [17].  \n3. Execution/fill modelling: LEAN models order behavior and documents differences between backtest (immediate fills, no slippage) and live/paper fills (dependent on book/top‑of‑book liquidity); the Alpaca brokerage implementation enumerates supported order types [16].  \n4. Data fidelity & bias: QuantConnect exposes Alpaca prices and curated datasets including long histories; cloud tiers influence data export and retention [15], [17].  \n5. Technical metadata: LEAN is multi‑language support with a maintained Alpaca brokerage project on GitHub; deploying live with Alpaca typically requires paid organization membership [17], [16], [22].  \n6. Usability: High — provides Jupyter notebooks, cloud deployment and a clear research→live path; constraints: paid tiers and cloud data/export limits apply [15], [17].\n\n### QuantRocket (hosted/commercial)\n1. Alpaca integration: QuantRocket supports setting Alpaca API keys and choosing realtime feed (IEX or SIP); it archives Alpaca ETB data and maintains historical archives including delisted stocks for better survivorship handling [18], [19].  \n2. Data provenance & corporate actions: QuantRocket collects Alpaca feeds and maintains its own historical archive; delisted coverage is explicit and recommended to avoid survivorship bias [19].  \n3. Execution/fill modelling: QuantRocket collects Alpaca order states and supports integration to Alpaca for live; explicit simulated fill models are not documented in cited material (evidence gap on backtest fill models) [18], [19].  \n4. Data fidelity & bias: QuantRocket bundles 1‑minute and EOD datasets with delisted securities and provides Alpaca ETB history — strong provenance for academic reproducibility [19].  \n5. Technical metadata: Hosted offering with on‑prem components and paid licensing for datasets; integration complexity medium but powerful for reproducible pipelines [19].  \n6. Usability: Strong for reproducible academic pipelines due to curated historical archives with delist history and explicit Alpaca feed configuration [19].\n\n### TradingView, Composer, Blueshift (hosted integrations)\n- TradingView: supports deploying Pine Script strategies to Alpaca for live/paper trading (quick deployment, less control over raw fills/provenance) [20].  \n- Composer: advertises white‑label Alpaca integration and direct funding from Alpaca accounts, suitable for no‑code fast deployment [23].  \n- Blueshift: uses Zipline backtesting and provides a straightforward Alpaca deployment path; less low‑level provenance control compared with QuantRocket [24], [13].  \nAll three prioritize usability and fast path to Alpaca paper/live trading; data provenance and fill model realism are constrained by hosted platform choices [20], [23], [24].\n\n## NautilusTrader & QuantConnect LEAN specific answers\n- NautilusTrader Alpaca adapter: No verifiable evidence in the provided findings shows an official or community Alpaca adapter for NautilusTrader; this is an evidence gap.  \n- QuantConnect LEAN Alpaca brokerage status: LEAN includes an Alpaca brokerage implementation (Lean.Brokerages.Alpaca) that supports multiple order types and live/paper deployment; LEAN CLI supports running live with Alpaca but typically requires paid organization membership for cloud live [16], [17], [22].\n\n## Evidence gaps (explicit)\n- NautilusTrader: absence of any cited documentation or adapter repo in the supplied findings.  \n- Per‑project exact release/version timestamps for Lumibot, vectorbt PRO versions beyond the PRO page, and backtrader adapter release history (specific adapter version dates) are not provided in the findings.  \n- Many projects do not show an explicit, centralized corporate‑action adjustment implementation in the cited pages — for those, corporate‑action behavior depends on the chosen data provider (e.g., Alpaca, ThetaData, DataBento) and is not uniformly documented in the supplied sources.\n\n## Practical recommendations for a research→paper pipeline\n- For reproducibility with full provenance: use QuantRocket to ingest Alpaca SIP (premium) or IEX data and retain delist history, run research locally, then route live/paper execution via Alpaca keys managed in QuantRocket [19], [18].  \n- For fast researcher prototyping: use Lumibot examples to develop strategies and toggle ALPACA_IS_PAPER for paper testing, but choose a deep historical provider (ThetaData/DataBento) for corporate‑action correctness if required [2].  \n- For high‑performance parameter sweeps and fast simulation: use vectorbt (or vectorbt PRO if paid features required) for vectorized experiments, then re‑validate selected strategies in an event‑driven engine or LEAN before live/paper deployment [4], [6].  \n- Always validate backtest fills against Alpaca paper fills; Alpaca paper fills use live quote prices and therefore produce near‑zero realized slippage in many cases — do not assume identical slippage between backtest simulators and Alpaca paper [27], [14], [33].\n\n## Methodology note\nSearch prioritized official docs, GitHub, release pages and Alpaca docs from the supplied evidence set. Community posts and tutorials were treated as secondary when present. If a requested attribute was not present in the findings, it is marked as an evidence gap above.\n\n## Works Cited\n[1] https://lumibot.lumiwealth.com/brokers.alpaca.html  \n[2] https://github.com/Lumiwealth/lumibot  \n[3] https://alpaca.markets/learn/introduction-to-backtesting-with-vectorbt  \n[4] https://vectorbt.dev/api/data/custom  \n[5] https://vectorbt.dev/terms/license  \n[6] https://vectorbt.pro  \n[7] https://github.com/alpacahq/alpaca-backtrader-api  \n[8] https://pyquantlab.medium.com/a-guide-to-live-trading-with-backtrader-on-alpaca-76981bdc74b0  \n[9] https://pypi.org/project/pylivetrader/0.0.2  \n[10] https://pybroker.com/en/latest/notebooks/1.%20Getting%20Started%20with%20Data%20Sources.html  \n[11] https://pybroker.com/en/dev/notebooks/14.%20Modeling%20Slippage.html  \n[12] https://pybroker.com/en/latest/reference/pybroker.slippage.html  \n[13] https://backtestscore.com/tools/zipline-reloaded  \n[14] https://alpaca.markets/support/data-provider-alpaca  \n[15] https://alpaca.markets/learn/how-to-build-and-deploy-trading-strategies-with-alpaca-and-quantconnect  \n[16] https://github.com/QuantConnect/Lean.Brokerages.Alpaca  \n[17] https://quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca  \n[18] https://quantrocket.com/docs  \n[19] https://quantrocket.com/data  \n[20] https://alpaca.markets/learn/trade-with-alpaca-on-tradingview  \n[21] https://alpaca.markets/learn/how-to-build-backtest-mean-reversion-strategy-with-alpaca  \n[22] https://alpaca.markets/blog/elevate-your-trading-with-the-new-alpaca-and-quantconnect-integration  \n[23] https://alpaca.markets/blog/how-composer-is-redefining-algorithmic-trading-with-their-no-code-platform  \n[24] https://alpaca.markets/learn/blueshift-quantinsti  \n[25] https://alpaca.markets/sdks/python/api_reference/broker/corporate-actions.html  \n[26] https://alpaca.markets/sdks/python/api_reference/trading/corporate-actions.html  \n[27] https://forum.alpaca.markets/t/paper-trading-order-fulfillment-delay/13324  \n[28] https://github.com/alpacahq/alpaca-py  \n[29] https://vectorbt.pro/faq  \n[30] https://vectorbt.pro/terms/remarks  \n[31] https://alpaca.markets/blog/market-data-api-launch  \n[32] https://github.com/alpacahq/alpaca-skills/blob/main/skills/trading-api/backtest/SKILL.md",
+ "sources": [
+  {
+   "url": "https://lumibot.lumiwealth.com/brokers.alpaca.html",
+   "title": "Alpaca - Lumibot",
+   "favicon": null
+  },
+  {
+   "url": "https://alpaca.markets/learn/introduction-to-backtesting-with-vectorbt",
+   "title": "Introduction to Backtesting with VectorBT",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://pyquantlab.medium.com/a-guide-to-live-trading-with-backtrader-on-alpaca-76981bdc74b0",
+   "title": "A Guide to Live Trading with Backtrader on Alpaca - Medium",
+   "favicon": null
+  },
+  {
+   "url": "https://pypi.org/project/pylivetrader/0.0.2",
+   "title": "pylivetrader",
+   "favicon": "https://pypi.org/static/images/favicon.35549fe8.ico"
+  },
+  {
+   "url": "https://www.pybroker.com/en/latest/notebooks/1.%20Getting%20Started%20with%20Data%20Sources.html",
+   "title": "Getting Started with Data Sources — PyBroker",
+   "favicon": "https://www.pybroker.com/favicon.ico"
+  },
+  {
+   "url": "https://github.com/alpacahq/alpaca-py",
+   "title": "GitHub - alpacahq/alpaca-py: The Official Python SDK for Alpaca API · GitHub",
+   "favicon": "https://github.githubassets.com/favicons/favicon.svg"
+  },
+  {
+   "url": "https://alpaca.markets/support/data-provider-alpaca",
+   "title": "Alpaca Support - What data provider does Alpaca use?",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://forum.alpaca.markets/t/paper-trading-order-fulfillment-delay/13324",
+   "title": "Paper trading order fulfillment delay",
+   "favicon": "https://us1.discourse-cdn.com/flex020/uploads/alp/optimized/2X/0/0db3c981a81590c06f90afd869ffdd3a67ae7e1d_2_180x180.png"
+  },
+  {
+   "url": "https://github.com/Lumiwealth/lumibot",
+   "title": "LumiBot AI Trading",
+   "favicon": "https://github.githubassets.com/favicons/favicon.svg"
+  },
+  {
+   "url": "https://vectorbt.pro/terms/remarks",
+   "title": "Remarks | VectorBT® PRO",
+   "favicon": "https://vectorbt.pro/assets/logo/apple-touch-icon.png"
+  },
+  {
+   "url": "https://vectorbt.dev/terms/license",
+   "title": "License - VectorBT",
+   "favicon": "https://vectorbt.dev/assets/logo/apple-touch-icon.png"
+  },
+  {
+   "url": "https://vectorbt.pro",
+   "title": "VectorBT® PRO: Python backtesting and quantitative research",
+   "favicon": "https://vectorbt.pro/assets/logo/apple-touch-icon.png"
+  },
+  {
+   "url": "https://vectorbt.dev/api/data/custom",
+   "title": "custom",
+   "favicon": "https://vectorbt.dev/assets/logo/apple-touch-icon.png"
+  },
+  {
+   "url": "https://github.com/alpacahq/alpaca-backtrader-api",
+   "title": "alpacahq/alpaca-backtrader-api",
+   "favicon": "https://github.githubassets.com/favicons/favicon.svg"
+  },
+  {
+   "url": "https://www.backtestscore.com/tools/zipline-reloaded",
+   "title": "Zipline Reloaded Review 2026: Verdict & Pricing | BacktestScore",
+   "favicon": "https://www.backtestscore.com/favicon.svg"
+  },
+  {
+   "url": "https://alpaca.markets/blog/market-data-api-launch",
+   "title": "Important Update: Alpaca Launches Market Data API 2.0",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://www.pybroker.com/en/dev/notebooks/14.%20Modeling%20Slippage.html",
+   "title": "Modeling Slippage — PyBroker",
+   "favicon": "https://www.pybroker.com/favicon.ico"
+  },
+  {
+   "url": "https://www.pybroker.com/en/latest/reference/pybroker.slippage.html",
+   "title": "pybroker.slippage module — PyBroker",
+   "favicon": "https://www.pybroker.com/favicon.ico"
+  },
+  {
+   "url": "https://alpaca.markets/sdks/python/api_reference/broker/corporate-actions.html",
+   "title": "Corporate Actions - Alpaca-py",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://alpaca.markets/sdks/python/api_reference/trading/corporate-actions.html",
+   "title": "Corporate Actions - Alpaca-py",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://vectorbt.pro/faq",
+   "title": "Frequently asked questions",
+   "favicon": "https://vectorbt.pro/assets/logo/apple-touch-icon.png"
+  },
+  {
+   "url": "https://github.com/alpacahq/alpaca-skills/blob/main/skills/trading-api/backtest/SKILL.md",
+   "title": "alpaca-skills/skills/trading-api/backtest/SKILL.md at main · alpacahq/alpaca-skills · GitHub",
+   "favicon": "https://github.githubassets.com/favicons/favicon.svg"
+  },
+  {
+   "url": "https://alpaca.markets/blog/elevate-your-trading-with-the-new-alpaca-and-quantconnect-integration",
+   "title": "Elevate Your Trading with the New Alpaca and ...",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://alpaca.markets/blog/how-composer-is-redefining-algorithmic-trading-with-their-no-code-platform",
+   "title": "How Composer is Redefining Algorithmic Trading with Their No-Code Platform",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://www.quantrocket.com/docs",
+   "title": "Usage Guide - QuantRocket",
+   "favicon": "https://www.quantrocket.com/favicons/apple-touch-icon-144x144.png"
+  },
+  {
+   "url": "https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca",
+   "title": "Alpaca - QuantConnect.com",
+   "favicon": "https://www.quantconnect.com/qc.ico"
+  },
+  {
+   "url": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+   "title": "GitHub - QuantConnect/Lean.Brokerages.Alpaca: Alpaca Brokerage Implementation · GitHub",
+   "favicon": "https://github.githubassets.com/favicons/favicon.svg"
+  },
+  {
+   "url": "https://alpaca.markets/learn/trade-with-alpaca-on-tradingview",
+   "title": "Trade with Alpaca on TradingView",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://alpaca.markets/learn/how-to-build-and-deploy-trading-strategies-with-alpaca-and-quantconnect",
+   "title": "How to Build and Deploy Trading Strategies with ...",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://quantrocket.com/data",
+   "title": "Data Library",
+   "favicon": "https://www.quantrocket.com/favicons/apple-touch-icon-144x144.png"
+  },
+  {
+   "url": "https://alpaca.markets/learn/blueshift-quantinsti",
+   "title": "Blueshift By QuantInsti and the Alpaca API: Tools for ...",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  },
+  {
+   "url": "https://alpaca.markets/learn/how-to-build-backtest-mean-reversion-strategy-with-alpaca",
+   "title": "How to Build a Mean Reversion Strategy With Alpaca",
+   "favicon": "https://files.alpaca.markets/webassets/apple-touch-icon.png"
+  }
+ ]
+}
