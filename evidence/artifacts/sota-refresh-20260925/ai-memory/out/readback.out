@@ -1,0 +1,12 @@
+# read-only read-back by the writing worker; no production change
+at 2026-09-25T20:54:04Z
+readlink bin/ai-memory: ~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory
+ai-memory --version: ai-memory 2.4.0
+sha256 of the link target: 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344
+tools/ai-memory-2.3.2/ai-memory present (rollback): yes
+GET http://127.0.0.1:49474/healthz: 200
+GET http://127.0.0.1:49474/mcp: HTTP/1.1 405 Method Not Allowed allow: POST 
+systemctl --user show nativestack-memory.service: NRestarts=0 ExecMainStartTimestamp=Fri 2026-09-25 16:44:37 EDT ActiveState=active SubState=running 
+~/.claude/settings.json (grep -c, contents not printed): tools/ai-memory-2.4.0/ai-memory=8 tools/ai-memory-2.3.2=0
+~/.codex/hooks.json (grep -c, contents not printed): tools/ai-memory-2.4.0/ai-memory=7 tools/ai-memory-2.3.2=0
+installed-versions.txt ai-memory record: ai-memory 2.3.2

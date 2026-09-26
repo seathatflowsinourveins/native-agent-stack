@@ -1,0 +1,43 @@
+{
+ "at": "2026-09-25T19:17:41Z",
+ "upstream": {
+  "tag_commit_via_api": "5c4350e31894 (tag)",
+  "release_published_at": "2026-09-21T23:45:13Z",
+  "immutable": false,
+  "latest_release_tag": "v2.4.0",
+  "api_digest_matches_pin": true,
+  "api_size": 15969555,
+  "api_url_is_official": true,
+  "api_asset_updated_at": "2026-09-21T23:45:12Z",
+  "sidecar_matches_pin": true,
+  "release_body_lists_pin": true
+ },
+ "tarball": {
+  "sha256_matches_pin": true,
+  "bytes": 15969555,
+  "bytes_match_api": true,
+  "mtime": "2026-09-25T18:57:14Z"
+ },
+ "prefix": {
+  "files_checked": 172,
+  "dirs_checked": 24,
+  "content_mismatches": [],
+  "missing_from_prefix": [],
+  "extra_in_prefix": [],
+  "group_or_world_writable_setid_or_foreign_owner": [],
+  "newest_ctime": "2026-09-25T18:57:15Z",
+  "newest_ctime_entry": "packaging",
+  "prefix_dir_ctime": "2026-09-25T18:57:15Z",
+  "prefix_dir_mode": "0o755",
+  "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+  "binary_mode": "0o755",
+  "version_scratch_home_entries_after": 0,
+  "version_stdout": "ai-memory 2.4.0",
+  "version_rc": 0
+ },
+ "baseline_2.3.2": {
+  "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+  "cached_tarball_sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+  "cached_tarball_binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0"
+ }
+}

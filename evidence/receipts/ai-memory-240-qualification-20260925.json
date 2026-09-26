@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "id": "ai-memory-240-qualification-20260925",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T00:31:24Z",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, ai-memory 2.4.0 was qualified against the installed 2.3.2 and then switched into production. The release asset ai-memory-linux-x86_64.tar.gz (15,969,555 bytes, sha256 590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076) matched the release .sha256 sidecar, the GitHub API asset digest and the release body before it was extracted into a new tools/ai-memory-2.4.0 prefix (binary sha256 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344, 'ai-memory 2.4.0'). On restored copies of an online backup of the live store, the 2.3.2 baseline passed 16/16 checks on its second attempt (the first failed only its embedding-status probe) and the 2.4.0 rehearsal passed 19/19: migration V64 -> V66 (66 rows) with quick_check ok, 0 pages missing or changed and 0 observations missing; /healthz 200; GET /mcp 405 with allow: POST; protocol 2024-11-05 with 23 tools named as in 2.3.2; the known page's body sha256 equal to the 2.3.2 read; unchanged allowlist check-capture; both the 2.4.0 and the 2.3.2 hook clients captured into the 2.4.0 server; no pre-migration archive; and 2.3.2 serve on the migrated copy exited 1 with 'memory database schema is newer than this ai-memory build'. An independent verifier reproduced these with its own probe code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 20:43:48Z and quiesced (0 ai-memory processes, 0 database users); the quiescent store read V64 (64 rows), quick_check ok, 36 pages and 77,213 observations; an at-rest cold copy (336 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.0; the upstream install-hooks --apply changed only the binary path on 8 Claude and 7 Codex commands; the service started at 20:44:37Z and applied V65__page_compacted_marker and V66__auto_improve_claim_attempts; /healthz returned 200 with NRestarts 0; the fingerprint compare V64 -> V66 passed (66 rows, quick_check ok, 36 pages with 0 missing or changed, 0 observations missing, 77,330 after); status --json reported 2.4.0; memory_status returned scope resolved_by explicit; a known page's body was unchanged (sha256 prefix 98eb1dfb4fc6b0f5); and a fresh headless claude -p session at 20:45:10Z produced session-start, pre-tool-use, post-tool-use, stop and session-end observations. A read-only read-back at 20:54:04Z found bin/ai-memory on tools/ai-memory-2.4.0, /healthz 200 and 8 Claude plus 7 Codex hook commands on 2.4.0.",
+  "limitations": [
+    "Pending, user-only: Codex skips changed hooks until they are trusted, so the 7 rewritten Codex ai-memory commands capture nothing until the user reviews and trusts them in Codex /hooks; Codex is usage-limited until 2026-09-30. Real Codex capture and Codex-format hook payloads through 2.4.0 were not observed. The rendered adoption/templates/codex.config.template.toml still carries the trusted_hash entries recorded for the pre-switch commands.",
+    "The migration is forward-only: after V65 and V66, 2.3.2 refuses the store with DataSchemaAhead, and 2.4.0 writes no automatic pre-migration archive for a store created by 2.x (snapshot_before_db_migration is gated to the 1.x to 2.0 upgrade). Rollback is the coordinator's private at-rest cold copy, a relink to the retained tools/ai-memory-2.3.2 prefix and the installer's .bak-1790369060 hook files; writes made after the cold copy would be lost from the live store. The rollback was not exercised on production, and `ai-memory restore --force` was not run.",
+    "GHSA-9pj6-vhgr-3mwh (CVE-2026-63128, rmcp < 2.0.0 Streamable-HTTP session-table leak), fixed by rmcp 2.2.0 in 2.4.0, was not reachable here: the service runs stateless (no --http-stateful; GET /mcp returns 405 with allow: POST) and the leak is in the stateful create_session path. The upgrade removes the three rmcp advisories from the dependency set; it did not close an exposed path on this host, and no exploit was attempted on either version.",
+    "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the durable-memory winner pin ai-memory 2.3.2 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 2.4.0 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only: adoption/pins-macos-arm64.json keeps ai-memory 2.3.2 (the macos-aarch64 archive) and is unchanged; nothing here is macOS evidence. The shared Claude settings template now names tools/ai-memory-2.4.0, so a Mac that renders it must point the hook commands at its installed 2.3.2 prefix until a Mac qualifies 2.4.0 itself.",
+    "Evidence class: our own integration checks (the locally authored aimem_accept.py driver and the verifier's rerun.py) plus coordinator observations; upstream unit and integration tests were not re-run (no Rust toolchain). The cutover facts are coordinator observations exported as aggregates in cutover.json; the cold copy and fingerprint files stay private and were not read by the writing worker.",
+    "Integrity rests on three matching upstream checksum values plus the local download hash: the asset has no artifact attestation (HTTP 404) and the release is not immutable.",
+    "At the writing worker's 20:54:04Z read-back, the host's installed-versions.txt ai-memory record still read 'ai-memory 2.3.2' (the mcporter record had been updated), so tools that read that record misreport this host until it is updated.",
+    "The qualification's own production before/after compare failed 1 of its 19 checks (results/prod-compare-before-after.json, pass false): claude_settings_unchanged, because ~/.claude/settings.json changed at 19:01:59Z during the qualification window. The writer was not identified, and nothing ties the change to this unit: no scratch ai-memory process existed then, install-hooks was not run, and the file's ai-memory hook lines stayed 8 on 2.3.2. Production hook and config files were otherwise fingerprinted only by hash and hook-path counts.",
+    "Not observed: whether Claude Code sessions that were already running reload the rewritten hooks (the capture check used a fresh session), 2.4.0 behaviour over time (decay, access reinforcement, scheduler ticks), web UI behaviour beyond /healthz, and the #792 fix, not in 2.4.0 (released in v2.4.1 at 2026-09-25T21:46:32Z). One host (NativeStack, WSL2); the rehearsal used an online backup that is SQLite-consistent but not proven atomic across db, wiki and config, and its scratch servers ran for seconds."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-25",
+    "previous_version": "2.3.2",
+    "version": "2.4.0",
+    "release": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0",
+    "tag_commit": "b1b25219b507cf56cb7334ac1a408dc9b09eaa50",
+    "asset": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.0/ai-memory-linux-x86_64.tar.gz",
+    "asset_sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+    "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+    "baseline_binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+    "acceptance_scripts": {
+      "aimem_accept.py": "20c88e7f5601fee499e219afed12c46f8e832c2c6f008b64ad90f7953fea8ec5",
+      "verify/rerun.py": "0ac1a3364e31a9542fcc4060978aaeeadcfbfec26cc4042105f1aff82b7e1947",
+      "verify/integrity.py": "a0dff6a3b174d7bddc02d74b8c5395838bbba70cb55c7c9d4ea32edfd1125ba2",
+      "verify/prod_check.py": "f9e5537d35893e52ef0267f7612ab403b8f3504c7cbdaf2b413bf18415a77a54"
+    },
+    "checks_passed": {
+      "2.3.2 baseline attempt 2": "16/16",
+      "2.3.2 baseline attempt 1": "failed only its embedding-status probe",
+      "2.4.0 rehearsal": "19/19",
+      "rollback-artifact check (2.3.2 on a fresh extraction)": "V64 PASS"
+    },
+    "cutover": {
+      "stopped_utc": "2026-09-25T20:43:48Z",
+      "started_utc": "2026-09-25T20:44:37Z",
+      "quiescent": "V64 (64 rows), quick_check ok, 36 pages, 77,213 observations",
+      "after": "V66 (66 rows), quick_check ok, 36 pages 0 missing or changed, 0 observations missing, 77,330 observations",
+      "hooks": "8 Claude and 7 Codex commands, binary path only",
+      "real_client_capture": "fresh headless claude -p at 2026-09-25T20:45:10Z: session-start, pre-tool-use, post-tool-use, stop, session-end",
+      "pending": "Codex /hooks trust for the 7 changed commands (user-only)"
+    },
+    "rollback": "stop and quiesce; restore the private cold V64 copy; relink ~/.local/share/codex-ecosystem/bin/ai-memory to tools/ai-memory-2.3.2/ai-memory; restore the two hook files from the installer's .bak-1790369060 copies; start",
+    "independent_review": "verdict agree, production_touched false, 3 minor defects (artifact results.json verifier section)",
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/ai-memory/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/aimem_accept.py",
+      "sha256": "20c88e7f5601fee499e219afed12c46f8e832c2c6f008b64ad90f7953fea8ec5",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/rerun.py",
+      "sha256": "0ac1a3364e31a9542fcc4060978aaeeadcfbfec26cc4042105f1aff82b7e1947",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/integrity.py",
+      "sha256": "a0dff6a3b174d7bddc02d74b8c5395838bbba70cb55c7c9d4ea32edfd1125ba2",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/prod_check.py",
+      "sha256": "f9e5537d35893e52ef0267f7612ab403b8f3504c7cbdaf2b413bf18415a77a54",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step0-install.json",
+      "sha256": "b195bc8be63515c30be6c42cc9438d4efa62288dc5daaa6ad577504b1dfc3e02",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step3-baseline.json",
+      "sha256": "17628877993779332062f8a3eb2b46c931e6d2f5ca6c267326c74a09eca82ec8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rehearsal.json",
+      "sha256": "9dc40ad1ad470653c70a578f2d9bf27dfee489b79b8489547ac7c257eca38bf3",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/step4-rollback-check.json",
+      "sha256": "718a475cbade2fabb5d6afbb90517d73d71794d5f7b9c6548e38ee9ee4abe8c4",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results/prod-compare-before-after.json",
+      "sha256": "9f4fd4de3017b8d68f64e22820163950200fb45f9dbcdc41621cfc45e626227a",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/integrity.json",
+      "sha256": "1c6a380b0c278024b6767c1c25abc77e97e4111ff2876e7f93edb0a0f0d2cd24",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/verify/rerun.json",
+      "sha256": "da99a610d55b3679b7a55904492fbf9326cc5aeb47f9ee40c75c8823a1c66436",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/cutover.json",
+      "sha256": "34b8603fee0d7ef12220a2dcdbd7d7ddccd3f8facd2e107c988dcd187fb7e4bd",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/out/readback.out",
+      "sha256": "390daa56b88e4f69a899ee72891cb1a67839307181603d6905d7250ef7b324df",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/ai-memory/results.json",
+      "sha256": "0a4c493e99c2656cc1642c6fbcdf6bf582abfb38d6c5d5435cbf8119598d7125",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}
