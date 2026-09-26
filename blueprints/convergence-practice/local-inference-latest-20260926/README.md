@@ -12,7 +12,9 @@ Another session owns GPU trials on this host until it records that they are done
 line `GPU trials: TRIALS DONE`. The coordinator replaces the status line below
 when that session reports completion. Until then the line reads PENDING.
 
-GPU trials: PENDING
+GPU trials: TRIALS DONE
+
+Set on 2026-09-26 (about 05:05Z) by this plan's coordinator after the session that owned GPU trials (token-efficiency-foundation-catalog: ColPali, MIRIX and ByteRover) reported that its trials were finished and that none of its processes used the GPU or llama.cpp any more. That report is a peer message, recorded here as the coordination fact the window checks; it is not a measurement.
 
 ## What and why
 
