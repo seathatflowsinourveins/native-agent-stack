@@ -1168,12 +1168,12 @@
               "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "independently_reviewed_pass": 1,
+                "latest": "2026-09-26T00:20:09Z",
+                "pass": 2
               },
               "qualified_models": []
             },
