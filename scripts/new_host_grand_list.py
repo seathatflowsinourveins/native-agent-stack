@@ -479,9 +479,9 @@ def render_md(data: dict) -> str:
               "A winner is the layer's recorded choice from its lane verdict, shown with its evidence class. It is not a "
               "claim that the component is the best in its field. The Decision column is the layer ledger's decision "
               f"({tally} across {len(data['layers'])} layers); a `keep_but_compare` row keeps its incumbent while the "
-              "comparison the row names is still owed. Each winner's recorded basis, its `why_selected` text and its "
-              "`evidence_refs`, is carried in the JSON form of this list and in the layer ledgers, together with the "
-              "layer's limitations and open gaps."]
+              "comparison the row names is still owed. The JSON form of this list carries each winner's recorded "
+              "basis, its `why_selected` text and its `evidence_refs`, and only counts of each layer's open gaps; "
+              "the limitations and the open-gap text are in the layer ledgers."]
     lines += ["", "## How to update this page", "",
               "Generated, not hand-edited. After any change to the component evidence matrix (host receipts, "
               "decisions, verdict re-records), the layer ledgers, `" + MANIFEST + "`, `adoption/manifest.json`, the "

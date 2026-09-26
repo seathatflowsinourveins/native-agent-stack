@@ -1,0 +1,22 @@
+## rtk: rtk 0.50.0 -> ~/.local/share/codex-ecosystem/tools/rtk-0.50.0/rtk
+## ~/.config/rtk/config.toml (sha256 1a8c4baaf2d16f0867d7a202ad098cb1cd4b104ed2d04513411d5e5949f9e47a)
+[hooks]
+exclude_commands = ['^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)', "diff"]
+parsed [hooks].exclude_commands: ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', 'diff']
+holds the recommended regex exactly: True | holds diff: True
+## rtk hook check with the host config (scratch history)
+  rc=1 [git show HEAD:x | tail -n 5] :: No rewrite for: git show HEAD:x | tail -n 5
+  rc=1 [git show --no-color HEAD:x | tail -n 5] :: No rewrite for: git show --no-color HEAD:x | tail -n 5
+  rc=1 [git -C . show HEAD:x | tail -n 5] :: No rewrite for: git -C . show HEAD:x | tail -n 5
+  rc=1 [git show  HEAD:x | tail -n 5] :: No rewrite for: git show  HEAD:x | tail -n 5
+  rc=1 [git --no-pager show HEAD:x] :: No rewrite for: git --no-pager show HEAD:x
+  rc=1 [git show :x] :: No rewrite for: git show :x
+  rc=1 [diff a missing] :: No rewrite for: diff a missing
+  rc=0 [git show HEAD~2] :: rtk git show HEAD~2
+  rc=0 [git show --stat HEAD] :: rtk git show --stat HEAD
+  rc=0 [git show HEAD --format=%h:%s] :: rtk git show HEAD --format=%h:%s
+  rc=0 [git show-branch] :: rtk git show-branch
+  rc=0 [git diff] :: rtk git diff
+  rc=0 [git status] :: rtk git status
+  rc=0 [git log -3] :: rtk git log -3
+  rc=0 [head -3 README.md] :: rtk read README.md --head-lines 3

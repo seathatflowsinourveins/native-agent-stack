@@ -825,6 +825,11 @@ class RtkConfigReminderTests(unittest.TestCase):
     evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json is cited only for the
     discovery). The reminder fires unless all four entries are present exactly once, including for a
     config that still has only the original two, or the original two plus a second, four-entry line.
+    2026-09-26 (Codex review of #314): the text check alone is not enough, because rtk also ignores a
+    TOML-valid file that does not deserialize (a [tracking] table without history_days fails
+    TrackingConfig, src/core/config.rs at 1d87b8e7) and then rewrites everything. So once the text
+    matches, the installed rtk must answer `rtk hook check` with exactly "No rewrite for: <probe>" and
+    exit 1 for every probe (PROBES); the stub rtk's answer is set per test (HOOK).
     install_pin, fetch, install_single_binary_tarball and
     rtk_config_reminder are extracted verbatim from bootstrap-linux.sh and run against a one-pin
     fixture whose synthetic tarball is pre-seeded in the download cache with its real sha256, so
@@ -841,6 +846,19 @@ class RtkConfigReminderTests(unittest.TestCase):
     # (test_the_recipes_exact_block_gets_no_reminder asserts the two stay identical).
     CONFIGURED = "[hooks]\nexclude_commands = [\n" + "".join(f"  {entry},\n" for entry in ENTRIES) + "]\n"
     OLD_TWO_ENTRY = f"[hooks]\nexclude_commands = [{ENTRY_1}, {ENTRY_2}]\n"
+    # Codex's #314 counterexample: the exact recipe text, TOML-valid, but rtk rejects the file.
+    REJECTED = CONFIGURED + "[tracking]\nenabled = false\n"
+    PROBES = ["git show HEAD:x | tail -n 5", "git -C . show --no-color HEAD:x | tail -n 5", "diff a missing",
+              "git branch -a", "git -C . branch"]
+    HINT = "rtk ignores a config it cannot load"
+    # `hook check` answers of the stub rtk.
+    HOOK = {
+        "excluded": 'echo "No rewrite for: $3" >&2; exit 1',
+        "rewrite": 'echo "rtk $3"; exit 0',
+        "unsupported": "echo \"error: unrecognized subcommand 'check'\" >&2; exit 2",
+        "branch rewritten": 'case "$3" in *branch*) echo "rtk $3"; exit 0 ;; esac; echo "No rewrite for: $3" >&2; exit 1',
+        "excluded with a warning": 'echo "rtk: warning: invalid exclude_commands pattern" >&2; echo "No rewrite for: $3" >&2; exit 1',
+    }
 
     @staticmethod
     def config_with(*entries: str) -> str:
@@ -862,8 +880,8 @@ class RtkConfigReminderTests(unittest.TestCase):
             raise AssertionError("recipes/README.md: could not find the [hooks] exclude_commands block")
         return match.group(1) + "\n"
 
-    def _run(self, tmp_path: Path, tool_id="rtk", xdg_config_home=None):
-        for tool in ["jq"] if sha256sum_checks_like_gnu() else ["jq", "shasum"]:
+    def _run(self, tmp_path: Path, tool_id="rtk", xdg_config_home=None, hook="rewrite"):
+        for tool in ["jq", "timeout"] if sha256sum_checks_like_gnu() else ["jq", "shasum", "timeout"]:
             if shutil.which(tool) is None:
                 self.skipTest(f"{tool} is not on PATH")
         home = tmp_path / "home"
@@ -873,9 +891,19 @@ class RtkConfigReminderTests(unittest.TestCase):
         cache.mkdir(parents=True, exist_ok=True)
         build = tmp_path / "build"
         build.mkdir(exist_ok=True)
-        (build / tool_id).write_text(f"#!/bin/sh\necho '{tool_id} 0.50.0'\n")
+        calls = tmp_path / "rtk-calls.log"
+        calls.unlink(missing_ok=True)
+        (build / tool_id).write_text(
+            "#!/bin/sh\n"
+            f"printf '%s\\t%s\\n' \"${{XDG_CONFIG_HOME:-unset}}\" \"$*\" >> {shlex.quote(str(calls))}\n"
+            f"if [ \"$1\" = --version ]; then echo '{tool_id} 0.50.0'; exit 0; fi\n"
+            f"if [ \"$1\" = hook ] && [ \"$2\" = check ]; then {self.HOOK[hook]}; fi\n"
+            "echo \"unexpected arguments: $*\" >&2; exit 97\n")
         (build / tool_id).chmod(0o755)
         asset = f"{tool_id}-x86_64-unknown-linux-musl.tar.gz"
+        (cache / asset).unlink(missing_ok=True)
+        shutil.rmtree(eco / "tools", ignore_errors=True)
+        shutil.rmtree(eco / "bin", ignore_errors=True)
         subprocess.run(["tar", "-czf", str(cache / asset), "-C", str(build), tool_id], check=True)
         pins_path = tmp_path / "pins.json"
         pins_path.write_text(json.dumps({"tools": [{
@@ -910,6 +938,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60, env=env)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn(f"Installed {tool_id} 0.50.0 (tarball)", result.stdout)
+        self.calls = calls.read_text().splitlines() if calls.exists() else []
         return result, home
 
     @staticmethod
@@ -930,7 +959,7 @@ class RtkConfigReminderTests(unittest.TestCase):
             config = Path(tmp) / "home/.config/rtk/config.toml"
             config.parent.mkdir(parents=True)
             config.write_text(self.CONFIGURED)
-            result, _home = self._run(Path(tmp))
+            result, _home = self._run(Path(tmp), hook="excluded")
             self.assertEqual(self.reminders(result.stdout), [])
             self.assertEqual(config.read_text(), self.CONFIGURED)
 
@@ -984,7 +1013,7 @@ class RtkConfigReminderTests(unittest.TestCase):
             config = Path(tmp) / "home/.config/rtk/config.toml"
             config.parent.mkdir(parents=True)
             config.write_text(block)
-            result, _home = self._run(Path(tmp))
+            result, _home = self._run(Path(tmp), hook="excluded")
             self.assertEqual(self.reminders(result.stdout), [])
             self.assertEqual(config.read_text(), block)
 
@@ -996,13 +1025,121 @@ class RtkConfigReminderTests(unittest.TestCase):
                           self.reminders(result.stdout)[0])
             (xdg / "rtk").mkdir(parents=True)
             (xdg / "rtk/config.toml").write_text(self.CONFIGURED)
-            result, _home = self._run(Path(tmp), xdg_config_home=xdg)
+            result, _home = self._run(Path(tmp), xdg_config_home=xdg, hook="excluded")
             self.assertEqual(self.reminders(result.stdout), [])
+            # rtk runs with the caller's environment, so it reads the same file.
+            self.assertTrue(self.calls)
+            self.assertEqual({call.split("\t", 1)[0] for call in self.calls}, {str(xdg)})
+
+    def test_an_exact_text_that_rtk_honours_probes_every_command(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / "home/.config/rtk/config.toml"
+            config.parent.mkdir(parents=True)
+            config.write_text(self.CONFIGURED)
+            result, _home = self._run(Path(tmp), hook="excluded")
+            self.assertEqual(self.reminders(result.stdout), [])
+            self.assertEqual([call.split("\t", 1)[1] for call in self.calls if "\thook check " in call],
+                             [f"hook check {probe}" for probe in self.PROBES])
+
+    def test_an_exact_text_that_rtk_does_not_honour_is_reminded(self):
+        """Either check failing reminds: here the text check passes and rtk's answer fails it. The
+        reminder carries a hint naming the failing probe; a failed text check never carries one."""
+        cases = {
+            "rtk rewrites the recipe's exact block": (self.CONFIGURED, "rewrite", self.PROBES[0]),
+            "Codex #314 counterexample: [tracking] without history_days, modelled as rtk rewriting": (
+                self.REJECTED, "rewrite", self.PROBES[0]),
+            "rtk has no hook check subcommand": (self.CONFIGURED, "unsupported", self.PROBES[0]),
+            "rtk still rewrites git branch": (self.CONFIGURED, "branch rewritten", "git branch -a"),
+            "rtk adds output beside its answer": (self.CONFIGURED, "excluded with a warning", self.PROBES[0]),
+            # The text checks read the whole file, so entries in comments beside an empty list pass them
+            # (Codex review of #291); only rtk's answer catches it.
+            "Codex #291 counterexample: empty list, entries only in comments": (
+                "[hooks]\nexclude_commands = []\n" + "".join(f"# {entry}\n" for entry in self.ENTRIES),
+                "rewrite", self.PROBES[0]),
+        }
+        for name, (text, hook, probe) in cases.items():
+            with self.subTest(name), tempfile.TemporaryDirectory() as tmp:
+                config = Path(tmp) / "home/.config/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                config.write_text(text)
+                result, _home = self._run(Path(tmp), hook=hook)
+                lines = self.reminders(result.stdout)
+                self.assertEqual(len(lines), 1, result.stdout)
+                self.assertTrue(lines[0].startswith(self.expected_reminder(config)[:-1]), lines[0])
+                self.assertIn(f"still rewrites or fails on: {probe};", lines[0])
+                self.assertIn(self.HINT, lines[0])
+                self.assertEqual(config.read_text(), text, "the reminder must never write the config")
+
+    def test_a_failed_text_check_reminds_without_asking_rtk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / "home/.config/rtk/config.toml"
+            config.parent.mkdir(parents=True)
+            config.write_text(self.OLD_TWO_ENTRY)
+            result, _home = self._run(Path(tmp), hook="excluded")
+            self.assertEqual(self.reminders(result.stdout), [self.expected_reminder(config)])
+            self.assertEqual([call for call in self.calls if "\thook check " in call], [])
 
     def test_other_pins_get_no_reminder(self):
         with tempfile.TemporaryDirectory() as tmp:
             result, _home = self._run(Path(tmp), tool_id="qdrant")
             self.assertEqual(self.reminders(result.stdout), [])
+            self.assertEqual([call for call in self.calls if "\thook check " in call], [])
+
+
+@LINUX_X86_64_ONLY
+class RtkConfigReminderRealBinaryTests(unittest.TestCase):
+    """Optional: the extracted rtk_config_reminder against a locally installed rtk 0.50.0
+    ($ECO_INSTALL_ROOT, or ~/.local/share/codex-ecosystem, then tools/rtk-0.50.0/rtk). Skipped when
+    that binary is absent, so CI does not need it. Each config lives in a scratch XDG_CONFIG_HOME."""
+
+    SINGLE_REGEX = r"^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)"
+    CONFIGS = {
+        "the recipe's four-entry block": (RtkConfigReminderTests.CONFIGURED, 0, False),
+        # Codex's #314 counterexample: exact text, but TrackingConfig needs history_days, so rtk ignores it.
+        "[tracking] without history_days": (RtkConfigReminderTests.REJECTED, 1, True),
+        "[tracking] with history_days": (RtkConfigReminderTests.REJECTED + "history_days = 90\n", 0, False),
+        "2026-09-25 two-entry line": (RtkConfigReminderTests.OLD_TWO_ENTRY, 1, False),
+        "the tested single-regex alternative": (f"[hooks]\nexclude_commands = ['{SINGLE_REGEX}', \"diff\"]\n", 1, False),
+        "no config": (None, 1, False),
+    }
+
+    def test_the_installed_rtk_and_the_text_decide_together(self):
+        root = Path(os.environ.get("ECO_INSTALL_ROOT") or Path.home() / ".local/share/codex-ecosystem")
+        binary = root / "tools/rtk-0.50.0/rtk"
+        if not os.access(binary, os.X_OK):
+            self.skipTest(f"no installed rtk 0.50.0 at {binary}")
+        version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30)
+        if version.stdout.strip() != "rtk 0.50.0":
+            self.skipTest(f"{binary} reports {version.stdout.strip()!r}")
+        if shutil.which("timeout") is None:
+            self.skipTest("timeout is not on PATH")
+        for name, (text, expected, hint) in self.CONFIGS.items():
+            with self.subTest(name), tempfile.TemporaryDirectory() as tmp:
+                tmp_path = Path(tmp)
+                (tmp_path / "bin").mkdir()
+                (tmp_path / "bin/rtk").symlink_to(binary)
+                config = tmp_path / "xdg/rtk/config.toml"
+                config.parent.mkdir(parents=True)
+                if text is not None:
+                    config.write_text(text)
+                harness = tmp_path / "harness.sh"
+                harness.write_text("set -Eeuo pipefail\n"
+                                   + shell_functions(SCRIPT_PATH.read_text(), "rtk_config_reminder")
+                                   + f"bin_dir={shlex.quote(str(tmp_path / 'bin'))}\nrtk_config_reminder\n")
+                env = dict(os.environ, HOME=str(tmp_path / "home"), XDG_CONFIG_HOME=str(tmp_path / "xdg"),
+                           XDG_DATA_HOME=str(tmp_path / "data"), RTK_DB_PATH=str(tmp_path / "data/history.db"),
+                           RTK_TELEMETRY_DISABLED="1")
+                result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=120,
+                                        env=env, cwd=tmp)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                lines = [line for line in result.stdout.splitlines() if line.startswith("Reminder:")]
+                self.assertEqual(len(lines), expected, result.stdout)
+                if lines:
+                    self.assertEqual(RtkConfigReminderTests.HINT in lines[0], hint, lines[0])
+                if text is None:
+                    self.assertFalse(config.exists(), "the reminder must not create the config")
+                else:
+                    self.assertEqual(config.read_text(), text)
 
 
 if __name__ == "__main__":

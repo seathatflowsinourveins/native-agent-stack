@@ -16,7 +16,8 @@
     "Local integration evidence with synthetic fixtures (fake pytest and ruff, generated git repositories, synthetic negative rows); the hook was driven directly with PreToolUse JSON. Upstream `cargo test` was not run on this host, and no fresh-session live Claude Code check after the switch is recorded.",
     "Provenance rests on checksums.txt and the GitHub API digest, both from the same release workflow; no signature is published, the attestation lookup returned HTTP 404, and the binary was not rebuilt from source.",
     "`rtk init` was not re-run. At 0.50.0, `rtk init --help` describes `--codex` as 'Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)', so re-running the recipe's `rtk init --global --codex` would install a Codex hook that is not qualified; recipes/README.md now says so.",
-    "One host (NativeStack, WSL2) and a prefix-flip switch; tools/rtk-0.49.0 and its archive are kept for rollback. The verifier's three minor defects (an unrelated ~/.claude/settings.json change outside the fingerprint window, the ungated `| tail` case, scratch written outside the unit dir) are retained in the artifact."
+    "One host (NativeStack, WSL2) and a prefix-flip switch; tools/rtk-0.49.0 and its archive are kept for rollback. The verifier's three minor defects (an unrelated ~/.claude/settings.json change outside the fingerprint window, the ungated `| tail` case, scratch written outside the unit dir) are retained in the artifact.",
+    "2026-09-26 correction to the first limitation (see also the addenda): the 2026-09-25 exclusion `^git show [^ ]*:` was too narrow. rtk tests an entry that starts with `^` as a raw Rust regex against each command segment (src/discover/registry.rs:1540-1569 and 1599-1604 at tag commit 1d87b8e7), so `git show --no-color HEAD:x`, `git -C . show HEAD:x`, `git show  HEAD:x` (two spaces) and `git --no-pager show HEAD:x` were still rewritten into the blob window (found by a Codex post-merge review of #291). The adopted recipe is #318's four-entry exclude_commands set (recipes/README.md#native-context-mode-and-hooks), which this host now runs. An alternative single-regex pattern tested the same day excluded 14 of 14 blob-read and diff spellings on 0.50.0 and 0.49.0, where the old pattern excluded 8, and is retained as evidence only (out/mitigation-20260926.out, out/readback-20260926.out). adoption/bootstrap-linux.sh's reminder combines #318's text check with the installed `rtk hook check` on five probes, because a TOML-valid config with the exact text can still be ignored: rtk 0.50.0 falls back to its defaults when the file does not deserialize (TrackingConfig, src/core/config.rs:152-158, needs history_days), and with `[tracking] enabled = false` alone every probe was rewritten (out/config-rejection-20260926.out, out/combined-reminder-20260926.out; found by a Codex review of #314). The exclusions cover only hook rewrites: an explicit `rtk git show <rev>:<path>` still windows the blob. The tested spellings are not exhaustive, and the claim's config text is the 2026-09-25 state."
   ],
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
@@ -106,7 +107,16 @@
     "rollback": "ln -sfn ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk ~/.local/share/codex-ecosystem/bin/rtk after the read-only negative-row count; config.toml entries behave the same on 0.49.0",
     "independent_review": "verdict agree, production_touched false, 3 minor defects (artifact results.json verifier section)",
     "native_token_ci_rtk_fixture": "scripts/native_token_ci.py's rtk install path and rtk_fixture at PINS rtk 0.50.0, run locally by the writing worker: fresh release download, checksum verification and all 6 fixture checks passed (out/native-token-ci-rtk-only.json); the hosted native-token-e2e workflow has not run at 0.50.0",
-    "artifacts": "evidence/artifacts/sota-refresh-20260925/rtk/"
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/rtk/",
+    "host_config_20260926": {
+      "path": "~/.config/rtk/config.toml",
+      "content": "[hooks]\nexclude_commands = ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', \"diff\"]\n",
+      "replaces": "[hooks]\nexclude_commands = [\"^git show [^ ]*:\", \"diff\"]\n",
+      "readback": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback-20260926.out",
+      "retest": "evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation-20260926.out",
+      "superseded": "Later on 2026-09-26 the coordinator replaced this content with #318's four-entry block (recipes/README.md); the single regex here is an alternative pattern that was tested, not the adopted recipe (evidence/artifacts/sota-refresh-20260925/rtk/out/combined-reminder-20260926.out part 3).",
+      "combined_reminder_readback": "evidence/artifacts/sota-refresh-20260925/rtk/out/combined-reminder-20260926.out"
+    }
   },
   "provenance": [
     {
@@ -445,8 +455,58 @@
       "byte_identical_to_run_copy": false
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/mitigation-20260926.sh",
+      "sha256": "7641374fad732e2e4ae878ab38d60892c2751a3b6364b86f0386ac798130beb8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation-20260926.out",
+      "sha256": "2e0c4cf0e205a32fec38264e93d2bd78aeb1b4d3e5c71f8e8da79a46b920c0c3",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/readback-20260926.sh",
+      "sha256": "ce65ba66693a094ec772ec4c38ae74d5a7180fbe63a0159c7a06564a3a885e52",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback-20260926.out",
+      "sha256": "f9d6855398540b004dd80dd98ff300217ed4d3aab1767ca87fc3a8e34ee46d71",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/config-rejection-20260926.sh",
+      "sha256": "206591461ee80a992654101107549663ff7431d929ec6976923518d173446586",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/config-rejection-20260926.out",
+      "sha256": "f916e54b6b014a2486c0d10ec1e909e2ae9c1ad7d06f49481a35597479d79347",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/reminder-readback-20260926.sh",
+      "sha256": "edead34b44652dd89e9543998af6be81d7f1e020b6e1c5be1a515d75f39a9e72",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/reminder-readback-20260926.out",
+      "sha256": "3a2ea52e494fc7707196943412d28d4d21a74f058179fd874b1558f94c5bf625",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/combined-reminder-20260926.sh",
+      "sha256": "394f214cb8fa34bb0054f46d2f964f00739df8993f207db0bb6c320faf26d9c0",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/combined-reminder-20260926.out",
+      "sha256": "7a14d3f6fea8d885bfa181211520e4df5ece422d7f5dc1dd056dc8d68b3ea7de",
+      "byte_identical_to_run_copy": true
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
-      "sha256": "cbca93315306d5cf420182e94b30c9e87764e38f2526dad4e748828de80922a1",
+      "sha256": "ee63903cef7492c8d16ea0d721fcd62596f74c6cae0d592149ed7a3936763c65",
       "byte_identical_to_run_copy": false
     }
   ],

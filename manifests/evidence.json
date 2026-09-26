@@ -3108,7 +3108,8 @@
         "Local integration evidence with synthetic fixtures (fake pytest and ruff, generated git repositories, synthetic negative rows); the hook was driven directly with PreToolUse JSON. Upstream `cargo test` was not run on this host, and no fresh-session live Claude Code check after the switch is recorded.",
         "Provenance rests on checksums.txt and the GitHub API digest, both from the same release workflow; no signature is published, the attestation lookup returned HTTP 404, and the binary was not rebuilt from source.",
         "`rtk init` was not re-run. At 0.50.0, `rtk init --help` describes `--codex` as 'Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)', so re-running the recipe's `rtk init --global --codex` would install a Codex hook that is not qualified; recipes/README.md now says so.",
-        "One host (NativeStack, WSL2) and a prefix-flip switch; tools/rtk-0.49.0 and its archive are kept for rollback. The verifier's three minor defects (an unrelated ~/.claude/settings.json change outside the fingerprint window, the ungated `| tail` case, scratch written outside the unit dir) are retained in the artifact."
+        "One host (NativeStack, WSL2) and a prefix-flip switch; tools/rtk-0.49.0 and its archive are kept for rollback. The verifier's three minor defects (an unrelated ~/.claude/settings.json change outside the fingerprint window, the ungated `| tail` case, scratch written outside the unit dir) are retained in the artifact.",
+        "2026-09-26 correction to the first limitation (see also the addenda): the 2026-09-25 exclusion `^git show [^ ]*:` was too narrow. rtk tests an entry that starts with `^` as a raw Rust regex against each command segment (src/discover/registry.rs:1540-1569 and 1599-1604 at tag commit 1d87b8e7), so `git show --no-color HEAD:x`, `git -C . show HEAD:x`, `git show  HEAD:x` (two spaces) and `git --no-pager show HEAD:x` were still rewritten into the blob window (found by a Codex post-merge review of #291). The adopted recipe is #318's four-entry exclude_commands set (recipes/README.md#native-context-mode-and-hooks), which this host now runs. An alternative single-regex pattern tested the same day excluded 14 of 14 blob-read and diff spellings on 0.50.0 and 0.49.0, where the old pattern excluded 8, and is retained as evidence only (out/mitigation-20260926.out, out/readback-20260926.out). adoption/bootstrap-linux.sh's reminder combines #318's text check with the installed `rtk hook check` on five probes, because a TOML-valid config with the exact text can still be ignored: rtk 0.50.0 falls back to its defaults when the file does not deserialize (TrackingConfig, src/core/config.rs:152-158, needs history_days), and with `[tracking] enabled = false` alone every probe was rewritten (out/config-rejection-20260926.out, out/combined-reminder-20260926.out; found by a Codex review of #314). The exclusions cover only hook rewrites: an explicit `rtk git show <rev>:<path>` still windows the blob. The tested spellings are not exhaustive, and the claim's config text is the 2026-09-25 state."
       ],
       "path": "evidence/receipts/rtk-050-qualification-20260925.json"
     },
@@ -3128,7 +3129,8 @@
         "The no-extras grep leg misses some extras (an [az-doc-intel] addition passed it in the verifier's mutation test); only the exact 20-package equality leg gates the package set. Importing onnxruntime 1.30.0 writes $TMPDIR/.ses and an empty mat-debug-<pid>.log on every call, in both versions; the qualification runs left such files in /tmp.",
         "The landscape ledger does not move here: catalogs/landscape/foundation.json keeps the document-retrieval winner pin markitdown 0.1.7 from the sealed 2026-09-22 layer-verdict packets. Host receipts recorded at 0.1.8 do not bind to that winner (scripts/host_receipts.py pin_matches) and stay unbound until a new verdict wave re-records the layer.",
         "Linux x86_64 only: adoption/pins-macos-arm64.json has no markitdown pin and is unchanged; nothing here is macOS evidence.",
-        "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin."
+        "One host (NativeStack, WSL2). The first post-switch run aborted before any leg because its run directory already existed; the retained 10-of-10 result is the rerun into a new directory. This receipt, not the 2026-09-23 qualification in evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json (another host, another install kind, a non-discriminating check), is the basis for the 0.1.8 pin.",
+        "2026-09-26 retention correction (Codex post-merge review of #291): the claim's 45-of-45 installed-byte figure first rested on a summary line. verify_installed.py, the run directories behind run_arm.py's checker counts (converted documents, PDF stderr with the home directory replaced by ~, package listings) and the independent verifier's integrity and checker outputs are now retained. The 2026-09-25 stdout of verify_installed.py and run_arm.py's raw checker stdout were never written to files. out/verify-installed-rerun-20260926.out, out/installed-files-20260926.json and out/checker-rerun-20260926.out are 2026-09-26 read-only re-runs on the production prefix and the retained directories (results.json corrections and not_retained)."
       ],
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json"
     },
@@ -3393,8 +3395,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "8b096b8245c7eb34eca1ca50140cfeb7044c8f6918f2773cdbc61f2ad8db21e9",
-      "bytes": 35016
+      "sha256": "458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456",
+      "bytes": 36209
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3403,8 +3405,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9d1c17ff5a16f3f541b4a4f64b4fd6c4d07b1e61f73d3350aacc888e747cc07f",
-      "bytes": 32936
+      "sha256": "e09d1bd692037f234cfb38dd3df69ae3f1be2890292d2308872e21fb08782e58",
+      "bytes": 33793
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3498,8 +3500,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "59bdb4cf3f1c6431483300663f1ad2cbbbb439d5e124886d1ef4a739c7590612",
-      "bytes": 26557
+      "sha256": "a274e88827dac55cf827eb8ac6db9451ba110739b2069ee00b9b041cf95772ac",
+      "bytes": 26853
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -3508,13 +3510,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "edb87fad513ce21e65989189254c3ea07e2102082a3b7fe433c366dfcd9d915a",
-      "bytes": 14015
+      "sha256": "fa39267466a1a80560bcb9869f3a9b3fac6f6bd19a997f1b487bbc38f61fed19",
+      "bytes": 14326
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "da9c805f8848413daaf42893cbe20efd62ac019ca02dda1adf33babbea79ad69",
-      "bytes": 42710
+      "sha256": "f4d69b71c2689475d3df1849a1dcc5a29213fa71150caf3e7eff7201b30904e5",
+      "bytes": 42888
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -9924,8 +9926,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "b6c9582cd263137aae3d96246b47fb972097cee476ec5cfb8b00bd3f04b036ac",
-      "bytes": 473150
+      "sha256": "3b34d1f3cca112a052b19990b89bd04b163b77abf2041f220ac5682edb9a88c5",
+      "bytes": 473278
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -10489,8 +10491,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "46a535ddd1687fa24ac6994006c3223842b0a3c451051fd412571331c9a4fb1b",
-      "bytes": 30688
+      "sha256": "89a5567b801ac445ca6d056dd56436c21b19289a4983d7cae76fabd2a9db7c1d",
+      "bytes": 32429
     },
     {
       "path": "docs/direct-results.md",
@@ -10744,8 +10746,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "fce38c0daa13419e4fc00018110a3a575f227b34a35fa93e3a6f971ac16a2386",
-      "bytes": 18038
+      "sha256": "46b0b90c68f5a5a940955f0327d3ad45c526303dbf8735410d3d2935c6edfec0",
+      "bytes": 18060
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -10859,8 +10861,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "de39875741740073a4493dab193afe6c768f5a641977007a09ae8104744b74aa",
-      "bytes": 22399
+      "sha256": "9b8d76e48198f100f139777c5dbc4c4b23241011f29659d6b0f00b53d23d0b1e",
+      "bytes": 22882
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -29173,9 +29175,24 @@
       "bytes": 1833
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/installed_files.py",
+      "sha256": "9cbdca1a222bf05d1c4eda0d8b70dd602e1938ee84dfbfcc018e0180c396016c",
+      "bytes": 2560
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/checker-rerun-20260926.out",
+      "sha256": "12909ca549d3753ca7872d629aad19aacef4f5a80806af65d1f241851b96a1b2",
+      "bytes": 853
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/install.log",
       "sha256": "98299a10cee552c8c60ac6b3bf387269e9c462f48ef4c8750070765b6266a488",
       "bytes": 919
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/installed-files-20260926.json",
+      "sha256": "c7632e1008c75c6ab0a8de62eb1498d9ee279e70664af0daa8a46a20b5d58105",
+      "bytes": 13669
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/postswitch-attempt1.log",
@@ -29193,14 +29210,124 @@
       "bytes": 463
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/out/verify-installed-rerun-20260926.out",
+      "sha256": "cb2f3ec303d9ef4b38925304ea67be05730913e4f6e24af68fd6405f187b75e8",
+      "bytes": 563
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/postswitch-out.json",
       "sha256": "5d1de1a0c39eb90f4d70afef0995bbf09dceafeba499034c42058ee1c3a69bda",
       "bytes": 4561
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
-      "sha256": "1d16fd89b90fd0798b2ab85f561a2a537567881b8cdd4849adba2bf330b4f84a",
-      "bytes": 51951
+      "sha256": "1a08f26480efd121c4f0299a19d8b1e0c34477265b2aa0ed98252846e41b5632",
+      "bytes": 66923
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "bytes": 5610
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "bytes": 5611
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/disc.md",
+      "sha256": "177abc325d9996496390b3df367eec90f1a5ef2b8bb0d5d59b407a0ab09cec1d",
+      "bytes": 99
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/pdf.err",
+      "sha256": "ae7c22a71a9e40153328d044822f0e7dc201f54828253b8504862a79db900634",
+      "bytes": 1711
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/pip-list.txt",
+      "sha256": "cbe120b35b622e6a96a1f9dfb2bbffaeedc2c99ba750cf5ccb5a313fb60082ba",
+      "bytes": 566
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "bytes": 5610
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "bytes": 5611
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/disc.md",
+      "sha256": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "bytes": 117
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/pdf.err",
+      "sha256": "d09a6d2024d35a82e14a7d41258346cf720d40b5b29901c59d0c474df726de6b",
+      "bytes": 1810
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-candidate/pip-list.txt",
+      "sha256": "7791af4ec9924445fce6ac964903dbfd858c14d7196571f59d1f1331860c50e3",
+      "bytes": 566
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "bytes": 5610
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "bytes": 5611
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/disc.md",
+      "sha256": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "bytes": 117
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/pdf.err",
+      "sha256": "10b7f75fa14a73ab6f322b91363696f01fae5adc647d6e9d64500bf435096715",
+      "bytes": 1787
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-postswitch2/pip-list.txt",
+      "sha256": "7791af4ec9924445fce6ac964903dbfd858c14d7196571f59d1f1331860c50e3",
+      "bytes": 566
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run_arm.py",
@@ -29216,6 +29343,46 @@
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/steps-candidate.json",
       "sha256": "c6f510ae62b6fecd900e8338c599243cc8c1f6985f92337a3275fefae26ab1b2",
       "bytes": 4699
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/independent-integrity.json",
+      "sha256": "ab672372fe48cc139e76ef7f974cc004ca9c90c0431a24bee377b546adfb38a4",
+      "bytes": 1241
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/independent_integrity.py",
+      "sha256": "40b23fa37f0cb2f90ac1379a54b2666d66f26a45d9281ad3fb7450a21e618cb0",
+      "bytes": 4785
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/legs-baseline.log",
+      "sha256": "6134751a81da70ebc08659a50a4c1feaf8499df553870f10901164940c171fa4",
+      "bytes": 1426
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/legs-candidate.log",
+      "sha256": "5528957943476a7bbad52f6c98f21d7e881b5dab8d332eccfe422d1c6e558333",
+      "bytes": 1407
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/legs_record.sh",
+      "sha256": "13e5fbb556da2c5d93cad6db37d3dbc4bff357ece146ff87f69a0cecf4404ae5",
+      "bytes": 3225
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/run-baseline/checker.out",
+      "sha256": "5f4c1ec58575d16a53005c2e164b6355602695b15045b8e7ff4312e00560d342",
+      "bytes": 233
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify/run-candidate/checker.out",
+      "sha256": "986c5993e4d3b41c9d5b370eab103725c994a5eddbc7acb920a0aa40e9f4dcf4",
+      "bytes": 233
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/markitdown/verify_installed.py",
+      "sha256": "b458645247c70ef6a3a15250aa91f916eaf33dbe5e7e6e89255546efa20e72a2",
+      "bytes": 1998
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/mcporter/accept.py",
@@ -29613,6 +29780,21 @@
       "bytes": 13017
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/combined-reminder-20260926.sh",
+      "sha256": "394f214cb8fa34bb0054f46d2f964f00739df8993f207db0bb6c320faf26d9c0",
+      "bytes": 3443
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/config-rejection-20260926.sh",
+      "sha256": "206591461ee80a992654101107549663ff7431d929ec6976923518d173446586",
+      "bytes": 1857
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/mitigation-20260926.sh",
+      "sha256": "7641374fad732e2e4ae878ab38d60892c2751a3b6364b86f0386ac798130beb8",
+      "bytes": 6715
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/mitigation.sh",
       "sha256": "b4f68b559bfd9bb9d6ed3c6f2aa69cf8d7112a607e1c623638e651f319257d4f",
       "bytes": 3798
@@ -29818,6 +30000,16 @@
       "bytes": 0
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/combined-reminder-20260926.out",
+      "sha256": "7a14d3f6fea8d885bfa181211520e4df5ece422d7f5dc1dd056dc8d68b3ea7de",
+      "bytes": 2368
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/config-rejection-20260926.out",
+      "sha256": "f916e54b6b014a2486c0d10ec1e909e2ae9c1ad7d06f49481a35597479d79347",
+      "bytes": 1559
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/fetch.out",
       "sha256": "8942f58ac4fd35cc09d739e69bd6fffd3c5cc117861579b07be9a996eb2a38a0",
       "bytes": 2124
@@ -29836,6 +30028,11 @@
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/install.out",
       "sha256": "99e97a66f8af15153f147ec8e7798c28878f5ea7e0dc0924333084936199a393",
       "bytes": 793
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation-20260926.out",
+      "sha256": "2e0c4cf0e205a32fec38264e93d2bd78aeb1b4d3e5c71f8e8da79a46b920c0c3",
+      "bytes": 13126
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation.out",
@@ -29878,9 +30075,19 @@
       "bytes": 531
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback-20260926.out",
+      "sha256": "f9d6855398540b004dd80dd98ff300217ed4d3aab1767ca87fc3a8e34ee46d71",
+      "bytes": 1450
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/readback.out",
       "sha256": "3755880cd097828bdb3025f0e517843ac49f78561a9e05fd4a8b0611ccfcaa21",
       "bytes": 973
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/reminder-readback-20260926.out",
+      "sha256": "3a2ea52e494fc7707196943412d28d4d21a74f058179fd874b1558f94c5bf625",
+      "bytes": 226
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/out/run-acceptance.summary",
@@ -29933,9 +30140,19 @@
       "bytes": 163
     },
     {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/readback-20260926.sh",
+      "sha256": "ce65ba66693a094ec772ec4c38ae74d5a7180fbe63a0159c7a06564a3a885e52",
+      "bytes": 1582
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/rtk/reminder-readback-20260926.sh",
+      "sha256": "edead34b44652dd89e9543998af6be81d7f1e020b6e1c5be1a515d75f39a9e72",
+      "bytes": 802
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
-      "sha256": "cbca93315306d5cf420182e94b30c9e87764e38f2526dad4e748828de80922a1",
-      "bytes": 71556
+      "sha256": "ee63903cef7492c8d16ea0d721fcd62596f74c6cae0d592149ed7a3936763c65",
+      "bytes": 83644
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v2.sh",
@@ -31359,8 +31576,8 @@
     },
     {
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
-      "sha256": "04c4223b75c7007419773db9008e62e69358c51e6a39b9c0a72a58be396661a4",
-      "bytes": 9976
+      "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
+      "bytes": 18417
     },
     {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
@@ -31629,8 +31846,8 @@
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
-      "sha256": "584b22a5d8a9f4c2f268f3b9facf6488372f425e83abaad35d3293539ce531c9",
-      "bytes": 27699
+      "sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879",
+      "bytes": 32488
     },
     {
       "path": "evidence/receipts/runtime-tools.json",
@@ -32244,8 +32461,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "d44208d27c29506f71adf2073a634dd9366e99519b2a2e9107ca4cc5bcf5abfb",
-      "bytes": 73168
+      "sha256": "4467a91605c1eb271153b779b1382cf27b3cf4e4a37239f3943bf2c4ee481d67",
+      "bytes": 75298
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -32584,8 +32801,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "7ad4e130e8d9a50fe46bbe5d3de0b4b50f3ca34bf076b8d48488b5902c2b1e7a",
-      "bytes": 55065
+      "sha256": "e50ee707b7285cc4543e0b681ed6fec17a3542dd3409859b820ad27aaeabba03",
+      "bytes": 64243
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",

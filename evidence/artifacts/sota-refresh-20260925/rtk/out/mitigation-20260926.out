@@ -1,0 +1,236 @@
+## narrow config (2026-09-25)
+[hooks]
+exclude_commands = ['^git show [^ ]*:', "diff"]
+## wide config (2026-09-26)
+[hooks]
+exclude_commands = ['^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)', "diff"]
+tomllib read-back: ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', 'diff']
+## rtk 0.50.0 hook check, EXCLUDE_EXPECTED (no config | narrow | wide)
+[git show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show HEAD:big.txt | tail -n 5
+[git show --no-color HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show --no-color HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git show --no-color HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show --no-color HEAD:big.txt | tail -n 5
+[git -C . show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git -C . show HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git -C . show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git -C . show HEAD:big.txt | tail -n 5
+[git show  HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show  HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git show  HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show  HEAD:big.txt | tail -n 5
+[git show<TAB>HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show<TAB>HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git show<TAB>HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show<TAB>HEAD:big.txt | tail -n 5
+[git --no-pager show HEAD:big.txt]
+  none:   rc=0 :: rtk git --no-pager show HEAD:big.txt
+  narrow: rc=0 :: rtk git --no-pager show HEAD:big.txt
+  wide:   rc=1 :: No rewrite for: git --no-pager show HEAD:big.txt
+[git -c color.ui=never show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git -c color.ui=never show HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git -c color.ui=never show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git -c color.ui=never show HEAD:big.txt | tail -n 5
+[git show HEAD:big.txt 2>&1 | tail -n 5]
+  none:   rc=0 :: rtk git show HEAD:big.txt 2>&1 | tail -n 5
+  narrow: rc=1 :: No rewrite for: git show HEAD:big.txt 2>&1 | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show HEAD:big.txt 2>&1 | tail -n 5
+[GIT_PAGER=cat git show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: GIT_PAGER=cat rtk git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: GIT_PAGER=cat git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: GIT_PAGER=cat git show HEAD:big.txt | tail -n 5
+[/usr/bin/git show HEAD:big.txt | tail -n 5]
+  none:   rc=1 :: No rewrite for: /usr/bin/git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: /usr/bin/git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: /usr/bin/git show HEAD:big.txt | tail -n 5
+[cd . && git show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: cd . && rtk git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: cd . && git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: cd . && git show HEAD:big.txt | tail -n 5
+[git show :big.txt]
+  none:   rc=0 :: rtk git show :big.txt
+  narrow: rc=1 :: No rewrite for: git show :big.txt
+  wide:   rc=1 :: No rewrite for: git show :big.txt
+[git show HEAD~1:big.txt]
+  none:   rc=0 :: rtk git show HEAD~1:big.txt
+  narrow: rc=1 :: No rewrite for: git show HEAD~1:big.txt
+  wide:   rc=1 :: No rewrite for: git show HEAD~1:big.txt
+[diff a.txt missing.txt]
+  none:   rc=0 :: rtk diff a.txt missing.txt
+  narrow: rc=1 :: No rewrite for: diff a.txt missing.txt
+  wide:   rc=1 :: No rewrite for: diff a.txt missing.txt
+## rtk 0.50.0 hook check, REWRITE_EXPECTED (no config | narrow | wide)
+[git show HEAD~2]
+  none:   rc=0 :: rtk git show HEAD~2
+  narrow: rc=0 :: rtk git show HEAD~2
+  wide:   rc=0 :: rtk git show HEAD~2
+[git show --stat HEAD]
+  none:   rc=0 :: rtk git show --stat HEAD
+  narrow: rc=0 :: rtk git show --stat HEAD
+  wide:   rc=0 :: rtk git show --stat HEAD
+[git show HEAD --format=%h:%s]
+  none:   rc=0 :: rtk git show HEAD --format=%h:%s
+  narrow: rc=0 :: rtk git show HEAD --format=%h:%s
+  wide:   rc=0 :: rtk git show HEAD --format=%h:%s
+[git show-branch]
+  none:   rc=0 :: rtk git show-branch
+  narrow: rc=0 :: rtk git show-branch
+  wide:   rc=0 :: rtk git show-branch
+[git diff]
+  none:   rc=0 :: rtk git diff
+  narrow: rc=0 :: rtk git diff
+  wide:   rc=0 :: rtk git diff
+[git status]
+  none:   rc=0 :: rtk git status
+  narrow: rc=0 :: rtk git status
+  wide:   rc=0 :: rtk git status
+[git log -3]
+  none:   rc=0 :: rtk git log -3
+  narrow: rc=0 :: rtk git log -3
+  wide:   rc=0 :: rtk git log -3
+[head -3 README.md]
+  none:   rc=0 :: rtk read README.md --head-lines 3
+  narrow: rc=0 :: rtk read README.md --head-lines 3
+  wide:   rc=0 :: rtk read README.md --head-lines 3
+## rtk 0.49.0 hook check, EXCLUDE_EXPECTED (no config | narrow | wide)
+[git show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show HEAD:big.txt | tail -n 5
+[git show --no-color HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show --no-color HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git show --no-color HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show --no-color HEAD:big.txt | tail -n 5
+[git -C . show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git -C . show HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git -C . show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git -C . show HEAD:big.txt | tail -n 5
+[git show  HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show  HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git show  HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show  HEAD:big.txt | tail -n 5
+[git show<TAB>HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git show<TAB>HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git show<TAB>HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show<TAB>HEAD:big.txt | tail -n 5
+[git --no-pager show HEAD:big.txt]
+  none:   rc=0 :: rtk git --no-pager show HEAD:big.txt
+  narrow: rc=0 :: rtk git --no-pager show HEAD:big.txt
+  wide:   rc=1 :: No rewrite for: git --no-pager show HEAD:big.txt
+[git -c color.ui=never show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: rtk git -c color.ui=never show HEAD:big.txt | tail -n 5
+  narrow: rc=0 :: rtk git -c color.ui=never show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: git -c color.ui=never show HEAD:big.txt | tail -n 5
+[git show HEAD:big.txt 2>&1 | tail -n 5]
+  none:   rc=0 :: rtk git show HEAD:big.txt 2>&1 | tail -n 5
+  narrow: rc=1 :: No rewrite for: git show HEAD:big.txt 2>&1 | tail -n 5
+  wide:   rc=1 :: No rewrite for: git show HEAD:big.txt 2>&1 | tail -n 5
+[GIT_PAGER=cat git show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: GIT_PAGER=cat rtk git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: GIT_PAGER=cat git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: GIT_PAGER=cat git show HEAD:big.txt | tail -n 5
+[/usr/bin/git show HEAD:big.txt | tail -n 5]
+  none:   rc=1 :: No rewrite for: /usr/bin/git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: /usr/bin/git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: /usr/bin/git show HEAD:big.txt | tail -n 5
+[cd . && git show HEAD:big.txt | tail -n 5]
+  none:   rc=0 :: cd . && rtk git show HEAD:big.txt | tail -n 5
+  narrow: rc=1 :: No rewrite for: cd . && git show HEAD:big.txt | tail -n 5
+  wide:   rc=1 :: No rewrite for: cd . && git show HEAD:big.txt | tail -n 5
+[git show :big.txt]
+  none:   rc=0 :: rtk git show :big.txt
+  narrow: rc=1 :: No rewrite for: git show :big.txt
+  wide:   rc=1 :: No rewrite for: git show :big.txt
+[git show HEAD~1:big.txt]
+  none:   rc=0 :: rtk git show HEAD~1:big.txt
+  narrow: rc=1 :: No rewrite for: git show HEAD~1:big.txt
+  wide:   rc=1 :: No rewrite for: git show HEAD~1:big.txt
+[diff a.txt missing.txt]
+  none:   rc=0 :: rtk diff a.txt missing.txt
+  narrow: rc=1 :: No rewrite for: diff a.txt missing.txt
+  wide:   rc=1 :: No rewrite for: diff a.txt missing.txt
+## rtk 0.49.0 hook check, REWRITE_EXPECTED (no config | narrow | wide)
+[git show HEAD~2]
+  none:   rc=0 :: rtk git show HEAD~2
+  narrow: rc=0 :: rtk git show HEAD~2
+  wide:   rc=0 :: rtk git show HEAD~2
+[git show --stat HEAD]
+  none:   rc=0 :: rtk git show --stat HEAD
+  narrow: rc=0 :: rtk git show --stat HEAD
+  wide:   rc=0 :: rtk git show --stat HEAD
+[git show HEAD --format=%h:%s]
+  none:   rc=0 :: rtk git show HEAD --format=%h:%s
+  narrow: rc=0 :: rtk git show HEAD --format=%h:%s
+  wide:   rc=0 :: rtk git show HEAD --format=%h:%s
+[git show-branch]
+  none:   rc=0 :: rtk git show-branch
+  narrow: rc=0 :: rtk git show-branch
+  wide:   rc=0 :: rtk git show-branch
+[git diff]
+  none:   rc=0 :: rtk git diff
+  narrow: rc=0 :: rtk git diff
+  wide:   rc=0 :: rtk git diff
+[git status]
+  none:   rc=0 :: rtk git status
+  narrow: rc=0 :: rtk git status
+  wide:   rc=0 :: rtk git status
+[git log -3]
+  none:   rc=0 :: rtk git log -3
+  narrow: rc=0 :: rtk git log -3
+  wide:   rc=0 :: rtk git log -3
+[head -3 README.md]
+  none:   rc=0 :: rtk read README.md --max-lines 3
+  narrow: rc=0 :: rtk read README.md --max-lines 3
+  wide:   rc=0 :: rtk read README.md --max-lines 3
+## rtk 0.50.0 hook claude (PreToolUse JSON), wide config
+  [git show HEAD:big.txt | tail -n 5]                        -> SILENT(native)
+  [git show --no-color HEAD:big.txt | tail -n 5]             -> SILENT(native)
+  [git -C . show HEAD:big.txt | tail -n 5]                   -> SILENT(native)
+  [git show  HEAD:big.txt | tail -n 5]                       -> SILENT(native)
+  [git show<TAB>HEAD:big.txt | tail -n 5]                    -> SILENT(native)
+  [git --no-pager show HEAD:big.txt]                         -> SILENT(native)
+  [git -c color.ui=never show HEAD:big.txt | tail -n 5]      -> SILENT(native)
+  [git show HEAD:big.txt 2>&1 | tail -n 5]                   -> SILENT(native)
+  [GIT_PAGER=cat git show HEAD:big.txt | tail -n 5]          -> SILENT(native)
+  [/usr/bin/git show HEAD:big.txt | tail -n 5]               -> SILENT(native)
+  [cd . && git show HEAD:big.txt | tail -n 5]                -> SILENT(native)
+  [git show :big.txt]                                        -> SILENT(native)
+  [git show HEAD~1:big.txt]                                  -> SILENT(native)
+  [diff a.txt missing.txt]                                   -> SILENT(native)
+  [git show HEAD~2]                                          -> rtk git show HEAD~2
+  [git show --stat HEAD]                                     -> rtk git show --stat HEAD
+  [git show HEAD --format=%h:%s]                             -> rtk git show HEAD --format=%h:%s
+  [git show-branch]                                          -> rtk git show-branch
+  [git diff]                                                 -> rtk git diff
+  [git status]                                               -> rtk git status
+  [git log -3]                                               -> rtk git log -3
+  [head -3 README.md]                                        -> rtk read README.md --head-lines 3
+## executed through the 0.50.0 hook decision: bytes compared with native git
+  native sha256 696cf406cbd912dc92cc27ea15f1f1c7e5d7a9f853a4884269c19323d43fc809
+  none   [git show HEAD:big.txt | tail -n 5]                DIFFERS: row 0196 padding-padding-padding-padding
+  none   [git show --no-color HEAD:big.txt | tail -n 5]     DIFFERS: row 0196 padding-padding-padding-padding
+  none   [git -C . show HEAD:big.txt | tail -n 5]           DIFFERS: row 0196 padding-padding-padding-padding
+  none   [git show  HEAD:big.txt | tail -n 5]               DIFFERS: row 0196 padding-padding-padding-padding
+  narrow [git show HEAD:big.txt | tail -n 5]                == native
+  narrow [git show --no-color HEAD:big.txt | tail -n 5]     DIFFERS: row 0196 padding-padding-padding-padding
+  narrow [git -C . show HEAD:big.txt | tail -n 5]           DIFFERS: row 0196 padding-padding-padding-padding
+  narrow [git show  HEAD:big.txt | tail -n 5]               DIFFERS: row 0196 padding-padding-padding-padding
+  wide   [git show HEAD:big.txt | tail -n 5]                == native
+  wide   [git show --no-color HEAD:big.txt | tail -n 5]     == native
+  wide   [git -C . show HEAD:big.txt | tail -n 5]           == native
+  wide   [git show  HEAD:big.txt | tail -n 5]               == native
+## explicit rtk invocation is outside exclude_commands (wide config)
+  [rtk git show HEAD:big.txt | tail -n 5] DIFFERS from native:
+    row 0196 padding-padding-padding-padding
+    row 0197 padding-padding-padding-padding
+    row 0198 padding-padding-padding-padding
+    row 0199 padding-padding-padding-padding
+    ... (+3801 lines) [see remaining: rtk proxy git show 'HEAD:big.txt' | tail -n +200]
+  hook check of an explicit rtk command: rc=1 :: No rewrite for: rtk git show HEAD:big.txt | tail -n 5
+  [rtk proxy git show HEAD:big.txt | tail -n 5] == native
+## diff on a missing file, wide config: executed natively
+  hook -> SILENT(native)
+  native rc=2

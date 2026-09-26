@@ -553,6 +553,76 @@
       "bytes": 973,
       "byte_identical_to_run_copy": false,
       "run_copy": "writing worker read-back (read-only), rtk section"
+    },
+    {
+      "path": "mitigation-20260926.sh",
+      "sha256": "7641374fad732e2e4ae878ab38d60892c2751a3b6364b86f0386ac798130beb8",
+      "bytes": 6715,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/mitigation-20260926.sh"
+    },
+    {
+      "path": "out/mitigation-20260926.out",
+      "sha256": "2e0c4cf0e205a32fec38264e93d2bd78aeb1b4d3e5c71f8e8da79a46b920c0c3",
+      "bytes": 13126,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/mitigation-20260926.out"
+    },
+    {
+      "path": "readback-20260926.sh",
+      "sha256": "ce65ba66693a094ec772ec4c38ae74d5a7180fbe63a0159c7a06564a3a885e52",
+      "bytes": 1582,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/readback-20260926.sh"
+    },
+    {
+      "path": "out/readback-20260926.out",
+      "sha256": "f9d6855398540b004dd80dd98ff300217ed4d3aab1767ca87fc3a8e34ee46d71",
+      "bytes": 1450,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/readback-20260926.out"
+    },
+    {
+      "path": "config-rejection-20260926.sh",
+      "sha256": "206591461ee80a992654101107549663ff7431d929ec6976923518d173446586",
+      "bytes": 1857,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/config-rejection-20260926.sh"
+    },
+    {
+      "path": "out/config-rejection-20260926.out",
+      "sha256": "f916e54b6b014a2486c0d10ec1e909e2ae9c1ad7d06f49481a35597479d79347",
+      "bytes": 1559,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/config-rejection-20260926.out"
+    },
+    {
+      "path": "reminder-readback-20260926.sh",
+      "sha256": "edead34b44652dd89e9543998af6be81d7f1e020b6e1c5be1a515d75f39a9e72",
+      "bytes": 802,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/reminder-readback-20260926.sh"
+    },
+    {
+      "path": "out/reminder-readback-20260926.out",
+      "sha256": "3a2ea52e494fc7707196943412d28d4d21a74f058179fd874b1558f94c5bf625",
+      "bytes": 226,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/reminder-readback-20260926.out"
+    },
+    {
+      "path": "combined-reminder-20260926.sh",
+      "sha256": "394f214cb8fa34bb0054f46d2f964f00739df8993f207db0bb6c320faf26d9c0",
+      "bytes": 3443,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/combined-reminder-20260926.sh"
+    },
+    {
+      "path": "out/combined-reminder-20260926.out",
+      "sha256": "7a14d3f6fea8d885bfa181211520e4df5ece422d7f5dc1dd056dc8d68b3ea7de",
+      "bytes": 2368,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/rtkfix/combined-reminder-20260926.out"
     }
   ],
   "integrity": {
@@ -836,6 +906,60 @@
       "pass": true,
       "observed_by": "writing_worker",
       "output_file": "out/readback.out"
+    },
+    {
+      "name": "2026-09-26 widened exclude_commands re-test (scratch XDG_CONFIG_HOME, never ~/.config/rtk)",
+      "arm": "both",
+      "command": "bash <scratchpad>/rtkfix/mitigation-20260926.sh   (no config | 2026-09-25 ['^git show [^ ]*:', \"diff\"] | 2026-09-26 ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', \"diff\"])",
+      "exit": 0,
+      "output_excerpt": "rtk hook check, on 0.50.0 and on 0.49.0 alike:\n- 14 blob-read and diff spellings: no config excludes 1 (/usr/bin/git show, which is never rewritten), the 2026-09-25 pattern excludes 8, the widened pattern excludes 14. The 2026-09-25 pattern still rewrote `git show --no-color HEAD:big.txt`, `git -C . show HEAD:big.txt`, `git show  HEAD:big.txt` (two spaces), `git show<TAB>HEAD:big.txt`, `git --no-pager show HEAD:big.txt` and `git -c color.ui=never show HEAD:big.txt`.\n- 8 other commands (`git show HEAD~2`, `git show --stat HEAD`, `git show HEAD --format=%h:%s`, `git show-branch`, `git diff`, `git status`, `git log -3`, `head -3 README.md`) are rewritten under all three configs.\n\nrtk hook claude (PreToolUse JSON), 0.50.0, widened config: the same 14 are SILENT (native) and the same 8 are rewritten.\n\nExecuted `... | tail -n 5` through the 0.50.0 hook decision against native git (sha256 696cf406...): no config differs 4 of 4; the 2026-09-25 pattern matches only plain `git show HEAD:big.txt` and differs for --no-color, -C . and two spaces; the widened pattern matches 4 of 4.\n\nAn explicit `rtk git show HEAD:big.txt | tail -n 5` still windows the blob under the widened config (rows 0196-0199 plus a '[see remaining: rtk proxy git show ...]' hint); `rtk proxy git show` equals native. diff on a missing file runs natively and exits 2.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/mitigation-20260926.out",
+      "label": "An alternative single-regex pattern that was tested; the adopted recipe is #318's four-entry set (recipes/README.md#native-context-mode-and-hooks)."
+    },
+    {
+      "name": "2026-09-26 read-back of the widened host config (read-only)",
+      "arm": "production",
+      "command": "bash <scratchpad>/rtkfix/readback-20260926.sh   (tomllib parse of ~/.config/rtk/config.toml; rtk hook check with scratch RTK_DB_PATH)",
+      "exit": 0,
+      "output_excerpt": "bin/rtk -> tools/rtk-0.50.0/rtk (rtk 0.50.0). The coordinator replaced ~/.config/rtk/config.toml on 2026-09-26 (the earlier file is kept beside it as config.toml.bak-20260926-narrow). tomllib reads [hooks].exclude_commands as the widened regex, exactly, plus 'diff'. rtk hook check exits 1 (No rewrite for) for `git show HEAD:x | tail -n 5`, `git show --no-color HEAD:x | tail -n 5`, `git -C . show HEAD:x | tail -n 5`, `git show  HEAD:x | tail -n 5`, `git --no-pager show HEAD:x`, `git show :x` and `diff a missing`, and exits 0 (rewritten) for `git show HEAD~2`, `git show --stat HEAD`, `git show HEAD --format=%h:%s`, `git show-branch`, `git diff`, `git status`, `git log -3` and `head -3 README.md` (`rtk read README.md --head-lines 3`).",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/readback-20260926.out",
+      "label": "An alternative single-regex pattern that was tested; the adopted recipe is #318's four-entry set (recipes/README.md#native-context-mode-and-hooks)."
+    },
+    {
+      "name": "2026-09-26 a TOML-valid config that rtk ignores (scratch XDG_CONFIG_HOME, never ~/.config/rtk)",
+      "arm": "candidate",
+      "command": "bash <scratchpad>/rtkfix/config-rejection-20260926.sh   (0.50.0 `rtk hook check` on the bootstrap reminder's three probes)",
+      "exit": 0,
+      "output_excerpt": "All three files are valid TOML and list both entries (tomllib). The recommended file: all three probes 'No rewrite for', exit 1. The same file plus `[tracking] enabled = false`: all three probes rewritten (`rtk git show HEAD:x | tail -n 5`, `rtk git -C . show --no-color HEAD:x | tail -n 5`, `rtk diff a missing`), exit 0, with no warning, because TrackingConfig has no default for history_days (src/core/config.rs:152-158 at 1d87b8e7) and cached_config() falls back to Config::default() (config.rs:261-281). Adding `history_days = 90`: all three 'No rewrite for', exit 1 again. Found by the Codex review of #314.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/config-rejection-20260926.out",
+      "label": "Run with the single-regex alternative as the base; out/combined-reminder-20260926.out repeats the rejection with #318's four-entry block."
+    },
+    {
+      "name": "2026-09-26 bootstrap reminder read-back through rtk (read-only)",
+      "arm": "production",
+      "command": "bash <scratchpad>/rtkfix/reminder-readback-20260926.sh adoption/bootstrap-linux.sh   (rtk_config_reminder extracted verbatim, run with this host's bin/rtk and environment)",
+      "exit": 0,
+      "output_excerpt": "rtk 0.50.0 at bin/rtk; ~/.config/rtk/config.toml; the reminder prints nothing, so every probe answered 'No rewrite for' with exit 1. `rtk hook check` writes no file (checked separately under an empty HOME).",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/reminder-readback-20260926.out",
+      "label": "Ran the pre-reconciliation reminder (behavioural check only) while this host held the single-regex config; out/combined-reminder-20260926.out part 3 runs the combined reminder against #318's block."
+    },
+    {
+      "name": "2026-09-26 combined reminder (#318 text check plus #314 rtk hook check) with #318's four-entry block",
+      "arm": "both",
+      "command": "bash <scratchpad>/rtkfix/combined-reminder-20260926.sh adoption/bootstrap-linux.sh   (scratch XDG_CONFIG_HOME and bin_dir for parts 1-2; part 3 read-only with this host's environment)",
+      "exit": 0,
+      "output_excerpt": "Part 1, rtk hook check on the five probes: #318's block excludes all five (exit 1); the same block plus `[tracking] enabled = false` has all five rewritten (exit 0), because TrackingConfig needs history_days; adding `history_days = 90` excludes all five again. Part 2, the extracted reminder: silent for #318's block and for the block with history_days; reminds with the 'rtk ignores a config it cannot load' hint for the [tracking] block without history_days (text passes, rtk fails); reminds without the hint for the single-regex alternative, the 2026-09-25 two-entry line and a missing file (text fails). Part 3: silent on this host, whose config holds #318's block.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/combined-reminder-20260926.out"
     }
   ],
   "differences": [
@@ -880,6 +1004,21 @@
       "corrected": "0.49.0 rtk gain --history and --all (including --all --format json|csv) show 18446744073709551116 or '18446744073709.6M', while plain rtk gain and rtk gain --format json show none (out/negrow.out lines 1-2) and 0.50.0 clamps to 0.",
       "by": "2026-09-25 repair round (independent review, needs_changes)",
       "reason": "Same correction as switch.rollback."
+    },
+    {
+      "field": "switch.host_config.content",
+      "original": "[hooks]\nexclude_commands = [\"^git show [^ ]*:\", \"diff\"]\n",
+      "corrected": "[hooks]\nexclude_commands = ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', \"diff\"]\n",
+      "by": "2026-09-26 post-merge cross-family review (Codex) of #291, needs_changes; the coordinator changed the host config and the writing worker re-tested and read it back",
+      "reason": "rtk 0.50.0 tests an exclude_commands entry that starts with ^ as a raw Rust regex with is_match against each command segment, and turns any other entry into ^<escaped entry>($|\\s) (src/discover/registry.rs:1540-1569 and 1599-1604 at tag commit 1d87b8e7). '^git show [^ ]*:' therefore needs exactly one space and no option before the <rev>:<path> word, so `git show --no-color HEAD:x`, `git -C . show HEAD:x`, `git show  HEAD:x` and `git --no-pager show HEAD:x` were still rewritten into the blob window (out/mitigation-20260926.out). The widened regex excluded all 14 blob-read and diff spellings tested and left the 8 other commands rewritten (out/mitigation-20260926.out, out/readback-20260926.out). The switch.host_config, step 13 and step 23 records keep the 2026-09-25 text as history.",
+      "superseded": "Later on 2026-09-26 #318 adopted a four-entry exclude_commands set (recipes/README.md), and the coordinator replaced this host's config with it; the single regex above is an alternative pattern that was tested, not the adopted recipe (out/combined-reminder-20260926.out part 3 reads the host with #318's block)."
+    },
+    {
+      "field": "adoption/bootstrap-linux.sh rtk_config_reminder (2026-09-26 tomllib check)",
+      "original": "The reminder stayed silent when a tomllib parse found both exact entries in [hooks].exclude_commands.",
+      "corrected": "Reconciled with #318: the reminder stays silent only when #318's text check passes (the exact four-entry exclude_commands key, exactly once) and the installed rtk answers `rtk hook check` with 'No rewrite for: <probe>' and exit 1 for `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a` and `git -C . branch`, under the caller's environment; either check failing prints the reminder, and a text pass with an rtk failure adds a hint naming the probe.",
+      "by": "2026-09-26 cross-family review (Codex) of #314, needs_changes (P2); the writing worker changed the check and re-tested it",
+      "reason": "A TOML-valid file listing both entries can still be ignored by rtk: with `[tracking] enabled = false` and no history_days, 0.50.0 rewrote every probe (out/config-rejection-20260926.out)."
     }
   ],
   "verifier": {

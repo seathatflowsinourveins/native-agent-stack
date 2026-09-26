@@ -94,6 +94,247 @@
       "bytes": 463,
       "byte_identical_to_run_copy": false,
       "run_copy": "writing worker read-back (read-only), markitdown section"
+    },
+    {
+      "path": "verify_installed.py",
+      "sha256": "b458645247c70ef6a3a15250aa91f916eaf33dbe5e7e6e89255546efa20e72a2",
+      "bytes": 1998,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/verify_installed.py"
+    },
+    {
+      "path": "run-candidate/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "bytes": 5610,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-candidate/8k.md"
+    },
+    {
+      "path": "run-candidate/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "bytes": 5611,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-candidate/8k.stdout.md"
+    },
+    {
+      "path": "run-candidate/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "bytes": 314,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-candidate/disc.html"
+    },
+    {
+      "path": "run-candidate/disc.md",
+      "sha256": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "bytes": 117,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-candidate/disc.md"
+    },
+    {
+      "path": "run-candidate/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-candidate/greeting.md"
+    },
+    {
+      "path": "run-candidate/pdf.err",
+      "sha256": "d09a6d2024d35a82e14a7d41258346cf720d40b5b29901c59d0c474df726de6b",
+      "bytes": 1810,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "ec536842e55cdf4aaac5c1e6d0647b3f693fbe9f8ba3c5c82b38caebda0b9fbb",
+      "publication_edit": "The home directory is replaced by ~; no other byte changed.",
+      "run_copy": "$IMPL/run-candidate/pdf.err"
+    },
+    {
+      "path": "run-candidate/pip-list.txt",
+      "sha256": "7791af4ec9924445fce6ac964903dbfd858c14d7196571f59d1f1331860c50e3",
+      "bytes": 566,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-candidate/pip-list.txt"
+    },
+    {
+      "path": "run-baseline/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "bytes": 5610,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-baseline/8k.md"
+    },
+    {
+      "path": "run-baseline/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "bytes": 5611,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-baseline/8k.stdout.md"
+    },
+    {
+      "path": "run-baseline/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "bytes": 314,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-baseline/disc.html"
+    },
+    {
+      "path": "run-baseline/disc.md",
+      "sha256": "177abc325d9996496390b3df367eec90f1a5ef2b8bb0d5d59b407a0ab09cec1d",
+      "bytes": 99,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-baseline/disc.md"
+    },
+    {
+      "path": "run-baseline/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-baseline/greeting.md"
+    },
+    {
+      "path": "run-baseline/pdf.err",
+      "sha256": "ae7c22a71a9e40153328d044822f0e7dc201f54828253b8504862a79db900634",
+      "bytes": 1711,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "9269d92a07ac3d9ba97eb05d67d7bda2963605bfdf184645d2bce37ccda9d465",
+      "publication_edit": "The home directory is replaced by ~; no other byte changed.",
+      "run_copy": "$IMPL/run-baseline/pdf.err"
+    },
+    {
+      "path": "run-baseline/pip-list.txt",
+      "sha256": "cbe120b35b622e6a96a1f9dfb2bbffaeedc2c99ba750cf5ccb5a313fb60082ba",
+      "bytes": 566,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-baseline/pip-list.txt"
+    },
+    {
+      "path": "run-postswitch2/8k.md",
+      "sha256": "b434cd315ba0da36730ad1fc4c035692d3570ccd444e122d179da75d2e554977",
+      "bytes": 5610,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-postswitch2/8k.md"
+    },
+    {
+      "path": "run-postswitch2/8k.stdout.md",
+      "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+      "bytes": 5611,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-postswitch2/8k.stdout.md"
+    },
+    {
+      "path": "run-postswitch2/disc.html",
+      "sha256": "932d7f622c511667e6ae4c745a05c24184c5009450824a84b58485f17b8c879e",
+      "bytes": 314,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-postswitch2/disc.html"
+    },
+    {
+      "path": "run-postswitch2/disc.md",
+      "sha256": "66a75a8cfa9cf61e0224f43680c915f40805b8a761ce809dc28ec5bc0ef76629",
+      "bytes": 117,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-postswitch2/disc.md"
+    },
+    {
+      "path": "run-postswitch2/greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-postswitch2/greeting.md"
+    },
+    {
+      "path": "run-postswitch2/pdf.err",
+      "sha256": "10b7f75fa14a73ab6f322b91363696f01fae5adc647d6e9d64500bf435096715",
+      "bytes": 1787,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "072e2684c8aec9a5b746f0d264fbfdd9a69d11bf2c05da9d47d1b32ad1c85b4d",
+      "publication_edit": "The home directory is replaced by ~; no other byte changed.",
+      "run_copy": "$IMPL/run-postswitch2/pdf.err"
+    },
+    {
+      "path": "run-postswitch2/pip-list.txt",
+      "sha256": "7791af4ec9924445fce6ac964903dbfd858c14d7196571f59d1f1331860c50e3",
+      "bytes": 566,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/run-postswitch2/pip-list.txt"
+    },
+    {
+      "path": "verify/independent_integrity.py",
+      "sha256": "40b23fa37f0cb2f90ac1379a54b2666d66f26a45d9281ad3fb7450a21e618cb0",
+      "bytes": 4785,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/verify/independent_integrity.py"
+    },
+    {
+      "path": "verify/independent-integrity.json",
+      "sha256": "ab672372fe48cc139e76ef7f974cc004ca9c90c0431a24bee377b546adfb38a4",
+      "bytes": 1241,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/verify/independent-integrity.json"
+    },
+    {
+      "path": "verify/legs_record.sh",
+      "sha256": "13e5fbb556da2c5d93cad6db37d3dbc4bff357ece146ff87f69a0cecf4404ae5",
+      "bytes": 3225,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/verify/legs_record.sh"
+    },
+    {
+      "path": "verify/legs-candidate.log",
+      "sha256": "5528957943476a7bbad52f6c98f21d7e881b5dab8d332eccfe422d1c6e558333",
+      "bytes": 1407,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "a3975b250f97f1af996e622453336f89c906c59fd8e25e59c19fb790b5bdda70",
+      "publication_edit": "The home directory is replaced by ~; no other byte changed.",
+      "run_copy": "$IMPL/verify/legs-candidate.log"
+    },
+    {
+      "path": "verify/legs-baseline.log",
+      "sha256": "6134751a81da70ebc08659a50a4c1feaf8499df553870f10901164940c171fa4",
+      "bytes": 1426,
+      "byte_identical_to_run_copy": false,
+      "run_copy_sha256": "d87b4a641c38a8782fe43f8c8189f4c5e6f644adc2f7505e88a1a55e1b0f31d4",
+      "publication_edit": "The home directory is replaced by ~; no other byte changed.",
+      "run_copy": "$IMPL/verify/legs-baseline.log"
+    },
+    {
+      "path": "verify/run-candidate/checker.out",
+      "sha256": "986c5993e4d3b41c9d5b370eab103725c994a5eddbc7acb920a0aa40e9f4dcf4",
+      "bytes": 233,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/verify/run-candidate/checker.out"
+    },
+    {
+      "path": "verify/run-baseline/checker.out",
+      "sha256": "5f4c1ec58575d16a53005c2e164b6355602695b15045b8e7ff4312e00560d342",
+      "bytes": 233,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "$IMPL/verify/run-baseline/checker.out"
+    },
+    {
+      "path": "installed_files.py",
+      "sha256": "9cbdca1a222bf05d1c4eda0d8b70dd602e1938ee84dfbfcc018e0180c396016c",
+      "bytes": 2560,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/mdfix/installed_files.py"
+    },
+    {
+      "path": "out/verify-installed-rerun-20260926.out",
+      "sha256": "cb2f3ec303d9ef4b38925304ea67be05730913e4f6e24af68fd6405f187b75e8",
+      "bytes": 563,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/mdfix/verify-installed-rerun-20260926.out"
+    },
+    {
+      "path": "out/installed-files-20260926.json",
+      "sha256": "c7632e1008c75c6ab0a8de62eb1498d9ee279e70664af0daa8a46a20b5d58105",
+      "bytes": 13669,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/mdfix/installed-files-20260926.json"
+    },
+    {
+      "path": "out/checker-rerun-20260926.out",
+      "sha256": "12909ca549d3753ca7872d629aad19aacef4f5a80806af65d1f241851b96a1b2",
+      "bytes": 853,
+      "byte_identical_to_run_copy": true,
+      "run_copy": "<scratchpad>/mdfix/checker-rerun-20260926.out"
     }
   ],
   "not_published": [
@@ -544,6 +785,36 @@
       "pass": true,
       "observed_by": "writing_worker",
       "output_file": "out/readback.out"
+    },
+    {
+      "name": "2026-09-26 re-run: installed files vs the hash-verified wheel (read-only)",
+      "arm": "production",
+      "command": "python3 -B <impl>/verify_installed.py <impl>/artifacts/markitdown-0.1.8-py3-none-any.whl ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages   (wheel sha256 de7375a5... re-hashed first)",
+      "exit": 0,
+      "output_excerpt": "wheel_members=46 record_entries_checked=45 record_mismatches=0; installed_identical=45 installed_differs=0 installed_missing=0 (RECORD excluded); installer_added_distinfo_files=INSTALLER,REQUESTED. The same script and wheel as step 2, run on the production prefix (bin/markitdown resolves into tools/markitdown-0.1.8 after the prefix flip), so it shows the installed bytes still equal the wheel on 2026-09-26; it is not the 2026-09-25 output.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/verify-installed-rerun-20260926.out"
+    },
+    {
+      "name": "2026-09-26 per-file listing: wheel RECORD digest, wheel member digest and installed digest for every member (read-only)",
+      "arm": "production",
+      "command": "python3 -B installed_files.py <impl>/artifacts/markitdown-0.1.8-py3-none-any.whl ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages > out/installed-files-20260926.json",
+      "exit": 0,
+      "output_excerpt": "46 members, 45 compared (RECORD is rewritten by the installer and listed only), 45 identical; every wheel member's digest equals its RECORD row; installer_added_distinfo_files INSTALLER, REQUESTED. Each row's digests are in RECORD form, so they can be checked against the RECORD of the PyPI wheel without host access.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/installed-files-20260926.json"
+    },
+    {
+      "name": "2026-09-26 re-run: check_outputs.py on the retained run directories",
+      "arm": "both",
+      "command": "python3 -B check_outputs.py run-candidate; python3 -B check_outputs.py run-baseline; python3 -B check_outputs.py run-postswitch2   (in this artifact directory)",
+      "exit": 0,
+      "output_excerpt": "run-candidate: 12 PASS, exit 0. run-baseline: 8 PASS, FAIL v018_underline, v018_encoded_slash, v018_strike and v018_data_src, exit 1. run-postswitch2: 12 PASS, exit 0. These are the raw lines behind run_arm.py's L8 counts (steps 11, 21 and 39). The retained greeting.md, 8k.md, 8k.stdout.md, disc.html and disc.md of each directory hash to the values recorded in steps-candidate.json, steps-baseline.json and postswitch-out.json.",
+      "pass": true,
+      "observed_by": "writing_worker",
+      "output_file": "out/checker-rerun-20260926.out"
     }
   ],
   "differences": [
@@ -618,5 +889,31 @@
     "How a later install_pin run interacts with a prefix-flipped bin/markitdown symlink was not tested.",
     "The output effect on real filings containing <u>, <strike>, path %2F escapes or data-src images was not measured; the committed corpus has none in affected positions.",
     "The timing comparison is 3 runs per arm on a shared host; treat those numbers as run-to-run observations only."
+  ],
+  "corrections": [
+    {
+      "field": "steps[2]",
+      "original": "The step named $IMPL/verify_installed.py and gave only its summary line; neither the script nor its output was retained.",
+      "corrected": "verify_installed.py is now retained byte-identical. Its 2026-09-25 stdout was printed to the terminal and only the summary line in output_excerpt was kept, so that output is not retained (not_retained[0]). Two independent records support the 45-of-45 figure: the independent verifier's verify/independent_integrity.py and verify/independent-integrity.json from 2026-09-25 (wheel_vs_installed identical 45, differ 0, missing 0), and the 2026-09-26 re-run of the same script plus a per-file listing on the production prefix (out/verify-installed-rerun-20260926.out, out/installed-files-20260926.json).",
+      "by": "2026-09-26 post-merge cross-family review (Codex) of #291, needs_changes; retained by the writing worker",
+      "reason": "The review found the installed-byte claim without its verifier or per-file evidence."
+    },
+    {
+      "field": "steps[11], steps[21], steps[39] (run_arm.py L8)",
+      "original": "run_arm.py reduces check_outputs.py's stdout to PASS/FAIL counts (run_arm.py lines 123-129), and the run directories holding the converted documents, PDF stderr and package listings were not retained.",
+      "corrected": "run-candidate/, run-baseline/ and run-postswitch2/ are now retained; each pdf.err has the home directory replaced by ~, and every other file is byte-identical. run_arm.py never saved the checker's raw stdout (not_retained[1]). out/checker-rerun-20260926.out is the retained byte-identical check_outputs.py re-run on those directories, and verify/run-candidate/checker.out and verify/run-baseline/checker.out are the independent verifier's raw checker output from its own 2026-09-25 legs run (verify/legs_record.sh, verify/legs-*.log).",
+      "by": "2026-09-26 post-merge cross-family review (Codex) of #291, needs_changes; retained by the writing worker",
+      "reason": "The review found the checker summaries without the directories and raw output behind them."
+    }
+  ],
+  "not_retained": [
+    {
+      "what": "The 2026-09-25 stdout of verify_installed.py (step 2)",
+      "reason": "It was printed to the terminal and never written to a file; only the summary line in steps[2].output_excerpt survives. The 2026-09-26 re-run output is a new observation, not a copy of it."
+    },
+    {
+      "what": "The raw check_outputs.py stdout of run_arm.py's L8 legs for run-candidate, run-baseline and run-postswitch2",
+      "reason": "run_arm.py captured it in memory and kept only the counts. out/checker-rerun-20260926.out re-derives it from the retained directories; the checker reads only greeting.md, 8k.md and disc.md, which are byte-identical to the run copies."
+    }
   ]
 }

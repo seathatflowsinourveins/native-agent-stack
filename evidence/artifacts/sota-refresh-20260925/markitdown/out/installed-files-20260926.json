@@ -1,0 +1,335 @@
+{
+ "wheel": "markitdown-0.1.8-py3-none-any.whl",
+ "wheel_sha256": "de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab",
+ "members": 46,
+ "compared": 45,
+ "identical": 45,
+ "installer_added_distinfo_files": [
+  "INSTALLER",
+  "REQUESTED"
+ ],
+ "files": [
+  {
+   "path": "markitdown-0.1.8.dist-info/METADATA",
+   "record": "sha256=vsZ4T0bjDek8sEBztAB6_iLLNfAXmj7v4NrGMRyNHBY",
+   "wheel_member": "sha256=vsZ4T0bjDek8sEBztAB6_iLLNfAXmj7v4NrGMRyNHBY",
+   "installed": "sha256=vsZ4T0bjDek8sEBztAB6_iLLNfAXmj7v4NrGMRyNHBY",
+   "identical": true
+  },
+  {
+   "path": "markitdown-0.1.8.dist-info/RECORD",
+   "record": "",
+   "wheel_member": "sha256=jNWkF_57JZJzYYzM_M721lfwiYb2j5LKMfCSgONmROg",
+   "installed": "sha256=rUciCLW4ewu6NOkEDeO2LCiJELY72-ApVrMN8VxHDug",
+   "compared": false
+  },
+  {
+   "path": "markitdown-0.1.8.dist-info/WHEEL",
+   "record": "sha256=zOwg4jB6zX2kU910N-cMawjivD6tO8NEWvE12je1bVk",
+   "wheel_member": "sha256=zOwg4jB6zX2kU910N-cMawjivD6tO8NEWvE12je1bVk",
+   "installed": "sha256=zOwg4jB6zX2kU910N-cMawjivD6tO8NEWvE12je1bVk",
+   "identical": true
+  },
+  {
+   "path": "markitdown-0.1.8.dist-info/entry_points.txt",
+   "record": "sha256=xqMYlPvoIIb-m-bHErs3uvO8WNyPa1IXUJu8GejWZj8",
+   "wheel_member": "sha256=xqMYlPvoIIb-m-bHErs3uvO8WNyPa1IXUJu8GejWZj8",
+   "installed": "sha256=xqMYlPvoIIb-m-bHErs3uvO8WNyPa1IXUJu8GejWZj8",
+   "identical": true
+  },
+  {
+   "path": "markitdown/__about__.py",
+   "record": "sha256=7PZiu3RDgZ7W88A68Y5Wpsx3wg3eg9pnc4nhSEKmdcI",
+   "wheel_member": "sha256=7PZiu3RDgZ7W88A68Y5Wpsx3wg3eg9pnc4nhSEKmdcI",
+   "installed": "sha256=7PZiu3RDgZ7W88A68Y5Wpsx3wg3eg9pnc4nhSEKmdcI",
+   "identical": true
+  },
+  {
+   "path": "markitdown/__init__.py",
+   "record": "sha256=uiivuQwlaR7kanhotWU2mwTlBzSE_B4iTX6tTY7Z9TM",
+   "wheel_member": "sha256=uiivuQwlaR7kanhotWU2mwTlBzSE_B4iTX6tTY7Z9TM",
+   "installed": "sha256=uiivuQwlaR7kanhotWU2mwTlBzSE_B4iTX6tTY7Z9TM",
+   "identical": true
+  },
+  {
+   "path": "markitdown/__main__.py",
+   "record": "sha256=eC8MJKkn-l1inz9mx7GJGmVyOejM6v3NCWiYXHNYJFo",
+   "wheel_member": "sha256=eC8MJKkn-l1inz9mx7GJGmVyOejM6v3NCWiYXHNYJFo",
+   "installed": "sha256=eC8MJKkn-l1inz9mx7GJGmVyOejM6v3NCWiYXHNYJFo",
+   "identical": true
+  },
+  {
+   "path": "markitdown/_base_converter.py",
+   "record": "sha256=O5z76GvCr09_IwQuYOrM9ejZ34ZtijWnfQBnLqtSAuY",
+   "wheel_member": "sha256=O5z76GvCr09_IwQuYOrM9ejZ34ZtijWnfQBnLqtSAuY",
+   "installed": "sha256=O5z76GvCr09_IwQuYOrM9ejZ34ZtijWnfQBnLqtSAuY",
+   "identical": true
+  },
+  {
+   "path": "markitdown/_exceptions.py",
+   "record": "sha256=XpJ-wuKq9-7uG7-oRf_4J2OliSzNjG4gRrEq-erh4gY",
+   "wheel_member": "sha256=XpJ-wuKq9-7uG7-oRf_4J2OliSzNjG4gRrEq-erh4gY",
+   "installed": "sha256=XpJ-wuKq9-7uG7-oRf_4J2OliSzNjG4gRrEq-erh4gY",
+   "identical": true
+  },
+  {
+   "path": "markitdown/_markitdown.py",
+   "record": "sha256=EfJR8qO7Z9nUvlXRKXDGyEOBEqai-EHz6UvKx0ABr7A",
+   "wheel_member": "sha256=EfJR8qO7Z9nUvlXRKXDGyEOBEqai-EHz6UvKx0ABr7A",
+   "installed": "sha256=EfJR8qO7Z9nUvlXRKXDGyEOBEqai-EHz6UvKx0ABr7A",
+   "identical": true
+  },
+  {
+   "path": "markitdown/_stream_info.py",
+   "record": "sha256=A5vOfp0MXmKm7VWsYTPn-lMNcCWi7YNy41U4sHL2298",
+   "wheel_member": "sha256=A5vOfp0MXmKm7VWsYTPn-lMNcCWi7YNy41U4sHL2298",
+   "installed": "sha256=A5vOfp0MXmKm7VWsYTPn-lMNcCWi7YNy41U4sHL2298",
+   "identical": true
+  },
+  {
+   "path": "markitdown/_uri_utils.py",
+   "record": "sha256=ay6GcFpEnDFxh4EEzsr_p1L_IzX30IgIUJPBNxEt18E",
+   "wheel_member": "sha256=ay6GcFpEnDFxh4EEzsr_p1L_IzX30IgIUJPBNxEt18E",
+   "installed": "sha256=ay6GcFpEnDFxh4EEzsr_p1L_IzX30IgIUJPBNxEt18E",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/__init__.py",
+   "record": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "wheel_member": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "installed": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/_image.py",
+   "record": "sha256=ih6A-0h-IkCnStfrzLHyumsqx1FZD82kUbC0sKh0lnI",
+   "wheel_member": "sha256=ih6A-0h-IkCnStfrzLHyumsqx1FZD82kUbC0sKh0lnI",
+   "installed": "sha256=ih6A-0h-IkCnStfrzLHyumsqx1FZD82kUbC0sKh0lnI",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/_xlsx_images.py",
+   "record": "sha256=b3VWmY1FmQYyhq9pvgy7_xI6X5mjjLMSKcLN-F90C0w",
+   "wheel_member": "sha256=b3VWmY1FmQYyhq9pvgy7_xI6X5mjjLMSKcLN-F90C0w",
+   "installed": "sha256=b3VWmY1FmQYyhq9pvgy7_xI6X5mjjLMSKcLN-F90C0w",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/docx/__init__.py",
+   "record": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "wheel_member": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "installed": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/docx/_images.py",
+   "record": "sha256=PNmsvUb32i4FjnmdXL4Xms1EGt2Rj2B8LBTXEdAZb0E",
+   "wheel_member": "sha256=PNmsvUb32i4FjnmdXL4Xms1EGt2Rj2B8LBTXEdAZb0E",
+   "installed": "sha256=PNmsvUb32i4FjnmdXL4Xms1EGt2Rj2B8LBTXEdAZb0E",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/docx/math/__init__.py",
+   "record": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "wheel_member": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "installed": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/docx/math/latex_dict.py",
+   "record": "sha256=Ds-yWxNzc2ka0P-eLokMgujm0EAluseoU_4J9m-cP14",
+   "wheel_member": "sha256=Ds-yWxNzc2ka0P-eLokMgujm0EAluseoU_4J9m-cP14",
+   "installed": "sha256=Ds-yWxNzc2ka0P-eLokMgujm0EAluseoU_4J9m-cP14",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/docx/math/omml.py",
+   "record": "sha256=tWX7T_rvKLPUYX3xNnAIYeXmpz4b7s1kmbYTOcd1_VY",
+   "wheel_member": "sha256=tWX7T_rvKLPUYX3xNnAIYeXmpz4b7s1kmbYTOcd1_VY",
+   "installed": "sha256=tWX7T_rvKLPUYX3xNnAIYeXmpz4b7s1kmbYTOcd1_VY",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converter_utils/docx/pre_process.py",
+   "record": "sha256=wnhlE8TwSs2XMfkh5OZgKsOGhaIwyiumxkiTYggHP08",
+   "wheel_member": "sha256=wnhlE8TwSs2XMfkh5OZgKsOGhaIwyiumxkiTYggHP08",
+   "installed": "sha256=wnhlE8TwSs2XMfkh5OZgKsOGhaIwyiumxkiTYggHP08",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/__init__.py",
+   "record": "sha256=HX1C9kUeUHCfLXQaWBRgLEYR1Dk7ntRJYuiy61WxUx4",
+   "wheel_member": "sha256=HX1C9kUeUHCfLXQaWBRgLEYR1Dk7ntRJYuiy61WxUx4",
+   "installed": "sha256=HX1C9kUeUHCfLXQaWBRgLEYR1Dk7ntRJYuiy61WxUx4",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_audio_converter.py",
+   "record": "sha256=AvJm5vtom83LJh-TFOKxXNX3SnNazMk_9ptkrYyZ6XU",
+   "wheel_member": "sha256=AvJm5vtom83LJh-TFOKxXNX3SnNazMk_9ptkrYyZ6XU",
+   "installed": "sha256=AvJm5vtom83LJh-TFOKxXNX3SnNazMk_9ptkrYyZ6XU",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_bing_serp_converter.py",
+   "record": "sha256=3LOp9AD93kYa6UY7vut2GB1eaSnAoBjjYcOY918zHj8",
+   "wheel_member": "sha256=3LOp9AD93kYa6UY7vut2GB1eaSnAoBjjYcOY918zHj8",
+   "installed": "sha256=3LOp9AD93kYa6UY7vut2GB1eaSnAoBjjYcOY918zHj8",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_csv_converter.py",
+   "record": "sha256=cckPABGFDAZU-LkKtfL6JzpKuQ9S2T65OBWdWWHVSE8",
+   "wheel_member": "sha256=cckPABGFDAZU-LkKtfL6JzpKuQ9S2T65OBWdWWHVSE8",
+   "installed": "sha256=cckPABGFDAZU-LkKtfL6JzpKuQ9S2T65OBWdWWHVSE8",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_cu_converter.py",
+   "record": "sha256=kDaLI8DQyouw0vwAfIYQDeYwhXvSk01aklRAIJWwOcY",
+   "wheel_member": "sha256=kDaLI8DQyouw0vwAfIYQDeYwhXvSk01aklRAIJWwOcY",
+   "installed": "sha256=kDaLI8DQyouw0vwAfIYQDeYwhXvSk01aklRAIJWwOcY",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_doc_intel_converter.py",
+   "record": "sha256=uK6K42Km1xiwTIKy546pRmIFQfURWaD71H0Tep23nYE",
+   "wheel_member": "sha256=uK6K42Km1xiwTIKy546pRmIFQfURWaD71H0Tep23nYE",
+   "installed": "sha256=uK6K42Km1xiwTIKy546pRmIFQfURWaD71H0Tep23nYE",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_docx_converter.py",
+   "record": "sha256=NbbaNaPSu5QNLIcqCSllwkm580y3fj89-3YTGhENcwI",
+   "wheel_member": "sha256=NbbaNaPSu5QNLIcqCSllwkm580y3fj89-3YTGhENcwI",
+   "installed": "sha256=NbbaNaPSu5QNLIcqCSllwkm580y3fj89-3YTGhENcwI",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_epub_converter.py",
+   "record": "sha256=ToJbUXiromJh2R2uX9dxnQGn9236uYPODwcZoj2PW3E",
+   "wheel_member": "sha256=ToJbUXiromJh2R2uX9dxnQGn9236uYPODwcZoj2PW3E",
+   "installed": "sha256=ToJbUXiromJh2R2uX9dxnQGn9236uYPODwcZoj2PW3E",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_exiftool.py",
+   "record": "sha256=e_1mc1t8j4MMnoHHQhYPP3uCqtYZo4zclUabDrtOahc",
+   "wheel_member": "sha256=e_1mc1t8j4MMnoHHQhYPP3uCqtYZo4zclUabDrtOahc",
+   "installed": "sha256=e_1mc1t8j4MMnoHHQhYPP3uCqtYZo4zclUabDrtOahc",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_html_converter.py",
+   "record": "sha256=B7y4DTNwUo_8siLosMoAMry8ggWmNpgJN-tvnypqRI0",
+   "wheel_member": "sha256=B7y4DTNwUo_8siLosMoAMry8ggWmNpgJN-tvnypqRI0",
+   "installed": "sha256=B7y4DTNwUo_8siLosMoAMry8ggWmNpgJN-tvnypqRI0",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_image_converter.py",
+   "record": "sha256=SB-naRTJxSFqpo9wlaJ9Eb1ZYcEpUlvIwwdSH2R2wgw",
+   "wheel_member": "sha256=SB-naRTJxSFqpo9wlaJ9Eb1ZYcEpUlvIwwdSH2R2wgw",
+   "installed": "sha256=SB-naRTJxSFqpo9wlaJ9Eb1ZYcEpUlvIwwdSH2R2wgw",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_ipynb_converter.py",
+   "record": "sha256=AJA7OBRW5U54GVOi3HHnzyBTaLStxp7ySZy5spjtcCI",
+   "wheel_member": "sha256=AJA7OBRW5U54GVOi3HHnzyBTaLStxp7ySZy5spjtcCI",
+   "installed": "sha256=AJA7OBRW5U54GVOi3HHnzyBTaLStxp7ySZy5spjtcCI",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_llm_caption.py",
+   "record": "sha256=H1lnOjIUsPArtmm2yIMWb9Ofm2-8sOP3d9HrGE6StLw",
+   "wheel_member": "sha256=H1lnOjIUsPArtmm2yIMWb9Ofm2-8sOP3d9HrGE6StLw",
+   "installed": "sha256=H1lnOjIUsPArtmm2yIMWb9Ofm2-8sOP3d9HrGE6StLw",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_markdownify.py",
+   "record": "sha256=Z_g1CX5T-KyUyH6A24sjO0fkJnOIh6jRbehQzAqvFv8",
+   "wheel_member": "sha256=Z_g1CX5T-KyUyH6A24sjO0fkJnOIh6jRbehQzAqvFv8",
+   "installed": "sha256=Z_g1CX5T-KyUyH6A24sjO0fkJnOIh6jRbehQzAqvFv8",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_outlook_msg_converter.py",
+   "record": "sha256=jc0v_Mo3ViAHyrf87jUUo2mqHzEk6ElvIvJY1oOphpY",
+   "wheel_member": "sha256=jc0v_Mo3ViAHyrf87jUUo2mqHzEk6ElvIvJY1oOphpY",
+   "installed": "sha256=jc0v_Mo3ViAHyrf87jUUo2mqHzEk6ElvIvJY1oOphpY",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_pdf_converter.py",
+   "record": "sha256=ikh4OhEfjCQKuHMgkhRV6Hml9nU0IabMRy5tK4m_LJI",
+   "wheel_member": "sha256=ikh4OhEfjCQKuHMgkhRV6Hml9nU0IabMRy5tK4m_LJI",
+   "installed": "sha256=ikh4OhEfjCQKuHMgkhRV6Hml9nU0IabMRy5tK4m_LJI",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_plain_text_converter.py",
+   "record": "sha256=H2uOLIInhiRnq1sjMm88pA2b1N_6V-yueKMWYjTVItA",
+   "wheel_member": "sha256=H2uOLIInhiRnq1sjMm88pA2b1N_6V-yueKMWYjTVItA",
+   "installed": "sha256=H2uOLIInhiRnq1sjMm88pA2b1N_6V-yueKMWYjTVItA",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_pptx_converter.py",
+   "record": "sha256=Ym_EYU6WtGRu8fknqlyHPhKjI-RIItVinbX7i3Akcfs",
+   "wheel_member": "sha256=Ym_EYU6WtGRu8fknqlyHPhKjI-RIItVinbX7i3Akcfs",
+   "installed": "sha256=Ym_EYU6WtGRu8fknqlyHPhKjI-RIItVinbX7i3Akcfs",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_rss_converter.py",
+   "record": "sha256=dLNHdNQ9SAao5agYEbVDvNWw06Thz8L1feR1bed6doQ",
+   "wheel_member": "sha256=dLNHdNQ9SAao5agYEbVDvNWw06Thz8L1feR1bed6doQ",
+   "installed": "sha256=dLNHdNQ9SAao5agYEbVDvNWw06Thz8L1feR1bed6doQ",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_transcribe_audio.py",
+   "record": "sha256=_js3ZGV9YK6vn7QXJqYESzGghul22B0RjJe66UiyTeI",
+   "wheel_member": "sha256=_js3ZGV9YK6vn7QXJqYESzGghul22B0RjJe66UiyTeI",
+   "installed": "sha256=_js3ZGV9YK6vn7QXJqYESzGghul22B0RjJe66UiyTeI",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_wikipedia_converter.py",
+   "record": "sha256=kqjVKfFtmSUYKDZEaBJR2P8xO6tOa0bcmOIdXe9CIPA",
+   "wheel_member": "sha256=kqjVKfFtmSUYKDZEaBJR2P8xO6tOa0bcmOIdXe9CIPA",
+   "installed": "sha256=kqjVKfFtmSUYKDZEaBJR2P8xO6tOa0bcmOIdXe9CIPA",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_xlsx_converter.py",
+   "record": "sha256=6gHURH74OoJ8_BCeiIb7JiwSmoJXy3dKXz3XhNiFQJA",
+   "wheel_member": "sha256=6gHURH74OoJ8_BCeiIb7JiwSmoJXy3dKXz3XhNiFQJA",
+   "installed": "sha256=6gHURH74OoJ8_BCeiIb7JiwSmoJXy3dKXz3XhNiFQJA",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_youtube_converter.py",
+   "record": "sha256=rvcP70oj9LXSKFYPOd40CzuY1agmM0-TWbqPrCG7YO8",
+   "wheel_member": "sha256=rvcP70oj9LXSKFYPOd40CzuY1agmM0-TWbqPrCG7YO8",
+   "installed": "sha256=rvcP70oj9LXSKFYPOd40CzuY1agmM0-TWbqPrCG7YO8",
+   "identical": true
+  },
+  {
+   "path": "markitdown/converters/_zip_converter.py",
+   "record": "sha256=N3KRcuyaEtskfGBl3Qv07cIB8iikbgylEj-WUHX3wEo",
+   "wheel_member": "sha256=N3KRcuyaEtskfGBl3Qv07cIB8iikbgylEj-WUHX3wEo",
+   "installed": "sha256=N3KRcuyaEtskfGBl3Qv07cIB8iikbgylEj-WUHX3wEo",
+   "identical": true
+  },
+  {
+   "path": "markitdown/py.typed",
+   "record": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "wheel_member": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "installed": "sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+   "identical": true
+  }
+ ]
+}
