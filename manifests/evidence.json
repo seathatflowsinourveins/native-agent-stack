@@ -4325,6 +4325,46 @@
       "bytes": 55347
     },
     {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/README.md",
+      "sha256": "2f5db0af40827c091ba3f010e68f51d00413e7b42f6d94cfcf6ddb511aeb80fe",
+      "bytes": 17285
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/acquire.py",
+      "sha256": "9e949e2db789b55f8c6145aaa382ed3fee02c15a8c4ca60499e775a92adbfe51",
+      "bytes": 25216
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py",
+      "sha256": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be",
+      "bytes": 18060
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py",
+      "sha256": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc",
+      "bytes": 33447
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+      "sha256": "21e78164701c9c6df0f7c3934c016867607b3829066694536c2360084c94aa3c",
+      "bytes": 12576
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
+      "sha256": "b90db46f20624895089cee5bbce27b0c8df2f3c783b1873cea5920a0f8e18b95",
+      "bytes": 43570
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt",
+      "sha256": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
+      "bytes": 2485
+    },
+    {
+      "path": "blueprints/convergence-practice/local-inference-latest-20260926/window.sh",
+      "sha256": "7b60e7c82f3cc3cbbf867fc122fdb1ad72d2c6ee6d7b915d0b76942fd8e1f066",
+      "bytes": 18769
+    },
+    {
       "path": "blueprints/convergence-practice/mac-memory-patch/README.md",
       "sha256": "21aa8d8b3702ab6add440c058da57fe7b3accd425c58bc604ea1bbbbcbfc5f2f",
       "bytes": 5358
@@ -33095,6 +33135,11 @@
       "bytes": 11123
     },
     {
+      "path": "tests/test_local_inference_latest_20260926.py",
+      "sha256": "03c425f7de2455028fe277f51e1c962a3ff7da868eb55dd045b6ff49f035c426",
+      "bytes": 70472
+    },
+    {
       "path": "tests/test_memory_lifecycle.py",
       "sha256": "d61a864ed272d9f8c796751c2d78ce27ec1ae18645ffeea455ce83bd212600c0",
       "bytes": 2188
@@ -33537,6 +33582,7 @@
     "blueprints/us-equities/sim-capacity/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
     "evidence/artifacts/local-model-workloads-20260924/experiment.json",
-    "evidence/artifacts/memory-stack-20260925/experiment.json"
+    "evidence/artifacts/memory-stack-20260925/experiment.json",
+    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json"
   ]
 }
