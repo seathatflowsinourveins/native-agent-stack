@@ -356,3 +356,60 @@ to it, and neither the `semgrep` nor the `codeql` CLI is installed on this host)
 API risks beside page labels in rule 3; a version-matched EdgarTools skill pin; `backtest-expert`
 on a frozen research task; a local scanner that passes the symlink fixture (P9); attribute each
 `writing-for-agents` use to the file it served (P10).
+
+## Addendum 2026-09-26: claude.ai skill sync and MCP servers off
+
+**Decided by:** the user on 2026-09-26, quoted exactly: "disable the unused claude.ai skills and
+the docs connector". A same-day request to also turn off the never-used user and plugin skills
+was replaced before this change by "don't just mindlessly delete, but improve their usage", so
+this addendum changes no `skillOverrides` state, no manifest entry and no Codex skill setting.
+
+**Change.** `adoption/templates/claude.settings.template.json` sets `"syncClaudeAiSkills": false`
+and, in `env`, `"ENABLE_CLAUDEAI_MCP_SERVERS": "false"`; `tools/adoption/apply_claude_settings.py`
+carries both into an applied host's user settings. Upstream sources, read 2026-09-26:
+
+- Claude Code docs, [Extend Claude with skills](https://code.claude.com/docs/en/skills): "To stop
+  syncing on a machine, set `syncClaudeAiSkills` to `false` in your user settings. Claude Code
+  stops downloading, and the next time it starts it moves the skills it already synced to
+  `~/.claude/skills/.trash/` and no longer loads them."
+- `anthropics/claude-code` `CHANGELOG.md` at `7779afb12e36` (2026-09-25), 2.1.275: "Added syncing of the skills and plugins enabled on
+  your claude.ai account to terminal sessions signed in with it; opt out with
+  `syncClaudeAiSkills: false` or `syncClaudeAiPlugins: false`"; 2.1.63: "Added
+  `ENABLE_CLAUDEAI_MCP_SERVERS=false` env var to opt out from making claude.ai MCP servers
+  available".
+
+`syncClaudeAiPlugins` stays unset: the user did not ask for it, and the init event below lists no
+claude.ai plugin (only the three marketplace plugins and two built-ins).
+
+**Use before the change**, host `nativestack-5975wx-20260925`:
+
+| Check | Evidence class | Result |
+| --- | --- | --- |
+| `/skill-doctor` baseline, 2026-09-25 ([above](#baseline-measurement--2026-09-25-host-nativestack-5975wx-20260925)) | Native operation | 8 synced (claude.ai sync) skills listed, none ever invoked. |
+| Local Claude transcripts, scanned 2026-09-26T20:15Z | Scout measurement, not a receipt | 2,234 transcript files dated 2026-09-24 to 2026-09-26: 0 `mcp__claude_ai_*` tool calls, and none of the 384 `Skill` calls names an `anthropic-skills:*` skill or a synced skill folder. |
+
+The scan covers under three days, the whole span of this host's local transcript store; it bounds
+this host's use, not any other host's.
+
+**Host read-back** (Claude Code 2.1.283, after both settings were applied on this host): a fresh
+headless `/skill-doctor` run (0 turns, $0) opens with an init event that lists 8 MCP servers, none
+from claude.ai, no `claude_ai` tool and no `anthropic-skills:*` skill or command, and its table has
+no `claude.ai sync` row. A session started on the same host before the change lists the connector
+as 8 tools, `mcp__claude_ai_Claude_Docs__` `batch`, `create`, `delete`, `export`, `guide`, `query`,
+`read` and `update`.
+
+**Effect on the selection rule.** [Rule 4](#selection-rule) counts the claude.ai skill sync as an
+existing capability, and two [excluded groups](#excluded-groups) cite it: `pdf`, `docx`, `xlsx`
+and `pptx` as duplicates of the synced copies, and `skill-creator` as a duplicate of the synced
+copy and Codex's `.system/skill-creator`. Where this template applies, the synced copies no longer
+load: the four document skills stay excluded on the user's finding that the synced skills went
+unused, not because a loaded duplicate exists, and `skill-creator`'s remaining duplicate is the
+Codex copy. The manifest's `excluded[]` text still names the synced copies; this addendum leaves
+it for the 2026-10-25 review. On Claude, `writing-for-agents` no longer shares its skill-editing
+trigger with a loaded `skill-creator`; that confound remains for Codex.
+
+**Overturn.** A task that needs a claude.ai skill or the Claude Docs connector: change the value
+in this template, not only on the host. `apply_claude_settings.py` lets template scalars win, so
+a host-only change is overwritten at the next apply, and a key deleted from the template stays on
+every host that already has it. `tests/test_render_config.py` pins both values in the rendered
+template.
