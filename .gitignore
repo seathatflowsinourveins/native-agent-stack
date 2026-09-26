@@ -20,6 +20,10 @@ node_modules/
 # Sanitized Codex --json event streams retained as receipt evidence (client configuration output withheld).
 !evidence/artifacts/codex-use-20260926-5/*.jsonl
 !evidence/artifacts/codex-use-20260926-6/*.jsonl
+# native_token_ci.py's committed synthetic Claude usage-log fixture for the ccusage
+# CLAUDE_CONFIG_DIR fixture (docs/token-efficiency-stack.md#hosted-ci-coverage-2026-09-26):
+# clearly labelled synthetic content, not host history.
+!fixtures/ccusage-synthetic-claude/**/*.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json

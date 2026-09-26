@@ -1,0 +1,3 @@
+Native CI Headroom round-trip fixture content. This sentence repeats itself.
+This sentence repeats itself. This sentence repeats itself. This sentence
+repeats itself. Public fixture text only; not a production artifact.

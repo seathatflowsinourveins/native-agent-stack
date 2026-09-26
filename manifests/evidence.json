@@ -3415,8 +3415,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "7de12500bb7c11546ca2cdf39ae83821943fd30c250aa153f90373e1a9edbea7",
-      "bytes": 2073
+      "sha256": "a937875f3a833b68258b1b90c778d7a14ec279b92a5e02e099e91e122677e546",
+      "bytes": 2351
     },
     {
       "path": ".gitleaks.toml",
@@ -12221,8 +12221,8 @@
     },
     {
       "path": "docs/native-token-ci.md",
-      "sha256": "e6c32f859e0ecf4ac56fd9e4095ede51c020a4cfe1f36243b570fe7dd263e896",
-      "bytes": 5504
+      "sha256": "0901344256a68aad4800bef7a1b81a90505a7fea092c84c0842e0127364de35c",
+      "bytes": 10695
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -12341,8 +12341,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "817d04a7cbecd6d4827d25543fa48e184c4b6edaee51f771fbfd3dcf2367122a",
-      "bytes": 20174
+      "sha256": "61a13a67cdd6134693fa79368f23732671db62475f7e5ba034650d155b7d8f26",
+      "bytes": 27059
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -12356,8 +12356,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "e8243ab217f7df77b16c26afeb129bbb1ac62e84f83f311090f2f472a7ccf38a",
-      "bytes": 36162
+      "sha256": "d4928b7474ce9ce66200e99074d6e2b911ab81ec45f00be53e23890a00c887f0",
+      "bytes": 36659
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -29350,6 +29350,61 @@
       "bytes": 96
     },
     {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/README.md",
+      "sha256": "355eaa29f0cfb35d2dc525f7db75106a80dcc39383039fbbf92be3862b41986e",
+      "bytes": 20744
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/clean_env_run.sh",
+      "sha256": "78bffc9742e41ab8e3ec1da19ca3d77260e5fddda5bca56d83e5b3294e2bd660",
+      "bytes": 3561
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/controls.json",
+      "sha256": "cc7097a3d638fd2577462237401cb90bb188275b710e6650f30c5b5c912da8aa",
+      "bytes": 210141
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/controls_driver.py",
+      "sha256": "c8fb1284ea5ff14b7a4fd614641322b28bd43fa63d4c9a97f1960e2916177d64",
+      "bytes": 17389
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/final-harness-run-1.receipt.json",
+      "sha256": "d0af00d5cac1c2e369614214e1bb39d88f7091ccf2162dabf6b4a29e3e31fc80",
+      "bytes": 97845
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/final-harness-run-2.receipt.json",
+      "sha256": "357e2eb1764628b3b2e9a747c6a39cfe6a78b340ca788f41ba1e54d18b595ff6",
+      "bytes": 97843
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/install_run.sh",
+      "sha256": "41701ff4221214b40a92d8ffdd91cf703982fc64925f8c31c1c31071d91da392",
+      "bytes": 2311
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/local-install-run-1.receipt.json",
+      "sha256": "bfd920e1272b67d3db47e09e6ed7258d4d8af635b4a66419920b7c337359dbee",
+      "bytes": 140747
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/local-install-run-2.receipt.json",
+      "sha256": "41307611b19dbcf7213534b392ea4dc2852435c85fade5680c4e68539cdaaf0b",
+      "bytes": 140558
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/pre-polish-native_token_ci.py",
+      "sha256": "3cec918f28724ba09d57c2dbcee227182b1566ef13ff5397e84a612084d889c8",
+      "bytes": 43890
+    },
+    {
+      "path": "evidence/artifacts/native-token-ci-extension-20260926/runs.json",
+      "sha256": "d74318f771e917aa2e63d1720188c4e4d227003b7097415f0d50d4a9bebbf267",
+      "bytes": 90168
+    },
+    {
       "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/comparison.json",
       "sha256": "81059fb93fa5adfeaa253932ee717045a5e155494251c47e084d7237ef236d8b",
       "bytes": 7907
@@ -34620,9 +34675,19 @@
       "bytes": 54
     },
     {
+      "path": "fixtures/ast_grep_calls.py",
+      "sha256": "d9e7dbf688ec478a5ccde8ebab2bf65e706c47d5752d1824d24e5d882c855d29",
+      "bytes": 549
+    },
+    {
       "path": "fixtures/before.py",
       "sha256": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60",
       "bytes": 48
+    },
+    {
+      "path": "fixtures/ccusage-synthetic-claude/projects/native-ci-synthetic-project/synthetic-session.jsonl",
+      "sha256": "b11ca41f7503eebc9604bdafeb972383b75e1ed3034f348325fae22b567d4d96",
+      "bytes": 1207
     },
     {
       "path": "fixtures/example.sh",
@@ -34633,6 +34698,16 @@
       "path": "fixtures/greeting.html",
       "sha256": "f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2",
       "bytes": 474
+    },
+    {
+      "path": "fixtures/headroom-note.txt",
+      "sha256": "b634452f0b4a85ad507dda77e27619bf6cb5f3b78fd4b2e6f9ad37c653cd995e",
+      "bytes": 220
+    },
+    {
+      "path": "fixtures/headroom-records.json",
+      "sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
+      "bytes": 2969
     },
     {
       "path": "fixtures/native-gap-prompt.txt",
@@ -35036,8 +35111,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "0d5616afcf3fd97c7e1baaa55ff994e4c02c9eabf282b6b989679cc06c885504",
-      "bytes": 20795
+      "sha256": "142120505edbb52646b84782a560d5daf773e28a7ef908eff13193a93cd94fe5",
+      "bytes": 51330
     },
     {
       "path": "scripts/path_safety.py",
@@ -35651,8 +35726,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "7d00b03337af587db421f1e9ddb5ecbc01900501225bf69c77f95dc72c55116a",
-      "bytes": 7816
+      "sha256": "67a69f2ed3f24d37747e662be6c5c6c4d9562aef2d6177a9f17cf77f07736b9e",
+      "bytes": 38990
     },
     {
       "path": "tests/test_native_worker_fixture.py",
