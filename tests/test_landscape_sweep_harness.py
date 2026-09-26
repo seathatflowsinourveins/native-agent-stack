@@ -526,7 +526,14 @@ if sys.argv[1:] == ["--version"]:
 config = json.load(open(os.environ["FAKE_CODEX_CONFIG"]))
 stdin, null = os.fstat(0), os.stat(os.devnull)
 record = {{"argv": sys.argv[1:], "cwd": os.getcwd(), "stdin_devnull": (stdin.st_ino, stdin.st_dev) == (null.st_ino, null.st_dev),
-          "stdin_read": sys.stdin.read()}}
+          "stdin_read": sys.stdin.read(), "rust_log": os.environ.get("RUST_LOG")}}
+if config.get("stubborn"):
+    import subprocess
+    subprocess.Popen([sys.executable, "-c", "import os, signal, sys, time; signal.signal(signal.SIGTERM, signal.SIG_IGN); "
+                      "open(sys.argv[1] + '.tmp', 'w').write(str(os.getpid())); os.replace(sys.argv[1] + '.tmp', sys.argv[1]); "
+                      "time.sleep(120)", config["stubborn"]])
+    while not os.path.exists(config["stubborn"]):
+        time.sleep(0.02)
 if config.get("log"):
     with open(config["log"], "a") as log:
         log.write("start %.6f\\n" % time.time())
@@ -546,6 +553,16 @@ if config.get("log"):
         log.write("end %.6f\\n" % time.time())
 sys.exit(config.get("exit", 0))
 """
+
+
+def process_alive(pid: int) -> bool:
+    """True while pid runs; a zombie (exited, not yet reaped by its new parent) counts as gone."""
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    state = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True).stdout.strip()
+    return bool(state) and not state.startswith("Z")
 
 
 class RunnerCase(unittest.TestCase):
@@ -656,17 +673,52 @@ class RunnerTests(RunnerCase):
         result = self.job("gpt6-flaky", exit=1, log=str(log), events=[{"type": "error", "message": "stream error"}])
         self.assertEqual((result["exit"], result["limit"]), (1, False))
         self.assertFalse((self.work / "LIMIT").exists())
-        result = self.job("gpt6-flaky", last=LAST, log=str(log))
+        result = self.job("gpt6-flaky", last=LAST, log=str(log), events=[COMPLETED])
         self.assertEqual(result["exit"], 0)
         again = self.call("start", "gpt6-flaky", self.prompt, self.schema)
         self.assertEqual(again.stdout.strip(), "already done: gpt6-flaky")
         self.assertEqual(log.read_text().count("start"), 2)
+        # The failed attempt is kept unchanged and still accounted: exit 1, no usage reported.
+        kept = self.work / "gpt6" / "gpt6-flaky" / "attempts" / "1"
+        self.assertIn("stream error", (kept / "events.jsonl").read_text())
+        self.assertEqual((kept / "exit").read_text().strip(), "1")
+        self.assertEqual([(a["attempt"], a["exit"], a["usage"], a["usage_status"]) for a in result["attempts"]],
+                         [(1, 1, None, "unavailable")])
+        self.assertEqual((result["usage"], result["usage_status"]), (COMPLETED["usage"], "reported"))
+
+    def test_a_done_job_is_reused_only_for_the_same_inputs(self):
+        # The resume case: a regenerated prompt (new proposals) must get a new GPT-6 vote, not the cached one.
+        log = self.bin / "runs.log"
+        first = self.job("gpt6-fit-alpha", last=LAST, log=str(log), events=[COMPLETED])
+        self.assertEqual(first["inputs"]["model"], "gpt-6-astra")
+        self.prompt.write_text("Reply in JSON about other proposals.\n", encoding="utf-8")
+        self.fake(last={**LAST, "latest_release": "b2"}, log=str(log), events=[COMPLETED])
+        rerun = self.call("start", "gpt6-fit-alpha", self.prompt, self.schema)
+        self.assertEqual(rerun.stdout.strip().splitlines(), [
+            "inputs changed since gpt6-fit-alpha finished; its attempt is kept under attempts/", "started gpt6-fit-alpha"])
+        self.assertTrue(self.call("wait", "gpt6-fit-alpha", "20").stdout.startswith("done exit=0"))
+        second = json.loads(self.call("result", "gpt6-fit-alpha").stdout)
+        self.assertEqual(json.loads(second["output_text"])["latest_release"], "b2")
+        self.assertNotEqual(second["inputs"]["prompt_sha256"], first["inputs"]["prompt_sha256"])
+        self.assertEqual([(a["exit"], a["usage"], a["inputs"]) for a in second["attempts"]],
+                         [(0, COMPLETED["usage"], first["inputs"])])
+        self.assertEqual(self.call("start", "gpt6-fit-alpha", self.prompt, self.schema).stdout.strip(),
+                         "already done: gpt6-fit-alpha")
+        self.settings({"model": "gpt-6-sol"})  # a different model is a different claim too
+        self.assertIn("started gpt6-fit-alpha", self.call("start", "gpt6-fit-alpha", self.prompt, self.schema).stdout)
+        self.assertTrue(self.call("wait", "gpt6-fit-alpha", "20").stdout.startswith("done exit=0"))
+        self.assertEqual(log.read_text().count("start"), 3)
 
     def test_a_running_job_is_not_started_twice(self):
         self.fake(last=LAST, sleep=2)
         self.assertEqual(self.call("start", "gpt6-slow", self.prompt, self.schema).returncode, 0)
         again = self.call("start", "gpt6-slow", self.prompt, self.schema)
         self.assertEqual(again.stdout.strip(), "already running: gpt6-slow")
+        other = self.bin / "other-prompt.txt"
+        other.write_text("A different claim.\n", encoding="utf-8")
+        refused = self.call("start", "gpt6-slow", other, self.schema)
+        self.assertEqual(refused.returncode, 2)
+        self.assertEqual(refused.stdout.strip(), "already running with different inputs: gpt6-slow; not started")
         self.assertEqual(self.call("wait", "gpt6-slow", "0.1").stdout.strip(), "running")
         self.assertTrue(self.call("wait", "gpt6-slow", "20").stdout.startswith("done exit=0"))
 
@@ -682,6 +734,28 @@ class RunnerTests(RunnerCase):
         self.assertEqual([kind for _, kind in sorted(events)], ["start", "end", "start", "end"])
         slots = {(self.work / "gpt6" / name / "slot").read_text().strip() for name in ("gpt6-a", "gpt6-b")}
         self.assertEqual(slots, {"1"})
+
+    def test_rust_log_is_not_passed_to_codex_and_trace_text_never_sets_the_marker(self):
+        # GPT-6 review of #324: with RUST_LOG=trace Codex 0.155.1 logs model response data on stderr, and a quoted
+        # limit message there set the marker falsely.
+        self.env["RUST_LOG"] = "trace"
+        trace = ('2026-09-26T03:47:00.000000Z TRACE codex_api::sse::responses: SSE event: '
+                 '{"type":"response.output_text.delta","delta":"a cited log: ' + LIMIT_TEXT + '"}\n')
+        result = self.job("gpt6-traced", last=LAST, events=[COMPLETED], stderr=trace)
+        self.assertIsNone(self.record()["rust_log"])
+        self.assertEqual((result["exit"], result["limit"]), (0, False))
+        self.assertFalse((self.work / "LIMIT").exists())
+
+    def test_timeout_kills_children_that_ignore_term(self):
+        self.settings({"timeout_s": 1, "kill_grace_s": 0.5})
+        pid_file = self.bin / "stubborn.pid"
+        result = self.job("gpt6-stubborn", sleep=60, stubborn=str(pid_file))
+        self.assertEqual(result["exit"], 124)
+        pid = int(pid_file.read_text())
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline and process_alive(pid):
+            time.sleep(0.1)
+        self.assertFalse(process_alive(pid), "a child that ignored SIGTERM survived the timeout cleanup")
 
     def test_timeout_stops_codex_with_exit_124(self):
         self.settings({"timeout_s": 1})
@@ -720,6 +794,11 @@ class RunnerTests(RunnerCase):
             ("", [{"type": "turn.failed", "error": {"message": LIMIT_TEXT}}], True),
             ("", [{"type": "turn.failed", "error": "not an object: hit your usage limit"}], False),
             ("Usage limitation", [], False),
+            # stderr counts only for Codex's own error lines, and only when no turn completed
+            ("2026-09-26T03:47:00.000000Z ERROR codex_core::codex: " + LIMIT_TEXT, [], True),
+            ("2026-09-26T03:47:00.000000Z TRACE codex_api::sse::responses: " + LIMIT_TEXT, [], False),
+            ("a quoted page: " + LIMIT_TEXT, [], False),
+            ("ERROR: " + LIMIT_TEXT, [{"type": "turn.completed", "usage": {"output_tokens": 1}}], False),
         ]
         for stderr, events, expected in cases:
             (directory / "stderr.txt").write_text(stderr)
@@ -935,6 +1014,32 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual([(f["round"], f["cause"], f["role"]) for f in out["returns"]["failures"]["alpha"]],
                          [("followup", "vote_missing", "fit_claude")])
         self.assertEqual(out["layers"][0]["reopen"][0]["trigger"], "retained_failure")
+        # (c) GPT-6 review of #324: the first round's GPT-6 fit job failed, and the follow-up re-proposed x with all
+        # three votes. The later votes decide x, but the first round's missing vote stays a retained failure.
+        first = layer_round("first", "keep_but_compare", votes("alpha", "facts", {x: False}),
+                            votes("alpha", "fit", {x: False}), gpt6_entry(None, "failed_exit_1"))
+        follow = layer_round("followup", "keep_but_compare", votes("alpha", "facts", {x: False}),
+                             votes("alpha", "fit", {x: False}), gpt6_entry(votes("alpha", "fit", {x: False})))
+        out = self.convert({"sweep": LANE, "first": [first], "critic": critic, "followups": [follow]})
+        self.assertEqual([e["repo"] for e in out["layers"][0]["survived"]], [x])
+        failures = out["returns"]["failures"]["alpha"]
+        self.assertEqual([(f["round"], f["cause"], f.get("role"), f.get("status")) for f in failures],
+                         [("first", "vote_missing", "fit_gpt6", "failed_exit_1")])
+        self.assertEqual(failures[0]["repositories"], [x])
+        self.assertEqual(out["layers"][0]["reopen"][0]["trigger"], "retained_failure")
+
+    def test_gpt6_usage_counts_every_attempt(self):
+        res = healthy_result()
+        fit = res["first"][0]["fit_gpt6"]
+        fit["usage_status"] = "reported"
+        fit["attempts"] = [{"attempt": 1, "exit": 1, "usage": None, "usage_status": "unavailable"},
+                           {"attempt": 2, "exit": 0, "usage": {"input_tokens": 5, "output_tokens": 2},
+                            "usage_status": "reported"}]
+        usage = self.convert(res)["returns"]["gpt6_usage"]
+        self.assertEqual(usage["earlier_attempts"], {"attempts": 2, "usage": {"input_tokens": 5, "output_tokens": 2},
+                                                     "usage_unavailable": 1})
+        self.assertEqual(usage["usage"]["input_tokens"], 2000)  # the final attempts of the two jobs
+        self.assertEqual(usage["usage_unavailable"], 0)
 
     def test_a_vote_refutes_unless_it_says_false(self):
         res = healthy_result()
@@ -1194,6 +1299,21 @@ class LedgerIntegrationTests(unittest.TestCase):
                           state[layer_id]["reset"])
         state = self.clean_counts(fail_gpt6_fit(healthy_result()))  # the same failure in an otherwise clean layer
         self.assertEqual(state["alpha"]["count"], 0)
+
+    def test_a_failed_first_round_never_counts_as_clean_after_a_reproposal(self):
+        # GPT-6 review of #324: round 1's GPT-6 fit failed, the follow-up re-proposed every repository with all
+        # votes, and the layer derived as clean (count 1) because the re-proposal replaced the failed round's votes.
+        res = fail_gpt6_fit(healthy_result())
+        first = res["first"][0]
+        follow = json.loads(json.dumps(healthy_result()["first"][0]))
+        follow.update(round="followup", followup_reason={"reason": "r", "search_directions": []})
+        res.update(critic={"followup_layers": [{"layer_id": first["layer_id"], "reason": "r",
+                                                "search_directions": []}], "general": []},
+                   followups=[follow])
+        state = self.clean_counts(res)
+        self.assertEqual(state[first["layer_id"]]["count"], 0)
+        self.assertIn({"trigger": "retained_failure",
+                       "ref": f"{self.base}/returns.json#/failures/{first['layer_id']}"}, state[first["layer_id"]]["reset"])
 
     def test_converted_evidence_appends_and_checks(self):
         out, reviews = self.evidence(synthetic_result())

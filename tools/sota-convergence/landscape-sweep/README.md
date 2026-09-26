@@ -239,28 +239,18 @@ Read these fields of `convert.py`'s summary before appending:
 
 ## Cost reference
 
-These figures come from the 2026-09-26 one-layer smoke: run `wf_1753e674-5dc` on `mcp-surfaces`, with the
-prototype of this harness and the same roles. The research budgets and the skills rule were added to the templates
-afterwards. The figures were read from that session's files and are not retained as a receipt in this repository.
-Each counter is its own kind, so they are never summed.
+No measured cost is quoted here. The 2026-09-26 one-layer smoke (run `wf_1753e674-5dc`, prototype harness) was
+read only from that session's files, and a figure without a retained record is not evidence. Each run's own record
+is its cost reference:
 
-- **Workflow runtime:** 5 agents, 1,795 s wall clock, 707,356 subagent tokens.
-- **`child-usage.mjs` over the same transcripts:**
+- `child-usage-<run>.json` (`usage_record.py`) for the Claude workers;
+- `returns.json` `gpt6_usage` for GPT-6: `usage` sums the final attempt of each job and `earlier_attempts` the
+  attempts the runner kept, with `usage_unavailable` counting attempts that reported none. Complete GPT-6 usage is
+  the per-counter sum of the two.
 
-  | Model | Children | Output tokens | Cache-read tokens | Cache-creation tokens | Input tokens |
-  | --- | ---: | ---: | ---: | ---: | ---: |
-  | claude-opus-5-5 | 2 | 150,617 | 15,441,930 | 428,539 | 236 |
-  | claude-sonnet-5 | 3 | 82,891 | 2,325,092 | 371,980 | 62 |
-
-- **GPT-6-Astra, from Codex `turn.completed` usage:**
-
-  | Job | Minutes | Input tokens | Cached input tokens | Output tokens | Reasoning output tokens |
-  | --- | ---: | ---: | ---: | ---: | ---: |
-  | Discovery | 11 | 1,781,265 | 1,623,168 | 19,411 | 10,801 |
-  | Fit | 7.4 | 1,190,254 | 1,057,536 | 13,061 | 7,262 |
-
-A full sweep has up to one round per due layer, plus at most 8 follow-up rounds and a critic. Scaling the smoke by
-that number of rounds is a first planning estimate, not a measurement. The recipe classes the lane as high cost.
+Each counter is its own kind, so Claude and GPT-6 counters are never summed together. A full sweep has up to one
+round per due layer, plus at most 8 follow-up rounds and a critic; the recipe classes the lane as high cost. Plan a
+new run from the latest retained record, and say so when no record exists yet.
 
 ## Coordination
 
@@ -277,8 +267,10 @@ that number of rounds is a first planning estimate, not a measurement. The recip
 - **Usage limit.** A real Codex usage-limit error writes `<W>/LIMIT`. After that no job starts, and jobs still
   waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
   `stderr.txt` or its `error` event gives. Do not sign in again (provider state is shared). Record the stopped run
-  as the recipe says. Remove `LIMIT` only after the reset. A failed job runs again at its next `start`, and a
-  finished one returns "already done".
+  as the recipe says. Remove `LIMIT` only after the reset. A failed job runs again at its next `start`; its failed
+  attempt moves unchanged to `gpt6/<job>/attempts/<n>/` and stays in `result` and `gpt6_usage`. A finished job
+  returns "already done" only for the same inputs (prompt and schema sha256, model, effort), so a resumed Workflow
+  whose regenerated prompt differs gets a fresh GPT-6 vote, never a cached one for another claim.
 - **Resume.** `Workflow({scriptPath: "<W>/sweep.embedded.js", resumeFromRunId: "wf_..."})` replays the unchanged
   agent calls from the cache.
 
@@ -300,9 +292,11 @@ that number of rounds is a first planning estimate, not a measurement. The recip
 
 ## Differences from the 2026-09-26 prototype
 
-On 2026-09-26, three things were checked against the prototype: the 32 first-round GPT-6 prompts are
-byte-identical, `convert.py` reproduces the prototype's conversion of the real smoke run, and `usage_record.py`
-reads that run's real transcripts with status complete. These were local checks.
+Parity with the prototype is not established by this package. On 2026-09-26 three unretained local checks were
+run (prompt bytes, the smoke's conversion, `usage_record.py` on the smoke's transcripts); their outputs are not
+kept, so they are not evidence. `PROMPTS_SHA256_20260926` in the tests is the value this package computes from its
+templates, and it matches the 2026-09-26 run only if that run's retained record carries the same
+`prompts_sha256`. Treat parity as unverified until that record is registered and compared.
 
 The deliberate changes:
 
@@ -310,10 +304,15 @@ The deliberate changes:
   the staged runtime uses its own directory. The date, layer count and skills-manifest date are template
   placeholders.
 - **Portable runner.** The runner is portable (stdlib locks, sessions and timeout).
-- **Usage-limit detection.** The runner also reads Codex's `error` and `turn.failed` JSONL events. `codex exec
+- **Usage-limit detection.** The runner reads Codex's `error` and `turn.failed` JSONL events. `codex exec
   --json` prints fatal errors on stdout, so the prototype's stderr-only check could miss a real limit; see
-  openai/codex `rust-v0.155.1`, `codex-rs/exec/src/exec_events.rs`. Model content never counts.
-- **Job reruns.** A failed job reruns, and a running one is never started twice.
+  openai/codex `rust-v0.155.1`, `codex-rs/exec/src/exec_events.rs`. Model content never counts. Codex runs without
+  the caller's `RUST_LOG` (at trace level it logs model response data, `codex-rs/codex-api/src/sse/responses.rs`),
+  and a stderr line counts only when it is an `ERROR`/`Error` line and no turn completed.
+- **Job reruns.** A failed job reruns with its earlier attempt kept under `attempts/<n>/`; a done job is reused only
+  for the same inputs; a running one is never started twice.
+- **Timeout cleanup.** On timeout the job's whole process group gets TERM, then KILL after the grace period
+  (`kill_grace_s`, 10 s), even when Codex itself has already exited, so no child keeps a slot or job lock.
 - **Layer inputs.**
   - The fields have undated names (`previous_sweep`, `components_vs_upstream`, `seeded_candidates`,
     `upstream_checked_at`).

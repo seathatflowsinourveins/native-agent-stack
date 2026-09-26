@@ -147,8 +147,19 @@ def gpt6_out(entry):
 def gpt6_meta(entry, keys=("status", "output", "usage", "started", "finished")) -> dict:
     entry = as_dict(entry)
     meta = {key: entry.get(key) for key in keys}
-    meta.update({key: entry[key] for key in ("model", "effort", "codex_version", "limit") if key in entry})
+    meta.update({key: entry[key] for key in ("model", "effort", "codex_version", "limit", "usage_status", "inputs",
+                                              "attempts") if key in entry})
     return meta
+
+
+def add_usage(total: dict, entry: dict) -> None:
+    """Add one attempt's Codex usage to `total`; an attempt that reported none counts as unavailable."""
+    usage = as_dict(entry.get("usage"))
+    if not usage or entry.get("usage_status") == "unavailable":
+        total["usage_unavailable"] += 1
+    for counter, value in usage.items():
+        if isinstance(value, int) and not isinstance(value, bool):
+            total["usage"][counter] = total["usage"].get(counter, 0) + value
 
 
 def job_exit(directory: Path):
@@ -226,7 +237,12 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
         returns["workflow_run"] = workflow_run
     children = usage_children(usage)
     lane_layers, proposals, ledger_layers, survivors, lost = [], [], [], [], []
-    calls_total, skills_usage, gpt6_usage, checks = {}, {}, {"jobs": 0, "by_status": {}, "usage": {}}, {}
+    calls_total, skills_usage, checks = {}, {}, {}
+    # `usage` sums the final attempt of each job; `earlier_attempts` sums the attempts the runner kept under
+    # gpt6/<job>/attempts/ (failed, refused or superseded). Complete GPT-6 usage is the per-counter sum of the two;
+    # an attempt with no reported usage is counted in `usage_unavailable`, never as zero.
+    gpt6_usage = {"jobs": 0, "by_status": {}, "usage": {}, "usage_unavailable": 0,
+                  "earlier_attempts": {"attempts": 0, "usage": {}, "usage_unavailable": 0}}
     gpt6_models = set()
     rounds_by_layer = {}
     for entry in sweep_rounds(res):
@@ -251,6 +267,9 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
         failures = []
         # Repository slug -> the latest round that proposed it: that round's proposal row with that round's votes.
         final, order = {}, []
+        # (round, role) -> repositories that round proposed without that refuter's vote. Collected per round, so a
+        # later re-proposal replaces the row but never the earlier round's failure.
+        missing = {}
         calls, raw, returned = {}, {}, {}
         for r in rounds:
             rnd = r.get("round", "first")
@@ -290,9 +309,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                 gpt6_usage["by_status"][status] = gpt6_usage["by_status"].get(status, 0) + 1
                 if entry.get("model"):
                     gpt6_models.add(str(entry["model"]))
-                for counter, value in as_dict(entry.get("usage")).items():
-                    if isinstance(value, int) and not isinstance(value, bool):
-                        gpt6_usage["usage"][counter] = gpt6_usage["usage"].get(counter, 0) + value
+                add_usage(gpt6_usage, entry)
+                for attempt in entry.get("attempts") or []:
+                    gpt6_usage["earlier_attempts"]["attempts"] += 1
+                    add_usage(gpt6_usage["earlier_attempts"], as_dict(attempt))
             for name, value in as_dict(as_dict(cd).get("calls")).items():
                 calls[name] = calls.get(name, 0) + int(value)
             for name, value in as_dict(as_dict(gpt6_out(gd)).get("calls")).items():
@@ -310,9 +330,12 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                     continue
                 if repo_slug not in final:
                     order.append(repo_slug)
+                row_votes = {role: by_role[role].get(repo_slug) for role in round_votes}
+                for role, _ in VOTE_ROLES:
+                    if row_votes[role] is None:
+                        missing.setdefault((rnd, role), []).append(canon(p["repository"]))
                 final[repo_slug] = {"round": rnd, "proposal": p, "skills": skills,
-                                    "gpt6_job": gpt6_meta(fg, ("status",)),
-                                    **{role: by_role[role].get(repo_slug) for role in round_votes}}
+                                    "gpt6_job": gpt6_meta(fg, ("status",)), **row_votes}
         if critic_lost:
             failures.append({"round": "critic", "cause": "critic_lost",
                              "detail": "the completeness critic returned nothing, so no layer's completeness was "
@@ -333,7 +356,7 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                                           "families_returned": returned}
         returns["raw"][layer_id] = raw
         returns["votes"][layer_id] = []
-        survived, refuted, new_candidates, missing = [], [], [], {}
+        survived, refuted, new_candidates = [], [], []
         for index, repo_slug in enumerate(order):
             row = final[repo_slug]
             rnd, p = row["round"], row["proposal"]
@@ -343,7 +366,6 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             for role, name in VOTE_ROLES:
                 if row[role] is None:
                     notes.append(f"{name} vote missing (counted as refuted)")
-                    missing.setdefault((rnd, role), []).append(repository)
             facts_refuted, claude_refuted, gpt6_refuted = is_refuted(fv), is_refuted(cv), is_refuted(gv)
             fit_refuted = claude_refuted or gpt6_refuted
             label_suffix = ":followup" if rnd == "followup" else ""

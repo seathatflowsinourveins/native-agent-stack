@@ -4,8 +4,9 @@
   codex_call.sh [--work-dir DIR] start  <job-id> <prompt-file> <schema-file>
   codex_call.sh [--work-dir DIR] wait   <job-id> [seconds]    default 540; prints "done exit=N" or "running"
   codex_call.sh [--work-dir DIR] result <job-id>              one JSON line: status, exit, started, finished,
-                                                              usage, output_text, stderr_tail, limit,
-                                                              limit_marker, model, effort, codex_version
+                                                              usage, usage_status, output_text, stderr_tail,
+                                                              limit, limit_marker, model, effort, codex_version,
+                                                              inputs, attempts
 
 `start` detaches one job and returns at once. The job waits for a semaphore slot (an fcntl lock on
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
@@ -16,20 +17,26 @@ this, in the empty directory <work-dir>/empty, bounded to 3000 s (exit 124 on ti
 
 --ignore-user-config keeps the host's Codex config out of the lane, the sandbox is read-only, stdin is /dev/null
 (background `codex exec` otherwise waits on stdin), and the effort is max. Never ultra: ultra lets Codex delegate to
-sub-agents, which breaks the one-model lane. The model and slot count come from <work-dir>/staged.json (build_args.py
+sub-agents, which breaks the one-model lane. Codex runs without the caller's RUST_LOG, so its stderr carries only
+its default `error`-level diagnostics (EXEC_DEFAULT_LOG_FILTER, codex-rs/exec/src/lib.rs at rust-v0.155.1): at
+trace level Codex logs model response data (codex-rs/codex-api/src/sse/responses.rs), which could quote any text. The model and slot count come from <work-dir>/staged.json (build_args.py
 --gpt6-model / --slots / --lock-dir); defaults gpt-6-astra, 3 slots, <work-dir>/locks. The codex binary is the one
 on PATH.
 
 Usage limit: when Codex reports "hit your usage limit" the job ends with exit 3 and writes <work-dir>/LIMIT; while
 that file exists no job starts and jobs still waiting for a slot end with exit 3, so the coordinator can stop and
-notify. Only Codex's own error reports count: its stderr, and the `error` / `turn.failed` events that
-`codex exec --json` prints on stdout (openai/codex rust-v0.155.1, codex-rs/exec/src/exec_events.rs and
-event_processor_with_jsonl_output.rs). Model content (item.* events: messages, web results, cited pages) never
-counts: on 2026-09-26 a grep of the whole event stream matched a cited README's "Usage limitation" and set the
-marker falsely.
+notify. Only Codex's own error reports count: the `error` / `turn.failed` events that `codex exec --json` prints on
+stdout (openai/codex rust-v0.155.1, codex-rs/exec/src/exec_events.rs and event_processor_with_jsonl_output.rs), and,
+only when no turn completed, an ERROR/Error line on stderr. Model content (item.* events: messages, web results,
+cited pages) never counts: on 2026-09-26 a grep of the whole event stream matched a cited README's "Usage
+limitation" and set the marker falsely.
 
-A job whose earlier attempt finished with exit 0 is not rerun ("already done"); a job that failed is cleaned and
-started again, and a job that is still running is left alone ("already running").
+A job is bound to its inputs: <job>/inputs.json holds the sha256 of its prompt and schema, the model and the effort.
+A job whose attempt finished with exit 0 for the same inputs is not rerun ("already done"). Any other earlier
+attempt (failed, refused, or done for different inputs, as after a Workflow resume regenerated the prompt) is moved
+unchanged to <job>/attempts/<n>/ and the job starts again; `result` lists every earlier attempt with its exit and
+usage ("unavailable" when Codex reported none), so failed attempts stay counted. A job that is still running is left
+alone ("already running"), or refused (exit 2) when it runs for different inputs.
 
 Work dir: --work-dir, else this file's directory when build_args.py staged it there (staged.json present), else
 $SWEEP_WORK_DIR. It must lie outside every git repository: Codex would otherwise load that repository's AGENTS.md
@@ -40,6 +47,7 @@ from __future__ import annotations
 
 import errno
 import fcntl
+import hashlib
 import json
 import os
 import re
@@ -55,15 +63,17 @@ HERE = Path(__file__).resolve().parent
 STAGED = "staged.json"
 DEFAULT_MODEL = "gpt-6-astra"
 EFFORT = "max"
-DEFAULTS = {"slots": 3, "timeout_s": 3000.0, "wait_poll_s": 10.0, "slot_poll_s": 5.0}
+DEFAULTS = {"slots": 3, "timeout_s": 3000.0, "wait_poll_s": 10.0, "slot_poll_s": 5.0, "kill_grace_s": 10.0}
 LIMIT_PHRASE = re.compile(r"hit your usage limit", re.IGNORECASE)
+# Codex's own error lines: "ERROR: ...", "Error: ..." (eprintln) or a tracing record "<timestamp> ERROR <target>: ...".
+STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
 # The prompt is one argv string, as in the 2026-09-26 runner; Linux caps one argument at 131072 bytes.
 MAX_PROMPT_BYTES = 120_000
 JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 MODEL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
-OUTPUTS = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model", "codex_version",
-           "done")
-KILL_GRACE_S = 10
+# Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
+ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
+                 "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
 
 
@@ -179,17 +189,35 @@ def running(directory: Path) -> bool:
         os.close(fd)
 
 
-def limit_error(directory: Path) -> bool:
-    """Codex itself reported the usage limit: in stderr, or in an `error` / `turn.failed` event."""
-    if LIMIT_PHRASE.search(read(directory / "stderr.txt") or ""):
-        return True
+def events(directory: Path) -> list[dict]:
+    out = []
     for line in (read(directory / "events.jsonl") or "").splitlines():
         try:
             event = json.loads(line)
         except ValueError:
             continue
-        if not isinstance(event, dict):
-            continue
+        if isinstance(event, dict):
+            out.append(event)
+    return out
+
+
+def turn_usage(directory: Path) -> dict | None:
+    """Summed `turn.completed` usage, or None when Codex reported no usage (no turn completed)."""
+    usage, reported = {}, False
+    for event in events(directory):
+        if event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
+            reported = True
+            for key, value in event["usage"].items():
+                if isinstance(value, int) and not isinstance(value, bool):
+                    usage[key] = usage.get(key, 0) + value
+    return usage if reported else None
+
+
+def limit_error(directory: Path) -> bool:
+    """Codex itself reported the usage limit: in an `error` / `turn.failed` event, or, when no turn completed, in one
+    of its own error lines on stderr. A completed turn was not limited, whatever a diagnostic line quotes."""
+    parsed = events(directory)
+    for event in parsed:
         if event.get("type") == "error":
             message = event.get("message")
         elif event.get("type") == "turn.failed" and isinstance(event.get("error"), dict):
@@ -198,7 +226,47 @@ def limit_error(directory: Path) -> bool:
             continue  # item.* events carry model content: never evidence of a limit
         if isinstance(message, str) and LIMIT_PHRASE.search(message):
             return True
-    return False
+    if any(event.get("type") == "turn.completed" for event in parsed):
+        return False
+    return any(STDERR_ERROR_LINE.match(line) and LIMIT_PHRASE.search(line)
+               for line in (read(directory / "stderr.txt") or "").splitlines())
+
+
+def codex_env() -> dict:
+    """The caller's environment without Rust tracing settings (see the module docstring)."""
+    return {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+
+
+def sha256_hex(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def job_inputs(prompt: bytes, schema: bytes, model: str) -> dict:
+    return {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
+            "effort": EFFORT}
+
+
+def read_json(path: Path):
+    text = read(path)
+    try:
+        return json.loads(text) if text is not None else None
+    except ValueError:
+        return None
+
+
+def archive_attempt(directory: Path) -> int | None:
+    """Move an earlier attempt's files, unchanged, to attempts/<n>/ (n = 1, 2, ...); None when there was none."""
+    present = [name for name in ATTEMPT_FILES if (directory / name).exists()]
+    if not present:
+        return None
+    attempts = directory / "attempts"
+    attempts.mkdir(exist_ok=True)
+    number = 1 + max((int(p.name) for p in attempts.iterdir() if p.name.isdigit()), default=0)
+    target = attempts / str(number)
+    target.mkdir()
+    for name in present:
+        os.replace(directory / name, target / name)
+    return number
 
 
 def codex_argv(codex: str, directory: Path, model: str, prompt: str) -> list[str]:
@@ -209,25 +277,31 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str) -> list[str
 
 def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
     directory = job_dir(base, job)
+    prompt_bytes = Path(prompt_file).read_bytes()
+    schema_bytes = Path(schema_file).read_bytes()
+    inputs = job_inputs(prompt_bytes, schema_bytes, settings(base)["model"])  # also refuses a broken staged.json
     if (directory / "done").exists() and exit_code(directory) == 0:
-        print(f"already done: {job}")
-        return 0
+        if read_json(directory / "inputs.json") == inputs:
+            print(f"already done: {job}")
+            return 0
+        print(f"inputs changed since {job} finished; its attempt is kept under attempts/")
     if (base / "LIMIT").exists():
         print(f"LIMIT marker present; refusing to start {job}")
         return EXIT_LIMIT
-    prompt_bytes = Path(prompt_file).read_bytes()
-    schema_bytes = Path(schema_file).read_bytes()
     directory.mkdir(parents=True, exist_ok=True)
     lock_fd = open_lock(directory / "job.lock")
     if not try_lock(lock_fd):
         os.close(lock_fd)
+        if read_json(directory / "inputs.json") not in (None, inputs):
+            print(f"already running with different inputs: {job}; not started")
+            return EXIT_REFUSED
         print(f"already running: {job}")
         return 0
     try:
-        for name in OUTPUTS:  # an earlier attempt that failed or died
-            (directory / name).unlink(missing_ok=True)
+        archive_attempt(directory)
         (directory / "prompt.txt").write_bytes(prompt_bytes)
         (directory / "schema.json").write_bytes(schema_bytes)
+        write_atomic(directory / "inputs.json", json.dumps(inputs, sort_keys=True) + "\n")
         problem = None
         try:
             json.loads(schema_bytes)
@@ -243,7 +317,6 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
             finish(directory, problem[0])
             print(f"not started {job}: {problem[1]}")
             return problem[0]
-        settings(base)  # refuse a broken staged.json before detaching
         (base / "empty").mkdir(exist_ok=True)
         with open(directory / "runner.log", "wb") as log:
             subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--work-dir", str(base), "run", job],
@@ -279,17 +352,34 @@ def codex_version(codex: str) -> str | None:
     return lines[0].strip() if done.returncode == 0 and lines else None
 
 
-def stop_group(process: subprocess.Popen) -> None:
-    for sig in (signal.SIGTERM, signal.SIGKILL):
-        try:
-            os.killpg(process.pid, sig)
-        except ProcessLookupError:
+def group_alive(pgid: int) -> bool:
+    try:
+        os.killpg(pgid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+
+
+def stop_group(process: subprocess.Popen, grace_s: float) -> None:
+    """TERM the job's whole process group, then KILL whatever is left of it after the grace period, including
+    children that ignore TERM after Codex itself has exited (they would keep the slot and job locks)."""
+    pgid = process.pid
+    try:
+        os.killpg(pgid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    end = time.monotonic() + grace_s
+    while time.monotonic() < end:
+        if process.poll() is not None and not group_alive(pgid):
             return
-        try:
-            process.wait(timeout=KILL_GRACE_S)
-            return
-        except subprocess.TimeoutExpired:
-            continue
+        time.sleep(0.1)
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    process.wait()
 
 
 def run(base: Path, job: str) -> int:
@@ -323,11 +413,11 @@ def run(base: Path, job: str) -> int:
     with open(directory / "events.jsonl", "wb") as events, open(directory / "stderr.txt", "wb") as errors:
         process = subprocess.Popen(codex_argv(codex, directory, config["model"], prompt), cwd=str(base / "empty"),
                                    stdin=subprocess.DEVNULL, stdout=events, stderr=errors,
-                                   pass_fds=(slot_fd, lock_fd), start_new_session=True)
+                                   pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env())
         try:
             code = process.wait(timeout=config["timeout_s"])
         except subprocess.TimeoutExpired:
-            stop_group(process)
+            stop_group(process, config["kill_grace_s"])
             code = EXIT_TIMEOUT
     if limit_error(directory):
         (base / "LIMIT").touch()
@@ -371,17 +461,9 @@ def result(base: Path, job: str) -> dict:
            "exit": exit_code(directory),
            "started": (read(directory / "started") or "").strip() or None,
            "finished": (read(directory / "finished") or "").strip() or None}
-    usage: dict[str, int] = {}
-    for line in (read(directory / "events.jsonl") or "").splitlines():
-        try:
-            event = json.loads(line)
-        except ValueError:
-            continue
-        if isinstance(event, dict) and event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
-            for key, value in event["usage"].items():
-                if isinstance(value, int) and not isinstance(value, bool):
-                    usage[key] = usage.get(key, 0) + value
-    out["usage"] = usage
+    usage = turn_usage(directory)
+    out["usage"] = usage or {}
+    out["usage_status"] = "reported" if usage is not None else "unavailable"
     out["output_text"] = compact(read(directory / "last.json"))
     stderr = read(directory / "stderr.txt")
     out["stderr_tail"] = stderr[-400:] if stderr is not None else None
@@ -390,7 +472,19 @@ def result(base: Path, job: str) -> dict:
     out["model"] = (read(directory / "model") or "").strip() or settings(base)["model"]
     out["effort"] = EFFORT
     out["codex_version"] = (read(directory / "codex_version") or "").strip() or None
+    out["inputs"] = read_json(directory / "inputs.json")
+    out["attempts"] = [attempt_summary(path) for path in sorted(
+        (p for p in (directory / "attempts").glob("*") if p.name.isdigit()), key=lambda p: int(p.name))]
     return out
+
+
+def attempt_summary(path: Path) -> dict:
+    usage = turn_usage(path)
+    return {"attempt": int(path.name), "exit": exit_code(path),
+            "started": (read(path / "started") or "").strip() or None,
+            "finished": (read(path / "finished") or "").strip() or None,
+            "usage": usage, "usage_status": "reported" if usage is not None else "unavailable",
+            "limit": limit_error(path), "inputs": read_json(path / "inputs.json")}
 
 
 def main(argv: list[str] | None = None) -> int:

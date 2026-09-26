@@ -124,7 +124,7 @@ function parseWrapped(r) {
   let output = null
   if (meta.output_text) { try { output = JSON.parse(meta.output_text) } catch (e) { output = null } }
   const out = { status: meta.exit === 0 && output ? 'ok' : `failed_exit_${meta.exit}`, output, usage: meta.usage, started: meta.started, finished: meta.finished, stderr_tail: output ? null : meta.stderr_tail }
-  for (const k of ['model', 'effort', 'codex_version', 'limit']) if (meta[k] !== undefined) out[k] = meta[k]
+  for (const k of ['model', 'effort', 'codex_version', 'limit', 'usage_status', 'inputs', 'attempts']) if (meta[k] !== undefined) out[k] = meta[k]
   return out
 }
 
