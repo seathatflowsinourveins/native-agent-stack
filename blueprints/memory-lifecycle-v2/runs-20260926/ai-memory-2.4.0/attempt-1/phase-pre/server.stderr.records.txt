@@ -1,0 +1,92 @@
+2026-09-26T02:18:52.351899Z  INFO ai_memory_cli: ai-memory starting version="2.4.0" server_url=http://127.0.0.1:49374 data_dir=/run/data bind=127.0.0.1:49374
+2026-09-26T02:18:52.352312Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=/run/data/.serve.lock
+2026-09-26T02:18:52.395490Z  INFO refinery_core::traits: schema history table is empty, going to apply all migrations
+2026-09-26T02:18:52.395543Z  INFO refinery_core::traits::sync: applying migration: V1__init
+2026-09-26T02:18:52.395556Z  INFO refinery_core::traits::sync: applying migration: V2__handoffs
+2026-09-26T02:18:52.395561Z  INFO refinery_core::traits::sync: applying migration: V3__decay
+2026-09-26T02:18:52.395566Z  INFO refinery_core::traits::sync: applying migration: V4__embeddings
+2026-09-26T02:18:52.395571Z  INFO refinery_core::traits::sync: applying migration: V5__cascade_indexes
+2026-09-26T02:18:52.395575Z  INFO refinery_core::traits::sync: applying migration: V6__wiki_migrations
+2026-09-26T02:18:52.395580Z  INFO refinery_core::traits::sync: applying migration: V7__observations_fts_and_link_index
+2026-09-26T02:18:52.395585Z  INFO refinery_core::traits::sync: applying migration: V8__performance_indexes
+2026-09-26T02:18:52.395590Z  INFO refinery_core::traits::sync: applying migration: V9__sessions_supported_agent_kinds
+2026-09-26T02:18:52.395595Z  INFO refinery_core::traits::sync: applying migration: V10__observation_extension_events
+2026-09-26T02:18:52.395602Z  INFO refinery_core::traits::sync: applying migration: V11__sessions_antigravity_agent_kind
+2026-09-26T02:18:52.395607Z  INFO refinery_core::traits::sync: applying migration: V12__fts_remove_diacritics
+2026-09-26T02:18:52.395613Z  INFO refinery_core::traits::sync: applying migration: V13__cross_project_links
+2026-09-26T02:18:52.395618Z  INFO refinery_core::traits::sync: applying migration: V14__users
+2026-09-26T02:18:52.395623Z  INFO refinery_core::traits::sync: applying migration: V15__pages_author_id
+2026-09-26T02:18:52.395627Z  INFO refinery_core::traits::sync: applying migration: V16__audit_log_author_id
+2026-09-26T02:18:52.395634Z  INFO refinery_core::traits::sync: applying migration: V17__pages_fts_index_path
+2026-09-26T02:18:52.395639Z  INFO refinery_core::traits::sync: applying migration: V18__enforce_project_workspace_pairing
+2026-09-26T02:18:52.395645Z  INFO refinery_core::traits::sync: applying migration: V19__repair_orphan_observation_attribution
+2026-09-26T02:18:52.395650Z  INFO refinery_core::traits::sync: applying migration: V20__sessions_grok_agent_kind
+2026-09-26T02:18:52.395655Z  INFO refinery_core::traits::sync: applying migration: V21__auto_improve_pending_proposals
+2026-09-26T02:18:52.395660Z  INFO refinery_core::traits::sync: applying migration: V22__auto_improve_scheduler
+2026-09-26T02:18:52.395665Z  INFO refinery_core::traits::sync: applying migration: V23__auto_improve_patch_proposals
+2026-09-26T02:18:52.395670Z  INFO refinery_core::traits::sync: applying migration: V24__auto_improve_rejections
+2026-09-26T02:18:52.395675Z  INFO refinery_core::traits::sync: applying migration: V25__sessions_pi_agent_kind
+2026-09-26T02:18:52.395707Z  INFO refinery_core::traits::sync: applying migration: V26__sessions_zero_agent_kind
+2026-09-26T02:18:52.395715Z  INFO refinery_core::traits::sync: applying migration: V27__repair_nongit_fragment_attribution
+2026-09-26T02:18:52.395720Z  INFO refinery_core::traits::sync: applying migration: V28__sessions_devin_agent_kind
+2026-09-26T02:18:52.395725Z  INFO refinery_core::traits::sync: applying migration: V29__maintenance_scheduler
+2026-09-26T02:18:52.395729Z  INFO refinery_core::traits::sync: applying migration: V30__sessions_kimi_code_agent_kind
+2026-09-26T02:18:52.395734Z  INFO refinery_core::traits::sync: applying migration: V31__managed_workstreams
+2026-09-26T02:18:52.395740Z  INFO refinery_core::traits::sync: applying migration: V32__sessions_crush_agent_kind
+2026-09-26T02:18:52.395746Z  INFO refinery_core::traits::sync: applying migration: V33__ingest_keys
+2026-09-26T02:18:52.395751Z  INFO refinery_core::traits::sync: applying migration: V34__session_consolidation_jobs
+2026-09-26T02:18:52.395756Z  INFO refinery_core::traits::sync: applying migration: V35__session_end_observation_watermark
+2026-09-26T02:18:52.395761Z  INFO refinery_core::traits::sync: applying migration: V36__page_expiry
+2026-09-26T02:18:52.395765Z  INFO refinery_core::traits::sync: applying migration: V37__page_feedback
+2026-09-26T02:18:52.395770Z  INFO refinery_core::traits::sync: applying migration: V38__entities
+2026-09-26T02:18:52.395776Z  INFO refinery_core::traits::sync: applying migration: V39__handoff_ownership
+2026-09-26T02:18:52.395780Z  INFO refinery_core::traits::sync: applying migration: V40__session_owner
+2026-09-26T02:18:52.395785Z  INFO refinery_core::traits::sync: applying migration: V41__handoffs_listing_index
+2026-09-26T02:18:52.395790Z  INFO refinery_core::traits::sync: applying migration: V42__auto_improve_proposal_author
+2026-09-26T02:18:52.395795Z  INFO refinery_core::traits::sync: applying migration: V43__page_access_by_actor
+2026-09-26T02:18:52.395800Z  INFO refinery_core::traits::sync: applying migration: V44__sessions_hermes_agent_kind
+2026-09-26T02:18:52.395805Z  INFO refinery_core::traits::sync: applying migration: V45__sessions_kiro_cli_agent_kind
+2026-09-26T02:18:52.395810Z  INFO refinery_core::traits::sync: applying migration: V46__client_activity
+2026-09-26T02:18:52.395815Z  INFO refinery_core::traits::sync: applying migration: V47__sessions_command_code_agent_kind
+2026-09-26T02:18:52.395821Z  INFO refinery_core::traits::sync: applying migration: V48__handoff_receiver_index
+2026-09-26T02:18:52.395826Z  INFO refinery_core::traits::sync: applying migration: V49__decay_tombstone_index
+2026-09-26T02:18:52.395830Z  INFO refinery_core::traits::sync: applying migration: V50__sessions_pool_agent_kind
+2026-09-26T02:18:52.395835Z  INFO refinery_core::traits::sync: applying migration: V51__sessions_zcode_agent_kind
+2026-09-26T02:18:52.395840Z  INFO refinery_core::traits::sync: applying migration: V52__purged_sessions_tombstones
+2026-09-26T02:18:52.395845Z  INFO refinery_core::traits::sync: applying migration: V53__page_embed_failures
+2026-09-26T02:18:52.395849Z  INFO refinery_core::traits::sync: applying migration: V54__human_auth
+2026-09-26T02:18:52.395863Z  INFO refinery_core::traits::sync: applying migration: V55__api_credentials
+2026-09-26T02:18:52.395868Z  INFO refinery_core::traits::sync: applying migration: V56__entity_link_validity
+2026-09-26T02:18:52.395873Z  INFO refinery_core::traits::sync: applying migration: V57__experience_pass_state
+2026-09-26T02:18:52.395877Z  INFO refinery_core::traits::sync: applying migration: V58__close_retired_entity_windows
+2026-09-26T02:18:52.395882Z  INFO refinery_core::traits::sync: applying migration: V59__purged_scopes_tombstones
+2026-09-26T02:18:52.395887Z  INFO refinery_core::traits::sync: applying migration: V60__bootstrap_chunk_progress
+2026-09-26T02:18:52.395892Z  INFO refinery_core::traits::sync: applying migration: V61__page_abstract_embeddings
+2026-09-26T02:18:52.395896Z  INFO refinery_core::traits::sync: applying migration: V62__page_ingestion_windows
+2026-09-26T02:18:52.395901Z  INFO refinery_core::traits::sync: applying migration: V63__page_evidence
+2026-09-26T02:18:52.395905Z  INFO refinery_core::traits::sync: applying migration: V64__agent_messages
+2026-09-26T02:18:52.395910Z  INFO refinery_core::traits::sync: applying migration: V65__page_compacted_marker
+2026-09-26T02:18:52.395917Z  INFO refinery_core::traits::sync: applying migration: V66__auto_improve_claim_attempts
+2026-09-26T02:18:52.395922Z  INFO refinery_core::traits::sync: preparing to apply 66 migrations: Map {
+2026-09-26T02:18:52.488074Z  INFO ai_memory_wiki::migrations::runner: running wiki migration migration="2026_09_01T18_00_okf_v02_conformance" description="conform wiki pages and index rows to OKF v0.2 (backup-gated, in place)"
+2026-09-26T02:18:52.488383Z  INFO ai_memory_wiki::migrations::runner: applied wiki migration migration="2026_09_01T18_00_okf_v02_conformance"
+2026-09-26T02:18:52.506826Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+2026-09-26T02:18:52.526633Z  INFO ai_memory_cli::commands::serve: wrote _meta.md scope manifests count=2
+2026-09-26T02:18:52.534714Z  INFO ai_memory_cli::commands::serve: created wiki upgrade baseline checkpoint checkpoint=fixture-checkpoint-14
+2026-09-26T02:18:52.534794Z  INFO ai_memory_cli::commands::serve: watcher disabled by --no-watcher
+2026-09-26T02:18:52.534803Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096
+2026-09-26T02:18:52.547610Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+2026-09-26T02:18:52.547713Z  INFO ai_memory_cli::commands::serve: scheduled retention/lint/embed maintenance disabled
+2026-09-26T02:18:52.547740Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler disabled; manual auto-improve remains available
+2026-09-26T02:18:52.547748Z  INFO ai_memory_cli::commands::serve: scheduled maintenance enabled but all intervals are disabled
+2026-09-26T02:18:52.547757Z  INFO ai_memory_cli::commands::serve: MCP server ready on stdio (Ctrl-C to stop)
+2026-09-26T02:18:52.551756Z  INFO serve_inner: rmcp::service: Service initialized as server peer_info=Some(InitializeRequestParams { meta: None, protocol_version: ProtocolVersion("2025-03-26"), capabilities: ClientCapabilities { experimental: None, extensions: None, roots: None, sampling: None, elicitation: None, tasks: None }, client_info: Implementation { name: "memory-lifecycle-v2", title: None, version: "1", description: None, icons: None, website_url: None } })
+2026-09-26T02:18:52.562261Z  INFO serve_inner: rmcp::service: received notification notification=InitializedNotification(NotificationNoParam { method: InitializedNotificationMethod, extensions: Extensions })
+2026-09-26T02:18:52.562384Z  INFO serve_inner: rmcp::handler::server: client initialized
+2026-09-26T02:18:52.825133Z  WARN serve_inner: rmcp::service: response error id=27 error=ErrorData { code: ErrorCode(-32602), message: "project 'absent' not found in workspace 'lifecycle-v2'", data: None }
+2026-09-26T02:18:52.826620Z  WARN serve_inner: rmcp::service: response error id=28 error=ErrorData { code: ErrorCode(-32603), message: "global cannot be combined with workspace/project/scopes", data: None }
+2026-09-26T02:18:59.456858Z  WARN serve_inner: rmcp::service: response error id=54 error=ErrorData { code: ErrorCode(-32603), message: "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha", data: None }
+2026-09-26T02:18:59.459248Z  WARN serve_inner: rmcp::service: response error id=55 error=ErrorData { code: ErrorCode(-32603), message: "page notes/expired.md not found in resolved scope lifecycle-v2/alpha", data: None }
+2026-09-26T02:18:59.475452Z  WARN serve_inner: rmcp::service: response error id=58 error=ErrorData { code: ErrorCode(-32603), message: "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date", data: None }
+2026-09-26T02:18:59.877332Z  INFO serve_inner: rmcp::service: input stream terminated
+2026-09-26T02:18:59.877615Z  INFO serve_inner: rmcp::service: serve finished quit_reason=Closed

@@ -1,15 +1,30 @@
 {
   "schema_version": 1,
   "claim_id": "memory-lifecycle-v2-20260925",
-  "kind": "native_cli_e2e",
-  "observed_at_utc": "2026-09-25T20:28Z",
-  "status": "passed_scoped_acceptance",
+  "evidence_class": "local_integration",
+  "acceptance_policy_class": "local integration check (docs/acceptance-evidence-policy.md): a locally authored fixture driving the official binaries; not an upstream test",
+  "observed_at_utc": "2026-09-25T20:32:04.321118Z/2026-09-25T20:32:19.602355Z",
+  "observed_at_source": "the retained execution receipts runs-20260925/*/attempt-*/phase-*/command.json",
+  "status": "superseded",
+  "status_as_published": "passed_scoped_acceptance",
+  "superseded_by": "results-20260926.json",
   "scope": "Disposable fixture only, both binaries independently against their own fresh --data-dir: TTL crossing in real wall-clock time, scoped retrieval across 4 projects / 2 workspaces including documented scopes[] and global=true search, restart durability (a second native process against the same store), plus v1-shape supersession/delete/expiry-sweep regressions.",
   "preregistration": {
-    "path": "blueprints/memory-lifecycle-v2/PREREGISTRATION.md",
-    "sha256": "fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c",
-    "sha256_recorded_before_any_run": true,
-    "note": "One post-freeze correction: the phase-\"post\" call-count arithmetic (15 -> 16) was fixed after exercise.py's own len(outcomes)!=N guard caught the miscount on the FIRST 2.3.2 phase-post attempt, before that attempt produced a usable result. No check or pass bar changed. Superseded sha256 (as first frozen): ca81e9b4380999e7ca8882fe1ae23116ae910adbec30e6eb43fefd09f15ed1a3."
+    "original": {
+      "path": "blueprints/memory-lifecycle-v2/history/PREREGISTRATION-20260925-original.md",
+      "sha256": "ca81e9b4380999e7ca8882fe1ae23116ae910adbec30e6eb43fefd09f15ed1a3",
+      "hash_recorded_utc": "2026-09-25T20:17:18Z",
+      "recorded_before_any_run": true
+    },
+    "amended": {
+      "path": "blueprints/memory-lifecycle-v2/history/PREREGISTRATION-20260925-amended.md",
+      "sha256": "fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c",
+      "hash_recorded_utc": "2026-09-25T20:23:01Z",
+      "recorded_before_any_run": false,
+      "recorded_after": "the first failed 2.3.2 attempt (20:21:37Z)"
+    },
+    "hash_log": "blueprints/memory-lifecycle-v2/history/preregistration-sha256-20260925.txt",
+    "note": "The runs retained here used the amended text. The amendment changed only the phase-post call count (15 to 16). Harness changes after the amendment (scope tuple order, the analyzer reading global_hits, an unused import) are listed in history/attempts-20260925.json."
   },
   "v1_reference": {
     "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
@@ -65,13 +80,13 @@
         "sweep": {
           "preview_expired": [
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-5",
               "path": "notes/ttl-short.md",
               "expired_at": "2026-09-25T20:32:08Z",
               "deleted": false
             },
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-7",
               "path": "notes/expired.md",
               "expired_at": "2000-01-01T00:00:00Z",
               "deleted": false
@@ -79,13 +94,13 @@
           ],
           "apply_expired": [
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-5",
               "path": "notes/ttl-short.md",
               "expired_at": "2026-09-25T20:32:08Z",
               "deleted": true
             },
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-7",
               "path": "notes/expired.md",
               "expired_at": "2000-01-01T00:00:00Z",
               "deleted": true
@@ -98,7 +113,9 @@
           "pages_all": 5,
           "sessions": 0,
           "observations": 0
-        }
+        },
+        "started_utc": "2026-09-25T20:32:04.321118+00:00",
+        "finished_utc": "2026-09-25T20:32:11.661549+00:00"
       },
       "phase_post": {
         "exit_code": 0,
@@ -113,9 +130,17 @@
             "code": -32603,
             "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha"
           }
-        }
+        },
+        "started_utc": "2026-09-25T20:32:11.662943+00:00",
+        "finished_utc": "2026-09-25T20:32:11.874014+00:00"
       },
-      "passed": true
+      "passed": true,
+      "release_verified_20260926": {
+        "asset_sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+        "asset_digests_agree": true,
+        "installed_equals_release_binary": true,
+        "record": "upstream-20260926/release-verification.json"
+      }
     },
     "2.4.0": {
       "path": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory",
@@ -156,13 +181,13 @@
         "sweep": {
           "preview_expired": [
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-5",
               "path": "notes/ttl-short.md",
               "expired_at": "2026-09-25T20:32:16Z",
               "deleted": false
             },
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-7",
               "path": "notes/expired.md",
               "expired_at": "2000-01-01T00:00:00Z",
               "deleted": false
@@ -170,13 +195,13 @@
           ],
           "apply_expired": [
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-5",
               "path": "notes/ttl-short.md",
               "expired_at": "2026-09-25T20:32:16Z",
               "deleted": true
             },
             {
-              "id": "01a0da44…",
+              "id": "fixture-id-7",
               "path": "notes/expired.md",
               "expired_at": "2000-01-01T00:00:00Z",
               "deleted": true
@@ -190,7 +215,9 @@
           "sessions": 0,
           "observations": 0,
           "evidence_rows": 0
-        }
+        },
+        "started_utc": "2026-09-25T20:32:11.932625+00:00",
+        "finished_utc": "2026-09-25T20:32:19.334729+00:00"
       },
       "phase_post": {
         "exit_code": 0,
@@ -205,9 +232,17 @@
             "code": -32603,
             "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha"
           }
-        }
+        },
+        "started_utc": "2026-09-25T20:32:19.335983+00:00",
+        "finished_utc": "2026-09-25T20:32:19.602355+00:00"
       },
-      "passed": true
+      "passed": true,
+      "release_verified_20260926": {
+        "asset_sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+        "asset_digests_agree": true,
+        "installed_equals_release_binary": true,
+        "record": "upstream-20260926/release-verification.json"
+      }
     }
   },
   "cross_binary_observations": [
@@ -231,11 +266,25 @@
     "Store migration (one store opened by both binaries) is explicitly NOT exercised; each binary used its own fresh store. Upgrade behavior here means \"the same checks pass on both binaries,\" not \"2.3.2 data migrates cleanly to 2.4.0.\"",
     "The 2.4.0 release tarball sha256 is asserted (task-supplied, peer-verified) and not re-fetched over the network by this run; only the installed binary's own sha256 was independently measured here.",
     "Concurrent multi-client access to one server process is not exercised; every check is one client, one request in flight at a time.",
-    "This does not certify the repository's adopted pin (stays 2.3.2 per manifests/stack.json and docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md) or change it; it is comparison evidence only."
+    "This does not certify the repository's adopted pin (stays 2.3.2 per manifests/stack.json and docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md) or change it; it is comparison evidence only.",
+    "Superseded analysis: the 2026-09-25 analyzer treated a missing hits field as an empty result, accepted any integer-coded error as the expected rejection, compared paths but not page ids across projects, and never read swept pages directly (see corrections)."
   ],
-  "raw_private_run_directories_not_copied_into_worktree": true,
+  "retained_runs": {
+    "2.3.2": {
+      "path": "runs-20260925/ai-memory-2.3.2/attempt-5",
+      "publication_manifest": "runs-20260925/ai-memory-2.3.2/attempt-5/publication.json"
+    },
+    "2.4.0": {
+      "path": "runs-20260925/ai-memory-2.4.0/attempt-2",
+      "publication_manifest": "runs-20260925/ai-memory-2.4.0/attempt-2/publication.json"
+    }
+  },
+  "attempts": {
+    "ledger": "history/attempts-20260925.json",
+    "summary": "2.3.2: five attempts, of which the first three failed; 2.4.0: two attempts. Only the final pair (20:32Z) kept its output."
+  },
   "itemized_checks": {
-    "source": "each binary's acceptance.json in its private run directory; check names and booleans only",
+    "source": "each binary's retained acceptance.json (runs-20260925/*/acceptance.json); check names and booleans from the 2026-09-25 analyzer, superseded",
     "by_binary": {
       "2.3.2": {
         "pre": {
@@ -432,5 +481,42 @@
         "passed": true
       }
     }
-  }
+  },
+  "recheck_with_repaired_rules": {
+    "script": "history/recheck_20260925.py",
+    "output": "history/recheck-20260925.json",
+    "run_utc": "2026-09-26",
+    "result": {
+      "2.3.2": "95 of 95 comparable checks pass",
+      "2.4.0": "95 of 95 comparable checks pass"
+    },
+    "excluded": "six checks that need calls or per-call instants this run did not make: the four post-sweep and post-restart direct reads and the two real-time TTL ordering checks"
+  },
+  "corrections": [
+    {
+      "date": "2026-09-26",
+      "source": "Codex gpt-6-astra cross-family review of PR #292",
+      "change": "kind native_cli_e2e replaced by evidence_class local_integration: the fixture is locally authored; upstream tests are recorded separately in results-20260926.json"
+    },
+    {
+      "date": "2026-09-26",
+      "source": "same review",
+      "change": "observed_at_utc 20:28Z (a literal in the assembler) replaced by the retained receipts' 20:32:04Z-20:32:19Z; per-phase started/finished instants added from those receipts"
+    },
+    {
+      "date": "2026-09-26",
+      "source": "same review",
+      "change": "sha256_recorded_before_any_run: true was attached to the amended hash; the original and amended freezes are now distinguished and both texts retained under history/"
+    },
+    {
+      "date": "2026-09-26",
+      "source": "same review",
+      "change": "the native responses, requests, handoff and execution receipts of the two retained runs are published under runs-20260925/, bound to their private sources by sha256; sweep ids now use those consistent fixture aliases instead of 8-hex prefixes that were identical for every id"
+    },
+    {
+      "date": "2026-09-26",
+      "source": "same review",
+      "change": "status passed_scoped_acceptance replaced by superseded; the repaired rerun is results-20260926.json"
+    }
+  ]
 }

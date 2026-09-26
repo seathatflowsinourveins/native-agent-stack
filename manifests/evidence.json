@@ -6616,33 +6616,1053 @@
     },
     {
       "path": "blueprints/memory-lifecycle-v2/PREREGISTRATION.md",
+      "sha256": "6804e430dee871cd10a38c097ade0e3f84ce246a00592ad2f038b20c6e6a4321",
+      "bytes": 15471
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/README.md",
+      "sha256": "85af7555c44eed9b2dcc06a44bf0b8ace5040bd7b11d741263117335031d8674",
+      "bytes": 18201
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/analyze.py",
+      "sha256": "bc99f5a38650740a16070be23f6c522e4ca0df67152b55befbe9067b94227625",
+      "bytes": 17123
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/assemble_results.py",
+      "sha256": "f9e66ec10cb2db075cf184f4258911216d5bf1976d8deabddbfab55c78d66d94",
+      "bytes": 30756
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/exercise.py",
+      "sha256": "6d6cfb5764daab0bddbf6ab7002da8375627af08b103c558b3b3ff4090cb701e",
+      "bytes": 19625
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/PREREGISTRATION-20260925-amended.md",
       "sha256": "fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c",
       "bytes": 23733
     },
     {
-      "path": "blueprints/memory-lifecycle-v2/README.md",
-      "sha256": "5da14fac8d9720e320c5aa28c01b58d7de61f7356f22d907ffa652dee35bf349",
-      "bytes": 10079
+      "path": "blueprints/memory-lifecycle-v2/history/PREREGISTRATION-20260925-original.md",
+      "sha256": "ca81e9b4380999e7ca8882fe1ae23116ae910adbec30e6eb43fefd09f15ed1a3",
+      "bytes": 23048
     },
     {
-      "path": "blueprints/memory-lifecycle-v2/analyze.py",
-      "sha256": "aade41ff4efd347c3269c7e88283fe0133a594346bdfeaea251ddac6458ac832",
-      "bytes": 12358
+      "path": "blueprints/memory-lifecycle-v2/history/attempts-20260925.json",
+      "sha256": "0ed5cf358e94c93814c24796339f48e1ebfdd79c24e9a746cc881a4c2ebc99d1",
+      "bytes": 8316
     },
     {
-      "path": "blueprints/memory-lifecycle-v2/exercise.py",
-      "sha256": "bcca4997c8ea0b5812c402f7af78ee90518a1c761344ca94e97c55b5f8aae62d",
-      "bytes": 18370
+      "path": "blueprints/memory-lifecycle-v2/history/preregistration-freeze-20260926.txt",
+      "sha256": "91d701f620f8d9c3852491410c73421891091769313310ec519dabb3b7a4624d",
+      "bytes": 632
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/preregistration-sha256-20260925.txt",
+      "sha256": "69ace31c2e0acabc231d5b3c0faecab2d01159b000ff0342af0eb76da24076ca",
+      "bytes": 1009
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/publication.json",
+      "sha256": "14a26a65fbf62a0d2c07dfa26c5f8d498ce4868d51d27eaa308ec1b5c45600c1",
+      "bytes": 7683
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/recheck-20260925.json",
+      "sha256": "ec834bb17e1aba38f4e242ca6262ce8f3b6b9648d3cf51aa75baeb982970b0c7",
+      "bytes": 1057
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/recheck_20260925.py",
+      "sha256": "7ef87c774a6bcc8a07f055b718ebde7a7fb630db8e77912a6cc8f42dd086f8dc",
+      "bytes": 2684
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/reproduce_review_20260926.py",
+      "sha256": "2fc940c91b1cfe39a48331418a69709909b47b21cec9cf6fe843bf7783272e10",
+      "bytes": 3171
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/review-repair-controls-20260926.txt",
+      "sha256": "c032227c79771d24a1f32da37fe5e97a95dafca269a4e263a97c12d99875f2d6",
+      "bytes": 5756
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/review-reproduction-20260926.txt",
+      "sha256": "e41cae19b34bea40b3ba67fdadc62c819a08c3482134fe7995e2186e640cf936",
+      "bytes": 898
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/review_repair_controls_20260926.py",
+      "sha256": "5f5d69f511c6d732f5eea2f627ce9ef40699a6a740cc1abd2ec908662835c4ef",
+      "bytes": 8002
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/upstream-final-round-driver-20260926.log",
+      "sha256": "051d4137e74628b76d16b5f919e379615c7fc4f392ba3ea77edb03474a68a169",
+      "bytes": 1765
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/upstream-final-round-driver-20260926.sh",
+      "sha256": "27b5ebd6edb92a3cf8fefdb61b5f47889abb89a0131957f6658f5dfab288ba00",
+      "bytes": 1218
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/upstream-scripts-as-run-20260926/control.py",
+      "sha256": "574201369882e31139edcb68bbbd99a83c08159eeac025d38684871307324db4",
+      "bytes": 3893
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/upstream-scripts-as-run-20260926/run_upstream_tests.py",
+      "sha256": "9b062549242768209a8e59d3aa83e7d8c9728dada5ba2aa211a20c3e522a788e",
+      "bytes": 9404
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/upstream-scripts-as-run-20260926/setup.sh",
+      "sha256": "d4779f67f69ddcb695e76b633d954ac065bdee7624bbe2fb23d7d386b804f10a",
+      "bytes": 1837
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/verification-repair-controls-20260926.txt",
+      "sha256": "a80edeb8eae3763f8534608d3f45d5d74dc3611533940958b1cff9d803048558",
+      "bytes": 3674
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/history/verification_repair_controls_20260926.py",
+      "sha256": "50c6209508d179bb381fc2d01f3f0ffc09cbcd8cfc199423eebfd2a0099e64ea",
+      "bytes": 6079
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/publish.py",
+      "sha256": "2090bd5bb82a34b0f9a09a3a27ff2aa5b4429035d036cd179154275b65770344",
+      "bytes": 6744
     },
     {
       "path": "blueprints/memory-lifecycle-v2/results-20260925.json",
-      "sha256": "f87410a11b1894460bbe504ca8417e15e6711b79203251a940d2dbbeb51ef3b3",
-      "bytes": 20380
+      "sha256": "a4fb611138df4496d09d19993ff11d79851ddc0efbfd3ef0d63551a1c5246a74",
+      "bytes": 24965
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/results-20260926.json",
+      "sha256": "9f49a0c89edea9d647eb3330d6548f775be3d9296a115f6fd539078e797275b9",
+      "bytes": 43044
     },
     {
       "path": "blueprints/memory-lifecycle-v2/run.py",
-      "sha256": "b0b82e4b634d1b0e1140065ef1d9425846415d8240ecbd7d0638d420a8bea911",
-      "bytes": 6315
+      "sha256": "491af233323171368b911925e048a90d3296d8e1251ee4053fbe3ff5a65e88bc",
+      "bytes": 7481
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/acceptance.json",
+      "sha256": "fc9108d26e77bf521bbe7b68a9695c24391cd8a8d21fd13fbbc3a87de883d342",
+      "bytes": 5920
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/handoff/fixture-state.json",
+      "sha256": "d6af65731921b36bf8bed38f37b28ffb49b0861daf7ede6240ad5fac22b18ab5",
+      "bytes": 648
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/command.json",
+      "sha256": "5b026601ecda0550c842c16a3dae7c60b6e393d28709a6d9525db7c5e2c9cfdc",
+      "bytes": 1354
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/driver.stdout",
+      "sha256": "bbc07cda14f930187ef4c580336bf243c3e1400e1126a77c6a51f357e3b49958",
+      "bytes": 114
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/mountinfo.txt",
+      "sha256": "eb7f6b8840dc4e64eb1543570542de6b94eb1ecb6401d0dc973409ce497a0f1d",
+      "bytes": 3504
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/namespace.json",
+      "sha256": "6ff7ccff83a77d45cbda4be5975a3a684ad40ccdf923576cb490116eba16d7e2",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/outcomes.json",
+      "sha256": "f1aa1e4cba64b0de368f6dba8c23d223433024bf589e9ed2faebd297925ef4ae",
+      "bytes": 6413
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/records.json",
+      "sha256": "6eed729b49e18aa6555127106d6cf4333b26ec561d485f806550e2d375f952bb",
+      "bytes": 98240
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/server.stderr.records.txt",
+      "sha256": "c975f25dd94b8b6686479dea21d19892c03eb4178741cfde0406c55d704c854a",
+      "bytes": 2813
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-post/version.json",
+      "sha256": "b26cfd044ff9f2dc1f0ee0c46147b24e730be86527d1b429a4e3d17672c0e7e8",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/command.json",
+      "sha256": "ff5eb6433804394b9c798fa6a1844fed0f37e9d98dd7a2a250ad5aa518ca2422",
+      "bytes": 1351
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/driver.stdout",
+      "sha256": "57d59b777cfdf9439e54ed83d7147fcd137646934b2a80b021aab6f290c371a3",
+      "bytes": 113
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/mountinfo.txt",
+      "sha256": "a77aa1b24a2bccb7ad6da54cd125e34eda1938b53ce16fb2423be5bd2d5aaf17",
+      "bytes": 3503
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/namespace.json",
+      "sha256": "ccd9be0981f0276d99c4f4215b63dd12d15b923df04e16c549dabd888297dff4",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/outcomes.json",
+      "sha256": "019130f98c5ecd82fd81a991628f1debb7be71c0aa8d9c63f52974423fbc7a23",
+      "bytes": 27416
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/records.json",
+      "sha256": "a11cc32173340438a896db6b6b2c19cd435af18a9920453224ac164e87e611fd",
+      "bytes": 137990
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/server.stderr.records.txt",
+      "sha256": "4e6917af9d9cf21545a45eea44780d0531a678d5b44d6fc1376a5f0d69513f47",
+      "bytes": 10862
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/phase-pre/version.json",
+      "sha256": "22f2f738531d0e1f0ac9ebbeea587fd13d1d21573a986b421d5c978cf362e342",
+      "bytes": 53
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.3.2/attempt-5/publication.json",
+      "sha256": "b46efc4d8afdfc9e3f34babe10812ffcc49f45f7ac0cbcb88aea7c312b1d1787",
+      "bytes": 11203
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/acceptance.json",
+      "sha256": "aa5e48c09df9b26c841cc251773ca8b0a6232fe7596d21292642b9990708bd23",
+      "bytes": 5998
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/handoff/fixture-state.json",
+      "sha256": "6d62ce6f8dd85c1a86d247f5b5f7fdc1c14899b83ded8701096ca0d03ce7107b",
+      "bytes": 672
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/command.json",
+      "sha256": "fc79da503f8a1c0f8d0b943ff4c26e41c918e476bd61844cdaac117b92545bdd",
+      "bytes": 1354
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/driver.stdout",
+      "sha256": "9f0888319cab240d5b11154758ee7373b64389f8b797bc7116d7ece3dbde461a",
+      "bytes": 114
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/mountinfo.txt",
+      "sha256": "d0a8b47e68d1a75e782e6ce81944a0151a334f5f9334a96d3365a065fb311c78",
+      "bytes": 3504
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/namespace.json",
+      "sha256": "6ff7ccff83a77d45cbda4be5975a3a684ad40ccdf923576cb490116eba16d7e2",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/outcomes.json",
+      "sha256": "f0a5a5f8f9f98f2ac0356c84eb29baa431cb69897f4b45318ec3b780d5f5cd08",
+      "bytes": 6563
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/records.json",
+      "sha256": "c87d402f499eb9b48a60f23bce1a9a6cb0df1b7f3e7db8e9da56366465a9cbf8",
+      "bytes": 107462
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/server.stderr.records.txt",
+      "sha256": "676a4b2abbdf26f3f15e86d701ac03498cf201b0e704503479e57f30da067a68",
+      "bytes": 2813
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-post/version.json",
+      "sha256": "e7061d6ae80b759cf8b7fc6a91018d502e44d0d8200a3f9e2db4885e5ca31b89",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/command.json",
+      "sha256": "7880403d0e8c025ef867dee7844ee125fb82618a4b3d55daced87edf4b5edd1d",
+      "bytes": 1351
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/driver.stdout",
+      "sha256": "29cc03bd8025f5662cf3a4282ffbbccd099017b8cd065cf65c215f4fc91ad7ac",
+      "bytes": 113
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/mountinfo.txt",
+      "sha256": "b8bdd80eb3bc7ac78650d64d0362c0c6a330c84debfc8699f21b4c2837f65f9e",
+      "bytes": 3503
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/namespace.json",
+      "sha256": "f240540311fd18645388eda4fda399991aa2f0dfdecb4e78f44381ee45c67427",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/outcomes.json",
+      "sha256": "7f848eae389228f595f101c8bc46638685fd380fc60ed8f8e48abc4cdedc47b7",
+      "bytes": 27648
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/records.json",
+      "sha256": "26b2ce99e7ed4c4013757ffe501aeaef63222159e50ea25c9722b8afc67882a0",
+      "bytes": 147294
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/server.stderr.records.txt",
+      "sha256": "22f6661118a173da024f9c9c04c8a353b6da14a5774e9f05a50548cf975fe53d",
+      "bytes": 11088
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/phase-pre/version.json",
+      "sha256": "c9f9c14428cfae2314553c4255347d2b19f78a2bb0a823ba57e217ef88b3c484",
+      "bytes": 53
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260925/ai-memory-2.4.0/attempt-2/publication.json",
+      "sha256": "652985654c986fc10709c25d23e87f3ec126c8c392551bbf68542b408536a882",
+      "bytes": 11205
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/acceptance.json",
+      "sha256": "80c6f36ae9938275801ec0f3ca5d31d4fb385bfd56847f6dfc4a26048a897a65",
+      "bytes": 8947
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/handoff/fixture-state.json",
+      "sha256": "0f9c41f59b21cb87ca562070462df26802fc576509da5669d8d1e9b7473c7cfc",
+      "bytes": 648
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/command.json",
+      "sha256": "0aad385ee890e91e09992cc0d3b3d5229250ff62aaeef44eba3b905ae8b0f583",
+      "bytes": 1393
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/driver.stdout",
+      "sha256": "59e54d0c2ff8446ebb433c5531197adf363c167ebee474f46e8dd505121deb11",
+      "bytes": 114
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/mountinfo.txt",
+      "sha256": "e66df494be1801b87f0a4e2240adca102ab55ec5375a4a2f3565a3175fbfcf53",
+      "bytes": 3505
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/namespace.json",
+      "sha256": "9b10edd283c00beefa4db57580e207f8eb0dd32c65f3a0c14b72f23861c98aa1",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/outcomes.json",
+      "sha256": "d584667a9c032cc7131a78275528da6479305993579cdb45fc853124029d6c0e",
+      "bytes": 6830
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/records.json",
+      "sha256": "a09fdb104a2e2b1e4aeeadfd815692abe9c67ae54a96a79756d19fe30004344c",
+      "bytes": 102073
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/server.stderr.records.txt",
+      "sha256": "94d8bf018aef6d02ee4d11809cb574459f92d74a81481be67b797f3cd7c62668",
+      "bytes": 3255
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/timeline.json",
+      "sha256": "b3ffeba7d820ebc47fdb0b5509bc574ac28b45be22700c5342a5b2c07672aecb",
+      "bytes": 2474
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-post/version.json",
+      "sha256": "b26cfd044ff9f2dc1f0ee0c46147b24e730be86527d1b429a4e3d17672c0e7e8",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/command.json",
+      "sha256": "a0e796702200675815ce4bb17df425d9816394538569d51098063e9522fe5007",
+      "bytes": 1390
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/driver.stdout",
+      "sha256": "6affed1c50cf171fe2a0c4e3b799972a36e7342c480555af4e31141374b8212a",
+      "bytes": 113
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/mountinfo.txt",
+      "sha256": "70b62a699e005d625a6ca47200904b19aa5781ffe884a2099ba8134b47db577e",
+      "bytes": 3504
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/namespace.json",
+      "sha256": "a35c19a4eb9b7bfa5ad51dbc72e65c2ac06938ad2a529128e08623bbafd9e1f3",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/outcomes.json",
+      "sha256": "f7c85a23f73fceee2c808dde2bc5248ebb9ee4d0bc0e0a482cd87707f4c84484",
+      "bytes": 27841
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/records.json",
+      "sha256": "0d54d2454e4849deb67abdc3bdecf2b6ff92d5261747c95d479b2f7a1eb44833",
+      "bytes": 149278
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/server.stderr.records.txt",
+      "sha256": "0db9f6e7ef8c797e2667d812109ddf97d82fb91cc3bbfef0de812d15484d7592",
+      "bytes": 11304
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/timeline.json",
+      "sha256": "7b66bec7ddcfa31f332df42e58f4aad86026a2b532d27e9c324823958b0a170a",
+      "bytes": 9664
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/phase-pre/version.json",
+      "sha256": "22f2f738531d0e1f0ac9ebbeea587fd13d1d21573a986b421d5c978cf362e342",
+      "bytes": 53
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/publication.json",
+      "sha256": "24ebfa0a9301a911761c5560fe27247642626bce998e3e2be87f5685475446ff",
+      "bytes": 12255
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.3.2/attempt-1/run.json",
+      "sha256": "50bd10792ec4597a1baa03df650ae5c9c7128912c99fce2ea616ae9975461072",
+      "bytes": 415
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/acceptance.json",
+      "sha256": "b9d73c4952e550bf2455ffe6e3dc94745b42821c8541ad758fa26261001d42e8",
+      "bytes": 9025
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/handoff/fixture-state.json",
+      "sha256": "e8f09a932f150894bc5f6c87190cdf7f4e2b0dfa1b7ac3b1dc3bd0a3efc8a506",
+      "bytes": 672
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/command.json",
+      "sha256": "cf09b4f2753da0655ca45ccef19d403281d390e912a32ddd0745169fc32e5856",
+      "bytes": 1393
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/driver.stdout",
+      "sha256": "bc2a794d925a79dba9db56e433aa86820475ced314a51fa77b0e0c4b4c92dee8",
+      "bytes": 114
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/mountinfo.txt",
+      "sha256": "e34c611eeeea3a8a6ba34ec275bb78ef68ccb21f1d93b6568c17f151b8bcf3b9",
+      "bytes": 3505
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/namespace.json",
+      "sha256": "9b10edd283c00beefa4db57580e207f8eb0dd32c65f3a0c14b72f23861c98aa1",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/outcomes.json",
+      "sha256": "c7242289126a78113d7f77ab1ef72b97013c5e876bfd3cbb24731c76f736be83",
+      "bytes": 6980
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/records.json",
+      "sha256": "c4000040bb766287f2421156fbd40bb2b57277d3e6eb806a472f952acc4ba978",
+      "bytes": 111295
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/server.stderr.records.txt",
+      "sha256": "aad96cc5b13802b44d8a612461a72806a518306fdd56d2f40132b3d243f9a288",
+      "bytes": 3255
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/timeline.json",
+      "sha256": "18b8016fb8c1542b3c9ee74a49d634b4b3bc9cdbda044cba683d477cc889f635",
+      "bytes": 2474
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-post/version.json",
+      "sha256": "e7061d6ae80b759cf8b7fc6a91018d502e44d0d8200a3f9e2db4885e5ca31b89",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/command.json",
+      "sha256": "c9ab1f2d66816a61c2c6b8967a754da8576a7c940c8edd32a9a87d3821d91aa7",
+      "bytes": 1390
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/driver.stdout",
+      "sha256": "31a1e9058481b03b56c783e6a9541d24092c010e435fcf37f8ef64bb93c38fe7",
+      "bytes": 113
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/mountinfo.txt",
+      "sha256": "50b91d5ef92629689009e756b2811e6a2f9d3bb9301afa1ca71cae1e6028a8c9",
+      "bytes": 3504
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/namespace.json",
+      "sha256": "a35c19a4eb9b7bfa5ad51dbc72e65c2ac06938ad2a529128e08623bbafd9e1f3",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/outcomes.json",
+      "sha256": "1c399b259f08f4379fd6d66f3c014e0b2ac469b9f2a77744e246549cd0f9e0c3",
+      "bytes": 28073
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/records.json",
+      "sha256": "0027c8deaf382995d548e54fe87f53a6ef144a9cef6c5128de5501d02038bc3a",
+      "bytes": 158582
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/server.stderr.records.txt",
+      "sha256": "dbf3c819392c49b01e8e30b24cd45c5e234af47513455d8711baa9a40f91b111",
+      "bytes": 11530
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/timeline.json",
+      "sha256": "facdbce85c4767091088309febf145bcdfdbd7acdd95a529638b860ddd29b528",
+      "bytes": 9664
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/phase-pre/version.json",
+      "sha256": "c9f9c14428cfae2314553c4255347d2b19f78a2bb0a823ba57e217ef88b3c484",
+      "bytes": 53
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/publication.json",
+      "sha256": "f8760e63f5a7b36f95c48c8a264b010581b4f2112f1d98784db957bbb94c3d8a",
+      "bytes": 12255
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.0/attempt-1/run.json",
+      "sha256": "13e8113badc2ef93d9951e03b142da3b1d3b0847ef094e67a39664b1bab8b40a",
+      "bytes": 415
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/acceptance.json",
+      "sha256": "64791bf11e6e59cb847bd95074fb6bc0ee243b74c194bb0517bbd28f797148b3",
+      "bytes": 9025
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/handoff/fixture-state.json",
+      "sha256": "def7eb677dc552b2ebd6d41d105d7a4cf4d9447f7e29fe598859f67f29a6e4a2",
+      "bytes": 672
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/command.json",
+      "sha256": "73bb31475c68e9c9e8a59bae924249922ec47c05a2cc51411cbb2922206e0656",
+      "bytes": 1393
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/driver.stdout",
+      "sha256": "6c07270c31c9a40bb5aa7997e86b772f8b1eec43834ec1d6b59ff099e2a2c36a",
+      "bytes": 114
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/mountinfo.txt",
+      "sha256": "36de57f79875ff1161e292763d9830c0251fee3dfec1504d0ca299daa21e8108",
+      "bytes": 3505
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/namespace.json",
+      "sha256": "9b10edd283c00beefa4db57580e207f8eb0dd32c65f3a0c14b72f23861c98aa1",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/outcomes.json",
+      "sha256": "0f8520b225d45e254fa7aa213071b982222b047a9f67e973eaec0f4345cdd121",
+      "bytes": 6980
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/records.json",
+      "sha256": "86a7b4ffd3682270d9aa9119ad9eae70292b3c6561438e4e495ab5dcbce5ea3d",
+      "bytes": 111295
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/server.stderr.records.txt",
+      "sha256": "50e389a2347608fcb68a78f9f76d1b8c4be0d83dfb58baa09e7db35573dd011c",
+      "bytes": 2266
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/timeline.json",
+      "sha256": "362ef2551849f6e2982d48c266a71a0011d8e407ff9237d8c3db4ac98cec5276",
+      "bytes": 2474
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-post/version.json",
+      "sha256": "8d1e5c88f7c5b57fe9d3d53d0d7fdbd88012da9f361ce0327ac8a174330be3c0",
+      "bytes": 54
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/command.json",
+      "sha256": "5c992f42b1308073faaeb1f93756d29b52430b869ee2c0d28ed5cc0cea35f49d",
+      "bytes": 1390
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/config.toml",
+      "sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+      "bytes": 287
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/driver.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/driver.stdout",
+      "sha256": "5a82ec7b358c69e790c770d1c7a135199e1c37e052b2260fd9098d2004fde9b7",
+      "bytes": 113
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/mountinfo.txt",
+      "sha256": "403610ecd069607fe6cc198e98f5141cb47cf36449edd4bb66d800e1ac0fe180",
+      "bytes": 3504
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/namespace.json",
+      "sha256": "a35c19a4eb9b7bfa5ad51dbc72e65c2ac06938ad2a529128e08623bbafd9e1f3",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/outcomes.json",
+      "sha256": "593e351d92d4553ced81976f80a318915c573831c34b936f4616370bc8d970fc",
+      "bytes": 28073
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/records.json",
+      "sha256": "9f808720bbe4d9a809ef80225b45d1dd42fe5ffa82575292386178b9fce1e4fe",
+      "bytes": 158582
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/server-argv.json",
+      "sha256": "ec5676fe7246f96c5345bccdfd7a5842bdbcb0544f0c8576cd7cc26052f39019",
+      "bytes": 204
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/server.stderr.records.txt",
+      "sha256": "3544576d585cc814fa713b58c166fe1b42393dc508011c43751692f516e93e0d",
+      "bytes": 10628
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/shutdown.json",
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+      "bytes": 28
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/timeline.json",
+      "sha256": "a8fa9429f43650a97e3a3994944e9f6c8800a0202ee18309b44e7d1570dd21e2",
+      "bytes": 9664
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/phase-pre/version.json",
+      "sha256": "9e869488224bc2bec3e01909cfcc8415c29040d627bbe4d04e792cd8d0f26000",
+      "bytes": 53
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/publication.json",
+      "sha256": "92fb59a026bbab23ee1d9ef4c49078a4abce477693c756b27fa0dfd91594adeb",
+      "bytes": 12255
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/runs-20260926/ai-memory-2.4.1/attempt-1/run.json",
+      "sha256": "36bc7801621cc5c6e2508e4436339c93d5d960209f894bca2fb88d219f032aa0",
+      "bytes": 415
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control.py",
+      "sha256": "50b629fadcd02c1c513fd8927e81378f6e3ac181d484ed9d1a407695a1dbaf14",
+      "bytes": 6749
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-0-unmodified.log",
+      "sha256": "dfe8e4de77f8fee8f5fe6c384becb3c14195bad4af1f6bdfee9c751c4c403ea3",
+      "bytes": 2332
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-0-unmodified.receipt.json",
+      "sha256": "285c85d216ff15c42a39ce4848ddd43b837d5878d9d8237eb262054b8e111740",
+      "bytes": 3538
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-1-empty-fragment.diff",
+      "sha256": "fe3b31e51dd43125c662f06352868935c2243bc6e397870432081c0851297fd4",
+      "bytes": 479
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-1-empty-fragment.log",
+      "sha256": "f95d6392f167ef64bb926e5d056fe60e6477ae2fb4bab284fc4411855c807aca",
+      "bytes": 1097
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-1-empty-fragment.receipt.json",
+      "sha256": "79ad258e96d1f850b602ba5b46086db2c45271983ad12dab75cf3bf394d28c99",
+      "bytes": 3703
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-2-filter-always-true.diff",
+      "sha256": "b6d7855ea6605a89d7afb99c74fd70b8acd451d12a3e8dfd0b5d9ac4715fc19e",
+      "bytes": 522
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-2-filter-always-true.log",
+      "sha256": "b5a6855a1b3a61c67872267cb3996abee1a51e096bbb80fa4e4641c15de35c83",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-2-filter-always-true.receipt.json",
+      "sha256": "4b3d2c27410ac7142f40d06b24eba90ffa6ba36809087dfe1dfff52172a19b2e",
+      "bytes": 3715
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-3-restored.log",
+      "sha256": "bb427baed49545fa0ffef5a0629d2584d7e520c72b2239b3eb28d6b20efadd12",
+      "bytes": 590
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-3-restored.receipt.json",
+      "sha256": "ba6322c7619de92cf3b320ff5b13cc39484db32024d9281adae8acefc0d0d15c",
+      "bytes": 3530
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/control/control-summary.json",
+      "sha256": "512120451eb7c6cd433437df9fe41d0da4138b3eb93f430361558f3638e5ecf7",
+      "bytes": 329
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/property-map.json",
+      "sha256": "8e209c4cddb1bd1d244c96c128f1a0b52087fba8a75302c72d332e8db108a8ce",
+      "bytes": 284176
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/publication.json",
+      "sha256": "95f92881cd3d8cf10385d6bafe6b06b689752d8b2ef3f2b56ae235ffb0053b80",
+      "bytes": 18351
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/publish_upstream.py",
+      "sha256": "3d959ec1234fc316d562a66ef75257ff3c0003621a57713af9c562427c429d7d",
+      "bytes": 12078
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/release-verification.json",
+      "sha256": "53900aef48af7a9d44440ade96311e603ed1937ba23a68f92cb97bf508e782a0",
+      "bytes": 3397
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py",
+      "sha256": "fdc180afc88c6f038fb5895c7a2cb401a09e0ee9e5e2f4a6afa3ab734bd490c0",
+      "bytes": 10318
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/rustup-init-verification.json",
+      "sha256": "c7598bc1c0e5e35969ea3dc73270ec7e5684badfeb18134676ade694070a34e6",
+      "bytes": 1364
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/setup.log",
+      "sha256": "13baa112ed790de734726ad14e852b13b3591aa35262a9741262153c689acc36",
+      "bytes": 22949
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/setup.sh",
+      "sha256": "8f0b7e32cdb6036996be0aa8ca1fa7fed6c75f48af2c580dae241d29c66272e1",
+      "bytes": 2042
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.3.2/workspace-all-targets.log",
+      "sha256": "6439a7f7b4e7b5b71875de0a8dc1dad1d314f32161d1c8e3224bf45d9c74f065",
+      "bytes": 304089
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.3.2/workspace-all-targets.receipt.json",
+      "sha256": "c25f242a3737c77c8f797c30c7ef38d5637bde21b5b4bc719ef8a79ce8f0d185",
+      "bytes": 6281
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.4.0/workspace-all-targets.log",
+      "sha256": "b72e0c4a6f7d19b4474cf4b62a2924f8e5b31e965c68777703cae70e55778839",
+      "bytes": 316857
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.4.0/workspace-all-targets.receipt.json",
+      "sha256": "7369fb894af41e4bf6f416db1a2607c95bb9a28cabc8c349d344cf0662ed15f3",
+      "bytes": 6281
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.4.1/workspace-all-targets.log",
+      "sha256": "33dc1490363d16fa7e9c6d5295ae156986ba1db94534821ad16b749df3032243",
+      "bytes": 325131
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.4.1/workspace-all-targets.receipt.json",
+      "sha256": "f459191f8df03569638400271d4ffb43e8587863e68e0794e1cc7e748b431bc8",
+      "bytes": 6281
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.4.1/workspace-doc.log",
+      "sha256": "02e813d2b1bae6701d02b0f185341b2574f20e01fd67fe7b7e3272862b7243bc",
+      "bytes": 1643
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/superseded-round-1/v2.4.1/workspace-doc.receipt.json",
+      "sha256": "4410f9f063994f0f635133cf9184d4010befc436f747a1875c3d362f3616f079",
+      "bytes": 4776
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.3.2/workspace-all-targets.log",
+      "sha256": "e4e005b87b6f0d048a6365c1a70c081b913d719930a64f75ea6d0de09545fe04",
+      "bytes": 291372
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.3.2/workspace-all-targets.receipt.json",
+      "sha256": "092f2aaf5adf0b98b9aec3c343d953eb89bc0a0238bd2f1aa98638dcb586d64c",
+      "bytes": 6366
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.4.0/workspace-all-targets.log",
+      "sha256": "8b8d0d814a5a383144eb5a737aab27908d0e05662e6c7b8da488905c41735979",
+      "bytes": 303962
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.4.0/workspace-all-targets.receipt.json",
+      "sha256": "e4e4f3885d860a00412df131ac220b3658fdb7b4e5292bed8aa6c35d3957f9a7",
+      "bytes": 6366
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.4.1/workspace-all-targets.log",
+      "sha256": "8aae8f08634c6f2f1a78d94dea87fbbf88079f222f8ac69f09f467b17efbb1eb",
+      "bytes": 312476
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.4.1/workspace-all-targets.receipt.json",
+      "sha256": "a1b2fd975dfeb571b781f095d883c29fbb3001d3b29def393070240b9e4800ed",
+      "bytes": 6366
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.4.1/workspace-doc.log",
+      "sha256": "7fadc1b7903049a49abac67f1c4c743af0808148e7013d379fac41b044ab71c3",
+      "bytes": 1643
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/v2.4.1/workspace-doc.receipt.json",
+      "sha256": "26878fdda25d9c0a9cdd9e6824d1f86ae32d945977fa8b0ca6de25fdd37eccb7",
+      "bytes": 4845
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/verify_release.py",
+      "sha256": "2f75f1633dd3fc54efa1ad3ac61393541e773f458c22df2421239c21f8ad6e68",
+      "bytes": 4131
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/verify_rustup_init.py",
+      "sha256": "e867397f6052b1173df57387cf7d14ba42fedeffbd1fde1fe4828c915d7946d3",
+      "bytes": 3465
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
@@ -33338,6 +34358,11 @@
       "path": "tests/test_memory_lifecycle.py",
       "sha256": "d61a864ed272d9f8c796751c2d78ce27ec1ae18645ffeea455ce83bd212600c0",
       "bytes": 2188
+    },
+    {
+      "path": "tests/test_memory_lifecycle_v2.py",
+      "sha256": "56d285d7cb593c576239478d889aa53209d02804cc2e2df5ce380d79c275d3a0",
+      "bytes": 55929
     },
     {
       "path": "tests/test_mover_early_entry_pipeline.py",

@@ -1,0 +1,19 @@
+2026-09-25T20:32:11.750657Z  INFO ai_memory_cli: ai-memory starting version="2.3.2" server_url=http://127.0.0.1:49374 data_dir=/run/data bind=127.0.0.1:49374
+2026-09-25T20:32:11.750893Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=/run/data/.serve.lock
+2026-09-25T20:32:11.755317Z  INFO refinery_core::traits: current version: 64
+2026-09-25T20:32:11.755369Z  INFO refinery_core::traits::sync: no migrations to apply
+2026-09-25T20:32:11.755373Z  INFO refinery_core::traits::sync: preparing to apply 0 migrations: Map {
+2026-09-25T20:32:11.765691Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+2026-09-25T20:32:11.766622Z  INFO ai_memory_cli::commands::serve: watcher disabled by --no-watcher
+2026-09-25T20:32:11.766653Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096
+2026-09-25T20:32:11.770462Z  INFO ai_memory_cli::commands::serve: AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+2026-09-25T20:32:11.770503Z  INFO ai_memory_cli::commands::serve: scheduled retention/lint/embed maintenance disabled
+2026-09-25T20:32:11.770507Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler disabled; manual auto-improve remains available
+2026-09-25T20:32:11.770510Z  INFO ai_memory_cli::commands::serve: scheduled maintenance enabled but all intervals are disabled
+2026-09-25T20:32:11.770515Z  INFO ai_memory_cli::commands::serve: MCP server ready on stdio (Ctrl-C to stop)
+2026-09-25T20:32:11.770918Z  INFO serve_inner: rmcp::service: Service initialized as server peer_info=Some(InitializeRequestParams { meta: None, protocol_version: ProtocolVersion("2025-03-26"), capabilities: ClientCapabilities { experimental: None, extensions: None, roots: None, sampling: None, elicitation: None, tasks: None }, client_info: Implementation { name: "memory-lifecycle-v2", title: None, version: "1", description: None, icons: None, website_url: None } })
+2026-09-25T20:32:11.771427Z  INFO serve_inner: rmcp::service: received notification notification=InitializedNotification(NotificationNoParam { method: InitializedNotificationMethod, extensions: Extensions })
+2026-09-25T20:32:11.771473Z  INFO serve_inner: rmcp::handler::server: client initialized
+2026-09-25T20:32:11.787996Z  WARN serve_inner: rmcp::service: response error id=12 error=ErrorData { code: ErrorCode(-32603), message: "page notes/revision.md not found in resolved scope lifecycle-v2/alpha", data: None }
+2026-09-25T20:32:11.817532Z  INFO serve_inner: rmcp::service: input stream terminated
+2026-09-25T20:32:11.817585Z  INFO serve_inner: rmcp::service: serve finished quit_reason=Closed

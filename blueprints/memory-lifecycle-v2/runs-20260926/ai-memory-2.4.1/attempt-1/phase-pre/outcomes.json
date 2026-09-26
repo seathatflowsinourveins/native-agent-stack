@@ -1,0 +1,900 @@
+{
+  "alpha_read": {
+    "id": 7,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Alpha routing\",\n  \"body\": \"# Alpha routing\\nMarigoldpixel is a alpha fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:01Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "alpha_search_beta": {
+    "id": 15,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "alpha_search_delta": {
+    "id": 17,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "alpha_search_gamma": {
+    "id": 16,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "alpha_search_self": {
+    "id": 11,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-1\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Alpha routing\",\n      \"snippet\": \"# Alpha routing\\n<mark>Marigoldpixel</mark> is a alpha fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_after_alpha_mutations": {
+    "id": 68,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Beta routing\",\n  \"body\": \"# Beta routing\\nDriftwoodlantern is a beta fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:01Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_read": {
+    "id": 8,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Beta routing\",\n  \"body\": \"# Beta routing\\nDriftwoodlantern is a beta fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:01Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_search_alpha": {
+    "id": 18,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_search_delta": {
+    "id": 20,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_search_gamma": {
+    "id": 19,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_search_self": {
+    "id": 12,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-2\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Beta routing\",\n      \"snippet\": \"# Beta routing\\n<mark>Driftwoodlantern</mark> is a beta fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delete_revision": {
+    "id": 65,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/revision.md\",\n  \"deleted\": true,\n  \"pre_checkpoint\": null,\n  \"checkpoint\": \"fixture-checkpoint-11\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "deleted_as_of": {
+    "id": 67,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "deleted_now": {
+    "id": 66,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delta_read": {
+    "id": 10,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Delta routing\",\n  \"body\": \"# Delta routing\\nThistlebronze is a delta fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:01Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delta_search_alpha": {
+    "id": 24,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delta_search_beta": {
+    "id": 25,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delta_search_gamma": {
+    "id": 26,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delta_search_self": {
+    "id": 14,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-4\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Delta routing\",\n      \"snippet\": \"# Delta routing\\n<mark>Thistlebronze</mark> is a delta fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "durable_after_expiry_wait": {
+    "id": 41,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-6\",\n      \"path\": \"notes/durable.md\",\n      \"title\": \"Durable fixture\",\n      \"snippet\": \"# Durable fixture\\n<mark>Granitewillow</mark> has no expiry.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "durable_after_sweep": {
+    "id": 57,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-6\",\n      \"path\": \"notes/durable.md\",\n      \"title\": \"Durable fixture\",\n      \"snippet\": \"# Durable fixture\\n<mark>Granitewillow</mark> has no expiry.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_past_after_preview": {
+    "id": 49,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-7\",\n      \"path\": \"notes/expired.md\",\n      \"title\": \"Expired fixture\",\n      \"snippet\": \"# Expired fixture\\n<mark>Palewinterlynx</mark> is temporary.\\n\",\n      \"rank\": -0.01934426229508197\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_past_after_sweep": {
+    "id": 52,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_past_after_sweep_direct_read": {
+    "error": {
+      "code": -32603,
+      "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha"
+    },
+    "id": 55,
+    "jsonrpc": "2.0"
+  },
+  "expired_past_default": {
+    "id": 43,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_past_direct_read": {
+    "id": 45,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/expired.md\",\n  \"title\": \"Expired fixture\",\n  \"body\": \"# Expired fixture\\nPalewinterlynx is temporary.\\n\",\n  \"frontmatter\": {\n    \"pinned\": true,\n    \"expires_at\": \"2000-01-01T00:00:00Z\",\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"stale_after\": \"2000-01-01T00:00:00Z\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:07Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_past_explicit": {
+    "id": 44,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-7\",\n      \"path\": \"notes/expired.md\",\n      \"title\": \"Expired fixture\",\n      \"snippet\": \"# Expired fixture\\n<mark>Palewinterlynx</mark> is temporary.\\n\",\n      \"rank\": -0.01934426229508197\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "future_after_sweep": {
+    "id": 56,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-8\",\n      \"path\": \"notes/future.md\",\n      \"title\": \"Future fixture\",\n      \"snippet\": \"# Future fixture\\n<mark>Sablefernbrook</mark> is retained.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "future_default": {
+    "id": 47,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-8\",\n      \"path\": \"notes/future.md\",\n      \"title\": \"Future fixture\",\n      \"snippet\": \"# Future fixture\\n<mark>Sablefernbrook</mark> is retained.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "gamma_read": {
+    "id": 9,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Gamma routing\",\n  \"body\": \"# Gamma routing\\nCinderfoxglove is a gamma fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:01Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "gamma_search_alpha": {
+    "id": 21,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "gamma_search_beta": {
+    "id": 22,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "gamma_search_delta": {
+    "id": 23,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "gamma_search_self": {
+    "id": 13,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-3\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Gamma routing\",\n      \"snippet\": \"# Gamma routing\\n<mark>Cinderfoxglove</mark> is a gamma fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "global_finds_alpha": {
+    "id": 31,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [],\n  \"global_hits\": [\n    {\n      \"workspace_name\": \"lifecycle-v2\",\n      \"project_name\": \"alpha\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Alpha routing\",\n      \"snippet\": \"# Alpha routing\\n<mark>Marigoldpixel</mark> is a alpha fixture only.\\n\",\n      \"rank\": -0.9320276464259241\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "global_finds_beta": {
+    "id": 32,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [],\n  \"global_hits\": [\n    {\n      \"workspace_name\": \"lifecycle-v2\",\n      \"project_name\": \"beta\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Beta routing\",\n      \"snippet\": \"# Beta routing\\n<mark>Driftwoodlantern</mark> is a beta fixture only.\\n\",\n      \"rank\": -0.9320276464259241\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "global_finds_delta": {
+    "id": 34,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [],\n  \"global_hits\": [\n    {\n      \"workspace_name\": \"lifecycle-v2-secondary\",\n      \"project_name\": \"delta\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Delta routing\",\n      \"snippet\": \"# Delta routing\\n<mark>Thistlebronze</mark> is a delta fixture only.\\n\",\n      \"rank\": -0.9320276464259241\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "global_finds_gamma": {
+    "id": 33,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [],\n  \"global_hits\": [\n    {\n      \"workspace_name\": \"lifecycle-v2\",\n      \"project_name\": \"gamma\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Gamma routing\",\n      \"snippet\": \"# Gamma routing\\n<mark>Cinderfoxglove</mark> is a gamma fixture only.\\n\",\n      \"rank\": -0.9320276464259241\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "invalid_combined_scope": {
+    "error": {
+      "code": -32603,
+      "message": "global cannot be combined with workspace/project/scopes"
+    },
+    "id": 28,
+    "jsonrpc": "2.0"
+  },
+  "invalid_expiry": {
+    "error": {
+      "code": -32603,
+      "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+    },
+    "id": 58,
+    "jsonrpc": "2.0"
+  },
+  "missing_scope": {
+    "error": {
+      "code": -32602,
+      "message": "project 'absent' not found in workspace 'lifecycle-v2'"
+    },
+    "id": 27,
+    "jsonrpc": "2.0"
+  },
+  "new2_now": {
+    "id": 72,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-12\",\n      \"path\": \"notes/revision2.md\",\n      \"title\": \"Revision2 fixture\",\n      \"snippet\": \"# Revision2 fixture\\n<mark>Copperlatticefawn</mark> is the replacement.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "new_as_of": {
+    "id": 64,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [],\n  \"streams_active\": [\n    \"entity\",\n    \"fts\"\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "new_now": {
+    "id": 62,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-10\",\n      \"path\": \"notes/revision.md\",\n      \"title\": \"Revision fixture\",\n      \"snippet\": \"# Revision fixture\\n<mark>Brightendersteel</mark> is the replacement.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "old2_as_of": {
+    "id": 71,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-11\",\n      \"path\": \"notes/revision2.md\",\n      \"title\": \"Revision2 fixture\",\n      \"snippet\": \"# Revision2 fixture\\n<mark>Ironpetalwren</mark> is the original.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "old_as_of": {
+    "id": 63,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-9\",\n      \"path\": \"notes/revision.md\",\n      \"title\": \"Revision fixture\",\n      \"snippet\": \"# Revision fixture\\n<mark>Hollowcopperfield</mark> is the original.\\n\",\n      \"rank\": -0.018032786885245903,\n      \"score_details\": {\n        \"fts_rank\": 1,\n        \"fts_score\": -1.6491226828776808,\n        \"rrf\": {\n          \"fts\": 0.01639344262295082,\n          \"vector\": 0.0,\n          \"graph\": 0.0,\n          \"entity\": 0.0\n        },\n        \"fused\": 0.01639344262295082,\n        \"authority\": 1.1\n      }\n    }\n  ],\n  \"streams_active\": [\n    \"entity\",\n    \"fts\"\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "old_now": {
+    "id": 61,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "scopes_excludes_delta": {
+    "id": 30,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "scopes_ws1_three": {
+    "id": 29,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-1\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Alpha routing\",\n      \"snippet\": \"# Alpha routing\\n<mark>Marigoldpixel</mark> is a alpha fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    },\n    {\n      \"id\": \"fixture-id-2\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Beta routing\",\n      \"snippet\": \"# Beta routing\\n<mark>Driftwoodlantern</mark> is a beta fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    },\n    {\n      \"id\": \"fixture-id-3\",\n      \"path\": \"notes/routing.md\",\n      \"title\": \"Gamma routing\",\n      \"snippet\": \"# Gamma routing\\n<mark>Cinderfoxglove</mark> is a gamma fixture only.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "status_pre": {
+    "id": 73,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"counts\": {\n    \"pages_latest\": 4,\n    \"pages_all\": 5,\n    \"sessions\": 0,\n    \"observations\": 0,\n    \"evidence_rows\": 0\n  },\n  \"scope\": {\n    \"workspace\": \"lifecycle-v2\",\n    \"project\": \"alpha\",\n    \"resolved_by\": \"default\"\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "sweep_apply": {
+    "id": 51,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"dry_run\": false,\n  \"candidates_evaluated\": 5,\n  \"evicted\": [],\n  \"compacted\": [],\n  \"merged\": [],\n  \"expired\": [\n    {\n      \"id\": \"fixture-id-5\",\n      \"path\": \"notes/ttl-short.md\",\n      \"expired_at\": \"2026-09-26T02:19:05Z\",\n      \"deleted\": true\n    },\n    {\n      \"id\": \"fixture-id-7\",\n      \"path\": \"notes/expired.md\",\n      \"expired_at\": \"2000-01-01T00:00:00Z\",\n      \"deleted\": true\n    }\n  ],\n  \"hard_deleted\": 0,\n  \"observations_prunable\": 0,\n  \"observations_pruned\": 0,\n  \"observation_prune_sessions\": 0,\n  \"observation_prune_batches\": 0\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "sweep_preview": {
+    "id": 48,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"dry_run\": true,\n  \"candidates_evaluated\": 5,\n  \"evicted\": [],\n  \"compacted\": [],\n  \"merged\": [],\n  \"expired\": [\n    {\n      \"id\": \"fixture-id-5\",\n      \"path\": \"notes/ttl-short.md\",\n      \"expired_at\": \"2026-09-26T02:19:05Z\",\n      \"deleted\": false\n    },\n    {\n      \"id\": \"fixture-id-7\",\n      \"path\": \"notes/expired.md\",\n      \"expired_at\": \"2000-01-01T00:00:00Z\",\n      \"deleted\": false\n    }\n  ],\n  \"hard_deleted\": 0,\n  \"observations_prunable\": 0,\n  \"observations_pruned\": 0,\n  \"observation_prune_sessions\": 0,\n  \"observation_prune_batches\": 0\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "ttl_after_expiry_default": {
+    "id": 38,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "ttl_after_expiry_direct_read": {
+    "id": 40,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"path\": \"notes/ttl-short.md\",\n  \"title\": \"TTL fixture\",\n  \"body\": \"# TTL fixture\\nEmberquokka expires soon.\\n\",\n  \"frontmatter\": {\n    \"expires_at\": \"2026-09-26T02:19:05Z\",\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"stale_after\": \"2026-09-26T02:19:05Z\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.4.1\",\n      \"at\": \"2026-09-26T02:19:01Z\"\n    }\n  }\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "ttl_after_expiry_explicit": {
+    "id": 39,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-5\",\n      \"path\": \"notes/ttl-short.md\",\n      \"title\": \"TTL fixture\",\n      \"snippet\": \"# TTL fixture\\n<mark>Emberquokka</mark> expires soon.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "ttl_after_preview": {
+    "id": 50,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-5\",\n      \"path\": \"notes/ttl-short.md\",\n      \"title\": \"TTL fixture\",\n      \"snippet\": \"# TTL fixture\\n<mark>Emberquokka</mark> expires soon.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "ttl_after_sweep": {
+    "id": 53,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": []\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "ttl_after_sweep_direct_read": {
+    "error": {
+      "code": -32603,
+      "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha"
+    },
+    "id": 54,
+    "jsonrpc": "2.0"
+  },
+  "ttl_before_expiry": {
+    "id": 37,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-5\",\n      \"path\": \"notes/ttl-short.md\",\n      \"title\": \"TTL fixture\",\n      \"snippet\": \"# TTL fixture\\n<mark>Emberquokka</mark> expires soon.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_alpha": {
+    "id": 3,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-1\",\n  \"path\": \"notes/routing.md\",\n  \"checkpoint\": \"fixture-checkpoint-1\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_beta": {
+    "id": 4,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-2\",\n  \"path\": \"notes/routing.md\",\n  \"checkpoint\": \"fixture-checkpoint-2\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_delta": {
+    "id": 6,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-4\",\n  \"path\": \"notes/routing.md\",\n  \"checkpoint\": \"fixture-checkpoint-4\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_durable": {
+    "id": 36,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-6\",\n  \"path\": \"notes/durable.md\",\n  \"checkpoint\": \"fixture-checkpoint-6\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_expired_past": {
+    "id": 42,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-7\",\n  \"path\": \"notes/expired.md\",\n  \"checkpoint\": \"fixture-checkpoint-7\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_future": {
+    "id": 46,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-8\",\n  \"path\": \"notes/future.md\",\n  \"checkpoint\": \"fixture-checkpoint-8\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_gamma": {
+    "id": 5,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-3\",\n  \"path\": \"notes/routing.md\",\n  \"checkpoint\": \"fixture-checkpoint-3\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_new": {
+    "id": 60,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-10\",\n  \"path\": \"notes/revision.md\",\n  \"checkpoint\": \"fixture-checkpoint-10\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_new2": {
+    "id": 70,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-12\",\n  \"path\": \"notes/revision2.md\",\n  \"checkpoint\": \"fixture-checkpoint-13\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_old": {
+    "id": 59,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-9\",\n  \"path\": \"notes/revision.md\",\n  \"checkpoint\": \"fixture-checkpoint-9\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_old2": {
+    "id": 69,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-11\",\n  \"path\": \"notes/revision2.md\",\n  \"checkpoint\": \"fixture-checkpoint-12\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_ttl_short": {
+    "id": 35,
+    "jsonrpc": "2.0",
+    "result": {
+      "content": [
+        {
+          "text": "{\n  \"page_id\": \"fixture-id-5\",\n  \"path\": \"notes/ttl-short.md\",\n  \"checkpoint\": \"fixture-checkpoint-5\"\n}",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  }
+}

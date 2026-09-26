@@ -1,0 +1,183 @@
+{
+  "passed": true,
+  "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+  "pre": {
+    "passed": true,
+    "tool_calls": 69,
+    "checks": {
+      "write_alpha_ok": true,
+      "alpha_read_matches": true,
+      "alpha_search_self_one_hit": true,
+      "write_beta_ok": true,
+      "beta_read_matches": true,
+      "beta_search_self_one_hit": true,
+      "write_gamma_ok": true,
+      "gamma_read_matches": true,
+      "gamma_search_self_one_hit": true,
+      "write_delta_ok": true,
+      "delta_read_matches": true,
+      "delta_search_self_one_hit": true,
+      "alpha_search_beta_zero": true,
+      "alpha_search_gamma_zero": true,
+      "alpha_search_delta_zero": true,
+      "beta_search_alpha_zero": true,
+      "beta_search_gamma_zero": true,
+      "beta_search_delta_zero": true,
+      "gamma_search_alpha_zero": true,
+      "gamma_search_beta_zero": true,
+      "gamma_search_delta_zero": true,
+      "delta_search_alpha_zero": true,
+      "delta_search_beta_zero": true,
+      "delta_search_gamma_zero": true,
+      "missing_scope_error": true,
+      "invalid_combined_scope_error": true,
+      "scopes_ws1_three_count3": true,
+      "scopes_ws1_three_all_routing": true,
+      "scopes_excludes_delta_zero": true,
+      "global_finds_alpha_one_hit": true,
+      "global_finds_alpha_origin_annotated": true,
+      "global_finds_beta_one_hit": true,
+      "global_finds_beta_origin_annotated": true,
+      "global_finds_gamma_one_hit": true,
+      "global_finds_gamma_origin_annotated": true,
+      "global_finds_delta_one_hit": true,
+      "global_finds_delta_origin_annotated": true,
+      "ttl_before_expiry_one_hit": true,
+      "ttl_after_expiry_default_zero": true,
+      "ttl_after_expiry_explicit_one_hit": true,
+      "ttl_after_expiry_direct_read_ok": true,
+      "durable_after_expiry_wait_one_hit": true,
+      "sweep_preview_dry_run_true": true,
+      "sweep_preview_expired_set_correct": true,
+      "expired_past_after_preview_one_hit": true,
+      "ttl_after_preview_one_hit": true,
+      "sweep_apply_dry_run_false": true,
+      "sweep_apply_expired_set_correct": true,
+      "expired_past_after_sweep_zero": true,
+      "ttl_after_sweep_zero": true,
+      "future_after_sweep_one_hit": true,
+      "durable_after_sweep_one_hit": true,
+      "write_expired_past_ok": true,
+      "expired_past_default_zero": true,
+      "expired_past_explicit_one_hit": true,
+      "expired_past_direct_read_body_and_pinned": true,
+      "write_future_ok": true,
+      "future_default_one_hit": true,
+      "invalid_expiry_error": true,
+      "write_old_new_distinct_ids": true,
+      "old_now_zero": true,
+      "new_now_one_hit": true,
+      "old_as_of_matches_old_id_and_fts_active": true,
+      "new_as_of_zero": true,
+      "delete_revision_true": true,
+      "deleted_now_zero": true,
+      "deleted_as_of_zero": true,
+      "beta_unaffected_by_alpha": true,
+      "write_old2_new2_distinct_ids": true,
+      "old2_as_of_one_hit_matches_id": true,
+      "new2_now_one_hit_matches_id": true,
+      "status_pre_no_imported_history": true
+    },
+    "expected_protocol_rejections": {
+      "invalid_combined_scope": {
+        "code": -32603,
+        "message": "global cannot be combined with workspace/project/scopes"
+      },
+      "invalid_expiry": {
+        "code": -32603,
+        "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+      },
+      "missing_scope": {
+        "code": -32602,
+        "message": "project 'absent' not found in workspace 'lifecycle-v2'"
+      }
+    },
+    "sweep": {
+      "preview_expired": [
+        {
+          "id": "fixture-id-5",
+          "path": "notes/ttl-short.md",
+          "expired_at": "2026-09-25T20:32:16Z",
+          "deleted": false
+        },
+        {
+          "id": "fixture-id-7",
+          "path": "notes/expired.md",
+          "expired_at": "2000-01-01T00:00:00Z",
+          "deleted": false
+        }
+      ],
+      "apply_expired": [
+        {
+          "id": "fixture-id-5",
+          "path": "notes/ttl-short.md",
+          "expired_at": "2026-09-25T20:32:16Z",
+          "deleted": true
+        },
+        {
+          "id": "fixture-id-7",
+          "path": "notes/expired.md",
+          "expired_at": "2000-01-01T00:00:00Z",
+          "deleted": true
+        }
+      ],
+      "native_hard_deleted_counter": 0
+    },
+    "status_counts": {
+      "pages_latest": 4,
+      "pages_all": 5,
+      "sessions": 0,
+      "observations": 0,
+      "evidence_rows": 0
+    },
+    "page_ids": {
+      "old_id": "fixture-id-9",
+      "new_id": "fixture-id-10",
+      "old2_id": "fixture-id-11",
+      "new2_id": "fixture-id-12"
+    }
+  },
+  "post": {
+    "passed": true,
+    "tool_calls": 16,
+    "checks": {
+      "alpha_read_persisted": true,
+      "beta_read_persisted": true,
+      "gamma_read_persisted": true,
+      "delta_read_persisted": true,
+      "durable_persisted": true,
+      "old2_as_of_persisted_same_id": true,
+      "new2_now_persisted_same_id": true,
+      "revision_deletion_persisted_current": true,
+      "revision_deletion_persisted_as_of": true,
+      "revision_deleted_direct_read_still_errors": true,
+      "ttl_sweep_persisted": true,
+      "expired_past_sweep_persisted": true,
+      "future_persisted": true,
+      "status_post_no_imported_history": true,
+      "status_stable_across_restart": true,
+      "post_restart_write_ok": true,
+      "post_restart_readback_one_hit": true
+    },
+    "expected_protocol_rejections": {
+      "revision_deleted_direct_read": {
+        "code": -32603,
+        "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha"
+      }
+    },
+    "status_counts_post": {
+      "pages_latest": 4,
+      "pages_all": 5,
+      "sessions": 0,
+      "observations": 0,
+      "evidence_rows": 0
+    },
+    "status_counts_pre": {
+      "evidence_rows": 0,
+      "observations": 0,
+      "pages_all": 5,
+      "pages_latest": 4,
+      "sessions": 0
+    }
+  }
+}

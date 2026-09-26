@@ -1,0 +1,6 @@
+ca81e9b4380999e7ca8882fe1ae23116ae910adbec30e6eb43fefd09f15ed1a3  <scratch>/wt-w3/blueprints/memory-lifecycle-v2/PREREGISTRATION.md
+2026-09-25T20:17:18Z
+--- correction 2026-09-25T20:23:01Z ---
+original preregistration sha256 (frozen before any run): ca81e9b4380999e7ca8882fe1ae23116ae910adbec30e6eb43fefd09f15ed1a3
+reason: exercise.py's own len(outcomes)!=N guard raised on the FIRST 2.3.2 phase-post attempt (got 16, doc said 15); the table row already specified both the write and the read-back as the bonus check, only the summary arithmetic (14+1=15) was wrong. No check, pass bar, or fixture content changed. Fixed exercise.py/analyze.py to assert 16, fixed the one arithmetic sentence + the failure-section count in PREREGISTRATION.md. That first attempt's partial phase-post output was discarded; phase-pre and phase-post are both re-run clean for 2.3.2 after this fix.
+fb82e0aa48df80bb97349a957dac195ca268bee9f1ff7673303e057abdfb1d7c  <scratch>/wt-w3/blueprints/memory-lifecycle-v2/PREREGISTRATION.md
