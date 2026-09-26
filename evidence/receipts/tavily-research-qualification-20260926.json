@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "id": "tavily-research-qualification-20260926",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T05:44:25Z",
+  "catalog_revision": "1b0e4598f30a756fc1615e361360dd2d18372617",
+  "component_ids": [
+    "tavily-cli"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, tavily-cli 0.1.8 (a uv tool, tavily-python 0.8.4) returned 33 Tavily Research reports with model pro, and every one has status completed. The 32 runs of the per-layer landscape sweep were started by the retained launcher tavily_layer.sh, one per catalog layer, each as `python3 kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly research run --model pro --json --citation-format numbered --timeout 1500 --client-name native-agent-stack -o <layer>.json <question>`, so TAVILY_API_KEY came from the Linux kernel user keyring and was set only in the tvly process's environment. They were created between 04:17:21Z and 04:49:21Z. The retained run.log has one `rc=0` line per layer; every run left an empty stdout and only tvly's `Output saved to` message on stderr, and every saved report has the six expected fields and a distinct UUID-shaped request id. Response times were 168.49 to 367.68 s (median 248.18), with 11 to 25 sources per report (median 17). The earlier Alpaca platform landscape report, retained in evidence/artifacts/alpaca-platform-landscape-20260926/tavily-research-pro.json and created at 03:00:49Z, records model pro, status completed, 32 sources and a response time of 291.57 s. Across all 33 reports the response time was 168.49 / 248.85 / 367.68 s (min / median / max) and the sources per report 11 / 17 / 32. Evidence class: native provider execution of the Tavily Research endpoint (tvly research run --model pro) through the kernel keyring exec; no quality comparison with another research endpoint. The runs show that the endpoint accepted the keyring-held key and returned completed reports; they do not show that the reports are correct, complete or better than another research path.",
+  "limitations": [
+    "No quality comparison: no report was scored or compared with another research endpoint, a search-plus-extract pipeline or a model's own research. The summary measured status, timing, source counts and report sizes only; report text and sources were not reviewed for this receipt.",
+    "The runs used a prototype kernel_keyring.py from the session's scratch directory (sha256 59a39a5a6307321ecac489c5be42199a54c74daeeb947bffd33bddec134798f7, 4,456 bytes, 98 lines, modified 03:00:13Z), not the committed scripts/kernel_keyring.py (sha256 fdb72475568f48301b543bf9efc43b45c8bcf730f91c3493a3ce4c858ece864e), which #325 committed at 05:02:02Z, after the runs. The prototype's exec path reads the payload and runs `env[env_var] = _read(libc, nr_keyctl, serial).decode()` and then `os.execvpe(child[0], child, env)`, so the variable reaches only the started command, as with the committed script; unlike it, the prototype does not restrict ENV_VAR or refuse startup variables. The prototype is not retained in this repository.",
+    "The landscape run's launch command was not retained. Its artifact's README states that the key was held only in the kernel keyring, and the run was created 36 s after the prototype was last modified; which script started it is not recorded.",
+    "The raw sweep reports (report text, source URLs and request ids) stay in the session's scratch directory and are not published. summary.json keeps only statuses, times, counts, sizes and request ids hashed as uuid-sha256:<first 16 hex digits of the SHA-256 of the UTF-8 id>; the landscape artifact's id was hashed when that artifact was written, by a rule it does not record.",
+    "Provider usage is unknown: Tavily credits and cost were not recorded. response_time is the provider's own field, not a wall-clock measurement by this repository.",
+    "run.log, as retained, has one rc=0 line per layer and no `skip` line. Attempts outside that log, if any, are not recorded.",
+    "One host, one day and one CLI version: tavily-cli 0.1.8 on WSL2 Linux x86_64. Not run: macOS (the login Keychain through `secret run`), aarch64, `research run --no-wait`, `research status`, `research poll`, and models other than pro.",
+    "At run time the installed guard hook did not inspect commands started by kernel_keyring.py exec. The keyring rules were added after the runs, in the change that records this receipt."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; tvly from `uv tool install`, the key in this kernel's user keyring"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-26",
+    "evidence_class": "native provider execution of the Tavily Research endpoint (tvly research run --model pro) through the kernel keyring exec; no quality comparison with another research endpoint",
+    "version": "0.1.8",
+    "install": {
+      "method": "uv tool install (requirement tavily-cli==0.1.8, Python 3.13)",
+      "tavily_python": "0.8.4",
+      "installed_utc": "2026-09-26T02:58:18Z (tavily_cli-0.1.8.dist-info directory time)",
+      "read_back": "`tvly --version` printed `tavily-cli 0.1.8` at 2026-09-26T05:41:53Z"
+    },
+    "endpoint": "Tavily Research through `tvly research run --model pro` (wait mode: the CLI polls until done)",
+    "keyring": {
+      "key": "user key native-agent-stack:tavily_api_key in the kernel user keyring",
+      "variable": "TAVILY_API_KEY",
+      "exec_script": "session prototype kernel_keyring.py (see limitations), not retained",
+      "committed_script": "scripts/kernel_keyring.py at 9eece9db (#325), committed after the runs"
+    },
+    "sweep": {
+      "reports": 32,
+      "status_counts": {
+        "completed": 32
+      },
+      "launcher_exit_status_counts": {
+        "0": 32
+      },
+      "stdout_bytes_total": 0,
+      "stderr_output_saved_only": 32,
+      "request_ids_distinct": 32,
+      "created_at_first": "2026-09-26T04:17:21.304485+00:00",
+      "created_at_last": "2026-09-26T04:49:21.046007+00:00",
+      "response_time_s": {
+        "max": 367.68,
+        "median": 248.18,
+        "min": 168.49
+      },
+      "sources_per_report": {
+        "max": 25,
+        "median": 17.0,
+        "min": 11
+      },
+      "content_chars": {
+        "max": 16257,
+        "median": 11618.0,
+        "min": 8141
+      }
+    },
+    "landscape": {
+      "content_chars": 16934,
+      "created_at": "2026-09-26T03:00:49.112271+00:00",
+      "model": "pro",
+      "report": "tavily-research-pro.json",
+      "request_id": "uuid-sha256:810355bc30e79707",
+      "response_time_s": 291.57,
+      "sources": 32,
+      "status": "completed"
+    },
+    "all_reports": {
+      "reports": 33,
+      "response_time_s": {
+        "max": 367.68,
+        "median": 248.85,
+        "min": 168.49
+      },
+      "sources_per_report": {
+        "max": 32,
+        "median": 17,
+        "min": 11
+      },
+      "status_counts": {
+        "completed": 33
+      }
+    },
+    "provider_usage": "unknown (credits and cost not recorded)",
+    "summary_command": "python3 evidence/artifacts/tavily-research-qualification-20260926/summarize.py --runs <sweep>/tavily --landscape evidence/artifacts/alpaca-platform-landscape-20260926/tavily-research-pro.json --output evidence/artifacts/tavily-research-qualification-20260926/summary.json",
+    "artifacts": "evidence/artifacts/tavily-research-qualification-20260926/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/tavily_layer.sh",
+      "sha256": "a1b2577d5dd5df4ae5583c06db8e69e08db1afdf3004b81af2562ae41fb4259b",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/run.log",
+      "sha256": "fdb738a4c9c28d554a79c8f07aba649b927aa3ffba1cf663cbc1f2f76c63a027",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/summarize.py",
+      "sha256": "782e721ff75bbe4465d332909bcc16de910e4e146dd368859f521d5632762791",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/summary.json",
+      "sha256": "6f1eed16996e287815e742dc3f0c3a68241da1907f48837d7262f5cc591b4e13",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/alpaca-platform-landscape-20260926/tavily-research-pro.json",
+      "sha256": "ce37813de0fbbf22f80cc7340a337a8379b26d931a81bb24aa43ccecc38f8a2b",
+      "byte_identical_to_run_copy": true
+    }
+  ]
+}

@@ -3295,6 +3295,25 @@
         "Not aligned here: catalogs/us-equities/agents-operations.json and .md still name Prometheus v3.14.0 (trading-catalog alignment, as #310 did for ai-memory); observability/README.md describes the 2026-09-19 acceptance at 3.14.0; docs/stack.md is a 2026-09-19 snapshot."
       ],
       "path": "evidence/receipts/prometheus-3150-qualification-20260926.json"
+    },
+    {
+      "id": "tavily-research-qualification-20260926",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "tavily-cli"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, tavily-cli 0.1.8 (a uv tool, tavily-python 0.8.4) returned 33 Tavily Research reports with model pro, and every one has status completed. The 32 runs of the per-layer landscape sweep were started by the retained launcher tavily_layer.sh, one per catalog layer, each as `python3 kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly research run --model pro --json --citation-format numbered --timeout 1500 --client-name native-agent-stack -o <layer>.json <question>`, so TAVILY_API_KEY came from the Linux kernel user keyring and was set only in the tvly process's environment. They were created between 04:17:21Z and 04:49:21Z. The retained run.log has one `rc=0` line per layer; every run left an empty stdout and only tvly's `Output saved to` message on stderr, and every saved report has the six expected fields and a distinct UUID-shaped request id. Response times were 168.49 to 367.68 s (median 248.18), with 11 to 25 sources per report (median 17). The earlier Alpaca platform landscape report, retained in evidence/artifacts/alpaca-platform-landscape-20260926/tavily-research-pro.json and created at 03:00:49Z, records model pro, status completed, 32 sources and a response time of 291.57 s. Across all 33 reports the response time was 168.49 / 248.85 / 367.68 s (min / median / max) and the sources per report 11 / 17 / 32. Evidence class: native provider execution of the Tavily Research endpoint (tvly research run --model pro) through the kernel keyring exec; no quality comparison with another research endpoint. The runs show that the endpoint accepted the keyring-held key and returned completed reports; they do not show that the reports are correct, complete or better than another research path.",
+      "limitations": [
+        "No quality comparison: no report was scored or compared with another research endpoint, a search-plus-extract pipeline or a model's own research. The summary measured status, timing, source counts and report sizes only; report text and sources were not reviewed for this receipt.",
+        "The runs used a prototype kernel_keyring.py from the session's scratch directory (sha256 59a39a5a6307321ecac489c5be42199a54c74daeeb947bffd33bddec134798f7, 4,456 bytes, 98 lines, modified 03:00:13Z), not the committed scripts/kernel_keyring.py (sha256 fdb72475568f48301b543bf9efc43b45c8bcf730f91c3493a3ce4c858ece864e), which #325 committed at 05:02:02Z, after the runs. The prototype's exec path reads the payload and runs `env[env_var] = _read(libc, nr_keyctl, serial).decode()` and then `os.execvpe(child[0], child, env)`, so the variable reaches only the started command, as with the committed script; unlike it, the prototype does not restrict ENV_VAR or refuse startup variables. The prototype is not retained in this repository.",
+        "The landscape run's launch command was not retained. Its artifact's README states that the key was held only in the kernel keyring, and the run was created 36 s after the prototype was last modified; which script started it is not recorded.",
+        "The raw sweep reports (report text, source URLs and request ids) stay in the session's scratch directory and are not published. summary.json keeps only statuses, times, counts, sizes and request ids hashed as uuid-sha256:<first 16 hex digits of the SHA-256 of the UTF-8 id>; the landscape artifact's id was hashed when that artifact was written, by a rule it does not record.",
+        "Provider usage is unknown: Tavily credits and cost were not recorded. response_time is the provider's own field, not a wall-clock measurement by this repository.",
+        "run.log, as retained, has one rc=0 line per layer and no `skip` line. Attempts outside that log, if any, are not recorded.",
+        "One host, one day and one CLI version: tavily-cli 0.1.8 on WSL2 Linux x86_64. Not run: macOS (the login Keychain through `secret run`), aarch64, `research run --no-wait`, `research status`, `research poll`, and models other than pro.",
+        "At run time the installed guard hook did not inspect commands started by kernel_keyring.py exec. The keyring rules were added after the runs, in the change that records this receipt."
+      ],
+      "path": "evidence/receipts/tavily-research-qualification-20260926.json"
     }
   ],
   "files": [
@@ -3475,13 +3494,18 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "56c6ec0a0880d1afa44a57472368ed74a7e5d0b5c751d70e807478e216f1cb02",
-      "bytes": 13991
+      "sha256": "3c60eb1a7368697801ecd26f173c4175eb23410d066013d830aeb8d14e0982d9",
+      "bytes": 15544
     },
     {
       "path": "adoption/hardware-profiles.json",
       "sha256": "ea2df494c8b2c60db7c9684ec67f577c9d7ef6d7b407c6993d32cd2c6ea0503c",
       "bytes": 12174
+    },
+    {
+      "path": "adoption/hooks/claude/SHA256SUMS",
+      "sha256": "94b9c17fc579d0b2b7850fad8a6687854f7de7ff00a2732489c2a9500d5fb7de",
+      "bytes": 200
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3640,8 +3664,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "2982f8557c58a6d273ea18773559543352e0f3f267f30a2afba42be95d8ffa84",
-      "bytes": 35285
+      "sha256": "43dcd65e8fc48a07a949c50dc6cbe5b75abb72f64f2c2206544568c4e5b97b6f",
+      "bytes": 40975
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -3657,6 +3681,11 @@
       "path": "adoption/tools/gitleaks-guarded-macos",
       "sha256": "fc76d3a11d076b02ad9878b2cc7cfd078058e84a86df285cf53da1ca82fd6ce5",
       "bytes": 9628
+    },
+    {
+      "path": "adoption/tools/tvly-keyring",
+      "sha256": "115cb20a993d88d11b71196d15cdf59965ebaddc3e1336aef477648e62d80861",
+      "bytes": 2682
     },
     {
       "path": "adoption/update.md",
@@ -7991,8 +8020,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "ba31bcec29590f53c3a389dde5f66bb8a1c4df2fe72bbf9f09b8576f6431222d",
-      "bytes": 481666
+      "sha256": "a75270b3de92574d1b8136b73d56015dee601d8f951641ba63f44493129471a8",
+      "bytes": 481873
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -12276,8 +12305,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "2bf718b7ba78826213bc05d4c494f2096795f98049afb3796c3db47e0fc4e031",
-      "bytes": 50995
+      "sha256": "11dfaa16f96f2cda2d82ce647b6da762270267781a3416a985b523bb18eab8f6",
+      "bytes": 59042
     },
     {
       "path": "docs/stack.md",
@@ -32715,6 +32744,26 @@
       "bytes": 2639
     },
     {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/run.log",
+      "sha256": "fdb738a4c9c28d554a79c8f07aba649b927aa3ffba1cf663cbc1f2f76c63a027",
+      "bytes": 735
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/summarize.py",
+      "sha256": "782e721ff75bbe4465d332909bcc16de910e4e146dd368859f521d5632762791",
+      "bytes": 7319
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/summary.json",
+      "sha256": "6f1eed16996e287815e742dc3f0c3a68241da1907f48837d7262f5cc591b4e13",
+      "bytes": 9593
+    },
+    {
+      "path": "evidence/artifacts/tavily-research-qualification-20260926/tavily_layer.sh",
+      "sha256": "a1b2577d5dd5df4ae5583c06db8e69e08db1afdf3004b81af2562ae41fb4259b",
+      "bytes": 1551
+    },
+    {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
       "sha256": "6ee972a67a347a9d49b235cdb2a0a1a66ad38928aa4e35bbd764ca507076ee7f",
       "bytes": 21265
@@ -34385,6 +34434,11 @@
       "bytes": 4906
     },
     {
+      "path": "evidence/receipts/tavily-research-qualification-20260926.json",
+      "sha256": "a8bdb6e6dea4aa99938bce568ee86e8391fe33929a1940ae141ae519a7100b4a",
+      "bytes": 8690
+    },
+    {
       "path": "evidence/receipts/token-native-retained-functional-20260920.json",
       "sha256": "3d68bc99234035207d7b6b9b5a7161b53c9bf7ffd73366250f7ce65f9d183b91",
       "bytes": 17135
@@ -34746,8 +34800,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "7dce7f5e842c5b4c34f9ce01964c0b9b2d90d61cd35363f6d2e2dfa29b37fea0",
-      "bytes": 90821
+      "sha256": "cbbc6ce14823e6114fdf43ef7c34e759e1d5fb758097c131ed077d7a168aeb1d",
+      "bytes": 90871
     },
     {
       "path": "observability/README.md",
@@ -35046,8 +35100,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "d142c736a5926c4b1702c790f787276b950ad5ecd51348670d3b6d32495a8833",
-      "bytes": 7447
+      "sha256": "a039d9f50b8f1863c63a4e2d437a1c4d3c1c6af5c82bb6ea460dfe762cc95e6c",
+      "bytes": 8794
     },
     {
       "path": "scripts/adoption_status.py",
@@ -35071,8 +35125,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "8b024716f36edebfbd2d5051fb2070a8551eab2b81d543330b7509ab7b39960a",
-      "bytes": 21688
+      "sha256": "e48679a0c6a7e50e59910936c76d3b97a6ac812a1ad7b77466f96832ed824d57",
+      "bytes": 22912
     },
     {
       "path": "scripts/env_freshness.py",
@@ -35091,8 +35145,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "2312f977dbaee1a6108480b2474124cb979f25a3625f562250511a6a690bcf2d",
-      "bytes": 17214
+      "sha256": "ed5556f0cb4942859cf9e8e2e6f709de4dbc5b96163fc6ef65fcd0dcab8da153",
+      "bytes": 35557
     },
     {
       "path": "scripts/host_receipts.py",
@@ -35486,8 +35540,13 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "fa2d01be3f7c87d53319cf7c87e239c783a0a130334cdaddb6f9c94ac4608b77",
-      "bytes": 25331
+      "sha256": "f1f3a7e431ebf092db8ed1ca121b80462aac950ec4280fb71c1b9a7ea0ccfca5",
+      "bytes": 27639
+    },
+    {
+      "path": "tests/test_credential_tools.py",
+      "sha256": "e828fe65519be3b7665641622f7115e8e27f350362cefc0c4d6cc4c0f356ff26",
+      "bytes": 17947
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -35846,8 +35905,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "e59e369b49b9476d1a6dfa983a29bc862424686ca2a3d914336393ef71ed250e",
-      "bytes": 21493
+      "sha256": "55a15476f91cc017352c3a036aca457364d4f44046df894c572ee613c5d35490",
+      "bytes": 43364
     },
     {
       "path": "tests/test_security_identity.py",
@@ -35923,6 +35982,11 @@
       "path": "tests/test_trading_gates_bindings.py",
       "sha256": "645bae30192a44f38495bceb1bd9ea659a4122f198fb4de0366f320f9f8eb272",
       "bytes": 14793
+    },
+    {
+      "path": "tests/test_tvly_keyring.py",
+      "sha256": "4879ed6cccb7be2f9dd7db5cfcd087e1884428cdcb97b16f7d17aef827ec5763",
+      "bytes": 12126
     },
     {
       "path": "tests/test_validate.py",

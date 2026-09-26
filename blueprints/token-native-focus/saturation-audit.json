@@ -9276,6 +9276,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "tavily-research-qualification-20260926",
+            "path": "evidence/receipts/tavily-research-qualification-20260926.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],

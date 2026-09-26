@@ -84,6 +84,40 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertTrue(any("home-anchored" in e for e in errors))
         self.assertTrue(any("uppercase variable names" in e for e in errors))
 
+    def test_kernel_keyring_row_is_validated_and_never_inspected(self):
+        row = next(e for e in self.inventory["entries"] if e["id"] == "tavily")
+        self.assertEqual((row["class"], row["variables"], row["store"]),
+                         ("provider_api_key", ["TAVILY_API_KEY"],
+                          {"kind": "kernel_keyring", "path_template": "", "key_name": "tavily_api_key"}))
+        report = self.report()
+        entry = self.entry(report, "tavily")
+        self.assertEqual((entry["state"], entry["key_name"], entry["findings"]), ("unchecked", "tavily_api_key", []))
+        self.assertNotIn("mode", entry)
+        self.assertEqual(report["result"], "ok")
+        self.assertIn("unchecked tavily", cs.render_text(report))
+        self.assertIn("(kernel keyring tavily_api_key; check: kernel_keyring.py status)", cs.render_text(report))
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("unchecked tavily", result.stdout)
+        # Exported in the launcher's environment instead, it is reported by name only.
+        exported_report = self.report({**self.env, "TAVILY_API_KEY": self.fake_a})
+        exported = self.entry(exported_report, "tavily")
+        self.assertEqual(exported["variables_in_environment"], ["TAVILY_API_KEY"])
+        self.assertIn("store_variables_exported_in_environment", exported["warnings"])
+        self.assert_no_values(json.dumps(exported_report), cs.render_text(exported_report))
+
+    def test_inventory_rejects_a_keyring_row_with_a_path_or_bad_key_name(self):
+        index = next(i for i, e in enumerate(self.inventory["entries"]) if e["id"] == "tavily")
+        for store, message in (
+                ({"kind": "kernel_keyring", "path_template": "$HOME/.tavily/config.json", "key_name": "tavily_api_key"},
+                 "empty path template"),
+                ({"kind": "kernel_keyring", "path_template": ""}, "key_name"),
+                ({"kind": "kernel_keyring", "path_template": "", "key_name": "Tavily/Key"}, "key_name")):
+            broken = copy.deepcopy(self.inventory)
+            broken["entries"][index]["store"] = store
+            with self.subTest(store=store):
+                self.assertTrue(any(message in error for error in cs.inventory_errors(broken, ROOT)))
+
     def test_missing_required_file_is_informational(self):
         entry = self.entry(self.report())
         self.assertEqual(entry["state"], "missing")

@@ -5,13 +5,16 @@ spawns, inside its own native systemd scope with hard memory, task and runtime
 limits, plus a CPU quota where the user manager delegates the cpu controller. They exist because an unbounded scan or build on a WSL2 host can exhaust
 the VM and take the whole session down; the scope kills the job instead.
 A third script, `gitleaks-guarded-macos`, applies the same Gitleaks caps on
-macOS, which has no per-job cgroup (see "macOS" below).
+macOS, which has no per-job cgroup (see "macOS" below). Two more tools are
+unrelated to containment: `codex-broker-reaper` and `tvly-keyring`, each in
+its own dated section below.
 
 | Script | Role |
 | --- | --- |
 | `ecosystem-bounded-run` | Generic launcher: runs `COMMAND [ARG ...]` in a transient `--user --scope` unit with `MemoryHigh`/`MemoryMax`/`MemorySwapMax`/`TasksMax`/`RuntimeMaxSec` applied, and `CPUQuota` where cpu is delegated (see "CPU quota" below). Refuses to run at all when it cannot contain the job. |
 | `gitleaks-guarded` | Gitleaks front end: preserves upstream Gitleaks argument and exit-code semantics, adds a per-user non-blocking lock so two scans cannot run at once, and delegates the actual scan to `ecosystem-bounded-run`. |
 | `gitleaks-guarded-macos` | macOS Gitleaks front end: the same argument and exit-code semantics, a per-user lock that waits up to 60 s, and a footprint watchdog that kills the scan's whole process tree above 6 GiB or after 600 s. Python 3 standard library only. |
+| `tvly-keyring` | Runs the real `tvly` with `TAVILY_API_KEY` from the Linux kernel user keyring, set only in that command's environment, through `kernel_keyring.py exec`. POSIX `sh`; never reads the key itself. See "`tvly-keyring` (2026-09-26)" below. |
 
 ## Provenance
 
@@ -514,3 +517,94 @@ installed: no host has loaded, started or enabled them. `@REPOSITORY@` is a
 placeholder for this repository's checkout path and must be substituted
 before installing either unit; `%h` is systemd's own home-directory specifier
 and needs no substitution.
+
+## `tvly-keyring` (2026-09-26)
+
+**Provenance.** Written in this repository on 2026-09-26, after the operator
+decided that the Tavily API key lives only in the Linux kernel user keyring
+([docs/secret-storage.md](../../docs/secret-storage.md#memory-only-option-linux-kernel-keyring-2026-09-26)).
+It has no external source.
+
+**What it does.** `tvly-keyring <args>` runs
+`python3 kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- <tvly> <args>`,
+where `<tvly>` is the first `tvly` on `PATH`. `kernel_keyring.py` reads the
+key and starts `tvly` with `TAVILY_API_KEY` in that one process's
+environment; the wrapper itself never reads the key, and every argument
+reaches `tvly` unchanged. Before that it runs `kernel_keyring.py status`,
+which prints only `present` or `absent`, and exits 2 without starting `tvly`
+when the key is absent. It is POSIX `sh`, and Linux-only in practice: on
+macOS `status` fails and the wrapper exits 2 (use `secret run` there, as in
+[`recipes/tavily.md`](../../recipes/tavily.md)).
+
+It is not named `tvly`, so it shadows nothing, and it refuses to run (exit 2)
+when the `tvly` it finds on `PATH` is itself, for example through a link
+named `tvly`, which would otherwise start it again in a loop.
+
+| Setting | Meaning |
+| --- | --- |
+| `kernel_keyring.py` beside the script | the default: the copy in the directory the wrapper was started from, or, when that path is a symbolic link, the directory of the file it points to |
+| `TVLY_KEYRING_SCRIPT` | path to `kernel_keyring.py`, used instead of the copy beside the script; a missing file is an error, not a fallback |
+| `TVLY_KEYRING_NAME` | the key name, `tavily_api_key` by default; the tests use throwaway names |
+
+Exit status: 2 when `kernel_keyring.py` is not found, the key is absent or
+cannot be checked, or `tvly` on `PATH` is the wrapper; 127 when there is no
+`tvly` on `PATH`; otherwise the status of `tvly`, or of `kernel_keyring.py`
+when it refuses to start `tvly` (1 when the key disappears between the check
+and the start). Messages name the key only when `status` accepted the name,
+because a refused name could be a pasted value.
+
+**Install (Linux/WSL2).** Copy the pair into the same directory, as for the
+Gitleaks pair above:
+
+```sh
+export ECO_INSTALL_ROOT="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+mkdir -p "$ECO_INSTALL_ROOT/bin"
+# Keep the pair together: tvly-keyring finds kernel_keyring.py next to itself.
+install -m 0755 adoption/tools/tvly-keyring "$ECO_INSTALL_ROOT/bin/tvly-keyring"
+install -m 0644 scripts/kernel_keyring.py "$ECO_INSTALL_ROOT/bin/kernel_keyring.py"
+```
+
+Store the key first, in your own terminal
+(`python3 scripts/kernel_keyring.py store tavily_api_key`), then check the
+install:
+
+```sh
+tvly-keyring auth --json    # "authenticated": true, "method": "env"
+```
+
+Do not run `tvly-keyring auth` without `--json`: `tvly auth` prints the key's
+first eight and last four characters. The guard hook blocks that form, and
+unwraps `tvly-keyring` like `kernel_keyring.py exec`
+([docs/secret-storage.md](../../docs/secret-storage.md#guard-coverage-2026-09-26)).
+Reinstall both files together when either changes.
+
+**Evidence class: local integration, synthetic `tvly`.**
+`tests/test_tvly_keyring.py` runs the wrapper from a temporary install
+directory laid out as above, with a fake `tvly` on `PATH` that reports only
+whether `TAVILY_API_KEY` is set, the value's length and its own arguments.
+On every host it checks: the file is an executable POSIX `sh` script that
+`sh -n` accepts, with no personal path; ShellCheck at style severity finds
+nothing (where `shellcheck` is on `PATH`; 0.11.0 was run by hand on
+2026-09-26); the text names `TAVILY_API_KEY` once, only as `exec`'s variable,
+and runs no `keyctl`; a missing `kernel_keyring.py` (beside the script or at
+`TVLY_KEYRING_SCRIPT`) exits 2 before `tvly` starts; no `tvly` on `PATH`
+exits 127; and a `tvly` link to the wrapper exits 2. With the kernel user
+keyring (Linux x86_64/aarch64, where its system calls are allowed; skipped
+otherwise), against throwaway keys that `scripts/kernel_keyring.py` stores
+and the test removes: `tvly` gets the stored value's length and twelve
+arguments byte for byte (spaces, an empty string, `*`, quotes, a literal
+`$HOME`, `--`, option-like words, a newline and non-ASCII text), and an
+inherited `TAVILY_API_KEY` is replaced; the status of `tvly` comes back
+unchanged; `kernel_keyring.py` is found through `TVLY_KEYRING_SCRIPT` and
+through a symbolic link to the wrapper; an absent key exits 2 without
+starting `tvly`; and a refused key name exits 2 without being repeated. No
+test value appears in any output. Two mutations were checked by hand on
+2026-09-26: with an unquoted `$@` the argument test fails, and without the
+`status` check the absent-key test fails. With the real tavily-cli 0.1.8 and
+the key stored on this host, run from the checkout on 2026-09-26 at 06:01Z
+with `TVLY_KEYRING_SCRIPT` set to `scripts/kernel_keyring.py`,
+`tvly-keyring auth --json` printed `"authenticated": true, "method": "env"`,
+and `tvly auth --json` without the wrapper printed `"authenticated": false`.
+Not run: an installed copy (installed after merge), macOS and aarch64. The
+Research runs through `exec` are in the qualification receipt that
+[`recipes/tavily.md`](../../recipes/tavily.md) links.
