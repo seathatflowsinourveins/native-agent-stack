@@ -15,11 +15,12 @@ max_concurrent_threads_per_session = 3
 
 # serena, ai-memory and socraticode moved to user scope (codex.config.template.toml), so every Codex
 # worktree worker has them without this project-local file (docs/decisions/2026-09-25-codex-mcp-scope.md).
-# context-mode also moved: its own plugin manifest (~/.codex/plugins/cache/context-mode/*/.codex-plugin/
-# plugin.json) already declares its mcp_servers.context-mode with no "cwd", so the "enabled = false"
-# override this project template used to carry, and its own cwd-pinned mcp_servers.context-mode block,
-# are both removed -- the plugin's own user-scope registration (already enabled in
-# codex.config.template.toml's [plugins."context-mode@context-mode"]) is used unchanged.
+# context-mode's MCP server moved there too. Its plugin's own server declares cwd "." in
+# .codex-plugin/mcp.json, which Codex resolves to the plugin root, not the project, so the user-scope
+# template turns that server off and registers context-mode with no cwd: Codex starts it in each
+# session's own directory, which upstream start.mjs binds as CONTEXT_MODE_PROJECT_DIR. That replaces the
+# main-checkout-only binding this file used to carry. recipes/README.md ("Retained Context Mode") keeps
+# the project-scoped form for a project that needs a fixed directory.
 
 # jcodemunch stays project-scoped: its own MCP instructions ("Prefer it over Read/Grep/Glob/Bash for code
 # navigation") would load into every session at user scope, contradicting this catalog's own retrieval

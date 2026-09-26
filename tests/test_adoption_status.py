@@ -1,22 +1,34 @@
 """Adoption preflight boundaries; no credentials, services, or model calls."""
 
 import contextlib
+import dis
+import errno
 import io
 import json
 import os
 from pathlib import Path
+import platform
 import shutil
 from shutil import which as native_which
+import signal
 import subprocess
+import sys
 import tempfile
+import threading
+import time
 import unittest
 from unittest.mock import patch
 
+from scripts import adoption_status
 from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, NO_CLIENT_STATE,
                                      NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring, git_revision,
-                                     inspect_adoption, main, probe_pinned_version, version_output_matches)
+                                     inspect_adoption, main, pins_file_path, probe_pinned_version,
+                                     signals_interrupt_probes, version_output_matches)
 
 REPO = Path(__file__).resolve().parents[1]
+# Resolved at import, before a test narrows PATH to its own directory or patches the platform.
+SLEEP = native_which("sleep")
+HOST_PLATFORM = {"os": platform.system().lower(), "architecture": platform.machine().lower()}
 PRIVATE = "private-value-never-reported"
 CLAUDE_EVENTS = ("PreToolUse", "SessionStart", "SubagentStop", "PostToolUse", "PreCompact", "Stop", "SessionEnd",
                  "SubagentStart")
@@ -63,6 +75,107 @@ def leaves(value):
             yield from leaves(item)
     else:
         yield value
+
+
+class Descendant:
+    """A child that a probe script starts in the background and leaves running: it writes "x" to a FIFO it
+    keeps open on descriptor 3 and its PID to a file, then execs sleep, keeping the probe's stdout and stderr
+    open too. The FIFO reads end-of-file only once no process holds it, which observes the kill without
+    depending on when a reaper collects the zombie."""
+
+    def __init__(self, test: unittest.TestCase, directory: Path):
+        self.fifo, self.pidfile = directory / "descendant.fifo", directory / "descendant.pid"
+        os.mkfifo(self.fifo)
+        self.reader = os.open(self.fifo, os.O_RDONLY | os.O_NONBLOCK)  # first, so the writer's open never blocks
+        test.addCleanup(self.cleanup)
+
+    def script(self, then: str) -> str:
+        """A probe script body: start the descendant, wait until it has written its marker, then ``then``."""
+        return (f"/bin/sh -c 'printf x >&3; echo $$ > \"$1\"; exec \"$2\" 30' sh '{self.pidfile}' '{SLEEP}' "
+                f"3> '{self.fifo}' &\nwhile [ ! -s '{self.pidfile}' ]; do :; done\n{then}")
+
+    def started(self) -> bool:
+        return self.pidfile.is_file() and self.pidfile.read_text().strip().isdigit()
+
+    def gone(self, seconds: float = 10.0) -> bool:
+        """Whether the FIFO reached end-of-file after the marker, within ``seconds``."""
+        seen, deadline = b"", time.monotonic() + seconds
+        while True:
+            try:
+                chunk = os.read(self.reader, 64)
+            except BlockingIOError:  # still held open: the descendant is alive
+                chunk = None
+            if chunk:
+                seen += chunk
+            elif chunk == b"" and seen:
+                return True
+            elif time.monotonic() > deadline:
+                return False
+            else:
+                time.sleep(0.02)
+
+    def cleanup(self):
+        os.close(self.reader)
+        with contextlib.suppress(OSError, ValueError):  # already gone, or never started
+            os.kill(int(self.pidfile.read_text()), signal.SIGKILL)
+
+
+# Sets each named signal's disposition, then execs the rest of argv. exec keeps an ignored signal ignored and
+# resets a handled one to its default, so the program starts with exactly these dispositions, whatever the
+# test runner inherited (a background job of a non-interactive shell starts with SIGINT ignored; nohup, SIGHUP).
+EXEC_WITH_DISPOSITIONS = ("import json, os, signal, sys\n"
+                          "for name, action in json.loads(sys.argv[1]).items():\n"
+                          "    signal.signal(getattr(signal, name),\n"
+                          "                  signal.SIG_IGN if action == 'ignore' else signal.SIG_DFL)\n"
+                          "os.execv(sys.argv[2], sys.argv[2:])\n")
+
+# Runs the --pinned-versions CLI in this process and raises a signal on itself at one point inside
+# run_version_probe, where a signal from outside would land only by chance. "created": after the probe's fork,
+# once its background child runs, but before subprocess.Popen has returned the process. "cleanup": as the kill of
+# the probe's group begins, after the test has interrupted the check once. Each point says on stderr that it was
+# reached. argv: the point, the signal number, the background child's PID file, the checkout, the CLI's arguments.
+INTERRUPT_INSIDE_A_PROBE = """\
+import os, signal, subprocess, sys, time
+point, signum, pidfile, checkout = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
+sys.path.insert(0, checkout)
+from scripts import adoption_status
+
+
+def child_runs():
+    try:
+        with open(pidfile) as handle:
+            return handle.read().strip().isdigit()
+    except OSError:
+        return False
+
+
+def interrupt(where):
+    print(f"raised {signal.Signals(signum).name} {where}", file=sys.stderr, flush=True)
+    signal.raise_signal(signum)
+
+
+if point == "created":
+    class Popen(subprocess.Popen):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            if os.path.basename(self.args[0]) == "forking-tool":
+                deadline = time.monotonic() + 20
+                while not child_runs() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                interrupt("after the probe's fork, before subprocess.Popen returned")
+
+    subprocess.Popen = Popen
+else:
+    kill_group = adoption_status.signal_group
+
+    def signal_group(group, sent):
+        if sent == signal.SIGKILL:
+            interrupt("as the kill of the probe's group began")
+        kill_group(group, sent)
+
+    adoption_status.signal_group = signal_group
+sys.exit(adoption_status.main(sys.argv[5:]))
+"""
 
 
 class AdoptionStatusTests(unittest.TestCase):
@@ -335,8 +448,9 @@ class AdoptionStatusTests(unittest.TestCase):
 
 class PinnedVersionProbeTests(unittest.TestCase):
     """probe_pinned_version/version_output_matches units, against a real tiny script on PATH (never a
-    fake subprocess.run): never execs a non-"exec" method, exact and minimum matching, and a missing
-    command, malformed command string or timeout is unchecked rather than raising."""
+    fake subprocess): never execs a non-"exec" method, exact and minimum matching, a failing probe never
+    matches, a missing command, malformed command string or timeout is unchecked rather than raising, and
+    the probe's whole process group is killed on timeout and once it exits."""
 
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -375,18 +489,18 @@ class PinnedVersionProbeTests(unittest.TestCase):
     def test_npm_metadata_method_is_never_executed(self):
         self.script("context-mode", "printf 'never run\\n'; exit 1")
         entry = {"version": "1.0.169", "version_probe": {"method": "npm-metadata", "note": "starts a server"}}
-        with patch("scripts.adoption_status.subprocess.run") as run:
+        with patch("scripts.adoption_status.subprocess.Popen") as popen:
             result = probe_pinned_version(entry)
-        run.assert_not_called()
+        popen.assert_not_called()
         self.assertEqual(result, {"pinned_version": "1.0.169", "checked": False, "matches_pin": None})
 
     def test_an_undeclared_future_method_is_also_never_executed(self):
         self.script("future-tool", "printf 'never run\\n'; exit 1")
         entry = {"version": "9.9.9",
                  "version_probe": {"method": "some-future-method", "command": "future-tool", "args": ["--version"]}}
-        with patch("scripts.adoption_status.subprocess.run") as run:
+        with patch("scripts.adoption_status.subprocess.Popen") as popen:
             result = probe_pinned_version(entry)
-        run.assert_not_called()
+        popen.assert_not_called()
         self.assertFalse(result["checked"])
 
     def test_a_command_not_on_path_is_unchecked_not_an_error(self):
@@ -398,9 +512,9 @@ class PinnedVersionProbeTests(unittest.TestCase):
         for command in ("rm -rf /", "/bin/sh", "../escape", ""):
             with self.subTest(command=command):
                 entry = {"version": "1.0.0", "version_probe": {"method": "exec", "command": command, "args": []}}
-                with patch("scripts.adoption_status.subprocess.run") as run:
+                with patch("scripts.adoption_status.subprocess.Popen") as popen:
                     result = probe_pinned_version(entry)
-                run.assert_not_called()
+                popen.assert_not_called()
                 self.assertFalse(result["checked"])
 
     def test_a_hanging_probe_times_out_and_is_unchecked(self):
@@ -410,6 +524,46 @@ class PinnedVersionProbeTests(unittest.TestCase):
         entry = {"version": "1.0.0", "version_probe": {"method": "exec", "command": "slow-tool", "args": [],
                                                         "timeout_seconds": 0.2}}
         self.assertEqual(probe_pinned_version(entry), {"pinned_version": "1.0.0", "checked": False, "matches_pin": None})
+
+    def test_a_failing_probe_never_matches_even_when_its_diagnostics_name_the_pin(self):
+        # bootstrap-linux.sh reports any nonzero exit as "FAILED (exit N)" before it looks at the output.
+        entry = {"version": "1.2.3", "version_probe": {"method": "exec", "command": "tool", "args": ["--version"]}}
+        for stream in ("", " >&2"):
+            with self.subTest(stream=stream or "stdout"):
+                self.script("tool", f"printf 'tool 1.2.3: cannot open its data directory\\n'{stream}; exit 42")
+                self.assertEqual(probe_pinned_version(entry),
+                                 {"pinned_version": "1.2.3", "checked": True, "matches_pin": False})
+                self.script("tool", f"printf 'tool 1.2.3: cannot open its data directory\\n'{stream}")
+                self.assertTrue(probe_pinned_version(entry)["matches_pin"])  # the same output, exit 0
+
+    def test_stdout_and_stderr_are_searched_as_two_streams(self):
+        # As the bootstrap greps two files: a stdout without a final newline does not run into stderr.
+        self.script("tool", "printf 'tool 1.2.3'; printf '4 warnings\\n' >&2")
+        entry = {"version": "1.2.3", "version_probe": {"method": "exec", "command": "tool", "args": []}}
+        self.assertTrue(probe_pinned_version(entry)["matches_pin"])
+
+    @unittest.skipUnless(SLEEP, "needs a sleep executable")
+    def test_a_timeout_kills_the_probe_s_whole_process_group(self):
+        descendant = Descendant(self, self.bin)
+        self.script("forking-tool", descendant.script("wait"))
+        entry = {"version": "1.2.3", "version_probe": {"method": "exec", "command": "forking-tool", "args": [],
+                                                        "timeout_seconds": 1}}
+        self.assertEqual(probe_pinned_version(entry), {"pinned_version": "1.2.3", "checked": False, "matches_pin": None})
+        self.assertTrue(descendant.started(), "the probe's background child never ran")
+        self.assertTrue(descendant.gone(), "the probe's background child outlived the timeout")
+
+    @unittest.skipUnless(SLEEP, "needs a sleep executable")
+    def test_a_probe_s_leftover_descendants_are_killed_once_it_exits(self):
+        # The leftover child also holds the probe's stdout and stderr open; the result must not wait for it.
+        descendant = Descendant(self, self.bin)
+        self.script("leaky-tool", descendant.script("printf 'leaky-tool 1.2.3\\n'"))
+        entry = {"version": "1.2.3", "version_probe": {"method": "exec", "command": "leaky-tool", "args": [],
+                                                        "timeout_seconds": 10}}
+        started = time.monotonic()
+        self.assertEqual(probe_pinned_version(entry), {"pinned_version": "1.2.3", "checked": True, "matches_pin": True})
+        self.assertLess(time.monotonic() - started, 8)
+        self.assertTrue(descendant.started(), "the probe's background child never ran")
+        self.assertTrue(descendant.gone(), "the probe's background child outlived the probe")
 
     def test_version_output_matches_rules(self):
         self.assertTrue(version_output_matches("2.101.0", "exact", "gh version 2.101.0 (2026-09-22)\n"))
@@ -478,9 +632,9 @@ class PinnedVersionsCheckTests(unittest.TestCase):
         self.enter.enter_context(patch("scripts.adoption_status.git_revision", return_value="a" * 40))
 
     def test_pinned_versions_is_opt_in(self):
-        with patch("scripts.adoption_status.subprocess.run") as run:
+        with patch("scripts.adoption_status.subprocess.Popen") as popen:
             result = inspect_adoption(self.path, self.root)
-        run.assert_not_called()
+        popen.assert_not_called()
         self.assertEqual(result["profiles"][0].keys(), {"id", "commands", "recipes", "status"})
         self.assertIn(NO_PINNED_VERSION, result["limitations"])
 
@@ -538,6 +692,338 @@ class PinnedVersionsCheckTests(unittest.TestCase):
         for item in result["profiles"][0]["pinned_versions"]:
             for key, value in item.items():
                 self.assertTrue(value is None or isinstance(value, (bool, str)), repr((key, value)))
+
+
+@unittest.skipUnless(SLEEP, "needs a sleep executable")
+class PinnedVersionInterruptionTests(unittest.TestCase):
+    """The --pinned-versions CLI, run as its own process on this host's real platform, gets a signal while a
+    probe runs. Started with the default dispositions, SIGINT, SIGTERM and SIGHUP all end the check with the
+    probe's whole process group killed, as bootstrap-linux.sh's EXIT trap does. Started with one of them
+    ignored (nohup; a background job of a non-interactive shell), that signal changes nothing, as CPython leaves
+    an ignored SIGINT ignored and bash cannot trap a signal ignored on entry: the probe finishes, is reported,
+    and its group is still killed once it exits. The group is also killed when the signal arrives while the
+    probe's process is being created, or a second one as the kill begins. Each check starts with exactly the
+    dispositions its test sets, whatever the test runner inherited."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        (self.root / "adoption").mkdir()
+        self.manifest = self.root / "adoption/manifest.json"
+        self.manifest.write_text(json.dumps({
+            "schema_version": 1,
+            "supported_platforms": [{"os": "linux", "architecture": "x86_64", "python": "3.13"}],
+            "profiles": [{"id": "probe", "label": "Probe", "required_commands": [],
+                          "component_ids": ["forking-tool"], "recipe_paths": []}],
+            "default_profile": "probe",
+            "source": {"baseline_commit": "a" * 40, "repository": "https://github.com/example/reference"},
+        }), encoding="utf-8")
+        pins_file_path(self.root, HOST_PLATFORM).write_text(json.dumps({"tools": [
+            {"id": "forking-tool", "version": "1.2.3",
+             "version_probe": {"method": "exec", "command": "forking-tool", "args": [], "timeout_seconds": 60}},
+        ]}), encoding="utf-8")
+        self.bin = self.root / "bin"
+        self.bin.mkdir()
+
+    def probe(self, body: str) -> None:
+        executable = self.bin / "forking-tool"
+        executable.write_text(f"#!/bin/sh\n{body}\n")
+        executable.chmod(0o755)
+
+    def start(self, ignored: signal.Signals | None, descendant: Descendant, **streams) -> subprocess.Popen:
+        """Start the check with SIGINT, SIGTERM and SIGHUP at their defaults, apart from ``ignored``, and wait
+        until the probe's background child runs."""
+        dispositions = {signum.name: "ignore" if signum == ignored else "default"
+                        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)}
+        check = subprocess.Popen([sys.executable, "-c", EXEC_WITH_DISPOSITIONS, json.dumps(dispositions),
+                                  sys.executable, str(REPO / "scripts/adoption_status.py"), "--manifest",
+                                  str(self.manifest), "--repo-root", str(self.root), "--pinned-versions", "--json"],
+                                 env={"PATH": str(self.bin)}, stdin=subprocess.DEVNULL, **streams)
+        self.addCleanup(check.kill)
+        deadline = time.monotonic() + 20
+        while not descendant.started() and check.poll() is None and time.monotonic() < deadline:
+            time.sleep(0.02)
+        self.assertTrue(descendant.started(), "the probe's background child never ran")
+        return check
+
+    @staticmethod
+    def release(fifo: Path, check: subprocess.Popen) -> None:
+        """Let a probe blocked reading ``fifo`` go on. A nonblocking open for writing fails with ENXIO until the
+        probe has the FIFO open, so it is retried while the check runs; a check that already exited is left
+        alone."""
+        deadline = time.monotonic() + 20
+        while check.poll() is None and time.monotonic() < deadline:
+            try:
+                descriptor = os.open(fifo, os.O_WRONLY | os.O_NONBLOCK)
+            except OSError as error:
+                if error.errno != errno.ENXIO:
+                    raise
+                time.sleep(0.02)
+                continue
+            try:
+                os.write(descriptor, b"go\n")
+            finally:
+                os.close(descriptor)
+            return
+
+    def test_an_interrupted_check_kills_the_running_probe_s_process_group(self):
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+            with self.subTest(signal=signum.name):
+                descendant = Descendant(self, Path(tempfile.mkdtemp(dir=self.root)))
+                self.probe(descendant.script("wait"))
+                check = self.start(None, descendant, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                check.send_signal(signum)
+                self.assertIn(check.wait(timeout=20), (-signum, 128 + signum))
+                self.assertTrue(descendant.gone(), f"the probe's background child outlived {signum.name}")
+
+    def test_a_signal_ignored_on_entry_leaves_the_check_running(self):
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+            with self.subTest(signal=signum.name):
+                work = Path(tempfile.mkdtemp(dir=self.root))
+                descendant, release = Descendant(self, work), work / "release.fifo"
+                os.mkfifo(release)
+                # The probe waits for the release, so the signal is sure to arrive while it runs.
+                self.probe(descendant.script(f"read line < '{release}'\nprintf 'forking-tool 1.2.3\\n'"))
+                check = self.start(signum, descendant, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                check.send_signal(signum)
+                time.sleep(0.2)  # time for a handler to act, were one installed
+                self.release(release, check)
+                output, _ = check.communicate(timeout=20)
+                # The prerequisite result (2 on a platform or Python this manifest does not list), never a signal's.
+                self.assertIn(check.returncode, (0, 2), f"{signum.name}, ignored on entry, ended the check")
+                self.assertEqual(json.loads(output)["profiles"][0]["pinned_versions"], [
+                    {"id": "forking-tool", "pinned_version": "1.2.3", "checked": True, "matches_pin": True}])
+                self.assertTrue(descendant.gone(), "the probe's background child outlived the probe")
+
+    def interrupt_inside(self, point: str, signum: signal.Signals, descendant: Descendant) -> subprocess.Popen:
+        """Start the check through INTERRUPT_INSIDE_A_PROBE, with SIGINT, SIGTERM and SIGHUP at their defaults."""
+        defaults = {each.name: "default" for each in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)}
+        check = subprocess.Popen([sys.executable, "-c", EXEC_WITH_DISPOSITIONS, json.dumps(defaults), sys.executable,
+                                  "-c", INTERRUPT_INSIDE_A_PROBE, point, str(int(signum)), str(descendant.pidfile),
+                                  str(REPO), "--manifest", str(self.manifest), "--repo-root", str(self.root),
+                                  "--pinned-versions", "--json"],
+                                 env={"PATH": str(self.bin)}, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.PIPE, text=True)
+        self.addCleanup(check.kill)
+        return check
+
+    def test_a_signal_while_the_probe_s_process_is_created_still_kills_its_group(self):
+        # After the fork, before subprocess.Popen returns: nothing yet holds the process to kill its group.
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+            with self.subTest(signal=signum.name):
+                descendant = Descendant(self, Path(tempfile.mkdtemp(dir=self.root)))
+                self.probe(descendant.script("wait"))
+                check = self.interrupt_inside("created", signum, descendant)
+                _, stderr = check.communicate(timeout=60)
+                self.assertIn(f"raised {signum.name} after the probe's fork", stderr)
+                self.assertTrue(descendant.started(), "the probe's background child never ran")
+                self.assertIn(check.returncode, (-signum, 128 + signum))
+                self.assertTrue(descendant.gone(),
+                                f"the probe's background child outlived {signum.name} while its process was created")
+
+    def test_a_second_signal_as_the_group_kill_begins_does_not_stop_it(self):
+        # The check is interrupted once (SIGTERM from here), and a second signal arrives as its cleanup starts.
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+            with self.subTest(second_signal=signum.name):
+                descendant = Descendant(self, Path(tempfile.mkdtemp(dir=self.root)))
+                self.probe(descendant.script("wait"))
+                check = self.interrupt_inside("cleanup", signum, descendant)
+                deadline = time.monotonic() + 20
+                while not descendant.started() and check.poll() is None and time.monotonic() < deadline:
+                    time.sleep(0.02)
+                self.assertTrue(descendant.started(), "the probe's background child never ran")
+                check.send_signal(signal.SIGTERM)
+                _, stderr = check.communicate(timeout=60)
+                self.assertIn(f"raised {signum.name} as the kill of the probe's group began", stderr)
+                self.assertIn(check.returncode, (-signum, 128 + signum))
+                self.assertTrue(descendant.gone(),
+                                f"the probe's background child outlived a second signal, {signum.name}")
+
+
+@unittest.skipUnless(hasattr(signal, "SIGHUP"), "needs POSIX signals")
+class ProbeSignalDispositionTests(unittest.TestCase):
+    """signals_interrupt_probes, in this process: it replaces SIGTERM's and SIGHUP's disposition only while that
+    is the default action, and SIGINT's while it is the default action or CPython's own handler, which CPython
+    installs only when SIGINT starts at its default action, and restores each afterwards. An ignored signal stays
+    ignored and a handler installed by someone else stays in place. Inside held_interrupts, the handlers keep the
+    first interrupt and raise it when the hold ends; interrupts_released lets them through again for its block.
+    run_version_probe, interrupted at the start of each line it and its helpers run, one line per run, leaves
+    nothing of its probe running. The handlers are called directly; no signal is sent."""
+
+    SIGNALS = (signal.SIGTERM, signal.SIGHUP) if hasattr(signal, "SIGHUP") else ()
+    ALL = (signal.SIGINT, *SIGNALS)
+    # run_version_probe and the helpers it calls while its probe's process exists.
+    PROBE_FUNCTIONS = ("run_version_probe", "held_interrupts", "interrupts_released", "signal_group")
+
+    def setUp(self):
+        if threading.current_thread() is not threading.main_thread():
+            self.skipTest("signal handlers can be changed in the main thread only")
+        for signum in self.ALL:
+            previous = signal.getsignal(signum)
+            if previous is None:  # installed outside Python: it could not be put back
+                self.skipTest(f"{signum.name} has a handler installed outside Python")
+            self.addCleanup(signal.signal, signum, previous)
+        held = getattr(adoption_status, "HELD_INTERRUPTS", {})
+        self.addCleanup(held.update, {key: value for key, value in held.items()})
+
+    def set_all(self, handler, signals=None) -> None:
+        for signum in self.SIGNALS if signals is None else signals:
+            signal.signal(signum, handler)
+
+    def test_an_ignored_signal_stays_ignored(self):
+        self.set_all(signal.SIG_IGN, self.ALL)
+        with signals_interrupt_probes():
+            for signum in self.ALL:
+                self.assertEqual(signal.getsignal(signum), signal.SIG_IGN, signum.name)
+        for signum in self.ALL:
+            self.assertEqual(signal.getsignal(signum), signal.SIG_IGN, signum.name)
+
+    def test_sigint_still_raises_keyboard_interrupt_and_is_restored(self):
+        for label, starting in (("default_int_handler", signal.default_int_handler), ("SIG_DFL", signal.SIG_DFL)):
+            with self.subTest(starting=label):
+                signal.signal(signal.SIGINT, starting)
+                with signals_interrupt_probes():
+                    handler = signal.getsignal(signal.SIGINT)
+                    self.assertTrue(callable(handler))
+                    self.assertIsNot(handler, starting)
+                    with self.assertRaises(KeyboardInterrupt):
+                        handler(signal.SIGINT, None)
+                self.assertEqual(signal.getsignal(signal.SIGINT), starting)
+
+    def test_an_interrupt_during_a_hold_is_raised_when_the_hold_ends(self):
+        self.set_all(signal.SIG_DFL)
+        signal.signal(signal.SIGINT, signal.default_int_handler)
+        reached = False
+        with signals_interrupt_probes():
+            with self.assertRaises(SystemExit) as raised:
+                with adoption_status.held_interrupts():
+                    signal.getsignal(signal.SIGTERM)(signal.SIGTERM, None)  # held: nothing is raised yet
+                    signal.getsignal(signal.SIGINT)(signal.SIGINT, None)  # a second one: the first is kept
+                    reached = True
+            self.assertTrue(reached, "an interrupt was raised inside the hold")
+            self.assertEqual(raised.exception.code, 128 + signal.SIGTERM)
+            with adoption_status.held_interrupts():  # nothing is left pending
+                pass
+            with self.assertRaises(KeyboardInterrupt):  # and outside a hold, the handlers raise at once
+                signal.getsignal(signal.SIGINT)(signal.SIGINT, None)
+
+    def test_a_release_raises_what_was_held_then_the_hold_resumes(self):
+        # A failure inside the hold would itself be replaced by the interrupt held at its end, so the block
+        # records that it ran to the end.
+        self.set_all(signal.SIG_DFL)
+        reached = False
+        with signals_interrupt_probes():
+            handler = signal.getsignal(signal.SIGTERM)
+            with self.assertRaises(SystemExit):  # the last one, held until the hold ends
+                with adoption_status.held_interrupts():
+                    handler(signal.SIGTERM, None)
+                    with self.assertRaises(SystemExit):
+                        with adoption_status.interrupts_released():
+                            self.fail("an interrupt held before the release was not raised as it started")
+                    self.assertTrue(adoption_status.HELD_INTERRUPTS["holding"], "the hold did not resume")
+                    with self.assertRaises(SystemExit):
+                        with adoption_status.interrupts_released():
+                            handler(signal.SIGTERM, None)  # raised at once
+                    self.assertTrue(adoption_status.HELD_INTERRUPTS["holding"], "the hold did not resume")
+                    handler(signal.SIGTERM, None)
+                    reached = True
+            self.assertTrue(reached, "the hold's block stopped early")
+            self.assertEqual(adoption_status.HELD_INTERRUPTS, {"holding": False, "pending": None})
+
+    def run_probe_interrupted_at(self, k: int, argv: list[str], seconds: float):
+        """run_version_probe(argv, seconds), with the SIGTERM handler called at the start of the k-th line that
+        PROBE_FUNCTIONS execute before a KILL to the probe's group has returned, as CPython calls a handler for a
+        signal that has arrived. Once that KILL is sent, nothing of the group is left to outlive it. A line that
+        starts with a NOP (a try statement's own line) is not counted: CPython runs a Python signal handler only
+        where it checks for pending signals, never at a NOP, and a NOP can lie outside every exception handler's
+        range, as the NOP of a try statement in run_version_probe does, so an exception raised there would skip
+        every cleanup, which no signal can cause. Returns that line, or None when fewer than k lines ran."""
+        functions = [getattr(adoption_status, name, None) for name in self.PROBE_FUNCTIONS]
+        traced = {getattr(function, "__wrapped__", function).__code__ for function in functions if function}
+        handler, count, where, killed = signal.getsignal(signal.SIGTERM), 0, None, False
+        signal_group = adoption_status.signal_group
+
+        def signal_group_noting_the_kill(group, signum):
+            nonlocal killed
+            signal_group(group, signum)
+            killed = killed or signum == signal.SIGKILL
+
+        def line(frame, event, _arg):
+            nonlocal count, where
+            if event == "line" and not killed and frame.f_code.co_code[frame.f_lasti] != dis.opmap["NOP"]:
+                count += 1
+                if count == k:
+                    where = f"{frame.f_code.co_name}, line {frame.f_lineno}"
+                    handler(signal.SIGTERM, frame)
+            return line
+
+        previous = sys.gettrace()
+        with patch.object(adoption_status, "signal_group", signal_group_noting_the_kill):
+            sys.settrace(lambda frame, _event, _arg: line if frame.f_code in traced else None)
+            try:
+                adoption_status.run_version_probe(argv, seconds)
+            except SystemExit as error:
+                self.assertEqual(error.code, 128 + signal.SIGTERM)
+            finally:
+                sys.settrace(previous)
+        return where
+
+    @unittest.skipUnless(SLEEP, "needs a sleep executable")
+    def test_an_interrupt_at_the_start_of_any_line_of_a_probe_run_still_kills_its_group(self):
+        # One run per line: the interrupt lands at the start of the first line, then the second, and so on, until a
+        # run sends its group the KILL with no line left. The probe and its background child ignore SIGTERM, so only
+        # that KILL ends them, whether the probe exits at once or outlives its bound (TERM, then KILL).
+        self.set_all(signal.SIG_DFL)
+        root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, root, True)
+        scenarios = (("exits at once", "printf 'tool 1.2.3\\n'", 10),
+                     ("outlives its bound", f"exec '{SLEEP}' 30", 0.1))
+        with signals_interrupt_probes(), patch.object(adoption_status, "PINNED_VERSION_KILL_GRACE_SECONDS", 0.05):
+            for scenario, then, seconds in scenarios:
+                with self.subTest(probe=scenario):
+                    left_running, started_then_interrupted, k = [], 0, 0
+                    while True:
+                        k += 1
+                        work = Path(tempfile.mkdtemp(dir=root))
+                        descendant = Descendant(self, work)
+                        probe = work / "probe"
+                        probe.write_text(f"#!/bin/sh\ntrap '' TERM\n{descendant.script(then)}\n")
+                        probe.chmod(0o755)
+                        where = self.run_probe_interrupted_at(k, [str(probe)], seconds)
+                        self.assertEqual(adoption_status.HELD_INTERRUPTS, {"holding": False, "pending": None},
+                                         f"a hold was left on after an interrupt at {where}")
+                        if descendant.started():
+                            started_then_interrupted += where is not None
+                            if not descendant.gone(3):
+                                left_running.append(where or "no interrupt")
+                        if where is None:
+                            break
+                    self.assertGreater(started_then_interrupted, 0, "no interrupt landed after the child started")
+                    self.assertEqual(left_running, [], "the probe's background child outlived these interrupts")
+
+    def test_a_default_signal_ends_the_check_through_system_exit_and_is_restored(self):
+        self.set_all(signal.SIG_DFL)
+        with signals_interrupt_probes():
+            for signum in self.SIGNALS:
+                handler = signal.getsignal(signum)
+                self.assertTrue(callable(handler), signum.name)
+                with self.assertRaises(SystemExit) as raised:
+                    handler(signum, None)
+                self.assertEqual(raised.exception.code, 128 + signum)
+        for signum in self.SIGNALS:
+            self.assertEqual(signal.getsignal(signum), signal.SIG_DFL, signum.name)
+
+    def test_a_handler_installed_by_someone_else_is_left_in_place(self):
+        def theirs(_signum, _frame):
+            pass
+
+        self.set_all(theirs, self.ALL)
+        with signals_interrupt_probes():
+            for signum in self.ALL:
+                self.assertIs(signal.getsignal(signum), theirs, signum.name)
+        for signum in self.ALL:
+            self.assertIs(signal.getsignal(signum), theirs, signum.name)
 
 
 class ClientWiringTests(unittest.TestCase):

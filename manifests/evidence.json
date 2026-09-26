@@ -3465,8 +3465,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "e09d1bd692037f234cfb38dd3df69ae3f1be2890292d2308872e21fb08782e58",
-      "bytes": 33793
+      "sha256": "fdf87a296434c9a104e13ef4f08bd00d70a4e304116dc70e5323b379933893df",
+      "bytes": 34294
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3625,13 +3625,13 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "9dab7b2029d6ac8cc1f452bf2970a7471e7ea62f22b77b0649d347a0eb51a293",
-      "bytes": 6604
+      "sha256": "1044688dd6c1d4f82441edc349b60d6b1d182d30e6cea8bd5fc9f06b119f7146",
+      "bytes": 8414
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "4d8fb060f3fda6113575d1bf529e39f9b44405ae7d83e573fd0469b62fe16bcb",
-      "bytes": 1967
+      "sha256": "23fc12610e419e7a212bbe8acf63e298903ad135539a3663da1d2952b42390ae",
+      "bytes": 2053
     },
     {
       "path": "adoption/tools/README.md",
@@ -11605,6 +11605,11 @@
       "bytes": 17752
     },
     {
+      "path": "docs/decisions/2026-09-25-codex-mcp-scope.md",
+      "sha256": "f509b770de5cc91b50952356d04faefff91fe01d9223e7a5ae19ff5785630fd2",
+      "bytes": 32507
+    },
+    {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
       "sha256": "33719ea14b01bf8aa745557e44f47d8cc6d222facf7cfe09d6f9ac4b531a986c",
       "bytes": 31964
@@ -11976,13 +11981,13 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "99b19cfdce38fc36bcfbc711a1a6147ed00e25ae3e4cb9f9299a2c8c3746b569",
-      "bytes": 157694
+      "sha256": "6c07ab13cbdcfe8969e8daca32069ec0dd68e16d7adbfe46af0466412c66b375",
+      "bytes": 157734
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "df2adfc08671cc8af77a111cdcfee05b4247200bb92538d566c468debc32f6a1",
-      "bytes": 19587
+      "sha256": "817d04a7cbecd6d4827d25543fa48e184c4b6edaee51f771fbfd3dcf2367122a",
+      "bytes": 20174
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -12568,6 +12573,86 @@
       "path": "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
       "sha256": "5b43a56c1bb8be4df24431ab5f947925c328a36f01c9b7bf308143809e5f1ddd",
       "bytes": 11131
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/README.md",
+      "sha256": "7febea979752e526902d916580ac4a1d20426a3bcddc2847a005828231d18415",
+      "bytes": 14165
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/binding_check.original.py",
+      "sha256": "0c6ed66d8ec370b2f3a3bac30bb8bfdc945f62d062af5d7db42fb2779f810c32",
+      "bytes": 11764
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/binding_check.py",
+      "sha256": "d506e1de3f8bb424d2398b4b7054ce66d52d77149c3cda7e4b265c01fdf09ae0",
+      "bytes": 12372
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/deadline-control.json",
+      "sha256": "6a4ca08f16f2127ee420c48ec73ce5f36095806c62d933bcbc6a0d61c3978bf5",
+      "bytes": 975
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/deadline_control.py",
+      "sha256": "04688ec2f569a315d3f1ebf7bfb38f9725355afb3f9f11f47e7683152da022d4",
+      "bytes": 4286
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/provenance_rerun.py",
+      "sha256": "1df810e5175b1d09781eb8f6fdce38d46e0a252d4c0eef175e9861c33f0cdc36",
+      "bytes": 9231
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/results-rerun.json",
+      "sha256": "29bf03c78a8edfbafdd175b666b0dcc643b77e566387c623e11a380ac357e63e",
+      "bytes": 11106
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/results-rerun.provenance.txt",
+      "sha256": "8d2563ce66136c86fc088cc6d10bf96ada19ee6569103e05724e1ba276efc514",
+      "bytes": 722
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/results.json",
+      "sha256": "b7da1f6e49592117a1d2961cd21c03b4f023fcdbcf79355be9c269fb40f9a8a7",
+      "bytes": 11106
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/template-readback-rerun.json",
+      "sha256": "73836cc5dd779a023485d021eec2f431358d87bb391d8e871056694474687d3a",
+      "bytes": 2542
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/template-readback-rerun.provenance.txt",
+      "sha256": "856791a28c95013eac09b116c516c9b4429de04dfece92b81a3b4748ef165e8b",
+      "bytes": 942
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/template-readback.json",
+      "sha256": "73836cc5dd779a023485d021eec2f431358d87bb391d8e871056694474687d3a",
+      "bytes": 2542
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/template_readback.py",
+      "sha256": "a6d017275cf730f4bc1dc732b9d4a67ea3c9949b96c54d0a0f6914994655af58",
+      "bytes": 5054
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests-rerun.provenance.txt",
+      "sha256": "8e9b40f7c5c9c943706dc249ba757503d515977df2820809fe2cdf663195218a",
+      "bytes": 1212
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests-rerun.txt",
+      "sha256": "4d4b8372f579c722719f090fbad350d29ac71d2cef74f1be411e938019fe5239",
+      "bytes": 14196
+    },
+    {
+      "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
+      "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
+      "bytes": 14197
     },
     {
       "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
@@ -32115,6 +32200,96 @@
       "bytes": 2639
     },
     {
+      "path": "evidence/artifacts/token-coverage-20260926/README.md",
+      "sha256": "6ee972a67a347a9d49b235cdb2a0a1a66ad38928aa4e35bbd764ca507076ee7f",
+      "bytes": 21265
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/codex-readback.json",
+      "sha256": "a3bba1094249a4217df3da70abd9a03b43d499eff1587dc7f48f4471457aab1d",
+      "bytes": 1707
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/codex_readback.py",
+      "sha256": "acdbbe256439c02253e8292df7f7e638a0ace45951f50469841bf40d8a461552",
+      "bytes": 3229
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage-20260926T000437Z.json",
+      "sha256": "02f0f500cc1da17c77157b9c8e8144060be012224bac72d63f62e2eadd29ccb9",
+      "bytes": 6641
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage-20260926T023952Z.json",
+      "sha256": "4664aa5203a711de3d8984a5197a3f1ce0268903f5e3b3ae8d9046b036b522ff",
+      "bytes": 6907
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage-20260926T044740Z.json",
+      "sha256": "494f9cf91c84eda06dc790c207bb0fe8878720da9e7d14913097c022cf3f79f5",
+      "bytes": 7008
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage-20260926T044740Z.provenance.txt",
+      "sha256": "60c7a21b07f8438b3760a9021d753616d10b7af251b52e63d92a9e274c71b9f5",
+      "bytes": 645
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage-20260926T064250Z-codex-home-empty.json",
+      "sha256": "bdbb2db7f1a6e5a529da8f47d46c2726e9dbab12715a67102c040d8fbe2e38ba",
+      "bytes": 7014
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage-20260926T064252Z.json",
+      "sha256": "494f9cf91c84eda06dc790c207bb0fe8878720da9e7d14913097c022cf3f79f5",
+      "bytes": 7008
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/coverage_run.py",
+      "sha256": "6796e1b9bade4acc0c6e87bb10fdff6d23f465f313dff6f24c0d74139dd33cc7",
+      "bytes": 3145
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/interrupt-window-every-line-regression-tests.txt",
+      "sha256": "8c0a8df67cfe87344d547979b0760c193029d21a0ba645e4700bddb5dd1789fd",
+      "bytes": 15771
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/interrupt-window-regression-tests.txt",
+      "sha256": "aa2e40345eb6f98a941c38714243f3bf7fef01336002d8f11bd3368dcc4d1fbc",
+      "bytes": 18148
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/interrupt_window_control.py",
+      "sha256": "cbffdad3e28f2718c19f453faa8593f8a6b1afee97ef6eddd529fea0c0b3ec15",
+      "bytes": 7071
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/pinned-versions-regression-tests.txt",
+      "sha256": "20a573284659748008656f04cfd5048ab8400a45cbb48b0f5446d94644d9f854",
+      "bytes": 11840
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/signal-disposition-regression-tests.txt",
+      "sha256": "96a424ba782d68635c739b243dbd35876f502c512eb12ebb987288bb6a265fcb",
+      "bytes": 16280
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/signal_disposition_control.py",
+      "sha256": "89ad09ae360886cb4be7233d4721a642053f20004463ae6d4ac105c85a83b6c5",
+      "bytes": 11026
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/wiring-control-20260926T064250Z.provenance.txt",
+      "sha256": "3c981efea1d09a3fb4651fc0c269c9de7689daf6a60677bd8d92dc11f2dbc583",
+      "bytes": 1488
+    },
+    {
+      "path": "evidence/artifacts/token-coverage-20260926/wiring_control.py",
+      "sha256": "c7395dcd73cf1253793badb0ec0bd9bc7e219c5ce45d0347d83c769651be04f3",
+      "bytes": 4637
+    },
+    {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
       "sha256": "7fa8f43808ecbbc1e412c306d21a532b24999def7edbd88ba2de91a5e9f98b58",
       "bytes": 8997
@@ -34296,8 +34471,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "65e469ed68e4cce41bf5ba81c816b78b60895d1b3b53320636ebab77134eef85",
-      "bytes": 76601
+      "sha256": "1c0c99e7ffd5e290cc488c699d2f8fb93efe5368b6cd97d249c6efaebf7e180f",
+      "bytes": 79038
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -34341,8 +34516,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "9da040c4f73eb7c87e972b04a79125a1964bd6a945243fefca480aa5b8c532a4",
-      "bytes": 34868
+      "sha256": "2b372896fb827871660789b99ab4553ec5d72bbc21c3b3a23a634950013a5d6b",
+      "bytes": 42553
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -34671,8 +34846,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "b68795021ce92542ccce28c42a8d8d79accd35b83828fec79b06807571362bd1",
-      "bytes": 49735
+      "sha256": "1069ee96b71602c98fa508cb10c6f0fb72b3257ed8b1bb894f67271fc0f5e6cf",
+      "bytes": 78783
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -35106,8 +35281,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "4bad32370e00bd5066ec46a74ab523d163488ac6ae64cfd7ae4a101f9aafc04d",
-      "bytes": 15788
+      "sha256": "a523f4edb4faa997923dfa6727128c58ce13648d06b359775806d86ed5bc2faa",
+      "bytes": 18698
     },
     {
       "path": "tests/test_research_efficiency.py",

@@ -516,7 +516,7 @@
           "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'"
         ],
         "use": [
-          "HEADROOM_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1",
+          "HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1",
           "headroom_compress({\"content\":\"selected content\"})",
           "headroom_retrieve({\"hash\":\"RETURNED_HASH\"})"
         ],

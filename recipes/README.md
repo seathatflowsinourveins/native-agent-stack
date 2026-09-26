@@ -452,12 +452,12 @@ Install once with the upstream MCP extra:
 
 ```sh
 uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'
-HEADROOM_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1
+HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1
 # native registration (the name comes before -e, which takes several values):
-claude mcp add --scope user headroom -e HEADROOM_OFFLINE=1 -e DO_NOT_TRACK=1 -- "$(command -v headroom)" mcp serve --proxy-url http://127.0.0.1:1
+claude mcp add --scope user headroom -e HEADROOM_OFFLINE=1 -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 -e DO_NOT_TRACK=1 -- "$(command -v headroom)" mcp serve --proxy-url http://127.0.0.1:1
 ```
 
-Headroom 0.37.0 uploads an anonymous usage beacon by default: `telemetry/beacon.py` sets `BEACON_DEFAULT_ON = True`, and the MCP compress path calls it. `HEADROOM_OFFLINE=1` is its master no-egress switch (`offline.py`). It turns off the beacon, the update check, the license and usage reporter, and Hugging Face downloads. `DO_NOT_TRACK=1` also turns off the beacon if a later version renames that switch. Set both wherever Headroom runs: the MCP registration for each client, and any service that calls `headroom savings`. On 2026-09-25, with both variables set, `headroom_compress` still returned compressed output, because the compression model is local.
+Headroom 0.37.0 uploads an anonymous usage beacon by default: `telemetry/beacon.py` sets `BEACON_DEFAULT_ON = True`, and the MCP compress path calls it. `HEADROOM_OFFLINE=1` is its master no-egress switch (`offline.py`), which the beacon, the update check and the license and usage reporter each check. Its Hugging Face half, `apply_offline_env()`, runs only at proxy startup (`proxy/server.py`), never in `headroom mcp serve` (`cli/mcp.py`), so the MCP server also needs the two variables that function would set, `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1`. With them, huggingface_hub and transformers make no Hub request, so a compress call cannot download a Kompress model on a cold cache. `DO_NOT_TRACK=1` also turns off the beacon if a later version renames that switch. Set `HEADROOM_OFFLINE` and `DO_NOT_TRACK` wherever Headroom runs, including any service that calls `headroom savings`, and all four in each client's MCP registration. On 2026-09-25, with `HEADROOM_OFFLINE` and `DO_NOT_TRACK` set, `headroom_compress` still returned compressed output. That install has no onnxruntime, torch or transformers, so Kompress is unavailable there and nothing on its compress path downloads a model; the Hugging Face variables matter where Headroom is installed with its ML extras. None of the four variables covers tiktoken: the MCP server's compress call counts tokens for a Claude model with tiktoken's `o200k_base` (`tokenizers/registry.py`, `_create_anthropic`), and on a cold cache tiktoken downloads that vocabulary on first use. Headroom bounds the load with `HEADROOM_TIKTOKEN_LOAD_TIMEOUT_SECONDS` (default 10) and then falls back to estimating (`tokenizers/tiktoken_counter.py`), and its warning suggests a pre-populated `TIKTOKEN_CACHE_DIR`. The two Hugging Face variables in these commands, and in the Codex template's headroom entry, changed after `v2026.09.26`; a host registered from that release lacks them.
 
 The tested direct MCP fixture used that unreachable loopback proxy address and
 the server's local compression path. Within one live MCP session, call
@@ -508,6 +508,21 @@ No plugin-cache edits or broader file allowlist are needed. A fresh native
 session reads the configuration; an existing process retains its loaded server
 connection. Both native clients completed the bounded project-file and symbol
 task in the [new client receipt](../evidence/receipts/native-token-focus-clients-20260920.json).
+
+To bind every worktree at once, `adoption/templates/codex.config.template.toml`
+uses a user-scope form (2026-09-26): the same `enabled = false` override, and a
+`[mcp_servers.context-mode]` entry with no `cwd` that runs the pinned npm
+install's upstream `start.mjs` with `node`. Codex starts a server that has no
+`cwd` in the session's own directory, and `start.mjs` binds
+`CONTEXT_MODE_PROJECT_DIR` to it. The bare `context-mode` command is not enough
+there: that CLI starts the server without `start.mjs`, so, like the plugin's own
+server, it takes the project from the newest Codex session log. See the
+[retained comparison](../evidence/artifacts/context-mode-codex-binding-20260926/README.md).
+This template form changed after `v2026.09.26`, whose template leaves the MCP server
+to the plugin. Like the plugin's own server, `start.mjs` runs upstream's self-heal
+on every start, which can write under the Claude configuration directory
+(`$CLAUDE_CONFIG_DIR`, else `~/.claude`): plugin registry and plugin cache
+repair, and a `SessionStart` cache-heal hook in `settings.json`.
 
 Point the Context Mode entry in the MCPorter example at the actual installed plugin's upstream `start.mjs`, using the intended runtime's configuration home. The path must come from that runtime's plugin inventory. This preserves native startup behavior instead of inserting a replacement server.
 

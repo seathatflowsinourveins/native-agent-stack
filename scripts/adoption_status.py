@@ -10,14 +10,16 @@ in-process and emits no value from them: fixed booleans and hook-event counts on
 never a value, command, path or environment value. The opt-in --pinned-versions execs
 a profile's PATH-resolved commands with their platform pin's declared "exec"
 version_probe only (never one declared "npm-metadata" or another method, since that
-method exists exactly because running the tool starts a server or a UI) and emits
-booleans, counts and version strings from the checked-in pins file and the probe's own
-version output.
+method exists exactly because running the tool starts a server or a UI), each in its
+own process group that is killed once the probe exits, times out or is interrupted,
+and emits booleans, counts and version strings from the checked-in pins file and the
+output of a probe that exited 0.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -25,8 +27,11 @@ import platform
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
+import tempfile
+import threading
 from urllib.parse import urlsplit
 
 
@@ -58,6 +63,9 @@ CLIENT_WIRING_LIMITATIONS = [
     "own checks (/mcp, /hooks, the plugin doctor).",
 ]
 PINNED_VERSION_TIMEOUT_SECONDS = 30
+# adoption/bootstrap-linux.sh run_version_probe: TERM to the probe's process group when its bound expires, KILL
+# this many seconds later.
+PINNED_VERSION_KILL_GRACE_SECONDS = 2
 # A pin's version_probe.method this script ever execs. "npm-metadata" (context-mode: no version flag, any
 # other argument starts its MCP stdio server) and any future undeclared method are reported unchecked instead;
 # see adoption/bootstrap-linux.sh's write_version_report, which this reuses the pins file's schema from (#251).
@@ -66,11 +74,15 @@ SUPPORTED_VERSION_PROBE_METHODS = ("exec",)
 PINNED_VERSION_LIMITATIONS = [
     "--pinned-versions execs a selected profile's component_ids that have an \"exec\" version_probe in this "
     "platform's pins file (adoption/pins-<os>-<arch>.json): the declared command, located on PATH only, run with "
-    "stdin from /dev/null and killed after its pin's timeout_seconds or "
-    f"{PINNED_VERSION_TIMEOUT_SECONDS}s, and its stdout and stderr text compared against the pinned version. A "
-    "component with no pins entry for this platform, or whose declared method is not \"exec\" (for example "
-    "context-mode's \"npm-metadata\", declared because any other argument starts its MCP stdio server), is "
-    "reported unchecked; this never execs a probe whose declared method is not \"exec\".",
+    "stdin from /dev/null in its own process group. That group is killed once the probe exits, on interruption "
+    "(SIGINT, SIGTERM or SIGHUP; a signal this check started with ignored, as under nohup, stays ignored), "
+    f"and after its pin's timeout_seconds or {PINNED_VERSION_TIMEOUT_SECONDS}s (TERM, then KILL "
+    f"{PINNED_VERSION_KILL_GRACE_SECONDS}s later); a descendant that leaves the group, for example by starting its "
+    "own session, is not reached. Only a probe that exits 0 has its stdout and stderr text compared against the "
+    "pinned version; a nonzero exit is reported as not matching. A component with no pins entry for this "
+    "platform, or whose declared method is not \"exec\" (for example context-mode's \"npm-metadata\", declared "
+    "because any other argument starts its MCP stdio server), is reported unchecked; this never execs a probe "
+    "whose declared method is not \"exec\".",
 ]
 # The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
 CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
@@ -476,6 +488,140 @@ def version_output_matches(expected: str, match: str, output: str) -> bool:
     return False
 
 
+def signal_group(group: int, signum: int) -> None:
+    """Signal a probe's whole process group; a group with nothing left in it is not an error."""
+    try:
+        os.killpg(group, signum)
+    except OSError:  # ProcessLookupError: the group is empty; PermissionError: macOS, zombies only
+        pass
+
+
+def run_version_probe(argv: list[str], seconds: float) -> tuple[int, str] | None:
+    """adoption/bootstrap-linux.sh run_version_probe: run ``argv`` with stdin from /dev/null in its own process
+    group (a new session), its output going to temporary files, so a descendant that keeps them open cannot
+    delay the result. When ``seconds`` pass, TERM goes to the whole group and KILL follows
+    PINNED_VERSION_KILL_GRACE_SECONDS later. Whatever is left in the group is killed once the probe exits, and on
+    any interruption before it propagates (main() turns SIGINT, SIGTERM and SIGHUP into one unless they are
+    ignored, as the bootstrap's EXIT trap stops its probe's group when that script is interrupted). Interruptions
+    are held back (held_interrupts) from before the process is created until its group has been killed and
+    reaped, except while the probe is waited for (interrupts_released), inside the block whose cleanup kills the
+    group. One held back, such as one that arrives between the probe's fork and subprocess.Popen returning it, or
+    during the kill, is raised once the group is gone. Returns the exit status and the stdout and stderr text, or
+    None on timeout."""
+    with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
+        with held_interrupts():
+            process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
+                                       start_new_session=True)
+            try:
+                with interrupts_released():
+                    try:
+                        status = process.wait(timeout=seconds)
+                    except subprocess.TimeoutExpired:
+                        signal_group(process.pid, signal.SIGTERM)
+                        with contextlib.suppress(subprocess.TimeoutExpired):
+                            process.wait(timeout=PINNED_VERSION_KILL_GRACE_SECONDS)
+                        status = None
+            finally:
+                signal_group(process.pid, signal.SIGKILL)
+                process.wait()
+        if status is None:
+            return None
+        stdout.seek(0)
+        stderr.seek(0)
+        # Joined by a newline, so the two streams are searched as the bootstrap's grep searches two files.
+        return status, "\n".join(stream.read().decode("utf-8", "replace") for stream in (stdout, stderr))
+
+
+# The interrupt held back by held_interrupts: whether a hold is on, and the first signal that arrived during it.
+# Python runs signal handlers in the main thread only, and only the main thread holds, so nothing else reads or
+# changes this.
+HELD_INTERRUPTS: dict = {"holding": False, "pending": None}
+
+
+def raise_interrupt(signum: int) -> None:
+    """A probe interruption: KeyboardInterrupt for SIGINT, as CPython's own handler raises, else SystemExit with
+    status 128 + the signal."""
+    if signum == signal.SIGINT:
+        raise KeyboardInterrupt
+    raise SystemExit(128 + signum)
+
+
+def interrupt_probe(signum: int, _frame) -> None:
+    """The handler signals_interrupt_probes installs: interrupt now, or, during a hold, keep the first signal for
+    the hold's end."""
+    if HELD_INTERRUPTS["holding"]:
+        if HELD_INTERRUPTS["pending"] is None:
+            HELD_INTERRUPTS["pending"] = signum
+        return
+    raise_interrupt(signum)
+
+
+@contextlib.contextmanager
+def held_interrupts():
+    """Hold back the interruptions signals_interrupt_probes turns signals into until the block ends, then raise
+    the first one that arrived. Outside the main thread, or inside another hold, this changes nothing."""
+    if threading.current_thread() is not threading.main_thread() or HELD_INTERRUPTS["holding"]:
+        yield
+        return
+    HELD_INTERRUPTS["pending"] = None  # one left by an earlier hold that was itself interrupted does not carry over
+    HELD_INTERRUPTS["holding"] = True
+    try:
+        yield
+    finally:
+        HELD_INTERRUPTS["holding"] = False
+        signum, HELD_INTERRUPTS["pending"] = HELD_INTERRUPTS["pending"], None
+        if signum is not None:
+            raise_interrupt(signum)
+
+
+@contextlib.contextmanager
+def interrupts_released():
+    """Inside a hold, let interruptions through for the block: one held back so far is raised as the block
+    starts, and the hold resumes when the block ends, however it ends. Outside a hold, or outside the main
+    thread, this changes nothing."""
+    if threading.current_thread() is not threading.main_thread() or not HELD_INTERRUPTS["holding"]:
+        yield
+        return
+    try:
+        HELD_INTERRUPTS["holding"] = False
+        signum, HELD_INTERRUPTS["pending"] = HELD_INTERRUPTS["pending"], None
+        if signum is not None:
+            raise_interrupt(signum)
+        yield
+    finally:
+        HELD_INTERRUPTS["holding"] = True
+
+
+@contextlib.contextmanager
+def signals_interrupt_probes():
+    """While probes run, SIGINT, SIGTERM and SIGHUP interrupt the check through interrupt_probe: SIGINT still
+    raises KeyboardInterrupt, SIGTERM and SIGHUP raise SystemExit (status 128 + the signal), so
+    run_version_probe kills the running probe's group on the way out; it holds an interruption back everywhere
+    but while it waits for the probe, inside the block whose cleanup kills the group. As CPython installs its
+    SIGINT handler only when SIGINT starts at its default action, a signal is changed only while it is at its
+    default action (SIG_DFL, or for SIGINT also CPython's default_int_handler), and put back afterwards: one the
+    check started with ignored (nohup, or a background job) stays ignored, as bash cannot trap a signal ignored
+    on entry, and a handler installed by someone else stays in place. Python accepts signal handlers in the main
+    thread only; elsewhere this changes nothing."""
+    if threading.current_thread() is not threading.main_thread():
+        yield
+        return
+    installed = []
+    for name in ("SIGINT", "SIGTERM", "SIGHUP"):
+        signum = getattr(signal, name, None)
+        if signum is None:
+            continue
+        previous = signal.getsignal(signum)
+        if previous == signal.SIG_DFL or (name == "SIGINT" and previous is signal.default_int_handler):
+            signal.signal(signum, interrupt_probe)
+            installed.append((signum, previous))
+    try:
+        yield
+    finally:
+        for signum, previous in installed:
+            signal.signal(signum, previous)
+
+
 def probe_pinned_version(entry: dict) -> dict:
     """One component's pinned-version result. Never execs a probe whose declared method is not "exec": a
     "npm-metadata" method (context-mode) is declared exactly because any other argument starts its MCP
@@ -499,13 +645,16 @@ def probe_pinned_version(entry: dict) -> dict:
     seconds = declared_seconds if isinstance(declared_seconds, (int, float)) and 0 < declared_seconds <= 300 \
         else PINNED_VERSION_TIMEOUT_SECONDS
     try:
-        completed = subprocess.run([resolved, *args], stdin=subprocess.DEVNULL, capture_output=True,
-                                   text=True, timeout=seconds, check=False)
-    except (OSError, ValueError, subprocess.TimeoutExpired):
+        outcome = run_version_probe([resolved, *args], seconds)
+    except (OSError, ValueError):
         return result
+    if outcome is None:  # timed out: its process group was killed
+        return result
+    status, output = outcome
     result["checked"] = True
-    result["matches_pin"] = isinstance(expected, str) and version_output_matches(expected, match,
-                                                                                 completed.stdout + completed.stderr)
+    # As the bootstrap's "FAILED (exit N)": a failing probe never matches, even if its diagnostics name the pin.
+    result["matches_pin"] = status == 0 and isinstance(expected, str) and version_output_matches(expected, match,
+                                                                                               output)
     return result
 
 
@@ -590,8 +739,9 @@ def main(argv: list[str] | None = None) -> int:
                              "(booleans, counts and version strings only; never execs a probe whose declared "
                              "method is not \"exec\", and the exit code is unchanged)")
     args = parser.parse_args(argv)
-    report = inspect_adoption(args.manifest, args.repo_root, args.profile, with_client_wiring=args.client_wiring,
-                              with_pinned_versions=args.pinned_versions)
+    with signals_interrupt_probes() if args.pinned_versions else contextlib.nullcontext():
+        report = inspect_adoption(args.manifest, args.repo_root, args.profile,
+                                  with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions)
     if args.json:
         print(json.dumps(report, indent=2))
     else:

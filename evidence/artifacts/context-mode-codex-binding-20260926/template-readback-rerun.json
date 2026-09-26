@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "codex_version": "codex-cli 0.155.1",
+  "render_exit": 0,
+  "render_host_values": "adoption/hosts/example.json",
+  "results": [
+    {
+      "configuration": "template as rendered",
+      "codex_mcp_list_exit": 0,
+      "servers_listed": [
+        "ai-memory",
+        "codebase-memory",
+        "context-mode",
+        "headroom",
+        "qmd",
+        "serena",
+        "socraticode"
+      ],
+      "context_mode_servers": [
+        {
+          "enabled": true,
+          "command_basename": "node",
+          "args_basenames": [
+            "start.mjs"
+          ],
+          "env_names": [
+            "CONTEXT_MODE_PLATFORM",
+            "PATH",
+            "RTK_TELEMETRY_DISABLED"
+          ],
+          "cwd": null
+        }
+      ],
+      "headroom_env_names": [
+        [
+          "DO_NOT_TRACK",
+          "HEADROOM_OFFLINE",
+          "HF_HUB_OFFLINE",
+          "TRANSFORMERS_OFFLINE"
+        ]
+      ]
+    },
+    {
+      "configuration": "template without the plugin-server override",
+      "codex_mcp_list_exit": 0,
+      "servers_listed": [
+        "ai-memory",
+        "codebase-memory",
+        "context-mode",
+        "headroom",
+        "qmd",
+        "serena",
+        "socraticode"
+      ],
+      "context_mode_servers": [
+        {
+          "enabled": true,
+          "command_basename": "node",
+          "args_basenames": [
+            "start.mjs"
+          ],
+          "env_names": [
+            "CONTEXT_MODE_PLATFORM",
+            "PATH",
+            "RTK_TELEMETRY_DISABLED"
+          ],
+          "cwd": null
+        }
+      ],
+      "headroom_env_names": [
+        [
+          "DO_NOT_TRACK",
+          "HEADROOM_OFFLINE",
+          "HF_HUB_OFFLINE",
+          "TRANSFORMERS_OFFLINE"
+        ]
+      ]
+    },
+    {
+      "configuration": "plugin server alone (before this repair)",
+      "codex_mcp_list_exit": 0,
+      "servers_listed": [
+        "ai-memory",
+        "codebase-memory",
+        "context-mode",
+        "headroom",
+        "qmd",
+        "serena",
+        "socraticode"
+      ],
+      "context_mode_servers": [
+        {
+          "enabled": true,
+          "command_basename": "node",
+          "args_basenames": [
+            "start.mjs"
+          ],
+          "env_names": [
+            "CONTEXT_MODE_PLATFORM"
+          ],
+          "cwd": "plugin root"
+        }
+      ],
+      "headroom_env_names": [
+        [
+          "DO_NOT_TRACK",
+          "HEADROOM_OFFLINE",
+          "HF_HUB_OFFLINE",
+          "TRANSFORMERS_OFFLINE"
+        ]
+      ]
+    }
+  ]
+}

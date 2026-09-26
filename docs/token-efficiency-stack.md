@@ -148,9 +148,16 @@ or parse, and the computed `complete`.
 Add `--pinned-versions` to also report, per profile, whether each component's
 installed version matches its platform pin (`adoption/pins-<os>-<arch>.json`). It runs
 only a pin's declared `exec` version probe, never one declared `npm-metadata` (which
-exists because any other argument starts that tool's server). Components without a
-pin entry for the platform are reported unchecked. This flag is new after
-`v2026.09.25.1` as well. Run the check from a fresh worktree, not only from the main
+exists because any other argument starts that tool's server). As in
+`adoption/bootstrap-linux.sh`, each probe runs in its own process group, which is
+killed once the probe exits, when the check is interrupted (Ctrl-C, SIGTERM or
+SIGHUP; a signal the check started with ignored, as under `nohup`, stays ignored,
+as it does for the bootstrap), and when the pin's time bound expires (TERM, then KILL
+2 s later); a probe that exits nonzero never counts as a match, whatever it printed.
+Components without a pin entry for the platform are reported unchecked. This flag is
+new after `v2026.09.25.1` as well, and its probe handling changed after `v2026.09.26`:
+that release's copy counts a probe's output whatever its exit status and, on timeout,
+kills only the probe itself. Run the check from a fresh worktree, not only from the main
 checkout, to confirm that worktree workers inherit the wiring.
 
 The `token-efficiency` profile in [the adoption manifest](../adoption/manifest.json)

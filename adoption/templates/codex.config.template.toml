@@ -14,8 +14,9 @@ max_concurrent_threads_per_session = 3
 # ai-memory's registration carries no project: its workspace/project scoping is a per-call argument.
 # headroom, codebase-memory and qmd mirror the Claude user-scope set: headroom's dead proxy URL means
 # it reroutes no model traffic, codebase-memory indexes only on an explicit index_repository call,
-# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240) and context-mode comes
-# from its plugin; see project.codex.config.template.toml.
+# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240). context-mode's plugin
+# supplies its hooks and skills, while its MCP server is registered below, bound to each session's own
+# directory; see project.codex.config.template.toml.
 [mcp_servers.serena]
 command = "${ECO_ROOT}/bin/serena"
 args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
@@ -56,10 +57,16 @@ command = "${ECO_ROOT}/bin/headroom"
 args = ["mcp", "serve", "--proxy-url", "http://127.0.0.1:1"]
 
 # headroom-ai 0.37.0 turns its usage beacon on by default (telemetry/beacon.py BEACON_DEFAULT_ON).
-# HEADROOM_OFFLINE is its master no-egress switch (offline.py): beacon, update check, usage reporter and
-# model downloads off. DO_NOT_TRACK also disables the beacon if a later release renames that switch.
+# HEADROOM_OFFLINE is its master no-egress switch (offline.py) for the beacon, update check and usage
+# reporter. Its model-download half, apply_offline_env(), runs only at proxy startup (proxy/server.py),
+# never in `headroom mcp serve` (cli/mcp.py), so the two variables it would set are set here:
+# huggingface_hub and transformers then make no Hub request, so a compress call on a cold cache (Kompress,
+# where it is installed) cannot download a model. DO_NOT_TRACK also disables the beacon if a later release
+# renames that switch.
 [mcp_servers.headroom.env]
 HEADROOM_OFFLINE = "1"
+HF_HUB_OFFLINE = "1"
+TRANSFORMERS_OFFLINE = "1"
 DO_NOT_TRACK = "1"
 
 [mcp_servers.codebase-memory]
@@ -68,6 +75,25 @@ command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 [mcp_servers.qmd]
 command = "${ECO_ROOT}/bin/qmd"
 args = ["--index", "native-agent-stack-catalog", "mcp"]
+
+# context-mode's plugin server (.codex-plugin/mcp.json: `node ./start.mjs`, cwd ".") starts in the plugin
+# root, because Codex joins a plugin server's relative cwd to that root. Upstream start.mjs then sets no
+# CONTEXT_MODE_PROJECT_DIR, and the server takes its project from the newest Codex session log, so with two
+# concurrent sessions one runs ctx_execute shell commands in the other's worktree. This entry has no cwd:
+# Codex starts it in the session's own directory, and the same upstream start.mjs, from the pinned npm
+# install, binds CONTEXT_MODE_PROJECT_DIR to that directory. The plugin's own server is turned off under
+# [plugins."context-mode@context-mode"] below; its hooks and skills stay on. Approval mode and platform are
+# the plugin manifest's own. See docs/decisions/2026-09-25-codex-mcp-scope.md, addendum 2026-09-26.
+[mcp_servers.context-mode]
+command = "${ECO_ROOT}/bin/node"
+args = ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"]
+startup_timeout_sec = 60
+default_tools_approval_mode = "approve"
+
+[mcp_servers.context-mode.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+CONTEXT_MODE_PLATFORM = "codex"
 
 [projects."${HOME}/codex-ecosystem/validation/native-codex"]
 trust_level = "trusted"
@@ -140,6 +166,10 @@ source = "https://github.com/mksglu/context-mode.git"
 
 [plugins."context-mode@context-mode"]
 enabled = true
+
+# Replaced by the session-bound [mcp_servers.context-mode] above.
+[plugins."context-mode@context-mode".mcp_servers.context-mode]
+enabled = false
 
 [features]
 hooks = true

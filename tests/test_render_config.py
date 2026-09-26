@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import string
 import subprocess
 import sys
@@ -66,6 +67,46 @@ class RenderConfigTests(unittest.TestCase):
                 self.assertNotIn("${" + key + "}", rendered, (name, key))
             if name.endswith(".json"):
                 json.loads(rendered)  # still valid JSON once rendered
+
+    def test_versioned_tool_paths_follow_the_linux_pins(self):
+        # A pinned install's own path in a template (${ECO_ROOT}/tools/<id>-<version>/) moves with that pin.
+        # The templates carry the WSL2 workstation's values, so the Linux pins file is the reference.
+        pins = {tool["id"]: tool["version"] for tool in
+                json.loads((ROOT / "adoption" / "pins-linux-x86_64.json").read_text(encoding="utf-8"))["tools"]}
+        pattern = r"\$\{ECO_ROOT\}/tools/([a-z][a-z0-9-]*?)-([0-9][0-9A-Za-z.]*)/"
+        paths = [(name, tool, version) for name in TEMPLATE_NAMES
+                 for tool, version in re.findall(pattern, (TEMPLATES / name).read_text(encoding="utf-8"))]
+        self.assertLessEqual({"context-mode", "socraticode"}, {tool for _, tool, _ in paths}, paths)
+        for name, tool, version in paths:
+            with self.subTest(template=name, tool=tool):
+                self.assertEqual(version, pins.get(tool))
+
+    def test_codex_templates_bind_context_mode_per_session_and_run_headroom_offline(self):
+        # docs/decisions/2026-09-25-codex-mcp-scope.md, addendum 2026-09-26. The plugin's own server starts in
+        # the plugin root and then follows the newest Codex session log; an entry with no cwd starts in each
+        # session's own directory, which upstream start.mjs binds as CONTEXT_MODE_PROJECT_DIR. A fixed
+        # CONTEXT_MODE_PROJECT_DIR, or a project-scope entry, would bind every session to one directory.
+        # `headroom mcp serve` never calls apply_offline_env(), so the Hugging Face variables are set here.
+        import tomllib  # Python 3.11+, as the Codex wiring check already requires
+
+        def rendered(name):
+            text = (TEMPLATES / name).read_text(encoding="utf-8")
+            return tomllib.loads(string.Template(text).substitute(FIXTURE_VALUES))
+
+        user = rendered("codex.config.template.toml")
+        self.assertIn("context-mode", user["mcp_servers"])
+        server = user["mcp_servers"]["context-mode"]
+        self.assertNotIn("cwd", server)
+        self.assertEqual(Path(server["command"]).name, "node")
+        self.assertEqual([Path(argument).name for argument in server["args"]], ["start.mjs"])
+        self.assertEqual(server["env"].get("CONTEXT_MODE_PLATFORM"), "codex")
+        self.assertNotIn("CONTEXT_MODE_PROJECT_DIR", server["env"])
+        plugin = user["plugins"]["context-mode@context-mode"]
+        self.assertIs(plugin["enabled"], True)  # its hooks and skills stay on
+        self.assertIs(plugin["mcp_servers"]["context-mode"]["enabled"], False)
+        offline = {"HEADROOM_OFFLINE": "1", "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "DO_NOT_TRACK": "1"}
+        self.assertLessEqual(offline.items(), user["mcp_servers"]["headroom"]["env"].items())
+        self.assertNotIn("context-mode", rendered("project.codex.config.template.toml").get("mcp_servers", {}))
 
     def test_render_out_writes_three_files(self):
         out_dir = self.tmp_path / "out"
