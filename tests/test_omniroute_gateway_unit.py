@@ -6,8 +6,9 @@ acceptance check. The template must render to the unit recorded as installed on 
 (evidence/artifacts/omniroute-gateway-20260927/omniroute.service), apart from its Description= and one documented
 extra line. The unit text holds no secret, names exactly one EnvironmentFile= and gives every Environment= line a one-line
 reason comment. A text test cannot see what a user service inherits from the user manager's environment; the template's header
-says how to keep credentials out of it. Each check is a helper function that a planted violation must fail (the
-discriminating controls at the end).
+says how to keep credentials and bind variables out of it. Every check of the template's text is a helper function, and
+a planted violation fails each helper (the discriminating controls at the end). The one cross-reference check, that
+the decision record names the template, is a direct assertion without a control.
 """
 
 from __future__ import annotations
@@ -29,13 +30,18 @@ WORKSTATION = {
 }
 # The one directive the template adds on purpose (see its header); the installed environment file sets the same value.
 TEMPLATE_ONLY = {"Environment=OMNIROUTE_SERVER_HOST=127.0.0.1"}
+ENVIRONMENT_FILE = "EnvironmentFile=%h/.local/share/omniroute/server.env"
 ENVIRONMENT_NAMES = {
     "PATH", "OMNIROUTE_SERVER_HOST", "OMNIROUTE_MEMORY_MB", "CODEX_CLIENT_VERSION", "STREAM_READINESS_TIMEOUT_MS",
     "STREAM_READINESS_MAX_TIMEOUT_MS", "STREAM_ACTIVE_TIMEOUT_MS", "CLI_ALLOW_CONFIG_WRITES",
 }
 PLACEHOLDER = re.compile(r"@([A-Z][A-Z0-9_]*)@")
 SECRET_LIKE = re.compile(r"SECRET|PASSWORD|TOKEN|COOKIE|_KEY\b|^KEY\b")
+CREDENTIAL_TEXT = re.compile(r"(?i)bearer|\bexport\s|[0-9a-f]{32,}")
 EXEC_START = "ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port 20128 --no-open --no-tray"
+SUPERVISION = ("Type=simple", "Restart=on-failure", "UMask=0077", "NoNewPrivileges=true", "[Install]",
+               "WantedBy=default.target")
+FORBIDDEN = ("--daemon", "--no-recovery", "npm start", "timeout ")
 
 
 def directives(text: str) -> list[str]:
@@ -55,6 +61,42 @@ def environment_names(text: str) -> list[str]:
 def secret_like_environment(text: str) -> list[str]:
     """Environment= names that look like secrets; a secret belongs only in the EnvironmentFile=."""
     return [name for name in environment_names(text) if SECRET_LIKE.search(name)]
+
+
+def environment_files(text: str) -> list[str]:
+    """EnvironmentFile= directives, in order; the unit must have exactly the one server.env line."""
+    return [line for line in directives(text) if line.startswith("EnvironmentFile=")]
+
+
+def environment_name_drift(text: str) -> list[str]:
+    """Documented Environment= names that are missing, undocumented names, and names given more than once."""
+    names = environment_names(text)
+    return ([f"missing {name}" for name in sorted(ENVIRONMENT_NAMES - set(names))]
+            + [f"undocumented {name}" for name in sorted(set(names) - ENVIRONMENT_NAMES)]
+            + [f"repeated {name}" for name in sorted({name for name in names if names.count(name) > 1})])
+
+
+def credential_like_directives(text: str) -> list[str]:
+    """Directive lines with bearer text, a shell export or a run of 32 or more hex digits."""
+    return [line for line in directives(text) if CREDENTIAL_TEXT.search(line)]
+
+
+def placeholder_problems(text: str) -> list[str]:
+    """Placeholders outside the documented set, documented ones the directives do not use, and ones the header omits."""
+    used = set(PLACEHOLDER.findall("\n".join(directives(text))))
+    header = "\n".join(line for line in text.splitlines() if line.startswith("#"))
+    return ([f"unknown @{name}@" for name in sorted(used - set(WORKSTATION))]
+            + [f"unused @{name}@" for name in sorted(set(WORKSTATION) - used)]
+            + [f"undocumented @{name}@" for name in sorted(WORKSTATION) if f"@{name}@" not in header])
+
+
+def supervision_problems(text: str) -> list[str]:
+    """Departures from a foreground serve under systemd supervision."""
+    lines = directives(text)
+    joined = "\n".join(lines)
+    return (([] if [line for line in lines if line.startswith("ExecStart=")] == [EXEC_START] else ["ExecStart differs"])
+            + [f"missing {setting}" for setting in SUPERVISION if setting not in lines]
+            + [f"forbidden {flag.strip()}" for flag in FORBIDDEN if flag in joined])
 
 
 def unexplained_environment(text: str) -> list[str]:
@@ -90,33 +132,20 @@ class OmniRouteUnitTemplateTests(unittest.TestCase):
             self.assertNotIn(line, directives(self.installed))
 
     def test_placeholders_are_exactly_the_documented_set_and_render_away(self):
-        used = set(PLACEHOLDER.findall("\n".join(directives(self.template))))
-        self.assertEqual(used, set(WORKSTATION))
-        header = "\n".join(line for line in self.template.splitlines() if line.startswith("#"))
-        for name in WORKSTATION:
-            self.assertIn(f"@{name}@", header, f"@{name}@ is not documented in the header")
+        self.assertEqual(placeholder_problems(self.template), [])
         self.assertEqual(PLACEHOLDER.findall("\n".join(directives(render(self.template, WORKSTATION)))), [])
 
     def test_no_inline_secret_and_exactly_one_environment_file(self):
-        lines = directives(self.template)
-        self.assertEqual([line for line in lines if line.startswith("EnvironmentFile=")],
-                         ["EnvironmentFile=%h/.local/share/omniroute/server.env"])
-        self.assertEqual(set(environment_names(self.template)), ENVIRONMENT_NAMES)
-        self.assertEqual(len(environment_names(self.template)), len(ENVIRONMENT_NAMES))
+        self.assertEqual(environment_files(self.template), [ENVIRONMENT_FILE])
+        self.assertEqual(environment_name_drift(self.template), [])
         self.assertEqual(secret_like_environment(self.template), [])
-        self.assertIsNone(re.search(r"(?i)bearer|\bexport\s|[0-9a-f]{32,}", "\n".join(lines)))
+        self.assertEqual(credential_like_directives(self.template), [])
 
     def test_every_environment_line_has_its_own_reason(self):
         self.assertEqual(unexplained_environment(self.template), [])
 
     def test_serve_runs_in_the_foreground_under_systemd_supervision(self):
-        lines = directives(self.template)
-        self.assertEqual([line for line in lines if line.startswith("ExecStart=")], [EXEC_START])
-        for setting in ("Type=simple", "Restart=on-failure", "UMask=0077", "NoNewPrivileges=true",
-                        "[Install]", "WantedBy=default.target"):
-            self.assertIn(setting, lines)
-        for flag in ("--daemon", "--no-recovery", "npm start", "timeout "):
-            self.assertNotIn(flag, "\n".join(lines))
+        self.assertEqual(supervision_problems(self.template), [])
 
     def test_the_decision_record_names_the_template(self):
         self.assertIn("adoption/templates/systemd/omniroute.service", DECISION.read_text(encoding="utf-8"))
@@ -129,6 +158,49 @@ class OmniRouteUnitTemplateTests(unittest.TestCase):
             "Environment=OMNIROUTE_MEMORY_MB=16384\n# reason\nEnvironment=JWT_SECRET=fixture-not-a-secret")
         self.assertEqual(secret_like_environment(planted), ["JWT_SECRET"])
         self.assertEqual(secret_like_environment("Environment=OMNIROUTE_API_KEY=x\n"), ["OMNIROUTE_API_KEY"])
+
+    def test_a_second_or_missing_environment_file_is_caught(self):
+        second = "EnvironmentFile=%h/.config/omniroute-extra.env"
+        planted = self.template.replace(ENVIRONMENT_FILE, f"{ENVIRONMENT_FILE}\n{second}")
+        self.assertEqual(environment_files(planted), [ENVIRONMENT_FILE, second])
+        self.assertEqual(environment_files(self.template.replace(ENVIRONMENT_FILE + "\n", "")), [])
+
+    def test_environment_name_drift_is_caught(self):
+        undocumented = self.template.replace(
+            "Environment=CLI_ALLOW_CONFIG_WRITES=false",
+            "Environment=CLI_ALLOW_CONFIG_WRITES=false\n# reason\nEnvironment=LIVE_WS_HOST=0.0.0.0")
+        self.assertEqual(environment_name_drift(undocumented), ["undocumented LIVE_WS_HOST"])
+        repeated = self.template.replace(
+            "Environment=OMNIROUTE_MEMORY_MB=16384",
+            "Environment=OMNIROUTE_MEMORY_MB=16384\n# reason\nEnvironment=OMNIROUTE_MEMORY_MB=8192")
+        self.assertEqual(environment_name_drift(repeated), ["repeated OMNIROUTE_MEMORY_MB"])
+        missing = self.template.replace("Environment=CLI_ALLOW_CONFIG_WRITES=false\n", "")
+        self.assertEqual(environment_name_drift(missing), ["missing CLI_ALLOW_CONFIG_WRITES"])
+
+    def test_credential_like_text_is_caught(self):
+        # The hex run is built at test time, so no 32-digit literal sits in this file.
+        for planted_line in ("ExecStartPre=/bin/sh -c 'export OMNIROUTE_API_KEY=x'",
+                             "Environment=AUTH_HEADER=Bearer fixture",
+                             "Environment=FIXTURE=" + "0123456789abcdef" * 2):
+            with self.subTest(planted_line=planted_line):
+                planted = self.template.replace("Restart=on-failure", f"{planted_line}\nRestart=on-failure")
+                self.assertEqual(credential_like_directives(planted), [planted_line])
+
+    def test_placeholder_drift_is_caught(self):
+        unknown = self.template.replace("--no-tray\n", "--no-tray --data-dir @DATA_DIR@\n")
+        self.assertEqual(placeholder_problems(unknown), ["unknown @DATA_DIR@"])
+        unused = self.template.replace("Environment=CODEX_CLIENT_VERSION=@CODEX_CLIENT_VERSION@",
+                                       "Environment=CODEX_CLIENT_VERSION=0.157.1")
+        self.assertEqual(placeholder_problems(unused), ["unused @CODEX_CLIENT_VERSION@"])
+        undocumented = "\n".join(line for line in self.template.splitlines()
+                                 if not (line.startswith("#") and "@NODE_PREFIX@" in line))
+        self.assertEqual(placeholder_problems(undocumented), ["undocumented @NODE_PREFIX@"])
+
+    def test_supervision_drift_is_caught(self):
+        daemon = self.template.replace("--no-tray\n", "--no-tray --daemon\n")
+        self.assertEqual(supervision_problems(daemon), ["ExecStart differs", "forbidden --daemon"])
+        unmasked = self.template.replace("UMask=0077\n", "")
+        self.assertEqual(supervision_problems(unmasked), ["missing UMask=0077"])
 
     def test_an_environment_line_without_a_reason_is_caught(self):
         planted = self.template.replace("Environment=CLI_ALLOW_CONFIG_WRITES=false",

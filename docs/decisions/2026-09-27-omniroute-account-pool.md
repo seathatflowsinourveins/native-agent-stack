@@ -31,8 +31,11 @@ Upstream prefixes used below:
 
 **About the settings synthesis.** The coordinator's settings synthesis of 2026-09-27 and its verified research
 rows are not retained in this repository. That covers the K, U and X items named below. This record uses them only
-as recommendations it adopts or declines, and says so where it does. Every factual claim here carries its own
-upstream citation or retained output.
+as recommendations it adopts or declines, and says so where it does.
+
+**What backs the claims.** The upstream mechanisms and defaults this record relies on are cited at their pins, and
+live observations point to retained outputs. Some statements rest only on the coordinator's report: the Evidence
+section lists the observations whose outputs are not retained, and other reported facts say so where they appear.
 
 ## Context
 
@@ -65,7 +68,14 @@ for `ultra` is `max` (OR `open-sse/executors/codex.ts` L354-355 and L1463).
 
 That commit had two defects on this host.
 
-1. **Every `/v1` inference route answered HTTP 500 on the host's Node 24.** Codex reports this as "high demand".
+1. **Every `/v1` inference route answered HTTP 500 on the host's Node 24.** The coordinator observed this with
+   `scripts/route_repro.py.txt`, whose status lines are reported, not retained. Codex shows an HTTP 500 from its
+   provider as "We’re currently experiencing high demand" (CX `codex-api/src/api_bridge.rs` L157-158 and
+   `protocol/src/error.rs` L160-161). The retained client events of a 06:32Z probe show five reconnects and a failed
+   turn with that message
+   ([`probe-lane-client-events.json`](../../evidence/artifacts/omniroute-gateway-20260927/probe-lane-client-events.json)).
+   They do not show whether the gateway raised the 500 itself or passed on an upstream one, or which build served
+   them.
    - **The cause.** `withDeadlineSignal` (OR `open-sse/utils/earlyStreamKeepalive.ts:341`, added by 8c05ec42 #14808
      on 2026-09-25) builds `new Request(request, {signal, headers})`. Next 16.3.5's app-route runtime hands
      `dynamic: auto` routes a Proxy (`proxyNextRequest`, `next/dist/server/route-modules/app-route/module.js`
@@ -135,9 +145,25 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
    `adoption/templates/systemd/omniroute.service`).
    - **Command.** `ExecStart=<prefix>/bin/omniroute serve --port 20128 --no-open --no-tray`, with
      `Restart=on-failure`, `UMask=0077` and `NoNewPrivileges=true`.
-   - **Addresses.** Loopback only: 127.0.0.1 on ports 20128, 20131 and 20132.
-   - **No `--no-recovery`.** Upstream labels it "Disable auto-restart on crash (debugging mode)". The default
-     in-process supervisor (two restarts) runs under systemd's `Restart=on-failure`.
+   - **Addresses.** Loopback only: 127.0.0.1 on ports 20128, 20131 and 20132. A read-only observation at 10:40Z,
+     after every probe, found exactly these three listeners among the unit's processes, and no other process on
+     those ports
+     ([`gateway-readonly-observation.txt`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-readonly-observation.txt)).
+     What sets each bind:
+     - 20128, the server: `OMNIROUTE_SERVER_HOST`, else `0.0.0.0` (OR `bin/cli/utils/serverHost.mjs` L16-26). The
+       environment file sets it to 127.0.0.1.
+     - 20132, the live dashboard WebSocket: `LIVE_WS_HOST`, else 127.0.0.1, on `LIVE_WS_PORT`, else 20132 (OR
+       `src/server/ws/liveServer.ts` L50-54 and L713-714).
+     - 20131, the embed WebSocket proxy: `EMBED_WS_PROXY_HOST`, else `LIVE_WS_HOST`, else 127.0.0.1, on
+       `EMBED_WS_PROXY_PORT`, else 20131 (OR `src/lib/services/embedWsProxy.ts` L35-36, L240-242 and L256-257;
+       `.env.example` L2302-2308 warns that a non-loopback value bypasses the local-only policy).
+
+     The two WebSocket listeners stay on loopback only while `LIVE_WS_HOST` and `EMBED_WS_PROXY_HOST` are unset.
+     The unit does not set them, `make_server_env.py.txt` does not write them into `server.env`, and the 10:40Z
+     observation found both listeners on loopback.
+   - **No `--no-recovery`.** Upstream labels it "Disable auto-restart on crash (debugging mode)" (OR
+     `bin/cli/locales/en.json` L255). The default in-process supervisor runs under systemd's `Restart=on-failure`;
+     its `--max-restarts` default is 2 (OR `bin/cli/commands/serve.mjs` L64-65, `en.json` L256).
    - **No secret in the unit; the unit adds its secrets only through `EnvironmentFile=`.** The unit reads
      `%h/.local/share/omniroute/server.env`, which lives inside `DATA_DIR`.
      - **How it was made.** `scripts/make_server_env.py.txt` generated it with `O_EXCL` at mode 0600 in a 0700
@@ -151,7 +177,9 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
 
      A systemd user service also inherits the user manager's environment (systemd.exec(5), "Environment variables in
      spawned processes"). `serve` then hands its whole environment to the server child, so any credential exported
-     into the user manager would reach the gateway. Keep credentials out of the manager: list its variable names with
+     into the user manager would reach the gateway. The same holds for bind settings: a `LIVE_WS_HOST` or
+     `EMBED_WS_PROXY_HOST` in the manager would move a WebSocket listener off loopback, and the `_PORT` variables
+     would move a port. Keep credentials and these four variables out of the manager: list its variable names with
      `systemctl --user show-environment | cut -d= -f1`.
 
      Why `EnvironmentFile=` fits here:
@@ -175,7 +203,10 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
    - **Non-secret `Environment=` lines.** The template gives each its own one-line reason:
      - `OMNIROUTE_MEMORY_MB=16384`: upstream accepts 64..16384 inclusive (OR `scripts/build/runtime-env.mjs` L19).
      - `CODEX_CLIENT_VERSION=0.157.1`: the installed client. It is the fallback for paths that do not forward the
-       caller's version (OR `src/shared/constants/codexClient.ts`).
+       caller's version. `getCodexClientVersion` reads this variable, else the built-in default (OR
+       `open-sse/config/codexClient.ts` L13 and L29-34), and `getCodexClientVersionFromHeaders` returns the
+       caller's own version, or null so callers fall back to `getCodexClientVersion` (L36-83). The built-in
+       default is 0.156.1 (OR `src/shared/constants/codexClient.ts` L6).
      - `STREAM_READINESS_TIMEOUT_MS=600000` and `STREAM_READINESS_MAX_TIMEOUT_MS=600000`: the defaults are 80000 and
        180000 (OR `src/shared/utils/runtimeTimeouts.ts` L24-25). The adaptive readiness budget starts from the first
        and never exceeds the second (OR `open-sse/utils/streamReadinessPolicy.ts` L198), and the content-stall
@@ -205,18 +236,23 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
    - `providerStrategies.codex = {fallbackStrategy: "round-robin", stickyRoundRobinLimit: 1}`.
      - Direct provider calls select by `providerStrategies[provider].fallbackStrategy`, else `fallbackStrategy`, else
        `"fill-first"` (OR `src/sse/services/auth.ts` L1952-1957).
-     - Affinity runs first.
-     - `stickyRoundRobinLimit` keeps one target for that many consecutive successes before rotating (default 3).
+     - Affinity runs first: a connection chosen by session affinity skips the strategy (OR `src/sse/services/auth.ts`
+       L1995-1997).
+     - `stickyRoundRobinLimit` keeps one target for that many consecutive successes before rotating (default 3: OR
+       `src/lib/db/settings.ts` L159 and `src/sse/services/auth.ts` L1998-2001).
        Upstream says to set the combo override to 1 "for one-request rotation" (OR `docs/routing/AUTO-COMBO.md`
        L354-357). This record applies the same value to the codex provider strategy, which direct provider calls
        read before the global setting (OR `src/sse/services/auth.ts` L1999-2000).
      - There is no combo and no router alias. Codex sends `cx/gpt-6-astra`, and the gateway logged the upstream model
        as `gpt-6-astra` (`probe-lane-run2.json`, `gateway-effort-rows.json`).
-   - `promptCacheAffinityEnabled = true`, the default, is kept.
-   - Compression stays off: `enabled=false` and `defaultMode="off"`, the seeded defaults.
+   - `promptCacheAffinityEnabled = true`, the default, is kept (OR `src/lib/db/settings.ts` L163).
+   - Compression stays off: `enabled=false` and `defaultMode="off"`, the defaults (OR
+     `open-sse/services/compression/types.ts` L421-423, which `getCompressionSettings` spreads under the stored
+     values at `src/lib/db/compression.ts` L663-664).
    - `exclusions = ["codex/*"]`. `a58000c7` removed 3.8.50's native-passthrough compression bypass, and upstream's own
      comment names this exclusion as the remedy (OR `open-sse/handlers/chatCore.ts` L1429-1449).
-   - The Thinking Budget mode is `passthrough`, the default. `auto` strips reasoning.
+   - The Thinking Budget mode is `passthrough`, the default (OR `open-sse/services/thinkingBudget.ts` L65-67).
+     `auto` strips the client's reasoning fields before upstream (L8-9, L19).
    - `mcpEnabled=false` and `a2aEnabled=false`.
 4. **Codex wiring**
    ([`codex-provider-block.toml`](../../evidence/artifacts/omniroute-gateway-20260927/codex-provider-block.toml),
@@ -259,7 +295,8 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
        prompts.
      - The `a58000c7` isolated-realm fix closes the sandbox escape, but not hook registration itself.
      - Inference keys are advisory.
-   - **Mitigation.** The bind is loopback only, on a single-user workstation.
+   - **Mitigation.** The bind is loopback only, on a single-user workstation: all three listeners were on 127.0.0.1
+     at 10:40Z (decision 2, "Addresses").
    - **Overturn.** Any multi-user or non-loopback exposure, or any untrusted local process.
    - **What the user overrode.** The settings synthesis recommended requiring the key and the login (its K7 and U2).
      The user's 06:05Z direction overrides that.
@@ -298,30 +335,52 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
 Retained outputs: [`evidence/artifacts/omniroute-gateway-20260927/`](../../evidence/artifacts/omniroute-gateway-20260927/README.md).
 The classes are kept separate.
 
-- **Live provider execution through the gateway (native Codex 0.157.1 at max, 2026-09-27):**
+- **Live provider execution through the gateway (native Codex 0.157.1 at max, 2026-09-27).** The lane probe and the
+  effort rows ran on `bf0255649` (`a58000c7` + #14904), the build before the running one. They predate the
+  `dd6e9607e` service start at 07:19:46Z, and the provenance records `bf0255649` as superseded at 07:19:45Z. The search
+  probes ran on `dd6e9607e`. The two builds differ in two files, the `/v1/alpha/search` route and its test
+  ([`build-delta.txt`](../../evidence/artifacts/omniroute-gateway-20260927/build-delta.txt)), so the `/v1/responses`
+  results below are expected to hold on `dd6e9607e`. That is an inference from the diff; the lane probe was not rerun
+  on `dd6e9607e`, and the peer's reported probe there is the only check of it.
   - **Probe run 2**
     ([`probe-lane-run2.json`](../../evidence/artifacts/omniroute-gateway-20260927/probe-lane-run2.json)):
     - `codex exec` exited 0, the shell tool returned the marker and the final answer was the marker;
     - turn 1 had 312 reasoning tokens and read 0 from cache;
     - turn 2 read 13,568 of 14,206 input tokens from cache, on the same account as turn 1;
-    - run 1 landed on a different account (round-robin across sessions).
+    - the rollout's `turn_context` shows `cx/gpt-6-astra` at `max`;
+    - the gateway's call-log listing holds each of the two requests twice. The pattern matches the list route's merge
+      of in-memory entries with persisted rows (OR `src/app/api/usage/call-logs/route.ts` L116-226); the evidence
+      README gives the arithmetic.
   - **Effort**
     ([`gateway-effort-rows.json`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-effort-rows.json)):
     - the gateway's `call_logs` show `reasoning_effort_requested=max` and `reasoning_effort_upstream=max` on both
-      reasoning turns (06:59:07Z and 07:00:03Z);
-    - no API exposes these columns (OR `src/lib/usage/callLogs.ts` L634-652), so a read-only SQLite select read these
-      columns only;
-    - the Codex rollout's `turn_context` showed `cx/gpt-6-astra` at `max`.
+      reasoning turns, 06:59:07Z for run 1 and 07:00:03Z for run 2;
+    - the writer fills these columns only for rows whose reasoning observation is `encrypted` (OR
+      `src/lib/usage/callLogs.ts` L646-653), which is consistent with the nulls on the three rows without reasoning;
+    - neither call-log API returns the columns: both map rows with `mapSummaryRow`, which has no effort field (OR
+      `src/lib/usage/callLogs.ts` L457-508, L1021 and L1040). So a read-only SQLite select read these columns only;
+    - run 1's client usage (27,996 input tokens,
+      [`probe-lane-client-events.json`](../../evidence/artifacts/omniroute-gateway-20260927/probe-lane-client-events.json))
+      exceeds its one row (13,806), so at least one follow-up request of run 1 has no `call_logs` row. This record
+      does not explain that.
   - **Search**
     ([`probe-search-profile-only.json`](../../evidence/artifacts/omniroute-gateway-20260927/probe-search-profile-only.json),
-    [`gateway-search-log.jsonl`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-search-log.jsonl)):
+    [`gateway-search-log.jsonl`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-search-log.jsonl),
+    [`gateway-readonly-observation.txt`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-readonly-observation.txt)):
     - the route is `web.run` → `/v1/alpha/search` → `duckduckgo-free`;
     - the answer, v3.8.50, is the latest published release ([`upstream-state.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-state.txt));
     - both searches returned 0 results, one a `site:` query and one a plain query, and GPT-6 fetched the page through
       an MCP tool instead;
-    - `/v1/alpha/search` writes no `call_logs` rows.
+    - the gateway logged exactly those two queries, and its `call_logs` hold one row per search under the path
+      `/v1/search`, where the free provider records it (OR `open-sse/handlers/search.ts` L1625-1638). An earlier
+      version of this record said `/v1/alpha/search` writes no `call_logs` rows; the probe had looked only for that
+      path.
   - **Peer parity:** 8 of 8 mechanical checks on `dd6e9607e` (decision 6). It is reported in #387's merged commit
     message; its outputs are not retained here.
+  - **Reported by the coordinator, outputs not retained:**
+    - `scripts/route_repro.py.txt`'s status lines, with every `/v1` inference route answering HTTP 500 on the
+      `a58000c7` build (defect 1). Only Codex's side of a 06:32Z probe is retained;
+    - that run 1 landed on a different account from run 2. No retained output holds run 1's gateway rows.
 - **Unchanged upstream tests, on a non-release tree:**
   - **26 route and keepalive test files on `a58000c7` + #14904**, run with upstream's runner:
     - 184 of 186 pass, 0 fail;
@@ -351,14 +410,19 @@ The classes are kept separate.
   - the build's identity: `BUILD_SHA`, `--version` and the tarball digests;
   - the cherry-pick patch-ids and tree
     ([`installed-build-identity.txt`](../../evidence/artifacts/omniroute-gateway-20260927/installed-build-identity.txt),
-    [`cherry-pick-fidelity.txt`](../../evidence/artifacts/omniroute-gateway-20260927/cherry-pick-fidelity.txt)).
+    [`cherry-pick-fidelity.txt`](../../evidence/artifacts/omniroute-gateway-20260927/cherry-pick-fidelity.txt));
+  - the two builds' source difference ([`build-delta.txt`](../../evidence/artifacts/omniroute-gateway-20260927/build-delta.txt));
+  - an independent read-only observation at 10:40Z, after every probe: the unit's listeners and the search rows in
+    `call_logs`
+    ([`gateway-readonly-observation.txt`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-readonly-observation.txt)).
 
   The compiled-output check (the fixed construction in 2 places and the Proxy-input form in 0, with the old build the
   reverse) is reported, not retained.
 - **Synthetic fixture:** the `Request`-over-`Proxy` reproduction on three Node runtimes. The corrected
   `proxy-repro-independent.txt` supersedes the first `proxy-repro.txt`, which is kept with its flaw noted.
 - **Source review:** every upstream line cited above, read at its stated pin: OmniRoute `a58000c7` or `5458026c`,
-  Codex `rust-v0.157.1`, systemd `v255`, and Next.js 16.3.5 in the build's `node_modules`.
+  Codex `rust-v0.157.1`, systemd `v255`, and Next.js 16.3.5 in the build's `node_modules`. The OmniRoute files cited
+  for the call-log listing, the effort columns and the search rows are the same in `dd6e9607e`.
 - **Structural validation:** `tests/test_omniroute_gateway_unit.py` checks the template's shape and that it renders to
   the recorded installed unit.
 
@@ -390,8 +454,8 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
     (decision 1).
   - **Running the gateway on Node 22.** Not tried. The corrected fixture constructs there, but defect 2 needed a
     source build anyway. A code fix also covers upstream's Node 24 and 26 targets.
-- **CLIProxyAPI v7.3.19 and thezillo/codex-proxy v0.3.7.** These are from the 2026-09-26 runtime-worker discovery.
-  CLIProxyAPI stores tokens unencrypted.
+- **CLIProxyAPI v7.3.19 and thezillo/codex-proxy v0.3.7.** These are from the 2026-09-26 runtime-worker discovery,
+  which reported that CLIProxyAPI stores tokens unencrypted; this record did not re-check that.
 - **Requiring the key and the login** (the settings synthesis's K7 and U2). Overridden by the user (decision 5).
 - **The subshell loader in `ExecStart=` instead of `EnvironmentFile=`.** Not needed: the file has no `export` lines,
   which systemd v255 would drop, and the process-environment exposure is the same (decision 2).
@@ -426,6 +490,10 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
   which was opened 2026-09-15; this record did not check that. Upstream must classify the site when it merges #13788.
   It is not patched locally.
 - **Two upstream unit stages did not run.** The dashboard stage and `test:unit:serial` never ran on this tree.
+- **The lane probe ran on the previous build.** The effort and cache results come from `bf0255649`. They carry to
+  `dd6e9607e` by the two-file source difference, not by a rerun (Evidence).
+- **One request of run 1 has no `call_logs` row.** Run 1's client usage exceeds its one row, and this record does
+  not explain the gap (Evidence).
 - **Key separation is not achieved.** `server.env` sits inside `DATA_DIR`, so a raw copy of the directory carries the
   key to its own encrypted tokens. Upstream's native backup copies only `storage.sqlite`, `settings.json`,
   `combos.json` and `providers.json` (OR `bin/cli/commands/backup.mjs` L27-32), so its backups carry no key. Moving

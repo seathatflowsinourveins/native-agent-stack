@@ -19,8 +19,11 @@
 #
 # No secret belongs in this unit, and the only secrets it adds come through EnvironmentFile=. A user service also
 # inherits the user manager's environment (systemd.exec(5), "Environment Variables in Spawned Processes"), and serve
-# passes its whole environment to the server child. So keep credentials out of the manager; list its variable names
-# with `systemctl --user show-environment | cut -d= -f1`.
+# passes its whole environment to the server child. So keep credentials out of the manager. Keep LIVE_WS_HOST,
+# EMBED_WS_PROXY_HOST, LIVE_WS_PORT and EMBED_WS_PROXY_PORT out of it too: this unit does not set them, and the two
+# WebSocket listeners (20132 and 20131) bind 127.0.0.1 only while the two host variables are unset
+# (src/server/ws/liveServer.ts L54 and L713-714; src/lib/services/embedWsProxy.ts L240-242). List the manager's
+# variable names with `systemctl --user show-environment | cut -d= -f1`.
 #
 # The environment file is:
 #   mode 0600 inside the 0700 data directory;
@@ -62,7 +65,7 @@ Environment=PATH=@OMNIROUTE_PREFIX@/shim:@NODE_PREFIX@/bin:/usr/local/bin:/usr/b
 Environment=OMNIROUTE_SERVER_HOST=127.0.0.1
 # V8 heap for the gateway; upstream accepts 64..16384 inclusive (scripts/build/runtime-env.mjs L19).
 Environment=OMNIROUTE_MEMORY_MB=16384
-# Caller-version fallback for paths that do not forward the Codex client's own version (src/shared/constants/codexClient.ts).
+# Fallback when a request carries no usable Codex version; unset, it is the built-in 0.156.1 (open-sse/config/codexClient.ts L29-49; src/shared/constants/codexClient.ts L6).
 Environment=CODEX_CLIENT_VERSION=@CODEX_CLIENT_VERSION@
 # Readiness budget (default 80 s), which the content-stall watchdog reuses (open-sse/handlers/chatCore.ts L6399); Astra at max can reason longer.
 Environment=STREAM_READINESS_TIMEOUT_MS=600000
