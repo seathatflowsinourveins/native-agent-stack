@@ -18,8 +18,11 @@ M13's classes are:
 - `ctx_index` then `ctx_search`;
 - serena `find_symbol`.
 
-A gate row passes only when every class returns that row's own fresh token and no other. Any other token means a wrong
-root or a stale result.
+A gate row passes only when every class returns that row's own fresh token and no other:
+- the token must come from a completed, error-free call made the way the brief prescribes: the relative path, no cwd or
+  directory change, no absolute path and no token typed into the arguments;
+- `ctx_search` counts only after a `ctx_index` of the fixture under the same source, and both must complete;
+- any other token in any call of the class, completed or failed, means a wrong root or a stale result.
 
 ## Run
 
@@ -39,13 +42,25 @@ host-only project `.codex/config.toml`. `m13` creates two detached worktrees at 
 **Output.** The first line is the verdict with counts per arm and per Loki reconciliation, and fits in the
 400-character excerpt that `scripts/host_receipts.py record` keeps. For `m13`, one line of class tallies per arm
 follows. Exit 0 means that:
+- every arm produced exactly its expected rows (jcodemunch and ai-memory: 6 gate rows and 2 per control; m13: 40
+  gate rows and 6 per control), each in its own conversation;
 - every gate row passed;
-- every control row failed by assertion, not by a provider error;
+- every control row failed by assertion, not by a provider error, with the outcome below, while the tools that control
+  does not touch kept working;
 - every row's MCP call count equals its Codex `codex.tool_result` count in Loki.
 
+| Control | Predicted outcome |
+|---|---|
+| `prompt` approval | Every call to the server was refused with Codex's "MCP tool call requires approval, but approval policy is never" ([`mcp_tool_call.rs#L1612`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/mcp_tool_call.rs#L1612)); none completed. |
+| Disabled server (jcodemunch, ai-memory) | No call to the server. |
+| Disabled context-mode (m13) | No context-mode class called; the shell and serena classes read their own token. |
+| context-mode bound to the other worktree (m13) | Each context-mode class, called as prescribed, returns the other tree's token, an error or nothing; the shell and serena classes read their own token. |
+
 **Privacy:**
-- promptfoo's database, the results file and the log stay in a private temporary directory that is deleted unless
-  `--keep` is given;
+- promptfoo's database, its log files, the results file and the run log stay in a private temporary directory that
+  is deleted unless `--keep` is given. Inherited `PROMPTFOO_*` settings are dropped and `PROMPTFOO_LOG_DIR` is pinned
+  inside that directory
+  ([`src/logger.ts#L227`](https://github.com/promptfoo/promptfoo/blob/0.123.1/src/logger.ts#L227) honors it);
 - telemetry, sharing and caching are off;
 - the output holds counts only: no model text, tool results or conversation ids.
 
@@ -76,6 +91,13 @@ follows. Exit 0 means that:
   - Runs through the SDK arrive in Loki as `service_name="codex_sdk_ts"`, because the SDK sets
     `CODEX_INTERNAL_ORIGINATOR_OVERRIDE`. Lane runs arrive as `codex_exec`.
   - `conversation_id` is the thread id. MCP records are keyed on `tool_namespace` (`mcp__<server>`).
+  - The query filters `event_name="codex.tool_result"` in Loki; a label filter also matches structured metadata
+    ([Loki v3.7.8](https://github.com/grafana/loki/blob/v3.7.8/docs/sources/get-started/labels/structured-metadata.md#L74)).
+    On the 2026-09-27 smoke window it returned the same 604 tool results as filtering the whole service stream.
+  - `query_range` returns timestamps from `start` inclusive to `end` exclusive
+    ([`loki-http-api.md#L474-L475`](https://github.com/grafana/loki/blob/v3.7.8/docs/sources/reference/loki-http-api.md#L474-L475)).
+    A full page continues from its last timestamp and drops records already seen, and a full page within one
+    timestamp fails the run.
 
 ## Decision
 

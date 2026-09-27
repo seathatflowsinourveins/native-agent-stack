@@ -51,49 +51,111 @@ function completedResult(output, context) {
 // m13_hooks.js into this tree only; every token has the form CGTOK-<tree>-<rep>-<16 hex>, so any other token in a
 // result came from the other tree (wrong root) or an earlier repetition (stale).
 const TOKEN = /CGTOK-[ab]-r\d{2}-[0-9a-f]{16}/g;
+
+function args(item) {
+  return item.arguments && typeof item.arguments === 'object' ? item.arguments : {};
+}
+
+function mcpCall(item, server, tool) {
+  return item.type === 'mcp_tool_call' && item.server === server && item.tool === tool;
+}
+
+function completed(item) {
+  return Boolean(item) && item.status === 'completed' && !item.error &&
+    !(item.type === 'command_execution' && item.exit_code);
+}
+
+// A command or snippet that names the fixture only by its relative path: no absolute path to it, no directory change
+// and no token typed in, so a returned token can only come from the session's default binding.
+function relativeRead(text, rel) {
+  if (typeof text !== 'string') return false;
+  const escaped = rel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[\\s'"])${escaped}`).test(text) && !/\/\.cg\//.test(text) && !/\bcd\b/.test(text) &&
+    !/CGTOK/.test(text);
+}
+
+function noCwd(item) {
+  return args(item).cwd === undefined || args(item).cwd === null;
+}
+
+function isFixtureIndex(item, rep) {
+  return mcpCall(item, 'context-mode', 'ctx_index') && args(item).path === `.cg/${rep}/sentinel-index.md` &&
+    args(item).source === `cg-sentinel-${rep}`;
+}
+
+// Per class: `calls` selects every call of the class's tools, all of which are checked for foreign tokens;
+// `prescribed` accepts only the call the brief prescribes (relative arguments, no cwd, no token in the arguments);
+// `done` says whether a prescribed call completed. ctx_search counts only after a ctx_index of the fixture under the
+// same source, and completes only when that index also completed.
 const CLASSES = {
-  shell: (item) => item.type === 'command_execution' && /sentinel-shell\.txt/.test(item.command || ''),
-  ctx_execute: (item) => item.type === 'mcp_tool_call' && item.server === 'context-mode' && item.tool === 'ctx_execute',
-  ctx_execute_file: (item) => item.type === 'mcp_tool_call' && item.server === 'context-mode' && item.tool === 'ctx_execute_file',
-  ctx_index_search: (item) => item.type === 'mcp_tool_call' && item.server === 'context-mode' && item.tool === 'ctx_search',
-  serena: (item) => item.type === 'mcp_tool_call' && item.server === 'serena' && item.tool === 'find_symbol',
+  shell: {
+    calls: (item) => item.type === 'command_execution',
+    prescribed: (item, rep) => relativeRead(item.command, `.cg/${rep}/sentinel-shell.txt`),
+    done: (item) => completed(item),
+  },
+  ctx_execute: {
+    calls: (item) => mcpCall(item, 'context-mode', 'ctx_execute'),
+    prescribed: (item, rep) => noCwd(item) && relativeRead(args(item).code, `.cg/${rep}/sentinel-ctx-execute.txt`),
+    done: (item) => completed(item),
+  },
+  ctx_execute_file: {
+    calls: (item) => mcpCall(item, 'context-mode', 'ctx_execute_file'),
+    prescribed: (item, rep) => noCwd(item) && args(item).path === `.cg/${rep}/sentinel-ctx-file.txt` &&
+      !/CGTOK/.test(String(args(item).code || '')),
+    done: (item) => completed(item),
+  },
+  ctx_index_search: {
+    calls: (item) => mcpCall(item, 'context-mode', 'ctx_index') || mcpCall(item, 'context-mode', 'ctx_search'),
+    prescribed: (item, rep, before) => mcpCall(item, 'context-mode', 'ctx_search') && noCwd(item) &&
+      args(item).source === `cg-sentinel-${rep}` && !/CGTOK/.test(JSON.stringify(args(item))) &&
+      before.some((prior) => isFixtureIndex(prior, rep)),
+    done: (item, rep, before) => completed(item) && before.some((prior) => isFixtureIndex(prior, rep) && completed(prior)),
+  },
+  serena: {
+    calls: (item) => mcpCall(item, 'serena', 'find_symbol'),
+    prescribed: (item, rep) => args(item).relative_path === `.cg/${rep}/cg_sentinel.py`,
+    done: (item) => completed(item),
+  },
 };
 
 function itemText(item) {
   return item.type === 'command_execution' ? String(item.aggregated_output || '') : resultText(item.result);
 }
 
-function classify(texts, own) {
-  const joined = texts.join('\n');
-  const others = (joined.match(TOKEN) || []).filter((token) => token !== own);
-  if (others.length > 0) return 'wrong_root_or_stale';
-  return joined.includes(own) ? 'own' : 'miss';
+// Verdict for one class, from every call of its tools, in this order:
+// - wrong_root_or_stale: any call, completed or failed, returned a token other than this row's own;
+// - no_call: no call of the class's tools;
+// - not_prescribed: no call with the brief's arguments (for ctx_search: none after a ctx_index of the fixture);
+// - own: a completed prescribed call returned this row's token;
+// - error_only: no prescribed call completed; miss: one completed without the token.
+function classVerdict(items, cls, own, rep) {
+  const spec = CLASSES[cls];
+  const calls = items.filter(spec.calls);
+  const foreign = (calls.map(itemText).join('\n').match(TOKEN) || []).filter((token) => token !== own);
+  if (foreign.length > 0) return 'wrong_root_or_stale';
+  if (calls.length === 0) return 'no_call';
+  const prescribed = [];
+  items.forEach((item, index) => {
+    if (spec.calls(item) && spec.prescribed(item, rep, items.slice(0, index))) prescribed.push([item, index]);
+  });
+  if (prescribed.length === 0) return 'not_prescribed';
+  const done = prescribed.filter(([item, index]) => spec.done(item, rep, items.slice(0, index)));
+  if (done.some(([item]) => itemText(item).includes(own))) return 'own';
+  return done.length === 0 ? 'error_only' : 'miss';
 }
 
-// Verdict for config.cls: own, wrong_root_or_stale, miss (no call) or error_only (only failed calls, no token).
 function m13Class(output, context) {
   const cls = (context.config || {}).cls;
   const own = context.vars.token;
-  if (!CLASSES[cls] || typeof own !== 'string' || !own) {
-    return { pass: false, score: 0, reason: 'misconfigured: unknown class or no token' };
+  const rep = context.vars.rep;
+  if (!CLASSES[cls] || typeof own !== 'string' || !own || !/^r\d{2}$/.test(String(rep))) {
+    return { pass: false, score: 0, reason: 'misconfigured: unknown class, no token or no rep' };
   }
   if ((context.prompt || '').includes(own)) {
     return { pass: false, score: 0, reason: 'the token is present in the prompt' };
   }
-  const hits = rawItems(context).filter(CLASSES[cls]);
-  let verdict;
-  if (hits.length === 0) {
-    verdict = 'miss';
-  } else {
-    const good = hits.filter((item) => item.status === 'completed' && !item.error && !(item.type === 'command_execution' && item.exit_code));
-    if (good.length === 0) {
-      verdict = classify(hits.map(itemText), own);
-      if (verdict === 'miss') verdict = 'error_only';
-    } else {
-      verdict = classify(good.map(itemText), own);
-    }
-  }
+  const verdict = classVerdict(rawItems(context), cls, own, rep);
   return { pass: verdict === 'own', score: verdict === 'own' ? 1 : 0, reason: verdict };
 }
 
-module.exports = { completedResult, m13Class, classify, TOKEN };
+module.exports = { completedResult, m13Class, classVerdict, relativeRead, TOKEN };
