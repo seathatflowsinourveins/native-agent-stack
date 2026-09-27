@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--headroom--use--20260927-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "a4116d26093b16319c004933d02055930540edb9",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "headroom",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v headroom) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && headroom --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" headroom",
+      "exit": 0,
+      "duration_s": 0.135,
+      "output_sha256": "87b902cee6cdc3a8108497480b1b8ed2b910c77967365d1261c2b10095a52e5e",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/headroom -> ~/.local/share/codex-ecosystem-staging/python-tools/headroom-ai/bin/headroom\nheadroom, version 0.37.0\nstack ['0.37.0'] winner pins ['0.37.0']\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1; mkdir -p \"$d/ws\" \"$d/cfg\"; python3 - \"$d\" <<'PY'\nimport json, pathlib, subprocess, sys\nscratch = sys.argv[1]\nenv = {\"HEADROOM_WORKSPACE_DIR\": scratch + \"/ws\", \"HEADROOM_CONFIG_DIR\": scratch + \"/cfg\",\n       \"HEADROOM_OFFLINE\": \"1\", \"DO_NOT_TRACK\": \"1\", \"HF_HUB_OFFLINE\": \"1\", \"TRANSFORMERS_OFFLINE\": \"1\"}\n\ndef call(tool, args):\n    argv = [\"mcporter\", \"call\", \"--stdio\", \"headroom\",\n            \"--stdio-arg\", \"mcp\", \"--stdio-arg\", \"serve\", \"--stdio-arg\", \"--proxy-url\",\n            \"--stdio-arg\", \"http://127.0.0.1:1\"]\n    for k, v in env.items():\n        argv += [\"--env\", f\"{k}={v}\"]\n    argv += [\"--name\", \"headroom-native-ci\", \"--tool\", tool, \"--args\", json.dumps(args),\n             \"--output\", \"json\", \"--no-oauth\", \"--timeout\", \"20000\"]\n    out = subprocess.run(argv, capture_output=True, text=True, timeout=30)\n    return json.loads(out.stdout, strict=False), out.returncode\n\nrecords = open(\"fixtures/headroom-records.json\").read()\nnote = open(\"fixtures/headroom-note.txt\").read()\n\ncompressed, rc1 = call(\"headroom_compress\", {\"content\": records})\nprint(\"compress fixtures/headroom-records.json: tokens_saved\", compressed.get(\"tokens_saved\"),\n      \"savings_percent\", compressed.get(\"savings_percent\"), \"hash\", compressed.get(\"hash\"))\nretrieved, rc2 = call(\"headroom_retrieve\", {\"hash\": compressed.get(\"hash\")})\nprint(\"retrieve exact match with the original fixture:\", retrieved.get(\"original_content\") == records)\nshort, rc3 = call(\"headroom_compress\", {\"content\": note})\nprint(\"short fixtures/headroom-note.txt stored unchanged:\", short.get(\"compressed\") == note,\n      \"tokens_saved:\", short.get(\"tokens_saved\"), \"has hash:\", bool(short.get(\"hash\")))\nnegative, rc4 = call(\"headroom_retrieve\", {\"hash\": \"0\" * 24})\nprint(\"bogus hash reports an error:\", \"error\" in negative)\nstore = sorted(p.name for p in pathlib.Path(scratch, \"ws\").rglob(\"*\") if p.is_file())\nprint(\"compression store created inside the scratch workspace, not this host's real ~/.headroom:\", store)\nok = (rc1 == 0 and rc2 == 0 and rc3 == 0 and rc4 == 0 and retrieved.get(\"original_content\") == records\n      and short.get(\"compressed\") == note and short.get(\"tokens_saved\") == 0 and short.get(\"hash\")\n      and \"error\" in negative and compressed.get(\"tokens_saved\", 0) > 0\n      and any(\"ccr_store\" in f for f in store))\nsys.exit(0 if ok else 1)\nPY\nrc=$?; rm -rf \"$d\"; exit $rc",
+      "exit": 0,
+      "duration_s": 2.411,
+      "output_sha256": "5bbe61471c0c99c3a1be4d9f16dfee169c2e1ab277d084c0097011f0e60c44cb",
+      "output_excerpt": "compress fixtures/headroom-records.json: tokens_saved 315 savings_percent 38.1 hash fdf314394a9854039da18b2f\nretrieve exact match with the original fixture: True\nshort fixtures/headroom-note.txt stored unchanged: True tokens_saved: 0 has hash: True\nbogus hash reports an error: True\ncompression store created inside the scratch workspace, not this host's real ~/.headroom: ['ccr_store.db', 'savings_e"
+    }
+  ],
+  "tool_versions": {
+    "headroom": "0.37.0"
+  },
+  "observed_at_utc": "2026-09-27T08:18:07Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), headroom 0.37.0 (the catalog pin) exercised its real MCP server, run in its documented guarded, offline mode (headroom mcp serve --proxy-url http://127.0.0.1:1, an unreachable loopback proxy, with HEADROOM_OFFLINE=1, HF_HUB_OFFLINE=1, TRANSFORMERS_OFFLINE=1 and DO_NOT_TRACK=1, and an owned HEADROOM_WORKSPACE_DIR/HEADROOM_CONFIG_DIR under a scratch directory), reached through MCPorter's ad-hoc stdio bridge. headroom_compress on the repository fixture fixtures/headroom-records.json reported real token savings, and headroom_retrieve by that hash returned the original content byte-for-byte (asserted): this fixture round-tripped through both compression and retrieval. headroom_compress on the short text fixture fixtures/headroom-note.txt stored it unchanged with tokens_saved 0 (asserted, the negative control for the savings claim); this fixture was compressed but not retrieved, since retrieving an unchanged store proves nothing beyond what the compress call already reports. headroom_retrieve with a bogus hash reported an error (asserted). The compression store (ccr_store.db) appeared inside the scratch workspace, not this host's real ~/.headroom. All four calls exit 0.",
+  "limitations": [
+    "Supersedes mac-coordinator-64gb-20260925--headroom--use--20260927 (generation 1, kept unchanged). Generation 1's claim said headroom \"compressed and exactly restored\" both fixtures/headroom-records.json and fixtures/headroom-note.txt; the note fixture was only ever compressed (it came back unchanged with tokens_saved 0) and headroom_retrieve was never called on its hash by either generation's command. This generation's commands are unchanged; only the claim is narrowed to what they actually assert: the records fixture round-tripped through compress and retrieve, and the note fixture was compressed and stored unchanged, not retrieved.",
+    "The workload is this repository's own fixtures/headroom-records.json and fixtures/headroom-note.txt, which docs/contributing-evidence.md Section 2 classes as local_integration: compressing a larger or real-world document, headroom's proxy-interception path (a reachable upstream), its memory backend and its durable savings/dashboard surfaces were not exercised. Token counts are headroom's own estimates, not provider billing.",
+    "Each call started headroom mcp serve as a new, short-lived process through MCPorter's ad-hoc stdio bridge, not a native Claude or Codex MCP registration or a model session; no service was started or left running (this host's own configured headroom MCP entry, which the mcporter receipt separately exercises, was not touched).",
+    "Recorded from a Claude Code session in this branch's worktree; headroom is this host's existing ecosystem-bin install, resolved as the first command shows. This is the first macOS host receipt for headroom.",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T08:18:07Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency"
+    }
+  ],
+  "supersedes": "mac-coordinator-64gb-20260925--headroom--use--20260927"
+}

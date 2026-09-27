@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--rtk--use--20260927-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "a4116d26093b16319c004933d02055930540edb9",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v rtk) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && rtk --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}),'macos pin file',[t['version'] for t in json.load(open('adoption/pins-macos-arm64.json'))['tools'] if t['id']==c])\" rtk",
+      "exit": 0,
+      "duration_s": 0.041,
+      "output_sha256": "1ec873eb286db20f82f0e4f142162ade128f0dde82ff64811822024280afc221",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/rtk -> ~/.local/share/codex-ecosystem-staging/tools/rtk-0.50.0/rtk\nrtk 0.50.0\nstack ['0.50.0'] winner pins ['0.49.0'] macos pin file ['0.50.0']\n"
+    },
+    {
+      "cmd": "cfg=\"$HOME/Library/Application Support/rtk/config.toml\"; eq=$(python3 -c \"import tomllib,sys;host=tomllib.load(open(sys.argv[1],'rb'))['hooks']['exclude_commands'];fix=tomllib.load(open(sys.argv[2],'rb'))['hooks']['exclude_commands'];print(len(host),host==fix)\" \"$cfg\" fixtures/rtk-hook-exclusions.toml)\nd=$(mktemp); bad=0\nwhile IFS= read -r c; do\n  out=$(rtk hook check \"$c\" 2>&1); rc=$?\n  if printf \"%s\" \"$out\" | grep -qF \"No rewrite for: $c\" && [ \"$rc\" -eq 1 ]; then\n    status=OK\n  else\n    status=MISMATCH; bad=1\n  fi\n  printf 'probe [%s] -> %s (exit %s) [%s]\\n' \"$c\" \"$out\" \"$rc\" \"$status\" >> \"$d\"\ndone <<'PROBES'\ngit show HEAD:x | tail -n 5\ndiff a.txt missing.txt\ngit -C repo show HEAD:x\ngit branch -a\njq -r .x f.json\nPROBES\necho \"RTK_HOOK_PROBES host_config_entries,equals_fixture=$eq mismatches=$bad (5 probes, 0 mismatches expected)\"\necho \"host rtk config (not a repository fixture): $cfg\"\ncat \"$d\"\nrm -f \"$d\"\ntest \"$bad\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.094,
+      "output_sha256": "8966bf539a6aee756c5b3ce13c562ac210f8b89d08616eccd413932b83d8444b",
+      "output_excerpt": "RTK_HOOK_PROBES host_config_entries,equals_fixture=5 True mismatches=0 (5 probes, 0 mismatches expected)\nhost rtk config (not a repository fixture): ~/Library/Application Support/rtk/config.toml\nprobe [git show HEAD:x | tail -n 5] -> No rewrite for: git show HEAD:x | tail -n 5 (exit 1) [OK]\nprobe [diff a.txt missing.txt] -> No rewrite for: diff a.txt missing.txt (exit 1) [OK]\nprobe [git -C repo sh"
+    },
+    {
+      "cmd": "out=$(rtk hook check \"git status\" 2>&1); rc=$?; echo \"probe [git status] -> $out (exit $rc)\"; test \"$rc\" -eq 0 && test \"$out\" = \"rtk git status\" && echo \"asserted: a supported command is rewritten (git status -> rtk git status)\"",
+      "exit": 0,
+      "duration_s": 0.018,
+      "output_sha256": "ea137ff9b49aeba65602a2a71667db1a9ce4903a7173896bbd74e95d65dbe006",
+      "output_excerpt": "probe [git status] -> rtk git status (exit 0)\nasserted: a supported command is rewritten (git status -> rtk git status)\n"
+    },
+    {
+      "cmd": "out=$(printf '{\"session_id\":\"%s\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"%s\",\"description\":\"%s\"},\"cwd\":\".\"}' receipt-fixture \"git status\" fixture | rtk hook claude) || exit 1; echo \"rtk hook claude <- PreToolUse Bash git status: $out\"; new=$(printf \"%s\" \"$out\" | python3 -c \"import json,sys;h=json.load(sys.stdin)['hookSpecificOutput'];assert h['hookEventName']=='PreToolUse';assert 'permissionDecision' not in h;assert h.get('permissionDecisionReason')=='RTK auto-rewrite';print(h['updatedInput']['command'])\") && test \"$new\" = \"rtk git status\" && echo \"asserted: updatedInput.command is rtk git status, permissionDecisionReason is RTK auto-rewrite, no permissionDecision field\"",
+      "exit": 0,
+      "duration_s": 0.032,
+      "output_sha256": "478f588b7b99733dda56b64d3628547c366b032df11b57280b45031ce94d03ef",
+      "output_excerpt": "rtk hook claude <- PreToolUse Bash git status: {\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git status\",\"description\":\"fixture\"}}}\nasserted: updatedInput.command is rtk git status, permissionDecisionReason is RTK auto-rewrite, no permissionDecision field\n"
+    },
+    {
+      "cmd": "raw=$(git status | wc -c); filtered=$(rtk git status | wc -c); same=no; [ \"$(git status | sha256sum)\" = \"$(rtk proxy git status | sha256sum)\" ] && same=yes; echo \"git status: $raw bytes; rtk git status (the rewritten command): $filtered bytes; rtk proxy git status byte-identical to raw: $same\"; test \"$filtered\" -lt \"$raw\" && test \"$same\" = yes && echo \"asserted: filtered output is smaller and rtk proxy recovers the raw output exactly\"",
+      "exit": 0,
+      "duration_s": 0.225,
+      "output_sha256": "4eaf25617dc0b86e53a4fbc4d14f3f93c632f11f555e50dd630460c1e6adfaf5",
+      "output_excerpt": "git status:      770 bytes; rtk git status (the rewritten command):      364 bytes; rtk proxy git status byte-identical to raw: yes\nasserted: filtered output is smaller and rtk proxy recovers the raw output exactly\n"
+    },
+    {
+      "cmd": "plain=$(env -i HOME=\"$HOME\" PATH=\"/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/share/mise/shims\" sh -c 'command -v rtk' 2>/dev/null); echo \"rtk resolved on a plain PATH (mise shims, no ecosystem bin): ${plain:-not found}\"; [ -n \"$plain\" ] && \"$plain\" --version",
+      "exit": 0,
+      "duration_s": 0.065,
+      "output_sha256": "eb7efe56a274de745a187a81b044ebe9aa6bc6bee0e444e70d6c5cef00085a08",
+      "output_excerpt": "rtk resolved on a plain PATH (mise shims, no ecosystem bin): ~/.local/share/mise/shims/rtk\nrtk 0.49.0\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.50.0"
+  },
+  "observed_at_utc": "2026-09-27T08:12:51Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), rtk 0.50.0 (the adoption/pins-macos-arm64.json and manifests/stack.json pin for the v2026.09.26.2 release; the catalogs/landscape/foundation.json winner pin for foundation/token-efficiency is still the earlier 0.49.0, not yet re-recorded, so --component-version 0.50.0 --allow-unbound-version is passed) was exercised on its real, host-configured Claude-hook exclusion path and as a real CLI filter. The host's own rtk config at ~/Library/Application Support/rtk/config.toml (not a repository fixture; read directly, not copied into a scratch XDG_CONFIG_HOME) carries a [hooks] exclude_commands list of 5 entries, equal to fixtures/rtk-hook-exclusions.toml's patterns (asserted). Against that live configuration, rtk hook check answered 'No rewrite for: ...' with exit 1 for one representative probe of each of its five exclusion patterns (a piped git show HEAD:x, a diff of two files, a git -C ... show HEAD:x, git branch -a, and a standalone jq filter); the command now sets a failure flag on any probe that does not match both the expected message and exit 1, and its own final exit code asserts zero mismatches across all five (asserted, not merely printed). Separately, rtk rewrote a plain git status to 'rtk git status' with exit 0 (asserted). A synthetic Claude Code PreToolUse event for Bash git status, built with printf and piped into rtk hook claude -- the exact command this host's ~/.claude/settings.json PreToolUse hook runs -- returned updatedInput.command 'rtk git status' with permissionDecisionReason 'RTK auto-rewrite' and no permissionDecision field (asserted). Run for real, rtk git status printed fewer bytes than plain git status in this worktree, and rtk proxy git status stayed byte-identical to git status's own output (asserted). A separate probe on a plain, ecosystem-bin-free PATH resolves rtk to mise's older 0.49.0 install rather than this host's pinned 0.50.0 (recorded here and reported as a PR finding, not fixed by this receipt).",
+  "limitations": [
+    "Supersedes mac-coordinator-64gb-20260925--rtk--use--20260927 (generation 1, kept unchanged). Generation 1's probe loop ended each iteration with `... grep -qF \"No rewrite for: $c\" && [ \"$rc\" -eq 1 ] || echo \"PROBE MISMATCH: $c\"`, whose last executed statement is always itself a successful command (the `[ ]` test when the probe matches, or the fallback `echo` when it does not), so the whole `for` loop, and therefore command 2's own recorded exit code, was 0 regardless of any mismatch; the 400-character excerpt cap also stopped the retained text at probe 3, before probes 4-5 or any \"PROBE MISMATCH\" line could appear. This generation's loop instead sets a `bad` flag on any mismatch and asserts `test \"$bad\" -eq 0` as its own final statement, so the command's exit code now reflects every probe, and it prints a one-line `mismatches=N` summary before the per-probe detail so the result survives the excerpt cap regardless of how many probes are shown.",
+    "No model session ran: the Claude hook was exercised by piping one synthetic PreToolUse event into rtk hook claude and by rtk hook check's own dry-run, not by Claude Code invoking it inside a live turn. This recording session's own PreToolUse hook is wired to the same settings.json entry and live-rewrites ordinary Bash tool calls in this transcript; that is incidental, unlogged evidence, not part of this receipt's asserted commands.",
+    "The five probes are one representative command per exclude_commands regex, not the full 15-probe suite scripts/native_token_ci.py's rtk_hook_check_fixture runs against a scratch XDG_CONFIG_HOME copy of fixtures/rtk-hook-exclusions.toml; that harness script was not executed for this receipt. No rtk gain or tracking report was read; RTK's savings counters are upstream estimates, not provider token measurements, and a byte count is not a token measurement.",
+    "rtk hook check and rtk hook claude are RTK's own read-only report and hook processor, not an independent parse of settings.json. The git status byte counts reflect this worktree at recording time.",
+    "Recorded from a Claude Code session in this branch's worktree, not a pinned install checkout; rtk is this host's existing ecosystem-bin install (~/.local/share/codex-ecosystem-staging/tools/rtk-0.50.0), resolved as the first command shows.",
+    "second_physical_machine is declared, not independently proven by this file: this host's measured profile (evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json) differs from the catalog's WSL authoring laptop and the other Mac (macos-m5pro-20260924). The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T08:12:51Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency"
+    }
+  ],
+  "supersedes": "mac-coordinator-64gb-20260925--rtk--use--20260927"
+}

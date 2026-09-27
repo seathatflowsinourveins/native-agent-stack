@@ -6,8 +6,10 @@ Machine-readable record: [`receipt.json`](receipt.json), the workflow's own per-
 
 This is **one bounded run** of the installed `readiness-audit` workflow, exercised as this issue's
 Mac child/worker E2E (issue #276, step 5). It is evidence that the workflow's child/worker fan-out
-completes and produces a verified result on this host; it is not a general acceptance of the
-`readiness-audit` skill, a benchmark of its accuracy, or a claim that every run behaves identically.
+completes on this host and that its verify phase ran to conclusion; it is not a claim that the
+workflow's own audit returned a fully verified result (see Results and Limitations, below), a general
+acceptance of the `readiness-audit` skill, a benchmark of its accuracy, or a claim that every run
+behaves identically.
 
 ## Question
 
@@ -32,12 +34,20 @@ provider usage.
 ## Results
 
 - **5/5 agents completed** (4 Sonnet readers + 1 Opus verifier), each with `complete: true` and no
-  `issues` in `receipt.json`.
+  `issues` in `receipt.json`. This `complete: true` is the child-usage report's own bookkeeping
+  (every child had a resolved model, returned usage and a non-null result); it is not the
+  `readiness-audit` workflow's own returned `status` field, which `receipt.json` does not carry.
 - The verifier's pass over the readers' output: **88 claims**, **83 confirmed**, **4 corrected**,
   **1 unverifiable**, **0 refuted**.
 
-No claim was refuted; the 4 corrections and 1 unverifiable claim are the verifier doing its job, not
-a failure of this run. The full per-claim verdicts are in this run's own transcript, not reproduced
+No claim was refuted, and the 4 corrections are the verifier doing its job, not a failure of this
+run. The 1 unverifiable claim is different: per the workflow's own logic
+(`examples/claude-native/workflows/readiness-audit.js`), a run whose verify phase returns any
+`unverifiable` verdict computes an overall `status` of `unverified` (or `incomplete`, if
+`evidence_issues` was also non-empty) -- never `complete`. This run's actual returned `status`,
+`missing_sources` and `evidence_issues` were not captured by this artifact (see Limitations), so this
+README cannot state which of `unverified` or `incomplete` the run returned, only that it was not
+`complete`. The full per-claim verdicts are in this run's own transcript, not reproduced
 here; `receipt.json` carries the usage side of the same run.
 
 ### Per-model usage (provider-returned, from `receipt.json`)
@@ -64,6 +74,15 @@ child hit a web-search cap (`web_search.calls: 0` throughout).
 - This is a workflow/child-worker exercise, not a host-receipt for a `manifests/stack.json` or
   landscape-catalog component, so it does not use `scripts/host_receipts.py` and carries no
   `evidence_class` or `platform_status` claim.
+- The `readiness-audit` workflow's own return value (its `status`, `missing_sources` and
+  `evidence_issues` fields) was not saved alongside `receipt.json`, which is only the child-usage
+  report. Given the 1 unverifiable verdict recorded above, `readiness-audit.js`'s own status logic
+  means this run's actual status was `unverified` or `incomplete`, not `complete`; this artifact
+  cannot say which. A future run of this kind should additionally persist the workflow's returned
+  object (sanitized) so its status is not lost.
+- The exact `docs`, `commands` and `question` arguments this run passed to the workflow are not kept
+  in this artifact, so the run itself cannot be reproduced from what is committed here; only the
+  skill's general argument shape is documented under Reproduce, below.
 
 ## Reproduce
 
