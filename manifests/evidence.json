@@ -14228,13 +14228,13 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "2c9c25ece91113b140e818b97b6e8351d9c69683b47fef06ac0f6b0f77d9cd6f",
-      "bytes": 26615
+      "sha256": "c4c93961a7bb6f44c863eda59c8855f5d0468cd24c1c8ff76d6645c8b88e8847",
+      "bytes": 29833
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "a7edddbbd6c905e2b670cf08a580d55f195ba8dd58752155cfba20828ea1fcbe",
-      "bytes": 68258
+      "sha256": "42d9fe273a50bbb10e3864ae1b5592a8b41c09d79d5040177129812889accd23",
+      "bytes": 74201
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -36078,23 +36078,28 @@
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
-      "sha256": "560e7dfddd4151ec07b6adb03f8086f305a12ac1c26a1687ea4eb0f45cf44abd",
-      "bytes": 9472
+      "sha256": "fc162ba9442b50bfafcf94673d91bb9a49c63787f76e0c97ff73a5f76bb26aa1",
+      "bytes": 11071
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
-      "sha256": "8b28bf87f8da27aa5a73e36a4ede1b7707ee4e4b21f31b397f1de1197061897b",
-      "bytes": 51728
+      "sha256": "9332b722012836e57d4b8f97ebac8970675ba36af5bb8471d41e259cb70bf447",
+      "bytes": 63492
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md",
+      "sha256": "a72a8bc1de3082ec6770caad94be44b8555d9d148e7d1b9795f7ed83058e94b0",
+      "bytes": 13044
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md",
-      "sha256": "c281ab5d9f94b4fa41eac527f48f6350cb69c9917d9e9b853dcaf663afb55bdb",
-      "bytes": 23238
+      "sha256": "96437d46d6a21e4355d1de2ac8930599c2b891ad43fb883342425daad3164ff0",
+      "bytes": 25046
     },
     {
       "path": "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json",
-      "sha256": "f186f4a192efafb3182185093abf87a7bb7d5b157bfe0d783dfe5df83f38c9f8",
-      "bytes": 147636
+      "sha256": "8e15b9637ec1aa2cff5278b39721d86672ee55e5d5fe7f5412682cc726bc2f90",
+      "bytes": 156380
     },
     {
       "path": "evidence/artifacts/token-lanes-subagent-start-20260927/README.md",
@@ -38573,8 +38578,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "e4d01770f9f00996e0f9eb2221efb4dc3d69115559ecc225108d794f75c35daa",
-      "bytes": 106458
+      "sha256": "8e7144362c8f64c00cc2e301eed390fdff7dd68ffb514f5c41da67c327f35c3f",
+      "bytes": 116400
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -39630,6 +39635,11 @@
       "path": "tests/test_token_e2e_preregistration.py",
       "sha256": "cdd0815fe214667134c6c65a2a0ba0d12a87d8a821817ec5b28e6cfd0c327a46",
       "bytes": 24774
+    },
+    {
+      "path": "tests/test_token_e2e_receipt_checks.py",
+      "sha256": "3bdd18f36d58f7df4af558dafa3a85d08b75e5796251769cc8e10bfa7aa021ff",
+      "bytes": 24697
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
