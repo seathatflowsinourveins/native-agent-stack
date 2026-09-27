@@ -103,8 +103,10 @@ RECORD_SCHEMA = "native-agent-stack/codex-lane-apply/v1"
 REQUEST_TIMEOUT = 60.0
 # A session start waits for every enabled server marked `required` and fails when one cannot start, with this text
 # before "<name>: <error>" pairs joined by "; " (codex-mcp/src/connection_manager/required.rs L51-58 at
-# rust-v0.157.1; the names are sorted at connection_manager.rs L246-251).
+# rust-v0.157.1; the names are sorted at connection_manager.rs L246-251). Neither part is escaped, so an error
+# text can itself hold "; " or a newline.
 REQUIRED_FAILURE = "required MCP servers failed to initialize: "
+REQUIRED_FAILURE_LIMIT = 2000  # characters of that error a run record keeps
 
 
 class Refused(Exception):
@@ -293,16 +295,24 @@ def relaxed_required_flags() -> list[str]:
     return flags
 
 
+def required_failure_text(stderr: str) -> str:
+    """A failed session start's required-server error, from its last "required MCP servers failed to initialize: "
+    to the end of stderr, newlines kept; "" when stderr has none."""
+    at = stderr.rfind(REQUIRED_FAILURE)
+    return stderr[at:].strip() if at >= 0 else ""
+
+
 def required_start_failures(stderr: str) -> list[str]:
-    """The servers a failed session start names in its required-server error, in its order; [] when stderr has no
-    such error. Only names the profile marks required are taken, so a "; " inside an error text adds none."""
-    lines = [line for line in stderr.splitlines() if REQUIRED_FAILURE in line]
-    if not lines:
-        return []
-    required = set(required_servers())
-    names = [match.group(1) for part in lines[-1].split(REQUIRED_FAILURE, 1)[1].split("; ")
-             if (match := re.match(r"([A-Za-z0-9_-]+): ", part))]
-    return [name for name in names if name in required]
+    """Best effort: the servers the profile marks required that open a "<name>: " pair in that error, in its order,
+    each once. Every pair Codex joined for them is found, but a "; <name>: " inside another server's error text
+    reads as one more pair, so a name can be added; the run record keeps the whole text beside these names."""
+    text = required_failure_text(stderr)
+    required, names = set(required_servers()), []
+    for part in text[len(REQUIRED_FAILURE):].split("; ") if text else []:
+        match = re.match(r"([A-Za-z0-9_-]+): ", part)
+        if match and match.group(1) in required and match.group(1) not in names:
+            names.append(match.group(1))
+    return names
 
 
 def agents_block() -> str:
@@ -658,9 +668,10 @@ def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omnir
             out[label] = prompt_input_counts(got.stdout)
             continue
         out[label] = {"error": last_line(got.stderr)}
-        not_started = required_start_failures(got.stderr)
-        if not_started:
-            out[label]["required_not_started"] = not_started
+        failure = required_failure_text(got.stderr)
+        if failure:
+            out[label]["required_failure"] = {"text": failure[:REQUIRED_FAILURE_LIMIT],
+                                              "names_best_effort": required_start_failures(got.stderr)}
     if relaxed:
         out["required_relaxed"] = required_servers()
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
@@ -705,11 +716,11 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     labelled = [("default", plain), ("-p stack-worker", profiled)]
     if "prompt_input_omniroute" in found:
         labelled.append((f"-p {OMNIROUTE_PROFILE}", found["prompt_input_omniroute"]))
-    not_started = [label for label, counts in labelled if counts.get("required_not_started")]
+    not_started = [label for label, counts in labelled if counts.get("required_failure")]
     for label in not_started:  # the session did not start, so the counts below would only repeat that
-        counts = dict(labelled)[label]
-        problems.append(f"{label} prompt input: required MCP servers did not start: "
-                        f"{', '.join(counts['required_not_started'])} ({counts.get('error')})")
+        failure = dict(labelled)[label]["required_failure"]
+        problems.append(f"{label} prompt input: required MCP servers did not start (read from the error, best "
+                        f"effort: {', '.join(failure['names_best_effort']) or 'none'}): {failure['text']}")
     labelled = [(label, counts) for label, counts in labelled if label not in not_started]
     for label, counts in labelled:
         if counts.get("top_rule") != 1 or counts.get("rtk_exceptions") != 1 or counts.get("prefix_rule", 0) < 1:

@@ -952,11 +952,15 @@ class ApplyFlowTests(unittest.TestCase):
         self.assertIn("rehearsal passed", out)
         code, out = self.host.apply()
         self.assertEqual(code, 3, out)
-        self.assertIn(f"-p {lane.PROFILE_NAME} prompt input: required MCP servers did not start: codebase-memory", out)
+        self.assertIn(f"-p {lane.PROFILE_NAME} prompt input: required MCP servers did not start (read from the error, "
+                      f"best effort: codebase-memory): {lane.REQUIRED_FAILURE}codebase-memory: ", out)
         run = self.host.latest_run()
         record = json.loads((run / "record.json").read_text())
         self.assertEqual(record["status"], "failed")
-        self.assertEqual(record["readback"]["prompt_input_profile"]["required_not_started"], ["codebase-memory"])
+        failure = record["readback"]["prompt_input_profile"]["required_failure"]
+        self.assertEqual(failure["names_best_effort"], ["codebase-memory"])
+        self.assertEqual(failure["text"],
+                         lane.REQUIRED_FAILURE + "codebase-memory: No such file or directory (os error 2)")
         self.assertIn(f"--rollback {run}", out)
         code, out = self.host.run("--rollback", str(run))
         self.assertEqual(code, 0, out)
@@ -1063,6 +1067,29 @@ class RequiredStartTests(unittest.TestCase):
                          ["codebase-memory", "serena"])
         self.assertEqual(lane.required_start_failures(exec_line + "\n"), ["serena"])
         self.assertEqual(lane.required_start_failures("Error: No MCP server named 'x' found.\n"), [])
+
+    def test_required_failure_keeps_the_whole_error_and_its_names_are_best_effort(self):
+        # Codex joins the "<name>: <error>" pairs with "; " unescaped (required.rs L51-58 at rust-v0.157.1), and an
+        # rmcp error keeps its message's newlines and delimiters, so the record keeps the whole text and the names
+        # read from it are best effort.
+        multiline = (lane.REQUIRED_FAILURE + "codebase-memory: startup failed\ncaused by missing executable; "
+                     "serena: missing executable")
+        stderr = "Error: Fatal error: Failed to initialize session: " + multiline + "\n"
+        self.assertEqual(lane.required_start_failures(stderr), ["codebase-memory", "serena"])
+        self.assertEqual(lane.required_failure_text(stderr), multiline)
+        # A "; serena: " inside codebase-memory's own error reads as a second pair: the text cannot tell them apart.
+        embedded = lane.REQUIRED_FAILURE + "codebase-memory: upstream said: a; serena: ready (no error)"
+        self.assertEqual(lane.required_start_failures(embedded), ["codebase-memory", "serena"])
+        self.assertEqual(lane.required_failure_text("a log line\n" + embedded + "\n"), embedded)
+        # A name the profile does not mark required is not taken, and a name is taken once.
+        self.assertEqual(lane.required_start_failures(lane.REQUIRED_FAILURE + "other: x; serena: y; serena: z"),
+                         ["serena"])
+        self.assertEqual(lane.required_failure_text("Error: No MCP server named 'x' found.\n"), "")
+        found = {"prompt_input_profile": {"error": "caused by missing executable; serena: missing executable",
+                                          "required_failure": {"text": multiline,
+                                                               "names_best_effort": ["codebase-memory", "serena"]}}}
+        self.assertIn(f"-p {lane.PROFILE_NAME} prompt input: required MCP servers did not start (read from the "
+                      f"error, best effort: codebase-memory, serena): {multiline}", lane.check_readbacks(found, "/eco"))
 
     def test_relaxed_flags_follow_the_profile(self):
         # Session flags (30) outrank the profile (21) key by key (config/src/config_layer_source.rs at rust-v0.157.1),
@@ -1714,7 +1741,7 @@ class CodexIntegrationTests(unittest.TestCase):
         code, out = host.apply()
         self.assertEqual(code, 0, out)
         record = json.loads((host.latest_run() / "record.json").read_text())
-        self.assertNotIn("required_not_started", record["readback"]["prompt_input_profile"])
+        self.assertNotIn("required_failure", record["readback"]["prompt_input_profile"])
         written = (host.codex_home / "config.toml").read_text()
         self.assertIn("# a comment the writer keeps", written)
         self.assertIn("startup_timeout_sec = 120\n", written)  # an integer stays an integer

@@ -43,7 +43,7 @@ CHUB_FEEDBACK = "0"
 # https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/required.rs#L15-L59
 # Without it, a server still starting one shared 1 s grace after the first tool-list build
 # (codex-mcp/src/mcp/mod.rs L195) is left out of that request (connection_manager/tool_catalog.rs L251-277).
-# Both servers take 1.2-2.3 s to start here, and a custom provider such as the OmniRoute gateway has no
+# Both servers answer initialize in 1.2-2.3 s here, and a custom provider such as the OmniRoute gateway has no
 # websocket prewarm to hide it. mcp_optional_startup_grace_ms stays unset: it would wait for every optional
 # server and never fail. Every -p stack-worker session start now waits for both, `debug prompt-input` included,
 # so run workers under the account's HOME: codebase-memory-mcp 0.11.0 does not start beside its account daemon

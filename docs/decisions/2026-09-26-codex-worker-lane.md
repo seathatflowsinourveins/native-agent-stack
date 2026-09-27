@@ -734,7 +734,12 @@ in the same turn. The source explains it:
   and in the race test's two failing-first runs below (fixture servers, template without `required`) the first
   request left 1.63 s and 1.69 s after `codex` started. Serena's slower starts (up to 2.24 s) fall past that point.
   These runs do not show codebase-memory's 1.20-1.25 s missing it; that it was missing on the gateway route rests on
-  the relayed peer measurement. Both fit the 60 s allowance.
+  the relayed peer measurement. Both are far inside the template's `startup_timeout_sec = 60`, which Codex applies
+  to each start-up step separately, not as one overall deadline: the client start, `initialize` and the first tool
+  listing
+  ([`rmcp_client.rs` L354](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L354),
+  [L946](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L946) and
+  [L1015](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L1015)).
 
 **Decision.**
 1. The worker profile's partial `[mcp_servers.serena]` and `[mcp_servers.codebase-memory]` tables gain
@@ -743,14 +748,16 @@ in the same turn. The source explains it:
    "When `true`, `codex exec` exits with an error if this MCP server fails to initialize"). Every `-p stack-worker`
    session start, `codex debug prompt-input` included (it starts a thread, `core/src/prompt_debug.rs` L72-74), waits
    for both and stops with "required MCP servers failed to initialize: <name>: <error>" (`required.rs` L51-58) when
-   one does not start within its 60 s. A worker never runs without these tools.
+   one does not start. Starting includes the first tool listing (`required.rs` L31 awaits the client that
+   `start_server_task` returns after `initialize` and `tools/list`, `rmcp_client.rs` L908-1020), and each of its
+   steps has the server's own `startup_timeout_sec` (60 s in the template). A worker never runs without these tools.
 2. `mcp_optional_startup_grace_ms` stays unset (alternatives below).
 3. `tools/adoption/apply_codex_lane.py`: the dry run's rehearsal makes the two optional again for its one
    `-p stack-worker` read, with `-c mcp_servers.<name>.required=false` (session flags 30 outrank the profile 21), and
    says so. Its scratch `HOME` cannot start codebase-memory: codebase-memory-mcp 0.11.0 keeps one account daemon and
    refuses a second cache directory (measured below). The apply's read-back and `prove_codex_lane.py`'s profile
-   check start both under the account's `HOME`, as a worker does; a failure names each server that did not start
-   (`required_not_started` in the run record) and points to the rollback.
+   check start both under the account's `HOME`, as a worker does. A failure keeps the whole required-server error
+   and the names read from it, best effort (`required_failure` in the run record), and points to the rollback.
 4. The landscape sweep's gateway lane copies the profile verbatim and sets only `CODEX_HOME`, so it inherits the
    wait. Its staging check already accepts partial tables for servers the rendered host config defines.
 
@@ -765,6 +772,7 @@ failing-first evidence; the synthetic row's before run failed only because the h
 | `CodexIntegrationTests.test_required_servers_start_before_the_first_request_on_a_custom_provider` | native integration, synthetic inputs | template without `required`: exit 1, `FAILED (failures=2)`; first request at 1.63 s, not after the servers' 5 s, and a serena that cannot start did not stop the run (exit 0). With the strengthened check (below), on a copy of the tree whose template lacks the two `required` lines: exit 1, `FAILED (failures=3)`; first request at 1.69 s, the first turn's tool list lacked `mcp__serena__fixture_serena` and `mcp__codebase_memory__fixture_codebase_memory`, so it did not differ from the control's, and the serena that cannot start again did not stop the run | exit 0, `Ran 1 test`, `OK`, and in the class run below |
 | `CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback` | native integration, synthetic inputs | script without the relaxation: exit 1, `FAILED (failures=1)`; the dry run's rehearsal, under the real codex, failed with "required MCP servers failed to initialize: codebase-memory: handshaking with MCP server failed: connection closed: initialize response". This is the behavioural failing-first evidence for the relaxation. | exit 0, `Ran 1 test`, `OK` |
 | `ApplyFlowTests`, `RequiredStartTests` | synthetic | script without the helpers: exit 1, `Ran 21 tests`, `FAILED (errors=3)`, all three `AttributeError` for the missing `required_servers`, `relaxed_required_flags` and `required_start_failures`: absent code, not a behavioural failure | exit 0, `Ran 21 tests`, `OK` |
+| `RequiredStartTests` and `ApplyFlowTests.test_the_dry_run_relaxes_required_servers_and_the_apply_read_back_starts_them` (GPT-6 repair round) | synthetic | the reviewed head's script (`a5296a3c`) under the new tests: exit 1, `Ran 4 tests`, `FAILED (failures=2)`; it read a multiline error as `['codebase-memory']`, dropping serena, and its read-back message lacked the whole error | exit 0, `Ran 4 tests`, `OK`; with all of `ApplyFlowTests`: `Ran 22 tests`, `OK` |
 
 - The race test runs the real codex under `bwrap --unshare-net` with scratch homes, fixture stdio MCP servers that
   answer `initialize` after 5 s, and a fake Responses endpoint on loopback; no sign-in, gateway, model or real server.
@@ -783,8 +791,8 @@ failing-first evidence; the synthetic row's before run failed only because the h
   body itself names no MCP tool.
 - Three older native tests registered the two servers as `/bin/false` or a stub and failed once the template changed
   (`FAILED (failures=3)`); they now register fixture servers. `NAS_CODEX_INTEGRATION=1 python3 -m unittest -v
-  tests.test_codex_worker_lane.CodexIntegrationTests`: exit 0, `Ran 9 tests`, `OK`, both before the race test was
-  strengthened and after.
+  tests.test_codex_worker_lane.CodexIntegrationTests`: exit 0, `Ran 9 tests`, `OK` before the race test was
+  strengthened, after it, and after the GPT-6 repair round (that run without `-v`).
 - Measured probe of the installed codebase-memory-mcp (not a Codex run): with a scratch `HOME` it answered nothing in
   30 s and printed "CBM could not start because the active account daemon uses a different cache directory ... Close
   all CBM sessions and commands, then retry with one consistent CBM_CACHE_DIR."; with the account's `HOME` it answered
@@ -821,10 +829,17 @@ failing-first evidence; the synthetic row's before run failed only because the h
 - The peer's gateway measurement is relayed, not retained; after the coordinator re-applies the profile, the peer
   reruns its gateway probe (pass: both tools present and completing on the first turn).
 - A worker whose `HOME` is not the account's cannot start codebase-memory while the account daemon runs. It used to
-  run without the tools; it now waits the 60 s allowance and fails.
-- Every `-p stack-worker` launch now holds its first request until both servers answer `initialize` (serena
-  1.53-2.24 s and codebase-memory 1.20-1.25 s here, each timed from its own launch). The added delay is only the part
-  past the grace: without `required`, the first request left 1.63 s and 1.69 s after `codex` started.
+  run without the tools; now its session start fails: at once if the server exits, or when the stalled step's 60 s
+  timeout ends if it hangs (the probe above saw no answer in 30 s).
+- Every `-p stack-worker` launch now holds its first request until both servers have started, their first tool
+  listing included. The timings here are observations, not the added delay: the probe's `initialize` times (serena
+  1.53-2.24 s, codebase-memory 1.20-1.25 s, each from its own launch) and, without `required`, the race test's first
+  request at 1.63 s and 1.69 s after `codex` started. The optional grace starts at the first tool-list build, after
+  the required wait
+  ([`session.rs` L1860-1868](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/session/session.rs#L1860-L1868),
+  [`tool_catalog.rs` L251-277](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs#L251-L277)),
+  so an optional server still starting then can add the shared 1 s grace on top. The added delay depends on how
+  long the required servers take and on the optional servers still starting.
 - The workstation's installed `stack-worker.config.toml` predates this template, so the dry run and the apply refuse
   it ("exists and differs from the template") and never overwrite it. The host step, after merge and in a quiet
   window with no Codex process: move that file aside privately, run the dry run, then apply.
