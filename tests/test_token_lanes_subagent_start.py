@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "adoption/hooks/claude/token-lanes-subagent-start.py"
 BLOCK = HOOK.with_name("token-lanes-block.md")
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
+BUDGET_BYTES = 3_500  # the carrier's local budget, in UTF-8 bytes (docs/decisions/2026-09-27-token-lanes-subagent-start.md)
 KEY_PHRASES = (
     "ToolSearch", "ctx_batch_execute", "rtk", "find_referencing_symbols",
     "codebase-memory", "jcodemunch", "TOON", "headroom",
@@ -31,6 +32,10 @@ CORRECTED_PHRASES = (
     "this parameter is on trace_path, not search_graph",
     "treat edges below confidence 0.5 as unverified candidates",
 )
+
+
+def fits_budget(raw: bytes) -> bool:
+    return len(raw) <= BUDGET_BYTES
 
 
 class TokenLanesHookTests(unittest.TestCase):
@@ -113,11 +118,19 @@ class TokenLanesHookTests(unittest.TestCase):
 
 
 class TokenLanesTextTests(unittest.TestCase):
+    def test_budget_counts_utf8_bytes_not_characters(self):
+        # 3,280 characters but 3,520 UTF-8 bytes: a character count would accept it.
+        text = "é" * 240 + "x" * 3_040
+        self.assertEqual((len(text), len(text.encode("utf-8"))), (3_280, 3_520))
+        self.assertFalse(fits_budget(text.encode("utf-8")))
+        self.assertTrue(fits_budget(b"x" * BUDGET_BYTES))
+
     def test_block_fits_budget_and_matches_handbook(self):
-        block = BLOCK.read_text(encoding="utf-8")
+        raw = BLOCK.read_bytes()
+        block = raw.decode("utf-8")
         handbook = HANDBOOK.read_text(encoding="utf-8")
         self.assertTrue(block.startswith("TOKEN LANES"))
-        self.assertLessEqual(len(block), 3_500)
+        self.assertTrue(fits_budget(raw), f"{len(raw)} bytes")
         for marker in ("/" + "home/", "/" + "tmp/claude-1000", "/" + "Users/", "/" + "mnt/c/"):
             self.assertNotIn(marker, block)
         for phrase in KEY_PHRASES:
