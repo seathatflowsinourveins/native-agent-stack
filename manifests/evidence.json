@@ -13828,8 +13828,8 @@
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
-      "sha256": "047e11b6b123236211159f8dfd287641b76808ccf0507c02bafba89e6f4ce694",
-      "bytes": 68991
+      "sha256": "e94001183e95286fcba35152123f0ce2569b7083f5ad4ab2afd5a24fc746e265",
+      "bytes": 69565
     },
     {
       "path": "docs/hf-memory-model-qualification.md",
@@ -14048,8 +14048,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "6e7a489dce50495e2d5ab5e4641bb70d641b6d4dfd9761ddaef995679e8d9de7",
-      "bytes": 32498
+      "sha256": "0b0836efad1dbdf8c0f26ce8325ed2c4422769204c17953471230143ac97b609",
+      "bytes": 32629
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -37518,8 +37518,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "b97c5417023f3fd521b7cc5e81f3708d3ad020e3bcb55b493b0bfcd804fa5ca0",
-      "bytes": 6347
+      "sha256": "e127fd1f9fdc966cc908f89d5d6ded913c8937b433cd8a49df486e8b5e4ffcc3",
+      "bytes": 6361
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -38103,8 +38103,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "4486e17d0337c29b9b31d8c047b885d50c40a0a2370eb7ccf26cf7869599d763",
-      "bytes": 69517
+      "sha256": "00a8e0751c4dd472fe57c6b79c1929390f96ee58fd7d2e1db16abe7086882533",
+      "bytes": 69847
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -38483,8 +38483,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "9e2708c131b670e3360ea392fff7d75600a3a399787c25f14634c8226b61de2b",
-      "bytes": 107988
+      "sha256": "d9604e2da6afd6528cb481f28f4148f147aefebabc38658f1e57ab8abbc773ba",
+      "bytes": 108593
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -39168,8 +39168,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "e2660484c3c094f27c1a4780945ec0a65572ae974139ceeb092939b36e94bf8a",
-      "bytes": 13136
+      "sha256": "f97f908f3a88111eeeeb5f698e5497b98ace1f5b26fecdab3092f9c2f553cf85",
+      "bytes": 13412
     },
     {
       "path": "tools/adoption/render_config.py",
