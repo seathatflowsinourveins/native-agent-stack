@@ -1,4 +1,4 @@
-# Decision: an OmniRoute account pool for GPT-6 lanes: a source build of release/v3.8.51 with two upstream fixes, a keyless loopback service and Codex wiring (2026-09-27)
+# Decision: an OmniRoute account pool for GPT-6 lanes: a source build of release/v3.8.51 with an upstream fix and an upstream feature, a keyless loopback service and Codex wiring (2026-09-27)
 
 **Status: decided by the user and installed on the NativeStack WSL2 workstation on 2026-09-27; this change records
 it.** The coordinator session built, installed and verified the gateway before this record was written. This change

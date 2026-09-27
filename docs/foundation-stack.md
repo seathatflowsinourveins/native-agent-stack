@@ -208,7 +208,7 @@ Exact model, effort, tool behavior and continuation need actual accepted results
 
 For owned lifecycle, preserve the same DATA_DIR/secrets through restart. Upstream `backup create --name NAME --encrypt --key-file FILE` creates encrypted backups, but the released native restore command only recognizes plaintext filenames and can print completion without restoring encrypted files. This wave independently decrypted/checked the encrypted backup and separately accepted a plaintext native restore; do not claim native encrypted restore passed. Before `stop`, verify `$OMNIROUTE_DATA/server/.pid` belongs to this launch: absent PID state can trigger a fallback targeting port 20128. `update --apply` installs into npm's default global prefix and is unsuitable for this isolated prefix. After closing only the owned process, `npm uninstall --global --prefix "$OMNIROUTE_PREFIX" omniroute` retires the package while preserving separate data/evidence. That is a retirement recipe, not an executed uninstall in this wave: the package remains installed, the owned acceptance process is stopped, and its final data/receipts are archived. Never erase working router counters as cleanup.
 
-### Source build of release/v3.8.51 with two upstream fixes (workstation, 2026-09-27)
+### Source build of release/v3.8.51 with an upstream fix and an upstream feature (workstation, 2026-09-27)
 
 Since 2026-09-27 the workstation's gateway pools its Codex accounts for GPT-6 lanes. The [decision record](decisions/2026-09-27-omniroute-account-pool.md) holds the reasons, the keyless loopback posture and its risk, and the overturn conditions. Its [evidence](../evidence/artifacts/omniroute-gateway-20260927/README.md) holds the build provenance, the installed unit and the probes.
 
@@ -216,7 +216,7 @@ Since 2026-09-27 the workstation's gateway pools its Codex accounts for GPT-6 la
 - [#14904](https://github.com/diegosouzapw/OmniRoute/pull/14904): without it, every `/v1` inference route answered HTTP 500 behind Next 16.3.5's request Proxy on this host's Node 24, as the coordinator reported. A synthetic fixture shows the same `Request` construction failure on Node 26, upstream's Docker base, where the gateway was not run;
 - [#13788](https://github.com/diegosouzapw/OmniRoute/pull/13788): `/v1/alpha/search`, which Codex's standalone `web.run` calls.
 
-The component pin in `manifests/stack.json` stays 3.8.50 until npm publishes 3.8.51 or upstream carries both fixes.
+The component pin in `manifests/stack.json` stays 3.8.50 until npm publishes 3.8.51 or upstream carries both changes (the #14904 fix and the #13788 feature).
 
 - **Build.** Use upstream's own scripts in a clean clone at the cherry-picked head:
   1. `npm ci`;

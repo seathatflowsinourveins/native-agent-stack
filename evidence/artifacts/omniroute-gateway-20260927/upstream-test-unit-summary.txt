@@ -15,7 +15,7 @@ One failure is introduced by the cherry-picks:
   tests/unit/hard-session-lease-bypass-inventory.test.ts:348 "hard-lease credential, executor, and connection-query
   inventory has no unclassified site": #13788's new src/app/api/v1/alpha/search/route.ts adds one connection-query
   site that the inventory guard (which postdates the PR, opened 2026-09-15) does not list. This is an inventory
-  classification gap in the open PR, not a behaviour regression of the two cherry-picked fixes; the search route's
+  classification gap in the open PR, not a behaviour regression of the two cherry-picked changes (the #14904 fix, the #13788 feature); the search route's
   behaviour was verified by live probes. Upstream must classify the site when it merges #13788. Not patched locally.
 
 The keepalive fix (#14904) introduces no failure: tests/unit/early-stream-keepalive.test.ts passes 26/26 and the
