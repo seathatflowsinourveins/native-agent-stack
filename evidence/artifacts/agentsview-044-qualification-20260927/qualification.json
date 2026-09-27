@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-27",
+  "component": "agentsview",
+  "evidence_class": "local_integration",
+  "verdict": "hold",
+  "qualified": false,
+  "pin_change_prepared": false,
+  "host_switch_performed": false,
+  "latest_release": {
+    "tag": "v0.44.0",
+    "published_at": "2026-09-21T13:56:12Z",
+    "draft": false,
+    "prerelease": false,
+    "checked_live": "2026-09-27",
+    "endpoint": "https://api.github.com/repos/kenn-io/agentsview/releases/latest"
+  },
+  "baseline": {
+    "version": "0.43.0",
+    "commit": "9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+    "installed_binary_used_with_isolated_data": true
+  },
+  "candidate": {
+    "version": "0.44.0",
+    "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+    "built_at": "2026-09-21T12:48:49Z",
+    "asset": "agentsview_0.44.0_linux_amd64.tar.gz",
+    "sha256": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "published_checksum_match": true,
+    "install_channel": "Official GitHub release archive and SHA256SUMS; extracted in a new unit scratch prefix.",
+    "installation_scope": "Linux amd64 scratch only; PATH and host configuration unchanged."
+  },
+  "repository_pin_locations": {
+    "current_version": "0.43.0",
+    "files": [
+      "manifests/stack.json",
+      "scripts/native_token_ci.py",
+      "recipes/README.md"
+    ],
+    "platform_pin_files": "adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json contain no agentsview entry."
+  },
+  "gates": {
+    "release_integrity": "passed",
+    "upstream_targeted_classification": "passed",
+    "upstream_broad_tests": "failed",
+    "copied_archive_population_and_usage": "passed",
+    "synthetic_population_visibility": "passed",
+    "synthetic_ccusage_parity": "failed",
+    "occupied_explicit_port_control": "passed",
+    "intended_recipe_sequence": "passed_on_isolated_state",
+    "unchanged_rr_runner": "not_run",
+    "fresh_four_native_lanes": "blocked",
+    "independent_gpt6_review": "completed_hold",
+    "independent_claude_review": "incomplete"
+  },
+  "mcp_accounting_decision": {
+    "status": "Use inclusive CLI usage plus ccusage on identical selected logs for the accounting boundary. Do not use MCP get_usage_summary for complete Codex exec usage.",
+    "observations": "On the copied archive, v0.43.0 MCP reports the Codex counters and v0.44.0 MCP reports zero; CLI and ccusage agree across both versions.",
+    "scope": "No upstream MCP fix; non-automated subset only. No cost, complete-history, or efficiency claim.",
+    "sources": [
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/mcp/tools.go#L705",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/service/usage.go#L208",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/usage.go#L163",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/usage.go#L582"
+    ]
+  },
+  "required_future_recipe_rewire": {
+    "file": "recipes/README.md",
+    "current_lines": "762-768 (the plan's older 589-595 range has shifted)",
+    "search_flags": [
+      "--include-automated",
+      "--include-one-shot",
+      "--include-children"
+    ],
+    "source_scope": "Keep selected source directories and cwd allowlist before first sync.",
+    "port_handling": "Treat failure of the explicitly selected port as a stop condition. Choose another free explicit port or upstream --port 0 deliberately; do not silently continue to an unrelated listener.",
+    "same_pr_requirement": "Apply the recipe rewire with any future pin change after qualification passes.",
+    "sources": [
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/docs/commands.md",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/serve_runtime.go#L57",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/parser/codex.go#L422"
+    ]
+  },
+  "reviews": {
+    "gpt6": {
+      "status": "completed",
+      "method": "Independent delegated GPT-6 source and retained-result review",
+      "verdict": "hold",
+      "tests_run_by_reviewer": 0,
+      "independently_checked": [
+        "upstream release identity",
+        "MCP and CLI source filters",
+        "explicit-port source",
+        "copied archive counters"
+      ],
+      "counts_as_native_lane_replay": false
+    },
+    "claude": {
+      "status": "incomplete",
+      "model_selection": "opus",
+      "effort": "xhigh",
+      "exit_code": 130,
+      "reason": "Native read-only review produced no returned report before interruption.",
+      "provider_execution_status": "unknown",
+      "provider_usage": null
+    },
+    "native_codex_attempts": [
+      {
+        "mode": "normal",
+        "exit_code": 1
+      },
+      {
+        "mode": "ephemeral",
+        "exit_code": 1
+      }
+    ],
+    "native_codex_failure": "failed to initialize in-process app-server client: Read-only file system (os error 30)",
+    "native_codex_provider_executions": 0
+  },
+  "residuals": [
+    "The selected unchanged upstream MCP/parser/db suite failed: 21 top-level parser tests and 25 test/subtest events. Reproduced failures remain unresolved; a temporary-directory Git marker is an environment lead, not a proven cause.",
+    "Fresh Claude main/child and Codex exec/subagent acceptance with fixed model, route and effort is not established. The retained archive contains one Claude session and one Codex session with no children.",
+    "The independent Claude review did not return; provider usage is unknown.",
+    "The synthetic fixture produced zero ccusage counters. Preserve that failed observation separately from successful copied-archive parity.",
+    "The legacy RR run.sh hardcodes writes and source locations outside this unit. Its native command sequence was adapted to isolated scratch state; the unchanged runner was not executed.",
+    "No whole-repository upstream ./... suite, frontend tests, Windows acceptance, macOS acceptance, or performance qualification.",
+    "No re-pin, production recipe change, host switch, evidence manifest registration, generated report refresh, or git commit. Registration and repository-wide validation remain with the coordinator harness."
+  ],
+  "sources": [
+    "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+    "https://github.com/kenn-io/agentsview/releases/download/v0.44.0/SHA256SUMS",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/go.mod",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L233",
+    "https://github.com/kenn-io/agentsview/pull/1855",
+    "https://github.com/ccusage/ccusage/tree/ecb676cce27cb5dd0090c7804a5cecc35e8ba805/rust/adapters/codex",
+    "docs/acceptance-evidence-policy.md"
+  ],
+  "repository_tests": {
+    "evidence_class": "local_integration",
+    "command": "python3 -m unittest tests.test_agentsview_qualification tests.test_foundation_stack_pins",
+    "tests_run": 7,
+    "exit_code": 0,
+    "result": "OK",
+    "failing_first": "The five new receipt checks initially failed because the qualification artifacts did not exist; the populated record and existing pin checks then passed.",
+    "scope": "Evidence scope/sanitization and current foundation pin regressions. Not upstream acceptance."
+  },
+  "recommended_lane": "lane:foundation"
+}

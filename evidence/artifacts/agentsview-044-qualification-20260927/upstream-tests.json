@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-27",
+  "evidence_class": "unchanged_upstream_tests",
+  "repository": "https://github.com/kenn-io/agentsview",
+  "tag": "v0.44.0",
+  "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+  "tracked_source_unchanged": true,
+  "runtime": {
+    "version": "go1.27.0",
+    "platform": "linux/amd64",
+    "archive": "go1.27.0.linux-amd64.tar.gz",
+    "sha256": "675c26c449cbb18fc24b74650de1eabbae6e16f64326fd85a283fb3b58280685",
+    "checksum_source": "https://go.dev/dl/?mode=json&include=all",
+    "installation_scope": "New unit scratch prefix; explicit executable path and isolated GOPATH/GOCACHE."
+  },
+  "scope": "Selected unchanged MCP, parser and database packages, including the plan's MCP and #1855 tests. This is not upstream's full ./... CI suite.",
+  "prerequisite": {
+    "command": "go run ./internal/pricing/cmd/litellm-snapshot -restore",
+    "exit_code": 0,
+    "source": "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L233"
+  },
+  "initial_build_failures": [
+    {
+      "command": "go test -json -tags fts5 ./internal/mcp/... -count=1 -timeout=20m",
+      "exit_code": 1,
+      "tests_executed": 0,
+      "stdout_sha256": "699ad01932ffa4baea94da201b2b283a491dd4d48edc9fa3139ff91d71ac6693"
+    },
+    {
+      "command": "go test -json -tags fts5 ./internal/parser ./internal/db -run 'TestParseCodexSession_(ExecOriginator|RoborevThreadSource)|TestIsAutomatedSessionMetadata|TestCurrentDataVersionCodexExecSessionKind' -count=1 -timeout=20m",
+      "exit_code": 1,
+      "tests_executed": 0,
+      "stdout_sha256": "cd8cb1528ff40f543f5b1bbb63002686e0fc6ef90ea84905c1b6aaed2d4b82c1"
+    }
+  ],
+  "initial_build_diagnostic": "internal/pricing/fallback.go:33:12: pattern snapshot/litellm_snapshot.json.gz: no matching files found",
+  "broad_attempt": {
+    "command": "go test -json -tags fts5 ./internal/mcp/... ./internal/parser ./internal/db -run 'Test|Example' -count=1 -timeout=20m",
+    "exit_code": 1,
+    "top_level_counts": {
+      "passed": 4549,
+      "failed": 21,
+      "skipped": 32
+    },
+    "test_event_counts": {
+      "passed": 8718,
+      "failed": 25,
+      "skipped": 39
+    },
+    "stdout_sha256": "ebd47a813ccde77f1baa6d9a778fa6f2e8a51804ae061084b7023898f26fd8ca",
+    "packages": [
+      {
+        "name": "internal/mcp",
+        "status": "pass",
+        "test_events_passed": 97,
+        "test_events_failed": 0,
+        "test_events_skipped": 3,
+        "elapsed_seconds": 4.826
+      },
+      {
+        "name": "internal/parser",
+        "status": "fail",
+        "test_events_passed": 5256,
+        "test_events_failed": 25,
+        "test_events_skipped": 19,
+        "elapsed_seconds": 107.392
+      },
+      {
+        "name": "internal/db",
+        "status": "pass",
+        "test_events_passed": 3365,
+        "test_events_failed": 0,
+        "test_events_skipped": 17,
+        "elapsed_seconds": 136.96
+      }
+    ],
+    "failed_test_events": [
+      "TestAntigravityCLIProviderUsesLastConversationsWorkspace",
+      "TestAntigravityCLIDiscoverAndParseDB",
+      "TestAntigravityCLIProjectFallbackPromptAndProximity",
+      "TestCrushProviderParsesTranscriptToolsAndUsage",
+      "TestParseOpenCodeDB_ProjectFromUnavailableProjectWorktree",
+      "TestParseOpenHandsSession",
+      "TestExtractProjectFromCwdNoGitInvocationWhenLocalWalkMisses",
+      "TestExtractProjectFromCwd_SubmoduleSiblingIgnored",
+      "TestExtractProjectFromCwd_UnrelatedSiblingWorktree",
+      "TestExtractProjectFromCwd_RepoSiblingWithWorktree",
+      "TestExtractProjectFromCwd_DeletedSiblingOfNormalRepo",
+      "TestExtractProjectFromCwd_UnrelatedDeletedNextToWorktreeRepo",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/HostingWorktree",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/HostingWorktreeSubdirectory",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/NamespacedHostingWorktree",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/NamespacedHostingWorktreeSubdirectory",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts",
+      "TestProjectRootMemoAncestorScanKeepsCwdAssociation",
+      "TestProjectRootMemoAbsentContextValue",
+      "TestRepoRootFromSiblingsSkipsRefusedGitfileTargets",
+      "TestRepoRootFromSiblingsSkipsGuardedSiblings",
+      "TestDeletedChildIsWorktreeSkipsSymlinkedWorktreesDir",
+      "TestTauParsesActiveLeafAndCanonicalFields",
+      "TestParseWorkBuddySession",
+      "TestParseWorkBuddySessionUsesCwdProjectAndFileSessionID"
+    ]
+  },
+  "targeted_classification": {
+    "command": "go test -json -tags fts5 ./internal/parser ./internal/db -run 'TestParseCodexSession_(ExecOriginator|RoborevThreadSource)|TestIsAutomatedSessionMetadata|TestCurrentDataVersionCodexExecSessionKind' -count=1 -timeout=20m",
+    "exit_code": 0,
+    "top_level_tests_passed": 4,
+    "test_events_passed": 13,
+    "test_events_failed": 0,
+    "test_events_skipped": 0,
+    "test_names": [
+      "TestParseCodexSession_ExecOriginator",
+      "TestParseCodexSession_RoborevThreadSource",
+      "TestIsAutomatedSessionMetadata",
+      "TestCurrentDataVersionCodexExecSessionKind"
+    ],
+    "packages": [
+      {
+        "name": "internal/parser",
+        "elapsed_seconds": 0.083
+      },
+      {
+        "name": "internal/db",
+        "elapsed_seconds": 0.07
+      }
+    ],
+    "stdout_sha256": "3e343fc71ab8b699d5981df43c2981fafeaf952712af889584761c0bb3a7757c",
+    "source": "https://github.com/kenn-io/agentsview/pull/1855"
+  },
+  "confirming_subprocess_rerun": {
+    "command": "go test -json -tags fts5 ./internal/mcp/... ./internal/parser ./internal/db -count=1 -timeout=20m",
+    "exit_code": 1,
+    "elapsed_seconds": 150.761,
+    "top_level_counts": {
+      "passed": 4554,
+      "failed": 21,
+      "skipped": 32
+    },
+    "test_event_counts": {
+      "passed": 8885,
+      "failed": 25,
+      "skipped": 39
+    },
+    "stdout_sha256": "fe13acde06521f5178bb90f19186cbf1e7178e96ece7de9652e773e36bb40bf3",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "same_failed_test_events": true,
+    "scope_difference": "Without the -run selector, unchanged fuzz seed tests also execute. Do not sum overlapping attempts or call the differing pass count a model improvement."
+  },
+  "diagnosis": {
+    "status": "unresolved",
+    "observed_pattern": "Project-inference expectations fail with actual project tmp.",
+    "environment_lead": "Native subprocesses observe a /tmp/.git directory. The context-mode interpreter's own filesystem view differs. Rerunning through context-mode still reproduces the failures.",
+    "conclusion": "The environmental lead is not established as the cause. No failure was waived or upstream test edited."
+  },
+  "retained_output": "returned-output.txt contains actual selected native output lines. Full first-run logs remain private in the unit; hashes above identify them. The confirming rerun was processed by context-mode.",
+  "sources": [
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/go.mod",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L238",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/parser/codex_parser_test.go#L573",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/db/automated_test.go",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/db/db_test.go"
+  ]
+}
