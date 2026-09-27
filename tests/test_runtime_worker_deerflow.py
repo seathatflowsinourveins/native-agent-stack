@@ -64,7 +64,7 @@ class DeerFlowRecipeTests(unittest.TestCase):
         with patch.object(renderer, "read", return_value={}), patch.object(renderer, "require_rootless"), \
                 patch.object(renderer, "docker", docker):
             renderer.lifecycle("down")
-        self.assertEqual([c[-1] for c in calls], ["rw-deerflow-nginx", "rw-deerflow-frontend", "rw-deerflow-gateway", "rw-deerflow-redis", "rw-deerflow-network"])
+        self.assertEqual([c[-1] for c in calls], ["rw-deerflow-nginx", "rw-deerflow-frontend", "rw-deerflow-gateway", "rw-deerflow-redis", "rw-deerflow-egress", "rw-deerflow-network", "rw-deerflow-egress-network"])
 
     def test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped(self):
         renderer = module("deerflow_recipe", RECIPE / "recipe.py")
@@ -83,12 +83,12 @@ class DeerFlowRecipeTests(unittest.TestCase):
             before = db.read_bytes()
             renderer.seed_qmd(settings, state)
             self.assertEqual(db.read_bytes(), before)
-            target = state / "data/mcp/qmd/cache/qmd/native-agent-stack-catalog.sqlite"
+            target = state / "qmd-seed/cache/qmd/native-agent-stack-catalog.sqlite"
             self.assertTrue(target.is_file())
             self.assertEqual(target.stat().st_mode & 0o777, 0o600)
             compose = renderer.render(settings, prefix, state)
             config = json.loads((state / "config/config.yaml").read_text())
-            self.assertEqual(config["models"][0]["base_url"], "http://10.0.2.2:20128/v1")
+            self.assertEqual(config["models"][0]["base_url"], "$DEERFLOW_BASE_URL")
             self.assertEqual(compose["services"]["gateway"]["environment"]["DEERFLOW_MODEL"], "cx/gpt-6-astra-max")
             settings["model"] = "cx/gpt-6-sol-max"
             compose = renderer.render(settings, prefix, state)
@@ -106,7 +106,10 @@ class DeerFlowRecipeTests(unittest.TestCase):
         project = tomllib.loads((ROOT / "adoption/templates/project.codex.config.template.toml").read_text())["mcp_servers"]
         for name in ("context-mode", "serena", "socraticode", "qmd", "jcodemunch"):
             native = project[name] if name == "jcodemunch" else common[name]
-            self.assertEqual(ext[name]["args"], [native["command"], *native.get("args", [])], name)
+            expected = [native["command"], *native.get("args", [])]
+            if name == "serena":
+                expected[expected.index("--enable-web-dashboard") + 1] = "false"
+            self.assertEqual(ext[name]["args"], expected, name)
             self.assertEqual(ext[name]["command"], "/runtime/stdio.sh")
 
     def test_adapter_preserves_known_pass_and_fail_without_a_local_verdict(self):
@@ -221,7 +224,7 @@ class DeerFlowRecipeTests(unittest.TestCase):
 
             def native(command, **kwargs):
                 invocations.append(command)
-                if "compose" in command:
+                if "compose" in command and "run" in command:
                     if malformed:
                         kwargs["stdout"].write('{"type":"worker-version","data":null}\n')
                         return subprocess.CompletedProcess(command, 0)
@@ -232,16 +235,17 @@ class DeerFlowRecipeTests(unittest.TestCase):
 
             with patch.object(runner, "STATE", state), patch.object(runner, "PREFIX", prefix), \
                     patch.object(runner, "require_rootless"), patch.object(runner.subprocess, "run", native), \
+                    patch.object(runner, "compression_snapshot", return_value={"state":"not_applicable"}), \
                     patch.object(runner.Path, "home", return_value=Path(tmp)):
                 result = runner.run_worker("unchanged question", "frozen", 1)
                 self.assertEqual(result["completion"], "99")
                 self.assertNotIn("passed", result)
                 self.assertTrue(result["receipt"]["transport"]["ok"])
                 self.assertIsNone(result["receipt"]["grader"]["verdict"])
-                launch = next(c for c in invocations if "compose" in c)
+                launch = next(c for c in invocations if "compose" in c and "run" in c)
                 self.assertTrue(launch[launch.index("--name") + 1].startswith("rw-deerflow-"))
                 self.assertEqual(launch[launch.index("--label") + 1], "com.native-agent-stack.owner=gpt6-omniroute-framework-integration")
-                self.assertEqual(invocations[-1][-3:-1], ["rm", "--force"])
+                self.assertIn("down", invocations[-1])
                 exit_code = 2
                 with self.assertRaises(ValueError):
                     runner.run_worker("unchanged question", "frozen", 2)
@@ -253,24 +257,55 @@ class DeerFlowRecipeTests(unittest.TestCase):
             self.assertEqual({json.loads((r / "window.json").read_text())["framework_exit_code"] for r in runs}, {0, 2})
             self.assertTrue(all((r / "receipt.json").is_file() for r in runs))
 
+    def test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets(self):
+        runner = module("deerflow_attempt", RECIPE / "e2e/run.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            state, prefix, run = root / "state", root / "prefix", root / "run"
+            (state / "config").mkdir(parents=True)
+            for file in ("config.yaml", "extensions_config.json"):
+                (state / "config" / file).write_text("{}")
+            (state / "qmd-seed").mkdir()
+            (state / "qmd-seed" / "snapshot.json").write_text("{}")
+            run.mkdir()
+            settings = {"variables":{}, "mcp_mounts":[]}
+            pins = json.loads((RECIPE / "pins.json").read_text())
+            arm = {"arm":"engines-on", "model":"sharedgw/gpt-6-astra-max", "base_url":"http://10.0.2.2:20129/v1"}
+            compose = runner.attempt_compose(settings, pins, prefix, state, run, "aabbcc", arm)
+            self.assertEqual(compose["name"], "rw-deerflow-e2e-aabbcc")
+            self.assertEqual(set(compose["services"]), {"gateway", "egress"})
+            svc = compose["services"]["gateway"]
+            self.assertNotIn("env_file", svc)
+            self.assertNotIn("depends_on", svc)
+            self.assertEqual(svc["environment"]["DEERFLOW_BASE_URL"], arm["base_url"])
+            self.assertEqual(svc["environment"]["RUNTIME_WORKER_ARM"], "engines-on")
+            self.assertEqual(svc["environment"]["DEER_FLOW_STREAM_BRIDGE_REDIS_URL"], "")
+            for volume in svc["volumes"]:
+                if not volume.get("read_only", False):
+                    self.assertTrue(Path(volume["source"]).is_relative_to(run))
+                self.assertNotIn("private.env", str(volume))
+                self.assertNotIn("redis-password", str(volume))
+            self.assertTrue((run / "data/mcp/qmd/snapshot.json").is_file())
+            self.assertTrue(all(n["name"].startswith(compose["name"]) for n in compose["networks"].values()))
+
     def test_gateway_reader_is_read_only_and_uses_only_approved_columns(self):
         receipt = module("deerflow_receipt", RECIPE / "e2e/receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
             db = Path(tmp) / "gateway.sqlite"
             with closing(sqlite3.connect(db)) as conn, conn:
-                conn.execute("CREATE TABLE call_logs (timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning, private_payload)")
+                conn.execute("CREATE TABLE call_logs (timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning, private_payload, correlation_id)")
                 conn.execute("CREATE TABLE secrets (value)")
-                conn.execute("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                             (1000, "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 100, 60, 9, "must-never-be-read"))
-                conn.execute("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                             (5000, "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 1, 0, 0, "outside-window"))
+                conn.execute("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                             (1000, "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 100, 60, 9, "must-never-be-read", "one"))
+                conn.execute("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                             (5000, "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 1, 0, 0, "outside-window", "two"))
                 for stamp in ("1000", "1000.5", "1970-01-01T00:16:40Z"):
-                    conn.execute("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                 (stamp, "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 100, 60, 9, "must-never-be-read"))
+                    conn.execute("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                 (stamp, "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 100, 60, 9, "must-never-be-read", stamp))
             before = db.read_bytes()
             rows = receipt.gateway_rows(db, 999, 1001)
             self.assertEqual(len(rows), 4)
-            self.assertEqual(set(rows[0]), set(receipt.COLUMNS))
+            self.assertEqual(set(rows[0]), set(receipt.COLUMNS) - {"correlation_id"})
             self.assertEqual(rows[0]["tokens_cache_read"], 60)
             self.assertEqual(db.read_bytes(), before)
             with closing(sqlite3.connect(db.as_uri() + "?mode=ro", uri=True)) as conn:
@@ -293,7 +328,7 @@ class DeerFlowRecipeTests(unittest.TestCase):
                 {"type": "tool", "tool_call_id": "private-two", "content": "Task completed", "additional_kwargs": {"subagent_status": "completed"}},
                 {"type": "tool", "tool_call_id": "private-failure", "content": "Error: native child error", "additional_kwargs": {"subagent_status": "failed"}},
                 {"type": "tool", "tool_call_id": "private-timeout", "content": "", "additional_kwargs": {"subagent_status": "polling_timed_out"}},
-                {"type": "tool", "tool_call_id": "private-three", "content": "actual skill instructions"}]}},
+                {"type": "tool", "tool_call_id": "private-three", "content": "---\nname: search-first\n---\nactual skill instructions"}]}},
             {"type": "messages-tuple", "data": {"type": "tool", "tool_call_id": "private-two", "content": "Task completed"}},
         ]
         with tempfile.TemporaryDirectory() as tmp:
@@ -316,8 +351,8 @@ class DeerFlowRecipeTests(unittest.TestCase):
                     {"name": "read_file", "id": "loaded", "args": {"path": "/mnt/skills/legacy/search-first/SKILL.md"}},
                     {"name": "read_file", "id": "failed", "args": {"path": "/mnt/skills/legacy/verification-before-completion/SKILL.md"}}]},
                 {"type": "tool", "tool_call_id": "metadata", "content": "Skill metadata and path"},
-                {"type": "tool", "tool_call_id": "loaded", "content": "Actual instructions"},
-                {"type": "tool", "tool_call_id": "failed", "content": "Error: not found"}]}},
+                {"type": "tool", "tool_call_id": "loaded", "content": "---\nname: search-first\n---\nActual instructions"},
+                {"type": "tool", "tool_call_id": "failed", "content": "The requested SKILL.md could not be opened\nname: verification-before-completion\n"}]}},
         ]
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "events.jsonl"
@@ -327,10 +362,37 @@ class DeerFlowRecipeTests(unittest.TestCase):
         self.assertEqual(found["skill_reads_observed"], ["search-first"])
         self.assertFalse(found["required_skills_activated"])
 
+    def test_round3_usage_correlates_entry_gateway_once_and_separates_effort(self):
+        receipt = module("deerflow_usage", RECIPE / "e2e/receipt.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "entry.sqlite"
+            with closing(sqlite3.connect(db)) as conn, conn:
+                conn.execute("CREATE TABLE call_logs (timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning, correlation_id)")
+                conn.executemany("INSERT INTO call_logs VALUES (?,?,?,?,?,?,?,?,?,?)", [
+                    (1000, "/v1/responses", 200, "sharedgw/gpt-6-astra-max", "max", "max", 100, 60, 9, "private-a"),
+                    (1001, "/v1/responses", 200, "gpt-6-astra-max", None, None, 50, 10, 0, "private-b"),
+                    (1001, "/v1/responses", 200, "gpt-6-astra-max", "max", "max", 999, 0, 3, "unrelated"),
+                    (1001, "/other", 200, "gpt-6-astra-max", "max", "max", 999, 0, 3, "private-a"),
+                    (1001, "/v1/responses", 200, "gpt-6-sol-max", "max", "max", 999, 0, 3, "private-a"),
+                ])
+            result = receipt.gateway_observation(db, {"start_epoch":999, "end_epoch":1002,
+                "model":"sharedgw/gpt-6-astra-max", "arm":"engines-on"}, {"private-a", "private-b"})
+            self.assertEqual(len(result["rows"]), 2)
+            self.assertEqual(result["usage_total"]["tokens_in"], 150)
+            self.assertEqual(result["effort"]["with_reasoning_max"], 1)
+            self.assertEqual(result["effort"]["no_returned_reasoning"], 1)
+            self.assertNotIn("private-", json.dumps(result))
+            self.assertNotIn("correlation_id", json.dumps(result["rows"]))
+            fallback = receipt.gateway_observation(db, {"start_epoch":999, "end_epoch":1002,
+                "model":"sharedgw/gpt-6-astra-max", "arm":"engines-on"}, set())
+            self.assertEqual(len(fallback["rows"]), 3)
+            self.assertIsNone(fallback["usage_total"])
+            self.assertIn("time window + model + path", fallback["scope"])
+
     def test_model_context_and_container_contract(self):
         config = json.loads((RECIPE / "config.yaml.template").read_text())
         model = config["models"][0]
-        self.assertEqual(model["base_url"], "http://127.0.0.1:20128/v1")
+        self.assertEqual(model["base_url"], "$DEERFLOW_BASE_URL")
         self.assertEqual(model["model"], "$DEERFLOW_MODEL")
         self.assertEqual(json.loads((RECIPE / "defaults.json").read_text())["model"], "cx/gpt-6-astra-max")
         self.assertEqual(model["api_key"], "local-loopback")
@@ -413,6 +475,7 @@ class DeerFlowRecipeTests(unittest.TestCase):
             payload = {"input": [], "temperature": 0.0, "extra_headers": {"custom": "preserved"}}
             one, two = client._get_request_payload(payload), client._get_request_payload(payload)
             self.assertNotIn("temperature", one)
+            self.assertEqual(one["reasoning"]["effort"], "max")
             self.assertEqual(one["extra_headers"]["custom"], "preserved")
             self.assertEqual(one["extra_headers"]["x-omniroute-session"], two["extra_headers"]["x-omniroute-session"])
             self.assertNotEqual(one["extra_headers"]["Idempotency-Key"], two["extra_headers"]["Idempotency-Key"])
@@ -428,6 +491,40 @@ class DeerFlowRecipeTests(unittest.TestCase):
         for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-next-max", "gpt-6"):
             with self.assertRaises(ValueError):
                 renderer.worker_model({"model": model})
+
+    def test_round3_arms_render_endpoint_model_and_only_selected_header(self):
+        renderer = module("deerflow_arms", RECIPE / "recipe.py")
+        headers = module("deerflow_arm_headers", RECIPE / "runtime/gateway_headers.py")
+        for arm, model, port in (("control", "cx/gpt-6-astra-max", 20128),
+                                 ("engines-on", "sharedgw/gpt-6-astra-max", 20129)):
+            with patch.dict("os.environ", {"RUNTIME_WORKER_ARM": arm}):
+                selection = renderer.arm_settings({})
+                self.assertEqual(selection["arm"], arm)
+                self.assertEqual(selection["model"], model)
+                self.assertEqual(selection["base_url"], f"http://10.0.2.2:{port}/v1")
+                self.assertEqual(selection["host_base_url"], f"http://127.0.0.1:{port}/v1")
+                self.assertEqual(selection["reasoning_effort"], "max")
+                actual = headers.call_headers("same-thread")
+                self.assertNotIn("X-OmniRoute-No-Cache", actual)
+                self.assertEqual(actual.get("x-omniroute-compression"),
+                                 "allow-lossy" if arm == "engines-on" else None)
+                self.assertEqual(selection["header_names"], sorted(actual))
+                with tempfile.TemporaryDirectory() as tmp:
+                    settings = {"variables":{"ECO_ROOT":"/opt/eco", "HOST_PATH":"/usr/bin", "QDRANT_URL":"10.0.2.2:16333", "EMBED_URL":"10.0.2.2:18232"}, "mcp_mounts":[], "session_namespace":"fixture"}
+                    compose = renderer.render(settings, Path(tmp) / "prefix", Path(tmp) / "state")
+                    labels = compose["services"]["gateway"]["labels"]
+                    self.assertEqual(labels["com.native-agent-stack.arm"], arm)
+                    self.assertEqual(labels["com.native-agent-stack.model"], model)
+        self.assertEqual(renderer.worker_model({"model": "sharedgw/gpt-6-astra-max"}),
+                         "sharedgw/gpt-6-astra-max")
+        for value in ("sharedgw/cx/gpt-6-astra-max", "sharedgw/gpt-6-sol-max"):
+            with self.assertRaises(ValueError):
+                renderer.worker_model({"model": value})
+        with self.assertRaises(ValueError):
+            renderer.arm_settings({}, "invalid")
+        with self.assertRaises(ValueError):
+            renderer.arm_settings({"model": "sharedgw/gpt-6-astra-max"}, "control")
+
 
     def test_skills_use_coordinator_project_installer(self):
         renderer = module("deerflow_skills", RECIPE / "recipe.py")
@@ -457,11 +554,332 @@ class DeerFlowRecipeTests(unittest.TestCase):
         requirements = (RECIPE / "e2e/requirements.txt").read_text()
         self.assertIn("inspect-evals[gaia]==0.22.0", requirements)
         self.assertIn("inspect-ai==0.3.271", requirements)
-        launch = (RECIPE / "run-e2e.sh").read_text()
+        launch = (RECIPE / "run-e2e.sh").read_text() + (RECIPE / "e2e/evaluate.py").read_text()
         self.assertIn("grader/bin/inspect", launch)
         self.assertIn("gaia.py@deerflow_gaia", launch)
-        self.assertIn("--max-samples 1", launch)
+        self.assertIn('"--max-samples", "1"', launch)
         self.assertNotIn("check.py", launch)
+
+    def test_round3_inspect_launch_has_no_model_and_publishes_stable_result(self):
+        supervisor = module("deerflow_eval_supervisor", RECIPE / "e2e/evaluate.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            state, prefix = root / "state", root / "prefix"
+            state.mkdir()
+            (state / "host.json").write_text("{}")
+            def inspect(command, **kwargs):
+                self.assertEqual(command[command.index("--model") + 1], "none")
+                self.assertNotIn("--model-base-url", command)
+                self.assertEqual(command[command.index("--log-format") + 1], "json")
+                run = state / "runs/frozen-run"
+                self.assertTrue((run / "status.json").is_file())
+                logdir = Path(command[command.index("--log-dir") + 1])
+                logdir.mkdir(exist_ok=True)
+                (logdir / "native.json").write_text(json.dumps({"status":"success",
+                    "results":{"total_samples":1, "completed_samples":1,
+                        "scores":[{"name":"gaia_scorer", "metrics":{"accuracy":{"value":0}}}]}}))
+                return subprocess.CompletedProcess(command, 0)
+            with patch.object(supervisor, "STATE", state), patch.object(supervisor, "PREFIX", prefix), \
+                    patch.object(supervisor.subprocess, "run", inspect):
+                self.assertEqual(supervisor.evaluate("gaia-id", "frozen-run", "control", 1), 1)
+            result = json.loads((state / "runs/frozen-run/result.json").read_text())
+            self.assertEqual(result["verdict"], "negative")
+            self.assertEqual(result["inspect_exit_code"], 0)
+            self.assertTrue(Path(result["inspect_log"]).is_file())
+            self.assertEqual(result["arm"], "control")
+
+    def test_round3_inspect_verdict_rejects_incomplete_evidence(self):
+        supervisor = module("deerflow_eval_verdict", RECIPE / "e2e/evaluate.py")
+        success = {"status":"success", "results":{"total_samples":1,"completed_samples":1,
+            "scores":[{"name":"gaia_scorer", "metrics":{"accuracy":{"value":1}}}]}}
+        self.assertEqual(supervisor.verdict(success, False), (3, "incomplete"))
+        self.assertEqual(supervisor.verdict(success, True), (0, "pass"))
+        for missing in ({}, {"status":"error"}, {"status":"success", "results":{"scores":[]}}):
+            self.assertEqual(supervisor.verdict(missing, True), (3, "incomplete"))
+
+    def test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths(self):
+        dispatch = module("deerflow_dispatch", RECIPE / "dispatch.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            (state / "host.json").write_text("{}")
+            requests = []
+            status = "running"
+            def api(method, path, body=None, headers=None):
+                requests.append((method,path,body,headers))
+                if path == "/threads":
+                    self.assertTrue((state / "dispatch/stable/status.json").exists())
+                    return {"thread_id":"native-thread"}, "trace-thread"
+                if method == "POST" and path.endswith("/runs"):
+                    return {"thread_id":"native-thread", "run_id":"native-run", "status":"pending"}, "trace-run"
+                if path.endswith("/messages?limit=200"):
+                    # Native RunEvent envelope, journal.py:13,124,153-173.
+                    return {"data":[{"seq":1,"category":"message", "event_type":"llm.ai.response",
+                        "metadata":{"caller":"lead_agent"}, "content":{"type":"ai",
+                        "content":[{"type":"text","text":"answer"}],
+                        "response_metadata":{"headers":{"x-correlation-id":"private-correlation"}}}}], "has_more":False}, "trace-result"
+                if path.endswith("/cancel"):
+                    return {}, "trace-cancel"
+                return {"status":status,"llm_call_count":1,"total_input_tokens":12,
+                    "total_output_tokens":4,"total_tokens":16,"message_count":2,"stop_reason":"completed","updated_at":"2026-09-27T00:00:00Z"}, "trace-wait"
+            with patch.object(dispatch, "STATE", state), patch.object(dispatch, "api", api), \
+                    patch.object(dispatch, "require_server_arm"), \
+                    patch.object(dispatch, "gateway_observation", return_value={"evidence_complete":True,"usage_total":{"tokens_in":12}}):
+                code, pointers = dispatch.start("stable", "control", "question", "pro", "workflow/stage")
+                self.assertEqual(code, 0)
+                self.assertEqual(Path(pointers["result_path"]), state / "dispatch/stable/result.json")
+                post = requests[1]
+                self.assertEqual(post[0:2], ("POST", "/threads/native-thread/runs"))
+                self.assertEqual(post[2]["context"], {"thinking_enabled":True,"is_plan_mode":True,
+                    "subagent_enabled":False,"thread_id":"native-thread","model_name":"worker"})
+                self.assertEqual(post[2]["on_disconnect"], "continue")
+                self.assertEqual(post[2]["metadata"]["caller"], "workflow/stage")
+                self.assertIn("Idempotency-Key", post[3])
+                self.assertEqual(dispatch.wait_run("stable", "control", 0, 1)[0], 3)
+                status = "success"
+                wait_code, waited = dispatch.wait_run("stable", "control", 0, 1)
+                self.assertEqual(wait_code, 0)
+                self.assertEqual(waited["stop_reason"], "completed")
+                code, result = dispatch.result_run("stable", "control")
+                self.assertEqual(code, 0)
+                self.assertEqual(result["answer"], "answer")
+                receipt = json.loads((state / "dispatch/stable/receipt.json").read_text())
+                self.assertNotIn("private-correlation", json.dumps(receipt))
+                self.assertNotIn("native-run", json.dumps(receipt))
+                self.assertEqual(receipt["server_reported"]["llm_call_count"], 1)
+                with self.assertRaises(ValueError):
+                    dispatch.start("stable", "control", "another", "pro", "workflow/stage")
+                with self.assertRaises(ValueError):
+                    dispatch.result_run("stable", "engines-on")
+            ledger = (state / "dispatch.jsonl").read_text().splitlines()
+            self.assertEqual(len(ledger), 1)
+            self.assertEqual((state / "dispatch.jsonl").stat().st_mode & 0o777, 0o600)
+
+    def test_round3_dispatch_reports_negative_setup_and_missing_evidence(self):
+        dispatch = module("deerflow_dispatch_failures", RECIPE / "dispatch.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            (state / "host.json").write_text("{}")
+            with patch.object(dispatch, "STATE", state), patch.object(dispatch, "require_server_arm", side_effect=ValueError("wrong arm")):
+                code, value = dispatch.start("wrong-arm", "engines-on", "question", "ultra", "child")
+                self.assertEqual(code, 2)
+                self.assertTrue((state / "dispatch/wrong-arm/status.json").is_file())
+            with patch.object(dispatch, "STATE", state):
+                run = state / "dispatch/negative"
+                run.mkdir()
+                dispatch.write(run / "status.json", {"arm":"control", "thread_id":"t", "run_id":"r", "status":"running"})
+                with patch.object(dispatch, "api", return_value=({"status":"error"}, "trace")):
+                    self.assertEqual(dispatch.wait_run("negative", "control", 0, 1)[0], 1)
+                with patch.object(dispatch, "api", return_value=({"status":"interrupted"}, "trace")):
+                    self.assertEqual(dispatch.wait_run("negative", "control", 0, 1)[0], 3)
+
+    def test_round3_compression_deltas_are_separate_and_reject_counter_resets(self):
+        receipt = module("deerflow_compression", RECIPE / "e2e/receipt.py")
+        before = {"state":"observed", "totalRequests":5,"totalTokensSaved":100,"totalSkipped":2}
+        after = {"state":"observed", "totalRequests":7,"totalTokensSaved":140,"totalSkipped":3}
+        delta = receipt.compression_delta(before, after)
+        self.assertEqual(delta["delta"], {"totalRequests":2,"totalTokensSaved":40,"totalSkipped":1})
+        self.assertIn("not provider usage", delta["scope"])
+        self.assertIsNone(receipt.compression_delta(after, before)["delta"])
+        with patch.object(receipt, "urlopen", side_effect=AssertionError("control must not request analytics")):
+            self.assertEqual(receipt.compression_snapshot("control")["state"], "not_applicable")
+
+    def test_round3_grader_install_is_hash_locked_and_wheel_only(self):
+        renderer = module("deerflow_locked_grader", RECIPE / "recipe.py")
+        import hashlib
+        lock = RECIPE / "e2e/requirements.lock"
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        self.assertEqual(hashlib.sha256(lock.read_bytes()).hexdigest(), pins["grader"]["lock_sha256"])
+        for requirement in lock.read_text().replace("\\\n", "").splitlines():
+            if requirement.strip() and not requirement.lstrip().startswith("#"):
+                self.assertRegex(requirement, r"==[^ ]+.*--hash=sha256:[0-9a-f]{64}")
+        with tempfile.TemporaryDirectory() as tmp, patch.object(renderer.subprocess, "run") as run:
+            renderer.install_grader(Path(tmp))
+            install = next(c.args[0] for c in run.call_args_list if "install" in c.args[0])
+            for arg in ("--require-hashes", "--only-binary=:all:", "--no-deps"):
+                self.assertIn(arg, install)
+            self.assertEqual(install[-1], str(lock))
+
+    def test_round3_container_network_hardening_and_resolved_mount_guards(self):
+        renderer = module("deerflow_security", RECIPE / "recipe.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            settings = {"variables": {"ECO_ROOT": str(root / "eco"), "HOST_PATH": "/usr/bin",
+                        "QDRANT_URL": "10.0.2.2:16333", "EMBED_URL": "10.0.2.2:18232"},
+                        "mcp_mounts": [], "session_namespace": "fixture"}
+            compose = renderer.render(settings, root / "prefix", root / "state")
+            self.assertTrue(compose["networks"]["default"]["internal"])
+            self.assertEqual(compose["services"]["gateway"]["networks"], ["default"])
+            self.assertEqual(set(compose["services"]["egress"]["networks"]), {"default", "egress"})
+            for service in compose["services"].values():
+                self.assertEqual(service["cap_drop"], ["ALL"])
+                self.assertIn("no-new-privileges:true", service["security_opt"])
+                self.assertTrue(service["read_only"])
+            proxy = (root / "state/config/egress.conf").read_text()
+            self.assertIn("http://10.0.2.2:20128", proxy)
+            self.assertNotIn("20129", proxy)
+            self.assertIn("return 403", proxy)
+            self.assertIn("$upstream_http_x_correlation_id", proxy)
+            self.assertIn("proxy_buffering off", proxy)
+            ext = json.loads((root / "state/config/extensions_config.json").read_text())["mcpServers"]
+            self.assertFalse(ext["ai-memory"]["enabled"])
+            self.assertFalse(ext["socraticode"]["enabled"])
+            self.assertEqual(ext["serena"]["args"][ext["serena"]["args"].index("--enable-web-dashboard") + 1], "false")
+            home = root / "home"
+            forbidden = home / ".config/native-agent-stack"
+            forbidden.mkdir(parents=True)
+            allowed = root / "eco/bin"
+            allowed.parent.mkdir()
+            allowed.symlink_to(forbidden, target_is_directory=True)
+            with patch.object(renderer.Path, "home", return_value=home):
+                for source in (home.parent, home / ".config", forbidden, allowed):
+                    settings["mcp_mounts"] = [{"source":str(source), "target":str(source), "read_only":True}]
+                    with self.assertRaises(ValueError):
+                        renderer.render(settings, root / "prefix", root / "state")
+        self.assertIn("requirepass", (RECIPE / "runtime/redis-start.sh").read_text())
+
+    def test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm(self):
+        renderer = module("deerflow_lifecycle_arm", RECIPE / "recipe.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            state = root / "state"
+            state.mkdir()
+            (state / "host.json").write_text("{}")
+            run = state / "dispatch/active"
+            run.mkdir(parents=True)
+            (run / "status.json").write_text('{"status":"running"}')
+            with patch.object(renderer, "STATE", state), patch.object(renderer, "PREFIX", root / "prefix"), \
+                    patch.object(renderer, "require_rootless"), patch.object(renderer, "render") as render, \
+                    patch.object(renderer, "docker") as docker:
+                with self.assertRaises(ValueError):
+                    renderer.lifecycle("up")
+                docker.assert_not_called()
+                (run / "status.json").write_text('{"status":"success"}')
+                renderer.lifecycle("up")
+                render.assert_called_once()
+                self.assertIn("--force-recreate", docker.call_args.args)
+        template = json.loads((RECIPE / "config.yaml.template").read_text())
+        self.assertTrue(template["models"][0]["include_response_headers"])
+        self.assertEqual(template["models"][0]["openai_proxy"], "http://egress:3128")
+
+    def test_round3_nginx_and_preflight_match_hardened_configuration(self):
+        compose = json.loads((RECIPE / "compose.json.template").read_text())
+        self.assertFalse(any(m.startswith("/etc/nginx:") for m in compose["services"]["nginx"]["tmpfs"]))
+        self.assertEqual(compose["services"]["nginx"]["user"], "101:101")
+        script = (RECIPE / "runtime/nginx-start.sh").read_text()
+        self.assertIn("/tmp/nginx.conf", script)
+        self.assertIn("/tmp/nginx.pid", script)
+        preflight = (RECIPE / "runtime/preflight.py").read_text()
+        self.assertIn("server_config.enabled", preflight)
+
+    def test_round3_installed_entrypoints_have_their_local_dependencies(self):
+        renderer = module("deerflow_entrypoints", RECIPE / "recipe.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            prefix = Path(tmp)
+            renderer.install_entrypoints(prefix)
+            for name in ("deerflow-run", "dispatch.py", "recipe.py", "defaults.json", "pins.json", "run-e2e.sh", "lifecycle.sh", "egress.conf.template"):
+                self.assertEqual((prefix / name).read_bytes(), (RECIPE / name).read_bytes())
+            self.assertEqual((prefix / "deerflow-run").stat().st_mode & 0o777, 0o700)
+
+    def test_round3_dispatch_pat_uses_header_and_refuses_redirects_and_unsafe_token_files(self):
+        dispatch = module("deerflow_pat", RECIPE / "dispatch.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            token = root / "pat"
+            token.write_text("dfp_" + "a" * 40)
+            token.chmod(0o600)
+            class Response:
+                headers = {"X-Trace-Id":"private-trace"}
+                def __enter__(self): return self
+                def __exit__(self, *args): return False
+                def read(self, bound): return b'{"thread_id":"fixture"}'
+            class Opener:
+                def open(inner, request, timeout):
+                    self.assertEqual(request.full_url, "http://127.0.0.1:3771/api/langgraph/threads")
+                    self.assertEqual(request.get_header("Authorization"), "Bearer dfp_" + "a" * 40)
+                    return Response()
+            with patch.dict("os.environ", {"DEERFLOW_PAT_FILE":str(token), "DEERFLOW_URL":"http://127.0.0.1:3771"}), \
+                    patch.object(dispatch, "REPO", root / "checkout"), \
+                    patch.object(dispatch, "build_opener", return_value=Opener()):
+                self.assertEqual(dispatch.api("POST", "/threads", {})[0], {"thread_id":"fixture"})
+                token.chmod(0o644)
+                with self.assertRaises(ValueError):
+                    dispatch.api("POST", "/threads", {})
+                token.chmod(0o600)
+                with patch.dict("os.environ", {"DEERFLOW_URL":"http://example.com"}):
+                    with self.assertRaises(ValueError):
+                        dispatch.api("POST", "/threads", {})
+            self.assertIsNone(dispatch.NoRedirect().redirect_request(None, None, 302, None, {}, "http://example.com"))
+
+    def test_round3_dispatch_cli_accepts_prompt_after_options(self):
+        dispatch = module("deerflow_dispatch_cli", RECIPE / "dispatch.py")
+        with patch.object(sys, "argv", ["deerflow-run", "start", "--run-id", "frozen", "--arm", "control", "literal prompt"]), \
+                patch.object(dispatch, "start", return_value=(0, {"result_path":"fixture"})) as start:
+            self.assertEqual(dispatch.main(), 0)
+            start.assert_called_once_with("frozen", "control", "literal prompt", "pro", "claude-code/workflow")
+
+    def test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key(self):
+        dispatch = module("deerflow_dispatch_retry", RECIPE / "dispatch.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            (state / "host.json").write_text("{}")
+            keys = []
+            calls = 0
+            def api(method, path, body=None, headers=None):
+                nonlocal calls
+                if path == "/threads":
+                    return {"thread_id":"t"}, "trace"
+                keys.append(headers["Idempotency-Key"])
+                calls += 1
+                if calls == 1:
+                    raise TimeoutError("response lost after native create")
+                return {"run_id":"r", "status":"pending"}, "trace"
+            with patch.object(dispatch, "STATE", state), patch.object(dispatch, "api", api), patch.object(dispatch, "require_server_arm"):
+                code, pointers = dispatch.start("retry", "control", "prompt", "pro", "child")
+                self.assertEqual(code, 3)
+                self.assertEqual(json.loads((state / "dispatch/retry/status.json").read_text())["status"], "pending")
+                self.assertEqual(dispatch.start("retry", "control", "prompt", "pro", "child")[0], 0)
+            self.assertEqual(len(keys), 2)
+            self.assertEqual(keys[0], keys[1])
+            self.assertEqual(len((state / "dispatch.jsonl").read_text().splitlines()), 1)
+
+    def test_round3_missing_host_setup_still_writes_status_and_result(self):
+        dispatch = module("deerflow_missing_setup", RECIPE / "dispatch.py")
+        supervisor = module("deerflow_missing_grader_setup", RECIPE / "e2e/evaluate.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            with patch.object(dispatch, "STATE", state):
+                code, result = dispatch.start("missing", "control", "prompt", "pro", "child")
+                self.assertEqual(code, 2)
+                self.assertTrue((state / "dispatch/missing/status.json").is_file())
+                self.assertEqual(json.loads((state / "dispatch/missing/result.json").read_text())["exit_code"], 2)
+            with patch.object(supervisor, "STATE", state), patch.object(supervisor.subprocess, "run") as native:
+                self.assertEqual(supervisor.evaluate("frozen", "missing", "control", 1), 2)
+                native.assert_not_called()
+                self.assertTrue((state / "runs/missing/status.json").is_file())
+
+    def test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized(self):
+        receipt = module("deerflow_duplicate_correlation", RECIPE / "e2e/receipt.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            db = Path(tmp) / "duplicate.sqlite"
+            with closing(sqlite3.connect(db)) as conn, conn:
+                conn.execute("CREATE TABLE call_logs (timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning, correlation_id)")
+                conn.executemany("INSERT INTO call_logs VALUES (?,?,?,?,?,?,?,?,?,?)", [
+                    (1000,"/v1/responses",200,"gpt-6-astra-max","max","max",10,0,1,"duplicate"),
+                    (1000,"/v1/responses",200,"gpt-6-astra-max","max","max",20,0,1,"duplicate")])
+            found = receipt.gateway_observation(db, {"start_epoch":999,"end_epoch":1001,"model":"cx/gpt-6-astra-max"}, {"duplicate"})
+            self.assertIsNone(found["usage_total"])
+            self.assertFalse(found["evidence_complete"])
+        dispatch = module("deerflow_counter_sanitization", RECIPE / "dispatch.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp)
+            run = state / "dispatch/counters"
+            run.mkdir(parents=True)
+            dispatch.write(run / "status.json", {"arm":"control", "thread_id":"t", "run_id":"r"})
+            with patch.object(dispatch, "STATE", state), patch.object(dispatch, "api", return_value=(
+                    {"status":"success", "llm_call_count":"private-text", "total_tokens":-1}, "trace")):
+                code, result = dispatch.wait_run("counters", "control", 0, 1)
+                self.assertNotIn("private-text", json.dumps(result))
+                self.assertIsNone(result["total_tokens"])
 
     @unittest.skipUnless(importlib.util.find_spec("inspect_ai") and importlib.util.find_spec("inspect_evals"),
                          "pinned upstream grader unavailable; installation prohibited in builder")

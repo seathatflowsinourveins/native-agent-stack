@@ -31,7 +31,7 @@
     "sdist_sha256": "ee4480b787706361b7125fad46930589a624df87aa158c6986ef1fad10d10675",
     "url": "https://files.pythonhosted.org/packages/9a/0e/d8e16c28aa67106d285e63b8ffc04c5af68341e345ce24a0751dbf2e167e/langchain_openai-1.2.1.tar.gz",
     "file": "langchain_openai/chat_models/base.py",
-    "lines": "783, 1385-1411, 1683-1712, 3327-3345"
+    "lines": "668-670, 934-935, 1220-1242, 1404-1411, 1462-1469, 1683-1712, 3327-3345"
   },
   "grader": {
     "repository": "https://github.com/UKGovernmentBEIS/inspect_evals",
@@ -44,6 +44,11 @@
     "dataset_revision": "682dd723ee1e1697e00360edccf2366dc8418dd9",
     "split": "validation",
     "verdict": "unchanged inspect_evals.gaia.scorer.gaia_scorer",
-    "install_source": "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/src/inspect_evals/gaia/README.md"
+    "install_source": "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/src/inspect_evals/gaia/README.md",
+    "lock_file": "e2e/requirements.lock",
+    "lock_sha256": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+    "lock_python": "3.13",
+    "lock_platform": "x86_64-unknown-linux-gnu",
+    "lock_source": "astral-sh/uv@0.12.17 docs/pip/compile.md:24-28; installed uv pip compile --help --generate-hashes --no-build"
   }
 }

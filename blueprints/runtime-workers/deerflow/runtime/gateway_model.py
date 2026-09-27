@@ -34,4 +34,7 @@ class ChatOpenAI(UpstreamChatOpenAI):
             **(payload.get("extra_headers") or {}), **call_headers(scope)
         }
         payload.pop("temperature", None)
+        # Responses payload at langchain-openai@1.2.1 base.py:3327-3345.
+        # Force every lead, summary and child call to the round-3 max contract.
+        payload["reasoning"] = {**(payload.get("reasoning") or {}), "effort": "max"}
         return payload

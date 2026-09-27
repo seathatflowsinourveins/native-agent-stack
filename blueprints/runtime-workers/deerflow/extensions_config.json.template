@@ -31,7 +31,7 @@
         "--context",
         "codex",
         "--enable-web-dashboard",
-        "true",
+        "false",
         "--open-web-dashboard",
         "false",
         "--enable-gui-log-window",
@@ -78,7 +78,7 @@
       "tool_call_timeout": 120
     },
     "socraticode": {
-      "enabled": true,
+      "enabled": false,
       "type": "stdio",
       "command": "/runtime/stdio.sh",
       "args": [
@@ -108,7 +108,7 @@
       "tool_call_timeout": 120
     },
     "ai-memory": {
-      "enabled": true,
+      "enabled": false,
       "type": "http",
       "url": "http://10.0.2.2:49474/mcp",
       "tool_name_prefix": true,

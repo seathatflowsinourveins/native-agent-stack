@@ -10,8 +10,13 @@ def call_headers(scope):
     # calls. Interactive workers without this variable retain native thread scope.
     scope = os.environ.get("DEERFLOW_CONVERSATION_ID") or scope
     affinity = hashlib.sha256((namespace + ":" + str(scope)).encode()).hexdigest()
-    return {
+    arm = os.environ.get("RUNTIME_WORKER_ARM", "control")
+    if arm not in {"control", "engines-on"}:
+        raise ValueError("invalid runtime worker arm")
+    headers = {
         "x-omniroute-session": affinity,
         "Idempotency-Key": str(uuid.uuid4()),
-        "X-OmniRoute-No-Cache": "true",
     }
+    if arm == "engines-on":
+        headers["x-omniroute-compression"] = "allow-lossy"
+    return headers

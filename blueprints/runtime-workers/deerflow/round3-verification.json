@@ -1,0 +1,700 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "recipe": "deerflow",
+  "pull_request": 427,
+  "base": "b98a1cd5",
+  "branch": "claude/runtime-worker-deerflow-20260927",
+  "scope": "Offline single repair round. Synthetic integration tests and source/lock artifact checks only; no installation, containers, model calls or gateway requests.",
+  "sources": [
+    {
+      "key": "DF",
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "files": [
+        "skills/public/claude-to-deerflow/scripts/chat.sh:24-90,140-164",
+        "skills/public/claude-to-deerflow/SKILL.md:104-108",
+        "backend/app/gateway/routers/thread_runs.py:223-242,923-939,1143-1168,1528-1560",
+        "backend/app/gateway/pagination.py:6-15",
+        "backend/app/gateway/run_models.py:29-58",
+        "backend/app/gateway/auth/pat.py:28-40,53-116",
+        "backend/app/gateway/routers/auth.py:651-704",
+        "backend/app/gateway/csrf_middleware.py:230-234",
+        "backend/packages/harness/deerflow/runtime/journal.py:327-344,512-522",
+        "backend/packages/harness/deerflow/runtime/events/store/base.py:32-43,54-55",
+        "backend/packages/harness/deerflow/client.py:527-564",
+        "backend/packages/harness/deerflow/sandbox/local/local_sandbox.py:813-842",
+        "backend/packages/harness/deerflow/config/app_config.py:432,565",
+        "backend/packages/harness/deerflow/config/extensions_config.py:209-215,384-387,559-565",
+        "backend/packages/harness/deerflow/models/factory.py:248-285",
+        "backend/Dockerfile:94-127",
+        "docker/nginx/nginx.conf:79-82"
+      ]
+    },
+    {
+      "key": "IA",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "c2b63a0b0560f9c3b5b5230365e0a8fe08cd3df0 (0.3.271)",
+      "files": [
+        "src/inspect_ai/model/_providers/providers.py:361-365,379-391",
+        "src/inspect_ai/_cli/eval.py:1681-1682",
+        "src/inspect_ai/log/_log.py:798-820,848-895"
+      ]
+    },
+    {
+      "key": "IE",
+      "repository": "UKGovernmentBEIS/inspect_evals",
+      "pin": "41c72eaa2b807ce43f35fac6f3f399318adc7e9d (v0.22.0)",
+      "files": [
+        "src/inspect_evals/gaia/dataset.py:14-23,78-104",
+        "src/inspect_evals/gaia/scorer.py:24",
+        "src/inspect_evals/gaia/README.md",
+        "tests/gaia/test_scorer.py"
+      ]
+    },
+    {
+      "key": "LC",
+      "repository": "langchain-ai/langchain (published langchain-openai sdist)",
+      "pin": "langchain-openai==1.2.1; SHA256 ee4480b787706361b7125fad46930589a624df87aa158c6986ef1fad10d10675",
+      "files": [
+        "langchain_openai/chat_models/base.py:668-670,934-935,1220-1242,1404-1411,1462-1469,1683-1712,3327-3345"
+      ]
+    },
+    {
+      "key": "OR",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "files": [
+        "src/lib/usage/callLogs.ts:628-653,779-800",
+        "src/app/api/analytics/compression/route.ts:13-24",
+        "src/lib/db/compressionAnalytics.ts:52-82"
+      ],
+      "qualification": "Source base inspected; installed patched gateway parity and store ownership require coordinator verification. Header contract comes from the user-supplied common requirements."
+    },
+    {
+      "key": "CS",
+      "repository": "compose-spec/compose-spec",
+      "pin": "914ec15d1fa498969c0df5c1d672306db3256089",
+      "files": [
+        "06-networks.md:215-218",
+        "05-services.md:171-175,1839-1841,1955-1963,2029-2046,2080-2082"
+      ]
+    },
+    {
+      "key": "NG",
+      "repository": "nginx/nginx",
+      "pin": "release-1.28.0",
+      "files": [
+        "src/http/modules/ngx_http_proxy_module.c:305-358,417-457"
+      ],
+      "qualification": "Supported directive reference; existing nginx image digest reused. No binary/config execution this round."
+    },
+    {
+      "key": "RD",
+      "repository": "redis/redis",
+      "pin": "7.4.2",
+      "files": [
+        "redis.conf:1041-1050"
+      ]
+    },
+    {
+      "key": "SR",
+      "repository": "oraios/serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "files": [
+        "src/serena/cli.py:291-305,398-400"
+      ]
+    },
+    {
+      "key": "UV",
+      "repository": "astral-sh/uv",
+      "pin": "0.12.17",
+      "files": [
+        "docs/pip/compile.md:24-28",
+        "installed uv pip compile --help: --generate-hashes, --no-build, --only-binary, --python-version, --python-platform"
+      ],
+      "qualification": "Resolved metadata/lock only, no installation. Wheel-only constrained re-resolution reproduced the exact hash."
+    }
+  ],
+  "findings": [
+    {
+      "id": "D1",
+      "severity": "blocker",
+      "disposition": "fixed",
+      "finding": "Engines-on model rejected",
+      "evidence": "recipe.arm_settings; arm regression red exit 1 -> green 0; one-slash common requirement overrides review's two-slash proposal.",
+      "sources": [
+        "user common requirements §1",
+        "DF config/app_config.py:432,565"
+      ]
+    },
+    {
+      "id": "D2",
+      "severity": "blocker",
+      "disposition": "fixed",
+      "finding": "Base URL fixed to control",
+      "evidence": "$DEERFLOW_BASE_URL; derived per-arm environment; attempt window and receipts identify arm/model/base_url/header names.",
+      "sources": [
+        "DF config/app_config.py:432,565",
+        "LC base.py:668-670,1220-1242"
+      ]
+    },
+    {
+      "id": "D3",
+      "severity": "blocker",
+      "disposition": "fixed",
+      "finding": "Inspect OpenAI provider unnecessarily required",
+      "evidence": "e2e/evaluate.py uses --model none; removes key/base URL; supplies --metadata. Grader optional OpenAI import probe no longer gates this provider path.",
+      "sources": [
+        "IA providers.py:361-365,379-391"
+      ]
+    },
+    {
+      "id": "D4",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Unconditional no-cache disables engines-on cache",
+      "evidence": "No no-cache header. Compression header only engines-on; max effort and temperature omission tested.",
+      "sources": [
+        "LC base.py:1683-1712,3327-3345",
+        "user common requirements §1"
+      ]
+    },
+    {
+      "id": "D5",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "No stable machine-readable result",
+      "evidence": "Stable caller run ID; start status/result paths; official Inspect JSON path; native HTTP start/wait/result/cancel; four exit classes.",
+      "sources": [
+        "DF thread_runs.py:923-939,1143-1168,1528-1560",
+        "IA _cli/eval.py:1681-1682; log/_log.py:798-820,848-895"
+      ]
+    },
+    {
+      "id": "D6",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "Skill activation trusts omitted tool status",
+      "evidence": "Corrected serialization comment; bounded frontmatter name required; errors without failure prefix including a stray name line fail activation.",
+      "sources": [
+        "DF client.py:527-564; sandbox/local/local_sandbox.py:813-842"
+      ]
+    },
+    {
+      "id": "S2",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Model shell reaches other host loopback services",
+      "evidence": "Internal network plus separate fixed per-port nginx forwarder; no raw ai-memory/Qdrant endpoints enabled. Native network enforcement and host bridge paths unmeasured.",
+      "sources": [
+        "CS 06-networks.md:215-218",
+        "NG proxy module:305-358,417-457"
+      ]
+    },
+    {
+      "id": "S3",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "E2E inherits persistent tokens/state/network",
+      "evidence": "Fresh two-service Compose graph/project/networks; isolated writable state/work; host-retained QMD seed; no env_file/internal token/Redis connection. Persistent Redis requirepass added.",
+      "sources": [
+        "CS 06-networks.md:215-218",
+        "RD redis.conf:1041-1050"
+      ]
+    },
+    {
+      "id": "S4",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Grader transitive installation unlocked",
+      "evidence": "96-package hash lock, hash in pins.json, CPython 3.13 Linux x86_64; --require-hashes --only-binary=:all: --no-deps; pip check/version validation. Resolution is not installation acceptance.",
+      "sources": [
+        "UV docs/pip/compile.md:24-28 and installed CLI help",
+        "IE GAIA README"
+      ]
+    },
+    {
+      "id": "S6",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "Credential/ancestor/symlink mounts accepted",
+      "evidence": "Resolved dependency-root allowlist and protected-store ancestor/descendant denial; regression covers .config/native-agent-stack, home ancestor and symlink escape.",
+      "sources": [
+        "CS 05-services.md volume bind contract",
+        "repository docs/secret-storage.md"
+      ]
+    },
+    {
+      "id": "S9a",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "Container capability/privilege/root-filesystem hardening missing",
+      "evidence": "All services cap_drop ALL, no-new-privileges, read-only roots/tmpfs. nginx and egress run UID 101.",
+      "sources": [
+        "CS 05-services.md:171-175,1839-1841,1955-1963,2029-2046,2080-2082"
+      ]
+    },
+    {
+      "id": "S9b",
+      "severity": "common baseline",
+      "disposition": "declined",
+      "finding": "Blanket non-root UID for Gateway/frontend/Redis",
+      "evidence": "Current rootless binds and generated private configuration use host-owned 0700/0600 permissions; an arbitrary container UID would break access. Published backend source defaults to root. Keep rootless default UID with all caps dropped until coordinator qualifies mapped-UID/owned-bind lifecycle. Residual is documented, not an upstream non-root absence claim.",
+      "sources": [
+        "DF backend/Dockerfile:94-127",
+        "CS 05-services.md:2080-2082",
+        "recipe.py owned file permissions"
+      ]
+    },
+    {
+      "id": "S11",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "Serena dashboard enabled",
+      "evidence": "--enable-web-dashboard false; GUI/off and native command otherwise retained.",
+      "sources": [
+        "SR src/serena/cli.py:291-305,398-400"
+      ]
+    },
+    {
+      "id": "C2-C3",
+      "severity": "common requirements",
+      "disposition": "fixed",
+      "finding": "Per-arm usage, correlation and effort evidence",
+      "evidence": "Entry store only; private IDs joined/omitted; exact model/path/window fallback without attributed total; positive-reasoning max/nonmax/unknown categories; zero-reasoning count; separate compression delta.",
+      "sources": [
+        "OR callLogs.ts:628-653; compression route:13-24; compressionAnalytics.ts:52-82",
+        "LC base.py:934-935,1404-1411,1462-1469"
+      ]
+    },
+    {
+      "id": "C4-C5",
+      "severity": "common requirements",
+      "disposition": "fixed",
+      "finding": "Native dispatch, invocation accounting and receipt boundary",
+      "evidence": "PAT native background run API; stable artifacts/private ledger; native RunEvent envelopes and lead-agent result; independent SQL checks, host-captured forwarder log, all receipt paths outside model mounts. Actual OTel/native run reconciliation remains a host gate.",
+      "sources": [
+        "DF chat.sh:24-90,140-164; thread_runs.py:223-242,923-939,1143-1168,1528-1560; runtime/journal.py:512-522"
+      ]
+    }
+  ],
+  "path_sanitization": "Only path substrings are replaced in commands/output: the absolute worktree becomes <WORKTREE>, the private home becomes <HOST_HOME>, and ephemeral /tmp/tmp* directories become <TEMP>. Relative paths, failures, exits, skipped tests and timings are retained.",
+  "verification": [
+    {
+      "phase": "arms-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract -v",
+      "chunk_id": "d73758",
+      "wall_time_seconds": 0.171232108,
+      "exit_code": 1,
+      "original_token_count": 782,
+      "output": "test_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header) ... ERROR\ntest_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... FAIL\ntest_model_context_and_container_contract (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract) ... FAIL\n\n======================================================================\nERROR: test_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 438, in test_round3_arms_render_endpoint_model_and_only_selected_header\n    selection = renderer.arm_settings({})\n                ^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'deerflow_arms' has no attribute 'arm_settings'. Did you mean: 'host_settings'?\n\n======================================================================\nFAIL: test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 91, in test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped\n    self.assertEqual(config[\"models\"][0][\"base_url\"], \"$DEERFLOW_BASE_URL\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'http://10.0.2.2:20128/v1' != '$DEERFLOW_BASE_URL'\n- http://10.0.2.2:20128/v1\n+ $DEERFLOW_BASE_URL\n\n\n======================================================================\nFAIL: test_model_context_and_container_contract (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 333, in test_model_context_and_container_contract\n    self.assertEqual(model[\"base_url\"], \"$DEERFLOW_BASE_URL\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'http://127.0.0.1:20128/v1' != '$DEERFLOW_BASE_URL'\n- http://127.0.0.1:20128/v1\n+ $DEERFLOW_BASE_URL\n\n\n----------------------------------------------------------------------\nRan 3 tests in 0.106s\n\nFAILED (failures=2, errors=1)\n"
+    },
+    {
+      "phase": "effort-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling -v",
+      "chunk_id": "0a0947",
+      "wall_time_seconds": 0.033914534,
+      "exit_code": 1,
+      "original_token_count": 251,
+      "output": "test_gateway_structured_output_uses_upstream_tool_calling (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling) ... ERROR\n\n======================================================================\nERROR: test_gateway_structured_output_uses_upstream_tool_calling (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 416, in test_gateway_structured_output_uses_upstream_tool_calling\n    self.assertEqual(one[\"reasoning\"][\"effort\"], \"max\")\n                     ~~~^^^^^^^^^^^^^\nKeyError: 'reasoning'\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (errors=1)\n"
+    },
+    {
+      "phase": "arms-effort-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling -v",
+      "chunk_id": "721d81",
+      "wall_time_seconds": 0.159756963,
+      "exit_code": 0,
+      "original_token_count": 203,
+      "output": "test_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header) ... ok\ntest_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... ok\ntest_model_context_and_container_contract (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract) ... ok\ntest_gateway_structured_output_uses_upstream_tool_calling (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.082s\n\nOK\n"
+    },
+    {
+      "phase": "receipt-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns -v",
+      "chunk_id": "6835a0",
+      "wall_time_seconds": 0.113009107,
+      "exit_code": 1,
+      "original_token_count": 646,
+      "output": "test_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads) ... FAIL\ntest_round3_usage_correlates_entry_gateway_once_and_separates_effort (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort) ... ERROR\ntest_gateway_reader_is_read_only_and_uses_only_approved_columns (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... ok\n\n======================================================================\nERROR: test_round3_usage_correlates_entry_gateway_once_and_separates_effort (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 343, in test_round3_usage_correlates_entry_gateway_once_and_separates_effort\n    result = receipt.gateway_observation(db, {\"start_epoch\":999, \"end_epoch\":1002,\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'deerflow_usage' has no attribute 'gateway_observation'\n\n======================================================================\nFAIL: test_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 327, in test_native_trace_distinguishes_skill_inventory_metadata_and_loads\n    self.assertEqual(found[\"skill_reads_observed\"], [\"search-first\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['search-first', 'verification-before-completion'] != ['search-first']\n\nFirst list contains 1 additional elements.\nFirst extra element 1:\n'verification-before-completion'\n\n- ['search-first', 'verification-before-completion']\n+ ['search-first']\n\n----------------------------------------------------------------------\nRan 3 tests in 0.079s\n\nFAILED (failures=1, errors=1)\n"
+    },
+    {
+      "phase": "receipt-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns -v",
+      "chunk_id": "3b63da",
+      "wall_time_seconds": 0.149279305,
+      "exit_code": 0,
+      "original_token_count": 220,
+      "output": "test_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads) ... ok\ntest_native_trace_does_not_count_failed_children_as_completed (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed) ... ok\ntest_round3_usage_correlates_entry_gateway_once_and_separates_effort (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort) ... ok\ntest_gateway_reader_is_read_only_and_uses_only_approved_columns (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.107s\n\nOK\n"
+    },
+    {
+      "phase": "security-lock-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands -v",
+      "chunk_id": "674d6f",
+      "wall_time_seconds": 0.052472873,
+      "exit_code": 1,
+      "original_token_count": 1016,
+      "output": "test_round3_grader_install_is_hash_locked_and_wheel_only (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only) ... ERROR\ntest_round3_container_network_hardening_and_resolved_mount_guards (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards) ... ERROR\ntest_mcp_launches_preserve_the_adoption_commands (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands) ... FAIL\n\n======================================================================\nERROR: test_round3_grader_install_is_hash_locked_and_wheel_only (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 530, in test_round3_grader_install_is_hash_locked_and_wheel_only\n    self.assertEqual(hashlib.sha256(lock.read_bytes()).hexdigest(), pins[\"grader\"][\"lock_sha256\"])\n                                    ~~~~~~~~~~~~~~~^^\n  File \"<HOST_HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_abc.py\", line 625, in read_bytes\n    with self.open(mode='rb') as f:\n         ~~~~~~~~~^^^^^^^^^^^\n  File \"<HOST_HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/blueprints/runtime-workers/deerflow/e2e/requirements.lock'\n\n======================================================================\nERROR: test_round3_container_network_hardening_and_resolved_mount_guards (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 549, in test_round3_container_network_hardening_and_resolved_mount_guards\n    self.assertTrue(compose[\"networks\"][\"default\"][\"internal\"])\n                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nKeyError: 'internal'\n\n======================================================================\nFAIL: test_mcp_launches_preserve_the_adoption_commands (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 112, in test_mcp_launches_preserve_the_adoption_commands\n    self.assertEqual(ext[name][\"args\"], expected, name)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['${E[132 chars]d', 'true', '--open-web-dashboard', 'false', '[29 chars]lse'] != ['${E[132 chars]d', 'false', '--open-web-dashboard', 'false', [30 chars]lse']\n\nFirst differing element 8:\n'true'\n'false'\n\n  ['${ECO_ROOT}/bin/serena',\n   'start-mcp-server',\n   '--transport',\n   'stdio',\n   '--project-from-cwd',\n   '--context',\n   'codex',\n   '--enable-web-dashboard',\n-  'true',\n+  'false',\n   '--open-web-dashboard',\n   'false',\n   '--enable-gui-log-window',\n   'false'] : serena\n\n----------------------------------------------------------------------\nRan 3 tests in 0.023s\n\nFAILED (failures=1, errors=2)\n"
+    },
+    {
+      "phase": "security-lock-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands -v",
+      "chunk_id": "7aca96",
+      "wall_time_seconds": 0.05876648,
+      "exit_code": 0,
+      "original_token_count": 159,
+      "output": "test_round3_grader_install_is_hash_locked_and_wheel_only (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only) ... ok\ntest_round3_container_network_hardening_and_resolved_mount_guards (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards) ... ok\ntest_mcp_launches_preserve_the_adoption_commands (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.031s\n\nOK\n"
+    },
+    {
+      "phase": "isolation-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped -v",
+      "chunk_id": "31c77b",
+      "wall_time_seconds": 0.159801626,
+      "exit_code": 1,
+      "original_token_count": 519,
+      "output": "test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets) ... ERROR\ntest_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... FAIL\n\n======================================================================\nERROR: test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 273, in test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets\n    compose = runner.attempt_compose(settings, pins, prefix, state, run, \"aabbcc\", arm)\n              ^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'deerflow_attempt' has no attribute 'attempt_compose'\n\n======================================================================\nFAIL: test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 87, in test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped\n    self.assertTrue(target.is_file())\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true\n\n----------------------------------------------------------------------\nRan 2 tests in 0.125s\n\nFAILED (failures=1, errors=1)\n"
+    },
+    {
+      "phase": "isolation-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts -v",
+      "chunk_id": "59f6a9",
+      "wall_time_seconds": 0.225740596,
+      "exit_code": 0,
+      "original_token_count": 172,
+      "output": "test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets) ... ok\ntest_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... ok\ntest_transport_runs_owned_container_and_retains_failed_attempts (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.193s\n\nOK\n"
+    },
+    {
+      "phase": "inspect-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence -v",
+      "chunk_id": "bb5904",
+      "wall_time_seconds": 0.056748779,
+      "exit_code": 1,
+      "original_token_count": 816,
+      "output": "test_round3_inspect_launch_has_no_model_and_publishes_stable_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result) ... ERROR\ntest_round3_inspect_verdict_rejects_incomplete_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence) ... ERROR\n\n======================================================================\nERROR: test_round3_inspect_launch_has_no_model_and_publishes_stable_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 557, in test_round3_inspect_launch_has_no_model_and_publishes_stable_result\n    supervisor = module(\"deerflow_eval_supervisor\", RECIPE / \"e2e/evaluate.py\")\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 34, in module\n    spec.loader.exec_module(result)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1019, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1156, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1214, in get_data\nFileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/blueprints/runtime-workers/deerflow/e2e/evaluate.py'\n\n======================================================================\nERROR: test_round3_inspect_verdict_rejects_incomplete_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 585, in test_round3_inspect_verdict_rejects_incomplete_evidence\n    supervisor = module(\"deerflow_eval_verdict\", RECIPE / \"e2e/evaluate.py\")\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 34, in module\n    spec.loader.exec_module(result)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1019, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1156, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1214, in get_data\nFileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/blueprints/runtime-workers/deerflow/e2e/evaluate.py'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nFAILED (errors=2)\n"
+    },
+    {
+      "phase": "inspect-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins -v",
+      "chunk_id": "c9e422",
+      "wall_time_seconds": 0.064305654,
+      "exit_code": 1,
+      "original_token_count": 1778,
+      "output": "test_round3_inspect_launch_has_no_model_and_publishes_stable_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result) ... {\"status_path\": \"<TEMP>/state/runs/frozen-run/status.json\", \"result_path\": \"<TEMP>/state/runs/frozen-run/result.json\"}\n{\"result_path\": \"<TEMP>/state/runs/frozen-run/result.json\", \"exit_code\": 1}\nok\ntest_round3_inspect_verdict_rejects_incomplete_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence) ... ok\ntest_grader_install_and_launch_use_exact_upstream_pins (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins) ... FAIL\n\n======================================================================\nFAIL: test_grader_install_and_launch_use_exact_upstream_pins (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 552, in test_grader_install_and_launch_use_exact_upstream_pins\n    self.assertIn(\"gaia.py@deerflow_gaia\", launch)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'gaia.py@deerflow_gaia' not found in '#!/usr/bin/env bash\\n# Inspect AI@0.3.271 providers.py:361-365; log/_log.py:798-895.\\nset -euo pipefail\\numask 077\\nrecipe_dir=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\"\\nexport PYTHONDONTWRITEBYTECODE=1\\nexec python3 \"$recipe_dir/e2e/evaluate.py\" \"$@\"\\n\"\"\"Supervise unchanged Inspect GAIA scoring; never compute an answer score.\\n\\nInspect AI@0.3.271 model/_providers/providers.py:361-365 (none),\\n_cli/eval.py:1681-1682 (exit reports completion, not correctness),\\nlog/_log.py:798-820,848-895 (scores/metrics). Status and result are host-written.\\n\"\"\"\\nfrom __future__ import annotations\\n\\nimport argparse\\nimport json\\nimport os\\nfrom pathlib import Path\\nimport re\\nimport subprocess\\nimport sys\\n\\nsys.path.insert(0, str(Path(__file__).resolve().parents[1]))\\nfrom recipe import HERE, PREFIX, STATE, arm_settings, read, write\\n\\n\\ndef verdict(log, evidence_complete):\\n    results = log.get(\"results\") or {}\\n    if (log.get(\"status\") != \"success\" or not results.get(\"total_samples\")\\n            or results.get(\"completed_samples\") != results[\"total_samples\"]):\\n        return 3, \"incomplete\"\\n    scores = [s for s in results.get(\"scores\", []) if s.get(\"name\", \"\").split(\"/\")[-1] == \"gaia_scorer\"]\\n    if len(scores) != 1:\\n        return 3, \"incomplete\"\\n    value = scores[0].get(\"metrics\", {}).get(\"accuracy\", {}).get(\"value\")\\n    if type(value) not in (int, float) or not 0 <= value <= 1:\\n        return 3, \"incomplete\"\\n    if value < 1:\\n        return 1, \"negative\"\\n    return (0, \"pass\") if evidence_complete else (3, \"incomplete\")\\n\\n\\ndef evaluate(frozen_id, run_id, arm, epochs):\\n    if not re.fullmatch(r\"[A-Za-z0-9][A-Za-z0-9_-]{0,63}\", run_id) or not frozen_id or epochs < 1:\\n        raise ValueError(\"provide a safe stable run ID, a frozen GAIA ID and positive epochs\")\\n    selection = arm_settings(read(STATE / \"host.json\"), arm)\\n    run = STATE / \"runs\" / run_id\\n    run.mkdir(parents=True, mode=0o700, exist_ok=False)\\n    result_path = run / \"result.json\"\\n    write(run / \"status.json\", {\"status\":\"starting\", \"arm\":arm, \"result_path\":str(result_path)})\\n    write(result_path, {\"arm\":arm, \"verdict\":\"incomplete\", \"exit_code\":3})\\n    print(json.dumps({\"status_path\":str(run / \"status.json\"), \"result_path\":str(result_path)}), flush=True)\\n    logs = run / \"inspect\"\\n    logs.mkdir(mode=0o700)\\n    env = dict(os.environ, PYTHONDONTWRITEBYTECODE=\"1\", DEERFLOW_RUN_ID=run_id,\\n               RUNTIME_WORKER_ARM=arm, INSPECT_EVALS_CACHE_DIR=str(STATE / \"eval-cache\"))\\n    command = [str(PREFIX / \"grader/bin/inspect\"), \"eval\", str(HERE / \"e2e/gaia.py\") + \"@deerflow_gaia\",\\n               \"-T\", \"instance_ids=\" + frozen_id, \"--model\", \"none\", \"--max-samples\", \"1\",\\n               \"--epochs\", str(epochs), \"--log-format\", \"json\", \"--log-dir\", str(logs)]\\n    for name in (\"arm\", \"model\", \"base_url\"):\\n        command.extend([\"--metadata\", name + \"=\" + selection[name]])\\n    try:\\n        with (run / \"inspect-output.log\").open(\"w\") as output:\\n            completed = subprocess.run(command, env=env, stdout=output, stderr=subprocess.STDOUT, check=False)\\n        paths = sorted(logs.glob(\"*.json\"))\\n        log = read(paths[0]) if len(paths) == 1 else {}\\n        attempts = [read(p) for p in sorted(run.glob(\"attempt-*/receipt.json\"))]\\n        evidence = len(attempts) == epochs and all(\\n            a[\"transport\"][\"ok\"] and a[\"gateway\"].get(\"evidence_complete\")\\n            and a[\"observations\"][\"required_skills_activated\"]\\n            and all(v == \"absent\" for v in a[\"cleanup\"].values()) for a in attempts)\\n        code, label = verdict(log, evidence)\\n        if completed.returncode and code == 0:\\n            code, label = 3, \"incomplete\"\\n        result = {**selection, \"exit_code\":code, \"verdict\":label,\\n                  \"inspect_exit_code\":completed.returncode,\\n                  \"inspect_log\":str(paths[0]) if len(paths) == 1 else None,\\n                  \"receipt_path\":str(run / \"receipt.json\")}\\n        write(run / \"receipt.json\", {**selection, \"grader\":{\\n            \"name\":\"inspect_evals.gaia.gaia_scorer\", \"version\":\"0.22.0\",\\n            \"verdict\":label, \"accuracy\":next((s.get(\"metrics\", {}).get(\"accuracy\", {}).get(\"value\")\\n                for s in (log.get(\"results\") or {}).get(\"scores\", []) if s.get(\"name\", \"\").split(\"/\")[-1] == \"gaia_scorer\"), None)},\\n            \"attempts\":attempts})\\n    except (OSError, ValueError, KeyError):\\n        code = 2\\n        result = {**selection, \"exit_code\":code, \"verdict\":\"setup-failure\"}\\n    write(result_path, result)\\n    write(run / \"status.json\", {\"status\":result[\"verdict\"], \"arm\":arm, \"result_path\":str(result_path), \"exit_code\":code})\\n    print(json.dumps({\"result_path\":str(result_path), \"exit_code\":code}), flush=True)\\n    return code\\n\\n\\ndef main():\\n    parser = argparse.ArgumentParser(description=__doc__)\\n    parser.add_argument(\"frozen_id\")\\n    parser.add_argument(\"run_id\")\\n    parser.add_argument(\"--arm\", choices=(\"control\", \"engines-on\"), default=os.environ.get(\"RUNTIME_WORKER_ARM\", \"control\"))\\n    parser.add_argument(\"--epochs\", type=int, default=int(os.environ.get(\"DEERFLOW_EPOCHS\", \"1\")))\\n    args = parser.parse_args()\\n    os.umask(0o077)\\n    try:\\n        return evaluate(args.frozen_id, args.run_id, args.arm, args.epochs)\\n    except (OSError, ValueError):\\n        print(json.dumps({\"exit_code\":2, \"verdict\":\"setup-failure\"}))\\n        return 2\\n\\n\\nif __name__ == \"__main__\":\\n    raise SystemExit(main())\\n'\n\n----------------------------------------------------------------------\nRan 3 tests in 0.028s\n\nFAILED (failures=1)\n"
+    },
+    {
+      "phase": "inspect-green-corrected",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins -v",
+      "chunk_id": "aa7e4d",
+      "wall_time_seconds": 0.048268152,
+      "exit_code": 0,
+      "original_token_count": 219,
+      "output": "test_round3_inspect_launch_has_no_model_and_publishes_stable_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result) ... {\"status_path\": \"<TEMP>/state/runs/frozen-run/status.json\", \"result_path\": \"<TEMP>/state/runs/frozen-run/result.json\"}\n{\"result_path\": \"<TEMP>/state/runs/frozen-run/result.json\", \"exit_code\": 1}\nok\ntest_round3_inspect_verdict_rejects_incomplete_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence) ... ok\ntest_grader_install_and_launch_use_exact_upstream_pins (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.026s\n\nOK\n"
+    },
+    {
+      "phase": "dispatch-compression-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets -v",
+      "chunk_id": "3d705e",
+      "wall_time_seconds": 0.052958389,
+      "exit_code": 1,
+      "original_token_count": 1085,
+      "output": "test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ERROR\ntest_round3_dispatch_reports_negative_setup_and_missing_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence) ... ERROR\ntest_round3_compression_deltas_are_separate_and_reject_counter_resets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets) ... ERROR\n\n======================================================================\nERROR: test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 594, in test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths\n    dispatch = module(\"deerflow_dispatch\", RECIPE / \"dispatch.py\")\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 34, in module\n    spec.loader.exec_module(result)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1019, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1156, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1214, in get_data\nFileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/blueprints/runtime-workers/deerflow/dispatch.py'\n\n======================================================================\nERROR: test_round3_dispatch_reports_negative_setup_and_missing_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 646, in test_round3_dispatch_reports_negative_setup_and_missing_evidence\n    dispatch = module(\"deerflow_dispatch_failures\", RECIPE / \"dispatch.py\")\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 34, in module\n    spec.loader.exec_module(result)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1019, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1156, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1214, in get_data\nFileNotFoundError: [Errno 2] No such file or directory: '<WORKTREE>/blueprints/runtime-workers/deerflow/dispatch.py'\n\n======================================================================\nERROR: test_round3_compression_deltas_are_separate_and_reject_counter_resets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 667, in test_round3_compression_deltas_are_separate_and_reject_counter_resets\n    delta = receipt.compression_delta(before, after)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'deerflow_compression' has no attribute 'compression_delta'\n\n----------------------------------------------------------------------\nRan 3 tests in 0.006s\n\nFAILED (errors=3)\n"
+    },
+    {
+      "phase": "dispatch-compression-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets -v",
+      "chunk_id": "d3d310",
+      "wall_time_seconds": 0.072376121,
+      "exit_code": 0,
+      "original_token_count": 179,
+      "output": "test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ok\ntest_round3_dispatch_reports_negative_setup_and_missing_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence) ... ok\ntest_round3_compression_deltas_are_separate_and_reject_counter_resets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.034s\n\nOK\n"
+    },
+    {
+      "phase": "intermediate-suite",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow -v",
+      "chunk_id": "9e5b63",
+      "wall_time_seconds": 0.54459489,
+      "exit_code": 0,
+      "original_token_count": 1514,
+      "output": "test_adapter_preserves_known_pass_and_fail_without_a_local_verdict (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_adapter_preserves_known_pass_and_fail_without_a_local_verdict) ... ok\ntest_adapter_rejects_missing_malformed_and_unfinished_output (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_adapter_rejects_missing_malformed_and_unfinished_output) ... ok\ntest_gateway_headers_preserve_affinity_and_new_call_identity (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_headers_preserve_affinity_and_new_call_identity) ... ok\ntest_gateway_reader_is_read_only_and_uses_only_approved_columns (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... ok\ntest_gateway_rejects_non_gpt6_model_routes (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_rejects_non_gpt6_model_routes) ... ok\ntest_gateway_structured_output_uses_upstream_tool_calling (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling) ... ok\ntest_grader_install_and_launch_use_exact_upstream_pins (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins) ... ok\ntest_inspect_solver_transports_only_input_and_preserves_upstream_task (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_inspect_solver_transports_only_input_and_preserves_upstream_task) ... ok\ntest_literal_cleanup_continues_after_already_absent_resource (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource) ... ok\ntest_mcp_launches_preserve_the_adoption_commands (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands) ... ok\ntest_model_context_and_container_contract (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract) ... ok\ntest_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads) ... ok\ntest_native_trace_does_not_count_failed_children_as_completed (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed) ... ok\ntest_owned_compose_resources_and_loopback_ports (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_owned_compose_resources_and_loopback_ports) ... ok\ntest_pins_and_script_boundaries (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_pins_and_script_boundaries) ... ok\ntest_real_upstream_gaia_known_pass_and_fail_controls (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_real_upstream_gaia_known_pass_and_fail_controls) ... skipped 'pinned upstream grader unavailable; installation prohibited in builder'\ntest_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... ok\ntest_reviewable_recipe_and_empty_result_rejection (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) ... ok\ntest_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header) ... ok\ntest_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets) ... ok\ntest_round3_compression_deltas_are_separate_and_reject_counter_resets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets) ... ok\ntest_round3_container_network_hardening_and_resolved_mount_guards (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards) ... ok\ntest_round3_dispatch_reports_negative_setup_and_missing_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence) ... ok\ntest_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ok\ntest_round3_grader_install_is_hash_locked_and_wheel_only (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only) ... ok\ntest_round3_inspect_launch_has_no_model_and_publishes_stable_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result) ... {\"status_path\": \"<TEMP>/state/runs/frozen-run/status.json\", \"result_path\": \"<TEMP>/state/runs/frozen-run/result.json\"}\n{\"result_path\": \"<TEMP>/state/runs/frozen-run/result.json\", \"exit_code\": 1}\nok\ntest_round3_inspect_verdict_rejects_incomplete_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence) ... ok\ntest_round3_usage_correlates_entry_gateway_once_and_separates_effort (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort) ... ok\ntest_skills_use_coordinator_project_installer (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_skills_use_coordinator_project_installer) ... ok\ntest_tool_limits_are_enforced_not_only_described (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_tool_limits_are_enforced_not_only_described) ... ok\ntest_transport_runs_owned_container_and_retains_failed_attempts (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts) ... ok\n\n----------------------------------------------------------------------\nRan 31 tests in 0.510s\n\nOK (skipped=1)\n"
+    },
+    {
+      "phase": "lifecycle-red-pat-controls",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_pat_uses_header_and_refuses_redirects_and_unsafe_token_files -v",
+      "chunk_id": "5c05d4",
+      "wall_time_seconds": 0.077879105,
+      "exit_code": 1,
+      "original_token_count": 1273,
+      "output": "test_literal_cleanup_continues_after_already_absent_resource (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource) ... FAIL\ntest_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header) ... ERROR\ntest_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm) ... FAIL\ntest_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration) ... FAIL\ntest_round3_dispatch_pat_uses_header_and_refuses_redirects_and_unsafe_token_files (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_pat_uses_header_and_refuses_redirects_and_unsafe_token_files) ... ok\n\n======================================================================\nERROR: test_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 515, in test_round3_arms_render_endpoint_model_and_only_selected_header\n    self.assertEqual(labels[\"com.native-agent-stack.arm\"], arm)\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nKeyError: 'com.native-agent-stack.arm'\n\n======================================================================\nFAIL: test_literal_cleanup_continues_after_already_absent_resource (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 67, in test_literal_cleanup_continues_after_already_absent_resource\n    self.assertEqual([c[-1] for c in calls], [\"rw-deerflow-nginx\", \"rw-deerflow-frontend\", \"rw-deerflow-gateway\", \"rw-deerflow-redis\", \"rw-deerflow-egress\", \"rw-deerflow-network\", \"rw-deerflow-egress-network\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['rw-[93 chars]flow-network'] != ['rw-[93 chars]flow-egress', 'rw-deerflow-network', 'rw-deerf[15 chars]ork']\n\nFirst differing element 4:\n'rw-deerflow-network'\n'rw-deerflow-egress'\n\nSecond list contains 2 additional elements.\nFirst extra element 5:\n'rw-deerflow-network'\n\n  ['rw-deerflow-nginx',\n   'rw-deerflow-frontend',\n   'rw-deerflow-gateway',\n   'rw-deerflow-redis',\n+  'rw-deerflow-egress',\n-  'rw-deerflow-network']\n?                       ^\n\n+  'rw-deerflow-network',\n?                       ^\n\n+  'rw-deerflow-egress-network']\n\n======================================================================\nFAIL: test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 747, in test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm\n    with self.assertRaises(ValueError):\n         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 760, in test_round3_nginx_and_preflight_match_hardened_configuration\n    self.assertFalse(any(m.startswith(\"/etc/nginx:\") for m in compose[\"services\"][\"nginx\"][\"tmpfs\"]))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: True is not false\n\n----------------------------------------------------------------------\nRan 5 tests in 0.040s\n\nFAILED (failures=3, errors=1)\n"
+    },
+    {
+      "phase": "entrypoint-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_installed_entrypoints_have_their_local_dependencies -v",
+      "chunk_id": "c7fd47",
+      "wall_time_seconds": 0.052521425,
+      "exit_code": 1,
+      "original_token_count": 270,
+      "output": "test_round3_installed_entrypoints_have_their_local_dependencies (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_installed_entrypoints_have_their_local_dependencies) ... ERROR\n\n======================================================================\nERROR: test_round3_installed_entrypoints_have_their_local_dependencies (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_installed_entrypoints_have_their_local_dependencies)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 771, in test_round3_installed_entrypoints_have_their_local_dependencies\n    renderer.install_entrypoints(prefix)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'deerflow_entrypoints' has no attribute 'install_entrypoints'\n\n----------------------------------------------------------------------\nRan 1 test in 0.015s\n\nFAILED (errors=1)\n"
+    },
+    {
+      "phase": "lifecycle-entrypoint-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_installed_entrypoints_have_their_local_dependencies -v",
+      "chunk_id": "ca9243",
+      "wall_time_seconds": 0.075821786,
+      "exit_code": 0,
+      "original_token_count": 266,
+      "output": "test_literal_cleanup_continues_after_already_absent_resource (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource) ... ok\ntest_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header) ... ok\ntest_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm) ... ok\ntest_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration) ... ok\ntest_round3_installed_entrypoints_have_their_local_dependencies (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_installed_entrypoints_have_their_local_dependencies) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.040s\n\nOK\n"
+    },
+    {
+      "phase": "intermediate-validator",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "chunk_id": "c0b056",
+      "wall_time_seconds": 10.001325848,
+      "session_id": 75192,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "phase": "intermediate-validator-completion",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "chunk_id": "2e0574",
+      "wall_time_seconds": 0.0000029,
+      "exit_code": 1,
+      "original_token_count": 563,
+      "output": "Publication validation failed:\nblueprints/runtime-workers/deerflow/compose.json.template: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/compose.json.template: byte count mismatch\nblueprints/runtime-workers/deerflow/config.yaml.template: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/config.yaml.template: byte count mismatch\nblueprints/runtime-workers/deerflow/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/deerflow/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/deerflow/extensions_config.json.template: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/extensions_config.json.template: byte count mismatch\nblueprints/runtime-workers/deerflow/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/pins.json: byte count mismatch\nblueprints/runtime-workers/deerflow/recipe.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/recipe.py: byte count mismatch\nblueprints/runtime-workers/deerflow/run-e2e.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/run-e2e.sh: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway-start.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway-start.sh: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_headers.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_headers.py: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_model.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_model.py: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/nginx-start.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/nginx-start.sh: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/preflight.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/preflight.py: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/redis-start.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/redis-start.sh: byte count mismatch\ntests/test_runtime_worker_deerflow.py: SHA-256 mismatch\ntests/test_runtime_worker_deerflow.py: byte count mismatch\n"
+    },
+    {
+      "phase": "robustness-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_cli_accepts_prompt_after_options tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized -v",
+      "chunk_id": "f94694",
+      "wall_time_seconds": 0.078121837,
+      "exit_code": 1,
+      "original_token_count": 348,
+      "output": "test_round3_dispatch_cli_accepts_prompt_after_options (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_cli_accepts_prompt_after_options) ... ok\ntest_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized) ... FAIL\n\n======================================================================\nFAIL: test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 823, in test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized\n    self.assertIsNone(found[\"usage_total\"])\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'tokens_in': 10, 'tokens_cache_read': 0, 'tokens_reasoning': 1} is not None\n\n----------------------------------------------------------------------\nRan 2 tests in 0.047s\n\nFAILED (failures=1)\n{\"result_path\": \"fixture\"}\n"
+    },
+    {
+      "phase": "robustness-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_cli_accepts_prompt_after_options tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized -v",
+      "chunk_id": "4a4991",
+      "wall_time_seconds": 0.127265829,
+      "exit_code": 0,
+      "original_token_count": 132,
+      "output": "test_round3_dispatch_cli_accepts_prompt_after_options (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_cli_accepts_prompt_after_options) ... ok\ntest_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.050s\n\nOK\n{\"result_path\": \"fixture\"}\n"
+    },
+    {
+      "phase": "stop-reason-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths -v",
+      "chunk_id": "f123a6",
+      "wall_time_seconds": 0.065351898,
+      "exit_code": 1,
+      "original_token_count": 277,
+      "output": "test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ERROR\n\n======================================================================\nERROR: test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 637, in test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths\n    self.assertEqual(waited[\"stop_reason\"], \"completed\")\n                     ~~~~~~^^^^^^^^^^^^^^^\nKeyError: 'stop_reason'\n\n----------------------------------------------------------------------\nRan 1 test in 0.027s\n\nFAILED (errors=1)\n"
+    },
+    {
+      "phase": "stop-reason-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths -v",
+      "chunk_id": "f02841",
+      "wall_time_seconds": 0.074802465,
+      "exit_code": 0,
+      "original_token_count": 79,
+      "output": "test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.028s\n\nOK\n"
+    },
+    {
+      "phase": "ambiguous-start-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key -v",
+      "chunk_id": "3acdea",
+      "wall_time_seconds": 0.071276189,
+      "exit_code": 1,
+      "original_token_count": 269,
+      "output": "test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key) ... FAIL\n\n======================================================================\nFAIL: test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 834, in test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key\n    self.assertEqual(code, 3)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^\nAssertionError: 2 != 3\n\n----------------------------------------------------------------------\nRan 1 test in 0.026s\n\nFAILED (failures=1)\n"
+    },
+    {
+      "phase": "ambiguous-start-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key -v",
+      "chunk_id": "131a32",
+      "wall_time_seconds": 0.073788582,
+      "exit_code": 0,
+      "original_token_count": 80,
+      "output": "test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.028s\n\nOK\n"
+    },
+    {
+      "phase": "nginx-uid-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration -v",
+      "chunk_id": "e61213",
+      "wall_time_seconds": 0.032922298,
+      "exit_code": 1,
+      "original_token_count": 262,
+      "output": "test_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration) ... ERROR\n\n======================================================================\nERROR: test_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 764, in test_round3_nginx_and_preflight_match_hardened_configuration\n    self.assertEqual(compose[\"services\"][\"nginx\"][\"user\"], \"101:101\")\n                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\nKeyError: 'user'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (errors=1)\n"
+    },
+    {
+      "phase": "nginx-uid-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration -v",
+      "chunk_id": "810079",
+      "wall_time_seconds": 0.033139918,
+      "exit_code": 0,
+      "original_token_count": 71,
+      "output": "test_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n"
+    },
+    {
+      "phase": "setup-status-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_missing_host_setup_still_writes_status_and_result -v",
+      "chunk_id": "22d44d",
+      "wall_time_seconds": 0.073146424,
+      "exit_code": 1,
+      "original_token_count": 643,
+      "output": "test_round3_missing_host_setup_still_writes_status_and_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_missing_host_setup_still_writes_status_and_result) ... ERROR\n\n======================================================================\nERROR: test_round3_missing_host_setup_still_writes_status_and_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_missing_host_setup_still_writes_status_and_result)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 848, in test_round3_missing_host_setup_still_writes_status_and_result\n    code, result = dispatch.start(\"missing\", \"control\", \"prompt\", \"pro\", \"child\")\n                   ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<WORKTREE>/blueprints/runtime-workers/deerflow/dispatch.py\", line 103, in start\n    selection = arm_settings(read(STATE / \"host.json\"), arm)\n                             ~~~~^^^^^^^^^^^^^^^^^^^^^\n  File \"<WORKTREE>/blueprints/runtime-workers/deerflow/recipe.py\", line 33, in read\n    return json.loads(Path(path).read_text())\n                      ~~~~~~~~~~~~~~~~~~~~^^\n  File \"<HOST_HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<HOST_HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<HOST_HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '<TEMP>/host.json'\n\n----------------------------------------------------------------------\nRan 1 test in 0.026s\n\nFAILED (errors=1)\n"
+    },
+    {
+      "phase": "setup-status-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_missing_host_setup_still_writes_status_and_result -v",
+      "chunk_id": "62dc67",
+      "wall_time_seconds": 0.091416579,
+      "exit_code": 0,
+      "original_token_count": 121,
+      "output": "test_round3_missing_host_setup_still_writes_status_and_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_missing_host_setup_still_writes_status_and_result) ... {\"status_path\": \"<TEMP>/runs/missing/status.json\", \"result_path\": \"<TEMP>/runs/missing/result.json\"}\n{\"result_path\": \"<TEMP>/runs/missing/result.json\", \"exit_code\": 2}\nok\n\n----------------------------------------------------------------------\nRan 1 test in 0.026s\n\nOK\n"
+    },
+    {
+      "phase": "native-message-envelope-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths -v",
+      "chunk_id": "96bf3c",
+      "wall_time_seconds": 0.06742216,
+      "exit_code": 1,
+      "original_token_count": 267,
+      "output": "test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... FAIL\n\n======================================================================\nFAIL: test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 643, in test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths\n    self.assertEqual(code, 0)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^\nAssertionError: 3 != 0\n\n----------------------------------------------------------------------\nRan 1 test in 0.026s\n\nFAILED (failures=1)\n"
+    },
+    {
+      "phase": "native-message-envelope-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths -v",
+      "chunk_id": "336a94",
+      "wall_time_seconds": 0.061383611,
+      "exit_code": 0,
+      "original_token_count": 79,
+      "output": "test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.026s\n\nOK\n"
+    },
+    {
+      "phase": "frontmatter-red",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads -v",
+      "chunk_id": "1237cb",
+      "wall_time_seconds": 0.049780271,
+      "exit_code": 1,
+      "original_token_count": 337,
+      "output": "test_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads) ... FAIL\n\n======================================================================\nFAIL: test_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 362, in test_native_trace_distinguishes_skill_inventory_metadata_and_loads\n    self.assertEqual(found[\"skill_reads_observed\"], [\"search-first\"])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['search-first', 'verification-before-completion'] != ['search-first']\n\nFirst list contains 1 additional elements.\nFirst extra element 1:\n'verification-before-completion'\n\n- ['search-first', 'verification-before-completion']\n+ ['search-first']\n\n----------------------------------------------------------------------\nRan 1 test in 0.015s\n\nFAILED (failures=1)\n"
+    },
+    {
+      "phase": "frontmatter-green",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads -v",
+      "chunk_id": "7134e3",
+      "wall_time_seconds": 0.05724076,
+      "exit_code": 0,
+      "original_token_count": 74,
+      "output": "test_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.014s\n\nOK\n"
+    },
+    {
+      "phase": "final-suite",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3-tmp\" python3 -m unittest tests.test_runtime_worker_deerflow -v",
+      "chunk_id": "b0b88c",
+      "wall_time_seconds": 0.461853093,
+      "exit_code": 0,
+      "original_token_count": 2161,
+      "output": "test_adapter_preserves_known_pass_and_fail_without_a_local_verdict (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_adapter_preserves_known_pass_and_fail_without_a_local_verdict) ... ok\ntest_adapter_rejects_missing_malformed_and_unfinished_output (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_adapter_rejects_missing_malformed_and_unfinished_output) ... ok\ntest_gateway_headers_preserve_affinity_and_new_call_identity (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_headers_preserve_affinity_and_new_call_identity) ... ok\ntest_gateway_reader_is_read_only_and_uses_only_approved_columns (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... ok\ntest_gateway_rejects_non_gpt6_model_routes (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_rejects_non_gpt6_model_routes) ... ok\ntest_gateway_structured_output_uses_upstream_tool_calling (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling) ... ok\ntest_grader_install_and_launch_use_exact_upstream_pins (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins) ... ok\ntest_inspect_solver_transports_only_input_and_preserves_upstream_task (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_inspect_solver_transports_only_input_and_preserves_upstream_task) ... ok\ntest_literal_cleanup_continues_after_already_absent_resource (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource) ... ok\ntest_mcp_launches_preserve_the_adoption_commands (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands) ... ok\ntest_model_context_and_container_contract (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract) ... ok\ntest_native_trace_distinguishes_skill_inventory_metadata_and_loads (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads) ... ok\ntest_native_trace_does_not_count_failed_children_as_completed (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed) ... ok\ntest_owned_compose_resources_and_loopback_ports (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_owned_compose_resources_and_loopback_ports) ... ok\ntest_pins_and_script_boundaries (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_pins_and_script_boundaries) ... ok\ntest_real_upstream_gaia_known_pass_and_fail_controls (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_real_upstream_gaia_known_pass_and_fail_controls) ... skipped 'pinned upstream grader unavailable; installation prohibited in builder'\ntest_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... ok\ntest_reviewable_recipe_and_empty_result_rejection (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) ... ok\ntest_round3_arms_render_endpoint_model_and_only_selected_header (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_arms_render_endpoint_model_and_only_selected_header) ... ok\ntest_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_attempt_has_fresh_state_and_network_and_no_stack_secrets) ... ok\ntest_round3_compression_deltas_are_separate_and_reject_counter_resets (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_compression_deltas_are_separate_and_reject_counter_resets) ... ok\ntest_round3_container_network_hardening_and_resolved_mount_guards (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_container_network_hardening_and_resolved_mount_guards) ... ok\ntest_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_ambiguous_start_is_incomplete_and_retries_same_native_key) ... ok\ntest_round3_dispatch_cli_accepts_prompt_after_options (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_cli_accepts_prompt_after_options) ... ok\ntest_round3_dispatch_pat_uses_header_and_refuses_redirects_and_unsafe_token_files (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_pat_uses_header_and_refuses_redirects_and_unsafe_token_files) ... ok\ntest_round3_dispatch_reports_negative_setup_and_missing_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_reports_negative_setup_and_missing_evidence) ... ok\ntest_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_dispatch_start_wait_result_uses_pat_native_runs_and_stable_paths) ... ok\ntest_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_duplicate_correlation_is_incomplete_and_dispatch_counts_are_sanitized) ... ok\ntest_round3_grader_install_is_hash_locked_and_wheel_only (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_grader_install_is_hash_locked_and_wheel_only) ... ok\ntest_round3_inspect_launch_has_no_model_and_publishes_stable_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_launch_has_no_model_and_publishes_stable_result) ... {\"result_path\": \"fixture\"}\n{\"status_path\": \"<WORKTREE>/.round3-tmp/tmpcqyj5hqf/state/runs/frozen-run/status.json\", \"result_path\": \"<WORKTREE>/.round3-tmp/tmpcqyj5hqf/state/runs/frozen-run/result.json\"}\n{\"result_path\": \"<WORKTREE>/.round3-tmp/tmpcqyj5hqf/state/runs/frozen-run/result.json\", \"exit_code\": 1}\nok\ntest_round3_inspect_verdict_rejects_incomplete_evidence (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_inspect_verdict_rejects_incomplete_evidence) ... ok\ntest_round3_installed_entrypoints_have_their_local_dependencies (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_installed_entrypoints_have_their_local_dependencies) ... ok\ntest_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_lifecycle_rejects_active_dispatch_and_recreates_selected_arm) ... ok\ntest_round3_missing_host_setup_still_writes_status_and_result (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_missing_host_setup_still_writes_status_and_result) ... {\"status_path\": \"<WORKTREE>/.round3-tmp/tmpsseosh8_/runs/missing/status.json\", \"result_path\": \"<WORKTREE>/.round3-tmp/tmpsseosh8_/runs/missing/result.json\"}\n{\"result_path\": \"<WORKTREE>/.round3-tmp/tmpsseosh8_/runs/missing/result.json\", \"exit_code\": 2}\nok\ntest_round3_nginx_and_preflight_match_hardened_configuration (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_nginx_and_preflight_match_hardened_configuration) ... ok\ntest_round3_usage_correlates_entry_gateway_once_and_separates_effort (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_round3_usage_correlates_entry_gateway_once_and_separates_effort) ... ok\ntest_skills_use_coordinator_project_installer (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_skills_use_coordinator_project_installer) ... ok\ntest_tool_limits_are_enforced_not_only_described (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_tool_limits_are_enforced_not_only_described) ... ok\ntest_transport_runs_owned_container_and_retains_failed_attempts (tests.test_runtime_worker_deerflow.DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts) ... ok\n\n----------------------------------------------------------------------\nRan 39 tests in 0.406s\n\nOK (skipped=1)\n"
+    },
+    {
+      "phase": "final-validator",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "chunk_id": "378321",
+      "wall_time_seconds": 1.000742388,
+      "session_id": 91032,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "phase": "final-diff-check",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 git diff --check",
+      "chunk_id": "556b48",
+      "wall_time_seconds": 0.0000041,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "phase": "final-validator-completion",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "chunk_id": "6c0b3a",
+      "wall_time_seconds": 2.354877199,
+      "exit_code": 1,
+      "original_token_count": 596,
+      "output": "Publication validation failed:\nblueprints/runtime-workers/deerflow/README.md: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/README.md: byte count mismatch\nblueprints/runtime-workers/deerflow/compose.json.template: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/compose.json.template: byte count mismatch\nblueprints/runtime-workers/deerflow/config.yaml.template: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/config.yaml.template: byte count mismatch\nblueprints/runtime-workers/deerflow/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/deerflow/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/deerflow/extensions_config.json.template: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/extensions_config.json.template: byte count mismatch\nblueprints/runtime-workers/deerflow/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/pins.json: byte count mismatch\nblueprints/runtime-workers/deerflow/recipe.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/recipe.py: byte count mismatch\nblueprints/runtime-workers/deerflow/run-e2e.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/run-e2e.sh: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway-start.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway-start.sh: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_headers.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_headers.py: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_model.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/gateway_model.py: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/nginx-start.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/nginx-start.sh: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/preflight.py: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/preflight.py: byte count mismatch\nblueprints/runtime-workers/deerflow/runtime/redis-start.sh: SHA-256 mismatch\nblueprints/runtime-workers/deerflow/runtime/redis-start.sh: byte count mismatch\ntests/test_runtime_worker_deerflow.py: SHA-256 mismatch\ntests/test_runtime_worker_deerflow.py: byte count mismatch\n"
+    },
+    {
+      "phase": "final-scratch-cleanup",
+      "cmd": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -c 'from pathlib import Path; p=Path(\".round3-tmp/rechecked.lock\"); p.unlink(); p.parent.rmdir(); print(\"Removed .round3-tmp/rechecked.lock and empty .round3-tmp\"); print(\"Cache files/directories:\", [str(x) for x in Path(\".\").rglob(\"*\") if x.name in (\"__pycache__\", \".pytest_cache\", \".mypy_cache\", \".ruff_cache\") or x.suffix in (\".pyc\", \".pyo\")])'",
+      "chunk_id": "7618ae",
+      "wall_time_seconds": 0.016491642,
+      "exit_code": 0,
+      "original_token_count": 22,
+      "output": "Removed .round3-tmp/rechecked.lock and empty .round3-tmp\nCache files/directories: []\n"
+    }
+  ],
+  "lock_evidence": {
+    "resolution": {
+      "content": [
+        {
+          "type": "text",
+          "text": "```python\nimport subprocess,os,json,hashlib\nroot='<WORKTREE>'\ncmd=['rtk','uv','pip','compile','blueprints/runtime-workers/deerflow/e2e/requirements.txt','--generate-hashes','--no-annotate','--no-header','--python-version','3.13','--python-platform','x86_64-unknown-linux-gnu','--no-build','--no-python-downloads','--no-cache','--output-file','blueprints/runtime-workers/deerflow/e2e/requirements.lock']\nr=subprocess.run(cmd,cwd=root,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',TMPDIR=root+'/.round3-tmp'),capture_output=True,text=True,timeout=55)\nprint('command',json.dumps(cmd)); print('exit',r.returncode); print(r.stderr[-3000:]);\nif r.returncode==0:\n from pathlib import Path\n p=Path(root)/cmd[-1];print('lock sha256',hashlib.sha256(p.read_bytes()).hexdigest()); print('bytes',p.stat().st_size); print('packages',sum(bool(x) and not x.startswith((' ','#')) for x in p.read_text().splitlines()))\n```\n\ncommand [\"rtk\", \"uv\", \"pip\", \"compile\", \"blueprints/runtime-workers/deerflow/e2e/requirements.txt\", \"--generate-hashes\", \"--no-annotate\", \"--no-header\", \"--python-version\", \"3.13\", \"--python-platform\", \"x86_64-unknown-linux-gnu\", \"--no-build\", \"--no-python-downloads\", \"--no-cache\", \"--output-file\", \"blueprints/runtime-workers/deerflow/e2e/requirements.lock\"]\nexit 0\nResolved 96 packages in 692ms\n\nlock sha256 388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341\nbytes 221764\npackages 96\n"
+        }
+      ]
+    },
+    "wheel_only_reresolution": {
+      "content": [
+        {
+          "type": "text",
+          "text": "```python\nimport subprocess,os,hashlib\nfrom pathlib import Path\nroot=Path('<WORKTREE>')\ncmd=['rtk','uv','pip','compile','blueprints/runtime-workers/deerflow/e2e/requirements.txt','--constraint','blueprints/runtime-workers/deerflow/e2e/requirements.lock','--generate-hashes','--no-annotate','--no-header','--python-version','3.13','--python-platform','x86_64-unknown-linux-gnu','--only-binary',':all:','--no-python-downloads','--no-cache','--output-file','.round3-tmp/rechecked.lock']\nr=subprocess.run(cmd,cwd=root,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',TMPDIR=str(root/'.round3-tmp')),capture_output=True,text=True,timeout=55)\nprint('exit',r.returncode);print(r.stderr)\nif r.returncode==0:\n print('wheel-only resolution sha256',hashlib.sha256((root/cmd[-1]).read_bytes()).hexdigest())\n print('matches committed lock', (root/cmd[-1]).read_bytes()==(root/'blueprints/runtime-workers/deerflow/e2e/requirements.lock').read_bytes())\n```\n\nexit 0\nResolved 96 packages in 564ms\n\nwheel-only resolution sha256 388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341\nmatches committed lock True\n"
+        }
+      ]
+    },
+    "refused_dry_run": {
+      "content": [
+        {
+          "type": "text",
+          "text": "```python\nimport subprocess,os\nroot='<WORKTREE>'\ncmd=['rtk','uv','pip','install','--dry-run','--system','--python','python3','--no-python-downloads','--no-cache','--require-hashes','--only-binary',':all:','--no-deps','-r','blueprints/runtime-workers/deerflow/e2e/requirements.lock']\nr=subprocess.run(cmd,cwd=root,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1',TMPDIR=root+'/.round3-tmp'),capture_output=True,text=True,timeout=55)\nprint('exit',r.returncode);print(r.stdout); print(r.stderr)\n```\n\nexit 2\n\nUsing Python 3.12.3 environment at: /usr\nerror: The interpreter at /usr is externally managed, and indicates the following:\n\n  To install Python packages system-wide, try apt install\n  python3-xyz, where xyz is the package you are trying to\n  install.\n\n  If you wish to install a non-Debian-packaged Python package,\n  create a virtual environment using python3 -m venv path/to/venv.\n  Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make\n  sure you have python3-full installed.\n\n  If you wish to install a non-Debian packaged Python application,\n  it may be easiest to use pipx install xyz, which will manage a\n  virtual environment for you. Make sure you have pipx installed.\n\n  See /usr/share/doc/python3.12/README.venv for more information.\n\nhint: Virtual environments were not considered due to the `--system` flag\n\n"
+        }
+      ]
+    },
+    "prior_no_venv_dry_run": {
+      "evidence_class": "session observation",
+      "outcome": "Refused before installation because no virtual environment was selected.",
+      "returned_output": null,
+      "exit_code": null,
+      "qualification": "This earlier refusal is known from the session history; raw output was not retained in the verification store. Do not infer an exit code."
+    }
+  },
+  "host_gates": [
+    "Coordinator installs skills/CLI extension and hash-locked CPython 3.13 grader; unchanged GAIA scorer controls.",
+    "Pinned image/Compose startup, Redis AUTH, non-root nginx, read-only roots and tmpfs; mapped-UID lifecycle for Gateway/frontend/Redis remains declined.",
+    "Native internal network: selected gateway forwarder allowed; other gateway/loopback/bridge/MCP/metadata/CONNECT denied. Public egress and remote ai-memory/Qdrant remain disabled.",
+    "MCP dependency/interpreter visibility, QMD copy, real skill reads and every model role's headers/max effort.",
+    "PAT setup, native start/wait/result/cancel, retry/restart recovery; Claude child-usage/OTel and native-run ledger reconciliation.",
+    "20129 DB identity, correlations, conditional effort rows, final-row flush and compression analytics access/deltas.",
+    "Permitted frozen GAIA runs for both arms with native logs, failures and cleanup evidence; no public-web coverage claimed.",
+    "Coordinator re-registers only changed evidence hashes and reruns repository validation."
+  ],
+  "final_acceptance": {
+    "unittest": {
+      "exit_code": 0,
+      "tests": 39,
+      "skipped": 1,
+      "returned_summary": "Ran 39 tests in 0.406s\n\nOK (skipped=1)",
+      "qualification": "38 executed tests passed; real pinned upstream GAIA scorer unavailable and explicitly skipped. Synthetic fixture checks only."
+    },
+    "validator": {
+      "exit_code": 1,
+      "qualification": "Only SHA-256 and byte-count mismatches for the 16 changed tracked files; manifests/evidence.json was not edited. Coordinator must register hashes and rerun."
+    },
+    "diff_check": {
+      "exit_code": 0,
+      "output": ""
+    },
+    "cleanup": {
+      "scratch_removed": true,
+      "cache_entries": []
+    }
+  }
+}

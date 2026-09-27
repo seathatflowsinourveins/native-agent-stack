@@ -103,6 +103,13 @@
       "path": "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json"
     },
     {
+      "path": "blueprints/runtime-workers/deerflow/e2e/requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json"
     },
     {

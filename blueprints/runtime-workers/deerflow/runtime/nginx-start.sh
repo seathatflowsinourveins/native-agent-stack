@@ -3,5 +3,7 @@
 set -eu
 ip="$(hostname -i)"
 sed -e "s/listen 2026 default_server;/listen ${ip}:2026 default_server;/" \
-    -e '/listen \[::\]:2026 default_server;/d' /config/nginx.conf > /etc/nginx/nginx.conf
-exec nginx -g 'daemon off;'
+    -e '/listen \[::\]:2026 default_server;/d' \
+    -e '/^[[:space:]]*user[[:space:]]/d' \
+    -e 's@pid[[:space:]][^;]*;@pid /tmp/nginx.pid;@' /config/nginx.conf > /tmp/nginx.conf
+exec nginx -c /tmp/nginx.conf -g 'daemon off;'

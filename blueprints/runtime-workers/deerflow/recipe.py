@@ -62,6 +62,34 @@ def mount(source, target, read_only=True):
             "read_only": read_only, "bind": {"create_host_path": False}}
 
 
+def dependency_mount(item, settings, prefix):
+    """Allow only resolved adopted executable/tool roots and declared collections.
+
+    Compose-spec@914ec15d 05-services.md volumes long syntax; never mount a
+    credential store via an ancestor or a symlink under an otherwise allowed root.
+    """
+    source, target = Path(item["source"]), Path(item["target"])
+    real = source.resolve()
+    home = Path.home().resolve()
+    eco = Path(settings["variables"]["ECO_ROOT"]).resolve()
+    allowed = [eco / "bin"] + [eco / "tools" / name for name in (
+        "context-mode-1.0.169", "serena-0.1.4", "socraticode-1.14.0", "qmd-2.8.3")]
+    # Versioned native tool prefixes from the host declaration are allowed only
+    # beneath tools, and must resolve there (no symlink escape to home stores).
+    is_tool = (real.is_relative_to(eco / "tools") and len(real.relative_to(eco / "tools").parts) >= 1
+               and re.fullmatch(r"[a-zA-Z0-9_.-]+-[0-9][a-zA-Z0-9_.-]*", real.relative_to(eco / "tools").parts[0]))
+    allowed += [Path(c["path"]).resolve() for c in settings.get("qmd_snapshot", {}).get("collections", {}).values()]
+    protected = [home / n for n in (".config", ".codex", ".claude", ".ssh", ".aws", ".gnupg",
+                 ".local/share/omniroute", ".local/share/omniroute-fw")]
+    protected.append(Path(os.environ.get("XDG_CONFIG_HOME", str(home / ".config"))) / "native-agent-stack")
+    if (not source.is_absolute() or source != target or not item.get("read_only", True)
+            or home.is_relative_to(real) or real == eco or Path(prefix).resolve().is_relative_to(real)
+            or any(real.is_relative_to(p.resolve()) or p.resolve().is_relative_to(real) for p in protected)
+            or real.name.endswith(".sock") or not (real in allowed or is_tool)):
+        raise ValueError("MCP mounts must resolve to allowed dependency/collection roots, never credentials")
+    return mount(real, target)
+
+
 def host_settings(path):
     path = Path(path).resolve()
     if path.stat().st_mode & 0o077:
@@ -83,9 +111,39 @@ def host_settings(path):
 
 def worker_model(settings):
     model = settings.get("model") or read(HERE / "defaults.json")["model"]
-    if not isinstance(model, str) or not re.fullmatch(r"cx/gpt-6-[a-z0-9-]+-max", model):
+    if not isinstance(model, str) or not re.fullmatch(r"cx/gpt-6-[a-z0-9-]+-max|sharedgw/gpt-6-astra-max", model):
         raise ValueError("worker/judgment roles require a configured GPT-6 max gateway route")
     return model
+
+
+def arm_settings(settings, arm=None):
+    """Round-3 gateway-owner contract; never infer the arm from a model slug.
+
+    DeerFlow@345f08be config/app_config.py:432,565 resolves $VAR model fields.
+    The control override preserves this recipe's existing GPT-6 max routes.
+    """
+    arm = arm if arm is not None else os.environ.get("RUNTIME_WORKER_ARM", "control")
+    if arm not in {"control", "engines-on"}:
+        raise ValueError("RUNTIME_WORKER_ARM must be control or engines-on")
+    model = "sharedgw/gpt-6-astra-max"
+    port = 20129
+    if arm == "control":
+        model = worker_model({"model": os.environ.get("DEERFLOW_CONTROL_MODEL") or settings.get("model")})
+        if not model.startswith("cx/"):
+            raise ValueError("the control arm requires a cx/ GPT-6 max route")
+        port = 20128
+    headers = ["Idempotency-Key", "x-omniroute-session"]
+    if arm == "engines-on":
+        headers.append("x-omniroute-compression")
+    return {"arm": arm, "model": model, "base_url": f"http://10.0.2.2:{port}/v1",
+            "host_base_url": f"http://127.0.0.1:{port}/v1", "reasoning_effort": "max",
+            "header_names": sorted(headers)}
+
+
+def usage_database(arm):
+    if arm not in {"control", "engines-on"}:
+        raise ValueError("invalid arm")
+    return Path.home() / ".local/share" / ("omniroute" if arm == "control" else "omniroute-fw") / "storage.sqlite"
 
 
 def render(settings, prefix, state):
@@ -94,9 +152,10 @@ def render(settings, prefix, state):
     defaults, pins = read(HERE / "defaults.json"), read(HERE / "pins.json")
     values = dict(settings["variables"])
     values.update({"IMAGE_" + k.upper(): v for k, v in pins["images"].items()})
-    values["DEERFLOW_MODEL"] = worker_model(settings)
+    arm = arm_settings(settings)
+    values.update({"DEERFLOW_MODEL": arm["model"], "DEERFLOW_BASE_URL": arm["base_url"],
+                   "RUNTIME_WORKER_ARM": arm["arm"]})
     config = read(HERE / "config.yaml.template")
-    config["models"][0]["base_url"] = defaults["container_gateway"]
     ext = expand(read(HERE / "extensions_config.json.template"), values)
     ext["mcpServers"]["qmd"]["env"].update({
         "PATH": values["ECO_ROOT"] + "/bin:" + values["HOST_PATH"],
@@ -106,8 +165,14 @@ def render(settings, prefix, state):
     cfg = state / "config"
     write(cfg / "config.yaml", config)  # JSON is valid YAML.
     write(cfg / "extensions_config.json", ext)
+    proxy = (HERE / "egress.conf.template").read_text().replace("GATEWAY_ORIGIN", arm["base_url"].removesuffix("/v1"))
+    (cfg / "egress.conf").write_text(proxy)
+    (cfg / "egress.conf").chmod(0o644)
+    cfg.chmod(0o755)  # Config contains no secrets; nginx's non-root UID can read it.
     compose = expand(read(HERE / "compose.json.template"), values)
     s = compose["services"]
+    for service in (s["gateway"], s["egress"]):
+        service["labels"].update({"com.native-agent-stack." + k: arm[k] for k in ("arm", "model", "base_url")})
     s["gateway"]["environment"]["DEERFLOW_SESSION_NAMESPACE"] = settings["session_namespace"]
     s["gateway"]["env_file"] = [str(state / "private.env")]
     s["frontend"]["env_file"] = [str(state / "private.env")]
@@ -116,22 +181,15 @@ def render(settings, prefix, state):
         mount(state / "data", "/state", False), mount(state / "work", "/work", False),
         # Supported legacy custom category; the coordinator owns installation.
         mount(state / "work/.agents/skills", "/skills/custom"),
+        mount(state / "work/.agents/skills", "/work/.agents/skills"),
     ]
     for item in settings["mcp_mounts"]:
-        source, target = Path(item["source"]), Path(item["target"])
-        # Pin dependencies at their real paths so executable symlinks stay valid.
-        # Forbid broad home/ecosystem/credential mounts and the installer oracle.
-        forbidden = (Path.home(), Path(settings["variables"]["ECO_ROOT"]), Path("/"))
-        if (not source.is_absolute() or source != target or source in forbidden
-                or source == prefix or prefix.is_relative_to(source)
-                or any(p in {".ssh", ".codex", ".claude", ".aws", ".gnupg"} for p in source.parts)
-                or source.name.endswith(".sock")):
-            raise ValueError("MCP mounts must be narrow dependency/index paths, not credentials or sockets")
-        if not item.get("read_only", True):
-            raise ValueError("shared MCP dependencies/index mounts must be read-only")
-        s["gateway"]["volumes"].append(mount(source, target))
+        s["gateway"]["volumes"].append(dependency_mount(item, settings, prefix))
     s["redis"]["volumes"] = [mount(state / "redis", "/data", False),
-                                mount(prefix / "runtime", "/runtime")]
+                                mount(prefix / "runtime", "/runtime"),
+                                mount(state / "redis-password", "/run/secrets/redis-password")]
+    s["gateway"]["volumes"].append(mount(state / "redis-password", "/run/secrets/redis-password"))
+    s["egress"]["volumes"] = [mount(cfg / "egress.conf", "/config/egress.conf")]
     s["frontend"]["volumes"] = [mount(prefix / "runtime", "/runtime")]
     s["nginx"]["volumes"] = [mount(prefix / "runtime", "/runtime"),
                                   mount(prefix / "source/docker/nginx/nginx.conf", "/config/nginx.conf")]
@@ -165,12 +223,22 @@ def install_skills(workspace):
 
 
 def install_grader(prefix):
-    """GAIA v0.22.0 README's pip install, isolated from the native worker image."""
+    """GAIA v0.22.0 install with uv@0.12.17 generated hashes; no sdist builds."""
+    pins = read(HERE / "pins.json")["grader"]
+    lock = HERE / pins["lock_file"]
+    if sha(lock) != pins["lock_sha256"]:
+        raise ValueError("grader lock hash mismatch")
+    if sys.version_info[:2] != (3, 13):
+        raise ValueError("grader lock targets CPython 3.13 on Linux x86_64")
     environment = Path(prefix) / "grader"
     subprocess.run([sys.executable, "-m", "venv", str(environment)], check=True)
     subprocess.run([str(environment / "bin/python"), "-m", "pip", "install",
                     "--require-virtualenv", "--no-cache-dir", "--disable-pip-version-check",
-                    "-r", str(HERE / "e2e/requirements.txt")], check=True)
+                    "--require-hashes", "--only-binary=:all:", "--no-deps", "-r", str(lock)], check=True)
+    subprocess.run([str(environment / "bin/python"), "-m", "pip", "check"], check=True)
+    subprocess.run([str(environment / "bin/python"), "-c",
+                    "import importlib.metadata as m; assert m.version('inspect-ai') == '0.3.271'; "
+                    "assert m.version('inspect-evals') == '0.22.0'"], check=True)
 
 
 def seed_qmd(settings, state):
@@ -189,7 +257,7 @@ def seed_qmd(settings, state):
         if not Path(value["path"]).is_absolute():
             raise ValueError("QMD source collection paths must be absolute")
         collections[name] = {"path": value["path"], "pattern": value.get("pattern", "**/*.md")}
-    root = Path(state) / "data/mcp/qmd"
+    root = Path(state) / "qmd-seed"
     destination = root / "cache/qmd/native-agent-stack-catalog.sqlite"
     destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     if not destination.exists():
@@ -206,6 +274,17 @@ def seed_qmd(settings, state):
         write(root / "snapshot.json", {"collections": counts, "sha256_at_capture": sha(destination),
                                        "evidence_class": "retained local index snapshot, not new indexing"})
     write(root / "config/qmd/native-agent-stack-catalog.yml", {"collections": collections})
+
+
+def install_entrypoints(prefix):
+    """Ship the reviewed wrapper and its configuration beside the native skill adapter."""
+    prefix = Path(prefix)
+    for name in ("recipe.py", "dispatch.py", "deerflow-run", "defaults.json", "pins.json",
+                 "run-e2e.sh", "lifecycle.sh", "compose.json.template", "config.yaml.template",
+                 "extensions_config.json.template", "egress.conf.template"):
+        shutil.copy2(HERE / name, prefix / name)
+    for name in ("deerflow-run", "run-e2e.sh", "lifecycle.sh"):
+        (prefix / name).chmod(0o700)
 
 
 def install(host_file):
@@ -243,19 +322,25 @@ def install(host_file):
             if sha(source / name) != expected:
                 raise ValueError("upstream lockfile hash mismatch")
         seed_qmd(settings, STATE)
+        if not (STATE / "data/mcp/qmd").exists():
+            shutil.copytree(STATE / "qmd-seed", STATE / "data/mcp/qmd")
         for subdir in ("runtime", "e2e"):
             shutil.copytree(HERE / subdir, PREFIX / subdir, dirs_exist_ok=True,
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         shutil.copy2(HERE / "e2e/drive.py", PREFIX / "runtime/drive.py")
-        shutil.copy2(HERE / "pins.json", PREFIX / "pins.json")
+        install_entrypoints(PREFIX)
         for script in (PREFIX / "runtime").glob("*.sh"):
-            script.chmod(0o700)
+            script.chmod(0o755)  # Secrets-free runtime code; nginx runs as UID 101.
         # Native internal-auth token is generated once, never printed.
         # Gateway auth/config.py persists its own JWT secret under DEER_FLOW_HOME.
         env = STATE / "private.env"
         if not env.exists():
             env.write_text("DEER_FLOW_INTERNAL_AUTH_TOKEN=" + secrets.token_hex(32) + "\n")
         env.chmod(0o600)
+        password = STATE / "redis-password"
+        if not password.exists():
+            password.write_text(secrets.token_hex(32) + "\n")
+        password.chmod(0o600)
         old = read(STATE / "host.json") if (STATE / "host.json").exists() else {}
         settings["session_namespace"] = old.get("session_namespace") or secrets.token_hex(16)
         write(STATE / "host.json", settings)
@@ -283,12 +368,17 @@ def lifecycle(action):
     require_rootless(settings)
     common = ["compose", "-f", str(STATE / "compose.json")]
     if action == "up":
-        docker(settings, *common, "up", "-d", "--wait", "--wait-timeout", "180", "--no-build", "--pull", "never")
+        for status in (STATE / "dispatch").glob("*/status.json"):
+            if read(status).get("status") in {"starting", "pending", "running"}:
+                raise ValueError("finish or cancel active dispatches before switching the server arm")
+        render(settings, PREFIX, STATE)
+        docker(settings, *common, "up", "-d", "--force-recreate", "--wait", "--wait-timeout", "180", "--no-build", "--pull", "never")
     elif action == "down":
         # Literal owned names only. Preserve all application bind-mount data.
         commands = [("rm", "--force", "rw-deerflow-" + name)
-                    for name in ("nginx", "frontend", "gateway", "redis")]
+                    for name in ("nginx", "frontend", "gateway", "redis", "egress")]
         commands.append(("network", "rm", "rw-deerflow-network"))
+        commands.append(("network", "rm", "rw-deerflow-egress-network"))
         for command in commands:
             try:
                 docker(settings, *command, capture_output=True, text=True)

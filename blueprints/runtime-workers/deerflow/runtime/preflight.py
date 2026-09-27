@@ -28,7 +28,9 @@ async def main():
     config = ExtensionsConfig.from_file()
     client = MultiServerMCPClient(build_servers_config(config), tool_name_prefix=True)
     counts = {}
-    for server in POLICY["servers"]:
+    for server, server_config in config.mcp_servers.items():
+        if not server_config.enabled:
+            continue
         tools = await asyncio.wait_for(client.get_tools(server_name=server), timeout=130)
         allowed = [t.name for t in tools if tool_allowed(t.name)]
         assert allowed, "enabled MCP server has no allowed tools"
