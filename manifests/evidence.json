@@ -7923,12 +7923,12 @@
     },
     {
       "path": "blueprints/memory-stack/longmemeval/README.md",
-      "sha256": "c35df4a3a003d525b13d9b0228839a92753164b052659dcbc65e8321dd904c99",
-      "bytes": 22843
+      "sha256": "dd50cdd5e021c98cb7a7ab6f82e859fe41233c6c8d00b25452cb7cf654c42aa8",
+      "bytes": 24244
     },
     {
       "path": "blueprints/memory-stack/longmemeval/SHA256SUMS",
-      "sha256": "6fef483f39fe37d4c9cd4f5f0698d6e023d0c8f9f3fa45337158210eca2ad821",
+      "sha256": "0eb443abaeba2da31be1abc28ff22ee72f0914ab9e6362e11f39a7be451c9dcb",
       "bytes": 1510
     },
     {
@@ -13623,8 +13623,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md",
-      "sha256": "bd813f20f0ffaea1eed7d824af23eae80502cc0ea38ffe0206c17796954480b9",
-      "bytes": 5525
+      "sha256": "ef72ab338d558167ca4ae9d56054f7995927443cd82e5e093c42d72787a5a442",
+      "bytes": 6056
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",

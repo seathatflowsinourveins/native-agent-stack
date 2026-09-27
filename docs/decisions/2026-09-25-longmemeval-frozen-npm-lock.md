@@ -62,8 +62,12 @@ the system the Mac measured.
   [2026-09-22-github-automation-closure.md](2026-09-22-github-automation-closure.md). After merge,
   Dependabot would open alerts and security-update pull requests against a file that must not
   change, and Scorecard would report it.
-- **The inventory's `excluded` list** (rejected). It admits only deliberately vulnerable test
-  fixtures, and the unit test requires the reason to say so. This lock is not a fixture.
+- **The inventory's `excluded` list** (rejected).
+  - The lock could qualify for it. The unit test accepts an exclusion when its reason calls the
+    file a fixture, and the list already holds three captured `dvc.lock` copies on that basis.
+  - But the list steers only the `osv-scanner` job. `dependency-review` reads any
+    `package-lock.json` by name, whatever the inventory says, and its `fail-on-severity: high`
+    would fail on GHSA-45rx-2jwx-cxfr. Scorecard and the Socket app also find lockfiles by name.
 - **Leave the lock out** and point at the copy on the agent-ecosystem LongMemEval lane branch
   (rejected). #274 asks for it here, and that branch is private and unmerged.
 - **Generate the lock at run time** (rejected). npm would resolve current versions, not the ones
@@ -71,6 +75,8 @@ the system the Mac measured.
 
 This follows `requirements.txt.fixture` (section 3 of the same closure record), which was renamed
 for the same reason: a name that scanners read reports a file that is kept unchanged on purpose.
+That file is a test fixture. This lock is a captured record of what the arms installed, which makes
+it the first file kept from the scanners by renaming that is not a test fixture.
 
 ## What the rename does not do
 
@@ -81,7 +87,8 @@ checked.
 
 ## Overturn
 
-- OSV-Scanner, GitHub's dependency graph or Scorecard starts reading `*.frozen` files.
+- OSV-Scanner, GitHub's dependency graph, Scorecard or the Socket app starts reading `*.frozen`
+  files.
 - The lock stops being a frozen record: a later run installs agentmemory from a new lock. That
   lock gets its npm name and the normal scan, or its own entry here with evidence.
 - Both required checks gain a supported per-path exclusion for frozen records. The files then go

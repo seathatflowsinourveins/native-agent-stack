@@ -18,6 +18,20 @@ which lists this preregistration (sha256 `1f3ca9d5…`) as "Not committed".
   given in [Restoring the agentmemory install](#restoring-the-agentmemory-install). The Mac launch
   scripts are in `mac-drivers/`. Two harness revisions that no longer exist as files on the Mac
   are in `reconstructed/`.
+- **Do not run the agentmemory arms on a shared host.** The frozen code cleans up by force and
+  never checks who owns the processes it kills.
+  - `lme_harness.py` and `reconstructed/lme_harness.v3pre.py` send `SIGKILL` to every process
+    listening on a slot's ports, before the slot starts and at its teardown. Each slot has a REST
+    port at `3611 + 100 × slot`, the stream port one above it and the engine port 46023 above it.
+    With the default four slots (`LME_AM_SLOTS`) those are 3611–3612, 3711–3712, 3811–3812,
+    3911–3912, 49634, 49734, 49834 and 49934. The engine ports are in the dynamic range
+    (49152–65535), where other services can be given a port.
+  - `lme_harness.v1.py`, `lme_harness.v2.py` and `reconstructed/lme_harness.v1a.py` run
+    `pkill -f`, then `pkill -9 -f`, on the agentmemory install's index path. That also stops
+    agentmemory instances the harness did not start.
+  - Run them only where nothing else listens on those ports and no other agentmemory runs from the
+    same prefix. An ownership guard or an isolated execution path belongs in the rerun's own code
+    (amendment A17), not in these frozen files.
 
 ## Files
 
@@ -298,7 +312,7 @@ size.
 
 | Claim | Evidence class | How |
 | --- | --- | --- |
-| The files match the Mac originals and commit `2c3e09b` | `source_review` | sha256 of every source against `SHA256SUMS`. A checksum proves byte identity, not that the bytes describe an adequate test. |
+| The 13 copied files match their sources: commit `2c3e09b` for `PREREGISTRATION.md`, and the Mac run and bench directories for the other 12 | `source_review` | sha256 of each source against `SHA256SUMS`. A checksum proves byte identity, not that the bytes describe an adequate test. The two `reconstructed/` files have no live source to compare: `SHA256SUMS` pins their bytes, and their provenance is the reconstruction described above. |
 | Which code produced which arm | `source_review` | logs, row schemas, file times, bytecode headers and the session's edit history, read only |
 | The summarizer and harness v3 reproduce both reports from the recorded rows | `local_integration` | the replay above, on the Mac, outputs in a scratch directory |
 | `--help` from a clean clone | `local_integration` | the table above |
