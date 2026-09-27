@@ -13068,7 +13068,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "5033dd2dfb49d79c1511c5f3856225c2e906d39cc0fedce933eeb56829a47378",
+      "sha256": "e3229133720407226725befb403e865bab65867303040196c9177025022e6045",
       "bytes": 189803
     },
     {
@@ -13583,7 +13583,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "6507295ba3e79bd55d7e1767c1fe9286f7d80d26f2b04d45b8b260221cd06825",
+      "sha256": "d8c35ea0ebc83af2d25ae40bf64c8af578b888bab64d199416072cbae5ba06c7",
       "bytes": 19505
     },
     {
@@ -36470,6 +36470,11 @@
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--markitdown--use--20260927.json",
       "sha256": "b16e50c4b3a846e21256b9d3ba0ea4d87f2f0deaf088fe46ff5d2160d1b43910",
       "bytes": 5193
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--mcporter--use--20260927-2.json",
+      "sha256": "2eccd0ce451d16222552cd9038658c2e753d28e11f1551a31456d5b67ac7f78e",
+      "bytes": 10362
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--mcporter--use--20260927.json",

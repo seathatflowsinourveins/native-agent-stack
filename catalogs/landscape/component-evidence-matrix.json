@@ -1480,8 +1480,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-27T13:04:05Z",
-                "pass": 1
+                "latest": "2026-09-27T13:21:08Z",
+                "pass": 2
               },
               "qualified_models": []
             }
