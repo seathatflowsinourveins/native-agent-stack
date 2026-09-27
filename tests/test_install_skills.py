@@ -50,7 +50,7 @@ PINNED_VERSION = "1.7.0"
 INSTALL_HINT = "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0"
 
 FAKE_SKILLS_BIN_TEMPLATE = r'''#!/usr/bin/env python3
-import json, os, sys, shutil
+import json, os, sys, shutil, hashlib
 from pathlib import Path
 
 VERSION = "__VERSION__"
@@ -88,6 +88,8 @@ if argv[0] == "--version":
     sys.exit(0)
 
 home = Path(os.environ["HOME"])
+project = "-g" not in argv
+target = Path.cwd() if project else home
 
 if argv[0] == "add":
     url = argv[1]
@@ -96,18 +98,19 @@ if argv[0] == "add":
         print(f"fake skills add: no fixture for {name!r}", file=sys.stderr)
         sys.exit(1)
     fixture = FIXTURES[name]
-    skill_dir = home / ".agents" / "skills" / name
+    skill_dir = target / ".agents" / "skills" / name
     if skill_dir.exists():
         shutil.rmtree(skill_dir)
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(fixture["skill_md"], encoding="utf-8")
-    link_dir = home / ".claude" / "skills"
-    link_dir.mkdir(parents=True, exist_ok=True)
-    link = link_dir / name
-    if link.is_symlink() or link.exists():
-        link.unlink()
-    os.symlink(os.path.join("..", "..", ".agents", "skills", name), link)
-    path = lock_path(home)
+    if not project or "claude-code" in argv:
+        link_dir = target / ".claude" / "skills"
+        link_dir.mkdir(parents=True, exist_ok=True)
+        link = link_dir / name
+        if link.is_symlink() or link.exists():
+            link.unlink()
+        os.symlink(os.path.join("..", "..", ".agents", "skills", name), link)
+    path = target / "skills-lock.json" if project else lock_path(home)
     path.parent.mkdir(parents=True, exist_ok=True)
     lock = load_lock(path)
     lock.setdefault("skills", {})[name] = {
@@ -115,16 +118,29 @@ if argv[0] == "add":
         "skillPath": fixture.get("path", name), "skillFolderHash": fixture["tree_sha"],
         "installedAt": "2026-09-25T00:00:00Z", "updatedAt": "2026-09-25T00:00:00Z",
     }
+    if project:
+        # Native v1.7.0 local-lock.ts:15-37: no skillFolderHash here.
+        lock = {"version": 1, "skills": lock["skills"]}
+        lock["skills"][name] = {
+            "source": fixture.get("source", f"example/{name}"), "sourceType": "github",
+            "ref": fixture.get("ref", "a" * 40),
+            "skillPath": fixture.get("path", f"skills/{name}") + "/SKILL.md",
+            "computedHash": hashlib.sha256(b"SKILL.md" + fixture["skill_md"].encode()).hexdigest(),
+        }
     path.write_text(json.dumps(lock))
     sys.exit(0)
 
 if argv[0] == "remove":
     name = argv[1]
-    shutil.rmtree(home / ".agents" / "skills" / name, ignore_errors=True)
-    link = home / ".claude" / "skills" / name
+    # remove.ts:297-331 preserves canonical data if a detected non-target
+    # agent (e.g. Codex) still shares it; success alone does not prove removal.
+    if project and "-a" in argv and "codex" not in argv:
+        sys.exit(0)
+    shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
+    link = target / ".claude" / "skills" / name
     if link.is_symlink() or link.exists():
         link.unlink()
-    path = lock_path(home)
+    path = target / "skills-lock.json" if project else lock_path(home)
     lock = load_lock(path)
     lock.get("skills", {}).pop(name, None)
     path.write_text(json.dumps(lock))
@@ -245,6 +261,135 @@ class DryRunTests(InstallSkillsTestCase):
         self.assertFalse((self.home / ".agents").exists())
         self.assertFalse((self.home / ".claude").exists())
         self.assertEqual(calls_log(fake_bin), [["--version"]])  # only the version check ran
+
+
+class ProjectInstallTests(InstallSkillsTestCase):
+    """CLI seam: project cwd/lock, source-tree verification and scoped rollback.
+
+    Fake gh returns independently selected source-tree metadata. These are
+    integration fixtures, not a native CLI run or upstream acceptance.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.project = self.tmp_path / "project with spaces"
+        self.project.mkdir()
+        self.content = "# Project skill\n"
+        self.skill = make_skill("project-skill", self.content, tree_sha("project"))
+        self.manifest = self.write_manifest([self.skill])
+        self.fake_bin = write_fake_skills_bin(self.bin_dir, {
+            "project-skill": {"skill_md": self.content, "tree_sha": self.skill["tree_sha"]}})
+        self.write_gh_tree(self.skill["tree_sha"])
+
+    def write_gh_tree(self, sha):
+        data = {"truncated": False, "tree": [{"path": self.skill["path"], "type": "tree", "sha": sha}]}
+        gh = self.bin_dir / "gh"
+        gh.write_text("#!/usr/bin/env python3\nimport json,sys\nprint(" + repr(json.dumps(data)) + ")\n")
+        gh.chmod(0o755)
+
+    def install(self, *extra):
+        return self.run_install(
+            self.manifest, "--project-dir", str(self.project), "--agent", "universal", *extra,
+            fake_bin=self.fake_bin,
+            env={"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]})
+
+    def test_project_install_uses_project_cwd_local_lock_and_explicit_agent(self):
+        result = self.install("--json")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "installed"})
+        self.assertEqual((self.project / ".agents/skills/project-skill/SKILL.md").read_text(), self.content)
+        self.assertFalse((self.home / ".agents").exists())
+        lock = json.loads((self.project / "skills-lock.json").read_text())
+        self.assertNotIn("skillFolderHash", lock["skills"]["project-skill"])
+        self.assertEqual(calls_log(self.fake_bin)[1], [
+            "add", self.skill["url"], "--skill", "project-skill", "-y", "-a", "universal"])
+        again = self.install("--json")
+        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertEqual(json.loads(again.stdout)["skills"], {"project-skill": "ok"})
+        self.assertEqual([c[0] for c in calls_log(self.fake_bin)], ["--version", "add", "--version"])
+
+    def test_check_only_reports_missing_without_installing(self):
+        result = self.install("--check-only", "--json")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "missing-or-drifted"})
+        self.assertEqual(calls_log(self.fake_bin), [["--version"]])
+        self.assertFalse((self.project / "skills-lock.json").exists())
+
+    def test_project_tree_mismatch_rolls_back_only_in_project(self):
+        self.write_gh_tree(tree_sha("other"))
+        result = self.install()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("rolled back", result.stderr)
+        self.assertEqual(calls_log(self.fake_bin)[-1], ["remove", "project-skill", "-y"])
+        self.assertFalse((self.project / ".agents/skills/project-skill").exists())
+        self.assertFalse((self.home / ".agents").exists())
+
+    def test_wrong_source_ref_or_path_is_not_accepted_even_when_bytes_match(self):
+        for field, value in (("source", "other/repo"), ("ref", "b" * 40), ("path", "elsewhere/skill")):
+            with self.subTest(field=field):
+                self.fake_bin = write_fake_skills_bin(self.bin_dir, {"project-skill": {
+                    "skill_md": self.content, "tree_sha": self.skill["tree_sha"], field: value}})
+                result = self.install()
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn("rolled back", result.stderr)
+
+    def test_project_byte_mismatch_rolls_back(self):
+        self.fake_bin = write_fake_skills_bin(self.bin_dir, {"project-skill": {
+            "skill_md": "# Wrong content\n", "tree_sha": self.skill["tree_sha"]}})
+        result = self.install()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("rolled back", result.stderr)
+
+    def test_project_dry_run_and_unlocked_local_refusal_are_nonmutating(self):
+        result = self.install("--dry-run")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse((self.project / ".agents").exists())
+        folder = self.project / ".agents/skills/project-skill"
+        folder.mkdir(parents=True)
+        (folder / "SKILL.md").write_text("local content")
+        result = self.install()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("local-modified", result.stderr)
+        self.assertEqual((folder / "SKILL.md").read_text(), "local content")
+        self.assertEqual(calls_log(self.fake_bin), [["--version"], ["--version"]])
+
+    def test_explicit_project_claude_target_keeps_canonical_directory(self):
+        result = self.install("--agent", "claude-code")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(calls_log(self.fake_bin)[1][-3:], ["-a", "universal", "claude-code"])
+
+    def test_adding_claude_target_to_existing_universal_install_creates_its_link(self):
+        first = self.install()
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        link = self.project / ".claude/skills/project-skill"
+        self.assertFalse(link.exists())
+        check = self.install("--agent", "claude-code", "--check-only")
+        self.assertEqual(check.returncode, 1, check.stdout + check.stderr)
+        second = self.install("--agent", "claude-code")
+        self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
+        self.assertTrue(link.is_symlink())
+
+    def test_pruned_skills_are_not_reinstalled(self):
+        self.skill["status"] = "pruned"
+        self.manifest = self.write_manifest([self.skill])
+        result = self.install("--json")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {})
+        self.assertEqual(calls_log(self.fake_bin), [["--version"]])
+
+    def test_relative_binary_is_resolved_before_changing_to_project_directory(self):
+        result = self.run_install(
+            self.manifest, "--project-dir", str(self.project), "--agent", "universal",
+            fake_bin=Path(os.path.relpath(self.fake_bin, Path.cwd())),
+            env={"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]})
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.project / ".agents/skills/project-skill/SKILL.md").is_file())
+
+    def test_global_default_add_arguments_remain_exact(self):
+        result = self.run_install(self.manifest, fake_bin=self.fake_bin)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(calls_log(self.fake_bin)[1], ["add", self.skill["url"], "--skill", "project-skill",
+                                                       "-g", "-y", "-a", "claude-code", "codex"])
 
 
 class IdempotentSkipTests(InstallSkillsTestCase):

@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-27",
+  "evidence_class": "local_integration_and_structural_checks",
+  "scope": "Source-pinned catalog and wrapper fixtures; not a native skills installation, model run or worker acceptance.",
+  "fail_first": [
+    {
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests -v",
+      "exit_code": 1,
+      "tests": 1,
+      "failures": 1,
+      "returned_excerpt": "FAILED (failures=1)",
+      "cause": "Before installer changes, argparse exited 2: unrecognized arguments --project-dir and --agent."
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests -v",
+      "exit_code": 1,
+      "tests": 9,
+      "failures": 2,
+      "returned_excerpt": "FAILED (failures=2)",
+      "cause": "--check-only was unrecognized; status pruned was installed instead of omitted."
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_adding_claude_target_to_existing_universal_install_creates_its_link -v",
+      "exit_code": 1,
+      "tests": 1,
+      "failures": 1,
+      "returned_excerpt": "AssertionError: 0 != 1 : project-skill: ok (pinned ref already installed and locked)",
+      "cause": "A missing requested Claude target was accepted."
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_project_tree_mismatch_rolls_back_only_in_project -v",
+      "exit_code": 1,
+      "tests": 1,
+      "failures": 1,
+      "returned_excerpt": "AssertionError: Lists differ: ['remove', 'project-skill', '-y', '-a', 'universal'] != ['remove', 'project-skill', '-y']",
+      "cause": "Native targeted removal can retain canonical content used by another agent."
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_relative_binary_is_resolved_before_changing_to_project_directory -v",
+      "exit_code": 1,
+      "tests": 1,
+      "failures": 1,
+      "returned_excerpt": "AssertionError: 1 != 0 : install-skills: 0/1 ok",
+      "cause": "Relative executable no longer resolved after switching project cwd."
+    }
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -v",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 42 tests in 3.759s; OK",
+      "kind": "local fixtures and structural contract"
+    },
+    {
+      "command": "python3 tools/adoption/runtime_skill_freshness.py --manifest blueprints/runtime-workers/skills/manifest.json --output blueprints/runtime-workers/skills/freshness-20260927.json --workers 4",
+      "exit_code": 0,
+      "returned_excerpt": "{\"ok\": true, \"skills\": 138, \"drift\": 2, \"errors\": 0, \"report_only\": true}",
+      "kind": "live gh api source-tree/HEAD observation",
+      "artifact": "freshness-20260927.json"
+    },
+    {
+      "command": "zizmor --no-online-audits .github/workflows/runtime-worker-skills-freshness.yml",
+      "exit_code": 0,
+      "returned_excerpt": "No findings to report. Good job! (2 suppressed)",
+      "version": "1.30.1",
+      "limitation": "Offline audits only; not online action-commit or advisory acceptance."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_excerpt": "Publication validation failed: changed registered installer/test hashes and temporary upstream research-cache privacy-pattern matches.",
+      "kind": "pre-cleanup failure",
+      "resolution": "Remove the temporary source cache and re-register owned modified files through scripts/host_receipts.py before rerunning."
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -q",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 43 tests in 3.330s; OK",
+      "kind": "final focused local integration and structural checks"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_excerpt": "{\"components\": 69, \"hashed_files\": 7346, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}",
+      "kind": "final publication integrity",
+      "limitation": "Integrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_excerpt": "",
+      "kind": "whitespace check"
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -q",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 43 tests in 3.242s; OK",
+      "kind": "final after coding-role research coverage clarification"
+    }
+  ],
+  "not_run": [
+    {
+      "command": "actionlint .github/workflows/runtime-worker-skills-freshness.yml",
+      "reason": "Executable unavailable on PATH or in inspected local tool locations; no installation was authorized."
+    },
+    {
+      "command": "upstream skills CLI tests / native skills add / worker E2E",
+      "reason": "skills executable absent on PATH; host installation and config changes excluded from builder scope. The fake CLI is not upstream acceptance."
+    }
+  ],
+  "pins_verified": {
+    "method": "gh api commits/{ref}, git/trees/{commit}?recursive=1 and contents/{path}/SKILL.md?ref={commit}; untruncated trees, actual returned bytes",
+    "sources": 12,
+    "skills": 138,
+    "adoption_entries_rechecked": 28,
+    "metadata_normalization": "description string is YAML-parsed and trimmed; hashes and byte sizes use unmodified SKILL.md"
+  },
+  "measurements": {
+    "first_prompt_before": null,
+    "first_prompt_after": null,
+    "native_activations": null
+  },
+  "output_retention": "Returned compact excerpts are transcribed from tool output; temporary personal paths and research response bodies are not published.",
+  "independent_review": {
+    "scope": "Read-only review of source-pinned loader semantics, wrapper, catalog, documentation and freshness implementation",
+    "result": "No remaining material code blockers after regression fixes. Documented that OpenHands invoke_skill rejects five invocation-disabled upstream skills.",
+    "verification": "42 focused tests passed before the final README-matrix consistency test was added."
+  },
+  "input_sha256": {
+    "tools/adoption/install_skills.py": "e2021b2fe2ab98a0ca1fbd5a2a6fc836a3267b3cb81ef43a3df333d835d85eb6",
+    "tools/adoption/runtime_skill_freshness.py": "497ea3b22f04d261afcd2ae8adbf9da5b1f1cb4fc12b2051aab74a14c0aeb3f9",
+    "tests/test_install_skills.py": "d45dd108c07e22d35f74c1972ea9fe199cc98ece6500e101aab187c3a65bc39d",
+    "tests/test_runtime_worker_skills.py": "19137a93dd33e2bdf9028e2614b685bf0040ee7de3eda30588874491e04f584f",
+    "blueprints/runtime-workers/skills/manifest.json": "aefae182fce9b964fc390a2eeaa7d407e96353c4bb8808e9a0c1d605adbbc25f",
+    "blueprints/runtime-workers/skills/README.md": "8a35160c6dd8d468a6f293613e11a637da9c25f14b46ab3b177657b677b9e854",
+    ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9"
+  }
+}
