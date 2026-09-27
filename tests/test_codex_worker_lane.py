@@ -330,8 +330,11 @@ class TemplateTests(unittest.TestCase):
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
-        # home writes the same route itself. Every key it writes must equal the profile's, or one of them drifted.
-        # The profile's extra keys (env_key_instructions, the env filter, web_search) are not in the lane home.
+        # home writes the route itself. Every model, provider and feature key it writes must equal the profile's, or
+        # one of them drifted. Its config.toml has no env_key_instructions, key filter or web_search: web_search =
+        # "live" comes from the stack-worker profile and the runner's -c flag, and without the filter a real key in
+        # the sweep's environment reaches the model's commands (recipes/README.md, "Codex through OmniRoute"). No
+        # assertion here pins those absences, so the sweep lane can add the filter without breaking this test.
         spec = importlib.util.spec_from_file_location(
             "landscape_sweep_build_args_for_lane_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
         build_args = importlib.util.module_from_spec(spec)
