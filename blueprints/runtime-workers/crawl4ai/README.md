@@ -1,8 +1,8 @@
 # Crawl4AI runtime worker — recipe, not host acceptance
 
 This worker uses **unclecode/crawl4ai v0.9.4** for crawling, filtered Markdown and
-structured extraction. The native Python library performs the two frozen LLM
-extraction trials, with **Promptfoo 0.123.1** supplying the task-quality verdict.
+structured extraction. The native Python library performs one explicitly selected
+frozen LLM extraction arm per run, with **Promptfoo 0.123.1** supplying the task-quality verdict.
 The authenticated rootless Docker service offers the upstream
 API and MCP endpoints to other workers. This is a foundation-lane recipe prepared
 for coordinator review; no packages were installed, images pulled, services
@@ -12,9 +12,211 @@ Two upstream limitations affect the requested configuration. The reviewed server
 does not expose the per-call LLM options needed for the gateway header/temperature
 contract, so container consumers use non-LLM crawling and FIT Markdown. Also,
 the WebSocket bridge appears incompatible with its declared MCP SDK message
-envelope. Both endpoints are configured and the E2E checks both, but successful
-WebSocket operation remains an unresolved host gate. The recipe does not patch
+envelope. Both endpoints are configured and the E2E observes both. SSE is the required
+dispatch transport; WebSocket results are diagnostic and remain unqualified. The recipe does not patch
 the upstream runtime or turn either limitation into a pass.
+
+## Workflow dispatch
+
+After the coordinator installs the reviewed snapshot, a workflow child runs the
+following Bash sequence. The run ID identifies an immutable request; repeating
+`start` with the same arm/input returns its status, while reusing it for a
+different request is refused. `start` writes `status.json` and an incomplete
+`receipt.json` before launching background work. Every operation prints one JSON
+object containing the deterministic receipt path:
+`$HOME/.local/state/native-agent-stack/runtime-workers/crawl4ai/runs/<run-id>/receipt.json`.
+
+```bash
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh start --run-id crawl-control-001 --arm control
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh wait --run-id crawl-control-001 --arm control --timeout 55
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh result --run-id crawl-control-001 --arm control
+```
+
+Repeat `wait` while the returned state is `starting` or `running`; a wait is
+bounded to 55 seconds. Then read the printed receipt path. `start` exit 0 means
+submission accepted. For `wait`/`result`, exit **0 = pass, 2 = setup failure,
+3 = negative upstream verdict, 4 = incomplete evidence** (including work still
+running). A setup exception produces a receipt with an error class, without the
+exception's private text. A host file lock serializes extraction attempts so the
+two arms cannot overlap the fixed fixture/container ports. A killed dispatcher
+leaves its incomplete status for investigation; it never silently resubmits.
+
+For engines-on, finish the control run and use the same sequence with
+`--run-id crawl-engines-001 --arm engines-on`. The default `--kind extraction`
+runs the frozen native Python extraction/Promptfoo trial; it is not an arbitrary
+web extraction schema. Its upstream basis is
+[unclecode/crawl4ai@133e1d92, pricing example:15–53](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/docs/examples/llm_extraction_openai_pricing.py#L15-L53).
+The detached status wrapper is local integration using
+[CPython@v3.12.12, subprocess.py](https://github.com/python/cpython/blob/v3.12.12/Lib/subprocess.py).
+
+For general non-LLM crawling, the native REST fallback is also dispatched through
+Bash. Start the persistent container first, then run:
+
+```bash
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh start --run-id crawl-page-001 --arm control --kind crawl --url https://example.com/
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh wait --run-id crawl-page-001 --arm control --timeout 55
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh result --run-id crawl-page-001 --arm control
+```
+
+This sends `POST /crawl/job`, expects 202, and polls `GET /crawl/job/{task_id}`;
+completed native results go to the adjacent private `result.json`. It accepts
+HTTPS seed URLs and offers no hook, JavaScript, provider or LLM strategy argument.
+The job ID stays private and never enters the receipt. Native status and per-page
+`success` fields own this verdict; it makes no GPT calls and claims no graded
+content accuracy. Sources:
+[job.py:60–64,114–149](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/job.py#L114-L149),
+[api.py:587–605,997–1078](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/api.py#L997-L1078).
+
+Register the recommended native MCP transport from the consumer's project directory
+on the host (the builder has not run this):
+
+```bash
+rtk python3 "$HOME/.local/share/codex-ecosystem/tools/crawl4ai-0.9.4/recipe/mcp-config.py" config
+rtk python3 "$HOME/.local/share/codex-ecosystem/tools/crawl4ai-0.9.4/recipe/mcp-config.py" register
+```
+
+`register` calls `claude mcp add-json crawl4ai --scope local` with explicit
+`type: sse`, the private host port, a 180000 ms timeout and `headersHelper`.
+Only Claude invokes the helper's `headers` action, reading the existing 0600
+token on connection/reconnection. The config contains no token value. Do not
+invoke `headers` interactively. The installed Claude 2.1.283 help confirms
+`add-json` and local scope; headersHelper is documented in
+[anthropics/claude-code@v2.1.283, CHANGELOG.md:5048,6971](https://github.com/anthropics/claude-code/blob/v2.1.283/CHANGELOG.md#L5048)
+and [official MCP documentation](https://code.claude.com/docs/en/mcp).
+Explicit SSE follows
+[self-hosting.md:404–419](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/docs/md_v2/core/self-hosting.md#L404-L419)
+and avoids probing HTTP against the unrestricted SSE route at
+[mcp_bridge.py:241–253](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/mcp_bridge.py#L241-L253).
+
+The role's tools grant is `mcp__crawl4ai__md`, `mcp__crawl4ai__crawl`, with
+`mcpServers: [crawl4ai]` sharing the parent's connection. Load those tools via
+`ToolSearch "select:mcp__crawl4ai__md,mcp__crawl4ai__crawl"`. Use `md` with
+`f=fit|raw|bm25` (`q` for bm25), or non-LLM `crawl`. Do not grant the five other
+advertised tools or send `f=llm`/`provider`. Each workflow `agent()` uses its role's
+`agentType`, explicit model and `effort: 'max'`. These are consumer grants, not
+server-enforced restrictions. Native frontmatter and monitoring semantics are
+documented in [subagents](https://code.claude.com/docs/en/sub-agents) and
+[monitoring usage](https://code.claude.com/docs/en/monitoring-usage).
+
+Count invocations in the existing `child-usage.mjs` transcript lane (server key
+`crawl4ai`) and independently through OTel `claude_code.tool_result` with
+`OTEL_LOG_TOOL_DETAILS=1`, grouped by MCP server/tool and child where available.
+Bash dispatch operations appear as Bash tool events. On the server, compare
+Gunicorn access logs for `/crawl/job`, `/crawl`, `/md` and native extraction logs;
+MCP calls proxy to REST via
+[mcp_bridge.py:39–82](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/mcp_bridge.py#L39-L82).
+These overlapping client/server observations are never added together. The host
+acceptance must observe one successful child SSE call, its transcript/OTel event
+and the matching native access-log/metric increment. Argument logging includes
+URLs, so keep that telemetry private.
+
+## Arms
+
+`CRAWL4AI_ARM=control|engines-on` selects the arm; the default is **control**.
+An explicit `--arm` on dispatch takes precedence. The environment overrides
+`CRAWL4AI_MODEL` and `CRAWL4AI_BASE_URL` must agree with the selected arm.
+`CRAWL4AI_CONTAINER_BASE_URL` is derived and exported by `container.sh`, not an
+unvalidated input. LiteLLM adds `openai/` to the model string.
+
+| Arm | Host URL | Derived container URL | Model | Gateway-only extra header |
+| --- | --- | --- | --- | --- |
+| control | `http://127.0.0.1:20128/v1` | `http://10.0.2.2:20128/v1` | `cx/gpt-6-astra-max` | none |
+| engines-on | `http://127.0.0.1:20129/v1` | `http://10.0.2.2:20129/v1` | `sharedgw/gpt-6-astra-max` | `x-omniroute-compression: allow-lossy` |
+
+Both arms request **max**. The engines route has exactly one slash. Control also
+retains the previously supported `cx/gpt-6-*` overrides. The optional historical
+`comparison` arm uses `CRAWL4AI_COMPARISON_MODEL=cx/gpt-6-sol` at medium, through
+20128; it does not replace either required arm. The local common requirements
+and coordinator's supplied gateway observation define these routes; this repair
+does not claim a new gateway measurement. `run.json` and the receipt name the
+arm, base URL, model, expected effort and header names without header values.
+
+## Usage accounting
+
+Usage is read once at the selected arm's entry gateway, using SQLite `?mode=ro`:
+control/comparison uses `~/.local/share/omniroute/storage.sqlite`; engines-on uses
+`~/.local/share/omniroute-fw/storage.sqlite`. The reader verifies that the file
+exists before opening it and never creates a database. The coordinator must
+confirm the engines database belongs to the running 20129 instance. Its forwarded
+20128 rows are excluded. No receipt sums gateways or adds cache/reasoning subsets
+to input tokens.
+
+A native OpenAI client injected into LiteLLM attaches a synchronous HTTPX response
+hook to capture `X-Correlation-Id` per wire response. IDs remain in memory, are
+matched against the entry database, and are stripped from receipts. If capture
+is incomplete, attribution falls back to **window + model + path at the entry
+gateway**, explicitly marked as potentially concurrent. The allowlisted fields
+are `timestamp`, `path`, `status`, `model`, `tokens_in`, `tokens_cache_read`,
+`tokens_reasoning`, `correlation_id`, plus `reasoning_effort_requested` and
+`reasoning_effort_upstream` required by the effort contract. No other table or
+column is read. Sources: the hash-verified **unclecode-litellm==1.81.13** wheel,
+`litellm/llms/openai/openai.py:741–790` (client injection), and
+[encode/httpx@0.28.1, event-hooks.md:1–52](https://github.com/encode/httpx/blob/0.28.1/docs/advanced/event-hooks.md#L1-L52).
+The wheel SHA256 is in pins.json.
+
+`allowed_openai_params=['reasoning_effort']` preserves the effort parameter in
+the fork's `litellm/utils.py:3925–3942,4677–4689`, even though
+[Crawl4AI utils.py:1820–1837](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/crawl4ai/utils.py#L1820-L1837)
+enables `drop_params`. LiteLLM and OpenAI client retries are zero. For rows with
+reasoning tokens greater than zero, both logged efforts must equal the arm's
+expected effort. Rows with zero returned reasoning are counted separately;
+unknown counters or missing effort on reasoning-bearing rows make evidence
+incomplete. Null effort alone does not prove that the request omitted effort:
+[OmniRoute@a58000c7, callLogs.ts:642–653](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L642-L653)
+sets those fields only for encrypted reasoning observations.
+
+Engines-on separately samples `GET /api/analytics/compression?since=all` before
+and after extraction. Only `totalRequests` and `totalTokensSaved` are retained as
+nonnegative counter deltas. Resets, unavailable/auth-refused endpoints and unknown
+values yield incomplete evidence, never zero savings. These service-wide deltas
+may include concurrent traffic and are not provider-token or causal savings.
+Sources: [analytics route:13–24](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/analytics/compression/route.ts#L13-L24)
+and [compressionAnalytics.ts:613–617](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts#L613-L617).
+This source pin is the installed gateway's documented base; host patch behavior
+still needs observation.
+
+## Security posture
+
+The extraction model produces structured data; it receives no host shell, Python
+execution tool, MCP client or arbitrary hook. The recipe grants calling children
+only the two non-LLM Crawl4AI tools above. Caller role tools outside this recipe
+remain the coordinator's responsibility. Host-owned run/grade/status files live
+outside the container's writable crawl/cache/Redis mounts, and raw provider or
+server content never supplies receipt routing or usage evidence.
+
+The runtime container drops all capabilities and adds only `CHOWN`,
+`DAC_OVERRIDE`, `SETUID`, `SETGID` for secret/bootstrap ownership and the native
+supervisor's appuser transition. It uses `no-new-privileges:true`, a read-only
+root, dedicated writable stores and a restricted `/tmp` tmpfs. Redis, Gunicorn
+and its browser run as appuser. Bootstrap/supervisor retain container root because
+the rootless mapping makes host-owned 0600 secret mounts unreadable to appuser.
+The wrapper temporarily owns only the dedicated mount roots for chmod, then
+returns them to appuser. Sources:
+[Crawl4AI Dockerfile:180–209](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/Dockerfile#L180-L209),
+[entrypoint.sh:8–39](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/entrypoint.sh#L8-L39),
+[Compose spec@914ec15, 05-services.md:171,1839,1955,2029](https://github.com/compose-spec/compose-spec/blob/914ec15d1fa498969c0df5c1d672306db3256089/05-services.md#L171).
+The coordinator must test startup/restart under those restrictions. These limits
+apply to the crawler service; the unchanged upstream grader is not containerized
+or given additional runtime limits by this repair.
+
+**Residual network risk:** this recipe does not implement a per-port firewall for
+host-loopback access. The reviewed rootless Docker mechanism is daemon-wide
+`--disable-host-loopback`, not a per-container port allowlist
+([moby/moby@v28.5.1, dockerd-rootless.sh:89–130,147–162](https://github.com/moby/moby/blob/v28.5.1/contrib/dockerd-rootless.sh#L89-L162)).
+Docker is unavailable in the builder environment, so no installed-runtime
+per-port capability is claimed. Automatic daemon/network changes are declined
+in this worktree-only round. Persistent crawling keeps native internal-address
+denial and hooks disabled; only the transient fixture project enables internal
+URLs. A compromised renderer, or that broad E2E override, may still reach other
+host listeners through 10.0.2.2. Before admitting untrusted workloads, the
+coordinator must measure isolation and use supported explicit service forwarders
+with host-loopback disabled, or an isolated internal network. Authenticated MCP
+tool grants and URL checks do not establish that network boundary.
+
+Python dependencies remain hash-locked wheel-only installs. The grader now uses
+`npm ci --ignore-scripts` against its integrity lock, following
+[npm/cli@v11.19.0, npm-ci.md:15–24](https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/commands/npm-ci.md#L15-L24).
+No lifecycle script is implicitly re-enabled to make a failed host install pass.
 
 ## Pins and artifact provenance
 
@@ -75,7 +277,7 @@ The coordinator can run these commands after reviewing this directory:
 bash blueprints/runtime-workers/crawl4ai/install.sh
 bash blueprints/runtime-workers/crawl4ai/container.sh start
 bash blueprints/runtime-workers/crawl4ai/container.sh status
-bash blueprints/runtime-workers/crawl4ai/run-e2e.sh
+rtk bash blueprints/runtime-workers/crawl4ai/dispatch.sh start --run-id crawl-control-001 --arm control
 bash blueprints/runtime-workers/crawl4ai/container.sh stop
 ```
 
@@ -83,11 +285,15 @@ bash blueprints/runtime-workers/crawl4ai/container.sh stop
 Docker and Compose, plus Node >=22.22.0 and npm for Promptfoo. It performs no sudo
 operation and installs no host OS packages. The upstream
 [npm installation](https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/installation.md)
-is pinned with `npm install --global --prefix "$NAS_CRAWL4AI_PREFIX/grader"
---cache "$NAS_CRAWL4AI_STATE/cache/npm" --no-audit --no-fund promptfoo@0.123.1`.
-The private prefix's `grader/bin/promptfoo` is the E2E executable; an unexpected
-version is refused. The npm dependency closure is resolved at install time, unlike
-the frozen Python wheel lock; a transitive npm lock remains a reproducibility gap.
+uses the reviewed [grader/package-lock.json](grader/package-lock.json):
+`npm ci --ignore-scripts --prefix "$NAS_CRAWL4AI_PREFIX/grader"
+--cache "$NAS_CRAWL4AI_STATE/cache/npm" --no-audit --no-fund`.
+All 942 dependency entries have registry SHA512 integrity. The lock's SHA256 is
+checked against pins.json before installation. The executable is
+`grader/node_modules/.bin/promptfoo`; unexpected versions are refused. The lock
+was generated with npm 11.19.0 in metadata-only mode: no packages or scripts ran.
+The coordinator must verify that the fresh install supports the unchanged
+standalone grader, including any native modules, with lifecycle scripts disabled.
 The native prefix is `$HOME/.local/share/codex-ecosystem/tools/crawl4ai-0.9.4`.
 Owned state lives under
 `$HOME/.local/state/native-agent-stack/runtime-workers/crawl4ai/`, with mode 0700
@@ -98,7 +304,7 @@ It is retained on repeat installs. Default ports are API 3730, fixture 3731,
 browser mirror 3732 and transient E2E API 3734, all published/bound on 127.0.0.1.
 `host.py` accepts only four distinct integer ports in **3730..3799**. Ports
 3710..3729 and 5433..5439 belong to S3; 3800..3819 belongs to cognee. The existing
-20128 gateway is a client destination. The upstream container's internal 11235
+20128/20129 gateways are client destinations. The upstream container's internal 11235
 API and internal Redis listener are not published as host worker listeners.
 
 The venv has its own `.cache/ms-playwright` reference to the worker's private
@@ -159,23 +365,22 @@ second-host operation remain unmeasured.
 
 | Setting | Configuration and upstream source |
 | --- | --- |
-| Model/provider | Config `llm.model`, overridden by `CRAWL4AI_MODEL`, defaults to `cx/gpt-6-astra-max`; `LLMConfig.provider` receives `openai/` plus that value. [`async_configs.py:2346–2409`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/async_configs.py#L2346-L2409). No model identifier is hard-coded in worker code. |
-| Native gateway | `LLMConfig.base_url=http://127.0.0.1:20128/v1`, `api_token=local-loopback`; the key is the gateway's non-secret placeholder. Same source as above. |
-| Container gateway | `LLM_PROVIDER`, `LLM_API_KEY`, `OPENAI_BASE_URL` and `LLM_BASE_URL=http://10.0.2.2:20128/v1`; [`deploy/docker/utils.py:114–138`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/deploy/docker/utils.py#L114-L138), [`293–316`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/deploy/docker/utils.py#L293-L316). Configured for the host network, but container LLM calls remain outside the qualified contract described below. |
-| Primary effort | Gateway `-max` alias; no body effort is sent. The supplied gateway-owner verdict establishes alias behavior; Crawl4AI itself does not implement that alias. |
-| Comparison effort | Config `comparison.model=cx/gpt-6-sol`, overridable by `CRAWL4AI_COMPARISON_MODEL`; `extra_args.reasoning_effort=medium`. Both arms must pass the same oracle and have matching gateway effort observations. |
+| Model/provider | Config `arms[arm].model`, overridden by `CRAWL4AI_MODEL`, defaults to the selected arm route; `LLMConfig.provider` receives `openai/` plus that value. [`async_configs.py:2346–2409`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/async_configs.py#L2346-L2409). The engines-on model is restricted to the common contract's one-slash route. |
+| Native gateway | `LLMConfig.base_url` is the selected arm's 20128/20129 loopback URL, `api_token=local-loopback`; the key is the gateway's non-secret placeholder. Same source as above. |
+| Container gateway | `LLM_PROVIDER`, `LLM_API_KEY`, `OPENAI_BASE_URL` and `LLM_BASE_URL` use the selected arm's `container_base_url`; [`deploy/docker/utils.py:114–138`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/deploy/docker/utils.py#L114-L138), [`293–316`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/deploy/docker/utils.py#L293-L316). Configured for the host network, but container LLM calls remain outside the qualified contract described below. |
+| Arm effort | Control and engines-on both send `reasoning_effort=max` with `allowed_openai_params=["reasoning_effort"]`, preserving the parameter despite upstream `drop_params=True`. See the wheel/file references under Usage accounting. |
+| Optional legacy comparison | `arms.comparison` retains `cx/gpt-6-sol` and medium effort through 20128, explicitly selected with `--arm comparison`. This is separate from the required max/max arm pair. |
 | Sampling and headers | `LLMExtractionStrategy.extra_args` carries `temperature=None`, stable `x-omniroute-session` per arm/conversation and fresh `Idempotency-Key` per page/logical call. [`extraction_strategy.py:598–617,685–691`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/extraction_strategy.py#L598-L691), [official header example:23–25](https://github.com/unclecode/crawl4ai/blob/v0.9.4/docs/examples/llm_extraction_openai_pricing.py#L23-L25). The explicit None overrides the otherwise hidden temperature 0.01 in [`utils.py:1825–1837`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/utils.py#L1825-L1837); the verified LiteLLM fork drops None before serialization. |
 | Structured output | `extra_args.response_format` overrides the native `json_object` default with `json_schema`, `strict:true`, and the frozen schema's `additionalProperties:false` on every object. All properties are required. The user instruction contains JSON. This follows the gateway owner's supplied cognee 1.6.1 observation: a system-only JSON mention is insufficient after it becomes instructions. The native parser reads message content, so this recipe uses strict schema rather than assuming native tool-call parsing. |
 | Transport | Native LiteLLM `completion()` uses chat completions, not a Crawl4AI Responses path. The selected extraction implementation expects a complete `response.choices[0].message`; streaming is not enabled. Omitting temperature is the compatible gateway-cache choice. The owner's measured gateway accepts these GPT-6 chat requests; actual wire headers/omission remain host observations. |
 | Content selection | `DefaultMarkdownGenerator(content_filter=PruningContentFilterLXML(...))`, `threshold=0.35`, `threshold_type=fixed`, `min_word_threshold=1`; exclude nav/footer/aside; pass only nonempty `fit_markdown` to extraction. [Upstream FIT guide:43–90](https://github.com/unclecode/crawl4ai/blob/v0.9.4/docs/md_v2/core/fit-markdown.md#L43-L90). |
-| Budgets | One page per strategy, `apply_chunking=False`, `extra_args.max_tokens=3000`, timeout 180 s. A local 6000-character/4096-estimated-token guard with `word_token_rate=1.3` bounds the one extraction unit. Both LiteLLM `num_retries=0` and native `LLMConfig.backoff_max_attempts=1` bound calls. [`extraction_strategy.py:556–617,774–835`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/extraction_strategy.py#L556-L617). No silent truncation. |
+| Budgets | One page per strategy, `apply_chunking=False`, `extra_args.max_tokens=3000`, timeout 180 s. A local 6000-character/4096-estimated-token guard with `word_token_rate=1.3` bounds the one extraction unit. LiteLLM `num_retries=0`, `max_retries=0`, an OpenAI client with `max_retries=0`, and native `LLMConfig.backoff_max_attempts=1` bound calls. [`extraction_strategy.py:556–617,774–835`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/extraction_strategy.py#L556-L617). No silent truncation. |
 | Cache/state | `CrawlerRunConfig.cache_mode=CacheMode.BYPASS` for measurement; `CRAWL4_AI_BASE_DIRECTORY` scopes native databases/logs. [`async_database.py:17–21`](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/async_database.py#L17-L21). Filtering bytes are retained independently from provider counters; gateway compression/cache settings remain unchanged. |
 
-Both configurable model routes must be `cx/gpt-6-*`; `model_for` rejects Claude
-and other families before a call or container start. The primary quality role
-defaults to `cx/gpt-6-astra-max`, with `cx/gpt-6-sol`/medium as the explicit A/B
-comparison. There is no additional model-based judge: Promptfoo grades the frozen
-answers deterministically, and makes no gateway calls while grading.
+Model validation allows `cx/gpt-6-*` on control/comparison and exactly
+`sharedgw/gpt-6-astra-max` on engines-on. It rejects cross-arm, two-slash and
+non-GPT-6 routes before resources start. Promptfoo grades the frozen answers
+deterministically, without model calls.
 
 The two-phase crawl/filter/extract sequence prevents the upstream crawler's
 [empty-FIT fallback](https://github.com/unclecode/crawl4ai/blob/v0.9.4/crawl4ai/async_webcrawler.py#L925-L935)
@@ -257,8 +462,8 @@ objects](https://github.com/unclecode/crawl4ai/blob/v0.9.4/deploy/docker/mcp_bri
 while its declared `mcp>=1.18.0,<2` dependency's [server](https://github.com/modelcontextprotocol/python-sdk/blob/v1.18.0/src/mcp/server/lowlevel/server.py#L597-L601)
 and [session reader](https://github.com/modelcontextprotocol/python-sdk/blob/v1.18.0/src/mcp/shared/session.py#L330-L353)
 expect SessionMessage wrappers. This is a source compatibility concern, not a
-runtime failure already measured against the image. The E2E retains a failed
-WebSocket gate if it occurs and continues the independent native model arms.
+runtime failure already measured against the image. The E2E retains the WebSocket outcome as diagnostic evidence. SSE, authentication,
+and native extraction remain required; no WebSocket success is inferred.
 
 ## Frozen E2E and receipts
 
@@ -314,29 +519,20 @@ service retains the upstream internal-address denial.
 
 The runner performs unauthenticated denial controls, authenticated API FIT crawling,
 SSE and WebSocket initialization/tool calls, then three sequential native extraction
-calls per model arm. It retains every attempt in a fresh private run directory,
+calls for the selected arm. It retains every attempt in a fresh private run directory,
 including failures, filtered Markdown, raw extraction results, native logs, time
 windows and cleanup outcome. It never retries an entire trial to replace a failed
 receipt. Retries are disabled; any extra observed gateway call still makes the
 exact-three-call routing gate fail for review. No automatic model promotion occurs.
 
-[e2e/receipt.py](e2e/receipt.py) reads only `call_logs` from the live gateway DB
-through a read-only SQLite connection. Its SQL and authorizer permit exactly:
-`timestamp`, `path`, `status`, `model`, `reasoning_effort_requested`,
-`reasoning_effort_upstream`, `tokens_in`, `tokens_cache_read`, `tokens_reasoning`.
-It never discovers schema or reads other tables/columns. Returned rows are scoped
-to each arm's wall-clock window, not uniquely attributed conversations. Concurrent
-same-model traffic makes qualification inconclusive; the gate requires exactly
-three matching successful rows with max/medium upstream effort respectively.
-Unknown counters remain null. Cache-read and reasoning counters are not summed
-into input totals.
-
-Public receipts contain hashes and allowed sanitized fields, never raw logs,
-host paths, emails, credential values or session/request identifiers. Native
-container logs supply MCP request-type and HTTP-route counts. Because the upstream
-bridge does not log tool names, the receipt distinguishes an inferred `md` route
-from a tool name actually observed in framework logs, and separates both from
-our client probe outcomes. Skills remain “none observed,” not fabricated calls.
+[e2e/receipt.py](e2e/receipt.py) uses the selected arm's entry database and
+the allowlisted fields documented under Usage accounting. Public receipts contain
+hashes and sanitized observations, never raw logs, host paths, credential values,
+correlation IDs, or session/request identifiers. The native container log's
+`POST /md` count includes direct REST probes and MCP requests together. It is a
+route cross-check and never an inferred MCP tool count. Native `CallToolRequest`
+counts and the authenticated SSE probe remain separate. Skills remain “none
+observed.”
 Inputs, schema/oracle, worker/configuration, browser metadata, dependency lock and
 deployment files are hashed for reproducibility.
 
@@ -345,23 +541,23 @@ deployment files are hashed for reproducibility.
 | Class | Available evidence / boundary |
 | --- | --- |
 | Upstream source read | Release/commit, registry provenance, supported installation/configuration, native filtering/extraction and auth/MCP source. This is the basis for the recipe, not native acceptance. |
-| Structural/offline checks | Round-1 evidence stays in `verification.json`. Round-2 failing-first and final output is in `verification-round2.json`; checks cover request configuration, ports/ownership, transport, grader-report binding and receipt redaction. |
+| Structural/offline checks | Round-1 evidence stays in `verification.json`. Round-3 failing-first and final output is in `verification-round3.json`; previous rounds remain historical; checks cover request configuration, ports/ownership, transport, grader-report binding and receipt redaction. |
 | Upstream grader execution | Installed Promptfoo 0.123.1 runs the unchanged assertions on synthetic positive/negative controls. This is actual upstream grader execution, with no new model execution or host installation. |
 | Synthetic fixtures | Three authored pages and a frozen exact oracle. Offline positive data is the oracle itself and never described as a provider result. |
-| Local host integration | Pending: install/reinstall, Playwright launch, private modes and mapped UID behavior, container startup, protected API, both MCP transports, model extraction, headers/effort, native logs, receipt generation and cleanup/restart. |
+| Local host integration | Pending: install/reinstall, Playwright launch, private modes and mapped UID behavior, hardened container startup, protected API, SSE dispatch, diagnostic WebSocket transport, model extraction, headers/effort, native logs, receipt generation and cleanup/restart. |
 | Unchanged upstream tests | Not run in this builder. The upstream MCP socket example informed our probe; the SSE example's stale URL was not relabeled as passed. Docker pytest suites and any broader upstream acceptance remain separate coordinator work. |
 
 The existing coordinator host facts are inputs, not measurements repeated here.
 The gateway DB's allowed columns do not include request headers or temperature, so
 the receipt cannot independently prove header retention, sampling omission or
-exclusive per-session attribution. Those require the gateway owner's bounded
+wire-level forwarding through both gateways. Correlation matching narrows receipt attribution when all response headers are captured. Those require the gateway owner's bounded
 observation; the builder does not access forbidden columns. Container LLM request
 controls, WebSocket compatibility, broader crawl quality, real websites, persistent
 session behavior, causal token savings and model-currency decisions remain open.
 
 Run the local contracts with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover
 -s tests -p test_runtime_worker_crawl4ai.py`, with `TMPDIR` set to the assigned
-external scratch directory. Promptfoo 0.123.1 must already be on PATH for the
+scratch directory inside the owned worktree; remove it after the run. Promptfoo 0.123.1 must already be on PATH for the
 native grader checks; those checks explicitly skip if it is unavailable. Run
 `PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py` afterward. The coordinator
 owns re-registering changed hashes in the shared evidence manifest; this builder

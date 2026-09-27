@@ -15,6 +15,7 @@ import hashlib, json, pathlib, sys
 root = pathlib.Path(sys.argv[1])
 pins = json.loads((root / 'pins.json').read_text())
 assert hashlib.sha256((root / 'requirements.lock').read_bytes()).hexdigest() == pins['requirements_lock_sha256'], 'reviewed lock hash mismatch'
+assert hashlib.sha256((root / 'grader/package-lock.json').read_bytes()).hexdigest() == pins['grader']['lock_sha256'], 'reviewed grader lock hash mismatch'
 PY
 python3 "$NAS_CRAWL4AI_RECIPE/host.py" init
 NAS_CRAWL4AI_PYTHON="$(python3 "$NAS_CRAWL4AI_RECIPE/host.py" get python)"
@@ -43,8 +44,11 @@ if source.resolve() != destination.resolve():
                     ignore=shutil.ignore_patterns('.research', '__pycache__', '.gitignore'))
 PY
 export TMPDIR="$NAS_CRAWL4AI_STATE/tmp"
-npm install --global --prefix "$NAS_CRAWL4AI_PREFIX/grader" --cache "$NAS_CRAWL4AI_STATE/cache/npm" \
-  --no-audit --no-fund promptfoo@0.123.1
+mkdir -p "$NAS_CRAWL4AI_PREFIX/grader"
+cp "$NAS_CRAWL4AI_RECIPE/grader/package.json" "$NAS_CRAWL4AI_RECIPE/grader/package-lock.json" "$NAS_CRAWL4AI_PREFIX/grader/"
+# npm/cli@v11.19.0 docs/lib/content/commands/npm-ci.md:15-24.
+npm ci --ignore-scripts --prefix "$NAS_CRAWL4AI_PREFIX/grader" --cache "$NAS_CRAWL4AI_STATE/cache/npm" \
+  --no-audit --no-fund
 PROMPTFOO_CONFIG_DIR="$NAS_CRAWL4AI_STATE/grader" PROMPTFOO_DISABLE_TELEMETRY=1 \
   PROMPTFOO_DISABLE_UPDATE=1 "$NAS_CRAWL4AI_GRADER" --version
 "$NAS_CRAWL4AI_PYTHON" "$NAS_CRAWL4AI_PREFIX/recipe/install-browser.py"

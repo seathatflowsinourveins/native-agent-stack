@@ -4,7 +4,7 @@ set -euo pipefail
 umask 077
 export NAS_CRAWL4AI_PREFIX="$HOME/.local/share/codex-ecosystem/tools/crawl4ai-0.9.4"
 export NAS_CRAWL4AI_STATE="$HOME/.local/state/native-agent-stack/runtime-workers/crawl4ai"
-export NAS_CRAWL4AI_GRADER="$NAS_CRAWL4AI_PREFIX/grader/bin/promptfoo"
+export NAS_CRAWL4AI_GRADER="$NAS_CRAWL4AI_PREFIX/grader/node_modules/.bin/promptfoo"
 export PYTHONDONTWRITEBYTECODE=1
 export XDG_CACHE_HOME="$NAS_CRAWL4AI_STATE/cache"
 export CRAWL4_AI_BASE_DIRECTORY="$NAS_CRAWL4AI_STATE/crawl"

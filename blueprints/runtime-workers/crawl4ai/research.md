@@ -89,10 +89,61 @@ receipt provenance, and the documented conditional skills installation command.
 They remain local integration checks; the upstream assertions are executed
 unchanged. Research scratch and test state are outside the repository.
 
+## Round-3 source selection (2026-09-27)
+
+All four supplied review/common inputs were read before repairs. Reviews are
+leads, not upstream evidence. The installed search-first, find-skills, tdd and
+verification-before-completion instructions were read; no worker was spawned
+and no skill installed. The skills.sh leaderboard exposed existing testing and
+verification skills. The already installed skills cover this repair; the
+official Crawl4AI 0.7.4 skill archive remains unsuitable as a runtime loader.
+
+The selected runtime stays unclecode/crawl4ai@133e1d92e37885dfccc03ea2e3687d06c98b7ceb
+(v0.9.4). Read-only `gh api repos/unclecode/crawl4ai/releases/tags/v0.9.4`
+returned the release's native pip/Docker commands and published_at
+2026-09-23T12:14:55Z. The builder has no installed Crawl4AI or Docker executable;
+runtime capability claims therefore stay at source-evidence level. Installed
+Claude returned 2.1.283 and its add-json help lists stdio/SSE/HTTP/WebSocket and
+local/user/project scope. Installed npm returned 11.19.0. Direct shell GitHub
+network access failed; read-only GitHub/registry research succeeded through the
+available Context Mode research tool. No gateway was queried.
+
+| Integration behavior | Verified source (repository@pin, file:line) | Choice |
+| --- | --- | --- |
+| Gateway arguments and hidden drop_params | unclecode/crawl4ai@133e1d92 `crawl4ai/utils.py:1820-1837`; unclecode-litellm@1.81.13 verified wheel `litellm/main.py:1435-1459`, `litellm/utils.py:3925-3942,4677-4689` | Use native extra_args plus allowed_openai_params, not a patched runtime. Wheel SHA256 is `5e1fbedbed92333b48e7371e0bacf86d1288020451bf34351703c3b159591399`. |
+| Correlation headers | Same verified wheel `litellm/llms/openai/openai.py:741-790`; encode/httpx@0.28.1 `docs/advanced/event-hooks.md:1-52` | Inject the supported native client, with a synchronous response hook; keep only correlation IDs in memory. |
+| Conditional effort evidence | diegosouzapw/OmniRoute@a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 `src/lib/usage/callLogs.ts:642-653` | Zero reasoning and missing effort are distinct. Never infer wire omission from null. |
+| Compression delta | Same OmniRoute pin `src/app/api/analytics/compression/route.ts:13-24`, `src/lib/db/compressionAnalytics.ts:613-617` | Read cumulative all-time counters before/after engines-on; keep separate from provider usage. |
+| Async native REST jobs | unclecode/crawl4ai@133e1d92 `deploy/docker/job.py:60-64,114-149`, `api.py:485-605,813-819,997-1078` | Supported POST/poll fallback with fixed non-LLM payload, native verdict and private result. |
+| SSE MCP registration | Same Crawl4AI pin `deploy/docker/mcp_bridge.py:39-82,241-253`, `docs/md_v2/core/self-hosting.md:404-419`; anthropics/claude-code@v2.1.283 `CHANGELOG.md:5048,6971` plus installed add-json help and official MCP docs | Explicit SSE and dynamic headersHelper. Host connection/auth remains unmeasured. |
+| Detached lifecycle and serialization | python/cpython@v3.12.12 `Lib/subprocess.py:506-570,749-815`, `Modules/fcntlmodule.c:273-328` | Thin local start/wait/result wrapper and nonblocking host file lock. No new runtime/orchestrator. |
+| Grader dependency closure | promptfoo/promptfoo@0.123.1 `package.json:5,48-55`; npm/cli@v11.19.0 `docs/lib/content/commands/npm-ci.md:15-24` | Metadata-only lock generation; npm ci --ignore-scripts. No grader/assertion modifications. |
+| Container hardening | compose-spec/compose-spec@914ec15d1fa498969c0df5c1d672306db3256089 `05-services.md:171-180,1839-1841,1955-1965,2029-2053`; Crawl4AI@133e1d92 `Dockerfile:180-209`, `deploy/docker/entrypoint.sh:8-39` and `supervisord.conf:8-32` | Supported capabilities, no-new-privileges, read-only root and tmpfs; native workers retain appuser. |
+| Rootless host loopback | moby/moby@v28.5.1 `contrib/dockerd-rootless.sh:127-130,147-162` | Daemon-wide disable-host-loopback is the verified mechanism. Per-container port enforcement was not found in the reviewed mechanism; installed Docker is unavailable. Retain explicit residual risk, without an unsupported absence claim or daemon mutation. |
+
+The npm lock is a local derived artifact with 942 registry entries, each carrying
+SHA512 integrity, bound by pins.json. Resolution command (metadata only):
+
+```bash
+rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR="$PWD/.round3/tmp" npm install --package-lock-only --ignore-scripts --prefix "$PWD/blueprints/runtime-workers/crawl4ai/grader" --cache "$PWD/.round3/npm" --no-audit --no-fund
+```
+
+Returned output: `up to date in 25s`, exit 0. No node_modules directory was
+created. The cache and all test scratch were removed before final validation.
+
 ## Recorded corrections / anti-pattern log
 
 | Date | Proven mistake or unsafe assumption | Evidence and correction |
 | --- | --- | --- |
+| 2026-09-27, round 3 | Assuming `reasoning_effort` survives Crawl4AI's `drop_params=True` for an unknown GPT-6 slug | The verified unclecode-litellm 1.81.13 wheel, `utils.py:3925-3942,4677-4689`, extends supported parameters with `allowed_openai_params`. The request regression failed before adding that override and explicit max/max effort. Null effort is conditional evidence, not proof of omission: OmniRoute@a58000c7 `callLogs.ts:642-653`. |
+| 2026-09-27, round 3 | Carrying the review's two-slash route and both-gateways usage assumption forward | The user's common requirements supersede the review: use `sharedgw/gpt-6-astra-max` and 20129's entry database for engines-on. Request, correlation-filter and separate-entry-database tests verify this local contract; host model-name/header observations remain pending. |
+| 2026-09-27, round 3 | Treating every POST /md as an MCP tool invocation | The native bridge (`mcp_bridge.py:39-82` at 133e1d92) and direct probe share the route. The repaired receipt reports the combined route count and no inferred tool name; authenticated SSE and native CallToolRequest observations remain separate. |
+| 2026-09-27, round 3 | Probing Promptfoo version before setting private log paths | The initial version probe returned 0.123.1 but reported EROFS while attempting default log rotation. No file was changed. Subsequent executions use the existing grader's per-test private config/log/cache environment; final verification checks the absence of worktree caches. |
+| 2026-09-27, round 3 | Running publication validation while temporary npm metadata and grader test directories existed | The intermediate validator returned exit 1 with cache/publication-text and disappearing-test-file errors. Those temporary artifacts were removed; final validation runs only after tests and scratch cleanup. This was a builder sequencing error, not a repository waiver. |
+| 2026-09-27, round 3 | Looking for the image definition at deploy/docker/Dockerfile and an API symbol beyond the file's length | Read-only GitHub API returned no valid file at that Dockerfile path. The pinned file is root `Dockerfile:180-209`; actual job status is `deploy/docker/api.py:485-605,997-1078` (1078 lines). The malformed read was discarded and the real sources were re-read. |
+| 2026-09-27, round 3 | Retaining chmod-after-chown while removing CAP_FOWNER | The new ownership regression failed on the missing bootstrap ownership phase. Startup now takes only dedicated mount roots with CAP_CHOWN, chmods while their owner, then gives them to appuser. Runtime startup/restart remains a host check. |
+| 2026-09-27, round 3 | Trying to replace one verification file with delete and add in a single apply_patch call | apply_patch rejected the duplicate target before mutation. A single update patch succeeded; final diff and publication checks cover the resulting file. |
+| 2026-09-27, round 3 | Allowing receipt construction to raise again after configuration loading already failed | The damaged-config test raised from make_receipt in finally. The fallback now writes the stable minimal setup receipt and exits 2. A separate poll-failure regression verifies that losing evidence after REST enqueue exits 4, not a negative task verdict. |
 | 2026-09-27 | Letting the local extraction checker own the verdict | Round 1's `check.py` computed equality itself. The round-2 adapter contract failed against that behavior. It now only transports bytes; unchanged Promptfoo 0.123.1 assertions returned 0/100/100 for correct/wrong-price/malformed controls. Tests also refuse missing/modified reports and changed input bytes. |
 | 2026-09-27 | Assuming a grader's echoed output is byte-identical to its input file | Native Promptfoo's positive control succeeded, but the first receipt observation rejected it because the echoed response omitted the input's final newline (413 versus 414 characters). Preserve the exact input/report hashes and account for outer whitespace in the transport-binding check; the upstream verdict still owns product equality. `test_upstream_grader_controls_and_type_strictness` failed on the positive observation before correction. |
 | 2026-09-27 | Letting a forbidden-data substring match the grader's name | The old privacy test rejected the harmless `promptfoo` harness name because it searched for `prompt` anywhere. Test forbidden JSON keys and planted private-value markers, while retaining the exact allowed gateway columns. The focused receipt suite first failed on this substring. |

@@ -8,7 +8,14 @@
     "node_minimum": "22.22.0",
     "installation": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/installation.md",
     "mode": "standalone assertions over native output",
-    "assertions": ["is-json", "equals"]
+    "assertions": [
+      "is-json",
+      "equals"
+    ],
+    "lockfile": "grader/package-lock.json",
+    "lock_sha256": "b3577cbcf13a57c7a1e2e961f2b3db4d56e1990d765822c810ac8dbafbb12e1f",
+    "lock_source": "npm/cli@v11.19.0 metadata-only package-lock resolution of promptfoo/promptfoo@0.123.1; npm-ci.md:15-24; registry.npmjs.org integrity for every package",
+    "install": "npm ci --ignore-scripts --no-audit --no-fund"
   },
   "repository": "https://github.com/unclecode/crawl4ai",
   "tag": "v0.9.4",

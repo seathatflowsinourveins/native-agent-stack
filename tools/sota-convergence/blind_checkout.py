@@ -228,6 +228,8 @@ LABEL_VALUES = frozenset({
     "retain_2.3.1_pending_functional_acceptance",
     "source-reviewed-not-executed",
     "language alternative only",
+    "fixed",
+    "declined",
 })
 # Free-text blueprint values classified by review, keyed by the sha256 of the exact
 # string so the classification does not repeat the text. LABEL_TEXT_SHA256 values

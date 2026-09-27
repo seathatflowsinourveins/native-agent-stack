@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "round": 3,
+  "date": "2026-09-27",
+  "framework": "crawl4ai",
+  "base_head": "b14a110f",
+  "scope": "Local recipe repair and offline integration contracts; no installation, container start, model run, gateway request or live usage database read.",
+  "inputs": [
+    "rw3-crawl4ai-review.json",
+    "rw3-security.json",
+    "rw3-crawl4ai-integrate.json",
+    "rw3-common.md"
+  ],
+  "evidence_classes": [
+    "Local contract tests (including synthetic SQLite and mocked REST boundary)",
+    "Unchanged installed Promptfoo 0.123.1 assertions on authored controls; no model grader",
+    "Pinned source/metadata research; not host acceptance"
+  ],
+  "findings": [
+    {
+      "id": "C-01",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Effort may be dropped by LiteLLM.",
+      "evidence": "worker.py extraction_args; test_explicit_arms_route_and_effort_are_bound_together; unclecode-litellm@1.81.13 utils.py:3925-3942,4677-4689; Crawl4AI@133e1d92 utils.py:1820-1837"
+    },
+    {
+      "id": "C-02",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Engines-on model rejected.",
+      "evidence": "worker.py arm_settings; config/worker.json; CRAWL4AI_ARM binding test. Common round-3 one-slash route supersedes review's two-slash proposal; host routing observation remains supplied evidence."
+    },
+    {
+      "id": "C-03",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Gateway URL not selected per arm; unused container URL.",
+      "evidence": "worker.py native LLMConfig; container.sh --field container_base_url; config/compose.yaml variable substitution; arm and container tests; Crawl4AI@133e1d92 async_configs.py:2346-2409; deploy/docker/utils.py:114-138"
+    },
+    {
+      "id": "C-04",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Routing receipt hard-codes arms/models/effort and reads wrong gateway for engines.",
+      "evidence": "e2e/receipt.py selected_arms, conditional effort and entry database mapping; correlation/entry-database/privacy regressions; OmniRoute@a58000c7 callLogs.ts:642-653. Common requirements replace review's count-only-20128 advice."
+    },
+    {
+      "id": "C-05",
+      "severity": "major",
+      "disposition": "declined",
+      "finding": "Shared evidence manifest hashes stale.",
+      "evidence": "User explicitly forbids editing manifests/evidence.json; coordinator owns re-registration. Final validate output records changed-file hash/byte mismatches only; not claimed fully green."
+    },
+    {
+      "id": "C-06",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "Direct REST traffic misidentified as an MCP tool.",
+      "evidence": "Receipt keeps combined POST /md count and tool_names_inferred_from_routes=[]; test_receipt_uses_only_allowed_rows_and_never_exports_private_fields; Crawl4AI@133e1d92 mcp_bridge.py:39-82"
+    },
+    {
+      "id": "C-07",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "No stable receipt or failure contract for dispatch.",
+      "evidence": "dispatch.py start/wait/result and run.py setup fallback; deterministic status, exit codes, damaged-config and REST poll tests; CPython@v3.12.12 subprocess.py:506-570,749-815; Crawl4AI@133e1d92 job.py:114-149"
+    },
+    {
+      "id": "S-02",
+      "severity": "major",
+      "disposition": "declined",
+      "finding": "Cross-cutting rootless host-loopback reachability.",
+      "evidence": "README Security posture explicitly retains risk. moby/moby@v28.5.1 contrib/dockerd-rootless.sh:127-130,147-162 verifies daemon-wide switch, not per-container ports. Installed Docker unavailable. Host daemon/forwarder changes outside authorized worktree-only round; no model shell/tools provided by native extraction, persistent internal-URL denial/hooks-disabled retained. Coordinator must verify isolation before untrusted workloads."
+    },
+    {
+      "id": "S-05",
+      "severity": "major",
+      "disposition": "fixed",
+      "finding": "Unlocked host Promptfoo install with lifecycle scripts.",
+      "evidence": "grader/package-lock.json freezes 942 SHA512 registry entries; pins.json binds hash; install.sh npm ci --ignore-scripts; test_grader_install_uses_integrity_lock_without_lifecycle_scripts; npm/cli@v11.19.0 npm-ci.md:15-24"
+    },
+    {
+      "id": "S-09",
+      "severity": "minor",
+      "disposition": "fixed",
+      "finding": "Missing container hardening.",
+      "evidence": "compose drops ALL, adds four bootstrap capabilities, no-new-privileges, read-only root and tmpfs; supervisor retains appuser children. Ownership ordering test. compose-spec@914ec15 05-services.md:171-180,1839-1841,1955-1965,2029-2053; Crawl4AI@133e1d92 Dockerfile:180-209, entrypoint.sh:8-39. Startup remains host verification; bootstrap root exception documented."
+    }
+  ],
+  "red_green": [
+    {
+      "slice": "arms",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_explicit_arms_route_and_effort_are_bound_together -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_explicit_arms_route_and_effort_are_bound_together (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_explicit_arms_route_and_effort_are_bound_together) ... ERROR\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nFAILED (errors=1)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_explicit_arms_route_and_effort_are_bound_together -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_explicit_arms_route_and_effort_are_bound_together (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_explicit_arms_route_and_effort_are_bound_together) ... ok\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK"
+      }
+    },
+    {
+      "slice": "correlation",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_response_correlation_is_captured_without_exporting_other_headers tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_entry_gateway_filters_correlations_and_reports_conditional_effort -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_response_correlation_is_captured_without_exporting_other_headers (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_response_correlation_is_captured_without_exporting_other_headers) ... ERROR\ntest_entry_gateway_filters_correlations_and_reports_conditional_effort (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_entry_gateway_filters_correlations_and_reports_conditional_effort) ... ERROR\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 0.038s\n\nFAILED (errors=2)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_response_correlation_is_captured_without_exporting_other_headers tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_entry_gateway_filters_correlations_and_reports_conditional_effort -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_response_correlation_is_captured_without_exporting_other_headers (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_response_correlation_is_captured_without_exporting_other_headers) ... ok\ntest_entry_gateway_filters_correlations_and_reports_conditional_effort (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_entry_gateway_filters_correlations_and_reports_conditional_effort) ... ok\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 0.065s\n\nOK"
+      }
+    },
+    {
+      "slice": "receipt",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_uses_only_allowed_rows_and_never_exports_private_fields tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_cannot_certify_absent_db_or_missing_native_mcp_logs -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "receipt.py: error: unrecognized arguments: --engines-db <synthetic-database>\nRan 2 tests in 15.451s\n\nFAILED (failures=2)",
+        "sanitization": "Synthetic absolute database path replaced; traceback and routine output omitted."
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_uses_only_allowed_rows_and_never_exports_private_fields tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_cannot_certify_absent_db_or_missing_native_mcp_logs -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "ok\ntest_receipt_cannot_certify_absent_db_or_missing_native_mcp_logs (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_cannot_certify_absent_db_or_missing_native_mcp_logs) ... ok\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 15.690s\n\nOK"
+      }
+    },
+    {
+      "slice": "security",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_grader_install_uses_integrity_lock_without_lifecycle_scripts tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "Warning: truncated output (original token count: 2152)\nTotal output lines: 25\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nFAILED (failures=2)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_grader_install_uses_integrity_lock_without_lifecycle_scripts tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_grader_install_uses_integrity_lock_without_lifecycle_scripts (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_grader_install_uses_integrity_lock_without_lifecycle_scripts) ... ok\ntest_container_hardening_and_arm_base_url_are_effective (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective) ... ok\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 0.005s\n\nOK"
+      }
+    },
+    {
+      "slice": "dispatch",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_dispatch_has_deterministic_status_and_distinct_verdicts -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_dispatch_has_deterministic_status_and_distinct_verdicts (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_dispatch_has_deterministic_status_and_distinct_verdicts) ... ERROR\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nFAILED (errors=1)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_dispatch_has_deterministic_status_and_distinct_verdicts -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_dispatch_has_deterministic_status_and_distinct_verdicts (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_dispatch_has_deterministic_status_and_distinct_verdicts) ... ok\n\n[traceback / routine output omitted]\n{\"arm\": \"engines-on\", \"exit_code\": 0, \"receipt_path\": \"<worktree>/.round3/tmp/tmpttwyrvrz/runs/child-001/receipt.json\", \"run_id\": \"child-001\", \"state\": \"finished\", \"status_path\": \"<worktree>/.round3/tmp/tmpttwyrvrz/runs/child-001/status.json\"}\n{\"arm\": \"engines-on\", \"exit_code\": 0, \"receipt_path\": \"<worktree>/.round3/tmp/tmpttwyrvrz/runs/child-001/receipt.json\", \"run_id\": \"child-001\", \"state\": \"finished\", \"status_path\": \"<worktree>/.round3/tmp/tmpttwyrvrz/runs/child-001/status.json\"}\n{\"arm\": \"engines-on\", \"exit_code\": 0, \"receipt_path\": \"<worktree>/.round3/tmp/tmpttwyrvrz/runs/child-001/receipt.json\", \"run_id\": \"child-001\", \"state\": \"finished\", \"status_path\": \"<worktree>/.round3/tmp/tmpttwyrvrz/runs/child-001/status.json\"}\n{\"outcome\": \"setup_failure\", \"error_class\": \"ValueError\", \"exit_code\": 2}\n{\"outcome\": \"setup_failure\", \"error_class\": \"ValueError\", \"exit_code\": 2}"
+      }
+    },
+    {
+      "slice": "run",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_e2e_setup_failure_writes_receipt_before_host_resources -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_e2e_setup_failure_writes_receipt_before_host_resources (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_e2e_setup_failure_writes_receipt_before_host_resources) ... ERROR\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.024s\n\nFAILED (errors=1)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_e2e_setup_failure_writes_receipt_before_host_resources -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_e2e_setup_failure_writes_receipt_before_host_resources (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_e2e_setup_failure_writes_receipt_before_host_resources) ... ok\n\n[traceback / routine output omitted]\n----------------------------------------------------------------------\nRan 1 test in 0.029s\n\nOK\n{\"arm\": \"engines-on\", \"exit_code\": 2, \"receipt_path\": \"<worktree>/.round3/tmp/tmp5pl0b7i0/receipt.json\", \"state\": \"finished\", \"status_path\": \"<worktree>/.round3/tmp/tmp5pl0b7i0/status.json\"}"
+      }
+    },
+    {
+      "slice": "rest",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_mcp_registration_uses_explicit_sse_and_dynamic_private_headers -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids) ... ERROR\ntest_mcp_registration_uses_explicit_sse_and_dynamic_private_headers (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_mcp_registration_uses_explicit_sse_and_dynamic_private_headers) ... ERROR\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 0.007s\n\nFAILED (errors=2)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_mcp_registration_uses_explicit_sse_and_dynamic_private_headers -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids) ... ok\ntest_mcp_registration_uses_explicit_sse_and_dynamic_private_headers (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_mcp_registration_uses_explicit_sse_and_dynamic_private_headers) ... ok\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 2 tests in 0.020s\n\nOK"
+      }
+    },
+    {
+      "slice": "ownership",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_container_hardening_and_arm_base_url_are_effective (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective) ... ERROR\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (errors=1)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_container_hardening_and_arm_base_url_are_effective (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective) ... ok\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK"
+      }
+    },
+    {
+      "slice": "damaged",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_damaged_config_still_leaves_a_setup_receipt -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_damaged_config_still_leaves_a_setup_receipt (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_damaged_config_still_leaves_a_setup_receipt) ... ERROR\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.027s\n\nFAILED (errors=1)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_damaged_config_still_leaves_a_setup_receipt -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_damaged_config_still_leaves_a_setup_receipt (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_damaged_config_still_leaves_a_setup_receipt) ... ok\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.029s\n\nOK"
+      }
+    },
+    {
+      "slice": "poll",
+      "fail_first": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids -v",
+        "exit_code": 1,
+        "returned_output_excerpt": "test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids) ... ERROR\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.018s\n\nFAILED (errors=1)"
+      },
+      "pass": {
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" python3 -m unittest tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids -v",
+        "exit_code": 0,
+        "returned_output_excerpt": "test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids) ... ok\n\n[traceback / routine output omitted]\n\n----------------------------------------------------------------------\nRan 1 test in 0.015s\n\nOK"
+      }
+    }
+  ],
+  "sanitization": "Returned excerpts preserve actual exit codes and selected lines. Absolute worktree/runtime/temp paths replaced; traceback/routine output omitted. Full final acceptance output is retained below.",
+  "research": "research.md#round-3-source-selection-2026-09-27; README source links and pin/file/line mappings",
+  "corrections": "research.md#recorded-corrections--anti-pattern-log includes failed network/path probes, Promptfoo default log attempt, premature validation with temporary caches, ownership and damaged-config corrections.",
+  "acceptance": {
+    "unittest": {
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 TMPDIR=\"$PWD/.round3/tmp\" NODE_DISABLE_COMPILE_CACHE=1 python3 -m unittest tests.test_runtime_worker_crawl4ai -v",
+      "exit_code": 0,
+      "returned_output": "test_adapter_transports_correct_wrong_and_malformed_outputs_unchanged (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_adapter_transports_correct_wrong_and_malformed_outputs_unchanged) ... ok\ntest_container_hardening_and_arm_base_url_are_effective (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_container_hardening_and_arm_base_url_are_effective) ... ok\ntest_damaged_config_still_leaves_a_setup_receipt (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_damaged_config_still_leaves_a_setup_receipt) ... ok\ntest_dispatch_has_deterministic_status_and_distinct_verdicts (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_dispatch_has_deterministic_status_and_distinct_verdicts) ... ok\ntest_docker_objects_have_owned_names_and_labels (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_docker_objects_have_owned_names_and_labels) ... ok\ntest_e2e_setup_failure_writes_receipt_before_host_resources (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_e2e_setup_failure_writes_receipt_before_host_resources) ... ok\ntest_engines_usage_comes_from_its_entry_database_only (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_engines_usage_comes_from_its_entry_database_only) ... ok\ntest_entry_gateway_filters_correlations_and_reports_conditional_effort (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_entry_gateway_filters_correlations_and_reports_conditional_effort) ... ok\ntest_explicit_arms_route_and_effort_are_bound_together (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_explicit_arms_route_and_effort_are_bound_together) ... ok\ntest_gateway_model_is_configurable_and_has_no_sampling_default (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_gateway_model_is_configurable_and_has_no_sampling_default) ... ok\ntest_gateway_refuses_non_gpt6_model_overrides (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_gateway_refuses_non_gpt6_model_overrides) ... ok\ntest_grader_install_uses_integrity_lock_without_lifecycle_scripts (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_grader_install_uses_integrity_lock_without_lifecycle_scripts) ... ok\ntest_install_is_scoped_hash_checked_and_loopback_only (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_install_is_scoped_hash_checked_and_loopback_only) ... ok\ntest_mcp_limits_are_explicit_and_not_claimed_as_loaded (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_mcp_limits_are_explicit_and_not_claimed_as_loaded) ... ok\ntest_mcp_registration_uses_explicit_sse_and_dynamic_private_headers (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_mcp_registration_uses_explicit_sse_and_dynamic_private_headers) ... ok\ntest_private_host_ports_refuse_other_lanes (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_private_host_ports_refuse_other_lanes) ... ok\ntest_receipt_cannot_certify_absent_db_or_missing_native_mcp_logs (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_cannot_certify_absent_db_or_missing_native_mcp_logs) ... ok\ntest_receipt_uses_only_allowed_rows_and_never_exports_private_fields (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_receipt_uses_only_allowed_rows_and_never_exports_private_fields) ... ok\ntest_recipe_is_reviewable_and_pinned (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_recipe_is_reviewable_and_pinned) ... ok\ntest_response_correlation_is_captured_without_exporting_other_headers (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_response_correlation_is_captured_without_exporting_other_headers) ... ok\ntest_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_rest_job_dispatch_uses_native_status_and_never_exposes_job_ids) ... ok\ntest_skills_documentation_uses_coordinator_install_lifecycle (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_skills_documentation_uses_coordinator_install_lifecycle) ... ok\ntest_structured_requests_close_schemas_and_bind_logical_calls (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_structured_requests_close_schemas_and_bind_logical_calls) ... ok\ntest_three_frozen_pages_and_both_arms (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_three_frozen_pages_and_both_arms) ... ok\ntest_upstream_grader_controls_and_type_strictness (tests.test_runtime_worker_crawl4ai.Crawl4AIRecipeTests.test_upstream_grader_controls_and_type_strictness)\nReal unchanged Promptfoo assertions, with local synthetic controls. ... ok\n\n----------------------------------------------------------------------\nRan 25 tests in 27.864s\n\nOK\n",
+      "scope": "25 local tests; unchanged installed Promptfoo assertions executed, with no skipped tests and no model/API calls. The temporary test directory was removed afterward."
+    },
+    "publication": {
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_output": "Publication validation failed:\nblueprints/runtime-workers/crawl4ai/README.md: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/README.md: byte count mismatch\nblueprints/runtime-workers/crawl4ai/common.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/common.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/config/compose.yaml: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/config/compose.yaml: byte count mismatch\nblueprints/runtime-workers/crawl4ai/config/worker.json: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/config/worker.json: byte count mismatch\nblueprints/runtime-workers/crawl4ai/container-entrypoint.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/container-entrypoint.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/container.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/container.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/crawl4ai/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/crawl4ai/install.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/install.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/pins.json: byte count mismatch\nblueprints/runtime-workers/crawl4ai/research.md: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/research.md: byte count mismatch\nblueprints/runtime-workers/crawl4ai/run-e2e.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/run-e2e.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/worker.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/worker.py: byte count mismatch\ntests/test_runtime_worker_crawl4ai.py: SHA-256 mismatch\ntests/test_runtime_worker_crawl4ai.py: byte count mismatch\n",
+      "classification": "28 SHA-256/byte-count mismatches on 14 changed tracked files only. The coordinator must re-register hashes; no evidence-manifest edit was made."
+    },
+    "diff_check": {
+      "command": "rtk env GIT_OPTIONAL_LOCKS=0 git diff --check",
+      "exit_code": 0,
+      "returned_output": ""
+    },
+    "syntax_and_cache": {
+      "exit_code": 0,
+      "returned_output": "PASS: Python AST, Bash syntax, no __pycache__, node_modules or round-3 scratch\n"
+    },
+    "git_boundaries": {
+      "head": "b14a110f",
+      "evidence_manifest_unchanged": true,
+      "command": "rtk env GIT_OPTIONAL_LOCKS=0 git diff --quiet -- manifests/evidence.json",
+      "exit_code": 0
+    }
+  },
+  "host_verification": [
+    "Coordinator re-register changed/new evidence hashes and rerun publication validation before committing.",
+    "Fresh hash-locked Python/npm installs; unchanged grader controls with lifecycle scripts disabled; no native dependency assumption promoted to acceptance.",
+    "Rootless Compose startup/restart, mapped UID ownership, appuser processes and read-only-root/tmpfs compatibility.",
+    "Measure host-loopback isolation and provision supported explicit service forwarding/isolation before untrusted crawling.",
+    "Sequential control/engines-on E2E; temperature omission, single-slash routing, max effort, compression/header/session/idempotency forwarding, correlation capture and client retry behavior.",
+    "Verify 20129 database path/ownership, timestamp/status/model formats, allowed column availability and compression endpoint deltas; no adding forwarded 20128 rows.",
+    "Claude 2.1.283 explicit SSE initialize/tools/call and auth on GET plus POST messages; transcript/OTel attribution and server log/metric increment; WebSocket remains diagnostic.",
+    "Container LLM remains unqualified; native extraction strict schema and max_tokens=3000 sufficiency still require host evidence."
+  ],
+  "changed_files": [
+    "blueprints/runtime-workers/crawl4ai/README.md",
+    "blueprints/runtime-workers/crawl4ai/common.sh",
+    "blueprints/runtime-workers/crawl4ai/config/compose.yaml",
+    "blueprints/runtime-workers/crawl4ai/config/worker.json",
+    "blueprints/runtime-workers/crawl4ai/container-entrypoint.sh",
+    "blueprints/runtime-workers/crawl4ai/container.sh",
+    "blueprints/runtime-workers/crawl4ai/dispatch.py",
+    "blueprints/runtime-workers/crawl4ai/dispatch.sh",
+    "blueprints/runtime-workers/crawl4ai/e2e/receipt.py",
+    "blueprints/runtime-workers/crawl4ai/e2e/run.py",
+    "blueprints/runtime-workers/crawl4ai/grader/package.json",
+    "blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
+    "blueprints/runtime-workers/crawl4ai/install.sh",
+    "blueprints/runtime-workers/crawl4ai/mcp-config.py",
+    "blueprints/runtime-workers/crawl4ai/pins.json",
+    "blueprints/runtime-workers/crawl4ai/research.md",
+    "blueprints/runtime-workers/crawl4ai/run-e2e.sh",
+    "blueprints/runtime-workers/crawl4ai/verification-round3.json",
+    "blueprints/runtime-workers/crawl4ai/worker.py",
+    "tests/test_runtime_worker_crawl4ai.py"
+  ]
+}

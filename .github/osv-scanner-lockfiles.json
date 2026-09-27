@@ -139,6 +139,17 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/runtime-workers/crawl4ai/requirements.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json"
+    },
+    {
       "path": "blueprints/us-equities/mover-v3/study/runtime-requirements.txt",
       "parser": "requirements.txt"
     },
@@ -198,6 +209,10 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
       "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/grader/package.json",
+      "lockfile": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json"
     }
   ],
   "excluded": [

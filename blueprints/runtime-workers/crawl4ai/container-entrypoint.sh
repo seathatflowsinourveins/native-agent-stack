@@ -6,8 +6,11 @@ export PLAYWRIGHT_BROWSERS_PATH="$(python3 -c 'import pwd; from pathlib import P
 # Only these dedicated worker mounts are initialized. Baked browser files stay
 # at their upstream image path. Dockerfile:180-191,204-209 and supervisor user=appuser.
 mkdir -p /var/lib/crawl4ai /var/lib/redis /var/cache/crawl4ai/tmp
-chown appuser:appuser /var/lib/crawl4ai /var/lib/redis /var/cache/crawl4ai /var/cache/crawl4ai/tmp
+# CAP_CHOWN permits reclaiming only these mount roots before chmod; dropping
+# CAP_FOWNER means chmod must happen while bootstrap root owns the directory.
+chown 0:0 /var/lib/crawl4ai /var/lib/redis /var/cache/crawl4ai /var/cache/crawl4ai/tmp
 chmod 0700 /var/lib/crawl4ai /var/lib/redis /var/cache/crawl4ai /var/cache/crawl4ai/tmp
+chown appuser:appuser /var/lib/crawl4ai /var/lib/redis /var/cache/crawl4ai /var/cache/crawl4ai/tmp
 # Explicit interface + a second loopback bind in supervisord.conf for MCP's proxy.
 NAS_CRAWL4AI_IP="$(python3 -c 'import socket; print(socket.gethostbyname(socket.gethostname()))')"
 export GUNICORN_BIND="${NAS_CRAWL4AI_IP}:11235"

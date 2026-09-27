@@ -13,23 +13,63 @@ import math
 import os
 import re
 import uuid
+from contextlib import AsyncExitStack
 from pathlib import Path
 
 
+def selected_arm():
+    arm = os.environ.get("CRAWL4AI_ARM", "control")
+    if arm not in {"control", "engines-on", "comparison"}:
+        raise ValueError("unknown Crawl4AI arm")
+    return arm
+
+
+def arm_settings(config, arm):
+    """Bind the reviewed route, port and effort; no cross-gateway overrides.
+
+    Common round-3 contract; Crawl4AI@133e1d92 async_configs.py:2346-2409.
+    The optional historical sol/medium comparison remains explicitly selected.
+    """
+    if arm == "primary":  # historical callers; new dispatch never emits this name
+        arm = "control"
+    if arm not in config["arms"]:
+        raise ValueError("unknown Crawl4AI arm")
+    route = dict(config["arms"][arm])
+    model = os.environ.get(route["model_env"], route["model"])
+    if arm == "engines-on":
+        valid = model == "sharedgw/gpt-6-astra-max"
+    else:
+        valid = re.fullmatch(r"cx/gpt-6(?:-[A-Za-z0-9]+)+", model) is not None
+    if not valid:
+        raise ValueError("model must use the selected arm's reviewed GPT-6 route")
+    base = os.environ.get(route["base_url_env"], route["base_url"])
+    if base != route["base_url"]:
+        raise ValueError("base URL must match the selected arm's loopback gateway")
+    route.update(arm=arm, model=model, base_url=base)
+    # Explicit log aliases are exact model strings, never broad prefix matches.
+    route["gateway_log_models"] = [model, model.split("/", 1)[-1]]
+    return route
+
+
 def model_for(config, arm):
-    settings = config["llm"] if arm == "primary" else config["comparison"]
-    model = os.environ.get(settings["model_env"], settings["model"])
-    if not re.fullmatch(r"cx/gpt-6(?:-[A-Za-z0-9]+)+", model):
-        raise ValueError("OmniRoute worker routes must select a cx/gpt-6 model")
-    return model
+    return arm_settings(config, arm)["model"]
 
 
-def extraction_args(config, arm, schema, session):
+def correlation_hook(collector):
+    """HTTPX@0.28.1 docs/advanced/event-hooks.md:1-52; retain IDs in memory only."""
+    def capture(response):
+        value = response.headers.get("x-correlation-id")
+        collector.append(value if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9._:-]{1,200}", value) else None)
+    return capture
+
+
+def extraction_args(config, arm, schema, session, client=None):
     """Native extra_args override, per v0.9.4 utils.py:1825-1837.
 
     force_json_response retains native JSON parsing; this strict schema replaces
     its weaker json_object request. The frozen schema closes every object.
     """
+    route = arm_settings(config, arm)
     extra = {
         # Native utils injects 0.01; the pinned LiteLLM fork omits None values.
         "temperature": None,
@@ -39,19 +79,29 @@ def extraction_args(config, arm, schema, session):
         "max_tokens": config["llm"]["max_tokens"],
         "timeout": config["llm"]["timeout_seconds"],
         "num_retries": 0,
+        "max_retries": 0,
+        # unclecode-litellm@1.81.13 utils.py:3925-3942: preserve this
+        # parameter even when Crawl4AI sets litellm.drop_params=True.
+        "allowed_openai_params": ["reasoning_effort"],
+        "reasoning_effort": route["expected_effort"],
         "extra_headers": {"x-omniroute-session": session, "Idempotency-Key": uuid.uuid4().hex},
     }
-    if arm == "comparison":
-        extra["reasoning_effort"] = config["comparison"]["reasoning_effort"]
+    if arm == "engines-on":
+        extra["extra_headers"]["x-omniroute-compression"] = "allow-lossy"
+    if client is not None:
+        extra["client"] = client
     return extra
 
 
-async def extract(config, arm, fixture_base, output, artifact_dir):
+async def extract(config, arm, fixture_base, output, artifact_dir, correlation_ids=None):
+    route = arm_settings(config, arm)
     model = model_for(config, arm)
     from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig, LLMConfig
     from crawl4ai.content_filter_strategy import PruningContentFilterLXML
     from crawl4ai.extraction_strategy import LLMExtractionStrategy
     from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
+    import httpx
+    from openai import OpenAI
 
     root = Path(__file__).parent
     schema = json.loads((root / "e2e/schema.json").read_text())
@@ -71,7 +121,16 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
     )
     rows, measurements = [], []
     output.write_text(json.dumps({"records": []}))
-    async with AsyncWebCrawler(config=browser) as crawler:
+    async with AsyncExitStack() as stack:
+        # Native LiteLLM client injection (1.81.13 openai.py:741-790).
+        # A synchronous HTTPX hook observes each wire response, before parsing;
+        # it captures only X-Correlation-Id, never bodies or other headers.
+        ids = correlation_ids if correlation_ids is not None else []
+        client = stack.enter_context(OpenAI(
+            api_key=config["llm"]["api_token"], base_url=route["base_url"], max_retries=0,
+            http_client=httpx.Client(event_hooks={"response": [correlation_hook(ids)]}),
+        ))
+        crawler = await stack.enter_async_context(AsyncWebCrawler(config=browser))
         for index, page in enumerate(config["e2e"]["pages"]):
             url = fixture_base + "/" + page
             crawled = await crawler.arun(url=url, config=crawl_config)
@@ -84,7 +143,7 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
             (artifact_dir / f"page-{index}.fit.md").write_text(fit)
             strategy = LLMExtractionStrategy(
                 llm_config=LLMConfig(provider=config["llm"]["provider_prefix"] + model,
-                                     api_token=config["llm"]["api_token"], base_url=config["llm"]["base_url"],
+                                     api_token=config["llm"]["api_token"], base_url=route["base_url"],
                                      backoff_max_attempts=1),
                 schema=schema,
                 extraction_type="schema",
@@ -95,7 +154,7 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
                 overlap_rate=content["overlap_rate"],
                 word_token_rate=content["word_token_rate"],
                 apply_chunking=False,
-                extra_args=extraction_args(config, arm, schema, session),
+                extra_args=extraction_args(config, arm, schema, session, client=client),
             )
             extracted = await asyncio.to_thread(strategy.run, url, [fit])
             (artifact_dir / f"page-{index}.raw.json").write_text(json.dumps(extracted))
@@ -119,4 +178,8 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
 
 if __name__ == "__main__":
     # Model read-back for container.sh; importing this file makes no provider call.
-    print(model_for(json.loads((Path(__file__).parent / "config/worker.json").read_text()), "primary"))
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--field", choices=("model", "container_base_url"), default="model")
+    args = parser.parse_args()
+    print(arm_settings(json.loads((Path(__file__).parent / "config/worker.json").read_text()), selected_arm())[args.field])

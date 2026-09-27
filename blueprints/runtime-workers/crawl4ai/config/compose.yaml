@@ -9,6 +9,13 @@ services:
     # Container root maps to the unprivileged host user. Native supervisor drops
     # Redis/Gunicorn to appuser after reading host-owned 0600 secret mounts.
     user: "0:0"
+    cap_drop: [ALL]
+    # Only bootstrap ownership and supervisor's native appuser transition.
+    cap_add: [CHOWN, DAC_OVERRIDE, SETUID, SETGID]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,mode=1777
     pull_policy: never
     init: true
     restart: "no"
@@ -21,8 +28,9 @@ services:
     environment:
       LLM_PROVIDER: "openai/${CRAWL4AI_MODEL:?model supplied by config}"
       LLM_API_KEY: "local-loopback"
-      OPENAI_BASE_URL: "http://10.0.2.2:20128/v1"
-      LLM_BASE_URL: "http://10.0.2.2:20128/v1"
+      OPENAI_BASE_URL: "${CRAWL4AI_CONTAINER_BASE_URL:?validated selected arm}"
+      LLM_BASE_URL: "${CRAWL4AI_CONTAINER_BASE_URL:?validated selected arm}"
+      PYTHONDONTWRITEBYTECODE: "1"
       CRAWL4AI_HOOKS_ENABLED: "false"
       CRAWL4AI_ALLOW_INTERNAL_URLS: "${NAS_CRAWL4AI_INTERNAL_URLS:-false}"
       CRAWL4_AI_BASE_DIRECTORY: "/var/lib/crawl4ai"
