@@ -73,7 +73,7 @@
   },
   "sanitization": "Red traceback excerpt replaces the worktree prefix with <scratchpad> and omits separator/caret lines. Native version/help and primary-source reads are described in the preregistration. No conversations, session identifiers, credentials or personal paths are published.",
   "limitations": "These checks do not establish Workflow inheritance, long-child eligibility, budget feasibility, frozen task quality or any comparative window result. Candidate hashes and registration establish byte identity, not a freeze or model execution.",
-  "original_record_scope": "Original authoring checks and commit attempt below are historical, preceding f7cc409a. cross_family_repair_20260927 is the current round and attempted no git mutation commands.",
+  "original_record_scope": "Original authoring checks and commit attempt below are historical, preceding f7cc409a. cross_family_repair_20260927 is the earlier repair round and attempted no git mutation commands; host_condition_amendment_20260927 is the current round.",
   "cross_family_repair_20260927": {
     "date": "2026-09-27",
     "reviewed_head": "f7cc409a3df212375c76f957700b1ebb16ce1e73",
@@ -361,6 +361,224 @@
         "result": "Rejected: multiple operations target the same path; no edit applied.",
         "correction": "Use one Update File patch."
       }
+    ],
+    "registration_handoff": {
+      "changed_files": [
+        "blueprints/compaction-window-ab/PREREGISTRATION.md",
+        "blueprints/compaction-window-ab/preregistration.json",
+        "blueprints/compaction-window-ab/build-evidence.json",
+        "tests/test_compaction_window_ab_preregistration.py"
+      ],
+      "manifest_edit_owner": "coordinator",
+      "builder_edited_manifest": false,
+      "final_byte_registration_pending": true
+    }
+  },
+  "host_condition_amendment_20260927": {
+    "date": "2026-09-27",
+    "base_revision": "b6f36d8cac660b47cafc827ee4595cf0bc74459a",
+    "branch": "claude/compaction-window-ab-prereg-20260927",
+    "worktree": "<scratch>/wt-compact",
+    "amendment": "Amendment 2026-09-27 — host-condition change (incumbent A), still DRAFT",
+    "status": "DRAFT_not_frozen_not_run",
+    "execution_authorized": false,
+    "builder": {
+      "role": "isolated-builder",
+      "model": "Claude Opus 5.5 (claude-opus-5-5, 1M context)",
+      "brief": "Coordinator brief with inputs F1-F3, then a coordinator course correction adding F4, F5, the partition band rule and the launch-gate keys; both applied in this one round."
+    },
+    "band_rule_applied": "partition",
+    "band_rule_history": "The first brief specified symmetric inclusive +/-10% bands around each trigger (B 330300..403700, C 150300..183700). The course correction, received before any blueprint edit, relayed F4 and replaced them with partition bands: C [150300, 330300), B [330300, 870300), A [870300, 1000000].",
+    "boundaries": {
+      "host_settings_changed_by_builder": false,
+      "claude_sessions_started": 0,
+      "model_runs": 0,
+      "claude_client_invocations": [
+        "claude --version: installation inspection, returned 2.1.283 (Claude Code); no session and no model call"
+      ],
+      "credential_reads": 0,
+      "subagents_spawned": 0,
+      "evidence_manifest_changed": false,
+      "edited_paths": [
+        "blueprints/compaction-window-ab/PREREGISTRATION.md",
+        "blueprints/compaction-window-ab/preregistration.json",
+        "blueprints/compaction-window-ab/build-evidence.json",
+        "tests/test_compaction_window_ab_preregistration.py"
+      ],
+      "git_mutations": "One commit of the four allowed paths after this record; no push. The fail-first base tree was exported with git archive, which writes no git metadata.",
+      "python_dont_write_bytecode": "1"
+    },
+    "inputs": [
+      {
+        "id": "F1",
+        "title": "host condition changed",
+        "provenance": "coordinator_supplied_not_replayed",
+        "observation": "At the user's request, peer session a9 removed env.CLAUDE_CODE_AUTO_COMPACT_WINDOW from the user settings. Its research workflow found no primary source recommending 400K or 40%, and a backup of the file exists.",
+        "command": "jq -r '.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW // \"absent\"' ~/.claude/settings.json",
+        "returned_output": "absent",
+        "observed_at_approx_utc": "2026-09-27T23:28Z",
+        "settings_file_mtime_utc": "2026-09-27T23:21:57Z",
+        "mtime_meaning": "File modification time, not the removal instant.",
+        "coordinator_shell_value": "400000",
+        "consequence": "Sessions started before the removal keep 400000 in their process environment, and a launcher spawned from one would pass it on, so arm A keeps env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW."
+      },
+      {
+        "id": "F2",
+        "title": "native autocompact buffer",
+        "provenance": "coordinator_supplied_not_replayed",
+        "command": "On installed Claude Code 2.1.283, from a scratch directory: claude -p \"/context\" --model claude-opus-5-5, with the variable removed via env -u for the unset case and set explicitly otherwise",
+        "returned_output_filtered": {
+          "unset": "**Tokens:** 19.3k / 1m (2%)\n| Free space | 947.7k | 94.8% |\n| Autocompact buffer | 33k | 3.3% |\n",
+          "400000": "**Tokens:** 19.3k / 400k (5%)\n| Free space | 347.7k | 86.9% |\n| Autocompact buffer | 33k | 8.3% |\n",
+          "200000": "**Tokens:** 19.3k / 200k (10%)\n| Free space | 147.7k | 73.8% |\n| Autocompact buffer | 33k | 16.5% |\n",
+          "100000": "**Tokens:** 19.3k / 100k (19%)\n| Free space | 47.7k | 47.7% |\n| Autocompact buffer | 33k | 33.0% |\n"
+        },
+        "result": "The buffer is a constant 33k at all four windows, so the implied automatic trigger is window - 33000: A about 967000 (matching the documented about 967K), B about 367000, C about 167000.",
+        "evidence_class": "native_display_observation_not_a_compaction_event",
+        "component_split": "Not recorded as fact. A peer's split of the 33k had no source in the first brief; it appears only through F5, as an undocumented reading."
+      },
+      {
+        "id": "F3",
+        "title": "consequence for the old bands",
+        "provenance": "coordinator_supplied_arithmetic_rechecked_by_builder",
+        "observation": "The C band 180000..220000 excludes C's 167000 trigger, so every C focal child would be out of band and invalidate the run; B's 360000..440000 includes 367000 by only 7000."
+      },
+      {
+        "id": "F4",
+        "title": "native automatic compaction events",
+        "provenance": "peer_a9_value_level_coordinator_relayed_not_replayed",
+        "field": "compactMetadata.preTokens on system entries with subtype compact_boundary and compactMetadata.trigger auto",
+        "population": "All main and subagent transcripts on this host; subagents include Workflow children.",
+        "window_utc": "2026-09-27T18:59:21Z (key added) to 2026-09-27T23:23:33Z",
+        "returned_values": "35 auto events. 31 came from sessions running 400000: n=31, min 366209, median 368563, max 432724 (18 main, 13 subagent). The other 4 (618371..922073) came from sessions launched before the switch, which still ran the default window. Before the switch every auto event fired between 966908 and 971662.",
+        "consequence": "A symmetric +/-10% band around 367000 (330300..403700) excludes the real 432724 event, an overshoot of +17.9% and about 1 in 31 events; partition bands replace it."
+      },
+      {
+        "id": "F5",
+        "title": "peer implementation reading",
+        "provenance": "peer_supplied_undocumented_implementation_reading",
+        "reading": "threshold = (window - min(model max output, 20000)) - 13000",
+        "binary_offsets": "omitted",
+        "relied_on": false
+      },
+      {
+        "id": "launch_gate_additions",
+        "provenance": "coordinator_supplied_and_rechecked_by_builder_fetch",
+        "keys_absent_in_every_arm": [
+          "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE",
+          "CLAUDE_CODE_MAX_OUTPUT_TOKENS",
+          "CLAUDE_CODE_DISABLE_1M_CONTEXT"
+        ],
+        "reasons": "The override can lower a trigger and can't raise it (env-vars docs). Increasing the output-token cap reduces the effective context window before auto-compaction (env-vars docs, found by the builder's fetch; the coordinator gave F5 as the reason and asked for a precaution). The 1M-disable variable holds sessions to 200K."
+      }
+    ],
+    "builder_observations": [
+      {
+        "operation": "value-only host readback",
+        "command": "jq -r '.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW // \"absent\"' ~/.claude/settings.json; printf of ${CLAUDE_CODE_AUTO_COMPACT_WINDOW-unset}, ${CLAUDE_AUTOCOMPACT_PCT_OVERRIDE-unset}, ${CLAUDE_CODE_MAX_OUTPUT_TOKENS-unset} and ${CLAUDE_CODE_DISABLE_1M_CONTEXT-unset}; date -u; claude --version",
+        "exit_code": 0,
+        "returned_output": "settings_key=absent\nbuilder_shell_value=400000\npct_override=unset max_output=unset disable_1m=unset\n2026-09-27T23:36:46Z\n2.1.283 (Claude Code)\n",
+        "interpretation": "Corroborates F1: the user-settings key is absent while the builder's shell, running under the coordinator session, still carries 400000."
+      },
+      {
+        "operation": "sandboxed documentation fetch: Context Mode ctx_execute, Node fetch of each page's Markdown form",
+        "urls": [
+          "https://code.claude.com/docs/en/model-config.md",
+          "https://code.claude.com/docs/en/env-vars.md"
+        ],
+        "http_status": {"model-config.md": 200, "env-vars.md": 200},
+        "returned_lines": {
+          "model-config.md L724": "The auto-compact window is how full the context window can get before Claude Code compacts the conversation. For what compaction keeps and drops per mechanism, see [What survives compaction](/docs/en/context-window#what-survives-compaction).",
+          "model-config.md L740": "The environment variable accepts only the plain token count. Claude Code caps the window at the model's context window.",
+          "model-config.md L749 (excerpt)": "* Models running with a native 1M window, such as Sonnet 5, the Fable models, and Opus 4.7 and later on the Anthropic API, compact before the window fills, at about 967K tokens by default.",
+          "env-vars.md L196 (excerpt, table padding collapsed)": "| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | Set the percentage (1-100) of the auto-compact window at which auto-compaction triggers. Use lower values like `50` to compact earlier; the variable can't raise the threshold, so values above the default percentage are ignored. It applies only in sessions that [compact before the model's context limit](/docs/en/model-config#context-window-and-auto-compaction). Applies to both main conversations and subagents",
+          "env-vars.md L308 (excerpt, table padding collapsed)": "| `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | Set the maximum number of output tokens for most requests. ... Increasing this value reduces the effective context window available before [auto-compaction](/docs/en/costs#reduce-token-usage) triggers"
+        },
+        "negative_search": "A case-insensitive search for 'buffer' matched no line of model-config.md.",
+        "quotation_note": "Quotes in the preregistration drop Markdown link markup, so 'before auto-compaction triggers' renders the linked text.",
+        "finding": "The fetch confirms the coordinator's quotes. env-vars.md L308 is primary-source support for requiring CLAUDE_CODE_MAX_OUTPUT_TOKENS absent; it states no cap, unlike F5."
+      }
+    ],
+    "checks": [
+      {
+        "phase": "baseline_validator_at_b6f36d8c_before_edits",
+        "command": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py",
+        "exit_code": 0,
+        "returned_output": "{\"components\": 69, \"hashed_files\": 7353, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+        "boundary": "The four files' registered bytes matched at base; structural validation only."
+      },
+      {
+        "phase": "red_first_test_draft_against_base_blueprints",
+        "command": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 1,
+        "artifact_state": "Only the test file had changed in the worktree; the blueprint files still matched b6f36d8c (empty diff).",
+        "returned_output_excerpt": "Ran 21 tests in 0.015s\nFAILED (failures=10)\n",
+        "result": "The same ten tests failed on assertions as in the final-file run below. This first test draft lacked three Markdown checks that were later scoped to the current protocol region (see mutation_checks); retained as history."
+      },
+      {
+        "phase": "red_final_test_file_against_exported_base_tree",
+        "command": "git archive b6f36d8c | tar -x -C <scratch>/base-tree; copy the final test file to <scratch>/base-tree/tests/; then from <scratch>/base-tree: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 1,
+        "artifact_state": "Base commit's blueprint files (the exported preregistration.json SHA256 prefix b0db35290d5c9fbb equals b6f36d8c's blob) with the final test file (SHA256 prefix 7a996c2473e3ec18, identical to the worktree copy).",
+        "returned_output_excerpt": "test_B1_observes_untracked_and_ignored_paths_and_projects_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_B1_observes_untracked_and_ignored_paths_and_projects_predicates) ... ok\ntest_R1_tolerances_and_pinned_source_are_boolean_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_R1_tolerances_and_pinned_source_are_boolean_predicates) ... ok\ntest_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm) ... FAIL\ntest_budget_uses_native_tokens_and_does_not_invent_a_charge_bound (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_budget_uses_native_tokens_and_does_not_invent_a_charge_bound) ... ok\ntest_cache_write_price_is_unknown_without_request_ttl_split (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_cache_write_price_is_unknown_without_request_ttl_split) ... ok\ntest_collector_gate_covers_every_used_log_attribute (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_collector_gate_covers_every_used_log_attribute) ... ok\ntest_current_text_names_A_as_incumbent_without_reversion_wording (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_current_text_names_A_as_incumbent_without_reversion_wording) ... FAIL\ntest_draft_contract (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... FAIL\ntest_expected_triggers_are_window_minus_observed_buffer (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_expected_triggers_are_window_minus_observed_buffer) ... FAIL\ntest_inspect_oracle_contracts_have_hashed_discriminating_controls (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_inspect_oracle_contracts_have_hashed_discriminating_controls) ... ok\ntest_live_host_condition_and_arm_readback_are_launch_gates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_live_host_condition_and_arm_readback_are_launch_gates) ... FAIL\ntest_log_ledger_does_not_claim_intermediate_retry_or_error_usage (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_log_ledger_does_not_claim_intermediate_retry_or_error_usage) ... ok\ntest_markdown_tables_match_json_windows_triggers_bands_and_thresholds (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_markdown_tables_match_json_windows_triggers_bands_and_thresholds) ... FAIL\ntest_partition_bands_anchor_below_each_trigger_and_tile_the_range (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_partition_bands_anchor_below_each_trigger_and_tile_the_range) ... FAIL\ntest_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown) ... ok\ntest_readback_gate_requires_window_modifiers_absent_in_every_arm (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_readback_gate_requires_window_modifiers_absent_in_every_arm) ... FAIL\ntest_request_ledger_covers_hidden_requests_and_reconciles_once (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_request_ledger_covers_hidden_requests_and_reconciles_once) ... ok\ntest_selection_optimizes_cost_instead_of_arm_order (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_selection_optimizes_cost_instead_of_arm_order) ... FAIL\ntest_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection) ... FAIL\ntest_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence) ... ok\ntest_wall_budget_includes_all_washouts_and_qualified_drains (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_wall_budget_includes_all_washouts_and_qualified_drains) ... ok\nRan 21 tests in 0.016s\nFAILED (failures=10)\n",
+        "sanitization": "Retained the actual status and summary lines; omitted tracebacks and the large assertion dumps. The scratch directory is shown as <scratch>.",
+        "result": "21 tests, 10 failures, 0 errors: the seven added tests and three existing tests whose literals encoded incumbent B, the old arm table or the old threshold keys. The 11 unaffected tests passed."
+      },
+      {
+        "phase": "mutation_checks",
+        "method": "Imported the final test module, pointed BLUEPRINT at mutated copies of the blueprint files under <scratch>/mut and ran the whole test case once per mutation; the copies were deleted afterward. The first two lines apply the wording patterns to the current region (before the first Amendment heading) of the base and amended Markdown.",
+        "exit_code": 0,
+        "returned_output": "base md current-region hits: ['incumbent host arm is **B', 'incumbent host setting B', 'incumbent **B', 'incumbent B', 'incumbent **B', 'Incumbent B', 'reversion to A', 'revert to A', 'reversion to A']\nnew md current-region hits: []\ncontrol_unmutated: failed=[]\nB_upper_inclusive: failed=['test_partition_bands_anchor_below_each_trigger_and_tile_the_range', \"test_partition_bands_anchor_below_each_trigger_and_tile_the_range (arm='B')\"]\nC_lower_150000: failed=[\"test_partition_bands_anchor_below_each_trigger_and_tile_the_range (arm='C')\"]\nB_trigger_367001: failed=['test_draft_contract', 'test_expected_triggers_are_window_minus_observed_buffer', \"test_markdown_tables_match_json_windows_triggers_bands_and_thresholds (key='B_expected_trigger_tokens')\", 'test_partition_bands_anchor_below_each_trigger_and_tile_the_range']\nrelayed_max_432725: failed=['test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm']\njson_reversion_to_A: failed=['test_current_text_names_A_as_incumbent_without_reversion_wording', 'test_live_host_condition_and_arm_readback_are_launch_gates']\ndrop_max_output_unset: failed=[\"test_readback_gate_requires_window_modifiers_absent_in_every_arm (key='CLAUDE_CODE_MAX_OUTPUT_TOKENS')\"]\nutilization_in_decision: failed=['test_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection']\nmd_B_band_symmetric: failed=['test_draft_contract', \"test_markdown_tables_match_json_windows_triggers_bands_and_thresholds (arm='B')\"]\nmd_contract_buffer: failed=['test_draft_contract', \"test_markdown_tables_match_json_windows_triggers_bands_and_thresholds (key='observed_autocompact_buffer_tokens')\"]\nmd_incumbent_B: failed=['test_current_text_names_A_as_incumbent_without_reversion_wording']\nmd_drop_not_powered: failed=['test_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection']\nmd_drop_readback_key: failed=['test_readback_gate_requires_window_modifiers_absent_in_every_arm']\nmd_band_notation: failed=[\"test_markdown_tables_match_json_windows_triggers_bands_and_thresholds (arm='B')\"]\n",
+        "finding": "Each of 13 mutations fails its targeted test; the unmutated control passes. An earlier mutation pass with the first test draft showed that dropping 'not powered' from the SIZE-07 paragraph did not fail, because the amendment repeats the phrase. The SIZE-07, readback-key and band-notation Markdown checks were then scoped to the current protocol region.",
+        "boundary": "A discrimination check of local structural tests, not upstream acceptance."
+      },
+      {
+        "phase": "green_before_build_record",
+        "command": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 0,
+        "returned_output": "test_B1_observes_untracked_and_ignored_paths_and_projects_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_B1_observes_untracked_and_ignored_paths_and_projects_predicates) ... ok\ntest_R1_tolerances_and_pinned_source_are_boolean_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_R1_tolerances_and_pinned_source_are_boolean_predicates) ... ok\ntest_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm) ... ok\ntest_budget_uses_native_tokens_and_does_not_invent_a_charge_bound (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_budget_uses_native_tokens_and_does_not_invent_a_charge_bound) ... ok\ntest_cache_write_price_is_unknown_without_request_ttl_split (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_cache_write_price_is_unknown_without_request_ttl_split) ... ok\ntest_collector_gate_covers_every_used_log_attribute (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_collector_gate_covers_every_used_log_attribute) ... ok\ntest_current_text_names_A_as_incumbent_without_reversion_wording (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_current_text_names_A_as_incumbent_without_reversion_wording) ... ok\ntest_draft_contract (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... ok\ntest_expected_triggers_are_window_minus_observed_buffer (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_expected_triggers_are_window_minus_observed_buffer) ... ok\ntest_inspect_oracle_contracts_have_hashed_discriminating_controls (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_inspect_oracle_contracts_have_hashed_discriminating_controls) ... ok\ntest_live_host_condition_and_arm_readback_are_launch_gates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_live_host_condition_and_arm_readback_are_launch_gates) ... ok\ntest_log_ledger_does_not_claim_intermediate_retry_or_error_usage (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_log_ledger_does_not_claim_intermediate_retry_or_error_usage) ... ok\ntest_markdown_tables_match_json_windows_triggers_bands_and_thresholds (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_markdown_tables_match_json_windows_triggers_bands_and_thresholds) ... ok\ntest_partition_bands_anchor_below_each_trigger_and_tile_the_range (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_partition_bands_anchor_below_each_trigger_and_tile_the_range) ... ok\ntest_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown) ... ok\ntest_readback_gate_requires_window_modifiers_absent_in_every_arm (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_readback_gate_requires_window_modifiers_absent_in_every_arm) ... ok\ntest_request_ledger_covers_hidden_requests_and_reconciles_once (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_request_ledger_covers_hidden_requests_and_reconciles_once) ... ok\ntest_selection_optimizes_cost_instead_of_arm_order (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_selection_optimizes_cost_instead_of_arm_order) ... ok\ntest_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection) ... ok\ntest_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence) ... ok\ntest_wall_budget_includes_all_washouts_and_qualified_drains (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_wall_budget_includes_all_washouts_and_qualified_drains) ... ok\nRan 21 tests in 0.036s\nOK\n",
+        "result": "All 21 structural tests passed with the amended JSON and Markdown, before this round record was written. The final checks follow."
+      },
+      {
+        "phase": "final_checks_with_round_record_present",
+        "commands": {
+          "tests": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+          "json_load": "python3 -c \"import json;json.load(open('blueprints/compaction-window-ab/preregistration.json'));json.load(open('blueprints/compaction-window-ab/build-evidence.json'))\"",
+          "validator": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py",
+          "whitespace": "GIT_OPTIONAL_LOCKS=0 git diff --check",
+          "scope": "GIT_OPTIONAL_LOCKS=0 git diff --stat b6f36d8c"
+        },
+        "exit_codes": {"tests": 0, "json_load": 0, "validator": 1, "whitespace": 0, "scope": 0},
+        "returned_output_excerpt": {
+          "tests": "Ran 21 tests in 0.040s\nOK\n",
+          "json_load": "",
+          "validator": "Publication validation failed:\nblueprints/compaction-window-ab/PREREGISTRATION.md: SHA-256 mismatch\nblueprints/compaction-window-ab/PREREGISTRATION.md: byte count mismatch\nblueprints/compaction-window-ab/build-evidence.json: SHA-256 mismatch\nblueprints/compaction-window-ab/build-evidence.json: byte count mismatch\nblueprints/compaction-window-ab/preregistration.json: SHA-256 mismatch\nblueprints/compaction-window-ab/preregistration.json: byte count mismatch\ntests/test_compaction_window_ab_preregistration.py: SHA-256 mismatch\ntests/test_compaction_window_ab_preregistration.py: byte count mismatch\n",
+          "whitespace": "",
+          "scope": " blueprints/compaction-window-ab/PREREGISTRATION.md | 265 ++++++++++++----\n .../compaction-window-ab/build-evidence.json       | 220 +++++++++++++-\n .../compaction-window-ab/preregistration.json      | 253 +++++++++++++--\n tests/test_compaction_window_ab_preregistration.py | 338 ++++++++++++++++++++-\n 4 files changed, 981 insertions(+), 95 deletions(-)\n"
+        },
+        "result": "All 21 tests passed, with 21 'ok' status lines. The validator reports only SHA-256 and byte-count mismatches for the four files edited in this round, pending coordinator re-registration; no other errors. The whitespace check is clean, and the diff touches only the four allowed paths. These outputs were rerun after a last one-line Markdown wording fix and with this entry already present; replacing the values in place leaves the line counts unchanged. The final rerun before commit is reported in the handoff."
+      }
+    ],
+    "changes": [
+      "preregistration.json: host_condition now records incumbent A (key absent) with F1's times and observations, and moves the 18:59Z/902612 record into superseded_conditions; drift_action is unchanged.",
+      "preregistration.json: thresholds add observed_autocompact_buffer_tokens 33000 and B/C expected triggers 367000/167000; native_lever adds autocompact_buffer_observation (F2, F5) and relayed_native_auto_compaction_events (F4).",
+      "preregistration.json: treatment_proof.validity_bands holds the partition bands with explicit inclusivity, the superseded window-centred bands and the considered symmetric bands; the B_and_C and A texts cite them, and A's band is unchanged.",
+      "preregistration.json: arm_readback_gate gives A's window as 1000000, adds expected_automatic_trigger_tokens and requires three keys absent in every arm, with a reason for each; CLAUDE_CODE_MAX_OUTPUT_TOKENS joins must_be_unset.",
+      "preregistration.json: tie_rule, selection_rule, worked_example_scope, no_selection_host_action, receipt_status_meaning, before_run, adoption_rule, other_constraints and research_disposition now name incumbent A. open_questions entries 1 and 7 were rewritten, and two residual questions added, because that list is current rather than dated history. The anti_pattern_log keeps the F1 entry and gains one dated entry.",
+      "preregistration.json: metrics.context_utilization_secondary adds the descriptive SIZE-07 outcome outside selection; the sources gain window_semantics, env_window_modifiers, size_07 and community_sweep_m3, and one receipt field is added.",
+      "PREREGISTRATION.md: status paragraph, arm table (window, trigger and band columns), frozen host condition with superseded history, arm A launch reason, readback gate keys, partition-band treatment paragraph, SIZE-07 paragraph, contract table rows, decision, receipt and open-gate wording; appended the dated amendment section.",
+      "tests/test_compaction_window_ab_preregistration.py: updated literals and seven added tests for window-minus-buffer triggers, partition bands, band membership, Markdown/JSON table equality, current wording, SIZE-07 and the readback keys."
+    ],
+    "residuals": [
+      "The 33k buffer is a /context display observation on 2.1.283, not a measured compaction threshold; the buffer may depend on the client version.",
+      "No automatic compaction at the new B or C triggers has been observed in an arm; F4 is relayed from historical host sessions.",
+      "Four F4 events from sessions launched before the switch (618371..922073) are unattributed. If those sessions ran the default window, an A child could auto-compact below 870300 and invalidate the run; the competing explanation is the superseded 902612 transition record. A's band was not widened.",
+      "The removal instant is unknown (file mtime only), and sessions started before it still carry 400000.",
+      "F5 is undocumented and disagrees with env-vars.md on whether the output reserve is capped; the protocol relies on neither beyond requiring the key absent."
+    ],
+    "remaining_gates": [
+      "Coordinator re-registration of the four changed files in manifests/evidence.json and a validator rerun",
+      "Every earlier native readiness gate: per-arm settings/coordinator/child readback, Workflow treatment, collector attributes, retry and TTL instruments, lag/reserve/cancellation, wall bounds, executable Inspect adapters and offline-suite readiness"
     ],
     "registration_handoff": {
       "changed_files": [

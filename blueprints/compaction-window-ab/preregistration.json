@@ -184,9 +184,47 @@
       "sha256": "305215a7fecd5329c7cb639561f60a16b582121a614b83b1b5b2acae6536fee6",
       "reviewed_head": "f7cc409a3df212375c76f957700b1ebb16ce1e73",
       "finding_count": 9
+    },
+    {
+      "id": "window_semantics",
+      "url": "https://code.claude.com/docs/en/model-config#set-the-auto-compact-window",
+      "read": "2026-09-27",
+      "read_by": "Coordinator; corroborated by the host-condition amendment builder's sandboxed fetch of the page's Markdown form",
+      "quotes": [
+        "The auto-compact window is how full the context window can get before Claude Code compacts the conversation.",
+        "Claude Code caps the window at the model's context window.",
+        "Models running with a native 1M window ... compact before the window fills, at about 967K tokens by default."
+      ],
+      "states_buffer": false
+    },
+    {
+      "id": "env_window_modifiers",
+      "url": "https://code.claude.com/docs/en/env-vars",
+      "read": "2026-09-27",
+      "read_by": "Host-condition amendment builder, sandboxed fetch of the page's Markdown form; the coordinator supplied the same override quote",
+      "quotes": {
+        "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "Set the percentage (1-100) of the auto-compact window at which auto-compaction triggers. Use lower values like `50` to compact earlier; the variable can't raise the threshold, so values above the default percentage are ignored. ... Applies to both main conversations and subagents",
+        "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "Increasing this value reduces the effective context window available before auto-compaction triggers",
+        "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "The effective window is also capped at the model's context window. ... The status line's used_percentage always measures against the model's full context window"
+      }
+    },
+    {
+      "id": "size_07",
+      "path": "docs/harness-rules-convergence-20260922.md",
+      "line": 207,
+      "revision": "b6f36d8cac660b47cafc827ee4595cf0bc74459a",
+      "rule": "SIZE-07, keep-but-compare: treat the community 'keep context utilization under 40%, below 30% for sensitive work' heuristic as unadopted guidance, not a harness rule, until measured against this project's own child-usage records.",
+      "overturn_condition": "A local trial correlating utilization above 40% with measurably worse extraction or review quality."
+    },
+    {
+      "id": "community_sweep_m3",
+      "path": "docs/decisions/2026-09-24-community-sweep.md",
+      "line": 172,
+      "revision": "b6f36d8cac660b47cafc827ee4595cf0bc74459a",
+      "candidate": "M3: keep sessions under 30-40% context usage. Adoption waits for SIZE-07's local trial to tie utilization above 40% to measurably worse extraction or review quality in the child-usage records."
     }
   ],
-  "research_disposition": "Source-backed extension of the existing document/contract-test seam. Native Claude OTel logs -> existing collector -> Loki capture emitted terminal records only; complete retry accounting and TTL weighting are unqualified. ccusage v20.0.26 is a cross-check, and Inspect 0.3.271 exact matching uses independent predicate records. No inspect_swe bridge. Prior repair reported installed Inspect 0.3.266; current repair python3 metadata did not find inspect-ai, and no pinned scorer was run. Supported source isolation addresses incumbent user env B without editing host settings. No host changes, Claude sessions, subagents or installations in this repair.",
+  "research_disposition": "Source-backed extension of the existing document/contract-test seam. Native Claude OTel logs -> existing collector -> Loki capture emitted terminal records only; complete retry accounting and TTL weighting are unqualified. ccusage v20.0.26 is a cross-check, and Inspect 0.3.271 exact matching uses independent predicate records. No inspect_swe bridge. Prior repair reported installed Inspect 0.3.266; current repair python3 metadata did not find inspect-ai, and no pinned scorer was run. Supported source isolation keeps user-settings and inherited window values out of every arm without editing host settings; the host incumbent is A (key absent) per the dated host-condition amendment. No host changes, Claude sessions, subagents or installations in this repair.",
   "native_lever": {
     "variable": "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
     "encoding": "plain integer token count",
@@ -200,9 +238,27 @@
       "native_event": "type=system; subtype=compact_boundary; compactMetadata.trigger; compactMetadata.preTokens",
       "sdk_event": "SDK streams use compact_metadata.trigger and compact_metadata.pre_tokens; do not parse them as native JSONL fields or count both copies.",
       "context_measure": "Per deduplicated assistant request, prompt_tokens = input_tokens + cache_creation_input_tokens + cache_read_input_tokens. Record maximum and the last prompt before/first after each boundary. Never substitute cumulative cache reads for context size.",
-      "B_and_C": "Every focal child must have at least one automatic boundary. All automatic preTokens must be within 10% of its assigned threshold: B 360000..440000, C 180000..220000 inclusive. These are conservative experimental validity bands, not an upstream timing guarantee. Outside-band or missing evidence makes the run incomplete; do not widen bands after observing results.",
-      "A": "Every focal child must exceed 400000 prompt tokens. If it auto-compacts, preTokens must be in 870300..1000000 inclusive (approximately 967000). If it never compacts, retain that right-censored observation and the verified default launch; do not invent an event at 967000.",
-      "exclusions": "Any manual compaction, context-limit recovery compaction, continuation as a replacement child, unresolved fallback, or context cap invalidates the matched comparison, with usage retained. Native automatic compaction in the same child is the treatment."
+      "B_and_C": "Every focal child must have at least one automatic boundary. Every automatic preTokens value must lie in its arm's partition band (validity_bands): B [330300, 870300), C [150300, 330300). Each lower bound is 0.9 x the arm's expected automatic trigger (window - 33000, observed on 2.1.283); each upper bound is the next-higher arm's lower bound, exclusive. These are experimental validity bands, not an upstream timing guarantee. Outside-band or missing evidence makes the run incomplete; do not widen bands after observing results.",
+      "A": "Every focal child must exceed 400000 prompt tokens. If it auto-compacts, preTokens must be in 870300..1000000 inclusive (approximately 967000 = 1000000 - 33000; lower bound 0.9 x that trigger, upper bound the model's 1000000-token window; unchanged by the 2026-09-27 host-condition amendment). If it never compacts, retain that right-censored observation and the verified default launch; do not invent an event at 967000.",
+      "exclusions": "Any manual compaction, context-limit recovery compaction, continuation as a replacement child, unresolved fallback, or context cap invalidates the matched comparison, with usage retained. Native automatic compaction in the same child is the treatment.",
+      "validity_bands": {
+        "rule": "partition",
+        "amended": "2026-09-27",
+        "lower_bound": "0.9 x the arm's expected automatic trigger, inclusive; this keeps the 10% tolerance below the trigger.",
+        "upper_bound": "The next-higher arm's lower bound, exclusive; A's upper bound is the model's 1000000-token window, inclusive.",
+        "attribution": "Every automatic preTokens value stays attributable to exactly one arm's trigger. A misapplied default window (an event at or above 870300) or a lower window (an event below 0.9 x the trigger) still invalidates the run; normal last-request overshoot above the trigger does not.",
+        "scope": "Experiment validity rule, not an upstream guarantee of when compaction fires.",
+        "client_change_rule": "The expected triggers use the 33000-token autocompact buffer displayed by client 2.1.283. A client version change can move the buffer and needs a dated amendment before launch.",
+        "arms": {
+          "C": {"window_tokens": 200000, "expected_trigger_tokens": 167000, "lower_tokens": 150300, "lower_inclusive": true, "upper_tokens": 330300, "upper_inclusive": false, "notation": "[150300, 330300)"},
+          "B": {"window_tokens": 400000, "expected_trigger_tokens": 367000, "lower_tokens": 330300, "lower_inclusive": true, "upper_tokens": 870300, "upper_inclusive": false, "notation": "[330300, 870300)"},
+          "A": {"window_tokens": 1000000, "expected_trigger_tokens": 967000, "lower_tokens": 870300, "lower_inclusive": true, "upper_tokens": 1000000, "upper_inclusive": true, "notation": "[870300, 1000000]"}
+        },
+        "superseded_window_centred": {"B": [360000, 440000], "C": [180000, 220000]},
+        "superseded_reason": "Inclusive +/-10% bands centred on each window value rather than on its trigger. C's expected trigger 167000 lies outside 180000..220000, so every C focal child would have invalidated the run; B's 367000 lay only 7000 inside 360000..440000. Replaced before any cohort or model observation.",
+        "considered_symmetric_ten_percent": {"B": [330300, 403700], "C": [150300, 183700]},
+        "considered_rejection_reason": "Symmetric inclusive +/-10% bands around each trigger were the first draft of this amendment. The relayed native event at 432724 in a 400000-window session (+17.9% over 367000, about 1 in 31 such events) falls outside 330300..403700. Focal children can compact more than once, and overshoot is an absolute last-request growth that weighs most on C, so symmetric bands would spuriously invalidate many runs. Replaced by the partition rule before commit."
+      }
     },
     "settings_isolation": {
       "mechanism": "Supported settings-source isolation for all arms, plus one identical explicit settings packet.",
@@ -224,7 +280,7 @@
       ],
       "procedure": "Use --setting-sources project --settings <sealed-common-settings.json> for every coordinator. The immutable project settings at the frozen base and the common packet must omit the selected env key. The common packet explicitly supplies the same required non-secret Ultracode, hook, agent, permission and telemetry settings for every arm; qualify their fingerprints rather than assuming excluded user/local features survive. Native authentication remains native; do not copy sign-ins or private state. Managed settings still apply and any managed or embedding-host injection of this key blocks launch.",
       "per_arm_environment": {
-        "A": "Remove the selected key from the launch environment with env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW; excluding user/local settings prevents the host user env entry from being reintroduced. Keep --autocompact auto.",
+        "A": "Remove the selected key from the launch environment with env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW. This stays required after the 2026-09-27 removal from user settings: sessions started before the removal keep 400000 in their process environment (the coordinator's shell read 400000 at about 23:28Z), and a launcher spawned from such a session would pass it on. Excluding user/local settings keeps any user env entry from being reintroduced. Keep --autocompact auto.",
         "B": "Set CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000 in the isolated launch environment; keep the common settings packet and --autocompact auto.",
         "C": "Set CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000 in the isolated launch environment; keep the common settings packet and --autocompact auto."
       },
@@ -241,17 +297,76 @@
       },
       "prelaunch_settings_and_environment_readback": true,
       "effective_coordinator_and_child_readback_required": true,
-      "prelaunch_procedure": "Before admitting each attempt, read back only the selected user-settings key to confirm the recorded incumbent; inspect the sealed enabled project/explicit/managed sources for that key and capture the launch-environment selected value or explicit unset marker after the arm patch. Confirm common packet/source hashes and --setting-sources project. Any unavailable effective source or conflicting injection fails preflight. No all-environment or credential dump.",
+      "prelaunch_procedure": "Before admitting each attempt, read back only the selected user-settings key to confirm the recorded incumbent (A: key absent); inspect the sealed enabled project/explicit/managed sources for that key and capture the launch-environment selected value or explicit unset marker after the arm patch. Read back, value-only, that every must_be_absent_in_every_arm key is absent from the patched launch environment and the enabled settings sources. Confirm common packet/source hashes and --setting-sources project. Any unavailable effective source or conflicting injection fails preflight. No all-environment or credential dump.",
       "runtime_procedure": "A separately qualified value-only native shell observation in the launched coordinator and each focal child must read the selected environment key after settings application and corroborate loaded settings-source identity. No documented dry-run/effective-window readback CLI is claimed. A prelaunch file read alone cannot prove child inheritance; until this observation path is qualified, do not launch. During eventual sealed attempts, count any readiness usage and abort on mismatch before accepting treatment; native automatic-boundary/context evidence remains separately required.",
       "expected_effective_window_tokens": {
-        "A": "model_tuned_default_about_967000",
+        "A": 1000000,
         "B": 400000,
         "C": 200000
+      },
+      "expected_automatic_trigger_tokens": {
+        "A": 967000,
+        "B": 367000,
+        "C": 167000
+      },
+      "must_be_absent_in_every_arm": {
+        "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "Can lower an arm's trigger. The env-vars docs (read 2026-09-27): 'Set the percentage (1-100) of the auto-compact window at which auto-compaction triggers ... the variable can't raise the threshold'; it applies to main conversations and subagents.",
+        "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "Can move an arm's trigger. The env-vars docs (read 2026-09-27): 'Increasing this value reduces the effective context window available before auto-compaction triggers'. A peer's undocumented implementation reading, not relied on, also ties the reserve to the model's maximum output. Required absent as a precaution.",
+        "CLAUDE_CODE_DISABLE_1M_CONTEXT": "Holds sessions to a 200K context window, which would change A's 1000000-token window and every trigger; already required unset."
       },
       "qualified": false,
       "receipt_sha256": null,
       "unqualified_action": "do_not_launch",
       "mismatch_action": "stop_entire_run_incomplete"
+    },
+    "autocompact_buffer_observation": {
+      "provenance": "coordinator_supplied_not_replayed",
+      "observed": "2026-09-27",
+      "client_version": "2.1.283",
+      "command": "From a scratch directory: claude -p \"/context\" --model claude-opus-5-5, with env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW for the unset case and the variable set explicitly to 400000, 200000 or 100000 otherwise.",
+      "returned_lines": {
+        "unset": ["**Tokens:** 19.3k / 1m (2%)", "| Free space | 947.7k | 94.8% |", "| Autocompact buffer | 33k | 3.3% |"],
+        "400000": ["**Tokens:** 19.3k / 400k (5%)", "| Free space | 347.7k | 86.9% |", "| Autocompact buffer | 33k | 8.3% |"],
+        "200000": ["**Tokens:** 19.3k / 200k (10%)", "| Free space | 147.7k | 73.8% |", "| Autocompact buffer | 33k | 16.5% |"],
+        "100000": ["**Tokens:** 19.3k / 100k (19%)", "| Free space | 47.7k | 47.7% |", "| Autocompact buffer | 33k | 33.0% |"]
+      },
+      "returned_lines_scope": "Filtered lines as supplied by the coordinator; the full /context output was not supplied.",
+      "buffer_tokens": 33000,
+      "buffer_constant_across_displayed_windows": true,
+      "model_window_tokens": 1000000,
+      "expected_trigger_rule": "window_tokens - buffer_tokens",
+      "expected_trigger_tokens": {"A": 967000, "B": 367000, "C": 167000},
+      "evidence_class": "native_display_observation_not_a_compaction_event",
+      "documentation": "window_semantics: the window is how full the context can get before compaction, capped at the model's context window; native 1M-window models compact at about 967K tokens by default. The page states no buffer; 1000000 - 33000 = 967000 corroborates that documented default.",
+      "corroboration": "relayed_native_auto_compaction_events: 31 native automatic events in 400000-window sessions fired at 366209..432724 (median 368563); pre-switch events fired at 966908..971662.",
+      "relies_on_undocumented_implementation_reading": false,
+      "peer_implementation_reading": {
+        "provenance": "peer_supplied_undocumented_implementation_reading",
+        "source": "Peer session a9 read the installed 2.1.283 binary; relayed by the coordinator with binary offsets omitted.",
+        "reading": "threshold = (window - min(model max output, 20000)) - 13000",
+        "relied_on": false,
+        "documented_contrast": "The env-vars docs say increasing CLAUDE_CODE_MAX_OUTPUT_TOKENS reduces the effective context window before auto-compaction and state no cap; the reading's 20000 cap is undocumented. The protocol relies on neither beyond requiring that key absent in every arm."
+      },
+      "client_change_rule": "A client version change can move the buffer and needs a dated amendment before launch."
+    },
+    "relayed_native_auto_compaction_events": {
+      "provenance": "peer_a9_value_level_coordinator_relayed_not_replayed",
+      "field": "compactMetadata.preTokens on type=system, subtype=compact_boundary entries with compactMetadata.trigger=auto",
+      "population": "All main and subagent transcripts on this host; subagents include Workflow children.",
+      "window_utc": {"from": "2026-09-27T18:59:21Z", "from_meaning": "key added", "to": "2026-09-27T23:23:33Z"},
+      "auto_events": 35,
+      "sessions_running_400000": {"n": 31, "min": 366209, "median": 368563, "max": 432724, "main": 18, "subagent": 13},
+      "pre_switch_launched_sessions": {
+        "n": 4,
+        "min": 618371,
+        "max": 922073,
+        "relayed_description": "Sessions launched before the switch, which still ran the default window.",
+        "attribution_status": "unresolved_residual",
+        "residual": "618371 lies below A's lower bound 870300. If these sessions compacted under the default window, an A focal child could auto-compact below 870300 and invalidate the run. The superseded host-condition record classified the coordinator's 902612 event after 18:59Z as a transition observation, which is the competing explanation. Not resolved here, and A's band is not widened."
+      },
+      "before_key_added": {"min": 966908, "max": 971662, "scope": "Every automatic event before the switch, as relayed."},
+      "evidence_class": "Peer value-level transcript extraction relayed by the coordinator: historical host sessions, not arm launches, readiness qualification or a replay by this builder.",
+      "use": "Corroborates the window - 33000 trigger and sizes the partition bands; it does not qualify treatment."
     }
   },
   "arms": [
@@ -279,14 +394,17 @@
     "token_lanes_carrier": "Keep the reference revision's saved-workflow/agent-body token-lane text and SubagentStart configuration identical. First-prompt evidence must show the carrier in Workflow children; Agent-tool hook acceptance alone is insufficient.",
     "mcp": "Same resolved MCP names, versions, grants, deferred discovery, output schema and Context Mode/RTK versions for every arm; seal a sanitized configuration fingerprint before launch. Separate fresh per-attempt task indexes; no warm research results from another arm.",
     "cache": "Require native five-minute Workflow-child caching with no forcing override. Configuration inspection is necessary but cannot prove per-request TTL. cache_write_ttl_evidence is unqualified; its absence blocks launch and leaves weighted cost unknown. Coordinator one-hour cache remains separately reported.",
-    "must_be_unset": ["CLAUDE_CODE_DISABLE_1M_CONTEXT", "CLAUDE_CODE_EFFORT_LEVEL", "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "DISABLE_AUTO_COMPACT", "DISABLE_COMPACT"],
-    "other_constraints": "Auto-compaction on, fast mode off, no model fallback or context/cache override, same native authentication and permissions, no session resume. Use the identical isolated settings scope/packet for all arms; no persistent host-setting edits or reversion from incumbent B. Abort on control drift. Seal effective non-secret settings, never dump the environment.",
+    "must_be_unset": ["CLAUDE_CODE_DISABLE_1M_CONTEXT", "CLAUDE_CODE_EFFORT_LEVEL", "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "DISABLE_AUTO_COMPACT", "DISABLE_COMPACT", "CLAUDE_CODE_MAX_OUTPUT_TOKENS"],
+    "other_constraints": "Auto-compaction on, fast mode off, no model fallback or context/cache override, same native authentication and permissions, no session resume. Use the identical isolated settings scope/packet for all arms; no persistent host-setting edits, so the host incumbent A (key absent) stays unchanged. Abort on control drift. Seal effective non-secret settings, never dump the environment.",
     "worktree_rule": "Use one owned disposable worktree per attempt at the frozen revision, with only the identical sealed packet/oracle overlay. Keep original task inputs immutable. Worktree ordinal and arm are metadata, not model instructions. No other checkout is a write target."
   },
   "thresholds": {
     "default_approx_tokens": 967000,
     "B_window_tokens": 400000,
     "C_window_tokens": 200000,
+    "observed_autocompact_buffer_tokens": 33000,
+    "B_expected_trigger_tokens": 367000,
+    "C_expected_trigger_tokens": 167000,
     "long_child_prompt_tokens_exclusive": 400000,
     "cost_reduction_min_fraction": 0.1,
     "repetitions_per_task_arm": 3,
@@ -531,6 +649,24 @@
       "denominator": "Each event and each child; event count, preTokens, last-before/first-after request prompt tokens, maximum prompt tokens",
       "missing": "No event is a valid censored A observation only with complete transcript; missing transcript/context is unknown."
     },
+    "context_utilization_secondary": {
+      "role": "descriptive_secondary_outcome_only",
+      "source_ids": ["size_07", "community_sweep_m3"],
+      "source": "The same deduplicated request_ledger rows and native compact_boundary records as metrics.compaction, plus the frozen Inspect check outcomes.",
+      "reported_per_task_and_arm": {
+        "check_outcomes": "Each frozen check boolean for every repetition, as in metrics.quality.",
+        "focal_child_peak_prompt_tokens": "Per focal child: the maximum over its deduplicated requests of input_tokens + cache_creation_input_tokens + cache_read_input_tokens.",
+        "focal_child_peak_window_utilization": "Per focal child: peak prompt tokens divided by 1000000, the model's native window, reported as an exact fraction and a percentage."
+      },
+      "utilization_denominator_tokens": 1000000,
+      "contrast": "The existing eligibility rule requires all 12 A focal children to exceed 400000 prompt tokens (40% of the 1M window), while the expected B and C triggers sit at about 36.7% and 16.7%. The arms therefore already contrast utilization above 40% with triggers below it. Last-request overshoot can carry a B child's peak above 40% (the relayed maximum 432724 is 43.3%), so peaks are recorded, not assumed.",
+      "enters_selection": false,
+      "powered_for_size_07_overturn": false,
+      "adds_quality_superiority_selection_path": false,
+      "boundary": "Three repetitions of four frozen tasks are not powered to satisfy SIZE-07's overturn condition, a local trial correlating utilization above 40% with measurably worse extraction or review quality. This outcome does not enter selection and adds no quality-superiority selection path; decision_rule is unchanged.",
+      "window": "Entire child attempt",
+      "denominator": "Each focal child, reported alongside the check outcomes of its task/arm/repetition"
+    },
     "wall_time": {
       "source": "Supervisor monotonic timestamps corroborated by native journal start/end",
       "window": "Coordinator launch to process-group exit for an attempt; separately child first-to-last record",
@@ -696,7 +832,7 @@
     "quality_rule": "For every task and check, any pass in A requires a pass in every repetition of the candidate.",
     "pass_count_rule": "Candidate total passed checks and successful tasks must each be at least A's totals.",
     "cost_rule": "All-attempt weighted child cost per successful task must be at least 10% lower than A, both pooled and for each task.",
-    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and leaves the incumbent host setting B unchanged.",
+    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and leaves the incumbent host setting A unchanged.",
     "incomplete_rule": "Any stopped, invalid, underlength, or unmeasured run is incomplete; no adoption result.",
     "completeness_gate": "All 36 prescribed attempts and their independent check results, usage and treatment evidence are available, with every eligibility/control/seal gate passed. Completed ordinary task failures count; no imputation or best-of repetitions.",
     "cost_test": "For each candidate independently (no arm order): for each task and the pool require successes(A)>0, successes(X)>0 and CPS(X)<=0.90*CPS(A). Among qualifying quality-non-inferior candidates minimize pooled CPS. Use exact decimal/rational rates and unrounded token totals. No additional effect threshold between B and C; equal minima give no selection, not a larger-cost winner.",
@@ -711,7 +847,7 @@
     "reopen_evidence": "A dated amendment with pinned changed inputs/reason and a new complete counterbalanced cohort, independent oracle evidence, native treatment/usage records and all previous failed/stopped attempts. Anecdotes, source claims or selectively rerun winners cannot reopen adoption.",
     "objective": "minimize_pooled_all_attempt_weighted_child_cost_per_success",
     "minimum_effect_fraction_vs_A": 0.1,
-    "tie_rule": "exact_unrounded_tie_no_selection_incumbent_B_unchanged",
+    "tie_rule": "exact_unrounded_tie_no_selection_incumbent_A_unchanged",
     "worked_examples": [
       {
         "id": "review_counterexample",
@@ -778,8 +914,8 @@
         "selected": "C"
       }
     ],
-    "worked_example_scope": "Every task has these CPS values and all gates hold. Selected is a descriptive pilot nomination only; null means no nomination and leaves incumbent B unchanged. A is the isolated default reference arm, not the host incumbent. A nomination of already-active B is not a new host change.",
-    "no_selection_host_action": "leave_incumbent_B_unchanged_no_reversion_to_A"
+    "worked_example_scope": "Every task has these CPS values and all gates hold. Selected is a descriptive pilot nomination only; null means no nomination and leaves incumbent A (key absent, native default) unchanged. A is both the host incumbent and the isolated default reference arm. No nomination changes a host setting.",
+    "no_selection_host_action": "leave_incumbent_A_unchanged"
   },
   "stop_rules": {
     "on_usage_limit_error": "stop_entire_run_incomplete",
@@ -906,7 +1042,8 @@
       "required_log_attribute_preservation",
       "retry_coverage_limitations",
       "per_request_cache_write_ttl_evidence_or_unknown",
-      "qualified_washout_drain_wall_budget"
+      "qualified_washout_drain_wall_budget",
+      "context_utilization_secondary_by_task_arm"
     ],
     "private_only": "Original transcripts, prompts/responses, source captures and full command output stay in the operator's private evidence store. Public receipts use task/arm/repetition ordinals and content digests only: no native session/run/agent/message ids, personal paths, environment dumps, sign-ins, credentials or raw conversations.",
     "receipt_statuses": [
@@ -918,8 +1055,8 @@
     "discriminating_controls": "oracle_framework defines hashed known-pass, known-fail, malformed and missing-output controls for all eight checks. They are synthetic definitions only until actual pinned Inspect scorer output is retained; full independent extraction-path controls and fixed-suite readiness are mandatory before sealing.",
     "compaction_usage_audit": "Use emitted request_ledger rows once; reconcile transcript/ccusage as cross-checks, never added totals. Qualify all applicable log attributes and Workflow ownership. Intermediate retries remain unobserved without traces/complete counter evidence, terminal errors always stop incomplete, and TTL weighting is unknown without per-request splits. An equal total does not establish coverage.",
     "receipt_status_meaning": {
-      "complete_no_change": "Complete pilot with no candidate nomination; leave live incumbent B=400000 unchanged. This is not adoption of B or a reversion to A.",
-      "complete_candidate_selected": "Nomination for confirmation only; no additional persistent host action, even when the nominated arm is already incumbent B."
+      "complete_no_change": "Complete pilot with no candidate nomination; leaves incumbent A (unset: key absent, native default) unchanged.",
+      "complete_candidate_selected": "Nomination for an independently preregistered confirmatory cohort only; no persistent host action. Setting B or C on the host requires that cohort to show non-inferior quality and the preregistered cost reduction, recorded."
     }
   },
   "sealing": {
@@ -927,7 +1064,7 @@
     "append_only_dated_amendments": true,
     "hash_table": "PREREGISTRATION.md: candidate SHA256 table is byte identity only, not a freeze or execution receipt",
     "before_run": [
-      "Confirm frozen host condition B=400000 since 2026-09-27T18:59:00Z; qualify the identical settings-source isolation and value-only arm_readback_gate for every arm before launch, with runtime coordinator/child evidence still required in each sealed attempt.",
+      "Confirm the amended host condition, incumbent A: a value-only readback shows the user-settings key absent (recorded 2026-09-27; the settings file mtime 23:21:57Z is not the removal instant). Launch A with env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW, because sessions started before the removal keep 400000. Qualify the identical settings-source isolation, the must_be_absent_in_every_arm keys and the value-only arm_readback_gate for every arm before launch, with runtime coordinator/child evidence still required in each sealed attempt.",
       "Prove every applicable required_log_attributes field through the active collector into Loki; resolve retry-observability and cache-write TTL instrument gaps by a dated source-backed amendment. Counter-less terminal errors stop incomplete. ID preservation alone cannot qualify launch.",
       "Qualify finite drain/readiness bounds and freeze whole_run_wall_cap_seconds >= 271800 + 36*D + H, including 35 washouts and 36 drains.",
       "Qualify native OTel request/child joins through the existing collector into Loki; retain measured reporting lag and proven outstanding-token reserve plus owned-process cancellation evidence. A documented export interval is not a bound; do not launch without qualification.",
@@ -937,7 +1074,7 @@
       "Append the dated sealing amendment with artifact SHA256 table, gate evidence and readiness; rehash before launch and each arm"
     ],
     "amendment_rule": "Preserve every prior amendment and seal table. Append date, reason, superseded rules/artifacts, whether results were observed, replacement hashes and merge/execution chronology. After any model observation, a changed workload, threshold, eligibility rule, instrument or budget requires a new cohort; retain the old incomplete/failed cohort. Never silently rewrite or retroactively recode eligibility.",
-    "adoption_rule": "This pilot can nominate a candidate for an independently preregistered confirmatory cohort only. It supplies no authority for additional persistent host changes or reverting the already-active incumbent B to A. That existing host setting was applied separately before this repair. This DRAFT neither schedules, launches, freezes nor adopts an arm.",
+    "adoption_rule": "This pilot can nominate a candidate for an independently preregistered confirmatory cohort only. It supplies no authority for persistent host changes; the host incumbent A (key absent, native default) stays unchanged. Setting B or C on the host requires that confirmatory cohort to show non-inferior quality and the preregistered cost reduction, recorded. This DRAFT neither schedules, launches, freezes nor adopts an arm.",
     "pilot_allows_persistent_adoption": false
   },
   "anti_pattern_log": [
@@ -1059,17 +1196,27 @@
       "mistake": "Historical registration failures were described as current at f7cc409a.",
       "verification": "Independent bytes/hashes matched all four pre-repair registry entries; baseline validator passed, exit 0.",
       "correction": "Date the earlier failures; record post-integration registration and this repair validation separately, with coordinator re-registration required for current edits."
+    },
+    {
+      "date": "2026-09-27",
+      "round": "host_condition_amendment",
+      "finding": "host_condition_and_bands",
+      "mistake": "Validity bands were centred on each window value although automatic compaction fires below the window, and the host condition still recorded a user-settings entry that had since been removed.",
+      "verification": "Coordinator-supplied /context display on 2.1.283 (constant 33k autocompact buffer at four windows), relayed native events in 400000-window sessions (366209..432724) and the value-only settings readback (absent); the model-config and env-vars docs read 2026-09-27.",
+      "correction": "Record incumbent A with the 18:59Z condition as superseded history; set each expected trigger to window - 33000 and use partition bands anchored at 0.9 x each trigger, before any cohort or model observation."
     }
   ],
   "open_questions": [
-    "Identical isolated settings/agent/MCP/carrier fingerprints and value-only arm readback remain unqualified; host B is recorded, A requires verified user/local-source exclusion.",
+    "Identical isolated settings/agent/MCP/carrier fingerprints and value-only arm readback remain unqualified; host A (user-settings key absent) is recorded, and every arm requires verified user/local-source exclusion, a launch environment without inherited window values and the must_be_absent_in_every_arm keys absent.",
     "Workflow inheritance and actual >400K A-child / B-C compaction eligibility remain unobserved.",
     "All applicable log attributes and child joins require active collector/Loki evidence; the template drops request_id, client_request_id, server_fallback_hop and speed.",
     "Log-only collection cannot establish intermediate-retry accounting; every terminal api_error ends the pilot incomplete. A complete attempt/counter instrument remains an amendment gate.",
     "Per-request cache-write TTL split is unavailable; current W/CPS and one-hour exclusion are not evaluable. Configuration alone is insufficient.",
     "Measured lag, enforceable request/delivery/cancellation bounds, the token reserve and finite drain/readiness wall bounds remain unknown. DO NOT LAUNCH.",
     "Eight full executable adapters still need hashes and Inspect 0.3.271 native controls; fixed 97-module readiness and budget feasibility are unobserved.",
-    "Three repetitions remain exploratory; confirmation is required before any additional persistent adoption or reversion."
+    "Three repetitions remain exploratory; an independently preregistered confirmatory cohort is required before any persistent host change to B or C.",
+    "The 33k autocompact buffer is a /context display observation on 2.1.283. No automatic compaction at the amended B or C triggers has been observed in an arm, and a client change can move the buffer.",
+    "Four relayed events (618371..922073) from sessions launched before the key was added remain unattributed; whether a default-window child can auto-compact below A's 870300 bound is unresolved."
   ],
   "oracle_framework": {
     "package": "inspect-ai==0.3.271",
@@ -1656,25 +1803,69 @@
   "host_condition": {
     "frozen_design_condition": true,
     "condition_scope": "Fixed input to this draft design; the experiment itself remains DRAFT, not frozen and not run.",
+    "amendment": "Amendment 2026-09-27 — host-condition change (incumbent A), still DRAFT",
     "variable": "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
-    "value": "400000",
+    "value": null,
+    "settings_value_state": "absent",
     "settings_file": "~/.claude/settings.json",
     "settings_scope": "user",
     "mechanism": "env",
-    "activated_at": "2026-09-27T18:59:00Z",
-    "applies_to": "Every Claude Code session and subagent on this host since activation, as supplied by the coordinator. Prospective arm launches deliberately isolate this user-settings scope.",
-    "incumbent_arm": "B",
+    "incumbent_arm": "A",
+    "incumbent_meaning": "The user-settings key is absent: native default window (the model's 1000000-token window), with an expected automatic trigger of about 967000 on client 2.1.283.",
+    "applies_to": "Claude Code sessions that load user settings after the removal. Sessions started before it keep 400000 in their process environment, as do launchers they spawn. Prospective arm launches isolate the user-settings scope and patch the launch environment per arm.",
+    "change": {
+      "provenance": "coordinator_supplied_not_replayed",
+      "actor": "Peer session a9, at the user's request",
+      "action": "Removed env.CLAUDE_CODE_AUTO_COMPACT_WINDOW from the user settings; a backup of the file exists.",
+      "reason": "Its research workflow found no primary source recommending 400K or 40%.",
+      "settings_file_mtime_utc": "2026-09-27T23:21:57Z",
+      "change_instant_utc": null,
+      "change_instant_status": "Unknown: the mtime is a file modification time, not the removal instant."
+    },
     "coordinator_observation": {
       "provenance": "coordinator_supplied_not_replayed",
-      "shell_value": "400000",
-      "first_request_auto_compaction_tokens": 902612,
-      "chronology": "The coordinator auto-compacted on its first request after 18:59Z; this is a transition observation, not an arm-B threshold qualification."
+      "observed_at_approx_utc": "2026-09-27T23:28Z",
+      "settings_readback_command": "jq -r '.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW // \"absent\"' ~/.claude/settings.json",
+      "settings_readback_output": "absent",
+      "coordinator_shell_value": "400000",
+      "interpretation": "Sessions started before the removal keep 400000 in their process environment; a launcher spawned from such a session would pass it on, so arm A keeps env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW."
     },
-    "repair_builder_observation": {
-      "settings_env_value": "400000",
-      "repair_shell_value": null,
-      "method": "Read only the selected env key from user settings and the selected shell variable; no environment dump, credential read, Claude session or replay of the coordinator observation."
+    "amendment_builder_observation": {
+      "observed_at_utc": "2026-09-27T23:36:46Z",
+      "settings_readback_output": "absent",
+      "builder_shell_value": "400000",
+      "other_keys_in_builder_shell": {
+        "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": null,
+        "CLAUDE_CODE_MAX_OUTPUT_TOKENS": null,
+        "CLAUDE_CODE_DISABLE_1M_CONTEXT": null
+      },
+      "method": "Value-only reads of the selected settings key and of four shell variables. The builder runs as a worker of the coordinator session, and its shell value matches the coordinator's inherited 400000, consistent with the change record. No environment dump, credential read, Claude session or replay of the coordinator observation."
     },
+    "superseded_conditions": [
+      {
+        "superseded_by": "Amendment 2026-09-27 — host-condition change (incumbent A), still DRAFT",
+        "recorded_by": "PR #416 cross-family repair",
+        "variable": "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
+        "value": "400000",
+        "settings_file": "~/.claude/settings.json",
+        "settings_scope": "user",
+        "mechanism": "env",
+        "activated_at": "2026-09-27T18:59:00Z",
+        "applies_to": "Every Claude Code session and subagent on this host since activation, as supplied by the coordinator. Prospective arm launches deliberately isolate this user-settings scope.",
+        "incumbent_arm": "B",
+        "coordinator_observation": {
+          "provenance": "coordinator_supplied_not_replayed",
+          "shell_value": "400000",
+          "first_request_auto_compaction_tokens": 902612,
+          "chronology": "The coordinator auto-compacted on its first request after 18:59Z; this is a transition observation, not an arm-B threshold qualification."
+        },
+        "repair_builder_observation": {
+          "settings_env_value": "400000",
+          "repair_shell_value": null,
+          "method": "Read only the selected env key from user settings and the selected shell variable; no environment dump, credential read, Claude session or replay of the coordinator observation."
+        }
+      }
+    ],
     "drift_action": "do_not_launch_until_dated_amendment_records_new_host_condition"
   }
 }

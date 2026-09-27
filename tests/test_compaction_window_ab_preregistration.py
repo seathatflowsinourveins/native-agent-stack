@@ -4,6 +4,7 @@ These are structural checks, not Claude execution or compaction acceptance.
 The public seam is the JSON protocol and its human-readable contract table.
 """
 
+from fractions import Fraction
 import hashlib
 import json
 from pathlib import Path
@@ -19,9 +20,35 @@ RULES = {
     "quality_rule": "For every task and check, any pass in A requires a pass in every repetition of the candidate.",
     "pass_count_rule": "Candidate total passed checks and successful tasks must each be at least A's totals.",
     "cost_rule": "All-attempt weighted child cost per successful task must be at least 10% lower than A, both pooled and for each task.",
-    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and leaves the incumbent host setting B unchanged.",
+    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and leaves the incumbent host setting A unchanged.",
     "incomplete_rule": "Any stopped, invalid, underlength, or unmeasured run is incomplete; no adoption result.",
 }
+# 2026-09-27 host-condition amendment. The coordinator-supplied /context
+# display on 2.1.283 shows a constant 33k autocompact buffer, so each expected
+# automatic trigger is window - 33000 (A uses the model's 1M window).
+MODEL_WINDOW = 1000000
+AMENDMENT_HEADING = "Amendment 2026-09-27 — host-condition change (incumbent A), still DRAFT"
+EXPECTED_TRIGGERS = {"A": 967000, "B": 367000, "C": 167000}
+# Partition bands: lower = 0.9 x trigger; upper = the next-higher arm's lower
+# bound (exclusive); A's upper bound is the model window (inclusive).
+EXPECTED_BANDS = {
+    "C": {"lower_tokens": 150300, "upper_tokens": 330300, "upper_inclusive": False},
+    "B": {"lower_tokens": 330300, "upper_tokens": 870300, "upper_inclusive": False},
+    "A": {"lower_tokens": 870300, "upper_tokens": 1000000, "upper_inclusive": True},
+}
+ARM_TABLE_HEADER = ("| Arm | CLAUDE_CODE_AUTO_COMPACT_WINDOW | Expected threshold "
+                    "| Validity band for automatic preTokens |")
+ABSENT_IN_EVERY_ARM = {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "CLAUDE_CODE_MAX_OUTPUT_TOKENS", "CLAUDE_CODE_DISABLE_1M_CONTEXT",
+}
+# Current (non-history) text must not keep B as the incumbent or forbid a
+# "reversion to A"; dated history and superseded records are excluded.
+FORBIDDEN_CURRENT_WORDING = (
+    re.compile(r"(?i:incumbent)[^.,;:\n]{0,24}?(?<![A-Za-z0-9])B(?![A-Za-z0-9])"),
+    re.compile(r"(?<![A-Za-z0-9])(?i:revers?(?:ion|t|ting|ted))(?:[\s_/]+[\w-]+){0,5}?"
+               r"[\s_]+to[\s_]+A(?![A-Za-z0-9])"),
+)
+JSON_HISTORY_PATHS = {("anti_pattern_log",), ("host_condition", "superseded_conditions")}
 
 
 class CompactionWindowPreregistrationTests(unittest.TestCase):
@@ -46,9 +73,12 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
             self.assertEqual(arm["environment"], {VARIABLE: EXPECTED_ARMS[arm["id"]]})
             value = "unset" if arm["id"] == "A" else EXPECTED_ARMS[arm["id"]]
             threshold = {
-                "A": "about 967000 tokens", "B": "400000 tokens", "C": "200000 tokens"
+                "A": "window 1000000 (model); trigger about 967000 tokens",
+                "B": "window 400000; trigger about 367000 tokens",
+                "C": "window 200000; trigger about 167000 tokens",
             }[arm["id"]]
-            self.assertIn(f"| {arm['id']} | {value} | {threshold} |", markdown)
+            band = {"A": "[870300, 1000000]", "B": "[330300, 870300)", "C": "[150300, 330300)"}[arm["id"]]
+            self.assertIn(f"| {arm['id']} | {value} | {threshold} | {band} |", markdown)
         controls = spec["shared_controls"]
         self.assertEqual(controls["client_version"], "2.1.283")
         self.assertEqual(controls["coordinator"]["effort"], "xhigh")
@@ -64,6 +94,9 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
             "default_approx_tokens": 967000,
             "B_window_tokens": 400000,
             "C_window_tokens": 200000,
+            "observed_autocompact_buffer_tokens": 33000,
+            "B_expected_trigger_tokens": 367000,
+            "C_expected_trigger_tokens": 167000,
             "long_child_prompt_tokens_exclusive": 400000,
             "cost_reduction_min_fraction": 0.1,
             "repetitions_per_task_arm": 3,
@@ -138,6 +171,10 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
     def spec(self):
         return json.loads((BLUEPRINT / "preregistration.json").read_text())
 
+    @staticmethod
+    def markdown():
+        return (BLUEPRINT / "PREREGISTRATION.md").read_text()
+
     def test_budget_uses_native_tokens_and_does_not_invent_a_charge_bound(self):
         spec = self.spec()
         self.assertIn("token_budget", spec["stop_rules"])
@@ -187,7 +224,7 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         rule = self.spec()["decision_rule"]
         self.assertEqual(rule["selection_rule"], RULES["selection_rule"])
         self.assertEqual(rule["objective"], "minimize_pooled_all_attempt_weighted_child_cost_per_success")
-        self.assertEqual(rule["tie_rule"], "exact_unrounded_tie_no_selection_incumbent_B_unchanged")
+        self.assertEqual(rule["tie_rule"], "exact_unrounded_tie_no_selection_incumbent_A_unchanged")
         self.assertEqual(rule["minimum_effect_fraction_vs_A"], 0.1)
         examples = {row["id"]: row for row in rule["worked_examples"]}
         # Independent review counterexample and its symmetric/tied controls.
@@ -254,16 +291,42 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         host = spec["host_condition"]
         self.assertTrue(host["frozen_design_condition"])
         self.assertEqual(host["variable"], VARIABLE)
-        self.assertEqual(host["value"], "400000")
+        # Amended 2026-09-27: the user-settings key is absent, so the host
+        # incumbent is A (native default); the 18:59Z record is superseded history.
+        self.assertEqual(host["incumbent_arm"], "A")
+        self.assertIsNone(host["value"])
+        self.assertEqual(host["value"], EXPECTED_ARMS[host["incumbent_arm"]])
+        self.assertEqual(host["settings_value_state"], "absent")
         self.assertEqual(host["settings_file"], "~/.claude/settings.json")
         self.assertEqual(host["settings_scope"], "user")
         self.assertEqual(host["mechanism"], "env")
-        self.assertEqual(host["activated_at"], "2026-09-27T18:59:00Z")
-        self.assertEqual(host["incumbent_arm"], "B")
+        self.assertEqual(host["amendment"], AMENDMENT_HEADING)
+        self.assertIn(f"## {AMENDMENT_HEADING}", self.markdown())
+        change = host["change"]
+        self.assertEqual(change["provenance"], "coordinator_supplied_not_replayed")
+        self.assertEqual(change["settings_file_mtime_utc"], "2026-09-27T23:21:57Z")
+        self.assertIsNone(change["change_instant_utc"])
         observation = host["coordinator_observation"]
-        self.assertEqual(observation["shell_value"], "400000")
-        self.assertEqual(observation["first_request_auto_compaction_tokens"], 902612)
         self.assertEqual(observation["provenance"], "coordinator_supplied_not_replayed")
+        self.assertEqual(observation["settings_readback_output"], "absent")
+        self.assertEqual(observation["coordinator_shell_value"], "400000")
+        self.assertEqual(host["drift_action"],
+                         "do_not_launch_until_dated_amendment_records_new_host_condition")
+        superseded = host["superseded_conditions"]
+        self.assertEqual(len(superseded), 1)
+        old = superseded[0]
+        self.assertEqual(old["superseded_by"], AMENDMENT_HEADING)
+        self.assertEqual(old["value"], "400000")
+        self.assertEqual(old["activated_at"], "2026-09-27T18:59:00Z")
+        self.assertEqual(old["incumbent_arm"], "B")
+        self.assertEqual(old["coordinator_observation"]["shell_value"], "400000")
+        self.assertEqual(old["coordinator_observation"]["first_request_auto_compaction_tokens"], 902612)
+        self.assertEqual(old["coordinator_observation"]["provenance"], "coordinator_supplied_not_replayed")
+        # Sessions started before the removal keep 400000 in their process
+        # environment, so A still strips the key from its launch environment.
+        per_arm = spec["native_lever"]["settings_isolation"]["per_arm_environment"]
+        self.assertIn("env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW", per_arm["A"])
+        self.assertIn("400000", per_arm["A"])
 
         isolation = spec["native_lever"]["settings_isolation"]
         self.assertEqual(isolation["setting_sources"], ["project"])
@@ -282,8 +345,11 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         self.assertFalse(gate["qualified"])
         self.assertEqual(gate["unqualified_action"], "do_not_launch")
         self.assertEqual(gate["mismatch_action"], "stop_entire_run_incomplete")
-        self.assertEqual(spec["decision_rule"]["no_selection_host_action"],
-                         "leave_incumbent_B_unchanged_no_reversion_to_A")
+        self.assertEqual(spec["decision_rule"]["no_selection_host_action"], "leave_incumbent_A_unchanged")
+        self.assertIn("incumbent A", spec["evidence"]["receipt_status_meaning"]["complete_no_change"])
+        adoption = spec["sealing"]["adoption_rule"]
+        self.assertIn("confirmatory cohort", adoption)
+        self.assertIn("non-inferior quality", adoption)
 
     def test_B1_observes_untracked_and_ignored_paths_and_projects_predicates(self):
         spec = self.spec()
@@ -433,6 +499,256 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         self.assertIsNone(stops["whole_run_wall_cap_seconds"])
         self.assertFalse(wall["qualified"])
         self.assertEqual(wall["unqualified_action"], "do_not_launch")
+
+    @staticmethod
+    def contains(band, value):
+        lower, upper = band["lower_tokens"], band["upper_tokens"]
+        above = value >= lower if band["lower_inclusive"] else value > lower
+        below = value <= upper if band["upper_inclusive"] else value < upper
+        return above and below
+
+    @staticmethod
+    def notation(band):
+        opening = "[" if band["lower_inclusive"] else "("
+        closing = "]" if band["upper_inclusive"] else ")"
+        return f"{opening}{band['lower_tokens']}, {band['upper_tokens']}{closing}"
+
+    @staticmethod
+    def table_rows(markdown, header):
+        lines = markdown.splitlines()
+        rows = []
+        for line in lines[lines.index(header) + 2:]:
+            if not line.startswith("|"):
+                break
+            rows.append([cell.strip() for cell in line.strip().strip("|").split("|")])
+        return rows
+
+    @staticmethod
+    def bands(spec):
+        return spec["native_lever"]["treatment_proof"]["validity_bands"]
+
+    def test_expected_triggers_are_window_minus_observed_buffer(self):
+        spec = self.spec()
+        thresholds = spec["thresholds"]
+        self.assertIn("observed_autocompact_buffer_tokens", thresholds)
+        buffer = thresholds["observed_autocompact_buffer_tokens"]
+        self.assertEqual(buffer, 33000)
+        self.assertEqual(thresholds["B_expected_trigger_tokens"], thresholds["B_window_tokens"] - buffer)
+        self.assertEqual(thresholds["C_expected_trigger_tokens"], thresholds["C_window_tokens"] - buffer)
+        # Corroborates the documented "about 967K" default of a native 1M window.
+        self.assertEqual(thresholds["default_approx_tokens"], MODEL_WINDOW - buffer)
+        lever = spec["native_lever"]
+        self.assertIn("autocompact_buffer_observation", lever)
+        observation = lever["autocompact_buffer_observation"]
+        self.assertEqual(observation["provenance"], "coordinator_supplied_not_replayed")
+        self.assertEqual(observation["evidence_class"], "native_display_observation_not_a_compaction_event")
+        self.assertEqual(observation["client_version"], spec["shared_controls"]["client_version"])
+        self.assertEqual(observation["buffer_tokens"], buffer)
+        self.assertEqual(observation["model_window_tokens"], MODEL_WINDOW)
+        self.assertEqual(set(observation["returned_lines"]), {"unset", "400000", "200000", "100000"})
+        for window, lines in observation["returned_lines"].items():
+            with self.subTest(window=window):
+                self.assertEqual(sum(line.startswith("| Autocompact buffer | 33k |") for line in lines), 1)
+        self.assertEqual(observation["expected_trigger_tokens"], EXPECTED_TRIGGERS)
+        for arm_id, band in self.bands(spec)["arms"].items():
+            with self.subTest(arm=arm_id):
+                self.assertEqual(band["expected_trigger_tokens"], band["window_tokens"] - buffer)
+        gate = lever["arm_readback_gate"]
+        self.assertEqual(gate["expected_effective_window_tokens"], {"A": MODEL_WINDOW, "B": 400000, "C": 200000})
+        self.assertEqual(gate["expected_automatic_trigger_tokens"], EXPECTED_TRIGGERS)
+        # A peer's binary reading is recorded as undocumented and not relied on.
+        self.assertIs(observation["relies_on_undocumented_implementation_reading"], False)
+        reading = observation["peer_implementation_reading"]
+        self.assertEqual(reading["provenance"], "peer_supplied_undocumented_implementation_reading")
+        self.assertIs(reading["relied_on"], False)
+
+    def test_partition_bands_anchor_below_each_trigger_and_tile_the_range(self):
+        spec = self.spec()
+        proof = spec["native_lever"]["treatment_proof"]
+        self.assertIn("validity_bands", proof)
+        bands = proof["validity_bands"]
+        self.assertEqual(bands["rule"], "partition")
+        arms = bands["arms"]
+        self.assertEqual(set(arms), {"A", "B", "C"})
+        thresholds = spec["thresholds"]
+        triggers = {"A": thresholds["default_approx_tokens"], "B": thresholds["B_expected_trigger_tokens"],
+                    "C": thresholds["C_expected_trigger_tokens"]}
+        self.assertEqual(triggers, EXPECTED_TRIGGERS)
+        for arm_id, band in arms.items():
+            with self.subTest(arm=arm_id):
+                self.assertEqual(band["expected_trigger_tokens"], triggers[arm_id])
+                # A 10% tolerance below the trigger, in exact integer arithmetic.
+                self.assertEqual(band["lower_tokens"] * 10, band["expected_trigger_tokens"] * 9)
+                self.assertIs(band["lower_inclusive"], True)
+                self.assertEqual({key: band[key] for key in EXPECTED_BANDS[arm_id]}, EXPECTED_BANDS[arm_id])
+                self.assertEqual(band["notation"], self.notation(band))
+        # Contiguous: each upper bound is the next-higher arm's lower bound, exclusive.
+        self.assertEqual(arms["C"]["upper_tokens"], arms["B"]["lower_tokens"])
+        self.assertEqual(arms["B"]["upper_tokens"], arms["A"]["lower_tokens"])
+        self.assertIs(arms["C"]["upper_inclusive"], False)
+        self.assertIs(arms["B"]["upper_inclusive"], False)
+        # Disjoint: every bound, and the value just below it, lies in exactly one band.
+        bounds = {band[key] for band in arms.values() for key in ("lower_tokens", "upper_tokens")}
+        probes = bounds | {bound - 1 for bound in bounds if bound - 1 >= arms["C"]["lower_tokens"]}
+        for value in sorted(probes):
+            with self.subTest(value=value):
+                self.assertEqual(sum(self.contains(band, value) for band in arms.values()), 1)
+        # A is unchanged: 870300..1000000 inclusive, capped at the model window.
+        self.assertEqual((arms["A"]["lower_tokens"], arms["A"]["upper_tokens"]), (870300, MODEL_WINDOW))
+        self.assertIs(arms["A"]["upper_inclusive"], True)
+        self.assertIn("870300..1000000", proof["A"])
+        self.assertIn("validity rule, not an upstream guarantee", bands["scope"])
+        self.assertIn("dated amendment", bands["client_change_rule"])
+
+    def test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm(self):
+        spec = self.spec()
+        lever = spec["native_lever"]
+        self.assertIn("relayed_native_auto_compaction_events", lever)
+        events = lever["relayed_native_auto_compaction_events"]
+        self.assertEqual(events["provenance"], "peer_a9_value_level_coordinator_relayed_not_replayed")
+        running_b = events["sessions_running_400000"]
+        self.assertEqual((running_b["n"], running_b["min"], running_b["median"], running_b["max"]),
+                         (31, 366209, 368563, 432724))
+        default = events["before_key_added"]
+        self.assertEqual((default["min"], default["max"]), (966908, 971662))
+        self.assertEqual(events["pre_switch_launched_sessions"]["attribution_status"], "unresolved_residual")
+        bands = self.bands(spec)
+        arms = bands["arms"]
+        members = {
+            "C": [EXPECTED_TRIGGERS["C"]],
+            "B": [EXPECTED_TRIGGERS["B"], running_b["min"], running_b["median"], running_b["max"]],
+            "A": [EXPECTED_TRIGGERS["A"], default["min"], default["max"]],
+        }
+        for arm_id, values in members.items():
+            for value in values:
+                with self.subTest(arm=arm_id, value=value):
+                    self.assertEqual([name for name, band in arms.items() if self.contains(band, value)], [arm_id])
+        # Why the rule changed before any cohort: the superseded window-centred C
+        # band excluded C's own trigger, and the considered symmetric 10% B band
+        # would have excluded the relayed 432724 event.
+        self.assertEqual(bands["superseded_window_centred"], {"B": [360000, 440000], "C": [180000, 220000]})
+        low, high = bands["superseded_window_centred"]["C"]
+        self.assertFalse(low <= EXPECTED_TRIGGERS["C"] <= high)
+        self.assertEqual(bands["considered_symmetric_ten_percent"], {"B": [330300, 403700], "C": [150300, 183700]})
+        low, high = bands["considered_symmetric_ten_percent"]["B"]
+        self.assertFalse(low <= running_b["max"] <= high)
+
+    def test_markdown_tables_match_json_windows_triggers_bands_and_thresholds(self):
+        spec = self.spec()
+        markdown = self.markdown()
+        current = markdown.split("\n## Amendment ", 1)[0]
+        self.assertIn(ARM_TABLE_HEADER, markdown.splitlines())
+        arms = self.bands(spec)["arms"]
+        rows = self.table_rows(markdown, ARM_TABLE_HEADER)
+        self.assertEqual([row[0] for row in rows], ["A", "B", "C"])
+        for arm_id, value, threshold, band in rows:
+            with self.subTest(arm=arm_id):
+                record = arms[arm_id]
+                expected = EXPECTED_ARMS[arm_id]
+                self.assertEqual(value, "unset" if expected is None else expected)
+                if expected is not None:
+                    self.assertEqual(record["window_tokens"], int(expected))
+                window = f"{record['window_tokens']} (model)" if expected is None else expected
+                self.assertEqual(threshold,
+                                 f"window {window}; trigger about {record['expected_trigger_tokens']} tokens")
+                self.assertEqual(band, record["notation"])
+                self.assertIn(f"{arm_id} **{record['notation']}**", current)
+        contract = dict(self.table_rows(markdown, "| Key | Value |"))
+        for key in ("observed_autocompact_buffer_tokens", "B_expected_trigger_tokens", "C_expected_trigger_tokens"):
+            self.assertIn(key, contract)
+        for key, value in spec["thresholds"].items():
+            with self.subTest(key=key):
+                self.assertEqual(contract[key], str(value))
+        for key in RULES:
+            self.assertEqual(contract[key], spec["decision_rule"][key])
+
+    def json_text(self, value, path=()):
+        if path in JSON_HISTORY_PATHS:
+            return
+        if isinstance(value, dict):
+            for key, item in value.items():
+                yield path + (key,), key
+                yield from self.json_text(item, path + (key,))
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                yield from self.json_text(item, path + (index,))
+        elif isinstance(value, str):
+            yield path, value
+
+    def test_current_text_names_A_as_incumbent_without_reversion_wording(self):
+        # Discriminating controls for the wording patterns themselves.
+        for text in ("leave_incumbent_B_unchanged_no_reversion_to_A",
+                     "exact_unrounded_tie_no_selection_incumbent_B_unchanged",
+                     "leaves the incumbent host setting B unchanged",
+                     "The incumbent host arm is **B**",
+                     "reverting the already-active incumbent B to A",
+                     "it does not retain/revert to A or newly adopt B"):
+            self.assertTrue(any(p.search(text) for p in FORBIDDEN_CURRENT_WORDING), text)
+        for text in ("leave_incumbent_A_unchanged",
+                     "leaves incumbent A (key absent, native default) unchanged. Setting B or C",
+                     "Sessions started before the removal keep 400000"):
+            self.assertFalse(any(p.search(text) for p in FORBIDDEN_CURRENT_WORDING), text)
+        for path, text in self.json_text(self.spec()):
+            for pattern in FORBIDDEN_CURRENT_WORDING:
+                self.assertIsNone(pattern.search(text), f"{'/'.join(map(str, path))}: {text}")
+        markdown = self.markdown()
+        self.assertIn("\n## Amendment ", markdown)
+        current = markdown.split("\n## Amendment ", 1)[0]
+        for pattern in FORBIDDEN_CURRENT_WORDING:
+            match = pattern.search(current)
+            self.assertIsNone(match, match and current[max(0, match.start() - 80):match.end() + 20])
+
+    def test_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection(self):
+        spec = self.spec()
+        self.assertIn("context_utilization_secondary", spec["metrics"])
+        outcome = spec["metrics"]["context_utilization_secondary"]
+        self.assertEqual(outcome["role"], "descriptive_secondary_outcome_only")
+        self.assertIs(outcome["enters_selection"], False)
+        self.assertIs(outcome["powered_for_size_07_overturn"], False)
+        self.assertIs(outcome["adds_quality_superiority_selection_path"], False)
+        self.assertEqual(outcome["utilization_denominator_tokens"], MODEL_WINDOW)
+        self.assertEqual(set(outcome["reported_per_task_and_arm"]), {
+            "check_outcomes", "focal_child_peak_prompt_tokens", "focal_child_peak_window_utilization",
+        })
+        sources = {source["id"]: source for source in spec["sources"]}
+        self.assertEqual(set(outcome["source_ids"]), {"size_07", "community_sweep_m3"})
+        self.assertEqual((sources["size_07"]["path"], sources["size_07"]["line"]),
+                         ("docs/harness-rules-convergence-20260922.md", 207))
+        self.assertEqual((sources["community_sweep_m3"]["path"], sources["community_sweep_m3"]["line"]),
+                         ("docs/decisions/2026-09-24-community-sweep.md", 172))
+        # The A eligibility rule (> 400000 prompt tokens) and the B/C triggers
+        # already contrast utilization above and below 40% of the 1M window.
+        thresholds = spec["thresholds"]
+        forty_percent = Fraction(2, 5)
+        self.assertEqual(Fraction(thresholds["long_child_prompt_tokens_exclusive"], MODEL_WINDOW), forty_percent)
+        self.assertLess(Fraction(thresholds["B_expected_trigger_tokens"], MODEL_WINDOW), forty_percent)
+        self.assertLess(Fraction(thresholds["C_expected_trigger_tokens"], MODEL_WINDOW), forty_percent)
+        self.assertNotIn("utilization", json.dumps(spec["decision_rule"]).lower())
+        # The current protocol paragraph itself, not the amendment record, must
+        # carry both limits.
+        current = self.markdown().split("\n## Amendment ", 1)[0]
+        heading = "**Secondary descriptive outcome (SIZE-07).**"
+        self.assertIn(heading, current)
+        paragraph = current[current.index(heading):].split("\n\n", 1)[0]
+        self.assertIn("**not powered**", paragraph)
+        self.assertIn("does not enter selection", paragraph)
+
+    def test_readback_gate_requires_window_modifiers_absent_in_every_arm(self):
+        spec = self.spec()
+        gate = spec["native_lever"]["arm_readback_gate"]
+        self.assertIn("must_be_absent_in_every_arm", gate)
+        absent = gate["must_be_absent_in_every_arm"]
+        self.assertEqual(set(absent), ABSENT_IN_EVERY_ARM)
+        must_be_unset = spec["shared_controls"]["must_be_unset"]
+        for key, reason in absent.items():
+            with self.subTest(key=key):
+                self.assertIn(key, must_be_unset)
+                self.assertTrue(reason.strip())
+        self.assertIn("can't raise the threshold", absent["CLAUDE_AUTOCOMPACT_PCT_OVERRIDE"])
+        self.assertIn("reduces the effective context window", absent["CLAUDE_CODE_MAX_OUTPUT_TOKENS"])
+        current = self.markdown().split("\n## Amendment ", 1)[0]
+        for key in ABSENT_IN_EVERY_ARM:
+            self.assertIn(f"`{key}`", current)
 
 
 if __name__ == "__main__":
