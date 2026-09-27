@@ -1,0 +1,443 @@
+{
+  "group": "OmniRoute S02/S03/S05/S06/S07 — read-only resolution, 2026-09-27. Checkout HEAD verified as dd6e9607e4884ec75c9bc0d96e60b01e9483d84e. Configurations below are proposals; no settings, processes or files were changed.",
+  "items": [
+    {
+      "id": "S02",
+      "feature": "OmniRoute MCP server",
+      "what_it_does": "Exposes routing/search, health/quota/usage, configuration, cache/compression, memory/skills, plugins and external context operations. The stated 45 tools are the canonical definitions: pinned documentation counts 110 built-in tools across modules; enabled database skills can add skill_* tools. Supports stdio, SSE and Streamable HTTP.",
+      "defaults": "mcpEnabled=false; transport resolves to stdio. Tool-cardinality filtering is inactive without MCP_TOOL_ALLOW/MCP_TOOL_DENY. Description compression defaults enabled. HTTP enablement and launching the independent stdio process are separate controls.",
+      "controls": "Settings mcpEnabled and mcpTransport; client MCP registration and omniroute --mcp process lifecycle; MCP_TOOL_ALLOW/MCP_TOOL_DENY; OMNIROUTE_MCP_ENFORCE_SCOPES and OMNIROUTE_MCP_SCOPES. Description controls: compression.mcpDescriptionCompressionEnabled or OMNIROUTE_MCP_COMPRESS_DESCRIPTIONS=false.",
+      "current_live_value": "Supplied GET snapshot: enabled=false, online=false, transport=stdio, scopesEnforced=false, totalCalls24h=0; MCP description compression=true. Reported offline status does not independently prove that no separately launched stdio process exists.",
+      "applies_to": "No MCP consumer is required by the stated CX, FW or SEARCH interfaces. A separate operator administration consumer could use a narrow catalog.",
+      "quality_risk": "omniroute_route_request constructs model/messages/stream:false plus optional x-combo; it omits effort, tools and response_format, then extracts textual output. It cannot preserve CX native Responses or FW strict-schema/tool semantics. With login disabled, management authentication is bypassed; disabled scope enforcement permits tool calls. Enabling HTTP MCP therefore adds a powerful interface for local processes. Routine usage polling also conflicts with the supplied no-GPT-6-usage-narration rule.",
+      "cache_effect": "Inference: leaving this server unregistered adds no tool schemas to lane prefixes. Loading a large or changing catalog can disturb prefix continuity; stable schemas may subsequently cache. Description compression changes tool-selection context and has no demonstrated quality parity here.",
+      "token_effect": "No demonstrated lane savings. Schemas and tool results add input context when surfaced; exact cost requires the client's actual serialized manifest. With approximately 94% input cache reads and only approximately 1.2% output tokens, avoiding unnecessary input context is the relevant consideration.",
+      "upstream_status": "GitHub API checked: scope-enforcement correction PR #2958 merged 2026-05-31; mcp:connect authentication issue #9159 closed 2026-08-08. These fixes do not make the current keyless, scopes-disabled posture isolated.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Gateway settings {\"mcpEnabled\":false,\"mcpTransport\":\"stdio\"}; omit OmniRoute MCP registrations from CX/FW/SEARCH clients and do not launch omniroute --mcp. mcpEnabled=false gates HTTP transports but does not prevent a separately launched stdio server. GET /api/mcp/tools can still expose metadata while execution is disabled.",
+      "experiment_needed": "None to retain OFF. Before reconsideration, identify an operator task, expose only its required tools through MCP_TOOL_ALLOW, and measure actual schema tokens, tool-selection accuracy and total task cost. Do not route lane inference through omniroute_route_request without effort/schema/tool parity evidence.",
+      "overturn_condition": "A concrete administration consumer demonstrates net benefit with a narrow catalog and an acceptable trust boundary. Preserve native CX/FW inference and keep usage narration outside worker context.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/frameworks/MCP-SERVER.md#L9-L35",
+          "claim": "110 built-in tools, 45 canonical definitions, transports and disabled HTTP default."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/frameworks/MCP-SERVER.md#L485-L517",
+          "claim": "Description compression and opt-in tool-cardinality controls."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L495-L556",
+          "claim": "Routing wrapper drops required request fields and returns extracted text."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L1467-L1546",
+          "claim": "Dynamic skill tools and independent stdio startup without an mcpEnabled gate."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/mcp/stream/route.ts#L15-L48",
+          "claim": "HTTP execution requires the enabled setting and selected transport."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/api/requireManagementAuth.ts#L49-L60",
+          "claim": "Management authentication bypass when authentication is disabled."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/scopeEnforcement.ts#L99-L109",
+          "claim": "Scope checks allow calls when enforcement is disabled."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/mcp/tools/route.ts#L5-L19",
+          "claim": "Metadata route has no mcpEnabled gate."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/2958",
+          "claim": "Merged scope-enforcement correction."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/9159",
+          "claim": "Closed mcp:connect authentication issue."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json",
+          "claim": "Recorded /api/mcp/status and /api/settings/compression observations."
+        }
+      ],
+      "unverified": [
+        "Actual connected-client tools/list serialization, schema tokens and lane A/B outcomes.",
+        "Current client registrations, separately launched stdio processes and environment allowlists.",
+        "Exact repository location of the supplied no-usage-narration rule; followed as an explicit user instruction."
+      ]
+    },
+    {
+      "id": "S03",
+      "feature": "A2A server",
+      "what_it_does": "Provides JSON-RPC agent tasks with six implemented skills: smart-routing, quota-management, provider-discovery, cost-analysis, health-report and list-capabilities. Agent Card discovery can additionally advertise Conductor fleet skills.",
+      "defaults": "a2aEnabled=false. Authentication permits keyless callers when neither required gateway-key authentication nor the legacy explicit A2A key is configured. Ownerless tasks are intentionally shared.",
+      "controls": "a2aEnabled gates task execution; REQUIRE_API_KEY and the optional legacy OMNIROUTE_API_KEY affect authentication. CONDUCTOR_HUB_URL controls conditional fleet discovery. Disabling task execution does not disable the public Agent Card.",
+      "current_live_value": "Supplied GET /api/a2a/status snapshot: enabled=false, online=false, status=disabled, skills=[], total tasks=0, active streams=0.",
+      "applies_to": "No A2A consumer appears in the supplied CX/FW/SEARCH traffic inventory.",
+      "quality_risk": "smart-routing reconstructs a nonstreaming chat request from model/messages/optional combo, omitting effort, tools and response_format. Substituting it for existing lanes would lose required semantics. Keyless task access does not provide local caller isolation.",
+      "cache_effect": "No prompt or cache-prefix effect while unused. Converting native traffic into A2A smart-routing would change its request contract; cache continuity cannot be assumed.",
+      "token_effect": "No token saving for the stated lanes. Agent discovery and task artifacts would add context only if consumed; no such consumer is established.",
+      "upstream_status": "GitHub API checked: dashboard A2A authentication issue #12888 closed/completed 2026-09-12; fix PR #13271 merged 2026-09-12. The inspected authentication helper contains the dashboard-session fallback.",
+      "proposed_state": "N/A",
+      "proposed_config": "Keep settings {\"a2aEnabled\":false}; configure no A2A client for CX/FW/SEARCH; leave CONDUCTOR_HUB_URL unset. The last condition prevents Agent Card GET from querying a Conductor hub even though A2A execution is disabled.",
+      "experiment_needed": "None without a consumer. A future consumer needs task ownership, cancellation/streaming and full request-contract tests before any lane adoption.",
+      "overturn_condition": "A named runtime requires A2A and demonstrates useful task interoperability without replacing native effort/schema/tool contracts or introducing unacceptable shared-task access.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/frameworks/A2A-SERVER.md#L145-L151",
+          "claim": "Documented A2A skill surface."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/taskExecution.ts#L138-L163",
+          "claim": "Six executable skill handlers."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings.ts#L185-L186",
+          "claim": "MCP and A2A default disabled."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/a2a/route.ts#L147-L185",
+          "claim": "Disabled task execution returns 503."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/authenticate.ts#L24-L63",
+          "claim": "Keyless authentication and ownerless-task visibility."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/skills/smartRouting.ts#L35-L51",
+          "claim": "Reduced nonstreaming inference request and textual result."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/.well-known/agent.json/route.ts#L25-L29",
+          "claim": "Agent Card GET consults fleet discovery independently of a2aEnabled."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/conductor/fleetSkills.ts#L50-L67",
+          "claim": "Unset hub URL avoids outbound fleet lookup."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/13271",
+          "claim": "Merged fix for issue #12888."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json",
+          "claim": "Recorded disabled A2A status and zero tasks."
+        }
+      ],
+      "unverified": [
+        "Host CONDUCTOR_HUB_URL and legacy A2A-key presence; environment/auth stores were not read.",
+        "Consumers outside the supplied traffic inventory.",
+        "Live task isolation and protocol behavior; no execution POST was performed."
+      ]
+    },
+    {
+      "id": "S05",
+      "feature": "Middleware hooks, guardrails, prompt-injection guard and vision bridge",
+      "what_it_does": "Pre-request JavaScript hooks can change bodies/models or short-circuit requests. The guardrail registry runs vision, audio, video, PII, prompt-injection and credential guards. Both CX and FW pass through pre-call guardrails and hooks before provider dispatch; native Responses passthrough does not bypass this stage.",
+      "defaults": "Vision bridge=true, auto mode, default describe model openai/gpt-4o-mini; audio bridge=true; video=false. Input inspection=true; request PII, response PII and credential rewriting are opt-in. Important mismatch: the feature-flag definition reports INJECTION_GUARD_MODE default off, but the evaluator falls through DB override, environment, legacy INPUT_SANITIZER_MODE, then warn. Even explicit off does not stop scanning; INPUT_SANITIZER_ENABLED=false does.",
+      "controls": "Hooks have enabled, priority and global/combo scope. However, the sole chat call invokes runHooks(hookContext) without comboId, so the advertised combo scope is not a verified working lane selector here. Guardrails accept an opt-out list through x-omniroute-disabled-guardrails, body/metadata.disabledGuardrails or key metadata. Early route injection checks do not reliably inherit that registry skip. Modality settings and PII/credential flags control rewriting; INPUT_SANITIZER_ENABLED is read directly from environment.",
+      "current_live_value": "Fresh anonymous GET /api/middleware/hooks on 2026-09-27 returned hooks=[], dbCount=0, registryCount=0. Supplied snapshot: INPUT_SANITIZER_ENABLED=true/default; INJECTION_GUARD_MODE=off/default; PII_REDACTION_ENABLED=false; PII_RESPONSE_SANITIZATION=false; credentialRedactionEnabled=false. Modality settings are absent, so source defaults apply. Actual legacy sanitizer mode and credential environment override are unverified.",
+      "applies_to": "CX and FW, including native Responses requests. The detector is also reused by other API routes.",
+      "quality_risk": "Any admitted local process can register hooks under the accepted login-off posture. The isolated-realm fix removes the identified escape but still requires trusted hook authors. Rewriting can alter extraction entities, tool arguments, images or model choice; regex block mode can reject legitimate quoted instructions/code. Guardrails generally fail open on errors. Ordinary text requests have no bridge rewrite, and catalog-recognized native-vision models skip vision conversion; this is not proof of whole-pipeline byte identity.",
+      "cache_effect": "Inspection-only warn/log behavior does not rewrite prompt content. Hooks, masks and image descriptions can change cached prefixes; changing routing can also move cache ownership. That risk matters substantially more than speculative shortening with approximately 94% cached input.",
+      "token_effect": "Regex inspection needs no model call. Vision describe performs additional inference and replaces images with generated text; it is neither lossless nor demonstrated token saving for these native multimodal lanes.",
+      "upstream_status": "GitHub API verified PR #14916 merged 2026-09-27 at the cited base pin, fixing GHSA-9p9m-h9rj-rhhg through isolated realms and JSON-only crossing. PR #11936 merged 2026-08-30 to remove duplicate injection logs. Vision fallback issue #8430 closed 2026-08-05; source still intentionally substitutes unavailable-image text on certain failed nonvision-combo paths.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Keep the hook registry empty. Settings {\"modalityBridgeVisionEnabled\":false,\"visionBridgeEnabled\":false,\"modalityBridgeAudioEnabled\":false,\"modalityBridgeVideoEnabled\":false,\"modalityBridgeVideoAudioTranscriptionEnabled\":false,\"credentialRedactionEnabled\":false}. Feature-flag overrides {\"INJECTION_GUARD_MODE\":\"off\",\"PII_REDACTION_ENABLED\":\"false\",\"PII_RESPONSE_SANITIZATION\":\"false\"}; service environment INPUT_SANITIZER_ENABLED=false, PII_REDACTION_ENABLED=false, CREDENTIAL_REDACTION_ENABLED=false. A dashboard-only INPUT_SANITIZER_ENABLED override is insufficient for its direct environment reader. No verified master hook-registration disable exists: empty hooks preserves current behavior but does not close the accepted local management trust boundary.",
+      "experiment_needed": "Before any future opt-in: demonstrate a working positive lane selector, compare complete CX/FW request bodies and model/effort, replay strict JSON/schema/tool tasks plus benign injection-like text, and measure image fidelity, cache reads and total inference tokens. No such replay was run in this GET-only review.",
+      "overturn_condition": "A specific lane demonstrates protection or modality support with no material quality loss and acceptable cache cost, while unselected requests remain unchanged. Hook adoption additionally requires trusted authors and verified scope enforcement.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L802-L919",
+          "claim": "Guardrails and hooks execute before routing; hook invocation supplies no comboId."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/middleware/registry.ts#L378-L415",
+          "claim": "Hook enable/scope selection and body/model mutations."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/middleware/hooks/route.ts#L79-L116",
+          "claim": "Management-authenticated registration creates enabled hooks."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/api/requireManagementAuth.ts#L49-L60",
+          "claim": "Login-off management bypass."
+        },
+        {
+          "ref": "~/code/native-agent-stack/docs/decisions/2026-09-27-omniroute-account-pool.md:285",
+          "claim": "Decision 5 explicitly accepts local hook-registration risk under the keyless loopback posture."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/promptInjection.ts#L138-L246",
+          "claim": "Actual mode precedence, environment enable gate and inspection/block behavior."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/constants/featureFlagDefinitions.ts#L27-L81",
+          "claim": "Dashboard sanitizer/injection/PII defaults, including reported off."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/security/GUARDRAILS.md#L615-L700",
+          "claim": "PII and credential opt-ins; injection policy and rewriting distinctions."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/constants/visionBridgeDefaults.ts#L38-L45",
+          "claim": "Enabled vision bridge and describe defaults."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/constants/modalityBridgeDefaults.ts#L17-L41",
+          "claim": "Vision mode, audio/video and transcription defaults."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/visionBridge.ts#L526-L586",
+          "claim": "Additional describe inference, generated text and failed-combo image substitution."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/settingsSchemas.ts#L440-L477",
+          "claim": "Supported modality configuration keys."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/14916",
+          "claim": "Merged isolated-realm security fix present at the pin."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/11936",
+          "claim": "Merged duplicate injection-log correction."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/8430",
+          "claim": "Closed vision fallback issue."
+        },
+        {
+          "ref": "http://127.0.0.1:20128/api/middleware/hooks",
+          "claim": "Fresh GET-only observation: no persisted or registered hooks."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json",
+          "claim": "Recorded feature-flag values and absent modality overrides."
+        }
+      ],
+      "unverified": [
+        "Legacy INPUT_SANITIZER_MODE and CREDENTIAL_REDACTION_ENABLED environment values.",
+        "Current model-capability overrides and per-request wire behavior.",
+        "A working positive per-lane guardrail enable control with the default path disabled.",
+        "Public advisory API returned 404; the merged fix and pinned implementation were verified independently."
+      ]
+    },
+    {
+      "id": "S06",
+      "feature": "Telemetry, cloud sync, updates, remote mode and tunnels",
+      "what_it_does": "Local telemetry records request timings/counters. Separately, Next.js includes framework telemetry; cloud sync exports configuration and credentials; CLI/dashboard update checks contact upstream services; remote mode directs CLI management to another server; Cloudflare, ngrok and Tailscale Funnel can publish the local gateway.",
+      "defaults": "cloudEnabled=true but sync requires CLOUD_URL or NEXT_PUBLIC_CLOUD_URL; tailscaleEnabled=false. Main CLI listener defaults to 0.0.0.0 unless overridden. Installed Next 16.3.5 telemetry defaults enabled when its configuration store is available; NO_UPDATE_NOTIFIER controls the installed notifier's daily check. Update installation requires an explicit application request; checking and applying are distinct.",
+      "controls": "cloudEnabled plus cloud URL environment; NEXT_TELEMETRY_DISABLED; dependency-level NO_UPDATE_NOTIFIER; listener host variables; CLI OMNIROUTE_BASE_URL/context; tunnel process lifecycle. OMNIROUTE_CLOUD_SYNC_SECRETS=false restricts inbound credential replacement, not outbound export. OMNIROUTE_NO_UPDATE_NOTIFIER only suppresses notification output. AUTO_UPDATE_MODE=off is invalid and normalizes to npm.",
+      "current_live_value": "Supplied snapshot: cloudEnabled=true, cloudConfigured=false, cloudUrl=null; tailscaleEnabled=false, tailscaleUrl=\"\"; local telemetry populated. Version channel=source, autoUpdateSupported=false with a not-a-git-repository error. This is a deployment condition, not an update-check disable. Recorded host evidence places listeners on loopback. Tunnel processes, CLI context and telemetry/notifier environment values are not established by the snapshot.",
+      "applies_to": "Host-wide control plane and deployment lifecycle; ordinary CX/FW/SEARCH provider traffic remains necessary and separate.",
+      "quality_risk": "Cloud outbound bundles include provider access/refresh credentials and gateway API keys. Unconfigured cloud currently prevents that destination-specific export; enabling a destination changes the privacy boundary. Tunnels defeat the chosen loopback exposure boundary. Automatic application of a different build could change all lanes. Next telemetry concerns build/development metadata; ongoing production telemetry emission was not demonstrated.",
+      "cache_effect": "Inference: disabling optional telemetry/sync/exposure needs no prompt rewrite. Preserving the pinned build and route configuration protects existing cache behavior; updates or synchronized routing changes could alter it.",
+      "token_effect": "No demonstrated model-token saving from these features. Retain local telemetry for measured A/B comparisons; it does not require injecting usage reports into model context.",
+      "upstream_status": "GitHub API checked: insecure-defaults issue #13679 remains open; cloud signature PR #13804 merged 2026-09-16, but unsigned/no-secret legacy acceptance remains at this pin. Updater classification issue #14782 remains open and resembles the snapshot symptom; identical host root cause is unproved.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Settings {\"cloudEnabled\":false,\"tailscaleEnabled\":false,\"tailscaleUrl\":\"\"}. Unset CLOUD_URL and NEXT_PUBLIC_CLOUD_URL. Set NEXT_TELEMETRY_DISABLED=1 for build/development/service environments and NO_UPDATE_NOTIFIER=1 for CLI/service environments. Keep OMNIROUTE_SERVER_HOST=API_HOST=LIVE_WS_HOST=EMBED_WS_PROXY_HOST=127.0.0.1; pin CLI OMNIROUTE_BASE_URL=http://127.0.0.1:20128. Keep every tunnel backend stopped and do not select a remote CLI context. Optional cloud defense: OMNIROUTE_CLOUD_SYNC_SECRETS=false and OMNIROUTE_CLOUD_SYNC_ENFORCE_SIGNATURE=true. Residual: no verified existing setting disables dashboard /api/system/version and news fetches; complete OFF for that surface requires a narrowly scoped source guard or equivalent egress control. Neither was implemented. Hidden tunnel cards are not disable controls.",
+      "experiment_needed": "Verify effective nonsecret flag values, bound addresses and stopped tunnel state; observe egress separately during service startup, dashboard use and builds while allowing intended provider/search traffic. Verify zero cloud/notifier/framework-telemetry traffic under proposed flags. Dashboard update/news suppression remains an implementation requirement.",
+      "overturn_condition": "A specific remote/sync consumer justifies off-host disclosure or exposure with an accepted security design. Updates require explicit pin review and CX/FW regression/cache evidence. Retaining local metrics needs no overturn.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/requestTelemetry.ts#L113-L130",
+          "claim": "Local bounded request-telemetry history, distinct from phone-home."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/package.json#L344-L377",
+          "claim": "Next 16.3.5 and update-notifier dependency versions; installed implementations were inspected."
+        },
+        {
+          "ref": "https://github.com/vercel/next.js/blob/v16.3.5/packages/next/src/telemetry/storage.ts#L135-L153",
+          "claim": "Pinned framework telemetry enable default and NEXT_TELEMETRY_DISABLED control."
+        },
+        {
+          "ref": "https://github.com/vercel/next.js/blob/v16.3.5/packages/next/src/telemetry/storage.ts#L312-L331",
+          "claim": "Disable gate precedes telemetry submission."
+        },
+        {
+          "ref": "https://github.com/vercel/next.js/blob/v16.3.5/packages/next/src/telemetry/post-telemetry-payload.ts#L18-L29",
+          "claim": "Framework telemetry HTTP destination and POST."
+        },
+        {
+          "ref": "https://github.com/yeoman/update-notifier/blob/v7.3.1/update-notifier.js#L55-L91",
+          "claim": "NO_UPDATE_NOTIFIER disables checks before the detached checker can run."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings.ts#L152-L158",
+          "claim": "Cloud and Tailscale settings defaults."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/cloudSync.ts#L5-L22",
+          "claim": "Cloud destination and inbound credential/signature controls."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/cloudSync.ts#L116-L136",
+          "claim": "Missing destination prevents export; configured destination receives the serialized bundle."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/sync/bundle.ts#L65-L126",
+          "claim": "Outbound bundle retains provider credentials and API-key values."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/system/version/route.ts#L56-L143",
+          "claim": "GET performs version/news checks; update application is separate."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/omniroute.mjs#L306-L315",
+          "claim": "Notifier construction precedes the notification-output suppression flag."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/system/autoUpdate.ts#L81-L85",
+          "claim": "Unsupported update-mode values fall back to npm."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/REMOTE-MODE.md#L9-L45",
+          "claim": "Remote mode changes CLI management destination."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/ops/TUNNELS_GUIDE.md#L12-L58",
+          "claim": "Three public-exposure backends and Cloudflare binary download behavior."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/cli/utils/serverHost.mjs#L16-L25",
+          "claim": "Main listener override and all-interface default."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/13679",
+          "claim": "Open insecure-defaults follow-up."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/13804",
+          "claim": "Merged cloud-signature hardening."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/14782",
+          "claim": "Open updater deployment-classification issue."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json",
+          "claim": "Recorded cloud, Tailscale, telemetry and updater observations."
+        }
+      ],
+      "unverified": [
+        "Effective host NEXT_TELEMETRY_DISABLED and NO_UPDATE_NOTIFIER values.",
+        "Current tunnel processes, remote CLI context and inherited environment.",
+        "Process-wide egress absence, including dependency telemetry outside inspected build/development paths.",
+        "Configuration-only suppression of dashboard version/news checks: no working master switch was found; full proposed OFF is not enforced today."
+      ]
+    },
+    {
+      "id": "S07",
+      "feature": "Gateway memory, skills and system/context injection",
+      "what_it_does": "Built-in memory extracts/stores preferences and decisions, retrieves context and can add memory tools. Omni Skills inject executable tool schemas. Agent Skills are a separate discovery catalog, not automatic Markdown injection. Two independent system-prompt features exist: customSystemPrompt and global prefix/suffix systemPrompt. External context tools include Notion, Obsidian and Local Corpus.",
+      "defaults": "Memory disabled, approximate 2,000-token retrieval budget, 30-day retention, hybrid retrieval and SQLite primary backend; skillsEnabled=true independently. Transformer/static embeddings and reranking default disabled. Custom and global system-prompt injection are disabled when unset.",
+      "controls": "/api/settings/memory controls enabled and skillsEnabled; settings customSystemPromptEnabled/customSystemPrompt control custom instructions; /api/settings/system-prompt controls enabled/prefixPrompt/suffixPrompt. x-omniroute-no-memory:true suppresses memory and skills through null ownership; it does not disable either system-prompt feature and is an opt-out rather than a positive lane enable.",
+      "current_live_value": "Snapshot: customSystemPromptEnabled=false and customSystemPrompt=\"\"; memory/skills/global-system keys absent. Fresh GETs on 2026-09-27 confirmed memory enabled=false, skillsEnabled=true, maxTokens=2000, retentionDays=30, hybrid, SQLite, no fallback backends, transformersEnabled=false, rerankEnabled=false; global system prompt enabled=false with empty prefix/suffix.",
+      "applies_to": "For genuinely keyless requests, missing API-key ownership prevents memory/skill injection and durable extraction in CX/FW. Native CX input[] also fails the memory-retrieval messages[] gate. A valid-key, nonstreaming FW request can receive installed skill schemas even with memory disabled. Global system-prompt injection can alter Responses instructions if enabled.",
+      "quality_risk": "Gateway retrieval and executable skills add another context/tool authority to CX and to FW runtimes that already own memory. The repository explicitly retains ai-memory/code-index responsibilities and prohibits competing gateway chains. Important existing behavior: injectMemoryAndSkills sorts any tools array with more than one entry even when memory/skills are off or ownership is null. Native Responses passthrough then uses that current body. Disabling injection therefore does not certify original client tool-order byte identity; this is existing baseline behavior, not a new proposed rewrite.",
+      "cache_effect": "Memory placement is cache-preserving only when its explicit cache_control detection selects that path; otherwise context can be prepended, and provider constraints can force leading placement. Provider cache-read counters and four-hour affinity do not prove that placement gate is active. Retrieved text, tool selection and global instructions can change prefixes.",
+      "token_effect": "Eligible memory retrieval can add approximately 2,000 input tokens under defaults; skill schemas add unmeasured input and tool choices. No net savings or quality improvement was demonstrated against the input-heavy, approximately 94%-cached workload.",
+      "upstream_status": "GitHub API verified PR #13414 merged 2026-09-15: eval runner opts out of memory/skills and output-style injection because injected context affected evaluation results. PR #13427 merged the same day to correct Anthropic memory placement. These fixes do not establish CX/FW prefix or quality parity.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Desired supported payloads: /api/settings/memory {\"enabled\":false,\"skillsEnabled\":false}; /api/settings {\"customSystemPromptEnabled\":false,\"customSystemPrompt\":\"\"}; /api/settings/system-prompt {\"enabled\":false,\"prefixPrompt\":\"\",\"suffixPrompt\":\"\",\"prompt\":\"\"}. Keep ai-memory, code indexes and FW-owned memory unchanged. If a lane later sends a real gateway key, x-omniroute-no-memory:true provides an additional opt-out. These settings disable added content; they do not disable the existing unconditional tool sort.",
+      "experiment_needed": "None to retain OFF. Any future memory/skill trial must be isolated to its consumer and compare extraction/graph accuracy, strict-schema/tool completion, total input tokens and cache-read ratio. Separately capture unsorted-tool CX/FW wire requests to quantify the existing sort and verify baseline continuity. No inference requests were issued.",
+      "overturn_condition": "A specific lane proves a retrieval/skill benefit that its native memory layer cannot supply, with acceptable total cost and unchanged unselected requests. Positive lane enablement must be verified; the no-memory header alone does not provide that contract.",
+      "citations": [
+        {
+          "ref": "~/code/native-agent-stack/docs/foundation-stack.md:20",
+          "claim": "OmniRoute memory does not replace ai-memory/code indexing; competing gateways must not be chained."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/frameworks/SKILLS.md#L18-L30",
+          "claim": "Executable Omni Skills versus discovery-only Agent Skills."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/memory/settings.ts#L26-L51",
+          "claim": "Memory, skills, retrieval and backend defaults."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memoryExtraction.ts#L125-L158",
+          "claim": "API-key owner resolution and durable extraction gates."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/memory/injection.ts#L259-L324",
+          "claim": "Conditional cache placement and messages[] eligibility."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memorySkillsInjection.ts#L148-L264",
+          "claim": "Explicit cache-control detection, nonstreaming tool gates and unconditional tool sorting."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1365-L1382",
+          "claim": "No-memory header nulls ownership but still calls the injection helper."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2358-L2366",
+          "claim": "Native Responses passthrough consumes the current, potentially reordered body."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L641-L654",
+          "claim": "Independent custom-system-prompt injection gate."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/systemPrompt.ts#L210-L285",
+          "claim": "Global prompt gate and Responses instructions modification."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/memory/route.ts#L42-L52",
+          "claim": "Supported memory settings update and cache invalidation."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/system-prompt/route.ts#L41-L50",
+          "claim": "Supported global prompt configuration and persistence."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/13414",
+          "claim": "Merged evaluation-context opt-out correction."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/13427",
+          "claim": "Merged Anthropic memory-placement correction."
+        },
+        {
+          "ref": "http://127.0.0.1:20128/api/settings/memory",
+          "claim": "Fresh GET-only observation of effective memory and skills settings."
+        },
+        {
+          "ref": "http://127.0.0.1:20128/api/settings/system-prompt",
+          "claim": "Fresh GET-only observation of disabled global prompt injection."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json",
+          "claim": "Recorded custom-system-prompt settings."
+        }
+      ],
+      "unverified": [
+        "Installed Omni Skills inventory and individual enabled/mode values.",
+        "Notion, Obsidian and Local Corpus connection status.",
+        "Actual CX/FW wire captures, injected-token counts and task/cache effects.",
+        "A positive per-lane enable mechanism while global memory/skills flags remain false.",
+        "A configuration gate that disables the existing unconditional tool sort."
+      ]
+    }
+  ],
+  "tools_used": [
+    "functions.exec",
+    "exec_command",
+    "mcp__codebase_memory__search_graph",
+    "mcp__codebase_memory__get_code_snippet",
+    "mcp__codebase_memory__trace_path",
+    "mcp__codebase_memory__check_index_coverage",
+    "mcp__context_mode__ctx_execute",
+    "mcp__context_mode__ctx_fetch_and_index",
+    "mcp__context_mode__ctx_search",
+    "collaboration.spawn_agent",
+    "collaboration.send_message",
+    "collaboration.followup_task"
+  ]
+}

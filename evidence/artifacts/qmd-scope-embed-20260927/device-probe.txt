@@ -1,0 +1,4 @@
+command: node <qmd 2.8.3 package dir>/.qmd-device-probe.mjs (device.mjs.txt, run from qmd's own package so it resolves qmd's node-llama-cpp; the copy was removed afterwards)
+env: QMD_LLAMA_GPU unset, QMD_FORCE_CPU unset (checked with shell set-tests; no values printed)
+output: {"gpu":"vulkan","devices":[]}
+time: 2026-09-27, about 16:27Z

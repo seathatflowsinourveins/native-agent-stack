@@ -1,0 +1,53 @@
+"""Run the frozen query set through qmd's three retrieval modes and score against the frozen expected docs.
+
+Arms: lex = `qmd search` (BM25, no LLM); vec = `qmd vsearch` (vector only); hybrid = `qmd query`
+(expansion + BM25 + vector + rerank). Top 5, index native-agent-stack-catalog. Scores: hit@1, hit@5, MRR@5.
+"""
+import hashlib
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+D = Path(sys.argv[1])
+QMD = str(Path.home() / ".local/share/codex-ecosystem/bin/qmd")
+qs = D / "queryset-frozen.json"
+assert hashlib.sha256(qs.read_bytes()).hexdigest() == (D / "queryset-frozen.sha256").read_text().split()[0], "query set changed"
+queries = json.loads(qs.read_text())["queries"]
+ARMS = {"lex": "search", "vec": "vsearch", "hybrid": "query"}
+
+
+def norm(uri):
+    return uri.split("?")[0]
+
+
+rows = []
+for q in queries:
+    expected = {norm(u) for u in q["expected_docs"]}
+    row = {"id": q["id"], "style": q["style"], "collection": q["collection"], "expected": sorted(expected), "arms": {}}
+    for arm, cmd in ARMS.items():
+        start = time.monotonic()
+        p = subprocess.run([QMD, "--index", "native-agent-stack-catalog", cmd, q["query"], "-n", "5", "--json"],
+                           capture_output=True, text=True, timeout=900)
+        seconds = round(time.monotonic() - start, 1)
+        try:
+            data = json.loads(p.stdout)
+            results = data if isinstance(data, list) else data.get("results", [])
+            top = [norm(r.get("file") or r.get("path") or "") for r in results[:5]]
+        except ValueError:
+            top = []
+        rank = next((i + 1 for i, u in enumerate(top) if u in expected), None)
+        row["arms"][arm] = {"exit": p.returncode, "seconds": seconds, "top5": top, "rank": rank}
+    rows.append(row)
+    print(q["id"], {a: v["rank"] for a, v in row["arms"].items()}, flush=True)
+
+summary = {}
+for arm in ARMS:
+    ranks = [r["arms"][arm]["rank"] for r in rows]
+    summary[arm] = {"hit@1": sum(1 for x in ranks if x == 1), "hit@5": sum(1 for x in ranks if x),
+                    "mrr@5": round(sum(1 / x for x in ranks if x) / len(ranks), 3), "n": len(ranks),
+                    "median_seconds": sorted(r["arms"][arm]["seconds"] for r in rows)[len(rows) // 2]}
+json.dump({"queryset_sha256": (D / "queryset-frozen.sha256").read_text().split()[0], "rows": rows, "summary": summary},
+          open(D / "ab-results.json", "w"), indent=1)
+print(json.dumps(summary, indent=1))

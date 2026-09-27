@@ -1,0 +1,73 @@
+{
+  "group": "RH5",
+  "items": [
+    {
+      "id": "S04",
+      "verdict": "corrected",
+      "state": "ON-OPT-IN",
+      "config": "Retain the proposed six GET targets, 300s polling, 5s timeout, 37 gauges, fixed labels, loopback binding, disabled redirects and exporter stdout/stderr suppression; gateway/client configuration delta remains empty. Correct the measurement contract: trendHours=24 does not reliably produce an exact trailing-24h dataset at this pin. Do not use its summed trend as a window-matched A/B acceptance measure or combine retained promptCache totals with usage_1d totals. The 37-series projection exports neither trend nor an all-request cached-input ratio; obtain that acceptance measure from independently recorded, matched lane receipts. Treat missing/non-finite fields and unexplained accounting collapse as invalid measurement, not zero activity. ON-OPT-IN describes the available aggregate APIs; the proposed adapter remains unapplied and requires native configuration, end-to-end privacy and polling-load acceptance before activation.",
+      "findings": [
+        {
+          "lens": "cache-token",
+          "claim": "Material correction: the nominal 24-hour cache trend can include older requests and distort a purported 24-hour cached-input share.",
+          "evidence": "getCacheTrend compares timestamp directly with SQLite datetime('now', '-24 hours'), which produces a space-separated cutoff; saveRequestUsage defaults to ISO timestamps containing T. Lexical comparison therefore admits earlier hours on the cutoff date. An isolated in-memory SQLite reproduction included a 39-hour-old row; a two-row fixture reported 50% cached input where the actual trailing-24h share was 100%. Summing numerator and denominator from one response remains internally consistent, but its effective window is not necessarily the requested window. This corrects the proposal's measurement guidance; its 37 gauges do not themselves export this ratio.",
+          "citation": "[Trend predicate and aggregation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L186-L221); [ISO timestamp default](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/usageHistory.ts#L755-L760); [Timestamp persisted unchanged](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/usageHistory.ts#L823-L858)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The opt-in observer state stands: these GET projections introduce no inference-body, model, effort or affinity configuration change.",
+          "evidence": "The inspected routes aggregate existing telemetry, cache and compression records. They do not invoke inference transformations. requireLogin=false bypasses the inspected authentication helpers, so numeric-only projection and loopback binding remain necessary under the user's existing keyless policy. Source separation supports no direct payload mutation; it does not establish zero polling interference or measured byte identity under load.",
+          "citation": "[Cache GET](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/cache/route.ts#L20-L48); [Compression GET](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/analytics/compression/route.ts#L13-L24); [Login-off behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiAuth.ts#L445-L451); [Management-auth bypass](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/api/requireManagementAuth.ts#L49-L60)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "Privacy projection and telemetry limitations are correctly identified.",
+          "evidence": "Usage analytics returns byAccount/byApiKey, and compression analytics returns stored combo identifiers. json_exporter v0.8.0 can log response data on JSONPath failures, supporting the proposed stdout/stderr suppression. Telemetry retains at most 1000 observations, defaults to five minutes, and is recorded when the chat handler returns its Response; activeConnections counts sessions and errorRate uses quota-monitor errors. These are neither complete streamed-response latency nor an HTTP failure rate.",
+          "citation": "[Usage response branches](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/usage/analytics/route.ts#L898-L915); [Compression identifiers](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts#L465-L479); [Exporter error handling, v0.8.0](https://github.com/prometheus-community/json_exporter/blob/v0.8.0/exporter/collector.go); [Telemetry retention and window](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/requestTelemetry.ts#L115-L156); [Recording boundary](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L1360-L1388); [Telemetry response semantics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/telemetry/summary/route.ts#L6-L28)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "The proposal correctly separates cache activity, retained totals, bounded cache-health samples and compression estimates; these scopes cannot be substituted for one another.",
+          "evidence": "promptCache.totalInputTokens includes only cache-active rows, while totalRequests includes all retained usage rows; cache activity includes reads or writes. Cache-health selects the newest 5000 qualifying status=200 call-log rows, excludes both-NULL cache counters and exposes truncation. Compression totals exclude rows with skip_reason and report skips separately. Gauges and the prohibition on summing snapshots are appropriate. Independently reproduced snapshot values include zero compression savings, 1600 excluded skips, zero semantic entries and the stated trend totals.",
+          "citation": "[Cache denominators](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L11-L41); [Cache response fields](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L142-L152); [Bounded cache-health query](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/cacheHealth.ts#L247-L289); [Compression saving filter](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts#L383-L402); [Compression skips](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts#L595-L626); [Supplied snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json:180)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "A present request gauge does not establish valid accounting; some source failures become successful zero-valued responses.",
+          "evidence": "getCacheMetrics catches query failures and returns zero totals; getCacheTrend returns an empty array on failure, and semantic-cache metric reads also fall back to zero. The outer cache route can consequently return HTTP 200 with numeric fields present. The proposed missing-gauge alarm cannot detect this condition. Preserve reconciliation as an acceptance gate and treat unexplained counter collapse as ambiguous rather than evidence of no traffic, no caching or no savings.",
+          "citation": "[Cache failure fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L154-L167); [Trend failure fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L223-L225); [Semantic metric fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L70-L77); [Outer successful response](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/cache/route.ts#L33-L48)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "The observer creates no model-token savings; the stated cost caveats are justified.",
+          "evidence": "Cache tokensSaved is reused input, and estimatedCostSaved applies a fixed $3/M price with a 90% discount. Codex/cx are intentionally excluded from flat-rate zeroing. Search cost multiplies registry prices by logged provider counts, including rows counted by search analytics rather than verified billable queries. These estimates must remain separate from invoices, compression reductions and subscription charges; the supplied cache-heavy traffic makes continuity measurement more relevant than claiming savings from observation.",
+          "citation": "[Cache savings formula](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L92-L98); [Codex cost treatment](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/flatRateProviders.ts#L25-L39); [Search cost calculation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/analytics/route.ts#L31-L50); [Search count scope](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/callLogStats.ts#L278-L309)",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "The researcher's fresh GET observations, newer counters, live /metrics 404s and claimed 37-path live verification were not independently reproduced. The supplied snapshot verifies 27 configured paths; usage/search response fields were checked in source.",
+        "The claimed Collector validation was not independently repeated. json_exporter native configuration acceptance, deployed adapter status, end-to-end ingestion, missing/invalid-field behavior and failure-path privacy remain unverified.",
+        "Polling overhead, inference byte identity under polling, per-lane quality/cache effects, complete stream accounting and reconciliation with native receipts require the proposed measured experiments.",
+        "Effective ENABLE_REQUEST_LOGS and actual OAuth charges/GPT-6 pricing accuracy remain unverified; no environment or authentication store was read.",
+        "Independent GitHub API fetches for PRs #8827, #4974 and #5018 returned HTTP 403. Their claimed merge states, and the previously unresolved #4268/#14618 follow-ups, remain unverified."
+      ]
+    }
+  ],
+  "cross_item": [],
+  "tools_used": [
+    "functions.exec",
+    "exec_command",
+    "mcp__codebase_memory__search_graph",
+    "mcp__codebase_memory__trace_path",
+    "mcp__context_mode__ctx_execute_file (workspace-boundary denial)",
+    "mcp__context_mode__ctx_execute",
+    "mcp__context_mode__ctx_fetch_and_index",
+    "mcp__context_mode__ctx_search"
+  ]
+}

@@ -1,0 +1,386 @@
+{
+  "group": "OmniRoute D02/D07/D08/D09 — retain the existing default path; source review at a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3, with redacted snapshot and read-only live GET verification on 2026-09-27. No configuration changes or inference tests performed.",
+  "items": [
+    {
+      "id": "D02",
+      "feature": "Session affinity TTL and keys",
+      "what_it_does": "Selects an eligible account using a provider-scoped session key before applying ordinary round-robin routing. Key precedence is x-codex-session-id → x-session-id → x-omniroute-session → metadata.session_id → metadata.sessionId → conversation_id → session_id → prompt_cache_key → first-input-text hash. Codex CLI 0.157.1 normally sends bare session-id and thread-id headers, plus a Responses prompt_cache_key; that body key normally supplies gateway affinity. Bare session-id is recognized separately by session bookkeeping, but is absent from the explicit affinity-header list. Headerless FW requests still receive affinity: chat requests normally hash their first user message. Different extraction chunks therefore create different pins; identical first-user text can share a pin across otherwise independent jobs.",
+      "defaults": "Upstream affinity defaults to disabled, sessionAffinityTtlMs=0, with a legacy codexSessionAffinityTtlMs read fallback. Supported configured range is 0–86400000 ms. TTL is sliding: selecting the pinned account refreshes expiry to selection time plus TTL. It is not a maximum conversation duration.",
+      "controls": "Global settings.sessionAffinityTtlMs; providerStrategies.codex controls routing when affinity does not select an account. Explicit session headers and supported body fields select the affinity key, not its TTL. No public header, combo or provider-block TTL override was found. The SDK does not necessarily create a gateway session identifier: inspected OpenAI Python default headers contain none of these session headers. An FW caller can supply extra_headers={\"X-Session-Id\":\"fw:<runtime>:<stable-run-or-conversation-id>\"}; keep it stable across that run and unique across independent runs.",
+      "current_live_value": "Snapshot: sessionAffinityTtlMs=14400000; providerStrategies.codex={\"fallbackStrategy\":\"round-robin\",\"stickyRoundRobinLimit\":1}. Live GET /api/providers?provider=codex at 2026-09-27T16:31Z confirmed four active OAuth accounts. The inspected Codex provider configuration uses Responses and has no custom session-header override; actual per-invocation wire traffic was not captured.",
+      "applies_to": "CX and FW through the chat/Responses account-selection path. SEARCH credential lookup supplies no sessionKey, so these search routes do not acquire conversation affinity from their caller's headers.",
+      "quality_risk": "Affinity does not rewrite prompts or reduce reasoning effort. Eligibility remains authoritative: cooldown, quota, model restrictions and exclusions can defeat a pin. Ordinary outer-loop failover evicts the failed pin and the next keyed selection creates a replacement. However, the inner Codex 429 rotation clears affinity and calls the raw credential selector without the session key; successful inner rotation does not guarantee immediate re-pinning to that replacement. A later request can select another account.",
+      "cache_effect": "Retaining 4h protects the existing continuity mechanism behind approximately 94% cached input. A continuously active 12h or 24h run can retain a 4h sliding pin indefinitely. Raising TTL to 12h/24h only helps gaps between selections exceeding 4h, including a sufficiently long single inference or tool/idle interval. It cannot extend upstream cache retention or prevent quota-driven rotation. Headerless FW affinity can fragment across extraction inputs or concentrate unrelated identical inputs on one account; stable explicit run keys make that policy predictable.",
+      "token_effect": "No direct token reduction or added model tokens. Expected benefit is preserving cached rather than uncached prefill. With input dominating the measured token mix, avoiding unnecessary account changes matters more than optimizing the approximately 1.2% output share. Actual savings require lane-specific cache measurements.",
+      "upstream_status": "GitHub API observations: generic-affinity issue #7274 closed 2026-07-18; forced-selection/affinity issue #5903 closed 2026-07-03; failed-pin eviction issue #6219 closed 2026-07-07. Corresponding generic TTL, affinity precedence and outer-loop eviction behavior is present at the pin. The inner Codex rotation caveat remains visible in the reviewed implementation.",
+      "proposed_state": "ON-GLOBAL",
+      "proposed_config": "Retain the already enabled configuration: {\"sessionAffinityTtlMs\":14400000,\"providerStrategies\":{\"codex\":{\"fallbackStrategy\":\"round-robin\",\"stickyRoundRobinLimit\":1}}}. Keep CX's native session headers and prompt_cache_key behavior unchanged. The existing header mechanism makes an FW trial reachable without changing the default request path: add X-Session-Id=fw:<runtime>:<stable-run-or-conversation-id> only in the selected FW caller after its A/B. Do not raise the shared TTL merely because total task duration exceeds 4h.",
+      "experiment_needed": "For each FW runtime, compare current derived keys with explicit stable run keys, holding model, effort and request bodies fixed. Measure account switches, cached-input fraction, uncached tokens, latency, extraction/schema/tool correctness and quota failures. Separately exercise outer and inner 429 failover followed by another turn to check re-pinning. Test 4h versus 12h/24h only if real gaps exceed 4h; TTL testing requires an isolated instance because no public lane-scoped TTL control was found.",
+      "overturn_condition": "Raise TTL only if measured long-gap sessions lose useful cache continuity and an isolated 12h/24h trial improves it without unacceptable account concentration. Revisit global affinity if a lane demonstrates worse completion or cache performance. Adopt explicit FW keys only after that runtime's A/B passes; require a source fix and verification before promising immediate re-pin after inner Codex rotation.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L144-L221",
+          "claim": "First-user/input fallback and exact header/body affinity-key precedence."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/sessionAccountAffinity.ts#L21-L123",
+          "claim": "Keys are scoped by provider plus session key; expiry is refreshed by touch/upsert."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L272-L319",
+          "claim": "Reuse touches the pin; missing/ineligible selections clear it and new pins select an eligible LRU account."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L443-L510",
+          "claim": "TTL resolution and account eligibility predicates; the internal TTL option is not itself a public request control."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L1952-L1997",
+          "claim": "Affinity selection precedes ordinary provider round-robin routing."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L2514-L2567",
+          "claim": "Outer fallback evicts the failed account's matching affinity pin."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/providerExecutionPipeline.ts#L373-L406",
+          "claim": "Inner Codex 429 rotation clears affinity and selects replacement credentials without a session key."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/sessionManager.ts#L332-L345",
+          "claim": "Separate session bookkeeping recognizes bare session-id."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md#L470-L493",
+          "claim": "Documented disabled default, global control and 4h/12h/24h recommendations; implementation supplies the sliding-TTL qualification."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-api/src/requests/headers.rs#L5-L15",
+          "claim": "Tagged Codex source builds session-id and thread-id headers."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/client.rs",
+          "claim": "Tagged Codex source constructs Responses prompt_cache_key from session metadata, with explicit/internal overrides."
+        },
+        {
+          "ref": "https://github.com/openai/openai-python/blob/main/src/openai/_base_client.py",
+          "claim": "Python SDK default_headers inspected on 2026-09-27 contain no automatic gateway affinity-session header; this is not evidence of installed FW wrapper behavior."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L81-L104",
+          "claim": "Standard search resolves credentials without a session key."
+        },
+        {
+          "ref": "[Local alpha-search route](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:90)",
+          "claim": "Local-only alpha search likewise calls credential selection without a session key; not attributed to the upstream pin."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/7274",
+          "claim": "Verified closed state and closure date for generic affinity."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/5903",
+          "claim": "Verified closed state for affinity versus forced selection."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/6219",
+          "claim": "Verified closed state for failed-pin eviction."
+        },
+        {
+          "ref": "[Redacted gateway snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json:1026)",
+          "claim": "Observed provider strategy and 14400000 ms affinity TTL; source defaults are reported separately."
+        }
+      ],
+      "unverified": [
+        "Actual wire headers and body overrides for every CX invocation and installed FW runtime; Python SDK source does not establish cognee/Hindsight wrapper behavior.",
+        "Upstream cache residency over 4h/12h/24h, account-boundary reuse and the cache benefit of explicit FW keys.",
+        "Live inner-versus-outer failover re-pinning behavior and encrypted reasoning/context portability after account changes.",
+        "No measured A/B was executed; absence of a public lane-scoped TTL control is based on the reviewed call sites and configuration surfaces."
+      ]
+    },
+    {
+      "id": "D07",
+      "feature": "Hard session lease: lease:exclusive, allowedConnections and /api/v1/session-leases",
+      "what_it_does": "Provides durable exclusive ownership of an eligible connection, with owner/API-key binding and generation fencing before dispatch. It is stronger than affinity for preventing other clients from using that connection. It does not override quota, model, health or cooldown eligibility: the same generation can transition to another free eligible connection. Connections held by active leases are removed from ordinary unmanaged selection.",
+      "defaults": "No automatic lease acquisition. Default lease lifetime is 120000 ms; internal TTL bounds are 1000–1800000 ms. The public lifecycle schema exposes no TTL field. Reusing the same binding does not renew its expiry, so long sessions require explicit renewal.",
+      "controls": "Lifecycle uses POST /api/v1/session-leases with acquire/model, status/generation, renew/generation or release/generation. It always requires a valid API key carrying lease:exclusive and a nonempty allowedConnections list. Managed inference carries X-OmniRoute-Lease-Owner and X-OmniRoute-Lease-Generation. A scoped managed key could coexist with keyless ordinary inference; enabling dashboard login is not a prerequisite. No lifecycle calls were made.",
+      "current_live_value": "User-selected keyless inference; snapshot requireLogin=false. Live GET /api/sessions at 2026-09-27T16:31Z returned exclusiveSessions count 0. No managed lease consumer was identified in the supplied CX/FW configuration. API-key inventories and auth stores were not inspected.",
+      "applies_to": "Future lease-aware CX/FW clients or wrappers that explicitly authenticate and maintain the lifecycle. Current keyless CX, FW and SEARCH have no demonstrated lease consumer.",
+      "quality_risk": "A missed renewal or stale generation can reject a long-running workflow's next dispatch. Leasing accounts from this shared four-account pool also reduces capacity available to default keyless clients; full occupancy can produce local 429 capacity errors. A lease cannot make an exhausted pinned account usable. Managed leases suppress the inner Codex account-rotation path so lease-aware routing owns transitions.",
+      "cache_effect": "Exclusive ownership can prevent competing clients from consuming an account's capacity, but does not extend upstream cache lifetime. Its 2-minute renewable lifetime is operationally more demanding than the existing 4-hour sliding affinity. There is no demonstrated cache improvement for the current consumers.",
+      "token_effect": "Lease lifecycle requests add control traffic, not inference tokens. There is no intrinsic token saving; expiry/rejection recovery and capacity contention can increase repeated work. The measured cached-input dominance does not justify introducing lease management without a consumer and evidence.",
+      "upstream_status": "GitHub API verified PR #10362, exclusive managed connection leases, merged 2026-08-18T14:25:47Z. PR #11389, lease visibility in Sessions, merged 2026-08-25T04:39:00Z. The implementation and architecture documentation are present at the pin.",
+      "proposed_state": "N/A",
+      "proposed_config": "Retain keyless inference and requireLogin=false. Create no lease:exclusive keys, reserve no allowedConnections for leases, add no lease headers and run no acquire/renew/release lifecycle. Continue using D02 affinity for current long Codex sessions. This resolves the feature as having no current managed consumer, rather than changing the user's authentication decision.",
+      "experiment_needed": "None for the current N/A resolution. If a lease-aware consumer is introduced, first test acquire, renewal comfortably inside 120 seconds, stale-generation rejection, process failure, quota-driven transition and contention using a pool isolated from default traffic; compare completion and cache metrics with ordinary affinity.",
+      "overturn_condition": "A concrete consumer needs exclusive ownership beyond soft affinity, implements authenticated lifecycle renewal and fencing, and demonstrates improved outcomes without reducing default-lane capacity. A desire for a longer session TTL alone is insufficient.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/architecture/RESILIENCE_GUIDE.md#L189-L221",
+          "claim": "Exclusive ownership, scoped-key requirements, generation fencing, eligibility-preserving transitions and capacity errors."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/session-leases/route.ts#L29-L94",
+          "claim": "Exact lifecycle actions, absent public TTL field and mandatory authenticated lease scope."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/leaseContext.ts#L33-L70",
+          "claim": "Managed inference requires scope, allowed connections and valid lease headers."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/exclusiveConnectionLeases.ts#L5-L8",
+          "claim": "120000 ms default and internal 1-second/30-minute bounds."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/exclusiveConnectionLeases.ts#L317-L346",
+          "claim": "Same-binding reuse does not renew expiry; transitions enforce ownership and occupancy."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/exclusiveConnectionLeasePolicy.ts#L33-L77",
+          "claim": "Unmanaged requests exclude actively leased connections; managed requests enforce the active generation."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L4105-L4111",
+          "claim": "Managed leases disable inner account rotation."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/10362",
+          "claim": "Verified merged state/date for lease implementation."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/pulls/11389",
+          "claim": "Verified merged state/date for lease Sessions visibility."
+        },
+        {
+          "ref": "http://127.0.0.1:20128/api/sessions",
+          "claim": "Read-only live observation at 2026-09-27T16:31Z: zero exclusive sessions; this does not prove absence of configured managed keys."
+        }
+      ],
+      "unverified": [
+        "Whether any unused lease-scoped API keys exist; no auth-store or API-key inventory inspection was performed.",
+        "Lease lifecycle, long-generation renewal, contention and quota-transition behavior under live load.",
+        "Any cache or completion benefit over existing affinity for these consumers."
+      ]
+    },
+    {
+      "id": "D08",
+      "feature": "Resilience: circuit breaker, connection cooldown, model lockout, bounded retry and provider cooldown gate",
+      "what_it_does": "Combines distinct controls: provider breakers reject new dispatches after qualifying provider failures; connection/scope cooldowns remove unhealthy candidates; model locks narrow suppression; bounded cooldown waiting can retry selection when all candidates are temporarily unavailable. requestRetry=3 is not a total upstream-attempt limit. The Codex HTTP executor can retry a 429 twice on the same URL at 2-second intervals; the inner Codex pipeline permits three attempts with account rotation; outer selection and client retries add further layers. The separate provider-wide cooldown gate overlaps these controls.",
+      "defaults": "Persisted settings defaults are requestRetry=3 and maxRetryIntervalSec=30; the resilience resolver's fallback, when these are absent, is 5 waits/90 seconds with a 300000 ms wait budget. OAuth defaults: cooldown base 5000 ms, maxBackoffSteps=8, useUpstreamRetryHints=false; breaker degradationThreshold=5, failureThreshold=8, resetTimeoutMs=60000. Generic modelLockout defaults disabled, base 120000 ms, maximum 1800000 ms. Provider cooldown and optional stream recovery default off. Disabling generic modelLockout does not disable mandatory Codex scope/model locks.",
+      "controls": "Settings requestRetry/maxRetryIntervalSec feed direct-model cooldown waiting; /api/resilience exposes separate cooldown, breaker and provider-gate configuration. Generic modelLockout is a separate settings object. Codex client controls are model_providers.<name>.request_max_retries and stream_max_retries, defaulting to 4 and 5 in CLI 0.157.1. A named combo's config.failoverBeforeRetry can suppress lower-level retry and, when explicitly enabled with a sibling available, prefer that sibling; it is not a universal per-request retry ceiling.",
+      "current_live_value": "Snapshot and live GET /api/resilience at 2026-09-27T16:31Z: direct wait enabled, maxRetries=3, maxRetryWaitSec=30; OAuth cooldown 5000 ms/8 steps/no generic upstream hints; OAuth breaker 5 degraded/8 open/60000 ms reset; providerCooldown.enabled=false. Combo cooldown waiting is enabled with maxWaitMs=90000, maxAttempts=5, budgetMs=300000. modelLockout is absent from settings, implying the generic disabled default. Earlier live feature-flag GETs showed stream recovery, midstream recovery, flush-empty retry, readiness-stall retry and early-EOF sibling failover effective false. Inspected Codex client retry fields are unset, implying 4/5 absent launch overrides.",
+      "applies_to": "The analyzed retry hierarchy governs CX and FW chat/Responses requests, including all four pooled Codex OAuth accounts. SEARCH uses a separate execution handler; its credential selection shares eligibility checks, but these chat retry counts should not be assigned to SEARCH.",
+      "quality_risk": "These guards do not lower model or reasoning effort. The breaker invokes its operation once and has no generation-abort timer; opening a breaker or cooling an account does not itself terminate an already returned stream. maxRetryIntervalSec=30 bounds a cooldown wait, not generation duration. Nevertheless, ambiguous failures can occur after expensive upstream computation: empty/early-EOF handling includes one bounded pre-content retry even with optional stream recovery disabled. Replays can duplicate inference and produce a different answer. Independent stream/body idle watchdogs can still cut a quiet max-effort response.",
+      "cache_effect": "Prefer eligible same-model siblings only when necessary; account rotation can lose warm cache locality. Ordinary 429s are excluded from provider-breaker failure classification, avoiding a provider-wide outage merely because one account is limited. Codex 429 suppression is scope-aware. The optional provider-wide cooldown gate can unnecessarily remove otherwise usable siblings and should remain off. The inner rotation's missing re-pin, described in D02, is a further cache-continuity limitation.",
+      "token_effect": "Retries can repeat prefill and reasoning work; the approximately 1.2% output share does not make a repeated full request cheap. Genuine pre-generation 429 rejection usually avoids generation work, but source inspection cannot establish upstream billing. With 3 waits of at most 30 seconds, configured direct cooldown sleeps total at most 90 seconds; this excludes inference time and other retry layers. Codex inner rotation can impose Retry-After or a 60-second fallback cooldown, so an all-account cooldown exceeding 30 seconds returns upstream to the client rather than waiting through it.",
+      "upstream_status": "GitHub API verified bounded-cooldown-wait PR #7360 merged 2026-07-18T18:12:53Z. Half-open breaker issue #13836 closed 2026-09-18T14:34:05Z; its discussion identifies PR #13849 as the fix, but direct PR detail retrieval was denied. The pin contains bounded cooldown decisions, single-invocation breaker execution and generation-aware half-open accounting.",
+      "proposed_state": "ON-GLOBAL",
+      "proposed_config": "Retain the existing global guard policy; this resolution adds no new retry or replay behavior. Keep settings {\"requestRetry\":3,\"maxRetryIntervalSec\":30}. Retain effective resilience values {\"connectionCooldown\":{\"oauth\":{\"baseCooldownMs\":5000,\"useUpstreamRetryHints\":false,\"maxBackoffSteps\":8}},\"providerBreaker\":{\"oauth\":{\"failureThreshold\":8,\"degradationThreshold\":5,\"resetTimeoutMs\":60000}},\"waitForCooldown\":{\"enabled\":true,\"maxRetries\":3,\"maxRetryWaitSec\":30,\"budgetMs\":300000},\"providerCooldown\":{\"enabled\":false}}. Keep generic modelLockout disabled and all currently disabled stream-replay features off; retain mandatory Codex scope locks. Leave the default Codex client retry settings unchanged. Four accounts alone is not evidence for reducing breaker threshold to four or increasing retry budgets.",
+      "experiment_needed": "Instrument attempts across gateway and client using request correlation without logging credentials. Test pre-dispatch 429, all-four-account cooldown, 5xx after computation, pre-content EOF and post-content disconnect; measure completion, duplicate upstream executions, cache reads, latency and charged/quota usage. A separate Codex provider block can test request_max_retries=1 and stream_max_retries=2 against current 4/5 while preserving model, effort, body and default provider selection; these are trial values, not an established optimum. Gateway-wide 3/30 versus larger waits requires an isolated instance. No fault injection or inference A/B was run.",
+      "overturn_condition": "Change a lane's retry values only when its A/B reduces duplicate work or failures without harming completion and max-effort quality. Enable broader model lockout or provider cooldown only after repeated provider-wide failure evidence and isolation testing show a net benefit. Do not enable midstream reconstruction merely to conceal stream cuts.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/architecture/RESILIENCE_GUIDE.md#L15-L109",
+          "claim": "Distinct provider breaker, connection cooldown and optional provider cooldown layers."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings.ts#L173-L174",
+          "claim": "Persisted defaults are requestRetry=3 and maxRetryIntervalSec=30."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/settings.ts#L78-L170",
+          "claim": "Separate resilience profiles, fallback wait budgets and opt-in provider cooldown/stream recovery."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/cooldownAwareRetry.ts#L107-L160",
+          "claim": "Retries require an eligible reset within both the per-wait limit and remaining wait budget."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatPredicates.ts#L10-L42",
+          "claim": "Provider-breaker failure classification excludes ordinary account 429s."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/circuitBreaker.ts#L350-L402",
+          "claim": "Breaker dispatch invokes the operation once, with generation-aware accounting and no retry/abort timer in execute."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/modelLockoutSettings.ts#L12-L18",
+          "claim": "Generic model-lockout disabled default and cooldown limits."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L3321-L3348",
+          "claim": "Codex 429 persists a scope cooldown and calls lockModel independently of the generic enabled flag."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L1671-L1711",
+          "claim": "Same-URL 429 retry and fallback behavior; skipUpstreamRetry controls this layer."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L583-L584",
+          "claim": "Same-URL retry configuration is two retries with 2000 ms delay."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L854-L855",
+          "claim": "Codex HTTP execution delegates to the base executor."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/providerExecutionPipeline.ts#L307-L406",
+          "claim": "Three-attempt Codex inner pipeline and 429 rotation with parsed retry delay or 60000 ms fallback."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L2098-L2211",
+          "claim": "Successful streams exit the account loop; bounded pre-content EOF retry exists separately from optional sibling recovery."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/executeTargetAttempt.ts#L1052-L1074",
+          "claim": "Explicit failoverBeforeRetry changes sibling-versus-same-target retry behavior only when another target exists."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs",
+          "claim": "Tagged client defaults: request retries 4, stream retries 5 and stream idle timeout 300000 ms."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md#L495-L505",
+          "claim": "Independent gateway stream/body idle limits can cut quiet reasoning; synthetic heartbeat does not reset upstream inactivity."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/7360",
+          "claim": "API pull_request metadata verifies merged_at for bounded cooldown waiting."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/13836",
+          "claim": "Verified closed state/date for the half-open breaker issue."
+        },
+        {
+          "ref": "http://127.0.0.1:20128/api/resilience",
+          "claim": "Read-only live effective cooldown, breaker, wait and provider-gate values at 2026-09-27T16:31Z."
+        }
+      ],
+      "unverified": [
+        "An empirically optimal retry budget for four OAuth accounts, exactly-once execution, duplicate billing and an exact bound on composed gateway/client attempts.",
+        "Effective gateway idle/body timeout environment values; the prohibited server.env was not read. Source defaults are not asserted as live environment values.",
+        "Per-launch Codex retry overrides, exact stream-resumption replay behavior and installed FW SDK retry configuration.",
+        "Direct PR #13849 status/details could not be independently fetched because the API request returned 403; the issue discussion's merge attribution is secondary.",
+        "No live fault-injection, stream-integrity or max-effort completion A/B was performed."
+      ]
+    },
+    {
+      "id": "D09",
+      "feature": "Per-connection quota preflight, Codex 0.95 quota cooldown and automatic quota refresh",
+      "what_it_does": "When enabled for a selected connection, preflight fetches or reuses quota data before inference and can reject a near-exhausted candidate, persist its Codex scope cooldown and select another account. It does not require dashboard auto quota refresh: preflight invokes its own fetcher. The default cutoff is 2% remaining, equivalent to 98% used. The separate Codex 0.95 usage-ratio helper chooses a quota-reset cooldown when processing a 429; crossing 95% on a successful response does not itself trigger that cooldown.",
+      "defaults": "Global quotaPreflight.enabled=false; defaultThresholdPercent=2 remaining; warnThresholdPercent=20; providerWindowDefaults={}; per-connection quotaPreflightEnabled requires strict true unless another configured cutoff activates the gate. Explicit per-connection false overrides activation. Dashboard autoRefreshProviderQuota=false, interval 180 seconds. Codex quota fetch cache TTL is 60000 ms, fetch timeout 8000 ms. Source fetch-pacing defaults are 250 ms plus up to 120 ms jitter; effective environment overrides were not inspected.",
+      "controls": "Per-connection setter is PUT /api/providers/{connection}, with providerSpecificData merged into existing metadata. A future isolated test can use {\"providerSpecificData\":{\"quotaPreflightEnabled\":true},\"quotaWindowThresholds\":{\"session\":2,\"weekly\":2}}. Thresholds cascade connection → provider defaults → global; session and weekly are Codex window names. A 95%-used preflight cutoff would be 5 remaining, not 0.95. No public request/header override was found. Dashboard auto refresh and the separate quota monitor are not prerequisites.",
+      "current_live_value": "Snapshot: autoRefreshProviderQuota=false, autoRefreshProviderQuotaInterval=180. Live GETs at 2026-09-27T16:31Z: global quota preflight disabled, threshold 2, warning 20, providerWindowDefaults empty; all four active Codex connections have quotaPreflightEnabled absent, quotaWindowThresholds=null and quotaMonitorEnabled absent. Thus the ordinary direct CX/FW selection path has no configured preflight activation.",
+      "applies_to": "CX and FW selecting these Codex accounts. SEARCH also calls the generic preflight credential helper for its selected search provider, but enabling a Codex connection is not a search-lane control. The proposed global-off/per-connection-off state introduces no additional SEARCH polling.",
+      "quality_risk": "Preflight is fail-open on unavailable quota data and cannot guarantee avoiding 429s. More significantly, a successful dispatch marks the connection quota-healthy for 30 minutes, and evaluateQuotaCutoff bypasses its cutoff while that marker is active. Frequent successes can continually bypass even near-exhausted quota readings. Inner Codex 429 rotation also uses raw credential selection without preflight. When a cutoff actually blocks a pinned account, normal eligibility defeats affinity and subsequent keyed selection re-pins elsewhere; it does not interrupt an already running generation. If all candidates are blocked, the gateway can return a local 429.",
+      "cache_effect": "Early rejection can move a warm session before its account truly refuses work, sacrificing locality in a workload with approximately 94% cached input. It may prevent futile requests when quota information is current and the healthy override is absent, but that benefit is conditional. Enabling it on any of the four shared connections changes behavior for both CX and FW using that account; a caller header or combo sharing the same accounts does not isolate the cooldown/cache effects.",
+      "token_effect": "Quota checks consume no model tokens. A cache hit adds no quota-network call; a cold/stale candidate normally adds one GET to chatgpt.com/backend-api/wham/usage, with pacing and up to an 8-second fetch timeout. Inspecting four candidates can add four GETs; this is not a hard request-wide maximum because retries, invalidation and concurrent misses can add more. The fetcher has no in-flight coalescing, and failed fetch results are not cached. Any saved failed inference must outweigh latency, OAuth traffic and potential cache loss.",
+      "upstream_status": "GitHub API observations: sibling preflight gating issue #11234 closed 2026-08-23; quota-fetch pacing issue #6009 closed 2026-07-04; false quota-parking issue #14359 closed 2026-09-24. The pin includes the pacing and recent-success override. The override resolves false parking but also limits how reliably preflight prevents exhaustion 429s in active sessions.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Retain {\"autoRefreshProviderQuota\":false,\"autoRefreshProviderQuotaInterval\":180}. Target effective resilience configuration: {\"quotaPreflight\":{\"enabled\":false,\"defaultThresholdPercent\":2,\"warnThresholdPercent\":20,\"providerWindowDefaults\":{}}}. Keep quotaWindowThresholds=null on all four shared Codex accounts; explicit providerSpecificData.quotaPreflightEnabled=false is the equivalent durable off setting if this proposal is later materialized. Retain the existing 0.95-on-429 Codex reset handling. Do not enable preflight or auto refresh globally for the current pool. The enabling PUT recipe above is reserved for an isolated measured trial; no PUT was executed.",
+      "experiment_needed": "Use an isolated instance or genuinely disjoint account pool; the same shared connections cannot isolate this test by header alone. Compare off versus per-connection on at 2% remaining, with dashboard refresh still off. Include a cold quota cache, concurrent misses, fetch timeout, recent-success marker present/expired, real quota rejection and pinned-session continuation. Measure quota GETs, 429s, account changes, cached-input fraction, latency and unchanged max-effort/schema/tool correctness. Test 5% remaining only if evidence supports earlier rotation.",
+      "overturn_condition": "Enable for a specific isolated lane only after it materially reduces exhausted-account failures without meaningful cache, latency or completion regression, and its recent-success bypass is understood or corrected. Broader rollout additionally requires a verified lane-scoping mechanism or evidence that shared-account effects are acceptable.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/quotaPreflight.ts#L111-L128",
+          "claim": "2% remaining/20% warning constants and strict per-connection true check."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/settings.ts#L144-L159",
+          "claim": "Global opt-in default, remaining-percent semantics and provider/window override map."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2375-L2487",
+          "claim": "Gate activation, per-connection false override, threshold cascade and blocked-candidate cooldown/reselection."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/quotaPreflight.ts#L376-L403",
+          "claim": "Preflight invokes its own fetcher and fails open on errors or absent data."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/codexQuotaFetcher.ts#L38-L45",
+          "claim": "Codex session/weekly window names, usage endpoint and 60-second quota cache."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/codexQuotaFetcher.ts#L201-L275",
+          "claim": "Cache-hit behavior, credential use, paced GET, 8-second timeout, fail-open handling and successful-result caching without in-flight coalescing."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/quotaFetchThrottle.ts#L17-L19",
+          "claim": "Source pacing defaults, distinguished from unverified live environment overrides."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/quotaPreflight.ts#L317-L332",
+          "claim": "Recent quota-healthy state bypasses cutoff evaluation."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/domain/quotaCache.ts#L94-L174",
+          "claim": "Healthy override lasts 30 minutes and can be cleared on genuine rejection."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L2098-L2101",
+          "claim": "Successful dispatch arms the quota-healthy override."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/quota.ts#L84-L113",
+          "claim": "0.95 usage-ratio cooldown helper, with weekly reset taking precedence."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/codexAccount/quota.ts#L24-L61",
+          "claim": "The helper is used for 429 handling; successful 200 observation does not proactively cool the account at 95%."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/providers/[id]/route.ts#L105-L106",
+          "claim": "Per-connection update method is PUT."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/providers/[id]/route.ts#L235-L287",
+          "claim": "Quota-window threshold handling and merged providerSpecificData updates."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/(dashboard)/dashboard/quota/page.tsx#L7-L30",
+          "claim": "Dashboard quota auto-refresh settings feed the quota UI."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/(dashboard)/dashboard/usage/components/ProviderLimits/index.tsx#L487-L512",
+          "claim": "Auto refresh is visible-dashboard polling, independent of request-path preflight."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/routing/SUBSCRIPTION_LADDER.md#L134-L139",
+          "claim": "Checkout documentation explicitly describes the preflight cutoff as 2% remaining."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/11234",
+          "claim": "Verified closed state for sibling preflight gating."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/6009",
+          "claim": "Verified closed state for quota-fetch pacing."
+        },
+        {
+          "ref": "https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14359",
+          "claim": "Verified 2026-09-24 closure of false quota parking; implementation contains its healthy-override behavior."
+        },
+        {
+          "ref": "http://127.0.0.1:20128/api/providers?provider=codex",
+          "claim": "Read-only live observation at 2026-09-27T16:31Z: four active OAuth connections, absent preflight flags and null per-window thresholds; identities were not emitted."
+        }
+      ],
+      "unverified": [
+        "Live 429 avoidance, quota-read accuracy, latency and cache impact; no preflight inference trial was performed.",
+        "Effective quota-fetch throttle environment overrides; only source defaults are stated.",
+        "A deployment-ready lane-isolated preflight mechanism using the current four shared accounts was not found.",
+        "Threshold-crossing behavior under real concurrent traffic, including the 30-minute healthy bypass and inner-rotation bypass.",
+        "Whether additional upstream issues after the checked items change this assessment; issue review was targeted, not an exhaustive repository audit."
+      ]
+    }
+  ],
+  "tools_used": [
+    "codebase-memory search_graph and source retrieval for project omniroute-dd6e9607e",
+    "exec_command: read-only rg and numbered sed source/documentation inspection",
+    "context-mode ctx_fetch_and_index: GitHub API, tagged Codex source and SDK documentation/source retrieval",
+    "context-mode ctx_search: targeted retrieval of indexed source and upstream issue/PR state",
+    "context-mode ctx_execute: redacted snapshot extraction, allowlisted loopback HTTP GET summaries and large-output processing",
+    "Read-only git diff verification: 30 cited OmniRoute implementation/documentation files matched a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3; alpha-search was treated as local-only"
+  ]
+}

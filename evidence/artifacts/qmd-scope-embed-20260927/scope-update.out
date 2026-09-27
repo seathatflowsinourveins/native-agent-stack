@@ -1,0 +1,25 @@
+Updating 4 collection(s)...
+
+[1/4] us-equities-catalog (**/*.md)
+Collection: ~/code/native-agent-stack-live/catalogs/us-equities (**/*.md)
+
+Indexed: 0 new, 0 updated, 22 unchanged, 0 removed
+
+[2/4] us-equities-foundation (**/*.md)
+Collection: ~/code/native-agent-stack-live/blueprints/us-equities (**/*.md)
+
+Indexed: 0 new, 0 updated, 100 unchanged, 0 removed
+
+[3/4] foundation-adoption (**/*.md)
+Collection: ~/code/native-agent-stack-live/adoption (**/*.md)
+
+Indexed: 0 new, 0 updated, 23 unchanged, 0 removed
+
+[4/4] foundation-docs (**/*.md)
+Collection: ~/code/native-agent-stack-live/docs (**/*.md)
+
+Indexed: 0 new, 0 updated, 123 unchanged, 1 removed
+
+✓ All collections updated.
+
+Run 'qmd embed' to update embeddings (146 unique hashes need vectors)

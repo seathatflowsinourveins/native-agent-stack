@@ -1,0 +1,162 @@
+{
+  "group": "S04",
+  "items": [
+    {
+      "id": "S04",
+      "feature": "Usage, analytics, cost and telemetry APIs; observability wiring",
+      "what_it_does": "Use the existing aggregate JSON APIs through an opt-in local metrics adapter. Native Prometheus export is absent: both /metrics and /api/metrics returned JSON 404. GET /api/cache and /api/settings/cache-metrics expose aggregate provider-cache accounting; /api/usage/cache-health exposes cache-read/write distributions; /api/telemetry/summary exposes bounded runtime timing/session summaries. GET /api/usage/requests-by-provider-date exposes provider/day request and token totals without account identifiers. GET /v1/search/analytics exposes search counts, cache activity and estimated cost. Two responses need projection before export: /api/analytics/compression can contain compression-combo IDs, and /api/usage/analytics includes account/API-key breakdowns alongside its numeric summary. Scrape explicit numeric fields; never ingest complete responses as logs.",
+      "defaults": "Telemetry defaults to windowMs=300000 and retains at most 1000 process-local observations. Cache-health defaults to range=24h, summarizes the newest 5000 qualifying call_logs rows, requires status=200, excludes rows with both cache counters NULL, and reports truncated. Compression defaults to since=24h; totalRequests counts saving runs, while totalSkipped counts skipped runs. Usage analytics defaults to range=30d. Cache trend defaults to 24 hours, clamped to 1–720; promptCache totals span retained usage_history, independently of trendHours. Detailed-payload logging defaults false when no legacy setting exists; ENABLE_REQUEST_LOGS can override the stored setting. These APIs require no new inference feature toggle.",
+      "controls": "Select GET query scopes explicitly: /api/telemetry/summary?windowMs=300000; /api/cache?trendHours=24; /api/usage/cache-health?range=24h, optionally model; /api/analytics/compression?since=24h; /api/usage/analytics?range=1d; /v1/search/analytics. Management-auth checks remain subject to the existing login-off policy; verified loopback GETs required no credentials. Collector adoption is controlled by a separate prometheus/omniroute receiver and metrics/omniroute pipeline. The existing http_check/ecosystem receiver checks HTTP availability; adding JSON URLs there does not extract their usage counters. Preserve its /api/health target and use a JSON-to-Prometheus adapter for application metrics.",
+      "current_live_value": "Supplied snapshot: call_log_pipeline_enabled=0, debugMode=false, requireLogin=false; compression saved 0 tokens with 1600 excluded skips and zero usage receipts; semantic cache had zero entries. Snapshot cache trend sums were 110864768 cached / 119071110 input tokens across 1540 rows; cache-health reported 1486 qualifying calls, 1443 warm, zero cache writes, truncated=false. Fresh GET observation at 2026-09-27T16:18:11Z: the four main aggregate APIs returned 200; /metrics and /api/metrics returned 404. Compression still saved 0 with 2723 skips; semantic cache then had 1 entry, 0 hits and 1 miss. These are different observation windows. Repository collector.yaml still contains only the gateway health check, with no OmniRoute application-metrics receiver.",
+      "applies_to": "CX and FW for recorded chat/Responses usage; SEARCH through its separate analytics endpoint. The local alpha-search adapter delegates to the shared search handler, whose records use /v1/search. Current aggregate APIs do not reliably distinguish CX from FW when they share provider/model accounts. Per-lane adoption therefore needs isolated measurement windows or independently recorded lane cohorts; do not infer lane identity from account identifiers or inject identifiers into prompts.",
+      "quality_risk": "The proposed observer does not alter inference payloads, model selection or reasoning effort. Its unresolved risk is operational: synchronous database aggregation shares the gateway event loop, so sustained polling needs a load comparison. Privacy requires projection before telemetry storage: call-log rows expose account labels with email/connection-ID fallbacks; usage analytics includes byAccount/byApiKey; compression includes byCompressionCombo. The proposed adapter exports only fixed numeric paths and static labels. Upstream json_exporter logs response data on JSONPath errors, so the proposed service explicitly discards stdout/stderr and enables missing-key handling. Telemetry errorRate measures quota-monitor errors divided by the sampled request count; it is not an HTTP failure rate. Its timings also do not establish complete streamed-response latency.",
+      "cache_effect": "No direct prompt-cache effect; retain the existing sticky account/session behavior. Keep provider prompt caching, semantic response caching and compression savings separate. requestsWithCacheControl counts reads OR writes, so its ratio is cache activity, not a strict read-hit rate. promptCache.totalInputTokens includes only cache-active requests; dividing cached tokens by that field overstates the all-request cached-token share. For that share, sum cachedTokens and inputTokens from the same cache.trend response. Zero reported Codex cache writes and a healthy cache-health verdict do not independently prove prefix stability.",
+      "token_effect": "GET observation and numeric export require no model tokens and produce no token savings themselves. Against the supplied ~94% cached-input and ~1.2% output split, preserving cache continuity is the useful measurement priority. Cache tokensSaved means reused input tokens, not removed tokens; estimatedCostSaved uses a fixed $3/M input price and 90% discount. Usage totalCost is computed from pricing; codex/cx are explicitly excluded from flat-rate zeroing, so OAuth subscription traffic can show a positive API-equivalent estimate. Search cost is registry price multiplied by logged request counts. None is an invoice.",
+      "upstream_status": "Verified through GitHub API fetch-and-index on 2026-09-27: cache-health PR #8827 merged on 2026-07-28. Prometheus/OTel bootstrap PR #4974 and Prometheus alert/SLO PR #5018 are closed and unmerged. Pinned monitoring docs describe native export as planned for v3.9. Their adjacent claim that latency has no REST endpoint is stale: the pinned implementation and live GET confirm /api/telemetry/summary exists. The /metrics rewrite intentionally falls through to the JSON catch-all; it is not a metrics implementation.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "Proposal only; nothing installed, edited or restarted. Existing aggregate GET APIs are reachable now. Adopt the observer after the lane/load/privacy experiment; gateway and client configuration delta is empty.\nUse prometheus-community/json_exporter v0.8.0 with --web.listen-address=127.0.0.1:17979 --config.file=omniroute-json-exporter.yaml --log.level=error. Its systemd [Service] must set StandardOutput=null and StandardError=null because upstream extraction errors can log response data. Configure no body, credentials, dynamic labels or log forwarding. JSON below is valid YAML.\nExporter configuration:\n{\"modules\":{\"telemetry\":{\"valid_status_codes\":[200],\"http_client_config\":{\"follow_redirects\":false},\"metrics\":[{\"name\":\"omniroute_telemetry_5m\",\"type\":\"object\",\"path\":\"{.}\",\"valuetype\":\"gauge\",\"allow_missing_key\":true,\"help\":\"OmniRoute numeric observation; scope is in metric name.\",\"values\":{\"requests\":\"{.count}\",\"latency_p50_ms\":\"{.p50}\",\"latency_p95_ms\":\"{.p95}\",\"latency_p99_ms\":\"{.p99}\",\"active_sessions\":\"{.activeConnections}\",\"rss_bytes\":\"{.memoryUsage.rss}\"}}]},\"cache\":{\"valid_status_codes\":[200],\"http_client_config\":{\"follow_redirects\":false},\"metrics\":[{\"name\":\"omniroute_cache_retained\",\"type\":\"object\",\"path\":\"{.}\",\"valuetype\":\"gauge\",\"allow_missing_key\":true,\"help\":\"OmniRoute numeric observation; scope is in metric name.\",\"values\":{\"requests\":\"{.promptCache.totalRequests}\",\"requests_with_cache_activity\":\"{.promptCache.requestsWithCacheControl}\",\"input_tokens_on_cache_active_requests\":\"{.promptCache.totalInputTokens}\",\"read_tokens\":\"{.promptCache.totalCachedTokens}\",\"write_tokens\":\"{.promptCache.totalCacheCreationTokens}\",\"semantic_hits\":\"{.semanticCache.hits}\",\"semantic_misses\":\"{.semanticCache.misses}\",\"semantic_entries\":\"{.semanticCache.dbEntries}\"}}]},\"compression\":{\"valid_status_codes\":[200],\"http_client_config\":{\"follow_redirects\":false},\"metrics\":[{\"name\":\"omniroute_compression_24h\",\"type\":\"object\",\"path\":\"{.}\",\"valuetype\":\"gauge\",\"allow_missing_key\":true,\"help\":\"OmniRoute numeric observation; scope is in metric name.\",\"values\":{\"runs\":\"{.totalRequests}\",\"skipped\":\"{.totalSkipped}\",\"tokens_saved_estimate\":\"{.totalTokensSaved}\",\"validation_fallbacks\":\"{.validationFallbacks}\",\"runs_with_usage_receipts\":\"{.realUsage.requestsWithReceipts}\"}}]},\"cache_health\":{\"valid_status_codes\":[200],\"http_client_config\":{\"follow_redirects\":false},\"metrics\":[{\"name\":\"omniroute_cache_health_24h\",\"type\":\"object\",\"path\":\"{.}\",\"valuetype\":\"gauge\",\"allow_missing_key\":true,\"help\":\"OmniRoute numeric observation; scope is in metric name.\",\"values\":{\"calls\":\"{.totalCalls}\",\"read_tokens\":\"{.cacheReadTotal}\",\"write_tokens\":\"{.cacheWriteTotal}\",\"warm_calls\":\"{.warmCalls}\",\"cold_calls\":\"{.coldCalls}\",\"rewrite_calls\":\"{.rewriteCalls}\",\"uncached_calls\":\"{.uncachedCalls}\",\"truncated\":\"{.truncated}\"}}]},\"usage\":{\"valid_status_codes\":[200],\"http_client_config\":{\"follow_redirects\":false},\"metrics\":[{\"name\":\"omniroute_usage_1d\",\"type\":\"object\",\"path\":\"{.summary}\",\"valuetype\":\"gauge\",\"allow_missing_key\":true,\"help\":\"OmniRoute numeric observation; scope is in metric name.\",\"values\":{\"requests\":\"{.totalRequests}\",\"input_tokens\":\"{.promptTokens}\",\"output_tokens\":\"{.completionTokens}\",\"successful_requests\":\"{.successfulRequests}\",\"cost_usd_estimate\":\"{.totalCost}\"}}]},\"search\":{\"valid_status_codes\":[200],\"http_client_config\":{\"follow_redirects\":false},\"metrics\":[{\"name\":\"omniroute_search_retained\",\"type\":\"object\",\"path\":\"{.}\",\"valuetype\":\"gauge\",\"allow_missing_key\":true,\"help\":\"OmniRoute numeric observation; scope is in metric name.\",\"values\":{\"requests\":\"{.total}\",\"today_requests\":\"{.today}\",\"cached\":\"{.cached}\",\"errors\":\"{.errors}\",\"cost_usd_estimate\":\"{.totalCostUsd}\"}}]}}}\nMerge the following overlay into observability/collector/collector.yaml, retaining its existing pipelines/exporters:\n{\"receivers\":{\"prometheus/omniroute\":{\"config\":{\"scrape_configs\":[{\"job_name\":\"omniroute\",\"scrape_interval\":\"300s\",\"scrape_timeout\":\"5s\",\"metrics_path\":\"/probe\",\"static_configs\":[{\"targets\":[\"http://127.0.0.1:20128/api/telemetry/summary?windowMs=300000\"],\"labels\":{\"module\":\"telemetry\"}},{\"targets\":[\"http://127.0.0.1:20128/api/cache?trendHours=24\"],\"labels\":{\"module\":\"cache\"}},{\"targets\":[\"http://127.0.0.1:20128/api/analytics/compression?since=24h\"],\"labels\":{\"module\":\"compression\"}},{\"targets\":[\"http://127.0.0.1:20128/api/usage/cache-health?range=24h\"],\"labels\":{\"module\":\"cache_health\"}},{\"targets\":[\"http://127.0.0.1:20128/api/usage/analytics?range=1d\"],\"labels\":{\"module\":\"usage\"}},{\"targets\":[\"http://127.0.0.1:20128/v1/search/analytics\"],\"labels\":{\"module\":\"search\"}}],\"relabel_configs\":[{\"source_labels\":[\"__address__\"],\"target_label\":\"__param_target\"},{\"source_labels\":[\"module\"],\"target_label\":\"__param_module\"},{\"target_label\":\"instance\",\"replacement\":\"omniroute-local\"},{\"target_label\":\"__address__\",\"replacement\":\"127.0.0.1:17979\"}],\"metric_relabel_configs\":[{\"source_labels\":[\"__name__\"],\"regex\":\"omniroute_.*\",\"action\":\"keep\"},{\"regex\":\"__name__|job|instance|module\",\"action\":\"labelkeep\"}]}]}}},\"service\":{\"pipelines\":{\"metrics/omniroute\":{\"receivers\":[\"prometheus/omniroute\"],\"processors\":[\"memory_limiter\",\"batch\"],\"exporters\":[\"prometheus\"]}}}}\nExport all 37 application series as gauges: rolling windows and retained-table totals can decrease. Do not apply increase() or sum consecutive snapshots. Alert on a missing per-module request gauge for 15 minutes; expose cache-health truncation. This adds six GETs per five minutes and exports through the existing loopback Prometheus exporter on port 18889.",
+      "experiment_needed": "Completed: pin comparisons for the principal source files; live GET/status checks; all 37 proposed numeric paths resolved; the final receiver/pipeline overlay passed installed otelcol-contrib 0.161.0 validate against the repository config, with a validation-only existing-directory override for file_storage. Before adoption: run json_exporter --config.check and end-to-end /probe→Collector→Prometheus verification; exercise missing/invalid fields and verify no response bodies or identifiers reach metrics, journals or Loki. Compare polling off/on in matched CX, FW and SEARCH windows, holding models, effort and affinity constant. Require unchanged inference request bytes, no task-quality regression, and no material latency/error/cache regression. Reconcile counts with native client receipts using matching windows and truncation flags.",
+      "overturn_condition": "Promote to ON-GLOBAL only after adapter privacy/error-path checks and polling-load comparisons pass for every active lane. Suspend collection if identity/body data escapes, polling materially worsens gateway latency/errors, or accounting cannot be reconciled. Replace the adapter only when a later pinned gateway actually implements and verifies an aggregate Prometheus endpoint; a rewrite, documentation roadmap or closed PR is insufficient.",
+      "citations": [
+        {
+          "ref": "[Cache API projection and query bounds](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/cache/route.ts#L20-L48)",
+          "claim": "GET /api/cache returns semantic-cache, prompt-cache, trend and idempotency aggregates; trendHours defaults to 24 and is clamped."
+        },
+        {
+          "ref": "[Cache accounting and estimate semantics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L7-L236)",
+          "claim": "Totals use retained usage_history; input-token totals are restricted to cache-active rows; cache activity includes reads or writes; savings estimate uses $3/M and 90%; trend includes all input tokens."
+        },
+        {
+          "ref": "[Dedicated cache-metrics GET](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/cache-metrics/route.ts#L1-L15)",
+          "claim": "/api/settings/cache-metrics exposes the same aggregate prompt-cache accounting behind management authentication."
+        },
+        {
+          "ref": "[Semantic-cache statistics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L449-L475)",
+          "claim": "Semantic hits, misses, entry counts and saved tokens are separate from provider prompt-cache metrics."
+        },
+        {
+          "ref": "[Cache-health computation and bounded query](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/cacheHealth.ts#L131-L290)",
+          "claim": "Warm/cold/rewrite classification, verdict thresholds, distributions, 5000-row cap, success filtering and truncation semantics."
+        },
+        {
+          "ref": "[Telemetry aggregation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/requestTelemetry.ts#L115-L187)",
+          "claim": "Telemetry is process-local, capped at 1000 observations, and filtered to a default five-minute window."
+        },
+        {
+          "ref": "[Telemetry privacy projection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/monitoring/observability.ts#L328-L350)",
+          "claim": "Telemetry returns session counts and quota status counts instead of session/account identifiers."
+        },
+        {
+          "ref": "[Telemetry route semantics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/telemetry/summary/route.ts#L6-L28)",
+          "claim": "activeConnections counts sessions; errorRate uses quota-monitor errors; uptime and process-memory values are added."
+        },
+        {
+          "ref": "[Telemetry recording boundary](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L1360-L1397)",
+          "claim": "Telemetry is recorded when the handler returns its response; it does not establish complete streamed-response latency."
+        },
+        {
+          "ref": "[Compression analytics route](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/analytics/compression/route.ts#L13-L24)",
+          "claim": "GET supports since=24h|7d|30d|all and defaults to 24h."
+        },
+        {
+          "ref": "[Compression aggregation and identifier branch](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts#L370-L632)",
+          "claim": "Saving runs and skips are separate; realUsage covers attached receipts; byCompressionCombo exposes stored combo IDs."
+        },
+        {
+          "ref": "[Usage analytics response](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/usage/analytics/route.ts#L898-L964)",
+          "claim": "The response includes summary plus byAccount/byApiKey; no summary-only response is selected by the proposed range query."
+        },
+        {
+          "ref": "[Usage scope and cost computation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/usage/analytics/route.ts#L240-L368)",
+          "claim": "Cost is computed from token/pricing data, flat-rate handling is conditional, and the default range is 30d."
+        },
+        {
+          "ref": "[Codex cost classification](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/flatRateProviders.ts#L25-L39)",
+          "claim": "codex/cx are deliberately excluded from flat-rate zero-cost classification."
+        },
+        {
+          "ref": "[Provider/day usage aggregate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/usageAnalytics.ts#L799-L827)",
+          "claim": "Provider/day rows contain date, provider, request counts and token totals without account identifiers."
+        },
+        {
+          "ref": "[Call-log identity exposure](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/usage/call-logs/route.ts#L116-L170)",
+          "claim": "Account labels can fall back to email or connection ID, and rows explicitly contain connectionId."
+        },
+        {
+          "ref": "[Detailed logging override](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/detailedLogs.ts#L55-L68)",
+          "claim": "ENABLE_REQUEST_LOGS takes precedence over call_log_pipeline_enabled; a stored zero alone does not prove the effective environment setting."
+        },
+        {
+          "ref": "[Detailed logging migration default](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/migrations/014_unified_log_artifacts.sql#L4-L12)",
+          "claim": "The setting inherits the legacy value or defaults to false."
+        },
+        {
+          "ref": "[Search analytics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/analytics/route.ts#L13-L55)",
+          "claim": "Search analytics returns aggregate counts/cache activity and registry-based estimated cost."
+        },
+        {
+          "ref": "[Shared search accounting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L1625-L1638)",
+          "claim": "The free-provider handler records search calls under /v1/search with requestType=search."
+        },
+        {
+          "ref": "[Local alpha-search delegation](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:195)",
+          "claim": "Local-only adapter delegates its queries to the shared search handler; this file is not cited as part of the upstream pin."
+        },
+        {
+          "ref": "[Metrics rewrite is a catch-all compatibility path](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/next.config.mjs#L760-L778)",
+          "claim": "/metrics is rewritten for JSON 404 handling, with any future real metrics route taking precedence."
+        },
+        {
+          "ref": "[Pinned monitoring roadmap](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/ops/MONITORING_GUIDE.md#L462-L470)",
+          "claim": "Native Prometheus/OTel export is documented as planned; the adjacent no-latency-REST statement conflicts with implemented behavior."
+        },
+        {
+          "ref": "[Cache-health PR #8827](https://github.com/diegosouzapw/OmniRoute/pull/8827), [OTel/Prometheus PR #4974](https://github.com/diegosouzapw/OmniRoute/pull/4974), [SLO PR #5018](https://github.com/diegosouzapw/OmniRoute/pull/5018)",
+          "claim": "GitHub API confirmed #8827 merged; #4974 and #5018 closed without merge."
+        },
+        {
+          "ref": "[Repository collector configuration](~/code/native-agent-stack/observability/collector/collector.yaml:37), [collector distribution pin](~/code/native-agent-stack/observability/collector/README.md:3)",
+          "claim": "Gateway observation currently uses /api/health; the repository uses otelcol-contrib 0.161.0 and already exports Prometheus metrics on loopback."
+        },
+        {
+          "ref": "[Snapshot: compression]($SCRATCH/omniroute-phase0/gateway-snapshot.json:22), [snapshot: cache]($SCRATCH/omniroute-phase0/gateway-snapshot.json:180), [snapshot: cache health]($SCRATCH/omniroute-phase0/gateway-snapshot.json:3485)",
+          "claim": "Recorded snapshot values; cache-trend totals were calculated in context-mode without printing identity-bearing rows."
+        },
+        {
+          "ref": "Live HTTP GET observations, 2026-09-27T16:18:11Z; numeric-path verification, 2026-09-27T16:25:00Z",
+          "claim": "Aggregate endpoints returned 200, native metrics paths returned 404, newer counters differed from the snapshot, and all 37 selected numeric fields resolved. No mutation methods were invoked."
+        },
+        {
+          "ref": "[json_exporter v0.8.0 configuration](https://github.com/prometheus-community/json_exporter/blob/v0.8.0/examples/config.yml), [collector extraction/error handling](https://github.com/prometheus-community/json_exporter/blob/v0.8.0/exporter/collector.go), [GET and value conversion](https://github.com/prometheus-community/json_exporter/blob/v0.8.0/exporter/util.go)",
+          "claim": "Upstream adapter supports JSONPath projections, gauges and missing-key handling; no configured body means GET; booleans become 0/1; JSONPath errors can log response data."
+        },
+        {
+          "ref": "[Prometheus receiver v0.161.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/receiver/prometheusreceiver/README.md), [HTTP check receiver v0.161.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/receiver/httpcheckreceiver/README.md)",
+          "claim": "Prometheus receiver consumes the adapter's metrics; HTTP check provides synthetic HTTP metrics rather than arbitrary JSON usage-field extraction."
+        },
+        {
+          "ref": "[Existing accounting evidence and limitations](~/code/native-agent-stack/docs/decisions/2026-09-27-omniroute-account-pool.md:345)",
+          "claim": "Repository evidence records duplicate-looking call-log listings and a missing call-log record relative to native client usage; these observations limit accounting completeness claims."
+        }
+      ],
+      "unverified": [
+        "The adapter is not installed or running. Native json_exporter configuration checks, actual Prometheus ingestion and failure-path privacy tests remain outstanding; Collector schema validation is not end-to-end acceptance.",
+        "Collector validation used an in-memory override pointing file_storage to an existing directory because the substituted validation data directory lacked collector/queue; no service configuration or filesystem contents were changed.",
+        "Effective ENABLE_REQUEST_LOGS was deliberately not inspected. Snapshot call_log_pipeline_enabled=0 does not rule out an environment override.",
+        "Polling overhead, per-lane attribution, complete request/stream accounting, and reconciliation against client receipts have not been measured for this observer.",
+        "Actual OAuth subscription charges and GPT-6 pricing accuracy are not established by gateway cost estimates.",
+        "Later GitHub API follow-ups for #4268 and #14618 returned HTTP 403; their detailed current state was not verified."
+      ]
+    }
+  ],
+  "tools_used": [
+    "functions.exec",
+    "exec_command",
+    "mcp__codebase_memory__search_graph",
+    "mcp__codebase_memory__get_code_snippet",
+    "mcp__codebase_memory__trace_path",
+    "mcp__context_mode__ctx_execute",
+    "mcp__context_mode__ctx_fetch_and_index",
+    "mcp__context_mode__ctx_search"
+  ]
+}

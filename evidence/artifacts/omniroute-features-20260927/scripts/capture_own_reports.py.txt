@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Capture OmniRoute's own usage, cache and compression reports as aggregates (read-only GET, whitelist).
+
+Usage: python3 capture_own_reports.py OUT.json [BASE_URL]
+Only the fields named in KEEP are written. Everything else is dropped, including the per-account rows of
+/api/usage/analytics (account emails), per-key rows and free-text error strings. Nothing is POSTed.
+"""
+import json
+import sys
+import urllib.request
+from datetime import datetime, timezone
+
+BASE = sys.argv[2] if len(sys.argv) > 2 else "http://127.0.0.1:20128"
+ROUTES = {
+    "cache": "/api/cache",
+    "cache_health_24h": "/api/usage/cache-health",
+    "compression_all": "/api/analytics/compression?since=all",
+    "usage_all": "/api/usage/analytics?range=all",
+    "version": "/api/system/version",
+    "settings": "/api/settings",
+    "compression_settings": "/api/settings/compression",
+    "thinking_budget": "/api/settings/thinking-budget",
+}
+KEEP = {
+    "cache": {"semanticCache": None, "promptCache": ["totalRequests", "requestsWithCacheControl", "totalInputTokens",
+              "totalCachedTokens", "totalCacheCreationTokens", "tokensSaved", "byProvider", "byStrategy", "lastUpdated"],
+              "idempotency": None, "config": None},
+    "cache_health_24h": {k: None for k in ["totalCalls", "cacheReadTotal", "cacheWriteTotal", "warmCalls", "coldCalls",
+                         "rewriteCalls", "uncachedCalls", "verdict", "byModel", "timeRange", "since", "truncated"]},
+    "compression_all": {k: None for k in ["totalRequests", "totalTokensSaved", "avgSavingsPct", "byMode", "byEngine",
+                        "byCompressionCombo", "totalSkipped", "bySkipReason", "validationFallbacks", "realUsage",
+                        "mcpDescriptionCompression"]},
+    "usage_all": {"summary": ["totalRequests", "promptTokens", "completionTokens", "totalTokens", "uniqueModels",
+                  "uniqueAccounts", "successfulRequests", "successRatePct", "avgLatencyMs", "firstRequest", "lastRequest",
+                  "fallbackCount"],
+                  "byModel": ["model", "provider", "requests", "promptTokens", "completionTokens", "totalTokens",
+                              "avgLatencyMs", "successRatePct"]},
+    "version": {"current": None, "channel": None},
+    "settings": {k: None for k in ["settingsRevision", "fallbackStrategy", "providerStrategies", "stickyRoundRobinLimit",
+                 "comboStrategy", "sessionAffinityTtlMs", "disableSessionStickiness", "promptCacheAffinityEnabled",
+                 "alwaysPreserveClientCache", "requestRetry", "maxRetryIntervalSec", "requireLogin", "mcpEnabled",
+                 "a2aEnabled", "idempotencyWindowMs"]},
+    "compression_settings": {k: None for k in ["enabled", "defaultMode", "exclusions", "autoTriggerTokens",
+                             "autoTriggerMode", "activeComboId", "comboOverrides", "enginesExplicit", "liveZone",
+                             "contextBudget", "cacheMinutes", "preserveSystemPromptMode", "outputStyles",
+                             "cavemanOutputMode", "mcpDescriptionCompressionEnabled"]},
+    "thinking_budget": {"mode": None},
+}
+
+
+def pick(obj, spec):
+    if spec is None:
+        return obj
+    if isinstance(spec, list):
+        if isinstance(obj, list):
+            return [{k: row.get(k) for k in spec if k in row} for row in obj if isinstance(row, dict)]
+        return {k: obj.get(k) for k in spec if isinstance(obj, dict) and k in obj}
+    return {k: pick(obj.get(k), sub) for k, sub in spec.items() if isinstance(obj, dict) and k in obj}
+
+
+out = {"captured_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "base_url": BASE, "method": "GET",
+       "note": "aggregates only; whitelist in KEEP; per-account and per-key rows dropped", "reports": {}}
+for name, route in ROUTES.items():
+    try:
+        with urllib.request.urlopen(urllib.request.Request(BASE + route, method="GET"), timeout=30) as resp:
+            out["reports"][name] = {"route": route, "status": resp.status, "body": pick(json.load(resp), KEEP[name])}
+    except Exception as exc:  # the error class only, never its message text
+        out["reports"][name] = {"route": route, "error": type(exc).__name__}
+json.dump(out, open(sys.argv[1], "w"), indent=1, sort_keys=True)
+print(sys.argv[1])

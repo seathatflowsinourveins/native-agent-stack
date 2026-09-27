@@ -1,0 +1,42 @@
+[
+  {
+    "docid": "#c4e39f",
+    "score": 0.75,
+    "file": "qmd://us-equities-catalog/source-followup.md?index=native-agent-stack-catalog",
+    "line": 24,
+    "title": "Bounded source follow-up",
+    "snippet": "@@ -23,4 @@ (22 before, 10 after)\nvaluation need and content policy justify it. |\n| [abtop](https://github.com/graykode/abtop/releases/tag/v0.5.5) | v0.5.5, 2026-09-14; MIT | Existing targeted star disposition | Optional operator view. Its JSON mode avoids summary inference, but snapshots contain private transcript-derived contex..."
+  },
+  {
+    "docid": "#ad00db",
+    "score": 0.38,
+    "file": "qmd://us-equities-foundation/hosting/backup/README.md?index=native-agent-stack-catalog",
+    "line": 18,
+    "title": "Native local backup and restore acceptance",
+    "snippet": "@@ -17,4 @@ (16 before, 120 after)\n\nThe [official release](https://github.com/restic/restic/releases/tag/v0.19.1),\npublished 2026-07-05, was still the latest stable release at acceptance.\nThe installed Linux amd64 archive matched its SHA-256 in upstream `SHA256SUMS`;"
+  },
+  {
+    "docid": "#f57161",
+    "score": 0.25,
+    "file": "qmd://us-equities-catalog/foundation-source-review.md?index=native-agent-stack-catalog",
+    "line": 16,
+    "title": "Foundation research pass — 2026-09-19",
+    "snippet": "@@ -15,4 @@ (14 before, 84 after)\n\n- Stable: v1.0.169; released 2026-06-29T18:18:53Z; tag commit `589d8214d56740a28b5f7bf63167743d586b0b40`. Main separately observed at `5283a70780305994433cb65d6a0275386e797172` on September 19. Existing catalog's historical reviewed-main pin must not be presented as the release commit.\n- License..."
+  },
+  {
+    "docid": "#e82ccd",
+    "score": 0.15,
+    "file": "qmd://us-equities-foundation/sim-crosscheck-hftbacktest/README.md?index=native-agent-stack-catalog",
+    "line": 28,
+    "title": "hftbacktest cross-check engine (Phase-B prep)",
+    "snippet": "@@ -27,4 @@ (26 before, 452 after)\n**2025-12-23** -- about **9 months** with no push as of this check -- with\n**17 open issues**, and `py-v2.4.4` remains the latest tag. This is the same\ncommit already reviewed in `catalogs/us-equities/architecture/trading.json`;\nnothing has moved. **Overturn condition for this specific risk: if u..."
+  },
+  {
+    "docid": "#2ff8bb",
+    "score": 0.12,
+    "file": "qmd://us-equities-foundation/supply-chain/README.md?index=native-agent-stack-catalog",
+    "line": 79,
+    "title": "Native SDK dependency inventory — September 19, 2026",
+    "snippet": "@@ -78,4 @@ (77 before, 148 after)\n)\ngh api repos/anchore/syft/releases/tags/v1.52.0 \\\n  --jq '.assets[] | select(.name == \"syft_1.52.0_linux_amd64.tar.gz\") | .digest'\n```"
+  }
+]

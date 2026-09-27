@@ -1,0 +1,465 @@
+{
+ "runner": "tools/sota-convergence/landscape-sweep/codex_job.py via codex_call.sh",
+ "provider": "omniroute (lane-local CODEX_HOME, stack-worker profile)",
+ "jobs": [
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:06:56Z",
+   "finished": "2026-09-27T16:43:26Z",
+   "usage": {
+    "input_tokens": 5933289,
+    "cached_input_tokens": 4915712,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 66575,
+    "reasoning_output_tokens": 26402
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H1"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:08:26Z",
+   "finished": "2026-09-27T16:28:48Z",
+   "usage": {
+    "input_tokens": 3889253,
+    "cached_input_tokens": 3628032,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 34251,
+    "reasoning_output_tokens": 9493
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H2"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:08:51Z",
+   "finished": "2026-09-27T16:21:31Z",
+   "usage": {
+    "input_tokens": 1394502,
+    "cached_input_tokens": 1239552,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 23354,
+    "reasoning_output_tokens": 9589
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H3"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:10:41Z",
+   "finished": "2026-09-27T16:31:15Z",
+   "usage": {
+    "input_tokens": 4894262,
+    "cached_input_tokens": 4687488,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 32776,
+    "reasoning_output_tokens": 8256
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H4"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:12:56Z",
+   "finished": "2026-09-27T16:34:45Z",
+   "usage": {
+    "input_tokens": 3493187,
+    "cached_input_tokens": 3201280,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 39215,
+    "reasoning_output_tokens": 15843
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H5"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:21:31Z",
+   "finished": "2026-09-27T16:44:12Z",
+   "usage": {
+    "input_tokens": 4075832,
+    "cached_input_tokens": 3708160,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 40182,
+    "reasoning_output_tokens": 12384
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H6"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:28:51Z",
+   "finished": "2026-09-27T17:00:36Z",
+   "usage": {
+    "input_tokens": 5671065,
+    "cached_input_tokens": 4946688,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 57253,
+    "reasoning_output_tokens": 20836
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "dive-H7"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T15:44:16Z",
+   "finished": "2026-09-27T15:44:52Z",
+   "usage": {
+    "input_tokens": 99663,
+    "cached_input_tokens": 75776,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 668,
+    "reasoning_output_tokens": 275
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "probe"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:44:16Z",
+   "finished": "2026-09-27T16:55:52Z",
+   "usage": {
+    "input_tokens": 965613,
+    "cached_input_tokens": 840064,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 21562,
+    "reasoning_output_tokens": 12891
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "qmd-queryset"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T15:46:46Z",
+   "finished": "2026-09-27T16:08:23Z",
+   "usage": {
+    "input_tokens": 4309153,
+    "cached_input_tokens": 3975552,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 36829,
+    "reasoning_output_tokens": 16190
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-G1"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T15:46:46Z",
+   "finished": "2026-09-27T16:06:54Z",
+   "usage": {
+    "input_tokens": 2471428,
+    "cached_input_tokens": 2292992,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 36243,
+    "reasoning_output_tokens": 17299
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-G2"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T15:46:46Z",
+   "finished": "2026-09-27T16:12:55Z",
+   "usage": {
+    "input_tokens": 6132210,
+    "cached_input_tokens": 5623424,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 46948,
+    "reasoning_output_tokens": 21433
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-G3"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T15:46:46Z",
+   "finished": "2026-09-27T16:10:37Z",
+   "usage": {
+    "input_tokens": 4491700,
+    "cached_input_tokens": 4092160,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 35620,
+    "reasoning_output_tokens": 14646
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-G4"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T15:46:46Z",
+   "finished": "2026-09-27T16:08:50Z",
+   "usage": {
+    "input_tokens": 3096175,
+    "cached_input_tokens": 2781568,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 40042,
+    "reasoning_output_tokens": 20155
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-G5"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:55:53Z",
+   "finished": "2026-09-27T17:13:41Z",
+   "usage": {
+    "input_tokens": 3425085,
+    "cached_input_tokens": 3055872,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 31395,
+    "reasoning_output_tokens": 11535
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH1"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:41:02Z",
+   "finished": "2026-09-27T17:01:27Z",
+   "usage": {
+    "input_tokens": 5291419,
+    "cached_input_tokens": 4930304,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 35288,
+    "reasoning_output_tokens": 13854
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH2"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:41:02Z",
+   "finished": "2026-09-27T16:51:03Z",
+   "usage": {
+    "input_tokens": 1004881,
+    "cached_input_tokens": 901120,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18006,
+    "reasoning_output_tokens": 7433
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH3"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:43:27Z",
+   "finished": "2026-09-27T17:02:57Z",
+   "usage": {
+    "input_tokens": 2949562,
+    "cached_input_tokens": 2598400,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 34596,
+    "reasoning_output_tokens": 15301
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH4"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T16:51:07Z",
+   "finished": "2026-09-27T17:01:25Z",
+   "usage": {
+    "input_tokens": 1266445,
+    "cached_input_tokens": 1155072,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 18837,
+    "reasoning_output_tokens": 6861
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH5"
+  },
+  {
+   "status": "not_running",
+   "exit": null,
+   "started": null,
+   "finished": null,
+   "usage": {},
+   "usage_status": "unavailable",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": null,
+   "limit": false,
+   "note": "stopped before codex started (quiet window) and relaunched as the -r2 job",
+   "job": "refute-RH6"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T17:19:05Z",
+   "finished": "2026-09-27T17:32:04Z",
+   "usage": {
+    "input_tokens": 2107899,
+    "cached_input_tokens": 1967360,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 22830,
+    "reasoning_output_tokens": 8157
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH6-r2"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T17:19:05Z",
+   "finished": "2026-09-27T17:37:37Z",
+   "usage": {
+    "input_tokens": 2766787,
+    "cached_input_tokens": 2613632,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 33194,
+    "reasoning_output_tokens": 15395
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "refute-RH7-r2"
+  },
+  {
+   "status": "not_running",
+   "exit": null,
+   "started": null,
+   "finished": null,
+   "usage": {},
+   "usage_status": "unavailable",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": null,
+   "limit": false,
+   "note": "stopped before codex started (quiet window) and relaunched as the -r2 job",
+   "job": "review-pr415"
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-27T17:19:05Z",
+   "finished": "2026-09-27T17:26:08Z",
+   "usage": {
+    "input_tokens": 764394,
+    "cached_input_tokens": 686976,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 11334,
+    "reasoning_output_tokens": 5020
+   },
+   "usage_status": "reported",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "review-pr415-r2"
+  },
+  {
+   "status": "done",
+   "exit": 124,
+   "started": "2026-09-27T17:37:37Z",
+   "finished": "2026-09-27T18:27:37Z",
+   "usage": {},
+   "usage_status": "unavailable",
+   "model": "cx/gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "limit": false,
+   "job": "synth-r1"
+  }
+ ]
+}

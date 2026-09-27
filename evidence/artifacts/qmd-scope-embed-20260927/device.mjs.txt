@@ -1,0 +1,4 @@
+import { getLlama } from "node-llama-cpp";
+const llama = await getLlama({ gpu: "auto" });
+console.log(JSON.stringify({ gpu: llama.gpu, devices: await llama.getGpuDeviceNames() }));
+await llama.dispose();

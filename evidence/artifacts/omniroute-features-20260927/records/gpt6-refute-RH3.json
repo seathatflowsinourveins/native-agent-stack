@@ -1,0 +1,79 @@
+{
+  "group": "RH3",
+  "items": [
+    {
+      "id": "S01",
+      "verdict": "upheld",
+      "state": "ON-OPT-IN",
+      "config": "Retain the proposed request-scoped experiment: candidate {\"query\":\"<q>\",\"provider\":\"searxng-search\",\"search_type\":\"web\",\"max_results\":5,\"provider_options\":{\"baseUrl\":\"http://127.0.0.1:8888/search\"}}; control {\"query\":\"<q>\",\"provider\":\"duckduckgo-free\",\"search_type\":\"web\",\"max_results\":5}. The proposed SearXNG deployment must enable JSON and exclude Tavily. Keep the endpoint literal in trusted lane configuration, fallbackOnly=true, existing provider TTLs, and no shared SearXNG connection or global routing changes. Native alpha retains its current behavior pending an implemented opt-in adapter and its own A/B. This upholds the proposed resolution; deployment, reachability and adoption remain unverified.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "The explicit SearXNG candidate is supported by source and avoids changing automatic provider selection.",
+          "evidence": "/v1/search defaults to web/5; explicit keyless providers can execute with empty credentials. SearXNG permits caller baseUrl overrides, stored baseUrl wins, and only the exact localhost catalog sentinel is skipped. The proposed 127.0.0.1 URL avoids that sentinel. Explicit selection does not construct an alternate chain; adding a shared SearXNG connection can change unqualified fallback selection.",
+          "citation": "[Defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/schemas/apiV1.ts#L616-L624); [keyless execution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L98-L104); [explicit and automatic selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L198-L277); [URL precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search/baseUrl.ts#L49-L65); [sentinel](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L471-L486)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The CX/FW applicability boundary is correct: this request configuration does not provide a native-alpha SearXNG switch.",
+          "evidence": "Local alpha tries the cheapest eligible web catalog provider—Ollama at this pin—then DuckDuckGo if credentials are unavailable. It has no provider-options forwarding or alternate-provider retry, and calls handleSearch sequentially. Its 3/5/10 tiers are per-query ceilings; model/settings/max_output_tokens do not control selection or sizing. Preserving this route and changing only opted-in search requests provides no source-level reason to alter GPT-6 model, effort or inference affinity.",
+          "citation": "[Cheapest-provider selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L530-L551); [local alpha tiers and envelope](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:30); [local alpha resolver](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:90); [local alpha execution](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:188)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The proposal correctly treats recall and filter fidelity as adoption gates rather than established SearXNG benefits.",
+          "evidence": "DuckDuckGo forwards only the query and result limit and accepts empty parsed results as success. SearXNG forwards query/category/language/time_range/pagination but not domainFilter; handleSearch does not consume strictFilters. Additional caveat: SearXNG normalization also accepts empty results and discards engine-level diagnostics, while successful responses contain errors:[]. A successful HTTP response therefore does not establish complete engine coverage.",
+          "citation": "[DuckDuckGo execution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L1601-L1654); [SearXNG request fields](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L664-L693); [handler options](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L1421-L1480); [SearXNG normalization](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L1046-L1072); [successful response shaping](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search/searchProxy.ts#L262-L288)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The fixed loopback configuration needs no broad private-URL flag, but request-level opt-in is not a security boundary.",
+          "evidence": "The resolver directly permits private/loopback URLs and rejects recognized metadata hostnames. It does not restrict callers to the proposed SearXNG endpoint. With no API key, policy enforcement returns no rejection. Thus the approved literal target is consistent with the user's keyless-loopback decision; the metadata check must not be interpreted as endpoint authorization or comprehensive protection against untrusted destinations.",
+          "citation": "[Caller override validation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search/baseUrl.ts#L49-L65); [metadata hostname checks](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/network/outboundUrlGuard.ts#L56-L82); [private-URL allowance](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/network/outboundUrlGuard.ts#L128-L145); [keyless policy behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiKeyPolicy.ts#L823-L830)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "The cache description and TTL warning are correct; explicit provider, result budget and caller URL separate the proposed experiment's cache keys.",
+          "evidence": "The cache is process-local, bounded to 500 entries with FIFO eviction and inflight coalescing. DuckDuckGo uses 300000 ms and SearXNG 180000 ms; provider TTL takes precedence over SEARCH_CACHE_TTL_MS. The key includes request options but excludes stored endpoint and connection identity. Isolated execution of the actual cache module confirmed provider/budget/caller-URL separation and successful-empty-result caching. Alpha bypasses this cache.",
+          "citation": "[Cache implementation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/searchCache.ts#L11-L138); [route key and TTL](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L332-L381); [SearXNG defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L231-L250); [DuckDuckGo defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L336-L350); [local alpha direct execution](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:198)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Neither search caching nor smaller result ceilings establish downstream token savings or lossless search fidelity.",
+          "evidence": "Search logs record zero model tokens; snippets can still become later model input. The supplied measurements calculate to 1.228% output and 94.163% input-cache reads. Short/medium changes the result ceiling by 40%, not a measured token count. Cache keys also lowercase queries while upstream query sanitation preserves case; isolated checks confirmed that collision. These limitations support the proposed per-lane quality/cache A/B and do not establish an observed wrong answer or saving.",
+          "citation": "[Search token accounting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search/searchProxy.ts#L262-L282); [cache query normalization](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/searchCache.ts#L25-L55); [upstream query sanitation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L135-L143); [local alpha sizing and output](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:188)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The retained observations support the proposal's narrow diagnosis, without proving provider health or SearXNG superiority.",
+          "evidence": "Observed in the supplied snapshot: 26 missing catalog rows, comprising 20 search and six fetch rows with 22 distinct IDs. Source derives status from credentials and gives keyless providers no exemption. The retained probe records both zero-result queries and a subsequent context-mode fetch; its two gateway events identify DuckDuckGo. Neither observation establishes the empty-result cause.",
+          "citation": "[Credential-based catalog status](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/search/providers/route.ts#L87-L129); [supplied GET snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json:368); [retained probe](~/code/native-agent-stack/evidence/artifacts/omniroute-gateway-20260927/probe-search-profile-only.json:12)",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "SearXNG deployment, listener reachability, JSON configuration, engine selection and live results were not verified; ON-OPT-IN is upheld as the proposed target resolution.",
+        "No lane A/B, recall improvement, downstream answer-quality result, token saving, search-cache hit rate or prompt-cache-affinity effect was measured.",
+        "No end-to-end inference-byte comparison or native-alpha opt-in implementation was tested. Static inspection supports keeping existing paths unchanged, not a completed runtime verification.",
+        "The cause of retained DuckDuckGo empty results, engine-specific effects of case-folded cache keys, and native-search/wigolo reference-arm availability remain unverified.",
+        "No gateway search request was executed. Verification used pinned source, retained observations, upstream GET lookups and isolated in-memory cache checks."
+      ]
+    }
+  ],
+  "cross_item": [],
+  "tools_used": [
+    "functions.exec / exec_command: bounded source reads, snapshot/probe aggregation, pin comparison and isolated cache checks",
+    "codebase-memory.search_graph",
+    "codebase-memory.trace_path",
+    "context-mode.ctx_fetch_and_index",
+    "context-mode.ctx_search",
+    "context-mode.ctx_execute",
+    "context-mode.ctx_execute_file: workspace restriction; used permitted shell reads"
+  ]
+}

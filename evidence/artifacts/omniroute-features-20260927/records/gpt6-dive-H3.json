@@ -1,0 +1,138 @@
+{
+  "group": "Search",
+  "items": [
+    {
+      "id": "S01",
+      "feature": "Search providers for /v1/search and local /v1/alpha/search",
+      "what_it_does": "Routes queries to search providers and normalizes results. /v1/search supports explicit provider selection, credential-aware automatic selection, an alternate provider, and result caching. The local alpha adapter accepts commands.search_query[], executes queries sequentially, and returns title/URL/snippet results plus a text rendering. Its resolver and cache behavior differ materially from /v1/search.",
+      "defaults": "/v1/search defaults to search_type=web and max_results=5. Registry automatic selection excludes fallbackOnly providers and chooses the lowest catalog cost; the route then resolves credentials and searches other candidates. DuckDuckGo: keyless, fallbackOnly=true, maximum 25 results, 10-second provider timeout, 300000-ms cache TTL. SearXNG: keyless, fallbackOnly=true, maximum 50 results, 10-second timeout, 180000-ms TTL. Its catalog URL, http://localhost:8888/search, is treated as unconfigured and skipped. Alpha response_length maps short/medium/long to 3/5/10 results PER QUERY, default medium; these are result-count ceilings, not token budgets.",
+      "controls": "/v1/search accepts provider=\"searxng-search\" or alias \"searxng\" and provider_options.baseUrl. Stored credentials.providerSpecificData.baseUrl takes precedence over the request override. SearXNG explicitly permits caller overrides; the resolver allows loopback while rejecting metadata destinations. Explicit provider requests do not construct the automatic alternate-provider chain. Alpha has NO implemented provider/header/combo/settings switch: it selects one cheapest web catalog entry, attempts that provider's credentials, then uses duckduckgo-free. It does not iterate all configured providers or call the search credential-fallback helper. At this pin the first cheapest eligible entry is ollama-search. Alpha accepts model, settings and max_output_tokens but does not use them for provider selection or output sizing.",
+      "current_live_value": "Observed in the supplied 2026-09-27 GET snapshot: /api/search/providers reports 26 missing catalog rows—20 search and 6 fetch, representing 22 distinct IDs. This is a credential-status report, not 26 failed provider health checks; its implementation also labels keyless providers missing. Retained live probe evidence confirms alpha used duckduckgo-free and returned zero results for both a GitHub releases site: query and its plain-query variant; the worker subsequently fetched the release page through context-mode. No new gateway search was executed during this read-only audit.",
+      "applies_to": "SEARCH directly; FW lanes when their tools explicitly call /v1/search. Native CX web.run currently reaches the restricted alpha adapter. The existing SearXNG opt-in is reachable through /v1/search; native alpha requires an adapter change before it can adopt SearXNG. This resolution does not change GPT-6 model, effort, Responses passthrough, Codex account affinity, or FW inference request bodies.",
+      "quality_risk": "The retained zero-result searches establish a recall problem for this workload, not its cause or a universal DuckDuckGo failure rate. DuckDuckGo treats an empty parsed result set as successful, so empty recall does not trigger error-based failover. Its dedicated path consumes query/maxResults and ignores structured domain and recency filters. SearXNG forwards query, category, language, time_range and pagination, but its builder does not implement domainFilter; strict_filters is accepted by the route without enforcement in this path. Use explicit site: queries and verify returned hosts during evaluation. SearXNG itself documents engine-dependent query syntax and time filtering; its documented time_range values are day/month/year, whereas OmniRoute also accepts hour/week. Alpha additionally rejects open/click/find/screenshot. Increasing response_length cannot repair an empty result set or missing filter semantics.",
+      "cache_effect": "The five-minute cache applies to /v1/search with DuckDuckGo and most registered providers; SearXNG uses three minutes. It is a separate, process-local, 500-entry FIFO cache with concurrent-request coalescing, not the LLM semantic cache. Alpha calls handleSearch directly and bypasses this cache entirely. The key includes normalized query, provider, result count, locale and request options, including caller baseUrl; it excludes connection identity and stored baseUrl. Successful empty results are cacheable. SEARCH_CACHE_TTL_MS supplies only the fallback TTL: the route's provider.cacheTTLMs takes precedence, so setting that environment variable to zero does not disable these providers' caches. Inference: request-scoped selection leaves the existing inference prefix untouched, but different search results change subsequent conversation content; measure downstream prompt-cache continuity independently of search-cache hits.",
+      "token_effect": "Search handlers record zero model prompt/completion tokens; returned snippets become downstream model input when the consumer includes them. Against the supplied approximately 1.2% output share and 94% input-cache-read share, prioritize recall and fewer retry/search/fetch cycles over globally shortening results. Short permits 40% fewer results than medium, but does not guarantee a 40% token saving or equivalent answer quality. Long permits twice medium's result count. Alpha also serializes both a text rendering and structured results; actual prompt inclusion depends on the client. Preserve GPT-6 max effort and compare total input, cached input, output and follow-up calls per completed task.",
+      "upstream_status": "Fresh GitHub API lookups on 2026-09-27: PR #9664, making SearXNG fallback-only, merged 2026-08-07; PR #10981, skipping the catalog-default loopback URL, merged 2026-08-21. Both behaviors are present at the pin. PR #13788 remains open, merged_at=null, targeting release/v3.8.51 and labeled deferred-v3.8.52; alpha is locally applied. Its PR description mentions credential-fallback mapping, but the inspected local resolver does not implement that mapping. The inspected search implementation files match a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 except the local alpha route.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "Proposal only; nothing applied. Prepare a SearXNG JSON endpoint reachable by OmniRoute at http://127.0.0.1:8888/search, with SearXNG search.formats=[\"html\",\"json\"] and evaluated engines excluding Tavily. The existing candidate switch is the /v1/search request body {\"query\":\"<q>\",\"provider\":\"searxng-search\",\"search_type\":\"web\",\"max_results\":5,\"provider_options\":{\"baseUrl\":\"http://127.0.0.1:8888/search\"}}. The matched control is {\"query\":\"<q>\",\"provider\":\"duckduckgo-free\",\"search_type\":\"web\",\"max_results\":5}. Use 3/5/10 only as separately evaluated result budgets. Keep the selection and baseUrl on opted-in requests; retain fallbackOnly=true and existing TTLs. Avoid registering a shared SearXNG connection for this experiment: the automatic fallback scan can then select it for unqualified requests, changing the default path. The explicit 127.0.0.1 URL avoids the exact localhost catalog sentinel. No broad private-URL flag change is required by this search resolver. Native alpha has no configuration-only SearXNG switch at this pin: a future lane-specific adapter or header-gated branch must forward the same provider options while preserving the current unmarked path. Until that implementation and its A/B pass, native alpha retains its current behavior.",
+      "experiment_needed": "Not run. Pre-register a paired bake-off of explicit DuckDuckGo versus loopback SearXNG, with native search and wigolo as external reference arms only where independently available; no Tavily. Use 80 queries split across known-answer site:/GitHub documentation, recent primary sources/news, technical long-tail questions and ambiguous general research; include both retained failed queries. Randomize arm order, repeat across time windows, and compare 3/5/10-result budgets. Separate cold and warm /v1/search trials using cached status and repeats after provider TTL expiry; do not treat SEARCH_CACHE_TTL_MS=0 as a bypass. Record actual provider, Recall@10, ranking, valid citations, domain/date adherence, empty/challenge/error rates, p50/p95 latency, search/fetch count and full-task token/cache usage. Run blinded downstream answer comparisons with unchanged GPT-6 max effort and prompts, separately for each adopting lane. Before any alpha adoption, verify header-absent behavior and inference request bytes remain unchanged, provider selection is observable, and unsupported filters fail or are explicitly handled.",
+      "overturn_condition": "Permit adoption only for the evaluated lane after recovering both retained failed queries, a proposed minimum 10-percentage-point Recall@10 improvement on the site/documentation slice, no critical answer regressions or domain-filter violations, and acceptable end-to-end latency/cost with preserved prompt-cache continuity. These are proposed acceptance gates, not measured outcomes. Withdraw that lane's SearXNG selection if engine outages, filter leakage, stale results or answer regressions defeat the benefit. A successful bake-off does not authorize a global default change; native alpha additionally requires the missing opt-in implementation.",
+      "citations": [
+        {
+          "ref": "[searchRegistry.ts:231–250](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L231-L250)",
+          "claim": "SearXNG's catalog URL, keyless authentication, result limits, timeout, three-minute TTL, fallbackOnly and caller-baseUrl permission."
+        },
+        {
+          "ref": "[searchRegistry.ts:253–350](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L253-L350)",
+          "claim": "Ollama precedes the other zero-cost eligible web entries; DuckDuckGo is keyless, fallback-only, capped at 25 results and configured for a five-minute TTL."
+        },
+        {
+          "ref": "[searchRegistry.ts:436–552](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/searchRegistry.ts#L436-L552)",
+          "claim": "Request aliases, exact catalog-default SearXNG sentinel and cheapest-provider selection excluding fallbackOnly entries."
+        },
+        {
+          "ref": "[search route:81–104](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L81-L104)",
+          "claim": "/v1/search explicitly resolves credential fallback IDs and permits keyless execution without a stored connection."
+        },
+        {
+          "ref": "[search route:198–329](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L198-L329)",
+          "claim": "Explicit selection has no automatic alternate chain; unqualified selection scans credentials and fallback-only providers, so adding a shared connection can change baseline routing."
+        },
+        {
+          "ref": "[baseUrl.ts:49–65](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search/baseUrl.ts#L49-L65)",
+          "claim": "Stored baseUrl precedes caller baseUrl; permitted caller overrides use the non-metadata URL validator directly."
+        },
+        {
+          "ref": "[outboundUrlGuard.ts:128–146](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/network/outboundUrlGuard.ts#L128-L146)",
+          "claim": "The search override validator permits loopback/private addresses while rejecting recognized metadata destinations; it does not require the broad private-provider flag."
+        },
+        {
+          "ref": "[search.ts:664–693](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L664-L693)",
+          "claim": "SearXNG requests JSON, maps web/news categories, forwards language/time_range/pagination and optionally bearer authentication, but omits structured domain filtering."
+        },
+        {
+          "ref": "[search.ts:1421–1583](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L1421-L1583)",
+          "claim": "The handler does not consume strictFilters, skips the effective catalog-default SearXNG URL, and attempts alternates only after eligible failures."
+        },
+        {
+          "ref": "[search.ts:1591–1655](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/search.ts#L1591-L1655)",
+          "claim": "DuckDuckGo consumes query/result count, returns empty results as success, logs under /v1/search and records zero model tokens."
+        },
+        {
+          "ref": "[freeWebSearch.ts:128–154](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/freeWebSearch.ts#L128-L154)",
+          "claim": "DuckDuckGo uses its HTML lite endpoint with only q in the request body; HTTP failures throw, while a successful HTML response is parsed into results."
+        },
+        {
+          "ref": "[search route:332–423](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L332-L423)",
+          "claim": "Result-count clamping, cache-key fields, provider TTL precedence, handler invocation on misses and zero upstream query cost on cache hits."
+        },
+        {
+          "ref": "[searchCache.ts:11–138](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/searchCache.ts#L11-L138)",
+          "claim": "Separate 500-entry in-memory cache, normalized hashed keys, FIFO eviction, request coalescing, success-result storage and fallback environment TTL."
+        },
+        {
+          "ref": "[Local alpha route:30](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:30)",
+          "claim": "Local-only implementation: 3/5/10 result tiers, accepted envelope fields, coarse recency mapping, single-candidate resolver and DuckDuckGo fallback at lines 30–114."
+        },
+        {
+          "ref": "[Local alpha route:154](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:154)",
+          "claim": "Local-only implementation: unsupported-operation rejection, direct sequential handleSearch calls without searchCache or providerOptions, and text plus structured output at lines 154–238."
+        },
+        {
+          "ref": "[Search catalog status:87–129](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/search/providers/route.ts#L87-L129)",
+          "claim": "Catalog status is derived from credential availability, with no keyless-provider health exemption."
+        },
+        {
+          "ref": "[Supplied live GET snapshot:368]($SCRATCH/omniroute-phase0/gateway-snapshot.json:368)",
+          "claim": "Observed catalog contains 26 missing rows: 20 search, six fetch and 22 distinct IDs; both SearXNG and DuckDuckGo are marked missing."
+        },
+        {
+          "ref": "[Retained live search probe:12](~/code/native-agent-stack/evidence/artifacts/omniroute-gateway-20260927/probe-search-profile-only.json:12)",
+          "claim": "Both retained searches returned zero results; the artifact records a subsequent context-mode fetch and matching DuckDuckGo gateway events."
+        },
+        {
+          "ref": "[Pinned API documentation:1403–1460](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/openapi.yaml#L1403-L1460)",
+          "claim": "Documented provider, max_results=5, search_type=web, filters, time_range, provider_options and strict_filters request controls; implementation determines actual provider support."
+        },
+        {
+          "ref": "[Pinned provider reference:400](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/PROVIDER_REFERENCE.md#L400)",
+          "claim": "Upstream checkout documentation requires a SearXNG base URL and describes optional bearer authentication."
+        },
+        {
+          "ref": "[PR #9664](https://github.com/diegosouzapw/OmniRoute/pull/9664)",
+          "claim": "GitHub API verification: SearXNG fallback-only fix merged 2026-08-07."
+        },
+        {
+          "ref": "[PR #10981](https://github.com/diegosouzapw/OmniRoute/pull/10981)",
+          "claim": "GitHub API verification: catalog-default SearXNG skip fix merged 2026-08-21."
+        },
+        {
+          "ref": "[PR #13788](https://github.com/diegosouzapw/OmniRoute/pull/13788)",
+          "claim": "GitHub API verification: alpha-search PR remains open and unmerged, targets release/v3.8.51 and carries deferred-v3.8.52; its description claims credential fallback support."
+        },
+        {
+          "ref": "[SearXNG Search API](https://docs.searxng.org/dev/search_api.html)",
+          "claim": "JSON must be enabled in search.formats or requests return 403; query operators and time filtering depend on engines; documented time_range values are day/month/year."
+        }
+      ],
+      "unverified": [
+        "No SearXNG listener, deployment version, JSON-format configuration, engine availability or real query result was verified. The proposed loopback address is a deployment target, not an observed service.",
+        "The cause of DuckDuckGo's empty results is unknown; insufficient coverage, response markup and anti-bot behavior were not distinguished.",
+        "No per-lane bake-off, token saving, answer-quality improvement, search-cache hit rate or prompt-cache effect has been measured. The supplied zero-entry LLM semantic-cache observation does not establish search-cache occupancy.",
+        "Native alpha cannot select SearXNG through existing configuration. The required lane-specific adapter/header implementation is proposed, not present, tested or applied.",
+        "Native-search and wigolo reference-arm availability and integration are unverified; neither is asserted to be a selectable OmniRoute provider here.",
+        "Verification was limited to source, documentation, retained observations, fresh upstream GET lookups and static consistency checks; no gateway POST, configuration write, restart or executable route test was performed."
+      ]
+    }
+  ],
+  "tools_used": [
+    "functions.exec",
+    "exec_command",
+    "mcp__codebase_memory__search_graph",
+    "mcp__codebase_memory__get_code_snippet",
+    "mcp__codebase_memory__trace_path",
+    "mcp__context_mode__ctx_execute",
+    "mcp__context_mode__ctx_fetch_and_index",
+    "mcp__context_mode__ctx_search"
+  ]
+}

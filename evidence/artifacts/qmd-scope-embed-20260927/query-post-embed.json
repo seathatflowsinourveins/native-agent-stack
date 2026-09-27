@@ -1,0 +1,42 @@
+[
+  {
+    "docid": "#effe53",
+    "score": 0.75,
+    "file": "qmd://us-equities-catalog/foundation-memory.md?index=native-agent-stack-catalog",
+    "line": 344,
+    "title": "Token, memory and retrieval foundations",
+    "snippet": "@@ -343,4 @@ (342 before, 376 after)\n\nEvidence: [README.md](https://github.com/EverMind-AI/EverOS/blob/5076683ab88d714390573d8f88ff3c470e51129a/README.md), [v1.3.1](https://github.com/EverMind-AI/EverOS/releases/tag/v1.3.1).\n\n## claude-mem"
+  },
+  {
+    "docid": "#a765c3",
+    "score": 0.38,
+    "file": "qmd://us-equities-catalog/agents-operations.md?index=native-agent-stack-catalog",
+    "line": 3,
+    "title": "Agents and operations for the US-equities research stack",
+    "snippet": "@@ -2,4 @@ (1 before, 144 after)\n\nChecked **2026-09-19**. This is a curated architecture decision record covering **42 upstream repositories**, not a claim that installing them creates an automated trading system. The [machine-readable catalog](agents-operations.json) contains release dates, license scope, requirements, primary ..."
+  },
+  {
+    "docid": "#c4e39f",
+    "score": 0.25,
+    "file": "qmd://us-equities-catalog/source-followup.md?index=native-agent-stack-catalog",
+    "line": 24,
+    "title": "Bounded source follow-up",
+    "snippet": "@@ -23,4 @@ (22 before, 10 after)\nvaluation need and content policy justify it. |\n| [abtop](https://github.com/graykode/abtop/releases/tag/v0.5.5) | v0.5.5, 2026-09-14; MIT | Existing targeted star disposition | Optional operator view. Its JSON mode avoids summary inference, but snapshots contain private transcript-derived contex..."
+  },
+  {
+    "docid": "#983da1",
+    "score": 0.15,
+    "file": "qmd://us-equities-foundation/sim-capacity/README.md?index=native-agent-stack-catalog",
+    "line": 318,
+    "title": "sim-capacity: simulation-lane throughput/capacity infrastructure test",
+    "snippet": "@@ -317,4 @@ (316 before, 171 after)\n\n## Results (2026-09-25 rerun, real Alpaca SIP data cache, exact-release default)\n\nRe-run 2026-09-25 from the same retained, cached Alpaca SIP pages (`--replay`,"
+  },
+  {
+    "docid": "#9948f2",
+    "score": 0.12,
+    "file": "qmd://us-equities-catalog/data-research.md?index=native-agent-stack-catalog",
+    "line": 5,
+    "title": "US-equities data and research catalog",
+    "snippet": "@@ -4,4 @@ (3 before, 152 after)\n\nThe machine-readable [catalog](data-research.json) records each repository's reviewed release and full source commit, software license, adoption decision, US-equity and Alpaca fit, prerequisites, limitations, primary sources and native command examples. `default` means recommended for the initia..."
+  }
+]

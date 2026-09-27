@@ -1,0 +1,429 @@
+{
+  "group": "D04-D06,D10-D12 — read-only routing resolution at dd6e9607e; proposals only, no configuration changes applied",
+  "items": [
+    {
+      "id": "D04",
+      "feature": "Combos and auto-combo",
+      "what_it_does": "Combos can provide explicit lane selectors with a fixed model and effort. Auto-combos instead select among available models and accounts; having only Codex accounts connected does not restrict them to Codex because the factory also admits keyless providers. The base auto inspector currently lists Codex and OpenCode candidates. LKGP prefers the last successful provider, not a guaranteed model/effort tier. Its fallback uses scoring; mode packs express preferences, not quality guarantees.",
+      "defaults": "Virtual auto-combos use strategy=auto and routerStrategy=lkgp. The scorer has 16 factors and six mode packs; default cacheAffinity and reliability weights are zero, although separate cache-affinity ordering still operates. Persisted combos default to priority, maxRetries=1, maxSetRetries=0, reasoningTokenBufferEnabled=true and a 120000 ms target timeout. Universal handoff defaults on.",
+      "controls": "Explicit combo model name; top-level strategy, models, allowedProviders and context_cache_protection; config retry, timeout, compression and speculation settings. Auto routing additionally accepts modePack and X-OmniRoute-Mode. Prompt-cache affinity is controlled by settings.promptCacheAffinityEnabled, not an effective per-combo config field. Disable universal handoff through D05's global feature flag: the runtime reads top-level universal_handoff/universalHandoff, but the public combo schema does not expose those fields.",
+      "current_live_value": "Fresh GETs on 2026-09-27: /api/combos contains zero persisted routing combos; /api/combos/auto advertises 47 built-ins. /v1/auto-combo/auto/candidates lists 194 decorated rows: 184 Codex rows representing 46 model/effort identifiers across four accounts, plus 10 keyless OpenCode rows. These are inspector entries, not 194 verified healthy routes. Snapshot and fresh GET agree: promptCacheAffinityEnabled=true, sessionAffinityTtlMs=14400000, providerStrategies.codex={fallbackStrategy:'round-robin',stickyRoundRobinLimit:1}, comboAutoPromoteEnabled=false, hideAutoCombos=false; combo defaults show priority/maxRetries=1 and providerOverrides={}. The snapshot's /api/context/combos entry describes a compression pipeline, not a persisted model-routing combo.",
+      "applies_to": "CX and FW when they explicitly select a combo. SEARCH has no consumer of these inference selectors. Keep the existing direct CX model selections unchanged.",
+      "quality_risk": "Unrestricted auto routing can select older models, lower effort variants or keyless OpenCode models. Neither 'quality-first' nor LKGP enforces Astra/max. The recorded Sol/medium result qualifies one mechanical 8-K extraction task only; it does not qualify S3 memory extraction, graph construction, reranking, tool use, research or judgment. Singleton priority combos avoid intentional cross-model substitution.",
+      "cache_effect": "Preserve four-hour account affinity, global prompt-cache affinity and per-combo session/model pinning. Priority confines cache-affinity reordering to the same model step. Auto/LKGP permit cross-model promotion and therefore cannot guarantee existing cache continuity. A new selector may initially choose a different account or cache identity; upstream byte equivalence and subsequent reuse require measurement.",
+      "token_effect": "Routing itself needs no summarization call when D05 is disabled. Automatic cost ranking is not calibrated to the supplied workload: runtime cost blending assumes 60% input/40% output, versus approximately 98.8% input/1.2% output here, and does not incorporate the observed 94% input cache-read share into that blend. Extra retries, model changes and lost cache reads can outweigh output savings. The recorded Sol/medium 12.5% billed-token reduction is task-specific, not a gateway-wide estimate.",
+      "upstream_status": "GitHub API checked 2026-09-27: issue #14889 remains open; PR #14925 remains open/unmerged and addresses repeated candidate-pool preparation in GET /api/combos/auto. Pinned docs describe the scorer and packs, but their early description of one model per connection and fail-open category filtering is stale: the implementation enumerates visible provider models and returns an empty filtered pool by default unless the category/tier legacy fallback environment option is enabled.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "Proposal only. Create two separate /api/combos entries: {\"name\":\"lane-judgment-astra-max\",\"strategy\":\"priority\",\"models\":[\"cx/gpt-6-astra-max\"],\"allowedProviders\":[\"codex\"],\"context_cache_protection\":true,\"config\":COMMON} and {\"name\":\"lane-mechanical-sol-medium\",\"strategy\":\"priority\",\"models\":[\"cx/gpt-6-sol-medium\"],\"allowedProviders\":[\"codex\"],\"context_cache_protection\":true,\"config\":COMMON}. COMMON={\"maxRetries\":0,\"maxSetRetries\":0,\"maxGlobalAttempts\":4,\"disableSessionStickiness\":false,\"connectionAwareExpansion\":false,\"targetTimeoutMs\":600000,\"reasoningTokenBufferEnabled\":false,\"compressionMode\":\"off\",\"zeroLatencyOptimizationsEnabled\":false,\"hedging\":false,\"fallbackCompressionMode\":\"off\",\"predictiveTtftMs\":0,\"handoffProviders\":[],\"shadowRouting\":{\"enabled\":false},\"evalRouting\":{\"enabled\":false}}. The target timeout is clamped to the upstream ceiling; maxGlobalAttempts bounds combo attempts, not every lower-level account retry. Retain existing promptCacheAffinityEnabled=true, sessionAffinityTtlMs=14400000 and providerStrategies.codex values. Require D05/D10/D11 disabled and D12's absent global fallback. Effort suffixes resolve to the base model plus max/medium; a server force rule is stronger, so verify the wire effort. No default client selects either new name before its lane A/B.",
+      "experiment_needed": "For each adopting lane, compare its current direct route with its singleton combo using matched requests and stable session/cache keys. Verify resolved base model and effort, upstream instructions/input/messages/tools/schema preservation, account continuity, cached-input share, billed tokens, total attempts and latency. Include native Responses tool continuations for CX and json_object, strict json_schema and tool-call cases for FW. Keep Astra/max as the judgment control; independently qualify every new Sol/medium task.",
+      "overturn_condition": "Broaden an opt-in combo only after that lane demonstrates noninferior quality and protocol correctness, preserved cache behavior and useful measured total-cost or reliability improvement. Any Astra-to-Sol downgrade, effort reduction, prompt mutation or unexplained cache regression rejects adoption. Mode-pack labels and provider availability alone cannot overturn this decision.",
+      "citations": [
+        {
+          "ref": "http://127.0.0.1:20128/v1/auto-combo/auto/candidates",
+          "claim": "Fresh read-only observation: 194 decorated candidate rows, comprising 184 Codex and 10 OpenCode rows; /api/combos returned zero and /api/combos/auto returned 47 built-ins."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/autoCombo/virtualFactory.ts#L348-L407",
+          "claim": "Regular auto pools admit allowlisted keyless OpenCode; family selectors can bypass that reliability allowlist."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/autoCombo/virtualFactory.ts#L613-L737",
+          "claim": "The factory enumerates provider models with account allowlists and adds eligible no-auth candidates."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/autoCombo/virtualFactory.ts#L1005-L1123",
+          "claim": "Empty category/family filtering behavior, LKGP default and variant-to-mode-pack selection."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/autoCombo/routerStrategy.ts#L338-L366",
+          "claim": "LKGP chooses a candidate from the last successful provider, then falls back to rules."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/routing/AUTO-COMBO.md#L185-L238",
+          "claim": "Pinned documentation describes the 16 scoring factors and six mode packs."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo.ts#L370-L380",
+          "claim": "Runtime candidate cost blends input and output prices; OUTPUT_TOKEN_RATIO is 0.4 at line 212."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/schemas/combo.ts#L170-L299",
+          "claim": "Public runtime config exposes the proposed retry, timeout, stickiness, compression, handoff-provider and speculation controls."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/schemas/combo.ts#L362-L389",
+          "claim": "Public creation schema accepts named singleton combos, provider restrictions and context-cache protection; it does not expose universal_handoff."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/comboSetup.ts#L53-L118",
+          "claim": "Session/model pinning is independent of universal handoff; handoff config is read from the combo's top level."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/targetResolution.ts#L641-L736",
+          "claim": "Global prompt-cache affinity control and priority's model-preserving affinity scope."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1424-L1464",
+          "claim": "Codex effort suffixes override client effort defaults, below a server force rule."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/comboConfig.ts#L247-L270",
+          "claim": "An explicit target timeout is bounded by the upstream timeout ceiling."
+        },
+        {
+          "ref": "~/code/native-agent-stack/evidence/artifacts/gpt6-family-tiering-20260927/README.md:18",
+          "claim": "Sol/medium won the frozen mechanical extraction comparison; lines 29-40 limit that result and retain Astra/max for judgment."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/14925",
+          "claim": "Observed open/unmerged candidate-pool preparation optimization linked to open issue #14889."
+        }
+      ],
+      "unverified": [
+        "No proposed combo was created or invoked; static schema inspection is not runtime acceptance.",
+        "Candidate inspector rows do not establish provider reachability, successful model execution or final routing eligibility.",
+        "No lane-specific wire-equivalence, cache-continuity or quality A/B was performed.",
+        "The running process's upstream timeout environment was not inspected; the proposed 600000 ms timeout must be checked against the lane's accepted latency budget."
+      ]
+    },
+    {
+      "id": "D05",
+      "feature": "Universal handoff and context relay",
+      "what_it_does": "Universal handoff modifies a combo request when its first attempted target differs from the session's previous model: it prepends an existing LLM-generated summary, or a no-summary handoff note, to Responses instructions or Chat Completions system messages. After a successful first-target model switch it may asynchronously generate a summary for later use. Same-request fallback targets at index greater than zero are explicitly excluded at this pin. The separate context-relay strategy generates quota-triggered Codex summaries and injects them after an actual account switch.",
+      "defaults": "Universal config: enabled=true, trigger='on-switch', providerAllowlist=[], maxMessagesForSummary=30, handoffModel='', ttlMinutes=300, preserveSystemPrompt=true. Empty handoffModel selects the current target model. Summary generation requests max_tokens=800 and targets an approximately 8000-token history budget; that budget is not a hard truncation cap. Context relay defaults to Codex providers, warning threshold 0.85 and no new generation at or above 0.95 quota consumption.",
+      "controls": "UNIVERSAL_CONTEXT_HANDOFF_ENABLED is the runtime global kill switch for universal generation and injection across existing and future combos. Its effective resolution is DB override > environment > default. The quota-based context-relay path is separate: avoid strategy='context-relay' and use config.handoffProviders=[] for the proposed combos. Setting a nested config.universalHandoff object does not control the inspected runtime.",
+      "current_live_value": "Snapshot and fresh GET /api/settings/feature-flags on 2026-09-27 agree: UNIVERSAL_CONTEXT_HANDOFF_ENABLED='true', source='default', requiresRestart=false. There are zero persisted routing combos. The default switch is enabled, but the supplied evidence does not show that current direct CX traffic has generated handoffs.",
+      "applies_to": "Selected CX/FW combos with a session and model switch; context-relay additionally responds to Codex quota/account transitions. Direct provider routes and SEARCH do not consume universal combo handoff.",
+      "quality_risk": "The summary is lossy and can be stale; the no-summary note also changes instructions even though original client history is already present. Preserving the original system text does not make prepending new system text lossless. The pin suppresses handoff on same-request fallback, addressing one failure mode, but cross-turn injection still violates the required unmodified prompt contract.",
+      "cache_effect": "For CX/FW the handoff is prepended before existing instructions/messages, changing the prompt prefix. Inference: this can invalidate substantial downstream cache reuse. The observed approximately 94% input cache-read share makes this especially unfavorable. The feature does not replace the original history with a shorter equivalent request.",
+      "token_effect": "Adds a separate history-bearing LLM request plus up to the requested 800 response tokens, then adds handoff text to subsequent inference. It provides no demonstrated token reduction here. Failed or unparseable summaries can consume quota without usable output; the pin adds regeneration backoff, not zero cost.",
+      "upstream_status": "GitHub API checked 2026-09-27: PR #12167 merged on 2026-09-02 and introduced the global runtime switch; issue #11552 is closed/completed after reporting discarded extra calls; issue #12305 remains open concerning same-request fallback handoffs. The inspected pin already contains first-target-only injection/generation guards, so the open discussion must not be mistaken for missing guards.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Proposal only: /api/settings/feature-flags override {\"key\":\"UNIVERSAL_CONTEXT_HANDOFF_ENABLED\",\"value\":\"false\"}. Equivalent environment baseline: UNIVERSAL_CONTEXT_HANDOFF_ENABLED=false, provided no DB=true override supersedes it. Use D04's priority combos with config.handoffProviders=[] and never select context-relay for these lanes. The universal flag alone does not disable the independent quota-relay branch. No unsupported per-combo universal_handoff setter is proposed.",
+      "experiment_needed": "No quality experiment is needed to justify disabling an unrequested prompt transformation. Before any future exception, use an isolated opt-in lane to measure summary fidelity, schema/tool correctness, complete summary-call usage and cache-read loss. An implementation check should confirm that disabling the flag prevents both universal injection and background summary calls; do not induce these requests on the live gateway during this read-only review.",
+      "overturn_condition": "Only a demonstrated cross-provider continuation requirement, explicitly accepted by that lane, with noninferior task quality and a measured net benefit after summary cost and cache loss could justify an opt-in exception. Existing full-history CX/FW requests do not establish that need.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextHandoff.ts#L12-L81",
+          "claim": "Summary limits, prompt and default universal handoff configuration."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextHandoff.ts#L138-L163",
+          "claim": "The global feature flag gates resolved universal handoff enablement."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/executeTargetAttempt.ts#L294-L319",
+          "claim": "Injection requires first target, enabled handoff, session and changed model; same-request fallback targets are excluded."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/executeTargetAttempt.ts#L570-L655",
+          "claim": "Post-success universal generation and the distinct Codex quota-relay branch."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextHandoff.ts#L772-L910",
+          "claim": "Summary model selection, extra inference request, persistence and asynchronous regeneration/backoff."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextHandoff.ts#L913-L964",
+          "claim": "Responses and Chat Completions handoff injection prepends text while retaining original content."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L1915-L1935",
+          "claim": "Quota-relay injection has its own strategy/account-switch guard, independent of the universal feature flag."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/architecture/ARCHITECTURE.md#L1153-L1153",
+          "claim": "Pinned documentation describes generation and post-account-resolution injection as separate responsibilities."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/feature-flags/route.ts#L101-L163",
+          "claim": "Exact runtime override payload uses key and string value."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/12167",
+          "claim": "Merged runtime kill-switch implementation; live API state verified."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/11552",
+          "claim": "Closed upstream report of discarded extra combo requests; this report is not a measurement of this gateway."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/12305",
+          "claim": "Open upstream handoff/fallback discussion as of the lookup."
+        }
+      ],
+      "unverified": [
+        "Actual handoff counts, summary usage and cache losses on this gateway were not measured.",
+        "No live switch, account-quota transition or disablement test was performed.",
+        "The exposed trigger and preserveSystemPrompt fields are not enforcement mechanisms in the inspected switch/injection path; no alternate behavior is claimed for them."
+      ]
+    },
+    {
+      "id": "D06",
+      "feature": "Model aliases, seeded aliases and wildcard routing",
+      "what_it_does": "Resolves an explicitly requested alias to a provider/model string. The five DB aliases exactly match upstream seed data, so they are not evidence of user customization. Startup preserves existing alias keys and recreates missing seed keys. A separate 31-entry built-in deprecation map handles legacy model names. Exact aliases precede wildcard matching; explicit provider/model requests bypass the DB/settings alias lookup.",
+      "defaults": "Five startup seeds target agy/Gemini models. The separate deprecation layer supplies 31 built-ins at this pin. Wildcards support '*' and '?' and deliberately remap matching model identities; they are not quality-preserving equivalence declarations.",
+      "controls": "/api/models/alias manages DB aliases with {alias,model}; /api/settings/model-aliases manages a separate custom/deprecation-alias layer; settings.wildcardAliases contains pattern/target rules. Aliases carry only the target string, not retry, affinity, handoff or combo policy.",
+      "current_live_value": "Snapshot and fresh GETs on 2026-09-27 agree: five DB aliases—claude-opus-4-6-thinking→agy/claude-opus-4-6-thinking; claude-sonnet-4-6→agy/claude-sonnet-4-6; gemini-3.1-flash-lite-preview→gemini/gemini-3.1-flash-lite; gemini-3.1-pro→agy/gemini-pro-agent; gemini-3.6-flash-low→agy/gemini-3.6-flash-low. /api/settings/model-aliases reports builtIn=31, custom=0, all=31. No wildcardAliases field appears in the supplied settings snapshot.",
+      "applies_to": "CX/FW clients explicitly selecting a bare alias. Existing cx/gpt-6-astra and cx/gpt-6-sol routes need no alias. SEARCH is unaffected.",
+      "quality_risk": "Keep the unused seeds: deletion is temporary because startup reseeds them. Do not introduce gpt-* remapping, Astra→Sol aliases or a misleading 'best' alias. Exact model-plus-effort aliases are useful for clients whose model selector is easier to control than reasoning fields, but D04 combos remain the selector for additional routing policy.",
+      "cache_effect": "Alias resolution itself changes no prompt content. A fixed alias resolving to the same base model and effort can be prefix-neutral; account/cache-key equivalence still requires a lane A/B. Retargeting an alias mid-session can break model identity and cache continuity.",
+      "token_effect": "No LLM call or meaningful prompt-token saving comes from shortening the model selector. Given 94% cached input, stable resolution matters more than name convenience. Sol's task-specific savings must not be generalized through an alias.",
+      "upstream_status": "GitHub API checked 2026-09-27: wildcard issue #7693 is closed and PR #7748 merged on 2026-07-19; the pinned runtime contains the settings-wildcard merge. Catalog/deprecation cleanup issue #11503 is closed. These fixes establish functioning remapping, not equivalent quality between arbitrary targets.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "Proposal only. Keep all five seed entries and the current built-ins; leave wildcardAliases absent/empty and custom deprecation aliases empty. Add two exact DB aliases through /api/models/alias: {\"alias\":\"alias-judgment-astra-max\",\"model\":\"cx/gpt-6-astra-max\"} and {\"alias\":\"alias-mechanical-sol-medium\",\"model\":\"cx/gpt-6-sol-medium\"}. These names are distinct from D04 combo names. A lane selects one only after its own A/B; otherwise retain its current explicit model/effort settings. Apply D05/D10/D11 negative controls to direct alias routes as well.",
+      "experiment_needed": "Compare each alias against its equivalent explicit provider/base-model/effort request. Check resolved upstream model and effort, instructions, tools/schema, session/account continuity and cache reads. The extraction alias needs a task-specific qualification beyond the recorded 8-K result.",
+      "overturn_condition": "Remove or revise a proposed alias if it collides with a combo/model name, changes effective effort unexpectedly, or adds no operational value. Delete shipped seeds only with a supported persistent opt-out or an observed routing collision; merely lacking their providers is insufficient.",
+      "citations": [
+        {
+          "ref": "http://127.0.0.1:20128/api/models/alias",
+          "claim": "Fresh GET matched all five supplied snapshot entries; the separate settings endpoint returned 31 built-ins and zero custom entries."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/modelAliasSeed.ts#L3-L19",
+          "claim": "The five observed aliases are exactly the shipped default seed map."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/modelAliasSeed.ts#L92-L108",
+          "claim": "Existing keys are preserved and missing seed aliases are recreated."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/instrumentation-node.ts#L519-L522",
+          "claim": "Startup invokes alias seeding."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/model.ts#L814-L889",
+          "claim": "Explicit provider/model bypass, exact-alias precedence and wildcard resolution."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/modelDeprecation.ts#L15-L76",
+          "claim": "Separate built-in deprecation mappings contain no GPT-6 substitutions."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/models/alias/route.ts#L96-L138",
+          "claim": "The supported alias mutation payload contains alias and model."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/reasoningSuffix.ts#L11-L57",
+          "claim": "GPT-6 max and medium suffix targets resolve to supported base-model/effort pairs."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/USER_GUIDE.md#L851-L860",
+          "claim": "Pinned documentation explicitly describes wildcard model remapping."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/7748",
+          "claim": "Verified merged fix connecting settings wildcard aliases to routing."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/11503",
+          "claim": "Verified closed catalog/deprecation-alias cleanup issue."
+        }
+      ],
+      "unverified": [
+        "The history of each stored row was not inspected; matching seed values establishes shipped provenance, not who originally wrote an individual row.",
+        "The proposed aliases were not created or exercised.",
+        "No wire/cache equivalence or quality generalization has been measured."
+      ]
+    },
+    {
+      "id": "D10",
+      "feature": "Emergency budget fallback",
+      "what_it_does": "After a qualifying direct-request error, recursively tries nvidia/openai/gpt-oss-120b with a copied body and capped output. A successful fallback response is returned without requiring client opt-in. Without usable Nvidia credentials, the internal attempt fails and processing resumes original-provider account fallback; therefore it is not entirely inert, but it cannot currently provide the advertised replacement model.",
+      "defaults": "Enabled; triggers on HTTP 402 or case-insensitive budget/billing/quota substrings independently of status; skipForToolRequests=true; maxOutputTokens=4096. The recursion guard prevents an emergency child from recursively emergency-falling back again.",
+      "controls": "OMNIROUTE_EMERGENCY_FALLBACK feature flag and same-named environment variable. DB override takes precedence over environment; false/0 disables the environment path. The runtime flag has a short cache and requires no service restart. Destination and trigger details are source configuration, not a verified per-lane public setting.",
+      "current_live_value": "Snapshot and fresh GET /api/settings/feature-flags on 2026-09-27: effectiveValue='true', source='default', requiresRestart=false. A sanitized provider-count GET found four Codex connections and no Nvidia connection. Source predicts a failed internal Nvidia credential lookup, not successful free inference.",
+      "applies_to": "Direct CX/FW inference requests without a nonempty body.tools array. Combo targets are excluded by !comboName. json_object or strict json_schema alone does not exempt a FW request. SEARCH is unaffected.",
+      "quality_risk": "Can silently replace Astra/max or Sol/medium with a different model and impose a 4096-token output cap. The tool-array exclusion does not protect tool-free structured extraction. A future Nvidia connection would activate successful substitution without changing the original lane's request.",
+      "cache_effect": "Inference: a successful Nvidia substitution cannot preserve the Codex provider/model cache partition and adds another inference attempt. Disabling the feature adds no prompt bytes and preserves the requested model contract.",
+      "token_effect": "With approximately 1.2% output and 94% input cache reads, an output cap or 'free' catalog label is not evidence of lower total cost. Today the missing credential path adds routing/error work rather than useful inference. No Nvidia price or availability claim was independently verified.",
+      "upstream_status": "GitHub API checked 2026-09-27: PR #3741 merged 2026-06-12 and PR #3752 merged 2026-06-13, supplying environment disablement and feature-flag exposure. Issue #1731 is closed; the pin explicitly skips emergency hops within combos.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Proposal only: /api/settings/feature-flags override {\"key\":\"OMNIROUTE_EMERGENCY_FALLBACK\",\"value\":\"false\"}. Also specify OMNIROUTE_EMERGENCY_FALLBACK=false in a future managed environment baseline so the raw-environment error fallback is disabled. The runtime override is the immediate supported control; an environment value alone cannot defeat DB=true. Do not connect Nvidia merely to make this fallback operational.",
+      "experiment_needed": "No model-quality trial is needed to reject unauthorized substitution. A future isolated fault-injection test should cover 402, billing/quota text, tools, schema-only requests, combo exclusion and missing credentials, asserting that disabled fallback preserves the original model and exposes the original recovery/failure outcome. No failing inference requests were submitted here.",
+      "overturn_condition": "Only an explicitly named opt-in lane with its own approved fallback model, preserved tool/schema contract and measured quality could justify such behavior. That does not justify re-enabling this global automatic downgrade for Astra/max.",
+      "citations": [
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/emergencyFallback.ts#L37-L62",
+          "claim": "Destination, trigger keywords, tool exclusion and output-cap defaults."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/emergencyFallback.ts#L79-L157",
+          "claim": "Feature-flag/environment resolution, short runtime cache and trigger decisions."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L2327-L2392",
+          "claim": "Combo exclusion, nonempty-tools detection, model substitution, capped output, direct success return and original-account recovery after failure."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/providers/registry/nvidia/index.ts#L3-L10",
+          "claim": "Nvidia uses API-key bearer authentication."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatHelpers.ts#L884-L902",
+          "claim": "A known direct provider without usable credentials produces an internal 401."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/featureFlags.ts#L7-L28",
+          "claim": "DB override takes precedence over environment and default."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/FEATURE_FLAGS.md#L268-L277",
+          "claim": "Pinned documentation describes emergency fallback disablement and its dashboard/environment controls."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/3741",
+          "claim": "Verified merged environment-switch change."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/3752",
+          "claim": "Verified merged feature-flag exposure."
+        }
+      ],
+      "unverified": [
+        "Missing-Nvidia failure behavior and successful silent substitution are source-derived; neither was induced live.",
+        "No current Nvidia pricing or capability acceptance was performed.",
+        "The child recursion guard does not establish a strict once-per-original-request bound across multiple original-account failures."
+      ]
+    },
+    {
+      "id": "D11",
+      "feature": "Task-aware router",
+      "what_it_does": "Uses local request-pattern/image detection to choose taskModelMap[taskType], then rewrites both the resolved model and body.model before combo/provider resolution. It does not invoke an LLM classifier. The apparent guard promising to respect an explicitly selected better model is an empty if block; enabled routing can replace an explicit cx/gpt-6-astra selection.",
+      "defaults": "enabled=false; detectionEnabled=true. Default destinations: coding→auto/coding, analysis→auto/reasoning, vision→auto/vision, summarization→auto/chat:fast, background→auto/chat:cheap; creative/chat have empty destinations.",
+      "controls": "/api/settings/task-routing exposes enabled, detectionEnabled, taskModelMap and patternOverrides. The route updates runtime state and persists settings.taskRouting for startup hydration. No per-request lane opt-out was found in the inspected integration. A separate combo-only task-aware strategy is a different mechanism.",
+      "current_live_value": "Snapshot and fresh GET /api/settings/task-routing on 2026-09-27 agree: enabled=false, detectionEnabled=true, detected=0, routed=0, with the default map above.",
+      "applies_to": "CX/FW requests reaching the shared chat routing handler when globally enabled. It runs before combo selection, so naming a quality-preserving combo alone is insufficient protection. SEARCH is unaffected.",
+      "quality_risk": "Keyword matching can silently replace explicit lane identity with an auto intent, including cheap/fast routes. The empty explicit-model guard supplies no protection for Astra/max. Auto intent routing can then choose among the broader D04 candidate pool. No demonstrated semantic-quality bound exists.",
+      "cache_effect": "The classifier itself leaves message text unchanged, but model/provider substitution can change cache identity and continuity. Keeping it disabled preserves the chosen route and introduces no prompt prefix.",
+      "token_effect": "No classifier tokens are spent, but cheap/fast model substitution has no demonstrated total-token advantage for this cache-heavy workload. The 1.2% output share does not justify weakening judgment or discarding established cached-input reuse.",
+      "upstream_status": "GitHub API checked 2026-09-27: issue #8602 is closed and PR #8605 merged 2026-07-27, replacing stale concrete defaults with auto intents; it does not protect explicit model choices. Issue #8601 is closed, but its auto-linked PR #8642 concerns unrelated reasoning deltas, so closure is not hydration evidence. Startup hydration is directly verified in the pin.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "Proposal only: /api/settings/task-routing body {\"enabled\":false,\"detectionEnabled\":false}. The existing taskModelMap may remain stored because both gates prevent classification/rerouting. Keep D04 lane combos on priority and do not select the separate smart/task-aware combo strategy.",
+      "experiment_needed": "No enabled-router A/B is necessary for this resolution. Any future implementation must first honor explicit model/effort choices and provide a lane-scoped opt-in. Then test misleading keywords, title/summary requests, long conversations, tool continuations and strict schemas against the lane's fixed-model control.",
+      "overturn_condition": "Only an explicit opt-in routing contract with protected model/effort floors, observable decisions and noninferior lane-specific quality/cache measurements can justify enabling task-based substitution. Merely fixing stale destinations or startup hydration cannot.",
+      "citations": [
+        {
+          "ref": "http://127.0.0.1:20128/api/settings/task-routing",
+          "claim": "Fresh GET confirmed disabled routing, enabled detection configuration, zero counters and the snapshot's default map."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/taskAwareRouter.ts#L185-L211",
+          "claim": "Default enabled/detection state and task destinations."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/taskAwareRouter.ts#L331-L425",
+          "claim": "Local detection and model replacement, including the empty explicit-model protection block."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L927-L946",
+          "claim": "The handler rewrites the model before subsequent routing without a lane-specific guard."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/task-routing/route.ts#L33-L71",
+          "claim": "Supported settings payload, immediate runtime update and persisted configuration."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/instrumentation-node.ts#L508-L516",
+          "claim": "Pinned startup implementation hydrates task-routing settings."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/architecture/ARCHITECTURE.md#L465-L478",
+          "claim": "Pinned architecture documentation places task-aware routing above combo selection."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/8605",
+          "claim": "Verified merged intent-default correction linked to closed issue #8602."
+        }
+      ],
+      "unverified": [
+        "No enabled-router inference experiment was performed.",
+        "No claim is made about which exact model an auto intent would select for a particular future request.",
+        "The proposed disabled detection value was not applied."
+      ]
+    },
+    {
+      "id": "D12",
+      "feature": "Model-family fallback, provider chains and cross-provider fallback",
+      "what_it_does": "Three mechanisms must be distinguished. The execution pipeline can rewrite a failed model to a supported sibling from a hardcoded family map. /api/fallback/chains stores provider-only chains keyed by model; its entries cannot directly encode Astra→Sol. Separately, an exhausted combo returning 502/503 can dispatch settings.globalFallbackModel outside its candidate set. Source/graph searches found provider-chain and adaptive failover helpers, but no production chat consumer establishing blanket chain-based cross-provider retries.",
+      "defaults": "Initial provider execution permits internal family fallback. The pin's family map contains Gemini and Claude entries, including weaker alternatives, but no GPT family; GPT-6 family resolution therefore returns null. The separate adaptive helper declares allowCrossProviderFallback=true and maxProviderAttempts=3, which must not be confused with demonstrated live chat wiring.",
+      "controls": "/api/fallback/chains manages model-keyed provider/priority/enabled entries. Combo target lists control explicit cross-model alternatives. A nonempty settings.globalFallbackModel enables the post-combo substitution path. No supported public global family-fallback off switch was verified; allowModelFallback is an internal execution policy, not a demonstrated settings key.",
+      "current_live_value": "Snapshot and fresh GETs on 2026-09-27 agree: /api/fallback/chains={}, globalFallbackModel absent, promptCacheAffinityEnabled=true and sessionAffinityTtlMs=14400000. Four Codex accounts are connected. Source inspection at dd6e9607e confirms no GPT-6 family candidates.",
+      "applies_to": "CX/FW inference execution and selected combos. Exact-model account recovery within Codex remains useful. SEARCH has no consumer of these model fallback mechanisms.",
+      "quality_risk": "Family membership does not imply equal quality: the shipped map includes Gemini high-to-low and Claude Opus-to-Sonnet alternatives. A multi-model combo or globalFallbackModel can also substitute a weaker model. Astra→Sol is unacceptable as failure recovery; Sol/medium is only an explicitly selected, independently qualified extraction lane. A successful HTTP response is not evidence of preserved judgment quality.",
+      "cache_effect": "Inference: model/provider changes alter cache identity and repeat inference work. Same-model account recovery preserves the requested capability contract, although account changes can still reduce cache reuse. Retain the established affinity policy rather than introducing cross-model recovery.",
+      "token_effect": "No measured token advantage supports downgrade fallback. With approximately 94% cached input and 1.2% output, additional attempts and cache loss can dominate nominal model-price or output savings. Preserve visible failure when the required model cannot serve the request.",
+      "upstream_status": "GitHub API checked 2026-09-27: global-fallback issue #689 is closed. PR #13603 remains open/unmerged and proposes GPT-6 Astra effort-alias families plus additional sibling hopping; those changes are absent from the inspected map. Pinned User Guide fallback-chain examples and provider-failover documentation are broader than the verified runtime consumers, so they are not sufficient evidence of active blanket cross-provider fallback.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "For these lanes, retain /api/fallback/chains={} and keep globalFallbackModel absent. Preserve providerStrategies.codex={\"fallbackStrategy\":\"round-robin\",\"stickyRoundRobinLimit\":1}, sessionAffinityTtlMs=14400000 and promptCacheAffinityEnabled=true. Use only the exact singleton model/effort targets in D04, with D10 emergency substitution disabled and D11 model rewriting disabled. Do not add an Astra→Sol target or chain. Do not invent settings.allowModelFallback=false. Do not propose PATCH /api/settings {\"globalFallbackModel\":\"\"} as a working setter at this pin: that field is absent from the public update schema and would be stripped. The current absent value requires no mutation. This resolution prevents substitution for the current GPT-6 lanes; it does not claim the hardcoded family engine is globally disabled.",
+      "experiment_needed": "Before adoption, isolate faults for unavailable models, context overflow, quota exhaustion and combo exhaustion; assert that the served model/effort remains identical or the request fails visibly. Reaudit the family map and actual chain consumers on every relevant upgrade, especially if PR #13603 lands. A future second provider requires equivalence and cache measurements for the exact model, not permission to choose a weaker sibling.",
+      "overturn_condition": "Only verified recovery serving the same required model capability and effort may qualify for a lane. The existing mechanical-extraction result cannot overturn the prohibition on Astra→Sol fallback for judgment. New family mappings, global fallback values or newly wired chain consumers trigger review before rollout.",
+      "citations": [
+        {
+          "ref": "http://127.0.0.1:20128/api/fallback/chains",
+          "claim": "Fresh GET confirmed empty chains; the settings GET confirmed globalFallbackModel remains absent."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/providerExecutionPipeline.ts#L517-L542",
+          "claim": "Permitted unavailable-model fallback rewrites the wire model and retries."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/modelFamilyFallback.ts#L29-L101",
+          "claim": "The complete template map covers Gemini/Claude, includes weaker alternatives and has no GPT family."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/modelFamilyFallback.ts#L181-L200",
+          "claim": "Missing family returns null; candidates are tied to the resolved provider registry."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/domain/fallbackPolicy.ts#L56-L101",
+          "claim": "Configured chains contain only provider, priority and enabled, sorted and filtered for resolution."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/domain/policyEngine.ts#L76-L100",
+          "claim": "Domain policy returns the chain as an adjustment; traced consumer searches did not establish chat execution of it."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/routing/adaptiveRouting.ts#L131-L153",
+          "claim": "The separate adaptive helper defines cross-provider defaults; no production shouldFailover caller was found."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L1253-L1306",
+          "claim": "Actual global post-combo fallback checks a nonempty globalFallbackModel after 502/503 and returns a successful replacement."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/settingsSchemas.ts#L102-L557",
+          "claim": "The public settings update object does not declare globalFallbackModel."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/route.ts#L299-L317",
+          "claim": "Settings updates use validated data, so an undeclared globalFallbackModel field is not a verified setter."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/USER_GUIDE.md#L862-L871",
+          "claim": "Pinned documentation advertises broad fallback-chain behavior, exceeding what the inspected provider-chain consumer path establishes."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/13603",
+          "claim": "Observed open/unmerged proposal to expand family fallback to GPT-6 Astra effort aliases."
+        }
+      ],
+      "unverified": [
+        "No induced model-unavailable, context-overflow or combo-exhaustion requests were sent.",
+        "Absence of production chain consumers is supported by graph and textual searches, not a live end-to-end negative test.",
+        "No public global disable for the hardcoded family engine was verified.",
+        "Current GPT-6 non-substitution depends on the reviewed family map and absent global fallback; it must not be generalized to other models or future builds."
+      ]
+    }
+  ],
+  "tools_used": [
+    "functions.exec with exec_command: read-only rg, sed/nl and git rev-parse",
+    "codebase-memory.search_graph",
+    "codebase-memory.get_code_snippet",
+    "codebase-memory.trace_path",
+    "context-mode.ctx_execute: snapshot aggregation, static checks and sanitized gateway HTTP GET observations",
+    "context-mode.ctx_fetch_and_index: GitHub issue/PR API retrieval",
+    "context-mode.ctx_search",
+    "collaboration.spawn_agent and collaboration.send_message: two read-only delegated source audits"
+  ]
+}

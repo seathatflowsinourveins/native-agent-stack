@@ -1,0 +1,166 @@
+{
+  "group": "RH1",
+  "items": [
+    {
+      "id": "D02",
+      "verdict": "corrected",
+      "state": "ON-GLOBAL",
+      "config": "Retain sessionAffinityTtlMs=14400000 and providerStrategies.codex={fallbackStrategy:\"round-robin\",stickyRoundRobinLimit:1}; preserve CX headers/body. For an FW A/B, use a stable, independently unique X-Session-Id, preferably at most 64 characters to avoid truncation in separate session bookkeeping. Correct the claim that different extraction chunks necessarily create different pins: only a bounded text prefix is hashed. Do not increase the shared TTL based on total run duration.",
+      "findings": [
+        {
+          "lens": "cache-token",
+          "claim": "Different FW extraction chunks can share an affinity pin even when their complete first-user messages differ.",
+          "evidence": "Fallback text extraction stops at 4096 JavaScript string units. In-memory execution of the pinned extractor confirmed that two messages sharing those first 4096 units but having different tails produce identical affinity keys. Shared extraction instructions or document prefixes can therefore concentrate otherwise distinct jobs; the proposal understates this case.",
+          "citation": "[Bounded extraction](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L69-L120), [first-user selection and hashing](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L161-L221)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The retained affinity controls select accounts without rewriting inference content; their key-precedence and eligibility claims stand.",
+          "evidence": "The extractor recognizes the stated three headers and body fields. Account eligibility checks exclusions, model restrictions, cooldowns, scope locks and quota. Selection updates affinity/account-use records rather than the request body. Separate session bookkeeping truncates external IDs to 64 characters, motivating the bounded FW header recommendation. The public TTL schema accepts 0–86400000 ms; the resolver falls back to the legacy setting and otherwise disables affinity.",
+          "citation": "[Key precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L221), [TTL and eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L443-L510), [TTL validation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/settingsSchemas.ts#L261-L266), [external-session truncation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/sessionManager.ts#L332-L345)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Four hours is a sliding selection TTL, with no intrinsic token reduction or guarantee of immediate re-pinning after inner rotation.",
+          "evidence": "Reusing a pin touches its expiry; a new pin chooses an eligible LRU account before ordinary round-robin selection. Thus continuous selections can sustain a pin beyond four hours. The inner Codex 429 path clears affinity and selects replacement credentials without sessionKey, matching the proposal's caveat. SEARCH credential lookups omit sessionKey. These mechanisms support retaining existing continuity but do not establish how much of the supplied 94% cache-read rate affinity caused.",
+          "citation": "[Pin reuse and LRU creation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L272-L319), [sliding expiry](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/sessionAccountAffinity.ts#L96-L123), [inner rotation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/providerExecutionPipeline.ts#L373-L406), [standard SEARCH](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L81-L104), [local alpha SEARCH](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:90)",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "Actual CX wire traffic, per-launch overrides and installed FW wrapper behavior; tagged Codex source supports the session-header/default prompt_cache_key claims, but does not establish every invocation.",
+        "Upstream cache retention, account-boundary reuse, incremental savings from affinity or explicit FW keys, and live inner-rotation re-pinning; no inference A/B was performed."
+      ]
+    },
+    {
+      "id": "D07",
+      "verdict": "upheld",
+      "state": "N/A",
+      "config": "Retain keyless ordinary inference and requireLogin=false. Introduce no lease-scoped keys, reservations, lease headers or lifecycle calls for current consumers. Continue D02 affinity. Any future lease-aware consumer needs authenticated lifecycle handling and a capacity-isolated trial.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "The public lease lifecycle is explicitly authenticated and cannot be acquired merely by adding headers to keyless inference.",
+          "evidence": "The lifecycle rejects missing/invalid API keys, requires lease:exclusive and validates nonempty allowedConnections. Its action schema exposes acquire/model and status/renew/release generation fields, with no TTL control. Inference constructs managed lease context only for a managed key. This supports N/A for the supplied consumers without changing the login decision.",
+          "citation": "[Lifecycle authentication and schema](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/session-leases/route.ts#L29-L94), [key and header validation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/leaseContext.ts#L33-L70), [managed inference gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L704-L716)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The two-minute lifetime, renewal requirement and eligibility-preserving transition claims hold for the public routing path.",
+          "evidence": "The default TTL is 120000 ms, internally bounded to 1000–1800000 ms. Existing bindings use transitionExclusiveConnectionLease; same-connection reuse returns without extending expiry, while explicit renew updates it. Transitions preserve the supplied generation and require a free connection. Managed leases suppress inner Codex account rotation. A direct internal acquire helper can renew an existing binding, but the public existing-binding path uses transition, so it does not invalidate the proposal.",
+          "citation": "[TTL constants](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/exclusiveConnectionLeases.ts#L5-L8), [public selection mutation path](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/exclusiveConnectionLeasePolicy.ts#L80-L107), [transition semantics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/exclusiveConnectionLeases.ts#L317-L346), [explicit renewal](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/exclusiveConnectionLeases.ts#L375-L392), [rotation suppression](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L4105-L4111)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Exclusivity reserves shared capacity; it neither compresses requests nor extends upstream prompt-cache retention.",
+          "evidence": "Unmanaged selection removes actively leased connections. Consequently introducing leases would change availability for ordinary clients even if their prompts were untouched. The lifecycle operates on routing/ownership records and adds no inference tokens itself. The proposal correctly makes no measured cache-saving claim.",
+          "citation": "[Unmanaged occupancy filtering](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/exclusiveConnectionLeasePolicy.ts#L33-L77), [capacity outcomes](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L1919-L1939), [lifecycle execution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/session-leases/route.ts#L95-L162)",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "The researcher's historical zero-exclusive-session GET and existence of unused managed keys; no session/auth inventory was inspected in this review.",
+        "Live renewal, fencing, long-generation expiry, contention and quota transitions; no lifecycle calls or comparative cache/completion tests were performed."
+      ]
+    },
+    {
+      "id": "D08",
+      "verdict": "corrected",
+      "state": "ON-GLOBAL",
+      "config": "Retain requestRetry=3, maxRetryIntervalSec=30, OAuth cooldown 5000 ms/8 steps/no generic upstream hints, breaker degraded=5/open=8/reset=60000 ms, wait budget=300000 ms, providerCooldown.enabled=false and generic modelLockout.enabled=false. Retain mandatory Codex scope locks and existing client retry settings. Keep resolved stream recovery, continuation, throughput watchdog and listed optional retry flags false; additionally make goal-triggered recovery suppression explicit with OMNIROUTE_AGENT_GOAL_STREAM_RECOVERY=false. This is a proposed configuration, not an applied change. ON-GLOBAL covers the existing admission/cooldown guards; the shared executor's reactive effort/field repairs are not certified lossless by these controls.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "Default-false stream-recovery flags do not establish that optional replay is disabled for every CX/FW request.",
+          "evidence": "The goal heuristic defaults on and recognizes either x-omniroute-agent-goal or /goal text anywhere in traversed request content, including quoted text. It can enable recovery when no explicit resilience setting or STREAM_RECOVERY_ENABLED environment value exists. A DB feature-flag false alone is absent from that explicit-configuration check. Source-only execution confirmed both body/header triggers and suppression by OMNIROUTE_AGENT_GOAL_STREAM_RECOVERY=false. This is a client-controlled replay path on the keyless gateway; actual live activation remains unverified.",
+          "citation": "[Goal detection and defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/agentGoalPolicy.ts#L39-L99), [recovery override](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L3351-L3378), [explicit-configuration test](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/settings.ts#L309-L318)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The no-effort-degradation statement must be limited to admission/cooldown guards, not the complete retry pipeline.",
+          "evidence": "Codex HTTP execution delegates to BaseExecutor. On a qualifying 400/422, that executor records an upstream-advertised effort enum, sanitizes the request and retries; the learned clamp can map max to high and affects later requests. A separate 400 path strips named fields, including top-level reasoning_effort. These branches are not gated by requestRetry or skipUpstreamRetry. This proves conditional mutation paths, not that live GPT-6 requests have encountered them.",
+          "citation": "[Codex HTTP delegation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L854-L855), [reactive repairs](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L1527-L1590), [learn-and-retry implementation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base/reasoningEffortRecovery.ts#L80-L112), [clamp semantics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/learnedReasoningEffortCaps.ts#L150-L181), [strippable fields](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/providerFieldStrips.ts#L9-L25)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The proposed breaker/cooldown settings and distinction between waiting and generation duration are supported.",
+          "evidence": "Live GET /api/resilience during this review confirmed 3 waits/30 seconds, OAuth cooldown 5000 ms/8 steps, breaker 5/8/60000 ms and providerCooldown=false. The breaker executes its operation once without a generation-abort timer. Ordinary 429s are excluded from provider-breaker failure statuses. The resolver distinguishes persisted 3/30 settings from its 5/90 fallback; generic model lockout defaults off while Codex 429 scope locks remain active.",
+          "citation": "[Persisted defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings.ts#L173-L174), [resolver precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/settings.ts#L195-L211), [single breaker execution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/circuitBreaker.ts#L350-L402), [breaker statuses](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatPredicates.ts#L10-L13), [mandatory Codex scope lock](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L3321-L3348), [live resilience GET](http://127.0.0.1:20128/api/resilience)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "The retry-cost warning stands, but the hierarchy contains additional replay paths beyond the summarized 429 and early-EOF layers.",
+          "evidence": "The 90-second bound applies only to three bounded cooldown sleeps. Direct requests also have a separate one-per-account pre-output transport retry with a 2–3-second delay. Goal-triggered recovery can reopen an uncommitted stream up to four times. None of these mechanisms directly reduces input tokens; repeated inference and account changes can spend more despite the supplied 94% cached-input rate. No composed attempt or billing bound is established.",
+          "citation": "[Cooldown bounds](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/cooldownAwareRetry.ts#L107-L160), [additional transport retry](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L2465-L2501), [recovery replay budget](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/constants.ts#L354-L375)",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "Effective goal-policy environment overrides and live occurrence of goal-triggered replay, effort clamping or field stripping; server.env was not read.",
+        "End-to-end max-effort fidelity under failures, exactly-once execution, upstream billing, complete composed retry bounds, live idle-timeout values and per-launch/FW retry overrides.",
+        "Direct PR #13849 verification remained unavailable: context-mode fetch returned HTTP 403."
+      ]
+    },
+    {
+      "id": "D09",
+      "verdict": "corrected",
+      "state": "OFF-BY-EVIDENCE",
+      "config": "Retain autoRefreshProviderQuota=false and interval=180; retain effective quotaPreflight={enabled:false,defaultThresholdPercent:2,warnThresholdPercent:20,providerWindowDefaults:{}}. Keep shared-account quotaWindowThresholds=null and preflight flags absent, or explicitly false if later materialized. Explicit false is a direct credential-selector opt-out, not a universal combo cutoff exemption. Keep the global cutoff off as well. Preserve 0.95-on-429 handling. Any trial requires an isolated instance or disjoint pool and must distinguish direct requests from combo routing.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "The per-connection false override and recent-success bypass are not universal across quota-cutoff consumers.",
+          "evidence": "The direct credential helper honors quotaPreflightEnabled=false. However, both the auto-combo cutoff and explicit-target combo cutoff are gated by the global setting without checking that flag. They also call evaluateQuotaCutoff without connectionId, so its connectionId-dependent healthy override cannot run there. The proposal overgeneralizes both protections; keeping the global gate off remains justified.",
+          "citation": "[Direct opt-out](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2400-L2421), [explicit-target combo cutoff](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/quotaExhaustionCutoff.ts#L103-L138), [auto-combo cutoff](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo.ts#L490-L503), [healthy bypass condition](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/quotaPreflight.ts#L317-L332)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The ordinary direct-path activation, threshold and fail-open claims stand.",
+          "evidence": "Live GET /api/resilience during this review confirmed global preflight disabled, remaining-percent cutoff 2, warning 20 and empty provider defaults. Source skips fetching when no connection/provider/global activation exists, fails open on absent/error quota data, and supplies connectionId for the direct healthy bypass. The healthy marker lasts 30 minutes. Those facts support retaining off for the shared pool without claiming reliable near-exhaustion prevention.",
+          "citation": "[Activation and threshold resolution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2375-L2459), [fetch and direct scope](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/quotaPreflight.ts#L376-L412), [healthy-marker lifetime](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/domain/quotaCache.ts#L94-L94), [healthy-marker behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/domain/quotaCache.ts#L161-L174), [live resilience GET](http://127.0.0.1:20128/api/resilience)",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The 0.95 usage-ratio helper is separate from the 2%-remaining preflight cutoff and dashboard refresh.",
+          "evidence": "The quota persistence helper consults the 0.95 dual-window reset calculation only for status 429; successful status 200 clears the corresponding cooldown rather than parking solely because usage exceeded 95%. Dashboard auto-refresh is visible-page polling and is not required by request-path preflight. Disabling optional preflight therefore preserves mandatory rejection handling.",
+          "citation": "[0.95 calculation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/quota.ts#L84-L113), [429-only application](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/codexAccount/quota.ts#L37-L61), [dashboard polling](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/(dashboard)/dashboard/usage/components/ProviderLimits/index.tsx#L487-L512)",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Preflight has conditional failure-avoidance value, no intrinsic model-token saving and potentially adverse shared-account cache effects.",
+          "evidence": "The Codex fetcher uses a 60-second cache, paced GET and 8-second timeout; it caches successful parsed results without an in-flight coalescing mechanism. A blocking decision persists unavailability and excludes the account before reselection, affecting every lane sharing it. Auto-combo scoring can also fetch quota while the hard cutoff is off, so these off settings must not be described as disabling every quota GET. No measured saving offsets early movement of warm sessions.",
+          "citation": "[Quota cache TTL](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/codexQuotaFetcher.ts#L38-L45), [fetch/cache behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/codexQuotaFetcher.ts#L201-L274), [blocking and reselection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2466-L2487), [scoring fetch independent of cutoff](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo.ts#L463-L490)",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "The researcher's historical per-connection flag/threshold observations were not independently repeated; the supplied snapshot establishes dashboard settings but contains no corresponding provider inventory.",
+        "Live quota accuracy, concurrent-miss frequency, throttle environment overrides, latency, 429 avoidance and cache/completion effects; no inference trial was performed.",
+        "Issue #14359 closure/date could not be independently verified because its API fetch returned HTTP 403; the relevant healthy-override implementation was verified locally."
+      ]
+    }
+  ],
+  "cross_item": [
+    "D02, D08 and D09 share one limitation: inner Codex 429 rotation clears affinity and calls raw credential selection without sessionKey or quota preflight. Neither retaining affinity nor enabling direct preflight establishes immediate re-pinning or preflight coverage for that replacement. [Shared rotation path](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/providerExecutionPipeline.ts#L373-L406).",
+    "D08/D09 configuration materialization is not necessarily a no-op: PATCH /api/resilience persists the complete resolved resilienceSettings object, including streamRecovery.enabled. Persisting its default false makes it explicit and can suppress the goal override even when only quota/wait values were intended to change. Distinguish retained effective values from a later write. [Persistence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/resilience/route.ts#L185-L243), [merged recovery setting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/settings.ts#L423-L428), [explicit-off detection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/resilience/settings.ts#L309-L318).",
+    "D02 headers separate affinity keys, not every shared runtime effect: D08 learned effort caps are keyed by provider:model, while D07 leases and D09 cooldowns act on shared connections. A caller header or combo over the same accounts does not establish lane isolation. [Effort-cap key](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/learnedReasoningEffortCaps.ts#L48-L77), [lease occupancy](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/exclusiveConnectionLeasePolicy.ts#L33-L43), [quota suppression](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2472-L2487)."
+  ],
+  "tools_used": [
+    "functions.exec / exec_command: read-only rg, sed, numbered source reads, selected JSON/TOML projections, build-pin verification and packet/source comparison",
+    "exec_command: in-memory execution of pinned pure helpers for bounded affinity hashing, goal-policy triggers and learned effort clamping; no inference or persistent writes",
+    "context-mode ctx_execute_file: attempted; outside-workspace packet access was rejected, so the authorized shell-read alternative was used",
+    "context-mode ctx_execute: compact audit aggregation",
+    "context-mode ctx_fetch_and_index / ctx_search: tagged Codex and SDK sources, targeted GitHub issue/PR verification, GET /api/resilience",
+    "clock.curr_time"
+  ]
+}

@@ -1,0 +1,1 @@
+{"type":"object","additionalProperties":false,"required":["ok","file","line","tools_used"],"properties":{"ok":{"type":"boolean"},"file":{"type":"string"},"line":{"type":"integer"},"tools_used":{"type":"array","items":{"type":"string"}}}}

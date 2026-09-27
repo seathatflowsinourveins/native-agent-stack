@@ -1,0 +1,22 @@
+import json, re, urllib.request, os, sys
+D = sys.argv[1]
+BASE = "http://127.0.0.1:20128"
+SECRET = re.compile(r"(email|token|access|refresh|secret|password|apikey|api_key|cookie|authorization|connectionid|connection_id)", re.I)
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
+EMAIL = re.compile(r"[^\s\"'@]+@[^\s\"'@]+\.[a-z]{2,}", re.I)
+def red(o):
+    if isinstance(o, dict):
+        return {k: ("<redacted>" if SECRET.search(k) and not isinstance(v,(bool,int,float)) or (SECRET.search(k) and isinstance(v,str)) else red(v)) for k, v in o.items()}
+    if isinstance(o, list): return [red(x) for x in o]
+    if isinstance(o, str):
+        return EMAIL.sub("<email>", UUID.sub("<uuid>", o))
+    return o
+out = {}
+for r in ["/api/settings","/api/settings/compression","/api/settings/cache-config","/api/settings/thinking-budget","/api/settings/combo-defaults","/api/settings/task-routing","/api/settings/feature-flags","/api/settings/model-aliases","/api/models/alias","/api/settings/reasoning-routing-rules","/api/settings/tier-config","/api/context/combos","/api/fallback/chains","/api/headroom/status","/api/mcp/status","/api/a2a/status","/api/system/version","/api/search/providers","/api/cache","/api/usage/cache-health","/api/analytics/compression","/api/telemetry/summary"]:
+    try:
+        with urllib.request.urlopen(urllib.request.Request(BASE+r, method="GET"), timeout=20) as resp:
+            out[r] = red(json.loads(resp.read()))
+    except Exception as e:
+        out[r] = {"error": type(e).__name__ + ": " + str(e)[:120]}
+json.dump(out, open(os.path.join(D,"gateway-snapshot.json"),"w"), indent=1, sort_keys=True)
+print({k: (len(json.dumps(v))) for k,v in out.items()})
