@@ -14058,18 +14058,18 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "c077a9e15c2bf26c1056dba87b1d5965e9fca751e44139439aaa3e2ba7ff4b1c",
-      "bytes": 19328
+      "sha256": "3f190f7532d8bfdfbad85b6aa119adc60f763cda45361f237cbbe6f5a1c30f8e",
+      "bytes": 19574
     },
     {
       "path": "docs/native-dashboard-operations-resolution.md",
-      "sha256": "0c42e73c610bb620b100cfb4cf620066b508c3e06c2e48c4b19900b009998fa9",
-      "bytes": 6086
+      "sha256": "2722111425c4e1f077604bbfb1c0ba09fed592a1c500bca9e3a69e91d2f18261",
+      "bytes": 6332
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "fe13245c6be4bd942fe85e604f071ffce18be95749ca2fbcdd2825a5b3d0ff80",
-      "bytes": 11062
+      "sha256": "1fe0186804f21c91d6e46c146603e42b477cda2fa242b580cad3829df116103f",
+      "bytes": 14860
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -36742,6 +36742,11 @@
       "bytes": 2603
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--agentsview--persistence--20260927.json",
+      "sha256": "9b8944165a11854152356d380ef5c088bd7cbf21bf69fc28fa7ea161acabedd8",
+      "bytes": 6350
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--agentsview--use--20260925.json",
       "sha256": "46ed88e596bc153b25589862b34642b4de7c9f2f29dea8675b64120001887a7e",
       "bytes": 2754
@@ -38098,13 +38103,13 @@
     },
     {
       "path": "examples/agentsview-archive.service.example",
-      "sha256": "eb4ce1a6eb14cd739f47b0381e12478d5519d348ad4e06a409eb861d7167f16b",
-      "bytes": 574
+      "sha256": "b555f4b83b60bb335fdfcc95b3956b9a72421e4e69d2ecd84427db69a4d56d8c",
+      "bytes": 790
     },
     {
       "path": "examples/agentsview.toml.example",
-      "sha256": "969b6ce0dd9ae5a603ab6cc92c9c3e99e549458c66665c16ed61a807daef50f4",
-      "bytes": 436
+      "sha256": "98ae8c2403a41e862f99131c86c8e3d9d525dec8f8fa7ed9eb396a86b97ab39a",
+      "bytes": 553
     },
     {
       "path": "examples/ai-memory-config.toml.example",
@@ -38663,8 +38668,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "16d0a50b1379e2a6d71b4502477d7d9ba9d2b488958a61a8ed3e0d9e53eab759",
-      "bytes": 117319
+      "sha256": "a6d32889e098462dc6d8f36b0b75999b7c8ba621823d20a9a07a21585bad7fd8",
+      "bytes": 117621
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",

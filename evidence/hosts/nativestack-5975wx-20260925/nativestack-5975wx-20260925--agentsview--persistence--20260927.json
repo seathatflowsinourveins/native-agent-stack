@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--agentsview--persistence--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a42f0f7fb5f21ba75699a03666249d8103d9d095",
+  "recorded_by": {
+    "identity_sha256": "5b4f00fe84f06be105fb8a8625b9ecd14d784c8e32357045a2971bf652b71ea6"
+  },
+  "component_id": "agentsview",
+  "stage": "persistence",
+  "commands": [
+    {
+      "cmd": "systemctl --user is-enabled agentsview-archive.service && systemctl --user is-active agentsview-archive.service && test \"$(systemctl --user show -p ExecStart --value agentsview-archive.service | grep -c -- '--require-auth')\" = 1 && echo unit_require_auth_flag_present",
+      "exit": 0,
+      "duration_s": 0.07,
+      "output_sha256": "8a97a85ec9c53bfde73ec1822a4f1a14d424214076c23e1dbb9f2e475d741dc4",
+      "output_excerpt": "enabled\nactive\nunit_require_auth_flag_present\n"
+    },
+    {
+      "cmd": "n=$(grep -c '^require_auth = true$' $HOME/.agentsview/config.toml); echo \"archive_config_require_auth_lines=$n\"; test \"$n\" = 1",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "916eaf38217f7c850851794cb1957f56b4f8a8dfbe6ea400ecd4accec6db7ae5",
+      "output_excerpt": "archive_config_require_auth_lines=1\n"
+    },
+    {
+      "cmd": "chk() { r=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:$1/\"); a=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:$1/api/ping\"); s=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:$1/api/v1/sessions?limit=1\"); echo \"port=$1 no_token: root=$r api_ping=$a api_sessions=$s\"; test \"$r\" = 200 && test \"$a\" = 401 && test \"$s\" = 401; }; chk 17384",
+      "exit": 0,
+      "duration_s": 0.029,
+      "output_sha256": "50af998b8e8bb9d780615045d402acc8a0b646d76f1de3001365922e4361f896",
+      "output_excerpt": "port=17384 no_token: root=200 api_ping=401 api_sessions=401\n"
+    },
+    {
+      "cmd": "chk() { r=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:$1/\"); a=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:$1/api/ping\"); s=$(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:$1/api/v1/sessions?limit=1\"); echo \"port=$1 no_token: root=$r api_ping=$a api_sessions=$s\"; test \"$r\" = 200 && test \"$a\" = 401 && test \"$s\" = 401; }; P=17399; if ss -ltn | grep -q \"127.0.0.1:$P \"; then echo \"control port $P busy\"; exit 2; fi; T=$(mktemp -d -t av-control.XXXXXX); mkdir -p \"$T/home\" \"$T/data\"; HOME=$T/home AGENTSVIEW_DATA_DIR=$T/data AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview serve --host 127.0.0.1 --port $P --no-sync --no-browser --no-update-check >/dev/null 2>&1 & pid=$!; i=0; until [ \"$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:$P/)\" = 200 ] || [ $i -ge 60 ]; do sleep 0.5; i=$((i+1)); done; if chk $P; then rc=0; else rc=$?; fi; kill $pid; wait $pid 2>/dev/null || true; case \"$T\" in */av-control.*) rm -rf \"$T\";; esac; echo \"control_without_require_auth_check_exit=$rc\"; test \"$rc\" -ne 0",
+      "exit": 0,
+      "duration_s": 0.63,
+      "output_sha256": "65f97a74ac8b65d8db7d1ce9ada6d493b55b2310baab9fe819f1e04390e1794e",
+      "output_excerpt": "port=17399 no_token: root=200 api_ping=200 api_sessions=200\ncontrol_without_require_auth_check_exit=1\n"
+    },
+    {
+      "cmd": "AGENTSVIEW_DATA_DIR=$HOME/.agentsview AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview projects --json | python3 -c \"import json,sys; d=json.load(sys.stdin); p=d.get('projects', d) if isinstance(d, dict) else d; print('data_dir_form_projects', len(p)); sys.exit(0 if len(p) > 0 else 1)\"",
+      "exit": 0,
+      "duration_s": 0.047,
+      "output_sha256": "ec23877df885673b5ef3a22ccaa742b2a2ded08dac3ec1bba35e68b73001055f",
+      "output_excerpt": "data_dir_form_projects 11\n"
+    },
+    {
+      "cmd": "out=$(AGENTSVIEW_DATA_DIR=$HOME/.agentsview AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview session list --server http://127.0.0.1:17384 --limit 1 --json 2>&1 || true); echo \"$out\" | grep -o 'HTTP 401: Unauthorized'",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "f51e285beb1d60593dfd0ed22b1b6e93fda007fd1a79b5922de5d659f8996382",
+      "output_excerpt": "HTTP 401: Unauthorized\n"
+    }
+  ],
+  "tool_versions": {
+    "agentsview": "0.43.0"
+  },
+  "observed_at_utc": "2026-09-27T15:16:56Z",
+  "result": "pass",
+  "claim": "On nativestack-5975wx-20260925, agentsview 0.43.0 runs as the enabled, active systemd --user unit agentsview-archive.service with --require-auth in its ExecStart, and the archive's config.toml has one require_auth = true line. Without a token on port 17384, / returned 200 and /api/ping and /api/v1/sessions returned 401. The identical check against an isolated instance started without require_auth (scratch HOME and data dir, port 17399) failed: its API routes returned 200 and the check exited nonzero. With the unit running, the data-dir form of agentsview projects --json listed the archive's projects, and an explicit --server session list without --server-token-file returned HTTP 401.",
+  "limitations": [
+    "Not a reboot or WSL-restart recovery proof; the unit's restart after a host restart is not exercised.",
+    "The browser interface's token prompt was not exercised; entering the token is the operator's step.",
+    "Which transport the data-dir CLI used is not shown by this output; docs/native-dashboards.md cites it from upstream source.",
+    "Only the ordinary dashboard API is covered; the remote-sync, raw-sync and artifact-exchange routes keep their own authentication and were not exercised.",
+    "Serves the host's existing default-directory archive with --no-sync; it does not refresh or rescope that archive."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T15:16:56Z",
+      "reviewer": {
+        "identity_sha256": "5b4f00fe84f06be105fb8a8625b9ecd14d784c8e32357045a2971bf652b71ea6"
+      }
+    }
+  ]
+}

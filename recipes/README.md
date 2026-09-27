@@ -772,7 +772,7 @@ Set `AGENTSVIEW_DATA_DIR` to a dedicated archive directory and merge [agentsview
 ```sh
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 AGENTSVIEW_NO_DAEMON=1 agentsview sync
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
-  agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --background
+  agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --require-auth --background
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview projects
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
   agentsview session search 'selected task' --fts --project "$HISTORY_PROJECT_ID" --limit 3 --json
@@ -783,6 +783,8 @@ CODEX_HOME="$SELECTED_CODEX_HOME" ccusage codex daily --offline --no-cost --json
 ```
 
 At v0.43.0, `session list` and `session search` leave out one-shot, automated and subagent sessions by default, and `--fts` searches message bodies only, not tool calls or results ([session API](https://github.com/kenn-io/agentsview/blob/v0.43.0/docs/session-api.md), [commands](https://github.com/kenn-io/agentsview/blob/v0.43.0/docs/commands.md)). Workflow children are subagent sessions and headless workers can be one-shot or automated, so a question about them adds `--include-children --include-automated --include-one-shot`, names the source roots it covers, and checks that each intended population appears. An archive answer is an observation of retained history, not an efficiency or savings measurement.
+
+`--require-auth` keeps the archive API behind the archive's own token ([token on the archive API](../docs/native-dashboards.md#token-on-the-archive-api-2026-09-27)); its `projects` and `session search` calls find the daemon through `AGENTSVIEW_DATA_DIR` and send that token themselves.
 
 Choose an available loopback port and start/stop only the daemon belonging to this dedicated archive. The query commands require the service; the sync command above runs explicitly without it. Use the project ID returned by the archive. Empty results, unreadable logs and parser failure are distinct outcomes. Native and Desktop roots can overlap or contain copied sessions: deduplicate by stable session identity and retain per-root scope before combining totals. Cached input is a subset of input, reasoning output a subset of output; do not add either subset again to provider totals. Local estimates and model subscription usage remain separate.
 
