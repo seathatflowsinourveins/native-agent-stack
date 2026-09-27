@@ -107,6 +107,28 @@ class RenderConfigTests(unittest.TestCase):
         offline = {"HEADROOM_OFFLINE": "1", "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "DO_NOT_TRACK": "1"}
         self.assertLessEqual(offline.items(), user["mcp_servers"]["headroom"]["env"].items())
         self.assertNotIn("context-mode", rendered("project.codex.config.template.toml").get("mcp_servers", {}))
+        self.assertEqual(server.get("default_tools_approval_mode"), "approve")
+
+    def test_recipe_project_form_mirrors_start_mjs_and_approves_tools(self):
+        # recipes/README.md "Retained Context Mode": the project-scoped form runs the bare `context-mode` CLI,
+        # which skips upstream start.mjs. start.mjs sets both CLAUDE_PROJECT_DIR and CONTEXT_MODE_PROJECT_DIR
+        # from the launch directory (start.mjs:42-51 at 6f0cc684), and the server reads project Bash denies
+        # only through CLAUDE_PROJECT_DIR (src/server.ts:1111-1120), so the static form sets both. Approval
+        # mode is the plugin manifest's own (.codex-plugin/mcp.json:10); without it a Codex run whose policy
+        # is `never` refuses every ctx_* call.
+        import tomllib  # Python 3.11+, as above
+
+        section = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8").split("\n## Retained Context Mode\n", 1)[1]
+        section = section.split("\n## ", 1)[0]
+        block = tomllib.loads(section.split("```toml\n", 1)[1].split("```", 1)[0])
+        self.assertIs(block["plugins"]["context-mode@context-mode"]["mcp_servers"]["context-mode"]["enabled"], False)
+        server = block["mcp_servers"]["context-mode"]
+        self.assertEqual(server["command"], "context-mode")
+        self.assertEqual(server.get("default_tools_approval_mode"), "approve")
+        project = server["cwd"]
+        self.assertEqual(server["env"].get("CONTEXT_MODE_PROJECT_DIR"), project)
+        self.assertEqual(server["env"].get("CLAUDE_PROJECT_DIR"), project)
+        self.assertEqual(server["env"].get("CONTEXT_MODE_PLATFORM"), "codex")
 
     def test_claude_template_turns_off_claudeai_skill_sync_and_mcp_servers(self):
         # docs/decisions/2026-09-25-skills-trial-and-usage.md, addendum "claude.ai skill sync and MCP

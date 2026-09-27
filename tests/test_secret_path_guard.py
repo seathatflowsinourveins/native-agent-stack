@@ -682,13 +682,42 @@ class SecretPathGuardTests(unittest.TestCase):
                      "Read(~/.cache/huggingface/token)", "Read(~/.cache/huggingface/stored_tokens)",
                      "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
                      "Bash(hf auth token)", "Bash(hf auth token *)",
-                     "Bash(git credential fill*)", "Bash(gh auth git-credential *)"):
+                     "Bash(git credential fill*)", "Bash(gh auth git-credential *)",
+                     # Context Mode twins (docs/secret-storage.md, "User-level guards"): 1.0.169 compiles a
+                     # Read glob literally, without expanding `~/` or `//`, and matches it against absolute
+                     # paths, while Claude Code bounds `**/` to the current directory.
+                     "Read(**/.config/native-agent-stack/**)", "Read(**/.config/ecosystem-observability/*.env)",
+                     "Read(**/.config/nativestack/*.key)", "Read(**/.claude/.credentials.json)",
+                     "Read(**/.codex/auth.json)", "Read(**/.config/gh/hosts.yml)",
+                     "Read(**/.cache/huggingface/token)", "Read(**/.cache/huggingface/stored_tokens)",
+                     "Read(**/proc/*/environ)", "Read(**/.env)", "Read(**/.env.*)"):
             self.assertIn(rule, deny)
-        self.assertLess(deny.index("Read(.env.*)"), deny.index("Read(!.env.example)"))
+        # A `!` carve-out reaches only the rules listed before it in the same file, so every `.env` rule,
+        # twins included, precedes both carve-outs (a twin appended after them would re-deny .env.example).
+        for rule in ("Read(.env)", "Read(.env.*)", "Read(**/.env)", "Read(**/.env.*)"):
+            for carve_out in ("Read(!.env.example)", "Read(!.env.*.example)"):
+                self.assertLess(deny.index(rule), deny.index(carve_out), (rule, carve_out))
         hooks = settings["hooks"]["PreToolUse"]
         self.assertEqual(hooks[0]["matcher"], "Bash")
         self.assertIn("scripts/hooks/secret_path_guard.py", hooks[0]["hooks"][0]["command"])
         self.assertNotIn("/home/", json.dumps(settings))
+
+    def test_every_anchored_read_deny_has_a_context_mode_twin(self):
+        # Each `Read(~/X)` or `Read(//X)` deny needs `Read(**/X)` beside it: Claude Code honours the anchored
+        # form, Context Mode's server-side path check only the `**/` form (docs/secret-storage.md). The
+        # hand-merge block for hosts without the template carries the same twins.
+        deny = json.loads((ROOT / ".claude/settings.json").read_text())["permissions"]["deny"]
+        anchored = [rule for rule in deny if re.fullmatch(r"Read\((?:~/|//)[^)]+\)", rule)]
+        self.assertGreaterEqual(len(anchored), 9)
+        block = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8").split(
+            "## User-level guards (deployed by the Claude profile)", 1)[1].split("```json", 1)[1].split("```", 1)[0]
+        for rule in anchored:
+            twin = "Read(**/" + re.sub(r"^Read\((?:~/|//)", "", rule)
+            with self.subTest(rule=rule):
+                self.assertIn(twin, deny)
+                self.assertEqual(deny.index(twin), deny.index(rule) + 1, "the twin sits right after its original")
+                self.assertIn(f'"{rule}"', block)
+                self.assertIn(f'"{twin}"', block)
 
 
     def test_host_profile_copy_is_verbatim(self):

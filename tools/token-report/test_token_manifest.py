@@ -391,6 +391,16 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(row["metrics"]["saved"],256)
         self.assertEqual(row["evidence"]["source"]["sha256"],m.digest(original))
         self.assertEqual(Path(row["evidence"]["captured_source"]["path"]).read_bytes(),original)
+    def test_context_boundary_names_the_persisted_counters(self):
+        # Context Mode 1.0.169's stats file: tokens_saved = (bytes_indexed + bytes_sandboxed + cache_bytes_saved)/4
+        # from the server's own counters (src/server.ts:1032-1041) and tokens_saved_lifetime = retained events x 256
+        # (:1047-1052). Hook redirect rows (bytes_avoided) feed only the rendered ctx_stats bars, never this file.
+        (self.root/"stats-1.json").write_text(json.dumps({"schemaVersion":2,"tokens_saved_lifetime":512,"tokens_saved":9}))
+        m.capture_context({"name":"runtime","path":str(self.root)},self.db,self.root,[])
+        boundary=self.db.native_views()[0]["latest_success"]["metrics"]["boundary"]
+        for phrase in ("(bytes_indexed + bytes_sandboxed + cache_bytes_saved) ÷ 4","excludes hook redirect rows",
+                       "not the rendered kept-out figure","retained events × 256","Neither is provider usage"):
+            self.assertIn(phrase,boundary)
     def test_context_nonobject_json_records_failure(self):
         (self.root/"stats-1.json").write_text("[]")
         issues=[]

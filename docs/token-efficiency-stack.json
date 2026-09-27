@@ -372,7 +372,7 @@
         "install_note": "Native plugin source reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: a reviewed revision, not a pin both clients enforce. Codex's `--ref` checks it out; a Claude marketplace source takes a branch or tag and never a commit, so the Claude commands install the default-branch head, and the installed `gitCommitSha` is then compared with the reviewed revision; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence.",
         "statistics_note": "Upstream savings estimate; keep its own scope."
       },
-      "returned_result_summary": "Foundation reporter at 15:50:45 UTC retained separate Context Mode event estimates: Desktop WSL 2,264,064, native Claude 57,856 and native Codex 79,616. They are not matched process-session deltas. 2026-09-20 14:55:58\u201359 UTC retained-file refresh read Desktop WSL 2,143,488 lifetime / 0 session, native Claude 54,016 / 0, and native Codex 71,424 / 1,070,038 upstream estimates. These latest persisted process files are not matched to the fresh acceptance sessions and are not additive. Earlier direct Desktop ctx_execute returned 42 and ctx_stats separately quoted a rounded 1.1M estimate. The loaded Desktop ctx_execute_file retained an old plugin-root restriction; the explicit project-root native MCPorter bridge returned matching file length and hash. Dated native Codex and Claude project-file and symbol tasks passed.",
+      "returned_result_summary": "Foundation reporter at 15:50:45 UTC retained separate Context Mode event estimates: Desktop WSL 2,264,064, native Claude 57,856 and native Codex 79,616. They are not matched process-session deltas. 2026-09-20 14:55:58\u201359 UTC retained-file refresh read Desktop WSL 2,143,488 lifetime / 0 session, native Claude 54,016 / 0, and native Codex 71,424 / 1,070,038 upstream estimates. These latest persisted process files are not matched to the fresh acceptance sessions and are not additive. Earlier direct Desktop ctx_execute returned 42 and ctx_stats separately quoted a rounded 1.1M estimate, an upstream-rendered figure (not verified avoidance or provider usage; derive no ratios). The loaded Desktop ctx_execute_file retained an old plugin-root restriction; the explicit project-root native MCPorter bridge returned matching file length and hash. Dated native Codex and Claude project-file and symbol tasks passed.",
       "session_statistics": {
         "availability": "upstream_estimate",
         "value": null,
@@ -380,7 +380,7 @@
         "observed_at": "2026-09-20T14:56:03.739753+00:00",
         "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
         "scope": "Separate latest persisted upstream process files under Desktop WSL, Native Claude and Native Codex runtime roots. These files are not linked to the newly accepted client tasks. Do not sum them or equate them with the directly loaded Desktop connection.",
-        "summary": "Earlier 14:56 persisted session estimates: Desktop WSL 0; native Claude 0; native Codex 1,070,038. Captured around 2026-09-20 14:55:59 UTC from separate runtime-root files, not fresh acceptance-session statistics. An earlier direct Desktop connection separately reported a rounded 1.1M estimate. The later foundation receipt does not establish a trustworthy exact fresh-session Context Mode delta.",
+        "summary": "Earlier 14:56 persisted session estimates: Desktop WSL 0; native Claude 0; native Codex 1,070,038. Captured around 2026-09-20 14:55:59 UTC from separate runtime-root files, not fresh acceptance-session statistics. An earlier direct Desktop connection separately reported a rounded 1.1M estimate, an upstream-rendered figure (not verified avoidance or provider usage; derive no ratios). The later foundation receipt does not establish a trustworthy exact fresh-session Context Mode delta.",
         "scoped_values": [
           {
             "scope": "Desktop WSL",
@@ -409,8 +409,8 @@
           "value": "1.1M (rounded)",
           "unit": "estimated tokens saved",
           "observed_at": "2026-09-20T14:28:53.815791+00:00",
-          "scope": "Existing Desktop connection: 98.9% quoted reduction. This is a byte/event heuristic, not an exact token count or a reading of the separate native-client roots. Snapshot timestamp is the retained observation receipt timestamp; direct tool output remains quoted and rounded.",
-          "summary": "1.1M (rounded) estimated tokens saved. Existing Desktop connection: 98.9% quoted reduction. This is a byte/event heuristic, not an exact token count or a reading of the separate native-client roots."
+          "scope": "Existing Desktop connection: 98.9% quoted reduction. This is a byte/event heuristic, not an exact token count or a reading of the separate native-client roots. Snapshot timestamp is the retained observation receipt timestamp; direct tool output remains quoted and rounded. An upstream-rendered figure whose composition was not traced: upstream defines the kept-out bytes as measured diverted output, but that side can include Claude Code read-redirected rows booked at full file size for Reads context-mode did not block (docs/token-session-handbook.md, Context Mode executor and session store). Not verified avoidance and not provider usage; derive no ratios.",
+          "summary": "1.1M (rounded) estimated tokens saved. Existing Desktop connection: 98.9% quoted reduction. This is a byte/event heuristic, not an exact token count or a reading of the separate native-client roots. An upstream-rendered figure: not verified avoidance and not provider usage; derive no ratios."
         }
       },
       "lifetime_statistics": {
@@ -479,7 +479,7 @@
           }
         ]
       },
-      "baseline_summary": "2026-09-20 Desktop: ctx_execute returned 42; ctx_stats returned '1.1M tokens saved \u00b798.9% reduction' rounded heuristic. Loaded ctx_execute_file still rejected project path due old plugin-root connection; explicit native MCPorter project bridge returned matching file length/hash. 2026-09-20 fresh native Codex and Claude each passed project-file and symbol task.",
+      "baseline_summary": "2026-09-20 Desktop: ctx_execute returned 42; ctx_stats returned '1.1M tokens saved \u00b798.9% reduction' rounded heuristic, an upstream-rendered figure (not verified avoidance or provider usage; derive no ratios). Loaded ctx_execute_file still rejected project path due old plugin-root connection; explicit native MCPorter project bridge returned matching file length/hash. 2026-09-20 fresh native Codex and Claude each passed project-file and symbol task.",
       "artifact_baselines": [],
       "additional_dated_artifact_pairs": [],
       "native_client_evidence": {

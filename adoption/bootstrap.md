@@ -241,12 +241,13 @@ GitHub-hosted macOS runner; see
    ai-memory hook commands name `tools/ai-memory-2.4.1`, the Linux pin; on
    macOS, whose pin is still 2.3.2, see
    [ai-memory hook paths on macOS](platforms/macos-arm64.md#ai-memory-hook-paths-on-macos).
-   `claude.settings.template.json` changed after `v2026.09.26.2` again: it sets `syncClaudeAiSkills` to `false` and `ENABLE_CLAUDEAI_MCP_SERVERS` to `"false"`, so Claude Code neither syncs the claude.ai account's skills nor loads its claude.ai MCP servers ([decision](../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)).
+   `claude.settings.template.json` changed after `v2026.09.26.2` again: it sets `syncClaudeAiSkills` to `false` and `ENABLE_CLAUDEAI_MCP_SERVERS` to `"false"`, so Claude Code neither syncs the claude.ai account's skills nor loads its claude.ai MCP servers ([decision](../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)), and it adds a `Read(**/…)` twin after each `~/`, `//` and `.env` credential deny rule, the `.env` twins ahead of the `!` carve-outs, because Context Mode's server-side path check does not expand `~/` or `//` ([secret storage](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)).
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets
    `OTEL_METRICS_INCLUDE_SESSION_ID` to `true` (Claude Code's default), so each
    session gets its own Prometheus series
    ([writer identity](../observability/collector/README.md#writer-identity-and-counter-integrity)).
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
+   The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
    The rendered `codex.config.toml` keeps the source host's `trusted_hash`
    entries for the ai-memory commands in `~/.codex/hooks.json`, recorded before
    those commands moved to 2.4.x; Codex treats the changed commands as
@@ -387,7 +388,14 @@ GitHub-hosted macOS runner; see
    each command's shell words; everything else in the live file that the
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
-   or any credential store.
+   or any credential store. `tools/adoption/apply_claude_settings.py`
+   changed after `v2026.09.26.2`: a template list entry the live list lacks
+   now joins right after its template neighbour instead of at the end, so a
+   deny rule stays ahead of the `!` carve-outs a host file already holds (a
+   carve-out reaches only the rules before it). The tag's applier appends a
+   missing entry at the end, so it would put the template's Context Mode
+   twins after `Read(!.env.example)` and deny that file again; apply the
+   template from a checkout that has both changes.
    The template registers the `rtk hook claude` Bash hook, so with the rtk 0.50.0 pin also make the `[hooks]` table of rtk's config file (`~/.config/rtk/config.toml` on Linux, or `$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; `~/Library/Application Support/rtk/config.toml` on macOS, where rtk ignores `XDG_CONFIG_HOME`; `rtk config` prints the file on its first line, `evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt`) hold `exclude_commands = ["^git show [^ ]*:", "diff", '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:', '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)']`: inside the existing `[hooks]` table, **replace** the key's whole value, from `exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add a `[hooks]` header line only when the file has no `[hooks]` table (a second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults, `src/core/config.rs:278-281`, rather than erroring): 0.50.0's hook windows `git show <rev>:<path>` blobs, so a piped `| tail` reads the window instead of the file's end, and a rewritten `diff` exits 1 instead of 2 on a missing file; the bare `"^git show [^ ]*:"` pattern misses a `git -C <dir> show HEAD:path` form, which is still windowed (8,261 of 22,907 bytes in one fixture), so the third entry anchors to the git subcommand position, matching `git show REV:path` in a bare, `-C`/`-c`/`--git-dir`/`--work-tree` or other `--flag` global-option form (the same global options rtk's own discovery strips, `GIT_GLOBAL_OPT`, `src/discover/registry.rs:78`) without also excluding a command that merely mentions "show" as an ordinary argument; and `git branch -a`'s branch-name compaction keeps git's local-worktree `+ ` prefix unconditionally ([`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244), specifically `git_cmd.rs:3209-3211`, unchanged on `develop`), but only misreports that branch as remote-only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) -- 31 vs 6 real in one fixture -- so the fourth entry similarly anchors `git branch` to native git ([RTK hook recipe](../recipes/README.md#native-context-mode-and-hooks); retained check `evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`). At `v2026.09.25.2` rtk was pinned at 0.49.0 and `adoption/bootstrap-linux.sh` printed no reminder at all -- the reminder was added after that tag (#291). It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here it requires all four entries, exactly once, to be present. It also changed after `v2026.09.26` in a second way (#314): once the text matches, it runs the installed `rtk hook check` on `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a` and `git -C . branch`, and still reminds unless each answers `No rewrite for: ...` with exit 1, because rtk can ignore a TOML-valid file with the exact text (a `[tracking]` table without `history_days` fails `TrackingConfig`, `src/core/config.rs:152-158`); check the file the same way after any edit. A single-regex alternative tested on 2026-09-26 is retained as evidence only; the adopted recipe is the four-entry set.
    The agent definitions in `adoption/agents/claude/` changed after `v2026.09.26.2` in `blind-adjudicator.md`, whose
    leak check now names the GPT-6 and Claude families (astra, gpt-6-sol, gpt-6-luna, gpt-5.6-terra, fable, mythos);
@@ -437,25 +445,48 @@ GitHub-hosted macOS runner; see
    ```
    Then compare the `gitCommitSha` that landed with the reviewed revisions in
    those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
-   Code does):
+   Code does). `context-mode`, installed from the default branch, also passes
+   by content: GitHub's compare API (`gh api`, signed in at step 3) must report
+   the installed revision `ahead` of the reviewed one with `stats.json` as the
+   only changed file (changed after `v2026.09.26.2`, whose check prints
+   `MISMATCH` for any revision other than the reviewed one):
    ```sh
    python3 - <<'EOF'
-   import json, os, pathlib
+   import json, os, pathlib, re, subprocess
    reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude
        "context-mode@context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b",
        "claude-hud@claude-hud": "ef5f1c8b167572ad1443c70629763ea8780af96b",
        "codex@openai-codex": "db52e28f4d9ded852ab3942cea316258ae4ef346",
    }
+   by_content = {"context-mode@context-mode": "mksglu/context-mode"}  # default-branch install, no ref
+
+   def same_content(repo, base, head):
+       """GitHub's compare API reports head ahead of base with stats.json as the only changed file."""
+       if not re.fullmatch(r"[0-9a-f]{40}", str(head)):
+           return False
+       result = subprocess.run(["gh", "api", f"repos/{repo}/compare/{base}...{head}",
+                                "--jq", "{status, files: [.files[].filename]}"], capture_output=True, text=True)
+       try:
+           return result.returncode == 0 and json.loads(result.stdout) == {"status": "ahead", "files": ["stats.json"]}
+       except ValueError:
+           return False
+
    config = pathlib.Path(os.environ.get("CLAUDE_CONFIG_DIR") or pathlib.Path.home() / ".claude")
    registry = json.loads((config / "plugins/installed_plugins.json").read_text())
    for key, sha in reviewed.items():
        found = [entry.get("gitCommitSha") for entry in registry.get("plugins", {}).get(key, [])]
-       print("ok" if found and set(found) == {sha} else "MISMATCH", key, found or "not installed")
+       if found and set(found) == {sha}:
+           print("ok", key, found)
+       elif key in by_content and len(set(found)) == 1 and same_content(by_content[key], sha, found[0]):
+           print("ok", key, found, "(ahead of the reviewed revision in stats.json only)")
+       else:
+           print("MISMATCH", key, found or "not installed")
    EOF
    ```
-   A `MISMATCH` means this host runs a plugin revision the catalog has not
-   reviewed: record the installed `gitCommitSha` in the step 7 receipt instead
-   of the recipe's revision, and review it before relying on the plugin.
+   Record each installed `gitCommitSha` in the step 7 receipt, with the
+   recipe's revision beside it when they differ. A `MISMATCH` means this host
+   runs a plugin revision the catalog has not reviewed, or the compare could
+   not run: review it before relying on the plugin.
 
 5. **Services.** Start only the selected profile's services using the native
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):

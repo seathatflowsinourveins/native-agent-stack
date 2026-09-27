@@ -89,7 +89,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `codex` · `0.157.1` | Changed after `v2026.09.26.2` (0.155.1 at that tag). Official [openai/codex rust-v0.157.1](https://github.com/openai/codex/releases/tag/rust-v0.157.1), complete package and hash above. Supported package-manager alternative: `npm install --global --prefix "$STACK_HOME/tools/codex-0.157.1" @openai/codex@0.157.1` | `codex --version`, then [native client acceptance](#native-client-acceptance). Preserve the existing account, model, approval policy and sandbox settings. A top-level `--search` does not reach `codex exec` in 0.155.1 or 0.157.1: `codex --search exec ...` keeps exec's default `web_search = "cached"` mode, so request live search with `codex exec -c web_search="live" ...` (measured 2026-09-26 against a loopback fake provider: the search requests carried `external_web_access` false with `--search` and true with the override). Before the first interactive 0.157.x launch, keep `daemon_auto_start = false` under `[features]` in `~/.codex/config.toml` (the bootstrap's [template](../adoption/templates/codex.config.template.toml) sets it; otherwise run `codex features disable daemon_auto_start`): without it that launch copies the package into `CODEX_HOME/packages/app-server-daemon` and starts a self-updating background app-server outside the pinned prefix. The NativeStack WSL2 host switched from 0.155.1 to 0.157.1 on 2026-09-26 and keeps 0.155.1 for rollback; `evidence/receipts/codex-01571-qualification-20260926.json` holds the qualification and the switch and rollback commands. `python3 -B scripts/codex_quota.py --json` reads the account's shared usage window through `codex app-server` ([token practice](../docs/token-practice.md#shared-codex-quota-2026-09-26)). |
 | `codex-for-claude` · `1.0.6` / `db52e28f4d9ded852ab3942cea316258ae4ef346` | `claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user`; `claude plugin install codex@openai-codex --scope user --json` | Optional: `/codex:setup` and `/codex:status` inside Claude. [Bridge scope](#optional-codex-for-claude). A status handshake does not consume a Codex model task or prove one completed. |
 | `context-hub` · `0.1.4` | `npm install --global --prefix "$STACK_HOME/tools/context-hub-0.1.4" @aisuite/chub@0.1.4` | `chub search 'python pytest' --json`; choose an actual returned ID, then `chub get "$DOC_ID" --lang py -o "$STACK_HOME/output/api-doc.md"`. Public registry/download access occurs; do not send feedback or annotations automatically. |
-| `context-mode` · `1.0.169` | Native plugin source, reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: a reviewed revision, not an enforced pin. A Claude marketplace source takes a branch or tag but not a commit, and none is set, so an install or update takes the default branch head; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence. | [Retained Context Mode workflow](#retained-context-mode). After installing, compare the installed `gitCommitSha` with this row ([bootstrap step 4a](../adoption/bootstrap.md)). Read `ctx_stats` as a connection-level estimate, never exact provider savings. |
+| `context-mode` · `1.0.169` | Native plugin source, reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: a reviewed revision, not an enforced pin. A Claude marketplace source takes a branch or tag but not a commit, and none is set, so an install or update takes the default branch head; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence. | [Retained Context Mode workflow](#retained-context-mode). After installing, compare the installed `gitCommitSha` with this row; a revision that GitHub's compare API shows ahead of it with `stats.json` as the only changed file passes by content ([bootstrap step 4a](../adoption/bootstrap.md)). Read `ctx_stats` as a connection-level estimate, never exact provider savings. |
 | `davila7/claude-code-templates` · `c840d6f626be7ba418da60aeb0f2080413562451` | `git clone https://github.com/davila7/claude-code-templates.git "$STACK_HOME/tools/claude-code-templates"`, then `git -C "$STACK_HOME/tools/claude-code-templates" checkout --detach c840d6f626be7ba418da60aeb0f2080413562451` | Optional reference: read `cli-tool/components/skills/productivity/concise-planning/SKILL.md` for a matching task. No all-agent pack installation or runtime E2E is implied. |
 | `difftastic` · `0.71.0` | Official [Wilfred/difftastic 0.71.0](https://github.com/Wilfred/difftastic/releases/tag/0.71.0), archive/hash above | `difft --exit-code --color never fixtures/before.py fixtures/after.py`. Exit **1** means differences with this flag; inspect the diff rather than treating it as a failed installation. |
 | `gitleaks` · `8.30.1` | Official [gitleaks/gitleaks v8.30.1](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1), archive/hash above | `gitleaks git --redact=100 --no-banner --no-color --report-format json --report-path "$STACK_HOME/output/gitleaks.json" "$PROJECT_ROOT"`. Exit 0 means no matches in the scanned scope; distinguish detection from operational errors. On macOS, run it through [`adoption/tools/gitleaks-guarded-macos`](../adoption/tools/README.md#macos-gitleaks-guarded-macos-2026-09-24). In this repository's all-refs history the redacted findings exceed its 6 GiB cap (exit 137), so scan a narrower range there. |
@@ -528,11 +528,13 @@ is part of this recipe.
 ## Retained Context Mode
 
 If a Codex plugin's bundled server starts in its cache directory, selected
-project files may be outside that server's root. The tested project-scoped
-repair preserves the enabled plugin and its hooks, disables only that bundled
-server, and registers the installed upstream `context-mode` command with the
-explicit project directory. Replace both absolute paths in the selected
-project's `.codex/config.toml`:
+project files may be outside that server's root. The default fix is the
+user-scope form below, which the bootstrap template renders. Where one project
+needs its own entry instead, this project-scoped repair preserves the enabled
+plugin and its hooks, disables only that bundled server, and registers the
+installed upstream `context-mode` command with the explicit project
+directory. Replace every `/absolute/project` in the selected project's
+`.codex/config.toml`:
 
 ```toml
 [plugins."context-mode@context-mode".mcp_servers.context-mode]
@@ -542,11 +544,29 @@ enabled = false
 command = "context-mode"
 cwd = "/absolute/project"
 startup_timeout_sec = 60
+default_tools_approval_mode = "approve"
 
 [mcp_servers.context-mode.env]
 CONTEXT_MODE_PLATFORM = "codex"
 CONTEXT_MODE_PROJECT_DIR = "/absolute/project"
+CLAUDE_PROJECT_DIR = "/absolute/project"
 ```
+
+The bare `context-mode` command imports the server directly
+(`src/cli.ts:258-261` at the reviewed revision `6f0cc684`), without upstream
+`start.mjs`, which is what sets `CLAUDE_PROJECT_DIR` and
+`CONTEXT_MODE_PROJECT_DIR` from the launch directory (`start.mjs:38-51`), so
+this form sets both. The server reads the
+project's `.claude/settings*.json` `Bash(...)` denies only through
+`CLAUDE_PROJECT_DIR` (`src/server.ts:1111-1120`, `src/security.ts:363-377`),
+and on Codex 0.157.1 the plugin's PreToolUse hook never sees an MCP tool, so
+without it those denies do not apply to `ctx_*` calls.
+`default_tools_approval_mode = "approve"` is the plugin manifest's own setting
+(`.codex-plugin/mcp.json:10`); without it, a `ctx_*` call that Codex routes to
+approval is refused outright in a session whose approval policy is `never`
+("MCP tool call requires approval, but approval policy is never",
+[`codex-rs/core/src/mcp_tool_call.rs:1610-1614`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/mcp_tool_call.rs#L1610-L1614)).
+Both keys changed after `v2026.09.26.2`.
 
 This uses the supported [bundled MCP server policy](https://developers.openai.com/plugins/build/plugins#bundled-mcp-servers-and-lifecycle-hooks).
 No plugin-cache edits or broader file allowlist are needed. A fresh native
@@ -555,7 +575,7 @@ connection. Both native clients completed the bounded project-file and symbol
 task in the [new client receipt](../evidence/receipts/native-token-focus-clients-20260920.json).
 
 To bind every worktree at once, `adoption/templates/codex.config.template.toml`
-uses a user-scope form (2026-09-26): the same `enabled = false` override, and a
+uses a user-scope form (2026-09-26), the default: the same `enabled = false` override, and a
 `[mcp_servers.context-mode]` entry with no `cwd` that runs the pinned npm
 install's upstream `start.mjs` with `node`. Codex starts a server that has no
 `cwd` in the session's own directory, and `start.mjs` binds

@@ -83,7 +83,7 @@ release, the note is history and the step is in your checkout (`test -e
    `true`, so each Claude session gets its own Prometheus series.
    Before using the rendered settings, follow
    [ai-memory hook paths on macOS](#ai-memory-hook-paths-on-macos).
-   The template changed after `v2026.09.26.2` again: it turns off the claude.ai skill sync (`syncClaudeAiSkills`) and the claude.ai MCP servers (`ENABLE_CLAUDEAI_MCP_SERVERS`) ([decision](../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)).
+   The template changed after `v2026.09.26.2` again: it turns off the claude.ai skill sync (`syncClaudeAiSkills`) and the claude.ai MCP servers (`ENABLE_CLAUDEAI_MCP_SERVERS`) ([decision](../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)), and it adds Context Mode's `Read(**/…)` twins of the credential deny rules ([secret storage](../../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)). `tools/adoption/apply_claude_settings.py` changed after `v2026.09.26.2` as well, so that those twins merge ahead of the `!` carve-outs already in a host's file; apply the template from a checkout that has both.
 4. launchd services and the embedding acceptance ("launchd services" and
    "Embedding backend decision" below).
 5. `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile macos-arm64-foundation --json`
