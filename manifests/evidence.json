@@ -4318,8 +4318,8 @@
     },
     {
       "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md",
-      "sha256": "1f3c93d9092cb1ed97b4e5ba01f253f204f3c6258f8305c1c7ec1126c62cfa81",
-      "bytes": 21446
+      "sha256": "e46bbf1918e63dbb1dd816d58cee63f02a10eb236e01ab27a38c780775676e0a",
+      "bytes": 22730
     },
     {
       "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py",
@@ -29125,6 +29125,21 @@
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
       "sha256": "619afdd1e30773633498215af9a0c881b1ab24632172879ef65421586ec749ab",
       "bytes": 5904
+    },
+    {
+      "path": "evidence/artifacts/gpt6-family-tiering-20260927/README.md",
+      "sha256": "f4b107c50e00ac17131ce5ed89f1dba11e1537e939de1914683319de31a9683b",
+      "bytes": 15786
+    },
+    {
+      "path": "evidence/artifacts/gpt6-family-tiering-20260927/decision.json",
+      "sha256": "555ed71c29a8a33070d9a185b65d69986e31a7955f1ed49b944224414b2a40ea",
+      "bytes": 22460
+    },
+    {
+      "path": "evidence/artifacts/gpt6-family-tiering-20260927/run-record.json",
+      "sha256": "8dc946bd48daa06e417452b3b8a8b8afd5d7bd846b33c144d7fbaa452b691b3d",
+      "bytes": 15311
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
