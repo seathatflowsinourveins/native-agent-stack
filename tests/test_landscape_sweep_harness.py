@@ -1182,16 +1182,20 @@ class RunnerTests(RunnerCase):
     def test_codex_sandbox_mount_targets_are_not_repositories(self):
         # Codex's Linux sandbox leaves an empty .git (directory or file) under its writable roots while a command runs
         # (codex-rs/linux-sandbox/src/bwrap.rs, SyntheticMountTarget); only a real marker makes a repository.
-        for kind in ("empty-dir", "empty-file", "gitdir-file"):
+        for kind in ("empty-dir", "empty-file", "gitdir-file", "unborn-head-symlink"):
             with self.subTest(kind=kind):
                 root = temp_dir(self)
                 if kind == "empty-dir":
                     (root / ".git").mkdir()
+                elif kind == "unborn-head-symlink":
+                    # git allows HEAD to be a symlink to a branch that has no commit yet (a dangling link): a repository.
+                    (root / ".git").mkdir()
+                    (root / ".git" / "HEAD").symlink_to("refs/heads/main")
                 else:
                     (root / ".git").write_text("gitdir: /elsewhere/.git\n" if kind == "gitdir-file" else "",
                                                encoding="utf-8")
                 (root / "w").mkdir()
-                expected = root if kind == "gitdir-file" else None
+                expected = root if kind in ("gitdir-file", "unborn-head-symlink") else None
                 self.assertEqual(codex_job.inside_repository(root / "w"), expected)
                 self.assertEqual(sweep_common.inside_repository(root / "w"), expected)
 
