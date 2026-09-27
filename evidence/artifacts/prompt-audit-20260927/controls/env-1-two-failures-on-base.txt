@@ -1,0 +1,38 @@
+# the full suite's two failures also fail on the unmodified base (expect FAILED, failures=1, errors=1). The order-throughput test passes dir="/tmp" to tempfile (tests/test_order_throughput.py:234). The tiering test's fixture starts run_arm.py with only PATH, CODEX_HOME and HOME (tests/test_gpt6_family_tiering_20260926.py:305), so the child's tempfile.gettempdir() is /tmp, which checked_scratch_root refuses (blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py:733-740). Both refuse /tmp because this host has a stray /tmp/.git directory (modified 2026-09-27 13:46:30.773466600 -0400), and each check treats any .git entry as a repository
+# commit as run: b26add90becaed49cfd74f3cf48126b7fa9b5c86 (base origin/main: b26add90becaed49cfd74f3cf48126b7fa9b5c86)
+# blobs as run (git hash-object):
+#   4c7663458023cba90a2aa9b868f1b80f28873cb4  tests/test_order_throughput.py
+#   06e07675378114a706971866ecb7a1a827e579d6  tests/test_gpt6_family_tiering_20260926.py
+# Python 3.13.15; TMPDIR set to a directory outside /tmp
+$ python3 -m unittest -v tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network tests.test_gpt6_family_tiering_20260926.RunnerTests.test_sigterm_records_the_running_call_as_interrupted_without_counting_it
+test_cli_refuses_live_base_url_from_env_file_without_network (tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network) ... ERROR
+test_sigterm_records_the_running_call_as_interrupted_without_counting_it (tests.test_gpt6_family_tiering_20260926.RunnerTests.test_sigterm_records_the_running_call_as_interrupted_without_counting_it) ... FAIL
+
+======================================================================
+ERROR: test_cli_refuses_live_base_url_from_env_file_without_network (tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<base>/tests/test_order_throughput.py", line 243, in test_cli_refuses_live_base_url_from_env_file_without_network
+    code = c.main(["paper", "--env-file", str(env), "--output", str(out)])
+  File "<base>/blueprints/us-equities/order-throughput/capacity.py", line 1589, in main
+    key, secret = credentials(args.env_file)
+                  ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<base>/blueprints/us-equities/adaptive-paper/runner.py", line 111, in credentials
+    raise SafetyError(str(error)) from None
+safety.SafetyError: credential_file_permissions:worktree
+
+======================================================================
+FAIL: test_sigterm_records_the_running_call_as_interrupted_without_counting_it (tests.test_gpt6_family_tiering_20260926.RunnerTests.test_sigterm_records_the_running_call_as_interrupted_without_counting_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<base>/tests/test_gpt6_family_tiering_20260926.py", line 811, in test_sigterm_records_the_running_call_as_interrupted_without_counting_it
+    self.assertEqual(process.returncode, RUN.EXIT_INTERRUPTED, stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 5 : run_arm: the temporary directory /tmp must lie outside the state directory and every repository
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 30.079s
+
+FAILED (failures=1, errors=1)
+# exit 1

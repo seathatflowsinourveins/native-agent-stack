@@ -256,8 +256,9 @@ provides it.
   - `proposed` must equal the set of adjudicated repositories, and every proposal gets both votes.
 - **`prompts_sha256`.** This is `sha256(json.dumps(T, sort_keys=True, ensure_ascii=False))` of the run's frozen,
   dated templates. `build_args.py` writes it to `prompts_sha256.txt`. With the 2026-09-26 values filled in, the
-  templates here give `3adfbed7…18d4` (tested), the value computed on 2026-09-26 from that run's staged
-  `templates.json`. That is a local check; the run's registered record is the evidence of what it used.
+  templates here give `PROMPTS_SHA256_CURRENT` in `tests/test_landscape_sweep_harness.py`, which changes with
+  every intended template edit; the 2026-09-26 run's own value is kept there as `PROMPTS_SHA256_20260926`.
+  That is a local check; the run's registered record is the evidence of what it used.
 - **Manifest.** `manifest_ref` is the dated SOTA manifest built from `lanes.json`. The record's `date` is its
   `checked_at`, and the manifest's rows for this lane must equal each layer's proposals and survival.
 - **Source reviews.** Each survivor needs one registered source review whose `layers` names the layer.
@@ -497,11 +498,12 @@ new run from the latest retained record, and say so when no record exists yet.
 
 ## Differences from the 2026-09-26 prototype
 
-Parity with the prototype is not established by this package. On 2026-09-26 three unretained local checks were
-run (prompt bytes, the smoke's conversion, `usage_record.py` on the smoke's transcripts); their outputs are not
-kept, so they are not evidence. `PROMPTS_SHA256_20260926` in the tests is the value this package computes from its
-templates, and it matches the 2026-09-26 run only if that run's retained record carries the same
-`prompts_sha256`. Treat parity as unverified until that record is registered and compared.
+The prompt templates are the only part with a retained comparison to the prototype. Until the 2026-09-27 template edits (#385),
+this package's templates filled with the run's values gave `PROMPTS_SHA256_20260926` in the tests (a local check),
+and the run's registered record, `landscape-sweep-20260926` in `catalogs/saturation/ledger.json`, carries the same
+`prompts_sha256`. On 2026-09-26 three unretained local checks were run (prompt bytes, the smoke's conversion,
+`usage_record.py` on the smoke's transcripts); their outputs are not kept, so they are not evidence, and parity of
+the smoke's conversion and of `usage_record.py` stays unverified.
 
 The deliberate changes:
 

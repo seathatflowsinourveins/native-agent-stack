@@ -41,8 +41,9 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # PROMPTS_SHA256_CURRENT, the sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False). An intended template edit
 # changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it.
 # 2026-09-27: the maintenance rule is derived from the OpenSSF Scorecard Maintained check, and licenses are information only
-# (never a refutation reason), per the operator's 2026-09-26/27 decisions.
-PROMPTS_SHA256_CURRENT = "f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d"
+# (never a refutation reason), per the operator's 2026-09-26/27 decisions. Later on 2026-09-27 the facts refuter
+# gained the unknown-field, maintenance and license exceptions (docs/decisions/2026-09-27-prompt-audit-resolution.md).
+PROMPTS_SHA256_CURRENT = "11fcd52312b96845a23d14ff739322bb9827eae33fd8760dff241585453b0107"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -255,7 +256,8 @@ class TemplateTests(unittest.TestCase):
         self.assertNotIn("license and platform fit", common)
         self.assertNotIn("OSI or clearly usable license", common)
         self.assertNotIn("license is non-commercial", fit)
-        # No role other than the facts refuter's accuracy check may treat a license as a criterion.
+        # No role treats a license as a criterion: the facts refuter records a wrong or unverifiable license in its
+        # reasoning and never refutes on it.
         for key, text in templates.items():
             for phrase in ("license is non-commercial", "restrictive license", "unclear license", "usable license"):
                 self.assertNotIn(phrase, text, f"{key} still uses a license as a criterion: {phrase!r}")
@@ -268,6 +270,17 @@ class TemplateTests(unittest.TestCase):
         # A lane that cannot reach the commit evidence (the web-only GPT-6 lane) never refutes on it.
         self.assertIn("never excludes or refutes a repository on unknown maintenance", common)
         self.assertIn("unknown maintenance is never a reason to refute", fit)
+
+    def test_the_facts_refuter_states_the_unknown_field_maintenance_and_license_exceptions(self):
+        # The facts refuter gets common and each proposal's upstream_now in one prompt (sweep.js), so its
+        # refute-when-uncertain default must name common's exceptions; #385 changed common and fit only
+        # (docs/decisions/2026-09-27-prompt-audit-resolution.md).
+        facts = json.loads((HARNESS / "templates.json").read_text())["facts"]
+        for phrase in ("a null upstream_now field means unknown",
+                       "record an unverifiable commit or activity fact as unknown",
+                       "none of these is a reason to refute",
+                       "a wrong or unverifiable license as a correction or as unknown"):
+            self.assertIn(phrase, facts)
 
     def test_only_per_call_placeholders_remain_after_filling(self):
         frozen = filled_templates()

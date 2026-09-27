@@ -1,0 +1,4 @@
+Task: adjudicate the six units in the input below and answer only in the required JSON, one entry per unit id
+(F1, F2, F3X7, N1, X9, N3). Read the original files at the repository root named in the input; do not write, install
+or change anything. You may search the web for current official documentation; cite official sources only.
+
