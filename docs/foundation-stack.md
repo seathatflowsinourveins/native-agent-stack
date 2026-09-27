@@ -213,7 +213,7 @@ For owned lifecycle, preserve the same DATA_DIR/secrets through restart. Upstrea
 Since 2026-09-27 the workstation's gateway pools its Codex accounts for GPT-6 lanes. The [decision record](decisions/2026-09-27-omniroute-account-pool.md) holds the reasons, the keyless loopback posture and its risk, and the overturn conditions. Its [evidence](../evidence/artifacts/omniroute-gateway-20260927/README.md) holds the build provenance, the installed unit and the probes.
 
 **What runs.** A source build of upstream's default branch `release/v3.8.51` at [`a58000c7`](https://github.com/diegosouzapw/OmniRoute/commit/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3), with two open upstream PRs cherry-picked:
-- [#14904](https://github.com/diegosouzapw/OmniRoute/pull/14904): without it, every `/v1` inference route answers HTTP 500 behind Next 16.3.5's request Proxy;
+- [#14904](https://github.com/diegosouzapw/OmniRoute/pull/14904): without it, on Node 24 (this host) and Node 26 (upstream's Docker base), every `/v1` inference route answers HTTP 500 behind Next 16.3.5's request Proxy;
 - [#13788](https://github.com/diegosouzapw/OmniRoute/pull/13788): `/v1/alpha/search`, which Codex's standalone `web.run` calls.
 
 The component pin in `manifests/stack.json` stays 3.8.50 until npm publishes 3.8.51 or upstream carries both fixes.
@@ -227,7 +227,7 @@ The component pin in `manifests/stack.json` stays 3.8.50 until npm publishes 3.8
   6. the fresh-prefix install and the allowlisted `npm rebuild` above, with the packed tarball in place of `omniroute@3.8.50`.
 
   The exact commands, digests and toolchain are in `build-provenance.json`.
-- **Service.** Run it from the values-free template [`adoption/templates/systemd/omniroute.service`](../adoption/templates/systemd/omniroute.service): `omniroute serve --port 20128 --no-open --no-tray` on loopback, with `Restart=on-failure`, secrets only through `EnvironmentFile=`, and no `--daemon`.
+- **Service.** Run it from the values-free template [`adoption/templates/systemd/omniroute.service`](../adoption/templates/systemd/omniroute.service): `omniroute serve --port 20128 --no-open --no-tray` on loopback, with `Restart=on-failure` and no `--daemon`. The unit holds no secret, and its secrets come only through `EnvironmentFile=`. A user service also inherits the user manager's environment, so keep credentials out of the manager.
 - **Effort.** `a58000c7` caps `gpt-6-astra` at `ultra` ([`reasoningSuffix.ts` L11-31](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/reasoningSuffix.ts#L11-L31)), and sends `max` on the wire for `ultra` ([`codex.ts` L1463](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1463)). The gateway's `call_logs` recorded `max` requested and `max` upstream. Keep Thinking Budget `passthrough`.
 - **Compression.** `a58000c7` compresses native Codex passthrough when compression is on. Keep the global switch off, and add `codex/*` to the exclusions, as upstream's own comment advises ([`chatCore.ts` L1429-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1429-L1449)).
 - **Codex.** Codex calls `cx/gpt-6-astra` directly through `[model_providers.omniroute]` and the `omniroute` profile. No router alias is written on this build. Set session affinity above the task length (`sessionAffinityTtlMs`).

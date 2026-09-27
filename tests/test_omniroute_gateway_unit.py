@@ -4,8 +4,10 @@ Offline text checks only, in the style of test_token_report_refresh_units.py. No
 verifies a unit with a live systemd manager; `systemd-analyze --user verify` on a rendered copy is a separate, manual
 acceptance check. The template must render to the unit recorded as installed on the workstation
 (evidence/artifacts/omniroute-gateway-20260927/omniroute.service), apart from its Description= and one documented
-extra line. Secrets may reach the service only through EnvironmentFile=, and every Environment= line carries a reason
-comment. Each check is a helper function that a planted violation must fail (the discriminating controls at the end).
+extra line. The unit text holds no secret, names exactly one EnvironmentFile= and gives every Environment= line a reason
+comment. A text test cannot see what a user service inherits from the user manager's environment; the template's header
+says how to keep credentials out of it. Each check is a helper function that a planted violation must fail (the
+discriminating controls at the end).
 """
 
 from __future__ import annotations
@@ -91,7 +93,7 @@ class OmniRouteUnitTemplateTests(unittest.TestCase):
             self.assertIn(f"@{name}@", header, f"@{name}@ is not documented in the header")
         self.assertEqual(PLACEHOLDER.findall("\n".join(directives(render(self.template, WORKSTATION)))), [])
 
-    def test_secrets_arrive_only_through_one_environment_file(self):
+    def test_no_inline_secret_and_exactly_one_environment_file(self):
         lines = directives(self.template)
         self.assertEqual([line for line in lines if line.startswith("EnvironmentFile=")],
                          ["EnvironmentFile=%h/.local/share/omniroute/server.env"])

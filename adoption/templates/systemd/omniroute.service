@@ -16,7 +16,12 @@
 #                           Codex pin.
 # %h is systemd's own specifier for the invoking user's home directory and needs no substitution.
 #
-# Secrets arrive only through EnvironmentFile=, and no value belongs in this unit. The file is:
+# No secret belongs in this unit, and the only secrets it adds come through EnvironmentFile=. A user service also
+# inherits the user manager's environment (systemd.exec(5), "Environment Variables in Spawned Processes"), and serve
+# passes its whole environment to the server child. So keep credentials out of the manager; list its variable names
+# with `systemctl --user show-environment | cut -d= -f1`.
+#
+# The environment file is:
 #   mode 0600 inside the 0700 data directory;
 #   plain NAME=value lines, the format upstream's scripts/build/bootstrap-env.mjs itself writes to
 #   {DATA_DIR}/server.env. systemd drops `export NAME=value` lines, so never point this at a native-agent-stack

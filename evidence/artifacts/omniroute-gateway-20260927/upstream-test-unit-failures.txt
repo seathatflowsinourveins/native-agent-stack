@@ -78,3 +78,12 @@ tests/unit/source-scanner-guards.test.ts
 18a19
 > ✖ hard-lease credential, executor, and connection-query inventory has no unclassified site
 diff rc=1
+
+## When the run happened (correction, added 2026-09-27T08:33:40Z after the GPT-6 review flagged the timestamps)
+- The record's author's own ps at 2026-09-27T07:45:47Z showed 'timeout 5400 npm run test:unit -- --test-reporter=tap'
+  with elapsed time 14:43, so the run started at about 07:31:04Z.
+- The output file was last written at 2026-09-27T08:03:29Z (its mtime), and the runner reports duration_ms 1944452 (32 min 24 s):
+  07:31:04Z + 32:24 = 08:03:28Z, consistent with the mtime.
+- So the run spanned about 07:31Z-08:03Z. The coordinator's upstream-test-unit-summary.txt says '07:45-08:17Z'; that range
+  does not match these observations and is left verbatim in that file as the coordinator wrote it. This file's own
+  extraction (header timestamp) came after the run had ended.

@@ -8,13 +8,13 @@ agent-sdks layer default is unchanged (decision 6).
 **Scope:**
 - new: this record; [`evidence/artifacts/omniroute-gateway-20260927/`](../../evidence/artifacts/omniroute-gateway-20260927/README.md);
   the values-free unit template `adoption/templates/systemd/omniroute.service` with its structural test
-  `tests/test_omniroute_gateway_unit.py`.
+  `tests/test_omniroute_gateway_unit.py`; a narrow `.gitignore` exception for this evidence directory's `*.jsonl`.
 - changed:
   - `docs/foundation-stack.md`: its 3.8.50-only statements are scoped to 3.8.50, and a short section describes this
     build;
   - `manifests/stack.json`: the omniroute component records the running build without changing its release pin
     (decision 7);
-  - `catalogs/foundation/manifest.json`: the native-clients and observation-inference layer text;
+  - `catalogs/foundation/manifest.json`: the native-clients layer text;
   - the `omniroute` entry of `adoption/credential-inventory.json` and its row in `docs/secret-storage.md`.
 - untouched:
   - the host;
@@ -28,6 +28,11 @@ Upstream prefixes used below:
 - `OR` = https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3
 - `OR50` = https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb (tag v3.8.50)
 - `CX` = https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs
+
+**About the settings synthesis.** The coordinator's settings synthesis of 2026-09-27 and its verified research
+rows are not retained in this repository. That covers the K, U and X items named below. This record uses them only
+as recommendations it adopts or declines, and says so where it does. Every factual claim here carries its own
+upstream citation or retained output.
 
 ## Context
 
@@ -44,7 +49,7 @@ The user's direction on 2026-09-27 (UTC, intent quoted from the session):
 - about 06:55Z, the workload: multi-hour GPT-6-heavy convergence through SOTA harness frameworks, with GPT-6 powering
   runtime workers.
 
-Two facts ruled out the published release. OmniRoute's npm `latest` is 3.8.50, and 3.8.51 is unpublished
+OmniRoute's published release was ruled out. npm `latest` is 3.8.50, and 3.8.51 is unpublished
 ([`upstream-state.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-state.txt)). 3.8.50 has two
 problems for this lane:
 - **The effort clamp.** 3.8.50 clamps any model missing from its effort table to `xhigh`: `MAX_EFFORT_BY_MODEL[model]
@@ -60,21 +65,29 @@ for `ultra` is `max` (OR `open-sse/executors/codex.ts` L354-355 and L1463).
 
 That commit had two defects on this host.
 
-1. **Every `/v1` inference route answered HTTP 500.** Codex reports this as "high demand". The cause is
-   `withDeadlineSignal` (OR `open-sse/utils/earlyStreamKeepalive.ts:341`, added by 8c05ec42 #14808 on 2026-09-25).
-   It builds `new Request(request, {signal, headers})`. Next 16.3.5's app-route runtime hands `dynamic: auto` routes a
-   Proxy (`proxyNextRequest`, `next/dist/server/route-modules/app-route/module.js` L626-629). The `Request`
-   constructor then reads the input's private `#state` through that Proxy. The reproduction fails on all three Node
-   lines ([`proxy-repro.txt`](../../evidence/artifacts/omniroute-gateway-20260927/proxy-repro.txt)):
-   - Node 24.21.0 (undici 7.29.1) and Node 26.10.0 (undici 8.10.2, upstream's Docker base) throw the `#state`
-     TypeError;
-   - Node 22.23.3 (undici 6.28.1) throws "already been used".
+1. **Every `/v1` inference route answered HTTP 500 on the host's Node 24.** Codex reports this as "high demand".
+   - **The cause.** `withDeadlineSignal` (OR `open-sse/utils/earlyStreamKeepalive.ts:341`, added by 8c05ec42 #14808
+     on 2026-09-25) builds `new Request(request, {signal, headers})`. Next 16.3.5's app-route runtime hands
+     `dynamic: auto` routes a Proxy (`proxyNextRequest`, `next/dist/server/route-modules/app-route/module.js`
+     L626-629). On the newer Node lines the `Request` constructor then reads the input's private `#state` through that
+     Proxy.
+   - **The corrected reproduction**
+     ([`proxy-repro-independent.txt`](../../evidence/artifacts/omniroute-gateway-20260927/proxy-repro-independent.txt))
+     gives each arm its own `Request`. A Proxy-wrapped POST and GET fail with the `#state` TypeError on Node 24.21.0
+     (undici 7.29.1) and Node 26.10.0 (undici 8.10.2); Node 26 is upstream's Docker base, `FROM node:26-trixie-slim`
+     at `Dockerfile` L2. The same cases construct on Node 22.23.3 (undici 6.28.1).
+   - **A flaw in the first reproduction.** The coordinator's first reproduction,
+     [`proxy-repro.txt`](../../evidence/artifacts/omniroute-gateway-20260927/proxy-repro.txt), shared one POST body
+     between its arms. Its Node 22 "already been used" error came from that shared body, not from the Proxy. That was a
+     finding of this record's cross-family review.
+   - **What this means.** Node 22 is within upstream's engines (`>=22.22.2 <23 || >=24.0.0 <27`) and might avoid the
+     construction failure, but the gateway was not run on it.
 
-   So a runtime switch cannot fix it. Three upstream fixes were open on 2026-09-26, all unreviewed: #14872, #14886 and
-   #14904.
+   Three upstream fixes were open on 2026-09-26, all unreviewed: #14872, #14886 and #14904.
 2. **Codex's standalone `web.run` POSTs `<base_url>/alpha/search` and got 404.** The peer's parity probe found this.
    Upstream #13788 serves that route. It is labelled `deferred-v3.8.52` and adds two files, the route and its test.
-   Its second commit is the maintainer's own "sanitize unexpected internal errors".
+   Its second commit is the maintainer's own "sanitize unexpected internal errors". A source build was therefore
+   needed whatever the Node line.
 
 Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: release/v3.8.51" is open. At
 07:58Z these check runs had failed ([`upstream-state.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-state.txt)):
@@ -94,7 +107,8 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      - client-abort propagation;
      - a body-less GET case.
 
-     It also preserves `redirect` and adds the changelog fragment.
+     It also preserves `redirect` and adds the changelog fragment. A fix in the code, rather than a pin to one Node
+     line, also covers upstream's Node 24 and 26 targets.
    - **#13788** (head `6c799005`) is applied as `b9f0d76e` and `dd6e9607`.
    - **Fidelity of the picks.** Each applied commit has the same stable patch-id as its upstream commit. The build
      head's tree is `6f3f9a23068b6640b1084682dba6aab144ddbdc2`
@@ -124,28 +138,37 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
    - **Addresses.** Loopback only: 127.0.0.1 on ports 20128, 20131 and 20132.
    - **No `--no-recovery`.** Upstream labels it "Disable auto-restart on crash (debugging mode)". The default
      in-process supervisor (two restarts) runs under systemd's `Restart=on-failure`.
-   - **Secrets through `EnvironmentFile=` only.** The unit reads `%h/.local/share/omniroute/server.env`, which lives
-     inside `DATA_DIR`.
+   - **No secret in the unit; the unit adds its secrets only through `EnvironmentFile=`.** The unit reads
+     `%h/.local/share/omniroute/server.env`, which lives inside `DATA_DIR`.
      - **How it was made.** `scripts/make_server_env.py.txt` generated it with `O_EXCL` at mode 0600 in a 0700
        directory, without printing values. `scripts/make_passwordless.py.txt` then made the decision-5 change.
      - **What it holds.** Generated `JWT_SECRET`, `API_KEY_SECRET` and `STORAGE_ENCRYPTION_KEY` (and
        `STORAGE_ENCRYPTION_KEY_VERSION`), plus non-secret `DATA_DIR`, `PORT`, `OMNIROUTE_SERVER_HOST=127.0.0.1` and
        `REQUIRE_API_KEY=false`.
-     - **Its format.** Plain `NAME=value` lines. That is the layout and format of upstream's
-     own bootstrap, which persists generated secrets to `{DATA_DIR}/server.env` as `NAME=value` lines (OR
-     `scripts/build/bootstrap-env.mjs` L1-19 and L183-186).
+     - **Its format.** Plain `NAME=value` lines. That is the layout and format of upstream's own bootstrap, which
+       persists generated secrets to `{DATA_DIR}/server.env` as `NAME=value` lines (OR
+       `scripts/build/bootstrap-env.mjs` L1-19 and L183-186).
 
-     Two reasons make `EnvironmentFile=` safe here:
-     - **The file format.** systemd v255 drops `export NAME=value` lines (`src/basic/env-util.c` L28-50, the settings
-       research's row 34), and this file has none. The repository's credential stores use the `export` form, so no
-       unit points at them.
-     - **The exposure.** OmniRoute reads these values from its process environment. They are therefore in
-       `/proc/<pid>/environ` with any loader, the subshell loader included. That is the same accepted inconsistency
-       the `grafana-admin` inventory entry and `docs/secret-storage.md` ("Process environment") record for Grafana's
-       loopback unit. `docs/secret-storage.md` step 9's "do not use `EnvironmentFile=`" covers services that accept
-       `--env-file`.
+     A systemd user service also inherits the user manager's environment (systemd.exec(5), "Environment variables in
+     spawned processes"). `serve` then hands its whole environment to the server child, so any credential exported
+     into the user manager would reach the gateway. Keep credentials out of the manager: list its variable names with
+     `systemctl --user show-environment | cut -d= -f1`.
+
+     Why `EnvironmentFile=` fits here:
+     - **The file format.** systemd v255 drops `export NAME=value` lines
+       ([`src/basic/env-util.c` L28-50 at v255](https://github.com/systemd/systemd/blob/v255/src/basic/env-util.c#L28-L50)),
+       and this file has none. The repository's credential stores use the `export` form, so no unit points at them.
+     - **The exposure.** This departs from `docs/secret-storage.md` step 9, which says services pass `--env-file`
+       and do not use `EnvironmentFile=`, because `EnvironmentFile=` puts values into `/proc/<pid>/environ`. The
+       exposure is the same with any loader, including upstream's own:
+       - the `omniroute` CLI loads its env files into `process.env` (OR `bin/omniroute.mjs` L134-216);
+       - `serve` spawns the server with `{...process.env, …}` (OR `bin/cli/commands/serve.mjs` L281-298);
+       - so the secrets are in the server process's environment either way.
+
+       This is the same accepted exception that `docs/secret-storage.md` ("Process environment") and the
+       `grafana-admin` inventory entry record for Grafana's loopback unit.
    - **Non-secret `Environment=` lines, each with its reason in the unit:**
-     - `OMNIROUTE_MEMORY_MB=16384`: upstream accepts 64..16384 inclusive, `scripts/build/runtime-env.mjs` L19.
+     - `OMNIROUTE_MEMORY_MB=16384`: upstream accepts 64..16384 inclusive (OR `scripts/build/runtime-env.mjs` L19).
      - `CODEX_CLIENT_VERSION=0.157.1`: the installed client. It is the fallback for paths that do not forward the
        caller's version (OR `src/shared/constants/codexClient.ts`).
      - `STREAM_READINESS_TIMEOUT_MS=600000` and `STREAM_READINESS_MAX_TIMEOUT_MS=600000`: the defaults are 80000 and
@@ -176,8 +199,8 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
        `"fill-first"` (OR `src/sse/services/auth.ts` L1952-1957).
      - Affinity runs first.
      - `docs/routing/AUTO-COMBO.md` recommends sticky 1 for one-model rotation.
-     - There is no combo and no router alias. Codex calls `cx/gpt-6-astra` directly, which is K1 of the settings
-       synthesis.
+     - There is no combo and no router alias. Codex sends `cx/gpt-6-astra`, and the gateway logged the upstream model
+       as `gpt-6-astra` (`probe-lane-run2.json`, `gateway-effort-rows.json`).
    - `promptCacheAffinityEnabled = true`, the default, is kept.
    - Compression stays off: `enabled=false` and `defaultMode="off"`, the seeded defaults.
    - `exclusions = ["codex/*"]`. `a58000c7` removed 3.8.50's native-passthrough compression bypass, and upstream's own
@@ -209,19 +232,26 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      keyless gateway accepts.
    - **Worker lanes.** They use #387's lane-local `CODEX_HOME` with the same provider fields
      (`tools/sota-convergence/landscape-sweep/README.md`, "GPT-6 through OmniRoute").
-   - **Not decided here.** The settings synthesis (K2) recommends moving the provider block out of the host base
-     config into the profile, so base config matches `adoption/templates/codex.config.template.toml`. That is the
+   - **Not decided here.** The settings synthesis recommends moving the provider block out of the host base config
+     into the profile (its K2), so base config matches `adoption/templates/codex.config.template.toml`. That is the
      Codex-templates unit's scope, not this record's.
 5. **Passwordless and keyless, by the user's decision.**
-   - **The settings.** `requireLogin=false`, `REQUIRE_API_KEY=false` and `INITIAL_PASSWORD` removed. When
-     `INITIAL_PASSWORD` is set, OR `src/lib/db/settings.ts` L301-311 forces `requireLogin=true` as a headless deploy.
-   - **Recorded risk.** Any local process can call the management API, including hook registration. Hooks can read
-     and rewrite prompts. The `a58000c7` isolated-realm fix closes the sandbox escape, but not hook registration
-     itself. Inference keys are advisory.
+   - **The settings.** `requireLogin=false`, `REQUIRE_API_KEY=false` and `INITIAL_PASSWORD` removed. While first-time
+     setup is incomplete, a set `INITIAL_PASSWORD` makes upstream mark setup complete and force `requireLogin=true`
+     as a headless deploy (OR `src/lib/db/settings.ts` L301-311: `!settings.setupComplete &&
+     process.env.INITIAL_PASSWORD`).
+   - **Recorded risk.** Any local process can call the management API, including hook registration.
+     - With login off, the management policy admits an anonymous `auth-disabled` subject on paths that are not always
+       protected (OR `src/server/authz/policies/management.ts` L261-266).
+     - `/api/middleware/` is only loopback-gated (OR `src/server/authz/routeGuard.ts` L79).
+     - Its `POST` registers hooks (OR `src/app/api/middleware/hooks/route.ts` L79), and hooks can read and rewrite
+       prompts.
+     - The `a58000c7` isolated-realm fix closes the sandbox escape, but not hook registration itself.
+     - Inference keys are advisory.
    - **Mitigation.** The bind is loopback only, on a single-user workstation.
    - **Overturn.** Any multi-user or non-loopback exposure, or any untrusted local process.
-   - **What the user overrode.** The settings synthesis recommended requiring the key and the login (K7, U2, and the
-     settings research's rows 2, 24 and 25). The user's 06:05Z direction overrides that.
+   - **What the user overrode.** The settings synthesis recommended requiring the key and the login (its K7 and U2).
+     The user's 06:05Z direction overrides that.
 6. **What "adopted" covers, and the gate that stays.**
    - **The gateway lane's uses.** The landscape sweep, on the user's direction, through #387's lane
      (`build_args.py --gpt6-provider omniroute`). The peer's 8-check mechanical parity probe on build `dd6e9607e` is
@@ -234,7 +264,8 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      no layer verdict.
    - **Two other checks that are not that gate:**
      - the peer's mechanical probe;
-     - the settings synthesis's preregistered `omniroute-codex-max-parity` experiment (X1), which has not run.
+     - `omniroute-codex-max-parity`, the gateway-parity experiment sketched in the settings synthesis (its X1). It is
+       not frozen in this repository and has not run.
 
      Native Codex remains the max-quality default until a preregistered comparison says otherwise.
 7. **Repository records.**
@@ -243,10 +274,11 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      cherry-picks. So the omniroute pin stays the published release 3.8.50 (`5458026c`). The component's `freshness`
      and `command_scope` record the base commit, the picks and `BUILD_SHA`, and point here. `upstream_sources` gains
      the base commit and the two PRs.
-   - **The unit template is values-free.** Prefix placeholders stand in for paths, and secrets arrive only through
-     `EnvironmentFile=`. It mirrors the installed unit, with one addition: `Environment=OMNIROUTE_SERVER_HOST=127.0.0.1`.
-     `omniroute serve` binds `0.0.0.0` when that variable is unset (OR `bin/cli/utils/serverHost.mjs` L16-26), and the
-     keyless posture needs loopback. On the workstation the environment file already sets the same value.
+   - **The unit template is values-free.** Prefix placeholders stand in for paths, no secret is written in it, and
+     the only secrets it adds come through `EnvironmentFile=`. It mirrors the installed unit, with one addition:
+     `Environment=OMNIROUTE_SERVER_HOST=127.0.0.1`. `omniroute serve` binds `0.0.0.0` when that variable is unset (OR
+     `bin/cli/utils/serverHost.mjs` L16-26), and the keyless posture needs loopback. On the workstation the
+     environment file already sets the same value.
    - **The inventory.** The `omniroute` entry describes a keyless loopback gateway with an optional per-lane key.
 
 ## Evidence
@@ -279,14 +311,18 @@ The classes are kept separate.
   - **Peer parity:** 8 of 8 mechanical checks on `dd6e9607e` (decision 6). It is reported in #387's merged commit
     message; its outputs are not retained here.
 - **Unchanged upstream tests, on a non-release tree:**
-  - 26 route and keepalive test files on `a58000c7` + #14904 with upstream's own runner: 184 of 186 pass, 0 fail, 2
-    skipped ([`upstream-tests-route-keepalive.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-tests-route-keepalive.txt)).
-  - The coordinator also reported:
+  - **26 route and keepalive test files on `a58000c7` + #14904**, run with upstream's runner:
+    - 184 of 186 pass, 0 fail;
+    - 2 skipped, both upstream's own skips ("ReadableStream error simulation hangs in Node.js test runner");
+    - #14904's two cases pass: the Proxy-wrapped request and the body-less GET.
+
+    Sources: [`upstream-tests-route-keepalive.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-tests-route-keepalive.txt),
+    [`upstream-tests-route-keepalive-detail.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-tests-route-keepalive-detail.txt).
+    The exact command line and the list of the 26 files are reported, not retained.
+  - **Reported by the coordinator, outputs not retained:**
     - `tests/unit/early-stream-keepalive.test.ts` at 25 of 26 on the `a58000c7` source, where the Proxy case fails
       with the production error, and 26 of 26 with the fix;
     - upstream's `issue-8674-alpha-search` test at 10 of 10, with keepalive still 26 of 26.
-
-    Those outputs are not retained, so they count as reported, not retained.
   - **Upstream's `npm run test:unit` on the `dd6e9607e` tree, first stage**
     ([`upstream-test-unit-summary.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-test-unit-summary.txt),
     [`upstream-test-unit-failures.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-test-unit-failures.txt)):
@@ -307,19 +343,25 @@ The classes are kept separate.
 
   The compiled-output check (the fixed construction in 2 places and the Proxy-input form in 0, with the old build the
   reverse) is reported, not retained.
-- **Synthetic fixture:** the ten-line `Request`-over-`Proxy` reproduction on three Node runtimes (`proxy-repro.txt`).
+- **Synthetic fixture:** the `Request`-over-`Proxy` reproduction on three Node runtimes. The corrected
+  `proxy-repro-independent.txt` supersedes the first `proxy-repro.txt`, which is kept with its flaw noted.
 - **Source review:** every upstream line cited above, read at `a58000c7` or `5458026c`.
 - **Structural validation:** `tests/test_omniroute_gateway_unit.py` checks the template's shape and that it renders to
   the recorded installed unit.
 
 Nothing here is a fidelity-parity result, and none of it certifies another host.
 
-**Not established.** Fidelity parity with native Codex beyond the checks above is not established. The settings
-research (rows 2 and 5) records these divergences at `a58000c7` × 0.157.1:
-- `reasoning.context: "all_turns"` is dropped;
-- placeholder `instructions` and `summary: "auto"` are injected;
-- Codex clears `encrypted_function_args` for non-OpenAI providers;
-- compaction behind the gateway runs locally, not remotely.
+**Not established.** Fidelity parity with native Codex beyond the checks above is not established. These divergences
+at `a58000c7` × codex 0.157.1 are known from source and unmeasured here:
+- **`reasoning.context: "all_turns"` is dropped.** Codex sends it for Responses Lite models (CX
+  `core/src/client.rs` L859-878), and the gateway keeps only `effort` and `summary` (OR `open-sse/executors/codex.ts`
+  L1467-1484).
+- **Instructions and a summary are injected.** A placeholder `instructions` fills an empty one on native passthrough
+  (OR `open-sse/executors/codex.ts` L1362-1369), and `summary: "auto"` fills a missing summary (L366, L374-393).
+- **Encrypted arguments are cleared.** Codex clears `encrypted_function_args` for non-OpenAI providers (CX
+  `core/src/client.rs` L897-954).
+- **Compaction runs locally.** Behind the gateway, compaction runs locally, not remotely: Codex reports remote
+  compaction as unsupported for a non-OpenAI, non-Azure provider (CX `model-provider/src/provider.rs` L410-423).
 
 The effort check has no failing control in this record. No clamping 3.8.50 build was probed, and the 3.8.50 clamp
 rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
@@ -328,30 +370,32 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 
 - **Native Codex only.** One account per session. It stays the max-quality default until a preregistered comparison.
 - **OmniRoute 3.8.50 from npm.** Rejected: the `xhigh` clamp and the hook sandbox escape.
-- **Waiting for npm 3.8.51.** This was U1 of the settings synthesis. Superseded by the user's 05:40Z direction to
-  install the branch. The re-pin trigger below keeps that path open.
+- **Waiting for npm 3.8.51** (the settings synthesis's U1). Superseded by the user's 05:40Z direction to install the
+  branch. The re-pin trigger below keeps that path open.
 - **The other open fixes for defect 1:**
   - **#14872** (head `396e1ad2`) and **#14886** (head `86b75f7d`) were not chosen; #14904 has the widest test coverage
     (decision 1).
-  - **A Node runtime switch.** Refuted by the reproduction.
+  - **Running the gateway on Node 22.** Not tried. The corrected fixture constructs there, but defect 2 needed a
+    source build anyway. A code fix also covers upstream's Node 24 and 26 targets.
 - **CLIProxyAPI v7.3.19 and thezillo/codex-proxy v0.3.7.** These are from the 2026-09-26 runtime-worker discovery.
   CLIProxyAPI stores tokens unencrypted.
-- **Requiring the key and the login** (K7, U2). Overridden by the user (decision 5).
-- **The subshell loader in `ExecStart=` instead of `EnvironmentFile=`** (the settings research's row 34). Not needed:
-  the file has no `export` lines, and the process-environment exposure is the same.
+- **Requiring the key and the login** (the settings synthesis's K7 and U2). Overridden by the user (decision 5).
+- **The subshell loader in `ExecStart=` instead of `EnvironmentFile=`.** Not needed: the file has no `export` lines,
+  which systemd v255 would drop, and the process-environment exposure is the same (decision 2).
 - **`--no-recovery`.** Rejected; upstream labels it a debugging mode.
-- **Deriving `CODEX_CLIENT_VERSION` from `codex --version` at start** (K4). Not taken for this unit, which pins the
-  installed value. The value must follow the Codex pin (limitations).
-- **`OMNIROUTE_MEMORY_MB=12288`,** the research's provisional value. The installed unit uses upstream's maximum 16384
-  on this 102 GiB host. Neither value is measured under the sweep (overturn).
+- **Deriving `CODEX_CLIENT_VERSION` from `codex --version` at start** (the settings synthesis's K4). Not taken for this
+  unit, which pins the installed value. The template takes it as a placeholder, and the value must follow the Codex
+  pin (limitations).
+- **`OMNIROUTE_MEMORY_MB=12288`,** the settings synthesis's provisional value. The installed unit uses upstream's
+  maximum 16384 on this 102 GiB host. Neither value is measured under the sweep (overturn).
 
 ## Overturn conditions
 
 - **Re-pin.** Upstream merges a #14904-equivalent and #13788 into `release/v3.8.51`, or tags or publishes 3.8.51.
   Rebuild from that upstream commit or npm, drop the cherry-picks and the local build record, and move the
   `manifests/stack.json` pin.
-- **The comparison favours native.** If the three-arm comparison or the X1 parity experiment favours native Codex,
-  the gateway serves framework traffic only.
+- **The comparison favours native.** If the three-arm comparison or a preregistered gateway-parity run favours native
+  Codex, the gateway serves framework traffic only.
 - **Search.** A search-backend bake-off (SearXNG, wigolo, DuckDuckGo, native; no Tavily) changes the search provider.
 - **Load.** Any heap abort or admission 503 shed under the sweep: resize, or run N instances with separate
   `DATA_DIR`s (upstream `docs/guides/DOCKER_GUIDE.md`, scale-out).
@@ -370,18 +414,21 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
   It is not patched locally.
 - **Two upstream unit stages did not run.** The dashboard stage and `test:unit:serial` never ran on this tree.
 - **Key separation is not achieved.** `server.env` sits inside `DATA_DIR`, so a raw copy of the directory carries the
-  key to its own encrypted tokens. That is the key separation the settings research's row 27 asks for, and it is not
-  achieved here. Upstream's native backups exclude `.env` and `server.env` (row 33). Moving the secrets out is a
-  migration, not a regeneration.
+  key to its own encrypted tokens. Upstream's native backup copies only `storage.sqlite`, `settings.json`,
+  `combos.json` and `providers.json` (OR `bin/cli/commands/backup.mjs` L27-32), so its backups carry no key. Moving
+  the secrets out of `DATA_DIR` is a migration, not a regeneration.
+- **The inherited manager environment is not isolated.** The unit cannot stop credentials exported into the user
+  manager from reaching the service (decision 2). Only the manager's own environment hygiene prevents it.
 - **The server secrets have no inventory entry.** `JWT_SECRET`, `API_KEY_SECRET` and `STORAGE_ENCRYPTION_KEY` are not
   in `adoption/credential-inventory.json`. Adding them also means adding the names to the secret-path guard (the
   test `test_inventory_secret_names_are_all_guarded` in `tests/test_secret_path_guard.py`), with a failing-first
   control. That is a separate change.
-- **The exclude filter is absent.** The Codex profile has `shell_snapshot = false`, but not
-  `[shell_environment_policy.filters] "OMNIROUTE_API_KEY" = "exclude"` (K3). This is moot with the placeholder, but
-  becomes live if a real per-lane key is ever set.
+- **The exclude filter is absent.** The Codex profile has `shell_snapshot = false`, but not the
+  `[shell_environment_policy.filters]` exclude for `OMNIROUTE_API_KEY` that the settings synthesis recommends (its
+  K3). This is moot with the placeholder, but becomes live if a real per-lane key is ever set.
 - **The search backend is weak.** `duckduckgo-free` returned few or no results, and none for `site:` queries.
-- **The client version is pinned by hand.** `CODEX_CLIENT_VERSION` is a literal, so it must follow the Codex pin.
+- **The client version is pinned by hand.** `CODEX_CLIENT_VERSION` is a literal in the installed unit, so it must
+  follow the Codex pin.
 - **One host.** These are this workstation's results. The trading lane's `blueprints/us-equities/routing/README.md:26`
   still says no Linux gateway is proposed, and `catalogs/foundation/surfaces.json` still describes the Windows
   gateway. Those files are not edited here.
