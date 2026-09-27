@@ -57,8 +57,11 @@ catalog ([invoke_skill.py:109](https://github.com/OpenHands/software-agent-sdk/b
 ## Lifecycle through the existing installer
 
 Use the already provisioned **skills 1.7.0** executable and `gh`. The wrapper
-verifies its version; project checks additionally use `gh api` to bind each
-project lock entry to the pinned source tree. It never copies a skill, writes a
+verifies its version; project checks first fetch every selected `(source, ref)`
+through `gh api`, before any add, then use those cached trees to bind project
+lock entries to their pins. A failed lookup stops without changing the project;
+`unverified (gh unavailable)` is distinct from a content mismatch. This lookup
+also runs for project dry-run/check-only. It never copies a skill, writes a
 lock, or patches upstream SKILL.md. Default invocation without `--project-dir`
 retains the existing global Claude Code/Codex behavior.
 
@@ -101,6 +104,12 @@ Use `--dry-run` to list planned adds; it is not an integrity pass for absent
 skills. `--check-only` exits 1 on missing, modified or drifted entries and makes
 no add/remove calls. `--only NAME` is repeatable for a bounded repair or explicitly
 scoped subset. The broad trial defaults to every non-pruned manifest skill.
+For `--agent claude-code`, an existing `.claude/skills/<name>` must be a symlink
+resolving to `.agents/skills/<name>`. A real directory, file or foreign symlink
+is `local-modified` with or without a project lock, even if its SKILL.md matches
+the pin. The wrapper refuses to overwrite it unless `--force` is given, because
+the upstream alias creator replaces existing directories
+([installer.ts:254-264](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L254-L264)).
 
 Project locks are **`<project>/skills-lock.json`**, with `computedHash` (SHA-256),
 source, ref and `skillPath`; they do not carry global `skillFolderHash` (Git tree
@@ -113,17 +122,23 @@ of a previous version. Recover by rerunning a retained previous manifest.
 See [vercel-labs/skills@7407f389 local-lock.ts:15](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/local-lock.ts#L15)
 and [add.ts:2066](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/add.ts#L2066).
 
-Remove uses the CLI in the same target project. Omit `-g` and `-a`: the native
-remover then cleans the name's project aliases and lock entry together. A targeted
-`remove -a universal` can retain the canonical copy when another detected agent
-uses it ([remove.ts:207,297](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L207)).
+Remove uses the CLI in the same target project, without `-g` and with exactly
+the `-a` targets used for add. Omitting `-a` targets every agent, including an
+OpenClaw `skills/<name>` source directory. Check the canonical folder, project
+lock entry and, for Claude, `.claude/skills/<name>` independently after removal;
+a dangling link also means cleanup is incomplete. The native in-use guard can
+retain the canonical folder and lock for another detected agent. The wrapper
+then returns `error: rollback retained, in use by another agent`; keep that
+failure visible and never widen the deletion to other agents.
+Sources: [remove.ts:209-333](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L209-L333),
+[agents.ts:166-169](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L166-L169).
 
 ```bash
 SKILL_NAME=example-skill
-(cd "$OH_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y)
-(cd "$DF_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y)
-(cd "$RESEARCH_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y)
-(cd "$EXTRACTION_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y)
+(cd "$OH_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y -a universal)
+(cd "$DF_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y -a universal)
+(cd "$RESEARCH_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y -a universal codex)
+(cd "$EXTRACTION_PROJECT" && DISABLE_TELEMETRY=1 "$SKILLS_BIN" remove "$SKILL_NAME" -y -a universal claude-code)
 ```
 
 Run only the relevant target's remove command. For a prune, retain the entry,
@@ -251,12 +266,25 @@ Count each native event once, and distinguish listing/discovery from loading:
 - **Research/extraction callers:** retain the calling agent's native skill-load
   event and, separately, its GPT Researcher MCP call or crawl4ai tool/API call.
   A tool response alone does not prove that the caller loaded a skill.
+- **Claude Code callers:** freeze and record the skill-listing budget setting
+  for each run: `skillListingBudgetFraction` or `SLASH_COMMAND_TOOL_CHAR_BUDGET`.
+  Record the value and configuration source (including default/unset), both
+  settings if present, and the effective budget with the model/context window.
+  Capture `/context` output and any excluded-skill warnings, plus debug-log
+  listing-overflow warnings. Retain which descriptions the model actually saw.
+  Claude keeps names but can drop descriptions when the budget is exceeded;
+  a skill whose description was dropped is **uninstrumented (unknown)** for
+  pruning, not a zero-activation observation. Missing visibility evidence also
+  means unknown. Source: [Claude Code skills, description budget](https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short)
+  (read 2026-09-27).
 
-After the entire frozen E2E run set completes with working activation capture,
+After the entire frozen E2E run set completes with working activation capture
+and confirmed description visibility for each eligible Claude run,
 **zero activations => `pruned`**. Store the run-set revision, run IDs, zero count,
-instrumentation completeness and evidence links in `prune_evidence`, then remove
-through the CLI and update coverage. Incomplete runs or missing instrumentation
-mean unknown, not zero. Report `activations / completed eligible runs` per role,
+instrumentation completeness, per-run listing-budget settings, visibility and
+warning evidence in `prune_evidence`, then remove through the CLI and update
+coverage. Incomplete runs, dropped descriptions or missing instrumentation mean
+unknown, not zero. Report `activations / completed eligible runs` per role,
 quality and first-prompt cost before deciding which activated skills to keep.
 No skill in this manifest has been pruned or promoted on invented invoke rates.
 

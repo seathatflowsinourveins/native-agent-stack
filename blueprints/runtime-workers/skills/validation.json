@@ -34,7 +34,8 @@
       "tests": 1,
       "failures": 1,
       "returned_excerpt": "AssertionError: Lists differ: ['remove', 'project-skill', '-y', '-a', 'universal'] != ['remove', 'project-skill', '-y']",
-      "cause": "Native targeted removal can retain canonical content used by another agent."
+      "cause": "Native targeted removal can retain canonical content used by another agent.",
+      "disposition": "Historical assertion prescribed unsafe untargeted removal. Superseded by repair-r1 exact-target rollback with an explicit retained/in-use error; no widening of deletion."
     },
     {
       "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_relative_binary_is_resolved_before_changing_to_project_directory -v",
@@ -43,9 +44,109 @@
       "failures": 1,
       "returned_excerpt": "AssertionError: 1 != 0 : install-skills: 0/1 ok",
       "cause": "Relative executable no longer resolved after switching project cwd."
+    },
+    {
+      "round": "repair-r1",
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_project_tree_mismatch_rolls_back_only_in_project tests.test_install_skills.ProjectInstallTests.test_project_rollback_preserves_other_agents_and_source_directories tests.test_install_skills.ProjectInstallTests.test_project_rollback_reports_canonical_retained_for_another_agent -v",
+      "exit_code": 1,
+      "returned_excerpt": "AssertionError: Lists differ: ['remove', 'project-skill', '-y'] != ['remove', 'project-skill', '-y', '-a', 'universal']\nAssertionError: Lists differ: ['remove', 'project-skill', '-y'] != ['remove', 'project-skill', '-y', '-a', 'universal']\nAssertionError: Lists differ: ['remove', 'project-skill', '-y'] != ['remove', 'project-skill', '-y', '-a', 'universal', 'codex']\nAssertionError: Lists differ: ['remove', 'project-skill', '-y'] != ['remove', 'project-skill', '-y', '-a', 'universal', 'claude-code']\nAssertionError: {'project-skill': 'rolled-back'} != {'project-skill': 'error'}\nRan 3 tests in 0.697s\nFAILED (failures=5)",
+      "cause": "Project rollback omitted -a, deleting non-target paths; a successful in-use removal was not reported as retained."
+    },
+    {
+      "round": "repair-r1",
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_project_rollback_checks_each_artifact_independently -v",
+      "exit_code": 1,
+      "returned_excerpt": "AssertionError: {'project-skill': 'rolled-back'} != {'project-skill': 'error'}\nRan 1 test in 0.409s\nFAILED (failures=1)",
+      "cause": "Rollback checked canonical/lock existence but ignored a retained dangling Claude symlink."
+    },
+    {
+      "round": "repair-r1",
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_project_claude_directory_is_protected_with_or_without_lock tests.test_install_skills.ProjectInstallTests.test_project_claude_foreign_symlink_requires_force -v",
+      "exit_code": 1,
+      "returned_excerpt": "AssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"ok\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nAssertionError: 0 != 1 : {\"dry_run\": false, \"ok\": true, \"skills\": {\"project-skill\": \"installed\"}}\nRan 2 tests in 1.378s\nFAILED (failures=8)",
+      "cause": "Locked and unlocked Claude target directories and foreign dangling symlinks were overwritten without --force; matching directory bytes were incorrectly accepted as ok."
+    },
+    {
+      "round": "repair-r1",
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_project_preflight_failure_on_later_source_changes_nothing tests.test_install_skills.ProjectInstallTests.test_project_fetches_each_selected_source_ref_before_any_add -v",
+      "exit_code": 1,
+      "returned_excerpt": "AssertionError: 'unverified (gh unavailable)' not found in 'second-skill: cannot verify pinned source tree for example/second-skill@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: cannot verify pinned source tree for example/second-skill@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (gh exit 1)\\nsecond-skill: installed content did not match the pinned manifest hash/tree; rolled back\\n'\nAssertionError: 'unverified' not found in 'second-skill: cannot verify pinned source tree for example/second-skill@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: Expecting value: line 1 column 1 (char 0)\\nsecond-skill: installed content did not match the pinned manifest hash/tree; rolled back\\n'\nAssertionError: 'unverified' not found in 'second-skill: cannot verify pinned source tree for example/second-skill@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: incomplete pinned source tree for example/second-skill@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\nsecond-skill: installed content did not match the pinned manifest hash/tree; rolled back\\n'\nAssertionError: 'unverified (gh unavailable)' not found in 'second-skill: cannot verify pinned source tree for example/project-skill@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb: cannot verify pinned source tree for example/project-skill@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb (gh exit 1)\\nsecond-skill: installed content did not match the pinned manifest hash/tree; rolled back\\n'\nAssertionError: 'unverified' not found in 'second-skill: cannot verify pinned source tree for example/project-skill@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb: Expecting value: line 1 column 1 (char 0)\\nsecond-skill: installed content did not match the pinned manifest hash/tree; rolled back\\n'\nAssertionError: 'unverified' not found in 'second-skill: cannot verify pinned source tree for example/project-skill@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb: incomplete pinned source tree for example/project-skill@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\nsecond-skill: installed content did not match the pinned manifest hash/tree; rolled back\\n'\nAssertionError: False is not true : [{'args': ['api', 'repos/example/project-skill/git/trees/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?recursive=1'], 'mutations': [['add', 'https://github.com/example/project-skill/tree/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/skills/project-skill', '--skill', 'project-skill', '-y', '-a', 'universal']]}, {'args': ['api', 'repos/example/third-skill/git/trees/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?recursive=1'], 'mutations': [['add', 'https://github.com/example/project-skill/tree/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/skills/project-skill', '--skill', 'project-skill', '-y', '-a', 'universal'], ['add', 'https://github.com/example/project-skill/tree/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/skills/second-skill', '--skill', 'second-skill', '-y', '-a', 'universal'], ['add', 'https://github.com/example/third-skill/tree/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/skills/third-skill', '--skill', 'third-skill', '-y', '-a', 'universal']]}]\nRan 2 tests in 1.370s\nFAILED (failures=7)",
+      "cause": "gh lookups happened after add; later source/ref failures mutated earlier skills and mislabeled unavailable, malformed or truncated lookup results as mismatches."
+    },
+    {
+      "round": "repair-r1",
+      "command": "python3 -m unittest tests.test_install_skills.ProjectInstallTests.test_help_describes_project_authentication_and_scoped_global_rollback tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_prune_contract_records_claude_listing_budget_and_unknown_visibility -v",
+      "exit_code": 1,
+      "returned_excerpt": "Ran 2 tests in 0.043s\nFAILED (failures=2)",
+      "cause": "CLI help omitted gh configured authentication and scoped global removal; README prune contract omitted Claude listing-budget settings and visibility/unknown treatment."
     }
   ],
-  "checks": [
+  "not_run": [
+    {
+      "command": "actionlint .github/workflows/runtime-worker-skills-freshness.yml",
+      "reason": "Executable unavailable on PATH or in inspected local tool locations; no installation was authorized."
+    },
+    {
+      "command": "upstream skills CLI tests / native skills add / worker E2E",
+      "reason": "skills executable absent on PATH; host installation and config changes excluded from builder scope. The fake CLI is not upstream acceptance."
+    }
+  ],
+  "pins_verified": {
+    "method": "gh api commits/{ref}, git/trees/{commit}?recursive=1 and contents/{path}/SKILL.md?ref={commit}; untruncated trees, actual returned bytes",
+    "sources": 12,
+    "skills": 138,
+    "adoption_entries_rechecked": 28,
+    "metadata_normalization": "description string is YAML-parsed and trimmed; hashes and byte sizes use unmodified SKILL.md"
+  },
+  "measurements": {
+    "first_prompt_before": null,
+    "first_prompt_after": null,
+    "native_activations": null
+  },
+  "output_retention": "Returned compact excerpts are transcribed from tool output; temporary personal paths and research response bodies are not published.",
+  "independent_review": {
+    "source": "skills-review-r1.json",
+    "source_sha256": "e5b3369b9b3170bce0333d358b0887f0248d521483a31953f07af60f43b217c0",
+    "scope": "Seven independent Claude review findings rechecked against pinned source or the relevant local execution/official documentation; repair starts at rebased 5f3eaebf.",
+    "result": "All seven findings fixed, including preservation of the already-fixed global target scope. No post-repair independent model review was run.",
+    "verification": "Full verbose suite: Ran 52 tests in 9.080s; OK (exit 0). See checks and review_findings."
+  },
+  "input_sha256": {
+    "tools/adoption/install_skills.py": "6fc923015e25089403caa58c631ccad08a1b3136a7576270b82e2161df82baa1",
+    "tools/adoption/runtime_skill_freshness.py": "497ea3b22f04d261afcd2ae8adbf9da5b1f1cb4fc12b2051aab74a14c0aeb3f9",
+    "tests/test_install_skills.py": "43a74fcfbbfa98b564623d595f9230e8ce162cafd018b118147f79dc6ed6eb91",
+    "tests/test_runtime_worker_skills.py": "ddab4e6a3ebfc4974c7a52720a28049793cebf317d9115fb1766a6f8a9d99ef1",
+    "blueprints/runtime-workers/skills/manifest.json": "aefae182fce9b964fc390a2eeaa7d407e96353c4bb8808e9a0c1d605adbbc25f",
+    "blueprints/runtime-workers/skills/README.md": "2948fcd23992ac7c66eb3438e22aba399b671c02380da35e30c287f61bd3403c",
+    ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
+    "docs/harness-defaults.md": "0e25525dbc73eff78e8e608c5dc35067542d0e7f0685633a2a4f3322f9525258"
+  },
+  "repair_r1_research": {
+    "base_head": "5f3eaebf",
+    "main_base": "0f76651d",
+    "selected_source": "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 (package.json version 1.7.0)",
+    "discovery": "Installed search-first, find-skills, tdd and verification-before-completion guidance; bounded repair of the selected CLI wrapper, no alternative install or model call.",
+    "installed_client": "skills not found on PATH; native CLI execution remains unverified.",
+    "source_access": "Read-only gh api tag/release requests failed: error connecting to api.github.com (exit 1). Read-only Context Mode HTTP retrieval returned pinned upstream source and v1.7.0 release metadata; the release body has no substantive changelog. Peeling the annotated tag returned HTTP 403; package.json at the requested commit reports 1.7.0.",
+    "references": [
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L209-L333",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L254-L264",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L388-L390",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L166-L169",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/local-lock.ts#L15-L37",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/skill-lock.ts#L168-L171",
+      "https://cli.github.com/manual/gh_help_environment",
+      "https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short"
+    ],
+    "authentication_check": "Installed gh help environment confirms configured authentication. The wrapper subprocess call contains no token argument or credential-store read.",
+    "budget_check": "Official Claude skills documentation read 2026-09-27: names remain listed while descriptions may be dropped; record the listing budget and /context output, plus debug-log overflow warnings. No Claude session or model execution performed.",
+    "fixture_boundary": "Installer CLI subprocess, isolated home/project filesystem, fake skills and gh executables. Tests model cited upstream behavior and fault injection, not unchanged upstream acceptance.",
+    "environment": {
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "TMPDIR": "temporary directory inside the owned worktree; removed after checks"
+    }
+  },
+  "historical_checks": [
     {
       "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -v",
       "exit_code": 0,
@@ -99,41 +200,159 @@
       "kind": "final after coding-role research coverage clarification"
     }
   ],
-  "not_run": [
+  "historical_checks_scope": "Pre-repair observations retained as history; none is acceptance for this repair. The stale 42-test result is superseded by checks below.",
+  "checks": [
     {
-      "command": "actionlint .github/workflows/runtime-worker-skills-freshness.yml",
-      "reason": "Executable unavailable on PATH or in inspected local tool locations; no installation was authorized."
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -v",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 52 tests in 9.080s\n\nOK",
+      "tests": 52,
+      "kind": "repair-r1 full local integration and structural checks",
+      "limitation": "Fake CLI/gh and structural contracts; not a native skills run, upstream acceptance or model activation."
     },
     {
-      "command": "upstream skills CLI tests / native skills add / worker E2E",
-      "reason": "skills executable absent on PATH; host installation and config changes excluded from builder scope. The fake CLI is not upstream acceptance."
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_excerpt": "Publication validation failed:\ndocs/harness-defaults.md: SHA-256 mismatch\ndocs/harness-defaults.md: byte count mismatch\ntests/test_install_skills.py: SHA-256 mismatch\ntests/test_install_skills.py: byte count mismatch\ntools/adoption/install_skills.py: SHA-256 mismatch\ntools/adoption/install_skills.py: byte count mismatch",
+      "kind": "repair-r1 publication integrity; expected coordinator-owned registrations pending",
+      "mismatch_files": [
+        "docs/harness-defaults.md",
+        "tests/test_install_skills.py",
+        "tools/adoption/install_skills.py"
+      ],
+      "resolution": "All reported files changed in this repair. Coordinator re-registers hashes/byte counts in manifests/evidence.json; this builder left it unchanged."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_excerpt": "",
+      "kind": "repair-r1 whitespace check"
     }
   ],
-  "pins_verified": {
-    "method": "gh api commits/{ref}, git/trees/{commit}?recursive=1 and contents/{path}/SKILL.md?ref={commit}; untruncated trees, actual returned bytes",
-    "sources": 12,
-    "skills": 138,
-    "adoption_entries_rechecked": 28,
-    "metadata_normalization": "description string is YAML-parsed and trimmed; hashes and byte sizes use unmodified SKILL.md"
-  },
-  "measurements": {
-    "first_prompt_before": null,
-    "first_prompt_after": null,
-    "native_activations": null
-  },
-  "output_retention": "Returned compact excerpts are transcribed from tool output; temporary personal paths and research response bodies are not published.",
-  "independent_review": {
+  "review_findings": [
+    {
+      "id": "R1-1",
+      "severity": "blocker",
+      "finding": "Global add/remove must retain main #407 agent scope.",
+      "disposition": "fixed",
+      "resolution": "Already fixed at 5f3eaebf; preserved SKILL_AGENTS and global add/remove -a *SKILL_AGENTS unchanged.",
+      "sources": [
+        "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 src/remove.ts:209-216",
+        "0f76651d tools/adoption/install_skills.py:63,181,201"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_global_default_add_arguments_remain_exact",
+        "MismatchRollbackTests.test_tree_sha_mismatch_after_add_rolls_back_and_exits_one"
+      ]
+    },
+    {
+      "id": "R1-2",
+      "severity": "major",
+      "finding": "Project rollback targets agents and source directories the run did not install.",
+      "disposition": "fixed",
+      "resolution": "Remove only the exact add targets. Independently check canonical folder, project lock entry and requested Claude link, including dangling links. Report retained/in-use error without wider removal. Correct manual commands and keep the anti-pattern row date 2026-09-27.",
+      "sources": [
+        "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 src/remove.ts:209-216,251-333",
+        "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 src/agents.ts:166-169"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_project_tree_mismatch_rolls_back_only_in_project",
+        "ProjectInstallTests.test_project_rollback_preserves_other_agents_and_source_directories",
+        "ProjectInstallTests.test_project_rollback_reports_canonical_retained_for_another_agent",
+        "ProjectInstallTests.test_project_rollback_checks_each_artifact_independently"
+      ]
+    },
+    {
+      "id": "R1-3",
+      "severity": "major",
+      "finding": "A project Claude alias can overwrite local content without --force.",
+      "disposition": "fixed",
+      "resolution": "Before either lock branch, any existing Claude target that is not a symlink resolving to the canonical directory is local-modified. Refuse unless forced. Real-directory fixtures cover local, matching and missing SKILL.md bytes with/without a lock, plus dry-run/check-only and foreign symlinks.",
+      "sources": [
+        "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 src/installer.ts:254-264,388-390"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_project_claude_directory_is_protected_with_or_without_lock",
+        "ProjectInstallTests.test_project_claude_foreign_symlink_requires_force"
+      ]
+    },
+    {
+      "id": "R1-4",
+      "severity": "minor",
+      "finding": "gh failures are reported as mismatches after an add.",
+      "disposition": "fixed",
+      "resolution": "Prefetch every distinct selected source/ref before any add; retain all lookup results for the run. Report unverified (gh unavailable) for execution/API failures and unverified (invalid gh response) for malformed/truncated trees. A later failing source or ref leaves the whole project unchanged.",
+      "sources": [
+        "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 src/local-lock.ts:15-37",
+        "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 src/skill-lock.ts:168-171",
+        "5f3eaebf tools/adoption/install_skills.py pinned_source_trees/process_skill"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_project_preflight_failure_on_later_source_changes_nothing",
+        "ProjectInstallTests.test_project_fetches_each_selected_source_ref_before_any_add"
+      ]
+    },
+    {
+      "id": "R1-5",
+      "severity": "minor",
+      "finding": "Docstring overstates the project authentication boundary.",
+      "disposition": "fixed",
+      "resolution": "Describe gh configured authentication and that the script itself never reads, prints or passes a token; preserve native subprocess authentication handling.",
+      "sources": [
+        "Installed gh help environment",
+        "https://cli.github.com/manual/gh_help_environment",
+        "tools/adoption/install_skills.py:28-35,140-144"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_help_describes_project_authentication_and_scoped_global_rollback"
+      ]
+    },
+    {
+      "id": "R1-6",
+      "severity": "minor",
+      "finding": "Recorded 42-test pass predates the committed suite.",
+      "disposition": "fixed",
+      "resolution": "Replace current acceptance with the complete 52-test verbose run on the repair, retain historical checks separately, record all five fail-first commands/exits/excerpts/causes and all review dispositions, and refresh this receipt input hashes. Coordinator owns manifests/evidence.json.",
+      "sources": [
+        "tests/test_install_skills.py",
+        "tests/test_runtime_worker_skills.py",
+        "checks[0] actual returned unittest output"
+      ],
+      "verification": [
+        "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -v"
+      ]
+    },
+    {
+      "id": "R1-7",
+      "severity": "minor",
+      "finding": "Zero-activation pruning ignores Claude listing-budget exclusions.",
+      "disposition": "fixed",
+      "resolution": "Freeze and record the listing budget for each run; capture /context, excluded-skill and debug overflow warnings; retain description visibility and treat dropped descriptions as uninstrumented (unknown), not zero.",
+      "sources": [
+        "https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short (read 2026-09-27; markdown lines 1099-1118)"
+      ],
+      "verification": [
+        "RuntimeWorkerManifestTests.test_prune_contract_records_claude_listing_budget_and_unknown_visibility"
+      ]
+    }
+  ],
+  "historical_independent_review": {
     "scope": "Read-only review of source-pinned loader semantics, wrapper, catalog, documentation and freshness implementation",
     "result": "No remaining material code blockers after regression fixes. Documented that OpenHands invoke_skill rejects five invocation-disabled upstream skills.",
     "verification": "42 focused tests passed before the final README-matrix consistency test was added."
   },
-  "input_sha256": {
-    "tools/adoption/install_skills.py": "e2021b2fe2ab98a0ca1fbd5a2a6fc836a3267b3cb81ef43a3df333d835d85eb6",
-    "tools/adoption/runtime_skill_freshness.py": "497ea3b22f04d261afcd2ae8adbf9da5b1f1cb4fc12b2051aab74a14c0aeb3f9",
-    "tests/test_install_skills.py": "d45dd108c07e22d35f74c1972ea9fe199cc98ece6500e101aab187c3a65bc39d",
-    "tests/test_runtime_worker_skills.py": "19137a93dd33e2bdf9028e2614b685bf0040ee7de3eda30588874491e04f584f",
-    "blueprints/runtime-workers/skills/manifest.json": "aefae182fce9b964fc390a2eeaa7d407e96353c4bb8808e9a0c1d605adbbc25f",
-    "blueprints/runtime-workers/skills/README.md": "8a35160c6dd8d468a6f293613e11a637da9c25f14b46ab3b177657b677b9e854",
-    ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9"
+  "open_items": [
+    "Coordinator must re-register changed evidence hashes in manifests/evidence.json and commit the repair.",
+    "Native skills CLI installation, unchanged upstream tests and worker/model E2E remain outside this repair; no such execution is claimed."
+  ],
+  "cleanup": {
+    "initial_observation": "Post-check inventory found three ignored __pycache__ directories containing eight .pyc files; the initial zero-cache assertion failed. Their origin was not attributed to this repair.",
+    "environment_verified": {
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "sys.dont_write_bytecode": true
+    },
+    "resolution": "Confirmed all cache paths were untracked, removed the eight bytecode files and three directories, and rechecked the worktree. Temporary repair outputs were also removed.",
+    "remaining_cache_paths": [],
+    "temporary_repair_artifacts_present": false
   }
 }

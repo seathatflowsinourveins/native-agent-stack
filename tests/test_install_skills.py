@@ -107,7 +107,13 @@ if argv[0] == "add":
         link_dir = target / ".claude" / "skills"
         link_dir.mkdir(parents=True, exist_ok=True)
         link = link_dir / name
-        if link.is_symlink() or link.exists():
+        # skills@7407f389 installer.ts:254-264 removes an existing directory
+        # before creating the alias. The wrapper must protect local content.
+        if link.is_symlink():
+            link.unlink()
+        elif link.is_dir():
+            shutil.rmtree(link)
+        elif link.exists():
             link.unlink()
         os.symlink(os.path.join("..", "..", ".agents", "skills", name), link)
     path = target / "skills-lock.json" if project else lock_path(home)
@@ -132,17 +138,41 @@ if argv[0] == "add":
 
 if argv[0] == "remove":
     name = argv[1]
-    # remove.ts:297-331 preserves canonical data if a detected non-target
-    # agent (e.g. Codex) still shares it; success alone does not prove removal.
-    if project and "-a" in argv and "codex" not in argv:
-        sys.exit(0)
-    shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
+    # Synthetic fault injection for independently checking cleanup artifacts.
+    retained = FIXTURES.get(name, {}).get("retain_after_remove", [])
+    if project:
+        # Relevant subset of skills@7407f389 remove.ts:209-333. A same-named
+        # OpenClaw source directory is a removal target even if not detected.
+        agent_dirs = {"universal": ".agents/skills", "codex": ".agents/skills",
+                      "claude-code": ".claude/skills", "cursor": ".cursor/skills",
+                      "openclaw": "skills"}
+        targets = argv[argv.index("-a") + 1:] if "-a" in argv else list(agent_dirs)
+        canonical = target / ".agents" / "skills" / name
+        for agent in targets:
+            path = target / agent_dirs[agent] / name
+            if path == canonical:
+                continue
+            if agent == "claude-code" and "claude-link" in retained:
+                continue
+            if path.is_symlink():
+                path.unlink()
+            elif path.is_dir():
+                shutil.rmtree(path)
+            elif path.exists():
+                path.unlink()
+        # Fixture detection is deliberately limited to a Codex home marker.
+        # remove.ts:293-310 retains canonical data and lock for another agent.
+        if "codex" not in targets and (home / ".codex").exists() and canonical.exists():
+            sys.exit(0)
+    if "canonical" not in retained:
+        shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
     link = target / ".claude" / "skills" / name
-    if link.is_symlink() or link.exists():
+    if not project and (link.is_symlink() or link.exists()):
         link.unlink()
     path = target / "skills-lock.json" if project else lock_path(home)
     lock = load_lock(path)
-    lock.get("skills", {}).pop(name, None)
+    if "lock" not in retained:
+        lock.get("skills", {}).pop(name, None)
     path.write_text(json.dumps(lock))
     sys.exit(0)
 
@@ -283,8 +313,25 @@ class ProjectInstallTests(InstallSkillsTestCase):
 
     def write_gh_tree(self, sha):
         data = {"truncated": False, "tree": [{"path": self.skill["path"], "type": "tree", "sha": sha}]}
+        endpoint = f"repos/{self.skill['source']}/git/trees/{self.skill['ref']}?recursive=1"
+        self.write_gh_responses({endpoint: (0, json.dumps(data))})
+
+    def write_gh_responses(self, responses):
         gh = self.bin_dir / "gh"
-        gh.write_text("#!/usr/bin/env python3\nimport json,sys\nprint(" + repr(json.dumps(data)) + ")\n")
+        gh.write_text("""#!/usr/bin/env python3
+import json, sys
+from pathlib import Path
+responses = """ + repr(responses) + """
+directory = Path(__file__).resolve().parent
+calls = directory / "calls.log"
+mutations = [json.loads(line) for line in calls.read_text().splitlines()
+             if json.loads(line)[0] in ("add", "remove")] if calls.exists() else []
+with (directory / "gh_calls.log").open("a") as log:
+    log.write(json.dumps({"args": sys.argv[1:], "mutations": mutations}) + "\\n")
+code, response = responses[sys.argv[2]]
+print(response)
+sys.exit(code)
+""")
         gh.chmod(0o755)
 
     def install(self, *extra):
@@ -315,14 +362,131 @@ class ProjectInstallTests(InstallSkillsTestCase):
         self.assertEqual(calls_log(self.fake_bin), [["--version"]])
         self.assertFalse((self.project / "skills-lock.json").exists())
 
+    def test_project_preflight_failure_on_later_source_changes_nothing(self):
+        projects = self.project
+        for same_source in (False, True):
+            for failure in ("unavailable", "invalid-json", "truncated"):
+                with self.subTest(same_source=same_source, failure=failure):
+                    self.project = projects / f"{same_source}-{failure}"
+                    self.project.mkdir()
+                    second = make_skill("second-skill", "# Second\n", tree_sha("second"))
+                    if same_source:
+                        second["source"] = self.skill["source"]
+                        second["ref"] = "b" * 40
+                        second["url"] = f"https://github.com/{second['source']}/tree/{second['ref']}/{second['path']}"
+                    self.manifest = self.write_manifest([self.skill, second])
+                    self.fake_bin = write_fake_skills_bin(self.bin_dir, {
+                        s["name"]: {"skill_md": content, "tree_sha": s["tree_sha"],
+                                    "source": s["source"], "ref": s["ref"], "path": s["path"]}
+                        for s, content in ((self.skill, self.content), (second, "# Second\n"))})
+                    failed_response = {"unavailable": (1, "fixture API failure"),
+                                       "invalid-json": (0, "not JSON"),
+                                       "truncated": (0, json.dumps({"truncated": True, "tree": []}))}[failure]
+                    self.write_gh_responses({
+                        f"repos/{self.skill['source']}/git/trees/{self.skill['ref']}?recursive=1":
+                            (0, json.dumps({"tree": [{"path": self.skill["path"], "type": "tree", "sha": self.skill["tree_sha"]}]})),
+                        f"repos/{second['source']}/git/trees/{second['ref']}?recursive=1": failed_response})
+                    before = calls_log(self.fake_bin)
+                    result = self.install()
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertIn("unverified (gh unavailable)" if failure == "unavailable" else "unverified", result.stderr)
+                    self.assertNotIn("did not match", result.stderr)
+                    self.assertNotIn("rolled back", result.stderr)
+                    self.assertEqual(calls_log(self.fake_bin)[len(before):], [["--version"]])
+                    self.assertEqual(list(self.project.iterdir()), [])
+
+    def test_project_fetches_each_selected_source_ref_before_any_add(self):
+        second = make_skill("second-skill", "# Second\n", tree_sha("second"))
+        second["source"] = self.skill["source"]
+        second["url"] = f"https://github.com/{second['source']}/tree/{second['ref']}/{second['path']}"
+        third = make_skill("third-skill", "# Third\n", tree_sha("third"))
+        self.manifest = self.write_manifest([self.skill, second, third])
+        self.fake_bin = write_fake_skills_bin(self.bin_dir, {
+            s["name"]: {"skill_md": content, "tree_sha": s["tree_sha"],
+                        "source": s["source"], "ref": s["ref"], "path": s["path"]}
+            for s, content in ((self.skill, self.content), (second, "# Second\n"), (third, "# Third\n"))})
+        responses = {}
+        for group in ((self.skill, second), (third,)):
+            skill = group[0]
+            responses[f"repos/{skill['source']}/git/trees/{skill['ref']}?recursive=1"] = (
+                0, json.dumps({"tree": [{"path": s["path"], "type": "tree", "sha": s["tree_sha"]} for s in group]}))
+        self.write_gh_responses(responses)
+        result = self.install("--json")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        gh_calls = [json.loads(line) for line in (self.bin_dir / "gh_calls.log").read_text().splitlines()]
+        self.assertEqual([c["args"] for c in gh_calls], [["api", endpoint] for endpoint in responses])
+        self.assertTrue(all(not call["mutations"] for call in gh_calls), gh_calls)
+        self.assertEqual(json.loads(result.stdout)["skills"],
+                         {"project-skill": "installed", "second-skill": "installed", "third-skill": "installed"})
+
     def test_project_tree_mismatch_rolls_back_only_in_project(self):
         self.write_gh_tree(tree_sha("other"))
         result = self.install()
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("rolled back", result.stderr)
-        self.assertEqual(calls_log(self.fake_bin)[-1], ["remove", "project-skill", "-y"])
+        self.assertEqual(calls_log(self.fake_bin)[-1], ["remove", "project-skill", "-y", "-a", "universal"])
         self.assertFalse((self.project / ".agents/skills/project-skill").exists())
         self.assertFalse((self.home / ".agents").exists())
+
+    def test_project_rollback_preserves_other_agents_and_source_directories(self):
+        for agent, targets in (("universal", ["universal"]),
+                               ("codex", ["universal", "codex"]),
+                               ("claude-code", ["universal", "claude-code"])):
+            with self.subTest(agent=agent):
+                sentinels = []
+                for directory in ("skills", ".cursor/skills"):
+                    sentinel = self.project / directory / "project-skill" / "LOCAL.md"
+                    sentinel.parent.mkdir(parents=True, exist_ok=True)
+                    sentinel.write_text("owned before this run\n")
+                    sentinels.append(sentinel)
+                self.write_gh_tree(tree_sha("other"))
+                result = self.install("--agent", agent)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn("rolled back", result.stderr)
+                calls = calls_log(self.fake_bin)
+                self.assertEqual(calls[-1], ["remove", "project-skill", "-y", "-a", *targets])
+                self.assertEqual(calls[-2][calls[-2].index("-a"):], calls[-1][calls[-1].index("-a"):])
+                for sentinel in sentinels:
+                    self.assertEqual(sentinel.read_text(), "owned before this run\n")
+                self.assertFalse((self.project / ".agents/skills/project-skill").exists())
+                link = self.project / ".claude/skills/project-skill"
+                self.assertFalse(link.exists() or link.is_symlink())
+                self.assertNotIn("project-skill", json.loads((self.project / "skills-lock.json").read_text())["skills"])
+
+    def test_project_rollback_reports_canonical_retained_for_another_agent(self):
+        (self.home / ".codex").mkdir()
+        self.write_gh_tree(tree_sha("other"))
+        result = self.install("--agent", "claude-code", "--json")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "error"})
+        self.assertIn("rollback retained, in use by another agent", result.stderr)
+        self.assertEqual(calls_log(self.fake_bin)[-1],
+                         ["remove", "project-skill", "-y", "-a", "universal", "claude-code"])
+        self.assertTrue((self.project / ".agents/skills/project-skill").is_dir())
+        self.assertIn("project-skill", json.loads((self.project / "skills-lock.json").read_text())["skills"])
+        link = self.project / ".claude/skills/project-skill"
+        self.assertFalse(link.exists() or link.is_symlink())
+        self.assertEqual([call[0] for call in calls_log(self.fake_bin)], ["--version", "add", "remove"])
+
+    def test_project_rollback_checks_each_artifact_independently(self):
+        self.write_gh_tree(tree_sha("other"))
+        for artifact in ("canonical", "lock", "claude-link"):
+            with self.subTest(artifact=artifact):
+                self.fake_bin = write_fake_skills_bin(self.bin_dir, {"project-skill": {
+                    "skill_md": self.content, "tree_sha": self.skill["tree_sha"],
+                    "retain_after_remove": [artifact]}})
+                result = self.install("--agent", "claude-code", "--json")
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "error"})
+                self.assertNotIn("rolled back", result.stderr)
+                canonical = self.project / ".agents/skills/project-skill"
+                link = self.project / ".claude/skills/project-skill"
+                lock = json.loads((self.project / "skills-lock.json").read_text())["skills"]
+                self.assertEqual(canonical.exists(), artifact == "canonical")
+                self.assertEqual("project-skill" in lock, artifact == "lock")
+                self.assertEqual(link.is_symlink(), artifact == "claude-link")
+                if artifact == "claude-link":
+                    self.assertFalse(link.exists(), "dangling Claude link must still count as retained")
 
     def test_wrong_source_ref_or_path_is_not_accepted_even_when_bytes_match(self):
         for field, value in (("source", "other/repo"), ("ref", "b" * 40), ("path", "elsewhere/skill")):
@@ -357,6 +521,62 @@ class ProjectInstallTests(InstallSkillsTestCase):
         result = self.install("--agent", "claude-code")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(calls_log(self.fake_bin)[1][-3:], ["-a", "universal", "claude-code"])
+        again = self.install("--agent", "claude-code", "--json")
+        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertEqual(json.loads(again.stdout)["skills"], {"project-skill": "ok"})
+        self.assertEqual([c[0] for c in calls_log(self.fake_bin)], ["--version", "add", "--version"])
+
+    def test_project_claude_directory_is_protected_with_or_without_lock(self):
+        projects = self.project
+        for locked in (False, True):
+            for content_kind in ("local", "matching", "missing"):
+                with self.subTest(locked=locked, content=content_kind):
+                    self.project = projects / f"locked-{locked}-{content_kind}"
+                    self.project.mkdir()
+                    if locked:
+                        first = self.install()
+                        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+                    local = self.project / ".claude/skills/project-skill"
+                    local.mkdir(parents=True)
+                    (local / "LOCAL.md").write_text("hand-written support file\n")
+                    if content_kind != "missing":
+                        (local / "SKILL.md").write_text(self.content if content_kind == "matching" else "local edits\n")
+                    before = calls_log(self.fake_bin)
+                    for mode in ((), ("--dry-run",), ("--check-only",)):
+                        result = self.install("--agent", "claude-code", "--json", *mode)
+                        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                        self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "local-modified"})
+                        self.assertFalse(local.is_symlink())
+                        self.assertEqual((local / "LOCAL.md").read_text(), "hand-written support file\n")
+                    self.assertEqual(calls_log(self.fake_bin)[len(before):], [["--version"]] * 3)
+                    forced = self.install("--agent", "claude-code", "--force", "--json")
+                    self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
+                    self.assertEqual(json.loads(forced.stdout)["skills"], {"project-skill": "installed"})
+                    self.assertTrue(local.is_symlink())
+                    self.assertEqual(local.resolve(), self.project / ".agents/skills/project-skill")
+                    self.assertEqual((local / "SKILL.md").read_text(), self.content)
+
+    def test_project_claude_foreign_symlink_requires_force(self):
+        projects = self.project
+        for locked in (False, True):
+            with self.subTest(locked=locked):
+                self.project = projects / f"locked-{locked}"
+                self.project.mkdir()
+                if locked:
+                    self.assertEqual(self.install().returncode, 0)
+                local = self.project / ".claude/skills/project-skill"
+                local.parent.mkdir(parents=True)
+                foreign = self.project / "hand-written-skill"
+                local.symlink_to(foreign)  # dangling foreign link still belongs to the user
+                before = calls_log(self.fake_bin)
+                result = self.install("--agent", "claude-code", "--json")
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "local-modified"})
+                self.assertEqual(local.readlink(), foreign)
+                self.assertEqual(calls_log(self.fake_bin)[len(before):], [["--version"]])
+                forced = self.install("--agent", "claude-code", "--force")
+                self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
+                self.assertEqual(local.resolve(), self.project / ".agents/skills/project-skill")
 
     def test_adding_claude_target_to_existing_universal_install_creates_its_link(self):
         first = self.install()
@@ -390,6 +610,15 @@ class ProjectInstallTests(InstallSkillsTestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(calls_log(self.fake_bin)[1], ["add", self.skill["url"], "--skill", "project-skill",
                                                        "-g", "-y", "-a", "claude-code", "codex"])
+
+    def test_help_describes_project_authentication_and_scoped_global_rollback(self):
+        result = self.install("--help")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        help_text = " ".join(result.stdout.split())
+        self.assertIn("gh uses its own configured authentication", help_text)
+        self.assertIn("script itself never reads, prints or passes a token", help_text)
+        self.assertNotIn("never reads a credential store", help_text)
+        self.assertIn("skills remove <name> -g -y -a claude-code codex", help_text)
 
 
 class IdempotentSkipTests(InstallSkillsTestCase):

@@ -18,17 +18,18 @@ For every manifest skill, in order:
       codex` (env DISABLE_TELEMETRY=1, so the run skips both telemetry and the
       add-time audit call) and re-check the same two conditions as (a). A
       mismatch after add (wrong tree, wrong bytes, or the CLI silently
-      installing something else) runs `skills remove <name> -g -y` and is
-      reported as 'rolled-back' rather than left half-installed.
+      installing something else) runs `skills remove <name> -g -y -a
+      claude-code codex` and is reported as 'rolled-back'.
 
 Exit status is 1 when any processed skill ends anywhere but 'ok' or
 'installed' (or, under --dry-run, anywhere but 'ok' or 'planned' -- a
 local-modified refusal is real even though --dry-run writes nothing).
 
-This script never reads a credential store or a `gh`/git token, and never
-passes one to the `skills` CLI: the only environment override it adds to that
-subprocess is HOME (so --home works for a non-default target, e.g. in tests)
-and DISABLE_TELEMETRY. It never writes ~/.agents/skills, ~/.claude/skills or
+Project verification invokes `gh api`; gh uses its own configured authentication.
+The script itself never reads, prints or passes a token. Its only environment
+overrides for the `skills` subprocess are HOME (so --home works for a non-default
+target, e.g. in tests) and DISABLE_TELEMETRY.
+It never writes ~/.agents/skills, ~/.claude/skills or
 the skill lock file directly -- only the `skills` CLI does, exactly as it
 would for a person running it by hand.
 
@@ -42,7 +43,9 @@ With --project-dir, the same pipeline invokes the CLI in that existing directory
 without -g, targeting --agent (default universal). The project lock is
 skills-lock.json. Its computedHash is NOT a Git tree SHA: project verification
 binds source/ref/skillPath to the manifest, resolves that pinned tree through
-`gh api`, and checks SKILL.md bytes. As with the global verifier, this attests
+`gh api` before any add, and checks SKILL.md bytes. Every selected source/ref is
+fetched first; unavailable verification is reported as unverified, not mismatch.
+As with the global verifier, this attests
 the source tree, not all installed support files. No lock or skill is hand-written.
 Reference: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73
 src/local-lock.ts:15-37,65-66; src/add.ts:2086-2160; src/agents.ts:815-820.
@@ -127,9 +130,9 @@ def read_lock_entry(home: Path, name: str, project_dir: Path | None = None) -> d
     return entry if isinstance(entry, dict) else None
 
 
-@functools.lru_cache(maxsize=128)
+@functools.lru_cache(maxsize=None)
 def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
-    """Read-only GitHub tree lookup; amortized once per source/ref per process.
+    """Read-only GitHub tree lookup; retain every preflight result for this run.
 
     Same source-tree oracle as upstream src/skill-lock.ts:168-171 (blob.ts).
     Project locks do not carry the global lock's skillFolderHash.
@@ -139,14 +142,19 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
             ["gh", "api", f"repos/{source}/git/trees/{ref}?recursive=1"],
             capture_output=True, text=True, timeout=VERSION_CHECK_TIMEOUT,
             check=False, stdin=subprocess.DEVNULL)
-        if result.returncode:
-            raise InstallError(f"cannot verify pinned source tree for {source}@{ref} (gh exit {result.returncode})")
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise InstallError(f"unverified (gh unavailable): {source}@{ref}: {error}") from error
+    if result.returncode:
+        raise InstallError(f"unverified (gh unavailable): {source}@{ref} (gh exit {result.returncode})")
+    try:
         data = json.loads(result.stdout)
-        if data.get("truncated") or not isinstance(data.get("tree"), list):
-            raise InstallError(f"incomplete pinned source tree for {source}@{ref}")
+        if not isinstance(data, dict) or data.get("truncated") or not isinstance(data.get("tree"), list):
+            raise ValueError("incomplete pinned source tree")
+        if not all(isinstance(entry, dict) for entry in data["tree"]):
+            raise ValueError("malformed pinned source tree entry")
         return {entry["path"]: entry["sha"] for entry in data["tree"] if entry.get("type") == "tree"}
-    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError) as error:
-        raise InstallError(f"cannot verify pinned source tree for {source}@{ref}: {error}") from error
+    except (ValueError, KeyError, TypeError) as error:
+        raise InstallError(f"unverified (invalid gh response): {source}@{ref}: {error}") from error
 
 
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
@@ -155,6 +163,17 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
     folder that already matches the manifest byte-for-byte)."""
     name = skill["name"]
     skill_dir = canonical_skill_dir(home, name, project_dir)
+    if project_dir is not None and agent == "claude-code":
+        # skills@7407f389 src/installer.ts:254-264 replaces existing aliases,
+        # including real directories. Protect them regardless of lock state.
+        target = project_dir / ".claude" / "skills" / name
+        if target.exists() or target.is_symlink():
+            try:
+                canonical_link = target.is_symlink() and target.resolve() == skill_dir.resolve()
+            except (OSError, RuntimeError):
+                canonical_link = False
+            if not canonical_link:
+                return "local-modified"
     skill_md = skill_dir / "SKILL.md"
     md_matches = skill_md.is_file() and sha256_of(skill_md) == skill["skill_md_sha256"]
     entry = read_lock_entry(home, name, project_dir)
@@ -233,8 +252,10 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         note(f"{name}: {status}")
         return status
     if state == "local-modified" and not force:
-        print(f"{name}: local-modified -- refusing to overwrite an unlocked local SKILL.md that does "
-              f"not match the pinned manifest hash (pass --force to overwrite it)", file=sys.stderr)
+        protected = ("local project content or an unmanaged Claude target" if project_dir is not None
+                     else "an unlocked local SKILL.md that does not match the pinned manifest hash")
+        print(f"{name}: local-modified -- refusing to overwrite {protected} "
+              f"(pass --force to overwrite it)", file=sys.stderr)
         return "local-modified"
 
     add_args = ["add", skill["url"], "--skill", name, "-g", "-y", "-a", *SKILL_AGENTS]
@@ -260,6 +281,8 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         verified = classify_skill(skill, home, project_dir, agent) == "ok"
     except InstallError as error:
         print(f"{name}: {error}", file=sys.stderr)
+        if project_dir is not None:
+            return "error"  # An unavailable oracle is not evidence of a mismatch.
         verified = False
     if verified:
         # classify_skill checks SKILL.md's sha256 and the lock's recorded tree (skills' skillFolderHash is the source
@@ -270,10 +293,10 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
             note(f"{name}: installed; SKILL.md sha256 and project lock identity match pinned source tree {skill['tree_sha']}")
         return "installed"
 
-    # Global: only SKILL_AGENTS, as for add (see SKILL_AGENTS). Project: native remove.ts:207-215,297-331,
-    # omitting -a cleans all project aliases; targeted removal can exit 0 while another agent retains the canonical copy.
+    # Remove exactly the add targets. skills@7407f389 src/remove.ts:209-333
+    # otherwise removes other agents' copies, and may retain shared canonical data.
     remove_args = (["remove", name, "-g", "-y", "-a", *SKILL_AGENTS] if project_dir is None
-                   else ["remove", name, "-y"])
+                   else ["remove", name, "-y", "-a", *targets])
     try:
         removed = run_skills_bin(skills_bin, remove_args, home, timeout=REMOVE_TIMEOUT, project_dir=project_dir)
     except (OSError, subprocess.TimeoutExpired) as error:
@@ -282,9 +305,17 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         print(f"{name}: verification failed and rollback could not run ({error})", file=sys.stderr)
         return "error"
     if project_dir is not None:
-        retained = canonical_skill_dir(home, name, project_dir).exists() or read_lock_entry(home, name, project_dir) is not None
-        if removed.returncode or retained:
-            print(f"{name}: verification failed and rollback incomplete (exit {removed.returncode})", file=sys.stderr)
+        canonical = canonical_skill_dir(home, name, project_dir)
+        canonical_retained = canonical.exists() or canonical.is_symlink()
+        lock_skills = load_lock(home, project_dir).get("skills")
+        lock_retained = isinstance(lock_skills, dict) and name in lock_skills
+        claude_link = project_dir / ".claude" / "skills" / name
+        claude_retained = agent == "claude-code" and (claude_link.exists() or claude_link.is_symlink())
+        if removed.returncode or canonical_retained or lock_retained or claude_retained:
+            reason = ("rollback retained, in use by another agent" if canonical_retained and not removed.returncode
+                      else "rollback incomplete")
+            print(f"{name}: error: {reason} (exit {removed.returncode}; canonical={canonical_retained}, "
+                  f"project-lock={lock_retained}, claude-link={claude_retained})", file=sys.stderr)
             return "error"
     print(f"{name}: installed content did not match the pinned manifest hash/tree; rolled back",
           file=sys.stderr)
@@ -315,14 +346,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skills-bin", default="skills",
                          help="Pinned 'skills' executable (default: 'skills' resolved on PATH)")
     parser.add_argument("--dry-run", action="store_true",
-                         help="Report planned actions; add, remove and verify nothing")
+                         help="Report planned actions without add/remove; project source lookups still run")
     parser.add_argument("--check-only", action="store_true",
                          help="Read-only installed pin check; exit 1 for any missing/drifted skill")
     parser.add_argument("--only", action="append", metavar="NAME",
                          help="Process only this manifest skill name; repeatable")
     parser.add_argument("--force", action="store_true",
                          help="Overwrite a local, unlocked skill folder whose SKILL.md does not "
-                              "match the manifest (default: refuse it as local-modified)")
+                              "match the manifest, or an unmanaged project Claude target "
+                              "(default: refuse it as local-modified)")
     parser.add_argument("--print-codex-config", action="store_true",
                          help="Print [[skills.config]] name/enabled=false lines for every "
                               "codex_enabled: false manifest skill, then exit")
@@ -396,6 +428,18 @@ def main(argv: list[str] | None = None) -> int:
     except (KeyError, TypeError) as error:
         print(f"install-skills failed: manifest missing 'cli' details ({error})", file=sys.stderr)
         return 1
+
+    if project_dir is not None:
+        # local-lock.ts:15-37 has computedHash, not a source tree SHA. Resolve
+        # every selected source/ref before any add, using the same Trees API
+        # oracle as skills@7407f389 src/skill-lock.ts:168-171. Cache all results
+        # so post-add verification never depends on a second network lookup.
+        try:
+            for source, ref in dict.fromkeys((skill["source"], skill["ref"]) for skill in skills):
+                pinned_source_trees(source, ref)
+        except InstallError as error:
+            print(f"install-skills failed: {error}", file=sys.stderr)
+            return 1
 
     results: dict[str, str] = {}
     try:

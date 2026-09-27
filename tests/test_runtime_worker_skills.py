@@ -118,6 +118,13 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         self.assertIsNone(budget["provider_input_tokens_before"])
         self.assertIsNone(budget["provider_input_tokens_after"])
 
+    def test_prune_contract_records_claude_listing_budget_and_unknown_visibility(self):
+        readme = (DIRECTORY / "README.md").read_text()
+        for required in ("skillListingBudgetFraction", "SLASH_COMMAND_TOOL_CHAR_BUDGET",
+                         "/context", "excluded-skill warnings", "uninstrumented (unknown)"):
+            self.assertIn(required, readme, required)
+        self.assertIn("description visibility", readme)
+
     def test_worker_installation_uses_extended_installer_without_hand_copy(self):
         readme = (DIRECTORY / "README.md").read_text()
         for target in ("OpenHands", "DeerFlow", "GPT Researcher", "crawl4ai"):
