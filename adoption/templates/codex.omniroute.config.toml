@@ -1,0 +1,56 @@
+# Codex profile "omniroute" for `codex -p omniroute`: GPT-6 through a local OmniRoute gateway, opt-in. Codex 0.134.0
+# and later layer $CODEX_HOME/<name>.config.toml over config.toml for --profile <name> (profile-v2, a second user
+# layer: codex-rs/config/src/loader/mod.rs L286-334 at rust-v0.157.1), so this one file carries the whole gateway
+# route and config.toml carries none of it: codex.config.template.toml stays gateway-free, and
+# `tools/adoption/render_config.py --check` keeps comparing a host's base config with it. Install it with
+# `tools/adoption/apply_codex_lane.py --omniroute-profile` as $CODEX_HOME/omniroute.config.toml. A worker has one
+# --profile slot, which stack-worker holds, so the landscape sweep's gateway lane writes the same keys into its own
+# lane home (tools/sota-convergence/landscape-sweep/build_args.py); tests/test_codex_worker_lane.py keeps both equal.
+#
+# Effort: OmniRoute 3.8.50 caps any model missing from MAX_EFFORT_BY_MODEL at xhigh, gpt-6-astra included
+# (open-sse/executors/codex.ts L331-355 at 5458026c). release/v3.8.51 at a58000c7 caps gpt-6-astra at ultra, one
+# level above max (open-sse/executors/codex/reasoningSuffix.ts L1-31), so max passes with the gateway's Thinking
+# Budget left at passthrough. That commit alone is not a working gateway for this profile: upstream PR #14904 (open
+# on 2026-09-27) reports HTTP 500 for every /v1/responses request on release/v3.8.51, and search needs the route
+# of PR #13788 (see supports_standalone_web_search below).
+# Max-effort GPT-6 lanes keep Codex's native openai provider as their default until a preregistered same-task
+# comparison with native Codex passes; this profile does not change that default.
+model = "cx/gpt-6-astra"
+model_provider = "omniroute"
+model_reasoning_effort = "max"
+# Live search as in the stack-worker profile. The bundled catalog runs gpt-6-astra on Responses Lite
+# (use_responses_lite, codex-rs/models-manager/models.json L4-23), which sends no hosted tools
+# (codex-rs/core/src/tools/spec_plan.rs L598-601), so a search reaches it only as Codex's standalone web search
+# (web.run), which the provider below opts into.
+web_search = "live"
+
+# Upstream's documented block (docs/guides/CODEX-CLI-CONFIGURATION.md L22-41 at a58000c7), port 20128 as a literal:
+# a host-value placeholder here would fail every host that lacks the value. OmniRoute's Codex models carry the cx/
+# prefix (same guide, L150-161); no gateway-side alias is needed. Never set name = "OpenAI": Codex's is_openai()
+# compares only this display name (codex-rs/model-provider-info/src/lib.rs L601-603) and would switch on OpenAI-only
+# paths. supports_websockets stays unset, so false (lib.rs L190-192). supports_standalone_web_search lets Codex send
+# web.run searches to the provider-relative alpha/search (codex-rs/codex-api/src/endpoint/search.rs L14-15), here
+# POST /v1/alpha/search. OmniRoute serves that route only with upstream PR #13788 (open and labelled
+# deferred-v3.8.52 on 2026-09-27); a gateway without it has no such route.
+[model_providers.omniroute]
+name = "OmniRoute"
+base_url = "http://127.0.0.1:20128/v1"
+env_key = "OMNIROUTE_API_KEY"
+env_key_instructions = "Export OMNIROUTE_API_KEY only in the shell that starts `codex -p omniroute`: the gateway's key, stored under inventory id omniroute with tools/credentials/open_credential_terminal.sh omniroute, or any non-empty value for a keyless loopback gateway."
+wire_api = "responses"
+requires_openai_auth = false
+supports_standalone_web_search = true
+
+# Keeps the gateway key out of every command the model runs. The keyed `filters` table is the canonical form, and it
+# must not be mixed with the legacy exclude/include_only arrays in one layer (codex-rs/config/src/
+# shell_environment_policy.rs L28-35 and L106-110). The base config's [shell_environment_policy.set] still applies.
+[shell_environment_policy.filters]
+"OMNIROUTE_API_KEY" = "exclude"
+
+# standalone_web_search is under development at 0.157.1 (codex-rs/features/src/lib.rs L1115-1120), so Codex prints
+# an under-development warning at startup; it stays visible on purpose. shell_snapshot (stable, default on) writes
+# every exported variable, a provider key included, into $CODEX_HOME/shell_snapshots
+# (codex-rs/shell-command/src/shell_snapshot_exports.rs), so this profile turns it off whatever the base config says.
+[features]
+standalone_web_search = true
+shell_snapshot = false

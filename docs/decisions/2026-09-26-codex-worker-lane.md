@@ -221,3 +221,122 @@ evidence.
 - **The rtk-worker result is one run.** It measures behaviour, not a guarantee.
 - **The profile depends on the user-scope servers.** It amends servers the user template registers; on a home
   without them, `-p stack-worker` fails. The dry run's read-back catches that.
+
+## Addendum 2026-09-27: start-up allowances, the gateway profile and four base keys
+
+**Status: decided; the repository side only. Not applied to any host.** Inputs: the 2026-09-27 settings synthesis
+(codex rows 1-10 and 16-22, conflicts K1-K5 and K11), the workstation's verified gateway wiring of the same day, and
+the token-stack verdict gaps serena#3, socraticode#2 and #3, jcodemunch-mcp#1 and #2, headroom#2, ai-memory#1 and
+context-mode#1. Codex paths below were read at `rust-v0.157.1` (tag object `ac0e23e5`), OmniRoute paths at `5458026c`
+(v3.8.50) or `a58000c7` (release/v3.8.51), all fetched with `gh api` on 2026-09-27.
+
+1. **The lane also owns two start-up allowances.** When serena or socraticode is registered, the batchWrite sets the
+   template's `startup_timeout_sec` (60 and 120 s). `codex mcp add` has no timeout option (its `--help`), so a server
+   it registered waits the 30 s default (`codex-mcp/src/rmcp_client.rs` L103 and L342); the verdict evidence found
+   both user entries without a value while the template and the main checkout's project file had one. Rollback
+   treats these keys like headroom's.
+2. **The gateway profile is opt-in and installed like the worker profile.** `--omniroute-profile` creates
+   `$CODEX_HOME/omniroute.config.toml` from `adoption/templates/codex.omniroute.config.toml`: only when absent,
+   journaled, removed by rollback only while it still holds the template. The profile file is a second user layer
+   (`config/src/loader/mod.rs` L286-334), so it carries the whole route and the base template stays gateway-free (K2):
+   - `cx/gpt-6-astra` with no gateway alias (K1; OmniRoute `docs/guides/CODEX-CLI-CONFIGURATION.md` L150-161);
+   - upstream's provider block with the literal port 20128 (the same guide, L22-41), `env_key` plus
+     `env_key_instructions` naming inventory id `omniroute` (K3), and `supports_websockets` unset (K5;
+     `model-provider-info/src/lib.rs` L190-192);
+   - the keyed `[shell_environment_policy.filters]` exclude for the key (`config/src/shell_environment_policy.rs`
+     L28-35 and L106-110), `supports_standalone_web_search` with the under-development `standalone_web_search`
+     feature (`features/src/lib.rs` L1115-1120), and `shell_snapshot = false`
+     (`shell-command/src/shell_snapshot_exports.rs`; the landscape sweep's GPT-6 probe found the key in a 0644
+     snapshot).
+
+   A base `config.toml` that still defines `[model_providers.omniroute]` is reported as a host step, not written:
+   the lane sends only keys it owns.
+
+   The profile does not choose the gateway build, but it names what a build needs. The bundled catalog runs
+   `gpt-6-astra` on Responses Lite (`models-manager/models.json` L4-23), which sends no hosted tools
+   (`core/src/tools/spec_plan.rs` L598-601; the unchanged upstream test `core/tests/suite/responses_lite.rs`
+   L328-370 asserts `web.run` present and hosted `web_search` absent, read, not run). A search therefore goes to the
+   provider-relative `alpha/search` (`codex-api/src/endpoint/search.rs` L14-15), which OmniRoute serves only with
+   upstream PR #13788, open and labelled `deferred-v3.8.52` on 2026-09-27. Upstream PR #14904, also open, reports
+   HTTP 500 for every `/v1/responses` request on `release/v3.8.51`. Commit `a58000c7` itself caps `gpt-6-astra` at
+   `ultra`, one level above `max` (`open-sse/executors/codex/reasoningSuffix.ts` L1-31).
+3. **Base keys (the synthesis's PR-F, H4 and H7).** `web_search = "live"` (`core/src/config/mod.rs` L2659-2670 and
+   L3050-3094), `check_for_update_on_startup = false` (`config/src/config_toml.rs` L520-523, with the pin in
+   `manifests/stack.json`), `[features] shell_snapshot = false` (`features/src/lib.rs` L1007-1012: stable, on by
+   default; without a snapshot each command runs as `shell -lc`, the login shell a snapshot would have captured,
+   `core/src/tools/runtimes/mod.rs` L268-276), and `[agents] default_subagent_reasoning_effort = "max"`
+   (`config_toml.rs` L723-724; `core/src/agent/child_config.rs` L196-250), with a comment that `max_depth` is
+   ignored for V2 models such as `gpt-6-astra`. The four dated `[projects]` trust entries are gone: none of the
+   directories exists on the recording host, and nothing else in this catalog names them. The workstation's own
+   `~/.codex/config.toml` already carried each of these keys on 2026-09-27 (a read of key names and these values
+   only), so the template now matches it there.
+4. **Template and recipe text for the token gaps.** `INCLUDE_DOT_FILES` (SocratiCode v1.14.0 `README.md` L1579) and
+   the approval-never refusal (`core/src/mcp_tool_call.rs` L1610-1614 and L2436-2466) are stated where the servers
+   are registered. The jCodeMunch recipe renders the project template into the opted-in checkout or worktree instead
+   of `codex mcp add`, which writes the user config, and keeps that file, which holds host paths, out of commits
+   through the repository's private `info/exclude` (git `gitrepository-layout`): the repository's `.gitignore` does
+   not list `.codex/`. The headroom recipe gains its Codex registration line.
+
+**Evidence, 2026-09-27, codex-cli 0.157.1 on the workstation:**
+- **Local integration check, scratch Codex homes** under `bwrap --unshare-net` with a private `/tmp`, no sign-in and
+  no gateway:
+  - With the rendered base template and both profiles, `codex --strict-config -p omniroute exec` stopped at "Missing
+    environment variable" for the gateway key, followed by the profile's instructions. So the configuration was
+    accepted and the provider came from the profile layer. Without a profile the same command reached the network
+    step, and `-p omniroute debug prompt-input` rendered the no-spawn sentence of `max`. The strict read goes
+    through `exec` because `codex debug` refuses the flag at 0.157.1 ("`--strict-config` is not supported for `codex
+    debug`"), so the synthesis's check "`codex --strict-config -p omniroute debug prompt-input`" cannot run as
+    written.
+  - `codex --strict-config -p stack-worker exec` fails with "invalid transport" on that profile's first
+    `[mcp_servers.*]` table, with main's templates too. Strict mode validates each configuration file on its own as a
+    whole `ConfigToml` (`config/src/loader/mod.rs` L594-600 and L625-645), and the profile's server tables name no
+    command or URL. The synthesis's advice to always pass `--strict-config` (codex row 6) therefore cannot apply to
+    stack-worker lanes as designed.
+  - `-c model_providers.omniroute.model=...`, which `omniroute run codex --model` sends (`bin/cli/commands/
+    launch-codex.mjs` L189-194), is ignored with a warning, also under `--strict-config`. Strict mode does check
+    session flags: in the control, an unknown top-level `-c` key was refused with "unknown configuration field ... in
+    -c/--config override". It checks the override layer on its own (`config/src/loader/mod.rs` L257-258 and
+    L647-669). A lone `model_providers.omniroute` table fails to deserialize, because its provider name is empty
+    (`config/src/config_toml.rs` L979-983 and L992-1001), and a layer that does not deserialize reports no ignored
+    field (`config/src/strict_config.rs` L97-110). So only the merged configuration's warning names the key. A
+    made-up key under the same `-c` table behaved the same way. This corrects the verifier's "`--strict-config`
+    rejects it".
+  - `codex mcp add headroom --env ...` printed "Added global MCP server" and kept the other servers'
+    `startup_timeout_sec` (rewritten as floats).
+  - The opt-in tests (`NAS_CODEX_INTEGRATION=1`) passed: the real app-server writes serena's allowance and rollback
+    restores the file byte for byte; `--strict-config -p omniroute exec` names the missing key; and through `codex -p
+    omniroute sandbox`, a fixture key reaches the command without the profile's filter and not with it, while the
+    base config's `set` reaches it in both arms (a failing-first control). Two more run the strict-mode limits
+    above again, each with its control: the provider `-c` key is warned about while an unknown top-level `-c` key
+    is refused, and `-p stack-worker` fails under `--strict-config` while the same home renders its prompt input
+    without it.
+- **Synthetic:** the fake-codex apply, dry-run and rollback tests of the new keys and the profile.
+- **Source review:** the paths above.
+
+Nothing here is host acceptance or a model run.
+
+**Alternatives considered:**
+- **A `${OMNIROUTE_PORT}` placeholder that `render_config.py` renders.** Rejected (K2): it fails every host without the
+  value, and 20128 is upstream's default.
+- **The provider block in the base template, or in `-c` flags for interactive use.** Rejected: every session would
+  route through the gateway, and the base config would stop matching the template.
+- **`auth = { command = ... }` instead of `env_key`.** Kept as an arm of the preregistered comparison (K3).
+- **Deleting a base `[model_providers.omniroute]` through batchWrite.** Rejected: the lane writes only keys it owns,
+  and a deleted table needs a new rollback form.
+- **The landscape sweep's lane-home builder reading this template.** Not done: that builder takes the model and URL as
+  arguments and has its own tests. `tests/test_codex_worker_lane.py` compares every provider and feature key it
+  writes with the profile's instead.
+
+**Overturn conditions:**
+- An OmniRoute release or a Codex pin change that alters the provider fields, the effort clamp or standalone search:
+  re-read the sources and rerun the opt-in tests.
+- A preregistered same-task comparison in which the gateway matches native Codex at `max`: max lanes may move to the
+  route; the profile itself does not change.
+- A Codex release whose `--strict-config` accepts partial profile server tables: add a strict read-back of the
+  stack-worker lane.
+- `codex mcp add` gaining a timeout option: the registration recipe sets the allowances and the writer can drop them.
+
+**Not decided here:** the interactive effort (`ultra` or `max`), approving read tools one by one in interactive
+sessions, and a host's own trust entries are user decisions. The latency of a login shell per command, now that
+the snapshot is off, is unmeasured. The stack-worker knobs `mcp_optional_startup_grace_ms = 0`, `required = true` and
+a pinned `model_reasoning_summary` wait for their measured trial.

@@ -17,12 +17,14 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
+import importlib.util
 import io
 import itertools
 import json
 import os
 import shutil
 import signal
+import string
 import subprocess
 import sys
 import tempfile
@@ -271,6 +273,89 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(lane.key_path(["plugins", "context-mode@context-mode", "mcp_servers", "context-mode"]),
                          'plugins."context-mode@context-mode".mcp_servers.context-mode')
         self.assertEqual(lane.key_path(["projects", "/a.b/c"]), 'projects."/a.b/c"')
+
+    def test_owned_edits_restore_the_start_up_allowance_of_registered_servers(self):
+        # `codex mcp add` takes no timeout option (its --help at 0.157.1), so a server it registered has none and
+        # Codex waits its 30 s default; the template gives serena 60 s and socraticode 120 s.
+        user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        live = {"mcp_servers": {"serena": {"command": "/x/serena"}, "socraticode": {"command": "/x/node"}}}
+        timeouts = {tuple(e["key"]): e["value"] for e in lane.owned_edits(live, "/opt/eco", "/usr/bin")
+                    if e["key"][-1] == "startup_timeout_sec"}
+        self.assertEqual(timeouts, {("mcp_servers", name, "startup_timeout_sec"):
+                                    user["mcp_servers"][name]["startup_timeout_sec"]
+                                    for name in lane.STARTUP_TIMEOUT_SERVERS})
+        self.assertEqual(set(timeouts.values()), {60, 120})
+        only_serena = lane.owned_edits({"mcp_servers": {"serena": {"command": "/x/serena"}}}, "/opt/eco", "/usr/bin")
+        self.assertEqual([e["key"][1] for e in only_serena if e["key"][-1] == "startup_timeout_sec"], ["serena"])
+
+    def test_omniroute_profile_template(self):
+        # Conflicts K1, K2, K3 and K5 of the 2026-09-27 settings synthesis, with the host's verified profile: the
+        # cx/ slug with no gateway alias, the provider block in the profile (never the base config), env_key plus a
+        # keyed filter that keeps the key out of model-run commands, websockets left at the default.
+        text = (TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8")
+        self.assertNotIn("${", text)  # installed verbatim; render_config.py never renders it
+        profile = tomllib.loads(text)
+        self.assertEqual({k: profile[k] for k in ("model", "model_provider", "model_reasoning_effort", "web_search")},
+                         {"model": "cx/gpt-6-astra", "model_provider": "omniroute", "model_reasoning_effort": "max",
+                          "web_search": "live"})
+        self.assertEqual(set(profile), {"model", "model_provider", "model_reasoning_effort", "web_search",
+                                        "model_providers", "shell_environment_policy", "features"})
+        provider = profile["model_providers"]["omniroute"]
+        self.assertEqual(provider["name"], "OmniRoute")  # "OpenAI" would switch on is_openai() paths
+        self.assertEqual(provider["base_url"], "http://127.0.0.1:20128/v1")
+        self.assertEqual(provider["env_key"], "OMNIROUTE_API_KEY")
+        self.assertEqual(provider["wire_api"], "responses")
+        self.assertIs(provider["requires_openai_auth"], False)
+        self.assertIs(provider["supports_standalone_web_search"], True)
+        self.assertNotIn("supports_websockets", provider)
+        self.assertNotIn("auth", provider)  # env_key, not a command (K3)
+        instructions = provider["env_key_instructions"]
+        self.assertIn("inventory id omniroute", instructions)
+        helper = "tools/credentials/open_credential_terminal.sh"
+        self.assertIn(helper, instructions)
+        self.assertTrue((ROOT / helper).is_file())
+        inventory = json.loads((ROOT / "adoption" / "credential-inventory.json").read_text(encoding="utf-8"))
+        entry = next(e for e in inventory["entries"] if e["id"] == "omniroute")
+        self.assertIn(provider["env_key"], entry["variables"])
+        # The canonical keyed form only: mixing it with the legacy exclude/include_only arrays in one layer is a
+        # config error, and no `set` here, so the base config's [shell_environment_policy.set] keeps applying.
+        self.assertEqual(profile["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
+        self.assertEqual(profile["features"], {"standalone_web_search": True, "shell_snapshot": False})
+        # K2: the base template stays gateway-free, so render_config.py --check still compares like with like.
+        user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        self.assertNotIn("model_providers", user)
+        self.assertNotIn("model_provider", user)
+        self.assertEqual(user["model"], "gpt-6-astra")
+
+    def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
+        # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
+        # home writes the same route itself. Every key it writes must equal the profile's, or one of them drifted.
+        # The profile's extra keys (env_key_instructions, the env filter, web_search) are not in the lane home.
+        spec = importlib.util.spec_from_file_location(
+            "landscape_sweep_build_args_for_lane_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
+        build_args = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(build_args)
+        profile = tomllib.loads((TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8"))
+        provider = profile["model_providers"]["omniroute"]
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            host = work / "fixture-host.json"
+            host.write_text(json.dumps({
+                "HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
+                "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
+                "CODE_INDEX_PATH": "/home/example/.code-index", "OTEL_ENDPOINT": "127.0.0.1:14318",
+                "AI_MEMORY_URL": "127.0.0.1:49374", "QDRANT_URL": "127.0.0.1:16333", "EMBED_URL": "127.0.0.1:8231"}))
+            build_args.stage_lane_home(work, model=profile["model"], base_url=provider["base_url"], host=str(host),
+                                       profile=TEMPLATES / "codex.stack-worker.config.toml", repo_root=ROOT)
+            staged = tomllib.loads((work / build_args.LANE_HOME / "config.toml").read_text(encoding="utf-8"))
+        for key in ("model", "model_provider", "model_reasoning_effort"):
+            self.assertEqual(staged[key], profile[key], key)
+        for key, value in staged["model_providers"]["omniroute"].items():
+            self.assertEqual(value, provider.get(key), f"model_providers.omniroute.{key}")
+        self.assertEqual(staged["features"], profile["features"])
+        self.assertEqual(build_args.OMNIROUTE_KEY_ENV, provider["env_key"])
+        self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
+        self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])
 
 
 class BlockTests(unittest.TestCase):
@@ -607,6 +692,91 @@ class ApplyFlowTests(unittest.TestCase):
         for line in ("line 1: [plugins.", "line 4: [mcp_servers.context-mode]", "line 8: [mcp_servers.context-mode.env]"):
             self.assertIn(line, out)
         self.assertNotIn("jcodemunch", out.split("HOST STEP", 1)[1].split("rehearsal", 1)[0])
+
+    def test_start_up_allowances_are_written_for_registered_servers_and_rolled_back(self):
+        # FakeHost registers socraticode without startup_timeout_sec; add serena the same way (a `codex mcp add`
+        # registration). codebase-memory has no template allowance and is left alone.
+        self.host.config["mcp_servers"]["serena"] = {"command": f"{self.host.eco}/bin/serena"}
+        self.host.config["mcp_servers"]["codebase-memory"] = {"command": f"{self.host.eco}/bin/codebase-memory-mcp"}
+        self.host.write_config(self.host.config)
+        before = self.host.read_config()
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("set  mcp_servers.serena.startup_timeout_sec: absent -> 60", out)
+        self.assertIn("set  mcp_servers.socraticode.startup_timeout_sec: absent -> 120", out)
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        after = self.host.read_config()
+        self.assertEqual(after["mcp_servers"]["serena"]["startup_timeout_sec"], 60)
+        self.assertEqual(after["mcp_servers"]["socraticode"]["startup_timeout_sec"], 120)
+        self.assertNotIn("startup_timeout_sec", after["mcp_servers"]["codebase-memory"])
+        code, out = self.host.run("--rollback", str(self.host.latest_run()))
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.host.read_config(), before)
+
+    def test_omniroute_profile_is_opt_in_created_read_back_and_rolled_back(self):
+        profile = self.host.codex_home / "omniroute.config.toml"
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertFalse(profile.exists())  # without --omniroute-profile nothing about it is written
+        first = self.host.latest_run()
+        self.assertNotIn("omniroute_profile", json.loads((first / "record.json").read_text()))
+        code, out = self.host.run("--omniroute-profile")
+        self.assertEqual(code, 0, out)
+        self.assertIn("omniroute.config.toml: create", out)
+        self.assertIn("prompt input -p omniroute:", out)
+        self.assertIn(" --omniroute-profile ", out)  # the printed apply command keeps the flag
+        self.assertFalse(profile.exists())  # the dry run writes nothing
+        code, out = self.host.run("--omniroute-profile", "--apply", "--expect-config-sha256", self.host.sha("config.toml"),
+                                  "--expect-agents-sha256", self.host.sha("AGENTS.md"))
+        self.assertEqual(code, 0, out)
+        self.assertEqual(profile.read_bytes(), (TEMPLATES / "codex.omniroute.config.toml").read_bytes())
+        self.assertEqual(profile.stat().st_mode & 0o777, 0o600)
+        run = self.host.latest_run()
+        self.assertNotEqual(run, first)
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["omniroute_profile"]["state"], "done")
+        self.assertIs(record["omniroute_profile"]["created"], True)
+        self.assertTrue(record["readback"]["prompt_input_omniroute"]["no_spawn_unless_asked"])
+        self.assertFalse(record["readback"]["prompt_input_omniroute"]["proactive_delegation"])
+        code, out = self.host.run("--omniroute-profile", "--apply", "--expect-config-sha256",
+                                  self.host.sha("config.toml"), "--expect-agents-sha256", self.host.sha("AGENTS.md"))
+        self.assertEqual(code, 0, out)
+        self.assertIn("already in place", out)
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertIn("omniroute_profile: removed", out)
+        self.assertFalse(profile.exists())
+        self.assertTrue((self.host.codex_home / "stack-worker.config.toml").exists())  # the first run's, untouched
+        code, out = self.host.run("--rollback", str(first))  # an older record without the entry
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("omniroute_profile", out)
+
+    def test_a_different_omniroute_profile_is_not_overwritten(self):
+        profile = self.host.codex_home / "omniroute.config.toml"
+        profile.write_text('model = "cx/gpt-6-astra"\nmodel_provider = "omniroute"\n')
+        code, out = self.host.run("--omniroute-profile", "--apply", "--expect-config-sha256",
+                                  self.host.sha("config.toml"), "--expect-agents-sha256", self.host.sha("AGENTS.md"))
+        self.assertEqual(code, 2, out)
+        self.assertIn("[fail] omniroute profile", out)
+        self.assertEqual(profile.read_text(), 'model = "cx/gpt-6-astra"\nmodel_provider = "omniroute"\n')
+        self.assertFalse(self.host.state.exists())
+
+    def test_a_base_config_provider_block_is_reported_as_a_host_step(self):
+        self.host.config["model_providers"] = {"omniroute": {"name": "OmniRoute", "base_url": "http://127.0.0.1:1/v1",
+                                                             "env_key": "OMNIROUTE_API_KEY"}}
+        self.host.write_config(self.host.config)
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("HOST STEP", out)  # reported only when the gateway profile is part of the run
+        code, out = self.host.run("--omniroute-profile")
+        self.assertEqual(code, 0, out)
+        step = out.split("HOST STEP", 1)[1].split("rehearsal", 1)[0]
+        lines = (self.host.codex_home / "config.toml").read_text().splitlines()
+        number = lines.index("[model_providers.omniroute]") + 1
+        self.assertIn(f"line {number}: [model_providers.omniroute]", step)
+        # The lane never sends that table: the rehearsed write leaves it as it was.
+        self.assertNotIn("model_providers", " ".join(line for line in out.splitlines() if line.startswith("  set ")))
 
 
 def fixture_events(name: str) -> list[dict]:
@@ -974,13 +1144,134 @@ while True:
                      "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.157.1 on PATH to run the real app-server")
 class CodexIntegrationTests(unittest.TestCase):
     """Local integration with the real codex: its app-server writes a scratch Codex home and rollback restores it
-    byte for byte; a project config outranks the profile but not the pinned flags. No sign-in or network needed
-    (the dry run's rehearsal runs under bwrap --unshare-net when it can)."""
+    byte for byte; a project config outranks the profile but not the pinned flags; the gateway profile loads under
+    --strict-config and its env filter keeps the key out of commands; and the two strict-mode limits the recipe states
+    hold at this pin. No sign-in, gateway or network needed (the dry run's rehearsal and the gateway-profile tests run
+    under bwrap --unshare-net when it can)."""
 
     def setUp(self):
         version = subprocess.run(["codex", "--version"], capture_output=True, text=True, check=False).stdout
         if lane.CODEX_VERSION not in version:
             self.skipTest(f"codex on PATH is {version.strip()}, not {lane.CODEX_VERSION}")
+
+    @staticmethod
+    def isolation(root: Path) -> list[str]:
+        """bwrap with no network and a private /tmp (codex sandbox keeps a lock there) around the scratch root, when
+        bwrap works here; [] otherwise."""
+        bwrap = shutil.which("bwrap")
+        if not bwrap:
+            return []
+        wrapper = [bwrap, "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc",
+                   "--tmpfs", "/tmp", "--bind", str(root), str(root), "--"]
+        return wrapper if subprocess.run([*wrapper, "true"], capture_output=True, check=False).returncode == 0 else []
+
+    @staticmethod
+    def gateway_home(root: Path, profile_text: str) -> dict:
+        """A scratch Codex home: a base config whose only table is a `set`, and the given gateway profile."""
+        codex_home = root / "home" / ".codex"
+        codex_home.mkdir(parents=True)
+        (codex_home / "config.toml").write_text('[shell_environment_policy.set]\nNAS_PROBE_SET = "kept"\n')
+        (codex_home / "omniroute.config.toml").write_text(profile_text)
+        (root / "cwd").mkdir()
+        return {"HOME": str(root / "home"), "CODEX_HOME": str(codex_home), "LANG": "C.UTF-8",
+                "PATH": os.pathsep.join([str(Path(shutil.which("codex")).parent), os.defpath])}
+
+    def test_the_omniroute_profile_loads_strictly_and_names_its_key(self):
+        # --strict-config rejects an unknown key at load. With the key unset, Codex then stops at the provider's
+        # env_key (model-provider-info/src/lib.rs api_key at rust-v0.157.1) before any request, printing the
+        # profile's env_key_instructions: the provider came from the profile layer.
+        text = (TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8")
+        instructions = tomllib.loads(text)["model_providers"]["omniroute"]["env_key_instructions"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            env = self.gateway_home(root, text)
+            got = subprocess.run([*self.isolation(root), "codex", "--strict-config", "-p", "omniroute", "exec",
+                                  "--skip-git-repo-check", "-s", "read-only", "reply ok"], cwd=root / "cwd", env=env,
+                                 stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
+        self.assertNotEqual(got.returncode, 0)
+        self.assertIn("Missing environment variable: `OMNIROUTE_API_KEY`", got.stderr)
+        self.assertIn(instructions, got.stderr)
+
+    def test_the_omniroute_filter_keeps_the_key_out_of_commands(self):
+        # A failing-first control. `codex sandbox` builds its command's environment from shell_environment_policy
+        # with create_env, as a model-run command does (cli/src/debug_sandbox.rs L258-259 at rust-v0.157.1), and
+        # --profile applies to it. The same fixture value reaches the command without the profile's filter and not
+        # with it; the base config's `set` reaches it either way (the two forms merge across layers).
+        text = (TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8")
+        unfiltered = text.replace('[shell_environment_policy.filters]\n"OMNIROUTE_API_KEY" = "exclude"\n', "")
+        self.assertNotEqual(unfiltered, text)
+        probe = ('if [ -n "${OMNIROUTE_API_KEY+x}" ]; then echo key=present; else echo key=absent; fi; '
+                 'echo "set=${NAS_PROBE_SET:-missing}"')
+        runs = {}
+        for label, profile_text in (("filtered", text), ("unfiltered", unfiltered)):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                env = {**self.gateway_home(root, profile_text), "OMNIROUTE_API_KEY": "fixture-not-a-key"}
+                runs[label] = subprocess.run([*self.isolation(root), "codex", "-p", "omniroute", "sandbox", "--",
+                                              "sh", "-c", probe], cwd=root / "cwd", env=env,
+                                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
+        if all(run.returncode != 0 for run in runs.values()):
+            self.skipTest(f"codex sandbox cannot run here: {runs['unfiltered'].stderr.strip()[-200:]}")
+        self.assertEqual(runs["unfiltered"].stdout.split(), ["key=present", "set=kept"])  # the control
+        self.assertEqual(runs["filtered"].stdout.split(), ["key=absent", "set=kept"])
+        self.assertNotIn("fixture-not-a-key", runs["filtered"].stdout + runs["filtered"].stderr)
+
+    def strict_exec(self, root: Path, env: dict, *flags: str) -> subprocess.CompletedProcess:
+        """`codex --strict-config <flags> exec` in a scratch home with stdin closed. At 0.157.1 `codex debug` refuses
+        --strict-config ("not supported for `codex debug`"), so exec is the strict read: without the gateway key it
+        stops at that key, or earlier at a configuration error, before any request."""
+        return subprocess.run([*self.isolation(root), "codex", "--strict-config", *flags, "exec",
+                               "--skip-git-repo-check", "-s", "read-only", "reply ok"], cwd=root / "cwd", env=env,
+                              stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
+
+    def test_strict_config_checks_a_session_flag_layer_on_its_own(self):
+        # recipes/README.md "Never `omniroute run codex --model`", with its control. Strict mode refuses an unknown
+        # top-level -c key (config/src/loader/mod.rs L257-258 and L647-669 at rust-v0.157.1). The -c key that
+        # launch-codex.mjs sends, model_providers.omniroute.model, is only warned about: that layer on its own has an
+        # empty provider name and fails to deserialize (config/src/config_toml.rs L979-983 and L992-1001), and a
+        # layer that fails reports no ignored field (config/src/strict_config.rs L97-110). The profile's model stays.
+        text = (TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8")
+        runs = {}
+        for label, override in (("top-level", "nas_probe_unknown_key=1"),
+                                ("provider", 'model_providers.omniroute.model="x-model"')):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                runs[label] = self.strict_exec(root, self.gateway_home(root, text), "-p", "omniroute", "-c", override)
+        self.assertNotEqual(runs["top-level"].returncode, 0)
+        self.assertIn("unknown configuration field `nas_probe_unknown_key` in -c/--config override",
+                      runs["top-level"].stderr)
+        provider = runs["provider"]
+        self.assertNotEqual(provider.returncode, 0)
+        self.assertIn("`model_providers.omniroute.model` is ignored", provider.stderr)
+        self.assertIn("model: cx/gpt-6-astra", provider.stderr)
+        self.assertIn("Missing environment variable: `OMNIROUTE_API_KEY`", provider.stderr)  # loaded, then stopped
+
+    def test_strict_config_refuses_the_stack_worker_profile_at_this_pin(self):
+        # recipes/README.md: start stack-worker lanes without --strict-config. Strict mode validates each
+        # configuration file on its own as a whole configuration (config/src/loader/mod.rs L594-600 and L625-645 at
+        # rust-v0.157.1), and the profile's server tables amend servers the base config registers, naming no command.
+        # The control: without --strict-config the same home renders the profile's prompt input.
+        fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
+                   "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
+                   "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
+                   "EMBED_URL": "127.0.0.1:1"}
+        base = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            env = self.gateway_home(root, "")
+            codex_home = Path(env["CODEX_HOME"])
+            (codex_home / "config.toml").write_text(base.substitute(fixture))
+            (codex_home / "stack-worker.config.toml").write_bytes(
+                (TEMPLATES / "codex.stack-worker.config.toml").read_bytes())
+            strict = self.strict_exec(root, env, "-p", "stack-worker")
+            plain = subprocess.run([*self.isolation(root), "codex", "-p", "stack-worker", "debug", "prompt-input",
+                                    "probe"], cwd=root / "cwd", env=env, stdin=subprocess.DEVNULL,
+                                   capture_output=True, text=True, timeout=120)
+        self.assertNotEqual(strict.returncode, 0)
+        self.assertIn("stack-worker.config.toml", strict.stderr)
+        self.assertIn("invalid transport", strict.stderr)
+        self.assertEqual(plain.returncode, 0, plain.stderr[-400:])
+        self.assertTrue(lane.prompt_input_counts(plain.stdout)["no_spawn_unless_asked"])  # the profile's max effort
 
     def test_real_app_server_apply_and_byte_exact_rollback(self):
         host = FakeHost(self)
@@ -988,6 +1279,7 @@ class CodexIntegrationTests(unittest.TestCase):
         text = ('# a comment the writer keeps\nmodel = "gpt-6-astra"\nmodel_reasoning_effort = "ultra"\n\n'
                 f'[features]\ndaemon_auto_start = false\n\n[shell_environment_policy.set]\n'
                 f'PATH = "{host.eco}/bin:/usr/bin:/bin"\n\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n\n'
+                f'[mcp_servers.serena]\ncommand = "{host.eco}/bin/serena"\n\n'
                 f'[mcp_servers.socraticode]\ncommand = "{host.eco}/bin/node"\nstartup_timeout_sec = 120\n\n'
                 f'[mcp_servers.headroom]\ncommand = "{host.eco}/bin/headroom"\n\n[mcp_servers.headroom.env]\n'
                 'HEADROOM_OFFLINE = "1"\n\n[plugins."context-mode@context-mode"]\nenabled = true\n')
@@ -1000,6 +1292,8 @@ class CodexIntegrationTests(unittest.TestCase):
         written = (host.codex_home / "config.toml").read_text()
         self.assertIn("# a comment the writer keeps", written)
         self.assertIn("startup_timeout_sec = 120\n", written)  # an integer stays an integer
+        # serena, registered without an allowance (as `codex mcp add` leaves it), gets the template's 60 s
+        self.assertEqual(tomllib.loads(written)["mcp_servers"]["serena"]["startup_timeout_sec"], 60)
         code, out = host.run("--rollback", str(host.latest_run()))
         self.assertEqual(code, 0, out)
         for name, data in before.items():
