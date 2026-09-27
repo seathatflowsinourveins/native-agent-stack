@@ -110,7 +110,14 @@ plans for is the labelled projection `macos-arm64-64gb-projected` in
 [`adoption/hardware-profiles.json`](../hardware-profiles.json) (about 38 GB of
 unified memory as the generation budget, `full` semantic-RAG tier, both drawn
 from one shared pool); for this page's embedding choice it follows the 48 GB
-rules. None of these sizes has a real qualification run yet.
+rules. The projections themselves have no qualification run. The measured
+64 GB host `mac-coordinator-64gb-20260925` has had one since 2026-09-27. The
+pinned RAG embedder, the memory stack's Ollama models and a 27B-class 4-bit
+generation model ran together under coordinator load with no swap growth and
+no memory kills. A large Node production build running alongside that set did
+push the host into swap (peak about 14 GB, no kills), so the shared-pool
+warning still applies to work beyond that set
+([#379 evidence](../../evidence/artifacts/mac-model-hosting-20260927/README.md)).
 
 ## Prerequisites
 
@@ -707,8 +714,14 @@ currently loaded from that same destination path, rename into place,
 confirmed loaded from its own destination path, or not loaded at all with a
 file present to clean up). On the hosted runner (run `35875188590`, "What a
 hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
-`qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
-three has run on a Mac workstation.
+`qdrant` and `llama-embed` agents; `ai-memory` has not run there. On
+2026-09-27 the `llama-embed` agent began running on the coordinator Mac
+`mac-coordinator-64gb-20260925`. It passes the embedding acceptance there,
+with all layers on Metal ([#379 evidence](../../evidence/artifacts/mac-model-hosting-20260927/README.md)).
+That host's pre-existing `local.agent-ecosystem.qdrant` and
+`local.agent-ecosystem.ai-memory` agents serve the other two roles. The
+`qdrant` and `ai-memory` templates therefore still have not run on a Mac
+workstation.
 
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 

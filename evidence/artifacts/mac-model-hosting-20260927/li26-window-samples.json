@@ -1,0 +1,39 @@
+{
+  "free_percent_max": 63,
+  "free_percent_min": 34,
+  "interval_seconds": 60,
+  "kind": "mac_li26_window_memory",
+  "max_ollama_resident_gib": 14.950000000000001,
+  "note": "sampled every 60 s while the li26 runs were active; ai-memory loads and unloads its Ollama models on its own schedule",
+  "ollama_models_seen": [
+    "qwen3-embedding:4b",
+    "qwen3.5-9b-64k:latest"
+  ],
+  "samples": 118,
+  "samples_with_ollama_models_resident": 6,
+  "swap_used_values": [
+    "16.81M",
+    "4993.12M",
+    "5009.19M",
+    "5017.19M",
+    "5033.19M",
+    "5137.19M",
+    "5438.81M",
+    "5630.81M",
+    "5638.81M",
+    "5646.81M",
+    "5654.81M",
+    "5662.81M",
+    "5670.81M",
+    "5678.81M",
+    "5710.81M",
+    "5742.81M",
+    "5750.81M",
+    "5766.81M",
+    "5774.81M",
+    "5782.88M",
+    "5798.88M",
+    "5838.88M",
+    "7647.81M"
+  ]
+}

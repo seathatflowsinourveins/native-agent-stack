@@ -24,10 +24,13 @@
       "request_label": "host:mac-coordinator",
       "owns": [
         "macos-acceptance",
-        "coordination"
+        "coordination",
+        "model-hosting",
+        "memory-e2e",
+        "rag-e2e"
       ],
       "credentials": [],
-      "note": "The replacement coordinator Mac."
+      "note": "The replacement coordinator Mac. It also owns model-hosting, memory-e2e and rag-e2e for its own native memory/RAG foundation layer (user decision 2026-09-27, request #379; measured basis in docs/decisions/2026-09-27-mac-native-model-hosting.md). GPU runtime qualification, cross-host model qualification and independent review stay with the workstation. Routing still follows only the request label."
     }
   },
   "peers": [
