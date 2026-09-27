@@ -174,9 +174,19 @@ directory holding the same six files under their committed `.frozen` names repor
 sources found" (exit 128) — identical in kind to the original record's control, and consistent
 with `TRACKED` not matching the `.frozen` names either.
 
-Under their plain names, `dependency-review` (`fail-on-severity: high`) would fail this pull
-request on at least GHSA-45rx-2jwx-cxfr and GHSA-f4j7-r4q5-qw2c, and `osv-scanner` would fail
-identically once `TRACKED` required the plain-named files in the inventory.
+Under their plain names, the five Python locks would need an inventory entry the same way the
+npm pair above does, and the required `osv-scanner` check would then fail on the advisories
+above (most immediately GHSA-6hm5-jgcp-p838 and the rest of `nltk`'s 42, which `official.lock.txt`
+carries unfiltered — see Context). `dependency-review` is a different mechanism: it reads GitHub's
+native dependency graph, which recognizes manifests by fixed per-ecosystem names
+(`requirements.txt`, `package-lock.json`, and so on), not by this repository's `TRACKED` pattern.
+None of the six plain names here — `official.lock.txt`, `embed.lock.txt`, `hindsight.lock.txt`,
+`mempalace.lock.txt`, `build.lock.txt`, `agentmemory-repo-package-lock.json` — is one of those
+recognized names (the npm one specifically is not `package-lock.json`, the same point the driver's
+README already makes about `TRACKED`), so `dependency-review` would not see any of them either
+way; unlike the 2026-09-25 record's own file, which was named exactly `package-lock.json` and so
+was reachable by both checks. The gate these six files actually escape by staying `.frozen` is
+`osv-scanner`, for the five that would otherwise need a `TRACKED` inventory entry.
 
 The bytes stay pinned: `SHA256SUMS` in `blueprints/memory-stack/longmemeval/v4/` and
 `manifests/evidence.json` list all six files, and `scripts/validate.py` checks their sha256.
