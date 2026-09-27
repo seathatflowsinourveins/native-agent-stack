@@ -3337,8 +3337,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "e433126c44fcb687ec6fec7d6c2a6a568af645f7a99331a048cc7208333be28e",
-      "bytes": 2778
+      "sha256": "6a6aebbd563c3e012077a0adafa6f711813b2cedfd5d31bc8a7f742256ffb867",
+      "bytes": 2858
     },
     {
       "path": ".gitattributes",
@@ -3717,8 +3717,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "c3533b6a0c4715a9a6acaf8cb43c5e35bd8b7e2ccac8356b0d69b2cecdefce3f",
-      "bytes": 10848
+      "sha256": "7026b8a04efcc5c81195997a7442951717153a3d5ff3830912b59e5526db8c7f",
+      "bytes": 10875
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -13178,8 +13178,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "0daad888d852dc86b479e8253dcd7bcde6bad937542607860eddc7420be08661",
-      "bytes": 139755
+      "sha256": "755e9d1e85f8abca24355a8a3cc31421e00f434f140157ced62d12a435394db7",
+      "bytes": 139753
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -13865,6 +13865,11 @@
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
       "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
       "bytes": 7782
+    },
+    {
+      "path": "docs/decisions/2026-09-27-model-currency.md",
+      "sha256": "fa158f90174868c3c57165a82db08c52fcfc83859f4d80125ed1c6aa88a54d89",
+      "bytes": 27671
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -38198,8 +38203,8 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "42e3087a50fc464be293f3ec7695b4780fa45ede696037819ea335cfa196d2a3",
-      "bytes": 284
+      "sha256": "437c91a3ce30fb83918466e4e097aa4a0068b0d3562fb34c2e7eb62d9186ad43",
+      "bytes": 364
     },
     {
       "path": "examples/claude-native/workflows/README.md",
@@ -38713,8 +38718,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "f2ac3f79cc74880bef8ded8e68ae02e5fc6e1a86279ceb5ce9fea731c9a7dbca",
-      "bytes": 34204
+      "sha256": "fdae81b5d5c089d7667d42e5d0601bd1b5b37cc287b33dfd74c229c8b8ca9ef8",
+      "bytes": 34915
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -39343,8 +39348,8 @@
     },
     {
       "path": "tests/test_foundation_catalog.py",
-      "sha256": "e89631495b52c7ee0c3a1387c4dac315a4d1d75f26850f4951b3c632fb26a6be",
-      "bytes": 11791
+      "sha256": "4a099466241a5d124c814c59fc018c487a4f5714cc87b10231062c5f4f11c5af",
+      "bytes": 13781
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -39423,8 +39428,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "5148d477a16b856b7d8e5a5ae544a0c49ccb21a88e57542fe49cc36582c8eee4",
-      "bytes": 57898
+      "sha256": "2428c8eb1cb0c522c5e064726e216dae6b3dbf21d43f24b9b3e24810cf52a47e",
+      "bytes": 61723
     },
     {
       "path": "tests/test_install_skills.py",
