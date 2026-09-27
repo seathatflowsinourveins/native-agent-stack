@@ -7,8 +7,8 @@ and it keeps negative controls that must fail.
 
 | Gate | Question | Gate rows (must pass) | Controls (must fail) |
 |---|---|---|---|
-| `jcodemunch` | In the main checkout, does one `order` call (`search_symbols` with `repo`) complete and return the symbol's signature? | 2 fixtures × 3 | `prompt` approval, disabled server (× 2 fixtures) |
-| `ai-memory` | Does one `memory_query` call complete under approval policy `never`? This is decision [F7](../../docs/decisions/2026-09-26-token-practice-f1-f9.md#f7-codex-mcp-approval-2026-09-26). | 2 fixtures × 3 | `prompt` approval, disabled server (× 2 fixtures) |
+| `jcodemunch` | In the main checkout, does the prescribed `order` call (action `search_symbols` with the brief's `repo` and `query`) complete and return the symbol's id and full signature? | 2 fixtures × 3 | `prompt` approval, disabled server (× 2 fixtures) |
+| `ai-memory` | Does the prescribed `memory_query` call (the brief's `query`, `workspace` and `project`) complete under approval policy `never`? This is decision [F7](../../docs/decisions/2026-09-26-token-practice-f1-f9.md#f7-codex-mcp-approval-2026-09-26). | 2 fixtures × 3 | `prompt` approval, disabled server (× 2 fixtures) |
 | `m13` | With two sessions running at once in two worktrees, does each tool class, called without a cwd, read its own worktree's file? | 20 repetitions × 2 worktrees | disabled context-mode; context-mode bound to the other worktree (3 × 2 each) |
 
 M13's classes are:
@@ -19,8 +19,10 @@ M13's classes are:
 - serena `find_symbol`.
 
 A gate row passes only when every class returns that row's own fresh token and no other:
-- the token must come from a completed, error-free call made the way the brief prescribes: the relative path, no cwd or
-  directory change, no absolute path and no token typed into the arguments;
+- the token must come from a completed, error-free call made the way the brief prescribes: the relative path, no cwd
+  argument, no absolute path, no token typed into the arguments, and no directory change in the command or code
+  (`cd`, `pushd`, `popd`, `chdir` as in `os.chdir` or `process.chdir`, `Set-Location`, or a `-C`, `--chdir` or
+  `--directory` option);
 - `ctx_search` counts only after a `ctx_index` of the fixture under the same source, and both must complete;
 - any other token in any call of the class, completed or failed, means a wrong root or a stale result.
 
@@ -39,15 +41,17 @@ python3 tools/capability-gate/run_gate.py {jcodemunch,ai-memory,m13} [--keep]
 The `jcodemunch` gate runs in the main checkout, because its jcodemunch server table lives in that checkout's
 host-only project `.codex/config.toml`. `m13` creates two detached worktrees at `HEAD` and removes them afterwards.
 
-**Output.** The first line is the verdict with counts per arm and per Loki reconciliation, and fits in the
-400-character excerpt that `scripts/host_receipts.py record` keeps. For `m13`, one line of class tallies per arm
-follows. Exit 0 means that:
+**Output.** The first line is the verdict. It has counts per arm and per Loki reconciliation, plus the sha256 of the
+retained results file, and fits in the 400-character excerpt that `scripts/host_receipts.py record` keeps. For `m13`,
+one line of class tallies per arm follows. The last line names the retained file relative to the state directory.
+Exit 0 means that:
 - every arm produced exactly its expected rows (jcodemunch and ai-memory: 6 gate rows and 2 per control; m13: 40
   gate rows and 6 per control), each in its own conversation;
 - every gate row passed;
 - every control row failed by assertion, not by a provider error, with the outcome below, while the tools that control
   does not touch kept working;
-- every row's MCP call count equals its Codex `codex.tool_result` count in Loki.
+- every row's MCP call count equals its Codex `codex.tool_result` count in Loki;
+- the results file was retained (see Privacy).
 
 | Control | Predicted outcome |
 |---|---|
@@ -62,7 +66,15 @@ follows. Exit 0 means that:
   inside that directory
   ([`src/logger.ts#L227`](https://github.com/promptfoo/promptfoo/blob/0.123.1/src/logger.ts#L227) honors it);
 - telemetry, sharing and caching are off;
-- the output holds counts only: no model text, tool results or conversation ids.
+- the output holds counts and the retained file's hash only: no model text, tool results or conversation ids;
+- **retained results:** a copy of the results file is kept, because it holds the Codex items every verdict was scored
+  from, so the verdicts can be checked again against the returned results
+  ([acceptance-evidence policy](../../docs/acceptance-evidence-policy.md), "Preserve the returned result").
+  - Location: `native-agent-stack/capability-gate/<gate>-<run UTC>-<pid>/results.json` under `$XDG_STATE_HOME`
+    (default `~/.local/state`), or under `CAPABILITY_GATE_RETAIN`.
+  - The directories are 0700 and the file 0600. It is never overwritten, and it stays on the host, uncommitted,
+    because it holds tool results and model text.
+  - The verdict line carries its sha256, and a run whose results cannot be retained fails.
 
 ## How it works
 
@@ -79,6 +91,9 @@ follows. Exit 0 means that:
     ([reference](https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/configuration/expected-outputs/deterministic.md#trajectorytool-used)).
   - The JavaScript assertions in [`assertions.js`](assertions.js) read the tool results from the provider's raw
     items: `response.raw`, `src/providers/openai/codex-sdk.ts:2430`.
+  - For jcodemunch and ai-memory, only the prescribed call counts: the tool the config names (`order`,
+    `memory_query`) with every argument the row's `call` names. The jcodemunch detail is the symbol's id
+    (`<file>::<name>#function`) and full signature.
   - The detail they look for is absent from the task text, and each assertion checks that absence against the
     rendered prompt.
 - **M13 rows.**
@@ -118,6 +133,11 @@ assertions, hook and wrapper are documented local integration code. Promptfoo an
   control shows that the own token is not returned. It does not show which tree's file was indexed.
 - **Shell class.** It is scored, but not reconciled against Loki. Codex's `functions.exec`, `exec_command` and `wait`
   envelope records do not map one-to-one to shell items, and that is a collector follow-up.
+- **Shell working directory.** Codex's `command_execution` item carries the command text, output, exit code and
+  status, but no working directory (`CommandExecutionItem` in `@openai/codex-sdk` 0.153.4's `dist/index.d.ts`).
+  - The shell class shows that a command naming only the relative path, with no directory change, returned the
+    row's own token.
+  - A working-directory argument to the shell tool itself would not be visible to the scorer.
 - **Originator.** SDK runs log as `codex_sdk_ts`, not the lane's `codex_exec`. Everything else is the lane's own
   profile.
 - **`order`, not `route`.** The jcodemunch fixtures call `order` with explicit `search_symbols` arguments.
@@ -128,7 +148,11 @@ assertions, hook and wrapper are documented local integration code. Promptfoo an
     6 of 6 runs. Neither symbol was in any of its 10 results.
   - `route` also has no default repository, so the fixtures pass `repo`.
   - The gate tests the tool binding and approval, not the lane's guidance about `route`.
-- **Fixtures.** Each checks a detail of the current code: register_file's `relative_path: str`,
-  profile_servers_without_base's `profile_bytes: bytes`, and memory_query's `hits` list. Update the fixture when that
-  code changes.
+- **Fixtures.** Each checks a detail of the current code and index:
+  - the ids and full signatures of `register_file` (`scripts/host_receipts.py`) and `profile_servers_without_base`
+    (`tools/sota-convergence/landscape-sweep/build_args.py`);
+  - memory_query's `hits` list.
+
+  Update the fixture when that code changes. An empty `hits` list passes, so the ai-memory gate shows access, not
+  answer quality.
 - **Timing.** Loki keeps 72 hours, so the reconciliation runs at the end of each gate run.

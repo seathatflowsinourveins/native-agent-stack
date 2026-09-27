@@ -6,14 +6,17 @@ each row with its own assertions: trajectory spans plus the tool-result checks i
 what promptfoo does not do:
 - it creates the two M13 worktrees at HEAD and removes them afterwards;
 - it keeps promptfoo's database, logs and results in a private temporary directory, with telemetry and sharing off;
+- it retains a copy of the results file, which holds the Codex items every verdict is scored from, in a private state
+  directory (see retain), and prints the copy's sha256 in the verdict line, so the verdicts can be checked again
+  against the returned results;
 - it reads the verdicts from promptfoo's results file. Every arm must produce exactly its expected rows, each in its
   own conversation; every gate row must pass; and every control row must fail by assertion (not by a provider
   error), with the outcome its manipulation predicts while the tools it does not touch keep working;
 - it counts, per row, the MCP calls in the provider's raw items and the `codex.tool_result` records that Codex's own
   OTel exporter sent to Loki for the same conversation. The two counts must be equal for every row.
 
-It prints counts and verdicts only, never model text, tool results or conversation ids; its first line fits in the
-400-character excerpt that `scripts/host_receipts.py record` keeps. Exit 0 means the gate passed.
+It prints counts, verdicts and the retained file's hash only, never model text, tool results or conversation ids; its
+first line fits in the 400-character excerpt that `scripts/host_receipts.py record` keeps. Exit 0 means the gate passed.
 
 Loki: http://127.0.0.1:13100 (observability/backends/README.md), override with CAPABILITY_GATE_LOKI. Runs through the
 SDK arrive as service_name "codex_sdk_ts": the bundled @openai/codex-sdk 0.153.4 sets
@@ -21,11 +24,14 @@ CODEX_INTERNAL_ORIGINATOR_OVERRIDE=codex_sdk_ts unless the environment already c
 thread id, and MCP records are keyed on tool_namespace "mcp__<server>" (observability/collector/README.md).
 
 Usage: run_gate.py {jcodemunch,ai-memory,m13} [--keep]
+
+Retention: CAPABILITY_GATE_RETAIN overrides the state directory (see retain_root).
 """
 from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import json
 import os
 import shutil
@@ -234,8 +240,10 @@ def reconcile(rows: list[dict], counts: dict[str, Counter]) -> tuple[int, int, i
     return matched, len(rows), sum(sum(c.values()) for c in counts.values())
 
 
-def summary(gate: str, result: dict, recon: tuple[int, int, int], versions: str) -> tuple[str, bool]:
-    """The first output line and the gate verdict (see verdict), which also needs every row to reconcile with Loki."""
+def summary(gate: str, result: dict, recon: tuple[int, int, int], versions: str,
+            results_sha256: str = "") -> tuple[str, bool]:
+    """The first output line and the gate verdict (see verdict), which also needs every row to reconcile with Loki and
+    the results file to be retained (its sha256 given)."""
     arms = result["arms"]
     parts = []
     for arm in sorted(arms, key=lambda a: (a != "gate", a)):
@@ -243,11 +251,34 @@ def summary(gate: str, result: dict, recon: tuple[int, int, int], versions: str)
         n, what = (t["passed"], "pass") if arm == "gate" else (t["predicted"], "fail as predicted")
         parts.append(f"{arm} {n}/{t['rows']} {what}" + (f", {t['errored']} errored" if t["errored"] else ""))
     ok = (result["matrix_ok"] and result["sessions_ok"] and result["gate_ok"] and result["controls_ok"]
-          and recon[1] > 0 and recon[0] == recon[1])
+          and recon[1] > 0 and recon[0] == recon[1] and bool(results_sha256))
     rows = (f"{result['rows']} rows {'as expected' if result['matrix_ok'] else 'NOT the expected ' + str(result['expected_rows']) + ' by arm'}"
             f", {result['distinct_sessions']} distinct sessions")
     return (f"capability-gate {gate}: {'PASS' if ok else 'FAIL'} | " + "; ".join(parts) + f" | {rows}"
-            f" | loki {recon[0]}/{recon[1]} rows match ({recon[2]} MCP tool results) | {versions}"), ok
+            f" | loki {recon[0]}/{recon[1]} rows match ({recon[2]} MCP tool results)"
+            f" | results {results_sha256 or 'NOT retained'} | {versions}"), ok
+
+
+def retain_root() -> Path:
+    """Where runs' results are retained: CAPABILITY_GATE_RETAIN, else native-agent-stack/capability-gate under
+    $XDG_STATE_HOME (default ~/.local/state). This is private host state and is never committed."""
+    configured = os.environ.get("CAPABILITY_GATE_RETAIN")
+    if configured:
+        return Path(configured)
+    return Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local" / "state") / "native-agent-stack" / "capability-gate"
+
+
+def retain(results_path: Path, root: Path, name: str) -> tuple[str, str]:
+    """Copy the results file to <root>/<name>/results.json and return its sha256 and its path relative to root. The run
+    directory must be new and the file is never overwritten; directories are 0700 and the file 0600, because it holds
+    tool results and model text (docs/acceptance-evidence-policy.md: keep sensitive raw output private)."""
+    data = results_path.read_bytes()
+    root.mkdir(mode=0o700, parents=True, exist_ok=True)
+    (root / name).mkdir(mode=0o700)
+    target = root / name / "results.json"
+    with os.fdopen(os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as handle:
+        handle.write(data)
+    return hashlib.sha256(data).hexdigest(), f"{name}/results.json"
 
 
 def promptfoo_env(private: Path, main_checkout: str) -> dict[str, str]:
@@ -308,6 +339,14 @@ def main() -> int:
             print(f"capability-gate {args.gate}: FAIL | promptfoo wrote no results (log kept in the private directory)")
             args.keep = True
             return 1
+        stamp = datetime.datetime.fromtimestamp(started / 1e9, datetime.timezone.utc)
+        try:
+            results_sha256, retained = retain(results_path, retain_root(),
+                                              f"{args.gate}-{stamp:%Y%m%dT%H%M%SZ}-{os.getpid()}")
+        except OSError as error:
+            print(f"capability-gate {args.gate}: FAIL | the results file could not be retained ({type(error).__name__})")
+            args.keep = True
+            return 1
         rows = parse_rows(json.loads(results_path.read_text()), args.gate)
         result = verdict(rows, args.gate)
         sessions = {row["session"] for row in rows if row["session"]}
@@ -324,13 +363,13 @@ def main() -> int:
             print(f"capability-gate {args.gate}: FAIL | Loki query failed ({type(error).__name__})")
             return 1
         recon = reconcile(rows, counts)
-        versions = (f"promptfoo {PROMPTFOO_VERSION}, {codex}, run "
-                    f"{datetime.datetime.fromtimestamp(started / 1e9, datetime.timezone.utc):%Y-%m-%dT%H:%M:%SZ}")
-        line, ok = summary(args.gate, result, recon, versions)
+        versions = f"promptfoo {PROMPTFOO_VERSION}, {codex}, run {stamp:%Y-%m-%dT%H:%M:%SZ}"
+        line, ok = summary(args.gate, result, recon, versions, results_sha256)
         print(line)
         for arm, classes in sorted(class_tallies(rows).items()):
             print(f"  {arm}: " + "; ".join(f"{cls} " + ", ".join(f"{k} {v}" for k, v in sorted(c.items()))
                                            for cls, c in sorted(classes.items())))
+        print(f"  retained results: {retained} in the capability-gate state directory (sha256 {results_sha256})")
         return 0 if ok else 1
     finally:
         # The worktrees are removed even with --keep, so no registered worktree outlives the run. Literal targets: the
