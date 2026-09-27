@@ -347,16 +347,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T07:12:20Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -482,8 +482,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T07:22:07Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -1472,16 +1472,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.13.13'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T07:19:50Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2790,8 +2790,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 1,
-                "latest": "2026-09-24T15:50:12Z",
-                "pass": 1
+                "latest": "2026-09-27T07:06:05Z",
+                "pass": 2
               },
               "qualified_models": []
             }
@@ -2844,16 +2844,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '0.37.0'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T07:24:11Z",
+                "pass": 1
               },
               "qualified_models": []
             }
@@ -2890,16 +2890,16 @@
             "macos-arm64": {
               "alias_receipts": [],
               "catalog_status": "untested",
-              "derived_reason": "no schema-valid host receipt bound to pin '20.0.24'",
-              "derived_status": "untested",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
                 "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T07:17:32Z",
+                "pass": 1
               },
               "qualified_models": []
             }

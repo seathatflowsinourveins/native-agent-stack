@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--ccusage--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "ccusage",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v ccusage) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && ccusage --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" ccusage",
+      "exit": 0,
+      "duration_s": 0.059,
+      "output_sha256": "8a480ca61d0791c521da484bbd295eade0dbf1cc1fdafe105dddf1332d085c8c",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ccusage -> ~/.local/share/codex-ecosystem-staging/tools/ccusage-20.0.24/lib/node_modules/ccusage/src/cli.js\nccusage 20.0.24\nstack ['20.0.24'] winner pins ['20.0.24']\n"
+    },
+    {
+      "cmd": "t=$(date -u +%Y%m%d); y2=$(date -u -v-2d +%Y%m%d 2>/dev/null || date -u -d '2 days ago' +%Y%m%d); echo \"querying this host's real Claude Code logs, UTC $y2..$t\"; ccusage claude daily --json --offline --no-cost --timezone UTC --since \"$y2\" --until \"$t\" | python3 -c \"\nimport json, sys\nd = json.load(sys.stdin)\nkeys = ('inputTokens', 'outputTokens', 'cacheCreationTokens', 'cacheReadTokens')\nrows = d['daily']\nper_day_ok = all(sum(r.get(k, 0) for k in keys) == r.get('totalTokens') for r in rows)\ngrand = d.get('totals', {})\ngrand_ok = sum(grand.get(k, 0) for k in keys) == grand.get('totalTokens')\nmodels = sorted({m for r in rows for m in r.get('modelsUsed', [])})\nhas_cost = 'totalCost' in grand or any('cost' in r for r in rows)\nprint('days:', [r['date'] for r in rows])\nprint('grand total tokens (counts only, --no-cost):', grand.get('totalTokens'))\nprint('per-day totals equal sum of their own token-category fields:', per_day_ok, '| grand total equal to sum of its category fields:', grand_ok)\nprint('models observed:', models, '| any cost field present:', has_cost)\nsys.exit(0 if per_day_ok and grand_ok and not has_cost and len(rows) >= 1 else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.134,
+      "output_sha256": "398dd1aa2dc0638860dcda04b0bd03c73f2e486b27bd9c15f4857f3474d7c1a6",
+      "output_excerpt": "querying this host's real Claude Code logs, UTC 20260925..20260927\ndays: ['2026-09-25', '2026-09-27']\ngrand total tokens (counts only, --no-cost): 3189847365\nper-day totals equal sum of their own token-category fields: True | grand total equal to sum of its category fields: True\nmodels observed: ['claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5'] | any cost field present: False\n"
+    }
+  ],
+  "tool_versions": {
+    "ccusage": "20.0.24"
+  },
+  "observed_at_utc": "2026-09-27T07:17:32Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), ccusage 20.0.24 (the catalog pin) ran an offline daily report over this host's own real Claude Code usage logs (~/.claude/projects), not a fixture: ccusage claude daily --json --offline --no-cost for the two most recent UTC days. Each reported day's own token-category fields (input, output, cache-creation, cache-read) summed to that day's own reported totalTokens, and the report's grand totals summed the same way, both asserted; --no-cost produced no cost field in either place, so only token counts, never dollar figures, are published here. All commands exit 0.",
+  "limitations": [
+    "Publishes token counts only, not the underlying per-project paths or per-session identifiers ccusage's full JSON also carries; --no-cost additionally withholds pricing. No monthly, weekly, session or blocks report, and no other agent's usage (Codex, etc.) was queried.",
+    "ccusage aggregates this host's local JSONL log files under the Claude config directory; it is not a provider billing API, and its token counts are read from the logs Claude Code itself wrote, not an independent measurement.",
+    "Recorded from a Claude Code session in this branch's worktree; ccusage is this host's existing ecosystem-bin install, resolved as the first command shows. This is the first macOS host receipt for ccusage.",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T07:17:32Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--mcporter--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "mcporter",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v mcporter) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && mcporter --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" mcporter",
+      "exit": 0,
+      "duration_s": 0.076,
+      "output_sha256": "f065a9971c5d3f025b2e744bff32b949349744fd0a3f36d7b9e5cb20c46c14b1",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/mcporter -> ~/.local/share/codex-ecosystem-staging/tools/mcporter-0.13.13/lib/node_modules/mcporter/dist/cli.js\n0.13.13\nstack ['0.14.1'] winner pins ['0.13.13']\n"
+    },
+    {
+      "cmd": "bt=$(mktemp); at=$(mktemp); pgrep -f 'mcporter|headroom' | sort > \"$bt\"; mcporter list 2>&1; echo \"---\"; mcporter call headroom.headroom_stats --output json --no-oauth --timeout 20000; rc=$?; sleep 0.5; pgrep -f 'mcporter|headroom' | sort > \"$at\"; new=$(comm -13 \"$bt\" \"$at\"); echo \"---\"; echo \"call exit: $rc | new PIDs left running by this call: [$new]\"; rm -f \"$bt\" \"$at\"; test \"$rc\" -eq 0 && test -z \"$new\"",
+      "exit": 0,
+      "duration_s": 2.866,
+      "output_sha256": "76a94d168ae6a576b40b8badea7fb012f8f5865837a06b7907908241ec1688fd",
+      "output_excerpt": "mcporter 0.13.13 \u2014 Listing 8 server(s) (per-server timeout: 30s)\n- ai-memory (23 tools, 0.0s) [source: ~/.claude.json]\n- socraticode (26 tools, 0.2s) [source: ~/.claude.json]\n- qmd (4 tools, 0.2s) [source: ~/.codex/config.toml]\n- node_repl (4 tools, 0.3s) [source: ~/.codex/config.toml]\n- openaiDeveloperDocs (5 tools, 0.4s) [source: ~/.claude.json]\n- context-mode (11 tools, 0.4s) [source: ~/.codex/"
+    }
+  ],
+  "tool_versions": {
+    "mcporter": "0.13.13"
+  },
+  "observed_at_utc": "2026-09-27T07:19:50Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), MCPorter 0.13.13 (the catalog pin) listed this host's real configured MCP servers -- 8 servers sourced from this host's actual ~/.claude.json and ~/.codex/config.toml, not a repository fixture config -- and called one real, read-only, no-argument tool, headroom.headroom_stats, against the configured headroom entry, returning its live session counters (asserted: valid JSON with the expected compressions/retrievals/tokens-saved keys). A process snapshot (pgrep -f 'mcporter|headroom') taken before and after the call diffed to no new surviving PID, so the ad-hoc call did not leave a daemon running (asserted). The call exits 0.",
+  "limitations": [
+    "One server (headroom) and one read-only, argument-free tool were called; the other 7 configured servers, tool arguments, OAuth-backed servers, and mcporter's own daemon/serve subcommands (not used here) were not exercised. mcp-inspector --version was not run, per issue #276's guard.",
+    "The process-diff check is a point-in-time pgrep snapshot in this shell, not a supervised trace of mcporter's internals; a daemon that starts and exits within the 0.5s window would not be caught.",
+    "Recorded from a Claude Code session in this branch's worktree; mcporter is this host's existing ecosystem-bin install (0.13.13, the macOS pin; manifests/stack.json separately shows 0.14.1, the newer version qualified on the Linux workstation per issue #276 -- reported as a PR finding, not fixed here). This is the first macOS host receipt for mcporter.",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T07:19:50Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces"
+    }
+  ]
+}

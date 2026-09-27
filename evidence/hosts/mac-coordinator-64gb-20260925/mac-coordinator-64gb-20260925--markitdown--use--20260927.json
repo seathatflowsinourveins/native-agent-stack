@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--markitdown--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "markitdown",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v markitdown) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && markitdown --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" markitdown",
+      "exit": 0,
+      "duration_s": 0.159,
+      "output_sha256": "4114b0c49979f0b02d50f71fe4f07703c06fc25fa0caf3b01dfe54b71a17f566",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/markitdown -> ~/.local/share/codex-ecosystem-staging/python-tools/markitdown/bin/markitdown\nmarkitdown 0.1.8\nstack ['0.1.8'] winner pins ['0.1.7']\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1; markitdown fixtures/greeting.html > \"$d/out.md\" 2> \"$d/err\"; rc=$?; cat \"$d/out.md\"; python3 -c \"\nimport sys\nmd = open(sys.argv[1]).read()\nhtml = open('fixtures/greeting.html').read()\nchecks = {\n    'title carried over': 'Local browser command check' in md,\n    'h1 became a markdown heading': '# Local browser command check' in md,\n    'label text kept': 'Name' in md,\n    'button text kept': 'Greet' in md,\n    'status placeholder text kept': 'Ready' in md,\n    'script body not leaked into markdown': 'addEventListener' not in md,\n    'raw html tags not leaked': '<h1>' not in md and '<script>' not in md,\n}\nfor k, v in checks.items():\n    print(k, ':', v)\nraise SystemExit(0 if all(checks.values()) else 1)\n\" \"$d/out.md\"; pc=$?; rm -rf \"$d\"; test \"$rc\" -eq 0 && test \"$pc\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.172,
+      "output_sha256": "4444dd04f555fb55f82377f1f069a551396fe181885a0d553d783fcee8a9089e",
+      "output_excerpt": "Local browser command check\n\n# Local browser command check\n\nNameGreet\n\nReady\ntitle carried over : True\nh1 became a markdown heading : True\nlabel text kept : True\nbutton text kept : True\nstatus placeholder text kept : True\nscript body not leaked into markdown : True\nraw html tags not leaked : True\n"
+    }
+  ],
+  "tool_versions": {
+    "markitdown": "0.1.8"
+  },
+  "observed_at_utc": "2026-09-27T07:22:07Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), markitdown 0.1.8 (the adoption/pins-macos-arm64.json and manifests/stack.json pin; the catalogs/landscape winner pin is still the earlier 0.1.7, not yet re-recorded, so --component-version 0.1.8 --allow-unbound-version is passed) converted the repository fixture fixtures/greeting.html to Markdown. The document's title and heading text, and its label/button/status text, all survive the conversion, while the script element's JavaScript body and raw HTML tags do not appear in the output (all six checks asserted). The command exits 0.",
+  "limitations": [
+    "The workload is this repository's own fixtures/greeting.html, a small hand-written fixture, which docs/contributing-evidence.md Section 2 classes as local_integration: a real vendored document (PDF, docx, a large or malformed HTML page) and markitdown's plugin/LLM-description surfaces were not exercised.",
+    "The landscape winner pin for markitdown (foundation/document-retrieval, 0.1.7) has not been re-recorded since the v2026.09.26.2 pin bump to 0.1.8; reported as a PR finding, not fixed here.",
+    "Recorded from a Claude Code session in this branch's worktree; markitdown is this host's existing ecosystem-bin install, resolved as the first command shows. This is the first macOS host receipt for markitdown.",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T07:22:07Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "document-retrieval"
+    }
+  ]
+}

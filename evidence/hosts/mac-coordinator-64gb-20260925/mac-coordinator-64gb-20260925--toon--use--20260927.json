@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--toon--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "toon",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v toon) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && toon --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" toon",
+      "exit": 0,
+      "duration_s": 0.058,
+      "output_sha256": "72d303a3d7210ccfc1cc202736a002cb83b35648fef6b9c8dc67ea4200ac6138",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/toon -> ~/.local/share/codex-ecosystem-staging/tools/toon-4.1.1/lib/node_modules/@toon-format/cli/bin/toon.mjs\n4.1.1\nstack ['4.1.1'] winner pins []\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1; enc=$(toon fixtures/records.json --stats -o \"$d/records.toon\" 2>&1); e=$?; dec=$(toon \"$d/records.toon\" --decode --strict -o \"$d/recovered.json\" 2>&1); s=$?; echo \"encode --stats exit $e: $(printf '%s\\n' \"$enc\" | sed -n '2,3p' | tr '\\n' ' ')\"; echo \"TOON:\"; cat \"$d/records.toon\"; echo; echo \"decode --strict exit $s\"; python3 -c \"import json,sys;a=json.load(open(sys.argv[1]));b=json.load(open(sys.argv[2]));print('decoded JSON == fixtures/records.json:',a==b);raise SystemExit(0 if a==b else 1)\" fixtures/records.json \"$d/recovered.json\"; rc=$?; rm -rf \"$d\"; test \"$e\" -eq 0 && test \"$s\" -eq 0 && test \"$rc\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.096,
+      "output_sha256": "7c3e3f094b837b6d7eacd40c596e25ae211a242ad2082420cec11d1b5e8df684",
+      "output_excerpt": "encode --stats exit 0: \u001b[36m\u25cf\u001b[39m Token estimates: ~33 (JSON) \u2192 ~21 (TOON) \u001b[32m\u2714\u001b[39m Saved ~12 tokens (-36.4%) \nTOON:\nitems[2]{name,enabled,count}:\n  alpha,true,2\n  beta,false,3\n\ndecode --strict exit 0\ndecoded JSON == fixtures/records.json: True\n"
+    }
+  ],
+  "tool_versions": {
+    "toon": "4.1.1"
+  },
+  "observed_at_utc": "2026-09-27T07:21:33Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), toon 4.1.1 (@toon-format/cli, the manifests/stack.json pin, resolved and version-checked by the first command) encoded fixtures/records.json to TOON with --stats, then decoded that TOON file with --decode --strict back to JSON. The decoded JSON equals the original fixtures/records.json exactly (asserted): a lossless round trip through the real encoder and decoder, not a copy. toon's own --stats reported a token-count reduction (JSON estimate to TOON estimate) for this fixture. Both commands exit 0.",
+  "limitations": [
+    "The workload is this repository's own fixtures/records.json, a small hand-written fixture, which docs/contributing-evidence.md Section 2 classes as local_integration: encoding a larger or differently-shaped real dataset, --no-strict lenient decoding, and corrupted-input error handling were not exercised.",
+    "toon's --stats token estimate is its own heuristic count, not a provider tokenizer measurement.",
+    "Recorded from a Claude Code session in this branch's worktree; toon is this host's existing ecosystem-bin install, resolved as the first command shows. This is the first macOS host receipt for toon.",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T07:21:33Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency"
+    }
+  ]
+}
