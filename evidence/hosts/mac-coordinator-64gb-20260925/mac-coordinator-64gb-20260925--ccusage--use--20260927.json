@@ -10,7 +10,7 @@
     "second_physical_machine": true,
     "hardware_profile_ref": "mac-coordinator-64gb-20260925"
   },
-  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "catalog_revision": "e08a9b8c7fd99f6e07b897c9edbc3fd8dee4ec85",
   "recorded_by": {
     "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
     "model": "claude-sonnet-5"
@@ -21,28 +21,29 @@
     {
       "cmd": "p=$(command -v ccusage) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && ccusage --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" ccusage",
       "exit": 0,
-      "duration_s": 0.059,
+      "duration_s": 0.054,
       "output_sha256": "8a480ca61d0791c521da484bbd295eade0dbf1cc1fdafe105dddf1332d085c8c",
       "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ccusage -> ~/.local/share/codex-ecosystem-staging/tools/ccusage-20.0.24/lib/node_modules/ccusage/src/cli.js\nccusage 20.0.24\nstack ['20.0.24'] winner pins ['20.0.24']\n"
     },
     {
-      "cmd": "t=$(date -u +%Y%m%d); y2=$(date -u -v-2d +%Y%m%d 2>/dev/null || date -u -d '2 days ago' +%Y%m%d); echo \"querying this host's real Claude Code logs, UTC $y2..$t\"; ccusage claude daily --json --offline --no-cost --timezone UTC --since \"$y2\" --until \"$t\" | python3 -c \"\nimport json, sys\nd = json.load(sys.stdin)\nkeys = ('inputTokens', 'outputTokens', 'cacheCreationTokens', 'cacheReadTokens')\nrows = d['daily']\nper_day_ok = all(sum(r.get(k, 0) for k in keys) == r.get('totalTokens') for r in rows)\ngrand = d.get('totals', {})\ngrand_ok = sum(grand.get(k, 0) for k in keys) == grand.get('totalTokens')\nmodels = sorted({m for r in rows for m in r.get('modelsUsed', [])})\nhas_cost = 'totalCost' in grand or any('cost' in r for r in rows)\nprint('days:', [r['date'] for r in rows])\nprint('grand total tokens (counts only, --no-cost):', grand.get('totalTokens'))\nprint('per-day totals equal sum of their own token-category fields:', per_day_ok, '| grand total equal to sum of its category fields:', grand_ok)\nprint('models observed:', models, '| any cost field present:', has_cost)\nsys.exit(0 if per_day_ok and grand_ok and not has_cost and len(rows) >= 1 else 1)\n\"",
+      "cmd": "t=$(date -u +%Y%m%d); y2=$(date -u -v-2d +%Y%m%d 2>/dev/null || date -u -d '2 days ago' +%Y%m%d); out=$(ccusage claude daily --json --offline --no-cost --timezone UTC --since \"$y2\" --until \"$t\"); ccrc=$?; printf '%s' \"$out\" | python3 -c \"\nimport json, sys\nccrc = int(sys.argv[1])\nd = json.load(sys.stdin)\nrows = d.get('daily', [])\ntotals = d.get('totals', {})\nrow_fields = sorted(rows[0].keys()) if rows else []\ntotals_fields = sorted(totals.keys())\nkeys = ('inputTokens', 'outputTokens', 'cacheCreationTokens', 'cacheReadTokens')\nper_day_ok = all(sum(r.get(k, 0) for k in keys) == r.get('totalTokens') for r in rows)\ngrand_ok = sum(totals.get(k, 0) for k in keys) == totals.get('totalTokens')\nhas_cost = 'totalCost' in totals or any('totalCost' in r for r in rows)\nok = ccrc == 0 and len(rows) >= 1 and per_day_ok and grand_ok and not has_cost\nprint('ccusage exit code:', ccrc, '| rows:', len(rows), '| row field names:', row_fields, '| totals field names:', totals_fields, '| per-day totals equal sum of their own category fields:', per_day_ok, '| grand total equal to sum of its category fields:', grand_ok, '| totalCost field present:', has_cost)\nsys.exit(0 if ok else 1)\n\" \"$ccrc\"",
       "exit": 0,
-      "duration_s": 0.134,
-      "output_sha256": "398dd1aa2dc0638860dcda04b0bd03c73f2e486b27bd9c15f4857f3474d7c1a6",
-      "output_excerpt": "querying this host's real Claude Code logs, UTC 20260925..20260927\ndays: ['2026-09-25', '2026-09-27']\ngrand total tokens (counts only, --no-cost): 3189847365\nper-day totals equal sum of their own token-category fields: True | grand total equal to sum of its category fields: True\nmodels observed: ['claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5'] | any cost field present: False\n"
+      "duration_s": 0.144,
+      "output_sha256": "3a6ce79ade6e4b1bd4333df2e4923ff41a5f8f38c20c91e2efb25a0946253094",
+      "output_excerpt": "ccusage exit code: 0 | rows: 2 | row field names: ['cacheCreationTokens', 'cacheReadTokens', 'date', 'inputTokens', 'modelBreakdowns', 'modelsUsed', 'outputTokens', 'totalTokens'] | totals field names: ['cacheCreationTokens', 'cacheReadTokens', 'inputTokens', 'outputTokens', 'totalTokens', 'unpricedModels'] | per-day totals equal sum of their own category fields: True | grand total equal to sum of"
     }
   ],
   "tool_versions": {
     "ccusage": "20.0.24"
   },
-  "observed_at_utc": "2026-09-27T07:17:32Z",
+  "observed_at_utc": "2026-09-27T12:28:04Z",
   "result": "pass",
-  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), ccusage 20.0.24 (the catalog pin) ran an offline daily report over this host's own real Claude Code usage logs (~/.claude/projects), not a fixture: ccusage claude daily --json --offline --no-cost for the two most recent UTC days. Each reported day's own token-category fields (input, output, cache-creation, cache-read) summed to that day's own reported totalTokens, and the report's grand totals summed the same way, both asserted; --no-cost produced no cost field in either place, so only token counts, never dollar figures, are published here. All commands exit 0.",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), ccusage 20.0.24 (the catalog pin) ran `ccusage claude daily --json --offline --no-cost --timezone UTC` over this host's own real Claude Code usage logs (~/.claude/projects) for a 3-calendar-day UTC window (today and the two days before it), not a fixture, and exited 0. The report's own JSON parsed: at least one daily row was present; the field names this receipt checks were present in a daily row and in the totals object; each day's own token-category fields summed to that day's own reported totalTokens and the grand totals summed the same way (both asserted, not printed); --no-cost produced no totalCost field in either place (asserted). Token counts, cost figures and which models were used are never printed, retained or asserted by this receipt: only ccusage's own exit code, the parsed row count, the two field-name lists, and two internal-consistency booleans are. All commands exit 0 only when every assertion holds; all commands exit 0.",
   "limitations": [
-    "Publishes token counts only, not the underlying per-project paths or per-session identifiers ccusage's full JSON also carries; --no-cost additionally withholds pricing. No monthly, weekly, session or blocks report, and no other agent's usage (Codex, etc.) was queried.",
-    "ccusage aggregates this host's local JSONL log files under the Claude config directory; it is not a provider billing API, and its token counts are read from the logs Claude Code itself wrote, not an independent measurement.",
-    "Recorded from a Claude Code session in this branch's worktree; ccusage is this host's existing ecosystem-bin install, resolved as the first command shows. This is the first macOS host receipt for ccusage.",
+    "Publishes no token counts, no per-day or grand totals, no cost figures and no list of models used -- only ccusage's own process exit code, the parsed row count, the sorted field names present in a daily row and in the totals object, and two internal-consistency booleans computed from (but never printing) the real per-category token values. This is narrower than this repository's only other real-log ccusage receipt (nativestack-5975wx-20260925), which publishes the days with rows and the list of models used; this generation withholds both of those too, in addition to counts and cost.",
+    "Replaces two withdrawn recordings at this same host/component/stage/date: mac-coordinator-64gb-20260925--ccusage--use--20260927 (generation 1) and its -2 supersession, both removed from this branch together with their manifests/evidence.json entries before this receipt was recorded, because neither was ever merged to main. Generation 1 printed this host's real grand-total token count in the clear; generation 2's own limitations text restated that same number in prose (a second instance of the same leak) and its command output also printed the list of models used. Both carried only a self review, so no independent review is lost by their removal. This is a fresh recording at the same host/component/stage/date, not an edit of either withdrawn file: a new observed_at_utc and a post-merge catalog_revision.",
+    "ccusage aggregates this host's local JSONL log files under the Claude config directory; it is not a provider billing API, and the token values used internally by the assertions above (never printed) are read from the logs Claude Code itself wrote, not an independent measurement.",
+    "Recorded from a Claude Code session in this branch's worktree; ccusage is this host's existing ecosystem-bin install, resolved as the first command shows. No macOS ccusage receipt from this branch is published beyond this one file.",
     "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
     "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
   ],
@@ -52,7 +53,7 @@
       "kind": "self",
       "ref": "scripts/host_receipts.py record",
       "verdict": "agree",
-      "at_utc": "2026-09-27T07:17:32Z",
+      "at_utc": "2026-09-27T12:28:04Z",
       "reviewer": {
         "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
         "model": "claude-sonnet-5"
