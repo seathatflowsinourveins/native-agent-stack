@@ -56,6 +56,73 @@ explicit in the client example. Adding a tracing database is a separate
 instrumentation and retention decision, not necessary for the accepted local
 monitoring loop. Do not collect prompt/tool bodies to make a dashboard prettier.
 
+## Run, tool and estimated-cost correlation — 2026-09-27
+
+The logs pipeline retains `cost_usd` and `tool_use_id`, alongside the existing
+`session.id`, `workflow.run_id` and `ecosystem.task.id`. This closes the
+Collector configuration residual from #364 for Claude token-adoption
+reconciliation. The existing `transform/privacy` allowlist uses the native
+[Transform Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/processor/transformprocessor/README.md)
+and [`keep_keys`](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/pkg/ottl/ottlfuncs/func_keep_keys.go)
+from `open-telemetry/opentelemetry-collector-contrib` **v0.161.0**.
+
+The [Claude Code monitoring documentation](https://code.claude.com/docs/en/monitoring-usage),
+checked live on 2026-09-27 with installed Claude Code 2.1.283 and its
+[release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.283),
+documents these fields:
+
+| Native source | Retained attribute and meaning |
+| --- | --- |
+| `claude_code.api_request`, attribute `event.name="api_request"` | `cost_usd` is estimated USD cost; `input_tokens`, `output_tokens`, `cache_read_tokens` and `cache_creation_tokens` report request usage. |
+| `claude_code.tool_result` / `claude_code.tool_decision`, attributes `event.name="tool_result"` / `"tool_decision"` | `tool_use_id` identifies the invocation and matches hooks. A rejected tool call has a decision event and no result event. |
+| Workflow agents and their descendants, since Claude Code 2.1.202 | `workflow.run_id` is emitted on their API/tool events and starts with `wf_`. It is absent on other events. |
+| Caller-supplied `OTEL_RESOURCE_ATTRIBUTES` | The resource block carries custom attributes. `ecosystem.task.id` is this repository's run key, supplied by the launcher; it is not a built-in Claude event field. |
+
+The [E2E RUNBOOK](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md#loki-queries-and-reconciliation--aa-7-84-steps-67)
+exports `ecosystem.task.id=<run>` and uses the distinct Workflow identifiers
+to split arms. For a non-Workflow invocation, supply a resource value that
+distinguishes the intended arm/task/attempt (the preregistration's
+`<run>.<arm>.<task>.<attempt>` format), or retain an independent session-to-arm
+mapping. A shared run value alone cannot identify the arm. The Collector
+preserves supplied identities; it does not invent a Workflow ID or fill in a
+missing cost with zero. The existing Workflow ID shape guard still applies.
+
+The [Loki template](../backends/templates/ecosystem-loki.yml.example) indexes
+only `service.name`. Loki's native
+[OTLP mapping](https://grafana.com/docs/loki/latest/send-data/otel/#format-considerations)
+keeps the remaining attributes as structured metadata and normalizes dots to
+underscores. Use pipeline filters, for example:
+
+```logql
+{service_name="claude-code"} | ecosystem_task_id="<run>" | workflow_run_id="<arm-workflow>" | event_name="api_request"
+{service_name="claude-code"} | ecosystem_task_id="<run>" | session_id="<session>" | tool_use_id="<tool-invocation>"
+```
+
+These filters select metadata; the scrubbed body cannot supply it through
+`| json`. Retained identities remain private. Metrics keep their existing
+writer identity and gain no run, tool-invocation or cost labels. `cost_usd`
+is an estimate, not a billed amount or a replacement for the experiment's
+dated token-pricing method. Confirm delivery and flushes before reconciliation;
+missing telemetry remains unknown.
+
+Validation: `python3 -m unittest tests.test_observability_run_correlation -v`.
+The always-on allowlist regression fails if either required field is dropped.
+With PyYAML and the documented Collector **0.161.0** and Loki **3.7.8** binaries,
+the native test sends synthetic OTLP records through the committed logs
+processors and exporters to isolated loopback services. It checks workflow arm
+token sums, resource-only run correlation, session/tool joins, string/numeric/zero
+costs, absent values, content removal and the actual indexed series through
+Loki's [query and series APIs](https://grafana.com/docs/loki/latest/reference/loki-http-api/).
+Those native checks skip when their optional dependencies are absent.
+This is **local integration with synthetic fixtures**; it is not a new provider
+run, an unchanged upstream test suite or proof of deployment on the active host.
+
+Dated clarification of the historical RUNBOOK's #364 paragraph: the unit's
+starting configuration already kept `workflow.run_id` and the resource run
+key; `tool_use_id` and `cost_usd` were still missing. That paragraph describes
+an earlier inspected revision and is left intact. No historical receipt or
+Codex `env`/`call_id` residual is changed by this Claude-specific correction.
+
 ## Writer identity and counter integrity
 
 Changed after `v2026.09.26.2`. A Prometheus series is identified by `job`
