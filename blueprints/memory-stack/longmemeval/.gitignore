@@ -1,0 +1,9 @@
+data
+models
+cache
+logs
+official-logs
+results*
+report*.md
+report*.json
+.venv-official

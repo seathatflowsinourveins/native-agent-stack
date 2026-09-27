@@ -1,0 +1,16 @@
+# Repaired synthetic-only native attempt: exit 1.
+# Paths and process IDs are replaced; other stdout is unchanged.
+INFO no capture files given: synthetic sentinel records only
+run dir: $RUN_DIR  otelcol: otelcol-contrib version 0.161.0
+Cannot open netlink socket: Operation not permitted
+ports: otlp=45700 health=45701 loki_http=45702 loki_grpc=45703
+PASS otelcol-contrib 0.161.0 validate --config $REPO/observability/collector/collector.yaml
+PASS scratch Loki config rendered from the repo's own template with scratch ports and data root only
+FAIL scratch Loki 3.7.8 ready (pid <pid>)
+PASS scratch Loki (<pid>) stopped
+
+# Native Loki error from that attempt:
+listen tcp 127.0.0.1:45702: socket: operation not permitted
+# Native Collector error from the initial attempt (before the replay repair):
+Error: failed to start extensions: failed to bind to address 127.0.0.1:45701: listen tcp 127.0.0.1:45701: socket: operation not permitted
+# No Collector/Loki replay acceptance is claimed for either attempt.
