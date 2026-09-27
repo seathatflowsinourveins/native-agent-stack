@@ -7912,6 +7912,141 @@
       "bytes": 3465
     },
     {
+      "path": "blueprints/memory-stack/longmemeval/v4/.gitignore",
+      "sha256": "71e684dc2c68d6e786c32d176f30b093c23933d10db9f82ad46c9337e4711a1f",
+      "bytes": 120
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/PREREGISTRATION.md",
+      "sha256": "a9b1db335eee1ff99d1883e048bcd8e443ca2afee3505a34fd874dd1ef412d5b",
+      "bytes": 37885
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/README.md",
+      "sha256": "b6841fdfd53250d33762c7c74f5ae8baa87f29803570d9c5fbbf1f4bf77e0c6e",
+      "bytes": 22280
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/SHA256SUMS",
+      "sha256": "33830919ff773bba5ea8d521cfcf0558cfc17a622a18b6983370e4f20e72fce0",
+      "bytes": 2313
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/embed_server_st.py",
+      "sha256": "7b5b5018fb0d24203e5c2fa8832ffa21baac91f89646df24a65a3c686f14028b",
+      "bytes": 22254
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/gguf_embed_front.py",
+      "sha256": "5fe0f4778f024162f0893f869b950401905d27c4dcfba9e19a2156e285acc7d1",
+      "bytes": 11179
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/k1-subset.json",
+      "sha256": "273b1f339a10a6b36dd6dd2235a4cd4e0bc5c6cab0b2cc93754232379addb97d",
+      "bytes": 9791
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/lane_tools.py",
+      "sha256": "954f00c96f74719188c9a2f4aa78c673df5348afc987d4e7f026cec89ff83fb9",
+      "bytes": 59483
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/lme_harness.py",
+      "sha256": "b9bcb545d66e1dd296479ce1bee638980f66c28e534e9d289f57d68a0767c9e8",
+      "bytes": 91367
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/lme_summarize.py",
+      "sha256": "3d2da1d71437f385108101771c5c570ae5a876a368e2299627b04b21dd3a8c49",
+      "bytes": 60498
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/mteb_lmeb.py",
+      "sha256": "f69910beb07dcd220c9c8eaa2088a1789a1a779ffadda213d79307c5a5abab0e",
+      "bytes": 6428
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/pins.json",
+      "sha256": "bd9e865a6d73b7d60a0e11a26d51e8951f4a17e981244018d527e47c9ecbccf3",
+      "bytes": 55869
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/reference/lme_harness_v3.py",
+      "sha256": "b59ee6f5ada7392e4c250ad54dd1ec75e2e30921bca8ae4265807f587716f751",
+      "bytes": 31991
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/build.in",
+      "sha256": "e39ff10a9d989e86461dd152f26fbfc39681f4fb43b68b2849ac87cf3a30cd06",
+      "bytes": 333
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/build.lock.txt.frozen",
+      "sha256": "161a6bf821bf23084e34b2bf195628acfc7bb88f9a2270b27fa459cb9e8a75bc",
+      "bytes": 763
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/embed.in",
+      "sha256": "48bee7cfa04999d83dc15fc8e98937471e96974df6fb221918d65d1c255a7fa8",
+      "bytes": 675
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/embed.lock.txt.frozen",
+      "sha256": "b96c2dab63348998dc19cc2960106d2ea77d672c3fdb3a245044db3f70f0a444",
+      "bytes": 179864
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/hindsight.in",
+      "sha256": "622601e56eb38ffb6c6faf633c2ac96de8c7e481337c1ad785ea4516e6f46fbb",
+      "bytes": 240
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/hindsight.lock.txt.frozen",
+      "sha256": "3cf398e5c82e77a294f433123e86920696804f50a48aad8ef7a6d66f22f98d8b",
+      "bytes": 342760
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/mempalace.in",
+      "sha256": "851cecd084c0fb21f9ebb58c84b41ae3f1cbab1796ba5e7dda7fc7893431c7e2",
+      "bytes": 310
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/mempalace.lock.txt.frozen",
+      "sha256": "c6821b18d0d93cf55ab5d4be37771c82b1fbcabcffbafc624c8a098f1def42a5",
+      "bytes": 193706
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/official.in",
+      "sha256": "87999b21c9784f431fee47df76678d59361ceec3af805c264e66e2781fc86a45",
+      "bytes": 913
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/requirements/official.lock.txt.frozen",
+      "sha256": "a866d967cc74e00d59ef18696444078576de6e26197278eafe5570ef51c6d14c",
+      "bytes": 103671
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/rerank_stage.py",
+      "sha256": "0500e0dc4c8d193fe28dc5fc7ac4b8f41a980ce9991f3ef389ec157b217ccea4",
+      "bytes": 8632
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/run_velanext.sh",
+      "sha256": "1632c32f21e25b1ccdad8926d293400c13d267ddee65cc21f299afdd3f784c8b",
+      "bytes": 53849
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/setup_velanext.sh",
+      "sha256": "024152e3f96425cbcc1e422ec4efcc184dff4bba3760f442d7af069b926289de",
+      "bytes": 19559
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/v4/vendor/agentmemory-repo-package-lock.json.frozen",
+      "sha256": "93d3bc4cdf39abbd721ed905e6daa5adfad53f11391fbcbcaa8caf0b5caa306b",
+      "bytes": 197870
+    },
+    {
       "path": "blueprints/native-skill-practice/README.md",
       "sha256": "013aa43f686b413287b5058c9a04689029b7d8421ae306cd7c6beb23eb0c5060",
       "bytes": 7960
