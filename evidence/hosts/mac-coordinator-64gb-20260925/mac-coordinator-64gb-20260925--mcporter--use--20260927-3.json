@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--mcporter--use--20260927-3",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "8e40cacb3ef350f75e4099ed777d58647b1c7db5",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "mcporter",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v mcporter) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && mcporter --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" mcporter",
+      "exit": 0,
+      "duration_s": 0.077,
+      "output_sha256": "f065a9971c5d3f025b2e744bff32b949349744fd0a3f36d7b9e5cb20c46c14b1",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/mcporter -> ~/.local/share/codex-ecosystem-staging/tools/mcporter-0.13.13/lib/node_modules/mcporter/dist/cli.js\n0.13.13\nstack ['0.14.1'] winner pins ['0.13.13']\n"
+    },
+    {
+      "cmd": "S=$(mktemp -d) || exit 1\nmkdir -p \"$S/ws\" \"$S/cfg\" \"$S/mchome\"\ncat > \"$S/mcporter.json\" <<JSON\n{\"mcpServers\":{\"headroom\":{\"command\":\"headroom\",\"args\":[\"mcp\",\"serve\",\"--proxy-url\",\"http://127.0.0.1:1\"],\"env\":{\"HEADROOM_OFFLINE\":\"1\",\"HF_HUB_OFFLINE\":\"1\",\"TRANSFORMERS_OFFLINE\":\"1\",\"DO_NOT_TRACK\":\"1\",\"HEADROOM_WORKSPACE_DIR\":\"$S/ws\",\"HEADROOM_CONFIG_DIR\":\"$S/cfg\"}}},\"imports\":[]}\nJSON\nEP=\"$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin:/usr/sbin:/sbin\"\nsnap() { for f in \"$HOME/.claude/settings.json\" \"$HOME/.claude/plugins/installed_plugins.json\" \"$HOME/.codex/config.toml\" \"$HOME/.serena/serena_config.yml\"; do if [ -f \"$f\" ]; then printf '%s ' \"$(sha256sum \"$f\" | cut -d' ' -f1)\"; else printf 'ABSENT '; fi; done; if [ -d \"$HOME/.claude/hooks\" ]; then find \"$HOME/.claude/hooks\" -type f -exec sha256sum {} \\; 2>/dev/null | sort | sha256sum | cut -d' ' -f1; else printf 'HOOKS_ABSENT'; fi; }\nbefore_files=$(snap)\nbt=$(mktemp); pgrep -f 'mcporter|headroom' | sort > \"$bt\"\nlist_out=$(env -i HOME=\"$S/mchome\" PATH=\"$EP\" mcporter --config \"$S/mcporter.json\" list headroom --brief --no-oauth 2>&1); list_rc=$?\ncall_out=$(env -i HOME=\"$S/mchome\" PATH=\"$EP\" mcporter --config \"$S/mcporter.json\" call headroom.headroom_stats --output json --no-oauth --timeout 20000 2>&1); call_rc=$?\nkeys_ok=$(printf '%s' \"$call_out\" | python3 -c \"\nimport json, sys\ntry:\n    d = json.load(sys.stdin)\nexcept Exception:\n    print('INVALID_JSON'); sys.exit(0)\nneed = ('compressions', 'retrievals', 'total_tokens_saved')\nprint('True' if all(k in d and isinstance(d[k], int) for k in need) else 'False')\n\")\nsleep 0.5\nat=$(mktemp); pgrep -f 'mcporter|headroom' | sort > \"$at\"; new=$(comm -13 \"$bt\" \"$at\")\nafter_files=$(snap)\nrm -rf \"$S\" \"$bt\" \"$at\"\nfiles_same=\"no\"; [ \"$before_files\" = \"$after_files\" ] && files_same=\"yes\"\necho \"MCPORTER_USE list_rc=$list_rc call_rc=$call_rc stats_keys_ok=$keys_ok new_pids=[$new] config_files_unchanged=$files_same\"\necho \"list (explicit scratch config, imports disabled, one headroom entry): $(printf '%s' \"$list_out\" | tr '\\n' ' ' | cut -c1-150)\"\necho \"headroom_stats returned compressions/retrievals/total_tokens_saved as ints: $keys_ok\"\necho \"fixed-list config snapshot (settings.json, installed_plugins.json, hooks/, codex/config.toml, serena_config.yml) unchanged: $files_same\"\ntest \"$list_rc\" -eq 0 && test \"$call_rc\" -eq 0 && test \"$keys_ok\" = \"True\" && test -z \"$new\" && test \"$files_same\" = \"yes\" && echo \"asserted: list and call both succeeded against an explicit headroom-only scratch config (no editor auto-import), headroom_stats' JSON carried the named integer counters, no surviving new PID, and this host's settings.json/installed_plugins.json/hooks/codex-config.toml/serena config were byte-for-byte unchanged\"",
+      "exit": 0,
+      "duration_s": 1.735,
+      "output_sha256": "5707d6383ce649947cd5d25c2f86da15d9658ab9616b7dec731eb99f4847d1c7",
+      "output_excerpt": "MCPORTER_USE list_rc=0 call_rc=0 stats_keys_ok=True new_pids=[] config_files_unchanged=yes\nlist (explicit scratch config, imports disabled, one headroom entry): headroom    function headroom_compress(content: string);    function headroom_retrieve(hash: string);    function headroom_stats();    3 tools \u00b7 240ms\nheadroom_stats returned compressions/retrievals/total_tokens_saved as ints: True\nfixed-l"
+    }
+  ],
+  "tool_versions": {
+    "mcporter": "0.13.13"
+  },
+  "observed_at_utc": "2026-09-27T14:01:00Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), MCPorter 0.13.13 (the catalog pin) listed and called one real, read-only, no-argument tool, headroom.headroom_stats, against an explicit, isolated scratch mcporter.json naming only a headroom stdio entry with imports disabled, run under a scratch HOME and a minimal PATH via env -i -- not this host's live ~/.claude.json / ~/.codex/config.toml server list. Both the list and the call exit 0, and the call's JSON response carried its compressions, retrievals and total_tokens_saved fields as integers (asserted). A process snapshot (pgrep -f 'mcporter|headroom') taken before and after the run diffed to no new surviving PID (asserted). A fixed-list sha256 snapshot of this host's ~/.claude/settings.json, ~/.claude/plugins/installed_plugins.json, ~/.claude/hooks/ (as one combined digest), ~/.codex/config.toml and ~/.serena/serena_config.yml, taken immediately before and after the run, found no change to any of them (asserted).",
+  "limitations": [
+    "Supersedes mac-coordinator-64gb-20260925--mcporter--use--20260927-2 (generation 2, corrected once already for a stale cross-reference; commands unchanged again here). A second independent rereview found three more problems in this family's text, fixed in this generation. First: both the unsuffixed generation-1 file and the '-2' file this receipt supersedes describe why the true, original generation 1 was withdrawn by quoting its leak -- generation 1's second command ran a bare `mcporter list` with no --config, which auto-imports every MCP server from this host's live ~/.claude.json and ~/.codex/config.toml, and its retained excerpt published all of their names, tool counts and config source files, exactly the 'machine-specific active client configuration' AGENTS.md bars from evidence. This receipt states only that generation 1 printed this host's list of active MCP server names in that excerpt, without repeating any of them. That list is not erased: it remains, byte-for-byte unchanged, in this family's unsuffixed generation-1 file and in the superseded '-2' file this receipt replaces, both still present, unedited, in this branch's tree at this receipt's own commit (this repository's append-only evidence policy keeps older generations on disk; only the latest generation of a family counts as a host's evidence). The true, original generation 1, with the same names in raw command output rather than in prose, additionally stays readable at every commit in this branch's own history before 29eeab76b0e2bea8ba488c4f510cc8b2d86de613 (where the unsuffixed file's content was replaced) and in GitHub's copy of this pull request's commits, regardless of the branch's later state, until the repository owner rewrites this branch's history (force-push) and files a GitHub Support request to purge its cached views -- a decision for the owner, not made by this receipt. Second: the '-2' id this receipt supersedes is a reused id, not the original -2's own id -- the true original generation 2 (which carried no leak of its own) was deleted at commit 29eeab76b0e2bea8ba488c4f510cc8b2d86de613 together with the true original generation 1, and scripts/host_receipts.py's next_free_superseding_id, which assigns the lowest '-N' suffix with no existing receipt file, later assigned that same freed '-2' slot (and, separately, the freed unsuffixed slot) to new, unrelated recordings: the '-2' file this receipt supersedes, and the unsuffixed file that now sits at this family's base id. The '-2' file's own text asserted the opposite -- that its own id 'was removed together with its evidence.json entry' -- true only of the different, original file that once held that id; it also called its own second limitation (limitations[1], below) already corrected, when that sentence itself carried the false claim corrected in this same pass, below. Third: this receipt's own catalog_revision simply names this generation's HEAD commit at record time; it does not characterize this branch's merge status, unlike the '-2' file's wording, since this branch is an open, unmerged pull request. Commands, claim and the limitations after this one and the next are otherwise unchanged from the '-2' generation: rerun live, still pass.",
+    "Only the ad-hoc headroom entry in an explicit scratch config was exercised; this host's other real configured MCP servers -- named in this branch's since-withdrawn true original mcporter generation 1, whose output remains readable as described in the limitation above (this branch's history before 29eeab76b0e2bea8ba488c4f510cc8b2d86de613, and GitHub's copy of this pull request) -- were deliberately not touched by this generation. Tool arguments, OAuth-backed servers, and mcporter's own daemon/serve subcommands were not exercised. mcp-inspector --version was not run, per issue #276's guard.",
+    "The process-diff check is a point-in-time pgrep snapshot in this shell, not a supervised trace of mcporter's internals; a daemon that starts and exits within the 0.5s window would not be caught.",
+    "Recorded from a Claude Code session in this branch's worktree; mcporter is this host's existing ecosystem-bin install (0.13.13, the macOS pin; manifests/stack.json separately shows 0.14.1, the newer version qualified on the Linux workstation per issue #276 -- reported as a PR finding, not fixed here). This is the first macOS host receipt for mcporter.",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T14:01:00Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces"
+    }
+  ],
+  "supersedes": "mac-coordinator-64gb-20260925--mcporter--use--20260927-2"
+}
