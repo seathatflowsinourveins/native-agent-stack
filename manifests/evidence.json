@@ -14008,8 +14008,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2a40695b8910272d20b2cdc455370d2f59dd384adc20c36eece754138075b678",
-      "bytes": 41101
+      "sha256": "392042dea6940417afa0b657035ed5fa388facab574479f90be6965122339a8b",
+      "bytes": 42680
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14168,8 +14168,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "d10da7da22afd0f87cc37ca43c9b349f9c5c9d90a6e1b509fc2fe21ab3f1fd55",
-      "bytes": 75196
+      "sha256": "cd94ce3e1aeee410699672d30e48af56e085974423492be555f1cf91b4b48f11",
+      "bytes": 78005
     },
     {
       "path": "docs/stack.md",
@@ -38218,8 +38218,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "c878419597aec836095bae82da831edc65c7bb2c801194190b80248a360ba9e1",
-      "bytes": 48365
+      "sha256": "3b470618e6807b3a1bb6f2db22366117312884e11ef7804bf93606abdfcf6c34",
+      "bytes": 48914
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -38790,6 +38790,11 @@
       "path": "scripts/git-hooks/pre-commit",
       "sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
       "bytes": 608
+    },
+    {
+      "path": "scripts/git-hooks/pre-push",
+      "sha256": "398be3114466272628f9615d847a7355989837b5b482a6d504137bdbb8b62924",
+      "bytes": 5576
     },
     {
       "path": "scripts/hardware_profile.py",
@@ -39665,6 +39670,11 @@
       "path": "tests/test_pre_commit_gate.py",
       "sha256": "0ebf4ad5cf4cd17f42046617c45abe584b82730ff1f0ef98d38b94f2fd8fcf2d",
       "bytes": 2939
+    },
+    {
+      "path": "tests/test_pre_push_gate.py",
+      "sha256": "0e86e30013f7daf0a3a2875bb5a4f4255c74782478baac8428898b7e63b08b31",
+      "bytes": 18294
     },
     {
       "path": "tests/test_promotion_gate.py",

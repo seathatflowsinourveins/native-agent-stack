@@ -452,7 +452,7 @@ Name the role's `agentType` on each stage beside an explicit `model` and `effort
 | --- | --- | --- | --- |
 | scout | `source-scout` | Sonnet, max | exact extraction, inventories and the acceptance commands a task names |
 | researcher | `stack-researcher` | Opus, max | web, documentation, repository and catalog research; pages through `ctx_fetch_and_index`; findings returned inline |
-| builder | `isolated-builder` | Opus, max | a bounded implementation in the owned checkout the coordinator prepared at the exact base and named in the brief |
+| builder | `isolated-builder` | Opus, max | a bounded implementation in the owned checkout the coordinator prepared at the exact base and named in the brief; its handoff runs the three registry test methods `tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed`, `tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified` and `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered` with zizmor on `PATH`, where a skip is not a pass (the same three that `scripts/git-hooks/pre-push` runs on the tip commit of each pushed ref) |
 | reviewer | `evidence-reviewer` | Opus, max | independent review from source and recorded evidence, running no commands |
 | security | `security-reviewer` | Opus, max | adversarial security review from original source, including agent tool grants; security-best-practices preloaded; never fixes or runs acceptance commands |
 | verifier | `stack-verifier` | Opus, max | re-running named commands and deciding claims from their output and source; never fixes |
