@@ -508,6 +508,48 @@ def capture_jcodemunch(config,ledger,run,commands,issues):
         issues.append("jcodemunch: native counter refresh failed; last successful snapshot remains separate")
     ledger.snapshot("jcodemunch","Linux / upstream default index",metrics,success,r["completed_at"],r)
 
+REPORT_KINDS=("usage report","status report","cache report","savings report")
+
+def validate_report_sources(entries):
+    """Upstream report commands retained as evidence; they never carry a savings value."""
+    if not isinstance(entries,list):
+        raise ValueError("report_sources must be a list")
+    names=set()
+    for entry in entries:
+        if not isinstance(entry,dict) or set(entry)-{"name","tool","kind","argv","boundary","format","timeout"}:
+            raise ValueError("report_sources entries take name, tool, kind, argv, boundary, format and timeout only")
+        if any(not isinstance(entry.get(k),str) or not entry[k].strip() for k in ("name","tool","boundary")):
+            raise ValueError("report_sources entries need nonempty name, tool and boundary strings")
+        if entry.get("kind") not in REPORT_KINDS:
+            raise ValueError("report_sources kind must be one of "+", ".join(REPORT_KINDS))
+        if not isinstance(entry.get("argv"),list) or not entry["argv"] or any(not isinstance(a,str) or not a for a in entry["argv"]):
+            raise ValueError("report_sources argv must be a nonempty list of strings")
+        if entry.get("format","json") not in ("json","text"):
+            raise ValueError("report_sources format must be json or text")
+        if "timeout" in entry and (type(entry["timeout"]) is not int or not 1<=entry["timeout"]<=600):
+            raise ValueError("report_sources timeout must be an integer from 1 to 600 seconds")
+        if entry["name"] in names:
+            raise ValueError("report_sources names must be unique")
+        names.add(entry["name"])
+    return entries
+
+def capture_report_sources(config,ledger,run,commands,issues):
+    """Retain each selected upstream report; a report is evidence, never a counter to add."""
+    for entry in config.get("report_sources",[]):
+        label="report-"+re.sub(r"[^A-Za-z0-9._-]+","-",entry["name"]).strip("-")
+        r=capture(entry["argv"],config["project"],run,label,timeout=entry.get("timeout",60))
+        commands.append(r)
+        metrics={"saved":None,"kind":entry["kind"],"boundary":entry["boundary"]}
+        success=r["exit_code"]==0
+        if success and entry.get("format","json")=="json":
+            try:
+                metrics["raw"]=json.loads(r["stdout_text"])
+            except ValueError as exc:
+                success=False;metrics["error"]="Report is not JSON: "+str(exc)
+        if not success:
+            issues.append(entry["name"]+": upstream report failed; last successful report remains separate")
+        ledger.snapshot(entry["tool"],"Native / "+entry["name"],metrics,success,r["completed_at"],r)
+
 def native_tool_identity(component_id):
     return {"jcodemunch-mcp":"jcodemunch"}.get(component_id,component_id)
 
@@ -600,6 +642,7 @@ def load_config(path):
     config.setdefault("node",shutil.which("node") or "node")
     config.setdefault("context_roots",[])
     config.setdefault("supporting_inventory",[])
+    validate_report_sources(config.setdefault("report_sources",[]))
     fields=("state_dir","project","publication","catalog_index","stack_manifest","practice_guide",
             "output_html","output_json","tokenizer_module","rtk_database","headroom_events",
             "context_capture","audit_json","gap_summary","hook_evidence","fresh_e2e","native_study",
@@ -723,6 +766,7 @@ def refresh(config,context_file=None):
                 issues.append(label+": native counter refresh failed; last successful snapshot remains separate")
             ledger.snapshot(tool,scope,metrics,success,r["completed_at"],r)
         capture_jcodemunch(config,ledger,run,commands,issues)
+        capture_report_sources(config,ledger,run,commands,issues)
         archive_native_events(config,ledger,issues)
         projects=retained_projects(config,run,commands,issues) if config.get("inspect_project_history") else []
         for entry in config.get("context_roots",[]):
@@ -790,6 +834,11 @@ def refresh(config,context_file=None):
             runtimes=[],prior_scope="Hook and session-database inspection was not selected.")
         for component in matrix:
             component["native_reports"]=[r for r in ledger.native_views() if r["tool"]==native_tool_identity(component["id"])]
+            sources=[s for s in config.get("report_sources",[]) if s["tool"]==native_tool_identity(component["id"])]
+            if sources and component["native_lifetime_kind"] in ("usage only","no verified native savings counter"):
+                component.update(native_lifetime_kind="; ".join(dict.fromkeys(s["kind"] for s in sources)),
+                                 native_command="; ".join(shlex.join(s["argv"]) for s in sources),
+                                 lifetime_boundary="; ".join(s["boundary"] for s in sources))
         try:
             registry=capture_json_source(Path(config["publication"])/"manifests/evidence.json",run,"publication-receipt-registry")
             extra["publication_registry"]=registry

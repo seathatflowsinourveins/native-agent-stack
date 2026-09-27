@@ -198,6 +198,46 @@ paths. An `rtk_database` path also enables RTK's client-visible view (see below)
 `inspect_hook_history` additionally inspects the configured Context Mode roots'
 hook metadata. Both default to false and are unnecessary for counters.
 
+## Optional upstream reports
+
+A tool with no savings counter can still report its own usage, cache or index state.
+Select each report explicitly with `report_sources`. The reporter runs its command at
+refresh, retains the complete output like any other capture, and records the parsed
+report beside the tool's coverage row. **A report never carries a savings value**,
+even when upstream names a field "saved": its `saved` is always null, so nothing is
+added to a counter. `kind` is one of `usage report` (tokens consumed), `status report`
+(index or store state), `cache report` (cache hits and cached tokens) or
+`savings report` (an upstream estimate retained as evidence, not counted).
+
+```json
+"report_sources": [
+  {"name": "ccusage daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Claude Code token consumption from local transcripts; consumption, not avoided tokens"},
+  {"name": "ai-memory status", "tool": "ai-memory", "kind": "status report",
+   "argv": ["/abs/ai-memory", "status", "--json"], "boundary": "Store and index state; no token counter"},
+  {"name": "qmd catalog status", "tool": "qmd", "kind": "status report", "format": "text",
+   "argv": ["/abs/qmd", "--index", "native-agent-stack-catalog", "status"],
+   "boundary": "Named index state; the default index is a different store"},
+  {"name": "agentsview usage daily", "tool": "agentsview", "kind": "usage report",
+   "argv": ["/abs/agentsview", "usage", "daily", "--no-sync", "--offline", "--json"],
+   "boundary": "Archived sessions only; --no-sync reads without syncing new history"},
+  {"name": "OmniRoute prompt cache", "tool": "omniroute", "kind": "cache report",
+   "argv": ["curl", "-sS", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
+   "boundary": "Gateway-lifetime cached input tokens as the provider reported them; not provider billing"},
+  {"name": "OmniRoute compression", "tool": "omniroute", "kind": "savings report",
+   "argv": ["curl", "-sS", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
+   "boundary": "Upstream compression estimate with skip reasons; retained, never counted"}
+]
+```
+
+`tool` must be the component id in `manifests/stack.json`, so the report lands on
+that component's row. Its command and boundary also replace the row's generic "no
+counter" text. `format` defaults to `json`; a JSON report that fails to parse, or a
+nonzero exit, is a failed report, and the last good report stays separate. `timeout`
+defaults to 60 seconds (1–600). Select only aggregate routes: OmniRoute's
+`/api/usage/analytics` and call-log routes carry per-account rows with account emails.
+
 ## Exact artifact comparisons
 
 Install the pinned tokenizer only if you need retained-text comparisons:

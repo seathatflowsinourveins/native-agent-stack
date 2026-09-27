@@ -154,6 +154,74 @@ class LedgerContract(unittest.TestCase):
             self.assertTrue(issues)
         self.assertIsNone(self.db.native_views()[0]["latest_success"])
 
+    def report_source(self,**overrides):
+        entry={"name":"ccusage daily","tool":"ccusage","kind":"usage report","argv":["upstream","daily","--json"],
+               "boundary":"Consumed tokens, not avoided tokens"}
+        entry.update(overrides)
+        return entry
+
+    def test_report_sources_retain_upstream_reports_without_a_savings_value(self):
+        from unittest.mock import patch
+        commands=[];issues=[]
+        config={"report_sources":[self.report_source(),self.report_source(name="qmd status",tool="qmd",kind="status report",argv=["qmd","status"],format="text")],
+                "project":str(self.root)}
+        def returned(argv,cwd,root,label,timeout=60):
+            text='{"totals":{"totalTokens":1000,"savedTokens":999}}' if argv[0]=="upstream" else "Documents: 122"
+            return {"argv":argv,"exit_code":0,"stdout_text":text,"stderr_text":"","completed_at":m.now()}
+        for _ in range(2):
+            with patch.object(m,"capture",side_effect=returned):
+                m.capture_report_sources(config,self.db,self.root,commands,issues)
+        self.assertEqual(issues,[])
+        rows={r["tool"]:r for r in self.db.native_views()}
+        self.assertEqual(rows["ccusage"]["scope"],"Native / ccusage daily")
+        self.assertEqual(rows["ccusage"]["snapshot_count"],2)
+        for row in rows.values():
+            self.assertIsNone(row["latest_success"]["metrics"]["saved"])
+            self.assertFalse(row["counter_decreased"])
+        self.assertEqual(rows["ccusage"]["latest_success"]["metrics"]["kind"],"usage report")
+        self.assertEqual(rows["ccusage"]["latest_success"]["metrics"]["raw"]["totals"]["savedTokens"],999)
+        self.assertNotIn("raw",rows["qmd"]["latest_success"]["metrics"])
+        self.assertEqual(len(commands),4)
+
+    def test_report_sources_failed_or_unparsed_output_is_not_a_good_report(self):
+        from unittest.mock import patch
+        for raw,code in [("not json",0),('{"ok":true}',1),("",None)]:
+            issues=[];db=m.Ledger(self.root/("ledger-"+str(code)+raw[:3]+".sqlite3"))
+            try:
+                with patch.object(m,"capture",return_value={"exit_code":code,"stdout_text":raw,"stderr_text":"","completed_at":m.now()}):
+                    m.capture_report_sources({"report_sources":[self.report_source()],"project":str(self.root)},db,self.root,[],issues)
+                self.assertEqual(len(issues),1)
+                self.assertIsNone(db.native_views()[0]["latest_success"])
+            finally:db.close()
+
+    def test_report_source_entries_are_validated_when_the_configuration_loads(self):
+        good=self.report_source()
+        for bad in [{**good,"kind":"savings"},{**good,"argv":[]},{**good,"argv":"upstream daily"},{k:v for k,v in good.items() if k!="boundary"},
+                    {**good,"format":"yaml"},{**good,"timeout":0},{**good,"saved":1},[good,good]]:
+            path=self.root/"config.json"
+            entries=bad if isinstance(bad,list) else [bad]
+            path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":entries}))
+            with self.subTest(bad=bad),self.assertRaises(ValueError):
+                m.load_config(path)
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[good]}))
+        self.assertEqual(m.load_config(path)["report_sources"],[good])
+
+    def test_coverage_matrix_names_the_configured_report_command(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config["report_sources"]=[self.report_source(argv=["ccusage","daily","--offline","--json"])]
+        def returned(argv,cwd,root,label,timeout=60):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"daily":[]}',"stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            self.assertEqual(m.refresh(config)["issues"],[])
+        data=json.loads(Path(config["output_json"]).read_text())
+        row=next(r for r in data["coverage_matrix"] if r["id"]=="ccusage")
+        self.assertEqual(row["native_lifetime_kind"],"usage report")
+        self.assertEqual(row["native_command"],"ccusage daily --offline --json")
+        self.assertIn("Consumed tokens, not avoided tokens",row["lifetime_boundary"])
+        self.assertEqual([r["scope"] for r in row["native_reports"]],["Native / ccusage daily"])
+        self.assertIsNone(row["exact_lifetime_provider_saved"])
+
     def test_narrative_dollar_line_does_not_invent_session_or_lifetime_footer(self):
         line="$1.18 of Opus 4.7 tokens your team didn't burn."
         d=m.dollar_explanation({'runtime':'Unresolved storage root','result':{'content':[{'type':'text','text':line}]}})
