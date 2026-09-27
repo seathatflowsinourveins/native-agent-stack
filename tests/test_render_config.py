@@ -30,6 +30,11 @@ FIXTURE_VALUES = {
     # The explicit opt-in, left off: empty renders as empty text both under a direct
     # string.Template substitution below and in render_config.py (absent, "" and "false" alike).
     "AI_MEMORY_CAPTURE_ASSISTANT": "",
+    # Derived by render_config.py when a host file leaves it out (AiMemoryBinTests); the direct
+    # substitutions below need it spelled out, so it names the Linux pin's install like the derivation.
+    "AI_MEMORY_BIN": "/home/example/.local/share/codex-ecosystem/tools/ai-memory-{}/ai-memory".format(next(
+        tool["version"] for tool in json.loads((ROOT / "adoption" / "pins-linux-x86_64.json").read_text(
+            encoding="utf-8"))["tools"] if tool["id"] == "ai-memory")),
 }
 
 
@@ -375,6 +380,78 @@ class RenderConfigTests(unittest.TestCase):
                      "--live-codex-project", str(self.tmp_path / "nowhere3.toml"))
         self.assertEqual(result.returncode, 1)
         self.assertIn("live file not found", result.stderr)
+
+
+class AiMemoryBinTests(unittest.TestCase):
+    """Token gap ai-memory#2 (2026-09-27): the Claude template's eight ai-memory hook commands named the
+    Linux pin's install (tools/ai-memory-2.4.1) on every platform, while adoption/pins-macos-arm64.json
+    installs 2.3.2. Upstream's native hook commands invoke the installed binary directly
+    (akitaonrails/ai-memory v2.4.1 docs/install.md), so render_config.py now renders ${AI_MEMORY_BIN}
+    from the selected platform's pin unless a host supplies the binary it actually runs."""
+
+    SETTINGS = TEMPLATES / "claude.settings.template.json"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.hosts_dir = ROOT / "adoption" / "hosts"
+        # A host value file without AI_MEMORY_BIN, as adoption/hosts/example.json is.
+        self.host = "test-fixture-no-bin"
+        values = {key: value for key, value in FIXTURE_VALUES.items() if key != "AI_MEMORY_BIN"}
+        (self.hosts_dir / f"{self.host}.json").write_text(json.dumps(values, indent=2))
+        self.addCleanup((self.hosts_dir / f"{self.host}.json").unlink, missing_ok=True)
+
+    @staticmethod
+    def pinned(platform_id: str) -> str:
+        tools = json.loads((ROOT / "adoption" / f"pins-{platform_id}.json").read_text(encoding="utf-8"))["tools"]
+        return next(tool["version"] for tool in tools if tool["id"] == "ai-memory")
+
+    def memory_commands(self, settings_path: Path) -> list[str]:
+        hooks = json.loads(settings_path.read_text())["hooks"]
+        return [hook["command"] for groups in hooks.values() for group in groups for hook in group["hooks"]
+                if " hook --event " in hook["command"]]
+
+    def test_the_template_names_no_versioned_ai_memory_install(self):
+        text = self.SETTINGS.read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"tools/ai-memory-[0-9]", text))
+        self.assertEqual(text.count("${AI_MEMORY_BIN} --data-dir"), 8)
+
+    def test_each_platform_renders_its_own_pinned_install(self):
+        platforms = sorted(path.name[len("pins-"):-len(".json")] for path in (ROOT / "adoption").glob("pins-*.json"))
+        self.assertLessEqual({"linux-x86_64", "macos-arm64"}, set(platforms))
+        for platform_id in platforms:
+            with self.subTest(platform=platform_id):
+                out_dir = Path(self.tmp.name) / platform_id
+                result = run("--host", self.host, "--platform", platform_id, "--out", str(out_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                expected = f"{FIXTURE_VALUES['ECO_ROOT']}/tools/ai-memory-{self.pinned(platform_id)}/ai-memory "
+                commands = self.memory_commands(out_dir / "settings.json")
+                self.assertEqual(len(commands), 8)
+                for command in commands:
+                    self.assertTrue(command.startswith(expected), command)
+
+    def test_a_host_supplied_binary_wins_over_the_pin(self):
+        out_dir = Path(self.tmp.name) / "override"
+        result = run("--host", self.host, "--platform", "macos-arm64",
+                     "--set", "AI_MEMORY_BIN=/opt/running/ai-memory", "--out", str(out_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        commands = self.memory_commands(out_dir / "settings.json")
+        self.assertEqual(len(commands), 8)
+        self.assertTrue(all(command.startswith("/opt/running/ai-memory --data-dir ") for command in commands))
+
+    def test_a_platform_without_a_pins_file_fails_closed_unless_the_binary_is_given(self):
+        out_dir = Path(self.tmp.name) / "unknown"
+        result = run("--host", self.host, "--platform", "linux-aarch64", "--out", str(out_dir))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("no pins file for platform 'linux-aarch64'", result.stderr)
+        self.assertFalse((out_dir / "settings.json").exists())
+        given = run("--host", self.host, "--platform", "linux-aarch64",
+                    "--set", "AI_MEMORY_BIN=/opt/running/ai-memory", "--out", str(out_dir))
+        self.assertEqual(given.returncode, 0, given.stderr)
+        # The platform names a file under adoption/, so anything but <os>-<arch> is refused.
+        escape = run("--host", self.host, "--platform", "../hosts/example", "--out", str(out_dir) + "-escape")
+        self.assertEqual(escape.returncode, 1)
+        self.assertIn("--platform must look like", escape.stderr)
 
 
 class VerifyStdinTests(unittest.TestCase):

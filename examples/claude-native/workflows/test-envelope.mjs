@@ -415,7 +415,16 @@ function agentOptionLiterals(src) {
     // One effort line, and it is the stage effort: a second, lower line cannot hide behind the first.
     expect('agents: ' + n + ' runs at effort ' + STAGE_EFFORT + ' on a single effort line', (fm.match(/^effort:/mg) || []).length === 1 && new RegExp('^effort: ' + STAGE_EFFORT + '$', 'm').test(fm))
     expect('agents: ' + n + ' declares a tools allowlist', tools.length > 0)
-    expect('agents: ' + n + ' runs in its own worktree when it can edit files', !tools.some((t) => ['Edit', 'Write', 'NotebookEdit'].includes(t)) || /^isolation: worktree$/m.test(fm))
+    // Frontmatter `isolation: worktree` branches from the default branch, not the exact base, and on 2026-09-25 rewrote the
+    // shared core.hooksPath (docs/harness-defaults.md anti-pattern log), so no agent declares it (since 2026-09-27). A
+    // subagent without it starts in the coordinator's working directory (sub-agents docs), so an agent that can edit
+    // files edits only in the owned checkout its brief names, after comparing that checkout's top level with its
+    // starting directory's (git-rev-parse(1) --show-toplevel) and refusing when they match.
+    const body = readFileSync(join(dir, n), 'utf8').split(/^---$/m)[2] || ''
+    expect('agents: ' + n + ' declares no frontmatter isolation', !/^isolation:/m.test(fm))
+    // Each refusal condition is asserted verbatim (no path named, the coordinator's own top level, a HEAD off the
+    // base), so dropping any one of them fails here, not only dropping the comparison or the stop.
+    expect('agents: ' + n + ' edits only in a coordinator-created worktree when it can edit files', !tools.some((t) => ['Edit', 'Write', 'NotebookEdit'].includes(t)) || (/git worktree add --no-track/.test(body) && /compare `git -C <path> rev-parse --show-toplevel` with `git rev-parse --show-toplevel` run from your starting directory, and read `git -C <path> rev-parse HEAD`/.test(body) && /stop without editing when the brief names no path, when both commands print the same top level \(the coordinator's own checkout\) or when HEAD is not the brief's base/.test(body)))
     expect('agents: ' + n + ' grants MCP tools by full name, never a bare server prefix', tools.filter((t) => t.startsWith('mcp__')).every((t) => /^mcp__.+__[A-Za-z0-9_]+$/.test(t) && !t.endsWith('__*')))
     expect('agents: ' + n + ' keeps granted MCP tools deferred behind ToolSearch', !tools.some((t) => t.startsWith('mcp__')) || tools.includes('ToolSearch'))
   }
@@ -479,6 +488,12 @@ function agentOptionLiterals(src) {
   const frontOf = (agent) => (readOr(join(dir, agent + '.md')).match(/^---\n([\s\S]*?)\n---/) || [null, ''])[1]
   const modelEffortOf = (agent) => title[(frontOf(agent).match(/^model: (\w+)$/m) || [])[1]] + ', ' + (frontOf(agent).match(/^effort: (\w+)$/m) || [])[1]
   expect('routing doc: the role table maps each dispatch role to its project agent with the model and effort its file declares', roleTable.length === Object.keys(ROLE_AGENTS).length && Object.entries(ROLE_AGENTS).every(([role, agent]) => { const rows = roleTable.filter((r) => r[0] === role); return rows.length === 1 && rows[0][1] === '`' + agent + '`' && names.includes(agent + '.md') && rows[0][2] === modelEffortOf(agent) }))
+  // The agent table restates each agent it lists with the model and effort its file declares (since 2026-09-27,
+  // when its builder and verifier rows still said Sonnet after both files moved to Opus and no check noticed).
+  const agentHead = routingLines.findIndex((l) => l.startsWith('| Agent | Model, effort | Tools | Use |'))
+  const agentTable = []
+  for (let i = agentHead + 2; agentHead >= 0 && i < routingLines.length && routingLines[i].startsWith('|'); i++) agentTable.push(routingLines[i].split('|').slice(1, -1).map((c) => c.trim()))
+  expect('routing doc: the agent table restates each listed agent with the model and effort its file declares', agentTable.length > 0 && agentTable.every((r) => { const agent = ((r[0] || '').match(/^`([^`]+)`$/) || [])[1]; return Boolean(agent) && names.includes(agent + '.md') && (r[1] === modelEffortOf(agent) || (r[1] || '').startsWith(modelEffortOf(agent) + ', ')) }))
   // The stack agents' surfaces are pinned exactly, like the reviewer's: an added edit, fetch or skill tool fails
   // here until it is reviewed and listed. Their Bash and Context Mode ctx_execute* stay instruction-bound.
   const toolsOf = (agent) => ((frontOf(agent).match(/^tools: (.*)$/m) || [null, ''])[1]).split(',').map((t) => t.trim()).filter(Boolean).sort()

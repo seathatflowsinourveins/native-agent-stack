@@ -128,15 +128,35 @@ the measured constraints and the per-stage rule.
 [role table](../examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26);
 this table records the qualification behind each choice.
 
+**2026-09-27: Opus builds and verifies; builders get coordinator-created worktrees.**
+Following the user's rule of 2026-09-27 (Opus at effort max for design, build,
+research, review, verification and synthesis; never a weaker model to save tokens),
+`isolated-builder` and `stack-verifier` declare `model: opus`. Sonnet stays only for
+`source-scout`'s exact extraction and command running, and Haiku is not routed. The
+builder no longer declares `isolation: worktree`: that field branches from the
+default branch rather than the exact base
+([sub-agents](https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields)),
+and on 2026-09-25 it rewrote the shared `core.hooksPath`
+([anti-pattern log](../docs/harness-defaults.md#upstream-verification-and-compounding-learning)).
+The coordinator prepares an owned checkout at the exact base, normally with `git
+worktree add --no-track <path> -b <branch> <exact base>`, and names it in the brief.
+A subagent without `isolation` starts in the coordinator's working directory
+([sub-agents](https://code.claude.com/docs/en/sub-agents)), so the builder compares
+the named checkout's `git rev-parse --show-toplevel` with its starting directory's and
+refuses to edit when they match, when no path is named or when `HEAD` is not the
+base. Both roles' qualification rows below were recorded on
+Sonnet, so neither is qualified on Opus yet
+([decision record](../docs/decisions/2026-09-27-claude-harness-settings.md)).
+
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
 | Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`xhigh` plus dynamic workflow orchestration), the default for every session; escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
 | Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, max; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
 | Research from the web, documentation, repository and catalog | `stack-researcher` (Opus, max; Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill) | None yet. Added 2026-09-26 in place of the default child for research; its first-prompt size, lane use, correctness and billed cost against `general-purpose` are preregistered in the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) and not yet run |
-| Implementation from a clear contract | `isolated-builder` (Sonnet, max, own worktree, named MCP read tools behind ToolSearch; Serena's symbol-edit tools removed on 2026-09-26 because they would edit the parent session's checkout; `context-mode:context-mode` and `verification-before-completion` preloaded) | One real task before the preload: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864). The preload has no native qualification or measured first-prompt size; it joins the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)'s preregistered comparison |
+| Implementation from a clear contract | `isolated-builder` (Opus, max since 2026-09-27; edits only in the owned checkout its brief names, never the coordinator's own, with no frontmatter `isolation`; named MCP read tools behind ToolSearch; Serena's symbol-edit tools removed on 2026-09-26 because they would edit the parent session's checkout; `context-mode:context-mode` and `verification-before-completion` preloaded) | One real task on Sonnet, before the preload: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864). The Opus model, the preload and the coordinator-created worktree have no native qualification or measured first-prompt size; they join the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)'s preregistered comparison |
 | Independent review from source and recorded evidence | `evidence-reviewer` (Opus, max; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |
 | Adversarial security review of a supplied diff or artifact | `security-reviewer` (Opus, max; evidence-reviewer's named read tools behind ToolSearch, no Bash/Edit/Write/WebFetch/Skill; `security-best-practices` preloaded) | None yet. Added 2026-09-26; first-prompt size, lane use, correctness and billed cost are preregistered in the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md), with no native run recorded |
-| Verification that re-runs named commands | `stack-verifier` (Sonnet, max; Read, Glob, Grep, Bash, ToolSearch and named Context Mode tools; no project instructions) | None yet. Added 2026-09-26 in place of the default child for ad-hoc verification; the same preregistered comparison applies |
+| Verification that re-runs named commands | `stack-verifier` (Opus, max since 2026-09-27; Read, Glob, Grep, Bash, ToolSearch and named Context Mode tools; no project instructions) | None yet. Added 2026-09-26 in place of the default child for ad-hoc verification; the same preregistered comparison applies |
 | Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` (Opus, max; Read, Glob and Grep, `typesafe-ai` skill preloaded) | One probe, `wf_20a5e69a-84d`, measured the skill preload (first prompt 15,059 tokens; [convergence record](../docs/harness-rules-convergence-20260922.md)); no quality comparison with another reviewer is recorded. The vendored layer-verdict lane no longer uses it (next row) |
 | Proposing, refuting and re-checking one stripped layer-verdict packet | `blind-lane-reviewer` (Opus, max; Read, Glob and Grep, no preloaded skill, no project instructions) | Every stage of the vendored [layer-verdict lane](../examples/claude-native/workflows/layer-verdict-lane.js) names it (agent-lab `e070125`, vendored with the lane). A skill it preloaded could be one of the candidates a packet judges, and project instructions can name incumbent selections, so it carries neither; this catalog records no dated run of the lane with it |
 | Judging or refuting one sealed comparison packet | `blind-judge` (Opus, max; Read only, no project instructions) | Its frontmatter was checked against the agent contract in the [convergence record](../docs/harness-rules-convergence-20260922.md); its body was not reviewed there, and this catalog records no dated run of the role |
@@ -155,6 +175,91 @@ return source-linked findings. Prefer small schemas with bounded fields over
 word-count instructions that trigger repeated shell calls. Verify substantive
 claims independently; preserve schema retries, nulls, failures and model
 substitutions as incomplete results rather than filtering them into a pass.
+
+### Dispatch modes, named spawns and verification (2026-09-27)
+
+The [portable instructions](../examples/claude-native/CLAUDE.md) name four dispatch
+modes: solo, one subagent, an Ultracode workflow and an agent team. These documented
+facts sit behind them (docs read 2026-09-27 against Claude Code 2.1.283; the
+[decision record](../docs/decisions/2026-09-27-claude-harness-settings.md) holds the
+rest):
+
+- **A named spawn becomes a teammate.** With agent teams enabled in an interactive
+  session, a subagent spawned from the main conversation with a `name` launches as a
+  teammate unless the call is a fork or passes `isolation` on the call itself;
+  frontmatter `isolation` does not prevent it, and the teammate runs in the main
+  session's working directory
+  ([sub-agents, "Subagent names"](https://code.claude.com/docs/en/sub-agents#subagent-names)).
+  Claude may name a subagent on its own, so a team can form during ordinary
+  delegation. A teammate gets its definition's `tools`, `model` and body but not its
+  `skills`, and loads CLAUDE.md, MCP servers and skills like a regular session;
+  `-p` runs never spawn teammates ([agent teams](https://code.claude.com/docs/en/agent-teams)).
+- **Teammates run at the lead's effort.** "Teammates inherit the lead's effort
+  level", so under Ultracode they run at `xhigh`, whatever their definition's
+  `effort: max` says, and raising the lead to `max` turns orchestration off. Where a
+  child needs `max`, spawn it unnamed through the Agent tool or as a workflow stage.
+- **Roles that never run as teammates.** Spawn unnamed every shipped role whose
+  contract rests on frontmatter a teammate ignores or that is unverified for
+  teammates: `isolated-builder` and `security-reviewer` (skill preloads),
+  `semantic-evidence-reviewer` (skill preload), the blind roles, `source-scout` and
+  `stack-verifier` (`omitClaudeMd`, unverified for teammates). A run that must keep
+  every frontmatter guarantee, such as a blind lane or a preregistered comparison,
+  opts out for that run with `claude --settings
+  '{"env":{"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS":"0"}}'`; a `--settings` payload
+  applies after user and project settings. A PreToolUse guard that denies named
+  spawns of these roles waits on a probe that the Agent tool's hook input carries
+  `name`: the [hooks reference](https://code.claude.com/docs/en/hooks) lists only
+  `prompt`, `description`, `subagent_type` and `model`.
+- **Teams.** Name each teammate's model at spawn, give each writer its own files or
+  owned worktree, start with three to five teammates, and keep one team per session
+  with no nesting. The lead verifies each idle notification's answer before acting
+  on it.
+- **Fan-outs go through a workflow.** A workflow caps its concurrency and can
+  resume, while under Ultracode the Agent tool's concurrent-subagent limit is not
+  enforced ([sub-agents](https://code.claude.com/docs/en/sub-agents#concurrent-subagent-limit)).
+  Resume re-runs a failed agent and every agent started after it, so run one
+  workflow per phase: understand, change, verify
+  ([workflows](https://code.claude.com/docs/en/workflows)). A run's token target
+  (`budget.total`) comes only from the user's own `+Nk` directive: a ceiling the user
+  sets, not a coordinator setting.
+- **Codex depth.** Codex 0.157.1 ignores `agents.max_depth` for V2 models such as
+  `gpt-6-astra` (`codex-rs/config/src/config_toml.rs` L719-720 at `rust-v0.157.1`),
+  and its V2 spawn handler records depth without checking it; only the thread cap
+  bounds a Codex fan-out. This is source reading, not a run, and Claude's
+  `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` does not reach Codex.
+
+Verification patterns, from the bundled `/workflow-authoring` reference, the
+[workflows](https://code.claude.com/docs/en/workflows) page ("adversarially review
+each other's findings"), [best practices](https://code.claude.com/docs/en/best-practices)
+("A reviewer prompted to find gaps will usually report some") and
+anthropics/claude-code `7779afb`, `plugins/code-review/commands/code-review.md`, steps
+4-6:
+
+- (a) validate each finding with its own verifier before reporting it, and drop the
+  unvalidated ones; use Opus for bug and logic findings;
+- (b) skeptics refute by default, a majority kills a finding, and the refuted set
+  stays visible to the coordinator;
+- (c) use distinct lenses when a finding can fail in more than one way;
+- (d) add a completeness critic to audits and research;
+- (e) loop until dry for discovery of unknown size, deduplicating against
+  everything already seen;
+- (f) no silent caps: a bound logs what it dropped;
+- (g) reviewers flag correctness and requirement gaps, and minor findings go to a
+  ledger;
+- (h) reviewers and verifiers never run as forks, which inherit the whole
+  conversation.
+
+The visible refuted set in (b) and the ledger in (g) are this catalog's additions,
+consistent with the paragraph above. arXiv:2512.08296 (v3) reports that
+architectures without centralized verification tend to propagate errors more.
+
+Prefix sharing: "Two agents that run with the same model, effort level, agent type,
+tools, output schema, and working directory build the same tools-and-system-prompt
+prefix" ([workflows](https://code.claude.com/docs/en/workflows)), so siblings in
+different worktrees do not share it. Keep a per-item schema where it enforces
+correctness, as `readiness-audit.js` does for each reader's claim enum, rather than
+widening it for cache reuse; measure per-sibling cache reads with `child-usage.mjs`
+before changing one.
 
 Use the bundled `/workflow-authoring` skill when writing reusable workflow code.
 For an interactive authoring session, start with the positional prompt
@@ -256,6 +361,9 @@ wherever a child is defined:
   without its own `effort` inherits the coordinator's `xhigh` unless its agent's
   frontmatter sets one, and the stage's effort also overrides a lower
   frontmatter;
+- a teammate runs at the lead's effort, so under Ultracode at `xhigh`, whatever
+  its definition says ([agent teams](https://code.claude.com/docs/en/agent-teams),
+  read 2026-09-27); spawn a child that needs `max` unnamed or as a workflow stage;
 - a single non-orchestrated session at `max` stays available on request:
   `claude --effort max` ran at `max` with orchestration off (P2). `/effort max`
   was not probed; the docs say Claude Code applies `max` "to the current
