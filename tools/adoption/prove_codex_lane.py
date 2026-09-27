@@ -31,6 +31,9 @@ first and a reached gate refuses them):
   rtk-worker    a worker asked to run `git status --short` and `git show HEAD:big.txt` in the scratch repository:
                 its status command carries the rtk prefix, and its blob read is native (or `rtk proxy`), exits 0
                 and is byte-exact
+  skill-worker  a sixth worker reads one installed SKILL.md (default: first under ~/.agents/skills, or --skill-file).
+                Its completed ctx_execute_file or `rtk cat` output must match the file's actual first line.
+                The result names the successful route; a project-boundary refusal can fall back to the shell.
 Every live check reads the `codex exec --json` item events, never the model's prose.
 
 Exit status: 0 every check passed, 1 a check failed, 2 could not start (no codex, or the quota gate refused).
@@ -72,6 +75,10 @@ MEMORY_PROMPT = ("Make exactly one MCP tool call, to the ai-memory server: memor
 RTK_PROMPT = ("Use your shell tool, not an MCP tool: in the current directory run `git status --short` and then "
               "`git show HEAD:big.txt`, each as its own command. Then reply with one line: how many lines the "
               "second command printed.")
+# mksglu/context-mode v1.0.169 src/server.ts: FILE_CONTENT is supplied by ctx_execute_file;
+# its small successful response echoes the path and this code, then stdout. Keep the query fixed so an
+# echoed/guessed answer cannot substitute for a read of the selected file.
+SKILL_CODE = "print(FILE_CONTENT.splitlines()[0])"
 EVIDENCE = {
     "evidence_class": "local integration check",
     "host_acceptance": False,
@@ -373,6 +380,84 @@ def rtk_verdict(run: dict, blob: bytes) -> tuple[bool, str]:
                 f"exit {show.get('exit_code')}, {len(output.encode('utf-8'))} of {len(blob)} bytes, byte-exact {exact}")
 
 
+def skill_cat_command(command: str, skill: Path) -> bool:
+    """Recognize a direct RTK read, using the CPython shlex POSIX parsing pattern
+    of git_operation. Refuse compound commands, echoes and different files.
+    Source: https://docs.python.org/3.12/library/shlex.html#improved-compatibility-with-shells
+    """
+    def tokens(source: str) -> list[str]:
+        lexer = shlex.shlex(source, posix=True, punctuation_chars=True)
+        lexer.whitespace_split = True
+        return list(lexer)
+
+    try:
+        argv = tokens(command)
+        if (len(argv) == 3 and Path(argv[0]).name in {"sh", "bash", "dash", "zsh"}
+                and argv[1] in {"-c", "-lc"}):
+            argv = tokens(argv[2])
+    except ValueError:
+        return False
+    if not argv or Path(argv[0]).name != "rtk":
+        return False
+    return argv[1:] in (["cat", str(skill)], ["cat", "--", str(skill)])
+
+
+def skill_verdict(run: dict, skill: Path) -> tuple[bool, str]:
+    """Check native tool output against the installed file, never model prose.
+
+    Sources: openai/codex rust-v0.157.1 codex-rs/exec/src/exec_events.rs
+    (item.completed, CommandExecutionItem, McpToolCallItem); mksglu/context-mode
+    v1.0.169 src/server.ts L2215-2219 (path/code echo plus stdout) and
+    src/security.ts::evaluateProjectContainment (#852). A refused MCP read may
+    be followed by the ordinary Codex shell read; no permissions are changed.
+    """
+    if run["timed_out"] or run["exit"] != 0:
+        return False, f"route none; worker exit {run['exit']}, timed out {run['timed_out']}"
+    try:
+        with skill.open(encoding="utf-8") as stream:
+            first = stream.readline()
+    except (OSError, UnicodeError):
+        return False, "route none; selected SKILL.md is not readable"
+    if not first:
+        return False, "route none; selected SKILL.md is empty"
+    expected = first.rstrip("\r\n")
+    for item in mcp_calls(run["events"], "context-mode", "ctx_execute_file"):
+        args = item.get("arguments") or {}
+        direct = (args.get("path") == str(skill) and args.get("language") == "python"
+                  and args.get("code") == SKILL_CODE)
+        if (not direct or item.get("status") != "completed" or item.get("error")
+                or (item.get("result") or {}).get("isError")):
+            continue
+        output = result_text(item).replace("\r\n", "\n")
+        output = output.removeprefix(f"path={skill}\n")
+        output = output.removeprefix(f"```python\n{SKILL_CODE}\n```\n\n")
+        if output == expected + "\n" or (expected and output == expected):
+            return True, "route context-mode ctx_execute_file; first line exact True"
+    for item in completed_items(run["events"], "command_execution"):
+        if (item.get("status") != "completed" or item.get("exit_code") != 0
+                or not skill_cat_command(item.get("command", ""), skill)):
+            continue
+        lines = (item.get("aggregated_output") or "").splitlines()
+        if lines and lines[0] == expected:
+            return True, "route shell (rtk cat); first line exact True"
+    return False, "route none; no successful direct read returned the selected SKILL.md first line"
+
+
+def skill_prompt(skill: Path) -> str:
+    """Request a native file read without supplying the expected first line.
+
+    Codex's user skill directory: https://developers.openai.com/codex/skills/
+    Shell fallback follows rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md and
+    context-mode v1.0.169's project containment policy, not a permission override.
+    """
+    return (f"Read the installed skill file {str(skill)!r}. Prefer the context-mode tool ctx_execute_file with "
+            f"path {str(skill)!r}, language python, and exactly this code: {SKILL_CODE}. "
+            "If context-mode refuses the file because it is outside the project directory, use your shell tool "
+            f"to run this single command instead: {shlex.join(['rtk', 'cat', str(skill)])}. "
+            "A direct shell read is also acceptable. Do not change any configuration or permissions. "
+            "Then reply with the file's first line. Do not guess it.")
+
+
 def live_checks(codex: str, codex_home: Path, scratch: Path, repo: Path, blob: bytes, args: argparse.Namespace,
                 results: Results) -> list[dict]:
     env = worker_env(codex_home)
@@ -401,6 +486,20 @@ def live_checks(codex: str, codex_home: Path, scratch: Path, repo: Path, blob: b
     results.add("approval control without the profile", ok, detail)
     ok, detail = rtk_verdict(more[2], blob)
     results.add("rtk-worker", ok, detail)
+    # Official Codex skill discovery includes ~/.agents/skills. Use a host file,
+    # not an authored fixture or a first line supplied to the worker as an answer.
+    skill = (Path(args.skill_file).expanduser().absolute() if args.skill_file else
+             next((p for p in sorted((Path.home() / ".agents/skills").glob("*/SKILL.md")) if p.is_file()), None))
+    if skill is None or skill.name != "SKILL.md" or not skill.is_file():
+        results.add("skill-worker", False, "route none; no installed SKILL.md found (or invalid --skill-file)")
+    else:
+        skill_runs = run_workers([
+            {"name": "skill-worker", "argv": exec_argv(codex, skill_prompt(skill), True),
+             "cwd": str(neutral), "env": env},
+        ], args.timeout)
+        ok, detail = skill_verdict(skill_runs[0], skill)
+        results.add("skill-worker", ok, detail)
+        more.extend(skill_runs)
     return [{key: run[key] for key in ("name", "exit", "timed_out", "seconds", "cleanup_error")}
             | {"usage": usage(run["events"])}
             for run in runs + more]
@@ -430,6 +529,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout", type=float, default=900.0, help="seconds per batch of live workers")
     parser.add_argument("--memory-workspace", default="local", help="ai-memory workspace for the approval check")
     parser.add_argument("--memory-project", default="native-agent-stack", help="ai-memory project for it")
+    parser.add_argument("--skill-file", metavar="SKILL.md",
+                        help="installed skill for --live (default: first ~/.agents/skills/*/SKILL.md)")
     parser.add_argument("--json", metavar="FILE", help="also write the results as JSON")
     args = parser.parse_args(argv)
     codex = args.codex or shutil.which("codex")

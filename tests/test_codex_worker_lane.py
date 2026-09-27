@@ -930,13 +930,15 @@ class ProveVerdictTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             report_path = Path(tmp) / "report.json"
+            skill_path = Path(tmp) / "SKILL.md"
+            skill_path.write_text("# Synthetic installed skill\n", encoding="utf-8")
             with mock.patch.object(prove, "make_repo", return_value=b"synthetic blob"), \
                  mock.patch.object(prove, "static_checks"), \
                  mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic open gate")), \
                  mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
                  contextlib.redirect_stdout(io.StringIO()):
                 code = prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp,
-                                   "--live", "--json", str(report_path)])
+                                   "--live", "--skill-file", str(skill_path), "--json", str(report_path)])
             self.assertEqual(code, 1)
             report = json.loads(report_path.read_text())
         self.assertEqual(report.get("evidence_class"), "local integration check")
@@ -948,7 +950,7 @@ class ProveVerdictTests(unittest.TestCase):
             self.assertIs(report["retention"][omitted], False)
         self.assertIs(report["retention"]["worker_exits"], True)
         self.assertIn("not sanitized", report["sanitization"])
-        self.assertEqual(len(report["live_runs"]), 5)
+        self.assertEqual(len(report["live_runs"]), 6)
         for run in report["live_runs"]:
             self.assertIn("TimeoutExpired", run["cleanup_error"])
             self.assertEqual(run["usage"], {"input_tokens": 7})
