@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+"""Minimal per-route reproduction against the loopback gateway: prints HTTP status and a bounded error text only."""
+import json
+import urllib.error
+import urllib.request
+
+BASE = "http://127.0.0.1:20128"
+CASES = [
+    ("GET", "/v1/models", None),
+    ("POST", "/v1/chat/completions", {"model": "cx/gpt-6-astra", "messages": [{"role": "user", "content": "Reply with: ok"}],
+                                      "stream": False}),
+    ("POST", "/v1/responses", {"model": "cx/gpt-6-astra", "input": "Reply with: ok", "stream": False,
+                               "reasoning": {"effort": "low"}}),
+]
+for method, path, body in CASES:
+    data = json.dumps(body).encode() if body is not None else None
+    request = urllib.request.Request(BASE + path, data=data, method=method,
+                                     headers={"Content-Type": "application/json",
+                                              "Authorization": "Bearer local-loopback"})
+    try:
+        with urllib.request.urlopen(request, timeout=180) as response:
+            text = response.read().decode("utf-8", "replace")
+            status = response.status
+    except urllib.error.HTTPError as error:
+        status, text = error.code, error.read(1500).decode("utf-8", "replace")
+    except Exception as error:  # noqa: BLE001 - report transport errors verbatim
+        status, text = "transport", repr(error)[:300]
+    if path == "/v1/models" and status == 200:
+        ids = [m.get("id") for m in json.loads(text).get("data", []) if "astra" in str(m.get("id"))][:6]
+        text = f"astra ids: {ids}"
+    print(f"{method} {path} -> {status}: {text[:400]}")

@@ -1,0 +1,749 @@
+{
+  "arms": [
+    {
+      "arm": "A0",
+      "bootstrap_vs_control": null,
+      "criteria": {
+        "every_batch_completed": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true
+      },
+      "effort": "max",
+      "model": "gpt-6-astra",
+      "role": "control",
+      "routable": true,
+      "state": "complete",
+      "summary": {
+        "batches": {
+          "completed": 25,
+          "failed": 0,
+          "pending": 0,
+          "total": 25
+        },
+        "calls": {
+          "abandoned": 0,
+          "by_reason": {},
+          "failed": 0,
+          "interrupted": 0,
+          "limit": 0,
+          "ok": 25,
+          "tool_use": 0,
+          "total": 25,
+          "unavailable": 0
+        },
+        "every_batch_completed": true,
+        "exact_match_rate": 0.975,
+        "failed_batch_ids": [],
+        "fenced_valid_rate": 0.0,
+        "invalid_filings": 0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.996978926978927,
+        "mean_f1": 0.9937542087542087,
+        "mean_precision": 0.9921296296296297,
+        "mean_recall": 0.9981481481481481,
+        "micro_f1": 0.9941972920696325,
+        "n": 360,
+        "pending_batch_ids": [],
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 1.0,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 1.0,
+          "3.03": 1.0,
+          "5.02": 1.0,
+          "5.03": 1.0,
+          "5.07": 1.0,
+          "7.01": 1.0,
+          "8.01": 0.9828571428571429,
+          "9.01": 0.990990990990991
+        },
+        "problems": [],
+        "retried_batches": 0,
+        "state": "complete",
+        "tokens": {
+          "calls_without_usage": 0,
+          "calls_without_usage_by_outcome": {},
+          "per_filing": {
+            "billed": 1852.2666666666667,
+            "cache_write_input": 0.0,
+            "cached_input": 72.53333333333333,
+            "input": 1856.3027777777777,
+            "output_including_reasoning": 68.49722222222222,
+            "reasoning": 42.61388888888889,
+            "uncached_input": 1783.7694444444444,
+            "visible_output": 25.883333333333333
+          },
+          "subset_violations": 0,
+          "totals": {
+            "billed": 666816,
+            "cache_write_input": 0,
+            "cached_input": 26112,
+            "input": 668269,
+            "output_including_reasoning": 24659,
+            "reasoning": 15341,
+            "uncached_input": 642157,
+            "visible_output": 9318
+          },
+          "usage_complete": true
+        },
+        "unexpected_entries": 0,
+        "wall": {
+          "call_wall_seconds_per_filing": 2.3054583333333336,
+          "median_ok_call_wall_seconds": 27.443,
+          "run_elapsed_seconds": 282.668,
+          "slot_wait_seconds": 0.002,
+          "total_call_wall_seconds": 829.965
+        }
+      }
+    },
+    {
+      "arm": "A1",
+      "bootstrap_vs_control": {
+        "lower": 0.0,
+        "point": 0.0,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 0.0
+      },
+      "criteria": {
+        "every_batch_completed": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true
+      },
+      "effort": "medium",
+      "model": "gpt-6-astra",
+      "role": "candidate",
+      "routable": true,
+      "state": "complete",
+      "summary": {
+        "batches": {
+          "completed": 25,
+          "failed": 0,
+          "pending": 0,
+          "total": 25
+        },
+        "calls": {
+          "abandoned": 0,
+          "by_reason": {},
+          "failed": 0,
+          "interrupted": 0,
+          "limit": 0,
+          "ok": 25,
+          "tool_use": 0,
+          "total": 25,
+          "unavailable": 0
+        },
+        "every_batch_completed": true,
+        "exact_match_rate": 0.975,
+        "failed_batch_ids": [],
+        "fenced_valid_rate": 0.0,
+        "invalid_filings": 0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.996978926978927,
+        "mean_f1": 0.9937542087542087,
+        "mean_precision": 0.9921296296296297,
+        "mean_recall": 0.9981481481481481,
+        "micro_f1": 0.9941972920696325,
+        "n": 360,
+        "pending_batch_ids": [],
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 1.0,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 1.0,
+          "3.03": 1.0,
+          "5.02": 1.0,
+          "5.03": 1.0,
+          "5.07": 1.0,
+          "7.01": 1.0,
+          "8.01": 0.9828571428571429,
+          "9.01": 0.990990990990991
+        },
+        "problems": [],
+        "retried_batches": 0,
+        "state": "complete",
+        "tokens": {
+          "calls_without_usage": 0,
+          "calls_without_usage_by_outcome": {},
+          "per_filing": {
+            "billed": 1883.0833333333333,
+            "cache_write_input": 0.0,
+            "cached_input": 0.0,
+            "input": 1856.2305555555556,
+            "output_including_reasoning": 26.852777777777778,
+            "reasoning": 1.075,
+            "uncached_input": 1856.2305555555556,
+            "visible_output": 25.77777777777778
+          },
+          "subset_violations": 0,
+          "totals": {
+            "billed": 677910,
+            "cache_write_input": 0,
+            "cached_input": 0,
+            "input": 668243,
+            "output_including_reasoning": 9667,
+            "reasoning": 387,
+            "uncached_input": 668243,
+            "visible_output": 9280
+          },
+          "usage_complete": true
+        },
+        "unexpected_entries": 0,
+        "wall": {
+          "call_wall_seconds_per_filing": 1.0976777777777778,
+          "median_ok_call_wall_seconds": 15.732,
+          "run_elapsed_seconds": 132.945,
+          "slot_wait_seconds": 0.002,
+          "total_call_wall_seconds": 395.164
+        }
+      }
+    },
+    {
+      "arm": "S0",
+      "bootstrap_vs_control": {
+        "lower": -0.0013404349755881118,
+        "point": 0.0006414176077869094,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 0.003149788432164735
+      },
+      "criteria": {
+        "every_batch_completed": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true
+      },
+      "effort": "max",
+      "model": "gpt-6-sol",
+      "role": "candidate",
+      "routable": true,
+      "state": "complete",
+      "summary": {
+        "batches": {
+          "completed": 25,
+          "failed": 0,
+          "pending": 0,
+          "total": 25
+        },
+        "calls": {
+          "abandoned": 0,
+          "by_reason": {},
+          "failed": 0,
+          "interrupted": 0,
+          "limit": 0,
+          "ok": 25,
+          "tool_use": 0,
+          "total": 25,
+          "unavailable": 0
+        },
+        "every_batch_completed": true,
+        "exact_match_rate": 0.9777777777777777,
+        "failed_batch_ids": [],
+        "fenced_valid_rate": 0.0,
+        "invalid_filings": 0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.99745781351794,
+        "mean_f1": 0.9943097643097643,
+        "mean_precision": 0.9935185185185186,
+        "mean_recall": 0.9976851851851852,
+        "micro_f1": 0.9948387096774194,
+        "n": 360,
+        "pending_batch_ids": [],
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 1.0,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 1.0,
+          "3.03": 1.0,
+          "5.02": 1.0,
+          "5.03": 1.0,
+          "5.07": 1.0,
+          "7.01": 1.0,
+          "8.01": 0.9886363636363636,
+          "9.01": 0.9909584086799277
+        },
+        "problems": [],
+        "retried_batches": 0,
+        "state": "complete",
+        "tokens": {
+          "calls_without_usage": 0,
+          "calls_without_usage_by_outcome": {},
+          "per_filing": {
+            "billed": 1656.8916666666667,
+            "cache_write_input": 0.0,
+            "cached_input": 233.95555555555555,
+            "input": 1825.1055555555556,
+            "output_including_reasoning": 65.74166666666666,
+            "reasoning": 39.86944444444445,
+            "uncached_input": 1591.15,
+            "visible_output": 25.872222222222224
+          },
+          "subset_violations": 0,
+          "totals": {
+            "billed": 596481,
+            "cache_write_input": 0,
+            "cached_input": 84224,
+            "input": 657038,
+            "output_including_reasoning": 23667,
+            "reasoning": 14353,
+            "uncached_input": 572814,
+            "visible_output": 9314
+          },
+          "usage_complete": true
+        },
+        "unexpected_entries": 0,
+        "wall": {
+          "call_wall_seconds_per_filing": 1.4724916666666665,
+          "median_ok_call_wall_seconds": 15.825,
+          "run_elapsed_seconds": 185.978,
+          "slot_wait_seconds": 0.001,
+          "total_call_wall_seconds": 530.097
+        }
+      }
+    },
+    {
+      "arm": "S1",
+      "bootstrap_vs_control": {
+        "lower": -0.0037475708579434164,
+        "point": -0.0006489049728582996,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 0.0020022160104536946
+      },
+      "criteria": {
+        "every_batch_completed": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true
+      },
+      "effort": "medium",
+      "model": "gpt-6-sol",
+      "role": "candidate",
+      "routable": true,
+      "state": "complete",
+      "summary": {
+        "batches": {
+          "completed": 25,
+          "failed": 0,
+          "pending": 0,
+          "total": 25
+        },
+        "calls": {
+          "abandoned": 0,
+          "by_reason": {},
+          "failed": 0,
+          "interrupted": 0,
+          "limit": 0,
+          "ok": 25,
+          "tool_use": 0,
+          "total": 25,
+          "unavailable": 0
+        },
+        "every_batch_completed": true,
+        "exact_match_rate": 0.975,
+        "failed_batch_ids": [],
+        "fenced_valid_rate": 0.0,
+        "invalid_filings": 0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.993834625112143,
+        "mean_f1": 0.9937542087542087,
+        "mean_precision": 0.9930555555555556,
+        "mean_recall": 0.9972222222222222,
+        "micro_f1": 0.9935483870967742,
+        "n": 360,
+        "pending_batch_ids": [],
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 0.9565217391304348,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 1.0,
+          "3.03": 1.0,
+          "5.02": 1.0,
+          "5.03": 1.0,
+          "5.07": 1.0,
+          "7.01": 1.0,
+          "8.01": 0.9886363636363636,
+          "9.01": 0.9909584086799277
+        },
+        "problems": [],
+        "retried_batches": 0,
+        "state": "complete",
+        "tokens": {
+          "calls_without_usage": 0,
+          "calls_without_usage_by_outcome": {},
+          "per_filing": {
+            "billed": 1619.9722222222222,
+            "cache_write_input": 0.0,
+            "cached_input": 241.77777777777777,
+            "input": 1825.05,
+            "output_including_reasoning": 36.7,
+            "reasoning": 10.833333333333334,
+            "uncached_input": 1583.2722222222221,
+            "visible_output": 25.866666666666667
+          },
+          "subset_violations": 0,
+          "totals": {
+            "billed": 583190,
+            "cache_write_input": 0,
+            "cached_input": 87040,
+            "input": 657018,
+            "output_including_reasoning": 13212,
+            "reasoning": 3900,
+            "uncached_input": 569978,
+            "visible_output": 9312
+          },
+          "usage_complete": true
+        },
+        "unexpected_entries": 0,
+        "wall": {
+          "call_wall_seconds_per_filing": 1.1015611111111112,
+          "median_ok_call_wall_seconds": 13.046,
+          "run_elapsed_seconds": 149.631,
+          "slot_wait_seconds": 0.0,
+          "total_call_wall_seconds": 396.562
+        }
+      }
+    },
+    {
+      "arm": "L0",
+      "bootstrap_vs_control": {
+        "lower": -0.006048832377028912,
+        "point": -0.0019392275535033976,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 0.0013261752043663977
+      },
+      "criteria": {
+        "every_batch_completed": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true
+      },
+      "effort": "max",
+      "model": "gpt-6-luna",
+      "role": "candidate",
+      "routable": true,
+      "state": "complete",
+      "summary": {
+        "batches": {
+          "completed": 25,
+          "failed": 0,
+          "pending": 0,
+          "total": 25
+        },
+        "calls": {
+          "abandoned": 0,
+          "by_reason": {},
+          "failed": 0,
+          "interrupted": 0,
+          "limit": 0,
+          "ok": 25,
+          "tool_use": 0,
+          "total": 25,
+          "unavailable": 0
+        },
+        "every_batch_completed": true,
+        "exact_match_rate": 0.9722222222222222,
+        "failed_batch_ids": [],
+        "fenced_valid_rate": 0.0,
+        "invalid_filings": 0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.990031767341894,
+        "mean_f1": 0.9906734006734006,
+        "mean_precision": 0.9902777777777778,
+        "mean_recall": 0.9939814814814815,
+        "micro_f1": 0.9922580645161291,
+        "n": 360,
+        "pending_batch_ids": [],
+        "per_code_f1": {
+          "1.01": 0.98989898989899,
+          "2.01": 0.9166666666666666,
+          "2.02": 1.0,
+          "2.03": 1.0,
+          "3.02": 1.0,
+          "3.03": 1.0,
+          "5.02": 1.0,
+          "5.03": 1.0,
+          "5.07": 1.0,
+          "7.01": 1.0,
+          "8.01": 0.9828571428571429,
+          "9.01": 0.9909584086799277
+        },
+        "problems": [],
+        "retried_batches": 0,
+        "state": "complete",
+        "tokens": {
+          "calls_without_usage": 0,
+          "calls_without_usage_by_outcome": {},
+          "per_filing": {
+            "billed": 1791.3694444444445,
+            "cache_write_input": 0.0,
+            "cached_input": 147.2,
+            "input": 1812.6972222222223,
+            "output_including_reasoning": 125.87222222222222,
+            "reasoning": 100.0,
+            "uncached_input": 1665.4972222222223,
+            "visible_output": 25.872222222222224
+          },
+          "subset_violations": 0,
+          "totals": {
+            "billed": 644893,
+            "cache_write_input": 0,
+            "cached_input": 52992,
+            "input": 652571,
+            "output_including_reasoning": 45314,
+            "reasoning": 36000,
+            "uncached_input": 599579,
+            "visible_output": 9314
+          },
+          "usage_complete": true
+        },
+        "unexpected_entries": 0,
+        "wall": {
+          "call_wall_seconds_per_filing": 2.521822222222222,
+          "median_ok_call_wall_seconds": 28.668,
+          "run_elapsed_seconds": 318.257,
+          "slot_wait_seconds": 0.001,
+          "total_call_wall_seconds": 907.856
+        }
+      }
+    },
+    {
+      "arm": "L1",
+      "bootstrap_vs_control": {
+        "lower": -0.01473247369201125,
+        "point": -0.006431677130804392,
+        "resamples": 10000,
+        "seed": 20260926,
+        "upper": 9.699603286228431e-06
+      },
+      "criteria": {
+        "every_batch_completed": true,
+        "json_valid_rate": true,
+        "noninferior_micro_f1": true
+      },
+      "effort": "medium",
+      "model": "gpt-6-luna",
+      "role": "candidate",
+      "routable": true,
+      "state": "complete",
+      "summary": {
+        "batches": {
+          "completed": 25,
+          "failed": 0,
+          "pending": 0,
+          "total": 25
+        },
+        "calls": {
+          "abandoned": 0,
+          "by_reason": {
+            "tool_use": 1
+          },
+          "failed": 1,
+          "interrupted": 0,
+          "limit": 0,
+          "ok": 25,
+          "tool_use": 1,
+          "total": 26,
+          "unavailable": 0
+        },
+        "every_batch_completed": true,
+        "exact_match_rate": 0.9666666666666667,
+        "failed_batch_ids": [],
+        "fenced_valid_rate": 0.0,
+        "invalid_filings": 0,
+        "json_valid_rate": 1.0,
+        "macro_codes": [
+          "1.01",
+          "2.01",
+          "2.02",
+          "2.03",
+          "3.02",
+          "3.03",
+          "5.02",
+          "5.03",
+          "5.07",
+          "7.01",
+          "8.01",
+          "9.01"
+        ],
+        "macro_f1": 0.9718402315296227,
+        "mean_f1": 0.9903703703703705,
+        "mean_precision": 0.9889351851851852,
+        "mean_recall": 0.9951851851851852,
+        "micro_f1": 0.9877656149388281,
+        "n": 360,
+        "pending_batch_ids": [],
+        "per_code_f1": {
+          "1.01": 0.98,
+          "2.01": 0.88,
+          "2.02": 1.0,
+          "2.03": 0.9473684210526315,
+          "3.02": 0.9411764705882353,
+          "3.03": 1.0,
+          "5.02": 1.0,
+          "5.03": 0.9696969696969697,
+          "5.07": 0.967741935483871,
+          "7.01": 0.9947089947089947,
+          "8.01": 0.9886363636363636,
+          "9.01": 0.9927536231884058
+        },
+        "problems": [],
+        "retried_batches": 1,
+        "state": "complete",
+        "tokens": {
+          "calls_without_usage": 0,
+          "calls_without_usage_by_outcome": {},
+          "per_filing": {
+            "billed": 1732.6722222222222,
+            "cache_write_input": 0.0,
+            "cached_input": 244.62222222222223,
+            "input": 1947.75,
+            "output_including_reasoning": 29.544444444444444,
+            "reasoning": 2.6694444444444443,
+            "uncached_input": 1703.1277777777777,
+            "visible_output": 26.875
+          },
+          "subset_violations": 0,
+          "totals": {
+            "billed": 623762,
+            "cache_write_input": 0,
+            "cached_input": 88064,
+            "input": 701190,
+            "output_including_reasoning": 10636,
+            "reasoning": 961,
+            "uncached_input": 613126,
+            "visible_output": 9675
+          },
+          "usage_complete": true
+        },
+        "unexpected_entries": 0,
+        "wall": {
+          "call_wall_seconds_per_filing": 0.7610833333333333,
+          "median_ok_call_wall_seconds": 10.076,
+          "run_elapsed_seconds": 95.81,
+          "slot_wait_seconds": 0.001,
+          "total_call_wall_seconds": 273.99
+        }
+      }
+    }
+  ],
+  "arms_incomplete": [],
+  "arms_not_run": [],
+  "codex_version": "codex-cli 0.157.1",
+  "final": true,
+  "frozen_inputs": {
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py": "a563b2e53b6891efa92c7eb8d81a722d58ea434581c7c9e3091a4ef6ec3d866e",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/prompt.txt": "1861b55a72932fc9a94eee727f9bba20b84f4f543d2b04125c4778b5ad785ce7",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json": "e8aaebf24a89d487e146bce23a66ceb528cc7dd47d77bfaa0330ac372094d301",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py": "af411b98af0869a37a5d6225a00d12ea0773ac2d4f6c4a59f8120712dfd372ad",
+    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be",
+    "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc",
+    "scripts/path_safety.py": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+  },
+  "frozen_inputs_verified": true,
+  "inputs_sha256": "2a5c8c9bd1650bc20a3e7364defef2d725904f6eb1ef509a511a49526a32bfe0",
+  "kind": "gpt6_family_tiering_decision",
+  "layout_sha256": "1db33e0f5f9c6328eab7c691e69c175b6084bedfe16a96e81fecacf33cf10d15",
+  "n_batches": 25,
+  "n_filings": 360,
+  "no_document_text": true,
+  "plan_sha256": "455e38df43e6bcc9e6e89c5e9399657f93a0a8cebcbf779c1d22c28afe370532",
+  "quota_context": null,
+  "rule": "An arm is routable for mechanical 8-K item extraction when (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(A0) is at least -0.02, (2) its JSON-valid rate is at least 0.98, and (3) every one of its batches completed. Cost is the mean billed tokens per filing: uncached input plus output, where Codex's output already includes reasoning. A candidate is recommended only when it is routable, its usage is complete, and its cost is strictly below A0's; among such candidates the cheapest wins, ties going to the lower median wall time of its ok calls, then to plan order. Otherwise the default (A0) stays. If A0's usage is incomplete, its reported cost is a lower bound: a candidate below it is still recommended, and if a ranked candidate exists but none is below it, the result is inconclusive. Cached input, reasoning and quota percentages are reported separately, and quota percentages never enter the rule.",
+  "schema_version": 2,
+  "selected": {
+    "arm": "S1",
+    "control_billed_per_filing": 1852.2666666666667,
+    "control_usage_complete": true,
+    "effort": "medium",
+    "model": "gpt-6-sol",
+    "outcome": "route_mechanical_extraction",
+    "ranked": [
+      "S1",
+      "S0",
+      "L1",
+      "L0",
+      "A1"
+    ],
+    "routable": [
+      "A0",
+      "A1",
+      "S0",
+      "S1",
+      "L0",
+      "L1"
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+# The gateway's listening sockets and its search call-log rows: read-only observation by the record's author
+# Script: scripts/observe_gateway.py.txt, run as: observe_gateway.py 2026-09-27T07:19:46Z 2026-09-27T07:30:00Z
+# It postdates every probe. The unit's start time and restart count show the same process that served the search probes.
+# observed 2026-09-27T10:40:04Z, read-only
+ActiveState=active
+SubState=running
+NRestarts=0
+ExecMainStartTimestamp=Sun 2026-09-27 07:19:46 UTC
+processes in the unit's cgroup: 3
+listening sockets of the unit's processes (netid address:port):
+  tcp 127.0.0.1:20128
+  tcp 127.0.0.1:20131
+  tcp 127.0.0.1:20132
+all of them on loopback: True
+gateway ports among them: ['20128', '20131', '20132']
+sockets of other processes on ['20128', '20131', '20132']: 0
+call_logs rows of provider duckduckgo-free with 2026-09-27T07:19:46Z <= timestamp < 2026-09-27T07:30:00Z: 8
+  {"timestamp": "2026-09-27T07:20:21.631Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 473}
+  {"timestamp": "2026-09-27T07:20:32.736Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 584}
+  {"timestamp": "2026-09-27T07:20:39.857Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 435}
+  {"timestamp": "2026-09-27T07:20:40.311Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 454}
+  {"timestamp": "2026-09-27T07:22:06.221Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 90}
+  {"timestamp": "2026-09-27T07:22:31.475Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 90}
+  {"timestamp": "2026-09-27T07:28:18.203Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 89}
+  {"timestamp": "2026-09-27T07:28:32.025Z", "path": "/v1/search", "status": 200, "model": "duckduckgo-free", "requestType": "search", "duration": 89}
