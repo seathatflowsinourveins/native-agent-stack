@@ -1,0 +1,5 @@
+INFO events files scanned: 4; tagged lines found: 29; forbidden strings: 26 (added 'pwd': True)
+PASS every tagged events-file line parsed as JSON :: lines=29 parsed=29
+PASS every tagged events-file record's body is exactly '[content omitted]' :: records=29 not_fixed=0
+PASS the events file holds this run's tagged records without command/prompt text (any length) or content/identity keys :: lines=29 value hits=0 banned keys=[]
+SUMMARY offline_recheck (events-file sink only; Loki sink not re-queried): 3 passed, 0 failed

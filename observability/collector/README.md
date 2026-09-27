@@ -245,11 +245,12 @@ metric allowlist, so the writer identity above is untouched.
   `codex.agent_communication`. The server name is copied and the communication fields are kept.
   `agent_name` only decides `actor`: the task name in the path is chosen by the model, so the path is
   not exported. `shell_rtk` comes from `exec_command`'s `cmd`.
-- **`client` tells front-ends apart.** Every Codex app-server front-end exports `service.name`
-  `codex-app-server`, so for that service `client` is the thread's `originator`; otherwise it is
-  `service.name`. First-party `Codex <App>` originators become `codex_<app>`. One app-server process
-  gives new threads the originator of the first client that initialized it, so two front-ends on
-  one process still share a `client`.
+- **`client` groups by normalized originator name, not by process.** Every Codex app-server front-end
+  exports `service.name` `codex-app-server`, so for that service `client` is the thread's `originator`;
+  otherwise it is `service.name`. First-party `Codex <App>` originators become `codex_<app>`. Two separate
+  app-server processes whose originator normalizes to the same name share one `client` label, and one
+  app-server process also gives new threads the originator of the first client that initialized it, so two
+  front-ends on one process share a `client` too.
 - **Content is deleted twice.** This processor deletes `tool_parameters`, `tool_input`, `arguments`,
   `output`, `content` and `error`, and none of them is on the allowlist. `error_mode: silent` keeps a
   failed parse from writing its input to the Collector log; such a record carries

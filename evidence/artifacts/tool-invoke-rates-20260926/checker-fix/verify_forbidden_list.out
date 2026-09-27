@@ -1,0 +1,6 @@
+OLD (pre-fix, 12-char floor): 25 lines, sha256 1b59bd7391cb0fb7e9780d0088660ad06e9438a5780e750836dfae864a94806d
+NEW (fixed, no floor + pwd):  27 lines, sha256 7c28caabffec77c05f17a8941f1e6d67d703da633cfd7a931b0bdce833ec7f19
+NEW adds exactly: 2 line(s) relative to OLD
+RETAINED file (forbidden.txt): 25 lines, sha256 1b59bd7391cb0fb7e9780d0088660ad06e9438a5780e750836dfae864a94806d
+RESULT: RETAINED == recomputed OLD (byte-identical) -- the 23:47Z run's forbidden.txt is exactly
+        reproduced from probe-prompt.txt + prove.sh's own CODEX_TASK text under the pre-fix pipeline.

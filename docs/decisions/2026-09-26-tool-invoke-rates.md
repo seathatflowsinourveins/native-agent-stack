@@ -1,12 +1,13 @@
 # Decision: tool, MCP server, skill and subagent invoke rates from Collector-extracted names in Loki (2026-09-26)
 
-**Status: proposed; the user decided on 2026-09-26 to turn `OTEL_LOG_TOOL_DETAILS` on with this
-filtering ("1 and full sota convergence practice we proceed").**
+**Status: decided; the user decided on 2026-09-26 to turn `OTEL_LOG_TOOL_DETAILS` on with this
+filtering ("1 and full sota convergence practice we proceed"). Applied on the host and passed host
+acceptance** (`prove.sh`, 2026-09-26T23:47:42Z-23:49:21Z, 33 passed, 0 failed; see "Evidence and its class").
 [docs/secret-storage.md](../secret-storage.md#telemetry-and-pasted-values) recommends, as a user
 decision, keeping tool details off while broker keys exist on the host, and records this change as its
 one dated exception. The Collector part works without the flag. This change is stacked
 on [telemetry writer identity](2026-09-26-telemetry-writer-identity.md), which left workflow and agent
-attribution on the Loki allowlist as a separate gap. It has not been applied on the host.
+attribution on the Loki allowlist as a separate gap of its own.
 
 **Scope:** `observability/collector/collector.yaml` (new `transform/tool_names`, log allowlist, logs
 pipeline), `OTEL_LOG_TOOL_DETAILS` in both Claude settings examples, a new row in
@@ -105,28 +106,59 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
 
 ## Evidence and its class
 
-- **Local integration** (scratch replay; the sanitized receipt is to be committed with the host proof):
-  replay of the probe captures (Claude runs A, B and C, and Codex exec) plus synthetic sentinel records,
-  including forged derived keys, addresses, token-shaped names, a forged SDK receipt, model-typed names
-  shaped like file names and hidden paths, and two app-server clients.
+- **Local integration** (scratch replay; sanitized receipt committed at
+  `evidence/artifacts/tool-invoke-rates-20260926/scratch-replay/`): replay of the probe captures (Claude runs
+  A, B and C, and Codex exec) plus synthetic sentinel records, including forged derived keys, addresses,
+  token-shaped names, a forged SDK receipt, model-typed names shaped like file names and hidden paths, and two
+  app-server clients.
   - The staged pipeline ran on the pinned otelcol-contrib 0.161.0, and a scratch Loki 3.7.8 ran from
     the repository's Loki template. Every assertion passed (109 of 109).
   - The derived fields matched a separately written reference implementation on every record.
   - No command, prompt, script, argument, output or sentinel text reached the file exporter or Loki.
   - Each new dashboard target returned the value computed from the exported records.
+  - The receipt carries the harness and reference implementation (paths parameterized, not hard-coded) and
+    the sanitized derived result; it does not carry the 536 real captured records it also covered, only their
+    counts. See that folder's README for exactly what is and is not reproducible without them.
 - **Unit test:** `tests/test_observability_tool_names.py` passes, including the pinned-binary class.
   It fails on the writer-identity profile without this change.
 - **Independent review:** two read-only Codex (gpt-6-astra) review rounds. The first raised nine
   findings; eight were fixed and the ninth, that shape checks cannot bound meaning, was recorded as a
   limit. The second demonstrated that limit and raised six more findings: the names above, the host
   merge helper, client grouping, launch timing, install and rollback drift, and the Claude flag
-  rollback. All were fixed in one repair round; the residuals are recorded below.
+  rollback. All were fixed in one repair round; the residuals are recorded below. A third, separate
+  read-only review (window 2) found that the host proof's own privacy checker (`prove_check.py`) dropped
+  forbidden strings under 8 characters (`prove.sh` generated that list with its own 12-character floor) and
+  never asserted a tagged record's body against the Collector's fixed placeholder; both are fixed below.
 - **Production Loki, read-only, before any apply:** all 19 repaired dashboard targets and the 15 proof
   queries parse and return. The hour before that run had about 83 Claude and 43 Codex tool calls per
   minute.
-- **Host acceptance after application:** not yet run. `prove.sh` must pass: one `claude -p` and one
-  `codex exec` tagged with `ecosystem.task.id`, with the counts per server, skill, subagent and client
-  in Loki within 120 seconds and no command text stored.
+- **Host acceptance:** `prove.sh` ran live against production Loki/Collector, 2026-09-26T23:47:42Z-23:49:21Z:
+  one real `claude -p` and one real `codex exec`, tagged with `ecosystem.task.id`. **33 passed, 0 failed** --
+  every per-server, per-skill, per-subagent and per-client count appeared in Loki within the deadline. Its 7
+  privacy assertions ran under the checker this fix replaces (next item); the 26 count-based checks above are
+  unaffected by that fix. Receipt: `evidence/artifacts/tool-invoke-rates-20260926/live-proof/`.
+- **Checker fix, discriminating control and offline re-check** (window-2 finding 2; review thread
+  `PRRT_kwDOUg_LrM6mT7_M` on this file): the privacy checker's two length floors are removed, and it now
+  asserts every tagged record's body equals the Collector's fixed placeholder (`set(body, "[content
+  omitted]")`) exactly, on both the Loki sink and the Collector's file-exporter sink, matched against parsed
+  body/attribute values rather than a raw serialized blob (so a short literal like `pwd` cannot
+  false-positive on JSON structure either).
+  - A fully synthetic, offline A/B control shows the pre-fix checker passing identically on a clean body and
+    on a leaked `"pwd"` body -- it cannot tell them apart -- and the fixed checker passing the clean body
+    while correctly failing 4 assertions on the leaked one.
+  - The fixed checker was re-run offline against the real, retained events-file export of the 23:47Z proof
+    above (29 tagged lines, still on disk, matching that proof's own `lines=29`): every body is exactly the
+    fixed placeholder, and no forbidden string, including the newly-added `pwd`, was found. This is a genuine
+    re-check of that sink on real data, with no new host run.
+  - The Loki sink of that same proof was **not** re-checked: the live run never persisted raw record bodies
+    to disk, only derived PASS/FAIL text, so nothing is retained to run the new assertion against, and this
+    fix does not requery production Loki to manufacture one. Window-2's separate, independent all-stream scan
+    (22:45:00Z-00:24:44Z, containing this proof's window) found every `claude-code`/`codex_exec` body exactly
+    the fixed placeholder -- a different method and record set, corroborating but not a run of this checker.
+  - Net claim: the events-file sink of the 23:47Z proof is now verified by the fixed checker against real
+    retained data; the Loki sink of that specific proof remains verified only by the pre-fix checker. The
+    next `prove.sh` run exercises the fixed checker on both sinks. Receipt:
+    `evidence/artifacts/tool-invoke-rates-20260926/checker-fix/`.
 
 ## Overturn when
 
@@ -146,8 +178,10 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
   completion and the MCP attribution of `api_request`. The latter counts requests, so several MCP
   results consumed by one request count once.
 - Custom agents count as `custom` until their names join the list.
-- One app-server process gives new threads the originator of the first client that initialized it, so
-  front-ends sharing one process still share a `client`. Codex spawn messages carry no originator.
+- `client` groups by normalized originator name, not by process: two separate app-server processes whose
+  originator normalizes to the same name share one `client` label. One app-server process also gives new
+  threads the originator of the first client that initialized it, so front-ends sharing one process share a
+  `client` too. Codex spawn messages carry no originator.
 - Codex `functions/exec` and `functions/wait` count as `code_mode`. Multi-agent v1 also names a tool
   `wait`.
 - `shell_rtk` looks at the command's first word only.

@@ -1,0 +1,40 @@
+-- OLD checker, clean body --
+  PASS the proof's records were fetched without truncation
+  PASS every stream's labels are exactly {service_name}
+  PASS proof records carry no content or identity key
+  PASS no Bash command or prompt text of the proof is stored in Loki :: kept=['git log --oneline -1']
+  PASS the Collector's events file holds the proof's records without command, prompt or content keys
+-- OLD checker, leaked pwd body --
+  PASS the proof's records were fetched without truncation
+  PASS every stream's labels are exactly {service_name}
+  PASS proof records carry no content or identity key
+  PASS no Bash command or prompt text of the proof is stored in Loki :: kept=['git log --oneline -1']
+  PASS the Collector's events file holds the proof's records without command, prompt or content keys
+INFO structured metadata keys on proof records: ecosystem_task_id, service_name
+-- NEW checker, clean body --
+  PASS the proof's records were fetched without truncation :: records=1
+  PASS every stream's labels are exactly {service_name} :: label sets=[(('service_name', 'codex-app-server'),)]
+  PASS name fields hold only the names this proof uses (bash and prompt text cannot hide in them) :: unexpected value counts={}
+  PASS proof records carry no content or identity key :: records=1 banned=[]
+  PASS every Loki record's body is exactly '[content omitted]' (transform/privacy set(body, ...)) :: records=1 not_fixed=0
+  PASS no executed command or prompt text (any length) is stored in a Loki record's body or metadata value :: strings checked=2 found=0
+  PASS every tagged events-file record's body is exactly '[content omitted]' :: records=1 not_fixed=0
+  PASS the Collector's events file holds the proof's records without command, prompt or content (any length), and without content/identity keys :: lines=1 value hits=0 banned keys=[]
+INFO structured metadata keys on proof records: ecosystem_task_id, service_name
+-- NEW checker, leaked pwd body --
+  PASS the proof's records were fetched without truncation :: records=1
+  PASS every stream's labels are exactly {service_name} :: label sets=[(('service_name', 'codex-app-server'),)]
+  PASS name fields hold only the names this proof uses (bash and prompt text cannot hide in them) :: unexpected value counts={}
+  PASS proof records carry no content or identity key :: records=1 banned=[]
+  FAIL every Loki record's body is exactly '[content omitted]' (transform/privacy set(body, ...)) :: records=1 not_fixed=1
+  FAIL no executed command or prompt text (any length) is stored in a Loki record's body or metadata value :: strings checked=2 found=1
+  FAIL every tagged events-file record's body is exactly '[content omitted]' :: records=1 not_fixed=1
+  FAIL the Collector's events file holds the proof's records without command, prompt or content (any length), and without content/identity keys :: lines=1 value hits=1 banned keys=[]
+
+== verdict ==
+PASS OLD accepts a clean body: expected all_pass=True, got True
+PASS OLD ALSO accepts the leaked 'pwd' body (the defect): expected all_pass=True, got True
+PASS NEW accepts a clean body (the fix is not just always-red): expected all_pass=True, got True
+PASS NEW REJECTS the leaked 'pwd' body: expected all_pass=False, got False
+
+SUMMARY failing_first_ab: every expected outcome occurred
