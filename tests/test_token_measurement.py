@@ -42,6 +42,33 @@ def result(key, content, error=False, timestamp="2026-09-26T01:00:01Z"):
         {"type": "tool_result", "tool_use_id": key, "content": content, "is_error": error}]}}
 
 
+def shell_carriers(command):
+    """The three shell-text carriers, their M4 carrier bucket and their curl/wget key."""
+    return [("Bash", {"command": command}, "bash", "shell_fetch"),
+            ("mcp__ctx__ctx_execute", {"language": "shell", "code": command}, "ctx", "ctx_sandbox_fetch"),
+            ("mcp__ctx__ctx_batch_execute", {"commands": [{"command": command}]}, "ctx", "ctx_sandbox_fetch")]
+
+
+# verify-fixup2 D1: heredoc openers whose stdin runs as a shell script. Sources: bash(1)
+# OPTIONS/ARGUMENTS (GNU bash 5.2.21), POSIX.1-2024 sh OPTIONS/STDIN, OpenSSH ssh(1) 9.6p1.
+EXECUTING_OPENERS = [
+    "bash <<'EOF'", "bash <<'EOF' 2>&1 | tail -n 5", "bash <<'EOF' 2>&1", "bash <<'EOF' > log.txt",
+    "bash <<'EOF' && echo done", "bash <<'EOF'; echo done", "timeout 60 bash <<'EOF' | tee out.log",
+    "bash -euo pipefail <<'EOF'", "bash -o pipefail <<'EOF'", "bash -oe pipefail <<'EOF'",
+    "bash +e <<'EOF'", "bash -O extglob <<'EOF'", "bash --norc <<'EOF'", "bash --login <<'EOF'",
+    "bash --rcfile /dev/null <<'EOF'", "bash - <<'EOF'", "sh -e <<'EOF'", "dash -o nounset <<'EOF'",
+    "ssh host <<'EOF'", "ssh -o StrictHostKeyChecking=no -p 22 user@host <<'EOF'",
+    "ssh host bash -s <<'EOF'", "ssh host 'bash -s' <<'EOF'",
+]
+# Stdin never runs as source: -c or a script operand (a shell's `-` equals `--`), -n reads
+# without executing, ssh -n/-N never read it, and a remote `cat` or a local `cat` keeps data.
+IGNORED_OPENERS = [
+    "bash -s -c 'echo x' <<'EOF'", "bash -n <<'EOF'", "bash -c cat <<'EOF'",
+    "bash - script.sh <<'EOF'", "ssh -n host <<'EOF'", "ssh -N host <<'EOF'",
+    "ssh host cat <<'EOF'", "ssh host 'cat > remote.sh' <<'EOF'", "cat <<'EOF' > run.sh",
+]
+
+
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
 class TokenMeasurement(unittest.TestCase):
     def measure(self, rows, *, env=None, **options):
@@ -53,6 +80,24 @@ class TokenMeasurement(unittest.TestCase):
                            text=True, capture_output=True, check=False, env=env)
         self.assertEqual(p.returncode, 0, p.stderr)
         return json.loads(p.stdout)
+
+    def exports(self, expression, value):
+        """Evaluate `expression` over the module's exports (`cu`) and the JSON input (`x`)."""
+        script = ("import {readFileSync} from 'node:fs'; import * as cu from " + json.dumps(MODULE.as_uri())
+                  + "; const x=JSON.parse(readFileSync(0,'utf8')); process.stdout.write(JSON.stringify("
+                  + expression + "));")
+        p = subprocess.run(["node", "--input-type=module", "-e", script], input=json.dumps(value),
+                           text=True, capture_output=True, check=False)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        return json.loads(p.stdout)
+
+    def carrier_m4(self, commands, routed=False):
+        """M4 for each command on each shell carrier, optionally beside one routed fetch."""
+        runs = [(command, *spec) for command in commands for spec in shell_carriers(command)]
+        prefix = [call("routed", "mcp__ctx__ctx_fetch_and_index", url="https://example.org")] if routed else []
+        got = self.exports("x.map((rows) => cu.measureTranscript(rows).m4)",
+                           [prefix + [call("c", name, **inputs)] for _, name, inputs, _, _ in runs])
+        return [(command, name, carrier, key, m4) for (command, name, _, carrier, key), m4 in zip(runs, got)]
 
     def test_all_carriers_utf8_thresholds_dedup_and_proxy_are_in_m3(self):
         specs = [("Bash", {"command": "ls"}), ("Bash", {"command": "rtk proxy ls"}),
@@ -346,6 +391,84 @@ class TokenMeasurement(unittest.TestCase):
         self.assertIsNone(empty["m4"]["routed_share_lower_bound"])
         self.assertEqual(empty["m4"]["by_carrier"], {})
         self.assertEqual(empty["m4"]["status"], "not_applicable")
+
+    def test_m4_heredoc_resolves_its_whole_simple_command_on_every_carrier(self):
+        # verify-fixup2 D1: pipes, lists and redirections after the heredoc token, shell
+        # options with names or long forms, and ssh do not turn an executed body into data.
+        commands = [opener + "\ncurl -s https://example.org\nEOF" for opener in EXECUTING_OPENERS]
+        for command, name, _, key, m4 in self.carrier_m4(commands):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["unclassifiable"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        # An interpreter heredoc keeps its confirmed HTTP operation behind the same suffixes.
+        commands = [opener + "\nfetch(u)\nEOF" for opener in
+                    ["python3 - <<'EOF' | tail -n 5", "python3 - <<'EOF' 2>&1", "node <<'EOF' > out.txt"]]
+        for command, name, _, _, m4 in self.carrier_m4(commands):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4["unclassifiable"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+
+    def test_m4_unexecuted_heredoc_curl_wget_and_gh_api_stay_possible_fetches(self):
+        # Recommendation 6 of verify-fixup2: raw curl/wget/gh api matches that executed-text
+        # analysis does not confirm lower the gate's bound, like HTTP_SCRIPT matches.
+        commands = [opener + "\ncurl -s https://example.org\nEOF" for opener in IGNORED_OPENERS]
+        commands += ["cat <<'EOF' > fetch.sh\nwget -q https://example.org\nEOF",
+                     "cat <<'EOF' > api.sh\ngh api repos/example/repo\nEOF",
+                     "cat <<'EOF' > api.sh\nrtk proxy gh api repos/example/repo\nEOF"]
+        for command, name, carrier, _, m4 in self.carrier_m4(commands, routed=True):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["routed_share"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+                self.assertEqual(m4["routed_share_lower_bound"], .5)
+                self.assertEqual(m4["status"], "incomplete")
+                self.assertEqual(m4["by_carrier"][carrier]["fetch_mentions_unconfirmed"], 1)
+
+    def test_m4_heredoc_openers_respect_quotes_comments_and_arithmetic(self):
+        # bash(1) QUOTING, COMMENTS and ARITHMETIC EVALUATION: a << inside quotes, in a comment
+        # or in $(( )) opens no heredoc, so later lines are not swallowed; a heredoc inside a
+        # quoted string that a shell runs is left to the quoted-string recursion.
+        cases = [("bash -c \"python3 - <<'PY'\nrequests.get(u)\nPY\"\ncurl https://example.org", 1),
+                 ('echo "a << b"\ncurl https://example.org', 0),
+                 ("ls # see <<EOF\ncurl https://example.org", 0),
+                 ("echo $(( 1 << bits ))\ncurl https://example.org", 0)]
+        expected = dict(cases)
+        for command, name, _, key, m4 in self.carrier_m4(list(expected)):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["unclassifiable"], expected[command])
+                self.assertEqual(m4["remote_fetches"], 1 + expected[command])
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+
+    def test_m4_confirmations_trace_back_to_raw_offsets(self):
+        # verify-fixup2 D3: an executed-text match confirms only the raw match at its own raw
+        # offset. Matches created by backslash-newline joins or by a quoted string a shell runs
+        # cannot offset a raw miss; a join that creates a command position is counted once.
+        cases = {"python3 - <<'EOF'\nr = requests.get \\\n    (u)\nx = 1 << bits\nrequests.get(v)\nEOF": (1, 0, 1),
+                 "python3 - <<'EOF'\nr = requests.get\\\n(u)\nx = 1 << bits\nrequests.get(v)\nEOF": (1, 0, 1),
+                 "bash -c 'curl https://example.org/a'\ncat <<'EOF' > b.sh\ncurl https://example.org/b\nEOF": (0, 1, 1),
+                 "echo a; \\\ncurl https://example.org": (0, 1, 0)}
+        for command, name, _, key, m4 in self.carrier_m4(list(cases)):
+            http, shell, mentions = cases[command]
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4["unclassifiable"], http)
+                self.assertEqual(m4[key], shell)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], mentions)
+
+    def test_fetch_kind_and_legacy_lane_follow_the_heredoc_resolution(self):
+        # Workflows README "Usage accounting": heredoc bodies count under ssh or a shell
+        # heredoc (the legacy lanes.fetch.bash_curl_wget counter uses fetchKind).
+        executing = [opener + "\ncurl -s https://example.org\nEOF" for opener in EXECUTING_OPENERS]
+        executing.append("bash -c \"python3 - <<'PY'\nrequests.get(u)\nPY\"\ncurl https://example.org")
+        ignored = [opener + "\ncurl -s https://example.org\nEOF" for opener in IGNORED_OPENERS]
+        kinds = self.exports("x.map(cu.fetchKind)", executing + ignored)
+        for command, kind in zip(executing + ignored, kinds):
+            with self.subTest(command=command):
+                self.assertEqual(kind, "fetch" if command in executing else None)
+        rows = [call(str(i), "Bash", command=c) for i, c in enumerate(executing + ignored)]
+        self.assertEqual(self.exports("cu.childLanes(x).fetch.bash_curl_wget", rows), len(executing))
 
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):

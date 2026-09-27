@@ -195,7 +195,8 @@ through Node; lane reports now require Node as well as Python, with no extra
 package install. The legacy fields above remain historical comparison fields.
 `measurement.m4.routed_share` uses confirmed fetches, including nested ctx
 fetches. `fetch_mentions_unconfirmed` counts possible fetches from raw
-`HTTP_SCRIPT` matches that executed-text analysis did not account for.
+`HTTP_SCRIPT`, command-position `curl`/`wget` and `gh api` matches that no
+executed-text match traces back to (the workflows README defines the rule).
 `routed_share_lower_bound` adds those possible fetches to the denominator as
 unrouted. **The #381 M4 >= 0.9 gate must use `routed_share_lower_bound`.**
 Both shares and the separate possible-fetch count also appear under

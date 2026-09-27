@@ -232,13 +232,27 @@ bodies and shell comments are removed and quoted argument syntax is neutralized.
 Quoted Python `-c` (including combined flags ending in `c`), Node
 `-e`/`--eval`/`-p`/`--print`, Deno `eval`, Bun `-e`/`--eval`, and ctx JS/Python
 code remain visible to the script detector, including dynamic URLs (kept
-unclassifiable). Heredocs remain source only for recognized invocations that
-execute stdin: Python or Node with no script operand or with `-`, shells with
-no script operand or `-s`, and the retained explicit stdin forms for other
-interpreters. Python `-c`/`-m`, Node `-e`/`-p`, and script-file invocations leave
-their stdin as data. Each retained body is analyzed separately so its quoting
-or shift syntax cannot consume later shell commands or data heredocs.
-Upstream strips every heredoc. Entrypoint references:
+unclassifiable). A heredoc body is source only when the simple command that
+contains its `<<` operator runs stdin as source. That command is the text
+between the nearest control operators around the operator, with quotes removed
+and redirection words and their targets dropped, so a pipe, list or redirection
+after the heredoc (`bash <<'EOF' 2>&1 | tail -n 5`, `> log.txt`, `&& ...`) does
+not replace it. A `<<` inside quotes, a comment or `$(( ))` opens no heredoc;
+one inside a quoted string that a shell runs is analyzed with that string.
+Python or Node read stdin with no script operand or with `-`; the retained
+explicit stdin forms apply to other interpreters. A shell reads its script from
+stdin unless `-c` supplies a command string or an operand names a script file:
+`-s` keeps stdin, a shell's `-` equals `--`, `-o`/`+o`/`-O`/`+O` take a name,
+`--rcfile`/`--init-file` take a file, and `-n` reads without executing
+(POSIX sh OPTIONS/STDIN, bash(1) 5.2 OPTIONS/ARGUMENTS). `ssh` runs stdin in the
+remote login shell when no remote command follows the destination, or when the
+remote command itself reads stdin as source; `-n`, `-f`, `-N`, `-s`, `-W`, `-O`,
+`-G`, `-V` and `-Q` never do ([OpenSSH ssh(1)](https://man.openbsd.org/ssh)).
+Python `-c`/`-m`, Node `-e`/`-p`, and script-file invocations leave their stdin
+as data. Each retained body is analyzed separately so its quoting or shift
+syntax cannot consume later shell commands or data heredocs. The legacy
+`bash_curl_wget` lane uses the same rule. Upstream strips every heredoc.
+Entrypoint references:
 [Python](https://docs.python.org/3.13/using/cmdline.html#interface-options),
 [Node](https://nodejs.org/docs/v24.21.0/api/cli.html#-),
 [POSIX sh](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/sh.html),
@@ -247,9 +261,16 @@ Upstream strips every heredoc. Entrypoint references:
 Shell-fed source heredocs retain executed commands. A grep pattern containing
 `fetch(`, a comment, or a heredoc writing a script gives zero confirmed fetches.
 
-`fetch_mentions_unconfirmed` separately counts raw `HTTP_SCRIPT` matches that
-the executed-text analysis did not account for, per command/code input. These
-are possible fetches, including data-only mentions, not confirmed operations.
+`fetch_mentions_unconfirmed` separately counts raw detector matches that the
+executed-text analysis did not confirm, per command/code input: `HTTP_SCRIPT`
+matches anywhere in the raw text, `curl`/`wget` in command position of the raw
+text (a line start, or after `;`, `&`, `|`, `(`, a backtick or `$(`, also behind
+a shell keyword or wrapper as in the legacy lane), and `gh api` at a line start
+or after a separator. An executed-text match confirms a raw match only when it
+traces back to that raw offset; matches the analysis creates (backslash-newline
+joins, unescaping, quoted strings a shell runs) confirm nothing. These are
+possible fetches, including data-only mentions such as a heredoc that writes a
+script, not confirmed operations.
 The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`:
 
 - `routed_share = ctx_fetch_and_index / remote_fetches` uses confirmed fetches.
@@ -259,16 +280,23 @@ The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`:
 
 For one routed fetch plus either a Python shift-syntax parser miss or a Node
 comment containing an apostrophe before `fetch`, the confirmed share is 1,
-the unconfirmed count is 1, and the lower bound is 0.5. Dropping a raw HTTP match
-from confirmed analysis therefore cannot inflate the gate's share. Counts are
-summed before shares are recomputed across actors; shares retain the existing
-four-decimal reporting convention. Any unconfirmed mention leaves M4 status
+the unconfirmed count is 1, and the lower bound is 0.5. A `curl` in a heredoc
+whose command does not run stdin (`ssh -n host <<'EOF'`, `cat <<'EOF' > run.sh`)
+gives the same values. Dropping a raw detector match from confirmed analysis, or
+confirming a created match in its place, therefore cannot inflate the gate's
+share. Counts are summed before shares are recomputed across actors; shares
+retain the existing four-decimal reporting convention, so the gate should
+compare the integer counts. Any unconfirmed mention leaves M4 status
 `incomplete`; a zero denominator gives null for its respective share.
 
-This is a lower bound against visible `HTTP_SCRIPT` matches, not against every
-possible runtime request. Loops, dynamic code, external scripts, aliases and
-nonliteral subprocess arguments still require separate observation. The static
-detector cannot prove the absence of fetches in arbitrary code.
+This is a lower bound against these raw detector patterns, not against every
+possible runtime request. A `curl` inside a quoted string the parser does not
+treat as run (`ssh -o Opt=value host 'curl ...'`, `watch 'curl ...'`), behind
+`xargs`, `find -exec` or an unrecognized wrapper, or passed to a subprocess
+inside interpreter code, is in neither count. Loops, dynamic code, external
+scripts, aliases and nonliteral subprocess arguments still require separate
+observation. The static detector cannot prove the absence of fetches in
+arbitrary code.
 
 `--rtk-check` enables M-R1/M6c in `rtk_parts` on Linux, using **a binary on PATH
 self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated
