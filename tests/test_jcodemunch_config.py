@@ -22,7 +22,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / ".jcodemunch.jsonc"
-CONFIG_TYPES = {"max_folder_files": int, "extra_ignore_patterns": list}
+CONFIG_TYPES = {"max_folder_files": int, "context_providers": bool, "extra_ignore_patterns": list}
 
 # Synthetic JSONC inputs; expected values are independent of the stripping
 # helper. Cover the pinned loader's strings, comments, and trailing commas.
@@ -170,6 +170,7 @@ class JCodeMunchConfigTests(unittest.TestCase):
         config = load_config()
         self.assertIsInstance(config, dict)
         self.assertEqual(set(config), set(CONFIG_TYPES))
+        self.assertIs(config["context_providers"], False)
         for key, expected in CONFIG_TYPES.items():
             with self.subTest(key=key):
                 self.assertIs(type(config[key]), expected)
@@ -327,7 +328,6 @@ class JCodeMunchRecipeTests(unittest.TestCase):
                 "path": "/absolute/checkout/root",
                 "incremental": False,
                 "use_ai_summaries": False,
-                "context_providers": False,
             },
             "allow_state_change": True,
         })

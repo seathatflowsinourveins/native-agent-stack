@@ -576,12 +576,14 @@ To apply [`.jcodemunch.jsonc`](../.jcodemunch.jsonc), call `order` with the
 following arguments, replacing `path` with this checkout's absolute root:
 
 ```json
-{"action":"index_folder","args":{"path":"/absolute/checkout/root","incremental":false,"use_ai_summaries":false,"context_providers":false},"allow_state_change":true}
+{"action":"index_folder","args":{"path":"/absolute/checkout/root","incremental":false,"use_ai_summaries":false},"allow_state_change":true}
 ```
 
 At jgravelle/jcodemunch-mcp v1.108.319,
-[`tools/index_folder.py` L1439–1451](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L1439-L1451)
-defines these indexing arguments and
+[`server.py` L1597–1645](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/server.py#L1597-L1645)
+defines the MCP `index_folder` arguments (it has no `context_providers` argument:
+the project file's `context_providers: false` disables providers through
+[`tools/index_folder.py` L796–803](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L796-L803)), and
 [L1528](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L1528)
 loads the project file; `order` requires `allow_state_change: true`
 ([`counter.py` L129–133](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/counter.py#L129-L133)).

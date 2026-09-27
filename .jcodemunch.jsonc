@@ -13,6 +13,13 @@
   // Walked-root repo key: tools/index_folder.py L1234, L1692 (v1.108.319).
   "max_folder_files": 4000,
 
+  // External context providers (for example git_blame, which writes per-file
+  // authors and dates into the index) stay off. The MCP index_folder call has no
+  // context_providers argument (server.py L1597-1645, L5915-5932); providers are
+  // gated by this config key through the project overlay instead:
+  // tools/index_folder.py L796-803; config.py L48, L374, L548, L1084-1091.
+  "context_providers": false,
+
   // Project patterns are merged by security.py L554-577 and compiled using
   // pathspec's gitignore dialect by tools/index_folder.py L1273-1279, at
   // https://github.com/jgravelle/jcodemunch-mcp/tree/v1.108.319/src/jcodemunch_mcp
