@@ -687,6 +687,7 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         for server in TOKEN_MCP_SERVERS:
             self.assertIn(f"[mcp_servers.{server}]", config)
         self.assertNotIn("supports_websockets = true", config)
+        self.assertNotIn("http_headers", config)  # the 20128 default sends no provider headers
         # The key never reaches a shell snapshot file, and GPT-6 Astra's search is Codex's standalone web.run.
         for line in ("[features]", "shell_snapshot = false", "standalone_web_search = true",
                      "supports_standalone_web_search = true"):
@@ -715,10 +716,111 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertNotIn("quota_stop_percent", codex)
         self.assertEqual(codex["api_key_placeholder"], "local-loopback")  # keyless loopback gateway by default
         self.assertNotIn("local-loopback", config)  # the placeholder is runtime-only, never in the lane config
+        self.assertEqual(codex["http_headers"], {})
         # The staged runner reads the same settings back.
         lane = codex_job.settings(work)
-        self.assertEqual((lane["provider"], lane["codex_home"], lane["profile"]),
-                         ("omniroute", work / "codex-home", "stack-worker"))
+        self.assertEqual((lane["provider"], lane["codex_home"], lane["profile"], lane["http_headers"]),
+                         ("omniroute", work / "codex-home", "stack-worker", {}))
+
+    def test_builder_and_runner_keep_the_name_patterns_equal(self):
+        # build_args.py checks what it stages and codex_job.py what it runs; the two copies must never drift.
+        for name in ("MODEL_NAME", "OMNIROUTE_HEADER_NAME", "HEADER_VALUE"):
+            self.assertEqual(getattr(build_args, name).pattern, getattr(codex_job, name).pattern, name)
+        self.assertEqual(build_args.SECRET_HEADER_WORDS, codex_job.SECRET_HEADER_WORDS)
+        # Codex strips only one namespace for metadata lookup (openai/codex rust-v0.157.1,
+        # codex-rs/models-manager/src/manager.rs L763-780); 20129 therefore needs a one-slash route.
+        for model in ("gpt-6-astra", "cx/gpt-6-astra", "sharedgw/gpt-6-astra-max", "gpt-6-astra-max"):
+            self.assertTrue(build_args.MODEL_NAME.fullmatch(model), model)
+        for model in ("sharedgw/cx/gpt-6-astra", "a/sharedgw/cx/gpt-6-astra", "/gpt-6-astra",
+                      "cx//gpt-6-astra", "cx/", "cx/gpt 6", ""):
+            self.assertIsNone(build_args.MODEL_NAME.fullmatch(model), model)
+
+    def test_two_slash_model_is_refused_by_builder_and_runner(self):
+        # Supplied 2026-09-27 gateway finding, pinned to openai/codex rust-v0.157.1 manager.rs L763-780:
+        # a second namespace triggers fallback metadata even if the gateway can route the request.
+        model = "sharedgw/cx/gpt-6-astra"
+        with self.subTest(entrypoint="build_args"):
+            work, _, done = self.stage_lane("--omniroute-base-url", "http://127.0.0.1:20129/v1",
+                                            "--gpt6-model", model)
+            self.assertEqual(done.returncode, 2, done.stderr)
+            self.assertIn("fallback metadata", done.stderr)
+            self.assertIn("manager.rs L763-780", done.stderr)
+            self.assertFalse((work / "codex-home").exists())
+            self.assertFalse((work / "staged.json").exists())
+        with self.subTest(entrypoint="codex_job"):
+            work, _, done = self.stage_lane("--omniroute-base-url", "http://127.0.0.1:20129/v1",
+                                            "--gpt6-model", "sharedgw/gpt-6-astra-max")
+            self.assertEqual(done.returncode, 0, done.stderr)
+            staged = json.loads((work / "staged.json").read_text())
+            staged["codex"]["model"] = model
+            write_json(work / "staged.json", staged)
+            jobs_before = sorted((work / "gpt6").iterdir())  # stage() creates this directory before any job
+            with self.assertRaisesRegex(codex_job.UsageError, "fallback metadata") as caught:
+                codex_job.settings(work)
+            self.assertIn("manager.rs L763-780", str(caught.exception))
+            self.assertEqual(sorted((work / "gpt6").iterdir()), jobs_before)
+
+    def test_framework_instance_lane_stages_static_provider_headers(self):
+        # Codex 0.157.1 adds model_providers.<id>.http_headers to every request to that provider
+        # (codex-rs/model-provider-info/src/lib.rs:166-168 and 385-412 at rust-v0.157.1).
+        work, _, done = self.stage_lane("--omniroute-base-url", "http://127.0.0.1:20129/v1",
+                                        "--gpt6-model", "sharedgw/gpt-6-astra-max",
+                                        "--omniroute-header", "x-omniroute-compression=allow-lossy",
+                                        "--omniroute-header", "X-OmniRoute-No-Memory=1")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        headers = {"x-omniroute-compression": "allow-lossy", "x-omniroute-no-memory": "1"}
+        config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
+        for line in ('model = "sharedgw/gpt-6-astra-max"', 'base_url = "http://127.0.0.1:20129/v1"',
+                     'http_headers = { "x-omniroute-compression" = "allow-lossy", "x-omniroute-no-memory" = "1" }'):
+            self.assertIn(line, config)
+        if sys.version_info >= (3, 11):
+            import tomllib
+            provider = tomllib.loads(config)["model_providers"]["omniroute"]
+            self.assertEqual(provider["http_headers"], headers)
+            self.assertNotIn("env_http_headers", provider)
+        codex = json.loads((work / "staged.json").read_text())["codex"]
+        self.assertEqual((codex["model"], codex["base_url"], codex["http_headers"]),
+                         ("sharedgw/gpt-6-astra-max", "http://127.0.0.1:20129/v1", headers))
+        lane = codex_job.settings(work)
+        self.assertEqual((lane["model"], lane["http_headers"]), ("sharedgw/gpt-6-astra-max", headers))
+
+    def test_omniroute_headers_take_only_non_credential_omniroute_names_and_plain_values(self):
+        self.assertEqual(build_args.omniroute_headers([]), {})
+        self.assertEqual(build_args.omniroute_headers(["X-OmniRoute-Compression=engine:caveman",
+                                                       "x-omniroute-session-id=sweep.job=1 a"]),
+                         {"x-omniroute-compression": "engine:caveman", "x-omniroute-session-id": "sweep.job=1 a"})
+        refused = [(["x-omniroute-compression"], "NAME=VALUE"),
+                   (["authorization=Bearer x"], "x-omniroute-"), (["x-other=1"], "x-omniroute-"),
+                   (["x-omniroute-=1"], "x-omniroute-"), (["x-omniroute-a b=1"], "x-omniroute-"),
+                   (["x-omniroute-" + "a" * 53 + "=1"], "x-omniroute-"),
+                   (["x-omniroute-compression=off", "X-OmniRoute-Compression=default"], "more than once")]
+        refused += [([f"x-omniroute-compression={value}"], "printable ASCII")
+                    for value in ("", 'a"b', "a\\b", "é", " off", "off ", "a\tb", "a" * 129)]
+        # Credential-carrying names of OmniRoute 3.8.51 itself, and the Codex default-exclude words.
+        refused += [([f"{name}=1"], "credential") for name in (
+            "x-omniroute-cli-token", "x-omniroute-bootstrap-token", "x-omniroute-internal-service-token",
+            "x-omniroute-ws-bridge-secret", "x-omniroute-playground-key-id", "x-omniroute-cache-key",
+            "x-omniroute-auth-id", "x-omniroute-auth-scopes", "x-omniroute-csrf", "x-omniroute-feed-signature",
+            "x-omniroute-password", "x-omniroute-credential")]
+        for specs, needle in refused:
+            with self.assertRaisesRegex(ValueError, re.escape(needle), msg=specs):
+                build_args.omniroute_headers(specs)
+        self.assertEqual(len(build_args.omniroute_headers(["x-omniroute-" + "a" * 52 + "=1"])), 1)  # 64 characters
+        self.assertEqual(build_args.omniroute_headers(["x-omniroute-compression=" + "a" * 128]),
+                         {"x-omniroute-compression": "a" * 128})
+
+    def test_omniroute_header_refusals_stage_nothing(self):
+        work, _, done = self.stage_lane("--omniroute-header", "x-omniroute-cli-token=abc")
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("credential", done.stderr)
+        self.assertNotIn("abc", done.stderr)  # a refused value is never echoed
+        self.assertFalse((work / "codex-home").exists())
+        self.assertFalse((work / "staged.json").exists())
+        work = stage_work(self)
+        done = build(work, "--omniroute-header", "x-omniroute-compression=allow-lossy")
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("--gpt6-provider omniroute", done.stderr)
+        self.assertFalse((work / "staged.json").exists())
 
     def stage_lane_with_skills(self):
         """Stage the lane with HOME at a fake home: a skill with a reference file and a symlink cycle, a symlinked skill
@@ -1045,6 +1147,42 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         self.settings({"provider": "omniroute", "codex_home": "../outside", "api_key_env": "OMNIROUTE_API_KEY"})
         with self.assertRaises(codex_job.UsageError):
             codex_job.settings(self.work)
+
+    def test_lane_headers_must_match_the_lane_home_and_are_recorded_per_job(self):
+        self.lane()
+        headers = {"x-omniroute-compression": "allow-lossy"}
+        (self.work / "codex-home" / "config.toml").write_text(
+            'model = "sharedgw/gpt-6-astra-max"\nmodel_provider = "omniroute"\n\n[model_providers.omniroute]\n'
+            'name = "OmniRoute"\nhttp_headers = { "x-omniroute-compression" = "allow-lossy" }\n', encoding="utf-8")
+        base = {"provider": "omniroute", "codex_home": "codex-home", "profile": "stack-worker",
+                "api_key_env": "OMNIROUTE_API_KEY", "api_key_placeholder": "local-loopback",
+                "model": "sharedgw/gpt-6-astra-max"}
+        self.settings({**base, "http_headers": headers})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["model"]), (0, "sharedgw/gpt-6-astra-max"))
+        argv = self.record()["argv"]
+        self.assertEqual(argv[argv.index("-m") + 1], "sharedgw/gpt-6-astra-max")
+        # The job's inputs carry the headers, so a job finished under other headers is rerun, never reused.
+        self.assertEqual(result["inputs"]["http_headers"], headers)
+        self.assertEqual(codex_job.job_inputs(b"p", b"s", "m", "omniroute", {}),
+                         codex_job.job_inputs(b"p", b"s", "m", "omniroute"))
+        # The lane home must carry exactly the staged headers: other values, or headers the record lacks.
+        if sys.version_info >= (3, 11):
+            for staged in ({**base, "http_headers": {"x-omniroute-compression": "off"}}, base):
+                self.settings(staged)
+                with self.assertRaisesRegex(codex_job.UsageError, "does not carry the staged provider headers"):
+                    codex_job.settings(self.work)
+        # Malformed or credential-named headers, and any header on the native lane, are refused.
+        for staged in ({**base, "http_headers": {"authorization": "Bearer x"}},
+                       {**base, "http_headers": {"x-omniroute-cli-token": "x"}},
+                       {**base, "http_headers": {"x-omniroute-compression": 'a"b'}},
+                       {**base, "http_headers": {"x-omniroute-compression": 1}},
+                       {**base, "http_headers": ["x-omniroute-compression"]},
+                       {"model": "gpt-6-astra", "http_headers": headers}):
+            self.settings(staged)
+            with self.assertRaisesRegex(codex_job.UsageError, "codex.http_headers"):
+                codex_job.settings(self.work)
 
 
 class RunnerTests(RunnerCase):

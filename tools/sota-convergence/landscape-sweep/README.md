@@ -103,7 +103,7 @@ With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 la
 
 `build_args.py` writes `<work-dir>/codex-home/` with three files:
 - `config.toml`:
-  - the provider block: `model = "cx/gpt-6-astra"`, `model_provider = "omniroute"`, `model_reasoning_effort = "max"`, and `[model_providers.omniroute]` with a loopback `base_url` ending in `/v1`, `env_key = "OMNIROUTE_API_KEY"`, `requires_openai_auth = false` and `wire_api = "responses"`. The fields follow the [Codex config reference](https://developers.openai.com/codex/config-reference).
+  - the provider block: `model = "cx/gpt-6-astra"`, `model_provider = "omniroute"`, `model_reasoning_effort = "max"`, and `[model_providers.omniroute]` with a loopback `base_url` ending in `/v1`, `env_key = "OMNIROUTE_API_KEY"`, `requires_openai_auth = false` and `wire_api = "responses"`, plus a static `http_headers` table only when `--omniroute-header` is given (see [the framework instance](#staging-on-the-framework-instance-20129)). The fields follow the [Codex config reference](https://developers.openai.com/codex/config-reference).
   - the `[mcp_servers.*]` tables of `adoption/templates/codex.config.template.toml`. The checkout's own `tools/adoption/render_config.py` renders them for `adoption/hosts/<HOST>.json`: serena, ai-memory, socraticode, headroom, codebase-memory, qmd and context-mode.
 - `stack-worker.config.toml`: the Codex worker profile (`--stack-worker-profile`, default `adoption/templates/codex.stack-worker.config.toml`), copied verbatim.
 - `AGENTS.md`: the host's Codex user instructions, the managed block of `adoption/templates/codex.AGENTS.template.md` read through `tools/adoption/apply_codex_lane.py`'s `agents_block()`: the top rule, rtk-ai/rtk v0.50.0's `hooks/rtk-awareness-full.md` verbatim, and the RTK exactness exceptions. Codex reads `$CODEX_HOME/AGENTS.md` as global instructions, so without it the lane's model got neither the top rule nor RTK's instructions, which the native lane's workers get from `~/.codex/AGENTS.md`. `staged.json` records its `agents_sha256`.
@@ -141,7 +141,7 @@ How the runner uses it:
 - `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`.
 - The key comes from `$OMNIROUTE_API_KEY` in the harness's environment. For a keyless loopback gateway, upstream's non-interactive setup with no login or API key, the staged placeholder `local-loopback` fills an unset variable; Codex's `env_key` only needs the variable to exist. `--omniroute-require-key` stages no placeholder, so a job without the variable ends with exit 6 before codex starts.
 - `--quota-stop-percent` is refused with this provider: the quota probe reads the native login, not the gateway's pool.
-- A job's `inputs.json` records the provider, so a gateway run never reuses a native job's result.
+- A job's `inputs.json` records the provider, so a gateway run never reuses a native job's result. It also records any provider headers, so a job finished under other headers is rerun, not reused.
 
 Before a full run through the gateway, run the lane's parity check on the staged home, and do not claim a gateway result as max quality until it passes. The check covers:
 - max effort reaching the upstream model, shown in the gateway's request log and the rollout's `turn_context`;
@@ -150,6 +150,62 @@ Before a full run through the gateway, run the lane's parity check on the staged
 - `--output-schema` output;
 - reported usage;
 - whether hosted web search passes through for a custom provider.
+
+#### Staging on the framework instance (20129)
+
+The default gateway stays 20128: `--omniroute-base-url` defaults to `http://127.0.0.1:20128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 20128 through its `sharedgw` node:
+
+```sh
+python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces \
+  --gpt6-provider omniroute --codex-host <HOST> \
+  --omniroute-base-url http://127.0.0.1:20129/v1 \
+  --gpt6-model sharedgw/gpt-6-astra-max \
+  --omniroute-header x-omniroute-compression=allow-lossy
+```
+
+Use exactly one slash for this lane: `sharedgw/gpt-6-astra-max`. The established 2026-09-27 route check returned HTTP 200 with reasoning: 20129 forwards the bare `gpt-6-astra-max` through `sharedgw` to 20128, whose built-in Codex provider serves it at max. This route observation does not qualify a landscape sweep.
+
+Every manual framework-lane invocation must pass `-m sharedgw/gpt-6-astra-max`. Under `-p stack-worker`, the profile's `model = "gpt-6-astra"` otherwise overrides the lane home's `model`. The established 2026-09-27 probe omitted `-m`, sent `gpt-6-astra` to 20129 and received six 401 responses. `codex_job.py` already passes `-m` explicitly. Profile precedence follows [openai/codex rust-v0.157.1, config loader L286-334](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L286-L334).
+
+Check prompt parity without a model call using the staged lane home and the same working directory for both commands. The control uses `cx/gpt-6-astra-max`; both commands pin the model with `-m` and with the requested prompt-debug config override:
+
+```sh
+CODEX_HOME="$W/codex-home" codex -p stack-worker -m sharedgw/gpt-6-astra-max \
+  debug prompt-input -c model=sharedgw/gpt-6-astra-max > "$W/prompt-sharedgw.json"
+CODEX_HOME="$W/codex-home" codex -p stack-worker -m cx/gpt-6-astra-max \
+  debug prompt-input -c model=cx/gpt-6-astra-max > "$W/prompt-cx.json"
+```
+
+If no lane home has been staged, use the installed `stack-worker` profile with `-c model_provider=omniroute` for both commands. Compare the rendered item counts for equality. At this pin, `prompt-input` returns only `prompt.input`, so it does not expose `base_instructions` ([Codex rust-v0.157.1, prompt_debug.rs](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/prompt_debug.rs)). Compare the nonempty base instructions separately in `codex debug models --bundled`, applying the pinned namespace/longest-slug-prefix lookup: both names strip to `gpt-6-astra-max` and resolve to the same catalog entry ([manager.rs L745-780](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/manager.rs#L745-L780)). Label that result as a source/catalog comparison, distinct from the rendered item comparison. Both debug commands run without model inference. Report only the two parity results and keep the prompt private.
+
+The header option:
+
+- `--omniroute-header NAME=VALUE` is repeatable and valid only with `--gpt6-provider omniroute`. It renders `http_headers = { "x-omniroute-compression" = "allow-lossy" }` in `[model_providers.omniroute]`. That is Codex's own provider field: Codex 0.157.1 adds these headers to every request to the provider (`codex-rs/model-provider-info/src/lib.rs:166-168`, `build_header_map` at 385-412, rust-v0.157.1; `model_providers.<id>.http_headers` in the config reference).
+- Codex silently drops a header whose name or value is invalid. Its config loader also ignores a misspelled provider key, because `deny_unknown_fields` there (`lib.rs:135`) is a JSON-schema attribute only. `build_args.py` therefore checks every header before staging and reads `config.toml` back to compare the table.
+- Only `x-omniroute-*` names are accepted: lowercased, at most 64 characters, each name once. A name holding a credential word is refused. The words are Codex's default secret excludes (`key`, `secret`, `token`), the credential words in OmniRoute 3.8.51's own header names (`auth`, `csrf`, `signature`), and the generic `password` and `credential`. Values are 1-128 printable ASCII characters without `"` or `\`.
+- The values are recorded in `staged.json` (`codex.http_headers`) and in each job's `inputs.json`, so never pass a secret. The runner refuses to start when the lane home's `http_headers` differs from `codex.http_headers`.
+
+What `allow-lossy` does (read from the installed OmniRoute 3.8.51 source, not measured):
+
+- OmniRoute reads `x-omniroute-compression` from each request, case-insensitively (`open-sse/handlers/chatCore/headers.ts:41-46`).
+- Without an opt-in, OmniRoute replaces lossy steps with the safe pipeline (session-dedup, lite). `allow-lossy` keeps the operator's plan (`open-sse/services/compression/lossyRequestPolicy.ts:29-47`).
+- The other values are `off`, `default`, `engine:<id>` and a named combo (`open-sse/services/compression/planResolution.ts:24-58`). No value turns compression on while the instance's master switch is off (`open-sse/services/compression/strategySelector.ts:126-129`).
+
+Known limits of the chained route:
+
+- **Headers stop at 20129.** It forwards to 20128 only User-Agent, `x-opencode-*`, `x-session-id` and `x-title`, besides its node's own static custom headers (`open-sse/executors/default.ts:678-685`, `open-sse/utils/opencodeHeaders.ts:102-116`). `x-omniroute-compression` goes no further, and neither do Codex's identity headers (`session-id`, `thread-id`, `x-client-request-id`, `x-codex-*`). Codex's `prompt_cache_key` travels in the request body, and 20128's Codex executor keeps a key it receives and lists it among the body fields it sends upstream (`open-sse/executors/codex.ts:1509-1514` and `1550-1562`). The effect of the lost headers on cache hits is not measured.
+- **Model metadata.** Both the builder and runner refuse names with two slashes. Codex strips exactly one namespace segment ([openai/codex rust-v0.157.1, manager.rs L763-780](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/manager.rs#L763-L780)); another slash causes [fallback metadata, model_info.rs L99-150](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/model_info.rs#L99-L150): a different prompt template, no Responses Lite, no multi-agent, a 272,000-token context window and a 10,000-byte tool-output truncation policy. Use `sharedgw/gpt-6-astra-max` and check prompt parity above.
+- **Slashless aliases fail on 20129 at this pin.** The established 2026-09-27 observation returned 401, `No active credentials for provider: codex`: the built-in Codex provider claims `gpt-6-astra*` names before stored aliases. A slashless alias is therefore not a supported alternative for this lane.
+- **Null effort columns prove nothing.** OmniRoute populates `call_logs.reasoning_effort_requested` and `reasoning_effort_upstream` only when the response carries encrypted reasoning (installed OmniRoute 3.8.51, `src/lib/usage/callLogs.ts` L646-653; established 2026-09-27 source finding). For evidence of what was sent, read `requestBody.reasoning` from `GET /api/usage/call-logs/<id>` at the relevant gateway; do not infer absent effort from a null column.
+
+Status: the route check above succeeded, but harness acceptance remains open; the manual verification probe without `-m` failed. Before a sweep counts on this route, run one probe job and one discover job through 20129 and record:
+
+- a valid `last.json`;
+- 20129's compression analytics for the request, showing a stacked plan with lossy engines rather than the safe downgrade;
+- max effort in 20128's outbound request, evidenced by `requestBody.reasoning` in the detailed call log;
+- the cached-input-token ratio against a control job sent straight to 20128.
+
+Keep failed attempts and their usage.
 
 ## Evidence contract
 
