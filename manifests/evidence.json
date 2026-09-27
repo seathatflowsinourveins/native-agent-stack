@@ -3557,13 +3557,13 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "344fbe59c376c7a218298c6b40ea3535fc99da18d3c87911925c017d10217fe7",
+      "sha256": "3ff6e4a8d7e07fe4fb33232c904043cd0cb89b091f4cc919bec81dc5a2288df9",
       "bytes": 383
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "8b9a60fa425900930c610ba7e3e0f8a0fa1457048a39c79e3136fb5073e7269f",
-      "bytes": 3159
+      "sha256": "2a9bab79fea04ec2c626973428e7db73fad6ace1267e34c2a9553f586e1f8b76",
+      "bytes": 4051
     },
     {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
@@ -13863,8 +13863,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "9afeaefcb0915e8de59e6f897702d991da310e82cce233044d20b4d2668493d0",
-      "bytes": 14486
+      "sha256": "fa08c91142827317d47df2482a2ae8d21b0f82e01b596d86566c34f7171c7ad2",
+      "bytes": 26879
     },
     {
       "path": "docs/direct-results.md",
@@ -14238,8 +14238,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "42d9fe273a50bbb10e3864ae1b5592a8b41c09d79d5040177129812889accd23",
-      "bytes": 74201
+      "sha256": "34843379d2aea7ea1626c98b77aea32e601f5042dfbcc91f67cb2345d54b1578",
+      "bytes": 79237
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -36152,6 +36152,21 @@
       "bytes": 6655
     },
     {
+      "path": "evidence/artifacts/token-lanes-subagent-start-20260927/containment_m3.py.txt",
+      "sha256": "e2ddebe66bc75b9ca8f0b9137d2d2867330ae52bfb12c754014e7230f01e748c",
+      "bytes": 2515
+    },
+    {
+      "path": "evidence/artifacts/token-lanes-subagent-start-20260927/measured-gaps.md",
+      "sha256": "e4a3b0a93b18fd52bd7c0097d9a9f28d300c2749b396fa7e1beb5725d930a1e2",
+      "bytes": 10462
+    },
+    {
+      "path": "evidence/artifacts/token-lanes-subagent-start-20260927/profile_workflow_tools.py.txt",
+      "sha256": "273688e95dd3136a28c400e8ce67a0e6cbb2e6bcc4c5dd91f9e40effd10d03e3",
+      "bytes": 2497
+    },
+    {
       "path": "evidence/artifacts/token-lanes-subagent-start-20260927/receipt.json",
       "sha256": "c575243c1efc5886e1f77895606959016bec808493f5dad3b300b506c2d0038a",
       "bytes": 24371
@@ -39733,8 +39748,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "3d16aa8faaba13d38e7d853d1afdb6e4ff6fde8d8dccb6bab85785a2a90f7a78",
-      "bytes": 7147
+      "sha256": "55824596f74d397aa380ddc404fcae0ffd7a94ac0852093b2f92f80785d1f185",
+      "bytes": 12084
     },
     {
       "path": "tests/test_trading_gates.py",
