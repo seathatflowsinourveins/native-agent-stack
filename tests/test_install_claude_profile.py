@@ -98,6 +98,10 @@ class SecretGuardProfileTests(unittest.TestCase):
         deny = template["permissions"]["deny"]
         for rule in project["permissions"]["deny"]:
             self.assertIn(rule, deny)
+        # In the same order: a `!` carve-out reaches only the rules before it, so the `.env` rules and their
+        # Context Mode `**/` twins must precede the carve-outs in the user file too.
+        self.assertEqual([rule for rule in deny if rule in project["permissions"]["deny"]],
+                         project["permissions"]["deny"])
         self.assertIn("Agent(codex:codex-rescue)", deny)
         bash_groups = [g for g in template["hooks"]["PreToolUse"] if g.get("matcher") == "Bash"]
         commands = [h["command"] for g in bash_groups for h in g["hooks"]]

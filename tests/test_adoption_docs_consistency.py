@@ -53,6 +53,7 @@ import ast
 import json
 import re
 import subprocess
+import sys
 import unittest
 from datetime import date
 from pathlib import Path
@@ -619,6 +620,85 @@ class PluginRevisionCheckTests(unittest.TestCase):
             with self.subTest(mutant=name):
                 self.assertNotEqual(bootstrap_text + recipe_text, bootstrap + recipe, "the mutation must apply")
                 self.assertTrue(check(bootstrap_text, recipe_text))
+
+
+class RevisionCheckByContentTests(unittest.TestCase):
+    """`context-mode` installs the default-branch head (a Claude marketplace source takes no commit), so the
+    documented registry checks in bootstrap.md step 4a and the session handbook accept an installed revision
+    other than the reviewed one only when GitHub's compare API reports it `ahead` of the reviewed revision with
+    `stats.json` as the only changed file. The documented Python runs here against a scratch registry and a
+    `gh` stand-in that serves canned compare results; nothing reaches the network or a real registry."""
+
+    DOCS = {"adoption/bootstrap.md": "claude plugin install codex@openai-codex --scope user --json",
+            "docs/token-session-handbook.md": "claude plugin install context-mode@context-mode --scope user --json"}
+    JQ = "{status, files: [.files[].filename]}"
+    GH = """import json, os, sys
+args = sys.argv[1:]
+if args[:1] != ["api"] or "--jq" not in args or args[args.index("--jq") + 1] != {jq!r}:
+    sys.exit(2)
+canned = json.loads(os.environ["FAKE_GH_COMPARE"]).get(args[1])
+if canned is None:
+    sys.exit(1)
+print(json.dumps(canned))
+"""
+
+    @classmethod
+    def snippet(cls, path: str) -> str:
+        text = (ROOT / path).read_text(encoding="utf-8")
+        tail = text.split(cls.DOCS[path], 1)[1]
+        lines = tail.split("python3 - <<'EOF'\n", 1)[1].splitlines()
+        body = lines[:next(n for n, line in enumerate(lines) if line.strip() == "EOF")]
+        indent = min(len(line) - len(line.lstrip()) for line in body if line.strip())
+        return "\n".join(line[indent:] for line in body) + "\n"
+
+    def run_snippet(self, path: str, installed: dict, compare: dict) -> dict:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "bin").mkdir()
+            gh = tmp / "bin" / "gh"
+            gh.write_text(f"#!{sys.executable}\n" + self.GH.format(jq=self.JQ), encoding="utf-8")
+            gh.chmod(0o755)
+            config = tmp / "claude"
+            (config / "plugins").mkdir(parents=True)
+            registry = {"plugins": {key: [{"gitCommitSha": sha}] for key, sha in installed.items()}}
+            (config / "plugins" / "installed_plugins.json").write_text(json.dumps(registry), encoding="utf-8")
+            env = {"PATH": f"{tmp / 'bin'}:/usr/bin:/bin", "CLAUDE_CONFIG_DIR": str(config), "HOME": str(tmp),
+                   "FAKE_GH_COMPARE": json.dumps(compare)}
+            result = subprocess.run([sys.executable, "-"], input=self.snippet(path), capture_output=True,
+                                    text=True, env=env, timeout=60, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        verdicts = {}
+        for line in result.stdout.splitlines():
+            verdict, _, rest = line.partition(" ")
+            key = next((name for name in PluginRevisionCheckTests.RECIPE_ROWS if name in rest), "context-mode@context-mode")
+            verdicts[key] = verdict
+        return verdicts
+
+    def test_a_stats_only_head_is_accepted_and_anything_else_is_a_mismatch(self):
+        quoted = dict(PluginRevisionCheckTests.QUOTED_RE.findall((ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")))
+        reviewed = quoted["context-mode@context-mode"]
+        head, other, behind = "a" * 40, "b" * 40, "c" * 40
+        base = "repos/mksglu/context-mode/compare/" + reviewed + "..."
+        compare = {base + head: {"status": "ahead", "files": ["stats.json"]},
+                   base + other: {"status": "ahead", "files": ["stats.json", "hooks/hooks.json"]},
+                   base + behind: {"status": "diverged", "files": ["stats.json"]}}
+        cases = {reviewed: "ok", head: "ok", other: "MISMATCH", behind: "MISMATCH", "d" * 40: "MISMATCH"}
+        for path in self.DOCS:
+            for installed, expected in cases.items():
+                with self.subTest(doc=path, installed=installed[:8]):
+                    others = {key: quoted[key] for key in quoted if key != "context-mode@context-mode"}
+                    verdicts = self.run_snippet(path, {"context-mode@context-mode": installed, **others}, compare)
+                    self.assertEqual(verdicts["context-mode@context-mode"], expected)
+                    if path == "adoption/bootstrap.md":
+                        self.assertEqual({key: verdicts[key] for key in others}, dict.fromkeys(others, "ok"))
+        # Content acceptance is for the default-branch install only: claude-hud and codex install a tag.
+        hud = "claude-hud@claude-hud"
+        compare_hud = {f"repos/jarrodwatts/claude-hud/compare/{quoted[hud]}...{head}": {"status": "ahead", "files": ["stats.json"]}}
+        verdicts = self.run_snippet("adoption/bootstrap.md", {**quoted, hud: head}, compare_hud)
+        self.assertEqual(verdicts[hud], "MISMATCH")
+        self.assertEqual(self.run_snippet("docs/token-session-handbook.md", {}, compare)["context-mode@context-mode"],
+                         "MISMATCH")
 
 
 class MarketplaceCommitRefTests(unittest.TestCase):

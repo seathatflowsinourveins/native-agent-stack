@@ -3337,8 +3337,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "42a632653140e9aa9b19bccfca0597688748684d8453836f01ff0d5aadab5c48",
-      "bytes": 1552
+      "sha256": "ebf51a178479d719fd015c5c7828d447e400425700cbac5d30978f115ef53dba",
+      "bytes": 1993
     },
     {
       "path": ".gitattributes",
@@ -3492,8 +3492,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "0454bf2f7446bd878be521dd54cdc50f7447246e4277269a8661002d4604ee99",
-      "bytes": 17628
+      "sha256": "41a8c93655c16b7a0301f3e82223f3652cb7858453ca1cdd4cdeeae4916b14b2",
+      "bytes": 17989
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -3537,8 +3537,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "975ad3e93a4b872c9409abd125bf7cba11ac41da6862fe61759e3df3f96c09f2",
-      "bytes": 38741
+      "sha256": "3a070ebc5d95dd6363454c74ba71990bf4377a6f58c74775f08fe9b5da44f0b2",
+      "bytes": 41327
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3652,8 +3652,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "1e0a17091bd62543b95dda9afab62ae79866658bb9fa25b77b1315eaafb29a5d",
-      "bytes": 53178
+      "sha256": "1e7ed12cc53bc68088cc9a7e963d39ba0a96689210703c391e7171c497e5c8fe",
+      "bytes": 53565
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3697,8 +3697,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "b8fdee5bdadb17c5f01f1b2df1c5c754f85c57f12b6deb5491ecb0592c1508d1",
-      "bytes": 8695
+      "sha256": "b68b1860fb60a24f76457f98feedb3d6539e81d3da0655ab4ce151f073356bbf",
+      "bytes": 9136
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -13858,8 +13858,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "11dfaa16f96f2cda2d82ce647b6da762270267781a3416a985b523bb18eab8f6",
-      "bytes": 59042
+      "sha256": "fd6ec97e68a804f7cd2b871ec50ccdf5d46946da6ab9eb5da2435265078de044",
+      "bytes": 61928
     },
     {
       "path": "docs/stack.md",
@@ -13918,13 +13918,13 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "6c07ab13cbdcfe8969e8daca32069ec0dd68e16d7adbfe46af0466412c66b375",
-      "bytes": 157734
+      "sha256": "9de4a4b5f23658a49a32dd8d95ffe51eb0011691665a713d58273b904e76c020",
+      "bytes": 158486
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "3fb8c9e63236429f82446a83d3904645f45b9b8d04a8f23d543f1954e23d9ca9",
-      "bytes": 32107
+      "sha256": "6e7a489dce50495e2d5ab5e4641bb70d641b6d4dfd9761ddaef995679e8d9de7",
+      "bytes": 32498
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -13933,13 +13933,13 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "a53e98e55f48857bd2ddceef429ad64de2d77443c1e68dbcf72899171befd506",
-      "bytes": 25061
+      "sha256": "08f45fa190a1f8003f19d94bc83a7214536854d281cc962841b6f326f729c40b",
+      "bytes": 26465
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "380e7a3fe32da05fe06c75eeab7d91fb19ac6f6a76ad9cfcf6b96377a05ec035",
-      "bytes": 42359
+      "sha256": "8381c6ab31be7a2b27f5b3f65ac6c48cbe54f207f431c8701712fec54b2739f1",
+      "bytes": 55264
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -37268,8 +37268,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "c050bd5df2a27786b3d37eb58839a2303c398bff90e65e6fd592eaed0afefa4b",
-      "bytes": 30100
+      "sha256": "142d88da268e059d5644a046b961d7c9494f7f308ade5834c25f9233494fd9ad",
+      "bytes": 31214
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -37758,8 +37758,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "53124dad97bbb185660406e2ee57d695a0bb995a124f74dfb44f61219d0d6acd",
-      "bytes": 83404
+      "sha256": "b9011ea3d599f9c179dd8222ac4042acebdaddeae3abf18cb8a09b4e5742117d",
+      "bytes": 84826
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -38168,8 +38168,8 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "4631cf79e30db12ac359c09316f8f4ff4b43f684d5853b2415aa780a40c11e70",
-      "bytes": 44824
+      "sha256": "68ca569407332079e1c8dfc1e9c10acfa3a92ea0c5fd9cc5ba3bfa2b84cc14d6",
+      "bytes": 49830
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -38210,6 +38210,11 @@
       "path": "tests/test_alpaca_paper.py",
       "sha256": "7ba298cb285f812d65a35f6c9269b47def5fc6cebfc0265235936b6b22fdcd73",
       "bytes": 20931
+    },
+    {
+      "path": "tests/test_apply_claude_settings.py",
+      "sha256": "5b966275a2628534a2f30d7d68781f17e6eef1607ab20b54a65c324683061f08",
+      "bytes": 15554
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -38290,6 +38295,11 @@
       "path": "tests/test_component_matrix.py",
       "sha256": "7a183c1082a91adec1a7f1a3b6189e6ed0993413b71c7a221a3dae640ad6117c",
       "bytes": 40285
+    },
+    {
+      "path": "tests/test_context_mode_practice_docs.py",
+      "sha256": "21d6ef6dc6c9e94db339c6b637f5533688992dae514d2c29bd66a32f588508ac",
+      "bytes": 5020
     },
     {
       "path": "tests/test_convergence_contract.py",
@@ -38433,8 +38443,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "09931a4c55ce350bce6728b73f368373536594b4cad0902cf4c1b43a72ab0007",
-      "bytes": 44243
+      "sha256": "9a712defd2f8bd10ef68753cfa39e654b9e5fcbdcc3e3ea1c1d2fa3363329d9f",
+      "bytes": 44586
     },
     {
       "path": "tests/test_install_skills.py",
@@ -38663,8 +38673,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "fab9cf2a69b0d8805ed1f50f584f18267551aad4ce35c37d94a2262d9d09d81f",
-      "bytes": 19592
+      "sha256": "d06fb1a6e27dec429f43d8b1d5255eba6373d5ae62ffa5fe6aa7c544a846f61b",
+      "bytes": 21222
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -38693,8 +38703,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "55a15476f91cc017352c3a036aca457364d4f44046df894c572ee613c5d35490",
-      "bytes": 43364
+      "sha256": "ab46675985f7f0c9c3af48e3849594a378767a740179fd0515c9b6d45188ac10",
+      "bytes": 45737
     },
     {
       "path": "tests/test_security_identity.py",
@@ -38830,6 +38840,11 @@
       "path": "tests/test_zizmor_negative_control.py",
       "sha256": "fa0bcd820eb59cfb7b806d440fa5c1abaa4b576062fdcc9190f4ed3f427ee4a3",
       "bytes": 7469
+    },
+    {
+      "path": "tools/adoption/apply_claude_settings.py",
+      "sha256": "aa69bcb6adaa1cea6b6961ff3bc3366621f36ef9443047ac64fe2d232640a07a",
+      "bytes": 11810
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -39038,8 +39053,8 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "1e81e6498ae91fe812b5f394b602dc24a42816ea16d3d42e2179c92f5acec03b",
-      "bytes": 50696
+      "sha256": "cded5ff99724a76c1776aa380b88a2efc4c5ae9284007975718f9557d101e714",
+      "bytes": 51678
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
@@ -39053,8 +39068,8 @@
     },
     {
       "path": "tools/token-report/token_manifest.py",
-      "sha256": "561975460e3305b5a8b4de14360575a1eb8b5efc7f7fc9f4f5cf91579e53be01",
-      "bytes": 56779
+      "sha256": "1363de9d62fe7286154a3705d1f9fb09232656223e3a6fb074c4589a48f1efb8",
+      "bytes": 56978
     }
   ],
   "convergence_records": [

@@ -252,7 +252,7 @@ def capture_context(entry,ledger,run,issues):
                       source_updated_at=d.get("updated_at"),schema=d["schemaVersion"],version=d.get("version"),
                       access="Read upstream-generated stats JSON; no fresh MCP invocation implied.")
         metrics=dict(saved=d["tokens_saved_lifetime"],session_estimated_saved=d.get("tokens_saved"),kind="upstream event/byte estimate",
-                     boundary="Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage.",
+                     boundary="Latest persisted upstream file in this runtime root, not a sum of sessions. Session = persisted tokens_saved = (bytes_indexed + bytes_sandboxed + cache_bytes_saved) ÷ 4 from this server's counters (server.ts:1032-1041); excludes hook redirect rows and is not the rendered kept-out figure. Lifetime = retained events × 256 (server.ts:1047-1052). Neither is provider usage.",
                      raw=d)
         ledger.snapshot("context-mode",entry["name"],metrics,True,now(),evidence)
     except (OSError,ValueError,TypeError) as exc:
