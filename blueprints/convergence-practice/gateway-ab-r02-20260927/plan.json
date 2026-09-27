@@ -1,0 +1,319 @@
+{
+  "id": "gateway-ab-r02-20260927",
+  "status": "draft-not-frozen-not-run",
+  "date": "2026-09-27",
+  "question": "Does GPT-6 at max effort beat the gateway's default medium effort for framework (FW) chat/completions roles by enough to pay for its reasoning tokens? On li26's frozen 8-K item task this is a cost and wire test with a non-inferiority bound, not a quality ranking.",
+  "freeze": "Before the first scored call: set status to frozen, rerun `build_r02.py frozen --update-plan` and `build_r02.py subset ... --check`, and obtain the GPT-6 review the design requires. The wire check does not freeze the design.",
+  "arms": {
+    "A": {
+      "model": "cx/gpt-6-astra",
+      "key_prefix": "r02-a-",
+      "effort": "no reasoning_effort sent; the gateway default, medium per the gateway owner's measurement (PR #423)"
+    },
+    "B": {
+      "model": "cx/gpt-6-astra-max",
+      "key_prefix": "r02-b-",
+      "effort": "max, selected by the model alias"
+    }
+  },
+  "harness": {
+    "runner": "promptfoo 0.123.1 HTTP provider (id: http), one provider per arm",
+    "configs": {
+      "ab": "promptfooconfig.ab.json",
+      "ba": "promptfooconfig.ba.json"
+    },
+    "prompt": "prompt_r02.py:build_prompt, li26 eval_arm.prompt_template(eval_arm.load_plan()) with MARKER replaced once by the filing",
+    "assertion": "assert_r02.py:get_assert, li26 eval_arm.parse_items and analyze.filing_scores",
+    "transform": "transform_r02.js, the gateway's OpenAI chat SSE stream",
+    "inputs": "build_r02.py",
+    "call_logs": "call_logs_by_correlation.py, read-only, six allowlisted columns",
+    "statistics": "analyze_r02.py under `uv run --with scipy==1.18.1 --with statsmodels==0.15.0 --with numpy`"
+  },
+  "request": {
+    "url": "http://127.0.0.1:20128/v1/chat/completions",
+    "endpoint_reason": "20128 is the plain gateway; 20129 runs the compression engines and would confound the arms (gateway owner, 2026-09-27)",
+    "maxRetries": 0,
+    "body_fields": [
+      "messages",
+      "model",
+      "response_format",
+      "stream",
+      "stream_options"
+    ],
+    "messages": "one user message holding li26's prompt with the filing; no system message and no tools, so the gateway's default Codex tool instructions are not added (OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1370-1378)",
+    "stream": true,
+    "stream_options": "include_usage true is sent, but the gateway deletes stream_options before the Responses upstream (OmniRoute@dd6e9607e:open-sse/handlers/chatCore.ts:2912-2916) and attaches usage to the final chunk itself; the transform does not depend on it",
+    "response_format": {
+      "type": "json_schema",
+      "strict": true,
+      "name": "li26_filing_items",
+      "derived_from": "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json#/properties/filings/items, with accession removed from properties and required (build_r02.py derive_schema)",
+      "gateway_path": "mapped to the Responses text.format with strict kept (OmniRoute@dd6e9607e:open-sse/translator/request/openai-responses/toResponses.ts:35-56), and text passes the codex executor's allowlist (open-sse/executors/codex.ts:1550-1573)",
+      "never": "json_object"
+    },
+    "schema_sha256": "dfa3c32cedad35c225047391d38d53b22d24b66568ddf5446b0b3efcd4e2e7d8",
+    "schema_sha256_note": "sha256 of the derived schema as canonical JSON (sorted keys, no spaces)",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-omniroute-session": "r02-<arm key>-{{accession}}-r{{__repeatIndex}}-{{__evalId}}",
+      "Idempotency-Key": "r02-<arm key>-{{__evalId}}-{{__evalStepId}}",
+      "X-OmniRoute-No-Cache": "true",
+      "Authorization": "not sent: the loopback gateway is keyless by the user's decision"
+    },
+    "header_rendering": "Nunjucks over the step vars in getHeaders (promptfoo@0.123.1:src/providers/http.ts:2394, 2409); the evaluator adds __evalId, __evalStepId (test-<testIdx>-prompt-<promptIdx>-repeat-<repeatIndex>) and __repeatIndex to them (src/evaluator.ts:744-763, 1646-1653)",
+    "not_sent": {
+      "temperature": "none sent; the gateway strips it for codex (OmniRoute@dd6e9607e:open-sse/translator/paramSupport.ts:48 via open-sse/executors/codex/stripPassthroughRejectedParams.ts:13-15, 26; and the codex allowlist, open-sse/executors/codex.ts:1550-1573)",
+      "top_p": "none sent; the gateway strips it for codex (same cites as temperature)",
+      "seed": "none sent; the chat-to-Responses translation builds a new request from named fields and carries no seed (OmniRoute@dd6e9607e:open-sse/translator/request/openai-responses/toResponses.ts:109-113, 432-453), and the codex allowlist has none",
+      "max_tokens": "none sent; for a reasoning model it caps reasoning plus output, so li26's 256 would truncate the max arm, and the gateway deletes it for codex (OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1490-1494)",
+      "reasoning_effort": "not sent in either arm; arm B's effort comes from the -max alias, and the codex executor deletes a body reasoning_effort after mapping (OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1488)",
+      "top_k": "llama.cpp-only field in li26",
+      "cache_prompt": "llama.cpp-only field in li26",
+      "chat_template_kwargs": "llama.cpp-only field in li26 ({enable_thinking: false})"
+    },
+    "li26_sampling_for_reference": {
+      "seed": 0,
+      "temperature": 0.0,
+      "top_k": 1,
+      "top_p": 1.0,
+      "max_tokens": 256,
+      "cache_prompt": false,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  },
+  "subset": {
+    "size": 60,
+    "seed": 20260927,
+    "source": {
+      "acquisition": "~/.local/state/native-agent-stack/local-inference-latest-20260926/sec/acq-20260926",
+      "inputs_sha256": "2a5c8c9bd1650bc20a3e7364defef2d725904f6eb1ef509a511a49526a32bfe0",
+      "rows": 360,
+      "loader": "li26 eval_arm.load_inputs(acquisition, inputs_sha256)"
+    },
+    "algorithm": "Stratum = min(number of labelled items, 4). Allocation: largest-remainder proportional allocation of the 60 filings in exact fractions, ties to the lower stratum. Within a stratum, the filings with the smallest sha256('<seed>:<accession>') hex digest. The selection, ordered by (stratum, digest), alternates between the AB run and the BA run, starting with AB. Code: build_r02.py select().",
+    "strata": {
+      "1": {
+        "population": 81,
+        "selected": 14
+      },
+      "2": {
+        "population": 198,
+        "selected": 33
+      },
+      "3": {
+        "population": 49,
+        "selected": 8
+      },
+      "4": {
+        "population": 32,
+        "selected": 5
+      }
+    },
+    "runs": {
+      "ab": [
+        "0000073756-20-000025",
+        "0001193125-20-057792",
+        "0000013239-20-000002",
+        "0001033905-20-000018",
+        "0001193125-20-059071",
+        "0001564590-20-008140",
+        "0001314727-20-000019",
+        "0001558370-20-001901",
+        "0001493152-20-003199",
+        "0001493152-20-003235",
+        "0001193125-20-059123",
+        "0000874238-20-000027",
+        "0001554795-20-000059",
+        "0000866829-20-000009",
+        "0001193125-20-058917",
+        "0001413447-20-000011",
+        "0001104659-20-027448",
+        "0000846913-20-000009",
+        "0001193125-20-058865",
+        "0001640334-20-000431",
+        "0001493152-20-003231",
+        "0001437749-20-004134",
+        "0001692427-20-000007",
+        "0001193125-20-059222",
+        "0001437749-20-003979",
+        "0000768835-20-000006",
+        "0001564590-20-008169",
+        "0001193125-20-057799",
+        "0001575051-20-000016",
+        "0001213900-20-005149"
+      ],
+      "ba": [
+        "0001580695-20-000093",
+        "0001403161-20-000014",
+        "0001564590-20-008142",
+        "0001104659-20-027880",
+        "0000314808-20-000025",
+        "0001681903-20-000004",
+        "0001506307-20-000032",
+        "0001104659-20-027502",
+        "0001193125-20-058930",
+        "0001157523-20-000289",
+        "0000874501-20-000033",
+        "0001193125-20-059187",
+        "0001564590-20-007971",
+        "0001193125-20-058970",
+        "0000354950-20-000012",
+        "0001493152-20-003233",
+        "0000784011-20-000029",
+        "0001213900-20-005100",
+        "0001193125-20-058942",
+        "0001564590-20-008128",
+        "0001104659-20-027908",
+        "0001104659-20-027475",
+        "0001213900-20-005109",
+        "0001709682-20-000004",
+        "0001104659-20-027864",
+        "0001413329-20-000016",
+        "0001193125-20-057870",
+        "0001038773-20-000043",
+        "0001193125-20-059183",
+        "0001161697-20-000102"
+      ]
+    },
+    "tests_files": {
+      "ab": {
+        "name": "tests-ab.jsonl",
+        "sha256": "54aaaa88d6dc227ec76e96a5139baba8e49300a06328712c0b8128f822d9b0a4",
+        "tests": 30
+      },
+      "ba": {
+        "name": "tests-ba.jsonl",
+        "sha256": "de3e46ddd7bc5c5a140f51897b884419fb2755bce2b3a40132befe172e2de4e1",
+        "tests": 30
+      }
+    }
+  },
+  "repeats": 3,
+  "run": {
+    "order": "Two runs with reversed provider lists: promptfooconfig.ab.json on subset.runs.ab and promptfooconfig.ba.json on subset.runs.ba, each with its own __evalId. promptfoo runs each test's repeats in turn and, within one repeat, the providers in config order.",
+    "options": "--repeat 3 --max-concurrency 1 --no-cache --no-share -o <results.json>",
+    "promptfoo_cache": "--no-cache disables promptfoo's own response cache; X-OmniRoute-No-Cache: true is the gateway's, so both are set",
+    "calls": 360
+  },
+  "metrics": {
+    "quality": "micro-F1 from TP/FP/FN summed per filing over repeats and then over filings (li26 analyze.micro_f1), never an average of filing F1",
+    "strict_schema_validity": "share of calls whose output li26's parse_items marks valid (fenced_valid is scored but is not strict-schema valid)",
+    "cost_per_filing": "per arm, mean per call (one call processes one filing once) of reasoning tokens, visible output tokens (completion minus reasoning), completion tokens (reasoning plus output), prompt tokens, uncached input and the cached-input share, from the provider's own usage fields",
+    "absent_usage_details": "the gateway writes completion_tokens_details and prompt_tokens_details only when their counts are above 0 (OmniRoute@dd6e9607e:open-sse/translator/response/openai-responses.ts:1403-1419), so on a call that returned usage an absent detail counts as 0; the analysis also reports how many calls carried each detail",
+    "latency": "promptfoo latencyMs per call, p50 and p95 (numpy percentile, linear)",
+    "timeouts": "calls that failed with promptfoo's 'Request timed out after <ms> ms' (REQUEST_TIMEOUT_MS, default 300000)",
+    "http_429": "two partial counts, reported side by side: client-side HTTP 429 errors (promptfoo throws before the transform, so these carry no correlation id: promptfoo@0.123.1:src/util/fetch/index.ts:681-714, 768-770) and call_logs rows with status 429 under the arm's correlation ids (a slow-path failure arrives as an in-band error chunk on HTTP 200, OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685). Neither alone is complete; see open question 1",
+    "other_errors": "transform errors (sse_error_event, malformed_sse_chunks, missing_terminal_chunk, missing_usage, not_an_sse_stream, http_status_<code>) and other provider errors, by kind"
+  },
+  "effort_measure": {
+    "primary": "client-observed usage.completion_tokens_details.reasoning_tokens per call, attributable by correlation id; per-filing mean over repeats, arm B minus arm A, with the same paired filing bootstrap (one-sided lower bound) and samples permutation test as quality",
+    "second_view": "completion_tokens (reasoning plus output), same tests",
+    "zero_reasoning": "about 14% of max-effort turns return 0 reasoning tokens as model behaviour (token-save-practice-gpt6's measurement, relayed by the coordinator on 2026-09-27, not measured here), so a per-call zero is not a defect; compare the arms' distributions (mean, median, p95, zero share)",
+    "call_logs_columns": "secondary check only where non-NULL: reasoning_effort_requested and reasoning_effort_upstream are filled only when the response carried encrypted reasoning (OmniRoute@dd6e9607e:src/lib/usage/callLogs.ts:646-653); a NULL is no observation, never 'no effort'. The column allowlist stays exactly the six columns in call_logs_by_correlation.py; request bodies stay off-limits"
+  },
+  "decision_rule": {
+    "adopt_max": "the one-sided 95% lower bound of micro-F1(B) - micro-F1(A) is above 0",
+    "keep_medium": "otherwise, when the lower bound of micro-F1(A) - micro-F1(B) is at least -0.02 and A's mean completion (reasoning plus output) tokens per filing are below B's",
+    "inconclusive": "otherwise; B is not adopted, and neither A's non-inferiority nor its cost advantage is shown",
+    "margin": 0.02,
+    "scope": "li26 part of R02 only. Memory-role effort is decided on the S3 r6 development runs, and moving a role to cx/gpt-6-sol is outside these two arms"
+  },
+  "statistics": {
+    "pairing": "by (accession, repeat) across arms; promptfoo gives both arms of one filing and repeat the same testIdx",
+    "unit": "filing; per-filing TP/FP/FN summed over repeats",
+    "difference": "micro-F1(B) - micro-F1(A)",
+    "bootstrap": {
+      "api": "scipy.stats.bootstrap (scipy 1.18.1, scipy/stats/_resampling.py:300)",
+      "paired": true,
+      "vectorized": true,
+      "method": "percentile",
+      "n_resamples": 10000,
+      "confidence_level": 0.95,
+      "alternative": "greater",
+      "rng": "numpy.random.default_rng(20260927)",
+      "statistic": "each filing's two arms are rows of one count table; the samples carry row indices, so a resample moves both arms of a filing together"
+    },
+    "permutation_test": {
+      "api": "scipy.stats.permutation_test (scipy/stats/_resampling.py:1679)",
+      "permutation_type": "samples",
+      "n_resamples": 10000,
+      "alternative": "greater",
+      "rng": "numpy.random.default_rng(20260927)",
+      "role": "secondary check"
+    },
+    "multiple_comparisons": "statsmodels 0.15.0 multipletests(method='holm') (statsmodels/stats/multitest.py:99) applies only to a family of roles; R02 compares one role, so Holm is not applied",
+    "li26_paired_bootstrap": "not reused; scipy's bootstrap replaces it"
+  },
+  "wire_check": {
+    "date": "2026-09-27",
+    "window_utc": [
+      "2026-09-27T19:49:16.997Z",
+      "2026-09-27T19:49:35.696Z"
+    ],
+    "gateway_calls": 2,
+    "call_budget": 6,
+    "command": "PROMPTFOO_CONFIG_DIR=~/.local/state/native-agent-stack/gateway-ab-r02-20260927/promptfoo PROMPTFOO_DISABLE_TELEMETRY=1 REQUEST_TIMEOUT_MS=300000 promptfoo eval -c promptfooconfig.ab.json -t ~/.local/state/native-agent-stack/gateway-ab-r02-20260927/tests-ab.jsonl --filter-first-n 1 --repeat 1 --max-concurrency 1 --no-cache --no-share -o <scratch results.json>",
+    "configs_sha256": {
+      "ab": "f8eaf75c07189b8b794001bcb2333d40c9d95f0b64ee8b302552339f97f13e68",
+      "ba": "32ef20c2f69982412c713f4a517fa82c372b0fcb4f8ed44356a349578808c54e"
+    },
+    "configs_note": "identical to the committed configs except the description string, which then ended with '; DRAFT, not frozen'",
+    "filing": "0000073756-20-000025, the first test of tests-ab.jsonl",
+    "outcome": "promptfoo exit 0, 2 passed; 2,986 prompt and 77 completion tokens, 37 of them reasoning",
+    "a_keys": "not observed: requestHeaders is absent from both result rows because promptfoo adds it only when context.debug is set (promptfoo@0.123.1:src/providers/http.ts:2734), which eval does not set. This is the brief's stop condition; it was reported, not worked around, and the rendered keys remain unobserved",
+    "b_effort": {
+      "A": "1 call_logs row by correlation id: status 200, model gpt-6-astra, requested NULL, upstream NULL; no observation",
+      "B": "1 call_logs row by correlation id: status 200, model gpt-6-astra-max, requested NULL, upstream max; consistent with max",
+      "unmatched": 0
+    },
+    "c_usage": {
+      "placement": "usage on the final chunk, which also carries finish_reason stop; [DONE] follows; 9 data chunks per stream, no keepalive frames",
+      "A": {
+        "prompt_tokens": 1493,
+        "completion_tokens": 19,
+        "total_tokens": 1512,
+        "tokens_per_second": 39.545
+      },
+      "B": {
+        "prompt_tokens": 1493,
+        "completion_tokens": 58,
+        "total_tokens": 1551,
+        "completion_tokens_details": {
+          "reasoning_tokens": 37
+        },
+        "tokens_per_second": 1077.146
+      },
+      "reading": "no prompt_tokens_details in either arm and no completion_tokens_details in arm A, which by the gateway's translator means 0 cached tokens in both and 0 reasoning tokens in A (openai-responses.ts:1403-1419)"
+    },
+    "d_fields": "strict json_schema response_format and stream_options returned HTTP 200 in both arms with output {\"items\":[\"7.01\"]}, parse valid, TP 1; no sampling field was sent, so there was nothing to fix and no re-run; latency A 1780 ms, B 4080 ms; the stream's model field is gpt-6-astra in both arms, the upstream model name (OmniRoute@dd6e9607e:open-sse/translator/response/openai-responses.ts:1016)",
+    "e_correlation_id": "the transform read a non-empty 36-character X-Correlation-Id from each streamed response, distinct across the arms, and copied it into metadata.http.headers and metadata.r02.correlation_id; the persisted results show metadata.http.headers x-correlation-id as [REDACTED] (promptfoo@0.123.1:src/models/evalResult.ts:199-213), so the analysis reads metadata.r02.correlation_id"
+  },
+  "post_run": {
+    "call_logs": "python3 call_logs_by_correlation.py ~/.local/share/omniroute/storage.sqlite <ids.json> --rows > <private call-logs.json>, with ids.json from `analyze_r02.py ids`",
+    "gateway_owner_handoff": "send each arm's correlation ids with the run window, arm tags (r02-A, r02-B) and key prefixes (r02-a-, r02-b-); the owner returns per arm the call count, distinct accounts and per-account call counts under masked labels shared across arms, call_logs status counts including 429, and any unmatched ids, plus a masked per-arm account-balance read. No connection or account ids are retained"
+  },
+  "limitations": [
+    "The account behind each call is an uncontrolled factor: per-conversation session keys spread calls across the gateway's 4 accounts, and no account column is read here; the gateway owner supplies the masked per-arm distribution after the run.",
+    "li26 is near ceiling for GPT-6 (0.992-0.995 for every tier, #359 and #397), so a quality difference is unlikely to be detectable; this is a cost and wire test with a non-inferiority bound.",
+    "Client-visible 429s carry no correlation id, and in-band slow-path failures show their 429 only in call_logs; see metrics.http_429.",
+    "A 200 response carrying x-ratelimit-remaining-requests, x-ratelimit-remaining-tokens or X-RateLimit-Remaining equal to 0 is treated by promptfoo as rate limited and, with maxRetries 0, fails (promptfoo@0.123.1:src/util/fetch/index.ts:375-388, 712-714); whether the gateway forwards such headers is unknown.",
+    "call_logs effort columns stay NULL without encrypted reasoning, so arm A's medium effort is not directly observable here; the gateway owner's PR #423 is the evidence for it."
+  ],
+  "frozen_inputs": {
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/build_r02.py": "f351518f79fa513c147ac044c8434f6f5eb05f281f25c703af95da6dff9939a4",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/prompt_r02.py": "c4fb538527f0ca010dbc96cb8f1c5710d8c2ee9250c17c7808ca8a7a37f458d2",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/assert_r02.py": "f42225eef40064c0b5e5523e3004f716de90a93bfd58e175aad72039d6fda0b8",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/transform_r02.js": "dc5b3ec15e356fb2058648c4a94311b8df4cb6b609c721dea1aaf090c889f88d",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/call_logs_by_correlation.py": "9c04300b9b66d807a00da46167574229604e7f4cc0b61e036595ef2cb7d0a73d",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/analyze_r02.py": "32a47be6674d47ae4aa628b60216ee1abcbb02451a75201aa8859a234679bb3d",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ab.json": "450b74cdef69a6e2f2a9a234fa7542efeb15e3e8073cc794ed8e7d73eb962640",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ba.json": "f1905fcc072927099db34f70f7759a6be236c973ec98ced9b12f4b4ba7aa5c5e",
+    "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc",
+    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be",
+    "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",
+    "blueprints/convergence-practice/local-inference-latest-20260926/plan.json": "b90db46f20624895089cee5bbce27b0c8df2f3c783b1873cea5920a0f8e18b95",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json": "e8aaebf24a89d487e146bce23a66ceb528cc7dd47d77bfaa0330ac372094d301"
+  }
+}
