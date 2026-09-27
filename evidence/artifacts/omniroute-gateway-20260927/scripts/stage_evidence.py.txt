@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Stage sanitized evidence for the OmniRoute gateway receipt (2026-09-27).
+
+Writes only values that are safe to publish: commit ids, digests, versions, test summaries, effort columns of /v1
+rows, cache-read counts, same/different account relations (never ids or hashes of ids), settings read-back of
+whitelisted keys and the gateway's SEARCH log lines. Never copies emails, connection ids, bearer text, headers,
+request bodies, credential files or personal paths (the home directory is written as ~).
+Usage: stage_evidence.py <scratchpad> <out_dir>
+"""
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import urllib.request
+from pathlib import Path
+
+SP, OUT = Path(sys.argv[1]), Path(sys.argv[2])
+OUT.mkdir(parents=True, exist_ok=True)
+HOME = str(Path.home())
+LANE = SP / "omniroute-lane"
+SRC = Path(HOME) / ".local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904"
+NODE_BIN = Path(HOME) / ".local/share/codex-ecosystem/tools/node-24.21.0/bin"
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
+EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
+
+
+def mask(text):
+    text = text.replace(HOME, "~").replace(str(SP), "$SCRATCH")
+    return EMAIL.sub("<email>", UUID.sub("<uuid>", text))
+
+
+def write(name, content):
+    (OUT / name).write_text(mask(content) if isinstance(content, str) else
+                            mask(json.dumps(content, indent=1, sort_keys=True)) + "\n", encoding="utf-8")
+
+
+def git(*args):
+    return subprocess.check_output(["git", "-C", str(SRC), *args], text=True).strip()
+
+
+def sha256(path):
+    return subprocess.check_output(["sha256sum", str(path)], text=True).split()[0]
+
+
+# 1. Build provenance.
+write("build-provenance.json", {
+    "upstream": "https://github.com/diegosouzapw/OmniRoute",
+    "base": {"branch": "release/v3.8.51", "commit": git("rev-parse", "a58000c7"),
+             "note": "head of the default branch release/v3.8.51 on 2026-09-27; npm latest is 3.8.50"},
+    "cherry_picks": [
+        {"pr": 14904, "pr_head": git("rev-parse", "pr-14904"),
+         "title": "fix(sse): rebuild deadline-wrapped request from public accessors",
+         "upstream_commits": ["07a6317b2", "b94e2dba4"],
+         "applied_as": [git("rev-parse", "22fb9f15f"), git("rev-parse", "bf0255649")],
+         "chosen_over": [14872, 14886], "state_2026_09_27": "open, unreviewed"},
+        {"pr": 13788, "pr_head": git("rev-parse", "pr-13788"),
+         "title": "feat(search): implement /v1/alpha/search endpoint for Codex native web search",
+         "upstream_commits": ["24bbadbad", "6c7990058 (maintainer's commit)"],
+         "applied_as": [git("rev-parse", "b9f0d76eb"), git("rev-parse", "dd6e9607e")],
+         "state_2026_09_27": "open, label deferred-v3.8.52"},
+    ],
+    "builds": [
+        {"head": git("rev-parse", "bf0255649"), "build_sha": "bf0255649",
+         "tarball_sha256": sha256(LANE / "build3/omniroute-3.8.51.tgz"), "status": "superseded 07:19:45Z"},
+        {"head": git("rev-parse", "dd6e9607e"), "build_sha": "dd6e9607e",
+         "tarball_sha256": sha256(LANE / "build4/omniroute-3.8.51.tgz"), "status": "running"},
+    ],
+    "toolchain": {"node": subprocess.check_output([str(NODE_BIN / "node"), "--version"], text=True).strip(),
+                  "npm": subprocess.check_output([str(NODE_BIN / "npm"), "--version"], text=True,
+                                                 env={**os.environ, "PATH": f"{NODE_BIN}:{os.environ['PATH']}"}).strip()},
+    "commands": ["npm ci --no-audit --no-fund", "npm run build:release", "npm run build:cli-api",
+                 "npm pack --pack-destination <dir>",
+                 "OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact",
+                 "npm install --global --prefix <new prefix> <tarball> --include=optional --no-audit --no-fund",
+                 "npm rebuild --global --prefix <new prefix> --allow-scripts=omniroute,keytar,onnxruntime-node,"
+                 "tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts"],
+    "pack_gate": [line for line in (LANE / "build4/check-pack.log").read_text().splitlines()
+                  if "provenance" in line or "policy check" in line],
+})
+
+# 2. Root-cause reproduction across Node runtimes.
+repro = SP / "node-rt/proxy_repro.js"
+lines = [f"$ node {repro.name}   (script below)"]
+for node in [NODE_BIN / "node", SP / "node-rt/node-v22.23.3-linux-x64/bin/node",
+             SP / "node-rt/node-v26.10.0-linux-x64/bin/node"]:
+    lines.append(subprocess.run([str(node), str(repro)], capture_output=True, text=True).stdout.strip())
+write("proxy-repro.txt", "\n".join(lines) + "\n\n--- proxy_repro.js ---\n" + repro.read_text())
+
+# 3. Upstream test summaries (TAP summary lines only).
+def tap_summary(path):
+    keep = [l for l in Path(path).read_text().splitlines() if re.match(r"^# (tests|suites|pass|fail|cancelled|skipped)", l)
+            or l.startswith("not ok")]
+    return "\n".join(keep[-12:])
+write("upstream-tests-route-keepalive.txt",
+      "26 upstream route/keepalive test files on a58000c7+#14904 (TAP summary):\n" + tap_summary(LANE / "build3/route-tests.tap"))
+
+# 4. Gateway-side effort record for the probe's /v1 rows only.
+db = sqlite3.connect(f"file:{HOME}/.local/share/omniroute/storage.sqlite?mode=ro", uri=True)
+rows = db.execute("SELECT timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, "
+                  "tokens_in, tokens_cache_read, tokens_reasoning FROM call_logs WHERE path LIKE '/v1/%' "
+                  "AND timestamp >= '2026-09-27T06:58' AND timestamp < '2026-09-27T07:01' ORDER BY timestamp").fetchall()
+write("gateway-effort-rows.json", [dict(zip(["timestamp", "path", "status", "model", "effort_requested",
+                                               "effort_upstream", "tokens_in", "tokens_cache_read",
+                                               "tokens_reasoning"], r)) for r in rows])
+
+# 5. Settings read-back (whitelisted keys).
+def get(path):
+    with urllib.request.urlopen("http://127.0.0.1:20128" + path, timeout=30) as response:
+        return json.load(response)
+settings, compression, thinking = get("/api/settings"), get("/api/settings/compression"), get("/api/settings/thinking-budget")
+write("gateway-settings-readback.json", {
+    "sessionAffinityTtlMs": settings.get("sessionAffinityTtlMs"),
+    "providerStrategies": settings.get("providerStrategies"),
+    "promptCacheAffinityEnabled": settings.get("promptCacheAffinityEnabled"),
+    "requireLogin": settings.get("requireLogin"), "mcpEnabled": settings.get("mcpEnabled"),
+    "a2aEnabled": settings.get("a2aEnabled"),
+    "compression": {k: compression.get(k) for k in ("enabled", "defaultMode", "exclusions")},
+    "thinkingBudgetMode": thinking.get("mode")})
+
+# 6. SEARCH lines from the gateway log (tag SEARCH only).
+log = Path(HOME) / ".local/share/omniroute/logs/application/app.log"
+search = [l for l in log.read_text(errors="replace").splitlines() if '"tag":"SEARCH"' in l]
+write("gateway-search-log.jsonl", "\n".join(search[-12:]) + "\n")
+
+# 7. The unit file and the Codex provider/profile as installed.
+write("omniroute.service", (Path(HOME) / ".config/systemd/user/omniroute.service").read_text())
+cfg = (Path(HOME) / ".codex/config.toml").read_text()
+block = cfg[cfg.index("[model_providers.omniroute]"):]
+block = block.split("\n[", 1)[0]
+write("codex-provider-block.toml", block + "\n")
+write("codex-omniroute-profile.toml", (Path(HOME) / ".codex/omniroute.config.toml").read_text())
+
+# 8. Scripts as records.
+scripts = OUT / "scripts"
+scripts.mkdir(exist_ok=True)
+for name in ("probe_lane.py", "probe_search.py", "effort_rows.py", "apply_settings.py", "read_settings.py",
+             "route_repro.py", "list_connections.py", "stage_evidence.py"):
+    (scripts / f"{name}.txt").write_text(mask((LANE / name).read_text()), encoding="utf-8")
+print(sorted(p.name for p in OUT.iterdir()))

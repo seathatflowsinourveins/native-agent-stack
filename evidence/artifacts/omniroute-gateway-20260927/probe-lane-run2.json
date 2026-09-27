@@ -1,0 +1,75 @@
+{
+ "probe": "codex-omniroute exec (profile omniroute: cx/gpt-6-astra, effort max), run 2, 07:00Z",
+ "client": {
+  "exec_rc": 0,
+  "elapsed_s": 25.2,
+  "thread_started": true,
+  "final_is_marker": true,
+  "commands": [
+   {
+    "exit_code": 0,
+    "marker_in_output": true
+   }
+  ],
+  "client_usage": {
+   "input_tokens": 28012,
+   "cached_input_tokens": 13568,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 390,
+   "reasoning_output_tokens": 312
+  },
+  "errors": [],
+  "stderr_tail": ""
+ },
+ "gateway_rows": [
+  {
+   "time_utc": "07:00:03",
+   "path": "/v1/responses",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "requested_model": "codex/gpt-6-astra",
+   "tokens": {
+    "in": 13806,
+    "out": 373,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 312,
+    "compressed": null
+   },
+   "same_account_as_previous_row": null
+  },
+  {
+   "time_utc": "07:00:03",
+   "path": "/v1/responses",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "requested_model": null,
+   "tokens": {
+    "in": 14206,
+    "out": 17,
+    "cacheRead": 13568,
+    "cacheCreation": 0,
+    "reasoning": 0,
+    "compressed": null
+   },
+   "same_account_as_previous_row": true
+  },
+  {
+   "time_utc": "07:00:11",
+   "path": "/v1/responses",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "requested_model": "codex/gpt-6-astra",
+   "tokens": {
+    "in": 14206,
+    "out": 17,
+    "cacheRead": 13568,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": null
+   },
+   "same_account_as_previous_row": true
+  }
+ ],
+ "note": "Run 1 (06:59Z) landed on a different account than run 2 (round-robin across sessions); account identities are withheld."
+}

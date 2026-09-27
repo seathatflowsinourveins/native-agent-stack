@@ -1,0 +1,12 @@
+[model_providers.omniroute]
+name = "OmniRoute"
+base_url = "http://127.0.0.1:20128/v1"
+env_key = "OMNIROUTE_API_KEY"
+requires_openai_auth = false
+wire_api = "responses"
+# GPT-6 Astra runs Responses Lite (no hosted tools), so search reaches it only as Codex's standalone web.run, which a
+# custom provider must opt into. OmniRoute answers it at /v1/alpha/search (upstream PR #13788, in the dd6e9607e build).
+supports_standalone_web_search = true
+
+
+

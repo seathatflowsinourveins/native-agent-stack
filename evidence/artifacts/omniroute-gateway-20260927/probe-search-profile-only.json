@@ -1,0 +1,30 @@
+{
+ "probe": "codex-omniroute exec, profile-only web search (no -c overrides), 07:3xZ",
+ "items": {
+  "error": 1,
+  "command_execution": 2,
+  "reasoning": 3,
+  "web_search": 2,
+  "_queries": [
+   {
+    "query": "site:github.com/diegosouzapw/OmniRoute/releases latest release",
+    "results": 0
+   },
+   {
+    "query": "diegosouzapw/OmniRoute releases",
+    "results": 0
+   }
+  ],
+  "mcp_tool_call": 1,
+  "agent_message": 1
+ },
+ "final": "v3.8.50 \u2014 [GitHub release page](https://github.com/diegosouzapw/OmniRoute/releases/latest)",
+ "usage": {
+  "input_tokens": 143526,
+  "cached_input_tokens": 94464,
+  "cache_write_input_tokens": 0,
+  "output_tokens": 1222,
+  "reasoning_output_tokens": 620
+ },
+ "gateway": "2 SEARCH lines (duckduckgo-free); /v1/alpha/search writes no call_logs rows"
+}
