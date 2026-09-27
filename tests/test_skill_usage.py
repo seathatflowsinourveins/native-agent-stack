@@ -14,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "skill-usage"))
@@ -517,7 +518,12 @@ class RenderTextAndCli(unittest.TestCase):
     def test_out_writes_report_outside_the_repository(self):
         with tempfile.TemporaryDirectory() as tmp:
             out_path = Path(tmp) / "nested" / "report.json"
-            code, _ = self.run_main(["--json"], out=out_path)
+            # Keep the checkout and output as siblings even when TMPDIR is inside
+            # the real worktree. Source: docs.python.org/3/library/unittest.mock.html#patch-object.
+            checkout = Path(tmp) / "checkout"
+            checkout.mkdir()
+            with mock.patch.object(S, "ROOT", checkout):
+                code, _ = self.run_main(["--json"], out=out_path)
             self.assertEqual(code, 0)
             written = json.loads(out_path.read_text())
             self.assertEqual(written["kind"], "skill_invoke_rate_report")
@@ -1139,6 +1145,29 @@ class CodexLanes(unittest.TestCase):
                                     "--root", str(self.root), "--exceptions", str(review)],
                                    capture_output=True, text=True)
                 self.assertEqual(p.returncode == 0, expected == 0)
+
+    def test_both_cli_sidecars_reject_malformed_classes_in_mixed_records(self):
+        review = self.root / "mixed-review.json"
+        good = {"transcript_sha256": "0" * 64, "tool_use_id": "c", "witness": "independent check",
+                "exception": "exact_bytes_required_by_frozen_check", "proxy_purpose": "acceptance",
+                "rtk_log_find": [{"part": 1, "disposition": "permitted"}]}
+        variants = [({}, True), ({"exception": "typo"}, False), ({"exception": None}, False),
+                    ({"proxy_purpose": "acceptence"}, False), ({"proxy_purpose": None}, False),
+                    ({"rtk_log_find": None}, False), ({"rtk_log_find": []}, False),
+                    ({"rtk_log_find": [{"part": 0, "disposition": "permitted"}]}, False),
+                    ({"rtk_log_find": [{"part": 1, "disposition": "guess"}]}, False),
+                    ({"rtk_log_find": good["rtk_log_find"] * 2}, False)]
+        for override, valid in variants:
+            review.write_text(json.dumps([{**good, **override}]))
+            with self.subTest(override=override, cli="skill_usage"):
+                code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root),
+                                           "--exceptions", str(review), "--json"])
+                self.assertEqual(code, 0 if valid else 2)
+            with self.subTest(override=override, cli="child_usage"):
+                p = subprocess.run(["node", str(S.MEASUREMENT_MODULE), "--lanes-sweep",
+                                    "--root", str(self.root), "--exceptions", str(review)],
+                                   capture_output=True, text=True)
+                self.assertEqual(p.returncode == 0, valid)
 
     def test_cli_lanes_refusals(self):
         root = ["--codex-root", str(self.root)]

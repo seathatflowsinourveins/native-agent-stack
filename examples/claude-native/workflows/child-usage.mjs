@@ -121,9 +121,13 @@ const LOOPBACK = /^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$/i
 // A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>.
 const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|eval|ssh(?:\s+-\S+)*\s+\S+)\s*$/
 // Inline interpreter code remains executable despite its shell quoting; all other
-// quoted arguments stay data. context-mode v1.0.169 routing.mjs:787-795 (-e/-c).
-const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:(?:python[\d.]*)(?:\s+-[A-Za-z]+)*\s+-c|node(?:js)?(?:\s+--?[\w-]+)*\s+(?:-e|--eval))\s*$/
+// quoted arguments stay data. Extend context-mode v1.0.169 routing.mjs:787-797
+// with documented interpreter entrypoints: docs.python.org/3.14/using/cmdline.html,
+// nodejs.org/docs/latest-v24.x/api/cli.html, docs.deno.com/runtime/reference/cli/eval/,
+// and bun.sh/docs/runtime. HTTP operations remain unclassifiable under #381 M4.
+const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:python[\d.]*(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|node(?:js)?(?:\s+--?[\w-]+)*\s+(?:-e|--eval|-p|--print)|bun(?:\s+--?[\w-]+)*\s+(?:-e|--eval)|deno\s+eval(?:\s+--?[\w-]+)*)\s*$/
 const SHELL_WORD = /^(?:(?:ba|z|da|k)?sh|ssh)$/
+const INTERPRETER_WORD = /^(?:python[\d.]*|node(?:js)?|deno|bun|ruby|perl|php)$/
 const HEREDOC = /(?<!<)<<(?!<)-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/
 const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nice', 'nohup', 'time', 'rtk'])
 // Shell text is read by bash(1) (GNU bash 5.2) QUOTING, COMMENTS and Here Documents: an escaped character is literal and
@@ -143,7 +147,8 @@ const programOf = (prefix) => {
   }
   return ''
 }
-// The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell, though with an
+// The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell (or an
+// interpreter in inlineHttp mode), though with an
 // unquoted delimiter its command substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED),
 // though inside double quotes $(...) and `...` still run; an escaped character and a comment are data, and
 // \<newline> joins lines. Data keeps its words (so URL arguments stay) but loses the separators that would put a
@@ -153,7 +158,9 @@ export function executedText(command, { inlineHttp = false } = {}) {
   for (let i = 0; i < lines.length; i++) {
     kept.push(lines[i])
     const m = HEREDOC.exec(lines[i])
-    if (!m || SHELL_WORD.test(programOf(lines[i].slice(0, m.index)))) continue
+    if (!m) continue
+    const program = programOf(lines[i].slice(0, m.index))
+    if (SHELL_WORD.test(program) || inlineHttp && INTERPRETER_WORD.test(program)) continue
     while (i + 1 < lines.length && lines[i + 1].replace(/^\t+/, '') !== m[2]) {
       i++
       kept.push(m[1] ? '' : (lines[i].match(SUBSTITUTION) || []).filter((s) => s[0] !== '\\').join(' '))
@@ -230,7 +237,13 @@ const EXCEPTIONS = ['read_of_subsequently_edited_file', 'original_source_quoted_
 const validLogFindReview = (r) => Array.isArray(r?.rtk_log_find) && r.rtk_log_find.length > 0
   && r.rtk_log_find.every((p) => Number.isInteger(p?.part) && p.part > 0 && ['permitted', 'requires_raw'].includes(p.disposition))
   && new Set(r.rtk_log_find.map((p) => p.part)).size === r.rtk_log_find.length
-const validReview = (r) => (EXCEPTIONS.includes(r?.exception) || r?.proxy_purpose === 'acceptance' || validLogFindReview(r)) && typeof r.witness === 'string' && !!r.witness.trim()
+// #381 digest-bound review contract: every supplied class must be valid, including
+// null values (Object.hasOwn: developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn).
+const validReview = (r) => typeof r?.witness === 'string' && !!r.witness.trim()
+  && ['exception', 'proxy_purpose', 'rtk_log_find'].some((key) => Object.hasOwn(r, key))
+  && (!Object.hasOwn(r, 'exception') || EXCEPTIONS.includes(r.exception))
+  && (!Object.hasOwn(r, 'proxy_purpose') || r.proxy_purpose === 'acceptance')
+  && (!Object.hasOwn(r, 'rtk_log_find') || validLogFindReview(r))
 // M4 source: context-mode v1.0.169 src/server.ts tool schemas (`commands`, `code`,
 // `requests`); #381 M4 explicitly keeps script HTTP operations unclassifiable.
 // These are statically visible operations, not observed network requests: loops,
@@ -268,7 +281,8 @@ function countFetches(call, counts) {
         : hosts.length ? (name === 'Bash' && !call.sandbox ? 'shell_fetch' : 'ctx_sandbox_fetch') : 'unclassifiable'
       counts[key]++
     }
-    // routing.mjs:787-795 strips data heredocs before inline-HTTP matching.
+    // routing.mjs:228-229,787-797 strips all heredocs before inline-HTTP matching.
+    // Retain interpreter-fed bodies for #381 M4, even though upstream cannot route them.
     // Reuse our bash quoting/comment state as well. Only interpreter code (or
     // ctx JS/Python) gets raw scanning; quoted grep patterns are not operations.
     const httpText = shell ? executedText(code, { inlineHttp: true }) : code
@@ -282,8 +296,10 @@ const finishFetches = (f) => {
   return { ...f, remote_fetches: remote, routed_share: share(f.ctx_fetch_and_index, remote),
     unclassifiable_share: share(f.unclassifiable, remote), status: !remote ? 'not_applicable' : f.unclassifiable / remote > .1 ? 'incomplete' : 'measured' }
 }
-// Native authority: rtk-ai/rtk v0.50.0 (1d87b8e7) src/main.rs:2940-2952,
+// Reference implementation: rtk-ai/rtk v0.50.0 src/main.rs:2940-2952,
 // src/discover/lexer.rs:119-135,488-526; registry.rs:1087-1345,1451-1494.
+// Replay accepts a Linux binary on PATH self-reporting rtk 0.50.0 and passing
+// the five-exclusion probe; this does not identify its build or binary hash.
 // Keep every part (upstream discover stops at its first pipe). Complex shell
 // constructs are unknown, never guessed or executed. This is a local adapter.
 function shellParts(command) {

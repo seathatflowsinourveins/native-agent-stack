@@ -1,0 +1,16 @@
+fix(measure): complete the PR-A measurement fixup
+
+Restore statically visible interpreter HTTP operations to M4, validate all
+present sidecar classes, and document RTK replay and sandbox bucket scope.
+Preserve the previous repair's resolved controls. Covering unittest modules
+pass all 128 tests with TMPDIR and Git ceiling under units/w3/measure.
+
+Sources: mksglu/context-mode v1.0.169 hooks/core/routing.mjs:228-229,727-804;
+rtk-ai/rtk v0.50.0 src/main.rs:2940-2952 and src/discover/{lexer,registry}.rs;
+openai/codex rust-v0.157.1 codex-rs/core/tests/suite/code_mode.rs:721-760;
+https://docs.python.org/3.14/using/cmdline.html#interface-options;
+https://nodejs.org/docs/latest-v24.x/api/cli.html;
+https://docs.deno.com/runtime/reference/cli/eval/;
+https://bun.sh/docs/runtime;
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn;
+https://docs.python.org/3/library/unittest.mock.html#patch-object.

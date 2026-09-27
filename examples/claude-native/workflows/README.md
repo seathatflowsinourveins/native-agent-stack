@@ -199,6 +199,9 @@ The tool validates binding and vocabulary; the reviewer establishes semantic
 truth. Sidecars, identifiers and witness text are never echoed. A mismatched
 digest removes no bytes. An entry may instead carry `proxy_purpose: "acceptance"`
 and a witness; this classifies M6 without granting an M3 exception.
+Every supplied `exception`, `proxy_purpose` and `rtk_log_find` field must be
+valid, and at least one must be present. A valid class does not mask a malformed
+sibling; present null fields are invalid.
 Top-level `sidecar_records.bound` and `.unbound` count records whose digest
 matches at least one measured transcript or none, respectively. Each sidecar
 record counts once across actors. A bound digest does not prove a call exists,
@@ -214,6 +217,10 @@ is their combined discovery count.
 `m4` counts visible remote operations, including individual `requests` in
 `ctx_fetch_and_index`, shell commands in `ctx_batch_execute`, and literal
 subprocess commands in JavaScript/Python ctx code. Loopback fetches are separate.
+The existing `ctx_sandbox_fetch` bucket includes both context-mode sandbox
+curl/wget commands and nested Codex code-mode shell curl/wget commands from the
+[shared adapter](../../../tools/skill-usage/README.md). It measures sandbox
+execution, not exclusive use of context-mode; both stay in the remote denominator.
 Script HTTP calls, dynamic URL fetches and `gh api` are `unclassifiable` and
 stay in the denominator; over 10% makes the metric `incomplete`. The regression
 of one indexed fetch plus nineteen sandbox curls therefore reports 5%.
@@ -221,16 +228,25 @@ Detection extends the maintained
 [context-mode v1.0.169 routing detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804)
 and the existing shell-text parser. Before inline-HTTP matching, data heredoc
 bodies and shell comments are removed and quoted argument syntax is neutralized.
-Quoted `python -c` / `node -e` interpreter code and ctx JS/Python code remain
-visible to the script detector, including dynamic URLs (kept unclassifiable).
+Quoted Python `-c` (including combined flags ending in `c`), Node
+`-e`/`--eval`/`-p`/`--print`, Deno `eval`, Bun `-e`/`--eval`, and ctx JS/Python
+code remain visible to the script detector, including dynamic URLs (kept
+unclassifiable). Heredocs fed to Python, Node, Deno, Bun, Ruby, Perl or PHP also
+remain visible for inline HTTP matching. Upstream strips every heredoc; these
+unrouted operations must still count in M4. Entrypoint references:
+[Python](https://docs.python.org/3.14/using/cmdline.html#interface-options),
+[Node](https://nodejs.org/docs/latest-v24.x/api/cli.html),
+[Deno](https://docs.deno.com/runtime/reference/cli/eval/), and
+[Bun](https://bun.sh/docs/runtime).
 Shell-fed heredocs retain executed commands. A grep pattern containing `fetch(`
 or a heredoc writing a script is data. It counts static call sites/attempts,
 not runtime requests: loops, dynamic code, external scripts, aliases and
 nonliteral subprocess arguments require separate observation. It cannot prove
 the absence of fetches in arbitrary code. A zero denominator is N/A.
 
-`--rtk-check` enables M-R1/M6c in `rtk_parts`, using installed **RTK 0.50.0 on
-Linux**, an isolated temporary five-exclusion configuration from
+`--rtk-check` enables M-R1/M6c in `rtk_parts` on Linux, using **a binary on PATH
+self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated
+temporary five-exclusion configuration from
 [the adopted recipe](../../../recipes/README.md#native-context-mode-and-hooks),
 and native `rtk hook check --agent claude` on every simple part and whole call.
 No transcript command executes. Sources:
@@ -238,6 +254,9 @@ No transcript command executes. Sources:
 [lexer](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/lexer.rs#L488-L526),
 [pipeline rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1087-L1345),
 and [consumer rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1451-L1494).
+These sources identify the reference implementation. The runtime gate does not
+compare the binary hash with the [qualification receipt](../../../evidence/receipts/rtk-050-qualification-20260925.json)
+and therefore does not establish that the binary is the qualified pinned build.
 The adapter retains every part; upstream's analytics splitter stops at the
 first pipe. Native refusals, exclusions and consumers requiring raw input are
 outside eligibility. Redirection is recognized using the splitter's quote state;
@@ -265,7 +284,8 @@ eligible population, including an otherwise eligible `git diff --stat`.
 This follows #381's separate acceptance/raw-proxy population. M6 still requires
 acceptance/exception justification; excluding a proxy from coverage does not
 justify it or remove its output from M3.
-Other versions/platforms report `unavailable`; omitted replay is `not_measured`.
+A different self-reported version, a non-Linux platform or a failed exclusion
+probe reports `unavailable`; omitted replay is `not_measured`.
 `rtk.not_logged_share` needs the read-only DB join. `measurement.proxy` reports
 acceptance/exception adjudications and unclassified calls for M6.
 

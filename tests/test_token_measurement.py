@@ -19,7 +19,10 @@ MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 
 
 def rtk_replay_supported():
-    """Match the kernel's Linux/RTK 0.50.0 native replay contract."""
+    """Check the kernel's platform/self-reported-version prerequisite only.
+
+    The kernel separately probes all five exclusions; neither check pins a build.
+    """
     if sys.platform != "linux" or not shutil.which("rtk"):
         return False
     version = subprocess.run(["rtk", "--version"], text=True, capture_output=True, check=False)
@@ -104,6 +107,29 @@ class TokenMeasurement(unittest.TestCase):
             {"type": "text", "text": "é"}, block])])
         self.assertEqual(mixed["m3"]["bytes"], 2 + len(json.dumps(block, separators=(",", ":")).encode()))
 
+    def test_mixed_sidecar_records_validate_every_present_class(self):
+        # #381 reviewed sidecars: a valid class cannot vouch for a malformed sibling.
+        rows = [call("c", "Bash", command="rtk proxy check"), result("c", "x" * 6000)]
+        good = {"exception": "exact_bytes_required_by_frozen_check", "proxy_purpose": "acceptance",
+                "rtk_log_find": [{"part": 1, "disposition": "permitted"}], "witness": "frozen check"}
+        accepted = self.measure(rows, exceptions={"c": good})
+        self.assertEqual(accepted["invalid_exceptions"], 0)
+        self.assertEqual(accepted["m3"]["bytes"], 0)
+        self.assertEqual(accepted["proxy"]["acceptance"], 1)
+        for field, invalid in [("exception", "typo"), ("exception", None),
+                               ("proxy_purpose", "acceptence"), ("proxy_purpose", None),
+                               ("rtk_log_find", None), ("rtk_log_find", []),
+                               ("rtk_log_find", [{"part": 0, "disposition": "permitted"}]),
+                               ("rtk_log_find", [{"part": 1, "disposition": "guess"}]),
+                               ("rtk_log_find", good["rtk_log_find"] * 2)]:
+            with self.subTest(field=field, invalid=invalid):
+                got = self.measure(rows, exceptions={"c": {**good, field: invalid}})
+                self.assertEqual(got["invalid_exceptions"], 1)
+                self.assertEqual(got["m3"]["bytes"], 6000)
+                self.assertEqual(got["proxy"]["unclassified"], 1)
+        empty = self.measure(rows, exceptions={"c": {"witness": "no class"}})
+        self.assertEqual(empty["invalid_exceptions"], 1)
+
     def test_m5_one_enormous_result_among_small_ones_fails_byte_and_max_guards(self):
         rows = []
         for i in range(20):
@@ -176,6 +202,35 @@ class TokenMeasurement(unittest.TestCase):
                         "bash <<'EOF'\npython3 -c 'requests.get(u)'\nEOF"]:
             with self.subTest(command=command):
                 self.assertEqual(self.measure([call("c", "Bash", command=command)])["m4"]["unclassifiable"], 1)
+
+    def test_m4_interpreter_heredocs_and_quoted_code_stay_in_denominator(self):
+        # context-mode v1.0.169 routing.mjs:228-229,787-797 strips heredocs;
+        # #381 M4 must count the interpreter HTTP operations it cannot route.
+        commands = ["python3 - <<'PY'\nrequests.get(u)\nPY",
+                    'node <<\'EOF\'\nfetch("https://example.org")\nEOF',
+                    "python3 -Bc 'requests.get(u)'",
+                    "python3 -IBc 'requests.get(u)'",
+                    "node -p 'fetch(u)'", "node --print 'fetch(u)'",
+                    "nodejs -p 'fetch(u)'", "deno eval 'fetch(u)'",
+                    "bun -e 'fetch(u)'", "bun --eval 'fetch(u)'"]
+        for interpreter in ("python", "python3.13", "nodejs", "deno run -",
+                            "bun run -", "ruby -", "perl -", "php"):
+            commands.append(f"{interpreter} <<'EOF'\nfetch(u)\nEOF")
+        for command in commands:
+            for name, inputs in [
+                ("Bash", {"command": command}),
+                ("mcp__ctx__ctx_execute", {"language": "shell", "code": command}),
+                ("mcp__ctx__ctx_batch_execute", {"commands": [{"command": command}]}),
+            ]:
+                with self.subTest(command=command, carrier=name):
+                    rows = [call("routed", "mcp__ctx__ctx_fetch_and_index", url="https://example.org"),
+                            call("code", name, **inputs)]
+                    got = self.measure(rows)["m4"]
+                    self.assertEqual(got["unclassifiable"], 1)
+                    self.assertEqual(got["remote_fetches"], 2)
+                    self.assertEqual(got["routed_share"], .5)
+                    self.assertEqual(got["unclassifiable_share"], .5)
+                    self.assertEqual(got["status"], "incomplete")
 
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):

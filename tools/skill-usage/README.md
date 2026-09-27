@@ -207,15 +207,24 @@ Nested operations inside code-mode `exec` are sandbox operations: they supply
 M4 fetches, RTK command parts and MCP state observations, while only the outer
 exec return contributes M3 bytes (`code_mode` carrier). Nested ctx returns do
 not contribute M5 bytes unless represented by a direct model-visible ctx call.
-`sandbox_operations` counts the normalized nested operations. Native MCP
-`status` supplies completion/failure state when result bytes were not persisted.
+`sandbox_operations` counts the normalized nested operations.
+
+Nested Codex code-mode shell curl/wget commands share M4's existing
+`ctx_sandbox_fetch` bucket with context-mode sandbox curl/wget commands. Both
+are remote-denominator operations; this bucket does not identify exclusive
+context-mode use. This mapping follows the adapter's sandbox normalization and
+the [context-mode v1.0.169 subprocess detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804).
+Native MCP `status` supplies completion/failure state when result bytes were not persisted.
 The adapter uses direct response call IDs first; other items in an open exec
 span are sandbox operations until its return, the next direct model call or a
 turn boundary. This local span rule covers the retained fixture. Interleaved or
 resumed cells without a persisted parent association need independent review.
 
-`--rtk-check` and `--exceptions` have the same pin, isolated five-exclusion
-replay and private digest-bound adjudication contract as the Claude tool.
+`--rtk-check` uses the same Linux gate as the Claude tool: a binary on PATH
+self-reporting `rtk 0.50.0` that passes the isolated five-exclusion probe.
+This checks behavior, not build identity or the qualification receipt's hash.
+`--exceptions` shares the private digest-bound adjudication contract, including
+validation of every supplied review class.
 For Codex, observed coverage comes from explicit prefixes; the replay fields
 are hypothetical Claude-hook routing, never evidence a Codex hook ran.
 Add these flags to the existing `--lanes` command when measuring M6c.
