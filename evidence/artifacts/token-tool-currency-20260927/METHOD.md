@@ -34,10 +34,15 @@ The primary release check uses GitHub's
 through the installed `gh api` command. Each `latest_release` retains only
 allowlisted returned values: tag, publication timestamp, release URL, draft and
 prerelease flags. Its `source_url` records the public endpoint queried; each
-record's `retrieved_at` is the batch start time of the latest-release query,
-not a per-request completion timestamp or the release time. Package-channel
-and compare observations carry only a retrieval date, 2026-09-27. Shared
-millisecond stamps do not imply simultaneous requests. GitHub's
+record's `retrieved_at` is a retrieval time, not the release time. It was
+recorded in two batches. In batch a (context-mode, headroom, repomix, rtk, toon,
+ccusage, markitdown, qmd, serena), records share batch stamps (12:40:10.076Z and
+12:40:20.547Z), so their `retrieved_at` is the batch start time of the
+latest-release query, not a per-request completion time. The nine batch b
+records carry distinct per-record stamps (12:40:31.483Z to 12:40:31.842Z); how
+those stamps were produced was not retained. Package-channel and compare
+observations carry only a retrieval date, 2026-09-27. Shared millisecond stamps
+do not imply simultaneous requests. GitHub's
 latest stable release excludes drafts and prereleases; it is not necessarily
 the newest tag or default-branch revision.
 
@@ -88,10 +93,11 @@ published. Commit hashes and release tags are public source identities.
 Some `pin.metadata_sources` line numbers came from the scratch review of
 repository revision `803bc351` without naming that revision. They drifted from
 their component entries. All primary and secondary metadata coordinates were
-recomputed against `1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f`, whose metadata
-files match the committed publication tree, and each record now names it.
-The unittest opens every file:line, checks the version and component, and
-requires a repository revision. No pin version or `scratch_record` was changed.
+recomputed against `1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f`, and each
+record now names that revision as `metadata_revision`. The coordinates are valid
+at that revision; later commits may move the lines. The unittest reads each
+file at the recorded revision (`git show <revision>:<path>`), opens the cited
+line, checks the version and component, and requires a repository revision. No pin version or `scratch_record` was changed.
 
 The earlier claim that `retrieved_at` was each observation's retrieval time
 was too precise. The batch-a research note also records an ENOBUFS failure

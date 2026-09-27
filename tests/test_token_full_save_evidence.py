@@ -10,6 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 import unittest
 from datetime import datetime
 from urllib.parse import urlparse
@@ -91,6 +92,15 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
         self.assertIn("lines=42 bytes=1387", exactness)
 
     def test_pin_metadata_lines_contain_the_component_version(self):
+        # The records cite coordinates at their recorded metadata_revision, so read that revision, not the live tree
+        # (whose lines move as later changes land). CI checks out full history (validate.yml, fetch-depth: 0).
+        def lines_at(revision, filename):
+            shown = subprocess.run(["git", "-C", str(ROOT), "show", f"{revision}:{filename}"],
+                                   capture_output=True, text=True)
+            if shown.returncode != 0:
+                self.skipTest(f"{revision[:8]}:{filename} is not in this clone's history")
+            return shown.stdout.splitlines()
+
         for tool in sorted(TOOLS):
             pin = json.loads((CURRENCY / "records" / f"{tool}.json").read_text())["pin"]
             entries = [(pin["version"], source) for source in pin["metadata_sources"]]
@@ -100,7 +110,7 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
                 with self.subTest(tool=tool, source=source):
                     self.assertRegex(source, r"^[^:]+:[1-9][0-9]*$")
                     filename, number = source.rsplit(":", 1)
-                    lines = (ROOT / filename).read_text().splitlines()
+                    lines = lines_at(pin["metadata_revision"], filename)
                     index = int(number) - 1
                     self.assertLess(index, len(lines))
                     self.assertIn(version, lines[index])
