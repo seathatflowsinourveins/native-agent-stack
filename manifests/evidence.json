@@ -3427,8 +3427,8 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "f8b5a1e0abdabdd2569bf8c655d70514aa31a6e9148a02b3bf2bd699126047a3",
-      "bytes": 2529
+      "sha256": "b9bb4c6ccdc1811028b499ad08e208114afe34007daceb10c15de116bef66b69",
+      "bytes": 2896
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
@@ -3472,8 +3472,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "cf44536f3793cc37187c9800b682bbf3f5d4e01c85fab6ee0be070c77a161a7c",
-      "bytes": 11907
+      "sha256": "bd962d7e12913a7ac05a2734d46a07ce605448ec9eae43b5978f87dfb3653885",
+      "bytes": 12060
     },
     {
       "path": "CLAUDE.md",
@@ -13923,8 +13923,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "a3f712c8aaf10b69659145558dd469251fdf8c6ed82dd7f393dd9ee07e20b489",
-      "bytes": 108918
+      "sha256": "b54245b21caa7eb86b97e83cb473daed085660ab42dc0270198afd64e253e2c2",
+      "bytes": 115792
     },
     {
       "path": "docs/evidence.md",
@@ -14228,8 +14228,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "9de4a4b5f23658a49a32dd8d95ffe51eb0011691665a713d58273b904e76c020",
-      "bytes": 158486
+      "sha256": "b3ee53e7772cf0e29b1eb6a1a709ceb8bb9e11927c5131144a164db19d112dfe",
+      "bytes": 587314
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -14248,8 +14248,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b4304cfbd2169c23d27a80fd938d1bd2aa74cf5294cf28e99340f1bad1c57896",
-      "bytes": 79772
+      "sha256": "f9d490f4a495caf1c41ff94f1e995f53a884a2f9074df17650ed383138cda804",
+      "bytes": 80165
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -36182,6 +36182,131 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
+      "sha256": "e398078e1df9504e30ccc50860203182740714d752cb062238a4e7c8fdf0d9ce",
+      "bytes": 8440
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/agentsview.json",
+      "sha256": "e5a086ce4eb86999596fc7c34f8dfb114ce8531180da52a0dcbc6dc43dc3f355",
+      "bytes": 41427
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ai-memory.json",
+      "sha256": "210554d29261af3dff7954ec22e372c103529bf1bbd3c4e0f662732fc9c80112",
+      "bytes": 52622
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ast-grep.json",
+      "sha256": "70a2abcc2d7e6836e72e50948abf9a14d9324ed1bd38d69317540f7b1c63451e",
+      "bytes": 36591
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ccusage.json",
+      "sha256": "9bc826ea5b13362943a344503d896dcdcd1f56ac8a25060ec6b6675c6ec49ce4",
+      "bytes": 37986
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/codebase-memory-mcp.json",
+      "sha256": "1f1b16c74ff984d09e92775a02e01fd8efcc2699d5aff97229b6237684ca5d93",
+      "bytes": 51103
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-hub.json",
+      "sha256": "cc9d9a64b1d9f32d9a1fffd3302165976199e42dccf2ed1345f17a5f52eb1a36",
+      "bytes": 33737
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-mode.json",
+      "sha256": "c156b4dda1438e52188ca24fcf2ee49aef31f5a2b9f38e55d8f66666f5fef4b3",
+      "bytes": 43370
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/gpt-tokenizer.json",
+      "sha256": "a95272983585938906537f90ae2d7df920af15e5de49b1b411963f31d5dee185",
+      "bytes": 41783
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/headroom.json",
+      "sha256": "545ff024e263ed54613e93111d7f35d1fb97935f3c7104fe98cfdf0dcbaed835",
+      "bytes": 45944
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/index.json",
+      "sha256": "11f374c1d817bdf2643d22bf0d573adb7c13a58cd66bd314b5d817ea38d68992",
+      "bytes": 2701
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/jcodemunch-mcp.json",
+      "sha256": "97c8300c11f588ab2fe01b78faddca8feb96e8178576f1e00d82aa6071bcc009",
+      "bytes": 44180
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/markitdown.json",
+      "sha256": "60374d95dfd98d9896945535f66786af3c2ae93cb75b8fde61771c6a735f056f",
+      "bytes": 36860
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/mcporter.json",
+      "sha256": "afdae44659982db5443d4fd4654cf86ea3edbd4931e587f116024e119d67f8c3",
+      "bytes": 39754
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/qmd.json",
+      "sha256": "1cda607a121d19f93e8cc7ac9bdf1460ef118c35562106385b864783bc82e494",
+      "bytes": 49621
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/repomix.json",
+      "sha256": "2c60441a2ea7b8df269f8194365a61de26bc041bec07ad9cab53353737296a37",
+      "bytes": 37808
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/rtk.json",
+      "sha256": "ade07f80c2ecef5113863ae93674d923efb14b137f97fc8aeb4f4860a2e758bc",
+      "bytes": 45952
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/serena.json",
+      "sha256": "4903157e74e112e3bc2ef3a6000d921f022a0600573679da7ff51eab8862df70",
+      "bytes": 39301
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/socraticode.json",
+      "sha256": "54f2ed198ab274f1452dcdb1590d60a40b01b1b16545142927ad1f63cfb98738",
+      "bytes": 47271
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/toon.json",
+      "sha256": "72eb878a8b97d51c296a99c78348327bbcf602eaee348448b9984ae3944a6f3e",
+      "bytes": 39711
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json",
+      "sha256": "7f0129cfa30f9d00f7e470116d5b66ee13c7b97205ae619423d11f66c303e29a",
+      "bytes": 66154
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/invoke-by-tool.json",
+      "sha256": "7580d47a1efa88ebf9fbad036ad50e055a875c019c13be3bf1dba55242c3a045",
+      "bytes": 16453
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/returned-results-subset.json",
+      "sha256": "0931950169dcedb6a95cd67be29a86b808221a16a433c83fdcc4b80ff01505cb",
+      "bytes": 466480
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/tools/bundle.py",
+      "sha256": "37e2069ea2348b99f9065d735ea5ddf728ebc86bc80ae5aa8890e73620ef3157",
+      "bytes": 11161
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/tools/condense.py",
+      "sha256": "ce4fa401294397d5d86e9daa38805e3fb39ab29fadb0326d247bdf0277a50db5",
+      "bytes": 19478
+    },
+    {
       "path": "evidence/artifacts/token-workflow-hardening-20260926/README.md",
       "sha256": "9a7cffe2d1b60650995a8de94507b8b7aa38e373b69e547728d937f300677a31",
       "bytes": 12122
@@ -38743,8 +38868,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "b6770b3f7b0d41781c38576fca7706d104deab31d68e65acc0375dd9260e75e2",
-      "bytes": 57915
+      "sha256": "93a954fa6efdf011e38fca0b1269901fac368191affd783ee0aeadb261981666",
+      "bytes": 63757
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -39313,8 +39438,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "ba90841894437a10f56f7f5632e1bf44c39a79fbf835718d534397423067ff86",
-      "bytes": 84133
+      "sha256": "a3bd9a5b49b80b5be89139bf1ac6b6872c457c68f97c924a2f044a2c460b07b8",
+      "bytes": 96178
     },
     {
       "path": "tests/test_effort_default_guard.py",
