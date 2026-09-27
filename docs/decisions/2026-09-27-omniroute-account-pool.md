@@ -244,7 +244,9 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      and `command_scope` record the base commit, the picks and `BUILD_SHA`, and point here. `upstream_sources` gains
      the base commit and the two PRs.
    - **The unit template is values-free.** Prefix placeholders stand in for paths, and secrets arrive only through
-     `EnvironmentFile=`.
+     `EnvironmentFile=`. It mirrors the installed unit, with one addition: `Environment=OMNIROUTE_SERVER_HOST=127.0.0.1`.
+     `omniroute serve` binds `0.0.0.0` when that variable is unset (OR `bin/cli/utils/serverHost.mjs` L16-26), and the
+     keyless posture needs loopback. On the workstation the environment file already sets the same value.
    - **The inventory.** The `omniroute` entry describes a keyless loopback gateway with an optional per-lane key.
 
 ## Evidence
