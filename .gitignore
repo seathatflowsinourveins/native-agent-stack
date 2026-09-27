@@ -27,6 +27,10 @@ node_modules/
 # CLAUDE_CONFIG_DIR fixture (docs/token-efficiency-stack.md#hosted-ci-coverage-2026-09-26):
 # clearly labelled synthetic content, not host history.
 !fixtures/ccusage-synthetic-claude/**/*.jsonl
+# PR-H's frozen public synthetic log fixture (blind-lane positive control and
+# seed-log-symbol tasks, evidence/artifacts/token-adoption-e2e-20260926/preregistration.json):
+# clearly labelled synthetic content, not host history.
+!evidence/artifacts/token-adoption-e2e-20260926/fixtures/*.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
 !adoption/hosts/macos-example.json

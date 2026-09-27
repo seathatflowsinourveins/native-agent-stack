@@ -1,0 +1,73 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch probe: what config/batchWrite does with null (delete) on a nested key whose parents it created."""
+import json
+import os
+import select
+import shutil
+import subprocess
+import sys
+import time
+
+home = sys.argv[1]
+codex_home = os.path.join(home, ".codex")
+child_env = {"HOME": home, "CODEX_HOME": codex_home, "PATH": os.defpath + ":" + os.path.dirname(shutil.which("codex")),
+             "LANG": "C.UTF-8"}
+cmd = ["bwrap", "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc",
+       "--bind", home, home, "--", shutil.which("codex"), "app-server", "--listen", "stdio://"]
+p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=child_env,
+                     text=True, bufsize=1)
+
+
+def send(o):
+    p.stdin.write(json.dumps(o) + "\n")
+    p.stdin.flush()
+
+
+def recv(want_id, timeout=30):
+    end = time.time() + timeout
+    while time.time() < end:
+        r, _, _ = select.select([p.stdout], [], [], 1)
+        if not r:
+            continue
+        line = p.stdout.readline()
+        if not line:
+            break
+        msg = json.loads(line)
+        if msg.get("id") == want_id and ("result" in msg or "error" in msg):
+            return msg
+    return None
+
+
+def user_version():
+    send({"id": 90, "method": "config/read", "params": {"includeLayers": True}})
+    r = recv(90)
+    return [l for l in r["result"]["layers"] if l["name"]["type"] == "user"][0]["version"]
+
+
+send({"id": 1, "method": "initialize",
+      "params": {"clientInfo": {"name": "nas_probe", "version": "0.0.1"}, "capabilities": {"experimentalApi": True}}})
+recv(1)
+send({"method": "initialized"})
+path = os.path.join(codex_home, "config.toml")
+print("== before\n" + open(path).read())
+send({"id": 2, "method": "config/batchWrite", "params": {"edits": [
+    {"keyPath": 'plugins."context-mode@context-mode".mcp_servers.context-mode.enabled', "value": False,
+     "mergeStrategy": "replace"},
+    {"keyPath": "mcp_servers.headroom.env.HF_HUB_OFFLINE", "value": "1", "mergeStrategy": "replace"}],
+    "expectedVersion": user_version()}})
+print("write", json.dumps(recv(2))[:200])
+print("== after write\n" + open(path).read())
+send({"id": 3, "method": "config/batchWrite", "params": {"edits": [
+    {"keyPath": 'plugins."context-mode@context-mode".mcp_servers.context-mode.enabled', "value": None,
+     "mergeStrategy": "replace"},
+    {"keyPath": "mcp_servers.headroom.env.HF_HUB_OFFLINE", "value": None, "mergeStrategy": "replace"}],
+    "expectedVersion": user_version()}})
+print("delete leaves", json.dumps(recv(3))[:200])
+print("== after leaf delete\n" + open(path).read())
+send({"id": 4, "method": "config/batchWrite", "params": {"edits": [
+    {"keyPath": 'plugins."context-mode@context-mode".mcp_servers', "value": None, "mergeStrategy": "replace"}],
+    "expectedVersion": user_version()}})
+print("delete parent", json.dumps(recv(4))[:200])
+print("== after parent delete\n" + open(path).read())
+p.stdin.close()
+p.wait(timeout=10)

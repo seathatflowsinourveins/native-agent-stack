@@ -1,0 +1,24 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Assemble adoption/templates/codex.AGENTS.template.md from its three verified sources (scratch build step).
+
+1. the staged top-rule block (120 words by wc -w, marker line included), byte for byte;
+2. rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, fetched with gh api at the tag, byte for byte;
+3. this catalog's exceptions block.
+"""
+import hashlib
+import sys
+from pathlib import Path
+
+sp = Path(sys.argv[1])
+out = Path(sys.argv[2])
+top = (sp / "rules/codex-agents-rules-block.md").read_bytes()
+upstream = (sp / "pd/up/rtk-awareness-full.v0.50.0.md").read_bytes()
+exceptions = (sp / "pd/build/exceptions.md").read_bytes()
+assert hashlib.sha256(top).hexdigest() == "476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311"
+assert hashlib.sha256(upstream).hexdigest() == "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
+begin = b"<!-- native-agent-stack:codex-user-instructions:begin (adoption/templates/codex.AGENTS.template.md) -->\n"
+upstream_marker = b"<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+end = b"<!-- native-agent-stack:codex-user-instructions:end -->\n"
+body = begin + top + b"\n" + upstream_marker + upstream + b"\n" + exceptions + end
+out.write_bytes(body)
+print(len(body), hashlib.sha256(body).hexdigest())

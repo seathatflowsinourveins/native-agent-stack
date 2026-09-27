@@ -1,0 +1,9 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+#!/bin/bash
+# Scratch probe: render codex debug prompt-input from a scratch CODEX_HOME (no auth, network off).
+# usage: pi_probe.sh <scratch-home> <out-prefix> [extra codex args...]
+H=$1; OUT=$2; shift 2
+CODEX_BIN=$(command -v codex)
+exec env -i HOME="$H" CODEX_HOME="$H/.codex" PATH="/usr/bin:/bin:$(dirname "$CODEX_BIN")" LANG=C.UTF-8 \
+  bwrap --unshare-net --ro-bind / / --dev /dev --proc /proc --bind "$H" "$H" --chdir / -- \
+  "$CODEX_BIN" "$@" debug prompt-input probe < /dev/null > "$OUT.json" 2> "$OUT.err"

@@ -1,0 +1,25 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+#!/bin/bash
+# Scratch driver: dry run, apply, second apply, rollback twice, on a sandbox copy of this host's Codex home files
+# (config.toml, AGENTS.md, RTK.md; never auth.json), with the real codex 0.157.1. usage: cycle.sh <sandbox-dir> <log>
+set -u
+SP=$SCRATCH
+WT=$SP/wt-u4; S=$1; LOG=$2
+rm -rf "$S"; mkdir -p "$S[redacted]"; chmod 700 "$S" "$S/home" "$S[redacted]"
+cp ~/.codex/config.toml ~/.codex/AGENTS.md ~/.codex/RTK.md "$S[redacted]"
+CH=$S[redacted]
+A=(python3 "$WT/tools/adoption/apply_codex_lane.py" --codex-home "$CH" --codex-process-name nas-none-xyz --state-dir "$S/state")
+cd "$WT" || exit 9
+{
+  echo "== sha256 before"; (cd "$CH" && sha256sum config.toml AGENTS.md)
+  echo "== dry run"; timeout 600 "${A[@]}" --project-config ~/code/native-agent-stack/.codex/config.toml; echo "rc=$?"
+  C=$(sha256sum "$CH/config.toml" | cut -d' ' -f1); G=$(sha256sum "$CH/AGENTS.md" | cut -d' ' -f1)
+  echo "== apply without hashes"; timeout 600 "${A[@]}" --apply | tail -3; echo "rc=${PIPESTATUS[0]}"
+  echo "== apply"; timeout 600 "${A[@]}" --apply --expect-config-sha256 "$C" --expect-agents-sha256 "$G" | sed -n '/^run record/,$p'; echo "rc=${PIPESTATUS[0]}"
+  echo "== second apply"; timeout 600 "${A[@]}" --apply --expect-config-sha256 "$(sha256sum "$CH/config.toml" | cut -d' ' -f1)" --expect-agents-sha256 "$(sha256sum "$CH/AGENTS.md" | cut -d' ' -f1)" | tail -1; echo "rc=${PIPESTATUS[0]}"
+  echo "== files after apply"; (cd "$CH" && ls -l AGENTS.md config.toml stack-worker.config.toml | awk '{print $1, $5, $9}')
+  R=$(readlink -f "$S/state/codex-lane/latest")
+  echo "== rollback"; timeout 600 "${A[@]}" --rollback "$R"; echo "rc=$?"
+  echo "== sha256 after rollback"; (cd "$CH" && sha256sum config.toml AGENTS.md; ls stack-worker.config.toml 2>&1 | sed 's|.*/||')
+  echo "== rollback again"; timeout 600 "${A[@]}" --rollback "$R"; echo "rc=$?"
+} > "$LOG" 2>&1
