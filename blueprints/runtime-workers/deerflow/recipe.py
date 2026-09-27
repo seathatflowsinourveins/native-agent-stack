@@ -16,6 +16,7 @@ import secrets
 import shutil
 import sqlite3
 import subprocess
+import sys
 import tarfile
 import tempfile
 import urllib.request
@@ -25,6 +26,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 PREFIX = Path.home() / ".local/share/codex-ecosystem/tools/deerflow-2.1.0"
 STATE = Path.home() / ".local/state/native-agent-stack/runtime-workers/deerflow"
+OWNER = "com.native-agent-stack.owner=gpt6-omniroute-framework-integration"
 
 
 def read(path):
@@ -76,9 +78,14 @@ def host_settings(path):
             raise ValueError("container service endpoints must use the measured rootless host address")
     if settings["variables"]["EMBED_URL"].endswith(":20128"):
         raise ValueError("OmniRoute does not serve embeddings")
-    if Path(settings["skills_root"]).resolve() != (Path.home() / ".agents/skills").resolve():
-        raise ValueError("skills_root must reference the adopted skills directory")
     return settings
+
+
+def worker_model(settings):
+    model = settings.get("model") or read(HERE / "defaults.json")["model"]
+    if not isinstance(model, str) or not re.fullmatch(r"cx/gpt-6-[a-z0-9-]+-max", model):
+        raise ValueError("worker/judgment roles require a configured GPT-6 max gateway route")
+    return model
 
 
 def render(settings, prefix, state):
@@ -87,7 +94,7 @@ def render(settings, prefix, state):
     defaults, pins = read(HERE / "defaults.json"), read(HERE / "pins.json")
     values = dict(settings["variables"])
     values.update({"IMAGE_" + k.upper(): v for k, v in pins["images"].items()})
-    values["DEERFLOW_MODEL"] = settings.get("model") or defaults["model"]
+    values["DEERFLOW_MODEL"] = worker_model(settings)
     config = read(HERE / "config.yaml.template")
     config["models"][0]["base_url"] = defaults["container_gateway"]
     ext = expand(read(HERE / "extensions_config.json.template"), values)
@@ -107,9 +114,8 @@ def render(settings, prefix, state):
     s["gateway"]["volumes"] = [
         mount(prefix / "runtime", "/runtime"), mount(cfg, "/config"),
         mount(state / "data", "/state", False), mount(state / "work", "/work", False),
-        mount(state / "skills", "/skills"),
-        mount(settings["skills_root"], settings["skills_root"]),
-        mount(prefix / "source/skills/public", "/upstream-skills"),
+        # Supported legacy custom category; the coordinator owns installation.
+        mount(state / "work/.agents/skills", "/skills/custom"),
     ]
     for item in settings["mcp_mounts"]:
         source, target = Path(item["source"]), Path(item["target"])
@@ -145,14 +151,26 @@ def require_rootless(settings):
         raise ValueError("the selected Docker context must be rootless")
 
 
-def link(directory, target):
-    if directory.is_symlink():
-        if os.readlink(directory) != str(target):
-            raise ValueError("refusing to replace an unrelated skill symlink")
-    elif directory.exists():
-        raise ValueError("refusing to replace an existing skill directory")
-    else:
-        directory.symlink_to(target, target_is_directory=True)
+def install_skills(workspace):
+    """Coordinator's project/universal extension is pending its separate PR.
+
+    No direct writes, symlinks, bundled-public fallback or alternative installer.
+    Source: tools/adoption/install_skills.py and the Round-2 skills contract.
+    """
+    subprocess.run([
+        sys.executable, str(REPO / "tools/adoption/install_skills.py"),
+        "--manifest", str(REPO / "blueprints/runtime-workers/skills/manifest.json"),
+        "--project-dir", str(workspace), "--agent", "universal",
+    ], check=True)
+
+
+def install_grader(prefix):
+    """GAIA v0.22.0 README's pip install, isolated from the native worker image."""
+    environment = Path(prefix) / "grader"
+    subprocess.run([sys.executable, "-m", "venv", str(environment)], check=True)
+    subprocess.run([str(environment / "bin/python"), "-m", "pip", "install",
+                    "--require-virtualenv", "--no-cache-dir", "--disable-pip-version-check",
+                    "-r", str(HERE / "e2e/requirements.txt")], check=True)
 
 
 def seed_qmd(settings, state):
@@ -196,12 +214,15 @@ def install(host_file):
     pins = read(HERE / "pins.json")
     require_rootless(settings)
     for folder in (PREFIX, STATE, STATE / "downloads", STATE / "config", STATE / "data",
-                   STATE / "work", STATE / "redis", STATE / "runs", STATE / "skills/custom"):
+                   STATE / "work", STATE / "redis", STATE / "runs"):
         folder.mkdir(parents=True, exist_ok=True, mode=0o700)
         folder.chmod(0o700)
     with (STATE / "install.lock").open("w") as lockfile:
         import fcntl
         fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        # Fail here if the coordinator's manifest/CLI extension is not merged.
+        install_skills(STATE / "work")
+        install_grader(PREFIX)
         archive = STATE / "downloads/source.tar.gz"
         if not archive.exists():
             temporary = archive.with_suffix(".part")
@@ -221,19 +242,10 @@ def install(host_file):
         for name, expected in pins["lockfiles"].items():
             if sha(source / name) != expected:
                 raise ValueError("upstream lockfile hash mismatch")
-        manifest = read(REPO / "adoption/skills/manifest.json")
-        selected = [s for s in manifest["skills"] if s.get("codex_enabled")]
-        for skill in selected:
-            target = Path(settings["skills_root"]) / skill["name"]
-            if sha(target / "SKILL.md") != skill["skill_md_sha256"]:
-                raise ValueError("adopted skill differs from its manifest pin: " + skill["name"])
-            link(STATE / "skills/custom" / skill["name"], target)
-        link(STATE / "skills/public", Path("/upstream-skills"))
         seed_qmd(settings, STATE)
         for subdir in ("runtime", "e2e"):
             shutil.copytree(HERE / subdir, PREFIX / subdir, dirs_exist_ok=True,
                             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-        shutil.copy2(HERE / "e2e/task.md", PREFIX / "runtime/task.md")
         shutil.copy2(HERE / "e2e/drive.py", PREFIX / "runtime/drive.py")
         shutil.copy2(HERE / "pins.json", PREFIX / "pins.json")
         for script in (PREFIX / "runtime").glob("*.sh"):
@@ -273,12 +285,23 @@ def lifecycle(action):
     if action == "up":
         docker(settings, *common, "up", "-d", "--wait", "--wait-timeout", "180", "--no-build", "--pull", "never")
     elif action == "down":
-        docker(settings, *common, "down", "--timeout", "30")
+        # Literal owned names only. Preserve all application bind-mount data.
+        commands = [("rm", "--force", "rw-deerflow-" + name)
+                    for name in ("nginx", "frontend", "gateway", "redis")]
+        commands.append(("network", "rm", "rw-deerflow-network"))
+        for command in commands:
+            try:
+                docker(settings, *command, capture_output=True, text=True)
+            except subprocess.CalledProcessError as exc:
+                if not any(reason in (exc.stderr or "").lower() for reason in ("no such container", "no such network", "network rw-deerflow-network not found")):
+                    raise
     elif action == "check":
-        docker(settings, *common, "run", "--rm", "--no-deps", "-T", "gateway",
+        docker(settings, *common, "run", "--rm", "--no-deps", "--name", "rw-deerflow-preflight",
+               "--label", OWNER, "-T", "gateway",
                "/app/backend/.venv/bin/python", "/runtime/preflight.py")
     elif action == "upstream-tests":
-        docker(settings, *common, "run", "--rm", "--no-deps", "-T", "--workdir", "/app/backend", "gateway",
+        docker(settings, *common, "run", "--rm", "--no-deps", "--name", "rw-deerflow-upstream-tests",
+               "--label", OWNER, "-T", "--workdir", "/app/backend", "gateway",
                "uv", "run", "--no-sync", "pytest", "-m", "not live",
                "tests/test_model_factory.py", "tests/test_mcp_client_config.py", "tests/test_client.py", "-q")
     else:

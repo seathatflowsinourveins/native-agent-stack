@@ -89,10 +89,17 @@ def observations(trace):
         for message in message.get("messages", []):
             visit(message)
 
+    inventory = set()
     if Path(trace).is_file():
         for line in Path(trace).read_text().splitlines():
             try:
-                visit(json.loads(line).get("data", {}))
+                event = json.loads(line)
+                if not isinstance(event, dict) or not isinstance(event.get("data"), dict):
+                    continue
+                if event.get("type") == "worker-skills":
+                    inventory.update(n for n in event["data"].get("names", [])
+                                     if isinstance(n, str) and re.fullmatch(r"[a-zA-Z0-9_-]{1,100}", n))
+                visit(event["data"])
             except (ValueError, TypeError):
                 continue
     mcps, skills = collections.Counter(), set()
@@ -113,16 +120,18 @@ def observations(trace):
                 task_failures += 1
             continue
         content = str(result.get("content", ""))
-        if not content or content.lstrip().lower().startswith(("error", "failed", "denied")):
+        if result.get("status") == "error" or not content or content.lstrip().lower().startswith(("error", "failed", "denied")):
             continue
         if any(name.startswith(s + "_") for s in SERVERS) and re.fullmatch(r"[a-zA-Z0-9_-]{1,100}", name):
             mcps[name] += 1
         if name == "read_file":
             path = str(call.get("args", {}).get("path", ""))
-            for skill in SKILLS:
-                if path.endswith("/" + skill + "/SKILL.md"):
+            for skill in inventory | SKILLS:
+                if path in {f"/mnt/skills/{category}/{skill}/SKILL.md" for category in ("legacy", "custom", "public")}:
                     skills.add(skill)
     return {"mcp_tool_results_observed": dict(sorted(mcps.items())),
+            "skills_listed_at_start": sorted(inventory),
+            "required_skills_activated": {"search-first", "verification-before-completion"} <= (inventory & skills),
             "skill_reads_observed": sorted(skills), "task_results_observed": task_results,
             "completed_tasks_observed": task_completed, "failed_tasks_observed": task_failures,
             "scope": "lead native StreamEvents; child-only tool events are not assumed visible; returned results are observations, not semantic success certification"}
@@ -138,13 +147,7 @@ def build_receipt(run, database, pins):
         gateway = {"state": "unavailable", "rows": [], "error_class": type(exc).__name__}
     gateway["scope"] = "time window only; concurrent traffic may be included; no session IDs or other columns queried"
     gateway["usage_total"] = None  # No total falsely attributed from a shared window.
-    try:
-        check = json.loads((run / "check.json").read_text())
-    except (OSError, ValueError):
-        check = {"passed": False, "reason": "checker_result_unavailable"}
-    # Keep only declared fields; neither driver metadata nor checker output is a public passthrough.
-    check = {"passed": check.get("passed") is True,
-             "exit_code": window.get("check_exit_code")}
+    transport = {"ok": window.get("transport_ok") is True}
     version = None
     if (run / "framework-events.jsonl").is_file():
         with (run / "framework-events.jsonl").open() as trace:
@@ -153,27 +156,30 @@ def build_receipt(run, database, pins):
                     record = json.loads(line)
                 except ValueError:
                     continue
-                if record.get("type") == "worker-version":
-                    candidate = record.get("data", {}).get("framework_version")
+                if isinstance(record, dict) and record.get("type") == "worker-version" and isinstance(record.get("data"), dict):
+                    candidate = record["data"].get("framework_version")
                     if isinstance(candidate, str) and re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", candidate):
                         version = candidate
                     break
     artifacts = {}
-    for name in ("files.json", "summarize.py", "report.json"):
-        path = run / "artifacts" / name
-        if path.is_file() and not path.is_symlink() and path.stat().st_size <= 1_000_000:
+    for name in ("input.txt", "framework-events.jsonl"):
+        path = run / name
+        if path.is_file() and not path.is_symlink():
             artifacts[name] = hashlib.sha256(path.read_bytes()).hexdigest()
-    return {"schema_version": 1, "evidence_class": "host local integration check with independent SQL observation",
+    return {"schema_version": 2, "evidence_class": "pre-grader native transport with independent SQL observation",
             "framework": {"tag": pins["tag"], "commit": pins["commit"], "observed_version": version,
                           "images": pins["images"]},
             "window": {"start_epoch": window["start_epoch"], "end_epoch": window["end_epoch"]},
             "framework_exit_code": window.get("framework_exit_code"),
             "cleanup": {k: window.get(k) if window.get(k) in {"absent", "unknown"} else "unknown"
-                        for k in ("framework_cleanup", "checker_cleanup")},
+                        for k in ("framework_cleanup",)},
             "artifact_sha256": artifacts,
-            "check": check, "gateway": gateway,
+            "transport": transport, "gateway": gateway,
+            "grader": {"name": "inspect_evals.gaia.gaia_scorer", "version": "0.22.0",
+                       "inspect_ai_version": "0.3.271", "verdict": None,
+                       "verdict_location": "Inspect .eval log; this receipt is captured before upstream scoring"},
             "observations": observations(run / "framework-events.jsonl"),
-            "acceptance": "task check and observations only; host review must establish gateway attribution and lifecycle before adoption"}
+            "acceptance": "GAIA score belongs to Inspect; skills, gateway attribution and lifecycle require separate native observations"}
 
 
 if __name__ == "__main__":
@@ -184,5 +190,5 @@ if __name__ == "__main__":
     args = p.parse_args()
     receipt = build_receipt(args.run, args.database, json.loads(args.pins.read_text()))
     (args.run / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
-    print(json.dumps({"receipt_written": True, "check_passed": receipt["check"]["passed"],
+    print(json.dumps({"receipt_written": True, "transport_ok": receipt["transport"]["ok"],
                       "gateway_observation": receipt["gateway"]["state"]}))

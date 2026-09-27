@@ -1,5 +1,5 @@
 {
-  "name": "runtime-worker-deerflow",
+  "name": "rw-deerflow",
   "services": {
     "redis": {
       "image": "${IMAGE_REDIS}",
@@ -17,7 +17,11 @@
       },
       "entrypoint": [
         "/runtime/redis-start.sh"
-      ]
+      ],
+      "container_name": "rw-deerflow-redis",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      }
     },
     "gateway": {
       "image": "${IMAGE_GATEWAY}",
@@ -48,7 +52,8 @@
         "MONOCLE_TRACING": "false",
         "CHUB_TELEMETRY": "0",
         "CHUB_FEEDBACK": "0",
-        "DO_NOT_TRACK": "1"
+        "DO_NOT_TRACK": "1",
+        "PYTHONDONTWRITEBYTECODE": "1"
       },
       "volumes": [],
       "depends_on": {
@@ -68,7 +73,11 @@
         "retries": 30
       },
       "mem_limit": "6g",
-      "pids_limit": 512
+      "pids_limit": 512,
+      "container_name": "rw-deerflow-gateway",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      }
     },
     "frontend": {
       "image": "${IMAGE_FRONTEND}",
@@ -82,7 +91,11 @@
         "DEER_FLOW_TRUSTED_ORIGINS": "http://127.0.0.1:3771",
         "NEXT_TELEMETRY_DISABLED": "1"
       },
-      "volumes": []
+      "volumes": [],
+      "container_name": "rw-deerflow-frontend",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      }
     },
     "nginx": {
       "image": "${IMAGE_NGINX}",
@@ -101,6 +114,18 @@
         "gateway": {
           "condition": "service_healthy"
         }
+      },
+      "container_name": "rw-deerflow-nginx",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      }
+    }
+  },
+  "networks": {
+    "default": {
+      "name": "rw-deerflow-network",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
       }
     }
   }

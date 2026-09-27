@@ -6,7 +6,6 @@
     "QDRANT_URL": "10.0.2.2:LOCAL_QDRANT_PORT",
     "EMBED_URL": "10.0.2.2:18232"
   },
-  "skills_root": "/ABSOLUTE/HOME/.agents/skills",
   "mcp_mounts": [
     {
       "source": "/ABSOLUTE/PATH/TO/codex-ecosystem/bin",

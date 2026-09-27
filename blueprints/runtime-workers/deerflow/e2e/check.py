@@ -1,62 +1,64 @@
-"""Frozen, local integration oracle; not an upstream test.
+"""Pre-grader transport sanity only. Never a task-success verdict.
 
-Source contract: GitHub REST commits API's files/statistics fields, frozen in
-expected.json before a run. Subprocess pattern: tests/test_install_skills.py.
-Run untrusted worker scripts ONLY in the isolated checker container used by
-run.py. The local unit suite supplies only author-controlled synthetic scripts.
+DeerFlow v2.1.0 client.py:538-565,830-910: values contain complete messages;
+messages-tuple contains deltas and must not be appended to the values snapshot.
+The final answer is handed unchanged to Inspect Evals v0.22.0 gaia_scorer.
+No targets, answer normalization, generated-code execution or local oracle.
 """
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 
-def run_script(script, data):
-    result = subprocess.run([sys.executable, "-I", str(script), str(data)],
-                            capture_output=True, text=True, timeout=10, check=False)
-    if result.returncode != 0:
-        raise ValueError("generated script failed")
-    return json.loads(result.stdout)
-
-
-def check(directory):
-    directory = Path(directory)
-    expected = json.loads(Path(__file__).with_name("expected.json").read_text())
-    script = directory / "summarize.py"
-    for name in ("summarize.py", "files.json", "report.json"):
-        path = directory / name
-        if path.is_symlink() or not path.is_file() or path.stat().st_size > 1_000_000:
-            raise ValueError("missing or invalid artifact")
-    files = json.loads((directory / "files.json").read_text())
-    if sorted(files, key=lambda x: x["filename"]) != expected["files"]:
-        raise ValueError("API fields differ from frozen release commit")
-    if json.loads((directory / "report.json").read_text()) != expected["summary"]:
-        raise ValueError("saved report differs from frozen expected summary")
-    if run_script(script, directory / "files.json") != expected["summary"]:
-        raise ValueError("script output differs from frozen expected summary")
-    # Independent literal controls ensure the script actually reads its input.
-    fixtures = [([], {"file_count": 0, "additions": 0, "deletions": 0, "changes": 0,
-                      "by_status": {}, "paths": []}),
-                ([{"filename": "z.py", "status": "added", "additions": 2, "deletions": 0, "changes": 2},
-                  {"filename": "a.md", "status": "modified", "additions": 3, "deletions": 1, "changes": 4}],
-                 {"file_count": 2, "additions": 5, "deletions": 1, "changes": 6,
-                  "by_status": {"added": 1, "modified": 1}, "paths": ["a.md", "z.py"]})]
-    with tempfile.TemporaryDirectory() as tmp:
-        fixture = Path(tmp) / "control.json"
-        for data, oracle in fixtures:
-            fixture.write_text(json.dumps(data))
-            if run_script(script, fixture) != oracle:
-                raise ValueError("script failed an independent input control")
-    return {"passed": True, "checks": ["frozen_files", "saved_report", "executed_script", "independent_inputs"]}
+def read_completion(trace):
+    path = Path(trace)
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > 64_000_000:
+        raise ValueError("missing or oversized native trace")
+    snapshot = None
+    ended = False
+    with path.open() as events:
+        for line in events:
+            try:
+                record = json.loads(line)
+            except ValueError as exc:
+                raise ValueError("malformed native event") from exc
+            if not isinstance(record, dict) or not isinstance(record.get("data"), dict):
+                raise ValueError("malformed native event")
+            if ended or record.get("type") == "error":
+                raise ValueError("failed or ambiguous native completion")
+            if record.get("type") == "values":
+                snapshot = record["data"].get("messages")
+            if record.get("type") == "end":
+                ended = True
+    if not ended or not isinstance(snapshot, list) or not snapshot:
+        raise ValueError("native end and final values snapshot are required")
+    final = snapshot[-1]
+    if not isinstance(final, dict) or final.get("type") != "ai" or final.get("tool_calls"):
+        raise ValueError("last message must be a final assistant answer")
+    content = final.get("content")
+    if isinstance(content, list):
+        # Match the upstream client's text-block extraction without coercion.
+        chunks = []
+        for block in content:
+            if not isinstance(block, dict):
+                raise ValueError("malformed assistant content block")
+            if block.get("type") in {"text", "output_text"}:
+                if not isinstance(block.get("text"), str):
+                    raise ValueError("malformed assistant text block")
+                chunks.append(block["text"])
+        content = "".join(chunks)
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("missing assistant answer")
+    return content
 
 
 if __name__ == "__main__":
     try:
-        result = check(sys.argv[1])
-    except (OSError, ValueError, KeyError, TypeError, IndexError, subprocess.TimeoutExpired) as exc:
-        result = {"passed": False, "reason": type(exc).__name__}
+        read_completion(sys.argv[1])
+        result = {"transport_ok": True, "verdict": "deferred to upstream gaia_scorer"}
+    except (OSError, ValueError, IndexError) as exc:
+        result = {"transport_ok": False, "error_class": type(exc).__name__}
     print(json.dumps(result, sort_keys=True))
-    raise SystemExit(0 if result["passed"] else 1)
+    raise SystemExit(0 if result["transport_ok"] else 1)

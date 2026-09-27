@@ -41,7 +41,8 @@ async def main():
     required = {"search-first", "verification-before-completion"}
     assert required <= names, "pinned skills are not visible through upstream storage"
     print(json.dumps({"passed": True, "model_invoked": False,
-                      "discovered_allowed_tools": counts, "required_skills_visible": sorted(required)}))
+                      "discovered_allowed_tools": counts, "required_skills_visible": sorted(required),
+                      "skills_listed_at_start": sorted(names), "skill_activation_proven": False}))
 
 
 if __name__ == "__main__":
