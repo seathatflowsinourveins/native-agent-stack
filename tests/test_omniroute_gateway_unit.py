@@ -82,12 +82,21 @@ def credential_like_directives(text: str) -> list[str]:
 
 
 def placeholder_problems(text: str) -> list[str]:
-    """Placeholders outside the documented set, documented ones the directives do not use, and ones the header omits."""
+    """Placeholders outside the documented set, documented ones the directives do not use, ones the header omits, and
+    any left in the directives after rendering with the workstation's values."""
     used = set(PLACEHOLDER.findall("\n".join(directives(text))))
     header = "\n".join(line for line in text.splitlines() if line.startswith("#"))
+    leftover = set(PLACEHOLDER.findall("\n".join(directives(render(text, WORKSTATION)))))
     return ([f"unknown @{name}@" for name in sorted(used - set(WORKSTATION))]
             + [f"unused @{name}@" for name in sorted(set(WORKSTATION) - used)]
-            + [f"undocumented @{name}@" for name in sorted(WORKSTATION) if f"@{name}@" not in header])
+            + [f"undocumented @{name}@" for name in sorted(WORKSTATION) if f"@{name}@" not in header]
+            + [f"unrendered @{name}@" for name in sorted(leftover)])
+
+
+def template_only_problems(template: str, installed: str) -> list[str]:
+    """The documented template-only directives must be in the template and absent from the installed unit."""
+    return ([f"template lacks {line}" for line in sorted(TEMPLATE_ONLY) if line not in directives(template)]
+            + [f"installed unit has {line}" for line in sorted(TEMPLATE_ONLY) if line in directives(installed)])
 
 
 def supervision_problems(text: str) -> list[str]:
@@ -127,13 +136,10 @@ class OmniRouteUnitTemplateTests(unittest.TestCase):
 
     def test_renders_to_the_recorded_installed_unit(self):
         self.assertEqual(mirror_differences(self.template, self.installed), [])
-        for line in TEMPLATE_ONLY:
-            self.assertIn(line, directives(self.template))
-            self.assertNotIn(line, directives(self.installed))
+        self.assertEqual(template_only_problems(self.template, self.installed), [])
 
     def test_placeholders_are_exactly_the_documented_set_and_render_away(self):
         self.assertEqual(placeholder_problems(self.template), [])
-        self.assertEqual(PLACEHOLDER.findall("\n".join(directives(render(self.template, WORKSTATION)))), [])
 
     def test_no_inline_secret_and_exactly_one_environment_file(self):
         self.assertEqual(environment_files(self.template), [ENVIRONMENT_FILE])
@@ -188,13 +194,20 @@ class OmniRouteUnitTemplateTests(unittest.TestCase):
 
     def test_placeholder_drift_is_caught(self):
         unknown = self.template.replace("--no-tray\n", "--no-tray --data-dir @DATA_DIR@\n")
-        self.assertEqual(placeholder_problems(unknown), ["unknown @DATA_DIR@"])
+        self.assertEqual(placeholder_problems(unknown), ["unknown @DATA_DIR@", "unrendered @DATA_DIR@"])
         unused = self.template.replace("Environment=CODEX_CLIENT_VERSION=@CODEX_CLIENT_VERSION@",
                                        "Environment=CODEX_CLIENT_VERSION=0.157.1")
         self.assertEqual(placeholder_problems(unused), ["unused @CODEX_CLIENT_VERSION@"])
         undocumented = "\n".join(line for line in self.template.splitlines()
                                  if not (line.startswith("#") and "@NODE_PREFIX@" in line))
         self.assertEqual(placeholder_problems(undocumented), ["undocumented @NODE_PREFIX@"])
+
+    def test_template_only_drift_is_caught(self):
+        (line,) = TEMPLATE_ONLY
+        dropped = self.template.replace(line + "\n", "")
+        self.assertEqual(template_only_problems(dropped, self.installed), [f"template lacks {line}"])
+        installed_too = self.installed.replace("Restart=on-failure", f"{line}\nRestart=on-failure")
+        self.assertEqual(template_only_problems(self.template, installed_too), [f"installed unit has {line}"])
 
     def test_supervision_drift_is_caught(self):
         daemon = self.template.replace("--no-tray\n", "--no-tray --daemon\n")
