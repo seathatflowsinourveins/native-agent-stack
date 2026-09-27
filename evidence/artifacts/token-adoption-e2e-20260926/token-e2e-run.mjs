@@ -134,6 +134,16 @@ for (const task of selected) {
       throw new Error('Supply the frozen per-arm worktree binding: ' + task.id);
     }
     prompt = prompt.replaceAll('<assigned-worktree>', path);
+    // Amendment 2 repair round (2026-09-27): each prepared tree's full base
+    // revision is frozen in args.worktree_bases before probes, and the builder
+    // brief names it, because isolated-builder.md:12 at d022295a stops when
+    // `git -C <path> rev-parse HEAD` is not the brief's base.
+    const base = args.worktree_bases?.[task.id];
+    if (typeof base !== 'string' || !/^[0-9a-f]{40}$/.test(base) ||
+        (task.worktree_check && !prompt.includes('<assigned-base>'))) {
+      throw new Error('Supply the frozen worktree base binding: ' + task.id);
+    }
+    prompt = prompt.replaceAll('<assigned-base>', base);
   }
   if (task.input_required) {
     const path = args.input_paths?.[task.id];
@@ -146,6 +156,9 @@ for (const task of selected) {
   if (task.run_binding) {
     if (!prompt.includes('<run-token>')) throw new Error('Missing run placeholder');
     prompt = prompt.replaceAll('<run-token>', args.run);
+  }
+  if (prompt.includes('<assigned-base>')) {
+    throw new Error('Unbound frozen base placeholder: ' + task.id);
   }
   for (const name of manifest.no_tool_names_denylist) {
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -193,9 +206,10 @@ for (const task of selected) {
   // and meta.json after return (RUNBOOK builder section), checks starting HEAD,
   // and diffs that observed tree, which must be the brief's prepared path: since
   // #402 the builder declares no frontmatter isolation (Amendment 2). The
-  // supplied path is a binding, not proof. Never invent an actual path.
+  // supplied path and base are bindings, not proof. Never invent an actual path.
   const worktreeEvidence = task.worktree_check ? {
-    prepared_path: args.worktree_paths[task.id], actual_path: null,
+    prepared_path: args.worktree_paths[task.id],
+    prepared_base: args.worktree_bases[task.id], actual_path: null,
     identity_sources: ['child_transcript', 'meta.json'],
     status: 'pending_independent_readback',
   } : null;

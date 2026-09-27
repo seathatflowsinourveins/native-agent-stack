@@ -2212,7 +2212,7 @@
       ],
       "opportunity": "organic",
       "description": "Isolated edit and test 1",
-      "task_text": "Use the isolated checkout actually assigned by the harness. If the harness creates no separate checkout, use the prepared control checkout <assigned-worktree>. Verify and report the actual working directory and starting revision before editing; stay inside that checkout. There, change fixtures/before.py so greeting('Ada') returns 'Hello, Ada!'. Confirm the complete result matches fixtures/after.py and test another name. Do not commit.",
+      "task_text": "Use the isolated checkout actually assigned by the harness. If the harness creates no separate checkout, use the prepared control checkout <assigned-worktree>, prepared at the exact base <assigned-base>. Verify and report the actual working directory and starting revision before editing; stay inside that checkout. There, change fixtures/before.py so greeting('Ada') returns 'Hello, Ada!'. Confirm the complete result matches fixtures/after.py and test another name. Do not commit.",
       "fixture_path": "fixtures/before.py",
       "lane_tags": [
         "rtk-claude",
@@ -2241,7 +2241,7 @@
       ],
       "opportunity": "organic",
       "description": "Isolated edit and test 2",
-      "task_text": "Use the isolated checkout actually assigned by the harness. If the harness creates no separate checkout, use the prepared control checkout <assigned-worktree>. Verify and report the actual working directory and starting revision before editing; stay inside that checkout. There, change fixtures/before.py so greeting('Grace') returns 'Hello, Grace!'. Confirm the complete result matches fixtures/after.py and test another name. Do not commit.",
+      "task_text": "Use the isolated checkout actually assigned by the harness. If the harness creates no separate checkout, use the prepared control checkout <assigned-worktree>, prepared at the exact base <assigned-base>. Verify and report the actual working directory and starting revision before editing; stay inside that checkout. There, change fixtures/before.py so greeting('Grace') returns 'Hello, Grace!'. Confirm the complete result matches fixtures/after.py and test another name. Do not commit.",
       "fixture_path": "fixtures/before.py",
       "lane_tags": [
         "rtk-claude",
@@ -3193,6 +3193,7 @@
     "missing_or_conflicting_identity": "block_grading",
     "prepared_path_is_proof": false,
     "brief_binding": "worktree_paths",
+    "base_binding": "worktree_bases",
     "harness_created_tree_expected": false,
     "observed_child_worktree_must_equal_prepared_path": true,
     "observed_worktree_other_than_prepared_path": "conflicting_identity",

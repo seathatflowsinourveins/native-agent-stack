@@ -14,7 +14,8 @@ process. Record the actual identity table with the format
 `<run>.<arm>.<task>.<attempt>`; keep native session/workflow/thread/call IDs and
 host paths private. Freeze task input bindings before capability probes:
 source receipts, original source revision, private task-output directories,
-isolated builder worktrees and two different per-tree sentinels. Do not
+isolated builder worktrees, the exact revision each prepared Workflow worktree
+was created at (`worktree_bases`) and two different per-tree sentinels. Do not
 replace missing retained source bytes with a convenient new fixture after a run.
 The two reused history tasks require the original retained 150-entry report.
 The two reused table tasks require the pointer value from the preregistration
@@ -58,8 +59,14 @@ settings and the `--agents` flag rank higher, and the launches below pass no
 freeze record retains the SHA256 of that file and of its same-named
 `.claude/agents/` and `~/.claude/agents/` copies, read back from disk after
 installation, and requires all three to be byte-identical. A missing copy or any
-difference blocks capability probes and launch. Child `meta.json` types are still
-observed separately (README dependency table).
+difference blocks capability probes and launch. **Repair round (2026-09-27):**
+for the five role bodies in README's Amendment 2 role-body table
+(`stack-verifier`, `isolated-builder`, `source-scout`, `stack-researcher` and
+`evidence-reviewer`), all three copies must also equal the SHA256 recorded there
+for `d022295a`; byte identity at the execution HEAD alone does not suffice. A
+differing body blocks capability probes and launch, and any later change to
+these bodies requires another dated amendment before execution. Child
+`meta.json` types are still observed separately (README dependency table).
 
 Use these shell variables as **operator inputs**, with real values recorded
 privately: `E2E_DIR` (owned private output directory), `RUN_TOKEN`,
@@ -185,6 +192,17 @@ is `claude plugin eval` with `--mocks off` and
 sentinel is required. `--allow-real-servers` alone may still use mocks.
 QMD is user-scoped and is not covered by that plugin harness.
 
+**Amendment 2 repair round (2026-09-27), builder brief.** The B-route
+`isolated-builder` probe must use exactly the frozen brief shape: the prepared
+path plus `<assigned-base>`, worded as the builder tasks' clause “the prepared
+control checkout `<assigned-worktree>`, prepared at the exact base
+`<assigned-base>`”. The probe binds its own prepared tree's absolute path and
+the full 40-hex revision that tree was created at, the way `worktree_paths` and
+`worktree_bases` bind them, and no other base text. A probe with other base
+wording, an abbreviated base or added base instructions does not qualify the
+route. A refusal on this shape is a retained gate failure, never repaired by
+rewording the brief.
+
 Run the M13 binding probe in two concurrent owned worktrees, 20 repetitions
 per worktree, covering shell, cwd-less execution, relative file read,
 index/search and the granted symbol service. Also test spawned children.
@@ -218,6 +236,7 @@ not enough (Workflow reference, “Where the keyword works”, lines 131–141).
 | gates_verified | true only after inspecting the retained merge/read-back/capability evidence |
 | frozen_tasks | Entire parsed committed `preregistration.json`, without edits |
 | worktree_paths | Every selected task with `worktree_required` mapped to this arm's prepared owned absolute checkout/clone path; six distinct prepared builder paths plus per-arm command-observation checkouts and caller clones, frozen privately before probes. For builders this is the owned checkout each arm's brief names (Amendment 2, 2026-09-27), not proof of the edited tree; follow the builder section below |
+| worktree_bases | Every selected task with `worktree_required` mapped to the full 40-hex revision its prepared checkout/clone was created at, recorded privately with `worktree_paths` before probes (Amendment 2 repair round, 2026-09-27). Builder trees are prepared at the frozen execution revision, which their unchanged check requires. The script replaces `<assigned-base>` with it in both builder briefs and refuses to start when a value is missing or malformed or the placeholder stays unbound. The two reused worktree tasks have no base placeholder: their value is recorded only, and their text and checks are unchanged |
 | input_paths | Every selected task with `input_required` mapped to its pre-recorded neutral absolute input path; history originals, the sealed table pointer value and the HTML seed retain identical bytes/hash across arms |
 
 The runtime cannot read files or import modules. The coordinator passes JSON
@@ -283,9 +302,14 @@ brief names none, when that checkout's top level is its starting directory's, or
 when its `HEAD` is not the brief's base. No arm expects a harness-created tree.
 Every builder launch in B, A and A0 carries this arm's frozen prepared path from
 `worktree_paths` in its brief, where it replaces `<assigned-worktree>`, and the
-child must edit there. The frozen task text names that path but no base
-revision, so whether the B role proceeds on it is **[nv]** until the capability
-gate observes it. A refusal is a retained failed attempt, never a reason to
+child must edit there. **Repair round (2026-09-27):** the same brief names that
+tree's exact base. The script replaces `<assigned-base>` with the full revision
+from `worktree_bases`, recorded privately before probes when the tree was
+prepared, and refuses to start without it. The role's refusal when `HEAD` is not
+the brief's base is kept. A and A0 reuse the identical task text, so they
+receive the same bound placeholders. Whether the Opus route proceeds on this
+brief is **[nv]** until the capability gate, which uses exactly this brief
+shape, observes it. A refusal is a retained failed attempt, never a reason to
 change task text after seeing results.
 
 Before each builder launch, from its prepared repository, retain the effective
@@ -361,7 +385,9 @@ codex exec -p stack-worker -m gpt-6-astra \
 `TASK_TEXT` is the JSON `task_text` with only its declared neutral placeholders
 bound: `<assigned-worktree>` to the frozen owned checkout/clone,
 `<retained-input>` to the retained source pathname, and `<run-token>` to
-`RUN_TOKEN`. Apply the same bindings in the Workflow args above. Check resolved
+`RUN_TOKEN`. Apply the same bindings in the Workflow args above. No Codex task
+text carries `<assigned-base>`; only the Workflow builder briefs bind it, from
+`worktree_bases`. Check resolved
 prompts against the JSON denylist; no receipt commands, tool names or lane
 guidance are appended. `IDENTITY` follows the frozen format.
 Record the actual exit status, start/end and `thread.started` ID separately.
