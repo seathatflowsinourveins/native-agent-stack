@@ -160,11 +160,30 @@ class NativeDataTests(unittest.TestCase):
         visible_failed = {key: value for key, value in failed.items() if key in fields}
         self.assertEqual(visible_failed, {"state": "unknown"})
 
-    def test_claude_prometheus_typed_panel_discloses_the_undercount(self):
-        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 10)
-        self.assertIn("undercount", (panel["title"] + " " + panel["description"]).lower())
-        self.assertEqual(panel["targets"][0]["expr"], "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)")
-        self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
+    def test_token_panels_sum_per_writer_rates_and_exclude_unscoped_writers(self):
+        # Each Claude session and Codex process is its own series (observability/collector/README.md#writer-identity-
+        # and-counter-integrity): a raw sum of cumulative counters follows series lifetimes, and an unscoped series is
+        # shared by several writers, so the panels sum per-writer rates and leave instance="unscoped" out.
+        panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
+        self.assertEqual(panels[10]["targets"][0]["expr"],
+                         '60 * sum by (type) (rate(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}'
+                         '[$__rate_interval]))')
+        self.assertEqual(panels[9]["targets"][0]["expr"],
+                         '60 * sum by (token_type) (rate(ecosystem_codex_turn_token_usage_sum{instance!="unscoped"}'
+                         '[$__rate_interval]))')
+        for pid in (9, 10):
+            with self.subTest(panel=pid):
+                panel = panels[pid]
+                self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
+                self.assertIn('instance="unscoped"', panel["description"])
+                self.assertNotIn("known to undercount", panel["title"])
+                self.assertNotIn("cause is open", panel["description"])
+
+    def test_activity_panel_includes_every_native_client_service(self):
+        expr = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 12)["targets"][0]["expr"]
+        for service in ("codex_exec", "codex_cli_rs", "codex-app-server", "claude-code", "claude-code-desktop"):
+            with self.subTest(service=service):
+                self.assertIn(service, expr.split('"')[1].split("|"))
 
     def test_loki_query_source_panels_cover_every_token_field(self):
         panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
@@ -207,7 +226,8 @@ class NativeDataTests(unittest.TestCase):
     def test_prometheus_effort_split_panel_present(self):
         panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 19)
         self.assertEqual(panel["targets"][0]["expr"],
-                         "sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total[$__rate_interval]))")
+                         'sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}'
+                         '[$__rate_interval]))')
         self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
         self.assertIn("effort", panel["title"].lower())
 

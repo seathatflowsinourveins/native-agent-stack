@@ -2,7 +2,7 @@
   "uid": "ecosystem-native",
   "title": "Native agent ecosystem",
   "schemaVersion": 39,
-  "version": 8,
+  "version": 9,
   "links": [
     {
       "type": "link",
@@ -26,7 +26,7 @@
   "panels": [
     {
       "id": 1,
-      "title": "Codex native token counters",
+      "title": "Codex turn tokens per minute",
       "type": "timeseries",
       "datasource": {
         "uid": "ecosystem-prometheus"
@@ -40,16 +40,16 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (token_type) (ecosystem_codex_turn_token_usage_sum)",
+          "expr": "60 * sum by (token_type) (rate(ecosystem_codex_turn_token_usage_sum{instance!=\"unscoped\"}[$__rate_interval]))",
           "legendFormat": "{{token_type}}"
         }
       ],
       "options": {},
-      "description": "Native exported per-turn histogram sums by token_type. Cached input is an input subset; reasoning output is an output subset. The native total series is separate; do not add all lines together."
+      "description": "Per-minute rate of the native per-turn histogram sums by token_type. A turn is recorded when it ends. Cached input is an input subset; reasoning output is an output subset; do not add all lines together. One series per writer: Claude sessions (session.id) and Codex processes (service.instance.id from the identity launcher) are summed at query time. Writers without an identity (instance=\"unscoped\") are excluded; the integrity panel counts them."
     },
     {
       "id": 2,
-      "title": "Claude native token counters",
+      "title": "Claude tokens per minute",
       "type": "timeseries",
       "datasource": {
         "uid": "ecosystem-prometheus"
@@ -63,12 +63,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)",
+          "expr": "60 * sum by (type) (rate(ecosystem_claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[$__rate_interval]))",
           "legendFormat": "{{type}}"
         }
       ],
       "options": {},
-      "description": "Native cumulative counters by type. Keep input, output, cacheRead and cacheCreation distinct; these are not a measured savings percentage or an invoice."
+      "description": "Per-minute rate of the native cumulative counters by type. Keep input, output, cacheRead and cacheCreation distinct; these are not a measured savings percentage or an invoice. One series per writer: Claude sessions (session.id) and Codex processes (service.instance.id from the identity launcher) are summed at query time. Writers without an identity (instance=\"unscoped\") are excluded; the integrity panel counts them."
     },
     {
       "id": 3,
@@ -395,6 +395,189 @@
         }
       },
       "description": "Counts observed receipt IDs with unreported usage. No data is not zero usage or proof that every task reached the receiver."
+    },
+    {
+      "id": 25,
+      "type": "stat",
+      "title": "Claude tokens (selected range)",
+      "description": "Prometheus increase over the selected range by type. One series per writer: Claude sessions (session.id) and Codex processes (service.instance.id from the identity launcher) are summed at query time. Writers without an identity (instance=\"unscoped\") are excluded; the integrity panel counts them. increase() extrapolates at the range edges, a few percent high for short-lived writers; the exact difference is increase(...[$__range] anchored) on a Prometheus started with promql-extended-range-selectors. Loki keeps the per-request events.",
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 8,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (type) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[$__range]))",
+          "instant": true,
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 26,
+      "type": "stat",
+      "title": "Codex turn tokens (selected range)",
+      "description": "Prometheus increase over the selected range by token_type; subsets are not additive. One series per writer: Claude sessions (session.id) and Codex processes (service.instance.id from the identity launcher) are summed at query time. Writers without an identity (instance=\"unscoped\") are excluded; the integrity panel counts them. increase() extrapolates at the range edges, a few percent high for short-lived writers; the exact difference is increase(...[$__range] anchored) on a Prometheus started with promql-extended-range-selectors. Loki keeps the per-request events.",
+      "gridPos": {
+        "x": 8,
+        "y": 50,
+        "w": 8,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (token_type) (increase(ecosystem_codex_turn_token_usage_sum{instance!=\"unscoped\"}[$__range]))",
+          "instant": true,
+          "legendFormat": "{{token_type}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 27,
+      "type": "stat",
+      "title": "Token telemetry integrity (selected range)",
+      "description": "Resets: the most resets of any one Claude token or cost series. A resumed session resets each of its series once; many resets on one series mean several writers share it. Dropped delta points and unscoped writer series should be 0: delta_to_cumulative rejected Codex points (shared stream or stream limit), and counters without a per-process identity. See the native-telemetry-integrity alert rules.",
+      "gridPos": {
+        "x": 16,
+        "y": 50,
+        "w": 8,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max(resets({__name__=~\"ecosystem_claude_code_token_usage_tokens_total|ecosystem_claude_code_cost_usage_USD_total\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "Most resets of one Claude series"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(increase(otelcol_deltatocumulative_datapoints{error!=\"\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "Dropped delta points"
+        },
+        {
+          "refId": "C",
+          "expr": "count(last_over_time({__name__=~\"ecosystem_claude_code_token_usage_tokens_total|ecosystem_codex_turn_token_usage_count\", instance=\"unscoped\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "Unscoped writer series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
     }
   ]
 }

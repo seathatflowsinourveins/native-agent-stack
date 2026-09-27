@@ -56,6 +56,132 @@ explicit in the client example. Adding a tracing database is a separate
 instrumentation and retention decision, not necessary for the accepted local
 monitoring loop. Do not collect prompt/tool bodies to make a dashboard prettier.
 
+## Writer identity and counter integrity
+
+Changed after `v2026.09.26.2`. A Prometheus series is identified by `job`
+(`service.name`), `instance` (`service.instance.id`) and the allowlisted data
+point labels. Before this change every Claude process and every directly
+launched Codex process was `instance="unscoped"`, so writers shared series:
+
+- Claude's cumulative counters from concurrent processes overwrote each other.
+  A raw sum showed whichever process wrote last; `increase()` read each
+  alternation as a reset. On the workstation on 2026-09-26 (14:51-15:51Z, with
+  concurrent sessions), `increase()` was 73 to 193 times the Loki `api_request`
+  sums per token type, with 7,216 counter resets.
+- Codex sends delta points. `delta_to_cumulative` rejects a point that is not
+  newer than its stream (`delta.ErrOutOfOrder`) or starts before it
+  (`delta.ErrOlderStart`). That hour it rejected about 3,518 of 8,160 points
+  (`increase()` estimates of its self-metric). A
+  window comparison with Loki cannot size the Codex loss, because Codex records
+  a turn's tokens when the turn ends; the proof compares completed processes.
+- The allowlist also merged streams inside one process: Claude token and cost
+  counters carry `agent.name`, `skill.name`, `mcp_server.name` and more,
+  Codex metrics carry `phase`, `feature` and others. `keep_keys` alone left
+  same-identity duplicates in one export.
+
+The profile now gives every writer its own series with upstream mechanisms:
+
+1. Claude sets `OTEL_METRICS_INCLUDE_SESSION_ID=true`, Claude Code's
+   documented default ([monitoring](https://code.claude.com/docs/en/monitoring-usage)),
+   in [its settings example](claude-settings.json.example) and
+   `adoption/templates/claude.settings.template.json`. `groupbyattrs/session`
+   moves `session.id` onto a resource of its own, and `transform/privacy`
+   makes it `service.instance.id` before the resource allowlist drops it. A
+   launcher-set `service.instance.id` is kept, with `/<session.id>` appended.
+   `/clear` assigns a new `session.id` in the same process, so each session is
+   a writer. A resumed session keeps its `session.id` in a new process, so each
+   of its type and cost series resets once; `increase()` handles that, and the
+   reset alert counts resets per series, so it stays silent. Cumulative
+   temporality stays: Prometheus expects it, and a Collector restart then loses
+   nothing.
+2. Codex (rust-v0.157.1) exports no per-process attribute on its metrics, but
+   its `opentelemetry_sdk` 0.31 `Resource::builder()` reads
+   `OTEL_RESOURCE_ATTRIBUTES` for metrics and logs. The
+   [identity launcher](codex-identity-launcher.sh.example), a local
+   integration, adds a fresh `service.instance.id`, then runs the real codex.
+   An inherited id (from a shell, worker or parent codex that set one) becomes
+   the prefix, `<inherited>/<fresh>`, so concurrent children of one parent stay
+   separate writers, as the repository's workers do for their subprocesses.
+   The Loki records of that process carry the same value as
+   `service_instance_id`.
+3. In `transform/privacy`, `aggregate_on_attributes("sum", <allowlist>)` adds
+   together the sum and histogram streams that the allowlist collapses
+   (delta points only when they share start and end times). Gauges and
+   summaries keep plain `keep_keys`.
+4. The Collector's Prometheus exporter sends each stream's start time.
+   Prometheus runs with `created-timestamp-zero-ingestion`, so a new
+   per-process series starts from an injected zero and its first sample
+   counts toward `increase()`, and with `promql-extended-range-selectors` for
+   exact `increase(x[w] anchored)` windows (see the
+   [backends README](../backends/README.md)).
+5. Dashboards use `rate()` and `increase()` summed over writers and exclude
+   `instance="unscoped"`. The `native-telemetry-integrity` alert group watches
+   counter resets, dropped delta points and unscoped writers.
+6. Per-process series multiply the Codex histogram buckets, which no dashboard
+   or rule reads. The `collector-native` scrape drops them with
+   `metric_relabel_configs`, keeping every `_sum` and `_count` and the
+   `turn_token_usage` buckets, so the size-based retention
+   (`--storage.tsdb.retention.size=512MB`) does not shorten the history of the
+   other jobs in this Prometheus.
+
+Install the launcher in place of the codex link on `PATH`, and run it again
+after every Codex version switch, because the switch re-links `bin/codex`:
+
+```bash
+# Only over the bootstrap's absolute link (e.g. to $ECO_ROOT/tools/codex-0.157.1/bin/codex):
+# if bin/codex is already a launcher, or its target is not executable, nothing changes.
+link="$ECO_ROOT/bin/codex"
+test -L "$link" && real="$(readlink "$link")" && [ -x "$real" ] \
+  && sed "s#@CODEX_BIN@#$real#" observability/collector/codex-identity-launcher.sh.example > "$link.tmp" \
+  && chmod 0755 "$link.tmp" && mv -f "$link.tmp" "$link" && "$link" --version
+```
+
+On a host that already runs the previous profile, the
+[host recipe](../../evidence/artifacts/telemetry-writer-identity-20260926/host/)
+does every step: `apply.sh` renders the configs with the repository renderers
+and this host's port overrides, validates them (`otelcol-contrib validate`,
+`promtool`, `systemd-analyze verify`, the launcher's `--version` against the
+real codex) and shows each diff. Any failed check stops it before the first
+change. `apply.sh --apply` then copies every file it replaces to
+`${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/g1-writer-identity/backup-<UTC>/`
+(mode 0700, outside `/tmp`), installs, restarts Prometheus and the Collector,
+reads both back and prints the rollback command when a read-back fails. It
+reads the running services back on every `--apply`, also a rerun whose files
+are already in place, and restarts one that started before its files or lacks
+part of the change. Prometheus is read at the port of its rendered unit.
+`rollback.sh` restores the newest backup, all or nothing. `prove.sh` is the
+read-only host acceptance check whose conditions the decision record below
+lists; run it at least 3.5 minutes after the scenario's processes finish.
+
+Privacy and cost: `session.id`, a random UUID, becomes the `instance` label
+and the Loki `session_id` field. It was already on the log allowlist, and
+account identifiers stay dropped. Each Claude session and Codex process now
+has its own series. The exporter drops a series five minutes after its writer
+stops (`metric_expiration`), and `delta_to_cumulative` keeps at most 10,000
+streams for an hour. Under the one shared identity before the change, 1,388
+of the 1,512 `codex_exec` series were histogram buckets (read-only count,
+kept in the [before-change receipt](../../evidence/artifacts/telemetry-writer-identity-20260926/host-before-20260926.json));
+the bucket drop above keeps per-process growth to the `_sum`, `_count` and
+counter series. `prove.sh` reports head series, storage against the size
+limit, size-based deletions and tracked delta streams.
+
+A synthetic run (local integration, not host evidence) sent identical OTLP
+input from three Claude-like and three Codex-like concurrent writers through
+the old and new profiles on the pinned binaries. Old profile: 4 Claude
+resets, totals 51 percent low, 24 of 70 delta points dropped, Codex totals
+6.7 percent low. New profile: 0 resets, 0 dropped points, and exact totals
+from `increase(... anchored)`. Plain `increase()` was 3.0 percent high: it
+extrapolates at the window edge after a writer stops. The
+[decision record](../../docs/decisions/2026-09-26-telemetry-writer-identity.md)
+keeps the sources, both measurements, the alternatives and what would overturn
+this choice.
+
+Limits: a session started before the settings change stays `unscoped` until
+it exits. A codex started from the real binary instead of `bin/codex` gets no
+id of its own: `unscoped`, or the id it inherited, shared with its parent. A
+Codex version switch re-links `bin/codex` and removes the launcher until it is
+installed again.
+
 ## SDK result receipts
 
 `file_log/sdk_receipts` uses the upstream file receiver and JSON parser to ingest

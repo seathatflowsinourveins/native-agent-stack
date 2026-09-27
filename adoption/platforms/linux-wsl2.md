@@ -190,7 +190,11 @@ upstream behavior behind each.
 - The observability backend renders fixed loopback ports. When another
   distribution holds one, run `observability/backends/configure.py` with
   `--port-overrides` (changed after `v2026.09.25.2`, which lacks the option).
-  The renderer keeps the map, so a later re-render does not reset the moved ports; see
+  The renderer keeps the map, so a later re-render does not reset the moved ports.
+  Its Prometheus unit also changed after `v2026.09.26.2`: it adds
+  `--enable-feature=created-timestamp-zero-ingestion,promql-extended-range-selectors`
+  for per-process token counters, and its `ecosystem-prometheus.yml` drops the
+  per-process Codex histogram buckets at scrape. See
   [its README](../../observability/backends/README.md).
 - vLLM listens on a wildcard port even with `--host 127.0.0.1`. vLLM 0.25.0
   initializes `torch.distributed` over TCP on a single GPU too (its
