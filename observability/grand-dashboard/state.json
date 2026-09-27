@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-26T18:18:50Z",
+  "recorded_at_utc": "2026-09-27T23:59:19Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -291,6 +291,13 @@
       "title": "GitHub host request lane (other PCs to the workstation)",
       "state": "live / workstation poll timer every 10 min / 0 workstation requests / 2 mac-coordinator requests open (274 and 276)",
       "evidence_ref": "recipes/host-request-lane.md"
+    },
+    {
+      "kind": "gate",
+      "id": "codex-capability-gate",
+      "title": "Codex worker capability gate (issue 381 jcodemunch / ai-memory F7 / M13 binding)",
+      "state": "3 of 3 round-2 receipts pass 2026-09-27 at main eb5ca78a / results re-scored 280 of 280 / GPT-6 review agree / M13 40 of 40 own tree / controls as predicted",
+      "evidence_ref": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--context-mode--use--20260927-2.json"
     }
   ],
   "workers": [
