@@ -10,6 +10,16 @@
   "mcp_readonly_mounts": [
     "<private existing MCP executable/dependency directory>"
   ],
+  "egress": {
+    "control": {
+      "network": "rw-openhands-egress-control",
+      "policy_receipt": "<private current host firewall verification receipt>"
+    },
+    "engines-on": {
+      "network": "rw-openhands-egress-engines-on",
+      "policy_receipt": "<private current host firewall verification receipt>"
+    }
+  },
   "qmd_collections": {
     "foundation-docs": "<private foundation docs directory>",
     "foundation-adoption": "<private adoption directory>",

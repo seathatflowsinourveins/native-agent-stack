@@ -33,15 +33,21 @@
     }
   },
   "requirements_sha256": "c4ca55604ea0bc85e74ccaa8b2c5bf9fa7b17cec35b830eda653025cb90ebd56",
-  "build_requirements_sha256": "4485df6339240d8551488bb18f27e644e8bd55d7d50bf439ca9d9da03ab7318a",
+  "build_requirements_sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
   "grader": {
     "repository": "https://github.com/OpenHands/benchmarks",
     "commit": "405bae7140d7e961a75f4910a0b2e7069731db96",
     "sdk_submodule_commit": "43376f1868ffd702746080714a59c16d3f69ec12",
     "swebench_version": "4.1.0",
     "swebench_wheel_sha256": "1243776f720047cc9e20a427f7a52b75c13a07abda6154fb60fe77f82ec8af57",
-    "installation": "make build",
+    "installation": "uv sync --locked --dev --no-build-isolation --inexact with hashed build-requirements.lock",
+    "uv_lock_sha256": "287a42d2157d044ca0f5e723fe3a05c1e4bdf6413049370360226374db6d7e8c",
+    "lock_source": "OpenHands/benchmarks@405bae7140d7e961a75f4910a0b2e7069731db96 uv.lock; Makefile:33-42",
+    "uv_version": "0.12.17",
+    "uv_source": "adoption/pins-linux-x86_64.json uv archive; astral-sh/uv@0.12.17",
+    "build_source": "OpenHands/software-agent-sdk@43376f1868ffd702746080714a59c16d3f69ec12 openhands-sdk/pyproject.toml:36-38; tools:26-28; agent-server:27-29; workspace:19-21",
     "verdict": "swebench.harness.run_evaluation official Docker tests and resolved_ids",
+    "evaluation_image": "Required per-instance digest in frozen OPENHANDS_GRADER_IMAGE_FILE; no task or digest selected in this worktree",
     "runner_up": {
       "repository": "https://github.com/harbor-framework/harbor",
       "tag": "v0.23.0",

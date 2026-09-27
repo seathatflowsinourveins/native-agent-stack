@@ -69,18 +69,42 @@ def render_mcp(variables):
     return config
 
 
-def llm_config(config, model=None):
+def arm_config(arm="control", model=None, base_url=None):
+    """Round-3 common contract; provider prefix belongs to LiteLLM only.
+
+    SDK@fcc102a llm/llm.py:442-446; coordinator's 2026-09-27 one-slash probe.
+    Entry-gateway model matching is explicit: OmniRoute logs the routed model.
+    """
+    if arm not in {"control", "engines-on"}:
+        raise ValueError("unknown_arm")
+    port = 20128 if arm == "control" else 20129
+    selected = model or ("cx/gpt-6-astra-max" if arm == "control" else "sharedgw/gpt-6-astra-max")
+    valid = (isinstance(selected, str) and re.fullmatch(r"cx/gpt-6(?:-[a-z0-9]+)*", selected)
+             if arm == "control" else selected == "sharedgw/gpt-6-astra-max")
+    if not valid:
+        raise ValueError("gateway_requires_gpt6_route_for_selected_arm")
+    expected_url = f"http://10.0.2.2:{port}/v1"
+    if base_url is not None and base_url != expected_url:
+        raise ValueError("base_url_must_match_arm")
+    return {"arm": arm, "requested_model": selected, "base_url": expected_url,
+            "gateway_port": port, "gateway_model": selected.split("/", 1)[1],
+            "gateway_path": "/v1/responses",
+            "headers": {"x-omniroute-compression": "allow-lossy"} if arm == "engines-on" else {}}
+
+
+def llm_config(config, model=None, *, arm="control", base_url=None):
     result = dict(config["llm"])
-    selected = model or result["model"]
-    if not isinstance(selected, str) or not re.fullmatch(r"cx/gpt-6(?:-[a-z0-9]+)*", selected):
-        raise ValueError("gateway_requires_gpt6_route")
+    selected = arm_config(arm, model, base_url)
+    if result.get("reasoning_effort") != "max":
+        raise ValueError("max_reasoning_effort_required")
     if result.get("temperature") is not None and result["temperature"] <= 0.1:
         raise ValueError("gateway_temperature_must_exceed_0_1_or_be_omitted")
     if result.get("response_format") is not None or result.get("native_tool_calling") is not True:
         raise ValueError("use_native_tool_calling_for_structured_output")
     # LiteLLM strips its openai provider prefix; the gateway receives selected.
-    result["model"] = "openai/" + selected
-    result["base_url"] = config["runtime"]["gateway_base_url"]
+    result["model"] = "openai/" + selected["requested_model"]
+    result["base_url"] = selected["base_url"]
+    result["extra_headers"] = selected["headers"]
     return result
 
 

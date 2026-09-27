@@ -142,3 +142,80 @@ The pending shared installer PR must still confirm its exact output contract.
 
 These new corrections remain recipe-local under the assigned file ownership;
 the coordinator can promote general entries into docs/harness-defaults.md.
+
+## Round 3: native dispatch, arm repair and trust boundaries (2026-09-27)
+
+Inputs were the coordinator's rw3 OpenHands review, security review, integration
+research and common requirements. The common requirements supersede the older
+two-slash route and downstream-20128 counting suggestions. Eight Claude findings
+were present (five major, three minor); no blocker was listed. Security finding
+numbers in the verification record are their one-based positions in the review.
+
+The installed client was inspected first: Python 3.13.15, uv 0.12.17,
+curl 8.5.0, gh 2.101.0 and Git 2.43.0. Docker and OpenHands were not found on
+PATH; the current interpreter had no OpenHands SDK package. These are scoped
+observations, not claims that the host lacks them. The GitHub v1.49.6 release
+was read, followed by pinned source files using read-only gh api calls.
+Shell-network gh calls failed; Context Mode's read-only gh transport succeeded.
+The skills.sh leaderboard was inspected for discovery. The installed tdd,
+verification-before-completion, search-first and find-skills instructions were
+used subject to the user's no-delegation/no-install rule. No package or skill
+was installed, no container was started, and neither gateway was contacted.
+
+The existing maintained SDK/server pin remains the selected source. No new
+agent loop, HTTP server, grader, model client or verdict implementation was
+introduced. The new dispatch adapter performs the recommended native REST
+start/get/final-response operations and retains host status, cancellation and
+official grading around them. It is an integration adaptation, not unchanged
+upstream execution.
+
+### Source index used by the repair
+
+Each numbered source names the repository, pin and exact file/line scope.
+Abbreviated pins elsewhere in this recipe resolve to these entries.
+
+| ID | Primary source | Behavior used |
+| --- | --- | --- |
+| R1 | [OpenHands/software-agent-sdk@fcc102a697874d54a357e36004e02c95040dbdc0 openhands-agent-server/openhands/agent_server/conversation_router.py:72-86,105-228,257-321](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-agent-server/openhands/agent_server/conversation_router.py#L72-L321) | Native serialization example, count/search, get/final response, start and interrupt. |
+| R2 | [Same SDK pin, openhands-sdk/openhands/sdk/conversation/request.py:64-72,105-147,212-228,317-347](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/conversation/request.py#L64-L347) | run=true, required workspace, bound iterations, tags/hooks and Agent validation. |
+| R3 | [Same SDK pin, openhands-agent-server/openhands/agent_server/__main__.py:74-135,240-285](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-agent-server/openhands/agent_server/__main__.py#L74-L135) | Supported module preloading, including PyInstaller; authenticated bind default. |
+| R4 | [Same SDK pin, openhands-agent-server/openhands/agent_server/docker/Dockerfile:7-9,301-305,343,570-590](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-agent-server/openhands/agent_server/docker/Dockerfile#L570-L590) | UID/GID 10001 and distinct source/binary ENTRYPOINTs. |
+| R5 | [Same SDK pin, openhands-sdk/openhands/sdk/llm/llm.py:442-446,1130-1138,1588-1642](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/llm/llm.py#L1130-L1138), [llm/options/common.py:26-46](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/llm/options/common.py#L26-L46), [agent/base.py:739-775](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/agent/base.py#L739-L775) | Raw response, public call kwargs, header merging and exact native LLM registration. |
+| R6 | [Same SDK pin, openhands-sdk/openhands/sdk/utils/pydantic_secrets.py:24-37,48-68](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/utils/pydantic_secrets.py#L24-L68) | Explicit serialization context for the fixed keyless gateway placeholder. |
+| R7 | [BerriAI/litellm@v1.93.0 litellm/llms/openai/responses/transformation.py:262-272](https://github.com/BerriAI/litellm/blob/v1.93.0/litellm/llms/openai/responses/transformation.py#L262-L272) | Returned headers in raw_response._hidden_params. |
+| R8 | [OpenHands/benchmarks@405bae7140d7e961a75f4910a0b2e7069731db96 Makefile:33-42](https://github.com/OpenHands/benchmarks/blob/405bae7140d7e961a75f4910a0b2e7069731db96/Makefile#L33-L42), [pyproject.toml:6,97-99](https://github.com/OpenHands/benchmarks/blob/405bae7140d7e961a75f4910a0b2e7069731db96/pyproject.toml#L97-L99), [.python-version:1](https://github.com/OpenHands/benchmarks/blob/405bae7140d7e961a75f4910a0b2e7069731db96/.python-version#L1), uv.lock | Native sync, build requirements, Python selection; unchanged lock SHA256 287a42d2157d044ca0f5e723fe3a05c1e4bdf6413049370360226374db6d7e8c. Installed uv 0.12.17 sync --help confirms --python, --locked, --no-build-isolation and --inexact. |
+| R9 | [OpenHands/software-agent-sdk@43376f1868ffd702746080714a59c16d3f69ec12 openhands-sdk/pyproject.toml:36-38](https://github.com/OpenHands/software-agent-sdk/blob/43376f1868ffd702746080714a59c16d3f69ec12/openhands-sdk/pyproject.toml#L36-L38); openhands-tools/pyproject.toml:26-28; openhands-agent-server/pyproject.toml:27-29; openhands-workspace/pyproject.toml:19-21 | The separate benchmark submodule requires setuptools>=61 and wheel. Retain its pin and the recipe's hashed build tools. |
+| R10 | [SWE-bench/SWE-bench@v4.1.0 swebench/harness/test_spec/python.py:271-292](https://github.com/SWE-bench/SWE-bench/blob/v4.1.0/swebench/harness/test_spec/python.py#L271-L292), [test_spec/test_spec.py:106-120](https://github.com/SWE-bench/SWE-bench/blob/v4.1.0/swebench/harness/test_spec/test_spec.py#L106-L120), [docker_build.py:516-524](https://github.com/SWE-bench/SWE-bench/blob/v4.1.0/swebench/harness/docker_build.py#L516-L524), [reporting.py:127-157](https://github.com/SWE-bench/SWE-bench/blob/v4.1.0/swebench/harness/reporting.py#L127-L157) | Branch exceptions, history boundary, instance tag/name, unchanged container resources and official verdict report. |
+| R11 | [docker/docker-py@7.1.0 docker/models/resource.py:28-33](https://github.com/docker/docker-py/blob/7.1.0/docker/models/resource.py#L28-L33) | Image.id identity check before official container creation. |
+| R12 | [docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f content/manuals/engine/network/firewall-iptables.md:22-24,48-95](https://github.com/docker/docs/blob/4e9a5751518ed8223a8dcde53693badddd72604f/content/manuals/engine/network/firewall-iptables.md#L22-L95), [port-publishing.md:186-192](https://github.com/docker/docs/blob/4e9a5751518ed8223a8dcde53693badddd72604f/content/manuals/engine/network/port-publishing.md#L186-L192) | DOCKER-USER policy and internal-bridge host reachability. Rootless namespace placement and effective filtering are host gates, not established here. |
+| R13 | [diegosouzapw/OmniRoute@a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 src/lib/usage/callLogs.ts:646-653](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L646-L653), [src/sse/handlers/chatHelpers.ts:1172-1184](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatHelpers.ts#L1172-L1184) | Encrypted-reasoning effort fields and X-Correlation-Id response header. Entry database/model values follow the common contract and require verification against the host's patched build. |
+| R14 | [Same OmniRoute pin, src/app/api/analytics/compression/route.ts:13-24](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/analytics/compression/route.ts#L13-L24), [src/lib/db/compressionAnalytics.ts:52-55](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts#L52-L55) | Authenticated since=all snapshot; separate totalRequests/totalTokensSaved delta. |
+| R15 | [git/git@v2.43.0 Documentation/git.txt:708-724](https://github.com/git/git/blob/v2.43.0/Documentation/git.txt#L708-L724), [Documentation/diff-options.txt:830-840](https://github.com/git/git/blob/v2.43.0/Documentation/diff-options.txt#L830-L840) | Disable system/global config and external diff/textconv during host patch export. |
+| R16 | [SDK@fcc102a697874d54a357e36004e02c95040dbdc0 openhands-tools/openhands/tools/terminal/terminal/subprocess_terminal.py:144-170](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-tools/openhands/tools/terminal/terminal/subprocess_terminal.py#L144-L170) | Terminal inherits process environment and UID. A writable SDK trace is not independent evidence. |
+| R17 | Repository baseline 17460572, adoption/bootstrap-linux.sh:240,439,457 and adoption/pins-linux-x86_64.json; scripts/validate.py:25-29 | Selected node/python-tool mount layout and publication identifier policy. No other lane's files changed. |
+| R18 | [python/cpython@v3.13.15 Doc/library/os.rst:1087-1092,1272-1296,1317-1373](https://github.com/python/cpython/blob/v3.13.15/Doc/library/os.rst#L1272-L1373) | Descriptor-relative opens, platform no-follow/directory flags and descriptor stat used by the bounded reader. Linux symlink/FIFO rejection is exercised locally. |
+
+### Round-3 corrections and remaining decisions
+
+| Finding or mistaken assumption | Correction and verification path |
+| --- | --- |
+| Older review used sharedgw/cx/... and proposed counting engines-on at 20128. | The common contract overrides both: one slash, entry 20129 only for engines-on. Round 01/02 red-green tests; host matching remains unobserved. |
+| Integration research assumed the source image ENTRYPOINT and found no per-call extension. | Pinned R3/R4 show the binary ENTRYPOINT and supported module preload. Preserve ENTRYPOINT; preload the transport wrapper. No native startup claim. |
+| Default model_dump was assumed to serialize the dummy gateway key. | R6 masks secrets by default. Explicit expose_secrets serializes only the fixed placeholder; server auth is not in the request body. |
+| A guessed Dockerfile path returned not-found. | Resolved the pinned repository tree to R4; the failed path was not absence evidence. |
+| Guessed node22 and uv-tools paths did not match adoption. | R17 requires node24.21.0 and python-tools. Resolved-path allowlist tests cover the corrected selected roots. |
+| An initial host-green run failed on a lazy e2e import after the test loader restored sys.path. | Moved the shared import to module load. Preserve both failed and passing runs in round3-commands.json. |
+| Duplicate start could release the running attempt's reservation. | A red-green lifecycle control now retains status/reservation and never resubmits the POST. |
+| Retrying result after collection could replace the official receipt with a transport failure. | Round 16 reproduced the overwritten-verdict path; collected results now return the retained host receipt without another API/grader call. Native result retrieval is a GET (R1). |
+| Result could proceed without confirmed server removal. | Red-green export control now stops before Git/grading until the exact owned server is gone. |
+| Literal synthetic UUIDs triggered the publication session-data rule. | Reuse that rule in the unit test; construct the fixture UUID at runtime. Round 14 red/green retains the original failure with the synthetic value redacted. The shared validator is unchanged. |
+| Upstream .python-version selects 3.12 while the recipe seeds build tools into 3.13. | Explicit --python keeps uv sync on the seeded interpreter (R8, installed help); round 15 red/green catches omission. This prevents ambiguous selection; no interpreter replacement was executed or observed here. |
+| Trace persistence shares the model terminal's UID (R16). | Bounded no-follow reads, untrusted labels and evidence_complete=false. Separate observer qualification is declined in this round because no tested source-backed deployment is available. Native dispatch does not currently export the legacy standalone callback trace. |
+| Host-loopback protection cannot be inferred from rootless mode, internal networks or MCP filters. | Disable remote MCPs, require scoped networks plus fresh external probe evidence. DOCKER-USER is source-backed (R12); its host rootless realization is deferred. A JSON assertion alone is not firewall proof. |
+| A pinned top-level grader is not a dependency/build lock. | Check upstream uv.lock bytes; hash-seed build tools; locked nonisolated sync with pinned uv; no pre-commit hook install. Grader host build execution remains a disclosed declined part of S7. |
+| Official grading options had local memory/CPU/PID changes. | Remove them per R10/common requirements. Digest identity gates/names/labels are transport adaptations; no grading-equivalence claim until official controls run. |
+
+The evidence remains offline adapter/synthetic evidence. Full upstream acceptance,
+independent trace qualification, rootless filtering, installed imports and model
+behavior are not inferred from these tests. General anti-pattern promotion and
+evidence hash registration remain coordinator-owned.

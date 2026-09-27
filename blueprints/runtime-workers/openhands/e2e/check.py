@@ -76,6 +76,8 @@ def main():
         print(json.dumps({"transport_error": "missing_or_malformed_output", "upstream_resolved": None}))
         return 2
     print(json.dumps(result))
+    if result.get("upstream_bucket") in {"error_ids", "incomplete_ids"}:
+        return 3
     return 0 if args.input or result["upstream_resolved"] else 1
 
 

@@ -1,325 +1,353 @@
 # OpenHands coding runtime worker
 
-This recipe uses OpenHands SDK **1.49.6** for one frozen SWE-bench coding task
-through OmniRoute. **Official SWE-bench 4.1.0 supplies the task verdict**, using
-the conversion and grading pipeline selected by OpenHands/benchmarks at
-405bae7140d7e961a75f4910a0b2e7069731db96. [check.py](e2e/check.py) only validates
-transport and relays the official report. Local contract tests cannot establish
-an upstream E2E pass.
+Round 3 provides a source-backed **native agent-server REST dispatch** for a
+frozen SWE-bench task with two explicit gateway arms. SDK/server **1.49.6** owns
+the agent loop. **SWE-bench 4.1.0** alone supplies the task verdict through the
+pinned OpenHands/benchmarks converter and official Docker harness. This repair
+ran offline contract tests only. No installation, container, model, gateway
+request or official grading run was performed.
 
-Round 2 is **awaiting host execution and the coordinator's skills PR**. No
-package was installed, container/service started, model called, or upstream
-grader executed in this build. The SDK owns the agent loop, tools, skills,
-native trace and condensation. All agent/LLM/MCP execution stays in an owned
-container; the grader uses separate official test containers. The worker never
-receives this checkout, the frozen oracle row, or a Docker socket.
+**Host acceptance is still open.** A verified firewall is required before model
+execution. SDK trace, skill and version files remain worker-reported because the
+terminal shares the server's UID. They cannot establish independent acceptance;
+`evidence_complete` deliberately stays false until an independent observer is
+qualified. A resolved official task therefore currently exits 2, not 0. This is
+an explicit acceptance gap, not a failed model task.
 
-## Sources, pins and installation
+[research.md](research.md) records primary-source checks and corrections.
+[round3-verification.md](evidence/round3-verification.md) records every applicable
+finding and the exact offline commands, outputs and exit codes. Earlier rounds
+remain historical evidence; their standalone/no-listener descriptions are
+superseded by this round.
 
-[pins.json](pins.json) keeps the worker's existing artifact pins and the new
-grader pins. [research.md](research.md) records research and corrections.
+## Sources and installation
 
-| Component | Exact selected pin | Role |
+| Component | Pin | Purpose |
 | --- | --- | --- |
-| OpenHands Software Agent SDK | v1.49.6 / fcc102a697874d54a357e36004e02c95040dbdc0 | Standalone coding worker |
-| OpenHands/benchmarks | 405bae7140d7e961a75f4910a0b2e7069731db96 | Native output conversion and official grading integration |
-| Benchmark SDK submodule | 43376f1868ffd702746080714a59c16d3f69ec12 | Preserved in the benchmark's separate environment |
-| SWE-bench | 4.1.0 | Official Docker tests and resolved_ids verdict |
-| Harbor, runner-up | v0.23.0 | Not selected: Terminal-Bench has a different task contract |
+| OpenHands/software-agent-sdk | `fcc102a697874d54a357e36004e02c95040dbdc0`, v1.49.6 | Native SDK request types and agent-server |
+| Agent-server image | `ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37` | Linux amd64 binary server and Python runtime |
+| OpenHands/benchmarks | `405bae7140d7e961a75f4910a0b2e7069731db96` | Official conversion and grading commands |
+| Benchmark SDK submodule | `43376f1868ffd702746080714a59c16d3f69ec12` | Unchanged separate grader dependency |
+| SWE-bench | v4.1.0 | Official tests and `resolved_ids` |
+| uv for host grader installation | 0.12.17 | Existing adopted executable; no automatic installation |
 
-The two SDK revisions are intentionally separate. The grader environment keeps
-the report's exact submodule; it does not silently upgrade to the worker SDK.
-The worker's inference is an explicitly local adaptation of the [standalone
-example][hello] and the benchmark's [issue prompt and patch export][benchmark-infer].
-It is not an unchanged swebench-infer run. The official grader's patch
-application, tests, scoring and report logic remain unchanged.
+The native server uses the image's **own ENTRYPOINT**. The published binary target
+is `openhands-agent-server/openhands/agent_server/docker/Dockerfile:580-590`.
+The source target at lines 570-576 has a
+different ENTRYPOINT. Do not assume the image contains the source-target venv.
+Request generation uses the separately installed SDK/tools wheels in the same
+image, with network disabled. [pins.json](pins.json) preserves the image, wheel
+and runtime lock hashes. No framework version changed in round 3.
 
-The primary fits this coding task because its converter accepts actual
-OpenHands patches and invokes the official SWE-bench harness.
-[Harbor's OpenHands adapter][harbor] is a maintained alternative; selecting its
-Terminal-Bench tasks would change the oracle. Stars and installation counts
-were discovery signals only. This choice follows the supplied eval-framework
-reports, particularly report2's W8a mapping.
+[install.sh](install.sh) installs the worker through the existing hash-required
+wheel/runtime locks and preinstalled hashed build tools. The install container
+can write only the worker venv and owned cache; the recipe snapshot is mounted
+read-only with no writable parent alias. The installer uses container root for
+these owned writes; model processes use upstream UID/GID 10001.
 
-[install.sh](install.sh) preserves the round-1 worker installation: the
-[official package path][getting-started], pinned published SDK/tools wheels,
-[requirements.lock](requirements.lock), [build-requirements.lock](build-requirements.lock),
-and a content-addressed agent-server image, used as a Python runtime with its
-server entrypoint replaced. [install-container.sh](install-container.sh) runs
-inside that image. The source archive, upstream lock, requirements and image
-configuration hashes are verified before use. The image is:
+[install-grader.sh](install-grader.sh) retains the pinned host checkout/submodule
+and uses the upstream Makefile's `uv sync --dev` operation with supported
+`--locked --no-build-isolation --inexact` flags. It first installs hashed build
+requirements, verifies the unchanged upstream `uv.lock` hash, checks uv 0.12.17,
+sets `UV_PYTHON_DOWNLOADS=never`, explicitly selects the seeded venv interpreter
+with `--python`, and checks the final SWE-bench version. The upstream
+`.python-version:1` selects 3.12; the explicit interpreter keeps the recipe's
+3.13 environment and its hashed build tools together. The
+Makefile's unrestricted sync and development-hook installation are not invoked.
+Sources: OpenHands/benchmarks@405bae7 `Makefile:33-42`, `pyproject.toml:97-99`;
+SDK@43376f1 package build-system sections listed in pins.json; installed
+`uv 0.12.17 sync --help`. Host build execution remains a disclosed residual;
+containerizing this host-side grader without changing its interpreter/Docker
+transport has not been qualified.
 
-~~~text
-ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37
-~~~
+Prefix: `$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6`.
+Private state: `$HOME/.local/state/native-agent-stack/runtime-workers/openhands`.
+Failed attempts are retained. The coordinator runs installation and acceptance.
 
-It selects Linux amd64 manifest
-ec7ed86f4021a21e161815853156521b44929d913f2e6ee06a173ef2f660aa12
-and image config 39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f.
-The image metadata records Python 3.13.15 and uv 0.12.15. No image was pulled
-here. The retained [wheel/source comparison](evidence/wheel-source-comparison.json)
-is artifact evidence only.
+## Arms
 
-The worker install follows the upstream lock's dependency export plus hashed
-published wheels. It bootstraps locked build tools before the hash-required
-install without build isolation; func-timeout is an sdist. Installation checks
-package versions/imports, not model behavior. SDK source builds, published binary
-images and importable wheels are different installation paths; this recipe
-retains the qualified artifact choices from round 1.
+`OPENHANDS_ARM=control|engines-on` defaults to `control`. `--arm` overrides it.
+`OPENHANDS_MODEL` and `OPENHANDS_BASE_URL` are optional explicit overrides that
+must match the selected arm. The control arm retains the existing `cx/gpt-6-*`
+variant support; the engines-on arm admits only the exact one-slash route below.
+LiteLLM prepends `openai/` for its provider selection.
 
-[install-grader.sh](install-grader.sh), called by the host installer, clones
-OpenHands/benchmarks into the owned prefix, checks out the exact commit,
-initializes its submodules and runs **make build**, the [documented install][benchmark-install].
-The [pinned Makefile][benchmark-make] runs uv sync --dev and installs its own
-development hooks in that isolated checkout. The script verifies the submodule
-before and after installation, refuses tracked modifications, checks that
-uv.lock/pyproject.toml did not drift, and verifies swebench==4.1.0. Grader source
-and SDK state remain separate from this repository. No alternative grader is
-installed as fallback.
+| Arm | Container base URL | Requested model | Compression header |
+| --- | --- | --- | --- |
+| control | `http://10.0.2.2:20128/v1` | `cx/gpt-6-astra-max` | absent |
+| engines-on | `http://10.0.2.2:20129/v1` | `sharedgw/gpt-6-astra-max` | `x-omniroute-compression: allow-lossy` |
 
-The prefix is $HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6;
-private state is $HOME/.local/state/native-agent-stack/runtime-workers/openhands.
-Every trial gets a fresh attempt directory. Failed attempts remain available.
-The grader source install has its own isolated venv and cache. The worker venv's
-interpreter link resolves inside the pinned image, not necessarily on the host.
+Both arms use Responses, `reasoning_effort=max`, native function tools, omitted
+temperature, a 40-iteration limit and a 1,200-second conversation deadline.
+Configured effort other than max, a cross-arm URL/model pairing, Claude routes,
+two-slash gateway slugs and JSON response-format modes are refused.
 
-## Model and gateway contract
+The exact switches are:
 
-[config/worker.json](config/worker.json) selects **cx/gpt-6-astra-max** for the
-coding/judgment loop and condenser. OPENHANDS_MODEL can select another cx/gpt-6
-family alias; [recipe.py](recipe.py) rejects Claude and other model families.
-OmniRoute does not serve claude-opus-5-5. The official SWE-bench grader is
-deterministic and makes no LLM judgment request.
+```sh
+export OPENHANDS_ARM=control
+export OPENHANDS_MODEL=cx/gpt-6-astra-max
+export OPENHANDS_BASE_URL=http://10.0.2.2:20128/v1
+```
 
-| Setting | Native SDK interface | Recipe behavior |
+```sh
+export OPENHANDS_ARM=engines-on
+export OPENHANDS_MODEL=sharedgw/gpt-6-astra-max
+export OPENHANDS_BASE_URL=http://10.0.2.2:20129/v1
+```
+
+No separate compression toggle is needed. The arm adds/removes the header.
+The receipt stores the arm, base URL, requested/routed model, expected path and
+**header names only**. A stable `x-omniroute-session` binds the conversation and
+condenser. `server_transport.py` loads through the native `--import-modules`
+option and supplies a fresh Idempotency-Key per logical `generate/agenerate`
+call, retaining upstream retries and exact native LLM types. It also captures
+returned correlation IDs privately where LiteLLM exposes response headers.
+Sources: SDK@fcc102a `llm/llm.py:442-446,1130-1138,1588-1642`,
+`llm/options/common.py:26-46`, `agent/base.py:739-775`,
+`agent_server/__main__.py:74-135,240-273`; LiteLLM@v1.93.0
+`litellm/llms/openai/responses/transformation.py:262-272`.
+
+## Workflow dispatch
+
+The coordinator first installs the recipe, supplies the frozen task and image
+pin, completes the network gate described below, and prepares **one arm at a
+time**. Preparation clones the task at its SWE-bench base-commit branch,
+installs the shared project skills, builds the scoped lexical QMD index,
+serializes the native request and starts the authenticated native server.
+Preparation can be long and belongs in a background Bash task. The skills
+manifest/installer PR must be available; there is no global-skill fallback.
+
+Set these private inputs outside all worktrees:
+
+- `OPENHANDS_HOST_FILE`: filled mode-0600 [host template](config/host.example.json).
+- `OPENHANDS_STACK_ROOT`: stack checkout with the shared skill installer/manifest.
+- `OPENHANDS_TASK_FILE`, `OPENHANDS_TASK_SHA256`: frozen original SWE-bench row.
+- `OPENHANDS_GRADER_IMAGE_FILE`, `OPENHANDS_GRADER_IMAGE_SHA256`: frozen image pin.
+- `OPENHANDS_SERVER_ENV`: mode-0600 file containing only this attempt's
+  `OH_SESSION_API_KEYS_0` setting. No shared service/provider secrets.
+- `OPENHANDS_HEADERS`: mode-0600 file containing the corresponding
+  `X-Session-API-Key` header. Commands use curl's `-H @file`; no inline key.
+
+```sh
+RECIPE="$PWD/blueprints/runtime-workers/openhands"
+export OPENHANDS_RUN_ID=rw-openhands-trial-001
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" prepare \
+  --prefix "$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6" \
+  --state "$HOME/.local/state/native-agent-stack/runtime-workers/openhands" \
+  --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
+```
+
+The workflow child runs exactly these three Bash commands after preparation:
+
+```sh
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/dispatch.py" start --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/dispatch.py" wait --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/dispatch.py" result --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
+```
+
+Run `wait` and `result` through the child's background Bash facility; the grader
+may take longer than a foreground tool timeout. Observe native completion or
+read `status.json`. Each command prints one JSON object including `run_id`,
+`arm`, `receipt`, `failure_stage`, `task_passed`, and `evidence_complete`.
+The deterministic host paths are:
+
+```text
+$HOME/.local/state/native-agent-stack/runtime-workers/openhands/runs/<run-id>/<arm>/status.json
+$HOME/.local/state/native-agent-stack/runtime-workers/openhands/runs/<run-id>/<arm>/receipt.json
+```
+
+The adapter uses curl to call these exact upstream routes on
+`http://127.0.0.1:3730`: POST `/api/conversations`, GET
+`/api/conversations/<uuid>`, then GET
+`/api/conversations/<uuid>/agent_final_response`. Start is asynchronous. The
+native SDK constructs `StartConversationRequest` and calls
+`model_dump(exclude_defaults=True, mode="json", context={"expose_secrets": True})`;
+only the fixed keyless gateway placeholder is exposed. It includes workspace,
+`initial_message.run=true`, native agent/condenser/MCP/hook configuration,
+`max_iterations=40`, and lowercase source/dispatch/arm tags. Preparation checks
+`/health`, `/docs`, and the request fields in live `/openapi.json`.
+Sources: SDK@fcc102a `conversation_router.py:72-86,163-228,257-287`,
+`sdk/conversation/request.py:64-72,105-147,212-228,317-347`,
+`sdk/utils/pydantic_secrets.py:24-37,48-68`.
+
+Polling treats only finished/error/stuck as terminal; idle is not completion.
+At the deadline it calls the native interrupt route and removes the exact owned
+server. Result captures the native final response privately, confirms container
+removal, then exports the candidate patch and invokes official grading.
+A native final message alone is never a task verdict. Sources: SDK@fcc102a
+`conversation_router.py:304-321`; SWE-bench@v4.1.0 `reporting.py:127-157`.
+
+| Final exit code | Meaning |
+| --- | --- |
+| 0 | Official task resolved and all required evidence complete |
+| 1 | Official unresolved or empty-patch verdict |
+| 2 | Incomplete evidence, including a resolved task with untrusted trace evidence |
+| 3 | Setup/infrastructure failure, deadline, grading error/incomplete bucket, or transport failure |
+
+Preparation/start/wait exit 0 means that operation succeeded, not that the task
+passed. Duplicate starts do not resubmit a native POST. Retrying a collected
+result returns its retained receipt without another API or grader call. A host reservation
+serializes dispatches from this recipe. It does not exclude unrelated gateway
+clients. Interrupted attempts retain their files; cleanup removes named owned
+containers only, never uses prune, and records whether removal was confirmed.
+The coordinator must reclaim a stale reservation only after confirming its
+recorded container is gone. Port 3730 must be available; another recipe using
+that port must be stopped before this one is prepared.
+
+Invocation counts use existing pipelines: on Claude, child usage and OTel Bash
+events whose command contains `dispatch.py`, the `start` subcommand and
+`--run-id` (allow shell quoting and whitespace); on OpenHands, JSON access logs for
+POST `/api/conversations`, plus native count/search endpoints. Run IDs also
+travel in native tags. Poll/result calls are separate from invocation counts.
+Native `server.log` is captured on result/cleanup and stays private. Sources:
+SDK@fcc102a `conversation_router.py:105-162`, `logging_config.py:55-106`;
+repository `adoption/templates/claude.settings.template.json:15` and
+`observability/collector/collector.yaml:74`. No collector change is required.
+
+## Usage accounting
+
+The only usage authority is the selected arm's **entry** gateway, opened with
+SQLite `?mode=ro` and `PRAGMA query_only=ON`:
+
+| Arm | Entry database | Expected entry row model/path |
 | --- | --- | --- |
-| Gateway | LLM.base_url and api_key | Host reference http://127.0.0.1:20128/v1; actual rootless-container URL http://10.0.2.2:20128/v1; keyless placeholder local-loopback |
-| Model | LLM.model, model_canonical_name | LiteLLM openai/ provider prefix is added before cx/gpt-6-astra-max |
-| Effort/API | LLM.api_mode, reasoning_effort | Responses, max; no automatic chat fallback |
-| Structured actions | ToolDefinition.to_responses_tool | Native function tools, strict:false; no JSON response format |
-| Sampling | LLM.temperature | Omitted, including summaries; values at or below 0.1 are rejected |
-| Affinity | LLM.extra_headers | Stable x-omniroute-session for one conversation and its condenser |
-| Idempotency | Public generate/agenerate kwargs | Fresh Idempotency-Key per logical call; upstream internal retries retain it |
-| Context | LLMSummarizingCondenser | 80 events / 60,000 input-token trigger, keep_first=2 |
-| Bounds | Native SDK run/request fields | 40 iterations, 1,200-second worker deadline, 16,384 output tokens, two retries, 180-second request timeout |
+| control | `$HOME/.local/share/omniroute/storage.sqlite` | `gpt-6-astra-max`, `/v1/responses` |
+| engines-on | `$HOME/.local/share/omniroute-fw/storage.sqlite` | `gpt-6-astra-max`, `/v1/responses` |
 
-The gateway owner's cognee 1.6.1 measurements establish that JSON-object mode
-needs the word “json” in input messages; system text moves to instructions.
-Strict JSON schemas need additionalProperties:false on every object.
-This recipe chooses **tool calling** for structured actions, following
-[the pinned serializer][tool-serialization]. It does not issue JSON-object or
-JSON-schema calls. Its [native condenser][condenser] consumes ordinary summary
-text. No gateway/schema acceptance is inferred from these offline checks.
+For a retained control variant the routed model is the suffix after `cx/`.
+The coordinator must verify both database paths and the actual entry row model
+and path on the host. A missing/mismatched database produces unknown usage.
+Never add forwarded 20128 rows to engines-on 20129 rows.
 
-[worker.py](worker.py) changes only the public LLM generation boundary to supply
-headers; the upstream serialization, retries and condenser remain native.
-The adapter scopes its method wrapping to one worker process and restores the
-methods afterward. Agent and condenser keep exact native LLM objects:
-[SDK registration][llm-discovery] explicitly checks type(obj) is LLM, and
-[conversation setup][llm-registration] uses that registry for native metrics
-and condenser context. A subclass would silently skip this registration.
-[SDK header merging][header-merging] preserves per-call headers. Actual
-wire-level header stability, fresh logical call keys, max effort, streaming and
-tool results still require host observation. Gateway log columns available to
-this recipe cannot independently prove header/session attribution.
+Reads are restricted to timestamp, path, status, model, tokens_in,
+tokens_cache_read, tokens_reasoning and correlation_id, plus the two explicitly
+required effort columns. IDs are discarded before returning rows. The private
+native capture may lack headers on streaming paths and shares the model's trust
+boundary, so receipts conservatively use **time window + model + path** at the
+entry gateway. They state the concurrent-caller limitation. Per-arm totals sum
+each matched row once, including failed calls; if any requested counter is
+missing, totals remain null. Cache-read tokens are an input subset, not an
+additional cost. No output-token or complete-provider-cost total is invented.
 
-## MCP and skills lifecycle
+Rows with positive returned reasoning tokens expose their logged effort; both
+requested and upstream effort must be max for `effort_verified`. Zero and
+unknown reasoning counts are reported separately. Null effort columns are not
+evidence that effort was omitted: OmniRoute@a58000c
+`src/lib/usage/callLogs.ts:646-653` fills them only for encrypted reasoning.
+Correlation response headers are defined in the same pin's
+`src/sse/handlers/chatHelpers.ts:1172-1184`.
 
-[config/mcp.template.json](config/mcp.template.json) retains the native command
-selection from the repository's adopted client templates.
-[recipe.py](recipe.py) translates tool limits into Agent.filter_tools_regex;
-Codex-only approval/allowlist keys are not passed as SDK configuration.
-The locked FastMCP uses the server_name_tool_name namespace and the worker
-requires multiple servers. See [MCP config][mcp-config] and [agent filtering][agent-base].
+For engines-on, the host records before/after
+`GET /api/analytics/compression?since=all` snapshots and reports only their
+`totalRequests` and `totalTokensSaved` deltas, separately from call-log usage.
+Optional `OPENHANDS_COMPRESSION_HEADERS` points to a mode-0600 management-header
+file if that endpoint requires authentication. Missing counters, auth failure
+or reset keep the delta null. These global analytics can include other callers;
+they do not establish measured semantic quality or provider-token savings.
+Sources: OmniRoute@a58000c `src/app/api/analytics/compression/route.ts:13-24`,
+`src/lib/db/compressionAnalytics.ts:52-55`.
 
-| Server | Scope |
-| --- | --- |
-| context-mode | Native stdio; ctx_upgrade and ctx_purge excluded |
-| serena | Native stdio, explicit /workspace, dashboard off, external attempt-owned metadata |
-| jcodemunch | Native stdio; route, menu and order only |
-| qmd | Native stdio; query/get/multi_get/status over exactly four named catalog/document collections |
-| ai-memory | Existing HTTP endpoint; query/read_page/recent/status/briefing only |
-| socraticode | Native stdio; search/status/list_projects/health; watcher manual; existing local embedder |
-| headroom | Configured but disabled; no measured remaining gap justifies it for this trial |
+## Security posture
 
-Serena state and QMD indices live under the attempt's MCP state.
-[qmd-setup.py](qmd-setup.py) uses native collection add/update only on the four
-mounted document directories. [mcp_guard.py](mcp_guard.py) requires explicit
-collections, lexical searches and rerank:false. There is no OmniRoute embedder.
-[config/host.example.json](config/host.example.json) describes the private,
-mode-0600 paths file; no credentials or authentication-store mounts are needed.
+All model-controlled shell, file and stdio MCP execution stays in the rootless
+container, under non-root UID/GID 10001, with capabilities dropped,
+no-new-privileges, read-only root, and an attempt-local temporary home. The model
+has no Docker socket, host authentication directory, oracle dataset or grader
+checkout. The task's Git metadata and installed skills are read-only mounts.
+Host patch export disables system/global Git config, external diff and textconv
+so candidate attributes cannot select host-global executable filters.
+Sources: SDK@fcc102a `agent_server/docker/Dockerfile:7-9,301-305,343`;
+Git@v2.43.0 `Documentation/git.txt:708-724`, `diff-options.txt:830-840`.
 
-**Skills installation has exactly one path**, executed from OPENHANDS_STACK_ROOT:
+MCP allowlists are not network security. ai-memory HTTP and socraticode are
+**disabled** because their host services would bypass the framework's tool
+filter. context-mode, Serena, jCodeMunch and lexical QMD remain container-local;
+headroom remains disabled. The host mount allowlist accepts only selected
+adoption tool roots and the four document roots, resolves symlinks before
+checking, and rejects authentication stores and every ancestor of the host home.
+No tool can execute directly on the host through this registration.
 
-~~~sh
-PYTHONDONTWRITEBYTECODE=1 python3 tools/adoption/install_skills.py \
-  --manifest blueprints/runtime-workers/skills/manifest.json \
-  --project-dir "$WORKER_WORKSPACE" --agent universal
-~~~
+Model launches require `rw-openhands-egress-control` or
+`rw-openhands-egress-engines-on`. The supported policy mechanism is Docker's
+**DOCKER-USER iptables chain**, with explicit destination/port rules before
+Docker accepts forwarding. Host INPUT must also deny traffic from the worker
+bridge; IPv6 is disabled. Only the selected gateway endpoint is allowed. Plain
+`--internal` alone is insufficient because an internal bridge may still reach
+host listeners. Source: docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f
+`content/manuals/engine/network/firewall-iptables.md:22-24,48-95` and
+`port-publishing.md:186-192`.
 
-The new project-dir/agent options and runtime-worker manifest are **pending the
-coordinator's skills PR** in this worktree. The call and regression test are
-present now. Missing manifest/options fail the trial; there is no global,
-copy, symlink or alternate installer fallback. The old
-[config/skills.lock.json](config/skills.lock.json) records round-1 provenance only
-and is no longer read for installation, loading or receipt decisions.
+The coordinator must provision and **independently probe** that policy in the
+rootless daemon's network namespace. The repair does not change daemon-wide
+firewalls. `model_network` fails closed without a fresh, host-owned mode-0600
+policy receipt whose network ID matches Docker inspect and whose allowed TCP
+endpoint is exactly the selected arm. The host template has per-arm receipt
+paths. The receipt schema is:
 
-The expected manifest contract is a skills array with name and
-skill_md_sha256, including tdd and verification-before-completion. The installer
-owns the project-local .agents/skills tree. The host verifies those bytes and
-mounts .agents read-only; [native load_skills_from_dir][skills-loader] discovers
-them and AgentContext.skills exposes them progressively. Public, home and project
-auto-discovery stays disabled. Discovery mismatches fail startup.
-The [upstream project installer][skills-local-lock] also writes skills-lock.json
-at the workspace root. Both installer paths are excluded from the worker patch
-and mounted read-only when present. A frozen task already containing .agents or
-skills-lock.json is rejected before installation so its own files stay intact.
-Additional artifacts from the pending shared installer must be reviewed at
-integration; the recipe does not assume that extension has been accepted.
+```json
+{
+  "mechanism": "docker-user-iptables",
+  "network_id": "<actual Docker network ID>",
+  "verified_at": "<UTC timestamp within the preceding 15 minutes>",
+  "allowed_tcp": ["10.0.2.2:20128"],
+  "default_deny": true,
+  "host_input_denied": true,
+  "ipv6_disabled": true,
+  "gateway_reachable": true,
+  "other_host_ports_denied": true
+}
+```
 
-Each attempt records the **actual names listed at start** in
-worker/skills-startup.json and input/skills.json, rather than claiming a fixed
-28-skill list in advance of the pending manifest. The E2E requires successful
-native **ObservationEvent / invoke_skill / skill_name** results for tdd and
-verification-before-completion, corroborated by the SDK's persisted trace.
-[InvokeSkillTool][invoke-skill] returns the rendered skill content and records
-the invocation. A name in config, startup listing or the task prompt alone
-does not prove activation. No activation was observed in this build.
+For engines-on only the endpoint changes to port 20129. This schema is an
+operator evidence gate, not a firewall implementation or proof by itself. Keep
+the actual rule dump and probe outputs privately; reject access to the other
+arm, ai-memory, Qdrant, embedder and other worker listeners before any model run.
+Docker was not found on this repair sandbox's PATH, so rootless rule placement,
+packet behavior and post-restart policy persistence remain unverified. This is
+a host setup gate, not an instruction to accept loopback exposure. Official
+grader containers retain upstream options; the coordinator must separately
+qualify their host-service isolation without misrepresenting altered test
+conditions as an unchanged environment.
 
-## Frozen task and official verdict
+Every authoritative status/window/verdict file is outside model mounts. Files
+read from worker output use bounded regular-file reads with O_NOFOLLOW on every
+path component, and are labelled worker-reported. The remaining shared-UID
+trace limitation is explicit at the top of this document; counterfeit events
+cannot cause `evidence_complete=true`. This round does not invent an isolation
+mechanism unsupported by the pin.
 
-Before host acceptance, select one original SWE-bench Verified row from a
-recorded dataset revision; retain the complete JSON-list or JSONL row, its
-source revision and SHA256 outside every worktree. The [official loader][swe-dataset]
-accepts both formats. OPENHANDS_TASK_FILE and OPENHANDS_TASK_SHA256 identify
-these frozen bytes. A concrete instance/revision is a remaining host input;
-the recipe does not invent a replacement benchmark task.
+## Official grading and remaining host gates
 
-[e2e/task.py](e2e/task.py) validates the hash, single-instance scope, repository,
-base commit and native test fields. Only the issue, repository and base commit
-enter the worker's prompt. Gold patch, test patch and test-name oracle fields
-remain outside every worker mount. The worker gets a checkout at the frozen
-base commit with protected Git/skill metadata. This bare-checkout adaptation
-does not claim the benchmark's preinstalled Conda testbed; dependency and native
-test availability must be established for the selected task.
+The task comes from a frozen original SWE-bench row with an externally supplied
+SHA256. Clone branch selection uses the pinned `REPO_BASE_COMMIT_BRANCH` mapping
+(SWE-bench@v4.1.0 `test_spec/python.py:271-277`). Oracle patches and private tests
+are never mounted in the worker. The retained bare checkout and 40 iterations
+remain inference adaptations; this is not unchanged `swebench-infer`.
 
-After inference, [host.py](host.py) exports the worker's staged diff against
-that base commit using the benchmark's [native patch pattern][benchmark-infer]
-into output.jsonl. The adapter rejects missing, malformed, duplicate or
-wrong-instance predictions before upstream conversion. Empty patches remain
-valid submissions that the official grader can fail.
+The image bundle contains `instance_id`, the exact upstream instance `tag`, an
+immutable `ref` (`docker.io/swebench/<instance-image>@sha256:<digest>`), and its
+registry `source`. The coordinator freezes its SHA256 and pre-pulls the digest.
+Before grading, host code verifies RepoDigests/platform/Id, retags it locally to
+the upstream name and passes the checked image ID to the adapter. Creation
+rechecks that identity; mutable pulls and builds are refused. Sources:
+SWE-bench@v4.1.0 `test_spec/test_spec.py:106-120`, `docker_build.py:516-524`;
+docker/docker-py@7.1.0 `docker/models/resource.py:28-33`.
 
-The primary pipeline is split at the official converter/grader boundary:
+`e2e/docker_grader.py` adapts names and ownership labels only. It adds **no memory,
+CPU, PID, capability or user changes** to the official grading container. Gold
+patch and known-negative official controls must run under the frozen image
+before a worker verdict is accepted. `e2e/check.py` relays the actual report; an
+error/incomplete bucket is infrastructure, not a model-negative tally.
 
-~~~sh
-# In the pinned benchmark environment; paths below are private attempt paths.
-swebench-eval "$OUTPUT_JSONL" --dataset "$FROZEN_DATASET" \
-  --run-id "$RUN_ID" --workers 1 --no-modal --skip-evaluation
-python /path/to/recipe/e2e/docker_grader.py \
-  --dataset_name "$FROZEN_DATASET" --predictions_path "$PREDICTIONS_JSONL" \
-  --instance_ids "$INSTANCE_ID" --run_id "$RUN_ID" --max_workers 1 \
-  --split test --timeout 1800 --namespace swebench \
-  --cache_level instance --clean false --modal false
-~~~
+Host work remaining: native installation and import acceptance; shared skills
+PR; frozen task/image selection; rootless firewall proof and port availability;
+native server health/auth/OpenAPI/preload startup; actual tool names/skills/MCP
+use; response-header capture for streaming and condenser calls; entry-database
+matching and max effort; official positive/negative grading controls; independent
+trace observation; cancellation/cleanup recovery. No A/B or savings result is
+claimed until these observations exist.
 
-The first command is the unchanged [OpenHands converter][benchmark-eval].
-The second executes the **unchanged swebench.harness.run_evaluation CLI**,
-the same module invoked by swebench-eval. [docker_grader.py](e2e/docker_grader.py)
-adapts only the [Docker creation boundary][swe-container] for names, ownership
-labels and resource limits. The split allows the native cache/cleanup flags,
-which swebench-eval does not expose. There is no local test grader.
-
-The benchmark converter intentionally removes edits to pyproject.toml,
-tox.ini and setup.py. Both original output.jsonl and converted
-output.swebench.jsonl are retained with hashes; host acceptance must examine
-any filtered changes. SWE-bench writes OpenHands.RUN_ID.json plus per-instance
-report.json and test output in its native logs. [receipt.py](receipt.py)
-re-reads that official report; resolved_ids supplies the verdict. A grader
-exit code of zero alone is insufficient. Missing/conflicting/malformed report
-fields leave the verdict unknown. [check.py](e2e/check.py) returns 0 for an
-upstream-resolved ID, 1 for an upstream negative outcome, and 2 for invalid
-transport; input-only mode reports ready_to_grade without a correctness claim.
-
-The old e2e/fixture-repo, frozen.json and task.txt are retained solely as
-historical round-1 artifacts. They are not mounted or executed in this E2E.
-
-## Ownership, ports and coordinator execution
-
-Every created container has prefix **rw-openhands-** and label
-**com.native-agent-stack.owner=gpt6-omniroute-framework-integration**.
-No named volume or custom network is created; worker persistence uses owned
-bind mounts. The grader rejects new volume/network/build operations and uses
-official prebuilt SWE-bench images. Their actual resolved digests must be
-recorded during host acceptance; the native per-instance image tags are not
-claimed here to be immutable artifacts.
-
-| Port/resource | Mapping |
-| --- | --- |
-| Worker, install, QMD and grader containers | No host ports published; no worker HTTP service configured |
-| Permitted future worker listener allocation | 127.0.0.1:3730–3799 only |
-| Existing gateway dependency | Host 127.0.0.1:20128; container access 10.0.2.2:20128 |
-| Existing ai-memory / local embedder dependencies | 10.0.2.2:49474 / 10.0.2.2:18232; not created by this recipe |
-| S3 memory arms and cognee | 3710–3729, 5433–5439 and 3800–3819 remain unallocated by this worker |
-
-On the coordinator's host, after the shared skills PR and a frozen native task:
-
-~~~sh
-export OPENHANDS_HOST_FILE=/absolute/private/openhands-host.json
-export OPENHANDS_STACK_ROOT=/absolute/native-agent-stack
-export OPENHANDS_TASK_FILE=/absolute/private/frozen-instance.jsonl
-export OPENHANDS_TASK_SHA256='<sha256-of-the-retained-original-row>'
-bash blueprints/runtime-workers/openhands/install.sh
-OPENHANDS_MODEL=cx/gpt-6-astra-max bash blueprints/runtime-workers/openhands/run-e2e.sh
-~~~
-
-The existing rootless Docker context is required. The worker uses container
-UID 0 mapped to the host user, dropped capabilities, no-new-privileges,
-a read-only image and temporary /root and /tmp. The worker and grader have
-4 CPU, 8 GiB and 384 PID limits; the grader uses the existing rootless socket
-from the host, never a worker socket mount. Its process deadline is 2,400
-seconds in addition to the upstream per-instance test timeout.
-
-Cleanup removes only each exact literal container name, then independently
-checks absence. There is no global prune or upstream broad cleanup helper.
-The grader's instance cache/clean=false setting retains images. Native logs
-and failures stay in private attempt state. A hard-killed host may still need
-literal-name cleanup; reboot/crash recovery has not been accepted.
-Inspect only the owner label and the relevant rw-openhands attempt before
-recovering. Do not remove shared Docker, gateway, native sign-ins or MCP state.
-
-## Evidence and remaining gates
-
-[Round-2 verification](evidence/round2-verification.md) records fail-first and
-final commands, exits and returned output. The unit suite provides **local
-synthetic transport controls**, including known-pass, known-fail, malformed,
-missing, duplicate and conflicting results. It tests the shared installer
-invocation, GPT-6 routing and resource adapter. None is reported as an unchanged
-upstream test or a live model evaluation.
-
-The read-only gateway receipt still reads only the nine authorized call_logs
-columns and never sums window rows into an exclusive worker cost. Native
-metrics and full traces remain private. Unknown usage stays unknown.
-Attribution, byte/token counts, cache subsets and provider spending are separate.
-
-Host checks remaining: install/import compatibility in both pinned environments;
-frozen dataset source/instance and testbed compatibility; official pass/fail
-controls using retained gold/empty patches before a real worker patch; actual
-grader image digests; container ownership/cleanup; native MCP startup and tool
-limits; exact skill listing and both activation observations; gateway headers,
-Responses/tool behavior and requested/upstream max effort. Native MCP aggregate
-startup is 30 seconds even when individual server timeouts are longer.
-No matched A/B, skill ablation, token savings, full upstream SDK suite or
-crash-recovery acceptance has been performed. A future comparison must freeze
-the same task/oracle, environment, models, tools and cache policy across arms.
-
-The coordinator owns shared manifests. Changed round-1 evidence hashes require
-re-registration in manifests/evidence.json after integration; this builder edits
-only this recipe and its assigned test. Publication validation is still run and
-its actual result is retained even when that shared-file boundary prevents a
-clean hash check.
-
-[release]: https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.49.6
-[sdk-readme]: https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/README.md#L49-L81
 [hello]: https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/examples/01_standalone_sdk/01_hello_world.py#L10-L29
 [makefile]: https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/Makefile#L34-L41
 [getting-started]: https://docs.openhands.dev/sdk/getting-started

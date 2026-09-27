@@ -24,8 +24,31 @@ def headers_for_call(static_headers):
     return {**(static_headers or {}), "Idempotency-Key": str(uuid.uuid4())}
 
 
+def worker_llm_config(environment, dispatch_id):
+    cfg = read_json(HERE / "config/worker.json")
+    fields = llm_config(cfg, environment.get("OPENHANDS_MODEL"),
+                        arm=environment.get("OPENHANDS_ARM", "control"),
+                        base_url=environment.get("OPENHANDS_BASE_URL"))
+    fields["extra_headers"].update({"x-omniroute-session": dispatch_id, "X-Correlation-Id": dispatch_id})
+    fields["usage_id"] = "agent"
+    return fields
+
+
+def response_correlation(response):
+    # SDK@fcc102a llm.py:1130-1138 preserves raw_response. LiteLLM@v1.93.0
+    # llms/openai/responses/transformation.py:262-272 preserves raw headers.
+    raw = getattr(response, "raw_response", None)
+    hidden = getattr(raw, "_hidden_params", {})
+    headers = hidden.get("headers", {}) if isinstance(hidden, dict) else {}
+    if isinstance(headers, dict):
+        for key, value in headers.items():
+            if key.lower() == "x-correlation-id" and isinstance(value, str) and 0 < len(value) <= 256:
+                return value
+    return None
+
+
 @contextmanager
-def gateway_transport(llm_type):
+def gateway_transport(llm_type, correlation_callback=None):
     """Scope header transport to this single worker process, preserving LLM type.
 
     SDK agent/base.py:739-775 registers only exact LLM objects. A subclass skips
@@ -46,11 +69,17 @@ def gateway_transport(llm_type):
 
     @wraps(original_generate)
     def generate(llm, *args, **kwargs):
-        return original_generate(llm, *args, **call_kwargs(llm, kwargs))
+        response = original_generate(llm, *args, **call_kwargs(llm, kwargs))
+        if correlation_callback:
+            correlation_callback(response_correlation(response))
+        return response
 
     @wraps(original_agenerate)
     async def agenerate(llm, *args, **kwargs):
-        return await original_agenerate(llm, *args, **call_kwargs(llm, kwargs))
+        response = await original_agenerate(llm, *args, **call_kwargs(llm, kwargs))
+        if correlation_callback:
+            correlation_callback(response_correlation(response))
+        return response
 
     llm_type.generate, llm_type.agenerate = generate, agenerate
     try:
@@ -59,14 +88,10 @@ def gateway_transport(llm_type):
         llm_type.generate, llm_type.agenerate = original_generate, original_agenerate
 
 
-def run_worker():
-    os.umask(0o077)
-    if not Path("/.dockerenv").exists() or os.environ.get("OPENHANDS_OWNED_CONTAINER") != "1":
-        raise RuntimeError("worker_requires_owned_container")
+def build_agent(environment, dispatch_id):
     # Imports belong inside this entry point; offline recipe tests need no SDK.
-    from openhands.sdk import Agent, AgentContext, Conversation, LLM, Tool
+    from openhands.sdk import Agent, AgentContext, LLM, Tool
     from openhands.sdk.context.condenser import LLMSummarizingCondenser
-    from openhands.sdk.hooks import HookConfig, HookDefinition, HookMatcher
     from openhands.sdk.mcp.config import coerce_mcp_config
     from openhands.sdk.skills import load_skills_from_dir
     from openhands.tools.file_editor import FileEditorTool
@@ -78,11 +103,7 @@ def run_worker():
     versions = {name: importlib.metadata.version(name) for name in ("openhands-sdk", "openhands-tools")}
     if any(version != pins["version"] for version in versions.values()):
         raise RuntimeError("installed_version_mismatch")
-    llm = LLM(
-        **llm_config(cfg, os.environ.get(cfg["model_env"])),
-        usage_id="agent",
-        extra_headers={"x-omniroute-session": str(uuid.uuid4())},
-    )
+    llm = LLM(**worker_llm_config(environment, dispatch_id))
     condenser_fields = {k: v for k, v in cfg["condenser"].items() if k != "kind"}
     condenser = LLMSummarizingCondenser(
         llm=llm.model_copy(update={"usage_id": "condenser"}), **condenser_fields,
@@ -112,14 +133,50 @@ def run_worker():
         include_default_tools=["FinishTool"],
         mcp_config=mcp_config, filter_tools_regex=tool_filter(policy),
     )
-    output = Path("/run-output")
-    output.mkdir(exist_ok=True)
-    hooks = HookConfig(pre_tool_use=[HookMatcher(
+    return agent, versions, sorted(skills)
+
+
+def worker_hooks():
+    from openhands.sdk.hooks import HookConfig, HookDefinition, HookMatcher
+    return HookConfig(pre_tool_use=[HookMatcher(
         matcher="qmd_query", hooks=[HookDefinition(
             command=f"{shlex.quote(sys.executable)} {shlex.quote(str(HERE / 'mcp_guard.py'))}", timeout=10,
         )],
     )])
 
+
+def start_request(task, run_id, arm):
+    """Native request example: SDK@fcc102a conversation_router.py:72-86.
+
+    expose_secrets serializes only the fixed keyless placeholder; the server
+    auth key is never part of this body. pydantic_secrets.py:24-37,48-68.
+    """
+    from openhands.sdk import TextContent
+    from openhands.sdk.workspace import LocalWorkspace
+    from openhands.sdk.conversation.request import StartConversationRequest, SendMessageRequest
+    agent, _, _ = build_agent({**os.environ, "OPENHANDS_ARM": arm}, run_id)
+    request = StartConversationRequest(
+        agent=agent, workspace=LocalWorkspace(working_dir="/workspace"),
+        initial_message=SendMessageRequest(role="user", content=[TextContent(text=task)], run=True),
+        max_iterations=read_json(HERE / "config/worker.json")["runtime"]["max_iteration_per_run"],
+        hook_config=worker_hooks(), tags={"source": "ultracode", "dispatch": run_id, "arm": arm},
+    )
+    return request.model_dump(exclude_defaults=True, mode="json", context={"expose_secrets": True})
+
+
+def capture_correlation(value):
+    # Private, explicitly worker-reported. Never copy identifiers into receipts.
+    with Path("/run-output/correlation.jsonl").open("a") as stream:
+        stream.write(json.dumps({"correlation_id": value}) + "\n")
+
+
+def run_worker():
+    os.umask(0o077)
+    from openhands.sdk import Conversation
+    cfg = read_json(HERE / "config/worker.json")
+    agent, versions, skills = build_agent(os.environ, os.environ.get("OPENHANDS_RUN_ID", str(uuid.uuid4())))
+    output = Path("/run-output")
+    output.mkdir(exist_ok=True)
     def record_event(event):
         # Native event fields, not claimed tool use inferred from a prompt/config.
         # Full upstream events remain in private SDK persistence. Export only the
@@ -142,7 +199,7 @@ def run_worker():
     }) + "\n")
     conversation = Conversation(
         agent=agent, workspace="/workspace", persistence_dir="/run-output/conversations",
-        callbacks=[record_event], token_callbacks=[lambda *_: None], hook_config=hooks,
+        callbacks=[record_event], token_callbacks=[lambda *_: None], hook_config=worker_hooks(),
         max_iteration_per_run=cfg["runtime"]["max_iteration_per_run"], visualizer=None,
     )
     try:
@@ -165,8 +222,13 @@ def run_worker():
 def main():
     if not Path("/.dockerenv").exists() or os.environ.get("OPENHANDS_OWNED_CONTAINER") != "1":
         raise RuntimeError("worker_requires_owned_container")
+    if sys.argv[1:] == ["--request"]:
+        body = start_request(Path("/run-input/task.txt").read_text(),
+                             os.environ["OPENHANDS_RUN_ID"], os.environ["OPENHANDS_ARM"])
+        Path("/run-output/start.json").write_text(json.dumps(body) + "\n")
+        return 0
     from openhands.sdk import LLM
-    with gateway_transport(LLM):
+    with gateway_transport(LLM, correlation_callback=capture_correlation):
         return run_worker()
 
 

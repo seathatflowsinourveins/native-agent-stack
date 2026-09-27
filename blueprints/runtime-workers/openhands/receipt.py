@@ -1,8 +1,8 @@
 """Sanitized evidence from native SDK events, independent check and gateway rows.
 
 Uses Python's sqlite3 URI mode=ro + query_only. The only SQL SELECT reads the
-nine user-authorized columns from call_logs. No schema introspection, other
-tables, credentials, prompts, responses, request identifiers or client config.
+authorized usage/effort columns from call_logs. Correlation IDs may be used
+in memory for matching, but are never returned in receipts.
 """
 
 from __future__ import annotations
@@ -10,19 +10,71 @@ from __future__ import annotations
 from collections import Counter
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import re
 import sqlite3
+import stat
 
-from recipe import HERE, read_json, tool_filter
+from recipe import HERE, arm_config, read_json, tool_filter
 from e2e.check import read_report
 
 
 COLUMNS = (
     "timestamp", "path", "status", "model", "reasoning_effort_requested",
-    "reasoning_effort_upstream", "tokens_in", "tokens_cache_read", "tokens_reasoning",
+    "reasoning_effort_upstream", "tokens_in", "tokens_cache_read", "tokens_reasoning", "correlation_id",
 )
 EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max", "auto"}
+
+
+def read_bounded(path, limit=4 * 1024 * 1024):
+    """CPython@v3.13.15 os.open dir_fd/O_NOFOLLOW; refuse every symlink hop.
+
+    Worker files are untrusted even if their content parses. O_NONBLOCK avoids
+    hanging on a malicious FIFO; fstat checks the opened object, not its name.
+    """
+    path = Path(path).absolute()
+    directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        for part in path.parts[1:-1]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+            os.close(directory)
+            directory = child
+        fd = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+    finally:
+        os.close(directory)
+    with os.fdopen(fd, "rb") as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_size > limit:
+            raise ValueError("receipt_input_not_bounded_regular_file")
+        data = stream.read(limit + 1)
+        if len(data) > limit:
+            raise ValueError("receipt_input_too_large")
+    return data.decode("utf-8")
+
+
+def gateway_database(arm):
+    arm_config(arm)
+    store = "omniroute" if arm == "control" else "omniroute-fw"
+    return Path.home() / ".local/share" / store / "storage.sqlite"
+
+
+def summarize_gateway(rows, selection):
+    matched = [row for row in rows if row.get("model") == selection["gateway_model"]
+               and row.get("path") == selection["gateway_path"]]
+    counters = ("tokens_in", "tokens_cache_read", "tokens_reasoning")
+    known = bool(matched) and all(isinstance(row.get(k), int) and not isinstance(row[k], bool)
+                                 and row[k] >= 0 for row in matched for k in counters)
+    reasoning = [row for row in matched if (row.get("tokens_reasoning") or 0) > 0]
+    return {"rows": [{k: row.get(k) for k in COLUMNS if k != "correlation_id"} for row in matched],
+            "totals": {k: sum(row[k] for row in matched) for k in counters} if known else None,
+            "reasoning_rows": len(reasoning),
+            "no_returned_reasoning_rows": sum(row.get("tokens_reasoning") == 0 for row in matched),
+            "unknown_reasoning_rows": sum(row.get("tokens_reasoning") is None for row in matched),
+            "effort_verified": bool(reasoning) and all(
+                row.get("reasoning_effort_requested") == row.get("reasoning_effort_upstream") == "max"
+                for row in reasoning),
+            "successful_rows": sum(row.get("status") in (200, "success", "ok") for row in matched)}
 
 
 def time_value(value):
@@ -34,11 +86,14 @@ def time_value(value):
     raise ValueError("invalid_timestamp")
 
 
-def gateway_rows(database, started_at, finished_at):
-    """Time-window evidence only: the allowed columns cannot correlate sessions."""
+def gateway_rows(database, started_at, finished_at, correlation_ids=None):
+    """Read only the arm entry gateway; discard IDs after optional exact matching."""
     start = time_value(started_at)
     end = time_value(finished_at)
-    uri = Path(database).resolve().as_uri() + "?mode=ro"
+    database = Path(database)
+    if not database.is_file() or database.is_symlink():
+        raise ValueError("gateway_database_must_be_existing_regular_file")
+    uri = database.resolve().as_uri() + "?mode=ro"
     connection = sqlite3.connect(uri, uri=True, timeout=3)
     try:
         connection.execute("PRAGMA query_only = ON")
@@ -53,7 +108,10 @@ def gateway_rows(database, started_at, finished_at):
                                           start.timestamp() * 1000, end.timestamp() * 1000)).fetchall()
     finally:
         connection.close()
-    return [sanitize_row(dict(zip(COLUMNS, row))) for row in rows]
+    records = [dict(zip(COLUMNS, row)) for row in rows]
+    if correlation_ids is not None:
+        records = [row for row in records if row["correlation_id"] in correlation_ids]
+    return [sanitize_row(row) for row in records]
 
 
 def sanitize_row(row):
@@ -84,10 +142,12 @@ def observations(events, known_skills=()):
     known_skills = set(known_skills)
     completed, failed, skills = Counter(), Counter(), Counter()
     for event in events:
-        if event.get("kind") != "ObservationEvent":
+        if not isinstance(event, dict) or event.get("kind") != "ObservationEvent":
             continue
         name = event.get("tool_name", "")
         observation = event.get("observation", {})
+        if not isinstance(name, str) or not isinstance(observation, dict):
+            continue
         if any(name.startswith(server + "_") for server in policy) and pattern.fullmatch(name):
             completed[name] += 1
             if observation.get("is_error"):
@@ -109,11 +169,13 @@ def create_receipt(result, database=None):
     trace_status = "missing"
     if events_path.is_file():
         try:
-            events = [json.loads(line) for line in events_path.read_text().splitlines() if line]
+            events = [json.loads(line) for line in read_bounded(events_path).splitlines() if line]
             trace_status = "observed" if events else "empty"
         except (ValueError, OSError):
             trace_status = "unreadable"
-    db = database or Path.home() / ".local/share/omniroute/storage.sqlite"
+    selection = arm_config(window.get("arm", "control"), window.get("requested_model", window.get("model")),
+                           window.get("base_url"))
+    db = database or gateway_database(selection["arm"])
     rows, db_status = [], "unavailable"
     try:
         rows = gateway_rows(db, window["started_at"], window["finished_at"])
@@ -125,7 +187,7 @@ def create_receipt(result, database=None):
     summary = result / "worker/native-summary.json"
     if summary.is_file():
         try:
-            native = read_json(summary)
+            native = json.loads(read_bounded(summary))
             candidate = native.get("versions", {}) if isinstance(native, dict) else {}
             if isinstance(candidate, dict) and all(candidate.get(name) == pins["version"] for name in ("openhands-sdk", "openhands-tools")):
                 versions = {name: candidate[name] for name in ("openhands-sdk", "openhands-tools")}
@@ -145,7 +207,7 @@ def create_receipt(result, database=None):
     listed_skills, skills_match = [], False
     try:
         expected = read_json(result / "input/skills.json")["names"]
-        listed = read_json(result / "worker/skills-startup.json")["listed_skills"]
+        listed = json.loads(read_bounded(result / "worker/skills-startup.json"))["listed_skills"]
         if (isinstance(expected, list) and isinstance(listed, list) and expected
                 and all(isinstance(name, str) and re.fullmatch(r"[a-z0-9-]+", name) for name in expected)
                 and sorted(expected) == sorted(listed)):
@@ -153,11 +215,7 @@ def create_receipt(result, database=None):
     except (OSError, ValueError, TypeError, KeyError):
         pass
     observed = observations(events, listed_skills)
-    expected_model = window.get("model")
-    matching_gateway_rows = [row for row in rows if (
-        row["model"] == expected_model and row["path"] == "/v1/responses"
-        and row["status"] in (200, "success", "ok") and row["reasoning_effort_upstream"] == "max"
-    )]
+    usage = summarize_gateway(rows, selection)
     cleanup = []
     for path in sorted(result.glob("*.log.cleanup.json")):
         try:
@@ -165,27 +223,30 @@ def create_receipt(result, database=None):
         except (OSError, ValueError, AttributeError):
             cleanup.append(False)
     return {
-        "schema_version": 2, "evidence_class": "standalone SDK inference adapter with official SWE-bench grading",
+        "schema_version": 3, "evidence_class": "SDK inference adapter with official SWE-bench grading",
+        **{k: selection[k] for k in ("arm", "base_url", "requested_model", "gateway_model", "gateway_path")},
+        "header_names": window.get("header_names", sorted(selection["headers"])),
         "framework": "OpenHands software-agent-sdk", "expected_version": pins["version"], "observed_versions": versions,
         "image": pins["image"]["ref"], "source_commit": pins["commit"],
         "window": {key: window[key] for key in ("started_at", "finished_at")},
         "worker_exit_code": window.get("worker_exit_code"),
-        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"prepare", "skills", "qmd_setup", "agent", "export", "grader"} else None,
+        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start", "wait", "result", "deadline"} else None,
         "task_passed": task_passed,
-        "evidence_complete": bool(matching_gateway_rows) and trace_status == "observed"
-        and versions is not None and skills_match
-        and all(observed["skills_observed"].get(name, 0) > 0 for name in ("tdd", "verification-before-completion"))
-        and checked.get("grader_exit_code") == 0 and verdict["upstream_resolved"] is not None
-        and bool(cleanup) and all(cleanup),
+        # The terminal shares the SDK's UID and writable persistence. Source:
+        # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py. Without a
+        # separate observer these files cannot prove skill use or SDK identity.
+        "evidence_complete": False,
+        "worker_evidence_trust": "worker-reported; not independent acceptance",
+        "independent_trace_required": True,
         "skills_listed_at_start": listed_skills, "skill_listing_matches_manifest": skills_match,
         "container_cleanup": {"attempts": len(cleanup), "confirmed_removed": sum(cleanup), "complete": bool(cleanup) and all(cleanup)},
         "gateway": {
-            "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, "rows": rows,
-            "matching_model_responses_max_rows": len(matching_gateway_rows),
-            "attribution": "Time window only; may include concurrent callers. Session/request identifiers are forbidden by this receipt contract.",
-            "totals": None,
-            "usage_note": "Rows are not summed or claimed as exclusive worker cost. Cache-read is a subset of input; missing counters remain null.",
+            "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, **usage,
+            "entry_port": selection["gateway_port"],
+            "attribution": "Time window + model + path at the arm entry gateway; concurrent callers cannot be excluded by the recipe lock.",
+            "usage_note": "Sum each entry row once, including failed calls; never add 20128 to 20129. Cache-read is an input subset. Missing counters keep totals null.",
         },
+        "compression": window.get("compression", {"delta": None, "status": "unavailable"}),
         "trace_status": trace_status, **observed,
         "upstream_grader": {
             **{key: verdict.get(key) for key in ("upstream_resolved", "upstream_bucket", "report_sha256")},
