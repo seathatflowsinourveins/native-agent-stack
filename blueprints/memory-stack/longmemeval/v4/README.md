@@ -38,28 +38,48 @@ Read before running anything here. Findings below come from reading the actual t
   the slot starts and at its teardown, with no ownership check. Each slot has a REST port at
   `3611 + 100 × slot`, the stream port one above it and the engine port `46023` above that. Do not
   run it where anything else uses those ports.
-- **`lme_harness.py` (v4) checks ownership before it kills a port holder.** `am_teardown()` kills
-  only the descendants of the process it started (via `pgrep -P`, recursively) and, for anything
-  still holding a slot's ports, reads that PID's command line (`ps -o command=`) and sends
-  `SIGKILL` **only** when the command contains `agentmemory`, the configured `iii` binary path, or
-  the `iii` binary's own name; for any other non-empty command line it raises an error and refuses
-  to kill it. The one gap: if `ps` returns an **empty** command line for a foreign PID (a race
-  where it exited between the port scan and the `ps` call, or a permission failure reading another
-  user's process), that PID is treated as "ours" and killed. `mp_kill_mines()` (MemPalace, M2)
-  only signals PIDs it reads from its own run's `~/.mempalace/hook_state/mine_pids/*.pid` files
-  under a temp home directory unique to that invocation. Neither function touches a process it did
-  not start or a PID it did not read from its own state.
+- **`lme_harness.py` (v4) matches process names; it does not check ownership.** (Corrected after
+  the GPT-6 review at `97697b81`, which reproduced all three cases below with inert probes; this
+  README previously said the empty-command-line case was the only gap, which understated it.)
+  `_ours()` (`lme_harness.py:698-701`) treats a foreign PID as "ours" to kill whenever its command
+  line merely **contains** the substring `agentmemory` anywhere, or contains the configured `iii`
+  binary's path, or its argv[0] basename equals the `iii` binary's name — a substring match, not a
+  check that the process is this run's own engine or worker. `am_teardown()`
+  (`lme_harness.py:730-756`) also treats an **empty** `ps -o command=` result for a foreign PID
+  (`:749`; a race where it exited between the port scan and the `ps` call, or a permission failure
+  reading another user's process) as "ours" and kills it. And `am_start()`
+  (`lme_harness.py:797-800`) calls `am_teardown(None, ports)` **before it has started anything of
+  its own**, solely to clear a slot's ports for its own use — so on that first call alone, whatever
+  is already listening on the slot's ports gets SIGKILLed the moment it matches `_ours()` or `ps`
+  cannot read it, with nothing yet started that could be "owned." `mp_kill_mines()` (MemPalace, M2,
+  `lme_harness.py:1149-1154`) has the same shape of gap: `mp_mine_pids()` (`:1045-1056`) keeps a PID
+  only when `_pid_alive()` (`:1035-1042`, `os.kill(pid, 0)`; a `PermissionError` also counts as
+  alive) succeeds, with no check that the live process is actually the one that wrote that pid
+  file, and `mp_kill_mines()` then calls `os.killpg(pid, signal.SIGKILL)` — the whole process
+  group, not just the pid — so a PID the OS reused for an unrelated process after the original
+  miner exited receives it too.
 - **`run_velanext.sh`'s `stop_bg`/`cleanup` is ownership-guarded, not port-based.** It records
   each background service's pid, start-tick count, boot id and resolved executable when it starts
   it (`pid_record`), and `same_process()` re-checks all four before sending `TERM` or `KILL`
   (`owned_pid`). A pid file whose process no longer matches is dropped, unsignalled, as "stale".
   It never scans a port for holders.
-- **Net effect:** the v4 files here (`lme_harness.py`, `run_velanext.sh`) are meaningfully safer
-  than v3's blind port sweep, but they are still not a full isolation guarantee (no isolated port
-  range, and the one empty-command-line gap above), and `reference/lme_harness_v3.py` in this same
-  directory has none of these guards. The task's own directive stands: no arm runs on this frozen
-  code on a shared host. The workstation's A17 runner is expected to add isolated ports and
-  stores and its own ownership-guarded teardown on top of this.
+- **`setup_velanext.sh`'s Ollama readiness has no server-identity check either.** After
+  backgrounding its own `ollama serve` (`:216-219`), the loop at `:220` only polls `curl -sf
+  http://127.0.0.1:11438/api/version` until something answers; it never checks that the answer
+  comes from the `oll_pid` process just started, and never checks `oll_pid` is even still alive. If
+  that process fails to bind port 11438 (for example, another Ollama server already holds it), the
+  curl succeeds against that other server instead and setup proceeds as if its own were ready.
+  `:222-224` then runs `ollama pull` for every pinned model, and `:228-229` runs `ollama create` for
+  every `ollama/*.Modelfile`, against `OLLAMA_HOST=127.0.0.1:11438` — whichever server actually
+  answered — writing into a model store this run does not own. `:231`'s `kill "$oll_pid"` cleanup
+  only ever targets the PID this run itself started, so it corrects nothing when that happens.
+- **Net effect: these are name and liveness checks, not ownership checks, and the gaps above are
+  real.** They are still real improvements on v3's blind port sweep (which has no check at all, see
+  above), and `run_velanext.sh`'s own `pid_record`/`same_process()` pairing is closer to a genuine
+  ownership check than anything in `lme_harness.py`. But **do not run `lme_harness.py`,
+  `run_velanext.sh` or `setup_velanext.sh` on a shared host** — not "with one gap to watch for," but
+  at all. The workstation's A17 runner is where isolated ports, isolated stores and
+  identity-checked cleanup belong; this frozen code does not provide them.
 
 ## Files
 
@@ -76,6 +96,7 @@ Read before running anything here. Findings below come from reading the actual t
 | `mteb_lmeb.py` | `f69910beb07dcd220c9c8eaa2088a1789a1a779ffadda213d79307c5a5abab0e` | 6,428 | `ae674e4b` | Upstream `mteb` on LMEB's LongMemEval task for every embedder, against the published leaderboard (first-line check; decides nothing) |
 | `run_velanext.sh` | `1632c32f21e25b1ccdad8926d293400c13d267ddee65cc21f299afdd3f784c8b` | 53,849 | `d174a308` | The VelaNext run driver: gates, cpu/mteb/arms/a16/x/amb/pooled/report/collect/status/all |
 | `setup_velanext.sh` | `024152e3f96425cbcc1e422ec4efcc184dff4bba3760f442d7af069b926289de` | 19,559 | `c64c7c5f` | Pinned, checksum-verified setup of the lane on VelaNext (WSL2 Ubuntu 24.04, RTX 4090) |
+| `ollama/qwen3.5-9b-64k.Modelfile` | `60dbf344e5c374eabda289e7b379c1642bd523a2b4f4f387eb00ce021afcc318` | 476 | `de951c96` | C4's reranker-LLM Modelfile (`FROM qwen3.5:9b`, `num_ctx 65536`): `pins.json:146`'s role field, `run_velanext.sh:654`'s `llm_up qwen3.5-9b-64k aimem-qwen3-rerank`. Added per the GPT-6 review at `97697b81`; also used by the A15.2 F reranking arms and the pooled `aimem-qwen3-rerank` stage (`run_velanext.sh:664,727`) |
 | `PREREGISTRATION.md` | `a9b1db335eee1ff99d1883e048bcd8e443ca2afee3505a34fd874dd1ef412d5b` | 37,885 | `8ac3d6f5` | The frozen protocol, amendments A1-A16.3 (verified against the required hash; see below) |
 | `k1-subset.json` | `273b1f339a10a6b36dd6dd2235a4cd4e0bc5c6cab0b2cc93754232379addb97d` | 9,791 | `e8788fb1` | K1's preregistered 100-question subset (question ids and stratification metadata only, no question or session text) |
 | `requirements/build.in` | `e39ff10a9d989e86461dd152f26fbfc39681f4fb43b68b2849ac87cf3a30cd06` | 333 | `a6dca7bd` | uv build-constraints source: setuptools/wheel for the one sdist-only package in the locks |
@@ -229,10 +250,23 @@ scope. Sizes and hashes are of the source blob at 576689a.
   **`reference/mac-rows/bm25-full.jsonl`** (23,493 bytes, sha256
   `a8d30256bbb16630206b09d3b7661f3a02943468c586a647fbe1e3d8c09a60bb`): recorded result rows from
   the Mac's v3 run. Results are out of scope for this PR.
-- **`ollama/*.Modelfile`** (4 files, 388-476 bytes each: `lfm2.5-2.6b-64k`,
-  `nemotron-3.5-lightning-30b-a3b-64k`, `qwen3.5-9b-64k`, `qwen3.6-35b-a3b-64k`): production Ollama
-  Modelfiles for the reranker/consolidation LLMs used by the H1-H3 and K1 arms, outside D2h/C4.
-  Not requested.
+- **`ollama/*.Modelfile`, three of the original four excluded.** `qwen3.5-9b-64k.Modelfile` is
+  **now transferred** (Files table above): the GPT-6 review at `97697b81` found it is a C4
+  prerequisite (`pins.json:146`'s role field, `run_velanext.sh:654`'s `llm_up qwen3.5-9b-64k
+  aimem-qwen3-rerank`), not outside D2h/C4 as this README wrongly said; it is also the reranker LLM
+  for the A15.2 F arms and the pooled `aimem-qwen3-rerank` stage. The other three really are
+  outside D2h/C4 — each is the reranker LLM for one H arm (`lme_harness.py`'s
+  `H_RERANK_MODELS`/`run_velanext.sh`'s matching loop), and `qwen3.6-35b-a3b-64k` doubles as K1's
+  LLM (`run_velanext.sh:68`'s `H1_BUILD`) — and stay excluded:
+  - **`lfm2.5-2.6b-64k.Modelfile`** (411 bytes, sha256
+    `f22a2c27d5401968b86d4eff044f5eed8e4a6299a468dd369714d733cd7ed6a1`, blob `d8a1d230`): H3's
+    reranker LLM.
+  - **`nemotron-3.5-lightning-30b-a3b-64k.Modelfile`** (403 bytes, sha256
+    `5ae40dcb5c124dbf9c9b2abcec711799661e4c78e6b1d0545ec238868174c768`, blob `bdbf2946`): H2's
+    reranker LLM.
+  - **`qwen3.6-35b-a3b-64k.Modelfile`** (388 bytes, sha256
+    `861c2be0691282ae47e240c1775a3afc0ab64d604e2c294af9fc509331697bc3`, blob `cbef3bff`): H1's
+    reranker LLM, and (via `H1_BUILD`) K1's LLM too.
 
 Also excluded, per this task's scope, regardless of size: the dataset, any run's results, caches,
 logs and model weights. None of those are tracked at 576689a under `evals/longmemeval/`.
@@ -249,7 +283,7 @@ shasum -a 256 -c SHA256SUMS
 
 | Claim | Evidence class | How |
 | --- | --- | --- |
-| The 24 copied files match `evals/longmemeval/<path>` at agent-ecosystem commit 576689a, byte-exact | `source_review` | `git rev-parse 576689a:evals/longmemeval/<path>` against the blob column above, and sha256 against `SHA256SUMS` |
+| The 25 copied files match `evals/longmemeval/<path>` at agent-ecosystem commit 576689a, byte-exact | `source_review` | `git rev-parse 576689a:evals/longmemeval/<path>` against the blob column above, and sha256 against `SHA256SUMS` |
 | `PREREGISTRATION.md` matches the required hash `a9b1db335eee1ff99d1883e048bcd8e443ca2afee3505a34fd874dd1ef412d5b` | `source_review` | sha256, checked before this commit was written |
 | Which code implements which arm (D2h, C4, X, A16) | `source_review` | reading `lme_harness.py` and `rerank_stage.py` directly, not their docstrings alone |
 | The teardown behavior described above | `source_review` | reading `am_teardown`, `stop`, `mp_kill_mines` in `lme_harness.py` and `stop_bg`/`same_process` in `run_velanext.sh` |
