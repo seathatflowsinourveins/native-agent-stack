@@ -155,9 +155,14 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      `systemctl --user show-environment | cut -d= -f1`.
 
      Why `EnvironmentFile=` fits here:
-     - **The file format.** systemd v255 drops `export NAME=value` lines
-       ([`src/basic/env-util.c` L28-50 at v255](https://github.com/systemd/systemd/blob/v255/src/basic/env-util.c#L28-L50)),
-       and this file has none. The repository's credential stores use the `export` form, so no unit points at them.
+     - **The file format.** systemd v255 drops `export NAME=value` lines, and this file has none. Its parser keeps
+       `export NAME` as the key
+       ([`src/basic/env-file.c` L75-95](https://github.com/systemd/systemd/blob/v255/src/basic/env-file.c#L75-L95)).
+       The `EnvironmentFile=` loader then discards, with an error in the log, every assignment whose name is not
+       valid ([`src/core/execute.c` L773-787](https://github.com/systemd/systemd/blob/v255/src/core/execute.c#L773-L787);
+       [`src/basic/env-util.c` L542-554](https://github.com/systemd/systemd/blob/v255/src/basic/env-util.c#L542-L554),
+       L78-90 and [L28-50](https://github.com/systemd/systemd/blob/v255/src/basic/env-util.c#L28-L50); all at v255).
+       The repository's credential stores use the `export` form, so no unit points at them.
      - **The exposure.** This departs from `docs/secret-storage.md` step 9, which says services pass `--env-file`
        and do not use `EnvironmentFile=`, because `EnvironmentFile=` puts values into `/proc/<pid>/environ`. The
        exposure is the same with any loader, including upstream's own:
@@ -167,15 +172,18 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
 
        This is the same accepted exception that `docs/secret-storage.md` ("Process environment") and the
        `grafana-admin` inventory entry record for Grafana's loopback unit.
-   - **Non-secret `Environment=` lines, each with its reason in the unit:**
+   - **Non-secret `Environment=` lines.** The template gives each its own one-line reason:
      - `OMNIROUTE_MEMORY_MB=16384`: upstream accepts 64..16384 inclusive (OR `scripts/build/runtime-env.mjs` L19).
      - `CODEX_CLIENT_VERSION=0.157.1`: the installed client. It is the fallback for paths that do not forward the
        caller's version (OR `src/shared/constants/codexClient.ts`).
      - `STREAM_READINESS_TIMEOUT_MS=600000` and `STREAM_READINESS_MAX_TIMEOUT_MS=600000`: the defaults are 80000 and
-       180000 (OR `src/shared/utils/runtimeTimeouts.ts` L24-25). The content-stall watchdog reuses them, and they would
-       abort a max-effort turn that reasons before its first content.
-     - `STREAM_ACTIVE_TIMEOUT_MS=3600000`: the default is 1260000, or 21 minutes, and it is never reset by upstream
-       bytes (L21).
+       180000 (OR `src/shared/utils/runtimeTimeouts.ts` L24-25). The adaptive readiness budget starts from the first
+       and never exceeds the second (OR `open-sse/utils/streamReadinessPolicy.ts` L198), and the content-stall
+       watchdog reuses that budget (OR `open-sse/handlers/chatCore.ts` L6395-6399). So the defaults would abort a
+       max-effort turn that reasons longer than that before its first content.
+     - `STREAM_ACTIVE_TIMEOUT_MS=3600000`: the default is 1260000, or 21 minutes (OR `runtimeTimeouts.ts` L21).
+       Upstream documents it as a hard cap that upstream byte activity never resets, disabled by 0 (OR
+       `open-sse/config/constants.ts` L31-33).
      - `CLI_ALLOW_CONFIG_WRITES=false`: the default is true (OR `src/shared/services/cliRuntime.ts` L1077-1078).
        Templates stay the single writer of Codex and Claude configuration.
    - **Local adaptation: an `lsof` shim on the unit's `PATH`.** It is
@@ -198,7 +206,10 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      - Direct provider calls select by `providerStrategies[provider].fallbackStrategy`, else `fallbackStrategy`, else
        `"fill-first"` (OR `src/sse/services/auth.ts` L1952-1957).
      - Affinity runs first.
-     - `docs/routing/AUTO-COMBO.md` recommends sticky 1 for one-model rotation.
+     - `stickyRoundRobinLimit` keeps one target for that many consecutive successes before rotating (default 3).
+       Upstream says to set the combo override to 1 "for one-request rotation" (OR `docs/routing/AUTO-COMBO.md`
+       L354-357). This record applies the same value to the codex provider strategy, which direct provider calls
+       read before the global setting (OR `src/sse/services/auth.ts` L1999-2000).
      - There is no combo and no router alias. Codex sends `cx/gpt-6-astra`, and the gateway logged the upstream model
        as `gpt-6-astra` (`probe-lane-run2.json`, `gateway-effort-rows.json`).
    - `promptCacheAffinityEnabled = true`, the default, is kept.
@@ -275,10 +286,11 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      and `command_scope` record the base commit, the picks and `BUILD_SHA`, and point here. `upstream_sources` gains
      the base commit and the two PRs.
    - **The unit template is values-free.** Prefix placeholders stand in for paths, no secret is written in it, and
-     the only secrets it adds come through `EnvironmentFile=`. It mirrors the installed unit, with one addition:
-     `Environment=OMNIROUTE_SERVER_HOST=127.0.0.1`. `omniroute serve` binds `0.0.0.0` when that variable is unset (OR
-     `bin/cli/utils/serverHost.mjs` L16-26), and the keyless posture needs loopback. On the workstation the
-     environment file already sets the same value.
+     the only secrets it adds come through `EnvironmentFile=`. It mirrors the installed unit's directives, apart from
+     `Description=`, with one addition: `Environment=OMNIROUTE_SERVER_HOST=127.0.0.1`. `omniroute serve` binds
+     `0.0.0.0` when that variable is unset (OR `bin/cli/utils/serverHost.mjs` L16-26), and the keyless posture needs
+     loopback. On the workstation the environment file already sets the same value. Each `Environment=` line carries
+     its own one-line reason, which the structural test enforces.
    - **The inventory.** The `omniroute` entry describes a keyless loopback gateway with an optional per-lane key.
 
 ## Evidence
@@ -345,7 +357,8 @@ The classes are kept separate.
   reverse) is reported, not retained.
 - **Synthetic fixture:** the `Request`-over-`Proxy` reproduction on three Node runtimes. The corrected
   `proxy-repro-independent.txt` supersedes the first `proxy-repro.txt`, which is kept with its flaw noted.
-- **Source review:** every upstream line cited above, read at `a58000c7` or `5458026c`.
+- **Source review:** every upstream line cited above, read at its stated pin: OmniRoute `a58000c7` or `5458026c`,
+  Codex `rust-v0.157.1`, systemd `v255`, and Next.js 16.3.5 in the build's `node_modules`.
 - **Structural validation:** `tests/test_omniroute_gateway_unit.py` checks the template's shape and that it renders to
   the recorded installed unit.
 

@@ -4,8 +4,8 @@ Offline text checks only, in the style of test_token_report_refresh_units.py. No
 verifies a unit with a live systemd manager; `systemd-analyze --user verify` on a rendered copy is a separate, manual
 acceptance check. The template must render to the unit recorded as installed on the workstation
 (evidence/artifacts/omniroute-gateway-20260927/omniroute.service), apart from its Description= and one documented
-extra line. The unit text holds no secret, names exactly one EnvironmentFile= and gives every Environment= line a reason
-comment. A text test cannot see what a user service inherits from the user manager's environment; the template's header
+extra line. The unit text holds no secret, names exactly one EnvironmentFile= and gives every Environment= line a one-line
+reason comment. A text test cannot see what a user service inherits from the user manager's environment; the template's header
 says how to keep credentials out of it. Each check is a helper function that a planted violation must fail (the
 discriminating controls at the end).
 """
@@ -58,10 +58,14 @@ def secret_like_environment(text: str) -> list[str]:
 
 
 def unexplained_environment(text: str) -> list[str]:
-    """Environment= lines whose preceding line is not a comment: each needs its own one-line reason."""
+    """Environment= lines without exactly one reason line: the line before must be a comment, the one before that not."""
     lines = text.splitlines()
+
+    def comment(index: int) -> bool:
+        return index >= 0 and lines[index].startswith("#")
+
     return [line for index, line in enumerate(lines)
-            if line.startswith("Environment=") and not (index and lines[index - 1].startswith("#"))]
+            if line.startswith("Environment=") and not (comment(index - 1) and not comment(index - 2))]
 
 
 def mirror_differences(template: str, installed: str) -> list[str]:
@@ -130,6 +134,11 @@ class OmniRouteUnitTemplateTests(unittest.TestCase):
         planted = self.template.replace("Environment=CLI_ALLOW_CONFIG_WRITES=false",
                                         "Environment=CLI_ALLOW_CONFIG_WRITES=false\nEnvironment=EXTRA=1")
         self.assertEqual(unexplained_environment(planted), ["Environment=EXTRA=1"])
+
+    def test_a_two_line_reason_is_caught(self):
+        planted = self.template.replace("Environment=CLI_ALLOW_CONFIG_WRITES=false",
+                                        "# a second reason line\nEnvironment=CLI_ALLOW_CONFIG_WRITES=false")
+        self.assertEqual(unexplained_environment(planted), ["Environment=CLI_ALLOW_CONFIG_WRITES=false"])
 
     def test_a_drifted_template_no_longer_mirrors_the_installed_unit(self):
         drifted = self.template.replace("STREAM_ACTIVE_TIMEOUT_MS=3600000", "STREAM_ACTIVE_TIMEOUT_MS=0")
