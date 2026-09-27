@@ -6843,8 +6843,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "8c99d9742e5b9b66592eaaf58e5bf99ac77c948f00b70443d7fb332275ed1526",
-      "bytes": 15815
+      "sha256": "d00c1dd4746c6519193bfedabc840356f6d981363c0ab438549ed63d6d8156ea",
+      "bytes": 19127
     },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",

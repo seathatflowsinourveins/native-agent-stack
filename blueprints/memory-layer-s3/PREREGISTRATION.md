@@ -1,6 +1,8 @@
-# Memory layer S3: head-to-head preregistration (DRAFT r2, 2026-09-27)
+# Memory layer S3: head-to-head preregistration (DRAFT r3, 2026-09-27)
 
-**Status: DRAFT r2, not frozen.**
+**Status: DRAFT r3, not frozen.**
+- r2 (sha256 `8c99d974…`) received GPT-6 `needs_changes`. It resolved 9 of r1's 11 findings, left 2 partly resolved (statistics specifics, token ledgers), and raised 4 new ones (1 high, 3 medium). r3 applies GPT-6's replacement text for all six; see section 11.
+- The next GPT-6 review is the bundle review of section 9.
 - r1 (sha256 `623efad9…`) received GPT-6 `needs_changes` (6 high, 4 medium, 1 low). This revision answers every finding; section 10 maps each one.
 - It freezes only as described in section 9: after an `accept` on the complete experiment bundle, not on this file alone.
 - Once frozen, it is never edited. Later changes are dated amendments.
@@ -104,6 +106,11 @@ Also pending from the 2026-09-26 sweep, where only a missing vote refuted them: 
   - (b) native per-model usage as each model reports it (cached input, uncached input, output and reasoning kept apart).
 
   A payload count is never added to a request total that already contains it.
+- **Decision ledger (r3).** Each host freezes **one decision ledger and its non-overlapping scalar aggregation** before execution, and applies it the same way to every compared arm and to the final selection.
+  - The decision ledger must be a normalized complete-workload ledger: every relevant model invocation, including internal extraction, embedding, consolidation, reranking and retries.
+  - Payload-only counts (ledger a) support only a payload-size claim. They never stand in for complete workload cost.
+  - If the decision ledger is incomplete for an arm, that arm's cost qualification is `pending`.
+  - If the reference's cost is zero, the cost route cannot qualify. Report absolute counts and an undefined ratio.
 - MCP-only paths are measured at the client tool-call boundary.
 - A required cost that is unknown leaves that configuration's cost qualification `pending`. It never counts as zero.
 - **Reporting:** candidate-to-reference ratios are reported only at matched quality (section 7). A configuration's being under a budget is not a token-saving claim.
@@ -141,11 +148,22 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 
 ## 6. Statistics (frozen before any confirmatory run)
 
-- **Pairing:** paired by question within history clusters. The cluster bootstrap resamples whole gold-session clusters, keeping all their questions and seeds together. Seeds 20260927–20260931, 10,000 resamples, percentile intervals.
-- **Hypothesis family, one per host:** for each primary candidate arm against that host's reference arm, a one-sided test on the full-track `recall_all@5` difference.
-  - H0: diff ≤ 0. The p-value is the cluster-bootstrap share of resampled differences ≤ 0.
-  - Holm correction across the candidates in that host's family.
-- **Outside the family:** C3′, the deployed arms, controls, reserves (unless admitted before execution), the common-embedder diagnostics, the official track and `ndcg_any@5`.
+- **Reference availability** is settled by a frozen preflight before any scoring: C4′ must install, start and return a well-formed reranked result on 5 frozen development questions. If it fails, the reference arm is C3′ and C4′ is `pending`, decided before the confirmatory run.
+- **Frozen before the first confirmatory result:**
+  - the question-to-cluster manifest (sha256), built by merging questions that share any gold session;
+  - seed aggregation: the five paired seeds (20260927–20260931) are averaged within each question;
+  - question-weighted differences;
+  - the RNG (NumPy `PCG64`, bootstrap seed 20260927);
+  - 10,000 cluster resamples. Each resample keeps every question of each drawn cluster.
+- **"Lower 95% bound"** means the **one-sided 5th-percentile bound** of the resampled difference, using `numpy.percentile(..., method="linear")`. Two-sided 95% intervals (2.5th and 97.5th percentiles) are reported separately and decide nothing.
+- **Hypothesis family, one per host, frozen before execution.** For every admitted primary candidate arm against that host's reference arm, the family holds both hypotheses:
+  - superiority, H0: Δ ≤ 0;
+  - non-inferiority, H0: Δ ≤ −0.02.
+
+  Δ is the full-track `recall_all@5` difference. Each p-value is the cluster-bootstrap share of resampled Δ at or below the null bound. Holm correction runs at family α = 0.05 across all of them.
+  - Missing arms cannot qualify, and they do not shrink the planned family.
+  - Reserves admitted after confirmatory execution are exploratory until a separately frozen comparison.
+- **Outside the family:** C3′, the deployed arms, controls, the common-embedder diagnostics, the official track and `ndcg_any@5`.
 - **Missing results:** a missing arm or lane result is `pending` and is not imputed.
 
 ## 7. Decision rule (per host)
@@ -153,17 +171,19 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 **Eligibility, required of every configuration, the reference included:**
 1. passes every item of 4.4;
 2. warm p95 latency (4.3) at most 1.0 s;
-3. complete workload cost (4.2) known, not `pending`;
-4. lane 4.5 (a) task success reported.
+3. the decision-ledger cost (4.2) is complete, not `pending`;
+4. lane 4.5 (a) results are complete for all 25 frozen tasks.
 
-**Replacement routes.** An eligible candidate replaces the reference by either route:
-- **Superiority:** Holm-adjusted p < 0.05 **and** an observed full-track `recall_all@5` difference of at least **0.05**. This does not claim the population improvement exceeds 5 points.
-- **Non-inferiority plus cost:** the lower 95% bound of the difference is above **−0.02**, **and** the complete workload tokens (ledger b; ledger a if the native ledger is unavailable for both arms) are at most **0.80×** the reference's, **and** 4.5 (a) task success is not below the reference's by more than 1 of 25 tasks.
+**Usefulness floor (r3), applied to both routes before the replacing set is formed.** The candidate's 4.5 (a) successes must be at least the reference's successes minus one, on the same 25 frozen tasks with the same scoring rules. Missing task results leave qualification `pending`.
+
+**Replacement routes.** An eligible candidate that meets the usefulness floor replaces the reference by either route:
+- **Superiority:** the Holm-adjusted p of its superiority hypothesis (§6) is below 0.05, **and** the observed full-track `recall_all@5` difference is at least **0.05**. This does not claim the population improvement exceeds 5 points.
+- **Non-inferiority plus cost:** the Holm-adjusted p of its non-inferiority hypothesis (§6) is below 0.05, which is equivalent to the adjusted one-sided lower bound lying above **−0.02**, **and** its decision-ledger workload cost (4.2) is at most **0.80×** the reference's.
 
 **Selection among several replacing candidates.**
 - Let `qmax` be the highest `recall_all@5` point estimate among them.
 - The cost-selection set is every replacing candidate with q ≥ qmax − **0.02**.
-- The member with the lowest complete workload tokens is selected.
+- The member with the lowest decision-ledger workload cost (the same frozen scalar aggregation for every member) is selected.
 - This is a practical decision tolerance, not statistical equivalence.
 - If an unknown cost could change the winner, selection is unresolved.
 - An exact residual tie gives joint winners.
@@ -212,3 +232,14 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 | medium 9: usefulness lane | §4.5 |
 | medium 10: native Codex control | §2 |
 | low 11: reserve admission and engram | §2 |
+
+## 11. r2 re-check findings and their fixes (r3)
+
+| r2 re-check finding | Fixed in |
+|---|---|
+| partly resolved r1-2: cluster assignment, weighting, seed aggregation, RNG, C4′ preflight | §6: frozen preflight, cluster manifest, seed averaging, question weighting, PCG64 seed |
+| partly resolved r1-4: payload ledger promoted to complete cost; aggregation undefined | §4.2 decision ledger; §7 routes use it |
+| new medium 1: "lower 95% bound" ambiguous | §6: one-sided 5th percentile, `numpy.percentile(method="linear")` |
+| new medium 2: non-inferiority escapes Holm | §6: per-host family holds both hypotheses; Holm at α 0.05 |
+| new medium 3: payload fallback changes the winner | §4.2: payload counts support only a payload-size claim; incomplete ledger means `pending` |
+| new high 4: superiority bypasses usefulness | §7: usefulness floor before either route |
