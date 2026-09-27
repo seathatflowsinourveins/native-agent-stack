@@ -469,6 +469,42 @@ function agentOptionLiterals(src) {
   expect('settings: workflowSizeGuideline is a documented value and the project instructions name the same one', ['unrestricted', 'small', 'medium', 'large'].includes(size) && readOr(configured('instructions')).includes('`' + size + '` size guideline'))
   const scout = readFileSync(join(dir, 'source-scout.md'), 'utf8')
   expect('agents: source-scout is read-only built-ins without project instructions', /^tools: Read, Grep, Glob, Bash$/m.test(scout) && /^omitClaudeMd: true$/m.test(scout))
+  // Dispatch by role (since 2026-09-26; docs/decisions/2026-09-26-stack-agents-role-dispatch.md in the catalog):
+  // each role names one project agent, and the role table restates that agent with the model and effort its
+  // file declares. A missing agent file reads as empty and fails here instead of aborting the suite.
+  const ROLE_AGENTS = { scout: 'source-scout', researcher: 'stack-researcher', builder: 'isolated-builder', reviewer: 'evidence-reviewer', security: 'security-reviewer', verifier: 'stack-verifier', adjudicator: 'blind-adjudicator' }
+  const roleHead = routingLines.findIndex((l) => l.startsWith('| Role | `agentType` | Model, effort |'))
+  const roleTable = []
+  for (let i = roleHead + 2; roleHead >= 0 && i < routingLines.length && routingLines[i].startsWith('|'); i++) roleTable.push(routingLines[i].split('|').slice(1, -1).map((c) => c.trim()))
+  const frontOf = (agent) => (readOr(join(dir, agent + '.md')).match(/^---\n([\s\S]*?)\n---/) || [null, ''])[1]
+  const modelEffortOf = (agent) => title[(frontOf(agent).match(/^model: (\w+)$/m) || [])[1]] + ', ' + (frontOf(agent).match(/^effort: (\w+)$/m) || [])[1]
+  expect('routing doc: the role table maps each dispatch role to its project agent with the model and effort its file declares', roleTable.length === Object.keys(ROLE_AGENTS).length && Object.entries(ROLE_AGENTS).every(([role, agent]) => { const rows = roleTable.filter((r) => r[0] === role); return rows.length === 1 && rows[0][1] === '`' + agent + '`' && names.includes(agent + '.md') && rows[0][2] === modelEffortOf(agent) }))
+  // The stack agents' surfaces are pinned exactly, like the reviewer's: an added edit, fetch or skill tool fails
+  // here until it is reviewed and listed. Their Bash and Context Mode ctx_execute* stay instruction-bound.
+  const toolsOf = (agent) => ((frontOf(agent).match(/^tools: (.*)$/m) || [null, ''])[1]).split(',').map((t) => t.trim()).filter(Boolean).sort()
+  expect('agents: security-reviewer tool surface is exactly the reviewed list', JSON.stringify(toolsOf('security-reviewer')) === JSON.stringify(expectedReviewerTools))
+  // Match the documented block-list style shipped by semantic-evidence-reviewer.
+  // Exact lists also reject substitution of an off/user-invocable-only skill; the
+  // installer tests separately read the pinned table's Listing column for all agents.
+  const skillsOf = (agent) => ((frontOf(agent).match(/^skills:\n((?:  - [^\n]+(?:\n|$))*)/m) || [null, ''])[1]).split('\n').filter(Boolean).map((line) => line.replace(/^  - /, '')).sort()
+  expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode', 'verification-before-completion']))
+  expect('agents: security-reviewer preloads exactly its reviewed skill', JSON.stringify(skillsOf('security-reviewer')) === JSON.stringify(['security-best-practices']))
+  const ctx = (t) => 'mcp__plugin_context-mode_context-mode__' + t
+  const expectedResearcherTools = ['Read', 'Glob', 'Grep', 'Bash', 'WebSearch', 'ToolSearch',
+    ctx('ctx_batch_execute'), ctx('ctx_execute'), ctx('ctx_execute_file'), ctx('ctx_fetch_and_index'), ctx('ctx_search'),
+    'mcp__qmd__query', 'mcp__qmd__get', 'mcp__ai-memory__memory_query',
+    'mcp__serena__find_symbol', 'mcp__serena__find_referencing_symbols', 'mcp__serena__get_symbols_overview',
+    'mcp__jcodemunch__route', 'mcp__jcodemunch__menu', 'mcp__jcodemunch__order'].sort()
+  expect('agents: stack-researcher tool surface is exactly the reviewed list', JSON.stringify(toolsOf('stack-researcher')) === JSON.stringify(expectedResearcherTools))
+  const expectedVerifierTools = ['Read', 'Glob', 'Grep', 'Bash', 'ToolSearch', ctx('ctx_batch_execute'), ctx('ctx_execute'), ctx('ctx_execute_file'), ctx('ctx_search')].sort()
+  expect('agents: stack-verifier tool surface is exactly the reviewed list', JSON.stringify(toolsOf('stack-verifier')) === JSON.stringify(expectedVerifierTools))
+  // Serena binds the parent session's project once at startup (--project-from-cwd; its claude-code context is
+  // single-project), so a worktree builder's Serena edit would change that checkout, not the worktree.
+  const SERENA_READ = ['find_symbol', 'find_referencing_symbols', 'find_declaration', 'find_implementations', 'get_symbols_overview', 'get_diagnostics_for_file'].map((t) => 'mcp__serena__' + t)
+  expect('agents: isolated-builder grants only Serena read tools', toolsOf('isolated-builder').length > 0 && toolsOf('isolated-builder').filter((t) => t.startsWith('mcp__serena__')).every((t) => SERENA_READ.includes(t)))
+  const bodyOf = (agent) => readOr(join(dir, agent + '.md')).split(/^---$/m)[2] || ''
+  expect('agents: stack-researcher fetches pages through Context Mode and returns findings inline', /`ctx_fetch_and_index`/.test(bodyOf('stack-researcher')) && /inline/.test(bodyOf('stack-researcher')))
+  expect('agents: stack-verifier runs named commands through rtk proxy and never fixes', /`rtk proxy`/.test(bodyOf('stack-verifier')) && /never fix/.test(bodyOf('stack-verifier')))
 }
 console.log('SUMMARY passed=' + passed + ' failed=' + failed + ' total=' + (passed + failed))
 process.exit(failed ? 1 : 0)

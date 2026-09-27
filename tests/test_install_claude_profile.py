@@ -144,12 +144,14 @@ class SecretGuardProfileTests(unittest.TestCase):
 
 class AgentsInstallTests(unittest.TestCase):
     def test_installs_every_adoption_agent(self):
-        # Seven since 2026-09-23: the blind layer-verdict roles (blind-lane-reviewer, blind-adjudicator) joined.
+        # Seven since 2026-09-23 (the blind layer-verdict roles joined); ten since 2026-09-26, when the
+        # stack-researcher, stack-verifier and security-reviewer roles joined
+        # (docs/decisions/2026-09-26-stack-agents-role-dispatch.md).
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_agents(home, dry_run=False)
             self.assertEqual(len(results), len(list(icp.AGENTS_SRC_DIR.glob("*.md"))))
-            self.assertEqual(len(results), 7)
+            self.assertEqual(len(results), 10)
             dest_dir = home / ".claude" / "agents"
             installed = sorted(p.name for p in dest_dir.glob("*.md"))
             expected = sorted(p.name for p in icp.AGENTS_SRC_DIR.glob("*.md"))
@@ -368,6 +370,99 @@ class ShippedAgentFrontmatterTests(unittest.TestCase):
                 with self.subTest(body=body):
                     self.assertNotEqual(self.yaml_problems(path, yaml), [])
                     self.assertEqual(self.problems(path) == [], text_reader_passes)
+
+
+class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
+    """The installer copies adoption/agents/claude/, while examples/claude-native/workflows/test-envelope.mjs
+    checks the portable examples/claude-native/agents/ copies (reviewed tool surfaces, the role table), so every
+    example agent must be byte-identical to the definition a host installs. AGENTS.md points workflow dispatch at
+    the role table in the examples README, and every agentType that table names must be a shipped agent
+    (docs/decisions/2026-09-26-stack-agents-role-dispatch.md)."""
+
+    EXAMPLES_DIR = ROOT / "examples" / "claude-native" / "agents"
+    ROLE_DOC = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
+    ROLE_HEADER = "| Role | `agentType` | Model, effort |"
+    SKILLS_DOC = ROOT / "docs" / "decisions" / "2026-09-25-skills-trial-and-usage.md"
+    SKILLS_HEADER = "| Name | Source @ ref | Status | Listing | Codex | Gap |"
+
+    @staticmethod
+    def table_rows(text: str, header: str) -> list[list[str]]:
+        """Cells from the table under the named header; empty when the table is absent."""
+        lines = text.splitlines()
+        head = next((i for i, line in enumerate(lines) if line.startswith(header)), None)
+        rows: list[list[str]] = []
+        for line in lines[head + 2:] if head is not None else []:
+            if not line.startswith("|"):
+                break
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            rows.append(cells)
+        return rows
+
+    @classmethod
+    def role_rows(cls, text: str) -> dict[str, str]:
+        """{role: agentType} using the same table reader as skill-listing eligibility."""
+        return {cells[0]: cells[1].strip("`") for cells in cls.table_rows(text, cls.ROLE_HEADER)}
+
+    def test_every_preload_is_listing_eligible_and_targeted_roles_have_exact_skills(self):
+        # Sources: the pinned table's Listing column and the upstream sub-agents
+        # preload rules. Plugin skills are not table rows: only their namespace shape
+        # is checked here; this is not a native plugin-preload probe.
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML is not installed")
+        columns = [cell.strip() for cell in self.SKILLS_HEADER.strip("|").split("|")]
+        rows = self.table_rows(self.SKILLS_DOC.read_text(encoding="utf-8"), self.SKILLS_HEADER)
+        self.assertTrue(rows, "pinned skills table is missing")
+        listing = {row[columns.index("Name")]: row[columns.index("Listing")] for row in rows}
+        preloads = {}
+        for path in sorted(icp.AGENTS_SRC_DIR.glob("*.md")):
+            with self.subTest(agent=path.name):
+                front, error = ShippedAgentFrontmatterTests.yaml_frontmatter(path, yaml)
+                self.assertIsNone(error)
+                self.assertIsInstance(front, dict)
+                skills = front.get("skills", [])
+                self.assertIsInstance(skills, list)
+                preloads[path.stem] = skills
+                for skill in skills:
+                    self.assertIsInstance(skill, str)
+                    if ":" in skill:
+                        self.assertRegex(skill, r"^[^:\s]+:[^:\s]+$")
+                    else:
+                        self.assertIn(listing.get(skill), {"on", "name-only"},
+                                      f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
+        for agent, expected in {
+            "isolated-builder": ["context-mode:context-mode", "verification-before-completion"],
+            "security-reviewer": ["security-best-practices"],
+        }.items():
+            with self.subTest(agent=agent):
+                self.assertIn(agent, preloads)
+                self.assertCountEqual(preloads[agent], expected)
+
+    def test_every_example_agent_is_byte_identical_to_its_installed_source(self):
+        examples = sorted(self.EXAMPLES_DIR.glob("*.md"))
+        self.assertTrue(examples)
+        for path in examples:
+            with self.subTest(agent=path.name):
+                source = icp.AGENTS_SRC_DIR / path.name
+                self.assertTrue(source.is_file(), f"{path.name} has no adoption/agents/claude copy")
+                self.assertEqual(path.read_bytes(), source.read_bytes())
+
+    def test_agents_md_points_at_a_role_table_of_shipped_agents(self):
+        rows = self.role_rows(self.ROLE_DOC.read_text(encoding="utf-8"))
+        self.assertTrue(rows)
+        for role, agent in rows.items():
+            with self.subTest(role=role):
+                self.assertTrue((icp.AGENTS_SRC_DIR / f"{agent}.md").is_file(), f"{role} names {agent}")
+        pointer = [line for line in (ROOT / "AGENTS.md").read_text(encoding="utf-8").splitlines()
+                   if "examples/claude-native/workflows/README.md" in line]
+        self.assertTrue(any("agentType" in line for line in pointer), "no AGENTS.md line points dispatch at the table")
+
+    def test_the_role_table_reader_needs_the_role_header(self):
+        self.assertEqual(self.role_rows("| Agent | Model, effort |\n| --- | --- |\n| `a` | Opus, max |\n"), {})
+        self.assertEqual(self.role_rows(self.ROLE_HEADER + " Use |\n| --- | --- | --- | --- |\n"
+                                        "| scout | `source-scout` | Sonnet, max | x |\n\nafter\n"),
+                         {"scout": "source-scout"})
 
 
 class McpMatchTests(unittest.TestCase):

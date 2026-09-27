@@ -311,9 +311,14 @@ GitHub-hosted macOS runner; see
      every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
      (paths relative to that file); skipped per file if the installed copy
      already matches.
-   - **agents**: copies the seven [`adoption/agents/claude/*.md`](agents/claude/)
+   - **agents**: copies the ten [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
-     byte-identical.
+     byte-identical. They changed after `v2026.09.26`: `stack-researcher`,
+     `stack-verifier` and `security-reviewer` were added (the security role
+     preloads `security-best-practices`), and `isolated-builder` preloads
+     `context-mode:context-mode` and `verification-before-completion` and lost Serena's
+     symbol-edit tools, which would edit the parent session's checkout rather
+     than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
      http and `serena` stdio), renders its `${HOME}` and
@@ -390,7 +395,7 @@ GitHub-hosted macOS runner; see
    at that tag `source-scout` and `isolated-builder` declare `effort: medium`
    (`source-scout` also `maxTurns: 40`), `evidence-reviewer`,
    `semantic-evidence-reviewer` and `blind-judge` declare `effort: high`, and the
-   two blind lane roles are absent; here all seven declare `effort: max`
+   two blind lane roles are absent; here all ten declare `effort: max`
    ([decision](../docs/decisions/2026-09-23-max-effort-default.md)). The guard
    hooks' `adoption/hooks/claude/` also changed after `v2026.09.24.1` (its
    `SHA256SUMS` gained the secret-path guard entry), and it changed after `v2026.09.25.1` again:

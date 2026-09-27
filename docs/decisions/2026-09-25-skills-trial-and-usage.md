@@ -120,7 +120,7 @@ The manifest applies one rule per candidate, in order:
 | --- | --- | --- | --- | --- | --- |
 | typesafe-ai | typesafe-ai/skills@65a39f3 | kept | name-only | yes | Verdict winner (`instructions-skills`): typed semantic judgments for evidence review, used by the semantic-evidence-reviewer role. |
 | gh-fix-ci | openai/skills@49f948f | kept | on | yes | Verdict winner: triage failing GitHub Actions checks on this repo's 18 workflows and 7 required checks. |
-| security-best-practices | openai/skills@49f948f | kept | on | yes | Verdict winner: language-specific secure-coding review for `scripts/` and `tools/`. |
+| security-best-practices | openai/skills@49f948f | kept | on | yes | Verdict winner: language-specific secure-coding review for `scripts/` and `tools/`, used by the security-reviewer role. |
 | iterative-retrieval | affaan-m/ECC@2b6e839 | kept | name-only | yes | Verdict winner (ECC): staged retrieval for subagent context under the small-context rule. |
 | search-first | affaan-m/ECC@2b6e839 | kept | name-only | yes | Verdict winner (ECC): research existing upstream tools before writing code (AGENTS.md research-first rule). |
 | diagnosing-bugs | mattpocock/skills@c55ee46 | trial | on | yes | No debugging procedure is installed; failing tests, CI and paper-engine faults are diagnosed ad hoc. |
@@ -453,3 +453,44 @@ heading, not a receipt. Another host or client version re-runs the probe.
 
 **Overturn.** Any Claude Code release note or docs change to preload eligibility, or a re-run of
 the probe on a newer client that preloads a `user-invocable-only` skill.
+
+## Addendum 2026-09-26: targeted role preloads (security-reviewer, isolated-builder)
+
+The [stack-agent decision](2026-09-26-stack-agents-role-dispatch.md) adds a read-only
+`security-reviewer` that preloads `security-best-practices` (openai/skills@49f948f,
+`kept`, `Listing: on`), and gives `isolated-builder` a targeted preload of
+`context-mode:context-mode` and `verification-before-completion` (obra/superpowers@8ca22db,
+`trial`, `Listing: on`). `security-reviewer`'s named read tools match `evidence-reviewer`;
+neither new configuration grants a Bash, Edit, Write, WebFetch or Skill tool beyond what
+each role already carried. The skills add guidance, not tool permissions. No `semgrep` or
+`codeql` preload is added: the first addendum above records that neither CLI is installed,
+and neither reviewer runs acceptance commands.
+
+All six dispatch roles now have an explicit preload decision:
+
+| Agent | Preloaded skills | Basis |
+| --- | --- | --- |
+| `source-scout` | none | bounded extraction and named command results |
+| `stack-researcher` | none | task-specific source research; read a named skill explicitly |
+| `stack-verifier` | none | named checks and per-claim verdicts |
+| `evidence-reviewer` | none | general source review with the existing named read tools |
+| `isolated-builder` | `context-mode:context-mode`, `verification-before-completion` | context-mode plugin 1.0.169 is available and its `SKILL.md` sets no invocation-disabling frontmatter; `verification-before-completion` is `trial`, `Listing: on` above |
+| `security-reviewer` | `security-best-practices` | pinned, `kept`, `Listing: on` above |
+
+Per the ["listing state and agent preload" addendum](#addendum-2026-09-26-listing-state-and-agent-preload)
+above, a skill preloads through `skills:` only at `Listing: on` or `name-only`;
+`user-invocable-only` and `off` block it. All three preloaded skills here meet that bar. That
+addendum's probe covers a pinned, table-listed skill; `context-mode:context-mode` is a
+plugin-scoped skill outside the pinned table, so its eligibility rests on the same upstream
+mechanism (no `disable-model-invocation` field in its installed `SKILL.md`) rather than a
+repeat of the probe on a plugin skill specifically. The local integration test
+(`tests/test_install_claude_profile.py`) checks every shipped agent's preload against this
+table's `Listing` column, and checks a plugin-scoped name only for its `plugin:skill` shape,
+not installation or native preload success.
+
+Native viability for `context-mode:context-mode` and `verification-before-completion`
+therefore rests on the probe above and the absent-disabling-field check, not a repeat native
+run of these two skills specifically; first-prompt size for all three preloaded
+configurations is unmeasured. They join the researcher/verifier preregistration in the
+stack-agent decision; no default preload is added to every role child (that decision's own
+D3 constraint, narrowed rather than reversed).
