@@ -2355,7 +2355,7 @@
   },
   {
    "action": "Direct-HTTP (FW) judgment callers: model `cx/gpt-6-astra-max` (suffix wins over body, codex.ts L1451-1456); never send reasoning_effort 'auto'",
-   "why": "Measured 2026-09-27 17:20Z from call_logs: no reasoning_effort -> upstream medium (105 reasoning tokens); -max -> max (279); -max plus a tool -> max (675) with the tool call returned; xhigh plus a tool -> xhigh. Codex CLI lanes do not reliably carry effort: 616 codex/gpt-6-astra /v1/responses rows (12:00-20:00Z) had none and 0 reasoning tokens, against 3,809 at max (probes/codex-effort-coverage-20260927.json), so Codex lanes use the -max suffix too.",
+   "why": "Measured 2026-09-27 17:20Z from call_logs: no reasoning_effort -> upstream medium (105 reasoning tokens); -max -> max (279); -max plus a tool -> max (675) with the tool call returned; xhigh plus a tool -> xhigh. Codex CLI lanes send reasoning.effort=max on every request (stored bodies: 541 of 541 no-reasoning rows that kept one; probes/codex-sent-effort-20260927.json), but 617 of their codex/gpt-6-astra /v1/responses turns (12:00-20:00Z) returned 0 reasoning tokens against 3,825 that reasoned (probes/codex-effort-coverage-20260927.json). call_logs records effort only when a response carries encrypted reasoning (callLogs.ts L646-653), so those rows show none; the -max suffix does not change it.",
    "owner_class": "fw-client-config"
   },
   {

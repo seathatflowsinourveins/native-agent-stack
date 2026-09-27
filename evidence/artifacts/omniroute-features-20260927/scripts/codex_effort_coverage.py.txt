@@ -1,8 +1,8 @@
 """Codex effort coverage on the shared gateway (read-only SELECT of call_logs; counts and quantiles only, no ids, tags,
 accounts or bodies).
 
-Question: do Codex CLI lanes configured for model `codex/gpt-6-astra` with `model_reasoning_effort=max` carry that
-effort on every /v1/responses request? Reported by token-save-practice-gpt6 (row-by-row matching to Codex rollouts:
+Question: how often do Codex CLI turns configured for `codex/gpt-6-astra` at `model_reasoning_effort=max` return no
+reasoning, and how do they spread across gateway conversations and job windows? Reported by token-save-practice-gpt6 (row-by-row matching to Codex rollouts:
 the first request of a `codex exec` session and every `spawn_agent` request carried no effort); this script measures
 the gateway side independently.
 
@@ -79,6 +79,7 @@ for job in json.load(open(jobs_path))["jobs"]:
 
 json.dump({
     "source": "read-only SELECT of the shared gateway's call_logs (127.0.0.1:20128, build dd6e9607e); counts only",
+    "column_semantics": "call_logs fills reasoning_effort_requested and reasoning_effort_upstream only when the response carried encrypted reasoning (src/lib/usage/callLogs.ts L646-653); a row whose response had no reasoning logs none/none whatever the request sent. What was sent is in codex-sent-effort-20260927.json.",
     "scope": {"path": "/v1/responses", "requested_model": "codex/gpt-6-astra", "since": since, "until": until},
     "totals": totals,
     "size_profile": profiles,

@@ -1,5 +1,6 @@
 {
  "source": "read-only SELECT of the shared gateway's call_logs (127.0.0.1:20128, build dd6e9607e); counts only",
+ "column_semantics": "call_logs fills reasoning_effort_requested and reasoning_effort_upstream only when the response carried encrypted reasoning (src/lib/usage/callLogs.ts L646-653); a row whose response had no reasoning logs none/none whatever the request sent. What was sent is in codex-sent-effort-20260927.json.",
  "scope": {
   "path": "/v1/responses",
   "requested_model": "codex/gpt-6-astra",
@@ -10,39 +11,39 @@
   {
    "requested": "max",
    "upstream": "max",
-   "rows": 3809
+   "rows": 3825
   },
   {
    "requested": "none",
    "upstream": "none",
-   "rows": 616
+   "rows": 617
   }
  ],
  "size_profile": {
   "no_effort": {
    "tokens_in": {
-    "n": 616,
+    "n": 617,
     "p10": 0,
     "p50": 28099,
     "p90": 118313,
     "max": 227936
    },
    "tokens_cache_read": {
-    "n": 616,
+    "n": 617,
     "p10": 0,
     "p50": 19200,
     "p90": 111360,
     "max": 227200
    },
    "tokens_out": {
-    "n": 616,
+    "n": 617,
     "p10": 0,
     "p50": 190,
     "p90": 424,
     "max": 3335
    },
    "tokens_reasoning": {
-    "n": 616,
+    "n": 617,
     "p10": 0,
     "p50": 0,
     "p90": 0,
@@ -50,42 +51,42 @@
    },
    "status": {
     "200": 464,
-    "499": 147,
+    "499": 148,
     "502": 4,
     "503": 1
    }
   },
   "max": {
    "tokens_in": {
-    "n": 3809,
-    "p10": 39344,
-    "p50": 95881,
-    "p90": 171180,
+    "n": 3825,
+    "p10": 39396,
+    "p50": 95731,
+    "p90": 171112,
     "max": 244390
    },
    "tokens_cache_read": {
-    "n": 3809,
-    "p10": 29440,
-    "p50": 89088,
+    "n": 3825,
+    "p10": 29568,
+    "p50": 88704,
     "p90": 166912,
     "max": 237824
    },
    "tokens_out": {
-    "n": 3809,
-    "p10": 228,
-    "p50": 686,
+    "n": 3825,
+    "p10": 229,
+    "p50": 690,
     "p90": 2158,
     "max": 27991
    },
    "tokens_reasoning": {
-    "n": 3809,
+    "n": 3825,
     "p10": 18,
-    "p50": 191,
+    "p50": 194,
     "p90": 1034,
     "max": 7948
    },
    "status": {
-    "200": 3809
+    "200": 3825
    }
   }
  },

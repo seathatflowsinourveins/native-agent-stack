@@ -1,0 +1,36 @@
+"""Read-only: for codex gpt-6-astra /v1/responses rows on 20128 (12:00-20:00Z), read the stored request body through the
+gateway's own detail API (GET /api/usage/call-logs/<id>) and tally only reasoning.effort / reasoning.summary / the
+body model's suffix, split by whether reasoning was observed. Prints counts only; ids and content never leave this
+script."""
+import json, os, sqlite3, sys, urllib.request
+from collections import Counter
+con = sqlite3.connect("file:" + os.path.expanduser("~/.local/share/omniroute/storage.sqlite") + "?mode=ro", uri=True)
+W = ("path='/v1/responses' AND requested_model LIKE 'codex/gpt-6-astra%' AND timestamp >= '2026-09-27T12:00:00' "
+     "AND timestamp < '2026-09-27T20:00:00'")
+groups = {
+    "no reasoning observed": con.execute(f"SELECT id FROM call_logs WHERE {W} AND reasoning_source IS NULL").fetchall(),
+    "reasoning observed (sample 200)": con.execute(f"SELECT id FROM call_logs WHERE {W} AND reasoning_source IS NOT NULL ORDER BY id LIMIT 200").fetchall(),
+}
+out = {}
+for label, ids in groups.items():
+    c = Counter()
+    for (rid,) in ids:
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:20128/api/usage/call-logs/{rid}", timeout=30) as r:
+                d = json.load(r)
+        except Exception as e:
+            c[("fetch error", type(e).__name__)] += 1
+            continue
+        b = d.get("requestBody")
+        if not isinstance(b, dict):
+            c[("no request body",)] += 1
+            continue
+        rs = b.get("reasoning") if isinstance(b.get("reasoning"), dict) else None
+        model = str(b.get("model", ""))
+        c[("effort=" + str(rs.get("effort") if rs else "(no reasoning obj)"),
+           "summary=" + str(rs.get("summary") if rs else "-"),
+           "model suffix -max" if model.endswith("-max") else "model bare",
+           "reasoning tokens>0" if (d.get("tokens") or {}).get("reasoning") else "reasoning tokens 0")] += 1
+    out[label] = {"rows": len(ids), "tally": [[list(k), n] for k, n in c.most_common()]}
+json.dump(out, open(sys.argv[1], "w"), indent=1)
+print(json.dumps(out, indent=1))

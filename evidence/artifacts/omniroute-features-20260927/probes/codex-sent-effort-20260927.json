@@ -1,0 +1,51 @@
+{
+ "no reasoning observed": {
+  "rows": 618,
+  "tally": [
+   [
+    [
+     "effort=max",
+     "summary=None",
+     "model bare",
+     "reasoning tokens 0"
+    ],
+    540
+   ],
+   [
+    [
+     "no request body"
+    ],
+    77
+   ],
+   [
+    [
+     "effort=max",
+     "summary=None",
+     "model suffix -max",
+     "reasoning tokens 0"
+    ],
+    1
+   ]
+  ]
+ },
+ "reasoning observed (sample 200)": {
+  "rows": 200,
+  "tally": [
+   [
+    [
+     "effort=max",
+     "summary=None",
+     "model bare",
+     "reasoning tokens>0"
+    ],
+    147
+   ],
+   [
+    [
+     "no request body"
+    ],
+    53
+   ]
+  ]
+ }
+}

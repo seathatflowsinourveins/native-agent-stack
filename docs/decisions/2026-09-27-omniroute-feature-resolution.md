@@ -92,13 +92,16 @@ The feature matrix with sources and lineage is [`omniroute-feature-verdict.json`
    - omit temperature, or send `X-OmniRoute-No-Cache: true` with `stream: true`;
    - use a fresh `Idempotency-Key` per call, sample, effort or experiment arm;
    - when sending `x-omniroute-session`, use one stable value per conversation. An explicit header overrides the body keys, so a constant shared by independent workers pins them all to one account.
-2. **Judgment roles use `cx/gpt-6-astra-max`, Codex CLI lanes included.**
-   - Correction (2026-09-27, about 20:00Z): an earlier version of this record said Codex CLI lanes "already pass `model_reasoning_effort=max` and logged max/max". That is wrong for part of their traffic.
-   - `token-save-practice-gpt6` matched gateway rows to Codex rollouts one by one. Its finding: the first request of a `codex exec` session and every `spawn_agent` request carried no effort.
-   - The gateway side measured independently (`probes/codex-effort-coverage-20260927.json`): of the `codex/gpt-6-astra` `/v1/responses` rows between 12:00 and 20:00Z, 616 carried no effort, and each of them had 0 reasoning tokens; 3,809 ran at max/max.
-   - The no-effort rows are full task turns, not auxiliary calls: median input 28k tokens, median output 190.
-   - Grouped by the gateway's conversation id, 72 conversations start with one no-effort row and 89 mix them in otherwise, while 94 multi-row conversations are all max. So the cause may depend on how a lane sets its effort. It is still being traced at `rust-v0.157.1`.
-   - The `-max` model suffix sets effort at the gateway whatever the client sends, which is why it applies to Codex lanes too.
+2. **Judgment roles use `cx/gpt-6-astra-max`.** Codex CLI lanes send `reasoning.effort=max` on every request, but part of their turns return no reasoning.
+   - History (2026-09-27): this action first said Codex CLI lanes "already pass `model_reasoning_effort=max` and logged max/max". A correction at about 20:00Z then said 616 of their rows "carried no effort". That correction was itself wrong, and it is withdrawn.
+   - **What the gateway logs.** `call_logs` fills its two effort columns only when the response carried encrypted reasoning (OR `src/lib/usage/callLogs.ts` L646-653). A turn that returned no reasoning therefore logs no effort, whatever the request sent.
+   - **What was sent** (`probes/codex-sent-effort-20260927.json`, from the stored request bodies through the gateway's own detail API). Every no-reasoning row that kept a body carries `reasoning.effort=max`: 541 of 541, and 77 rows kept no body. The executor applies an explicit effort or a `-max` suffix on both the native and the translated path (OR `open-sse/executors/codex.ts` L1425-1464). So upstream was asked for max; that is inferred from source, because these rows kept no upstream body.
+   - **What came back** (`probes/codex-effort-coverage-20260927.json`, `codex/gpt-6-astra` `/v1/responses`, 12:00-20:00Z):
+     - 617 turns returned 0 reasoning tokens and 3,825 reasoned at max.
+     - The zero-reasoning turns are full task turns: median input 28k tokens, median output 190 (an immediate tool call).
+     - `token-save-practice-gpt6` matched rows to rollouts and found them on first and `spawn_agent` turns. By gateway conversation, 72 start with one and 89 mix them in otherwise, while 94 multi-row conversations always reasoned.
+     - A `-max` request (19:55:49Z) shows the same pattern, so the suffix does not change it.
+   - **Consequence:** this is upstream model behaviour under max, not a transport defect, and the gateway has nothing to fix. Whether it costs quality has to be measured on those turns; the effort columns cannot show it.
 3. **Structured output from frameworks:** tool calling, or schemas with `additionalProperties:false`. `json_object` needs "json" in a user message.
 4. **Keep compression off with `codex/*` excluded.** Set the flags `UNIVERSAL_CONTEXT_HANDOFF_ENABLED=false` and `OMNIROUTE_EMERGENCY_FALLBACK=false` (no restart needed). Any combo keeps prompt-cache affinity on, universal handoff off, canonical `codex/` targets and an explicit effort tier per role.
 5. **Watch upstream:**
@@ -138,6 +141,6 @@ A framework-only second instance (its own `DATA_DIR` and port, upstream's docume
 
 - **Structural checks only on this host.** The byte-identity of the default path is established from source and from the live settings read-back, not from a captured request body.
 - **Unmeasured:** the net token effect of any `enable_after_ab` feature, and the recall of the duckduckgo-free search backend beyond the earlier probe.
-- **Part of the GPT-6 work may have run without reasoning.** The GPT-6 dives and refutations ran as Codex CLI jobs configured for `cx/gpt-6-astra` at max (`gpt6-job-usage.json`). Every job window contains no-effort rows (`probes/codex-effort-coverage-20260927.json`). The shared gateway carried other lanes at the same time, so no row is attributed to a job. Some turns of these jobs, most likely their first, may have run with 0 reasoning tokens. Their records stand as written, but the effort they ran at is not fully verified.
+- **Some GPT-6 turns of this run returned no reasoning.** The GPT-6 dives and refutations ran as Codex CLI jobs configured for `cx/gpt-6-astra` at max (`gpt6-job-usage.json`). Every job window contains turns that returned 0 reasoning tokens at max (`probes/codex-effort-coverage-20260927.json`). The shared gateway carried other lanes at the same time, so no row is attributed to a job. Their records stand as written.
 - **Same-family refutation.** The GPT-6 dives were refuted by GPT-6 (adversarial, fresh context); the Claude dives were refuted cross-family. The deterministic merge takes the refuter's state and config wherever a refutation corrected or refuted a proposal.
 - **One host.** None of this certifies another host.
