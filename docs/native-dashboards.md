@@ -188,9 +188,9 @@ curl --fail http://127.0.0.1:17384/
 curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:17384/api/ping  # 401 without a token
 ```
 
-Do not run a second background daemon beside this unit. It retains the same
-archive and `--no-sync` scope. This is native process supervision, not a new
-session importer or proof of physical-PC reboot recovery.
+Do not run a second background daemon beside this unit. It serves the same
+archive, in live mode since 2026-09-27 ([live mode](#live-mode-on-the-workstation-2026-09-27)).
+This is native process supervision, not proof of physical-PC reboot recovery.
 
 ### Token on the archive API (2026-09-27)
 
@@ -222,7 +222,8 @@ processes share this loopback address.
     daemon takes its settings from the config, not from the unit's flags.
   - It also syncs, because `--no-sync` is a runtime option with no config key
     ([config](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L711)).
-    So keep the unit running while you read in the data-dir form.
+    The live-mode unit syncs too. For a frozen `--no-sync` archive, keep its
+    unit running while you read in the data-dir form.
 - While the unit runs, a direct write such as `AGENTSVIEW_NO_DAEMON=1 agentsview sync`
   on the same archive is refused
   ([write guard](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L1421-L1427)).
@@ -231,8 +232,9 @@ processes share this loopback address.
   from raw.githubusercontent.com and openrouter.ai at start and every 24 hours
   ([pricing schedule](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/pricing_schedule.go)).
 - On the workstation, the unit serves the default directory `~/.agentsview`. The
-  2026-09-25 host receipt filled it by default discovery, with no allowlist, so
-  the token protects it, not scoping.
+  2026-09-25 host receipt filled it by default discovery, with no allowlist, and
+  live mode keeps importing from every default and configured home. So the token
+  protects it, not scoping.
 - Measured on the workstation:
   - without a token, `/` returned 200, and `/api/ping`, `/api/v1/sessions` and
     `/api/v1/projects` returned 401;
@@ -243,6 +245,43 @@ Alternatives were no token (rejected because of the routes above) and a reverse
 proxy with its own login (another layer for a gap the upstream flag already
 closes). An upstream release that removes or separately guards the
 program-starting routes would overturn this.
+
+### Live mode on the workstation (2026-09-27)
+
+The user chose AgentsView as the live view of all jobs, so the unit no longer
+passes `--no-sync`. At v0.43.0
+([9be7745a](https://github.com/kenn-io/agentsview/tree/9be7745ad1906ee24e04eb05bb86c872ef0939a1)),
+`serve` without it does the following:
+
+- runs an initial sync
+  ([main.go#L206](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L206));
+- builds the sync engine
+  ([main.go#L306-L325](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L306-L325));
+- watches session files
+  ([startFileWatcher](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L1969));
+- polls directories it cannot watch every 2 minutes, and resyncs every 15
+  minutes ([intervals](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L43-L45),
+  [periodic sync](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L2726)).
+
+A worker lane that runs Codex with its own `CODEX_HOME` shows up only when that
+home is listed under `[agents.codex] homes` in the archive's `config.toml`.
+Listed homes add to the default ones
+([alternate agent homes](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/docs/configuration.md#L988-L1013)).
+The workstation lists its GPT-6 lane homes there. Their paths are host-private.
+
+Local observation (not a receipt): the unit restarted in live mode at
+18:37Z. A later probe ran 14 `codex exec` sessions between 18:58Z and 19:04Z.
+All 14 thread ids were listed without a manual sync, by:
+
+```sh
+agentsview session list --agent codex --active-since <start> \
+  --include-automated --include-one-shot --include-children --json
+```
+
+Return to `--no-sync` for an archive that must stay frozen, such as one a
+receipt cites, or if continuous sync's load or a parser regression harms the
+host. The alternative was the frozen archive plus on-demand `agentsview session sync`
+runs, which does not show jobs as they run.
 
 [Context Mode Insight](https://context-mode.com/insight) is a separate hosted,
 opt-in account. Opening its landing page does not connect local telemetry or

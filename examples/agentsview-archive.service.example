@@ -1,8 +1,11 @@
 # Replace both absolute placeholders with this PC's adopted archive and native binary.
 # --require-auth: without it the dashboard's /api/ routes, including ones that launch programs, check no token.
 # The interface asks once for the archive config.toml auth_token; serve never prints it.
+# Live mode (2026-09-27): without --no-sync, serve syncs at start, watches session files and resyncs, so running jobs
+# appear. Add --no-sync only for an archive that must stay frozen
+# (docs/native-dashboards.md#live-mode-on-the-workstation-2026-09-27).
 [Unit]
-Description=AgentsView scoped archive dashboard
+Description=AgentsView session dashboard (live sync)
 After=network.target
 
 [Service]
@@ -11,7 +14,7 @@ WorkingDirectory=/ABSOLUTE/SCOPED_ARCHIVE
 Environment=AGENTSVIEW_DATA_DIR=/ABSOLUTE/SCOPED_ARCHIVE
 Environment=AGENTSVIEW_TELEMETRY_ENABLED=0
 Environment=AGENTSVIEW_DISABLE_UPDATE_CHECK=1
-ExecStart=/ABSOLUTE/AGENTSVIEW_BINARY serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --require-auth
+ExecStart=/ABSOLUTE/AGENTSVIEW_BINARY serve --host 127.0.0.1 --port 17384 --no-browser --no-update-check --require-auth
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=10
