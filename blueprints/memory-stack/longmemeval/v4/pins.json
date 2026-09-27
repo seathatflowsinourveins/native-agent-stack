@@ -1,0 +1,1411 @@
+{
+ "schema": 1,
+ "verified_at": "2026-09-25",
+ "note": "Every pin the VelaNext lane uses. setup_velanext.sh installs from these and verifies each checksum; lane_tools.py receipt records them with what was found on disk. Sources: GitHub release asset digests (and the release's own sha256 files where published), the Hugging Face API (LFS sha256 or git blob id per file at the pinned revision), the Ollama registry manifests, and PyPI/npm lockfiles.",
+ "layout": "everything under $LME_BENCH_ROOT (default ~/.local/share/lme-bench): tools/, src/, downloads/, ollama/ (binary, models, runtime home), agentmemory/, longmemeval/ (LME_HOME); never the workstation's ~/.local/share/agent-ecosystem (review pins P3, lane F8)",
+ "dataset": {
+  "repo": "xiaowu0162/longmemeval-cleaned",
+  "revision": "98d7416c24c778c2fee6e6f3006e7a073259d48f",
+  "file": "longmemeval_s_cleaned.json",
+  "size": 277383467,
+  "sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+  "url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/98d7416c24c778c2fee6e6f3006e7a073259d48f/longmemeval_s_cleaned.json"
+ },
+ "manifest": {
+  "file": "eligible-manifest.json",
+  "sha256": "871f5da108b2901204aa01315b87d91cdee8d4e61dea96f4499916cbc19a05b7"
+ },
+ "official": {
+  "repo": "https://github.com/xiaowu0162/LongMemEval",
+  "commit": "9e0b455f4ef0e2ab8f2e582289761153549043fc",
+  "requirements": "requirements/official.lock.txt (requirements-full.txt pins; vllm, vllm-flash-attn, flash-attn and ninja left out)"
+ },
+ "python": {
+  "version": "3.11.16",
+  "installer": "uv python install (uv verifies python-build-standalone downloads)",
+  "amb_version": "3.12.14",
+  "amb_note": "AMB's .python-version is 3.12; uv installs this managed build (python-build-standalone, checksum-verified by uv) and syncs with UV_PYTHON_PREFERENCE=only-managed"
+ },
+ "uv": {
+  "version": "0.12.18",
+  "url": "https://github.com/astral-sh/uv/releases/download/0.12.18/uv-x86_64-unknown-linux-gnu.tar.gz",
+  "sha256": "89eadd7c76fc063887959510d5ba0ab1264dfd5f1143b925ddb73021a40acf16",
+  "source": "GitHub release asset digest"
+ },
+ "node": {
+  "version": "24.21.0",
+  "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.gz",
+  "sha256": "6e1db87ef58b8819e5d5402eff1536491b18edd8eb7bee5ef7897876e88dc5ff",
+  "source": "this repository's mise.lock"
+ },
+ "ai_memory": {
+  "repo": "https://github.com/akitaonrails/ai-memory",
+  "commit": "19b6429badfe17903074d2da38b5e533222d7a61",
+  "branch": "release/2.5",
+  "release_check": "2026-09-25: the newest release is v2.4.0 (2026-09-21; linux-x86_64 asset and Docker Hub akitaonrails/ai-memory:2.4.0). 19b6429 is 110 commits ahead of v2.4.0 and no 2.5 release, prerelease or image exists, so no official prebuilt covers the pin; it is built from source with cargo --locked.",
+  "build": [
+   "cargo build --locked --release -p ai-memory-cli",
+   "cargo build --locked --release -p ai-memory-eval"
+  ],
+  "rust_toolchain": "1.95.0",
+  "vendor_eval": {
+   "dataset": "xiaowu0162/longmemeval longmemeval_s (the harness's own --fetch)",
+   "sha256": "08d8dad4be43ee2049a22ff5674eb86725d0ce5ff434cde2627e5e8e7e117894",
+   "published": {
+    "local hit@5": 0.815,
+    "fts hit@5": 0.666,
+    "source": "docs/benchmarks/README.md at 19b6429 (2026-09-21, 2.4 RC)"
+   }
+  },
+  "workspace_version": "2.4.0",
+  "workspace_version_note": "at 19b6429 the workspace version is still 2.4.0, so `ai-memory --version` prints 2.4.0 like the v2.4.0 release; the receipt records the source commit and SOURCE file"
+ },
+ "rustup": {
+  "version": "1.29.1",
+  "url": "https://static.rust-lang.org/rustup/archive/1.29.1/x86_64-unknown-linux-gnu/rustup-init",
+  "sha256": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71",
+  "source": "static.rust-lang.org rustup-init.sha256"
+ },
+ "agentmemory": {
+  "package": "@agentmemory/agentmemory",
+  "version": "0.9.29",
+  "integrity": "sha512-NGHEi563Ap6MDan19slUH47qrTHRRyLCsuEsa1tRZ0y3e4urJnxedLJR9/agp47P1nw6LiCEvNRvK4LfUWj9Gg==",
+  "lockfile": "agentmemory/package-lock.json",
+  "install": "npm ci --ignore-scripts",
+  "repo": "https://github.com/rohitg00/agentmemory",
+  "tag": "v0.9.29",
+  "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+  "vendor_bench": {
+   "script": "benchmark/longmemeval-bench.ts (bm25, hybrid)",
+   "lockfile": "vendor/agentmemory-repo-package-lock.json",
+   "published": {
+    "hybrid R@5": 0.952,
+    "bm25 R@5": 0.862,
+    "source": "benchmark/LONGMEMEVAL.md at v0.9.29"
+   }
+  }
+ },
+ "iii": {
+  "version": "0.11.2",
+  "url": "https://github.com/iii-hq/iii/releases/download/iii/v0.11.2/iii-x86_64-unknown-linux-gnu.tar.gz",
+  "sha256": "9c83c47788b4ef4beeb65dd9bf37e94f993770cd3db874464c3ce1cdc92352cd",
+  "source": "GitHub release asset digest, equal to the release's iii-x86_64-unknown-linux-gnu.sha256",
+  "image_alternative": "iiidev/iii:0.11.2@sha256:15f8d4ed16c0bec350b98f4e18ed04498b1fc5ccc50585e087b736717300cf26"
+ },
+ "ollama": {
+  "version": "0.34.4",
+  "url": "https://github.com/ollama/ollama/releases/download/v0.34.4/ollama-linux-amd64.tar.zst",
+  "sha256": "c238986e61d40c0cc5f4a9b9e40b9eea104350b77efa34741fc134e105cb9533",
+  "source": "GitHub release asset digest, equal to the release's sha256sum.txt",
+  "commit": "b2da9e468af2479058ae18c6d908ed29de410684",
+  "respin_note": "the v0.34.4 tag was re-spun: the release was published 2026-09-23T02:24Z, the tag's commit b2da9e4 dates from 23:36Z and every asset was re-uploaded 2026-09-24T04:18Z; the sha256 above is the re-uploaded asset's (GitHub digest and sha256sum.txt agree)"
+ },
+ "llama_cpp": {
+  "release": "v0.5.0",
+  "build": "b11146",
+  "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+  "assets": [
+   {
+    "name": "llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+    "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11146/llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+    "sha256": "c2ab9e19838513ff69d1af8d999ad717dd3c7ee4714ac04c7ed5ab9077c50e4e"
+   },
+   {
+    "name": "cudart-llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+    "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11146/cudart-llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+    "sha256": "1466daea60aad1144819e151b2bae19d54556cf1da6c129c4f55a5ded2637c25"
+   }
+  ],
+  "source": "GitHub release asset digests; the v0.5.0 release names nightly b11146 as its assets",
+  "llm_serving": "A16 open item: H1, H2 and K1's LLM run on this llama-server build (Ollama 0.34.4 has no MoE expert offload): the Ollama GGUF blob by digest, --fit on with the context fixed at the Modelfile's num_ctx per slot, the Modelfile's sampling as server defaults, --jinja"
+ },
+ "ollama_models": {
+  "qwen3-embedding:0.6b": {
+   "manifest": "sha256:ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+   "gguf": "sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439",
+   "size": 639150592,
+   "role": "C6 (llama-server)"
+  },
+  "qwen3-embedding:4b": {
+   "manifest": "sha256:df5bd2e3c74cd8d069d21dc038f1b359fcdc9458fce1c99bd43c9eb1518ff907",
+   "gguf": "sha256:2b0cf8f17b4c723c27303015383c27ec4bf2d8314bb677d05e920dd70bb0f16b",
+   "size": 2496703776,
+   "role": "B2, C3, C4, D3, H (llama-server)"
+  },
+  "qwen3-embedding:8b": {
+   "manifest": "sha256:64b933495768fbd3b87c20583d379728a07471e0c66733a9df87cd1901b3c44b",
+   "gguf": "sha256:3fcd3febec8b3fd64435204db75bf0dd73b91e8d0661e0331acfe7e7c3120b85",
+   "size": 4676804928,
+   "role": "C5 (llama-server)"
+  },
+  "qwen3.5:9b": {
+   "manifest": "sha256:6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+   "gguf": "sha256:dec52a44569a2a25341c4e4d3fee25846eed4f6f0b936278e3a3c900bb99d37c",
+   "size": 6594462816,
+   "quant": "Q4_K_M",
+   "role": "C4 as qwen3.5-9b-64k (ollama/qwen3.5-9b-64k.Modelfile)",
+   "source": "https://ollama.com/library/qwen3.5:9b (Qwen publishes no Qwen3.5-9B GGUF on Hugging Face)"
+  },
+  "qwen3.6:35b-a3b": {
+   "manifest": "sha256:096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+   "gguf": "sha256:d372de8e934898a59e6ccfabc3368474711384d8f1fd4d22d87a3f0a45400cdc",
+   "size": 21718480960,
+   "projector": "sha256:a62390d25b4b4a2d8afd7cc3c90021c11935c1fdd48d7cb0723ab71cd02a598e",
+   "quant": "Q4_K_M",
+   "role": "H1 as qwen3.6-35b-a3b-64k",
+   "source": "https://ollama.com/library/qwen3.6:35b-a3b (Qwen publishes no Qwen3.6-35B-A3B GGUF)"
+  },
+  "nemotron-3.5-lightning:30b-a3b": {
+   "manifest": "sha256:e7a64ff15fb174c42b4f463e5c888c4f2c7b9cabf9e8d65a1c0874405426c1b2",
+   "gguf": "sha256:5c19f6282f4fc51cb114cb6c876d70ca2fc3b9cf0fbd0a018d9908f4fe1f63b3",
+   "size": 25430738944,
+   "quant": "Q4_K_M",
+   "role": "H2 as nemotron-3.5-lightning-30b-a3b-64k",
+   "source": "NVIDIA's card gives `ollama run nemotron-3.5-lightning` for Ollama (https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-NVFP4)"
+  },
+  "hf.co/LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M": {
+   "gguf": "sha256:02a8b7e17487d326e46d68ce0ba24211e1b80a14c4cd0597fa73c1cd697f52ed",
+   "size": 1674455040,
+   "hf_revision": "e7caca5d835a3901a8e0d63e94009429bafafdfc",
+   "manifest_observed": "sha256:26d07caa2ddb76ed45e54f71deb656b7ff5b9c8978feabfa84407d69022c9198",
+   "quant": "Q4_K_M",
+   "role": "H3 as lfm2.5-2.6b-64k",
+   "licence": "LFM1.0 (review before production use)",
+   "source": "https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF (Liquid AI's own GGUF); the GGUF layer digest equals the file's LFS sha256 at the pinned revision; the manifest is generated by Hugging Face (manifest_observed hashes the served bytes on 2026-09-25); its template, params and license layers are pinned and checked by verify-ollama (review pins P5)",
+   "layers": {
+    "template": "sha256:a776233427f34f27db3c6e090de4523a0785a9c286e17a6b869a026dd83971d7",
+    "params": "sha256:d7ca051a8aacbbb63013633dee3ab67598170ded7b45616f077aabeafe22276e",
+    "license": "sha256:30adf9d6478191fb87f2424f63ba0728598335aaf99cd2848ef17e8e545fe94b"
+   }
+  }
+ },
+ "python_locks": {
+  "official": "requirements/official.lock.txt",
+  "embed": "requirements/embed.lock.txt (torch 2.11.0, transformers 5.7.0, sentence-transformers 5.7.0, mteb 2.21.8)",
+  "mempalace": "requirements/mempalace.lock.txt (mempalace 3.10.0)",
+  "hindsight": "requirements/hindsight.lock.txt (hindsight-api 0.10.1, torch 2.14.0 on the CPU)",
+  "build": "requirements/build.lock.txt: hashed setuptools and wheel, passed as --build-constraints to every venv sync, so the sdist-only sentence-transformers 2.2.2 (official.lock.txt) builds under the hash regime; AMB's langdetect builds against AMB's own locked setuptools (hindsight.amb.langdetect) (uv enforces build-constraint hashes, checked 2026-09-25)"
+ },
+ "mteb": {
+  "package": "mteb==2.21.8",
+  "wheel_sha256": "1adfd8056c4fb00079dd4107a86256a3c3307be6e6e6dd17bfa7cda8f1453141",
+  "tag_commit": "3cd2041234f3126416bf3659a34b4dec846dc1c0",
+  "task": "LongMemEval (LMEB)",
+  "task_dataset": "mteb/LongMemEval@9dc1a8fdcf9b5676f87c2cdccac021988f6ff5af",
+  "main_score": "ndcg_at_10 (mean of 6 subsets)",
+  "published": {
+   "nvidia/Nemotron-3-Embed-8B-BF16": {
+    "score": 85.7,
+    "revision": "dd9d06b1852ef836d3dc2fbd2b71a34356912759",
+    "mteb_version": "2.3.0",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/nvidia__Nemotron-3-Embed-8B-BF16/dd9d06b1852ef836d3dc2fbd2b71a34356912759/LongMemEval.json"
+   },
+   "nvidia/Nemotron-3-Embed-1B-BF16": {
+    "score": 81.58,
+    "revision": "f880174635613cff04033875fc6a69296cb72006",
+    "mteb_version": "2.3.0",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/nvidia__Nemotron-3-Embed-1B-BF16/f880174635613cff04033875fc6a69296cb72006/LongMemEval.json"
+   },
+   "microsoft/harrier-oss-v1-0.6b": {
+    "score": 72.46,
+    "revision": "f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+    "mteb_version": "2.3.0",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/microsoft__harrier-oss-v1-0.6b/f9b9dc8d367d443f2479d27aa5d8d2850c0774ee/LongMemEval.json"
+   },
+   "Qwen/Qwen3-Embedding-8B": {
+    "score": 77.66,
+    "revision": "4e423935c619ae4df87b646a3ce949610c66241c",
+    "mteb_version": "2.12.39",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/Qwen__Qwen3-Embedding-8B/4e423935c619ae4df87b646a3ce949610c66241c/LongMemEval.json"
+   },
+   "Qwen/Qwen3-Embedding-4B": {
+    "score": 50.21,
+    "revision": "636cd9bf47d976946cdbb2b0c3ca0cb2f8eea5ff",
+    "mteb_version": "2.12.39",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/Qwen__Qwen3-Embedding-4B/636cd9bf47d976946cdbb2b0c3ca0cb2f8eea5ff/LongMemEval.json"
+   },
+   "Qwen/Qwen3-Embedding-0.6B": {
+    "score": 73.08,
+    "revision": "b22da495047858cce924d27d76261e96be6febc0",
+    "mteb_version": "2.12.39",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/Qwen__Qwen3-Embedding-0.6B/b22da495047858cce924d27d76261e96be6febc0/LongMemEval.json"
+   },
+   "sentence-transformers/all-MiniLM-L6-v2": {
+    "score": 67.94,
+    "revision": "8b3219a92973c328a8e22fadcfa821b5dc75636a",
+    "mteb_version": "2.3.0",
+    "url": "https://github.com/embeddings-benchmark/results/blob/fe1eb0571d7c1c261d3cb892c558477451ba5232/results/sentence-transformers__all-MiniLM-L6-v2/8b3219a92973c328a8e22fadcfa821b5dc75636a/LongMemEval.json"
+   }
+  },
+  "published_source": "embeddings-benchmark/results at fe1eb0571d7c1c261d3cb892c558477451ba5232 (read 2026-09-25)"
+ },
+ "hf_models": {
+  "nvidia/Nemotron-3-Embed-8B-BF16@d1f2f25730bbd775b99b29185134bc86653bf2d1": {
+   "repo": "nvidia/Nemotron-3-Embed-8B-BF16",
+   "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+   "role": "E1, F1, G1 (embed_server_st.py)",
+   "license": "openmdw-1.1",
+   "last_modified": "2026-08-28T15:59:43.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 298,
+     "git_sha1": "2cb2e4b192804106cf8c2a1db2f6213613bc60a4"
+    },
+    "config.json": {
+     "size": 1120,
+     "git_sha1": "2e180d71ee5968cbb7d51fb14312faea99591706"
+    },
+    "config_sentence_transformers.json": {
+     "size": 261,
+     "git_sha1": "58358a9a4835aa966210213b08a575ba2edc999b"
+    },
+    "model-00001-of-00004.safetensors": {
+     "size": 4966645872,
+     "sha256": "9f76c1359913d8bd47a00b84fa00e078369beed6eee4eec8bcd9662b59f79257"
+    },
+    "model-00002-of-00004.safetensors": {
+     "size": 4932506104,
+     "sha256": "3b6a31ecd38827c15c86645477f3384d2389940adac6c73d5ffbd1fd924bf4bc"
+    },
+    "model-00003-of-00004.safetensors": {
+     "size": 4932506112,
+     "sha256": "46321d661b89b96ec19f62aa526561c9b39b4f2847168ef617737429da4901c2"
+    },
+    "model-00004-of-00004.safetensors": {
+     "size": 1073741960,
+     "sha256": "eb9b7f0e415cc4fb6b744cdcf45f03a623d7e9a1da625a7cab2b32323658dccc"
+    },
+    "model.safetensors.index.json": {
+     "size": 23530,
+     "git_sha1": "3d1acbeff8eb4db28427e8906cddfc6ab65b2c26"
+    },
+    "modules.json": {
+     "size": 350,
+     "git_sha1": "a32b46a13926a0aeb8367448eef21d776acd09b9"
+    },
+    "sentence_bert_config.json": {
+     "size": 56,
+     "git_sha1": "e52ea70d8299332da0b02437f92f404f7e4a8162"
+    },
+    "tokenizer.json": {
+     "size": 17077678,
+     "sha256": "797410dfb649a5b9ba92bc4fef7dbf4022d00e73de6867c4ac199a8846439421"
+    },
+    "tokenizer_config.json": {
+     "size": 21139,
+     "git_sha1": "d3c57e6b115d8906ff86f7714fc8df409adbe308"
+    }
+   },
+   "card": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md"
+  },
+  "nvidia/Nemotron-3-Embed-1B-BF16@c0c9fea93ea424587517f2c59e20db9f1d6bf615": {
+   "repo": "nvidia/Nemotron-3-Embed-1B-BF16",
+   "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+   "role": "E2, F2, G2 (embed_server_st.py)",
+   "license": "openmdw-1.1",
+   "last_modified": "2026-08-27T23:53:03.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 298,
+     "git_sha1": "5942817c6089ede1c038a0dab5bf46c0c2193f53"
+    },
+    "config.json": {
+     "size": 1117,
+     "git_sha1": "08f63d11e8c6e11c3c5da0bddfb901418692079c"
+    },
+    "config_sentence_transformers.json": {
+     "size": 261,
+     "git_sha1": "58358a9a4835aa966210213b08a575ba2edc999b"
+    },
+    "model.safetensors": {
+     "size": 2281852472,
+     "sha256": "f959c3b04e66b42de280bfb97c140cb7e0bfe25e3ecb0b4464c68a8436b2d04f"
+    },
+    "model.safetensors.index.json": {
+     "size": 8936,
+     "git_sha1": "1f0938a5aaa4c1a13760f9cfce23bb0159c225ed"
+    },
+    "modules.json": {
+     "size": 350,
+     "git_sha1": "a32b46a13926a0aeb8367448eef21d776acd09b9"
+    },
+    "sentence_bert_config.json": {
+     "size": 56,
+     "git_sha1": "e52ea70d8299332da0b02437f92f404f7e4a8162"
+    },
+    "tokenizer.json": {
+     "size": 17077678,
+     "sha256": "797410dfb649a5b9ba92bc4fef7dbf4022d00e73de6867c4ac199a8846439421"
+    },
+    "tokenizer_config.json": {
+     "size": 21139,
+     "git_sha1": "d3c57e6b115d8906ff86f7714fc8df409adbe308"
+    }
+   },
+   "card": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/blob/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md"
+  },
+  "microsoft/harrier-oss-v1-0.6b@f9b9dc8d367d443f2479d27aa5d8d2850c0774ee": {
+   "repo": "microsoft/harrier-oss-v1-0.6b",
+   "revision": "f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+   "role": "E3, F3, G3 (embed_server_st.py); mteb",
+   "license": "mit",
+   "last_modified": "2026-03-30T08:00:59.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 297,
+     "git_sha1": "e1cde9c8752f2afcae01dc89fad8578afbcf5248"
+    },
+    "added_tokens.json": {
+     "size": 707,
+     "git_sha1": "b54f9135e44c1e81047e8d05cb027af8bc039eed"
+    },
+    "chat_template.jinja": {
+     "size": 4116,
+     "git_sha1": "699ff8df401fe4788525e9c1f9b86a99eadd6230"
+    },
+    "config.json": {
+     "size": 1355,
+     "git_sha1": "db0369ca6ec6a17b3ccb1b31050cbcdfd6ea573f"
+    },
+    "config_sentence_transformers.json": {
+     "size": 351,
+     "git_sha1": "2d094bb77ecdfe35df5e10fdb2f08ceb384afdba"
+    },
+    "merges.txt": {
+     "size": 1671853,
+     "git_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "model.safetensors": {
+     "size": 1192133232,
+     "sha256": "6bb124227f33c3dbf7fbbd38119b2afa8be959e93666d3c9be7142b66708b66c"
+    },
+    "modules.json": {
+     "size": 349,
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "mteb_v2_eval_prompts.json": {
+     "size": 11877,
+     "git_sha1": "af17620cafe3b90decea71116a0c7cdb1777b571"
+    },
+    "special_tokens_map.json": {
+     "size": 613,
+     "git_sha1": "ac23c0aaa2434523c494330aeb79c58395378103"
+    },
+    "tokenizer.json": {
+     "size": 11423705,
+     "sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a"
+    },
+    "tokenizer_config.json": {
+     "size": 5404,
+     "git_sha1": "ddaf69808214a44fdd26d3785b66c1367c78277a"
+    },
+    "vocab.json": {
+     "size": 2776833,
+     "git_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    }
+   },
+   "card": "https://huggingface.co/microsoft/harrier-oss-v1-0.6b/blob/f9b9dc8d367d443f2479d27aa5d8d2850c0774ee/README.md"
+  },
+  "Qwen/Qwen3-Embedding-4B@5cf2132abc99cad020ac570b19d031efec650f2b": {
+   "repo": "Qwen/Qwen3-Embedding-4B",
+   "revision": "5cf2132abc99cad020ac570b19d031efec650f2b",
+   "role": "G0 (embed_server_st.py)",
+   "license": "apache-2.0",
+   "last_modified": "2025-06-20T09:30:56.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 313,
+     "git_sha1": "81de5602eacbce382009c5af7a23085871801d8f"
+    },
+    "config.json": {
+     "size": 727,
+     "git_sha1": "8b4b87fc69023e7a224eb6563753aaf3223d8b98"
+    },
+    "config_sentence_transformers.json": {
+     "size": 215,
+     "git_sha1": "76aef3ade63553ebb698fe3c2a3264040ed093f8"
+    },
+    "generation_config.json": {
+     "size": 117,
+     "git_sha1": "d46f1983345269c582611bbedb3ca0a13f8e5f7b"
+    },
+    "merges.txt": {
+     "size": 1671853,
+     "git_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "model-00001-of-00002.safetensors": {
+     "size": 4965826464,
+     "sha256": "e70bfe3c970523fb7ef4eddffed2254ce3f1e7150c3de2af4342de129dd756f8"
+    },
+    "model-00002-of-00002.safetensors": {
+     "size": 3077765624,
+     "sha256": "ed1b87c8e9eb7e535a1a155e4fd00d9f4dba80e58a6db48a4c9f82cede7079c1"
+    },
+    "model.safetensors.index.json": {
+     "size": 30431,
+     "git_sha1": "3d736ef26714eee0abde3e05104ee1b3ec26c974"
+    },
+    "modules.json": {
+     "size": 349,
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "tokenizer.json": {
+     "size": 11422947,
+     "sha256": "83cdf8c3a34f68862319cb1810ee7b1e2c0a44e0864ae930194ddb76bb7feb8d"
+    },
+    "tokenizer_config.json": {
+     "size": 7256,
+     "git_sha1": "df3a9d96759529ca1006eb6db024bbb099a97578"
+    },
+    "vocab.json": {
+     "size": 2776833,
+     "git_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    }
+   },
+   "card": "https://huggingface.co/Qwen/Qwen3-Embedding-4B/blob/5cf2132abc99cad020ac570b19d031efec650f2b/README.md"
+  },
+  "nvidia/Nemotron-3-Embed-8B-BF16@dd9d06b1852ef836d3dc2fbd2b71a34356912759": {
+   "repo": "nvidia/Nemotron-3-Embed-8B-BF16",
+   "revision": "dd9d06b1852ef836d3dc2fbd2b71a34356912759",
+   "role": "mteb LMEB reproduction (the registry and leaderboard revision; same files as d1f2f257)",
+   "license": "openmdw-1.1",
+   "last_modified": "2026-07-14T07:39:23.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 298,
+     "git_sha1": "2cb2e4b192804106cf8c2a1db2f6213613bc60a4"
+    },
+    "config.json": {
+     "size": 1120,
+     "git_sha1": "2e180d71ee5968cbb7d51fb14312faea99591706"
+    },
+    "config_sentence_transformers.json": {
+     "size": 261,
+     "git_sha1": "58358a9a4835aa966210213b08a575ba2edc999b"
+    },
+    "model-00001-of-00004.safetensors": {
+     "size": 4966645872,
+     "sha256": "9f76c1359913d8bd47a00b84fa00e078369beed6eee4eec8bcd9662b59f79257"
+    },
+    "model-00002-of-00004.safetensors": {
+     "size": 4932506104,
+     "sha256": "3b6a31ecd38827c15c86645477f3384d2389940adac6c73d5ffbd1fd924bf4bc"
+    },
+    "model-00003-of-00004.safetensors": {
+     "size": 4932506112,
+     "sha256": "46321d661b89b96ec19f62aa526561c9b39b4f2847168ef617737429da4901c2"
+    },
+    "model-00004-of-00004.safetensors": {
+     "size": 1073741960,
+     "sha256": "eb9b7f0e415cc4fb6b744cdcf45f03a623d7e9a1da625a7cab2b32323658dccc"
+    },
+    "model.safetensors.index.json": {
+     "size": 23530,
+     "git_sha1": "3d1acbeff8eb4db28427e8906cddfc6ab65b2c26"
+    },
+    "modules.json": {
+     "size": 350,
+     "git_sha1": "a32b46a13926a0aeb8367448eef21d776acd09b9"
+    },
+    "sentence_bert_config.json": {
+     "size": 56,
+     "git_sha1": "e52ea70d8299332da0b02437f92f404f7e4a8162"
+    },
+    "tokenizer.json": {
+     "size": 17077678,
+     "sha256": "797410dfb649a5b9ba92bc4fef7dbf4022d00e73de6867c4ac199a8846439421"
+    },
+    "tokenizer_config.json": {
+     "size": 21139,
+     "git_sha1": "d3c57e6b115d8906ff86f7714fc8df409adbe308"
+    }
+   },
+   "card": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/dd9d06b1852ef836d3dc2fbd2b71a34356912759/README.md"
+  },
+  "nvidia/Nemotron-3-Embed-1B-BF16@f880174635613cff04033875fc6a69296cb72006": {
+   "repo": "nvidia/Nemotron-3-Embed-1B-BF16",
+   "revision": "f880174635613cff04033875fc6a69296cb72006",
+   "role": "mteb LMEB reproduction (same files as c0c9fea9)",
+   "license": "openmdw-1.1",
+   "last_modified": "2026-07-14T07:32:58.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 298,
+     "git_sha1": "5942817c6089ede1c038a0dab5bf46c0c2193f53"
+    },
+    "config.json": {
+     "size": 1117,
+     "git_sha1": "08f63d11e8c6e11c3c5da0bddfb901418692079c"
+    },
+    "config_sentence_transformers.json": {
+     "size": 261,
+     "git_sha1": "58358a9a4835aa966210213b08a575ba2edc999b"
+    },
+    "model.safetensors": {
+     "size": 2281852472,
+     "sha256": "f959c3b04e66b42de280bfb97c140cb7e0bfe25e3ecb0b4464c68a8436b2d04f"
+    },
+    "model.safetensors.index.json": {
+     "size": 8936,
+     "git_sha1": "1f0938a5aaa4c1a13760f9cfce23bb0159c225ed"
+    },
+    "modules.json": {
+     "size": 350,
+     "git_sha1": "a32b46a13926a0aeb8367448eef21d776acd09b9"
+    },
+    "sentence_bert_config.json": {
+     "size": 56,
+     "git_sha1": "e52ea70d8299332da0b02437f92f404f7e4a8162"
+    },
+    "tokenizer.json": {
+     "size": 17077678,
+     "sha256": "797410dfb649a5b9ba92bc4fef7dbf4022d00e73de6867c4ac199a8846439421"
+    },
+    "tokenizer_config.json": {
+     "size": 21139,
+     "git_sha1": "d3c57e6b115d8906ff86f7714fc8df409adbe308"
+    }
+   },
+   "card": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/blob/f880174635613cff04033875fc6a69296cb72006/README.md"
+  },
+  "Qwen/Qwen3-Embedding-8B@4e423935c619ae4df87b646a3ce949610c66241c": {
+   "repo": "Qwen/Qwen3-Embedding-8B",
+   "revision": "4e423935c619ae4df87b646a3ce949610c66241c",
+   "role": "mteb LMEB reproduction",
+   "license": "apache-2.0",
+   "last_modified": "2025-06-06T05:57:51.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 313,
+     "git_sha1": "c5dd8df913b71a207df20c856ba12cbf48e53013"
+    },
+    "config.json": {
+     "size": 729,
+     "git_sha1": "39c68b7e1512f93926bf7439cee0e88d3437f0ce"
+    },
+    "config_sentence_transformers.json": {
+     "size": 215,
+     "git_sha1": "76aef3ade63553ebb698fe3c2a3264040ed093f8"
+    },
+    "generation_config.json": {
+     "size": 117,
+     "git_sha1": "d46f1983345269c582611bbedb3ca0a13f8e5f7b"
+    },
+    "merges.txt": {
+     "size": 1671853,
+     "git_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "model-00001-of-00004.safetensors": {
+     "size": 4900037024,
+     "sha256": "99b343597fe840706146144699a8b9188dd3387e43eb61faf0231b70b249d451"
+    },
+    "model-00002-of-00004.safetensors": {
+     "size": 4915959512,
+     "sha256": "dff635b0f6dbbaad2a2d633ef037ec0a39bc165cc1806c712fbd6fcbcb4526c0"
+    },
+    "model-00003-of-00004.safetensors": {
+     "size": 4983067656,
+     "sha256": "30b1d4c53d84eb018f642cad7b373f0aabf79699872d8702c1f38577c0a59a2f"
+    },
+    "model-00004-of-00004.safetensors": {
+     "size": 335570376,
+     "sha256": "36cbc9c60375693629f25743c1e77ebb1724af58e671b2376463193c7fd21ef6"
+    },
+    "model.safetensors.index.json": {
+     "size": 30432,
+     "git_sha1": "ccf940ee00f0f478e333660f274e770fbbfa5bab"
+    },
+    "modules.json": {
+     "size": 349,
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "tokenizer.json": {
+     "size": 11422947,
+     "sha256": "83cdf8c3a34f68862319cb1810ee7b1e2c0a44e0864ae930194ddb76bb7feb8d"
+    },
+    "tokenizer_config.json": {
+     "size": 7256,
+     "git_sha1": "df3a9d96759529ca1006eb6db024bbb099a97578"
+    },
+    "vocab.json": {
+     "size": 2776833,
+     "git_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    }
+   },
+   "card": "https://huggingface.co/Qwen/Qwen3-Embedding-8B/blob/4e423935c619ae4df87b646a3ce949610c66241c/README.md"
+  },
+  "Qwen/Qwen3-Embedding-4B@636cd9bf47d976946cdbb2b0c3ca0cb2f8eea5ff": {
+   "repo": "Qwen/Qwen3-Embedding-4B",
+   "revision": "636cd9bf47d976946cdbb2b0c3ca0cb2f8eea5ff",
+   "role": "mteb LMEB reproduction (same files as 5cf2132a)",
+   "license": "apache-2.0",
+   "last_modified": "2025-06-06T05:58:34.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 313,
+     "git_sha1": "81de5602eacbce382009c5af7a23085871801d8f"
+    },
+    "config.json": {
+     "size": 727,
+     "git_sha1": "8b4b87fc69023e7a224eb6563753aaf3223d8b98"
+    },
+    "config_sentence_transformers.json": {
+     "size": 215,
+     "git_sha1": "76aef3ade63553ebb698fe3c2a3264040ed093f8"
+    },
+    "generation_config.json": {
+     "size": 117,
+     "git_sha1": "d46f1983345269c582611bbedb3ca0a13f8e5f7b"
+    },
+    "merges.txt": {
+     "size": 1671853,
+     "git_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "model-00001-of-00002.safetensors": {
+     "size": 4965826464,
+     "sha256": "e70bfe3c970523fb7ef4eddffed2254ce3f1e7150c3de2af4342de129dd756f8"
+    },
+    "model-00002-of-00002.safetensors": {
+     "size": 3077765624,
+     "sha256": "ed1b87c8e9eb7e535a1a155e4fd00d9f4dba80e58a6db48a4c9f82cede7079c1"
+    },
+    "model.safetensors.index.json": {
+     "size": 30431,
+     "git_sha1": "3d736ef26714eee0abde3e05104ee1b3ec26c974"
+    },
+    "modules.json": {
+     "size": 349,
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "tokenizer.json": {
+     "size": 11422947,
+     "sha256": "83cdf8c3a34f68862319cb1810ee7b1e2c0a44e0864ae930194ddb76bb7feb8d"
+    },
+    "tokenizer_config.json": {
+     "size": 7256,
+     "git_sha1": "df3a9d96759529ca1006eb6db024bbb099a97578"
+    },
+    "vocab.json": {
+     "size": 2776833,
+     "git_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    }
+   },
+   "card": "https://huggingface.co/Qwen/Qwen3-Embedding-4B/blob/636cd9bf47d976946cdbb2b0c3ca0cb2f8eea5ff/README.md"
+  },
+  "Qwen/Qwen3-Embedding-0.6B@b22da495047858cce924d27d76261e96be6febc0": {
+   "repo": "Qwen/Qwen3-Embedding-0.6B",
+   "revision": "b22da495047858cce924d27d76261e96be6febc0",
+   "role": "mteb LMEB reproduction",
+   "license": "apache-2.0",
+   "last_modified": "2025-06-06T05:43:53.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 313,
+     "git_sha1": "b6291baabbc39f9792d6759883a47d7d5bd0fbcf"
+    },
+    "config.json": {
+     "size": 727,
+     "git_sha1": "cef2749ee93607b8f9a58ec72f4f6bfaf874e71d"
+    },
+    "config_sentence_transformers.json": {
+     "size": 215,
+     "git_sha1": "76aef3ade63553ebb698fe3c2a3264040ed093f8"
+    },
+    "generation_config.json": {
+     "size": 117,
+     "git_sha1": "d46f1983345269c582611bbedb3ca0a13f8e5f7b"
+    },
+    "merges.txt": {
+     "size": 1671853,
+     "git_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "model.safetensors": {
+     "size": 1191586416,
+     "sha256": "0437e45c94563b09e13cb7a64478fc406947a93cb34a7e05870fc8dcd48e23fd"
+    },
+    "modules.json": {
+     "size": 349,
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "tokenizer.json": {
+     "size": 11423705,
+     "sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a"
+    },
+    "tokenizer_config.json": {
+     "size": 9706,
+     "git_sha1": "7345216a0785dc7086e8c245b2a9d3896ce2b756"
+    },
+    "vocab.json": {
+     "size": 2776833,
+     "git_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    }
+   },
+   "card": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/blob/b22da495047858cce924d27d76261e96be6febc0/README.md"
+  },
+  "sentence-transformers/all-MiniLM-L6-v2@8b3219a92973c328a8e22fadcfa821b5dc75636a": {
+   "repo": "sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "8b3219a92973c328a8e22fadcfa821b5dc75636a",
+   "role": "mteb LMEB reproduction",
+   "license": "apache-2.0",
+   "last_modified": "2024-05-29T14:43:28.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 190,
+     "git_sha1": "d1514c3162bbe87b343f565fadc62e6c06f04f03"
+    },
+    "config.json": {
+     "size": 612,
+     "git_sha1": "72b987fd805cfa2b58c4c8c952b274a11bfd5a00"
+    },
+    "config_sentence_transformers.json": {
+     "size": 116,
+     "git_sha1": "fd1b291129c607e5d49799f87cb219b27f98acdf"
+    },
+    "data_config.json": {
+     "size": 39265,
+     "git_sha1": "2e85f0eac205cf444bdf97ede4935603ca6a0416"
+    },
+    "model.safetensors": {
+     "size": 90868376,
+     "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db"
+    },
+    "modules.json": {
+     "size": 349,
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "sentence_bert_config.json": {
+     "size": 53,
+     "git_sha1": "59d594003bf59880a884c574bf88ef7555bb0202"
+    },
+    "special_tokens_map.json": {
+     "size": 112,
+     "git_sha1": "e7b0375001f109a6b8873d756ad4f7bbb15fbaa5"
+    },
+    "tokenizer.json": {
+     "size": 466247,
+     "git_sha1": "cb202bfe2e3c98645018a6d12f182a434c9d3e02"
+    },
+    "tokenizer_config.json": {
+     "size": 350,
+     "git_sha1": "c79f2b6a0cea6f4b564fed1938984bace9d30ff0"
+    },
+    "train_script.py": {
+     "size": 13156,
+     "git_sha1": "82b47b6277499b8f17d139d0c651a6f961c06124"
+    },
+    "vocab.txt": {
+     "size": 231508,
+     "git_sha1": "fb140275c155a9c7c5a3b3e0e77a9e839594a938"
+    }
+   },
+   "card": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/blob/8b3219a92973c328a8e22fadcfa821b5dc75636a/README.md"
+  },
+  "cross-encoder/ettin-reranker-400m-v1@5dca36282a5d85f368d2544002513a29159b4c9e": {
+   "repo": "cross-encoder/ettin-reranker-400m-v1",
+   "revision": "5dca36282a5d85f368d2544002513a29159b4c9e",
+   "role": "X (rerank_stage.py)",
+   "license": "apache-2.0",
+   "last_modified": "2026-05-19T13:59:49.000Z",
+   "files": {
+    "1_Pooling/config.json": {
+     "size": 90,
+     "git_sha1": "d5e96914b80e80fa08a6bc6318045e192e9d6d89"
+    },
+    "2_Dense/config.json": {
+     "size": 230,
+     "git_sha1": "3e1dd7adb1c6c7e4708a743866238ac1d6a83ecb"
+    },
+    "2_Dense/model.safetensors": {
+     "size": 4194392,
+     "sha256": "c8f99555ed4aad347dca99afeb5609ba2f803c0b54592a9f3ef26ad60ac9d4c2"
+    },
+    "3_LayerNorm/config.json": {
+     "size": 25,
+     "git_sha1": "7cf0a2e1fc2d17b2d83fcd7d4e6e996180efaa9f"
+    },
+    "3_LayerNorm/model.safetensors": {
+     "size": 8344,
+     "sha256": "c3bc9839299b6c8b7d473279ef9e1ec1a5d70d63581383b963e51df692676817"
+    },
+    "4_Dense/config.json": {
+     "size": 214,
+     "git_sha1": "bfa4793c23f1a1422c3619becc7c748509c0b788"
+    },
+    "4_Dense/model.safetensors": {
+     "size": 4252,
+     "sha256": "83ab91e7f5f697783a49c5864bd552844fa06b5dc6b80e795823c2a5e932b311"
+    },
+    "config.json": {
+     "size": 2165,
+     "git_sha1": "c3b97b7744d2007dc0b85a17093c17b4b2f8d084"
+    },
+    "config_sentence_transformers.json": {
+     "size": 257,
+     "git_sha1": "7a1acee00d6679a7f5f4a4fe6d52033fb0e61cc5"
+    },
+    "model.safetensors": {
+     "size": 1579143688,
+     "sha256": "4b8364853f7ed939d93d3ae8b4ead502db7b86b7a67ed2046907166477d947c2"
+    },
+    "modules.json": {
+     "size": 678,
+     "git_sha1": "47ea356ac3df2f27652b3d507298fe21f5c275c9"
+    },
+    "sentence_bert_config.json": {
+     "size": 241,
+     "git_sha1": "d2cd15826913bba6e43310063d75883bb0b7b842"
+    },
+    "tokenizer.json": {
+     "size": 3583327,
+     "git_sha1": "632c265ee1546855a20a5cf80b0fe0f90ab3d032"
+    },
+    "tokenizer_config.json": {
+     "size": 488,
+     "git_sha1": "0abfc51c1faf6445651565714b64a833f2f4d252"
+    }
+   },
+   "card": "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1/blob/5dca36282a5d85f368d2544002513a29159b4c9e/README.md"
+  },
+  "IAAR-Shanghai/MemReranker-4B@22890bb4adff85b83b2181ed91e940ffb5a4ec45": {
+   "repo": "IAAR-Shanghai/MemReranker-4B",
+   "revision": "22890bb4adff85b83b2181ed91e940ffb5a4ec45",
+   "role": "X (rerank_stage.py)",
+   "license": "apache-2.0",
+   "last_modified": "2026-05-12T03:44:14.000Z",
+   "files": {
+    "1_LogitScore/config.json": {
+     "size": 57,
+     "git_sha1": "d2c77fa4fc4e2bdba0fbd2caa97f7272f7c9e967"
+    },
+    "chat_template.jinja": {
+     "size": 741,
+     "git_sha1": "63b97f268a9ddb9c6b34e6d7d8ef531d1fee9cf4"
+    },
+    "config.json": {
+     "size": 1593,
+     "git_sha1": "0e06a5e64d38e682e1340c1f9c90597938bb749b"
+    },
+    "config_sentence_transformers.json": {
+     "size": 325,
+     "git_sha1": "c6f8a7e0240028086cbce6b5c018874cf48cbeb7"
+    },
+    "generation_config.json": {
+     "size": 213,
+     "git_sha1": "3775feb639204c83ab04a04e705e7bd87243475d"
+    },
+    "model.safetensors": {
+     "size": 8820160440,
+     "sha256": "48aef1a3c826aabaf8a3852d3d5122ebd456d166ae3e1e401279fc82c15e0ec2"
+    },
+    "modules.json": {
+     "size": 280,
+     "git_sha1": "008ceadb8aca5de2810344509a4ac73352f23428"
+    },
+    "sentence_bert_config.json": {
+     "size": 362,
+     "git_sha1": "813a773d3bf36aa61b1760d80070c9d72c87e270"
+    },
+    "special_tokens_map.json": {
+     "size": 613,
+     "git_sha1": "ac23c0aaa2434523c494330aeb79c58395378103"
+    },
+    "tokenizer.json": {
+     "size": 11422650,
+     "sha256": "be75606093db2094d7cd20f3c2f385c212750648bd6ea4fb2bf507a6a4c55506"
+    },
+    "tokenizer_config.json": {
+     "size": 348,
+     "git_sha1": "be8885e0c6b33e03bf589fdef5eaab60c7f35e1b"
+    }
+   },
+   "card": "https://huggingface.co/IAAR-Shanghai/MemReranker-4B/blob/22890bb4adff85b83b2181ed91e940ffb5a4ec45/README.md"
+  },
+  "Qwen/Qwen3-Reranker-4B@22e683669bc0f0bd69640a1354a6d0aebcfeede5": {
+   "repo": "Qwen/Qwen3-Reranker-4B",
+   "revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5",
+   "role": "X (rerank_stage.py)",
+   "license": "apache-2.0",
+   "last_modified": "2026-04-16T08:56:07.000Z",
+   "files": {
+    "1_LogitScore/config.json": {
+     "size": 57,
+     "git_sha1": "d2c77fa4fc4e2bdba0fbd2caa97f7272f7c9e967"
+    },
+    "chat_template.jinja": {
+     "size": 741,
+     "git_sha1": "63b97f268a9ddb9c6b34e6d7d8ef531d1fee9cf4"
+    },
+    "config.json": {
+     "size": 727,
+     "git_sha1": "b0d564fb244100a8bbcb6499da05485440bae0d2"
+    },
+    "config_sentence_transformers.json": {
+     "size": 325,
+     "git_sha1": "c6f8a7e0240028086cbce6b5c018874cf48cbeb7"
+    },
+    "generation_config.json": {
+     "size": 214,
+     "git_sha1": "e4f1d3193e99a3e5d7047edf56e93a6e933fa31b"
+    },
+    "merges.txt": {
+     "size": 1671853,
+     "git_sha1": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7"
+    },
+    "model-00001-of-00002.safetensors": {
+     "size": 4058781760,
+     "sha256": "cf2e87cbf71fa628961532232e04dd6c19702a0a057f5e2aff95ea1aca4fd488"
+    },
+    "model-00002-of-00002.safetensors": {
+     "size": 3984833200,
+     "sha256": "78946d22b7f6456ea7a5358dbdf3982de36c5bac1f166a5fd58e18e31db8048a"
+    },
+    "model.safetensors.index.json": {
+     "size": 32819,
+     "git_sha1": "c8dc285661c390e68d4864b34cbe7ec6f755b776"
+    },
+    "modules.json": {
+     "size": 280,
+     "git_sha1": "008ceadb8aca5de2810344509a4ac73352f23428"
+    },
+    "sentence_bert_config.json": {
+     "size": 362,
+     "git_sha1": "813a773d3bf36aa61b1760d80070c9d72c87e270"
+    },
+    "special_tokens_map.json": {
+     "size": 613,
+     "git_sha1": "ac23c0aaa2434523c494330aeb79c58395378103"
+    },
+    "tokenizer.json": {
+     "size": 11422654,
+     "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    },
+    "tokenizer_config.json": {
+     "size": 9706,
+     "git_sha1": "7345216a0785dc7086e8c245b2a9d3896ce2b756"
+    },
+    "vocab.json": {
+     "size": 2776833,
+     "git_sha1": "4783fe10ac3adce15ac8f358ef5462739852c569"
+    }
+   },
+   "card": "https://huggingface.co/Qwen/Qwen3-Reranker-4B/blob/22e683669bc0f0bd69640a1354a6d0aebcfeede5/README.md"
+  },
+  "KaLM-Embedding/KaLM-Reranker-V1-Small@8c2141c8af7417cd4a58fe7b58f79f1c00ad1d49": {
+   "repo": "KaLM-Embedding/KaLM-Reranker-V1-Small",
+   "revision": "8c2141c8af7417cd4a58fe7b58f79f1c00ad1d49",
+   "role": "X (rerank_stage.py; trust_remote_code from this revision)",
+   "license": "apache-2.0",
+   "last_modified": "2026-09-21T05:50:34.000Z",
+   "files": {
+    "config.json": {
+     "size": 6548,
+     "git_sha1": "e985bb3347ede457a22a23da677d658f6f3844d6"
+    },
+    "config_sentence_transformers.json": {
+     "size": 341,
+     "git_sha1": "b308c68f4218ef304db34116fa1e9578d26f20d4"
+    },
+    "generation_config.json": {
+     "size": 190,
+     "git_sha1": "fbd94c7302b0bd76313c0eebb8c17f327f09b9e7"
+    },
+    "kalm_cross_encoder.py": {
+     "size": 10752,
+     "git_sha1": "321cc3254eaef5358b3e44435ef054bdea63fc2c"
+    },
+    "kalm_cross_encoder_config.json": {
+     "size": 263,
+     "git_sha1": "f463ad70be9d0b3cb177f3387d3d0530152fb509"
+    },
+    "kalm_reranker.py": {
+     "size": 11253,
+     "git_sha1": "75add2cb71bf517c46a5ae3a058a2c0dfcc38c2d"
+    },
+    "kalm_reranker_utils.py": {
+     "size": 7603,
+     "git_sha1": "af40b90808164ccc9fc11509d9c23114ed4114e4"
+    },
+    "model.safetensors": {
+     "size": 4232105984,
+     "sha256": "4b6ae77ac85b39e855e96d6b82d89a213cdda6aa71ad02a75d45a71a626b51c6"
+    },
+    "modules.json": {
+     "size": 115,
+     "git_sha1": "00e4bc080260dd8a569ff26a4e709a9fd4cd382f"
+    },
+    "tokenizer.json": {
+     "size": 33384387,
+     "sha256": "f5b325224482ec441ec5fbe2a5ac08c3758e0f9605f6e54368e31f736fcfb01d"
+    },
+    "tokenizer_config.json": {
+     "size": 772,
+     "git_sha1": "23f7a9974116ebed24f97bd8035467023ace6d4b"
+    }
+   },
+   "card": "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Small/blob/8c2141c8af7417cd4a58fe7b58f79f1c00ad1d49/README.md"
+  },
+  "sentence-transformers/all-MiniLM-L6-v2@1110a243fdf4706b3f48f1d95db1a4f5529b4d41": {
+   "repo": "sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "role": "C2 (ai-memory local embedder: <LME_HOME>/models/all-MiniLM-L6-v2)",
+   "license": "apache-2.0",
+   "last_modified": "2026-06-01T06:29:13.000Z",
+   "files": {
+    "config.json": {
+     "size": 612,
+     "git_sha1": "72b987fd805cfa2b58c4c8c952b274a11bfd5a00",
+     "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41"
+    },
+    "model.safetensors": {
+     "size": 90868376,
+     "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db"
+    },
+    "tokenizer.json": {
+     "size": 466247,
+     "git_sha1": "cb202bfe2e3c98645018a6d12f182a434c9d3e02",
+     "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+    }
+   },
+   "card": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/blob/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/README.md",
+   "note": "each sha256 equals ai-memory's own pin (crates/ai-memory-llm/src/local.rs MODEL_FILES)"
+  },
+  "Xenova/all-MiniLM-L6-v2@751bff37182d3f1213fa05d7196b954e230abad9": {
+   "repo": "Xenova/all-MiniLM-L6-v2",
+   "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+   "role": "D2, D2h (agentmemory transformers.js cache, q8)",
+   "license": "apache-2.0",
+   "last_modified": "2025-07-22T16:42:24.000Z",
+   "files": {
+    "config.json": {
+     "size": 650,
+     "git_sha1": "72147e4ff4426ebedbfa2146c4a0999def51a313",
+     "sha256": "7135149f7cffa1a573466c6e4d8423ed73b62fd2332c575bf738a0d033f70df7"
+    },
+    "onnx/model_quantized.onnx": {
+     "size": 22972370,
+     "sha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1"
+    },
+    "tokenizer.json": {
+     "size": 711661,
+     "git_sha1": "c17ed520ed8438736732a54957a69306b8822215",
+     "sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
+    },
+    "tokenizer_config.json": {
+     "size": 366,
+     "git_sha1": "37fca74771bc76a8e01178ce3a6055a0995f8093",
+     "sha256": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3"
+    }
+   },
+   "card": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/blob/751bff37182d3f1213fa05d7196b954e230abad9/README.md",
+   "note": "each sha256 equals the file agentmemory's transformers.js cached on the Mac for D2"
+  },
+  "BAAI/bge-small-en-v1.5@5c38ec7c405ec4b44b94cc5a9bb96e735b38267a": {
+   "repo": "BAAI/bge-small-en-v1.5",
+   "revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+   "role": "K1 (Hindsight's default local embedder)",
+   "license": "mit",
+   "last_modified": "2024-02-22T03:36:23.000Z",
+   "card": "https://huggingface.co/BAAI/bge-small-en-v1.5/blob/5c38ec7c405ec4b44b94cc5a9bb96e735b38267a/README.md",
+   "note": "the main revision on 2026-09-25; refs/main is pinned to it in Hindsight's own HF cache (fetch-hf --pin-main), because Hindsight loads models by name",
+   "files": {
+    "1_Pooling/config.json": {
+     "git_sha1": "1da070f0993788c8851a652170ff013aa54dd519"
+    },
+    "README.md": {
+     "git_sha1": "8b8567d75ffa619486d9590cb0eb76d66ad46c49"
+    },
+    "config.json": {
+     "git_sha1": "3992bf890728a92476c700e6e657fd696eb94160"
+    },
+    "config_sentence_transformers.json": {
+     "git_sha1": "dcb0c0d97d09b930d13600b1a773ddb27e441aab"
+    },
+    "model.safetensors": {
+     "sha256": "3c9f31665447c8911517620762200d2245a2518d6e7208acc78cd9db317e21ad"
+    },
+    "modules.json": {
+     "git_sha1": "952a9b81c0bfd99800fabf352f69c7ccd46c5e43"
+    },
+    "sentence_bert_config.json": {
+     "git_sha1": "ea85692bff64b0d1917833c31ddbca8ab10f5455"
+    },
+    "special_tokens_map.json": {
+     "git_sha1": "a8b3208c2884c4efb86e49300fdd3dc877220cdf"
+    },
+    "tokenizer.json": {
+     "git_sha1": "688882a79f44442ddc1f60d70334a7ff5df0fb47"
+    },
+    "tokenizer_config.json": {
+     "git_sha1": "37fca74771bc76a8e01178ce3a6055a0995f8093"
+    },
+    "vocab.txt": {
+     "git_sha1": "fb140275c155a9c7c5a3b3e0e77a9e839594a938"
+    }
+   }
+  },
+  "cross-encoder/ms-marco-MiniLM-L-6-v2@233902d25c440f23af6f7d6e94d2946bac0bee0a": {
+   "repo": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+   "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+   "role": "K1 (Hindsight's default local reranker)",
+   "license": "apache-2.0",
+   "last_modified": "2026-08-09T15:22:24.000Z",
+   "card": "https://huggingface.co/cross-encoder/ms-marco-MiniLM-L-6-v2/blob/233902d25c440f23af6f7d6e94d2946bac0bee0a/README.md",
+   "note": "the main revision on 2026-09-25; refs/main is pinned to it in Hindsight's own HF cache (fetch-hf --pin-main), because Hindsight loads models by name",
+   "files": {
+    "README.md": {
+     "git_sha1": "4c0467b102d751d799638ad2bc0cdf6de56e9745"
+    },
+    "config.json": {
+     "git_sha1": "88bc4f74b33a2073abc9a66cb532b889448ac3ed"
+    },
+    "model.safetensors": {
+     "sha256": "821d1aa69520101d6e0737f78a042ae25b19e5cb9160701909d10434f4aeb0ae"
+    },
+    "special_tokens_map.json": {
+     "git_sha1": "7520992f25914d962f0e2fd0e0566fc33d19ec59"
+    },
+    "tokenizer.json": {
+     "git_sha1": "688882a79f44442ddc1f60d70334a7ff5df0fb47"
+    },
+    "tokenizer_config.json": {
+     "git_sha1": "a2435fedfac32b9ad70f052d4f84007730cd3109"
+    },
+    "vocab.txt": {
+     "git_sha1": "fb140275c155a9c7c5a3b3e0e77a9e839594a938"
+    }
+   }
+  }
+ },
+ "hf_datasets": {
+  "mteb/LongMemEval@9dc1a8fdcf9b5676f87c2cdccac021988f6ff5af": {
+   "repo": "mteb/LongMemEval",
+   "revision": "9dc1a8fdcf9b5676f87c2cdccac021988f6ff5af",
+   "role": "mteb LMEB LongMemEval task data",
+   "license": "mit",
+   "last_modified": "2026-05-11T15:18:55.000Z",
+   "files": {
+    "knowledge_update-corpus/test-00000-of-00001.parquet": {
+     "size": 164440071,
+     "sha256": "3dfd1c8fb301fb3663416404c74fc378c90456695a7cf2f1c2723172d5b952b2"
+    },
+    "knowledge_update-qrels/test-00000-of-00001.parquet": {
+     "size": 3767,
+     "sha256": "6e7ba3c96fcd78176baa974380eceedbcc7a1b451f5d27d680b72be76da02f00"
+    },
+    "knowledge_update-queries/test-00000-of-00001.parquet": {
+     "size": 5521,
+     "sha256": "e20db3547e7cac9a67bccc1a2f326fff9daa8f714e7b7f8a77f6ab50fd680302"
+    },
+    "knowledge_update-top_ranked/test-00000-of-00001.parquet": {
+     "size": 920781,
+     "sha256": "524ea4cb03605d38cf64c058abe787e1cfd792a7de34e21c1fe08194c6dc6424"
+    },
+    "multi_session-corpus/test-00000-of-00001.parquet": {
+     "size": 164440071,
+     "sha256": "3dfd1c8fb301fb3663416404c74fc378c90456695a7cf2f1c2723172d5b952b2"
+    },
+    "multi_session-qrels/test-00000-of-00001.parquet": {
+     "size": 5781,
+     "sha256": "9cb05191aae796ed739d32a5b17e30ef9f122fc0977d9df7f512f37010ecab02"
+    },
+    "multi_session-queries/test-00000-of-00001.parquet": {
+     "size": 8096,
+     "sha256": "c40d13dbdc53f581a9a1c0d2eefe2c8d202f75915436c849f2a1713a951b4a7e"
+    },
+    "multi_session-top_ranked/test-00000-of-00001.parquet": {
+     "size": 1572496,
+     "sha256": "6c43eb7541b49c69bfcca44ce56ef7508c143b68da617a0f2627063f365ce1fa"
+    },
+    "single_session_assistant-corpus/test-00000-of-00001.parquet": {
+     "size": 164440071,
+     "sha256": "3dfd1c8fb301fb3663416404c74fc378c90456695a7cf2f1c2723172d5b952b2"
+    },
+    "single_session_assistant-qrels/test-00000-of-00001.parquet": {
+     "size": 2615,
+     "sha256": "47cf635a75f793d3fbb13ec5dca8a384b6fb04d705585d62f6fbe8555b684db5"
+    },
+    "single_session_assistant-queries/test-00000-of-00001.parquet": {
+     "size": 7958,
+     "sha256": "9dfe4b358549b169d674a4608184ed9537cbbe17bea1ddedf0da6db7d7529bc3"
+    },
+    "single_session_assistant-top_ranked/test-00000-of-00001.parquet": {
+     "size": 631737,
+     "sha256": "cbf25c340de2e98a6dc5266e070bb3ff32ac8791f40ff6b3f2115e5291e7733c"
+    },
+    "single_session_preference-corpus/test-00000-of-00001.parquet": {
+     "size": 164440071,
+     "sha256": "3dfd1c8fb301fb3663416404c74fc378c90456695a7cf2f1c2723172d5b952b2"
+    },
+    "single_session_preference-qrels/test-00000-of-00001.parquet": {
+     "size": 2264,
+     "sha256": "fb9dbc680a7b1c61e3b798f3efa45c0503b6593821f7a009d971ccb06b260434"
+    },
+    "single_session_preference-queries/test-00000-of-00001.parquet": {
+     "size": 3348,
+     "sha256": "5c51cf99214fe1d27383de5b2fef0017e8afcce9271603c1194056a77df21799"
+    },
+    "single_session_preference-top_ranked/test-00000-of-00001.parquet": {
+     "size": 354067,
+     "sha256": "231b5d0018cc31798111f5fbb20c437d7cb32d58be8a50a3d18a694a1ebcd4ac"
+    },
+    "single_session_user-corpus/test-00000-of-00001.parquet": {
+     "size": 164440071,
+     "sha256": "3dfd1c8fb301fb3663416404c74fc378c90456695a7cf2f1c2723172d5b952b2"
+    },
+    "single_session_user-qrels/test-00000-of-00001.parquet": {
+     "size": 2896,
+     "sha256": "3168bc7bb752c5486724c42b492f074f7f161914d0f2a4ba4b1a68dee164067b"
+    },
+    "single_session_user-queries/test-00000-of-00001.parquet": {
+     "size": 4300,
+     "sha256": "62fab2f75d7229a57547156d1426fabd28f4949a589242a0e21aa413a91e87c4"
+    },
+    "single_session_user-top_ranked/test-00000-of-00001.parquet": {
+     "size": 804256,
+     "sha256": "fe3be44b3213dec2bc2962c8a5985373e944811d6b3afd8b8328e9fea7cf9171"
+    },
+    "temporal_reasoning-corpus/test-00000-of-00001.parquet": {
+     "size": 164440071,
+     "sha256": "3dfd1c8fb301fb3663416404c74fc378c90456695a7cf2f1c2723172d5b952b2"
+    },
+    "temporal_reasoning-qrels/test-00000-of-00001.parquet": {
+     "size": 5367,
+     "sha256": "941aaf72327136733ad77bffc55c86b83f638dcb1b1224fd17a722964a2d459c"
+    },
+    "temporal_reasoning-queries/test-00000-of-00001.parquet": {
+     "size": 9286,
+     "sha256": "302563a4ca9f77f6a1c92d7da51bc7bfe96e1d203fd76e54fd7445a9b5b78f9a"
+    },
+    "temporal_reasoning-top_ranked/test-00000-of-00001.parquet": {
+     "size": 1567152,
+     "sha256": "1156d2abdaa2428482ba4d018237df6e673ed9dfc7e3002130a5b026fce0bf65"
+    }
+   }
+  },
+  "xiaowu0162/longmemeval-cleaned@98d7416c24c778c2fee6e6f3006e7a073259d48f": {
+   "repo": "xiaowu0162/longmemeval-cleaned",
+   "revision": "98d7416c24c778c2fee6e6f3006e7a073259d48f",
+   "role": "the benchmark dataset",
+   "license": "mit",
+   "last_modified": "2025-09-19T23:48:16.000Z",
+   "files": {
+    "longmemeval_s_cleaned.json": {
+     "size": 277383467,
+     "sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442"
+    }
+   }
+  }
+ },
+ "mempalace": {
+  "version": "3.10.0",
+  "license": "MIT",
+  "role": "A16 M2 (palace mode) and M1 (raw mode through its own bench)",
+  "pypi": {
+   "wheel": "mempalace-3.10.0-py3-none-any.whl",
+   "sha256": "9f65645235ba4da58fda237e5fad0ba83a5941066a18bcfdbf178b7fc8cf7abf",
+   "sdist_sha256": "c76f1aeae81a68b695249f940e6771f147ae3be73d99bb43ad93530de12cb1f4",
+   "uploaded": "2026-09-16T00:25:55Z",
+   "checksum_source": "https://pypi.org/pypi/mempalace/3.10.0/json"
+  },
+  "lock": "requirements/mempalace.lock.txt (hash-locked; chromadb 1.5.9, onnxruntime 1.30.0)",
+  "repo": "https://github.com/MemPalace/mempalace",
+  "tag": "v3.10.0",
+  "commit": "22fd87f09c19d5ffb2d6966486483353937931c0",
+  "release": "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0 (2026-09-16)",
+  "container": {
+   "image": "ghcr.io/mempalace/mempalace:3.10.0",
+   "digest": "sha256:db5761316990215fc6f2db332e63db50f1e35b86fa8c5b3ae6bbf4ab1e61f902",
+   "note": "recorded only; the lane installs the PyPI release"
+  },
+  "embedding": {
+   "model": "chromadb ONNXMiniLM_L6_V2 (all-MiniLM-L6-v2, MemPalace's default embedder)",
+   "url": "https://chroma-onnx-models.s3.amazonaws.com/all-MiniLM-L6-v2/onnx.tar.gz",
+   "sha256": "913d7300ceae3b2dbc2c50d1de4baacab4be7b9380491c27fab7418616a16ec3",
+   "checksum_source": "chromadb 1.5.9 chromadb/utils/embedding_functions/onnx_mini_lm_l6_v2.py _MODEL_SHA256 (tag 1.5.9, commit 11f3c7435e71024aa0a2b53710a28d3289d922d1)"
+  },
+  "published": {
+   "recall_any@5": 0.966,
+   "mode": "raw",
+   "questions": 500,
+   "source": "README.md and benchmarks/BENCHMARKS.md at v3.10.0 ('96.6% R@5 raw on LongMemEval')"
+  },
+  "hooks": ".claude-plugin/hooks/hooks.json at v3.10.0: Stop and SessionEnd run `mempalace hook run --harness claude-code`"
+ },
+ "hindsight": {
+  "version": "0.10.1",
+  "license": "MIT",
+  "role": "A16 K1 (one bank per question, the K1 subset)",
+  "pypi": {
+   "hindsight-api": {
+    "wheel": "hindsight_api-0.10.1-py3-none-any.whl",
+    "sha256": "abc5575516e0ffdf88770f8d2fb3def1894c7ace220e8de6b7e11b525b004d2e"
+   },
+   "hindsight-api-slim": {
+    "wheel": "hindsight_api_slim-0.10.1-py3-none-any.whl",
+    "sha256": "998dfe11ed8685311f7f1aaa06c97fdf6cc3a4289b2666b6f526a6e1f0905aa1"
+   },
+   "checksum_source": "https://pypi.org/pypi/hindsight-api/0.10.1/json; the same digests are GitHub release assets with PyPI publish attestations"
+  },
+  "lock": "requirements/hindsight.lock.txt (hash-locked; pg0-embedded 0.15.2 bundles PostgreSQL 18 with pgvector)",
+  "repo": "https://github.com/vectorize-io/hindsight",
+  "tag": "v0.10.1",
+  "commit": "f8950b0c07d9e34c76493dba802bb309f0ce60fd",
+  "release": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1 (2026-09-21)",
+  "container": {
+   "image": "ghcr.io/vectorize-io/hindsight:0.10.1",
+   "digest": "sha256:b4d3b76f363aa40cf348450e7f8f52a50653008731b99824b14623a196182e73",
+   "note": "recorded only; the lane installs the PyPI release (no Docker on VelaNext is assumed)"
+  },
+  "defaults": {
+   "embeddings": "local BAAI/bge-small-en-v1.5",
+   "reranker": "local cross-encoder/ms-marco-MiniLM-L-6-v2",
+   "database": "pg0 (embedded)",
+   "recall": "budget mid, max_tokens 4096 (API defaults)",
+   "source": "hindsight-api-slim/hindsight_api/config.py and hindsight-docs/static/openapi.json at v0.10.1"
+  },
+  "llm": "the H1 build: qwen3.6:35b-a3b GGUF (ollama_models) on llama-server, production's Modelfile parameters, reasoning_effort low (HINDSIGHT_API_LLM_REASONING_EFFORT, as H1)",
+  "amb": {
+   "repo": "https://github.com/vectorize-io/agent-memory-benchmark",
+   "commit": "309e0065dade533f2c9c64511d20090d6cad4129",
+   "commit_source": "hindsight-system-evals/AMB_REF at hindsight v0.10.1",
+   "published": {
+    "accuracy": 0.946,
+    "correct": 473,
+    "questions": 500,
+    "memory": "hindsight",
+    "mode": "rag",
+    "judge": "Gemini (AMB default)",
+    "source": "results-manifest.json at 309e0065 (outputs/longmemeval/hindsight/rag/s.json)"
+   },
+   "langdetect": {
+    "version": "1.0.9",
+    "sdist_sha256": "cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0",
+    "built_with_setuptools": "82.0.1",
+    "note": "AMB's only sdist-only dependency (via cognee), hash-locked in AMB's uv.lock; setup installs everything else first (--no-install-package langdetect), which brings AMB's own hash-locked setuptools 82.0.1, then builds langdetect against it without isolation (--no-build-isolation-package langdetect)"
+   }
+  }
+ },
+ "k1_subset": {
+  "file": "k1-subset.json",
+  "sha256": "273b1f339a10a6b36dd6dd2235a4cd4e0bc5c6cab0b2cc93754232379addb97d",
+  "seed": 20260925,
+  "size": 100,
+  "check": "lane_tools.py k1-subset --data <dataset> --check k1-subset.json",
+  "ingest_budget_s": 10800,
+  "ingest_budget_source": "PREREGISTRATION.md A16.1"
+ },
+ "a16_deferred": {
+  "no arm": [
+   "Attemory (gate: a source and licence check of its prebuilt core)",
+   "GBrain",
+   "Mem0 OSS"
+  ],
+  "rejected for this role": [
+   "Honcho",
+   "OpenViking",
+   "Basic Memory",
+   "the retired Letta server"
+  ],
+  "source": "PREREGISTRATION.md A16"
+ }
+}
