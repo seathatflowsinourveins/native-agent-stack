@@ -1,0 +1,2465 @@
+{
+  "schema_version": 1,
+  "status": "DRAFT",
+  "frozen": false,
+  "run_started": false,
+  "execution_authorized": false,
+  "created": "2026-09-27",
+  "lane": "foundation",
+  "base_revision": "0f76651d",
+  "objective": "Choose GPT-6 compression configurations per frozen role domain using upstream grading, exact-value preservation and complete two-hop accounting.",
+  "results": null,
+  "research": {
+    "method": "Installed sources/help where observational, pinned changelogs and sources via gh api, then source-based design. search-first researcher and installed find-skills/tdd/verification skills; no installs.",
+    "structural_model": "#416 blueprints/compaction-window-ab, read-only sibling draft, structure only; no outcomes or thresholds copied as evidence.",
+    "local_test_reference": "tests/test_token_e2e_preregistration.py at 0f76651d",
+    "mapping": [
+      "catalogs/convergence-practice/source-review.json",
+      "catalogs/convergence-practice/architecture-wave/harbor-framework__harbor.json",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      "manifests/stack.json"
+    ],
+    "discovery_limit": "Skills discovery used installed skill sources. Web open was unsupported and a search returned no usable output; no catalog-wide absence claim. Direct shell gh could not connect; network-capable research tool gh api succeeded.",
+    "source_date": "2026-09-27"
+  },
+  "sources": [
+    {
+      "id": "or-live-zone",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/liveZone.ts",
+      "lines": [
+        127,
+        132
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L127-L132",
+      "claim": "Principal and session required; absent context calls compress(body) at 376-395.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "e959421584a9a2523a2615f4892dd37ce43e8add67fc3972c699f766371798da",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-chat-core",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/handlers/chatCore.ts",
+      "lines": [
+        1425,
+        1449
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449",
+      "claim": "Opt-out leaves reactive passes enabled. Styles 1689-1734; principal 1793; live zone 1866-1903; safety passes 2134-2160 and 2210-2231.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "d244f5e9045e320161617d8b1488dfbe40f78dea74deb1aef73ae67bd7d534a9",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-lite",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/lite.ts",
+      "lines": [
+        148,
+        168
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L148-L168",
+      "claim": "Default limit 2000 at line 24; truncates string tool content; default apply path 259-262.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "255644fe84ae8e80e196c5bc25ce3dea1321c4ade274059a1c635721f722b29c",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-adapter",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/bodyAdapter.ts",
+      "lines": [
+        116,
+        145
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145",
+      "claim": "Responses function_call_output becomes role tool content; restore 205-221,315-365; eligibility metadata is separate.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "b2a836ff12f870e5d464f7b228e7b7a18a0a43fb72c54ff16bb70d94d80cdc01",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-strategy",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/strategySelector.ts",
+      "lines": [
+        367,
+        386
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386",
+      "claim": "Lite and stacked paths use Responses adapter; lite does not consult codex-responses eligibility metadata.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "76a671f9af9b2be846854e1254c8cd236b8d67449cb93927199c579ab85c117a",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-minify",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/engines/codexResponses/index.ts",
+      "lines": [
+        137,
+        145
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145",
+      "claim": "JSON.parse then JSON.stringify; candidate selection also has size thresholds at 216-226.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "8b53cc348e643c7b96a89ef496cb2d700ddeb36ceca948c2833666f29daafc20",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-dedup",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/engines/session-dedup/index.ts",
+      "lines": [
+        291,
+        345
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L291-L345",
+      "claim": "String key i collides with multipart key i*100000+p+1, and replacement lookup uses both key spaces.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "00e5e81520fb4189256924cbfc4bd0800134ca525d5d778155db0eb9e64be64b",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-engine-labels",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/engineCatalog.ts",
+      "lines": [
+        31,
+        108
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engineCatalog.ts#L31-L108",
+      "claim": "Four engines carry lossy:false labels; this is classification, not exact-value acceptance.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "d0029c910f3587cc352347ae1d6461caef8f758b0210f6d5ba4d95cd162ef04b",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-styles",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/outputStyles/backCompat.ts",
+      "lines": [
+        13,
+        28
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/backCompat.ts#L13-L28",
+      "claim": "Explicit nonempty styles override legacy caveman output mode; empty styles fall back unless legacy disabled.",
+      "installed_build": "dd6e9607e",
+      "installed_file_sha256": "7a2d5d004e4b028b97f7b59278c1b49fe2a1848e20337d803e6d51452271accd",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true,
+      "evidence_class": "read-only installed source and gh-api byte comparison"
+    },
+    {
+      "id": "or-lossy-policy",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/lossyRequestPolicy.ts",
+      "lines": [
+        29,
+        67
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lossyRequestPolicy.ts#L29-L67",
+      "claim": "allow-lossy keeps plan; headerless stacked plan retains isSafeDefault steps.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "8831e43712b6b2a994a418022e548f31b8eebc46b9f6fa8c3a32e60f2eac25c5",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-caveman",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/caveman.ts",
+      "lines": [
+        403,
+        445
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/caveman.ts#L403-L445",
+      "claim": "Rule rewrites applied to message content.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "55bbdc6bebf75d958d8f25dff391e1cbdcffb1c9845a34446e714d465af992d0",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-relevance",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/engines/relevance/index.ts",
+      "lines": [
+        36,
+        84
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/relevance/index.ts#L36-L84",
+      "claim": "Sentence selection retains a subset in original order.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "94d1e363b74564df40b719aeeb89af584fd97dd94bcce74aa5fc052554ab7ace",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-aggressive",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/aggressive.ts",
+      "lines": [
+        123,
+        145
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/aggressive.ts#L123-L145",
+      "claim": "Fallback summaries replace long messages.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "f9b3d0b6dcd9f441218b12663f706ff1cfe32b90d0f59aba291aa94b3adc7677",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-llmlingua",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/engines/llmlingua/index.ts",
+      "lines": [
+        417,
+        489
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/index.ts#L417-L489",
+      "claim": "Native model compression path and runtime availability guard; enabled is not proof of application.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "f6ac8a7051d12bc3dd9abcd3a76df060d7855e78bb03367503c785549a40f11e",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-ultra",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/services/compression/ultra.ts",
+      "lines": [
+        42,
+        65
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultra.ts#L42-L65",
+      "claim": "Prose pruning protects selected blocks, not every lexical value.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "11484549092368163d277e250ad3a6bd99cfa38ba494aa8186492ba893468a0c",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-codex-transport",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "open-sse/executors/codex.ts",
+      "lines": [
+        1498,
+        1573
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1498-L1573",
+      "claim": "Cache key injection, session body field removal, conditional encrypted reasoning policy and Responses allowlist. Also 365-391,1176-1218,1395-1405.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "8ca56325adc9775305464ea7adcfa9b4e70e18ce47825aa58f8c8929418f1289",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "or-call-logs",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "src/lib/usage/callLogs.ts",
+      "lines": [
+        90,
+        107
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107",
+      "claim": "Source declares row id, duration, tokens_in/out/cache_read/reasoning; live database not inspected.",
+      "installed_build": "dd6e9607e",
+      "evidence_class": "read-only installed source and gh-api byte comparison",
+      "live_acceptance": null,
+      "installed_file_sha256": "64269db02cb0ed73f6f7d0a3daaf314a1aa08df2993accd559ec078aff764e9c",
+      "gh_api_exit": 0,
+      "installed_equals_upstream": true
+    },
+    {
+      "id": "harbor-codex",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "file": "src/harbor/agents/installed/codex.py",
+      "lines": [
+        1207,
+        1296
+      ],
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1207-L1296",
+      "claim": "Native config loader preserves provider settings, merges runtime inputs, uploads config. CODEX_HOME 81,1352-1359; options 38-59; launch 1432-1448; native transcripts 1452-1476.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "harbor-options",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "file": "src/harbor/agents/options.py",
+      "lines": [
+        50,
+        70
+      ],
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/options.py#L50-L70",
+      "claim": "Profile forwarding not found in shared options, CodexOptions or native launch; arbitrary extras forbidden.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "harbor-verifier",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "file": "src/harbor/verifier/verifier.py",
+      "lines": [
+        165,
+        250
+      ],
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/verifier/verifier.py#L165-L250",
+      "claim": "Native task test execution and reward/artifact retention.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "rewardkit-example",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "file": "examples/tasks/reward-kit-example/tests/test.sh",
+      "lines": [
+        1,
+        2
+      ],
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/examples/tasks/reward-kit-example/tests/test.sh#L1-L2",
+      "claim": "Unchanged example pins harbor-rewardkit 0.1.8; bundled package version 0.2.0 is a different pin.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "promptfoo-responses",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/responses.ts",
+      "lines": [
+        1195,
+        1210
+      ],
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/responses.ts#L1195-L1210",
+      "claim": "POST /responses uses config.headers; request fields at 1003-1040.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "promptfoo-base-url",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/index.ts",
+      "lines": [
+        111,
+        128
+      ],
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/index.ts#L111-L128",
+      "claim": "apiBaseUrl selects custom OpenAI endpoint.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "promptfoo-cli",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/commands/eval.ts",
+      "lines": [
+        54,
+        97
+      ],
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/commands/eval.ts#L54-L97",
+      "claim": "--model-outputs supports offline grading; --repeat, --max-concurrency and --no-cache.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "promptfoo-python",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/assertions/python.ts",
+      "lines": [
+        32,
+        63
+      ],
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/assertions/python.ts#L32-L63",
+      "claim": "Python assertions normalize grading result; exceptions fail.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "promptfoo-startup",
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/main.ts",
+      "lines": [
+        63,
+        64
+      ],
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/main.ts#L63-L64",
+      "claim": "Migration runs before argument parsing at 147; logger.ts 224-247 creates/cleans logs.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "inspect",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "c2b63a0b0560f9c3b5b5230365e0a8fe08cd3df0",
+      "file": "CHANGELOG.md",
+      "lines": [
+        1,
+        4
+      ],
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/c2b63a0b0560f9c3b5b5230365e0a8fe08cd3df0/CHANGELOG.md#L1-L4",
+      "claim": "0.3.271 adds extra headers/body CLI; release endpoints 404, tagged changelog retrieved.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "inspect-swe",
+      "repository": "meridianlabs-ai/inspect_swe",
+      "pin": "7eb8dd64309db4cd0f6bdf1d0ffd9786a74a4088",
+      "file": "src/inspect_swe/_codex_cli/codex_cli.py",
+      "lines": [
+        619,
+        637
+      ],
+      "url": "https://github.com/meridianlabs-ai/inspect_swe/blob/7eb8dd64309db4cd0f6bdf1d0ffd9786a74a4088/src/inspect_swe/_codex_cli/codex_cli.py#L619-L637",
+      "claim": "0.2.71 rewrites provider and CODEX_HOME to Inspect bridge; cannot silently substitute transport.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "scipy",
+      "repository": "scipy/scipy",
+      "pin": "e4e854eaa8f18d807cd3496028e257e36caa93cc",
+      "file": "scipy/stats/_resampling.py",
+      "lines": [
+        300,
+        394
+      ],
+      "url": "https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L300-L394",
+      "claim": "SciPy 1.18.1 bootstrap paired option; permutation_test at 1679-1780 and paired samples at 1892-1916.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "scipy-binomial",
+      "repository": "scipy/scipy",
+      "pin": "e4e854eaa8f18d807cd3496028e257e36caa93cc",
+      "file": "scipy/stats/_binomtest.py",
+      "lines": [
+        52,
+        126
+      ],
+      "url": "https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_binomtest.py#L52-L126",
+      "claim": "Exact proportion interval; binomtest at 187. Conservative harmful-discordance gate avoids zero-width bootstrap certification.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "statsmodels",
+      "repository": "statsmodels/statsmodels",
+      "pin": "278ff9950636cdd4939b4055e339a8e681d79cab",
+      "file": "statsmodels/stats/multitest.py",
+      "lines": [
+        99,
+        149
+      ],
+      "url": "https://github.com/statsmodels/statsmodels/blob/278ff9950636cdd4939b4055e339a8e681d79cab/statsmodels/stats/multitest.py#L99-L149",
+      "claim": "statsmodels 0.15.0 multipletests(method=holm), implementation 233-245.",
+      "gh_api_exit": 0
+    },
+    {
+      "id": "role-policy",
+      "evidence_class": "user instruction",
+      "repository": null,
+      "pin": null,
+      "file": null,
+      "lines": null,
+      "url": null,
+      "claim": "H6 is a normative role gate, not an OmniRoute capability."
+    },
+    {
+      "id": "codex-provider",
+      "repository": "openai/codex",
+      "pin": "rust-v0.157.1",
+      "file": "codex-rs/model-provider-info/src/lib.rs",
+      "lines": [
+        137,
+        173
+      ],
+      "url": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L137-L173",
+      "gh_api_exit": 0,
+      "claim": "Native provider base_url, wire_api, http_headers and env_http_headers; header map at 385. Tagged release notes checked, installed client reports 0.157.1."
+    },
+    {
+      "id": "numpy-rng",
+      "repository": "numpy/numpy",
+      "pin": "c5ab79c14c98bfda1e60770ffa23a6130f8267b7",
+      "file": "numpy/random/_pcg64.pyx",
+      "lines": [
+        53,
+        108
+      ],
+      "url": "https://github.com/numpy/numpy/blob/c5ab79c14c98bfda1e60770ffa23a6130f8267b7/numpy/random/_pcg64.pyx#L53-L108",
+      "gh_api_exit": 0,
+      "claim": "NumPy 2.4.0 PCG64 fixed-seed bitstream; freeze exact Generator distribution/runtime too. SciPy 1.18.1 pyproject accepts numpy>=2.0,<2.8."
+    },
+    {
+      "id": "or-affinity-header",
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "src/sse/handlers/chat.ts",
+      "lines": [
+        684,
+        692
+      ],
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L684-L692",
+      "evidence_class": "read-only installed source review",
+      "claim": "request.headers.get(\"x-omniroute-connection\") is the requested connection pin; cross-hop identity mapping unobserved."
+    },
+    {
+      "id": "harbor-oracle",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "file": "src/harbor/agents/oracle.py",
+      "lines": [
+        57,
+        104
+      ],
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/oracle.py#L57-L104",
+      "gh_api_exit": 0,
+      "claim": "Native reference solution agent; nop.py is native negative control."
+    }
+  ],
+  "client": {
+    "version": "0.157.1",
+    "profile": "stack-worker",
+    "effort": "max",
+    "argv_contract": [
+      "codex",
+      "-p",
+      "stack-worker",
+      "-m",
+      "<cell.model>",
+      "-c",
+      "model_reasoning_effort=\"max\"",
+      "exec",
+      "--json",
+      "<frozen-task>"
+    ],
+    "stdin": "DEVNULL",
+    "same_config_except_provider": true,
+    "config_rule": "Freeze one sanitized lane-local config plus actual effective config/profile/project precedence and client binary SHA256. Only model provider definition and routed model differ. Never assume profile replaces base config. No user credential/auth store copy.",
+    "static_provider_header": {
+      "A0/A1": {
+        "x-omniroute-compression": "allow-lossy"
+      },
+      "D0/D1": {},
+      "C": {}
+    },
+    "wire_api": "responses",
+    "unsuffixed_allowed": false,
+    "unsuffixed_unlock": "Separate pre-data amendment only after 20128 call_logs proves reasoning_effort_upstream=max for unsuffixed name through openai-compatible sharedgw. This matrix uses -max everywhere.",
+    "runtime_acceptance": null,
+    "provider_example": {
+      "model_provider": "ab_gateway",
+      "model_providers": {
+        "ab_gateway": {
+          "name": "Compression AB gateway",
+          "base_url": "<cell.base_url>",
+          "wire_api": "responses",
+          "requires_openai_auth": false,
+          "http_headers": {
+            "x-omniroute-compression": "<allow-lossy only for A0/A1; omit field for headerless cells>"
+          }
+        }
+      },
+      "source_id": "codex-provider",
+      "note": "Illustrative native supported fields only; layer into same sanitized lane-local base/profile, then hash and inspect actual effective configuration. No gateway authentication secret in public config."
+    }
+  },
+  "harnesses": {
+    "primary": {
+      "name": "Harbor",
+      "version": "0.23.0",
+      "source_id": "harbor-codex",
+      "native_provider_config": "supported source path, not host accepted",
+      "native_code_home": "Harbor creates isolated CODEX_HOME; arbitrary parent home forwarding not assumed",
+      "profile_flag": "not found in v0.23.0 CodexOptions, InstalledAgentOptions or native launch; Harbor not found on PATH; release reviewed",
+      "readiness": "BLOCKED until supported upstream launch can meet literal -p stack-worker; no invented extra_args, custom runner or config-only substitution",
+      "transcripts": "Native Codex rollout JSONL plus Harbor result/reward/verifier artifacts; ATIF only cross-check"
+    },
+    "gateway": {
+      "name": "promptfoo",
+      "version": "0.123.1",
+      "source_ids": [
+        "promptfoo-responses",
+        "promptfoo-base-url",
+        "promptfoo-cli",
+        "promptfoo-python"
+      ],
+      "provider_id_template": "openai:responses:<cell.model>",
+      "config_fields": [
+        "apiBaseUrl",
+        "headers",
+        "reasoning.effort",
+        "store",
+        "include",
+        "prompt_cache_key"
+      ],
+      "command_contract": "promptfoo eval --no-cache --repeat <frozen-repetitions> --max-concurrency 1; offline --model-outputs for native Codex answers",
+      "boundary": "Direct promptfoo requests are gateway diagnostics, not native Codex role attempts or proof of multi-turn tool use."
+    },
+    "runner_up": {
+      "name": "Inspect 0.3.271 + inspect_swe 0.2.71",
+      "source_ids": [
+        "inspect",
+        "inspect-swe"
+      ],
+      "readiness": "Installed inspect --version is 0.3.266. Runner-up adds a bridge and rewrites routing; may replace primary only by pre-data amendment with full transport/profile requalification. Never pool runners."
+    },
+    "rewardkit": {
+      "bundled_version": "0.2.0",
+      "unchanged_example_dependency": "0.1.8",
+      "source_id": "rewardkit-example",
+      "readiness": "Freeze actual criteria and dependency; do not relabel 0.1.8 example as 0.2.0 execution."
+    },
+    "statistics": {
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "installed_acceptance": null,
+      "numpy": "2.4.0"
+    }
+  },
+  "cells": [
+    {
+      "id": "C",
+      "classification": "confirmatory",
+      "base_url": "http://127.0.0.1:20128/v1",
+      "model": "cx/gpt-6-astra-max",
+      "engines": [],
+      "compression_header": null,
+      "output_styles_on": false,
+      "principal": "keyless",
+      "live_zone_configured": false,
+      "observed_effective_plan": null
+    },
+    {
+      "id": "D0",
+      "classification": "confirmatory",
+      "base_url": "http://127.0.0.1:20129/v1",
+      "model": "sharedgw/cx/gpt-6-astra-max",
+      "engines": [
+        "session-dedup",
+        "ccr",
+        "lite",
+        "headroom"
+      ],
+      "compression_header": null,
+      "output_styles_on": false,
+      "principal": "keyless",
+      "live_zone_configured": true,
+      "observed_effective_plan": null
+    },
+    {
+      "id": "D1",
+      "classification": "confirmatory",
+      "base_url": "http://127.0.0.1:20129/v1",
+      "model": "sharedgw/cx/gpt-6-astra-max",
+      "engines": [
+        "session-dedup",
+        "ccr",
+        "lite",
+        "headroom"
+      ],
+      "compression_header": null,
+      "output_styles_on": true,
+      "principal": "keyless",
+      "live_zone_configured": true,
+      "observed_effective_plan": null
+    },
+    {
+      "id": "A0",
+      "classification": "confirmatory",
+      "base_url": "http://127.0.0.1:20129/v1",
+      "model": "sharedgw/cx/gpt-6-astra-max",
+      "engines": [
+        "session-dedup",
+        "ccr",
+        "lite",
+        "rtk",
+        "codex-responses",
+        "headroom",
+        "relevance",
+        "caveman",
+        "aggressive",
+        "llmlingua",
+        "ultra",
+        "omniglyph"
+      ],
+      "compression_header": "allow-lossy",
+      "output_styles_on": false,
+      "principal": "keyless",
+      "live_zone_configured": true,
+      "observed_effective_plan": null
+    },
+    {
+      "id": "A1",
+      "classification": "confirmatory",
+      "base_url": "http://127.0.0.1:20129/v1",
+      "model": "sharedgw/cx/gpt-6-astra-max",
+      "engines": [
+        "session-dedup",
+        "ccr",
+        "lite",
+        "rtk",
+        "codex-responses",
+        "headroom",
+        "relevance",
+        "caveman",
+        "aggressive",
+        "llmlingua",
+        "ultra",
+        "omniglyph"
+      ],
+      "compression_header": "allow-lossy",
+      "output_styles_on": true,
+      "principal": "keyless",
+      "live_zone_configured": true,
+      "observed_effective_plan": null
+    }
+  ],
+  "factorization": {
+    "design": "Direct clean control plus 2x2 crossing upstream safe-labelled default/all engines with output styles off/on. Five cells; four one-factor lossy/style contrasts avoid confounding an output change with input compression.",
+    "header_off_is_clean_control": false,
+    "direct_control": {
+      "compression_enabled": false,
+      "exclusions": [
+        "codex/*"
+      ]
+    },
+    "framework_node": "sharedgw -> 20128, openai-compatible; preserve selected 20129 engine plan and order",
+    "styles_on": [
+      {
+        "id": "terse-prose",
+        "level": "full"
+      },
+      {
+        "id": "less-code",
+        "level": "full"
+      },
+      {
+        "id": "ponytail",
+        "level": "full"
+      },
+      {
+        "id": "i-have-adhd",
+        "level": "full"
+      }
+    ],
+    "legacy_on": {
+      "enabled": true,
+      "intensity": "lite"
+    },
+    "styles_off": {
+      "outputStyles": [],
+      "cavemanOutputMode": {
+        "enabled": false
+      }
+    },
+    "style_resolution": "Nonempty explicit styles win; legacy lite is configured but not added as a fifth style.",
+    "allocation": "All four comparisons to C in each role are confirmatory. Internal engine/style contrasts and interaction estimates are explanatory, without promotion claims.",
+    "configuration_application": "Future host owner snapshots and read-backs 20129 settings for each cell in exclusive experiment windows, preserving all unrelated fields; restore exact snapshot after block. No live changes while drafting. If exclusive scope unavailable, do not run mixed-style cells on the shared instance.",
+    "engine_activation": "Pin effective config and model dependencies, verify applied vs no-eligible/skipped per engine. All-enabled treatment is not evidence that every engine executed."
+  },
+  "exploratory": {
+    "allows_promotion": false,
+    "single_engine_order": [
+      "codex-responses",
+      "rtk",
+      "relevance",
+      "caveman",
+      "aggressive",
+      "llmlingua",
+      "ultra",
+      "omniglyph"
+    ],
+    "single_engine_design": "If remaining reserved budget supports a complete paired block, add exactly one listed engine to D0, styles off; compare D0 within same block, 3 repetitions x 6 tasks x 3 roles. Fixed order, no data-driven engine selection. Never infer all-engine interactions from individual passes. New confirmation required before adopting any such plan.",
+    "keyed_live_zone": {
+      "cells": [
+        "D0-keyed",
+        "A1-keyed"
+      ],
+      "paired_keyless": [
+        "D0",
+        "A1"
+      ],
+      "classification": "exploratory",
+      "ttl_minutes": 60,
+      "settings_field": "cacheMinutes",
+      "key_file_mode": "0600",
+      "secret_policy": "Future host owner registers API key on 20129; key remains in per-provider private 0600 store outside checkout, never printed/committed, never copy another auth store. Observe value-free principal ID/equality evidence.",
+      "other_conditions": "Same model/account/affinity/session schedule and settings, no global hard-budget bypass. Only registered principal differs; keyful authentication may itself confound caching.",
+      "repetitions": 3,
+      "live_result": null
+    },
+    "budget_rule": "Qualification then complete confirmatory cohort first. No borrowing its budget for exploratory cells; no post-result extension."
+  },
+  "hashing": {
+    "packet": "UTF-8 JSON, sort_keys=true, ensure_ascii=true, separators=(comma,colon), allow_nan=false, no trailing newline; hash packet object only.",
+    "upstream_task_directory": "All files sorted bytewise by relative path; concatenate relative_path + NUL + sha256(file_bytes).hexdigest() + LF; sha256(concatenation).",
+    "freeze_scope": "Draft task selections and literal stimuli have hashes now. Runtime images/dependencies/adapter executables and final execution seal remain null; no provider request before sealing."
+  },
+  "task_sets": {
+    "builder": {
+      "packet": {
+        "role": "builder",
+        "tasks": [
+          {
+            "id": "B-deepswe_tomlkit-toml-table-converters",
+            "prompt": "Implement TOML table converters; preserve values/comments and specified error behavior.",
+            "prompt_binding": "Execute original instruction.md and any native steps without rewriting; this description is an index, not a replacement prompt.",
+            "source_ids": [
+              "harbor-codex",
+              "harbor-verifier"
+            ],
+            "source_repository": "harbor-framework/harbor",
+            "source_pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+            "source_directory": "examples/tasks/deepswe_tomlkit-toml-table-converters",
+            "source_files": 8,
+            "source_manifest_sha256": "fa8dbedf2d1a53a7795b8ef4978742e87eaf20f5e50ff822574d9477fcdfae5e",
+            "oracle": "Unchanged task tests/test.sh or each native step verifier; full reward contract from pinned task, all required checks pass, no skipped/missing/nonfinite reward.",
+            "task_bytes_verified_by": "gh api: all source blobs read in memory; source-byte manifest hash independently recomputed",
+            "runtime_image_digest": null
+          },
+          {
+            "id": "B-reward-kit-example",
+            "prompt": "Implement textstats and JSON analysis pipeline against unchanged Rewardkit criteria.",
+            "prompt_binding": "Execute original instruction.md and any native steps without rewriting; this description is an index, not a replacement prompt.",
+            "source_ids": [
+              "harbor-codex",
+              "harbor-verifier",
+              "rewardkit-example"
+            ],
+            "source_repository": "harbor-framework/harbor",
+            "source_pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+            "source_directory": "examples/tasks/reward-kit-example",
+            "source_files": 15,
+            "source_manifest_sha256": "28959a602e7c90928cae7535ce90b48f4a8d2a67bddabc0dc190cc772e7c2661",
+            "oracle": "Unchanged task tests/test.sh or each native step verifier; full reward contract from pinned task, all required checks pass, no skipped/missing/nonfinite reward.",
+            "task_bytes_verified_by": "gh api: all source blobs read in memory; source-byte manifest hash independently recomputed",
+            "runtime_image_digest": null
+          },
+          {
+            "id": "B-hello-multi-step-simple",
+            "prompt": "Execute native create-file and append-content steps, preserving each native verifier.",
+            "prompt_binding": "Execute original instruction.md and any native steps without rewriting; this description is an index, not a replacement prompt.",
+            "source_ids": [
+              "harbor-codex",
+              "harbor-verifier"
+            ],
+            "source_repository": "harbor-framework/harbor",
+            "source_pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+            "source_directory": "examples/tasks/hello-multi-step-simple",
+            "source_files": 8,
+            "source_manifest_sha256": "5da0ec364eb13199c924e9daf7826044276ad453e04aca7fb07a8d2b19476a0e",
+            "oracle": "Unchanged task tests/test.sh or each native step verifier; full reward contract from pinned task, all required checks pass, no skipped/missing/nonfinite reward.",
+            "task_bytes_verified_by": "gh api: all source blobs read in memory; source-byte manifest hash independently recomputed",
+            "runtime_image_digest": null
+          },
+          {
+            "id": "B-hello-mcp",
+            "prompt": "Use task MCP get_secret and persist the exact returned synthetic value.",
+            "prompt_binding": "Execute original instruction.md and any native steps without rewriting; this description is an index, not a replacement prompt.",
+            "source_ids": [
+              "harbor-codex",
+              "harbor-verifier"
+            ],
+            "source_repository": "harbor-framework/harbor",
+            "source_pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+            "source_directory": "examples/tasks/hello-mcp",
+            "source_files": 10,
+            "source_manifest_sha256": "f420d962ff4c12ffd6cff758f1f81c26c7f8c4361cf14d7310cf09441a549565",
+            "oracle": "Unchanged task tests/test.sh or each native step verifier; full reward contract from pinned task, all required checks pass, no skipped/missing/nonfinite reward.",
+            "task_bytes_verified_by": "gh api: all source blobs read in memory; source-byte manifest hash independently recomputed",
+            "runtime_image_digest": null
+          },
+          {
+            "id": "B-hello-workdir",
+            "prompt": "Write the working directory as required by the original instruction.",
+            "prompt_binding": "Execute original instruction.md and any native steps without rewriting; this description is an index, not a replacement prompt.",
+            "source_ids": [
+              "harbor-codex",
+              "harbor-verifier"
+            ],
+            "source_repository": "harbor-framework/harbor",
+            "source_pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+            "source_directory": "examples/tasks/hello-workdir",
+            "source_files": 5,
+            "source_manifest_sha256": "f8fddbfe39d4c1375391155cd7a698b7ae6af2637b8738f0283848bd2061db6d",
+            "oracle": "Unchanged task tests/test.sh or each native step verifier; full reward contract from pinned task, all required checks pass, no skipped/missing/nonfinite reward.",
+            "task_bytes_verified_by": "gh api: all source blobs read in memory; source-byte manifest hash independently recomputed",
+            "runtime_image_digest": null
+          },
+          {
+            "id": "B-separate-verifier-environment",
+            "prompt": "Produce specified artifacts for the original isolated verifier.",
+            "prompt_binding": "Execute original instruction.md and any native steps without rewriting; this description is an index, not a replacement prompt.",
+            "source_ids": [
+              "harbor-codex",
+              "harbor-verifier"
+            ],
+            "source_repository": "harbor-framework/harbor",
+            "source_pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+            "source_directory": "examples/tasks/separate-verifier-environment",
+            "source_files": 6,
+            "source_manifest_sha256": "4a0001756486d276c78e01aefb3ee901617ccb99e8ca2c54acf29d99f50eec0a",
+            "oracle": "Unchanged task tests/test.sh or each native step verifier; full reward contract from pinned task, all required checks pass, no skipped/missing/nonfinite reward.",
+            "task_bytes_verified_by": "gh api: all source blobs read in memory; source-byte manifest hash independently recomputed",
+            "runtime_image_digest": null
+          }
+        ],
+        "controls": [
+          {
+            "kind": "known-pass",
+            "input": {
+              "native_agent": "oracle",
+              "task_set": "all six unchanged tasks"
+            },
+            "expected_accept": true
+          },
+          {
+            "kind": "known-fail",
+            "input": {
+              "native_agent": "nop",
+              "task_set": "all six unchanged tasks"
+            },
+            "expected_accept": false
+          },
+          {
+            "kind": "malformed",
+            "input": {
+              "reward_artifact_bytes": "{\"reward\": NaN}",
+              "variant": "missing/truncated verifier artifact also required"
+            },
+            "expected_accept": false
+          }
+        ],
+        "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+        "shared_files": {},
+        "delivery": "Native Codex task + same-session three-user-turn tool canary; promptfoo grades retained outputs offline. Upstream task verifiers retain their own separate rewards.",
+        "scope": "Frozen finite task set only; no population-wide or arbitrary repository role claim."
+      },
+      "sha256": "e42a388f70cf7b94b2a59b6b19bc625911df44716c52d857fa8c65985256ec74",
+      "materialized_runtime_sha256": null,
+      "native_controls_result": null
+    },
+    "reviewer": {
+      "packet": {
+        "role": "reviewer",
+        "tasks": [
+          {
+            "id": "R-number",
+            "prompt": "Read the supplied patch file and companion tool evidence. Find the one planted defect under the frozen contract. Return only {\"defect_id\": string, \"file\": string, \"exact_values\": string[]}; do not edit files. Explain no additional speculative defects. Allowed defect_id vocabulary: JSON_NUMBER_ROUNDING, MESSAGE_KEY_COLLISION, TOOL_TAIL_LOSS, CACHE_DOUBLE_COUNT, LEGACY_STYLE_STILL_ENABLED, ENCRYPTED_REASONING_DROPPED, NONE. Set file to the supplied patch filename. exact_values must contain, in order: original integer lexeme, then original decimal lexeme from numeric.json. Obtain companion facts through tools; do not guess missing values.",
+            "source_ids": [
+              "or-minify",
+              "promptfoo-python"
+            ],
+            "evidence_class": "synthetic mutation derived from cited upstream behavior",
+            "files": {
+              "numeric.ts": "export const compact = (text: string) => JSON.stringify(JSON.parse(text));\n"
+            },
+            "companion_tool_input": {
+              "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+              "usage_row": {
+                "tokens_in": 1000,
+                "tokens_cache_read": 940
+              }
+            },
+            "expected": {
+              "defect_id": "JSON_NUMBER_ROUNDING",
+              "file": "numeric.ts",
+              "exact_values": [
+                "1234567890123456711",
+                "1.50"
+              ]
+            },
+            "oracle": "promptfoo native Python assertion: strict JSON parse, reject duplicate keys/nonfinite values, require exactly expected keys/types and byte-exact string values; exact object equality; malformed or missing output fails. Artifact-derived source facts, never model self-score.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect_id",
+                "file",
+                "exact_values"
+              ],
+              "properties": {
+                "defect_id": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_NUMBER_ROUNDING",
+                    "MESSAGE_KEY_COLLISION",
+                    "TOOL_TAIL_LOSS",
+                    "CACHE_DOUBLE_COUNT",
+                    "LEGACY_STYLE_STILL_ENABLED",
+                    "ENCRYPTED_REASONING_DROPPED",
+                    "NONE"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "exact_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"defect_id\":\"JSON_NUMBER_ROUNDING\",\"file\":\"numeric.ts\",\"exact_values\":[\"1234567890123456711\",\"1.50\"]}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"defect_id\":\"WRONG_CONTROL_VALUE\",\"file\":\"numeric.ts\",\"exact_values\":[\"1234567890123456711\",\"1.50\"]}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "R-key",
+            "prompt": "Read the supplied patch file and companion tool evidence. Find the one planted defect under the frozen contract. Return only {\"defect_id\": string, \"file\": string, \"exact_values\": string[]}; do not edit files. Explain no additional speculative defects. Allowed defect_id vocabulary: JSON_NUMBER_ROUNDING, MESSAGE_KEY_COLLISION, TOOL_TAIL_LOSS, CACHE_DOUBLE_COUNT, LEGACY_STYLE_STILL_ENABLED, ENCRYPTED_REASONING_DROPPED, NONE. Set file to the supplied patch filename. exact_values must contain, in order: stringKey(1) formatted as string(1)=<integer>, then partKey(0,0) formatted as part(0,0)=<integer>. Obtain companion facts through tools; do not guess missing values.",
+            "source_ids": [
+              "or-dedup",
+              "promptfoo-python"
+            ],
+            "evidence_class": "synthetic mutation derived from cited upstream behavior",
+            "files": {
+              "keys.ts": "const stringKey = (i: number) => i;\nconst partKey = (i: number, p: number) => i * 100000 + p + 1;\n"
+            },
+            "companion_tool_input": {
+              "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+              "usage_row": {
+                "tokens_in": 1000,
+                "tokens_cache_read": 940
+              }
+            },
+            "expected": {
+              "defect_id": "MESSAGE_KEY_COLLISION",
+              "file": "keys.ts",
+              "exact_values": [
+                "string(1)=1",
+                "part(0,0)=1"
+              ]
+            },
+            "oracle": "promptfoo native Python assertion: strict JSON parse, reject duplicate keys/nonfinite values, require exactly expected keys/types and byte-exact string values; exact object equality; malformed or missing output fails. Artifact-derived source facts, never model self-score.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect_id",
+                "file",
+                "exact_values"
+              ],
+              "properties": {
+                "defect_id": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_NUMBER_ROUNDING",
+                    "MESSAGE_KEY_COLLISION",
+                    "TOOL_TAIL_LOSS",
+                    "CACHE_DOUBLE_COUNT",
+                    "LEGACY_STYLE_STILL_ENABLED",
+                    "ENCRYPTED_REASONING_DROPPED",
+                    "NONE"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "exact_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"defect_id\":\"MESSAGE_KEY_COLLISION\",\"file\":\"keys.ts\",\"exact_values\":[\"string(1)=1\",\"part(0,0)=1\"]}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"defect_id\":\"WRONG_CONTROL_VALUE\",\"file\":\"keys.ts\",\"exact_values\":[\"string(1)=1\",\"part(0,0)=1\"]}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "R-tail",
+            "prompt": "Read the supplied patch file and companion tool evidence. Find the one planted defect under the frozen contract. Return only {\"defect_id\": string, \"file\": string, \"exact_values\": string[]}; do not edit files. Explain no additional speculative defects. Allowed defect_id vocabulary: JSON_NUMBER_ROUNDING, MESSAGE_KEY_COLLISION, TOOL_TAIL_LOSS, CACHE_DOUBLE_COUNT, LEGACY_STYLE_STILL_ENABLED, ENCRYPTED_REASONING_DROPPED, NONE. Set file to the supplied patch filename. exact_values must contain, in order: the cutoff as a decimal integer string, then TAIL_PIN from long.txt. Obtain companion facts through tools; do not guess missing values.",
+            "source_ids": [
+              "or-lite",
+              "promptfoo-python"
+            ],
+            "evidence_class": "synthetic mutation derived from cited upstream behavior",
+            "files": {
+              "tool.ts": "const shrink = (text: string) => text.length > 2000 ? text.slice(0, 2000) : text;\n"
+            },
+            "companion_tool_input": {
+              "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+              "usage_row": {
+                "tokens_in": 1000,
+                "tokens_cache_read": 940
+              }
+            },
+            "expected": {
+              "defect_id": "TOOL_TAIL_LOSS",
+              "file": "tool.ts",
+              "exact_values": [
+                "2000",
+                "dd6e9607e"
+              ]
+            },
+            "oracle": "promptfoo native Python assertion: strict JSON parse, reject duplicate keys/nonfinite values, require exactly expected keys/types and byte-exact string values; exact object equality; malformed or missing output fails. Artifact-derived source facts, never model self-score.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect_id",
+                "file",
+                "exact_values"
+              ],
+              "properties": {
+                "defect_id": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_NUMBER_ROUNDING",
+                    "MESSAGE_KEY_COLLISION",
+                    "TOOL_TAIL_LOSS",
+                    "CACHE_DOUBLE_COUNT",
+                    "LEGACY_STYLE_STILL_ENABLED",
+                    "ENCRYPTED_REASONING_DROPPED",
+                    "NONE"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "exact_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"defect_id\":\"TOOL_TAIL_LOSS\",\"file\":\"tool.ts\",\"exact_values\":[\"2000\",\"dd6e9607e\"]}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"defect_id\":\"WRONG_CONTROL_VALUE\",\"file\":\"tool.ts\",\"exact_values\":[\"2000\",\"dd6e9607e\"]}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "R-cache",
+            "prompt": "Read the supplied patch file and companion tool evidence. Find the one planted defect under the frozen contract. Return only {\"defect_id\": string, \"file\": string, \"exact_values\": string[]}; do not edit files. Explain no additional speculative defects. Allowed defect_id vocabulary: JSON_NUMBER_ROUNDING, MESSAGE_KEY_COLLISION, TOOL_TAIL_LOSS, CACHE_DOUBLE_COUNT, LEGACY_STYLE_STILL_ENABLED, ENCRYPTED_REASONING_DROPPED, NONE. Set file to the supplied patch filename. exact_values must contain, in order: tokens_in as a decimal integer string, tokens_cache_read as a string, then the correct total input counted once as a string. Obtain companion facts through tools; do not guess missing values.",
+            "source_ids": [
+              "or-call-logs",
+              "promptfoo-python"
+            ],
+            "evidence_class": "synthetic mutation derived from cited upstream behavior",
+            "files": {
+              "usage.py": "def total_input(row):\n    return row[\"tokens_in\"] + row[\"tokens_cache_read\"]\n"
+            },
+            "companion_tool_input": {
+              "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+              "usage_row": {
+                "tokens_in": 1000,
+                "tokens_cache_read": 940
+              }
+            },
+            "expected": {
+              "defect_id": "CACHE_DOUBLE_COUNT",
+              "file": "usage.py",
+              "exact_values": [
+                "1000",
+                "940",
+                "1000"
+              ]
+            },
+            "oracle": "promptfoo native Python assertion: strict JSON parse, reject duplicate keys/nonfinite values, require exactly expected keys/types and byte-exact string values; exact object equality; malformed or missing output fails. Artifact-derived source facts, never model self-score.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect_id",
+                "file",
+                "exact_values"
+              ],
+              "properties": {
+                "defect_id": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_NUMBER_ROUNDING",
+                    "MESSAGE_KEY_COLLISION",
+                    "TOOL_TAIL_LOSS",
+                    "CACHE_DOUBLE_COUNT",
+                    "LEGACY_STYLE_STILL_ENABLED",
+                    "ENCRYPTED_REASONING_DROPPED",
+                    "NONE"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "exact_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"defect_id\":\"CACHE_DOUBLE_COUNT\",\"file\":\"usage.py\",\"exact_values\":[\"1000\",\"940\",\"1000\"]}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"defect_id\":\"WRONG_CONTROL_VALUE\",\"file\":\"usage.py\",\"exact_values\":[\"1000\",\"940\",\"1000\"]}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "R-style",
+            "prompt": "Read the supplied patch file and companion tool evidence. Find the one planted defect under the frozen contract. Return only {\"defect_id\": string, \"file\": string, \"exact_values\": string[]}; do not edit files. Explain no additional speculative defects. Allowed defect_id vocabulary: JSON_NUMBER_ROUNDING, MESSAGE_KEY_COLLISION, TOOL_TAIL_LOSS, CACHE_DOUBLE_COUNT, LEGACY_STYLE_STILL_ENABLED, ENCRYPTED_REASONING_DROPPED, NONE. Set file to the supplied patch filename. exact_values must contain, in order: the resolved output style id, then its level. Obtain companion facts through tools; do not guess missing values.",
+            "source_ids": [
+              "or-styles",
+              "promptfoo-python"
+            ],
+            "evidence_class": "synthetic mutation derived from cited upstream behavior",
+            "files": {
+              "styles.json": "{\"outputStyles\": [], \"cavemanOutputMode\": {\"enabled\": true, \"intensity\": \"lite\"}}\n"
+            },
+            "companion_tool_input": {
+              "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+              "usage_row": {
+                "tokens_in": 1000,
+                "tokens_cache_read": 940
+              }
+            },
+            "expected": {
+              "defect_id": "LEGACY_STYLE_STILL_ENABLED",
+              "file": "styles.json",
+              "exact_values": [
+                "terse-prose",
+                "lite"
+              ]
+            },
+            "oracle": "promptfoo native Python assertion: strict JSON parse, reject duplicate keys/nonfinite values, require exactly expected keys/types and byte-exact string values; exact object equality; malformed or missing output fails. Artifact-derived source facts, never model self-score.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect_id",
+                "file",
+                "exact_values"
+              ],
+              "properties": {
+                "defect_id": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_NUMBER_ROUNDING",
+                    "MESSAGE_KEY_COLLISION",
+                    "TOOL_TAIL_LOSS",
+                    "CACHE_DOUBLE_COUNT",
+                    "LEGACY_STYLE_STILL_ENABLED",
+                    "ENCRYPTED_REASONING_DROPPED",
+                    "NONE"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "exact_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"defect_id\":\"LEGACY_STYLE_STILL_ENABLED\",\"file\":\"styles.json\",\"exact_values\":[\"terse-prose\",\"lite\"]}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"defect_id\":\"WRONG_CONTROL_VALUE\",\"file\":\"styles.json\",\"exact_values\":[\"terse-prose\",\"lite\"]}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "R-replay",
+            "prompt": "Read the supplied patch file and companion tool evidence. Find the one planted defect under the frozen contract. Return only {\"defect_id\": string, \"file\": string, \"exact_values\": string[]}; do not edit files. Explain no additional speculative defects. Allowed defect_id vocabulary: JSON_NUMBER_ROUNDING, MESSAGE_KEY_COLLISION, TOOL_TAIL_LOSS, CACHE_DOUBLE_COUNT, LEGACY_STYLE_STILL_ENABLED, ENCRYPTED_REASONING_DROPPED, NONE. Set file to the supplied patch filename. exact_values must contain, in order: the dropped item type, then the field name containing its opaque encrypted bytes. Obtain companion facts through tools; do not guess missing values.",
+            "source_ids": [
+              "or-codex-transport",
+              "promptfoo-python"
+            ],
+            "evidence_class": "synthetic mutation derived from cited upstream behavior",
+            "files": {
+              "replay.py": "def next_input(items):\n    return [item for item in items if item[\"type\"] != \"reasoning\"]\n"
+            },
+            "companion_tool_input": {
+              "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+              "usage_row": {
+                "tokens_in": 1000,
+                "tokens_cache_read": 940
+              }
+            },
+            "expected": {
+              "defect_id": "ENCRYPTED_REASONING_DROPPED",
+              "file": "replay.py",
+              "exact_values": [
+                "reasoning",
+                "encrypted_content"
+              ]
+            },
+            "oracle": "promptfoo native Python assertion: strict JSON parse, reject duplicate keys/nonfinite values, require exactly expected keys/types and byte-exact string values; exact object equality; malformed or missing output fails. Artifact-derived source facts, never model self-score.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "defect_id",
+                "file",
+                "exact_values"
+              ],
+              "properties": {
+                "defect_id": {
+                  "type": "string",
+                  "enum": [
+                    "JSON_NUMBER_ROUNDING",
+                    "MESSAGE_KEY_COLLISION",
+                    "TOOL_TAIL_LOSS",
+                    "CACHE_DOUBLE_COUNT",
+                    "LEGACY_STYLE_STILL_ENABLED",
+                    "ENCRYPTED_REASONING_DROPPED",
+                    "NONE"
+                  ]
+                },
+                "file": {
+                  "type": "string"
+                },
+                "exact_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"defect_id\":\"ENCRYPTED_REASONING_DROPPED\",\"file\":\"replay.py\",\"exact_values\":[\"reasoning\",\"encrypted_content\"]}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"defect_id\":\"WRONG_CONTROL_VALUE\",\"file\":\"replay.py\",\"exact_values\":[\"reasoning\",\"encrypted_content\"]}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          }
+        ],
+        "controls": [
+          {
+            "kind": "known-pass",
+            "input": {
+              "operation": "feed each complete expected object through full frozen adapter"
+            },
+            "expected_accept": true
+          },
+          {
+            "kind": "known-fail",
+            "input": {
+              "operation": "feed each expected object with its first required value changed; numeric canary uses 1234567890123456800 or 1.5"
+            },
+            "expected_accept": false
+          },
+          {
+            "kind": "malformed",
+            "input": {
+              "output_bytes": "{\"unterminated\":",
+              "also_reject": [
+                "missing output",
+                "duplicate keys",
+                "NaN",
+                "wrong type",
+                "unknown extra key"
+              ]
+            },
+            "expected_accept": false
+          }
+        ],
+        "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+        "shared_files": {
+          "evidence.json": "{\n  \"source_class\": \"peer_report\",\n  \"reported_cache_fraction\": 0.94,\n  \"observed_cache_fraction\": null,\n  \"live_zone_observed\": null\n}",
+          "usage.json": "{\n  \"tokens_in\": 1000,\n  \"tokens_cache_read\": 940,\n  \"tokens_out\": 100,\n  \"tokens_reasoning\": 25\n}",
+          "styles.json": "{\n  \"outputStyles\": [\n    {\n      \"id\": \"terse-prose\",\n      \"level\": \"full\"\n    }\n  ],\n  \"cavemanOutputMode\": {\n    \"enabled\": true,\n    \"intensity\": \"lite\"\n  }\n}",
+          "precedence.txt": "Explicit nonempty outputStyles wins; otherwise enabled cavemanOutputMode maps to terse-prose at its intensity. Source: outputStyles/backCompat.ts:13-28 at a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+          "numeric.json": "{\n  \"integer\": 1234567890123456711,\n  \"decimal\": 1.50,\n  \"negative_decimal\": -0.0100,\n  \"pin\": \"dd6e9607e\",\n  \"sha256\": \"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"\n}",
+          "long.txt": "row 000: preserve source identity and its exact lexical value.\nrow 001: preserve source identity and its exact lexical value.\nrow 002: preserve source identity and its exact lexical value.\nrow 003: preserve source identity and its exact lexical value.\nrow 004: preserve source identity and its exact lexical value.\nrow 005: preserve source identity and its exact lexical value.\nrow 006: preserve source identity and its exact lexical value.\nrow 007: preserve source identity and its exact lexical value.\nrow 008: preserve source identity and its exact lexical value.\nrow 009: preserve source identity and its exact lexical value.\nrow 010: preserve source identity and its exact lexical value.\nrow 011: preserve source identity and its exact lexical value.\nrow 012: preserve source identity and its exact lexical value.\nrow 013: preserve source identity and its exact lexical value.\nrow 014: preserve source identity and its exact lexical value.\nrow 015: preserve source identity and its exact lexical value.\nrow 016: preserve source identity and its exact lexical value.\nrow 017: preserve source identity and its exact lexical value.\nrow 018: preserve source identity and its exact lexical value.\nrow 019: preserve source identity and its exact lexical value.\nrow 020: preserve source identity and its exact lexical value.\nrow 021: preserve source identity and its exact lexical value.\nrow 022: preserve source identity and its exact lexical value.\nrow 023: preserve source identity and its exact lexical value.\nrow 024: preserve source identity and its exact lexical value.\nrow 025: preserve source identity and its exact lexical value.\nrow 026: preserve source identity and its exact lexical value.\nrow 027: preserve source identity and its exact lexical value.\nrow 028: preserve source identity and its exact lexical value.\nrow 029: preserve source identity and its exact lexical value.\nrow 030: preserve source identity and its exact lexical value.\nrow 031: preserve source identity and its exact lexical value.\nrow 032: preserve source identity and its exact lexical value.\nrow 033: preserve source identity and its exact lexical value.\nrow 034: preserve source identity and its exact lexical value.\nrow 035: preserve source identity and its exact lexical value.\nrow 036: preserve source identity and its exact lexical value.\nrow 037: preserve source identity and its exact lexical value.\nrow 038: preserve source identity and its exact lexical value.\nrow 039: preserve source identity and its exact lexical value.\nrow 040: preserve source identity and its exact lexical value.\nrow 041: preserve source identity and its exact lexical value.\nrow 042: preserve source identity and its exact lexical value.\nrow 043: preserve source identity and its exact lexical value.\nrow 044: preserve source identity and its exact lexical value.\nrow 045: preserve source identity and its exact lexical value.\nrow 046: preserve source identity and its exact lexical value.\nrow 047: preserve source identity and its exact lexical value.\nrow 048: preserve source identity and its exact lexical value.\nrow 049: preserve source identity and its exact lexical value.\nrow 050: preserve source identity and its exact lexical value.\nrow 051: preserve source identity and its exact lexical value.\nrow 052: preserve source identity and its exact lexical value.\nrow 053: preserve source identity and its exact lexical value.\nrow 054: preserve source identity and its exact lexical value.\nrow 055: preserve source identity and its exact lexical value.\nrow 056: preserve source identity and its exact lexical value.\nrow 057: preserve source identity and its exact lexical value.\nrow 058: preserve source identity and its exact lexical value.\nrow 059: preserve source identity and its exact lexical value.\nrow 060: preserve source identity and its exact lexical value.\nrow 061: preserve source identity and its exact lexical value.\nrow 062: preserve source identity and its exact lexical value.\nrow 063: preserve source identity and its exact lexical value.\nTAIL_PIN=dd6e9607e\nTAIL_SHA256=039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\nTAIL_DECIMAL=1.50\n",
+          "replay.json": "[{\"type\":\"reasoning\",\"encrypted_content\":\"SYNTHETIC_FIXTURE_NOT_REAL_REASONING\"}]\n",
+          "artifact.json": "{\n  \"pin\": \"dd6e9607e\",\n  \"sha256\": \"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"\n}\n"
+        },
+        "delivery": "Native Codex task + same-session three-user-turn tool canary; promptfoo grades retained outputs offline. Upstream task verifiers retain their own separate rewards.",
+        "scope": "Frozen finite task set only; no population-wide or arbitrary repository role claim."
+      },
+      "sha256": "8ca985caea25ee2c62ca1640d64b0be55faeed505a702dd964c9e6662ff7476b",
+      "materialized_runtime_sha256": null,
+      "native_controls_result": null
+    },
+    "researcher": {
+      "packet": {
+        "role": "researcher",
+        "tasks": [
+          {
+            "id": "S-number",
+            "prompt": "Read numeric.json through the shell tool. Transcribe number lexemes as JSON strings without parsing them as floats. Return only the required JSON object.",
+            "source_ids": [
+              "or-minify",
+              "promptfoo-python"
+            ],
+            "input_refs": [
+              "canaries.packet.numeric_tool_output",
+              "canaries.packet.long_tool_output",
+              "task_sets.researcher.packet.shared_files"
+            ],
+            "expected": {
+              "integer": "1234567890123456711",
+              "decimal": "1.50",
+              "negative_decimal": "-0.0100"
+            },
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "integer",
+                "decimal",
+                "negative_decimal"
+              ],
+              "properties": {
+                "integer": {
+                  "type": "string"
+                },
+                "decimal": {
+                  "type": "string"
+                },
+                "negative_decimal": {
+                  "type": "string"
+                }
+              }
+            },
+            "oracle": "promptfoo native schema assertion plus Python exact typed-object comparison; retry once with the identical fixed schema reminder, retain initial failure and both outputs. Success requires first response correct for the primary endpoint.",
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"integer\":\"1234567890123456711\",\"decimal\":\"1.50\",\"negative_decimal\":\"-0.0100\"}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"integer\":\"WRONG_CONTROL_VALUE\",\"decimal\":\"1.50\",\"negative_decimal\":\"-0.0100\"}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "S-pin",
+            "prompt": "Read the artifact identity from tool evidence and return its exact pin and sha256 strings. Return only the required JSON object.",
+            "source_ids": [
+              "or-dedup",
+              "promptfoo-python"
+            ],
+            "input_refs": [
+              "canaries.packet.numeric_tool_output",
+              "canaries.packet.long_tool_output",
+              "task_sets.researcher.packet.shared_files"
+            ],
+            "expected": {
+              "pin": "dd6e9607e",
+              "sha256": "039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d"
+            },
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pin",
+                "sha256"
+              ],
+              "properties": {
+                "pin": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string"
+                }
+              }
+            },
+            "oracle": "promptfoo native schema assertion plus Python exact typed-object comparison; retry once with the identical fixed schema reminder, retain initial failure and both outputs. Success requires first response correct for the primary endpoint.",
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"pin\":\"dd6e9607e\",\"sha256\":\"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"pin\":\"WRONG_CONTROL_VALUE\",\"sha256\":\"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "S-tail",
+            "prompt": "Read long.txt through a tool and return the three TAIL fields as lowercase JSON keys, retaining exact value bytes. Return only the required JSON object.",
+            "source_ids": [
+              "or-lite",
+              "promptfoo-python"
+            ],
+            "input_refs": [
+              "canaries.packet.numeric_tool_output",
+              "canaries.packet.long_tool_output",
+              "task_sets.researcher.packet.shared_files"
+            ],
+            "expected": {
+              "tail_pin": "dd6e9607e",
+              "tail_sha256": "039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d",
+              "tail_decimal": "1.50"
+            },
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tail_pin",
+                "tail_sha256",
+                "tail_decimal"
+              ],
+              "properties": {
+                "tail_pin": {
+                  "type": "string"
+                },
+                "tail_sha256": {
+                  "type": "string"
+                },
+                "tail_decimal": {
+                  "type": "string"
+                }
+              }
+            },
+            "oracle": "promptfoo native schema assertion plus Python exact typed-object comparison; retry once with the identical fixed schema reminder, retain initial failure and both outputs. Success requires first response correct for the primary endpoint.",
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"tail_pin\":\"dd6e9607e\",\"tail_sha256\":\"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\",\"tail_decimal\":\"1.50\"}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"tail_pin\":\"WRONG_CONTROL_VALUE\",\"tail_sha256\":\"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\",\"tail_decimal\":\"1.50\"}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "S-null",
+            "prompt": "Read evidence.json. Return cache_fraction and live_zone_observed as null because no live observations exist; source_class must retain its literal value. Return only the required JSON object.",
+            "source_ids": [
+              "or-live-zone",
+              "promptfoo-python"
+            ],
+            "input_refs": [
+              "canaries.packet.numeric_tool_output",
+              "canaries.packet.long_tool_output",
+              "task_sets.researcher.packet.shared_files"
+            ],
+            "expected": {
+              "cache_fraction": null,
+              "live_zone_observed": null,
+              "source_class": "peer_report"
+            },
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cache_fraction",
+                "live_zone_observed",
+                "source_class"
+              ],
+              "properties": {
+                "cache_fraction": {
+                  "type": "null"
+                },
+                "live_zone_observed": {
+                  "type": "null"
+                },
+                "source_class": {
+                  "type": "string"
+                }
+              }
+            },
+            "oracle": "promptfoo native schema assertion plus Python exact typed-object comparison; retry once with the identical fixed schema reminder, retain initial failure and both outputs. Success requires first response correct for the primary endpoint.",
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"cache_fraction\":null,\"live_zone_observed\":null,\"source_class\":\"peer_report\"}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"cache_fraction\":\"WRONG_CONTROL_VALUE\",\"live_zone_observed\":null,\"source_class\":\"peer_report\"}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "S-accounting",
+            "prompt": "Read usage.json. Return integer totals; cache reads are a subset of input and reasoning is a subset of output, each counted once. Return only the required JSON object.",
+            "source_ids": [
+              "or-call-logs",
+              "promptfoo-python"
+            ],
+            "input_refs": [
+              "canaries.packet.numeric_tool_output",
+              "canaries.packet.long_tool_output",
+              "task_sets.researcher.packet.shared_files"
+            ],
+            "expected": {
+              "input_total": 1000,
+              "cache_read_subset": 940,
+              "uncached_input": 60,
+              "reasoning_subset": 25,
+              "output_total": 100,
+              "total_tokens": 1100
+            },
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "input_total",
+                "cache_read_subset",
+                "uncached_input",
+                "reasoning_subset",
+                "output_total",
+                "total_tokens"
+              ],
+              "properties": {
+                "input_total": {
+                  "type": "integer"
+                },
+                "cache_read_subset": {
+                  "type": "integer"
+                },
+                "uncached_input": {
+                  "type": "integer"
+                },
+                "reasoning_subset": {
+                  "type": "integer"
+                },
+                "output_total": {
+                  "type": "integer"
+                },
+                "total_tokens": {
+                  "type": "integer"
+                }
+              }
+            },
+            "oracle": "promptfoo native schema assertion plus Python exact typed-object comparison; retry once with the identical fixed schema reminder, retain initial failure and both outputs. Success requires first response correct for the primary endpoint.",
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"input_total\":1000,\"cache_read_subset\":940,\"uncached_input\":60,\"reasoning_subset\":25,\"output_total\":100,\"total_tokens\":1100}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"input_total\":\"WRONG_CONTROL_VALUE\",\"cache_read_subset\":940,\"uncached_input\":60,\"reasoning_subset\":25,\"output_total\":100,\"total_tokens\":1100}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          },
+          {
+            "id": "S-style",
+            "prompt": "Read styles.json and the pinned precedence excerpt. Report the selected style/level and whether legacy caveman adds another style. Return only the required JSON object.",
+            "source_ids": [
+              "or-styles",
+              "promptfoo-python"
+            ],
+            "input_refs": [
+              "canaries.packet.numeric_tool_output",
+              "canaries.packet.long_tool_output",
+              "task_sets.researcher.packet.shared_files"
+            ],
+            "expected": {
+              "selected_style": "terse-prose",
+              "selected_level": "full",
+              "legacy_added": false
+            },
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "selected_style",
+                "selected_level",
+                "legacy_added"
+              ],
+              "properties": {
+                "selected_style": {
+                  "type": "string"
+                },
+                "selected_level": {
+                  "type": "string"
+                },
+                "legacy_added": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "oracle": "promptfoo native schema assertion plus Python exact typed-object comparison; retry once with the identical fixed schema reminder, retain initial failure and both outputs. Success requires first response correct for the primary endpoint.",
+            "grader_controls": [
+              {
+                "kind": "known-pass",
+                "output": "{\"selected_style\":\"terse-prose\",\"selected_level\":\"full\",\"legacy_added\":false}",
+                "expected_accept": true
+              },
+              {
+                "kind": "known-fail",
+                "output": "{\"selected_style\":\"WRONG_CONTROL_VALUE\",\"selected_level\":\"full\",\"legacy_added\":false}",
+                "expected_accept": false
+              },
+              {
+                "kind": "malformed",
+                "output": "{\"unterminated\":",
+                "expected_accept": false
+              }
+            ]
+          }
+        ],
+        "controls": [
+          {
+            "kind": "known-pass",
+            "input": {
+              "operation": "feed each complete expected object through full frozen adapter"
+            },
+            "expected_accept": true
+          },
+          {
+            "kind": "known-fail",
+            "input": {
+              "operation": "feed each expected object with its first required value changed; numeric canary uses 1234567890123456800 or 1.5"
+            },
+            "expected_accept": false
+          },
+          {
+            "kind": "malformed",
+            "input": {
+              "output_bytes": "{\"unterminated\":",
+              "also_reject": [
+                "missing output",
+                "duplicate keys",
+                "NaN",
+                "wrong type",
+                "unknown extra key"
+              ]
+            },
+            "expected_accept": false
+          }
+        ],
+        "canary_packet_sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+        "shared_files": {
+          "evidence.json": "{\n  \"source_class\": \"peer_report\",\n  \"reported_cache_fraction\": 0.94,\n  \"observed_cache_fraction\": null,\n  \"live_zone_observed\": null\n}",
+          "usage.json": "{\n  \"tokens_in\": 1000,\n  \"tokens_cache_read\": 940,\n  \"tokens_out\": 100,\n  \"tokens_reasoning\": 25\n}",
+          "styles.json": "{\n  \"outputStyles\": [\n    {\n      \"id\": \"terse-prose\",\n      \"level\": \"full\"\n    }\n  ],\n  \"cavemanOutputMode\": {\n    \"enabled\": true,\n    \"intensity\": \"lite\"\n  }\n}",
+          "precedence.txt": "Explicit nonempty outputStyles wins; otherwise enabled cavemanOutputMode maps to terse-prose at its intensity. Source: outputStyles/backCompat.ts:13-28 at a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+          "numeric.json": "{\n  \"integer\": 1234567890123456711,\n  \"decimal\": 1.50,\n  \"negative_decimal\": -0.0100,\n  \"pin\": \"dd6e9607e\",\n  \"sha256\": \"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"\n}",
+          "long.txt": "row 000: preserve source identity and its exact lexical value.\nrow 001: preserve source identity and its exact lexical value.\nrow 002: preserve source identity and its exact lexical value.\nrow 003: preserve source identity and its exact lexical value.\nrow 004: preserve source identity and its exact lexical value.\nrow 005: preserve source identity and its exact lexical value.\nrow 006: preserve source identity and its exact lexical value.\nrow 007: preserve source identity and its exact lexical value.\nrow 008: preserve source identity and its exact lexical value.\nrow 009: preserve source identity and its exact lexical value.\nrow 010: preserve source identity and its exact lexical value.\nrow 011: preserve source identity and its exact lexical value.\nrow 012: preserve source identity and its exact lexical value.\nrow 013: preserve source identity and its exact lexical value.\nrow 014: preserve source identity and its exact lexical value.\nrow 015: preserve source identity and its exact lexical value.\nrow 016: preserve source identity and its exact lexical value.\nrow 017: preserve source identity and its exact lexical value.\nrow 018: preserve source identity and its exact lexical value.\nrow 019: preserve source identity and its exact lexical value.\nrow 020: preserve source identity and its exact lexical value.\nrow 021: preserve source identity and its exact lexical value.\nrow 022: preserve source identity and its exact lexical value.\nrow 023: preserve source identity and its exact lexical value.\nrow 024: preserve source identity and its exact lexical value.\nrow 025: preserve source identity and its exact lexical value.\nrow 026: preserve source identity and its exact lexical value.\nrow 027: preserve source identity and its exact lexical value.\nrow 028: preserve source identity and its exact lexical value.\nrow 029: preserve source identity and its exact lexical value.\nrow 030: preserve source identity and its exact lexical value.\nrow 031: preserve source identity and its exact lexical value.\nrow 032: preserve source identity and its exact lexical value.\nrow 033: preserve source identity and its exact lexical value.\nrow 034: preserve source identity and its exact lexical value.\nrow 035: preserve source identity and its exact lexical value.\nrow 036: preserve source identity and its exact lexical value.\nrow 037: preserve source identity and its exact lexical value.\nrow 038: preserve source identity and its exact lexical value.\nrow 039: preserve source identity and its exact lexical value.\nrow 040: preserve source identity and its exact lexical value.\nrow 041: preserve source identity and its exact lexical value.\nrow 042: preserve source identity and its exact lexical value.\nrow 043: preserve source identity and its exact lexical value.\nrow 044: preserve source identity and its exact lexical value.\nrow 045: preserve source identity and its exact lexical value.\nrow 046: preserve source identity and its exact lexical value.\nrow 047: preserve source identity and its exact lexical value.\nrow 048: preserve source identity and its exact lexical value.\nrow 049: preserve source identity and its exact lexical value.\nrow 050: preserve source identity and its exact lexical value.\nrow 051: preserve source identity and its exact lexical value.\nrow 052: preserve source identity and its exact lexical value.\nrow 053: preserve source identity and its exact lexical value.\nrow 054: preserve source identity and its exact lexical value.\nrow 055: preserve source identity and its exact lexical value.\nrow 056: preserve source identity and its exact lexical value.\nrow 057: preserve source identity and its exact lexical value.\nrow 058: preserve source identity and its exact lexical value.\nrow 059: preserve source identity and its exact lexical value.\nrow 060: preserve source identity and its exact lexical value.\nrow 061: preserve source identity and its exact lexical value.\nrow 062: preserve source identity and its exact lexical value.\nrow 063: preserve source identity and its exact lexical value.\nTAIL_PIN=dd6e9607e\nTAIL_SHA256=039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\nTAIL_DECIMAL=1.50\n",
+          "replay.json": "[{\"type\":\"reasoning\",\"encrypted_content\":\"SYNTHETIC_FIXTURE_NOT_REAL_REASONING\"}]\n",
+          "artifact.json": "{\n  \"pin\": \"dd6e9607e\",\n  \"sha256\": \"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"\n}\n"
+        },
+        "delivery": "Native Codex task + same-session three-user-turn tool canary; promptfoo grades retained outputs offline. Upstream task verifiers retain their own separate rewards.",
+        "scope": "Frozen finite task set only; no population-wide or arbitrary repository role claim."
+      },
+      "sha256": "eda4967d6e0dfb1bf9d433c0fbf55c04c14a3603299d3937488d109daa07b056",
+      "materialized_runtime_sha256": null,
+      "native_controls_result": null
+    }
+  },
+  "canaries": {
+    "packet": {
+      "roles": [
+        "builder",
+        "reviewer",
+        "researcher"
+      ],
+      "evidence_class": "synthetic source-derived canaries",
+      "source_ids": [
+        "or-minify",
+        "or-lite",
+        "or-dedup",
+        "or-styles"
+      ],
+      "numeric_tool_output": "{\n  \"integer\": 1234567890123456711,\n  \"decimal\": 1.50,\n  \"negative_decimal\": -0.0100,\n  \"pin\": \"dd6e9607e\",\n  \"sha256\": \"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\"\n}",
+      "long_tool_output": "row 000: preserve source identity and its exact lexical value.\nrow 001: preserve source identity and its exact lexical value.\nrow 002: preserve source identity and its exact lexical value.\nrow 003: preserve source identity and its exact lexical value.\nrow 004: preserve source identity and its exact lexical value.\nrow 005: preserve source identity and its exact lexical value.\nrow 006: preserve source identity and its exact lexical value.\nrow 007: preserve source identity and its exact lexical value.\nrow 008: preserve source identity and its exact lexical value.\nrow 009: preserve source identity and its exact lexical value.\nrow 010: preserve source identity and its exact lexical value.\nrow 011: preserve source identity and its exact lexical value.\nrow 012: preserve source identity and its exact lexical value.\nrow 013: preserve source identity and its exact lexical value.\nrow 014: preserve source identity and its exact lexical value.\nrow 015: preserve source identity and its exact lexical value.\nrow 016: preserve source identity and its exact lexical value.\nrow 017: preserve source identity and its exact lexical value.\nrow 018: preserve source identity and its exact lexical value.\nrow 019: preserve source identity and its exact lexical value.\nrow 020: preserve source identity and its exact lexical value.\nrow 021: preserve source identity and its exact lexical value.\nrow 022: preserve source identity and its exact lexical value.\nrow 023: preserve source identity and its exact lexical value.\nrow 024: preserve source identity and its exact lexical value.\nrow 025: preserve source identity and its exact lexical value.\nrow 026: preserve source identity and its exact lexical value.\nrow 027: preserve source identity and its exact lexical value.\nrow 028: preserve source identity and its exact lexical value.\nrow 029: preserve source identity and its exact lexical value.\nrow 030: preserve source identity and its exact lexical value.\nrow 031: preserve source identity and its exact lexical value.\nrow 032: preserve source identity and its exact lexical value.\nrow 033: preserve source identity and its exact lexical value.\nrow 034: preserve source identity and its exact lexical value.\nrow 035: preserve source identity and its exact lexical value.\nrow 036: preserve source identity and its exact lexical value.\nrow 037: preserve source identity and its exact lexical value.\nrow 038: preserve source identity and its exact lexical value.\nrow 039: preserve source identity and its exact lexical value.\nrow 040: preserve source identity and its exact lexical value.\nrow 041: preserve source identity and its exact lexical value.\nrow 042: preserve source identity and its exact lexical value.\nrow 043: preserve source identity and its exact lexical value.\nrow 044: preserve source identity and its exact lexical value.\nrow 045: preserve source identity and its exact lexical value.\nrow 046: preserve source identity and its exact lexical value.\nrow 047: preserve source identity and its exact lexical value.\nrow 048: preserve source identity and its exact lexical value.\nrow 049: preserve source identity and its exact lexical value.\nrow 050: preserve source identity and its exact lexical value.\nrow 051: preserve source identity and its exact lexical value.\nrow 052: preserve source identity and its exact lexical value.\nrow 053: preserve source identity and its exact lexical value.\nrow 054: preserve source identity and its exact lexical value.\nrow 055: preserve source identity and its exact lexical value.\nrow 056: preserve source identity and its exact lexical value.\nrow 057: preserve source identity and its exact lexical value.\nrow 058: preserve source identity and its exact lexical value.\nrow 059: preserve source identity and its exact lexical value.\nrow 060: preserve source identity and its exact lexical value.\nrow 061: preserve source identity and its exact lexical value.\nrow 062: preserve source identity and its exact lexical value.\nrow 063: preserve source identity and its exact lexical value.\nTAIL_PIN=dd6e9607e\nTAIL_SHA256=039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\nTAIL_DECIMAL=1.50\n",
+      "expected": {
+        "integer_lexeme": "1234567890123456711",
+        "decimal_lexeme": "1.50",
+        "negative_decimal_lexeme": "-0.0100",
+        "pin": "dd6e9607e",
+        "sha256": "039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d",
+        "tail_pin": "dd6e9607e",
+        "tail_decimal": "1.50"
+      },
+      "numeric_padding": "numeric_engine_tool_output is a separate fully materialized valid JSON stimulus; prove pinned/effective minBytes and maxCandidateBytes eligibility before interpreting its result.",
+      "dedup_probe": "At the chat compression boundary, message[0] multipart part[0] has key 1; message[1] string has key 1. Keep earlier user value distinct, append a repeated suffix in message[2]. Check earlier user message byte-for-byte after pipeline and require its exact value in turn 3. A failed trigger is inconclusive, not a pass.",
+      "dedup_messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "EARLIER_USER_PIN=0f76651d\nline 00: this repeated multi-line block identifies artifact alpha exactly.\nline 01: this repeated multi-line block identifies artifact alpha exactly.\nline 02: this repeated multi-line block identifies artifact alpha exactly.\nline 03: this repeated multi-line block identifies artifact alpha exactly.\nline 04: this repeated multi-line block identifies artifact alpha exactly.\nline 05: this repeated multi-line block identifies artifact alpha exactly.\nline 06: this repeated multi-line block identifies artifact alpha exactly.\nline 07: this repeated multi-line block identifies artifact alpha exactly.\nline 08: this repeated multi-line block identifies artifact alpha exactly.\nline 09: this repeated multi-line block identifies artifact alpha exactly.\nline 10: this repeated multi-line block identifies artifact alpha exactly.\nline 11: this repeated multi-line block identifies artifact alpha exactly."
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "content": "line 00: this repeated multi-line block identifies artifact alpha exactly.\nline 01: this repeated multi-line block identifies artifact alpha exactly.\nline 02: this repeated multi-line block identifies artifact alpha exactly.\nline 03: this repeated multi-line block identifies artifact alpha exactly.\nline 04: this repeated multi-line block identifies artifact alpha exactly.\nline 05: this repeated multi-line block identifies artifact alpha exactly.\nline 06: this repeated multi-line block identifies artifact alpha exactly.\nline 07: this repeated multi-line block identifies artifact alpha exactly.\nline 08: this repeated multi-line block identifies artifact alpha exactly.\nline 09: this repeated multi-line block identifies artifact alpha exactly.\nline 10: this repeated multi-line block identifies artifact alpha exactly.\nline 11: this repeated multi-line block identifies artifact alpha exactly."
+        },
+        {
+          "role": "tool",
+          "content": "line 00: this repeated multi-line block identifies artifact alpha exactly.\nline 01: this repeated multi-line block identifies artifact alpha exactly.\nline 02: this repeated multi-line block identifies artifact alpha exactly.\nline 03: this repeated multi-line block identifies artifact alpha exactly.\nline 04: this repeated multi-line block identifies artifact alpha exactly.\nline 05: this repeated multi-line block identifies artifact alpha exactly.\nline 06: this repeated multi-line block identifies artifact alpha exactly.\nline 07: this repeated multi-line block identifies artifact alpha exactly.\nline 08: this repeated multi-line block identifies artifact alpha exactly.\nline 09: this repeated multi-line block identifies artifact alpha exactly.\nline 10: this repeated multi-line block identifies artifact alpha exactly.\nline 11: this repeated multi-line block identifies artifact alpha exactly."
+        }
+      ],
+      "output_contract": "Return a UTF-8 JSON object of the expected string fields and complete requested artifact, with no numeric coercion, ellipsis or missing patch body. No expected answer is shown to the model.",
+      "qualification": "Run unchanged relevant upstream engine tests if available and frozen integration stimuli through native adapters before model cells. Confirm candidateRewrite size eligibility and effective engine application; toggles alone do not qualify a probe. Never run this while drafting.",
+      "numeric_engine_tool_output": "{\n  \"integer\": 1234567890123456711,\n  \"decimal\": 1.50,\n  \"negative_decimal\": -0.0100,\n  \"pin\": \"dd6e9607e\",\n  \"sha256\": \"039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\",\n  \"padding\": \"row 000: preserve source identity and its exact lexical value.\\nrow 001: preserve source identity and its exact lexical value.\\nrow 002: preserve source identity and its exact lexical value.\\nrow 003: preserve source identity and its exact lexical value.\\nrow 004: preserve source identity and its exact lexical value.\\nrow 005: preserve source identity and its exact lexical value.\\nrow 006: preserve source identity and its exact lexical value.\\nrow 007: preserve source identity and its exact lexical value.\\nrow 008: preserve source identity and its exact lexical value.\\nrow 009: preserve source identity and its exact lexical value.\\nrow 010: preserve source identity and its exact lexical value.\\nrow 011: preserve source identity and its exact lexical value.\\nrow 012: preserve source identity and its exact lexical value.\\nrow 013: preserve source identity and its exact lexical value.\\nrow 014: preserve source identity and its exact lexical value.\\nrow 015: preserve source identity and its exact lexical value.\\nrow 016: preserve source identity and its exact lexical value.\\nrow 017: preserve source identity and its exact lexical value.\\nrow 018: preserve source identity and its exact lexical value.\\nrow 019: preserve source identity and its exact lexical value.\\nrow 020: preserve source identity and its exact lexical value.\\nrow 021: preserve source identity and its exact lexical value.\\nrow 022: preserve source identity and its exact lexical value.\\nrow 023: preserve source identity and its exact lexical value.\\nrow 024: preserve source identity and its exact lexical value.\\nrow 025: preserve source identity and its exact lexical value.\\nrow 026: preserve source identity and its exact lexical value.\\nrow 027: preserve source identity and its exact lexical value.\\nrow 028: preserve source identity and its exact lexical value.\\nrow 029: preserve source identity and its exact lexical value.\\nrow 030: preserve source identity and its exact lexical value.\\nrow 031: preserve source identity and its exact lexical value.\\nrow 032: preserve source identity and its exact lexical value.\\nrow 033: preserve source identity and its exact lexical value.\\nrow 034: preserve source identity and its exact lexical value.\\nrow 035: preserve source identity and its exact lexical value.\\nrow 036: preserve source identity and its exact lexical value.\\nrow 037: preserve source identity and its exact lexical value.\\nrow 038: preserve source identity and its exact lexical value.\\nrow 039: preserve source identity and its exact lexical value.\\nrow 040: preserve source identity and its exact lexical value.\\nrow 041: preserve source identity and its exact lexical value.\\nrow 042: preserve source identity and its exact lexical value.\\nrow 043: preserve source identity and its exact lexical value.\\nrow 044: preserve source identity and its exact lexical value.\\nrow 045: preserve source identity and its exact lexical value.\\nrow 046: preserve source identity and its exact lexical value.\\nrow 047: preserve source identity and its exact lexical value.\\nrow 048: preserve source identity and its exact lexical value.\\nrow 049: preserve source identity and its exact lexical value.\\nrow 050: preserve source identity and its exact lexical value.\\nrow 051: preserve source identity and its exact lexical value.\\nrow 052: preserve source identity and its exact lexical value.\\nrow 053: preserve source identity and its exact lexical value.\\nrow 054: preserve source identity and its exact lexical value.\\nrow 055: preserve source identity and its exact lexical value.\\nrow 056: preserve source identity and its exact lexical value.\\nrow 057: preserve source identity and its exact lexical value.\\nrow 058: preserve source identity and its exact lexical value.\\nrow 059: preserve source identity and its exact lexical value.\\nrow 060: preserve source identity and its exact lexical value.\\nrow 061: preserve source identity and its exact lexical value.\\nrow 062: preserve source identity and its exact lexical value.\\nrow 063: preserve source identity and its exact lexical value.\\nTAIL_PIN=dd6e9607e\\nTAIL_SHA256=039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d\\nTAIL_DECIMAL=1.50\\n\"\n}",
+      "scheduled_tools": [
+        "Turn 1: read numeric.json and long.txt once, then perform original task tools.",
+        "Turn 2: read fresh next-turn.txt (literal content: turn=2\\n); inspect prior tool output through native continuation.",
+        "Turn 3: read fresh final-turn.txt (literal content: turn=3\\n); answer using original numeric/tail/earlier-user evidence."
+      ]
+    },
+    "sha256": "f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43",
+    "live_result": null
+  },
+  "oracle_contract": {
+    "primary_success": "Core upstream/native assertion success AND all exact canary/transport output checks; no missing required evidence. Report both components independently.",
+    "grading": "Harbor native verifier for builder. promptfoo native schema/Python assertions on retained native outputs for reviewer/researcher. Locally materialized task-specific extraction/assertion adapters remain local integration glue, not unchanged upstream tests.",
+    "exact_comparison": "Reject invalid UTF-8, duplicate JSON keys, nonfinite numbers, missing/extra keys, type mismatches and any changed lexical record field. Compare string bytes, including decimal scale and pin/hash case. Independent original source bytes are oracle; no model self-reported pass.",
+    "required_negative_qualification": "Every adapter/verifier must accept its known-pass and reject known-fail, malformed and missing evidence through its full extraction path before any model cell. Exercise numeric rounded integer, 1.5, wrong pin/hash and tail removed. Empty execution/zero tests/exit0 without real reward fails.",
+    "adapters_sha256": null,
+    "native_control_results": null,
+    "blindness": "Sanitized cell labels hidden from grader and human adjudicator; deterministic canonical output comparisons. Unexpected but potentially correct outputs retained as failures under frozen rule, no post-hoc oracle edits."
+  },
+  "multi_turn": {
+    "user_turns": 3,
+    "tools_required_each_turn": true,
+    "aggregation_unit": "task/session/user_turn",
+    "same_native_session": true,
+    "sequence": [
+      "Turn 1: unchanged role task and at least one successful tool read; retain independent bytes and original call IDs.",
+      "Turn 2: ask for exact facts requiring prior tool output and another tool action, replay the real prior call_id/function_call_output and encrypted reasoning if returned.",
+      "Turn 3: require final exact record using earlier user provenance plus tail/numeric values, with another tool action; unchanged-file re-reads beyond scheduled tools count as recall."
+    ],
+    "required_checks": [
+      "prompt_cache_key",
+      "session_headers",
+      "affinity_headers",
+      "store",
+      "include",
+      "encrypted_reasoning",
+      "turn_2_tool_roundtrip"
+    ],
+    "headers_to_trace": [
+      "x-omniroute-session-id",
+      "session_id",
+      "x-codex-turn-state",
+      "x-omniroute-connection"
+    ],
+    "header_scope": "x-omniroute-session-id is read for live zone; Codex session_id and x-codex-turn-state have source paths; the connection pin is x-omniroute-connection (src/sse/handlers/chat.ts:688). Freeze how hop-local connection identity maps to the downstream account; equal strings across two different connection namespaces are not required. No invented account-id/connection-id headers. Actual propagation remains unobserved.",
+    "wire_fields": {
+      "store": false,
+      "include": [
+        "reasoning.encrypted_content"
+      ],
+      "prompt_cache_key": "stable unique session identity; separate across arms and repetitions"
+    },
+    "field_acceptance": "Observe both ingress/egress hops privately. Assert stable cache/session identity within session, chosen account affinity unchanged, include remains effective, store=false accepted, encrypted reasoning bytes identical when replayed. If provider returns no encrypted item, mark that subcheck null and keep its gate open. No fabricated blob.",
+    "native_capability_gate": "Harbor resume support is source-visible, but this exact three-turn/profile/transport protocol is not host-qualified. Repeats alone never close it."
+  },
+  "hazards": [
+    {
+      "id": "H1",
+      "source_ids": [
+        "or-live-zone",
+        "or-chat-core"
+      ],
+      "verification_status": "Principal/session requirement verified in installed source; 94% is peer-reported historical context only; cache loss is a hypothesis.",
+      "checks": [
+        "Measure each of three user turns including all tool continuations, retries and failures from 20128 rows.",
+        "Compare compressed stable-prefix digests privately at both hops, cache-read fraction, uncached input and priced billed-input equivalent.",
+        "Keyless absence of live-zone context calls compression again; determinism or other memoization may still preserve prefix. Optional paired keyed cells use registered 20129 principal and cacheMinutes=60."
+      ],
+      "live_result": null
+    },
+    {
+      "id": "H2",
+      "source_ids": [
+        "or-minify",
+        "or-dedup",
+        "or-lite",
+        "or-adapter",
+        "or-strategy",
+        "or-engine-labels",
+        "or-caveman",
+        "or-relevance",
+        "or-aggressive",
+        "or-llmlingua",
+        "or-ultra"
+      ],
+      "verification_status": "Source-confirmed numeric normalization, key collision and truncation paths. Responses-to-lite path now traced; actual live settings/application remain unobserved.",
+      "checks": [
+        "Compare number lexemes, pin/hash strings and >2000-character tail sentinels at wire, native transcript and deliverable boundaries.",
+        "Use role tool function_call_output for shell command plus protected read and unmatched call IDs; do not infer lite protection from codex-responses guards.",
+        "Exercise multipart/string key 1 collision and prove earlier user content unchanged; headerless cells must pass too.",
+        "Record applied/no-eligible/skipped/error per engine; a no-op is not engine acceptance."
+      ],
+      "live_result": null
+    },
+    {
+      "id": "H3",
+      "source_ids": [
+        "or-chat-core",
+        "or-styles"
+      ],
+      "verification_status": "Configured styles run without allow-lossy when enabled/header not off. Explicit styles override legacy caveman; they are not additive.",
+      "checks": [
+        "Cross default/all input plans with styles on/off. Off means outputStyles=[] AND cavemanOutputMode.enabled=false.",
+        "Compare exact artifacts, all patch hunks, required explanations and schema completeness; byte-preserve every record field.",
+        "Read back effective styles and applied telemetry each request; no cross-cell shared settings races."
+      ],
+      "live_result": null
+    },
+    {
+      "id": "H4",
+      "source_ids": [
+        "or-chat-core"
+      ],
+      "verification_status": "Header-off/reactive separation verified; safety passes gated by !nativeCodexPassthrough, so actual framework-route reachability is a live gate.",
+      "checks": [
+        "Only C on 20128 is the clean control.",
+        "Exploratory bounded threshold probes below/above resolved proactive and final limits compare pre/post message inventories and hashes, including header off.",
+        "Reject any control with compression enabled or codex/* exclusion missing; retain safety-pass telemetry for framework cells."
+      ],
+      "live_result": null
+    },
+    {
+      "id": "H5",
+      "source_ids": [
+        "or-codex-transport",
+        "harbor-codex",
+        "promptfoo-responses",
+        "or-affinity-header"
+      ],
+      "verification_status": "Some fields supported in source; end-to-end forwarding across sharedgw is not proven.",
+      "checks": [
+        "Trace prompt_cache_key, session/affinity headers, store/include semantics and encrypted reasoning hashes at client->20129->20128->provider boundaries.",
+        "Turn 2 must receive real prior function_call_output matched to call_id and produce a valid next tool call and final answer.",
+        "Keep credentials/account-bound reasoning private; log only equality booleans and salted identifiers."
+      ],
+      "live_result": null
+    },
+    {
+      "id": "H6",
+      "source_ids": [
+        "role-policy"
+      ],
+      "verification_status": "Normative user role restriction, not an installed-package behavior.",
+      "checks": [
+        "Builder-only early canary after deterministic and transport gates; reviewer/researcher trial outputs remain quarantined.",
+        "Review, judgment, verification and evidence routes stay 20128 until their own frozen quality and exact-value gates pass.",
+        "Record-output preservation is mandatory even for builders; task success alone cannot promote record-producing roles."
+      ],
+      "live_result": null
+    }
+  ],
+  "metrics": [
+    {
+      "id": "task_success",
+      "definition": "Binary first-attempt success: unchanged Harbor verifier complete pass for builder; promptfoo deterministic known-answer/schema grader for reviewer/researcher. Report core task score and combined task-plus-canary success separately; combined is primary."
+    },
+    {
+      "id": "apply_patch_failures",
+      "definition": "Count rejected/error apply_patch tool invocations per session; session-any-failure indicator. Inapplicable tasks remain null for this component; any malformed required patch fails task."
+    },
+    {
+      "id": "verification_failures",
+      "definition": "Native nonzero verification invocations and missing/skipped/nonfinite rewards per session; intended starting red tests labelled separately; fixed protocol-required negative controls excluded from outcome denominator and charged to qualification."
+    },
+    {
+      "id": "schema_retries",
+      "definition": "Count corrective schema requests; maximum one fixed-reminder retry; initial failure remains in primary success and operational-failure rates."
+    },
+    {
+      "id": "tool_output_recall",
+      "definition": "An unrequested second read of the same normalized path, overlapping byte range and unchanged file SHA256 after a successful read; changed-file verification reads and mandated canary reads excluded. Count events and sessions, cite original/re-read call IDs; unresolved identity remains null."
+    },
+    {
+      "id": "tokens_in",
+      "definition": "20128.call_logs summed once per finalized request, task/session/user_turn and task."
+    },
+    {
+      "id": "tokens_cache_read",
+      "definition": "Subset of tokens_in; report per-turn sum and fraction sum(cache)/sum(input), never mean of call fractions."
+    },
+    {
+      "id": "tokens_reasoning",
+      "definition": "20128 subset of output, displayed separately, never added to output again."
+    },
+    {
+      "id": "compression_savings",
+      "definition": "20129 analytics before/after deltas for isolated owned window, with original/compressed tokens and pipeline-level savings. Never sum per-engine overlapping savings; never add to 20128 usage."
+    },
+    {
+      "id": "latency",
+      "definition": "Monotonic start-to-terminal wall seconds per task and user turn, includes tool, compression, verification and retry time; gateway duration diagnostic separate."
+    },
+    {
+      "id": "cancellations",
+      "definition": "All status 499 rows attributable to owned attempts plus local aborted-without-row attempts; aborted row counts and aborted session counts separate. No automatic replacement; unknown usage stays null."
+    }
+  ],
+  "accounting": {
+    "usage_authority": "20128.call_logs",
+    "savings_authority": "20129 GET /api/analytics/compression",
+    "add_savings_to_usage": false,
+    "cache_read_is_input_subset": true,
+    "reasoning_is_output_subset": true,
+    "required_columns": [
+      "timestamp",
+      "path",
+      "status",
+      "model",
+      "reasoning_effort_requested",
+      "reasoning_effort_upstream",
+      "tokens_in",
+      "tokens_cache_read",
+      "tokens_reasoning"
+    ],
+    "required_additional_columns": [
+      "id",
+      "tokens_out",
+      "duration"
+    ],
+    "output_column_verified_on_host": null,
+    "uncached_input_formula": "sum(tokens_in - tokens_cache_read)",
+    "total_billed_tokens_formula": "sum(tokens_in + tokens_out)",
+    "total_billed_tokens_scope": "Total provider-billed token positions, including cached input once, unweighted. This is not dollars; cached input can have a different price. Output is required because styles alter deliverables. Listed input/reasoning fields alone cannot determine the total.",
+    "billed_input_equivalent_formula": "sum(tokens_in - tokens_cache_read + cache_price_ratio * tokens_cache_read)",
+    "cache_price_ratio": null,
+    "economic_total_formula": "sum(uncached_input + cache_price_ratio * tokens_cache_read + output_price_ratio * tokens_out)",
+    "output_price_ratio": null,
+    "economic_rule": "Freeze applicable provider billing category/ratios before run for the warm-cache guard; never guess GPT-6 prices or infer dollars from compression analytics. Unknown rates leave economic result null.",
+    "include_failed_retried_cancelled_attempts": true,
+    "join": "Read-only final request rows deduplicated by row id, not timestamp/model. Attribute via private request/session correlation mapped to public ordinals and exact turn start/end. Serialize owned sessions; unrelated traffic or ambiguous join blocks scoring. Polling snapshots replace unfinished rows; never sum snapshots or gateway hops.",
+    "negative_or_missing": "Require 0 <= cache_read <= tokens_in and 0 <= reasoning <= tokens_out; unknown/malformed/null usage remains null and makes cost winner ineligible. Never zero-fill missing 499 usage.",
+    "compression_snapshot": "Owned exclusive 20129 analytics window before/after; no counter reset. Record totals/deltas and engine applied/skipped flags; if other traffic contaminates it, savings=null. Do not add engine subtotals to pipeline savings.",
+    "receipt_rows": [
+      "role",
+      "task_id",
+      "cell",
+      "repetition",
+      "session_ordinal",
+      "user_turn",
+      "request_ordinal",
+      "start/end",
+      "status",
+      "model",
+      "reasoning_effort_requested",
+      "reasoning_effort_upstream",
+      "tokens_in",
+      "tokens_out",
+      "tokens_cache_read",
+      "tokens_reasoning",
+      "duration",
+      "native_artifact_sha256",
+      "verifier_result",
+      "initial_schema_result",
+      "exact_value_result"
+    ],
+    "zero_denominators": "No synthetic zero total, zero paired-session denominator or zero native tests. Ratios with missing/zero control usage are null and cannot qualify cost."
+  },
+  "analysis": {
+    "tasks_per_role": 6,
+    "sessions_per_role_cell": 240,
+    "total_confirmatory_sessions": 3600,
+    "success_ni_margin": 0.05,
+    "failure_ni_margin": 0.05,
+    "alpha": 0.05,
+    "upstream_functions": [
+      "bootstrap",
+      "permutation_test",
+      "binomtest",
+      "multipletests"
+    ],
+    "estimand": "Each role separately: uniform six-task x two cache-condition mixture, paired by role/draw/task/cache assignment. Independent draws with replacement permit a binomial harmful-discordance gate; repeated task identities are not new task diversity.",
+    "failure_endpoint": "Session has any unexpected apply_patch/verification failure, schema retry, invalid tool round trip, cancellation or missing output. Components and recall reported separately, no success-rate-only qualification.",
+    "noninferiority": "For success, harmful discordance = C succeeds and candidate fails. For operational failure, harmful discordance = candidate has any failure and C has none. Each probability is a conservative upper bound on the corresponding net success loss/failure excess; require one-sided scipy.stats.binomtest(k, n, p=0.05, alternative=\"less\") rejection after Holm. Require observed net success loss and failure excess <=0.05 as well. Paired trials, not calls, are n; task repetitions never represent distinct tasks.",
+    "assumptions": "Independent paired outcomes under the preregistered random task/cache mixture and stationary provider conditions. Task/condition response rates may differ; randomized mixture supplies the marginal Bernoulli distribution. Retain assignment and time/block evidence. Failed randomization, material temporal dependence or backend/config drift makes certification inconclusive; no easier post-hoc method.",
+    "multiplicity": {
+      "method": "holm",
+      "comparisons": 24,
+      "family": "3 roles x 4 candidate-vs-C comparisons x 2 co-primary harmful-discordance endpoints; missing/unrun comparisons get p=1; reject each relevant endpoint at family alpha .05."
+    },
+    "bootstrap": "scipy.stats.bootstrap paired=True, method=percentile, n_resamples=99999, rng seed=20260927. Resample complete paired session draws, preserving all five arms and all turns/retries/priming within a draw. Report 95% net success/failure and token-ratio CIs; warm-only resampling for economic guard. Descriptive intervals cannot replace NI tests.",
+    "permutation": "scipy.stats.permutation_test permutation_type=samples, n_resamples=99999, alternative=less, rng seed=20260928, statistic mean(candidate_tokens-control_tokens) on paired complete session draws. Explanatory cost comparison only; nonsignificant equality is not non-inferiority.",
+    "degenerate_interval_guard": "Zero-width/NaN bootstrap intervals are not proof. Exact harmful-discordance tests and one-sided exact binomial bounds still required; if these or assumptions cannot resolve margin, label inconclusive.",
+    "precision": "Fixed sample/budget, no guaranteed power. Qualification data excluded from confirmation. A completed but underpowered cohort can only be inconclusive; no outcome-dependent extra repetitions.",
+    "ordering": "For draw ordinal r use r mod 10 through [C,D0,A1,D1,A0], [D0,D1,C,A0,A1], [D1,A0,D0,A1,C], [A0,A1,D1,C,D0], [A1,C,A0,D0,D1] then their respective reversals. Add sorted role ordinal as cyclic schedule phase. Seal realized schedule before probes.",
+    "cache_design": "Cold/warm labels are independent random draws with equal probability; expected 20 of each per task/cell. New task-scoped sessions each attempt, stable identity within session. Warm label has exactly one fixed same-arm native three-turn priming sequence in a separate session with shared stable task prefix; include its entire measured usage and latency. Cold label has no prime and fresh namespace. Actual coldness/warmth not assumed; measure first/second/third-turn cache fractions and actual affinity. Freeze prime task text and identity policy before probes; no cache flush.",
+    "planned_repetitions_per_role_cell": 240,
+    "expected_repetitions_per_task_cell": 40,
+    "sampling": "Before first provider probe, NumPy 2.4.0 numpy.random.Generator(PCG64(20260927 + sorted_role_ordinal)) draws 240 independent integers in [0,12); integer//2 selects one of six sorted tasks and integer%2 selects cold/warm label. Freeze realized schedule bytes/hash, exact NumPy version and per-task counts. All cells use identical draws. No outcome-dependent rerandomization, balancing, replacement or minimum-count repair.",
+    "scored_vs_priming": "3600 is the scored role/cell attempt count only. Warm assignments add one unscored native priming session per cell, expected 1800 extra sessions; exact count is fixed by the pre-data schedule. Priming failures count against the associated scored attempt and all its usage/latency remains charged. Do not call the scored count total model sessions.",
+    "actual_total_sessions_including_priming": null
+  },
+  "decision_rule": {
+    "per_role": true,
+    "objective": "minimum total billed tokens among non-inferior cells",
+    "eligibility": "Complete matched cohort, effective max at 20128 on every attributable model call, unchanged effective control, passed native controls, 100% exact-value/record preservation, both NI endpoints Holm-rejected, full usage/transport evidence and stable cache strata. Any exact-value corruption vetoes the cell regardless of success rate. Apply absolute_quality_gate; no selection from all-failing tasks or absent task coverage.",
+    "cost_rule": "Compare all-attempt sum(tokens_in + tokens_out) on identical completed role schedule including warm-up, retries, failures and cancellations. Minimum among eligible cells and C. Reject monetary-savings claims unless frozen price ratios and weighted billed input support them.",
+    "cache_economic_guard": "Promotion additionally requires warm-stratum priced billed input and priced total not exceed C by more than 1% (upper one-sided 95% paired-block bootstrap ratio bound <=1.01). Unknown weights/degenerate unsupported bounds => no economic promotion; token ranking may still be reported descriptively.",
+    "tie_rule": "Within 1% of minimum all-attempt tokens is a practical tie. Prefer C, then D0, D1, A0, A1 in that order; cost confidence intervals overlapping zero savings yield retain C pending another preregistration. No arbitrary latency tie-break after seeing data.",
+    "engine_rule": "Only entire tested configurations qualify. A1 passing for researcher and failing for builder permits only scoped researcher A1; individual-engine exploratory winners require fresh confirmation. Broad role changes require a broader independently frozen representative task pack; these six-task results may qualify only their named domains.",
+    "incomplete": "Any budget/telemetry/profile/transport gate, missing paired session or safety stop => incomplete or inconclusive, retain C. Keep all attempts and usage, never discard failed arms.",
+    "outcomes": {
+      "builder": null,
+      "reviewer": null,
+      "researcher": null
+    },
+    "minimum_absolute_combined_success_rate": 0.9,
+    "absolute_quality_gate": "Control and candidate each require combined success >=0.90, with at least one real successful attempt of every selected task and nonempty exactness evidence. A trivially all-failing control cannot qualify a cheap treatment. A task omitted by the sealed random draw makes coverage incomplete; do not rerandomize after observations."
+  },
+  "role_policy": {
+    "early_canary_roles": [
+      "builder"
+    ],
+    "control_until_pass": [
+      "reviewer",
+      "researcher",
+      "judgment",
+      "verification",
+      "evidence"
+    ],
+    "record_outputs_require_exact_preservation": true,
+    "builder_canary": "Only isolated reversible builder trials after deterministic exactness and two-hop readiness; no early adoption, external publication or authoritative records.",
+    "trial_vs_production": "Reviewer/researcher treatment outputs are quarantined experimental artifacts graded independently on control/locally; their production routes remain 20128. No LLM grader in compressed arm.",
+    "promotion": "Role+configuration+task-domain specific; any broad review/evidence role needs representative confirmation and exact strings in verdict prose, receipts, pins and hashes. Stop on new record corruption and revert owned scope to control."
+  },
+  "budget": {
+    "total_token_cap": 24000000,
+    "allocations": {
+      "qualification_and_controls": 2000000,
+      "confirmatory_including_priming": 20000000,
+      "exploratory": 2000000
+    },
+    "unit": "20128 sum(tokens_in + tokens_out), both cache and output counted once; do not subtract compression savings",
+    "max_concurrent_sessions": 1,
+    "inflight_reserve_tokens": 600000,
+    "max_owned_session_wall_seconds": 1800,
+    "whole_run_wall_seconds": 604800,
+    "poll_seconds": 5,
+    "admission": "Before launch reserve measured worst-case next-session input/priming/tool continuations + output cap; estimate must fit remaining allocation with 600000 global reserve. Freeze supported per-request output/context limits after source/host qualification. If a hard upstream charge cap cannot be proven, report monitored soft cap with bounded cancellation overshoot; never call it enforced. Do not start confirmatory cohort if fixed schedule cannot reasonably fit based on qualification usage.",
+    "stop_conditions": [
+      "Unknown/delayed usage beyond 30 seconds or ambiguous task attribution.",
+      "Budget reserve reached, timeout, quota/auth refusal, model/effort drift or config hash drift.",
+      "Exact-value or encrypted reasoning corruption, control verifier/malformed-control failure, uncontrolled shared traffic/settings.",
+      "Five consecutive 499/error requests or three cancelled sessions in any ten-session owned block; one record corruption stops that treatment immediately.",
+      "Missing required native profile/multi-turn capability; no substitute runner without amendment."
+    ],
+    "owned_process_cancellation": "Use native Harbor cancellation first; coordinator records own job/container/process group identities at launch. Stop launching, interrupt only that owned process group, allow 10 seconds, TERM then 10 seconds then KILL only surviving owned descendants; remove only owned sandbox resources through Harbor. Never pkill by model name, stop either gateway or kill unrelated sessions. Observe local death and separately reconcile 20128 terminal/499 rows for up to 60 seconds. Remote provider cancellation unproven remains null; no automatic retry, no erased partial cohort.",
+    "restore": "Future host owner restores the exact owned 20129 experiment configuration snapshot; never changes 20128. No host state was configured by this draft.",
+    "actual_usage": null
+  },
+  "threats_to_validity": [
+    "Prompt cache: peer historical ~94% does not establish current warmth; keyless live-zone bypass may or may not disturb deterministic prefixes.",
+    "Sharedgw adds a hop; default-only cells differ from C in hop and labelled-safe engines. No pure hop-only causal claim without additional globally-disabled/excluded framework control in a new protocol.",
+    "Session/account affinity, encrypted reasoning policy and fallback routing may change between hops; log actual identities privately and resolved model/effort.",
+    "Provider stochasticity and time-varying account capacity; fresh paired sessions, fixed order counterbalancing, same account affinity where supported, provider backend seed not assumed.",
+    "Five-cell time-sliced styles require exclusive ownership; config variants can disturb cache partition. Preserve snapshot hashes and report every transition.",
+    "Six fixed tasks per role and four builder smoke tasks constrain generalization; repetitions increase stochastic precision, not task diversity.",
+    "Promptfoo disk result cache would avoid model calls; use --no-cache. Keep native provider caching enabled and measured.",
+    "Enabled engine with no eligible input or missing optional model does not demonstrate that engine; engine interaction order and safe-label defects can dominate.",
+    "Repeated reads can be intentional; count only preregistered unchanged-file unrequested rereads; unknown artifact identity remains null."
+  ],
+  "evidence": {
+    "draft_class": "source-backed protocol and local structural validation only",
+    "upstream_tests_executed": false,
+    "model_sessions_executed": false,
+    "gateway_requests_executed": false,
+    "private_only": [
+      "API keys",
+      "auth stores",
+      "raw native conversations",
+      "encrypted reasoning",
+      "account/session identities",
+      "personal host paths"
+    ],
+    "public": "Compact sanitized per-task/turn receipts, exact commands/exit results, upstream revision+file spans, hashes and equality booleans, failed attempts and unknown usage. Never generated summaries as upstream execution evidence."
+  },
+  "sealing": {
+    "sealed_at": null,
+    "execution_revision": null,
+    "schedule_sha256": null,
+    "effective_configs_sha256": null,
+    "adapter_executables_sha256": null,
+    "image_digests": null,
+    "before_run": [
+      "Resolve all open host gates through maintained upstream commands, with no custom substitute harness.",
+      "Materialize task/canary bytes and compare frozen hashes; lock upstream dependencies/images, task graders, output schemas, native config and role definitions.",
+      "Run known-pass/known-fail/malformed controls in native harness; retain exact artifacts and outputs; hash adapters.",
+      "Seal complete order/warm-up schedule and budget with dated coordinator record before any model capability probe.",
+      "Qualification has its own excluded-from-confirmation budget; a changed task/engine/config/oracle requires append-only amendment and fresh cohort.",
+      "Materialize/hash the exact native priming sequence from multi_turn without target answers; freeze NumPy runtime and realized IID task/cache draw inventory before any capability request."
+    ],
+    "amendments": "Append-only dated rationale plus old/new hashes and explicit before/after-data timing; never silently rewrite after observations. No run/adoption authority from this draft."
+  },
+  "anti_pattern_log": [
+    {
+      "mistake": "Treating safe-default classification as proven losslessness.",
+      "correction": "Session-dedup index collision and lite truncation paths are visible; all cells require exactness checks.",
+      "verification": "or-engine-labels; or-dedup 291-345; or-lite 148-168; or-adapter 116-145; or-strategy 367-386."
+    },
+    {
+      "mistake": "Treating explicit output styles and legacy caveman output mode as additive, or clearing only styles to disable them.",
+      "correction": "Explicit nonempty styles win; disable legacy fallback too.",
+      "verification": "or-styles 13-28; D0/A0 config contract."
+    },
+    {
+      "mistake": "Assuming promptfoo --help is read-only.",
+      "correction": "Research preflight attempted logging/DB migration and failed with EROFS/SQLITE_CANTOPEN, exit 1; no successful host write observed. Use package metadata/source under no-host-change scope.",
+      "verification": "promptfoo-startup src/main.ts 63-64 before parse at 147; src/logger.ts 224-247."
+    },
+    {
+      "mistake": "Assuming direct-shell gh failure means upstream research unavailable.",
+      "correction": "Installed research tool gh api succeeded; source byte comparisons and pin checks retained here.",
+      "verification": "Nine installed compression files compared byte-for-byte to OmniRoute a58000c7, all gh calls exit 0."
+    },
+    {
+      "mistake": "Assuming a configurable Harbor CODEX_HOME proves arbitrary parent-home or -p forwarding.",
+      "correction": "Harbor chooses its own home and launch lacks discovered profile flag; keep literal profile gate unresolved.",
+      "verification": "harbor-codex 81,1352-1359,1432-1448; harbor-options 50-70."
+    },
+    {
+      "mistake": "Leaving the peer-reported Responses-to-lite path untraced.",
+      "correction": "Installed bodyAdapter maps function_call_output to role tool; strategySelector invokes lite through it, and lite truncates eligible string content without consulting codex-responses metadata. This is source reachability, not observed live application.",
+      "verification": "or-adapter 116-145,205-221; or-strategy 367-386; or-lite 148-168,259-262."
+    },
+    {
+      "mistake": "Applying a binomial gate to a fixed balanced heterogeneous task schedule.",
+      "correction": "Use preregistered IID draws from the finite task/cache mixture, pair the same draws across cells, and freeze the realized schedule before observations. Repetition is an expected 40/task, not a fabricated fixed realized count.",
+      "verification": "SciPy binomtest source at pinned version; analysis.sampling and structural checks; no statistical execution claimed."
+    },
+    {
+      "mistake": "Guessing affinity-header names for the draft checklist.",
+      "correction": "Replaced provisional x-omniroute-account-id and x-omniroute-connection-id with installed x-omniroute-connection. Its identity is hop-local and must map to the actual downstream account.",
+      "verification": "Installed src/sse/handlers/chat.ts:688 and open-sse/handlers/chatCore/responseHeaders.ts:222; multi_turn.header_scope prevents an equal-string cross-hop assumption."
+    }
+  ],
+  "open_host_gates": [
+    {
+      "id": "native-profile",
+      "requirement": "Supported pinned native Harbor launch including literal -p stack-worker; no custom runner or silent config-only replacement. If unsupported at pin, revise protocol/pin before data.",
+      "passed": null
+    },
+    {
+      "id": "two-hop",
+      "requirement": "Prove native three-turn tools, session/account affinity, cache key, store/include and real encrypted-reasoning replay across both hops.",
+      "passed": null
+    },
+    {
+      "id": "effective-config",
+      "requirement": "Observe 20128 off + codex/* exclusion and both max columns; observe 20129 effective engines/styles and safety compaction behavior per cell; no live query in draft.",
+      "passed": null
+    },
+    {
+      "id": "accounting",
+      "requirement": "Confirm live schema id/tokens_out, reasoning/cache subset semantics, row finalization/turn correlation, 499 usage, analytics window isolation and frozen applicable pricing ratios.",
+      "passed": null
+    },
+    {
+      "id": "native-harnesses",
+      "requirement": "Harbor 0.23.0 and task runtime/dependency/image readiness, promptfoo isolated state, Rewardkit actual example pin, statistics pins; Inspect 0.3.266 is not 0.3.271 acceptance.",
+      "passed": null
+    },
+    {
+      "id": "native-controls",
+      "requirement": "Materialize and hash exact adapters; native known-pass/fail/malformed/missing-output controls for each task and all numeric/dedup/long-output canaries.",
+      "passed": null
+    },
+    {
+      "id": "coverage",
+      "requirement": "Wider role promotion needs a broader frozen representative builder/review/research task pack; do not generalize four builder smoke tasks.",
+      "passed": null
+    },
+    {
+      "id": "keyed-live-zone",
+      "requirement": "Optional future registered 20129 key in private 0600 store, stable session id and cacheMinutes=60; prove actual live-zone reuse, no key value recorded.",
+      "passed": null
+    }
+  ],
+  "local_validation": {
+    "classification": "local structural contract, not upstream acceptance",
+    "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_gpt6_lane_compression_ab_preregistration.py -v",
+    "fail_first": {
+      "exit_code": 1,
+      "result": "Ran 1 test; FAILED (failures=1): preregistration.json does not exist yet",
+      "before_draft_files": true
+    },
+    "pass": {
+      "exit_code": 0,
+      "result": "Ran 1 test; OK",
+      "scope": "Local structural contract only; upstream/native/model execution not performed."
+    },
+    "repository_validator": {
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py",
+      "exit_code": 0,
+      "result": {
+        "components": 69,
+        "hashed_files": 7348,
+        "profiles": 4,
+        "receipts": 159,
+        "status": "passed"
+      },
+      "scope": "Repository integrity and scope checks only. Untracked draft files covered by their direct contract test and explicit publication scan."
+    },
+    "publication_scan": {
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py --scan-file blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md --scan-file blueprints/gpt6-lane-compression-ab/preregistration.json --scan-file tests/test_gpt6_lane_compression_ab_preregistration.py",
+      "exit_code": 0,
+      "result": {
+        "scanned_files": 3,
+        "status": "passed"
+      }
+    }
+  }
+}
