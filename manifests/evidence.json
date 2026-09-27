@@ -3466,6 +3466,11 @@
       "bytes": 7333
     },
     {
+      "path": ".jcodemunch.jsonc",
+      "sha256": "54f9c2a44f6d8ceac528a9369468f3af9dd84e1c6f1230f269c63700782f2cdd",
+      "bytes": 2751
+    },
+    {
       "path": "AGENTS.md",
       "sha256": "cf44536f3793cc37187c9800b682bbf3f5d4e01c85fab6ee0be070c77a161a7c",
       "bytes": 11907
@@ -38683,8 +38688,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "df60259df7e4edc68f11ccc1719fead0029e5523e71afcbbbf00428ce388ac9e",
-      "bytes": 119452
+      "sha256": "a4f27da14b6e74dfefabb0e4ebb7adc07522698533a2b23fd3805ac23408bf5e",
+      "bytes": 120714
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -39415,6 +39420,11 @@
       "path": "tests/test_install_skills.py",
       "sha256": "94ee9f6484a8b80fe98e0de45fbb71cfae1624c2bbad4bc61091c64586a71b5d",
       "bytes": 25577
+    },
+    {
+      "path": "tests/test_jcodemunch_config.py",
+      "sha256": "8316931b0d82ddb539518ed3322736879d7da6ea358c9ccd5344031eb4e859da",
+      "bytes": 13287
     },
     {
       "path": "tests/test_job_recovery.py",

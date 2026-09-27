@@ -572,17 +572,34 @@ summaries, savings sharing, watchers, cross-repository defaults and external
 context providers disabled. Do not index conversations, credentials or every
 project merely because the server is available.
 
+To apply [`.jcodemunch.jsonc`](../.jcodemunch.jsonc), call `order` with the
+following arguments, replacing `path` with this checkout's absolute root:
+
+```json
+{"action":"index_folder","args":{"path":"/absolute/checkout/root","incremental":false,"use_ai_summaries":false},"allow_state_change":true}
+```
+
+At jgravelle/jcodemunch-mcp v1.108.319,
+[`server.py` L1597–1645](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/server.py#L1597-L1645)
+defines the MCP `index_folder` arguments (it has no `context_providers` argument:
+the project file's `context_providers: false` disables providers through
+[`tools/index_folder.py` L796–803](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L796-L803)), and
+[L1528](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L1528)
+loads the project file; `order` requires `allow_state_change: true`
+([`counter.py` L129–133](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/counter.py#L129-L133)).
+The loader reads `.jcodemunch.jsonc` only from the requested folder
+([`config.py` L1230](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/config.py#L1230)),
+so indexing a subdirectory does not apply this root file. Supply no per-call
+`extra_ignore_patterns`: upstream appends them to the project list
+([`security.py` L576–577](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/security.py#L576-L577)).
+
 The upstream default index root is intentional: in this release, source retrieval
 records its estimate there even when a custom index root was requested. Reading
 stats from a different root can therefore show a misleading zero. Keep the
 existing default ledger; the native estimate includes repeated reads.
 
-The six-tool surface exposes actions through `order`. Select actual local scope
-and returned repository/symbol IDs for these tool arguments:
-
-```json
-{"action":"index_folder","args":{"path":"/absolute/selected/project/src","use_ai_summaries":false,"extra_ignore_patterns":["*.json","*.jsonl","*.md","*.html","*.txt","**/__pycache__/**"],"follow_symlinks":false,"context_providers":false},"allow_state_change":true}
-```
+The six-tool surface exposes actions through `order`. Use returned
+repository/symbol IDs for these navigation arguments:
 
 ```json
 {"action":"search_symbols","args":{"repo":"RETURNED_REPOSITORY_ID","query":"requested_function","kind":"function","max_results":1}}
