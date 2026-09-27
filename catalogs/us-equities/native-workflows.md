@@ -13,9 +13,9 @@ remain separate accounting surfaces.
 
 ## Use the catalog without loading all of it
 
-The native QMD CLI has a dedicated local index. These two catalog/foundation
-collections are the portable setup below; the authoring host also has a third,
-explicitly scoped observation collection. To adopt a different checkout, set
+The native QMD CLI has a dedicated local index. These four collections, two for
+this catalog and two for the foundation docs, are the portable setup below; the
+authoring host also has an explicitly scoped observation collection. To adopt a different checkout, set
 `STACK_REPO` to that checkout and add only the selected collections:
 
 ```bash
@@ -23,10 +23,20 @@ qmd --index native-agent-stack-catalog collection add \
   "$STACK_REPO/catalogs/us-equities" --name us-equities-catalog --mask '**/*.md'
 qmd --index native-agent-stack-catalog collection add \
   "$STACK_REPO/blueprints/us-equities" --name us-equities-foundation --mask '**/*.md'
+qmd --index native-agent-stack-catalog collection add \
+  "$STACK_REPO/adoption" --name foundation-adoption --mask '**/*.md'
+qmd --index native-agent-stack-catalog collection add \
+  "$STACK_REPO/docs" --name foundation-docs --mask '**/*.md'
 qmd --index native-agent-stack-catalog update
 qmd --index native-agent-stack-catalog search timesfm -c us-equities-catalog -n 2 --format json
 qmd --index native-agent-stack-catalog get qmd://us-equities-catalog/models.md:268:27
 ```
+
+`collection add` has no ignore option. Where the checkout holds the generated
+`docs/ecosystem/` guide, add `ignore: ["ecosystem/**"]` under `foundation-docs` in the
+index's YAML configuration (on the workstation,
+`~/.config/qmd/native-agent-stack-catalog.yml`) before `update`. The two foundation
+collections were added on 2026-09-27, after the recorded run described next.
 
 Collection creation, search and source retrieval completed with exit **0**. The
 recorded search returned the model guide. The selected source distinguishes
