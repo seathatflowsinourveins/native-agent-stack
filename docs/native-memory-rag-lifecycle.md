@@ -14,7 +14,34 @@ session's consolidation finished on attempt 1. No learning run was triggered
 manually for this observation. These outcomes establish lifecycle execution,
 not improved answer quality or token savings.
 
-## Installed selection
+## September 27 scheduled follow-up
+
+The [September 27 observation](../observability/memory-scheduled-20260927.json)
+and [returned native results](../observability/memory-scheduled-results-20260927.json)
+record the actual daily wake. Current local service/configuration reads confirm
+the previously installed prefix-enabled ai-memory build, Nemotron memory
+embeddings, vLLM 0.30.0 and Codex gpt-6-sol at medium effort. The hourly learning
+scheduler has been intentionally paused since September 25. The table below and
+September 21 configuration are historical; do not restore their older model,
+embedding or scheduler settings over the current qualified setup.
+
+Memory, Qdrant and embedding services were healthy; the existing collector
+published successfully and all 9 Prometheus targets were up. The native report
+returned 83 historical runs and 19 approved terminal proposals. The latest
+captured completed session has no consolidation job. The latest completed job
+is an older observation generation, completed September 24; it does not validate
+the subsequent model change. One semantic excerpt and the QMD pause decision
+matched their source. Exact session/lifetime savings remain unknown.
+
+Stock ai-memory [v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1)
+still lacks the query/document prefixes required by this deployment. Independent
+tagged-source review confirmed that its query-dispatch fix is already present in
+the installed patch. Retain the current build pending a release containing
+upstream #859 and isolated migration/retrieval qualification; this wake made no
+runtime change. Existing gateway/swap warnings and missing journal output are
+retained in the receipt. No restart persistence or new cross-client E2E is claimed.
+
+## Historical September 21 installed selection
 
 | Layer | Accepted upstream | Current qualification |
 | --- | --- | --- |

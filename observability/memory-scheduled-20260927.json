@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "id": "memory-scheduled-lifecycle-20260927",
+  "kind": "native_cli_observation",
+  "component_ids": [
+    "ai-memory",
+    "socraticode",
+    "qmd"
+  ],
+  "recorded_at_utc": "2026-09-27T13:11:00Z",
+  "claim": "Actual daily heartbeat returned scoped memory/RAG observations. Existing services and publications were healthy; hourly learning is intentionally paused. Stock ai-memory 2.4.1 remains conditional because it lacks the installed query/document-prefix capability.",
+  "trigger": {
+    "automation_id": "maintain-native-foundation-and-trading-catalogs",
+    "scheduled_heartbeat_timestamp_utc": "2026-09-27T13:01:01.000Z",
+    "provenance": "Scheduler-provided heartbeat received by the native task; separate dispatch database not inspected.",
+    "separate_scheduler_dispatch_id": null,
+    "actual_operation": "Read-only scoped setup, learning report, completed-session/consolidation metadata, one source-matched semantic search, QMD search/get and existing monitors.",
+    "restart_persistence": {
+      "app": null,
+      "service": null,
+      "physical_pc": null
+    }
+  },
+  "upstream_results": "observability/memory-scheduled-results-20260927.json",
+  "installed_observation": {
+    "source": "Native scoped setup MCP read and independent selected config/systemd inspection; source checkout inspected separately.",
+    "ai_memory": {
+      "cli_version": "2.3.2",
+      "selected_build": "2.3.2-prefix-gpt6-f24f7181",
+      "source_commit": "62e73148fa4712540dab82d7fadf2ebf09a42cec",
+      "config_sha256": "cd883d43269b93bd323d065b684fd8a0dd6cf6cc29f75dc2f5e9fb11877c13fc",
+      "consolidation_provider": "codex",
+      "consolidation_model": "gpt-6-sol",
+      "consolidation_effort": "medium",
+      "model_selection_status": "keep_but_compare; existing two-sample restored-store qualification is not general model superiority",
+      "embedding_provider": "openai-compat",
+      "embedding_model": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "query_prefix": "query: ",
+      "document_prefix": "passage: ",
+      "auto_improve_scheduler_enabled": false
+    },
+    "embedding_service": {
+      "vllm_version": "0.30.0",
+      "max_model_len": 8192,
+      "qualification": "Previously qualified switch retained; no dedicated model probe, benchmark or restart this wake. The required semantic search uses embedding inference."
+    }
+  },
+  "learning": {
+    "report_generated_at": "2026-09-27T13:01:57.119541853Z",
+    "summary": "83 run(s), 19 terminal learning proposal(s), 100.0% approved in the last 30 day(s).",
+    "run_count": 83,
+    "terminal_proposals": 19,
+    "approved_rate": 1,
+    "interpretation": "Aggregate historical proposals are not new model runs, retrieval quality, token savings, or hourly scheduler activity. Latest captured completed session has no job; latest completed job belongs to an earlier generation of a longer session.",
+    "latest_completed_session": {
+      "agent_kind": "claude-code",
+      "started_at": "2026-09-26T00:03:19.422179Z",
+      "ended_at": "2026-09-26T00:03:25.983864Z",
+      "observation_count": 2,
+      "session_end_observed": true,
+      "consolidation_job": null
+    },
+    "latest_completed_consolidation": {
+      "agent_kind": "claude-code",
+      "started_at": "2026-09-22T19:49:04.048902+00:00",
+      "ended_at": "2026-09-25T22:42:35.853111+00:00",
+      "ended_observation_count": 20743,
+      "summary_page_present": 1,
+      "generation": 13452,
+      "state": "completed",
+      "requested_at": "2026-09-24T19:29:16.470451+00:00",
+      "job_started_at": "2026-09-24T19:30:13.394123+00:00",
+      "completed_at": "2026-09-24T19:30:36.717316+00:00",
+      "attempts": 1,
+      "last_error": null
+    }
+  },
+  "retrieval": {
+    "socraticode": {
+      "query": "collect native Linux and Desktop usage separately",
+      "path": "tools/ecosystem/linux-usage-report.test.cjs",
+      "start": 76,
+      "end": 83,
+      "source_sha256": "da5975a3bb9a3b0af972af387dd28497c590881ed08d868411efd1a6a9e16b54",
+      "matches_native_excerpt": true,
+      "watcher": "active in another native process",
+      "indexed_chunks": 1974,
+      "interpretation": "Exact returned excerpt checked against source; score and count are not retrieval quality or savings."
+    },
+    "qmd": {
+      "command": "qmd --index agent-lab-docs search 'hourly auto-improve scheduler paused' -c agent-lab-docs -n 2 --json",
+      "returned_document": "qmd://agent-lab-docs/tasks/2026-09-25-quality-optimization.md",
+      "get_exit": 0,
+      "source_sha256": "1eace1655ce74cb960b7e0091e45245cdcde954c3e8076ce3b9b7421e1038661",
+      "source_lines": [
+        493,
+        514
+      ],
+      "matches_source": true,
+      "interpretation": "September 25 pause decision was retrieved; later September 26 model setup comes from current scoped setup and independently observed config, not this older note."
+    }
+  },
+  "independent_monitor_observation": {
+    "classification": "Independent read-only worker summary; original native service/API results remain in its tool records.",
+    "observed_at_utc": "2026-09-27T13:04:00Z",
+    "memory_qdrant_embedding_services": "active/running/enabled/success",
+    "native_inventory": {
+      "published_at_utc": "2026-09-27T13:01:30.671Z",
+      "observed_at_utc": "2026-09-27T13:01:30.039Z",
+      "http_status": 204,
+      "rows": 78,
+      "markers": 1,
+      "unknown_count": 0,
+      "stale_count": 5,
+      "stale_scope": "Old token-counter captures, not current session savings.",
+      "latest_pages": 210,
+      "all_versions": 631,
+      "sessions": 314,
+      "observations": 453761,
+      "missing_latest_embeddings": 0,
+      "unresolved_embedding_failures": 0,
+      "snapshot_sha256": "c4f7b511a7ea106cee6fc07519395ee4fbc434c4391864063a0e49bd6b25b982",
+      "loki_payload_sha256": "c4a8c29235462ec3e7f1b759b799f54fcd0a8f08715e5d5423167e0ea427a523"
+    },
+    "qmd": {
+      "files": 183,
+      "vectors": 0,
+      "mode": "intentional BM25"
+    },
+    "qdrant": {
+      "points": 1974,
+      "status": "green"
+    },
+    "progress": {
+      "rows": 100,
+      "checkpoint_utc": "2026-09-25T22:46:00Z",
+      "last_observed_emission_utc": "2026-09-27T12:55:25.551Z",
+      "checkpoint_sha256": "f73f1f175ee31b2fbdcce4b23294c97093dcf7645433b9309a763f66b6c266dd"
+    },
+    "prometheus_targets": {
+      "up": 9,
+      "total": 9,
+      "observed_at_utc": "2026-09-27T13:02:32Z"
+    },
+    "existing_warnings": [
+      {
+        "name": "EcosystemOmniRouteHealthUnexpected",
+        "active_since_utc": "2026-09-23T18:37:19Z"
+      },
+      {
+        "name": "EcosystemFreeLLMAPIHealthUnexpected",
+        "active_since_utc": "2026-09-23T18:37:19Z"
+      },
+      {
+        "name": "EcosystemSwapUsedHigh",
+        "active_since_utc": "2026-09-24T04:12:49Z",
+        "bytes": 2682691584
+      }
+    ],
+    "limits": "Existing warning categories; current activation timestamps do not establish continuous firing since September 23. No new memory/RAG service or publication failure. Existing adaptive-paper-live target was read via Prometheus only; no broker calls."
+  },
+  "upstream_release_review": {
+    "release": "v2.4.1",
+    "published_at_utc": "2026-09-25T21:46:32Z",
+    "commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
+    "decision": "retain installed patched build; stock upgrade conditional",
+    "evidence": [
+      {
+        "source": "crates/ai-memory-cli/src/config.rs",
+        "finding": "Tagged configuration lacks embedding_query_prefix and embedding_document_prefix."
+      },
+      {
+        "source": "crates/ai-memory-llm/src/embedding.rs",
+        "lines": [
+          58,
+          59,
+          324,
+          344
+        ],
+        "finding": "Tagged OpenAI-compatible implementation inherits embed_query -> embed and sends unprefixed input with unqualified model identity."
+      },
+      {
+        "source": "crates/ai-memory-mcp/src/server.rs",
+        "lines": [
+          2001,
+          2455,
+          8067
+        ],
+        "finding": "#861 uses embed_query with a regression test. Installed source already dispatches embed_query at lines 1744 and 2159 and implements query-prefix embedding at embedding.rs:478."
+      }
+    ],
+    "pr_859": {
+      "base": "release/2.5",
+      "merge_commit": "7552d4fd390c1370a09f7452dfbd76bdd707db47"
+    },
+    "pr_861": {
+      "base": "main",
+      "merge_commit": "21fc32800c2c9549692372241310e675a5b25240"
+    },
+    "overturn": "A tagged release containing #859, qualified on an isolated restored store with prefix/model identity, native scoped retrieval, relevant upstream regressions and migration/restore acceptance. Source comparison alone does not qualify an upgrade."
+  },
+  "retained_observation_errors": [
+    {
+      "command": "journalctl --user -u ai-memory.service --since '2026-09-26 00:00:00 UTC' --grep 'consolidat|auto.improve|scheduler' -n 8 --no-pager -o cat",
+      "exit_code": 1,
+      "returned": "",
+      "interpretation": "No matching output retained; not evidence of absent capture or successful consolidation."
+    },
+    {
+      "operation": "systemctl inside Context Mode",
+      "returned": "No medium found",
+      "recovery": "Native shell systemctl --user show succeeded; observer user-bus context error."
+    },
+    {
+      "operation": "Source discovery",
+      "returned": "An absent task-file glob and an overbroad listing were replaced by focused original-file reads."
+    }
+  ],
+  "exact_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  },
+  "retained_validation_attempts": [
+    {
+      "classification": "Local publication integrity check, not upstream E2E",
+      "command": "ecosystem-bounded-run python3 scripts/validate.py",
+      "exit_code": 1,
+      "result": "The two edited handbook files had stale registered hashes and byte counts before re-registration."
+    }
+  ],
+  "independent_review": {
+    "scope": "Current monitor and tagged upstream source observations, sanitized result coverage and claim limits.",
+    "findings_resolved": [
+      "Added the scoped read-only job lookup for the exact MCP-returned completed session: one matched row, job_present=0, generation/state/attempts null.",
+      "Replaced the overbroad no-model-execution phrase: native semantic retrieval uses embeddings; no dedicated model probe or benchmark was run."
+    ]
+  },
+  "local_checks": {
+    "classification": "Existing project publication/integration checks; not upstream runtime tests",
+    "catalog_validator": {
+      "command": "ecosystem-bounded-run python3 scripts/validate_catalogs.py",
+      "exit_code": 0
+    },
+    "project_tests": {
+      "command": "ecosystem-bounded-run python3 -m unittest tests.test_grand_dashboard tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "tests": 63
+    },
+    "source_excerpt_matches": true,
+    "qmd_document_span_matches": true
+  },
+  "limitations": [
+    "This is a bounded observation and source review, not fresh upstream installation, cross-client E2E, learning quality evaluation or benchmark.",
+    "No new session-end event, learning call, restart, upgrade, model/account/permission change or competing monitor was generated.",
+    "The latest completed consolidation predates the current model change and covered an earlier observation generation; it does not prove that the latest session or current model consolidated successfully.",
+    "Previously passing upstream/recovery receipts retain their original inputs and dates; this wake does not requalify changed embedding/model versions.",
+    "Existing historical dashboard checkpoint and prior failures remain evidence with their original dates; publication freshness is distinct from acceptance.",
+    "Savings and restart persistence remain unknown."
+  ]
+}
