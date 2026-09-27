@@ -13058,7 +13058,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "729bd9bb7a4f29332de9ad6aba03e472d21b4cb348d23ebb8a16142d35d096d9",
+      "sha256": "377da64df009e127764a359afe3080c9e1b06632323cabc5d22ce89e2bf85334",
       "bytes": 189734
     },
     {
@@ -13573,7 +13573,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "cf1867b290f67573580d0c8dbea4a599a9d31214dfa266a47522e266d3d1eafe",
+      "sha256": "eea012431ea3b86e2e59dccccc8b14d911d925c95752c54fbbe076e2e2b3a80f",
       "bytes": 19505
     },
     {
@@ -30465,6 +30465,11 @@
       "path": "evidence/artifacts/local-model-workloads-20260924/usage.json",
       "sha256": "eea0ecfdfd6c022208f0c812dd634c7ba6fff4b0455e875dce017d051ba4ab73",
       "bytes": 4691
+    },
+    {
+      "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
+      "sha256": "5d5edb426112086293da22262d58d9a8ae3d9ff970fe19f969a54cdb8f263eaf",
+      "bytes": 12442
     },
     {
       "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
