@@ -1,0 +1,6 @@
+INFO replay under test: replay.py; exported records=31
+INFO clean records -> fixed-body check lines: ["PASS every Loki record line is exactly '[content omitted]' (always run, with or without historical captures) :: records=31 expected>=31 not_fixed=0"]
+INFO leaking records ('pwd') -> fixed-body check lines: ["FAIL every Loki record line is exactly '[content omitted]' (always run, with or without historical captures) :: records=31 expected>=31 not_fixed=31"]
+PASS clean Loki records pass the fixed-body check
+PASS a leaked 'pwd' body in Loki is caught by the fixed-body check
+SUMMARY loki_body_control: 2 passed, 0 failed
