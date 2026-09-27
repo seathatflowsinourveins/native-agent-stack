@@ -49,7 +49,13 @@
      "worked": true,
      "notes_excerpt": "Environment: R = disposable detached worktree at f5812d3f (origin/main); W = <scratch>/e2e/work/rtk (created). rtk binary: ~/.local/share/codex-ecosystem/bin/rtk (on PATH via the required export). R was left clean (git status: clean, no commits, no pushes); nothing in ~/.claude, ~/.codex, systemd, or the main checkout (~/code/native-agent-stack) was touched; no UI/server/daemon was started; no --version on banned tools; ANTHROPIC_BASE_URL not set.\n\n1) Hook applies inside this subagent (the user's core complaint): running the 6 commands as plain Bash (no manual `rtk` prefix) returned rtk-conden"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The baseline is retained by hash only."
+   }
   },
   {
    "tool": "context-mode",
@@ -87,7 +93,16 @@
      "worked": true,
      "change": "Rerun context-mode's ctx_execute_file against a real, larger repository file that sits under the actual MCP project root (the first attempt had targeted a file under the disposable e2e worktree and was refused with \\\"File access blocked, resolves outside project root\\\"). Target: ~/code/native-agent-stack/docs/grand-catalog-handbook.md (644 lines, 416.1K, read-only/detached checkout). Code must pri"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. A 2026-09-27 reproduction rebuilds this answer check from the pinned Git blob, hash-matched to baseline_sha256, and rejects wrong answers; it is new local integration evidence, not a control this run recorded. The retained answer excerpt is truncated after the seventh heading.",
+    "evidence": [
+     "tests/test_token_e2e_receipt_checks.py::E1ContextModeHeadingOracle"
+    ]
+   }
   },
   {
    "tool": "headroom",
@@ -120,7 +135,13 @@
      "worked": true,
      "notes_excerpt": "Files left in W (all under the given scratchpad, nothing under ~/.claude, ~/.codex, or the main checkout): base.txt (891615B, baseline via redirect only), tool.txt (headroom_compress raw JSON response, byte-exact copy of mcporter's stdout), retrieve.txt (headroom_retrieve raw JSON response, byte-exact copy), savings.json, quality_check.py. R (the detached worktree) was left clean: no edits, no commits, HEAD unchanged at f5812d3f2266399b0c3df3ea76aa6720c7f3e598. Observed (not caused by this run): an unrelated `mcporter daemon start --foreground` process for an OLDER mcporter build (0.13.13) was"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. Compression and exact retrieval were observed; the baseline is retained by hash only."
+   }
   },
   {
    "tool": "jcodemunch",
@@ -153,7 +174,16 @@
      "worked": true,
      "notes_excerpt": "Tool worked end-to-end, no substitution needed. Compliance: baseline was produced only via shell redirect (cat ... > base.txt) and was never Read/cat'd to stdout, so it never entered my context; only wc -l/-c and ls metadata (line/byte counts) were printed. tool.txt holds the exact MCP get_symbol_source JSON, saved via a quoted heredoc from the text already in context (not re-read afterward). No forbidden long-running process, UI, --version probe, or ANTHROPIC_BASE_URL was used; nothing outside R/scripts and W was touched; no commit made; no credentials involved. Cleanup done: invalidate_cache"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. A 2026-09-27 reproduction rebuilds this answer check from the pinned Git blob, hash-matched to baseline_sha256, and rejects wrong answers; it is new local integration evidence, not a control this run recorded.",
+    "evidence": [
+     "tests/test_token_e2e_receipt_checks.py::JCodeMunchLocationOracle"
+    ]
+   }
   },
   {
    "tool": "qmd",
@@ -186,7 +216,20 @@
      "worked": true,
      "notes_excerpt": "Environment: real qmd binary at ~/.local/share/codex-ecosystem/bin/qmd, hitting a pre-built persistent index (~/.cache/qmd/native-agent-stack-catalog.sqlite, 3.9MB, 121 markdown files, 0 embedded/BM25-only) that indexes ~/code/native-agent-stack-live (a separate live checkout), not R itself -- R (the origin/main f5812d3f worktree) was used only to produce the baseline cat, and file contents matched (same byte layout: 179 lines / 25,459 bytes for engines-strategies.md in both). All qmd calls were read-only (collection list/show, search, get, status, --help), bounded by `timeout`, stdin from /de"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "retracted_later",
+    "bad_input_control_recorded": false,
+    "failure_mode": "wrong_document",
+    "basis": "The recorded check only confirmed that the answer's quotes exist in the retrieved document, catalogs/us-equities/engines-strategies.md, which does not say how a new machine pins a release. The catalog index held only the us-equities collections, so adoption/update.md, which does, was outside its scope. quality_check.passed and the exact_comparison counts stay as historical results; the counts describe that wrong document and its QMD output.",
+    "boundary_erratum": "'answer verified (PASS)' is superseded: the answer came from a wrong document.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-codex-20260926/receipt.json#/corrections_to_296/0",
+     "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
+     "tests/test_token_e2e_receipt_checks.py::E1QmdDocumentOracle"
+    ]
+   }
   },
   {
    "tool": "serena",
@@ -224,7 +267,13 @@
      "worked": true,
      "change": "Rerun: prove Serena (bound to session project ~/code/native-agent-stack via --project-from-cwd, no project switch) works inside this subagent by running find_symbol(register_file, with body) and find_referencing_symbols(register_file) against that bound project, then deterministically quality-check the definition line and referencing-call-site count against a grep/cat baseline."
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The baseline is retained by hash only."
+   }
   },
   {
    "tool": "socraticode",
@@ -257,7 +306,13 @@
      "worked": true,
      "notes_excerpt": "Tool worked end-to-end with no substitution needed. Never read base.txt or the source files into context -- baseline was produced purely by shell redirect (cat ... > base.txt), and only its byte/line counts (66308 bytes / 1263 lines) were observed via wc, never its content. Only the MCP tool's own returned text entered context and was saved verbatim to tool.txt (19368 bytes / 328 lines) via a single-quoted heredoc (no shell expansion of the $/`` in the returned markdown/code). Quality check greps base.txt for the two literal source lines underlying the author_association and user.type conditio"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The baseline is retained by hash only."
+   }
   },
   {
    "tool": "ai-memory",
@@ -278,7 +333,17 @@
      "worked": true,
      "notes_excerpt": "Ran entirely inside the detached worktree e2e-root (HEAD f5812d3f, clean) via ToolSearch-loaded native MCP calls, never Bash/CLI or an mcporter bridge. No UI or long-lived server was launched, no commits were made, and the main checkout/~/.claude/~/.codex were untouched. Retrieved memory content (all query hits, e.g. past decision/session notes) was treated strictly as untrusted historical data per ai-memory's own server instructions and the task note \u2014 nothing in it was executed or followed as an instruction, only saved verbatim and summarized. tool.txt contains both calls' exact JSON (status"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "untested",
+    "bad_input_control_recorded": false,
+    "correctness": "untested",
+    "basis": "The check recorded base_empty=True: the baseline was empty by design, so the check established returned hits and scope keys, not answer correctness, which is a vacuous pass under docs/acceptance-evidence-policy.md. Native invocation and the ten scoped hits remain observed.",
+    "evidence": [
+     "docs/acceptance-evidence-policy.md"
+    ]
+   }
   },
   {
    "tool": "repomix",
@@ -311,7 +376,21 @@
      "worked": true,
      "notes_excerpt": "Never read base.txt (baseline) into context: it exists on disk only, produced by shell redirect, and consumed only inside the python3 quality-check subprocess whose sole stdout was \"count=47 PASS\". Everything the answer is built from came from W/tool.txt (33,873 bytes), against a raw baseline of 74,397 bytes for the same two files (54.5% smaller, consistent with repomix's own reported 8,799 packed tokens for the pair). repomix succeeded fully; no fallback/substitution was needed. No UI or long-lived process was started; the only external command (repomix) ran under `timeout` with stdin from /d"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "retracted_later",
+    "bad_input_control_recorded": false,
+    "failure_mode": "incomplete_inventory",
+    "basis": "'count=47 PASS' accepted an incomplete inventory: scripts/host_requests.py at f5812d3f has 48 top-level functions. repomix 1.18.1 --compress silently drops status_body, whose signature spans three lines, because getFunctionSignature tests only a def's first physical line (PythonParseStrategy.ts L81-86); the same rule drops inspect from scripts/credential_status.py. The E2 verifier found this on the identical files, and the Codex run recorded the same loss. The recorded output and counts stay as historical results.",
+    "boundary_erratum": "'all 47 function names verified (PASS)' is superseded: 47 of 48 top-level functions; the token counts are unaffected.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json#/tools/8/quality_check",
+     "evidence/artifacts/token-e2e-codex-20260926/README.md",
+     "tests/test_token_e2e_receipt_checks.py::E1RepomixInventoryOracle",
+     "https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81"
+    ]
+   }
   },
   {
    "tool": "toon",
@@ -344,7 +423,16 @@
      "worked": true,
      "notes_excerpt": "toon v4.1.1 (@toon-format/cli) resolved via PATH at $HOME/.local/share/codex-ecosystem/bin/toon. Used exactly the two toon invocations given in the task (`toon base.txt --stats -o tool.txt`, then `toon tool.txt --decode --strict -o roundtrip.json`); no substitute tool needed. Only tool.txt (the TOON artifact toon produced, 61 lines / 3248 bytes) and tool_stats.txt (toon's own printed --stats line) were read into this session's context; base.txt (the compact-JSON baseline, 6552 bytes) was produced purely by a shell redirect from a Python extraction script and was never read directly -- it was o"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The 2026-09-27 review reproduced the output hash, a full round trip and a wrong-row-count failure with TOON 4.1.1; that is fresh reviewer evidence, not a control this run recorded.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md"
+    ]
+   }
   },
   {
    "tool": "ast-grep",
@@ -377,7 +465,16 @@
      "worked": true,
      "notes_excerpt": "Operational finding worth flagging upstream: the repo's PreToolUse hook scripts/hooks/secret_path_guard.py blocked my first quality-check command with reason \"environment_dump\". Root cause (confirmed by reading the hook, not modified): its tokenizer replaces every newline with ';' and always treats a bare '(' or ')' as a segment boundary, even outside shell context. My heredoc'd Python used set(x) - set(y); the '(' right after `set` turned that call into a lone one-word segment [\"set\"], which the heuristic reads as the bash builtin `set` (no args) = a full environment dump. This is a false pos"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. A 2026-09-27 reproduction rebuilds the per-file call counts with CPython's AST at f5812d3f and rejects wrong answers (new local integration evidence). The baseline's 459,520 bytes match the ten pinned files, but its grep -rl concatenation order, and so its hash, is not reproducible from Git. The retained answer excerpt is truncated in the tenth file.",
+    "evidence": [
+     "tests/test_token_e2e_receipt_checks.py::AstGrepCallOracle"
+    ]
+   }
   },
   {
    "tool": "codebase-memory",
@@ -410,7 +507,13 @@
      "worked": true,
      "notes_excerpt": "codebase-memory-mcp 0.11.0. Did not modify ~/.claude, ~/.codex, systemd units, running services, or the main checkout; no commits made; no long-running process started (every external call wrapped in `timeout ... </dev/null`, no --ui, no install/inspector/dashboard commands run). No credentials touched. Two genuine tool rough edges worth carrying forward for future E2E runs of this tool: (1) mode=\"fast\"/\"moderate\" can silently drop a whole non-hidden, tracked source directory from the graph with no error surfaced at query time \u2014 always confirm a target path with check_index_coverage before tru"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The baseline is retained by hash only."
+   }
   },
   {
    "tool": "context-hub",
@@ -448,7 +551,13 @@
      "worked": true,
      "change": "Rerun the context-hub (chub) token-efficiency proof with content the curated registry actually has (prior attempt: \"Anthropic prompt caching\" returned nothing). Run `chub --help`, search 2-3 likely topics, `chub get` one returned doc into W/tool.txt, fetch its cited/canonical upstream page raw via curl into W/base.txt (shell-redirect only, never read into context), answer one concrete factual ques"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. It checked one fact against a third-party page; the size comparison is not a provider saving."
+   }
   },
   {
    "tool": "markitdown",
@@ -481,7 +590,13 @@
      "worked": true,
      "notes_excerpt": "Verdict: markitdown WORKED end-to-end as a real token-efficiency tool, but only after a documented gotcha.\n\nExtension gotcha (the task predicted this and it happened): markitdown 0.1.8's format detection keys off the file extension. Run on the raw `W/base.txt` (curl's literal .txt extension) it exited 0 but silently no-op'd - output was 1,497,758 bytes (10 fewer than the 1,497,768-byte input) and still contained 14 `<script>` tags and a `<!DOCTYPE>`, i.e. it passed the HTML through nearly untouched rather than converting it. Copying (not moving, so the curl artifact at base.txt stays pristine)"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The conversion scope is one selected HTML page."
+   }
   },
   {
    "tool": "agentsview",
@@ -502,7 +617,13 @@
      "worked": true,
      "notes_excerpt": "Full raw outputs (sync, projects --json, health --json, session list --json, plus the derived python summary) are concatenated at W/tool.txt (~1.0MB / 3457 lines) with '### command:' section headers; per-command raw files (sync-out.txt, projects.json, health.json, session-list-today.json, analysis-summary.txt, help-*.txt) remain individually in W for a full recovery path. base.txt was left empty per the task's explicit 'baseline empty' instruction: this task is a live capability confirmation (does the tool observe today's/subagent sessions), not a content-retrieval task with a natural 'full ra"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "An observation with no baseline pair and no retained checker detail; it establishes archive observation, not task acceptance or a saving."
+   }
   },
   {
    "tool": "otel-tui",
@@ -523,7 +644,13 @@
      "worked": true,
      "notes_excerpt": "Two harness pitfalls hit and fixed during this run, noted for RTK/Ultracode awareness: (1) chaining a backgrounded command with `&&`-joined setup before it (`cd ... && export ... && cmd &`) backgrounds the WHOLE preceding chain as one subshell in bash, silently losing all those variable/cd assignments in the foreground shell \u2014 fixed by grouping setup and the single background launch inside `{ ...; }` with `;`/newline separators, keeping only the one `cmd &` bare. (2) `pkill/pgrep -f <pattern>` scans every process's full cmdline including the invoking `bash -c \"<this whole script>\"` wrapper, wh"
     }
-   ]
+   ],
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "A presence check of one constructed span over loopback (local integration); no baseline pair and no token-saving claim."
+   }
   }
  ],
  "counters": {
@@ -727,5 +854,66 @@
  ],
  "codex_probe": [
   "ERROR: You\u2019ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at Sep 30th, 2026 11:50 PM."
- ]
+ ],
+ "errata": {
+  "written_at": "2026-09-27T08:09:36Z",
+  "receipt_sha256_before_errata": "8b28bf87f8da27aa5a73e36a4ede1b7707ee4e4b21f31b397f1de1197061897b",
+  "rule": "Append-only: every field recorded on 2026-09-25 is unchanged. tools[].adjudication holds the current task acceptance; the recorded quality_check and exact_comparison values stay as historical results.",
+  "preregistration_identity": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json records the pre-errata bytes above in receipt_sources as a historical source identity; the tool and task fields its reused tasks point to are unchanged.",
+  "review": "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md",
+  "task_acceptance_vocabulary": {
+   "partial": "Evidence exists, but it lacks a complete publicly reviewable result or baseline, or the failing run of the check that the discriminating-controls rule requires.",
+   "retracted_later": "A later check (the run's own verifier, a later receipt or this erratum) refuted or retracted the recorded pass; the recorded outcome stays as a historical result.",
+   "untested": "The recorded check was vacuous, so correctness is untested; observed invocation can remain.",
+   "unsupported": "The tool did not complete the task, and the recorded failure is accurate."
+  },
+  "items": [
+   {
+    "tools": [
+     "qmd"
+    ],
+    "finding": "The PASS answered from a wrong document; the 2026-09-26 README correction is now machine-readable in tools[4].adjudication.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-codex-20260926/receipt.json#/corrections_to_296/0"
+    ]
+   },
+   {
+    "tools": [
+     "repomix"
+    ],
+    "finding": "'count=47 PASS' is a false pass on an incomplete inventory (48 top-level functions; status_body missing). The E2 README recommended this erratum.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md",
+     "tests/test_token_e2e_receipt_checks.py::E1RepomixInventoryOracle"
+    ]
+   },
+   {
+    "tools": [
+     "ai-memory"
+    ],
+    "finding": "base_empty=True makes the check vacuous: correctness untested, invocation observed.",
+    "evidence": [
+     "docs/acceptance-evidence-policy.md"
+    ]
+   },
+   {
+    "tools": [
+     "*"
+    ],
+    "finding": "None of the sixteen checks recorded a failing run, so no row is more than partial.",
+    "evidence": [
+     "docs/acceptance-evidence-policy.md",
+     "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md"
+    ]
+   },
+   {
+    "scope": "aggregate",
+    "finding": "Supersedes the README sentence 'each subagent's answer passed its baseline check' and evidence_classes.subagent_tool_use: sixteen tools were exercised inside subagents. QMD and Repomix task passes were subsequently retracted, ai-memory's check was vacuous, and the remaining thirteen are partial, limited by retained evidence and the absence of recorded failing controls.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-20260925/README.md",
+     "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md"
+    ]
+   }
+  ]
+ }
 }
