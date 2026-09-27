@@ -79,8 +79,9 @@ def row(receipt, tool):
 def require_commit(revision):
     """The git executable, or skip when this checkout lacks Git or the pinned commit.
 
-    Same guard as tests/test_adoption_status.py RetainedEvidenceTests; CI's validate job
-    checks out full history (fetch-depth: 0), so the pinned commits are present there.
+    Modelled on the Git check in tests/test_adoption_status.py RetainedEvidenceTests, which skips
+    only when git or the Git checkout is missing; this guard adds the pinned-commit probe. CI's
+    validate job checks out full history (fetch-depth: 0), so the pinned commits are present there.
     """
     git = shutil.which("git")
     if git is None:

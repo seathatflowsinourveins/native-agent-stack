@@ -1116,7 +1116,7 @@
    },
    {
     "scope": "aggregate",
-    "finding": "Thirteen tools were exercised. RTK's pass was refuted by the verifier and Repomix's recorded FAIL is accurate; the other eleven are partial, including the six whose verifiers recorded failing controls, because the complete native outputs are retained only by hash in the private ledger.",
+    "finding": "Thirteen tools were exercised. RTK's pass was refuted by the verifier, and Repomix's recorded FAIL is accurate. The other eleven are partial, for three different reasons. Context Mode, jCodeMunch, QMD and ast-grep have no recorded failing run of their passing checks. Serena's definition check passed, and the recorded FAIL of its reference check is accurate: find_referencing_symbols missed 6 of 8 project-wide call sites (verifier-confirmed). The six whose verifiers recorded failing controls (Headroom, SocratiCode, ai-memory, TOON, Context Hub and MarkItDown) are partial because their complete native outputs are retained only by hash in the private ledger.",
     "evidence": [
      "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md",
      "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md"
