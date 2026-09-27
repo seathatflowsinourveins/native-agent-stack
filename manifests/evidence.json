@@ -3452,8 +3452,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "3f55d8d68f28a1d62601703794d6dd93698c9b86e26d1d6744684298a3c49cec",
-      "bytes": 2813
+      "sha256": "ac749af64d39dd080707ed32028ff68649b804290bb1e97900f2b081048e3ff1",
+      "bytes": 3107
     },
     {
       "path": ".gitleaks.toml",
@@ -35462,6 +35462,36 @@
       "bytes": 10192
     },
     {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
+      "sha256": "25d3a710ffd9e0d9b097fbfbc1d2c25005dc43b97e6a254100268fa0c07ef3c4",
+      "bytes": 51934
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md",
+      "sha256": "a8ee0e09ce001db21269f66dc5ec4a4aa39abc3020e86e37d610a4aa9236c5a4",
+      "bytes": 39612
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e",
+      "bytes": 84003
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
+      "bytes": 2969
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+      "sha256": "e04c1a08de610356e2f24cf8d1f59a70e8b630e093c93934cd03ab0a8091bee4",
+      "bytes": 133651
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/token-e2e-run.mjs",
+      "sha256": "6ca129d94d51c6c99c5a9430e2b7fb0d23b0919001acf789bf5d59d74c7cb828",
+      "bytes": 8099
+    },
+    {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
       "sha256": "6ee972a67a347a9d49b235cdb2a0a1a66ad38928aa4e35bbd764ca507076ee7f",
       "bytes": 21265
@@ -39075,6 +39105,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_token_e2e_preregistration.py",
+      "sha256": "cdd0815fe214667134c6c65a2a0ba0d12a87d8a821817ec5b28e6cfd0c327a46",
+      "bytes": 24774
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
