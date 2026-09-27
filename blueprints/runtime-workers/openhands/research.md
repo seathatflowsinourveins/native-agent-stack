@@ -56,6 +56,9 @@ and the SDK event/LLM/MCP implementations. README.md contains immutable links.
 SDK wheels were downloaded as source artifacts and their bytes verified against
 PyPI's SHA256; they were not installed or imported. The dependency requirements
 were exported with the installed uv 0.12.17 from the unchanged upstream uv.lock.
+Correction, 2026-09-27: the runtime lock security relock at the end of this file
+restricts the lock to linux x86_64 and upgrades four packages, so the lock is no
+longer that unchanged export.
 
 FastMCP 3.2.0 at 665514e19a78543709be85b4261153bbe98e882f confirms the
 `server_name_tool_name` namespace. QMD v2.8.3 source confirms QMD_CONFIG_DIR,
@@ -219,3 +222,130 @@ The evidence remains offline adapter/synthetic evidence. Full upstream acceptanc
 independent trace qualification, rootless filtering, installed imports and model
 behavior are not inferred from these tests. General anti-pattern promotion and
 evidence hash registration remain coordinator-owned.
+
+## Runtime lock security relock (2026-09-27)
+
+requirements.lock is now a **local integration lock for linux/amd64 only**:
+upstream v1.49.6's uv.lock, resolved for linux x86_64 with uv's `environments`
+setting, plus four security upgrades. It is no longer the unchanged upstream
+export. OSV-Scanner 2.6.0 reported 14 advisories in five packages, both in CI run
+36351247754 and locally with the same pinned binary on the previous lock. No
+upstream fix exists yet. v1.49.6 (published 2026-09-25 at fcc102a) is still the
+latest release, and main at 3311ba9eec5044f40ab5d0b3d7eddc9f7e1e2d14 pins the same
+five flagged versions and keeps the cryptography constraint described below.
+cryptography needs no upgrade: the restriction leaves only upstream's linux
+50.0.0, which fixes all three of its advisories. Returned outputs are retained in
+[evidence/relock-2026-09-27.txt](evidence/relock-2026-09-27.txt); its section F
+holds the final lock.
+
+The installed uv 0.12.17 reproduced the previous lock byte for byte in the
+unchanged upstream workspace, whose uv.lock matches the pinned SHA256:
+
+    uv export --frozen --format requirements.txt --no-header --no-annotate \
+      --package openhands-tools --no-emit-workspace
+
+That output equals the lock's first 2,856 lines; adding `--no-dev` gives the same
+bytes. The last four lines are appended from pins.json `wheels`, in file order,
+as `<name> @ <url> \` followed by `    --hash=sha256:<sha256>`. Together they give
+the previous SHA256, c4ca55604ea0bc85e74ccaa8b2c5bf9fa7b17cec35b830eda653025cb90ebd56.
+
+In a scratch copy of that workspace, one line was added to the existing
+`[tool.uv]` table of the root pyproject.toml; nothing else in the workspace
+changed:
+
+    environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+
+The pinned linux/amd64 image (pins.json `image.platform`) is the recipe's only
+install target. The setting and lockfile preferences follow
+[astral-sh/uv@0.12.17 docs/concepts/resolution.md:142-173 and 303-309](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/resolution.md#L142-L173).
+The relock uses the existing uv.lock as preferences. The workspace's relative
+`exclude-newer = "7 days"` would make an unpinned selection depend on the run
+time, so the upgrades are version-pinned:
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2
+
+The coordinator reproduced the relock builder's uv.lock from a fresh copy of the
+unchanged workspace with that line added: SHA256
+30e608b1fdb091db1609e8261a787020df12e0350911079cc2177c772a9ccffd, byte for byte,
+and `uv lock --check` exits 0. uv printed the four updates and
+`Updated cryptography v48.0.1, v50.0.0 -> v50.0.0`, which is the darwin x86_64
+fork leaving the resolved environment. It removed cython, macholib, pefile,
+pyobjc-framework-pubsub, pywin32 and pywin32-ctypes from uv.lock. The export and
+wheel append above then give SHA256
+02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394:
+
+| Package | Previous | New | Advisories (fixed in) |
+| --- | --- | --- | --- |
+| anyio | 4.11.0 | 4.14.2 | GHSA-82r6-8w77-94w6, GHSA-5p39-cfhj-2xmp (4.14.2) |
+| click | 8.1.8 | 8.5.0 | PYSEC-2026-2132 (8.3.3) |
+| cryptography | 48.0.1 for darwin x86_64, 50.0.0 elsewhere | 50.0.0 (the darwin line leaves the lock) | PYSEC-2026-3552 (50.0.0); PYSEC-2026-3553, PYSEC-2026-3554 (49.0.0) |
+| pypdf | 6.14.2 | 6.19.0 | PYSEC-2026-3655, PYSEC-2026-3656, PYSEC-2026-3912 (6.15.0); PYSEC-2026-3913 (6.16.0); PYSEC-2026-3910, PYSEC-2026-3911 (6.16.1) |
+| soupsieve | 2.8.4 | 2.9.2 | GHSA-gjv8-xp57-g29c, GHSA-j934-xhv5-fg8f (2.9.0) |
+
+A scratch classification checked every other change. It mapped each hash to its
+file through the upstream uv.lock and evaluated markers with packaging 26.3 for
+linux x86_64 under CPython and PyPy 3.12 to 3.15:
+
+- No other package changed version, and none was added.
+- Six entries were removed, and none applies on linux x86_64: colorama 0.4.6,
+  pywin32 311 and pywin32-ctypes 0.2.3 (win32), cryptography 48.0.1 (darwin
+  x86_64), pyobjc-framework-pubsub 11.1 (darwin) and cython 3.1.4
+  (`platform_system != 'darwin' and sys_platform == 'darwin'`).
+- The export adds `platform_machine == 'x86_64' and sys_platform == 'linux'` to
+  every exported marker, including those of the 330 same-version entries; none
+  of them changes linux x86_64 applicability. The 159 pyobjc entries remain: uv
+  keeps their upstream `platform_system == 'darwin'` term beside the Linux
+  marker, and the combined markers never hold there.
+- 1,694 hash lines were removed from 129 same-version entries. All are wheels for
+  other platforms: macOS, Windows, iOS, Android, and Linux on aarch64, armv7l,
+  i686, ppc64le, riscv64 and s390x. No sdist or linux x86_64 wheel hash was
+  removed, and none was added.
+
+anyio stops at 4.14.2 because 4.15.x requires typing_extensions>=4.16.0 below
+Python 3.15, and typing-extensions 4.15.0 stays locked. A dry run that also
+released typing-extensions selected anyio 4.15.1. soupsieve 2.10 was uploaded on
+2026-09-24, inside the seven-day window.
+
+The restriction replaces a constraint override. cryptography 48.0.1 existed only
+on the darwin x86_64 fork, which the image never installs, yet OSV-Scanner's
+`--no-resolve` requirements.txt scan still reported that marker-gated line. In
+the universal resolution, `uv lock --upgrade-package cryptography` printed
+`Updated cryptography v48.0.1, v50.0.0 -> v48.0.1` under pyproject.toml:18,
+`"cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'"`.
+The fork collapsed, which would downgrade Linux. That line stays unchanged and
+now falls outside the resolved environment. Deleting it was tried only in
+scratch and declined. An intermediate universal relock of the other four
+packages (SHA256 da0d550f1e03d42ef2d1f4fe31a608eb8abdb796ecb9354d30457875f2172d71)
+left the three cryptography advisories open; it is superseded, and its outputs
+stay in the evidence file. So is a five-package variant that also moved
+cryptography to 50.0.1 (uv.lock b3e8a6f4..., requirements.lock f215ac9f...;
+evidence sections C to E): the linux 50.0.0 already carries every fix.
+
+The consistency check used a Python 3.13.15 scratch venv and the
+install-container.sh sequence, with UV_NO_CONFIG=1:
+
+- build-requirements.lock with `--require-hashes --no-deps --only-binary :all:`
+  exited 0;
+- the runtime lock with `--require-hashes --no-deps --no-build-isolation` exited
+  0 (`Installed 175 packages`: anyio 4.14.2, click 8.5.0, cryptography 50.0.0,
+  pypdf 6.19.0, soupsieve 2.9.2); func-timeout 4.3.5 is its only sdist;
+- `uv pip check` exited 0 (`All installed packages are compatible`).
+
+A runtime-lock install with `--only-binary=:all:` exits 1, because PyPI has only
+sdists for func-timeout 4.3.x, as recorded above. Without UV_NO_CONFIG=1, step 1
+run inside the workspace exits 2: the workspace's `constraint-dependencies`
+(`starlette>=0.49.1`) is not a hashed `==` pin. The script's import check, run
+offline under bwrap (`--unshare-net`), printed `SDK/tools 1.49.6 imports passed;
+no model request`. These are host scratch checks. The image installation, model
+behavior and runtime paths through the upgraded packages remain unmeasured.
+
+Overturn conditions: return to the unchanged upstream export once an SDK release
+pins fixed versions; add linux aarch64 to `environments` if the recipe adds an
+arm64 image.
+
+| Proven issue | Correction |
+| --- | --- |
+| `UV_NO_CONFIG=1` also stops `uv lock` from reading the workspace pyproject.toml. Installed help: "Avoid discovering configuration files (`pyproject.toml`, `uv.toml`)". The first relock printed `Resolving despite existing lockfile due to removal of global exclude newer` and chose soupsieve 2.10 from inside the seven-day window. | Relock without it so `[tool.uv]` applies; `uv lock --check` on the unchanged workspace exits 0. Keep UV_NO_CONFIG=1 only for the `uv pip install` steps, as install-container.sh does. |
+| In the universal resolution, `--upgrade-package cryptography` collapsed the marker-split fork to the constrained 48.0.1. | Read every `Updated` and `Removed` line before accepting a relock. Resolve only the recipe's install environment with `environments` instead of deleting an upstream constraint, and classify every removed or re-marked line. |
+| The coordinator's decision to keep cryptography at 50.0.0 reached the relock builder after it had relocked five packages from an earlier instruction (evidence section C). | A decision that changes a brief goes out as one message naming what it replaces. The final lock was reproduced from the unchanged workspace before commit (evidence section F). |

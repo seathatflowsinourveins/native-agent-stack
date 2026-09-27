@@ -37,7 +37,10 @@ The source target at lines 570-576 has a
 different ENTRYPOINT. Do not assume the image contains the source-target venv.
 Request generation uses the separately installed SDK/tools wheels in the same
 image, with network disabled. [pins.json](pins.json) preserves the image, wheel
-and runtime lock hashes. No framework version changed in round 3.
+and runtime lock hashes. No framework version changed in round 3. The runtime
+lock is a linux/amd64 security relock of the upstream export with four
+dependency upgrades, reproduced from the unchanged upstream workspace
+([research.md](research.md#runtime-lock-security-relock-2026-09-27)).
 
 [install.sh](install.sh) installs the worker through the existing hash-required
 wheel/runtime locks and preinstalled hashed build tools. The install container
