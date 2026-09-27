@@ -242,6 +242,10 @@ GitHub-hosted macOS runner; see
    macOS, whose pin is still 2.3.2, see
    [ai-memory hook paths on macOS](platforms/macos-arm64.md#ai-memory-hook-paths-on-macos).
    `claude.settings.template.json` changed after `v2026.09.26.2` again: it sets `syncClaudeAiSkills` to `false` and `ENABLE_CLAUDEAI_MCP_SERVERS` to `"false"`, so Claude Code neither syncs the claude.ai account's skills nor loads its claude.ai MCP servers ([decision](../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)).
+   `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets
+   `OTEL_METRICS_INCLUDE_SESSION_ID` to `true` (Claude Code's default), so each
+   session gets its own Prometheus series
+   ([writer identity](../observability/collector/README.md#writer-identity-and-counter-integrity)).
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The rendered `codex.config.toml` keeps the source host's `trusted_hash`
    entries for the ai-memory commands in `~/.codex/hooks.json`, recorded before

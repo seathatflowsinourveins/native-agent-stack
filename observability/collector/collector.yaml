@@ -50,6 +50,10 @@ processors:
     check_interval: 1s
     limit_mib: 256
     spike_limit_mib: 64
+  # Claude Code sets session.id on every metric data point (OTEL_METRICS_INCLUDE_SESSION_ID, default true).
+  # Move it to a resource of its own, so a process that ran /clear (a new session.id) keeps separate streams.
+  groupbyattrs/session:
+    keys: [session.id]
   transform/sdk_receipt:
     error_mode: propagate
     log_statements:
@@ -88,10 +92,21 @@ processors:
     metric_statements:
       - context: resource
         statements:
+          # One writer per series. Concurrent cumulative Claude streams under one identity overwrite each other,
+          # and delta Codex points from several writers are dropped as out of order. A launcher-set writer id
+          # (OTEL_RESOURCE_ATTRIBUTES service.instance.id) is kept and made per session; else the session is the writer.
+          - set(attributes["service.instance.id"], Concat([attributes["service.instance.id"], attributes["session.id"]], "/")) where attributes["service.instance.id"] != nil and attributes["session.id"] != nil
+          - set(attributes["service.instance.id"], attributes["session.id"]) where attributes["service.instance.id"] == nil and attributes["session.id"] != nil
           - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "ecosystem.client.scope"])
       - context: scope
         statements:
           - keep_keys(attributes, [])
+      - context: metric
+        statements:
+          # Dropping an attribute that splits one writer's streams (agent.name, skill.name, mcp_server.name, decision,
+          # phase, ...) must add those streams together; keep_keys alone leaves same-identity duplicates that
+          # overwrite each other (cumulative) or are dropped as out of order (delta). Same allowlist as below.
+          - aggregate_on_attributes("sum", ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"]) where metric.type == METRIC_DATA_TYPE_SUM or metric.type == METRIC_DATA_TYPE_HISTOGRAM or metric.type == METRIC_DATA_TYPE_EXPONENTIAL_HISTOGRAM
       - context: datapoint
         statements:
           - set(resource.schema_url, "")
@@ -104,7 +119,7 @@ processors:
           - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"])
           - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
           - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
-  deltatocumulative:
+  delta_to_cumulative:
     max_stale: 1h
     max_streams: 10000
   batch:
@@ -156,7 +171,7 @@ service:
       exporters: [otlphttp/loki, file/events]
     metrics:
       receivers: [otlp]
-      processors: [memory_limiter, transform/privacy, deltatocumulative, batch]
+      processors: [memory_limiter, groupbyattrs/session, transform/privacy, delta_to_cumulative, batch]
       exporters: [prometheus]
     metrics/health:
       receivers: [http_check/ecosystem]

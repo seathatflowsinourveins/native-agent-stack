@@ -3512,8 +3512,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "5aa0b377740d0bf69691aad6f586321f5f5c37506398831e72ffcc32d58dd8b5",
-      "bytes": 38040
+      "sha256": "e0405c0203a264973be1ea92150b596a236736f9d3b0537727ef9496864d7b38",
+      "bytes": 38341
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3622,13 +3622,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "235d9284a3c47b6c8abf18347c4143897ee518b80e7adef592781d3c0b6d15cb",
-      "bytes": 15132
+      "sha256": "4e6e043d7065c0dc31ebf2993b75943909f049239a97a2404c53ac0cf91daa7e",
+      "bytes": 15412
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "3e5e052a161d4c35e5d1a827bd48d86fff3b11fce8884f86f44d2b88f2ab6bc5",
-      "bytes": 53033
+      "sha256": "1e0a17091bd62543b95dda9afab62ae79866658bb9fa25b77b1315eaafb29a5d",
+      "bytes": 53178
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3672,8 +3672,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "f3fc9e5b014655971952be44321c9c3ebd4fb81da5d4f95a69e43d59b2fad553",
-      "bytes": 8696
+      "sha256": "b8fdee5bdadb17c5f01f1b2df1c5c754f85c57f12b6deb5491ecb0592c1508d1",
+      "bytes": 8695
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -13522,6 +13522,11 @@
       "bytes": 18351
     },
     {
+      "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
+      "sha256": "6ed5991efc338f8aeeb6e5c4a958e5b10457adc1e415abf457e98f171a157b3c",
+      "bytes": 13667
+    },
+    {
       "path": "docs/decisions/2026-09-26-token-workflow-hardening.md",
       "sha256": "524f0542b684f225b95d4999a694a2b82b798a97cb7e78f84f87800894bab6b1",
       "bytes": 16124
@@ -13663,8 +13668,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "dd7395c0dbc4ecb68cb4e6bdc1ca99693d1c51b773b097d40d1e9e59f20c9372",
-      "bytes": 26107
+      "sha256": "30c6a0769637d7bde5d7f066aa557b10fd6c571a4bc47ac95ac206d6d660bea9",
+      "bytes": 29153
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -35237,6 +35242,71 @@
       "bytes": 1551
     },
     {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host-before-20260926.json",
+      "sha256": "bdc2feb61e01dd728d5a26603c14efeef66b34db9493d232729097e349bb4feb",
+      "bytes": 17546
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/apply.sh",
+      "sha256": "0f029a4f68da284ae893da8853a3bc7e5f433cdd9faf202d9ec784c6ac4d40e5",
+      "bytes": 28654
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/claude_setting.py",
+      "sha256": "2e8e3ae8d2291932b3b6d3615a512776c47bd0e210c0aa6cd8f2cfbaaeb0f022",
+      "bytes": 1933
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py",
+      "sha256": "0fc025d1a486924e5f0095160e8d458bfafe55b0dfd1ed8262108d64dfdfb900",
+      "bytes": 6630
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_prometheus.py",
+      "sha256": "9472b029834eb87f0d1074117c9b0b8572c757a9c6d28ccd626ed0d61f1fff45",
+      "bytes": 3358
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/prove.py",
+      "sha256": "178b356f5320524d6cb32ec3e72e2653a8f92c2e52ad89cc676ed9a2043d6399",
+      "bytes": 35122
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/prove.sh",
+      "sha256": "03d54cb3355a7a5ffbfdcf932e321e1903738c275c839012c50373bde9b9e281",
+      "bytes": 2093
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/rollback.sh",
+      "sha256": "7dc6d40ff7b525e8edb9ef46cb42d579e57b66f4df62d75f1598e24e0b30a38b",
+      "bytes": 6717
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/synthetic-ab-20260926.json",
+      "sha256": "1bb648f4df4e91c45052de2f4dcf59a6a4e50419c42c88cbca48a36006db1e4f",
+      "bytes": 5205
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/synthetic/check.py",
+      "sha256": "c2f952650ca765792cf591907bd7f583d2c45bcff592ac4b66a05e36a3ed61a4",
+      "bytes": 3851
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/synthetic/make_config.py",
+      "sha256": "472ae589eee4ca30067a8edc743b6289f53730256cefdb069256fafbbbc55639",
+      "bytes": 2416
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/synthetic/run.sh",
+      "sha256": "fe812a577bd9420d9d38eee57a90a98d7151a7464aaa75aa54076b70dfb8d8c7",
+      "bytes": 3622
+    },
+    {
+      "path": "evidence/artifacts/telemetry-writer-identity-20260926/synthetic/send.py",
+      "sha256": "67c95ef28f762e5e32ea7e91b1e0bdb0dba3e676eeda65c0cfd0e8631fb6a20e",
+      "bytes": 10192
+    },
+    {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
       "sha256": "6ee972a67a347a9d49b235cdb2a0a1a66ad38928aa4e35bbd764ca507076ee7f",
       "bytes": 21265
@@ -37373,13 +37443,13 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "29bb61f67614f52e9759b958bb35556f34fe4ef5ad49f0fd7e1d30a525e90646",
-      "bytes": 14744
+      "sha256": "cd8e1f6060c3d6cdecb2dbb5773a91ac263bcfa93414359571ace02d892fe0c8",
+      "bytes": 15297
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "d56f2dbaff653907c9ae63ba2a6329337b32f7a38f6d2b4dae87d76c6ab5effc",
-      "bytes": 22150
+      "sha256": "1c2a3becc592aaaa38dcbb2f37663850703ab75ffe6c3fb6c78e86622632839e",
+      "bytes": 24197
     },
     {
       "path": "observability/backends/broker-path-rules-receipt.json",
@@ -37393,8 +37463,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "91fee36a38b1d11d9344169ce59ec7303aa50e5793ef7f4cc55e94017432de24",
-      "bytes": 8894
+      "sha256": "74fc5793c7c13953986f9d95a0de923399d07b95ea78771ff8b6999f6442a227",
+      "bytes": 9207
     },
     {
       "path": "observability/backends/install.py",
@@ -37428,8 +37498,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "e09c4d5d9148a50b925fa8d5bf63efa990e51c8e3ffd738bdea6496ccfe96518",
-      "bytes": 10027
+      "sha256": "5239e1f0d1700eee4ce60d6b9a50dd1dc49e347e9f71d21bec800e523f5b8127",
+      "bytes": 16719
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -37463,23 +37533,28 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "3791486b1bc1a006cb02ae4c894d4c61d5e97a238887a885cb9c45b3fcc88416",
-      "bytes": 9821
+      "sha256": "25583ba47d5919759f569cc130c31374707dcfb992ed7faf692e620f4ada4947",
+      "bytes": 12864
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
-      "sha256": "4c41e85e2cb3cc0aabed4776f19b6e7590625944d41fcd909124f9046b70ce25",
-      "bytes": 1147
+      "sha256": "50cbfed76c52c803cea60dfa6f5985a1a8778bd0967248fd7cda2e22bea7b4db",
+      "bytes": 1825
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "4a63f6dadfaad5ac4609bbb4a48d7eba04e094e2031ce05a0eae09e4ac513702",
-      "bytes": 6391
+      "sha256": "28623b6414a1f7b6cb082f60e50741428a4adfadc314c1afcdb7ca79e607a3c8",
+      "bytes": 17288
     },
     {
       "path": "observability/collector/claude-settings.json.example",
-      "sha256": "8515745238ffa5abf9078e2527b08f9daccea8d04fbe956f4d9207dee5427a69",
-      "bytes": 776
+      "sha256": "65f26b5fb516dc4e21cf8361b8021c2700e9dd883b76690a2de5531a34754020",
+      "bytes": 775
+    },
+    {
+      "path": "observability/collector/codex-identity-launcher.sh.example",
+      "sha256": "fc52db22a3a0176291427fb687b8bbfebc02bae0dada0b185a08fb7b69916c9d",
+      "bytes": 3874
     },
     {
       "path": "observability/collector/codex.toml.example",
@@ -37488,8 +37563,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "c6aa902c52bd61677c5b964cc7d7db8e16e25bbca4e34671efa8a7a70977a0d8",
-      "bytes": 7545
+      "sha256": "7308ec8f33a3fb339e20f309b699477ee454a2da9d0398099e9c50b6c23dd7e6",
+      "bytes": 9316
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -37553,8 +37628,8 @@
     },
     {
       "path": "observability/grand-dashboard/render.py",
-      "sha256": "100539749fe53e337c351680cc76c9f322c2e30032f623c811f0c09939614d82",
-      "bytes": 8129
+      "sha256": "9d5ebb8b6c9f9f532603d2b112905125a143e039b7d9dcc33a396b7596590772",
+      "bytes": 8173
     },
     {
       "path": "observability/grand-dashboard/state.json",
@@ -37573,8 +37648,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "9aa189f6178c21734673b35d36b3578fd820a14da4923e9707c631a8cff84548",
-      "bytes": 16217
+      "sha256": "0ced49d094ec8ab7737da7ef008216b053ee8c2622c82508966f854b326786f8",
+      "bytes": 16655
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -37603,8 +37678,8 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "067a0db24b468d0540fcc78df92b175a45a7ef5c5d15d95d8023cba6ad43bd97",
-      "bytes": 18483
+      "sha256": "0a0bf07fa2a8bacbfc8c5de3e7f615e776625167c976db81db639621ee6945f8",
+      "bytes": 18302
     },
     {
       "path": "observability/native-data/snapshot.py",
@@ -38263,8 +38338,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "cfb03d77270fbe02be0993e08bfa2e59972a119aec5194c50bd6d2ffb02679a0",
-      "bytes": 13618
+      "sha256": "78176c87eb7e0c977289272efcadbb8eb348d486f6043ca8f70e075eb4d4ccff",
+      "bytes": 14161
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
@@ -38403,8 +38478,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "d402fed80b472c8b29feb7caf7a50bea5a232891d02d0f47988007e5807b70eb",
-      "bytes": 38881
+      "sha256": "7696c21ef08a5a0fde82c67cebe928d7efe02e0e0fa5f465dd28f4b809157b4e",
+      "bytes": 40258
     },
     {
       "path": "tests/test_native_faults_min.py",
@@ -38453,8 +38528,18 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "e3e1a3330829fe62cee922ebcf0a8a47816a0b4160f0da03b83c0667a7429084",
-      "bytes": 16141
+      "sha256": "944fb543cbb1ba5025a4d1df2a4ffd84a3323f3f67b591bb83a8bdd796fc1a0e",
+      "bytes": 16142
+    },
+    {
+      "path": "tests/test_observability_writer_identity.py",
+      "sha256": "ef64ba46907134593f0c05ea9376820f1524ccffc465396746c5a329920a91f4",
+      "bytes": 30907
+    },
+    {
+      "path": "tests/test_observability_writer_identity_host.py",
+      "sha256": "ed753ba402f5795c0d15d1e8e58430bb8fb71471f0a30d7650e6ddf196417c4a",
+      "bytes": 61935
     },
     {
       "path": "tests/test_offhost_app_state.py",

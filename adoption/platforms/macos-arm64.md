@@ -79,6 +79,8 @@ release, the note is history and the step is in your checkout (`test -e
    scope, which main leaves to each project.
    `adoption/templates/claude.settings.template.json` changed after `v2026.09.25.2`: its eight
    ai-memory hook commands name `tools/ai-memory-2.4.1`, where the tag's name `tools/ai-memory-2.3.2`.
+   It also changed after `v2026.09.26.2`: `OTEL_METRICS_INCLUDE_SESSION_ID` is
+   `true`, so each Claude session gets its own Prometheus series.
    Before using the rendered settings, follow
    [ai-memory hook paths on macOS](#ai-memory-hook-paths-on-macos).
    The template changed after `v2026.09.26.2` again: it turns off the claude.ai skill sync (`syncClaudeAiSkills`) and the claude.ai MCP servers (`ENABLE_CLAUDEAI_MCP_SERVERS`) ([decision](../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)).
