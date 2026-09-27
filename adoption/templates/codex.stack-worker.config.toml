@@ -38,7 +38,7 @@ CHUB_FEEDBACK = "0"
 # Partial tables retain user commands; profile 21 < project 25 < -c 30 (source in header).
 # required = true: session start waits for the server and fails if it cannot start, so a worker never runs
 # without these tools. Field: config/src/mcp_types.rs L233-235; the wait: codex-mcp/src/connection_manager/
-# required.rs L15-59, awaited with `?` at core/src/session/session.rs L1860-1866 (all at rust-v0.157.1).
+# required.rs L15-59, awaited with `?` at core/src/session/session.rs L1860-1867 (all at rust-v0.157.1).
 # https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/mcp_types.rs#L233-L235
 # https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/required.rs#L15-L59
 # Without it, a server still starting one shared 1 s grace after the first tool-list build

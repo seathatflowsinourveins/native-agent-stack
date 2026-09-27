@@ -178,7 +178,7 @@ if argv[:2] == ["mcp", "list"]:
     print(json.dumps([{"name": n} for n in effective().get("mcp_servers", {})])); sys.exit(0)
 if argv[:2] == ["debug", "prompt-input"]:
     # Session start waits for every enabled server marked required and fails when one cannot start
-    # (codex-mcp/src/connection_manager/required.rs L15-59, core/src/session/session.rs L1860-1866); the message is
+    # (codex-mcp/src/connection_manager/required.rs L15-59, core/src/session/session.rs L1860-1867); the message is
     # the one real codex 0.157.1 prints. Here a server can start when it has a url or an executable command.
     failed = [f"{name}: No such file or directory (os error 2)"
               for name, table in sorted(effective().get("mcp_servers", {}).items())
@@ -254,37 +254,65 @@ while True:
 '''
 
 # Runs inside the isolation wrapper, so the fake endpoint and codex share one loopback. It serves a fake Responses
-# endpoint, runs ARGV (each "{BASE_URL}" replaced) and records when each request arrived, from codex's start, and
-# whether it carried the exec tool's deferred-tool guidance. The stream is the one openai/codex rust-v0.157.1 builds
-# for its own tests in core/tests/common/responses.rs: sse() L717-730, ev_response_created L748-755,
+# endpoint, runs ARGV (each "{BASE_URL}" replaced) and records, for each request, when it arrived (from codex's
+# start), whether it carried the exec tool's deferred-tool guidance, and the tool names an earlier `exec` call listed.
+# Its first answer calls code mode's `exec` with CODE, which lists ALL_TOOLS by name; every later answer is a plain
+# "done" message. That is how openai/codex rust-v0.157.1 inspects a turn's tools in its own tests:
+# core/tests/suite/code_mode.rs run_code_mode_turn_with_builder L264-293 and
+# code_mode_exports_all_tools_metadata_for_namespaced_mcp_tools L7133-7175, read back from the next request's
+# custom_tool_call_output as custom_tool_output_last_non_empty_text (L214-229) does. The streams are the ones
+# core/tests/common/responses.rs builds: sse() L717-730, ev_response_created L748-755, ev_custom_tool_call L975-985,
 # ev_assistant_message L785-795, ev_completed L737-745.
 RESPONSES_DRIVER = r'''import http.server, json, os, signal, subprocess, sys, threading, time
 OUT, ARGV = sys.argv[1], json.loads(sys.argv[2])
 GUIDANCE = b"Some deferred nested tools may be omitted"
-EVENTS = [
-    {"type": "response.created", "response": {"id": "resp-fixture"}},
-    {"type": "response.output_item.done", "item": {"type": "message", "role": "assistant", "id": "msg-fixture",
-                                                     "content": [{"type": "output_text", "text": "done"}]}},
-    {"type": "response.completed", "response": {"id": "resp-fixture", "usage": {
-        "input_tokens": 0, "input_tokens_details": None, "output_tokens": 0, "output_tokens_details": None,
-        "total_tokens": 0}}},
-]
-STREAM = "".join("event: %s\ndata: %s\n\n" % (event["type"], json.dumps(event)) for event in EVENTS).encode()
+CODE = "text(JSON.stringify(ALL_TOOLS.map(({ name }) => name)));"  # names no tool: every listed name came from Codex
+USAGE = {"input_tokens": 0, "input_tokens_details": None, "output_tokens": 0, "output_tokens_details": None,
+         "total_tokens": 0}
+
+def stream(response_id, item):
+    events = [{"type": "response.created", "response": {"id": response_id}},
+              {"type": "response.output_item.done", "item": item},
+              {"type": "response.completed", "response": {"id": response_id, "usage": USAGE}}]
+    return "".join("event: %s\ndata: %s\n\n" % (event["type"], json.dumps(event)) for event in events).encode()
+
+EXEC = stream("resp-exec", {"type": "custom_tool_call", "call_id": "call-1", "name": "exec", "input": CODE})
+DONE = stream("resp-fixture", {"type": "message", "role": "assistant", "id": "msg-fixture",
+                               "content": [{"type": "output_text", "text": "done"}]})
 REQUESTS, STARTED = [], [0.0]
+
+def listed_tools(raw):
+    """The names in this request's custom_tool_call_output for call-1 (its last non-empty text), or None."""
+    try:
+        items = json.loads(raw).get("input") or []
+    except ValueError:
+        return None
+    for item in items:
+        if isinstance(item, dict) and item.get("type") == "custom_tool_call_output" and item.get("call_id") == "call-1":
+            output = item.get("output")
+            parts = [output] if isinstance(output, str) else [part.get("text") or "" for part in output or []]
+            parts = [part for part in parts if part.strip()]
+            try:
+                return json.loads(parts[-1]) if parts else None
+            except ValueError:
+                return None
+    return None
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+        first = not any(request["path"].endswith("/responses") for request in REQUESTS)
         REQUESTS.append({"path": self.path, "t": round(time.monotonic() - STARTED[0], 2),
-                         "deferred_tool_guidance": GUIDANCE in raw})
+                         "deferred_tool_guidance": GUIDANCE in raw, "listed_tools": listed_tools(raw)})
         if not self.path.endswith("/responses"):
             self.send_error(404)
             return
+        body = EXEC if first else DONE
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
-        self.send_header("Content-Length", str(len(STREAM)))
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(STREAM)
+        self.wfile.write(body)
 
     def do_GET(self):
         self.send_error(404)
@@ -415,7 +443,7 @@ class TemplateTests(unittest.TestCase):
         # core/config.schema.json; codex-mcp/src/rmcp_client.rs:103 defaults to 30 s.
         # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
         # required = true (config/src/mcp_types.rs:233-235) makes session start wait for the server and fail when it
-        # cannot start (codex-mcp/src/connection_manager/required.rs:15-59, core/src/session/session.rs:1860-1866).
+        # cannot start (codex-mcp/src/connection_manager/required.rs:15-59, core/src/session/session.rs:1860-1867).
         # Without it a server still starting after the shared 1 s grace (codex-mcp/src/mcp/mod.rs:195) is left out of
         # the first request (codex-mcp/src/connection_manager/tool_catalog.rs:251-277).
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
@@ -516,11 +544,12 @@ class TemplateTests(unittest.TestCase):
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
-        # home writes the route itself. Every model, provider and feature key it writes must equal the profile's, or
-        # one of them drifted. Its config.toml has no env_key_instructions, key filter or web_search: web_search =
-        # "live" comes from the stack-worker profile and the runner's -c flag, and without the filter a real key in
-        # the sweep's environment reaches the model's commands (recipes/README.md, "Codex through OmniRoute"). No
-        # assertion here pins those absences, so the sweep lane can add the filter without breaking this test.
+        # home writes the route itself. Every model, provider, feature and key-filter setting it writes must equal the
+        # profile's, or one of them drifted. Since #393 its config.toml writes the profile's
+        # [shell_environment_policy.filters] (build_args.py stage_lane_home), which keeps a real key in the sweep's
+        # environment out of the model's commands (recipes/README.md, "Codex through OmniRoute"). It has no
+        # env_key_instructions or web_search: web_search = "live" comes from the stack-worker profile and the runner's
+        # -c flag. No assertion here pins those two absences.
         spec = importlib.util.spec_from_file_location(
             "landscape_sweep_build_args_for_lane_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
         build_args = importlib.util.module_from_spec(spec)
@@ -543,6 +572,7 @@ class TemplateTests(unittest.TestCase):
         for key, value in staged["model_providers"]["omniroute"].items():
             self.assertEqual(value, provider.get(key), f"model_providers.omniroute.{key}")
         self.assertEqual(staged["features"], profile["features"])
+        self.assertEqual(staged.get("shell_environment_policy"), profile["shell_environment_policy"])
         self.assertEqual(build_args.OMNIROUTE_KEY_ENV, provider["env_key"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])
@@ -1733,11 +1763,14 @@ class CodexIntegrationTests(unittest.TestCase):
         # first tool-list build (codex-mcp/src/mcp/mod.rs L195) and is then left out of that request
         # (codex-mcp/src/connection_manager/tool_catalog.rs L251-277), and a custom provider has no websocket prewarm
         # to hide a slower start (core/src/client.rs L1020-1028, model-provider-info/src/lib.rs L190-192). Here both
-        # servers answer `initialize` after `delay` s and a fake Responses endpoint on loopback records the first
-        # request. gpt-6-astra runs in code mode, where MCP tools are deferred nested tools of `exec`, so their
-        # presence shows as the guidance Codex adds only when deferred tools exist
-        # (code-mode-protocol/src/description.rs L15 and L291-293). The relaxed case is the control.
+        # servers answer `initialize` after `delay` s and a fake Responses endpoint on loopback records each request.
+        # gpt-6-astra runs in code mode, where MCP tools are deferred nested tools of `exec`: the first request names
+        # none of them and carries only the guidance Codex adds when deferred tools exist
+        # (code-mode-protocol/src/description.rs L15 and L291-293). So the endpoint answers it with an `exec` call that
+        # lists ALL_TOOLS by name (RESPONSES_DRIVER), and the second request carries the names that first turn saw.
+        # The relaxed case is the control.
         delay = 5
+        mcp_tools = {"mcp__serena__fixture_serena", "mcp__codebase_memory__fixture_codebase_memory"}
         profile = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
         cases = {"profile": [], "relaxed": lane.relaxed_required_flags(),
                  "cannot start": ["-c", 'mcp_servers.serena.command="/bin/false"', "-c", "mcp_servers.serena.args=[]"]}
@@ -1777,16 +1810,23 @@ class CodexIntegrationTests(unittest.TestCase):
                 results[label] = json.loads(out.read_text())
         for label, result in results.items():
             result["responses"] = [request for request in result["requests"] if request["path"].endswith("/responses")]
-        with self.subTest(case="profile"):  # the first request waits for both servers and carries their tools
+            # the names the first turn's exec call listed, carried by the second request
+            result["listed"] = set((result["responses"][1:2] or [{}])[0].get("listed_tools") or [])
+        with self.subTest(case="profile"):  # the first request waits for both servers; that turn lists both tools
             result = results["profile"]
             self.assertEqual(result["exit"], 0, result["stderr"][-400:])
             self.assertGreaterEqual(result["responses"][0]["t"], delay)
             self.assertTrue(result["responses"][0]["deferred_tool_guidance"])
+            self.assertLessEqual(mcp_tools, result["listed"])
         with self.subTest(case="relaxed"):  # the control: the first request leaves after the grace, without them
             result = results["relaxed"]
             self.assertEqual(result["exit"], 0, result["stderr"][-400:])
             self.assertLess(result["responses"][0]["t"], delay)
             self.assertFalse(result["responses"][0]["deferred_tool_guidance"])
+            self.assertTrue(result["listed"])  # the exec call ran and listed the built-in tools
+            self.assertFalse(mcp_tools & result["listed"])
+        with self.subTest(case="difference"):  # only the two servers' tools tell the two first turns apart
+            self.assertEqual(results["profile"]["listed"] ^ results["relaxed"]["listed"], mcp_tools)
         with self.subTest(case="cannot start"):  # the run stops at session start, before any request
             result = results["cannot start"]
             self.assertNotIn(result["exit"], (0, "timeout"), result["stderr"][-400:])

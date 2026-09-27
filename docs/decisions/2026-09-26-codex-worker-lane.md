@@ -716,7 +716,7 @@ in the same turn. The source explains it:
 - Every enabled server starts in the background, and a session start waits only for servers marked `required`
   ([`connection_manager.rs` L246-251](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager.rs#L246-L251);
   [`required.rs` L15-59](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/required.rs#L15-L59),
-  called at `core/src/session/mcp_runtime.rs` L148 and awaited with `?` at `core/src/session/session.rs` L1860-1866).
+  called at `core/src/session/mcp_runtime.rs` L148 and awaited with `?` at `core/src/session/session.rs` L1860-1867).
 - Each model request rebuilds the tool list. A server that is not required and is still starting gets one shared
   grace from the first build, 1 s by default
   ([`mcp/mod.rs` L195](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/mcp/mod.rs#L195)),
@@ -729,7 +729,12 @@ in the same turn. The source explains it:
   L198-208, `core/src/client.rs` L1020-1028). The native route hides the race by timing; the gateway route does not.
 - A handshake probe of the installed servers from this worktree (stdio `initialize` and `tools/list`, not a Codex
   run): serena answered `initialize` in 1.53-2.24 s (24 tools), codebase-memory in 1.20-1.25 s (17 tools), three runs
-  each. Both exceed the grace and fit the 60 s allowance.
+  each, each timed from that server's own launch. The grace ends 1 s after Codex's first tool-list build instead
+  ([`tool_catalog.rs` L252-258](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs#L252-L258)),
+  and in the race test's two failing-first runs below (fixture servers, template without `required`) the first
+  request left 1.63 s and 1.69 s after `codex` started. Serena's slower starts (up to 2.24 s) fall past that point. These runs do not
+  show codebase-memory's 1.20-1.25 s missing it; that it was missing on the gateway route rests on the relayed peer
+  measurement. Both fit the 60 s allowance.
 
 **Decision.**
 1. The worker profile's partial `[mcp_servers.serena]` and `[mcp_servers.codebase-memory]` tables gain
@@ -750,21 +755,32 @@ in the same turn. The source explains it:
    wait. Its staging check already accepts partial tables for servers the rendered host config defines.
 
 **Evidence, 2026-09-27, codex-cli 0.157.1 on the workstation.** Every unittest run set
-`TMPDIR=/var/tmp/claude-codex-startup`; each control failed before its change:
+`TMPDIR=/var/tmp/claude-codex-startup`, and each check ran before its change as well as after. The structural row's
+before run shows its template assertion discriminates; the two native rows' before runs are the behavioural
+failing-first evidence; the synthetic row's before run failed only because the helpers did not exist yet:
 
 | Check, in `tests/test_codex_worker_lane.py` | Class | Before | After |
 | --- | --- | --- | --- |
 | `TemplateTests.test_worker_startup_timeouts_layer_over_user_servers` | structural | template without `required`: exit 1, `Ran 1 test`, `FAILED (failures=3)` | exit 0, `Ran 12 tests` (`TemplateTests`), `OK` |
-| `CodexIntegrationTests.test_required_servers_start_before_the_first_request_on_a_custom_provider` | native integration, synthetic inputs | template without `required`: exit 1, `FAILED (failures=2)`; first request at 1.63 s, not after the servers' 5 s, and a serena that cannot start did not stop the run (exit 0) | exit 0, in the class run below |
-| `CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback` | native integration, synthetic inputs | script without the relaxation: exit 1, `FAILED (failures=1)`; the rehearsal failed with "required MCP servers failed to initialize: codebase-memory: handshaking with MCP server failed: connection closed: initialize response" | exit 0, `Ran 1 test`, `OK` |
-| `ApplyFlowTests`, `RequiredStartTests` | synthetic | script without the helpers: exit 1, `Ran 21 tests`, `FAILED (errors=3)` | exit 0, `Ran 21 tests`, `OK` |
+| `CodexIntegrationTests.test_required_servers_start_before_the_first_request_on_a_custom_provider` | native integration, synthetic inputs | template without `required`: exit 1, `FAILED (failures=2)`; first request at 1.63 s, not after the servers' 5 s, and a serena that cannot start did not stop the run (exit 0). With the strengthened check (below), on a copy of the tree whose template lacks the two `required` lines: exit 1, `FAILED (failures=3)`; first request at 1.69 s, the first turn's tool list lacked `mcp__serena__fixture_serena` and `mcp__codebase_memory__fixture_codebase_memory`, so it did not differ from the control's, and the serena that cannot start again did not stop the run | exit 0, `Ran 1 test`, `OK`, and in the class run below |
+| `CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback` | native integration, synthetic inputs | script without the relaxation: exit 1, `FAILED (failures=1)`; the dry run's rehearsal, under the real codex, failed with "required MCP servers failed to initialize: codebase-memory: handshaking with MCP server failed: connection closed: initialize response". This is the behavioural failing-first evidence for the relaxation. | exit 0, `Ran 1 test`, `OK` |
+| `ApplyFlowTests`, `RequiredStartTests` | synthetic | script without the helpers: exit 1, `Ran 21 tests`, `FAILED (errors=3)`, all three `AttributeError` for the missing `required_servers`, `relaxed_required_flags` and `required_start_failures`: absent code, not a behavioural failure | exit 0, `Ran 21 tests`, `OK` |
 
 - The race test runs the real codex under `bwrap --unshare-net` with scratch homes, fixture stdio MCP servers that
   answer `initialize` after 5 s, and a fake Responses endpoint on loopback; no sign-in, gateway, model or real server.
-  `gpt-6-astra` runs in code mode, where MCP tools are deferred nested tools, so their presence is the guidance Codex
-  adds only when deferred tools exist (`code-mode-protocol/src/description.rs` L15 and L291-293). With the profile the
-  first request left after 5 s with that guidance; with `required` relaxed (the control) it left before 5 s without
-  it; with serena unable to start, the run exited non-zero before any request.
+  `gpt-6-astra` runs in code mode, where MCP tools are deferred nested tools: the first request names none of them and
+  carries only the guidance Codex adds when deferred tools exist (`code-mode-protocol/src/description.rs` L15 and
+  L291-293), which shows that at least one deferred tool is present, not which. So the endpoint answers the first
+  request with a code-mode `exec` call whose script lists `ALL_TOOLS` by name and names no tool itself, and the
+  second request carries that list in its `custom_tool_call_output`. This follows upstream's own code-mode tests at
+  `rust-v0.157.1`: `core/tests/suite/code_mode.rs` `run_code_mode_turn_with_builder` (L264-293) and
+  `code_mode_exports_all_tools_metadata_for_namespaced_mcp_tools` (L7133-7175), with `ev_custom_tool_call` from
+  `core/tests/common/responses.rs` (L975-985). With the profile, the first request left after 5 s with the guidance
+  and the first turn listed `mcp__serena__fixture_serena` and `mcp__codebase_memory__fixture_codebase_memory`. With
+  `required` relaxed (the control), it left before 5 s without the guidance, and the first turn listed only the
+  built-in tools. The two lists differ by exactly those two names. With serena unable to start, the run exited
+  non-zero before any request. The check is on the first turn's tools as `exec` sees them; the first request's
+  body itself names no MCP tool.
 - Three older native tests registered the two servers as `/bin/false` or a stub and failed once the template changed
   (`FAILED (failures=3)`); they now register fixture servers. `NAS_CODEX_INTEGRATION=1 python3 -m unittest -v
   tests.test_codex_worker_lane.CodexIntegrationTests`: exit 0, `Ran 9 tests`, `OK`.
@@ -809,4 +825,24 @@ in the same turn. The source explains it:
 - The workstation's installed `stack-worker.config.toml` predates this template, so the dry run and the apply refuse
   it ("exists and differs from the template") and never overwrite it. The host step, after merge and in a quiet
   window with no Codex process: move that file aside privately, run the dry run, then apply.
-- **Unchanged upstream tests, live provider or model runs, gateway runs and token measurements: none.**
+- **Unchanged upstream tests: not run.** The relevant tests at `rust-v0.157.1` (commit `36650394`):
+  - `core/tests/suite/mcp_optional_startup_grace.rs` L40 `optional_mcp_startup_grace_controls_initial_turn_tool_catalog`
+    (four cases: a custom grace omits a pending server and admits a ready one; a zero grace waits for server start-up
+    and respects the start-up timeout);
+  - `codex-mcp/src/connection_manager_tests.rs` L2871
+    `capture_binding_skips_pending_optional_servers_after_configured_shared_startup_grace`, L3027
+    `capture_binding_waits_for_optional_startup_when_shared_grace_is_disabled` and L3120
+    `capture_binding_shares_optional_startup_grace_across_connection_sets`;
+  - `core/tests/suite/managed_threads_tests.rs` L30 `dropping_startup_cleans_up_while_required_mcp_is_stalled`
+    (start-up waits for a stalled `required` server);
+  - `exec/tests/suite/mcp_required_exit.rs` L9 `exits_non_zero_when_required_mcp_server_fails_to_initialize`
+    (`codex exec` exits non-zero with "required MCP servers failed to initialize: <name>").
+
+  The documented invocation is `just test -p codex-core`, `-p codex-mcp` or `-p codex-exec` with the test name as a
+  filter (upstream `AGENTS.md` L66-67; the `justfile` recipe, L87-88, runs `cargo nextest run --no-fail-fast`), on
+  the Rust 1.95.0 that `codex-rs/rust-toolchain.toml` pins. This host has no Rust toolchain: `cargo`, `rustc`,
+  `rustup`, `just` and `cargo-nextest` are not on `PATH` and `~/.rustup` is empty (probe, 2026-09-27), and none was
+  installed for this. Two of the tests skip without network (`skip_if_no_network!`, `mcp_optional_startup_grace.rs`
+  L43 and `managed_threads_tests.rs` L31), so a run has to record its skips. The race test above is our local
+  integration check, not a substitute for them.
+- **Live provider or model runs, gateway runs and token measurements: none.**
