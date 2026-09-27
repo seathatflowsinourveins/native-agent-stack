@@ -13813,8 +13813,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "ecc1967ff6ad96b4e1cdfb3871e46d49b800ccb7338e114749ca3486e1f1b061",
-      "bytes": 39216
+      "sha256": "29228c5daf220fb390d6da4771c364c4db744b662dc54e15533f973eed0fbedf",
+      "bytes": 39459
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
@@ -13868,8 +13868,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "fa158f90174868c3c57165a82db08c52fcfc83859f4d80125ed1c6aa88a54d89",
-      "bytes": 27671
+      "sha256": "016dc2dc219efc002b92acef5c63524a84dfa7dd83b6e467f19577f16871adbc",
+      "bytes": 34082
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
