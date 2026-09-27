@@ -3,10 +3,27 @@ model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 mcp_oauth_credentials_store = "file"
+# Live search in every sandbox. Without this key a read-only or workspace-write sandbox searches Codex's cached index
+# only, and only full access picks live (codex-rs/core/src/config/mod.rs L2659-2670 and L3050-3094 at rust-v0.157.1;
+# docs/harness-defaults.md, row 2026-09-26). A lane that must not browse passes -c web_search="disabled".
+web_search = "live"
+# The client is pinned (manifests/stack.json; evidence/receipts/codex-01571-qualification-20260926.json), so Codex
+# neither checks for updates nor prompts about them at startup: "Set to `false` only if your Codex updates are
+# centrally managed" (codex-rs/config/src/config_toml.rs L520-523).
+check_for_update_on_startup = false
 
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
+# A child whose spawn call names no effort otherwise keeps the parent's, `ultra` above, which for gpt-6-astra sends
+# xhigh and turns on proactive delegation in the child too. With this default it runs at max and spawns only when
+# asked (codex-rs/core/src/agent/child_config.rs L196-250; core/src/session/multi_agents.rs L77-111). Effort alone
+# keeps the parent's model; a default_subagent_model without an effort would give that model's catalog default, `low`
+# for gpt-6-astra. agents.max_depth is "Ignored by V2" (codex-rs/config/src/config_toml.rs L719-720) and gpt-6-astra
+# is a V2 model (models-manager/models.json), so nothing caps nesting depth here; max_concurrent_threads_per_session
+# still caps concurrent children at 3: V2 counts the root thread, adds one and subtracts it again
+# (core/src/config/mod.rs L2733-2746 and L1591-1605).
+default_subagent_reasoning_effort = "max"
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local
 # .codex/config.toml (docs/decisions/2026-09-25-codex-mcp-scope.md). serena and socraticode take no
@@ -26,6 +43,12 @@ startup_timeout_sec = 60
 RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 
+# Registered is not callable under approval_policy = "never". A tool without MCP annotations needs approval in Codex's
+# default mode, and a never policy turns that into "MCP tool call requires approval, but approval policy is never"
+# (codex-rs/core/src/mcp_tool_call.rs L2436-2466 and L1610-1614 at rust-v0.157.1). ai-memory, SocratiCode and
+# Headroom declare none, so every call to them is refused unless configuration approves it: the stack-worker profile
+# (codex.stack-worker.config.toml) approves their read tools for workers, and sessions without that profile keep the
+# refusals (docs/decisions/2026-09-26-codex-worker-lane.md, decision 5).
 [mcp_servers.ai-memory]
 url = "http://${AI_MEMORY_URL}/mcp"
 
@@ -48,6 +71,9 @@ EMBEDDING_QUERY_PREFIX = "query: "
 EMBEDDING_DOCUMENT_PREFIX = "passage: "
 EMBEDDING_DOCUMENT_INCLUDE_PATH = "true"
 RESPECT_GITIGNORE = "true"
+# SocratiCode's own default: files and directories whose names start with "." are not indexed (README.md L1579 at
+# v1.14.0, the same at v1.15.0), so .github/, .claude/, .codex/ and dotfiles never come back from codebase_search.
+# Read those files directly; indexing them is a separate, measured change of scope.
 INCLUDE_DOT_FILES = "false"
 SOCRATICODE_WATCHER = "auto"
 SEARCH_DEFAULT_LIMIT = "3"
@@ -97,19 +123,11 @@ RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 CONTEXT_MODE_PLATFORM = "codex"
 
-[projects."${HOME}/codex-ecosystem/validation/native-codex"]
-trust_level = "trusted"
-
-[projects."${HOME}/codex-ecosystem/validation/native-codex-20260918T222103Z"]
-trust_level = "trusted"
-
+# Trust lets Codex load a project's own .codex/config.toml, which is otherwise loaded but disabled; for a linked
+# worktree Codex looks the trust up under its main checkout (codex-rs/config/src/loader/mod.rs L131-133 and
+# L1041-1084; git-utils/src/trust.rs L9-16). Four dated validation directories this list used to trust were removed:
+# none exists on the recording host, and nothing else in this catalog names them.
 [projects."${PROJECT_ROOT}"]
-trust_level = "trusted"
-
-[projects."${HOME}/codex-ecosystem/validation/native-paired-20260918-v2/source"]
-trust_level = "trusted"
-
-[projects."${HOME}/codex-ecosystem/state/gap-resolution-20260919/deerflow/run-1/runtime/acp-workspace"]
 trust_level = "trusted"
 
 [projects."${HOME}/code/native-agent-stack-publication"]
@@ -180,6 +198,12 @@ hooks = true
 # (evidence/receipts/codex-01571-qualification-20260926.json); 0.155.1 accepts the key.
 # Changed after `v2026.09.26.2` (the key is absent at that tag).
 daemon_auto_start = false
+# The shell snapshot (stable, on by default: codex-rs/features/src/lib.rs L1007-1012 at rust-v0.157.1) writes every
+# exported variable, secrets included, into CODEX_HOME/shell_snapshots (shell-command/src/shell_snapshot_exports.rs);
+# the landscape sweep's GPT-6 probe found a provider key there in a 0644 file (tools/sota-convergence/landscape-sweep/
+# README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
+# (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
+shell_snapshot = false
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]
