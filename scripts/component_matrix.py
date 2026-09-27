@@ -538,7 +538,25 @@ def newest_sweep_manifest(root: Path) -> tuple[str | None, dict | None]:
             raise SystemExit(f"component_matrix: {relative}: a sweep manifest must be an object with an ISO checked_at")
         if newest is None or (day, name) > newest[0]:
             newest = ((day, name), relative, document)
+    if newest:
+        reject_duplicate_manifest_layers(newest[1], newest[2])
     return (newest[1], newest[2]) if newest else (None, None)
+
+
+def reject_duplicate_manifest_layers(relative: str, document: dict) -> None:
+    """Stop the build when the newest sweep manifest names one layer twice in a section. The join
+    (``saturation_ledger.manifest_layer``) takes the first match, so a second entry's rows would be dropped
+    silently from the denominator, which frozen rule 2 forbids."""
+    for section in sorted(set(saturation_ledger.MANIFEST_SECTION.values())):
+        seen = set()
+        for row in document.get(section) or []:
+            layer_id = row.get("layer") if isinstance(row, dict) else None
+            if layer_id is None:
+                continue
+            if layer_id in seen:
+                raise SystemExit(f"component_matrix: {relative}: {section} names layer {layer_id!r} more than once; "
+                                 "the convergence join would drop the later entry's rows")
+            seen.add(layer_id)
 
 
 def completed_sweeps(ledger_doc) -> list[dict]:

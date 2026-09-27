@@ -1267,6 +1267,27 @@ class ConvergenceByLayerTests(unittest.TestCase):
                     self.assertIn(f"{catalog}/{layer_id}", message)
                     self.assertIn(f"{key}[1]", message)
 
+    def test_duplicate_manifest_layers_fail_closed(self):
+        # A second entry for the same (section, layer) would otherwise be ignored by the first-match join,
+        # silently dropping its components from the denominator (frozen rule 2).
+        relative = "catalogs/sota-convergence/manifest-20260927.json"
+        for catalog, section, layer_id in (("foundation", "foundation", "f-current"),
+                                           ("us-equities", "trading", "u-engines")):
+            with self.subTest(catalog=catalog), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                _convergence_root(root)
+                manifest = json.loads((root / relative).read_text(encoding="utf-8"))
+                layer = next(item for item in manifest[section] if item["layer"] == layer_id)
+                manifest[section].append(json.loads(json.dumps(layer)))
+                _write_json(root / relative, manifest)
+                with self.assertRaises(SystemExit) as caught:
+                    cm.build_document(root)
+                message = str(caught.exception)
+                self.assertIn(relative, message)
+                self.assertIn(f"{section}", message)
+                self.assertIn(layer_id, message)
+                self.assertIn("more than once", message)
+
     def test_an_undated_verdict_is_never_confirmed_current_under_a_covering_sweep(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

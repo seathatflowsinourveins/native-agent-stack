@@ -38753,8 +38753,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "65df749596b8b701c3321ec37e39c669a8399504b30cfb072866c4e2dfb34a68",
-      "bytes": 71155
+      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
+      "bytes": 72137
     },
     {
       "path": "scripts/credential_status.py",
@@ -39263,8 +39263,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "ebc9a6716390aa1644a6ac1b060b08fb37e2e6251ed70e3bf42f31ec7380b0e9",
-      "bytes": 81816
+      "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
+      "bytes": 83131
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
