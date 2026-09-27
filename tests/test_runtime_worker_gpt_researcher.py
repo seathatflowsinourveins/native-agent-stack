@@ -485,7 +485,7 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
                          {"content": "Public source text", "source": "research"}, {}),
                          {"content": "Public source text", "source": "research"})
         with tempfile.TemporaryDirectory() as tmp:
-            run_dir = Path(tmp)
+            run_dir = Path(tmp).resolve()  # server_config resolves it; macOS temp dirs sit under a /var symlink
             host = {"ECO_ROOT": "/opt/tools", "HOST_PATH": "/usr/bin", "WORKER_CWD": "/private/checkout"}
             cfg = proxy.server_config("context-mode", host, run_dir)
             self.assertEqual(cfg["cwd"], str(run_dir / "mcp-work"))

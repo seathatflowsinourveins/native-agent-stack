@@ -73,10 +73,6 @@
       "path": "blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json"
     },
     {
-      "path": "blueprints/runtime-workers/gpt-researcher/requirements.in",
-      "parser": "requirements.txt"
-    },
-    {
       "path": "blueprints/runtime-workers/gpt-researcher/requirements.lock",
       "parser": "requirements.txt"
     },
@@ -214,6 +210,10 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
       "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.in",
+      "lockfile": "blueprints/runtime-workers/gpt-researcher/requirements.lock"
     }
   ],
   "excluded": [
