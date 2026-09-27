@@ -66,24 +66,28 @@ PROBE_PROMPT = ("Use web search. What is the latest release tag of https://githu
 ARGS_LINE = re.compile(r"^const A = args$", re.MULTILINE)
 SWEEP_ID = re.compile(r"[a-z0-9][a-z0-9._-]{0,127}")
 # Kept equal to codex_job.MODEL_NAME: at most one provider segment, e.g. "cx/gpt-6-astra" or the framework
-# instance's "sharedgw/gpt-6-astra-max". Codex strips only one namespace for metadata lookup; another slash gives
-# fallback metadata (openai/codex rust-v0.157.1, codex-rs/models-manager/src/manager.rs L763-780).
-MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9._-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# instance's "sharedgw/gpt-6-astra-max". Codex strips one namespace for metadata lookup, and only one of letters,
+# digits, '_' and '-'; another slug gets fallback metadata (openai/codex rust-v0.157.1,
+# codex-rs/models-manager/src/manager.rs L763-780).
+MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9_-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Static provider headers (--omniroute-header NAME=VALUE), rendered as model_providers.omniroute.http_headers. Codex
 # 0.157.1 adds them to every request to the provider and silently skips a name or value that is not a valid HTTP header
 # (codex-rs/model-provider-info/src/lib.rs:166-168 and 385-412 at rust-v0.157.1; config reference
 # https://developers.openai.com/codex/config-reference), so both are checked here. Kept equal to codex_job.py.
-# Names: OmniRoute's own request headers only, lowercase (field names are case-insensitive, RFC 9110 section 5.1), at
-# most 64 characters.
-OMNIROUTE_HEADER_NAME = re.compile(r"(?=.{13,64}\Z)x-omniroute-[a-z0-9]+(?:-[a-z0-9]+){0,7}")
+# Names: only OmniRoute 3.8.51's per-request switches, lowercase (field names are case-insensitive, RFC 9110 section
+# 5.1). staged.json and every job's inputs.json record the values, and other x-omniroute-* headers carry secrets under
+# names without a credential word: x-omniroute-self-hop (open-sse/utils/selfHop.ts:1-12) and
+# x-omniroute-video-bridge-broker (src/lib/guardrails/videoBridgeBrokerAuth.ts:7-19), for example. So the switches
+# are listed, not filtered by word.
+OMNIROUTE_REQUEST_HEADERS = (
+    "x-omniroute-compression",  # a compression plan or allow-lossy (open-sse/handlers/chatCore/headers.ts:35-46)
+    "x-omniroute-no-cache",  # "true" skips the semantic cache (src/lib/semanticCache.ts:483-486 and 501-504)
+    "x-omniroute-no-memory",  # true, 1 or yes skips memory injection (open-sse/handlers/chatCore/headers.ts:18-33)
+    "x-omniroute-strip-reasoning",  # true, 1 or yes strips reasoning_content (the same file, 48-65)
+)
 # Values: printable ASCII without '"' or '\' and without a space at either end, at most 128 characters: a valid HTTP
 # field value (RFC 9110 section 5.5) that json.dumps writes as a TOML basic string without escapes.
 HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
-# staged.json and every job's inputs.json record the values, so a name that could carry a credential is refused:
-# Codex's own default secret excludes (*KEY*, *SECRET*, *TOKEN*, case-insensitive; codex-rs/protocol/src/
-# shell_environment.rs:124-130 at rust-v0.157.1) and the credential words in OmniRoute 3.8.51's own x-omniroute-* names
-# (-auth-id/-kind/-label/-scopes, -csrf, -feed-signature). "password" and "credential" are generic additions.
-SECRET_HEADER_WORDS = ("key", "secret", "token", "auth", "csrf", "signature", "password", "credential")
 # GPT-6 lane providers. native: Codex's own login (--ignore-user-config). omniroute: a lane-local CODEX_HOME whose
 # config.toml routes Codex through the local OmniRoute gateway (Codex model_providers with env_key; see
 # https://developers.openai.com/codex/config-reference) and carries the token-stack MCP servers.
@@ -247,22 +251,19 @@ def codex_user_instructions(repo_root: Path) -> str:
 
 
 def omniroute_headers(specs) -> dict[str, str]:
-    """--omniroute-header NAME=VALUE options as the lane's static provider headers, sorted by name: OmniRoute's own
-    request headers (OMNIROUTE_HEADER_NAME) whose names hold none of SECRET_HEADER_WORDS, each once, with a HEADER_VALUE
-    value. A refused value is never echoed, nor a name that is not an x-omniroute-* header."""
+    """--omniroute-header NAME=VALUE options as the lane's static provider headers, sorted by name: OmniRoute's
+    per-request switches (OMNIROUTE_REQUEST_HEADERS), each once, with a HEADER_VALUE value. A refused value is never
+    echoed, nor a refused name."""
     headers = {}
     for number, spec in enumerate(specs or (), 1):
         name, separator, value = spec.partition("=")
         name = name.lower()
         if not separator:
             raise ValueError(f"--omniroute-header #{number} must be NAME=VALUE")
-        if not OMNIROUTE_HEADER_NAME.fullmatch(name):
-            raise ValueError(f"--omniroute-header #{number}: only OmniRoute's own request headers can be staged, named "
-                             "x-omniroute-<word>[-<word>...] with letters and digits, at most 64 characters")
-        words = [word for word in SECRET_HEADER_WORDS if word in name]
-        if words:
-            raise ValueError(f"--omniroute-header {name} could carry a credential ({', '.join(words)}): staged.json and "
-                             "each job's inputs.json record header values, so only non-credential headers are staged")
+        if name not in OMNIROUTE_REQUEST_HEADERS:
+            raise ValueError(f"--omniroute-header #{number}: only OmniRoute's per-request switches can be staged "
+                             f"({', '.join(OMNIROUTE_REQUEST_HEADERS)}); other headers can carry a secret, and "
+                             "staged.json and each job's inputs.json record header values")
         if name in headers:
             raise ValueError(f"--omniroute-header {name} is given more than once")
         if not HEADER_VALUE.fullmatch(value):
@@ -352,21 +353,17 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     (home / "config.toml").write_text(config, encoding="utf-8")
     (home / f"{LANE_PROFILE}.config.toml").write_bytes(profile_bytes)
     (home / "AGENTS.md").write_text(agents_text, encoding="utf-8")
-    try:
-        import tomllib  # Python 3.11+; older interpreters skip this syntax check
-    except ImportError:
-        tomllib = None
-    if tomllib is not None:
-        for name in ("config.toml", f"{LANE_PROFILE}.config.toml"):
-            try:
-                tomllib.loads((home / name).read_text(encoding="utf-8"))
-            except tomllib.TOMLDecodeError as error:
-                raise ValueError(f"{LANE_HOME}/{name} is not valid TOML: {error}") from None
-        # Codex's ModelProviderInfo denies unknown fields only in its JSON schema, not when serde loads the config
-        # (lib.rs:133-136), so a header table under the wrong key would load silently: read it back as Codex will.
-        provider = tomllib.loads((home / "config.toml").read_text(encoding="utf-8"))["model_providers"]["omniroute"]
-        if provider.get("http_headers", {}) != http_headers:
-            raise ValueError(f"{LANE_HOME}/config.toml does not parse back to the requested provider headers")
+    import tomllib  # mcp_sections has already required it (Python 3.11+)
+    for name in ("config.toml", f"{LANE_PROFILE}.config.toml"):
+        try:
+            tomllib.loads((home / name).read_text(encoding="utf-8"))
+        except tomllib.TOMLDecodeError as error:
+            raise ValueError(f"{LANE_HOME}/{name} is not valid TOML: {error}") from None
+    # Codex's ModelProviderInfo denies unknown fields only in its JSON schema, not when serde loads the config
+    # (lib.rs:133-136), so a header table under the wrong key would load silently: read it back as Codex will.
+    provider = tomllib.loads((home / "config.toml").read_text(encoding="utf-8"))["model_providers"]["omniroute"]
+    if provider.get("http_headers", {}) != http_headers:
+        raise ValueError(f"{LANE_HOME}/config.toml does not parse back to the requested provider headers")
     settings = work / LANE_CONTEXT_SETTINGS
     settings.parent.mkdir(parents=True, exist_ok=True)
     skill_rules = lane_skill_read_rules(Path.home())
@@ -374,7 +371,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     keyless = {} if require_key else {"api_key_placeholder": OMNIROUTE_KEYLESS_PLACEHOLDER}
     return {"provider": "omniroute", "codex_home": LANE_HOME, "profile": LANE_PROFILE,
             "api_key_env": OMNIROUTE_KEY_ENV, **keyless, "base_url": base_url,
-            "http_headers": http_headers,  # names and values; omniroute_headers admits no credential header
+            "http_headers": http_headers,  # names and values; omniroute_headers admits only OmniRoute's switches
             "lane_home": {"host": host_label,
                           "template": str(CODEX_TEMPLATE), "template_sha256": template_sha,
                           "mcp_servers": servers,
@@ -568,9 +565,9 @@ def main(argv=None) -> int:
                         help=f"the Codex worker profile overlay (default {STACK_WORKER_PROFILE} in the checkout)")
     parser.add_argument("--omniroute-header", action="append", default=[], metavar="NAME=VALUE",
                         help="a static request header for the gateway (repeatable; --gpt6-provider omniroute only), "
-                             "rendered as model_providers.omniroute.http_headers and recorded in staged.json: an "
-                             "x-omniroute-* name that carries no credential and a printable ASCII value, e.g. "
-                             "x-omniroute-compression=allow-lossy")
+                             "rendered as model_providers.omniroute.http_headers and recorded in staged.json: one of "
+                             f"OmniRoute's per-request switches ({', '.join(OMNIROUTE_REQUEST_HEADERS)}) with a "
+                             "printable ASCII value, e.g. x-omniroute-compression=allow-lossy")
     parser.add_argument("--omniroute-require-key", action="store_true",
                         help=f"the gateway requires an API key: stage no {OMNIROUTE_KEYLESS_PLACEHOLDER!r} placeholder, "
                              f"so a job without ${OMNIROUTE_KEY_ENV} ends before codex starts")
@@ -595,9 +592,10 @@ def main(argv=None) -> int:
             raise ValueError("--quota-stop-percent must be above 0 and at most 100")
         gpt6_model = args.gpt6_model or (OMNIROUTE_DEFAULT_MODEL if args.gpt6_provider == "omniroute"
                                          else "gpt-6-astra")
-        if gpt6_model.count("/") > 1:
-            raise UsageError("--gpt6-model must have at most one provider segment: more than one slash causes "
-                             "fallback metadata because Codex strips only one namespace "
+        namespace, slash, rest = gpt6_model.partition("/")
+        if slash and ("/" in rest or not re.fullmatch(r"[A-Za-z0-9_-]+", namespace)):
+            raise UsageError("--gpt6-model may have one provider segment, of letters, digits, '_' and '-' only: "
+                             "Codex strips only such a namespace, and any other slug gets fallback metadata "
                              "(openai/codex rust-v0.157.1, codex-rs/models-manager/src/manager.rs L763-780)")
         if not MODEL_NAME.fullmatch(gpt6_model):
             raise ValueError("--gpt6-model is not a model name")

@@ -24,10 +24,11 @@ operator's environment. For a keyless loopback gateway, codex.api_key_placeholde
 unset variable, because Codex's env_key only needs it to exist. Without either, a job ends with exit 6 before codex
 starts. The quota gate reads the native login only, so it is refused for a gateway lane. A lane staged on a chained
 OmniRoute instance, such as the framework instance at http://127.0.0.1:20129/v1, names its model with a node alias in
-front (`-m sharedgw/gpt-6-astra-max`), and its static provider headers (codex.http_headers, x-omniroute-* only, for
-example x-omniroute-compression = allow-lossy; build_args.py --omniroute-header) sit in the lane home's
-[model_providers.omniroute] http_headers. The runner refuses to start when that table differs from codex.http_headers
-(checked with tomllib on Python 3.11+), and records the headers in each job's inputs.json.
+front (`-m sharedgw/gpt-6-astra-max`), and its static provider headers (codex.http_headers, OmniRoute's per-request
+switches only, for example x-omniroute-compression = allow-lossy; build_args.py --omniroute-header) sit in the lane
+home's [model_providers.omniroute] http_headers. The runner refuses to start when that table differs from
+codex.http_headers, and records the headers in each job's inputs.json. The comparison needs tomllib (Python 3.11+):
+older interpreters refuse a lane with staged headers and skip it for a header-less lane.
 
 --ignore-user-config keeps the host's Codex config out of the lane, the sandbox is read-only, stdin is /dev/null
 (background `codex exec` otherwise waits on stdin), and the effort is max. Never ultra: ultra lets Codex delegate to
@@ -98,15 +99,16 @@ STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
 MAX_PROMPT_BYTES = 120_000
 JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 # Kept equal to build_args.MODEL_NAME: at most one provider segment, e.g. "cx/gpt-6-astra" or the framework
-# instance's "sharedgw/gpt-6-astra-max". Codex strips only one namespace for metadata lookup; another slash gives
-# fallback metadata (openai/codex rust-v0.157.1, codex-rs/models-manager/src/manager.rs L763-780).
-MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9._-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# instance's "sharedgw/gpt-6-astra-max". Codex strips one namespace for metadata lookup, and only one of letters,
+# digits, '_' and '-'; another slug gets fallback metadata (openai/codex rust-v0.157.1,
+# codex-rs/models-manager/src/manager.rs L763-780).
+MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9_-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Kept equal to build_args.py, which cites their sources: a gateway lane's static provider headers (staged.json
-# codex.http_headers, rendered as model_providers.<provider>.http_headers in the lane home) are x-omniroute-* request
-# headers whose names hold no credential word, with printable ASCII values.
-OMNIROUTE_HEADER_NAME = re.compile(r"(?=.{13,64}\Z)x-omniroute-[a-z0-9]+(?:-[a-z0-9]+){0,7}")
+# codex.http_headers, rendered as model_providers.<provider>.http_headers in the lane home) are OmniRoute's per-request
+# switches only, since other x-omniroute-* headers carry secrets, with printable ASCII values.
+OMNIROUTE_REQUEST_HEADERS = ("x-omniroute-compression", "x-omniroute-no-cache", "x-omniroute-no-memory",
+                             "x-omniroute-strip-reasoning")
 HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
-SECRET_HEADER_WORDS = ("key", "secret", "token", "auth", "csrf", "signature", "password", "credential")
 PROVIDERS = ("native", "omniroute")
 ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
 PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
@@ -174,9 +176,10 @@ def settings(base: Path) -> dict:
     lock_dir = Path(staged.get("lock_dir") or "locks").expanduser()
     out["lock_dir"] = lock_dir if lock_dir.is_absolute() else base / lock_dir
     out["model"] = str(staged.get("model") or DEFAULT_MODEL)
-    if out["model"].count("/") > 1:
-        raise UsageError("codex.model must have at most one provider segment: more than one slash causes "
-                         "fallback metadata because Codex strips only one namespace "
+    namespace, slash, rest = out["model"].partition("/")
+    if slash and ("/" in rest or not re.fullmatch(r"[A-Za-z0-9_-]+", namespace)):
+        raise UsageError("codex.model may have one provider segment, of letters, digits, '_' and '-' only: Codex "
+                         "strips only such a namespace, and any other slug gets fallback metadata "
                          "(openai/codex rust-v0.157.1, codex-rs/models-manager/src/manager.rs L763-780)")
     if not MODEL_NAME.fullmatch(out["model"]):
         raise UsageError(f"codex.model {out['model']!r} is not a model name")
@@ -203,12 +206,16 @@ def lane_settings(base: Path, staged: dict) -> dict:
     if provider not in PROVIDERS:
         raise UsageError(f"codex.provider {provider!r} must be one of {', '.join(PROVIDERS)}")
     headers = staged.get("http_headers")
-    if headers is not None and not (isinstance(headers, dict) and all(
-            isinstance(name, str) and OMNIROUTE_HEADER_NAME.fullmatch(name)
-            and not any(word in name for word in SECRET_HEADER_WORDS)
-            and isinstance(value, str) and HEADER_VALUE.fullmatch(value) for name, value in headers.items())):
-        raise UsageError("codex.http_headers must map x-omniroute-* header names without credential words to printable "
-                         "ASCII values; restage with build_args.py")
+    if headers is not None and not isinstance(headers, dict):
+        raise UsageError("codex.http_headers must be a table of header names and values; restage with build_args.py")
+    for name, value in (headers or {}).items():
+        if name not in OMNIROUTE_REQUEST_HEADERS:  # never echoed: a refused name may be anything
+            raise UsageError(f"codex.http_headers may hold only OmniRoute's per-request switches "
+                             f"({', '.join(OMNIROUTE_REQUEST_HEADERS)}): other headers can carry a secret; restage "
+                             "with build_args.py")
+        if not (isinstance(value, str) and HEADER_VALUE.fullmatch(value)):
+            raise UsageError(f"codex.http_headers {name}: the value must be 1-128 printable ASCII characters without "
+                             "'\"' or '\\' and without a space at either end; restage with build_args.py")
     headers = dict(sorted((headers or {}).items()))
     lane = {"provider": provider, "codex_home": None, "profile": None, "api_key_env": None,
             "api_key_placeholder": None, "http_headers": headers}
@@ -233,6 +240,9 @@ def lane_settings(base: Path, staged: dict) -> dict:
     if placeholder is not None and not (isinstance(placeholder, str) and PROFILE_NAME.fullmatch(placeholder)):
         raise UsageError("codex.api_key_placeholder must be a short plain token (a keyless loopback gateway's value)")
     carried = lane_home_headers(base / home / "config.toml", provider)
+    if carried is None and headers:
+        raise UsageError("comparing codex.http_headers with the lane home config.toml needs Python 3.11+ (tomllib); "
+                         "run the harness with a newer python3, or restage without --omniroute-header")
     if carried is not None and carried != headers:
         raise UsageError(f"the lane home config.toml does not carry the staged provider headers (codex.http_headers "
                          f"{sorted(headers)}, model_providers.{provider}.http_headers "
@@ -243,7 +253,7 @@ def lane_settings(base: Path, staged: dict) -> dict:
 
 def lane_home_headers(config: Path, provider: str):
     """model_providers.<provider>.http_headers in the lane home's config.toml, {} when absent. None without tomllib
-    (Python 3.9 and 3.10), where the check is skipped."""
+    (Python 3.9 and 3.10): lane_settings then refuses staged headers and skips the check for a header-less lane."""
     try:
         import tomllib
     except ImportError:
