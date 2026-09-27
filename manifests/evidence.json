@@ -3822,13 +3822,13 @@
     },
     {
       "path": "blueprints/compaction-window-ab/PREREGISTRATION.md",
-      "sha256": "9be4afab23a645ec05e9687ed3246fd6cddaf5fac6426e7a4cc1c40cc9afddd4",
-      "bytes": 44580
+      "sha256": "b372d1a736e9e037c8c5a751c313fb28b58a8d2a850d29369530c4ba50196c90",
+      "bytes": 60968
     },
     {
       "path": "blueprints/compaction-window-ab/build-evidence.json",
-      "sha256": "aa584ddddc97c0a06c6ec9f6b337ef8589d6782f42e27761c8ba2fa5fed9848d",
-      "bytes": 5731
+      "sha256": "67ecc11ef53c7720be90519cc8c2c256e53828a912cd02f3703f56972cd80c82",
+      "bytes": 33093
     },
     {
       "path": "blueprints/compaction-window-ab/motivation-20260927.md",
@@ -3837,8 +3837,8 @@
     },
     {
       "path": "blueprints/compaction-window-ab/preregistration.json",
-      "sha256": "2d335e15a0d0de7bdacd6421261a2cad83971bbd9053450be0b917c42975730c",
-      "bytes": 99597
+      "sha256": "b0db35290d5c9fbbbed0df00940ec7e0dee6fcef02d54781b6f8f724cde7b731",
+      "bytes": 134486
     },
     {
       "path": "blueprints/convergence-practice/README.md",
@@ -39328,8 +39328,8 @@
     },
     {
       "path": "tests/test_compaction_window_ab_preregistration.py",
-      "sha256": "4bc86a6aa52d014e29ace37e25ab74c564b4984d3d20534aae21be39d6ffb155",
-      "bytes": 14927
+      "sha256": "8355571d4cdd5a0b9e5c3201b9a33443ab9ed874045be1f1a27fe839641d1713",
+      "bytes": 26503
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -40063,8 +40063,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
-      "bytes": 55626
+      "sha256": "780312b8d48db5875672cf1baabb307c3a1c50413e2d9072e89ad5250b6109b3",
+      "bytes": 55711
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

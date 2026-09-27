@@ -4,7 +4,9 @@
 The user chose “A/B test first,” followed by the best quality per token. The
 planned start is immediately after the weekly reset on **2026-09-30 at 21:00
 America/New_York (2026-10-01 01:00 UTC)**, subject to sealing and readiness.
-This three-repetition pilot can nominate a candidate for confirmation only; it cannot authorize persistent host changes. This document does not
+This three-repetition pilot can nominate a candidate for confirmation only. The
+host already uses B=400000, independently of this experiment; the pilot grants
+no authority for additional persistent changes or reversion to A. This document does not
 launch or schedule anything. [preregistration.json](preregistration.json) holds
 the complete task packets, exact oracle specifications, controls and receipt
 contract; the tables here are checked against it.
@@ -32,7 +34,8 @@ Research and source inspection on **2026-09-27**, before artifact writing:
   document native 1M for Opus 4.7 and later on Anthropic API and Sonnet 5, with
   default auto-compaction around 967K. The plain-integer environment variable
   overrides the command, launch flag and saved setting. The identical launch
-  flag `--autocompact auto` gives A the tuned default despite a saved window.
+  flag `--autocompact auto` overrides a saved `autoCompactWindow`, but cannot
+  unset a window injected through settings `env`. A requires the source isolation below.
   `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` instead holds sessions to 200K; it must be absent.
 * [Environment variables](https://code.claude.com/docs/en/env-vars),
   [Workflows](https://code.claude.com/docs/en/workflows) and
@@ -82,22 +85,84 @@ requires no package installation or replacement orchestrator.
 The sole treatment difference is that variable. JSON arms contain only their
 ordinal and environment patch; all other controls come from one shared object.
 Every task/arm/repetition gets its own fresh `claude -p` coordinator and owned
-worktree at the frozen revision. A deletes the selected variable from its
-launch environment; B and C assign their plain integer. All launches include
-`--autocompact auto --model claude-opus-5-5 --effort xhigh --output-format stream-json
---verbose` and the same sealed prompt/settings/MCP packet. These are proposed
-launch arguments, not a command executed while drafting. Use the existing
-Ultracode configuration, retaining coordinator xhigh and an explicit Workflow
-stage. Every focal child is Opus 5.5/max with the named role. Sonnet 5/max is
-allowed only for pure command wrappers; verification, build and judgment remain
-Opus. No global effort override, fast mode, model fallback or 200K context hold.
+worktree at the frozen revision.
+
+**Frozen host condition for this draft design:** the user settings file
+`~/.claude/settings.json` contains
+`env.CLAUDE_CODE_AUTO_COMPACT_WINDOW="400000"`. The coordinator reports that it
+has applied to every Claude Code session and subagent on this host since
+**2026-09-27T18:59:00Z**. Its own shell read back `400000`, and its first request
+after 18:59Z automatically compacted at **902,612 tokens**. That is a supplied
+transition observation, not a measured B-arm threshold or a new run by this
+builder. A value-only repair read independently confirmed the user-settings
+entry; this Codex builder's shell has the variable unset. The two shells are
+different observation scopes. The incumbent host arm is **B**, while A is the
+experiment's isolated default reference. `host_condition` in JSON fixes this
+input without freezing the experiment.
+
+Use the supported **`--setting-sources project`** on **all three arms**, excluding
+user and local settings, and load one byte-identical, sealed non-secret packet
+with **`--settings <sealed-common-settings.json>`**. The frozen project's settings
+and the explicit packet must omit the window env key. Materialize the common
+Ultracode, hook, agent, permission and telemetry settings explicitly and qualify
+the same effective fingerprints for every arm. Excluding a source may remove
+features as well as the window entry; no equivalence is assumed. Keep native
+authentication native, without copying sign-ins or private state.
+
+* **A:** remove the selected key from the launch environment using
+  `env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW`. Source exclusion prevents the user
+  `env` entry from being loaded again. Use the common `--autocompact auto`.
+* **B:** set the isolated launch environment to `400000`, with the same sources,
+  packet and `--autocompact auto`.
+* **C:** set it to `200000`, with those identical controls.
+
+This mechanism is supported by installed **2.1.283 `--help`**, the
+[tagged changelog](https://github.com/anthropics/claude-code/blob/v2.1.283/CHANGELOG.md),
+and the [CLI settings-source flag](https://code.claude.com/docs/en/cli-reference#cli-flags).
+[Settings precedence](https://code.claude.com/docs/en/settings#settings-precedence)
+puts managed settings above CLI settings, then local/project/user settings.
+`--settings` merges with enabled lower scopes: an omitted key keeps its lower
+value. Passing an empty `env` object therefore does not erase the host entry.
+A supported per-key deletion operation was **not found in** installed 2.1.283
+help, that pin's changelog or the inspected settings/model-config/CLI docs.
+Do not invent an unset flag or use `null`, an empty string or `auto` as an env
+value. Managed or embedding-host injection still blocks readiness.
+
+A separate **`CLAUDE_CONFIG_DIR`** is a documented alternative: it relocates
+settings, history and plugins. It would require separately qualified matching
+setup and native authentication, so this draft selects settings-source isolation.
+See [environment variables](https://code.claude.com/docs/en/env-vars) and
+[settings locations](https://code.claude.com/docs/en/settings). No directory,
+settings file or launch command was applied to the host during this repair.
+
+The **per-arm readback launch gate** applies to every task/arm/repetition.
+Before admitting an attempt, read back only this key from the incumbent user
+settings, the enabled project/explicit/managed sources and the patched launch
+environment, plus their sealed digests. Expected launch values are A **unset**,
+B **400000**, C **200000**. An inaccessible source, conflict or changed host
+condition blocks launch. A separately qualified value-only native shell
+observation must also read the effective coordinator and focal-child variable
+after settings application and corroborate the loaded sources. A prelaunch
+file read cannot prove inheritance. No undocumented dry-run or effective-window
+readback CLI is asserted; this observation path remains **unqualified**, with
+`do_not_launch`. In eventual sealed attempts, count all readiness usage, stop
+incomplete on mismatches and retain independent native treatment evidence.
+
+All proposed launches also include `--autocompact auto --model claude-opus-5-5
+--effort xhigh --output-format stream-json --verbose`, the common settings-source
+arguments and the same sealed prompt/MCP packet. These are design arguments,
+not commands executed while drafting. Keep coordinator xhigh under Ultracode
+and an explicit Workflow stage. Every focal child is Opus 5.5/max with its named
+role. Sonnet 5/max is allowed only for pure command wrappers; verification,
+build and judgment remain Opus. No global effort override, fast mode, model
+fallback or 200K context hold.
 
 Seal byte-identical agent definitions, task packets, token-lane carrier, MCP set,
 deferred grants, native caching, permission policy and tool versions. Capture
 resolved model/effort in every child. The carrier must actually appear in each
 Workflow child's first prompt; Agent-tool acceptance does not prove that.
-An inherited settings `env` block must not replace the intended arm value. A
-conflict is a readiness failure, not permission to edit host settings.
+The isolated scope is the permitted draft remedy for the recorded user env;
+any remaining conflict is a readiness failure. Persistent host settings stay B.
 
 Prove treatment with both sanitized launch evidence and **child** transcripts:
 native `system/compact_boundary`, `compactMetadata.trigger=auto` and `preTokens`,
@@ -184,7 +249,7 @@ missing independent source evidence blocks readiness, never passes.
 
 | Check | Independent adapter inputs | Known-fail control |
 | --- | --- | --- |
-| B1 | Git base/diff, actual red/edit/green chronology and original test bytes | Red run follows the edit |
+| B1 | Frozen Git base; porcelain status including untracked/ignored files; ignored-file hashes; actual red/edit/green chronology and original test bytes | Red run follows the edit |
 | B2 | Candidate module results on frozen vectors and immutable source coverage | Input mutation |
 | W1 | Original RST blobs and native fetch captures | Empty page coverage |
 | W2 | Typed original rows, facts and bounded original citation spans | String latency instead of integer |
@@ -193,10 +258,38 @@ missing independent source evidence blocks readiness, never passes.
 | R1 | Original Git/AST inventory and pinned reader spans | Failed-attempt usage excluded |
 | R2 | Original patch and unchanged-worktree observation | 30 hunks instead of 31 |
 
+B1 derives paths with `git status --porcelain=v1 --untracked-files=all
+--ignored=traditional -z`, against the frozen HEAD and the predetermined sealed
+overlay. Include tracked changes, every untracked file, both rename paths and
+new/changed/deleted ignored files. Compare ignored-file path and SHA256 inventories
+before and after: an unchanged `!!` status does not imply unchanged bytes. Only
+byte-unchanged sealed overlays may be excluded. Any forbidden path fails; the
+new regression file cannot disappear from the check merely because it is
+untracked. No staging or index writes are needed. Source:
+[Git status](https://git-scm.com/docs/git-status); plain
+[Git diff](https://git-scm.com/docs/git-diff) alone omits these new files.
+
+Exact digest matching operates on **adapter-computed predicates** for tolerance
+rules. B1 emits `red_exit_nonzero` and `changed_paths_subset_including_reader`,
+with separate new-test, missing-export and ownership predicates. Red exit 2 is
+valid just as 1 is; the subset predicate alone does not satisfy new-test creation.
+R1 emits three `citation_predicates` plus `cites_pinned_reader_sha`: spans must
+cover 458..458, 460..460 and 542..548, with at most five extra original lines on
+either side. For example, 456..460 is valid for the first fact. Require the
+specified path/revision and original reader SHA256
+`f5ea9c3a1b47cab91e90a515f455bcf6a960fb696db89717e04b7424e4ff42a0`.
+Raw exit codes, paths, spans and source identities remain independent evidence;
+only actual literal requirements enter the target as literals. See
+[Inspect 0.3.271 exact comparison](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/scorer/_common.py).
+Both contracts and their eight control hashes were regenerated; local predicate
+examples check boundaries without claiming executable adapter acceptance.
+
 These fixtures exercise the proposed scorer boundary; reduced synthetic
 coverage is explicitly **not** a passing full-corpus extraction test. Full
 artifact adapters are still unmaterialized (`executable_sha256: null`), their
-pinned Inspect controls are unrun, and the installed package is **0.3.266**.
+pinned Inspect controls are unrun, and the earlier repair inspected a separate installed package at **0.3.266**.
+This repair's `python3` package metadata did not find `inspect-ai`; neither
+observation qualifies execution at 0.3.271.
 A source-backed contract does not close that runtime gap. Before sealing,
 materialize and hash each executable adapter, exercise native-artifact positive,
 negative, malformed and missing-output cases through its entire extraction path,
@@ -221,7 +314,9 @@ as specified in JSON; within each task block the arm orders are:
 Each arm occupies each position once for every task; each of the six orderings
 appears twice across the design. Wait **360 seconds** after the prior attempt's
 last request and process-group termination before the next launch. Child TTL
-must be five minutes, with no other Claude usage during the experiment. Record
+must be five minutes, with no other Claude usage during the experiment. The
+per-request TTL evidence gate below is unqualified; settings alone do not prove
+this condition or the adequacy of the washout. Record
 first-request cache reads; do not equate a fresh process with a cache miss.
 Within-child caching stays native. Coordinator cache can last one hour and is
 reported separately from the child-only cost estimand. Worktree path differences
@@ -255,46 +350,73 @@ candidate/per-task gates. Keep this cohort and its failures as pilot evidence.
 ## Measures and decision
 
 Follow [token-practice scopes](../../docs/token-practice.md): every metric in JSON
-names its source, observation window and denominator. The authoritative
-instrument is **native Claude Code OTel `api_request` events → the existing
-host collector → Loki**, with `api_error` and `api_refusal` events for coverage.
-Use the native request's input/output/cache-creation/cache-read counters, mapping
-OTel `cache_creation_tokens`/`cache_read_tokens` to the transcript category names.
+names its source, observation window and denominator. The proposed instrument
+is **native Claude Code OTel `api_request` events → the existing host collector
+→ Loki**, plus `api_error` and `api_refusal` coverage records. This is a
+**log-only, unqualified** instrument: it does not see individual intermediate
+retry attempts. Use emitted input/output/cache-creation/cache-read counters,
+mapping OTel `cache_creation_tokens`/`cache_read_tokens` to transcript categories.
 Per-request context is input + cache creation + cache read; cumulative cache
 reads measure cost, not context size.
 
-Query Loki's `GET /loki/api/v1/query_range` every second with the sealed owned
-session selector and overlapping time intervals. Fully page/split truncated
-responses, retain query/arrival timestamps and re-query the complete interval
-at shutdown. A missing page is missing evidence. **Deduplicate by provider and
-request ID**: identical retransmissions count once; conflicting duplicate
-counters stop the comparison. Distinct provider request IDs in one retry chain
-count separately. Join error/refusal rows by request ID without adding their
-counters a second time. Do not deduplicate by message ID, timestamp or text.
+Query Loki's `GET /loki/api/v1/query_range` each second with the sealed owned
+session selector and overlapping intervals. Fully page/split truncated responses,
+retain query/arrival timestamps and re-query the whole interval at shutdown.
+A missing page is missing evidence. **Deduplicate by provider and request ID**,
+where provider is the sealed run constant **`anthropic_api`**, attached to each
+row from the fixed route; it is not a documented `api_request` attribute.
+Identical retransmissions count once; conflicting duplicate counters stop the
+comparison. Distinct observed provider request IDs count separately. A missing
+request ID stays unresolved: retain `session.id`, `event.sequence`, `event.name`
+and an observer envelope ordinal as a holding locator, never a usage key.
+Sequence numbers are per process, so collisions must not merge records. Missing
+IDs stop the pilot incomplete; neither timestamps nor text establish zero charge.
 
-Join native transcript request IDs and the session/Workflow/agent lineage to
-one owner per request. Include **compaction, background preparation, retries,
-refusals, fallbacks and failed/interrupted attempts**, even when an assistant
-message is absent. A compaction boundary is treatment evidence, not a token
-record. Check the resolved model and refusal `server_fallback_hop`; any fallback
-invalidates the matched comparison while its usage remains in the budget.
-Unattributed requests stay in the whole-run ledger and prevent child-cost
-selection. Missing counters or unreported failed-request charge remain unknown.
+Join request IDs and session/Workflow ownership through the qualified launch
+registry, `workflow.run_id` and `query_source`. `agent_id` and `parent_agent_id`
+are span fields; this log ledger does not use them. Retain observed compact,
+background, terminal-chain, refusal, fallback and interrupted work even without
+an assistant message. Ambiguous owners prevent child-cost selection. Check
+resolved model, `speed` and refusal `server_fallback_hop`; absent applicable
+attributes are **unknown**, never evidence of normal speed or no fallback.
 
-After settled exit, reconcile each owned session using **ccusage v20.0.26**:
+**Retry/error limitation:** `api_request` documents no `attempt` field.
+`api_error.attempt` is the total number of attempts including the initial one;
+it is a terminal-chain count, not an individual usage row. Intermediate retries
+appear as `gen_ai.request.attempt` **trace** events, which this ledger does not
+collect. A successful terminal request cannot establish that earlier attempts
+were absent or free. `api_error` also documents no token counters. No admissible
+counter source is qualified here: **any terminal API error ends the pilot
+incomplete**. Complete retry accounting is **not supported until qualified**;
+an independently sourced attempt/counter instrument needs an amendment before
+launch. Merely adding trace IDs would not prove counters. Sources:
+[API error events](https://code.claude.com/docs/en/monitoring-usage#api-error-event),
+[API request events](https://code.claude.com/docs/en/monitoring-usage#api-request-event)
+and [traces](https://code.claude.com/docs/en/monitoring-usage#traces-beta).
+
+After settled exit, reconcile owned sessions with **ccusage v20.0.26**:
 `ccusage claude session --id "$SESSION_ID" --json --offline`. Prove which child
-transcripts are included before comparing the same model/category scopes.
-Require `OTel = ccusage + OTel-only - ccusage-only`, enumerating every residual
-by private request ID and original evidence. Fully metered OTel-only compaction
-requests can legitimately lack transcript rows; unexplained residuals cannot.
-The unchanged baseline `child-usage.mjs` supplies an additional attribution
-cross-check. **Never add ccusage, transcript totals or /usage to OTel totals.**
-Equal totals alone do not prove that both instruments captured every request.
+transcripts are included before comparing model/category scopes. Require
+`OTel = ccusage + OTel-only - ccusage-only`, enumerating each residual by private
+request ID and original evidence. Fully metered OTel-only compaction may be
+legitimate; unexplained residuals cannot be discarded. The unchanged baseline
+reader supplies a separate attribution cross-check. **Never add ccusage,
+transcript or /usage totals to OTel totals.** Equal sums cannot recover missing
+intermediate retries or settle counter-less terminal errors.
 
-The repository collector template currently drops request/client/agent IDs.
-Its active host configuration and retained native joins have not been observed
-in this repair. Required-ID preservation is therefore an explicit launch gate;
-no host configuration is changed and session aggregates are no substitute.
+The actual repository log `keep_keys` allowlist retains `workflow.run_id`,
+`query_source`, `attempt`, `model` and the four counters, but drops
+**`request_id`, `client_request_id`, `server_fallback_hop`, `speed`**. It also
+omits span-only agent/parent IDs, which are excluded from this log-ledger design.
+The launch gate now requires all applicable emitted attributes, including event
+name/time/sequence and session identity, to survive the **active collector into
+Loki** with equal values/types. JSON lists the full requirement and its exact
+difference from the template. ID-only checks are insufficient. Read-back must
+cover the corresponding request, error, refusal and Workflow event types;
+missing applicable fields are unknown. Template membership cannot prove active
+preservation or native emission. No collector changes or live observations were
+performed in this repair. [Collector template](../../observability/collector/collector.yaml),
+[refusal schema](https://code.claude.com/docs/en/monitoring-usage#api-refusal-event).
 
 Retain input, cache creation, cache read and output separately. The primary cost
 is the all-attempt weighted total divided by successful tasks, for each task and
@@ -313,9 +435,17 @@ Thus `W = sum_models((pI*I + pW*Wcache + pR*R + pO*O) / 1000000)`.
 Normalized weights are Opus **1, 1.25, 0.05, 5**, Sonnet **1, 1.25, 0.1, 5**;
 only the dollar-equivalent total combines models on one basis. Source:
 [official pricing, read 2026-09-27](https://platform.claude.com/docs/en/about-claude/pricing).
-Fast mode, other models, one-hour child writes or unresolved usage invalidate
-this fixed price comparison. Neither model has a >200K price premium in this
-price sheet. Coordinator-only requests, native tool savings estimates and quota
+Fast mode, other models or unresolved usage invalidate this comparison. The
+one-hour-write exclusion is **not evaluable from the current ledger**:
+`cache_creation_tokens` has no TTL split. Official prices charge 1.25x base for
+five-minute writes and 2x for one-hour writes. No per-request source is qualified
+here, and no claim is made that pinned transcripts retain the split. Configuration
+inspection cannot prove five-minute writes. Require a source-backed per-request
+split joined by request ID with totals reconciling to the native aggregate; until
+qualified by amendment, **W and cost per success remain unknown, no selection is
+possible and launch is prohibited**. Aggregate cache-write tokens still count
+once in the token budget. The table/formula above are conditional five-minute
+weights. Neither model has a >200K premium in this price sheet. Coordinator-only requests, native tool savings estimates and quota
 readings have separate scopes and are not added to overlapping child totals.
 
 Record every compaction's trigger, its pre-compaction size (the native
@@ -341,7 +471,7 @@ The following contract table is checked literally against JSON:
 | quality_rule | For every task and check, any pass in A requires a pass in every repetition of the candidate. |
 | pass_count_rule | Candidate total passed checks and successful tasks must each be at least A's totals. |
 | cost_rule | All-attempt weighted child cost per successful task must be at least 10% lower than A, both pooled and for each task. |
-| selection_rule | Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and retains A. |
+| selection_rule | Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and leaves the incumbent host setting B unchanged. |
 | incomplete_rule | Any stopped, invalid, underlength, or unmeasured run is incomplete; no adoption result. |
 
 All 36 attempts and independent checks must be available with valid treatments,
@@ -352,10 +482,12 @@ cost at most **0.90 times A**, for every task and pooled. Then minimize pooled
 all-attempt weighted child cost per success among eligible candidates, using
 unrounded exact decimal/rational arithmetic. There is no B/C priority and no
 extra margin between them. An exact tie for the lowest cost gives **no
-selection**, retaining A. Rounded display equality is not an exact tie.
+selection**, leaving incumbent **B=400000** unchanged. A remains the isolated
+reference, and a tie does not authorize a reversion. Rounded equality is not an exact tie.
 
 At equal quality, `A=100, B=60, C=89` selects **B**; `A=100, B=89, C=60` selects
-**C**. If `B=C=60`, neither wins the tie and A is retained. `B=91, C=95` fails
+**C**. If `B=C=60`, neither wins; the nomination is null and incumbent B is
+unchanged. `B=91, C=95` fails
 the minimum effect; B=60 with a quality regression cannot beat eligible C=89.
 These examples apply to every task as well as pooled cost. They are arithmetic
 controls, not model observations.
@@ -372,7 +504,9 @@ anecdotes or selectively rerun winners cannot validate this one.
 The proposed ceiling is **1,000,000,000 native tokens**, summed as input + cache
 creation + cache read + output over all deduplicated **owned** requests,
 including readiness, coordinators, children, compaction/background work,
-wrappers, retries, failures, refusals and fallbacks. This is a fixed proposed
+wrappers, retries, failures, refusals and fallbacks. This is the required budget
+scope, not a claim that the present log instrument observes all of those paths.
+Intermediate retries and counter-less errors remain unresolved. This is a fixed proposed
 resource ceiling, not a conversion from the superseded weekly-percentage cap,
 a subscription billing guarantee, or evidence that 36 attempts fit.
 
@@ -431,9 +565,15 @@ procedure without claiming it is now safe to execute.
 After eventual qualified shutdown, drain for at least the proven delivery
 bound and take two complete ledger snapshots one polling period apart plus
 ccusage reconciliation. Stable snapshots alone do not establish no lost events.
-Retain unresolved charge as unknown and the run as incomplete. Attempt and
-whole-run wall limits remain 7200 and 259200 seconds. Preserve every stopped
-attempt; never resume, replace or increase the ceiling within this cohort.
+Retain unresolved charge as unknown and the run as incomplete. The attempt wall cap stays **7200 seconds**. The whole-run cap must include
+**36 attempts + 35 washouts + 36 drains**, plus bounded readiness/orchestration:
+`36*7200 + 35*360 + 36*D + H = 271800 + 36*D + H` seconds. `D` must bound delivery
+wait, both complete ledger reads and reconciliation; `H` must cover readiness
+and overhead outside attempts. Conservatively do not overlap drains and
+washouts. Both bounds and the resulting numeric cap remain **null**, with
+`do_not_launch`; sealing must supply qualified finite values and a cap at least
+this large. The former 259200 seconds is superseded, with no guessed drain
+allowance. Preserve every stopped attempt; no in-cohort extension or replacement.
 
 ## Evidence and receipt shape
 
@@ -454,7 +594,10 @@ denominators; weighted cost; every compaction and adjacent context sizes;
 wall times; request-ledger and reconciliation hashes; measured lag, reserve proof and cancellation records; before/after value-only `/usage` observations/reset; failures, interruption and
 unknown fields; evidence classes, sanitizations and independent readback.
 Allowed statuses are `not_run`, `incomplete`, `complete_no_change` and
-`complete_candidate_selected`; the last denotes a pilot nomination only. An arbitrary `passed` flag is not evidence.
+`complete_candidate_selected`. `complete_no_change` means no candidate
+nomination and leaves the recorded incumbent **B=400000** unchanged; it does
+not retain/revert to A or newly adopt B. Candidate selection is a nomination
+only, even if B already runs on the host. An arbitrary `passed` flag is not evidence.
 
 Original conversations, complete tool output, source captures and native ids
 stay private. Publish no sessions, native run/agent/message ids, personal paths,
@@ -471,7 +614,13 @@ and [token-adoption E2E Sealing](../../evidence/artifacts/token-adoption-e2e-202
 The table below retains the **original draft candidate byte identities**,
 superseded by the repair Amendment below. It does not freeze
 this DRAFT, establish chronology, or authorize execution. There is no result.
-The existing evidence manifest records the original draft hashes. The coordinator must refresh all three changed file registrations after integrating this repair; that shared manifest is outside this builder's three-file ownership.
+At integrated head **f7cc409a**, the evidence manifest registered the prior
+repair's three files at their then-current bytes, plus the unchanged original
+build record. A read-only comparison in this cross-family round confirmed those
+identities, and the baseline validator passed (7353 hashed files). The older
+failure below is dated history. This round changes four files, including the
+build record; their final registrations are for the coordinator to refresh.
+This builder does not edit `manifests/evidence.json`.
 
 | Artifact | SHA256 |
 | --- | --- |
@@ -482,7 +631,7 @@ The existing evidence manifest records the original draft hashes. The coordinato
 Before running, materialize and hash exact inputs, prompts, original page bytes,
 independent oracle adapters, agent definitions, carrier and sanitized MCP/runtime
 fingerprints. Qualify every oracle offline with correct and discriminating
-wrong/malformed/missing inputs using Inspect 0.3.271. Freeze the native request instrumentation, prove active collector ID preservation, and qualify measured lag, an enforceable outstanding-token reserve and owned cancellation. Runtime inheritance is evaluated inside each sealed attempt, not
+wrong/malformed/missing inputs using Inspect 0.3.271. Freeze the native request instrumentation, prove every applicable required log attribute survives the active collector, and qualify measured lag, an enforceable outstanding-token reserve and owned cancellation. Runtime inheritance is evaluated inside each sealed attempt, not
 claimed from a pre-seal model probe. Record a separate
 seal commit and actual merge revision/time, with independent ordering evidence
 showing that sealing preceded **all** native probes and arms. Rehash before each
@@ -498,7 +647,7 @@ must explicitly change the draft status; this commit leaves it DRAFT.
 
 ## Draft validation and unresolved gates
 
-Research for the one repair round, **2026-09-27**, before repairs: the supplied
+Research for the **earlier GPT-6 review repair**, 2026-09-27, before those repairs: the supplied
 `gpt6-review.md` (SHA256 `f27867d62728615952804aa8e04cd540ab0e63ce199545d4893883f0d7c18e2c`)
 and W9 in `report2.md` (SHA256 `b5d204ebe070c26b64fe06ea4726181ad695f7f9e4abd7bc41b6b34dcd2ed5a6`)
 were checked against primary sources. Reuse the review's installed Claude
@@ -508,13 +657,15 @@ were checked against primary sources. Reuse the review's installed Claude
   [Loki query API](https://grafana.com/docs/loki/latest/reference/loki-http-api/),
   and [ccusage v20.0.26 session reports](https://github.com/ccusage/ccusage/blob/v20.0.26/docs/guide/session-reports.md).
   The repository [collector template](../../observability/collector/collector.yaml)
-  currently omits `request_id`, `client_request_id` and `agent_id` from its
-  attribute allowlist. The existing host collector is the intended route;
-  the template is not proof that its active Loki records preserve these fields.
+  was initially described as missing IDs only. This round checked the actual
+  log allowlist: `request_id`, `client_request_id`, `server_fallback_hop` and
+  `speed` are the missing required log fields. Span-only agent/parent IDs are
+  removed from the join. The template cannot prove active Loki preservation.
 * Grading: [Inspect 0.3.271 scorers](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/docs/scorers.qmd)
   and its [match implementation](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/scorer/_match.py).
-  Package metadata of the existing installation reports **0.3.266**; this round
-  does not install or substitute that version for the requested pin.
+  The earlier repair recorded installed metadata **0.3.266**. This builder's
+  `python3` metadata does not find `inspect-ai`; no installation or scorer
+  execution is inferred from either observation.
 * Skill discovery: the [Inspect skills directory](https://skills.sh/meridianlabs-ai/inspect-skills)
   and [v0.4.5 source](https://github.com/meridianlabs-ai/inspect-skills/blob/v0.4.5/README.md)
   offer package selection and log analysis, not these task oracles. No skill
@@ -544,11 +695,16 @@ Claude session. Original draft structural results are retained separately in
 [build-evidence.json](build-evidence.json); they do not validate this repair.
 The new red/green output is recorded in the Amendment below.
 
-Open gates are Workflow inheritance/treatment observation, native request-ID/child joins, measured lag and a proven outstanding-token bound, actual >400K task eligibility and budget feasibility, offline-suite readiness, resolved host fingerprints and executable Inspect adapters with returned control evidence. The source
-findings above do not settle these runtime questions. They do not justify any persistent host setting change; this pilot requires separate confirmation even after a complete result.
+Open gates include isolated settings and effective per-arm readback, Workflow
+treatment, complete log-attribute/child joins, retry and TTL instruments, lag and
+proven outstanding-token/drain/readiness bounds, >400K eligibility and budget
+feasibility, offline-suite readiness and executable Inspect controls. The source
+findings above do not settle these runtime questions. Incumbent B was applied
+separately; this pilot supplies no authority for additional host changes or a
+reversion to A, even after a complete result.
 
 
-## Amendment 2026-09-27 — one repair round, still DRAFT
+## Amendment 2026-09-27 — earlier GPT-6 review repair, still DRAFT
 
 No model results were observed and no Claude session was launched. This
 amendment supersedes the original weekly-percent cap, transcript-primary cost
@@ -556,13 +712,13 @@ instrument, C-first choice, unspecified grader/control framework and the
 three-repeat adoption scope. It preserves the original task packets, arm
 windows, common launch controls and ordering. Source identities and the
 research disposition are recorded above and in JSON. The original candidate
-hash table remains historical; current byte identities follow this repair
-record. This is not a seal, merge receipt or execution authorization.
+hash table remains historical; the identities at the end of this earlier
+record were subsequently registered at f7cc409a. This is not a seal, merge receipt or execution authorization.
 
 | Review finding | Disposition | Repair and remaining evidence |
 | --- | --- | --- |
 | Blocker: hard cap lacks observation, cancellation and outstanding-charge bound | **Not supported as a proven hard cap** | Replaced weekly percentages with the 1,000,000,000-token all-owned ledger budget; specified polling, ownership-checked TERM/KILL, late-event settlement and an explicit conservative reserve formula. Actual reporting lag, enforceable request/delivery bounds and cancellation observations are unavailable in this no-session round. They remain null and launch remains prohibited; a five-second export interval cannot fill them. |
-| High: compaction/background/retry/refusal/fallback accounting has no request instrument | **Fixed at protocol level** | Native OTel request events through the existing collector into Loki, provider/request-ID deduplication, private child/Workflow joins, model/fallback checks, and ccusage v20.0.26 per-category residual reconciliation now define one authoritative ledger. Active ID preservation and complete-path qualification remain open; the repository collector template drops required IDs. |
+| High: compaction/background/retry/refusal/fallback accounting has no request instrument | **Not supported until qualified** (corrected in cross-family round below) | Log events define emitted terminal-chain records only. Intermediate attempts are trace events and counter-less terminal errors end this pilot incomplete. Attribute-complete collector qualification, child ownership, complete attempt/counter evidence and TTL weighting remain open. A specified ledger is not proof of full coverage. |
 | High: C can beat cheaper B at equal quality | **Fixed** | Minimize pooled all-attempt weighted child cost per success among observed non-inferior arms meeting the 10% per-task and pooled margin; exact tied minima yield no selection. The A=100/B=60/C=89 counterexample now selects B. |
 | High: executable oracle adapters and controls lack qualification | **Not supported as executable readiness** | Pin Inspect 0.3.271 scorers; define eight independent adapter contracts and 32 hashed known-pass, known-fail, malformed and missing-output fixtures. Full extraction adapters and their actual pinned-scorer control outputs remain absent; installed 0.3.266 is not substituted. Structural fixture/hash checks cannot establish these or the fixed 97-module suite's readiness. |
 | Medium: three repetitions have no precision/stability justification for 10% | **Fixed by narrowing the claim** | Three repeats are an exploratory frozen-suite pilot only. State the missing variance, paired unit and illustrative 95% t half-width; prescribe block-deletion sensitivity. No claimed confidence, confirmatory sample size or persistent adoption follows from this design. |
@@ -604,7 +760,7 @@ Ran 6 tests in 0.009s
 OK
 ```
 
-The required publication command was run, exit **1**:
+The earlier repair's pre-integration publication command returned exit **1**:
 
 ```text
 PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py
@@ -617,13 +773,15 @@ tests/test_compaction_window_ab_preregistration.py: SHA-256 mismatch
 tests/test_compaction_window_ab_preregistration.py: byte count mismatch
 ```
 
-These are the three edited files' stale registrations in the shared
-`manifests/evidence.json`, which this builder did not edit. The coordinator must
-register their final SHA256/byte counts and rerun `python3 scripts/validate.py`
-before committing. The validator is **not passing** in this worktree; no
-upstream scorer run or new native acceptance is claimed by the six local tests.
+Those were the three edited files' stale registrations **at that earlier
+pre-integration check**. The coordinator subsequently registered them at
+f7cc409a. This cross-family round independently verified those registered bytes
+and ran the baseline validator successfully before editing. The earlier exit 1
+is preserved as history, not a present-tense status. This round's final output
+is retained in `build-evidence.json`; no scorer or native acceptance follows
+from structural tests.
 
-Current repair candidate identities (not a freeze):
+Earlier repair candidate identities, registered at f7cc409a (not a freeze):
 
 | Artifact | SHA256 |
 | --- | --- |
@@ -631,8 +789,52 @@ Current repair candidate identities (not a freeze):
 | `../../tests/test_compaction_window_ab_preregistration.py` | `4bc86a6aa52d014e29ace37e25ab74c564b4984d3d20534aae21be39d6ffb155` |
 
 The coordinator records this Markdown's final digest externally to avoid a
-self-hash. Open runtime gates are native request-ID preservation and complete
-child attribution, measured lag and enforceable outstanding-charge bounds,
-owned-process cancellation qualification, full Inspect adapter/control
-execution, the unchanged offline suite, and treatment/host fingerprints.
+self-hash. That earlier list of runtime gates is supplemented by this round's
+attribute-complete, retry, TTL, settings-readback and wall-budget gates below.
 Three repeats remain a pilot even if those gates are later satisfied.
+
+
+## Amendment 2026-09-27 — PR #416 cross-family repair, still DRAFT
+
+This round checks the nine findings in `416-review-claude.json` against reviewed
+head **f7cc409a3df212375c76f957700b1ebb16ce1e73**, native client help, the
+v2.1.283 release/changelog, original reader bytes, the actual collector allowlist,
+Git's documented status format, Inspect 0.3.271 source and official Claude docs.
+The review file digest is in JSON. Installed search-first/find-skills discovery
+retained the existing document/test seam and pinned Inspect approach; the
+[Inspect skills listing](https://skills.sh/meridianlabs-ai/inspect-skills) supplies
+no replacement for these task oracles. The installed tdd and
+verification-before-completion skills govern the fail-first structural check.
+No package installation, subagent, model run, Claude session, host setting edit,
+Git metadata write or evidence-manifest edit is part of this repair.
+
+The `gh api` release lookup failed on network access; Context Mode fetched the
+same [v2.1.283 release record](https://api.github.com/repos/anthropics/claude-code/releases/tags/v2.1.283)
+and tagged changelog. Native web open/search was unavailable; Context Mode
+fetched the official documents. A direct sandbox HTTP fetch was refused (403)
+and was not treated as evidence of source absence. The current Python
+interpreter did not find Inspect package metadata; the earlier 0.3.266 result
+has been dated to its original environment. No upstream scorer was run.
+
+| Finding | Disposition | Verified repair and boundary |
+| --- | --- | --- |
+| F1 blocker: live host setting missing | **Fixed in draft** | Record user `env` value 400000, activation 18:59Z, all-session/subagent scope and supplied coordinator readback/902,612 transition. A uses supported source exclusion plus a common explicit packet; every arm gets value-only readback gates. No-selection leaves incumbent B unchanged. [Settings precedence](https://code.claude.com/docs/en/settings#settings-precedence), [CLI](https://code.claude.com/docs/en/cli-reference#cli-flags), [window precedence](https://code.claude.com/docs/en/model-config#set-the-auto-compact-window). Native qualification remains open. |
+| F2 major: B1 misses untracked paths | **Fixed** | Porcelain v1 with all untracked and ignored files, before/after ignored-file hashes, frozen base and exact immutable-overlay checks; no index mutation. [Git status](https://git-scm.com/docs/git-status). |
+| F3 major: tolerance rules encoded as literals | **Fixed** | B1 exit/set predicates; R1 bounded-span and pinned-reader identity predicates. Rehash both contracts and all eight controls. [Inspect exact branch](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/scorer/_common.py); original reader at 341ba641, SHA256 and lines recorded above. Executable adapters remain unqualified. |
+| F4 major: ID-only collector gate | **Fixed** | Compare required attributes with actual log `keep_keys`; missing request/client IDs, fallback hop and speed all gate launch. Remove span-only lineage from log joins. [Collector](../../observability/collector/collector.yaml), [monitoring schema](https://code.claude.com/docs/en/monitoring-usage). |
+| F5 major: retries/errors overclaimed | **Fixed by narrowing; complete metering not supported until qualified** | Terminal-chain scope only, no intermediate-attempt claim; any terminal API error ends incomplete with no qualified counter source. [API errors](https://code.claude.com/docs/en/monitoring-usage#api-error-event), [traces](https://code.claude.com/docs/en/monitoring-usage#traces-beta). |
+| F6 minor: uncaptured provider in key | **Fixed** | Provider is the sealed `anthropic_api` run constant; missing request IDs stay unresolved and cannot become usage dedup keys. [API request fields](https://code.claude.com/docs/en/monitoring-usage#api-request-event). |
+| F7 minor: one-hour write rule lacks TTL split | **Fixed by marking not evaluable** | No qualified per-request TTL source; conditional weights remain, W/CPS unknown and no launch/selection. Native aggregate tokens still count. [API request fields](https://code.claude.com/docs/en/monitoring-usage#api-request-event), [pricing multipliers](https://platform.claude.com/docs/en/about-claude/pricing). |
+| F8 minor: whole-run wall cap excludes washouts/drains | **Fixed** | Replace 259200 with a seal-time cap at least `271800 + 36*D + H`; D/H and numeric cap stay null until qualified. Arithmetic uses this draft's frozen 36 attempts, 7200-second attempt caps and 35 360-second washouts. |
+| F9 minor: stale registration/validation statements | **Fixed** | Date earlier failures; independently confirm all pre-repair registered bytes at f7cc409a and baseline validator exit 0. Current edited-file hash mismatches require coordinator registration. [Build evidence](build-evidence.json). |
+
+All nine corrections and verification paths are also appended to JSON's
+anti-pattern log. The new tests ran before changing JSON or this Markdown:
+`python3 -m unittest tests.test_compaction_window_ab_preregistration -v`, with
+`PYTHONDONTWRITEBYTECODE=1`, returned **exit 1**, **14 tests, 11 failures**.
+Failures cover the blocker, all four majors and the structurally checkable
+minors, plus existing selection/coverage assertions that encoded the old rules.
+The actual red excerpt and final pass/validator outputs are retained in
+[build-evidence.json](build-evidence.json), with their command and exit codes.
+These checks verify draft structure and predicate examples only. The experiment
+remains **DRAFT, not frozen, not run; launch stays prohibited**.

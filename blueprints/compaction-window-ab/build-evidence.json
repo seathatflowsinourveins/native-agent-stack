@@ -55,7 +55,10 @@
   ],
   "independent_review": {
     "scope": "Read-only source and draft review; no Claude session or task execution",
-    "observations": ["Recomputed the frozen verification inventory: 97 selected and 93 excluded, with the declared SHA256; the complementary platform-skip module is excluded.", "Confirmed W2 literal-source predicates and R1 exact source spans replace subjective citation scoring."],
+    "observations": [
+      "Recomputed the frozen verification inventory: 97 selected and 93 excluded, with the declared SHA256; the complementary platform-skip module is excluded.",
+      "Confirmed W2 literal-source predicates and R1 exact source spans replace subjective citation scoring."
+    ],
     "boundary": "Review findings were checked against the cited original sources; this is not native compaction or quota acceptance."
   },
   "commit": {
@@ -69,5 +72,306 @@
     "required_message_trailer": "Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>"
   },
   "sanitization": "Red traceback excerpt replaces the worktree prefix with <scratchpad> and omits separator/caret lines. Native version/help and primary-source reads are described in the preregistration. No conversations, session identifiers, credentials or personal paths are published.",
-  "limitations": "These checks do not establish Workflow inheritance, long-child eligibility, budget feasibility, frozen task quality or any comparative window result. Candidate hashes and registration establish byte identity, not a freeze or model execution."
+  "limitations": "These checks do not establish Workflow inheritance, long-child eligibility, budget feasibility, frozen task quality or any comparative window result. Candidate hashes and registration establish byte identity, not a freeze or model execution.",
+  "original_record_scope": "Original authoring checks and commit attempt below are historical, preceding f7cc409a. cross_family_repair_20260927 is the current round and attempted no git mutation commands.",
+  "cross_family_repair_20260927": {
+    "date": "2026-09-27",
+    "reviewed_head": "f7cc409a3df212375c76f957700b1ebb16ce1e73",
+    "review_artifact": "416-review-claude.json",
+    "finding_count": 9,
+    "status": "DRAFT_not_frozen_not_run",
+    "execution_authorized": false,
+    "skills": {
+      "selected": [
+        "search-first (inline, no delegation)",
+        "find-skills (discovery only)",
+        "tdd",
+        "verification-before-completion"
+      ],
+      "seam": "User-requested tests/test_compaction_window_ab_preregistration.py checks the JSON and Markdown protocol; no new runtime or skill installation."
+    },
+    "boundaries": {
+      "host_settings_changed": false,
+      "claude_sessions_started": 0,
+      "model_runs": 0,
+      "subagents_spawned": 0,
+      "git_mutation_commands_run": 0,
+      "evidence_manifest_changed": false,
+      "python_dont_write_bytecode": "1"
+    },
+    "research": {
+      "source_order": "Installed Claude 2.1.283 version/help and value-only settings read; version release/changelog; pinned Inspect/reader/collector source and official documentation. Direct GitHub CLI network failure was preserved; Context Mode fetched the same release and tagged changelog.",
+      "installed_help": {
+        "exit_code": 0,
+        "version": "2.1.283 (Claude Code)",
+        "flags": [
+          "--autocompact <auto|tokens>",
+          "--setting-sources <sources>",
+          "--settings <file-or-json>"
+        ]
+      },
+      "host_readback": {
+        "settings_scope": "user",
+        "mechanism": "env",
+        "selected_key": "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
+        "value": "400000",
+        "repair_shell_value": null
+      },
+      "coordinator_observation": {
+        "provenance": "user_supplied_not_replayed",
+        "activated_at": "2026-09-27T18:59:00Z",
+        "scope": "Every Claude Code session and subagent on this host since activation",
+        "shell_value": "400000",
+        "first_request_after_activation_auto_compaction_tokens": 902612
+      },
+      "sources": [
+        "https://code.claude.com/docs/en/settings#settings-precedence",
+        "https://code.claude.com/docs/en/cli-reference#cli-flags",
+        "https://code.claude.com/docs/en/env-vars",
+        "https://code.claude.com/docs/en/model-config#set-the-auto-compact-window",
+        "https://api.github.com/repos/anthropics/claude-code/releases/tags/v2.1.283",
+        "https://github.com/anthropics/claude-code/blob/v2.1.283/CHANGELOG.md",
+        "https://code.claude.com/docs/en/monitoring-usage",
+        "https://platform.claude.com/docs/en/about-claude/pricing",
+        "https://git-scm.com/docs/git-status",
+        "https://git-scm.com/docs/git-diff",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/scorer/_common.py",
+        "https://skills.sh/meridianlabs-ai/inspect-skills",
+        "https://github.com/git/git/blob/v2.43.0/Documentation/git-status.txt"
+      ],
+      "failed_or_limited_reads": [
+        {
+          "command": "rtk env PYTHONDONTWRITEBYTECODE=1 gh api repos/anthropics/claude-code/releases/tags/v2.1.283 --jq '{tag: .tag_name, body: .body}'",
+          "exit_code": 1,
+          "returned_output": "error connecting to api.github.com\ncheck your internet connection or https://githubstatus.com\n",
+          "resolution": "Context Mode fetched the identical public release URL and tagged changelog."
+        },
+        {
+          "operation": "native web open",
+          "result": "HTTP 400: Unsupported operation for /v1/alpha/search: open",
+          "resolution": "Context Mode fetched and indexed the official documents; search returned no usable result."
+        },
+        {
+          "operation": "direct sandbox urllib official-doc read",
+          "exit_code": 1,
+          "returned_output_excerpt": "urllib.error.HTTPError: HTTP Error 403: Forbidden",
+          "resolution": "Used supported Context Mode URL fetching; no absence claim derived from the refusal."
+        },
+        {
+          "operation": "current python3 importlib.metadata.version('inspect-ai') after successful reader/hash inspection",
+          "exit_code": 1,
+          "returned_output_excerpt": "importlib.metadata.PackageNotFoundError: No package metadata was found for inspect-ai",
+          "resolution": "Date the prior 0.3.266 metadata report to that earlier environment; neither observation establishes 0.3.271 execution."
+        }
+      ],
+      "arm_A_mechanism": "Use identical --setting-sources project --settings <sealed-common-settings.json> for A/B/C; project/common packet omit the window key. A removes it from the launch environment; B/C set 400000/200000. Managed conflicts block. No supported per-key env delete was found in inspected help/tagged changelog/docs. CLAUDE_CONFIG_DIR was researched as a broader alternative, not selected.",
+      "native_readback_qualified": false,
+      "qualification_boundary": "Documented flags and file readback do not prove runtime source exclusion, child inheritance, retry coverage, TTL pricing or compaction acceptance.",
+      "git_status_help": {
+        "version": "2.43.0",
+        "exit_code": 129,
+        "result": "Native help confirms --porcelain[=<version>], -z, --untracked-files=all and --ignored=traditional."
+      }
+    },
+    "checks": [
+      {
+        "phase": "baseline_at_f7cc409a_before_edits",
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py",
+        "exit_code": 0,
+        "returned_output": "{\"components\": 69, \"hashed_files\": 7353, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+        "boundary": "Pre-repair registrations matched; this is structural validation, not experiment execution."
+      },
+      {
+        "phase": "red_before_cross_family_protocol_repairs",
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 1,
+        "artifact_state": "Only the test file had changed; JSON and Markdown still matched reviewed head f7cc409a.",
+        "returned_output_excerpt": "test_B1_observes_untracked_and_ignored_paths_and_projects_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_B1_observes_untracked_and_ignored_paths_and_projects_predicates) ... FAIL\ntest_R1_tolerances_and_pinned_source_are_boolean_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_R1_tolerances_and_pinned_source_are_boolean_predicates) ... FAIL\ntest_budget_uses_native_tokens_and_does_not_invent_a_charge_bound (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_budget_uses_native_tokens_and_does_not_invent_a_charge_bound) ... ok\ntest_cache_write_price_is_unknown_without_request_ttl_split (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_cache_write_price_is_unknown_without_request_ttl_split) ... FAIL\ntest_collector_gate_covers_every_used_log_attribute (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_collector_gate_covers_every_used_log_attribute) ... FAIL\ntest_draft_contract (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... FAIL\ntest_inspect_oracle_contracts_have_hashed_discriminating_controls (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_inspect_oracle_contracts_have_hashed_discriminating_controls) ... ok\ntest_live_host_condition_and_arm_readback_are_launch_gates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_live_host_condition_and_arm_readback_are_launch_gates) ... FAIL\ntest_log_ledger_does_not_claim_intermediate_retry_or_error_usage (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_log_ledger_does_not_claim_intermediate_retry_or_error_usage) ... FAIL\ntest_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown) ... FAIL\ntest_request_ledger_covers_hidden_requests_and_reconciles_once (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_request_ledger_covers_hidden_requests_and_reconciles_once) ... FAIL\ntest_selection_optimizes_cost_instead_of_arm_order (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_selection_optimizes_cost_instead_of_arm_order) ... FAIL\ntest_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence) ... ok\ntest_wall_budget_includes_all_washouts_and_qualified_drains (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_wall_budget_includes_all_washouts_and_qualified_drains) ... FAIL\nRan 14 tests in 0.010s\nFAILED (failures=11)\n",
+        "sanitization": "Retained actual test-status and summary lines; omitted tracebacks, personal paths and large assertion dumps. Tool output was truncated, so no claim of retaining the full red stream.",
+        "result": "14 tests, 11 failures: eight added finding tests plus three pre-existing assertions exposed stale selection/coverage rules; three unaffected tests passed."
+      },
+      {
+        "phase": "first_green_after_protocol_repairs",
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 0,
+        "returned_output": "test_B1_observes_untracked_and_ignored_paths_and_projects_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_B1_observes_untracked_and_ignored_paths_and_projects_predicates) ... ok\ntest_R1_tolerances_and_pinned_source_are_boolean_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_R1_tolerances_and_pinned_source_are_boolean_predicates) ... ok\ntest_budget_uses_native_tokens_and_does_not_invent_a_charge_bound (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_budget_uses_native_tokens_and_does_not_invent_a_charge_bound) ... ok\ntest_cache_write_price_is_unknown_without_request_ttl_split (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_cache_write_price_is_unknown_without_request_ttl_split) ... ok\ntest_collector_gate_covers_every_used_log_attribute (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_collector_gate_covers_every_used_log_attribute) ... ok\ntest_draft_contract (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... ok\ntest_inspect_oracle_contracts_have_hashed_discriminating_controls (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_inspect_oracle_contracts_have_hashed_discriminating_controls) ... ok\ntest_live_host_condition_and_arm_readback_are_launch_gates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_live_host_condition_and_arm_readback_are_launch_gates) ... ok\ntest_log_ledger_does_not_claim_intermediate_retry_or_error_usage (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_log_ledger_does_not_claim_intermediate_retry_or_error_usage) ... ok\ntest_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown) ... ok\ntest_request_ledger_covers_hidden_requests_and_reconciles_once (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_request_ledger_covers_hidden_requests_and_reconciles_once) ... ok\ntest_selection_optimizes_cost_instead_of_arm_order (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_selection_optimizes_cost_instead_of_arm_order) ... ok\ntest_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence) ... ok\ntest_wall_budget_includes_all_washouts_and_qualified_drains (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_wall_budget_includes_all_washouts_and_qualified_drains) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 0.016s\n\nOK\n",
+        "result": "All 14 structural tests passed. Predicate examples and required collector allowlist are checked; no executable adapter, upstream scorer, model or native compaction was run."
+      },
+      {
+        "phase": "green_with_nine_dispositions_recorded",
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 0,
+        "returned_output": "test_B1_observes_untracked_and_ignored_paths_and_projects_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_B1_observes_untracked_and_ignored_paths_and_projects_predicates) ... ok\ntest_R1_tolerances_and_pinned_source_are_boolean_predicates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_R1_tolerances_and_pinned_source_are_boolean_predicates) ... ok\ntest_budget_uses_native_tokens_and_does_not_invent_a_charge_bound (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_budget_uses_native_tokens_and_does_not_invent_a_charge_bound) ... ok\ntest_cache_write_price_is_unknown_without_request_ttl_split (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_cache_write_price_is_unknown_without_request_ttl_split) ... ok\ntest_collector_gate_covers_every_used_log_attribute (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_collector_gate_covers_every_used_log_attribute) ... ok\ntest_draft_contract (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... ok\ntest_inspect_oracle_contracts_have_hashed_discriminating_controls (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_inspect_oracle_contracts_have_hashed_discriminating_controls) ... ok\ntest_live_host_condition_and_arm_readback_are_launch_gates (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_live_host_condition_and_arm_readback_are_launch_gates) ... ok\ntest_log_ledger_does_not_claim_intermediate_retry_or_error_usage (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_log_ledger_does_not_claim_intermediate_retry_or_error_usage) ... ok\ntest_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown) ... ok\ntest_request_ledger_covers_hidden_requests_and_reconciles_once (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_request_ledger_covers_hidden_requests_and_reconciles_once) ... ok\ntest_selection_optimizes_cost_instead_of_arm_order (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_selection_optimizes_cost_instead_of_arm_order) ... ok\ntest_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_three_repetitions_are_an_exploratory_pilot_not_adoption_evidence) ... ok\ntest_wall_budget_includes_all_washouts_and_qualified_drains (tests.test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_wall_budget_includes_all_washouts_and_qualified_drains) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 0.015s\n\nOK\n",
+        "result": "All 14 tests passed with the cross-family record present. This precedes appending the returned results and the final recheck."
+      },
+      {
+        "phase": "publication_validation_after_cross_family_repairs",
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py",
+        "exit_code": 1,
+        "returned_output": "Publication validation failed:\nblueprints/compaction-window-ab/PREREGISTRATION.md: SHA-256 mismatch\nblueprints/compaction-window-ab/PREREGISTRATION.md: byte count mismatch\nblueprints/compaction-window-ab/build-evidence.json: SHA-256 mismatch\nblueprints/compaction-window-ab/build-evidence.json: byte count mismatch\nblueprints/compaction-window-ab/preregistration.json: SHA-256 mismatch\nblueprints/compaction-window-ab/preregistration.json: byte count mismatch\ntests/test_compaction_window_ab_preregistration.py: SHA-256 mismatch\ntests/test_compaction_window_ab_preregistration.py: byte count mismatch\n",
+        "result": "Only SHA-256 and byte-count mismatches for the four files edited in this round; no other errors. Coordinator must re-register final bytes and rerun. The evidence manifest was not edited."
+      },
+      {
+        "phase": "whitespace_check_cross_family",
+        "command": "rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 git diff --check",
+        "exit_code": 0,
+        "returned_output": ""
+      },
+      {
+        "phase": "independent_scope_and_cache_observation",
+        "method": "Read-only Git/base comparison plus JSON comparison and an os.walk cache inventory, with GIT_OPTIONAL_LOCKS=0 and PYTHONDONTWRITEBYTECODE=1.",
+        "exit_code": 0,
+        "returned_output_excerpt": " M blueprints/compaction-window-ab/PREREGISTRATION.md\n M blueprints/compaction-window-ab/build-evidence.json\n M blueprints/compaction-window-ab/preregistration.json\n M tests/test_compaction_window_ab_preregistration.py\nIndependent invariants: six other adapters, three other task packets, arm values, thresholds, ordering, frozen corpora and builder vectors unchanged.\nEvidence manifest unchanged.\nWorktree cache artifacts: 0\nPYTHONDONTWRITEBYTECODE=1\n",
+        "sanitization": "Omitted only the long semantic-change-path list and pre-final candidate digests; no external paths or private state in retained lines."
+      }
+    ],
+    "dispositions": [
+      {
+        "finding": "F1",
+        "severity": "blocker",
+        "disposition": "fixed",
+        "defect": "Unrecorded live user env and an A launch that only unsets its shell.",
+        "verification": "Value-only user-settings readback; installed 2.1.283 help, tagged changelog and official settings/model-config/CLI/env docs.",
+        "repair": "Record incumbent B activation and supplied coordinator observation; use equal source isolation and arm readback gates, no implicit reversion to A.",
+        "sources": [
+          "https://code.claude.com/docs/en/settings#settings-precedence",
+          "https://code.claude.com/docs/en/cli-reference#cli-flags",
+          "https://code.claude.com/docs/en/model-config#set-the-auto-compact-window"
+        ],
+        "boundary": "Draft repair only; no native launch qualification."
+      },
+      {
+        "finding": "F2",
+        "severity": "major",
+        "disposition": "fixed",
+        "defect": "Plain git diff excludes untracked/ignored builder files.",
+        "verification": "Git v2.43.0 porcelain status docs and B1 prompt/new-file requirement.",
+        "repair": "Use full porcelain status plus ignored-file before/after hashes against the frozen base; forbid any unauthorized path and rehash B1.",
+        "sources": [
+          "https://git-scm.com/docs/git-status"
+        ],
+        "boundary": "Draft repair only; no native launch qualification."
+      },
+      {
+        "finding": "F3",
+        "severity": "major",
+        "disposition": "fixed",
+        "defect": "Exact digests compared tolerated exits, path subsets and citation spans as literals; R1 omitted source identity.",
+        "verification": "Inspect 0.3.271 _common.py exact branch and pinned child-usage.mjs original bytes/spans.",
+        "repair": "Project independent B1 and R1 predicates, including pinned-reader identity; keep raw evidence separate and rehash both contracts and all eight controls.",
+        "sources": [
+          "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/scorer/_common.py",
+          "examples/claude-native/workflows/child-usage.mjs at 341ba64186b5631f52c11bd290a4f32fd405b7b1:458,460,542-548"
+        ],
+        "boundary": "Draft repair only; no native launch qualification."
+      },
+      {
+        "finding": "F4",
+        "severity": "major",
+        "disposition": "fixed",
+        "defect": "An ID-only collector gate overlooked speed/fallback attributes and assumed span lineage in logs.",
+        "verification": "Actual collector keep_keys at f7cc409a and Claude monitoring API/trace schema.",
+        "repair": "Gate every applicable log attribute through Loki; exclude span-only agent_id/parent_agent_id and treat missing as unknown.",
+        "sources": [
+          "observability/collector/collector.yaml at f7cc409a:123,217",
+          "https://code.claude.com/docs/en/monitoring-usage"
+        ],
+        "boundary": "Draft repair only; no native launch qualification."
+      },
+      {
+        "finding": "F5",
+        "severity": "major",
+        "disposition": "fixed",
+        "defect": "Log-only metering overclaimed intermediate retries and unspecified error-charge resolution.",
+        "verification": "Claude monitoring api_request/api_error and gen_ai.request.attempt trace schema.",
+        "repair": "Narrow to terminal chains; every terminal api_error ends incomplete, full retry accounting remains not supported until qualified.",
+        "sources": [
+          "https://code.claude.com/docs/en/monitoring-usage#api-error-event",
+          "https://code.claude.com/docs/en/monitoring-usage#traces-beta"
+        ],
+        "boundary": "Claim narrowed; complete metering is not supported until qualified."
+      },
+      {
+        "finding": "F6",
+        "severity": "minor",
+        "disposition": "fixed",
+        "defect": "Provider/request_id dedup used an uncaptured provider field.",
+        "verification": "Claude api_request schema and sealed Anthropic route.",
+        "repair": "Attach a run-constant provider; retain missing IDs as unresolved event locators with no usage dedup or zero-charge inference.",
+        "sources": [
+          "https://code.claude.com/docs/en/monitoring-usage#api-request-event",
+          "preregistration.json#/shared_controls/provider"
+        ],
+        "boundary": "Draft repair only; no native launch qualification."
+      },
+      {
+        "finding": "F7",
+        "severity": "minor",
+        "disposition": "fixed",
+        "defect": "One-hour writes were excluded without TTL-split observations.",
+        "verification": "Claude api_request single cache_creation_tokens and official pricing 1.25x versus 2x.",
+        "repair": "Mark current pricing/TTL rule not evaluable, W/CPS unknown and launch blocked pending a qualified per-request source.",
+        "sources": [
+          "https://code.claude.com/docs/en/monitoring-usage#api-request-event",
+          "https://platform.claude.com/docs/en/about-claude/pricing"
+        ],
+        "boundary": "Not evaluable under current instrumentation; launch and cost selection remain blocked."
+      },
+      {
+        "finding": "F8",
+        "severity": "minor",
+        "disposition": "fixed",
+        "defect": "The whole-run wall cap was only 36 times the attempt cap.",
+        "verification": "Frozen schedule: 36*7200 + 35*360 = 271800 seconds before drains/readiness.",
+        "repair": "Seal a numeric cap at least 271800+36*D+H once finite drain/readiness bounds are qualified; null and do_not_launch until then.",
+        "sources": [
+          "preregistration.json#/execution/planned_attempts",
+          "preregistration.json#/thresholds/washout_seconds",
+          "preregistration.json#/stop_rules/whole_run_wall_cap"
+        ],
+        "boundary": "Formula repaired; numeric cap remains a sealing gate until drain/readiness bounds are qualified."
+      },
+      {
+        "finding": "F9",
+        "severity": "minor",
+        "disposition": "fixed",
+        "defect": "Historical registration failures were described as current at f7cc409a.",
+        "verification": "Independent bytes/hashes matched all four pre-repair registry entries; baseline validator passed, exit 0.",
+        "repair": "Date the earlier failures; record post-integration registration and this repair validation separately, with coordinator re-registration required for current edits.",
+        "sources": [
+          "manifests/evidence.json at f7cc409a3df212375c76f957700b1ebb16ce1e73",
+          "baseline_at_f7cc409a_before_edits returned validator output"
+        ],
+        "boundary": "Draft repair only; no native launch qualification."
+      }
+    ],
+    "remaining_gates": [
+      "Coordinator re-registration and validator rerun after integrating these four files",
+      "Native per-arm settings/coordinator/child readback and Workflow treatment",
+      "Complete log-attribute/child attribution evidence and intermediate-retry accounting",
+      "Qualified per-request cache-write TTL source",
+      "Measured lag, enforced outstanding-token and cancellation bounds",
+      "Finite drain/readiness bounds and sealed numeric wall cap",
+      "Eight executable Inspect 0.3.271 adapters/control runs, fixed offline-suite readiness and budget feasibility",
+      "Independent confirmation before any additional persistent adoption or reversion"
+    ],
+    "failed_edit_attempts": [
+      {
+        "operation": "append build evidence with apply_patch delete/add targeting one path",
+        "result": "Rejected: multiple operations target the same path; no edit applied.",
+        "correction": "Use one Update File patch."
+      }
+    ],
+    "registration_handoff": {
+      "changed_files": [
+        "blueprints/compaction-window-ab/PREREGISTRATION.md",
+        "blueprints/compaction-window-ab/preregistration.json",
+        "blueprints/compaction-window-ab/build-evidence.json",
+        "tests/test_compaction_window_ab_preregistration.py"
+      ],
+      "manifest_edit_owner": "coordinator",
+      "builder_edited_manifest": false,
+      "final_byte_registration_pending": true
+    }
+  }
 }

@@ -7,6 +7,7 @@ The public seam is the JSON protocol and its human-readable contract table.
 import hashlib
 import json
 from pathlib import Path
+import re
 import unittest
 
 
@@ -18,7 +19,7 @@ RULES = {
     "quality_rule": "For every task and check, any pass in A requires a pass in every repetition of the candidate.",
     "pass_count_rule": "Candidate total passed checks and successful tasks must each be at least A's totals.",
     "cost_rule": "All-attempt weighted child cost per successful task must be at least 10% lower than A, both pooled and for each task.",
-    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and retains A.",
+    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and leaves the incumbent host setting B unchanged.",
     "incomplete_rule": "Any stopped, invalid, underlength, or unmeasured run is incomplete; no adoption result.",
 }
 
@@ -170,7 +171,7 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
             "cache_creation_tokens": "cache_creation_input_tokens",
             "cache_read_tokens": "cache_read_input_tokens",
         })
-        self.assertTrue({"compaction", "background_preparation", "retry", "refusal", "fallback"}
+        self.assertTrue({"compaction", "background_preparation", "terminal_retry_chain", "refusal", "fallback"}
                         <= set(ledger["include"]))
         self.assertIn("request_id", ledger["required_attributes"])
         self.assertIn("workflow.run_id", ledger["attribution"])
@@ -186,7 +187,7 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         rule = self.spec()["decision_rule"]
         self.assertEqual(rule["selection_rule"], RULES["selection_rule"])
         self.assertEqual(rule["objective"], "minimize_pooled_all_attempt_weighted_child_cost_per_success")
-        self.assertEqual(rule["tie_rule"], "exact_unrounded_tie_retain_A_no_selection")
+        self.assertEqual(rule["tie_rule"], "exact_unrounded_tie_no_selection_incumbent_B_unchanged")
         self.assertEqual(rule["minimum_effect_fraction_vs_A"], 0.1)
         examples = {row["id"]: row for row in rule["worked_examples"]}
         # Independent review counterexample and its symmetric/tied controls.
@@ -194,8 +195,8 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
                          {"A": 100, "B": 60, "C": 89})
         self.assertEqual(examples["review_counterexample"]["selected"], "B")
         self.assertEqual(examples["C_cheapest"]["selected"], "C")
-        self.assertEqual(examples["cost_tie"]["selected"], "A")
-        self.assertEqual(examples["below_minimum_effect"]["selected"], "A")
+        self.assertIsNone(examples["cost_tie"]["selected"])
+        self.assertIsNone(examples["below_minimum_effect"]["selected"])
         self.assertEqual(examples["cheap_quality_regression"]["selected"], "C")
 
     def test_inspect_oracle_contracts_have_hashed_discriminating_controls(self):
@@ -246,6 +247,192 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         self.assertFalse(spec["sealing"]["pilot_allows_persistent_adoption"])
         self.assertIn("exploratory", spec["decision_rule"]["interpretation"])
         self.assertIn("stability", precision)
+
+    def test_live_host_condition_and_arm_readback_are_launch_gates(self):
+        spec = self.spec()
+        self.assertIn("host_condition", spec)
+        host = spec["host_condition"]
+        self.assertTrue(host["frozen_design_condition"])
+        self.assertEqual(host["variable"], VARIABLE)
+        self.assertEqual(host["value"], "400000")
+        self.assertEqual(host["settings_file"], "~/.claude/settings.json")
+        self.assertEqual(host["settings_scope"], "user")
+        self.assertEqual(host["mechanism"], "env")
+        self.assertEqual(host["activated_at"], "2026-09-27T18:59:00Z")
+        self.assertEqual(host["incumbent_arm"], "B")
+        observation = host["coordinator_observation"]
+        self.assertEqual(observation["shell_value"], "400000")
+        self.assertEqual(observation["first_request_auto_compaction_tokens"], 902612)
+        self.assertEqual(observation["provenance"], "coordinator_supplied_not_replayed")
+
+        isolation = spec["native_lever"]["settings_isolation"]
+        self.assertEqual(isolation["setting_sources"], ["project"])
+        self.assertEqual(isolation["excluded_settings_sources"], ["user", "local"])
+        self.assertTrue(isolation["same_packet_all_arms"])
+        self.assertFalse(isolation["packet_contains_window_env"])
+        self.assertFalse(isolation["edits_host_settings"])
+        self.assertEqual(spec["shared_controls"]["common_cli"]["setting_sources"], "project")
+        self.assertTrue({"claude_settings", "claude_cli", "claude_config_dir"}
+                        <= set(isolation["source_ids"]))
+        gate = spec["native_lever"]["arm_readback_gate"]
+        self.assertEqual(gate["expected_values"], EXPECTED_ARMS)
+        self.assertEqual(gate["every"], "task_arm_repetition")
+        self.assertTrue(gate["prelaunch_settings_and_environment_readback"])
+        self.assertTrue(gate["effective_coordinator_and_child_readback_required"])
+        self.assertFalse(gate["qualified"])
+        self.assertEqual(gate["unqualified_action"], "do_not_launch")
+        self.assertEqual(gate["mismatch_action"], "stop_entire_run_incomplete")
+        self.assertEqual(spec["decision_rule"]["no_selection_host_action"],
+                         "leave_incumbent_B_unchanged_no_reversion_to_A")
+
+    def test_B1_observes_untracked_and_ignored_paths_and_projects_predicates(self):
+        spec = self.spec()
+        adapter = spec["oracle_framework"]["adapters"]["B1"]
+        contract = adapter["contract"]
+        self.assertIn("changed_path_derivation", contract)
+        derivation = contract["changed_path_derivation"]
+        self.assertEqual(derivation["status_argv"], [
+            "git", "status", "--porcelain=v1", "--untracked-files=all",
+            "--ignored=traditional", "-z",
+        ])
+        self.assertEqual(derivation["base_revision"], spec["reference_revision"])
+        self.assertEqual(derivation["include_statuses"], ["tracked", "untracked", "ignored"])
+        self.assertEqual(derivation["ignored_file_policy"], "compare_before_after_paths_and_sha256")
+        self.assertEqual(derivation["rename_policy"], "include_both_paths")
+        self.assertFalse(derivation["index_writes_required"])
+        check = spec["tasks"][0]["checks"][0]
+        self.assertEqual(contract["procedure"], check["procedure"])
+        self.assertNotIn("final git diff names", check["procedure"])
+        good = adapter["controls"]["known_pass"]["fixture"]
+        target = good["target"]
+        self.assertNotIn("red_exit", target)
+        self.assertNotIn("changed_paths", target)
+        self.assertIs(target["red_exit_nonzero"], True)
+        self.assertIs(target["changed_paths_subset_including_reader"], True)
+        reader = "examples/claude-native/workflows/child-usage.mjs"
+        regression = "examples/claude-native/workflows/test-compaction-summary.mjs"
+        self.assertEqual(set(derivation["allowed_paths"]), {reader, regression})
+        # Independent boundary examples check the written projection, not an
+        # unmaterialized adapter. Exit 2 is as valid a red result as exit 1.
+        cases = contract["predicate_examples"]
+        self.assertTrue(any(row["red_exit"] == 2 for row in cases))
+        self.assertTrue(any(row["changed_paths"] == [reader] for row in cases))
+        self.assertTrue(any("forbidden.py" in row["changed_paths"] for row in cases))
+        for row in cases:
+            with self.subTest(example=row["id"]):
+                paths = set(row["changed_paths"])
+                self.assertEqual(row["red_exit_nonzero"], row["red_exit"] != 0)
+                self.assertEqual(row["changed_paths_subset_including_reader"],
+                                 reader in paths and paths <= {reader, regression})
+
+    def test_R1_tolerances_and_pinned_source_are_boolean_predicates(self):
+        adapter = self.spec()["oracle_framework"]["adapters"]["R1"]
+        contract = adapter["contract"]
+        target = adapter["controls"]["known_pass"]["fixture"]["target"]
+        self.assertNotIn("citation_spans", target)
+        self.assertIs(target["cites_pinned_reader_sha"], True)
+        self.assertEqual(target["citation_predicates"], [True, True, True])
+        self.assertEqual(contract["extra_lines_each_side_max"], 5)
+        self.assertEqual(contract["required_source_spans"], [[458, 458], [460, 460], [542, 548]])
+        source = contract["citation_source"]
+        self.assertEqual(source["path"], "examples/claude-native/workflows/child-usage.mjs")
+        self.assertEqual(source["revision"], self.spec()["reference_revision"])
+        self.assertEqual(source["sha256"], "f5ea9c3a1b47cab91e90a515f455bcf6a960fb696db89717e04b7424e4ff42a0")
+        cases = contract["predicate_examples"]
+        self.assertTrue(any(row["spans"][0] == [456, 460] for row in cases))
+        self.assertTrue(any(not row["cites_pinned_reader_sha"] for row in cases))
+        self.assertTrue(any(False in row["citation_predicates"] for row in cases))
+        for row in cases:
+            with self.subTest(example=row["id"]):
+                predicates = [
+                    max(1, required_start - 5) <= start <= required_start
+                    and required_end <= end <= required_end + 5
+                    for (start, end), (required_start, required_end)
+                    in zip(row["spans"], contract["required_source_spans"], strict=True)
+                ]
+                self.assertEqual(row["citation_predicates"], predicates)
+                self.assertEqual(row["cites_pinned_reader_sha"], row["source"] == source)
+
+    def test_collector_gate_covers_every_used_log_attribute(self):
+        ledger = self.spec()["metrics"]["request_ledger"]
+        gate = ledger["qualification"]
+        self.assertIn("required_log_attributes", gate)
+        required = set(gate["required_log_attributes"])
+        self.assertTrue({
+            "request_id", "client_request_id", "server_fallback_hop", "speed",
+            "workflow.run_id", "query_source", "attempt", "model", "session.id",
+            "event.name", "event.timestamp", "event.sequence", "input_tokens",
+            "output_tokens", "cache_creation_tokens", "cache_read_tokens",
+        } <= required)
+        collector = (ROOT / "observability/collector/collector.yaml").read_text()
+        lists = re.findall(r"keep_keys\(attributes, (\[[^\n]+\])\)", collector)
+        log_keys = next(set(json.loads(keys)) for keys in lists if '"event.name"' in keys)
+        self.assertEqual(set(gate["template_missing_log_attributes"]), required - log_keys)
+        self.assertFalse(gate["attribute_preservation_proven"])
+        self.assertEqual(gate["unqualified_action"], "do_not_launch")
+        self.assertTrue(gate["missing_applicable_attribute_is_unknown"])
+        self.assertTrue({"agent_id", "parent_agent_id"}.isdisjoint(ledger["attribution"]))
+        self.assertNotIn("attempt", ledger["required_attributes"])
+        self.assertIn("speed", ledger["required_attributes"])
+
+    def test_log_ledger_does_not_claim_intermediate_retry_or_error_usage(self):
+        spec = self.spec()
+        ledger = spec["metrics"]["request_ledger"]
+        self.assertIn("retry_observability", ledger)
+        retry = ledger["retry_observability"]
+        self.assertEqual(retry["scope"], "terminal_chains_only")
+        self.assertFalse(retry["intermediate_attempts_observed"])
+        self.assertFalse(retry["traces_collected"])
+        self.assertFalse(retry["api_request_has_attempt"])
+        self.assertFalse(retry["api_error_has_token_counters"])
+        self.assertEqual(retry["api_error_attempt_meaning"], "total_attempts_including_initial")
+        self.assertEqual(retry["terminal_error_action"], "stop_entire_run_incomplete")
+        self.assertEqual(spec["stop_rules"]["on_terminal_api_error"], "stop_entire_run_incomplete")
+        self.assertNotIn("retry", ledger["include"])
+        self.assertNotIn("client_request_id plus attempt", ledger["join"])
+        self.assertFalse(retry["complete_retry_accounting_qualified"])
+        self.assertEqual(retry["unqualified_action"], "do_not_launch")
+
+    def test_provider_key_is_a_sealed_run_constant_and_missing_ids_stay_unknown(self):
+        ledger = self.spec()["metrics"]["request_ledger"]
+        self.assertIn("run_constants", ledger)
+        self.assertEqual(ledger["run_constants"]["provider"], "anthropic_api")
+        self.assertEqual(ledger["deduplication"]["key"], ["provider", "request_id"])
+        missing = ledger["deduplication"]["missing_request_id"]
+        self.assertEqual(missing["holding_key"], ["session.id", "event.sequence", "event.name"])
+        self.assertFalse(missing["holding_key_is_usage_dedup_key"])
+        self.assertEqual(missing["action"], "stop_entire_run_incomplete")
+
+    def test_cache_write_price_is_unknown_without_request_ttl_split(self):
+        cost = self.spec()["metrics"]["weighted_cost"]
+        self.assertIn("cache_write_ttl_evidence", cost)
+        ttl = cost["cache_write_ttl_evidence"]
+        self.assertEqual(ttl["status"], "not_evaluable_from_current_ledger")
+        self.assertFalse(ttl["otel_has_ttl_split"])
+        self.assertIsNone(ttl["qualified_per_request_source"])
+        self.assertFalse(ttl["configuration_proves_ttl"])
+        self.assertEqual(ttl["missing_action"], "weighted_cost_unknown_no_selection")
+        self.assertEqual(ttl["unqualified_action"], "do_not_launch")
+
+    def test_wall_budget_includes_all_washouts_and_qualified_drains(self):
+        spec = self.spec()
+        stops = spec["stop_rules"]
+        self.assertIn("whole_run_wall_cap", stops)
+        wall = stops["whole_run_wall_cap"]
+        attempts = spec["execution"]["planned_attempts"]
+        self.assertEqual(wall["attempts"], attempts)
+        self.assertEqual(wall["washouts"], attempts - 1)
+        self.assertEqual(wall["drains"], attempts)
+        self.assertEqual(wall["fixed_seconds"],
+                         attempts * stops["attempt_wall_cap_seconds"]
+                         + (attempts - 1) * spec["thresholds"]["washout_seconds"])
+        self.assertEqual(wall["fixed_seconds"], 271800)
+        self.assertEqual(wall["formula"], "271800 + 36 * qualified_drain_bound_seconds + qualified_readiness_bound_seconds")
+        self.assertIsNone(wall["qualified_drain_bound_seconds"])
+        self.assertIsNone(wall["qualified_readiness_bound_seconds"])
+        self.assertIsNone(stops["whole_run_wall_cap_seconds"])
+        self.assertFalse(wall["qualified"])
+        self.assertEqual(wall["unqualified_action"], "do_not_launch")
 
 
 if __name__ == "__main__":
