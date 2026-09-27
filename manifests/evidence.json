@@ -13567,6 +13567,11 @@
       "bytes": 8203
     },
     {
+      "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
+      "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
+      "bytes": 7782
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -13828,8 +13833,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "1088ed35d0da2fc4ec63d18b5b0bee974e705a1fc93106b80402eab7db386ca0",
-      "bytes": 14233
+      "sha256": "a1aecf488248fdf93da79f144a34340f64a13483c4bd698593596bc8a43eb003",
+      "bytes": 14441
     },
     {
       "path": "docs/paper-lane-policy.md",
