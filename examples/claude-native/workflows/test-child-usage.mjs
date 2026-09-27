@@ -2,7 +2,7 @@
 // OFFLINE check of child-usage.mjs against SYNTHETIC transcript rows (no provider
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
-import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER } from './child-usage.mjs'
+import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER, executedText, logFindPart, sensitivePart } from './child-usage.mjs'
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync, readFileSync, chmodSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -366,5 +366,15 @@ try {
     expect('rtk-db: the sweep joins every Bash call in the window, and the database is unchanged', all && JSON.stringify(all.rtk.decisions) === JSON.stringify({ allow: 1, ask: 1, defer: 1, deny: 1, not_logged: 3, other: 0 }) && all.rtk.covered_share_of_bash === 0.2857 && readFileSync(db).equals(before))
   }
 } finally { rmSync(sweepRoot, { recursive: true, force: true }) }
+// CodeQL js/redos witnesses (2026-09-27): before the repair each took seconds at 28 repetitions, doubling with each one.
+const timed = (f) => { const t = process.hrtime.bigint(), r = f(); return { r, ms: Number(process.hrtime.bigint() - t) / 1e6 } }
+const gitWitness = 'git ' + '--git-dir --! '.repeat(28) + 'status'
+const gitRun = timed(() => [logFindPart(gitWitness), sensitivePart(gitWitness)])
+expect('redos: repeated --git-dir option words are read in linear time', gitRun.ms < 1000 && gitRun.r.join() === 'false,false')
+const codeRun = timed(() => ['node -', 'bun -', 'deno eval -'].map((p) => executedText(p + '-- -'.repeat(28) + " 'fetch(u)'", { inlineHttp: true })))
+expect('redos: repeated interpreter option words are matched in linear time', codeRun.ms < 1000)
+expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
+  logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
+  && !logFindPart('git status') && sensitivePart('git -C repo branch -a') && sensitivePart('git --git-dir=.g show HEAD:a') && !sensitivePart('git -C repo status'))
 console.log('SUMMARY passed=' + passed + ' failed=' + failed + ' total=' + (passed + failed))
 process.exit(failed ? 1 : 0)

@@ -125,7 +125,9 @@ const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s
 // with documented interpreter entrypoints: docs.python.org/3.14/using/cmdline.html,
 // nodejs.org/docs/latest-v24.x/api/cli.html, docs.deno.com/runtime/reference/cli/eval/,
 // and bun.sh/docs/runtime. HTTP operations remain unclassifiable under #381 M4.
-const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:python[\d.]*(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|node(?:js)?(?:\s+--?[\w-]+)*\s+(?:-e|--eval|-p|--print)|bun(?:\s+--?[\w-]+)*\s+(?:-e|--eval)|deno\s+eval(?:\s+--?[\w-]+)*)\s*$/
+// An option word is -[\w-]+: the same words as --?[\w-]+, which splits '---' two ways and backtracks
+// exponentially on repeated option words (CodeQL js/redos).
+const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:python[\d.]*(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|node(?:js)?(?:\s+-[\w-]+)*\s+(?:-e|--eval|-p|--print)|bun(?:\s+-[\w-]+)*\s+(?:-e|--eval)|deno\s+eval(?:\s+-[\w-]+)*)\s*$/
 const SHELL = /^(?:ba|z|da|k)?sh$/
 const INTERPRETER_WORD = /^(?:python[\d.]*|node(?:js)?|deno|bun|ruby|perl|php)$/
 // A here-document operator and its delimiter word at lastIndex (bash(1) Here Documents).
@@ -493,9 +495,29 @@ function shellParts(command) {
   parts.push(part(command.length, ''))
   return parts.filter((p) => p.text)
 }
+// git(1) global options before the subcommand: -C, -c, --git-dir or --work-tree with the next word, or one --option.
+const GIT_OPTIONS = String.raw`^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*`
 const FIVE_EXCLUSIONS = [String.raw`^git show [^ ]*:`, 'diff',
-  String.raw`^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:`,
-  String.raw`^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)`, 'jq']
+  GIT_OPTIONS + String.raw`show\s+(?:[^\n]*\s)?[^\s]*:`,
+  GIT_OPTIONS + String.raw`branch(?:\s|$)`, 'jq']
+// Where GIT_OPTIONS can end. RTK evaluates the patterns with Rust's linear-time regex; in JavaScript the nested
+// quantifier backtracks exponentially on repeated '--git-dir --x ' (CodeQL js/redos), so every reading of the
+// option words is walked here instead and the rest of the pattern is tried at each word it can reach.
+function gitSubcommandStarts(text) {
+  if (!/^git\s/.test(text)) return []
+  const words = [...text.matchAll(/\S+/g)], reach = new Set([1]), starts = []
+  for (let i = 1; i < words.length; i++) {
+    if (!reach.has(i)) continue
+    starts.push(words[i].index)
+    if (/^(?:-C|-c|--git-dir|--work-tree)$/.test(words[i][0]) && i + 2 < words.length) reach.add(i + 2)
+    if (/^--\S/.test(words[i][0]) && i + 1 < words.length) reach.add(i + 1)
+  }
+  return starts
+}
+const afterGitOptions = (rest, text) => {
+  const pattern = new RegExp(rest, 'y')
+  return gitSubcommandStarts(text).some((at) => { pattern.lastIndex = at; return pattern.test(text) })
+}
 let nativeCheck = null
 function rtkChecker() {
   if (nativeCheck) return nativeCheck
@@ -521,8 +543,9 @@ function rtkChecker() {
   if (['jq . f', 'diff a b', 'git branch -a', 'git show HEAD:a', 'git -C . show HEAD:a'].some((c) => nativeCheck(c).rewrite !== null)) { nativeCheck = null; return null }
   return nativeCheck
 }
-function sensitivePart(text) {
-  if (FIVE_EXCLUSIONS.some((p) => new RegExp(p.startsWith('^') ? p : '^' + p + '(?:\\s|$)').test(text))) return true
+export function sensitivePart(text) {
+  if (FIVE_EXCLUSIONS.some((p) => p.startsWith(GIT_OPTIONS) ? afterGitOptions(p.slice(GIT_OPTIONS.length), text)
+    : new RegExp(p.startsWith('^') ? p : '^' + p + '(?:\\s|$)').test(text))) return true
   // Deterministic refusals only. Conditional log/find exceptions need a witness
   // (adoption/templates/codex.AGENTS.template.md, RTK exceptions).
   return /^(?:cd|export|source)\b/.test(text)
@@ -530,7 +553,7 @@ function sensitivePart(text) {
     || /^(?:head|tail)\s/.test(text) && /(?:^|\s)-c|["'$*?\[]/.test(text)
     || /^\S*\/\S*(?:\s|$)/.test(text)
 }
-const logFindPart = (text) => /^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*log\b|^find\b/.test(text)
+export const logFindPart = (text) => /^find\b/.test(text) || afterGitOptions(String.raw`log\b`, text)
 const safeConsumer = (part) => /^(?:cat|head)(?:\s|$)/.test(part) || /^tail(?:\s|$)/.test(part) && !/(?:^|\s)(?:-[^-\s]*[fF]|--follow)(?:\S*)/.test(part)
 const emptyRtk = () => ({ calls: 0, eligible_parts: 0, eligible_calls: 0, observed_covered_parts: 0, observed_all_covered_calls: 0,
   replayed_covered_parts: 0, replayed_all_covered_calls: 0, explicit_rtk_on_excluded_or_sensitive: 0,
