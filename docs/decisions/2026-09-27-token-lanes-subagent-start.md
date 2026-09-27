@@ -388,3 +388,127 @@ if the index's collections change, or if a measured child run shows the four-nam
 ([sources, boundaries and freeze, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#sources-boundaries-and-freeze)),
 so its run records the installed hash and install time. No other carrier rule changed, and no child run with this
 block is claimed.
+
+## Addendum 2026-09-27: jCodeMunch route arguments
+
+**Need.** The carrier told every non-blind Claude subagent to use "jcodemunch route(task, repo?, execute?),
+menu(query?), order(action, args)". In jcodemunch-mcp 1.108.319, `route` builds an action's arguments from its own
+inputs. The installed package is byte-identical to upstream
+[`8f7b34ab`](https://github.com/jgravelle/jcodemunch-mcp/tree/8f7b34abe16fb459e0bf1c04747d584216dfe32e):
+
+- `_QUERY_ARG` maps `search_symbols` and `search_text` to `query`
+  ([`counter.py` L584-590](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py#L584-L590)).
+- `shape_execute_args` returns `{"repo": repo, qarg: task}`
+  ([L616-630](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py#L616-L630)).
+- `_handle_route` uses that shape for each recommendation's `args_template` (L5549) and, with `execute`, for the
+  dispatched call (L5562)
+  ([`server.py` L5535-5580](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py#L5535-L5580)).
+
+A symbol search run through `route(execute=true)` therefore searches for the whole task text.
+
+The coordinator's native probes on 2026-09-27 ([record](../../evidence/artifacts/jcodemunch-route-args-20260927/README.md))
+showed three results:
+
+- `order search_symbols {repo: ".", query: "register_file", kind: "function", max_results: 1}` returned the target in
+  one call.
+- `route("register_file", repo: ".", execute: true)` ranked the state-changing `register_edit` first and executed
+  nothing.
+- `route(<sentence>, repo: ".")` recommended `search_symbols` with the whole sentence as its template query.
+
+Another session's Codex-lane gate,
+[PR #433](https://github.com/seathatflowsinourveins/native-agent-stack/pull/433) (`tools/capability-gate`, merged on
+2026-09-27 as `55fc8d17`), measured the same failure. In its first smoke (run 2026-09-27T20:09:50Z), `route` with the sentence and
+`execute: true` returned neither target symbol in 6 of 6 runs. Its gate case, `order search_symbols` with the
+identifier, passed 6 of 6 rows with exactly one completed call each (run 2026-09-27T20:16:19Z, promptfoo 0.123.1
+`openai:codex-sdk`). Under the gate's repaired scoring its rows passed again, 6 of 6, each with exactly one completed
+`order search_symbols` that returned the signature. PR #433 classes all these runs as workstation smoke, not
+receipts, and lists its pre-repair smokes (20:09Z-20:31Z) as superseded by the repaired-scoring rows.
+
+**Change.**
+
+- **Carrier and handbook mirror.** The clause now reads
+  `jcodemunch route(task, repo: ".") (no execute) then order(action, own args) on indexed repos;`. Serena
+  `find_symbol`, earlier on the same line, already covers a known name for Claude subagents. The jCodeMunch clause
+  therefore serves open tasks: `route` recommends, and the caller writes the `order` arguments.
+  `mcp__jcodemunch__menu` stays in the ToolSearch id list, so a task that needs the catalog can still load it where
+  it is granted; the rule line no longer names it. The handbook's sources line cites the lines above and the probes.
+- **Codex user instructions.** A marked section,
+  `<!-- native-agent-stack:jcodemunch jcodemunch-mcp 1.108.319 counter.py L616-630 -->`, now closes the managed block
+  of `adoption/templates/codex.AGENTS.template.md`, after the RTK exceptions. It says that
+  `route(task, repo, execute: true)` sends the whole task as the search query. It looks up a known name with
+  `order("search_symbols", {repo: ".", query: NAME, kind, max_results: 1})`. For an open task it calls
+  `route(task, repo: ".")` without execute, then `order`s the recommended action with arguments the model writes.
+  - Only `adoption/templates/project.codex.config.template.toml` registers `[mcp_servers.jcodemunch]` (L30).
+    `codex.config.template.toml` names jcodemunch only in a comment (L34); `codex.stack-worker.config.toml` and
+    `codex.omniroute.config.toml` do not mention it. The section's heading therefore limits it to a checkout whose
+    `.codex/config.toml` registers the server.
+  - Both lanes read this one block. The native lane installs it through `tools/adoption/apply_codex_lane.py`
+    `agents_block()` into `~/.codex/AGENTS.md`. The gateway lane reads it through
+    `tools/sota-convergence/landscape-sweep/build_args.py` `codex_user_instructions()` (L208-223), which returns
+    `agents_block()`; `test_lane_home_carries_the_hosts_codex_user_instructions` asserts the staged lane `AGENTS.md`
+    equals the template bytes.
+  - Gateway lane jobs run outside every git repository (`codex_job.py` docstring, "Work dir"). The lane home's
+    config comes from `codex.config.template.toml` and the `stack-worker` profile, neither of which registers
+    jcodemunch, so the section is inert there.
+  - `repo: "."` names the session's checkout for two reasons. Codex starts a server without `cwd` in the session's
+    own directory ([Codex MCP scope, 2026-09-26 addendum](2026-09-25-codex-mcp-scope.md#addendum-2026-09-26-cross-family-review-repair)).
+    The probes' `order` call resolved `"."` to the server's working directory. No Codex run with this section is
+    claimed.
+  - The three custom agents under `examples/codex-native/agents/` carry F4 only: the RTK text and its exceptions
+    ([worker-lane decision](2026-09-26-codex-worker-lane.md)). `tests/test_codex_agents.py` now ends F4 at the new
+    marker, so the roles do not carry the jCodeMunch section. Extending them is a separate change. That decision
+    already records as unverified whether a spawned role also sees `~/.codex/AGENTS.md`.
+- **Project Codex template.** Two comment lines beside the jcodemunch approval list in
+  `project.codex.config.template.toml` repeat the rule and cite `counter.py` L616-630. The recipe's sed range copies
+  them into a checkout's `.codex/config.toml` as comments; the parsed TOML is unchanged.
+
+**Size.** The block measures **4,095 UTF-8 bytes**, within the existing **4,100-byte** bound, which does not move.
+Under the bound the clause can be at most 98 bytes.
+
+| Text | Clause bytes | Block bytes |
+| --- | ---: | ---: |
+| Former clause, `jcodemunch route(task, repo?, execute?), menu(query?), order(action, args) on indexed repos;` | 92 | 4,094 |
+| New clause | 93 | 4,095 |
+
+**Alternatives rejected.** Block bytes are 4,094 minus 92 plus the clause bytes:
+
+| Alternative | Clause bytes | Block bytes | Reason |
+| --- | ---: | ---: | --- |
+| `jcodemunch order(search_symbols, {repo: ".", query: NAME}) or route(task, repo: ".") on indexed repos;` | 102 | 4,104 | Over the bound. Serena `find_symbol` on the same line already covers known names for Claude subagents. |
+| `jcodemunch order(search_symbols, {repo: ".", query: NAME}) for a known name, else route(task, repo: ".") then order on indexed repos;` | 133 | 4,135 | Over the bound. |
+| `jcodemunch order(search_symbols, {repo: ".", query: NAME}) for a known name; for open tasks route(task, repo: ".") (no execute), then order(action, own args) on indexed repos;` | 175 | 4,177 | Over the bound. |
+| Keep `menu(query?)`: `jcodemunch route(task, repo: ".") (no execute), menu(query?), then order(action, own args) on indexed repos;` | 108 | 4,110 | No longer fits. |
+| Keep the former clause with `execute?` | 92 | 4,094 | `route(execute)` returned the wrong target: neither symbol in 6 of 6 runs of #433's first smoke. |
+| Pass the identifier alone as the task | n/a | n/a | Misroutes: `route("register_file", repo: ".", execute: true)` ranked the state-changing `register_edit` first and executed nothing. |
+
+**Dated erratum and anti-pattern.**
+
+| Earlier assumption or omission | Correction and verification path |
+| --- | --- |
+| The carrier offered a tool's auto-execute mode from its signature, `route(task, repo?, execute?)` (the handler's docstring at `server.py` L5536), without reading how the tool shapes arguments. | `shape_execute_args` (`counter.py` L616-630) passes the whole task as the query, and the probes and #433's first smoke confirmed wrong targets. Read the argument-shaping code before recommending an execute or auto mode. The carrier now leaves `execute` off; `test_injected_jcodemunch_rule_leaves_execute_off` checks the injected block and the handbook mirror. |
+
+The general lesson also belongs in the anti-pattern log of [harness defaults](../harness-defaults.md#anti-pattern-log),
+which lies outside this change.
+
+**Evidence classes.**
+
+- Upstream source read at a pinned commit, with the installed package byte-identical to it.
+- The coordinator's native tool probes: one call each, against a local index.
+- Another session's workstation smoke (#433).
+- This change's structural tests, run failing first and then passing.
+
+No subagent or Codex worker run with the changed text is claimed, and no token saving. Installing the changed carrier
+(`install_claude_profile.py --only guard`) and the changed Codex block (`apply_codex_lane.py`) on a host is a separate
+step, not done here.
+
+**Overturn.** Restore an `execute` form if either of these holds:
+
+- Upstream `route` extracts identifiers, or otherwise shapes a search query from the task, for search actions. That
+  would be a change at `counter.py` L616-630 or in `_handle_route`.
+- A gate shows `route(execute=true)` returning the target symbol in #433's fixture.
+
+Revisit the wording if the carrier's byte bound changes.
+
+**#381.** The carrier hash changes to `5e69d1f9…`. #381 freezes carrier and skill hashes at execution
+([sources, boundaries and freeze, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#sources-boundaries-and-freeze)),
+so its run records the installed hash and install time. No other carrier rule changed.
