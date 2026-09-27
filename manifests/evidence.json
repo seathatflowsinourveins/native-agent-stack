@@ -3537,8 +3537,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "65cd3dcbcf23109bb2aa2d19b30de4fd03c5b306b2d8659f477c6de53b55d8c5",
-      "bytes": 42814
+      "sha256": "b3fe7576f0aaafb5959e0ddf20225b1bc4c61dd5266087c51402941ad8dfc7ae",
+      "bytes": 43335
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3717,8 +3717,13 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "9374eaaecaa05073909b5270f8d4d64b49fd3163c79b3add7f707997e4ddd457",
-      "bytes": 8978
+      "sha256": "98fa731425078d2e763adaa349b332700a31dec3f15d8c57d173d1729e2d3ac6",
+      "bytes": 12102
+    },
+    {
+      "path": "adoption/templates/codex.omniroute.config.toml",
+      "sha256": "0751419f445daaa7735e952af41fa93b1b0464de36282d22b38573653891aba8",
+      "bytes": 4932
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
@@ -4318,8 +4323,8 @@
     },
     {
       "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md",
-      "sha256": "1f3c93d9092cb1ed97b4e5ba01f253f204f3c6258f8305c1c7ec1126c62cfa81",
-      "bytes": 21446
+      "sha256": "e46bbf1918e63dbb1dd816d58cee63f02a10eb236e01ab27a38c780775676e0a",
+      "bytes": 22730
     },
     {
       "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py",
@@ -13658,8 +13663,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "ce84397d2991e9e69722a7fd75b713a9acc176d5e97d621ecc3197b9fcb47d33",
-      "bytes": 17579
+      "sha256": "0400433c7417da5c7372c1b71dc73e3e04930f74f496066fc85c27ebcd99e1f6",
+      "bytes": 29858
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -13838,8 +13843,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "8f489c240e63cba79970aab5d456111a9137050ed9972d2933bec450c30a1857",
-      "bytes": 31578
+      "sha256": "351ee3c1b19d33dfd25ac9c035f802c2a77ed2852499a6a780dddc22d56bda48",
+      "bytes": 32745
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14078,8 +14083,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "16926f1de26aef9026783b3a07ccc90932bab559fadafed796ef32c4bbaca20f",
-      "bytes": 67994
+      "sha256": "a7edddbbd6c905e2b670cf08a580d55f195ba8dd58752155cfba20828ea1fcbe",
+      "bytes": 68258
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -29127,6 +29132,21 @@
       "bytes": 5904
     },
     {
+      "path": "evidence/artifacts/gpt6-family-tiering-20260927/README.md",
+      "sha256": "f4b107c50e00ac17131ce5ed89f1dba11e1537e939de1914683319de31a9683b",
+      "bytes": 15786
+    },
+    {
+      "path": "evidence/artifacts/gpt6-family-tiering-20260927/decision.json",
+      "sha256": "555ed71c29a8a33070d9a185b65d69986e31a7955f1ed49b944224414b2a40ea",
+      "bytes": 22460
+    },
+    {
+      "path": "evidence/artifacts/gpt6-family-tiering-20260927/run-record.json",
+      "sha256": "8dc946bd48daa06e417452b3b8a8b8afd5d7bd846b33c144d7fbaa452b691b3d",
+      "bytes": 15311
+    },
+    {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
       "sha256": "79e8f86b6c36d0afff4e5174f491937c7c257cebc4fc2cbb3f88adf6efb90e94",
       "bytes": 3576
@@ -38318,8 +38338,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "baf50da4f1c7ee20d41b2c61afbb9cf7b5a291bd14168dd5d1b6173b90b1ecaf",
-      "bytes": 94539
+      "sha256": "e4d01770f9f00996e0f9eb2221efb4dc3d69115559ecc225108d794f75c35daa",
+      "bytes": 106458
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -38878,8 +38898,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "76ab2b7d9c3e7e39b508dfe6f3a9e3f103a9c70109fcd57c96e5d86c565109ce",
-      "bytes": 60423
+      "sha256": "384a1e6618623db08e78f9697dc49af55f525978903888f30dfa27dafb53d61a",
+      "bytes": 87373
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -39268,8 +39288,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "d06fb1a6e27dec429f43d8b1d5255eba6373d5ae62ffa5fe6aa7c544a846f61b",
-      "bytes": 21222
+      "sha256": "b4aaa3c79a2b74249beb387fc6f09e5591929b76c4e54110f12fe810651d0e9c",
+      "bytes": 25414
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -39453,8 +39473,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "9b1459b767cf5e79537f5b7641b4766f35d5cff430bb5d26cf0079e169a20778",
-      "bytes": 53334
+      "sha256": "a5605cb436cb5fad97394d7c35634e3901c2321a1f7aa33a8aa293a8e4f159db",
+      "bytes": 62148
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
