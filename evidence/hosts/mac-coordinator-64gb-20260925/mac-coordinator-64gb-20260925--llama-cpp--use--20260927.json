@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--llama-cpp--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "b16b84b821f75a8c900557b763a2cdbef62e8f4e",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "llama-cpp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "launchctl list | awk '$3 ~ /agent-ecosystem|native-stack/ {print ($1==\"-\"?\"stopped\":\"running\"), \"last_exit=\" $2, $3}' && for p in 6333 8232 11434 49374 16333; do printf \"port %s: \" \"$p\"; lsof -nP -iTCP:\"$p\" -sTCP:LISTEN 2>/dev/null | awk 'NR==2{print $1; f=1} END{if(!f) print \"none\"}'; done && curl -fsS -m 5 http://127.0.0.1:8232/health && echo",
+      "exit": 0,
+      "duration_s": 0.335,
+      "output_sha256": "5a44eb414069f492fa8c63591169c1e60b8b223b8102cb0d45323b96a6a96d45",
+      "output_excerpt": "running last_exit=0 local.agent-ecosystem.ai-memory\nstopped last_exit=1 local.agent-ecosystem.maintenance\nrunning last_exit=0 local.agent-ecosystem.ollama\nrunning last_exit=0 local.agent-ecosystem.qdrant\nrunning last_exit=0 com.native-stack.omniroute\nrunning last_exit=0 com.native-stack.llama-embed\nport 6333: qdrant\nport 8232: llama-ser\nport 11434: ollama\nport 49374: ai-memory\nport 16333: none\n{\"s"
+    },
+    {
+      "cmd": "P=\"$HOME/Library/LaunchAgents/com.native-stack.llama-embed.plist\" && plutil -extract ProgramArguments json -o - \"$P\" | python3 -c 'import json,os,sys; a=json.load(sys.stdin); print(\"argv:\", \" \".join(os.path.basename(x) if x.startswith(\"/\") else x for x in a))' && M=$(plutil -extract ProgramArguments.5 raw -o - \"$P\") && stat -f \"%z bytes\" \"$M\" && shasum -a 256 \"$M\" | cut -d\" \" -f1 && \"$(plutil -extract ProgramArguments.0 raw -o - \"$P\")\" --version 2>&1 | head -1",
+      "exit": 0,
+      "duration_s": 0.709,
+      "output_sha256": "b81f7ab8026a4286e2b332ba2eecfc564681d91d534c50de0cf015fb87017e53",
+      "output_excerpt": "argv: llama-server --embedding --port 8232 -m embeddinggemma-300M-Q8_0.gguf\n333590944 bytes\nb5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63\n0.00.000.202 I srv  llama_server: initializing ...\n"
+    },
+    {
+      "cmd": "python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
+      "exit": 0,
+      "duration_s": 0.12,
+      "output_sha256": "2fb3cf7549659183986fc0f6d8c9740ec0d25fed7758b49c3e4ce394a20ab375",
+      "output_excerpt": "{\n  \"passed\": true,\n  \"dimension_expected\": 768,\n  \"dimension_actual\": 768,\n  \"cosine\": 0.999661109106148,\n  \"threshold\": 0.99,\n  \"url\": \"http://127.0.0.1:8232/v1/embeddings\"\n}\n"
+    },
+    {
+      "cmd": "P=\"$HOME/Library/LaunchAgents/com.native-stack.llama-embed.plist\" && S=$(plutil -extract ProgramArguments.0 raw -o - \"$P\") && M=$(plutil -extract ProgramArguments.5 raw -o - \"$P\") && D=$(mktemp -d \"${TMPDIR:-/tmp}/mac379-metal.XXXXXX\") && { \"$S\" --embedding --port 18233 -m \"$M\" -lv 4 > \"$D/log\" 2>&1 & pid=$!; for i in $(seq 1 60); do curl -s -m 2 http://127.0.0.1:18233/health | grep -q ok && break; sleep 0.5; done; kill $pid; wait $pid 2>/dev/null; grep -E \"using device MTL0|offloaded [0-9]+/[0-9]+ layers|assigned to device CPU\" \"$D/log\" | sed -E \"s/^[0-9.]+ [A-Z] +//\" | sort | uniq -c; rm -rf \"$D\"; }",
+      "exit": 0,
+      "duration_s": 0.568,
+      "output_sha256": "4d2a1e385ca58133c2e5bc9a3c84e7e66cd49eb608c8f27b47f5e245fa919bd7",
+      "output_excerpt": "   1 llama_prepare_model_devices: using device MTL0 (Apple M5 Pro) (unknown id) - 53083 MiB free\n   1 load_tensors: offloaded 25/25 layers to GPU\n"
+    },
+    {
+      "cmd": "M=\"$HOME/.local/share/codex-ecosystem-staging/state/models/qwen3.8-27b-ud-q4km-4ca72078/Qwen3.8-27B-UD-Q4_K_M.gguf\" && stat -f \"%z bytes\" \"$M\" && shasum -a 256 \"$M\" | cut -d\" \" -f1 && \"$HOME/.local/share/codex-ecosystem-staging/tools/llama-cpp-b11057/llama-bench\" -m \"$M\" -p 512 -n 128 -ngl 99 -fa on -r 1 -o json 2>/dev/null | python3 -c 'import json,sys; [print(\"build\", e[\"build_number\"], e[\"build_commit\"], e[\"backends\"], e[\"gpu_info\"], \"ngl\", e[\"n_gpu_layers\"], \"pp%d/tg%d\" % (e[\"n_prompt\"], e[\"n_gen\"]), round(e[\"avg_ts\"], 1), \"tok/s\") for e in json.load(sys.stdin)]'",
+      "exit": 0,
+      "duration_s": 39.859,
+      "output_sha256": "e9ca313cf4167017a710331d80e559b55362a050878bfa74af05a265d6adde9c",
+      "output_excerpt": "16464440224 bytes\n322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482\nbuild 11057 59657a613 MTL,BLAS Apple M5 Pro ngl 99 pp512/tg0 370.4 tok/s\nbuild 11057 59657a613 MTL,BLAS Apple M5 Pro ngl 99 pp0/tg128 16.1 tok/s\n"
+    },
+    {
+      "cmd": "python3 -B evidence/artifacts/mac-model-hosting-20260927/li26_mac_descriptive.py --runs \"$HOME/.local/state/native-agent-stack/local-inference-latest-20260926/mac-runs\" --check evidence/artifacts/mac-model-hosting-20260927/li26-mac-descriptive.json",
+      "exit": 0,
+      "duration_s": 0.732,
+      "output_sha256": "00b71872252282a35a08eff93f9cc3c04cb9a3b5ef3c1e91669c6abd3af3040c",
+      "output_excerpt": "{\"matches_committed\": true, \"pairs\": [{\"arm\": \"C2@b11146\", \"ci95\": [0.0, 0.0], \"control\": \"C0@b11146\", \"decode_speedup\": 1.515, \"delta_micro_f1\": 0.0, \"identical_predictions\": 360}, {\"arm\": \"C0@b11146\", \"ci95\": [0.0, 0.0], \"control\": \"C0@b11057\", \"decode_speedup\": 1.004, \"delta_micro_f1\": 0.0, \"identical_predictions\": 360}], \"runs\": {\"C0@b11057\": {\"errors\": 0, \"json_valid_rate\": 1.0, \"median_decod"
+    }
+  ],
+  "tool_versions": {
+    "llama-cpp": "b11057 (0.4.1-dev)"
+  },
+  "observed_at_utc": "2026-09-27T15:22:06Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS 27.0 arm64, Apple M5 Pro, 64 GB unified memory) the pinned RAG profile ran: the com.native-stack.llama-embed LaunchAgent (llama.cpp b11057) served embeddinggemma-300M-Q8_0 on 127.0.0.1:8232 beside the pre-existing Qdrant (6333), Ollama (11434) and ai-memory (49374) agents, with no second Qdrant or ai-memory and nothing on 16333 (first command). Its launchd argv, served file size and sha256, and binary version are shown by the second command. tools/adoption/embed_acceptance.py passed against the Linux reference (third command), and a short-lived instance with the same argv at -lv 4 reported MTL0 with all 25 layers offloaded (fourth command). The b11057 llama-bench ran Qwen3.8-27B UD-Q4_K_M @4ca72078 (16,464,440,224 bytes, sha256 322e194f...3482) fully on Metal (fifth command). The sixth command re-derived the committed li26 descriptive summary (evidence/artifacts/mac-model-hosting-20260927/li26-mac-descriptive.json) from the retained private runs with the frozen analyze.py functions and reports whether it matches.",
+  "limitations": [
+    "This Mac is not the li26 preregistered host. The li26 figures describe this host and are neither a parity result nor a replacement decision; the sixth command re-derives the committed summary from the retained private runs and does not run li26 again.",
+    "The capacity probe's llama-bench figures are upstream-tool measurements (native_proven). Its llama-server serving figures used this repository's own docs as prompts, so they are local_integration, recorded in capacity.json.",
+    "Builds b11146 and b11214 are isolated trial installs used for the plan's runtime (li26) and for the newest-build probes. The macOS pin stays b11057; re-pinning is its own reviewed change.",
+    "The worst-case co-residency probe requested the memory stack's own Ollama models with keep_alive and drove all three model servers at once. It did not replay ai-memory's real consolidation traffic.",
+    "Embedding acceptance checks one fixed request against the Linux reference vector. It is not a retrieval-quality comparison; that belongs to the S3 preregistration (#390)."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T15:22:06Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference"
+    }
+  ],
+  "qualified_models": [
+    {
+      "model_id": "ggml-org/embeddinggemma-300M-GGUF",
+      "revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12",
+      "runtime": "llama.cpp llama-server --embedding on Metal (LaunchAgent com.native-stack.llama-embed, 127.0.0.1:8232), file embeddinggemma-300M-Q8_0.gguf",
+      "runtime_version": "b11057 (0.4.1-dev)",
+      "bars": "tools/adoption/embed_acceptance.py against evidence/artifacts/macos-embed-reference-20260923: 768 dimensions and cosine >= 0.99 (0.99966 measured); all 25 layers offloaded to MTL0 per llama-server's own log. This receipt's third and fourth commands.",
+      "result": "pass"
+    },
+    {
+      "model_id": "unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "runtime": "llama.cpp llama-server on Metal, file Qwen3.8-27B-UD-Q4_K_M.gguf; li26 serving values with --gpu-layers 99, 8192 context, one slot (the li26 C0 profile, full offload)",
+      "runtime_version": "b11057 (0.4.1-dev)",
+      "bars": "li26 frozen protocol run descriptively on this host (360 SEC 8-K filings of 2020-03-02, greedy non-thinking): micro-F1 0.9909, JSON-valid 1.0, 0 errors, 0 memory kills, median decode 15.73 tokens/s. Not the preregistered host; no parity or replacement claim. The sixth command re-derives it from the retained private runs.",
+      "result": "pass"
+    },
+    {
+      "model_id": "unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "runtime": "llama.cpp llama-server on Metal, the same file; the li26 C2 drafting profile (--spec-type draft-mtp --spec-draft-n-max 3) with --gpu-layers 99, 8192 context, one slot",
+      "runtime_version": "b11146 (0.5.0-dev), an isolated trial install of the official release asset",
+      "bars": "The li26 frozen rule applied descriptively to this host's own C0/C2 pair on b11146: paired bootstrap 95% lower bound 0.0 >= -0.02 (identical predictions on all 360 filings), median decode 23.94 vs 15.80 tokens/s, JSON-valid 1.0, no errors or memory kills. The sixth command re-derives it.",
+      "result": "pass"
+    }
+  ]
+}
