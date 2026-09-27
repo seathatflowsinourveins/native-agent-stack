@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--claude-code--use--20260927-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "1aa9776591847b4860bf258f8953315ae71d7bc4",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "claude-code",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v claude)\necho \"resolved: $p\"\necho \"readlink: $(readlink -f \"$p\" 2>/dev/null || echo \"$p (not a symlink)\")\"\nclaude --version",
+      "exit": 0,
+      "duration_s": 0.014,
+      "output_sha256": "73436ead43a0c9c18663723a30ad3e166719def4b5eca2219418aa57432d886c",
+      "output_excerpt": "resolved: ~/.local/bin/claude\nreadlink: ~/.local/share/claude/versions/2.1.283\n2.1.283 (Claude Code)\n"
+    },
+    {
+      "cmd": "D=\"$(mktemp -d)\"\nn=$((3 + RANDOM % 6))\n: > \"$D/fixture.txt\"\nfor i in $(seq 1 \"$n\"); do echo $((RANDOM % 900 + 1)) >> \"$D/fixture.txt\"; done\nreal=$(wc -l < \"$D/fixture.txt\" | tr -d ' ')\ncd \"$D\"\nclaude -p --output-format stream-json --verbose \"Count the lines in the file ./fixture.txt in your current working directory using your Read tool, then reply with exactly one line of the form COUNT=<n> and nothing else.\" < /dev/null > out.jsonl 2> err.log\nrc=$?\npython3 - \"$real\" \"$rc\" <<'PY'\nimport json, re, sys\nreal, rc = sys.argv[1], sys.argv[2]\ninit = {}\nfinal = {}\nfor line in open(\"out.jsonl\"):\n    line = line.strip()\n    if not line:\n        continue\n    try:\n        ev = json.loads(line)\n    except ValueError:\n        continue\n    if ev.get(\"type\") == \"system\" and ev.get(\"subtype\") == \"init\" and not init:\n        init = ev\n    if ev.get(\"type\") == \"result\":\n        final = ev\ncounts = {}\nfor key in (\"agents\", \"skills\", \"plugins\", \"mcp_servers\", \"slash_commands\", \"tools\"):\n    v = init.get(key)\n    if isinstance(v, list):\n        counts[key] = len(v)\nmcp_status = sorted({s.get(\"status\") for s in init.get(\"mcp_servers\", []) if isinstance(s, dict)})\ntext = final.get(\"result\") or \"\"\nm = re.search(r\"COUNT=(\\d+)\", text)\ngot = m.group(1) if m else None\nok = (rc == \"0\") and (not final.get(\"is_error\")) and (got == real)\nprint(\"permissionMode=\" + str(init.get(\"permissionMode\")) + \" model=\" + str(init.get(\"model\")))\nprint(\"counts=\" + json.dumps(counts, sort_keys=True))\nprint(\"mcp_status=\" + json.dumps(mcp_status))\nprint(\"turn_subtype=\" + str(final.get(\"subtype\")) + \" is_error=\" + str(final.get(\"is_error\")))\nprint(\"positive_control expected=\" + real + \" got=\" + str(got) + \" match=\" + str(got == real))\nraise SystemExit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 10.266,
+      "output_sha256": "3907e536551fa1de32f29cdbb218574671424a86197f803e969d9333e07881d5",
+      "output_excerpt": "permissionMode=bypassPermissions model=claude-opus-5-5[1m]\ncounts={\"agents\": 18, \"mcp_servers\": 5, \"plugins\": 11, \"skills\": 67, \"slash_commands\": 107, \"tools\": 118}\nmcp_status=[\"connected\"]\nturn_subtype=success is_error=False\npositive_control expected=5 got=5 match=True\n"
+    },
+    {
+      "cmd": "D=\"$(mktemp -d)\"\ncd \"$D\"\nclaude mcp list < /dev/null 2>&1 | python3 -c \"\nimport sys\nrows = []\nfor line in sys.stdin:\n    line = line.rstrip(chr(10))\n    if ' - ' not in line or ': ' not in line:\n        continue\n    name, _, _ = line.partition(': ')\n    _, _, status = line.rpartition(' - ')\n    rows.append((name.strip(), status.strip()))\nrows.sort()\nfor name, status in rows:\n    print(name + ': ' + status)\nprint('count=' + str(len(rows)))\n\"",
+      "exit": 0,
+      "duration_s": 1.587,
+      "output_sha256": "e3a146db303fe5ed9bbf4a55a1160f0442ae4d520117e5e50e4438befd67ac14",
+      "output_excerpt": "ai-memory: \u2714 Connected\nopenaiDeveloperDocs: \u2714 Connected\nplugin:context-mode:context-mode: \u2714 Connected\nserena: \u2714 Connected\nsocraticode: \u2714 Connected\ncount=5\n"
+    }
+  ],
+  "tool_versions": {
+    "claude-code": "2.1.283"
+  },
+  "observed_at_utc": "2026-09-27T07:28:48Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64), the installed Claude Code client, resolved and versioned by the first command below, performs a real headless turn from a freshly created scratch working directory under this Mac's user-scope client-layer profile (~/.claude): given a fixture file it creates itself with a random line count, `claude -p --output-format stream-json --verbose` reads the file with its own Read tool and replies with the correct count, while the run's init event reports the loaded profile's agent/skill/plugin/MCP-server/slash-command/tool counts and every configured MCP server's connection status. A separate `claude mcp list` from another fresh scratch directory independently reports every configured MCP server's name and health status. All commands exit 0 only when the reported count matches the independently computed one and the turn reports no error.",
+  "limitations": [
+    "Recorded from a Claude Code session in a git worktree of this repository at commit 1aa97765 (the catalog_revision), not a pinned install checkout; the first command's --version reports 2.1.283, newer than the catalog's claude-code pin 2.1.278, so this receipt is recorded with --allow-unbound-version and does not count toward the winner's status.",
+    "second_physical_machine is declared, not proven by this file: this host's measured profile (evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "Counts and connection statuses only: no MCP server command line, argument, environment value, session id, uuid or working-directory path is copied into this receipt; the --cmd values print only names, counts and statuses by construction, and the underlying stream-json/mcp list output (which does carry those fields) is never itself echoed to stdout.",
+    "This receipt exercises the native-clients role (a version check, one headless turn and an MCP listing); it does not exercise claude-code's owned-writing-child role in the workers layer, which needs a different command shape."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T07:28:48Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients"
+    }
+  ],
+  "supersedes": "mac-coordinator-64gb-20260925--claude-code--use--20260927"
+}

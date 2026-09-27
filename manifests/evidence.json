@@ -13038,8 +13038,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "675416e13d771bb65e154dfad33d8b5d10d708c418c517e3b84618f651a02471",
-      "bytes": 189662
+      "sha256": "729bd9bb7a4f29332de9ad6aba03e472d21b4cb348d23ebb8a16142d35d096d9",
+      "bytes": 189734
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -13553,7 +13553,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "819ab53a4d29d4b881ec15674b5ecfa7f716b1e8bce3a27d83140956cfe36bb9",
+      "sha256": "cf1867b290f67573580d0c8dbea4a599a9d31214dfa266a47522e266d3d1eafe",
       "bytes": 19505
     },
     {
@@ -36015,6 +36015,26 @@
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--ai-memory--use--20260925.json",
       "sha256": "491a43789016027cd144f38a0bc9fc30f6d305a32025a9dc8972e542f96fd8c4",
       "bytes": 7687
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--claude-code--use--20260927-2.json",
+      "sha256": "8a612acf5d43d131af2871227b29f7d44f07aa9c98fe0a34f3e1832dc83cfd1e",
+      "bytes": 7174
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--claude-code--use--20260927.json",
+      "sha256": "45eb8886eba9eea56fad70d181c299061b0d314c27a21acaa92ee27f73d5d713",
+      "bytes": 6649
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927-2.json",
+      "sha256": "9fd2c2dfe47a5422755dd94526eda66347f1550cd069d1d13d4848de1cc55336",
+      "bytes": 10009
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927.json",
+      "sha256": "49cfbdfc06c5626d3e3244cce2efbad58d37cddc059bcb1ea793f195b7350dd5",
+      "bytes": 8718
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--qdrant--use--20260925.json",
