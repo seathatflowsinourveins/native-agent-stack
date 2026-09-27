@@ -109,6 +109,29 @@ class RenderConfigTests(unittest.TestCase):
         self.assertNotIn("context-mode", rendered("project.codex.config.template.toml").get("mcp_servers", {}))
         self.assertEqual(server.get("default_tools_approval_mode"), "approve")
 
+    def test_codex_user_template_sets_the_verified_base_keys(self):
+        # PR-F and H4 of the 2026-09-27 settings synthesis (codex rows 8, 10, 20 and 21), each read at openai/codex
+        # rust-v0.157.1: live search in every sandbox (core/src/config/mod.rs), no startup update check on a pinned
+        # client (config/src/config_toml.rs L520-523), no shell snapshot of exported variables
+        # (shell-command/src/shell_snapshot_exports.rs), children at max unless the spawn call picks an effort
+        # (core/src/agent/child_config.rs), and no trust for dated directories that no longer exist. The interactive
+        # effort stays `ultra`: moving it is a user decision. The gateway route lives only in the omniroute profile.
+        import tomllib  # Python 3.11+, as above
+
+        text = (TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8")
+        user = tomllib.loads(string.Template(text).substitute(FIXTURE_VALUES))
+        self.assertEqual(user["web_search"], "live")
+        self.assertIs(user["check_for_update_on_startup"], False)
+        self.assertIs(user["features"]["shell_snapshot"], False)  # exported secrets never land in a snapshot file
+        self.assertEqual(user["agents"]["default_subagent_reasoning_effort"], "max")
+        self.assertNotIn("default_subagent_model", user["agents"])  # alone it would give the catalog's `low`
+        self.assertEqual(user["model_reasoning_effort"], "ultra")
+        self.assertEqual(sorted(user["projects"]), [FIXTURE_VALUES["PROJECT_ROOT"],
+                                                    FIXTURE_VALUES["HOME"] + "/code/native-agent-stack-publication"])
+        self.assertNotIn("codex-ecosystem/validation", text)
+        self.assertNotIn("model_providers", user)
+        self.assertNotIn("model_provider", user)
+
     def test_recipe_project_form_mirrors_start_mjs_and_approves_tools(self):
         # recipes/README.md "Retained Context Mode": the project-scoped form runs the bare `context-mode` CLI,
         # which skips upstream start.mjs. start.mjs sets both CLAUDE_PROJECT_DIR and CONTEXT_MODE_PROJECT_DIR
@@ -129,6 +152,38 @@ class RenderConfigTests(unittest.TestCase):
         self.assertEqual(server["env"].get("CONTEXT_MODE_PROJECT_DIR"), project)
         self.assertEqual(server["env"].get("CLAUDE_PROJECT_DIR"), project)
         self.assertEqual(server["env"].get("CONTEXT_MODE_PLATFORM"), "codex")
+
+    def test_recipe_jcodemunch_step_copies_only_the_server_tables(self):
+        # recipes/README.md "Focused jCodeMunch retrieval": the Codex step copies the rendered project template's
+        # jcodemunch tables with the recipe's own sed range, and nothing else. The template's approval_policy,
+        # sandbox_mode, [agents] and shell PATH would outrank the user config and its profiles in that directory
+        # (codex-rs/config/src/config_layer_source.rs L33-51 at rust-v0.157.1). The server runs from the prefix
+        # the recipe installs into.
+        import tomllib  # Python 3.11+, as above
+
+        section = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8")
+        section = section.split("\n## Focused jCodeMunch retrieval\n", 1)[1].split("\n## ", 1)[0]
+        expression = re.search(r"sed -n '([^']+)' \\\n", section).group(1)
+        text = string.Template((TEMPLATES / "project.codex.config.template.toml").read_text(encoding="utf-8"))
+        rendered = text.substitute(FIXTURE_VALUES)
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "project.codex.config.toml"
+            source.write_text(rendered, encoding="utf-8")
+            copied = subprocess.run(["sed", "-n", expression, str(source)], capture_output=True, text=True,
+                                    check=True).stdout
+        full = tomllib.loads(rendered)
+        self.assertIn("approval_policy", full)  # the control: the whole template carries more than the server
+        self.assertEqual(tomllib.loads(copied), {"mcp_servers": {"jcodemunch": full["mcp_servers"]["jcodemunch"]}})
+        self.assertEqual(full["mcp_servers"]["jcodemunch"]["command"],
+                         FIXTURE_VALUES["ECO_ROOT"] + "/bin/jcodemunch-mcp")
+        self.assertIn('UV_TOOL_BIN_DIR="$eco/bin"', section)
+        self.assertIn('-- "$eco/bin/jcodemunch-mcp"', section)
+        self.assertNotIn("codex mcp add jcodemunch --", section)  # the user-scope form is named, never copyable
+        # Each copyable block that uses $eco defines it first, so either block works pasted on its own.
+        for block in re.findall(r"```sh\n(.*?)```", section, flags=re.S):
+            if "$eco" in block:
+                self.assertTrue(block.startswith('eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"\n'),
+                                block[:80])
 
     def test_claude_template_turns_off_claudeai_skill_sync_and_mcp_servers(self):
         # docs/decisions/2026-09-25-skills-trial-and-usage.md, addendum "claude.ai skill sync and MCP
