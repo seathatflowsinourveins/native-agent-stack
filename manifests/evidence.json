@@ -3507,8 +3507,8 @@
     },
     {
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
-      "sha256": "1ff91e40b81403041be293fa3a6f8c63d06bdde1c68c7eb0e5c0997a5a10b61c",
-      "bytes": 1349
+      "sha256": "f4b52841ad4bb2ba8cfb35c20f88e11570c41fddb3e0388a73150d234baa5ae6",
+      "bytes": 1699
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
