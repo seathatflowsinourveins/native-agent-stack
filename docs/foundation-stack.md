@@ -200,9 +200,38 @@ The corrected upstream launcher shape is `omniroute launch --remote "$OMNIROUTE_
 
 For Codex, `omniroute launch-codex --remote "$OMNIROUTE_URL" -- ...` injects a Responses provider. Its token precedence is explicit `--api-key`, active context credential, then environment; an active context can shadow a trial environment key. Use a private in-memory launch or the launcher's [documented direct provider overrides](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/bin/cli/commands/launch-codex.mjs) without printing credentials. The native attempt with `codex/gpt-6-astra` returned400 for an unsupported prefixed model; that error alone does not independently identify the endpoint that received it. The released passthrough source retains a raw prefixed model, so the source-supported correction is a single router alias, authenticated `PUT /api/models/alias` with `{"alias":"gpt-6-astra","model":"codex/gpt-6-astra"}`, then native `exec --model gpt-6-astra` at the same explicit effort. The alias was installed and read back withHTTP200; corrected inference remains pending account capacity. Preserve any prior alias and constrain the trial key. This is distinct from the model-deprecation settings map. Alias writes can sync to cloud when a cloud URL is configured; the observed server had no configured cloud URL.
 
-Actual later provider probes returned Codex and Claude quota 429, so do not claim a passing gateway native task or retry the unchanged limits. The 3.8.50 executor also caps unknown-model reasoning effort at xhigh, including passthrough. It cannot certify preservation of Astra max/ultra. Native Codex passthrough skips router compression. Exact model, effort, tool behavior and continuation need actual accepted results once capacity is available; do not substitute a cheaper model to manufacture a pass.
+Actual later provider probes returned Codex and Claude quota 429, so do not claim a passing gateway native task or retry the unchanged limits. Two behaviours below hold for 3.8.50 only; `release/v3.8.51` changed both, as the next section says.
+- **The effort cap.** The 3.8.50 executor caps unknown-model reasoning effort at xhigh, including passthrough ([`codex.ts` L346-347 at v3.8.50](https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/open-sse/executors/codex.ts#L346-L347)). So a 3.8.50 gateway cannot certify preservation of Astra max/ultra.
+- **Compression.** In 3.8.50, native Codex passthrough skips router compression.
+
+Exact model, effort, tool behavior and continuation need actual accepted results once capacity is available; do not substitute a cheaper model to manufacture a pass.
 
 For owned lifecycle, preserve the same DATA_DIR/secrets through restart. Upstream `backup create --name NAME --encrypt --key-file FILE` creates encrypted backups, but the released native restore command only recognizes plaintext filenames and can print completion without restoring encrypted files. This wave independently decrypted/checked the encrypted backup and separately accepted a plaintext native restore; do not claim native encrypted restore passed. Before `stop`, verify `$OMNIROUTE_DATA/server/.pid` belongs to this launch: absent PID state can trigger a fallback targeting port 20128. `update --apply` installs into npm's default global prefix and is unsuitable for this isolated prefix. After closing only the owned process, `npm uninstall --global --prefix "$OMNIROUTE_PREFIX" omniroute` retires the package while preserving separate data/evidence. That is a retirement recipe, not an executed uninstall in this wave: the package remains installed, the owned acceptance process is stopped, and its final data/receipts are archived. Never erase working router counters as cleanup.
+
+### Source build of release/v3.8.51 with an upstream fix and an upstream feature (workstation, 2026-09-27)
+
+Since 2026-09-27 the workstation's gateway pools its Codex accounts for GPT-6 lanes. The [decision record](decisions/2026-09-27-omniroute-account-pool.md) holds the reasons, the keyless loopback posture and its risk, and the overturn conditions. Its [evidence](../evidence/artifacts/omniroute-gateway-20260927/README.md) holds the build provenance, the installed unit and the probes.
+
+**What runs.** A source build of upstream's default branch `release/v3.8.51` at [`a58000c7`](https://github.com/diegosouzapw/OmniRoute/commit/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3), with two open upstream PRs cherry-picked:
+- [#14904](https://github.com/diegosouzapw/OmniRoute/pull/14904): without it, every `/v1` inference route answered HTTP 500 behind Next 16.3.5's request Proxy on this host's Node 24, as the coordinator reported. A synthetic fixture shows the same `Request` construction failure on Node 26, upstream's Docker base, where the gateway was not run;
+- [#13788](https://github.com/diegosouzapw/OmniRoute/pull/13788): `/v1/alpha/search`, which Codex's standalone `web.run` calls.
+
+The component pin in `manifests/stack.json` stays 3.8.50 until npm publishes 3.8.51 or upstream carries both changes (the #14904 fix and the #13788 feature).
+
+- **Build.** Use upstream's own scripts in a clean clone at the cherry-picked head:
+  1. `npm ci`;
+  2. `npm run build:release`;
+  3. `npm run build:cli-api`;
+  4. `npm pack`;
+  5. `OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact`. The head is not on the release line, so the gate accepts it only as a recorded canary;
+  6. the fresh-prefix install and the allowlisted `npm rebuild` above, with the packed tarball in place of `omniroute@3.8.50`.
+
+  The exact commands, digests and toolchain are in `build-provenance.json`.
+- **Service.** Run it from the values-free template [`adoption/templates/systemd/omniroute.service`](../adoption/templates/systemd/omniroute.service): `omniroute serve --port 20128 --no-open --no-tray` on loopback, with `Restart=on-failure` and no `--daemon`. The unit holds no secret, and its secrets come only through `EnvironmentFile=`. A user service also inherits the user manager's environment, so keep credentials out of the manager.
+- **Effort.** `a58000c7` caps `gpt-6-astra` at `ultra` ([`reasoningSuffix.ts` L11-31](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/reasoningSuffix.ts#L11-L31)), and sends `max` on the wire for `ultra` ([`codex.ts` L1463](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1463)). The gateway's `call_logs` recorded `max` requested and `max` upstream on `bf0255649`, the build before #13788 was added; the running build differs from it only in the search route and its test. Keep Thinking Budget `passthrough`.
+- **Compression.** `a58000c7` compresses native Codex passthrough when compression is on. Keep the global switch off, and add `codex/*` to the exclusions, as upstream's own comment advises ([`chatCore.ts` L1429-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1429-L1449)).
+- **Codex.** Codex calls `cx/gpt-6-astra` directly through `[model_providers.omniroute]` and the `omniroute` profile. No router alias is written on this build. Set session affinity above the task length (`sessionAffinityTtlMs`).
+- **Posture.** The workstation runs keyless and passwordless on loopback, by the user's decision. Any multi-user or non-loopback deployment keeps this recipe's `REQUIRE_API_KEY=true` and the dashboard login.
 
 ## Reconcile returned results with observation
 

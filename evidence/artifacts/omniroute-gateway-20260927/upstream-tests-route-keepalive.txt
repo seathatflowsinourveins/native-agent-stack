@@ -1,0 +1,7 @@
+26 upstream route/keepalive test files on a58000c7+#14904 (TAP summary):
+# tests 186
+# suites 0
+# pass 184
+# fail 0
+# cancelled 0
+# skipped 2

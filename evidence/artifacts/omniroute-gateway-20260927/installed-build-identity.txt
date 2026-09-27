@@ -1,0 +1,20 @@
+# Installed build identity, read-only independent observation by the record's author (2026-09-27T07:57:22Z)
+# Paths: ~ is the home directory, $SCRATCH the coordinator's private scratch directory, <prefix> = ~/.local/share/codex-ecosystem/tools/omniroute-3.8.51-a58000c7-pr14904-pr13788
+$ sha256sum $SCRATCH/omniroute-lane/build3/omniroute-3.8.51.tgz $SCRATCH/omniroute-lane/build4/omniroute-3.8.51.tgz
+8663882260d5b4309354187fa0bb80c3b96fc361807f9584ce11bb94eb8b7e8b  $SCRATCH/omniroute-lane/build3/omniroute-3.8.51.tgz
+039df6938ecc0adc0f5995f4bce10161a66318712c5f0856507c6dc17f6a675d  $SCRATCH/omniroute-lane/build4/omniroute-3.8.51.tgz
+$ cat <prefix>/lib/node_modules/omniroute/dist/BUILD_SHA
+dd6e9607e
+$ PATH=~/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$PATH <prefix>/bin/omniroute --version
+3.8.51
+$ diff ~/.config/systemd/user/omniroute.service omniroute.service (this directory's copy); echo rc=$?
+rc=0
+$ systemctl --user show omniroute.service -p ActiveState -p SubState -p NRestarts -p ExecMainStartTimestamp
+NRestarts=0
+ExecMainStartTimestamp=Sun 2026-09-27 03:19:46 EDT
+ActiveState=active
+SubState=running
+$ systemd-analyze --version | head -1
+systemd 255 (255.4-1ubuntu8.17)
+$ curl -s http://127.0.0.1:20128/api/health
+{"status":"ok","timestamp":"2026-09-27T07:57:22.624Z"}

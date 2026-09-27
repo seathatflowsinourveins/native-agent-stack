@@ -17,7 +17,7 @@ against it.
 | `sec-contact` | SEC/EDGAR contact string. This is private personal data, not an auth secret | required now | `<store>/sec-contact.env` | `SEC_USER_AGENT` (optional: `EDGAR_IDENTITY`) |
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` only | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
-| `omniroute` | OmniRoute local gateway key | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
+| `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
 | `tavily` | Tavily API key, memory only ([kernel keyring](#memory-only-option-linux-kernel-keyring-2026-09-26)) | optional | Linux kernel user keyring, key `tavily_api_key`; never a file (macOS: the login Keychain) | `TAVILY_API_KEY`, set only in the environment of the command that `exec` or `tvly-keyring` starts |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |

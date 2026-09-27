@@ -1,0 +1,133 @@
+{
+ "probe": "scripts/probe_lane.py run 2: codex-omniroute exec with the omniroute profile, started 2026-09-27T06:59:46Z",
+ "derivation": "scripts/derive_probe_records.py.txt from the probe's private stdout; see the README",
+ "client": {
+  "exec_rc": 0,
+  "elapsed_s": 25.2,
+  "thread_started": true,
+  "final_is_marker": true,
+  "commands": [
+   {
+    "exit_code": 0,
+    "marker_in_output": true
+   }
+  ],
+  "client_usage": {
+   "input_tokens": 28012,
+   "cached_input_tokens": 13568,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 390,
+   "reasoning_output_tokens": 312
+  },
+  "errors": [],
+  "stderr_tail": ""
+ },
+ "gateway_listing": {
+  "source": "GET /api/usage/call-logs?limit=50, rows with timestamp at or after the probe start",
+  "rows_since_start": 4,
+  "account_legend": "one letter per distinct connection, in order of first appearance; ids and hashes withheld",
+  "rows": [
+   {
+    "timestamp": "2026-09-27T06:59:48.943Z",
+    "path": "/v1/responses",
+    "status": 200,
+    "model": "gpt-6-astra",
+    "requestedModel": null,
+    "provider": "codex",
+    "duration": 14532,
+    "tokens": {
+     "in": 13806,
+     "out": 373,
+     "cacheRead": 0,
+     "cacheCreation": 0,
+     "reasoning": 312,
+     "compressed": null
+    },
+    "cacheSource": null,
+    "requestType": null,
+    "sourceFormat": null,
+    "targetFormat": null,
+    "effort_fields": {},
+    "pipeline_bodies": {},
+    "account": "A"
+   },
+   {
+    "timestamp": "2026-09-27T07:00:03.480Z",
+    "path": "/v1/responses",
+    "status": 200,
+    "model": "gpt-6-astra",
+    "requestedModel": "codex/gpt-6-astra",
+    "provider": "codex",
+    "duration": 14536,
+    "tokens": {
+     "in": 13806,
+     "out": 373,
+     "cacheRead": 0,
+     "cacheWrite": 0,
+     "reasoning": 312,
+     "compressed": null
+    },
+    "cacheSource": "upstream",
+    "requestType": null,
+    "sourceFormat": "openai-responses",
+    "targetFormat": "openai-responses",
+    "effort_fields": {},
+    "pipeline_bodies": {},
+    "account": "A"
+   },
+   {
+    "timestamp": "2026-09-27T07:00:03.875Z",
+    "path": "/v1/responses",
+    "status": 200,
+    "model": "gpt-6-astra",
+    "requestedModel": null,
+    "provider": "codex",
+    "duration": 7469,
+    "tokens": {
+     "in": 14206,
+     "out": 17,
+     "cacheRead": 13568,
+     "cacheCreation": 0,
+     "reasoning": 0,
+     "compressed": null
+    },
+    "cacheSource": null,
+    "requestType": null,
+    "sourceFormat": null,
+    "targetFormat": null,
+    "effort_fields": {},
+    "pipeline_bodies": {},
+    "account": "A"
+   },
+   {
+    "timestamp": "2026-09-27T07:00:11.351Z",
+    "path": "/v1/responses",
+    "status": 200,
+    "model": "gpt-6-astra",
+    "requestedModel": "codex/gpt-6-astra",
+    "provider": "codex",
+    "duration": 7473,
+    "tokens": {
+     "in": 14206,
+     "out": 17,
+     "cacheRead": 13568,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "compressed": null
+    },
+    "cacheSource": "upstream",
+    "requestType": null,
+    "sourceFormat": "openai-responses",
+    "targetFormat": "openai-responses",
+    "effort_fields": {},
+    "pipeline_bodies": {},
+    "account": "A"
+   }
+  ]
+ },
+ "rollout_turn_context": {
+  "model": "cx/gpt-6-astra",
+  "effort": "max",
+  "summary": "none"
+ }
+}

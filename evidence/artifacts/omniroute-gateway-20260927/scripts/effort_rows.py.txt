@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""Read the effort OmniRoute recorded for recent Codex requests, straight from its call_logs table (read-only).
+
+Upstream persists reasoning_effort_requested / reasoning_effort_upstream for encrypted-reasoning rows
+(src/lib/usage/callLogs.ts:634-652, columns added in src/lib/db/schemaColumns.ts:282) but exposes them in no API.
+Selects only these non-sensitive call_logs columns; never touches credential tables or values.
+Usage: effort_rows.py <db_path> <iso_since>
+"""
+import sqlite3
+import sys
+
+db_path, since = sys.argv[1], sys.argv[2]
+connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+rows = connection.execute(
+    "SELECT timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, "
+    "tokens_in, tokens_cache_read, tokens_reasoning FROM call_logs WHERE timestamp >= ? ORDER BY timestamp",
+    (since,)).fetchall()
+print("timestamp | path | status | model | effort_requested | effort_upstream | in | cache_read | reasoning")
+for row in rows:
+    print(" | ".join(str(value) for value in row))

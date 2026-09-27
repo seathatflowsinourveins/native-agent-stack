@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""Derive the published probe records from the coordinator's private probe outputs (OmniRoute gateway, 2026-09-27).
+
+Replaces the earlier hand derivation of probe-lane-run2.json and probe-search-profile-only.json, which was not
+declared and dropped a gateway row. The inputs stay private:
+- run2_out: the stdout of scripts/probe_lane.py for run 2;
+- lane_events: the Codex JSONL events files that probe_lane.py wrote (probe-events-<stamp>.jsonl), run 2 included;
+- search_events: the Codex JSONL events of the profile-only search probe (search-events-<stamp>.jsonl);
+- search_log: the retained gateway-search-log.jsonl.
+
+Declared sanitization (the evidence README repeats it):
+- a gateway row keeps every field probe_lane.py printed except conn_hash, a 6-hex hash of the connection id. The hash
+  becomes `account`, one letter per distinct hash in order of first appearance; ids and hashes are not written;
+- an events summary keeps event and item type counts, error messages, command exit codes, whether the output or the
+  final answer is the probe's marker, and the usage. Thread ids, item ids, commands, outputs and reasoning text are
+  not written;
+- the search summary keeps each web_search query with its result count, the MCP call's server, tool, URL argument
+  and status (not its result) and the first sentence of each error item. The rest of that text names a local path;
+- the home directory is written as ~, and the script refuses to write a UUID or an email address.
+Usage: derive_probe_records.py <run2_out> <search_events> <search_log> <out_dir> <lane_events>...
+"""
+import json
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
+EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
+STAMP = re.compile(r"-(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z\.jsonl$")
+HOME = str(Path.home())
+
+
+def stamp_of(path):
+    """UTC start stamp encoded in the events file name by probe_lane.py and probe_search.py."""
+    y, mo, d, h, mi, s = STAMP.search(str(path)).groups()
+    return f"{y}-{mo}-{d}T{h}:{mi}:{s}Z", f"{y}{mo}{d}T{h}{mi}{s}Z"
+
+
+def events(path):
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        try:
+            yield json.loads(line)
+        except ValueError:
+            continue
+
+
+def summarize_lane_events(path):
+    """Client-side facts of one probe_lane.py run, from its Codex events file."""
+    started, compact = stamp_of(path)
+    marker = f"omniroute-probe-{compact}"
+    kinds, items, errors, commands, final, usage, failed = Counter(), Counter(), [], [], None, None, None
+    for event in events(path):
+        kind = event.get("type")
+        kinds[kind] += 1
+        if kind == "item.completed":
+            item = event.get("item", {})
+            items[item.get("type")] += 1
+            if item.get("type") == "agent_message":
+                final = item.get("text")
+            elif item.get("type") == "command_execution":
+                commands.append({"exit_code": item.get("exit_code"),
+                                 "marker_in_output": marker in (item.get("aggregated_output") or "")})
+        elif kind == "turn.completed":
+            usage = event.get("usage")
+        elif kind == "error":
+            errors.append(str(event.get("message"))[:300])
+        elif kind == "turn.failed":
+            failed = str((event.get("error") or {}).get("message"))[:300]
+    return {"started_utc": started, "event_types": dict(sorted(kinds.items())), "item_types": dict(sorted(items.items())),
+            "commands": commands, "final_is_marker": (final or "").strip() == marker, "errors": errors,
+            "turn_failed": failed, "usage": usage}
+
+
+def parse_run2(path):
+    """probe_lane.py stdout: one client object, a row-count line, N row objects, then the rollout line."""
+    text, decoder, pos = Path(path).read_text(encoding="utf-8"), json.JSONDecoder(), 0
+    client, rows, count, rollout = None, [], None, None
+    while pos < len(text):
+        if text[pos].isspace():
+            pos += 1
+            continue
+        end = text.find("\n", pos)
+        end = len(text) if end < 0 else end
+        line = text[pos:end]
+        if line.startswith("gateway call-log rows since start:"):
+            count, pos = int(line.split(":", 1)[1]), end
+        elif line.startswith("rollout turn_context:"):
+            rollout, pos = json.loads(line.split(":", 1)[1]), end
+        elif line.startswith("rollout:"):
+            rollout, pos = line, end
+        else:
+            obj, pos = decoder.raw_decode(text, pos)
+            if client is None:
+                client = obj
+            else:
+                rows.append(obj)
+    if count != len(rows):
+        raise SystemExit(f"row count line says {count}, parsed {len(rows)}")
+    return client, rows, rollout
+
+
+def account_labels(rows):
+    letters, labelled = {}, []
+    for row in rows:
+        row = dict(row)
+        key = row.pop("conn_hash")
+        letters.setdefault(key, "ABCDEFGH"[len(letters)])
+        labelled.append({**row, "account": letters[key]})
+    return labelled
+
+
+def write(out_dir, name, record):
+    text = json.dumps(record, indent=1).replace(HOME, "~") + "\n"
+    if UUID.search(text) or EMAIL.search(text) or "conn_hash" in text:
+        raise SystemExit(f"{name}: refusing to write an id, a hash of one or an email")
+    (Path(out_dir) / name).write_text(text, encoding="utf-8")
+    print(f"wrote {name}: {len(text.encode())} bytes")
+
+
+run2_out, search_events, search_log, out_dir, *lane_events = sys.argv[1:]
+lane = {stamp_of(path)[0]: summarize_lane_events(path) for path in lane_events}
+
+# 1. Run 2: every row of the gateway listing, the account relation instead of the hash, and the rollout line.
+client, rows, rollout = parse_run2(run2_out)
+run2_started = max(lane)
+if lane[run2_started]["usage"] != client["client_usage"]:
+    raise SystemExit("run 2 usage in the probe output differs from its events file")
+write(out_dir, "probe-lane-run2.json", {
+    "probe": f"scripts/probe_lane.py run 2: codex-omniroute exec with the omniroute profile, started {run2_started}",
+    "derivation": "scripts/derive_probe_records.py.txt from the probe's private stdout; see the README",
+    "client": client,
+    "gateway_listing": {
+        "source": "GET /api/usage/call-logs?limit=50, rows with timestamp at or after the probe start",
+        "rows_since_start": len(rows),
+        "account_legend": "one letter per distinct connection, in order of first appearance; ids and hashes withheld",
+        "rows": account_labels(rows),
+    },
+    "rollout_turn_context": rollout,
+})
+
+# 2. The earlier probe_lane.py runs: client events only (their probe stdout was not kept).
+write(out_dir, "probe-lane-client-events.json", {
+    "probe": "scripts/probe_lane.py runs before run 2, from their Codex events files; the probe's gateway listing "
+             "for these runs was not kept",
+    "derivation": "scripts/derive_probe_records.py.txt; see the README",
+    "runs": [lane[started] for started in sorted(lane) if started != run2_started],
+})
+
+# 3. The profile-only search probe, cross-checked against the gateway's SEARCH log lines.
+search_started, _ = stamp_of(search_events)
+items, queries, mcp_calls, error_items, final, usage = Counter(), [], [], [], None, None
+for event in events(search_events):
+    if event.get("type") == "item.completed":
+        item = event.get("item", {})
+        items[item.get("type")] += 1
+        if item.get("type") == "web_search":
+            queries.append({"query": item.get("query"), "results": len(item.get("results") or [])})
+        elif item.get("type") == "mcp_tool_call":
+            mcp_calls.append({"server": item.get("server"), "tool": item.get("tool"),
+                              "url": (item.get("arguments") or {}).get("url"), "status": item.get("status")})
+        elif item.get("type") == "error":
+            error_items.append(str(item.get("message")).split(". ", 1)[0] + ".")
+        elif item.get("type") == "agent_message":
+            final = item.get("text")
+    elif event.get("type") == "turn.completed":
+        usage = event.get("usage")
+search_lines = []
+for line in Path(search_log).read_text(encoding="utf-8").splitlines():
+    entry = json.loads(line)
+    if entry.get("time", "") >= search_started.replace("Z", ".000Z"):
+        match = re.search(r'^(\S+) \| query: "(.*)" \| type: (\S+)$', entry.get("msg", ""))
+        search_lines.append({"time": entry["time"], "provider": match.group(1), "query": match.group(2)})
+if [line["query"] for line in search_lines] != [query["query"] for query in queries]:
+    raise SystemExit("the gateway SEARCH lines after the start do not match the web_search queries")
+write(out_dir, "probe-search-profile-only.json", {
+    "probe": f"scripts/probe_search.py, profile-only mode as the coordinator ran it, started {search_started}; "
+             "the events file does not record the mode",
+    "derivation": "scripts/derive_probe_records.py.txt from the probe's private events file; see the README",
+    "item_types": dict(sorted(items.items())),
+    "web_search": queries,
+    "error_items_first_sentence": error_items,
+    "mcp_tool_calls": mcp_calls,
+    "final": final,
+    "usage": usage,
+    "gateway_search_lines_after_start": search_lines,
+})
