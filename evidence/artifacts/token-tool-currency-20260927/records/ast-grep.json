@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "tool": "ast-grep",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.546Z",
+  "upstream_repository": "https://github.com/ast-grep/ast-grep",
+  "pin": {
+    "version": "0.45.3",
+    "metadata_sources": [
+      "manifests/stack.json:138",
+      "recipes/README.md:84",
+      "scripts/native_token_ci.py:37"
+    ],
+    "scope": "Repository metadata; not an installed-client observation"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/ast-grep/gpt6.md",
+      "full-save/cur/ast-grep/record-draft.md"
+    ],
+    "latest_release": {
+      "version": "0.45.3",
+      "published_at": "2026-08-31T01:42:23Z",
+      "source_url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+      "package_channels": {
+        "verification_status": "Retained scratch package-channel facts; not reverified live in this handoff",
+        "records": [
+          {
+            "channel": "npm @ast-grep/cli",
+            "version": "0.45.3",
+            "published_at": "2026-08-31T02:32:31Z",
+            "source_url": "https://registry.npmjs.org/@ast-grep%2fcli"
+          },
+          {
+            "channel": "PyPI ast-grep-cli",
+            "version": "0.45.3",
+            "published_at": "2026-08-31T01:50:19Z",
+            "source_url": "https://pypi.org/pypi/ast-grep-cli/0.45.3/json"
+          },
+          {
+            "channel": "crates.io ast-grep",
+            "version": "0.45.3",
+            "published_at": "2026-08-31T01:40:29Z",
+            "source_url": "https://crates.io/api/v1/crates/ast-grep/0.45.3"
+          }
+        ]
+      }
+    },
+    "behind_by": {
+      "stable_release_count": 0,
+      "main_commits_after_latest": 18,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "0.45.3",
+    "published_at": "2026-08-31T01:42:23Z",
+    "html_url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+    "resolved_tag_commit": "979c143639e3588c31f563091e69398683ed34f0"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable GitHub releases",
+    "reference_pin": "0.45.3",
+    "latest": "0.45.3",
+    "method": "The repository pin equals the latest stable GitHub release version.",
+    "source_url": "https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "Merged PR #2960 adds explicit opt-in for custom-language native libraries; this change is after 0.45.3 and is not established as a released capability.",
+      "source_urls": [
+        "https://github.com/ast-grep/ast-grep/pull/2960"
+      ],
+      "revision": "9aafe2d55944389d2070e827c1652ffdcce934ba",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/ast-grep/ast-grep/compare/0.45.3...9aafe2d55944389d2070e827c1652ffdcce934ba",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "Merged PR #2969 removes null as an accepted relation-field value in generated rule schemas; this is also unreleased.",
+      "source_urls": [
+        "https://github.com/ast-grep/ast-grep/pull/2969"
+      ],
+      "revision": "6602aeb97d387b01e6ef4e49a6d07578dbf645cd",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "979c143639e3588c31f563091e69398683ed34f0",
+    "head_commit": "6602aeb97d387b01e6ef4e49a6d07578dbf645cd",
+    "commits_after_latest_release": 18,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/ast-grep/ast-grep/compare/0.45.3...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "Scratch custom-language execution probes were not rerun; no installed-capability absence claim is made."
+  ]
+}

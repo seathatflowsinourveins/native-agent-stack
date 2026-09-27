@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "tool": "socraticode",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.505Z",
+  "upstream_repository": "https://github.com/giancarloerra/SocratiCode",
+  "pin": {
+    "version": "1.14.0",
+    "metadata_sources": [
+      "manifests/stack.json:960",
+      "manifests/stack.json:990",
+      "adoption/pins-linux-x86_64.json:296",
+      "adoption/pins-macos-arm64.json:190"
+    ],
+    "scope": "Repository metadata; not an installed-client observation",
+    "source_commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/socraticode/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "1.15.0",
+      "published_at": "2026-09-24T10:58:58Z",
+      "source_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
+      "package_channels": {
+        "verification_status": "Retained scratch package-channel facts; not reverified live in this handoff",
+        "records": [
+          {
+            "channel": "npm",
+            "version": "1.15.0",
+            "published_at": "2026-09-24T11:01:27.714Z",
+            "source_url": "https://registry.npmjs.org/socraticode"
+          }
+        ]
+      }
+    },
+    "behind_by": {
+      "stable_release_count": 1,
+      "main_commits_after_latest": 9,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v1.15.0",
+    "published_at": "2026-09-24T10:58:58Z",
+    "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest",
+    "resolved_tag_commit": "f6191f076a42405f0d5508139f3a8b505cfef93a"
+  },
+  "behind_by": {
+    "count": 1,
+    "unit": "stable GitHub releases",
+    "reference_pin": "1.14.0",
+    "latest": "1.15.0",
+    "method": "Filtered the GitHub releases list to published, non-draft, non-prerelease entries and counted releases between the pin and latest; both endpoints were present.",
+    "source_url": "https://api.github.com/repos/giancarloerra/SocratiCode/releases?per_page=100",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The 1.15.0 release waits for this process's in-flight Qdrant collection creation before reading that collection.",
+      "source_urls": [
+        "https://github.com/giancarloerra/SocratiCode/commit/5b8eb16e739eafe871c695e23dcc23a6de5448d5"
+      ],
+      "revision": "5b8eb16e739eafe871c695e23dcc23a6de5448d5",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The 1.15.0 release preserves Qdrant's error reason and delivers MCP log notifications.",
+      "source_urls": [
+        "https://github.com/giancarloerra/SocratiCode/commit/9f65b5063b4928ab6c713665b3660f383511f286"
+      ],
+      "revision": "9f65b5063b4928ab6c713665b3660f383511f286",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+    "head_commit": "23569f0b05089edfe9a941894508ae8b9a35c4d2",
+    "commits_after_latest_release": 9,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/giancarloerra/SocratiCode/compare/v1.15.0...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The scratch tarball hashes and production-client behavior were not rerun."
+  ]
+}

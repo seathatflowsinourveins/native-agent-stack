@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "tool": "agentsview",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.576Z",
+  "upstream_repository": "https://github.com/kenn-io/agentsview",
+  "pin": {
+    "version": "0.43.0",
+    "metadata_sources": [
+      "manifests/stack.json:65",
+      "recipes/README.md:82"
+    ],
+    "scope": "Repository metadata; not an installed-client observation"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/agentsview/gpt6.md",
+      "full-save/cur/agentsview/record-draft.json"
+    ],
+    "latest_release": {
+      "version": "v0.44.0",
+      "published_at": "2026-09-21T13:56:12Z",
+      "source_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+    },
+    "behind_by": {
+      "stable_release_count": 1,
+      "main_commits_after_latest": 39,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v0.44.0",
+    "published_at": "2026-09-21T13:56:12Z",
+    "html_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/kenn-io/agentsview/releases/latest",
+    "resolved_tag_commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba"
+  },
+  "behind_by": {
+    "count": 1,
+    "unit": "stable GitHub releases",
+    "reference_pin": "0.43.0",
+    "latest": "0.44.0",
+    "method": "Filtered the GitHub releases list to published, non-draft, non-prerelease entries and counted releases between the pin and latest; both endpoints were present.",
+    "source_url": "https://api.github.com/repos/kenn-io/agentsview/releases?per_page=100",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    },
+    {
+      "date": "2026-09-27",
+      "field": "unreleased_main",
+      "change": "Main advanced from 39 to 40 commits after v0.44.0; the observed head is dc2525891fabce8501db45cc034c70079ac70e95. Stable release currency is unchanged."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The v0.44.0 release separates Codex user text from injected context and refreshes affected archived text, previews, and message counts during startup resync when source files remain available.",
+      "source_urls": [
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+      ],
+      "revision": "v0.44.0",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The v0.44.0 release classifies codex exec sessions as automated and Roborev-tagged sessions as automated code reviews.",
+      "source_urls": [
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+      ],
+      "revision": "v0.44.0",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The v0.44.0 release expands MCP session lookup to active sessions and adds include_one_shot and include_automated options to content search.",
+      "source_urls": [
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+      ],
+      "revision": "v0.44.0",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+    "head_commit": "dc2525891fabce8501db45cc034c70079ac70e95",
+    "commits_after_latest_release": 40,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/kenn-io/agentsview/compare/v0.44.0...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The additional main commit was not individually reviewed; archive migration, classification, and search behavior were not executed."
+  ]
+}

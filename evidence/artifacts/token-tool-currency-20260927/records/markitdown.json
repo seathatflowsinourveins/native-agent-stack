@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "tool": "markitdown",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:20.547Z",
+  "upstream_repository": "https://github.com/microsoft/markitdown/",
+  "pin": {
+    "version": "0.1.8",
+    "source_pin": null,
+    "metadata_sources": [
+      "manifests/stack.json",
+      "adoption/pins-linux-x86_64.json"
+    ],
+    "verified_against_worktree_on": "2026-09-27"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/markitdown/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "0.1.8",
+      "tag": "v0.1.8",
+      "published_at": "2026-09-21T21:22:51Z"
+    },
+    "behind_by": {
+      "stable_releases": 0,
+      "main_commits_ahead": 0,
+      "scope": "Scratch source comparison; main comparison not rerun in this record."
+    }
+  },
+  "latest_release": {
+    "tag_name": "v0.1.8",
+    "published_at": "2026-09-21T21:22:51Z",
+    "html_url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/microsoft/markitdown/releases/latest"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable releases",
+    "basis": "GitHub latest and PyPI latest equal the pin.",
+    "source_url": "https://api.github.com/repos/microsoft/markitdown/releases/latest"
+  },
+  "changes_since_scratch": [
+    {
+      "field": "latest_stable_and_companion_versions",
+      "status": "unchanged"
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The v0.1.8 release notes include truncation of uppercase DATA image URIs. Scratch reported a local synthetic fixture; that fixture result is not presented here as a fresh execution.",
+      "source_urls": [
+        "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+      ],
+      "revision": "v0.1.8 / PR #2122",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The v0.1.8 release notes include CSV byte-order-mark removal, blank-row handling, and pipe/newline escaping. Conversion output still requires task-specific semantic checks before adoption.",
+      "source_urls": [
+        "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+      ],
+      "revision": "v0.1.8 / PRs #2303 and #2266",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "package_channels": [
+    {
+      "package": "markitdown",
+      "latest": "0.1.8",
+      "published_at": "2026-09-21T21:14:35.654197Z",
+      "source_url": "https://pypi.org/pypi/markitdown/json",
+      "channel": "PyPI info.version; earliest upload",
+      "retrieved_on": "2026-09-27"
+    },
+    {
+      "package": "markitdown-mcp",
+      "latest": "0.0.1a7",
+      "published_at": "2026-09-14T16:50:59.998219Z",
+      "source_url": "https://pypi.org/pypi/markitdown-mcp/json",
+      "channel": "separate companion package, prerelease version",
+      "retrieved_on": "2026-09-27"
+    },
+    {
+      "package": "markitdown-ocr",
+      "latest": "0.1.1",
+      "published_at": "2026-09-21T21:14:50.272465Z",
+      "source_url": "https://pypi.org/pypi/markitdown-ocr/json",
+      "channel": "separate companion package",
+      "retrieved_on": "2026-09-27"
+    }
+  ],
+  "limitations": [
+    "Source/documentation review only; this record does not establish installed behavior, native tests, model execution, savings or upgrade acceptance.",
+    "Scratch host measurements and executable probes were not rerun or promoted into this evidence class."
+  ]
+}

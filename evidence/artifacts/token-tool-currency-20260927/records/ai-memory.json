@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "tool": "ai-memory",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.702Z",
+  "upstream_repository": "https://github.com/akitaonrails/ai-memory",
+  "pin": {
+    "version": "2.4.1",
+    "metadata_sources": [
+      "manifests/stack.json:94",
+      "manifests/stack.json:134",
+      "adoption/pins-linux-x86_64.json:116"
+    ],
+    "scope": "Repository metadata; not an installed-client observation",
+    "source_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "secondary_pins": [
+      {
+        "version": "2.3.2",
+        "metadata_source": "adoption/pins-macos-arm64.json:136",
+        "scope": "scratch macOS policy hold"
+      },
+      {
+        "version": "2.3.2",
+        "metadata_source": "catalogs/landscape/foundation.json",
+        "scope": "scratch sealed landscape winner"
+      }
+    ]
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/ai-memory/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "v2.4.1",
+      "published_at": "2026-09-25T21:46:32Z",
+      "source_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
+    },
+    "behind_by": {
+      "stable_release_count": 0,
+      "main_commits_after_latest": 0,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v2.4.1",
+    "published_at": "2026-09-25T21:46:32Z",
+    "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest",
+    "resolved_tag_commit": "433a19f3d54dea287571b1423591db2a89965fa9"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable GitHub releases",
+    "reference_pin": "2.4.1",
+    "latest": "2.4.1",
+    "method": "The repository pin equals the latest stable GitHub release version.",
+    "source_url": "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The v2.4.1 changelog documents TCP keepalive on accepted connections, with a 60-second default, to address half-open socket file-descriptor leakage.",
+      "source_urls": [
+        "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/CHANGELOG.md"
+      ],
+      "revision": "v2.4.1",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The v2.4.1 changelog documents preserving an installed session-aware Claude Code bridge during ai-memory run auto-wiring.",
+      "source_urls": [
+        "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/CHANGELOG.md"
+      ],
+      "revision": "v2.4.1",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "PR #859 adds query/document prefixes for OpenAI-compatible embedders on release/2.5. Its merge commit diverges from v2.4.1 and is not in that stable release.",
+      "source_urls": [
+        "https://github.com/akitaonrails/ai-memory/pull/859"
+      ],
+      "revision": "7552d4fd390c1370a09f7452dfbd76bdd707db47",
+      "release_status": "unreleased-release/2.5",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/akitaonrails/ai-memory/compare/v2.4.1...7552d4fd390c1370a09f7452dfbd76bdd707db47",
+      "comparison_returned": {
+        "status": "diverged",
+        "ahead_by": 32,
+        "behind_by": 92
+      },
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "head_commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "commits_after_latest_release": 0,
+    "github_behind_by": 0,
+    "status": "identical",
+    "source_url": "https://api.github.com/repos/akitaonrails/ai-memory/compare/v2.4.1...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The stable-release count applies to the Linux/stack pin. The scratch macOS and sealed landscape pins are 2.3.2 and were reported two releases behind; those secondary pins were not recounted here.",
+    "The current release/2.5 head and scratch open-PR list were not refreshed; only PR #859's merge target and commit exclusion from v2.4.1 were verified."
+  ]
+}
