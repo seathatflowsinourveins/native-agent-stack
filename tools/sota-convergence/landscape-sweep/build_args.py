@@ -82,8 +82,10 @@ LANE_PROFILE = "stack-worker"
 CODEX_TEMPLATE = Path("adoption/templates/codex.config.template.toml")
 STACK_WORKER_PROFILE = Path("adoption/templates/codex.stack-worker.config.toml")
 TABLE_HEADER = re.compile(r"^\s*\[")
-# [mcp_servers.<name>...] with optional spaces inside the brackets and a bare or double-quoted name.
-MCP_TABLE_HEADER = re.compile(r'^\s*\[\s*mcp_servers\.(?:"([^"]+)"|([A-Za-z0-9_-]+))(?:\.[^\]]+)?\s*\]\s*(?:#.*)?$')
+# [mcp_servers.<name>...] as TOML writes a table header: optional spaces inside the brackets and around the dots, and
+# a bare, double-quoted or single-quoted (literal) name.
+MCP_TABLE_HEADER = re.compile(
+    r"""^\s*\[\s*mcp_servers\s*\.\s*(?:"([^"]+)"|'([^']+)'|([A-Za-z0-9_-]+))\s*(?:\.[^\]]*)?\]\s*(?:#.*)?$""")
 
 
 def load_templates() -> dict:
@@ -100,26 +102,33 @@ def mcp_sections(rendered: str) -> tuple[str, list[str]]:
         if TABLE_HEADER.match(line):
             match = MCP_TABLE_HEADER.match(line)
             keep = match is not None
-            name = (match.group(1) or match.group(2)) if match else None
+            name = (match.group(1) or match.group(2) or match.group(3)) if match else None
             if keep and name not in names:
                 names.append(name)
         if keep:
             kept.append(line)
     text = "\n".join(kept).strip() + "\n"
-    # Line extraction is checked against a real TOML parse (Python 3.11+): the extracted text must parse and name
-    # exactly the servers the whole rendered config names, or staging fails closed rather than dropping a server.
+    # Line extraction is checked against a real TOML parse: the extracted text must parse to exactly the
+    # mcp_servers table of the whole rendered config, every server and every nested setting, or staging fails closed
+    # rather than dropping a server or a server's env. Without tomllib (Python 3.11+) nothing can check it.
     try:
         import tomllib
     except ImportError:
-        tomllib = None
-    if tomllib is not None:
-        try:
-            full = set((tomllib.loads(rendered).get("mcp_servers") or {}).keys())
-            extracted = set((tomllib.loads(text).get("mcp_servers") or {}).keys())
-        except tomllib.TOMLDecodeError as error:
-            raise ValueError(f"extracted [mcp_servers.*] tables are not valid TOML: {error}") from None
-        if extracted != full or set(names) != full:
-            raise ValueError(f"MCP extraction mismatch: template names {sorted(full)}, extracted {sorted(extracted)}")
+        raise ValueError("checking the extracted [mcp_servers.*] tables needs Python 3.11+ (tomllib)") from None
+    try:
+        full = tomllib.loads(rendered).get("mcp_servers") or {}
+    except tomllib.TOMLDecodeError as error:
+        raise ValueError(f"the rendered Codex config is not valid TOML: {error}") from None
+    if not isinstance(full, dict):
+        raise ValueError("the rendered Codex config's mcp_servers is not a table")
+    try:
+        extracted = tomllib.loads(text).get("mcp_servers") or {}
+    except tomllib.TOMLDecodeError as error:
+        raise ValueError(f"extracted [mcp_servers.*] tables are not valid TOML: {error}") from None
+    if extracted != full or set(names) != set(full):
+        differ = sorted(name for name in set(full) | set(extracted) | set(names)
+                        if full.get(name) != extracted.get(name) or name not in full or name not in names)
+        raise ValueError(f"MCP extraction mismatch: the extracted tables differ from the rendered config for {differ}")
     return text, names
 
 

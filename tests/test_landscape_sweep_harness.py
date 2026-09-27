@@ -746,20 +746,37 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual(missing.returncode, 2)
         self.assertIn("does not exist", missing.stderr)
 
+    @unittest.skipIf(sys.version_info < (3, 11), "tomllib is Python 3.11+")
     def test_mcp_extraction_accepts_quoted_and_spaced_headers_and_fails_closed(self):
+        import tomllib
         text = ('model = "x"\n[mcp_servers."demo"]\ncommand = "a"\n[ mcp_servers.plain ]\ncommand = "b"\n'
                 '[mcp_servers.plain.env]\nK = "v"\n[projects."/p"]\ntrust_level = "trusted"\n')
         sections, names = build_args.mcp_sections(text)
         self.assertEqual(names, ["demo", "plain"])
         self.assertNotIn("[projects.", sections)
-        try:
-            import tomllib
-        except ImportError:
-            return
-        self.assertEqual(sorted(tomllib.loads(sections)["mcp_servers"]), ["demo", "plain"])
+        self.assertEqual(tomllib.loads(sections)["mcp_servers"], tomllib.loads(text)["mcp_servers"])
         # A server the line extraction cannot see (declared with inline-table syntax under [mcp_servers]) fails closed.
         with self.assertRaises(ValueError):
             build_args.mcp_sections('[mcp_servers]\nhidden = { command = "c" }\n[mcp_servers.plain]\ncommand = "b"\n')
+
+    @unittest.skipIf(sys.version_info < (3, 11), "tomllib is Python 3.11+")
+    def test_mcp_extraction_keeps_nested_tables_in_every_header_spelling(self):
+        import tomllib
+        # TOML allows a literal-quoted name and spaces around the dots; a server's env table in either spelling is kept.
+        for env_header in ("[mcp_servers.'demo'.env]", "[ mcp_servers . demo . env ]", "[mcp_servers . 'demo' . env]"):
+            text = f'[mcp_servers.demo]\ncommand = "a"\n{env_header}\nK = "v"\n[projects."/p"]\ntrust_level = "t"\n'
+            sections, names = build_args.mcp_sections(text)
+            self.assertEqual(names, ["demo"], env_header)
+            self.assertEqual(tomllib.loads(sections)["mcp_servers"], {"demo": {"command": "a", "env": {"K": "v"}}},
+                             env_header)
+        # A nested table the line extraction cannot see (a quoted top-level key) would lose the env: fail closed.
+        with self.assertRaisesRegex(ValueError, r"differ from the rendered config for \['demo'\]"):
+            build_args.mcp_sections('[mcp_servers.demo]\ncommand = "a"\n["mcp_servers".demo.env]\nK = "v"\n')
+
+    def test_mcp_extraction_refuses_without_tomllib(self):
+        with mock.patch.dict(sys.modules, {"tomllib": None}):  # a None entry makes the import raise ImportError
+            with self.assertRaisesRegex(ValueError, "Python 3.11"):
+                build_args.mcp_sections('[mcp_servers.demo]\ncommand = "a"\n')
 
     def test_missing_profile_names_the_flag(self):
         work = stage_work(self)
