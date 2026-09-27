@@ -278,22 +278,29 @@ From the coordinator's Stage 1 run, plus this session's own checks where noted:
 
 - The settings template's ai-memory 2.4.1 hooks were not merged; the live hooks reach the
   running ai-memory 19b6429 build and its own store instead.
-- The rtk hook is wired (independently confirmed in this session: Claude's `PreToolUse`
-  `Bash` matcher runs `rtk hook claude`) and needs rtk >= 0.50.0 plus a five-entry
-  `exclude_commands` list. This session's own check found **both** rtk builds present on
-  this host: a `mise`-managed install at 0.49.0, and the ecosystem install at 0.50.0
-  (`~/.local/share/codex-ecosystem/bin/rtk`, itself a symlink into a `-staging` tree). A
-  plain interactive shell resolves the mise-managed 0.49.0. This session read
-  `~/.claude/settings.json`'s own `env.PATH` value and re-ran `command -v rtk`/`rtk
-  --version` with exactly that `PATH` (the environment Claude Code gives its hooks,
-  including `rtk hook claude`): it resolves to the ecosystem install and reports **rtk
-  0.50.0**, confirming the "done here" holds for hook execution specifically, not for
-  every possible invocation of the bare `rtk` command on this host.
+- The rtk hook is wired (Claude's `PreToolUse` `Bash` matcher runs `rtk hook claude`) and
+  needs rtk >= 0.50.0 plus a five-entry `exclude_commands` list. This session's own check
+  found **both** rtk builds present on this host: a `mise`-managed install at 0.49.0, and
+  the ecosystem install at 0.50.0 (`~/.local/share/codex-ecosystem/bin/rtk`, itself a
+  symlink into a `-staging` tree). A plain interactive shell resolves the mise-managed
+  0.49.0. This session read `~/.claude/settings.json`'s own `env.PATH` value and re-ran
+  `command -v rtk`/`rtk --version` with exactly that `PATH` (the environment Claude Code
+  gives its hooks, including `rtk hook claude`): it resolves to the ecosystem install and
+  reports **rtk 0.50.0**, so the "done here" holds for hook execution specifically, not
+  for every possible invocation of the bare `rtk` command on this host. **This check ran
+  directly in this session, not through either receipt: neither receipt's own retained
+  `commands` runs an rtk command, so its result is quoted here but not retained the way a
+  receipt's output is. This claim is `source_review`, not `native_proven` (relabeled on
+  review; the PR's evidence-class table matches).**
 - The context-mode cache-heal hook is registered by the plugin itself, not by the settings
   template.
-- The Qdrant URL wired into this profile is `127.0.0.1:6333` (independently confirmed in
-  this session via `codex mcp list --json`'s `socraticode` entry), not the template's
-  `16333`.
+- The Qdrant URL wired into this profile is `127.0.0.1:6333`, not the template's `16333`
+  (checked directly in this session against this host's live `codex mcp list --json`
+  output). **The codex receipt's own retained `mcp list` command deliberately never prints
+  a server's URL or any other connection detail, to avoid capturing MCP server config in
+  the receipt (see its `limitations`), so this value is not itself in any retained command
+  output. This claim is `source_review`, not `native_proven` (relabeled on review; the
+  PR's evidence-class table matches).**
 - No Homebrew on this host.
 - No OTel collector is running yet, so telemetry exports fail silently.
 - `mcp_oauth_credentials_store` was left at its default.
