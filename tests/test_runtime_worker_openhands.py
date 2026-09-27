@@ -307,7 +307,7 @@ class OpenHandsRecipeTests(unittest.TestCase):
     def test_mount_allowlist_checks_resolved_targets_and_secret_ancestors(self):
         host = load_recipe_module("host.py")
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             eco = root / "ecosystem"
             good = eco / "bin"
             good.mkdir(parents=True)
@@ -363,11 +363,13 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
     """
     INSTANCE = "django__django-11333"
 
+    # Temp roots are realpath-resolved throughout: read_bounded refuses every symlink hop from "/", and macOS temp
+    # dirs sit under the /var -> /private/var symlink.
     def setUp(self):
         self.checker = load_recipe_module("e2e/check.py")
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.result = Path(self.tmp.name)
+        self.result = Path(self.tmp.name).resolve()
 
     def report(self, bucket):
         data = {key: [] for key in ("resolved_ids", "unresolved_ids", "error_ids", "empty_patch_ids", "incomplete_ids", "submitted_ids")}
@@ -650,7 +652,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
     def test_worker_evidence_cannot_complete_receipt_and_symlinks_are_rejected(self):
         module = load_recipe_module("receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
+            root = Path(tmp).resolve()
             (root / "target").write_text("sensitive")
             (root / "link").symlink_to(root / "target")
             with self.assertRaises((ValueError, OSError)):
@@ -669,7 +671,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
     def test_local_pass_field_is_never_a_worker_verdict(self):
         module = load_recipe_module("receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
-            result = Path(tmp)
+            result = Path(tmp).resolve()
             (result / "window.json").write_text(json.dumps({
                 "started_at": "2026-09-27T18:00:00Z", "finished_at": "2026-09-27T18:00:02Z",
                 "worker_exit_code": 0,
@@ -682,7 +684,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
     def test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass(self):
         module = load_recipe_module("receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
-            result = Path(tmp)
+            result = Path(tmp).resolve()
             instance = "django__django-11333"
             (result / "window.json").write_text(json.dumps({
                 "started_at": "2026-09-27T18:00:00Z", "finished_at": "2026-09-27T18:00:02Z",
@@ -703,7 +705,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
     def test_truncated_native_summary_retains_failed_attempt_receipt(self):
         module = load_recipe_module("receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
-            result = Path(tmp)
+            result = Path(tmp).resolve()
             (result / "worker").mkdir()
             (result / "window.json").write_text(json.dumps({"started_at": "2026-09-27T18:00:00Z", "finished_at": "2026-09-27T18:00:01Z", "worker_exit_code": 124}))
             (result / "check.json").write_text(json.dumps({"passed": False, "exit_code": 1, "failures": ["missing_result"]}))
@@ -717,7 +719,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
     def test_cleanup_timeout_does_not_erase_primary_exit(self):
         host = load_recipe_module("host.py")
         with tempfile.TemporaryDirectory() as tmp:
-            log = Path(tmp) / "worker.log"
+            log = Path(tmp).resolve() / "worker.log"
             effects = [subprocess.CompletedProcess(["synthetic"], 7), subprocess.TimeoutExpired(["synthetic-cleanup"], 30)]
             with patch.object(host.subprocess, "run", side_effect=effects):
                 self.assertEqual(host.execute_container(["synthetic"], "fixture", log, 1), 7)
@@ -727,7 +729,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
     def test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage(self):
         module = load_recipe_module("receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
-            db = Path(tmp) / "fixture.sqlite"
+            db = Path(tmp).resolve() / "fixture.sqlite"
             connection = sqlite3.connect(db)
             connection.execute("CREATE TABLE call_logs (timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning, correlation_id, forbidden_prompt)")
             connection.execute("CREATE TABLE forbidden_credentials (secret)")
@@ -765,7 +767,7 @@ class OpenHandsDispatchTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.state = Path(self.tmp.name)
+        self.state = Path(self.tmp.name).resolve()
         self.run_id = "rw-openhands-fixture"
         self.arm = "engines-on"
         self.result = self.state / "runs" / self.run_id / self.arm
