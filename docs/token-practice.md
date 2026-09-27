@@ -44,9 +44,12 @@ it. Repair a failed connection individually while continuing independent work.
 For profiles that select RTK global awareness, use the
 [upstream installation recipe](../recipes/README.md#native-context-mode-and-hooks)
 once per profile, then prove use through returned native task results. Stable
-Codex uses explicit RTK commands; native Claude supports Bash rewriting. An
-explicit-command profile can instead carry the relevant RTK instruction in its
-task envelope. An installed executable alone does not prove either behavior.
+Codex uses explicit RTK commands; native Claude supports Bash rewriting. A Codex
+home gets RTK's instructions from the global `AGENTS.md` block of the
+[Codex worker lane](../recipes/README.md#codex-worker-lane)
+(changed after `v2026.09.26.2`), because Codex does not expand the `@RTK.md`
+pointer that `rtk init` writes. An installed executable alone does not prove
+either behavior.
 A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's four
 `exclude_commands` entries, which keep blob reads, `git branch` and `diff` native.
 The recipe explains how RTK anchors each entry. On 2026-09-26 it grew from two

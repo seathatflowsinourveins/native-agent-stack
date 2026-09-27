@@ -1,0 +1,31 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch helper: write a copy of a project .codex/config.toml with the host step done (the three context-mode
+tables removed, each from its header line to the line before the next header). Never edits the source file.
+usage: host_step_copy.py <source config.toml> <destination config.toml>"""
+import sys
+import tomllib
+from pathlib import Path
+
+TABLES = {'[plugins."context-mode@context-mode".mcp_servers.context-mode]', "[mcp_servers.context-mode]",
+          "[mcp_servers.context-mode.env]"}
+src, dst = Path(sys.argv[1]), Path(sys.argv[2])
+out, skipping = [], False
+for line in src.read_text(encoding="utf-8").splitlines(keepends=True):
+    stripped = line.strip()
+    if stripped.startswith("["):
+        skipping = stripped in TABLES
+    if not skipping:
+        out.append(line)
+text = "".join(out)
+data = tomllib.loads(text)
+assert "context-mode" not in data.get("mcp_servers", {})
+assert "context-mode@context-mode" not in data.get("plugins", {})
+before = tomllib.loads(src.read_text(encoding="utf-8"))
+before["mcp_servers"].pop("context-mode")
+before.get("plugins", {}).pop("context-mode@context-mode", None)
+if not before.get("plugins"):
+    before.pop("plugins", None)
+assert before == data, "only the three tables may differ"
+dst.parent.mkdir(parents=True, exist_ok=True)
+dst.write_text(text, encoding="utf-8")
+print(f"removed {len(src.read_text(encoding='utf-8').splitlines()) - len(text.splitlines())} lines; the rest parses equal")

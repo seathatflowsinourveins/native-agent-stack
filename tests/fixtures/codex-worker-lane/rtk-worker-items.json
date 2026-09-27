@@ -1,0 +1,20 @@
+{
+  "blob_sha256": "79cb30c3a0f46cd75a4ed5168e6050e22affbe6ff0285a9d8a72c373e13c5678",
+  "blob_bytes": 21300,
+  "items": [
+    {
+      "id": "item_1",
+      "type": "command_execution",
+      "command": "/bin/bash -lc 'rtk git status --short'",
+      "exit_code": 0,
+      "status": "completed"
+    },
+    {
+      "id": "item_2",
+      "type": "command_execution",
+      "command": "/bin/bash -lc 'rtk proxy git show HEAD:big.txt'",
+      "exit_code": 0,
+      "status": "completed"
+    }
+  ]
+}
