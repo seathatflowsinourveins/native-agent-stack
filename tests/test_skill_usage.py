@@ -14,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "skill-usage"))
@@ -517,7 +518,12 @@ class RenderTextAndCli(unittest.TestCase):
     def test_out_writes_report_outside_the_repository(self):
         with tempfile.TemporaryDirectory() as tmp:
             out_path = Path(tmp) / "nested" / "report.json"
-            code, _ = self.run_main(["--json"], out=out_path)
+            # Keep the checkout and output as siblings even when TMPDIR is inside
+            # the real worktree. Source: docs.python.org/3/library/unittest.mock.html#patch-object.
+            checkout = Path(tmp) / "checkout"
+            checkout.mkdir()
+            with mock.patch.object(S, "ROOT", checkout):
+                code, _ = self.run_main(["--json"], out=out_path)
             self.assertEqual(code, 0)
             written = json.loads(out_path.read_text())
             self.assertEqual(written["kind"], "skill_invoke_rate_report")
@@ -598,6 +604,178 @@ def materialize_lanes_root(dest: Path) -> Path:
 
 
 class CodexLanes(unittest.TestCase):
+    def test_measurement_uses_own_outputs_and_differences_cumulative_usage(self):
+        def record(kind, payload, ordinal):
+            return {"type": kind, "timestamp": "2026-10-20T02:01:00Z", "payload": payload, "ordinal": ordinal}
+        def tokens(total, out=0):
+            return {"type": "token_count", "info": {"total_token_usage": {
+                "input_tokens": total, "cached_input_tokens": 20, "output_tokens": out,
+                "reasoning_output_tokens": 0, "total_tokens": total + out}}}
+        rows = [record("session_meta", {"source": {"subagent": {}}, "subagent_history_start_ordinal": 5}, 0),
+                record("event_msg", tokens(100), 2),
+                record("response_item", {"type": "function_call", "call_id": "parent", "name": "exec_command", "arguments": '{"cmd":"ls"}'}, 3),
+                record("response_item", {"type": "function_call_output", "call_id": "parent", "output": "p" * 9000}, 4),
+                record("event_msg", {"type": "task_started", "turn_id": "turn"}, 5),
+                record("response_item", {"type": "function_call", "call_id": "child", "name": "exec_command", "arguments": '{"cmd":"rtk proxy cat a"}'}, 6),
+                record("response_item", {"type": "function_call_output", "call_id": "child", "output": "c" * 6000}, 7),
+                record("event_msg", tokens(110, 3), 8), record("event_msg", tokens(110, 3), 9),
+                record("event_msg", {"type": "turn_aborted"}, 10)]
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m3"]["results"], 1)
+        self.assertEqual(got["by_carrier"]["rtk_proxy"]["bytes"], 6000)
+        self.assertEqual(got["provider_usage"]["totals"]["input_tokens"], 10)
+        self.assertEqual(got["provider_usage"]["totals"]["output_tokens"], 3)
+        self.assertEqual(got["provider_usage"]["attempts"][0]["state"], "interrupted")
+        self.assertFalse(got["provider_usage"]["complete"])
+        self.assertEqual(got["provider_usage"]["duplicate_snapshots"], 1)
+        self.assertNotIn("turn_id", json.dumps(got))
+
+    def test_measurement_includes_ctx_nested_fetches_from_item_arguments(self):
+        rows = []
+        for i in range(20):
+            tool = "ctx_fetch_and_index" if i == 0 else "ctx_execute"
+            args = {"url": "https://example.org"} if i == 0 else {"language": "shell", "code": "curl https://example.org"}
+            rows.append({"type": "event_msg", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                "type": "item_completed", "item": {"id": str(i), "type": "McpToolCall", "server": "context-mode",
+                    "tool": tool, "arguments": args, "result": {"content": [{"type": "text", "text": "ok"}]}}}})
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m4"]["remote_fetches"], 20)
+        self.assertEqual(got["m4"]["routed_share"], .05)
+        self.assertEqual(got["m5"]["results"], 20)
+
+    def test_lane_report_exposes_sanitized_per_actor_metrics(self):
+        report = self.scan()
+        self.assertEqual(len(report["actors"]), report["sessions_in_window"])
+        self.assertIn("m3", report["actors"][0]["measurement"])
+        self.assertIn("provider_usage", report["groups"]["workers"]["measurement"])
+        for actor in report["actors"]:
+            self.assertNotIn("usage", actor["measurement"])
+        self.assertNotIn(str(self.root), json.dumps(report))
+
+    def test_code_mode_fixture_keeps_nested_operations_out_of_context_bytes(self):
+        path = next(self.root.glob("rollout-*-lanes-worker.jsonl"))
+        rows = []
+        for line in path.read_text().splitlines():
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                pass  # Fixture intentionally includes one malformed row.
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["orphan_results"], 0)
+        self.assertEqual(got["mcp_states"]["context-mode"],
+                         {"attempted": 3, "succeeded": 2, "failed": 1, "unfinished": 0})
+        self.assertEqual(got["mcp_states"]["qmd"]["succeeded"], 1)
+        self.assertEqual(got["calls_without_result"], 3)  # exec, spawn_agent, direct shell
+        self.assertEqual(got["sandbox_operations"], 10)
+        self.assertEqual(got["m4"]["ctx_sandbox_fetch"], 1)
+        # The retained fixture has no exec output; add one synthetic model-visible
+        # return and large sandbox results to exercise the actual byte boundary.
+        exec_key = next(r["payload"]["call_id"] for r in rows
+                        if r.get("payload", {}).get("type") == "custom_tool_call")
+        boundary = next(i for i, r in enumerate(rows)
+                        if r.get("payload", {}).get("name") == "spawn_agent")
+        rows.insert(boundary, {"type": "response_item", "timestamp": "2026-10-20T01:05:10Z",
+                               "payload": {"type": "custom_tool_call_output", "call_id": exec_key,
+                                           "output": "visible summary"}})
+        for row in rows[:boundary]:
+            item = row.get("payload", {}).get("item", {})
+            if item.get("type") == "CommandExecution":
+                item["aggregated_output"] = "x" * 6000
+            if item.get("type") == "McpToolCall":
+                item["result"] = {"content": [{"type": "text", "text": "x" * 6000}]}
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["orphan_results"], 0)
+        self.assertEqual(got["m3"]["bytes"], len("visible summary"))
+        self.assertEqual(got["m3"]["results"], 1)
+        self.assertEqual(got["m5"]["results"], 0)
+        self.assertEqual(got["calls_without_result"], 2)
+
+    def test_local_shell_and_custom_calls_pair_with_native_outputs(self):
+        def row(payload):
+            return {"type": "response_item", "timestamp": "2026-10-20T02:00:00Z", "payload": payload}
+        rows = [row({"type": "local_shell_call", "call_id": "shell", "action": {
+                    "type": "exec", "command": ["bash", "-lc", "curl https://example.org"]}}),
+                row({"type": "function_call_output", "call_id": "shell", "output": "done"}),
+                row({"type": "custom_tool_call", "call_id": "custom", "name": "apply_patch", "input": "patch"}),
+                row({"type": "custom_tool_call_output", "call_id": "custom", "output": "ok"})]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["orphan_results"], 0)
+        self.assertEqual(got["calls_without_result"], 0)
+        self.assertTrue(got["bytes_complete"])
+        self.assertEqual(got["m3"]["bytes"], 6)
+        self.assertEqual(got["by_carrier"]["bash"]["bytes"], 4)
+        self.assertEqual(got["m4"]["shell_fetch"], 1)
+
+    def test_sidecar_binding_counts_distinguish_changed_rollouts(self):
+        import hashlib
+        path = next(self.root.glob("rollout-*-lanes-worker.jsonl"))
+        records = [{"transcript_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                    "tool_use_id": "reviewed", "proxy_purpose": "acceptance", "witness": "check"},
+                   {"transcript_sha256": "0" * 64, "tool_use_id": "stale",
+                    "proxy_purpose": "acceptance", "witness": "check"}]
+        def scan():
+            return S.scan_codex_lanes([self.root], self.manifest, since=self.since, until=self.until,
+                                     marker=S.DEFAULT_LANES_MARKER, exception_records=records)
+        self.assertEqual(scan()["sidecar_records"], {"bound": 1, "unbound": 1})
+        path.write_text(path.read_text() + "\n")
+        self.assertEqual(scan()["sidecar_records"], {"bound": 0, "unbound": 2})
+
+    def test_measurement_namespace_and_failed_terminal_event(self):
+        def row(kind, payload):
+            return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload}
+        rows = [row("response_item", {"type": "function_call", "call_id": "c", "namespace": "mcp__context_mode",
+                "name": "ctx_execute", "arguments": json.dumps({"language": "shell", "code": "curl https://example.org"})}),
+                row("response_item", {"type": "function_call_output", "call_id": "c", "output": "x" * 6000}),
+                row("event_msg", {"type": "item_completed", "item": {"type": "McpToolCall", "id": "c",
+                    "server": "context_mode", "tool": "ctx_execute", "arguments": {"language": "shell", "code": "curl https://example.org"}}}),
+                row("event_msg", {"type": "task_started"}),
+                row("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, 10)}}),
+                row("event_msg", {"type": "task_complete", "error": {"message": "failed"}})]
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m5"]["large_results"], 1)
+        self.assertEqual(got["m4"]["ctx_sandbox_fetch"], 1)
+        self.assertFalse(got["provider_usage"]["complete"])
+        self.assertEqual(got["provider_usage"]["attempts"][0]["state"], "failed")
+
+    def test_usage_missing_parent_baseline_and_counter_regression_stay_unknown(self):
+        def row(kind, payload, ordinal=10):
+            return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload, "ordinal": ordinal}
+        def snapshot(value):
+            return row("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, value)}})
+        rows = [row("session_meta", {"subagent_history_start_ordinal": 5}, 0),
+                row("event_msg", {"type": "task_started"}), snapshot(100),
+                row("event_msg", {"type": "task_complete"})]
+        got = S.measure_codex_records(rows)["provider_usage"]
+        self.assertIsNone(got["totals"]["input_tokens"])
+        self.assertFalse(got["complete"])
+        regressed = S.measure_codex_records([row("event_msg", {"type": "task_started"}), snapshot(100), snapshot(90),
+                                            row("event_msg", {"type": "task_complete"})])["provider_usage"]
+        self.assertIsNone(regressed["totals"]["input_tokens"])
+        self.assertFalse(regressed["complete"])
+
+    def test_codex_mcp_failure_uses_native_item_state_with_response_bytes(self):
+        rows = [{"type": "response_item", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                    "type": "function_call", "call_id": "c", "namespace": "mcp__qmd", "name": "search", "arguments": "{}"}},
+                {"type": "response_item", "timestamp": "2026-10-20T02:00:01Z", "payload": {
+                    "type": "function_call_output", "call_id": "c", "output": "failed"}},
+                {"type": "event_msg", "timestamp": "2026-10-20T02:00:01Z", "payload": {
+                    "type": "item_completed", "item": {"id": "c", "type": "McpToolCall", "server": "qmd", "tool": "search", "status": "failed"}}}]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["mcp_states"]["qmd"]["failed"], 1)
+        self.assertEqual(got["m3"]["bytes"], 6)
+
+    def test_native_mcp_status_without_result_payload(self):
+        rows = [{"type": "event_msg", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                    "type": "item_completed", "item": {"type": "McpToolCall", "id": str(i),
+                        "server": "qmd", "tool": "query", "status": state, "result": None}}}
+                for i, state in enumerate(["completed", "failed", "inProgress"])]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["mcp_states"]["qmd"],
+                         {"attempted": 3, "succeeded": 1, "failed": 1, "unfinished": 1})
+        self.assertEqual(got["unknown_result_bytes"], 0)
+        self.assertEqual(got["calls_without_result"], 3)
+        self.assertFalse(got["bytes_complete"])
+
     def setUp(self):
         self.manifest = load_fixture_manifest()
         self.names = fixture_names()
@@ -948,6 +1126,48 @@ class CodexLanes(unittest.TestCase):
         code, out, _ = self.run_main(["--lanes", "--codex-root", str(self.root), *window])
         self.assertEqual(code, 0)
         self.assertIn("user_config: applied=3 ignored=1 unknown=1", out)
+
+    def test_both_cli_sidecars_accept_and_validate_log_find_review(self):
+        review = self.root / "review.json"
+        record = {"transcript_sha256": "0" * 64, "tool_use_id": "c", "witness": "independent check",
+                  "rtk_log_find": [{"part": 1, "disposition": "permitted"}]}
+        for adjudications, expected in [([{ "part": 1, "disposition": "permitted"}], 0),
+                                       ([{ "part": 0, "disposition": "permitted"}], 2),
+                                       ([{ "part": 1, "disposition": "guess"}], 2),
+                                       ([{ "part": 1, "disposition": "permitted"}] * 2, 2)]:
+            with self.subTest(adjudications=adjudications):
+                record["rtk_log_find"] = adjudications
+                review.write_text(json.dumps([record]))
+                code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root),
+                                             "--exceptions", str(review), "--json"])
+                self.assertEqual(code, expected)
+                p = subprocess.run(["node", str(S.MEASUREMENT_MODULE), "--lanes-sweep",
+                                    "--root", str(self.root), "--exceptions", str(review)],
+                                   capture_output=True, text=True)
+                self.assertEqual(p.returncode == 0, expected == 0)
+
+    def test_both_cli_sidecars_reject_malformed_classes_in_mixed_records(self):
+        review = self.root / "mixed-review.json"
+        good = {"transcript_sha256": "0" * 64, "tool_use_id": "c", "witness": "independent check",
+                "exception": "exact_bytes_required_by_frozen_check", "proxy_purpose": "acceptance",
+                "rtk_log_find": [{"part": 1, "disposition": "permitted"}]}
+        variants = [({}, True), ({"exception": "typo"}, False), ({"exception": None}, False),
+                    ({"proxy_purpose": "acceptence"}, False), ({"proxy_purpose": None}, False),
+                    ({"rtk_log_find": None}, False), ({"rtk_log_find": []}, False),
+                    ({"rtk_log_find": [{"part": 0, "disposition": "permitted"}]}, False),
+                    ({"rtk_log_find": [{"part": 1, "disposition": "guess"}]}, False),
+                    ({"rtk_log_find": good["rtk_log_find"] * 2}, False)]
+        for override, valid in variants:
+            review.write_text(json.dumps([{**good, **override}]))
+            with self.subTest(override=override, cli="skill_usage"):
+                code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root),
+                                           "--exceptions", str(review), "--json"])
+                self.assertEqual(code, 0 if valid else 2)
+            with self.subTest(override=override, cli="child_usage"):
+                p = subprocess.run(["node", str(S.MEASUREMENT_MODULE), "--lanes-sweep",
+                                    "--root", str(self.root), "--exceptions", str(review)],
+                                   capture_output=True, text=True)
+                self.assertEqual(p.returncode == 0, valid)
 
     def test_cli_lanes_refusals(self):
         root = ["--codex-root", str(self.root)]
