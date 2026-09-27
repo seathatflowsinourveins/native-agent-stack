@@ -15,7 +15,7 @@ of the real `skills` CLI (v1.7.0) to exercise install_skills.py end to end:
                     rule install_skills.py itself applies when reading it
                     back, so a test that sets $XDG_STATE_HOME exercises both
                     sides of that contract at once.
-  remove <name> -g -y
+  remove <name> -g -y -a claude-code codex
                     deletes the canonical folder, the symlink and the lock
                     entry.
 
@@ -311,7 +311,11 @@ class MismatchRollbackTests(InstallSkillsTestCase):
         result = self.run_install(manifest, fake_bin=fake_bin)
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("rolled back", result.stderr)
-        self.assertEqual([c[0] for c in calls_log(fake_bin)], ["--version", "add", "remove"])
+        calls = calls_log(fake_bin)
+        self.assertEqual([c[0] for c in calls], ["--version", "add", "remove"])
+        # The rollback is scoped to exactly the agents the install wrote for, never to every agent (#405).
+        self.assertEqual(calls[2], ["remove", "drift-skill", "-g", "-y", "-a", "claude-code", "codex"])
+        self.assertEqual(calls[1][calls[1].index("-a"):], calls[2][calls[2].index("-a"):])
         # The fake remove handler actually deleted what add wrote.
         self.assertFalse((self.home / ".agents" / "skills" / "drift-skill").exists())
         self.assertFalse((self.home / ".claude" / "skills" / "drift-skill").exists())

@@ -57,6 +57,11 @@ VERSION_CHECK_TIMEOUT = 30
 ADD_TIMEOUT = 120
 REMOVE_TIMEOUT = 30
 
+# The only agents this installer writes for. `add` and the rollback `remove` both pass them, because skills
+# v1.7.0's `remove` without -a selects every known agent (vercel-labs/skills src/remove.ts#L209) and would delete
+# a same-named skill that another agent owns. -a stays last: the CLI reads trailing words as agent names.
+SKILL_AGENTS = ("claude-code", "codex")
+
 # Real-run and --dry-run each have their own notion of "nothing left to fix":
 # a dry run never executes `add`/`remove`, so 'planned' (not 'installed') is
 # its success outcome, but a real local-modified refusal is still a refusal.
@@ -173,7 +178,7 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
               f"not match the pinned manifest hash (pass --force to overwrite it)", file=sys.stderr)
         return "local-modified"
 
-    add_args = ["add", skill["url"], "--skill", name, "-g", "-y", "-a", "claude-code", "codex"]
+    add_args = ["add", skill["url"], "--skill", name, "-g", "-y", "-a", *SKILL_AGENTS]
     if dry_run:
         note(f"{name}: would run: {shlex.join([skills_bin, *add_args])}")
         return "planned"
@@ -193,7 +198,7 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         note(f"{name}: installed; SKILL.md sha256 matches the pin and the lock records tree {skill['tree_sha']}")
         return "installed"
 
-    run_skills_bin(skills_bin, ["remove", name, "-g", "-y"], home, timeout=REMOVE_TIMEOUT)
+    run_skills_bin(skills_bin, ["remove", name, "-g", "-y", "-a", *SKILL_AGENTS], home, timeout=REMOVE_TIMEOUT)
     print(f"{name}: installed content did not match the pinned manifest hash/tree; rolled back",
           file=sys.stderr)
     return "rolled-back"
