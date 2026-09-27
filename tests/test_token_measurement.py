@@ -4,14 +4,29 @@ Contract: #381 preregistration M3/M4/M5 and full-save plan §4.1 controls.
 The public measurement export is shared by the two existing WP4 tools.
 """
 import json
+import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
+
+
+def rtk_replay_supported():
+    """Match the kernel's Linux/RTK 0.50.0 native replay contract."""
+    if sys.platform != "linux" or not shutil.which("rtk"):
+        return False
+    version = subprocess.run(["rtk", "--version"], text=True, capture_output=True, check=False)
+    return version.returncode == 0 and bool(re.fullmatch(r"rtk 0\.50\.0\s*", version.stdout))
+
+
+RTK_REPLAY_SUPPORTED = rtk_replay_supported()
 
 
 def call(key, name, **inputs):
@@ -26,13 +41,13 @@ def result(key, content, error=False, timestamp="2026-09-26T01:00:01Z"):
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
 class TokenMeasurement(unittest.TestCase):
-    def measure(self, rows, **options):
+    def measure(self, rows, *, env=None, **options):
         script = ("import {readFileSync} from 'node:fs'; import {measureTranscript} from "
                   + json.dumps(MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); "
                   "process.stdout.write(JSON.stringify(measureTranscript(x.rows,x.options))); ")
         p = subprocess.run(["node", "--input-type=module", "-e", script],
                            input=json.dumps({"rows": rows, "options": options}),
-                           text=True, capture_output=True, check=False)
+                           text=True, capture_output=True, check=False, env=env)
         self.assertEqual(p.returncode, 0, p.stderr)
         return json.loads(p.stdout)
 
@@ -72,6 +87,22 @@ class TokenMeasurement(unittest.TestCase):
         invalid = self.measure(rows, exceptions={"exact": {"exception": "exact_bytes_required_by_frozen_check"}})
         self.assertEqual(invalid["m3"]["large_results"], 3)
         self.assertEqual(invalid["invalid_exceptions"], 1)
+
+    def test_text_blocks_have_the_same_utf8_size_as_string_results(self):
+        text = 'é\n"' * 1280  # Exactly 5,120 bytes; JSON escapes would cross M3.
+        rows = [call("bash", "Bash", command="cat f"), result("bash", text),
+                call("ctx", "mcp__ctx__ctx_execute"),
+                result("ctx", [{"type": "text", "text": text[:100]},
+                               {"type": "text", "text": text[100:]}])]
+        got = self.measure(rows)
+        self.assertEqual(got["by_carrier"]["bash"]["bytes"], 5120)
+        self.assertEqual(got["by_carrier"]["ctx"]["bytes"], 5120)
+        self.assertEqual(got["m3"]["large_results"], 0)
+        self.assertEqual(got["m5"]["large_results"], 0)
+        block = {"type": "image", "data": "synthetic"}
+        mixed = self.measure([call("c", "mcp__ctx__ctx_execute"), result("c", [
+            {"type": "text", "text": "é"}, block])])
+        self.assertEqual(mixed["m3"]["bytes"], 2 + len(json.dumps(block, separators=(",", ":")).encode()))
 
     def test_m5_one_enormous_result_among_small_ones_fails_byte_and_max_guards(self):
         rows = []
@@ -131,6 +162,21 @@ class TokenMeasurement(unittest.TestCase):
         self.assertEqual(got["ctx_sandbox_fetch"], 2)
         self.assertEqual(got["remote_fetches"], 2)
 
+    def test_m4_quoted_patterns_comments_and_written_scripts_are_not_fetches(self):
+        commands = ['grep -n "fetch(" app.js', '# fetch(url) is slow',
+                    'cat <<\'EOF\' > script.py\nrequests.get(u)\nEOF',
+                    'grep "requests.get(u)" f', '# requests.get(u)',
+                    'cat <<EOF > script.js\nfetch("https://example.org")\nEOF']
+        for command in commands:
+            with self.subTest(command=command):
+                got = self.measure([call("c", "Bash", command=command)])["m4"]
+                self.assertEqual(got["remote_fetches"], 0)
+        for command in ["python3 -c 'import requests; requests.get(u)'",
+                        'node -e \'fetch("https://example.org")\'',
+                        "bash <<'EOF'\npython3 -c 'requests.get(u)'\nEOF"]:
+            with self.subTest(command=command):
+                self.assertEqual(self.measure([call("c", "Bash", command=command)])["m4"]["unclassifiable"], 1)
+
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):
             return {"type": "attachment", "timestamp": "2026-09-26T01:00:00Z", "attachment": {
@@ -179,7 +225,7 @@ class TokenMeasurement(unittest.TestCase):
         self.assertEqual(early["input_tokens"] + late["input_tokens"], 10)
         self.assertEqual(early["output_tokens"] + late["output_tokens"], 7)
 
-    @unittest.skipUnless(shutil.which("rtk"), "RTK v0.50.0 required")
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
     def test_rtk_native_replay_parts_and_call_controls(self):
         controls = [
             ("git status && gh pr view 1 | head -n 5", 2, 1, 0),
@@ -196,7 +242,7 @@ class TokenMeasurement(unittest.TestCase):
                 # Replay proves potential routing, never what actually executed.
                 self.assertEqual(got["observed_covered_parts"], 0)
 
-    @unittest.skipUnless(shutil.which("rtk"), "RTK v0.50.0 required")
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
     def test_whole_call_substitution_does_not_hide_eligible_prefix(self):
         got = self.measure([call("c", "Bash", command='git status && printf "%s" "$(date)"')], rtkCheck=True)["rtk_parts"]
         self.assertEqual(got["eligible_parts"], 1)
@@ -215,7 +261,7 @@ class TokenMeasurement(unittest.TestCase):
         self.assertEqual(got["status"], "incomplete")
         self.assertEqual(got["routed_share"], .05)
 
-    @unittest.skipUnless(shutil.which("rtk"), "RTK v0.50.0 required")
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
     def test_rtk_explicit_exclusions_proxy_and_quoted_operators(self):
         commands = ["rtk jq . a.json", "rtk git -C . show HEAD:a", "rtk git branch -a",
                     "rtk diff a b", "rtk git log", "rtk find missing", "rtk cd .",
@@ -226,12 +272,75 @@ class TokenMeasurement(unittest.TestCase):
                     "rtk gh pr view 1 --json title", "rtk /usr/bin/git status"]
         got = self.measure([call(str(i), "Bash", command=c) for i,c in enumerate(commands)],
                            rtkCheck=True)["rtk_parts"]
-        self.assertEqual(got["explicit_rtk_on_excluded_or_sensitive"], 11)
+        self.assertEqual(got["explicit_rtk_on_excluded_or_sensitive"], 9)
+        self.assertEqual(got["explicit_rtk_log_find_advisory"], 2)
         self.assertEqual(got["proxy_parts"], 1)
         # log/find still rewrite under the frozen FIVE exclusions; their
         # independent raw-exactness guard must not shrink M-R1's denominator.
         self.assertEqual(got["eligible_parts"], 5)
         self.assertEqual(got["observed_covered_parts"], 3)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_rtk_quoted_greater_than_is_data_and_redirect_is_syntax(self):
+        for command in ['rtk grep -n "=>" f', 'rtk rg "Vec<String>" src']:
+            with self.subTest(command=command):
+                got = self.measure([call("c", "Bash", command=command)], rtkCheck=True)["rtk_parts"]
+                self.assertEqual(got["explicit_rtk_on_excluded_or_sensitive"], 0)
+                self.assertEqual(got["eligible_parts"], 1)
+                self.assertEqual(got["observed_covered_parts"], 1)
+        got = self.measure([call("c", "Bash", command="rtk git status > out.txt")], rtkCheck=True)["rtk_parts"]
+        self.assertEqual(got["explicit_rtk_on_excluded_or_sensitive"], 1)
+        self.assertEqual(got["eligible_parts"], 0)
+        # /dev/null is accepted by the native hook; the local guard cannot veto it.
+        got = self.measure([call("c", "Bash", command="git status 2>/dev/null")], rtkCheck=True)["rtk_parts"]
+        self.assertEqual(got["eligible_parts"], 1)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_rtk_log_find_are_advisory_with_per_part_review(self):
+        rows = [call("c", "Bash", command="rtk git log -3 && rtk find . -name x")]
+        got = self.measure(rows, rtkCheck=True)["rtk_parts"]
+        self.assertEqual(got["explicit_rtk_on_excluded_or_sensitive"], 0)
+        self.assertEqual(got["explicit_rtk_log_find_advisory"], 2)
+        self.assertEqual(got["log_find_unresolved_parts"], 2)
+        self.assertEqual(got["eligible_parts"], 2)
+        reviewed = self.measure(rows, rtkCheck=True, exceptions={"c": {
+            "rtk_log_find": [{"part": 1, "disposition": "permitted"},
+                             {"part": 2, "disposition": "requires_raw"}],
+            "witness": "bounded history and independently checked path requirement"}})["rtk_parts"]
+        self.assertEqual(reviewed["log_find_permitted_parts"], 1)
+        self.assertEqual(reviewed["log_find_requires_raw_parts"], 1)
+        self.assertEqual(reviewed["log_find_unresolved_parts"], 0)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_rtk_proxy_parts_are_outside_eligible_population(self):
+        for review in [{"proxy_purpose": "acceptance", "witness": "native check"},
+                       {"exception": "exact_bytes_required_by_frozen_check", "witness": "check"}, {}]:
+            with self.subTest(review=review):
+                got = self.measure([call("c", "Bash", command="rtk proxy git diff --stat && rtk git status")],
+                                   rtkCheck=True, exceptions={"c": review})["rtk_parts"]
+                self.assertEqual(got["proxy_parts"], 1)
+                self.assertEqual(got["eligible_parts"], 1)
+                self.assertEqual(got["coverage"], 1)
+
+    def test_unsupported_rtk_version_reports_unavailable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = Path(directory) / "rtk"
+            binary.write_text("#!/bin/sh\nprintf 'rtk 0.51.0\\n'\n")
+            binary.chmod(0o755)
+            env = {**os.environ, "PATH": directory + os.pathsep + os.environ.get("PATH", "")}
+            got = self.measure([call("c", "Bash", command="git status")], env=env, rtkCheck=True)["rtk_parts"]
+            self.assertEqual(got["status"], "unavailable")
+            self.assertIsNone(got["coverage"])
+
+    def test_rtk_replay_support_matches_kernel_platform_and_version(self):
+        with mock.patch.object(sys, "platform", "linux"), mock.patch.object(shutil, "which", return_value="rtk"):
+            for output, code, expected in [("rtk 0.50.0\n", 0, True), ("rtk 0.51.0\n", 0, False),
+                                           (" rtk 0.50.0\n", 0, False), ("rtk 0.50.0\n", 1, False)]:
+                with self.subTest(output=output, code=code), mock.patch.object(subprocess, "run", return_value=
+                        subprocess.CompletedProcess(["rtk", "--version"], code, output, "")):
+                    self.assertEqual(rtk_replay_supported(), expected)
+        with mock.patch.object(sys, "platform", "darwin"):
+            self.assertFalse(rtk_replay_supported())
 
     def test_usage_dedup_routes_partial_counters_and_completion(self):
         def message(key, output, **kw):
@@ -258,22 +367,48 @@ class TokenMeasurement(unittest.TestCase):
             child.parent.mkdir(parents=True)
             rows = [call("c", "WebFetch", url="https://example.org"), result("c", "x" * 6000)]
             content = "\n".join(json.dumps(r) for r in rows)
-            child.write_text(content)
+            child.write_text(content + "\n")  # Different digest, same semantic rows.
             (root / "session.jsonl").write_text(content)
             review = root / "exceptions.json"
             review.write_text(json.dumps([{"transcript_sha256": hashlib.sha256(content.encode()).hexdigest(),
-                "tool_use_id": "c", "exception": "original_source_quoted_or_line_cited", "witness": "citation"}]))
+                "tool_use_id": "c", "exception": "original_source_quoted_or_line_cited", "witness": "citation"},
+                {"transcript_sha256": "0" * 64, "tool_use_id": "stale",
+                 "exception": "original_source_quoted_or_line_cited", "witness": "stale citation"}]))
             p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", directory,
                                 "--exceptions", str(review)], capture_output=True, text=True)
             self.assertEqual(p.returncode, 0, p.stderr)
             got = json.loads(p.stdout)
             self.assertEqual(got["children_in_window"], 1)
             self.assertEqual(got["main_sessions_in_window"], 1)
-            self.assertEqual(got["groups"]["all"]["measurement"]["m3"]["large_results"], 0)
+            self.assertEqual(got["groups"]["all"]["measurement"]["m3"]["large_results"], 1)
             self.assertEqual(got["main"]["measurement"]["exceptions"]["original_source_quoted_or_line_cited"]["results"], 1)
+            self.assertEqual(got["sidecar_records"], {"bound": 1, "unbound": 1})
             self.assertEqual(len(got["actors"]), 2)
             self.assertNotIn(directory, p.stdout)
             self.assertNotIn("tool_use_id", p.stdout.split('"limits"')[0])
+
+    def test_sweep_keeps_legacy_skips_and_parse_errors_child_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            child_dir = root / "session/subagents"
+            child_dir.mkdir(parents=True)
+            content = json.dumps(call("c", "Read"))
+            (child_dir / "agent-child.jsonl").write_text(content + "\n{bad\n")
+            (root / "session.jsonl").write_text(content + "\n{bad\n{bad\n")
+            stale = [child_dir / "agent-old.jsonl", root / "old.jsonl", root / "older.jsonl"]
+            for path in stale:
+                path.write_text(content)
+                os.utime(path, (0, 0))
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", directory,
+                                "--since", "2026-09-26T00:00:00Z"], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            got = json.loads(p.stdout)
+            self.assertEqual(got["transcripts_found"], 2)
+            self.assertEqual(got["transcripts_skipped_unmodified"], 1)
+            self.assertEqual(got["parse_errors"], 1)
+            self.assertEqual(got["main_transcripts_found"], 3)
+            self.assertEqual(got["main_transcripts_skipped_unmodified"], 2)
+            self.assertEqual(got["main_parse_errors"], 2)
 
 
 if __name__ == "__main__":

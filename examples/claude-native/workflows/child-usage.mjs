@@ -120,6 +120,9 @@ const URL_HOST = /\bhttps?:\/\/(\[[^\]\s]*\]|[^\s/:'"`<>)?#\]]+)/gi
 const LOOPBACK = /^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$/i
 // A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>.
 const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|eval|ssh(?:\s+-\S+)*\s+\S+)\s*$/
+// Inline interpreter code remains executable despite its shell quoting; all other
+// quoted arguments stay data. context-mode v1.0.169 routing.mjs:787-795 (-e/-c).
+const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:(?:python[\d.]*)(?:\s+-[A-Za-z]+)*\s+-c|node(?:js)?(?:\s+--?[\w-]+)*\s+(?:-e|--eval))\s*$/
 const SHELL_WORD = /^(?:(?:ba|z|da|k)?sh|ssh)$/
 const HEREDOC = /(?<!<)<<(?!<)-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/
 const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nice', 'nohup', 'time', 'rtk'])
@@ -145,7 +148,7 @@ const programOf = (prefix) => {
 // though inside double quotes $(...) and `...` still run; an escaped character and a comment are data, and
 // \<newline> joins lines. Data keeps its words (so URL arguments stay) but loses the separators that would put a
 // word in command position.
-export function executedText(command) {
+export function executedText(command, { inlineHttp = false } = {}) {
   const lines = String(command || '').split('\n'), kept = []
   for (let i = 0; i < lines.length; i++) {
     kept.push(lines[i])
@@ -174,7 +177,8 @@ export function executedText(command) {
     let j = i + 1
     while (j < text.length && text[j] !== ch) j += ch === '"' && text[j] === '\\' ? 2 : 1
     const inner = text.slice(i + 1, j)
-    if (RUN_QUOTED.test(out)) out += ';' + inner + ';'
+    if (RUN_QUOTED.test(out)) out += ';' + (inlineHttp ? executedText(inner, { inlineHttp }) : inner) + ';'
+    else if (inlineHttp && RUN_HTTP_CODE.test(out)) out += ';' + inner + ';'
     else if (ch === '"') out += '"' + inner.replace(DOUBLE_QUOTED_DATA, (s) => s[0] === '\\' ? '_' : s.length > 1 ? s : ' ') + '"'
     else out += "'" + inner.replace(/[;&|()`$\n]/g, ' ') + "'"
     i = j
@@ -203,23 +207,30 @@ const counter = () => Object.create(null)
 const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
 
 // PR-A result accounting. Source: #381 preregistration.json M3/M5,
-// mksglu/context-mode v1.0.169 hooks/posttooluse.mjs:54-56 and
-// src/session/extract.ts:1060-1069 (serialized response UTF-8 bytes), and
+// mksglu/context-mode v1.0.169 src/session/extract.ts:1060-1069 (UTF-8
+// accounting only), and
 // https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use
-// (`tool_use.id` -> `tool_result.tool_use_id`). UTF-8 bytes of string content or
-// compact JSON block content, not tokenizer/provider counters. No result text is emitted.
+// (`tool_use.id` -> `tool_result.tool_use_id`). Local rule: sum UTF-8 text block
+// payloads without wrappers/separators; compact JSON for non-text blocks only.
+// This is not hook tool_response serialization or tokenizer/provider usage.
 const RESULT_LIMIT = 5120
+const contentBytes = (content) => typeof content === 'string' ? Buffer.byteLength(content, 'utf8')
+  : Array.isArray(content) ? content.reduce((n, b) => n + contentBytes(b?.type === 'text' && typeof b.text === 'string' ? b.text : b), 0)
+    : Buffer.byteLength(JSON.stringify(content), 'utf8')
 const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes: 0, max_bytes: 0 })
 const addSize = (s, n) => { s.results++; s.bytes += n; if (n > RESULT_LIMIT) { s.large_results++; s.large_bytes += n } s.max_bytes = Math.max(s.max_bytes, n) }
 const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s.results), large_byte_share: share(s.large_bytes, s.bytes) })
 const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
-const carrierOf = (call) => call?.name === 'Bash' ? (/^\s*rtk\s+proxy\b/.test(call.input?.command || '') ? 'rtk_proxy' : 'bash')
+const carrierOf = (call) => call?.code_mode ? 'code_mode' : call?.name === 'Bash' ? (/^\s*rtk\s+proxy\b/.test(call.input?.command || '') ? 'rtk_proxy' : 'bash')
   : call?.name === 'WebFetch' ? 'webfetch' : call?.name === 'Read' ? 'read'
     : ['Grep', 'Glob'].includes(call?.name) ? 'grep_glob' : isCtx(call?.name) ? 'ctx'
       : mcpServer(call?.name) ? 'other_mcp' : 'other'
 const blocksOf = (row) => Array.isArray(row?.message?.content) ? row.message.content.filter((b) => b && typeof b === 'object') : []
 const EXCEPTIONS = ['read_of_subsequently_edited_file', 'original_source_quoted_or_line_cited', 'exact_bytes_required_by_frozen_check']
-const validReview = (r) => (EXCEPTIONS.includes(r?.exception) || r?.proxy_purpose === 'acceptance') && typeof r.witness === 'string' && !!r.witness.trim()
+const validLogFindReview = (r) => Array.isArray(r?.rtk_log_find) && r.rtk_log_find.length > 0
+  && r.rtk_log_find.every((p) => Number.isInteger(p?.part) && p.part > 0 && ['permitted', 'requires_raw'].includes(p.disposition))
+  && new Set(r.rtk_log_find.map((p) => p.part)).size === r.rtk_log_find.length
+const validReview = (r) => (EXCEPTIONS.includes(r?.exception) || r?.proxy_purpose === 'acceptance' || validLogFindReview(r)) && typeof r.witness === 'string' && !!r.witness.trim()
 // M4 source: context-mode v1.0.169 src/server.ts tool schemas (`commands`, `code`,
 // `requests`); #381 M4 explicitly keeps script HTTP operations unclassifiable.
 // These are statically visible operations, not observed network requests: loops,
@@ -254,10 +265,14 @@ function countFetches(call, counts) {
       const segment = text.slice(matches[i].index + matches[i][0].length, matches[i + 1]?.index).split(/[;\n|&]/)[0]
       const hosts = [...segment.matchAll(URL_HOST)].map((m) => m[1])
       const key = hosts.length && hosts.every((h) => LOOPBACK.test(h)) ? 'loopback'
-        : hosts.length ? (name === 'Bash' ? 'shell_fetch' : 'ctx_sandbox_fetch') : 'unclassifiable'
+        : hosts.length ? (name === 'Bash' && !call.sandbox ? 'shell_fetch' : 'ctx_sandbox_fetch') : 'unclassifiable'
       counts[key]++
     }
-    counts.unclassifiable += [...code.matchAll(HTTP_SCRIPT)].length
+    // routing.mjs:787-795 strips data heredocs before inline-HTTP matching.
+    // Reuse our bash quoting/comment state as well. Only interpreter code (or
+    // ctx JS/Python) gets raw scanning; quoted grep patterns are not operations.
+    const httpText = shell ? executedText(code, { inlineHttp: true }) : code
+    counts.unclassifiable += [...httpText.matchAll(HTTP_SCRIPT)].length
     // GitHub API calls are remote operations even when their endpoint is relative.
     counts.unclassifiable += [...text.matchAll(/(?:^|[;\n|&])\s*(?:rtk\s+(?:proxy\s+)?)?gh\s+api\b/g)].length
   }
@@ -273,13 +288,14 @@ const finishFetches = (f) => {
 // constructs are unknown, never guessed or executed. This is a local adapter.
 function shellParts(command) {
   if (/<<|\$\(\(/.test(command)) return null
-  const parts = []
+  const parts = [], syntax = command.split('')
+  const part = (end, op) => ({ text: command.slice(start, end).trim(), syntax: syntax.slice(start, end).join('').trim(), op })
   let start = 0, quote = null, depth = 0
   for (let i = 0; i < command.length; i++) {
     const ch = command[i]
-    if (ch === '\\' && quote !== "'") { i++; continue }
-    if (quote) { if (ch === quote) quote = null; continue }
-    if (ch === "'" || ch === '"' || ch === '`') { quote = ch; continue }
+    if (ch === '\\' && quote !== "'") { syntax[i] = '_'; if (i + 1 < command.length) syntax[++i] = '_'; continue }
+    if (quote) { syntax[i] = '_'; if (ch === quote) quote = null; continue }
+    if (ch === "'" || ch === '"' || ch === '`') { syntax[i] = '_'; quote = ch; continue }
     if (ch === '(' || ch === '{') { depth++; continue }
     if (ch === ')' || ch === '}') { depth--; if (depth < 0) return null; continue }
     if (depth) continue
@@ -288,12 +304,12 @@ function shellParts(command) {
       const op = command[i + 1] === ch && '&|'.includes(ch) ? ch + ch : ch
       // & in 2>&1 is a redirection, not an asynchronous command boundary.
       if (ch === '&' && command[i - 1] === '>') continue
-      parts.push({ text: command.slice(start, i).trim(), op })
+      parts.push(part(i, op))
       i += op.length - 1; start = i + 1
     }
   }
   if (quote || depth) return null
-  parts.push({ text: command.slice(start).trim(), op: '' })
+  parts.push(part(command.length, ''))
   return parts.filter((p) => p.text)
 }
 const FIVE_EXCLUSIONS = [String.raw`^git show [^ ]*:`, 'diff',
@@ -326,16 +342,20 @@ function rtkChecker() {
 }
 function sensitivePart(text) {
   if (FIVE_EXCLUSIONS.some((p) => new RegExp(p.startsWith('^') ? p : '^' + p + '(?:\\s|$)').test(text))) return true
-  // Additional raw-sensitive forms from the adopted RTK exceptions (AGENTS.md).
-  return /^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*log\b|^find\b|^(?:cd|export|source)\b/.test(text)
+  // Deterministic refusals only. Conditional log/find exceptions need a witness
+  // (adoption/templates/codex.AGENTS.template.md, RTK exceptions).
+  return /^(?:cd|export|source)\b/.test(text)
     || /^gh\s/.test(text) && /(?:^|\s)--(?:json|jq|template)(?:[=\s]|$)/.test(text)
     || /^(?:head|tail)\s/.test(text) && /(?:^|\s)-c|["'$*?\[]/.test(text)
     || /^\S*\/\S*(?:\s|$)/.test(text)
 }
+const logFindPart = (text) => /^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*log\b|^find\b/.test(text)
 const safeConsumer = (part) => /^(?:cat|head)(?:\s|$)/.test(part) || /^tail(?:\s|$)/.test(part) && !/(?:^|\s)(?:-[^-\s]*[fF]|--follow)(?:\S*)/.test(part)
 const emptyRtk = () => ({ calls: 0, eligible_parts: 0, eligible_calls: 0, observed_covered_parts: 0, observed_all_covered_calls: 0,
-  replayed_covered_parts: 0, replayed_all_covered_calls: 0, explicit_rtk_on_excluded_or_sensitive: 0, proxy_parts: 0, ineligible_parts: 0, unknown_calls: 0 })
-function rtkParts(calls, rewrites, enabled) {
+  replayed_covered_parts: 0, replayed_all_covered_calls: 0, explicit_rtk_on_excluded_or_sensitive: 0,
+  explicit_rtk_log_find_advisory: 0, log_find_permitted_parts: 0, log_find_requires_raw_parts: 0, log_find_unresolved_parts: 0,
+  proxy_parts: 0, ineligible_parts: 0, unknown_calls: 0 })
+function rtkParts(calls, rewrites, enabled, exceptions) {
   const out = emptyRtk(), check = enabled ? rtkChecker() : null
   if (!check) return { ...out, status: enabled ? 'unavailable' : 'not_measured', coverage: null, call_coverage: null }
   for (const c of calls) {
@@ -348,19 +368,30 @@ function rtkParts(calls, rewrites, enabled) {
     for (const [i, part] of parts.entries()) {
       const explicit = /^rtk\s+/.test(part.text), proxy = /^rtk\s+proxy\s+/.test(part.text)
       const raw = part.text.replace(/^rtk\s+(?:proxy\s+)?/, '')
-      if (proxy) out.proxy_parts++
+      // #381 preregistration: acceptance/raw-proxy runs are a separate population.
+      // Unclassified proxies still fail the separate M6 adjudication requirement.
+      if (proxy) { out.proxy_parts++; continue }
       const downstream = []
       for (let j = i; parts[j]?.op === '|'; j++) downstream.push(parts[j + 1]?.text || '')
       // Native pipeline mode rewrites only supported grep/rg filter stages;
       // stdin consumers such as wc are not standalone command opportunities.
       const pipelineConsumer = i > 0 && parts[i - 1].op === '|' && !/^(?:grep|rg)\b/.test(raw)
       const rawPipeline = downstream.some((s) => !safeConsumer(s))
-      const redirected = />\s*(?!&\d)[^\s]/.test(raw)
+      // Same quote state as the splitter; quoted/escaped > is argument data.
+      // RTK lexer redirect_has_file_target exempts fd duplication and /dev/null.
+      const redirected = [...part.syntax.matchAll(/>+\s*([^\s]+)/g)].some((m) => m[1] !== '/dev/null' && !/^&(?:\d+|-)$/.test(m[1]))
       if (explicit && !proxy && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
+      if (explicit && logFindPart(raw)) {
+        out.explicit_rtk_log_find_advisory++
+        const review = exceptions[c.id]
+        const disposition = validReview(review) && validLogFindReview(review)
+          ? review.rtk_log_find.find((p) => p.part === i + 1)?.disposition : null
+        out[disposition === 'permitted' ? 'log_find_permitted_parts' : disposition === 'requires_raw' ? 'log_find_requires_raw_parts' : 'log_find_unresolved_parts']++
+      }
       // Query EVERY standalone part, even exclusions; the native hook decides eligibility.
       const alone = check(raw)
       if (alone.error) { out.unknown_calls++; continue }
-      if (redirected || rawPipeline || pipelineConsumer || !alone.rewrite) { out.ineligible_parts++; continue }
+      if (rawPipeline || pipelineConsumer || !alone.rewrite) { out.ineligible_parts++; continue }
       eligible++
       if (/^rtk\s+(?!proxy\b)/.test(executed[i].text)) observed++
       if (/^rtk\s+(?!proxy\b)/.test(predicted[i].text)) covered++
@@ -436,7 +467,11 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     const server = mcpServer(c.name), r = results.get(c.id)
     if (server) {
       const state = mcpStates[server] ||= { attempted: 0, succeeded: 0, failed: 0, unfinished: 0 }
-      state.attempted++; state[!r ? 'unfinished' : r.is_error ? 'failed' : 'succeeded']++
+      // Codex UI items can retain status without a model-visible result payload
+      // (rust-v0.157.1 app-server-protocol/src/protocol/v2/item.rs McpToolCall).
+      const status = r ? (r.is_error ? 'failed' : 'succeeded')
+        : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
+      state.attempted++; state[status]++
     }
     if (carrierOf(c) === 'rtk_proxy') {
       proxy.calls++
@@ -458,9 +493,10 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   for (const [id, r] of results) {
     if (!inside(r.row)) continue
     const c = calls.get(id), carrier = carrierOf(c)
+    if (c?.sandbox) continue // Nested results return to code, not model context.
     if (!c) orphanResults++
     if (r.content === undefined || r.content === null) { unknownResultBytes++; continue }
-    const n = Buffer.byteLength(typeof r.content === 'string' ? r.content : JSON.stringify(r.content ?? null), 'utf8')
+    const n = contentBytes(r.content)
     addSize(carriers[carrier] ||= emptySizes(), n)
     let exception = null
     if (!r.is_error && c?.name === 'Read' && c.input?.file_path && edits.some((e) => e.index > r.index && e.input.file_path === c.input.file_path && e.row.cwd === c.row.cwd)) exception = EXCEPTIONS[0]
@@ -474,14 +510,15 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     if (carrier === 'ctx') addSize(m5, n)
   }
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
-  const unfinished = [...calls.values()].filter((c) => inside(c.row) && !results.has(c.id)).length
+  const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
   return { m3: finishSizes(m3), m4: finishFetches(m4), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
-    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck),
+    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
     usage: transcriptUsage(transcript, window),
     hook_context: hookContext,
     mcp_states: mcpStates, loaded_not_called: loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
     invalid_exceptions: invalidExceptions, orphan_results: orphanResults,
+    sandbox_operations: [...calls.values()].filter((c) => inside(c.row) && c.sandbox).length,
     unknown_result_bytes: unknownResultBytes, bytes_complete: !unknownResultBytes && !orphanResults && !unfinished,
     calls_without_result: unfinished }
 }
@@ -510,14 +547,15 @@ export function aggregateMeasurements(items) {
     m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),
     by_carrier: groups('by_carrier'), exceptions: groups('exceptions'),
     orphan_results: items.reduce((n, m) => n + m.orphan_results, 0),
+    sandbox_operations: items.reduce((n, m) => n + m.sandbox_operations, 0),
     unknown_result_bytes: items.reduce((n, m) => n + m.unknown_result_bytes, 0),
     bytes_complete: items.length > 0 && items.every((m) => m.bytes_complete && !m.parse_errors),
     invalid_exceptions: items.reduce((n, m) => n + m.invalid_exceptions, 0),
     calls_without_result: items.reduce((n, m) => n + m.calls_without_result, 0),
     rtk_parts: { ...rtk, status: rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured',
       coverage: share(rtk.observed_covered_parts, rtk.eligible_parts), call_coverage: share(rtk.observed_all_covered_calls, rtk.eligible_calls) },
-    usage: { complete: items.length > 0 && items.every((m) => m.usage.complete),
-      totals: Object.fromEntries(COUNTERS.map((k) => [k, items.length && items.every((m) => m.usage.totals[k] !== null) ? items.reduce((n, m) => n + m.usage.totals[k], 0) : null])) } }
+    ...(items.every((m) => m.usage) ? { usage: { complete: items.length > 0 && items.every((m) => m.usage.complete),
+      totals: Object.fromEntries(COUNTERS.map((k) => [k, items.length && items.every((m) => m.usage.totals[k] !== null) ? items.reduce((n, m) => n + m.usage.totals[k], 0) : null])) } } : {}) }
 }
 
 // Private adjudications are bound to exact transcript bytes; only the exception's
@@ -525,12 +563,12 @@ export function aggregateMeasurements(items) {
 export function exceptionsFor(records, digest) {
   return Object.fromEntries(records.filter((r) => r.transcript_sha256 === digest).map((r) => [r.tool_use_id, r]))
 }
-export function loadExceptions(path) {
-  const records = JSON.parse(readFileSync(path, 'utf8'))
+export function validateExceptions(records) {
   if (!Array.isArray(records) || records.some((r) => !/^[a-f0-9]{64}$/.test(r?.transcript_sha256) || typeof r.tool_use_id !== 'string' || !validReview(r))) throw new Error('invalid exception sidecar')
   if (new Set(records.map((r) => r.transcript_sha256 + ':' + r.tool_use_id)).size !== records.length) throw new Error('duplicate exception sidecar key')
   return records
 }
+export const loadExceptions = (path) => validateExceptions(JSON.parse(readFileSync(path, 'utf8')))
 
 // One child's lane use. Counted: tool_use blocks (deduplicated by id), the tool_reference blocks a
 // ToolSearch result returned, and PreToolUse:Bash hook rows from `rtk hook` whose stdout carries
@@ -726,13 +764,15 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
   const files = findChildTranscripts(roots, unreadable, true)
   const children = []
   const main = []
-  let parseErrors = 0, skipped = 0
+  let parseErrors = 0, skipped = 0, mainParseErrors = 0, mainSkipped = 0
+  const measuredDigests = new Set()
   for (const file of files) {
     if (Number.isFinite(window.since)) {
-      try { if (statSync(file.path).mtimeMs < window.since) { skipped++; continue } } catch { continue }
+      try { if (statSync(file.path).mtimeMs < window.since) { if (file.spawn === 'main') mainSkipped++; else skipped++; continue } } catch { continue }
     }
     const { rows, errors, digest } = readRows(file.path)
-    parseErrors += errors
+    if (file.spawn === 'main') mainParseErrors += errors
+    else parseErrors += errors
     let first = Infinity, last = -Infinity, inside = false
     for (const row of rows) {
       const t = timeOf(row)
@@ -745,6 +785,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     let meta = null
     try { meta = JSON.parse(readFileSync(file.path.replace(/\.jsonl$/, '.meta.json'), 'utf8')) } catch { meta = null }
     if (file.spawn === 'main' && !rows.some((r) => ['assistant', 'user'].includes(r?.type))) continue
+    measuredDigests.add(digest)
     const actor = {
       spawn: file.spawn, session: file.path.split('\\').join('/').replace(/\/subagents\/.*$/, ''), first,
       agent_type: meta && typeof meta.agentType === 'string' && meta.agentType ? safeKey(meta.agentType) : '(none)',
@@ -767,12 +808,16 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
   const bySpawnAndType = Object.fromEntries([...new Set(children.map((c) => c.spawn))].sort().map((s) => [s, byKey('agent_type', children.filter((c) => c.spawn === s))]))
   const blind = (c) => c.agent_type.startsWith('blind-')
   const iso = (t) => Number.isFinite(t) ? new Date(t).toISOString() : null
+  const bound = exceptionRecords.filter((r) => measuredDigests.has(r.transcript_sha256)).length
   return {
     kind: 'claude_child_lane_usage', schema_version: 1,
     window: { since: iso(window.since), until: iso(window.until) }, marker,
     roots_count: roots.length, unreadable_directories: unreadable.count,
     transcripts_found: files.filter((f) => f.spawn !== 'main').length, all_transcripts_found: files.length, transcripts_skipped_unmodified: skipped,
+    main_transcripts_found: files.filter((f) => f.spawn === 'main').length,
+    main_transcripts_skipped_unmodified: mainSkipped, main_parse_errors: mainParseErrors,
     children_in_window: children.length, sessions_in_window: ordinal.size, parse_errors: parseErrors,
+    sidecar_records: { bound, unbound: exceptionRecords.length - bound },
     children_started_before_window: children.filter((c) => c.started_before_window).length,
     children_ran_past_window_end: children.filter((c) => c.ran_past_window_end).length,
     rtk_db: rtk ? { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates } : { joined: false },
@@ -783,7 +828,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     main_sessions_in_window: main.length, main: aggregateLanes(main),
     actors: [...children, ...main].map((c, i) => ({ ordinal: i + 1, actor: c.spawn === 'main' ? 'main' : 'child',
       spawn: c.spawn, agent_type: c.agent_type, session_ordinal: c.session_ordinal ?? null, measurement: c.lanes.measurement })),
-    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: serialized-content UTF-8 bytes across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors are separate from child groups. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
+    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: UTF-8 text payloads and individually serialized non-text blocks across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors and file counters are separate from children. Sidecar binding reports counts only. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
   }
 }
 

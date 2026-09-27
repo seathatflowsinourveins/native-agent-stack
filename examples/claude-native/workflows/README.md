@@ -172,13 +172,15 @@ node examples/claude-native/workflows/child-usage.mjs --lanes-sweep \
 
 `m3` covers every result carrier, including `rtk proxy`, with `results`, `bytes`,
 `large_results`, `large_bytes`, `large_result_share`, `large_byte_share` and
-`max_bytes`. Large means strictly greater than 5,120 UTF-8 bytes. String content
-is measured directly; structured content uses compact JSON serialization.
-This follows context-mode v1.0.169's
-[PostToolUse serialization](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/posttooluse.mjs#L54-L56)
-and [UTF-8 retrieval accounting](https://github.com/mksglu/context-mode/blob/v1.0.169/src/session/extract.ts#L1060-L1069).
-It is a local content-byte measurement, distinct from provider tokens or the
-server's text-block-only counter. `by_carrier` includes exception bytes; `m3`
+`max_bytes`. Large means strictly greater than 5,120 UTF-8 bytes. This tool's
+content-byte rule measures strings directly and sums the UTF-8 bytes of `text`
+fields in text blocks, with no wrapper, escaping or separator bytes. Non-text
+blocks use compact JSON individually. Equal text therefore has equal size in a
+Bash string and a ctx text-block array. The citation to context-mode v1.0.169's
+[UTF-8 accounting](https://github.com/mksglu/context-mode/blob/v1.0.169/src/session/extract.ts#L1060-L1069)
+supports UTF-8 accounting only; this rule is local and does not serialize a
+hook `tool_response` object. Provider tokens remain separate.
+`by_carrier` includes exception bytes; `m3`
 excludes them. Group `m3_large_results_per_actor` gives nearest-rank percentiles.
 `m5` includes **all** ctx results, even M3 exceptions, so a single enormous ctx
 result cannot hide behind a low count share. No threshold verdict is inferred
@@ -197,6 +199,17 @@ The tool validates binding and vocabulary; the reviewer establishes semantic
 truth. Sidecars, identifiers and witness text are never echoed. A mismatched
 digest removes no bytes. An entry may instead carry `proxy_purpose: "acceptance"`
 and a witness; this classifies M6 without granting an M3 exception.
+Top-level `sidecar_records.bound` and `.unbound` count records whose digest
+matches at least one measured transcript or none, respectively. Each sidecar
+record counts once across actors. A bound digest does not prove a call exists,
+a witness is correct or an exception was applied; the exception counters show
+actual removals. Skipped/out-of-window transcripts cannot bind a record.
+
+The legacy `transcripts_found`, `transcripts_skipped_unmodified` and
+`parse_errors` remain child-only, preserving the #369 comparison population.
+`main_transcripts_found`, `main_transcripts_skipped_unmodified` and
+`main_parse_errors` describe main files separately; `all_transcripts_found`
+is their combined discovery count.
 
 `m4` counts visible remote operations, including individual `requests` in
 `ctx_fetch_and_index`, shell commands in `ctx_batch_execute`, and literal
@@ -206,7 +219,12 @@ stay in the denominator; over 10% makes the metric `incomplete`. The regression
 of one indexed fetch plus nineteen sandbox curls therefore reports 5%.
 Detection extends the maintained
 [context-mode v1.0.169 routing detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804)
-and the existing shell-text parser. It counts static call sites/attempts,
+and the existing shell-text parser. Before inline-HTTP matching, data heredoc
+bodies and shell comments are removed and quoted argument syntax is neutralized.
+Quoted `python -c` / `node -e` interpreter code and ctx JS/Python code remain
+visible to the script detector, including dynamic URLs (kept unclassifiable).
+Shell-fed heredocs retain executed commands. A grep pattern containing `fetch(`
+or a heredoc writing a script is data. It counts static call sites/attempts,
 not runtime requests: loops, dynamic code, external scripts, aliases and
 nonliteral subprocess arguments require separate observation. It cannot prove
 the absence of fetches in arbitrary code. A zero denominator is N/A.
@@ -221,14 +239,32 @@ No transcript command executes. Sources:
 [pipeline rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1087-L1345),
 and [consumer rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1451-L1494).
 The adapter retains every part; upstream's analytics splitter stops at the
-first pipe. Native refusals, exclusions, file redirection
-and consumers requiring raw input are outside eligibility. Log/find exactness
-risks are reported by the separate hard guard; they do not silently add a
-sixth exclusion to M-R1's fixed-config denominator. Heredocs/arithmetic
+first pipe. Native refusals, exclusions and consumers requiring raw input are
+outside eligibility. Redirection is recognized using the splitter's quote state;
+a quoted `>` is data. The native check decides standalone eligibility, including
+its accepted `2>/dev/null` form. Heredocs/arithmetic
 or unsupported shapes stay unknown. `coverage` and `call_coverage` use observed
 command prefixes/recorded hook rewrites, while `replayed_*` fields describe
 potential routing under the fixed config. Replay never proves execution.
-`explicit_rtk_on_excluded_or_sensitive` is the M-R3 guard; `rtk proxy` is separate.
+`explicit_rtk_on_excluded_or_sensitive` is the deterministic zero counter used
+by M-R3 and M6c: the five exclusions, `cd`/`export`/`source`, adopted by-design
+refusals, file-target redirects and raw-input pipelines. Conditional log/find
+forms contribute only to `explicit_rtk_log_find_advisory`, not this zero counter
+or an additional exclusion. Syntax cannot establish complete-history intent or
+path existence ([adopted conditional exceptions](../../../adoption/templates/codex.AGENTS.template.md)).
+The advisory is partitioned into `log_find_permitted_parts`,
+`log_find_requires_raw_parts` and `log_find_unresolved_parts`. Resolve it in the
+same digest-bound sidecar with a witness and `rtk_log_find: [{"part": 1,
+"disposition": "permitted"}]` (or `"requires_raw"`); `part` is the one-based
+position among all command segments. M-R3/M6c's deterministic zero is not full
+exception clearance while advisory parts are unresolved or require raw output.
+These semantic adjudications never change the fixed-config eligible denominator.
+
+Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's
+eligible population, including an otherwise eligible `git diff --stat`.
+This follows #381's separate acceptance/raw-proxy population. M6 still requires
+acceptance/exception justification; excluding a proxy from coverage does not
+justify it or remove its output from M3.
 Other versions/platforms report `unavailable`; omitted replay is `not_measured`.
 `rtk.not_logged_share` needs the read-only DB join. `measurement.proxy` reports
 acceptance/exception adjudications and unclassified calls for M6.
@@ -245,7 +281,12 @@ added to byte measurements or tool savings estimates.
 `hook_context` counts every inserted `hook_additional_context` by event/name,
 separately from stdout claims and marker presence. Stdout alone no longer sets
 the legacy SubagentStart insertion flag. `mcp_states` distinguishes attempts,
-success, failure and unfinished calls; `loaded_not_called` counts loaded server
+success, failure and unfinished calls; persisted Codex item status supplies state
+when result bytes are absent. `sandbox_operations` counts normalized nested
+code-mode operations, whose results return to code. They contribute M4/RTK/MCP
+state observations but no M3/M5 context bytes or missing-context-result counts.
+The outer exec return is measured once as carrier `code_mode`.
+`loaded_not_called` counts loaded server
 references without an attempted call by that actor. These implement PR-A's
 review controls, but do not supply a rejected/cancelled native-ID reconciliation
 ledger or an E2E acceptance verdict. Synthetic controls run through

@@ -809,12 +809,12 @@ CODEX_COUNTERS = ("input_tokens", "cached_input_tokens", "output_tokens",
 MEASUREMENT_MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 
 
-def _measurement_bridge(payload, *, aggregate=False):
-    export = "aggregateMeasurements" if aggregate else "measureTranscript"
+def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
+    export = "validateExceptions" if validate_reviews else "aggregateMeasurements" if aggregate else "measureTranscript"
     script = ("import {readFileSync} from 'node:fs'; import {" + export + "} from "
               + json.dumps(MEASUREMENT_MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); "
               + "process.stdout.write(JSON.stringify(" + export
-              + ("(x)" if aggregate else "(x.rows,x.options)") + ")); ")
+              + ("(x)" if aggregate or validate_reviews else "(x.rows,x.options)") + ")); ")
     try:
         result = subprocess.run(["node", "--input-type=module", "-e", script],
                                 input=json.dumps(payload), capture_output=True, text=True,
@@ -910,6 +910,11 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     failed_ids = {r.get("payload", {}).get("item", {}).get("id") for r in visible
                   if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
                   and r.get("payload", {}).get("item", {}).get("status") == "failed"}
+    item_states = {r["payload"]["item"].get("id"): r["payload"]["item"].get("status") for r in visible
+                   if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
+                   and isinstance(r.get("payload", {}).get("item"), dict)}
+    model_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
+                      if r.get("type") == "response_item" and r.get("payload", {}).get("type") in CALL_PAYLOAD_TYPES}
 
     def arguments(value):
         if isinstance(value, dict):
@@ -923,48 +928,69 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     def emit(r, block, role):
         normalized.append({"type": role, "timestamp": r["timestamp"], "message": {"content": [block]}})
 
-    def use(r, key, name, inputs):
+    def use(r, key, name, inputs, *, sandbox=False, code_mode=False):
         if name.rsplit(".", 1)[-1] in ("exec_command", "shell_command", "shell"):
             name, inputs = "Bash", {"command": shell_script(inputs.get("cmd", inputs.get("command", "")))}
-        emit(r, {"type": "tool_use", "id": key, "name": name, "input": inputs}, "assistant")
+        emit(r, {"type": "tool_use", "id": key, "name": name, "input": inputs,
+                 "sandbox": sandbox, "code_mode": code_mode, "native_status": item_states.get(key)}, "assistant")
 
+    # openai/codex rust-v0.157.1 models.rs:1060-1165,1938-1949;
+    # core/tests/suite/code_mode.rs:721-760,3436-3752: nested returns go to JS;
+    # only the outer custom output is model-visible. UI item IDs can differ.
+    # With no explicit parent field, bound the sandbox span by the exec return
+    # or the next direct model call/turn boundary; direct response IDs win.
+    active_exec = set()
     for index, r in enumerate(visible):
         p = r.get("payload") or {}
         if r.get("type") == "response_item":
-            kind, key = p.get("type"), p.get("call_id", f"missing-{index}")
-            if kind == "function_call":
+            kind, key = p.get("type"), p.get("call_id") or p.get("id") or f"missing-{index}"
+            if kind in ("function_call", "custom_tool_call"):
                 # Native FunctionCall keeps namespace separate (models.rs:1073-1088).
-                name, namespace = p.get("name", "unknown"), p.get("namespace", "")
+                name, namespace = p.get("name", "unknown"), p.get("namespace") or ""
                 if namespace.startswith("mcp__") and not name.startswith("mcp__"):
                     name = namespace.rstrip("_") + "__" + name
-                use(r, key, name, arguments(p.get("arguments")))
+                code_mode = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
+                if code_mode:
+                    active_exec.add(key)
+                else:
+                    active_exec.clear()
+                inputs = arguments(p.get("arguments")) if kind == "function_call" else {"code": p.get("input", "")}
+                use(r, key, name, inputs, code_mode=code_mode)
+            elif kind == "local_shell_call":
+                active_exec.clear()
+                use(r, key, "Bash", {"command": shell_script((p.get("action") or {}).get("command"))})
             elif kind in ("function_call_output", "custom_tool_call_output"):
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": p.get("output"), "is_error": key in failed_ids}, "user")
+                active_exec.discard(key)
         elif r.get("type") == "event_msg" and p.get("type") == "item_completed":
             item = p.get("item") or {}
             key = item.get("id", f"missing-{index}")
             kind = item.get("type")
+            sandbox = bool(active_exec) and key not in model_call_ids
             output, has_output = None, False
             if kind == "CommandExecution":
-                use(r, key, "Bash", {"command": shell_script(item.get("command"))})
-                has_output = "aggregated_output" in item
+                use(r, key, "Bash", {"command": shell_script(item.get("command"))}, sandbox=sandbox)
                 output = item.get("aggregated_output")
+                has_output = output is not None
             elif kind == "McpToolCall":
-                use(r, key, "mcp__" + str(item.get("server", "unknown")) + "__" + str(item.get("tool", "unknown")), arguments(item.get("arguments")))
-                has_output = "result" in item
+                use(r, key, "mcp__" + str(item.get("server", "unknown")) + "__" + str(item.get("tool", "unknown")), arguments(item.get("arguments")), sandbox=sandbox)
                 value = item.get("result")
                 output = value.get("content", value) if isinstance(value, dict) else value
+                has_output = output is not None
             elif kind == "Extension" and item.get("kind") == "web.search":
                 action = item.get("action") or {}
-                use(r, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")})
+                use(r, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
             if has_output and key not in output_ids:
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": output,
                          "is_error": item.get("status") == "failed"}, "user")
+        elif r.get("type") == "event_msg" and p.get("type") in ("task_started", "task_complete", "turn_aborted"):
+            active_exec.clear()
     window = {"since": since.timestamp() * 1000 if since else -8640000000000000,
               "until": until.timestamp() * 1000 if until else 8640000000000000}
     measured = _measurement_bridge({"rows": normalized, "options": {
         "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}}})
     # Claude per-message fields are inapplicable to Codex cumulative native counters.
+    measured.pop("usage", None)
     measured["provider_usage"] = {"totals": totals if snapshots else dict.fromkeys(CODEX_COUNTERS),
         "attempts": attempts, "snapshots": snapshots, "duplicate_snapshots": duplicates, "gaps": gaps,
         "complete": bool(snapshots) and not gaps and all(a["state"] == "completed" and a["snapshots"] for a in attempts)}
@@ -1092,6 +1118,10 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                     _score_lane_item(session, item, new_call)
     if session["in_window"]:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        # Only counts leave the public report. Binding is per sidecar record,
+        # once across all measured rollouts, not once per matching actor.
+        session["_sidecar_record_indices"] = [i for i, r in enumerate(exception_records)
+                                               if r["transcript_sha256"] == digest]
         exceptions = {r["tool_use_id"]: r for r in exception_records if r["transcript_sha256"] == digest}
         session["measurement"] = measure_codex_records(metric_records, since=since, until=until,
                                                        rtk_check=rtk_check, exceptions=exceptions)
@@ -1181,7 +1211,7 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
     measurements = [session["measurement"] for session in sessions if "measurement" in session]
     if measurements:
         out["measurement"] = _measurement_bridge(measurements, aggregate=True)
-        del out["measurement"]["usage"]
+        out["measurement"].pop("usage", None)
         out["measurement"]["provider_usage"] = {
             "complete": all(m["provider_usage"]["complete"] for m in measurements),
             "totals": {key: (sum(m["provider_usage"]["totals"][key] for m in measurements)
@@ -1228,8 +1258,10 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
         return dict(sorted(counts.items()))
 
     workers = [s for s in sessions if s["user_config"] == "applied"]
+    bound = len({i for s in sessions for i in s.get("_sidecar_record_indices", ())})
     return {
         "roots_count": len(roots or []), "files_scanned": scanned,
+        "sidecar_records": {"bound": bound, "unbound": len(exception_records) - bound},
         "files_skipped_unmodified": skipped, "parse_errors": parse_errors,
         "records_without_timestamp": untimed, "sessions_in_window": len(sessions),
         "sessions_started_before_window": sum(s["started_before_window"] for s in sessions),
@@ -1420,14 +1452,7 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     try:
         reviews = []
         if args.exceptions:
-            reviews = json.loads(args.exceptions.read_text())
-            allowed = {"read_of_subsequently_edited_file", "original_source_quoted_or_line_cited", "exact_bytes_required_by_frozen_check"}
-            if (not isinstance(reviews, list) or any(not isinstance(r, dict)
-                or not re.fullmatch(r"[a-f0-9]{64}", str(r.get("transcript_sha256", "")))
-                or not isinstance(r.get("tool_use_id"), str) or (r.get("exception") not in allowed and r.get("proxy_purpose") != "acceptance")
-                or not isinstance(r.get("witness"), str) or not r["witness"].strip() for r in reviews)
-                or len({(r["transcript_sha256"], r["tool_use_id"]) for r in reviews}) != len(reviews)):
-                raise ValueError("invalid exception sidecar")
+            reviews = _measurement_bridge(json.loads(args.exceptions.read_text()), validate_reviews=True)
         scan = scan_codex_lanes(args.codex_root, manifest, since=since, until=until, marker=marker,
                                rtk_check=args.rtk_check, exception_records=reviews)
     except (OSError, ValueError):

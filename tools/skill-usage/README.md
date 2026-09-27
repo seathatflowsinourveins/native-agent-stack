@@ -194,18 +194,36 @@ the existing [child-usage.mjs measurement kernel](../../examples/claude-native/w
 through Node; lane reports now require Node as well as Python, with no extra
 package install. The legacy fields above remain historical comparison fields.
 Use `measurement.m4.routed_share` for the denominator including nested ctx
-fetches. M3/M5 use own persisted `function_call_output` content, with native
-`item_completed` content as fallback; a missing result stays visible instead
-of being supplied as an empty result. Function namespaces are preserved.
-Structured output is compact JSON UTF-8 bytes; it is not provider tokens.
+fetches. M3/M5 use own persisted `function_call_output` and
+`custom_tool_call_output` content, paired with function, custom or local-shell
+calls; native `item_completed` content is the fallback. A missing context
+result stays visible instead of being supplied as an empty result.
+Function namespaces and legacy local-shell IDs are preserved. Strings and text
+block payloads use their UTF-8 bytes; only non-text blocks use compact JSON.
 Response-item output takes priority when both representations exist. Other
 function results remain in M3's `other` carrier and orphan results are counted.
+
+Nested operations inside code-mode `exec` are sandbox operations: they supply
+M4 fetches, RTK command parts and MCP state observations, while only the outer
+exec return contributes M3 bytes (`code_mode` carrier). Nested ctx returns do
+not contribute M5 bytes unless represented by a direct model-visible ctx call.
+`sandbox_operations` counts the normalized nested operations. Native MCP
+`status` supplies completion/failure state when result bytes were not persisted.
+The adapter uses direct response call IDs first; other items in an open exec
+span are sandbox operations until its return, the next direct model call or a
+turn boundary. This local span rule covers the retained fixture. Interleaved or
+resumed cells without a persisted parent association need independent review.
 
 `--rtk-check` and `--exceptions` have the same pin, isolated five-exclusion
 replay and private digest-bound adjudication contract as the Claude tool.
 For Codex, observed coverage comes from explicit prefixes; the replay fields
 are hypothetical Claude-hook routing, never evidence a Codex hook ran.
 Add these flags to the existing `--lanes` command when measuring M6c.
+M6c reads the deterministic `explicit_rtk_on_excluded_or_sensitive` zero counter;
+conditional log/find forms stay in the separate advisory counters and require
+the shared per-part `rtk_log_find` sidecar review described in the kernel docs.
+Proxy parts stay outside the coverage denominator. `sidecar_records` reports
+bound/unbound digest counts across measured rollouts without publishing records.
 
 `measurement.provider_usage` differences cumulative `token_count` counters
 per rollout and attempt, using inherited/pre-window snapshots only as a
@@ -218,10 +236,15 @@ Known usage remains counted for failed/interrupted turns. A native
 model/effort when available; it does not claim provider-resolved routing.
 Supply one rollout per thread; this tool does not reconcile copied files of
 the same thread from multiple archives. Interrupted terminal usage that the
-client never persisted cannot be reconstructed.
+client never persisted cannot be reconstructed. Codex actor and group
+measurements omit the inapplicable Claude `usage` object entirely.
 
 Sources: [Codex rust-v0.157.1 native usage protocol](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2234-L2310),
 [native function namespace](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1073-L1088),
+[custom/local-shell calls and outputs](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1060-L1165),
+[code-mode emission test](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/tests/suite/code_mode.rs#L721-L760),
+[nested and outer byte limits](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/tests/suite/code_mode.rs#L3436-L3752),
+[MCP item state and optional result](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/app-server-protocol/src/protocol/v2/item.rs#L333-L352),
 [terminal error](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2146-L2152),
 and [ccusage v20.0.24 baseline/delta parsing](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/codex/src/parser.rs#L153-L350).
 The project-specific measurement contract is
