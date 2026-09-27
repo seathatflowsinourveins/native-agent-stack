@@ -1440,7 +1440,8 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
   recovery_hidden: byId["catalog-recovery"].hidden, tab_hidden: (byId["tab-convergence"] || {}).hidden,
   panel_hidden: (byId["convergence"] || {}).hidden,
   rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
-  summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null}));
+  summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null,
+  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null}));
 '''
 
     @staticmethod
@@ -1505,6 +1506,48 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                          "Layers missing from the newest sweep manifestfoundation/f-missing",
                          "Newest sweep manifest layers without a matrix rowus-equities/u-unlisted"):
             self.assertIn(expected, observed["definitions"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_token_topic_cards(self):
+        """The topic section shows each card block with its evidence class, the drift note and the marker."""
+        self.use_real_template()
+        self.write_topic(self.topic_card(recorded_pin="0.9"))
+        _, with_card = self.build()
+        observed = self.run_page(with_card)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        topic = observed["token_topic"]
+        for expected in (
+                "Edition 2026-09-27",
+                "Pin drift: this card recorded 0.9; manifests/stack.json now pins 1.0. The card's upstream, E2E, "
+                "performance and review facts describe 0.9 until a newer card edition is recorded.",
+                "Per-tool card · edition 2026-09-27",
+                "Card source: " + self.TOPIC_CARD_SOURCE + " ↗",
+                "UpstreamEvidence class: upstream provenance (live release metadata)",
+                "Latest release v1.1 (2026-09-24)", "Behind: One minor release behind",
+                "Recommended install: search install",
+                "Native adaptationEvidence class: repository configuration review",
+                "Assessment: Claude hook and Codex instructions follow upstream",
+                "E2E returned resultsEvidence class: local integration (upstream commands, returned data retained)",
+                "Status pass", "Records: 3; cited: search-01-query",
+                "Adapted performance per payload and laneEvidence class: one class per entry; never summed across classes",
+                "claude_subagent · Same query raw versus search output: 400 → 100 tokens (-75%) · o200k_base · "
+                "exact artifact comparison",
+                "Invoke ratesEvidence class: local integration (transcript counts)",
+                "Window: 2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z",
+                "agent_subagents: 14 of 71 agents (19.72%) · MCP calls 0 · CLI calls 85",
+                "GPT-6 reviewEvidence class: model review (judgment over retained sources, not execution)",
+                "Verdict adapted-with-gaps (review: defects)", "Aligned with one documented gap"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, topic)
+        self.assertNotIn("No card in this edition", topic)
+
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        _, without_card = self.build()
+        observed = self.run_page(without_card)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertIn("No card in this edition (2026-09-27)", observed["token_topic"])
+        self.assertNotIn("Pin drift", observed["token_topic"])
+        self.assertNotIn("Per-tool card", observed["token_topic"])
 
     def test_the_repository_matrix_convergence_block_is_accepted(self):
         """The real generated matrix, not the fixture: the page accepts what scripts/component_matrix.py writes."""
