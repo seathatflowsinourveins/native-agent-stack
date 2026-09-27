@@ -8,15 +8,17 @@ lane itself lives in `tools/adoption/apply_codex_lane.py`, `tools/adoption/prove
 context-mode 1.0.169 (`start.mjs` sha256 `0324441841b2…`). Paths are masked: `~` is the home directory, `$SCRATCH` a
 private scratch directory, `<uuid>` an installation id.
 
-**What was not done.** Nothing was applied to the host. No file under the host's Codex or Claude homes was changed:
-the dry run's and the live rehearsal's before-and-after hashes and mtimes are in their own records. No credential
-store was opened, copied or linked. The live workers ran with the host's own Codex home and signed in natively.
+**What was not done.** The lane was not applied to the host. The retained before-and-after hashes and mtimes cover
+the Codex home's `config.toml`, `AGENTS.md`, `RTK.md` and `hooks.json` in the dry run and live rehearsal, and the
+Claude home's `settings.json` and `plugins/installed_plugins.json` in the live rehearsal. Those enumerated files
+were unchanged; the snapshots do not cover every file under either home. No credential store was opened, copied
+or linked. The live workers ran with the host's own Codex home and signed in natively.
 
 ## Records
 
 | File | Evidence class | What it shows |
 | --- | --- | --- |
-| [`host-dry-run.txt`](host-dry-run.txt) | local integration, on the real Codex home | The dry run with the final script (22:53Z): all ten preconditions pass, with no `codex` process running at that moment; an earlier run at 22:20Z had warned about two peer processes. Every planned key and the host step's three tables are listed. The rehearsal on private copies passes, and the output gives the two hashes and the worker command line. The Codex home's files are unchanged. |
+| [`host-dry-run.txt`](host-dry-run.txt) | local integration, on the real Codex home | The dry run with the final script (22:53Z): all ten preconditions pass, with no `codex` process running at that moment; an earlier run at 22:20Z had warned about two peer processes. Every planned key and the host step's three tables are listed. The rehearsal on private copies passes, and the output gives the two hashes and the worker command line. The four enumerated Codex configuration files are unchanged. |
 | [`host-prove-before-apply.txt`](host-prove-before-apply.txt) | local integration, on the real Codex home | Before any apply: 0 top-rule lines, RTK text not inline, and context-mode bound to the plugin cache from `/` and to the checkout from the checkout (2 pass, 5 fail). `rtk git show` returns 8,248 of 21,300 bytes, while native `git show` is exact. |
 | [`rehearsal-cycle.txt`](rehearsal-cycle.txt) | local integration, on scratch copies | Dry run, then apply without the hashes (exit 2), apply, a second apply ("already in place"), rollback (`config.toml` and `AGENTS.md` byte-identical, profile removed), and a second rollback ("already"). |
 | [`rehearsal-static.txt`](rehearsal-static.txt) | local integration, on scratch copies | Prove before apply fails (2 of 7); after apply it passes 7 of 7. A scratch project stands in for the main checkout after the host step. |

@@ -51,6 +51,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import apply_codex_lane as lane  # noqa: E402
 from scripts import adoption_status  # noqa: E402
+from scripts.codex_quota import group_alive  # noqa: E402
 
 BIG_LINES = 300  # about 15 KB: over rtk 0.50.0's roughly 8 KiB blob window, far under Codex's 1 MiB output cap
 UNSET_FOR_WORKERS = ("CLAUDECODE", "CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_ENTRYPOINT", "CONTEXT_MODE_PROJECT_DIR",
@@ -197,17 +198,20 @@ def run_workers(specs: list[dict], timeout: float) -> list[dict]:
             timed_out = True
         results.append((spec, proc, out, err, started, timed_out))
     for _, proc, *_ in results:  # kill every group left, whichever worker timed out
+        # scripts/codex_quota.py::AppServer.close: a group can outlive its leader,
+        # including when that leader exits promptly on TERM but a descendant ignores it.
+        for sig in (signal.SIGTERM, signal.SIGKILL):
+            if proc.poll() is not None and not group_alive(proc.pid):
+                break
+            try:
+                os.killpg(proc.pid, sig)
+            except ProcessLookupError:
+                pass
+            end = time.monotonic() + 5.0
+            while time.monotonic() < end and not (proc.poll() is not None and not group_alive(proc.pid)):
+                time.sleep(0.05)
         if proc.poll() is None:
-            for sig in (signal.SIGTERM, signal.SIGKILL):
-                try:
-                    os.killpg(proc.pid, sig)
-                except ProcessLookupError:
-                    break
-                try:
-                    proc.wait(timeout=5)
-                    break
-                except subprocess.TimeoutExpired:
-                    continue
+            proc.wait(timeout=5)
     collected = []
     for spec, proc, out, err, started, timed_out in results:
         out.seek(0)
@@ -250,17 +254,29 @@ def usage(events: list[dict]) -> dict | None:
 
 
 def pwd_verdict(run: dict, own: str, other: str) -> tuple[bool, str]:
+    if run["timed_out"] or run["exit"] != 0:
+        return False, f"worker exit {run['exit']}, timed out {run['timed_out']}"
     calls = mcp_calls(run["events"], "context-mode", "ctx_execute")
     if not calls:
         return False, f"no completed context-mode ctx_execute item (exit {run['exit']}, timed out {run['timed_out']})"
     call = calls[0]
+    arguments = call.get("arguments") or {}
+    code = (arguments.get("code") or "").strip()
+    # PWD_PROMPT and the captured pwd fixtures query the inherited directory directly.
+    # Full matches exclude echoes, comments and an explicit cd that would defeat the probe.
+    queries_pwd = (arguments.get("language") == "shell"
+                   and re.fullmatch(r"(?:rtk\s+(?:proxy\s+)?)?pwd", code) is not None) or (
+                       arguments.get("language") == "javascript"
+                       and re.fullmatch(r"console\.log\(\s*process\.cwd\(\s*\)\s*\)\s*;?", code) is not None)
     lines = [line.strip() for line in result_text(call).splitlines() if line.strip()]
     printed = lines[-1] if lines else ""
-    ok = call.get("status") == "completed" and printed == own and other not in result_text(call)
-    return ok, f"status {call.get('status')}, pwd printed {printed}"
+    ok = queries_pwd and call.get("status") == "completed" and printed == own and other not in result_text(call)
+    return ok, f"status {call.get('status')}, direct pwd query {queries_pwd}, pwd printed {printed}"
 
 
 def approval_verdict(run: dict, expect_refusal: bool) -> tuple[bool, str]:
+    if run["timed_out"] or run["exit"] != 0:
+        return False, f"worker exit {run['exit']}, timed out {run['timed_out']}"
     calls = mcp_calls(run["events"], "ai-memory", "memory_query")
     if not calls:
         return False, f"no completed ai-memory memory_query item (exit {run['exit']}, timed out {run['timed_out']})"
@@ -273,18 +289,22 @@ def approval_verdict(run: dict, expect_refusal: bool) -> tuple[bool, str]:
 
 
 def rtk_verdict(run: dict, blob: bytes) -> tuple[bool, str]:
+    if run["timed_out"] or run["exit"] != 0:
+        return False, f"worker exit {run['exit']}, timed out {run['timed_out']}"
     commands = completed_items(run["events"], "command_execution")
     status = [c for c in commands if re.search(r"git\s+status", c.get("command", ""))]
     shows = [c for c in commands if "HEAD:big.txt" in c.get("command", "")]
     if not status or not shows:
         return False, f"commands seen: {[c.get('command') for c in commands]}"
-    prefixed = any(re.search(r"(?<![\w-])rtk\s+git\s+status", c["command"]) for c in status)
+    prefixed = [c for c in status if re.search(r"(?<![\w-])rtk\s+git\s+status", c["command"])]
+    status_ok = any(c.get("exit_code") == 0 for c in prefixed)
     show = shows[-1]
     raw = not re.search(r"(?<![\w-])rtk\s+(?!proxy\b)(?:\S+\s+)*?git\s+(?:\S+\s+)*?show", show["command"])
     output = (show.get("aggregated_output") or "").replace("\r\n", "\n")
     exact = output.encode("utf-8") == blob
-    ok = prefixed and raw and show.get("exit_code") == 0 and exact
-    return ok, (f"status command rtk-prefixed {prefixed}; blob read {show.get('command')!r}: raw {raw}, "
+    ok = status_ok and raw and show.get("exit_code") == 0 and exact
+    return ok, (f"status command rtk-prefixed {bool(prefixed)}, exit 0 {status_ok}; "
+                f"blob read {show.get('command')!r}: raw {raw}, "
                 f"exit {show.get('exit_code')}, {len(output.encode('utf-8'))} of {len(blob)} bytes, byte-exact {exact}")
 
 

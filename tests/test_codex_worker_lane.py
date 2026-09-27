@@ -21,6 +21,7 @@ import io
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -476,6 +477,75 @@ class ApplyFlowTests(unittest.TestCase):
         code, out = self.host.apply()
         self.assertEqual(code, 0, out)
 
+    def test_rollback_conflicts_on_an_edited_managed_block(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        run = self.host.latest_run()
+        agents = self.host.codex_home / "AGENTS.md"
+        edited = agents.read_text().replace(lane.TOP_RULE_MARKER,
+                                            lane.TOP_RULE_MARKER + "\nAn instruction edited after apply.", 1)
+        agents.write_text(edited)
+        code, out = self.host.run("--rollback", str(run))
+        conflict = "AGENTS.md: the managed block changed since the run; left in place"
+        self.assertEqual(code, 3, out)
+        self.assertIn("CONFLICT: " + conflict, out.splitlines())
+        self.assertEqual(agents.read_bytes(), edited.encode())
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["status"], "rollback-conflict")
+        self.assertEqual(record["rollbacks"][-1]["conflicts"], [conflict])
+        self.assertNotIn("agents", record["rollbacks"][-1]["outcome"])
+
+    def test_rollback_restores_a_prior_managed_block_verbatim(self):
+        # Both the whole-file restore and the prior-block splice must preserve literal bytes.
+        prior = (lane.BLOCK_BEGIN + " prior -->\nEarlier instruction with trailing spaces.  \n"
+                 "\tKeep this indentation.\n\n" + lane.BLOCK_END + "\n")
+        prefix, suffix = "Existing prefix.\n\n", "\nExisting suffix.\n"
+        for outside_edits in (False, True):
+            with self.subTest(outside_edits=outside_edits):
+                host = FakeHost(self)
+                agents = host.codex_home / "AGENTS.md"
+                original = (prefix + prior + suffix).encode()
+                agents.write_bytes(original)
+                code, out = host.apply()
+                self.assertEqual(code, 0, out)
+                self.assertEqual(agents.read_text(), prefix + lane.agents_block() + suffix)
+                run = host.latest_run()
+                if outside_edits:
+                    agents.write_text("New prefix.\n" + agents.read_text() + "\nNew suffix.\n")
+                code, out = host.run("--rollback", str(run))
+                self.assertEqual(code, 0, out)
+                expected = b"New prefix.\n" + original + b"\nNew suffix.\n" if outside_edits else original
+                self.assertEqual(agents.read_bytes(), expected)
+                outcome = ("the earlier block is back; edits made since outside it are kept" if outside_edits
+                           else "restored from the backup")
+                record = json.loads((run / "record.json").read_text())
+                self.assertEqual(record["rollbacks"][-1]["outcome"]["agents"], outcome)
+                self.assertIn("agents: " + outcome, out.splitlines())
+
+    def test_rollback_keeps_the_prior_block_backup_when_the_managed_block_was_removed(self):
+        prior = lane.BLOCK_BEGIN + " prior -->\nPrior instructions.\n" + lane.BLOCK_END + "\n"
+        original = ("Existing prefix.\n\n" + prior + "\nExisting suffix.\n").encode()
+        agents = self.host.codex_home / "AGENTS.md"
+        agents.write_bytes(original)
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("Prior instructions.", agents.read_text())
+        self.assertIn(lane.agents_block(), agents.read_text())
+        run = self.host.latest_run()
+        removed = b"Existing prefix.\n\nThe block was removed elsewhere.\n\nExisting suffix.\n"
+        agents.write_bytes(removed)
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        outcome = "no managed block left; nothing to undo"
+        self.assertIn("agents: " + outcome, out.splitlines())
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["rollbacks"][-1]["outcome"]["agents"], outcome)
+        self.assertEqual(agents.read_bytes(), removed)
+        backup = run / "AGENTS.md.before"
+        self.assertTrue(backup.is_file())
+        self.assertEqual(backup.read_bytes(), original)
+        self.assertIn(prior.encode(), backup.read_bytes())
+
     def test_an_override_with_text_and_a_damaged_block_are_refused(self):
         (self.host.codex_home / "AGENTS.override.md").write_text("override\n")
         code, out = self.host.run()
@@ -513,7 +583,7 @@ def fixture_events(name: str) -> list[dict]:
 
 
 class ProveVerdictTests(unittest.TestCase):
-    """The live verdicts on event shapes from real codex-cli 0.157.1 `codex exec --json` runs."""
+    """Real codex-cli 0.157.1 event shapes, plus explicitly synthetic adversarial cases."""
 
     def test_pwd_verdict_on_a_bound_and_an_unbound_worker(self):
         bound = {"events": fixture_events("pwd-bound.events.json"), "exit": 0, "timed_out": False}
@@ -526,6 +596,37 @@ class ProveVerdictTests(unittest.TestCase):
         ok, detail = prove.pwd_verdict(unbound, "/scratch/npm-live/wC1", "/scratch/npm-live/wP1")
         self.assertFalse(ok)
         self.assertIn("ADVERSARY", detail)
+
+    def test_pwd_verdict_rejects_synthetic_directory_spoofs(self):
+        # Synthetic completed items: the claimed output is right, but the arguments do not
+        # query the inherited working directory. Keep the real captured fixtures unchanged.
+        own, other = "/scratch/worker-a", "/scratch/worker-b"
+        for language, code in (("shell", f"echo {own}"),
+                               ("shell", f"echo {own} # pwd"),
+                               ("shell", f"cd {own}; pwd"),
+                               ("javascript", f"console.log('{own}')"),
+                               ("javascript", f"console.log('{own}') // process.cwd()")):
+            with self.subTest(language=language, code=code):
+                item = {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_execute",
+                        "arguments": {"language": language, "code": code}, "status": "completed",
+                        "result": {"content": [{"type": "text", "text": own + "\n"}]}}
+                run = {"events": [{"type": "item.completed", "item": item}], "exit": 0, "timed_out": False}
+                ok, detail = prove.pwd_verdict(run, own, other)
+                self.assertFalse(ok, detail)
+
+    def test_pwd_verdict_accepts_synthetic_direct_directory_queries(self):
+        # Synthetic positive controls for the explicit query forms; the shell pwd fixture
+        # above remains the evidence for a real captured invocation.
+        own, other = "/scratch/worker-a", "/scratch/worker-b"
+        for language, code in (("shell", "pwd"), ("shell", "rtk pwd"), ("shell", "rtk proxy pwd"),
+                               ("javascript", "console.log(process.cwd());")):
+            with self.subTest(language=language, code=code):
+                item = {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_execute",
+                        "arguments": {"language": language, "code": code}, "status": "completed",
+                        "result": {"content": [{"type": "text", "text": own + "\n"}]}}
+                run = {"events": [{"type": "item.completed", "item": item}], "exit": 0, "timed_out": False}
+                ok, detail = prove.pwd_verdict(run, own, other)
+                self.assertTrue(ok, detail)
 
     def test_approval_verdicts(self):
         items = json.loads((FIXTURES / "approval-items.json").read_text())
@@ -580,6 +681,46 @@ class ProveVerdictTests(unittest.TestCase):
         self.assertIn('codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live"',
                       recipe)
 
+    def test_rtk_verdict_rejects_a_synthetic_failed_status_command(self):
+        # Synthetic fault injected into the captured item shape; no command is executed here.
+        fixture = json.loads((FIXTURES / "rtk-worker-items.json").read_text())
+        status, show = fixture["items"]
+        blob = prove.big_blob()
+        show = {**show, "aggregated_output": blob.decode()}
+        failed = {**status, "exit_code": 1}
+        # A successful unprefixed command cannot rescue a failed prefixed command.
+        raw_success = {**status, "command": "git status --short", "exit_code": 0}
+        for statuses in ([failed], [failed, raw_success]):
+            with self.subTest(status_commands=len(statuses)):
+                run = {"events": [{"type": "item.completed", "item": item} for item in [*statuses, show]],
+                       "exit": 0, "timed_out": False}
+                ok, detail = prove.rtk_verdict(run, blob)
+                self.assertFalse(ok, detail)
+
+    def test_verdicts_reject_synthetic_failed_or_timed_out_workers(self):
+        # Synthetic run lifetimes around otherwise-valid captured completed items. The
+        # successful controls prove that worker completion alone changes these verdicts.
+        approvals = json.loads((FIXTURES / "approval-items.json").read_text())
+        rtk_items = json.loads((FIXTURES / "rtk-worker-items.json").read_text())["items"]
+        blob = prove.big_blob()
+        rtk_items[-1] = {**rtk_items[-1], "aggregated_output": blob.decode()}
+        cases = (("pwd", prove.pwd_verdict, fixture_events("pwd-bound.events.json"),
+                  ("/scratch/npm-live/wP1", "/scratch/npm-live/wP2")),
+                 ("approved", prove.approval_verdict,
+                  [{"type": "item.completed", "item": approvals["approved"]}], (False,)),
+                 ("refused", prove.approval_verdict,
+                  [{"type": "item.completed", "item": approvals["refused"]}], (True,)),
+                 ("rtk", prove.rtk_verdict,
+                  [{"type": "item.completed", "item": item} for item in rtk_items], (blob,)))
+        for name, verdict, events, args in cases:
+            valid = {"events": events, "exit": 0, "timed_out": False}
+            self.assertTrue(verdict(valid, *args)[0], name)
+            for exit_code, timed_out in ((0, True), (7, False), (None, False), (-signal.SIGTERM, False)):
+                with self.subTest(verdict=name, exit=exit_code, timed_out=timed_out):
+                    run = {**valid, "exit": exit_code, "timed_out": timed_out}
+                    ok, detail = verdict(run, *args)
+                    self.assertFalse(ok, detail)
+
     def test_grep_count_counts_lines(self):
         self.assertEqual(prove.grep_count("a x\nb\nx x\n", "x"), 2)
 
@@ -592,6 +733,49 @@ class ProveVerdictTests(unittest.TestCase):
         self.assertLess(__import__("time").monotonic() - started, 15)
         self.assertTrue(runs[0]["timed_out"])
         self.assertEqual(runs[1]["events"], [{"type": "turn.completed"}])
+
+    @unittest.skipUnless(hasattr(os, "fork") and hasattr(os, "killpg"), "requires POSIX process groups")
+    def test_run_workers_kills_descendants_after_the_leader_exits(self):
+        # Synthetic workers, real OS processes. Mirror the stubborn-child observation in
+        # tests/test_codex_quota.py: a zombie has exited and cannot continue doing work.
+        worker = '''
+import json, os, signal, sys, time
+from pathlib import Path
+reader, writer = os.pipe()
+child = os.fork()
+if child == 0:
+    os.close(reader)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    os.write(writer, b"ready")
+    os.close(writer)
+    time.sleep(60)
+    os._exit(0)
+os.close(writer)
+os.read(reader, 5)
+os.close(reader)
+Path(sys.argv[1]).write_text(json.dumps({"child": child, "group": os.getpgrp()}))
+if sys.argv[2] == "already-exited":
+    sys.exit(0)
+while True:
+    signal.pause()
+'''
+        for mode in ("exits-on-term", "already-exited"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp:
+                pids = Path(tmp) / "pids.json"
+                try:
+                    runs = prove.run_workers([{"name": mode, "argv": [sys.executable, "-c", worker, str(pids), mode],
+                                               "cwd": tmp, "env": dict(os.environ)}], timeout=1.0)
+                    self.assertEqual(runs[0]["timed_out"], mode == "exits-on-term")
+                    self.assertEqual(runs[0]["exit"], -signal.SIGTERM if mode == "exits-on-term" else 0)
+                    child = json.loads(pids.read_text())["child"]
+                    state = subprocess.run(["ps", "-o", "stat=", "-p", str(child)], capture_output=True,
+                                           text=True, check=False).stdout.strip()
+                    self.assertTrue(not state or state.startswith("Z"), "a child ignoring SIGTERM survived cleanup")
+                finally:
+                    # The red run must also leave no running descendants behind.
+                    if pids.exists():
+                        with contextlib.suppress(ProcessLookupError):
+                            os.killpg(json.loads(pids.read_text())["group"], signal.SIGKILL)
 
 
 @unittest.skipUnless(os.environ.get("NAS_CODEX_INTEGRATION") == "1" and shutil.which("codex"),
