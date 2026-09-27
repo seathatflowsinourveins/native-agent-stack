@@ -14073,8 +14073,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "1fe0186804f21c91d6e46c146603e42b477cda2fa242b580cad3829df116103f",
-      "bytes": 14860
+      "sha256": "3e1a49e3a6e7d90fd6985d85c4e56c32c5d232e4d6d073f471338b7e753592bc",
+      "bytes": 17709
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -38123,8 +38123,8 @@
     },
     {
       "path": "examples/agentsview-archive.service.example",
-      "sha256": "b555f4b83b60bb335fdfcc95b3956b9a72421e4e69d2ecd84427db69a4d56d8c",
-      "bytes": 790
+      "sha256": "9188250bc9392477b475833979ea4b291fbe43ea9ab979849ac1d4e1ac038efc",
+      "bytes": 1066
     },
     {
       "path": "examples/agentsview.toml.example",
@@ -38688,8 +38688,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "f53071146cf1fef18ad7c2080056cbb63fd566e38e72f56de611e111d7eae4fa",
-      "bytes": 120805
+      "sha256": "1ed331c14a48569a991ee03ae72a5b0af778e1b393ef08d00064b5486ce55ca5",
+      "bytes": 121039
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
