@@ -1,0 +1,104 @@
+# Capability gate: jcodemunch under `codex exec --profile stack-worker` in the main checkout, driven by promptfoo 0.123.1's
+# openai:codex-sdk (site/docs/providers/openai-codex-sdk.md) through codex-profile-exec. Run it with run_gate.py, which
+# sets the env templates below (promptfoo renders `{{ env.X }}` at config load, site/docs/configuration/guide.md) and
+# reconciles every row with the native Codex OTel tool_result records in Loki. The profile decides model and effort.
+# Gate rows must pass; each control must fail: `prompt` approval (Codex refuses the call under approval policy never,
+# decision F7 in docs/decisions/2026-09-26-token-practice-f1-f9.md) and a disabled server (no tool to call).
+description: capability gate, jcodemunch
+tracing:
+  enabled: true
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+prompts:
+  - '{{ instruction }}'
+providers:
+  - id: openai:codex-sdk
+    label: gate
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_MAIN_CHECKOUT }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+  - id: openai:codex-sdk
+    label: ctrl-prompt
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_MAIN_CHECKOUT }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          jcodemunch:
+            default_tools_approval_mode: prompt
+  - id: openai:codex-sdk
+    label: ctrl-disabled
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_MAIN_CHECKOUT }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          jcodemunch:
+            enabled: false
+defaultTest:
+  assert:
+    # Exactly one call to the server: trajectory spans (site/docs/configuration/expected-outputs/deterministic.md).
+    - type: trajectory:tool-used
+      value:
+        pattern: 'mcp jcodemunch/*'
+        min: 1
+        max: 1
+    # That call completed without error and returned the function's signature, which the task does not contain (register_file's second parameter, profile_servers_without_base's first).
+    - type: javascript
+      value: file://assertions.js:completedResult
+      config:
+        server: jcodemunch
+tests:
+  - description: gate a
+    providers: [gate]
+    options:
+      repeat: 3
+    vars:
+      instruction: file://briefs/jcodemunch-a.md
+      detail: 'relative_path: str'
+  - description: gate b
+    providers: [gate]
+    options:
+      repeat: 3
+    vars:
+      instruction: file://briefs/jcodemunch-b.md
+      detail: 'profile_bytes: bytes'
+  - description: ctrl-prompt a
+    providers: [ctrl-prompt]
+    vars:
+      instruction: file://briefs/jcodemunch-a.md
+      detail: 'relative_path: str'
+  - description: ctrl-prompt b
+    providers: [ctrl-prompt]
+    vars:
+      instruction: file://briefs/jcodemunch-b.md
+      detail: 'profile_bytes: bytes'
+  - description: ctrl-disabled a
+    providers: [ctrl-disabled]
+    vars:
+      instruction: file://briefs/jcodemunch-a.md
+      detail: 'relative_path: str'
+  - description: ctrl-disabled b
+    providers: [ctrl-disabled]
+    vars:
+      instruction: file://briefs/jcodemunch-b.md
+      detail: 'profile_bytes: bytes'

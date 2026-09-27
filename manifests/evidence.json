@@ -13857,6 +13857,11 @@
       "bytes": 8203
     },
     {
+      "path": "docs/decisions/2026-09-27-capability-gate-harness.md",
+      "sha256": "046d30cc81c4a3cc2575bdbc7a802b121cf1681d89fc4ed3e401766b3752c20e",
+      "bytes": 4469
+    },
+    {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
       "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
       "bytes": 7782
@@ -39197,6 +39202,11 @@
       "bytes": 50802
     },
     {
+      "path": "tests/test_capability_gate.py",
+      "sha256": "4eca99a707f56421de1f4bc3ce5aa62c8fae0cf02a3ec2aa3ec5c9e46b25f72a",
+      "bytes": 28440
+    },
+    {
       "path": "tests/test_catalog_decisions.py",
       "sha256": "e24efa328daf0a3536ee8416bcf5c1ac406e207202f559c3ad5ca11155e4110e",
       "bytes": 9953
@@ -39885,6 +39895,76 @@
       "path": "tools/adoption/render_launchd.py",
       "sha256": "253a3f4591fa1eb22314a7d085988464f3a3c7c009c7a52b5ee2566d160f0749",
       "bytes": 5605
+    },
+    {
+      "path": "tools/capability-gate/README.md",
+      "sha256": "90b798c1c4f8fbd39ae1ead70ac49f778d0d6b72e1bed98dc194de33b08c5fdc",
+      "bytes": 9784
+    },
+    {
+      "path": "tools/capability-gate/ai-memory.yaml",
+      "sha256": "29d89d6467b75cd22ff3eb244ebf8090920ff2b1cb078c81980a01881e60d82e",
+      "bytes": 3543
+    },
+    {
+      "path": "tools/capability-gate/assertions.js",
+      "sha256": "ba28b0b11e174af8fc543a9d87f80220f7028df9c7b90766d7b41b7e93b80fcc",
+      "bytes": 8093
+    },
+    {
+      "path": "tools/capability-gate/briefs/ai-memory-a.md",
+      "sha256": "30959a79d2ba23418b105e600555f2c701f1a9f10a3c7e6f571de9298d6c9a3c",
+      "bytes": 343
+    },
+    {
+      "path": "tools/capability-gate/briefs/ai-memory-b.md",
+      "sha256": "a637280e054bde676ee9e1ad06ff7e201f8dc75d94dffe33c5d646e3298e0bb0",
+      "bytes": 343
+    },
+    {
+      "path": "tools/capability-gate/briefs/jcodemunch-a.md",
+      "sha256": "918c040248e82693c45259119793c72acd9bc755595e8a83917b2090152edd91",
+      "bytes": 377
+    },
+    {
+      "path": "tools/capability-gate/briefs/jcodemunch-b.md",
+      "sha256": "cd906c661b9dae5ac168786cf7ffe18056af3c7e276c62d9494e4c932ae09b80",
+      "bytes": 392
+    },
+    {
+      "path": "tools/capability-gate/briefs/m13.md",
+      "sha256": "ba031c2f2d44f3d5c2d864f8cb0bacd398cb604fe106be362caa673487b772ee",
+      "bytes": 931
+    },
+    {
+      "path": "tools/capability-gate/codex-profile-exec",
+      "sha256": "b159f6b5883bfd43041eb548c1b5c193d2ebada0360260af55149d78d0845b13",
+      "bytes": 619
+    },
+    {
+      "path": "tools/capability-gate/jcodemunch.yaml",
+      "sha256": "8c94318e9516be91168682c66ee7ab54023c15dd0f8641c0eaae661d709d18b7",
+      "bytes": 3653
+    },
+    {
+      "path": "tools/capability-gate/m13.yaml",
+      "sha256": "20f43319855d0adc7950b5038f5462e435fb77b9bb2f1666b36c7bdbdeefcd9a",
+      "bytes": 4939
+    },
+    {
+      "path": "tools/capability-gate/m13_hooks.js",
+      "sha256": "8bcc55235a63847cc672893cc8f8009e06b097561d39952be2b45cb2c6a4ab71",
+      "bytes": 2412
+    },
+    {
+      "path": "tools/capability-gate/m13_tests.js",
+      "sha256": "998bf976b87749b42363d42cff52b9d59372baf2ecf2e362637634c1bd739c8a",
+      "bytes": 983
+    },
+    {
+      "path": "tools/capability-gate/run_gate.py",
+      "sha256": "0c3759d1144999ca62028ec22eb69716ff2d37ab74f4c8161b88074f897da4ff",
+      "bytes": 19070
     },
     {
       "path": "tools/skill-usage/README.md",
