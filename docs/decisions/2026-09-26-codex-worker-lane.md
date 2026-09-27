@@ -822,7 +822,9 @@ failing-first evidence; the synthetic row's before run failed only because the h
   reruns its gateway probe (pass: both tools present and completing on the first turn).
 - A worker whose `HOME` is not the account's cannot start codebase-memory while the account daemon runs. It used to
   run without the tools; it now waits the 60 s allowance and fails.
-- Every `-p stack-worker` launch now waits for the two starts (1.2-2.3 s here) before its first request.
+- Every `-p stack-worker` launch now holds its first request until both servers answer `initialize` (serena
+  1.53-2.24 s and codebase-memory 1.20-1.25 s here, each timed from its own launch). The added delay is only the part
+  past the grace: without `required`, the first request left 1.63 s and 1.69 s after `codex` started.
 - The workstation's installed `stack-worker.config.toml` predates this template, so the dry run and the apply refuse
   it ("exists and differs from the template") and never overwrite it. The host step, after merge and in a quiet
   window with no Codex process: move that file aside privately, run the dry run, then apply.
