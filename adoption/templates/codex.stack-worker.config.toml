@@ -19,6 +19,17 @@ model_reasoning_effort = "max"
 # workspace-write sandbox keeps that default. A lane that must not browse passes -c web_search="disabled".
 web_search = "live"
 
+# Workers may have a different HOME or CHUB_DIR and miss the user's ~/.chub/config.yaml opt-outs.
+# Context Hub v0.1.4: https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js
+# (isTelemetryEnabled/isFeedbackEnabled); cli/src/lib/config.js (getChubDir).
+# Profile-v2 honours this table: openai/codex rust-v0.157.1 config/src/loader/mod.rs loads the profile
+# as a full second user layer; protocol/src/shell_environment.rs applies `set` to shell commands.
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs
+# This explicit worker profile opts out even when HOME is shared. Base user settings stay home-scoped.
+[shell_environment_policy.set]
+CHUB_TELEMETRY = "0"
+CHUB_FEEDBACK = "0"
+
 # These three servers declare no MCP tool annotations, so under approval_policy = "never" Codex refuses every call
 # to them ("MCP tool call requires approval, but approval policy is never"). Workers get their read tools, approved.
 [mcp_servers.ai-memory]

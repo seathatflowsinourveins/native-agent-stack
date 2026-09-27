@@ -407,3 +407,98 @@ frozen mechanical-extraction experiment. It does not change the worker profile
 or establish tiering for general worker tasks; its findings and limits stay in
 that experiment's receipt. The earlier sentence remains the dated historical
 state, with this addendum supplying its update.
+
+## 2026-09-27 addendum: PR-E custom agents and Context Hub
+
+**Scope:** the remaining PR-E items from full-save plan section 3.1. The worker
+installer, base Codex template, AGENTS template and gateway profile already exist.
+This addendum records new repository changes and local checks; the historical
+host receipts above retain their original scope.
+
+**F4 carrier.** The three files under `examples/codex-native/agents/` already define
+`evidence-reviewer`, `isolated-builder` and `semantic-evidence-reviewer`. Append
+[rtk-ai/rtk `v0.50.0`, `hooks/rtk-awareness-full.md`](https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md)
+verbatim and the existing marked exceptions from `codex.AGENTS.template.md` to
+each role's `developer_instructions`. Preserve its original task instructions,
+model/effort inheritance and sandbox settings. At openai/codex `rust-v0.157.1`,
+[`agent_role_config.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/agent_role_config.rs)
+parses these files and validates developer instructions,
+[`discovery.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/discovery.rs)
+finds agent TOML files,
+[`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)
+resolves their roles, and
+[`core/src/agent/role.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs)
+applies developer instructions as bounded role overrides. No additional custom
+agent, orchestration layer or installation mechanism is required.
+
+**Context Hub scope.** Put `CHUB_TELEMETRY = "0"` and `CHUB_FEEDBACK = "0"` in
+`codex.stack-worker.config.toml` under `[shell_environment_policy.set]`. Workers
+whose `HOME` or `CHUB_DIR` differs from the user's can miss that user's
+`~/.chub/config.yaml`: Context Hub `v0.1.4`
+[`cli/src/lib/config.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js)
+resolves that directory, and
+[`cli/src/lib/telemetry.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js)
+honours each environment opt-out before loading configuration. Selecting this
+worker profile opts out for shell commands even with a shared home. It does not
+detect home identity. Ordinary user configuration keeps its existing scope.
+
+**[nv] resolved: yes, in a profile-v2 file.** At `rust-v0.157.1`,
+[`config/src/loader/mod.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs)
+loads `$CODEX_HOME/stack-worker.config.toml` as a second user configuration layer
+over `config.toml`. The field is part of
+[`config_toml.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/config_toml.rs),
+and [`shell_environment_policy.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/shell_environment_policy.rs)
+accepts `set` as a string map.
+[`protocol/src/shell_environment.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/shell_environment.rs)
+applies those overrides when building a command's environment.
+[`cli/src/debug_sandbox.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/cli/src/debug_sandbox.rs)
+uses that environment builder for `codex sandbox`, which supplies the local
+execution check. This answer concerns the separate profile file selected by
+`-p stack-worker`, not a legacy `[profiles.stack-worker]` table.
+[`config_layer_source.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/config_layer_source.rs)
+assigns base user/profile/project/session-flag precedence 20/21/25/30: project
+settings and explicit flags can override these values. They are defaults for the
+worker lane, not an enforced egress boundary.
+
+**Evidence classes.** `tests.test_codex_agents` checks every role's parsed F4
+payload against the existing template and the pinned upstream hash.
+`tests.test_codex_worker_lane.TemplateTests.test_profile_template` checks the
+profile's two string values. Both failed before the corresponding changes.
+These are repository integration checks; no upstream tests were modified.
+
+`CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home`
+is local integration with installed `codex-cli 0.157.1`, using scratch `HOME` and
+`CODEX_HOME`, an allowlisted environment and no provider or MCP execution. It
+repeats with `CHUB_DIR` unset and separately overridden. For both cases, actual
+shell output is asserted as follows (the base opts in to make the control visible):
+
+| Configuration | Telemetry | Feedback | Other base `set` | Base filter |
+| --- | --- | --- | --- | --- |
+| Base only | `1` | `1` | kept | excluded |
+| `-p stack-worker` | `0` | `0` | kept | excluded |
+| Profile plus explicit telemetry `-c` override | `1` | `0` | kept | excluded |
+
+Before the profile change, four worker/override subcases failed with feedback
+still `1`; both base controls passed. With the change all six cases pass.
+Run the covering modules with:
+
+```sh
+NAS_CODEX_INTEGRATION=1 python3 -m unittest tests.test_codex_agents tests.test_codex_worker_lane
+```
+
+The fixtures and unittest checks are locally authored; this is neither an
+unchanged upstream test run nor live provider execution. No agent adherence,
+Context Hub network behaviour, token saving or new host adoption is claimed.
+
+**Adoption limits.** `apply_codex_lane.py` already reads the profile template and
+installs its bytes; it still refuses a differing installed profile. Updating a
+host's existing profile is a separate reviewed adoption step. The gateway sweep
+selects `stack-worker` in its lane home, so it receives these defaults from that
+profile. The interactive `omniroute` profile and base user template receive no
+new unconditional CHUB setting. Changing only `CODEX_HOME` does not itself
+change Context Hub's `HOME`/`CHUB_DIR` lookup. F4 changes are portable examples;
+the existing copy/registration recipe remains the deployment path.
+
+Recheck the sources and native test when Codex profile loading or Context Hub's
+environment switches change. Fresh named-role execution and any token-savings
+comparison remain separate qualification work.

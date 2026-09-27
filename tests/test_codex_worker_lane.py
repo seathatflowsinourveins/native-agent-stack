@@ -234,7 +234,12 @@ class TemplateTests(unittest.TestCase):
         # max, the effort of #359's control arm; ultra (the user default) turns on proactive delegation.
         self.assertEqual(profile["model_reasoning_effort"], "max")
         self.assertEqual(profile["web_search"], "live")
-        self.assertLessEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers"})
+        self.assertLessEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers",
+                                            "shell_environment_policy"})
+        # PR-E: profile-v2 is a full config layer (config/src/loader/mod.rs at rust-v0.157.1).
+        # Context Hub v0.1.4 cli/src/lib/telemetry.js checks these before loading home-scoped config.
+        self.assertEqual(profile.get("shell_environment_policy"),
+                         {"set": {"CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0"}})
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         # Each table only amends a server the user template registers; alone it would be an invalid server.
         self.assertLessEqual(set(profile["mcp_servers"]), set(user["mcp_servers"]))
@@ -1241,6 +1246,43 @@ class CodexIntegrationTests(unittest.TestCase):
         self.assertEqual(runs["unfiltered"].stdout.split(), ["key=present", "set=kept"])  # the control
         self.assertEqual(runs["filtered"].stdout.split(), ["key=absent", "set=kept"])
         self.assertNotIn("fixture-not-a-key", runs["filtered"].stdout + runs["filtered"].stderr)
+
+    def test_worker_profile_sets_chub_opt_outs_in_an_isolated_home(self):
+        # PR-E [nv]: real shell output, no provider. Sources at openai/codex rust-v0.157.1:
+        # config/src/loader/mod.rs (profile-v2 layering), cli/src/debug_sandbox.rs (create_env),
+        # protocol/src/shell_environment.rs (set overrides inherited variables).
+        profile = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        probe = ('printf "%s\\n" "telemetry=${CHUB_TELEMETRY:-missing}" '
+                 '"feedback=${CHUB_FEEDBACK:-missing}" "base=${NAS_PROBE_SET:-missing}"; '
+                 'if [ -n "${NAS_PROBE_FILTERED+x}" ]; then echo filter=present; else echo filter=absent; fi')
+        expected_tail = ["base=kept", "filter=absent"]
+        for chub_dir in (False, True):
+            with self.subTest(chub_dir_overridden=chub_dir), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                env = self.gateway_home(root, "")  # allowlisted environment; HOME and CODEX_HOME are scratch
+                env.update(CHUB_TELEMETRY="1", CHUB_FEEDBACK="1", NAS_PROBE_FILTERED="fixture")
+                if chub_dir:
+                    env["CHUB_DIR"] = str(root / "separate-chub")
+                home = Path(env["CODEX_HOME"])
+                base = ('[shell_environment_policy.set]\nNAS_PROBE_SET = "kept"\n'
+                        'CHUB_TELEMETRY = "1"\nCHUB_FEEDBACK = "1"\n'
+                        '[shell_environment_policy.filters]\nNAS_PROBE_FILTERED = "exclude"\n')
+                # Register the four amended servers; sandbox runs no MCP server or model.
+                for name in tomllib.loads(profile)["mcp_servers"]:
+                    base += f'[mcp_servers."{name}"]\ncommand = "/bin/false"\n'
+                (home / "config.toml").write_text(base, encoding="utf-8")
+                (home / "stack-worker.config.toml").write_text(profile, encoding="utf-8")
+                cases = (("base", [], ["telemetry=1", "feedback=1"]),
+                         ("worker", ["-p", "stack-worker"], ["telemetry=0", "feedback=0"]),
+                         ("override", ["-p", "stack-worker", "-c", 'shell_environment_policy.set.CHUB_TELEMETRY="1"'],
+                          ["telemetry=1", "feedback=0"]))
+                for label, flags, expected in cases:
+                    with self.subTest(case=label):
+                        got = subprocess.run([*self.isolation(root), "codex", *flags, "sandbox", "--", "sh", "-c", probe],
+                                             cwd=root / "cwd", env=env, stdin=subprocess.DEVNULL,
+                                             capture_output=True, text=True, timeout=30)
+                        self.assertEqual(got.returncode, 0, got.stderr[-400:])
+                        self.assertEqual(got.stdout.splitlines(), expected + expected_tail)
 
     def strict_exec(self, root: Path, env: dict, *flags: str, strict: bool = True) -> subprocess.CompletedProcess:
         """`codex [--strict-config] <flags> exec` in a scratch home with stdin closed. At 0.157.1 `codex debug`

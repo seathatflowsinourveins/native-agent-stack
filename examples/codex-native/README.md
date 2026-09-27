@@ -32,3 +32,28 @@ end-to-end run of their own in the dated guide
 (`docs/ultracode-token-routing-20260921.md`); the Codex evidence there is the
 lane C bridge review run from Claude. Qualify a Codex agent per task before
 relying on it.
+
+## 2026-09-27: PR-E instruction refresh
+
+The repository has three custom-agent templates: the two listed above and
+[`semantic-evidence-reviewer`](agents/semantic-evidence-reviewer.toml). That third
+role sets `sandbox_mode = "read-only"`; the earlier inheritance paragraph applies
+to the two roles in the table. PR-E adds the full-save plan's F4 block to all three
+`developer_instructions`: [RTK v0.50.0's awareness text](https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md)
+verbatim, followed by the marked exceptions already in the
+[Codex AGENTS template](../../adoption/templates/codex.AGENTS.template.md).
+The existing role instructions still bound what each agent may do.
+
+Verified at **openai/codex `rust-v0.157.1`**:
+[`agent_role_config.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/agent_role_config.rs)
+parses the role file and validates `developer_instructions`,
+[`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)
+loads declared and discovered roles, and
+[`core/src/agent/role.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs)
+applies their developer instructions as bounded role overrides. These existing
+native templates are the PR-E carrier; no new role or installer is needed.
+[`tests/test_codex_agents.py`](../../tests/test_codex_agents.py) checks the parsed
+developer payload of every template against the existing F4 block and the pinned
+upstream text's SHA-256. This is local template integration evidence, not a new
+spawned-agent run or a measured token saving. See the
+[PR-E decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-pr-e-custom-agents-and-context-hub).
