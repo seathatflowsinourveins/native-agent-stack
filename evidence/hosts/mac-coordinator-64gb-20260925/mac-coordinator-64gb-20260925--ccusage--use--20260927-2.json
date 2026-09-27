@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--ccusage--use--20260927-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "024531521d5acb717960190cbe66f04f83ecbfd7",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "ccusage",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v ccusage) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && ccusage --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" ccusage",
+      "exit": 0,
+      "duration_s": 0.067,
+      "output_sha256": "8a480ca61d0791c521da484bbd295eade0dbf1cc1fdafe105dddf1332d085c8c",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ccusage -> ~/.local/share/codex-ecosystem-staging/tools/ccusage-20.0.24/lib/node_modules/ccusage/src/cli.js\nccusage 20.0.24\nstack ['20.0.24'] winner pins ['20.0.24']\n"
+    },
+    {
+      "cmd": "F=$(mktemp -d) || exit 1\nmkdir -p \"$F/cfg/projects/-tmp-ccusage-fixture-mac\" \"$F/empty/projects\" || exit 1\npython3 -c \"\nimport json,sys\ndef row(i,ts,inp,out,cw,cr):\n    return {'parentUuid':None,'isSidechain':False,'userType':'external','cwd':'/tmp/ccusage-fixture-mac','sessionId':'mcc-ccusage-fixture-session','version':'2.1.278','type':'assistant','uuid':'u'+str(i),'timestamp':ts,'requestId':'req_mcc_'+str(i),'message':{'id':'msg_mcc_'+str(i),'type':'message','role':'assistant','model':'claude-sonnet-4-5-20250929','content':[{'type':'text','text':'fixture'}],'usage':{'input_tokens':inp,'output_tokens':out,'cache_creation_input_tokens':cw,'cache_read_input_tokens':cr}}}\nrows=[row(1,'2026-01-15T10:00:00.000Z',100,20,300,4000),row(2,'2026-01-15T11:00:00.000Z',50,10,0,6000),row(2,'2026-01-15T11:00:00.000Z',50,10,0,6000),row(3,'2026-01-16T09:00:00.000Z',7,3,0,0)]\nopen(sys.argv[1],'w').write(''.join(json.dumps(r,separators=(',',':'))+chr(10) for r in rows))\n\" \"$F/cfg/projects/-tmp-ccusage-fixture-mac/mcc-ccusage-fixture-session.jsonl\"\nrc1=$?\nCLAUDE_CONFIG_DIR=\"$F/cfg\" ccusage claude daily --json --offline --timezone UTC --since 20260101 --until 20260131 > \"$F/daily.json\"\nrc2=$?\nexact_ok=$(python3 -c \"\nimport json,sys\nd=json.load(open(sys.argv[1]));k=('inputTokens','outputTokens','cacheCreationTokens','cacheReadTokens','totalTokens')\ngot={r['date']:tuple(r[x] for x in k) for r in d['daily']};tot=tuple(d['totals'][x] for x in k)\nwant={'2026-01-15':(150,30,300,10000,10480),'2026-01-16':(7,3,0,0,10)};wt=(157,33,300,10000,10490)\nprint('True' if (got==want and tot==wt) else 'False')\n\" \"$F/daily.json\")\nsince_out=$(CLAUDE_CONFIG_DIR=\"$F/cfg\" ccusage claude daily --json --offline --timezone UTC --since 20260116 --until 20260131 | python3 -c \"import json,sys;d=json.load(sys.stdin);r=[(x['date'],x['totalTokens']) for x in d['daily']];print('True' if r==[('2026-01-16',10)] else 'False')\")\nempty_out=$(CLAUDE_CONFIG_DIR=\"$F/empty\" ccusage claude daily --json --offline --timezone UTC | python3 -c \"import json,sys;d=json.load(sys.stdin);print('True' if (not d['daily'] and d['totals']['totalTokens']==0) else 'False')\")\nrm -rf \"$F\"\necho \"SUMMARY fixture_build_rc=$rc1 ccusage_rc=$rc2 exact_match=$exact_ok since_narrows=$since_out empty_dir_zero=$empty_out\"\necho \"fixture per-day/totals equal to hand-computed values with the repeated message counted once: $exact_ok\"\necho \"--since 20260116 keeps only the second day: $since_out\"\necho \"an empty projects directory produces zero rows and zero tokens: $empty_out\"\ntest \"$rc1\" -eq 0 && test \"$rc2\" -eq 0 && test \"$exact_ok\" = \"True\" && test \"$since_out\" = \"True\" && test \"$empty_out\" = \"True\"\n",
+      "exit": 0,
+      "duration_s": 0.195,
+      "output_sha256": "ecb7c32ac9d4017fef8164113b1273509ef1a6f3235f2e6cb8d6b336343bb37d",
+      "output_excerpt": "SUMMARY fixture_build_rc=0 ccusage_rc=0 exact_match=True since_narrows=True empty_dir_zero=True\nfixture per-day/totals equal to hand-computed values with the repeated message counted once: True\n--since 20260116 keeps only the second day: True\nan empty projects directory produces zero rows and zero tokens: True\n"
+    },
+    {
+      "cmd": "t=$(date -u +%Y%m%d); y2=$(date -u -v-2d +%Y%m%d 2>/dev/null || date -u -d '2 days ago' +%Y%m%d); out=$(ccusage claude daily --json --offline --no-cost --timezone UTC --since \"$y2\" --until \"$t\"); ccrc=$?; printf '%s' \"$out\" | python3 -c \"\nimport json, sys\nccrc = int(sys.argv[1])\nd = json.load(sys.stdin)\nrows = d.get('daily', [])\ntotals = d.get('totals', {})\nrow_fields = sorted(rows[0].keys()) if rows else []\ntotals_fields = sorted(totals.keys())\nkeys = ('inputTokens', 'outputTokens', 'cacheCreationTokens', 'cacheReadTokens')\nper_day_ok = all(sum(r.get(k, 0) for k in keys) == r.get('totalTokens') for r in rows)\ngrand_ok = sum(totals.get(k, 0) for k in keys) == totals.get('totalTokens')\nhas_cost = 'totalCost' in totals or any('totalCost' in r for r in rows)\nok = ccrc == 0 and len(rows) >= 1 and per_day_ok and grand_ok and not has_cost\nprint('SUMMARY exit=%d rows=%d per_day_ok=%s grand_ok=%s has_cost=%s' % (ccrc, len(rows), per_day_ok, grand_ok, has_cost))\nprint('row field names (printed, not asserted):', row_fields)\nprint('totals field names (printed, not asserted):', totals_fields)\nsys.exit(0 if ok else 1)\n\" \"$ccrc\"\n",
+      "exit": 0,
+      "duration_s": 0.176,
+      "output_sha256": "59e0e93d3a6d2df2d7732c8056fbab320e795fd5fd7302452c4da939c4d5470c",
+      "output_excerpt": "SUMMARY exit=0 rows=2 per_day_ok=True grand_ok=True has_cost=False\nrow field names (printed, not asserted): ['cacheCreationTokens', 'cacheReadTokens', 'date', 'inputTokens', 'modelBreakdowns', 'modelsUsed', 'outputTokens', 'totalTokens']\ntotals field names (printed, not asserted): ['cacheCreationTokens', 'cacheReadTokens', 'inputTokens', 'outputTokens', 'totalTokens', 'unpricedModels']\n"
+    }
+  ],
+  "tool_versions": {
+    "ccusage": "20.0.24"
+  },
+  "observed_at_utc": "2026-09-27T13:06:49Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), ccusage 20.0.24 (the catalog pin) is exercised two ways. First, a positive control: a four-row synthetic fixture (two UTC days, one message repeated with the same message and request ids, values made up for this receipt, mirroring this repository's other real-log ccusage receipt nativestack-5975wx-20260925) is written in Claude Code's compact JSONL format under a scratch CLAUDE_CONFIG_DIR, and `ccusage claude daily --json --offline --timezone UTC` reports per-day and grand-total input/output/cache-creation/cache-read/total tokens exactly equal to the hand-computed values with the repeated message counted once (asserted); --since keeps only the later day (asserted); an empty projects directory reports zero rows and zero tokens (asserted). Second, the real check (unchanged from generation 1 apart from a summary line): `ccusage claude daily --json --offline --no-cost --timezone UTC` runs over this host's own real Claude Code usage logs (not a fixture) for a 3-calendar-day UTC window, and its own JSON parses: at least one daily row is present, each day's own token-category fields sum to that day's own reported totalTokens and the grand totals sum the same way (asserted, not printed), and --no-cost produces no totalCost field in either place (asserted); the sorted field names present in a daily row and in the totals object are printed for information, not asserted. Token counts, cost figures and which models were used are never printed, retained or asserted anywhere in this receipt: only ccusage's own exit codes, the fixture's known-answer match, the real report's parsed row count, the two field-name lists, and the real report's own internal-consistency booleans are. All commands exit 0 only when every assertion holds; all commands exit 0.",
+  "limitations": [
+    "Supersedes mac-coordinator-64gb-20260925--ccusage--use--20260927 (generation 1, kept unchanged; see its own limitations for the privacy-fix history of two earlier withdrawn recordings at this same host/component/stage/date). Generation 1 already withheld all real-host token/cost/model values, but its only check on the real-host command compares ccusage's own report fields against each other (per-day and grand totals against their own category fields), not against an independently known answer -- a ccusage misread that shifted a token count without breaking that internal arithmetic would still show every generation-1 boolean true. This generation adds a synthetic known-answer fixture as a positive control that would catch such a misread, and also prints a SUMMARY line (exit code and all four booleans) ahead of the verbose field-name dump on the real-host command, so the decision-relevant facts survive the 400-character excerpt cap regardless of how long that dump runs. Generation 1's own real-host command and claim are otherwise unchanged.",
+    "The fixture half is local_integration evidence (an owned synthetic fixture, not this host's real usage) inside a receipt whose overall evidence_class is native_proven because of its real-host half; ccusage 20.0.24 is known to skip the same fixture rows when written with spaces after JSON separators (observed on the Linux precedent), so the fixture is written with compact separators, matching how Claude Code itself writes these logs. The fixture half establishes that ccusage parses and sums a known input correctly; it does not prove that arithmetic generalizes to every real log shape. The real-host half asserts presence and internal consistency of the real data, not independently known totals -- that gap is why the fixture half exists.",
+    "ccusage aggregates this host's local JSONL log files under the Claude config directory; it is not a provider billing API, and the token values used internally by the real-host assertions (never printed) are read from the logs Claude Code itself wrote, not an independent measurement.",
+    "Recorded from a Claude Code session in this branch's worktree; ccusage is this host's existing ecosystem-bin install, resolved as the first command shows. No macOS ccusage receipt from this branch is published beyond this component's two generations (this one and the generation-1 file it supersedes).",
+    "second_physical_machine is declared, not independently proven by this file. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T13:06:49Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency"
+    }
+  ],
+  "supersedes": "mac-coordinator-64gb-20260925--ccusage--use--20260927"
+}
