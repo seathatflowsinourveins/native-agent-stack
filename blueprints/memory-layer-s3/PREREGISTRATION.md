@@ -1,6 +1,16 @@
-# Memory layer S3: head-to-head preregistration (DRAFT r3, 2026-09-27)
+# Memory layer S3: head-to-head preregistration (DRAFT r4, 2026-09-27)
 
-**Status: DRAFT r3, not frozen.**
+**Status: DRAFT r4, not frozen.**
+- r4 governs the memory decision on both hosts and proposes that the unwritten A17 plan (the workstation's confirmatory R1 under A1–A16.3) is superseded, not run (section 12, with the amendment file `blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md`). Other r4 changes:
+  - reference feasibility on v2.4.0 is established from source (section 1);
+  - the arms are defined from the v4 driver (#386), and the harness is v4-based with a new isolated runner (section 3);
+  - agentmemory's primary arm is its shipped hook path (section 2);
+  - a late-candidate rule is added (section 2);
+  - the Mac production diagnostic arm is added (section 1);
+  - the cache proxy's omission is preregistered (section 3);
+  - there is a GPU window and a Mac Hindsight status (section 5).
+
+  The user confirms the supersession at the freeze.
 - r2 (sha256 `8c99d974…`) received GPT-6 `needs_changes`. It resolved 9 of r1's 11 findings, left 2 partly resolved (statistics specifics, token ledgers), and raised 4 new ones (1 high, 3 medium). r3 applies GPT-6's replacement text for all six; see section 11.
 - The next GPT-6 review is the bundle review of section 9.
 - r1 (sha256 `623efad9…`) received GPT-6 `needs_changes` (6 high, 4 medium, 1 low). This revision answers every finding; section 10 maps each one.
@@ -23,12 +33,26 @@ The user decided on 2026-09-27 that the memory layer is chosen on merit and the 
   - **C4′:** the same, with ai-memory's LLM reranker.
   - The reference arm is **C4′**, ai-memory's claimed production configuration. **C3′** is a diagnostic ablation outside the decision family.
   - If C4′ cannot run, the reference arm is C3′ and C4′ is reported `pending`.
+  - **Definitions (r4).** C3′ and C4′ are the A-protocol's C3 and C4 configurations run on the official v2.4.0 binary.
+    - **C3′:** Qwen3-Embedding-4B (`qwen3-embedding:4b`) with the production query prefix, reranker off.
+    - **C4′:** C3′ plus `AI_MEMORY_RERANKER=llm` through the openai-compat provider, model `qwen3.5-9b-64k`, reasoning `low`, 3 workers.
+    - Sources: `blueprints/memory-stack/longmemeval/v4/lme_harness.py:1562-1567,1575`, v4 `PREREGISTRATION.md:46-47,221-233,289-300`.
+    - More than 5% rerank fallbacks makes a C4′ result inconclusive (v4 `PREREGISTRATION.md:231-233`).
+  - **Feasibility on v2.4.0, from source (r4).** Official v2.4.0 (tag object `5c4350e3`) ships the LLM reranker.
+    - `crates/ai-memory-cli/src/config.rs:413-420,1744-1759` parses and validates `AI_MEMORY_RERANKER=llm`.
+    - `crates/ai-memory-llm/src/reranker.rs` implements `LlmReranker`.
+    - `docs/llm-providers.md:185-192` documents the behaviour.
+    - The v2.4.0 docs name no specific reranker model, only "a small, fast model" (`docs/llm-providers.md:136-147`), so the reranker model stays the preregistered production one:
+      - the base is `qwen3.5:9b` Q4_K_M, pinned by manifest and GGUF digest (v4 `pins.json:141-147`);
+      - the v4 Modelfile is sha256 `60dbf344…`. It says `FROM qwen3.5:9b`, a mutable tag, with no template.
+      - The runner therefore verifies the exact base, records the effective template and parameters, and hashes the served blob bytes.
+  - **Lineage (r4).** The Mac's production build `19b6429` is 46 commits ahead of v2.4.1 and 62 behind it; v2.4.0 is its ancestor (the Mac's 2026-09-27 lineage check). The official v2.4.0 reference is therefore code that production's line descends from, not a divergent build.
   - The historical Mac C3 (0.570) ran on a 2.5-pre build `19b6429` (`evidence/artifacts/memory-stack-20260925/experiment.json`). It is descriptive only and is not this reference.
 - **Deployed (descriptive only):**
   - workstation: ai-memory 2.4.1;
-  - Mac: the agent-ecosystem ai-memory service, a 19b6429 build that reports 2.4.0.
+  - Mac: **D-mac-prod (r4)**, the Mac's production build `19b6429` in a C4-shaped configuration: production's Ollama `qwen3-embedding:4b` embedder and `qwen3.5-9b-64k` reranker. The Mac session asked for it because it is what actually runs there and carries 46 commits the reference lacks.
 
-  Measured as descriptive arms; not in the decision family.
+  Measured as labelled diagnostic arms; not in the decision family.
 - **Eligibility applies to every configuration, the reference included** (section 7). The reference gains no advantage from its role, and "retention" never means qualification.
 
 ## 2. Candidates, controls and reserves (frozen identities)
@@ -44,6 +68,22 @@ The user decided on 2026-09-27 that the memory layer is chosen on merit and the 
 | [MemPalace/mempalace](https://github.com/MemPalace/mempalace) | v3.10.0 |
 | [basicmachines-co/basic-memory](https://github.com/basicmachines-co/basic-memory) | v0.23.2 |
 | [zilliztech/memsearch](https://github.com/zilliztech/memsearch) | v0.4.21 |
+
+**agentmemory's primary arm (r4)** is its shipped Claude Code hook path, the A-protocol's D2h shape (`am-minilm-hooks`: v4 `lme_harness.py:759-784,1618-1619`; v4 `PREREGISTRATION.md:456-459,497-498`). Sessions are ingested through the plugin's shipped hook sequence, not a direct import. The pins are:
+- agentmemory 0.9.29 at `2d38dafe`;
+- iii 0.11.2, Linux asset `9c83c477…`;
+- Node 24.21.0;
+- Xenova MiniLM q8 at `751bff37`, ONNX `afdb6f1a…`, staged by v4 `lane_tools.py` `install_minilm`.
+
+All four are in v4 `pins.json:36-39,70-77,89-93,1072-1100`. On macOS the runner records its own platform assets.
+
+**Discovery inputs (r4).** The Mac session's five model and repository sweeps (embedders, rerankers, memory LLMs, generation models and memory systems), each Opus-verified and dated 2026-09-27, are committed under `inputs/` with sources and dates. Each is marked vendor-reported or measured. Vendor-reported scores, such as AA-LCR v1.1 and MemReranker's self-reported LongMemEval, are motivation for the candidate list only (section 8), never S3 evidence.
+
+**Late candidates (r4).** The 32-layer landscape sweep is held for the user's Gates A and B, so this preregistration does not wait for its durable-memory survivors. Any later survivor, or any other dated discovery, is handled like a reserve admitted after confirmatory execution (section 6):
+- it is exploratory until a separately frozen, dated amendment arm names it before its first run;
+- it uses the same reference, lanes, thresholds and decision rule;
+- it can change a host's selection only through that amendment's own frozen comparison;
+- it never edits this text.
 
 **Native no-external-memory controls, both clients:**
 - **Claude Code auto memory** at 2.1.283, isolated with `--settings autoMemoryDirectory`. `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` gives the no-memory control.
@@ -81,6 +121,19 @@ Also pending from the 2026-09-26 sweep, where only a missing vote refuted them: 
   - A system whose output cannot be mapped to source sessions gets retrieval `N/A`, never a constructed score.
 - **Scorer:** upstream [`eval_utils.py` @9e0b455f](https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/retrieval/eval_utils.py), unchanged, run in a pinned environment.
 - **Dependence:** questions share evidence histories (465 gold-session clusters, 5 of them non-singleton), so resampling is by cluster (section 6). Some questions have up to 6 gold sessions, so a perfect `recall_all@5` is unattainable for them; this is reported, not corrected.
+- **Harness and runner (r4).**
+  - **Base.** The arms' adapter logic comes from the v4 driver (#386, `blueprints/memory-stack/longmemeval/v4/`), where C4 and D2h exist; v3 (#380) has neither. v4's files stay frozen and are never run on a shared host (v4 `README.md:21-24,86-93`). S3's runner is **new code**, and every change lands in new files.
+  - **Isolation**, which the runner must implement before any scored run (the requirements come from the GPT-6 reviews on #386):
+    - owned ports, stores, homes and caches, with lane-owned `HOME` and `HF_HOME`;
+    - server readiness that checks identity;
+    - process and process-group identity (pid, start ticks, boot id, executable) checked before any signal;
+    - fail closed on an occupied port or unreadable identity;
+    - `env -i` for vendor harnesses;
+    - production services and stores are never touched. On the workstation that includes ai-memory on 127.0.0.1:49474.
+  - **Embedding-cache proxy: omitted, preregistered (r4).** v4's A16.3 says the cache gives no reuse between arms, because ai-memory writes wall-clock timestamps into session pages, and stays "only for byte-identical repeats, such as infra retries", with no arm ever cache-only (v4 `PREREGISTRATION.md:566-573`). So neither the v4 proxy (sha256 `e08e11f8…`) nor #380's is used.
+    - Omitting it means only that a byte-identical repeat is recomputed rather than served from the cache.
+    - Each run records its embedding server's runtime and device, so a recomputation difference stays attributable.
+  - **Private inputs.** S3 needs only the reranker Modelfile, which has been public since #386, and its base pin. v4's other Modelfiles, `embed_gates.json` and the v3-check ids gate v4's own driver, which S3 does not run. The runner writes and freezes its own gates in the bundle.
 
 ## 4. Lanes
 
@@ -145,6 +198,13 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 - **Order of acceptance testing on each host:** by primary-lane point estimate, descending. Continue while any untested eligible configuration could still change that host's selection.
 - **Cross-host differences** are a diagnostic, not a gate.
 - **CUDA timing, VRAM behaviour, model-serving compatibility and lifecycle acceptance do not transfer to macOS**, and Mac results do not transfer back.
+- **Workstation GPU window (r4).** The workstation's arms need the GPU. It is held by production vLLM embeddings on 127.0.0.1:18231 and llama.cpp generation on 127.0.0.1:18232. The runs therefore need a drained-GPU window, a scheduled production stop and restore that the user approves. The runner never stops a production unit itself.
+- **Per-host qualification (r4).** Before its confirmatory run, each host records:
+  - RSS, latency and co-residency of every serving model;
+  - the reference reranker's latency against ai-memory's reranker timeout, since timeouts become fallbacks and more than 5% fallbacks makes C4′ inconclusive.
+
+  The Mac's numbers come from its #379 PR.
+- **Mac Hindsight (r4).** Hindsight 0.10.1 installs on the Mac but cannot start. Its `pg0-embedded` 0.15.2 Postgres is linked to Homebrew OpenSSL, and the Mac has no Homebrew. Relinking would modify the upstream artifact, so it is not a faithful arm. The macOS profile's own Postgres choice, Apple Container, needs the owner's sudo install. Until the user decides, the Mac's Hindsight arm is `pending`, not `refuted`.
 
 ## 6. Statistics (frozen before any confirmatory run)
 
@@ -165,6 +225,7 @@ Each host selects and qualifies **separately**, against **its own** measured ref
   - Reserves admitted after confirmatory execution are exploratory until a separately frozen comparison.
 - **Outside the family:** C3′, the deployed arms, controls, the common-embedder diagnostics, the official track and `ndcg_any@5`.
 - **Missing results:** a missing arm or lane result is `pending` and is not imputed.
+- **Governing statistics (r4):** these statistics govern S3 on both hosts. The A-protocol's family α values (0.0333, 0.0167), its +5 pp/−2 pp rule and its one-look-per-family rule do not transfer (section 12).
 
 ## 7. Decision rule (per host)
 
@@ -205,14 +266,15 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 
 1. Build the experiment bundle:
    - this document;
-   - the source inputs (the GPT-6 landscape and prompt committed under `inputs/` with sha256);
+   - the source inputs committed under `inputs/` with sha256: the GPT-6 landscape and prompt, and the Mac's 2026-09-27 model and repository sweeps (r4);
    - the dataset hash and question manifests;
-   - the harness v3 (#380) and every adapter;
+   - the v4 driver (#386) as the frozen adapter source, the S3 runner (new code, section 3), its frozen gates and every adapter (r4, replacing "the harness v3 (#380)");
+   - the A17 supersession amendment (section 12);
    - the analysis code;
    - client and plugin versions;
    - the model weights and quantizations (Qwen3-8B Q4_K_M and every embedder);
    - prompts, seeds, fixtures and configurations.
-2. Verify that every referenced file and link exists; the decision record resolves once #383 merges.
+2. Verify that every referenced file and link exists (the decision record merged with #383).
 3. Get a GPT-6 cross-family review of the **bundle**. Freeze only on `accept`, after every required finding is resolved.
 4. Record the immutable commit and the bundle's sha256 list outside the worktree, then run.
 5. Keep per-case outputs, failures and each arm's actual execution status.
@@ -243,3 +305,11 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 | new medium 2: non-inferiority escapes Holm | §6: per-host family holds both hypotheses; Holm at α 0.05 |
 | new medium 3: payload fallback changes the winner | §4.2: payload counts support only a payload-size claim; incomplete ledger means `pending` |
 | new high 4: superiority bypasses usefulness | §7: usefulness floor before either route |
+
+## 12. Relationship to the A1–A16.3 protocol and A17 (r4, proposed)
+
+- **What A17 was.** VelaNext was retired, so the confirmatory rerun R1 of the frozen memory-stack protocol (A1–A16.3, v3 #380 and v4 #386) needed another host and a new amendment naming it before any run (`docs/decisions/2026-09-25-retire-vela-velanext.md:36-44`). The workstation took R1 as "A17" (`docs/decisions/2026-09-25-workstation-sota-refresh.md:542-546`; issue #274). No A17 text was ever written, and no session holds a draft (checked 2026-09-27).
+- **Why S3 supersedes it without spending a look.** No confirmatory arm of A1–A16.3 has ever run on any host: no C3′, C4′, C4 or D2h result exists (`retire-vela-velanext.md:43-44`; `catalogs/foundation/memory-stack-20260925.json:1318`; `docs/decisions/2026-09-27-mac-single-writer-staged.md:48`). Retiring R1 in favour of S3 therefore consumes no confirmatory look and selects nothing after seeing results.
+- **What carries over.** The user's 2026-09-25 choice of official ai-memory v2.4.0 as the control (issue #274; `workstation-sota-refresh.md:228`) becomes S3's reference, and the A-protocol's C3/C4/D2h configurations become S3's C3′, C4′ and agentmemory arm (sections 1 and 2). The historical Mac C3 on `19b6429` stays descriptive.
+- **What does not carry over.** The A-protocol's statistics and decision rules (section 6), its v4 = v3 reproduction gate and its VelaNext-only drivers. S3's own gates, runner and statistics replace them.
+- **The amendment.** `blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md` records this as a dated amendment in the protocol's own lineage, a new file, since frozen text is never edited. It is **proposed**. It takes effect only when the user confirms it at the S3 freeze (section 9). Until then nothing runs under either protocol.
