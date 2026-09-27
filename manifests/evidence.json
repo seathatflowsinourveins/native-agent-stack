@@ -13708,8 +13708,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "30c6a0769637d7bde5d7f066aa557b10fd6c571a4bc47ac95ac206d6d660bea9",
-      "bytes": 29153
+      "sha256": "074e054a5fd931680bd50be81d436f21eff6233357dbaa75c3627958c079b515",
+      "bytes": 29169
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -38478,8 +38478,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "2ce3f4105d76247e62fb0fd740bf12a544f90d77da63a6671f295555225b652b",
-      "bytes": 147126
+      "sha256": "882676248a11e1f144dd72d3eda28cd00da85f7a009c7867d03854713710040c",
+      "bytes": 148106
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -39018,8 +39018,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/templates.json",
-      "sha256": "f67a0197a97fb4095ea87fad708412c12e32a1763cbd295bba5c6dc1bdcca7c3",
-      "bytes": 9156
+      "sha256": "7b7ccf702ef9c5ff477efa66a0efac02315593b8beb8572b189b086dc776fbb5",
+      "bytes": 9676
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",

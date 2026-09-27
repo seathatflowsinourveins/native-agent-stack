@@ -42,7 +42,7 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it.
 # 2026-09-27: the maintenance rule follows the OpenSSF Scorecard Maintained check, and licenses are information only
 # (never a refutation reason), per the operator's 2026-09-26/27 decisions.
-PROMPTS_SHA256_CURRENT = "dc5ffcb6c58fb5de13adcf1f2ccac84b0f051a821ce89638ce8b566ebe938953"
+PROMPTS_SHA256_CURRENT = "0e4435853c80a29eca8a699a2449a095dfb0efd39ca9c89eba0cefd530a54367"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -248,10 +248,23 @@ class TemplateTests(unittest.TestCase):
 
     def test_templates_never_refute_on_license_and_name_the_maintenance_rule(self):
         templates = json.loads((HARNESS / "templates.json").read_text())
-        self.assertIn("OpenSSF Scorecard Maintained check", templates["common"])
-        self.assertIn("never a reason to exclude, refute or rank down", templates["common"])
-        self.assertNotIn("license is non-commercial", templates["fit"])
-        self.assertIn("it is stale under the selection principles' maintenance rule", templates["fit"])
+        common, fit = templates["common"], templates["fit"]
+        # Licenses: information only, in the selection principles and in the merit criteria every role receives.
+        self.assertIn("never a reason to exclude, refute or rank down", common)
+        self.assertIn("and platform fit (license is information only)", common)
+        self.assertNotIn("license and platform fit", common)
+        self.assertNotIn("OSI or clearly usable license", common)
+        self.assertNotIn("license is non-commercial", fit)
+        # No role other than the facts refuter's accuracy check may treat a license as a criterion.
+        for key, text in templates.items():
+            for phrase in ("license is non-commercial", "restrictive license", "unclear license", "usable license"):
+                self.assertNotIn(phrase, text, f"{key} still uses a license as a criterion: {phrase!r}")
+        # Maintenance: derived from the Scorecard check, with its evidence command and a flag destination.
+        self.assertIn("derived from the OpenSSF Scorecard Maintained check", common)
+        self.assertIn("commits?since=", common)
+        self.assertIn("not from pushed_at", common)
+        self.assertIn("TOO NEW TO ASSESS (<90 days)", common)
+        self.assertIn("it is stale under the selection principles' maintenance rule", fit)
 
     def test_only_per_call_placeholders_remain_after_filling(self):
         frozen = filled_templates()
