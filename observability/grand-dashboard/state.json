@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-26T18:18:50Z",
+  "recorded_at_utc": "2026-09-27T08:08:45Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -282,8 +282,8 @@
       "kind": "gate",
       "id": "token-stack-subagent-e2e",
       "title": "Token stack inside Ultracode subagents",
-      "state": "16 of 16 tools used in Sonnet workflow subagents with passing checks / RTK +56527 run-only / Headroom +183904 lifetime / Codex workers blocked until 2026-09-30",
-      "evidence_ref": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json"
+      "state": "16 exercised / QMD + Repomix passes retracted / failing controls not recorded / Codex run 11 of 15 pass 09-26 / 18 tool cards with GPT-6 verdicts 09-27",
+      "evidence_ref": "evidence/artifacts/token-stack-cards-20260927/README.md"
     },
     {
       "kind": "gate",

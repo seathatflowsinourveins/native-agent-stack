@@ -13753,8 +13753,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "de95e0e075204efe5ade37aa11daad625035b3a2747eb89f1c2aec5ab61cdb55",
-      "bytes": 103223
+      "sha256": "28c2f6869b5a32ab33b65394dbc327e9c1f9fba81ad125183a6cb28b123a6a3f",
+      "bytes": 112446
     },
     {
       "path": "docs/evidence.md",
@@ -14058,13 +14058,13 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "9de4a4b5f23658a49a32dd8d95ffe51eb0011691665a713d58273b904e76c020",
-      "bytes": 158486
+      "sha256": "3f6534c24fab49ce1cbb29aa62c4f2c7bde1562833f1baa277080e1db4cb5b97",
+      "bytes": 651855
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "46f159dc2712d95665db4b449a737bea0fc5a12c2453b5ecb098ade39d71d3d5",
-      "bytes": 32798
+      "sha256": "b271c2e75cceb229f0ff62ad269317d7f460ea92dccfb2394166922eb907f321",
+      "bytes": 34840
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -35762,6 +35762,131 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
+      "sha256": "e6c34af34b9d57fb256c9a8ec15668f33017cf29f5e56b1a21fd854398c848f6",
+      "bytes": 20470
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/agentsview.json",
+      "sha256": "ef29ba61eef7cf8fc1d2cd76a57eca24bf289c91252de9c8b4106febdb8656ba",
+      "bytes": 43291
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ai-memory.json",
+      "sha256": "a1578299aa6d0e3ea8258f67983bc2e26c5157befdff1d07261b9e432b0ed35b",
+      "bytes": 54767
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ast-grep.json",
+      "sha256": "eb82d130fa5223f03c354be42dc91d58d5c582ecdf286da30aaa172036be4d4e",
+      "bytes": 38630
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ccusage.json",
+      "sha256": "b04607216e6dece094f8604973621162705b3ff7c6386371da7062c6b9583fa5",
+      "bytes": 39845
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/codebase-memory-mcp.json",
+      "sha256": "559d0bf7e49a2c889c834f1f0180af9b33d2c84e4b6e5e3a89aa01a226e0fac5",
+      "bytes": 53468
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-hub.json",
+      "sha256": "6537a5394e107f4692c1b885949237e7b545a734cf36c4a5382650ad352c88be",
+      "bytes": 35523
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-mode.json",
+      "sha256": "74c90b6762def8d08a65a1fc614a99eccab774f11dc52872649d95d414c6da2b",
+      "bytes": 45326
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/gpt-tokenizer.json",
+      "sha256": "b1713d3e62681d6aaf018b332fe02bbb449cb5bbfc9232b0633fdc8909b401d2",
+      "bytes": 43658
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/headroom.json",
+      "sha256": "acb1721a7f39ea5e3f89cf1a15a765d25c5cb75455ec52739cad6925deaf5c07",
+      "bytes": 47916
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/index.json",
+      "sha256": "67320a754131ac05d0c88596f82bb3aa0a9480f3e386eac919767c3d912284c5",
+      "bytes": 2952
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/jcodemunch-mcp.json",
+      "sha256": "d9d51922f8500eff7d08c3cde6137b0a6b6d9166f08be676394c990bca9dd7ab",
+      "bytes": 46443
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/markitdown.json",
+      "sha256": "f923ec4c604273774c1fa0498d5c35e90b7c0fcafcdfa8a23eef994d6ec656db",
+      "bytes": 38893
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/mcporter.json",
+      "sha256": "ee47a5acb6f5a9a1e18f31f356f8be69d07a5193ebbe8f9cf87db48ae6982b51",
+      "bytes": 41428
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/qmd.json",
+      "sha256": "80876917f4ffa2be2c0406fa5743ae3f381a0cce05e7ff4b73c87565ee285f6b",
+      "bytes": 51804
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/repomix.json",
+      "sha256": "bdac44102896949cb67f297926e6097717a157113a561e325ef0223d0eb7864a",
+      "bytes": 39783
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/rtk.json",
+      "sha256": "5350af07e98d186c2db62aecd2214104090d8e4d57480af522472376097ca9f0",
+      "bytes": 48257
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/serena.json",
+      "sha256": "6346186f6d695dbcd284ab7b9572009c1ba92af55dbf8da02d83526fc5820b06",
+      "bytes": 41441
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/socraticode.json",
+      "sha256": "27ebd9957acdb12c319e58a27cff80f6ff3ce4cf59bfde8e50481e20a86b4e60",
+      "bytes": 49270
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/toon.json",
+      "sha256": "ab5703fed150da4f3ae9574f8df071e46cd4f3293f4f28fce0240f9907e6576f",
+      "bytes": 41824
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/groups/final-verdict-evidence.json",
+      "sha256": "152edd399928ecb437e873e3c0c7dfa55afafd118b82d18db58c59c8ded7b369",
+      "bytes": 7058
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/groups/g5-g6-verification.json",
+      "sha256": "445e0f2c521ba8d85996d43d8e4c287c9663f489eb7c6c52ab0397ba12714f2a",
+      "bytes": 9269
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/groups/verdict-evidence.json",
+      "sha256": "0612d365d52c388ba44372ba40a21f16c933aa15b2d979b737784dae2ef2eae9",
+      "bytes": 6804
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/invoke_by_tool.json",
+      "sha256": "50fb0b39470c508c1d9f2d3761328aac45987f7bd1a338666906f22b0f08060e",
+      "bytes": 19412
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/project_topic.py",
+      "sha256": "21b5adc35e8ffa845fdf2d0f8ffe08986d5d89fe9787c7eaa9f4294a9b8c0bd4",
+      "bytes": 9248
+    },
+    {
       "path": "evidence/artifacts/token-workflow-hardening-20260926/README.md",
       "sha256": "9a7cffe2d1b60650995a8de94507b8b7aa38e373b69e547728d937f300677a31",
       "bytes": 12122
@@ -38158,8 +38283,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "385f8b39aa1b1d3295c5233ad48795f913d412871bf14c926f15d93b03a04f81",
-      "bytes": 15507
+      "sha256": "d0c10312e33f0e46ac92f6e2ddf88cf4b5abde57fa94094d29084c221a9c28a0",
+      "bytes": 15494
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -38278,8 +38403,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "0a84a2c596512eac0f7e470cd287b9dcbea2c0c2998e14e0f98a2f71160fd150",
-      "bytes": 49805
+      "sha256": "e67cd3f30ac20be51bfa4ead1ad981a6a9d53921f34d5915805a9a1e2257f830",
+      "bytes": 52557
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -38833,8 +38958,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "9468971db76fab5c185d1710f4d19e06d1b2a2c80121c65dc916023579cafdfd",
-      "bytes": 58693
+      "sha256": "ae57a3879310f34741128d124a582277a548fc8e32b560c0c4a9250b7133d083",
+      "bytes": 72792
     },
     {
       "path": "tests/test_effort_default_guard.py",
