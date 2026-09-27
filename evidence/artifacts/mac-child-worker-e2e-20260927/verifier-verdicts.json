@@ -2,6 +2,7 @@
   "run": "readiness-audit workflow verify phase (issue #276 step 5 Mac child/worker E2E)",
   "verifier": "claude-opus-5-5",
   "claim_source_note": "issue-382.md and issue-276.md are this run's own synthetic input documents (copies of GitHub issue bodies used to exercise the workflow), not files tracked in this repository. docs/token-session-handbook.md is a repository path. commands-4 sources are read-only commands the workflow ran, not files.",
+  "id_note": "ids (c01..c88) are positional indices into the verifier's own returned verdicts array for this run, assigned when this file was built; the raw verify-phase output carried no per-claim id of its own. packet groups the 30/16/24/18 claims contiguously by reader packet (docs-1/docs-2/docs-3/commands-4), confirmed against the claim text at each boundary.",
   "tally": {
     "confirmed": 83,
     "corrected": 4,
