@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/bytedance/deer-flow",
+  "tag": "v2.1.0",
+  "tag_object": "f6e747be2486d3f75b0d66a8b17d8fb0ffd5f8ce",
+  "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+  "archive": {
+    "url": "https://codeload.github.com/bytedance/deer-flow/tar.gz/345f08be00c8a9495079b732a39b46aa9af1584e",
+    "sha256": "de309ec407d0b5b9ef1855a2cdcd97d9a9c2c95d0b0029cde6c79b9212518ffe",
+    "bytes": 26278334
+  },
+  "lockfiles": {
+    "backend/uv.lock": "3cc643cd34374384c62de7fd8cef49cc4608df01ea11eff85daeea51f5cf0d5f",
+    "frontend/pnpm-lock.yaml": "cee8007d2e1b10eb84c853971130cbb8ba5e0893fd0c0a381f840e77b6a2ed5b"
+  },
+  "images": {
+    "gateway": "ghcr.io/bytedance/deer-flow-backend@sha256:68426f84f06f91a44f61c9620c9badffec162133615d351f1d40db0982a753e6",
+    "frontend": "ghcr.io/bytedance/deer-flow-frontend@sha256:2f10108592ddb2f93ff5c62f670e010cd4123c4e93eed6bc0ce5fd2bf426f0db",
+    "redis": "redis@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499",
+    "nginx": "nginx@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2"
+  },
+  "image_provenance": {
+    "measured_at": "2026-09-27",
+    "method": "Registry manifest bytes SHA256 matched Docker-Content-Digest; no layer pulls. Backend/frontend image config OCI revision matched commit. Redis/nginx are dated resolutions of upstream Compose tags, not version-tag lockfiles.",
+    "platform": "linux/amd64",
+    "attestations_verified": false
+  },
+  "header_reference": {
+    "package": "langchain-openai",
+    "version": "1.2.1",
+    "sdist_sha256": "ee4480b787706361b7125fad46930589a624df87aa158c6986ef1fad10d10675",
+    "url": "https://files.pythonhosted.org/packages/9a/0e/d8e16c28aa67106d285e63b8ffc04c5af68341e345ce24a0751dbf2e167e/langchain_openai-1.2.1.tar.gz",
+    "file": "langchain_openai/chat_models/base.py",
+    "lines": "783, 1385-1411, 1683-1712, 3327-3345"
+  }
+}

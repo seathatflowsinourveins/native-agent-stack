@@ -1,0 +1,160 @@
+{
+  "models": [
+    {
+      "name": "worker",
+      "display_name": "OmniRoute worker",
+      "use": "gateway_model:ChatOpenAI",
+      "model": "$DEERFLOW_MODEL",
+      "base_url": "http://127.0.0.1:20128/v1",
+      "api_key": "local-loopback",
+      "use_responses_api": true,
+      "use_previous_response_id": false,
+      "output_version": "responses/v1",
+      "streaming": true,
+      "stream_usage": true,
+      "supports_reasoning_effort": false,
+      "max_retries": 2,
+      "timeout": 180,
+      "supports_thinking": true
+    }
+  ],
+  "tools": [
+    {
+      "name": "ls",
+      "group": "file:read",
+      "use": "deerflow.sandbox.tools:ls_tool"
+    },
+    {
+      "name": "read_file",
+      "group": "file:read",
+      "use": "deerflow.sandbox.tools:read_file_tool"
+    },
+    {
+      "name": "glob",
+      "group": "file:read",
+      "use": "deerflow.sandbox.tools:glob_tool"
+    },
+    {
+      "name": "grep",
+      "group": "file:read",
+      "use": "deerflow.sandbox.tools:grep_tool"
+    },
+    {
+      "name": "write_file",
+      "group": "file:write",
+      "use": "deerflow.sandbox.tools:write_file_tool"
+    },
+    {
+      "name": "str_replace",
+      "group": "file:write",
+      "use": "deerflow.sandbox.tools:str_replace_tool"
+    },
+    {
+      "name": "bash",
+      "group": "bash",
+      "use": "deerflow.sandbox.tools:bash_tool"
+    }
+  ],
+  "tool_groups": [
+    {
+      "name": "file:read"
+    },
+    {
+      "name": "file:write"
+    },
+    {
+      "name": "bash"
+    }
+  ],
+  "sandbox": {
+    "use": "deerflow.sandbox.local:LocalSandboxProvider",
+    "allow_host_bash": true,
+    "bash_output_max_chars": 20000,
+    "read_file_output_max_chars": 50000,
+    "ls_output_max_chars": 20000,
+    "mounts": [
+      {
+        "host_path": "/work",
+        "container_path": "/work",
+        "read_only": false
+      }
+    ],
+    "bash_command_timeout": 120
+  },
+  "summarization": {
+    "enabled": true,
+    "model_name": "worker",
+    "trigger": [
+      {
+        "type": "tokens",
+        "value": 24000
+      },
+      {
+        "type": "messages",
+        "value": 50
+      }
+    ],
+    "keep": {
+      "type": "messages",
+      "value": 20
+    },
+    "trim_tokens_to_summarize": 12000
+  },
+  "tool_output": {
+    "enabled": true,
+    "externalize_min_chars": 12000,
+    "preview_head_chars": 2000,
+    "preview_tail_chars": 1000,
+    "fallback_max_chars": 16000,
+    "fallback_head_chars": 8000,
+    "fallback_tail_chars": 3000,
+    "elide_superseded_writes": true
+  },
+  "token_budget": {
+    "enabled": true,
+    "max_tokens": 250000,
+    "warn_threshold": 0.8,
+    "hard_stop_threshold": 1
+  },
+  "tool_search": {
+    "enabled": true,
+    "auto_promote_top_k": 2
+  },
+  "skills": {
+    "path": "/skills",
+    "container_path": "/mnt/skills",
+    "deferred_discovery": true
+  },
+  "subagent_runtime": {
+    "max_running": 2,
+    "max_queued": 2,
+    "admission_policy": "reject",
+    "queue_timeout_seconds": 120
+  },
+  "subagents": {
+    "max_total_per_run": 2,
+    "max_turns": 30,
+    "timeout_seconds": 900,
+    "token_budget": {
+      "enabled": true,
+      "max_tokens": 125000,
+      "warn_threshold": 0.8
+    }
+  },
+  "authorization": {
+    "enabled": true,
+    "fail_closed": true,
+    "default_role": "worker",
+    "provider": {
+      "use": "worker_policy:WorkerAuthorization",
+      "config": {}
+    }
+  },
+  "memory": {
+    "enabled": false
+  },
+  "database": {
+    "backend": "sqlite",
+    "sqlite_dir": "$DEERFLOW_SQLITE_DIR"
+  }
+}

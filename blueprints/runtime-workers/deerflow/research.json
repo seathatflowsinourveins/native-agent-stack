@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "scope": "Recipe construction and offline integration checks only; lane:foundation; no host installation, image layer pull, service start, live DB access or model invocation.",
+  "selection": {
+    "repository": "https://github.com/bytedance/deer-flow",
+    "tag": "v2.1.0",
+    "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "reason": "User-selected maintained upstream orchestration runtime; native task delegation, embedded client, production Compose topology, SKILL.md discovery and context controls are present at this revision. No measured superiority or adoption claim is made.",
+    "artifact_record": "pins.json"
+  },
+  "research_workflow": {
+    "skills_applied": [
+      "search-first",
+      "find-skills",
+      "tdd",
+      "modern-python",
+      "verification-before-completion"
+    ],
+    "research_delegation": "Read-only researcher reviewed primary sources; coordinator independently checked critical source, image metadata and configuration claims. No additional writing worktree or worker was created.",
+    "discovery": "Installed skill catalog and skills registry used as leads; upstream skills/public/claude-to-deerflow/SKILL.md verified at the selected commit. Existing adopted skills remain the selection; no skill was installed.",
+    "capability_check_order": [
+      "Installed runtime: intentionally not installed or executed under the recipe-only scope; native acceptance remains pending.",
+      "Release tag and release notes: v2.1.0 resolved through GitHub metadata.",
+      "Pinned source: verified codeload bytes, lockfiles, configuration classes, supported extension seams and native execution/test commands.",
+      "Official documentation: pinned README and backend docs, QMD source, SQLite/Python documentation."
+    ],
+    "retrieval": "Web content fetched/indexed with Context Mode and queried in its index; large source extraction printed derived answers only. Known-source local reads used the verified archive.",
+    "retrieval_limitations": [
+      "A shell network attempt failed DNS; Context Mode retrieval was available.",
+      "One release-API retrieval returned 403; researcher used gh API fallback.",
+      "No native runtime diagnostic was attempted; absence statements are scoped to inspected source."
+    ]
+  },
+  "sources": {
+    "release": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+    "installation": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/README.md#L283-L299",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/README.md#L377-L424",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/README.md#L500-L528",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/Makefile#L94-L101",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/scripts/deploy.sh",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/docker/docker-compose.yaml#L27-L162",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/.github/workflows/container.yaml#L15-L114",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/Dockerfile#L61-L74",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/frontend/Dockerfile#L10-L40"
+    ],
+    "sandbox": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/sandbox/local/local_sandbox_provider.py#L36-L70",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/config.example.yaml#L1436-L1472",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/docker/docker-compose.dood.yaml#L1-L26",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/community/aio_sandbox/aio_sandbox_provider.py#L253-L284",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/community/opensandbox/README.md#L7-L40"
+    ],
+    "configuration": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/models/factory.py#L208-L345",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/summarization_config.py#L55-L94",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/tool_output_config.py#L12-L118",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/token_budget_config.py#L6-L20",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/subagents_config.py#L74-L174",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/subagent_runtime_config.py#L8-L36",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/skills_config.py#L18-L39",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/database_config.py#L259-L268",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/tracing_config.py#L143-L169",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/app/gateway/auth/config.py#L35-L80",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/frontend/src/core/auth/gateway-config.ts#L16-L35"
+    ],
+    "mcp_policy": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/extensions_config.py#L206-L252",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/mcp/client.py#L25-L33",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/authz/provider.py#L1-L126",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/authz/adapter.py#L88-L101",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/authz/tool_filter.py"
+    ],
+    "local_adoption": [
+      "adoption/templates/codex.config.template.toml",
+      "adoption/templates/codex.stack-worker.config.toml",
+      "adoption/templates/project.codex.config.template.toml",
+      "adoption/skills/manifest.json"
+    ],
+    "skills": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/skills/public/claude-to-deerflow/SKILL.md#L54-L108",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/skills/storage/local_skill_storage.py#L75-L92",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/skills/storage/user_scoped_skill_storage.py#L270-L308"
+    ],
+    "qmd": [
+      "https://github.com/tobi/qmd/blob/v2.8.3/src/collections.ts#L101-L125",
+      "https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L636-L653",
+      "https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1181-L1270"
+    ],
+    "e2e": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/client.py#L492-L569",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/client.py#L770-L910",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/paths.py",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/subagents/status_contract.py#L67-L89",
+      "https://api.github.com/repos/bytedance/deer-flow/commits/345f08be00c8a9495079b732a39b46aa9af1584e"
+    ],
+    "native_tests": [
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/Makefile#L20-L26",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_model_factory.py",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_mcp_client_config.py",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/test_client.py"
+    ],
+    "sqlite": [
+      "https://www.sqlite.org/uri.html",
+      "https://www.sqlite.org/lang_datefunc.html",
+      "https://docs.python.org/3.12/library/sqlite3.html#sqlite3.Connection.backup",
+      "https://docs.python.org/3.12/library/sqlite3.html#sqlite3.Connection.set_authorizer"
+    ],
+    "headers": "pins.json#/header_reference: langchain-openai 1.2.1 verified sdist, chat_models/base.py:783,1385-1411,1683-1712,3327-3345; gateway-owner measured request contract supplied by the user on 2026-09-27"
+  },
+  "decisions": [
+    {
+      "action": "Install official release images by digest with the production Compose topology.",
+      "sources": [
+        "installation"
+      ],
+      "alternatives": "Native make install/make dev and development Compose are upstream-supported. Native installation alters Git hooks and the host dependency environment; development Compose syncs at startup. Those are not selected.",
+      "evidence_class": "upstream source and registry metadata"
+    },
+    {
+      "action": "Run LocalSandboxProvider inside the dedicated backend container; mount no Docker socket.",
+      "sources": [
+        "sandbox"
+      ],
+      "alternatives": "AIO DooD exposes the rootless daemon to the backend. The reviewed AIO selection chooses a Kubernetes provisioner or local Docker manager; no static base_url connector was found there. Native AIO, Kubernetes, E2B and OpenSandbox require separate host choices.",
+      "limitation": "Trusted single-user code shares the backend process/container and mounts; thread paths are not process isolation."
+    },
+    {
+      "action": "Use native summarization, tool-output externalization, token budgets and bounded task delegation.",
+      "sources": [
+        "configuration"
+      ],
+      "limitation": "No token or cost savings measured. Headroom is omitted because native offload covers the requested gap."
+    },
+    {
+      "action": "Wrap only the pinned ChatOpenAI payload hook to supply per-call idempotency and stable conversation affinity headers.",
+      "sources": [
+        "headers",
+        "configuration"
+      ],
+      "limitation": "Private LangChain hook must be requalified on upgrade. Actual Responses/max/cache/header behavior is a host gate."
+    },
+    {
+      "action": "Implement tool schema/execution restrictions through the supported AuthorizationProvider interface.",
+      "sources": [
+        "mcp_policy",
+        "local_adoption"
+      ],
+      "limitation": "Codex enabled_tools/disabled_tools keys are not implemented by the inspected MCP connection builder. Allowed bash/ctx_execute remains arbitrary code; this is not a process security boundary."
+    },
+    {
+      "action": "Launch adopted stdio MCP commands inside the backend using narrow read-only host dependency mounts and a cwd wrapper.",
+      "sources": [
+        "mcp_policy",
+        "local_adoption"
+      ],
+      "limitation": "Host registrations alone are insufficient. Binary/interpreter dependencies and ABI compatibility must pass host preflight."
+    },
+    {
+      "action": "Create an owned writable QMD SQLite backup of exactly four nonempty adopted collections; permit lexical query and collection-qualified reads.",
+      "sources": [
+        "qmd",
+        "sqlite",
+        "local_adoption"
+      ],
+      "limitation": "No shared index refresh or model download; snapshot freshness and permitted source database must be supplied privately."
+    },
+    {
+      "action": "Verify adopted SKILL.md hashes and symlink adopted/public skills by reference.",
+      "sources": [
+        "skills",
+        "local_adoption"
+      ],
+      "limitation": "Per-user global custom fallback stops after interactive user custom skills exist; dedicated-user visibility remains a host check."
+    },
+    {
+      "action": "Drive the unchanged embedded client for a frozen research-plus-code task; separately execute the deterministic verifier and sanitize native/SQL observations.",
+      "sources": [
+        "e2e",
+        "sqlite",
+        "native_tests"
+      ],
+      "limitation": "Local oracle fixtures do not establish DeerFlow acceptance; gateway rows cover a window and cannot uniquely attribute concurrent traffic."
+    }
+  ],
+  "local_file_reference_map": {
+    "recipe.py, install.sh, lifecycle.sh, compose.json.template, runtime/*-start.sh": [
+      "installation",
+      "sandbox",
+      "qmd",
+      "sqlite",
+      "local_adoption",
+      "native_tests"
+    ],
+    "config.yaml.template, defaults.json": [
+      "configuration",
+      "headers"
+    ],
+    "extensions_config.json.template, host.json.example, runtime/stdio.sh": [
+      "mcp_policy",
+      "local_adoption",
+      "qmd"
+    ],
+    "runtime/worker_policy.py, runtime/tool-policy.json": [
+      "mcp_policy",
+      "local_adoption",
+      "qmd"
+    ],
+    "runtime/gateway_model.py, runtime/gateway_headers.py": [
+      "headers",
+      "configuration"
+    ],
+    "runtime/preflight.py": [
+      "configuration",
+      "mcp_policy",
+      "skills",
+      "native_tests"
+    ],
+    "run-e2e.sh, e2e/drive.py, e2e/run.py, e2e/task.md, e2e/expected.json": [
+      "e2e",
+      "installation",
+      "skills"
+    ],
+    "e2e/check.py, tests/test_runtime_worker_deerflow.py": [
+      "e2e",
+      "local_adoption",
+      "repository tests/test_install_skills.py subprocess contract pattern; literal synthetic controls from the task contract"
+    ],
+    "e2e/receipt.py": [
+      "e2e",
+      "sqlite",
+      "gateway-owner nine-column allowlist in the user task"
+    ],
+    "README.md, pins.json, research.json, evidence/*": [
+      "returned source metadata and offline command output; evidence classes kept separate"
+    ]
+  },
+  "anti_pattern_log": [
+    {
+      "mistake": "Guessed sandbox.bash_timeout rather than the upstream field.",
+      "proof": "Pinned SandboxConfig and config.example.yaml specify bash_command_timeout.",
+      "correction": "Use bash_command_timeout and assert absence of the wrong key."
+    },
+    {
+      "mistake": "Collected artifacts without the effective user scope.",
+      "proof": "Pinned Paths.sandbox_outputs_dir and runtime user_context require the user-specific path.",
+      "correction": "Pass get_effective_user_id() when locating outputs."
+    },
+    {
+      "mistake": "Counted every task tool return as child completion.",
+      "proof": "Pinned status_contract.py and synthetic native event reproduction distinguish completion, failure and timeout.",
+      "correction": "Count only subagent_status=completed; keep every native failure status including error-prefixed and empty results."
+    },
+    {
+      "mistake": "Allowed a later tool tuple event to discard richer values-event status.",
+      "proof": "client.py serializes additional_kwargs in values events but omits them in tool tuple events.",
+      "correction": "Merge returned message fields by tool call identity."
+    },
+    {
+      "mistake": "Redis image entrypoint would chown the owned bind and a loopback probe would miss an interface-only listener.",
+      "proof": "Upstream Redis image entrypoint and the draft listener/healthcheck disagreed.",
+      "correction": "Use a bounded entrypoint retaining rootless user ownership and probe the explicit container interface."
+    },
+    {
+      "mistake": "Mounted the native QMD cache read-only although query startup needs writes.",
+      "proof": "QMD v2.8.3 store.ts opens/initializes SQLite state.",
+      "correction": "Read the adopted source with mode=ro, seed with SQLite backup, and query owned writable state; preserve adopted Node PATH for addon ABI."
+    },
+    {
+      "mistake": "Placed raw trace evidence in a writable worker mount.",
+      "proof": "Draft container mounts exposed the intended observation path.",
+      "correction": "Host captures stdout outside worker mounts; oracle also runs separately."
+    },
+    {
+      "mistake": "Only framework container cleanup was guaranteed after interruption.",
+      "proof": "Draft checker timeout left its named process outside the cleanup path.",
+      "correction": "Both exact owned names are cleaned in finally blocks; unknown cleanup fails the gate."
+    },
+    {
+      "mistake": "Used a SQLite transaction context without closing the connection.",
+      "proof": "An offline suite returned ResourceWarnings for unclosed connections.",
+      "correction": "Wrap all scoped SQLite handles in contextlib.closing."
+    },
+    {
+      "mistake": "Invented tracing.enabled in application YAML.",
+      "proof": "Source AST reported unknown top-level tracing; tracing_config.py:143-169 reads provider environment flags. Contract test failed before correction.",
+      "correction": "Remove the unsupported section and set the three native tracing flags to false."
+    },
+    {
+      "mistake": "Assumed DEER_FLOW_HOME also controls the SQLite database directory.",
+      "proof": "database_config.py:259-268 resolves sqlite_dir from cwd; AppConfig defaults to .deer-flow/data.",
+      "correction": "Explicit database.sqlite_dir environment reference uses owned application state and fresh per-attempt E2E state."
+    },
+    {
+      "mistake": "The receipt reader normalized numeric text timestamps only after an SQL predicate that excluded them.",
+      "proof": "Synthetic gateway-reader test returned two rows instead of the four in-window representations.",
+      "correction": "Normalize nonnegative epoch text in the SQL window predicate before filtering; ISO and numeric formats remain supported."
+    },
+    {
+      "mistake": "Carried an unused BETTER_AUTH_SECRET key and default frontend origins into the draft.",
+      "proof": "At this pin gateway auth/config.py persists a JWT secret under DEER_FLOW_HOME, while frontend gateway-config.ts defaults its proxy origin list to localhost:3000.",
+      "correction": "Remove the unused secret, retain native JWT persistence, and configure DEER_FLOW_TRUSTED_ORIGINS for the actual loopback nginx URL."
+    }
+  ],
+  "anti_pattern_log_scope": "Corrections retained here because the shared docs/harness-defaults.md log is outside this builder file ownership. Coordinator may link or integrate this record.",
+  "evidence_classes": {
+    "upstream_source_read": "Tag/commit, verified archive and lockfile bytes, image manifest/config metadata, native commands/config/extensions reviewed.",
+    "offline_local_integration": "Recipe contract tests, synthetic verifier/trace/SQL controls, source-key audit, syntax/structure and repository validator; see evidence/verification.json.",
+    "unchanged_upstream_tests": "Selected native command provided; not run in this workspace.",
+    "host_provider_acceptance": "Not run: installation/pull, startup, MCP execution, skills, model payloads, frozen task, cleanup, restart and exclusive gateway attribution remain pending."
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "docker_bin": "/ABSOLUTE/PATH/TO/rootless-docker/bin/docker",
+  "variables": {
+    "ECO_ROOT": "/ABSOLUTE/PATH/TO/codex-ecosystem",
+    "HOST_PATH": "/usr/local/bin:/usr/bin:/bin",
+    "QDRANT_URL": "10.0.2.2:LOCAL_QDRANT_PORT",
+    "EMBED_URL": "10.0.2.2:18232"
+  },
+  "skills_root": "/ABSOLUTE/HOME/.agents/skills",
+  "mcp_mounts": [
+    {
+      "source": "/ABSOLUTE/PATH/TO/codex-ecosystem/bin",
+      "target": "/ABSOLUTE/PATH/TO/codex-ecosystem/bin",
+      "read_only": true
+    },
+    {
+      "source": "/ABSOLUTE/PATH/TO/required-pinned-tool-prefix",
+      "target": "/ABSOLUTE/PATH/TO/required-pinned-tool-prefix",
+      "read_only": true
+    }
+  ],
+  "model": "cx/gpt-6-astra-max",
+  "qmd_snapshot": {
+    "database": "/ABSOLUTE/PATH/TO/native-agent-stack-catalog.sqlite",
+    "collections": {
+      "foundation-docs": {
+        "path": "/ABSOLUTE/PATH/TO/foundation-docs",
+        "pattern": "**/*.md"
+      },
+      "foundation-adoption": {
+        "path": "/ABSOLUTE/PATH/TO/foundation-adoption",
+        "pattern": "**/*.md"
+      },
+      "us-equities-foundation": {
+        "path": "/ABSOLUTE/PATH/TO/us-equities-foundation",
+        "pattern": "**/*.md"
+      },
+      "us-equities-catalog": {
+        "path": "/ABSOLUTE/PATH/TO/us-equities-catalog",
+        "pattern": "**/*.md"
+      }
+    }
+  }
+}
