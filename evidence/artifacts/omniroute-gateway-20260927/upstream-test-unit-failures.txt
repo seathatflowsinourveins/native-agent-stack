@@ -1,0 +1,80 @@
+# Upstream npm run test:unit on the dd6e9607e tree: totals and failure lists (extracted 2026-09-27T08:10:27Z by the record's author)
+# Sources: the run's private output file ($SCRATCH/omniroute-lane/upstream-suite/test-unit.tap, 239004 lines, spec
+# reporter; it holds local temporary paths, so it is not published) and the coordinator's lists next to it.
+
+## Totals printed by the node test runner (grep -a '^ℹ ' on the output file)
+ℹ tests 43522
+ℹ suites 1919
+ℹ pass 43460
+ℹ fail 31
+ℹ cancelled 0
+ℹ skipped 31
+ℹ todo 0
+ℹ duration_ms 1944452.361019
+
+## Which stages ran
+upstream's test:unit script chains three node --test stages with '&&': (1) tests/unit/*.test.ts plus the listed
+subdirectories and tests/unit/**/*.test.mjs, (2) tests/unit/dashboard/**/*.test.ts, (3) npm run test:unit:serial.
+The output holds exactly one totals block (1 'ℹ tests' line) and ends with stage 1's failing-test list, so
+stage 1's 31 failures stopped the chain: stages 2 and 3 did not run, and their results are unknown.
+
+## The 21 failing test files (coordinator's failing-files.txt, verbatim)
+tests/unit/build/mcp-bundle-startup.test.ts
+tests/unit/call-logs-id-collision.test.ts
+tests/unit/chatcore-upstream-timeouts.test.ts
+tests/unit/chatgpt-web-codex.test.ts
+tests/unit/cli-environment-helpers.test.ts
+tests/unit/compression/session-dedup-memory-7849.test.ts
+tests/unit/flush-empty-retry.test.ts
+tests/unit/ghe-copilot.test.ts
+tests/unit/hard-session-lease-bypass-inventory.test.ts
+tests/unit/i18n-glossary-consistency-check.test.ts
+tests/unit/mcp-stdio-json-purity.test.ts
+tests/unit/noauth-catalog-only-providers.test.ts
+tests/unit/opencode-accounts-per-request.test.ts
+tests/unit/opencode-geo-block-rotation.test.ts
+tests/unit/opencode-responses-first-byte-stall.test.ts
+tests/unit/opencode-transient-retry-delay.test.ts
+tests/unit/pack-artifact-policy.test.ts
+tests/unit/pricing-for-model-cached-13891.test.ts
+tests/unit/proxyfetch-upstream-status-capture.test.ts
+tests/unit/settings-i18n-keys.test.ts
+tests/unit/source-scanner-guards.test.ts
+
+## Failing test names on the dd6e9607e tree (31, coordinator's patched-failing-names.txt, verbatim)
+✖ #7849: line-rich long context stays within a 512 MiB heap and the stacked pipeline continues
+✖ English sidebar translations include every configured sidebar item
+✖ GHE Copilot registry exposes Claude Opus 5
+✖ MCP server bundle imports successfully on Node 24
+✖ a fetch still running when the dispatch returns does not change the status
+✖ a mixed streak (500 then empty 400) pauses; a 429 or geo 403 resets it
+✖ a stalled stream that already carries content is passed through, not replayed
+✖ advances the shared pick cursor across sequential requests
+✖ bounded read keeps no budget when the idle budget is zero
+✖ bounded read outcome tells a read failure apart from an over-cap body
+✖ bounded read returns small bodies intact
+✖ catalog-only no-auth providers reach the model-sync import stage
+✖ detectRestrictedEnvironment retorna ci quando CI=1
+✖ detectRestrictedEnvironment retorna gitpod quando GITPOD_WORKSPACE_ID set
+✖ detectRestrictedEnvironment retorna replit quando REPL_ID set
+✖ executeWithUpstreamStartTimeout leaves no abort listener on the client signal after a resolving execute
+✖ findMissingArtifactPaths flags missing root runtime files in the tarball
+✖ flag off: a silent Responses stream is returned untouched (no guard, no rotation)
+✖ hard-lease credential, executor, and connection-query inventory has no unclassified site
+✖ hits the DB at most once across many repeated lookups (simulating usageStats' 531 groups/request)
+✖ keeps member cooldown history across a rebuild from the same credentials
+✖ keeps the 200 success body intact after a geo rotation
+✖ loads the TypeScript MCP entrypoint through the Node 26-compatible tsx import hook
+✖ phrase-only geo signal without type still rotates
+✖ real zh-CN.json + real glossary + real protected terms pass the gate
+✖ real zh-TW.json + real zh-TW glossary pass the gate
+✖ regression: src/i18n/messages/zh-CN.json no longer contains 提供商
+✖ regression: src/i18n/messages/zh-TW.json is free of the retired renderings
+✖ rotates on 451 geo like on 403
+✖ test files scanning project source are not guarded by negative assertions alone
+✖ writes only valid JSON-RPC to stdout — no DB init or other startup logging leaks through
+
+## diff base-a58000c7 names (coordinator's baseline-failing-names.txt, 30 names from the same files on bare a58000c7) vs the dd6e9607e names
+18a19
+> ✖ hard-lease credential, executor, and connection-query inventory has no unclassified site
+diff rc=1

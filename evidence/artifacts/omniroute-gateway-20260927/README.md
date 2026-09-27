@@ -29,9 +29,11 @@ files, keeping whitelisted fields only:
 The record's author re-scanned every file before publishing it. There are no emails, account or connection ids,
 UUIDs, headers, request bodies, credential values or personal paths. The only bearer text is the placeholder
 `local-loopback`, in a script. Paths are masked: `~` is the home directory and `$SCRATCH` a private scratch
-directory. The unit file uses systemd's own `%h`. The record's author added six files, all read-only observations
-or copies:
-- three observations: `cherry-pick-fidelity.txt`, `installed-build-identity.txt` and `upstream-state.txt`;
+directory. The unit file uses systemd's own `%h`. The record's author added eight files, all read-only
+observations or copies:
+- four observations: `cherry-pick-fidelity.txt`, `installed-build-identity.txt`, `upstream-state.txt` and
+  `upstream-test-unit-failures.txt`;
+- the coordinator's suite summary: `upstream-test-unit-summary.txt`;
 - three script records: `lsof-shim.sh.txt`, `make_server_env.py.txt` and `make_passwordless.py.txt`.
 
 ## What was not done
@@ -46,8 +48,12 @@ or copies:
   "Release branch not green: release/v3.8.51", is open. [`upstream-state.txt`](upstream-state.txt) lists the failing
   check runs. The build is a recorded canary: upstream's pack gate accepted it only with
   `OMNIROUTE_ALLOW_CANARY_BUILD=1`.
-- **Full upstream unit suite.** A full upstream `npm run test:unit` on the built tree was still running when this
-  directory was written. Its summary is pending, and no pass count is claimed for it.
+- **Only the first stage of upstream's unit script ran.** `npm run test:unit` chains three `node --test` stages
+  with `&&`, and stage 1's 31 failures stopped the chain. The dashboard stage and `test:unit:serial` did not run, and
+  their results are unknown ([`upstream-test-unit-failures.txt`](upstream-test-unit-failures.txt)).
+- **One upstream test fails because of the picks and is not patched.** #13788's new route adds a connection-query
+  site that the hard-session-lease inventory guard does not classify
+  (`tests/unit/hard-session-lease-bypass-inventory.test.ts:348`).
 - **Reported, not retained.** The coordinator observed the following, but their outputs are not in this directory:
   - `tests/unit/early-stream-keepalive.test.ts` at 25 of 26 on the `a58000c7` source (the Proxy case fails with the
     production TypeError) and 26 of 26 with #14904: the red-to-green control for defect 1;
@@ -70,6 +76,8 @@ or copies:
 | [`upstream-state.txt`](upstream-state.txt) | live upstream metadata (`npm view`, `git ls-remote`, `gh api`) | At 07:58Z: npm `latest` is 3.8.50; `release/v3.8.51` is at `a58000c7`; #14904, #13788 (`deferred-v3.8.52`), #14872 and #14886 are open and unmerged; #14866 is open; the latest release is v3.8.50. The check runs on `a58000c7` include failures (Release acceptance, Node 24 and Node 26 compat shards, promptfoo, garak). |
 | [`proxy-repro.txt`](proxy-repro.txt) | synthetic fixture (root-cause reproduction) | A ten-line Node script: `new Request(proxiedRequest, init)` fails and the raw `Request` works. Node 24.21.0/undici 7.29.1 and Node 26.10.0/undici 8.10.2 fail with the `#state` TypeError, and Node 22.23.3/undici 6.28.1 fails with "already been used". A runtime switch does not fix defect 1. |
 | [`upstream-tests-route-keepalive.txt`](upstream-tests-route-keepalive.txt) | unchanged upstream tests, non-release tree | TAP summary of 26 upstream route and keepalive test files on `a58000c7` + #14904, run with upstream's own `node --test` flags: 186 tests, 184 pass, 0 fail, 2 skipped. Per-test lines stay in the private TAP, which holds local paths. |
+| [`upstream-test-unit-summary.txt`](upstream-test-unit-summary.txt) | unchanged upstream tests, non-release tree (the coordinator's summary, verbatim) | Upstream's `npm run test:unit` on the `dd6e9607e` tree, Node 24.21.0, 07:45Z to 08:17Z. There were 43,522 tests: 43,460 pass, 31 fail, 31 skipped. The same 21 failing files were rerun on bare `a58000c7`: 225 tests, 195 pass, 30 fail, the same 30 failures (base reds; #14866). The one added failure comes from #13788: `hard-session-lease-bypass-inventory.test.ts:348`, which has an unclassified connection-query site in the new `/v1/alpha/search` route. It is an inventory classification gap, not patched locally. #14904 adds no failure. The summary calls the run the "full unit suite"; see the next row. |
+| [`upstream-test-unit-failures.txt`](upstream-test-unit-failures.txt) | unchanged upstream tests (extraction by the record's author) | The runner's own totals, copied from the private output. It also lists the 21 failing files and the 31 failing names on the build, and diffs them with the base's 30: exactly one name is added. The output holds one totals block, so stage 1's failures stopped the script's `&&` chain. Upstream's dashboard stage and `test:unit:serial` did not run. |
 | [`omniroute.service`](omniroute.service) | local integration (installed state) | The installed unit. Secrets come only through `EnvironmentFile=`, and each non-secret `Environment=` line has a reason comment. It also shows the `lsof` shim on `PATH`, `serve --port 20128 --no-open --no-tray` without `--no-recovery`, `Restart=on-failure`, `UMask=0077` and `NoNewPrivileges=true`. |
 | [`gateway-settings-readback.json`](gateway-settings-readback.json) | local integration (settings API read-back) | The applied settings: `sessionAffinityTtlMs` 14400000; codex `round-robin` with sticky limit 1; `promptCacheAffinityEnabled` true; `requireLogin` false; compression disabled and off, with the `codex/*` exclusion; Thinking Budget `passthrough`; MCP and A2A off. |
 | [`codex-provider-block.toml`](codex-provider-block.toml) | local integration (installed client config) | `[model_providers.omniroute]` as installed in `~/.codex/config.toml`: the loopback `/v1` base URL, `env_key`, `requires_openai_auth = false`, `wire_api = "responses"` and `supports_standalone_web_search = true`. `supports_websockets` is unset. |

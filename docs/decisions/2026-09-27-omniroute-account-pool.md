@@ -287,7 +287,16 @@ The classes are kept separate.
     - upstream's `issue-8674-alpha-search` test at 10 of 10, with keepalive still 26 of 26.
 
     Those outputs are not retained, so they count as reported, not retained.
-  - The full upstream `npm run test:unit` on the built tree is recorded in the evidence README, or marked pending there.
+  - **Upstream's `npm run test:unit` on the `dd6e9607e` tree, first stage**
+    ([`upstream-test-unit-summary.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-test-unit-summary.txt),
+    [`upstream-test-unit-failures.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-test-unit-failures.txt)):
+    - 43,522 tests: 43,460 pass, 31 fail, 31 skipped;
+    - 30 of the failures also fail in the same 21 files on bare `a58000c7`: base reds (#14866);
+    - the 31st comes from #13788: `tests/unit/hard-session-lease-bypass-inventory.test.ts:348` finds an unclassified
+      connection-query site in the new `/v1/alpha/search` route;
+    - #14904 adds no failure.
+
+    Stage 1's failures stopped the script's `&&` chain, so the dashboard stage and `test:unit:serial` did not run.
 - **Local integration:**
   - the settings read-back;
   - the installed unit and service state;
@@ -355,6 +364,11 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 ## Limitations and residuals
 
 - **Upstream CI is red on the base** (#14866). The build is a recorded canary, not a release.
+- **#13788 fails one upstream inventory test.** The route's connection-query site is unclassified in
+  `tests/unit/hard-session-lease-bypass-inventory.test.ts`. The coordinator's summary says the guard postdates the PR,
+  which was opened 2026-09-15; this record did not check that. Upstream must classify the site when it merges #13788.
+  It is not patched locally.
+- **Two upstream unit stages did not run.** The dashboard stage and `test:unit:serial` never ran on this tree.
 - **Key separation is not achieved.** `server.env` sits inside `DATA_DIR`, so a raw copy of the directory carries the
   key to its own encrypted tokens. That is the key separation the settings research's row 27 asks for, and it is not
   achieved here. Upstream's native backups exclude `.env` and `server.env` (row 33). Moving the secrets out is a

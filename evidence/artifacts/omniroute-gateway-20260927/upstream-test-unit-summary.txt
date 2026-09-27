@@ -1,0 +1,22 @@
+Upstream full unit suite (npm run test:unit, upstream's own runner flags; Node 24.21.0) — evidence class: unchanged
+upstream tests on a non-release tree. Run by the coordinator on 2026-09-27 (07:45-08:17Z).
+
+Tree under test: release/v3.8.51 a58000c7 + #14904 (22fb9f15, bf025564) + #13788 (b9f0d76e, dd6e9607) = dd6e9607e.
+  tests 43522 | suites 1919 | pass 43460 | fail 31 | cancelled 0 | skipped 31 | todo 0 | duration 1944 s
+
+Baseline for attribution: the same 21 failing test files run on bare a58000c7 (same runner flags):
+  tests 225 | pass 195 | fail 30
+  30 of the 31 failures are identical on bare a58000c7: pre-existing base-reds of the release branch (upstream issue
+  #14866 "Release branch not green" is open). Examples: MCP bundle import on Node 24, detectRestrictedEnvironment
+  env probes, zh-CN/zh-TW i18n glossary gates, opencode geo-rotation and stall cases, pack-artifact missing-path check,
+  source-scanner negative-guard check.
+
+One failure is introduced by the cherry-picks:
+  tests/unit/hard-session-lease-bypass-inventory.test.ts:348 "hard-lease credential, executor, and connection-query
+  inventory has no unclassified site": #13788's new src/app/api/v1/alpha/search/route.ts adds one connection-query
+  site that the inventory guard (which postdates the PR, opened 2026-09-15) does not list. This is an inventory
+  classification gap in the open PR, not a behaviour regression of the two cherry-picked fixes; the search route's
+  behaviour was verified by live probes. Upstream must classify the site when it merges #13788. Not patched locally.
+
+The keepalive fix (#14904) introduces no failure: tests/unit/early-stream-keepalive.test.ts passes 26/26 and the
+26 route/keepalive test files pass 184/186 (2 skipped).
