@@ -217,6 +217,49 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
    was added after `v2026.09.24.1`. In a checkout of that tag,
    `git hook run pre-commit` fails with `cannot find a hook named pre-commit`,
    and `git commit` runs no hook at all.
+
+   **5c. The same setting enables the pre-push registry gate.** The tracked
+   [`scripts/git-hooks/pre-push`](../scripts/git-hooks/pre-push) checks out
+   the tip commit of each pushed ref into a detached worktree under `$TMPDIR`
+   and runs the three registry tests that failed CI's `validate` job on six
+   pull requests on 2026-09-27:
+   `tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed`,
+   `tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified`
+   and
+   `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered`.
+   Like CI, which tests one commit per pull request, it does not test the
+   commits between a ref's old and new tip.
+   - **Refused:** a failure, a skip or an expected failure. So is a tip that
+     lacks the three tests: an old tag, a `backup/*` branch, or an unrelated
+     history such as a notes ref or an orphan branch. Push those with
+     `git push --no-verify`, the explicit, visible override.
+   - **Not tested:** a branch deletion, which needs neither zizmor nor Python.
+   - **Prerequisites:** install the pinned zizmor 1.30.1 first
+     ([`ci-security`](../blueprints/convergence-practice/ci-security/README.md):
+     `uv tool install zizmor==1.30.1`). The workflow-coverage class skips
+     without it, so the hook refuses every push that has a commit to test
+     while `zizmor` is missing from `PATH`. The first `python3` on `PATH` must
+     be 3.11 or later (`tomllib`). The macOS system `/usr/bin/python3` is 3.9
+     (3.9.6 on CI's `macos-15` runner); with it, the `tomllib` import fails
+     and the push is refused.
+   - **Scratch location:** the hook refuses when git's own discovery finds a
+     repository above `$TMPDIR`. An empty `.git` directory, such as the mount
+     point a sandbox can leave in `/tmp`, is not a repository to git, so it
+     is not refused. `$TMPDIR` defaults to `/var/tmp`, because the checkout is
+     about 140 MB, and file-hierarchy(7) keeps `/tmp`, usually a tmpfs, for
+     small files.
+   - **Cleanup:** the hook removes its worktree when it exits and when it
+     gets HUP, INT, QUIT, PIPE or TERM. A signal it cannot or does not trap,
+     such as SIGKILL, can leave a `pre-push.*` directory behind; delete that
+     directory, then run `git worktree prune`.
+
+   Measured on WSL2 on 2026-09-27: 1.5 to 1.8 s for a push of one commit,
+   most of it the checkout. Check it without pushing:
+   ```sh
+   zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+   printf 'refs/heads/x %s refs/heads/x %s\n' "$(git rev-parse HEAD)" "$zero" |
+     scripts/git-hooks/pre-push origin origin; echo "exit=$?"   # "Ran 3 tests", "OK", exit=0
+   ```
 6. Install the user-level guards with the Claude profile tools
    ([`adoption/bootstrap.md`](../adoption/bootstrap.md) step 4a):
    `python3 tools/adoption/install_claude_profile.py --only guard`, then render
