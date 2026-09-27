@@ -240,6 +240,52 @@ Run role-specific acceptance where applicable; guidance and research catalog
 entries are not implied executable deployments. Preserve failed quality gates
 when importing new matched-task or retrieval evaluations.
 
+## Counts, comparisons and acceptance (2026-09-27)
+
+These rules follow from the 2026-09-27 per-tool verdict wave and the review of the
+E1 and E2 subagent receipts.
+
+- **An invocation count is not a success rate.** A scan of native histories that
+  matches command text or MCP server names counts attempts. Report each population
+  with its own denominator. A subgroup, such as the children that received the
+  token-lanes block, is part of its population, not another one, and its rate is
+  neither general coverage nor a causal effect. Successful use on eligible tasks is
+  what the [preregistered E2E](../evidence/artifacts/token-adoption-e2e-20260926/README.md)
+  measures (M1, M6c, M7 and M8). It has not run, so no tool has an eligible-task
+  success rate yet.
+- **A comparison needs its task's acceptance.** A token difference counts only with
+  the check that the smaller output still answers its task. One Context Hub fact
+  does not make its document current; an ast-grep call match does not establish
+  outline or rule-configuration fidelity; one MarkItDown HTML conversion says nothing
+  about other formats or extensions; a Serena Python fixture does not establish
+  complete references in another language. The
+  [handbook's upstream limits](token-session-handbook.md#known-upstream-limits-behind-the-lanes)
+  give the routing.
+- **Count the recovery read.** Filtered or compressed output is not raw output. In
+  the [laptop run](../evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md),
+  the verifier refuted RTK's "no fact lost" claim (a misreported branch list and
+  shortened recall pointers), and Headroom's compression plus its full retrieval came
+  to more tokens than the original. Include recall or original reads and the response
+  envelope when comparing workflow cost; the clean-prefix Headroom figures below show
+  the same growth.
+- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 3.4.0
+  (`o200k_base`) is the counter behind the exact comparisons, not a reducer. Its
+  counting contract covers ordinary UTF-8 text under the default special-token
+  policy, which disallows every special token and throws on an input that contains
+  one ([3.4.0 README](https://github.com/niieani/gpt-tokenizer/blob/3.4.0/README.md#special-tokens));
+  allowed-special modes are not qualified here, and neither is 4.0.0. ccusage totals
+  are consumption, reported token-only while any model is unpriced
+  ([recipe row](../recipes/README.md#component-catalog-install-and-check)). An
+  agentsview answer observes retained history, and MCPorter is transport.
+- **Receipts carry their current acceptance.** The E1 (#296) and E2 (#316) receipts
+  now hold dated adjudications. Of E1's sixteen exercised tools, QMD and Repomix
+  were retracted, ai-memory's check was vacuous, and the rest are partial because
+  no E1 check recorded a failing run. E2 keeps Context Mode, jCodeMunch, QMD and
+  ast-grep partial for the same reason
+  ([E1 correction](../evidence/artifacts/token-e2e-ultracode-20260925/README.md#results),
+  [E2 erratum](../evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md#erratum-2026-09-27)).
+  Read `tools[].adjudication`, not `quality_check.passed`.
+
 ## Shared Codex quota (2026-09-26)
 
 `scripts/codex_quota.py` reads the Codex account's usage snapshot through the
