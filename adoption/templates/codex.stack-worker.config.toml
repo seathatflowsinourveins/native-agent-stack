@@ -36,11 +36,26 @@ CHUB_FEEDBACK = "0"
 # Default is 30 s (codex-mcp/src/rmcp_client.rs:103); connection_manager.rs consumes it.
 # https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L103
 # Partial tables retain user commands; profile 21 < project 25 < -c 30 (source in header).
+# required = true: session start waits for the server and fails if it cannot start, so a worker never runs
+# without these tools. Field: config/src/mcp_types.rs L233-235; the wait: codex-mcp/src/connection_manager/
+# required.rs L15-59, awaited with `?` at core/src/session/session.rs L1860-1866 (all at rust-v0.157.1).
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/mcp_types.rs#L233-L235
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/required.rs#L15-L59
+# Without it, a server still starting one shared 1 s grace after the first tool-list build
+# (codex-mcp/src/mcp/mod.rs L195) is left out of that request (connection_manager/tool_catalog.rs L251-277).
+# Both servers take 1.2-2.3 s to start here, and a custom provider such as the OmniRoute gateway has no
+# websocket prewarm to hide it. mcp_optional_startup_grace_ms stays unset: it would wait for every optional
+# server and never fail. Every -p stack-worker session start now waits for both, `debug prompt-input` included,
+# so run workers under the account's HOME: codebase-memory-mcp 0.11.0 does not start beside its account daemon
+# under another home (measured 2026-09-27).
+# Decision record: docs/decisions/2026-09-26-codex-worker-lane.md, addendum 2026-09-27 "Required start-up".
 [mcp_servers.serena]
 startup_timeout_sec = 60
+required = true
 
 [mcp_servers.codebase-memory]
 startup_timeout_sec = 60
+required = true
 
 # These three servers declare no MCP tool annotations, so under approval_policy = "never" Codex refuses every call
 # to them ("MCP tool call requires approval, but approval policy is never"). Workers get their read tools, approved.

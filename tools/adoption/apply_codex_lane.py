@@ -28,10 +28,14 @@ Modes:
               rehearses the same batchWrite, AGENTS.md block and profiles on private copies in a scratch Codex
               home (network namespace off where bwrap works) and prints Codex's own read-back of the result:
               `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker` (and `-p omniroute`).
-              Nothing under the target Codex home is written; the scratch home is removed afterwards.
+              Nothing under the target Codex home is written; the scratch home is removed afterwards. The profile
+              marks serena and codebase-memory required, and that scratch HOME cannot start a server bound to the
+              account's home, so this rehearsal's `-p stack-worker` read makes them optional with `-c` flags.
   --apply     refuses while a `codex` process runs or when a file differs from the --expect-* hash the dry run
               printed. Writes a run record and 0600 backups of config.toml and AGENTS.md first (never auth.json
-              or any other file), prints the rollback command, then makes the changes, each read back.
+              or any other file), prints the rollback command, then makes the changes, each read back. Its
+              `-p stack-worker` read-back starts the required servers, as a worker's session start does, and names
+              any that did not start.
   --rollback RUN_DIR
               undoes what that run changed, key by key and block by block, skipping anything someone changed
               since; safe to re-run.
@@ -97,6 +101,10 @@ START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26
 HEADROOM_OFFLINE_KEYS = ("HEADROOM_OFFLINE", "HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "DO_NOT_TRACK")
 RECORD_SCHEMA = "native-agent-stack/codex-lane-apply/v1"
 REQUEST_TIMEOUT = 60.0
+# A session start waits for every enabled server marked `required` and fails when one cannot start, with this text
+# before "<name>: <error>" pairs joined by "; " (codex-mcp/src/connection_manager/required.rs L51-58 at
+# rust-v0.157.1; the names are sorted at connection_manager.rs L246-251).
+REQUIRED_FAILURE = "required MCP servers failed to initialize: "
 
 
 class Refused(Exception):
@@ -266,6 +274,35 @@ def worker_command() -> str:
     """How a worker lane starts: the profile plus the pinned flags, stdin closed."""
     pins = " ".join(f"'{flag}'" if '"' in flag else flag for flag in worker_pins())
     return f"codex exec -p {PROFILE_NAME} {pins} -s <sandbox> ... < /dev/null"
+
+
+def required_servers() -> list[str]:
+    """The servers the worker profile marks required, sorted as Codex waits for them (connection_manager.rs
+    L246-251). Every `-p stack-worker` session start, `debug prompt-input` included, waits for them and fails when
+    one cannot start."""
+    profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
+    return sorted(name for name, table in profile.get("mcp_servers", {}).items() if table.get("required") is True)
+
+
+def relaxed_required_flags() -> list[str]:
+    """Session flags that make the profile's required servers optional again. `-c` (session flags, 30) outranks the
+    profile (21) key by key, so each flag moves only `required`."""
+    flags = []
+    for name in required_servers():
+        flags += ["-c", key_path(["mcp_servers", name, "required"]) + "=false"]
+    return flags
+
+
+def required_start_failures(stderr: str) -> list[str]:
+    """The servers a failed session start names in its required-server error, in its order; [] when stderr has no
+    such error. Only names the profile marks required are taken, so a "; " inside an error text adds none."""
+    lines = [line for line in stderr.splitlines() if REQUIRED_FAILURE in line]
+    if not lines:
+        return []
+    required = set(required_servers())
+    names = [match.group(1) for part in lines[-1].split(REQUIRED_FAILURE, 1)[1].split("; ")
+             if (match := re.match(r"([A-Za-z0-9_-]+): ", part))]
+    return [name for name in names if name in required]
 
 
 def agents_block() -> str:
@@ -601,18 +638,31 @@ def prompt_input_counts(stdout: str) -> dict:
             "proactive_delegation": "Proactive multi-agent delegation is active" in stdout}
 
 
-def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omniroute: bool = False) -> dict:
+def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omniroute: bool = False,
+              relax_required: bool = False) -> dict:
     """Codex's own view of the lane: the context-mode server, the model-visible input with and without the
-    profile (and with the gateway profile when it is part of the run), and the profile's read-only servers."""
+    profile (and with the gateway profile when it is part of the run), and the profile's read-only servers.
+    The `-p stack-worker` input starts the profile's required servers, as a worker's session start does; with
+    relax_required (the dry run's scratch HOME, which cannot start a server bound to the account's own home) it
+    makes them optional for that one read."""
     out = {}
     got = run_codex(codex, ["mcp", "get", "context-mode", "--json"], env, cwd, wrapper=wrapper)
     out["context_mode"] = json.loads(got.stdout) if got.returncode == 0 else {"error": last_line(got.stderr)}
-    inputs = [("prompt_input", []), ("prompt_input_profile", ["-p", PROFILE_NAME])]
+    relaxed = relaxed_required_flags() if relax_required else []
+    inputs = [("prompt_input", []), ("prompt_input_profile", ["-p", PROFILE_NAME, *relaxed])]
     if omniroute:
         inputs.append(("prompt_input_omniroute", ["-p", OMNIROUTE_PROFILE]))
     for label, extra in inputs:
         got = run_codex(codex, [*extra, "debug", "prompt-input", "probe"], env, cwd, wrapper=wrapper)
-        out[label] = prompt_input_counts(got.stdout) if got.returncode == 0 else {"error": last_line(got.stderr)}
+        if got.returncode == 0:
+            out[label] = prompt_input_counts(got.stdout)
+            continue
+        out[label] = {"error": last_line(got.stderr)}
+        not_started = required_start_failures(got.stderr)
+        if not_started:
+            out[label]["required_not_started"] = not_started
+    if relaxed:
+        out["required_relaxed"] = required_servers()
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
     out["profile_servers"] = {}
     for name in sorted(profile.get("mcp_servers", {})):
@@ -655,10 +705,18 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     labelled = [("default", plain), ("-p stack-worker", profiled)]
     if "prompt_input_omniroute" in found:
         labelled.append((f"-p {OMNIROUTE_PROFILE}", found["prompt_input_omniroute"]))
+    not_started = [label for label, counts in labelled if counts.get("required_not_started")]
+    for label in not_started:  # the session did not start, so the counts below would only repeat that
+        counts = dict(labelled)[label]
+        problems.append(f"{label} prompt input: required MCP servers did not start: "
+                        f"{', '.join(counts['required_not_started'])} ({counts.get('error')})")
+    labelled = [(label, counts) for label, counts in labelled if label not in not_started]
     for label, counts in labelled:
         if counts.get("top_rule") != 1 or counts.get("rtk_exceptions") != 1 or counts.get("prefix_rule", 0) < 1:
             problems.append(f"{label} prompt input: {counts}")
-    for label, counts in labelled[1:]:
+    for label, counts in labelled:
+        if label == "default":
+            continue
         if not counts.get("no_spawn_unless_asked") or counts.get("proactive_delegation"):
             problems.append(f"the {label} profile's effort did not reach the prompt input "
                             "(max turns proactive delegation off)")
@@ -716,7 +774,11 @@ def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
                                          written.decode("utf-8").splitlines(), "config.toml", "config.toml (rehearsed)",
                                          lineterm="", n=1))
         lines += ["  config.toml diff:", *[f"    {line}" for line in diff[2:]]] if diff else ["  config.toml: unchanged"]
-        found = readbacks(codex, env, wrapper, cwd, omniroute=plan.omniroute)
+        found = readbacks(codex, env, wrapper, cwd, omniroute=plan.omniroute, relax_required=True)
+        if found.get("required_relaxed"):
+            lines.append(f"  -p {PROFILE_NAME} required servers {', '.join(found['required_relaxed'])}: relaxed in "
+                         "this rehearsal (-c mcp_servers.<name>.required=false), since its scratch HOME cannot start "
+                         "a server bound to the account's home; the apply's read-back starts them under Codex")
         transport = found.get("context_mode", {}).get("transport") or {}
         lines.append(f"  codex mcp get context-mode: command {transport.get('command')}, cwd {transport.get('cwd')}, "
                      f"env keys {sorted(transport.get('env') or {})}")
