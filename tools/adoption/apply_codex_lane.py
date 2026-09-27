@@ -1,29 +1,37 @@
 #!/usr/bin/env python3
 """Put the Codex worker lane on one Codex home, through Codex's own config writer. Dry run by default.
 
-The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes:
+The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes, four with --omniroute-profile:
 
   config.toml   written only through `codex app-server` `config/batchWrite` with `expectedVersion`, the writer
                 Codex's own clients use: [mcp_servers.context-mode] exactly as adoption/templates/
                 codex.config.template.toml renders it (upstream start.mjs from the pinned npm install, no `cwd`,
                 `default_tools_approval_mode = "approve"`), the context-mode plugin's own server turned off,
-                and headroom's four offline variables when headroom is registered. No other key is sent.
+                headroom's four offline variables when headroom is registered, and the template's
+                `startup_timeout_sec` for serena and socraticode when they are registered (`codex mcp add` takes no
+                timeout option, so a server it registered has none). No other key is sent.
   AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk
                 v0.50.0's awareness text verbatim, this catalog's exceptions), inserted or replaced between its
                 begin and end markers; every other line is kept. Hash-guarded atomic write.
   stack-worker.config.toml
                 the worker profile, adoption/templates/codex.stack-worker.config.toml, for `codex exec -p
                 stack-worker`. Created only when absent (or already identical).
+  omniroute.config.toml
+                only with --omniroute-profile: the gateway profile, adoption/templates/codex.omniroute.config.toml,
+                for `codex -p omniroute` through a local OmniRoute. Created only when absent (or already identical).
+                A config.toml that still carries the gateway route ([model_providers.omniroute], model_provider =
+                "omniroute" or a cx/ model) is reported as a host step, because the profile now carries it and the
+                lane sends no key it does not own.
 
 Modes:
   (default)   dry run. Checks the preconditions, prints each planned change against the live files, then
-              rehearses the same batchWrite, AGENTS.md block and profile on private copies in a scratch Codex
+              rehearses the same batchWrite, AGENTS.md block and profiles on private copies in a scratch Codex
               home (network namespace off where bwrap works) and prints Codex's own read-back of the result:
-              `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker`. Nothing under the
-              target Codex home is written; the scratch home is removed afterwards.
+              `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker` (and `-p omniroute`).
+              Nothing under the target Codex home is written; the scratch home is removed afterwards.
   --apply     refuses while a `codex` process runs or when a file differs from the --expect-* hash the dry run
               printed. Writes a run record and 0600 backups of config.toml and AGENTS.md first (never auth.json
-              or any other file), prints the rollback command, then makes the three changes, each read back.
+              or any other file), prints the rollback command, then makes the changes, each read back.
   --rollback RUN_DIR
               undoes what that run changed, key by key and block by block, skipping anything someone changed
               since; safe to re-run.
@@ -68,6 +76,15 @@ USER_TEMPLATE = TEMPLATES / "codex.config.template.toml"
 AGENTS_TEMPLATE = TEMPLATES / "codex.AGENTS.template.md"
 PROFILE_TEMPLATE = TEMPLATES / "codex.stack-worker.config.toml"
 PROFILE_NAME = "stack-worker"
+OMNIROUTE_TEMPLATE = TEMPLATES / "codex.omniroute.config.toml"
+OMNIROUTE_PROFILE = "omniroute"
+# OmniRoute's Codex models carry this prefix (docs/guides/CODEX-CLI-CONFIGURATION.md L150-161 at a58000c7); a base
+# config.toml model with it belongs to the gateway route, not to Codex's native provider.
+GATEWAY_MODEL_PREFIX = "cx/"
+# User-scope servers whose template start-up allowance the lane restores when they are registered. A host that
+# registered them with `codex mcp add` has no value, so Codex waits its default 30 s (codex-mcp/src/rmcp_client.rs
+# L103 and L342 at rust-v0.157.1), while the template gives serena 60 s and socraticode 120 s.
+STARTUP_TIMEOUT_SERVERS = ("serena", "socraticode")
 BLOCK_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
 BLOCK_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
 TOP_RULE_MARKER = "native-agent-stack:top-rule"
@@ -169,6 +186,13 @@ def describe(present: bool, value) -> str:
     return json.dumps(value)
 
 
+def file_state(live: bytes | None, template: bytes) -> str:
+    """A profile file against its template: create (absent), same, or differs (never overwritten)."""
+    if live is None:
+        return "create"
+    return "same" if live == template else "differs"
+
+
 def atomic_write(path: Path, data: bytes, mode: int, expect_sha: str | None, create_only: bool = False) -> None:
     """Write via a temporary file in the same directory. With create_only the target must not exist (os.link
     refuses an existing name); otherwise the target must still hash to expect_sha (None: must be absent) right
@@ -210,8 +234,8 @@ def context_mode_entry(eco_root: str, host_path: str) -> dict:
 
 
 def owned_edits(live: dict, eco_root: str, host_path: str) -> list[dict]:
-    """[{key: segments, value}] for the user config. headroom's variables are sent only when headroom is
-    registered; registering servers is not this lane's job."""
+    """[{key: segments, value}] for the user config. headroom's variables and the serena and socraticode start-up
+    allowances are sent only when that server is registered; registering servers is not this lane's job."""
     template = rendered_user_template(eco_root, host_path)
     edits = [
         {"key": ["mcp_servers", "context-mode"], "value": context_mode_entry(eco_root, host_path)},
@@ -222,6 +246,10 @@ def owned_edits(live: dict, eco_root: str, host_path: str) -> list[dict]:
         for name in HEADROOM_OFFLINE_KEYS:
             edits.append({"key": ["mcp_servers", "headroom", "env", name],
                           "value": template["mcp_servers"]["headroom"]["env"][name]})
+    for server in STARTUP_TIMEOUT_SERVERS:
+        if get_path(live, ["mcp_servers", server])[0]:
+            edits.append({"key": ["mcp_servers", server, "startup_timeout_sec"],
+                          "value": template["mcp_servers"][server]["startup_timeout_sec"]})
     return edits
 
 
@@ -383,6 +411,14 @@ class Plan:
         self.block = agents_block()
         self.profile_template = PROFILE_TEMPLATE.read_bytes()
         tomllib.loads(self.profile_template.decode("utf-8"))  # the template itself must parse
+        # The gateway profile is opt-in (--omniroute-profile); without the flag nothing about it is read or written.
+        self.omniroute = bool(getattr(args, "omniroute_profile", False))
+        self.omniroute_path = self.codex_home / f"{OMNIROUTE_PROFILE}.config.toml"
+        self.omniroute_template = OMNIROUTE_TEMPLATE.read_bytes() if self.omniroute else b""
+        if self.omniroute:
+            tomllib.loads(self.omniroute_template.decode("utf-8"))
+        self.omniroute_bytes = (self.omniroute_path.read_bytes()
+                                if self.omniroute and self.omniroute_path.is_file() else None)
         self.edits = owned_edits(self.live, self.eco_root, self.host_path or "") if self.host_path else []
         current_agents = (self.agents_bytes or b"").decode("utf-8")
         try:
@@ -409,9 +445,55 @@ class Plan:
         return (self.agents_bytes or b"").decode("utf-8") != self.new_agents
 
     def profile_state(self) -> str:
-        if self.profile_bytes is None:
-            return "create"
-        return "same" if self.profile_bytes == self.profile_template else "differs"
+        return file_state(self.profile_bytes, self.profile_template)
+
+    def omniroute_state(self) -> str | None:
+        """create | same | differs for the gateway profile; None when --omniroute-profile was not given."""
+        return file_state(self.omniroute_bytes, self.omniroute_template) if self.omniroute else None
+
+    def base_provider_step(self) -> list[str]:
+        """Report lines when config.toml still carries the gateway route the profile now holds (a host step): the
+        [model_providers.omniroute] table, a top-level model_provider = "omniroute", or a model with OmniRoute's cx/
+        prefix, the form upstream's guide puts in config.toml. They go together: a model_provider left without its
+        table stops every launch without the profile with "Model provider `omniroute` not found"."""
+        if not self.omniroute:
+            return []
+        table = get_path(self.live, ["model_providers", OMNIROUTE_PROFILE])[0]
+        selector = self.live.get("model_provider") == OMNIROUTE_PROFILE
+        model = self.live.get("model")
+        gateway_model = isinstance(model, str) and model.startswith(GATEWAY_MODEL_PREFIX)
+        if not (table or selector or gateway_model):
+            return []
+        lines = self.config_bytes.decode("utf-8").splitlines()
+        # Top-level keys come before the first table header.
+        top_level = next((index for index, line in enumerate(lines) if line.lstrip().startswith("[")), len(lines))
+        found = {"table": [], "selector": [], "model": []}  # each: (line number, text) pairs
+        for number, line in enumerate(lines, 1):
+            text = line.strip()
+            if re.fullmatch(r"\[\s*model_providers\s*\.\s*\"?omniroute\"?\s*\]", text):
+                found["table"].append((number, text))
+            elif number <= top_level and re.match(r"\"?model_provider\"?\s*=", text):
+                found["selector"].append((number, text))
+            elif number <= top_level and re.match(r"\"?model\"?\s*=", text):
+                found["model"].append((number, text))
+        wanted = {"table": table, "selector": selector, "model": gateway_model}
+        entries = [f"line {number}: {text}"
+                   for number, text in sorted(hit for part, hits in found.items() if wanted[part] for hit in hits)]
+        # A form this scan does not see (a dotted or inline table, a quoted key) is still named.
+        entries += [text for part, text in (("table", "[model_providers.omniroute] (a dotted or inline form)"),
+                                            ("selector", f'model_provider = "{OMNIROUTE_PROFILE}"'),
+                                            ("model", f"model = {json.dumps(model)}"))
+                    if wanted[part] and not found[part]]
+        return ["  HOST STEP (not scripted; the lane sends only its own keys): config.toml still carries the gateway "
+                f"route that {OMNIROUTE_PROFILE}.config.toml",
+                "  now carries:",
+                *[f"    {entry}" for entry in entries],
+                "  Once the profile is in place, back config.toml up privately and delete these together, restoring "
+                "the template's model: a",
+                f"  model_provider left without its table stops every launch without -p {OMNIROUTE_PROFILE} "
+                f"(\"Model provider `{OMNIROUTE_PROFILE}` not found\").",
+                f"  Read back: `codex debug prompt-input probe` and `codex -p {OMNIROUTE_PROFILE} debug prompt-input "
+                "probe` both render, and `render_config.py --check` no longer lists them."]
 
     def preconditions(self, codex: str, for_apply: bool) -> list[tuple[str, str, str]]:
         """[(level, name, detail)]; level ok|warn|fail. Apply refuses on any fail; the dry run reports."""
@@ -445,6 +527,12 @@ class Plan:
         checks.append(("fail" if profile == "differs" else "ok", "stack-worker profile",
                        {"create": "absent; will be created", "same": "already the template",
                         "differs": f"{self.profile_path} exists and differs from the template"}[profile]))
+        omniroute = self.omniroute_state()
+        if omniroute is not None:
+            checks.append(("fail" if omniroute == "differs" else "ok", "omniroute profile",
+                           {"create": "absent; will be created", "same": "already the template",
+                            "differs": f"{self.omniroute_path} exists and differs from the template; move it "
+                                       "aside privately first"}[omniroute]))
         running = codex_processes(self.args.codex_process_name)
         checks.append((("fail" if for_apply else "warn") if running else "ok", "codex processes",
                        f"{len(running)} running (pids {', '.join(running)})" if running else "none"))
@@ -513,13 +601,16 @@ def prompt_input_counts(stdout: str) -> dict:
             "proactive_delegation": "Proactive multi-agent delegation is active" in stdout}
 
 
-def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path) -> dict:
+def readbacks(codex: str, env: dict, wrapper: list[str] | None, cwd: Path, omniroute: bool = False) -> dict:
     """Codex's own view of the lane: the context-mode server, the model-visible input with and without the
-    profile, and the profile's read-only servers."""
+    profile (and with the gateway profile when it is part of the run), and the profile's read-only servers."""
     out = {}
     got = run_codex(codex, ["mcp", "get", "context-mode", "--json"], env, cwd, wrapper=wrapper)
     out["context_mode"] = json.loads(got.stdout) if got.returncode == 0 else {"error": last_line(got.stderr)}
-    for label, extra in (("prompt_input", []), ("prompt_input_profile", ["-p", PROFILE_NAME])):
+    inputs = [("prompt_input", []), ("prompt_input_profile", ["-p", PROFILE_NAME])]
+    if omniroute:
+        inputs.append(("prompt_input_omniroute", ["-p", OMNIROUTE_PROFILE]))
+    for label, extra in inputs:
         got = run_codex(codex, [*extra, "debug", "prompt-input", "probe"], env, cwd, wrapper=wrapper)
         out[label] = prompt_input_counts(got.stdout) if got.returncode == 0 else {"error": last_line(got.stderr)}
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
@@ -561,11 +652,16 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     """Problems in a read-back; empty when the lane is in place."""
     problems = context_mode_problems(found.get("context_mode", {}), eco_root)
     plain, profiled = found.get("prompt_input", {}), found.get("prompt_input_profile", {})
-    for label, counts in (("default", plain), ("-p stack-worker", profiled)):
+    labelled = [("default", plain), ("-p stack-worker", profiled)]
+    if "prompt_input_omniroute" in found:
+        labelled.append((f"-p {OMNIROUTE_PROFILE}", found["prompt_input_omniroute"]))
+    for label, counts in labelled:
         if counts.get("top_rule") != 1 or counts.get("rtk_exceptions") != 1 or counts.get("prefix_rule", 0) < 1:
             problems.append(f"{label} prompt input: {counts}")
-    if not profiled.get("no_spawn_unless_asked") or profiled.get("proactive_delegation"):
-        problems.append("the profile's effort did not reach the prompt input (max turns proactive delegation off)")
+    for label, counts in labelled[1:]:
+        if not counts.get("no_spawn_unless_asked") or counts.get("proactive_delegation"):
+            problems.append(f"the {label} profile's effort did not reach the prompt input "
+                            "(max turns proactive delegation off)")
     profile = tomllib.loads(PROFILE_TEMPLATE.read_text(encoding="utf-8"))
     for name, table in profile.get("mcp_servers", {}).items():
         got = found.get("profile_servers", {}).get(name, {})
@@ -590,6 +686,8 @@ def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
         os.chmod(codex_home / "config.toml", 0o600)
         (codex_home / "AGENTS.md").write_text(plan.new_agents, encoding="utf-8")
         (codex_home / f"{PROFILE_NAME}.config.toml").write_bytes(plan.profile_template)
+        if plan.omniroute:
+            (codex_home / f"{OMNIROUTE_PROFILE}.config.toml").write_bytes(plan.omniroute_template)
         env = {"HOME": str(home), "CODEX_HOME": str(codex_home), "LANG": "C.UTF-8",
                "PATH": os.pathsep.join([str(Path(codex).parent), os.defpath])}
         wrapper = bwrap_wrapper(scratch)
@@ -618,12 +716,14 @@ def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
                                          written.decode("utf-8").splitlines(), "config.toml", "config.toml (rehearsed)",
                                          lineterm="", n=1))
         lines += ["  config.toml diff:", *[f"    {line}" for line in diff[2:]]] if diff else ["  config.toml: unchanged"]
-        found = readbacks(codex, env, wrapper, cwd)
+        found = readbacks(codex, env, wrapper, cwd, omniroute=plan.omniroute)
         transport = found.get("context_mode", {}).get("transport") or {}
         lines.append(f"  codex mcp get context-mode: command {transport.get('command')}, cwd {transport.get('cwd')}, "
                      f"env keys {sorted(transport.get('env') or {})}")
         lines.append(f"  prompt input: {found.get('prompt_input')}")
         lines.append(f"  prompt input -p {PROFILE_NAME}: {found.get('prompt_input_profile')}")
+        if plan.omniroute:
+            lines.append(f"  prompt input -p {OMNIROUTE_PROFILE}: {found.get('prompt_input_omniroute')}")
         lines.append(f"  -p {PROFILE_NAME} servers: {json.dumps(found.get('profile_servers'))}")
         problems += check_readbacks(found, plan.eco_root)
     finally:
@@ -654,6 +754,10 @@ def print_plan(plan: Plan, checks: list[tuple[str, str, str]]) -> None:
         print(f"AGENTS.md: {'writes the managed block' if plan.agents_changed() else 'block already in place'} "
               f"(sha256 {agents_sha} -> {sha256_bytes(plan.new_agents.encode('utf-8'))})")
     print(f"{PROFILE_NAME}.config.toml: {plan.profile_state()}")
+    if plan.omniroute:
+        print(f"{OMNIROUTE_PROFILE}.config.toml: {plan.omniroute_state()}")
+        for line in plan.base_provider_step():
+            print(line)
     for path in plan.args.project_config or []:
         for line in project_block_step(Path(path).expanduser()):
             print(line)
@@ -681,6 +785,7 @@ def cmd_plan(args: argparse.Namespace, codex: str) -> int:
           + (f" --codex-home {plan.codex_home}" if args.codex_home else "")
           + (f" --eco-root {plan.eco_root}" if args.eco_root else "")
           + (f" --host-path '{plan.host_path}'" if args.host_path else "")
+          + (" --omniroute-profile" if plan.omniroute else "")
           + f" --expect-config-sha256 {sha256_bytes(plan.config_bytes)} --expect-agents-sha256 {agents_sha}")
     print(f"workers then start with: {worker_command()}")
     return 0
@@ -719,7 +824,8 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         print("refused: nothing written")
         return 2
     changes = plan.config_changes()
-    if not any(c["changed"] for c in changes) and not plan.agents_changed() and plan.profile_state() == "same":
+    if (not any(c["changed"] for c in changes) and not plan.agents_changed() and plan.profile_state() == "same"
+            and plan.omniroute_state() in (None, "same")):
         print("already in place: nothing to do")
         return 0
     root.mkdir(parents=True, exist_ok=True)
@@ -748,6 +854,9 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
                     "sha256_after": sha256_bytes(plan.profile_template), "state": "pending"},
         "rollbacks": [],
     }
+    if plan.omniroute:  # records of runs without --omniroute-profile, and older records, have no such entry
+        record["omniroute_profile"] = {"path": str(plan.omniroute_path), "existed": plan.omniroute_bytes is not None,
+                                       "sha256_after": sha256_bytes(plan.omniroute_template), "state": "pending"}
     write_record(run, record)
     if latest.is_symlink() or latest.exists():
         latest.unlink()
@@ -787,24 +896,29 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         record["agents"]["state"] = "done"
         write_record(run, record)
         print("AGENTS.md: written and read back")
-        # 3. the profile: journal the creation first, so an interruption after the link still leaves a record
-        # that rollback trusts (it removes the file only while it holds the template)
-        if plan.profile_state() == "create":
-            record["profile"]["creating"] = True
+        # 3. the profiles: journal each creation first, so an interruption after the link still leaves a record
+        # that rollback trusts (it removes a file only while it holds the template)
+        profiles = [("profile", plan.profile_path, plan.profile_template, plan.profile_state())]
+        if plan.omniroute:
+            profiles.append(("omniroute_profile", plan.omniroute_path, plan.omniroute_template,
+                             plan.omniroute_state()))
+        for part, path, template, state in profiles:
+            if state == "create":
+                record[part]["creating"] = True
+                write_record(run, record)
+                try:
+                    atomic_write(path, template, 0o600, None, create_only=True)
+                except FileExistsError:
+                    record[part]["creating"] = False  # another writer made it in between; it is not ours
+                    raise Failed(f"{path} appeared since it was read; left as it is") from None
+                record[part]["created"] = True
+            if sha256_file(path) != record[part]["sha256_after"]:
+                raise Failed(f"read-back: {path} does not hold the template")
+            record[part]["state"] = "done"
             write_record(run, record)
-            try:
-                atomic_write(plan.profile_path, plan.profile_template, 0o600, None, create_only=True)
-            except FileExistsError:
-                record["profile"]["creating"] = False  # another writer made it in between; it is not ours
-                raise Failed(f"{plan.profile_path} appeared since it was read; left as it is") from None
-            record["profile"]["created"] = True
-        if sha256_file(plan.profile_path) != record["profile"]["sha256_after"]:
-            raise Failed(f"read-back: {plan.profile_path} does not hold the template")
-        record["profile"]["state"] = "done"
-        write_record(run, record)
-        print(f"{PROFILE_NAME}.config.toml: in place")
+            print(f"{path.name}: in place")
         # 4. Codex's own view
-        found = readbacks(codex, env, None, Path("/"))
+        found = readbacks(codex, env, None, Path("/"), omniroute=plan.omniroute)
         record["readback"] = found
         problems = check_readbacks(found, plan.eco_root)
         if adoption_status.rtk_instructions_inline(plan.codex_home) is not True:
@@ -841,20 +955,24 @@ def cmd_rollback(args: argparse.Namespace, codex: str) -> int:
         print(f"refused: {len(running)} codex processes running (pids {', '.join(running)})")
         return 2
     outcome, conflicts = {}, []
-    # 3. the profile: remove it only if this run created it (or was creating it when it stopped) and nobody
-    # changed it since
-    profile = Path(record["profile"]["path"])
-    if record["profile"].get("created") or record["profile"].get("creating"):
-        digest = sha256_file(profile)
-        if digest is None:
-            outcome["profile"] = "already absent"
-        elif digest == record["profile"]["sha256_after"]:
-            profile.unlink()
-            outcome["profile"] = "removed"
+    # 3. the profiles: remove one only if this run created it (or was creating it when it stopped) and nobody
+    # changed it since. A record without "omniroute_profile" (no --omniroute-profile, or an older run) has only one.
+    for part in ("profile", "omniroute_profile"):
+        entry = record.get(part)
+        if entry is None:
+            continue
+        profile = Path(entry["path"])
+        if entry.get("created") or entry.get("creating"):
+            digest = sha256_file(profile)
+            if digest is None:
+                outcome[part] = "already absent"
+            elif digest == entry["sha256_after"]:
+                profile.unlink()
+                outcome[part] = "removed"
+            else:
+                conflicts.append(f"{profile} changed since the run; left in place")
         else:
-            conflicts.append(f"{profile} changed since the run; left in place")
-    else:
-        outcome["profile"] = "not created by this run"
+            outcome[part] = "not created by this run"
     # 2. AGENTS.md: restore the backup when the file is exactly what the run wrote. When it changed since, swap back
     # only the block, and only while the block is still the one the run installed; the earlier block comes back
     # if there was one.
@@ -973,6 +1091,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--expect-config-sha256", help="--apply: config.toml's sha256 from the reviewed dry run")
     parser.add_argument("--expect-agents-sha256", help="--apply: AGENTS.md's sha256 from the reviewed dry run "
                         "(\"absent\" when it had none)")
+    parser.add_argument("--omniroute-profile", action="store_true",
+                        help="also install adoption/templates/codex.omniroute.config.toml as "
+                             "$CODEX_HOME/omniroute.config.toml, the opt-in profile for `codex -p omniroute` through a "
+                             "local OmniRoute gateway (created only when absent; rollback removes it)")
     parser.add_argument("--keep-rehearsal", action="store_true", help="dry run: keep the scratch Codex home")
     parser.add_argument("--codex-process-name", default="codex",
                         help="the executable name the no-running-Codex check looks for (default: codex)")
