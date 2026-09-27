@@ -197,10 +197,13 @@ python3 tools/adoption/apply_codex_lane.py --rollback RUN_DIR
 - **Dry run (the default).** It rehearses the write, the block and the profile on copies in a scratch Codex home, then prints Codex's own read-back and the two hashes the apply needs.
 - **Apply.** It runs only when no `codex` process is running (`pgrep -x codex` is empty). It refuses when either file changed since the reviewed dry run, when a non-empty `AGENTS.override.md` would shadow `AGENTS.md`, and while an earlier run is unfinished. It keeps 0600 backups of `config.toml` and `AGENTS.md` and a run record under `~/.local/state/native-agent-stack/codex-lane/`, and prints the rollback command before its first write.
 - **Rollback.** It restores each key, and the block, only where it still holds what the run wrote, and reports whatever changed since.
-- **`--live`.** It spends five model calls, each started with the pinned flags above:
+- **`--live`.** With an installed skill, it spends six model calls, each started with the pinned flags above:
   - two concurrent workers must each get their own directory from `ctx_execute pwd`;
   - `memory_query` must complete with the profile and be refused without it;
-  - a worker must run `git status` through `rtk` and read `git show HEAD:big.txt` natively or through `rtk proxy`, byte for byte.
+  - a worker must run `git status` through `rtk` and read `git show HEAD:big.txt` natively or through `rtk proxy`, byte for byte;
+  - the skill worker must read an installed `SKILL.md` and return its real first line through `context-mode ctx_execute_file` or the specified `rtk cat` command; the check records which route succeeded.
+
+Install a skill under `~/.agents/skills/*/SKILL.md` with the [Claude native profile recipe](claude-native-profile.md#small-persistent-contract-selected-upstream-skills), or select an installed file with `--skill-file PATH/TO/SKILL.md`. The live worker suite always reports the `skill-worker` check. A missing skill or invalid `--skill-file` fails the run (exit 1) after the other five calls; no sixth call is fabricated. Skill locations follow the [official Codex documentation](https://developers.openai.com/codex/skills/), and the native event verdict follows [openai/codex `rust-v0.157.1` exec events](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec/src/exec_events.rs).
 
 A project `.codex/config.toml` that still pins context-mode to one directory (a `cwd` and `CONTEXT_MODE_PROJECT_DIR`) overrides the user-scope entry in that project. Codex's writer only writes the user config, so it cannot fix this. The dry run lists those tables and their line numbers for each `--project-config`; back the file up privately and delete them by hand. Then read back from that project's root: `codex mcp get context-mode --json` must show `"cwd": null`, and `codex mcp list --json` must list one context-mode. Start main-checkout sessions from the repository root, because the bound directory is the session's cwd.
 

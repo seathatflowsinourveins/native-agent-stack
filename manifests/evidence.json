@@ -13813,8 +13813,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "0400433c7417da5c7372c1b71dc73e3e04930f74f496066fc85c27ebcd99e1f6",
-      "bytes": 29858
+      "sha256": "4614d7c8c844bf6596bcc0769ece7287caac2abd22781259171baa0950a20c1d",
+      "bytes": 33296
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -13998,8 +13998,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "bd6677f6fed5170a574206ed366bee91dfbcbf16869b78999e9fc0424de9bb8d",
-      "bytes": 35935
+      "sha256": "39434fd5db6e4ecfdf55cc86f06094a62d6ba5134497785e3536e753972031cb",
+      "bytes": 38176
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15290,6 +15290,41 @@
       "path": "evidence/artifacts/codex-worker-lane-20260926/writer-probes.txt",
       "sha256": "ff3188db91ffdd8544c4074194f034d0f6c8de487921f1e59d695e4dbec33e14",
       "bytes": 4985
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/README.md",
+      "sha256": "9347406c05bffd573f13593fa132a6d20f8040b854f44f7d73422e26e62ec3ee",
+      "bytes": 7401
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/apply.txt",
+      "sha256": "4695a72f73d1ae63f82d490bacdc5e29bb6b168ad128c07ff0bd0ef4182873c1",
+      "bytes": 1919
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/dry-run-project.txt",
+      "sha256": "493d11cd7fcaaf3914859c9cca8820d61aa6e67bfdf7ef7c81a8ddba0e711c6e",
+      "bytes": 3582
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/dry-run.txt",
+      "sha256": "6776df4a61467f79805737a190a0f440ddf1b8f510d3e51da3be1582f50b2bdb",
+      "bytes": 3924
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/prove-live.txt",
+      "sha256": "69ebc7a39e2cffa6e8c97355f18a7686c3d5dbbf12b6a23beaaa319fe064381c",
+      "bytes": 2343
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/prove.txt",
+      "sha256": "8a779b0b858a9e3efc207c2c84352f93dfc355b9c43c345033ccf85b7f706e2a",
+      "bytes": 1777
+    },
+    {
+      "path": "evidence/artifacts/codex-worker-lane-host-20260927/prove2.txt",
+      "sha256": "d9e07392788be37799ed9f4cb79639fc65e88a18e17d3df55161da66fc969012",
+      "bytes": 1718
     },
     {
       "path": "evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json",
@@ -38628,8 +38663,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "8e7144362c8f64c00cc2e301eed390fdff7dd68ffb514f5c41da67c327f35c3f",
-      "bytes": 116400
+      "sha256": "16d0a50b1379e2a6d71b4502477d7d9ba9d2b488958a61a8ed3e0d9e53eab759",
+      "bytes": 117319
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -39188,8 +39223,13 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "384a1e6618623db08e78f9697dc49af55f525978903888f30dfa27dafb53d61a",
-      "bytes": 87373
+      "sha256": "5af475b81bbeab31ed8612a8d031aa4860eb3e26e20a6244791fd98174b3d876",
+      "bytes": 87539
+    },
+    {
+      "path": "tests/test_codex_worker_skill.py",
+      "sha256": "95de88e374a4f3db7dcc82f86d937643782d2bb63c501b4510ab65866f3f8aec",
+      "bytes": 12476
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -39793,8 +39833,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "45855c7cfb1a581e9376897ab84e14ef4756fa75d6e0ad46bec720ddc67e37f1",
-      "bytes": 25684
+      "sha256": "a399117aa14bec57fd5be59badc0121523148449ae758d7d37ecf052f7c92e23",
+      "bytes": 31531
     },
     {
       "path": "tools/adoption/render_config.py",

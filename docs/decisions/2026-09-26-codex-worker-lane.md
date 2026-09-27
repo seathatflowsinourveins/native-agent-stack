@@ -363,3 +363,47 @@ Nothing here is host acceptance or a model run.
 sessions, and a host's own trust entries are user decisions. The latency of a login shell per command, now that
 the snapshot is off, is unmeasured. The stack-worker knobs `mcp_optional_startup_grace_ms = 0`, `required = true` and
 a pinned `model_reasoning_summary` wait for their measured trial.
+
+## Addendum 2026-09-27: workstation apply, proof and the completed A0 control
+
+The coordinator's watcher applied the lane to the workstation's real `~/.codex`
+at **2026-09-27T07:51:52Z**, the first moment with no Codex process. The retained
+[`apply.txt`](../../evidence/artifacts/codex-worker-lane-host-20260927/apply.txt)
+confirms the quiet precondition and the installed/read-back files; the exact
+watcher timestamp is coordinator-supplied. Afterwards the coordinator privately
+backed up the main checkout's untracked `.codex/config.toml` and removed the
+three context-mode tables named by the documented host step. No private backup
+or active configuration is published.
+
+**2026-09-27 revision erratum:** the local `apply_codex_lane.py` / `prove_codex_lane.py` revision was **main before #395; exact commit not retained**; the [#395 start-up allowances](#addendum-2026-09-27-start-up-allowances-the-gateway-profile-and-four-base-keys) are not part of this apply and remain pending until a dry run and apply at the current revision.
+
+The [six sanitized records and evidence table](../../evidence/artifacts/codex-worker-lane-host-20260927/README.md)
+retain the initial 6/7 proof with its project-binding failure, the corrected
+**7/7 static proof**, and **12/12 with `--live` (five real model calls)**. The
+apply/read-backs are local integration on the real Codex home; the five worker
+calls additionally constitute live provider execution. They do not accept other
+hosts or become unchanged upstream tests. The records retain runner summaries,
+not full native events, complete invocation records or outer command exit
+statuses, so the earlier formal host-acceptance limitation still applies.
+
+The proof runner now adds an installed-skill check. A sixth worker reads one
+SKILL.md from `~/.agents/skills` (or `--skill-file`); completed native tool output
+must match its actual first line, and the result records the successful route.
+Context-mode's [v1.0.169 `evaluateProjectContainment`](https://github.com/mksglu/context-mode/blob/v1.0.169/src/security.ts#L766)
+(compiled to `security.js`, following [#852](https://github.com/mksglu/context-mode/issues/852))
+can refuse a file outside the worker directory, so an ordinary `rtk cat` shell
+read is accepted. No permission policy is relaxed. The event contract comes from
+[openai/codex `rust-v0.157.1` exec events](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec/src/exec_events.rs);
+the user skill location follows the [official skill documentation](https://developers.openai.com/codex/skills/).
+The historical 12/12 run predates this addition. Its new control cases are
+synthetic unittest events, not evidence of a sixth live call.
+
+**Dated update to Decision 4's “which has not run”:** the tiering preregistration's
+A0 control has now run. [The receipt published with #397](../../evidence/artifacts/gpt6-family-tiering-20260927/README.md)
+and its [run record](../../evidence/artifacts/gpt6-family-tiering-20260927/run-record.json)
+record `gpt-6-astra` at `max`, **25 successful calls**, exit 0, from
+2026-09-27T07:09:02.343Z to 07:13:45.011Z. This is live provider execution of the
+frozen mechanical-extraction experiment. It does not change the worker profile
+or establish tiering for general worker tasks; its findings and limits stay in
+that experiment's receipt. The earlier sentence remains the dated historical
+state, with this addendum supplying its update.
