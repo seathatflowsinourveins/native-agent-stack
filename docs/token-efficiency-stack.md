@@ -3,7 +3,10 @@
 This is the topic-specific entry point for the selected stack on September 20,
 2026. The [machine-readable list](token-efficiency-stack.json) contains the full
 upstream install, use and statistics commands, versioned sources, returned results,
-baseline comparisons and lifecycle limits for each tool. The
+baseline comparisons and lifecycle limits for each tool. Its 2026-09-27 edition adds,
+for 17 of its 24 rows, each tool's upstream state, native adaptation, adapted
+performance, invoke rates and GPT-6 review from the
+[per-tool evidence cards](../evidence/artifacts/token-stack-cards-20260927/README.md). The
 offline HTML (`ecosystem/index.html#efficiency`, generated with
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
 from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) embeds this guide and those rows;
@@ -273,11 +276,32 @@ host's result, the reference host's included, is not its acceptance.
 
 On the workstation, 16 Sonnet 5 workflow subagents each used one tool on real work in this repository and checked the answer against the plain baseline. The record is in [the E2E receipt](../evidence/artifacts/token-e2e-ultracode-20260925/README.md).
 
-**Coverage.** All 16 tools worked:
+**Coverage.** Sixteen tools were exercised:
 - the RTK hook;
 - Context Mode, jCodeMunch, Serena, SocratiCode and ai-memory as native MCP;
 - Headroom as MCP through MCPorter;
 - QMD, Repomix, TOON, ast-grep, codebase-memory-mcp, Context Hub, MarkItDown, agentsview and otel-tui as CLIs.
+
+**Correction (2026-09-27).** The receipt marks all 16 checks passed. That is not the
+current acceptance:
+- QMD's and Repomix's passes were retracted on 2026-09-26. QMD retrieved a document that
+  does not answer the question ([the receipt's own note](../evidence/artifacts/token-e2e-ultracode-20260925/README.md#retained-failures-and-gaps),
+  [the Codex run](../evidence/artifacts/token-e2e-codex-20260926/README.md#correction-to-296)).
+  Repomix's `--compress` pack dropped the multi-line `status_body` declaration, so its
+  `count=47 PASS` was a false pass ([the laptop reproduction](../evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md#retained-failures-and-gaps)).
+- ai-memory's check (`PASS base_empty=True hits=10`) shows returned hits against an empty
+  baseline, not a correct answer, so its task acceptance is untested.
+- The receipt records a passing result for each check and no failing control, so the
+  remaining passes lack the [discriminating control](acceptance-evidence-policy.md#identify-what-each-check-proves)
+  the policy asks of new claims.
+- The later runs are separate evidence. On the laptop (13 of these tools, 2026-09-26),
+  11 of 13 checks passed; its independent verifier refuted RTK's "no fact lost" claim, and
+  Serena and Repomix failed their own checks. In Codex (15 tools, 2026-09-26), 11 of 15
+  passed.
+
+Each tool's current upstream state, native adaptation, adapted performance, invoke rates
+and GPT-6 verdict are in the [2026-09-27 evidence cards](../evidence/artifacts/token-stack-cards-20260927/README.md)
+and in the rows of the [machine list](token-efficiency-stack.json).
 
 These 16 are not the `token-efficiency` profile, whose 14 `component_ids` the
 [coverage check](#coverage-check) tests. Ten of them are profile rows: RTK, Context
@@ -302,7 +326,7 @@ Three passed only on a second attempt, each after a real binding constraint:
 
 **Fresh sessions.** A fresh `claude -p` session loaded the Headroom, codebase-memory and QMD MCP servers registered at user scope, and called each of them.
 
-**Not run.** Codex workers could not run: the account is at its usage limit until 2026-09-30. OmniRoute stays excluded, because it reroutes model traffic.
+**Not run in this window.** Codex workers could not run then: the account was at its usage limit, reported until 2026-09-30. After a re-login, [the Codex run](../evidence/artifacts/token-e2e-codex-20260926/README.md) did the same tasks on 2026-09-26. OmniRoute stays excluded, because it reroutes model traffic.
 
 ## Hosted CI coverage (2026-09-26)
 

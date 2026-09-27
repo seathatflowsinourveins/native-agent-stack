@@ -1,0 +1,236 @@
+{
+  "verified_at_utc": "2026-09-27T02:55:29Z",
+  "scope": "Final verdict verification; scratch paths are relative to the token-cards directory, and adoption/docs/evidence paths are relative to the native stack repository. No installation or upstream issue changes were made.",
+  "attachments": [
+    {
+      "tool": "codebase-memory-mcp",
+      "records": 31,
+      "attachment_references_opened": 83,
+      "missing": 0,
+      "hash_or_size_mismatches": 0
+    },
+    {
+      "tool": "jcodemunch-mcp",
+      "records": 48,
+      "attachment_references_opened": 164,
+      "missing": 0,
+      "hash_or_size_mismatches": 0
+    },
+    {
+      "tool": "serena",
+      "records": 25,
+      "attachment_references_opened": 112,
+      "missing": 0,
+      "hash_or_size_mismatches": 0
+    },
+    {
+      "tool": "ai-memory",
+      "records": 48,
+      "attachment_references_opened": 110,
+      "missing": 0,
+      "hash_or_size_mismatches": 0
+    },
+    {
+      "tool": "qmd",
+      "records": 30,
+      "attachment_references_opened": 92,
+      "missing": 0,
+      "hash_or_size_mismatches": 0
+    },
+    {
+      "tool": "socraticode",
+      "records": 34,
+      "attachment_references_opened": 91,
+      "missing": 0,
+      "hash_or_size_mismatches": 0
+    }
+  ],
+  "recounts": {
+    "method": "Read the exact content-addressed baseline and candidate files referenced by retained comparison outputs; recompute SHA-256, byte size, and o200k_base tokens using the installed gpt-tokenizer module. Counts do not establish semantic eligibility.",
+    "comparisons": 15,
+    "artifact_checks": 30,
+    "failures": 0,
+    "results": [
+      {
+        "evidence": "../rr/codebase-memory-mcp/out/c20-compare-cli-plan.stdout",
+        "before": 56274,
+        "after": 1844
+      },
+      {
+        "evidence": "../rr/codebase-memory-mcp/out/c21-compare-cli-plan-fallback.stdout",
+        "before": 56274,
+        "after": 2975
+      },
+      {
+        "evidence": "../rr/codebase-memory-mcp/out/c22-compare-mcp-plan.stdout",
+        "before": 56274,
+        "after": 865
+      },
+      {
+        "evidence": "../rr/codebase-memory-mcp/out/c23-compare-mcp-plan-fallback.stdout",
+        "before": 56274,
+        "after": 1410
+      },
+      {
+        "evidence": "../rr/jcodemunch-mcp/out/raw/74-compare-retrieval.stdout",
+        "before": 25440,
+        "after": 570
+      },
+      {
+        "evidence": "../rr/jcodemunch-mcp/out/raw/75-compare-schema-surface.stdout",
+        "before": 24189,
+        "after": 1090
+      },
+      {
+        "evidence": "../rr/serena/out/80-compare-serena.stdout",
+        "before": 25942,
+        "after": 2168
+      },
+      {
+        "evidence": "../rr/qmd/out/27-compare-A.stdout",
+        "before": 4373,
+        "after": 4388
+      },
+      {
+        "evidence": "../rr/qmd/out/28-compare-B.stdout",
+        "before": 4373,
+        "after": 1850
+      },
+      {
+        "evidence": "../rr/qmd/out/29-compare-C.stdout",
+        "before": 4373,
+        "after": 5111
+      },
+      {
+        "evidence": "../rr/qmd/out/30-compare-D.stdout",
+        "before": 5756,
+        "after": 3367
+      },
+      {
+        "evidence": "../rr/socraticode/out/cmp-claude.stdout",
+        "before": 16096,
+        "after": 2352
+      },
+      {
+        "evidence": "../rr/socraticode/out/cmp-mcporter.stdout",
+        "before": 16096,
+        "after": 2396
+      },
+      {
+        "evidence": "../rr/socraticode/out/cmp-codex.stdout",
+        "before": 16096,
+        "after": 2396
+      },
+      {
+        "evidence": "../rr/socraticode/out/cmp-iso.stdout",
+        "before": 16096,
+        "after": 2196
+      }
+    ]
+  },
+  "q3": {
+    "method": "Opened the matching retained codebase-memory SQLite graph read-only, joined inbound CALLS edges to scripts/host_receipts.py register_file, and compared (file,name) pairs with ../cbm-q3/truth.json; opened original clone source to confirm the two low-confidence calls.",
+    "known_direct_callers": 12,
+    "true_callers_returned": 9,
+    "true_callers_at_confidence_at_least_0_5": 7,
+    "low_confidence_true_callers": [
+      {
+        "file": "scripts/freshness_propose.py",
+        "name": "rebuild_explorer",
+        "call_line": 598,
+        "confidence": 0.38
+      },
+      {
+        "file": "scripts/freshness_propose.py",
+        "name": "apply",
+        "call_line": 649,
+        "confidence": 0.38
+      }
+    ],
+    "evidence": [
+      "../cbm-q3/truth.json",
+      "../cbm-q3/clone/scripts/freshness_propose.py",
+      "groups/g3-code-navigation/codebase-memory-mcp.review.json"
+    ]
+  },
+  "live_probes": {
+    "qmd": {
+      "status": "completed",
+      "documents": 122,
+      "pending_embedding": 122,
+      "has_vector_index": false,
+      "collections": [
+        "us-equities-foundation",
+        "us-equities-catalog"
+      ],
+      "query_then_get": "Completed typed lexical query with rerank:false and an eight-line get; returned document was a US-equities catalog, not the token-session handbook. No new savings measurement."
+    },
+    "serena": {
+      "tool": "initial_instructions",
+      "status": "timed_out",
+      "timeout_seconds": 240,
+      "useful_retrieval_completed": false,
+      "find_symbol": {
+        "name_path_pattern": "register_file",
+        "relative_path": "scripts/host_receipts.py",
+        "status": "timed_out",
+        "timeout_seconds": 240
+      }
+    },
+    "ai-memory": {
+      "tool": "memory_query",
+      "status": "denied",
+      "error": "MCP tool call requires approval, but approval policy is never",
+      "useful_retrieval_completed": false
+    },
+    "socraticode": {
+      "tool": "codebase_status",
+      "status": "denied",
+      "error": "MCP tool call requires approval, but approval policy is never",
+      "useful_retrieval_completed": false
+    }
+  },
+  "wiring": {
+    "claude_portable_mcp_servers": [
+      "ai-memory",
+      "serena"
+    ],
+    "claude_agents_checked": 6,
+    "claude_agents_with_direct_cbm_namespace_grant": 0,
+    "claude_template_serena_hooks": false,
+    "live_codex_serena_hooks": false,
+    "serena_startup_timeout_seconds": {
+      "user": null,
+      "project": 60,
+      "template": 60
+    },
+    "socraticode_startup_timeout_seconds": {
+      "user": null,
+      "project": 120,
+      "template": 120
+    },
+    "jcodemunch_registration": {
+      "user": false,
+      "project": true
+    },
+    "cbm_platform_pins": {
+      "linux": false,
+      "macos": false
+    },
+    "ai_memory_versions": {
+      "linux_pin": "2.4.1",
+      "macos_pin": "2.3.2",
+      "claude_hook_template": "2.4.1"
+    },
+    "cause_of_serena_timeout": "unverified"
+  },
+  "invoke_scan": {
+    "source": "invoke_by_tool.json",
+    "scanner": "invoke_by_tool.py",
+    "since": "2026-09-25T11:37:28Z",
+    "until": "2026-09-26T23:37:28Z",
+    "card_population_rows_match_source": true,
+    "codex_negative_control_sessions_excluded": 139,
+    "interpretation": "Counts of detected invocation attempts and agents invoking; not tool-success rates, not causal savings, and not added to the separate OTel window."
+  }
+}

@@ -1,0 +1,463 @@
+{
+  "tool": "mcporter",
+  "group": "g2-context-sandbox",
+  "repo": "https://github.com/openclaw/mcporter",
+  "pin": "0.14.1 (npm, sha256 8e489864...; 0.13.13 kept for rollback, its leftover daemon retired in #345)",
+  "installed_version": "0.14.1 (native `mcporter --version`)",
+  "role": "CLI MCP bridge that is the upstream client for subagent or CLI access to stdio MCP servers (headroom, jcodemunch, context-mode, serena), with a keep-alive daemon for same-connection counters. Saves nothing itself. Landscape: mcp-surfaces winner.",
+  "lanes": [
+    "CLI: mcporter call --stdio / --config",
+    "keep-alive daemon (MCPORTER_DAEMON_DIR)"
+  ],
+  "upstream": {
+    "latest_release": "v0.14.1, 2026-09-24, https://github.com/openclaw/mcporter/releases/tag/v0.14.1 ; the fresh canonical-repository releases API reports 2026-09-24T13:16:08Z and the npm latest dist-tag is also 0.14.1, https://registry.npmjs.org/mcporter/latest . No published 0.14.2 or newer was found; the old steipete URL's cached release view was not used as the currency authority.",
+    "latest_date": "2026-09-24",
+    "our_pin": "Linux active pin 0.14.1 (manifests/stack.json:621; adoption/pins-linux-x86_64.json:131), https://github.com/openclaw/mcporter/releases/tag/v0.14.1 . macOS adoption/pins-macos-arm64.json:105 and the cross-tool landscape winner remain 0.13.13, as explicitly retained in manifests/stack.json's mcporter freshness note; https://github.com/openclaw/mcporter/releases/tag/v0.13.13 . Those are separate platform/verdict scopes, not evidence that this Linux executable is still 0.13.13.",
+    "behind_by": "Linux is zero released versions behind. Observed main 5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7 is one commit after v0.14.1, changing CHANGELOG.md only to start 0.14.2 development and record release proof; the compare page was visited: https://github.com/openclaw/mcporter/compare/v0.14.1...5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7 . This is not a 0.14.2 runtime release. macOS and the retained landscape verdict are deliberately on their older 0.13.13 pin.",
+    "recommended_install": {
+      "command": "npm install -g mcporter",
+      "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/install.md"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "For CLI-based agent access, configure/import the selected MCP server, inspect its relevant tools, then use a small per-server or per-workflow skill that invokes mcporter call; upstream discourages one generic skill teaching every server. A dedicated generated CLI is another option for repeated workflows. If pooled native MCP access is actually wanted, upstream separately supports mcporter serve --servers <selected> --stdio; that optional bridge is documented at https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md .",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/agent-skills.md"
+      },
+      "codex": {
+        "how": "The same focused CLI/skill pattern works from Codex shell commands and scripts. Codex can also register the optional mcporter serve --stdio bridge for selected keep-alive servers, but native mcp_servers registrations can connect directly to each upstream server and do not inherently traverse mcporter. The bridge publishes server__tool names; importing Codex config into mcporter is not the reverse operation of routing Codex through it.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md#mcporter-serve---servers-abc---stdio---http-port"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "Upstream defines mcporter as a TypeScript runtime and CLI for discovering and invoking MCP servers from terminals, scripts, agents and generated CLIs; it supports ad-hoc URL/stdio targets and imports several native clients' server configurations. These are transport and workflow capabilities, not a published token-compression percentage.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/README.md"
+      },
+      {
+        "claim": "Upstream's agent-skill guidance recommends small per-server skills so agents do not load irrelevant server schemas; it presents prompt-size economy as a workflow design benefit without a quantitative savings guarantee for this host.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/agent-skills.md"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "npm installs require Node 24 or newer. The package's CLI/runtime and optional native standalone distributions are distinct installation choices.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/install.md"
+      },
+      {
+        "text": "File-backed string arguments are supported as key=@path or --key @path; @@ escapes a literal leading @. --args/--params accept a JSON object, and source also supports --args - for JSON read from stdin (https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts#L317). This is a named UTF-8 string facility, not arbitrary binary attachment transport.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md#mcporter-call-servertool"
+      },
+      {
+        "text": "In v0.14.1, resolveSelectorAndTool at src/cli/call-arguments.ts:170-171 consumes the first positional token when no --server or expression-provided server is present, even if --tool was supplied; trailing named arguments are parsed afterward. A call must select the target unambiguously before relying on content=@file to reach a required content property. The same source handles --args - at :317-322 and reads @path at :362-386.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts#L164"
+      },
+      {
+        "text": "The optional mcporter serve MCP bridge exposes only configured keep-alive servers; it is not an automatic interception layer for every MCP connection made by Claude or Codex.",
+        "url": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md#mcporter-serve---servers-abc---stdio---http-port"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "Since Linux's v0.14.1 pin, observed main contains only the CHANGELOG.md development/release-proof update at 5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7. No newer runtime implementation or released 0.14.2 was found.",
+        "url": "https://github.com/openclaw/mcporter/compare/v0.14.1...5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7"
+      },
+      {
+        "text": "Relative to the separately retained macOS/landscape 0.13.13 baseline, the Linux v0.14.1 release includes caller-visible alias filtering for daemon activity logs, suppression of Windows background-console flashes, and dependency/development-tool refreshes. These changes are already included in Linux's active pin and are not a reason to report Linux as behind.",
+        "url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {
+      "id": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "version": "0.14.1",
+      "license": "MIT",
+      "profile": "core",
+      "role": "Native CLI bridge with persistent MCP daemon connection",
+      "freshness": "0.14.1 serves bin/mcporter on the NativeStack WSL2 host since 2026-09-25 after a matched 37-step comparison against 0.13.13 (independent review). 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.13.13 is kept for rollback. The Mac pin stays 0.13.13, and the landscape winner pin stays 0.13.13 until a new verdict wave."
+    },
+    "how_we_install": "Linux uses npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1 and the ecosystem bin link (recipes/README.md:100; adoption/pins-linux-x86_64.json:131). The retained qualification is evidence/receipts/mcporter-0141-qualification-20260925.json. Node >=24 and ps on the daemon launch PATH are required by the recipe; stop an idle prior daemon before switching because a compatible old daemon can continue serving newer clients. macOS adoption/pins-macos-arm64.json:105 remains 0.13.13, as does the landscape winner pending a new verdict wave (manifests/stack.json:621).",
+    "claude_wiring": "The native lane is shell/CLI use with explicit configuration, not an MCP tool target named mcporter (docs/token-session-handbook.md:142; recipes/README.md:100). adoption/templates/claude.settings.template.json contains no mcporter server/plugin entry, and none of examples/claude-native/agents/*.md explicitly lists mcporter MCP tools. The retained scripts use it to discover and call selected upstream servers; the native context-mode and headroom registrations are separate.",
+    "codex_wiring": "Neither adoption/templates/codex.config.template.toml nor adoption/templates/project.codex.config.template.toml nor the live .codex/config.toml registers mcporter as a native MCP server. Codex instead connects directly to headroom at the user template's :55 and context-mode at :87, with this host's context-mode override in .codex/config.toml:21; the live headroom entry is in ~/.codex/config.toml. mcporter is used through command execution in retained scripts and isolated MCP tests, including scratchpad-relative rr/mcporter/make_config.py:4-10 and rr/context-mode/build_records.py:67, not between Codex's native MCP client and these servers.",
+    "lane_rule": "Use the on-demand MCP CLI bridge with an explicit selected config and target, inspect only needed tool schemas, then verify a real call rather than treating list output as functionality (docs/token-session-handbook.md:142; recipes/README.md:100). Retained rr/mcporter/*.py and rr/context-mode/*.py use isolated/ad-hoc or keep-alive fixture configurations. It is transport for another tool's operation, not an additional compression layer; the card's method explicitly permits one command to count for several tools.",
+    "deviations_from_upstream": [
+      {
+        "what": "Linux is current while macOS and the sealed cross-tool landscape verdict retain 0.13.13.",
+        "why": "manifests/stack.json's mcporter freshness note and the platform pins distinguish a qualified Linux host switch from macOS adoption and the scope of a prior landscape verdict. The Linux evidence does not establish that another host has upgraded.",
+        "fix": "Keep those scopes explicit. Upgrade another platform only after its own qualification and refresh the landscape winner only with a new verdict; do not flatten them into a single incorrect installed version.",
+        "pr": null
+      },
+      {
+        "what": "This adaptation uses the CLI bridge and direct native-client MCP connections, not upstream's optional mcporter serve aggregate MCP server.",
+        "why": "The README describes CLI/runtime use as a primary role (https://github.com/openclaw/mcporter/blob/v0.14.1/README.md), while the native-stack handbook explicitly selects CLI bridging and the client templates launch their upstream servers directly. Upstream does support a native MCP bridge, so the measured absence of mcporter MCP calls is a deployment choice rather than an intrinsic inability of the tool.",
+        "fix": "Retain explicit, focused CLI use for scripts/tests; use upstream's small per-server skill pattern for repeated agent workflows and consider serve only if shared keep-alive native access is actually needed. Do not score zero native MCP invocations as a failure of this selected CLI architecture.",
+        "pr": null
+      },
+      {
+        "what": "The shared failed headroom compression record is an invocation-shape defect in the fixture, not lack of mcporter file-argument support.",
+        "why": "The first command had --name headroom --tool headroom_compress content=@file but no --server; the parser consumes the content token as selector at src/cli/call-arguments.ts:170-171 (https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts#L164), leaving Headroom's required content argument absent. The CLI reference expressly supports key=@path (https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md#mcporter-call-servertool). The corrected headroom card command adds --server headroom and succeeds; the same failed record is intentionally attributed to transport and target under the card's multi-tool counting method.",
+        "fix": "Use --server headroom --tool headroom_compress content=@file, a complete server.tool selector, or an explicitly serialized JSON payload with an unambiguous target. Preserve the original failure and its corrected result; do not change either assembled card's attribution or numbers.",
+        "pr": null
+      }
+    ],
+    "pending_fixes": [
+      "Standardize complete target selection in future ad-hoc fixture calls so a named file argument cannot be consumed as the selector; retain the first failed command as evidence.",
+      "Preserve Node/ps launch prerequisites and the idle-daemon stop/switch procedure from recipes/README.md:100 when an actual newer runtime is qualified; current main's changelog-only commit needs no runtime upgrade.",
+      "Keep Linux, macOS and landscape-verdict pins separate, and avoid claiming numeric token savings from transport-only evidence."
+    ],
+    "assessment": "Linux's 0.14.1 CLI adaptation is aligned with the latest released upstream and with its terminal/script role; optional mcporter serve exists upstream but is not how this host wires native Claude/Codex MCP access (https://github.com/openclaw/mcporter/blob/v0.14.1/README.md; https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md). The assembled token-cards/cards/mcporter.json records mcp_calls 0 in workflow_children, workflow_children_with_lanes_block, workflow_children_without_lanes_block, agent_subagents, main_sessions and codex_exec_workers, which is architecturally expected here, while workflow_children cli_calls is 1111; the lanes-block population separately records cli_calls 0 with agents 22 and is not added to another population. Its shared headroom record failed with exit 1 because --tool plus --name without --server let the positional content=@file token become the selector, an incomplete invocation on our side rather than a file/blob limitation or an invalid Headroom signature; adding --server headroom delivered the supported file-backed string, and the method intentionally allows the same command to count for both tools. Its own local_integration fidelity is 'passed: exact original returned in a new process (sha256 match); verifier: agree, 0 defects', while exact_comparisons is empty, native_counter is null and native_snapshot is empty, so this card establishes bridge operation and recovery rather than a numeric token-saving result."
+  },
+  "e2e_returned_results": {
+    "status": "pass",
+    "reason": "passed",
+    "run_utc": "2026-09-26T17:52:24.521Z",
+    "fidelity": {
+      "what": "local_integration fidelity check",
+      "result": "passed: exact original returned in a new process (sha256 match); verifier: agree, 0 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 5 240 ~/.local/share/codex-ecosystem/bin/mcporter call --stdio ~/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env DO_NOT_TRACK=1 --env HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws --env HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg --name headroom --tool headroom_compress content=@<scratch>/rr/headroom/base.txt --output json --no-oauth --timeout 180000",
+        "exit": 1,
+        "returned": "failed (exit 1): content argument not delivered"
+      },
+      {
+        "cmd": "timeout -k 5 120 mcporter --config <scratch>/rr/qmd/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/qmd --stdio-arg --index --stdio-arg rr-docs --stdio-arg mcp --env PATH=${PATH} --env XDG_CACHE_HOME=<scratch>/rr/qmd/state/cache --env QMD_CONFIG_DIR=<scratch>/rr/qmd/state/config --env INDEX_PATH=<scratch>/rr/qmd/state/cache/qmd/rr-docs.sqlite --env NODE_LLAMA_CPP_SKIP_DOWNLOAD=true --env QMD_FORCE_CPU=1 --name qmd-rr --no-oauth --output json --tool status --args {}",
+        "exit": null,
+        "returned": "completed"
+      },
+      {
+        "cmd": "timeout -k 5 120 mcporter --config <scratch>/rr/qmd/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/qmd --stdio-arg --index --stdio-arg rr-docs --stdio-arg mcp --env PATH=${PATH} --env XDG_CACHE_HOME=<scratch>/rr/qmd/state/cache --env QMD_CONFIG_DIR=<scratch>/rr/qmd/state/config --env INDEX_PATH=<scratch>/rr/qmd/state/cache/qmd/rr-docs.sqlite --env NODE_LLAMA_CPP_SKIP_DOWNLOAD=true --env QMD_FORCE_CPU=1 --name qmd-rr --no-oauth --output json --tool query --args {\"searches\":[{\"type\":\"lex\",\"query\":\"re-pin release tag new machine\"}],\"intent\":\"how a host moves to a newly cut and re-pinned release\",\"limit\":5,\"rerank\":false}",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 120 mcporter --config <scratch>/rr/qmd/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/qmd --stdio-arg --index --stdio-arg rr-docs --stdio-arg mcp --env PATH=${PATH} --env XDG_CACHE_HOME=<scratch>/rr/qmd/state/cache --env QMD_CONFIG_DIR=<scratch>/rr/qmd/state/config --env INDEX_PATH=<scratch>/rr/qmd/state/cache/qmd/rr-docs.sqlite --env NODE_LLAMA_CPP_SKIP_DOWNLOAD=true --env QMD_FORCE_CPU=1 --name qmd-rr --no-oauth --output json --tool get --args {\"file\":\"rr-adoption/update.md\",\"fromLine\":5,\"maxLines\":80}",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 180 mcporter --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 180 mcporter --config <scratch>/rr/repomix/mcp/mcporter.json list repomix --json",
+        "exit": null,
+        "returned": "passed"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 92,
+    "records_shown": [
+      {
+        "id": "context-mode-mcporter-version",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --version",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": \"0.14.1\", \"pin\": \"0.14.1\", \"pin_match\": true}",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-mcp-ctx-stats-before",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"counter\": \"ctx_stats (upstream MCP tool), read before any other call on this server\", \"session_lines\": [\"context-mode  < 1 min  0 calls\", \"No tool calls yet. Use batch_execute or execute to start saving tokens.\"], \"host_scope_lines\": [\"you ran 366 conversations across 2 AI tools.\", \"25.8K events · 366 sessions · ~$32.96 saved lifetime\", \"Codex CLI            14.",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-mcp-ctx-execute-file",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_execute_file --args {\"path\":\"$WT/docs/grand-catalog-handbook.md\",\"language\":\"python\",\"code\":\"",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"task\": \"Count the '## ' headings of docs/grand-catalog-handbook.md (426,080 B) and print the first 10, in Python over FILE_CONTENT inside the context-mode sandbox.\", \"returned\": {\"text_bytes\": 623, \"shape\": \"path=<file> echo, fenced copy of the executed code, then stdout: '10' and the 10 headings\", \"server_counted_bytes\": 622, \"bytes_note\": \"The server's own by_",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-mcp-ctx-stats-after-execute",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"counter\": \"ctx_stats on the same server and connection, after ctx_execute_file\", \"session_lines\": [\"context-mode  < 1 min  2 calls\", \"1.6 KB entered context  |  0 tokens saved\"], \"delta_vs_before\": \"0 calls -> 2 calls (ctx_stats plus ctx_execute_file); '1.6 KB entered context | 0 tokens saved'\", \"finding\": \"The upstream session counter credits 0 tokens saved for",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-mcp-ctx-stats-after-hooks",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"counter\": \"ctx_stats on the same server and connection, after the hooks wrote the session DB\", \"conversation_lines\": [\"Without context-mode    416 KB  ████████████████████████████████    106.5K tokens\", \"With context-mode          1 B  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░         1 tokens\", \"100.0% kept out of context · your AI ran 106520× longer before /compact fir",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-mcp-daemon-status",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json daemon status --json",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"daemon_pid\": 809544, \"servers\": 1, \"connection\": {\"connectionGeneration\": 1, \"connected\": true, \"activeCalls\": 0}, \"reading\": \"One server connection (generation 1) served all four ctx_* calls, so the before/after ctx_stats reads come from the same server process. The persisted stats file is named stats-pid-<daemon pid>.json because the server's parent is the dae",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-mcp-daemon-stop",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json daemon stop",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": \"Daemon stopped (if it was running).\", \"after_stop\": \"A later 'daemon status --json' returned null (record context-mode-cleanup). No new context-mode marker name remained in /tmp (record context-mode-isolation-check); the running server writes a /tmp readiness sentinel and a preload file (build/server.js), so any such files were gone by then.\", \"stats",
+        "attachments": 2
+      },
+      {
+        "id": "context-mode-cleanup",
+        "status": "passed",
+        "kind": "upstream native operation (native execution) plus cleanup commands",
+        "command": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json daemon status --json",
+        "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution (daemon status) and plain cleanup commands\", \"daemon_status_after_stop\": \"null\", \"removed_literal_targets\": [\"$RR/context-mode/state\", \"$MCPORTER_DAEMON_DIR (<tmp>/rr-mcpd-cm)\"], \"listing_before_removal\": \"31-list-cleanup-targets.stdout\", \"confirm_exit_code\": 2, \"note\": \"The status call re-created daemon/user.key in the empty daemon directory; it was nev",
+        "attachments": 4
+      },
+      {
+        "id": "headroom-e2e-03-mcp-list",
+        "status": "passed: 3 tools listed",
+        "kind": "upstream native operation (tool discovery)",
+        "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter list --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+        "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 1.17,\n  \"status\": \"ok\",\n  \"server_duration_ms\": 549,\n  \"transport\": \"STDIO $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1\",\n  \"tools\": [\n    {\n      \"name\": \"headroom_compress\",\n      \"required\": [\n        \"content\"\n      ]\n    },\n    {\n     ",
+        "attachments": 2
+      },
+      {
+        "id": "headroom-e2e-04-stats-before",
+        "status": "ok: 0 compressions; proxy unreachable by design",
+        "kind": "upstream native operation (MCP counter read)",
+        "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+        "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 21.16,\n  \"compressions\": 0,\n  \"retrievals\": 0,\n  \"total_tokens_saved\": 0,\n  \"sub_agents\": null,\n  \"proxy\": {\n    \"url\": \"http://127.0.0.1:1\",\n    \"status\": \"unreachable\",\n    \"error\": \"ConnectTimeout: \",\n    \"warning\": \"Configured proxy http://127.0.0.1:1 is unreachable (ConnectTimeo",
+        "attachments": 2
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [],
+    "native_counter": null,
+    "native_snapshot": [],
+    "shortfall_cause": null,
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 0,
+        "cli_calls": 1111,
+        "agents_using": 111,
+        "agents": 1010,
+        "pct_agents_using": 0.1099
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 0,
+        "agents_using": 0,
+        "agents": 22,
+        "pct_agents_using": 0.0
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 1111,
+        "agents_using": 111,
+        "agents": 988,
+        "pct_agents_using": 0.1123
+      },
+      "agent_subagents": {
+        "mcp_calls": 0,
+        "cli_calls": 326,
+        "agents_using": 6,
+        "agents": 71,
+        "pct_agents_using": 0.0845
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 106,
+        "agents_using": 5,
+        "agents": 15,
+        "pct_agents_using": 0.3333
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 0,
+        "cli_calls": 2,
+        "agents_using": 2,
+        "agents": 301,
+        "pct_agents_using": 0.0066
+      }
+    },
+    "live_otel": null,
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "accurate",
+    "findings": [
+      {
+        "severity": "low",
+        "field": "native_adaptation.assessment",
+        "issue": "The clause reporting cli_calls 0 and agents 22 abbreviates the source population name to 'the lanes-block population'. The values are correct, but the review contract requires the same population label as invoke_by_tool.json; that label is workflow_children_with_lanes_block. This is a labeling issue, not a numeric discrepancy or evidence-class blend.",
+        "fix": "Replace 'the lanes-block population' in that clause with 'workflow_children_with_lanes_block', retaining cli_calls 0 and agents 22 unchanged.",
+        "source": "../../invoke_by_tool.json"
+      }
+    ],
+    "checked": [
+      "Live latest-release check: https://github.com/openclaw/mcporter/releases/latest resolves to v0.14.1, whose page records 2026-09-24T13:16:08Z; https://registry.npmjs.org/mcporter/latest reports 0.14.1 and Node >=24. Also fetched the cited v0.13.13 release page.",
+      "Live main remains 5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7. The cited v0.14.1-to-main compare page reports one commit, and its diff changes only CHANGELOG.md to introduce unreleased 0.14.2 and add release verification. No newer released runtime was found.",
+      "Fetched the cited v0.14.1 README, docs/install.md, docs/agent-skills.md and docs/cli-reference.md through raw.githubusercontent.com. Confirmed npm install -g mcporter, the Node 24 prerequisite, standalone distribution distinction, TypeScript/CLI role, ad-hoc URL/stdio use, native-client configuration imports and focused per-server skill guidance without a numeric compression guarantee.",
+      "Confirmed the CLI reference's optional mcporter serve bridge, configured keep-alive requirement, selected-server filtering and server__tool names. The documentation supports native Claude/Codex registration of that optional bridge without implying that existing direct MCP registrations traverse it.",
+      "Checked the cited CLI argument contract and src/cli/call-arguments.ts at v0.14.1: key=@path and --key @path load named UTF-8 strings, @@ escapes a leading @, --args/--params accept object payloads, and --args - reads stdin. resolveSelectorAndTool consumes the first positional token when neither a server nor a selector has been established.",
+      "Checked the v0.14.1 release notes for caller-visible alias filtering, suppression of Windows background-console flashes and dependency/development-tool refreshes. These changes are already included in the Linux pin.",
+      "Compared native_adaptation.stack_entry with REPO/manifests/stack.json and checked Linux/macOS adoption pins, recipes/README.md and evidence/receipts/mcporter-0141-qualification-20260925.json. Linux is 0.14.1; macOS remains 0.13.13; the manifest explicitly retains the older landscape winner. The receipt and recipe support the 37-step qualification, ps-on-PATH caveat and idle-daemon switch procedure.",
+      "Checked both Codex adoption templates, the live project config, selected non-secret user-config settings, the Claude settings template and example-agent allowlists. They support direct context-mode/Headroom connections and shell-based mcporter use, with no mcporter native MCP registration in the checked wiring.",
+      "Checked docs/token-session-handbook.md and recipes/README.md for explicit-config CLI bridging and real-call verification. Inspected the retained rr/mcporter/make_config.py and rr/context-mode/build_records.py fixture sources for selected-server bridge use.",
+      "Compared the shared failed Headroom command with the Headroom card's corrected command and the upstream parser source. The initial command lacks --server and records exit 1/content missing; the corrected --server headroom call succeeds. The assessment preserves the failure and correctly avoids claiming that file-backed strings are unsupported.",
+      "Compared invoke_rates.populations.workflow_children, workflow_children_with_lanes_block, workflow_children_without_lanes_block, agent_subagents, main_sessions and codex_exec_workers directly with SP/token-cards/invoke_by_tool.json. All six mcp_calls values are 0; workflow_children cli_calls is 1111; workflow_children_with_lanes_block cli_calls is 0 with agents 22. The only finding concerns the abbreviated population label in the prose.",
+      "Checked the invoke method note and attribution language: a command can count for several tools; the assessment expressly permits the shared Headroom/mcporter attribution and does not characterize cli_calls as exclusive to mcporter.",
+      "Checked the assembled local_integration fidelity wording, including new-process exact-original recovery, SHA-256 match and verifier agreement with 0 defects. exact_comparisons is empty, native_counter is null and native_snapshot is empty. The assessment draws an operational bridge/recovery conclusion rather than claiming numeric token savings or summing evidence classes.",
+      "Scanned the complete card for ~, bare <user>, <tmp>, the supplied session UUID and arbitrary UUID-shaped strings: no matches. gpt6_review remains pending."
+    ],
+    "resolutions": [],
+    "final_verdict": {
+      "tool": "mcporter",
+      "verdict": "adapted-sota",
+      "summary": "For its selected Linux CLI-bridge role, installed MCPorter 0.14.1 matches latest stable and the supported upstream architecture; the retained qualification reports 37/37 checks on both candidate and baseline (https://github.com/openclaw/mcporter/releases/tag/v0.14.1; evidence/receipts/mcporter-0141-qualification-20260925.json). There is no eligible standalone token-reduction comparison or native savings counter: returned-results demonstrate transport and exact cross-process recovery, while attributable token savings remain unverified (cards/mcporter.json#adapted_performance; ../rr/returned-results.json#components/mcporter). The failed shared Headroom call omitted --server, and its corrected invocation succeeds with file-backed content, matching upstream selector parsing and key=@path support (../rr/returned-results.json#headroom-e2e-06-compress-attempt1-failed; #headroom-e2e-06-compress; https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md). The scan labels 111/1010 Ultracode workflow children (10.99%, 1111 CLI matches), 2/301 eligible Codex workers (0.66%, 2 CLI matches), and 0/22 workflow_children_with_lanes_block as users; zero MCP calls is consistent with the selected CLI bridge and direct native server registrations (invoke_by_tool.json; docs/token-session-handbook.md:142). Next, standardize complete selectors for recurring workflows, preserve Node/ps and daemon-version checks, and measure successful useful calls without assigning downstream compression savings to the bridge.",
+      "gaps": [
+        {
+          "gap": "Observed command-text matches do not establish successful useful-call coverage, and no standalone reduction measurement exists for this transport role.",
+          "evidence": "invoke_by_tool.json; invoke_by_tool.py; cards/mcporter.json#adapted_performance",
+          "action": "Keep transport acceptance separate from token savings and add success/opportunity annotations only where recurring bridge workflows justify them.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The retained failed fixture shows that an ephemeral --name does not replace selecting the server when using --tool and a positional file argument.",
+          "evidence": "../rr/returned-results.json#headroom-e2e-06-compress-attempt1-failed; https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts",
+          "action": "Reuse the successful complete --server/--tool form or server.tool selector in local examples; preserve the failure as a corrected invocation defect.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Latest stable and the installed Linux executable are 0.14.1.",
+          "evidence": "https://api.github.com/repos/openclaw/mcporter/releases/latest; https://github.com/openclaw/mcporter/releases/tag/v0.14.1; groups/verdict-evidence.json",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained platform qualification reports 37/37 matched acceptance checks for 0.14.1 and 0.13.13, with ps-on-PATH and cutover limitations explicitly preserved.",
+          "evidence": "evidence/receipts/mcporter-0141-qualification-20260925.json",
+          "result": "holds"
+        },
+        {
+          "claim": "Focused CLI calls are supported; zero native MCP calls does not by itself refute this chosen bridge architecture.",
+          "evidence": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md; docs/token-session-handbook.md:142; groups/g2-context-sandbox/mcporter.upstream.json",
+          "result": "holds"
+        },
+        {
+          "claim": "File-backed key=@path arguments are supported, and omitting the selector or --server can consume the first positional token as the selector.",
+          "evidence": "https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md; https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts",
+          "result": "holds"
+        },
+        {
+          "claim": "The shared initial Headroom failure was followed by a successful call with --server and file-backed content.",
+          "evidence": "../rr/returned-results.json#headroom-e2e-06-compress-attempt1-failed; ../rr/returned-results.json#headroom-e2e-06-compress",
+          "result": "holds"
+        },
+        {
+          "claim": "Returned-results retain a passing exact-original recovery check across processes and an agreeing verifier for this bridge.",
+          "evidence": "../rr/returned-results.json#components/mcporter; cards/mcporter.json#e2e_returned_results",
+          "result": "holds"
+        },
+        {
+          "claim": "The scan-labelled rates are 111/1010 workflow children and 2/301 eligible Codex workers; workflow_children_with_lanes_block is separately 0/22.",
+          "evidence": "invoke_by_tool.json; groups/verdict-evidence.json#invoke_check",
+          "result": "holds"
+        },
+        {
+          "claim": "MCPorter has a demonstrated standalone exact reduction or attributable provider-token saving.",
+          "evidence": "cards/mcporter.json#adapted_performance; cards/mcporter.json#invoke_rates/arm_b_native",
+          "result": "unverified"
+        },
+        {
+          "claim": "The current Linux qualification proves that macOS or every daemon launch environment is also accepted.",
+          "evidence": "evidence/receipts/mcporter-0141-qualification-20260925.json; groups/g2-context-sandbox/mcporter.upstream.json",
+          "result": "does-not-hold"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "qmd"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "9a767b61d2c1",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 29
+        },
+        "shell_commands": 3,
+        "shell_commands_rtk_prefixed": 1,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-a.err",
+        "session_id_sha": "d0e7ab34063f",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 47,
+          "qmd": 3
+        },
+        "shell_commands": 1,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "f2b73a47fe05",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 28
+        },
+        "shell_commands": 4,
+        "shell_commands_rtk_prefixed": 2,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "#296: Headroom reached through MCPorter. #338 CI: pinned bridge; bare server names spawned PATH copies (ENOENT on fresh runners), so absolute paths are now required. 0.14.1 qualification: 37-step mat…"
+}

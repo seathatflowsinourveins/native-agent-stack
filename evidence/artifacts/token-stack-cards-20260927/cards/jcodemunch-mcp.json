@@ -1,0 +1,611 @@
+{
+  "tool": "jcodemunch-mcp",
+  "group": "g3-code-navigation",
+  "repo": "https://github.com/jgravelle/jcodemunch-mcp",
+  "pin": "1.108.319 (uv tool; source 8f7b34abe16f; Dual-Use License 1.1)",
+  "installed_version": "jcodemunch-mcp 1.108.319 (native `jcodemunch-mcp --version`)",
+  "role": "Exact symbol search and source retrieval that replaces whole-file reads. Lanes: Claude MCP project-scoped to native-agent-stack (#240); absent from Codex worktrees; mcporter --stdio for isolated runs. Counter: order get_session_stats (bytes/4, including verification reads). Landscape: code-navigation alternative (measured comparison).",
+  "lanes": [
+    "Claude project MCP (3-verb route/menu/order)",
+    "mcporter --stdio"
+  ],
+  "upstream": {
+    "latest_release": "v1.108.319",
+    "latest_release_url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest",
+    "latest_date": "2026-09-16",
+    "latest_date_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+    "our_pin": "1.108.319 @ 8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+    "our_pin_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+    "behind_by": "The pin exactly equals the latest release tag, so it is neither ahead of nor behind that release (https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319). Current main ffe99fdee833435442a5ff506259f68cae872c39 is 79 unreleased commits ahead of the pin (https://github.com/jgravelle/jcodemunch-mcp/compare/8f7b34abe16fb459e0bf1c04747d584216dfe32e...ffe99fdee833435442a5ff506259f68cae872c39). Latest-release identity, tag commit and comparison were rechecked live.",
+    "recommended_install": {
+      "command": "uv tool install jcodemunch-mcp\njcodemunch-mcp init",
+      "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#recommended-one-command"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "The README documents `claude mcp add -s user jcodemunch -- uvx jcodemunch-mcp`, or a preinstalled jcodemunch-mcp executable. Its init path also installs prompt policy and offers enforcement hooks and project indexing; the manual instructions ask the agent to call jcodemunch_guide. This is a broader default than merely making an optional project server available.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#manual-claude-code-setup"
+      },
+      "codex": {
+        "how": "CLIENTS.md recommends a preinstalled executable, resolved to an absolute path in [mcp_servers.jcodemunch], with no arguments. Its example uses ~/.codex/config.toml; init refuses a uvx fallback for Codex because first-run installer output can corrupt the initial JSON-RPC exchange.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/CLIENTS.md#L34-L63"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "Upstream benchmarks search_symbols followed by focused get_symbol_source retrieval against both grep-and-read and read-all baselines on pinned public repositories. Its advertised savings are specific to those retrieval workloads and are not a measurement of this adaptation.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#reproducible-token-efficiency-benchmark"
+      },
+      {
+        "claim": "The current server still supplies MCP initialization instructions directing clients to prefer jCodeMunch over Read/Grep/Glob/Bash for code navigation, for both Counter and full surfaces. The server inserts _mcp_instructions into the initialization response, so this is client-facing server policy rather than only README advice.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/src/jcodemunch_mcp/server.py#L359-L400"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "Upstream says targeted function, method and class edits benefit most; work that genuinely needs an entire file has no corresponding source-selection advantage.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#L178"
+      },
+      {
+        "text": "For Codex, executable availability and a clean stdout handshake matter; configuring an on-demand package runner is not equivalent to a qualified installed-binary integration. The client guide also identifies noninteractive elicitation declines as a distinct client-side failure mode.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/CLIENTS.md#L34-L71"
+      },
+      {
+        "text": "The base package reports an anonymous aggregate savings counter by default; upstream provides a share_savings opt-out. Such counters and marketing totals are separate from task-level exact artifact comparisons.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#L225"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "Merged but unreleased: linked worktree indexes resolve to themselves instead of failing as ambiguous, directly relevant to isolated native workers.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/pull/893"
+      },
+      {
+        "text": "Merged but unreleased: legacy watcher locks account for PID reuse instead of treating an unrelated process as the lock owner.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/pull/792"
+      },
+      {
+        "text": "Merged but unreleased: Python class-state extraction now covers every class rather than omitting state in affected forms.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/pull/800"
+      },
+      {
+        "text": "Merged but unreleased: absence evidence is scoped to the repository in which it was measured.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/pull/720"
+      },
+      {
+        "text": "Merged but unreleased: generated agent policy permits absence conclusions only when a scan has established the required evidence.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/pull/873"
+      },
+      {
+        "text": "Merged but unreleased: changed-symbol analysis preserves the blast-radius verdict, so an empty result is not automatically interpreted as no impact.",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/pull/880"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {
+      "id": "jcodemunch-mcp",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "version": "1.108.319",
+      "license": "Dual-Use License 1.1; upstream non-commercial/commercial terms retained",
+      "profile": "supporting",
+      "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
+      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "freshness": "Pinned upstream installation, direct artifact acceptance and one bounded task in each native client verified 2026-09-20; no causal provider savings claim.",
+      "command_scope": "Index only selected code; default upstream index root; sharing, AI summaries, watchers, cross-repository defaults and external context providers disabled. See native recipe and receipt for whole-file versus focused-source baselines."
+    },
+    "how_we_install": "Reviewed the checkout matching origin/main@34c56340e636ad3d3daeb8482d48d1d8f0b135ae. manifests/stack.json:1672 identifies the supporting component and source commit 8f7b34abe16fb459e0bf1c04747d584216dfe32e. Install the pinned package with `uv tool install --python 3.13 jcodemunch-mcp==1.108.319` in the owned uv-tool prefix, exposing ${ECO_ROOT}/bin/jcodemunch-mcp (adoption/bootstrap.md:286; recipes/README.md:434). This is an explicit bootstrap step; jCodeMunch is not selected by the automated adoption profiles or listed in either platform pins file (adoption/manifest.json; adoption/pins-linux-x86_64.json; adoption/pins-macos-arm64.json).",
+    "claude_wiring": "Project opt-in uses `claude mcp add --scope local jcodemunch` with the installed executable, or a project .mcp.json entry; CODE_INDEX_PATH points to ~/.code-index and JCODEMUNCH_SHARE_SAVINGS=0 (adoption/bootstrap.md:334). adoption/mcp/claude-user.json deliberately omits jcodemunch, and adoption/templates/claude.settings.template.json does not register it. The shipped evidence-reviewer and isolated-builder explicitly grant mcp__jcodemunch__route and mcp__jcodemunch__order, usable where the project registers the server (examples/claude-native/agents/evidence-reviewer.md:4; examples/claude-native/agents/isolated-builder.md:4).",
+    "codex_wiring": "adoption/templates/project.codex.config.template.toml:25 deliberately keeps [mcp_servers.jcodemunch] at project scope with the installed ${ECO_ROOT}/bin/jcodemunch-mcp executable and startup_timeout_sec=60; the user template has no jcodemunch entry. Live `codex mcp list --json` plus `codex mcp get jcodemunch --json` confirm the main checkout's server, while the same merged list in a neutral directory lacks it. The untracked host-only .codex/config.toml:33 is therefore a real local registration for this checkout, not proof of user-scope or fresh-worktree availability.",
+    "lane_rule": "Explicitly index selected code, search, then retrieve a returned symbol ID; check original source and freshness. Use the Counter surface and keep sharing, AI/paid summaries, watchers, cross-repository defaults and external context providers disabled for this recipe (recipes/README.md:432; docs/token-session-handbook.md:108; docs/token-session-handbook.md:131).",
+    "deviations_from_upstream": [
+      {
+        "what": "Project scope in both clients is an intentional departure from upstream's user-scope examples. Current main still records this decision in docs/decisions/2026-09-23-claude-user-profile.md:127 and docs/decisions/2026-09-25-codex-mcp-scope.md:83. Upstream still injects the tool-preference instruction that motivated it (https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/src/jcodemunch_mcp/server.py#L359-L400).",
+        "why": "Those decisions retain the historical transcript and sealed-retrieval evidence, including the corpus's Markdown coverage gap, and conclude that a globally loaded preference conflicts with this catalog's rg/Serena/SocratiCode routing. They do not retire jCodeMunch or claim that the historical comparison applies to every workload. Fresh worktrees consequently need their own registration, consistent with the assembled card's scope shortfall.",
+        "fix": "Preserve the intentional scope; render the project entry into each opted-in worktree and verify it there. Reconsider user scope only under the decision's Codex-specific retrieval-evidence overturn condition.",
+        "pr": null
+      },
+      {
+        "what": "The focused recipe still prints `codex mcp add jcodemunch` before explaining that the tested adoption used project configuration, whereas the current scope decision and project template require explicit per-project registration (recipes/README.md:441; recipes/README.md:449; adoption/templates/project.codex.config.template.toml:25).",
+        "why": "The recipe distinguishes the CLI configuration from the tested project entry, but its copyable command can lead a new adopter to bypass the deliberate project-scope policy.",
+        "fix": "Make the recipe's Codex example render the project template and verify registration from the intended worktree; explain any user-scope CLI example as a different choice.",
+        "pr": null
+      },
+      {
+        "what": "The adaptation uses a preinstalled pinned binary and selected-code workflow instead of upstream init's broader prompt/hook installation, and opts out of savings sharing and optional enrichment (recipes/README.md:434; recipes/README.md:452; https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#recommended-one-command).",
+        "why": "This preserves the catalog's existing retrieval lanes and bounded indexing. The installed executable also matches upstream's specific Codex handshake recommendation; optional watcher and enrichment behavior cannot be credited as enabled here.",
+        "fix": "Keep explicit opt-in and freshness checks, and measure any future hook or enrichment adoption separately. Do not infer client use or exact token savings from the upstream counter alone.",
+        "pr": null
+      }
+    ],
+    "pending_fixes": [
+      "Clarify the Codex registration example in recipes/README.md:441 and provision the existing project template for opted-in worktrees; project scope itself is deliberate.",
+      "Qualify unreleased linked-worktree, extraction and absence-evidence fixes before repinning; the current pin remains the latest published release.",
+      "Keep the native savings counter separate from exact artifact comparisons and transcript-derived invocation evidence."
+    ],
+    "assessment": "The installed release and direct executable launch match upstream's current release and Codex guidance; project scope deliberately preserves this catalog's routing (adoption/templates/project.codex.config.template.toml:25; docs/decisions/2026-09-25-codex-mcp-scope.md:83). The assembled card's exact comparison supports useful focused-source retrieval, while its separate invocation evidence and the live scope checks show limited reach into fresh Codex workers. The native savings counter is a different evidence class, and useful unreleased worktree and coverage fixes still require qualification."
+  },
+  "e2e_returned_results": {
+    "status": "partial",
+    "reason": "partial",
+    "run_utc": "2026-09-26T18:30:04.863Z",
+    "fidelity": {
+      "what": "exact artifact comparison predicate",
+      "result": " answer verified (PASS); verifier: agree, 0 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 5 60 ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp --version",
+        "exit": null,
+        "returned": "passed: jcodemunch-mcp 1.108.319 (matches the pin)"
+      },
+      {
+        "cmd": "timeout -k 5 60 ~/.local/share/codex-ecosystem/bin/mcporter --version",
+        "exit": null,
+        "returned": "passed: mcporter 0.14.1 (the pinned bridge)"
+      },
+      {
+        "cmd": "timeout -k 5 180 ~/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/jcodemunch-mcp/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=<scratch>/rr/jcodemunch-mcp/state/fixture-home --env CODE_INDEX_PATH=<scratch>/rr/jcodemunch-mcp/state/fixture-home/.code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --output json --no-oauth --timeout 120000 --args {\"action\":\"get_session_stats\",\"args\":{}}",
+        "exit": null,
+        "returned": "passed: total_tokens_saved 0 (fresh isolated ledger)"
+      },
+      {
+        "cmd": "timeout -k 5 300 ~/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/jcodemunch-mcp/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=<scratch>/rr/jcodemunch-mcp/state/fixture-home --env CODE_INDEX_PATH=<scratch>/rr/jcodemunch-mcp/state/fixture-home/.code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --output json --no-oauth --timeout 120000 --args {\"action\":\"index_folder\",\"args\":{\"path\":\"<scratch>/rr/jcodemunch-mcp/clone/scripts\",\"use_ai_summaries\":false,\"extra_ignore_patterns\":[\"*.json\",\"*.jsonl\",\"*.md\",\"*.html\",\"*.txt\",\"**/__pycache__/**\"],\"follow_symlinks\":false,\"context_providers\":false},\"allow_state_change\":true}",
+        "exit": null,
+        "returned": "passed: 32 files, 1,241 symbols indexed (python 31, javascript 1)"
+      },
+      {
+        "cmd": "timeout -k 5 180 ~/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/jcodemunch-mcp/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=<scratch>/rr/jcodemunch-mcp/state/fixture-home --env CODE_INDEX_PATH=<scratch>/rr/jcodemunch-mcp/state/fixture-home/.code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --output json --no-oauth --timeout 120000 --args {\"action\":\"search_symbols\",\"args\":{\"repo\":\"scratchpad/wt-rr\",\"query\":\"register_file\",\"kind\":\"function\",\"max_results\":1}}",
+        "exit": null,
+        "returned": "passed: 1 result, register_file at scripts/host_receipts.py:710"
+      },
+      {
+        "cmd": "timeout -k 5 180 ~/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/jcodemunch-mcp/mcporter.json call --stdio ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=<scratch>/rr/jcodemunch-mcp/state/fixture-home --env CODE_INDEX_PATH=<scratch>/rr/jcodemunch-mcp/state/fixture-home/.code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --output json --no-oauth --timeout 120000 --args {\"action\":\"get_symbol_source\",\"args\":{\"repo\":\"scratchpad/wt-rr\",\"symbol_id\":\"scripts/host_receipts.py::register_file#function\"}}",
+        "exit": null,
+        "returned": "passed: register_file lines 710-727 returned; source exact (record jcodemunch-mcp-70-check-source-exact)"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 48,
+    "records_shown": [
+      {
+        "id": "jcodemunch-mcp-00-run-provenance",
+        "status": "completed: 33 captured steps; exit 0 except the two expected grep -c zero-count exits (1)",
+        "kind": "local integration check (local_integration)",
+        "command": "bash run.sh",
+        "observation": "{\n  \"evidence_class\": \"local_integration (capture harness); each step's own output is classed in its record\",\n  \"run\": \"run.sh was executed at 18:30:04Z-18:30:28Z by the previous attempt of this same workflow step (resumed run). Its exact shell line is not retained; the script changes to its own directory and refuses to run over an existing log. This attempt did not rerun it (a rerun would need the isolated ledger wi",
+        "attachments": 23
+      },
+      {
+        "id": "jcodemunch-mcp-00a-version",
+        "status": "passed: jcodemunch-mcp 1.108.319 (matches the pin)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --version",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"returned\": \"jcodemunch-mcp 1.108.319\"\n}",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-00b-mcporter-version",
+        "status": "passed: mcporter 0.14.1 (the pinned bridge)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --version",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"returned\": \"0.14.1\"\n}",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-01-baseline-cat",
+        "status": "completed (exit 0): 110,200 B whole-file read",
+        "kind": "baseline without the tool (native execution of a system tool)",
+        "command": "timeout -k 5 60 cat $RR/jcodemunch-mcp/clone/scripts/host_receipts.py",
+        "observation": "{\n  \"evidence_class\": \"native execution (system tool; the no-tool baseline)\",\n  \"exit_code\": 0,\n  \"returned\": {\n    \"bytes\": 110200,\n    \"sha256\": \"87dc207b029aba8497bb08a1ca4fce25b050f4275a59d7e97cb1158100ac43e6\"\n  },\n  \"note\": \"base.txt is a byte-identical copy (cmp) and is the --before input of record jcodemunch-mcp-74-compare-retrieval.\"\n}",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-10-counter-before",
+        "status": "passed: total_tokens_saved 0 (fresh isolated ledger)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 180 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/jcodemunch-mcp/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=$RR/jcodemunch-mcp/state/fixture-home --env",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"counter_before\": {\n    \"total_tokens_saved\": 0,\n    \"lifetime_by_tool\": {},\n    \"session_tokens_saved\": 0,\n    \"session_calls\": 0\n  },\n  \"tool_surface\": {\n    \"surface\": \"full\",\n    \"visible_tools\": 90,\n    \"catalog_tools\": 94,\n    \"schema_tokens_visible\": 27032\n  }\n}",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-11-index-folder",
+        "status": "passed: 32 files, 1,241 symbols indexed (python 31, javascript 1)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 300 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/jcodemunch-mcp/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=$RR/jcodemunch-mcp/state/fixture-home --env",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"returned\": {\n    \"success\": true,\n    \"repo\": \"scratchpad/wt-rr\",\n    \"file_count\": 32,\n    \"symbol_count\": 1241,\n    \"languages\": {\n      \"python\": 31,\n      \"javascript\": 1\n    },\n    \"duration_seconds\": 1.33,\n    \"requested_incremental\": true,\n    \"performed_incremental\": false,\n    \"indexed_at\": \"2026-09-26T14:30:11.075700\",\n    \"_meta\": {\n      \"igno",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-12-search-symbols",
+        "status": "passed: 1 result, register_file at scripts/host_receipts.py:710",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 180 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/jcodemunch-mcp/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=$RR/jcodemunch-mcp/state/fixture-home --env",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"returned\": {\n    \"id\": \"scripts/host_receipts.py::register_file#function\",\n    \"kind\": \"function\",\n    \"name\": \"register_file\",\n    \"file\": \"scripts/host_receipts.py\",\n    \"line\": 710,\n    \"signature\": \"def register_file(root: Path, relative_path: str) -> None\",\n    \"summary\": \"Update relative_path in manifests/evidence.\",\n    \"byte_length\": 1130,\n    \"_f",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-13-get-symbol-source",
+        "status": "passed: register_file lines 710-727 returned; source exact (record jcodemunch-mcp-70-check-source-exact)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 180 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/jcodemunch-mcp/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=$RR/jcodemunch-mcp/state/fixture-home --env",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"returned\": {\n    \"id\": \"scripts/host_receipts.py::register_file#function\",\n    \"kind\": \"function\",\n    \"file\": \"scripts/host_receipts.py\",\n    \"line\": 710,\n    \"end_line\": 727,\n    \"signature\": \"def register_file(root: Path, relative_path: str) -> None\",\n    \"_freshness\": \"fresh\"\n  },\n  \"source_sha256\": \"3428805e96ab963255e89959c8c25efdbf678e75192fa640a01",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-14-counter-after",
+        "status": "measured: total_tokens_saved 0 -> 27,267 (+27,267, all get_symbol_source)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 180 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/jcodemunch-mcp/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=$RR/jcodemunch-mcp/state/fixture-home --env",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"counter_before\": 0,\n  \"counter_after\": 27267,\n  \"delta\": 27267,\n  \"lifetime_by_tool\": {\n    \"get_symbol_source\": 27267\n  },\n  \"lifetime_by_tool_since\": \"2026-09-26\",\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"notes\": [\n    \"Only get_symbol_source wrote the persistent ledger; index_folder and search_symbols added 0.\",\n    \"Derived, not the upstr",
+        "attachments": 2
+      },
+      {
+        "id": "jcodemunch-mcp-15-search-negative",
+        "status": "observed: result_count 1 (partial-token match), not a zero-result control",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 180 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/jcodemunch-mcp/mcporter.json call --stdio $HOME/.local/share/codex-ecosystem/bin/jcodemunch-mcp --env HOME=$RR/jcodemunch-mcp/state/fixture-home --env",
+        "observation": "{\n  \"evidence_class\": \"native execution\",\n  \"exit_code\": 0,\n  \"arguments\": {\n    \"query\": \"zzz_rr_nonexistent_symbol\",\n    \"kind\": \"function\",\n    \"max_results\": 1\n  },\n  \"returned\": {\n    \"result_count\": 1,\n    \"results\": [\n      {\n        \"id\": \"scripts/native_token_ci.py::jcodemunch_symbol_exact#function\",\n        \"kind\": \"function\",\n        \"name\": \"jcodemunch_symbol_exact\",\n        \"file\": \"scripts/native_token_",
+        "attachments": 2
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [
+      {
+        "lane": "claude_subagent",
+        "payload": "Locate register_file source: whole scripts/host_receipts.py vs jCodeMunch get_symbol_source; answer verified (PASS)",
+        "before_tokens": 22043,
+        "after_tokens": 443,
+        "change_pct": -98.0,
+        "encoding": "o200k_base",
+        "eligibility": null,
+        "evidence_class": "exact artifact comparison",
+        "first_seen": "2026-09-25T21:07:54.668956+00:00",
+        "last_seen": "2026-09-25T21:07:54.668956+00:00"
+      }
+    ],
+    "native_counter": {
+      "command": "order(action=\"get_session_stats\", args={})",
+      "before": 0,
+      "after": 27267,
+      "delta": 27267,
+      "unit": "tokens"
+    },
+    "native_snapshot": [],
+    "shortfall_cause": "Registered per project, so fresh Codex worktrees do not see it (our registration scope).",
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 24,
+        "cli_calls": 500,
+        "agents_using": 64,
+        "agents": 1010,
+        "pct_agents_using": 0.0634
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 1,
+        "agents_using": 1,
+        "agents": 22,
+        "pct_agents_using": 0.0455
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 24,
+        "cli_calls": 499,
+        "agents_using": 63,
+        "agents": 988,
+        "pct_agents_using": 0.0638
+      },
+      "agent_subagents": {
+        "mcp_calls": 2,
+        "cli_calls": 19,
+        "agents_using": 5,
+        "agents": 71,
+        "pct_agents_using": 0.0704
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 29,
+        "agents_using": 4,
+        "agents": 15,
+        "pct_agents_using": 0.2667
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 2,
+        "cli_calls": 8,
+        "agents_using": 3,
+        "agents": 301,
+        "pct_agents_using": 0.01
+      }
+    },
+    "live_otel": {
+      "window": {
+        "since": "2026-09-26T22:50:00Z",
+        "until": "2026-09-26T23:37:28Z",
+        "duration": "2848s"
+      },
+      "panel": "U6 panel 31: MCP calls by client and server",
+      "series": []
+    },
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "defects",
+    "findings": [
+      {
+        "severity": "medium",
+        "field": "e2e_returned_results.upstream_commands[2..5].cmd",
+        "issue": "The assembler-owned command summaries inherit an incorrect evidence-root mapping from savings.json: they use <scratch>/rr/jcodemunch-mcp/ for the configuration, isolated state and clone. The retained records use $RR/jcodemunch-mcp/, and build_records.py defines $RR as <scratch>/rr. Consequently the cited <scratch>/rr/jcodemunch-mcp/mcporter.json does not exist; the retained file is <scratch>/rr/jcodemunch-mcp/mcporter.json. This is a report/assembly-side path-sanitization defect, not a defect in the prior worker's upstream file.",
+        "fix": "Correct the report-source mapping from $RR to <scratch>/rr, preserving that segment in configuration, HOME, CODE_INDEX_PATH and clone paths, then regenerate the assembled card. Do not repair this in jcodemunch-mcp.upstream.json.",
+        "source": "<scratch>/rr/jcodemunch-mcp/build_records.py:30"
+      }
+    ],
+    "checked": [
+      ".codex/config.toml (main-checkout MCP fields read through codex mcp list --json)",
+      "<scratch>/html-report/savings.json",
+      "<scratch>/html-report/scripts/data/live_otel.json",
+      "<scratch>/rr/jcodemunch-mcp/build_records.py",
+      "<scratch>/rr/jcodemunch-mcp/mcporter.json",
+      "<scratch>/rr/jcodemunch-mcp/out/logs/records.raw.jsonl",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00a-jcodemunch-version.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00a-jcodemunch-version.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00b-mcporter-version.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00b-mcporter-version.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00c-wt-head.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00c-wt-head.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00d-clone.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00d-clone.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00e-clone-checkout.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00e-clone-checkout.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00f-clone-head.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00f-clone-head.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00g-state-config.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00g-state-config.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00h-hook-wiring-user.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00h-hook-wiring-user.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00i-hook-wiring-project.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/00i-hook-wiring-project.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/01-baseline-cat.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/01-baseline-cat.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/10-order-get-session-stats-before.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/10-order-get-session-stats-before.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/11-order-index-folder.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/11-order-index-folder.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/12-order-search-symbols.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/12-order-search-symbols.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/13-order-get-symbol-source.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/13-order-get-symbol-source.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/14-order-get-session-stats-after.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/14-order-get-session-stats-after.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/15-order-search-symbols-negative.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/15-order-search-symbols-negative.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/30-make-hook-inputs.stderr",
+      "<scratch>/rr/jcodemunch-mcp/out/raw/30-make-hook-inputs.stdout",
+      "<scratch>/rr/jcodemunch-mcp/out/scripts/isoprobe.py",
+      "<scratch>/rr/jcodemunch-mcp/out/scripts/make_hook_inputs.py",
+      "<scratch>/rr/jcodemunch-mcp/out/scripts/mcporter.json",
+      "<scratch>/rr/jcodemunch-mcp/out/scripts/parse.py",
+      "<scratch>/rr/jcodemunch-mcp/out/scripts/rec.py",
+      "<scratch>/rr/jcodemunch-mcp/out/scripts/run.sh",
+      "<scratch>/rr/jcodemunch-mcp/records.json",
+      "<scratch>/rr/returned-results.json",
+      "<scratch>/token-cards/assemble.py",
+      "<scratch>/token-cards/cards/jcodemunch-mcp.json",
+      "<scratch>/token-cards/groups/g3-code-navigation/jcodemunch-mcp.upstream.json",
+      "<scratch>/token-cards/invoke_by_tool.json",
+      "<scratch>/token-cards/provenance.py",
+      "AGENTS.md",
+      "adoption/bootstrap.md",
+      "adoption/manifest.json",
+      "adoption/mcp/claude-user.json",
+      "adoption/pins-linux-x86_64.json",
+      "adoption/pins-macos-arm64.json",
+      "adoption/templates/claude.settings.template.json",
+      "adoption/templates/codex.config.template.toml",
+      "adoption/templates/project.codex.config.template.toml",
+      "docs/decisions/2026-09-23-claude-user-profile.md",
+      "docs/decisions/2026-09-25-codex-mcp-scope.md",
+      "docs/token-session-handbook.md",
+      "examples/claude-mcp.json.example",
+      "examples/claude-native/agents/blind-adjudicator.md",
+      "examples/claude-native/agents/blind-lane-reviewer.md",
+      "examples/claude-native/agents/evidence-reviewer.md",
+      "examples/claude-native/agents/isolated-builder.md",
+      "examples/claude-native/agents/semantic-evidence-reviewer.md",
+      "examples/claude-native/agents/source-scout.md",
+      "examples/mcporter.json.example",
+      "https://api.github.com/repos/jgravelle/jcodemunch-mcp/commits/main",
+      "https://api.github.com/repos/jgravelle/jcodemunch-mcp/commits/main?review=independent",
+      "https://api.github.com/repos/jgravelle/jcodemunch-mcp/compare/8f7b34abe16fb459e0bf1c04747d584216dfe32e...ffe99fdee833435442a5ff506259f68cae872c39",
+      "https://api.github.com/repos/jgravelle/jcodemunch-mcp/compare/8f7b34abe16fb459e0bf1c04747d584216dfe32e...ffe99fdee833435442a5ff506259f68cae872c39?per_page=1",
+      "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest",
+      "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest?review=independent",
+      "https://github.com/jgravelle/jcodemunch-mcp.git",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/CLIENTS.md#L34-L63",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/CLIENTS.md#L34-L71",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#L178",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#L225",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#manual-claude-code-setup",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#recommended-one-command",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/README.md#reproducible-token-efficiency-benchmark",
+      "https://github.com/jgravelle/jcodemunch-mcp/blob/ffe99fdee833435442a5ff506259f68cae872c39/src/jcodemunch_mcp/server.py#L359-L400",
+      "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "https://github.com/jgravelle/jcodemunch-mcp/commits/main.atom",
+      "https://github.com/jgravelle/jcodemunch-mcp/compare/8f7b34abe16fb459e0bf1c04747d584216dfe32e...ffe99fdee833435442a5ff506259f68cae872c39",
+      "https://github.com/jgravelle/jcodemunch-mcp/pull/720",
+      "https://github.com/jgravelle/jcodemunch-mcp/pull/792",
+      "https://github.com/jgravelle/jcodemunch-mcp/pull/800",
+      "https://github.com/jgravelle/jcodemunch-mcp/pull/873",
+      "https://github.com/jgravelle/jcodemunch-mcp/pull/880",
+      "https://github.com/jgravelle/jcodemunch-mcp/pull/893",
+      "https://github.com/jgravelle/jcodemunch-mcp/releases/latest",
+      "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+      "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/ffe99fdee833435442a5ff506259f68cae872c39/CLIENTS.md",
+      "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/ffe99fdee833435442a5ff506259f68cae872c39/README.md",
+      "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/ffe99fdee833435442a5ff506259f68cae872c39/src/jcodemunch_mcp/server.py",
+      "manifests/stack.json",
+      "recipes/README.md",
+      "~/.agents/skills/verification-before-completion/SKILL.md",
+      "~/.codex/RTK.md",
+      "~/.codex/config.toml (MCP fields read through codex mcp list --json from the main checkout and review workspace)",
+      "~/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md",
+      "~/code/native-agent-stack/manifests/stack.json"
+    ],
+    "resolutions": [],
+    "final_verdict": {
+      "tool": "jcodemunch-mcp",
+      "verdict": "adapted-with-gaps",
+      "summary": "Installed v1.108.319 matches the latest release, and the pinned executable with selected indexing fits upstream guidance; project-only registration is an intentional local routing choice that still leaves fresh worktrees without the server. The newer source-verified comparison is 25,440→570 o200k_base tokens (97.8%), eligible for MCPorter-rendered search_symbols plus get_symbol_source against a whole-file baseline, with the one-time index response excluded and native-client rendering unmeasured (../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-74-compare-retrieval). The historical native Claude result is separately 22,043→443 (98.0%), while the newer +27,267 native ledger delta is an estimate rather than the exact 24,870-token artifact reduction; no successful fresh-worktree Codex comparison is available (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json; ../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-14-counter-after). The fixed scan found invocations in 64/1,010 Ultracode children (6.34%) and 3/301 Codex workers (1.00%), including 1/22 TOKEN LANES children (4.55%); invocation does not establish successful retrieval (invoke_by_tool.json). Next, render and verify the project entry in each opted-in worktree, correct the conflicting copyable recipe, and retain a successful native Codex task before claiming equivalent worker performance.",
+      "gaps": [
+        {
+          "gap": "Fresh Codex worktrees lack the intentionally project-scoped registration; two retained native attempts could not expose jcodemunch.",
+          "evidence": "evidence/artifacts/token-e2e-codex-20260926/receipt.json; adoption/templates/project.codex.config.template.toml; docs/decisions/2026-09-25-codex-mcp-scope.md; https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/CLIENTS.md",
+          "action": "Preserve the approved project scope, render the project configuration into each opted-in worktree, and verify discovery plus exact source retrieval there before reconsidering global scope.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The recipe's copyable codex mcp add command can bypass the documented project-scope policy.",
+          "evidence": "recipes/README.md; adoption/templates/project.codex.config.template.toml",
+          "action": "Make the primary recipe render the project template and verify from that worktree; label any user-scope alternative explicitly.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The merged comparison list omits the newer 97.8% bridge measurement and its exclusion of indexing and native-client rendering.",
+          "evidence": "cards/jcodemunch-mcp.json; ../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-74-compare-retrieval",
+          "action": "Add the newer result with its exact boundary and separate the native counter, projected schema comparison, and historical native Claude result.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Latest official release v1.108.319 was published 2026-09-16 and matches the retained executable version.",
+          "evidence": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest; ../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-00a-version",
+          "result": "holds"
+        },
+        {
+          "claim": "Pinned executable installation and explicit MCP configuration are supported upstream; the native project scope is an intentional adaptation.",
+          "evidence": "https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/README.md; https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/CLIENTS.md; adoption/templates/project.codex.config.template.toml",
+          "result": "holds"
+        },
+        {
+          "claim": "The newer 25,440→570 comparison removes exactly 24,870 tokens and passes exact source, line-bound, and byte-length checks; it measures MCPorter-rendered retrieval, not native-client rendering or total workflow cost.",
+          "evidence": "../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-74-compare-retrieval; ../rr/jcodemunch-mcp/out/raw/70-check-source-exact.stdout; groups/final-verdict-evidence.json#recounts",
+          "result": "holds"
+        },
+        {
+          "claim": "The persistent native ledger advanced 0→27,267; independent server processes left session counters at zero, so this is not a same-session counter comparison.",
+          "evidence": "../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-14-counter-after",
+          "result": "holds"
+        },
+        {
+          "claim": "The separate projected schema-surface comparison is 24,189→1,090 tokens (95.5%); it must not be added to retrieval savings.",
+          "evidence": "../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-75-compare-schema-surface",
+          "result": "holds"
+        },
+        {
+          "claim": "The earlier review's missing rr path segment is corrected in the merged card's command summaries; the retained source remains under ../rr/jcodemunch-mcp/.",
+          "evidence": "groups/g3-code-navigation/jcodemunch-mcp.review.json; cards/jcodemunch-mcp.json; ../rr/jcodemunch-mcp/build_records.py",
+          "result": "holds"
+        },
+        {
+          "claim": "All 48 retained records and 164 attachment references were opened; the attachment hashes and sizes match.",
+          "evidence": "../rr/jcodemunch-mcp/records.json; groups/final-verdict-evidence.json#attachments",
+          "result": "holds"
+        },
+        {
+          "claim": "The fixed 36-hour scan records 24 MCP and 500 CLI invocations across 64/1,010 workflow children, and 2 MCP plus 8 CLI invocations across 3/301 Codex workers; TOKEN LANES children were 1/22.",
+          "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+          "result": "holds"
+        },
+        {
+          "claim": "A successful fresh-worktree native Codex exact comparison and causal provider savings are established.",
+          "evidence": "evidence/artifacts/token-e2e-codex-20260926/receipt.json; cards/jcodemunch-mcp.json#invoke_rates/arm_b_native",
+          "result": "unverified"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "gpt-tokenizer"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "d966a7a0d960",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 29
+        },
+        "shell_commands": 3,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-b.err",
+        "session_id_sha": "41a6a84e910d",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 37,
+          "qmd": 4,
+          "ai-memory": 1,
+          "socraticode": 1,
+          "serena": 2
+        },
+        "shell_commands": 2,
+        "shell_commands_rtk_prefixed": 2,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "050bff786958",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 60
+        },
+        "shell_commands": 7,
+        "shell_commands_rtk_prefixed": 4,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "#296: 22,043->443 (98.0%); session counter 23,643 over 4 calls. #316: persistent ledger +23,575, exactly matching the session. #343: not exposed in a fresh Codex worktree (project-scoped). #338 CI: i…"
+}

@@ -18,6 +18,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 .returned-screenshot{display:block;max-width:100%;height:auto;margin:15px 0;border:1px solid var(--line);border-radius:8px}.returned-artifact{margin:18px 0}.returned-artifact summary{overflow-wrap:anywhere}.returned-artifact p{overflow-wrap:anywhere;margin:10px 0}
 #token-topic th:nth-child(1){width:15%}#token-topic th:nth-child(2){width:25%}#token-topic th:nth-child(3){width:32%}#token-topic th:nth-child(4){width:28%}
 #token-topic .topic-detail td{padding-top:0;padding-bottom:20px}#token-topic .topic-detail pre{max-width:100%}
+#token-topic .topic-card-items{padding-left:18px;margin:6px 0 14px;overflow-wrap:anywhere}#token-topic .topic-card-items li{margin:4px 0}#token-topic .topic-detail h4{margin:14px 0 4px;font-size:13px}
 #token-topic-section{scroll-margin-top:160px}
 .navigation{flex-wrap:wrap;column-gap:22px;row-gap:0}.navigation button:last-child{margin-left:0}
 .catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
@@ -630,8 +631,90 @@ $("stack-layer").addEventListener("change", renderStack);
 $("stack-profile").addEventListener("change", renderStack);
 $("stack-reset").addEventListener("click", () => { $("stack-search").value = ""; $("stack-layer").value = ""; $("stack-profile").value = ""; renderStack(); });
 renderStack();
+function topicCardSections(row) {
+  // A topic row's evidence-card fields as titled items. Every line keeps its own evidence class;
+  // comparisons, counter windows, invoke populations and verdicts are never totalled.
+  if(!row || !row.gpt6_review) return [];
+  const say = value => value === undefined || value === null || value === "" ? "not recorded" : String(value);
+  // Some cards record a repair as text, others as a small object; show either as readable text.
+  const flat = value => value !== null && typeof value === "object" ? Object.entries(value).map(([key, entry]) => key.replaceAll("_", " ") + ": "
+    + (entry !== null && typeof entry === "object" ? JSON.stringify(entry) : say(entry))).join(" · ") : say(value);
+  const percent = value => typeof value === "number" ? (100 * value).toFixed(1) + "%" : "share not recorded";
+  const plural = (count, word) => count + " " + word + (count === 1 ? "" : "s");
+  const cited = (label, entries, key) => (entries || []).map(entry => ({text: label + ": " + say(entry[key]), url: entry.url}));
+  const upstream = row.upstream || {}, native = row.native_adaptation || {}, performance = row.adapted_performance || {};
+  const invoke = row.invoke_rates || {}, review = row.gpt6_review, verdict = review.final_verdict || {};
+  const install = upstream.recommended_install || {}, wiring = upstream.recommended_wiring || {};
+  const upstreamItems = [
+    {text: "Latest release: " + say(upstream.latest_release) + (upstream.latest_date ? " (" + upstream.latest_date + ")" : ""), url: upstream.latest_release_url},
+    {text: "Our pin: " + say(upstream.our_pin), url: upstream.our_pin_url}, {text: "Behind by: " + say(upstream.behind_by)}];
+  if(install.command) upstreamItems.push({text: "Official install: " + install.command, url: install.url});
+  [["claude_code", "Official Claude Code wiring"], ["codex", "Official Codex wiring"]].forEach(([key, label]) => {
+    if(wiring[key] && wiring[key].how) upstreamItems.push({text: label + ": " + wiring[key].how, url: wiring[key].url});
+  });
+  upstreamItems.push(...cited("Official claim", upstream.official_baseline_claims, "claim"),
+    ...cited("Limitation", upstream.limitations, "text"), ...cited("New since our pin", upstream.new_since_pin, "text"));
+  const nativeItems = [["assessment", "Assessment"], ["how_we_install", "Install"], ["claude_wiring", "Claude wiring"],
+    ["codex_wiring", "Codex wiring"], ["lane_rule", "Lane rule"]].filter(([key]) => native[key]).map(([key, label]) => ({text: label + ": " + native[key]}));
+  (native.deviations_from_upstream || []).forEach(item => nativeItems.push({text: "Deviation: " + say(item.what) + " Why: " + say(item.why) + " Fix: " + say(item.fix) + (item.pr ? " (" + item.pr + ")" : "")}));
+  (native.pending_fixes || []).forEach(item => nativeItems.push({text: "Pending: " + flat(item)}));
+  const performanceItems = (performance.exact_comparisons || []).map(item => ({text: "Exact o200k comparison · " + say(item.lane) + ": " + say(item.before_tokens) + " → " + say(item.after_tokens)
+    + " tokens (" + (typeof item.change_pct === "number" ? item.change_pct.toFixed(1) + "%" : "change not recorded") + ") · " + say(item.payload) + (item.eligibility ? " · Eligibility: " + item.eligibility : "")}));
+  const counter = performance.native_counter;
+  if(counter) performanceItems.push({text: "Native counter window · " + say(counter.command) + ": " + say(counter.before) + " → " + say(counter.after) + " " + say(counter.unit) + (typeof counter.delta === "number" ? " (delta " + counter.delta + ")" : "")});
+  (performance.native_snapshot || []).forEach(item => performanceItems.push({text: "Native retained-history estimate · " + say(item.scope) + ": " + say(item.saved) + " " + say(item.unit) + " at " + say(item.observed_utc)}));
+  if(performance.q3_fixture) performanceItems.push({text: "Q3 fixture (" + say(performance.q3_fixture.evidence_class) + "): " + say(performance.q3_fixture.result) + " · hop-1 recall " + say(performance.q3_fixture.hop1_recall)});
+  if(performance.shortfall_cause) performanceItems.push({text: "Shortfall cause: " + performance.shortfall_cause});
+  if(!performanceItems.length) performanceItems.push({text: "No exact comparison or native counter is recorded in this card. Unmeasured is not zero."});
+  const labels = {workflow_children: "Ultracode workflow children, all", workflow_children_with_lanes_block: "Ultracode children with the lanes block",
+    workflow_children_without_lanes_block: "Ultracode children without the lanes block", agent_subagents: "Agent-tool subagents",
+    main_sessions: "Main Claude sessions", codex_exec_workers: "Codex exec workers (GPT-6)"};
+  const span = invoke.window || {};
+  const invokeItems = [{text: "Transcript window: " + say(span.last_36h_start) + " to " + say(span.now)}];
+  Object.entries(invoke.populations || {}).forEach(([key, counts]) => invokeItems.push({text: (labels[key] || key.replaceAll("_", " ")) + ": " + counts.agents_using + " of " + counts.agents
+    + " agents (" + percent(counts.pct_agents_using) + ") · " + counts.mcp_calls + " MCP calls, " + counts.cli_calls + " CLI calls"}));
+  const otel = invoke.live_otel;
+  if(otel) (otel.series || []).forEach(series => invokeItems.push({text: "Live OTel · " + say(otel.panel) + " (" + say((otel.window || {}).since) + " to " + say((otel.window || {}).until) + "): "
+    + say(series.client) + " → " + say(series.mcp_server_name) + ", " + say(series.calls) + " calls"}));
+  invokeItems.push({text: "Arm-B native: " + say(invoke.arm_b_native)});
+  if(invoke.method) invokeItems.push({text: "Method: " + invoke.method});
+  // The card field is named resolutions, but its entries are the repair round's dispositions: an edit, or a
+  // deferral that leaves the finding open. The cards label a deferral by starting its text with "deferred".
+  const findings = review.findings || [], dispositions = (review.resolutions || []).map(flat);
+  const deferred = dispositions.filter(text => /^deferred\b/i.test(text)).length;
+  const reviewItems = [{text: "Card review: " + say(review.verdict) + " · " + plural(findings.length, "finding") + " · " + plural(dispositions.length, "disposition")
+    + (deferred ? " (" + deferred + " deferred)" : "")}, {text: "Adaptation verdict: " + say(verdict.verdict)}];
+  if(verdict.summary) reviewItems.push({text: "Summary: " + verdict.summary});
+  findings.forEach(item => reviewItems.push({text: "Finding (" + say(item.severity) + ") · " + say(item.field) + ": " + say(item.issue) + " Fix: " + say(item.fix)}));
+  dispositions.forEach(text => reviewItems.push({text: "Disposition: " + text}));
+  (verdict.gaps || []).forEach(item => reviewItems.push({text: "Gap: " + say(item.gap) + " Action: " + say(item.action)}));
+  const results = {};
+  (verdict.claims_verified || []).forEach(item => { results[say(item.result)] = (results[say(item.result)] || 0) + 1; });
+  if(Object.keys(results).length) reviewItems.push({text: "Claims verified: " + Object.entries(results).map(([result, count]) => count + " " + result).join(", ")});
+  const runs = Object.entries(review.harness || {}).map(([run, detail]) => run.replaceAll("_", " ") + " " + say(detail && detail.model) + " at effort " + say(detail && detail.effort));
+  if(runs.length) reviewItems.push({text: "GPT-6 runs: " + runs.join("; ")});
+  return [
+    {title: "Upstream", evidence_class: "GPT-6 upstream source review; each fact links its source", items: upstreamItems},
+    {title: "Native adaptation", evidence_class: "GPT-6 assessment of this repository's wiring", items: nativeItems},
+    {title: "Adapted performance", evidence_class: "each line keeps its own class; never summed", items: performanceItems},
+    {title: "Invoke rates", evidence_class: "invocation attempts per population and window; not success or savings", items: invokeItems},
+    {title: "GPT-6 review", evidence_class: "GPT-6 review of the card and verdict on the adaptation", items: reviewItems}];
+}
+function topicCardDetail(row) {
+  const sections = topicCardSections(row);
+  if(!sections.length) return make("p", "small muted", "No evidence card for this row.");
+  const detail = add(make("details", "record-detail"), make("summary", "", "Evidence card: upstream, adaptation, performance, invoke rates and GPT-6 review"));
+  sections.forEach(section => {
+    const list = make("ul", "topic-card-items");
+    section.items.forEach(item => add(list, item.url ? add(make("li"), link(item.text + " ↗", item.url)) : make("li", "", item.text)));
+    add(detail, make("h4", "", section.title + " · " + section.evidence_class), list);
+  });
+  if(row.evidence_card) add(detail, add(make("p", "small mono"), link("Complete card: " + row.evidence_card.path + " · sha256 " + row.evidence_card.sha256.slice(0, 12) + " ↗", row.evidence_card.url)));
+  return detail;
+}
 const topic = data.efficiency.topic;
 $("token-topic-scope").textContent = topic.scope;
+if(topic.evidence_cards) add($("token-topic"), make("p", "small muted", "Evidence cards, edition " + topic.evidence_cards.edition + ": " + topic.evidence_cards.boundary));
 if(!topic.rows.length) $("token-topic-section").hidden = true;
 [["core", "Core token-efficiency paths"], ["observation", "Observation and accounting"], ["runtime", "Native clients and supporting runtimes"]].forEach(([group, title]) => {
   const rows = topic.rows.filter(row => row.group === group);
@@ -646,7 +729,7 @@ if(!topic.rows.length) $("token-topic-section").hidden = true;
     const meters = add(make("td"), make("p", "", "Session: " + row.session_statistics.summary), make("p", "", "Lifetime: " + row.lifetime_statistics.summary));
     const record = add(make("tr"), identity, add(make("td"), codeBlock(row.upstream_commands.use)), make("td", "", row.returned_result_summary), meters);
     record.dataset.component = row.component_id;
-    const detailCell = add(make("td"), detail); detailCell.colSpan = 4;
+    const detailCell = add(make("td"), detail, topicCardDetail(row)); detailCell.colSpan = 4;
     add(body, record, add(make("tr", "topic-detail"), detailCell));
   });
   add(table, body); add($("token-topic"), make("h3", "", title), add(make("div", "table-wrap"), table));

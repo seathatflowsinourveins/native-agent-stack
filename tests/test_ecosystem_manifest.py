@@ -692,6 +692,161 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("must be selected and unique", result.stdout)
 
+    def card_topic_row(self, card_path="evidence/artifacts/cards/search.json"):
+        """Synthetic fixture: one topic row carrying the five evidence-card fields
+        (evidence/artifacts/token-stack-cards-20260927/project_topic.py writes them)."""
+        self.write(card_path, {"tool": "search", "complete": True})
+        raw = (self.root / card_path).read_bytes()
+        return {"component_id": "search", "group": "core", "purpose": "Find exact source",
+                "upstream_commands": {"use": "search --native"},
+                "returned_result_summary": "Exact source returned",
+                "session_statistics": {"value": None, "summary": "Not provided by upstream"},
+                "lifetime_statistics": {"value": None, "summary": "No cumulative savings counter"},
+                "baseline_summary": "Keep the focused read", "lifecycle_summary": "Dated acceptance only",
+                "source_paths": ["evidence/history.json"],
+                "upstream": {"latest_release": "v1.1", "latest_date": "2026-09-24", "our_pin": "1.0",
+                             "behind_by": "one minor release",
+                             "recommended_install": {"command": "search install",
+                                                     "url": "https://example.org/install"},
+                             "official_baseline_claims": [{"claim": "Up to 90 percent smaller output",
+                                                           "url": "https://example.org/claim"}],
+                             "limitations": [{"text": "No recovery path", "url": "https://example.org/limit"}]},
+                "native_adaptation": {"assessment": "Aligned with upstream", "lane_rule": "Large source reads",
+                                      "deviations_from_upstream": [{"what": "No hook", "why": "Exactness",
+                                                                    "fix": "Keep explicit calls", "pr": "#9"}],
+                                      "pending_fixes": ["Qualify the hook"]},
+                "adapted_performance": {
+                    "exact_comparisons": [{"lane": "claude_subagent", "payload": "Same source read",
+                                           "before_tokens": 1000, "after_tokens": 100, "change_pct": -90.0,
+                                           "encoding": "o200k_base", "eligibility": None,
+                                           "evidence_class": "exact artifact comparison"}],
+                    "native_counter": {"command": "search stats", "before": 0, "after": 50, "delta": 50,
+                                       "unit": "tokens"},
+                    "native_snapshot": [], "shortfall_cause": "None recorded", "q3_fixture": None},
+                "invoke_rates": {
+                    "window": {"last_36h_start": "2026-09-25T11:37:28Z", "now": "2026-09-26T23:37:28Z"},
+                    "method": "Transcript counts",
+                    "populations": {
+                        "workflow_children": {"mcp_calls": 3, "cli_calls": 4, "agents_using": 2, "agents": 10,
+                                              "pct_agents_using": 0.2},
+                        "codex_exec_workers": {"mcp_calls": 0, "cli_calls": 1, "agents_using": 1, "agents": 4,
+                                               "pct_agents_using": 0.25}},
+                    "live_otel": {"window": {"since": "2026-09-26T22:50:00Z", "until": "2026-09-26T23:37:28Z"},
+                                  "panel": "MCP calls by client and server",
+                                  "series": [{"client": "codex_exec", "mcp_server_name": "search", "calls": "7"}]},
+                    "arm_b_native": "pending: preregistered arm-B E2E"},
+                "gpt6_review": {"verdict": "defects",
+                                "findings": [{"severity": "medium", "field": "adapted_performance",
+                                              "issue": "Wrong record id", "fix": "Cite the record",
+                                              "source": "records"}],
+                                "resolutions": [{"field": "upstream.limitations[0].text", "action": "edited"},
+                                                "deferred: ASSEMBLER-owned field, not edited in this round"],
+                                "final_verdict": {"verdict": "adapted-with-gaps", "summary": "Aligned with one gap",
+                                                  "gaps": [{"gap": "Hook unqualified", "action": "Qualify it"}],
+                                                  "claims_verified": [{"claim": "Pin is latest", "result": "holds"}]},
+                                "harness": {"verdict_run": {"model": "gpt-6-astra", "effort": "max"}}},
+                "evidence_card": {"path": card_path, "sha256": hashlib.sha256(raw).hexdigest(),
+                                  "bytes": len(raw)}}
+
+    def write_topic(self, row):
+        self.write("docs/token-efficiency-stack.json", {"schema_version": 1,
+                   "scope": "Dated topic evidence", "rows": [row]})
+
+    def test_topic_card_fields_reach_the_page_with_a_verified_card_link(self):
+        self.write_topic(self.card_topic_row())
+        page, _ = self.build()
+        data = json.loads(page.data)
+        actual = data["efficiency"]["topic"]["rows"][0]
+        self.assertEqual(actual["gpt6_review"]["final_verdict"]["verdict"], "adapted-with-gaps")
+        self.assertEqual(actual["invoke_rates"]["populations"]["codex_exec_workers"]["agents"], 4)
+        self.assertEqual(actual["adapted_performance"]["exact_comparisons"][0]["after_tokens"], 100)
+        self.assertTrue(actual["evidence_card"]["url"].endswith(
+            "/blob/main/evidence/artifacts/cards/search.json"), actual["evidence_card"]["url"])
+        self.assertIn("evidence/artifacts/cards/search.json", {row["path"] for row in data["inputs"]})
+
+    def test_topic_card_rejects_incomplete_changed_or_private_cards(self):
+        def without(field):
+            row = self.card_topic_row()
+            row.pop(field)
+            return row
+
+        def changed(update):
+            row = self.card_topic_row()
+            update(row)
+            return row
+
+        cases = (
+            ("four of five fields", without("invoke_rates"), "needs all five card fields"),
+            ("fields without a card", without("evidence_card"), "needs all five card fields"),
+            ("no review verdict", changed(lambda row: row["gpt6_review"].pop("verdict")),
+             "needs a GPT-6 verdict"),
+            ("no adaptation verdict", changed(lambda row: row["gpt6_review"]["final_verdict"].pop("verdict")),
+             "needs a GPT-6 verdict"),
+            ("comparisons not a list", changed(lambda row: row["adapted_performance"].update(
+                exact_comparisons={"lane": "x"})), "needs exact comparisons"),
+            ("more agents invoking than agents", changed(lambda row: row["invoke_rates"]["populations"][
+                "workflow_children"].update(agents_using=11)), "needs invoke counts"),
+            ("count as text", changed(lambda row: row["invoke_rates"]["populations"][
+                "workflow_children"].update(cli_calls="4")), "needs invoke counts"),
+            ("changed card bytes", changed(lambda row: row["evidence_card"].update(sha256="0" * 64)),
+             "hash or size mismatch"),
+            ("card outside public evidence", changed(lambda row: row["evidence_card"].update(
+                path="evidence/history.json")), "must be a public evidence artifact"),
+        )
+        for label, row, message in cases:
+            with self.subTest(label=label):
+                self.write_topic(row)
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0, label)
+                self.assertIn(message, result.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "Topic card rendering check needs Node")
+    def test_topic_card_sections_keep_evidence_classes_apart_without_totals(self):
+        """Executes the committed template function, not a reimplementation."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        match = re.search(r"^function topicCardSections\(.*?^}", template, re.S | re.M)
+        self.assertIsNotNone(match, "topicCardSections not found in template.html")
+        row = self.card_topic_row()
+        row["evidence_card"]["url"] = "https://example.org/card.json"
+        script = match.group(0) + r'''
+const input = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+process.stdout.write(JSON.stringify([topicCardSections(input.card), topicCardSections(input.plain)]));
+'''
+        result = subprocess.run(["node", "-e", script], input=json.dumps({
+            "card": row, "plain": {"component_id": "otel-tui"}}), capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        sections, plain = json.loads(result.stdout)
+        self.assertEqual(plain, [], "a row without a card renders no card sections")
+        self.assertEqual([section["title"] for section in sections],
+                         ["Upstream", "Native adaptation", "Adapted performance", "Invoke rates", "GPT-6 review"])
+        self.assertTrue(all(section["evidence_class"] for section in sections))
+        text = {section["title"]: " | ".join(item["text"] for item in section["items"]) for section in sections}
+        urls = {item["url"] for section in sections for item in section["items"] if item.get("url")}
+        self.assertLessEqual({"https://example.org/claim", "https://example.org/limit",
+                              "https://example.org/install"}, urls)
+        self.assertIn("v1.1 (2026-09-24)", text["Upstream"])
+        self.assertIn("Deviation: No hook", text["Native adaptation"])
+        performance = text["Adapted performance"]
+        self.assertIn("Exact o200k comparison", performance)
+        self.assertIn("1000 → 100 tokens (-90.0%)", performance)
+        self.assertIn("Native counter window", performance)
+        invoke = text["Invoke rates"]
+        self.assertIn("2 of 10 agents (20.0%)", invoke)
+        self.assertIn("1 of 4 agents (25.0%)", invoke)
+        self.assertIn("Live OTel", invoke)
+        self.assertIn("pending: preregistered arm-B E2E", invoke)
+        for total in ("of 14 agents", "8 calls", "11 calls"):
+            self.assertNotIn(total, invoke, "populations and windows are never summed")
+        review = text["GPT-6 review"]
+        # A repair round's entries are dispositions: an edit, or a deferral that leaves the finding open.
+        self.assertIn("Card review: defects · 1 finding · 2 dispositions (1 deferred)", review)
+        self.assertIn("Adaptation verdict: adapted-with-gaps", review)
+        self.assertIn("Disposition: field: upstream.limitations[0].text · action: edited", review)
+        self.assertIn("Disposition: deferred: ASSEMBLER-owned field", review)
+        self.assertNotIn("resolution", review.lower())
+        self.assertIn("1 holds", review)
+        self.assertNotIn("[object Object]", " | ".join(text.values()))
+
     def grand_catalog_fixture(self):
         self.config["grand_catalogs"] = {
             "foundation_manifest": "catalogs/foundation/manifest.json",
@@ -1003,6 +1158,53 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         result = self.run_generator("--write")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("supersedes an unknown decision", result.stdout)
+
+
+class TokenTopicEditionTests(unittest.TestCase):
+    """The committed topic against the committed per-tool evidence cards (structural validation)."""
+
+    PROJECTION = ROOT / "evidence/artifacts/token-stack-cards-20260927/project_topic.py"
+
+    def test_committed_topic_is_the_projection_of_the_committed_cards(self):
+        result = subprocess.run([sys.executable, str(self.PROJECTION), "--check"],
+                                capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_every_card_is_a_row_or_a_recorded_exception(self):
+        topic = json.loads((ROOT / "docs/token-efficiency-stack.json").read_text(encoding="utf-8"))
+        index = json.loads((self.PROJECTION.parent / "cards/index.json").read_text(encoding="utf-8"))
+        block = topic["evidence_cards"]
+        carded = {row["component_id"] for row in topic["rows"] if "evidence_card" in row}
+        excepted = {item["tool"] for item in block["cards_without_rows"]}
+        self.assertEqual(carded | excepted, {item["tool"] for item in index})
+        self.assertEqual(carded, set(block["rows_with_cards"]))
+        self.assertEqual({row["component_id"] for row in topic["rows"]} - carded, set(block["rows_without_cards"]))
+
+    @unittest.skipUnless(shutil.which("node"), "Topic card rendering check needs Node")
+    def test_every_committed_card_renders_as_readable_text(self):
+        """The committed template function over every committed row: card shapes vary by tool."""
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        function = re.search(r"^function topicCardSections\(.*?^}", template, re.S | re.M).group(0)
+        script = function + r'''
+const rows = JSON.parse(require("node:fs").readFileSync(0, "utf8")).rows;
+process.stdout.write(JSON.stringify(rows.map(row => [row.component_id, topicCardSections(row)])));
+'''
+        result = subprocess.run(["node", "-e", script], input=(ROOT / "docs/token-efficiency-stack.json").read_text(),
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rendered = dict(json.loads(result.stdout))
+        topic = json.loads((ROOT / "docs/token-efficiency-stack.json").read_text(encoding="utf-8"))
+        for identifier in topic["evidence_cards"]["rows_with_cards"]:
+            sections = rendered[identifier]
+            with self.subTest(component=identifier):
+                self.assertEqual(len(sections), 5)
+                for item in (item for section in sections for item in section["items"]):
+                    for marker in ("[object Object]", "undefined", "NaN"):
+                        self.assertNotIn(marker, item["text"])
+                    if item.get("url"):
+                        self.assertTrue(item["url"].startswith("https://"), item["url"])
+        for identifier in topic["evidence_cards"]["rows_without_cards"]:
+            self.assertEqual(rendered[identifier], [], identifier)
 
 
 if __name__ == "__main__":

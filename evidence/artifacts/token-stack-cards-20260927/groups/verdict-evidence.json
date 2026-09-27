@@ -1,0 +1,187 @@
+{
+  "evidence_class": "local_integration",
+  "checked_on": "2026-09-26 (America/New_York)",
+  "scope": "Final-verdict read-only verification; locally authored summary of actual returned checks, not a new provider run or an unchanged upstream test suite.",
+  "path_convention": "cards/, groups/, invoke_by_tool.json and ../rr or ../html-report paths are relative to token-cards; docs/, recipes/, tools/, adoption/ and evidence/ paths are relative to the main repository. Record names after # identify retained entries, not personal identifiers.",
+  "installed_versions": {
+    "gpt-tokenizer": "3.4.0",
+    "rtk": "0.50.0",
+    "toon": "4.1.1",
+    "context-mode": "1.0.169",
+    "headroom": "0.37.0",
+    "mcporter": "0.14.1"
+  },
+  "version_checks": "Native --version for rtk, toon, headroom and mcporter; installed package.json for gpt-tokenizer and context-mode.",
+  "latest_releases": [
+    {
+      "tool": "gpt-tokenizer",
+      "tag": "4.0.0",
+      "published_at": "2026-08-16T02:29:41Z",
+      "url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0"
+    },
+    {
+      "tool": "rtk",
+      "tag": "v0.50.0",
+      "published_at": "2026-09-24T10:02:31Z",
+      "url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
+    },
+    {
+      "tool": "toon",
+      "tag": "v4.1.1",
+      "published_at": "2026-08-05T11:49:55Z",
+      "url": "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+    },
+    {
+      "tool": "context-mode",
+      "tag": "v1.0.169",
+      "published_at": "2026-06-29T18:18:53Z",
+      "url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+    },
+    {
+      "tool": "headroom",
+      "tag": "v0.39.1",
+      "published_at": "2026-09-26T20:31:39Z",
+      "url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1"
+    },
+    {
+      "tool": "mcporter",
+      "tag": "v0.14.1",
+      "published_at": "2026-09-24T13:16:08Z",
+      "url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1"
+    }
+  ],
+  "release_method": "Fresh official GitHub releases/latest API responses (all HTTP 200), followed by opened official release pages and release/current upstream documentation; search-index snippets were not used as freshness authority.",
+  "retained_attachment_check": {
+    "source": "../rr/returned-results.json",
+    "selection": "All records whose component_ids include one of the six verdict tools, unique attachment paths.",
+    "attachments_opened": 775,
+    "byte_or_sha256_mismatches": 0,
+    "missing": 0
+  },
+  "historical_comparison_recount": {
+    "source": "../html-report/savings.json#report_comparisons",
+    "method": "Opened the private ledger's retained baseline/candidate paths, checked bytes and SHA256, then re-encoded fatal UTF-8 with installed gpt-tokenizer 3.4.0 cjs/encoding/o200k_base.js; private paths and ledger IDs omitted.",
+    "artifact_count": 22,
+    "comparisons": [
+      {
+        "tool": "toon",
+        "before": 119390,
+        "after": 130681
+      },
+      {
+        "tool": "rtk",
+        "before": 29986,
+        "after": 3786
+      },
+      {
+        "tool": "headroom",
+        "before": 237691,
+        "after": 56939
+      },
+      {
+        "tool": "toon",
+        "before": 1642,
+        "after": 907
+      },
+      {
+        "tool": "context-mode",
+        "before": 97952,
+        "after": 204
+      },
+      {
+        "tool": "toon",
+        "before": 120961,
+        "after": 132322
+      },
+      {
+        "tool": "codex:rtk",
+        "before": 25386,
+        "after": 4278
+      },
+      {
+        "tool": "codex:context-mode",
+        "before": 97952,
+        "after": 204
+      },
+      {
+        "tool": "codex:headroom",
+        "before": 210316,
+        "after": 14611
+      },
+      {
+        "tool": "codex:toon",
+        "before": 1642,
+        "after": 907
+      },
+      {
+        "tool": "toon",
+        "before": 121472,
+        "after": 132861
+      }
+    ],
+    "all_counts_match": true,
+    "all_byte_counts_and_hashes_match": true,
+    "provider_tokens_saved": null,
+    "limit": "A matching count and hash does not independently establish semantic acceptance; eligibility comes from each retained boundary and check."
+  },
+  "invoke_check": {
+    "source": "invoke_by_tool.json",
+    "generator": "invoke_by_tool.py",
+    "all_six_cards_match_population_objects": true,
+    "window_start_utc": "2026-09-25T11:37:28Z",
+    "window_end_utc": "2026-09-26T23:37:28Z",
+    "workflow_children": 1010,
+    "codex_exec_workers": 301,
+    "workflow_children_with_lanes_block": 22,
+    "excluded_codex_negative_controls": 139,
+    "limits": [
+      "CLI command-text matches can include mentions rather than successful useful execution; MCP matches identify servers.",
+      "The 22-child lane-block population is a subset, not an additional population.",
+      "Eligible-task opportunity counts and causal provider savings are absent.",
+      "The cards retain the preregistered arm-B run as pending."
+    ]
+  },
+  "host_wiring_readback": {
+    "method": "Parsed selected current user/project TOML fields and the portable Codex template; emitted only booleans, command basenames and the named offline guards.",
+    "context_mode": {
+      "user_registered": false,
+      "project_registered": true,
+      "project_command_basename": "node",
+      "project_launches_start_mjs": true,
+      "project_cwd_set": true,
+      "project_fixed_project_env": true,
+      "template_user_registered": true,
+      "template_launches_start_mjs": true,
+      "template_cwd_set": false,
+      "template_fixed_project_env": false
+    },
+    "headroom": {
+      "user_registered": true,
+      "user_guards": {
+        "HEADROOM_OFFLINE": "1",
+        "DO_NOT_TRACK": "1"
+      },
+      "template_guards": {
+        "HEADROOM_OFFLINE": "1",
+        "DO_NOT_TRACK": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1"
+      }
+    },
+    "limit": "Read-back establishes selected configuration state, not hook execution, concurrent native-session isolation or blanket offline behavior."
+  },
+  "toon_bom_check": {
+    "version": "4.1.1",
+    "method": "Pass JSON.stringify of the root string U+FEFF followed by true to toon --encode; pass stdout to toon --decode --strict; JSON.parse the decoded stdout and compare types and values.",
+    "input_type": "string",
+    "output_type": "boolean",
+    "encode_exit": 0,
+    "decode_exit": 0,
+    "value_preserved": false,
+    "upstream": "https://github.com/toon-format/toon/issues/339"
+  },
+  "retrieval_limits": {
+    "qmd": "Query/get returned an indexed historical foundation document; the requested handbook was inspected at its original known repository path.",
+    "serena": "Initialization was attempted but did not return before the call was terminated; no symbol-service success is claimed."
+  }
+}

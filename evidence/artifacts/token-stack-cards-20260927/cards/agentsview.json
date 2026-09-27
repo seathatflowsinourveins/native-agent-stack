@@ -1,0 +1,514 @@
+{
+  "tool": "agentsview",
+  "group": "g6-docs-accounting",
+  "repo": "https://github.com/kenn-io/agentsview",
+  "pin": "0.43.0",
+  "installed_version": "agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z) (native `agentsview --version`)",
+  "role": "Observation only: searches and lists Claude and Codex session history, used to confirm which native sessions ran. No savings. Landscape: observation-inference alternative.",
+  "lanes": [
+    "CLI: agentsview sync/projects/session list"
+  ],
+  "upstream": {
+    "latest_release": "v0.44.0",
+    "latest_date": "2026-09-21",
+    "our_pin": "0.43.0; cards/agentsview.json retains commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1 and ~/code/native-agent-stack/manifests/stack.json pins that release. Upstream identity: https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+    "behind_by": "One published release behind: v0.43.0 to v0.44.0. Fresh release and tag lists show no newer tag or published release. Sources: https://api.github.com/repos/kenn-io/agentsview/releases ; https://api.github.com/repos/kenn-io/agentsview/tags",
+    "recommended_install": {
+      "command": "curl -fsSL https://agentsview.io/install.sh | bash",
+      "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/README.md#install"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "Use the CLI against the selected archive, with daemon startup before daemon-backed queries. Optional MCP is documented as command agentsview with args [\"mcp\"], using stdio for local Claude Code clients. Local MCP resolves/starts the daemon; it does not fall back to direct SQLite reads when daemon startup is disabled. This registration is optional.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/mcp.md"
+      },
+      "codex": {
+        "how": "Use the CLI through CommandExecution against the selected archive. Optional upstream MCP uses agentsview mcp over stdio, documented for Codex as well as Claude Code (https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/commands.md). Its tools can search sessions, fetch messages and summarize usage, subject to their own filters; MCP adoption is not required for the CLI workflow.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/mcp.md"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "Source for latest_release and latest_date: fresh live checks on 2026-09-27 UTC returned tag_name v0.44.0 and published_at 2026-09-21T13:56:12Z. The immediately preceding published release is v0.43.0, and the tags list also starts at v0.44.0.",
+        "url": "https://api.github.com/repos/kenn-io/agentsview/releases/latest"
+      },
+      {
+        "claim": "Upstream describes local session browsing/search and cost tracking across coding agents, with the archive kept locally unless a sharing feature is selected. This is an observation/retrieval capability, not an official token-savings measurement.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/README.md"
+      },
+      {
+        "claim": "The CLI documents offline sync with AGENTSVIEW_NO_DAEMON=1 and separately documents daemon-backed read commands. Disabling autostart does not stop an existing daemon or bypass its archive ownership lock.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/commands.md"
+      },
+      {
+        "claim": "Upstream offers an optional read-only MCP surface over stdio, with a separate HTTP option. Local MCP is daemon-backed and resolves the daemon on tool calls.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/mcp.md"
+      },
+      {
+        "claim": "A separate agentsview capture workflow is documented for measuring one exact non-interactive execution without the normal daemon, server, watchers or archive. It should not be confused with the normal projects/session-query workflow.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/one-shot-capture.md"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "The changelog dates the daemon-transport requirement for affected CLI read commands to v0.35.1, 2026-06-30. Direct SQLite access remains available for documented dedicated/offline operations; it was not removed for every command.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/changelog.md#0351"
+      },
+      {
+        "text": "At the installed v0.43.0 pin, ensureTransportContext explicitly refuses read intent when no usable daemon exists and autostart is disabled, directing the user to agentsview daemon start or to unset AGENTSVIEW_NO_DAEMON. This matches the retained failure condition.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.43.0/cmd/agentsview/transport.go#L275"
+      },
+      {
+        "text": "session search defaults --include-automated, --include-one-shot and --include-children to false in both v0.43.0 (https://github.com/kenn-io/agentsview/blob/v0.43.0/cmd/agentsview/session_search.go#L125) and v0.44.0. The common search request carries these flags regardless of selecting --fts; omitted flags can exclude matching sessions.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/cmd/agentsview/session_search.go#L126"
+      },
+      {
+        "text": "At v0.44.0 the usage CLI builds db.UsageFilter without setting ExcludeAutomated or ExcludeOneShot; both remain false, and its HTTP adapter explicitly requests the inverse inclusion flags. Thus CLI usage reporting includes those session classes.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/cmd/agentsview/usage.go#L163"
+      },
+      {
+        "text": "At v0.44.0 get_usage_summary sets IncludeOneShot=true but omits IncludeAutomated, and its input schema exposes no include_automated parameter. The service converts that omitted false value into ExcludeAutomated=true (https://github.com/kenn-io/agentsview/blob/v0.44.0/internal/service/usage.go#L208). This is a real CLI/MCP default-population mismatch; adding an unsupported argument is not a documented remedy.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/internal/mcp/tools.go#L703"
+      },
+      {
+        "text": "The changelog file at the v0.44.0 tag still labels its leading section Unreleased and names v0.43.0 as latest. Use the live GitHub release object for release identity rather than that stale heading.",
+        "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/changelog.md"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "Released in the successor: PR #1855, merged 2026-09-20, reads Codex session_meta originator=codex_exec into session_kind=non-interactive. thread_source=roborev overrides it with the more specific roborev kind, and the automated classifier accepts both kinds. This verifies the classification change from the actual parser/classifier diff, rather than from a prior summary.",
+        "url": "https://github.com/kenn-io/agentsview/pull/1855/files"
+      },
+      {
+        "text": "The same PR raises dataVersion from 111 to 112 specifically so existing Codex-format rows reparse and persist the classification; its changelog hunk instructs restart or agentsview sync. This describes the migration introduced by the PR, not a claim that later versions cannot have a higher data version.",
+        "url": "https://github.com/kenn-io/agentsview/commit/2f81cf478579cc8ec7966f4a84ea7e37177d07e5"
+      },
+      {
+        "text": "v0.44.0 is the published successor to the installed v0.43.0; its release notes include the Codex exec automated-session change. Other main-branch changes after this tag are not part of the published successor.",
+        "url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {
+      "id": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+      "version": "0.43.0",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Scoped historical Codex/Claude transcript lexical search",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    "how_we_install": "Install the selected host archive from the pinned official release, identified with gh release view v0.43.0 --repo kenn-io/agentsview --json assets, then follow the repository's archive procedure (~/code/native-agent-stack/recipes/README.md:82; manifests/stack.json, component agentsview). cards/agentsview.json retains the installed-version probe. Repository observations use the current detached checkout at the supplied path, which has no local main ref.",
+    "claude_wiring": "CLI only through Bash, using a dedicated selected-history archive with explicit Claude/Codex log-directory and cwd scope (~/code/native-agent-stack/recipes/README.md:629; examples/agentsview.toml.example). adoption/templates/claude.settings.template.json contains no agentsview MCP registration. The current recipe performs offline sync, starts serve --background, queries projects/search, then stops the daemon; its AGENTSVIEW_NO_DAEMON assignment applies only to the sync command.",
+    "codex_wiring": "CLI only through CommandExecution against the same deliberately scoped archive. Neither ~/code/native-agent-stack/adoption/templates/codex.config.template.toml nor .codex/config.toml registers agentsview MCP; the Claude template also has no entry. docs/token-session-handbook.md:144 and recipes/README.md:629 define the selected-history workflow; optional upstream MCP is not adopted.",
+    "lane_rule": "Observation and selected-history retrieval only; configure authorized source directories and cwd filters before sync, use the returned project identity, refresh explicitly, and do not treat search coverage or cost totals as tokens saved. Sources: ~/code/native-agent-stack/examples/agentsview.toml.example; recipes/README.md:629; docs/token-session-handbook.md:115, :124 and :144.",
+    "deviations_from_upstream": [
+      {
+        "what": "The retained no-daemon execution fails before the later startup step: cards/agentsview.json, e2e_returned_results.records_shown[id=agentsview-04-projects].observation contains exit_code = 1; agentsview-05-session-list-claude and agentsview-06-session-list-codex also contain exit_code = 1. The stronger lead that the CURRENT recipe omits startup is refuted: recipes/README.md already starts serve --background before projects/search, and the inline AGENTSVIEW_NO_DAEMON setting is only on sync.",
+        "why": "Those retained commands requested daemon-backed reads while autostart was disabled and no usable daemon had been started. This is supported by the pinned transport source (https://github.com/kenn-io/agentsview/blob/v0.43.0/cmd/agentsview/transport.go#L275), but is not evidence that the current documented command order lacks a daemon. No fresh daemon or history mutation was run in this research.",
+        "fix": "Use the already-retained post-start projects and inclusive Claude/Codex session lists cited in pending_fixes[1] to document successful startup before reads for the same AGENTSVIEW_DATA_DIR and the intended --include-one-shot --include-automated flags. Stop on startup failure and avoid propagating the sync-only AGENTSVIEW_NO_DAEMON setting across the query sequence. Qualify any changed search or upgrade workflow separately; the bounded inclusive-list results do not establish complete population coverage.",
+        "pr": null
+      },
+      {
+        "what": "The selected-history recipe runs session search --fts without --include-automated, --include-one-shot or --include-children, although the upstream search command excludes those classes by default. Consequently its results omit otherwise matching sessions already classified as automated, including classified Codex exec workers; they cannot serve as a complete worker-session count.",
+        "why": "The example is a bounded selected-task search, but its scope limitation is not made explicit. The default automated/one-shot filters exist at both the installed pin and the published successor; the successor classifies exec-originated Codex sessions systematically. Sources: https://github.com/kenn-io/agentsview/blob/v0.43.0/cmd/agentsview/session_search.go and https://github.com/kenn-io/agentsview/pull/1855/files .",
+        "fix": "For worker-history coverage, add --include-automated and, when those classes are intended, --include-one-shot and --include-children; make archive/project scope and bounded result limits explicit. Preserve the default interactive-history example as a separately labelled use case. Do not infer that every legacy worker row at the installed pin was already classified automated.",
+        "pr": null
+      },
+      {
+        "what": "The installed archive tool remains on cards/agentsview.json pin = \"0.43.0\", behind the live published successor.",
+        "why": "The recipe retains its previously qualified archive pin. The successor changes classification and reparses existing Codex-format rows, so adopting it changes the population visible under default filters; optional MCP usage summary has different automated-session inclusion from the usage CLI.",
+        "fix": "Qualify the published successor against a preserved archive copy, reparse according to upstream guidance, and compare explicitly matched CLI/search/MCP populations before changing the adopted pin. Keep the optional MCP surface separate from the current CLI evidence.",
+        "pr": null
+      }
+    ],
+    "pending_fixes": [
+      "Tracking gap in our own manifest: ~/code/native-agent-stack/manifests/stack.json says latest-release identity is recorded in manifests/landscape.json, but the current landscape.json contains no agentsview entry. Add the published successor and retained pin distinction or correct that freshness claim.",
+      "The full <scratch>/rr/returned-results.json record set already retains successful post-start projects reads in agentsview-11-projects-daemon and agentsview-12-projects-daemon-json, followed by successful target-session retrieval in agentsview-15-session-list-claude-inclusive and agentsview-16-session-list-codex-inclusive with --include-one-shot --include-automated. The pre-start refusals record the no-daemon condition; the intervening default lists ran successfully but excluded one-shot sessions. Document the recipe's existing serve --background startup order and intended inclusion flags, and qualify any changed search/upgrade workflow. These bounded inclusive results do not establish complete population coverage.",
+      "Clarify search population and add explicit automated/one-shot/child inclusion for a worker-history recipe. A filtered or limited search result is not a complete count of Codex exec sessions.",
+      "Qualify the successor's exec-session reclassification/reparse before upgrading the shared archive. If MCP is later adopted, retain the documented CLI/get_usage_summary population mismatch as an upstream limitation until reconciled.",
+      "cards/agentsview.json: e2e_returned_results.fidelity.result = \"verifier: disagree, 4 defects\". The verifier raised 4 defects against the raw records and attachments; all 4 were already dispositioned at assembly, as documented in <scratch>/rr/returned-results.json components[id=agentsview].defect_dispositions."
+    ],
+    "assessment": "The CLI-only adaptation is appropriate for scoped historical observation, but its pin trails the published successor and its default search omits classified automated sessions. cards/agentsview.json reports e2e_returned_results.status = \"partial\"; its historical \"verifier: disagree, 4 defects\" result concerns findings already dispositioned at assembly in <scratch>/rr/returned-results.json components[id=agentsview].defect_dispositions. The retained post-start projects and inclusive Claude/Codex lists cited in pending_fixes[1] succeeded. Pre-start refusals record the no-daemon condition, while successful default lists excluded one-shot sessions. The bounded inclusive results leave population coverage partial; document startup order and intended inclusion flags and qualify changed search/upgrade workflows. adapted_performance.exact_comparisons = [] and adapted_performance.native_counter = null provide no measured token-savings result."
+  },
+  "e2e_returned_results": {
+    "status": "partial",
+    "reason": "partial",
+    "run_utc": "2026-09-26T18:54:13.678Z",
+    "fidelity": {
+      "what": "independent verifier agreement",
+      "result": "verifier: disagree, 4 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 10 30 agentsview --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 10 1800 agentsview sync",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 10 120 agentsview projects",
+        "exit": null,
+        "returned": "failed"
+      },
+      {
+        "cmd": "timeout -k 10 120 agentsview session list --agent claude --active-since 2026-09-26T17:42:00Z --json",
+        "exit": null,
+        "returned": "failed"
+      },
+      {
+        "cmd": "timeout -k 10 120 agentsview session list --agent codex --active-since 2026-09-26T17:42:00Z --json",
+        "exit": null,
+        "returned": "failed"
+      },
+      {
+        "cmd": "timeout -k 10 120 env -u AGENTSVIEW_NO_DAEMON agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --background",
+        "exit": null,
+        "returned": "passed"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 25,
+    "records_shown": [
+      {
+        "id": "agentsview-01-write-config",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 10 30 python3 $RR/agentsview/write_config.py $WT/examples/agentsview.toml.example $RR/agentsview/state/config.toml $HOME/.claude/projects $HOME/.codex/sessions $RR/_fixture/clone $RR/codex/clone $RR/claude-cod",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"local_integration\",\"expected\":\"config.toml from $WT/examples/agentsview.toml.example, only its 3 placeholders replaced\",\"raw_bytes\":{\"stdout\":738,\"stderr\":0},\"stdout\":\"# Inactive config for a dedicated AGENTSVIEW_DATA_DIR, before first sync.\\n# Replace paths with explicitly authorized log directories; no auth stores.\\nsync_include_cwd_prefixes = [\\\"$RR/_fixture/clone\\\", \\\"$RR/codex/cl",
+        "attachments": 3
+      },
+      {
+        "id": "agentsview-02-version",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 30 agentsview --version",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"native execution\",\"expected\":\"agentsview v0.43.0, commit 9be7745a\",\"raw_bytes\":{\"stdout\":97,\"stderr\":0},\"stdout\":\"agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z)\", \"assembly_review\": {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copies\", \"verifier\": \"disagree\", \"notes\":",
+        "attachments": 2
+      },
+      {
+        "id": "agentsview-03-sync",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 1800 agentsview sync",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"native execution\",\"expected\":\"offline sync into the empty isolated archive\",\"raw_bytes\":{\"stdout\":120,\"stderr\":0},\"stdout\":\"Preparing sync...\\nRunning initial sync...\\nSync complete: 2 sessions synced in 4.936s\\n\\nDatabase: 2 sessions, 11 messages\", \"assembly_review\": {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copi",
+        "attachments": 2
+      },
+      {
+        "id": "agentsview-04-projects",
+        "status": "failed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 120 agentsview projects",
+        "observation": "{\"exit_code\":1,\"evidence_class\":\"native execution\",\"expected\":\"plan command; source predicts a refusal: with no daemon, AGENTSVIEW_NO_DAEMON=1 blocks direct SQLite reads (cmd/agentsview/transport.go ensureTransportContext)\",\"raw_bytes\":{\"stdout\":0,\"stderr\":190},\"stderr\":\"fatal: resolving transport: daemon autostart is disabled; direct SQLite reads are not supported for this command. Start a daemon with `agentsview da",
+        "attachments": 2
+      },
+      {
+        "id": "agentsview-05-session-list-claude",
+        "status": "failed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 120 agentsview session list --agent claude --active-since 2026-09-26T17:42:00Z --json",
+        "observation": "{\"exit_code\":1,\"evidence_class\":\"native execution\",\"expected\":\"plan command; source predicts a refusal: with no daemon, AGENTSVIEW_NO_DAEMON=1 blocks direct SQLite reads (cmd/agentsview/transport.go ensureTransportContext)\",\"raw_bytes\":{\"stdout\":0,\"stderr\":169},\"result\":{\"reason\":\"no JSON session list on stdout (see the exit code and stderr)\"},\"e2e_session_listed\":false,\"stderr\":\"fatal: daemon autostart is disabled; ",
+        "attachments": 3
+      },
+      {
+        "id": "agentsview-06-session-list-codex",
+        "status": "failed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 120 agentsview session list --agent codex --active-since 2026-09-26T17:42:00Z --json",
+        "observation": "{\"exit_code\":1,\"evidence_class\":\"native execution\",\"expected\":\"plan command; source predicts a refusal: with no daemon, AGENTSVIEW_NO_DAEMON=1 blocks direct SQLite reads (cmd/agentsview/transport.go ensureTransportContext)\",\"raw_bytes\":{\"stdout\":0,\"stderr\":169},\"result\":{\"reason\":\"no JSON session list on stdout (see the exit code and stderr)\"},\"e2e_session_listed\":false,\"stderr\":\"fatal: daemon autostart is disabled; ",
+        "attachments": 3
+      },
+      {
+        "id": "agentsview-07-port-free-before",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 10 10 ss -ltnH sport = :17384",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"local_integration\",\"expected\":\"port 17384 free before serve\",\"raw_bytes\":{\"stdout\":0,\"stderr\":0}, \"assembly_review\": {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copies\", \"verifier\": \"disagree\", \"notes\": [\"run.sh (exact commands): run.sh comment lines 27-28 name sanitize.py and project.py, which do not exist; publish",
+        "attachments": 1
+      },
+      {
+        "id": "agentsview-08-serve-background",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 120 env -u AGENTSVIEW_NO_DAEMON agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --background",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"native execution\",\"expected\":\"owned loopback daemon, --no-sync (recipes/README.md History and usage)\",\"raw_bytes\":{\"stdout\":196,\"stderr\":0},\"stdout\":\"agentsview running at http://127.0.0.1:17384 (pid 2481004)\\nLogs: $RR/agentsview/state/serve.log\",\"sanitization\":[{\"raw_sha256\":\"ed681451d70592e898766aa2be86245f3876ed188768deded50f9e8907b29193\",\"sanitized_sha256\":\"2b9da5e10a31baef048c6a",
+        "attachments": 2
+      },
+      {
+        "id": "agentsview-09-daemon-status",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 10 30 agentsview daemon status",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"native execution\",\"expected\":\"owned daemon reported running\",\"raw_bytes\":{\"stdout\":97,\"stderr\":0},\"stdout\":\"agentsview running at http://127.0.0.1:17384\\n  pid:     2481004\\n  version: v0.43.0\\n  uptime:  0s\", \"assembly_review\": {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copies\", \"verifier\": \"disagree\", \"notes\": [\"",
+        "attachments": 2
+      },
+      {
+        "id": "agentsview-10-listen-socket",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 10 10 ss -ltnH sport = :17384",
+        "observation": "{\"exit_code\":0,\"evidence_class\":\"local_integration\",\"expected\":\"listening on 127.0.0.1:17384 only\",\"raw_bytes\":{\"stdout\":47,\"stderr\":0},\"stdout\":\"LISTEN 0      4096   127.0.0.1:17384 0.0.0.0:*\", \"assembly_review\": {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copies\", \"verifier\": \"disagree\", \"notes\": [\"run.sh (exact commands): run.sh comment lines 27",
+        "attachments": 2
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [],
+    "native_counter": null,
+    "native_snapshot": [],
+    "shortfall_cause": "The verifier disagreed with our check: a defect in our check or claim, not a savings failure.",
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 0,
+        "cli_calls": 238,
+        "agents_using": 32,
+        "agents": 1010,
+        "pct_agents_using": 0.0317
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 1,
+        "agents_using": 1,
+        "agents": 22,
+        "pct_agents_using": 0.0455
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 237,
+        "agents_using": 31,
+        "agents": 988,
+        "pct_agents_using": 0.0314
+      },
+      "agent_subagents": {
+        "mcp_calls": 0,
+        "cli_calls": 32,
+        "agents_using": 4,
+        "agents": 71,
+        "pct_agents_using": 0.0563
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 13,
+        "agents_using": 2,
+        "agents": 15,
+        "pct_agents_using": 0.1333
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 0,
+        "cli_calls": 11,
+        "agents_using": 1,
+        "agents": 301,
+        "pct_agents_using": 0.0033
+      }
+    },
+    "live_otel": null,
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "defects",
+    "findings": [
+      {
+        "severity": "medium",
+        "field": "native_adaptation.pending_fixes[4]",
+        "issue": "Says to preserve an 'unresolved disagreement' from 'verifier: disagree, 4 defects', and native_adaptation.assessment uses it as a current fidelity limitation. components[id=agentsview].defect_dispositions shows all 4 findings were already dispositioned at assembly: the run.sh path was sanitized, attachment scope was corrected, upstream-source context was recited as a citation, and the nonexistent-script comments were noted on every affected record.",
+        "fix": "Replace that characterization with: 'The verifier raised 4 defects against the raw records and attachments; all 4 were already dispositioned at assembly, as documented in <scratch>/rr/returned-results.json components[id=agentsview].defect_dispositions.' Update the assessment consistently, distinguishing this historical verifier result from the separately retained partial execution/filter coverage. Do not imply that the verifier was rerun.",
+        "source": "<scratch>/rr/returned-results.json"
+      },
+      {
+        "severity": "medium",
+        "field": "native_adaptation.pending_fixes[1]",
+        "issue": "Requests successful projects and Claude/Codex session-list captures after startup as though they were missing. The full retained sequence already contains successful projects reads in agentsview-11-projects-daemon and agentsview-12-projects-daemon-json, followed by successful target-session retrieval in agentsview-15-session-list-claude-inclusive and agentsview-16-session-list-codex-inclusive. The intervening daemon-backed default lists ran successfully but excluded the one-shot sessions. The recapture requirement, deviations_from_upstream[0].fix and assessment overlook that existing evidence and leave the historical pre-start refusals framed as an unresolved daemon-state problem.",
+        "fix": "Acknowledge the already retained successful post-start projects and inclusive session-list runs, citing those record IDs. Describe the pre-start refusals as the recorded no-daemon condition and the default empty lists as a separate one-shot filter limitation. Narrow pending work to documenting startup and intended inclusion flags, and qualifying any changed search/upgrade workflow; do not claim post-start list evidence is absent or turn the bounded inclusive results into complete population coverage.",
+        "source": "<scratch>/rr/returned-results.json"
+      }
+    ],
+    "checked": [
+      "Read the full assembled card and agentsview.upstream.json. Inspected the agentsview component/dispositions and all matching records in <scratch>/rr/returned-results.json, including the post-start records omitted from records_shown, plus the tool/comparison data in <scratch>/html-report/savings.json.",
+      "Attempted every URL cited under upstream, including embedded links. GitHub API endpoints returned HTTP 403 rate-limit errors; official /releases/latest, /releases and /tags pages corroborated latest v0.44.0, publication at 2026-09-21T13:56:12Z, and preceding v0.43.0. The pinned changelog really retains an Unreleased heading and names v0.43.0 as latest.",
+      "Verified upstream.recommended_install and recommended_wiring against the v0.44.0 README, MCP documentation and command reference: official installer, optional agentsview mcp stdio registration, Codex/Claude client applicability, daemon-backed local reads and separate HTTP mode.",
+      "Verified upstream.official_baseline_claims about local archive/search/usage observation, offline sync and archive ownership, read-only MCP, and daemon-free one-shot capture against each cited primary document.",
+      "Verified upstream.limitations[0] and [1] against the v0.35.1 changelog section dated 2026-06-30 and pinned v0.43.0 transport.go. The retained pre-start failures match the explicit refusal when no usable daemon exists and autostart is disabled.",
+      "Compared session_search.go at both cited tags: include-automated, include-one-shot and include-children default to false and flow through the shared search request, including FTS. The local recipe omits these inclusion flags.",
+      "Verified the v0.44.0 CLI/MCP population mismatch in usage.go, internal/service/usage.go and internal/mcp/tools.go: CLI usage includes automated and one-shot sessions; get_usage_summary includes one-shot sessions but omits automated inclusion and exposes no corresponding input parameter.",
+      "Verified every upstream.new_since_pin entry against the actual PR #1855 diff, migration commit and v0.44.0 release notes: codex_exec sets non-interactive, roborev overrides the kind, the classifier accepts both, and dataVersion changes from 111 to 112 with restart/sync reparse guidance.",
+      "Checked native_adaptation against local stack/landscape manifests, recipes, example archive configuration, handbook and client templates/config. The recipe already starts serve --background before projects/search and limits AGENTSVIEW_NO_DAEMON to sync; no agentsview MCP registration appears in the cited configs.",
+      "Matched the quoted exit_code = 1 to the same card's pre-start observations and the full retained records. records_total = 25 matches the assembler's component_ids cardinality filter; the full matching set also contains its shared publish-join record. Historical execution failures and assembly-time verifier dispositions are distinct.",
+      "Verified empty exact_comparisons and null native_counter against <scratch>/html-report/savings.json. No invented native measurement or arithmetic combining evidence classes was found; classification/filter claims are not invocation-rate measurements.",
+      "Independently selected agentsview from all six populations in <scratch>/token-cards/invoke_by_tool.json. Counts, rates and window match invoke_rates exactly. Scanned the card and upstream file for literal scratch paths, raw UUIDs, personal home paths and emails, excluding the permitted repository prefix; no leak found."
+    ],
+    "resolutions": [
+      {
+        "finding": "Says to preserve an 'unresolved disagreement' from 'verifier: disagree, 4 defects', and native_adaptation.assessment uses it as a current fidelity limitation. components[id=agentsview].defect_dispositions shows all 4 findings were already dispositioned at assembly: the run.sh path was sanitized, attachment scope was corrected, upstream-source context was recited as a citation, and the nonexistent-script comments were noted on every affected record.",
+        "action": "edited upstream.json: recorded all 4 verifier defects as dispositioned at assembly in pending_fixes[4] and assessment, distinguishing the historical verifier result from partial execution/filter coverage.",
+        "reverified_url": null
+      },
+      {
+        "finding": "Requests successful projects and Claude/Codex session-list captures after startup as though they were missing. The full retained sequence already contains successful projects reads in agentsview-11-projects-daemon and agentsview-12-projects-daemon-json, followed by successful target-session retrieval in agentsview-15-session-list-claude-inclusive and agentsview-16-session-list-codex-inclusive. The intervening daemon-backed default lists ran successfully but excluded the one-shot sessions. The recapture requirement, deviations_from_upstream[0].fix and assessment overlook that existing evidence and leave the historical pre-start refusals framed as an unresolved daemon-state problem.",
+        "action": "edited upstream.json: cited the four retained successful post-start records in pending_fixes[1], separated no-daemon refusals from default one-shot exclusions, and narrowed deviations_from_upstream[0].fix and assessment to startup/inclusion documentation and qualification of changed search/upgrade workflows without claiming complete coverage.",
+        "reverified_url": null
+      }
+    ],
+    "final_verdict": {
+      "tool": "agentsview",
+      "verdict": "adapted-with-gaps",
+      "summary": "The native scoped archive/CLI lane is supported and runnable, but installed 0.43.0 trails the published 0.44.0 successor and default worker-history coverage remains incomplete (groups/g6-docs-accounting/agentsview.upstream.json; https://github.com/kenn-io/agentsview/releases/tag/v0.44.0). There is no exact token-efficiency comparison or native saved-token counter, so comparison eligibility and attributable savings are unverified; the retained benefit is successful post-start project reads and one selected Claude plus one selected Codex session returned with inclusive flags (cards/agentsview.json; ../rr/returned-results.json#agentsview-11-projects-daemon; ../rr/returned-results.json#agentsview-15-session-list-claude-inclusive; ../rr/returned-results.json#agentsview-16-session-list-codex-inclusive). The pre-start refusals are explained by disabled daemon autostart, while later empty lists are explained by default one-shot exclusion, and all four historical verifier findings were already dispositioned at assembly (../rr/returned-results.json#components/agentsview). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 32/1010 Ultracode workflow children (3.17%, 238 CLI detections), 1/301 Codex workers (0.33%, 11), and 1/22 children given the lanes block (4.55%, 1) (invoke_by_tool.json). Next, preserve the successful recovered records, document intended one-shot/automated/child coverage, and qualify the successor on a scoped archive copy before upgrading or claiming complete worker-history coverage.",
+      "gaps": [
+        {
+          "gap": "The installed 0.43.0 pin is one published release behind v0.44.0.",
+          "evidence": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+          "action": "Qualify the successor on a selected archive copy with the same project, session and filter checks before changing the pin.",
+          "owner_pr": null
+        },
+        {
+          "gap": "Current startup sequencing is documented, but the recipe's default search does not explicitly include the worker populations omitted by default filters.",
+          "evidence": "recipes/README.md:631",
+          "action": "Document intended inclusion flags and source roots, then verify each relevant population; upstream behavior is specified at https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/commands.md.",
+          "owner_pr": null
+        },
+        {
+          "gap": "No matched task-level efficiency comparison exists; the bounded inclusive results do not prove complete history coverage or savings.",
+          "evidence": "cards/agentsview.json#adapted_performance",
+          "action": "Continue labeling this as archive observation; if claiming an efficiency benefit, retain a matched retrieval task, acceptance result and complete cost boundary.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Fresh agentsview --version returned v0.43.0; the official latest release is v0.44.0 dated 2026-09-21.",
+          "evidence": "groups/g5-g6-verification.json#versions/agentsview",
+          "result": "holds"
+        },
+        {
+          "claim": "Upstream supports daemon-backed CLI reads and offers optional agentsview mcp; persistent MCP is not required for this scoped CLI lane.",
+          "evidence": "https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/mcp.md",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained pre-start projects command failed with a specific disabled-autostart/direct-SQLite refusal, rather than proving the component cannot run.",
+          "evidence": "../rr/agentsview/out/04-projects.stderr",
+          "result": "holds"
+        },
+        {
+          "claim": "Retained post-start project reads succeeded; the Claude inclusive list parsed and returned its one selected session with exit 0.",
+          "evidence": "../rr/returned-results.json#agentsview-15-session-list-claude-inclusive",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained Codex inclusive list parsed and returned its one selected session with exit 0.",
+          "evidence": "../rr/agentsview/out/16-session-list-codex-inclusive.projection.json",
+          "result": "holds"
+        },
+        {
+          "claim": "Default post-start lists cover the retained one-shot sessions without inclusion flags.",
+          "evidence": "../rr/agentsview/out/13-session-list-claude-daemon.stderr",
+          "result": "does-not-hold"
+        },
+        {
+          "claim": "All four raw-record verifier findings have assembly dispositions; the review resolutions acknowledge this and the already successful post-start records without claiming a verifier rerun.",
+          "evidence": "../rr/returned-results.json#components/agentsview/defect_dispositions",
+          "result": "holds"
+        },
+        {
+          "claim": "Reported invoke detections are 32/1010 workflow children, 1/22 with lanes, and 1/301 Codex workers; these do not prove complete archive capture.",
+          "evidence": "invoke_by_tool.json#populations",
+          "result": "holds"
+        },
+        {
+          "claim": "Exact comparison eligibility, attributable token savings and complete worker-history coverage are established.",
+          "evidence": "cards/agentsview.json#adapted_performance",
+          "result": "unverified"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "gpt-tokenizer",
+        "qmd (lookup returned no matching handbook entry)",
+        "serena (symbol lookup unavailable)"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "c45a2270f8b5",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 30
+        },
+        "shell_commands": 2,
+        "shell_commands_rtk_prefixed": 1,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-c.err",
+        "session_id_sha": "1e8fde23d9fa",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 57,
+          "qmd": 1,
+          "serena": 2
+        },
+        "shell_commands": 5,
+        "shell_commands_rtk_prefixed": 4,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "1ce311950588",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 53
+        },
+        "shell_commands": 4,
+        "shell_commands_rtk_prefixed": 1,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "#296: PASS observation (sync, projects, health; no serve or daemon). #343: observed 51 Codex sessions on 2026-09-25. Not in #338 CI."
+}

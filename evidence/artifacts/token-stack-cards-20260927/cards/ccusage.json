@@ -1,0 +1,513 @@
+{
+  "tool": "ccusage",
+  "group": "g6-docs-accounting",
+  "repo": "https://github.com/ccusage/ccusage",
+  "pin": "20.0.24 (npm; source ecb676cc)",
+  "installed_version": "ccusage 20.0.24 (native `ccusage --version`)",
+  "role": "Reads native usage from the Claude and Codex session logs; measures consumption, never savings. Lanes: CLI observing the Claude main/subagent and Codex lanes. Landscape: token-efficiency winner (observation).",
+  "lanes": [
+    "CLI: ccusage claude|codex daily --json --offline"
+  ],
+  "upstream": {
+    "latest_release": "v20.0.24",
+    "latest_date": "2026-09-21",
+    "our_pin": "20.0.24, source ecb676cce27cb5dd0090c7804a5cecc35e8ba805; confirmed in ~/code/native-agent-stack/manifests/stack.json and cards/ccusage.json. Corresponding release: https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+    "behind_by": "Matches the latest published GitHub release and npm latest package. A v20.0.25 tag exists without a published successor release, and the release PR for v20.0.26 remains open. Sources: https://api.github.com/repos/ccusage/ccusage/releases/latest ; https://api.github.com/repos/ccusage/ccusage/tags ; https://registry.npmjs.org/ccusage ; https://github.com/ccusage/ccusage/pull/1778",
+    "recommended_install": {
+      "command": "bunx ccusage",
+      "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/installation.md#quick-start-recommended"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "Run the installed ccusage claude daily CLI from Bash over the intended Claude logs; the current CLI supports source-specific reports (https://github.com/ccusage/ccusage/blob/v20.0.24/apps/ccusage/README.md). An optional, separately published @ccusage/mcp server exposes Claude usage analytics: launch bunx @ccusage/mcp@latest --type stdio through an MCP registration. Its npm latest is 18.0.11 (https://registry.npmjs.org/@ccusage%2Fmcp), so it must not be assumed to match the current Rust CLI's accounting behavior.",
+        "url": "https://github.com/ccusage/ccusage/blob/v18.0.11/docs/guide/mcp-server.md"
+      },
+      "codex": {
+        "how": "Use ccusage codex daily through CommandExecution with the intended CODEX_HOME; this is the documented Codex-accounting CLI (https://github.com/ccusage/ccusage/blob/v20.0.24/apps/ccusage/README.md). A Codex MCP client can optionally launch the generic stdio @ccusage/mcp server, but that package documents Claude usage tools, not equivalence to ccusage codex reports. It is an optional interface, not a required replacement for the adopted CLI lane.",
+        "url": "https://github.com/ccusage/ccusage/blob/v18.0.11/apps/mcp/README.md"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "Source for latest_release and latest_date: fresh live checks on 2026-09-27 UTC returned tag_name v20.0.24 and published_at 2026-09-21T11:23:53Z; the release list contained no newer published version.",
+        "url": "https://api.github.com/repos/ccusage/ccusage/releases/latest"
+      },
+      {
+        "claim": "The live npm latest dist-tag remains 20.0.24, published 2026-09-21T11:28:00.120Z. The newer Git tag is not the npm latest package.",
+        "url": "https://registry.npmjs.org/ccusage"
+      },
+      {
+        "claim": "The CLI analyzes existing usage records and provides Claude- and Codex-specific daily/session reports, JSON output, date filtering and optional cost fields.",
+        "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/apps/ccusage/README.md"
+      },
+      {
+        "claim": "The installed release's documented pricing source is a LiteLLM snapshot embedded in the binary, with optional runtime refresh. --offline skips that refresh; defaults.pricingOverrides can supply model-specific prices in either online or offline mode.",
+        "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides"
+      },
+      {
+        "claim": "The build obtains its embedded LiteLLM data from a supplied pricing JSON path; Nix builds use the pinned LiteLLM input. This connects the release's flake.lock revision to its offline pricing source.",
+        "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/rust/crates/ccusage-core/build.rs"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "At v20.0.24, flake.lock pins LiteLLM revision e484a7c89c4ced103645c33159d33922e7eac84a (https://github.com/ccusage/ccusage/blob/v20.0.24/flake.lock). Its model_prices_and_context_window.json contains neither claude-opus-5-5 nor gpt-6-luna, including names containing either identifier. This supports the retained offline unpricedModels observations at the installed pin.",
+        "url": "https://github.com/BerriAI/litellm/blob/e484a7c89c4ced103645c33159d33922e7eac84a/model_prices_and_context_window.json"
+      },
+      {
+        "text": "The release's bundled models.dev pricing file also contains neither claude-opus-5-5 nor gpt-6-luna. Updating the upstream registry or inspecting main does not refresh an already installed binary's embedded snapshots.",
+        "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/rust/crates/ccusage-core/src/models-dev-pricing.json"
+      },
+      {
+        "text": "Custom pricing is already supported at the installed release: set defaults.pricingOverrides with raw model-name keys, including claude-opus-5-5 and gpt-6-luna, and supply verified input/output/cache rates. Overrides work with --offline; unspecified fields can fall back to zero when no upstream entry exists. No actual rates or resolved host costs were assumed in this research.",
+        "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides"
+      },
+      {
+        "text": "The online code path can refresh LiteLLM before applying user overrides; offline mode skips it. Availability of new upstream entries is therefore a supported remediation path, not evidence that the retained offline outputs are already priced.",
+        "url": "https://github.com/ccusage/ccusage/blob/v20.0.24/rust/crates/ccusage-core/src/pricing.rs#L967"
+      },
+      {
+        "text": "The optional @ccusage/mcp package remains separately published at 18.0.11 and documents Claude usage analytics. Its documented protocol surface should not be presented as parity with the current CLI's Codex accounting.",
+        "url": "https://github.com/ccusage/ccusage/blob/v18.0.11/apps/mcp/README.md"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "The live main snapshot inspected at 4417ea3346529bb70667a124e51d0d747a37edc9 pins LiteLLM e73abe6c72785ad91d4927da26de3a5d1b54300b (https://github.com/ccusage/ccusage/blob/4417ea3346529bb70667a124e51d0d747a37edc9/flake.lock). That pricing JSON contains exact entries for both claude-opus-5-5 and gpt-6-luna. This is newer source data, not a newer published ccusage release.",
+        "url": "https://github.com/BerriAI/litellm/blob/e73abe6c72785ad91d4927da26de3a5d1b54300b/model_prices_and_context_window.json"
+      },
+      {
+        "text": "The inspected main models.dev snapshot also contains both model identifiers; it is newer than the bundled snapshot at the installed pin.",
+        "url": "https://github.com/ccusage/ccusage/blob/4417ea3346529bb70667a124e51d0d747a37edc9/rust/crates/ccusage-core/src/models-dev-pricing.json"
+      },
+      {
+        "text": "Merged, unreleased PR #1799 scopes requestless Claude deduplication by timestamp so daily reports can agree with weekly/monthly reports. This change must not be identified as one of the local verifier's historical findings already dispositioned at assembly.",
+        "url": "https://github.com/ccusage/ccusage/pull/1799"
+      },
+      {
+        "text": "Merged, unreleased PR #1794 skips stale files in date-bounded Claude loads and bounds statusline-block work; these are reporting-runtime optimizations, not demonstrated model-token savings.",
+        "url": "https://github.com/ccusage/ccusage/pull/1794"
+      },
+      {
+        "text": "Merged, unreleased PR #1796 indexes normalized pricing spellings for exact lookups.",
+        "url": "https://github.com/ccusage/ccusage/pull/1796"
+      },
+      {
+        "text": "Merged, unreleased PR #1777 adds filtering Codex session reports by ID.",
+        "url": "https://github.com/ccusage/ccusage/pull/1777"
+      },
+      {
+        "text": "The v20.0.25 page identifies a tagged commit, while GitHub's latest published release remains v20.0.24 and npm latest remains 20.0.24. The open release PR proposes v20.0.26 (https://github.com/ccusage/ccusage/pull/1778); a tag/feed entry alone is not a published-package upgrade.",
+        "url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.25"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {
+      "id": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "version": "20.0.24",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Read existing native provider usage logs",
+      "source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    "how_we_install": "Pinned isolated npm installation, not a moving package runner: recipes/native-upgrades-20260921.md:24 specifies npm install --prefix \"$NATIVE_TOOLS/ccusage-20.0.24\" --save-exact --no-audit --no-fund ccusage@20.0.24 and an explicit candidate executable. ~/code/native-agent-stack/adoption/pins-linux-x86_64.json records the global isolated-prefix form and tarball hash; recipes/README.md:85 links the qualification. cards/ccusage.json, e2e_returned_results.records_shown[id=ccusage-resolve-executable].observation, identifies the host's PATH launcher in the versioned global npm prefix. Repository observations use the current detached checkout at the supplied path, which has no local main ref.",
+    "claude_wiring": "CLI only from Bash, reading selected native Claude logs. No ccusage MCP server is registered in ~/code/native-agent-stack/adoption/templates/claude.settings.template.json; the Codex template and project config also contain no entry. ~/code/native-agent-stack/manifests/stack.json describes reading native provider usage logs; cards/ccusage.json retains ccusage claude daily invocations. Optional @ccusage/mcp is not adopted in these files.",
+    "codex_wiring": "CLI only from CommandExecution. ~/code/native-agent-stack/recipes/README.md:643 selects CODEX_HOME for that invocation and runs ccusage codex daily --offline --no-cost --json --timezone UTC --config /dev/null; docs/token-session-handbook.md:143 repeats this lane. Neither adoption/templates/codex.config.template.toml nor .codex/config.toml registers ccusage as an MCP server.",
+    "lane_rule": "Read the intended native logs for accounting; preserve the selected source home, date/timezone and cost mode, and treat consumption as consumption rather than savings. Sources: ~/code/native-agent-stack/docs/token-session-handbook.md:115, :124, :143; recipes/README.md:642. The handbook's native-token CI section describes selected integration checks, and its lifetime-report section describes capturing counters into a separate ledger; neither changes the meaning of a ccusage total (docs/token-session-handbook.md:34 and :220).",
+    "deviations_from_upstream": [
+      {
+        "what": "The selected recipe intentionally uses --offline --no-cost --config /dev/null. In cards/ccusage.json, e2e_returned_results.records_shown[id=ccusage-claude-daily-host-before].observation records unpricedModels: ['claude-opus-5-5']; the corresponding ccusage-codex-daily-host-before record reports unpricedModels: ['gpt-6-luna'].",
+        "why": "Offline operation retains the installed embedded pricing snapshot; --config /dev/null does not load a user override file, and --no-cost suppresses Codex cost output rather than supplying missing prices. This is appropriate for a deterministic token-count lane but insufficient for complete cost accounting. Upstream override documentation: https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides .",
+        "fix": "Preserve the explicit token-only lane. For a separately qualified cost report, pass a selected config file containing defaults.pricingOverrides for the exact raw model IDs with independently verified rates, including applicable cache/tier fields, or deliberately allow upstream runtime pricing refresh. Check unpricedModels and retain the new output; do not invent rates or backfill the existing card.",
+        "pr": null
+      },
+      {
+        "what": "The native stack uses a pinned installed CLI instead of upstream's convenient bunx quick start and optional MCP package.",
+        "why": "The isolated prefix preserves the qualified executable and offline behavior. The upstream MCP package is a separate Claude-analytics implementation; adopting it is not necessary for the current Claude/Codex CLI lane.",
+        "fix": "Continue using the explicit pinned executable for retained comparisons. Treat any optional MCP adoption as a separate qualification, with no assumed CLI/MCP accounting equivalence.",
+        "pr": null
+      }
+    ],
+    "pending_fixes": [
+      "Tracking gap in our own manifest: ~/code/native-agent-stack/manifests/stack.json claims latest-release identity is recorded in manifests/landscape.json, but the current landscape.json contains no ccusage entry. Add the live published-release identity and distinguish the newer tag/open release PR, or correct the claim.",
+      "cards/ccusage.json: e2e_returned_results.fidelity.result = \"verifier: disagree, 5 defects\". The verifier raised 5 defects against the raw records; all 5 were already dispositioned at assembly, as documented in <scratch>/rr/returned-results.json components[id=ccusage].defect_dispositions.",
+      "Qualify an explicit custom-pricing or online-refresh cost-report path for the retained unpricedModels entries. The current recipe's /dev/null config and offline mode cannot consume a separately prepared override file automatically.",
+      "Track the merged deduplication, bounded-history and pricing-lookup improvements as unreleased changes; investigate them against retained evidence before upgrading, without attributing them to the historical verifier findings already dispositioned at assembly."
+    ],
+    "assessment": "The pinned CLI matches the latest published upstream release and is suitable for native-history accounting, but its retained offline prices are incomplete for the model IDs named by the card. In cards/ccusage.json, e2e_returned_results.status is \"pass\" while e2e_returned_results.fidelity.result is the historical \"verifier: disagree, 5 defects\"; all 5 raw-record findings were already dispositioned at assembly, as documented in <scratch>/rr/returned-results.json components[id=ccusage].defect_dispositions. adapted_performance.exact_comparisons is [] and adapted_performance.native_counter is null; this evidence describes accounting behavior, not measured token savings."
+  },
+  "e2e_returned_results": {
+    "status": "pass",
+    "reason": "passed",
+    "run_utc": "2026-09-26T17:42:00.516Z",
+    "fidelity": {
+      "what": "independent verifier agreement",
+      "result": "verifier: disagree, 5 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 10 60 ccusage --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 10 600 ccusage claude daily --json --offline --since 20260926 --until 20260926 --timezone UTC",
+        "exit": null,
+        "returned": "observed"
+      },
+      {
+        "cmd": "timeout -k 10 600 ccusage codex daily --json --offline --no-cost --since 2026-09-26 --until 2026-09-26 --timezone UTC",
+        "exit": null,
+        "returned": "observed"
+      },
+      {
+        "cmd": "env CLAUDE_CONFIG_DIR=<scratch>/fixtures/ccusage-synthetic-claude timeout -k 10 120 ccusage claude daily --json --offline --timezone UTC",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "env CLAUDE_CONFIG_DIR=<scratch>/fixtures/ccusage-synthetic-claude timeout -k 10 120 ccusage claude daily --json --offline --since 20260106 --until 20260106 --timezone UTC",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 10 600 ccusage codex session --json --offline --no-cost --since 2026-09-26 --until 2026-09-26 --timezone UTC",
+        "exit": null,
+        "returned": "passed"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 17,
+    "records_shown": [
+      {
+        "id": "ccusage-resolve-executable",
+        "status": "passed",
+        "kind": "host executable resolution (local integration)",
+        "command": "sh -c command -v ccusage; readlink -f \"$(command -v ccusage)\"",
+        "observation": "Evidence class: local_integration (host shell probe, not an upstream command). Exit 0, stderr 0 bytes. `ccusage` on PATH is $HOME/.local/share/codex-ecosystem/bin/ccusage, which resolves (readlink -f) to $HOME/.local/share/codex-ecosystem/tools/ccusage-20.0.24/lib/node_modules/ccusage/src/cli.js: the npm package launcher (per the installed package metadata, which is not attached, it spawns the @ccusage/ccusage-linux-",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-version",
+        "status": "passed",
+        "kind": "upstream native operation",
+        "command": "timeout -k 10 60 ccusage --version",
+        "observation": "Evidence class: native execution. Returned `ccusage 20.0.24` (exit 0, stderr 0 bytes). Context not shown by the attachments: wt-rr manifests/stack.json pins ccusage 20.0.24 (npm; source_pin ecb676cc), which the returned version matches; host nativestack-5975wx-20260925 (NativeStack WSL2 workstation).\n\nassembly_review: {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged exc",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-claude-daily-fixture-known-answer",
+        "status": "passed",
+        "kind": "upstream native operation",
+        "command": "env CLAUDE_CONFIG_DIR=$WT/fixtures/ccusage-synthetic-claude timeout -k 10 120 ccusage claude daily --json --offline --timezone UTC",
+        "observation": "Evidence class: native execution (returned output); the verdict comes from the local_integration record ccusage-known-answer-check. Exit 0, stderr 0 bytes. Returned 2 daily rows. 2026-01-05: inputTokens 1,500, outputTokens 300, cacheCreationTokens 100, cacheReadTokens 50, totalTokens 1,950, totalCost 0.0271, modelsUsed ['claude-sonnet-4-5-20250929']; 2026-01-06: inputTokens 400, outputTokens 80, cacheCreationTokens 0",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-claude-daily-fixture-date-filter",
+        "status": "passed",
+        "kind": "upstream native operation",
+        "command": "env CLAUDE_CONFIG_DIR=$WT/fixtures/ccusage-synthetic-claude timeout -k 10 120 ccusage claude daily --json --offline --since 20260106 --until 20260106 --timezone UTC",
+        "observation": "Evidence class: native execution. Exit 0, stderr 0 bytes. Returned 1 row(s) dated ['2026-01-06']; totals inputTokens 400, outputTokens 80, cacheCreationTokens 0, cacheReadTokens 0, totalTokens 480, totalCost 0.0057: exactly the fixture's 2026-01-06 message. Checker: 7 of 7 filter checks passed (the filter-20260106:* checks in ccusage/out/check-fixture.stdout, attached to record ccusage-known-answer-check).\n\nassembly_",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-claude-daily-host-before",
+        "status": "observed",
+        "kind": "upstream native operation",
+        "command": "timeout -k 10 600 ccusage claude daily --json --offline --since 20260926 --until 20260926 --timezone UTC",
+        "observation": "Evidence class: native execution. Exit 0, stderr 0 bytes. Days returned: ['2026-09-26']. Totals: inputTokens 66,232, outputTokens 53,236,621, cacheCreationTokens 204,516,698, cacheReadTokens 7,822,579,542, totalTokens 8,080,399,093, totalCost 476.4189794999994 USD. modelsUsed: ['claude-opus-5-5', 'claude-sonnet-5', 'claude-opus-4-8', 'claude-haiku-4-5-20251001']. unpricedModels: ['claude-opus-5-5']; modelBreakdowns f",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-codex-daily-host-before",
+        "status": "observed",
+        "kind": "upstream native operation",
+        "command": "timeout -k 10 600 ccusage codex daily --json --offline --no-cost --since 2026-09-26 --until 2026-09-26 --timezone UTC",
+        "observation": "Evidence class: native execution. Exit 0, stderr 0 bytes. Days returned: ['2026-09-26']. Totals: inputTokens 28,961,515, cacheReadTokens 299,613,824, cacheCreationTokens 0, outputTokens 3,295,493, reasoningOutputTokens 1,742,129, totalTokens 331,870,832. Per model: gpt-6-astra: totalTokens 331,854,792; gpt-6-luna: totalTokens 16,040 (missingPricing). unpricedModels: ['gpt-6-luna']. Cost fields present: False (--no-co",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-claude-daily-host-after",
+        "status": "observed",
+        "kind": "upstream native operation",
+        "command": "timeout -k 10 600 ccusage claude daily --json --offline --since 20260926 --until 20260926 --timezone UTC",
+        "observation": "Evidence class: native execution. Exit 0, stderr 0 bytes. Days returned: ['2026-09-26']. Totals: inputTokens 66,652, outputTokens 53,655,918, cacheCreationTokens 205,564,524, cacheReadTokens 7,879,893,317, totalTokens 8,139,180,411, totalCost 478.0519460999992 USD. modelsUsed: ['claude-opus-5-5', 'claude-sonnet-5', 'claude-opus-4-8', 'claude-haiku-4-5-20251001']. unpricedModels: ['claude-opus-5-5']; modelBreakdowns f",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-codex-daily-host-after",
+        "status": "observed",
+        "kind": "upstream native operation",
+        "command": "timeout -k 10 600 ccusage codex daily --json --offline --no-cost --since 2026-09-26 --until 2026-09-26 --timezone UTC",
+        "observation": "Evidence class: native execution. Exit 0, stderr 0 bytes. Days returned: ['2026-09-26']. Totals: inputTokens 28,977,599, cacheReadTokens 300,174,336, cacheCreationTokens 0, outputTokens 3,302,691, reasoningOutputTokens 1,746,323, totalTokens 332,454,626. Per model: gpt-6-astra: totalTokens 332,438,586; gpt-6-luna: totalTokens 16,040 (missingPricing). unpricedModels: ['gpt-6-luna']. Cost fields present: False (--no-co",
+        "attachments": 2
+      },
+      {
+        "id": "ccusage-known-answer-check",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 10 60 python3 check.py fixture out ../../wt-rr/fixtures/ccusage-synthetic-claude",
+        "observation": "Evidence class: local_integration (our checker, not an upstream test). Exit 0: 34/34 checks passed. It checks the plan constants (totals inputTokens 1,900, outputTokens 380, totalTokens 2,430, totalCost 0.0328 within 1e-9, 2 daily rows). It also checks every token, cost and model field per day and in the totals against an independent recomputation from the fixture JSONL usage fields, and checks that the 20260106 filt",
+        "attachments": 6
+      },
+      {
+        "id": "ccusage-window-delta",
+        "status": "observed",
+        "kind": "local integration check",
+        "command": "timeout -k 10 60 python3 check.py delta out runs.jsonl",
+        "observation": "Evidence class: local_integration arithmetic over the four native snapshots above. claude: window 2026-09-26T17:42:01.035Z -> 2026-09-26T17:45:05.687Z (184.7 s); totals inputTokens +420, outputTokens +419,297, cacheCreationTokens +1,047,826, cacheReadTokens +57,313,775, totalTokens +58,781,318, totalCost +1.632967 USD (priced models only). Per model: claude-opus-5-5 cacheCreationTokens +1,006,630, cacheReadTokens +50",
+        "attachments": 3
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [],
+    "native_counter": null,
+    "native_snapshot": [],
+    "shortfall_cause": "The verifier disagreed with our check: a defect in our check or claim, not a savings failure.",
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 0,
+        "cli_calls": 430,
+        "agents_using": 63,
+        "agents": 1010,
+        "pct_agents_using": 0.0624
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 9,
+        "agents_using": 1,
+        "agents": 22,
+        "pct_agents_using": 0.0455
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 421,
+        "agents_using": 62,
+        "agents": 988,
+        "pct_agents_using": 0.0628
+      },
+      "agent_subagents": {
+        "mcp_calls": 0,
+        "cli_calls": 23,
+        "agents_using": 3,
+        "agents": 71,
+        "pct_agents_using": 0.0423
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 21,
+        "agents_using": 4,
+        "agents": 15,
+        "pct_agents_using": 0.2667
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 0,
+        "cli_calls": 1,
+        "agents_using": 1,
+        "agents": 301,
+        "pct_agents_using": 0.0033
+      }
+    },
+    "live_otel": null,
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "defects",
+    "findings": [
+      {
+        "severity": "medium",
+        "field": "native_adaptation.pending_fixes[1]",
+        "issue": "Calls the verifier result '5 unresolved defects' and says the findings were not supplied. components[id=ccusage].defect_dispositions supplies all 5 dispositions already applied at assembly: path substitution, clarification of the unattached validation-tree boundary, two contextual-attribution corrections, and the cross-record filter-check citation. native_adaptation.assessment consequently treats this historical disagreement as a current fidelity blocker; pending_fixes[3] and upstream.new_since_pin[2] also call the findings undisclosed.",
+        "fix": "Replace the unresolved-defect sentence with: 'The verifier raised 5 defects against the raw records; all 5 were already dispositioned at assembly, as documented in <scratch>/rr/returned-results.json components[id=ccusage].defect_dispositions.' Update the assessment and related undisclosed-findings wording consistently. Keep the independently supported offline-pricing limitation, and do not imply that a new verifier rerun occurred.",
+        "source": "<scratch>/rr/returned-results.json"
+      }
+    ],
+    "checked": [
+      "Read the full assembled card and ccusage.upstream.json, and inspected the ccusage component/dispositions and all records whose component_ids include ccusage in <scratch>/rr/returned-results.json. Also checked the tool and report_comparisons data in <scratch>/html-report/savings.json.",
+      "Attempted every URL cited under upstream, including embedded links. GitHub API endpoints returned HTTP 403 rate-limit errors; the official /releases/latest, /releases and /tags pages corroborated v20.0.24 published 2026-09-21T11:23:53Z and the newer v20.0.25 tag without a newer published release. The live npm registry confirmed latest 20.0.24 and its stated publication timestamp; PR #1778 remains open for v20.0.26.",
+      "Verified upstream.recommended_install, recommended_wiring and reporting capabilities against the pinned installation guide, CLI README, v18.0.11 MCP guide and MCP README. bunx ccusage is the recommended quick start; the separately published MCP package documents Claude usage and its npm latest is 18.0.11.",
+      "Verified upstream.official_baseline_claims about embedded LiteLLM pricing, optional runtime refresh and pricingOverrides against the pinned config guide, build.rs and pricing.rs. build.rs explicitly connects Nix builds to the pinned LiteLLM input.",
+      "Fetched and parsed the exact-ref flake.lock and pricing JSON sources, using raw counterparts where GitHub's large-file page omitted content. The v20.0.24 LiteLLM revision and bundled models.dev snapshot contain neither claude-opus-5-5 nor gpt-6-luna; the cited newer snapshots contain both exact model keys.",
+      "Verified upstream.limitations on raw-model override keys, optional-field fallback to 0.0, offline/online override support, and runtime refresh before overrides against the cited config guide and implementation. No actual host prices were inferred from newer source data.",
+      "Verified the cited merged PRs #1799, #1794, #1796 and #1777 support requestless timestamp deduplication, bounded-history loading, normalized pricing lookups and Codex session-ID filtering. Their changes postdate the latest published release and are not identified as local verifier findings.",
+      "Checked native_adaptation installation, CLI-only wiring, selected CODEX_HOME, --offline --no-cost --config /dev/null recipe and manifest tracking gap against the cited local recipes, platform pin, manifests, handbook and client templates/config.",
+      "The full retained before/after observations support the named unpricedModels values. Host consumption snapshots and their local deltas remain accounting evidence, not savings. The assembler selects 17 records using its component_ids cardinality filter; that matches records_total and is distinct from the full matching-record set.",
+      "Verified adapted_performance.exact_comparisons is empty and native_counter is null against <scratch>/html-report/savings.json. Native numeric quotations match the same card's evidence; no cross-class sum or invented host quantity was found.",
+      "Independently selected ccusage from all six populations in <scratch>/token-cards/invoke_by_tool.json. Every count, rate and window value matches invoke_rates; no unsupported invocation-frequency claim was found.",
+      "Scanned the assembled card and upstream file for session scratch paths, raw UUIDs, personal home paths and emails, excluding the allowed repository prefix. No leak found. Verified the historical verifier count separately from the assembly dispositions described in the finding."
+    ],
+    "resolutions": [
+      {
+        "finding": "Calls the verifier result '5 unresolved defects' and says the findings were not supplied. components[id=ccusage].defect_dispositions supplies all 5 dispositions already applied at assembly: path substitution, clarification of the unattached validation-tree boundary, two contextual-attribution corrections, and the cross-record filter-check citation. native_adaptation.assessment consequently treats this historical disagreement as a current fidelity blocker; pending_fixes[3] and upstream.new_since_pin[2] also call the findings undisclosed.",
+        "action": "edited upstream.json: recorded all 5 verifier defects as dispositioned at assembly in pending_fixes[1] and assessment, and corrected undisclosed-findings wording in pending_fixes[3] and new_since_pin[2] while retaining the offline-pricing limitation.",
+        "reverified_url": null
+      }
+    ],
+    "final_verdict": {
+      "tool": "ccusage",
+      "verdict": "adapted-with-gaps",
+      "summary": "The installed 20.0.24 CLI matches the latest published release and the explicit native-history accounting lane is supported, including the intentional offline/no-cost Codex recipe (groups/g6-docs-accounting/ccusage.upstream.json; https://github.com/ccusage/ccusage/releases/tag/v20.0.24). No exact token-savings comparison or native saved-token counter is present, so savings eligibility remains unverified; the actual retained result is correct synthetic token accounting across 34 checks, with a deliberately changed input rejected by two checks (cards/ccusage.json; ../rr/ccusage/out/check-fixture.stdout; ../rr/ccusage/out/check-fixture-negative-control.stdout). The retained Claude report leaves claude-opus-5-5 unpriced and the Codex report flags gpt-6-luna while omitting cost fields under --no-cost, which is an offline-pricing coverage limit explained by upstream's embedded snapshot and configurable overrides (../rr/ccusage/out/claude-daily-before.stdout; ../rr/ccusage/out/codex-daily-before.stdout; https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 63/1010 Ultracode workflow children (6.24%, 430 CLI detections), 1/301 Codex workers (0.33%, 1), and 1/22 children given the lanes block (4.55%, 9) (invoke_by_tool.json). Next, retain the token-only lane and qualify a separate pricing configuration when complete cost reporting is required; the five historical verifier findings already have assembly dispositions and are not unresolved savings defects.",
+      "gaps": [
+        {
+          "gap": "Offline pricing lacks models present in the retained native histories, so reported cost is incomplete or intentionally absent.",
+          "evidence": "../rr/ccusage/out/claude-daily-before.stdout",
+          "action": "Keep token-only reporting explicit; separately qualify selected prices or a pricing refresh and require unpricedModels to be handled, as documented at https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides.",
+          "owner_pr": null
+        },
+        {
+          "gap": "There is no matched efficiency comparison or task-attributed provider-savings measurement for this accounting tool.",
+          "evidence": "cards/ccusage.json#adapted_performance",
+          "action": "Do not equate observed token totals with tokens saved; retain a controlled task boundary and comparison only if claiming an efficiency benefit.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The invoke scan measures command-text detections without a success-confirmed or task-eligible denominator.",
+          "evidence": "invoke_by_tool.py",
+          "action": "Measure whether intended accounting checkpoints complete successfully and label CLI detections separately from workload coverage.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Fresh ccusage --version returned 20.0.24; the latest published release is v20.0.24 dated 2026-09-21.",
+          "evidence": "groups/g5-g6-verification.json#versions/ccusage",
+          "result": "holds"
+        },
+        {
+          "claim": "Upstream documents native ccusage installation and CLI reporting; the pinned CLI is compatible with that supported surface.",
+          "evidence": "https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/installation.md",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained synthetic accounting checker passes all 34 checks.",
+          "evidence": "../rr/ccusage/out/check-fixture.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "The deliberate negative-control mutation is rejected with two failed checks.",
+          "evidence": "../rr/ccusage/out/check-fixture-negative-control.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained Claude cost total includes every model's usage.",
+          "evidence": "../rr/ccusage/out/claude-daily-before.stdout",
+          "result": "does-not-hold"
+        },
+        {
+          "claim": "The retained Codex report flags gpt-6-luna as missingPricing and omits totalCost under the selected no-cost command.",
+          "evidence": "../rr/ccusage/out/codex-daily-before.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "Upstream documents an embedded LiteLLM pricing snapshot, offline suppression of refresh and defaults.pricingOverrides.",
+          "evidence": "https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides",
+          "result": "holds"
+        },
+        {
+          "claim": "All five historical verifier findings were dispositioned at assembly; this is not evidence of a new verifier rerun.",
+          "evidence": "../rr/returned-results.json#components/ccusage/defect_dispositions",
+          "result": "holds"
+        },
+        {
+          "claim": "Reported invoke detections are 63/1010 workflow children, 1/22 with lanes, and 1/301 Codex workers.",
+          "evidence": "invoke_by_tool.json#populations",
+          "result": "holds"
+        },
+        {
+          "claim": "Exact efficiency-comparison eligibility, native saved-token counters and attributable provider savings are established.",
+          "evidence": "cards/ccusage.json#adapted_performance",
+          "result": "unverified"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "gpt-tokenizer",
+        "qmd (lookup returned no matching handbook entry)",
+        "serena (symbol lookup unavailable)"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "c45a2270f8b5",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 30
+        },
+        "shell_commands": 2,
+        "shell_commands_rtk_prefixed": 1,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-c.err",
+        "session_id_sha": "1e8fde23d9fa",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 57,
+          "qmd": 1,
+          "serena": 2
+        },
+        "shell_commands": 5,
+        "shell_commands_rtk_prefixed": 4,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "1ce311950588",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 53
+        },
+        "shell_commands": 4,
+        "shell_commands_rtk_prefixed": 1,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "#338 CI: synthetic fixture totals 1900/380/2430 and cost 0.0328 pass. #296 recorded ccusage daily before/after across all Claude sessions (host-wide). Hosted CI succeeded."
+}

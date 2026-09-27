@@ -36,6 +36,11 @@ REVIEW = "catalogs/convergence-practice/source-review.json"
 ADOPTION = "adoption/manifest.json"
 SATURATION = "blueprints/token-native-focus/saturation-audit.json"
 TOKEN_TOPIC = "docs/token-efficiency-stack.json"
+# The five fields a topic row carries from its per-tool evidence card, and where the card must live
+# (evidence/artifacts/token-stack-cards-20260927/project_topic.py writes them).
+TOKEN_CARD_FIELDS = ("upstream", "native_adaptation", "adapted_performance", "invoke_rates", "gpt6_review")
+TOKEN_CARD_ROOT = "evidence/artifacts/"
+TOKEN_INVOKE_COUNTS = ("mcp_calls", "cli_calls", "agents_using", "agents")
 FOUNDATION_SURFACES = "catalogs/foundation/surfaces.json"
 SETUP_GUIDES = ("adoption/README.md", "adoption/update.md", "tools/token-report/README.md")
 TOKEN_RECEIPTS = (
@@ -175,6 +180,39 @@ def source_links(value):
         if public_url(candidate) and candidate not in links:
             links.append(candidate)
     return links
+
+
+def check_token_card(root, row):
+    """Return the topic row's evidence_card identity, or None for a row without a card.
+
+    The five card fields travel together with the exact public card they were projected
+    from. Its evidence classes stay separate fields: nothing here totals comparisons,
+    counters, invoke populations or verdicts."""
+    if not any(field in row for field in TOKEN_CARD_FIELDS + ("evidence_card",)):
+        return None
+    require(all(isinstance(row.get(field), dict) for field in TOKEN_CARD_FIELDS + ("evidence_card",)),
+            "token topic row needs all five card fields and its evidence card")
+    review = row["gpt6_review"]
+    final = review.get("final_verdict")
+    verdicts = (review.get("verdict"), final.get("verdict") if isinstance(final, dict) else None)
+    require(all(isinstance(value, str) and value.strip() for value in verdicts),
+            "token topic card needs a GPT-6 verdict on the card and on the adaptation")
+    require(isinstance(row["adapted_performance"].get("exact_comparisons"), list),
+            "token topic card needs exact comparisons as a list")
+    populations = row["invoke_rates"].get("populations")
+    require(isinstance(populations, dict) and all(
+        isinstance(counts, dict)
+        and all(type(counts.get(key)) is int and counts[key] >= 0 for key in TOKEN_INVOKE_COUNTS)
+        and counts["agents_using"] <= counts["agents"] for counts in populations.values()),
+            "token topic card needs invoke counts per population")
+    card = row["evidence_card"]
+    path = card.get("path")
+    require(isinstance(path, str) and path.startswith(TOKEN_CARD_ROOT) and path.endswith(".json"),
+            "token topic card must be a public evidence artifact")
+    raw = safe_file(root, path).read_bytes()
+    require(card.get("sha256") == digest(raw) and card.get("bytes") == len(raw),
+            "token topic card hash or size mismatch")
+    return {"path": path, "sha256": card["sha256"], "bytes": card["bytes"]}
 
 
 def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root):
@@ -655,11 +693,17 @@ def build_data(root):
                         and meter["summary"].strip(), "token topic needs scoped " + field)
             require(isinstance(row.get("upstream_commands"), dict) and row["upstream_commands"].get("use"),
                     "token topic needs an upstream use command")
+            card = check_token_card(root, row)
             topic_ids.add(identifier)
             component = selected_by_id[identifier]
             item = dict(row)
             item.update(repository=component["repository"], version=component["version"],
                         recipe_path=component["recipe_path"], sources=[])
+            if card:
+                # A card added with this packet is not at the immutable base; link it at the publication ref.
+                track(card["path"])
+                current_public_paths.add(card["path"])
+                item["evidence_card"] = {**card, "url": file_url(card["path"])}
             for path in item.pop("source_paths"):
                 track(path)
                 item["sources"].append({"path": path, "url": file_url(path)})

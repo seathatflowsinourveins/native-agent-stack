@@ -1,0 +1,558 @@
+{
+  "tool": "markitdown",
+  "group": "g5-conversion-packing",
+  "repo": "https://github.com/microsoft/markitdown",
+  "pin": "0.1.8 (uv-tool)",
+  "installed_version": "markitdown 0.1.8 (native `markitdown --version`)",
+  "role": "Converts HTML (the base install, no PDF/Office extras) to readable Markdown. Lanes: CLI in any lane. Landscape: document-retrieval winner.",
+  "lanes": [
+    "CLI: markitdown IN.html -o OUT.md"
+  ],
+  "upstream": {
+    "latest_release": "v0.1.8",
+    "latest_date": "2026-09-21",
+    "our_pin": "0.1.8 from manifests/stack.json:571, qualified by evidence/receipts/markitdown-018-qualification-20260925.json; upstream identity: https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+    "behind_by": "0 published releases (https://github.com/microsoft/markitdown/releases/latest). Main is the same b8f79c57ebc0044be41323d89b2a45d3fda8460e revision as v0.1.8, with no unreleased commit delta: https://github.com/microsoft/markitdown/compare/v0.1.8...b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+    "recommended_install": {
+      "command": "pip install 'markitdown[all]'",
+      "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#installation"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "no upstream Claude Code guidance found; checked https://github.com/microsoft/markitdown/blob/v0.1.8/README.md, https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/README.md and https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md. The companion MCP README documents Claude Desktop and generic transports; that is not Claude Code-specific setup guidance.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md"
+      },
+      "codex": {
+        "how": "no upstream Codex-specific guidance found; checked https://github.com/microsoft/markitdown/blob/v0.1.8/README.md, https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/README.md and https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md. Upstream documents a CLI, Python API and separate generic MCP package, without a Codex registration recipe.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "Live GitHub release metadata identifies v0.1.8, published 2026-09-21, as the latest release. Its source revision is b8f79c57ebc0044be41323d89b2a45d3fda8460e.",
+        "url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+      },
+      {
+        "claim": "MarkItDown converts supported documents to Markdown for text-analysis and LLM workflows, aiming to retain useful headings, lists, tables and links. Supported format families include HTML, PDF, Office, text, archives and media, with dependencies varying by format.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md"
+      },
+      {
+        "claim": "Upstream documents Python 3.10 through 3.14, isolated environments, an all-extras pip installation and selective format extras such as pdf, docx and pptx.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#optional-dependencies"
+      },
+      {
+        "claim": "The CLI accepts filenames or stdin and can write Markdown with -o; the Python library exposes conversion methods. Third-party plugins are disabled by default.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#usage"
+      },
+      {
+        "claim": "The separate markitdown-mcp package publishes convert_to_markdown(uri), with STDIO as the default transport and optional Streamable HTTP/SSE. Its client-specific example targets Claude Desktop.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md"
+      },
+      {
+        "claim": "The release already includes charset, CSV, document-format and URI fixes, underline/strikethrough and image-source handling changes, an MCP SDK migration and an OCR refactor. These are already within the current pin, not an outstanding upgrade.",
+        "url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+      },
+      {
+        "claim": "The optional OCR plugin uses configured llm_client/llm_model objects and vision inference; the Python API example enables plugins explicitly. Without an llm_client, its documentation says OCR is skipped.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-ocr/README.md"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "Upstream positions the output for text analysis and explicitly warns that it may not suit high-fidelity document presentation. Format support in the README does not mean a base installation contains every format dependency.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md"
+      },
+      {
+        "text": "Conversion performs I/O with the current process's privileges. Upstream recommends narrow conversion entry points for the required input type and input sanitization where inputs are untrusted.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#security-considerations"
+      },
+      {
+        "text": "The MCP package is intended for local trusted use; its HTTP/SSE examples bind to localhost and its security section says it has no authentication. This companion package is a separate deployment from the CLI.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md#security-considerations"
+      },
+      {
+        "text": "The released HTTP URI path calls requests-session get(uri, stream=True) without an explicit timeout, and response conversion buffers content. This source behavior limits unattended URL handling without external bounds.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/_markitdown.py"
+      },
+      {
+        "text": "ZIP conversion reads decompressed entries into memory before nested conversion; the inspected converter does not impose an expanded-size budget.",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/converters/_zip_converter.py#L108"
+      },
+      {
+        "text": "The OCR README's --llm-client/--llm-model CLI example does not match the released CLI parser, which defines neither flag. Use its published Python API example for qualification instead. Conflicting example: https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-ocr/README.md#L33",
+        "url": "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/__main__.py"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "No newer release was present in the live release list; earlier beta releases precede the final v0.1.8 release.",
+        "url": "https://github.com/microsoft/markitdown/releases"
+      },
+      {
+        "text": "No unreleased main changes exist relative to v0.1.8 at b8f79c57ebc0044be41323d89b2a45d3fda8460e.",
+        "url": "https://github.com/microsoft/markitdown/compare/v0.1.8...b8f79c57ebc0044be41323d89b2a45d3fda8460e"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {
+      "id": "markitdown",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "version": "0.1.8",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Convert supported source documents to readable Markdown",
+      "freshness": "0.1.8 serves bin/markitdown on the NativeStack WSL2 host since 2026-09-25 after a discriminating comparison against 0.1.7 (byte-identical fixture, 8-K and committed-HTML outputs; intended <u>/<strike>/%2F/data-src changes; independent review). 0.1.7 is kept for rollback. The landscape winner pin stays 0.1.7 until a new verdict wave."
+    },
+    "how_we_install": "The current component pin is 0.1.8, not the older draft's 0.1.7 (manifests/stack.json:571). The recipe installs the base package with `uv tool install markitdown==0.1.8` in an owned environment (recipes/README.md:98; docs/token-session-handbook.md:185). The qualification receipt records Python 3.13, an exclude-newer cutoff, a production bin/markitdown prefix flip and preservation of the old environment for rollback (evidence/receipts/markitdown-018-qualification-20260925.json).",
+    "claude_wiring": "The case-insensitive search of adoption/templates/claude.settings.template.json, adoption/templates/codex.config.template.toml, adoption/templates/project.codex.config.template.toml, .codex/config.toml and every file under examples/claude-native/agents/ found no tool-name matches. In these maintained surfaces there is no MCP server registration, no settings.json permission entry and no dedicated example-agent persona. Claude calls `markitdown \"$INPUT_HTML\" -o \"$OUTPUT_MD\"` as a plain CLI through Bash for selected document conversion (docs/token-session-handbook.md:141). The checked adaptation does not establish an installed MarkItDown MCP companion.",
+    "codex_wiring": "The case-insensitive search of adoption/templates/claude.settings.template.json, adoption/templates/codex.config.template.toml, adoption/templates/project.codex.config.template.toml, .codex/config.toml and every file under examples/claude-native/agents/ found no tool-name matches. In these maintained surfaces there is no MCP server registration, no settings.json permission entry and no dedicated example-agent persona. Codex calls the same plain CLI through CommandExecution for a selected document (docs/token-session-handbook.md:141); the upstream generic MCP package does not imply Codex registration.",
+    "lane_rule": "Choose one useful context method per artifact and select MarkItDown for supported document conversion; the accepted base lane is HTML, with PDF/Office extras separate (docs/token-session-handbook.md:106, docs/token-session-handbook.md:113, docs/token-session-handbook.md:141; recipes/README.md:98). Retain originals and evaluate the converted content needed for the task.",
+    "deviations_from_upstream": [
+      {
+        "what": "The stack pins the base package in an isolated uv environment instead of adopting the upstream README's broad pip all-extras example.",
+        "why": "The documented and qualified workload is selected HTML conversion. Upstream itself permits selective dependencies; the narrower installation does not qualify PDF/Office, OCR or cloud conversion (recipes/README.md:98).",
+        "fix": "Keep claims limited to the installed converters. Qualify additional dependencies and a representative target-document corpus only when expanding the lane.",
+        "pr": null
+      },
+      {
+        "what": "The installed component pin and sealed landscape winner pin are different records: stack 0.1.8 versus landscape 0.1.7.",
+        "why": "manifests/landscape.json contains no MarkItDown entry. The actual older winner is in catalogs/landscape/foundation.json:1515; the qualification receipt explicitly defers rebinding it until a new verdict wave. The draft's claim that the current committed stack pin is 0.1.7 is stale.",
+        "fix": "Use manifests/stack.json:571 as our_pin. Cite catalogs/landscape/foundation.json for the historical winner and re-record its verdict before binding the newer host receipt; do not downgrade the component or silently rewrite historical evidence.",
+        "pr": null
+      },
+      {
+        "what": "The production qualification prefix and fresh-host bootstrap do not guarantee an identical transitive environment.",
+        "why": "The receipt's production environment carries an exclude-newer cutoff and uses a prefix flip; the documented fresh installation lacks that cutoff. The receipt also says interaction between a later installer run and the flipped symlink was not tested (evidence/receipts/markitdown-018-qualification-20260925.json).",
+        "fix": "Qualify a clean bootstrap with the supported install command, compare its dependency set and retained output checks against production, and verify launcher/rollback behavior before claiming portable reproduction.",
+        "pr": null
+      },
+      {
+        "what": "The adoption is an on-demand CLI converter, with no persistent MCP, skill or agent registration in the checked templates.",
+        "why": "The handbook's selected HTML operation already has returned CLI evidence. The separate upstream MCP package and optional OCR/cloud paths introduce different installation and qualification requirements.",
+        "fix": "Keep CLI integration evidence separate from optional MCP/OCR capabilities and from unchanged upstream test-suite acceptance.",
+        "pr": null
+      }
+    ],
+    "pending_fixes": [
+      "Correct future freshness summaries to cite the current stack pin 0.1.8 and the separate historical winner at catalogs/landscape/foundation.json:1515; a new landscape verdict is required before rebinding the host receipt.",
+      "Close the qualification receipt's clean-bootstrap, transitive-dependency and prefix-flip lifecycle gaps before claiming that the fresh-host installation reproduces the production environment.",
+      "Keep target-content assertions and correct extension/MIME hints in conversion checks: token-cards/cards/markitdown.json records HTML named .txt passing through unchanged, so exit success alone does not establish HTML conversion.",
+      "Adoption observation only: token-cards/invoke_by_tool.json populations.workflow_children_with_lanes_block.markitdown records cli_calls=0 and mcp_calls=0 with agents=22. The token MCP-server list in codex-lanes-block.txt does not name markitdown; that list is not a CLI inventory. Add an explicit task-matched CLI example to the worker guidance and retain a subsequent observation; this population does not establish why the tool was unused."
+    ],
+    "assessment": "The qualified base CLI at 0.1.8 aligns with the latest upstream release and the selected HTML lane. token-cards/cards/markitdown.json records passing selected HTML and plain-text controls, including retained visible content, while distinguishing extension-dependent passthrough. Those artifact comparisons do not establish arbitrary Office/PDF/OCR fidelity, persistent MCP integration or provider savings. Portable bootstrap equivalence remains limited by the qualification receipt's dependency and launcher caveats."
+  },
+  "e2e_returned_results": {
+    "status": "pass",
+    "reason": "passed",
+    "run_utc": "2026-09-26T17:44:40.110Z",
+    "fidelity": {
+      "what": "exact artifact comparison predicate",
+      "result": " three scopes verified (PASS); verifier: agree, 3 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 5 120 markitdown --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 120 markitdown --help",
+        "exit": 0,
+        "returned": "completed (exit 0)"
+      },
+      {
+        "cmd": "timeout -k 5 120 markitdown <scratch>/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html -o tool.md",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 120 markitdown <scratch>/fixtures/greeting.html -o greeting.md",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 120 markitdown <scratch>/rr/markitdown/in/markitdown-plain.txt -o markitdown-plain-converted.txt",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 120 markitdown <scratch>/rr/markitdown/in/greeting-html-named.txt -o greeting-html-named-txt.md",
+        "exit": null,
+        "returned": "passed"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 10,
+    "records_shown": [
+      {
+        "id": "markitdown-version",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown --version",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"returned\": \"markitdown 0.1.8\",\n  \"pin\": \"0.1.8\",\n  \"pin_match\": true,\n  \"install_read_from_files\": \"uv tool install of markitdown==0.1.8 (base install, no extras; uv receipt python 3.13, exclude-newer 2026-09-25T17:00:00Z) under $HOME/.local/share/codex-ecosystem/tools/markitdown-0.1.8, linked as $HOME/.local/share/codex-ecosystem/bin/markitdown on PATH; ",
+        "attachments": 2
+      },
+      {
+        "id": "markitdown-help",
+        "status": "completed (exit 0)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown --help",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"cli_surfaces_listed\": [\n    \"FILENAME argument, or stdin when empty\",\n    \"-o/--output file, else stdout\",\n    \"-x/--extension and -m/--mime-type hints\",\n    \"-c/--charset hint\",\n    \"-d/--use-docintel with -e/--endpoint (Azure Document Intelligence)\",\n    \"--use-cu with --cu-endpoint/--cu-analyzer/--cu-file-types (Azure Content Understanding)\",\n    \"-p/-",
+        "attachments": 2
+      },
+      {
+        "id": "markitdown-convert-nyse-hours",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown $WT/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html -o tool.md",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"input\": {\n    \"fixture\": \"$WT/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html\",\n    \"bytes\": 101300,\n    \"sha256\": \"06c1061151ddacfa85fa917a587c40bed428d18e6298c3b13ae85d86fc076886\",\n    \"utf8\": \"valid (strict decode in check.py and compare)\",\n    \"attached_copy\": \"markitdown/in/6-nyse-hours-calenda",
+        "attachments": 4
+      },
+      {
+        "id": "markitdown-control-greeting-html",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown $WT/fixtures/greeting.html -o greeting.md",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"input\": {\n    \"fixture\": \"$WT/fixtures/greeting.html\",\n    \"bytes\": 474,\n    \"sha256\": \"f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2\"\n  },\n  \"output\": {\n    \"file\": \"greeting.md\",\n    \"bytes\": 76,\n    \"sha256\": \"6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2\"\n  },\n  \"heading_present\": {\n    \"expected\": \"# Local browse",
+        "attachments": 4
+      },
+      {
+        "id": "markitdown-control-plain-txt-passthrough",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown $RR/markitdown/in/markitdown-plain.txt -o markitdown-plain-converted.txt",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"input\": {\n    \"file\": \"markitdown-plain.txt\",\n    \"bytes\": 77,\n    \"sha256\": \"80232a863e68f6072041861ed76481fa88e614794cff896447180a7ad583a61d\",\n    \"text\": \"the same two lines as scripts/native_token_ci.py markitdown_fixture\"\n  },\n  \"output\": {\n    \"file\": \"markitdown-plain-converted.txt\",\n    \"bytes\": 77,\n    \"sha256\": \"80232a863e68f6072041861ed76481fa8",
+        "attachments": 4
+      },
+      {
+        "id": "markitdown-control-html-named-txt",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown $RR/markitdown/in/greeting-html-named.txt -o greeting-html-named-txt.md",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"input\": {\n    \"file\": \"greeting-html-named.txt\",\n    \"note\": \"byte copy of fixtures/greeting.html under a .txt name\",\n    \"bytes\": 474,\n    \"sha256\": \"f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2\"\n  },\n  \"output\": {\n    \"file\": \"greeting-html-named-txt.md\",\n    \"bytes\": 474,\n    \"sha256\": \"f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d",
+        "attachments": 4
+      },
+      {
+        "id": "markitdown-stdin-convert-nyse-hours",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 120 markitdown -x html",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"native execution\",\n  \"stdout\": {\n    \"file\": \"11-stdin-convert-nyse-hours.stdout\",\n    \"bytes\": 8367,\n    \"sha256\": \"d830e76f0d10b3f80ecd3122a738a0dba41755ba337587c97abc2b18a96cf177\"\n  },\n  \"equals_tool_md_plus_one_trailing_newline\": true,\n  \"why\": \"markitdown/__main__.py _handle_output (installed 0.1.8, lines 266-277) writes result.markdown unchanged with -o and print()s it t",
+        "attachments": 2
+      },
+      {
+        "id": "markitdown-quality-check",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 5 120 python3 $RR/markitdown/check.py $WT/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html $RR/markitdown/out/tool.md $RR/markitdown/out/greeting.md $RR/",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"local_integration\",\n  \"required_pass\": true,\n  \"phrase\": \"9:30 a.m. to 4:00 p.m. ET\",\n  \"phrase_counts\": {\n    \"baseline_raw_html\": 12,\n    \"baseline_visible_text_scripts_removed\": 6,\n    \"tool_md\": 6,\n    \"reading\": \"The raw HTML repeats each visible statement inside its embedded page-data JSON; tool.md keeps all 6 visible occurrences and drops the script copies.\"\n  },\n  \"gre",
+        "attachments": 3
+      },
+      {
+        "id": "markitdown-o200k-compare",
+        "status": "measured (exit 0)",
+        "kind": "local integration check",
+        "command": "timeout -k 5 120 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/markitdown/config.json --tool markitdown --before $WT/evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-",
+        "observation": "{\n  \"exit_code\": 0,\n  \"evidence_class\": \"local_integration\",\n  \"encoding\": \"o200k_base\",\n  \"tokenizer\": \"gpt-tokenizer 3.4.0 (version enforced by token_manifest.py)\",\n  \"baseline_raw_html\": 33177,\n  \"markitdown_output\": 2556,\n  \"tokens_removed\": 30621,\n  \"reduction_percent\": 92.3,\n  \"bytes\": {\n    \"baseline\": 101300,\n    \"output\": 8366,\n    \"reduction_percent\": 91.7\n  },\n  \"comparison_id\": \"f3f1e9814bc6367fa87b5d0671",
+        "attachments": 7
+      },
+      {
+        "id": "markitdown-capture-harness",
+        "status": "completed: 11 captured steps, all exit 0",
+        "kind": "local integration check",
+        "command": "bash run.sh",
+        "observation": "{\n  \"evidence_class\": \"local_integration\",\n  \"timing_note\": \"started_at is step 1's start and completed_at is step 11's end; the bash processes themselves were not timed\",\n  \"steps\": [\n    \"1 version: exit 0\",\n    \"2 help: exit 0\",\n    \"3 convert-nyse-hours: exit 0\",\n    \"4 control-greeting-html: exit 0\",\n    \"5 control-plain-txt-passthrough: exit 0\",\n    \"6 control-html-named-txt: exit 0\",\n    \"7 quality-check: exit",
+        "attachments": 5
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [
+      {
+        "lane": "claude_subagent",
+        "payload": "Claude Code MCP docs page: HTML vs MarkItDown Markdown; three scopes verified (PASS)",
+        "before_tokens": 503230,
+        "after_tokens": 28934,
+        "change_pct": -94.3,
+        "encoding": "o200k_base",
+        "eligibility": null,
+        "evidence_class": "exact artifact comparison",
+        "first_seen": "2026-09-25T21:07:57.380157+00:00",
+        "last_seen": "2026-09-25T21:07:57.380157+00:00"
+      },
+      {
+        "lane": "codex_worker",
+        "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's markitdown task; answer verified against the baseline (PASS)",
+        "before_tokens": 505768,
+        "after_tokens": 29471,
+        "change_pct": -94.2,
+        "encoding": "o200k_base",
+        "eligibility": null,
+        "evidence_class": "exact artifact comparison",
+        "first_seen": "2026-09-26T13:51:54.508225+00:00",
+        "last_seen": "2026-09-26T13:51:54.508225+00:00"
+      }
+    ],
+    "native_counter": null,
+    "native_snapshot": [],
+    "shortfall_cause": null,
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 0,
+        "cli_calls": 517,
+        "agents_using": 67,
+        "agents": 1010,
+        "pct_agents_using": 0.0663
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 0,
+        "agents_using": 0,
+        "agents": 22,
+        "pct_agents_using": 0.0
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 517,
+        "agents_using": 67,
+        "agents": 988,
+        "pct_agents_using": 0.0678
+      },
+      "agent_subagents": {
+        "mcp_calls": 0,
+        "cli_calls": 239,
+        "agents_using": 8,
+        "agents": 71,
+        "pct_agents_using": 0.1127
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 58,
+        "agents_using": 5,
+        "agents": 15,
+        "pct_agents_using": 0.3333
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 0,
+        "cli_calls": 4,
+        "agents_using": 1,
+        "agents": 301,
+        "pct_agents_using": 0.0033
+      }
+    },
+    "live_otel": null,
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "accurate",
+    "findings": [],
+    "checked": [
+      "token-cards/cards/markitdown.json",
+      "token-cards/groups/g5-conversion-packing/markitdown.upstream.json",
+      "token-cards/invoke_by_tool.json",
+      "manifests/stack.json",
+      "recipes/README.md",
+      "docs/token-session-handbook.md",
+      "adoption/templates/claude.settings.template.json",
+      "adoption/templates/codex.config.template.toml",
+      "adoption/templates/project.codex.config.template.toml",
+      ".codex/config.toml",
+      "examples/claude-native/agents/source-scout.md",
+      "examples/claude-native/agents/isolated-builder.md",
+      "examples/claude-native/agents/blind-lane-reviewer.md",
+      "examples/claude-native/agents/evidence-reviewer.md",
+      "examples/claude-native/agents/semantic-evidence-reviewer.md",
+      "examples/claude-native/agents/blind-adjudicator.md",
+      "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "https://github.com/microsoft/markitdown/releases",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#installation",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#optional-dependencies",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#security-considerations",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#usage",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-mcp/README.md#security-considerations",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-ocr/README.md",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown-ocr/README.md#L33",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/README.md",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/__main__.py",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/_markitdown.py",
+      "https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/converters/_zip_converter.py#L108",
+      "https://github.com/microsoft/markitdown/compare/v0.1.8...b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+      "https://github.com/microsoft/markitdown/releases/latest",
+      "evidence/receipts/markitdown-018-qualification-20260925.json",
+      "catalogs/landscape/foundation.json",
+      "https://github.com/microsoft/markitdown/tree/main",
+      "https://github.com/microsoft/markitdown/compare/v0.1.8...b8f79c57ebc0044be41323d89b2a45d3fda8460e.diff",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/README.md",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown/README.md",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown-mcp/README.md",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown-ocr/README.md",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown/src/markitdown/__main__.py",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown/src/markitdown/_markitdown.py",
+      "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown/src/markitdown/converters/_zip_converter.py",
+      "Compared all six invoke_rates.populations objects, their method and window exactly against token-cards/invoke_by_tool.json; checked native_adaptation.pending_fixes and assessment against the same populations. cli_calls was treated as command-text matching, which can include path mentions, not verified executable invocations.",
+      "Compared upstream and native_adaptation with the prior upstream file; both match verbatim apart from the assembler-added stack_entry.",
+      "Checked native_adaptation.assessment against e2e_returned_results, adapted_performance.exact_comparisons, invoke_rates and prior_evidence; found no numeric blending across evidence classes in the prior-run prose.",
+      "Ran a case-insensitive grep and recursive JSON field scan of the card and prior upstream file for the prohibited home path, username, temporary paths and UUIDs; no matches."
+    ],
+    "resolutions": [],
+    "final_verdict": {
+      "tool": "markitdown",
+      "verdict": "adapted-with-gaps",
+      "summary": "The installed 0.1.8 base CLI matches the latest release and upstream permits selecting format dependencies, so the native HTML lane is aligned while fresh-bootstrap equivalence remains unqualified (groups/g5-conversion-packing/markitdown.upstream.json). The historical card comparisons are 503230→28934 tokens (94.25%) for Claude and 505768→29471 (94.17%) for Codex, with null eligibility fields rather than an explicit acceptance decision (cards/markitdown.json). The separately retained HTML comparison is 33177→2556 o200k_base tokens (92.30%), eligible for recovering the checked market-hours fact and 14 additional visible facts, not arbitrary document fidelity (../rr/markitdown/out/10-o200k-compare.stdout; ../rr/markitdown/out/7-quality-check.stdout). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 67/1010 Ultracode workflow children (6.63%, 517 CLI detections), 1/301 Codex workers (0.33%, 4), and 0/22 children given the lanes block (invoke_by_tool.json). Next, run the unperformed clean-install promotion gate and enforce input-format and required-content checks; PDF/Office/OCR coverage, native savings counters and attributable provider savings remain unverified.",
+      "gaps": [
+        {
+          "gap": "Production uses the qualification prefix with exclude-newer and a prefix flip; the receipt explicitly says the fresh install_pin promotion gate was not run.",
+          "evidence": "evidence/receipts/markitdown-018-qualification-20260925.json#limitations",
+          "action": "Qualify the actual bootstrap form, compare its dependency set and launcher with production, and retain rollback and acceptance outputs before claiming fresh-host equivalence.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The HTML-as-.txt control passed through raw markup; the selected HTML success does not qualify arbitrary extensions or optional formats.",
+          "evidence": "../rr/markitdown/out/7-quality-check.stdout",
+          "action": "Validate format metadata and required output facts, and install and qualify only the extra formats the workload needs; upstream permits selective extras at https://github.com/microsoft/markitdown/blob/main/README.md#optional-dependencies.",
+          "owner_pr": null
+        },
+        {
+          "gap": "Historical eligibility and success-confirmed use across eligible worker tasks are missing.",
+          "evidence": "cards/markitdown.json#adapted_performance",
+          "action": "Attach acceptance decisions to the historical comparisons and collect task-eligible invocation outcomes without extrapolating artifact reduction into provider savings.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Fresh markitdown --version returned 0.1.8; the latest release is v0.1.8 dated 2026-09-21.",
+          "evidence": "groups/g5-g6-verification.json#versions/markitdown",
+          "result": "holds"
+        },
+        {
+          "claim": "Upstream allows individual optional dependencies; omitting the optional MCP or unused PDF/Office extras does not invalidate the qualified HTML CLI lane.",
+          "evidence": "https://github.com/microsoft/markitdown/blob/main/README.md#optional-dependencies",
+          "result": "holds"
+        },
+        {
+          "claim": "Historical comparison sizes reproduce 503230→28934 and 505768→29471 o200k_base tokens; their eligibility fields are null.",
+          "evidence": "cards/markitdown.json#adapted_performance/exact_comparisons",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained HTML comparison reproduces 33177→2556 tokens, and provider_tokens_saved is null.",
+          "evidence": "../rr/markitdown/out/10-o200k-compare.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "The required market-hours fact, heading and plain-text controls pass, and all 14 additional visible facts are present; HTML named .txt remains markup.",
+          "evidence": "../rr/markitdown/out/7-quality-check.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "The qualification receipt establishes identical dependency and launcher behavior on a fresh bootstrap.",
+          "evidence": "evidence/receipts/markitdown-018-qualification-20260925.json#limitations",
+          "result": "unverified"
+        },
+        {
+          "claim": "Reported invoke detections are 67/1010 workflow children, 0/22 with lanes, and 1/301 Codex workers; these are detections rather than successful conversions.",
+          "evidence": "invoke_by_tool.json#populations",
+          "result": "holds"
+        },
+        {
+          "claim": "The review is accurate with no findings or unresolved resolutions.",
+          "evidence": "groups/g5-conversion-packing/markitdown.review.json",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained HTML reductions establish full-workflow provider-token savings or general optional-format fidelity.",
+          "evidence": "cards/markitdown.json#adapted_performance",
+          "result": "unverified"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "gpt-tokenizer",
+        "qmd (lookup returned no matching handbook entry)",
+        "serena (symbol lookup unavailable)"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "2e04ddfca8c9",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 42
+        },
+        "shell_commands": 2,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-c.err",
+        "session_id_sha": "1e8fde23d9fa",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 57,
+          "qmd": 1,
+          "serena": 2
+        },
+        "shell_commands": 5,
+        "shell_commands_rtk_prefixed": 4,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "c79b4b6862dc",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "diagnosing-bugs",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 35
+        },
+        "shell_commands": 5,
+        "shell_commands_rtk_prefixed": 4,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "#296: 503,230->28,934 (94.3%) on a live docs page. #343: 505,768->29,471 (94.2%). #316: 505,753->29,471. #338 CI: greeting heading and .txt passthrough pass. Hosted CI succeeded."
+}

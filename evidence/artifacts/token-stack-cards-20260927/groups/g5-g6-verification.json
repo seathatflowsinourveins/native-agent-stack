@@ -1,0 +1,236 @@
+{
+  "verified_at_utc": "2026-09-27T03:20:30Z",
+  "scope": "Read-only final-verdict verification for g5-conversion-packing and g6-docs-accounting. Local evidence references are relative to token-cards, except docs/, recipes/ and evidence/ references, which are relative to the native stack repository. No installation, configuration, source card or upstream issue was changed.",
+  "versions": {
+    "ast-grep": {
+      "command": "ast-grep --version",
+      "exit": 0,
+      "installed": "0.45.3",
+      "latest": "0.45.3",
+      "published_at": "2026-08-31T01:42:23Z",
+      "release": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+    },
+    "markitdown": {
+      "command": "markitdown --version",
+      "exit": 0,
+      "installed": "0.1.8",
+      "latest": "v0.1.8",
+      "published_at": "2026-09-21T21:22:51Z",
+      "release": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+    },
+    "repomix": {
+      "command": "repomix --version",
+      "exit": 0,
+      "installed": "1.18.1",
+      "latest": "v1.18.1",
+      "published_at": "2026-09-21T08:34:49Z",
+      "release": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+    },
+    "agentsview": {
+      "command": "agentsview --version",
+      "exit": 0,
+      "installed": "0.43.0",
+      "latest": "v0.44.0",
+      "published_at": "2026-09-21T13:56:12Z",
+      "release": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+    },
+    "ccusage": {
+      "command": "ccusage --version",
+      "exit": 0,
+      "installed": "20.0.24",
+      "latest": "v20.0.24",
+      "published_at": "2026-09-21T11:23:53Z",
+      "release": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24"
+    },
+    "context-hub": {
+      "command": "chub --cli-version",
+      "exit": 0,
+      "installed": "0.1.4",
+      "latest": "v0.1.4",
+      "published_at": "2026-04-27T22:10:03Z",
+      "release": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4"
+    }
+  },
+  "release_method": "Fresh official /repos/<repository>/releases/latest API reads, corroborated by official release-page and documentation research; all reported releases are non-prereleases. Search-engine snippets were not used to override fresh release evidence.",
+  "attachment_check": {
+    "source": "../rr/returned-results.json",
+    "method": "Opened every attachment on every record naming the component and checked retained byte size and SHA-256. Counts are attachment references and may include the same file more than once; record status is not inferred from attachment integrity.",
+    "results": [
+      {
+        "tool": "ast-grep",
+        "records": 27,
+        "attachments_opened": 56,
+        "mismatches": 0
+      },
+      {
+        "tool": "markitdown",
+        "records": 10,
+        "attachments_opened": 37,
+        "mismatches": 0
+      },
+      {
+        "tool": "repomix",
+        "records": 22,
+        "attachments_opened": 58,
+        "mismatches": 0
+      },
+      {
+        "tool": "agentsview",
+        "records": 26,
+        "attachments_opened": 53,
+        "mismatches": 0
+      },
+      {
+        "tool": "ccusage",
+        "records": 19,
+        "attachments_opened": 54,
+        "mismatches": 0
+      },
+      {
+        "tool": "context-hub",
+        "records": 31,
+        "attachments_opened": 75,
+        "mismatches": 0
+      }
+    ]
+  },
+  "recount_method": "Opened the exact baseline and candidate files referenced by the native report ledger and retained comparison outputs, verified size and SHA-256, and recomputed o200k_base with the configured gpt-tokenizer module. Thirteen comparisons and 26 artifact checks reproduced with zero mismatches. Numeric reproduction alone does not establish semantic eligibility.",
+  "historical_comparisons": [
+    {
+      "tool": "ast-grep",
+      "lane": "claude_subagent",
+      "before": 105877,
+      "after": 10293,
+      "reduction_pct": 90.28,
+      "eligibility": null,
+      "evidence": "cards/ast-grep.json"
+    },
+    {
+      "tool": "ast-grep",
+      "lane": "codex_worker",
+      "before": 112899,
+      "after": 11508,
+      "reduction_pct": 89.81,
+      "eligibility": null,
+      "evidence": "cards/ast-grep.json"
+    },
+    {
+      "tool": "markitdown",
+      "lane": "claude_subagent",
+      "before": 503230,
+      "after": 28934,
+      "reduction_pct": 94.25,
+      "eligibility": null,
+      "evidence": "cards/markitdown.json"
+    },
+    {
+      "tool": "markitdown",
+      "lane": "codex_worker",
+      "before": 505768,
+      "after": 29471,
+      "reduction_pct": 94.17,
+      "eligibility": null,
+      "evidence": "cards/markitdown.json"
+    },
+    {
+      "tool": "repomix",
+      "lane": "claude_subagent",
+      "before": 17935,
+      "after": 8799,
+      "reduction_pct": 50.94,
+      "eligibility": "retracted",
+      "evidence": "cards/repomix.json"
+    },
+    {
+      "tool": "context-hub",
+      "lane": "claude_subagent",
+      "before": 70903,
+      "after": 2073,
+      "reduction_pct": 97.08,
+      "eligibility": null,
+      "evidence": "cards/context-hub.json"
+    }
+  ],
+  "retained_comparisons": {
+    "ast-grep-calls": {
+      "before": 133697,
+      "after": 10903,
+      "reduction_pct": 91.84,
+      "evidence": "../rr/ast-grep/out/17-compare.stdout",
+      "acceptance": "../rr/ast-grep/check/check.json",
+      "eligibility": "bounded subprocess-call extraction; 19 ranges match Python AST; all 15 checks pass"
+    },
+    "ast-grep-outline": {
+      "before": 18233,
+      "after": 2245,
+      "reduction_pct": 87.69,
+      "evidence": "../rr/ast-grep/out/25-outline-compare.stdout",
+      "acceptance": "../rr/ast-grep/check/check_outline.json",
+      "eligibility": "two-file top-level outline only; all six checks pass"
+    },
+    "repomix-cli": {
+      "before": 23638,
+      "after": 10565,
+      "reduction_pct": 55.31,
+      "evidence": "../rr/repomix/out/16-compare-cli.stdout",
+      "acceptance": "../rr/repomix/check/def_names.json",
+      "eligibility": "ineligible for complete-definition lookup"
+    },
+    "repomix-mcp": {
+      "before": 18641,
+      "after": 8981,
+      "reduction_pct": 51.82,
+      "evidence": "../rr/repomix/out/17-compare-mcp.stdout",
+      "acceptance": "../rr/repomix/check/def_names.json",
+      "eligibility": "ineligible for complete-definition lookup"
+    },
+    "markitdown-html": {
+      "before": 33177,
+      "after": 2556,
+      "reduction_pct": 92.3,
+      "evidence": "../rr/markitdown/out/10-o200k-compare.stdout",
+      "acceptance": "../rr/markitdown/out/7-quality-check.stdout",
+      "eligibility": "bounded market-hours fact; required checks and 14 informative visible facts pass"
+    },
+    "context-hub-cli": {
+      "before": 503515,
+      "after": 3094,
+      "reduction_pct": 99.39,
+      "evidence": "../rr/context-hub/out/23-o200k-compare-cli.stdout",
+      "acceptance": "../rr/context-hub/out/10-quality-check.stdout",
+      "eligibility": "strict_content_type introduction fact only; primary check and discrimination control pass"
+    },
+    "context-hub-mcp": {
+      "before": 503515,
+      "after": 3094,
+      "reduction_pct": 99.39,
+      "evidence": "../rr/context-hub/out/24-o200k-compare-mcp.stdout",
+      "acceptance": "../rr/context-hub/out/20-mcp-check-json.stdout",
+      "eligibility": "same bounded fact and CLI-document parity; not additional savings"
+    }
+  },
+  "invoke_scan": {
+    "source": "invoke_by_tool.json",
+    "scanner": "invoke_by_tool.py",
+    "since": "2026-09-25T11:37:28Z",
+    "until": "2026-09-26T23:37:28Z",
+    "population_rows_compared": 36,
+    "mismatches": 0,
+    "codex_negative_controls_excluded": 139,
+    "interpretation": "Reported command-text/MCP-name detections and agents detected, not successful execution or task-eligible adoption rates. Regex matches can include tool-name mentions inside command text. Existing frozen-window scan was inspected and cross-checked, not rerun over private transcripts. No sums across populations, OTel, native counters or provider usage."
+  },
+  "review_resolutions": {
+    "ast_grep": "Corrected before/after-full-parsing wording read with the cited merged upstream sources.",
+    "repomix": "Stale historical PASS remains in payload; explicit eligibility retraction is present.",
+    "agentsview": "All four historical raw-record findings dispositioned; successful post-start projects and inclusive lists retained.",
+    "ccusage": "All five historical raw-record findings dispositioned; pricing gap remains.",
+    "markitdown": "Review accurate with no findings.",
+    "context_hub": "Review accurate with no findings."
+  },
+  "measurement_limits": "No card provides a native saved-token counter; AgentsView and ccusage have no exact comparison. No attributable provider-savings measurement is established for any of the six. The retained fidelity checks were opened and assessed, not rerun as fresh application tests.",
+  "tool_limits": [
+    "GitHub CLI authentication unavailable; public official web/API sources were used.",
+    "QMD query found no matching handbook entry in its active collections; original local handbook was opened.",
+    "Serena find_symbol failed because its language-server manager was uninitialized; the scanner source was opened directly and Serena configuration was not changed."
+  ]
+}

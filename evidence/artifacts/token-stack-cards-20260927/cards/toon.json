@@ -1,0 +1,579 @@
+{
+  "tool": "toon",
+  "group": "g1-shell-output",
+  "repo": "https://github.com/toon-format/toon",
+  "pin": "4.1.1 (npm @toon-format/cli)",
+  "installed_version": "4.1.1 (native `toon --version`)",
+  "role": "Serializes structured data compactly with a strict decode round trip; suits uniform tabular arrays only, and compact JSON can win. Lanes: CLI in any lane. Counter: --stats per conversion (tokenx estimate). Landscape: token-efficiency alternative (measured comparison).",
+  "lanes": [
+    "CLI: toon IN --stats -o OUT; toon OUT --decode --strict -o JSON"
+  ],
+  "upstream": {
+    "latest_release": "v4.1.1",
+    "latest_date": "2026-08-05",
+    "our_pin": "4.1.1, @toon-format/cli (https://github.com/seathatflowsinourveins/native-agent-stack/blob/34c56340e636ad3d3daeb8482d48d1d8f0b135ae/manifests/stack.json)",
+    "behind_by": "No published release behind: GitHub latest and npm CLI latest both remain 4.1.1, checked live on 2026-09-26. main is 11 unreleased commits ahead at f151a5d830d001bc244395b891183cba37e0d935. Sources: https://api.github.com/repos/toon-format/toon/releases/latest ; https://registry.npmjs.org/@toon-format%2Fcli ; https://github.com/toon-format/toon/compare/v4.1.1...f151a5d830d001bc244395b891183cba37e0d935",
+    "recommended_install": {
+      "command": "npm install -g @toon-format/cli@4.1.1",
+      "url": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#installation"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "Apply the upstream generic LLM workflow through the available shell: encode selected JSON, provide the result in a toon code fence, and strictly decode generated TOON. No dedicated first-party Claude Code hook, plugin, MCP server or subagent installer was found in the checked release documentation; applying the CLI workflow to Claude is an adaptation.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/llm-prompts.md"
+      },
+      "codex": {
+        "how": "Use the same on-demand CLI/SDK encode-and-strict-decode workflow in a Codex task or worker. No dedicated first-party Codex integration was found in the checked release documentation; making the CLI available and including the encoded data/instructions in the task is an adaptation, not automatic interception.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/llm-prompts.md"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "GitHub latest identifies latest_release v4.1.1, published 2026-08-05T11:49:55Z, establishing latest_date 2026-08-05; npm @toon-format/cli latest is also 4.1.1, published 2026-08-05T11:50:41.210Z (https://registry.npmjs.org/@toon-format%2Fcli).",
+        "url": "https://api.github.com/repos/toon-format/toon/releases/latest"
+      },
+      {
+        "claim": "The checked upstream retrieval benchmark reports TOON accuracy 72.2%, JSON accuracy 71.4%, and 42.6% fewer tokens. These are benchmark-specific results, not this repository's adapted performance.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/benchmarks.md#retrieval-accuracy"
+      },
+      {
+        "claim": "Token-efficiency benchmarks use gpt-tokenizer/o200k_base and primarily compare against formatted JSON with two-space indentation; the documentation separately includes compact JSON comparisons.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/benchmarks.md#token-efficiency"
+      },
+      {
+        "claim": "Uniform arrays and keyed objects can share a tabular header; uniform nested object columns can also fold into nested field groups. Deeply nested or non-uniform structures may be less efficient than compact JSON.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/README.md"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "The upstream nested e-commerce benchmark is +5.6% versus compact JSON, despite being smaller than formatted JSON. Source: docs/guide/benchmarks.md:300-315. Baseline formatting therefore materially changes a savings claim.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/benchmarks.md#L300-L315"
+      },
+      {
+        "text": "The specific rule 'only uniform arrays of 5 or more flat records' is UNVERIFIED as an upstream claim. No such minimum was found across the checked release's docs and package Markdown or encoder eligibility logic. extractTabularFields rejects an empty array, empty record fields and incompatible shapes, not arrays shorter than five. Correctness and positive token savings are separate questions.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts#L5-L37"
+      },
+      {
+        "text": "There are other explicit counts that must not be confused with a five-record cutoff: keyed tabular objects require at least two entries, and the prompting guide recommends examples of 2–5 rows. Uniform nested columns are supported, so 'flat records only' is also narrower than upstream. Prompt-example source: https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/llm-prompts.md#L179-L183",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/format-overview.md#L70-L146"
+      },
+      {
+        "text": "CLI --stats calls tokenx.estimateTokenCount on input JSON text and encoded TOON, not the benchmark's exact o200k_base tokenizer. It is a per-conversion estimate, not a cumulative provider-savings counter.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/src/conversion.ts#L36-L50"
+      },
+      {
+        "text": "Open upstream issue #339 reports root strings beginning with U+FEFF being emitted unquoted and changing content or type on decode. PR #343 remains open, draft and unmerged in the live check; strict syntax validation alone is not proof of value preservation. Fix status: https://github.com/toon-format/toon/pull/343",
+        "url": "https://github.com/toon-format/toon/issues/339"
+      },
+      {
+        "text": "The upstream ecosystem links Tooner as a separate MCP proxy. Installing the TOON CLI alone does not enable that transport integration.",
+        "url": "https://github.com/toon-format/toon/blob/v4.1.1/docs/ecosystem/tools-and-playgrounds.md#L51-L55"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "No newer published release. The live v4.1.1-to-main comparison contains unreleased CLI, dependency and documentation changes, with no changes under packages/toon/src.",
+        "url": "https://github.com/toon-format/toon/compare/v4.1.1...f151a5d830d001bc244395b891183cba37e0d935"
+      },
+      {
+        "text": "Unreleased CLI changes send usage accompanying invalid-argument errors to stderr while requested help remains on stdout, avoid immediate process termination that can discard buffered output, and split short-option values such as -o=report.toon correctly.",
+        "url": "https://github.com/toon-format/toon/commit/55483e6f6a9add33a1b3d6652d3176ee4989f836"
+      },
+      {
+        "text": "Unreleased dependency changes replace citty/shared CLI helpers with utilful/cli, remove ansis, adopt utilful 3.3.0 and exempt that version from minimum release age.",
+        "url": "https://github.com/toon-format/toon/compare/v4.1.1...f151a5d830d001bc244395b891183cba37e0d935"
+      },
+      {
+        "text": "The leading-BOM root-string fix is proposed in draft PR #343, not included in the pinned release or checked main.",
+        "url": "https://github.com/toon-format/toon/pull/343"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {
+      "id": "toon",
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+      "version": "4.1.1",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Compact suitable structured data with explicit decode",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    "how_we_install": "~/code/native-agent-stack/manifests/stack.json pins TOON 4.1.1. adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json identify the npm @toon-format/cli archive; adoption/bootstrap-linux.sh uses the versioned npm installation. recipes/README.md:113 gives npm install --global --prefix \"$STACK_HOME/tools/toon-4.1.1\" @toon-format/cli@4.1.1. This is the CLI package, not a dedicated MCP server.",
+    "claude_wiring": "On-demand Bash conversion: toon IN.json --stats -o OUT.toon, then toon OUT.toon --decode --strict -o BACK.json and compare decoded values (docs/token-session-handbook.md:137; recipes/README.md:113). adoption/templates/claude.settings.template.json has no TOON hook; none of the checked examples/claude-native/agents/*.md explicitly names TOON, so worker briefs need to supply the chosen representation and recovery requirement.",
+    "codex_wiring": "The CLI is available for explicit shell use and task-envelope data. Neither adoption/templates/codex.config.template.toml nor repo .codex/config.toml contains TOON-specific integration; those configurations do not provide automatic conversion. docs/token-session-handbook.md:137 explicitly lists TOON as on-demand structured-data conversion.",
+    "lane_rule": "Choose one useful context method per artifact; keep compact JSON when TOON expands it (docs/token-session-handbook.md:106-113,137). Require strict decoding plus semantic value comparison, including numeric precision (recipes/README.md:113). Treat --stats as an estimate and separate it from the evidence card's exact named-tokenizer comparisons.",
+    "deviations_from_upstream": [
+      {
+        "what": "The assembler's minimum-row and flat-only rule is a local operational heuristic, not an upstream eligibility or correctness rule.",
+        "why": "Upstream bases tabular eligibility on uniform fields and value shapes, supports uniform nested columns and keyed maps, and imposes no five-record minimum on arrays. The hardcoded shortfall_cause must be read as local advice, not an official TOON claim.",
+        "fix": "The card owner should mark the specific threshold UNVERIFIED against upstream and prefer measured comparison with compact JSON plus exact semantic round trip. No card or assembler file was edited.",
+        "pr": null
+      },
+      {
+        "what": "Automatic TOON interception is not enabled.",
+        "why": "The repo selects an explicit CLI representation lane, matching the upstream generic workflow; the separately linked Tooner proxy is not part of the installed CLI.",
+        "fix": "Keep conversion selective. Any future transport proxy needs its own installation and end-to-end qualification rather than being credited to this CLI.",
+        "pr": null
+      },
+      {
+        "what": "Local conversion recipes add an explicit semantic recovery check and a compact-JSON fallback.",
+        "why": "Strict decoding validates structure but does not prove that the decoded value matches the original, and upstream documents workloads that expand relative to compact JSON.",
+        "fix": "Retain both checks and avoid the documented root-BOM input case unless a qualified upstream fix is installed.",
+        "pr": null
+      },
+      {
+        "what": "The pinned encoder retains upstream's leading-BOM root-string defect.",
+        "why": "The live upstream issue remains open and its proposed fix is not released.",
+        "fix": "Track upstream toon-format/toon PR #343, then qualify its eventual release and retain a value-preserving round-trip check: https://github.com/toon-format/toon/pull/343.",
+        "pr": "#343"
+      }
+    ],
+    "pending_fixes": [
+      "Upstream toon-format/toon PR #343 is open, draft and unmerged: https://github.com/toon-format/toon/pull/343. No local upgrade or automatic integration is implied."
+    ],
+    "assessment": "The current CLI pin and selective encode/decode workflow align with upstream, but the card's minimum-row and flat-only wording is more restrictive than upstream and its specific cutoff is UNVERIFIED. <scratch>/token-cards/cards/toon.json adapted_performance.exact_comparisons reports -44.8% for both the Claude subagent and Codex worker on the eligible table, while the nested catalog expands by +9.4% and compact JSON is retained. Those results support choosing by actual data shape, measured size and value-preserving recovery; they do not support applying TOON to every structured artifact."
+  },
+  "e2e_returned_results": {
+    "status": "pass",
+    "reason": "passed",
+    "run_utc": "2026-09-26T17:49:01.116Z",
+    "fidelity": {
+      "what": "exact artifact comparison predicate",
+      "result": "complete grand catalog, compact JSON baseline; native semantic roundtrip; verifier: agree, 3 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 5 30 toon --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 60 toon base.json --stats -o tool.toon",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 60 toon tool.toon --decode --strict -o recovered.json",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 60 toon malformed.toon --decode --strict",
+        "exit": null,
+        "returned": "passed (expected nonzero exit)"
+      },
+      {
+        "cmd": "timeout -k 5 60 toon malformed.toon --decode --strict -o partial.json",
+        "exit": null,
+        "returned": "passed (expected nonzero exit)"
+      },
+      {
+        "cmd": "timeout -k 5 60 toon malformed.toon --decode --no-strict",
+        "exit": null,
+        "returned": "passed (control accepted without strict)"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 19,
+    "records_shown": [
+      {
+        "id": "toon-00-version",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 30 toon --version",
+        "observation": "evidence_class: native execution (the upstream CLI's own return on this host)\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nreturned: 4.1.1\npin: manifests/stack.json toon version 4.1.1 at 803bc351 -> match\nexecutable (PATH lookup when the records were built, same host and PATH): $HOME/.local/share/codex-ecosystem/bin/toon -> $HOME/.local/share/codex-ecosystem/tools/toon-4.1.",
+        "attachments": 6
+      },
+      {
+        "id": "toon-01-baseline-jq",
+        "status": "passed",
+        "kind": "baseline preparation (native execution of jq; not a toon operation)",
+        "command": "timeout -k 5 60 jq -c .summary.needs_host[\"macos-arm64\"] ../../wt-rr/catalogs/landscape/component-evidence-matrix.json",
+        "observation": "evidence_class: native execution of jq (baseline preparation for the toon task; not a toon operation)\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\njq: jq-1.7\nstdout = base.json: toon/base.json (6553 B, sha256 7bb4fc20e7af6ceefed74c84e5010dbc7ef62f352bab4240df3d371bec586817)\nshape: 60 rows x keys catalog,component_id,e2e_state,layer_id\nprior baselines: identical to #343's (y",
+        "attachments": 3
+      },
+      {
+        "id": "toon-02-encode-stats",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 toon base.json --stats -o tool.toon",
+        "observation": "evidence_class: native execution\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nupstream counter (--stats, stderr, tokenx estimate): ✔ Encoded `base.json` → `tool.toon` | ● Token estimates: ~2001 (JSON) → ~964 (TOON) | ✔ Saved ~1037 tokens (-51.8%)\ncounter before: none (no persistent toon counter to read); counter after: the --stats lines above\noutput: toon/tool.toon (3248 B,",
+        "attachments": 3
+      },
+      {
+        "id": "toon-03-decode-strict",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 toon tool.toon --decode --strict -o recovered.json",
+        "observation": "evidence_class: native execution\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nstderr: ✔ Decoded `tool.toon` → `recovered.json`\noutput: toon/recovered.json (8354 B, sha256 a47a906a6adadcb622e73874525c66ffad3c6f3c4ecf4b66b96b7b9e333e5c01)",
+        "attachments": 3
+      },
+      {
+        "id": "toon-04-reject-truncated",
+        "status": "passed (expected nonzero exit)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 toon malformed.toon --decode --strict",
+        "observation": "evidence_class: native execution\nexit_code: 1\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nexpected: nonzero exit; observed: exit 1\nstderr: ✖ Failed to decode TOON at line 2: Expected 2 tabular rows, but got 1 / 2 |   alpha,1 / ^\ninput: toon/malformed.toon (32 B, sha256 a859214cb71f01b329421856a57a6076eb07a8805d9e410181e700fe72594886) = printf 'items[2]{name,count}:\\n  alpha,1\\n'\nstdout",
+        "attachments": 3
+      },
+      {
+        "id": "toon-05-reject-truncated-to-file",
+        "status": "passed (expected nonzero exit)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 toon malformed.toon --decode --strict -o partial.json",
+        "observation": "evidence_class: native execution\nexit_code: 1\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nexpected: nonzero exit; observed: exit 1\nstderr: ✖ Failed to decode TOON at line 2: Expected 2 tabular rows, but got 1 / 2 |   alpha,1 / ^\ninput: toon/malformed.toon (32 B, sha256 a859214cb71f01b329421856a57a6076eb07a8805d9e410181e700fe72594886) = printf 'items[2]{name,count}:\\n  alpha,1\\n'\noutput",
+        "attachments": 4
+      },
+      {
+        "id": "toon-06-lenient-control",
+        "status": "passed (control accepted without strict)",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 toon malformed.toon --decode --no-strict",
+        "observation": "evidence_class: native execution\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nstdout JSON: {\"items\":[{\"name\":\"alpha\",\"count\":1}]}\nreading: --no-strict accepts the same truncated table (1 of 2 declared rows), so records 04 and 05 are rejected by strict validation, not by a parse error",
+        "attachments": 2
+      },
+      {
+        "id": "toon-07-check-roundtrip",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 5 60 python3 check_roundtrip.py base.json recovered.json --rows 60",
+        "observation": "evidence_class: local_integration (our checker, not an upstream test)\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\ncriterion: scripts/native_token_ci.py verify_json_roundtrip at 803bc351 (sorted-key canonical JSON; bool vs int kept); controls that must be detected: one changed leaf (always) and a bool replaced by an int (only when the data holds a bool)\nverdict: PASS\nresult",
+        "attachments": 3
+      },
+      {
+        "id": "toon-08-compare-o200k",
+        "status": "passed",
+        "kind": "local integration check",
+        "command": "timeout -k 5 120 python3 ../../wt-rr/tools/token-report/token_manifest.py compare --config tr-config.json --tool toon --before base.json --after tool.toon --boundary toon 4.1.1, NativeStack WSL2, 2026-09-26: 60-row x 4-k",
+        "observation": "evidence_class: local_integration (token_manifest.py compare)\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\ncomparison_id: 0fc4c4348c535c64213435829062832be5d2e19f3f6439f1fc29e79358cf4db8\nencoding: o200k_base via gpt-tokenizer 3.4.0 (the reporter enforces the version and strict UTF-8)\nbaseline tokens: 1642 (6553 B, sha256 7bb4fc20e7af6ceefed74c84e5010dbc7ef62f352bab4240df3d3",
+        "attachments": 4
+      },
+      {
+        "id": "toon-09-stack-encode-stats",
+        "status": "passed",
+        "kind": "upstream native operation (native execution)",
+        "command": "timeout -k 5 60 toon ../../wt-rr/fixtures/records.json --stats -o stack/records.toon",
+        "observation": "evidence_class: native execution\nexit_code: 0\ncwd: $RR/toon (../../wt-rr is the read-only fixture $WT, detached 803bc351)\nupstream counter (--stats, stderr, tokenx estimate): ✔ Encoded `../../wt-rr/fixtures/records.json` → `stack/records.toon` | ● Token estimates: ~33 (JSON) → ~21 (TOON) | ✔ Saved ~12 tokens (-36.4%)\ncounter before: none (no persistent toon counter to read); counter after: the --stats lines above\nout",
+        "attachments": 3
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [
+      {
+        "lane": "claude_subagent",
+        "payload": "complete grand catalog, compact JSON baseline; native semantic roundtrip",
+        "before_tokens": 121472,
+        "after_tokens": 132861,
+        "change_pct": 9.4,
+        "encoding": "o200k_base",
+        "eligibility": "ineligible: nested, compact JSON kept",
+        "evidence_class": "exact artifact comparison",
+        "first_seen": "2026-09-26T21:34:26.962183+00:00",
+        "last_seen": "2026-09-26T22:54:19.679792+00:00"
+      },
+      {
+        "lane": "claude_subagent",
+        "payload": "60-row tabular JSON (compact) vs TOON; strict decode round trip exact (PASS)",
+        "before_tokens": 1642,
+        "after_tokens": 907,
+        "change_pct": -44.8,
+        "encoding": "o200k_base",
+        "eligibility": "eligible: uniform table",
+        "evidence_class": "exact artifact comparison",
+        "first_seen": "2026-09-25T21:07:56.255414+00:00",
+        "last_seen": "2026-09-25T21:07:56.255414+00:00"
+      },
+      {
+        "lane": "codex_worker",
+        "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's toon task; answer verified against the baseline (PASS)",
+        "before_tokens": 1642,
+        "after_tokens": 907,
+        "change_pct": -44.8,
+        "encoding": "o200k_base",
+        "eligibility": "eligible: uniform table",
+        "evidence_class": "exact artifact comparison",
+        "first_seen": "2026-09-26T13:51:53.255510+00:00",
+        "last_seen": "2026-09-26T13:51:53.255510+00:00"
+      }
+    ],
+    "native_counter": null,
+    "native_snapshot": [],
+    "shortfall_cause": "Behaves as upstream documents: -44.8% on a uniform 60-row table, +9.4% on the nested grand catalog (upstream's own benchmark: +5.6% vs compact JSON on nested data). Upstream's tabular form needs only non-empty arrays with uniform keys; our handbook's 5-record minimum is a local heuristic.",
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 0,
+        "cli_calls": 308,
+        "agents_using": 62,
+        "agents": 1010,
+        "pct_agents_using": 0.0614
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 0,
+        "agents_using": 0,
+        "agents": 22,
+        "pct_agents_using": 0.0
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 308,
+        "agents_using": 62,
+        "agents": 988,
+        "pct_agents_using": 0.0628
+      },
+      "agent_subagents": {
+        "mcp_calls": 0,
+        "cli_calls": 17,
+        "agents_using": 3,
+        "agents": 71,
+        "pct_agents_using": 0.0423
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 27,
+        "agents_using": 3,
+        "agents": 15,
+        "pct_agents_using": 0.2
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 0,
+        "cli_calls": 10,
+        "agents_using": 3,
+        "agents": 301,
+        "pct_agents_using": 0.01
+      }
+    },
+    "live_otel": null,
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "defects",
+    "findings": [
+      {
+        "severity": "medium",
+        "field": "adapted_performance.shortfall_cause",
+        "issue": "The final sentence, 'Use it only on uniform arrays of 5 or more flat records', presents an unsupported restriction after 'Behaves as upstream documents'. The pinned encoder has no five-row minimum for arrays and supports uniform nested columns and keyed tabular objects. The retained two-row fixture also reports a successful round trip and 29 -> 22 exact o200k tokens. The -44.8%, +9.4% and upstream +5.6% values themselves are correct.",
+        "fix": "Needs an ASSEMBLER-side correction to CAUSE['toon'] in <scratch>/html-report/render_page.py. Remove the unsupported minimum/flat-only rule or explicitly identify it as an unverified local heuristic; prefer measured comparison with compact JSON and value-preserving recovery. Do not try to change this field through toon.upstream.json.",
+        "source": "https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts#L5-L37; <scratch>/rr/returned-results.json (toon-11-stack-check, toon-12-stack-compare-o200k)"
+      },
+      {
+        "severity": "low",
+        "field": "upstream.new_since_pin[1].text",
+        "issue": "The statement that the unreleased CLI changes 'keep usage on stderr' is broader than the cited implementation. That commit deliberately writes explicitly requested --help/-h usage to stdout; only usage accompanying invalid-argument diagnostics goes to stderr.",
+        "fix": "In toon.upstream.json, qualify this to 'send usage accompanying invalid-argument errors to stderr, while requested help remains on stdout'. Keep the correct buffered-output and short-option-value changes.",
+        "source": "https://github.com/toon-format/toon/commit/55483e6f6a9add33a1b3d6652d3176ee4989f836"
+      }
+    ],
+    "checked": [
+      "Opened <scratch>/token-cards/cards/toon.json and <scratch>/token-cards/groups/g1-shell-output/toon.upstream.json directly. The card's upstream object equals the upstream.json object; native_adaptation differs only by the assembler-added stack_entry.",
+      "All six invoke_rates.populations entries equal the corresponding toon entries in <scratch>/token-cards/invoke_by_tool.json, including every count and the stored pct_agents_using value. native_adaptation makes no numerical invoke-rate claim.",
+      "Exact invoke population workflow_children: {\"mcp_calls\":0,\"cli_calls\":308,\"agents_using\":62,\"agents\":1010,\"pct_agents_using\":0.0614}",
+      "Exact invoke population workflow_children_with_lanes_block: {\"mcp_calls\":0,\"cli_calls\":0,\"agents_using\":0,\"agents\":22,\"pct_agents_using\":0}",
+      "Exact invoke population workflow_children_without_lanes_block: {\"mcp_calls\":0,\"cli_calls\":308,\"agents_using\":62,\"agents\":988,\"pct_agents_using\":0.0628}",
+      "Exact invoke population agent_subagents: {\"mcp_calls\":0,\"cli_calls\":17,\"agents_using\":3,\"agents\":71,\"pct_agents_using\":0.0423}",
+      "Exact invoke population main_sessions: {\"mcp_calls\":0,\"cli_calls\":27,\"agents_using\":3,\"agents\":15,\"pct_agents_using\":0.2}",
+      "Exact invoke population codex_exec_workers: {\"mcp_calls\":0,\"cli_calls\":10,\"agents_using\":3,\"agents\":301,\"pct_agents_using\":0.01}",
+      "Checked the separate exact artifact comparison, local integration, upstream estimate/native_snapshot and native_counter fixture-ledger classes. No amounts were added across classes; invoke frequency was not treated as compression or provider savings.",
+      "Historical <scratch>/wt-rr at commit 803bc351 is absent. Original-file byte/hash assertions requiring that checkout could not be reverified today. Existing retained attachments were checked; the missing historical checkout is not a defect.",
+      "Path-hygiene scan of toon.upstream.json found no literal personal home/scratch path, local username or session UUID. Review paths use ~ or <scratch>.",
+      "Fresh GitHub metadata confirmed v4.1.1 published 2026-08-05T11:49:55Z; npm @toon-format/cli latest is 4.1.1, published 2026-08-05T11:50:41.210Z. Fresh main resolves to f151a5d830d001bc244395b891183cba37e0d935, 11 commits ahead of v4.1.1.",
+      "Fresh benchmark text confirms TOON accuracy 72.2%, JSON accuracy 71.4%, 42.6% fewer tokens in that retrieval benchmark, o200k_base measurement via gpt-tokenizer, the two-space formatted-JSON primary baseline, and +5.6% versus compact JSON for nested e-commerce data.",
+      "Fresh format/encoder reads confirm keyed tabular objects require at least two entries, arrays have no five-row threshold, and uniform nested object columns are supported. The prompting guide's 2-5 rows are example-size advice rather than an eligibility rule.",
+      "Fresh packages/cli/src/conversion.ts confirms --stats uses tokenx estimateTokenCount for JSON text and TOON output. That estimate is distinct from the exact o200k artifact counts and is not a cumulative provider-savings counter.",
+      "Fresh issue #339 and PR #343 checks confirm the root U+FEFF string round-trip defect is reported on published 4.1.1/main and the proposed fix remains open, draft and unmerged.",
+      "Fresh CLI and prompting docs support explicit encode/decode use and strict validation. The ecosystem page identifies Tooner as a separate MCP proxy; no first-party native Claude/Codex interception is established by installing this CLI.",
+      "Fresh comparison and commit reads confirm unreleased CLI/dependency/documentation changes, no changes under packages/toon/src, migration to utilful/cli, removal of ansis, utilful 3.3.0 and its release-age exemption. The usage-stream qualification is the upstream wording defect listed above.",
+      "Read the pinned manifest, installation recipe, handbook and client templates: TOON 4.1.1 is an on-demand CLI, with compact-JSON fallback and semantic recovery checks.",
+      "records_total=19 and all ten displayed record projections match the assembler's retained-record selection. Validated 56 attachment references covering 55 distinct files against recorded sizes and SHA-256 values.",
+      "Read <scratch>/rr/toon/base.json, tool.toon, recovered.json and the encode/decode/check/comparison records. Fresh gpt-tokenizer 3.4.0 o200k_base counts reproduced 1642 -> 907. The 60-row baseline and recovered JSON are equal under canonical JSON comparison. Kept the separate --stats estimate ~2001 -> ~964 apart from this exact pair.",
+      "Read <scratch>/rr/toon/catalog/catalog.compact.json, catalog.toon and toon-16/toon-17 records. A fresh recount reproduced 121472 -> 132861. The recorded +9.4% expansion is distinct from the --stats estimate that reports a reduction; the assessment correctly follows the exact counts and retains compact JSON.",
+      "native_adaptation.assessment copies -44.8% for both table lanes and +9.4% for the catalog exactly. Its data-shape and recovery qualifications follow the evidence. native_counter is null, native_snapshot is empty and prior_evidence matches savings.json.",
+      "The original two-row fixture and original catalog source under <scratch>/wt-rr cannot be rehashed today; retained outputs and recorded checks remain available. No finding is based on that checkout's absence.",
+      "Freshly fetched every cited upstream URL below without cache reuse; supplemented code/diff pages with their raw source and patch views.",
+      "https://api.github.com/repos/toon-format/toon/releases/latest",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/34c56340e636ad3d3daeb8482d48d1d8f0b135ae/manifests/stack.json",
+      "https://github.com/toon-format/toon/blob/v4.1.1/docs/ecosystem/tools-and-playgrounds.md",
+      "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/benchmarks.md",
+      "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/format-overview.md",
+      "https://github.com/toon-format/toon/blob/v4.1.1/docs/guide/llm-prompts.md",
+      "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md",
+      "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/src/conversion.ts",
+      "https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/README.md",
+      "https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts",
+      "https://github.com/toon-format/toon/commit/55483e6f6a9add33a1b3d6652d3176ee4989f836",
+      "https://github.com/toon-format/toon/compare/v4.1.1...f151a5d830d001bc244395b891183cba37e0d935",
+      "https://github.com/toon-format/toon/issues/339",
+      "https://github.com/toon-format/toon/pull/343",
+      "https://registry.npmjs.org/@toon-format%2Fcli",
+      "https://github.com/toon-format/toon",
+      "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+    ],
+    "resolutions": [
+      {
+        "field": "upstream.new_since_pin[1].text",
+        "action": "edited",
+        "summary": "narrowed the stderr claim to invalid-argument usage only"
+      }
+    ],
+    "final_verdict": {
+      "tool": "toon",
+      "verdict": "adapted-with-gaps",
+      "summary": "Installed TOON 4.1.1 is current and the selective CLI conversion with compact-JSON fallback matches upstream practice, but strict decoding alone does not guarantee value preservation (https://github.com/toon-format/toon/releases/tag/v4.1.1; https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md). The eligible 60-row uniform-table comparisons are 1642→907 o200k_base tokens (44.8%) in both Claude and Codex, whereas the nested catalog is 121472→132861 (+9.4%) and is ineligible as a saving, so compact JSON should be retained (../html-report/savings.json#report_comparisons). A separate two-row comparison saves 29→22 (24.1%), refuting an upstream five-row minimum, while a fresh installed-version check strictly decodes a BOM-prefixed string into a boolean (../rr/toon/out/12-stack-compare-o200k.sanitized.stdout; groups/verdict-evidence.json#toon_bom_check). The retained scan labels 62/1010 Ultracode workflow children (6.14%, 308 CLI matches), 3/301 eligible Codex workers (1.00%, 10 CLI matches), and 0/22 workflow_children_with_lanes_block as users; it does not count suitable conversion opportunities (invoke_by_tool.json). Next, replace the unqualified size heuristic with measured compact-JSON comparison and semantic round-trip checks, including the BOM case, before expanding use.",
+      "gaps": [
+        {
+          "gap": "The five-record cutoff is a local heuristic with no established upstream requirement or measured optimal threshold.",
+          "evidence": "cards/toon.json#adapted_performance/shortfall_cause; https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts; ../rr/toon/out/11-stack-check.stdout",
+          "action": "Choose by actual encoded size and value-preserving recovery; stop presenting the cutoff or flat-only restriction as upstream eligibility.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The installed CLI can accept a strict decode that changes a BOM-prefixed root string into a different JSON type.",
+          "evidence": "groups/verdict-evidence.json#toon_bom_check; https://github.com/toon-format/toon/issues/339",
+          "action": "Keep the original JSON unless semantic equality passes; add this case to local qualification and reassess a future upstream release without filing a new upstream report.",
+          "owner_pr": null
+        },
+        {
+          "gap": "Command-text matches are sparse and do not establish successful or opportunity-normalized conversion use.",
+          "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+          "action": "Measure successful size-positive conversions on suitable artifacts, preserving zero use in the lane-block subset rather than inferring adoption from instructions.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Latest stable and the installed CLI are 4.1.1.",
+          "evidence": "https://api.github.com/repos/toon-format/toon/releases/latest; https://github.com/toon-format/toon/releases/tag/v4.1.1; groups/verdict-evidence.json",
+          "result": "holds"
+        },
+        {
+          "claim": "The table fixtures reduce 1642→907 tokens in both lanes with recorded semantic round-trip acceptance.",
+          "evidence": "../html-report/savings.json#report_comparisons; groups/verdict-evidence.json#historical_comparison_recount",
+          "result": "holds"
+        },
+        {
+          "claim": "The latest retained nested-catalog comparison expands 121472→132861 tokens; it is not eligible as a saving.",
+          "evidence": "../html-report/savings.json#report_comparisons; groups/verdict-evidence.json#historical_comparison_recount",
+          "result": "holds"
+        },
+        {
+          "claim": "Upstream tabular eligibility requires at least five flat records.",
+          "evidence": "https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts; ../rr/toon/out/11-stack-check.stdout; ../rr/toon/out/12-stack-compare-o200k.sanitized.stdout",
+          "result": "does-not-hold"
+        },
+        {
+          "claim": "Strict decode by itself proves semantic equality for all accepted inputs.",
+          "evidence": "groups/verdict-evidence.json#toon_bom_check; https://github.com/toon-format/toon/issues/339",
+          "result": "does-not-hold"
+        },
+        {
+          "claim": "CLI --stats is an estimate and is separate from the retained exact o200k_base comparisons.",
+          "evidence": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md; ../rr/toon/out/12-stack-compare-o200k.sanitized.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "The review resolution narrows the stderr claim to invalid-argument usage; requested help remains a separate case.",
+          "evidence": "groups/g1-shell-output/toon.review.json#resolutions; groups/g1-shell-output/toon.upstream.json",
+          "result": "holds"
+        },
+        {
+          "claim": "Scan-labelled use is 62/1010 workflow children, 3/301 eligible Codex workers and 0/22 lane-block children.",
+          "evidence": "invoke_by_tool.json; groups/verdict-evidence.json#invoke_check",
+          "result": "holds"
+        },
+        {
+          "claim": "These selected artifacts establish whole-session or provider-token savings.",
+          "evidence": "../rr/toon/out/12-stack-compare-o200k.sanitized.stdout; cards/toon.json#invoke_rates/arm_b_native",
+          "result": "unverified"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "qmd",
+        "gpt-tokenizer",
+        "toon"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "09c02532efae",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 37
+        },
+        "shell_commands": 7,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-a.err",
+        "session_id_sha": "d0e7ab34063f",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 47,
+          "qmd": 3
+        },
+        "shell_commands": 1,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "c915835e924b",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 37,
+          "ai-memory": 1,
+          "serena": 2,
+          "socraticode": 1
+        },
+        "shell_commands": 11,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "#296 and #343: 1,642->907 (44.8%) on the same 60-row table, exact strict round trip. Full-catalog counterexample: compact JSON 59,792 vs TOON 66,815 (JSON wins). #338 CI: encode, strict decode and tr…"
+}

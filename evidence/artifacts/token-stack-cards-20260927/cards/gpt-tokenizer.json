@@ -1,0 +1,515 @@
+{
+  "tool": "gpt-tokenizer",
+  "group": "g1-shell-output",
+  "repo": "https://github.com/niieani/gpt-tokenizer",
+  "pin": "3.4.0 (npm; token_manifest.py refuses any other version)",
+  "installed_version": "3.4.0 (`npm ls --prefix ~/.local/share/native-token-report/tokenizer --depth=0 --json`; module cjs/encoding/o200k_base.js present)",
+  "role": "Measurement tool, not a reducer: gives the exact o200k_base counts behind every with/without comparison, through `token_manifest.py compare` (node -e, fatal UTF-8). Lane: local integration used by all lanes.",
+  "lanes": [
+    "Node library called by tools/token-report/token_manifest.py compare (tokenizer_module)"
+  ],
+  "upstream": {
+    "latest_release": "4.0.0",
+    "latest_date": "2026-08-16",
+    "our_pin": "3.4.0, enforced in code rather than manifests/stack.json (https://github.com/seathatflowsinourveins/native-agent-stack/blob/34c56340e636ad3d3daeb8482d48d1d8f0b135ae/tools/token-report/token_manifest.py#L159-L165)",
+    "behind_by": "One published major release behind. Live GitHub releases/tags and npm metadata still identify 4.0.0 as latest, with no later published version found on 2026-09-26; the 3.4.0...4.0.0 comparison is 14 commits ahead. Sources: https://api.github.com/repos/niieani/gpt-tokenizer/releases/latest ; https://registry.npmjs.org/gpt-tokenizer ; https://github.com/niieani/gpt-tokenizer/compare/3.4.0...4.0.0",
+    "recommended_install": {
+      "command": "npm install gpt-tokenizer@4.0.0",
+      "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#installation"
+    },
+    "recommended_wiring": {
+      "claude_code": {
+        "how": "Import the JavaScript/TypeScript library in a measurement helper and explicitly invoke that helper when counts are needed. The checked upstream package/README has no Claude Code hook, plugin, proxy or MCP registration recipe; applying an ordinary helper to Claude main sessions or subagents is local integration.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#usage"
+      },
+      "codex": {
+        "how": "Use an explicit measurement helper in the worker environment; there is no upstream Codex CLI registration or automatic interception. Codex names in the model catalog describe tokenizer metadata, not an agent integration or model routing configuration.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#supported-models-and-their-encodings"
+      }
+    },
+    "official_baseline_claims": [
+      {
+        "claim": "Live GitHub metadata identifies latest_release 4.0.0 and publication 2026-08-16T02:29:41Z, establishing latest_date 2026-08-16. The tag is 4.0.0, without a v prefix.",
+        "url": "https://api.github.com/repos/niieani/gpt-tokenizer/releases/latest"
+      },
+      {
+        "claim": "npm dist-tags.latest is 4.0.0, published 2026-08-16T02:34:51.039Z; the only published version after 3.4.0 in the live registry metadata is 4.0.0.",
+        "url": "https://registry.npmjs.org/gpt-tokenizer"
+      },
+      {
+        "claim": "Upstream exposes a pure JavaScript BPE encoder/decoder, token-count and token-limit APIs, chat accounting helpers and model cost estimates; its default encoding is o200k_base. These are measurement/encoding functions, not automatic prompt reduction.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#usage"
+      },
+      {
+        "claim": "Upstream calls itself the fastest tokenizer on npm and links its own encoding/decoding, initialization and memory benchmarks. That is a library-runtime performance claim, not evidence of fewer provider tokens in this adaptation.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#benchmarks"
+      }
+    ],
+    "limitations": [
+      {
+        "text": "No CLI executable is shipped: package.json at tag 4.0.0 has no bin field and provides ESM/CommonJS exports. The published npm manifest also has no bin (https://registry.npmjs.org/gpt-tokenizer/4.0.0). A consumer running node -e is invoking the library, not a gpt-tokenizer subprocess binary.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/package.json"
+      },
+      {
+        "text": "The tagged source package.json uses the release-build placeholder version 0.0.0; use GitHub release/tag and published npm metadata for release identity rather than treating that placeholder as the installed version.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/package.json"
+      },
+      {
+        "text": "Text encoding is not a complete model request or billing meter. Upstream distinguishes encode/countTokens from model-aware chat accounting and cost estimation; model metadata or an encoding choice does not verify Claude or Codex provider usage.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#api"
+      },
+      {
+        "text": "Special tokens are disallowed by default and may make encoding throw unless the caller explicitly chooses a handling policy. The documented local LRU merge cache accelerates tokenization; it is not provider prompt caching.",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#special-tokens"
+      },
+      {
+        "text": "Image-token accounting remains an open upstream issue; ordinary text-artifact counts should not be represented as complete multimodal request accounting.",
+        "url": "https://github.com/niieani/gpt-tokenizer/issues/41"
+      },
+      {
+        "text": "The major update removes UMD bundles and the unpkg global entry point. ESM/CommonJS remain available, but consumer import/build compatibility still needs qualification.",
+        "url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0"
+      }
+    ],
+    "new_since_pin": [
+      {
+        "text": "4.0.0 migrates the build to Vite+ and removes UMD/unpkg globals; these are packaging changes, not a token-saving algorithm.",
+        "url": "https://github.com/niieani/gpt-tokenizer/commit/158658082a35a7b73163c0dd60a4e1b170c04740"
+      },
+      {
+        "text": "Model catalog maintenance is automated and GPT-5-nano pricing data is added.",
+        "url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0"
+      },
+      {
+        "text": "GPT-2 tokenizer support is added and Harmony submodule metadata is restored.",
+        "url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0"
+      },
+      {
+        "text": "Build output omits BPE-rank source maps.",
+        "url": "https://github.com/niieani/gpt-tokenizer/commit/fb04ebca53f662200e737caefe9a5ef372a5e41a"
+      },
+      {
+        "text": "A fresh byte comparison found identical tagged data/o200k_base.tiktoken files in 3.4.0 and 4.0.0. This supports vocabulary continuity, not proof of complete runtime parity or a reason to skip qualification. Previous source: https://github.com/niieani/gpt-tokenizer/blob/3.4.0/data/o200k_base.tiktoken",
+        "url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/data/o200k_base.tiktoken"
+      }
+    ]
+  },
+  "native_adaptation": {
+    "stack_entry": {},
+    "how_we_install": "There is no gpt-tokenizer entry in ~/code/native-agent-stack/manifests/stack.json. tools/token-report/README.md:203-210 installs npm gpt-tokenizer@3.4.0 under \"$REPORT_TOOLS/tokenizer\" and configures its cjs/encoding/o200k_base.js module; README.md:260 also documents the isolated 3.4.0 install. tools/token-report/token_manifest.py:159-165 enforces pkg.version === '3.4.0' inside count_files and invokes the configured Node executable with -e, importing the library and strictly decoding UTF-8 before encode(...).length. Additional direct callers also enforce 3.4.0: scripts/recount-tokens.cjs:12-15 and blueprints/us-equities/research-runtime/measure_packet.cjs:11-14.",
+    "claude_wiring": "Use python3 tools/token-report/token_manifest.py compare through the shell for retained artifact pairs, or the separately documented recount helper where applicable. adoption/templates/claude.settings.template.json has no tokenizer hook or direct tokenizer registration. The library is an explicit local measurement dependency available to any instructed lane; installing it does not intercept Claude requests.",
+    "codex_wiring": "The shared report helper uses Node -e and the configured module path; no gpt-tokenizer executable is spawned. adoption/templates/codex.config.template.toml and repo .codex/config.toml contain no tokenizer entry. docs/token-session-handbook.md has no per-tool row naming gpt-tokenizer and no occurrence of that name; it points to tools/token-report/ generically, including the report workflow at line 220. Its implementation and install contract are in tools/token-report/token_manifest.py and tools/token-report/README.md.",
+    "lane_rule": "Measurement lane across clients: retain identical source bytes and hashes, name the tokenizer/version/encoding, and keep selected-artifact counts separate from native estimates, provider usage and semantic acceptance (docs/token-session-handbook.md:115; tools/token-report/README.md:201-225). compare_artifacts at tools/token-report/token_manifest.py:647-669 retains complete inputs, permits negative savings, leaves provider_tokens_saved null and explicitly does not infer semantic equivalence. Do not stack a compression step into the tokenizer's accounting claim.",
+    "deviations_from_upstream": [
+      {
+        "what": "The helper deliberately remains pinned to 3.4.0 while latest stable is 4.0.0.",
+        "why": "The published evidence uses a fixed o200k_base counter, and count_files rejects another package version. The new release changes packaging and catalog support without demonstrating token reduction for this use.",
+        "fix": "Qualify 4.0.0 against the actual Python-to-Node path, frozen artifact bytes, error behavior and both direct JavaScript callers before changing pins; update install instructions and provenance together. This is an upgrade recommendation, not a verified in-flight PR.",
+        "pr": null
+      },
+      {
+        "what": "The claim that token_manifest.py is the only repository caller is false.",
+        "why": "scripts/recount-tokens.cjs and blueprints/us-equities/research-runtime/measure_packet.cjs directly require the library and enforce the same version. token_manifest.py is the shared report caller, but not the exclusive call site.",
+        "fix": "Describe the shared reporting path separately from the direct recount and packet-measurement helpers; include all of them when qualifying an upgrade.",
+        "pr": null
+      },
+      {
+        "what": "The dependency is code-pinned and documented under token-report rather than being a standalone manifest component or handbook table row.",
+        "why": "It supplies measurement to other tools instead of a separately activated agent context-reduction lane.",
+        "fix": "Keep references explicit in the report's install and measurement documentation; do not imply that the handbook or native client templates install a tokenizer CLI.",
+        "pr": null
+      },
+      {
+        "what": "The evidence card does not establish full local acceptance.",
+        "why": "<scratch>/token-cards/cards/gpt-tokenizer.json marks the returned-results evaluation partial with independent verifier disagreement. Its exact-comparison collection and native savings counter do not establish a reduction attributable to the tokenizer itself.",
+        "fix": "Resolve the retained check/claim disagreement before claiming full acceptance; distinguish an evidence-check defect from a demonstrated upstream tokenization defect. No specific fix PR was verified.",
+        "pr": null
+      }
+    ],
+    "pending_fixes": [
+      "UNVERIFIED: no specific local upgrade or verifier-resolution PR is established by the supplied records. Qualifying 4.0.0 and resolving the card's verifier disagreement are recommendations, not confirmed fixes in flight."
+    ],
+    "assessment": "The adaptation uses the library appropriately as a fixed o200k_base measurement dependency, although its 3.4.0 pin is behind upstream 4.0.0. <scratch>/token-cards/cards/gpt-tokenizer.json contains no exact reduction comparison or native savings counter for the tokenizer itself, so it supports an accounting role rather than a token-savings claim. The card records partial acceptance and 'verifier: disagree, 3 defects'; that limits confidence in the local check or claim and does not establish an upstream tokenizer failure. Upgrading requires compatibility qualification and does not by itself promise better adapted savings."
+  },
+  "e2e_returned_results": {
+    "status": "partial",
+    "reason": "partial",
+    "run_utc": "2026-09-26T17:44:42.826Z",
+    "fidelity": {
+      "what": "independent verifier agreement",
+      "result": "verifier: disagree, 3 defects"
+    },
+    "upstream_commands": [
+      {
+        "cmd": "timeout -k 5 120 python3 <scratch>/tools/token-report/token_manifest.py compare --config <scratch>/rr/context-hub/config.json --tool context-hub --before <scratch>/rr/context-hub/private/work/base.html --after <scratch>/rr/context-hub/private/work/tool.md --boundary Same task on wt-rr 803bc351: fetch current FastAPI documentation for the fixture's pinned FastAPI (manifests/stack.json fastapi 0.141.1) and confirm one version-specific fact against its source. Baseline: the complete raw HTML of the page the doc cites, https://fastapi.tiangolo.com/release-notes/ (curl -sS -L, HTTP 200, 1,537,147 B, sha256 a6d4fdaf4960151cd76ff5522beaa507a0e94646cc8151c2bdf32216309a5fb4, scripts included). Candidate: the complete output of context-hub 0.1.4 CLI 'chub get fastapi/package --lang py -o tool.md' (12,514 B, sha256 383ff6ced76ee38ddb0e8dad86e6d0710b1f54c4cf867953aba67d5703198a9f; doc version 0.136.3, registry updated-on 2026-05-29). Quality check (local_integration check.py, fact preregistered in fact.json before the baseline was fetched): the tokens 0.132.0 and strict_content_type occur verbatim in both files and strict_content_type sits inside the upstream '0.132.0 (2026-02-23)' section: PASS; the control section 0.129.0 lacks it. Retained gap: the candidate covers 0.136.3 and none of the 25 upstream releases 0.137.0 to 0.141.1, including the pin, which the baseline covers. o200k_base artifact counts only; not provider billing, causal savings or semantic equivalence.",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 120 python3 <scratch>/tools/token-report/token_manifest.py compare --config <scratch>/rr/context-hub/config.json --tool context-hub --before <scratch>/rr/context-hub/private/work/base.html --after <scratch>/rr/context-hub/private/raw/13-mcp-chub-get-text.stdout --boundary Same task and baseline as the CLI comparison on wt-rr 803bc351: the complete raw HTML of https://fastapi.tiangolo.com/release-notes/ (1,537,147 B, sha256 a6d4fdaf4960151cd76ff5522beaa507a0e94646cc8151c2bdf32216309a5fb4, scripts included). Candidate: the complete text returned by the context-hub 0.1.4 MCP server (chub-mcp, own empty CHUB_DIR) for tool chub_get {id: fastapi/package, lang: py} through mcporter 0.14.1 'call --output text' (12,515 B, sha256 189ca6a35695d53d3f32e020daa3b086db9b6add39b29f194e0f4c6b1f5d5f50). Quality check (local_integration check_mcp.py): the MCP content[0].text (from --output json) is byte-identical to the CLI tool.md, the text rendering adds one trailing newline, and the preregistered 0.132.0 strict_content_type fact line is present: PASS. The same version gap applies (doc 0.136.3; pin 0.141.1 absent). The MCP tool definitions a client loads (mcporter list --schema) are not counted here. o200k_base artifact counts only; not provider billing, causal savings or semantic equivalence.",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 180 node --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 180 npm ls --prefix ~/.local/share/native-token-report/tokenizer --depth=0 --json",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 180 repomix --version",
+        "exit": null,
+        "returned": "passed"
+      },
+      {
+        "cmd": "timeout -k 5 180 repomix <scratch> --config <scratch>/rr/gpt-tokenizer/empty.json --include scripts/host_requests.py,scripts/credential_status.py,tools/token-report/token_manifest.py,docs/token-practice.md,evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/6-alertmanager-ntfy-latency.json,evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/round1/wong2-interactive-list.json,blueprints/gap-resolution-20260922/restic-filesystem-semantics/fixture.py,blueprints/convergence-practice/wsl-restore/fixture.py,blueprints/convergence-practice/application-delivery/app/page.tsx,blueprints/convergence-practice/application-delivery/verification.txt,blueprints/gap-wave2-20260923/us-equities__agents-models-workers/fomc/fetch_log.tsv,evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt --style xml --token-count-encoding o200k_base --top-files-len 20 --no-file-summary --no-directory-structure --parsable-style --output <scratch>/rr/gpt-tokenizer/inputs/pack.xml",
+        "exit": null,
+        "returned": "passed"
+      }
+    ],
+    "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+    "records_total": 65,
+    "records_shown": [
+      {
+        "id": "rtk-L02-compare-primary",
+        "status": "passed",
+        "kind": "local integration check (local_integration)",
+        "command": "timeout -k 5 300 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/rtk/token-report/config.json --tool rtk --before $RR/rtk/private/base.txt --after $RR/rtk/private/tool.txt --boundary 4 read-only com",
+        "observation": "{\"class\": \"local_integration\", \"exit\": 0, \"stdout_raw\": {\"bytes\": 1004, \"sha256\": \"5d8e4176e68dadbb3d4f5c65ed30ded73abe289f86afee9d569b032aed8aa44d\"}, \"stderr\": \"empty\", \"result\": {\"comparison_id\": \"bb7c8884cc8bf10a629a33372f74878cde6dde21a0137e07a4eba1d9c9676fff\", \"inputs\": {\"before\": {\"stdout_of\": [\"rtk-03-base-git-log\", \"rtk-04-base-git-status\", \"rtk-05-base-grep\", \"rtk-06-base-ls\"], \"raw_sha256\": \"2c65945b3c75379",
+        "attachments": 1
+      },
+      {
+        "id": "rtk-L03-compare-supplementary",
+        "status": "passed",
+        "kind": "local integration check (local_integration)",
+        "command": "timeout -k 5 300 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/rtk/token-report/config.json --tool rtk --before $RR/rtk/private/supp-base.txt --after $RR/rtk/private/supp-tool.txt --boundary 2 rea",
+        "observation": "{\"class\": \"local_integration\", \"exit\": 0, \"stdout_raw\": {\"bytes\": 1003, \"sha256\": \"13ff547137ab61df33cbfd1a5fffe245dce33afa350040ffe03b04320e763d11\"}, \"stderr\": \"empty\", \"result\": {\"comparison_id\": \"2bfdd0a0d1ff1260a81f7833b482147634560e193c059da85cebbac88cdff6f5\", \"inputs\": {\"before\": {\"stdout_of\": [\"rtk-s02-base-git-log\", \"rtk-s03-base-grep\"], \"raw_sha256\": \"5f8e396ca78dba11b2f739bafeadc4c14c88a1b5b17c1b1f13dc53197",
+        "attachments": 1
+      },
+      {
+        "id": "rtk-L05-count",
+        "status": "passed",
+        "kind": "local integration check (local_integration)",
+        "command": "timeout -k 5 300 python3 $RR/rtk/count_tokens.py",
+        "observation": "{\"class\": \"local_integration\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"primary_per_command_raw_total_tokens\": 102072, \"primary_recall_raw_total_tokens\": 1062, \"supplementary_per_command_raw_total_tokens\": 51652, \"supplementary_recall_raw_total_tokens\": 11809, \"published_sanitized_pairs_total_tokens\": 153628}}",
+        "attachments": 2
+      },
+      {
+        "id": "headroom-e2e-13-compare-compressed",
+        "status": "measured: 181,298 -> 13,827 o200k tokens (167,471 removed, 92.4%)",
+        "kind": "exact artifact comparison (local_integration, o200k_base via gpt-tokenizer 3.4.0)",
+        "command": "timeout -k 5 120 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/headroom/tr-config.json --tool headroom --before $RR/headroom/base.txt --after $RR/headroom/tool.txt --boundary Same task on this hos",
+        "observation": "{\n  \"evidence_class\": \"local_integration (this repository's script over native returned outputs)\",\n  \"exit_code\": 0,\n  \"comparison_id\": \"911ddb92615ed87c604e037252561d997f58955d193745e73d4a4d80bec68007\",\n  \"baseline\": {\n    \"bytes\": 672368,\n    \"sha256\": \"c7c88ebe5c190327aafb70304bd47c49f3d4c029de88a26a50470b5b9b0f8abf\",\n    \"tokens\": 181298\n  },\n  \"candidate\": {\n    \"bytes\": 52256,\n    \"sha256\": \"967c186b40bb3db8892",
+        "attachments": 2
+      },
+      {
+        "id": "headroom-e2e-14-compare-recovery",
+        "status": "measured: 181,298 -> 195,125 o200k tokens (-13,827 removed, -7.6%)",
+        "kind": "exact artifact comparison (local_integration, o200k_base via gpt-tokenizer 3.4.0)",
+        "command": "timeout -k 5 120 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/headroom/tr-config.json --tool headroom --before $RR/headroom/base.txt --after $RR/headroom/recovered.txt --boundary Recovery cost fo",
+        "observation": "{\n  \"evidence_class\": \"local_integration (this repository's script over native returned outputs)\",\n  \"exit_code\": 0,\n  \"comparison_id\": \"e75cd436eea6a072b8ab6201f802d7a917e5472789b1504ea137e0a6b1bbc310\",\n  \"baseline\": {\n    \"bytes\": 672368,\n    \"sha256\": \"c7c88ebe5c190327aafb70304bd47c49f3d4c029de88a26a50470b5b9b0f8abf\",\n    \"tokens\": 181298\n  },\n  \"candidate\": {\n    \"bytes\": 724625,\n    \"sha256\": \"0cc5a648bec6f8ef67",
+        "attachments": 2
+      },
+      {
+        "id": "headroom-e2e-15-compare-envelope",
+        "status": "measured: 181,298 -> 14,906 o200k tokens (166,392 removed, 91.8%)",
+        "kind": "exact artifact comparison (local_integration, o200k_base via gpt-tokenizer 3.4.0)",
+        "command": "timeout -k 5 120 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/headroom/tr-config.json --tool headroom --before $RR/headroom/base.txt --after $RR/headroom/private/raw/06-compress.stdout --boundary",
+        "observation": "{\n  \"evidence_class\": \"local_integration (this repository's script over native returned outputs)\",\n  \"exit_code\": 0,\n  \"comparison_id\": \"a9dfc2095eb2b738531b36c8015b64b2113a071235f8e03d644495c2f566e185\",\n  \"baseline\": {\n    \"bytes\": 672368,\n    \"sha256\": \"c7c88ebe5c190327aafb70304bd47c49f3d4c029de88a26a50470b5b9b0f8abf\",\n    \"tokens\": 181298\n  },\n  \"candidate\": {\n    \"bytes\": 53809,\n    \"sha256\": \"9d3e1adcfa6dafc59ff",
+        "attachments": 2
+      },
+      {
+        "id": "headroom-e2e-16-counter-reconciliation",
+        "status": "passed: isolated ledger delta 167,471 = exact o200k tokens removed 167,471",
+        "kind": "local_integration check (counter vs exact count)",
+        "command": "timeout -k 5 30 python3 $RR/headroom/reconcile.py",
+        "observation": "{\n  \"evidence_class\": \"local_integration (this repository's script over native returned outputs)\",\n  \"exit_code\": 0,\n  \"upstream_returned\": {\n    \"original_tokens\": 181305,\n    \"compressed_tokens\": 13834,\n    \"tokens_saved\": 167471,\n    \"savings_percent\": 92.4\n  },\n  \"upstream_ledger_delta\": {\n    \"tokens_saved\": 167471,\n    \"tokens_before\": 181305,\n    \"calls\": 1\n  },\n  \"exact_o200k\": {\n    \"compressed\": {\n      \"co",
+        "attachments": 2
+      },
+      {
+        "id": "repomix-16-compare-cli",
+        "status": "passed",
+        "kind": "local_integration exact artifact comparison",
+        "command": "timeout -k 5 180 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/repomix/token-report/config.json --tool repomix --before $RR/repomix/base.xml --after $RR/repomix/tool.xml --boundary Same task on fi",
+        "observation": "Evidence class: local_integration (tools/token-report/token_manifest.py compare, gpt-tokenizer 3.4.0, o200k_base, scratch config with its own state dir). CLI base.xml -> tool.xml: 23,638 -> 10,565 tokens, tokens_removed 13,073 (55.3%), provider_tokens_saved null, comparison_id 417bbe172348ccd1e9e0208ca03c8367250c51dde45a1478dde090f64920dad6. Upstream counter 23,638 -> 10,565 from repomix's printed Total Tokens: ident",
+        "attachments": 3
+      },
+      {
+        "id": "repomix-17-compare-mcp",
+        "status": "passed",
+        "kind": "local_integration exact artifact comparison",
+        "command": "timeout -k 5 180 python3 $WT/tools/token-report/token_manifest.py compare --config $RR/repomix/token-report/config.json --tool repomix --before $RR/repomix/mcp/base.txt --after $RR/repomix/mcp/tool.txt --boundary Same ta",
+        "observation": "Evidence class: local_integration (tools/token-report/token_manifest.py compare, gpt-tokenizer 3.4.0, o200k_base, scratch config with its own state dir). MCP before text -> after text: 18,641 -> 8,981 tokens, tokens_removed 9,660 (51.8%), provider_tokens_saved null, comparison_id f7e5234d4060b73c36a80f43a366a012e28690564ecefa9e2883a02ff3b48e4c. Upstream counter 18,641 -> 8,981 from pack_codebase metrics.totalTokens, ",
+        "attachments": 2
+      },
+      {
+        "id": "qmd-compare-A-get-whole",
+        "status": "measured",
+        "kind": "local_integration: exact o200k_base comparison",
+        "command": "python3 $SCRATCH/wt-rr/tools/token-report/token_manifest.py compare --config $SCRATCH/rr/qmd/token-report/config.json --tool qmd --before $SCRATCH/rr/qmd/base.txt --after $SCRATCH/rr/qmd/tool-A.txt --boundary qmd 2.8.3 C",
+        "observation": "Exit 0. o200k_base via gpt-tokenizer 3.4.0: before 4,373 tokens (19,209 bytes) -> after 4,388 tokens (19,252 bytes); tokens_removed -15 (-0.3% of the baseline; negative means expansion). comparison_id 2243e7e1ad391548edb957c4147d2bca7f587626ee50ee391da08b5535217bc6. Retrieval alone, the whole document: qmd adds its 43-byte header, so it saves nothing here. Sanitized: 27-compare-A.stdout raw (private, qmd/private/raw)",
+        "attachments": 4
+      }
+    ]
+  },
+  "adapted_performance": {
+    "exact_comparisons": [],
+    "native_counter": null,
+    "native_snapshot": [],
+    "shortfall_cause": "The verifier disagreed with our check: a defect in our check or claim, not a savings failure.",
+    "q3_fixture": null
+  },
+  "invoke_rates": {
+    "window": {
+      "now": "2026-09-26T23:37:28Z",
+      "last_36h_start": "2026-09-25T11:37:28Z",
+      "baseline_since": "2026-09-25T17:18:00Z",
+      "baseline_until": "2026-09-26T15:05:00Z",
+      "otel_name_only_start": "2026-09-26T22:46:00Z",
+      "otel_tool_details_start": "2026-09-26T22:50:00Z"
+    },
+    "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+    "populations": {
+      "workflow_children": {
+        "mcp_calls": 0,
+        "cli_calls": 189,
+        "agents_using": 45,
+        "agents": 1010,
+        "pct_agents_using": 0.0446
+      },
+      "workflow_children_with_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 0,
+        "agents_using": 0,
+        "agents": 22,
+        "pct_agents_using": 0.0
+      },
+      "workflow_children_without_lanes_block": {
+        "mcp_calls": 0,
+        "cli_calls": 189,
+        "agents_using": 45,
+        "agents": 988,
+        "pct_agents_using": 0.0455
+      },
+      "agent_subagents": {
+        "mcp_calls": 0,
+        "cli_calls": 1,
+        "agents_using": 1,
+        "agents": 71,
+        "pct_agents_using": 0.0141
+      },
+      "main_sessions": {
+        "mcp_calls": 0,
+        "cli_calls": 8,
+        "agents_using": 2,
+        "agents": 15,
+        "pct_agents_using": 0.1333
+      },
+      "codex_exec_workers": {
+        "mcp_calls": 0,
+        "cli_calls": 4,
+        "agents_using": 1,
+        "agents": 301,
+        "pct_agents_using": 0.0033
+      }
+    },
+    "live_otel": null,
+    "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+  },
+  "gpt6_review": {
+    "verdict": "accurate",
+    "findings": [],
+    "checked": [
+      "Opened <scratch>/token-cards/cards/gpt-tokenizer.json and <scratch>/token-cards/groups/g1-shell-output/gpt-tokenizer.upstream.json directly. The card's upstream object equals the upstream.json object; native_adaptation differs only by the assembler-added stack_entry.",
+      "All six invoke_rates.populations entries equal the corresponding gpt-tokenizer entries in <scratch>/token-cards/invoke_by_tool.json, including every count and the stored pct_agents_using value. native_adaptation makes no numerical invoke-rate claim.",
+      "Exact invoke population workflow_children: {\"mcp_calls\":0,\"cli_calls\":189,\"agents_using\":45,\"agents\":1010,\"pct_agents_using\":0.0446}",
+      "Exact invoke population workflow_children_with_lanes_block: {\"mcp_calls\":0,\"cli_calls\":0,\"agents_using\":0,\"agents\":22,\"pct_agents_using\":0}",
+      "Exact invoke population workflow_children_without_lanes_block: {\"mcp_calls\":0,\"cli_calls\":189,\"agents_using\":45,\"agents\":988,\"pct_agents_using\":0.0455}",
+      "Exact invoke population agent_subagents: {\"mcp_calls\":0,\"cli_calls\":1,\"agents_using\":1,\"agents\":71,\"pct_agents_using\":0.0141}",
+      "Exact invoke population main_sessions: {\"mcp_calls\":0,\"cli_calls\":8,\"agents_using\":2,\"agents\":15,\"pct_agents_using\":0.1333}",
+      "Exact invoke population codex_exec_workers: {\"mcp_calls\":0,\"cli_calls\":4,\"agents_using\":1,\"agents\":301,\"pct_agents_using\":0.0033}",
+      "Checked the separate exact artifact comparison, local integration, upstream estimate/native_snapshot and native_counter fixture-ledger classes. No amounts were added across classes; invoke frequency was not treated as compression or provider savings.",
+      "Historical <scratch>/wt-rr at commit 803bc351 is absent. Original-file byte/hash assertions requiring that checkout could not be reverified today. Existing retained attachments were checked; the missing historical checkout is not a defect.",
+      "Path-hygiene scan of gpt-tokenizer.upstream.json found no literal personal home/scratch path, local username or session UUID. Review paths use ~ or <scratch>.",
+      "Fresh GitHub metadata confirmed release/tag 4.0.0 (without a v prefix), published 2026-08-16T02:29:41Z. npm latest is 4.0.0, published 2026-08-16T02:34:51.039Z; it is the only published version after 3.4.0. The comparison is 14 commits ahead.",
+      "Read pinned tools/token-report/token_manifest.py:159-165 and the two direct JavaScript callers. All enforce 3.4.0. The report helper imports cjs/encoding/o200k_base.js via Node -e with strict UTF-8; gpt-tokenizer is absent from manifests/stack.json and has no dedicated handbook row or native-client integration.",
+      "Fresh README checks support the JavaScript BPE encoder/decoder, token count/limit/chat/cost APIs, default o200k_base encoding, special-token defaults and local LRU merge cache. The 'fastest tokenizer' statement is correctly attributed to upstream's runtime benchmarks, not independently established or credited as token savings.",
+      "Fresh tag package.json contains version 0.0.0, no bin field and ESM/CommonJS exports. Published npm 4.0.0 metadata also has no bin field. The card correctly distinguishes the source placeholder, released version and library invocation.",
+      "Fresh release notes and build commits confirm Vite+, removal of UMD/unpkg globals, model-catalog automation, GPT-5-nano pricing, GPT-2 support, restored Harmony metadata and omission of BPE-rank source maps.",
+      "Freshly downloaded both tagged data/o200k_base.tiktoken files. They are byte-identical: 3613922 bytes each, SHA-256 446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d. This verifies vocabulary continuity only.",
+      "Fresh issue #41 remains open for picture-token support. Ordinary text counting is not a complete multimodal or provider-billing measurement.",
+      "The assembler's <=2-component filter yields records_total=65 and the exact ten displayed records. Read the broader 66 tokenizer-tagged records and validated 202 attachment references covering 200 distinct files against recorded sizes and SHA-256 values.",
+      "Read retained probe/vector/cross-check/special-option/error-visibility outputs and their harnesses. Record gpt-tokenizer-10 is explicitly a local replay: 143 passed, 0 failed, not an upstream vitest run. Record gpt-tokenizer-36 reports 26 of 27 hard checks, with allowedSpecial divergence.",
+      "The retained allowedSpecial counterexample is a real, separate library limitation: a fresh 3.4.0 probe reproduced non-preserving decode(encode(x)) for repeated endoftext tokens when explicitly allowed. The report helper does not enable that option. The assessment's statement that verifier disagreement alone does not establish an upstream tokenizer failure was checked as that limited inference, not as a claim that the library has no defects.",
+      "Read gpt-tokenizer-46: Node-side refusal reasons are hidden by the local reporter's captured stderr; the earlier version-error visibility check was a harness false positive. These local reporting/check limitations are kept separate from tokenizer functionality and provider savings.",
+      "native_adaptation.assessment correctly copies partial acceptance and 'verifier: disagree, 3 defects'; exact_comparisons is empty, native_counter is null and native_snapshot is empty. The accounting-role conclusion does not claim a tokenizer-attributable reduction or promise savings from an upgrade.",
+      "Fresh 3.4.0 o200k_base recounts matched the six retained RTK/TOON artifact counts used in this review; this supports those named text measurements, not general runtime parity or semantic acceptance.",
+      "native_counter, native_snapshot and prior_evidence match savings.json. The absent historical <scratch>/wt-rr prevents rechecking original fixture-source hashes, without invalidating retained outputs.",
+      "Freshly fetched every cited upstream URL below without cache reuse. The additional FastAPI URL appears in a retained context-hub measurement command, not as evidence of tokenizer savings.",
+      "https://api.github.com/repos/niieani/gpt-tokenizer/releases/latest",
+      "https://github.com/niieani/gpt-tokenizer/blob/3.4.0/data/o200k_base.tiktoken",
+      "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md",
+      "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/data/o200k_base.tiktoken",
+      "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/package.json",
+      "https://github.com/niieani/gpt-tokenizer/commit/158658082a35a7b73163c0dd60a4e1b170c04740",
+      "https://github.com/niieani/gpt-tokenizer/commit/fb04ebca53f662200e737caefe9a5ef372a5e41a",
+      "https://github.com/niieani/gpt-tokenizer/compare/3.4.0...4.0.0",
+      "https://github.com/niieani/gpt-tokenizer/issues/41",
+      "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/34c56340e636ad3d3daeb8482d48d1d8f0b135ae/tools/token-report/token_manifest.py",
+      "https://registry.npmjs.org/gpt-tokenizer",
+      "https://registry.npmjs.org/gpt-tokenizer/4.0.0",
+      "https://github.com/niieani/gpt-tokenizer",
+      "https://fastapi.tiangolo.com/release-notes/"
+    ],
+    "resolutions": [],
+    "final_verdict": {
+      "tool": "gpt-tokenizer",
+      "verdict": "adapted-with-gaps",
+      "summary": "The fixed 3.4.0 o200k_base library is an appropriate native measurement dependency, but upstream latest is 4.0.0 and compatibility still needs qualification (tools/token-report/token_manifest.py:159; https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0). No eligible reduction comparison measures savings produced by the tokenizer itself; the 22 freshly recounted artifacts support other tools' comparisons, with provider savings unverified (groups/verdict-evidence.json; cards/gpt-tokenizer.json#adapted_performance). The retained local cross-check reports 26/27 checks, and its follow-up finds ordinary-text agreement but special-token discrepancies in both 3.4.0 and 4.0.0, so upgrading alone does not resolve that boundary (../rr/gpt-tokenizer/out/36-crosscheck.stdout; ../rr/gpt-tokenizer/out/44-special-report.stdout). The retained invoke scan labels 45/1010 Ultracode workflow children (4.46%, 189 CLI matches), 1/301 eligible Codex workers (0.33%, 4 CLI matches), and 0/22 workflow_children_with_lanes_block as users; these are command-text observations, not successful-call or opportunity rates (invoke_by_tool.json). Next, qualify the actual callers against 4.0.0 and make ordinary-text versus special-token acceptance explicit while preserving reproducible measurement provenance.",
+      "gaps": [
+        {
+          "gap": "The installed, code-enforced 3.4.0 pin is behind 4.0.0; latest-version compatibility is not established for the native reporting path.",
+          "evidence": "tools/token-report/token_manifest.py:159; https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0; groups/verdict-evidence.json",
+          "action": "Qualify frozen artifacts, UTF-8 rejection, packaging and all local callers before changing the pin and provenance.",
+          "owner_pr": null
+        },
+        {
+          "gap": "The local special-token criterion fails, and the retained follow-up shows the same allowed-special discrepancies after upgrading; full upstream-suite acceptance is also absent.",
+          "evidence": "../rr/gpt-tokenizer/out/36-crosscheck.stdout; ../rr/gpt-tokenizer/out/44-special-report.stdout; ../rr/returned-results.json#components/gpt-tokenizer/defect_dispositions",
+          "action": "Separate the ordinary-file counting contract from special-token modes, retain failure cases, and resolve the local acceptance claim without assuming an upgrade fixes it.",
+          "owner_pr": null
+        },
+        {
+          "gap": "No standalone token-reduction comparison or successful-use denominator exists for this measurement dependency.",
+          "evidence": "cards/gpt-tokenizer.json#adapted_performance; invoke_by_tool.json; invoke_by_tool.py",
+          "action": "Report it as measurement infrastructure and distinguish observed command matches from successful useful measurements; do not assign reducer savings.",
+          "owner_pr": null
+        }
+      ],
+      "claims_verified": [
+        {
+          "claim": "Latest stable is 4.0.0, published 2026-08-16; the installed measurement dependency is 3.4.0.",
+          "evidence": "https://api.github.com/repos/niieani/gpt-tokenizer/releases/latest; https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0; groups/verdict-evidence.json",
+          "result": "holds"
+        },
+        {
+          "claim": "The native helper requires gpt-tokenizer 3.4.0 and uses fatal UTF-8 decoding with an explicit encoding module.",
+          "evidence": "tools/token-report/token_manifest.py:159",
+          "result": "holds"
+        },
+        {
+          "claim": "Explicit library-based token measurement agrees with the upstream integration model.",
+          "evidence": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md; tools/token-report/token_manifest.py:159",
+          "result": "holds"
+        },
+        {
+          "claim": "All 22 retained artifacts behind the 11 relevant historical comparisons reproduce their recorded o200k_base counts and byte hashes.",
+          "evidence": "groups/verdict-evidence.json#historical_comparison_recount; ../html-report/savings.json#report_comparisons",
+          "result": "holds"
+        },
+        {
+          "claim": "The retained cross-check is an unqualified 27/27 pass.",
+          "evidence": "../rr/gpt-tokenizer/out/36-crosscheck.stdout",
+          "result": "does-not-hold"
+        },
+        {
+          "claim": "The retained follow-up establishes ordinary-text agreement but special-token differences and repeated-special round-trip failure in both tested versions.",
+          "evidence": "../rr/gpt-tokenizer/out/44-special-report.stdout",
+          "result": "holds"
+        },
+        {
+          "claim": "The replay of upstream vectors constitutes execution of the unchanged upstream test suite.",
+          "evidence": "../rr/returned-results.json#components/gpt-tokenizer/defect_dispositions",
+          "result": "does-not-hold"
+        },
+        {
+          "claim": "The card's population counts match the retained scan: 45/1010 workflow children, 1/301 eligible Codex workers, 0/22 children with the lane block.",
+          "evidence": "invoke_by_tool.json; groups/verdict-evidence.json#invoke_check",
+          "result": "holds"
+        },
+        {
+          "claim": "Standalone tokenizer reduction or causal provider-token savings has been measured.",
+          "evidence": "cards/gpt-tokenizer.json#adapted_performance; cards/gpt-tokenizer.json#invoke_rates/arm_b_native",
+          "result": "unverified"
+        }
+      ],
+      "skills_used": [
+        "search-first",
+        "iterative-retrieval",
+        "verification-before-completion",
+        "context-mode:context-mode"
+      ],
+      "token_tools_used": [
+        "context-mode",
+        "rtk",
+        "qmd",
+        "gpt-tokenizer"
+      ]
+    },
+    "harness": {
+      "review_runs": {
+        "log": "review.out.err",
+        "session_id_sha": "09c02532efae",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 37
+        },
+        "shell_commands": 7,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "verdict_run": {
+        "log": "verdict-a.err",
+        "session_id_sha": "d0e7ab34063f",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "iterative-retrieval",
+          "search-first",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 47,
+          "qmd": 3
+        },
+        "shell_commands": 1,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      },
+      "deep_dive_run": {
+        "log": "deep.out.err",
+        "session_id_sha": "c915835e924b",
+        "rollout_found": true,
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "skills_loaded": [
+          "context-mode",
+          "verification-before-completion"
+        ],
+        "mcp_calls_by_server": {
+          "context-mode": 37,
+          "ai-memory": 1,
+          "serena": 2,
+          "socraticode": 1
+        },
+        "shell_commands": 11,
+        "shell_commands_rtk_prefixed": 0,
+        "web_searches": 0
+      }
+    }
+  },
+  "prior_evidence": "Exact o200k_base counts in #296, #316 and #343 all came from token_manifest.py compare with gpt-tokenizer 3.4.0. The production ledger holds these comparisons."
+}
