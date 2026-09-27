@@ -285,7 +285,7 @@ had been dropped in the first measured-gap build.
 The carrier measures **4,051 UTF-8 bytes**. The former **3,500-byte** local bound
 rejects it, so the bound becomes **4,100 bytes**, leaving 49 bytes of headroom.
 The required safety, tool-grant and retrieval instructions cannot fit the prior
-build's 10 spare bytes. This measured increase follows original brief item 4;
+build's 10 spare bytes. The bound grows only by the measured need, and the block stays as short as its rules allow;
 unrelated lane guidance is unchanged. Relative to the 3,490-byte build:
 
 | Required change | Additional UTF-8 bytes |
