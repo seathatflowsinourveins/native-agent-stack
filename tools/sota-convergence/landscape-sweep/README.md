@@ -103,6 +103,7 @@ With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 la
 
 What the lane config also sets:
 - **`[features] shell_snapshot = false`.** Codex's shell snapshot writes the exported environment, the provider key included, into `<CODEX_HOME>/shell_snapshots/*.sh` with mode 0644 (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at rust-v0.157.1). A GPT-6 probe reproduced this.
+- **`[shell_environment_policy.filters] OMNIROUTE_API_KEY = "exclude"`.** Codex 0.157.1 applies its default `*KEY*`, `*SECRET*` and `*TOKEN*` excludes only when `ignore_default_excludes` is false, and that setting defaults to true (`codex-rs/config/src/shell_environment_policy.rs`, `codex-rs/protocol/src/shell_environment.rs`). Without the filter, a real key would reach every command the model runs.
 - **Web search for GPT-6 Astra.** Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as Codex's standalone web search (`web.run`). The lane therefore sets:
   - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers ([Codex advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced));
   - `[features] standalone_web_search = true`, which is under development in 0.157.1.
@@ -110,10 +111,12 @@ What the lane config also sets:
   The capability flag alone enables nothing: OmniRoute must serve a compatible endpoint, and the parity check below has to show it working before a sweep counts on GPT-6 search through the gateway.
 
   Measured 2026-09-27: `web.run` POSTs `<base_url>/alpha/search`. OmniRoute release/v3.8.51 at `a58000c7` answers 404 there. Upstream PR #13788 adds the route, but answers from OmniRoute's own search registry, not OpenAI's hosted search: the keyless `duckduckgo-free` provider, unless a keyed provider is configured. Through that route, `site:` queries returned nothing and plain queries few results. GPT-6 fell back to fetched pages and the GitHub API through context-mode.
-- **Skills.** Codex lists the pinned skills from its user skill roots: `$CODEX_HOME/skills`, which holds its `.system` cache, and `$HOME/.agents/skills` (`codex-rs/ext/skills/src/host_roots.rs` at rust-v0.157.1).
+- **Skills.** Codex lists user skills from `$CODEX_HOME/skills` and `$HOME/.agents/skills` (`codex-rs/ext/skills/src/host_roots.rs` at rust-v0.157.1). In the lane, `$CODEX_HOME/skills` holds only Codex's `.system` cache; the pinned skills are in `$HOME/.agents/skills`, where `install_skills.py` puts them.
   - The lane's GPT-6 loads them with context-mode's `ctx_execute_file`. That tool refuses a path outside its project directory, here the runner's `<work-dir>/empty`, unless a `Read(...)` allow rule in `<project>/.claude/settings.json` names it (context-mode 1.0.169 `build/security.js`, `evaluateProjectContainment`, issue #852).
-  - `build_args.py` therefore writes `<work-dir>/empty/.claude/settings.json`, allowing reads of those two roots and nothing else. `staged.json` records the roots symbolically.
-  - Without it, the 2026-09-27 smoke's GPT-6 workers asked for their skills, were refused, and reported `skills_used: []`.
+  - Without such a rule, the 2026-09-27 smoke's GPT-6 workers asked for their skills, were refused, and reported `skills_used: []`.
+  - `build_args.py` writes `<work-dir>/empty/.claude/settings.json` with **one exact rule per file** under `$HOME/.agents/skills`. It follows symlinked directories, lists each real directory once, and leaves out any path containing `*` or `?`. `staged.json` records the root symbolically and the file count.
+  - The rules are exact because context-mode also matches an allow rule against the raw path. A wildcard rule such as `<root>/**` would admit `<root>/../elsewhere` and every sibling path under the root. The test `test_context_mode_reads_only_the_listed_skill_files` runs context-mode's own matcher (set `CONTEXT_MODE_SECURITY_JS` to an installed `build/security.js`): listed files pass; siblings, outside files and `..` traversals do not. Its control shows the wildcard admitting the traversal.
+  - The host's deny rules still apply.
   - A native restage of the work directory removes the file, because the native lane has no context-mode.
 
 What the lane does not carry or allow:
