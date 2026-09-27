@@ -71,7 +71,7 @@ itself: 7 of the 10 also match their
 this commit (`blind-adjudicator`, `blind-judge`, `blind-lane-reviewer`, `evidence-reviewer`,
 `security-reviewer`, `semantic-evidence-reviewer`, `stack-researcher`); the other 3
 (`isolated-builder.md`, `source-scout.md`, `stack-verifier.md`) do not, because this branch's
-merge of `origin/main` (below) revised those three agent definitions after this host installed
+merge of `origin/main` revised those three agent definitions after this host installed
 its own copies — an ordinary divergence for a file this document never claimed was pinned or
 byte-identical, not evidence of anything wrong with the live install, and exactly why the gate
 below reads the live digest rather than the repository's:
@@ -169,8 +169,10 @@ either way, but its listed benefit is currently theoretical for that plugin spec
 `-m/--marketplace`, `--enable`, `--disable`, `--json`, `-h/--help`) has nothing that preserves
 data. So `codex plugin remove context-mode@context-mode` above unconditionally removes both
 the plugin's registration and its cache directory under
-`~/.codex/plugins/cache/openai-bundled/context-mode/` (or whichever marketplace it resolves
-through) — there is no partial-preserve option in this build. Whether it also edits
+`~/.codex/plugins/cache/context-mode/context-mode/` (the `context-mode` marketplace this
+plugin resolves through — confirmed by this same document's own codex `-3` receipt excerpt
+below, which retains a `cat` of a file under that exact path) — there is no partial-preserve
+option in this build. Whether it also edits
 `config.toml`'s own `[plugins."*@*"]` table is not stated by the help text and not tested by
 this document.
 
@@ -224,14 +226,21 @@ then removes `<agent.globalSkillsDir>/<name>` for each one that exists on disk, 
 same-named skill belonging to a tool Stage 1 never installed anything for would be deleted
 too if that tool happened to have one. `-a claude-code codex` restricts the per-agent cleanup
 loop to exactly those two link locations; `claude-code` and `codex` are the CLI's own agent
-keys (confirmed by triggering its own "Invalid agents" validation with a nonsense name, which
-lists them). This still fully removes the canonical skill content and its lock entry, not
-just the two links: the CLI's own removal loop (`cli.mjs`, matching `remove.ts`) checks, after
-the scoped agents are cleaned up, whether any *other* installed-but-untouched agent still
-links the skill (`detectInstalledAgents()` minus the `-a` list) before deleting the shared
-canonical copy — with only claude-code and codex installed on this host, nothing remains
-linked, so the canonical copy and lock entry are still removed exactly as the decision record
-describes, just without touching any other tool's directory to get there. One further
+keys, read directly from its `agents` object in `cli.mjs` (`"claude-code": {` and `codex: {`,
+the same object the invalid-agent check at removeCommand's start validates `-a` values
+against — this document cites the source directly rather than a live CLI run, since the
+pinned package as extracted for this review has no `node_modules` of its own to run
+standalone). This still aims to fully remove the canonical skill content and its lock entry,
+not just the two links: the CLI's own removal loop (`cli.mjs`, matching `remove.ts`) checks,
+after the scoped agents are cleaned up, whether any *other* installed-but-untouched agent
+still links the skill (`detectInstalledAgents()` minus the `-a` list, including any further
+universal agent that shares this same canonical `~/.agents/skills` store) before deleting the
+shared canonical copy; this document did not run `detectInstalledAgents()` to confirm the
+result for this host, so it states the mechanism, not the outcome: the canonical copy and
+lock entry are removed unless the CLI detects another installed agent still linked to them,
+in which case it conservatively keeps both rather than deleting them out from under that
+other agent — either way, `-a claude-code codex` never causes an *extra* deletion beyond what
+the unscoped form would also have removed. One further
 syntax note the CLI's own arg parser requires: `-a` must be the *last* flag on the line,
 after `-g -y`, not before — it greedily consumes every following bare word as an agent name,
 so `-a claude-code codex -g -y` would try to treat `-g` and `-y` themselves as agent names
