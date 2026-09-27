@@ -38203,13 +38203,13 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "596e0067ab8ffde61e1af395ffcbb95a5f23696c95b66bb470fbc91e57c0daca",
-      "bytes": 45801
+      "sha256": "c878419597aec836095bae82da831edc65c7bb2c801194190b80248a360ba9e1",
+      "bytes": 48365
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "6be9fd131694e78ebac01c95c15081647d17c9604c0344de1b7846836531f17a",
-      "bytes": 1205
+      "sha256": "9eadf11b8e659cc026de7f92d6b2923521341a25fcc56f52a1c738258996bb6d",
+      "bytes": 1129
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -38218,8 +38218,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "26bc09717021343de332cca05216f26b6e55fdbb6cc0c71f2b8b4ef62b56d110",
-      "bytes": 80288
+      "sha256": "062f4c0fa48209d7dce76075faa3d074920ba67e46df425769fcd4757f8c291f",
+      "bytes": 90100
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -38243,8 +38243,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "15a15fbe42930949a13e11f3313e72ab76843290ffbd1fe2e67f313dc03b32ce",
-      "bytes": 49781
+      "sha256": "78d60c83e31a0edc4601fb1957bf6b0fb35596b3dc88d518a6daff4f6681fce5",
+      "bytes": 51024
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -39788,8 +39788,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "93e591aa97d1825f7f162845ae37b9be81de9dbba95892f6a5acf65ec01df268",
-      "bytes": 36575
+      "sha256": "314c86151c3fab9236b0c20fa9682491b9191d7ae5ec5bc1774e9bd21c8c9699",
+      "bytes": 45198
     },
     {
       "path": "tests/test_trading_gates.py",
@@ -39973,8 +39973,8 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "35684beb5b66ebbed27ffffcf0d297db8333c23f0f0dd02b8215b7b156983810",
-      "bytes": 22039
+      "sha256": "08c549f84a852ebb19987f36a8c69aa677cfc8ab635eac635b8ef7263c21de5c",
+      "bytes": 22119
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
@@ -40175,36 +40175,6 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "1363de9d62fe7286154a3705d1f9fb09232656223e3a6fb074c4589a48f1efb8",
       "bytes": 56978
-    },
-    {
-      "path": "units/w3/measure/commit-build.txt",
-      "sha256": "6bee7d4e210869c265dceada17e9707e7852a6b1b107c526339ef02edb0e93e8",
-      "bytes": 1247
-    },
-    {
-      "path": "units/w3/measure/commit-fixup.txt",
-      "sha256": "5ec5ebcd1d3041ad923c8bbebb4b6fb7b1fc03926fb0aa5a9ff611da5918caf3",
-      "bytes": 1046
-    },
-    {
-      "path": "units/w3/measure/commit-fixup2.txt",
-      "sha256": "6bee7d4e210869c265dceada17e9707e7852a6b1b107c526339ef02edb0e93e8",
-      "bytes": 1247
-    },
-    {
-      "path": "units/w3/measure/fixup-receipt.md",
-      "sha256": "aba5d24f2137659651769cffa447eb2a17c864ca438447c92660b5072e82c648",
-      "bytes": 7192
-    },
-    {
-      "path": "units/w3/measure/fixup2-receipt.md",
-      "sha256": "2077235d5eb528e7ebc5ea9116e45a54d51751895af47568829c8c42a9421dbd",
-      "bytes": 10211
-    },
-    {
-      "path": "units/w3/measure/pr-body.md",
-      "sha256": "aa3e912b4a14c7e1325fbc34ef62cd9322b52de1009de05b83dbcf1046b37ad5",
-      "bytes": 8452
     }
   ],
   "convergence_records": [
