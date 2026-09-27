@@ -263,7 +263,9 @@ def main():
     parser.add_argument("--mode", choices=tuple(MODES), default="pro")
     parser.add_argument("--timeout", type=float, default=540)
     parser.add_argument("--interval", type=float, default=10)
-    args = parser.parse_args()
+    # The prompt may follow the options (start --run-id ID PROMPT). parse_args() on Python 3.12 binds the optional
+    # positional before the options and then rejects PROMPT; intermixed parsing is argparse's documented mode for it.
+    args = parser.parse_intermixed_args()
     os.umask(0o077)
     try:
         if args.action == "start":

@@ -8473,8 +8473,8 @@
     },
     {
       "path": "blueprints/runtime-workers/deerflow/dispatch.py",
-      "sha256": "4fc299f86f2d5ccb8eb91c038170b3a7a20bcade403617e768194b15ded81ccc",
-      "bytes": 14812
+      "sha256": "3133d1dbc1e21a286bcedf5e02a591039036d2fc87ba9c7265611110bd4ee18d",
+      "bytes": 15056
     },
     {
       "path": "blueprints/runtime-workers/deerflow/e2e/check.py",
@@ -39968,8 +39968,8 @@
     },
     {
       "path": "tests/test_runtime_worker_deerflow.py",
-      "sha256": "560c3830ce3a5c5601d0d280a316c29ecd850107c799f277698472b7d9759ddf",
-      "bytes": 61888
+      "sha256": "f685cb2fae74d1a5e0806868cebac50429cfa507d283037e7cfda2f9702be860",
+      "bytes": 62925
     },
     {
       "path": "tests/test_saturation_ledger.py",

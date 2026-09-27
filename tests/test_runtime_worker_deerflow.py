@@ -26,6 +26,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RECIPE = ROOT / "blueprints/runtime-workers/deerflow"
 
+# install_grader creates its venv from sys.executable and refuses any interpreter but the lock's CPython 3.13;
+# the grader tests stand in that interpreter through the recipe module's own sys name, never the global one.
+LOCK_TARGET_PYTHON = types.SimpleNamespace(executable=sys.executable, version_info=(3, 13, 0, "final", 0))
+
 
 def module(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -545,7 +549,8 @@ class DeerFlowRecipeTests(unittest.TestCase):
 
     def test_grader_install_and_launch_use_exact_upstream_pins(self):
         renderer = module("deerflow_grader_install", RECIPE / "recipe.py")
-        with tempfile.TemporaryDirectory() as tmp, patch.object(renderer.subprocess, "run") as run:
+        with tempfile.TemporaryDirectory() as tmp, patch.object(renderer.subprocess, "run") as run, \
+                patch.object(renderer, "sys", LOCK_TARGET_PYTHON):
             prefix = Path(tmp)
             renderer.install_grader(prefix)
             commands = [c.args[0] for c in run.call_args_list]
@@ -692,12 +697,22 @@ class DeerFlowRecipeTests(unittest.TestCase):
         for requirement in lock.read_text().replace("\\\n", "").splitlines():
             if requirement.strip() and not requirement.lstrip().startswith("#"):
                 self.assertRegex(requirement, r"==[^ ]+.*--hash=sha256:[0-9a-f]{64}")
-        with tempfile.TemporaryDirectory() as tmp, patch.object(renderer.subprocess, "run") as run:
+        with tempfile.TemporaryDirectory() as tmp, patch.object(renderer.subprocess, "run") as run, \
+                patch.object(renderer, "sys", LOCK_TARGET_PYTHON):
             renderer.install_grader(Path(tmp))
             install = next(c.args[0] for c in run.call_args_list if "install" in c.args[0])
             for arg in ("--require-hashes", "--only-binary=:all:", "--no-deps"):
                 self.assertIn(arg, install)
             self.assertEqual(install[-1], str(lock))
+
+    def test_grader_install_refuses_an_interpreter_the_lock_does_not_target(self):
+        renderer = module("deerflow_grader_guard", RECIPE / "recipe.py")
+        other = types.SimpleNamespace(executable=sys.executable, version_info=(3, 12, 3, "final", 0))
+        with tempfile.TemporaryDirectory() as tmp, patch.object(renderer.subprocess, "run") as run, \
+                patch.object(renderer, "sys", other):
+            with self.assertRaisesRegex(ValueError, "CPython 3.13"):
+                renderer.install_grader(Path(tmp))
+            run.assert_not_called()
 
     def test_round3_container_network_hardening_and_resolved_mount_guards(self):
         renderer = module("deerflow_security", RECIPE / "recipe.py")
