@@ -3821,6 +3821,26 @@
       "bytes": 10682
     },
     {
+      "path": "blueprints/compaction-window-ab/PREREGISTRATION.md",
+      "sha256": "6c7fd49c2d1e46f4a87515418114c27dc8845abcd3a1bc34da48affcfd64e53d",
+      "bytes": 25141
+    },
+    {
+      "path": "blueprints/compaction-window-ab/build-evidence.json",
+      "sha256": "aa584ddddc97c0a06c6ec9f6b337ef8589d6782f42e27761c8ba2fa5fed9848d",
+      "bytes": 5731
+    },
+    {
+      "path": "blueprints/compaction-window-ab/motivation-20260927.md",
+      "sha256": "7e9b224ddb2874cf4836a7ff1d113c7c6c8abb001a1c64d4b4686e9ac907a365",
+      "bytes": 1815
+    },
+    {
+      "path": "blueprints/compaction-window-ab/preregistration.json",
+      "sha256": "4a4f08e172dd95ca2998e9a39a6dbebf38dc605f10859d714a1779ca8249ef1b",
+      "bytes": 44206
+    },
+    {
       "path": "blueprints/convergence-practice/README.md",
       "sha256": "5e259cc7d810606100601771d010b562f8e7e2242762773d7814133802d3d273",
       "bytes": 10645
@@ -39305,6 +39325,11 @@
       "path": "tests/test_codex_worker_skill.py",
       "sha256": "95de88e374a4f3db7dcc82f86d937643782d2bb63c501b4510ab65866f3f8aec",
       "bytes": 12476
+    },
+    {
+      "path": "tests/test_compaction_window_ab_preregistration.py",
+      "sha256": "47f04aee9892437b3add023c4cf764056bb6af3c2af4a7f09d75b70b76ae30dd",
+      "bytes": 7520
     },
     {
       "path": "tests/test_component_matrix.py",

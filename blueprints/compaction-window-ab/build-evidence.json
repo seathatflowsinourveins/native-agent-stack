@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "evidence_class": "structural_validation",
+  "experiment_status": "not_run",
+  "preregistration_status": "DRAFT",
+  "host_settings_changed": false,
+  "claude_sessions_started": 0,
+  "source_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1",
+  "reference_test": "tests/test_token_e2e_preregistration.py",
+  "checks": [
+    {
+      "phase": "red_before_artifacts",
+      "command": "rtk python3 -m unittest discover -s tests -p test_compaction_window_ab_preregistration.py -v",
+      "exit_code": 1,
+      "artifact_state": "Neither preregistration.json nor PREREGISTRATION.md existed when this test ran.",
+      "returned_output_excerpt": "test_draft_contract (test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... FAIL\n  File \"<scratchpad>/tests/test_compaction_window_ab_preregistration.py\", line 29, in test_draft_contract\n    self.assertTrue((BLUEPRINT / \"preregistration.json\").is_file())\nAssertionError: False is not true\nRan 1 test in 0.001s\nFAILED (failures=1)",
+      "result": "Expected assertion failure for the absent JSON artifact; no model invocation."
+    },
+    {
+      "phase": "green_contract",
+      "command": "rtk python3 -m unittest discover -s tests -p test_compaction_window_ab_preregistration.py -v",
+      "exit_code": 0,
+      "returned_output": "test_draft_contract (test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.004s\n\nOK\n",
+      "result": "Draft JSON/Markdown agree on arms, thresholds and decision rule; tasks/checks, roles, order, stop/seal policy and sanitization satisfy the structural contract."
+    },
+    {
+      "phase": "repository_validation_before_registration",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 7340, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "result": "Existing registry and repository integrity passed before these draft files were registered."
+    },
+    {
+      "phase": "green_after_review_corrections",
+      "command": "rtk python3 -m unittest discover -s tests -p test_compaction_window_ab_preregistration.py -v",
+      "exit_code": 0,
+      "returned_output": "test_draft_contract (test_compaction_window_ab_preregistration.CompactionWindowPreregistrationTests.test_draft_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.006s\n\nOK\n",
+      "result": "Contract passed after freezing the 97-module subset, deterministic citation predicates and missing-compaction-usage rule; the dated anti-pattern log retains the corrected draft mistakes."
+    },
+    {
+      "phase": "repository_validation_after_registration",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 7345, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "result": "Repository integrity passed with all five new files registered through scripts/host_receipts.py register_file. This returned output was appended afterward; its updated registry hash is revalidated before commit."
+    },
+    {
+      "phase": "whitespace_check",
+      "command": "rtk git diff --check",
+      "exit_code": 0,
+      "returned_output": "",
+      "result": "No whitespace errors in the tracked manifest diff. New files were still untracked; this is not a claim that staging succeeded."
+    }
+  ],
+  "independent_review": {
+    "scope": "Read-only source and draft review; no Claude session or task execution",
+    "observations": ["Recomputed the frozen verification inventory: 97 selected and 93 excluded, with the declared SHA256; the complementary platform-skip module is excluded.", "Confirmed W2 literal-source predicates and R1 exact source spans replace subjective citation scoring."],
+    "boundary": "Review findings were checked against the cited original sources; this is not native compaction or quota acceptance."
+  },
+  "commit": {
+    "status": "blocked_read_only_git_metadata",
+    "command": "rtk git add blueprints/compaction-window-ab/PREREGISTRATION.md blueprints/compaction-window-ab/preregistration.json blueprints/compaction-window-ab/motivation-20260927.md blueprints/compaction-window-ab/build-evidence.json tests/test_compaction_window_ab_preregistration.py manifests/evidence.json",
+    "exit_code": 128,
+    "returned_output_sanitized": "FAILED: git add\nfatal: Unable to create '<git-metadata>/index.lock': Read-only file system\n",
+    "sha": null,
+    "pushed": false,
+    "reason": "The assigned worktree is writable, but its Git metadata is outside the writable filesystem scope. No bypass or write to another checkout was attempted.",
+    "required_message_trailer": "Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>"
+  },
+  "sanitization": "Red traceback excerpt replaces the worktree prefix with <scratchpad> and omits separator/caret lines. Native version/help and primary-source reads are described in the preregistration. No conversations, session identifiers, credentials or personal paths are published.",
+  "limitations": "These checks do not establish Workflow inheritance, long-child eligibility, budget feasibility, frozen task quality or any comparative window result. Candidate hashes and registration establish byte identity, not a freeze or model execution."
+}
