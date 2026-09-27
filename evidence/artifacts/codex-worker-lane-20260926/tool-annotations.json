@@ -1,0 +1,410 @@
+{
+  "what": "Each server's tools as codex app-server mcpServerStatus/list reports them (detail toolsAndAuthOnly), from a scratch CODEX_HOME holding only these servers' tables copied from the user config (scripts/list_tools.py.txt); annotations null means the server declares none, which under Codex's auto approval mode requires approval for the call. SocratiCode was not started (its automatic watcher could write an index); its registrations were read from the installed package instead.",
+  "servers": {
+    "ai-memory": {
+      "tools": {
+        "memory_auto_improve": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Run manual auto-improvement for one completed session and apply or stage validated wiki edit proposals through the auto-improvement approval path. Use when the "
+        },
+        "memory_briefing": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Compose a structured snapshot of project activity WITHOUT any LLM call: lifetime counts, 7-day and 30-day activity windows, last-observation timestamp, pending "
+        },
+        "memory_consolidate": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "LLM-driven consolidation. Default mode (single-page) rewrites sessions/<id>.md from the observation log. multi_page=true fans out into a batch of concept/decisi"
+        },
+        "memory_delete_page": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Delete a single wiki page by its exact relative path (e.g. `notes/foo.md`). Use when the user explicitly asks to delete or remove a page. Fires the admission ch"
+        },
+        "memory_explore": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Compose a calibrated prose digest of project state. Calls `memory_briefing` for structured data, computes how long it's been since the last observation, then as"
+        },
+        "memory_feedback": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Record how useful a recalled page actually was, by its exact path. `helpful` / `not_helpful` nudge the page's salience, which scales the retention formula's tim"
+        },
+        "memory_forget_sweep": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Run the retention sweep. FOUR passes, and they differ on what they will delete. (1) TTL: pages whose frontmatter expires_at is in the past are hard-deleted (fil"
+        },
+        "memory_handoff_accept": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Fetch an OPEN cross-agent handoff and mark it accepted. IMPORTANT: handoffs are SINGLE-USE. The SessionStart hook automatically consumes the handoff at session-"
+        },
+        "memory_handoff_begin": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Record a cross-agent handoff snapshot for the NEXT agent that opens this project (e.g. Codex picking up after Claude Code). Use this ONLY when ending/wrapping u"
+        },
+        "memory_handoff_cancel": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Cancel/discard a mistakenly-created OPEN handoff by exact `handoff_id` returned from `memory_handoff_begin` or `memory_handoff_list`. Use this ONLY when you rea"
+        },
+        "memory_handoff_list": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "List OPEN cross-agent handoffs for this project WITHOUT claiming or expiring them. READ-ONLY: every returned row stays `open`. Use this when no SessionStart han"
+        },
+        "memory_install_self_routing": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Returns the canonical ai-memory routing install payload: `markered_block` for the slim CLAUDE.md / AGENTS.md snippet, `agent_filenames` for rules-file targets, "
+        },
+        "memory_lint": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Audit the wiki for stale episodic pages, duplicate titles, broken cross-references, and (if an LLM provider is configured) contradictions across semantic pages."
+        },
+        "memory_message_cancel": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Cancel pending message(s) this project SENT to other inboxes, before the recipient pops them. Pass `message_id` to retract a specific one, or omit it to clear E"
+        },
+        "memory_message_list": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "List PENDING cross-project messages for this project WITHOUT popping them. `box`=\"inbox\" (default) shows mail addressed to this project \u2014 what you can pop; `box"
+        },
+        "memory_message_pop": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Pop ONE pending message from this project's inbox and mark it claimed \u2014 the cross-project queue's consume step. Omit `message_id` to pop the oldest; pass an id "
+        },
+        "memory_message_send": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Send a message to ANOTHER project's ai-memory inbox \u2014 directed cross-project agent-to-agent messaging. Use this when the user wants an agent working in a differ"
+        },
+        "memory_query": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Search the project's long-term memory wiki \u2014 prior sessions, decisions, gotchas, architecture notes captured by ai-memory across earlier runs. Call this BEFORE "
+        },
+        "memory_read_page": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Fetch the FULL body of a wiki page. You MUST pass exactly one of `path` or `query` \u2014 a call with neither (or with nulls) is invalid and will error; do NOT retry"
+        },
+        "memory_read_session_observations": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Read the RAW lifecycle observations of ONE session (prompts, tool calls, stops) as captured by the hooks, before any consolidation. Use when the user asks what "
+        },
+        "memory_recent": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Return the N most-recently-updated wiki pages for this project (descending by updated_at). Call this at the START of any session to see what the previous sessio"
+        },
+        "memory_status": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Report aggregate memory counts and runtime status (pages latest, pages all versions, sessions, observations). Use this at session start to see how much context "
+        },
+        "memory_write_page": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Write or update a durable wiki page for the current project. Use this when the user explicitly asks to remember, save, pin, annotate, or make permanent a fact/r"
+        }
+      },
+      "tools_error": null
+    },
+    "codebase-memory": {
+      "tools": {},
+      "tools_error": "MCP startup failed: timed out handshaking with MCP server after 29.99999986s"
+    },
+    "headroom": {
+      "tools": {
+        "headroom_compress": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Compress content to save context window space. Use this on large tool outputs, file contents, search results, or any content you want to shrink before reasoning"
+        },
+        "headroom_retrieve": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Retrieve original uncompressed content by hash. Use this when you need full details from previously compressed content. The hash comes from headroom_compress re"
+        },
+        "headroom_stats": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": null,
+          "description": "Show compression statistics for this session: total compressions, tokens saved, estimated cost savings, and recent compression events."
+        }
+      },
+      "tools_error": null
+    },
+    "qmd": {
+      "tools": {
+        "get": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "multi_get": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "query": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "status": {
+          "destructiveHint": null,
+          "idempotentHint": null,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        }
+      },
+      "tools_error": null
+    },
+    "serena": {
+      "tools": {
+        "activate_project": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "delete_memory": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "edit_memory": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "find_declaration": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "find_implementations": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "find_referencing_symbols": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "find_symbol": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "get_current_config": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "get_diagnostics_for_file": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "get_symbols_overview": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "initial_instructions": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "insert_after_symbol": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "insert_before_symbol": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "list_memories": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "onboarding": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "open_dashboard": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "read_memory": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "rename_memory": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "rename_symbol": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "replace_in_files": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "replace_symbol_body": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "safe_delete_symbol": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        },
+        "search_for_pattern": {
+          "destructiveHint": false,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": true
+        },
+        "write_memory": {
+          "destructiveHint": true,
+          "idempotentHint": null,
+          "openWorldHint": null,
+          "readOnlyHint": false
+        }
+      },
+      "tools_error": null
+    },
+    "socraticode (source, not started)": {
+      "source": "npm socraticode 1.14.0 dist/index.js: server.tool(name, description, schema, handler) registrations; 'readOnlyHint' occurs 0 times",
+      "tools": [
+        "codebase_index",
+        "codebase_update",
+        "codebase_remove",
+        "codebase_prune",
+        "codebase_stop",
+        "codebase_watch",
+        "codebase_search",
+        "codebase_status",
+        "codebase_graph_build",
+        "codebase_graph_query",
+        "codebase_graph_stats",
+        "codebase_graph_circular",
+        "codebase_graph_visualize",
+        "codebase_graph_remove",
+        "codebase_graph_status",
+        "codebase_impact",
+        "codebase_flow",
+        "codebase_symbol",
+        "codebase_symbols",
+        "codebase_context",
+        "codebase_context_search",
+        "codebase_context_index",
+        "codebase_context_remove",
+        "codebase_health",
+        "codebase_list_projects",
+        "codebase_about"
+      ]
+    }
+  }
+}
