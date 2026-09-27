@@ -1,5 +1,15 @@
 {
   "version": "0.9.4",
+  "grader": {
+    "repository": "https://github.com/promptfoo/promptfoo",
+    "version": "0.123.1",
+    "tag": "0.123.1",
+    "package": "promptfoo@0.123.1",
+    "node_minimum": "22.22.0",
+    "installation": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/installation.md",
+    "mode": "standalone assertions over native output",
+    "assertions": ["is-json", "equals"]
+  },
   "repository": "https://github.com/unclecode/crawl4ai",
   "tag": "v0.9.4",
   "commit": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb",

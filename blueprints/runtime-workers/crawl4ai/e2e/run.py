@@ -27,6 +27,7 @@ from host import load_host, locations, private_file
 from worker import extract, model_for
 from mcp_probe import probe
 from receipt import make_receipt
+from grade import grade, run_controls, observation
 
 
 def now():
@@ -46,10 +47,19 @@ def main():
     _, state = locations()
     directory = state / "runs" / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8])
     directory.mkdir(mode=0o700)
-    metadata = {"framework_version": importlib.metadata.version("crawl4ai"), "start": now(), "arms": {}, "probes": {}}
+    metadata = {"framework_version": importlib.metadata.version("crawl4ai"), "start": now(), "arms": {}, "probes": {},
+                "skills_at_start": {"names": [], "status": "no native skill inventory/loader in reviewed v0.9.4"}}
     server, server_thread, container_attempted = None, None, False
     lifecycle = (directory / "lifecycle.log").open("w")
     try:
+        executable = os.environ["NAS_CRAWL4AI_GRADER"]
+        metadata["grader_controls"] = run_controls(directory / "controls", executable)
+        for name, expected in (("known-pass", 0), ("known-fail", 100), ("malformed-output", 100)):
+            control = observation(directory / "controls" / name)
+            if control["status"] != "observed" or control["exit_code"] != expected or control["passed"] is not (expected == 0):
+                raise ValueError("upstream grader controls failed; no model trial attempted")
+        for arm in config["e2e"]["arms"]:
+            model_for(config, arm)  # refuse unavailable routes before starting resources
         server = http.server.ThreadingHTTPServer(("127.0.0.1", host["fixture_port"]),
             functools.partial(QuietHandler, directory=str(ROOT / "e2e/fixtures")))
         server_thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -93,6 +103,13 @@ def main():
                     traceback.print_exc(file=log)
             finally:
                 info["end"] = now()
+                # End the provider window before offline grading. EchoProvider's
+                # counters never enter native model usage or gateway attribution.
+                try:
+                    info["grader"] = grade(output, executable)
+                except Exception as exc:
+                    info["grader_error_class"] = type(exc).__name__
+                    traceback.print_exc(file=lifecycle)
                 metadata["arms"][arm] = info
                 (directory / "run.json").write_text(json.dumps(metadata, indent=2))
     finally:

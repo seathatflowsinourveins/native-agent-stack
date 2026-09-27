@@ -41,8 +41,8 @@ def load_host():
     private_file(path)
     data = json.loads(path.read_text())
     ports = [data[key] for key in ("api_port", "fixture_port", "mirror_port", "e2e_api_port")]
-    if any(type(p) is not int or not 3700 <= p <= 3799 for p in ports) or len(set(ports)) != 4:
-        raise ValueError("private host ports must be distinct integers in 3700..3799")
+    if any(type(p) is not int or not 3730 <= p <= 3799 for p in ports) or len(set(ports)) != 4:
+        raise ValueError("private host ports must be distinct integers in 3730..3799")
     for key in ("docker", "python", "working_directory"):
         if not Path(data[key]).is_absolute() or "\n" in data[key]:
             raise ValueError("host paths must be absolute single-line values")

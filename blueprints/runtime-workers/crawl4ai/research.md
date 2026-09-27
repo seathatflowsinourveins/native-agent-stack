@@ -38,10 +38,67 @@ LLMExtractionStrategy and the authenticated upstream Docker API/MCP server.
 Alternative frameworks and third-party scraping skills do not close a demonstrated
 gap for the user-selected crawler. Popularity was not used as acceptance evidence.
 
+## Round 2 source selection (before implementation)
+
+The supplied evaluation reports select **Promptfoo 0.123.1** for W8d, with
+Crawl4AI v0.9.4's extraction regression as runner-up. The installed Promptfoo
+reports 0.123.1 and its `eval --help` exposes `--assertions`, `--model-outputs`,
+`--no-cache`, `--no-share` and `--no-write`. No installation was performed.
+The installed search-first workflow delegated bounded read-only source research;
+find-skills checked the skills.sh leaderboard and public search endpoint again.
+The search returned `brettdavies/crawl4ai-skill` and
+`lancelin111/crawl4ai-skill`; these remain caller guidance, not evidence that
+Crawl4AI loads skills. No new skill is selected for this runtime.
+
+The exact implementation references for this round are:
+
+- [Promptfoo installation at 0.123.1](https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/installation.md):
+  documented npm install, scoped with npm's `--prefix`; requires Node >=22.22.0.
+- [Standalone output grading](https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/configuration/expected-outputs/index.md#running-assertions-directly-on-outputs):
+  transport the retained native output as a JSON string array; Promptfoo's
+  unchanged [JSON](https://github.com/promptfoo/promptfoo/blob/0.123.1/src/assertions/json.ts)
+  and [equals](https://github.com/promptfoo/promptfoo/blob/0.123.1/src/assertions/equals.ts)
+  assertions own the verdict. No Python/JavaScript custom scorer is needed.
+  This is an upstream grader on our frozen fixture, not an unchanged upstream
+  test or a new model execution when replaying outputs.
+- The report's [HTTP-provider mapping](https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/providers/http.md)
+  cannot safely carry LLM extraction through this server revision's untrusted
+  configuration loader. Preserve native Python extraction and use the documented
+  standalone grader. [Server](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/server.py#L514-L520)
+  and [API](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/deploy/docker/api.py#L688-L689)
+  are the transport boundary; this limitation is not silently patched.
+- [Crawl4AI utils.py](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/crawl4ai/utils.py#L1825-L1837)
+  merges `extra_args` after its `json_object`/temperature defaults.
+  [Extraction](https://github.com/unclecode/crawl4ai/blob/133e1d92e37885dfccc03ea2e3687d06c98b7ceb/crawl4ai/extraction_strategy.py#L685-L741)
+  reads message content, so use a strict `json_schema` override with every object
+  closed, retain JSON in the user instruction, and preserve per-conversation
+  session/fresh logical-call headers. The gateway owner's cognee 1.6.1 observation
+  supplied by the user is the compatibility input; this builder does not repeat it.
+- [Docker Compose services](https://docs.docker.com/reference/compose-file/services/)
+  and [networks](https://docs.docker.com/reference/compose-file/networks/) provide
+  explicit names and owner labels. Bind mounts are directories, not Docker volume
+  objects. The user's 3730..3799 range constrains published host listeners.
+- Skill installation, if a calling agent needs it, follows the coordinator's
+  `tools/adoption/install_skills.py` with the specified manifest/project/universal
+  options. The current file lacks the new project/agent options; that calling-agent
+  operation stays pending the separate PR. No loader is added to Crawl4AI.
+
+Round 2 tests use the user-specified seams: output transport and upstream verdict
+controls, gateway request options, host port validation, resource ownership,
+receipt provenance, and the documented conditional skills installation command.
+They remain local integration checks; the upstream assertions are executed
+unchanged. Research scratch and test state are outside the repository.
+
 ## Recorded corrections / anti-pattern log
 
 | Date | Proven mistake or unsafe assumption | Evidence and correction |
 | --- | --- | --- |
+| 2026-09-27 | Letting the local extraction checker own the verdict | Round 1's `check.py` computed equality itself. The round-2 adapter contract failed against that behavior. It now only transports bytes; unchanged Promptfoo 0.123.1 assertions returned 0/100/100 for correct/wrong-price/malformed controls. Tests also refuse missing/modified reports and changed input bytes. |
+| 2026-09-27 | Assuming a grader's echoed output is byte-identical to its input file | Native Promptfoo's positive control succeeded, but the first receipt observation rejected it because the echoed response omitted the input's final newline (413 versus 414 characters). Preserve the exact input/report hashes and account for outer whitespace in the transport-binding check; the upstream verdict still owns product equality. `test_upstream_grader_controls_and_type_strictness` failed on the positive observation before correction. |
+| 2026-09-27 | Letting a forbidden-data substring match the grader's name | The old privacy test rejected the harmless `promptfoo` harness name because it searched for `prompt` anywhere. Test forbidden JSON keys and planted private-value markers, while retaining the exact allowed gateway columns. The focused receipt suite first failed on this substring. |
+| 2026-09-27 | Testing host port validation behind an unrelated scratch-location refusal | The assigned external research scratch has a Git ancestor. The first host-parser fixture hit the private-state location guard before it exercised ports. Substitute only the location policy in this unit fixture; the focused port test then failed because 3710 was accepted, and passes with 3730..3799. Production location guards remain intact. |
+| 2026-09-27 | Assuming a SQLite transaction context closes its connection | Python 3.13 exposed an unclosed-connection ResourceWarning during local receipt checks. The [Python 3.12 documentation](https://docs.python.org/3.12/library/sqlite3.html#how-to-use-the-connection-context-manager) explicitly requires `contextlib.closing` for lifecycle closure; both the read-only receipt connection and synthetic fixture connections now use it. |
+| 2026-09-27 | Running a CLI help probe before scoping its writable state | The installed Promptfoo version/help probes attempted to rotate default log files and received EROFS. Every grading/version subprocess now gets private `PROMPTFOO_CONFIG_DIR`, `PROMPTFOO_LOG_DIR` and `PROMPTFOO_CACHE_PATH` plus disabled telemetry/update; no default logs were changed. |
 | 2026-09-27 | Treating a tag's lockfile as compatible without checking its metadata | `uv.lock` SHA256 `c672410c737e3085cae56d948854596284b7ac55066a97d9241d91913e3bb8e9` lists `litellm>=1.53.1`; v0.9.4 `pyproject.toml` and release wheel require `unclecode-litellm==1.81.13`. Use a derived hash lock from release metadata, label it local, and do not claim `uv sync --locked` acceptance. |
 | 2026-09-27 | Assuming every uv lock entry has a version | The read-only research probe raised `KeyError: 'version'` on the editable root. Corrected the probe to inspect source and optional version separately. No install was attempted. |
 | 2026-09-27 | Treating omission of temperature in caller config as omission on the wire | `crawl4ai/utils.py:1825` injects 0.01. Override through upstream `extra_args` with `temperature=None`; verify omission in the pinned LiteLLM transport and leave live wire behavior a host check. |
@@ -59,6 +116,10 @@ gap for the user-selected crawler. Popularity was not used as acceptance evidenc
 
 The locally derived wheel lock uses the official release requirement and
 `uv 0.12.17`'s supported requirements compilation, without installing:
+
+The command below records the historical round-1 invocation. Do not reuse its
+in-repository cache argument: round-2 research and verification use only the
+coordinator's assigned external scratch directory.
 
 ```
 uv pip compile blueprints/runtime-workers/crawl4ai/requirements.in \

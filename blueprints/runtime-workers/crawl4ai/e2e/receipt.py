@@ -9,10 +9,11 @@ import hashlib
 import json
 import re
 import sqlite3
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
-from check import check
+from grade import observation
 
 ROOT = Path(__file__).resolve().parents[1]
 COLUMNS = ("timestamp", "path", "status", "model", "reasoning_effort_requested",
@@ -30,7 +31,9 @@ def timestamp(value):
 
 def gateway_rows(database, start, end):
     try:
-        with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True, timeout=5) as db:
+        # sqlite3's transaction context does not close the connection; the
+        # Python 3.12 sqlite3 context-manager docs prescribe closing for that.
+        with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True, timeout=5)) as db:
             # Only call_logs and the nine named columns may be read, even after future edits.
             def authorize(action, table, column, *_):
                 if action == sqlite3.SQLITE_READ and (table != "call_logs" or column not in COLUMNS):
@@ -75,7 +78,8 @@ def make_receipt(directory, database):
     for arm in ("primary", "comparison"):
         info = metadata["arms"].get(arm)
         if info is None:
-            arms.append({"arm": arm, "check_passed": False, "gateway": {"status": "not_run", "rows": []}})
+            arms.append({"arm": arm, "grader": {"passed": False, "status": "not_run"},
+                         "gateway": {"status": "not_run", "rows": []}})
             continue
         gateway = gateway_rows(database, info["start"], info["end"])
         effort = "max" if arm == "primary" else "medium"
@@ -86,8 +90,8 @@ def make_receipt(directory, database):
         routing = len(relevant) == 3 and all(
             row["reasoning_effort_upstream"] == effort and row["path"] in PATHS
             and str(row["status"]) in {"200", "success", "completed"} for row in relevant)
-        passed = check(directory / arm / "result.json")
-        arms.append({"arm": arm, "check_passed": passed, "routing_observed_in_window": routing,
+        grader = observation(directory / arm)
+        arms.append({"arm": arm, "grader": grader, "routing_observed_in_window": routing,
                      "gateway": gateway, "framework_log_sha256": digest(directory / arm / "native.log"),
                      "result_sha256": digest(directory / arm / "result.json"),
                      "error_class": info.get("error_class") if re.fullmatch(r"[A-Za-z]+(?:Error|Exception)", info.get("error_class", "")) else None,
@@ -95,14 +99,21 @@ def make_receipt(directory, database):
     required_probes = ("auth_/mcp/sse", "auth_/mcp/ws", "auth_/crawl", "api_fit", "sse", "websocket")
     probes = metadata.get("probes", {})
     probe_checks = {key: probes.get(key) is True for key in required_probes}
-    passed = (all(a["check_passed"] and a.get("routing_observed_in_window", False) for a in arms)
+    controls = {name: observation(directory / "controls" / name)
+                for name in ("known-pass", "known-fail", "malformed-output")}
+    controls_passed = all(controls[name]["status"] == "observed"
+                          and controls[name].get("exit_code") == code
+                          and controls[name]["passed"] is (code == 0)
+                          for name, code in (("known-pass", 0), ("known-fail", 100), ("malformed-output", 100)))
+    passed = (all(a["grader"]["passed"] and a.get("routing_observed_in_window", False) for a in arms)
               and all(probe_checks.values()) and route_calls >= 1 and mcp_requests >= 1
-              and metadata.get("cleanup_passed") is True)
+              and metadata.get("cleanup_passed") is True and controls_passed)
     return {
-        "schema_version": 1, "framework": "crawl4ai", "framework_version": metadata.get("framework_version"),
+        "schema_version": 2, "framework": "crawl4ai", "framework_version": metadata.get("framework_version"),
         "expected_version": "0.9.4", "evidence_class": "local integration on synthetic frozen fixtures",
         "passed": passed and metadata.get("framework_version") == "0.9.4",
         "arms": arms, "container_checks": probe_checks, "cleanup_passed": metadata.get("cleanup_passed", False),
+        "grader_controls": controls, "grader_controls_passed": controls_passed,
         "mcp_observation": {
             "source": "framework container stdout/stderr bounded by this run start", "log_sha256": digest(native_log),
             "native_call_tool_request_count": mcp_requests,
@@ -111,14 +122,17 @@ def make_receipt(directory, database):
             "tool_names_inferred_from_routes": ["md"] if route_calls else [],
             "limitation": "v0.9.4 does not log MCP tool names; API route inference and client transport checks are distinct",
         },
-        "skills_observation": {"names": [], "status": "none observed; no native skill loader found in reviewed sources"},
+        "skills_observation": {"names_at_start": [], "events": [],
+                               "status": "not applicable: no native SKILL.md loader or inventory API found in reviewed v0.9.4 sources; no activation claimed"},
         "frozen_artifacts": {str(path.relative_to(ROOT)): digest(path) for path in sorted((ROOT / "e2e/fixtures").glob("*.html"))},
-        "oracle_sha256": digest(ROOT / "e2e/check.py"), "schema_sha256": digest(ROOT / "e2e/schema.json"),
+        "grader": {"name": "promptfoo", "version": "0.123.1", "mode": "standalone unchanged is-json and equals assertions",
+                   "assertions_sha256": digest(ROOT / "e2e/assertions.json")},
+        "transport_sha256": digest(ROOT / "e2e/check.py"), "schema_sha256": digest(ROOT / "e2e/schema.json"),
         "oracle_expected_sha256": digest(ROOT / "e2e/expected.json"), "pins_sha256": digest(ROOT / "pins.json"),
         "recipe_artifacts": {name: digest(ROOT / name) for name in (
             "worker.py", "requirements.lock", "browser-artifacts.json", "config/worker.json",
             "config/compose.yaml", "config/server.yml", "config/supervisord.conf", "config/logging.ini",
-            "container-entrypoint.sh", "e2e/run.py", "e2e/mcp_probe.py", "e2e/receipt.py",
+            "container-entrypoint.sh", "e2e/run.py", "e2e/mcp_probe.py", "e2e/receipt.py", "e2e/grade.py",
         )},
         "sanitization": "No raw logs, paths, credentials, emails, session/request identifiers or unapproved DB columns; unknown counters stay null",
         "qualification": "A passing comparison check qualifies only this frozen extraction contract; no global model substitution",

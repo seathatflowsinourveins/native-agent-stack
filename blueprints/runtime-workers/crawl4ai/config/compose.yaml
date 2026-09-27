@@ -1,6 +1,9 @@
 # Sources: upstream v0.9.4 Dockerfile, entrypoint.sh, supervisord.conf, config.yml.
 services:
   crawl4ai:
+    container_name: rw-crawl4ai-${NAS_CRAWL4AI_STORE:?}
+    labels:
+      com.native-agent-stack.owner: gpt6-omniroute-framework-integration
     image: unclecode/crawl4ai@sha256:048848e548fad60c670bd656cbb3eb204fd999709a30365d3697c411ce50796d
     platform: linux/amd64
     # Container root maps to the unprivileged host user. Native supervisor drops
@@ -47,3 +50,8 @@ services:
       options:
         max-size: "10m"
         max-file: "2"
+networks:
+  default:
+    name: rw-crawl4ai-${NAS_CRAWL4AI_STORE:?}-net
+    labels:
+      com.native-agent-stack.owner: gpt6-omniroute-framework-integration

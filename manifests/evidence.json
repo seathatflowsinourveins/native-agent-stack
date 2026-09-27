@@ -8448,8 +8448,8 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/README.md",
-      "sha256": "f72d934365ec77c4d2f3a6dfd2213045321d53208789326309c9a65c908f2228",
-      "bytes": 22642
+      "sha256": "e42e6f39bea6cea51febd723b6b315db660218845b7643c973f70da805f184b2",
+      "bytes": 29018
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/browser-artifacts.json",
@@ -8458,13 +8458,13 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/common.sh",
-      "sha256": "28a6c62a6063e49ce4a49c6e49c39dffe11d3ca3e6118a4bc5f3091cbefeabf0",
-      "bytes": 759
+      "sha256": "610f526187b7104e37bfac76aa68f6328848e739f215229bf7bd4f962a453d51",
+      "bytes": 863
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/config/compose.yaml",
-      "sha256": "1fee368ad1f278f9ff7b82eb2010d470b29aba5d0b9fbf7f453ae9b8c82a2a73",
-      "bytes": 2358
+      "sha256": "cf9f6565adc6e6e822df8af7165d4c74f9ed03285e7a342a446941081c00dd57",
+      "bytes": 2655
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/config/host.example.json",
@@ -8503,13 +8503,18 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/container.sh",
-      "sha256": "67cec78b10d8d5cc12109a0f483f462870bc50ccbce7f9ef16dff37b4070f708",
-      "bytes": 1685
+      "sha256": "dc753081dadc485d7e71b7f94a356ef718f306f52c8248db24081a0270394c60",
+      "bytes": 2491
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/assertions.json",
+      "sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "bytes": 81
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/e2e/check.py",
-      "sha256": "a1c362f9e379b9e8d391ce607a0f497ee76d1261eba13ad898377d01cfe60fc1",
-      "bytes": 1370
+      "sha256": "7878f98bea665d4111e3ce76580b26b8d495e84651ed236f108492e381623dd7",
+      "bytes": 831
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/e2e/expected.json",
@@ -8532,19 +8537,24 @@
       "bytes": 834
     },
     {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/grade.py",
+      "sha256": "cefc9125e6d505778cdb9f25f09c3ae9c072894ad8902c612f52c3e61d7e348f",
+      "bytes": 5734
+    },
+    {
       "path": "blueprints/runtime-workers/crawl4ai/e2e/mcp_probe.py",
       "sha256": "9f2f8e4e97c0ca59a6ed01338f000a1b9187edf9d8f71b8267e84801fb11a93d",
       "bytes": 5078
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/e2e/receipt.py",
-      "sha256": "5c7ee007c45dc1b086b65c6dbdd466611011812dbcb059831f5499c87fd4fc7b",
-      "bytes": 9433
+      "sha256": "23f3c0eb180d0586f5ee4d75067f1d2b78cc774599a799a89dc83aa1ba8a1305",
+      "bytes": 10561
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/e2e/run.py",
-      "sha256": "bde23a05cbf39c7155e8d85ec13aa3cfb64beb0374aa18242ac242e91ca1d811",
-      "bytes": 5531
+      "sha256": "941064359f5c56ecd4e8b288df14834d9f29c5ce2c29ef4fdc352730f32d6878",
+      "bytes": 6769
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/e2e/schema.json",
@@ -8553,7 +8563,7 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/host.py",
-      "sha256": "782e9ea4ddf86483aec24ff4df90b74b1b1a8551b40cb4f8f4a43356f46210d4",
+      "sha256": "38687eb528d63bb115654dbcb7c9d45c02f4f061625a198d1f9bb0363cbc47d8",
       "bytes": 4270
     },
     {
@@ -8563,13 +8573,13 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/install.sh",
-      "sha256": "11525ae807096ce96813041017fa1d5a2cf9f1ba53718900d336e0555beddf2f",
-      "bytes": 3278
+      "sha256": "0c065d7e98c5c6a84952828920465d3b692c6b564d24540a364d9661875ee53f",
+      "bytes": 3811
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/pins.json",
-      "sha256": "a79f2c194b986285f906a293ee04f2ad436c3fe3d1b571790a2904dda033d3e8",
-      "bytes": 1899
+      "sha256": "95b7e791aaad264a7dbefdd2eb70ddfe17be79fe756cdb19d407f668b6ba5a0e",
+      "bytes": 2290
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/registry-evidence.json",
@@ -8588,13 +8598,18 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/research.md",
-      "sha256": "86d8fb81447bb6d70f28e443383d00441ed295ecbac1bc80801e67da117c7e52",
-      "bytes": 9802
+      "sha256": "eb4f9c6229069d591c87023be401b90cdd4e99e276c714a5ab6e8c44151ecfea",
+      "bytes": 16473
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/run-e2e.sh",
       "sha256": "d39d556f748ee5a1cefea6f0dbe17dcbcac08a193fed522c2eae47450da89f44",
       "bytes": 392
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification-round2.json",
+      "sha256": "76c7dc531a0397c11dfaa97508d78eb383b8fef042533d9a0376723d3e533d97",
+      "bytes": 12483
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/verification.json",
@@ -8603,8 +8618,8 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/worker.py",
-      "sha256": "dfd3450936dbcc5103729f8e3a7cf8a6cc27a045727f86774b1e1517b74efbe2",
-      "bytes": 5238
+      "sha256": "e6ccb63f11b8da87c20b6a044d9513569586c52f3dd3743107d04a56a6862fc6",
+      "bytes": 6049
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -39903,8 +39918,8 @@
     },
     {
       "path": "tests/test_runtime_worker_crawl4ai.py",
-      "sha256": "44521b58dd752afb932431ba0d39e9e1a4ebee1b0322cdebb986df21c2c8760d",
-      "bytes": 13384
+      "sha256": "6c3669f6221f501d3a7392ab298b93234bd610a979ebbf608df93a51c67150dd",
+      "bytes": 21011
     },
     {
       "path": "tests/test_saturation_ledger.py",

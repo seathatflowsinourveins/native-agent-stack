@@ -7,6 +7,9 @@ NAS_CRAWL4AI_RECIPE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$NAS_CRAWL4AI_RECIPE/common.sh"
 [[ "$(uname -m)" == x86_64 && "$(uname -s)" == Linux ]] || { echo 'Linux x86_64 required' >&2; exit 1; }
 [[ "$(uv --version)" == 'uv 0.12.17'* ]] || { echo 'uv 0.12.17 required' >&2; exit 1; }
+# Promptfoo 0.123.1 site/docs/installation.md; no global/default npm prefix.
+node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 22 || (major === 22 && minor < 22)) process.exit(1)'
+command -v npm >/dev/null
 python3 - "$NAS_CRAWL4AI_RECIPE" <<'PY'
 import hashlib, json, pathlib, sys
 root = pathlib.Path(sys.argv[1])
@@ -40,6 +43,10 @@ if source.resolve() != destination.resolve():
                     ignore=shutil.ignore_patterns('.research', '__pycache__', '.gitignore'))
 PY
 export TMPDIR="$NAS_CRAWL4AI_STATE/tmp"
+npm install --global --prefix "$NAS_CRAWL4AI_PREFIX/grader" --cache "$NAS_CRAWL4AI_STATE/cache/npm" \
+  --no-audit --no-fund promptfoo@0.123.1
+PROMPTFOO_CONFIG_DIR="$NAS_CRAWL4AI_STATE/grader" PROMPTFOO_DISABLE_TELEMETRY=1 \
+  PROMPTFOO_DISABLE_UPDATE=1 "$NAS_CRAWL4AI_GRADER" --version
 "$NAS_CRAWL4AI_PYTHON" "$NAS_CRAWL4AI_PREFIX/recipe/install-browser.py"
 NAS_CRAWL4AI_IMAGE="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["image"])' "$NAS_CRAWL4AI_RECIPE/pins.json")"
 "$NAS_CRAWL4AI_DOCKER" --context "$NAS_CRAWL4AI_DOCKER_CONTEXT" pull --platform linux/amd64 "$NAS_CRAWL4AI_IMAGE"

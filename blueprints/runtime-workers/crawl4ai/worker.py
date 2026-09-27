@@ -11,16 +11,43 @@ import hashlib
 import json
 import math
 import os
+import re
 import uuid
 from pathlib import Path
 
 
 def model_for(config, arm):
     settings = config["llm"] if arm == "primary" else config["comparison"]
-    return os.environ.get(settings["model_env"], settings["model"])
+    model = os.environ.get(settings["model_env"], settings["model"])
+    if not re.fullmatch(r"cx/gpt-6(?:-[A-Za-z0-9]+)+", model):
+        raise ValueError("OmniRoute worker routes must select a cx/gpt-6 model")
+    return model
+
+
+def extraction_args(config, arm, schema, session):
+    """Native extra_args override, per v0.9.4 utils.py:1825-1837.
+
+    force_json_response retains native JSON parsing; this strict schema replaces
+    its weaker json_object request. The frozen schema closes every object.
+    """
+    extra = {
+        # Native utils injects 0.01; the pinned LiteLLM fork omits None values.
+        "temperature": None,
+        "response_format": {"type": "json_schema", "json_schema": {
+            "name": "crawl4ai_product", "strict": True, "schema": schema,
+        }},
+        "max_tokens": config["llm"]["max_tokens"],
+        "timeout": config["llm"]["timeout_seconds"],
+        "num_retries": 0,
+        "extra_headers": {"x-omniroute-session": session, "Idempotency-Key": uuid.uuid4().hex},
+    }
+    if arm == "comparison":
+        extra["reasoning_effort"] = config["comparison"]["reasoning_effort"]
+    return extra
 
 
 async def extract(config, arm, fixture_base, output, artifact_dir):
+    model = model_for(config, arm)
     from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig, LLMConfig
     from crawl4ai.content_filter_strategy import PruningContentFilterLXML
     from crawl4ai.extraction_strategy import LLMExtractionStrategy
@@ -29,7 +56,6 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
     root = Path(__file__).parent
     schema = json.loads((root / "e2e/schema.json").read_text())
     content = config["content"]
-    model = model_for(config, arm)
     session = "crawl4ai-" + uuid.uuid4().hex
     browser = BrowserConfig(browser_type="chromium", headless=True, verbose=True)
     crawl_config = CrawlerRunConfig(
@@ -56,22 +82,10 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
             if not fit or len(fit) > content["max_fit_characters"] or estimate > content["chunk_token_threshold"]:
                 raise ValueError("filtered content empty or exceeds the frozen one-chunk budget")
             (artifact_dir / f"page-{index}.fit.md").write_text(fit)
-            extra = {
-                # utils.py injects 0.01; the pinned LiteLLM fork omits None values.
-                "temperature": None,
-                "max_tokens": config["llm"]["max_tokens"],
-                "timeout": config["llm"]["timeout_seconds"],
-                "num_retries": 0,
-                "extra_headers": {
-                    "x-omniroute-session": session,
-                    "Idempotency-Key": uuid.uuid4().hex,
-                },
-            }
-            if arm == "comparison":
-                extra["reasoning_effort"] = config["comparison"]["reasoning_effort"]
             strategy = LLMExtractionStrategy(
                 llm_config=LLMConfig(provider=config["llm"]["provider_prefix"] + model,
-                                     api_token=config["llm"]["api_token"], base_url=config["llm"]["base_url"]),
+                                     api_token=config["llm"]["api_token"], base_url=config["llm"]["base_url"],
+                                     backoff_max_attempts=1),
                 schema=schema,
                 extraction_type="schema",
                 input_format="fit_markdown",
@@ -80,8 +94,8 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
                 chunk_token_threshold=content["chunk_token_threshold"],
                 overlap_rate=content["overlap_rate"],
                 word_token_rate=content["word_token_rate"],
-                apply_chunking=True,
-                extra_args=extra,
+                apply_chunking=False,
+                extra_args=extraction_args(config, arm, schema, session),
             )
             extracted = await asyncio.to_thread(strategy.run, url, [fit])
             (artifact_dir / f"page-{index}.raw.json").write_text(json.dumps(extracted))
@@ -101,3 +115,8 @@ async def extract(config, arm, fixture_base, output, artifact_dir):
                 "estimated_chunk_tokens": estimate,
             })
     return measurements
+
+
+if __name__ == "__main__":
+    # Model read-back for container.sh; importing this file makes no provider call.
+    print(model_for(json.loads((Path(__file__).parent / "config/worker.json").read_text()), "primary"))
