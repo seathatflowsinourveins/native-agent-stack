@@ -152,6 +152,10 @@ agentsview session sync "$SELECTED_NATIVE_SESSION_FILE" \
   --server http://127.0.0.1:17384
 ```
 
+Since 2026-09-27 the workstation's archive unit requires a token
+([token on the archive API](native-dashboards.md#token-on-the-archive-api-2026-09-27)).
+Set `AGENTSVIEW_DATA_DIR` to the archive and drop `--server`, or add `--server-token-file`.
+
 The installed 0.43.0 command returns a human-readable sync status. It calls the
 existing server and does not start another daemon. This wave selected this Codex
 conversation and two recent Claude files in the same agent-lab project. The three
