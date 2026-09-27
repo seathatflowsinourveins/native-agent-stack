@@ -26,18 +26,161 @@ plugins, skills, agents) to a private, dated, `0700` folder outside every worktr
 files, manifest sha256 `a7478603be747dfd52a18dd05f4f0d80510af5bd736c7af4581c0e7cd6b2c5c4`.
 The backup folder's path is not recorded here (personal path).
 
-**Never in the backup, and never touched by the rollback below, in either direction:**
-credentials (the Codex credential store `~/.codex/auth.json`; Claude Code's own native
-credential store, not a file this backup or rollback names), transcripts, sessions, history
-files or caches, for both clients. The rollback below only ever adds or overwrites files
-that the backup does hold; it is structurally unable to delete any of these, because it
-never runs `rm` or `rsync --delete` against a live client tree.
+**Never in the backup, and never touched by either step below:** credentials (the Codex
+credential store `~/.codex/auth.json`; Claude Code's own native credential store, not a file
+this backup or rollback names), transcripts, sessions, history files or caches, for both
+clients. Neither step deletes any of these: the removal step immediately below runs `rm` (or
+`skills remove`) only on the specific Stage 1 files and skills its table names, never on a
+credential, transcript, session, history or cache path; the restore step further below runs
+no `rm` or `rsync --delete` at all (see the note at that step).
 
-**Rollback — the one-line form (restores only what the backup holds, in place, over the
-live trees; adds and overwrites, never moves or deletes anything):**
+**Order: removal first, then restore — not the reverse.** The two steps undo different
+things. Removal deletes what Stage 1 *added*: files and registrations the backup, by
+construction, never held a prior copy of, so restoring cannot touch them. Restore overwrites
+live files with the backup's pre-Stage-1 copies (settings.json, config.toml, and so on) *in
+place*. Running restore first would rewrite exactly the live state — hook and MCP
+registrations, config values — that the removal table below was built from by reading this
+host, before removal has used that state to confirm exactly what is still there to delete;
+doing removal first, while that state is still live, avoids masking it. This is also the
+order the two steps appear in below.
+
+### Removal (what Stage 1 added)
+
+Undo each with its own native command (all read-only to verify first: `claude plugin list`,
+`claude mcp list`, `codex mcp list`, `codex plugin list`):
+
+| Stage 1 addition | Native removal |
+| --- | --- |
+| The 10 catalog agents ([`adoption/agents/claude/`](../../../adoption/agents/claude/)) under `~/.claude/agents/` | `rm ~/.claude/agents/{blind-adjudicator,blind-judge,blind-lane-reviewer,evidence-reviewer,isolated-builder,security-reviewer,semantic-evidence-reviewer,source-scout,stack-researcher,stack-verifier}.md` |
+| Two guard hooks under `~/.claude/hooks/` — of the four files [`tools/adoption/install_claude_profile.py`](../../../tools/adoption/install_claude_profile.py)'s `HOOKS` map (lines 48-53) can place; see note below | `rm ~/.claude/hooks/secret_path_guard.py`; `rm ~/.claude/hooks/effort-default-guard.py` (their `hooks` entries in `settings.json` go with the settings restore below) |
+| Every file under `~/.claude/workflows/` (13 files; see note below) — never the directory itself | one `rm` per file, listed below |
+| The `context-mode`, `claude-hud` and `codex` Claude plugins | `claude plugin uninstall context-mode@context-mode`, `claude plugin uninstall claude-hud@claude-hud`, `claude plugin uninstall codex@openai-codex` |
+| The `serena` user-scope Claude MCP registration | `claude mcp remove serena -s user` |
+| The Codex MCP servers `serena`, `headroom` and `qmd` | `codex mcp remove serena`, `codex mcp remove headroom`, `codex mcp remove qmd` |
+| The Codex `context-mode` plugin | `codex plugin remove context-mode@context-mode` |
+| `~/.codex/RTK.md` | `rm ~/.codex/RTK.md` (the inline RTK block this file's text was copied into, inside `~/.codex/AGENTS.md` — a pre-existing file, see "Codex" above — needs manual editing to remove; deleting `AGENTS.md` itself would remove more than Stage 1 added) |
+| The `updater.autoUpdateEnabled` key this session wrote into `~/.codex/app-server-daemon/settings.json` (whether the file existed before Stage 1 is not recorded; see note below) | conditional, not a blind `rm` — see note below |
+| The 28 skills pinned in [`adoption/skills/manifest.json`](../../../adoption/skills/manifest.json), the skills@1.7.0 manifest Stage 1 installed | one `skills remove <name> -g -y` per skill, listed below |
+
+**Hooks.** The `HOOKS` map names four files it can place under `~/.claude/hooks/`:
+`effort-default-guard.py`, `secret_path_guard.py`, `token-lanes-block.md` and
+`token-lanes-subagent-start.py`. Only the first two exist on this host (sha256-verified equal
+to their repository source, `adoption/hooks/claude/effort-default-guard.py` and
+`scripts/hooks/secret_path_guard.py`); the other two were added to that map by
+[#378](https://github.com/seathatflowsinourveins/native-agent-stack/issues/378)
+(`0c33b37a`) after Stage 1's own install ran on this host, so there is nothing to remove for
+them here. A third file also lives in `~/.claude/hooks/`, `context-mode-cache-heal.mjs` —
+that one is not this installer's own: per the [macOS template findings](#macos-template-findings)
+above, it is registered by the `context-mode` plugin itself, and goes with that plugin's own
+removal command in the table above, not with these two.
+
+**`~/.claude/workflows/`.** `ls -la ~/.claude/workflows` lists 13 files. Compared by name and
+sha256 against this repository's own
+[`examples/claude-native/workflows/`](../../../examples/claude-native/workflows) (whose own
+`README.md` and `SHA256SUMS` are documentation, not installed files, so they are not expected
+here): all 13 names match, and 12 match by sha256 exactly. The 13th, `contract.config.json`,
+does not match by sha256 because it is a per-host *render* of that same template — this
+host's own absolute paths in place of the template's relative ones — the same gap the
+[macOS template findings](#macos-template-findings) above record ("User-scope workflows need
+absolute contract paths, which `test-contract-mutations` rejects"), not a different file.
+Every file present is therefore accounted for as Stage 1's own; there is nothing in this
+directory today that is the user's own to preserve, and all 13 are named individually below,
+never the directory itself:
 
 ```sh
-rsync -a <backup>/claude/ ~/.claude/ && cp -p <backup>/claude.json ~/.claude.json && rsync -a <backup>/codex/ ~/.codex/
+rm ~/.claude/workflows/check-syntax.mjs
+rm ~/.claude/workflows/child-usage.mjs
+rm ~/.claude/workflows/codex-cross-review.mjs
+rm ~/.claude/workflows/contract.config.json
+rm ~/.claude/workflows/layer-verdict-lane.js
+rm ~/.claude/workflows/readiness-audit.js
+rm ~/.claude/workflows/review-changes.js
+rm ~/.claude/workflows/test-child-usage.mjs
+rm ~/.claude/workflows/test-codex-envelope.mjs
+rm ~/.claude/workflows/test-contract-mutations.mjs
+rm ~/.claude/workflows/test-envelope.mjs
+rm ~/.claude/workflows/test-usage-receipts.mjs
+rm ~/.claude/workflows/vendored-lanes.json
+```
+
+Any file that later appears in `~/.claude/workflows/` outside this list of 13 names is the
+user's own and stays; re-run the same name-and-sha256 comparison against
+`examples/claude-native/workflows/` before assuming otherwise.
+
+**`~/.codex/app-server-daemon/settings.json`.** This Mac's coordinator session wrote this
+file during Stage 1 with `{"updater": {"autoUpdateEnabled": false}}` — read directly again in
+this round-2 fix pass, still exactly that one key and value. Whether the file existed before
+Stage 1 is not recorded, so rollback must not delete it blindly: if the private backup holds
+a copy, the restore step below already puts that copy back (its `codex/` rsync is not
+`--delete`d, so it only overwrites, never skips, this path); if the backup holds no such
+file, remove only the key Stage 1 is known to have written, not the file:
+
+```sh
+if [ -f "<dated-backup>/codex/app-server-daemon/settings.json" ]; then
+  : # nothing to do here — the restore step's rsync of <dated-backup>/codex/ already restores it
+else
+  python3 -c "
+import json, pathlib
+p = pathlib.Path.home() / '.codex/app-server-daemon/settings.json'
+d = json.loads(p.read_text())
+d.get('updater', {}).pop('autoUpdateEnabled', None)
+p.write_text(json.dumps(d, indent=2) + chr(10))
+"
+fi
+```
+
+**Skills.** The skills@1.7.0 CLI's `remove` needs `-g` for global scope: Stage 1 installed
+these skills globally, and without `-g` the CLI acts on the current directory's *project*
+skills instead, not the global ones Stage 1 placed
+(`docs/decisions/2026-09-25-skills-trial-and-usage.md:43`, verbatim: "`skills remove <name>
+-g -y` (no `-a`) removes the canonical copy, both links and the lock entry" — the same call
+this repository's own installer runs on a mismatched install,
+[`tools/adoption/install_skills.py`](../../../tools/adoption/install_skills.py) lines 17-21
+and its `remove` call at line 196). The `skills` binary is the pinned 1.7.0 package the
+[Skills](#skills) section below names — there is no separate `<skills-bin>` path to look up.
+`DISABLE_TELEMETRY=1` matches the manifest's own `cli.env` and what the installer sets. There
+is no bulk form here, only one call per skill
+([`adoption/lifecycle.md`](../../../adoption/lifecycle.md):100, verbatim: "Never uninstall
+all user tools to roll back one package"):
+
+```sh
+DISABLE_TELEMETRY=1 skills remove typesafe-ai -g -y
+DISABLE_TELEMETRY=1 skills remove gh-fix-ci -g -y
+DISABLE_TELEMETRY=1 skills remove security-best-practices -g -y
+DISABLE_TELEMETRY=1 skills remove iterative-retrieval -g -y
+DISABLE_TELEMETRY=1 skills remove search-first -g -y
+DISABLE_TELEMETRY=1 skills remove diagnosing-bugs -g -y
+DISABLE_TELEMETRY=1 skills remove tdd -g -y
+DISABLE_TELEMETRY=1 skills remove codebase-design -g -y
+DISABLE_TELEMETRY=1 skills remove resolving-merge-conflicts -g -y
+DISABLE_TELEMETRY=1 skills remove grill-me -g -y
+DISABLE_TELEMETRY=1 skills remove improve-codebase-architecture -g -y
+DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y
+DISABLE_TELEMETRY=1 skills remove security-threat-model -g -y
+DISABLE_TELEMETRY=1 skills remove gh-address-comments -g -y
+DISABLE_TELEMETRY=1 skills remove semgrep -g -y
+DISABLE_TELEMETRY=1 skills remove codeql -g -y
+DISABLE_TELEMETRY=1 skills remove supply-chain-risk-auditor -g -y
+DISABLE_TELEMETRY=1 skills remove agentic-actions-auditor -g -y
+DISABLE_TELEMETRY=1 skills remove property-based-testing -g -y
+DISABLE_TELEMETRY=1 skills remove modern-python -g -y
+DISABLE_TELEMETRY=1 skills remove sarif-parsing -g -y
+DISABLE_TELEMETRY=1 skills remove fp-check -g -y
+DISABLE_TELEMETRY=1 skills remove mcp-builder -g -y
+DISABLE_TELEMETRY=1 skills remove frontend-design -g -y
+DISABLE_TELEMETRY=1 skills remove agent-browser -g -y
+DISABLE_TELEMETRY=1 skills remove find-skills -g -y
+DISABLE_TELEMETRY=1 skills remove variant-analysis -g -y
+DISABLE_TELEMETRY=1 skills remove writing-for-agents -g -y
+```
+
+### Restore (what Stage 1 overwrote)
+
+**The one-line form** (restores only what the backup holds, in place, over the live trees;
+adds and overwrites, never moves or deletes anything):
+
+```sh
+rsync -a <backup>/claude/ ~/.claude/ ; cp -p <backup>/claude.json ~/.claude.json ; rsync -a <backup>/codex/ ~/.codex/
 ```
 
 Spelled out:
@@ -48,41 +191,31 @@ cp -p "<dated-backup>/claude.json" ~/.claude.json
 rsync -a "<dated-backup>/codex/" ~/.codex/
 ```
 
-No `--delete` on either `rsync`, and no `rm` anywhere in this procedure: every command only
-adds a file the backup holds or overwrites a live file with the backup's copy, so a wrong
+No `--delete` on either `rsync`, and no `rm` anywhere in this step: every command only adds
+a file the backup holds or overwrites a live file with the backup's copy, so a wrong
 `<dated-backup>` path, a partial run, or stopping partway through never deletes anything —
 worst case, an unwritable destination or a missing source makes one line fail (non-zero
 exit) while leaving every live file exactly as it was, and the remaining lines are still
-safe to run. The coordinator's report does not state whether the 4,516-file manifest
-covers a sibling `claude.json` next to its `claude/` and `codex/` folders (this session did
-not re-hash the private manifest to check); the `cp -p` line is included on a best-effort
-basis regardless — a missing source makes only that one `cp` fail, touching nothing, and
-the two `rsync` lines are unaffected either way.
+safe to run. That independence is also why the one-line form above joins its three commands
+with `;` rather than `&&`: a missing `claude.json` backup (see below) would make only the
+`cp` fail, and an `&&` chain would then skip the second `rsync` for no reason it needs to —
+each command's own success or failure here is independent of the others, matching the
+spelled-out form below it. The coordinator's report does not state whether the 4,516-file
+manifest covers a sibling `claude.json` next to its `claude/` and `codex/` folders (this
+session did not re-hash the private manifest to check); the `cp -p` line is included on a
+best-effort basis regardless — a missing source makes only that one `cp` fail, touching
+nothing, and the two `rsync` lines are unaffected either way.
 
 This restores Stage 1's own overwrites (settings.json, config.toml and the other files the
-backup held before Stage 1 touched them). It does **not** remove anything Stage 1 *added*
-that the backup, by construction, never had a prior copy of to restore. Undo each with its
-own native command (all read-only to verify first: `claude plugin list`, `claude mcp list`,
-`codex mcp list`, `codex plugin list`):
-
-| Stage 1 addition | Native removal |
-| --- | --- |
-| The 10 catalog agents ([`adoption/agents/claude/`](../../../adoption/agents/claude/)) under `~/.claude/agents/` | `rm ~/.claude/agents/{blind-adjudicator,blind-judge,blind-lane-reviewer,evidence-reviewer,isolated-builder,security-reviewer,semantic-evidence-reviewer,source-scout,stack-researcher,stack-verifier}.md` |
-| The two guard hooks, `~/.claude/hooks/secret_path_guard.py` and `~/.claude/hooks/effort-default-guard.py` | `rm ~/.claude/hooks/secret_path_guard.py ~/.claude/hooks/effort-default-guard.py` (their `hooks` entries in `settings.json` go with the settings restore below) |
-| `~/.claude/workflows` | `rm -rf ~/.claude/workflows` |
-| The `context-mode`, `claude-hud` and `codex` Claude plugins | `claude plugin uninstall context-mode@context-mode`, `claude plugin uninstall claude-hud@claude-hud`, `claude plugin uninstall codex@openai-codex` |
-| The `serena` user-scope Claude MCP registration | `claude mcp remove serena -s user` |
-| The Codex MCP servers `serena`, `headroom` and `qmd` | `codex mcp remove serena`, `codex mcp remove headroom`, `codex mcp remove qmd` |
-| The Codex `context-mode` plugin | `codex plugin remove context-mode@context-mode` |
-| `~/.codex/RTK.md` | `rm ~/.codex/RTK.md` (the inline RTK block this file's text was copied into, inside `~/.codex/AGENTS.md` — a pre-existing file, see "Codex" above — needs manual editing to remove; deleting `AGENTS.md` itself would remove more than Stage 1 added) |
-| `~/.codex/app-server-daemon/settings.json` | `rm ~/.codex/app-server-daemon/settings.json` |
-| The pinned skills manifest ([`adoption/skills/manifest.json`](../../../adoption/skills/manifest.json)) | `<skills-bin> remove --all` (see "Skills" below for this host's `<skills-bin>` path) |
+backup held before Stage 1 touched them); it was never going to remove anything Stage 1
+*added* — the backup, by construction, never had a prior copy of an addition to restore,
+which is exactly why removal comes first, above.
 
 `apply_claude_settings.py` also wrote its own timestamped backup of the pre-Stage-1
 `~/.claude/settings.json`, separate from the private folder backup above; restoring that
 one file undoes every `settings.json` edit (both guard hooks' registration, the plugin and
 MCP entries, `effortLevel`, etc.) in a single step, but it does not uninstall the plugin,
-MCP-server or skill payloads themselves — those still need the commands above.
+MCP-server or skill payloads themselves — those still need the removal commands above.
 
 ## Service continuity
 
@@ -215,10 +348,11 @@ never/danger-full-access profile is an open question for the owner, not decided 
 README previously described the live listing as matching config.toml, which undercounted
 it, and no longer does.
 
-`app-server-daemon` `updater.autoUpdateEnabled`: `false` (per the coordinator's report; not
-re-checked in this session either, since that setting lives under `CODEX_HOME` outside the
-profile files this session read; stays `source_review` and unverified by any
-receipt — the codex receipt proves only `features.daemon_auto_start = false`, a different
+`app-server-daemon` `updater.autoUpdateEnabled`: `false` (per the coordinator's report, and
+confirmed again by a direct read of the file in this round-2 fix pass — still exactly
+`{"updater": {"autoUpdateEnabled": false}}` — since that setting lives under `CODEX_HOME`
+outside the profile files this document otherwise reads directly; stays `source_review` and
+unverified by any receipt — the codex receipt proves only `features.daemon_auto_start = false`, a different
 setting).
 
 `shell_environment_policy.set` carries the pinned `PATH`, `RTK_TELEMETRY_DISABLED=1` and
@@ -328,7 +462,7 @@ below):
 | [`...--codex--use--20260927.json`](../../hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927.json) | codex-cli 0.158.0-alpha.2.1 | superseded three times; version was only a flag here, not a retained command |
 | [`...--codex--use--20260927-2.json`](../../hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927-2.json) | codex-cli 0.158.0-alpha.2.1 | superseded by `-3` (review findings: the version-check command's exit code was actually a later `echo`'s, not `codex --version`'s; the claim named a specific model command that was not checked; `approval_policy`/`sandbox_mode` were claimed without a live check; the mcp-list check's summary line and the `socraticode` row fell outside the 400-char excerpt — `cua_repl` and `codex_app` were inside it, not cut off; see below) |
 | [`...--codex--use--20260927-3.json`](../../hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927-3.json) | codex-cli 0.158.0-alpha.2.1 | superseded by `-4` (review findings: the positive control's checker accepted the first successful `command_execution` in the transcript, whichever it was — this generation's own retained excerpt shows a plugin `SKILL.md` read satisfied it, with no relation to the fixture; `mcp list`/`features list` piped codex's own stderr into the JSON/text parse and discarded codex's own exit code behind `python3`'s exit code; the claim called `--sandbox read-only` a safety boundary though it does not bound the declared `context-mode` MCP server or Codex's plugin-provided tools; see below and "Memory-store writes during recording" above) |
-| [`...--codex--use--20260927-4.json`](../../hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927-4.json) | codex-cli 0.158.0-alpha.2.1 | current. Version/channel check whose exit code is `codex --version`'s own; `codex exec --skip-git-repo-check --sandbox read-only --ephemeral` (random-fixture positive control gated on, and printing, a `command_execution` event whose own command text contains the fixture's filename and exited 0 — not merely the first successful `command_execution`, whichever it is — plus an in-transcript negative control on a deliberately wrong count, correctly rejected; both `event_kinds`, per top-level event type, and `item_kinds`, per completed item type, are printed); `codex mcp list --json` and `codex features list`, both now run with `set -o pipefail` and codex's own stderr discarded before the parse instead of merged into it (declared ⊆ live gates the exit code together with codex's own; any live-only server is disclosed, not a failure — this run: `cua_repl`, `codex_app`). No longer claims `approval_policy`/`sandbox_mode`, and no longer calls `--sandbox read-only` a safety boundary (see "Codex" and "Memory-store writes during recording" above) |
+| [`...--codex--use--20260927-4.json`](../../hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--codex--use--20260927-4.json) | codex-cli 0.158.0-alpha.2.1 | current. Version/channel check whose exit code is `codex --version`'s own; `codex exec --skip-git-repo-check --sandbox read-only --ephemeral` (random-fixture positive control gated on, and printing, a `command_execution` event whose own command text contains the fixture's filename and exited 0 — not merely the first successful `command_execution`, whichever it is — plus an in-transcript negative control on a deliberately wrong count, correctly rejected; both `event_kinds`, per top-level event type, and `item_kinds`, per completed item type, are printed); `codex mcp list --json` and `codex features list`, both now run with `set -o pipefail` and codex's own stderr discarded before the parse instead of merged into it (declared ⊆ live gates the exit code together with codex's own; any live-only server is disclosed, not a failure — this run: `cua_repl`, `codex_app`; the receipt's own line naming which plugin provides each, `unified-computer-use@openai-bundled` and `codex-app-tools@openai-bundled` respectively, carries no evidence-class label of its own — that plugin-to-server mapping is `source_review`, same as the marketplace-origin claim beside it, both read from each plugin's own `.mcp.json`, not from this command's name/enabled/transport-only output; see "Codex" above). No longer claims `approval_policy`/`sandbox_mode`, and no longer calls `--sandbox read-only` a safety boundary (see "Codex" and "Memory-store writes during recording" above) |
 
 Both installed builds are newer than the current catalog pins (claude-code 2.1.278, codex
 0.155.1), so every `-2` and later receipt uses `--allow-unbound-version` and does not by
@@ -338,7 +472,8 @@ needs independent review plus the matrix flip rule in
 
 **A compliant independent review of these receipts cannot return `agree`, by construction,
 and this PR's merge does not wait on that being fixed.** `docs/contributing-evidence.md`
-section 8's four review points include, as point 4, "bound to the winner": the receipt's
+section 3, step 8's four review points (`docs/contributing-evidence.md:340-363`) include, as
+point 4, "bound to the winner": the receipt's
 `tool_versions` must match the landscape winner's pin. The current claude-code `-3` and
 codex `-4` receipts are both `--allow-unbound-version`; the tested codex is the ChatGPT
 app's bundled alpha build, which cannot bind to an `openai/codex` release pin at all, at any
@@ -460,12 +595,14 @@ From the coordinator's Stage 1 run, plus this session's own checks where noted:
   `--allow-unbound-version`).
 - No `platform_status` is changed by this PR. `adoption/manifest.json`'s macOS platform
   profile status is a separate, maintainer-judgment field this PR does not touch.
-- Counts, booleans, file names and (in the current `-3` claude-code and `-4` codex
-  receipts) tool names, item-type tallies and one sanitized shell command line appear; no
-  session id, uuid, working-directory path, MCP server command/args/env, or personal path
-  appears in this document or in any receipt's retained command output (those two current
-  receipts replace the scratch directory with `<scratch>` in the one command line they
-  print).
+- Counts, booleans, file names and, in the current `-3` claude-code and `-4` codex receipts,
+  tool names and item-type tallies appear; no session id, uuid, working-directory path, MCP
+  server command/args/env, or personal path appears in this document or in any receipt's
+  retained command output. Only one of the two prints a command line at all: the `-4` codex
+  receipt captures the one `command_execution` its positive control gates on, with its
+  scratch directory replaced by `<scratch>` in the printed text; the `-3` claude-code
+  receipt's own retained output has no command line anywhere in it, only the `tool_use_names`
+  its transcript scan records (see "Host receipts" above for both).
 - Host request [#382](https://github.com/seathatflowsinourveins/native-agent-stack/issues/382)
   still carries the `request:blocked` label as of this PR. Its status comment (written by
   `scripts/host_requests.py`, updated 2026-09-27T05:08:09Z) gives the reason: "Claude Code's
