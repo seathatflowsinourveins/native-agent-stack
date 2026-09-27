@@ -38,7 +38,7 @@ def mcp_item(path, output, **overrides):
     return {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_execute_file",
             "status": "completed", "error": None,
             "arguments": {"path": str(path), "language": "python", "code": SKILL_CODE},
-            "result": {"content": [{"type": "text", "text": output}]}, **overrides}
+            "result": {"content": [{"type": "text", "text": output}], "structured_content": None}, **overrides}
 
 
 class SkillVerdictTests(unittest.TestCase):
@@ -59,6 +59,28 @@ class SkillVerdictTests(unittest.TestCase):
         self.skill.write_text("# Changed first line\n", encoding="utf-8")
         self.assertFalse(prove.skill_verdict(run(item), self.skill)[0])
 
+    def test_prompt_limits_shell_reads_to_the_forms_the_verdict_accepts(self):
+        prompt = prove.skill_prompt(self.skill)
+        self.assertNotIn("A direct shell read is also acceptable", prompt)
+        self.assertIn("For shell reads, use only rtk cat", prompt)
+        self.assertIn(shlex.join(["rtk", "cat", str(self.skill)]), prompt)
+        # The review permits narrowing the prompt instead of expanding the
+        # parser. All alternative reads named by the reviewer are explicit
+        # negative controls, even when they return the correct first line.
+        for argv, accepted in ((["rtk", "cat", str(self.skill)], True),
+                               (["rtk", "cat", "--", str(self.skill)], True),
+                               (["cat", str(self.skill)], False),
+                               (["head", "-n", "1", str(self.skill)], False),
+                               (["rtk", "read", str(self.skill)], False),
+                               (["rtk", "proxy", "cat", str(self.skill)], False)):
+            command = shlex.join(argv)
+            for wrapped in (command, "/bin/bash -lc " + shlex.quote(command)):
+                with self.subTest(command=wrapped):
+                    item = shell_item(self.skill, self.skill.read_text(), command=wrapped)
+                    ok, detail = prove.skill_verdict(run(item), self.skill)
+                    self.assertEqual(ok, accepted, detail)
+                    self.assertIn("route shell (rtk cat)" if accepted else "route none", detail)
+
     def test_context_mode_direct_read_accepts_only_its_stdout(self):
         for echo in ("", f"```python\n{SKILL_CODE}\n```\n\n",
                      f"path={self.skill}\n```python\n{SKILL_CODE}\n```\n\n"):
@@ -69,8 +91,10 @@ class SkillVerdictTests(unittest.TestCase):
                 self.assertIn("route context-mode ctx_execute_file", detail)
 
     def test_project_boundary_refusal_can_fall_back_to_rtk_cat(self):
+        # Shape observed in the builder's native Codex 0.157.1 event: the
+        # refusal text is in result.content, status is failed, error is null.
         refused = mcp_item(self.skill, "File access blocked: resolves outside the project root (issue #852)",
-                           status="failed", error={"message": "File access blocked"})
+                           status="failed", error=None)
         self.assertFalse(prove.skill_verdict(run(refused), self.skill)[0])
         ok, detail = prove.skill_verdict(run(refused, shell_item(self.skill, self.skill.read_text())), self.skill)
         self.assertTrue(ok, detail)
@@ -114,8 +138,7 @@ class SkillVerdictTests(unittest.TestCase):
             with self.subTest(changed=changed):
                 item = {**good, "arguments": {**good["arguments"], **changed}}
                 self.assertFalse(prove.skill_verdict(run(item), self.skill)[0])
-        for changed in ({"status": "failed"}, {"error": {"message": "read failed"}},
-                        {"result": {**good["result"], "isError": True}}):
+        for changed in ({"status": "failed"}, {"error": {"message": "read failed"}}):
             with self.subTest(changed=changed):
                 self.assertFalse(prove.skill_verdict(run({**good, **changed}), self.skill)[0])
         # A code echo alone is never the actual first-line output.

@@ -375,6 +375,8 @@ backed up the main checkout's untracked `.codex/config.toml` and removed the
 three context-mode tables named by the documented host step. No private backup
 or active configuration is published.
 
+**2026-09-27 revision erratum:** the local `apply_codex_lane.py` / `prove_codex_lane.py` revision was **main before #395; exact commit not retained**; the [#395 start-up allowances](#addendum-2026-09-27-start-up-allowances-the-gateway-profile-and-four-base-keys) are not part of this apply and remain pending until a dry run and apply at the current revision.
+
 The [six sanitized records and evidence table](../../evidence/artifacts/codex-worker-lane-host-20260927/README.md)
 retain the initial 6/7 proof with its project-binding failure, the corrected
 **7/7 static proof**, and **12/12 with `--live` (five real model calls)**. The

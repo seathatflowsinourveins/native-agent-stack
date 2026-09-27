@@ -381,7 +381,7 @@ def rtk_verdict(run: dict, blob: bytes) -> tuple[bool, str]:
 
 
 def skill_cat_command(command: str, skill: Path) -> bool:
-    """Recognize a direct RTK read, using the CPython shlex POSIX parsing pattern
+    """Recognize a direct rtk cat read, using the CPython shlex POSIX parsing pattern
     of git_operation. Refuse compound commands, echoes and different files.
     Source: https://docs.python.org/3.12/library/shlex.html#improved-compatibility-with-shells
     """
@@ -425,8 +425,7 @@ def skill_verdict(run: dict, skill: Path) -> tuple[bool, str]:
         args = item.get("arguments") or {}
         direct = (args.get("path") == str(skill) and args.get("language") == "python"
                   and args.get("code") == SKILL_CODE)
-        if (not direct or item.get("status") != "completed" or item.get("error")
-                or (item.get("result") or {}).get("isError")):
+        if not direct or item.get("status") != "completed" or item.get("error"):
             continue
         output = result_text(item).replace("\r\n", "\n")
         output = output.removeprefix(f"path={skill}\n")
@@ -454,7 +453,8 @@ def skill_prompt(skill: Path) -> str:
             f"path {str(skill)!r}, language python, and exactly this code: {SKILL_CODE}. "
             "If context-mode refuses the file because it is outside the project directory, use your shell tool "
             f"to run this single command instead: {shlex.join(['rtk', 'cat', str(skill)])}. "
-            "A direct shell read is also acceptable. Do not change any configuration or permissions. "
+            "For shell reads, use only rtk cat with that path (optionally put -- before the path). "
+            "Do not change any configuration or permissions. "
             "Then reply with the file's first line. Do not guess it.")
 
 

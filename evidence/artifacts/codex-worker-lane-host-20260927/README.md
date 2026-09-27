@@ -6,6 +6,8 @@ process. `apply.txt` independently reports that no Codex processes were running
 and that the three lane files were written/read back or installed. The exact
 watcher timestamp is coordinator-supplied context; it is not in that text file.
 
+**2026-09-27 revision erratum:** the local `apply_codex_lane.py` / `prove_codex_lane.py` revision was **main before #395; exact commit not retained**; the [#395 start-up allowances](../../../docs/decisions/2026-09-26-codex-worker-lane.md#addendum-2026-09-27-start-up-allowances-the-gateway-profile-and-four-base-keys) are not part of this apply and remain pending until a dry run and apply at the current revision.
+
 The first proof retained a project-binding failure. Afterwards the coordinator
 privately backed up the main checkout's untracked `.codex/config.toml` and removed
 the three tables identified by `dry-run-project.txt`:
@@ -37,8 +39,10 @@ step. The failed proof remains visible.
 
 `prove-live.txt` is the five-call run made before the installed-skill check was
 added to `tools/adoption/prove_codex_lane.py`. Its 12/12 total is historical and
-does **not** prove that new check. The updated runner adds a sixth call and a
-thirteenth check when an installed SKILL.md is available. Its result records
+does **not** prove that new check. **2026-09-27 check-count correction:** the
+updated live worker suite always reports the thirteenth `skill-worker` check;
+it fails without an installed SKILL.md (or with an invalid `--skill-file`). A
+valid installed skill adds the sixth call. Its result records
 `context-mode ctx_execute_file` or `shell (rtk cat)` and compares actual tool
 output with the selected file's real first line. A project-boundary refusal
 alone does not pass the check. Synthetic tests are in
@@ -73,7 +77,8 @@ was run for this record, and no token-saving measurement is claimed.
   and the [app-server config API](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/app-server/README.md).
 - [mksglu/context-mode `v1.0.169`, containment implementation](https://github.com/mksglu/context-mode/blob/v1.0.169/src/security.ts#L766)
   (`evaluateProjectContainment`, compiled to `security.js`) and
-  [file-read handler](https://github.com/mksglu/context-mode/blob/v1.0.169/src/server.ts#L1165-L1200),
+  [project-boundary guard](https://github.com/mksglu/context-mode/blob/v1.0.169/src/server.ts#L1165-L1200),
+  invoked by the [file-read handler](https://github.com/mksglu/context-mode/blob/v1.0.169/src/server.ts#L2114-L2123),
   following [issue #852](https://github.com/mksglu/context-mode/issues/852).
   A skill outside the worker's project may be refused by this MCP tool; the
   permitted native shell read requires no change to that boundary.
@@ -87,3 +92,7 @@ was run for this record, and no token-saving measurement is claimed.
 The separate [tiering receipt](../gpt6-family-tiering-20260927/README.md) records
 A0 (`gpt-6-astra`, max) with 25 successful calls on the same date. Its live
 provider execution is a different experiment from the five worker-lane calls.
+
+**2026-09-27 source-label erratum:** `server.ts` L1165-1200 defines the
+project-boundary guard; the file-read handler calls it at L2114-2123. Both
+ranges were checked at `v1.0.169` during review repair.
