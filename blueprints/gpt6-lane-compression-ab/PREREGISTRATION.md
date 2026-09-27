@@ -1,432 +1,474 @@
 # GPT-6 lane compression A/B preregistration
 
-**DRAFT — not sealed, not run, no execution or adoption authority.** Foundation
-lane, 2026-09-27, reference base `0f76651d`. The machine-readable contract is
-[preregistration.json](preregistration.json). All live results, usage, pricing
-ratios, runtime qualification and role decisions remain `null`.
+**DRAFT — not sealed, not frozen, not run.** Repair round for draft PR #431 at
+`f201e07b`, 2026-09-27, foundation lane. No execution or adoption authority.
+The machine-readable contract is [preregistration.json](preregistration.json).
+All model results, route qualification, pilot measurements, powered sample
+sizes and confirmatory resource allocations remain `null`.
 
-The intended decision is the configuration with the fewest total billed token
-positions among quality-qualified configurations, separately for builders,
-reviewers and researchers. Exact numbers, pins, hashes and record contents are
-hard gates. Compression analytics cannot establish either correctness or lower
-billing. This document proposes an experiment; it does not change either gateway,
-install tools, start clients, register keys or schedule a run.
+This experiment compares all-attempt entry-gateway input plus output tokens,
+subject to paired quality, exact-record and transport gates. Its ceiling is
+**the six named task domains per role**. It cannot authorize moving a production
+builder, reviewer or researcher role. Reviewer/researcher output-style conclusions
+cover **JSON-only records**; prose verdicts, research narrative and evidence-writing
+need representative frozen tasks in a new preregistration.
 
-## Research and capability boundaries
+Research used installed search-first inline, find-skills discovery, TDD and
+verification-before-completion at the user-specified document/test seam. The
+installed Codex reports 0.157.1 and its prompt-input help describes a renderer.
+No model was called, including no prompt-input invocation in this repair.
+Seventeen installed OmniRoute source hashes were recomputed: all 17 match the
+retained pinned upstream bindings. This is source identity, not live acceptance.
+Direct shell gh failed to connect; read-only gh API through Context Mode supplied
+release notes and pinned source. No installed skills/tools or host configuration
+were changed. Sources and the exact review dispositions appear below and in JSON.
 
-The recorded harness mapping is in
-[the convergence source review](../../catalogs/convergence-practice/source-review.json),
-[Harbor's source record](../../catalogs/convergence-practice/architecture-wave/harbor-framework__harbor.json),
-[the September 26 catalog](../../catalogs/sota-convergence/manifest-20260926.json)
-and [the stack manifest](../../manifests/stack.json). Catalog inclusion is not
-host acceptance. The sibling #416 compaction-window draft supplied document and
-receipt structure only. Its task results and thresholds are not evidence here.
-The local test extends the document boundary used by
-[test_token_e2e_preregistration.py](../../tests/test_token_e2e_preregistration.py)
-at the reference base.
+The historical original authoring evidence is retained in JSON. This round uses
+the dated checks/findings/remaining-gates structure from
+[PR #416 build evidence](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b6f36d8cac660b47cafc827ee4595cf0bc74459a/blueprints/compaction-window-ab/build-evidence.json).
+That file was absent in this worktree and read at the cited upstream revision.
 
-Research used the installed search-first, find-skills, tdd and verification
-skills. The user had already specified the test/document seam. Installed skill
-sources were sufficient for this extension; no installation was attempted.
-Direct shell GitHub access failed, but read-only `rtk gh api` through the installed
-research tool succeeded. Release/tag checks preceded the source decisions below.
-The source inventory in JSON records immutable revisions, file spans and the
-evidence class. Sources establish available interfaces; no native harness or
-provider acceptance run occurred.
+## Runner and native configuration
 
-| Component | Pinned finding | Consequence |
-| --- | --- | --- |
-| Harbor v0.23.0, `1e5c5c6db929a10a140d05e606882c671ae20729` | Native TOML/inline config is accepted and uploaded after runtime overrides. [Loader/merge, L1207–1296](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1207-L1296) | Provider base URL and static headers can be carried in native config; prove the actual resulting request. |
-| Harbor native Codex | Harbor chooses its own `CODEX_HOME`; it retains native sessions. [Home/environment, L1352–1359](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1352-L1359), [retention, L1452–1476](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1452-L1476) | Use native transcripts for exact output, with ATIF as a cross-check. Do not copy the coordinator's home or authentication store. |
-| Required `-p stack-worker` | Forwarding **not found in** v0.23.0 [CodexOptions, L38–59](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L38-L59), [shared options, L50–70](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/options.py#L50-L70) or [launch, L1432–1448](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1432-L1448). Harbor was not found on PATH. | **Sealing blocker.** Native config support does not prove this literal invocation. Resolve with a supported upstream route or a pre-data protocol/pin amendment; do not invent `extra_args`, a custom runner or silently flatten the profile. |
-| Harbor verifier and Rewardkit | [Native verifier, L165–250](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/verifier/verifier.py#L165-L250) runs task tests. The bundled Rewardkit package is 0.2.0, but the unchanged [example verifier, L1–2](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/examples/tasks/reward-kit-example/tests/test.sh#L1-L2) pins 0.1.8. | Freeze the actual criteria/dependency; do not describe the example as 0.2.0 acceptance. |
-| promptfoo 0.123.1, `34f74d34e140b5e17d23770dfb2340057b1936b8` | OpenAI [base URL, L111–128](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/index.ts#L111-L128) and **Responses** [headers, L1195–1210](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/responses.ts#L1195-L1210) are supported. | Use `openai:responses:<model>`, `apiBaseUrl` and `headers` for gateway diagnostics. |
-| promptfoo repetition/grading | [CLI, L54–97](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/commands/eval.ts#L54-L97) has `--repeat`, `--no-cache`, concurrency and `--model-outputs`; [Python assertions, L32–63](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/assertions/python.ts#L32-L63) normalize results and fail exceptions. | Grade retained native Codex outputs offline. Direct promptfoo repetitions are separate gateway checks; they do not prove a persistent Codex tool session. |
-| Inspect 0.3.271 / inspect_swe 0.2.71 | The tagged [Inspect changelog, L1–4](https://github.com/UKGovernmentBEIS/inspect_ai/blob/c2b63a0b0560f9c3b5b5230365e0a8fe08cd3df0/CHANGELOG.md#L1-L4) adds extra headers/body. The installed CLI reports 0.3.266. [inspect_swe, L619–637](https://github.com/meridianlabs-ai/inspect_swe/blob/7eb8dd64309db4cd0f6bdf1d0ffd9786a74a4088/src/inspect_swe/_codex_cli/codex_cli.py#L619-L637) rewrites routing through its bridge. | Runner-up only. Substitution requires a pre-data amendment and transport/profile requalification; never pool different runners. |
+**Choose Harbor v0.23.0 conditionally, under option (b).** Harbor at `1e5c5c6d`
+passes only the final slash-separated segment to `--model`. Main `3c823808` does
+the same; no release after v0.23.0 was found in the releases API checked on
+2026-09-27. The canonical models below are therefore **not what Harbor currently
+emits**. The emitted argument for every cell is `gpt-6-astra-max`. A working
+20129-side route for that argument has not been identified or qualified.
+The established built-in `gpt-6-astra*` precedence rules out assuming an ordinary
+stored alias fixes it. This is an open sealing gate, not a fabricated mapping.
+[Harbor command](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1339-L1449), [inspected main](https://github.com/harbor-framework/harbor/blob/3c82380859d187957cfd5cd64802b076d9779550/src/harbor/agents/installed/codex.py#L1502-L1605).
 
-Codex reports 0.157.1. Every eventual native arm must use `-p stack-worker` and
-max effort with identical lane-local effective configuration except its provider
-definition and routed model. Freeze profile/project precedence, binary and config
-hashes. The `-max` model names below are mandatory. The unsuffixed name is locked
-out until a separate 20128 observation proves `reasoning_effort_upstream=max`
-through the openai-compatible node, followed by an amendment before data.
+| Alternative | Source-backed comparison |
+| --- | --- |
+| Later Harbor release/main | Release query returned v0.23.0 as latest; inspected main still strips prefixes. An upgrade alone is not a demonstrated repair. |
+| Inspect inspect_swe 0.2.71 | Resolves a catalog slug into `--model` and routes through its own OpenAI bridge. Profile, wire and correlation equivalence require qualification. [Command and bridge](https://github.com/meridianlabs-ai/inspect_swe/blob/7eb8dd64309db4cd0f6bdf1d0ffd9786a74a4088/src/inspect_swe/_codex_cli/codex_cli.py#L483-L637). |
+| promptfoo Codex SDK 0.123.1 | `config.model` passes intact into thread options; Codex SDK passes it intact to `--model`. Explicit thread resume exists, while deep tracing forces fresh threads. This is the strongest alternate for prefix preservation; native task/verifier/container integration is unqualified. [Provider](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts#L1034-L1134), [SDK](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/sdk/typescript/src/exec.ts#L91-L178). |
 
-## Five confirmatory cells and bounded exploratory work
+Harbor retains the existing native task/verifier/multi-step route without a new
+runner implementation. **Overturn this choice** before confirmation if promptfoo's
+Codex SDK passes the same merged-config, prompt-input, three-turn tool/verifier,
+correlation and both-hop effort checks while Harbor has no supported route or
+has unequal native semantics. Amend once before data; never pool runners.
 
-| Cell | Route/model | Input engines | Output styles |
+Route qualification belongs to the coordinator. Compare
+`codex debug prompt-input` for the slashless candidate against the canonical
+one-slash slug with identical semantic settings. Require the expected five items
+and equivalent template, tools, Responses Lite and multi-agent metadata after
+declared identity/path normalization; item count alone is insufficient. Then
+require one attributable live 200 at max through 20129 and prove C's emitted
+bare route equivalent to `cx/gpt-6-astra-max`. Reuse the user's established
+one-namespace metadata fact; do not re-probe it during repair.
+
+Adopt the **native semantic deep merge** of frozen `config.toml` followed by
+`stack-worker.config.toml`, with no `profile` or `profiles` keys. Hash both inputs,
+merged TOML, uploaded config and resolved effective settings. Codex's merge has
+normalization and replacement rules beyond a shallow dictionary update. Harbor
+uploads this file via `config`, then applies its runtime/MCP overrides.
+[Profile loader](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/config/src/loader/mod.rs#L286-L340), [merge implementation](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/config/src/merge.rs#L56-L185),
+[Harbor upload](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1207-L1296).
+
+Equivalence gate: same binary/model/cwd/project/system layers and effective
+forced flags, compare **resolved configuration and prompt-input** from the
+`-p stack-worker` base-plus-profile reference to the merged-file run without `-p`.
+Repeat after Harbor upload. Configuration provenance paths may differ; semantic
+settings, prompt content and tool definitions must match. Freeze the native
+resolved-config inspection command before qualification; it was not run here.
+
+Harbor's actual command contract is:
+
+```text
+codex exec [resume --last on turns 2/3]
+  --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check
+  --model gpt-6-astra-max --json --enable unified_exec
+  -c model_reasoning_effort=max -- <shell-quoted-step-instruction>
+```
+
+The upstream wrapper optionally sources NVM, redirects `2>&1 </dev/null` and
+pipes to `tee`. Freeze bypassed approvals/sandbox, git-check bypass, unified_exec,
+JSON output, runner home and MCP overrides as equal deviations across arms.
+This is not acceptance of stack-worker's sandbox. A tee exit alone does not
+prove Codex or verifier success. [Launch and options](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1339-L1449).
+
+The job uses `environment.extra_docker_compose` with the proposed overlay below,
+hashed before use. This is a supported integration shape, not a deployed file.
+[Compose implementation](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/docker.py#L350-L420), [upstream example](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/examples/jobs/extra-docker-compose/config.yaml#L1-L8).
+
+```yaml
+services:
+  main:
+    network_mode: host
+```
+
+From the actual main container, probe TCP reachability to both loopback ports and
+an unauthenticated non-inference health URL, discard the body and retain only
+status/latency. Verify actual WSL2/Docker behavior. A successful TCP connection
+is not provider acceptance. Host networking and sandbox bypass expose the
+**passwordless management APIs**; the inference key does not protect them.
+Frozen trusted synthetic tasks, no hostile/internet task input, no host mounts
+or Docker socket, one session and independent before/after settings observations
+bound scope and detect changes, but do not form a security boundary. Execution
+also requires a source-supported, host-qualified network restriction preventing
+management and alternate-route access. No such containment is accepted here;
+if unavailable, amend to an isolated host/gateway arrangement before running.
+
+## Cells, authentication and wire contract
+
+| Cell | Canonical client entry | Input engines | Output styles |
 | --- | --- | --- | --- |
-| C | `20128/v1`, `cx/gpt-6-astra-max` | Compression globally off; `codex/*` excluded | Off |
-| D0 | `20129/v1`, `sharedgw/cx/gpt-6-astra-max` | Headerless defaults | Off |
-| D1 | Same framework route | Headerless defaults | On |
-| A0 | Same framework route | All 12, static `x-omniroute-compression: allow-lossy` | Off |
-| A1 | Same framework route | All 12, same static header | On |
+| C | `20128/v1`, `cx/gpt-6-astra-max` | Globally off, `codex/*` excluded | Off |
+| D0 | `20129/v1`, `sharedgw/gpt-6-astra-max` | Headerless defaults | Off |
+| D1 | Same 20129 route | Headerless defaults | On |
+| A0 | Same 20129 route | All 12; `x-omniroute-compression: allow-lossy` | Off |
+| A1 | Same 20129 route | All 12; same header | On |
 
-Both URLs use `http://127.0.0.1`. The framework instance chains through provider
-node `sharedgw` to 20128. The headerless set is `session-dedup`, `ccr`, `lite`,
-`headroom`. “Lossless defaults” is an upstream label, not this experiment's
-finding. The full set adds `rtk`, `codex-responses`, `relevance`, `caveman`,
-`aggressive`, `llmlingua`, `ultra`, `omniglyph`. Preserve upstream engine order
-and freeze all thresholds, models, preservation rules and fallback settings.
+Both gateway URLs are host loopback. The logical model per hop is
+client→20129 **`sharedgw/gpt-6-astra-max`**, 20129→20128 **`gpt-6-astra-max`**,
+and control C **`cx/gpt-6-astra-max`**. Harbor's stripped argument requires the
+route gate above; a config model cannot override its forced `--model`.
+Freeze sharedgw **Responses→Responses**, including actual source/target format.
+No Chat fallback is confirmatory. Preserve real encrypted reasoning/custom items,
+`store=false`, effective include and call IDs at both hops.
+[Compression stages/translation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449), [adapter](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145).
 
-Styles-on selects `terse-prose`, `less-code`, `ponytail`, `i-have-adhd`, all at
-`full`, with legacy caveman output configured `lite`. Inspection corrects an
-additive interpretation: explicit nonempty styles **override** legacy caveman.
-Styles-off sets both `outputStyles=[]` and `cavemanOutputMode.enabled=false`;
-clearing only the list re-enables its legacy fallback. This comes from
-[backCompat.ts L13–28](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/backCompat.ts#L13-L28).
+Headerless engines are `session-dedup`, `ccr`, `lite`, `headroom`. The remaining
+eight are `rtk`, `codex-responses`, `relevance`, `caveman`, `aggressive`,
+`llmlingua`, `ultra`, `omniglyph`. Freeze upstream order, thresholds and model
+dependencies. A safe label is not proof of exact preservation. Explicit styles
+are `terse-prose`, `less-code`, `ponytail`, `i-have-adhd`, all full. Nonempty
+explicit styles override legacy caveman; styles-off clears them and disables
+legacy output mode. A header-off 20129 request is never clean C because reactive
+context fitting remains possible. [Policy](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lossyRequestPolicy.ts#L29-L67),
+[style precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/backCompat.ts#L13-L28), [context fitting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449).
 
-These five cells are the economical direct-control-plus-2×2 design. All four
-candidate-versus-C comparisons are confirmatory for each role. D1–D0 and A1–A0
-separate output-style effects at each input setting; A0–D0 and A1–D1 describe
-input-engine effects. These internal contrasts and interactions are explanatory.
-C versus a framework cell also includes the extra hop; it cannot identify a
-pure compression effect independently of routing.
+All four D/A cells use the **existing registered lane principal and 60-minute
+live zone confirmatorily**. Native Codex uses `env_key = "OMNIROUTE_FW_API_KEY"`;
+Harbor uses `extra_env` with the literal variable template
+`${OMNIROUTE_FW_API_KEY}`. No key is in static headers, files or CLI arguments.
+The owner supplies the existing private 0600 secret through the runner's secret
+environment; this repair never opens it. C omits that key and provider env_key.
+Require `OPENAI_API_KEY`, `CODEX_AUTH_JSON_PATH`, `CODEX_FORCE_AUTH_JSON` and
+ambient `OPENAI_BASE_URL` unset in the Harbor parent process. Harbor may itself
+supply an empty OpenAI key/auth stub; verify absence/emptiness predicates only,
+never inspect or print a real credential value.
+Harbor's KEY redaction can expose partial values when falling back to redaction,
+so preserve the environment template and verify no literal/partial secret logs.
+[Environment](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py#L560-L648), [redaction](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/utils/env.py#L4-L65),
+[principal/session requirement](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L127-L132).
 
-The future host owner must reserve exclusive 20129 experiment windows, snapshot
-settings, apply/read back the exact cell, and restore the snapshot. No shared
-settings race is permissible. Freeze applied/skipped/no-eligible engine evidence;
-an enabled toggle does not show that an optional engine actually ran. Failure
-to isolate styles or traffic leaves the factor untested.
+Existing key registration and TTL are user-established facts; observed live-zone
+reuse is still a qualification result. The optional keyed exploration was
+removed. Single-engine exploratory work cannot promote: each repetition is one
+persistent three-turn session per task/cell, three repetitions × six tasks ×
+three roles, paired with D0, in fixed engine order and complete blocks only.
 
-Only after a complete confirmatory cohort, reserved budget may fund exploratory
-D0-plus-one-engine cells in this fixed order: `codex-responses`, `rtk`,
-`relevance`, `caveman`, `aggressive`, `llmlingua`, `ultra`, `omniglyph`. Each uses
-styles off and three paired repetitions of all six tasks per role against D0.
-Do not choose engines after looking at outcomes. No exploratory cell promotes
-a role without fresh confirmation.
+## Exactness, tasks and native turns
 
-Optional exploratory D0-keyed and A1-keyed cells compare their corresponding
-keyless cells with a registered 20129 principal and `cacheMinutes=60`. A future
-host owner keeps that key in a private per-provider **0600** store, outside the
-checkout, never printing it. Match account/session conditions and retain only
-sanitized identity checks. Key registration and live-zone reuse are separate
-facts. No registration occurs in this draft.
+Every session, including C and sessions with no applied engine, scores exact
+numeric lexemes, pins, hashes and records. Engine application is a separate
+coverage gate; no-op is not engine acceptance and never silently removes an
+outcome. Zero exact-record corruption is mandatory. [Engine eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145),
+[stage gating](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386).
 
-## H1–H6: installed-source checks and required experiments
+The numeric canary includes `1234567890123456711`, `1.50`, `-0.0100`, pins and
+hashes, padded beyond the 512-byte threshold. Four separate native shapes are
+specified: shell, MCP text, MCP structuredContent and custom tool. For each,
+retain pre-compression output shape/hash, eligibility, whole-string JSON parse,
+actual rewrite and delivered exactness. Unified exec and legacy shell prepend
+headers, so the whole shell output is not JSON: report the minifier unreachable
+on that shape, without stripping headers to manufacture eligibility. MCP and
+custom-tool reachability remains open. StructuredContent numeric serialization
+can lose scale before compression; use string lexemes and a raw text block to
+separate client serialization from engine damage.
+[Whole-string minification](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145), [native tool shapes](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/tools/context.rs#L524-L601),
+[legacy shell](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/tools/mod.rs#L97-L124).
 
-The installed package's `dist/BUILD_SHA` is `dd6e9607e`, corresponding to the
-recorded build `dd6e9607e4884ec75c9bc0d96e60b01e9483d84e`. Its compression source
-matches upstream base `a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3` byte-for-byte for
-the seventeen files listed with SHA256s in JSON. Public citations use that verified
-upstream base, rather than assuming the local cherry-pick commit is published.
-This is source verification of peer report #423, not a new gateway observation.
+The corrected direct-Chat dedup stimulus has message 0 with padding part 0 and
+an independent earlier-pin part 1; message 1 is string block B and message 2
+repeats B. Both message 0 part 1 and message 2 use key **2**. Assert
+`messages[0].content[1].text` unchanged. The original single-part stimulus could
+not trigger that rewrite. Native Responses `input_text` may never meet the
+engine's `type=text` condition: record native reachability separately, without
+presenting a direct-Chat reproduction as a native lane finding.
+[Dedup](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L291-L345), [adapter](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145), [stage selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386).
 
-**H1, cache.** [liveZone.ts L127–132](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L127-L132)
-requires principal, session and variant. [chatCore.ts L1793](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1793)
-derives the principal from caller API-key identity. Without a live-zone context,
-[L376–395](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L376-L395)
-calls compression again. Prefix damage is a hypothesis: deterministic results
-or other memoization can still preserve cacheability. The reported **about 94%**
-20128 cache rate is historical peer context, with current measurement `null`.
-Measure input, cached subset, uncached input and priced billed-input equivalent
-for each complete user turn, including all its tool continuations and retries.
+The long canary retains tail sentinels beyond 2,000 characters for lite's
+truncation path. Optional dependencies that never fire remain uncovered; setting
+all 12 engine names does not prove all 12 ran. Output-style findings remain
+within JSON-only reviewer/researcher records. [Lite](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L148-L168),
+[style catalog](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/catalog.ts#L32-L194).
 
-**H2, exact content.** The minifier uses `JSON.parse`/`JSON.stringify` at
-[codexResponses/index.ts L137–145](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145).
-Canaries require exact lexemes `1234567890123456711`, `1.50`, `-0.0100`, pin
-`dd6e9607e` and a complete 64-character hash. A rounded integer or `1.5` fails.
-Qualify the minifier's size thresholds before claiming its path was exercised.
-
-Lite's default maximum is 2,000 characters, and its
-[tool truncation L148–168](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L148-L168)
-retains only a prefix. The peer's unknown Responses path is now source-traced:
-[bodyAdapter.ts L116–145](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145)
-maps `function_call_output` to `role: tool`, and
-[strategySelector.ts L367–386](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386)
-adapts and restores the lite/stacked paths. Actual configured truncation remains
-a host check. Do not transfer codex-responses eligibility guards to lite.
-
-The dedup defect is an index-key collision: string message 1 and multipart
-message 0, part 0, both use key 1 in
-[session-dedup/index.ts L291–345](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L291-L345).
-The probe preserves a distinct earlier user pin alongside repeated multiline
-blocks, then checks the earlier message bytes and the turn-3 answer. Test it
-in headerless cells too. Caveman rewrites, relevance sentence selection,
-aggressive summarization, LLMLingua and ultra pruning have separate installed
-file/line references in JSON. Run exactness checks against the effective pipeline,
-not merely its safety labels.
-
-**H3, styles.** The enabled/header-not-off condition at
-[chatCore.ts L1689–1734](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1689-L1734)
-does not require `allow-lossy`. “Every request” therefore means configured,
-eligible requests, not unconditional injection. Check complete deliverables,
-all required patch hunks/explanations, schema fields and exact record values.
-
-**H4, control.** Header/per-key opt-out leaves independent context-fit safety
-enabled at [chatCore.ts L1443–1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1449).
-Proactive and last-resort passes additionally require
-`!nativeCodexPassthrough` at
-[L2134–2160](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2134-L2160)
-and [L2210–2231](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2210-L2231).
-Framework-route reachability must be observed. An exploratory bounded threshold
-probe compares histories below/above the resolved thresholds, including header
-off. **20129 with header off is never C.**
-
-**H5, both hops.** Source supports configured Responses `include`, `store`,
-`previous_response_id`, `prompt_cache_key` in
-[promptfoo L1003–1040](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/responses.ts#L1003-L1040).
-OmniRoute applies cache-key, session and conditional reasoning transformations at
-[codex.ts L1498–1573](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1498-L1573).
-Neither fact proves chain continuity. Observe client→20129→20128→provider
-boundaries privately: stable prompt-cache/session identity, supported affinity
-carriers (including `x-omniroute-connection`), actual account, `store=false`, effective encrypted-reasoning `include`,
-byte-identical real encrypted items and matching call IDs on turn 2. An absent
-reasoning item leaves that check `null`; never fabricate one. Freeze actual
-supported affinity headers before use; candidate names in JSON are a checklist,
-not a claim that each is forwarded.
-
-**H6, roles.** This is the user's policy, not a package feature. Only builders
-may canary early, in isolated reversible work after deterministic exactness and
-transport gates. Reviewer/researcher experimental outputs remain quarantined;
-production judgment, verification, review, research and evidence use C until
-their own role/domain passes. Any output that becomes a record needs exact-value
-preservation. A successful task score cannot waive a corrupted verdict or pin.
-
-## Task packets, controls and multi-turn unit
-
-Each role has six fixed tasks. The JSON contains task prompts/source bindings,
-known answers, schemas, literal input files, source-derived synthetic defects
-and canary bytes. Hashes bind the entire packet, including oracle/control
-contracts. They do not pretend that executable adapters or containers exist.
+Each role retains six task packets with explicit expected answers and negative
+controls. Builder core source directories/verifiers remain pinned; their 52-file
+source manifests are historical byte evidence. Canaries and three-step envelopes
+are **local integration additions**, not unchanged upstream acceptance. The
+native two-step builder runs `create-file`, `append-content`, then one new
+`exact-record` step as turns 1/2/3. Other tasks use original-core-and-evidence,
+recall-with-fresh-tool, exact-record. Use native Harbor `[[steps]]` and
+`agent.resume_trajectory=true`; retain one Codex session, not three independent
+jobs. Hash and qualify the wrappers and graders before pilot.
+[Native trial](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/multi_step.py#L25-L110), [two-step source](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/examples/tasks/hello-multi-step-simple/task.toml#L15-L31).
 
 | Packet | SHA256 |
 | --- | --- |
-| Builder | `e42a388f70cf7b94b2a59b6b19bc625911df44716c52d857fa8c65985256ec74` |
-| Reviewer | `8ca985caea25ee2c62ca1640d64b0be55faeed505a702dd964c9e6662ff7476b` |
+| Builder | `4ddbb5aae74a1fa6b613d836f62120abf28f3ffd1091ae90e496edb9b879444b` |
+| Reviewer | `336a23603b7c31e0f5c8b6a2f6f49f9b27ab77f79c12d3ab7df5ab016fcc6198` |
 | Researcher | `eda4967d6e0dfb1bf9d433c0fbf55c04c14a3603299d3937488d109daa07b056` |
-| Shared canaries | `f06487b5af0fdab5a12dbb35cae00b4b6b0e6ec938311a961c9f5ea332446b43` |
+| Shared canaries | `8bf066389d8523cbfa1d3593d399a986083b6e875e652901f266469dce5a6d07` |
 
-Packet serialization is UTF-8 JSON, sorted keys, ASCII escapes, compact
-separators, no NaN, no trailing newline. Hash only the `packet` member. The
-structural test independently recomputes these hashes.
+Hash UTF-8 JSON `packet` values with sorted keys, ASCII escapes, compact
+separators, no NaN or trailing newline. Structural tests independently recompute
+the hashes. Known-pass, known-fail, malformed, missing/nonfinite rewards, duplicate
+keys, missing/extra fields and zero-test controls must run through the native
+extraction path. Structural validation cannot close those runtime gates.
 
-Builder tasks reuse unchanged Harbor examples: TOML table conversion,
-Rewardkit text statistics, native multi-step file work, MCP exact output,
-working-directory capture and a separate verifier environment. All **52 source
-files** were fetched through `gh api`, and per-directory SHA256 manifests were
-independently recomputed. The manifest hashes sorted records
-`relative_path + NUL + sha256(file_bytes) + LF`; each selected directory and
-digest is in JSON. Run original instructions/step files and original verifiers;
-the short descriptions are indexes, not replacement prompts. Four tasks are
-smoke/tool-chain checks. They cannot justify broad builder adoption.
+One fixed schema-reminder retry is allowed within the original session budget.
+Final recovered task/canary success is primary; initial schema, patch and verifier
+failures remain secondary events and retain all cost. Only **unrecovered**
+operational failures at final termination enter the co-primary endpoint. An
+exact-value corruption still vetoes the cell regardless of later recovery.
 
-Reviewer tasks contain one source-derived planted defect each: numeric rounding,
-multipart-key collision, long-output truncation, cache double-counting, legacy
-style fallback and discarded encrypted reasoning. Grade exact defect identity,
-file and evidence values. These are synthetic tasks, not new security findings
-or unchanged upstream test cases.
+## Accounting, effort and cache identity
 
-Researcher tasks extract number lexemes, pins/hashes, long-output tail fields,
-honest unknowns, non-overlapping usage and style precedence. Every output has an
-explicit schema and exact expected typed object. One fixed-reminder schema retry
-is permitted and counted; the initial failure remains in the primary endpoint.
+**Count at the entry gateway exactly once:** C uses `20128.call_logs`; D0/D1/A0/A1
+use `20129.call_logs`. Exclude the chained 20128 usage row. Required fields include
+`correlation_id`, row ID, timestamp/path/status/model/duration, input/output/cache/
+reasoning tokens, nullable effort columns and `tokens_compressed`. Join returned
+**`X-Correlation-Id`** to that entry row, privately mapping task/session/turn/request
+ordinals. Never join by model and time or sum cumulative polls.
+[Usage fields](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107), [response header](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatHelpers.ts#L1172-L1184).
 
-Builder controls are Harbor's native oracle and nop agents plus malformed,
-missing or nonfinite reward artifacts. Reviewer/researcher controls feed the
-complete expected answer, an intentionally wrong value and malformed output
-through the same extraction/grading path. Also reject duplicate keys, extra
-fields, missing output, zero tests and exit-zero-without-reward. The numeric
-controls specifically distinguish `1234567890123456800` and `1.5` from the
-required values. Native control runs and adapter hashes remain unresolved;
-this repository test is structural evidence only.
+Native Codex's inspected SSE reader exposes selected response headers; no
+X-Correlation-Id exporter was found in that path. Preregister a client-side
+**mitmproxy 12.2.3 reverse listener** with a minimal header-only adapter following
+upstream `responseheaders` and streaming examples. Codex's base URL points to the
+owned listener, which forwards model/body unchanged to its entry gateway.
+The adapter emits only correlation ID, status, request/flow ordinal and assigned
+trial/turn ordinal. It does not read or persist authorization values, request
+header dumps, bodies or complete flows. Use identical observation in all arms;
+hash the adapter and qualify SSE/cache/tool behavior and error joins before use.
+No observer was installed or run here. A second, exact observed downstream-flow
+join is required for 20128 effort evidence, with no unrelated lane traffic;
+timestamps/model cannot substitute. That join remains open.
+[Codex reader](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/codex-api/src/sse/responses.rs#L30-L101), [header hooks](https://github.com/mitmproxy/mitmproxy/blob/6c09d56e4c29a92f5ad01b03199977584b8ea14f/mitmproxy/proxy/layers/http/_hooks.py#L7-L39),
+[stream example](https://github.com/mitmproxy/mitmproxy/blob/6c09d56e4c29a92f5ad01b03199977584b8ea14f/examples/addons/http-stream-simple.py#L1-L14), [reverse mode](https://github.com/mitmproxy/mitmproxy/blob/6c09d56e4c29a92f5ad01b03199977584b8ea14f/docs/src/content/concepts/modes.md#L178-L257).
 
-Every scored attempt includes **one persistent native Codex session with three
-user turns**, tools on every turn, and the original role task. Turn 1 completes
-the native task and captures tool evidence; turn 2 uses earlier tool outputs and
-a real function-call/output pair while making another tool action; turn 3 returns
-the exact record using earlier provenance and tail values. The canary artifact
-is separate from the original builder deliverable, and the task's original reward
-is retained. Primary success requires both core task and mandatory canary success.
-Capture pre-compression tool bytes, final wire/transcript evidence and delivered
-record independently. A failed trigger is untested, not a passing canary.
+For effort, GET `/api/usage/call-logs/<id>` at each joined hop and inspect the
+stored client/provider request body's **`reasoning.effort`**, printing only that
+field. Freeze actual detail selectors during qualification. Null effort columns
+are expected without encrypted reasoning and **never prove drift**; they only
+corroborate. Missing body evidence stays unknown, observed non-max is drift.
+[Conditional columns](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L628-L653), [detail API](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/usage/call-logs/[id]/route.ts#L1-L22).
 
-Harbor's exact profile/continuation protocol must be qualified before use. The
-draft creates no replacement orchestration. A loop of promptfoo calls or repeated
-single-turn jobs cannot satisfy this requirement.
-
-## Accounting and operational metrics
-
-**Count usage exactly once at 20128.** Required columns are `timestamp`, `path`,
-`status`, `model`, `reasoning_effort_requested`, `reasoning_effort_upstream`,
-`tokens_in`, `tokens_cache_read`, `tokens_reasoning`. Also require a stable request
-row ID, **`tokens_out`** and duration. Source declares these at
-[callLogs.ts L90–107](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107);
-the actual host database has not been inspected. Without output tokens, output
-style costs and total billed tokens are unknowable.
-
-Use finalized request IDs, mapped privately to task/session/user-turn ordinals.
-Sum all calls within the user turn, including retries/tool continuations. Update
-an unfinished row on the next poll instead of adding cumulative snapshots.
-Timestamp/model matching alone is insufficient with shared traffic. Include
-failed, cancelled and retried attempts; no automatic replacement of bad trials.
-Missing 499 usage stays `null`, making cost comparison incomplete.
-
-| Quantity | Formula/boundary |
+| Quantity | Boundary |
 | --- | --- |
 | Uncached input | `sum(tokens_in - tokens_cache_read)` |
-| Total billed token positions | `sum(tokens_in + tokens_out)`; cached input included once |
-| Billed-input equivalent | `sum(tokens_in - tokens_cache_read + cache_price_ratio * tokens_cache_read)` |
-| Priced total equivalent | Uncached input + weighted cache reads + weighted total output |
-| Reasoning | Display `tokens_reasoning` separately; it is an output subset |
-| Compression savings | Isolated before/after deltas from **20129 `GET /api/analytics/compression`**, never added to 20128 usage |
+| Total positions | `sum(tokens_in + tokens_out)` at the entry only |
+| Weighted input | uncached input + cache ratio × cached input |
+| Weighted total | weighted input + output ratio × total output |
+| Reasoning | Output subset, reported separately, never added again |
+| Compression diagnostic | Joined 20129 `tokens_compressed`; includes reactive compaction, not billed savings |
 
-Total token positions are not dollars. Freeze applicable cache/output price
-ratios before a billing conclusion; both remain `null` now. Never add cached
-input to total input, reasoning to total output, engine savings to overlapping
-pipeline savings or 20129 usage to the downstream ledger. Contaminated analytics
-windows leave savings unknown.
+Exclusive-window analytics can corroborate compression diagnostics but are
+optional and never additive with per-call savings. Retain failures, retries and
+cancellations. Null usage remains null, with a lower/upper interval only if
+supported by stored nonsecret request size **and** provider serialization/context
+and output caps. Request bytes alone cannot bound total tokens; pilot maxima
+are not hard caps. Without a defensible upper bound, cost is inconclusive.
+Require the winner to remain cheaper under candidate upper/control lower totals
+and all sensitivity weights. This replaces automatic rejection of every null
+499 row while preserving uncertainty. [Nullable counters](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107).
 
-Report original verifier success, combined success, rejected `apply_patch`
-invocations, verification failures, schema retries and tool-output recall.
-Recall means an unrequested second read of an unchanged file and overlapping
-byte range after a successful first read; changed-file verification and scheduled
-canary reads are excluded. Unresolvable file identity is unknown. Preserve both
-event counts and session-any-failure indicators. Latency is monotonic end-to-end
-task/turn duration including tools, grading and retries. Count 499 request rows
-and cancelled sessions separately, including local cancellations with no row.
+Actual subscription prices remain unknown. Preregister sensitivity assumptions
+**cache ratio [0,1], output ratio [1,10]**, with uncached input as unit weight.
+Require the economic guard at all four corners for whole-session and turn 1/2/3
+strata; test weighted candidate minus 1.01×C using simultaneous paired bounds.
+The weighted inequality is linear in weights, so the corner checks cover the
+rectangle. Report crossover weights. This is robustness to stated assumptions,
+not GPT-6 dollar pricing or a measured subscription-limit meter.
 
-## Repetitions, analysis and role decisions
+`x-omniroute-connection` is a **connection pin**, not session affinity. Affinity
+uses `x-codex-session-id`, `x-session-id`, `x-omniroute-session`, then body session
+identifiers, `prompt_cache_key`, then first-input hash. Live zone instead uses
+`x-omniroute-session-id` or a generated body/provider/connection fingerprint.
+Trace cache keys at both hops, salted accounts and per-arm account spread/cache
+read rates. The review's account-collapse risk remains unobserved; verify it in
+qualification. [Affinity](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L221), [live-zone fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/sessionManager.ts#L103-L145).
 
-The fixed confirmatory allocation is **240 paired session draws per role per
-cell**, 3,600 scored native attempts plus assigned priming sessions. Each draw selects from the frozen six-task
-role mixture and a cold-labelled/warm-labelled condition with equal probability,
-using the pinned random generator and seed defined in JSON. Expected repetition
-is 40 per task per cell. Seal the realized schedule before any provider probe;
-there is no outcome-driven task balancing or extra sampling. The same draw runs
-all five cells. Counterbalance their order with the five specified Williams
-orders and their reversals, rotated by role ordinal.
+## Pilot, statistics and resources
 
-Fresh sessions isolate arms/repetitions; stable identity preserves within-session
-affinity. Warm-labelled attempts get a fixed same-arm priming sequence, fully
-charged to their attempt, including failed primes. The expected 1,800 additional
-priming sessions are not hidden inside the 3,600 scored-session count; the sealed
-schedule fixes their actual count. Cold-labelled attempts have no prime and a fresh
-namespace. These are assigned conditions, not proof of provider cache state:
-measure actual warmth, session/account routing and timing on every turn. Never
-flush the shared gateway or assume a delay guarantees a cold provider cache.
+Run no confirmation until an **excluded pre-confirmatory qualification pilot**
+has measured each cell. Proposed pilot: 12 paired draws per role, two per task,
+all five cells, 180 native three-turn sessions, zero primes. Its provisional
+24M-token/seven-day/30-minute-session ceilings are monitored planning limits,
+not evidence it fits or execution authority. Preflight native request/output
+bounds and reserve before starting. An incomplete pilot cannot size confirmation.
+Keep all its usage, wall time, failures and refusals.
 
-Success and operational-failure non-inferiority margins are both **5 percentage
-points**, separately for each role. Operational failure is any unexpected patch
-or verifier error, schema retry, invalid tool round trip, cancellation or missing
-output in a session. Task-success and operational-failure details remain visible.
+Retain joint five-arm final success/unrecovered-failure patterns and per-cell
+tokens, wall time, cache by turn, account spread and null-usage bounds. Then use
+the pinned NumPy/SciPy algorithms in JSON to simulate power and margin-null
+calibration. Candidate n grid: 120, 240, 480, 960, 1920, 3840; 10,000 simulations
+per law, seed 20260929. The random primitives are pinned to
+[NumPy 2.4.0](https://github.com/numpy/numpy/blob/c5ab79c14c98bfda1e60770ffa23a6130f8267b7/numpy/random/_generator.pyx#L299-L310). Preserve empirical joint dependence and a declared
+sensitivity grid. For harmless-arm power, permute all five arm labels within
+a resampled pilot draw, preserving joint outcomes with equal marginal rates.
+Sensitivity laws use shared-or-independent uniform draws with fixed success and
+unrecovered-failure thresholds; exact laws and feasibility rules are in JSON. Choose the smallest n whose lower 95% exact power bound is at least .80
+for jointly qualifying four harmless candidates per role, and whose upper
+family false-promotion bound at margin-null is at most .055 (Monte Carlo
+tolerance .005 around .05). If none qualifies, keep the gate open. No statistical
+simulation or pilot result is claimed by this repair.
 
-For a conservative paired gate, count harmful discordances: C passes/candidate
-fails for success; candidate has operational failure/C does not for failure.
-Their probabilities upper-bound net harm. Require one-sided
-`scipy.stats.binomtest(k, n, p=.05, alternative="less")` rejection for each
-co-primary endpoint after `statsmodels.stats.multitest.multipletests(method="holm")`
-over **24** tests (3 roles × 4 candidates × 2 endpoints). Missing tests get
-`p=1`. Also require observed net differences within the margins and **zero exact
-record/canary corruptions**. Paired attempts are the units, never calls. Control and candidate must also each achieve at least **90% combined success**,
-with at least one successful attempt of every task. An all-failing control cannot
-qualify a cheap treatment. Independent
-draws from the frozen mixture and independent provider attempts are assumptions;
-temporal dependence or failed randomization makes the result inconclusive.
+Primary success harm is `mean(C_success - candidate_success)`; failure harm is
+`mean(candidate_unrecovered_failure - C_unrecovered_failure)`. Both margins are
+five percentage points. Use `scipy.stats.bootstrap(paired=True, method="percentile")`,
+99,999 whole-draw resamples, `alternative="less"`, fixed seed 20260927. Invert the one-sided upper
+percentile interval against +.05. This is approximate and must pass the pre-data
+calibration; a nonsignificant equality test is not non-inferiority.
+[SciPy bootstrap](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L300-L394). Tango's paired-proportions score interval is a
+source-backed alternative, recorded but not implemented with a new solver.
+[Tango 1998](https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8%3C891::AID-SIM780%3E3.0.CO;2-B).
 
-Use pinned **SciPy 1.18.1** [bootstrap](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L300-L394)
-and [permutation_test](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L1679-L1780)
-for paired whole-session difference/cost intervals and explanatory paired cost
-permutations. Keep every turn, retry and warm-up attached to its session. Exact
-binomial bounds guard zero-width/undefined bootstrap intervals; a nonsignificant
-equality test never establishes non-inferiority. Holm is supplied by
-[statsmodels 0.15.0](https://github.com/statsmodels/statsmodels/blob/278ff9950636cdd4939b4055e339a8e681d79cab/statsmodels/stats/multitest.py#L99-L149).
-Seeds, resample counts and alternatives are in JSON. No custom statistics engine
-is proposed. No power or precision outcome is claimed in advance.
+Exact fallback when fewer than 20 discordant draws, degenerate or nonfinite
+bootstrap: h counts harmful discordance and b counts beneficial discordance.
+At test level a use one-sided Clopper-Pearson `U(h,n,1-a/2) - L(b,n,1-a/2)`.
+This union-bound upper limit covers **net harm**, without independence between
+h and b. Require it below .05; invert monotonically for p. All-concordant data
+have a nonzero exact uncertainty bound. Unsupported results get p=1.
+[SciPy exact interval](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_binomtest.py#L52-L115).
 
-Among complete quality-qualified cells, choose the minimum **all-attempt total
-billed tokens** on the identical role schedule. Values within **1%** of the
-minimum are a practical tie: prefer C, then D0, D1, A0, A1. If the paired cost
-interval does not establish any saving, retain C. Promotion also requires the
-upper one-sided 95% bound on both warm-stratum priced input and priced total
-ratios versus C to be at most **1.01**. Unknown billing weights cannot justify
-economic promotion. This catches a shorter compressed prompt that destroys a
-valuable cache prefix.
+Combine the two required endpoints with candidate `p=max(p_success,p_failure)`
+(intersection-union), then Holm across **12 role-candidate hypotheses** at .05;
+missing/unrun hypotheses get p=1. This avoids treating each mandatory component
+as a separate promotion claim. [Intersection-union reference](https://doi.org/10.1214/ss/1032280304),
+[Holm implementation](https://github.com/statsmodels/statsmodels/blob/278ff9950636cdd4939b4055e339a8e681d79cab/statsmodels/stats/multitest.py#L99-L149). Control and candidate still need observed
+combined success ≥.90, at least one success for each task, zero exact-record
+corruption and valid native controls.
 
-Only a whole tested configuration in its qualified role/task domain may move.
-A1 can qualify for a research domain while builders retain C. Exploratory
-one-engine evidence cannot identify every engine interaction or authorize broad
-adoption. Broad judgment/review/evidence use needs representative tasks beyond
-this narrow six-task pack and exact-value tests on the records it creates.
-Underpowered, incomplete or invalid cohorts retain C and keep all costs visible.
+Confirmation uses independent uniform draws over each role's six tasks, paired
+across all five cells. Retain the Williams orders and their reversals recorded
+in JSON. Freeze realized schedule after the pilot and before confirmatory data;
+no outcome-driven balancing, replacement or extra sampling. There are **zero
+priming sessions**, no cold/warm labels and no cache flush. Analyze measured
+cache state by user turn 1, 2 and 3, keeping all requests/retries attached to the
+session. Fresh per-arm/draw identities do not prove a cold cache.
 
-## Budget, cancellation, validity and sealing
+Sample size, confirmation token cap and wall allowance remain null until sizing.
+Use pilot per-cell one-sided upper mean cost/wall estimates ×1.25 and the larger
+99% resampled aggregate schedule estimate. Add pilot/control/exploration costs,
+setup/teardown and a separately qualified inflight/cancellation reserve. With
+one session at a time, sum all five cells' wall time. A statistical forecast
+does not create a hard provider charge cap. Never reduce powered n to fit an
+insufficient resource envelope. The old 5,400-session plan allowed only 3,703.70
+tokens and 112 seconds per session; that arithmetic is verified, but the cited
+13,806-token request came from a different invocation and was not a measured
+minimum for this cohort.
 
-The planned ceiling is **24,000,000** downstream input-plus-output token
-positions: 2,000,000 qualification/controls, 20,000,000 confirmation including
-priming, 2,000,000 exploration. Use one owned session at a time, a 600,000-token
-inflight reserve, five-second ledger polls, 30-minute session and seven-day whole
-run wall limits. No starts when a conservatively bounded next session cannot fit.
-Before confirmation, use qualification usage to check whether the entire fixed
-cohort can fit; no optimistic partial-cohort promotion. Native request/output
-bounds are a sealing gate. Until enforceable charge bounds are demonstrated,
-describe the cap as monitored with possible cancellation overshoot.
+Pilot-calibrate routine error/cancellation thresholds over rolling 20-session
+blocks using conservative exact rate bounds and a .01 whole-run false-stop
+allocation. Freeze finalization/reconciliation delays from pilot timing. Immediate
+stops remain corruption, authentication/quota refusal, observed model/effort/config
+drift, failed controls, ambiguous joins and insufficient resource reserve.
+Null effort columns and recovered transient failures are not drift.
 
-Stop on record corruption, budget/reserve threshold, authentication/quota refusal,
-model/effort/config drift, ambiguous usage, ledger delay beyond 30 seconds,
-failed controls, uncontrolled traffic, five consecutive 499/error requests or
-three cancelled sessions within ten owned sessions. A corruption veto stops that
-treatment immediately; do not continue spending merely to estimate its rate.
-Retain the incomplete cohort and every failed attempt.
+Use native Harbor cancellation, then only the owned recorded process group with
+bounded interrupt/TERM/KILL escalation; verify local termination and reconcile
+entry-gateway rows. Never stop gateways or unrelated sessions. Restore only the
+owned 20129 settings snapshot. Unknown remote cancellation/trailing usage stays
+unknown. None of this lifecycle work executes while drafting.
 
-Use Harbor's native cancellation first. Record owned job/container/process-group
-identities at launch; stop new work, interrupt only that group, allow ten seconds,
-then TERM and another ten seconds before KILL of surviving owned descendants.
-Clean only owned resources through Harbor. Never stop either gateway or use a
-broad process-name kill. Observe local termination independently and reconcile
-downstream terminal/499 rows for up to 60 seconds. Remote provider cancellation
-and unknown trailing usage remain unproved when not observed. Restore only the
-owned 20129 settings snapshot. None of these operations occurs while drafting.
+After quality gates, rank complete all-attempt total tokens, with the preregistered
+1% tie preference C, D0, D1, A0, A1 and evidence of positive paired saving. Economic
+guards use simultaneous bounds across candidates, rectangle corners and turn/
+session strata. Incomplete, underpowered or weight-sensitive results retain C.
 
-Main validity threats are cache warmth, both-hop affinity/reasoning continuity,
-provider nondeterminism and time/order effects, configuration time slicing,
-optional engines that never apply, promptfoo's result cache, narrow task coverage
-and ambiguous repeated reads. No result can resolve a threat merely because its
-receipt has valid JSON. Use `--no-cache` for promptfoo's own result cache while
-preserving native provider caching. Keep salted correlation identifiers and raw
-conversations private; publish bounded sanitized artifacts and source hashes.
+## Review repair dispositions
 
-Before the first model capability probe, the coordinator must seal source/task
-bytes, runtime images/dependencies, exact graders and their negative controls,
-native profile/three-turn invocation, realized order/prime schedule, effective
-configuration, both-hop transport and ledger mappings. Unknown executable hashes,
-image digests and readiness results stay null. Changes after sealing require an
-append-only dated amendment preserving old/new hashes and whether data existed;
-material changes require a fresh cohort. This draft cannot supply that seal.
+“Fixed by gating” means the protocol defect is repaired but an explicitly open
+qualification result prevents sealing. It is not passed host acceptance.
+PLAUSIBLE findings remain marked as unobserved where source inspection cannot
+establish their occurrence. No whole finding was declined; the unsupported
+request-size-only total usage bound in M9 was specifically declined.
 
-Open host items are explicitly enumerated in JSON: the Harbor profile gap,
-native two-hop acceptance, effective settings/max effort, request/output billing
-fields and pricing, native pinned harness readiness, full grader controls,
-representative domain coverage and optional keyed live-zone reuse. These are
-future verification requirements, not fabricated passed checks.
+| Finding | Disposition | Repair, verification and source |
+| --- | --- | --- |
+| B1 | fixed by gating | Canonical hop names fixed; retain Harbor option (b) with unresolved supported route, full prompt equivalence and live-200-max gates; compare three alternatives. Verified stripping in v0.23.0/main. Established namespace/route facts reused. PLAUSIBLE bare-name 401 not re-probed; no working route asserted. [Source 1](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1339-L1449) [Source 2](https://github.com/harbor-framework/harbor/blob/3c82380859d187957cfd5cd64802b076d9779550/src/harbor/agents/installed/codex.py#L1502-L1605) [Source 3](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts#L1034-L1134) [Source 4](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/sdk/typescript/src/exec.ts#L91-L178) [Source 5](https://github.com/meridianlabs-ai/inspect_swe/blob/7eb8dd64309db4cd0f6bdf1d0ffd9786a74a4088/src/inspect_swe/_codex_cli/codex_cli.py#L483-L637) |
+| B2 | fixed by gating | Merged semantic config, actual forced command, equal-arm deviations, host-network overlay/probe, admin containment gate and native [[steps]] mapping. Read loader/merge, Harbor upload/command/compose/multi-step code. WSL2 reachability and config equivalence unobserved, gated. [Source 1](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/config/src/loader/mod.rs#L286-L340) [Source 2](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/config/src/merge.rs#L56-L185) [Source 3](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1339-L1449) [Source 4](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/environments/docker/docker.py#L350-L420) [Source 5](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/multi_step.py#L25-L110) |
+| B3 | fixed by gating | Pre-confirmatory pilot measures all cell costs/wall times; powered n, confirmation budget/reserve/wall fields now null pending sizing. Zero primes. Old arithmetic verified: 5,400 sessions, 3,703.70 tokens/session, 112 s/session. Historical 13,806-token row is a different invocation, not a measured lower bound for this cohort; no new host receipt read. [Source 1](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L300-L394) [Source 2](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/multi_step.py#L25-L110) |
+| B4 | fixed by gating | Usage at entry only joined on X-Correlation-Id; upstream-hook observer specified; no hop summation. Request-body effort at both hops; nullable columns corroborate only. Verified call_logs schema/conditional effort and header emission; native Codex header export not found in inspected SSE path. Observer and second-hop exact join remain unqualified. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatHelpers.ts#L1172-L1184) [Source 3](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L628-L653) [Source 4](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/usage/call-logs/[id]/route.ts#L1-L22) [Source 5](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/codex-api/src/sse/responses.rs#L30-L101) [Source 6](https://github.com/mitmproxy/mitmproxy/blob/6c09d56e4c29a92f5ad01b03199977584b8ea14f/mitmproxy/proxy/layers/http/_hooks.py#L7-L39) |
+| B5 | fixed by gating | Paired net-harm bootstrap with explicit conservative exact fallback; 12 candidate intersection-union Holm tests, unrecovered failures, pilot power and null calibration. Recomputed reviewer's old-gate probabilities .003102/.306404/.784372; cited pinned bootstrap/exact/Holm code. No power result claimed without pilot. [Source 1](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L300-L394) [Source 2](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_binomtest.py#L52-L115) [Source 3](https://github.com/statsmodels/statsmodels/blob/278ff9950636cdd4939b4055e339a8e681d79cab/statsmodels/stats/multitest.py#L99-L149) [Source 4](https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8%3C891::AID-SIM780%3E3.0.CO;2-B) [Source 5](https://doi.org/10.1214/ss/1032280304) [Source 6](https://github.com/numpy/numpy/blob/c5ab79c14c98bfda1e60770ffa23a6130f8267b7/numpy/random/_generator.pyx#L299-L310). |
+| M1 | fixed by gating | Registered-key D/A cells and TTL 60 are confirmatory; key name through env_key/extra_env templates only; reuse acceptance gated. Established host configuration reused; inspected principal/session and environment-template source, no key file access. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L127-L132) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449) [Source 3](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py#L560-L648) [Source 4](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/utils/env.py#L4-L65) |
+| M2 | fixed | Sensitivity cache ratio [0,1], output ratio [1,10]; robust all-corner/turn guard without claiming actual prices or subscription meter. These ranges are explicit protocol assumptions over source-defined token components; actual price fields remain null. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107) [Source 2](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L300-L394) |
+| M3 | fixed by gating | Four native output-shape canaries with whole-string eligibility and native-reachability results; shell minifier nonreachability cannot count as engine acceptance. Verified shell/unified_exec headers and whole-string JSON.parse. MCP/custom shapes and actual engine application remain qualification results. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145) [Source 2](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/tools/context.rs#L524-L601) [Source 3](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/tools/mod.rs#L97-L124) [Source 4](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145) |
+| M4 | fixed by gating | Direct Chat key-2 collision stimulus rebuilt; assert multipart pin part unchanged; native Responses reachability and wire format independently gated. Source key construction/owner ordering/replacement verified. input_text bypass is source-supported concern; no native collision observed. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L291-L345) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145) [Source 3](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386) |
+| M5 | fixed | Reviewer/researcher style conclusions restricted to JSON-only records; no prose-verdict/evidence harmlessness claim. All 12 task schemas inspected; style catalog targets prose/code. PLAUSIBLE effect magnitude remains unmeasured; narrowed scope uses reviewer's alternative fix. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/catalog.ts#L32-L194) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449) |
+| M6 | fixed by gating | Connection pin separated from session affinity; prompt_cache_key at both hops, account spread/cache reads by arm, prior false correction repaired. Header/body/fallback precedence verified. PLAUSIBLE account collapse not observed and not claimed; qualification required. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L221) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1498-L1573) |
+| M7 | fixed | Every session including C scores exact values; application/reachability is separate engine coverage, never exclusion or vacuous pass. Source allows no-op/ineligible engine paths; public document contract now explicitly defines both outcomes. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386) |
+| M8 | fixed | Drop all separate priming and cold/warm labels; stratify measured cache analysis by turn. PLAUSIBLE lack of warming not established experimentally; native session/affinity source supports avoiding an unverified priming benefit. No cache-effect claim. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L221) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1498-L1573) |
+| M9 | fixed by gating | Pilot-calibrated operational stops; null usage intervals and worst-case ranking. Request size alone is declined as a bound on total input+output usage. Nullable input/output/reasoning schema verified. Routine error prevalence unmeasured. Require supported output/serialization caps as well as stored request size; without them cost gate stays open. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L628-L653) [Source 3](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_binomtest.py#L52-L115) |
+| M10 | fixed | Explicit ceiling: named synthetic task domains only, no production role migration or prose-record adoption. Six-task packets and four builder smoke cases inspected; narrower scope states the design's limitation without adding representative tasks. [Source 1](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/verifier/verifier.py#L165-L250) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/catalog.ts#L32-L194) |
+| m1 | fixed | Replace Nine with Seventeen installed source files in correction log. Recomputed all 17 retained installed SHA256 bindings: 17 matched. No new live acceptance implied. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145) |
+| m2 | fixed | Per-call tokens_compressed primary diagnostic; includes reactive compaction, not billed savings. Analytics optional, never additive. Inspected callLogs L107 and chatCore L1916-1919/L2164; source-backed attribution improvement. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449) |
+| m3 | fixed | promptfoo gateway example uses sharedgw/gpt-6-astra-max; Codex SDK alternate preserves the same one-slash slug. Verified provider model propagation and SDK --model code path; no promptfoo execution. [Source 1](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/responses.ts#L1195-L1210) [Source 2](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts#L1034-L1134) [Source 3](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/sdk/typescript/src/exec.ts#L91-L178) |
+| m4 | fixed by gating | Require ambient OPENAI_API_KEY/auth-copy switches unset and use OMNIROUTE_FW_API_KEY template; verify no literal/partial secret logs. Harbor can inject OpenAI credentials and KEY-sensitive env handling verified. Presence checks and redaction runtime acceptance left to coordinator; no values opened. [Source 1](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1339-L1449) [Source 2](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py#L560-L648) [Source 3](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/utils/env.py#L4-L65) |
+| m5 | fixed by gating | Responses->Responses sharedgw format specified; no Chat fallback; real encrypted/custom-item preservation gated. Adapter and pre/post-translation stage source inspected; configured/actual node format still unobserved. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L145) [Source 3](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L367-L386) |
+| m6 | fixed | Live-zone session fallback derived from request body/provider/connection is explicit and distinct from affinity extraction. Inspected chatCore L1868-1881 and sessionManager L103-145. [Source 1](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/sessionManager.ts#L103-L145) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1425-L1449) |
+| m7 | fixed | Tests now enforce canonical model hops and entry gateway ledger, plus all structurally checkable blockers. Before document repair: requested unittest command exit 1, 10 tests, 12 failures, including old L61/L122 expectations. [Source 1](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L1339-L1449) [Source 2](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chatHelpers.ts#L1172-L1184) [Source 3](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts#L90-L107) |
+| m8 | fixed | Exploratory repetition unit explicit; keyed exploratory cell removed; original two builder steps are turns 1/2 and record step is turn 3. Pinned task.toml contains exactly create-file and append-content; native resume implementation inspected. Wrapper remains local integration, not unchanged upstream execution. [Source 1](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/examples/tasks/hello-multi-step-simple/task.toml#L15-L31) [Source 2](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/multi_step.py#L25-L110) |
 
-## Local structural evidence and corrections
+## Open sealing gates
 
-The requested test was written before either draft file. The command was:
+- **runner-route**: Supported 20129 slashless route preserving canonical native metadata, five-item/full prompt equivalence and coordinator live 200 at max; C route equivalence too. No mapping has been found/qualified.
+- **merged-profile**: Materialize/hash native semantic base+stack-worker merge; no profile/profiles keys; same resolved config and prompt-input versus -p reference before/after Harbor forced flags.
+- **network-containment**: Hash extra_docker_compose overlay; prove actual container reachability and separately qualify upstream-supported containment of passwordless admin APIs; trusted-task constraints alone are not a security boundary.
+- **header-capture**: Materialize/hash upstream-hook response-header observer, qualify privacy/SSE/cache semantics and X-Correlation-Id entry joins including failures; demonstrate a separate exact second-hop effort join.
+- **effort-detail**: Qualify detail-API selectors and inspect only reasoning.effort at joined hops; null corroboration columns are allowed, missing body stays unknown.
+- **two-hop**: Freeze Responses wire format and prove three native steps, genuine call IDs/encrypted reasoning replay, prompt_cache_key, session/account affinity and arm account spread/cache rate.
+- **effective-config**: Read back C off/exclusions; keyed D/A engine/style plans, 60-minute live zone, optional dependencies and safety compaction. Existing key/TTL are facts, reuse is not accepted.
+- **native-harnesses**: Harbor 0.23.0, Codex 0.157.1, chosen observer, statistics, actual task dependencies/images and exact build/config hashes through supported upstream commands.
+- **native-controls**: Materialize/hash three-turn wrappers and graders; native known-pass/fail/malformed controls, four numeric output shapes, rebuilt Chat collision plus separately observed native reachability.
+- **pilot-power-resources**: Complete excluded pre-confirmatory pilot; calibrate NI at margin, simulate power and operational stops; freeze powered n, complete token budget, reserve, wall time and schedule.
+- **usage-sensitivity**: Confirm usage fields and finalization, missing-row input/output bounds, all-corner sensitivity and simultaneous cost bounds; actual dollar prices remain unknown.
 
-```sh
-rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_gpt6_lane_compression_ab_preregistration.py -v
-```
+Qualification inputs/ceilings must be frozen by the coordinator before live
+qualification; confirmation inputs/schedule/resources only after excluded pilot
+results. This document freezes neither. All open gate results are null, and
+material changes after confirmatory data require a new cohort. Wider role/prose
+adoption is outside this experiment's ceiling, not a gate this cohort can close.
 
-It returned **exit 1**, `Ran 1 test; FAILED (failures=1)`, specifically
-`preregistration.json does not exist yet`. After the files were written, the same
-command returned **exit 0**, `Ran 1 test; OK`. This checks the document contract
-only; it is never Harbor, promptfoo, model or gateway acceptance.
+## Local structural verification
 
-`rtk env PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py`
-also returned **exit 0**, `status: passed` (69 components, 7,348 hashed files,
-4 profiles, 159 receipts). Its tracked publication scope is separate from the
-untracked draft contract; all three new files also receive an explicit
-publication scan before handoff.
+The new tests ran before changing either protocol file. The requested command
+with `PYTHONDONTWRITEBYTECODE=1`, `TMPDIR=/var/tmp/claude-431` and
+`GIT_OPTIONAL_LOCKS=0` returned **exit 1**: `Ran 10 tests in 0.009s`,
+`FAILED (failures=12)`. It rejected the old model/usage assertions and all missing
+blocker contracts. Full sanitized returned output and subsequent acceptance
+commands are retained in `repair_round_20260927.checks` in JSON.
 
-The scoped anti-pattern log in JSON preserves the corrections from this work:
-safe labels are not preservation evidence; explicit styles override legacy mode;
-Responses can reach lite via the adapter; configurable native config does not
-prove profile-flag forwarding; and shell network failure was not research
-unavailability. One research preflight wrongly assumed `promptfoo --help` was
-observational: it attempted log cleanup/database migration and failed with
-read-only/database errors, exit 1. No successful host write was observed.
-[Startup migration L63–64](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/main.ts#L63-L64)
-precedes parsing, and [logger L224–247](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/logger.ts#L224-L247)
-explains cleanup. Subsequent inspection used package metadata/source. The
-coordinator can carry this correction into the shared anti-pattern log; this
-builder's file ownership is limited to the requested deliverables and test.
+After repair, the same contract command returned **exit 0**:
+`Ran 10 tests in 0.011s`, `OK`.
+
+The required broader command
+`python3 -m unittest tests.test_osv_lockfile_coverage tests.test_blind_checkout tests.test_workflow_security_coverage`
+returned **exit 1**: `Ran 57 tests in 24.869s`, `FAILED (errors=11)`.
+All eleven errors are blind-export ancestor refusals: the requested
+`/var/tmp/claude-431` also has an existing read-only `.git` directory. The guard
+at `tools/sota-convergence/blind_checkout.py:970-973` checks its presence even
+when empty. No metadata was removed and no test was weakened. The separate
+`tests.test_blind_checkout.RepositoryClassificationTests -v` command returned
+**exit 0**, `Ran 2 tests in 0.151s`, `OK`; there are no new unclassified strings.
+
+`python3 scripts/validate.py` returned **exit 0**:
+`{"components": 69, "hashed_files": 7348, "profiles": 4, "receipts": 159, "status": "passed"}`
+and `Integrity and scope checks only; no live provider or GPU execution.`
+`git diff --check` returned **exit 0** with no output. Every Python command used
+the requested TMPDIR and bytecode suppression. Final post-record checks are
+appended in the JSON round record; the failed broader run remains retained.
+
+These are local structural/integrity checks, not Harbor upstream acceptance,
+gateway probes, model trials or statistical power evidence. The coordinator
+owns any hash re-registration and commit; no git metadata or evidence manifest
+is written by this repair. Corrections, including the earlier false affinity
+correction and the seventeen-file count, remain in the draft's anti-pattern log.
