@@ -163,10 +163,15 @@ The workstation, 2026-09-26, codex-cli 0.157.1: [`evidence/artifacts/codex-worke
 
 **Evidence classes:**
 - source review: the protocol, loader, approval and rtk/context-mode/SocratiCode reads;
-- local integration: the dry run, the rehearsals and the opt-in test;
+- local integration check: the dry run, the rehearsals, the opt-in test and `prove_codex_lane.py`, including
+  `--live` after the real apply;
 - synthetic: the fake-codex tests.
 
-Nothing here is host acceptance: that is `prove_codex_lane.py --live` after the real apply.
+Nothing here is host acceptance. The runner's JSON declares `evidence_class: "local integration check"` and
+`host_acceptance: false`. Under [the acceptance evidence policy](../acceptance-evidence-policy.md), acceptance
+requires the official pinned installation and upstream commands, with retained invocation arguments, actual
+returned output and exit statuses, and declared sanitization. A passing local runner summary cannot replace that
+evidence.
 
 ## Alternatives considered
 
@@ -199,6 +204,12 @@ Nothing here is host acceptance: that is `prove_codex_lane.py --live` after the 
 
 ## Limitations and residuals
 
+- **Runner retention.** `live_checks` examines native events in memory but retains only verdicts, worker exits,
+  elapsed time, timeout/cleanup failures and usage. Native events, full invocation arguments and returned output
+  are discarded. Sanitized event retention is deferred: retaining model/tool payloads needs an explicit field and
+  redaction policy, and this bounded repair does not establish one. The JSON declares these omissions; its
+  summaries can still contain unredacted local paths and must remain private. This remains a local integration
+  limitation even when every verdict passes.
 - **Not applied.** The host changes wait for the coordinated window, and the host step (removing three tables from
   the main checkout's untracked `.codex/config.toml`) is manual.
 - **Sessions without the profile.** They keep the approval refusals for the three servers, and they keep

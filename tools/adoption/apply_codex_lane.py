@@ -897,7 +897,34 @@ def cmd_rollback(args: argparse.Namespace, codex: str) -> int:
     try:
         with AppServer(codex, env, run) as server:
             version, current = server.user_layer()
+            created_roots = {}
             for edit in record["config"]["edits"]:
+                if not edit["before_present"]:
+                    root = tuple(edit.get("created_root") or edit["key"])
+                    created_roots.setdefault(root, []).append(edit)
+            removed_roots = set()
+            for root, edits in created_roots.items():
+                # Reconstruct all still-present values owned by this run, not one leaf
+                # at a time. Exact root equality preserves foreign keys and edited values.
+                # Already removed leaves need not prevent removal of the remaining table.
+                only_ours = {}
+                for edit in edits:
+                    if not get_path(current, edit["key"])[0]:
+                        continue
+                    relative = edit["key"][len(root):]
+                    if not relative:
+                        only_ours = edit["after"]
+                    else:
+                        node = only_ours
+                        for segment in relative[:-1]:
+                            node = node.setdefault(segment, {})
+                        node[relative[-1]] = edit["after"]
+                if get_path(current, root) == (True, only_ours):
+                    restore.append({"key": list(root), "value": None})
+                    removed_roots.add(root)
+            for edit in record["config"]["edits"]:
+                if tuple(edit.get("created_root") or edit["key"]) in removed_roots:
+                    continue
                 now = get_path(current, edit["key"])
                 if now == (edit["before_present"], edit["before"]):
                     continue
@@ -906,13 +933,7 @@ def cmd_rollback(args: argparse.Namespace, codex: str) -> int:
                 elif edit["before_present"]:
                     restore.append({"key": edit["key"], "value": edit["before"]})
                 else:
-                    # Delete the table the run created when it still holds only this key; else just the key.
-                    root = edit.get("created_root") or edit["key"]
-                    only_ours = edit["after"]
-                    for segment in reversed(edit["key"][len(root):]):
-                        only_ours = {segment: only_ours}
-                    target = root if get_path(current, root) == (True, only_ours) else edit["key"]
-                    restore.append({"key": target, "value": None, "checks": edit["key"]})
+                    restore.append({"key": edit["key"], "value": None})
             if restore:
                 server.batch_write(restore, version)
                 _, current = server.user_layer()

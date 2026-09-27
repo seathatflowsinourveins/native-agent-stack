@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Prove the Codex worker lane on a host after `tools/adoption/apply_codex_lane.py --apply`.
+"""Run local integration checks after `tools/adoption/apply_codex_lane.py --apply`.
+
+These checks, including --live, are local integration, not host acceptance. The JSON
+retains summaries only; native events, invocation arguments and returned output are
+not retained. See docs/acceptance-evidence-policy.md and the JSON evidence fields.
 
 Static checks (no model call):
   marker        `env -C / codex debug prompt-input probe < /dev/null | grep -c 'native-agent-stack:top-rule'` is 1;
@@ -35,9 +39,11 @@ Exit status: 0 every check passed, 1 a check failed, 2 could not start (no codex
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import re
+import shlex
 import shutil
 import signal
 import subprocess
@@ -66,6 +72,20 @@ MEMORY_PROMPT = ("Make exactly one MCP tool call, to the ai-memory server: memor
 RTK_PROMPT = ("Use your shell tool, not an MCP tool: in the current directory run `git status --short` and then "
               "`git show HEAD:big.txt`, each as its own command. Then reply with one line: how many lines the "
               "second command printed.")
+EVIDENCE = {
+    "evidence_class": "local integration check",
+    "host_acceptance": False,
+    "acceptance_requirements": (
+        "Acceptance requires the official pinned installation and upstream commands, with retained arguments, "
+        "returned output and exit statuses, and declared sanitization. This local summary does not provide them."
+    ),
+    "retention": {"native_events": False, "invocation_arguments": False, "returned_output": False,
+                  "worker_exits": True},
+    "sanitization": (
+        "Summaries are not sanitized and may include local paths; keep this JSON private. "
+        "Native events and full invocation/output records are omitted, not sanitized or retained."
+    ),
+}
 
 
 class Results:
@@ -181,53 +201,58 @@ def exec_argv(codex: str, prompt: str, profile: bool, extra: list[str] | None = 
 def run_workers(specs: list[dict], timeout: float) -> list[dict]:
     """Start every spec at once, each in its own process group with stdin from /dev/null, and collect its
     events. When the deadline passes, every group still running is killed; its events so far are kept."""
-    running = []
-    for spec in specs:
-        out = tempfile.TemporaryFile()
-        err = tempfile.TemporaryFile()
-        proc = subprocess.Popen(spec["argv"], cwd=spec["cwd"], env=spec["env"], stdin=subprocess.DEVNULL,
-                                stdout=out, stderr=err, start_new_session=True)
-        running.append((spec, proc, out, err, time.monotonic()))
-    deadline = time.monotonic() + timeout
-    results = []
-    for spec, proc, out, err, started in running:
+    running, results = [], []
+    cleanup_errors = {}
+    with contextlib.ExitStack() as handles:
         try:
-            proc.wait(timeout=max(0.0, deadline - time.monotonic()))
-            timed_out = False
-        except subprocess.TimeoutExpired:
-            timed_out = True
-        results.append((spec, proc, out, err, started, timed_out))
-    for _, proc, *_ in results:  # kill every group left, whichever worker timed out
-        # scripts/codex_quota.py::AppServer.close: a group can outlive its leader,
-        # including when that leader exits promptly on TERM but a descendant ignores it.
-        for sig in (signal.SIGTERM, signal.SIGKILL):
-            if proc.poll() is not None and not group_alive(proc.pid):
-                break
-            try:
-                os.killpg(proc.pid, sig)
-            except ProcessLookupError:
-                pass
-            end = time.monotonic() + 5.0
-            while time.monotonic() < end and not (proc.poll() is not None and not group_alive(proc.pid)):
-                time.sleep(0.05)
-        if proc.poll() is None:
-            proc.wait(timeout=5)
-    collected = []
-    for spec, proc, out, err, started, timed_out in results:
-        out.seek(0)
-        err.seek(0)
-        events = []
-        for line in out.read().decode("utf-8", "replace").splitlines():
-            try:
-                events.append(json.loads(line))
-            except ValueError:
-                continue
-        collected.append({"name": spec["name"], "exit": proc.returncode, "timed_out": timed_out,
-                          "seconds": round(time.monotonic() - started, 1), "events": events,
-                          "stderr_tail": err.read().decode("utf-8", "replace")[-400:]})
-        out.close()
-        err.close()
-    return collected
+            for spec in specs:
+                out = handles.enter_context(tempfile.TemporaryFile())
+                err = handles.enter_context(tempfile.TemporaryFile())
+                proc = subprocess.Popen(spec["argv"], cwd=spec["cwd"], env=spec["env"], stdin=subprocess.DEVNULL,
+                                        stdout=out, stderr=err, start_new_session=True)
+                running.append((spec, proc, out, err, time.monotonic()))
+            deadline = time.monotonic() + timeout
+            for spec, proc, out, err, started in running:
+                try:
+                    proc.wait(timeout=max(0.0, deadline - time.monotonic()))
+                    timed_out = False
+                except subprocess.TimeoutExpired:
+                    timed_out = True
+                results.append((spec, proc, out, err, started, timed_out))
+        finally:
+            for _, proc, *_ in running:  # also clean earlier launches on failure or cancellation
+                # scripts/codex_quota.py::AppServer.close: a group can outlive its leader,
+                # including when that leader exits promptly on TERM but a descendant ignores it.
+                for sig in (signal.SIGTERM, signal.SIGKILL):
+                    if proc.poll() is not None and not group_alive(proc.pid):
+                        break
+                    try:
+                        os.killpg(proc.pid, sig)
+                    except ProcessLookupError:
+                        pass
+                    end = time.monotonic() + 5.0
+                    while time.monotonic() < end and not (proc.poll() is not None and not group_alive(proc.pid)):
+                        time.sleep(0.05)
+                if proc.poll() is None:
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        cleanup_errors[proc.pid] = "TimeoutExpired: worker not reaped after SIGKILL and a 5s wait"
+        collected = []
+        for spec, proc, out, err, started, timed_out in results:
+            out.seek(0)
+            err.seek(0)
+            events = []
+            for line in out.read().decode("utf-8", "replace").splitlines():
+                try:
+                    events.append(json.loads(line))
+                except ValueError:
+                    continue
+            collected.append({"name": spec["name"], "exit": proc.returncode, "timed_out": timed_out,
+                              "cleanup_error": cleanup_errors.get(proc.pid),
+                              "seconds": round(time.monotonic() - started, 1), "events": events,
+                              "stderr_tail": err.read().decode("utf-8", "replace")[-400:]})
+        return collected
 
 
 def completed_items(events: list[dict], kind: str) -> list[dict]:
@@ -268,6 +293,7 @@ def pwd_verdict(run: dict, own: str, other: str) -> tuple[bool, str]:
                    and re.fullmatch(r"(?:rtk\s+(?:proxy\s+)?)?pwd", code) is not None) or (
                        arguments.get("language") == "javascript"
                        and re.fullmatch(r"console\.log\(\s*process\.cwd\(\s*\)\s*\)\s*;?", code) is not None)
+    queries_pwd = queries_pwd and "cwd" not in arguments
     lines = [line.strip() for line in result_text(call).splitlines() if line.strip()]
     printed = lines[-1] if lines else ""
     ok = queries_pwd and call.get("status") == "completed" and printed == own and other not in result_text(call)
@@ -288,18 +314,57 @@ def approval_verdict(run: dict, expect_refusal: bool) -> tuple[bool, str]:
     return call.get("status") == "completed" and not refused, f"status {call.get('status')}, error {error[:120]!r}"
 
 
+def git_operation(command: str) -> tuple[str, str] | None:
+    """Recognize the probe's argv, using CPython shlex's POSIX/comment handling.
+
+    Codex wraps shell commands in `bash -lc`. Accept that wrapper and an optional
+    `cd DIR &&` prefix; other compound commands are outside this probe's contract.
+    Never search inside an echo argument, a comment or an unexecuted shell string.
+    """
+    def tokens(source: str) -> list[str]:
+        lexer = shlex.shlex(source, posix=True, punctuation_chars=True)
+        lexer.whitespace_split = True
+        return list(lexer)
+
+    try:
+        argv = tokens(command)
+        if (len(argv) == 3 and Path(argv[0]).name in {"sh", "bash", "dash", "zsh"}
+                and argv[1] in {"-c", "-lc"}):
+            argv = tokens(argv[2])
+    except ValueError:
+        return None
+    if len(argv) > 3 and argv[0] == "cd" and argv[2] == "&&":
+        argv = argv[3:]
+    wrapper = "native"
+    if argv and Path(argv[0]).name == "rtk":
+        wrapper, argv = "rtk", argv[1:]
+        if argv[:1] == ["proxy"]:
+            wrapper, argv = "proxy", argv[1:]
+    if not argv or Path(argv[0]).name != "git":
+        return None
+    argv = argv[1:]
+    while len(argv) >= 2 and argv[0] == "-C":
+        argv = argv[2:]
+    if argv in (["status"], ["status", "--short"]):
+        return "status", wrapper
+    if argv == ["show", "HEAD:big.txt"]:
+        return "show", wrapper
+    return None
+
+
 def rtk_verdict(run: dict, blob: bytes) -> tuple[bool, str]:
     if run["timed_out"] or run["exit"] != 0:
         return False, f"worker exit {run['exit']}, timed out {run['timed_out']}"
     commands = completed_items(run["events"], "command_execution")
-    status = [c for c in commands if re.search(r"git\s+status", c.get("command", ""))]
-    shows = [c for c in commands if "HEAD:big.txt" in c.get("command", "")]
+    parsed = [(c, git_operation(c.get("command", ""))) for c in commands]
+    status = [(c, op) for c, op in parsed if op and op[0] == "status"]
+    shows = [(c, op) for c, op in parsed if op and op[0] == "show"]
     if not status or not shows:
         return False, f"commands seen: {[c.get('command') for c in commands]}"
-    prefixed = [c for c in status if re.search(r"(?<![\w-])rtk\s+git\s+status", c["command"])]
+    prefixed = [c for c, op in status if op[1] == "rtk"]
     status_ok = any(c.get("exit_code") == 0 for c in prefixed)
-    show = shows[-1]
-    raw = not re.search(r"(?<![\w-])rtk\s+(?!proxy\b)(?:\S+\s+)*?git\s+(?:\S+\s+)*?show", show["command"])
+    show, operation = shows[-1]
+    raw = operation[1] in {"native", "proxy"}
     output = (show.get("aggregated_output") or "").replace("\r\n", "\n")
     exact = output.encode("utf-8") == blob
     ok = status_ok and raw and show.get("exit_code") == 0 and exact
@@ -336,7 +401,8 @@ def live_checks(codex: str, codex_home: Path, scratch: Path, repo: Path, blob: b
     results.add("approval control without the profile", ok, detail)
     ok, detail = rtk_verdict(more[2], blob)
     results.add("rtk-worker", ok, detail)
-    return [{key: run[key] for key in ("name", "exit", "timed_out", "seconds")} | {"usage": usage(run["events"])}
+    return [{key: run[key] for key in ("name", "exit", "timed_out", "seconds", "cleanup_error")}
+            | {"usage": usage(run["events"])}
             for run in runs + more]
 
 
@@ -389,7 +455,7 @@ def main(argv: list[str] | None = None) -> int:
     failed = [row["check"] for row in results.rows if not row["ok"]]
     print(f"result: {'PASS' if not failed else 'FAIL'} ({len(results.rows) - len(failed)} pass, {len(failed)} fail)")
     if args.json:
-        Path(args.json).write_text(json.dumps({"started_utc": started, "codex_home": str(codex_home),
+        Path(args.json).write_text(json.dumps({**EVIDENCE, "started_utc": started, "codex_home": str(codex_home),
                                                "checks": results.rows, "live_runs": runs}, indent=2) + "\n",
                                    encoding="utf-8")
     return 0 if not failed else 1

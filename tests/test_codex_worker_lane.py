@@ -18,6 +18,7 @@ from __future__ import annotations
 import contextlib
 import hashlib
 import io
+import itertools
 import json
 import os
 import shutil
@@ -28,6 +29,7 @@ import tempfile
 import tomllib
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
@@ -460,6 +462,36 @@ class ApplyFlowTests(unittest.TestCase):
         self.assertIn("@/home/example/.codex/RTK.md", text)
         self.assertIn("A line someone added later.", text)
 
+    def test_rollback_removes_shared_created_root_and_preserves_foreign_values(self):
+        # The same created_root owns multiple Headroom env edits. A native null write
+        # must delete the table only when its remaining contents still belong to this run.
+        for later_change in ("none", "partial-undo", "foreign-key", "edited-key"):
+            with self.subTest(later_change=later_change):
+                host = FakeHost(self)
+                del host.config["mcp_servers"]["headroom"]["env"]
+                host.write_config(host.config)
+                before = host.read_config()
+                code, out = host.apply()
+                self.assertEqual(code, 0, out)
+                current = host.read_config()
+                env = current["mcp_servers"]["headroom"]["env"]
+                self.assertGreater(len(env), 1)
+                owned_key = next(iter(env))
+                if later_change == "partial-undo":
+                    del env[owned_key]
+                elif later_change == "foreign-key":
+                    env["LATER_SETTING"] = "keep"
+                    before["mcp_servers"]["headroom"]["env"] = {"LATER_SETTING": "keep"}
+                elif later_change == "edited-key":
+                    env[owned_key] = "changed"
+                    before["mcp_servers"]["headroom"]["env"] = {owned_key: "changed"}
+                host.write_config(current)
+                run = host.latest_run()
+                for attempt in range(2):
+                    code, out = host.run("--rollback", str(run))
+                    self.assertEqual(code, 3 if later_change == "edited-key" else 0, out)
+                    self.assertEqual(host.read_config(), before, f"rollback attempt {attempt}: {out}")
+
     def test_a_version_conflict_writes_nothing_and_blocks_the_next_apply(self):
         before_agents = (self.host.codex_home / "AGENTS.md").read_bytes()
         code, out = self.host.apply(FAKE_CODEX_RACE="1")
@@ -628,6 +660,18 @@ class ProveVerdictTests(unittest.TestCase):
                 ok, detail = prove.pwd_verdict(run, own, other)
                 self.assertTrue(ok, detail)
 
+    def test_pwd_verdict_rejects_an_explicit_cwd_override(self):
+        own, other = "/scratch/worker-a", "/scratch/worker-b"
+        # Even an apparently correct directory masks what the server actually inherited.
+        for cwd in (own, other, "", None):
+            with self.subTest(cwd=cwd):
+                item = {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_execute",
+                        "arguments": {"language": "shell", "code": "pwd", "cwd": cwd}, "status": "completed",
+                        "result": {"content": [{"type": "text", "text": own + "\n"}]}}
+                run = {"events": [{"type": "item.completed", "item": item}], "exit": 0, "timed_out": False}
+                ok, detail = prove.pwd_verdict(run, own, other)
+                self.assertFalse(ok, detail)
+
     def test_approval_verdicts(self):
         items = json.loads((FIXTURES / "approval-items.json").read_text())
 
@@ -681,6 +725,41 @@ class ProveVerdictTests(unittest.TestCase):
         self.assertIn('codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live"',
                       recipe)
 
+    def test_prove_json_declares_local_integration_and_retention_limits(self):
+        # Exercise main -> live_checks -> JSON without a model call or real Codex home.
+        # Synthetic worker failures also verify that cleanup failures survive summarization.
+        def worker_runs(specs, timeout):
+            return [{"name": spec["name"], "exit": None, "timed_out": True, "seconds": 1,
+                     "cleanup_error": "TimeoutExpired: synthetic cleanup failure",
+                     "events": [{"type": "turn.completed", "usage": {"input_tokens": 7}}]}
+                    for spec in specs]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            report_path = Path(tmp) / "report.json"
+            with mock.patch.object(prove, "make_repo", return_value=b"synthetic blob"), \
+                 mock.patch.object(prove, "static_checks"), \
+                 mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic open gate")), \
+                 mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                code = prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp,
+                                   "--live", "--json", str(report_path)])
+            self.assertEqual(code, 1)
+            report = json.loads(report_path.read_text())
+        self.assertEqual(report.get("evidence_class"), "local integration check")
+        self.assertIs(report["host_acceptance"], False)
+        for requirement in ("official pinned installation", "upstream commands", "arguments",
+                            "returned output", "exit statuses", "declared sanitization"):
+            self.assertIn(requirement, report["acceptance_requirements"])
+        for omitted in ("native_events", "invocation_arguments", "returned_output"):
+            self.assertIs(report["retention"][omitted], False)
+        self.assertIs(report["retention"]["worker_exits"], True)
+        self.assertIn("not sanitized", report["sanitization"])
+        self.assertEqual(len(report["live_runs"]), 5)
+        for run in report["live_runs"]:
+            self.assertIn("TimeoutExpired", run["cleanup_error"])
+            self.assertEqual(run["usage"], {"input_tokens": 7})
+            self.assertNotIn("events", run)
+
     def test_rtk_verdict_rejects_a_synthetic_failed_status_command(self):
         # Synthetic fault injected into the captured item shape; no command is executed here.
         fixture = json.loads((FIXTURES / "rtk-worker-items.json").read_text())
@@ -696,6 +775,32 @@ class ProveVerdictTests(unittest.TestCase):
                        "exit": 0, "timed_out": False}
                 ok, detail = prove.rtk_verdict(run, blob)
                 self.assertFalse(ok, detail)
+
+    def test_rtk_verdict_rejects_command_mentions_in_comments_or_quoted_data(self):
+        blob = prove.big_blob()
+        # Isolate each false positive as well as the reviewer's combined example. The
+        # output bytes are intentionally right, so only the executed argv can reject it.
+        cases = [("echo 'rtk git status'", "git show HEAD:big.txt"),
+                 ("true # rtk git status --short", "git show HEAD:big.txt"),
+                 ("rtk git status --short", "cat big.txt # HEAD:big.txt"),
+                 ("rtk git status --short", "echo 'git show HEAD:big.txt'"),
+                 ("echo 'rtk git status'", "cat big.txt # HEAD:big.txt"),
+                 ("echo 'rtk git status'", "cat big.txt # git show HEAD:big.txt"),
+                 ("printf '%s' 'rtk git status --short'", "git show HEAD:big.txt")]
+        for status_command, show_command in cases:
+            for wrapped in (False, True):
+                with self.subTest(status=status_command, show=show_command, wrapped=wrapped):
+                    if wrapped:
+                        import shlex
+                        status_command, show_command = ("/bin/bash -lc " + shlex.quote(command)
+                                                        for command in (status_command, show_command))
+                    items = [{"type": "command_execution", "command": status_command, "exit_code": 0},
+                             {"type": "command_execution", "command": show_command, "exit_code": 0,
+                              "aggregated_output": blob.decode()}]
+                    run = {"events": [{"type": "item.completed", "item": item} for item in items],
+                           "exit": 0, "timed_out": False}
+                    ok, detail = prove.rtk_verdict(run, blob)
+                    self.assertFalse(ok, detail)
 
     def test_verdicts_reject_synthetic_failed_or_timed_out_workers(self):
         # Synthetic run lifetimes around otherwise-valid captured completed items. The
@@ -733,6 +838,93 @@ class ProveVerdictTests(unittest.TestCase):
         self.assertLess(__import__("time").monotonic() - started, 15)
         self.assertTrue(runs[0]["timed_out"])
         self.assertEqual(runs[1]["events"], [{"type": "turn.completed"}])
+
+    def test_run_workers_cleans_started_groups_and_handles_on_launch_failure_or_cancellation(self):
+        # Real OS workers and handles, with deterministic faults at the launch/wait boundary.
+        # The test's finally also reaps the children on the red run.
+        real_popen, real_file = subprocess.Popen, tempfile.TemporaryFile
+        for fault in ("launch-error", "launch-cancel", "wait-cancel", "handle-error"):
+            with self.subTest(fault=fault):
+                processes, handles = [], []
+
+                def open_handle():
+                    if fault == "handle-error" and len(handles) == 5:
+                        raise OSError("synthetic handle failure")
+                    handle = real_file()
+                    handles.append(handle)
+                    return handle
+
+                def launch(*args, **kwargs):
+                    if len(processes) == 2 and fault.startswith("launch-"):
+                        if fault == "launch-cancel":
+                            raise KeyboardInterrupt("synthetic cancellation")
+                        raise OSError("synthetic launch failure")
+                    proc = real_popen(*args, **kwargs)
+                    processes.append(proc)
+                    if fault == "wait-cancel" and len(processes) == 1:
+                        proc.wait = mock.Mock(side_effect=[KeyboardInterrupt("synthetic cancellation"),
+                                                          mock.DEFAULT], wraps=proc.wait)
+                    return proc
+
+                specs = [{"name": str(i), "argv": [sys.executable, "-c", "import time; time.sleep(60)"],
+                          "cwd": "/", "env": dict(os.environ)} for i in range(3)]
+                try:
+                    with mock.patch.object(prove.tempfile, "TemporaryFile", side_effect=open_handle), \
+                         mock.patch.object(prove.subprocess, "Popen", side_effect=launch):
+                        with self.assertRaises(KeyboardInterrupt if "cancel" in fault else OSError):
+                            prove.run_workers(specs, timeout=1.0)
+                    self.assertTrue(all(proc.returncode is not None for proc in processes),
+                                    "started workers were not terminated and reaped")
+                    self.assertTrue(all(not prove.group_alive(proc.pid) for proc in processes),
+                                    "a started process group survived cleanup")
+                    self.assertTrue(all(handle.closed for handle in handles), "worker handles leaked")
+                finally:
+                    for proc in processes:
+                        with contextlib.suppress(ProcessLookupError):
+                            os.killpg(proc.pid, signal.SIGKILL)
+                        # Bypass the injected cancellation when cleaning up the red test.
+                        subprocess.Popen.wait.__get__(proc)(timeout=5)
+                    for handle in handles:
+                        handle.close()
+
+    def test_run_workers_collects_partial_results_after_final_wait_timeout(self):
+        # Synthetic process boundary: SIGKILL has been sent but reaping still times out.
+        # No signals reach real processes; later workers must still be cleaned and collected.
+        handles = []
+        processes = [mock.Mock(pid=101, returncode=None), mock.Mock(pid=102, returncode=None)]
+        for proc in processes:
+            proc.poll.side_effect = lambda proc=proc: proc.returncode
+            proc.wait.side_effect = subprocess.TimeoutExpired(["synthetic-worker"], 5)
+
+        def launch(*args, **kwargs):
+            index = len(handles) // 2
+            handles.extend([kwargs["stdout"], kwargs["stderr"]])
+            kwargs["stdout"].write(json.dumps({"type": "partial", "worker": index}).encode() + b"\n")
+            kwargs["stderr"].write(f"stderr {index}".encode())
+            return processes[index]
+
+        def signal_group(pid, sig):
+            if pid == 102:
+                processes[1].returncode = -sig
+
+        specs = [{"name": str(i), "argv": ["synthetic-worker"], "cwd": "/", "env": {}} for i in range(2)]
+        with mock.patch.object(prove.subprocess, "Popen", side_effect=launch), \
+             mock.patch.object(prove.os, "killpg", side_effect=signal_group) as killpg, \
+             mock.patch.object(prove, "group_alive", return_value=False), \
+             mock.patch.object(prove.time, "monotonic", side_effect=itertools.count(0, 6)):
+            runs = prove.run_workers(specs, timeout=1)
+        self.assertEqual(len(runs), 2)
+        self.assertIn("TimeoutExpired", runs[0]["cleanup_error"])
+        self.assertIsNone(runs[0]["exit"])
+        self.assertIsNone(runs[1]["cleanup_error"])
+        self.assertEqual(runs[1]["exit"], -signal.SIGTERM)
+        self.assertEqual(killpg.call_args_list, [mock.call(101, signal.SIGTERM), mock.call(101, signal.SIGKILL),
+                                               mock.call(102, signal.SIGTERM)])
+        for i, run in enumerate(runs):
+            self.assertTrue(run["timed_out"])
+            self.assertEqual(run["events"], [{"type": "partial", "worker": i}])
+            self.assertEqual(run["stderr_tail"], f"stderr {i}")
+        self.assertTrue(all(handle.closed for handle in handles))
 
     @unittest.skipUnless(hasattr(os, "fork") and hasattr(os, "killpg"), "requires POSIX process groups")
     def test_run_workers_kills_descendants_after_the_leader_exits(self):
