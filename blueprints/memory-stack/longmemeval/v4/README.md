@@ -193,10 +193,14 @@ plainly named scratch copies, the advisory list, and a discriminating control ag
 `.frozen`-named copies: "No package sources found", exit 128, same as the original record). #380
 has merged, so the record is on `main`: see [the 2026-09-27
 addendum](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md#addendum-2026-09-27-extending-scope-to-the-longmemeval-v4-drivers-six-locks)
-for the full counts. In short: `official.lock.txt` alone carries 114 unique advisories across 9
+for the full counts. In short: `official.lock.txt` alone carries 115 unique advisories across 9
 of its 64 packages (concentrated in `nltk`, `pillow`, `torch` and `transformers`);
 `mempalace.lock.txt`'s `chromadb` 1.5.9 carries 4, including a pre-authentication code-injection
-advisory; `embed.lock.txt` carries 2; `agentmemory-repo-package-lock.json` (376 packages) repeats
+advisory; `embed.lock.txt` carries 3 across 3 packages. Those two totals read 114 and 2 when the
+scan uses this repository's `osv-scanner.toml`, because its two ignores are global by advisory ID
+(OSV-Scanner 2.6.0 `ShouldIgnore` matches ID and expiry only), not scoped to the Lumibot lock they
+were written for: GHSA-8mgp-746c-j5xp filters one `nltk` 3.9.1 advisory and GHSA-h35f-9h28-mq5c
+the one `setuptools` 81.0.0 advisory. `agentmemory-repo-package-lock.json` (376 packages) repeats
 the same 2 the 2026-09-25 decision already found in the smaller install-prefix lock; and
 `hindsight.lock.txt` (223 packages) and `build.lock.txt` (3 packages) show none at scan time.
 

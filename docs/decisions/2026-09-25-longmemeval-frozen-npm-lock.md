@@ -129,33 +129,45 @@ speculative concern; the pins are the ones the driver's README already names.
 2026-09-27) on scratch copies named with their plain (non-`.frozen`) names, one `--lockfile=`
 override per file (`--lockfile=requirements.txt:<path>` for the five Python locks,
 `--lockfile=package-lock.json:<path>` for the npm one — the same flag shape
-`.github/workflows/security-scan.yml` builds from `.github/osv-scanner-lockfiles.json`):
+`.github/workflows/security-scan.yml` builds from `.github/osv-scanner-lockfiles.json`).
+A second run of the same command with an empty config file gives the unfiltered counts
+(re-run 2026-09-27 for the GPT-6 re-check). Pairs below read "unfiltered / with the repository
+config":
 
 | File (plain name) | Packages scanned | Vulnerable packages | Unique advisories |
 | --- | --- | --- | --- |
-| `official.lock.txt` | 64 | 9 | 114 |
-| `embed.lock.txt` | 91 | 2 | 2 |
-| `mempalace.lock.txt` | 80 | 1 | 4 |
-| `hindsight.lock.txt` | 223 | 0 | 0 |
-| `build.lock.txt` | 3 | 0 | 0 |
-| `agentmemory-repo-package-lock.json` | 376 | 2 | 2 |
+| `official.lock.txt` | 64 | 9 / 9 | 115 / 114 |
+| `embed.lock.txt` | 91 | 3 / 2 | 3 / 2 |
+| `mempalace.lock.txt` | 80 | 1 / 1 | 4 / 4 |
+| `hindsight.lock.txt` | 223 | 0 / 0 | 0 / 0 |
+| `build.lock.txt` | 3 | 0 / 0 | 0 / 0 |
+| `agentmemory-repo-package-lock.json` | 376 | 2 / 2 | 2 / 2 |
 
 ("Unique advisories" collapses GHSA/CVE/PYSEC/BIT aliases of the same finding to one row; the
 raw, alias-duplicated JSON output was retained for this review round but is not committed.)
+The two differences are the repository's two `[[IgnoredVulns]]` entries, which apply here
+too (see the last point of the next list): GHSA-8mgp-746c-j5xp (alias PYSEC-2026-3740) on
+`nltk` 3.9.1 in `official.lock.txt`, and GHSA-h35f-9h28-mq5c (alias PYSEC-2026-3447) on
+`setuptools` 81.0.0 in `embed.lock.txt`.
 
 Representative findings, not the full list:
 
-- `official.lock.txt`: `nltk` 3.9.1 alone carries 42 unique advisories (path traversal, SSRF,
-  ReDoS and arbitrary-file-read classes; e.g. GHSA-6hm5-jgcp-p838, GHSA-qvv7-cg9c-w4x3);
-  `transformers` 4.43.3 carries 26 (mostly ReDoS); `torch` 2.3.1 carries 20; `pillow` 10.2.0
-  carries 15 (buffer overflow, decompression-bomb and out-of-bounds-read classes); `jinja2` 3.1.3
-  carries 4 (sandbox breakout, e.g. GHSA-cpwx-vrp4-4pq7). `nltk` is the same package this
-  repository already carries a repo-wide, no-fix-available ignore for outside the named Lumibot
-  lock (`.github/osv-scanner.toml`); this scan confirms that ignore does not reach
-  `official.lock.txt` — its 42 `nltk` advisories came back unfiltered, while the scanner's stderr
-  reported filtering exactly 4 unrelated vulnerabilities, each scoped by evidence path to
-  `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json` (the Lumibot
-  lock), proving the config's ignores are lock-scoped and this is not a vacuous pass.
+- `official.lock.txt`: `nltk` 3.9.1 alone carries 43 unique advisories, 42 with the repository
+  config (path traversal, SSRF, ReDoS and arbitrary-file-read classes; e.g. GHSA-6hm5-jgcp-p838,
+  GHSA-qvv7-cg9c-w4x3); `transformers` 4.43.3 carries 26 (mostly ReDoS); `torch` 2.3.1 carries
+  20; `pillow` 10.2.0 carries 15 (buffer overflow, decompression-bomb and out-of-bounds-read
+  classes); `jinja2` 3.1.3 carries 4 (sandbox breakout, e.g. GHSA-cpwx-vrp4-4pq7).
+- **The repository's OSV ignores are global, not lock-scoped.** OSV-Scanner 2.6.0 matches an
+  `[[IgnoredVulns]]` entry by advisory ID and `ignoreUntil` only
+  ([`internal/config/config.go:104-112`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L104-L112),
+  `ShouldIgnore`); the evidence path in an entry's `reason` scopes nothing. Both entries written
+  for the Lumibot lock therefore also filter these locks when they are scanned:
+  GHSA-8mgp-746c-j5xp (`nltk` through 3.10.3) removes one advisory from `nltk` 3.9.1 in
+  `official.lock.txt`, and GHSA-h35f-9h28-mq5c (`setuptools` below 83.0.0) removes the only
+  advisory on `setuptools` 81.0.0 in `embed.lock.txt`. The scanner's "Filtered 4 vulnerabilities"
+  line counts those two advisories with their aliases, not four unrelated ones. Nothing here
+  relies on those ignores: under their `.frozen` names these files reach no scanner, and the counts
+  above name both filtered advisories.
 - `mempalace.lock.txt`: `chromadb` 1.5.9 carries 4, including GHSA-f4j7-r4q5-qw2c
   (PYSEC-2026-311, CVE-2026-45829), described upstream as a pre-authentication code-injection
   vulnerability.
