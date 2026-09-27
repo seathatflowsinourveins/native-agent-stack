@@ -259,15 +259,22 @@ passes `--no-sync`. At v0.43.0
   ([main.go#L306-L325](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L306-L325));
 - watches session files
   ([startFileWatcher](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L1969));
-- polls directories it cannot watch every 2 minutes, and resyncs every 15
-  minutes ([intervals](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L43-L45),
-  [periodic sync](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L2726)).
+- polls directories it cannot watch every 2 minutes
+  ([intervals](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L43-L45));
+- runs a scheduled reconciliation every 15 minutes
+  ([periodic sync](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L2726)).
+  That pass covers only providers that declare `PeriodicReconcile`
+  ([scheduledReconcileTargets](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L2910-L2955)).
+  Codex and Claude Code do not declare it, so their sessions arrive through the
+  watcher and the 2-minute poll.
 
-A worker lane that runs Codex with its own `CODEX_HOME` shows up only when that
-home is listed under `[agents.codex] homes` in the archive's `config.toml`.
-Listed homes add to the default ones
+A worker lane that runs Codex with its own `CODEX_HOME` is outside the default
+Codex directories. The workstation makes such homes visible by listing them
+under `[agents.codex] homes` in the archive's `config.toml`. Listed homes add to
+the default ones; `dirs`, the directory environment overrides and
+`[[session_sources]]` are the supported alternatives
 ([alternate agent homes](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/docs/configuration.md#L988-L1013)).
-The workstation lists its GPT-6 lane homes there. Their paths are host-private.
+The GPT-6 lane homes listed there are host-private paths.
 
 Local observation (not a receipt): the unit restarted in live mode at
 18:37Z. A later probe ran 14 `codex exec` sessions between 18:58Z and 19:04Z.

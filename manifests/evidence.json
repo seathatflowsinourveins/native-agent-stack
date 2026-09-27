@@ -14073,8 +14073,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "b32f98b8a1331f6537968e4fdde4af4512ca90bbc01e5004198094a871afbf45",
-      "bytes": 17213
+      "sha256": "3e1a49e3a6e7d90fd6985d85c4e56c32c5d232e4d6d073f471338b7e753592bc",
+      "bytes": 17709
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -38123,8 +38123,8 @@
     },
     {
       "path": "examples/agentsview-archive.service.example",
-      "sha256": "95cc91533da2cc724b0480e713d71cd1bd1f52bd0ddb31bef5732710e764a8d0",
-      "bytes": 1040
+      "sha256": "9188250bc9392477b475833979ea4b291fbe43ea9ab979849ac1d4e1ac038efc",
+      "bytes": 1066
     },
     {
       "path": "examples/agentsview.toml.example",
