@@ -10,10 +10,14 @@ runs check the configuration without installing an MCP server or reading host
 settings. These are local integration checks, not unchanged upstream tests.
 """
 
+import io
 import json
+import re
 import subprocess
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -217,16 +221,27 @@ class JCodeMunchConfigTests(unittest.TestCase):
         # Known repository data families must be removed without hiding the
         # source files alongside them. These predicates are the test oracle,
         # independent of the patterns read from the project configuration.
-        for directory in ("receipts", "native-outputs", "judge_results", "data"):
+        # docs/lanes.md separates trading blueprints: an individual family can
+        # disappear when that lane moves. Require a nonempty union instead.
+        # Directory exclusions cover every suffix; data patterns cover four.
+        families = {
+            "receipts": None,
+            "native-outputs": None,
+            "judge_results": None,
+            "data": {".json", ".jsonl", ".csv", ".tsv"},
+        }
+        blueprint_data = set()
+        for directory, suffixes in families.items():
             with self.subTest(blueprint_data=directory):
                 data = {
                     p for p in files if p.startswith("blueprints/")
                     and directory in Path(p).parts[1:-1]
-                    and Path(p).suffix in {".json", ".jsonl", ".csv", ".tsv", ".txt"}
+                    and (suffixes is None or Path(p).suffix in suffixes)
                 }
-                self.assertTrue(data)
+                blueprint_data.update(data)
                 missing = data - ignored
                 self.assertEqual(len(missing), 0, sorted(missing)[:5])
+        self.assertTrue(blueprint_data, "blueprint output coverage must not be vacuous")
 
         remaining = len(files - ignored)
         cap = config["max_folder_files"]
@@ -238,6 +253,84 @@ class JCodeMunchConfigTests(unittest.TestCase):
             f"ignored={len(ignored)} remaining={remaining} cap={cap} "
             f"margin={cap - remaining}"
         )
+
+
+class JCodeMunchCoverageRegressionTests(unittest.TestCase):
+    """Exercise the coverage contract with changed Git inventories.
+
+    Sources: docs/lanes.md (trading extraction); the configured gitignore
+    dialect at upstream index_folder.py L1273-1279; Python's supported mock:
+    https://docs.python.org/3/library/unittest.mock.html#patch
+    """
+
+    def setUp(self):
+        self.files = tracked_files()
+        patterns = load_config()["extra_ignore_patterns"]
+        self.ignored = tracked_files(
+            "--ignored", *("--exclude=" + p for p in patterns)
+        )
+
+    def run_coverage(self, files, ignored):
+        result = unittest.TestResult()
+        with patch(__name__ + ".tracked_files", side_effect=(files, ignored)):
+            with redirect_stdout(io.StringIO()):
+                JCodeMunchConfigTests(
+                    "test_index_coverage_and_measured_cap"
+                ).run(result)
+        return result
+
+    def test_coverage_survives_trading_blueprint_removal(self):
+        files = {p for p in self.files if not p.startswith("blueprints/us-equities/")}
+        result = self.run_coverage(files, self.ignored & files)
+        self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+
+    def test_data_text_file_does_not_require_an_unconfigured_exclusion(self):
+        files = self.files | {"blueprints/convergence-practice/data/notes.txt"}
+        result = self.run_coverage(files, self.ignored)
+        self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+
+    def test_empty_blueprint_output_union_is_rejected(self):
+        directories = {"receipts", "native-outputs", "judge_results", "data"}
+        files = {
+            p for p in self.files
+            if not (
+                p.startswith("blueprints/")
+                and directories.intersection(Path(p).parts[1:-1])
+            )
+        }
+        result = self.run_coverage(files, self.ignored & files)
+        self.assertFalse(result.errors)
+        self.assertTrue(result.failures, "empty coverage must still fail")
+
+
+class JCodeMunchRecipeTests(unittest.TestCase):
+    def test_root_reindex_order_has_required_flags_and_no_extra_exclusions(self):
+        # Upstream v1.108.319: index_folder.py L1439-1451/L1528;
+        # counter.py L129-133; config.py L1230 (requested-folder lookup).
+        recipe = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8")
+        root_orders = []
+        for block in re.findall(r"```json\n(.*?)\n```", recipe, re.DOTALL):
+            try:
+                order = json.loads(block)
+            except json.JSONDecodeError:
+                continue
+            if (
+                isinstance(order, dict)
+                and order.get("action") == "index_folder"
+                and order.get("args", {}).get("path") == "/absolute/checkout/root"
+            ):
+                root_orders.append(order)
+        self.assertEqual(len(root_orders), 1, "document one complete root reindex call")
+        self.assertEqual(root_orders[0], {
+            "action": "index_folder",
+            "args": {
+                "path": "/absolute/checkout/root",
+                "incremental": False,
+                "use_ai_summaries": False,
+                "context_providers": False,
+            },
+            "allow_state_change": True,
+        })
 
 
 if __name__ == "__main__":

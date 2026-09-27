@@ -8,8 +8,9 @@
   // Counting all retained extensions is conservative; this is not a reindex
   // result. This config and its new test add two paths when they are tracked.
   // tests/test_jcodemunch_config.py recomputes the count on each test run.
-  // Upstream's project override replaces its default 2,000-file folder cap:
-  // security.py L589-592; config.py L346, L536.
+  // Upstream's default 2,000-file folder cap: security.py L589-592.
+  // Project override: security.py L717-743; config.py L1084-1091.
+  // Walked-root repo key: tools/index_folder.py L1234, L1692 (v1.108.319).
   "max_folder_files": 4000,
 
   // Project patterns are merged by security.py L554-577 and compiled using
