@@ -416,11 +416,13 @@ showed three results:
 - `route(<sentence>, repo: ".")` recommended `search_symbols` with the whole sentence as its template query.
 
 Another session's Codex-lane gate,
-[PR #433](https://github.com/seathatflowsinourveins/native-agent-stack/pull/433) (`tools/capability-gate`, open at
-this writing), measured the same failure. In its first smoke (run 2026-09-27T20:09:50Z), `route` with the sentence and
+[PR #433](https://github.com/seathatflowsinourveins/native-agent-stack/pull/433) (`tools/capability-gate`, merged on
+2026-09-27 as `55fc8d17`), measured the same failure. In its first smoke (run 2026-09-27T20:09:50Z), `route` with the sentence and
 `execute: true` returned neither target symbol in 6 of 6 runs. Its gate case, `order search_symbols` with the
 identifier, passed 6 of 6 rows with exactly one completed call each (run 2026-09-27T20:16:19Z, promptfoo 0.123.1
-`openai:codex-sdk`). PR #433 classes both runs as workstation smoke and records its receipts after it merges.
+`openai:codex-sdk`). Under the gate's repaired scoring its rows passed again, 6 of 6, each with exactly one completed
+`order search_symbols` that returned the signature. PR #433 classes all these runs as workstation smoke, not
+receipts, and lists its pre-repair smokes (20:09Z-20:31Z) as superseded by the repaired-scoring rows.
 
 **Change.**
 

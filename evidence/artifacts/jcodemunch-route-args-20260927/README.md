@@ -49,8 +49,8 @@ The coordinator's Claude session made these calls through its native jcodemunch 
 ## Corroboration (another session's measurement)
 
 This record repeats the following observations; it did not re-run them. The Codex-lane gate in
-[PR #433](https://github.com/seathatflowsinourveins/native-agent-stack/pull/433) (`tools/capability-gate`, open at
-this writing) belongs to another session, which ran `codex exec -p stack-worker` through promptfoo 0.123.1
+[PR #433](https://github.com/seathatflowsinourveins/native-agent-stack/pull/433) (`tools/capability-gate`, merged on
+2026-09-27 as `55fc8d17`) belongs to another session, which ran `codex exec -p stack-worker` through promptfoo 0.123.1
 `openai:codex-sdk` on 2026-09-27:
 
 - In the first smoke (run 2026-09-27T20:09:50Z),
@@ -59,7 +59,9 @@ this writing) belongs to another session, which ran `codex exec -p stack-worker`
 - The gate's jcodemunch case uses `order search_symbols` with the identifier. It passed 6 of 6 gate rows, each with
   exactly one completed call that returned the signature (run 2026-09-27T20:16:19Z).
 
-PR #433 classes both runs as smoke on the workstation, not receipts, and records its receipts after it merges.
+Under the gate's repaired scoring, the jcodemunch rows passed again, 6 of 6, each with exactly one completed
+`order search_symbols` that returned the signature. PR #433 classes all these runs as smoke on the workstation, not
+receipts, and lists its pre-repair smokes (20:09Z-20:31Z) as superseded by the repaired-scoring rows.
 
 ## Boundaries
 
