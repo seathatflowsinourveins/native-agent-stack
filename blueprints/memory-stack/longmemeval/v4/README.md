@@ -1,25 +1,27 @@
-# LongMemEval-S retrieval harness: the v4 driver (D2h, C4) for the VelaNext rerun
+# LongMemEval-S retrieval harness: the v4 driver (D2h, C4, the A16 arms) for the VelaNext rerun
 
 This directory holds, byte-exact, the LongMemEval-S harness v4 driver and its supporting pins,
 protocol and lock files, committed for host request
 [#274](https://github.com/seathatflowsinourveins/native-agent-stack/issues/274) and
 [#384](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384), so the
 workstation's amendment A17 rerun has this code in Git rather than only in the private
-agent-ecosystem repository. It follows the pattern of #380 (the Mac's v3 harness, not yet
-merged): the same per-file provenance table, the same non-portable labelling, and the same
-"copied files are frozen" rule.
+agent-ecosystem repository. It follows the pattern of #380 (the Mac's v3 harness, merged to
+`main` since this PR opened): the same per-file provenance table, the same non-portable
+labelling, and the same "copied files are frozen" rule.
 
 - **Source.** The private `agent-ecosystem` repository, branch
   `claude/longmemeval-velanext-lane-20260925`, commit `576689a`
   (`576689af6f5e5f4d85013c7c4bed3b8f7c92f57d`; re-fetched and confirmed to still resolve there
   before this commit). Every file below comes from `evals/longmemeval/<path>` at that commit,
   extracted with `git show 576689a:evals/longmemeval/<path>`, which is byte-exact by
-  construction; the table gives each file's blob id.
+  construction; the table gives each file's blob id. For the six files this directory stores as
+  `<name>.frozen` (below), `<path>` in that command is the plain name without `.frozen`.
 - **Nothing was run for this commit.** No arm, model or embedding server ran. This is a code
   transfer only.
-- **The copied files are frozen.** Every file in `SHA256SUMS` except `README.md` is a record. A
-  fix or a later revision lands as a new file or a new PR; an edit here breaks the pinned hashes
-  this commit is accepted against.
+- **The copied files are frozen.** Every file in `SHA256SUMS` except `README.md` and `.gitignore`
+  is a record; both of those were written for this commit, not transferred (see below). A fix or
+  a later revision lands as a new file or a new PR; an edit here breaks the pinned hashes this
+  commit is accepted against.
 - **v4 is the harness A15.2 names**, distinct from the v3 harness #380 carries (`lme_harness.py`
   there; `reference/lme_harness_v3.py` here, byte-identical to it, sha256
   `b59ee6f5ada7392e4c250ad54dd1ec75e2e30921bca8ae4265807f587716f751`). v4 keeps v3's logic for
@@ -58,11 +60,15 @@ Read before running anything here. Findings below come from reading the actual t
   file, and `mp_kill_mines()` then calls `os.killpg(pid, signal.SIGKILL)` — the whole process
   group, not just the pid — so a PID the OS reused for an unrelated process after the original
   miner exited receives it too.
-- **`run_velanext.sh`'s `stop_bg`/`cleanup` is ownership-guarded, not port-based.** It records
-  each background service's pid, start-tick count, boot id and resolved executable when it starts
-  it (`pid_record`), and `same_process()` re-checks all four before sending `TERM` or `KILL`
-  (`owned_pid`). A pid file whose process no longer matches is dropped, unsignalled, as "stale".
-  It never scans a port for holders.
+- **`run_velanext.sh`'s `stop_bg`/`cleanup` is ownership-guarded on the single-process path, not
+  on the process group it also signals.** It records each background service's pid, start-tick
+  count, boot id and resolved executable when it starts it (`pid_record`), and `same_process()`
+  re-checks all four (`owned_pid`) before `stop_bg` (`:145`) sends its first `TERM`/`KILL` pair. A
+  pid file whose process no longer matches is dropped, unsignalled, as "stale". But in group mode
+  — the CPU stream only, via `cleanup`'s `stop_bg cpu-stream group` (`:181`) — `stop_bg` also sends
+  `kill -TERM -- "-$pid"` and, after a pause, `kill -9 -- "-$pid"` **unconditionally** (`:153-157`):
+  no `same_process` check guards either group signal, precisely because the group leader may
+  already have exited while its group lives on. It never scans a port for holders.
 - **`setup_velanext.sh`'s Ollama readiness has no server-identity check either.** After
   backgrounding its own `ollama serve` (`:216-219`), the loop at `:220` only polls `curl -sf
   http://127.0.0.1:11438/api/version` until something answers; it never checks that the answer
@@ -72,14 +78,37 @@ Read before running anything here. Findings below come from reading the actual t
   `:222-224` then runs `ollama pull` for every pinned model, and `:228-229` runs `ollama create` for
   every `ollama/*.Modelfile`, against `OLLAMA_HOST=127.0.0.1:11438` — whichever server actually
   answered — writing into a model store this run does not own. `:231`'s `kill "$oll_pid"` cleanup
-  only ever targets the PID this run itself started, so it corrects nothing when that happens.
+  targets only the PID this run itself started, but only while that PID is still that process: in
+  the failed-bind case just described, that process has already exited (and may already be
+  reaped) well before `:231` or the `EXIT` trap at `:219` runs, so the signal can land on whatever
+  the OS has since reused that PID for — the same PID-reuse gap this section attributes to
+  `mp_kill_mines()` above.
 - **Net effect: these are name and liveness checks, not ownership checks, and the gaps above are
   real.** They are still real improvements on v3's blind port sweep (which has no check at all, see
   above), and `run_velanext.sh`'s own `pid_record`/`same_process()` pairing is closer to a genuine
   ownership check than anything in `lme_harness.py`. But **do not run `lme_harness.py`,
-  `run_velanext.sh` or `setup_velanext.sh` on a shared host** — not "with one gap to watch for," but
-  at all. The workstation's A17 runner is where isolated ports, isolated stores and
-  identity-checked cleanup belong; this frozen code does not provide them.
+  `run_velanext.sh`, `setup_velanext.sh` or `lane_tools.py`'s `v3-shim`/`fetch-hf --pin-main`
+  subcommands on a shared host** — not "with one gap to watch for," but at all. The workstation's
+  A17 runner is where isolated ports, isolated stores and identity-checked cleanup belong; this
+  frozen code does not provide them.
+- **`lane_tools.py`'s `v3-shim` and `fetch-hf --pin-main` mutate shared state outside this
+  directory when run outside their wrapping scripts' lane-owned paths.** `v3-shim HOME`
+  (`:804-816`) unlinks (`:812-813`) and replaces with symlinks
+  `HOME/.local/share/agent-ecosystem/{src/LongMemEval, tools/ai-memory-2.5.0-19b6429/ai-memory,
+  bench/agentmemory}` — the second of those is the Mac's production ai-memory binary path
+  (`lme_harness.py:86,117`). `fetch-hf --pin-main` (`:110-120`) rewrites `refs/main` in whatever
+  `HF_HUB_CACHE` is active, changing which snapshot every program that loads that model by name
+  resolves. The shipped call paths are safe (`run_velanext.sh:479` passes a lane-owned `HOME`;
+  `setup_velanext.sh:320` passes a lane-owned `HF_HOME`); the risk is calling either subcommand
+  directly with the real home or the real `HF_HOME` active.
+- **Two third-party vendor harnesses launch with the operator's full environment, not `env -i`.**
+  `run_velanext.sh:563` (`./node_modules/.bin/tsx benchmark/longmemeval-bench.ts`, in the
+  agentmemory checkout) and `:596-597` (`./target/release/ai-memory-eval retrieval --fetch`) run
+  in a plain subshell. Every other third-party launch in this file uses `env -i` with an explicit
+  allowlist (`:361-363` Ollama, `:383-388` Hindsight, `:608-609` MemPalace M1, `:712-716` AMB), and
+  the harness starts its own servers under a cleaned environment too (`lme_harness.py:326-327`).
+  Whether either vendor reads an ambient provider credential from the operator's shell was not
+  checked here.
 
 ## Files
 
@@ -130,9 +159,20 @@ same reasoning
 gives for the npm lock in #380, applied to these Python locks: they are records of exactly what
 five isolated venvs installed for specific measured or to-be-measured runs, not floating
 dependencies to keep current, so they are kept unchanged under names no dependency scanner reads.
-The `.in` files are pip-compile *sources* (unpinned, no hashes); OSV-Scanner's Python extractor
-does not read them, `TRACKED` does not match them, and they carry no advisory, so they keep their
-plain names.
+The `.in` files keep their plain names and are **not** frozen, but not because they are unpinned
+or unreadable in principle: scanning plain-named scratch copies with no explicit
+`--lockfile=requirements.txt:<path>` override returns "No package sources found" — OSV-Scanner
+does not auto-detect a bare `.in`/`.lock.txt` extension by name — and separately, `TRACKED`'s
+`requirements[^/]*\.(?:txt|in)` alternative matches only a *basename* starting with
+`requirements`; `requirements/official.in`'s basename is `official.in`, so it escapes that
+alternative on a technicality of the regex, not because the file is clean. It is not unpinned
+either: `requirements/official.in` alone pins 25 of its 28 lines (`Jinja2==3.1.3`, `nltk==3.9.1`,
+`pillow==10.2.0`, `torch==2.3.1`, `transformers==4.43.3` among them); `embed.in` pins its whole
+GPU-venv set (`torch`, `transformers`, `sentence-transformers`, `mteb`, `openai`, `httpx`,
+`rank-bm25`); `mempalace.in` and `hindsight.in` pin the one package each names
+(`mempalace==3.10.0`, `hindsight-api==0.10.1`); only `build.in` pins none (bare
+`setuptools`/`wheel`, hash-locked solely in `build.lock.txt`). What each `.in` file pins is
+exactly what its matching `.lock.txt.frozen` resolves, hashes and is scanned for below.
 
 `requirements/build.in` and `.lock.txt` are the exception in spirit but not in mechanism: they pin
 only `setuptools`/`wheel` as build constraints, not a runtime dependency set, but `build.lock.txt`
@@ -145,9 +185,20 @@ stored as `.frozen`, per this task's directive and the same decision record's ra
 npm-lockfile-format record of a fixed, historical dependency set (a different, larger lock than
 the install-prefix pair #380 already freezes — the agentmemory repository's own 381-package lock,
 not the 1-dependency install lock), not something meant to be reinstalled or rescanned as shipped.
-**This PR does not add an addendum to the 2026-09-25 decision record**, because that record lives
-only on #380's unmerged branch, not on `main`; the reasoning above is the addendum, held here
-until #380 merges and the record exists to append to.
+
+**This PR adds a dated addendum to the 2026-09-25 decision record**, extending its scope to these
+six `.frozen` files with the same kind of evidence the record used for the npm pair: a scan of
+plainly named scratch copies, the advisory list, and a discriminating control against the
+`.frozen` names (`osv-scanner scan source --config .github/osv-scanner.toml --no-resolve` over
+`.frozen`-named copies: "No package sources found", exit 128, same as the original record). #380
+has merged, so the record is on `main`: see [the 2026-09-27
+addendum](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/decisions/2026-09-25-longmemeval-frozen-npm-lock.md#addendum-2026-09-27-extending-scope-to-the-longmemeval-v4-drivers-six-locks)
+for the full counts. In short: `official.lock.txt` alone carries 114 unique advisories across 9
+of its 64 packages (concentrated in `nltk`, `pillow`, `torch` and `transformers`);
+`mempalace.lock.txt`'s `chromadb` 1.5.9 carries 4, including a pre-authentication code-injection
+advisory; `embed.lock.txt` carries 2; `agentmemory-repo-package-lock.json` (376 packages) repeats
+the same 2 the 2026-09-25 decision already found in the smaller install-prefix lock; and
+`hindsight.lock.txt` (223 packages) and `build.lock.txt` (3 packages) show none at scan time.
 
 ## Which arms this driver implements
 
@@ -166,7 +217,12 @@ until #380 merges and the record exists to append to.
   these models as shipped, so X is outside every Holm family" — unlike C4, which is inside the
   confirmatory family structure. The coordinator's brief for this task named `rerank_stage.py` as
   "the C4 reranker stage"; that does not match what the code does, and this README follows the
-  code.
+  code. One of the four X rerankers, `kalm-small` (KaLM-Embedding/KaLM-Reranker-V1-Small),
+  loads with `trust_remote_code=True` (`rerank_stage.py:40`), so that arm executes Python shipped
+  in the model repository. Mitigations already in place: the revision is pinned
+  (`pins.json`/`revision_of`, `:48-49`), the load uses `local_files_only=True` (`:98-100`),
+  `lane_tools.py`'s `fetch-hf` hash-verifies the files (`:110-133`), and `run_velanext.sh:757`
+  sets `HF_HUB_OFFLINE=1` for every X-arm invocation.
 - **The A16 arms** (`mempalace-palace`, M2; `hindsight-qwen3.6`, K1, on `k1-subset.json`) are also
   dispatched from `lme_harness.py`, which drives both systems over HTTP (`LME_MEMPALACE_VENV`/
   `LME_MEMPALACE_ONNX`, `LME_HINDSIGHT_URL`) the same way it drives ai-memory and agentmemory; D2h
@@ -189,11 +245,17 @@ until #380 merges and the record exists to append to.
 - **`lme_harness.py`, `lane_tools.py`, `lme_summarize.py` and `rerank_stage.py` are portable by
   design** (every install and data path is environment-variable overridable: `LME_HOME`,
   `LME_OFFICIAL_DIR`, `LME_AIMEM_BIN`, `LME_AM_ROOT`, `LME_MINILM_DIR`, `LME_MEMPALACE_VENV`,
-  `LME_MEMPALACE_ONNX`, `LME_HINDSIGHT_URL`, `LME_NODE`, and more), but every *default* still
-  resolves under `Path.home()` — the Mac's `.local/share/agent-ecosystem` layout for
-  `lme_harness.py`, the lane's own `.local/share/lme-bench` for `lane_tools.py`. Unconfigured, they
-  assume one of those two layouts exists; `run_velanext.sh` is what sets the environment variables
-  that repoint them at VelaNext's prefix.
+  `LME_MEMPALACE_ONNX`, `LME_HINDSIGHT_URL`, `LME_NODE`, and more), but not every *default* points
+  the same way. `LME_HOME` itself defaults to `HERE`, this directory (`lme_harness.py:87`; its
+  docstring at `:34` says "default: this directory"), so the paths derived from it — `DATA`
+  (`:102`), `MINILM_DIR` (`:120`), `MP_VENV` and `MP_ONNX` (`:182-183`) — resolve inside
+  `blueprints/memory-stack/longmemeval/v4/` when unconfigured. Only the paths derived from `AE =
+  Path.home() / ".local/share/agent-ecosystem"` (`:86`) — `LME_OFFICIAL_DIR`'s default (`:88`),
+  `AIMEM_BIN` (`:117`) and `AM_ROOT` (`:121`) — default under `Path.home()`, the Mac's layout.
+  `lane_tools.py` defaults separately, to its own lane's `.local/share/lme-bench` layout.
+  Unconfigured, a run assumes some mix of this directory and one of those two home layouts
+  exists; `run_velanext.sh` is what sets the environment variables that repoint every one of them
+  at VelaNext's prefix.
 - **`reference/lme_harness_v3.py` hardcodes the Mac's home layout** with no environment override
   for the official checkout or the ai-memory/agentmemory paths (only `LME_EMBED_URL`,
   `LME_AM_SLOTS` and `LME_LLM_URL` are configurable there) — the same non-portability #380 already
@@ -254,10 +316,19 @@ scope. Sizes and hashes are of the source blob at 576689a.
   **now transferred** (Files table above): the GPT-6 review at `97697b81` found it is a C4
   prerequisite (`pins.json:146`'s role field, `run_velanext.sh:654`'s `llm_up qwen3.5-9b-64k
   aimem-qwen3-rerank`), not outside D2h/C4 as this README wrongly said; it is also the reranker LLM
-  for the A15.2 F arms and the pooled `aimem-qwen3-rerank` stage. The other three really are
-  outside D2h/C4 — each is the reranker LLM for one H arm (`lme_harness.py`'s
-  `H_RERANK_MODELS`/`run_velanext.sh`'s matching loop), and `qwen3.6-35b-a3b-64k` doubles as K1's
-  LLM (`run_velanext.sh:68`'s `H1_BUILD`) — and stay excluded:
+  for the A15.2 F arms and the pooled `aimem-qwen3-rerank` stage. The other three are not
+  themselves D2h's or C4's own reranker LLM — each is the reranker LLM for one H arm
+  (`lme_harness.py`'s `H_RERANK_MODELS`/`run_velanext.sh`'s matching loop), and
+  `qwen3.6-35b-a3b-64k` doubles as K1's LLM (`run_velanext.sh:68`'s `H1_BUILD`) — but that does
+  not make them optional for a D2h, C4 or K1 run *from this directory*: `run_velanext.sh gates`
+  is mandatory before any arm (`require_gates`, `:229-233`, called by `cmd_cpu` at `:573` for D2h,
+  `cmd_arms` at `:691` for C4, and `cmd_a16` at `:695` for K1), and `cmd_gates` (`:458`)
+  smoke-tests all four reranker-LLM tags, including these three, and runs the K1 smoke on
+  `$H1_BUILD` (`:528-535`) before it writes `logs/gates/passed.json`; the two llama-served tags
+  among them are read from `$LANE/ollama/$tag.Modelfile` at `:338`. **So no D2h, C4 or K1 run
+  through this driver can pass its gates from this directory without all three of the files
+  below — they stay excluded from the transferred file list, not from what a run needs** (see
+  "Before anything runs" below):
   - **`lfm2.5-2.6b-64k.Modelfile`** (411 bytes, sha256
     `f22a2c27d5401968b86d4eff044f5eed8e4a6299a468dd369714d733cd7ed6a1`, blob `d8a1d230`): H3's
     reranker LLM.
@@ -270,6 +341,24 @@ scope. Sizes and hashes are of the source blob at 576689a.
 
 Also excluded, per this task's scope, regardless of size: the dataset, any run's results, caches,
 logs and model weights. None of those are tracked at 576689a under `evals/longmemeval/`.
+
+## Before anything runs
+
+Committing this code is not the same as being able to run it from this directory. Beyond
+`embed_cache_proxy.py` (above, blocking C3 and beyond), none of `setup_velanext.sh`'s steps or
+`run_velanext.sh gates` succeed here without also supplying:
+
+| Missing or renamed | Read at | Available from |
+| --- | --- | --- |
+| `eligible-manifest.json` | `lme_harness.py:103,1710`; `setup_velanext.sh:130`; `run_velanext.sh:472`; `lane_tools.py:697` | Byte-identical to `../eligible-manifest.json` (#380, now on `main`): `cp ../eligible-manifest.json .` |
+| `agentmemory/package.json`, `agentmemory/package-lock.json` | `setup_velanext.sh:156` (D2h's `npm ci`) | Byte-identical to `../agentmemory/package.json.frozen`/`package-lock.json.frozen` (#380): `mkdir -p agentmemory && cp ../agentmemory/package.json.frozen agentmemory/package.json && cp ../agentmemory/package-lock.json.frozen agentmemory/package-lock.json` |
+| `embed_gates.json` | `embed_server_st.py:381,388`; `run_velanext.sh:511` (the reference-output gate loop); hashed by `lane_tools.py:697`'s receipt | Not present anywhere in this repository (not requested for transfer, and not byte-identical to any file #380 carries); fetch it from `evals/longmemeval/embed_gates.json` at `agent-ecosystem@576689a` |
+| `reference/v3-check-ids.txt` | `lane_tools.py:54`; `run_velanext.sh:469,489,492,503` (the v3=v4 equivalence gate) | Not present anywhere in this repository; fetch it from the same commit's `evals/longmemeval/reference/v3-check-ids.txt` |
+| The five `requirements/*.lock.txt` (plain names) and `vendor/agentmemory-repo-package-lock.json` (plain name) | `setup_velanext.sh:95` (`venv()`), `:130` area's sibling installs, `:278`; `pins.json`'s `python_locks`/`vendor_bench.lockfile` fields | Restore each `.frozen` copy under its plain name **only in an isolated prefix**, never in this checkout (the coverage test reads the plain names here): e.g. `cp requirements/official.lock.txt.frozen /isolated/prefix/requirements/official.lock.txt` for each of the five, and `cp vendor/agentmemory-repo-package-lock.json.frozen /isolated/prefix/vendor/agentmemory-repo-package-lock.json`; point `setup_velanext.sh`'s `$LANE` at that prefix |
+| `ollama/lfm2.5-2.6b-64k.Modelfile`, `ollama/nemotron-3.5-lightning-30b-a3b-64k.Modelfile`, `ollama/qwen3.6-35b-a3b-64k.Modelfile` | `run_velanext.sh:338` (the two llama-served tags), `setup_velanext.sh:228-229` (`ollama create`); required by `cmd_gates` (`:528-535`) before `require_gates` passes for any arm | Excluded from this PR (sizes, hashes and source blobs above); fetch them from the same commit before `gates` can run |
+
+None of this changes what is committed here. It is the gap between "the driver's code is in
+Git" and "a run can start from this directory alone," and this PR does not close it.
 
 ## Verifying
 
@@ -286,6 +375,7 @@ shasum -a 256 -c SHA256SUMS
 | The 25 copied files match `evals/longmemeval/<path>` at agent-ecosystem commit 576689a, byte-exact | `source_review` | `git rev-parse 576689a:evals/longmemeval/<path>` against the blob column above, and sha256 against `SHA256SUMS` |
 | `PREREGISTRATION.md` matches the required hash `a9b1db335eee1ff99d1883e048bcd8e443ca2afee3505a34fd874dd1ef412d5b` | `source_review` | sha256, checked before this commit was written |
 | Which code implements which arm (D2h, C4, X, A16) | `source_review` | reading `lme_harness.py` and `rerank_stage.py` directly, not their docstrings alone |
-| The shared-host warning's claims about `_ours`, `am_teardown`, `am_start`, `mp_mine_pids`/`_pid_alive`/`mp_kill_mines` in `lme_harness.py`, `stop_bg`/`same_process` in `run_velanext.sh`, and the Ollama readiness loop in `setup_velanext.sh` | `source_review` | reading each function directly at the line numbers cited above, and reproducing the three `lme_harness.py` cases with inert probes (GPT-6 review at `97697b81`) |
+| The shared-host warning's claims about `_ours`, `am_teardown`, `am_start`, `mp_mine_pids`/`_pid_alive`/`mp_kill_mines` in `lme_harness.py`, `stop_bg`/`same_process` in `run_velanext.sh`, and the Ollama readiness loop in `setup_velanext.sh` | `source_review` | reading each function directly at the line numbers cited above |
+| The three `lme_harness.py` teardown gaps above (`_ours`, `am_teardown`, `am_start`), reproduced rather than only read | independent observation | GPT-6 cross-family review at `97697b81` ([PR comment](https://github.com/seathatflowsinourveins/native-agent-stack/pull/386#issuecomment-5853228279)): "An inert reproduction confirmed SIGKILL in all three cases" |
 | `--help` for `lme_harness.py` and `lme_summarize.py` from a clean clone | `local_integration` | see the PR body for the exact commands and results |
 | Any benchmark result | none new | no arm ran for this commit |
