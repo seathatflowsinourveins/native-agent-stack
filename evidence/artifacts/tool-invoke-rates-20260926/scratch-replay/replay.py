@@ -46,6 +46,7 @@ DERIVED_KEYS = ["tool_family", "actor", "shell_rtk", "tool_details"] + NAME_KEYS
     "workflow.run_id", "kind", "state", "sender_thread_id", "receiver_thread_id", "total_tool_uses",
     "invocation_trigger"]
 SENTINEL = "U6SENTINEL"
+HISTORICAL_CAPTURE_FILES = {"claude-A-logs.json", "claude-B-logs.json", "claude-C-logs.json", "codex-logs.json"}
 
 results = {"pass": 0, "fail": 0}
 
@@ -263,9 +264,15 @@ def post(args) -> None:
     # the captures is kept; the pipeline never reads timestamps. A scratch Loki 3.7.8 accepted (HTTP 204) but did
     # not return entries about 2 h old right after ingestion (round2/loki_probe.py), so unshifted captures made the
     # Loki stage depend on the time of day.
-    latest = max(max(int(r.get("timeUnixNano") or 0), int(r.get("observedTimeUnixNano") or 0))
-                 for p in args.inputs for _, _, r, _ in records(Path(p)))
-    shift = max(0, time.time_ns() - 120_000_000_000 - latest)
+    captured = [(Path(p).name, r) for p in args.inputs for _, _, r, _ in records(Path(p))]
+    if not captured and not args.synthetic:
+        raise SystemExit("no capture records; pass --synthetic to replay the synthetic fixture")
+    recent = time.time_ns() - 120_000_000_000
+    latest = max((max(int(r.get("timeUnixNano") or 0), int(r.get("observedTimeUnixNano") or 0))
+                  for _, r in captured), default=recent)
+    shift = max(0, recent - latest)
+    historical = HISTORICAL_CAPTURE_FILES <= {name for name, _ in captured}
+    print("INFO historical capture set: " + ("present" if historical else "absent"))
     if args.synthetic:
         # Just after the newest captured record: Loki accepts out-of-order entries only within max_chunk_age/2.
         for line_no, doc in enumerate(synthetic_batches(latest + shift + 1_000_000_000)):
@@ -495,6 +502,74 @@ def staged_allowlists(collector: Path):
     return quoted("resource"), quoted("log")
 
 
+def historical_assertions(inputs, outputs, shared) -> None:
+    # spot checks against the probe tables (fixed expectations, independent of the reference spec)
+    def rows(file_name, event):
+        return [outputs[t][3] for t in shared if inputs[t][0] == file_name and outputs[t][3].get("event.name") == event]
+    b_tools = rows("claude-B-logs.json", "tool_result")
+    servers = collections.Counter(r.get("mcp_server.name") for r in b_tools if r.get("tool_family") == "mcp")
+    check("B (details on): MCP tool_result by server = context-mode plugin 1, qmd 2",
+          servers == collections.Counter({"plugin_context-mode_context-mode": 1, "qmd": 2}), f"got={dict(servers)}")
+    tools = collections.Counter(r.get("mcp_tool.name") for r in b_tools if r.get("tool_family") == "mcp")
+    check("B: MCP tool_result by tool = ctx_stats 1, status 2",
+          tools == collections.Counter({"ctx_stats": 1, "status": 2}), f"got={dict(tools)}")
+    check("B: skill_activated names the skill (codebase-design); the Skill tool_result carries no skill name",
+          [r.get("skill.name") for r in b_tools if r.get("tool_name") == "Skill"] == [None]
+          and [r.get("skill.name") for r in rows("claude-B-logs.json", "skill_activated")] == ["codebase-design"])
+    check("B: the Agent tool_result and its accepted tool_decision name the subagent type (general-purpose)",
+          [r.get("subagent_type") for r in b_tools if r.get("tool_name") == "Agent"] == ["general-purpose"]
+          and [(r.get("decision"), r.get("subagent_type")) for r in rows("claude-B-logs.json", "tool_decision")
+               if r.get("tool_name") == "Agent"] == [("accept", "general-purpose")])
+    rtk = [r.get("shell_rtk") for r in b_tools if r.get("tool_family") == "shell"]
+    check("B: the Bash call carries shell_rtk=true (the hook-rewritten command starts with rtk)", rtk == ["true"],
+          f"got={rtk}")
+    actors = collections.Counter((r.get("tool_name"), r.get("actor")) for r in b_tools)
+    check("B: the workflow child's ToolSearch and MCP results are actor=workflow; the other 8 are main_or_subagent",
+          actors[("mcp_tool", "workflow")] == 1 and actors[("ToolSearch", "workflow")] == 1
+          and sum(n for (t, a), n in actors.items() if a == "main_or_subagent") == 8, f"got={dict(actors)}")
+    b_api = collections.Counter((r.get("actor"), r.get("mcp_server.name")) for r in rows("claude-B-logs.json", "api_request")
+                                if r.get("mcp_server.name"))
+    check("B: api_request consuming MCP results = main/context-mode 1, subagent/qmd 1, workflow/qmd 1",
+          b_api == collections.Counter({("main", "plugin_context-mode_context-mode"): 1, ("subagent", "qmd"): 1,
+                                        ("workflow", "qmd"): 1}), f"got={dict(b_api)}")
+    sub = rows("claude-B-logs.json", "subagent_completed")
+    check("B: subagent_completed keeps agent_type and total_tool_uses",
+          len(sub) == 1 and sub[0].get("agent_type") == "general-purpose" and str(sub[0].get("total_tool_uses", "")).isdigit())
+    for run in ("A", "C"):
+        tools = rows(f"claude-{run}-logs.json", "tool_result")
+        check(f"{run} (details off): MCP calls counted as tool_family=mcp without names; nothing unparsed",
+              sum(1 for r in tools if r.get("tool_family") == "mcp") == 3
+              and not any("mcp_server.name" in r or "tool_details" in r for r in tools))
+        check(f"{run}: skill_activated keeps the redacted placeholder custom_skill",
+              [r.get("skill.name") for r in rows(f"claude-{run}-logs.json", "skill_activated")] == ["custom_skill"])
+    c_session = {r.get("session.id") is not None for r in rows("claude-C-logs.json", "tool_result")}
+    check("C: session.id survives on events (u1 correlation id kept); A has none",
+          c_session == {True} and not any("session.id" in r for r in rows("claude-A-logs.json", "tool_result")))
+    codex = rows("codex-logs.json", "codex.tool_result")
+    check("Codex: ctx_stats result is tool_family=mcp, mcp_server.name=context-mode, mcp_tool.name=ctx_stats",
+          [(r.get("tool_family"), r.get("mcp_server.name"), r.get("mcp_tool.name")) for r in codex
+           if r.get("tool_family") == "mcp"] == [("mcp", "context-mode", "ctx_stats")])
+    check("Codex: actor main on 6 root-thread results, subagent on 2 sub-agent results; the agent path is not exported",
+          collections.Counter(r.get("actor") for r in codex) == collections.Counter({"main": 6, "subagent": 2})
+          and not any("agent_name" in r for r in codex))
+    families = collections.Counter(r.get("tool_family") for r in codex)
+    check("Codex: families code_mode 3 (exec wrappers kept apart), shell 2, agent 2, mcp 1",
+          families == collections.Counter({"code_mode": 3, "shell": 2, "agent": 2, "mcp": 1}), f"got={dict(families)}")
+    check("Codex: exec_command results carry shell_rtk (command text deleted)",
+          all(r.get("shell_rtk") in ("true", "false") for r in codex if r.get("tool_name") == "exec_command"))
+    comms = rows("codex-logs.json", "codex.agent_communication")
+    check("Codex: agent_communication keeps kind/state/sender/receiver, drops content",
+          sorted((r.get("kind"), r.get("state")) for r in comms if r.get("state") == "send")
+          == [("result", "send"), ("spawn", "send")]
+          and all(r.get("sender_thread_id") and r.get("receiver_thread_id") for r in comms if r.get("state") == "send")
+          and not any("content" in r for r in comms))
+    check("Codex: originator kept (codex_exec) and client codex_exec on tool results",
+          {r.get("originator") for r in codex} == {"codex_exec"} and {r.get("client") for r in codex} == {"codex_exec"})
+    check("Claude: client is the service name (claude-code) on every tool event of A, B and C",
+          {r.get("client") for run in "ABC" for event in ("tool_result", "tool_decision")
+           for r in rows(f"claude-{run}-logs.json", event)} == {"claude-code"})
+
+
 def run_assertions(args) -> None:
     tags, inputs, outputs = load(args)
     resource_allow, log_allow = staged_allowlists(Path(args.collector))
@@ -568,71 +643,10 @@ def run_assertions(args) -> None:
     check("no synthetic sentinel reaches the exporter", SENTINEL not in exported_text,
           f"synthetic records={sum(1 for t in tags if t.startswith('u6s'))}")
 
-    # spot checks against the probe tables (fixed expectations, independent of the reference spec)
-    def rows(file_name, event):
-        return [outputs[t][3] for t in shared if inputs[t][0] == file_name and outputs[t][3].get("event.name") == event]
-    b_tools = rows("claude-B-logs.json", "tool_result")
-    servers = collections.Counter(r.get("mcp_server.name") for r in b_tools if r.get("tool_family") == "mcp")
-    check("B (details on): MCP tool_result by server = context-mode plugin 1, qmd 2",
-          servers == collections.Counter({"plugin_context-mode_context-mode": 1, "qmd": 2}), f"got={dict(servers)}")
-    tools = collections.Counter(r.get("mcp_tool.name") for r in b_tools if r.get("tool_family") == "mcp")
-    check("B: MCP tool_result by tool = ctx_stats 1, status 2",
-          tools == collections.Counter({"ctx_stats": 1, "status": 2}), f"got={dict(tools)}")
-    check("B: skill_activated names the skill (codebase-design); the Skill tool_result carries no skill name",
-          [r.get("skill.name") for r in b_tools if r.get("tool_name") == "Skill"] == [None]
-          and [r.get("skill.name") for r in rows("claude-B-logs.json", "skill_activated")] == ["codebase-design"])
-    check("B: the Agent tool_result and its accepted tool_decision name the subagent type (general-purpose)",
-          [r.get("subagent_type") for r in b_tools if r.get("tool_name") == "Agent"] == ["general-purpose"]
-          and [(r.get("decision"), r.get("subagent_type")) for r in rows("claude-B-logs.json", "tool_decision")
-               if r.get("tool_name") == "Agent"] == [("accept", "general-purpose")])
-    rtk = [r.get("shell_rtk") for r in b_tools if r.get("tool_family") == "shell"]
-    check("B: the Bash call carries shell_rtk=true (the hook-rewritten command starts with rtk)", rtk == ["true"],
-          f"got={rtk}")
-    actors = collections.Counter((r.get("tool_name"), r.get("actor")) for r in b_tools)
-    check("B: the workflow child's ToolSearch and MCP results are actor=workflow; the other 8 are main_or_subagent",
-          actors[("mcp_tool", "workflow")] == 1 and actors[("ToolSearch", "workflow")] == 1
-          and sum(n for (t, a), n in actors.items() if a == "main_or_subagent") == 8, f"got={dict(actors)}")
-    b_api = collections.Counter((r.get("actor"), r.get("mcp_server.name")) for r in rows("claude-B-logs.json", "api_request")
-                                if r.get("mcp_server.name"))
-    check("B: api_request consuming MCP results = main/context-mode 1, subagent/qmd 1, workflow/qmd 1",
-          b_api == collections.Counter({("main", "plugin_context-mode_context-mode"): 1, ("subagent", "qmd"): 1,
-                                        ("workflow", "qmd"): 1}), f"got={dict(b_api)}")
-    sub = rows("claude-B-logs.json", "subagent_completed")
-    check("B: subagent_completed keeps agent_type and total_tool_uses",
-          len(sub) == 1 and sub[0].get("agent_type") == "general-purpose" and str(sub[0].get("total_tool_uses", "")).isdigit())
-    for run in ("A", "C"):
-        tools = rows(f"claude-{run}-logs.json", "tool_result")
-        check(f"{run} (details off): MCP calls counted as tool_family=mcp without names; nothing unparsed",
-              sum(1 for r in tools if r.get("tool_family") == "mcp") == 3
-              and not any("mcp_server.name" in r or "tool_details" in r for r in tools))
-        check(f"{run}: skill_activated keeps the redacted placeholder custom_skill",
-              [r.get("skill.name") for r in rows(f"claude-{run}-logs.json", "skill_activated")] == ["custom_skill"])
-    c_session = {r.get("session.id") is not None for r in rows("claude-C-logs.json", "tool_result")}
-    check("C: session.id survives on events (u1 correlation id kept); A has none",
-          c_session == {True} and not any("session.id" in r for r in rows("claude-A-logs.json", "tool_result")))
-    codex = rows("codex-logs.json", "codex.tool_result")
-    check("Codex: ctx_stats result is tool_family=mcp, mcp_server.name=context-mode, mcp_tool.name=ctx_stats",
-          [(r.get("tool_family"), r.get("mcp_server.name"), r.get("mcp_tool.name")) for r in codex
-           if r.get("tool_family") == "mcp"] == [("mcp", "context-mode", "ctx_stats")])
-    check("Codex: actor main on 6 root-thread results, subagent on 2 sub-agent results; the agent path is not exported",
-          collections.Counter(r.get("actor") for r in codex) == collections.Counter({"main": 6, "subagent": 2})
-          and not any("agent_name" in r for r in codex))
-    families = collections.Counter(r.get("tool_family") for r in codex)
-    check("Codex: families code_mode 3 (exec wrappers kept apart), shell 2, agent 2, mcp 1",
-          families == collections.Counter({"code_mode": 3, "shell": 2, "agent": 2, "mcp": 1}), f"got={dict(families)}")
-    check("Codex: exec_command results carry shell_rtk (command text deleted)",
-          all(r.get("shell_rtk") in ("true", "false") for r in codex if r.get("tool_name") == "exec_command"))
-    comms = rows("codex-logs.json", "codex.agent_communication")
-    check("Codex: agent_communication keeps kind/state/sender/receiver, drops content",
-          sorted((r.get("kind"), r.get("state")) for r in comms if r.get("state") == "send")
-          == [("result", "send"), ("spawn", "send")]
-          and all(r.get("sender_thread_id") and r.get("receiver_thread_id") for r in comms if r.get("state") == "send")
-          and not any("content" in r for r in comms))
-    check("Codex: originator kept (codex_exec) and client codex_exec on tool results",
-          {r.get("originator") for r in codex} == {"codex_exec"} and {r.get("client") for r in codex} == {"codex_exec"})
-    check("Claude: client is the service name (claude-code) on every tool event of A, B and C",
-          {r.get("client") for run in "ABC" for event in ("tool_result", "tool_decision")
-           for r in rows(f"claude-{run}-logs.json", event)} == {"claude-code"})
+    if HISTORICAL_CAPTURE_FILES <= {row[0] for row in inputs.values()}:
+        historical_assertions(inputs, outputs, shared)
+    else:
+        print("INFO historical capture assertions skipped: complete A/B/C/Codex capture set absent")
     synthetic = {t: outputs[t][3] for t in shared if t.startswith("u6s")}
     by_input = {t: inputs[t][2] for t in synthetic}
     malformed = [synthetic[t] for t, a in by_input.items() if SENTINEL + "-malformed" in str(a.get("tool_parameters"))]
@@ -905,7 +919,7 @@ def main() -> None:
     p.add_argument("--task-id")
     p.add_argument("--tags", required=True)
     p.add_argument("--synthetic", action="store_true")
-    p.add_argument("inputs", nargs="+")
+    p.add_argument("inputs", nargs="*")
     p = sub.add_parser("forbidden")
     p.add_argument("--out", required=True)
     p.add_argument("inputs", nargs="+")
@@ -913,7 +927,7 @@ def main() -> None:
     p.add_argument("--out", required=True)
     p.add_argument("--tags", required=True)
     p.add_argument("--collector", required=True)
-    p.add_argument("inputs", nargs="+")
+    p.add_argument("inputs", nargs="*")
     p = sub.add_parser("loki")
     p.add_argument("--port", type=int, required=True)
     p.add_argument("--collector", required=True)

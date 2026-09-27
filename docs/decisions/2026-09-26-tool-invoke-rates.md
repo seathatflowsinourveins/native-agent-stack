@@ -2,7 +2,8 @@
 
 **Status: decided; the user decided on 2026-09-26 to turn `OTEL_LOG_TOOL_DETAILS` on with this
 filtering ("1 and full sota convergence practice we proceed"). Applied on the host and passed host
-acceptance** (`prove.sh`, 2026-09-26T23:47:42Z-23:49:21Z, 33 passed, 0 failed; see "Evidence and its class").
+acceptance with the pre-fix checker** (`prove.sh`, 2026-09-26T23:47:42Z-23:49:21Z,
+33 passed, 0 failed; see "Evidence and its class" for the corrected offline result and remaining limits).
 [docs/secret-storage.md](../secret-storage.md#telemetry-and-pasted-values) recommends, as a user
 decision, keeping tool details off while broker keys exist on the host, and records this change as its
 one dated exception. The Collector part works without the flag. This change is stacked
@@ -106,7 +107,7 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
 
 ## Evidence and its class
 
-- **Local integration** (scratch replay; sanitized receipt committed at
+- **Historical local integration** (scratch replay; sanitized receipt committed at
   `evidence/artifacts/tool-invoke-rates-20260926/scratch-replay/`): replay of the probe captures (Claude runs
   A, B and C, and Codex exec) plus synthetic sentinel records, including forged derived keys, addresses,
   token-shaped names, a forged SDK receipt, model-typed names shaped like file names and hidden paths, and two
@@ -114,13 +115,18 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
   - The staged pipeline ran on the pinned otelcol-contrib 0.161.0, and a scratch Loki 3.7.8 ran from
     the repository's Loki template. Every assertion passed (109 of 109).
   - The derived fields matched a separately written reference implementation on every record.
-  - No command, prompt, script, argument, output or sentinel text reached the file exporter or Loki.
+  - The historical checker found none of its 72 retained forbidden strings in the file exporter or Loki;
+    its length floors and missing fixed-body assertion limit that result.
   - Each new dashboard target returned the value computed from the exported records.
   - The receipt carries the harness and reference implementation (paths parameterized, not hard-coded) and
     the sanitized derived result; it does not carry the 536 real captured records it also covered, only their
     counts. See that folder's README for exactly what is and is not reproducible without them.
-- **Unit test:** `tests/test_observability_tool_names.py` passes, including the pinned-binary class.
-  It fails on the writer-identity profile without this change.
+- **Unit tests:** the original `tests/test_observability_tool_names.py` result passed, including the
+  pinned-binary class, and failed on the writer-identity profile without this change. The repair's requested
+  three-module command (`tests.test_observability_tool_names`, `tests.test_observability_writer_identity`,
+  `tests.test_observability_writer_identity_host`) ran **78 tests: 57 passed, 21 errors** in the repair
+  sandbox. All 21 errors were socket-creation `PermissionError` failures there. The coordinator re-ran the
+  same command on the host: **78 tests, OK**.
 - **Independent review:** two read-only Codex (gpt-6-astra) review rounds. The first raised nine
   findings; eight were fixed and the ninth, that shape checks cannot bound meaning, was recorded as a
   limit. The second demonstrated that limit and raised six more findings: the names above, the host
@@ -132,10 +138,10 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
 - **Production Loki, read-only, before any apply:** all 19 repaired dashboard targets and the 15 proof
   queries parse and return. The hour before that run had about 83 Claude and 43 Codex tool calls per
   minute.
-- **Host acceptance:** `prove.sh` ran live against production Loki/Collector, 2026-09-26T23:47:42Z-23:49:21Z:
+- **Historical host acceptance:** `prove.sh` ran live against production Loki/Collector, 2026-09-26T23:47:42Z-23:49:21Z:
   one real `claude -p` and one real `codex exec`, tagged with `ecosystem.task.id`. **33 passed, 0 failed** --
   every per-server, per-skill, per-subagent and per-client count appeared in Loki within the deadline. Its 7
-  privacy assertions ran under the checker this fix replaces (next item); the 26 count-based checks above are
+  privacy assertions ran under the checker this fix replaces (next item); the 26 other assertions are
   unaffected by that fix. Receipt: `evidence/artifacts/tool-invoke-rates-20260926/live-proof/`.
 - **Checker fix, discriminating control and offline re-check** (window-2 finding 2; review thread
   `PRRT_kwDOUg_LrM6mT7_M` on this file): the privacy checker's two length floors are removed, and it now
@@ -146,10 +152,26 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
   - A fully synthetic, offline A/B control shows the pre-fix checker passing identically on a clean body and
     on a leaked `"pwd"` body -- it cannot tell them apart -- and the fixed checker passing the clean body
     while correctly failing 4 assertions on the leaked one.
-  - The fixed checker was re-run offline against the real, retained events-file export of the 23:47Z proof
-    above (29 tagged lines, still on disk, matching that proof's own `lines=29`): every body is exactly the
-    fixed placeholder, and no forbidden string, including the newly-added `pwd`, was found. This is a genuine
-    re-check of that sink on real data, with no new host run.
+  - Cross-family review of `a0348904` found that the first body fix checked only the last body in a batch,
+    accepted absent/non-string bodies, ignored resource/scope and nested values, and matched banned keys
+    only in minified JSON. The extended `failing_first_ab.py` controls returned **2 passed, 10 failed**
+    before this repair (both clean controls stayed green), then **12 passed, 0 failed**. The retained
+    `.red.out` and regenerated `.out` preserve both runs. The earlier A/B still rejects the leaked body.
+  - `scan_otlp()` now traverses decoded keys and values at every OTLP level, including arrays and key-value
+    lists, and retains every body's validity. Live and offline paths call one `events_privacy_checks()`
+    implementation. The schema references are OpenTelemetry `opentelemetry-proto` `v1.9.0`
+    [`logs.proto`](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.9.0/opentelemetry/proto/logs/v1/logs.proto)
+    and [`common.proto`](https://github.com/open-telemetry/opentelemetry-proto/blob/v1.9.0/opentelemetry/proto/common/v1/common.proto).
+  - The corrected checker was re-run against the **same retained events-file export** of the 23:47Z proof:
+    **4 files, 29 tagged batches, 270 records, 26 forbidden strings; 3 passed, 0 failed**. All 270 bodies
+    are fixed placeholders, with zero missing/non-string bodies, empty batches, forbidden-value hits or
+    banned keys. The batches also contain records sharing a batch with the tagged proof records. The old
+    `records=29` was a batch count. The 26-string search is the retained 25 strings plus `pwd`, not the
+    separate 27-string recomputation. No violation was found. This is offline real-data evidence, not a new
+    host run; see `checker-fix/offline_recheck.out` in the receipt.
+  - That run, at 2026-09-27T03:55:26Z, cannot be repeated. The Collector's `file/events` exporter keeps
+    10 MB x 3 backups and rotated at 04:05:11Z, dropping the backup that held the proof's records. A
+    coordinator re-run at 04:14Z found 0 tagged lines (`checker-fix/offline_recheck.rerun-after-rotation.out`).
   - The Loki sink of that same proof was **not** re-checked: the live run never persisted raw record bodies
     to disk, only derived PASS/FAIL text, so nothing is retained to run the new assertion against, and this
     fix does not requery production Loki to manufacture one. Window-2's separate, independent all-stream scan
@@ -159,6 +181,19 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
     retained data; the Loki sink of that specific proof remains verified only by the pre-fix checker. The
     next `prove.sh` run exercises the fixed checker on both sinks. Receipt:
     `evidence/artifacts/tool-invoke-rates-20260926/checker-fix/`.
+- **Synthetic-only replay repair:** an empty capture previously raised `ValueError` in `max()` and ran
+  unconditional historical assertions. `post --synthetic` now accepts no captures with a recent default
+  timestamp. Historical counts and live-proof scenario checks require the complete A/B/C/Codex capture set;
+  synthetic record and dashboard assertions remain active. The committed `synthetic_replay_control.py`
+  exercises 31 synthetic records with stubbed HTTP and output from the existing design reference:
+  **25 passed, 20 failed** before / **25 passed, 0 failed** after; 41 fixture strings, zero hits on the
+  reference output. This is a harness regression check, not native Collector/Loki acceptance.
+  In the repair sandbox, the full scratch run could not create loopback sockets (`socket: operation not
+  permitted`); that attempt is retained at `scratch-replay/synthetic-native-attempt.out`. The coordinator
+  then ran the same synthetic-only `replay-test.sh` on the host, with the installed pinned Collector 0.161.0
+  and Loki 3.7.8 on scratch loopback ports 45700-45703 and scratch storage: **67 passed, 0 failed**, with no
+  scratch listener left (`scratch-replay/synthetic-native.out`). Production services and systemd units were
+  untouched.
 
 ## Overturn when
 

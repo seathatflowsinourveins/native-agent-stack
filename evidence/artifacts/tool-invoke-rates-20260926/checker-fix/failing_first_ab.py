@@ -125,4 +125,63 @@ for name, actual, expected in checks:
     ok_overall &= passed
     print(f"{'PASS' if passed else 'FAIL'} {name}: expected all_pass={expected}, got {actual}")
 print(f"\nSUMMARY failing_first_ab: {'every expected outcome occurred' if ok_overall else 'UNEXPECTED OUTCOME'}")
+
+# PR #366 cross-family controls. These exercise the real privacy_checks entry point,
+# with clean Loki records so each rejection must come from the events-file sink.
+# OTLP reference: opentelemetry-proto v1.9.0, logs/v1/logs.proto and
+# common/v1/common.proto (AnyValue, ArrayValue, KeyValueList).
+def structural_events(case):
+    doc = json.loads(make_events_line(prove_check.FIXED_BODY))
+    resource_logs = doc["resourceLogs"][0]
+    scope_logs = resource_logs["scopeLogs"][0]
+    record = scope_logs["logRecords"][0]
+    forbidden_attr = {"key": "fixture", "value": {"stringValue": "pwd"}}
+    if case == "earlier leaked body in batch":
+        scope_logs["logRecords"].insert(0, {
+            "body": {"stringValue": "pwd"}, "attributes": record["attributes"]})
+    elif case == "missing body":
+        record.pop("body")
+    elif case == "non-string body":
+        record["body"] = {"intValue": "7"}
+    elif case == "non-string stringValue":
+        record["body"] = {"stringValue": 7}
+    elif case == "resource attribute":
+        resource_logs["resource"]["attributes"].append(forbidden_attr)
+    elif case == "scope attribute":
+        scope_logs["scope"]["attributes"] = [forbidden_attr]
+    elif case == "nested kvlist value":
+        record["attributes"].append({"key": "fixture", "value": {
+            "kvlistValue": {"values": [forbidden_attr]}}})
+    elif case == "nested array value":
+        scope_logs["scope"]["attributes"] = [{"key": "fixture", "value": {
+            "arrayValue": {"values": [{"kvlistValue": {"values": [forbidden_attr]}}]}}}]
+    elif case == "spaced banned key":
+        record["attributes"].append({"key": "user.email", "value": {"stringValue": "fixture"}})
+    elif case == "nested banned key":
+        resource_logs["resource"]["attributes"].append({"key": "fixture", "value": {
+            "kvlistValue": {"values": [{"key": "user.email", "value": {"stringValue": "fixture"}}]}}})
+    elif case == "multiple clean records":
+        scope_logs["logRecords"].append(record.copy())
+    elif case != "clean body":
+        raise ValueError("unknown synthetic case")
+    return json.dumps(doc)  # Default separators deliberately include spaces.
+
+
+print("\n== structural events-file regression controls ==")
+structural_passed = 0
+structural_cases = ["clean body", "multiple clean records", "earlier leaked body in batch",
+                    "missing body", "non-string body", "non-string stringValue", "resource attribute",
+                    "scope attribute", "nested kvlist value", "nested array value", "spaced banned key",
+                    "nested banned key"]
+for case in structural_cases:
+    checks = run(case, new_privacy_checks, make_streams(prove_check.FIXED_BODY),
+                 FORBIDDEN_LINES, [structural_events(case)])
+    accepted = all(ok for _, ok, _ in checks)
+    expected = case in {"clean body", "multiple clean records"}
+    passed = accepted == expected
+    structural_passed += passed
+    ok_overall &= passed
+    print(f"{'PASS' if passed else 'FAIL'} {case}: expected accepted={expected}, got {accepted}")
+print(f"SUMMARY structural_events: {structural_passed} passed, "
+      f"{len(structural_cases) - structural_passed} failed")
 sys.exit(0 if ok_overall else 1)

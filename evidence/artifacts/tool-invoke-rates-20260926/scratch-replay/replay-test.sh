@@ -5,18 +5,18 @@
 # 2. A scratch logs-only Collector, built from the SAME logs-pipeline processors (copied verbatim from
 #    collector.yaml), replays: your own capture files (if you pass any) plus this file's synthetic sentinel
 #    records; a file exporter writes the result, and the assertions compare it with the inputs. With no capture
-#    files, pass one empty placeholder input (see USAGE below) to exercise the fully-synthetic path only --
-#    replay.py's `records()` loader skips empty files cleanly, so this needs no real data at all.
+#    files, the synthetic-only path uses a recent default timestamp and synthetic assertions.
+#    Historical-count assertions require the complete A/B/C/Codex capture set.
 # 3. Unless --no-loki: a scratch Loki (pinned 3.7.8, the repo's own ecosystem-loki template on scratch ports)
 #    receives the same export, and every invoke-rate dashboard target is evaluated there and compared with the
-#    exported file, then prove_check.py's own Loki checks run over the tagged synthetic/captured records.
+#    exported file. With the complete historical capture set, prove_check.py's live-scenario checks also run.
 #
 # USAGE: REPO=/path/to/this/checkout ./replay-test.sh [--no-loki] [capture-file ...]
 #   REPO             required: a checkout of this repository (this PR or later). No path in this script is
 #                     specific to any one machine or session.
 #   capture-file ...  optional: your own real OTLP/JSON export files (Claude/Codex file-exporter captures,
 #                     never included in this receipt -- see ../README.md for why). With none given, this
-#                     script creates and uses one empty placeholder, so --synthetic alone still runs.
+#                     script passes --synthetic with no input files. Empty input files also work.
 # Env: TOOLS_DIR (default: ~/.local/share/codex-ecosystem/tools), UV_BIN (default: PATH's uv), PY (override the
 #      interpreter list run before design/replay.py, e.g. to skip `uv run`).
 # Scratch processes use loopback ports 45700-45799 and are stopped by their literal PIDs. Outputs stay under
@@ -42,14 +42,12 @@ for a in "$@"; do
   if [ "$a" = "--no-loki" ]; then WITH_LOKI=0; else INPUTS+=("$a"); fi
 done
 RUN_DIR="${RUN_DIR:-$(mktemp -d)}"
+umask 077; mkdir -p "$RUN_DIR"; chmod 700 "$RUN_DIR"
 if [ "${#INPUTS[@]}" -eq 0 ]; then
-  : > "$RUN_DIR/empty-placeholder-capture.json"  # replay.py's records() skips empty files: a synthetic-only run
-  INPUTS=("$RUN_DIR/empty-placeholder-capture.json")
-  echo "INFO no capture files given: using an empty placeholder (synthetic sentinel records only)"
+  echo "INFO no capture files given: synthetic sentinel records only"
 fi
 
 TASK="u6-replay-$(cat /proc/sys/kernel/random/uuid 2>/dev/null || uuidgen 2>/dev/null || date +%s%N)"
-umask 077; mkdir -p "$RUN_DIR"; chmod 700 "$RUN_DIR"
 PASS=0; FAIL=0
 result() { if [ "$1" = 0 ]; then PASS=$((PASS + 1)); echo "PASS $2"; else FAIL=$((FAIL + 1)); echo "FAIL $2"; fi; }
 tally() {
@@ -95,7 +93,7 @@ if [ "$WITH_LOKI" = 1 ] && [ -x "$LOKI_BIN" ] && [ -f "$LOKI_TEMPLATE" ]; then
     sleep 0.5
   done
   result $ready "scratch Loki 3.7.8 ready (pid $LOKI_PID)"
-  [ $ready = 0 ] || WITH_LOKI=0
+  [ $ready = 0 ] || exit 1
 else
   WITH_LOKI=0
   [ -x "$LOKI_BIN" ] && [ -f "$LOKI_TEMPLATE" ] || echo "SKIP scratch Loki (--no-loki, or LOKI_BIN/LOKI_TEMPLATE not found -- set TOOLS_DIR / OTELCOL_BIN / LOKI_BIN, or pass --no-loki explicitly)"
@@ -120,6 +118,7 @@ for _ in $(seq 1 120); do
   sleep 0.25
 done
 result $ready "scratch collector ready (pid $COLLECTOR_PID)"
+[ "$ready" = 0 ] || exit 1
 
 "${PY[@]}" post --port "$OTLP_PORT" --tags "$RUN_DIR/tags.json" --task-id "$TASK" --synthetic "${INPUTS[@]}" > "$RUN_DIR/post.log" 2>&1
 result $? "replay posted: $(grep -E '^posted' "$RUN_DIR/post.log")"
@@ -147,13 +146,17 @@ if [ "$WITH_LOKI" = 1 ]; then
     --window 3h > "$RUN_DIR/loki-check.log" 2>&1
   grep -E '^(PASS|FAIL) ' "$RUN_DIR/loki-check.log"; tally "$RUN_DIR/loki-check.log"
   grep -q '^SUMMARY' "$RUN_DIR/loki-check.log" || { FAIL=$((FAIL + 1)); echo "FAIL Loki harness crashed (see $RUN_DIR/loki-check.log)"; }
-  "${PY[@]}" forbidden --out "$RUN_DIR/forbidden.txt" "${INPUTS[@]}" > "$RUN_DIR/forbidden.log" 2>&1
-  grep -E '^(PASS|FAIL) ' "$RUN_DIR/forbidden.log"; tally "$RUN_DIR/forbidden.log"
-  python3 "$HERE/../checker-fix/prove_check.py" "http://127.0.0.1:$LOKI_HTTP" "$TASK" 30 --window 3h \
-    --forbidden-file "$RUN_DIR/forbidden.txt" --collector "$COLLECTOR_YAML" > "$RUN_DIR/prove-check.log" 2>&1
-  grep -E '^(PASS|FAIL|INFO) ' "$RUN_DIR/prove-check.log" | sed -E 's/^(PASS|FAIL|INFO) /\1 [fixed checker on scratch Loki] /'
-  tally "$RUN_DIR/prove-check.log"
-  grep -q '^SUMMARY' "$RUN_DIR/prove-check.log" || { FAIL=$((FAIL + 1)); echo "FAIL prove_check crashed (see $RUN_DIR/prove-check.log)"; }
+  if grep -qx 'INFO historical capture set: present' "$RUN_DIR/post.log"; then
+    "${PY[@]}" forbidden --out "$RUN_DIR/forbidden.txt" "${INPUTS[@]}" > "$RUN_DIR/forbidden.log" 2>&1
+    grep -E '^(PASS|FAIL) ' "$RUN_DIR/forbidden.log"; tally "$RUN_DIR/forbidden.log"
+    "${PY[@]:0:${#PY[@]}-1}" "$HERE/../checker-fix/prove_check.py" "http://127.0.0.1:$LOKI_HTTP" "$TASK" 30 --window 3h \
+      --forbidden-file "$RUN_DIR/forbidden.txt" --collector "$COLLECTOR_YAML" > "$RUN_DIR/prove-check.log" 2>&1
+    grep -E '^(PASS|FAIL|INFO) ' "$RUN_DIR/prove-check.log" | sed -E 's/^(PASS|FAIL|INFO) /\1 [fixed checker on scratch Loki] /'
+    tally "$RUN_DIR/prove-check.log"
+    grep -q '^SUMMARY' "$RUN_DIR/prove-check.log" || { FAIL=$((FAIL + 1)); echo "FAIL prove_check crashed (see $RUN_DIR/prove-check.log)"; }
+  else
+    echo "SKIP live-proof scenario checks: complete historical capture set absent; synthetic dashboard assertions run above"
+  fi
   stop "$LOKI_PID" "scratch Loki"; LOKI_PID=""
 else
   echo "SKIP scratch Loki dashboard queries (--no-loki or Loki binary/template missing)"

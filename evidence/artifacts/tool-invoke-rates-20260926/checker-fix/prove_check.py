@@ -57,7 +57,7 @@ def by(expr_labels, pipeline, selector, window, unwrap=None):
 def build_checks(claude, any_, window):
     """The 12 count-based checks + 3 zero-checks, bound to this run's task-scoped selectors and window. Kept as
     a function (not module-level) so importing this file for its offline-replayable pieces (privacy_checks,
-    streams_to_lines, record_values, otlp_body_and_values, load_forbidden) never touches the network or argv."""
+    streams_to_lines, record_values, events_privacy_checks, load_forbidden) never touches the network or argv."""
     checks = [
         ("Claude MCP tool_result by server: context-mode plugin >= 1, qmd >= 2",
          by(["mcp_server_name"], 'event_name="tool_result" | tool_family="mcp"', claude, window),
@@ -136,22 +136,66 @@ def load_forbidden(paths):
     return out
 
 
-def otlp_body_and_values(obj):
-    """One parsed OTLP JSON log line -> (last logRecord body string or None, [every string attribute value]).
-    Reads only decoded values, never the line's raw text, so a short forbidden literal can't false-positive on
-    JSON punctuation or an unrelated key name."""
-    body, values = None, []
+def scan_otlp(obj):
+    """Return every record body, decoded key and string value in an OTLP export.
+
+    Reference: opentelemetry-proto v1.9.0, logs/v1/logs.proto and
+    common/v1/common.proto. AnyValue arrays and key-value lists are recursive;
+    resource and scope fields need the same traversal as log record fields.
+    Missing/non-string bodies retain a None entry so they cannot disappear.
+    """
+    bodies, keys, values = [], set(), set()
+
+    def walk(node):
+        if isinstance(node, dict):
+            keys.update(node)
+            for key, value in node.items():
+                if key == "key" and isinstance(value, str):
+                    keys.add(value)  # OTLP KeyValue key, independent of JSON spacing.
+                else:
+                    walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value)
+        elif isinstance(node, str):
+            values.add(node)
+
+    walk(obj)
     for rl in obj.get("resourceLogs", []) or []:
         for sl in rl.get("scopeLogs", []) or []:
             for lr in sl.get("logRecords", []) or []:
-                b = (lr.get("body") or {}).get("stringValue")
-                if isinstance(b, str):
-                    body = b
-                for a in lr.get("attributes", []) or []:
-                    v = (a.get("value") or {}).get("stringValue")
-                    if isinstance(v, str):
-                        values.append(v)
-    return body, values
+                body = lr.get("body")
+                value = body.get("stringValue") if isinstance(body, dict) else None
+                bodies.append(value if isinstance(value, str) and set(body) == {"stringValue"} else None)
+    return bodies, keys, values
+
+
+def events_privacy_checks(events_lines, forbidden, fixed_body=FIXED_BODY, report=report):
+    """Shared live/offline events-file checks; only bounded counts and banned key names are printed."""
+    scans = []
+    for line in events_lines:
+        try:
+            scans.append(scan_otlp(json.loads(line)))
+        except (json.JSONDecodeError, AttributeError, TypeError):
+            continue
+    report("every tagged events-file line parsed as OTLP JSON", len(scans) == len(events_lines),
+           f"lines={len(events_lines)} parsed={len(scans)}")
+    bodies = [body for record_bodies, _, _ in scans for body in record_bodies]
+    not_fixed = sum(body != fixed_body for body in bodies)
+    empty_batches = sum(not record_bodies for record_bodies, _, _ in scans)
+    report(f"every tagged events-file record's body is exactly {fixed_body!r}",
+           bool(bodies) and not_fixed == 0 and empty_batches == 0,
+           f"records={len(bodies)} not_fixed={not_fixed} empty_batches={empty_batches}")
+    event_values = {value for _, _, values in scans for value in values}
+    event_keys = {key for _, keys, _ in scans for key in keys}
+    event_hits = sum(1 for f in forbidden if any(f in value for value in event_values))
+    banned_keys = sorted(event_keys & {
+        "tool_parameters", "tool_input", "full_command", "bash_command", "arguments", "output",
+        "content", "error", "prompt", "response", "user.email", "user.account_id", "user.account_uuid",
+        "user.id", "organization.id", "user_email", "user_account_id"})
+    report("the events file holds this run's tagged records without command/prompt text (any length) or "
+           "content/identity keys", bool(events_lines) and bool(forbidden) and event_hits == 0 and not banned_keys,
+           f"lines={len(events_lines)} value hits={event_hits} banned keys={banned_keys}")
 
 
 def fetch_lines(loki, task, window_s):
@@ -242,25 +286,7 @@ def privacy_checks(lines, forbidden, collector=None, events_lines=None, fixed_bo
     report("no executed command or prompt text (any length) is stored in a Loki record's body or metadata value",
            bool(forbidden) and hits == 0, f"strings checked={len(forbidden)} found={hits}")
     if events_lines is not None:
-        parsed = []
-        for line in events_lines:
-            try:
-                parsed.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
-        bodies_values = [otlp_body_and_values(obj) for obj in parsed]
-        not_fixed_e = sum(1 for body, _ in bodies_values if body is not None and body != fixed_body)
-        report(f"every tagged events-file record's body is exactly {fixed_body!r}",
-               bool(bodies_values) and not_fixed_e == 0,
-               f"records={len(bodies_values)} not_fixed={not_fixed_e}")
-        event_values = {v for body, vals in bodies_values for v in ([body] if isinstance(body, str) else []) + vals}
-        event_hits = sum(1 for f in forbidden if any(f in v for v in event_values))
-        banned_keys = [k for k in ("tool_parameters", "tool_input", "full_command", "arguments", "user.email")
-                       if any(f'"key":"{k}"' in line for line in events_lines)]
-        report("the Collector's events file holds the proof's records without command, prompt or content"
-               " (any length), and without content/identity keys",
-               bool(events_lines) and event_hits == 0 and not banned_keys,
-               f"lines={len(events_lines)} value hits={event_hits} banned keys={banned_keys}")
+        events_privacy_checks(events_lines, forbidden, fixed_body=fixed_body, report=report)
     print("INFO structured metadata keys on proof records: " + ", ".join(keys))
 
 

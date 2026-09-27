@@ -18,9 +18,8 @@ INFO structured metadata keys on proof records: ecosystem_task_id, service_name
   PASS proof records carry no content or identity key :: records=1 banned=[]
   PASS every Loki record's body is exactly '[content omitted]' (transform/privacy set(body, ...)) :: records=1 not_fixed=0
   PASS no executed command or prompt text (any length) is stored in a Loki record's body or metadata value :: strings checked=2 found=0
-  PASS every tagged events-file line parsed as OTLP JSON :: lines=1 parsed=1
-  PASS every tagged events-file record's body is exactly '[content omitted]' :: records=1 not_fixed=0 empty_batches=0
-  PASS the events file holds this run's tagged records without command/prompt text (any length) or content/identity keys :: lines=1 value hits=0 banned keys=[]
+  PASS every tagged events-file record's body is exactly '[content omitted]' :: records=1 not_fixed=0
+  PASS the Collector's events file holds the proof's records without command, prompt or content (any length), and without content/identity keys :: lines=1 value hits=0 banned keys=[]
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
 -- NEW checker, leaked pwd body --
   PASS the proof's records were fetched without truncation :: records=1
@@ -29,9 +28,8 @@ INFO structured metadata keys on proof records: ecosystem_task_id, service_name
   PASS proof records carry no content or identity key :: records=1 banned=[]
   FAIL every Loki record's body is exactly '[content omitted]' (transform/privacy set(body, ...)) :: records=1 not_fixed=1
   FAIL no executed command or prompt text (any length) is stored in a Loki record's body or metadata value :: strings checked=2 found=1
-  PASS every tagged events-file line parsed as OTLP JSON :: lines=1 parsed=1
-  FAIL every tagged events-file record's body is exactly '[content omitted]' :: records=1 not_fixed=1 empty_batches=0
-  FAIL the events file holds this run's tagged records without command/prompt text (any length) or content/identity keys :: lines=1 value hits=1 banned keys=[]
+  FAIL every tagged events-file record's body is exactly '[content omitted]' :: records=1 not_fixed=1
+  FAIL the Collector's events file holds the proof's records without command, prompt or content (any length), and without content/identity keys :: lines=1 value hits=1 banned keys=[]
 
 == verdict ==
 PASS OLD accepts a clean body: expected all_pass=True, got True
@@ -47,23 +45,23 @@ PASS clean body: expected accepted=True, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
 PASS multiple clean records: expected accepted=True, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS earlier leaked body in batch: expected accepted=False, got False
+FAIL earlier leaked body in batch: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS missing body: expected accepted=False, got False
+FAIL missing body: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS non-string body: expected accepted=False, got False
+FAIL non-string body: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS non-string stringValue: expected accepted=False, got False
+FAIL non-string stringValue: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS resource attribute: expected accepted=False, got False
+FAIL resource attribute: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS scope attribute: expected accepted=False, got False
+FAIL scope attribute: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS nested kvlist value: expected accepted=False, got False
+FAIL nested kvlist value: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS nested array value: expected accepted=False, got False
+FAIL nested array value: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS spaced banned key: expected accepted=False, got False
+FAIL spaced banned key: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS nested banned key: expected accepted=False, got False
-SUMMARY structural_events: 12 passed, 0 failed
+FAIL nested banned key: expected accepted=False, got True
+SUMMARY structural_events: 2 passed, 10 failed

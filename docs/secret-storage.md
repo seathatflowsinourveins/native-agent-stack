@@ -748,9 +748,18 @@ local Collector, so the control sits there
   Codex arguments and output, and agent messages (31 from the captures, 41
   synthetic). None reached the file exporter or Loki, and no
   `tool_parameters`, `tool_input` or `user.*` key was exported (109 of 109
-  checks). The host proof repeats the check on production after the apply:
-  no sentence of either probe prompt and no probe command may appear in Loki
-  or in the Collector's `events*.jsonl`. It has not run yet.
+  checks, historical pre-fix evidence). The live host proof ran on
+  **2026-09-26T23:47:42Z-23:49:21Z: 33 passed, 0 failed**, with the **pre-fix
+  checker**. That checker did not assert fixed bodies and omitted short
+  forbidden strings. The corrected structural checker was re-run offline
+  against the retained events file: **270 records in 29 batches, 26 forbidden
+  strings, zero hits or banned keys; 3 passed, 0 failed** (2026-09-27T03:55Z;
+  that file has since rotated out, so the run cannot be repeated). Raw Loki
+  bodies from that proof were not retained, so that sink has not been
+  re-verified with the corrected checker. The repaired synthetic-only replay
+  passed natively on the pinned Collector and Loki with scratch ports:
+  **67 passed, 0 failed**. These limits and the historical live output are
+  retained in the [evidence receipt](../evidence/artifacts/tool-invoke-rates-20260926/README.md).
 
 Only sessions started after the flag changes carry names. The other four
 flags stay `"false"`, and the recommendation above still covers them.
