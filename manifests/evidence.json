@@ -13783,8 +13783,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "7788b5bda8c5e01ea12d21f9b8856ce2dc827782de03635418c0dbdccb33f631",
-      "bytes": 121949
+      "sha256": "fb752a943d01c954f10f176e7e70be9342760023e4b4471d1a42406f531b5e09",
+      "bytes": 122808
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",

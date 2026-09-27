@@ -1548,6 +1548,19 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   every open pull request whose branch predates the job until it is rebased, so the
   owner of #294 applies it when those branches are rebased or merged. Close it with
   the section-10 PUT of the committed file and a dated after-GET here.
+- **Drift closed (2026-09-27).** Before-GET at 21:00:04Z: the same seven checks,
+  without `sota-sources` (`updated_at` 2026-09-24T23:02:29-04:00). At 21:00:13Z,
+  `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input .github/main-ruleset.json`
+  ran with the file as committed on `main` at `e82e6be7`. The after-GET, the same
+  minute, lists all eight required checks and differs from the committed file in no
+  rule, target, condition or bypass actor (`updated_at` 2026-09-27T17:00:13-04:00).
+  Open pull requests at the time:
+  - #410 fails `sota-sources` and cannot merge until its sources are fixed.
+  - #205 and #216 predate the job, so they need a rebase before they can report it.
+  - #415 and #417 pass it.
+
+  **Rollback:** PUT the before-GET body with `sota-sources` removed from
+  `required_status_checks`.
 - **Fork-approval after-GET (closes the pending step above).** "GitHub
   hardening follow-up (2026-09-25)" decided `all_external_contributors` and
   left "record the dated after-GET here" open. A live, read-only GET of
