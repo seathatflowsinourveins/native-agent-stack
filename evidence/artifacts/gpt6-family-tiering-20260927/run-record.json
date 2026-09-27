@@ -359,5 +359,5 @@
     },
     "reading": "The runner's own directories and files are 0700 and 0600, as the plan states. Inside each call's 0700 codex-home, Codex created its own files and directories with its default modes; they are reachable only through the owner-only directories above them. Every call's credential link was removed, and no call left an entry in its scratch directory."
   },
-  "sanitization": "Aggregates and metadata only. No filing text, accession number, prompt, prompt hash, reply, event, stderr or Codex session record was copied. Private paths are written as ~ or as the README's pointer variables LI26_ACQ and CODEX_SLOT_LOCKS."
+  "sanitization": "Aggregates and metadata only. No filing text, accession number, rendered batch prompt or its hash, reply, event, stderr or Codex session record was copied. The only prompt hash in these records is the public template's (prompt.txt), in decision.json's frozen map. Private paths are written as ~ or as the README's pointer variables LI26_ACQ and CODEX_SLOT_LOCKS."
 }

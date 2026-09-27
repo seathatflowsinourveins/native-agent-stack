@@ -51,7 +51,9 @@ From `decision.json`, over all 360 filings.
 | L0 | `gpt-6-luna` | max | 0.9923 | 0.9900 | 0.9722 | 1.000 | −0.0060 (−0.0019) | 25 ok |
 | L1 | `gpt-6-luna` | medium | 0.9878 | 0.9718 | 0.9667 | 1.000 | −0.0147 (−0.0064) | 25 ok, 1 failed (`tool_use`) |
 
-- A1's paired-bootstrap interval is exactly zero: its micro-F1 equals A0's in all 10,000 resamples.
+- A1 equals A0 on every quality aggregate in the decision: micro-F1, macro-F1, per-code F1, exact match, and mean
+  precision and recall. Its bootstrap point estimate and both 95% bounds are exactly zero. The decision records
+  those percentiles only, not every resample.
 - Macro-F1 covers the 12 codes with at least five labelled filings. S1's per-code F1 differs from A0's by more than
   0.001 on two codes: lower on 2.01 (0.957 against 1.000) and higher on 8.01 (0.989 against 0.983). L1 is lower on
   seven of the twelve codes, down to 0.880 on 2.01.
@@ -171,7 +173,8 @@ records here do not depend on it.
 - All 151 credential links were removed after their calls, and no call left anything in its scratch directory.
 - Published here: `decision.json` holds aggregates only (`no_document_text: true`, repository-relative paths, no
   filing text, reply text or accession numbers). `run-record.json` holds run metadata and aggregates. Neither
-  contains a prompt, a prompt hash, an event or a session record.
+  contains a rendered batch prompt or its hash, an event or a session record. The only prompt hash is the public
+  template's (`prompt.txt`), in `decision.json`'s frozen map.
 
 ## What this does not establish
 
