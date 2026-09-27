@@ -76,7 +76,7 @@ includes them. On the two copied logs, candidate MCP returns zero Codex usage
 while CLI and ccusage agree. The chosen accounting boundary accommodates this
 known limitation; it does not fix the MCP tool.
 
-A future qualifying pin PR must rewire `recipes/README.md` (lines 762–768) and
+A future qualifying pin PR must rewire the AgentsView block in `recipes/README.md#history-and-usage` and
 the mirrored `install`, `install_note` and `use` entries in
 `docs/token-efficiency-stack.json` (lines 1583–1591), the input to
 `scripts/build_ecosystem.py`. Update the version and release link in
@@ -94,7 +94,9 @@ makes this behavior intentional. Successful scratch recipe sequences used a
 free explicit port; the occupied control used the recipe's literal 17384.
 
 The native sync/serve/projects/search/usage/stop sequence was exercised against
-both versions using isolated scratch data. The full-save E2E runner itself was not
+both versions using isolated scratch data. The unchanged runner of the 2026-09-26
+returned-results E2E (its `rr/agentsview/run.sh`, which the full-save plan's
+qualification procedure designates) was not
 executed: it hardcodes writable locations outside this unit and direct native
 source roots. Its command sequence was adapted, not presented as unchanged
 upstream tests.
@@ -153,8 +155,8 @@ made. Full private logs and scratch binaries remain in the unit. Only aggregate
 whitelist projections are published; native identities and transcript content
 are excluded. Historical repository receipts were not rewritten.
 
-The coordinator harness registered the six build files in `manifests/evidence.json`
-in its last build commit, following the `docs/lanes.md` hot-file protocol; there
+The coordinator harness registers this branch's files in `manifests/evidence.json`
+in the branch's last commit, following the `docs/lanes.md` hot-file protocol; there
 were no generated-report changes. Repair registration, generated reports and
 repository-wide validation belong to that harness. Private `units/w3/agentsview/`
 references identify retained coordinator scratch records, not public checkout

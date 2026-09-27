@@ -11,14 +11,14 @@
   "copied_archive": {
     "evidence_class": "local_integration",
     "input_class": "copied_historical_native_logs",
-    "scope": "Two copied native session logs from the full-save E2E clones; no existing AgentsView database was read or copied. These are new archive observations, not new provider execution.",
+    "scope": "Two copied native session logs from the 2026-09-26 returned-results (RR) E2E clone directories; no existing AgentsView database was read or copied. These are new archive observations, not new provider execution.",
     "source_log_counts": {
       "claude": 1,
       "codex": 1
     },
     "source_bytes": 381416,
     "source_copies_byte_identical": true,
-    "source_cwd_scope": "The Claude and Codex full-save E2E clone directories only; copies remain private under units/w3/agentsview/archive-copy/.",
+    "source_cwd_scope": "The Claude and Codex clone directories of the 2026-09-26 returned-results (RR) E2E only; copies remain private under units/w3/agentsview/archive-copy/.",
     "fresh_provider_executions": 0,
     "children_in_input": 0,
     "session_keys_preserved": true,

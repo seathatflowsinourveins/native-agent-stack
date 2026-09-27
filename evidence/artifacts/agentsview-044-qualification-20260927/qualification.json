@@ -70,7 +70,7 @@
   "required_future_recipe_rewire": {
     "files": {
       "recipes/README.md": {
-        "current_lines": "762-768 (the plan's older 589-595 range has shifted)",
+        "current_location": "recipes/README.md#history-and-usage (AgentsView block; line numbers move as other changes land)",
         "changes": "Version, worker inclusion flags, explicit-port failure handling and accounting boundary."
       },
       "docs/token-efficiency-stack.json": {
@@ -162,7 +162,7 @@
     "Fresh Claude main/child and Codex exec/subagent acceptance with fixed model, route and effort is not established. The retained archive contains one Claude session and one Codex session with no children.",
     "Neither required independent review completed. Claude requalification must run outside the Codex sandbox; its interrupted attempt's provider usage is unknown.",
     "The synthetic fixture produced zero ccusage counters. Preserve that failed observation separately from successful copied-archive parity.",
-    "The full-save E2E runner hardcodes writes and source locations outside this unit. Its native command sequence was adapted to isolated scratch state; the unchanged runner was not executed.",
+    "The 2026-09-26 returned-results (RR) E2E runner, rr/agentsview/run.sh, which the full-save plan's qualification procedure designates, hardcodes writes and source locations outside this unit. Its native command sequence was adapted to isolated scratch state; the unchanged runner was not executed.",
     "No whole-repository upstream ./... suite, frontend tests, Windows acceptance, macOS acceptance, or performance qualification.",
     "No re-pin, production recipe change or host switch. The coordinator harness registered the six build files in manifests/evidence.json; repair registration and repository-wide validation remain with that harness."
   ],
