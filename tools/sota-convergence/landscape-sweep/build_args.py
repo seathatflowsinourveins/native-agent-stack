@@ -86,8 +86,12 @@ LANE_PROFILE = "stack-worker"
 # Codex's .system cache, and $HOME/.agents/skills, where install_skills.py puts the pinned skills
 # (codex-rs/ext/skills/src/host_roots.rs at rust-v0.157.1). context-mode matches an allow rule against the raw path as
 # well as the resolved one, so a wildcard rule such as <root>/** would also admit <root>/../elsewhere: the lane
-# therefore allows each file under $HOME/.agents/skills by its exact path, and nothing else. Codex reads no .claude/
-# files, so the file adds no Codex project layer.
+# therefore allows each file under $HOME/.agents/skills by its exact path. Residual: the matcher turns backslashes into
+# slashes before matching while the executor opens the literal Linux name, so a file whose name holds backslashes that
+# normalize to a listed path would pass too; none exists, and making one takes the write access ctx_execute already
+# has. The #852 boundary limits ctx_execute_file only: ctx_execute, which the stack-worker profile leaves enabled, runs
+# code with the user's own file access outside Codex's read-only sandbox. Codex reads no .claude/ files, so the file
+# adds no Codex project layer.
 LANE_CONTEXT_SETTINGS = Path("empty") / ".claude" / "settings.json"
 LANE_SKILL_ROOT = "$HOME/.agents/skills"
 CODEX_TEMPLATE = Path("adoption/templates/codex.config.template.toml")
@@ -172,8 +176,8 @@ def render_codex_template(repo_root: Path, host: str) -> str:
 def lane_skill_read_rules(home: Path) -> list[str]:
     """One exact Read(...) allow rule per file under <home>/.agents/skills (LANE_SKILL_ROOT), sorted, by the path Codex
     lists (symlinked directories followed, each real directory once). context-mode escapes every character of a rule
-    except *, ? and ** and anchors it, so a rule without them matches only that path; a path containing either is
-    left out rather than widening its rule."""
+    except *, ? and ** and anchors it, so a rule without them matches only that path, up to the backslash residual
+    above; a path containing either is left out rather than widening its rule."""
     root = home / ".agents" / "skills"
     rules, seen = [], set()
     for directory, subdirectories, files in os.walk(root, followlinks=True):

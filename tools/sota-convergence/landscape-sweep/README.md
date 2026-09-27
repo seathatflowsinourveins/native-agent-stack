@@ -117,6 +117,8 @@ What the lane config also sets:
   - `build_args.py` writes `<work-dir>/empty/.claude/settings.json` with **one exact rule per file** under `$HOME/.agents/skills`. It follows symlinked directories, lists each real directory once, and leaves out any path containing `*` or `?`. `staged.json` records the root symbolically and the file count.
   - The rules are exact because context-mode also matches an allow rule against the raw path. A wildcard rule such as `<root>/**` would admit `<root>/../elsewhere` and every sibling path under the root. The test `test_context_mode_reads_only_the_listed_skill_files` runs context-mode's own matcher (set `CONTEXT_MODE_SECURITY_JS` to an installed `build/security.js`): listed files pass; siblings, outside files and `..` traversals do not. Its control shows the wildcard admitting the traversal.
   - The host's deny rules still apply.
+  - Residual (context-mode 1.0.169): the matcher turns backslashes into slashes before matching, but the executor opens the literal Linux file name. A file whose name holds backslashes that normalize to a listed path would therefore pass too, as a GPT-6 re-check reproduced with a planted symlink. No rule can exclude it, because deny matching normalizes the same way. No such file exists, and creating one needs write access that `ctx_execute` already has.
+  - The #852 boundary limits `ctx_execute_file` only. `ctx_execute`, which the stack-worker profile leaves enabled for the token practice, runs code with the user's own file access, outside Codex's read-only sandbox. The lane's `-s read-only` binds Codex's own shell tool, not its MCP servers.
   - A native restage of the work directory removes the file, because the native lane has no context-mode.
 
 What the lane does not carry or allow:
