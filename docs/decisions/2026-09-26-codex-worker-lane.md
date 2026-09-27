@@ -732,9 +732,9 @@ in the same turn. The source explains it:
   each, each timed from that server's own launch. The grace ends 1 s after Codex's first tool-list build instead
   ([`tool_catalog.rs` L252-258](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager/tool_catalog.rs#L252-L258)),
   and in the race test's two failing-first runs below (fixture servers, template without `required`) the first
-  request left 1.63 s and 1.69 s after `codex` started. Serena's slower starts (up to 2.24 s) fall past that point. These runs do not
-  show codebase-memory's 1.20-1.25 s missing it; that it was missing on the gateway route rests on the relayed peer
-  measurement. Both fit the 60 s allowance.
+  request left 1.63 s and 1.69 s after `codex` started. Serena's slower starts (up to 2.24 s) fall past that point.
+  These runs do not show codebase-memory's 1.20-1.25 s missing it; that it was missing on the gateway route rests on
+  the relayed peer measurement. Both fit the 60 s allowance.
 
 **Decision.**
 1. The worker profile's partial `[mcp_servers.serena]` and `[mcp_servers.codebase-memory]` tables gain
@@ -783,7 +783,8 @@ failing-first evidence; the synthetic row's before run failed only because the h
   body itself names no MCP tool.
 - Three older native tests registered the two servers as `/bin/false` or a stub and failed once the template changed
   (`FAILED (failures=3)`); they now register fixture servers. `NAS_CODEX_INTEGRATION=1 python3 -m unittest -v
-  tests.test_codex_worker_lane.CodexIntegrationTests`: exit 0, `Ran 9 tests`, `OK`.
+  tests.test_codex_worker_lane.CodexIntegrationTests`: exit 0, `Ran 9 tests`, `OK`, both before the race test was
+  strengthened and after.
 - Measured probe of the installed codebase-memory-mcp (not a Codex run): with a scratch `HOME` it answered nothing in
   30 s and printed "CBM could not start because the active account daemon uses a different cache directory ... Close
   all CBM sessions and commands, then retry with one consistent CBM_CACHE_DIR."; with the account's `HOME` it answered
