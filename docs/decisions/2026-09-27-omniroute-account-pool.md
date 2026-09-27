@@ -178,8 +178,8 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      A systemd user service also inherits the user manager's environment (systemd.exec(5), "Environment variables in
      spawned processes"). `serve` then hands its whole environment to the server child, so any credential exported
      into the user manager would reach the gateway. The same holds for bind settings: a `LIVE_WS_HOST` or
-     `EMBED_WS_PROXY_HOST` in the manager would move a WebSocket listener off loopback, and the `_PORT` variables
-     would move a port. Keep credentials and these four variables out of the manager: list its variable names with
+     `EMBED_WS_PROXY_HOST` in the manager could move a WebSocket listener off loopback, and the `_PORT` variables
+     could move a port. Keep credentials and these four variables out of the manager: list its variable names with
      `systemctl --user show-environment | cut -d= -f1`.
 
      Why `EnvironmentFile=` fits here:
@@ -348,17 +348,19 @@ The classes are kept separate.
     - turn 1 had 312 reasoning tokens and read 0 from cache;
     - turn 2 read 13,568 of 14,206 input tokens from cache, on the same account as turn 1;
     - the rollout's `turn_context` shows `cx/gpt-6-astra` at `max`;
-    - the gateway's call-log listing holds each of the two requests twice. The pattern matches the list route's merge
-      of in-memory entries with persisted rows (OR `src/app/api/usage/call-logs/route.ts` L116-226); the evidence
-      README gives the arithmetic.
+    - the gateway's call-log listing holds each of the two requests twice. The pattern is consistent with the list
+      route's merge of in-memory entries with persisted rows (OR `src/app/api/usage/call-logs/route.ts` L116-226),
+      but the ids are withheld, so it is not proven. The evidence README gives the arithmetic.
   - **Effort**
     ([`gateway-effort-rows.json`](../../evidence/artifacts/omniroute-gateway-20260927/gateway-effort-rows.json)):
     - the gateway's `call_logs` show `reasoning_effort_requested=max` and `reasoning_effort_upstream=max` on both
       reasoning turns, 06:59:07Z for run 1 and 07:00:03Z for run 2;
     - the writer fills these columns only for rows whose reasoning observation is `encrypted` (OR
       `src/lib/usage/callLogs.ts` L646-653), which is consistent with the nulls on the three rows without reasoning;
-    - neither call-log API returns the columns: both map rows with `mapSummaryRow`, which has no effort field (OR
-      `src/lib/usage/callLogs.ts` L457-508, L1021 and L1040). So a read-only SQLite select read these columns only;
+    - neither call-log API returns the columns. Both map persisted rows with `mapSummaryRow`, which has no effort
+      field (OR `src/lib/usage/callLogs.ts` L457-508, L1021 and L1040), and the list route's in-memory entries carry
+      none either (OR `src/app/api/usage/call-logs/route.ts` L141-174, L186-215). So a read-only SQLite select read
+      these columns only;
     - run 1's client usage (27,996 input tokens,
       [`probe-lane-client-events.json`](../../evidence/artifacts/omniroute-gateway-20260927/probe-lane-client-events.json))
       exceeds its one row (13,806), so at least one follow-up request of run 1 has no `call_logs` row. This record
