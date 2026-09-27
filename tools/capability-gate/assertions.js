@@ -71,7 +71,7 @@ function completedResult(output, context) {
   };
 }
 
-// M13 binding: which tree's token did one tool class return? vars.token is this row's own token, written by
+// M13 binding: which tree's token did one tool class return? vars.sentinel is this row's own token, written by
 // m13_hooks.js into this tree only; every token has the form CGTOK-<tree>-<rep>-<16 hex>, so any other token in a
 // result came from the other tree (wrong root) or an earlier repetition (stale).
 const TOKEN = /CGTOK-[ab]-r\d{2}-[0-9a-f]{16}/g;
@@ -89,9 +89,14 @@ function completed(item) {
     !(item.type === 'command_execution' && item.exit_code);
 }
 
-// A directory change inside a command or snippet: cd, pushd, popd, chdir (os.chdir, process.chdir, Dir.chdir),
-// Set-Location, and the -C, --chdir and --directory options (git -C, make -C, tar -C, env --chdir).
-const DIRECTORY_CHANGE = /\b(cd|pushd|popd|chdir)\b|Set-Location|(^|\s)(-C|--chdir|--directory)(=|\s|$)/;
+// A directory change inside a command or snippet, in the forms each tool's --help gives on the workstation (GNU
+// coreutils 9.4 env, GNU make 4.3, GNU tar 1.35, git 2.43.0, sudo 1.9.15p5, util-linux 2.39.3, systemd 255):
+// - cd, pushd, popd and chdir (os.chdir, process.chdir, Dir.chdir), and PowerShell's Set-, Push- and Pop-Location;
+// - a short-option group containing C, its directory separate or attached (git -C dir, env -C/dir, tar -xC dir);
+// - --chdir, --directory, --work-tree, --git-dir, --wd and --working-directory;
+// - chroot, nsenter, unshare, systemd-run and sudo, which run a command in another directory or root.
+// It is a list of syntactic forms: a form not on it, such as another tool's working-directory option, is not detected.
+const DIRECTORY_CHANGE = /\b(cd|pushd|popd|chdir|chroot|nsenter|unshare|systemd-run|sudo)\b|\b(Set|Push|Pop)-Location\b|(^|[\s'"`(\[,])(-[A-Za-z]*C|--(chdir|directory|work-tree|git-dir|wd|working-directory)(?![\w-]))/;
 
 // A command or snippet that names the fixture only by its relative path: no absolute path to it, no directory change
 // and no token typed in. The shell tool's own working-directory argument is not in the Codex item (the SDK's
@@ -175,7 +180,7 @@ function classVerdict(items, cls, own, rep) {
 
 function m13Class(output, context) {
   const cls = (context.config || {}).cls;
-  const own = context.vars.token;
+  const own = context.vars.sentinel;
   const rep = context.vars.rep;
   if (!CLASSES[cls] || typeof own !== 'string' || !own || !/^r\d{2}$/.test(String(rep))) {
     return { pass: false, score: 0, reason: 'misconfigured: unknown class, no token or no rep' };

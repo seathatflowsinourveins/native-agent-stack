@@ -34,6 +34,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -119,6 +120,21 @@ def parse_rows(results: dict, gate: str) -> list[dict]:
             "classes": classes,
         })
     return rows
+
+
+def rows_without_sentinel(results: dict, gate: str) -> int:
+    """How many m13 rows lack their own sentinel in the results file, so that their class verdicts could not be checked
+    again from it. m13_hooks.js stores it as vars.sentinel; promptfoo 0.123.1's sanitizer (src/util/sanitizer.ts)
+    writes secret-named vars, `token` among them, as [REDACTED]."""
+    if gate != "m13":
+        return 0
+    missing = 0
+    for row in results["results"]["results"]:
+        variables = row.get("vars") or {}
+        own = rf"CGTOK-{re.escape(str(variables.get('tree')))}-{re.escape(str(variables.get('rep')))}-[0-9a-f]{{16}}"
+        if not re.fullmatch(own, str(variables.get("sentinel"))):
+            missing += 1
+    return missing
 
 
 def control_outcome(row: dict, gate: str) -> bool:
@@ -347,7 +363,13 @@ def main() -> int:
             print(f"capability-gate {args.gate}: FAIL | the results file could not be retained ({type(error).__name__})")
             args.keep = True
             return 1
-        rows = parse_rows(json.loads(results_path.read_text()), args.gate)
+        results = json.loads(results_path.read_text())
+        missing = rows_without_sentinel(results, args.gate)
+        if missing:
+            print(f"capability-gate {args.gate}: FAIL | {missing} rows lack their sentinel in the retained results, so "
+                  "their verdicts cannot be checked again")
+            return 1
+        rows = parse_rows(results, args.gate)
         result = verdict(rows, args.gate)
         sessions = {row["session"] for row in rows if row["session"]}
         expected = sum(sum(row["calls"].values()) for row in rows)

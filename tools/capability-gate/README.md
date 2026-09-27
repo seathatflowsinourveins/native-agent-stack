@@ -20,9 +20,14 @@ M13's classes are:
 
 A gate row passes only when every class returns that row's own fresh token and no other:
 - the token must come from a completed, error-free call made the way the brief prescribes: the relative path, no cwd
-  argument, no absolute path, no token typed into the arguments, and no directory change in the command or code
-  (`cd`, `pushd`, `popd`, `chdir` as in `os.chdir` or `process.chdir`, `Set-Location`, or a `-C`, `--chdir` or
-  `--directory` option);
+  argument, no absolute path, no token typed into the arguments, and none of these directory-change forms in the
+  command or code:
+  - `cd`, `pushd`, `popd` and `chdir` (as in `os.chdir` or `process.chdir`), and PowerShell's `Set-Location`,
+    `Push-Location` and `Pop-Location`;
+  - a short-option group containing `C`, with its directory separate or attached (`git -C dir`, `env -C/dir`,
+    `tar -xC dir`);
+  - `--chdir`, `--directory`, `--work-tree`, `--git-dir`, `--wd` or `--working-directory`;
+  - `chroot`, `nsenter`, `unshare`, `systemd-run` or `sudo`;
 - `ctx_search` counts only after a `ctx_index` of the fixture under the same source, and both must complete;
 - any other token in any call of the class, completed or failed, means a wrong root or a stale result.
 
@@ -51,7 +56,7 @@ Exit 0 means that:
 - every control row failed by assertion, not by a provider error, with the outcome below, while the tools that control
   does not touch kept working;
 - every row's MCP call count equals its Codex `codex.tool_result` count in Loki;
-- the results file was retained (see Privacy).
+- the results file was retained (see Privacy) and, for m13, carries every row's own sentinel.
 
 | Control | Predicted outcome |
 |---|---|
@@ -75,6 +80,10 @@ Exit 0 means that:
   - The directories are 0700 and the file 0600. It is never overwritten, and it stays on the host, uncommitted,
     because it holds tool results and model text.
   - The verdict line carries its sha256, and a run whose results cannot be retained fails.
+  - `m13_hooks.js` stores each row's token as `vars.sentinel`, because promptfoo 0.123.1's sanitizer
+    (`src/util/sanitizer.ts`) writes secret-named vars, `token` among them, to the results file as `[REDACTED]`. An
+    m13 run whose results file lacks any row's own sentinel fails, since its class verdicts could not be checked
+    again from the file.
 
 ## How it works
 
@@ -135,9 +144,12 @@ assertions, hook and wrapper are documented local integration code. Promptfoo an
   envelope records do not map one-to-one to shell items, and that is a collector follow-up.
 - **Shell working directory.** Codex's `command_execution` item carries the command text, output, exit code and
   status, but no working directory (`CommandExecutionItem` in `@openai/codex-sdk` 0.153.4's `dist/index.d.ts`).
-  - The shell class shows that a command naming only the relative path, with no directory change, returned the
-    row's own token.
+  - The shell class shows that a command naming only the relative path, with none of the listed directory-change
+    forms, returned the row's own token.
   - A working-directory argument to the shell tool itself would not be visible to the scorer.
+- **Directory-change forms.** The check is a list of syntactic forms, taken from each tool's `--help` on the
+  workstation (GNU coreutils 9.4 `env`, GNU make 4.3, GNU tar 1.35, git 2.43.0, sudo 1.9.15p5, util-linux 2.39.3 and
+  systemd 255). A form not on the list, such as another tool's working-directory option, is not detected.
 - **Originator.** SDK runs log as `codex_sdk_ts`, not the lane's `codex_exec`. Everything else is the lane's own
   profile.
 - **`order`, not `route`.** The jcodemunch fixtures call `order` with explicit `search_symbols` arguments.

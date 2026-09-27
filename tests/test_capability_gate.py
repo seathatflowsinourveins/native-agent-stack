@@ -325,6 +325,17 @@ class RetentionTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 run_gate.retain(source, root, "m13-20260927T220000Z-1")
 
+    def test_m13_rows_need_their_own_sentinel_in_the_results(self):
+        def results(*variables):
+            return {"results": {"results": [{"vars": v} for v in variables]}}
+        own = {"tree": "a", "rep": "r07", "sentinel": "CGTOK-a-r07-0123456789abcdef"}
+        self.assertEqual(run_gate.rows_without_sentinel(results(own), "m13"), 0)
+        redacted = {**own, "sentinel": "[REDACTED]"}
+        other_rep = {**own, "sentinel": "CGTOK-a-r08-0123456789abcdef"}
+        old_name = {"tree": "a", "rep": "r07", "token": own["sentinel"]}
+        self.assertEqual(run_gate.rows_without_sentinel(results(own, redacted, other_rep, old_name), "m13"), 3)
+        self.assertEqual(run_gate.rows_without_sentinel(results(redacted), "jcodemunch"), 0)
+
     def test_the_retention_root_is_private_state_outside_the_checkout(self):
         with mock.patch.dict(os.environ, {"CAPABILITY_GATE_RETAIN": "/r", "XDG_STATE_HOME": "/s"}):
             self.assertEqual(run_gate.retain_root(), Path("/r"))
@@ -434,6 +445,24 @@ class AssertionTests(unittest.TestCase):
              "not_prescribed"),
             ("Set-Location", "ctx_execute", [ctx_exec(OWN, "Set-Location /w/wt-a; cat .cg/r01/sentinel-ctx-execute.txt")],
              "not_prescribed"),
+            ("Push-Location", "ctx_execute", [ctx_exec(OWN, "Push-Location /w/wt-a; cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("attached -C", "shell", [shell("/bin/bash -lc 'env -C/w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("grouped -C", "ctx_execute", [ctx_exec(OWN, "tar -xC/w/wt-a -f x.tar; cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("-C in an argument list", "ctx_execute",
+             [ctx_exec(OWN, "subprocess.run(['git', '-C', '/w/wt-a', 'show', 'HEAD:.cg/r01/sentinel-ctx-execute.txt'])")],
+             "not_prescribed"),
+            ("git --work-tree", "ctx_execute",
+             [ctx_exec(OWN, "git --work-tree=/w/wt-a show HEAD:.cg/r01/sentinel-ctx-execute.txt")], "not_prescribed"),
+            ("sudo -D", "shell", [shell("/bin/bash -lc 'sudo -D /w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("unshare -w", "shell", [shell("/bin/bash -lc 'unshare -w /w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("systemd-run --working-directory", "shell",
+             [shell("/bin/bash -lc 'systemd-run --working-directory=/w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
             ("directory change in the file snippet", "ctx_execute_file",
              [ctx_file(OWN, code='cd /w/wt-a && echo "$FILE_CONTENT"')], "not_prescribed"),
             ("shell pushd", "shell", [shell("/bin/bash -lc 'pushd /w/wt-a && cat .cg/r01/sentinel-shell.txt'", OWN)],
@@ -455,14 +484,14 @@ class AssertionTests(unittest.TestCase):
              good["shell"] + [shell("/bin/bash -lc 'ls'", OTHER)], "wrong_root_or_stale"),
             ("serena on another path", "serena", [find_symbol(OWN, ".cg/r02/cg_sentinel.py")], "not_prescribed"),
         ]
-        base = {"prompt": "read .cg/r01/...", "vars": {"token": OWN, "rep": "r01"}}
+        base = {"prompt": "read .cg/r01/...", "vars": {"sentinel": OWN, "rep": "r01"}}
         verdicts = self.batch("m13Class", [{**base, "config": {"cls": cls}, "items": items} for _, cls, items, _ in cases])
         for (name, _, _, expected), got in zip(cases, verdicts):
             self.assertEqual(got["reason"], expected, name)
             self.assertEqual(got["pass"], expected == "own", name)
         in_prompt, no_rep = self.batch("m13Class", [
             {**base, "prompt": OWN, "config": {"cls": "ctx_execute"}, "items": good["ctx_execute"]},
-            {**base, "vars": {"token": OWN}, "config": {"cls": "ctx_execute"}, "items": good["ctx_execute"]},
+            {**base, "vars": {"sentinel": OWN}, "config": {"cls": "ctx_execute"}, "items": good["ctx_execute"]},
         ])
         self.assertFalse(in_prompt["pass"])
         self.assertTrue(no_rep["reason"].startswith("misconfigured"))
@@ -486,7 +515,7 @@ class AssertionTests(unittest.TestCase):
             env = {**os.environ, "CAPABILITY_GATE_WT_A": str(trees["a"]), "CAPABILITY_GATE_WT_B": str(trees["b"])}
             out = json.loads(subprocess.run([NODE, "-e", script], check=True, capture_output=True, text=True,
                                             env=env).stdout)
-            token = out["test"]["vars"]["token"]
+            token = out["test"]["vars"]["sentinel"]
             self.assertRegex(token, r"^CGTOK-a-r07-[0-9a-f]{16}$")
             written = sorted(p.name for p in (trees["a"] / ".cg" / "r07").iterdir())
             self.assertEqual(written, ["cg_sentinel.py", "sentinel-ctx-execute.txt", "sentinel-ctx-file.txt",
