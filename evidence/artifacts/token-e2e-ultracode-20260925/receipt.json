@@ -98,7 +98,7 @@
     "as_of": "2026-09-27",
     "task_acceptance": "partial",
     "bad_input_control_recorded": false,
-    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. A 2026-09-27 reproduction rebuilds this answer check from the pinned Git blob, hash-matched to baseline_sha256, and rejects wrong answers; it is new local integration evidence, not a control this run recorded. The retained answer excerpt is truncated after the seventh heading.",
+    "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. A 2026-09-27 reproduction rebuilds this answer check from the pinned Git blob, hash-matched to baseline_sha256, and rejects wrong answers; it is new local integration evidence, not a control this run recorded. The retained answer excerpt is truncated after the seventh heading. Attempt 1's check (a marker grep) printed FAIL on a refused call whose output held no answer; the receipt does not record attempt 2's check command, so that failure is not shown to be a run of the same answer check.",
     "evidence": [
      "tests/test_token_e2e_receipt_checks.py::E1ContextModeHeadingOracle"
     ]

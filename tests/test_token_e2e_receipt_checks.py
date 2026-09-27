@@ -118,9 +118,10 @@ def top_level_functions(source):
 
 
 def inventory_oracle(claimed_count, claimed_names, source):
-    """A complete top-level inventory: the claimed count and every listed name match the source."""
+    """A complete top-level inventory: the claimed count, and exactly the source's names, each once."""
     actual = top_level_functions(source)
-    return claimed_count == len(actual) and set(claimed_names) <= set(actual)
+    return (claimed_count == len(actual) and len(claimed_names) == len(actual)
+            and set(claimed_names) == set(actual))
 
 
 def historical_subset_check(claimed_count, claimed_names, source):
@@ -150,7 +151,7 @@ def symbol_location_oracle(start, end, signature, source, name):
 
 
 def subprocess_run_calls(revision):
-    """{file stem: count} of subprocess.run(...) calls under scripts/ at revision, from CPython's AST."""
+    """{path under scripts/ without .py: count} of subprocess.run(...) calls at revision, from CPython's AST."""
     counts = {}
     for path in git_python_files(revision, "scripts"):
         tree = ast.parse(git_blob(revision, path))
@@ -159,7 +160,7 @@ def subprocess_run_calls(revision):
                     and node.func.attr == "run" and isinstance(node.func.value, ast.Name)
                     and node.func.value.id == "subprocess")
         if found:
-            counts[Path(path).stem] = found
+            counts[path[len("scripts/"):-len(".py")]] = found
     return counts
 
 
@@ -307,6 +308,16 @@ class E1RepomixInventoryOracle(unittest.TestCase):
         self.assertFalse(inventory_oracle(claimed, answered, self.source))
         # Positive control: the complete inventory passes the same oracle.
         self.assertTrue(inventory_oracle(len(actual), actual, self.source))
+        # Controls that keep the correct count but get the names wrong (2026-09-27 GPT-6 review finding).
+        controls = {
+            "one name missing": answered,
+            "one name duplicated": [*answered, answered[0]],
+            "one name invented": [*answered, "not_a_function"],
+            "no names": [],
+        }
+        for label, names in controls.items():
+            with self.subTest(control=label):
+                self.assertFalse(inventory_oracle(len(actual), names, self.source))
 
     def test_repomix_first_line_regex_predicts_the_dropped_definitions(self):
         self.assertEqual(repomix_dropped_functions(self.source), ["status_body"])
