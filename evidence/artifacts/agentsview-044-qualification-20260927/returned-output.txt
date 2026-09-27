@@ -45,3 +45,27 @@ Error: failed to initialize in-process app-server client: Read-only file system 
 Source: kenn-io/agentsview v0.44.0 / 413a87f7bfbd67b2815b1119ac51abc1efbeeaba,
 .github/workflows/ci.yml:233-238; cmd/agentsview/serve_runtime.go:57-65.
 Native Codex diagnostic is an observed launch limitation, not an AgentsView test.
+
+2026-09-27 repair addendum
+The confirming rerun above survives as selected lines and an in-session summary;
+its full raw stdout/stderr were not retained. The earlier blanket retention claim
+was incorrect. The following lines were extracted from the coordinator's retained
+JSONL, identified by file and SHA-256 in upstream-tests.json. Both tags ran outside
+the Codex sandbox with TMPDIR=/var/tmp/claude-w3-agentsview-go. Earlier failures are
+preserved and classified environmental; counts from attempts are not added.
+
+Candidate v0.44.0 broad selection (exit 0)
+ok  	go.kenn.io/agentsview/internal/mcp	5.887s
+ok  	go.kenn.io/agentsview/internal/parser	103.889s
+ok  	go.kenn.io/agentsview/internal/db	138.591s
+
+Baseline v0.43.0 broad selection, same environment (exit 0)
+ok  	go.kenn.io/agentsview/internal/mcp	2.533s
+ok  	go.kenn.io/agentsview/internal/parser	102.354s
+ok  	go.kenn.io/agentsview/internal/db	120.326s
+
+Candidate v0.44.0 #1855 serve-runtime selection (exit 0)
+ok  	go.kenn.io/agentsview/cmd/agentsview	1.083s
+
+Sources: unchanged kenn-io/agentsview v0.44.0 / 413a87f7 and v0.43.0 / 9be7745a;
+.github/workflows/ci.yml:233-238 and cmd/agentsview/serve_runtime_test.go.

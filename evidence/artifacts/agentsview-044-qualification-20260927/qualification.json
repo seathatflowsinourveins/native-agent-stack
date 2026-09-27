@@ -2,7 +2,7 @@
   "schema_version": 1,
   "recorded_at": "2026-09-27",
   "component": "agentsview",
-  "evidence_class": "local_integration",
+  "evidence_class": "multi_class_summary",
   "verdict": "hold",
   "qualified": false,
   "pin_change_prepared": false,
@@ -35,22 +35,25 @@
     "files": [
       "manifests/stack.json",
       "scripts/native_token_ci.py",
-      "recipes/README.md"
+      "recipes/README.md",
+      "docs/token-efficiency-stack.json",
+      "docs/stack.md"
     ],
     "platform_pin_files": "adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json contain no agentsview entry."
   },
   "gates": {
     "release_integrity": "passed",
     "upstream_targeted_classification": "passed",
-    "upstream_broad_tests": "failed",
+    "upstream_broad_tests": "passed_outside_codex_sandbox",
+    "upstream_serve_runtime_tests": "passed",
     "copied_archive_population_and_usage": "passed",
     "synthetic_population_visibility": "passed",
     "synthetic_ccusage_parity": "failed",
     "occupied_explicit_port_control": "passed",
     "intended_recipe_sequence": "passed_on_isolated_state",
-    "unchanged_rr_runner": "not_run",
+    "unchanged_full_save_runner": "not_run",
     "fresh_four_native_lanes": "blocked",
-    "independent_gpt6_review": "completed_hold",
+    "independent_gpt6_review": "not_completed",
     "independent_claude_review": "incomplete"
   },
   "mcp_accounting_decision": {
@@ -65,8 +68,21 @@
     ]
   },
   "required_future_recipe_rewire": {
-    "file": "recipes/README.md",
-    "current_lines": "762-768 (the plan's older 589-595 range has shifted)",
+    "files": {
+      "recipes/README.md": {
+        "current_lines": "762-768 (the plan's older 589-595 range has shifted)",
+        "changes": "Version, worker inclusion flags, explicit-port failure handling and accounting boundary."
+      },
+      "docs/token-efficiency-stack.json": {
+        "current_lines": "1583-1591",
+        "fields": ["install", "install_note", "use"],
+        "changes": "Update release references and mirrored session search inclusion flags; this file feeds scripts/build_ecosystem.py."
+      },
+      "docs/stack.md": {
+        "current_lines": "9",
+        "changes": "Update the AgentsView version and release link together with the pin."
+      }
+    },
     "search_flags": [
       "--include-automated",
       "--include-one-shot",
@@ -83,48 +99,72 @@
   },
   "reviews": {
     "gpt6": {
-      "status": "completed",
-      "method": "Independent delegated GPT-6 source and retained-result review",
-      "verdict": "hold",
+      "status": "not_completed",
+      "method": "Only the two failed codex exec launches listed in native_codex_attempts are recorded.",
       "tests_run_by_reviewer": 0,
-      "independently_checked": [
-        "upstream release identity",
-        "MCP and CLI source filters",
-        "explicit-port source",
-        "copied archive counters"
-      ],
+      "returned_report_retained": false,
+      "independence_limit": "A GPT-6 child of this GPT-6 builder would not establish author-independent or cross-family review under the full-save plan section 2.2 step 5.",
       "counts_as_native_lane_replay": false
     },
     "claude": {
       "status": "incomplete",
       "model_selection": "opus",
       "effort": "xhigh",
+      "tools": ["Read", "Agent"],
+      "permission_mode": "plan",
+      "strict_mcp_config": true,
+      "output_format": "json",
+      "launch_context": "inside_builder_codex_sandbox",
       "exit_code": 130,
-      "reason": "Native read-only review produced no returned report before interruption.",
+      "stopped_by": "build_session",
+      "signal": "SIGINT",
+      "reason": "The build session stopped the stalled native review; no returned report was retained.",
+      "launch_record": "units/w3/agentsview/gpt6-build-events.jsonl item_122 (launch and exit); stopping rationale immediately before its completion",
+      "stdout_ref": "units/w3/agentsview/claude-review.private.json",
+      "stdout_bytes": 0,
+      "requalification_context": "outside_codex_sandbox",
       "provider_execution_status": "unknown",
       "provider_usage": null
     },
     "native_codex_attempts": [
       {
         "mode": "normal",
-        "exit_code": 1
+        "exit_code": 1,
+        "model": "gpt-6",
+        "effort": "high",
+        "sandbox": "read-only",
+        "launch_record": "units/w3/agentsview/gpt6-build-events.jsonl item_123",
+        "stderr_ref": "units/w3/agentsview/gpt6-review.stderr",
+        "jsonl_ref": "units/w3/agentsview/gpt6-review.private.jsonl",
+        "jsonl_bytes": 0,
+        "last_message_ref": "units/w3/agentsview/gpt6-review.private.md",
+        "last_message_exists": false
       },
       {
         "mode": "ephemeral",
-        "exit_code": 1
+        "exit_code": 1,
+        "model": "gpt-6",
+        "effort": "high",
+        "sandbox": "read-only",
+        "launch_record": "units/w3/agentsview/gpt6-build-events.jsonl item_138",
+        "stderr_ref": "units/w3/agentsview/gpt6-review-attempt2.stderr",
+        "jsonl_ref": "units/w3/agentsview/gpt6-review-attempt2.private.jsonl",
+        "jsonl_bytes": 0,
+        "last_message_ref": "units/w3/agentsview/gpt6-review-attempt2.private.md",
+        "last_message_exists": false
       }
     ],
     "native_codex_failure": "failed to initialize in-process app-server client: Read-only file system (os error 30)",
     "native_codex_provider_executions": 0
   },
   "residuals": [
-    "The selected unchanged upstream MCP/parser/db suite failed: 21 top-level parser tests and 25 test/subtest events. Reproduced failures remain unresolved; a temporary-directory Git marker is an environment lead, not a proven cause.",
+    "The selected unchanged upstream MCP/parser/db suite passes outside the Codex sandbox with TMPDIR outside /tmp on both tags; earlier environmental failures remain in upstream-tests.json. No upstream fix is a requalification prerequisite for these failures.",
     "Fresh Claude main/child and Codex exec/subagent acceptance with fixed model, route and effort is not established. The retained archive contains one Claude session and one Codex session with no children.",
-    "The independent Claude review did not return; provider usage is unknown.",
+    "Neither required independent review completed. Claude requalification must run outside the Codex sandbox; its interrupted attempt's provider usage is unknown.",
     "The synthetic fixture produced zero ccusage counters. Preserve that failed observation separately from successful copied-archive parity.",
-    "The legacy RR run.sh hardcodes writes and source locations outside this unit. Its native command sequence was adapted to isolated scratch state; the unchanged runner was not executed.",
+    "The full-save E2E runner hardcodes writes and source locations outside this unit. Its native command sequence was adapted to isolated scratch state; the unchanged runner was not executed.",
     "No whole-repository upstream ./... suite, frontend tests, Windows acceptance, macOS acceptance, or performance qualification.",
-    "No re-pin, production recipe change, host switch, evidence manifest registration, generated report refresh, or git commit. Registration and repository-wide validation remain with the coordinator harness."
+    "No re-pin, production recipe change or host switch. The coordinator harness registered the six build files in manifests/evidence.json; repair registration and repository-wide validation remain with that harness."
   ],
   "sources": [
     "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
@@ -134,16 +174,55 @@
     "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L233",
     "https://github.com/kenn-io/agentsview/pull/1855",
     "https://github.com/ccusage/ccusage/tree/ecb676cce27cb5dd0090c7804a5cecc35e8ba805/rust/adapters/codex",
-    "docs/acceptance-evidence-policy.md"
+    "docs/acceptance-evidence-policy.md",
+    "https://docs.python.org/3.13/library/unittest.html#unittest.TestCase.assertRaises"
   ],
   "repository_tests": {
-    "evidence_class": "local_integration",
+    "evidence_class": "structural_validation",
     "command": "python3 -m unittest tests.test_agentsview_qualification tests.test_foundation_stack_pins",
-    "tests_run": 7,
+    "tests_run": 9,
     "exit_code": 0,
     "result": "OK",
-    "failing_first": "The five new receipt checks initially failed because the qualification artifacts did not exist; the populated record and existing pin checks then passed.",
+    "TMPDIR": "/var/tmp/claude-w3-agentsview-go",
+    "failing_first": "The original five FileNotFoundError errors establish no discriminating control. Before receipt repair, the updated nine-test run failed with two assertions and three missing-field errors against existing artifacts (exit 1).",
+    "sanitization_control": {
+      "inputs": ["generated home path", "generated UUID", "nested forbidden key"],
+      "method": "The same check used for published artifacts must raise AssertionError for each planted input. A separate run disarms assertNotRegex and assertFalse using unittest.mock.patch.object; all three assertRaises self-checks then fail.",
+      "disarmed_tests_run": 1,
+      "disarmed_subtest_failures": 3,
+      "disarmed_exit_code": 1,
+      "enabled_covering_tests_run": 9,
+      "enabled_exit_code": 0,
+      "reproduction_ref": "units/w3/agentsview/repair-sanitization-control.py",
+      "returned_output_ref": "units/w3/agentsview/repair-validation.md"
+    },
     "scope": "Evidence scope/sanitization and current foundation pin regressions. Not upstream acceptance."
   },
+  "prior_records": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/agentsview.json",
+      "verdict": "qualified",
+      "evidence_class": "native_proven",
+      "scope_basis": "limits[0] and limits[2]: checksum verification and first-line --version/--help checks, without full sync/serve E2E or qualification of the new command surface.",
+      "satisfies_full_qualification": false,
+      "reconciled_at": "2026-09-27",
+      "governing_repin_record": "qualification.json",
+      "disposition": "Preserve the historical receipt, pins-tools/README.md and catalog summary. Their qualified wording covers the narrow historical checks; this 2026-09-27 hold governs any re-pin under the full procedure."
+    }
+  ],
+  "errata": [
+    {
+      "date": "2026-09-27",
+      "reason": "Independent evidence review repair; historical failed attempts and the 2026-09-23 receipt are preserved.",
+      "corrections": [
+        "Withdraw unsupported completed GPT-6 review, verdict and independently_checked claims; only two exit-1 launches are retained.",
+        "Replace the failed broad upstream gate with the passing coordinator control results in upstream-tests.json; preserve environmental failures.",
+        "Add the historical verdict boundary and missing docs/token-efficiency-stack.json and docs/stack.md re-pin locations.",
+        "Classify this record as a multi-class summary and repository tests as structural validation; the original missing-file red run was not a discriminating control.",
+        "Record who stopped Claude, SIGINT/130 and sandbox conditions; replace unexplained RR terminology with full-save E2E descriptions.",
+        "Acknowledge coordinator registration separately from builder edits."
+      ]
+    }
+  ],
   "recommended_lane": "lane:foundation"
 }

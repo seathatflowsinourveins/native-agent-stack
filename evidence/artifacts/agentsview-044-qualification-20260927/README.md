@@ -1,7 +1,7 @@
 # AgentsView 0.44.0 qualification — 2026-09-27
 
-**Hold the 0.43.0 pin.** The live release check still identifies v0.44.0 as
-the latest published stable release. Its official Linux amd64 asset passed the
+**Hold the 0.43.0 pin.** The build's live release check on 2026-09-27 identified
+v0.44.0 as the latest published stable release. Its official Linux amd64 asset passed the
 published checksum check and several archive checks, but the complete
 qualification procedure did not pass. No pin, production recipe, PATH, host
 configuration or installed AgentsView archive changed.
@@ -37,24 +37,34 @@ upstream tracked source was unchanged.
 
 | Evidence class | Observation | Limit |
 | --- | --- | --- |
-| Unchanged upstream tests | MCP: 97 passing test/subtest events, 3 skipped. DB: 3,365 passing events, 17 skipped. The #1855 selectors pass all 4 top-level tests, 13 events. | Selected package scope; no full `./...`, frontend or cross-platform acceptance. |
-| Unchanged upstream tests, failed | The first runnable MCP/parser/DB attempt has 21 failing top-level parser tests, 25 failing events. A second subprocess run reproduces the same failures. | The failures remain unresolved. Pass counts from overlapping attempts are never summed. |
+| Unchanged upstream tests | Coordinator broad runs outside the Codex sandbox: v0.44.0 passes 4,575 top-level tests; v0.43.0 passes 4,387; each skips 32, with zero failures across three packages. The original #1855 parser/DB selectors pass 4 top-level tests / 13 events; the coordinator's serve-runtime selector passes 5 more top-level tests. | Selected package scope; no full `./...`, frontend or cross-platform acceptance. Counts from overlapping runs are never summed. |
+| Unchanged upstream tests, environmental failures preserved | The first runnable in-sandbox MCP/parser/DB attempt has 21 failing top-level parser tests, 25 failing events. The confirming subprocess run reports the same failures. | The coordinator controls discriminate the environmental failure; the confirming run's raw bytes were not retained, only its in-session summary. |
 | Local integration over copied historical logs | Two exact authorized log copies, 381,416 bytes: one Claude session and one Codex session. Both pins preserve 2 inclusive sessions, 1 project and 2 bounded FTS hits. | No child sessions in these retained inputs; no new provider run. |
 | Local integration, usage | Both pins' inclusive CLI totals agree with ccusage 20.0.24: 20,965 uncached input + 58,752 cache read + 556 output = 80,273 tokens. | Reasoning output 64 is a subset of output. No cost-parity claim. |
-| Synthetic fixture | Five controlled populations, including both child types and an interactive control, are visible with all three inclusion flags. Codex automated classification changes as expected. | The local fixture's ccusage report is zero; fixture usage parity failed and remains recorded. |
+| Synthetic fixture | Five controlled populations, including both child types and an interactive control, are visible with all three inclusion flags. Expected automated counts: 0 at baseline, 2 at candidate. All 23 retained fixture files now have hashes in native-checks.json. | Hashes and explicit expectations were captured during repair, not prospectively before the trial. The local fixture's ccusage report is zero; fixture usage parity failed and remains recorded. |
 | Local integration, port control | With an owned listener occupying 17384, baseline succeeds on 17385; candidate exits 1. The candidate gives an explicit choose-another-port diagnostic. | Only the owned scratch listeners and daemons were used. |
 | Local measurement | One full sync over the same two copied logs: 0.407672 seconds on baseline; 0.358587 seconds on candidate. | Too small and unreplicated for an efficiency or throughput conclusion. |
-| Provider execution / review | Native Codex review initialization fails in both normal and ephemeral modes. Claude review was interrupted without a returned report; usage is unknown. | Four fresh native lanes and the independent Claude review remain unaccepted. |
-| Independent source/result review | Delegated GPT-6 review independently confirmed the release, source filters, port behavior and copied-archive counters; recommendation: hold. | No tests run by that reviewer; not a native lane replay. |
+| Provider execution / review | The only GPT-6 review activity is two Codex launches, each exit 1 before provider execution; both JSONL captures are empty and neither final-message target exists. The build session stopped the stalled Claude review with SIGINT, exit 130; usage is unknown. | Four fresh native lanes and both independent reviews remain unaccepted. |
+| Structural validation | Repository unittests check receipt consistency and sanitization, including planted home-path, UUID and forbidden-key violations through the same publication checks. | These checks establish no upstream or provider execution. |
 
 The initial upstream test attempts failed to build because the generated pricing
 snapshot was absent. The supported
 [CI prerequisite](https://github.com/kenn-io/agentsview/blob/v0.44.0/.github/workflows/ci.yml#L233),
 `go run ./internal/pricing/cmd/litellm-snapshot -restore`, resolved that build
-prerequisite. Later parser failures are separate: project inference repeatedly
-returns `tmp` where tests expect a different project. A `/tmp/.git` marker seen
-by native subprocesses is an environment lead; it has not been established as
-the cause. Tests were not modified or waived.
+prerequisite. Later parser failures were environmental: all 25 failed events
+return project `tmp` where another name is expected, consistent with the Codex
+sandbox's empty `/tmp/.git`. The interpreter's differing filesystem view did
+not exclude that marker's effect on native subprocesses.
+
+The coordinator ran the same unchanged broad command at both tags with Go
+1.27.0, isolated GOPATH/GOCACHE, `GOTOOLCHAIN=local`, `GOTELEMETRY=off` and
+`TMPDIR=/var/tmp/claude-w3-agentsview-go`, outside the Codex sandbox. Both pass;
+both tracked checkouts were clean before and after. Its additional
+`./cmd/agentsview -run 'TestPrepareRunServeRuntimeConfig|TestWaitForBackendReady'`
+selection closes the original #1855 `serve_runtime_test.go` omission. Retained
+JSONL hashes, first/last event times (14:04–14:09Z), stderr references and counts
+are in [upstream-tests.json](upstream-tests.json). The repair recomputed those
+hashes and counts; it did not rerun the upstream tests.
 
 ## MCP usage decision and required future recipe
 
@@ -66,9 +76,12 @@ includes them. On the two copied logs, candidate MCP returns zero Codex usage
 while CLI and ccusage agree. The chosen accounting boundary accommodates this
 known limitation; it does not fix the MCP tool.
 
-A future qualifying pin PR must rewire `recipes/README.md` together with its
-pins. The current commands are at lines 762–768, shifted from the plan's older
-range. Search/list intended to include workers must use
+A future qualifying pin PR must rewire `recipes/README.md` (lines 762–768) and
+the mirrored `install`, `install_note` and `use` entries in
+`docs/token-efficiency-stack.json` (lines 1583–1591), the input to
+`scripts/build_ecosystem.py`. Update the version and release link in
+`docs/stack.md:9` together with the manifest and CI pin. The recipe line range
+has shifted from the plan's older range. Search/list intended to include workers must use
 `--include-automated --include-one-shot --include-children`, preserving selected
 source roots and the cwd allowlist. Sources:
 [tagged command reference](https://github.com/kenn-io/agentsview/blob/v0.44.0/docs/commands.md)
@@ -81,7 +94,7 @@ makes this behavior intentional. Successful scratch recipe sequences used a
 free explicit port; the occupied control used the recipe's literal 17384.
 
 The native sync/serve/projects/search/usage/stop sequence was exercised against
-both versions using isolated scratch data. The legacy RR runner itself was not
+both versions using isolated scratch data. The full-save E2E runner itself was not
 executed: it hardcodes writable locations outside this unit and direct native
 source roots. Its command sequence was adapted, not presented as unchanged
 upstream tests.
@@ -96,18 +109,53 @@ now append extensions rather than replacing them. Attempt 3's overwritten raw
 captures are not used as accepted evidence.
 
 The platform pins files currently have no AgentsView entry. Existing version
-references are in `manifests/stack.json`, `scripts/native_token_ci.py` and the
-recipe; all remain at 0.43.0. The upstream ccusage source is
+references are in `manifests/stack.json`, `scripts/native_token_ci.py`,
+`recipes/README.md`, `docs/token-efficiency-stack.json` and `docs/stack.md`;
+all remain at 0.43.0. The upstream ccusage source is
 [ccusage/ccusage at ecb676cc](https://github.com/ccusage/ccusage/tree/ecb676cce27cb5dd0090c7804a5cecc35e8ba805/rust/adapters/codex),
 whose maintained adapter is Rust. The guessed older TypeScript path was a 404,
 not evidence of a missing capability.
 
-Requalification needs resolved upstream failures, four fresh native lanes,
-a completed independent Claude review and the final recipe controls in the
-same pin PR. No complete-history, savings, model-run or performance claim is
+**2026-09-27 review erratum:** the former completed GPT-6 review and its hold
+verdict had no retained returned report. Those claims are withdrawn. The only
+recorded GPT-6 attempts are the two exit-1 launches. A GPT-6 child of the GPT-6
+builder would not satisfy independent cross-family review. Claude was launched
+inside the builder's Codex sandbox with `--model opus --effort xhigh`,
+`--permission-mode plan --tools Read,Agent --strict-mcp-config --output-format json`;
+the build session stopped it. The next Claude qualification review must run
+outside the Codex sandbox. [qualification.json](qualification.json) retains
+the launch references and explicit interruption conditions.
+
+**2026-09-27 prior-record reconciliation:** the
+[2026-09-23 receipt](../sota-refresh-20260923/pins-tools/agentsview.json) calls
+this upgrade `qualified` / `native_proven`. Its own `limits[0]` and `limits[2]`
+restrict that verdict to checksum verification and the first lines of
+`--version` / `--help`, without full sync/serve E2E. The qualified wording in
+[its README](../sota-refresh-20260923/pins-tools/README.md) and
+[the convergence catalog](../../../catalogs/sota-convergence/manifest-20260923.json)
+inherits that narrower boundary. It does not satisfy the full qualification
+procedure; **this 2026-09-27 hold governs any re-pin**. The old receipt is unchanged.
+
+Other repair corrections: repository tests are structural validation and this
+qualification is a summary of multiple evidence classes. The old five
+FileNotFoundError errors were not a discriminating sanitization test. The
+confirming broad rerun's raw bytes were not retained, despite the old blanket
+retention claim; its printed hash identifies no available raw file. The new
+coordinator runs retain their JSONL and stderr. Fixture hashes and expectations
+are retrospective repair additions, with original observations preserved.
+
+Requalification needs four fresh native lanes, both completed independent
+reviews, execution of the unchanged full-save E2E runner and the final recipe
+controls in the same pin PR. The selected upstream tests now pass; no upstream
+bug fix is required for the environmental failures. No complete-history,
+savings, model-run or performance claim is
 made. Full private logs and scratch binaries remain in the unit. Only aggregate
 whitelist projections are published; native identities and transcript content
 are excluded. Historical repository receipts were not rewritten.
 
-Evidence registration, generated reports and repository-wide validation belong
-to the coordinator harness. Recommended label: `lane:foundation`.
+The coordinator harness registered the six build files in `manifests/evidence.json`
+in its last build commit, following the `docs/lanes.md` hot-file protocol; there
+were no generated-report changes. Repair registration, generated reports and
+repository-wide validation belong to that harness. Private `units/w3/agentsview/`
+references identify retained coordinator scratch records, not public checkout
+files. Recommended label: `lane:foundation`.

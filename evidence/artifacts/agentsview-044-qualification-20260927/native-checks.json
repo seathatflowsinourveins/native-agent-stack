@@ -11,14 +11,14 @@
   "copied_archive": {
     "evidence_class": "local_integration",
     "input_class": "copied_historical_native_logs",
-    "scope": "Two exact authorized RR log copies; no existing AgentsView database was read or copied. These are new archive observations, not new provider execution.",
+    "scope": "Two copied native session logs from the full-save E2E clones; no existing AgentsView database was read or copied. These are new archive observations, not new provider execution.",
     "source_log_counts": {
       "claude": 1,
       "codex": 1
     },
     "source_bytes": 381416,
     "source_copies_byte_identical": true,
-    "source_cwd_scope": "The retained RR Claude and Codex E2E clone directories only.",
+    "source_cwd_scope": "The Claude and Codex full-save E2E clone directories only; copies remain private under units/w3/agentsview/archive-copy/.",
     "fresh_provider_executions": 0,
     "children_in_input": 0,
     "session_keys_preserved": true,
@@ -94,6 +94,39 @@
     "evidence_class": "synthetic_fixture",
     "expected_sessions": 5,
     "expected_children": 2,
+    "expected_automated_sessions": {"0.43.0": 0, "0.44.0": 2},
+    "expected_counts_basis": "Five fixture populations, including two codex_exec originators. v0.44.0 internal/parser/codex.go:421-422 classifies those two as automated; baseline v0.43.0 does not. Expectations are made explicit during repair, not claimed as prospectively frozen before the original run.",
+    "frozen_inputs": {
+      "retained_private_root": "units/w3/agentsview/probe/fixture/",
+      "capture_stage": "repair_after_original_trial",
+      "hashed_at": "2026-09-27",
+      "scope": "Every retained fixture file, including Git scaffold files. Session filenames are replaced by population labels to exclude identities. These hashes anchor the retained bytes during repair, not a new fixture execution or proof of a pre-trial freeze.",
+      "files": [
+        {"label": "Claude main", "kind": "session_log", "bytes": 2021, "sha256": "6fb2bf5ae24c85a43440bfed56cb76f5e23d88bb92aacb6297458de142893c31"},
+        {"label": "Claude child", "kind": "session_log", "bytes": 1013, "sha256": "39c9fb5693ee667bf8ec135323c91a1b8f2c29b693250bf8fc899cec6370f335"},
+        {"label": "Codex interactive control", "kind": "session_log", "bytes": 1692, "sha256": "9c56f0db50612705c5c0b840ebaf7e85adb7223df28260d8de8cc0e539542376"},
+        {"label": "Codex exec", "kind": "session_log", "bytes": 1686, "sha256": "3bac007de8f8707ddf1284f5754653727d6afb9f705f42fd0d203fb14d720f0e"},
+        {"label": "Codex child", "kind": "session_log", "bytes": 1518, "sha256": "4156523c85c5d26ced20d550a36a8f0ec7366f9ce66f030bfb7ac8f31a8e1025"},
+        {"label": "project/.git/HEAD", "kind": "git_scaffold", "bytes": 23, "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10"},
+        {"label": "project/.git/config", "kind": "git_scaffold", "bytes": 92, "sha256": "cfe7ba1238c9a78be7535d7c63bcaf5a4d5011d46b07c9b45d3bbf7d6c312dfe"},
+        {"label": "project/.git/description", "kind": "git_scaffold", "bytes": 73, "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee"},
+        {"label": "project/.git/hooks/applypatch-msg.sample", "kind": "git_scaffold", "bytes": 478, "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7"},
+        {"label": "project/.git/hooks/commit-msg.sample", "kind": "git_scaffold", "bytes": 896, "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437"},
+        {"label": "project/.git/hooks/fsmonitor-watchman.sample", "kind": "git_scaffold", "bytes": 4726, "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0"},
+        {"label": "project/.git/hooks/post-update.sample", "kind": "git_scaffold", "bytes": 189, "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5"},
+        {"label": "project/.git/hooks/pre-applypatch.sample", "kind": "git_scaffold", "bytes": 424, "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475"},
+        {"label": "project/.git/hooks/pre-commit.sample", "kind": "git_scaffold", "bytes": 1643, "sha256": "f9af7d95eb1231ecf2eba9770fedfa8d4797a12b02d7240e98d568201251244a"},
+        {"label": "project/.git/hooks/pre-merge-commit.sample", "kind": "git_scaffold", "bytes": 416, "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53"},
+        {"label": "project/.git/hooks/pre-push.sample", "kind": "git_scaffold", "bytes": 1374, "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a"},
+        {"label": "project/.git/hooks/pre-rebase.sample", "kind": "git_scaffold", "bytes": 4898, "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3"},
+        {"label": "project/.git/hooks/pre-receive.sample", "kind": "git_scaffold", "bytes": 544, "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989"},
+        {"label": "project/.git/hooks/prepare-commit-msg.sample", "kind": "git_scaffold", "bytes": 1492, "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619"},
+        {"label": "project/.git/hooks/push-to-checkout.sample", "kind": "git_scaffold", "bytes": 2783, "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f"},
+        {"label": "project/.git/hooks/sendemail-validate.sample", "kind": "git_scaffold", "bytes": 2308, "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92"},
+        {"label": "project/.git/hooks/update.sample", "kind": "git_scaffold", "bytes": 3650, "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106"},
+        {"label": "project/.git/info/exclude", "kind": "git_scaffold", "bytes": 240, "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1"}
+      ]
+    },
     "populations": [
       "Claude main",
       "Claude child",
@@ -184,5 +217,11 @@
     },
     "performance_claim": false
   },
-  "sanitization": "Whitelist projection of aggregate fields. Session keys, machine identities, project names, native log bodies, prompts, account information and request payloads are not published."
+  "sanitization": "Whitelist projection of aggregate fields. Session keys, machine identities, project names, native log bodies, prompts, account information and request payloads are not published.",
+  "errata": [
+    {
+      "date": "2026-09-27",
+      "correction": "Replace undefined RR references with copied native logs from the full-save E2E clones. Add hashes for all 23 retained fixture files and explicit automated-count expectations, with their retrospective capture boundary. Preserve every original observation, including failed synthetic ccusage parity."
+    }
+  ]
 }
