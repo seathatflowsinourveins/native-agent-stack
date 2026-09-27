@@ -42,7 +42,7 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it.
 # 2026-09-27: the maintenance rule is derived from the OpenSSF Scorecard Maintained check, and licenses are information only
 # (never a refutation reason), per the operator's 2026-09-26/27 decisions.
-PROMPTS_SHA256_CURRENT = "a9722fec777e5a5d6037be15ccda8ad208a06bba075fcb9832e49b54bcff1fb4"
+PROMPTS_SHA256_CURRENT = "f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -265,6 +265,9 @@ class TemplateTests(unittest.TestCase):
         self.assertIn("not from pushed_at", common)
         self.assertIn("TOO NEW TO ASSESS (<90 days)", common)
         self.assertIn("it is stale under the selection principles' maintenance rule", fit)
+        # A lane that cannot reach the commit evidence (the web-only GPT-6 lane) never refutes on it.
+        self.assertIn("never excludes or refutes a repository on unknown maintenance", common)
+        self.assertIn("unknown maintenance is never a reason to refute", fit)
 
     def test_only_per_call_placeholders_remain_after_filling(self):
         frozen = filled_templates()
