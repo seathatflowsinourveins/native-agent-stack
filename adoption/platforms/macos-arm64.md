@@ -211,7 +211,7 @@ These components are installed from upstream `darwin-arm64` (or `darwin-arm64`-e
 release archives rather than Homebrew, matching the archive convention in
 [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions).
 Every SHA-256 below was read from the publisher on 2026-09-22, or on 2026-09-26
-for the eight rows from `rtk` down — a checksum file, a `.sha256` sidecar, a
+for `context-hub` and the eight rows from `rtk` down — a checksum file, a `.sha256` sidecar, a
 registry or PyPI digest, or (where the publisher ships none) the GitHub release
 asset `digest` plus an independent re-hash of the downloaded asset. `headroom`,
 `markitdown` and `serena` are not archives this script extracts: uv installs them.
@@ -234,6 +234,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
 | `claude-code` | 2.1.281 | `darwin-arm64/claude` (native, not npm) | `a922981f6f3b55a251ef9f9dbaa0621a5f99cbcb5ca67f8a797476ccfc83f626` | `manifest_crosscheck` |
 | `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
+| `context-hub` | 0.1.4 | `chub-0.1.4.tgz` (`@aisuite/chub`) | `ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f` | `npm_registry_integrity_crosscheck` |
 | `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
 | `ai-memory` | 2.3.2 | `ai-memory-macos-aarch64.tar.gz` | `e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a` | `publisher_checksum_sidecar` |
 | `llama-cpp` | b11057 | `llama-b11057-bin-macos-arm64.tar.gz` | `443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1` | `github_release_asset_digest_plus_local_rehash` |
@@ -287,6 +288,18 @@ refusal -- and `install_uv_tool_from_git` refuses the install unless the resulti
 `uv-receipt.toml` records that commit. Not in this table: `gitleaks`, `syft` and `dagu`,
 which are not in the `macos-arm64-foundation` component list.
 
+**Context Hub opt-out (0.1.4).** Set `telemetry: false` and `feedback: false` in
+`~/.chub/config.yaml`, as documented in upstream
+[`docs/cli-reference.md:215–229`](https://github.com/andrewyng/context-hub/blob/v0.1.4/docs/cli-reference.md#L215-L229)
+and [`SECURITY.md:28`](https://github.com/andrewyng/context-hub/blob/v0.1.4/SECURITY.md#L28).
+Use the environment form `CHUB_TELEMETRY=0 CHUB_FEEDBACK=0` only where an invocation overrides
+`HOME` or `CHUB_DIR`, such as a worker using another home; upstream
+[`cli/src/lib/config.js:23–40`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js#L23-L40)
+resolves the config there. No wrapper script is needed. The context-hub row was added on
+2026-09-26 after independently checking the npm tarball's SHA-256, SHA-512 integrity and SHA-1;
+both platform pin files name those same bytes. This is artifact verification, not a Mac
+installation or native execution receipt; see the [recipe](../../recipes/README.md#context-hub-opt-out).
+
 A Mac that runs the Claude RTK hook at the rtk 0.50.0 pin needs the exclusions from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) in
 `~/Library/Application Support/rtk/config.toml`, the only config file rtk 0.50.0 reads on
@@ -303,7 +316,7 @@ and tables. A second `[hooks]` header or `exclude_commands` key is invalid TOML,
 silently loads its defaults
 ([`rtk-hooks-table-control.txt`](../../evidence/artifacts/macos-token-pins-20260926/rtk-hooks-table-control.txt):
 on the pinned Linux binary a second `[hooks]` header makes `rtk config` exit 1 while the hook
-keeps rewriting, and this edit loads with the four entries):
+keeps rewriting, and this edit loaded the four entries the block held then):
 
 ```toml
 [hooks]
@@ -312,11 +325,12 @@ exclude_commands = [
   "diff",
   '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:',
   '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)',
+  "jq",
 ]
 ```
 
 The recipe explains each entry. `adoption/bootstrap-macos.sh` never writes that file; after
-installing rtk it prints a reminder unless the key appears exactly once with all four
+installing rtk it prints a reminder unless the key appears exactly once with all five
 entries in that file. That check reads only the file's text, so after editing the file ask
 rtk itself: `rtk config` prints the file it reads on its first line and exits 1 when it
 cannot load that file (a duplicate key, or a `[tracking]` table without `history_days`),
@@ -399,7 +413,7 @@ the bootstrap never moves a native auto-updated Claude Code back to the pin
 `adoption/bootstrap-linux.sh` changed after `v2026.09.26` too, in its rtk
 post-install reminder (the macOS script's own reminder, added with its rtk pin,
 is described in the RTK paragraph above): the Linux reminder now
-requires all four `[hooks] exclude_commands` entries from
+requires every `[hooks] exclude_commands` entry from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
 exactly once, instead of the tag's original two, and it also asks the installed
 `rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`

@@ -132,7 +132,7 @@
         "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
       ],
       "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
-      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
+      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. Among those seven commands, the Codex PreCompact hook remains unverified after the upgrade: whether it fires correctly has not been checked; this is a recorded verification gap, not an observed defect. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
     },
     {
       "id": "ast-grep",
@@ -540,7 +540,7 @@
         "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin equals the September 21 current stable release. Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
+      "freshness": "Installed tested pin 0.37.0 is stale through v0.39.1, the latest stable release published 2026-09-26T20:31:39Z (https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1; GitHub releases/latest checked 2026-09-26). Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
       "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
     },
     {

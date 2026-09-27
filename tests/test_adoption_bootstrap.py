@@ -1183,8 +1183,8 @@ class RtkConfigReminderTests(unittest.TestCase):
     rtk-ai/rtk v0.50.0 release asset) is a raw capture in
     evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt, not the E2E receipt (sibling PR #316's
     evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json is cited only for the
-    discovery). The reminder fires unless all four entries are present exactly once, including for a
-    config that still has only the original two, or the original two plus a second, four-entry line.
+    discovery). The reminder fires unless all five entries are present exactly once, including for a
+    config that still has only the original two, or the original two plus a second, five-entry line.
     2026-09-26 (Codex review of #314): the text check alone is not enough, because rtk also ignores a
     TOML-valid file that does not deserialize (a [tracking] table without history_days fails
     TrackingConfig, src/core/config.rs at 1d87b8e7) and then rewrites everything. So once the text
@@ -1200,7 +1200,9 @@ class RtkConfigReminderTests(unittest.TestCase):
     ENTRY_2 = '"diff"'
     ENTRY_3 = r"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'"
     ENTRY_4 = r"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"
-    ENTRIES = (ENTRY_1, ENTRY_2, ENTRY_3, ENTRY_4)
+    # F2 (docs/decisions/2026-09-26-token-practice-f1-f9.md): standalone jq stays native.
+    ENTRY_5 = '"jq"'
+    ENTRIES = (ENTRY_1, ENTRY_2, ENTRY_3, ENTRY_4, ENTRY_5)
     EXCLUDE_ITEMS = "[" + ", ".join(ENTRIES) + "]"
     # Matches recipes/README.md's pretty-printed, one-entry-per-line block exactly
     # (test_the_recipes_exact_block_gets_no_reminder asserts the two stay identical).
@@ -1372,8 +1374,8 @@ class RtkConfigReminderTests(unittest.TestCase):
                 self.assertEqual(config.read_bytes(), text.encode(), "the reminder must never write the config")
 
     def test_each_missing_entry_gets_exactly_one_reminder(self):
-        """Leave-one-out: three of the four entries present, one missing -- exactly one reminder,
-        naming all four (the recommendation to replace, never just append)."""
+        """Leave-one-out: four of the five entries present, one missing -- exactly one reminder,
+        naming all five (the recommendation to replace, never just append)."""
         for index in range(len(self.ENTRIES)):
             remaining = self.ENTRIES[:index] + self.ENTRIES[index + 1:]
             text = self.config_with(*remaining)
@@ -1388,7 +1390,7 @@ class RtkConfigReminderTests(unittest.TestCase):
     def test_a_duplicate_exclude_commands_key_is_reminded(self):
         """A second exclude_commands line is invalid TOML (rtk silently loads defaults), so the
         reminder must fire even though, read alone, either line would be complete: the old
-        two-entry line plus a correct new four-entry line, and the new line duplicated verbatim."""
+        two-entry line plus a correct new five-entry line, and the new line duplicated verbatim."""
         old_plus_new = f"[hooks]\nexclude_commands = [{self.ENTRY_1}, {self.ENTRY_2}]\n{self.CONFIGURED}"
         new_plus_new = self.CONFIGURED + self.CONFIGURED
         for text in (old_plus_new, new_plus_new):
@@ -1490,7 +1492,7 @@ class RtkConfigReminderRealBinaryTests(unittest.TestCase):
 
     SINGLE_REGEX = r"^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)"
     CONFIGS = {
-        "the recipe's four-entry block": (RtkConfigReminderTests.CONFIGURED, 0, False),
+        "the recipe's five-entry block": (RtkConfigReminderTests.CONFIGURED, 0, False),
         # Codex's #314 counterexample: exact text, but TrackingConfig needs history_days, so rtk ignores it.
         "[tracking] without history_days": (RtkConfigReminderTests.REJECTED, 1, True),
         "[tracking] with history_days": (RtkConfigReminderTests.REJECTED + "history_days = 90\n", 0, False),
@@ -1545,7 +1547,7 @@ class RtkExclusionInstructionTests(unittest.TestCase):
     which is invalid TOML: rtk 0.50.0 then loads its defaults and the hook keeps rewriting
     (`duplicate key `hooks` in document root`; evidence/artifacts/macos-token-pins-20260926/
     rtk-hooks-table-control.txt). Replacing a "line" also breaks the recipe's own multi-line value.
-    So every instruction that puts the four entries into rtk's config (the paragraph before each copy
+    So every instruction that puts the entries into rtk's config (the paragraph before each copy
     of the recipe's block in a Markdown page outside evidence/, bootstrap.md step 4a and the macOS
     rtk pin's install_note) says to replace the key's whole value inside the existing `[hooks]`
     table and to add the header only when the file has no `[hooks]` table, and none says to replace
@@ -1595,7 +1597,7 @@ class RtkExclusionInstructionTests(unittest.TestCase):
                 for phrase in self.REQUIRED:
                     self.assertIn(phrase.lower(), words)
 
-    def test_bootstrap_step_4a_keeps_the_four_entry_value_verbatim(self):
+    def test_bootstrap_step_4a_keeps_the_five_entry_value_verbatim(self):
         self.assertIn(f"`exclude_commands = {RtkConfigReminderTests.EXCLUDE_ITEMS}`",
                       self.instructions()["adoption/bootstrap.md step 4a"])
 
