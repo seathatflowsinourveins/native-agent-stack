@@ -83,7 +83,9 @@ args = ["--index", "native-agent-stack-catalog", "mcp"]
 # Codex starts it in the session's own directory, and the same upstream start.mjs, from the pinned npm
 # install, binds CONTEXT_MODE_PROJECT_DIR to that directory. The plugin's own server is turned off under
 # [plugins."context-mode@context-mode"] below; its hooks and skills stay on. Approval mode and platform are
-# the plugin manifest's own. See docs/decisions/2026-09-25-codex-mcp-scope.md, addendum 2026-09-26.
+# the plugin manifest's own. See docs/decisions/2026-09-25-codex-mcp-scope.md, addendum 2026-09-26. Interim:
+# drop this entry once upstream binds a Codex session to its own directory. tools/adoption/apply_codex_lane.py
+# writes exactly this entry to an existing host through Codex's config writer.
 [mcp_servers.context-mode]
 command = "${ECO_ROOT}/bin/node"
 args = ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"]

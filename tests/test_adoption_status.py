@@ -57,7 +57,7 @@ SERVERS = ("serena", "socraticode", "ai-memory")
 WIRED = {
     "claude": {"rtk_hook": True, "ai_memory_hook_events": 8, "context_mode_plugin_enabled": True,
                "subagent_spawn_depth_1": True, "workflow_concurrency_set": True,
-               "effort_level_env_unset": True, "agent_teams_off": True},
+               "effort_level_env_unset": True, "agent_teams_opt_in": 0},
     "project": {"settings_depth_and_concurrency": True, "codex_mcp_servers_present": dict.fromkeys(SERVERS, True)},
     "codex": {"rtk_instructions": True, "context_mode_plugin_enabled": True,
               "mcp_servers_present": dict.fromkeys(SERVERS, True), "hooks_feature_enabled": True,
@@ -1249,7 +1249,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(self.wiring(), {
             "claude": {"rtk_hook": False, "ai_memory_hook_events": 0, "context_mode_plugin_enabled": False,
                        "subagent_spawn_depth_1": False, "workflow_concurrency_set": False,
-                       "effort_level_env_unset": True, "agent_teams_off": True},
+                       "effort_level_env_unset": True, "agent_teams_opt_in": 0},
             "project": {"settings_depth_and_concurrency": False,
                         "codex_mcp_servers_present": dict.fromkeys(SERVERS, False)},
             # Without a config.toml Codex keeps its default: hooks on.
@@ -1307,7 +1307,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(result["claude"], {"rtk_hook": False, "ai_memory_hook_events": 0,
                                             "context_mode_plugin_enabled": False, "subagent_spawn_depth_1": False,
                                             "workflow_concurrency_set": False, "effort_level_env_unset": True,
-                                            "agent_teams_off": True})
+                                            "agent_teams_opt_in": 0})
         self.assertFalse(result["project"]["settings_depth_and_concurrency"])
         self.assertEqual(result["codex"], {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                                            "mcp_servers_present": dict.fromkeys(SERVERS, False),
@@ -1590,14 +1590,23 @@ class ClientWiringTests(unittest.TestCase):
     def test_effort_and_agent_team_opt_ins_are_found_by_name_whatever_their_value(self):
         self.wire()
         claude = self.wiring({**self.env, "CLAUDE_CODE_EFFORT_LEVEL": PRIVATE})["claude"]
-        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_off"]), (False, True))
+        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_opt_in"]), (False, 0))
         claude = self.wiring({**self.env, "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"})["claude"]
-        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_off"]), (True, False))
+        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_opt_in"]), (True, 1))
         settings = self.claude_settings()
         settings["env"].update(CLAUDE_CODE_EFFORT_LEVEL=PRIVATE, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=PRIVATE)
         self.write(".claude/settings.json", settings)
         claude = self.wiring()["claude"]
-        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_off"]), (False, False))
+        self.assertEqual((claude["effort_level_env_unset"], claude["agent_teams_opt_in"]), (False, 1))
+
+    def test_agent_teams_opt_in_is_information_and_never_blocks_completeness(self):
+        # Agent teams are an allowed dispatch mode (user instructions 2026-09-27), so the opt-in is reported as a
+        # 0/1 count and the completeness rule is the same with it set or unset.
+        self.wire()
+        unset = self.wiring()
+        with_teams = self.wiring({**self.env, "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"})
+        self.assertEqual((unset["claude"]["agent_teams_opt_in"], with_teams["claude"]["agent_teams_opt_in"]), (0, 1))
+        self.assertEqual(with_teams["complete"], unset["complete"])
 
     def test_disabled_or_uninstalled_plugins_and_servers_are_not_wired(self):
         self.wire()

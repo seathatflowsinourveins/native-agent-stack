@@ -57,9 +57,11 @@ EOF_GRACE_S, TERM_GRACE_S = 2.0, 2.0
 
 
 class ProbeError(Exception):
-    def __init__(self, stage: str, message: str, code=None):
+    def __init__(self, stage: str, message: str, code=None, answer=None):
         super().__init__(message)
-        self.stage, self.message, self.code = stage, message, code
+        # answer: the server's error object, kept for a caller that talks to a local writer (config/batchWrite);
+        # as_json() never includes it, since a backend error can carry account ids.
+        self.stage, self.message, self.code, self.answer = stage, message, code, answer
 
     def as_json(self) -> dict:
         return {"stage": self.stage, "code": self.code, "message": self.message[:MESSAGE_CHARS]}
@@ -140,11 +142,13 @@ def judge(summary: dict, percent: float) -> tuple[bool | None, list[str]]:
 class AppServer:
     """`codex app-server` over stdio, in its own process group."""
 
-    def __init__(self, codex: str, cwd: str):
-        env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+    def __init__(self, codex: str, cwd: str, argv: list[str] | None = None, env: dict | None = None):
+        if env is None:
+            env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
         # A read-only sandbox: the probe only reads account state, so the server prepares no writable roots
-        # (a workspace-write sandbox protects .git mount points inside roots such as /tmp).
-        self.process = subprocess.Popen([codex, "-c", 'sandbox_mode="read-only"', "app-server"],
+        # (a workspace-write sandbox protects .git mount points inside roots such as /tmp). Another caller
+        # (tools/adoption/apply_codex_lane.py) passes its own argv and environment.
+        self.process = subprocess.Popen(argv or [codex, "-c", 'sandbox_mode="read-only"', "app-server"],
                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.DEVNULL, cwd=cwd, env=env, bufsize=0,
                                         start_new_session=True)
@@ -212,7 +216,7 @@ class AppServer:
             if error is not None:
                 # The server's own message text is never echoed: backend errors can carry account ids.
                 if isinstance(error, dict):
-                    raise ProbeError(method, "the server answered with an error", number(error.get("code")))
+                    raise ProbeError(method, "the server answered with an error", number(error.get("code")), error)
                 raise ProbeError(method, "the server answered with a malformed error")
             result = message.get("result")
             if not isinstance(result, dict):
