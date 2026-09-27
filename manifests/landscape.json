@@ -74,6 +74,15 @@
       "target_commitish": "main",
       "repo": "anthropics/sandbox-runtime",
       "source_commit": "6fa731368807419ee157f9a3fac955fefe1019c6"
+    },
+    {
+      "tag_name": "v20.0.24",
+      "published_at": "2026-09-21T11:23:53Z",
+      "prerelease": false,
+      "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+      "target_commitish": "main",
+      "repo": "ccusage/ccusage",
+      "source_commit": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805"
     }
   ],
   "vllm_compatibility": "Current upstream0.29.0 resolves/installs/startsCLI, but actualWSLGPUmodel initialization failedRuntimeError:UVAisnotavailable. Publisher-validated0.25.0restored; directDesktopsemanticquerypassedafterrestoration. No dependency/source overrides.",
