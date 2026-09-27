@@ -40,9 +40,9 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # A change detector: templates.json filled with the 2026-09-26 run's values (date, layer count, skills date) must give
 # PROMPTS_SHA256_CURRENT, the sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False). An intended template edit
 # changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it.
-# 2026-09-27: the maintenance rule follows the OpenSSF Scorecard Maintained check, and licenses are information only
+# 2026-09-27: the maintenance rule is derived from the OpenSSF Scorecard Maintained check, and licenses are information only
 # (never a refutation reason), per the operator's 2026-09-26/27 decisions.
-PROMPTS_SHA256_CURRENT = "0e4435853c80a29eca8a699a2449a095dfb0efd39ca9c89eba0cefd530a54367"
+PROMPTS_SHA256_CURRENT = "a9722fec777e5a5d6037be15ccda8ad208a06bba075fcb9832e49b54bcff1fb4"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
