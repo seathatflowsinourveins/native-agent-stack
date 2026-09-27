@@ -686,6 +686,10 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         for server in TOKEN_MCP_SERVERS:
             self.assertIn(f"[mcp_servers.{server}]", config)
         self.assertNotIn("supports_websockets = true", config)
+        # The key never reaches a shell snapshot file, and GPT-6 Astra's search is Codex's standalone web.run.
+        for line in ("[features]", "shell_snapshot = false", "standalone_web_search = true",
+                     "supports_standalone_web_search = true"):
+            self.assertIn(line, config)
         self.assertNotIn("[projects.", config)
         self.assertNotIn("[hooks.state", config)
         self.assertNotIn("${", config)  # every template placeholder rendered
@@ -697,6 +701,8 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         if tomllib is not None:
             parsed = tomllib.loads(config)
             self.assertEqual(parsed["model_providers"]["omniroute"]["env_key"], "OMNIROUTE_API_KEY")
+            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], True)
+            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": True})
             self.assertEqual(sorted(parsed["mcp_servers"]), sorted(TOKEN_MCP_SERVERS))
         codex = json.loads((work / "staged.json").read_text())["codex"]
         self.assertEqual((codex["provider"], codex["codex_home"], codex["profile"], codex["api_key_env"],
@@ -739,6 +745,28 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
                         "--stack-worker-profile", profile)
         self.assertEqual(missing.returncode, 2)
         self.assertIn("does not exist", missing.stderr)
+
+    def test_mcp_extraction_accepts_quoted_and_spaced_headers_and_fails_closed(self):
+        text = ('model = "x"\n[mcp_servers."demo"]\ncommand = "a"\n[ mcp_servers.plain ]\ncommand = "b"\n'
+                '[mcp_servers.plain.env]\nK = "v"\n[projects."/p"]\ntrust_level = "trusted"\n')
+        sections, names = build_args.mcp_sections(text)
+        self.assertEqual(names, ["demo", "plain"])
+        self.assertNotIn("[projects.", sections)
+        try:
+            import tomllib
+        except ImportError:
+            return
+        self.assertEqual(sorted(tomllib.loads(sections)["mcp_servers"]), ["demo", "plain"])
+        # A server the line extraction cannot see (declared with inline-table syntax under [mcp_servers]) fails closed.
+        with self.assertRaises(ValueError):
+            build_args.mcp_sections('[mcp_servers]\nhidden = { command = "c" }\n[mcp_servers.plain]\ncommand = "b"\n')
+
+    def test_missing_profile_names_the_flag(self):
+        work = stage_work(self)
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
+                     "--stack-worker-profile", temp_dir(self) / "absent.config.toml")
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("pass --stack-worker-profile", done.stderr)
 
     def test_require_key_stages_no_placeholder(self):
         work, _, done = self.stage_lane("--omniroute-require-key")
@@ -848,6 +876,8 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         lane = codex_job.settings(self.work)
         saved = os.environ.pop("OMNIROUTE_API_KEY", None)
         try:
+            self.assertEqual(codex_job.codex_env(lane)["OMNIROUTE_API_KEY"], "local-loopback")
+            os.environ["OMNIROUTE_API_KEY"] = "   "  # blank counts as unset: Codex rejects a blank env_key value
             self.assertEqual(codex_job.codex_env(lane)["OMNIROUTE_API_KEY"], "local-loopback")
             os.environ["OMNIROUTE_API_KEY"] = "operator-value"
             self.assertEqual(codex_job.codex_env(lane)["OMNIROUTE_API_KEY"], "operator-value")  # a real key wins

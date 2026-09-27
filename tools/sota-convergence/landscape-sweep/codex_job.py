@@ -308,7 +308,7 @@ def codex_env(lane: dict | None = None) -> dict:
     env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
     if lane is not None and lane.get("codex_home") is not None:
         env["CODEX_HOME"] = str(lane["codex_home"])
-        if not env.get(lane["api_key_env"]) and lane.get("api_key_placeholder"):
+        if not (env.get(lane["api_key_env"]) or "").strip() and lane.get("api_key_placeholder"):
             env[lane["api_key_env"]] = lane["api_key_placeholder"]  # keyless loopback gateway; a real key wins
     return env
 
@@ -598,7 +598,7 @@ def run(base: Path, job: str) -> int:
         finish(directory, EXIT_NO_CODEX)
         return EXIT_NO_CODEX
     lane = config if config["codex_home"] is not None else None
-    if lane is not None and not os.environ.get(lane["api_key_env"]) and not lane["api_key_placeholder"]:
+    if lane is not None and not (os.environ.get(lane["api_key_env"]) or "").strip() and not lane["api_key_placeholder"]:
         write_atomic(directory / "stderr.txt", f"{lane['api_key_env']} is not set in the runner's environment; start "
                      "the harness with the gateway key loaded from its store by pointer (docs/secret-storage.md)\n")
         finish(directory, EXIT_NO_KEY)

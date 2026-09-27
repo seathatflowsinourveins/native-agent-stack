@@ -101,10 +101,23 @@ With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 la
   - the `[mcp_servers.*]` tables of `adoption/templates/codex.config.template.toml`. The checkout's own `tools/adoption/render_config.py` renders them for `adoption/hosts/<HOST>.json`: serena, ai-memory, socraticode, headroom, codebase-memory, qmd and context-mode.
 - `stack-worker.config.toml`: the Codex worker profile (`--stack-worker-profile`, default `adoption/templates/codex.stack-worker.config.toml`), copied verbatim.
 
+What the lane config also sets:
+- **`[features] shell_snapshot = false`.** Codex's shell snapshot writes the exported environment, the provider key included, into `<CODEX_HOME>/shell_snapshots/*.sh` with mode 0644 (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at rust-v0.157.1). A GPT-6 probe reproduced this.
+- **Web search for GPT-6 Astra.** Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as Codex's standalone web search (`web.run`). The lane therefore sets:
+  - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers ([Codex advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced));
+  - `[features] standalone_web_search = true`, which is under development in 0.157.1.
+
+  The capability flag alone enables nothing: OmniRoute must serve a compatible endpoint, and the parity check below has to show it working before a sweep counts on GPT-6 search through the gateway.
+
 What the lane does not carry or allow:
 - Project and hook trust are left out, because they describe the host's interactive client.
 - `supports_websockets` stays unset. OmniRoute forwards the Codex client version only on its HTTP `/v1/responses` path.
 - `--omniroute-base-url` must point at loopback.
+- The default worker profile, `adoption/templates/codex.stack-worker.config.toml`, arrives with the Codex worker-lane change. Until the checkout has it, pass `--stack-worker-profile PATH`.
+
+Isolation limits:
+- `CODEX_HOME` replaces the user-config location, but a trusted `.codex/config.toml` in the working directory and the system config still layer in.
+- The runner works in the empty `<work-dir>/empty`, so no project layer applies there. A host system config (`/etc/codex/config.toml`) would, so keep it absent on sweep hosts.
 
 How the runner uses it:
 - `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`.

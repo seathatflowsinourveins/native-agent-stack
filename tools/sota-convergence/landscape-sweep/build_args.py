@@ -82,7 +82,8 @@ LANE_PROFILE = "stack-worker"
 CODEX_TEMPLATE = Path("adoption/templates/codex.config.template.toml")
 STACK_WORKER_PROFILE = Path("adoption/templates/codex.stack-worker.config.toml")
 TABLE_HEADER = re.compile(r"^\s*\[")
-MCP_TABLE_HEADER = re.compile(r"^\s*\[mcp_servers\.([A-Za-z0-9_-]+)(?:\.[^\]]+)?\]\s*(?:#.*)?$")
+# [mcp_servers.<name>...] with optional spaces inside the brackets and a bare or double-quoted name.
+MCP_TABLE_HEADER = re.compile(r'^\s*\[\s*mcp_servers\.(?:"([^"]+)"|([A-Za-z0-9_-]+))(?:\.[^\]]+)?\s*\]\s*(?:#.*)?$')
 
 
 def load_templates() -> dict:
@@ -99,11 +100,27 @@ def mcp_sections(rendered: str) -> tuple[str, list[str]]:
         if TABLE_HEADER.match(line):
             match = MCP_TABLE_HEADER.match(line)
             keep = match is not None
-            if keep and match.group(1) not in names:
-                names.append(match.group(1))
+            name = (match.group(1) or match.group(2)) if match else None
+            if keep and name not in names:
+                names.append(name)
         if keep:
             kept.append(line)
-    return "\n".join(kept).strip() + "\n", names
+    text = "\n".join(kept).strip() + "\n"
+    # Line extraction is checked against a real TOML parse (Python 3.11+): the extracted text must parse and name
+    # exactly the servers the whole rendered config names, or staging fails closed rather than dropping a server.
+    try:
+        import tomllib
+    except ImportError:
+        tomllib = None
+    if tomllib is not None:
+        try:
+            full = set((tomllib.loads(rendered).get("mcp_servers") or {}).keys())
+            extracted = set((tomllib.loads(text).get("mcp_servers") or {}).keys())
+        except tomllib.TOMLDecodeError as error:
+            raise ValueError(f"extracted [mcp_servers.*] tables are not valid TOML: {error}") from None
+        if extracted != full or set(names) != full:
+            raise ValueError(f"MCP extraction mismatch: template names {sorted(full)}, extracted {sorted(extracted)}")
+    return text, names
 
 
 def host_values_from_file(path: Path) -> dict:
@@ -151,9 +168,19 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         f"# {host_label!r} by tools/adoption/render_config.py. The provider key comes from ${OMNIROUTE_KEY_ENV}; it is never",
         "# stored here. supports_websockets stays unset (false): OmniRoute's WebSocket bridge drops the client headers",
         "# that carry the Codex version, which only its HTTP /v1/responses path forwards.",
+        "# Web search: GPT-6 Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as",
+        "# Codex's standalone web search (web.run). A custom provider advertises that with",
+        "# supports_standalone_web_search (Codex config docs, config-advanced) and the standalone_web_search feature",
+        "# turns it on (under development in 0.157.1); the lane's parity check must show it works through OmniRoute.",
+        "# shell_snapshot is off: Codex's shell snapshot writes the exported environment, the provider key included,",
+        "# to <CODEX_HOME>/shell_snapshots (codex-rs/shell-command/src/shell_snapshot_exports.rs at rust-v0.157.1).",
         f'model = "{model}"',
         'model_provider = "omniroute"',
         'model_reasoning_effort = "max"',
+        "",
+        "[features]",
+        "shell_snapshot = false",
+        "standalone_web_search = true",
         "",
         "[model_providers.omniroute]",
         'name = "OmniRoute"',
@@ -161,6 +188,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         f'env_key = "{OMNIROUTE_KEY_ENV}"',
         "requires_openai_auth = false",
         'wire_api = "responses"',
+        "supports_standalone_web_search = true",
         "",
         servers_text,
     ])
@@ -406,7 +434,9 @@ def main(argv=None) -> int:
                 raise ValueError("--omniroute-base-url must be a loopback http URL ending in /v1")
             profile = args.stack_worker_profile or (args.repo_root.resolve() / STACK_WORKER_PROFILE)
             if not Path(profile).is_file():
-                raise ValueError(f"stack-worker profile {profile} does not exist; pass --stack-worker-profile")
+                raise ValueError(f"stack-worker profile {profile} does not exist: the default "
+                                 f"{STACK_WORKER_PROFILE} arrives with the Codex worker-lane change; until the "
+                                 "checkout has it, pass --stack-worker-profile PATH")
             lane = {"host": args.codex_host, "base_url": args.omniroute_base_url, "profile": Path(profile).resolve(),
                     "require_key": args.omniroute_require_key}
         if args.skills_checked_at:
