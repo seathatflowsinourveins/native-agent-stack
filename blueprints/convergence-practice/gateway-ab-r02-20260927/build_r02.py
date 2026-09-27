@@ -118,6 +118,14 @@ def provider(arm, schema, url=GATEWAY_URL):
                 "x-omniroute-session": f"r02-{key}-{{{{accession}}}}-r{{{{__repeatIndex}}}}-{{{{__evalId}}}}",
                 # __evalStepId has no provider index; the static arm prefix separates the arms.
                 "Idempotency-Key": f"r02-{key}-{{{{__evalId}}}}-{{{{__evalStepId}}}}",
+                # The same per-call value as the gateway's request id. A caller X-Correlation-Id is trimmed, has
+                # CR/LF removed and is kept when 1-256 characters long (OmniRoute@dd6e9607e:src/app/api/v1/chat/
+                # completions/route.ts:292-298, 322; src/shared/utils/correlationPreserve.ts:6-12) as the request
+                # id (src/sse/handlers/chat.ts:436) that call_logs stores as correlation_id, one row per gateway
+                # attempt (open-sse/handlers/chatCore/attemptLogging.ts:549-557, 611), and it is returned as the
+                # response header (src/sse/handlers/chatHelpers.ts:1172-1187; route.ts:313-314).
+                # analyze_r02.py rebuilds it for every call, including calls that fail before the transform.
+                "X-Correlation-Id": f"r02-{key}-{{{{__evalId}}}}-{{{{__evalStepId}}}}",
                 "X-OmniRoute-No-Cache": "true",
             },
             "body": {

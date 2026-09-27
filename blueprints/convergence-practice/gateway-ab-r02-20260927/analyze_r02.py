@@ -10,18 +10,30 @@ results.results) and, optionally, `call_logs_by_correlation.py --rows` output. T
 standard library.
 
 - Rows. The arm is the provider label (r02-A, r02-B), which error rows carry too (src/evaluator.ts:808-832).
-  Both arms of one filing and repeat share a testIdx, which promptfoo advances once per test and repeat
-  (src/evaluator.ts:2674-2696); the repeat is the rank of that testIdx among the filing's testIdx values.
+  Both arms of one filing and repeat share a testIdx, which promptfoo advances once per test and repeat, a
+  test's repeats taking consecutive values (src/evaluator.ts:2674-2696; installed
+  dist/src/evaluator-DlYW7Rgb.js:8612-8643), so the repeat is the testIdx minus the filing's smallest testIdx.
   failureReason 2 is a provider error and 1 a rejected assertion (src/types/index.ts:376-383;
   src/evaluator.ts:608-612, 1342-1346, 1799-1830).
+- Correlation ids. Each call sends X-Correlation-Id r02-<arm key>-{{__evalId}}-{{__evalStepId}}, where
+  __evalStepId is test-<testIdx>-prompt-<promptIdx>-repeat-<repeatIndex> (dist/src/evaluator-DlYW7Rgb.js:
+  7599-7605). promptfoo drops these runtime vars from the persisted vars (:7606-7619), but every result row,
+  including a provider error thrown before the transform, keeps testIdx and promptIdx (:8087-8100,
+  8133-8157), and the results file keeps evalId, so the sent id of every call is rebuilt. Where the transform
+  ran, the gateway's X-Correlation-Id must equal it (the gateway keeps a caller id of 1-256 characters,
+  OmniRoute@dd6e9607e:src/shared/utils/correlationPreserve.ts:6-12); `ids` refuses to continue otherwise.
 - Errors. transform_r02.js returns its own prefixed errors with metadata. promptfoo throws before the transform
   on a 429 when maxRetries is 0 ("Rate limit exceeded: HTTP 429" or "Quota exceeded: HTTP 429",
   src/util/fetch/index.ts:681-714, 768-770; src/util/fetch/errors.ts:164-211), on a 200 that carries a
   rate-limit-remaining 0 header ("Rate limited: ...", index.ts:375-388, 712-714) and on a timeout ("Request
-  timed out after <ms> ms", index.ts:355, 804). A thrown error keeps no response headers, so those calls
-  have no correlation id. A failure after the gateway committed a slow-path 200 stream arrives in-band as a
-  data-only error chunk (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685), which the
-  transform reports as sse_error_event with the correlation id; only call_logs shows whether it was a 429.
+  timed out after <ms> ms", index.ts:355, 804). A thrown error keeps no response headers, so the gateway's echo
+  of the id is missing, but its sent id is rebuilt. A failure after the gateway committed a slow-path 200
+  stream arrives in-band as a data-only error chunk (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:
+  664-685), which the transform reports as sse_error_event.
+- call_logs. Each call is joined on its sent id to the rows call_logs_by_correlation.py returns: one row per
+  gateway attempt, numbered by (timestamp, rowid), the last being the call's final row. Status, model and
+  effort per call come from the final row; attempts and 429 rows are counted over all rows; the client-side
+  outcome is cross-tabulated with the final status, and calls with no row are counted by client-side outcome.
 - Scores. li26's own eval_arm.parse_items and analyze.filing_scores rescore every returned output; the
   assertion's namedScores must agree. A call without output scores as filing_scores(gold, None), li26's rule
   for a call that returned nothing usable.
@@ -65,6 +77,7 @@ import sys
 HERE = Path(__file__).resolve().parent
 LI26 = HERE.parent / "local-inference-latest-20260926"
 ARM_LABELS = {"r02-A": "A", "r02-B": "B"}
+ARM_KEYS = {"A": "a", "B": "b"}  # build_r02.ARMS key prefixes
 ERROR = 2
 TRANSFORM_ERRORS = ("sse_error_event", "malformed_sse_chunks", "missing_terminal_chunk", "missing_usage",
                     "not_an_sse_stream")
@@ -98,6 +111,33 @@ def result_rows(data):
 def r02_metadata(row):
     response = row.get("response") or {}
     return (response.get("metadata") or {}).get("r02") or (row.get("metadata") or {}).get("r02") or {}
+
+
+def repeat_by_step(rows):
+    """promptfoo's repeatIndex for each testIdx: the testIdx minus the smallest testIdx of the same filing."""
+    first = {}
+    for row in rows:
+        accession = row["vars"]["accession"]
+        first[accession] = min(first.get(accession, row["testIdx"]), row["testIdx"])
+    return {row["testIdx"]: row["testIdx"] - first[row["vars"]["accession"]] for row in rows}
+
+
+def sent_id(arm, eval_id, test_idx, prompt_idx, repeat):
+    """The X-Correlation-Id (and Idempotency-Key) promptfoo rendered for one call."""
+    return f"r02-{ARM_KEYS[arm]}-{eval_id}-test-{test_idx}-prompt-{prompt_idx}-repeat-{repeat}"
+
+
+def sent_calls(data):
+    """(arm, sent id, the gateway's echoed id or None) for every row of one results file."""
+    eval_id = data.get("evalId")
+    if not isinstance(eval_id, str) or not eval_id:
+        raise ValueError("the results file has no evalId, so the sent correlation ids cannot be rebuilt")
+    rows = result_rows(data)
+    repeats = repeat_by_step(rows)
+    return [(ARM_LABELS[row["provider"]["label"]],
+             sent_id(ARM_LABELS[row["provider"]["label"]], eval_id, row["testIdx"], row["promptIdx"],
+                     repeats[row["testIdx"]]),
+             r02_metadata(row).get("correlation_id")) for row in rows]
 
 
 def error_kind(row):
@@ -139,8 +179,9 @@ def usage_fields(usage):
             "reasoning_reported": reported_reasoning is not None, "cached_reported": reported_cached is not None}
 
 
-def call_record(row, run):
-    """One call: arm, filing, counts from li26's rescoring, status, tokens, latency and correlation id."""
+def call_record(row, run, eval_id=None, repeat=None):
+    """One call: arm, filing, repeat, counts from li26's rescoring, status, tokens, latency, the sent correlation
+    id, the gateway's echo of it and the rate-limit headers the transform saw."""
     analyze = li26()
     arm = ARM_LABELS[row["provider"]["label"]]
     variables = row["vars"]
@@ -161,14 +202,31 @@ def call_record(row, run):
         status = "error"
         scores = analyze.filing_scores(gold, None)
     meta = r02_metadata(row)
-    return {"run": run, "arm": arm, "test_idx": row["testIdx"], "accession": variables["accession"],
+    identifier = None
+    if eval_id and repeat is not None:
+        identifier = sent_id(arm, eval_id, row["testIdx"], row["promptIdx"], repeat)
+    else:
+        problems.append("sent correlation id not rebuilt (no evalId or repeat)")
+    echoed = meta.get("correlation_id")
+    if echoed and identifier and echoed != identifier:
+        problems.append("the gateway's X-Correlation-Id differs from the sent id")
+    return {"run": run, "arm": arm, "test_idx": row["testIdx"], "repeat": repeat, "accession": variables["accession"],
             "tp": scores["tp"], "fp": scores["fp"], "fn": scores["fn"], "status": status, "error_kind": kind,
             "latency_ms": finite(row.get("latencyMs")), "usage": usage_fields(meta.get("usage")),
-            "correlation_id": meta.get("correlation_id"), "problems": problems}
+            "sent_id": identifier, "correlation_id": echoed,
+            "rate_limit_headers": sorted(meta.get("rate_limit_headers") or {}),
+            "dropped_upstream_headers": meta.get("dropped_upstream_headers"), "problems": problems}
+
+
+def run_calls(data, run):
+    """call_record for every row of one results file, with its evalId and each row's repeat."""
+    rows = result_rows(data)
+    repeats = repeat_by_step(rows)
+    return [call_record(row, run, data.get("evalId"), repeats[row["testIdx"]]) for row in rows]
 
 
 def pair_calls(runs, repeats):
-    """Pair A and B on (run, testIdx); the repeat is the rank of the testIdx among the filing's."""
+    """Pair A and B on (run, testIdx), in repeat order within each filing."""
     problems, pairs = [], []
     for run, calls in runs.items():
         by_step = {}
@@ -189,8 +247,9 @@ def pair_calls(runs, repeats):
         for accession, steps in sorted(steps_by_filing.items()):
             if len(steps) != repeats:
                 problems.append(f"{run}: {accession} has {len(steps)} complete repeats, expected {repeats}")
-            for repeat, step in enumerate(sorted(steps)):
-                pairs.append({"run": run, "accession": accession, "repeat": repeat,
+            for rank, step in enumerate(sorted(steps)):
+                repeat = by_step[step]["A"]["repeat"]
+                pairs.append({"run": run, "accession": accession, "repeat": rank if repeat is None else repeat,
                               "A": by_step[step]["A"], "B": by_step[step]["B"]})
     accessions = [{pair["accession"] for pair in pairs if pair["run"] == run} for run in runs]
     if len(accessions) == 2 and accessions[0] & accessions[1]:
@@ -276,37 +335,72 @@ def arm_summary(calls, np):
         "cached_input_share": sum(entry["cached"] for entry in returned) / prompt_total if prompt_total else None,
         "reasoning_tokens": distribution([entry["reasoning"] for entry in usage], np),
         "completion_tokens": distribution([entry["completion"] for entry in usage], np),
+        # Open question 3: rate-limit-class response headers on calls that reached the transform.
+        "rate_limit_headers": {"calls_with_any": sum(bool(call["rate_limit_headers"]) for call in calls),
+                               "names": dict(sorted(Counter(name for call in calls
+                                                            for name in call["rate_limit_headers"]).items()))},
+        "calls_with_dropped_upstream_headers": sum(call["dropped_upstream_headers"] is not None for call in calls),
     }
 
 
+def client_outcome(call):
+    return call["error_kind"] or "no_provider_error"
+
+
 def call_log_summary(call_logs, calls):
-    """Status and effort per arm from call_logs rows joined on the correlation id. A NULL effort column is no
-    observation, never "no effort"."""
-    rows = {}
+    """Per arm, each call joined on its sent correlation id to its call_logs rows. Status, model and effort per
+    call come from its final row; attempts and 429 rows are counted over all rows. A NULL effort column is no
+    observation, never "no effort". Returns the report and its problems."""
+    rows, problems = {}, []
     for entry in call_logs.values():
         for row in entry.get("matched_rows", []):
             rows.setdefault(row["correlation_id"], []).append(row)
     report = {}
     for arm in ("A", "B"):
         arm_calls = [call for call in calls if call["arm"] == arm]
-        ids = [call["correlation_id"] for call in arm_calls if call["correlation_id"]]
-        matched = [row for identifier in ids for row in rows.get(identifier, [])]
+        joined = [(call, rows.get(call["sent_id"], []) if call["sent_id"] else []) for call in arm_calls]
+        finals = []
+        for call, matched in joined:
+            if not matched:
+                continue
+            final = [row for row in matched if row.get("final") is True]
+            numbers = [row.get("attempt") for row in matched]
+            if len(final) != 1 or not all(isinstance(number, int) for number in numbers) or \
+                    sorted(numbers) != list(range(1, len(matched) + 1)) or final[0]["attempt"] != len(matched):
+                problems.append(f"{arm} {call['sent_id']}: call_logs rows are not numbered as attempts with one "
+                                "final row (use call_logs_by_correlation.py --rows)")
+                continue
+            finals.append((call, final[0], len(matched)))
+        all_rows = [row for _, matched in joined for row in matched]
+        unmatched = [call for call, matched in joined if not matched]
         report[arm] = {
-            "calls_with_id": len(ids),
-            "calls_without_id": len(arm_calls) - len(ids),
-            "ids_matched": sum(identifier in rows for identifier in ids),
-            "rows": len(matched),
-            "status": dict(sorted(Counter(str(row["status"]) for row in matched).items())),
-            "http_429_rows": sum(1 for row in matched if row["status"] == 429),
-            "model": dict(sorted(Counter(str(row["model"]) for row in matched).items())),
+            "calls": len(arm_calls),
+            "calls_without_sent_id": sum(call["sent_id"] is None for call in arm_calls),
+            "calls_matched": len(arm_calls) - len(unmatched),
+            "calls_unmatched": len(unmatched),
+            "unmatched_by_client_outcome": dict(sorted(Counter(client_outcome(call) for call in unmatched).items())),
+            "attempt_rows": len(all_rows),
+            "attempts_per_call": dict(sorted(Counter(attempts for _, _, attempts in finals).items())),
+            "retried_calls": sum(attempts > 1 for _, _, attempts in finals),
+            "final_status": dict(sorted(Counter(str(row["status"]) for _, row, _ in finals).items())),
+            "attempt_status": dict(sorted(Counter(str(row["status"]) for row in all_rows).items())),
+            "http_429_attempt_rows": sum(row["status"] == 429 for row in all_rows),
+            "http_429_final": sum(row["status"] == 429 for _, row, _ in finals),
+            "client_outcome_by_final_status": [
+                {"client": client, "final_status": status, "count": count}
+                for (client, status), count in sorted(Counter(
+                    [(client_outcome(call), str(row["status"])) for call, row, _ in finals] +
+                    [(client_outcome(call), "no_row") for call in unmatched]).items())],
+            "model": dict(sorted(Counter(str(row["model"]) for _, row, _ in finals).items())),
             "effort_observed": {
-                column: dict(sorted(Counter(row[f"reasoning_effort_{column}"] for row in matched
+                column: dict(sorted(Counter(row[f"reasoning_effort_{column}"] for _, row, _ in finals
                                             if row[f"reasoning_effort_{column}"] is not None).items()))
                 for column in ("requested", "upstream")},
-            "effort_not_observed_rows": {column: sum(row[f"reasoning_effort_{column}"] is None for row in matched)
-                                         for column in ("requested", "upstream")},
+            "effort_not_observed_calls": {
+                column: sum(row[f"reasoning_effort_{column}"] is None for _, row, _ in finals)
+                for column in ("requested", "upstream")},
         }
-    return report
+    return report, problems
 
 
 def paired_tests(sample_a, sample_b, statistic, np, stats):
@@ -404,14 +498,33 @@ def holm(p_values):
                                        for role, p, r in zip(p_values, corrected, reject)}}
 
 
+def correlation_summary(calls):
+    """Sent ids per arm, the gateway's echoes of them, and the problems: echoes that differ, repeated ids."""
+    report = {arm: {"calls": sum(call["arm"] == arm for call in calls),
+                    "sent_ids": sum(call["arm"] == arm and call["sent_id"] is not None for call in calls),
+                    "echoed": sum(call["arm"] == arm and call["correlation_id"] is not None for call in calls),
+                    "echo_mismatch": sum(call["arm"] == arm and call["correlation_id"] is not None and
+                                         call["correlation_id"] != call["sent_id"] for call in calls)}
+              for arm in ("A", "B")}
+    counts = Counter(call["sent_id"] for call in calls if call["sent_id"])
+    problems = [f"sent correlation id used by {count} calls" for count in sorted(
+        count for count in counts.values() if count > 1)]
+    return report, problems
+
+
 def analyze(results_by_run, repeats, call_logs=None):
     import numpy as np
 
-    runs = {run: [call_record(row, run) for row in result_rows(data)] for run, data in results_by_run.items()}
-    calls = [call for run_calls in runs.values() for call in run_calls]
+    runs = {run: run_calls(data, run) for run, data in results_by_run.items()}
+    calls = [call for members in runs.values() for call in members]
     pairs, problems = pair_calls(runs, repeats)
     problems += sorted({f"{call['run']} {call['arm']} {call['accession']}: {problem}"
                         for call in calls for problem in call["problems"]})
+    correlation, correlation_problems = correlation_summary(calls)
+    problems += correlation_problems
+    if call_logs is not None:
+        call_log_report, call_log_problems = call_log_summary(call_logs, calls)
+        problems += call_log_problems
     filings, table_a, table_b = filing_table(pairs)
     tests = quality_tests(table_a, table_b)
     arms = {arm: arm_summary([pair[arm] for pair in pairs], np) for arm in ("A", "B")}
@@ -420,8 +533,9 @@ def analyze(results_by_run, repeats, call_logs=None):
         "status": "analysis" if not problems else "analysis-with-problems",
         "problems": problems,
         "pairs": len(pairs), "filings": len(filings), "repeats": repeats,
-        "runs": {run: {"calls": len(run_calls), "eval_id": results_by_run[run].get("evalId")}
-                 for run, run_calls in runs.items()},
+        "runs": {run: {"calls": len(members), "eval_id": results_by_run[run].get("evalId")}
+                 for run, members in runs.items()},
+        "correlation": correlation,
         "micro_f1": {"A": micro_f1(table_a), "B": micro_f1(table_b)},
         "tests": tests,
         "holm": holm({ROLES[0]: tests["permutation_b_minus_a"]["p_value_greater"]}),
@@ -434,24 +548,32 @@ def analyze(results_by_run, repeats, call_logs=None):
                      "statsmodels": installed("statsmodels")},
     }
     if call_logs is not None:
-        report["call_logs"] = call_log_summary(call_logs, calls)
+        report["call_logs"] = call_log_report
     return report
 
 
 def correlation_ids(paths):
-    ids = {"A": [], "B": []}
+    """The sent correlation id of every call per arm, rebuilt from the results files. Refuses when an id the
+    gateway echoed differs from the rebuilt one, since call_logs would then be joined on wrong ids."""
+    ids, mismatched = {"A": [], "B": []}, 0
     for path in paths:
-        for row in result_rows(json.loads(Path(path).read_text())):
-            identifier = r02_metadata(row).get("correlation_id")
-            if identifier:
-                ids[ARM_LABELS[row["provider"]["label"]]].append(identifier)
+        try:
+            calls = sent_calls(json.loads(Path(path).read_text()))
+        except ValueError as error:
+            raise SystemExit(f"{Path(path).name}: {error}") from error
+        for arm, identifier, echoed in calls:
+            ids[arm].append(identifier)
+            mismatched += echoed is not None and echoed != identifier
+    if mismatched:
+        raise SystemExit(f"the gateway's X-Correlation-Id differs from the rebuilt sent id for {mismatched} calls")
     return ids
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    ids = commands.add_parser("ids", help="correlation ids per arm, for call_logs_by_correlation.py")
+    ids = commands.add_parser("ids", help="the sent correlation id of every call per arm, for "
+                                          "call_logs_by_correlation.py")
     ids.add_argument("--results", nargs="+", required=True)
     run = commands.add_parser("analyze", help="paired statistics and the preregistered decision")
     run.add_argument("--results-ab", required=True)

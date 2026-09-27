@@ -175,6 +175,29 @@ process.stdout.write(JSON.stringify(cases.map((item) => {
         self.assertIsNone(result["metadata"]["r02"]["correlation_id"])
         self.assertEqual(result["output"], '{"items":["7.01"]}')
 
+    def test_rate_limit_headers_and_dropped_count_go_to_r02_metadata(self):
+        # Open question 3: the gateway's rate-limit forwarding class is any name containing "ratelimit" or
+        # "rate-limit" (OmniRoute@dd6e9607e:open-sse/handlers/chatCore/responseHeaders.ts:145).
+        headers = {**OK["headers"], "x-ratelimit-remaining-requests": "12", "X-RateLimit-Limit": "100",
+                   "ratelimit-reset": "30", "x-codex-primary-used-percent": "4", "retry-after": "1",
+                   "X-OmniRoute-Dropped-Upstream-Headers": "2"}
+        expected = {"x-ratelimit-remaining-requests": "12", "x-ratelimit-limit": "100", "ratelimit-reset": "30"}
+        success, failure, plain = self.run_cases([
+            {"text": content_stream(), "response": {**OK, "headers": headers}},
+            {"text": '{"error": {}}', "json": {"error": {}},
+             "response": {**OK, "status": 503, "statusText": "Service Unavailable", "headers": headers}},
+            {"text": content_stream()},
+        ])
+        for result in (success, failure):
+            self.assertEqual(result["metadata"]["r02"]["rate_limit_headers"], expected)
+            self.assertEqual(result["metadata"]["r02"]["dropped_upstream_headers"], "2")
+            # promptfoo redacts x-ratelimit-* in metadata.http.headers; none are copied there.
+            self.assertEqual(result["metadata"]["http"]["headers"], {"x-correlation-id": "cid-fixture-1"})
+        self.assertEqual(success["output"], '{"items":["7.01"]}')
+        self.assertTrue(failure["error"].startswith("http_status_503: "))
+        self.assertEqual(plain["metadata"]["r02"]["rate_limit_headers"], {})
+        self.assertIsNone(plain["metadata"]["r02"]["dropped_upstream_headers"])
+
 
 class AssertionTests(unittest.TestCase):
     """assert_r02.get_assert: li26's parse_items and filing_scores as a promptfoo Python assertion."""
@@ -272,10 +295,12 @@ class ConfigTests(unittest.TestCase):
                 self.assertEqual(settings["transformResponse"], "file://transform_r02.js")
                 headers = settings["headers"]
                 self.assertEqual(set(headers), {"Content-Type", "x-omniroute-session", "Idempotency-Key",
-                                                "X-OmniRoute-No-Cache"})
+                                                "X-Correlation-Id", "X-OmniRoute-No-Cache"})
+                self.assertFalse({name.lower() for name in headers} & {"authorization", "x-api-key"})
                 self.assertEqual(headers["x-omniroute-session"],
                                  f"r02-{key}-{{{{accession}}}}-r{{{{__repeatIndex}}}}-{{{{__evalId}}}}")
                 self.assertEqual(headers["Idempotency-Key"], f"r02-{key}-{{{{__evalId}}}}-{{{{__evalStepId}}}}")
+                self.assertEqual(headers["X-Correlation-Id"], headers["Idempotency-Key"])
                 self.assertEqual(headers["X-OmniRoute-No-Cache"], "true")
                 body = settings["body"]
                 self.assertEqual(set(body), {"model", "messages", "stream", "stream_options", "response_format"})
@@ -291,11 +316,25 @@ class ConfigTests(unittest.TestCase):
         first, second = (copy.deepcopy(provider["config"]) for provider in config["providers"])
         for settings in (first, second):
             settings["body"].pop("model")
-            for name in ("x-omniroute-session", "Idempotency-Key"):
+            for name in ("x-omniroute-session", "Idempotency-Key", "X-Correlation-Id"):
                 settings["headers"][name] = settings["headers"][name][len("r02-a-"):]
         self.assertEqual(first, second)
         self.assertEqual(BUILD.ARMS, {"A": {"model": "cx/gpt-6-astra", "key": "a"},
                                       "B": {"model": "cx/gpt-6-astra-max", "key": "b"}})
+        self.assertEqual(ANALYZE.ARM_KEYS, {arm: entry["key"] for arm, entry in BUILD.ARMS.items()})
+
+    def test_analysis_rebuilds_the_rendered_correlation_id(self):
+        # promptfoo renders __evalStepId as test-<testIdx>-prompt-<promptIdx>-repeat-<repeatIndex>
+        # (promptfoo@0.123.1:dist/src/evaluator-DlYW7Rgb.js:7599-7605); the echo check observed it on the wire.
+        eval_id = "eval-Ab3-2026-09-27T20:00:00"
+        for arm in ("A", "B"):
+            template = BUILD.provider(arm, self.schema)["config"]["headers"]["X-Correlation-Id"]
+            rendered = template.replace("{{__evalId}}", eval_id).replace("{{__evalStepId}}",
+                                                                          "test-5-prompt-1-repeat-2")
+            self.assertEqual(rendered, ANALYZE.sent_id(arm, eval_id, 5, 1, 2))
+            self.assertNotIn("{{", rendered)
+            # The gateway keeps a caller id of 1-256 characters (correlationPreserve.ts:6-12).
+            self.assertLessEqual(len(rendered), 256)
 
 
 def synthetic_rows(count=360, seed=7):
@@ -392,6 +431,9 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(PLAN["request"]["body_fields"], sorted(provider["body"]))
         self.assertEqual(PLAN["request"]["headers"]["x-omniroute-session"],
                          "r02-<arm key>-{{accession}}-r{{__repeatIndex}}-{{__evalId}}")
+        self.assertEqual(PLAN["request"]["headers"]["X-Correlation-Id"],
+                         PLAN["request"]["headers"]["Idempotency-Key"])
+        self.assertEqual(set(PLAN["request"]["headers"]) - {"Authorization"}, set(provider["headers"]))
         self.assertEqual(PLAN["request"]["schema_sha256"], sha256(BUILD.canonical(schema)))
         self.assertTrue({"temperature", "top_p", "seed", "max_tokens", "top_k", "cache_prompt",
                          "chat_template_kwargs"} <= set(PLAN["request"]["not_sent"]))
@@ -421,11 +463,17 @@ class CallLogsTests(unittest.TestCase):
                            "status INTEGER, model TEXT, reasoning_effort_requested TEXT, "
                            "reasoning_effort_upstream TEXT, account_id TEXT, connection_id TEXT, request_body TEXT, "
                            "artifact_path TEXT, tokens_in INTEGER)")
-        rows = [("cid-a-1", "2026-09-27T10:00:01Z", 200, "gpt-6-astra", None, None),
-                ("cid-b-1", "2026-09-27T10:00:02Z", 200, "gpt-6-astra-max", None, "max"),
-                ("cid-b-2", "2026-09-27T10:00:03Z", 429, "gpt-6-astra-max", None, None),
-                ("cid-b-2", "2026-09-27T10:00:04Z", 200, "gpt-6-astra-max", None, "max"),
-                ("cid-other", "2026-09-27T10:00:05Z", 200, "gpt-6-astra-max", None, "max")]
+        # Rows in insertion (rowid) order. cid-b-3's two attempts share a timestamp, so insertion order decides;
+        # cid-b-4's later attempt was inserted first, so the timestamp decides.
+        rows = [("cid-a-1", "2026-09-27T10:00:01.000Z", 200, "gpt-6-astra", None, None),
+                ("cid-b-1", "2026-09-27T10:00:02.000Z", 200, "gpt-6-astra-max", None, "max"),
+                ("cid-b-2", "2026-09-27T10:00:03.000Z", 429, "gpt-6-astra-max", None, None),
+                ("cid-b-2", "2026-09-27T10:00:04.000Z", 200, "gpt-6-astra-max", None, "max"),
+                ("cid-other", "2026-09-27T10:00:05.000Z", 200, "gpt-6-astra-max", None, "max"),
+                ("cid-b-3", "2026-09-27T10:00:06.000Z", 503, "gpt-6-astra-max", None, None),
+                ("cid-b-3", "2026-09-27T10:00:06.000Z", 200, "gpt-6-astra-max", None, "max"),
+                ("cid-b-4", "2026-09-27T10:00:08.000Z", 200, "gpt-6-astra-max", None, "max"),
+                ("cid-b-4", "2026-09-27T10:00:07.000Z", 503, "gpt-6-astra-max", None, None)]
         for row in rows:
             connection.execute("INSERT INTO call_logs (correlation_id, timestamp, status, model, "
                                "reasoning_effort_requested, reasoning_effort_upstream, account_id, connection_id, "
@@ -442,6 +490,8 @@ class CallLogsTests(unittest.TestCase):
                                              "reasoning_effort_requested", "reasoning_effort_upstream"))
         self.assertTrue(CALL_LOGS.QUERY.startswith(f"SELECT {', '.join(CALL_LOGS.COLUMNS)} FROM call_logs WHERE "
                                                    "correlation_id IN ("))
+        # rowid only orders an id's rows; it is never selected.
+        self.assertTrue(CALL_LOGS.QUERY.endswith(") ORDER BY correlation_id, timestamp, rowid"))
         before = hashlib.sha256(self.db.read_bytes()).hexdigest()
         rows = CALL_LOGS.lookup(self.db, ["cid-a-1", "cid-b-2", "cid-missing"])
         self.assertEqual(hashlib.sha256(self.db.read_bytes()).hexdigest(), before)
@@ -451,17 +501,29 @@ class CallLogsTests(unittest.TestCase):
             self.assertNotIn(value, text)
 
     def test_summary_and_unmatched(self):
-        arms = {"A": ["cid-a-1", "cid-a-missing"], "B": ["cid-b-1", "cid-b-2"]}
+        arms = {"A": ["cid-a-1", "cid-a-missing"], "B": ["cid-b-1", "cid-b-2", "cid-b-3", "cid-b-4"]}
         rows = CALL_LOGS.lookup(self.db, [identifier for ids in arms.values() for identifier in ids])
         summary = CALL_LOGS.summarize(arms, rows, include_rows=True)
-        self.assertEqual((summary["A"]["rows"], summary["A"]["unmatched"]), (1, ["cid-a-missing"]))
+        self.assertEqual((summary["A"]["rows"], summary["A"]["ids_matched"], summary["A"]["unmatched"]),
+                         (1, 1, ["cid-a-missing"]))
         self.assertEqual(summary["A"]["rows_per_id"], {0: 1, 1: 1})
-        self.assertEqual((summary["B"]["rows"], summary["B"]["unmatched"]), (3, []))
-        self.assertEqual(summary["B"]["rows_per_id"], {1: 1, 2: 1})
-        groups = {(group["status"], group["upstream"]): group["count"]
-                  for group in summary["B"]["by_status_model_requested_upstream"]}
-        self.assertEqual(groups, {(200, "max"): 2, (429, None): 1})
-        self.assertEqual(len(summary["B"]["matched_rows"]), 3)
+        self.assertEqual((summary["B"]["rows"], summary["B"]["ids_matched"], summary["B"]["unmatched"]), (7, 4, []))
+        self.assertEqual(summary["B"]["rows_per_id"], {1: 1, 2: 3})
+        self.assertEqual(summary["B"]["retried_ids"], ["cid-b-2", "cid-b-3", "cid-b-4"])
+
+        def groups(key):
+            return {(group["status"], group["upstream"]): group["count"] for group in summary["B"][key]}
+
+        self.assertEqual(groups("all_rows_by_status_model_requested_upstream"),
+                         {(200, "max"): 4, (429, None): 1, (503, None): 2})
+        self.assertEqual(groups("final_rows_by_status_model_requested_upstream"), {(200, "max"): 4})
+        attempts = [(row["correlation_id"], row["status"], row["attempt"], row["attempts"], row["final"])
+                    for row in summary["B"]["matched_rows"]]
+        self.assertEqual(attempts, [("cid-b-1", 200, 1, 1, True),
+                                    ("cid-b-2", 429, 1, 2, False), ("cid-b-2", 200, 2, 2, True),
+                                    ("cid-b-3", 503, 1, 2, False), ("cid-b-3", 200, 2, 2, True),
+                                    ("cid-b-4", 503, 1, 2, False), ("cid-b-4", 200, 2, 2, True)])
+        self.assertEqual(CALL_LOGS.summarize({"B": ["cid-b-1", "cid-b-1"]}, rows)["B"]["duplicate_ids"], 1)
 
     def test_batches_and_command_line(self):
         ids = [f"cid-missing-{index}" for index in range(1200)] + ["cid-b-1"]
@@ -479,14 +541,16 @@ class CallLogsTests(unittest.TestCase):
             CALL_LOGS.main([str(self.db), str(ids_file)])
 
 
-def result_row(arm, test_idx, accession, labels, output=None, error=None, usage=None, cid=None, latency=1000):
+def result_row(arm, test_idx, accession, labels, output=None, error=None, usage=None, cid=None, latency=1000,
+               prompt_idx=0, rate_limit_headers=None):
     """One promptfoo 0.123.1 result row as `-o results.json` persists it."""
     variables = {"accession": accession, "document": "Synthetic filing.", "labels_json": json.dumps(labels),
                  "prompt_sha256": "[REDACTED]"}
     row = {"provider": {"id": "http://127.0.0.1:20128/v1/chat/completions", "label": f"r02-{arm}"},
-           "vars": variables, "testIdx": test_idx, "promptIdx": 0 if arm == "A" else 1, "latencyMs": latency}
+           "vars": variables, "testIdx": test_idx, "promptIdx": prompt_idx, "latencyMs": latency}
     metadata = {"http": {"status": 200, "headers": {"x-correlation-id": "[REDACTED]"}},
-                "r02": {"correlation_id": cid, "usage": usage}}
+                "r02": {"correlation_id": cid, "usage": usage, "rate_limit_headers": rate_limit_headers or {},
+                        "dropped_upstream_headers": None}}
     if error is not None:
         row.update({"success": False, "failureReason": 2, "error": error, "score": 0, "namedScores": {},
                     "response": {"error": error, "metadata": metadata} if cid else None})
@@ -509,17 +573,26 @@ def usage(completion, reasoning=0, prompt=1500, cached=0):
     return value
 
 
+def rendered_id(arm, eval_id, test_idx, prompt_idx, repeat):
+    """The config's X-Correlation-Id with promptfoo's runtime vars filled in: __evalStepId is
+    test-<testIdx>-prompt-<promptIdx>-repeat-<repeatIndex> (dist/src/evaluator-DlYW7Rgb.js:7599-7605)."""
+    return f"r02-{arm.lower()}-{eval_id}-test-{test_idx}-prompt-{prompt_idx}-repeat-{repeat}"
+
+
 def results_file(eval_id, filings, orders, repeats=3, outputs=None):
-    """A promptfoo results file: tests in order, each repeat a new testIdx, the providers in `orders`."""
+    """A promptfoo results file: tests in order, each repeat a new testIdx, the providers in `orders` (the prompt
+    column index follows the provider order). Each row carries the gateway's echo of its sent id unless its
+    spec sets `cid`."""
     outputs = outputs or {}
     rows, test_idx = [], 0
     for accession, labels in filings:
         for repeat in range(repeats):
-            for arm in orders:
+            for prompt_idx, arm in enumerate(orders):
                 spec = outputs.get((accession, repeat, arm)) or outputs.get(arm) or {}
-                rows.append(result_row(arm, test_idx, accession, labels, cid=f"cid-{eval_id}-{test_idx}-{arm}",
+                rows.append(result_row(arm, test_idx, accession, labels, prompt_idx=prompt_idx,
+                                       cid=spec.get("cid", rendered_id(arm, eval_id, test_idx, prompt_idx, repeat)),
                                        latency=spec.get("latency", 1000),
-                                       **{key: value for key, value in spec.items() if key != "latency"}))
+                                       **{key: value for key, value in spec.items() if key not in ("latency", "cid")}))
             test_idx += 1
     return {"evalId": eval_id, "results": {"version": 3, "results": rows}}
 
@@ -560,7 +633,7 @@ class AnalysisTests(unittest.TestCase):
         data = results_file("eval-ab", FILINGS[:2], ("A", "B"), outputs={
             "A": {"output": '{"items": ["7.01"]}', "usage": usage(20)},
             "B": {"output": '{"items": ["7.01", "9.01"]}', "usage": usage(60, reasoning=40)}})
-        runs = {"ab": [ANALYZE.call_record(row, "ab") for row in ANALYZE.result_rows(data)]}
+        runs = {"ab": ANALYZE.run_calls(data, "ab")}
         pairs, problems = ANALYZE.pair_calls(runs, 3)
         self.assertEqual(problems, [])
         self.assertEqual(len(pairs), 6)
@@ -577,7 +650,7 @@ class AnalysisTests(unittest.TestCase):
         rows = ANALYZE.result_rows(data)
         del rows[-1]
         rows[0]["namedScores"]["tp"] = 5
-        runs = {"ab": [ANALYZE.call_record(row, "ab") for row in rows]}
+        runs = {"ab": ANALYZE.run_calls(data, "ab")}
         pairs, problems = ANALYZE.pair_calls(runs, 2)
         self.assertEqual(len(pairs), 1)
         self.assertIn("ab: testIdx 1 lacks an arm", problems)
@@ -588,14 +661,55 @@ class AnalysisTests(unittest.TestCase):
 
     def test_errors_score_as_not_returned(self):
         data = results_file("eval-ab", FILINGS[1:2], ("A", "B"), repeats=1, outputs={
-            "A": {"error": "HttpRateLimitError: Rate limit exceeded: HTTP 429 Too Many Requests"},
+            "A": {"error": "HttpRateLimitError: Rate limit exceeded: HTTP 429 Too Many Requests", "cid": None},
             "B": {"error": "sse_error_event: {\"message\": \"x\"}", "usage": None}})
-        data["results"]["results"][0]["response"] = None
-        calls = [ANALYZE.call_record(row, "ab") for row in ANALYZE.result_rows(data)]
+        self.assertIsNone(ANALYZE.result_rows(data)[0]["response"])
+        calls = ANALYZE.run_calls(data, "ab")
         self.assertEqual([(call["tp"], call["fp"], call["fn"]) for call in calls], [(0, 0, 2), (0, 0, 2)])
         self.assertEqual([call["error_kind"] for call in calls], ["http_429", "sse_error_event"])
+        # A call thrown before the transform has no echoed id, but its sent id is rebuilt.
         self.assertIsNone(calls[0]["correlation_id"])
-        self.assertIsNotNone(calls[1]["correlation_id"])
+        self.assertEqual(calls[0]["sent_id"], rendered_id("A", "eval-ab", 0, 0, 0))
+        self.assertEqual(calls[1]["correlation_id"], calls[1]["sent_id"])
+        self.assertEqual([call["problems"] for call in calls], [[], []])
+
+    def test_sent_ids_are_rebuilt_for_every_call(self):
+        # BA order: B is the first provider, so its prompt column index is 0.
+        data = results_file("eval-ba", FILINGS[:2], ("B", "A"), repeats=2, outputs={
+            "A": {"output": "{}"}, "B": {"output": "{}"},
+            (FILINGS[1][0], 1, "A"): {"error": "Error: Request timed out after 300000 ms", "cid": None}})
+        rows = ANALYZE.result_rows(data)
+        self.assertEqual(ANALYZE.repeat_by_step(rows), {0: 0, 1: 1, 2: 0, 3: 1})
+        expected = {"A": [rendered_id("A", "eval-ba", step, 1, step % 2) for step in range(4)],
+                    "B": [rendered_id("B", "eval-ba", step, 0, step % 2) for step in range(4)]}
+        self.assertEqual({arm: [identifier for row_arm, identifier, _ in ANALYZE.sent_calls(data)
+                                if row_arm == arm] for arm in ("A", "B")}, expected)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "results.json"
+            path.write_text(json.dumps(data))
+            self.assertEqual(ANALYZE.correlation_ids([path]), expected)
+            # The repeat is testIdx minus the filing's smallest testIdx, whatever the row order.
+            data["results"]["results"].reverse()
+            path.write_text(json.dumps(data))
+            self.assertEqual({arm: sorted(ids) for arm, ids in ANALYZE.correlation_ids([path]).items()},
+                             {arm: sorted(ids) for arm, ids in expected.items()})
+
+    def test_echo_mismatch_and_missing_eval_id_are_refused(self):
+        data = results_file("eval-ab", FILINGS[:1], ("A", "B"), repeats=1,
+                            outputs={"A": {"output": "{}", "cid": "gateway-generated-id"}, "B": {"output": "{}"}})
+        calls = ANALYZE.run_calls(data, "ab")
+        self.assertEqual(calls[0]["problems"], ["the gateway's X-Correlation-Id differs from the sent id"])
+        self.assertEqual(ANALYZE.correlation_summary(calls)[0]["A"],
+                         {"calls": 1, "sent_ids": 1, "echoed": 1, "echo_mismatch": 1})
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "results.json"
+            path.write_text(json.dumps(data))
+            with self.assertRaises(SystemExit):
+                ANALYZE.correlation_ids([path])
+            del data["evalId"]
+            path.write_text(json.dumps(data))
+            with self.assertRaises(SystemExit):
+                ANALYZE.correlation_ids([path])
 
     def test_decision_rule(self):
         self.assertEqual(ANALYZE.decide(0.001, -0.5, 10, 20), "adopt_max")
@@ -603,6 +717,12 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(ANALYZE.decide(0.0, -0.021, 10, 20), "inconclusive")
         self.assertEqual(ANALYZE.decide(-0.1, 0.0, 30, 20), "inconclusive")
         self.assertEqual(ANALYZE.decide(-0.1, 0.0, None, 20), "inconclusive")
+
+    @staticmethod
+    def log_row(identifier, second, status, upstream=None):
+        """A call_logs row as call_logs_by_correlation.lookup returns it (the six allowlisted columns)."""
+        return {"correlation_id": identifier, "timestamp": f"2026-09-27T10:00:{second:02d}.000Z", "status": status,
+                "model": "gpt-6-astra", "reasoning_effort_requested": None, "reasoning_effort_upstream": upstream}
 
     def test_correlation_ids_and_call_log_join(self):
         data = results_file("eval-ab", FILINGS[:1], ("A", "B"), repeats=1,
@@ -612,27 +732,72 @@ class AnalysisTests(unittest.TestCase):
             path = Path(directory) / "results.json"
             path.write_text(json.dumps(data))
             ids = ANALYZE.correlation_ids([path])
-        self.assertEqual(ids, {"A": ["cid-eval-ab-0-A"], "B": ["cid-eval-ab-0-B"]})
-        calls = [ANALYZE.call_record(row, "ab") for row in ANALYZE.result_rows(data)]
-        call_logs = {"A": {"matched_rows": [{"correlation_id": "cid-eval-ab-0-A", "status": 200, "model": "m",
-                                             "reasoning_effort_requested": None, "reasoning_effort_upstream": None}]},
-                     "B": {"matched_rows": [
-                         {"correlation_id": "cid-eval-ab-0-B", "status": 429, "model": "m",
-                          "reasoning_effort_requested": None, "reasoning_effort_upstream": None},
-                         {"correlation_id": "cid-eval-ab-0-B", "status": 200, "model": "m",
-                          "reasoning_effort_requested": None, "reasoning_effort_upstream": "max"}]}}
-        summary = ANALYZE.call_log_summary(call_logs, calls)
+        self.assertEqual(ids, {"A": ["r02-a-eval-ab-test-0-prompt-0-repeat-0"],
+                               "B": ["r02-b-eval-ab-test-0-prompt-1-repeat-0"]})
+        calls = ANALYZE.run_calls(data, "ab")
+        # B: a 429 attempt, then the 200 attempt the client received.
+        rows = [self.log_row(ids["A"][0], 1, 200), self.log_row(ids["B"][0], 2, 429),
+                self.log_row(ids["B"][0], 3, 200, "max")]
+        call_logs = CALL_LOGS.summarize(ids, rows, include_rows=True)
+        summary, problems = ANALYZE.call_log_summary(json.loads(json.dumps(call_logs)), calls)
+        self.assertEqual(problems, [])
         self.assertEqual(summary["A"]["effort_observed"], {"requested": {}, "upstream": {}})
-        self.assertEqual(summary["A"]["effort_not_observed_rows"], {"requested": 1, "upstream": 1})
+        self.assertEqual(summary["A"]["effort_not_observed_calls"], {"requested": 1, "upstream": 1})
         self.assertEqual(summary["B"]["effort_observed"]["upstream"], {"max": 1})
-        self.assertEqual((summary["B"]["rows"], summary["B"]["http_429_rows"]), (2, 1))
+        self.assertEqual((summary["B"]["attempt_rows"], summary["B"]["http_429_attempt_rows"],
+                          summary["B"]["http_429_final"], summary["B"]["retried_calls"]), (2, 1, 0, 1))
+        self.assertEqual(summary["B"]["attempts_per_call"], {2: 1})
+        self.assertEqual(summary["B"]["final_status"], {"200": 1})
+        self.assertEqual(summary["B"]["attempt_status"], {"200": 1, "429": 1})
+
+    def test_final_rows_and_unmatched_calls_by_client_outcome(self):
+        # Two repeats per arm. A: repeat 0 graded; repeat 1 a client-side 429 thrown before the transform, whose
+        # gateway row is joined through its rebuilt id. B: repeat 0 graded after a 503 attempt; repeat 1 a
+        # timeout with no call_logs row.
+        data = results_file("eval-ab", FILINGS[:1], ("A", "B"), repeats=2, outputs={
+            "A": {"output": "{}"}, "B": {"output": "{}"},
+            (FILINGS[0][0], 1, "A"): {"error": "HttpRateLimitError: Rate limit exceeded: HTTP 429", "cid": None},
+            (FILINGS[0][0], 1, "B"): {"error": "Error: Request timed out after 300000 ms", "cid": None}})
+        calls = ANALYZE.run_calls(data, "ab")
+        a0, b0, a1, b1 = (call["sent_id"] for call in calls)
+        rows = [self.log_row(a0, 1, 200), self.log_row(b0, 2, 503), self.log_row(b0, 4, 200, "max"),
+                self.log_row(a1, 5, 429)]
+        call_logs = CALL_LOGS.summarize({"A": [a0, a1], "B": [b0, b1]}, rows, include_rows=True)
+        self.assertEqual((call_logs["B"]["retried_ids"], call_logs["B"]["unmatched"]), ([b0], [b1]))
+        summary, problems = ANALYZE.call_log_summary(call_logs, calls)
+        self.assertEqual(problems, [])
+        self.assertEqual((summary["A"]["calls_matched"], summary["A"]["calls_unmatched"]), (2, 0))
+        self.assertEqual(summary["A"]["final_status"], {"200": 1, "429": 1})
+        self.assertEqual((summary["A"]["http_429_final"], summary["A"]["http_429_attempt_rows"]), (1, 1))
+        self.assertEqual(summary["A"]["client_outcome_by_final_status"],
+                         [{"client": "http_429", "final_status": "429", "count": 1},
+                          {"client": "no_provider_error", "final_status": "200", "count": 1}])
+        self.assertEqual((summary["B"]["calls_matched"], summary["B"]["calls_unmatched"]), (1, 1))
+        self.assertEqual(summary["B"]["unmatched_by_client_outcome"], {"timeout": 1})
+        self.assertEqual((summary["B"]["retried_calls"], summary["B"]["final_status"]), (1, {"200": 1}))
+        self.assertEqual(summary["B"]["attempt_status"], {"200": 1, "503": 1})
+        self.assertEqual(summary["B"]["effort_observed"]["upstream"], {"max": 1})
+        self.assertEqual(summary["B"]["client_outcome_by_final_status"],
+                         [{"client": "no_provider_error", "final_status": "200", "count": 1},
+                          {"client": "timeout", "final_status": "no_row", "count": 1}])
+
+    def test_call_log_rows_without_attempt_numbers_are_a_problem(self):
+        data = results_file("eval-ab", FILINGS[:1], ("A", "B"), repeats=1,
+                            outputs={"A": {"output": "{}"}, "B": {"output": "{}"}})
+        calls = ANALYZE.run_calls(data, "ab")
+        unnumbered = {"A": {"matched_rows": [self.log_row(calls[0]["sent_id"], 1, 503),
+                                             self.log_row(calls[0]["sent_id"], 2, 200)]}}
+        summary, problems = ANALYZE.call_log_summary(unnumbered, calls)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("one final row", problems[0])
+        self.assertEqual(summary["A"]["final_status"], {})
 
     def test_filing_means_leave_out_filings_without_usage(self):
         data = results_file("eval-ab", FILINGS[:2], ("A", "B"), repeats=2, outputs={
             "A": {"output": "{}", "usage": usage(20)}, "B": {"output": "{}", "usage": usage(60, reasoning=40)},
             (FILINGS[1][0], 0, "A"): {"error": "Error: Request timed out after 300000 ms"},
             (FILINGS[1][0], 1, "A"): {"error": "Error: Request timed out after 300000 ms"}})
-        runs = {"ab": [ANALYZE.call_record(row, "ab") for row in ANALYZE.result_rows(data)]}
+        runs = {"ab": ANALYZE.run_calls(data, "ab")}
         pairs, _ = ANALYZE.pair_calls(runs, 2)
         sample_a, sample_b, left_out = ANALYZE.filing_means(pairs, "reasoning")
         self.assertEqual((sample_a, sample_b, left_out), ([0.0], [40.0], 1))
@@ -647,7 +812,8 @@ class StatisticsTests(unittest.TestCase):
                                 "ba": results_file("eval-ba", FILINGS[3:], ("B", "A"), outputs=outputs_ba)}, 3)
 
     def test_max_better_on_every_filing_is_adopted(self):
-        outputs = {"A": {"output": '{"items": []}', "usage": usage(20, cached=512), "latency": 1000},
+        outputs = {"A": {"output": '{"items": []}', "usage": usage(20, cached=512), "latency": 1000,
+                         "rate_limit_headers": {"x-ratelimit-remaining-requests": "12"}},
                    "B": {"usage": usage(60, reasoning=40), "latency": 4000}}
         per_filing = {}
         for accession, labels in FILINGS:
@@ -673,6 +839,10 @@ class StatisticsTests(unittest.TestCase):
         self.assertEqual(arm_a["reasoning_tokens"]["zero_share"], 1.0)
         self.assertEqual(arm_b["tokens_per_filing"]["visible_output"], 20.0)
         self.assertEqual(arm_a["strict_schema_validity"], 1.0)
+        self.assertEqual(arm_a["rate_limit_headers"],
+                         {"calls_with_any": 18, "names": {"x-ratelimit-remaining-requests": 18}})
+        self.assertEqual(arm_b["rate_limit_headers"], {"calls_with_any": 0, "names": {}})
+        self.assertEqual(report["correlation"]["A"], {"calls": 18, "sent_ids": 18, "echoed": 18, "echo_mismatch": 0})
 
     def test_identical_quality_and_cheaper_medium_keeps_medium(self):
         per_filing = {}
@@ -699,8 +869,7 @@ class StatisticsTests(unittest.TestCase):
         report = self.run_analysis(per_filing, per_filing)
         runs = {"ab": results_file("eval-ab", FILINGS[:3], ("A", "B"), outputs=per_filing),
                 "ba": results_file("eval-ba", FILINGS[3:], ("B", "A"), outputs=per_filing)}
-        calls = {run: [ANALYZE.call_record(row, run) for row in ANALYZE.result_rows(data)]
-                 for run, data in runs.items()}
+        calls = {run: ANALYZE.run_calls(data, run) for run, data in runs.items()}
         _, table_a, table_b = ANALYZE.filing_table(ANALYZE.pair_calls(calls, 3)[0])
         # scipy 1.18.1 draws one (n_resamples, n) index matrix (_resampling.py _bootstrap_resample, rng_integers)
         # and takes the linear 5th percentile (stats.quantile) for a one-sided "greater" bound.

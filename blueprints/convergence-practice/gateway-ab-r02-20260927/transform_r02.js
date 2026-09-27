@@ -23,9 +23,21 @@
 //   versus 1799-1830), which is what joins a failed call to call_logs by its correlation id.
 // - Non-200 statuses reach this function because validateStatus is unset (src/providers/http.ts:1488-1493,
 //   2716), except 429: with maxRetries 0, promptfoo throws before any transform (src/util/fetch/index.ts:
-//   681-714, 768-770), so a 429 is recorded from the thrown error's text and carries no correlation id.
+//   681-714, 768-770), so a 429 is recorded from the thrown error's text; analyze_r02.py rebuilds its
+//   correlation id from the caller-set header.
+// - Rate-limit headers (open question 3): every response header whose name contains "ratelimit" or
+//   "rate-limit", the class the gateway forwards from the upstream at priority 2 within its 768-byte budget
+//   (OmniRoute@dd6e9607e:open-sse/handlers/chatCore/responseHeaders.ts:51, 133-163, 245-304), and the
+//   gateway's count of upstream headers dropped over that budget (:49, 306-339) go into metadata.r02.
+//   promptfoo keeps none of them otherwise: the transform's metadata replaces the provider's metadata.http
+//   (promptfoo@0.123.1:dist/src/providers-BUaNtf-O.js:12936-12941, 13132-13136), and results redact
+//   x-ratelimit-* in metadata.http.headers (dist/src/evalResult-yO_CeNru.js:616-642, 668-681). A 200 whose
+//   X-RateLimit-Remaining, x-ratelimit-remaining-requests or x-ratelimit-remaining-tokens is "0" never reaches
+//   this function: with maxRetries 0 promptfoo fails it (dist/src/fetch-DpK1Rb6J.js:1200-1204, 1432-1453,
+//   1464-1495).
 
 const CORRELATION_HEADER = 'x-correlation-id';
+const DROPPED_HEADERS_HEADER = 'x-omniroute-dropped-upstream-headers';
 const MAX_ERROR_CHARS = 500;
 
 function headerValue(headers, name) {
@@ -37,6 +49,18 @@ function headerValue(headers, name) {
     }
   }
   return null;
+}
+
+function rateLimitHeaders(headers) {
+  const found = {};
+  if (!headers || typeof headers !== 'object') return found;
+  for (const [key, value] of Object.entries(headers).sort(([left], [right]) => left.localeCompare(right))) {
+    const name = key.toLowerCase();
+    if (name.includes('ratelimit') || name.includes('rate-limit')) {
+      found[name] = Array.isArray(value) ? value.join(',') : String(value);
+    }
+  }
+  return found;
 }
 
 function bounded(value) {
@@ -122,7 +146,11 @@ function tokenUsage(usage) {
 module.exports = (json, text, context) => {
   const response = (context && context.response) || {};
   const correlationId = headerValue(response.headers, CORRELATION_HEADER);
-  const r02 = { correlation_id: correlationId };
+  const r02 = {
+    correlation_id: correlationId,
+    rate_limit_headers: rateLimitHeaders(response.headers),
+    dropped_upstream_headers: headerValue(response.headers, DROPPED_HEADERS_HEADER),
+  };
   const metadata = {
     http: { status: response.status, statusText: response.statusText, headers: { [CORRELATION_HEADER]: correlationId } },
     r02,

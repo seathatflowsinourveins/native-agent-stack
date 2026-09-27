@@ -26,7 +26,7 @@
     "assertion": "assert_r02.py:get_assert, li26 eval_arm.parse_items and analyze.filing_scores",
     "transform": "transform_r02.js, the gateway's OpenAI chat SSE stream",
     "inputs": "build_r02.py",
-    "call_logs": "call_logs_by_correlation.py, read-only, six allowlisted columns",
+    "call_logs": "call_logs_by_correlation.py, read-only, six allowlisted columns; each id's rows numbered as attempts and the last marked final (correlation.final_row_rule)",
     "statistics": "analyze_r02.py under `uv run --with scipy==1.18.1 --with statsmodels==0.15.0 --with numpy`"
   },
   "request": {
@@ -57,6 +57,7 @@
       "Content-Type": "application/json",
       "x-omniroute-session": "r02-<arm key>-{{accession}}-r{{__repeatIndex}}-{{__evalId}}",
       "Idempotency-Key": "r02-<arm key>-{{__evalId}}-{{__evalStepId}}",
+      "X-Correlation-Id": "r02-<arm key>-{{__evalId}}-{{__evalStepId}}",
       "X-OmniRoute-No-Cache": "true",
       "Authorization": "not sent: the loopback gateway is keyless by the user's decision"
     },
@@ -204,14 +205,24 @@
     "absent_usage_details": "the gateway writes completion_tokens_details and prompt_tokens_details only when their counts are above 0 (OmniRoute@dd6e9607e:open-sse/translator/response/openai-responses.ts:1403-1419), so on a call that returned usage an absent detail counts as 0; the analysis also reports how many calls carried each detail",
     "latency": "promptfoo latencyMs per call, p50 and p95 (numpy percentile, linear)",
     "timeouts": "calls that failed with promptfoo's 'Request timed out after <ms> ms' (REQUEST_TIMEOUT_MS, default 300000)",
-    "http_429": "two partial counts, reported side by side: client-side HTTP 429 errors (promptfoo throws before the transform, so these carry no correlation id: promptfoo@0.123.1:src/util/fetch/index.ts:681-714, 768-770) and call_logs rows with status 429 under the arm's correlation ids (a slow-path failure arrives as an in-band error chunk on HTTP 200, OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685). Neither alone is complete; see open question 1",
+    "http_429": "per arm: client-side HTTP 429 errors (promptfoo throws before the transform: promptfoo@0.123.1:src/util/fetch/index.ts:681-714, 768-770), call_logs rows with status 429 over all attempts, and final rows with status 429; each call's client-side outcome is cross-tabulated with its final call_logs status. Every call's sent correlation id is rebuilt (correlation.sent_ids), so a client-side 429 and an in-band failure after a slow-path 200 (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685) both join their call_logs rows",
+    "rate_limit_headers": "per arm, the calls whose response carried a header named like ratelimit or rate-limit and the names seen (transform metadata.r02.rate_limit_headers), and the calls carrying the gateway's X-OmniRoute-Dropped-Upstream-Headers count; a call promptfoo fails on a remaining count of 0 is the error kind rate_limit_header",
     "other_errors": "transform errors (sse_error_event, malformed_sse_chunks, missing_terminal_chunk, missing_usage, not_an_sse_stream, http_status_<code>) and other provider errors, by kind"
   },
   "effort_measure": {
     "primary": "client-observed usage.completion_tokens_details.reasoning_tokens per call, attributable by correlation id; per-filing mean over repeats, arm B minus arm A, with the same paired filing bootstrap (one-sided lower bound) and samples permutation test as quality",
     "second_view": "completion_tokens (reasoning plus output), same tests",
     "zero_reasoning": "about 14% of max-effort turns return 0 reasoning tokens as model behaviour (token-save-practice-gpt6's measurement, relayed by the coordinator on 2026-09-27, not measured here), so a per-call zero is not a defect; compare the arms' distributions (mean, median, p95, zero share)",
-    "call_logs_columns": "secondary check only where non-NULL: reasoning_effort_requested and reasoning_effort_upstream are filled only when the response carried encrypted reasoning (OmniRoute@dd6e9607e:src/lib/usage/callLogs.ts:646-653); a NULL is no observation, never 'no effort'. The column allowlist stays exactly the six columns in call_logs_by_correlation.py; request bodies stay off-limits"
+    "call_logs_columns": "secondary check only where non-NULL, on each call's final row (correlation.final_row_rule): reasoning_effort_requested and reasoning_effort_upstream are filled only when the response carried encrypted reasoning (OmniRoute@dd6e9607e:src/lib/usage/callLogs.ts:646-653); a NULL is no observation, never 'no effort'. The column allowlist stays exactly the six columns in call_logs_by_correlation.py; request bodies stay off-limits"
+  },
+  "correlation": {
+    "header": "X-Correlation-Id, set by the caller for every call to the same value as Idempotency-Key (request.headers)",
+    "gateway": "a caller X-Correlation-Id is trimmed, has CR/LF removed and is kept when 1-256 characters long (OmniRoute@dd6e9607e:src/app/api/v1/chat/completions/route.ts:292-298, 322; src/shared/utils/correlationPreserve.ts:6-12) as the request id (src/sse/handlers/chat.ts:436), which call_logs stores as correlation_id (src/lib/usage/callLogs.ts:713, 786, 801) and the gateway returns as the X-Correlation-Id response header (src/sse/handlers/chatHelpers.ts:1172-1187; route.ts:313-314)",
+    "sent_ids": "analyze_r02.py rebuilds every call's sent id from the results file: evalId, testIdx, promptIdx and the repeat, which is testIdx minus the filing's smallest testIdx. promptfoo renders __evalStepId as test-<testIdx>-prompt-<promptIdx>-repeat-<repeatIndex> and does not persist it (promptfoo@0.123.1:dist/src/evaluator-DlYW7Rgb.js:7599-7619), but every result row keeps testIdx and promptIdx, including a provider error thrown before the transform (:8087-8100, 8133-8157), and a test's repeats take consecutive testIdx values (:8612-8643). `analyze_r02.py ids` refuses to continue when an id the gateway echoed differs from the rebuilt one",
+    "final_row_rule": "the gateway writes one call_logs row per attempt under the same correlation id (OmniRoute@dd6e9607e:open-sse/handlers/chatCore/attemptLogging.ts:549-557, 611), stamped with its write time (src/lib/usage/callLogs.ts:680). call_logs_by_correlation.py orders an id's rows by timestamp and then SQLite rowid (insertion order; used only to order, never returned), numbers them as attempts, and marks the last as the call's final row. Status, model and effort per call come from the final row; attempts per call, retried calls and 429 rows count all rows. Several rows for one id are gateway attempts, never separate calls: with maxRetries 0 promptfoo sends one request per result row. The analysis reports a problem when a matched call lacks exactly one final row or its attempts are not numbered 1..n",
+    "unmatched_calls": "a sent id with no call_logs row is counted per arm by the call's client-side outcome, never dropped; such calls include requests the gateway rejects before its attempt logging (a peer rejection, or backpressure when OMNI_MAX_CONCURRENT_CONNECTIONS is set: OmniRoute@dd6e9607e:src/sse/handlers/chat.ts:432-433, 439-442; src/sse/utils/backpressure.ts:25-67). call_logs writes are not awaited (attemptLogging.ts:557, 618; src/lib/usage/callLogs.ts:854-876), so call_logs is read after both runs have finished",
+    "choice": "rebuilding the sent ids, over a lookup by the run's evalId prefix: for a completed run the rebuilt ids cover every sent request",
+    "gap": "a run that stops before promptfoo writes -o has no results file to rebuild from, and the prefix lookup is not implemented"
   },
   "decision_rule": {
     "adopt_max": "the one-sided 95% lower bound of micro-F1(B) - micro-F1(A) is above 0",
@@ -259,10 +270,10 @@
       "ab": "f8eaf75c07189b8b794001bcb2333d40c9d95f0b64ee8b302552339f97f13e68",
       "ba": "32ef20c2f69982412c713f4a517fa82c372b0fcb4f8ed44356a349578808c54e"
     },
-    "configs_note": "identical to the committed configs except the description string, which then ended with '; DRAFT, not frozen'",
+    "configs_note": "differ from the committed configs in the description string, which then ended with '; DRAFT, not frozen', and in the X-Correlation-Id header, added afterwards (wire_recheck)",
     "filing": "0000073756-20-000025, the first test of tests-ab.jsonl",
     "outcome": "promptfoo exit 0, 2 passed; 2,986 prompt and 77 completion tokens, 37 of them reasoning",
-    "a_keys": "not observed: requestHeaders is absent from both result rows because promptfoo adds it only when context.debug is set (promptfoo@0.123.1:src/providers/http.ts:2734), which eval does not set. This is the brief's stop condition; it was reported, not worked around, and the rendered keys remain unobserved",
+    "a_keys": "not observed in this check: requestHeaders is absent from both result rows because promptfoo adds it only when context.debug is set (promptfoo@0.123.1:src/providers/http.ts:2734), which eval does not set, and the check's own promptfoo debug log redacts every rendered header value except Content-Type. This was the brief's stop condition; it was reported, not worked around. Resolved by echo_check without a gateway call",
     "b_effort": {
       "A": "1 call_logs row by correlation id: status 200, model gpt-6-astra, requested NULL, upstream NULL; no observation",
       "B": "1 call_logs row by correlation id: status 200, model gpt-6-astra-max, requested NULL, upstream max; consistent with max",
@@ -288,28 +299,114 @@
       "reading": "no prompt_tokens_details in either arm and no completion_tokens_details in arm A, which by the gateway's translator means 0 cached tokens in both and 0 reasoning tokens in A (openai-responses.ts:1403-1419)"
     },
     "d_fields": "strict json_schema response_format and stream_options returned HTTP 200 in both arms with output {\"items\":[\"7.01\"]}, parse valid, TP 1; no sampling field was sent, so there was nothing to fix and no re-run; latency A 1780 ms, B 4080 ms; the stream's model field is gpt-6-astra in both arms, the upstream model name (OmniRoute@dd6e9607e:open-sse/translator/response/openai-responses.ts:1016)",
-    "e_correlation_id": "the transform read a non-empty 36-character X-Correlation-Id from each streamed response, distinct across the arms, and copied it into metadata.http.headers and metadata.r02.correlation_id; the persisted results show metadata.http.headers x-correlation-id as [REDACTED] (promptfoo@0.123.1:src/models/evalResult.ts:199-213), so the analysis reads metadata.r02.correlation_id"
+    "e_correlation_id": "the transform read a non-empty 36-character X-Correlation-Id from each streamed response, distinct across the arms, and copied it into metadata.http.headers and metadata.r02.correlation_id; the persisted results show metadata.http.headers x-correlation-id as [REDACTED] (promptfoo@0.123.1:src/models/evalResult.ts:199-213), so the analysis reads metadata.r02.correlation_id. This id was gateway-generated; the configs now set it (wire_recheck.f_caller_correlation_id)"
+  },
+  "echo_check": {
+    "date": "2026-09-27",
+    "window_utc": [
+      "2026-09-27T21:14:14.341Z",
+      "2026-09-27T21:14:40.605Z"
+    ],
+    "gateway_calls": 0,
+    "server": "go-httpbin v2.25.0 (https://github.com/mccutchen/go-httpbin/releases/tag/v2.25.0), /anything; the linux-amd64 archive matched the release's checksums.txt and the binary matched the archive. Started with -host 127.0.0.1 on a free port and stopped afterwards; it exited and the port was closed",
+    "configs": "generated from the committed configs in a private 0700 directory; a recursive comparison showed they differ only in url (http://127.0.0.1:<port>/anything), transformResponse json, the removed defaultTest, the description and an absolute prompt path",
+    "url_guard": "every providers[*].config.url in both echo configs was exactly the go-httpbin loopback URL, with no :20128 and no omniroute; passed at generation and again immediately before the first eval",
+    "command": "PROMPTFOO_CONFIG_DIR=<private> PROMPTFOO_LOG_DIR=<private> PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval -c <echo config> -t ~/.local/state/native-agent-stack/gateway-ab-r02-20260927/tests-<ab|ba>.jsonl -n 2 --repeat 2 --max-concurrency 1 --no-cache --no-share -o <private>/echo-<ab|ba>.json",
+    "outcome": "each run exited 0 with 8 of 8 passed; go-httpbin logged 16 /anything requests",
+    "checks_passed_of_16": {
+      "four_headers_rendered_without_braces": 16,
+      "arm_prefix_of_session_idempotency_and_correlation_matches_provider": 16,
+      "session_key_is_r02_arm_accession_r_repeatIndex_evalId": 16,
+      "idempotency_key_equals_x_correlation_id": 16,
+      "x_correlation_id_equals_rebuilt_sent_id": 16,
+      "no_cache_true_content_type_json_post_no_authorization": 16,
+      "body_model_stream_include_usage_strict_schema_five_fields": 16,
+      "user_message_sha256_equals_tests_file": 16
+    },
+    "distinct_session_keys": 16,
+    "distinct_correlation_ids_across_both_runs": 16,
+    "correlation_id_characters": 59,
+    "coverage": "2 filings per run, repeats 0 and 1, both provider orders (in the BA run B is prompt column 0)",
+    "resolves": "wire_check.a_keys"
+  },
+  "wire_recheck": {
+    "date": "2026-09-27",
+    "window_utc": [
+      "2026-09-27T21:16:07.134Z",
+      "2026-09-27T21:16:27.448Z"
+    ],
+    "gateway_calls": 2,
+    "gateway_calls_total": 4,
+    "call_budget": 6,
+    "command": "as wire_check.command, with -o under ~/.local/state/native-agent-stack/gateway-ab-r02-20260927/wire-check/ (directory 0700, files 0600)",
+    "configs_sha256": {
+      "ab": "d05d542a8e1c3b2be00134f98d2f1bbe293b5dcc81dfc2f6e14751c2e2e014c9",
+      "ba": "4c665f0490668b02e1950740ba93b777803feaef124c84a50741d89dbb5b910d"
+    },
+    "transform_sha256": "c0ae04eb90b70e0b28ec620095fbfe5349e1c22e29f37ae3b6ba6dc9caa06f2c",
+    "filing": "0000073756-20-000025, the first test of tests-ab.jsonl",
+    "outcome": "promptfoo exit 0, 2 passed; both outputs parsed valid with TP 1",
+    "f_caller_correlation_id": {
+      "kept": true,
+      "http_200": 2,
+      "echoed_equals_sent": 2,
+      "sent_ids": "rebuilt from the results, a rebuild echo_check validated, because promptfoo persists no request headers; `analyze_r02.py ids` exited 0",
+      "call_logs": "call_logs_by_correlation.py found exactly the 2 sent ids, 1 row each; 0 retried, 0 unmatched",
+      "A": "status 200, model gpt-6-astra, requested NULL, upstream NULL; no observation",
+      "B": "status 200, model gpt-6-astra-max, requested NULL, upstream max; consistent with max",
+      "analysis_call_log_problems": 0
+    },
+    "usage": {
+      "A": {
+        "prompt_tokens": 1493,
+        "completion_tokens": 19,
+        "reasoning_tokens": "no detail (0 by the gateway's translator)"
+      },
+      "B": {
+        "prompt_tokens": 1493,
+        "completion_tokens": 59,
+        "reasoning_tokens": 38
+      }
+    },
+    "latency_ms": {
+      "A": 1010,
+      "B": 4639
+    },
+    "q3_rate_limit_headers": {
+      "source": "on a fast-path stream the gateway forwards upstream headers whose names contain ratelimit or rate-limit at priority 2, after request and correlation ids and Retry-After, within a 768-byte budget, and reports how many it dropped in X-OmniRoute-Dropped-Upstream-Headers (OmniRoute@dd6e9607e:open-sse/handlers/chatCore/responseHeaders.ts:49-51, 133-163, 245-352); a slow-path stream commits the keepalive wrapper's headers only (open-sse/utils/earlyStreamKeepalive.ts:21-31, 720-728)",
+      "observed": "no rate-limit-class header on either call",
+      "B": "fast path: only the handler's streaming headers carry the dropped-header count (responseHeaders.ts:337-339; open-sse/handlers/chatCore/streamingResponseHeaders.ts:34), and B's reported 10 upstream headers dropped over the budget; which headers were forwarded or dropped is not recorded",
+      "A": "no dropped-header count; its stream began with a keepalive chunk, which is the slow-path startup frame (earlyStreamKeepalive.ts:43-48; src/app/api/v1/chat/completions/route.ts:307-316) or the stream pipeline's heartbeat (open-sse/utils/sseHeartbeat.ts:62-70; open-sse/handlers/chatCore/streamingPipeline.ts:111-117). At the default 15 s heartbeat interval (src/shared/utils/runtimeTimeouts.ts:23) a 1010 ms call can only have received the startup frame, so A most likely took the slow path; the host's configured interval was not read",
+      "scope": "two calls on one host and day; not evidence that the upstream never sends such headers or that a forwarded one could never read 0"
+    }
   },
   "post_run": {
-    "call_logs": "python3 call_logs_by_correlation.py ~/.local/share/omniroute/storage.sqlite <ids.json> --rows > <private call-logs.json>, with ids.json from `analyze_r02.py ids`",
+    "call_logs": "python3 call_logs_by_correlation.py ~/.local/share/omniroute/storage.sqlite <ids.json> --rows > <private call-logs.json>, after both runs have finished, with ids.json from `analyze_r02.py ids` (the rebuilt sent id of every call)",
     "gateway_owner_handoff": "send each arm's correlation ids with the run window, arm tags (r02-A, r02-B) and key prefixes (r02-a-, r02-b-); the owner returns per arm the call count, distinct accounts and per-account call counts under masked labels shared across arms, call_logs status counts including 429, and any unmatched ids, plus a masked per-arm account-balance read. No connection or account ids are retained"
   },
   "limitations": [
     "The account behind each call is an uncontrolled factor: per-conversation session keys spread calls across the gateway's 4 accounts, and no account column is read here; the gateway owner supplies the masked per-arm distribution after the run.",
     "li26 is near ceiling for GPT-6 (0.992-0.995 for every tier, #359 and #397), so a quality difference is unlikely to be detectable; this is a cost and wire test with a non-inferiority bound.",
-    "Client-visible 429s carry no correlation id, and in-band slow-path failures show their 429 only in call_logs; see metrics.http_429.",
-    "A 200 response carrying x-ratelimit-remaining-requests, x-ratelimit-remaining-tokens or X-RateLimit-Remaining equal to 0 is treated by promptfoo as rate limited and, with maxRetries 0, fails (promptfoo@0.123.1:src/util/fetch/index.ts:375-388, 712-714); whether the gateway forwards such headers is unknown.",
+    "A call the gateway rejects before its attempt logging has no call_logs row; it is counted as unmatched by its client-side outcome (correlation.unmatched_calls). A run that stops before promptfoo writes -o cannot have its sent ids rebuilt (correlation.gap).",
+    "A 200 response carrying x-ratelimit-remaining-requests, x-ratelimit-remaining-tokens or X-RateLimit-Remaining equal to 0 is treated by promptfoo as rate limited and, with maxRetries 0, fails (promptfoo@0.123.1:src/util/fetch/index.ts:375-388, 712-714; installed dist/src/fetch-DpK1Rb6J.js:1200-1204, 1432-1453, 1464-1495). The gateway forwards rate-limit-class upstream headers on fast-path streams within its budget, and the re-check saw none on its 2 calls (wire_recheck.q3_rate_limit_headers). Such a failure is the error kind rate_limit_header, and call_logs still shows the gateway's side of the call through its rebuilt id.",
+    "Other clients (hindsight-live, cognee-live) call cx/gpt-6-astra-max through the same gateway, so call_logs is read by correlation id, never by window and model.",
     "call_logs effort columns stay NULL without encrypted reasoning, so arm A's medium effort is not directly observable here; the gateway owner's PR #423 is the evidence for it."
   ],
+  "open_questions": {
+    "1_correlation_id": "answered: the caller X-Correlation-Id is kept, returned and stored as call_logs.correlation_id (wire_recheck.f_caller_correlation_id)",
+    "2_rows_per_id": "partly answered from source: one row per attempt under the same id, handled by correlation.final_row_rule; open: does the gateway retry an upstream 429 on another account?",
+    "3_rate_limit_headers": "partly answered: forwarded on fast-path streams within a 768-byte budget, none seen on 2 calls (wire_recheck.q3_rate_limit_headers); open: does the Codex upstream send x-ratelimit-remaining-* at all, and can they survive the budget next to the Codex quota headers of the same priority?",
+    "4_arm_a_effort": "open: an observation of arm A's effective effort that does not depend on encrypted reasoning, besides PR #423"
+  },
   "frozen_inputs": {
-    "blueprints/convergence-practice/gateway-ab-r02-20260927/build_r02.py": "f351518f79fa513c147ac044c8434f6f5eb05f281f25c703af95da6dff9939a4",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/build_r02.py": "1ef73e1d40ad039cebc682271c401c24d6ad43870e906a4525eab76c7ef06b8d",
     "blueprints/convergence-practice/gateway-ab-r02-20260927/prompt_r02.py": "c4fb538527f0ca010dbc96cb8f1c5710d8c2ee9250c17c7808ca8a7a37f458d2",
     "blueprints/convergence-practice/gateway-ab-r02-20260927/assert_r02.py": "f42225eef40064c0b5e5523e3004f716de90a93bfd58e175aad72039d6fda0b8",
-    "blueprints/convergence-practice/gateway-ab-r02-20260927/transform_r02.js": "dc5b3ec15e356fb2058648c4a94311b8df4cb6b609c721dea1aaf090c889f88d",
-    "blueprints/convergence-practice/gateway-ab-r02-20260927/call_logs_by_correlation.py": "9c04300b9b66d807a00da46167574229604e7f4cc0b61e036595ef2cb7d0a73d",
-    "blueprints/convergence-practice/gateway-ab-r02-20260927/analyze_r02.py": "32a47be6674d47ae4aa628b60216ee1abcbb02451a75201aa8859a234679bb3d",
-    "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ab.json": "450b74cdef69a6e2f2a9a234fa7542efeb15e3e8073cc794ed8e7d73eb962640",
-    "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ba.json": "f1905fcc072927099db34f70f7759a6be236c973ec98ced9b12f4b4ba7aa5c5e",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/transform_r02.js": "c0ae04eb90b70e0b28ec620095fbfe5349e1c22e29f37ae3b6ba6dc9caa06f2c",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/call_logs_by_correlation.py": "84b63b2353d232fbd94ee3e115ce936e4b024ff47cadc3f68fdb4dbc26dee6e2",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/analyze_r02.py": "63cfb2606ac82f1e0cb621ba7638111fab46c5cb97fe6312fc7499f7671931fa",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ab.json": "d05d542a8e1c3b2be00134f98d2f1bbe293b5dcc81dfc2f6e14751c2e2e014c9",
+    "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ba.json": "4c665f0490668b02e1950740ba93b777803feaef124c84a50741d89dbb5b910d",
     "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc",
     "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be",
     "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt": "faf9273a6807e982154667a8654ec2cff637cf57c8d85c34093e615876ae1d58",

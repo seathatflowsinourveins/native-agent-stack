@@ -15,6 +15,7 @@
           "Content-Type": "application/json",
           "x-omniroute-session": "r02-a-{{accession}}-r{{__repeatIndex}}-{{__evalId}}",
           "Idempotency-Key": "r02-a-{{__evalId}}-{{__evalStepId}}",
+          "X-Correlation-Id": "r02-a-{{__evalId}}-{{__evalStepId}}",
           "X-OmniRoute-No-Cache": "true"
         },
         "body": {
@@ -102,6 +103,7 @@
           "Content-Type": "application/json",
           "x-omniroute-session": "r02-b-{{accession}}-r{{__repeatIndex}}-{{__evalId}}",
           "Idempotency-Key": "r02-b-{{__evalId}}-{{__evalStepId}}",
+          "X-Correlation-Id": "r02-b-{{__evalId}}-{{__evalStepId}}",
           "X-OmniRoute-No-Cache": "true"
         },
         "body": {
