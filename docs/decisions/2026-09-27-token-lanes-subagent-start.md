@@ -182,6 +182,8 @@ test suite or a new native model run.
   positive `general-purpose` child, none in the other two. This is one native
   operation per arm on Agent-tool children. It does not cover Workflow children,
   which WP1 shows also reach SubagentStart, nor lane use, compliance or savings.
+  The [carrier receipt](../../evidence/artifacts/token-lanes-subagent-start-20260927/README.md)
+  retains the prompts, replies, transcript counts, usage and the RTK hook checks.
 - The blind gate matches `agent_type` values starting `blind-`, which is how
   [`install_claude_profile.py`](../../tools/adoption/install_claude_profile.py)
   installs the blind agents (user agents). A plugin-shipped blind agent would
