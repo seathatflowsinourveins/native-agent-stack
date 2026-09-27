@@ -218,9 +218,9 @@ python3 tools/adoption/apply_codex_lane.py --apply --omniroute-profile --expect-
 - **Launch** `codex -p omniroute` only in a shell that exports `OMNIROUTE_API_KEY`: the gateway key stored under inventory id `omniroute` with [`tools/credentials/open_credential_terminal.sh`](../tools/credentials/open_credential_terminal.sh) `omniroute`, or any non-empty value for a keyless loopback gateway ([upstream guide, L65-75](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md?plain=1#L65-L75)). Without it Codex stops before any request and prints the profile's `env_key_instructions`. The profile's `[shell_environment_policy.filters]` keeps the variable out of every command the model runs, and `shell_snapshot = false` keeps it out of `$CODEX_HOME/shell_snapshots`.
 - **Workers** use the [landscape sweep's lane home](../tools/sota-convergence/landscape-sweep/README.md) (`build_args.py --gpt6-provider omniroute`), because a worker's one `--profile` slot holds `stack-worker`. `tests/test_codex_worker_lane.py` keeps its provider block equal to this profile's.
 - **Effort and gateway build.** OmniRoute 3.8.50 caps `gpt-6-astra` at `xhigh` (`clampEffort`, [`open-sse/executors/codex.ts:331-355`](https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/open-sse/executors/codex.ts#L331-L355)). Commit `a58000c7` on `release/v3.8.51` caps it at `ultra`, one level above `max` ([`reasoningSuffix.ts:1-31`](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/reasoningSuffix.ts#L1-L31)), so `max` passes with the gateway's Thinking Budget at passthrough. That commit alone does not serve this profile. Upstream [PR #14904](https://github.com/diegosouzapw/OmniRoute/pull/14904) reports HTTP 500 for every `/v1/responses` request on that branch. Search also needs `POST /v1/alpha/search` from [PR #13788](https://github.com/diegosouzapw/OmniRoute/pull/13788): `gpt-6-astra` runs on Responses Lite, which sends no hosted tools ([`spec_plan.rs:598-601`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/spec_plan.rs#L598-L601)), so Codex searches through the provider-relative `alpha/search` ([`endpoint/search.rs:14-15`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-api/src/endpoint/search.rs#L14-L15)). Both PRs were open on 2026-09-27. Max-effort GPT-6 lanes keep the native `openai` provider by default until a preregistered same-task comparison with native Codex passes.
-- **Never `omniroute run codex --model <id>`.** It passes the model only as `-c model_providers.omniroute.model=<id>` ([`bin/cli/commands/launch-codex.mjs:189-194`](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/cli/commands/launch-codex.mjs#L189-L194), called from `run.mjs:162`), which is not a provider field. Codex 0.157.1 warns that the setting is ignored, even under `--strict-config`, and runs the model its configuration names (measured 2026-09-27 in a scratch Codex home; strict mode checks a `-c` layer on its own, and a lone provider table fails to deserialize there, see the [decision's addendum](../docs/decisions/2026-09-26-codex-worker-lane.md#addendum-2026-09-27-start-up-allowances-the-gateway-profile-and-four-base-keys)). Choose the model with the profile or `-m`. Never set `name = "OpenAI"` on the provider: `is_openai()` compares only that display name ([`model-provider-info/src/lib.rs:601-603`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L601-L603)).
-- **`--strict-config`** loads `-p omniroute`, but at 0.157.1 it rejects `-p stack-worker` with "invalid transport" on that profile's first `[mcp_servers.*]` table: strict mode validates each configuration file on its own as a whole configuration ([`config/src/loader/mod.rs:594-600`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L594-L600) and [L625-645](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L625-L645)), and the profile's server tables name no command or URL. Start stack-worker lanes without it (measured 2026-09-27 in a scratch Codex home; `NAS_CODEX_INTEGRATION=1` runs both checks again).
-- A `config.toml` that still defines `[model_providers.omniroute]` is listed by the dry run as a host step. Back the file up privately and delete that table once the profile is in place.
+- **Never `omniroute run codex --model <id>`.** It defines the provider inline and passes the model only as `-c model_providers.omniroute.model=<id>` ([`bin/cli/commands/launch-codex.mjs:173-194`](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/cli/commands/launch-codex.mjs#L173-L194), called from `run.mjs:162`), which is not a provider field. With those flags Codex 0.157.1 warns that the setting is ignored and runs another model; under `--strict-config` it refuses to start with "unknown configuration field `model_providers.omniroute.model` in -c/--config override" (measured 2026-09-27 in a scratch Codex home; `NAS_CODEX_INTEGRATION=1` runs it again). Choose the model with the profile or `-m`. Never set `name = "OpenAI"` on the provider: `is_openai()` compares only that display name ([`model-provider-info/src/lib.rs:601-603`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L601-L603)).
+- **`--strict-config`** loads `-p omniroute`, but at 0.157.1 it rejects `-p stack-worker` with "invalid transport" on that profile's first `[mcp_servers.*]` table: strict mode validates each configuration file on its own as a whole configuration ([`config/src/loader/mod.rs:594-600`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L594-L600) and [L625-645](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L625-L645)), and the profile's server tables name no command or URL. Start stack-worker lanes without it (measured 2026-09-27 in a scratch Codex home; `NAS_CODEX_INTEGRATION=1` runs it again).
+- A `config.toml` that still carries the gateway route is listed by the dry run as a host step: a `[model_providers.omniroute]` table, `model_provider = "omniroute"` or a `cx/` model, the form of upstream's [guide](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md?plain=1#L26-L41). Once the profile is in place, back the file up privately and delete them together, restoring the template's `model`. A `model_provider` left without its table stops every launch without `-p omniroute` with "Model provider `omniroute` not found" (measured 2026-09-27 in a scratch Codex home). Read back with `codex debug prompt-input probe`, with and without `-p omniroute`.
 
 ## Native project MCP
 
@@ -495,29 +495,48 @@ client telemetry settings.
 
 ## Focused jCodeMunch retrieval
 
-Install the pinned upstream server with `uv tool install jcodemunch-mcp==1.108.319`.
+Install the pinned upstream server into the ecosystem prefix, the host value
+file's `ECO_ROOT`, where the project template runs `${ECO_ROOT}/bin/jcodemunch-mcp`
+(the uv-tool layout of [bootstrap step 4](../adoption/bootstrap.md)). A plain
+`uv tool install` puts the command in uv's own bin directory instead, and the
+rendered entry would name a missing file (changed after `v2026.09.26.2`):
+
+```sh
+eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
+  uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+"$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+```
+
 The retained upstream license is **Dual-Use License 1.1**; the bounded local
 acceptance does not establish eligibility for commercial deployment. Keep its
 default six-tool `counter` surface. Register it per project, never at user scope
 ([decision 2](../docs/decisions/2026-09-25-codex-mcp-scope.md)): its server
 instructions ("Prefer it over Read/Grep/Glob/Bash") would otherwise reach every
 session. Run these from the checkout, or linked worktree, that opts in. For Codex,
-render the project template there and read the entry back (changed after
-`v2026.09.26.2`); for Claude, use `local` scope:
+render the project template and copy only its jCodeMunch tables there, then read
+the entry back (changed after `v2026.09.26.2`); for Claude, use `local` scope:
 
 ```sh
 python3 "$PROJECT_ROOT/tools/adoption/render_config.py" --host <host> --out "$STACK_HOME/output/project-render"
 exclude=$(git rev-parse --git-path info/exclude)
 grep -qxF '/.codex/' "$exclude" || echo '/.codex/' >> "$exclude"
-test -e .codex/config.toml || install -D -m 600 \
-  "$STACK_HOME/output/project-render/project.codex.config.toml" .codex/config.toml
+test -e .codex/config.toml || (umask 077 && mkdir -p .codex && \
+  sed -n '/^\[mcp_servers\.jcodemunch\]/,$p' \
+  "$STACK_HOME/output/project-render/project.codex.config.toml" > .codex/config.toml)
 codex mcp get jcodemunch --json
 claude mcp add jcodemunch --scope local --transport stdio \
   --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
-  -- jcodemunch-mcp
+  -- "$eco/bin/jcodemunch-mcp"
 ```
 
-The rendered file holds this host's paths, so it stays untracked: `/.codex/` goes
+The `sed` range copies the rendered `[mcp_servers.jcodemunch]` tables, the
+template's last ones, and nothing else. The whole project template also sets
+`approval_policy`, `sandbox_mode`, `[agents]` and a shell `PATH`, and a project
+file outranks both the user config and its profiles
+(`codex-rs/config/src/config_layer_source.rs` L33-51 at `rust-v0.157.1`), so
+copying all of it would replace the user's own settings in that directory.
+The file holds this host's paths, so it stays untracked: `/.codex/` goes
 into the repository's private ignore list, which every linked worktree of the
 checkout shares ([gitrepository-layout](https://git-scm.com/docs/gitrepository-layout),
 `info`: `$GIT_COMMON_DIR/info` is used). The repository's `.gitignore` does not

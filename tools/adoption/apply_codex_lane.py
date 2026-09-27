@@ -19,8 +19,9 @@ The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes, four
   omniroute.config.toml
                 only with --omniroute-profile: the gateway profile, adoption/templates/codex.omniroute.config.toml,
                 for `codex -p omniroute` through a local OmniRoute. Created only when absent (or already identical).
-                A config.toml that still defines [model_providers.omniroute] is reported as a host step, because
-                the profile now carries that table and the lane sends no key it does not own.
+                A config.toml that still carries the gateway route ([model_providers.omniroute], model_provider =
+                "omniroute" or a cx/ model) is reported as a host step, because the profile now carries it and the
+                lane sends no key it does not own.
 
 Modes:
   (default)   dry run. Checks the preconditions, prints each planned change against the live files, then
@@ -77,6 +78,9 @@ PROFILE_TEMPLATE = TEMPLATES / "codex.stack-worker.config.toml"
 PROFILE_NAME = "stack-worker"
 OMNIROUTE_TEMPLATE = TEMPLATES / "codex.omniroute.config.toml"
 OMNIROUTE_PROFILE = "omniroute"
+# OmniRoute's Codex models carry this prefix (docs/guides/CODEX-CLI-CONFIGURATION.md L150-161 at a58000c7); a base
+# config.toml model with it belongs to the gateway route, not to Codex's native provider.
+GATEWAY_MODEL_PREFIX = "cx/"
 # User-scope servers whose template start-up allowance the lane restores when they are registered. A host that
 # registered them with `codex mcp add` has no value, so Codex waits its default 30 s (codex-mcp/src/rmcp_client.rs
 # L103 and L342 at rust-v0.157.1), while the template gives serena 60 s and socraticode 120 s.
@@ -448,19 +452,48 @@ class Plan:
         return file_state(self.omniroute_bytes, self.omniroute_template) if self.omniroute else None
 
     def base_provider_step(self) -> list[str]:
-        """Report lines when config.toml still defines the gateway provider the profile now carries (a host step)."""
-        if not self.omniroute or not get_path(self.live, ["model_providers", OMNIROUTE_PROFILE])[0]:
+        """Report lines when config.toml still carries the gateway route the profile now holds (a host step): the
+        [model_providers.omniroute] table, a top-level model_provider = "omniroute", or a model with OmniRoute's cx/
+        prefix, the form upstream's guide puts in config.toml. They go together: a model_provider left without its
+        table stops every launch without the profile with "Model provider `omniroute` not found"."""
+        if not self.omniroute:
+            return []
+        table = get_path(self.live, ["model_providers", OMNIROUTE_PROFILE])[0]
+        selector = self.live.get("model_provider") == OMNIROUTE_PROFILE
+        model = self.live.get("model")
+        gateway_model = isinstance(model, str) and model.startswith(GATEWAY_MODEL_PREFIX)
+        if not (table or selector or gateway_model):
             return []
         lines = self.config_bytes.decode("utf-8").splitlines()
-        found = [f"line {number}: {line.strip()}" for number, line in enumerate(lines, 1)
-                 if re.fullmatch(r"\[\s*model_providers\s*\.\s*\"?omniroute\"?\s*\]", line.strip())]
-        return ["  HOST STEP (not scripted; the lane sends only its own keys): config.toml defines "
-                "[model_providers.omniroute], which",
-                f"  {OMNIROUTE_PROFILE}.config.toml now carries. Once the profile is in place, back config.toml up "
-                "privately and delete that table:",
-                *[f"    {entry}" for entry in found or ["[model_providers.omniroute] (a dotted or inline form)"]],
-                "  Read back: `codex -p omniroute debug prompt-input probe` still renders, and `render_config.py "
-                "--check` no longer lists the table."]
+        # Top-level keys come before the first table header.
+        top_level = next((index for index, line in enumerate(lines) if line.lstrip().startswith("[")), len(lines))
+        found = {"table": [], "selector": [], "model": []}  # each: (line number, text) pairs
+        for number, line in enumerate(lines, 1):
+            text = line.strip()
+            if re.fullmatch(r"\[\s*model_providers\s*\.\s*\"?omniroute\"?\s*\]", text):
+                found["table"].append((number, text))
+            elif number <= top_level and re.match(r"\"?model_provider\"?\s*=", text):
+                found["selector"].append((number, text))
+            elif number <= top_level and re.match(r"\"?model\"?\s*=", text):
+                found["model"].append((number, text))
+        wanted = {"table": table, "selector": selector, "model": gateway_model}
+        entries = [f"line {number}: {text}"
+                   for number, text in sorted(hit for part, hits in found.items() if wanted[part] for hit in hits)]
+        # A form this scan does not see (a dotted or inline table, a quoted key) is still named.
+        entries += [text for part, text in (("table", "[model_providers.omniroute] (a dotted or inline form)"),
+                                            ("selector", f'model_provider = "{OMNIROUTE_PROFILE}"'),
+                                            ("model", f"model = {json.dumps(model)}"))
+                    if wanted[part] and not found[part]]
+        return ["  HOST STEP (not scripted; the lane sends only its own keys): config.toml still carries the gateway "
+                f"route that {OMNIROUTE_PROFILE}.config.toml",
+                "  now carries:",
+                *[f"    {entry}" for entry in entries],
+                "  Once the profile is in place, back config.toml up privately and delete these together, restoring "
+                "the template's model: a",
+                f"  model_provider left without its table stops every launch without -p {OMNIROUTE_PROFILE} "
+                f"(\"Model provider `{OMNIROUTE_PROFILE}` not found\").",
+                f"  Read back: `codex debug prompt-input probe` and `codex -p {OMNIROUTE_PROFILE} debug prompt-input "
+                "probe` both render, and `render_config.py --check` no longer lists them."]
 
     def preconditions(self, codex: str, for_apply: bool) -> list[tuple[str, str, str]]:
         """[(level, name, detail)]; level ok|warn|fail. Apply refuses on any fail; the dry run reports."""

@@ -22,6 +22,7 @@ import io
 import itertools
 import json
 import os
+import re
 import shutil
 import signal
 import string
@@ -778,6 +779,26 @@ class ApplyFlowTests(unittest.TestCase):
         # The lane never sends that table: the rehearsed write leaves it as it was.
         self.assertNotIn("model_providers", " ".join(line for line in out.splitlines() if line.startswith("  set ")))
 
+    def test_base_config_gateway_selectors_are_part_of_the_host_step(self):
+        # Upstream's guide puts model = "cx/..." and model_provider = "omniroute" in config.toml
+        # (docs/guides/CODEX-CLI-CONFIGURATION.md L28-29 at a58000c7). Deleting only the table would leave every launch
+        # without the profile at "Model provider `omniroute` not found" (codex-cli 0.157.1, measured 2026-09-27).
+        code, out = self.host.run("--omniroute-profile")
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("HOST STEP", out)  # the control: a native model and no gateway selector
+        self.host.config = {"model": "cx/gpt-6-astra", "model_provider": "omniroute",
+                            **{k: v for k, v in self.host.config.items() if k != "model"}}
+        self.host.write_config(self.host.config)
+        code, out = self.host.run("--omniroute-profile")
+        self.assertEqual(code, 0, out)
+        step = out.split("HOST STEP", 1)[1].split("rehearsal", 1)[0]
+        lines = (self.host.codex_home / "config.toml").read_text().splitlines()
+        for text in ('model = "cx/gpt-6-astra"', 'model_provider = "omniroute"'):
+            self.assertIn(f"line {lines.index(text) + 1}: {text}", step)
+        self.assertNotIn("[model_providers.omniroute]", step)  # no table here, so none is listed
+        self.assertIn("`codex debug prompt-input probe`", step)  # the read-back covers a launch without the profile
+        self.assertIn("Model provider `omniroute` not found", step)
+
 
 def fixture_events(name: str) -> list[dict]:
     """A run's `codex exec --json` events, one JSON array per run (`*.jsonl` is git-ignored here)."""
@@ -1216,35 +1237,44 @@ class CodexIntegrationTests(unittest.TestCase):
         self.assertEqual(runs["filtered"].stdout.split(), ["key=absent", "set=kept"])
         self.assertNotIn("fixture-not-a-key", runs["filtered"].stdout + runs["filtered"].stderr)
 
-    def strict_exec(self, root: Path, env: dict, *flags: str) -> subprocess.CompletedProcess:
-        """`codex --strict-config <flags> exec` in a scratch home with stdin closed. At 0.157.1 `codex debug` refuses
-        --strict-config ("not supported for `codex debug`"), so exec is the strict read: without the gateway key it
-        stops at that key, or earlier at a configuration error, before any request."""
-        return subprocess.run([*self.isolation(root), "codex", "--strict-config", *flags, "exec",
-                               "--skip-git-repo-check", "-s", "read-only", "reply ok"], cwd=root / "cwd", env=env,
-                              stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
+    def strict_exec(self, root: Path, env: dict, *flags: str, strict: bool = True) -> subprocess.CompletedProcess:
+        """`codex [--strict-config] <flags> exec` in a scratch home with stdin closed. At 0.157.1 `codex debug`
+        refuses --strict-config ("not supported for `codex debug`"), so exec is the strict read: without the gateway
+        key it stops at that key, or earlier at a configuration error, before any request."""
+        return subprocess.run([*self.isolation(root), "codex", *(["--strict-config"] if strict else []), *flags,
+                               "exec", "--skip-git-repo-check", "-s", "read-only", "reply ok"], cwd=root / "cwd",
+                              env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
 
-    def test_strict_config_checks_a_session_flag_layer_on_its_own(self):
-        # recipes/README.md "Never `omniroute run codex --model`", with its control. Strict mode refuses an unknown
-        # top-level -c key (config/src/loader/mod.rs L257-258 and L647-669 at rust-v0.157.1). The -c key that
-        # launch-codex.mjs sends, model_providers.omniroute.model, is only warned about: that layer on its own has an
-        # empty provider name and fails to deserialize (config/src/config_toml.rs L979-983 and L992-1001), and a
-        # layer that fails reports no ignored field (config/src/strict_config.rs L97-110). The profile's model stays.
+    def test_strict_config_refuses_the_launchers_model_flag(self):
+        # recipes/README.md "Never `omniroute run codex --model`". The launcher defines the provider inline and adds
+        # the model as a provider field (bin/cli/commands/launch-codex.mjs L173-194 at a58000c7): Codex ignores that
+        # key with a warning and runs another model, and under --strict-config refuses the launch
+        # (config/src/loader/mod.rs L257-258 and L647-669 at rust-v0.157.1). The contrast: the same key alone is only
+        # warned about, because that layer on its own has an empty provider name and fails to deserialize
+        # (config/src/config_toml.rs L979-983 and L992-1001), and a failing layer reports no ignored field
+        # (config/src/strict_config.rs L97-110). A probe of the lone key alone once drew the wrong conclusion.
+        launcher = ["-c", 'model_provider="omniroute"', "-c", 'model_providers.omniroute.name="OmniRoute"',
+                    "-c", 'model_providers.omniroute.base_url="http://127.0.0.1:20128/v1"',
+                    "-c", 'model_providers.omniroute.env_key="OMNIROUTE_API_KEY"',
+                    "-c", 'model_providers.omniroute.wire_api="responses"',
+                    "-c", "model_providers.omniroute.requires_openai_auth=false",
+                    "-c", 'model_providers.omniroute.model="cx/nas-probe-model"']
         text = (TEMPLATES / "codex.omniroute.config.toml").read_text(encoding="utf-8")
         runs = {}
-        for label, override in (("top-level", "nas_probe_unknown_key=1"),
-                                ("provider", 'model_providers.omniroute.model="x-model"')):
+        for label, flags, strict in (("launcher strict", launcher, True), ("launcher", launcher, False),
+                                     ("lone key strict", ["-p", "omniroute", *launcher[-2:]], True)):
             with tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
-                runs[label] = self.strict_exec(root, self.gateway_home(root, text), "-p", "omniroute", "-c", override)
-        self.assertNotEqual(runs["top-level"].returncode, 0)
-        self.assertIn("unknown configuration field `nas_probe_unknown_key` in -c/--config override",
-                      runs["top-level"].stderr)
-        provider = runs["provider"]
-        self.assertNotEqual(provider.returncode, 0)
-        self.assertIn("`model_providers.omniroute.model` is ignored", provider.stderr)
-        self.assertIn("model: cx/gpt-6-astra", provider.stderr)
-        self.assertIn("Missing environment variable: `OMNIROUTE_API_KEY`", provider.stderr)  # loaded, then stopped
+                runs[label] = self.strict_exec(root, self.gateway_home(root, text), *flags, strict=strict)
+        refused = runs["launcher strict"]
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("unknown configuration field `model_providers.omniroute.model` in -c/--config override",
+                      refused.stderr)
+        for label in ("launcher", "lone key strict"):
+            got = runs[label]
+            self.assertIn("`model_providers.omniroute.model` is ignored", got.stderr, label)
+            self.assertNotIn("model: cx/nas-probe-model", got.stderr, label)  # the requested model never runs
+            self.assertIn("Missing environment variable: `OMNIROUTE_API_KEY`", got.stderr, label)  # loaded, stopped
 
     def test_strict_config_refuses_the_stack_worker_profile_at_this_pin(self):
         # recipes/README.md: start stack-worker lanes without --strict-config. Strict mode validates each
@@ -1272,6 +1302,37 @@ class CodexIntegrationTests(unittest.TestCase):
         self.assertIn("invalid transport", strict.stderr)
         self.assertEqual(plain.returncode, 0, plain.stderr[-400:])
         self.assertTrue(lane.prompt_input_counts(plain.stdout)["no_spawn_unless_asked"])  # the profile's max effort
+
+    def test_the_jcodemunch_recipe_step_registers_the_server_only_where_it_is_copied(self):
+        # recipes/README.md "Focused jCodeMunch retrieval": the recipe's own sed range, copied into a trusted
+        # checkout's .codex/config.toml, is that directory's whole jcodemunch registration, and an unrelated directory
+        # lists no MCP server at all (the user config here registers none).
+        section = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8")
+        section = section.split("\n## Focused jCodeMunch retrieval\n", 1)[1].split("\n## ", 1)[0]
+        expression = re.search(r"sed -n '([^']+)' \\\n", section).group(1)
+        eco = "/home/example/.local/share/codex-ecosystem"
+        rendered = string.Template((TEMPLATES / "project.codex.config.template.toml").read_text(encoding="utf-8"))
+        rendered = rendered.substitute(ECO_ROOT=eco, HOST_PATH="/usr/bin:/bin", CODE_INDEX_PATH="/home/example/.ci")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            env = self.gateway_home(root, "")
+            project, other = root / "checkout", root / "cwd"
+            subprocess.run(["git", "init", "-q", str(project)], check=True)
+            source = root / "project.codex.config.toml"
+            source.write_text(rendered)
+            (project / ".codex").mkdir()
+            (project / ".codex" / "config.toml").write_text(
+                subprocess.run(["sed", "-n", expression, str(source)], capture_output=True, text=True,
+                               check=True).stdout)
+            (Path(env["CODEX_HOME"]) / "config.toml").write_text(
+                f'[projects."{project}"]\ntrust_level = "trusted"\n')
+            got, listed = (subprocess.run([*self.isolation(root), "codex", "mcp", *args, "--json"], cwd=cwd, env=env,
+                                          stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
+                           for cwd, args in ((project, ["get", "jcodemunch"]), (other, ["list"])))
+        self.assertEqual(got.returncode, 0, got.stderr[-400:])
+        self.assertEqual(json.loads(got.stdout)["transport"]["command"], f"{eco}/bin/jcodemunch-mcp")
+        self.assertEqual(listed.returncode, 0, listed.stderr[-400:])
+        self.assertEqual(json.loads(listed.stdout), [])
 
     def test_real_app_server_apply_and_byte_exact_rollback(self):
         host = FakeHost(self)

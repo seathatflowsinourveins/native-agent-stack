@@ -249,8 +249,11 @@ context-mode#1. Codex paths below were read at `rust-v0.157.1` (tag object `ac0e
      (`shell-command/src/shell_snapshot_exports.rs`; the landscape sweep's GPT-6 probe found the key in a 0644
      snapshot).
 
-   A base `config.toml` that still defines `[model_providers.omniroute]` is reported as a host step, not written:
-   the lane sends only keys it owns.
+   A base `config.toml` that still carries the gateway route is reported as a host step, not written: the lane sends
+   only keys it owns. The step lists the `[model_providers.omniroute]` table, a top-level `model_provider =
+   "omniroute"` and a `cx/` model, the form upstream's guide puts in `config.toml` (L26-41), to be deleted together.
+   A `model_provider` left without its table stops every launch without the profile with "Model provider `omniroute`
+   not found" (measured). Its read-back renders the prompt input with and without `-p omniroute`.
 
    The profile does not choose the gateway build, but it names what a build needs. The bundled catalog runs
    `gpt-6-astra` on Responses Lite (`models-manager/models.json` L4-23), which sends no hosted tools
@@ -272,10 +275,17 @@ context-mode#1. Codex paths below were read at `rust-v0.157.1` (tag object `ac0e
    only), so the template now matches it there.
 4. **Template and recipe text for the token gaps.** `INCLUDE_DOT_FILES` (SocratiCode v1.14.0 `README.md` L1579) and
    the approval-never refusal (`core/src/mcp_tool_call.rs` L1610-1614 and L2436-2466) are stated where the servers
-   are registered. The jCodeMunch recipe renders the project template into the opted-in checkout or worktree instead
-   of `codex mcp add`, which writes the user config, and keeps that file, which holds host paths, out of commits
-   through the repository's private `info/exclude` (git `gitrepository-layout`): the repository's `.gitignore` does
-   not list `.codex/`. The headroom recipe gains its Codex registration line.
+   are registered. The jCodeMunch recipe now works from the project template, not `codex mcp add`, which writes the
+   user config:
+   - it installs the server into the ecosystem prefix, where the template runs `${ECO_ROOT}/bin/jcodemunch-mcp`
+     (bootstrap step 4's uv-tool layout);
+   - it copies only the rendered `[mcp_servers.jcodemunch]` tables into the opted-in checkout or worktree. The whole
+     project template also sets `approval_policy`, `sandbox_mode`, `[agents]` and a shell `PATH`, and a project
+     file outranks the user config and its profiles (`config/src/config_layer_source.rs` L33-51);
+   - it keeps that file, which holds host paths, out of commits through the repository's private `info/exclude`
+     (git `gitrepository-layout`); the repository's `.gitignore` does not list `.codex/`.
+
+   The headroom recipe gains its Codex registration line.
 
 **Evidence, 2026-09-27, codex-cli 0.157.1 on the workstation:**
 - **Local integration check, scratch Codex homes** under `bwrap --unshare-net` with a private `/tmp`, no sign-in and
@@ -292,26 +302,36 @@ context-mode#1. Codex paths below were read at `rust-v0.157.1` (tag object `ac0e
     whole `ConfigToml` (`config/src/loader/mod.rs` L594-600 and L625-645), and the profile's server tables name no
     command or URL. The synthesis's advice to always pass `--strict-config` (codex row 6) therefore cannot apply to
     stack-worker lanes as designed.
-  - `-c model_providers.omniroute.model=...`, which `omniroute run codex --model` sends (`bin/cli/commands/
-    launch-codex.mjs` L189-194), is ignored with a warning, also under `--strict-config`. Strict mode does check
-    session flags: in the control, an unknown top-level `-c` key was refused with "unknown configuration field ... in
-    -c/--config override". It checks the override layer on its own (`config/src/loader/mod.rs` L257-258 and
-    L647-669). A lone `model_providers.omniroute` table fails to deserialize, because its provider name is empty
-    (`config/src/config_toml.rs` L979-983 and L992-1001), and a layer that does not deserialize reports no ignored
-    field (`config/src/strict_config.rs` L97-110). So only the merged configuration's warning names the key. A
-    made-up key under the same `-c` table behaved the same way. This corrects the verifier's "`--strict-config`
-    rejects it".
+  - `omniroute run codex --model` defines the provider inline and adds the model as
+    `-c model_providers.omniroute.model=...` (`bin/cli/commands/launch-codex.mjs` L173-194). With that exact flag
+    set, Codex ignores the model key with a warning and runs another model, and under `--strict-config` it refuses
+    to start with "unknown configuration field `model_providers.omniroute.model` in -c/--config override". Strict
+    mode checks the override layer on its own (`config/src/loader/mod.rs` L257-258 and L647-669), so the verifier's
+    "`--strict-config` rejects it" holds for the launcher. The same key passed alone is only warned about: that
+    layer has an empty provider name and fails to deserialize (`config/src/config_toml.rs` L979-983 and L992-1001),
+    and a layer that fails reports no ignored field (`config/src/strict_config.rs` L97-110). A first draft of this
+    addendum probed only the lone key and reached the opposite conclusion; the cross-family review below caught it.
   - `codex mcp add headroom --env ...` printed "Added global MCP server" and kept the other servers'
     `startup_timeout_sec` (rewritten as floats).
   - The opt-in tests (`NAS_CODEX_INTEGRATION=1`) passed: the real app-server writes serena's allowance and rollback
     restores the file byte for byte; `--strict-config -p omniroute exec` names the missing key; and through `codex -p
     omniroute sandbox`, a fixture key reaches the command without the profile's filter and not with it, while the
-    base config's `set` reaches it in both arms (a failing-first control). Two more run the strict-mode limits
-    above again, each with its control: the provider `-c` key is warned about while an unknown top-level `-c` key
-    is refused, and `-p stack-worker` fails under `--strict-config` while the same home renders its prompt input
-    without it.
-- **Synthetic:** the fake-codex apply, dry-run and rollback tests of the new keys and the profile.
+    base config's `set` reaches it in both arms (a failing-first control). Three more cover the recipe's claims:
+    - strict mode refuses the launcher's flag set, while the lone key is only warned about;
+    - `-p stack-worker` fails under `--strict-config`, while the same home renders its prompt input without it;
+    - the recipe's jCodeMunch step, copied into a trusted checkout, registers the server there, and an unrelated
+      directory lists none.
+- **Synthetic:**
+  - the fake-codex apply, dry-run and rollback tests of the new keys and the profile, including the host step for
+    base selectors;
+  - a render test that runs the recipe's own `sed` range on the rendered project template.
 - **Source review:** the paths above.
+- **Cross-family review:** one round of GPT-6 (`cx/gpt-6-astra` at max through the local gateway, read-only)
+  reported four defects in the first draft, and each was reproduced before it was fixed:
+  - the jCodeMunch step copied the project template's permissions;
+  - the host step missed base selectors;
+  - the launcher claim rested on the lone key;
+  - the install path did not match the template.
 
 Nothing here is host acceptance or a model run.
 
@@ -326,6 +346,9 @@ Nothing here is host acceptance or a model run.
 - **The landscape sweep's lane-home builder reading this template.** Not done: that builder takes the model and URL as
   arguments and has its own tests. `tests/test_codex_worker_lane.py` compares every provider and feature key it
   writes with the profile's instead.
+- **Installing the whole rendered project template for jCodeMunch.** Rejected: the project layer would replace the
+  user's approval policy, sandbox, agents and shell `PATH` in that directory, against the codex row's "preserve the
+  existing ... approval policy and sandbox settings" in `recipes/README.md`.
 
 **Overturn conditions:**
 - An OmniRoute release or a Codex pin change that alters the provider fields, the effort clamp or standalone search:
