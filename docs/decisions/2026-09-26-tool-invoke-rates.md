@@ -157,6 +157,14 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
     only in minified JSON. The extended `failing_first_ab.py` controls returned **2 passed, 10 failed**
     before this repair (both clean controls stayed green), then **12 passed, 0 failed**. The retained
     `.red.out` and regenerated `.out` preserve both runs. The earlier A/B still rejects the leaked body.
+  - A GPT-6 re-check of that repair (`7a15a2e2`) found two more defects, both now fixed:
+    - A base64 `bytesValue` was scanned only in its encoded form. It is now also scanned decoded, and an
+      undecodable value fails closed. Controls: 12 passed, 3 failed before; **15 passed, 0 failed** after.
+    - Loki's fixed-body assertion ran only with historical captures. `replay.py loki_body_checks()` now runs
+      on every replay. `checker-fix/loki_body_control.py`, a stubbed Loki with `pwd` bodies: 0 passed, 2 failed
+      on the prior replay; 2 passed, 0 failed after.
+    - Residual: Loki's structured metadata stores attribute values as strings, so a bytes-typed attribute stays
+      base64 there.
   - `scan_otlp()` now traverses decoded keys and values at every OTLP level, including arrays and key-value
     lists, and retains every body's validity. Live and offline paths call one `events_privacy_checks()`
     implementation. The schema references are OpenTelemetry `opentelemetry-proto` `v1.9.0`
@@ -191,7 +199,8 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
   In the repair sandbox, the full scratch run could not create loopback sockets (`socket: operation not
   permitted`); that attempt is retained at `scratch-replay/synthetic-native-attempt.out`. The coordinator
   then ran the same synthetic-only `replay-test.sh` on the host, with the installed pinned Collector 0.161.0
-  and Loki 3.7.8 on scratch loopback ports 45700-45703 and scratch storage: **67 passed, 0 failed**, with no
+  and Loki 3.7.8 on scratch loopback ports 45700-45703 and scratch storage: **68 passed, 0 failed**, including
+  the always-run Loki fixed-body check, with no
   scratch listener left (`scratch-replay/synthetic-native.out`). Production services and systemd units were
   untouched.
 

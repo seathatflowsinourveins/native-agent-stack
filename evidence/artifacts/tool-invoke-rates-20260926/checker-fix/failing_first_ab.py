@@ -160,6 +160,14 @@ def structural_events(case):
     elif case == "nested banned key":
         resource_logs["resource"]["attributes"].append({"key": "fixture", "value": {
             "kvlistValue": {"values": [{"key": "user.email", "value": {"stringValue": "fixture"}}]}}})
+    elif case == "bytes attribute":
+        # ProtoJSON writes bytes as base64 (https://protobuf.dev/programming-guides/json/); "cHdk" is b"pwd".
+        resource_logs["resource"]["attributes"].append({"key": "service.instance.id", "value": {"bytesValue": "cHdk"}})
+    elif case == "nested bytes value":
+        record["attributes"].append({"key": "fixture", "value": {
+            "kvlistValue": {"values": [{"key": "fixture", "value": {"bytesValue": "cHdk"}}]}}})
+    elif case == "undecodable bytes":
+        record["attributes"].append({"key": "fixture", "value": {"bytesValue": "!not base64!"}})
     elif case == "multiple clean records":
         scope_logs["logRecords"].append(record.copy())
     elif case != "clean body":
@@ -172,7 +180,7 @@ structural_passed = 0
 structural_cases = ["clean body", "multiple clean records", "earlier leaked body in batch",
                     "missing body", "non-string body", "non-string stringValue", "resource attribute",
                     "scope attribute", "nested kvlist value", "nested array value", "spaced banned key",
-                    "nested banned key"]
+                    "nested banned key", "bytes attribute", "nested bytes value", "undecodable bytes"]
 for case in structural_cases:
     checks = run(case, new_privacy_checks, make_streams(prove_check.FIXED_BODY),
                  FORBIDDEN_LINES, [structural_events(case)])

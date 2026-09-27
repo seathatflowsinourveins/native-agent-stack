@@ -15,6 +15,8 @@ blob or JSON line, so a short literal cannot false-positive on brackets, key nam
 `REPORT_FIXED_BODY` now asserts every tagged record's body equals the transform/privacy placeholder exactly, in
 both the Loki sink and the Collector's file-exporter sink.
 """
+import base64
+import binascii
 import glob
 import re
 import argparse
@@ -136,6 +138,21 @@ def load_forbidden(paths):
     return out
 
 
+UNDECODABLE_BYTES = "<undecodable bytesValue>"
+
+
+def decode_bytes_value(text):
+    """Decode an OTLP ProtoJSON bytesValue: standard or URL-safe base64, with or without padding
+    (https://protobuf.dev/programming-guides/json/#representation-of-each-type). None when undecodable."""
+    padded = text + "=" * (-len(text) % 4)
+    for decode in (lambda s: base64.b64decode(s, validate=True), base64.urlsafe_b64decode):
+        try:
+            return decode(padded).decode("utf-8", errors="replace")
+        except (binascii.Error, ValueError):
+            continue
+    return None
+
+
 def scan_otlp(obj):
     """Return every record body, decoded key and string value in an OTLP export.
 
@@ -143,6 +160,8 @@ def scan_otlp(obj):
     common/v1/common.proto. AnyValue arrays and key-value lists are recursive;
     resource and scope fields need the same traversal as log record fields.
     Missing/non-string bodies retain a None entry so they cannot disappear.
+    A bytesValue is scanned both as its base64 text and decoded; an undecodable one adds the
+    UNDECODABLE_BYTES marker to the keys, which the privacy checks treat as banned (fail closed).
     """
     bodies, keys, values = [], set(), set()
 
@@ -152,6 +171,13 @@ def scan_otlp(obj):
             for key, value in node.items():
                 if key == "key" and isinstance(value, str):
                     keys.add(value)  # OTLP KeyValue key, independent of JSON spacing.
+                elif key == "bytesValue" and isinstance(value, str):
+                    values.add(value)
+                    decoded = decode_bytes_value(value)
+                    if decoded is None:
+                        keys.add(UNDECODABLE_BYTES)
+                    else:
+                        values.add(decoded)
                 else:
                     walk(value)
         elif isinstance(node, list):
@@ -192,7 +218,7 @@ def events_privacy_checks(events_lines, forbidden, fixed_body=FIXED_BODY, report
     banned_keys = sorted(event_keys & {
         "tool_parameters", "tool_input", "full_command", "bash_command", "arguments", "output",
         "content", "error", "prompt", "response", "user.email", "user.account_id", "user.account_uuid",
-        "user.id", "organization.id", "user_email", "user_account_id"})
+        "user.id", "organization.id", "user_email", "user_account_id", UNDECODABLE_BYTES})
     report("the events file holds this run's tagged records without command/prompt text (any length) or "
            "content/identity keys", bool(events_lines) and bool(forbidden) and event_hits == 0 and not banned_keys,
            f"lines={len(events_lines)} value hits={event_hits} banned keys={banned_keys}")

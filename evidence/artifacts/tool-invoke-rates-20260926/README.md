@@ -59,8 +59,8 @@ the failing-first control below is a byte-faithful transcription of its seven pr
 | 2 | Historical host acceptance | Live host proof, `prove.sh`, one real `claude -p` and one real `codex exec`, 2026-09-26T23:47:42Z-23:49:21Z, checked with the **pre-fix** checker | **33 passed, 0 failed**, not re-run here |
 | 3 | Discriminating control | Failing-first A/B, fully synthetic, offline: old checker vs. fixed checker against a body of `"pwd"` | Old **accepts** the leak; fixed checker **rejects** it |
 | 4 | Local integration (offline re-derivation) | Corrected structural scanner against proof #2's **retained, real** events-file batches, run 2026-09-27T03:55:26Z | **3 passed, 0 failed**; **270 records in 29 batches**, 26 forbidden strings, zero hits (events-file sink only). The input rotated out at 04:05:11Z, so this run cannot be repeated (part 4) |
-| 5 | Synthetic regression controls | Checker structural cases; synthetic-only replay with stubbed HTTP and reference exporter output | Checker **2 passed, 10 failed** before / **12 passed, 0 failed** after; replay **25 passed, 20 failed** before / **25 passed, 0 failed** after |
-| 6 | Local integration (native synthetic replay) | `replay-test.sh`, synthetic-only, on the installed pinned Collector 0.161.0 and Loki 3.7.8 with scratch loopback ports 45700-45703 and scratch storage. The coordinator ran it on the host, outside the repair sandbox | **67 passed, 0 failed**, no scratch listener left ([output](scratch-replay/synthetic-native.out)). The repair sandbox's blocked attempt is retained ([output](scratch-replay/synthetic-native-attempt.out)) |
+| 5 | Synthetic regression controls | Checker structural cases; synthetic-only replay with stubbed HTTP and reference exporter output | Checker **2 passed, 10 failed** before / **12 passed, 0 failed** after; with the bytes cases added (second repair), **12 passed, 3 failed** before / **15 passed, 0 failed** after; replay **25 passed, 20 failed** before / **25 passed, 0 failed** after; Loki fixed-body control **0 passed, 2 failed** on the prior `replay.py` / **2 passed, 0 failed** after |
+| 6 | Local integration (native synthetic replay) | `replay-test.sh`, synthetic-only, on the installed pinned Collector 0.161.0 and Loki 3.7.8 with scratch loopback ports 45700-45703 and scratch storage. The coordinator ran it on the host, outside the repair sandbox | **68 passed, 0 failed**, including the always-run Loki fixed-body check (31 of 31 lines), no scratch listener left ([output](scratch-replay/synthetic-native.out)). The repair sandbox's blocked attempt is retained ([output](scratch-replay/synthetic-native-attempt.out)) |
 | -- | Independent observation (not re-run here) | Window-2's own separate all-stream Loki scan, 22:45:00Z-00:24:44Z (contains proof #2's window) | Every `claude-code`/`codex_exec` body exactly `[content omitted]`, corroborating but not the fixed checker |
 
 ## 1. Scratch replay -- 109/109 (local integration)
@@ -142,8 +142,31 @@ The extended control also exercises a leak before a clean body in the same batch
 bodies, resource/scope attributes, nested key-value lists and arrays, and spaced/nested banned keys.
 [`failing_first_ab.red.out`](checker-fix/failing_first_ab.red.out) records the actual run against `a0348904`:
 both clean controls passed and all ten rejection controls failed (exit 1).
-The regenerated [`failing_first_ab.out`](checker-fix/failing_first_ab.out) records **12 passed, 0 failed**
+The regenerated [`failing_first_ab.out`](checker-fix/failing_first_ab.out) records **15 passed, 0 failed**
 (exit 0), including the unchanged clean-body control. The earlier frozen A/B outcomes still match.
+
+**Second repair (GPT-6 re-check of 7a15a2e2).**
+
+1. *bytesValue.* A ProtoJSON `bytesValue` is base64, standard or URL-safe, with or without padding
+   ([protobuf JSON mapping](https://protobuf.dev/programming-guides/json/#representation-of-each-type)).
+   The scanner matched only the encoded text, so `{"bytesValue":"cHdk"}` (`pwd`) passed. `scan_otlp()` now also
+   scans the decoded text. An undecodable value adds a marker that the checks treat as a banned key, so they
+   fail closed.
+   - [`failing_first_ab.bytes-red.out`](checker-fix/failing_first_ab.bytes-red.out): the three new cases were
+     accepted before the fix (a bytes resource attribute, a nested bytes value, an undecodable value), giving
+     12 passed, 3 failed.
+   - All 15 pass after the fix.
+2. *Loki body check.* Loki's fixed-body assertion ran only with the historical capture set. Now
+   `replay.py loki_body_checks()` runs on every replay and requires every stored Loki line to equal the
+   placeholder.
+   - [`loki_body_control.py`](checker-fix/loki_body_control.py) runs the real `loki()` against a stubbed
+     Loki (no sockets). On the prior `replay.py`, no fixed-body check ran, so a Loki full of `pwd` bodies went
+     unnoticed ([red](checker-fix/loki_body_control.red.out): 0 passed, 2 failed).
+   - On the fixed one, clean records pass and all 31 leaked lines are caught
+     ([green](checker-fix/loki_body_control.out): 2 passed, 0 failed).
+   - Residual: in the Loki sink, attribute values are plain strings in structured metadata, and their
+     original OTLP type is lost. So a bytes-typed attribute stays base64 there. The events-file sink keeps the
+     type and is decoded.
 
 ## 4. Offline re-check against the retained live-proof exports
 
@@ -212,7 +235,8 @@ In the repair sandbox, the full native scratch run could not create loopback soc
 
 The coordinator then ran the same synthetic-only `replay-test.sh` on the host, outside the sandbox, with the
 installed Collector 0.161.0 and Loki 3.7.8 on scratch loopback ports 45700-45703 and scratch storage. Result:
-**67 passed, 0 failed**, ending with "no scratch listener left on the replay ports"
+**68 passed, 0 failed** (the second repair added the always-run Loki fixed-body check), ending with "no scratch
+listener left on the replay ports"
 ([sanitized output](scratch-replay/synthetic-native.out)). This is native local-integration evidence for
 the repaired synthetic path. Production services and systemd units were untouched.
 

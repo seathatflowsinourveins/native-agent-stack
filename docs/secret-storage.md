@@ -758,7 +758,7 @@ local Collector, so the control sits there
   bodies from that proof were not retained, so that sink has not been
   re-verified with the corrected checker. The repaired synthetic-only replay
   passed natively on the pinned Collector and Loki with scratch ports:
-  **67 passed, 0 failed**. These limits and the historical live output are
+  **68 passed, 0 failed**. These limits and the historical live output are
   retained in the [evidence receipt](../evidence/artifacts/tool-invoke-rates-20260926/README.md).
 
 Only sessions started after the flag changes carry names. The other four

@@ -13568,8 +13568,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-tool-invoke-rates.md",
-      "sha256": "81adec21e4c8a0e827bb1ca2da24aa136b3636a746f911c98dfde3ed346fd38c",
-      "bytes": 18722
+      "sha256": "6ec9ae5ee58551f19aa554750414e7a1d3918012cccdee78f3eabbf9a740a394",
+      "bytes": 19479
     },
     {
       "path": "docs/decisions/2026-09-26-workstation-tool-refresh.md",
@@ -13873,7 +13873,7 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "4c82f6afa9342d7099654db611553c05deb44d82e58e0b5853601960b2b4c85e",
+      "sha256": "79af1b025d969c3d1d4f24de7fbf006840be82e5b5da9ff90b7cd653fcebc1ef",
       "bytes": 65175
     },
     {
@@ -35518,8 +35518,8 @@
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/README.md",
-      "sha256": "4ce1c63730d5726ed4a7bb36354d9f8f08920202e5814ed7cc5f8d8321fb6eae",
-      "bytes": 23286
+      "sha256": "faae5f5ff57ad3d7efae578fb19965f3e56099128e81e3a9d1bfac34b5ac0727",
+      "bytes": 25297
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/dry_run_smoke.out",
@@ -35532,19 +35532,39 @@
       "bytes": 2822
     },
     {
+      "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/failing_first_ab.bytes-red.out",
+      "sha256": "fae29be1ed483314ec5fe3981d3348ee7091f1d317ef5860988ab5afd5840438",
+      "bytes": 5624
+    },
+    {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/failing_first_ab.out",
-      "sha256": "bf57c2b96d4e59f087e7c949cf399bb111b239d8eb0ab07109ff93fd607ac7a0",
-      "bytes": 5211
+      "sha256": "0e066e46260d9099e39e49dd17249d22749229d3d0692ab30ee84da3f373366b",
+      "bytes": 5627
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/failing_first_ab.py",
-      "sha256": "05e47c838fd8be77f5ff640037a9030e4bb4ea915ce1718c63201a72736bc6f4",
-      "bytes": 10371
+      "sha256": "bd473b0a17b7103c2ac1d63b9e88a60ea59b685da25f0041185d8e9d3f7b2075",
+      "bytes": 11035
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/failing_first_ab.red.out",
       "sha256": "14a4084be76589712b58d7adddc230e0644a119b8a82446f8f4c99aaf52827a2",
       "bytes": 5061
+    },
+    {
+      "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/loki_body_control.out",
+      "sha256": "d4aadc55eead783c4741e48d452209bc8c7801ad5312937637c1a731ef85efa0",
+      "bytes": 625
+    },
+    {
+      "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/loki_body_control.py",
+      "sha256": "f7655ed0399b45bd2d3ced9947e5b346d0e36837fc11d1dc21306ac25fcaf7ba",
+      "bytes": 5544
+    },
+    {
+      "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/loki_body_control.red.out",
+      "sha256": "cc3c207ad4158a05235b6d69a6cb479afead29a51bd613b961267ca677ca17c4",
+      "bytes": 337
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/offline_recheck.out",
@@ -35568,8 +35588,8 @@
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/prove_check.py",
-      "sha256": "f9c9762e6a504e1dd8bef86892dd16dac0db7826fc05cde56b32a72ff4491c3d",
-      "bytes": 20516
+      "sha256": "c2e84f0f46ee42ba692ea528ffe314d06e67db6ab3b81ba80a66400ae588906f",
+      "bytes": 21664
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/checker-fix/synthetic_replay_control.out",
@@ -35643,8 +35663,8 @@
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/scratch-replay/replay.py",
-      "sha256": "596eb7af630fc141812017d74f58dd338b46f49cc477bd46dd911f46efe1cd80",
-      "bytes": 59823
+      "sha256": "0df2371a898237ef8880af80530100cefd1248e5520b96ee1bafe84dd7b9fd3c",
+      "bytes": 60631
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/scratch-replay/run_panel_queries.py",
@@ -35658,8 +35678,8 @@
     },
     {
       "path": "evidence/artifacts/tool-invoke-rates-20260926/scratch-replay/synthetic-native.out",
-      "sha256": "f41e600e3066e176de1f9f60941f03d3979f2f75821befb89c618554dd39410f",
-      "bytes": 8680
+      "sha256": "bc694b94d367754fd3323c46b5f8b01f49b58747669f0644cdf7b6afdb47517f",
+      "bytes": 8828
     },
     {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",

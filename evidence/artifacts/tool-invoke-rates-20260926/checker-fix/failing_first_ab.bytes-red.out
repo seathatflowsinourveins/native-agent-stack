@@ -67,9 +67,9 @@ PASS spaced banned key: expected accepted=False, got False
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
 PASS nested banned key: expected accepted=False, got False
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS bytes attribute: expected accepted=False, got False
+FAIL bytes attribute: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS nested bytes value: expected accepted=False, got False
+FAIL nested bytes value: expected accepted=False, got True
 INFO structured metadata keys on proof records: ecosystem_task_id, service_name
-PASS undecodable bytes: expected accepted=False, got False
-SUMMARY structural_events: 15 passed, 0 failed
+FAIL undecodable bytes: expected accepted=False, got True
+SUMMARY structural_events: 12 passed, 3 failed

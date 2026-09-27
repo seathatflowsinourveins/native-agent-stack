@@ -3,15 +3,15 @@ run dir: <run-dir>  otelcol: otelcol-contrib version 0.161.0
 ports: otlp=45700 health=45701 loki_http=45702 loki_grpc=45703
 PASS otelcol-contrib 0.161.0 validate --config <repo>/observability/collector/collector.yaml
 PASS scratch Loki config rendered from the repo's own template with scratch ports and data root only
-PASS scratch Loki 3.7.8 ready (pid 655634)
+PASS scratch Loki 3.7.8 ready (pid 957654)
 PASS scratch SDK receipts written (helper shape + forged u6 keys) :: files=2
 PASS scratch config keeps the staged SDK-receipt processors verbatim, in order :: processors=['memory_limiter', 'transform/sdk_receipt', 'transform/tool_names', 'transform/privacy', 'batch']
 PASS scratch config uses only scratch loopback ports (no production endpoint) :: ports=['45700', '45701', '45702']
 PASS scratch config keeps the staged logs processors verbatim, in order :: processors=['memory_limiter', 'transform/tool_names', 'transform/privacy', 'batch']
 PASS otelcol-contrib validate --config scratch replay config
-PASS scratch collector ready (pid 658128)
+PASS scratch collector ready (pid 967440)
 PASS replay posted: posted records=31 requests=3 inputs=0 synthetic=True capture_time_shift_s=0
-PASS scratch collector (658128) stopped
+PASS scratch collector (967440) stopped
 PASS scratch collector log has no errors (1 lines)
 PASS both SDK receipts were exported by the receipt pipeline :: receipts=['u6-forged-receipt', 'u6-legit-receipt']
 PASS a receipt file cannot add u6 names or derived keys through the shared allowlist :: u6 keys present=[]
@@ -45,6 +45,7 @@ PASS synthetic: a token-shaped server name becomes other
 PASS synthetic: an MCP tool named exec_command gets no shell_rtk; an originator with spaces becomes other
 PASS scratch Loki ingested every exported record (OTLP, u1 Loki template) :: exported=31 ingested=31
 PASS only service_name is a stream label; names stay structured metadata :: streams=['claude-code', 'codex-app-server', 'codex_exec']
+PASS every Loki record line is exactly '[content omitted]' (always run, with or without historical captures) :: records=31 expected>=31 not_fixed=0
 PASS every stream's labels are exactly {service_name}: no name or id is a stream label :: label sets=[('service_name',)]
 PASS every structured-metadata key comes from the staged allowlists or Loki's own OTLP fields :: keys=28 extra=[]
 PASS the Loki record fetch was not truncated :: records=31
@@ -69,7 +70,7 @@ PASS panel 37B (Invoke-rate telemetry integrity (selected range)) :: series=1 {}
 PASS panel 37C (Invoke-rate telemetry integrity (selected range)) :: series=1 {}=5
 PASS panel 38A (MCP-consuming API requests per minute by actor) :: series=1 {'actor': 'subagent', 'mcp_server_name': 'qmd'}=0.005556
 SKIP live-proof scenario checks: complete historical capture set absent; synthetic dashboard assertions run above
-PASS scratch Loki (655634) stopped
+PASS scratch Loki (957654) stopped
 PASS no scratch listener left on the replay ports
-TOTAL: 67 passed, 0 failed
+TOTAL: 68 passed, 0 failed
 run directory kept at: <run-dir>

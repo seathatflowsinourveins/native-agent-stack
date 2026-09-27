@@ -822,6 +822,20 @@ def expectation(panel: int, ref: str, rows: list[dict], window_s: float):
     return table[(panel, ref)]()
 
 
+FIXED_BODY = "[content omitted]"
+
+
+def loki_body_checks(streams, total) -> None:
+    """Always-run Loki privacy check, with or without the historical capture set (GPT-6 re-check of #366).
+    Every record line stored in Loki must be the Collector's fixed placeholder, so any other body fails,
+    whatever its content (a leaked short command such as "pwd" included)."""
+    lines = [e[1] if len(e) > 1 else None for s in streams for e in s.get("values", [])]
+    not_fixed = sum(line != FIXED_BODY for line in lines)
+    check(f"every Loki record line is exactly {FIXED_BODY!r} (always run, with or without historical captures)",
+          total > 0 and len(lines) >= total and not_fixed == 0,
+          f"records={len(lines)} expected>={total} not_fixed={not_fixed}")
+
+
 def loki(args) -> None:
     base = f"http://127.0.0.1:{args.port}"
     rows = [loki_label_map(resource, a) for resource, _, _, a in records(Path(args.out))]
@@ -859,6 +873,7 @@ def loki(args) -> None:
                                      headers={"X-Loki-Response-Encoding-Flags": "categorize-labels"})
     with urllib.request.urlopen(request, timeout=60) as response:
         streams = json.load(response)["data"]["result"]
+    loki_body_checks(streams, total)
     metadata_text = json.dumps(streams)
     label_sets = {tuple(sorted(s["stream"])) for s in streams}
     check("every stream's labels are exactly {service_name}: no name or id is a stream label",
