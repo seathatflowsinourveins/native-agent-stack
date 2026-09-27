@@ -1,0 +1,86 @@
+# OmniRoute gateway: a values-free systemd --user unit template.
+#
+# It mirrors the unit installed and running on the NativeStack WSL2 workstation since 2026-09-27,
+# evidence/artifacts/omniroute-gateway-20260927/omniroute.service. tests/test_omniroute_gateway_unit.py renders it
+# with that host's values and compares the result. This template file is not installed anywhere as it is. The
+# decision, the build and the recorded risk are in docs/decisions/2026-09-27-omniroute-account-pool.md.
+#
+# Apart from Description= and the comments, one directive differs from the installed unit: the explicit
+# OMNIROUTE_SERVER_HOST below. On the workstation the environment file already sets the same value, so the process
+# environment is the same.
+#
+# Substitute these before installing, following this directory's @NAME@ convention (codex-broker-reaper.service):
+#   @OMNIROUTE_PREFIX@      the owned npm prefix of the build (docs/foundation-stack.md, "Source build of
+#                           release/v3.8.51"); it holds bin/omniroute and shim/.
+#   @NODE_PREFIX@           a Node 24 installation whose bin/ holds node (upstream engines: >=22.22.2 <23 or >=24 <27).
+#   @CODEX_CLIENT_VERSION@  the host's `codex --version` number (0.157.1 on the workstation). Update it with the
+#                           Codex pin.
+# %h is systemd's own specifier for the invoking user's home directory and needs no substitution.
+#
+# No secret belongs in this unit, and the only secrets it adds come through EnvironmentFile=. A user service also
+# inherits the user manager's environment (systemd.exec(5), "Environment Variables in Spawned Processes"), and serve
+# passes its whole environment to the server child. So keep credentials out of the manager. Keep LIVE_WS_HOST,
+# EMBED_WS_PROXY_HOST, LIVE_WS_PORT and EMBED_WS_PROXY_PORT out of it too: this unit does not set them, and the two
+# WebSocket listeners (20132 and 20131) bind 127.0.0.1 only while the two host variables are unset
+# (src/server/ws/liveServer.ts L54 and L713-714; src/lib/services/embedWsProxy.ts L240-242). List the manager's
+# variable names with `systemctl --user show-environment | cut -d= -f1`.
+#
+# The environment file is:
+#   mode 0600 inside the 0700 data directory;
+#   plain NAME=value lines, the format upstream's scripts/build/bootstrap-env.mjs itself writes to
+#   {DATA_DIR}/server.env. systemd drops `export NAME=value` lines, so never point this at a native-agent-stack
+#   credential store (docs/secret-storage.md).
+# It holds JWT_SECRET, API_KEY_SECRET, STORAGE_ENCRYPTION_KEY and STORAGE_ENCRYPTION_KEY_VERSION, and the non-secret
+# DATA_DIR (its own directory), PORT, OMNIROUTE_SERVER_HOST=127.0.0.1 and REQUIRE_API_KEY.
+# Generate it without printing any value: evidence/artifacts/omniroute-gateway-20260927/scripts/make_server_env.py.txt.
+# Values in that file override the Environment= lines below (systemd.exec(5), EnvironmentFile=).
+#
+# The lsof shim. shim/ on PATH holds evidence/artifacts/omniroute-gateway-20260927/scripts/lsof-shim.sh.txt. Without
+# it, serve's port preflight (bin/cli/commands/serve.mjs L252-261 at a58000c7) reads null.length on a free port
+# whenever lsof exits 1, and serve exits. Drop the shim/ segment once upstream handles that case.
+#
+# Posture. The workstation runs with REQUIRE_API_KEY=false and requireLogin=false by the user's decision, which is
+# safe on loopback only. Any multi-user or non-loopback host sets REQUIRE_API_KEY=true and keeps the dashboard login.
+#
+# Not used, deliberately:
+#   --no-recovery: upstream labels it "Disable auto-restart on crash (debugging mode)"; systemd's Restart= runs
+#                  above upstream's own in-process supervisor.
+#   --daemon:      systemd supervises the foreground process.
+#   npm start:     it reads HOST, whose default is 0.0.0.0.
+#   timeout:       this is a long-running service.
+#
+# Each Environment= line below has a one-line reason. Upstream paths are at release/v3.8.51 a58000c7; the stream
+# timeout defaults are in src/shared/utils/runtimeTimeouts.ts L21-25.
+[Unit]
+Description=OmniRoute gateway (loopback only)
+Documentation=https://github.com/diegosouzapw/OmniRoute
+After=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.local/share/omniroute/server.env
+# shim/ first, so serve's port preflight finds the lsof no-match adaptation (see "The lsof shim" above).
+Environment=PATH=@OMNIROUTE_PREFIX@/shim:@NODE_PREFIX@/bin:/usr/local/bin:/usr/bin:/bin
+# serve binds 0.0.0.0 when this is unset (bin/cli/utils/serverHost.mjs L16-26); the keyless posture needs loopback.
+Environment=OMNIROUTE_SERVER_HOST=127.0.0.1
+# V8 heap for the gateway; upstream accepts 64..16384 inclusive (scripts/build/runtime-env.mjs L19).
+Environment=OMNIROUTE_MEMORY_MB=16384
+# Fallback when a request carries no usable Codex version; unset, it is the built-in 0.156.1 (open-sse/config/codexClient.ts L29-49; src/shared/constants/codexClient.ts L6).
+Environment=CODEX_CLIENT_VERSION=@CODEX_CLIENT_VERSION@
+# Readiness budget (default 80 s), which the content-stall watchdog reuses (open-sse/handlers/chatCore.ts L6399); Astra at max can reason longer.
+Environment=STREAM_READINESS_TIMEOUT_MS=600000
+# Its cap (default 180 s), raised to match, because the budget never exceeds it (open-sse/utils/streamReadinessPolicy.ts L198).
+Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000
+# Hard stream cap (default 21 min) that upstream bytes never reset (open-sse/config/constants.ts L31-33); 1 h here, never 0.
+Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
+# Templates stay the single writer for Codex/Claude configs (src/shared/services/cliRuntime.ts L1077-1078).
+Environment=CLI_ALLOW_CONFIG_WRITES=false
+ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port 20128 --no-open --no-tray
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
