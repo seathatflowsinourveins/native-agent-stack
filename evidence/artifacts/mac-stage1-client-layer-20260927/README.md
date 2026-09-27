@@ -157,12 +157,13 @@ From the coordinator's Stage 1 run, plus this session's own checks where noted:
   `Bash` matcher runs `rtk hook claude`) and needs rtk >= 0.50.0 plus a five-entry
   `exclude_commands` list. This session's own check found **both** rtk builds present on
   this host: a `mise`-managed install at 0.49.0, and the ecosystem install at 0.50.0
-  (`~/.local/share/codex-ecosystem/bin/rtk`, itself a symlink into a `-staging` tree). Since
-  `~/.claude/settings.json`'s `env.PATH` lists the ecosystem `bin` directory before
-  `.local/bin`, hooks that Claude Code runs (including `rtk hook claude`) resolve rtk
-  0.50.0; a plain interactive shell without that override resolves the mise-managed 0.49.0.
-  The "done here" therefore holds for hook execution specifically, not for every possible
-  invocation of the bare `rtk` command on this host.
+  (`~/.local/share/codex-ecosystem/bin/rtk`, itself a symlink into a `-staging` tree). A
+  plain interactive shell resolves the mise-managed 0.49.0. This session read
+  `~/.claude/settings.json`'s own `env.PATH` value and re-ran `command -v rtk`/`rtk
+  --version` with exactly that `PATH` (the environment Claude Code gives its hooks,
+  including `rtk hook claude`): it resolves to the ecosystem install and reports **rtk
+  0.50.0**, confirming the "done here" holds for hook execution specifically, not for
+  every possible invocation of the bare `rtk` command on this host.
 - The context-mode cache-heal hook is registered by the plugin itself, not by the settings
   template.
 - The Qdrant URL wired into this profile is `127.0.0.1:6333` (independently confirmed in

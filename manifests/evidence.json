@@ -30468,8 +30468,8 @@
     },
     {
       "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
-      "sha256": "5d5edb426112086293da22262d58d9a8ae3d9ff970fe19f969a54cdb8f263eaf",
-      "bytes": 12442
+      "sha256": "abe13a444f6dce832c44e11434623f9bf3f43ad4e273bf8dbea6e1b82a02ef8f",
+      "bytes": 12520
     },
     {
       "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
