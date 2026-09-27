@@ -50,6 +50,40 @@ class TokenLanesHookTests(unittest.TestCase):
         self.assertEqual(result.stderr, "")
         return result.stdout
 
+    def test_injected_web_rule_routes_fetches_and_quotes_to_source_text(self):
+        # context-mode v1.0.169 src/server.ts L3423-3478; Claude WebFetch contract:
+        # https://code.claude.com/docs/en/tools-reference#webfetch-tool-behavior
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        bootstrap = next(line for line in context.splitlines() if "ToolSearch" in line)
+        self.assertIn("mcp__plugin_context-mode_context-mode__ctx_fetch_and_index", bootstrap)
+        web_rule = next((line for line in context.splitlines() if line.startswith("- Fetch pages")), "")
+        for phrase in ("ctx_fetch_and_index", "batch requests with concurrency", "quote with ctx_search",
+                       "Do not use WebFetch for evidence", "small fast model's reading of the page"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, web_rule)
+
+    def test_injected_execution_rule_sets_intent_and_shell_cwd(self):
+        # context-mode v1.0.169 src/server.ts L1675-1690, L1728-1738.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        rule = next(line for line in context.splitlines() if line.startswith("- For output"))
+        for phrase in ("output over ~5 KB", "ctx_execute with intent", "indexes output",
+                       "returns only titles/previews", "ctx_search", "print derived answers",
+                       "keep failures and original-output recovery", "ctx_execute cwd",
+                       "shell only", "other languages run in sandbox temp"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, rule)
+        self.assertNotIn("explicitly cd", context)
+        self.assertNotIn("server is bound to the main checkout", context)
+
+    def test_injected_accounting_rule_preserves_verbatim_wrapper_returns(self):
+        # measured-gaps.md: smoke-2 wrapper copy check 2/2; summaries/footers change that contract.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        rule = next(line for line in context.splitlines() if line.startswith("- Use one lane"))
+        self.assertIn("Preserve verbatim wrapper returns", rule)
+
     def test_blind_roles_receive_zero_injection(self):
         for role in ("blind-lane-reviewer", "blind-judge", "blind-adjudicator", "blind-anything"):
             with self.subTest(agent_type=role):

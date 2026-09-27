@@ -199,3 +199,94 @@ test suite or a new native model run.
 This record claims no after measurement, token savings or live installation.
 A native Workflow-child run remains open; text delivery alone does not prove
 tool access, compliance or improved outcomes.
+
+## Addendum 2026-09-27: measured fetch and containment gaps
+
+The coordinator's later measurement changes what needs to be instructed, not the
+carrier's delivery mechanism. The [retained result tables and counter records](../../evidence/artifacts/token-lanes-subagent-start-20260927/measured-gaps.md)
+are **local measurement of native transcripts**, copied from the supplied
+`scratchpad/units/w3/lanes-facts.md` report. No workflow was rerun for this unit;
+no prompts, tool inputs or workflow identifiers are published with these counts.
+The original native-probe receipt above remains unchanged.
+
+**M4, fetch routing.** Landscape-sweep peer smoke 2 had five agents and the
+original carrier active (installed 08:26:32Z from `main` at `5f3a7c21`). Its
+discover role made five WebFetch calls and refute-facts made ten; all agents
+made zero `ctx_fetch_and_index` calls: **0/15 remote fetches routed through
+context-mode despite delivery**. Four WebSearch calls are excluded from that
+fetch denominator. The original block never specified page fetching. The two
+Sonnet wrappers still passed the reported verbatim-return copy check, **2/2**.
+
+**M3/M5, containment.** Each coordinator wave had twelve agents and started before
+installation; smoke 2 ran with the original block. The counts are descriptive,
+with differing workloads and no controlled causal comparison:
+
+| Run | Results | Results over 5,120 bytes | Share of result bytes from those results | ctx_execute results over 5,120 bytes |
+| --- | ---: | ---: | ---: | ---: |
+| Coordinator wave 1 (no block) | 1,452 | 198 (13.6%) | 61.4% | 40/119 (34%) |
+| Coordinator wave 2 (no block) | 1,589 | 314 (19.8%) | 70.7% | 78/214 (36%) |
+| Peer smoke 2 (block) | 126 | 30 (23.8%) | 74.7% | 16/34 (47%) |
+
+The preregistration #381 targets are at most 20% of bytes from results over 5 KB
+(M3) and at most 10% of context-mode results over 5 KB (M5). The table shows
+`ctx_execute` specifically. It also includes legitimate `Read`-before-edit
+exceptions, so these counts are not an adjudicated M3 result or an E2E execution
+of #381. `Read`, `Bash` and `ctx_execute` dominate oversized-result bytes in the
+supplied report. Tool choice alone did not contain what agents printed.
+
+**Upstream verification and selection.** The connected context-mode 1.0.169 tool
+schemas expose `requests`, `concurrency`, `intent` and shell-only `cwd`.
+`claude --version` returned `2.1.283 (Claude Code)`. The
+[context-mode v1.0.169 release notes](https://github.com/mksglu/context-mode/releases/tag/v1.0.169)
+were checked via `gh api`; they describe accounting fixes, not a routing outcome.
+The [Claude changelog at `7779afb1`](https://github.com/anthropics/claude-code/blob/7779afb12e3635f46f56ec823979d68350ae000b/CHANGELOG.md)
+was checked for WebFetch and SubagentStart. The contracts that settle the change
+are:
+
+- [mksglu/context-mode `589d8214d56740a28b5f7bf63167743d586b0b40` (1.0.169), `src/server.ts` L3423-3478](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L3423-L3478): `ctx_fetch_and_index` retains fetched page content for `ctx_search`; multiple URLs use `requests` with `concurrency` (1-8). This is HTTP fetching, not JavaScript rendering.
+- [Claude Code's WebFetch contract](https://code.claude.com/docs/en/tools-reference#webfetch-tool-behavior), read 2026-09-27, agrees with the supplied installed 2.1.283 description: ordinary results answer the extraction prompt through a small fast model. They are not authoritative page quotations. The page-evidence rule is our routing policy based on that distinction.
+- [The same context-mode revision, `src/server.ts` L1728-1740](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1728-L1740): `intent` indexes sufficiently large output and returns section titles/previews for later search; `cwd` applies only to shell commands. Non-shell languages start in sandbox temporary directories. Its [execution guidance](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1675-L1690) still requires deriving answers in code. The [threshold constant](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1979-L1980) is 5,000 bytes; the historical counter deliberately remains at 5,120. Neither is a hard cap on every response.
+
+Research used the installed `search-first` quick workflow, the visible skill
+catalog and the [adopted find-skills reference at `7407f389`](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md).
+The supported installed tools already provide these controls, so no new runtime,
+skill installation or custom fetch mechanism is needed. The tool schemas and
+official docs were checked directly; the coordinator's claims remain separately
+attributed measurement evidence.
+
+**Change and size.** The block adds `ctx_fetch_and_index` to its single ToolSearch
+bootstrap, routes page fetches and quotations explicitly, requests `intent` for
+large `ctx_execute` output while retaining “print derived answers”, and replaces
+the stale `cd` advice with the shell-only `cwd` parameter. The
+[handbook source section](../token-session-handbook.md#token-lanes-carried-into-subagents)
+contains the same guidance lines and both tool-contract citations. Verbatim
+wrapper returns take precedence over summaries and the tool-use footer.
+The revised carrier is **3,490 UTF-8 bytes**, up from the historical 3,159, within
+the unchanged **3,500-byte** test bound. The installer checksum is refreshed;
+the hook's blind-role gate and fail-open implementation are unchanged.
+
+### Dated errata and anti-patterns
+
+| Earlier assumption or omission | Correction and verification path |
+| --- | --- |
+| The context-mode server is necessarily bound to the main checkout; shell callers should `cd` | Use `ctx_execute`'s `cwd` for the actual worktree when `language` is shell. The connected schema and pinned `src/server.ts` L1731 distinguish shell from non-shell working directories. This supersedes that sentence in the original carrier. |
+| Naming `ctx_execute` alone contains large printed output | State `intent` and continue printing derived answers. The connected schema and L1736-1738 document preview/index behavior; M5's smoke-2 16/34 demonstrates the unclosed measured gap. |
+| A WebFetch extraction is page text suitable as quotation evidence | Retrieve page text through `ctx_fetch_and_index` and `ctx_search`, citing both upstream contracts. M4's 0/15 motivates the missing routing rule. |
+
+The earlier size statement describes the original artifact, not this revision.
+The retained counter sources are byte-identical `.txt` records; adding them does
+not turn local measurement into an unchanged upstream test. New text controls
+failed first at the hook's injected-context boundary, including web routing,
+`intent`/`cwd` and the wrapper exemption. The unchanged blind and fail-open tests
+and installer temp-directory checks cover integration, not model compliance.
+
+**Overturn condition.** Re-measure **M4 and M5 on the next sweep run and on the
+next coordinator waves**, recording carrier revision, role/task mix, routing
+denominators, containment counts and wrapper copy checks. If routing does not
+move from this baseline, enforce research routing by agent type: dispatch through
+[`stack-researcher`](../../adoption/agents/claude/stack-researcher.md), whose tools
+list includes WebSearch and `ctx_fetch_and_index` and excludes WebFetch. The
+[role-dispatch decision](2026-09-26-stack-agents-role-dispatch.md) supplies that
+existing option. Revisit containment if M5 remains above its target; merely
+delivering the text cannot close it. No after-change native workflow run, live
+installation, provider usage or token savings is claimed here.
