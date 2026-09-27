@@ -518,6 +518,7 @@ render the project template and copy only its jCodeMunch tables there, then read
 the entry back (changed after `v2026.09.26.2`); for Claude, use `local` scope:
 
 ```sh
+eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
 python3 "$PROJECT_ROOT/tools/adoption/render_config.py" --host <host> --out "$STACK_HOME/output/project-render"
 exclude=$(git rev-parse --git-path info/exclude)
 grep -qxF '/.codex/' "$exclude" || echo '/.codex/' >> "$exclude"

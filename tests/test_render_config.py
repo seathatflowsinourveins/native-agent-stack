@@ -179,6 +179,11 @@ class RenderConfigTests(unittest.TestCase):
         self.assertIn('UV_TOOL_BIN_DIR="$eco/bin"', section)
         self.assertIn('-- "$eco/bin/jcodemunch-mcp"', section)
         self.assertNotIn("codex mcp add jcodemunch --", section)  # the user-scope form is named, never copyable
+        # Each copyable block that uses $eco defines it first, so either block works pasted on its own.
+        for block in re.findall(r"```sh\n(.*?)```", section, flags=re.S):
+            if "$eco" in block:
+                self.assertTrue(block.startswith('eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"\n'),
+                                block[:80])
 
     def test_claude_template_turns_off_claudeai_skill_sync_and_mcp_servers(self):
         # docs/decisions/2026-09-25-skills-trial-and-usage.md, addendum "claude.ai skill sync and MCP
