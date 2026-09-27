@@ -13218,7 +13218,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "88ef34723db563ebb73ec22e463479e18b60d6c3bc986e01d30ad692af3b2775",
+      "sha256": "1c305945003ba6efe56acce8472b53e622e2fa3e3aba2455b8b2eec080be4650",
       "bytes": 312456
     },
     {
@@ -13733,8 +13733,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "78dca27a48d1cd7e2dcb442033722409e6a7c3aee8688232770578e0772dd8d6",
-      "bytes": 32290
+      "sha256": "e144044aadd2e637144d40250c6f124184470f143e717eaddcdf1d9772e3abc5",
+      "bytes": 32302
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -13858,8 +13858,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-capability-gate-harness.md",
-      "sha256": "046d30cc81c4a3cc2575bdbc7a802b121cf1681d89fc4ed3e401766b3752c20e",
-      "bytes": 4469
+      "sha256": "25886f8f04f2e3f223e290f179f830c69baa0ca84dc3cf6c07e753950b95657f",
+      "bytes": 6492
     },
     {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
@@ -36787,6 +36787,11 @@
       "bytes": 12391
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--ai-memory--use--20260927.json",
+      "sha256": "1eef70c06abc4dce9115d0b1515cc0afde184fa08b3d60e03ca6b75adb2d59a2",
+      "bytes": 5120
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--ast-grep--install--20260925.json",
       "sha256": "aaedbc071a70fc41892ea52026d3354bd93cd53450bc5499a1e9426b7f6b8cba",
       "bytes": 2181
@@ -36895,6 +36900,11 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--context-mode--use--20260925.json",
       "sha256": "ea57622638309453995456e0618d74ac823e954b4d144b21f0dd87582ecd7960",
       "bytes": 8967
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--context-mode--use--20260927.json",
+      "sha256": "3adea1d883307a24ecb0a41964786ac9c20af9a2ed31d72ee259614baee5bd7d",
+      "bytes": 6452
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--dagu--install--20260925.json",
@@ -37050,6 +37060,11 @@
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925.json",
       "sha256": "c1e7bea0520884f24ffc78b13e5f2e3ed0d42682a2a5683e566a7052f82d4d2d",
       "bytes": 7370
+    },
+    {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--jcodemunch-mcp--use--20260927.json",
+      "sha256": "2a53ced34167c2009be96b966d2370a294732a23db32083b8769355417d41bcb",
+      "bytes": 5237
     },
     {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--lean--use--20260925.json",
@@ -39208,8 +39223,8 @@
     },
     {
       "path": "tests/test_capability_gate.py",
-      "sha256": "4eca99a707f56421de1f4bc3ce5aa62c8fae0cf02a3ec2aa3ec5c9e46b25f72a",
-      "bytes": 28440
+      "sha256": "60252de360d48a773ce32165f8eb0ab2e8e9f166d052bce280db54b68b0102ae",
+      "bytes": 38580
     },
     {
       "path": "tests/test_catalog_decisions.py",
@@ -39913,18 +39928,18 @@
     },
     {
       "path": "tools/capability-gate/README.md",
-      "sha256": "90b798c1c4f8fbd39ae1ead70ac49f778d0d6b72e1bed98dc194de33b08c5fdc",
-      "bytes": 9784
+      "sha256": "9cd718c7161adccdd77d65f3a398bb699531568e065b341c6911181c3916ce99",
+      "bytes": 12956
     },
     {
       "path": "tools/capability-gate/ai-memory.yaml",
-      "sha256": "29d89d6467b75cd22ff3eb244ebf8090920ff2b1cb078c81980a01881e60d82e",
-      "bytes": 3543
+      "sha256": "cc1f91da083437ec4a6f48155ed8fd277aa1685a11ffda2b1ee052178b262bf2",
+      "bytes": 4227
     },
     {
       "path": "tools/capability-gate/assertions.js",
-      "sha256": "ba28b0b11e174af8fc543a9d87f80220f7028df9c7b90766d7b41b7e93b80fcc",
-      "bytes": 8093
+      "sha256": "5d548d56bde3e68f990dcdac4f6fe04705ddc4426ee850e01e07ce8e8fd2dcc4",
+      "bytes": 10447
     },
     {
       "path": "tools/capability-gate/briefs/ai-memory-a.md",
@@ -39958,8 +39973,8 @@
     },
     {
       "path": "tools/capability-gate/jcodemunch.yaml",
-      "sha256": "8c94318e9516be91168682c66ee7ab54023c15dd0f8641c0eaae661d709d18b7",
-      "bytes": 3653
+      "sha256": "af2c2689648442ed20e7aa82f226105ef6d02cb0063127c6f83187bd9f591973",
+      "bytes": 5453
     },
     {
       "path": "tools/capability-gate/m13.yaml",
@@ -39968,8 +39983,8 @@
     },
     {
       "path": "tools/capability-gate/m13_hooks.js",
-      "sha256": "8bcc55235a63847cc672893cc8f8009e06b097561d39952be2b45cb2c6a4ab71",
-      "bytes": 2412
+      "sha256": "9e01e3d2620d8df8f2aa830da483d685d71d5c27310e127a79cfda153a3dd63a",
+      "bytes": 2705
     },
     {
       "path": "tools/capability-gate/m13_tests.js",
@@ -39978,8 +39993,8 @@
     },
     {
       "path": "tools/capability-gate/run_gate.py",
-      "sha256": "0c3759d1144999ca62028ec22eb69716ff2d37ab74f4c8161b88074f897da4ff",
-      "bytes": 19070
+      "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
+      "bytes": 22476
     },
     {
       "path": "tools/skill-usage/README.md",

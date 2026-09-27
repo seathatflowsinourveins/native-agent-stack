@@ -30,24 +30,48 @@ function describe(calls) {
   return calls.map((call) => `${call.tool}:${call.status}${call.error ? ' ' + String(call.error.message || '').slice(0, 120) : ''}`).join(', ') || 'none';
 }
 
-// One completed, error-free call to config.server whose result matches vars.detail, a detail the task text does not
-// contain (checked against the rendered prompt).
+// Whether every key of `expected` is in `actual` with an equal value (objects compared the same way, anything else by
+// strict equality): the arguments the brief prescribes, allowing arguments it does not name.
+function subset(expected, actual) {
+  if (expected === null || typeof expected !== 'object') return expected === actual;
+  if (actual === null || typeof actual !== 'object') return false;
+  return Object.keys(expected).every((key) => subset(expected[key], actual[key]));
+}
+
+function prescribedCall(vars) {
+  try {
+    const call = typeof vars.call === 'string' ? JSON.parse(vars.call) : vars.call;
+    return call && typeof call === 'object' && Object.keys(call).length > 0 ? call : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// One completed, error-free call of the prescribed tool (config.tool on config.server, with the arguments in vars.call,
+// a JSON object) whose result matches vars.detail, a pattern the task text does not match (checked against the
+// rendered prompt). A call of another tool on the server, or with other arguments, never counts.
 function completedResult(output, context) {
-  const server = (context.config || {}).server;
+  const { server, tool } = context.config || {};
+  const call = prescribedCall(context.vars);
+  if (!server || !tool || !call) {
+    return { pass: false, score: 0, reason: 'misconfigured: no server, tool or prescribed arguments' };
+  }
   const detail = new RegExp(context.vars.detail);
   if (detail.test(context.prompt || '')) {
     return { pass: false, score: 0, reason: 'the detail pattern is present in the prompt' };
   }
   const calls = rawItems(context).filter((item) => item.type === 'mcp_tool_call' && item.server === server);
-  const hit = calls.find((call) => call.status === 'completed' && !call.error && detail.test(resultText(call.result)));
+  const hit = calls.find((item) => item.tool === tool && subset(call, args(item)) && completed(item) &&
+    detail.test(resultText(item.result)));
   return {
     pass: Boolean(hit),
     score: hit ? 1 : 0,
-    reason: `${hit ? 'completed result matched' : 'no completed result matched'}; calls: ${describe(calls)}`,
+    reason: `${hit ? 'prescribed call completed and matched' : 'no completed prescribed call matched'}; ` +
+      `calls: ${describe(calls)}`,
   };
 }
 
-// M13 binding: which tree's token did one tool class return? vars.token is this row's own token, written by
+// M13 binding: which tree's token did one tool class return? vars.sentinel is this row's own token, written by
 // m13_hooks.js into this tree only; every token has the form CGTOK-<tree>-<rep>-<16 hex>, so any other token in a
 // result came from the other tree (wrong root) or an earlier repetition (stale).
 const TOKEN = /CGTOK-[ab]-r\d{2}-[0-9a-f]{16}/g;
@@ -65,12 +89,22 @@ function completed(item) {
     !(item.type === 'command_execution' && item.exit_code);
 }
 
+// A directory change inside a command or snippet, in the forms each tool's --help gives on the workstation (GNU
+// coreutils 9.4 env, GNU make 4.3, GNU tar 1.35, git 2.43.0, sudo 1.9.15p5, util-linux 2.39.3, systemd 255):
+// - cd, pushd, popd and chdir (os.chdir, process.chdir, Dir.chdir), and PowerShell's Set-, Push- and Pop-Location;
+// - a short-option group containing C, its directory separate or attached (git -C dir, env -C/dir, tar -xC dir);
+// - --chdir, --directory, --work-tree, --git-dir, --wd and --working-directory;
+// - chroot, nsenter, unshare, systemd-run and sudo, which run a command in another directory or root.
+// It is a list of syntactic forms: a form not on it, such as another tool's working-directory option, is not detected.
+const DIRECTORY_CHANGE = /\b(cd|pushd|popd|chdir|chroot|nsenter|unshare|systemd-run|sudo)\b|\b(Set|Push|Pop)-Location\b|(^|[\s'"`(\[,])(-[A-Za-z]*C|--(chdir|directory|work-tree|git-dir|wd|working-directory)(?![\w-]))/;
+
 // A command or snippet that names the fixture only by its relative path: no absolute path to it, no directory change
-// and no token typed in, so a returned token can only come from the session's default binding.
+// and no token typed in. The shell tool's own working-directory argument is not in the Codex item (the SDK's
+// command_execution item has no such field), so for the shell class only the command text can be checked.
 function relativeRead(text, rel) {
   if (typeof text !== 'string') return false;
   const escaped = rel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(^|[\\s'"])${escaped}`).test(text) && !/\/\.cg\//.test(text) && !/\bcd\b/.test(text) &&
+  return new RegExp(`(^|[\\s'"])${escaped}`).test(text) && !/\/\.cg\//.test(text) && !DIRECTORY_CHANGE.test(text) &&
     !/CGTOK/.test(text);
 }
 
@@ -101,7 +135,7 @@ const CLASSES = {
   ctx_execute_file: {
     calls: (item) => mcpCall(item, 'context-mode', 'ctx_execute_file'),
     prescribed: (item, rep) => noCwd(item) && args(item).path === `.cg/${rep}/sentinel-ctx-file.txt` &&
-      !/CGTOK/.test(String(args(item).code || '')),
+      !/CGTOK/.test(String(args(item).code || '')) && !DIRECTORY_CHANGE.test(String(args(item).code || '')),
     done: (item) => completed(item),
   },
   ctx_index_search: {
@@ -146,7 +180,7 @@ function classVerdict(items, cls, own, rep) {
 
 function m13Class(output, context) {
   const cls = (context.config || {}).cls;
-  const own = context.vars.token;
+  const own = context.vars.sentinel;
   const rep = context.vars.rep;
   if (!CLASSES[cls] || typeof own !== 'string' || !own || !/^r\d{2}$/.test(String(rep))) {
     return { pass: false, score: 0, reason: 'misconfigured: unknown class, no token or no rep' };
@@ -158,4 +192,4 @@ function m13Class(output, context) {
   return { pass: verdict === 'own', score: verdict === 'own' ? 1 : 0, reason: verdict };
 }
 
-module.exports = { completedResult, m13Class, classVerdict, relativeRead, TOKEN };
+module.exports = { completedResult, m13Class, classVerdict, relativeRead, subset, TOKEN, DIRECTORY_CHANGE };

@@ -1323,12 +1323,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T14:37:15Z",
-                "pass": 2
+                "latest": "2026-09-27T21:34:53Z",
+                "pass": 3
               },
               "qualified_models": []
             },

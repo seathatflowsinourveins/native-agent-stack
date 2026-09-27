@@ -62,11 +62,13 @@ defaultTest:
         pattern: 'mcp jcodemunch/*'
         min: 1
         max: 1
-    # That call completed without error and returned the function's signature, which the task does not contain (register_file's second parameter, profile_servers_without_base's first).
+    # That call was the prescribed one (order, action search_symbols, with the brief's repo and query), completed
+    # without error and returned the function's symbol id and full signature, neither of which the task contains.
     - type: javascript
       value: file://assertions.js:completedResult
       config:
         server: jcodemunch
+        tool: order
 tests:
   - description: gate a
     providers: [gate]
@@ -74,31 +76,37 @@ tests:
       repeat: 3
     vars:
       instruction: file://briefs/jcodemunch-a.md
-      detail: 'relative_path: str'
+      detail: '^(?=[\s\S]*"id"\s*:\s*"scripts/host_receipts\.py::register_file#function")(?=[\s\S]*"signature"\s*:\s*"def register_file\(root: Path, relative_path: str\) -> None")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"register_file"}}'
   - description: gate b
     providers: [gate]
     options:
       repeat: 3
     vars:
       instruction: file://briefs/jcodemunch-b.md
-      detail: 'profile_bytes: bytes'
+      detail: '^(?=[\s\S]*"id"\s*:\s*"tools/sota-convergence/landscape-sweep/build_args\.py::profile_servers_without_base#function")(?=[\s\S]*"signature"\s*:\s*"def profile_servers_without_base\(profile_bytes: bytes, base_servers: list\) -> list")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"profile_servers_without_base"}}'
   - description: ctrl-prompt a
     providers: [ctrl-prompt]
     vars:
       instruction: file://briefs/jcodemunch-a.md
-      detail: 'relative_path: str'
+      detail: '^(?=[\s\S]*"id"\s*:\s*"scripts/host_receipts\.py::register_file#function")(?=[\s\S]*"signature"\s*:\s*"def register_file\(root: Path, relative_path: str\) -> None")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"register_file"}}'
   - description: ctrl-prompt b
     providers: [ctrl-prompt]
     vars:
       instruction: file://briefs/jcodemunch-b.md
-      detail: 'profile_bytes: bytes'
+      detail: '^(?=[\s\S]*"id"\s*:\s*"tools/sota-convergence/landscape-sweep/build_args\.py::profile_servers_without_base#function")(?=[\s\S]*"signature"\s*:\s*"def profile_servers_without_base\(profile_bytes: bytes, base_servers: list\) -> list")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"profile_servers_without_base"}}'
   - description: ctrl-disabled a
     providers: [ctrl-disabled]
     vars:
       instruction: file://briefs/jcodemunch-a.md
-      detail: 'relative_path: str'
+      detail: '^(?=[\s\S]*"id"\s*:\s*"scripts/host_receipts\.py::register_file#function")(?=[\s\S]*"signature"\s*:\s*"def register_file\(root: Path, relative_path: str\) -> None")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"register_file"}}'
   - description: ctrl-disabled b
     providers: [ctrl-disabled]
     vars:
       instruction: file://briefs/jcodemunch-b.md
-      detail: 'profile_bytes: bytes'
+      detail: '^(?=[\s\S]*"id"\s*:\s*"tools/sota-convergence/landscape-sweep/build_args\.py::profile_servers_without_base#function")(?=[\s\S]*"signature"\s*:\s*"def profile_servers_without_base\(profile_bytes: bytes, base_servers: list\) -> list")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"profile_servers_without_base"}}'
