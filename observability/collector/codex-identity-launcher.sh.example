@@ -17,8 +17,9 @@ set -eu
 # POSIX assignments keep inherited export flags. Scratch assignments run in the function below, which executes in
 # the subshell of $(...), so even an inherited private name reaches codex unchanged; only OTEL_RESOURCE_ATTRIBUTES
 # changes in this shell. The parsing lives in a function, not inline in $(...): bash 3.2 (macOS bash and /bin/sh)
-# mis-parses case patterns and nested quoted expansions inside a command substitution, but parses a function body
-# normally.
+# takes a case pattern's closing parenthesis inside a command substitution as the end of the substitution. bash -n
+# does not report it; at run time the shell prints a syntax error and continues with a wrong value. A function body
+# parses normally. Nested quoted expansions inside $(...) parse correctly in bash 3.2.
 __codex_identity_attributes() {
   __codex_identity_id=""
   if [ -r /proc/sys/kernel/random/uuid ]; then

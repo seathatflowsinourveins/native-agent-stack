@@ -637,8 +637,8 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 | Store outside every worktree, plus `.gitignore` for `.env*`, `*.env`, `*.key`, `*.pem`, `stored_tokens` and other native-store names (the generic `token` basename is deliberately not listed: it is too broad to ignore repository-wide, and `scripts/credential_status.py`'s `SENSITIVE_BASENAME` makes the same choice) | committing a credential by accident | a value pasted into a tracked file, or a tracked file literally named `token` |
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
-| Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential` | Python or other subprocesses that open the files themselves; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal | a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
+| Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential`; through the `**/` twins, Context Mode's `ctx_execute_file` and `ctx_index` on the same paths | Python or other subprocesses that open the files themselves, including code run by Context Mode's `ctx_execute` or `ctx_batch_execute` that opens a file directly; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can
@@ -654,7 +654,20 @@ it is a separate change that has to be measured first. The decision accepts
 agent read access to the **paper-only** keys as a residual risk. It accepts
 the same for the Hugging Face token, which this runbook limits to reading
 public gated repositories: a one-liner that calls
-`huggingface_hub.get_token()` also passes the guard. Live broker
+`huggingface_hub.get_token()` also passes the guard. The same residual covers
+Context Mode: `ctx_execute` and `ctx_batch_execute` run arbitrary code with the
+server's file access (upstream `README.md:1575` at the reviewed revision).
+Context Mode checks shell code, and the shell commands it recognises inside
+other languages, against the `Bash(...)` deny rules (`src/server.ts:1111-1150,
+1744-1750, 3779-3782`), but nothing mediates a file that such code opens
+itself, such as Python `open()` or Node `fs.readFileSync`, so a read through
+them is part of this accepted risk. The built-in sandbox does not change that: it
+applies to Bash, PowerShell and Monitor commands, and MCP servers run
+unconstrained on the host
+([sandboxing](https://code.claude.com/docs/en/sandboxing),
+[sandbox environments](https://code.claude.com/docs/en/sandbox-environments)).
+Closing it needs OS-level containment around the whole Claude Code session,
+which has to be measured before it is adopted. Live broker
 keys are out of scope for this scheme and must not be stored this way.
 
 Other boundaries that are recorded but not closed:
@@ -695,13 +708,61 @@ or managed settings file, and the flags are not in the process environment.
 The same was true of the two retained settings backups from 2026-09-23. The
 earlier text of this page said the user settings enabled tool-content and
 raw-body logging; this measurement does not support that statement, so it is
-withdrawn. The settings template sets all five to `"false"`, so
-`apply_claude_settings.py` writes them off on a new host.
+withdrawn. The settings template sets four of them to `"false"`, so
+`apply_claude_settings.py` writes them off on a new host. `OTEL_LOG_TOOL_DETAILS`
+is `"1"` since the [invoke-rate change](decisions/2026-09-26-tool-invoke-rates.md),
+under the dated exception below. The checker still reports
+`claude_telemetry_logs_content: true`, because it reads the client flag.
 
 Recommendation, as a user decision: keep tool-content and raw-body logging
-(and tool details) off for as long as broker keys exist on the host. Turning
-any of them on is a deliberate choice to copy tool traffic into the local
-store; the checker then reports `claude_telemetry_logs_content: true`.
+off for as long as broker keys exist on the host, and tool details too,
+except for the dated exception below. Turning any of them on is a deliberate
+choice to copy tool traffic into the local store; the checker then reports
+`claude_telemetry_logs_content: true`.
+
+**Exception: tool details (user decision, 2026-09-26).** Asked in the
+workstation coordinator session whether to enable `OTEL_LOG_TOOL_DETAILS=1`
+with name-only filtering in the Collector, the user answered "1 and full sota
+convergence practice we proceed". `adoption/templates/claude.settings.template.json`
+changed after `v2026.09.26.2` accordingly: it sets the flag to `"1"`, where a
+host at that tag writes `"false"`. Bash commands and tool input still reach the
+local Collector, so the control sits there
+([decision record](decisions/2026-09-26-tool-invoke-rates.md)):
+
+- `transform/tool_names`, in both logs pipelines before `transform/privacy`,
+  copies out of `tool_parameters` only the MCP server and tool names and the
+  Agent tool's `subagent_type`, plus one boolean, `shell_rtk`, from the first
+  word of `bash_command`. It never reads `full_command`. Skill names come only
+  from Claude Code's own `skill_activated` event. MCP server, MCP tool and
+  skill names that are not a short identifier become `other`, and an agent
+  type outside Claude Code's built-in agents and the workflow child becomes
+  `custom`.
+- `tool_parameters` (which carries `full_command`) and `tool_input` are
+  deleted in that processor. None of them, nor `user.email`, the Skill tool's
+  `skill_name` or a workflow name, is on any `transform/privacy` allowlist, so
+  none is exported to Loki or `events.jsonl`.
+- Canary proof (local integration, 2026-09-26): a scratch replay of real
+  Claude Code and Codex captures plus 31 synthetic records, through the
+  pinned otelcol-contrib 0.161.0 and a scratch Loki 3.7.8, looked for 72
+  known strings: Bash commands, prompts, a workflow script, search queries,
+  Codex arguments and output, and agent messages (31 from the captures, 41
+  synthetic). None reached the file exporter or Loki, and no
+  `tool_parameters`, `tool_input` or `user.*` key was exported (109 of 109
+  checks, historical pre-fix evidence). The live host proof ran on
+  **2026-09-26T23:47:42Z-23:49:21Z: 33 passed, 0 failed**, with the **pre-fix
+  checker**. That checker did not assert fixed bodies and omitted short
+  forbidden strings. The corrected structural checker was re-run offline
+  against the retained events file: **270 records in 29 batches, 26 forbidden
+  strings, zero hits or banned keys; 3 passed, 0 failed** (2026-09-27T03:55Z;
+  that file has since rotated out, so the run cannot be repeated). Raw Loki
+  bodies from that proof were not retained, so that sink has not been
+  re-verified with the corrected checker. The repaired synthetic-only replay
+  passed natively on the pinned Collector and Loki with scratch ports:
+  **68 passed, 0 failed**. These limits and the historical live output are
+  retained in the [evidence receipt](../evidence/artifacts/tool-invoke-rates-20260926/README.md).
+
+Only sessions started after the flag changes carry names. The other four
+flags stay `"false"`, and the recommendation above still covers them.
 
 ### Measured on this host (2026-09-24, Claude Code 2.1.281, headless `bypassPermissions`)
 
@@ -756,15 +817,39 @@ For a host that does not use the template, merge the same rules by hand under
 `permissions.deny` in `~/.claude/settings.json`:
 
 ```json
-"Read(~/.config/native-agent-stack/**)", "Edit(~/.config/native-agent-stack/**)",
-"Read(~/.config/ecosystem-observability/*.env)", "Read(~/.config/nativestack/*.key)",
-"Read(~/.claude/.credentials.json)", "Read(~/.codex/auth.json)",
-"Read(~/.config/gh/hosts.yml)", "Read(//proc/*/environ)",
-"Read(~/.cache/huggingface/token)", "Read(~/.cache/huggingface/stored_tokens)",
+"Read(~/.config/native-agent-stack/**)", "Read(**/.config/native-agent-stack/**)",
+"Edit(~/.config/native-agent-stack/**)",
+"Read(~/.config/ecosystem-observability/*.env)", "Read(**/.config/ecosystem-observability/*.env)",
+"Read(~/.config/nativestack/*.key)", "Read(**/.config/nativestack/*.key)",
+"Read(~/.claude/.credentials.json)", "Read(**/.claude/.credentials.json)",
+"Read(~/.codex/auth.json)", "Read(**/.codex/auth.json)",
+"Read(~/.config/gh/hosts.yml)", "Read(**/.config/gh/hosts.yml)",
+"Read(//proc/*/environ)", "Read(**/proc/*/environ)",
+"Read(~/.cache/huggingface/token)", "Read(**/.cache/huggingface/token)",
+"Read(~/.cache/huggingface/stored_tokens)", "Read(**/.cache/huggingface/stored_tokens)",
 "Bash(printenv)", "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
 "Bash(hf auth token)", "Bash(hf auth token *)",
 "Bash(git credential fill*)", "Bash(gh auth git-credential *)"
 ```
+
+Each `~/` or `//` Read rule has a `**/` twin (changed 2026-09-26). Claude Code
+reads `~/` and `//` as anchors and bounds a `**/` pattern to the current
+directory ([permissions](https://code.claude.com/docs/en/permissions)). Context
+Mode 1.0.169 applies the same Read deny rules to the paths `ctx_execute_file`
+and `ctx_index` receive, but it compiles each pattern literally, without
+expanding `~/` or `//`, and tests it against the path's raw, resolved and
+canonical absolute forms (`src/security.ts:101-135, 616-655` at the reviewed
+revision `6f0cc684`; upstream tracks the anchors as #1075). Each form is
+therefore inert in the other engine, and the pair covers both. The project
+settings and the template also carry `Read(**/.env)` and `Read(**/.env.*)`
+right after `Read(.env)` and `Read(.env.*)`, before `Read(!.env.example)` and
+`Read(!.env.*.example)`: a `!` carve-out reaches only the rules listed before
+it in the same file, so a twin placed after the carve-outs would deny
+`.env.example` again. Context Mode has no `!` carve-outs, so its
+`ctx_execute_file` refuses `.env.example` as well; read that file with the
+native Read tool. `apply_claude_settings.py` inserts a missing template rule
+next to its template neighbours, so it keeps this order on a host whose file
+already holds the carve-outs.
 
 ### Codex
 

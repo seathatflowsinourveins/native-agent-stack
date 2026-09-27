@@ -123,9 +123,29 @@ python binding_check.py --plugin-src ~/.codex/plugins/cache/context-mode/context
 The two forms that fail are the discriminating control. They run the same check without the binding
 and fail it.
 
-- **Packages.** `start.mjs` is byte-identical in the plugin clone and in the npm install (sha256
-  `0324441841b2…`). The two server bundles differ: the npm release is a different source revision
-  from the plugin pin. Every server exited 0 and wrote nothing to stderr.
+### Packages
+
+The npm package and reviewed plugin use the same context-mode source; separately built bundles
+that differ by one vendored expression. Every server in the retained integration check exited 0
+and wrote nothing to stderr.
+
+A 2026-09-26 byte comparison of the [npm 1.0.169 tarball](https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz)
+with [plugin commit `6f0cc6841c687e754059f36714a11233fda1a02b`](https://github.com/mksglu/context-mode/tree/6f0cc6841c687e754059f36714a11233fda1a02b)
+finds identical `start.mjs` bytes (SHA-256
+`0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b`).
+In both `server.bundle.mjs` and `cli.bundle.mjs`, replacing the npm bundle's vendored
+`URL.domainToASCII(r.host.toLowerCase())` with the plugin bundle's
+`new URL("http://"+r.host).hostname` accounts for the entire byte difference.
+The rest of each compiled bundle is identical; differing bundle hashes alone did not establish
+a different context-mode source revision.
+
+| Bundle | npm SHA-256 | Plugin SHA-256 |
+| --- | --- | --- |
+| [`server.bundle.mjs`](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/server.bundle.mjs) | `c5c36b73505e567034f5dfec0388f3490e8d9bf24d9db79378ebf8c2cc7a45e7` | `161a106d8c026fd2be84585466c89e645d71bf11ab7963006ee7d4d5d82ce8f4` |
+| [`cli.bundle.mjs`](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/cli.bundle.mjs) | `7f5211b390353bd22d22ada5b8d6f9c3d597ff5fa08b3dda94ea2a08e0208cec` | `baee0434afa7fcf51cf1583b7fd37eb6ab796cc9c643db35c720da9cf8faa90b` |
+
+This is an artifact comparison, not a new native session or a rerun of the server checks.
+The npm CLI installation still does not establish acceptance of the native plugin's hooks.
 
 ### Request deadline (`deadline-control.json`)
 

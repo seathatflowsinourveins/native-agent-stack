@@ -161,7 +161,7 @@ Desktop WSL, native Claude and native Codex Context Mode runtime scopes.
 | rtk gain --format json | Retained command-history estimates | Installed 0.50.0, like 0.49.0, defaults history_days to 90; this is not a forever ledger or provider accounting. |
 | rtk gain --project --format json | Same history, selected project | A subset of the all-history view, not another total to add. |
 | toon input.json --stats -o output.toon | One conversion | TOON 4.1.1 uses tokenx 1.3.0 estimates here; no native cross-run savings ledger. Exact o200k_base recount is separate. |
-| Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. |
+| Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. The persisted counters and the rendered bars measure different things; see below. |
 | headroom savings --json | Native usage ledger report | In 0.37.0, the field named lifetime is capped by a 30-day report lookback. Offline guard results do not populate it automatically. |
 
 The reviewed RTK retained-history snapshot reported 46 commands, 11,509 input,
@@ -183,15 +183,32 @@ benefit. Heuristic counters and illustrative API prices are not subscription bil
 
 ### Why the Context Mode lifetime dollar line can be small
 
-In installed Context Mode 1.0.169, the text footer estimates session tokens as
-`round((kept-out bytes + cache bytes saved) / 4)`. Its lifetime dollar line prices
-`retained events × 256 + current session estimated tokens`. The persisted status
-JSON instead reports `retained events × 256` without the session term. The
-renderer's fallback is $5 per million input tokens, with an environment override;
-this is an illustrative value, not avoided provider billing or subscription cost.
+Installed Context Mode 1.0.169 reports two different "saved" quantities. The
+server's persisted status JSON holds `tokens_saved = round((bytes_indexed + bytes_sandboxed + cache_bytes_saved) / 4)`
+from its own counters and `tokens_saved_lifetime = retained events × 256`
+(`src/server.ts:1032-1052` at the reviewed revision `6f0cc684`); the
+[token report](../tools/token-report/README.md) reads these two fields. The
+rendered `ctx_stats` text computes the same session sum for its footer, and its
+lifetime dollar line prices `retained events × 256 + current session estimated tokens`.
+Its Without/kept-out bars and its "real" lifetime tokens instead add the session
+database's `bytes_avoided` (`src/session/analytics.ts:1025-1034, 2173-2180`),
+which upstream defines as measured diverted output. On Claude Code that column
+also holds `read-redirected` rows booked at full file size for Reads that
+context-mode only advised against and did not block (`hooks/core/routing.mjs:848-862`;
+upstream #950, comment 5412624311), so quote a rendered figure only as an
+upstream-rendered figure, never as verified avoidance or provider usage, and
+derive no ratios from it. The renderer's fallback is $5 per million input
+tokens, with an environment override; this is an illustrative value, not
+avoided provider billing or subscription cost.
 
-The native database caps 1,000 events per session. Startup removes sessions older
-than seven days. Consequently, "lifetime" means retained runtime history and can
+The native database keeps at most 1,000 events per Claude Code session, and the
+session's Agent and Workflow children write into the same session. At the cap,
+1.0.169 deletes the lowest `priority` value first, while its capture hooks write
+1 for their most critical rows (upstream #1156). Each fresh startup removes the
+project's sessions whose start time is more than seven days old, even while they
+are still active (upstream #1140). Neither limit has a setting; see the
+[executor and session-store notes](token-session-handbook.md#context-mode-executor-and-session-store).
+Consequently, "lifetime" means retained runtime history and can
 decrease. Native Codex, native Claude and Desktop data stores have separate scope.
 A small dollar quote without its runtime and capture date cannot establish whole-PC
 or per-repository savings. Inspect the installed `src/session/analytics.ts`
