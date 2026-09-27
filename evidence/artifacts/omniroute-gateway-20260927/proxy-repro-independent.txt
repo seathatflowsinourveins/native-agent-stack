@@ -1,0 +1,31 @@
+# Corrected reproduction, run by the record's author 2026-09-27T08:28:13Z. Each arm builds its own Request; the
+# original proxy-repro.txt shared one POST body between its two arms, so its Node 22 'already been used' result came
+# from the raw arm consuming that body, not from the Proxy (finding of the GPT-6 review of this record).
+$ ~/.local/share/codex-ecosystem/tools/node-24.21.0/bin/node proxy_repro_independent.js
+v24.21.0 undici 7.29.1 | POST raw=ok | POST proxy=TypeError: Cannot read private member #state from an object whose class did not declare it | GET raw=ok | GET proxy=TypeError: Cannot read private member #state from an object whose class did not declare it
+$ $SCRATCH/node-rt/node-v22.23.3-linux-x64/bin/node proxy_repro_independent.js
+v22.23.3 undici 6.28.1 | POST raw=ok | POST proxy=ok | GET raw=ok | GET proxy=ok
+$ $SCRATCH/node-rt/node-v26.10.0-linux-x64/bin/node proxy_repro_independent.js
+v26.10.0 undici 8.10.2 | POST raw=ok | POST proxy=TypeError: Cannot read private member #state from an object whose class did not declare it | GET raw=ok | GET proxy=TypeError: Cannot read private member #state from an object whose class did not declare it
+
+--- proxy_repro_independent.js ---
+// Corrected reproduction for OmniRoute defect 1: every arm builds its own Request, so no arm can see a body that an
+// earlier arm consumed. The Proxy handler is the one in the original proxy_repro.js. The rebuild call mirrors
+// withDeadlineSignal (open-sse/utils/earlyStreamKeepalive.ts:341 at a58000c7): new Request(input, {signal, headers}).
+const make = (method) => new Request("http://x/v1/responses", method === "POST"
+  ? {method, body: "{}", headers: {"content-type": "application/json"}}
+  : {method});
+const proxied = (target) => new Proxy(target, {get(t, p) { const v = Reflect.get(t, p, t); return typeof v === "function" ? v.bind(t) : v; }});
+const out = [];
+for (const method of ["POST", "GET"]) {
+  for (const [label, build] of [["raw", () => make(method)], ["proxy", () => proxied(make(method))]]) {
+    try {
+      const input = build();
+      new Request(input, {signal: new AbortController().signal, headers: new Headers(input.headers)});
+      out.push(`${method} ${label}=ok`);
+    } catch (e) {
+      out.push(`${method} ${label}=${e.constructor.name}: ${e.message}`);
+    }
+  }
+}
+console.log(process.version, "undici", process.versions.undici, "|", out.join(" | "));

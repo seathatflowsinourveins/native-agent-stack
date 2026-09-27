@@ -1,0 +1,38 @@
+# codex debug models --bundled, gpt-6 entries, 2026-09-26T22:52:16Z
+{
+ "gpt-6-astra": {
+  "multi_agent_reasoning_effort": "xhigh",
+  "default_reasoning_level": "low",
+  "supported_reasoning_levels": [
+   "low",
+   "medium",
+   "high",
+   "xhigh",
+   "max",
+   "ultra"
+  ]
+ },
+ "gpt-6-sol": {
+  "multi_agent_reasoning_effort": null,
+  "default_reasoning_level": "medium",
+  "supported_reasoning_levels": [
+   "low",
+   "medium",
+   "high",
+   "xhigh",
+   "max",
+   "ultra"
+  ]
+ },
+ "gpt-6-luna": {
+  "multi_agent_reasoning_effort": null,
+  "default_reasoning_level": "medium",
+  "supported_reasoning_levels": [
+   "low",
+   "medium",
+   "high",
+   "xhigh",
+   "max"
+  ]
+ }
+}

@@ -1,0 +1,15 @@
+# Cherry-pick fidelity and tree identity of the running build (read-only git, 2026-09-27T07:56:40Z)
+# Repository: the build's source clone (~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904), git 2.43.0
+# Per pair: git show <commit> | git patch-id --stable
+#14904 upstream 07a6317b2e6af9f3646b1ab45752f3760f917465 patch-id a4e319bb4136df42a33712d6a3810dacc6938c3f | applied 22fb9f15fcc1d4579547d7969b238849c5f448bc patch-id a4e319bb4136df42a33712d6a3810dacc6938c3f | MATCH
+#14904 upstream b94e2dba4da4c19792a80c11d63cacb931dfdafb patch-id 309ad30d57e6ff3a391697edd4b6fe1dd95abcf5 | applied bf02556494beb99cd6dbd14391266ebbb0d48079 patch-id 309ad30d57e6ff3a391697edd4b6fe1dd95abcf5 | MATCH
+#13788 upstream 24bbadbad15eec0d598c908416e4b01be4e37671 patch-id d6cb98ecd2c4aed3462224f8059454ebff67a2b9 | applied b9f0d76eb3fc93aa9265af4c769ade80348d024e patch-id d6cb98ecd2c4aed3462224f8059454ebff67a2b9 | MATCH
+#13788 upstream 6c7990058c4ce9677de79452c8cefb10b4bf1b3d patch-id cbb7d8fb78ed0dcf19fa0cef4c701d7cbc69d991 | applied dd6e9607e4884ec75c9bc0d96e60b01e9483d84e patch-id cbb7d8fb78ed0dcf19fa0cef4c701d7cbc69d991 | MATCH
+# git log --format="%H %P %s" -5 dd6e9607e (the source clone is shallow, so a58000c7 shows no parent)
+dd6e9607e4884ec75c9bc0d96e60b01e9483d84e b9f0d76eb3fc93aa9265af4c769ade80348d024e fix(api): sanitize unexpected internal errors in /v1/alpha/search
+b9f0d76eb3fc93aa9265af4c769ade80348d024e bf02556494beb99cd6dbd14391266ebbb0d48079 feat(search): implement /v1/alpha/search endpoint for Codex native web search (fixes #8674)
+bf02556494beb99cd6dbd14391266ebbb0d48079 22fb9f15fcc1d4579547d7969b238849c5f448bc docs(changelog): add fragment for #14904
+22fb9f15fcc1d4579547d7969b238849c5f448bc a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 fix(sse): rebuild deadline-wrapped request from public accessors
+a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3  fix(security): run pre-request hooks in an isolated realm; only JSON crosses the boundary (GHSA-9p9m-h9rj-rhhg) (#14916)
+# git rev-parse dd6e9607e^{tree} (independent of committer and time; a re-verifier who cherry-picks the four upstream commits onto a58000c7 in this order and applies them cleanly gets the same tree)
+6f3f9a23068b6640b1084682dba6aab144ddbdc2

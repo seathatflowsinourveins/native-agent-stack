@@ -1,0 +1,4 @@
+# M2 and M1 (A16): MemPalace 3.10.0 (MIT), the official PyPI release (wheel sha256 9f656452..., pins.json).
+# M2 runs the installed release (its CLI, hook runner and MCP server); M1 runs the release's own
+# benchmarks/longmemeval_bench.py from the v3.10.0 tag checkout with this environment.
+mempalace==3.10.0

@@ -423,7 +423,7 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
         # the macOS reminder's behaviour and output to recipes/README.md's exclude_commands block.
         linux = _shell_functions((ROOT / "adoption/bootstrap-linux.sh").read_text(), "rtk_config_reminder")
         mac_check = _config_text_check(_shell_functions(self.script, "rtk_config_reminder"))
-        # The file test, the exactly-once key count and the four entries' grep -F lines.
+        # The file test, the exactly-once key count and the five entries' grep -F lines.
         self.assertEqual(len(mac_check), 5, mac_check)
         self.assertEqual(mac_check, _config_text_check(linux),
                          "the rtk reminder's config check drifted from adoption/bootstrap-linux.sh's")
@@ -450,7 +450,7 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
                         install_pin_body.index('[[ "$id" != rtk ]] || rtk_config_reminder'))
 
     def test_the_page_carries_the_recipes_exact_rtk_exclude_block(self):
-        # Any macOS rtk guidance uses recipes/README.md's own four-entry block, never a variant.
+        # Any macOS rtk guidance uses recipes/README.md's own five-entry block, never a variant.
         recipe = (ROOT / "recipes/README.md").read_text(encoding="utf-8")
         match = re.search(r"```toml\n(\[hooks\]\nexclude_commands = \[.*?\n\])\n```", recipe, re.S)
         self.assertIsNotNone(match, "recipes/README.md: no [hooks] exclude_commands block")

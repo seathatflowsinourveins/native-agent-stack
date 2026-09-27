@@ -1,0 +1,5 @@
+# Build dependencies for the one sdist-only package in the locks (sentence-transformers 2.2.2 in official.lock.txt):
+# passed to every `uv pip sync --require-hashes` as --build-constraints, so its isolated build uses exactly these
+# hashed setuptools and wheel (uv enforces build-constraint hashes; review pins P6).
+setuptools
+wheel

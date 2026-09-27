@@ -132,7 +132,7 @@
         "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
       ],
       "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
-      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
+      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. Among those seven commands, the Codex PreCompact hook remains unverified after the upgrade: whether it fires correctly has not been checked; this is a recorded verification gap, not an observed defect. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
     },
     {
       "id": "ast-grep",
@@ -540,7 +540,7 @@
         "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin equals the September 21 current stable release. Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
+      "freshness": "Installed tested pin 0.37.0 is stale through v0.39.1, the latest stable release published 2026-09-26T20:31:39Z (https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1; GitHub releases/latest checked 2026-09-26). Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
       "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
     },
     {
@@ -1892,11 +1892,14 @@
         "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
         "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/SETUP_GUIDE.md",
         "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/app/api/compression/preview/route.ts",
-        "https://registry.npmjs.org/omniroute/3.8.50"
+        "https://registry.npmjs.org/omniroute/3.8.50",
+        "https://github.com/diegosouzapw/OmniRoute/commit/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+        "https://github.com/diegosouzapw/OmniRoute/pull/14904",
+        "https://github.com/diegosouzapw/OmniRoute/pull/13788"
       ],
       "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task.",
-      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. Optional only: existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
+      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task. Running build, 2026-09-27: the workstation runs a source build, not this pin. Its base is release/v3.8.51 at a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3. Upstream PRs #14904 and #13788 are cherry-picked onto it, both open and unmerged, with patch-ids equal to upstream's. The BUILD_SHA is dd6e9607e. This manifest has no field for cherry-picks. A version/source_pin pair must also match the landscape freshness snapshot. So the pin stays the published 3.8.50 (npm latest on 2026-09-27) until upstream releases or merges both changes (the #14904 fix and the #13788 feature). Build, service, probes and the recorded keyless loopback posture: docs/decisions/2026-09-27-omniroute-account-pool.md and evidence/artifacts/omniroute-gateway-20260927/.",
+      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. The workstation's source build runs from the values-free adoption/templates/systemd/omniroute.service. It is adopted for pooled GPT-6 access by gateway-routed Codex lanes. By the user's decision that gateway runs keyless and passwordless on loopback only (docs/decisions/2026-09-27-omniroute-account-pool.md, decision 5); a multi-user or non-loopback host keeps this recipe's API key and dashboard login. Native Codex stays the max-quality default, and the agent-sdks layer default waits on the preregistered three-arm comparison. Existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
     },
     {
       "id": "tavily-cli",

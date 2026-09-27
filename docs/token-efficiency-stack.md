@@ -176,9 +176,11 @@ clients. `client_wiring` checks three places:
 
 - `claude`, the user settings: a Bash `PreToolUse` hook runs `rtk hook claude`; the
   number of hook events that run ai-memory; Context Mode is enabled and installed;
-  subagent spawn depth is 1; a workflow concurrency cap is set; and neither
-  `CLAUDE_CODE_EFFORT_LEVEL` nor the agent-teams opt-in appears in the settings or
-  the checker's environment;
+  subagent spawn depth is 1; a workflow concurrency cap is set; and
+  `CLAUDE_CODE_EFFORT_LEVEL` does not appear in the settings or the checker's
+  environment. The agent-teams opt-in is reported as information only
+  (`agent_teams_opt_in`, 0 or 1), because agent teams are an allowed dispatch mode
+  since 2026-09-27;
 - `project`, this checkout: `.claude/settings.json` sets the depth and the cap, and
   a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers
   (optional since 2026-09-25: those servers now live at Codex user scope, so a fresh
@@ -196,8 +198,10 @@ clients. `client_wiring` checks three places:
   the same order at `rust-v0.155.1`). So the pointer `rtk init -g --codex` writes does
   not count, and neither does an inline copy that no longer matches `RTK.md`; the
   comparison ignores whitespace and RTK's `<!-- rtk-owned: ... -->` line. To make it
-  true, replace the `@…/RTK.md` line in the file Codex reads with `RTK.md`'s own text,
-  and do it again whenever an RTK update changes `RTK.md`; `codex debug prompt-input`
+  true, apply the [Codex worker lane](../recipes/README.md#codex-worker-lane), which
+  changed after `v2026.09.26.2`: its `AGENTS.md` block carries `RTK.md`'s text verbatim,
+  followed by this catalog's exceptions, and leaves rtk's own pointer line in place.
+  Apply it again whenever an RTK update changes `RTK.md`; `codex debug prompt-input`
   then shows that text in the model's input. Codex runs a
   `hooks.json` hook only when it is enabled and trusted: the user `config.toml`'s
   `[hooks.state."<hooks.json path>:<event>:<group>:<handler>"]` `trusted_hash` equals the

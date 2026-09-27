@@ -1,0 +1,3 @@
+tool_details True
+session_id True
+resource_attributes_in_settings False

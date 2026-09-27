@@ -153,7 +153,7 @@ REGEX_SUBSET_MAX_DEPTH = 64
 CLIENT_FILE_LIMIT = 1_048_576
 CLIENT_WIRING_KEYS = {
     "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
-               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_off"),
+               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
     "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
               "ai_memory_hook_events", "ai_memory_hook_events_trusted"),
@@ -395,7 +395,10 @@ def claude_wiring(claude_dir: Path, env) -> dict:
         "subagent_spawn_depth_1": depth,
         "workflow_concurrency_set": concurrency,
         "effort_level_env_unset": EFFORT_VARIABLE not in names and EFFORT_VARIABLE not in env,
-        "agent_teams_off": AGENT_TEAMS_VARIABLE not in names and AGENT_TEAMS_VARIABLE not in env,
+        # Information, not a requirement: agent teams are an allowed dispatch mode for parallel exploration
+        # (user instructions 2026-09-27; https://code.claude.com/docs/en/agent-teams). A 0/1 count, not a bool,
+        # so the all-booleans completeness rule never counts it and the output stays flags and counts only.
+        "agent_teams_opt_in": int(AGENT_TEAMS_VARIABLE in names or AGENT_TEAMS_VARIABLE in env),
     }
 
 

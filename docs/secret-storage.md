@@ -17,7 +17,7 @@ against it.
 | `sec-contact` | SEC/EDGAR contact string. This is private personal data, not an auth secret | required now | `<store>/sec-contact.env` | `SEC_USER_AGENT` (optional: `EDGAR_IDENTITY`) |
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` only | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
-| `omniroute` | OmniRoute local gateway key | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
+| `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
 | `tavily` | Tavily API key, memory only ([kernel keyring](#memory-only-option-linux-kernel-keyring-2026-09-26)) | optional | Linux kernel user keyring, key `tavily_api_key`; never a file (macOS: the login Keychain) | `TAVILY_API_KEY`, set only in the environment of the command that `exec` or `tvly-keyring` starts |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
@@ -708,13 +708,61 @@ or managed settings file, and the flags are not in the process environment.
 The same was true of the two retained settings backups from 2026-09-23. The
 earlier text of this page said the user settings enabled tool-content and
 raw-body logging; this measurement does not support that statement, so it is
-withdrawn. The settings template sets all five to `"false"`, so
-`apply_claude_settings.py` writes them off on a new host.
+withdrawn. The settings template sets four of them to `"false"`, so
+`apply_claude_settings.py` writes them off on a new host. `OTEL_LOG_TOOL_DETAILS`
+is `"1"` since the [invoke-rate change](decisions/2026-09-26-tool-invoke-rates.md),
+under the dated exception below. The checker still reports
+`claude_telemetry_logs_content: true`, because it reads the client flag.
 
 Recommendation, as a user decision: keep tool-content and raw-body logging
-(and tool details) off for as long as broker keys exist on the host. Turning
-any of them on is a deliberate choice to copy tool traffic into the local
-store; the checker then reports `claude_telemetry_logs_content: true`.
+off for as long as broker keys exist on the host, and tool details too,
+except for the dated exception below. Turning any of them on is a deliberate
+choice to copy tool traffic into the local store; the checker then reports
+`claude_telemetry_logs_content: true`.
+
+**Exception: tool details (user decision, 2026-09-26).** Asked in the
+workstation coordinator session whether to enable `OTEL_LOG_TOOL_DETAILS=1`
+with name-only filtering in the Collector, the user answered "1 and full sota
+convergence practice we proceed". `adoption/templates/claude.settings.template.json`
+changed after `v2026.09.26.2` accordingly: it sets the flag to `"1"`, where a
+host at that tag writes `"false"`. Bash commands and tool input still reach the
+local Collector, so the control sits there
+([decision record](decisions/2026-09-26-tool-invoke-rates.md)):
+
+- `transform/tool_names`, in both logs pipelines before `transform/privacy`,
+  copies out of `tool_parameters` only the MCP server and tool names and the
+  Agent tool's `subagent_type`, plus one boolean, `shell_rtk`, from the first
+  word of `bash_command`. It never reads `full_command`. Skill names come only
+  from Claude Code's own `skill_activated` event. MCP server, MCP tool and
+  skill names that are not a short identifier become `other`, and an agent
+  type outside Claude Code's built-in agents and the workflow child becomes
+  `custom`.
+- `tool_parameters` (which carries `full_command`) and `tool_input` are
+  deleted in that processor. None of them, nor `user.email`, the Skill tool's
+  `skill_name` or a workflow name, is on any `transform/privacy` allowlist, so
+  none is exported to Loki or `events.jsonl`.
+- Canary proof (local integration, 2026-09-26): a scratch replay of real
+  Claude Code and Codex captures plus 31 synthetic records, through the
+  pinned otelcol-contrib 0.161.0 and a scratch Loki 3.7.8, looked for 72
+  known strings: Bash commands, prompts, a workflow script, search queries,
+  Codex arguments and output, and agent messages (31 from the captures, 41
+  synthetic). None reached the file exporter or Loki, and no
+  `tool_parameters`, `tool_input` or `user.*` key was exported (109 of 109
+  checks, historical pre-fix evidence). The live host proof ran on
+  **2026-09-26T23:47:42Z-23:49:21Z: 33 passed, 0 failed**, with the **pre-fix
+  checker**. That checker did not assert fixed bodies and omitted short
+  forbidden strings. The corrected structural checker was re-run offline
+  against the retained events file: **270 records in 29 batches, 26 forbidden
+  strings, zero hits or banned keys; 3 passed, 0 failed** (2026-09-27T03:55Z;
+  that file has since rotated out, so the run cannot be repeated). Raw Loki
+  bodies from that proof were not retained, so that sink has not been
+  re-verified with the corrected checker. The repaired synthetic-only replay
+  passed natively on the pinned Collector and Loki with scratch ports:
+  **68 passed, 0 failed**. These limits and the historical live output are
+  retained in the [evidence receipt](../evidence/artifacts/tool-invoke-rates-20260926/README.md).
+
+Only sessions started after the flag changes carry names. The other four
+flags stay `"false"`, and the recommendation above still covers them.
 
 ### Measured on this host (2026-09-24, Claude Code 2.1.281, headless `bypassPermissions`)
 

@@ -1,0 +1,6 @@
+INFO replay under test: replay.prefix.py; exported records=31
+INFO clean records -> fixed-body check lines: none
+INFO leaking records ('pwd') -> fixed-body check lines: none
+FAIL clean Loki records pass the fixed-body check
+FAIL a leaked 'pwd' body in Loki is caught by the fixed-body check
+SUMMARY loki_body_control: 0 passed, 2 failed

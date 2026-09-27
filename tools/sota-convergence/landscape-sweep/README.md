@@ -91,6 +91,59 @@ The GPT-6 lanes run with `--ignore-user-config`, so per-skill `enabled = false` 
 `config.toml` do not apply there. Which skills Codex lists inside the lane is untested; `skills_used` records what
 each worker says it used.
 
+### GPT-6 through OmniRoute (`--gpt6-provider omniroute`)
+
+With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 lane runs through the local OmniRoute gateway. OmniRoute pools the operator's accounts. The lane gets its own Codex home, so the host's interactive config never applies.
+
+`build_args.py` writes `<work-dir>/codex-home/` with two files:
+- `config.toml`:
+  - the provider block: `model = "cx/gpt-6-astra"`, `model_provider = "omniroute"`, `model_reasoning_effort = "max"`, and `[model_providers.omniroute]` with a loopback `base_url` ending in `/v1`, `env_key = "OMNIROUTE_API_KEY"`, `requires_openai_auth = false` and `wire_api = "responses"`. The fields follow the [Codex config reference](https://developers.openai.com/codex/config-reference).
+  - the `[mcp_servers.*]` tables of `adoption/templates/codex.config.template.toml`. The checkout's own `tools/adoption/render_config.py` renders them for `adoption/hosts/<HOST>.json`: serena, ai-memory, socraticode, headroom, codebase-memory, qmd and context-mode.
+- `stack-worker.config.toml`: the Codex worker profile (`--stack-worker-profile`, default `adoption/templates/codex.stack-worker.config.toml`), copied verbatim.
+
+What the lane config also sets:
+- **`[features] shell_snapshot = false`.** Codex's shell snapshot writes the exported environment, the provider key included, into `<CODEX_HOME>/shell_snapshots/*.sh` with mode 0644 (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at rust-v0.157.1). A GPT-6 probe reproduced this.
+- **`[shell_environment_policy.filters] OMNIROUTE_API_KEY = "exclude"`.** Codex 0.157.1 applies its default `*KEY*`, `*SECRET*` and `*TOKEN*` excludes only when `ignore_default_excludes` is false, and that setting defaults to true (`codex-rs/config/src/shell_environment_policy.rs`, `codex-rs/protocol/src/shell_environment.rs`). Without the filter, a real key would reach every command the model runs.
+- **Web search for GPT-6 Astra.** Astra runs Responses Lite, which carries no hosted tools, so search reaches it only as Codex's standalone web search (`web.run`). The lane therefore sets:
+  - `supports_standalone_web_search = true` on the provider, which defaults to false for custom providers ([Codex advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced));
+  - `[features] standalone_web_search = true`, which is under development in 0.157.1.
+
+  The capability flag alone enables nothing: OmniRoute must serve a compatible endpoint, and the parity check below has to show it working before a sweep counts on GPT-6 search through the gateway.
+
+  Measured 2026-09-27: `web.run` POSTs `<base_url>/alpha/search`. OmniRoute release/v3.8.51 at `a58000c7` answers 404 there. Upstream PR #13788 adds the route, but answers from OmniRoute's own search registry, not OpenAI's hosted search: the keyless `duckduckgo-free` provider, unless a keyed provider is configured. Through that route, `site:` queries returned nothing and plain queries few results. GPT-6 fell back to fetched pages and the GitHub API through context-mode.
+- **Skills.** Codex lists user skills from `$CODEX_HOME/skills` and `$HOME/.agents/skills` (`codex-rs/ext/skills/src/host_roots.rs` at rust-v0.157.1). In the lane, `$CODEX_HOME/skills` holds only Codex's `.system` cache; the pinned skills are in `$HOME/.agents/skills`, where `install_skills.py` puts them.
+  - The lane's GPT-6 loads them with context-mode's `ctx_execute_file`. That tool refuses a path outside its project directory, here the runner's `<work-dir>/empty`, unless a `Read(...)` allow rule in `<project>/.claude/settings.json` names it (context-mode 1.0.169 `build/security.js`, `evaluateProjectContainment`, issue #852).
+  - Without such a rule, the 2026-09-27 smoke's GPT-6 workers asked for their skills, were refused, and reported `skills_used: []`.
+  - `build_args.py` writes `<work-dir>/empty/.claude/settings.json` with **one exact rule per file** under `$HOME/.agents/skills`. It follows symlinked directories, lists each real directory once, and leaves out any path containing `*` or `?`. `staged.json` records the root symbolically and the file count.
+  - The rules are exact because context-mode also matches an allow rule against the raw path. A wildcard rule such as `<root>/**` would admit `<root>/../elsewhere` and every sibling path under the root. The test `test_context_mode_reads_only_the_listed_skill_files` runs context-mode's own matcher (set `CONTEXT_MODE_SECURITY_JS` to an installed `build/security.js`): listed files pass; siblings, outside files and `..` traversals do not. Its control shows the wildcard admitting the traversal.
+  - The host's deny rules still apply.
+  - Residual (context-mode 1.0.169): the matcher turns backslashes into slashes before matching, but the executor opens the literal Linux file name. A file whose name holds backslashes that normalize to a listed path would therefore pass too, as a GPT-6 re-check reproduced with a planted symlink. No rule can exclude it, because deny matching normalizes the same way. No such file exists, and creating one needs write access that `ctx_execute` already has.
+  - The #852 boundary limits `ctx_execute_file` only. `ctx_execute`, which the stack-worker profile leaves enabled for the token practice, runs code with the user's own file access, outside Codex's read-only sandbox. The lane's `-s read-only` binds Codex's own shell tool, not its MCP servers.
+  - A native restage of the work directory removes the file, because the native lane has no context-mode.
+
+What the lane does not carry or allow:
+- Project and hook trust are left out, because they describe the host's interactive client.
+- `supports_websockets` stays unset. OmniRoute forwards the Codex client version only on its HTTP `/v1/responses` path.
+- `--omniroute-base-url` must point at loopback.
+
+Isolation limits:
+- `CODEX_HOME` replaces the user-config location, but a trusted `.codex/config.toml` in the working directory and the system config still layer in.
+- The runner works in `<work-dir>/empty`. It holds only `.claude/settings.json`, which context-mode reads and Codex does not, so no Codex project layer applies there. A host system config (`/etc/codex/config.toml`) would apply, so keep it absent on sweep hosts.
+
+How the runner uses it:
+- `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`.
+- The key comes from `$OMNIROUTE_API_KEY` in the harness's environment. For a keyless loopback gateway, upstream's non-interactive setup with no login or API key, the staged placeholder `local-loopback` fills an unset variable; Codex's `env_key` only needs the variable to exist. `--omniroute-require-key` stages no placeholder, so a job without the variable ends with exit 6 before codex starts.
+- `--quota-stop-percent` is refused with this provider: the quota probe reads the native login, not the gateway's pool.
+- A job's `inputs.json` records the provider, so a gateway run never reuses a native job's result.
+
+Before a full run through the gateway, run the lane's parity check on the staged home, and do not claim a gateway result as max quality until it passes. The check covers:
+- max effort reaching the upstream model, shown in the gateway's request log and the rollout's `turn_context`;
+- the shell tool;
+- an MCP call such as `ctx_execute`;
+- `--output-schema` output;
+- reported usage;
+- whether hosted web search passes through for a custom provider.
+
 ## Evidence contract
 
 `saturation_ledger.py --check` and `--append` need the following. Each item names the part of the harness that

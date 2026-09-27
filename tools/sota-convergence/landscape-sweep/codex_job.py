@@ -15,6 +15,15 @@ this, in the empty directory <work-dir>/empty, bounded to 3000 s (exit 124 on ti
   codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra \
     -c model_reasoning_effort="max" -c web_search="live" --output-schema <job>/schema.json -o <job>/last.json --json "<prompt>" </dev/null
 
+Gateway provider (staged.json codex.provider "omniroute", build_args.py --gpt6-provider omniroute): the runner sets
+CODEX_HOME to the staged lane-local home <work-dir>/codex-home instead, drops --ignore-user-config (that home IS the
+configuration: the OmniRoute provider block plus the token MCP servers) and adds `-p <profile>` (the stack-worker
+profile layered over it), so the command becomes `codex exec -p stack-worker --skip-git-repo-check -s read-only
+-m cx/gpt-6-astra ...`. The provider key comes from the variable codex.api_key_env (OMNIROUTE_API_KEY) in the
+operator's environment. For a keyless loopback gateway, codex.api_key_placeholder ("local-loopback") fills an
+unset variable, because Codex's env_key only needs it to exist. Without either, a job ends with exit 6 before codex
+starts. The quota gate reads the native login only, so it is refused for a gateway lane.
+
 --ignore-user-config keeps the host's Codex config out of the lane, the sandbox is read-only, stdin is /dev/null
 (background `codex exec` otherwise waits on stdin), and the effort is max. Never ultra: ultra lets Codex delegate to
 sub-agents, which breaks the one-model lane. Codex runs without the caller's RUST_LOG, so its stderr carries only
@@ -83,11 +92,16 @@ STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
 # The prompt is one argv string, as in the 2026-09-26 runner; Linux caps one argument at 131072 bytes.
 MAX_PROMPT_BYTES = 120_000
 JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
-MODEL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# An optional provider prefix is allowed for gateway routes, e.g. OmniRoute's "cx/gpt-6-astra".
+MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9._-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+PROVIDERS = ("native", "omniroute")
+ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
+PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
 ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
                  "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log", "quota.json")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
+EXIT_NO_KEY = 6  # a gateway lane whose API key variable is unset in the runner's environment
 
 
 class UsageError(Exception):
@@ -144,7 +158,43 @@ def settings(base: Path) -> dict:
     out["quota_stop_percent"] = None if stop is None else float(stop)
     if not 0 < out["quota_timeout_s"] <= 600:
         raise UsageError("codex.quota_timeout_s must be above 0 and at most 600")
+    out.update(lane_settings(base, staged))
+    if out["codex_home"] is not None and out["quota_stop_percent"] is not None:
+        raise UsageError("codex.quota_stop_percent reads the native Codex login's usage; it cannot gate a gateway "
+                         "provider's account pool, so it must be absent when codex.provider is not native")
     return out
+
+
+def lane_settings(base: Path, staged: dict) -> dict:
+    """The GPT-6 lane's provider. native (the default) runs Codex with --ignore-user-config against the caller's
+    login. A gateway provider (omniroute) runs Codex with CODEX_HOME set to the staged lane-local home
+    <work-dir>/<codex_home>: its config.toml (the provider block and the token MCP servers) and its profile file are
+    the lane's whole configuration, and the provider's API key comes from the named environment variable."""
+    provider = str(staged.get("provider") or "native")
+    if provider not in PROVIDERS:
+        raise UsageError(f"codex.provider {provider!r} must be one of {', '.join(PROVIDERS)}")
+    lane = {"provider": provider, "codex_home": None, "profile": None, "api_key_env": None,
+            "api_key_placeholder": None}
+    if provider == "native":
+        return lane
+    home = staged.get("codex_home")
+    if not isinstance(home, str) or not home or Path(home).is_absolute() or ".." in Path(home).parts:
+        raise UsageError("codex.codex_home must name a directory inside the work directory")
+    if not (base / home / "config.toml").is_file():
+        raise UsageError(f"codex.codex_home {home!r} holds no config.toml; restage with build_args.py")
+    profile = staged.get("profile")
+    if profile is not None and not (isinstance(profile, str) and PROFILE_NAME.fullmatch(profile)):
+        raise UsageError(f"codex.profile {profile!r} is not a profile name")
+    if profile is not None and not (base / home / f"{profile}.config.toml").is_file():
+        raise UsageError(f"codex.profile {profile!r} has no {profile}.config.toml in the lane home; restage")
+    key = staged.get("api_key_env")
+    if not isinstance(key, str) or not ENV_NAME.fullmatch(key):
+        raise UsageError("codex.api_key_env must name the environment variable that holds the provider key")
+    placeholder = staged.get("api_key_placeholder")
+    if placeholder is not None and not (isinstance(placeholder, str) and PROFILE_NAME.fullmatch(placeholder)):
+        raise UsageError("codex.api_key_placeholder must be a short plain token (a keyless loopback gateway's value)")
+    lane.update(codex_home=base / home, profile=profile, api_key_env=key, api_key_placeholder=placeholder)
+    return lane
 
 
 def job_dir(base: Path, job: str) -> Path:
@@ -251,18 +301,28 @@ def limit_error(directory: Path) -> bool:
                for line in (read(directory / "stderr.txt") or "").splitlines())
 
 
-def codex_env() -> dict:
-    """The caller's environment without Rust tracing settings (see the module docstring)."""
-    return {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+def codex_env(lane: dict | None = None) -> dict:
+    """The caller's environment without Rust tracing settings (see the module docstring). For a gateway lane,
+    CODEX_HOME points at the staged lane-local home, never at the caller's; the key variable passes through as it is
+    and is never written anywhere."""
+    env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+    if lane is not None and lane.get("codex_home") is not None:
+        env["CODEX_HOME"] = str(lane["codex_home"])
+        if not (env.get(lane["api_key_env"]) or "").strip() and lane.get("api_key_placeholder"):
+            env[lane["api_key_env"]] = lane["api_key_placeholder"]  # keyless loopback gateway; a real key wins
+    return env
 
 
 def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def job_inputs(prompt: bytes, schema: bytes, model: str) -> dict:
-    return {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
-            "effort": EFFORT}
+def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native") -> dict:
+    inputs = {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
+              "effort": EFFORT}
+    if provider != "native":  # a gateway run never reuses a native job's result, or the other way round
+        inputs["provider"] = provider
+    return inputs
 
 
 def read_json(path: Path):
@@ -288,10 +348,16 @@ def archive_attempt(directory: Path) -> int | None:
     return number
 
 
-def codex_argv(codex: str, directory: Path, model: str, prompt: str) -> list[str]:
+def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict | None = None) -> list[str]:
     # Live web search: `--search` before exec (and no flag) sends external_web_access false, a cached index;
     # only web_search="live" sends true (evidence/artifacts/sota-refresh-20260926/codex/results/websearch-*.json).
-    return [codex, "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
+    if lane is not None and lane.get("codex_home") is not None:
+        # The lane-local CODEX_HOME is the whole configuration, so --ignore-user-config (which drops
+        # $CODEX_HOME/config.toml) must not be passed; the profile layers <profile>.config.toml over it (profile-v2).
+        head = [codex, "exec", *(["-p", lane["profile"]] if lane.get("profile") else [])]
+    else:
+        head = [codex, "exec", "--ignore-user-config"]
+    return [*head, "--skip-git-repo-check", "-s", "read-only",
             "-m", model, "-c", f'model_reasoning_effort="{EFFORT}"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
 
@@ -311,7 +377,8 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
     directory = job_dir(base, job)
     prompt_bytes = Path(prompt_file).read_bytes()
     schema_bytes = Path(schema_file).read_bytes()
-    inputs = job_inputs(prompt_bytes, schema_bytes, settings(base)["model"])  # also refuses a broken staged.json
+    config = settings(base)  # also refuses a broken staged.json
+    inputs = job_inputs(prompt_bytes, schema_bytes, config["model"], config["provider"])
     changed = False
     if (directory / "done").exists() and exit_code(directory) == 0:
         if read_json(directory / "inputs.json") == inputs:
@@ -530,6 +597,12 @@ def run(base: Path, job: str) -> int:
         write_atomic(directory / "stderr.txt", "codex is not on PATH\n")
         finish(directory, EXIT_NO_CODEX)
         return EXIT_NO_CODEX
+    lane = config if config["codex_home"] is not None else None
+    if lane is not None and not (os.environ.get(lane["api_key_env"]) or "").strip() and not lane["api_key_placeholder"]:
+        write_atomic(directory / "stderr.txt", f"{lane['api_key_env']} is not set in the runner's environment; start "
+                     "the harness with the gateway key loaded from its store by pointer (docs/secret-storage.md)\n")
+        finish(directory, EXIT_NO_KEY)
+        return EXIT_NO_KEY
     version = codex_version(codex)
     if version:
         write_atomic(directory / "codex_version", version + "\n")
@@ -537,9 +610,9 @@ def run(base: Path, job: str) -> int:
     prompt = (directory / "prompt.txt").read_text(encoding="utf-8").rstrip("\n")
     (base / "empty").mkdir(exist_ok=True)
     with open(directory / "events.jsonl", "wb") as events, open(directory / "stderr.txt", "wb") as errors:
-        process = subprocess.Popen(codex_argv(codex, directory, config["model"], prompt), cwd=str(base / "empty"),
-                                   stdin=subprocess.DEVNULL, stdout=events, stderr=errors,
-                                   pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env())
+        process = subprocess.Popen(codex_argv(codex, directory, config["model"], prompt, lane),
+                                   cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=events, stderr=errors,
+                                   pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))
         try:
             code = process.wait(timeout=config["timeout_s"])
         except subprocess.TimeoutExpired:

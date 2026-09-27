@@ -37,9 +37,14 @@ NODE = shutil.which("node")
 SHELLCHECK = shutil.which("shellcheck")
 BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and os.access(
     os.environ["BASH32_BINARY"], os.X_OK) else None
-# prompts_sha256 of the 2026-09-26 run (its templates, sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False)).
-# A change detector: templates.json filled with that run's values must give it. An intended template edit changes
-# every later run's prompts_sha256; update this test with it (the 2026-09-26 value stays in that run's record).
+# A change detector: templates.json filled with the 2026-09-26 run's values (date, layer count, skills date) must give
+# PROMPTS_SHA256_CURRENT, the sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False). An intended template edit
+# changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it.
+# 2026-09-27: the maintenance rule is derived from the OpenSSF Scorecard Maintained check, and licenses are information only
+# (never a refutation reason), per the operator's 2026-09-26/27 decisions.
+PROMPTS_SHA256_CURRENT = "f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d"
+# The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
+# fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
 REQ, PLAT = "a" * 64, "b" * 64
 LIMIT_TEXT = ("You’ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more "
@@ -237,9 +242,32 @@ SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
 
 
 class TemplateTests(unittest.TestCase):
-    def test_filled_templates_reproduce_the_20260926_prompts_sha256(self):
+    def test_filled_templates_match_the_current_prompts_sha256(self):
         frozen = filled_templates("2026-09-26", 32, "2026-09-25")
-        self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_20260926)
+        self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_CURRENT)
+
+    def test_templates_never_refute_on_license_and_name_the_maintenance_rule(self):
+        templates = json.loads((HARNESS / "templates.json").read_text())
+        common, fit = templates["common"], templates["fit"]
+        # Licenses: information only, in the selection principles and in the merit criteria every role receives.
+        self.assertIn("never a reason to exclude, refute or rank down", common)
+        self.assertIn("and platform fit (license is information only)", common)
+        self.assertNotIn("license and platform fit", common)
+        self.assertNotIn("OSI or clearly usable license", common)
+        self.assertNotIn("license is non-commercial", fit)
+        # No role other than the facts refuter's accuracy check may treat a license as a criterion.
+        for key, text in templates.items():
+            for phrase in ("license is non-commercial", "restrictive license", "unclear license", "usable license"):
+                self.assertNotIn(phrase, text, f"{key} still uses a license as a criterion: {phrase!r}")
+        # Maintenance: derived from the Scorecard check, with its evidence command and a flag destination.
+        self.assertIn("derived from the OpenSSF Scorecard Maintained check", common)
+        self.assertIn("commits?since=", common)
+        self.assertIn("not from pushed_at", common)
+        self.assertIn("TOO NEW TO ASSESS (<90 days)", common)
+        self.assertIn("it is stale under the selection principles' maintenance rule", fit)
+        # A lane that cannot reach the commit evidence (the web-only GPT-6 lane) never refutes on it.
+        self.assertIn("never excludes or refutes a repository on unknown maintenance", common)
+        self.assertIn("unknown maintenance is never a reason to refute", fit)
 
     def test_only_per_call_placeholders_remain_after_filling(self):
         frozen = filled_templates()
@@ -586,7 +614,8 @@ if sys.argv[1:] == ["-c", 'sandbox_mode="read-only"', "app-server"]:  # the quot
 config = json.load(open(os.environ["FAKE_CODEX_CONFIG"]))
 stdin, null = os.fstat(0), os.stat(os.devnull)
 record = {{"argv": sys.argv[1:], "cwd": os.getcwd(), "stdin_devnull": (stdin.st_ino, stdin.st_dev) == (null.st_ino, null.st_dev),
-          "stdin_read": sys.stdin.read(), "rust_log": os.environ.get("RUST_LOG")}}
+          "stdin_read": sys.stdin.read(), "rust_log": os.environ.get("RUST_LOG"),
+          "codex_home": os.environ.get("CODEX_HOME"), "api_key_present": bool(os.environ.get("OMNIROUTE_API_KEY"))}}
 if config.get("stubborn"):
     import subprocess
     subprocess.Popen([sys.executable, "-c", "import os, signal, sys, time; signal.signal(signal.SIGTERM, signal.SIG_IGN); "
@@ -623,6 +652,230 @@ def process_alive(pid: int) -> bool:
         return False
     state = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True).stdout.strip()
     return bool(state) and not state.startswith("Z")
+
+
+STACK_WORKER_FIXTURE = """model = "gpt-6-astra"
+model_reasoning_effort = "max"
+web_search = "live"
+
+[mcp_servers.context-mode]
+disabled_tools = ["ctx_upgrade", "ctx_purge"]
+"""
+TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode")
+
+
+class OmniRouteLaneBuildTests(unittest.TestCase):
+    """--gpt6-provider omniroute stages a lane-local CODEX_HOME: the provider block, the rendered token MCP servers
+    and the stack-worker profile, and nothing of the host's interactive trust state."""
+
+    def stage_lane(self, *extra):
+        work = stage_work(self)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        return work, profile, build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
+                                    "--stack-worker-profile", profile, *extra)
+
+    def test_lane_home_carries_provider_mcp_servers_and_profile(self):
+        work, profile, done = self.stage_lane()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
+        for line in ('model = "cx/gpt-6-astra"', 'model_provider = "omniroute"', 'model_reasoning_effort = "max"',
+                     "[model_providers.omniroute]", 'base_url = "http://127.0.0.1:20128/v1"',
+                     'env_key = "OMNIROUTE_API_KEY"', "requires_openai_auth = false", 'wire_api = "responses"'):
+            self.assertIn(line, config)
+        for server in TOKEN_MCP_SERVERS:
+            self.assertIn(f"[mcp_servers.{server}]", config)
+        self.assertNotIn("supports_websockets = true", config)
+        # The key never reaches a shell snapshot file, and GPT-6 Astra's search is Codex's standalone web.run.
+        for line in ("[features]", "shell_snapshot = false", "standalone_web_search = true",
+                     "supports_standalone_web_search = true"):
+            self.assertIn(line, config)
+        self.assertNotIn("[projects.", config)
+        self.assertNotIn("[hooks.state", config)
+        self.assertNotIn("${", config)  # every template placeholder rendered
+        self.assertEqual((work / "codex-home" / "stack-worker.config.toml").read_bytes(), profile.read_bytes())
+        try:
+            import tomllib
+        except ImportError:
+            tomllib = None
+        if tomllib is not None:
+            parsed = tomllib.loads(config)
+            self.assertEqual(parsed["model_providers"]["omniroute"]["env_key"], "OMNIROUTE_API_KEY")
+            self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], True)
+            self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": True})
+            # Codex 0.157.1 leaves its default *KEY* excludes off, so the key variable is excluded by name.
+            self.assertEqual(parsed["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
+            self.assertEqual(sorted(parsed["mcp_servers"]), sorted(TOKEN_MCP_SERVERS))
+        codex = json.loads((work / "staged.json").read_text())["codex"]
+        self.assertEqual((codex["provider"], codex["codex_home"], codex["profile"], codex["api_key_env"],
+                          codex["model"], codex["effort"]),
+                         ("omniroute", "codex-home", "stack-worker", "OMNIROUTE_API_KEY", "cx/gpt-6-astra", "max"))
+        self.assertEqual(sorted(codex["lane_home"]["mcp_servers"]), sorted(TOKEN_MCP_SERVERS))
+        self.assertNotIn("quota_stop_percent", codex)
+        self.assertEqual(codex["api_key_placeholder"], "local-loopback")  # keyless loopback gateway by default
+        self.assertNotIn("local-loopback", config)  # the placeholder is runtime-only, never in the lane config
+        # The staged runner reads the same settings back.
+        lane = codex_job.settings(work)
+        self.assertEqual((lane["provider"], lane["codex_home"], lane["profile"]),
+                         ("omniroute", work / "codex-home", "stack-worker"))
+
+    def stage_lane_with_skills(self):
+        """Stage the lane with HOME at a fake home: a skill with a reference file and a symlink cycle, a symlinked skill
+        directory, a file outside the skills root, and a file whose name holds a glob character."""
+        home = temp_dir(self)
+        root = home / ".agents" / "skills"
+        (root / "demo" / "references").mkdir(parents=True)
+        (root / "demo" / "SKILL.md").write_text("# demo\n", encoding="utf-8")
+        (root / "demo" / "references" / "notes.md").write_text("notes\n", encoding="utf-8")
+        (root / "demo" / "odd*name.md").write_text("glob character\n", encoding="utf-8")
+        (root / "demo" / "loop").symlink_to(root / "demo", target_is_directory=True)
+        linked = temp_dir(self) / "linked-skill"
+        linked.mkdir()
+        (linked / "SKILL.md").write_text("# linked\n", encoding="utf-8")
+        (root / "linked").symlink_to(linked, target_is_directory=True)
+        (home / "outside.md").write_text("outside\n", encoding="utf-8")
+        work = stage_work(self)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        env = {**os.environ, "HOME": str(home)}
+        common = [sys.executable, HARNESS / "build_args.py", "--work-dir", work, "--sweep-id", "landscape-sweep-20261026",
+                  "--date", "2026-10-26"]
+        done = run([*common, "--gpt6-provider", "omniroute", "--codex-host", "example", "--stack-worker-profile", profile],
+                   env=env)
+        return home, work, done, lambda: run(common, env=env)
+
+    def test_lane_allows_context_mode_exactly_the_skill_files(self):
+        # context-mode 1.0.169 refuses ctx_execute_file paths outside the runner's cwd unless a Read(...) allow rule in
+        # <cwd>/.claude/settings.json names them (#852); the lane's GPT-6 loads its pinned skills with that tool.
+        home, work, done, restage_native = self.stage_lane_with_skills()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        root = home / ".agents" / "skills"
+        settings = json.loads((work / "empty" / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        # One exact rule per file, by the path Codex lists; the cycle is listed once and the glob-character file never.
+        self.assertEqual(settings, {"permissions": {"allow": [
+            f"Read({root / 'demo' / 'SKILL.md'})", f"Read({root / 'demo' / 'references' / 'notes.md'})",
+            f"Read({root / 'linked' / 'SKILL.md'})"]}})
+        staged = (work / "staged.json").read_text(encoding="utf-8")
+        self.assertEqual(json.loads(staged)["codex"]["lane_home"]["context_mode_skill_reads"],
+                         {"settings": "empty/.claude/settings.json", "root": "$HOME/.agents/skills", "exact_files": 3})
+        self.assertNotIn(str(home), staged)  # the lane record keeps the host's paths out
+        # Restaging the same work dir for the native lane, which has no context-mode, removes the rules.
+        native = restage_native()
+        self.assertEqual(native.returncode, 0, native.stderr)
+        self.assertFalse((work / "empty" / ".claude").exists())
+        self.assertTrue((work / "empty").is_dir())
+
+    @unittest.skipUnless(NODE and os.environ.get("CONTEXT_MODE_SECURITY_JS")
+                         and Path(os.environ.get("CONTEXT_MODE_SECURITY_JS", "")).is_file(),
+                         "set CONTEXT_MODE_SECURITY_JS to an installed context-mode build/security.js")
+    def test_context_mode_reads_only_the_listed_skill_files(self):
+        """context-mode's own matcher on the staged file: listed files pass; a sibling, the outside file and ..
+        traversals under the root do not. The control shows why the rules are exact: with a <root>/** rule, the
+        traversal passes too, because context-mode also matches the raw path."""
+        home, work, done, _ = self.stage_lane_with_skills()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        root = home / ".agents" / "skills"
+        script = (
+            "const [url, project, root, home] = process.argv.slice(1);\n"
+            "const m = await import(url);\n"
+            "const allow = m.readToolPermissionPatterns('Read', 'allow', project, project + '/no-global-settings.json');\n"
+            "const check = (rules, p) => m.evaluateProjectContainment(p, project, rules).allowed;\n"
+            "const paths = {skill: root + '/demo/SKILL.md', reference: root + '/demo/references/notes.md',\n"
+            "  linked: root + '/linked/SKILL.md', sibling: root + '/demo/other.md', outside: home + '/outside.md',\n"
+            "  traversal: root + '/demo/../../../outside.md', shallow_traversal: root + '/../../outside.md'};\n"
+            "const out = {};\n"
+            "for (const [name, p] of Object.entries(paths)) out[name] = check(allow, p);\n"
+            "out.control_wildcard_traversal = check([[root + '/**']], paths.traversal);\n"
+            "console.log(JSON.stringify(out));\n")
+        url = Path(os.environ["CONTEXT_MODE_SECURITY_JS"]).resolve().as_uri()
+        done = run([NODE, "--input-type=module", "-e", script, url, work / "empty", root, home])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(json.loads(done.stdout), {
+            "skill": True, "reference": True, "linked": True, "sibling": False, "outside": False,
+            "traversal": False, "shallow_traversal": False, "control_wildcard_traversal": True})
+
+    def test_lane_refuses_quota_gate_missing_host_and_remote_gateways(self):
+        for extra, needle in ((("--quota-stop-percent", "90"), "--quota-stop-percent"),
+                              (("--omniroute-base-url", "http://10.0.0.5:20128/v1"), "loopback")):
+            _, _, done = self.stage_lane(*extra)
+            self.assertEqual(done.returncode, 2, done.stdout)
+            self.assertIn(needle, done.stderr)
+        work = stage_work(self)
+        done = build(work, "--gpt6-provider", "omniroute")
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("--codex-host", done.stderr)
+
+    def test_codex_host_accepts_a_private_host_value_file_by_path(self):
+        private = temp_dir(self) / "privatehost.json"
+        private.write_text((ROOT / "adoption" / "hosts" / "example.json").read_text(encoding="utf-8"), encoding="utf-8")
+        work = stage_work(self)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", private, "--stack-worker-profile", profile)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
+        self.assertIn("[mcp_servers.context-mode]", config)
+        self.assertNotIn(str(private.parent), config)  # the private file's location stays out of the lane record
+        codex = json.loads((work / "staged.json").read_text())["codex"]
+        self.assertEqual(codex["lane_home"]["host"], "privatehost")
+        missing = build(stage_work(self), "--gpt6-provider", "omniroute", "--codex-host", str(private) + ".gone.json",
+                        "--stack-worker-profile", profile)
+        self.assertEqual(missing.returncode, 2)
+        self.assertIn("does not exist", missing.stderr)
+
+    @unittest.skipIf(sys.version_info < (3, 11), "tomllib is Python 3.11+")
+    def test_mcp_extraction_accepts_quoted_and_spaced_headers_and_fails_closed(self):
+        import tomllib
+        text = ('model = "x"\n[mcp_servers."demo"]\ncommand = "a"\n[ mcp_servers.plain ]\ncommand = "b"\n'
+                '[mcp_servers.plain.env]\nK = "v"\n[projects."/p"]\ntrust_level = "trusted"\n')
+        sections, names = build_args.mcp_sections(text)
+        self.assertEqual(names, ["demo", "plain"])
+        self.assertNotIn("[projects.", sections)
+        self.assertEqual(tomllib.loads(sections)["mcp_servers"], tomllib.loads(text)["mcp_servers"])
+        # A server the line extraction cannot see (declared with inline-table syntax under [mcp_servers]) fails closed.
+        with self.assertRaises(ValueError):
+            build_args.mcp_sections('[mcp_servers]\nhidden = { command = "c" }\n[mcp_servers.plain]\ncommand = "b"\n')
+
+    @unittest.skipIf(sys.version_info < (3, 11), "tomllib is Python 3.11+")
+    def test_mcp_extraction_keeps_nested_tables_in_every_header_spelling(self):
+        import tomllib
+        # TOML allows a literal-quoted name and spaces around the dots; a server's env table in either spelling is kept.
+        for env_header in ("[mcp_servers.'demo'.env]", "[ mcp_servers . demo . env ]", "[mcp_servers . 'demo' . env]"):
+            text = f'[mcp_servers.demo]\ncommand = "a"\n{env_header}\nK = "v"\n[projects."/p"]\ntrust_level = "t"\n'
+            sections, names = build_args.mcp_sections(text)
+            self.assertEqual(names, ["demo"], env_header)
+            self.assertEqual(tomllib.loads(sections)["mcp_servers"], {"demo": {"command": "a", "env": {"K": "v"}}},
+                             env_header)
+        # A nested table the line extraction cannot see (a quoted top-level key) would lose the env: fail closed.
+        with self.assertRaisesRegex(ValueError, r"differ from the rendered config for \['demo'\]"):
+            build_args.mcp_sections('[mcp_servers.demo]\ncommand = "a"\n["mcp_servers".demo.env]\nK = "v"\n')
+
+    def test_mcp_extraction_refuses_without_tomllib(self):
+        with mock.patch.dict(sys.modules, {"tomllib": None}):  # a None entry makes the import raise ImportError
+            with self.assertRaisesRegex(ValueError, "Python 3.11"):
+                build_args.mcp_sections('[mcp_servers.demo]\ncommand = "a"\n')
+
+    def test_missing_profile_names_the_flag(self):
+        work = stage_work(self)
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
+                     "--stack-worker-profile", temp_dir(self) / "absent.config.toml")
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("pass --stack-worker-profile", done.stderr)
+
+    def test_require_key_stages_no_placeholder(self):
+        work, _, done = self.stage_lane("--omniroute-require-key")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertNotIn("api_key_placeholder", json.loads((work / "staged.json").read_text())["codex"])
+
+    def test_native_default_is_unchanged(self):
+        work = stage_work(self)
+        done = build(work)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        codex = json.loads((work / "staged.json").read_text())["codex"]
+        self.assertNotIn("provider", codex)
+        self.assertEqual(codex["model"], "gpt-6-astra")
+        self.assertFalse((work / "codex-home").exists())
+        self.assertEqual(codex_job.settings(work)["codex_home"], None)
 
 
 class RunnerCase(unittest.TestCase):
@@ -668,6 +921,77 @@ class RunnerCase(unittest.TestCase):
 LAST = {"repository": "https://github.com/ggml-org/llama.cpp", "latest_release": "b1", "stars_known": 1}
 COMPLETED = {"type": "turn.completed", "usage": {"input_tokens": 100, "cached_input_tokens": 80, "output_tokens": 7,
                                                  "reasoning_output_tokens": 3}}
+
+
+class OmniRouteLaneRunnerTests(RunnerCase):
+    """A gateway lane runs Codex with CODEX_HOME set to the staged lane-local home, -p stack-worker and no
+    --ignore-user-config, and never starts without its key variable."""
+
+    def lane(self):
+        home = self.work / "codex-home"
+        home.mkdir(exist_ok=True)
+        (home / "config.toml").write_text('model = "cx/gpt-6-astra"\nmodel_provider = "omniroute"\n', encoding="utf-8")
+        (home / "stack-worker.config.toml").write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        self.settings({"provider": "omniroute", "codex_home": "codex-home", "profile": "stack-worker",
+                       "api_key_env": "OMNIROUTE_API_KEY", "model": "cx/gpt-6-astra"})
+
+    def test_lane_uses_its_codex_home_and_profile(self):
+        self.lane()
+        self.env["OMNIROUTE_API_KEY"] = "fixture-not-a-key"
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+        directory = self.work / "gpt6" / "gpt6-probe"
+        self.assertEqual(self.record()["argv"], [
+            "exec", "-p", "stack-worker", "--skip-git-repo-check", "-s", "read-only",
+            "-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
+            "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
+            "Reply in JSON."])
+        self.assertEqual(self.record()["codex_home"], str(self.work / "codex-home"))
+        self.assertTrue(self.record()["api_key_present"])
+        self.assertEqual((result["status"], result["exit"], result["model"]), ("done", 0, "cx/gpt-6-astra"))
+        self.assertEqual(json.loads((directory / "inputs.json").read_text())["provider"], "omniroute")
+
+    def test_lane_without_its_key_never_starts_codex(self):
+        self.lane()
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+        self.assertEqual(result["exit"], codex_job.EXIT_NO_KEY)
+        self.assertIn("OMNIROUTE_API_KEY is not set", result["stderr_tail"])
+        self.assertFalse((self.bin / "record.json").exists())  # the fake codex never ran
+
+    def test_keyless_lane_uses_the_placeholder_only_when_the_variable_is_unset(self):
+        self.lane()
+        self.settings({"provider": "omniroute", "codex_home": "codex-home", "profile": "stack-worker",
+                       "api_key_env": "OMNIROUTE_API_KEY", "api_key_placeholder": "local-loopback",
+                       "model": "cx/gpt-6-astra"})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
+        self.assertEqual(result["exit"], 0)
+        self.assertTrue(self.record()["api_key_present"])
+        lane = codex_job.settings(self.work)
+        saved = os.environ.pop("OMNIROUTE_API_KEY", None)
+        try:
+            self.assertEqual(codex_job.codex_env(lane)["OMNIROUTE_API_KEY"], "local-loopback")
+            os.environ["OMNIROUTE_API_KEY"] = "   "  # blank counts as unset: Codex rejects a blank env_key value
+            self.assertEqual(codex_job.codex_env(lane)["OMNIROUTE_API_KEY"], "local-loopback")
+            os.environ["OMNIROUTE_API_KEY"] = "operator-value"
+            self.assertEqual(codex_job.codex_env(lane)["OMNIROUTE_API_KEY"], "operator-value")  # a real key wins
+        finally:
+            os.environ.pop("OMNIROUTE_API_KEY", None)
+            if saved is not None:
+                os.environ["OMNIROUTE_API_KEY"] = saved
+
+    def test_lane_settings_refuse_a_quota_gate_and_a_missing_home(self):
+        self.lane()
+        self.settings({"provider": "omniroute", "codex_home": "codex-home", "profile": "stack-worker",
+                       "api_key_env": "OMNIROUTE_API_KEY", "quota_stop_percent": 90})
+        with self.assertRaises(codex_job.UsageError):
+            codex_job.settings(self.work)
+        self.settings({"provider": "omniroute", "codex_home": "missing-home", "api_key_env": "OMNIROUTE_API_KEY"})
+        with self.assertRaises(codex_job.UsageError):
+            codex_job.settings(self.work)
+        self.settings({"provider": "omniroute", "codex_home": "../outside", "api_key_env": "OMNIROUTE_API_KEY"})
+        with self.assertRaises(codex_job.UsageError):
+            codex_job.settings(self.work)
 
 
 class RunnerTests(RunnerCase):

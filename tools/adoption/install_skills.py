@@ -188,7 +188,9 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         return "error"
 
     if classify_skill(skill, home) == "ok":
-        note(f"{name}: installed and verified at tree {skill['tree_sha']}")
+        # classify_skill checks SKILL.md's sha256 and the lock's recorded tree (skills' skillFolderHash is the source
+        # tree hash recorded at install, vercel-labs/skills v1.7.0 src/skill-lock.ts), not the installed support files.
+        note(f"{name}: installed; SKILL.md sha256 matches the pin and the lock records tree {skill['tree_sha']}")
         return "installed"
 
     run_skills_bin(skills_bin, ["remove", name, "-g", "-y"], home, timeout=REMOVE_TIMEOUT)

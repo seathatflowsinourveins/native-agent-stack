@@ -1,0 +1,20 @@
+ok   panel 29A vector series=8 {"tool_family": "agent"}=0.1333; {"tool_family": "edit"}=2; {"tool_family": "mcp"}=1.283; {"tool_family": "other"}=0.2833; {"tool_family": "read"}=0.9833; {"tool_family": "shell"}=7.967
+ok   panel 30A vector series=5 {"tool_family": "agent"}=0.03333; {"tool_family": "code_mode"}=1.483; {"tool_family": "mcp"}=3.2; {"tool_family": "shell"}=0.2667; {"tool_family": "web"}=0.3333
+ok   panel 31A vector series=7 {"client": "claude-code"}=0.03333; {"client": "claude-code", "mcp_server_name": "plugin_context-mode_context-mode"}=1.167; {"client": "claude-code", "mcp_server_name": "qmd"}=0.08333; {"client": "codex_exec", "mcp_server_name": "ai-memory"}=0.01667; {"client": "codex_exec", "mcp_server_name": "context-mode"}=3.067; {"client": "codex_exec", "mcp_server_name": "qmd"}=0.05
+ok   panel 32A vector series=2 {"invocation_trigger": "nested-skill", "skill_name": "artifact-design"}=0.01667; {"invocation_trigger": "nested-skill", "skill_name": "codebase-design"}=0.03333
+ok   panel 33A vector series=1 {"subagent_type": "general-purpose"}=0.05
+ok   panel 33B vector series=1 {"service_name": "claude-code"}=0.08333
+ok   panel 33C vector series=1 {"service_name": "codex_exec"}=0.01667
+ok   panel 34A vector series=4 {"actor": "main", "client": "codex_exec"}=3.817; {"actor": "main_or_subagent", "client": "claude-code"}=4.867; {"actor": "subagent", "client": "codex_exec"}=0.01667; {"actor": "workflow", "client": "claude-code"}=8.1
+ok   panel 34B vector series=1 {"agent_type": "general-purpose"}=3.883
+ok   panel 35A vector series=1 {}=0.09897
+ok   panel 35B vector series=1 {}=0.8348
+ok   panel 36A vector series=1 {}=0.1153
+ok   panel 36B vector series=1 {}=0.8364
+ok   panel 36C vector series=1 {}=0.1186
+ok   panel 36D vector series=1 {}=0.3125
+ok   panel 37A vector series=1 {}=2
+ok   panel 37B vector series=1 {}=0
+ok   panel 37C vector series=1 {}=0
+ok   panel 38A vector series=8 {"actor": "main", "mcp_server_name": "plugin_context-mode_context-mode"}=0.25; {"actor": "main", "mcp_server_name": "qmd"}=0.01667; {"actor": "subagent", "mcp_server_name": "custom"}=0.03333; {"actor": "subagent", "mcp_server_name": "plugin_context-mode_context-mode"}=0.1833; {"actor": "subagent", "mcp_server_name": "qmd"}=0.03333; {"actor": "workflow", "mcp_server_name": "custom"}=0.03333
+targets=19 failures=0

@@ -1,0 +1,13 @@
+# scripts/precedence_probe.sh.txt: which layer sets model_reasoning_effort for a worker. The multi_agent_mode
+# sentence of `codex debug prompt-input` tells ultra (proactive delegation) from any other effort.
+# 2026-09-26T22:51:27Z codex-cli 0.157.1
+== trust given only as a -c flag (in this probe the project value did not apply; cause not traced)
+user max, project ultra, no profile: Do not spawn sub-agents unless
+user max, project ultra, -p stack-worker: Do not spawn sub-agents unless
+user max, project ultra, -p stack-worker + -c max: Do not spawn sub-agents unless
+control, outside the project, no profile: Do not spawn sub-agents unless
+== trust in the scratch user config file
+user max, project ultra, no profile: Proactive multi-agent delegation is active
+user max, project ultra, -p stack-worker: Proactive multi-agent delegation is active
+user max, project ultra, -p stack-worker + -c max: Do not spawn sub-agents unless
+control, outside the project, no profile: Do not spawn sub-agents unless
