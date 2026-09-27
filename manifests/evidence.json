@@ -14008,8 +14008,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2a40695b8910272d20b2cdc455370d2f59dd384adc20c36eece754138075b678",
-      "bytes": 41101
+      "sha256": "c1d902778776fea9bb955e744abf5d0dd73abb19143ee1db90e27f88f95de4b0",
+      "bytes": 43340
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14475,6 +14475,31 @@
       "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/review2_harness.py",
       "sha256": "64f456a287bb687a361a281b94cf4b20e76a6b1168a65cd0c11dddeec7407ede",
       "bytes": 12379
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
+      "sha256": "c00e2bd1dc165cb31a9885a3bdc5eb859cd26b0243ee336238afedcde9c000fe",
+      "bytes": 12514
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/native-checks.json",
+      "sha256": "089881821b4d31105f596baba06e6899e95ce9a3adc518fa53d42fad5787806d",
+      "bytes": 11995
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/qualification.json",
+      "sha256": "55b2670643c5693163a47bd8671f63366de496ea7dba47af2ed42a30ed76a870",
+      "bytes": 12827
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/returned-output.txt",
+      "sha256": "53b819b72f55980d84c52f73681c96fbf61288af5d2d29e2372bc35eb59878c3",
+      "bytes": 3161
+    },
+    {
+      "path": "evidence/artifacts/agentsview-044-qualification-20260927/upstream-tests.json",
+      "sha256": "09bab4b4d2866aaa264ed511d69a055054574a3e824d55af3db444c26f6d20a7",
+      "bytes": 14718
     },
     {
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
@@ -39150,6 +39175,11 @@
       "path": "tests/test_adoption_version_probes.py",
       "sha256": "36de5b9442ea76c735ef789599dfcf2b7d903d34f69d844f22423501bbde5054",
       "bytes": 23447
+    },
+    {
+      "path": "tests/test_agentsview_qualification.py",
+      "sha256": "df6296e8e4e51f4d959f52686ecba2027d4dc804e407fa3952e06685729ea858",
+      "bytes": 11313
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
