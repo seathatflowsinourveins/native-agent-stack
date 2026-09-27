@@ -164,9 +164,9 @@ BLOCKED = {
     "sudo -iu root cat .env": "dotenv_read",
     "nice -n 5 cat .env": "dotenv_read",
     "stdbuf -o0 cat .env": "dotenv_read",
-    # Home credential files as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key
-    # (a glob too) but not its .pub, the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an
-    # option's `=` value, and Codex shell snapshots, which record every exported value.
+    # Home credential stores as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key (a glob
+    # too), the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an option's `=` value, and Codex shell
+    # snapshots, which record every exported value. The rest of each store follows further down.
     "cat ~/.ssh/id_ed25519": "credential_file_read",
     "cp ~/.ssh/id_rsa /tmp/key": "credential_file_read",
     "base64 \"$HOME/.ssh/id_ecdsa\"": "credential_file_read",
@@ -204,9 +204,51 @@ BLOCKED = {
     "rtk -v summary --ultra-compact cat ~/.aws/credentials": "credential_file_read",
     "rtk proxy cat .env": "dotenv_read",
     "rtk env": "environment_dump",
-    # OmniRoute keeps its secrets in .env layers and server.env in its data directory: dotenv files.
-    "cat ~/.omniroute/.env": "dotenv_read",
-    "cat ~/.config/omniroute/server.env": "dotenv_read",
+    # OmniRoute keeps its secrets in .env layers and server.env in its data directory: dotenv files there, now
+    # reported as reads of the data directory, which the store rule checks first.
+    "cat ~/.omniroute/.env": "credential_file_read",
+    "cat ~/.config/omniroute/server.env": "credential_file_read",
+    "cat /srv/omniroute-data/.env": "dotenv_read",
+    # Every path the template's credential-store Read denies cover (2026-09-27 independent verification). rtk 0.50.0
+    # rewrites `cat`, `head` and `tail -n` of them to `rtk read` before Claude Code checks its rules, so on an RTK
+    # host the guard is what stops those readers (test_every_template_read_deny_has_a_blocked_bash_reader). Anything
+    # in the SSH, GnuPG, AWS, Azure, kube and OmniRoute directories counts, `.pub`, `config` and a key under any name
+    # included, because the template denies all of ~/.ssh (a carve-out is an open user decision that would change
+    # both); so do each directory itself and a glob in it, and the Docker home as a whole.
+    "cat ~/.ssh/config": "credential_file_read",
+    "cat ~/.ssh/id_ed25519.pub": "credential_file_read",
+    "cp ~/.ssh/id_*.pub /tmp/keys/": "credential_file_read",
+    "cp -t /tmp/keys ~/.ssh/id_ed25519.pub": "credential_file_read",
+    "cat ~/.ssh/github_deploy_key": "credential_file_read",
+    "cat ~/.aws/config": "credential_file_read",
+    "cat ~/.azure/msal_token_cache.json": "credential_file_read",
+    "cat ~/.omniroute/storage.sqlite": "credential_file_read",
+    "cat ~/.config/omniroute/storage.sqlite": "credential_file_read",
+    "cat /mnt/c/Users/example/AppData/Roaming/omniroute/storage.sqlite": "credential_file_read",
+    "cat ~/.gnupg/private-keys-v1.d/ABCD.key": "credential_file_read",
+    "tail ~/.kube/cache/discovery/example/servergroups.json": "credential_file_read",
+    "cat ~/.ssh/*": "credential_file_read",
+    "head -n 100 ~/.ssh/*": "credential_file_read",
+    "base64 ~/.ssh/*": "credential_file_read",
+    "cp -r ~/.ssh /tmp/k": "credential_file_read",
+    "rsync -a ~/.ssh/ /tmp/k/": "credential_file_read",
+    "grep -r BEGIN ~/.ssh": "credential_file_read",
+    "grep -r -A 40 PRIVATE ~/.ssh/": "credential_file_read",
+    "cat ~/.aws/*": "credential_file_read",
+    "cp -r ~/.aws /tmp/a": "credential_file_read",
+    "cat ~/.kube/*": "credential_file_read",
+    "find ~/.ssh -type f -exec cat {} +": "credential_file_read",
+    "find ~/.aws -name credentials -exec cat {} \\;": "credential_file_read",
+    "rtk read ~/.aws/*": "credential_file_read",
+    "cat ~/.docker/*": "credential_file_read",
+    "cp -r ~/.docker /tmp/d": "credential_file_read",
+    "cat ~/.config/nativestack/example.key": "credential_file_read",
+    # Erring toward blocking (docs/secret-storage.md): a client whose key or home option names a store as the
+    # operand of a program the guard treats as a reader. A key named in ~/.ssh/config or loaded with ssh-add, and
+    # gpg without --homedir, pass.
+    "scp -i ~/.ssh/nas_key build.tgz nas:/volume1/": "credential_file_read",
+    "rsync -a -e 'ssh -i ~/.ssh/nas_key' dist/ nas:/volume1/dist/": "credential_file_read",
+    "gpg --homedir ~/.gnupg --list-keys": "credential_file_read",
 }
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
@@ -571,29 +613,33 @@ SAFE_CORPUS = [
     "tvly search \"agent harness\" --depth basic --max-results 4 --json",
     "tvly --version",
     "ls ~/.tavily",
-    # The home credential-file rule blocks readers only: clients that use a key or a store, listings,
-    # public keys, SSH config and mode changes pass (the H4 chmod of Codex snapshots included).
+    # The home credential-store rule blocks readers only: clients that use a key or a store, listings, status
+    # and mode changes pass (the H4 chmod of Codex snapshots included), and so do the Docker and Codex files that
+    # hold no credential.
     "ssh-add",
     "ssh-add ~/.ssh/id_ed25519",
     "ssh -i ~/.ssh/id_ed25519 git@github.com",
     "ssh-keygen -y -f ~/.ssh/id_ed25519",
     "ls -la ~/.ssh",
-    "cat ~/.ssh/id_ed25519.pub",
-    "cp ~/.ssh/id_*.pub /tmp/keys/",
-    "cat ~/.ssh/config",
-    "cat ~/.aws/config",
+    "ls -la ~/.aws ~/.kube ~/.gnupg",
+    "chmod 700 ~/.ssh",
+    "stat -c '%a %U' ~/.ssh/id_ed25519",
+    "gh ssh-key add ~/.ssh/id_ed25519.pub --title example",
     "kubectl --kubeconfig ~/.kube/config get pods",
     "curl --netrc https://example.invalid",
     "chmod 600 ~/.codex/shell_snapshots/*.sh",
     "ls ~/.codex/shell_snapshots",
+    "cat ~/.docker/buildx/current",
+    "cat ~/.codex/config.toml",
     # A search's own pattern is not a file it reads (grep(1): PATTERNS before FILE), when only plain flags
-    # come before it; dd writes its of= file; cp -t copies a public key into the directory it names.
+    # come before it; dd writes its of= file; cp -t copies into the directory it names.
     "rg shell_snapshots docs",
     "grep -nF '.ssh/id_ed25519' README.md",
+    "rg -n '\\.aws/credentials' docs",
     "git grep -n '.kube/config' -- docs",
     "grep -- ~/.netrc README.md",
     "dd of=/home/example/.npmrc if=template.npmrc",
-    "cp -t /tmp/keys ~/.ssh/id_ed25519.pub",
+    "cp -t /tmp/out docs/secret-storage.md",
     # Ordinary rtk use: filtered git, raw re-runs through `rtk proxy`, reading a repository file, a listing.
     "rtk git status",
     "rtk proxy git show HEAD:README.md",
@@ -642,12 +688,21 @@ EXPECTED_PASS_THROUGH = [
     f"{DEMO_EXEC} sh -c 'eval echo \\$KK_DEMO_TOK$0' EN",
     f"{EXEC} script -qc 'export -p' /dev/null",
     "watch -n 5 cat .env",
-    # Home credential files: a key under a custom name, a relative read after `cd`, a client that prints
-    # its own store, and a program that opens a store itself (the database file name is illustrative).
-    "cat ~/.ssh/github_deploy_key",
+    # Home credential stores: a relative read after `cd`, a client that prints its own store, a program that
+    # opens a store itself (the database file name is illustrative), an archiver on a store, a glob that names a
+    # store only after the shell expands it, a copy or search of an ancestor of a store (~/.config, the Codex
+    # home that holds shell_snapshots) or of a directory that holds an older store file (~/.claude, whose
+    # .credentials.json the mention rule covers only by name), and an OmniRoute DATA_DIR elsewhere.
     "cd ~/.aws && cat credentials",
     "kubectl config view --raw",
+    "gpg --export-secret-keys --armor",
     "sqlite3 ~/.omniroute/gateway.sqlite .dump",
+    "tar czf /tmp/k.tgz ~/.ssh",
+    "cat ~/.n*rc",
+    "cp -r ~/.config /tmp/c",
+    "cp -r ~/.codex /tmp/c",
+    "grep -r token ~/.claude",
+    "cat /srv/omniroute-data/storage.sqlite",
 ]
 
 
@@ -686,6 +741,27 @@ class SecretPathGuardTests(unittest.TestCase):
             for prefix in ("rtk proxy ", "rtk -v proxy --skip-env "):
                 with self.subTest(command=command, prefix=prefix):
                     self.assertEqual(guard.check(prefix + command), reason)
+
+    def test_every_template_read_deny_has_a_blocked_bash_reader(self):
+        # The settings template registers `rtk hook claude`. rtk 0.50.0 rewrites `cat`, `head` and `tail -n` of a file
+        # to `rtk read` (src/discover/rules.rs), Claude Code evaluates its permission rules against the command a hook
+        # returns (hooks, PreToolUse `updatedInput`), and RTK leaves a command alone only when a Bash(...) deny rule
+        # matches it (src/hooks/permissions.rs, append_bash_rules), so on such a host the Read denies do not stop
+        # those readers. The guard reads the command as written, so for every anchored Read deny of the template and
+        # the project settings (the `**/` twins and `!` carve-outs aside) a concrete path under it must be blocked
+        # for each reader and for the rewritten form. Found by the 2026-09-27 independent verification; a probe
+        # project holding the template's deny rules showed `rtk hook check 'cat ~/.ssh/config'` -> `rtk read`.
+        rules = set()
+        for settings in ("adoption/templates/claude.settings.template.json", ".claude/settings.json"):
+            deny = json.loads((ROOT / settings).read_text(encoding="utf-8"))["permissions"]["deny"]
+            rules.update(match.group(1) for rule in deny
+                         if (match := re.fullmatch(r"Read\(((?:~/|//|\.env).*)\)", rule)))
+        self.assertGreaterEqual(len(rules), 26)
+        for pattern in sorted(rules):
+            path = re.sub(r"^//", "/", pattern).replace("**", "sample.txt").replace("*", "sample")
+            for command in (f"cat {path}", f"head -n 5 {path}", f"tail -n 3 {path}", f"rtk read {path}"):
+                with self.subTest(rule=pattern, command=command):
+                    self.assertIsNotNone(guard.check(command))
 
     def test_documented_keyring_commands_pass(self):
         # The keyring commands in the fenced blocks of the pages that document them.

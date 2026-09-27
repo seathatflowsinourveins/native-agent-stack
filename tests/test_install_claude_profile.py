@@ -264,8 +264,9 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         self.assertFalse(any("force-with-lease" in rule for rule in deny))
 
     def test_the_push_denies_also_match_the_rtk_rewrite(self):
-        # This template registers rtk 0.50.0's Claude hook (`rtk hook claude`). It leaves a command that a deny
-        # rule of the project or user settings files matches untouched, so Claude's own deny applies to it
+        # This template registers rtk 0.50.0's Claude hook (`rtk hook claude`). It leaves a command that a Bash(...)
+        # deny rule of the project or user settings files matches untouched (it ignores Read(...) rules), so Claude's
+        # own deny applies to it
         # (rtk-ai/rtk v0.50.0 src/hooks/decision.rs "Deny wins outright", src/hooks/permissions.rs), and it
         # rewrites a plain `git push ...` to `rtk git push ...`. A model can type the rtk spelling itself, which
         # the hook passes through unchanged, and a deny rule from a source rtk does not read (managed settings, a
