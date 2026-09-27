@@ -413,6 +413,7 @@ batch completed. `analyze.py` returned `final: true` with outcome `route_mechani
 at `medium`**. It costs 1,620.0 billed tokens per filing against A0's 1,852.3, with micro-F1 0.9935 against 0.9942
 (paired-bootstrap lower bound −0.0037). The decision covers mechanical, deterministically scored 8-K item extraction
 only. Generalization to other stages is untested, judgment roles stay on `gpt-6-astra` at `max`, and no stage's
-command changes here. One deviation: the slot locks were a dedicated directory, not a shared host pool.
-`experiment.json` remains the planned record. The receipt, with the decision, the run record, the scope and the
-deviation, is [`evidence/artifacts/gpt6-family-tiering-20260927/`](../../../evidence/artifacts/gpt6-family-tiering-20260927/README.md).
+command changes here. Two deviations: the slot locks were a dedicated directory, not a shared host pool, and inside
+each call's 0700 Codex home, Codex created directories at 0775 and files at 0664 and 0644, where `plan.json`'s
+`state_dir` gives 0700 and 0600 for the whole state tree. `experiment.json` remains the planned record. The receipt,
+with the decision, the run record, the scope and the deviations, is [`evidence/artifacts/gpt6-family-tiering-20260927/`](../../../evidence/artifacts/gpt6-family-tiering-20260927/README.md).

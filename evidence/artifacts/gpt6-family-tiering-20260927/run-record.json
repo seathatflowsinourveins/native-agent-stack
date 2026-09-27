@@ -294,7 +294,13 @@
       "what": "Slot lock directory",
       "planned": "README step 2: CODEX_SLOT_LOCKS is the host's shared Codex slot directory holding slot-1..slot-3, which the landscape-sweep runner also takes.",
       "actual": "None existed at launch (coordinator). At the run's checkout, the landscape-sweep runner's slot pool defaults to its own <work-dir>/locks (tools/sota-convergence/landscape-sweep/codex_job.py, docstring and settings()), and the coordinator reported that the sweep's GPT-6 lane runs through OmniRoute with its own work-dir locks. The coordinator created a dedicated owner-only (0700) directory holding slot-1..slot-3 and passed it as --lock-dir.",
-      "effect": "The three-slot cap bounded the tiering's own calls (slots 1, 2 and 3 took 51, 49 and 51 calls; each arm's summed slot wait was at most 0.002 s), but it was not shared with other Codex jobs on the host. Token counts are per-call Codex counters and scoring reads each call's own reply, so neither depends on the pool. Only wall times could, and wall time only breaks cost ties, which this decision did not need."
+      "effect": "The three-slot cap bounded the tiering's own calls (slots 1, 2 and 3 took 51, 49 and 51 calls; each arm's summed slot wait was at most 0.002 s), but it was not shared with other Codex jobs on the host. Scoring reads each call's own reply, so it does not depend on the pool. Token counts are per-call Codex counters, but their cached input reflects the provider's cache state, which scheduling (concurrency and call order) can influence; the dedicated pool's effect on cached input was not measured. Without the cache credit S1 still ranks first, at 1,861.8 input plus output tokens per filing against A0's 1,924.8 (README 'Reading the cost numbers', outside the frozen rule). Wall times could also depend on the pool; wall time only breaks cost ties, which this decision did not need."
+    },
+    {
+      "what": "Modes inside each call's Codex home",
+      "planned": "plan.json state_dir: the whole state tree, including each attempt's codex-home/ with Codex's session record, logs and state, as 0700 directories and 0600 files.",
+      "actual": "The runner's own 314 directories are 0700 and its 629 files 0600, and it creates each codex-home at 0700 (run_arm.py, codex_home.mkdir(mode=0o700); its only chmod sets its own files to 0600). It sets no umask and does not change the modes of what Codex writes there. Under codex-home, each codex-home itself included, 302 directories are 0700 and 5,285 are 0775; of the files there, 151 are 0600, 9,513 are 0664 and 1,329 are 0644 (privacy_check.state_directory_modes).",
+      "effect": "Each of these lies below its call's 0700 attempt directory, so it is reachable only through owner-only directories. No file from them is copied into these records; they hold only the item-type counts that each call's call.json took from its session record. Scores and token counts do not depend on these modes."
     }
   ],
   "quota_context": {
@@ -357,7 +363,7 @@
       "runner directories 0700": 314,
       "runner files 0600": 629
     },
-    "reading": "The runner's own directories and files are 0700 and 0600, as the plan states. Inside each call's 0700 codex-home, Codex created its own files and directories with its default modes; they are reachable only through the owner-only directories above them. Every call's credential link was removed, and no call left an entry in its scratch directory."
+    "reading": "The runner's own directories and files are 0700 and 0600, as the plan states. Inside each call's 0700 codex-home, Codex created directories at 0775 and files at 0664 and 0644 besides 0700 and 0600, where the plan's state_dir gives 0700 and 0600 for the whole tree (deviations[1]); they are reachable only through the owner-only directories above them. Every call's credential link was removed, and no call left an entry in its scratch directory."
   },
   "sanitization": "Aggregates and metadata only. No filing text, accession number, rendered batch prompt or its hash, reply, event, stderr or Codex session record was copied. The only prompt hash in these records is the public template's (prompt.txt), in decision.json's frozen map. Private paths are written as ~ or as the README's pointer variables LI26_ACQ and CODEX_SLOT_LOCKS."
 }

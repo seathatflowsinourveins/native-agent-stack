@@ -28,8 +28,10 @@ upstream test and no synthetic fixture is part of this result.
 
 - **Covered:** mechanical, deterministically scored 8-K item extraction. That is the frozen task: li26's 360
   filings of 2020-03-02 in the 25 frozen batches of up to 15 filings, with filer-declared header `ITEMS` as labels
-  and li26's scorers and 16,000-character cap. The calls went through the frozen, tool-free `codex exec` command on
-  `codex-cli 0.157.1`, on this host, one run per arm on one day.
+  and li26's scorers and 16,000-character cap. The calls went through the frozen isolation `codex exec` command on
+  `codex-cli 0.157.1`, on this host, one run per arm on one day. That command still offers `exec`, `wait` and
+  `request_user_input`. Any tool call fails the call, and its reply is not scored (the preregistration's
+  [Why the overrides](../../../blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md#why-the-overrides)).
 - **Untested:** generalization to any other stage. That includes other extraction tasks or labels, other batch
   sizes, days or Codex versions, stages that let the model use tools, and every review, research, synthesis or other
   judgment stage.
@@ -130,8 +132,21 @@ output tokens (70,942 of them reasoning), or 3,793,052 billed tokens. Each call 
   dedicated owner-only directory holding `slot-1` to `slot-3` and passed it as `--lock-dir`.
   - The cap of three bounded the tiering's own calls: slots 1, 2 and 3 took 51, 49 and 51 calls, and each arm's
     summed slot wait was at most 0.002 s. It was not shared with other Codex jobs on the host.
-  - Token counts are per-call counters, and scoring reads each call's own reply, so neither depends on the pool.
-    Only wall time could, and the decision used none.
+  - Scoring reads each call's own reply, so it does not depend on the pool. Token counts are per-call counters,
+    but their cached input reflects the provider's cache state, which scheduling (concurrency and call order) can
+    influence. The dedicated pool's effect on cached input was not measured. Without the cache credit, S1 still
+    ranks first: 1,861.8 input plus output tokens per filing against A0's 1,924.8 (see
+    [Reading the cost numbers](#reading-the-cost-numbers); that view is outside the frozen rule).
+  - Wall time could also depend on the pool. It only breaks cost ties, and the decision needed none.
+- **Deviation: modes inside each call's Codex home.** `plan.json`'s `state_dir` gives the whole state tree as 0700
+  directories and 0600 files, including each attempt's `codex-home/` with Codex's session record, logs and state.
+  The runner's own 314 directories are 0700 and its 629 files 0600, and it creates each `codex-home` at 0700
+  (`run_arm.py`). It sets no umask and does not change the modes of what Codex writes there.
+  - Under `codex-home`, each `codex-home` itself included, 302 directories are 0700 and 5,285 are 0775. Of the
+    files there, 151 are 0600, 9,513 are 0664 and 1,329 are 0644.
+  - Each of them lies below its call's 0700 attempt directory, so it is reachable only through owner-only
+    directories. No file from them is copied here. The records hold only the item-type counts that each call's
+    `call.json` took from its session record (see [Privacy boundary, as observed](#privacy-boundary-as-observed)).
 - **Quota context.** The coordinator ran `scripts/codex_quota.py --json` at launch: the `codex` bucket's weekly
   window was at 3% used, on plan type `pro`. That is the only reading. No per-arm readings were taken, so `analyze.py`
   ran without `--quota-context` and the decision's `quota_context` is `null`. Other sessions share the account, so
@@ -168,8 +183,10 @@ records here do not depend on it.
 ## Privacy boundary, as observed
 
 - Replies, events, stderr, Codex session records and per-call records stay in the private state directory. The
-  runner's 314 directories are 0700 and its 629 files 0600. Inside each call's 0700 `codex-home`, Codex created its
-  own files with its default modes, reachable only through the owner-only directories above them.
+  runner's 314 directories are 0700 and its 629 files 0600. Inside each call's 0700 `codex-home`, Codex created
+  directories at 0775 and files at 0664 and 0644 besides 0700 and 0600, reachable only through the owner-only
+  directories above them. The plan gives 0700 and 0600 for the whole tree, so this is the second recorded deviation
+  (see Run record).
 - All 151 credential links were removed after their calls, and no call left anything in its scratch directory.
 - Published here: `decision.json` holds aggregates only (`no_document_text: true`, repository-relative paths, no
   filing text, reply text or accession numbers). `run-record.json` holds run metadata and aggregates. Neither
@@ -195,4 +212,4 @@ Recording the observed convergence record is a later change.
 |---|---|
 | [`README.md`](README.md) | This summary: decision, scope, per-arm quality, tokens and time, the retry, the run record, re-verification, privacy and limits |
 | [`decision.json`](decision.json) | The frozen `analyze.py` decision, copied unchanged (SHA-256 `555ed71c…`); a rerun reproduced it byte for byte |
-| [`run-record.json`](run-record.json) | The run record: provenance, checkout and pre-run checks, launch and loop exits, per-arm times, call aggregates, the retried batch, usage totals, versions, the lock-directory deviation, quota context, the analysis rerun and the privacy check |
+| [`run-record.json`](run-record.json) | The run record: provenance, checkout and pre-run checks, launch and loop exits, per-arm times, call aggregates, the retried batch, usage totals, versions, the two deviations (slot lock directory, modes inside each call's Codex home), quota context, the analysis rerun and the privacy check |
