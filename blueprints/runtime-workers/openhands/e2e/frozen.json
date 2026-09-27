@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic fixture",
+  "allowed_files": [
+    "range_utils.py"
+  ],
+  "expected_test_count": 1,
+  "test_command": "python -B -m unittest discover -s tests -v",
+  "files": {
+    "README.md": "3af3bcbdb2c08a268481be21a5b3a136d35cafaa8107a83f14db0a0358497f06",
+    "range_utils.py": "219dfcb3d11544b62e9fd496fc2e544f4689c286253118c48248c88d0802c66d",
+    "tests/test_ranges.py": "bfa9a8f4fb795f6201b45f7efce2a9477fbbd94041e56382be0756e6b1bd1b73"
+  }
+}

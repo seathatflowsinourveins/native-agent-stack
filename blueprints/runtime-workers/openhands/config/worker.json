@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "model_env": "OPENHANDS_MODEL",
+  "llm": {
+    "model": "cx/gpt-6-astra-max",
+    "model_canonical_name": "openai/gpt-6",
+    "base_url": "http://127.0.0.1:20128/v1",
+    "api_key": "local-loopback",
+    "api_mode": "responses",
+    "reasoning_effort": "max",
+    "stream": true,
+    "native_tool_calling": true,
+    "max_output_tokens": 16384,
+    "num_retries": 2,
+    "timeout": 180,
+    "capability_overrides": {
+      "supports_reasoning_effort": true,
+      "supports_sampling_params": false,
+      "supports_responses_api": true
+    }
+  },
+  "runtime": {
+    "agent_loop": "container",
+    "llm_calls": "container",
+    "stdio_mcp": "container",
+    "gateway_base_url": "http://10.0.2.2:20128/v1",
+    "published_ports": [],
+    "max_iteration_per_run": 40,
+    "timeout_seconds": 1200,
+    "cpus": "4",
+    "memory": "8g",
+    "pids_limit": 384
+  },
+  "condenser": {
+    "kind": "LLMSummarizingCondenser",
+    "max_size": 80,
+    "keep_first": 2,
+    "max_tokens": 60000
+  },
+  "agent_context": {
+    "load_user_skills": false,
+    "load_public_skills": false,
+    "load_project_skills": false,
+    "load_memory": false
+  }
+}

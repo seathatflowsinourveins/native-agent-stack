@@ -1,0 +1,10 @@
+Fix the tiny repository at /workspace according to its README.
+The allowed edit is range_utils.py only. The existing test seam and test-first
+procedure are already authorized. Invoke the pinned tdd skill with invoke_skill.
+Before any edit, run exactly: python -B -m unittest discover -s tests -v
+Observe its failing assertion, repair the implementation, and rerun that command.
+Use context-mode for a bounded inspection when useful, and use the installed
+coding/retrieval tools only when they improve this task. Do not manufacture MCP
+calls to inflate coverage. Do not edit tests, README, runner state or recipe files.
+Do not install software, start services, contact broker APIs or use Git. Finish
+with the change and the actual test result.

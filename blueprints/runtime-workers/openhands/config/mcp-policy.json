@@ -1,0 +1,24 @@
+{
+  "context-mode": {
+    "disabled_tools": ["ctx_upgrade", "ctx_purge"],
+    "env": {"CONTEXT_MODE_PROJECT_DIR": "/workspace"}
+  },
+  "serena": {"enabled": true},
+  "jcodemunch": {"enabled_tools": ["route", "menu", "order"]},
+  "qmd": {
+    "enabled_tools": ["query", "get", "multi_get", "status"],
+    "collections": ["foundation-docs", "foundation-adoption", "us-equities-foundation", "us-equities-catalog"]
+  },
+  "ai-memory": {
+    "enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"]
+  },
+  "socraticode": {
+    "enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
+    "env": {"SOCRATICODE_WATCHER": "manual"}
+  },
+  "headroom": {
+    "enabled": false,
+    "enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"],
+    "reason": "Native terminal output offload and LLMSummarizingCondenser cover this bounded task; no demonstrated remaining gap."
+  }
+}
