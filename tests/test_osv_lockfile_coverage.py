@@ -2,17 +2,20 @@
 
 .github/osv-scanner-lockfiles.json is the one checked-in list of files the osv-scanner job
 scans. These tests fail when a tracked lockfile or manifest is missing from it (unless its
-"excluded" list names it with a reason and an evidence path), when a listed file no longer exists, when a parser name is not one OSV-Scanner v2 accepts for that file, and
+"excluded" list names it with a reason and an evidence path), when a listed file no longer exists, when a parser name is not one OSV-Scanner v2 accepts for that file,
 when an ignore in .github/osv-scanner.toml lacks an id, a reason or an ignoreUntil at most 90
-days away.
+days away, and when a repo-wide ignore would hide a pin that IGNORE_ALLOWED_LOCKS does not allow
+for that lock and advisory at the lock's reviewed sha256.
 """
 
 from datetime import date, timedelta
 from pathlib import Path
+import hashlib
 import json
 import os
 import re
 import subprocess
+import tempfile
 import tomllib
 import unittest
 
@@ -39,14 +42,21 @@ PARSERS = {"requirements.txt", "packages.lock.json"}
 
 # osv-scanner 2.6.0 matches [[IgnoredVulns]] by id in every lockfile it scans (ShouldIgnore checks only the id and
 # ignoreUntil, and security-scan.yml passes one --config for the whole inventory). An ignore added for one lock is
-# therefore repo-wide. Each such ignore names the package versions it affects and the only locks allowed to pin them.
+# therefore repo-wide. IGNORE_SCOPES names the package versions each such ignore affects. IGNORE_ALLOWED_LOCKS names the
+# only locks allowed to pin them: per inventory lockfile, the advisories whose non-reachability was reviewed for it, the
+# sha256 of the lock content that review covered and the repository path of its evidence. A changed lock needs a new
+# review before its new digest is recorded here.
 IGNORE_SCOPES = {
     # nltk: no patched release, so every version is affected.
     "GHSA-8mgp-746c-j5xp": {"package": "nltk", "fixed": None},
     "GHSA-h35f-9h28-mq5c": {"package": "setuptools", "fixed": (83, 0, 0)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+    "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock": {
+        "advisories": ["GHSA-8mgp-746c-j5xp", "GHSA-h35f-9h28-mq5c"],
+        "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+        "evidence": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json",
+    },
 }
 REQUIREMENT = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)\s*(?:\[[^\]]*\])?\s*(?:===?\s*([0-9][^\s;\\,]*))?")
 
@@ -84,22 +94,34 @@ def version_tuple(text):
     return tuple(parts)
 
 
-def affected_pins(entries, ignore_ids):
-    """(path, package, version, advisory) for each lock outside IGNORE_ALLOWED_LOCKS that pins a version an active
-    repo-wide ignore would hide: nltk at any version (or unpinned), setuptools below 83.0.0 (unpinned resolves to a
-    fixed release, so it is not counted)."""
+def affected_pins(entries, ignore_ids, allowed=IGNORE_ALLOWED_LOCKS):
+    """(path, package, version, advisory) for each pin of a version an active repo-wide ignore would hide: nltk at any
+    version (or unpinned), setuptools below 83.0.0 (unpinned resolves to a fixed release, so it is not counted). A lock
+    that `allowed` names is exempt only for the advisories its entry lists."""
     found = []
     for entry in entries:
-        if entry["path"] in IGNORE_ALLOWED_LOCKS:
-            continue
+        exempt = set(allowed.get(entry["path"], {}).get("advisories", ()))
         for package, version in python_pins(ROOT / entry["path"], entry.get("parser")):
             for advisory in ignore_ids:
                 scope = IGNORE_SCOPES[advisory]
-                if package != scope["package"]:
+                if advisory in exempt or package != scope["package"]:
                     continue
                 if scope["fixed"] is None or (version is not None and version_tuple(version) < scope["fixed"]):
                     found.append((entry["path"], package, version, advisory))
     return found
+
+
+def digest_drift(allowed=IGNORE_ALLOWED_LOCKS):
+    """(path, reviewed sha256, current sha256, or None for a missing file) for each allowed lock whose bytes differ from
+    the content its review covered. `* text=auto eol=lf` in .gitattributes checks locks out with LF on every host, so
+    the digest does not depend on the checkout."""
+    drift = []
+    for path, grant in sorted(allowed.items()):
+        lock = ROOT / path
+        current = hashlib.sha256(lock.read_bytes()).hexdigest() if lock.is_file() else None
+        if current != grant["sha256"]:
+            drift.append((path, grant["sha256"], current))
+    return drift
 
 
 def tracked_files():
@@ -190,19 +212,22 @@ class IgnorePolicyTests(unittest.TestCase):
             self.assertLessEqual(until, latest, f"{entry.get('id')}: ignoreUntil more than 90 days away")
 
     def test_repo_wide_ignores_hide_nothing_outside_their_allowed_lock(self):
-        # 9a's condition on #336: the Lumibot-only ignores match repo-wide, so no other inventory lockfile may pin
-        # nltk (any version) or setuptools below 83.0.0 while they are active.
+        # Every ignore matches repo-wide, so while one is active no inventory lockfile may pin a version it would hide
+        # (IGNORE_SCOPES) unless IGNORE_ALLOWED_LOCKS lists that advisory for that lock; AllowedLockTests bind each
+        # entry to the reviewed lock's sha256 and its evidence. The rule began as 9a's condition on #336 for the
+        # Lumibot ignores.
         config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
         active = [entry["id"] for entry in config.get("IgnoredVulns", [])]
         unscoped = [advisory for advisory in active if advisory not in IGNORE_SCOPES]
         self.assertEqual(unscoped, [], "every ignore needs an IGNORE_SCOPES entry naming the versions it affects")
         entries = json.loads(INVENTORY.read_text(encoding="utf-8"))["lockfiles"]
-        self.assertEqual(affected_pins(entries, active), [])
+        self.assertEqual(affected_pins(entries, active), [],
+                         "pin a fixed version, or review reachability and list the advisory for that lock in "
+                         "IGNORE_ALLOWED_LOCKS with the lock's sha256 and the evidence path")
 
     def test_the_scope_guard_catches_a_mutant(self):
         # A lock outside the allowed set that pins nltk, or setuptools below the fix, must be reported; a fixed
         # setuptools and an unpinned setuptools must not.
-        import tempfile
         with tempfile.TemporaryDirectory() as scratch:
             lock = Path(scratch) / "requirements.lock"  # an absolute path: ROOT / path keeps it as is
             lock.write_text("nltk==3.9.1 \\\n    --hash=sha256:00\nsetuptools==80.9.0\nSetuptools==84.0.0\n"
@@ -223,6 +248,70 @@ class IgnorePolicyTests(unittest.TestCase):
             if hasattr(until, "date"):
                 until = until.date()
             self.assertLessEqual(until, latest, f"{entry}: effectiveUntil more than 90 days away")
+
+
+class AllowedLockTests(unittest.TestCase):
+    """Each IGNORE_ALLOWED_LOCKS entry is a scanned lock, bound to the advisories reviewed for it, the sha256 of the
+    content that review covered and an existing evidence file."""
+
+    config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+
+    def test_every_allowed_lock_is_an_inventory_lockfile(self):
+        listed = {entry["path"] for entry in self.inventory["lockfiles"]}
+        self.assertEqual(sorted(set(IGNORE_ALLOWED_LOCKS) - listed), [],
+                         f"an allowed lock must be scanned: list it under lockfiles in {INVENTORY.relative_to(ROOT)}")
+
+    def test_every_allowed_lock_matches_its_reviewed_digest(self):
+        self.assertEqual(
+            digest_drift(), [],
+            "these allowed locks changed after their reachability review (path, reviewed sha256, current sha256). "
+            "Re-review whether each changed lock reaches the advisories listed for it, then record its new sha256 and "
+            "the evidence path of that review in IGNORE_ALLOWED_LOCKS, or remove the entry and the affected pins.")
+
+    def test_every_allowed_lock_names_existing_evidence(self):
+        for path, grant in IGNORE_ALLOWED_LOCKS.items():
+            evidence = grant.get("evidence", "")
+            self.assertTrue(evidence and (ROOT / evidence).is_file(),
+                            f"{path}: evidence must be the repository path of its non-reachability receipt")
+
+    def test_allowed_advisories_are_scoped_active_ignores(self):
+        active = {entry["id"] for entry in self.config.get("IgnoredVulns", [])}
+        for path, grant in IGNORE_ALLOWED_LOCKS.items():
+            advisories = set(grant["advisories"])
+            self.assertTrue(advisories, f"{path}: an entry lists the advisories it may pin")
+            self.assertLessEqual(advisories, set(IGNORE_SCOPES), f"{path}: every advisory needs an IGNORE_SCOPES entry")
+            self.assertLessEqual(advisories, active, f"{path}: drop advisories with no active ignore in {CONFIG.name}")
+
+    def test_an_allowed_lock_is_exempt_only_for_the_advisories_it_lists(self):
+        # A lock allowed for the nltk advisory alone that also pins setuptools below the fix (a relock, or a new pin)
+        # must still report the setuptools pin, and only that pin.
+        with tempfile.TemporaryDirectory() as scratch:
+            lock = Path(scratch) / "requirements.lock"  # an absolute path: ROOT / path keeps it as is
+            lock.write_text("nltk==3.10.3 \\\n    --hash=sha256:00\nsetuptools==80.10.2\n", encoding="utf-8")
+            evidence = Path(scratch) / "reachability.json"
+            evidence.write_text("{}\n", encoding="utf-8")
+            allowed = {str(lock): {"advisories": ["GHSA-8mgp-746c-j5xp"],
+                                   "sha256": hashlib.sha256(lock.read_bytes()).hexdigest(), "evidence": str(evidence)}}
+            found = affected_pins([{"path": str(lock), "parser": "requirements.txt"}], list(IGNORE_SCOPES), allowed)
+        self.assertEqual([(package, version, advisory) for _, package, version, advisory in found],
+                         [("setuptools", "80.10.2", "GHSA-h35f-9h28-mq5c")])
+
+    def test_the_digest_check_catches_a_changed_byte(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            lock = Path(scratch) / "requirements.lock"
+            lock.write_bytes(b"nltk==3.10.3 \\\n    --hash=sha256:00\n")
+            evidence = Path(scratch) / "reachability.json"
+            evidence.write_text("{}\n", encoding="utf-8")
+            reviewed = hashlib.sha256(lock.read_bytes()).hexdigest()
+            allowed = {str(lock): {"advisories": ["GHSA-8mgp-746c-j5xp"], "sha256": reviewed,
+                                   "evidence": str(evidence)}}
+            self.assertEqual(digest_drift(allowed), [])
+            content = bytearray(lock.read_bytes())
+            content[content.index(b"3.10.3") + 5] ^= 1  # one byte: nltk==3.10.3 becomes nltk==3.10.2
+            lock.write_bytes(bytes(content))
+            drift = digest_drift(allowed)
+        self.assertEqual(drift, [(str(lock), reviewed, hashlib.sha256(bytes(content)).hexdigest())])
 
 
 if __name__ == "__main__":

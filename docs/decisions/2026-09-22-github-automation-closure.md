@@ -193,16 +193,40 @@ locally with `GH_TOKEN` set and no `--offline`, using
   enforced by the unit test. Since 2026-09-26 two time-boxed entries (until
   2026-12-24) exist for the evaluation-only Lumibot 4.6.1 lock of the SPY
   one_zero engine trial (run offline under bwrap, never installed outside
-  that trial). osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id in every
-  scanned lockfile (one `--config` for the whole inventory), so both apply
-  repo-wide. Today only the Lumibot lock pins an affected version, and
-  `tests/test_osv_lockfile_coverage.py` fails if any other inventory lockfile
-  pins nltk at any version or setuptools below 83.0.0:
-  GHSA-8mgp-746c-j5xp (nltk 3.10.3, no patched release) and
-  GHSA-h35f-9h28-mq5c (setuptools 80.10.2; the environment was installed
-  binary-only on Linux). At expiry the Lumibot lock and both ignores are
-  deleted unless a verdict has adopted Lumibot (trading lane, 2026-09-26; the
-  OSV policy owner decides). Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
+  that trial): GHSA-8mgp-746c-j5xp (nltk 3.10.3) and GHSA-h35f-9h28-mq5c
+  (setuptools 80.10.2; the environment was installed binary-only on Linux).
+  osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id and expiry only
+  ([`internal/config/config.go:104-112`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L104-L112)),
+  and the workflow's single `--config` replaces every per-directory
+  `osv-scanner.toml` ([`docs/configuration.md`](https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md)),
+  so both ignores apply repo-wide.
+  **Scoped, digest-bound allowlist (2026-09-27).** `IGNORE_ALLOWED_LOCKS` in
+  `tests/test_osv_lockfile_coverage.py` maps each inventory lockfile that may
+  pin an affected version to the advisories whose non-reachability was
+  reviewed for it, the sha256 of the lock content that review covered and
+  the repository path of its evidence. The test fails when an inventory
+  lockfile pins nltk at any version, or setuptools below 83.0.0, for an
+  advisory its entry does not list; when an allowed lock's bytes no longer
+  match the reviewed sha256 (re-review reachability, then record the new
+  digest and evidence); when the evidence file is missing; and when an entry
+  lists an advisory with no scope or no active ignore. The earlier set of
+  allowed paths exempted a listed lock from every advisory and bound nothing
+  to its content, so a lock added for the nltk advisory alone (the pending
+  GPT Researcher and crawl4ai runtime locks, #426 and #428) could have gained
+  a setuptools pin below 83 or been relocked without failing. Today one entry
+  allows both advisories for the Lumibot lock; its digest equals the
+  `lock_sha256` its evidence recorded. nltk has no patched release as of
+  2026-09-27 (PyPI latest 3.10.3); the fixes are merged on develop
+  (nltk#3757, #3759, #3813). **Expiry:** relock every allowed lock onto the
+  first nltk release that ships those fixes, then delete the nltk ignore;
+  delete the Lumibot lock, and with it the setuptools ignore, unless a
+  verdict has adopted Lumibot (trading lane, 2026-09-26; the OSV policy
+  owner decides). **Alternatives considered:** per-directory
+  `osv-scanner.toml` files (replaced by the workflow's single `--config`) and
+  `[[PackageOverrides]]` (matched by package and version rather than lock,
+  and `vulnerability.ignore` drops every advisory of that package).
+  **Overturn:** OSV-Scanner scopes an ignore to paths, or the workflow scans
+  each lock with its own config. Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day

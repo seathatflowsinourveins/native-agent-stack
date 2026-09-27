@@ -3372,8 +3372,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "9cd9fd23b73813141599fbd7e7ddcaaa1098df9d14d5dfec9414684a57fbbca1",
-      "bytes": 2327
+      "sha256": "b47d5728daaf78904f953d8fd127f52d64022688ed7befeb00224c15b8250135",
+      "bytes": 3200
     },
     {
       "path": ".github/pull_request_template.md",
@@ -13783,8 +13783,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "7788b5bda8c5e01ea12d21f9b8856ce2dc827782de03635418c0dbdccb33f631",
-      "bytes": 121949
+      "sha256": "70aef6d0762baeefc4f208486944a72b147920e0c2d57a9be9e3157acd3d1341",
+      "bytes": 123801
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -39658,8 +39658,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "2d0f6fdc6c8f947e48846e229cdb74ae54c13359654162be01da047741394f7e",
-      "bytes": 11823
+      "sha256": "fe9654fe71c65256820517408e3c36787f646383f53b7194c8294238f4924895",
+      "bytes": 17876
     },
     {
       "path": "tests/test_path_safety.py",
