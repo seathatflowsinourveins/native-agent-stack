@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "evidence_class": "local structural and synthetic checks only",
+  "fail_first": {
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py",
+    "exit_code": 1,
+    "recipe_directory_existed": false,
+    "returned_summary": "Ran 6 tests in 0.003s\nFAILED (failures=3, errors=3)",
+    "sanitization": "Only exact terminal summary retained; private absolute paths in missing-file tracebacks omitted"
+  },
+  "final_unit": {
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ".........\n----------------------------------------------------------------------\nRan 9 tests in 0.335s\n\nOK\n"
+  },
+  "shell_syntax": {
+    "command": [
+      "bash",
+      "-n",
+      "blueprints/runtime-workers/crawl4ai/common.sh",
+      "blueprints/runtime-workers/crawl4ai/container-entrypoint.sh",
+      "blueprints/runtime-workers/crawl4ai/container.sh",
+      "blueprints/runtime-workers/crawl4ai/install.sh",
+      "blueprints/runtime-workers/crawl4ai/run-e2e.sh"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "python_syntax": {
+    "method": "stdlib ast.parse; no imports or code execution",
+    "files": 7,
+    "passed": true
+  },
+  "publication_validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "returned_output": "{\"components\": 69, \"hashed_files\": 7345, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+    "scope": "observed after replacing the container-home literal; rerun after final evidence write"
+  },
+  "host_execution": {
+    "install": false,
+    "docker_pull": false,
+    "service_start": false,
+    "model_calls": false,
+    "live_gateway_database_read": false,
+    "unchanged_upstream_tests": "not run"
+  },
+  "test_sha256": "44521b58dd752afb932431ba0d39e9e1a4ebee1b0322cdebb986df21c2c8760d",
+  "recipe_hashes": {
+    "README.md": "f72d934365ec77c4d2f3a6dfd2213045321d53208789326309c9a65c908f2228",
+    "browser-artifacts.json": "2ccc245dc89b29d7586e8278d808301117d22740ad171810b06245201601da2d",
+    "common.sh": "28a6c62a6063e49ce4a49c6e49c39dffe11d3ca3e6118a4bc5f3091cbefeabf0",
+    "config/compose.yaml": "1fee368ad1f278f9ff7b82eb2010d470b29aba5d0b9fbf7f453ae9b8c82a2a73",
+    "config/host.example.json": "e096e196c7324a67de265fb58371747b72ef94a4f4e445ea66e216b8c44ed9b4",
+    "config/logging.ini": "b495284f90c1b328e98e7ab6dc48c7be37b7a35140a90e270ead4fef133098d8",
+    "config/mcp-policy.json": "7c253c5e14045a7310025b71ff21d45a8ef6002c22f7dc917084d3e1d152e8e1",
+    "config/server.yml": "2d77b444912fa70eac926a87b37ad4e5335f6953475a0702ecf52900972acac9",
+    "config/supervisord.conf": "a145e5d4db3d7f659a74246eaabf5d11e547d4368008bb796afb2e7fbbb7a548",
+    "config/worker.json": "430188ff02afb22e5e4f1939ec6a21769f73d9f9c8f0956d7faf156533cf8076",
+    "container-entrypoint.sh": "fe4072118c6d318b6e51ffbe11448ce57ad6f2470fd2e67d20815af8967f9510",
+    "container.sh": "67cec78b10d8d5cc12109a0f483f462870bc50ccbce7f9ef16dff37b4070f708",
+    "e2e/check.py": "a1c362f9e379b9e8d391ce607a0f497ee76d1261eba13ad898377d01cfe60fc1",
+    "e2e/expected.json": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+    "e2e/fixtures/beacon.html": "d743937367e843d738223dc1dc7aac0db363ef5173c53d188a68136d63f8739e",
+    "e2e/fixtures/flask.html": "b643e3617fc0681d2775da7f53bced1c8b60235b5f940af712bcad44d9a1d852",
+    "e2e/fixtures/lamp.html": "5d3e3fdc038def93ef353119fbbb06ed6fc8e311c89f1eed1785363b6256348f",
+    "e2e/mcp_probe.py": "9f2f8e4e97c0ca59a6ed01338f000a1b9187edf9d8f71b8267e84801fb11a93d",
+    "e2e/receipt.py": "5c7ee007c45dc1b086b65c6dbdd466611011812dbcb059831f5499c87fd4fc7b",
+    "e2e/run.py": "bde23a05cbf39c7155e8d85ec13aa3cfb64beb0374aa18242ac242e91ca1d811",
+    "e2e/schema.json": "69747f245f545a29151f17cd4fcbe5dee1418f9176970a67b4ce9f6f094e4d36",
+    "host.py": "782e9ea4ddf86483aec24ff4df90b74b1b1a8551b40cb4f8f4a43356f46210d4",
+    "install-browser.py": "7919165002ce74da8274c70ff294ff6eee11481bcbd6a1e45b8539fea9e25729",
+    "install.sh": "11525ae807096ce96813041017fa1d5a2cf9f1ba53718900d336e0555beddf2f",
+    "pins.json": "a79f2c194b986285f906a293ee04f2ad436c3fe3d1b571790a2904dda033d3e8",
+    "registry-evidence.json": "710dc54f473150f9209e76e0a5a889abda8c56c793b3f52b064b624e9a290d29",
+    "requirements.in": "f922a5a3f6b978192899aa94a0b64a82e01dbb4782b4cc151ad8a7d2ca5f3d38",
+    "requirements.lock": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+    "research.md": "86d8fb81447bb6d70f28e443383d00441ed295ecbac1bc80801e67da117c7e52",
+    "run-e2e.sh": "d39d556f748ee5a1cefea6f0dbe17dcbcac08a193fed522c2eae47450da89f44",
+    "worker.py": "dfd3450936dbcc5103729f8e3a7cf8a6cc27a045727f86774b1e1517b74efbe2"
+  }
+}
