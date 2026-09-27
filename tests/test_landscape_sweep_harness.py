@@ -223,8 +223,8 @@ def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("founda
 
 
 def child_usage_raw(run_id, labels, status="complete", transcript_root="/home/example/.claude/projects/p/s"):
-    children = [{"label": label, "requested_model": "sonnet" if label.startswith(("refute-facts", "gpt6-")) else "opus",
-                 "resolved_models": ["claude-sonnet-5" if label.startswith(("refute-facts", "gpt6-")) else "claude-opus-5-5"],
+    children = [{"label": label, "requested_model": "sonnet" if label.startswith("gpt6-") else "opus",
+                 "resolved_models": ["claude-sonnet-5" if label.startswith("gpt6-") else "claude-opus-5-5"],
                  "efforts": ["max"], "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
                  "complete": True} for label in labels]
     return json.dumps({"transcript_dir": f"{transcript_root}/subagents/workflows/{run_id}", "status": status,
@@ -578,6 +578,7 @@ class BuildArgsTests(unittest.TestCase):
         self.assertEqual(build(work, "--force").returncode, 0)
         repo = temp_dir(self)
         (repo / ".git").mkdir()
+        (repo / ".git" / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
         inside = repo / "sweep"
         inside.mkdir()
         done = run([sys.executable, HARNESS / "build_args.py", "--work-dir", inside, "--sweep-id", "s", "--date",
@@ -1171,11 +1172,32 @@ class RunnerTests(RunnerCase):
     def test_work_dir_inside_a_repository_is_refused(self):
         repo = temp_dir(self)
         (repo / ".git").mkdir()
+        (repo / ".git" / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
         (repo / "w").mkdir()
         done = run(["bash", HARNESS / "codex_call.sh", "--work-dir", repo / "w", "start", "gpt6-x", self.prompt,
                     self.schema], env=self.env)
         self.assertEqual(done.returncode, 2)
         self.assertIn("inside the git repository", done.stderr)
+
+    def test_codex_sandbox_mount_targets_are_not_repositories(self):
+        # Codex's Linux sandbox leaves an empty .git (directory or file) under its writable roots while a command runs
+        # (codex-rs/linux-sandbox/src/bwrap.rs, SyntheticMountTarget); only a real marker makes a repository.
+        for kind in ("empty-dir", "empty-file", "gitdir-file", "unborn-head-symlink"):
+            with self.subTest(kind=kind):
+                root = temp_dir(self)
+                if kind == "empty-dir":
+                    (root / ".git").mkdir()
+                elif kind == "unborn-head-symlink":
+                    # git allows HEAD to be a symlink to a branch that has no commit yet (a dangling link): a repository.
+                    (root / ".git").mkdir()
+                    (root / ".git" / "HEAD").symlink_to("refs/heads/main")
+                else:
+                    (root / ".git").write_text("gitdir: /elsewhere/.git\n" if kind == "gitdir-file" else "",
+                                               encoding="utf-8")
+                (root / "w").mkdir()
+                expected = root if kind in ("gitdir-file", "unborn-head-symlink") else None
+                self.assertEqual(codex_job.inside_repository(root / "w"), expected)
+                self.assertEqual(sweep_common.inside_repository(root / "w"), expected)
 
     def test_limit_detection_reads_only_codex_error_reports(self):
         directory = self.work / "gpt6" / "unit"
@@ -1476,17 +1498,17 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(sum(p["survives"] for p in lane["proposals"]), 3)
         self.assertTrue(any("capped at 8 per layer" in limit for limit in lane["result"]["limits"]))
         # Without a usage record the vote objects name the requested aliases, never a guessed model.
-        self.assertEqual(out["returns"]["votes"]["alpha"][0]["facts"]["model"], "sonnet")
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["facts"]["model"], "opus")
 
     def test_resolved_models_come_from_the_usage_record(self):
         document = usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
         models = convert.resolved_models(document)
-        self.assertEqual(models, {"discover": "claude-opus-5-5", "refute-facts": "claude-sonnet-5",
+        self.assertEqual(models, {"discover": "claude-opus-5-5", "refute-facts": "claude-opus-5-5",
                                   "refute-fit": "claude-opus-5-5", "critic": "claude-opus-5-5"})
         out = self.convert(models=models)
         vote = out["returns"]["votes"]["alpha"][0]
         self.assertEqual((vote["facts"]["model"], vote["fit"]["claude"]["model"], vote["fit"]["gpt6"]["model"]),
-                         ("claude-sonnet-5", "claude-opus-5-5", "gpt-6-astra"))
+                         ("claude-opus-5-5", "claude-opus-5-5", "gpt-6-astra"))
 
     def test_failed_gpt6_fit_lanes_reopen_every_affected_layer(self):
         out = self.convert(fail_gpt6_fit(synthetic_result()))
@@ -1637,11 +1659,11 @@ class ConvertTests(unittest.TestCase):
                          ("max", "xhigh", "max"))
         followup_vote = out["returns"]["votes"]["beta"][1]
         self.assertEqual((followup_vote["facts"]["round"], followup_vote["facts"]["effort"],
-                          followup_vote["facts"]["model"]), ("followup", "max", "claude-sonnet-5"))
+                          followup_vote["facts"]["model"]), ("followup", "max", "claude-opus-5-5"))
         # Without a usage record nothing was measured: the requested alias, and effort null rather than a claimed max.
         vote = self.convert()["returns"]["votes"]["alpha"][0]
         self.assertEqual((vote["facts"]["model"], vote["facts"]["effort"], vote["fit"]["claude"]["effort"]),
-                         ("sonnet", None, None))
+                         ("opus", None, None))
 
     def test_a_rerun_workers_vote_is_measured_by_the_attempt_that_returned(self):
         # A record listing a re-run call's earlier attempt among its children (child-usage.mjs before
@@ -2297,7 +2319,7 @@ const args = argsPath ? JSON.parse(fs.readFileSync(argsPath, 'utf8')) : undefine
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 const calls = [], logs = [], phases = []
 const agent = async (prompt, opts = {}) => {
-  calls.push({ label: opts.label, model: opts.model, effort: opts.effort, phase: opts.phase, schema: !!opts.schema, prompt })
+  calls.push({ label: opts.label, model: opts.model, effort: opts.effort, phase: opts.phase, schema: !!opts.schema, agentType: opts.agentType || null, prompt })
   const r = fixture.responses[opts.label]
   return r === undefined ? null : r
 }
@@ -2358,8 +2380,12 @@ def node_fixture():
     return {"responses": responses}, kept, reason
 
 
-EXPECTED_MODELS = {"discover": "opus", "gpt6-discover": "sonnet", "refute-facts": "sonnet", "refute-fit": "opus",
+EXPECTED_MODELS = {"discover": "opus", "gpt6-discover": "sonnet", "refute-facts": "opus", "refute-fit": "opus",
                    "gpt6-refute-fit": "sonnet", "critic": "opus"}
+# The Claude judgment stages run as the sweep's own agent type (WebFetch disallowed); the GPT-6 wrappers keep the default.
+EXPECTED_AGENT_TYPES = {"discover": "landscape-sweep-worker", "gpt6-discover": None,
+                        "refute-facts": "landscape-sweep-worker", "refute-fit": "landscape-sweep-worker",
+                        "gpt6-refute-fit": None, "critic": "landscape-sweep-worker"}
 
 
 @unittest.skipUnless(NODE, "node is not installed")
@@ -2398,8 +2424,10 @@ class SweepScriptTests(unittest.TestCase):
         S = str(self.work)
         for call in calls:
             role = call["label"].split(":")[0]
-            self.assertEqual((call["model"], call["effort"], call["schema"]), (EXPECTED_MODELS[role], "max", True),
-                             call["label"])
+            self.assertEqual((call["model"], call["effort"], call["schema"], call["agentType"]),
+                             (EXPECTED_MODELS[role], "max", True, EXPECTED_AGENT_TYPES[role]), call["label"])
+            # No prompt tells a worker to use WebFetch: the worker type disallows it, and pages go through ctx_*.
+            self.assertNotIn("WebFetch", call["prompt"], call["label"])
         self.assertEqual(sorted(c["label"] for c in calls), sorted(fixture["responses"]))
         self.assertEqual(out["phases"], ["Discover", "Critic", "Follow-up"])
         self.assertEqual({c["label"]: c["phase"] for c in calls}["refute-fit:alpha"], "Refute")
