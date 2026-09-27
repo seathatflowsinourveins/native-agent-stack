@@ -113,6 +113,9 @@ assertions, hook and wrapper are documented local integration code. Promptfoo an
   names, are not covered.
 - **Overlap.** At two in flight, two rows of one worktree can overlap in time. Per-repetition paths make that
   harmless, but not every moment has exactly one session per worktree.
+- **Wrong-root index and search.** Under the wrong-root control, `ctx_index` reports that it indexed the fixture,
+  and `ctx_search` under the same source then returns no results (6 of 6 rows in both 2026-09-27 M13 smokes). The
+  control shows that the own token is not returned. It does not show which tree's file was indexed.
 - **Shell class.** It is scored, but not reconciled against Loki. Codex's `functions.exec`, `exec_command` and `wait`
   envelope records do not map one-to-one to shell items, and that is a collector follow-up.
 - **Originator.** SDK runs log as `codex_sdk_ts`, not the lane's `codex_exec`. Everything else is the lane's own

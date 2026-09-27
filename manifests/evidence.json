@@ -39898,8 +39898,8 @@
     },
     {
       "path": "tools/capability-gate/README.md",
-      "sha256": "6102c81f8da85248bce776b2268063ad8e36b2f0d0ab84862b4252f15ee21d88",
-      "bytes": 9451
+      "sha256": "5ae07239b080ebb479ccb3e35283cedae02be53f0d07d119c279bfdf5a0a81b8",
+      "bytes": 9779
     },
     {
       "path": "tools/capability-gate/ai-memory.yaml",
