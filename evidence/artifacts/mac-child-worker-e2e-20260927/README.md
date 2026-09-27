@@ -1,8 +1,9 @@
 # Mac child/worker E2E: readiness-audit (2026-09-27)
 
 Host: `mac-coordinator-64gb-20260925` (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory).
-Machine-readable record: [`receipt.json`](receipt.json), the workflow's own per-child usage report
-(`examples/claude-native/workflows/child-usage.mjs`-shaped).
+Machine-readable records: [`receipt.json`](receipt.json), the workflow's own per-child usage report
+(`examples/claude-native/workflows/child-usage.mjs`-shaped), and [`verifier-verdicts.json`](verifier-verdicts.json),
+a sanitized per-claim breakdown (id, verdict, cited source) of the verify phase's own output.
 
 This is **one bounded run** of the installed `readiness-audit` workflow, exercised as this issue's
 Mac child/worker E2E (issue #276, step 5). It is evidence that the workflow's child/worker fan-out
@@ -25,7 +26,8 @@ One `readiness-audit` invocation, dispatched as a workflow with two phases:
   read a slice of the named project documents and extracted source-cited claims; `read:commands-4`
   ran the named read-only commands and extracted claims from their output.
 - **Verify** (1 Opus 5.5 child, `workflow-subagent`): adversarially re-checked every extracted claim
-  against the original documents and command output, and recorded a verdict per claim.
+  against the original documents and command output, and recorded a verdict per claim (retained,
+  sanitized, in `verifier-verdicts.json`).
 
 `receipt.json` is this run's own per-child usage report (`transcript_dir` sanitized to a placeholder
 project/session path): every child's `requested_model`, `resolved_models`, `complete` flag and raw
@@ -38,7 +40,9 @@ provider usage.
   (every child had a resolved model, returned usage and a non-null result); it is not the
   `readiness-audit` workflow's own returned `status` field, which `receipt.json` does not carry.
 - The verifier's pass over the readers' output: **88 claims**, **83 confirmed**, **4 corrected**,
-  **1 unverifiable**, **0 refuted**.
+  **1 unverifiable**, **0 refuted** -- the per-claim id/verdict/source breakdown backing this tally
+  is retained in [`verifier-verdicts.json`](verifier-verdicts.json) (recounts to the same five
+  numbers; see Limitations for what that file does and does not include).
 
 No claim was refuted, and the 4 corrections are the verifier doing its job, not a failure of this
 run. The 1 unverifiable claim is different: per the workflow's own logic
@@ -47,8 +51,9 @@ run. The 1 unverifiable claim is different: per the workflow's own logic
 `evidence_issues` was also non-empty) -- never `complete`. This run's actual returned `status`,
 `missing_sources` and `evidence_issues` were not captured by this artifact (see Limitations), so this
 README cannot state which of `unverified` or `incomplete` the run returned, only that it was not
-`complete`. The full per-claim verdicts are in this run's own transcript, not reproduced
-here; `receipt.json` carries the usage side of the same run.
+`complete`. The full per-claim verdicts, including each claim's own text and the verifier's full
+justification, are in this run's own transcript, not reproduced here; `verifier-verdicts.json` retains
+a sanitized id/verdict/source line per claim, and `receipt.json` carries the usage side of the same run.
 
 ### Per-model usage (provider-returned, from `receipt.json`)
 
@@ -67,8 +72,16 @@ child hit a web-search cap (`web_search.calls: 0` throughout).
 - One run, one question shape (readiness/status claims over named project records). It does not
   establish a pass rate, and a different document set or command list would exercise different
   content.
-- The claim tally (88/83/4/1/0) is this run's own verifier output; this README reports it rather
-  than re-deriving it, since re-verifying 88 claims independently is outside this receipt's scope.
+- The claim tally (88/83/4/1/0) is retained as a sanitized per-claim breakdown in
+  `verifier-verdicts.json` (id, verdict and cited source per claim, taken from this run's own
+  verify-phase output); this README's tally is a recount of that file, not an independent
+  re-verification of the 88 underlying claims, which is outside this receipt's scope.
+  `verifier-verdicts.json`'s own `source` field is a short citation extracted from each claim's
+  fuller verifier evidence text (which also cites cross-references and command reruns not
+  reproduced here); its `claim_source_note` explains which cited sources are this repository's
+  tracked files (`docs/token-session-handbook.md`, and the `commands-4` packet's six read-only
+  commands) and which are this run's own synthetic input documents used to exercise the workflow
+  (`issue-382.md`, `issue-276.md` -- not files tracked in this repository).
 - `receipt.json`'s `transcript_dir` is sanitized to a placeholder; the real path stayed under this
   host's own `~/.claude/projects/`, not shared elsewhere.
 - This is a workflow/child-worker exercise, not a host-receipt for a `manifests/stack.json` or
@@ -76,8 +89,9 @@ child hit a web-search cap (`web_search.calls: 0` throughout).
   `evidence_class` or `platform_status` claim.
 - The `readiness-audit` workflow's own return value (its `status`, `missing_sources` and
   `evidence_issues` fields) was not saved alongside `receipt.json`, which is only the child-usage
-  report. Given the 1 unverifiable verdict recorded above, `readiness-audit.js`'s own status logic
-  means this run's actual status was `unverified` or `incomplete`, not `complete`; this artifact
+  report. Given the 1 unverifiable verdict recorded above (retained in `verifier-verdicts.json` as
+  claim `c86`), `readiness-audit.js`'s own status logic means this run's actual status was
+  `unverified` or `incomplete`, not `complete`; this artifact
   cannot say which. A future run of this kind should additionally persist the workflow's returned
   object (sanitized) so its status is not lost.
 - The exact `docs`, `commands` and `question` arguments this run passed to the workflow are not kept

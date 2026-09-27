@@ -30638,13 +30638,18 @@
     },
     {
       "path": "evidence/artifacts/mac-child-worker-e2e-20260927/README.md",
-      "sha256": "16ed58a0258d8c7f4b8741a69fa6109c32c4f32e2610234e2d04264e9499faa4",
-      "bytes": 5831
+      "sha256": "8b1f55ab09e1509b81405b5a79932b3c9bf6a1829d10403e7cbda8a07e53d474",
+      "bytes": 7183
     },
     {
       "path": "evidence/artifacts/mac-child-worker-e2e-20260927/receipt.json",
       "sha256": "a3163366b25c8b37cf094f6faad3b1708ff151a9c189fd0c57f55fcd2c24cf80",
       "bytes": 9671
+    },
+    {
+      "path": "evidence/artifacts/mac-child-worker-e2e-20260927/verifier-verdicts.json",
+      "sha256": "6c6624ef7c5d7b86122ecbd621e3bacc2c18b7d0c2a153da3652f164f74a4211",
+      "bytes": 12075
     },
     {
       "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
@@ -36622,19 +36627,9 @@
       "bytes": 5193
     },
     {
-      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--mcporter--use--20260927-2.json",
-      "sha256": "2eccd0ce451d16222552cd9038658c2e753d28e11f1551a31456d5b67ac7f78e",
-      "bytes": 10362
-    },
-    {
-      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--mcporter--use--20260927-3.json",
-      "sha256": "816897c66372ebaa3f8d5bb3e2d6cdcdcb3145883df80aab733ecc48dd147e1d",
-      "bytes": 11496
-    },
-    {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--mcporter--use--20260927.json",
-      "sha256": "bb52496322ea43deaf84e12206c58ce6628abcc8f7b07c0d77ff5defec4f36d9",
-      "bytes": 9797
+      "sha256": "f5bcce5292dbffe7873f053f2dbbccbc1461a66b46633617670a4a9f659ac0b3",
+      "bytes": 9879
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--qdrant--use--20260925.json",
@@ -36660,6 +36655,11 @@
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--rtk--use--20260927-2.json",
       "sha256": "8e83cb20e2660fad72f056e105aa6e375dfae1690024851e5ab9939aaeb4ae0e",
       "bytes": 12092
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--rtk--use--20260927-3.json",
+      "sha256": "6310c9567bedccb741cf9fa42d60712fa7919fa309dfd429e15e7ba191badda4",
+      "bytes": 13082
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--rtk--use--20260927.json",

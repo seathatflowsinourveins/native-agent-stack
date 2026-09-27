@@ -1,0 +1,542 @@
+{
+  "run": "readiness-audit workflow verify phase (issue #276 step 5 Mac child/worker E2E)",
+  "verifier": "claude-opus-5-5",
+  "claim_source_note": "issue-382.md and issue-276.md are this run's own synthetic input documents (copies of GitHub issue bodies used to exercise the workflow), not files tracked in this repository. docs/token-session-handbook.md is a repository path. commands-4 sources are read-only commands the workflow ran, not files.",
+  "tally": {
+    "confirmed": 83,
+    "corrected": 4,
+    "unverifiable": 1,
+    "refuted": 0
+  },
+  "total_claims": 88,
+  "verdicts": [
+    {
+      "id": "c01",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:1"
+    },
+    {
+      "id": "c02",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:3"
+    },
+    {
+      "id": "c03",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:7"
+    },
+    {
+      "id": "c04",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:11"
+    },
+    {
+      "id": "c05",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:17"
+    },
+    {
+      "id": "c06",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:19"
+    },
+    {
+      "id": "c07",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:20"
+    },
+    {
+      "id": "c08",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:21"
+    },
+    {
+      "id": "c09",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:23"
+    },
+    {
+      "id": "c10",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:24"
+    },
+    {
+      "id": "c11",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:25"
+    },
+    {
+      "id": "c12",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:26"
+    },
+    {
+      "id": "c13",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:27"
+    },
+    {
+      "id": "c14",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:28-29"
+    },
+    {
+      "id": "c15",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:30"
+    },
+    {
+      "id": "c16",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:31"
+    },
+    {
+      "id": "c17",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:32"
+    },
+    {
+      "id": "c18",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:33"
+    },
+    {
+      "id": "c19",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:34-37"
+    },
+    {
+      "id": "c20",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:39"
+    },
+    {
+      "id": "c21",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:40-43"
+    },
+    {
+      "id": "c22",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:44"
+    },
+    {
+      "id": "c23",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:45"
+    },
+    {
+      "id": "c24",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:46-49"
+    },
+    {
+      "id": "c25",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:51"
+    },
+    {
+      "id": "c26",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:55-64"
+    },
+    {
+      "id": "c27",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:68"
+    },
+    {
+      "id": "c28",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:72-73"
+    },
+    {
+      "id": "c29",
+      "packet": "docs-1",
+      "verdict": "corrected",
+      "source": "issue-382.md:26"
+    },
+    {
+      "id": "c30",
+      "packet": "docs-1",
+      "verdict": "confirmed",
+      "source": "issue-382.md:23"
+    },
+    {
+      "id": "c31",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:1"
+    },
+    {
+      "id": "c32",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:3"
+    },
+    {
+      "id": "c33",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:9"
+    },
+    {
+      "id": "c34",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:19-21"
+    },
+    {
+      "id": "c35",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:22"
+    },
+    {
+      "id": "c36",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:23"
+    },
+    {
+      "id": "c37",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:24"
+    },
+    {
+      "id": "c38",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:32"
+    },
+    {
+      "id": "c39",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:33"
+    },
+    {
+      "id": "c40",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:34"
+    },
+    {
+      "id": "c41",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:36-38"
+    },
+    {
+      "id": "c42",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md:42-43"
+    },
+    {
+      "id": "c43",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md"
+    },
+    {
+      "id": "c44",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md"
+    },
+    {
+      "id": "c45",
+      "packet": "docs-2",
+      "verdict": "confirmed",
+      "source": "issue-276.md"
+    },
+    {
+      "id": "c46",
+      "packet": "docs-2",
+      "verdict": "corrected",
+      "source": "issue-276.md:22"
+    },
+    {
+      "id": "c47",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:3"
+    },
+    {
+      "id": "c48",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:14"
+    },
+    {
+      "id": "c49",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:16-24"
+    },
+    {
+      "id": "c50",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:26"
+    },
+    {
+      "id": "c51",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:34"
+    },
+    {
+      "id": "c52",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:197"
+    },
+    {
+      "id": "c53",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:50"
+    },
+    {
+      "id": "c54",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:67"
+    },
+    {
+      "id": "c55",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:76"
+    },
+    {
+      "id": "c56",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:148"
+    },
+    {
+      "id": "c57",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:177"
+    },
+    {
+      "id": "c58",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:205-208"
+    },
+    {
+      "id": "c59",
+      "packet": "docs-3",
+      "verdict": "corrected",
+      "source": "docs/token-session-handbook.md:268"
+    },
+    {
+      "id": "c60",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:268"
+    },
+    {
+      "id": "c61",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:270"
+    },
+    {
+      "id": "c62",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:271"
+    },
+    {
+      "id": "c63",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:272-276"
+    },
+    {
+      "id": "c64",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:277"
+    },
+    {
+      "id": "c65",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:227"
+    },
+    {
+      "id": "c66",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:264"
+    },
+    {
+      "id": "c67",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:296"
+    },
+    {
+      "id": "c68",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:311-312"
+    },
+    {
+      "id": "c69",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md:346"
+    },
+    {
+      "id": "c70",
+      "packet": "docs-3",
+      "verdict": "confirmed",
+      "source": "docs/token-session-handbook.md"
+    },
+    {
+      "id": "c71",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c72",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c73",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c74",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c75",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c76",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c77",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c78",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c79",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "command: codex mcp list --json"
+    },
+    {
+      "id": "c80",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "command: codex mcp list --json"
+    },
+    {
+      "id": "c81",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "command: claude mcp list"
+    },
+    {
+      "id": "c82",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "command: codex features list"
+    },
+    {
+      "id": "c83",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "command: codex features list"
+    },
+    {
+      "id": "c84",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/skills_status.py"
+    },
+    {
+      "id": "c85",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "command: launchctl list"
+    },
+    {
+      "id": "c86",
+      "packet": "commands-4",
+      "verdict": "unverifiable",
+      "source": "command: launchctl list"
+    },
+    {
+      "id": "c87",
+      "packet": "commands-4",
+      "verdict": "corrected",
+      "source": "scripts/adoption_status.py"
+    },
+    {
+      "id": "c88",
+      "packet": "commands-4",
+      "verdict": "confirmed",
+      "source": "scripts/adoption_status.py"
+    }
+  ]
+}
