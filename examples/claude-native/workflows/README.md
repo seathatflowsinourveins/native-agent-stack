@@ -237,8 +237,15 @@ contains its `<<` operator runs stdin as source. That command is the text
 between the nearest control operators around the operator, with quotes removed
 and redirection words and their targets dropped, so a pipe, list or redirection
 after the heredoc (`bash <<'EOF' 2>&1 | tail -n 5`, `> log.txt`, `&& ...`) does
-not replace it. A `<<` inside quotes, a comment or `$(( ))` opens no heredoc;
-one inside a quoted string that a shell runs is analyzed with that string.
+not replace it. A `<<` inside quotes, a comment or `$(( ))` opens no heredoc.
+Two known limits err toward counting a fetch: `$(` is not tracked inside
+double quotes, and a quoted string that a shell runs (`bash -c '...'`) is added
+as executed text without its own heredoc resolution. A heredoc body inside
+`"$( ... )"` (the usual `git commit -m "$(cat <<'EOF' ... EOF)"` form) or inside
+such a string therefore counts as executed even when it is the inner command's
+data: a line-start `curl`/`wget` in it counts as a confirmed fetch (inside
+`"$( ... )"` only when the body has no parentheses) and a `gh api` line as
+unclassifiable. This can lower the routed shares, never raise them.
 Python or Node read stdin with no script operand or with `-`; the retained
 explicit stdin forms apply to other interpreters. A shell reads its script from
 stdin unless `-c` supplies a command string or an operand names a script file:
