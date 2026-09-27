@@ -212,7 +212,7 @@ against that baseline.
 | llama.cpp tag identities | independent observation (platform record) | `gh api` `git/ref/tags/b11057`, `b11146`, `v0.5.0`; `git/tags/c13fcbf6`; `releases/latest`, 2026-09-27 |
 | Review status of the 2026-09-26 llama.cpp receipts; no later llama.cpp receipt | `source_review` (repository records) | the `reviews` and `limitations` fields of the three host receipts under `evidence/hosts/nativestack-5975wx-20260925/` and of `evidence/receipts/local-inference-c2-serving-switch-20260926.json`; the tree and `manifests/stack.json` of `origin/main` at `c8362c02`, 2026-09-27 |
 | `deniedModels` exists and is managed-only; that denying the older Opus IDs would stop the fallback to them without disabling the `opus` wildcard is an inference | `source_review` | CHANGELOG at `7779afb1`, lines 6-7; settings reference, `deniedModels`; model-config lines 350, 353, 364 and 517 (Markdown source, fetched 2026-09-27); not probed |
-| The host's `bin/vllm` link points at the 0.30.0 prefix | the coordinator's host observation (no receipt) | repointed 2026-09-27T19:21:18Z; the 0.25.0 prefix is retained and no systemd unit uses the link |
+| The host's `bin/vllm` link points at the 0.30.0 prefix | the coordinator's host observation (no receipt in the repository) | repointed 2026-09-27T19:21:18Z; the 0.25.0 prefix is retained and no systemd unit uses the link |
 
 No native run backs the guard or advisor changes: no request was flagged on purpose (deliberately tripping a safety
 classifier is not an acceptable test), and no session was started with the changed files.
