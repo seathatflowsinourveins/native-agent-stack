@@ -16,11 +16,16 @@ release notes, immutable source or issue/PR metadata, with separate boundaries
 for package releases, stable tags, prereleases and unreleased main changes.
 
 `pin` identifies the revision reviewed in the scratch study and its repository
-metadata location. It does not assert the installed version on the reader's
+metadata location. Its `metadata_sources` file:line references point to the
+component's version; `metadata_revision` names the repository commit read,
+including the locations of any `secondary_pins`. These are repository source
+coordinates, separate from an upstream `source_pin` or `source_commit`.
+It does not assert the installed version on the reader's
 host. `scratch_record` preserves the historical latest-release and distance
 claims separately. `changes_since_scratch` states both newly published versions
 and dated corrections or changes in unreleased source observations. No previous
-committed receipt is rewritten.
+scratch facts are changed; the dated repair erratum below identifies corrections
+to this publication's provenance and interpretation.
 
 ## Live source retrieval
 
@@ -29,7 +34,10 @@ The primary release check uses GitHub's
 through the installed `gh api` command. Each `latest_release` retains only
 allowlisted returned values: tag, publication timestamp, release URL, draft and
 prerelease flags. Its `source_url` records the public endpoint queried; each
-record's `retrieved_at` is the retrieval time, not the release time. GitHub's
+record's `retrieved_at` is the batch start time of the latest-release query,
+not a per-request completion timestamp or the release time. Package-channel
+and compare observations carry only a retrieval date, 2026-09-27. Shared
+millisecond stamps do not imply simultaneous requests. GitHub's
 latest stable release excludes drafts and prereleases; it is not necessarily
 the newest tag or default-branch revision.
 
@@ -44,7 +52,9 @@ scratch record, not evidence that the installed route or acceptance changed.
 count published non-draft/non-prerelease releases after the reviewed pin;
 commit counts compare the named revisions and are explicitly distinct from
 release lag. A development-commit pin can be ahead of stable and behind main at
-the same time. Counts apply only at the recorded retrieval time. Package upload
+the same time. Counts apply only to the observations on the retrieval date.
+A comparison between fixed commits does not re-verify a mutable branch head.
+Package upload
 timestamps, GitHub release publication and source commit dates stay distinct.
 
 Primary source review uses maintained upstream code at the stated revision and
@@ -61,8 +71,9 @@ client, that an issue was reproduced, or that a model/tool binding was exercised
   review mentions these, they remain historical claims with their stated
   boundaries. This publication does not replay them or promote reviewer prose
   to independently retained native-test stdout.
-- **Local integration:** offline unittest checks validate publication structure,
-  required source fields and sanitized content. They are authored here.
+- **Structural validation:** offline unittest checks validate publication structure,
+  metadata references, required source fields and sanitized content. They are
+  authored here and establish artifact consistency, not execution or adoption.
 - **Synthetic fixtures:** the separate RTK receipt directory contains the
   historical exactness fixture output. It is not part of a currency verdict.
 - **Live provider execution:** none performed or claimed for these receipts.
@@ -71,6 +82,34 @@ Release snapshots omit authors, account/connection identifiers, request bodies
 and unrelated API fields. No credential store was read. Home paths are not
 retained; no host installation paths or private reviewer transcripts are
 published. Commit hashes and release tags are public source identities.
+
+## 2026-09-27 repair erratum: source coordinates and claim boundaries
+
+Some `pin.metadata_sources` line numbers came from the scratch review of
+repository revision `803bc351` without naming that revision. They drifted from
+their component entries. All primary and secondary metadata coordinates were
+recomputed against `1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f`, whose metadata
+files match the committed publication tree, and each record now names it.
+The unittest opens every file:line, checks the version and component, and
+requires a repository revision. No pin version or `scratch_record` was changed.
+
+The earlier claim that `retrieved_at` was each observation's retrieval time
+was too precise. The batch-a research note also records an ENOBUFS failure
+and successful rerun of Headroom's release-list query with a larger buffer;
+its separate request times were not retained. Millisecond stamps are preserved
+with the batch-start boundary above, not promoted to per-request timing.
+
+Serena's retained comparison to fixed commit `7a2968335f2198b966864de1ce3655c8e485a653`
+does not establish the main branch head on the refresh date. The 30-commit
+main distance remains in `scratch_record`; its refreshed distance is null and
+marked `not_reverified`. The stable comparison remains separate. No new live
+release or compare requests were made for these repair edits.
+
+The offline tests were previously mislabelled local integration. The
+[acceptance policy](../../../docs/acceptance-evidence-policy.md#identify-what-each-check-proves)
+classifies these artifact checks as structural validation. The shared
+identifier-pattern assertion now also rejects planted synthetic samples;
+an empty-publication failure alone was not evidence that the patterns matched.
 
 ## Re-verification and limits
 

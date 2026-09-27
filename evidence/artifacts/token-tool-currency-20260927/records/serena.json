@@ -7,9 +7,10 @@
   "pin": {
     "version": "2.0.0.dev0",
     "source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json",
-      "adoption/pins-linux-x86_64.json"
+      "manifests/stack.json:878",
+      "adoption/pins-linux-x86_64.json:295"
     ],
     "verified_against_worktree_on": "2026-09-27"
   },
@@ -44,8 +45,9 @@
   "behind_by": {
     "count": null,
     "unit": "stable releases",
-    "basis": "Not a comparable stable-release pin: the adopted development commit is 123 commits ahead of v1.7.0. It is 30 commits behind the observed main commit.",
-    "development_commits_behind_main": 30,
+    "basis": "Not a comparable stable-release pin: the adopted development commit is 123 commits ahead of v1.7.0. The retained fixed-SHA comparison does not re-verify the live main distance; the historical 30-commit distance remains in scratch_record.",
+    "development_commits_behind_main": null,
+    "main_distance_status": "not_reverified",
     "development_pin_commits_ahead_of_stable": 123,
     "source_urls": [
       "https://api.github.com/repos/oraios/serena/compare/v1.7.0...c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
@@ -54,13 +56,21 @@
   },
   "changes_since_scratch": [
     {
-      "field": "latest_stable_and_main_distance",
+      "field": "latest_stable_release",
       "status": "unchanged"
+    },
+    {
+      "date": "2026-09-27",
+      "field": "main_distance",
+      "status": "not_reverified",
+      "previous": "30 commits behind main was labelled unchanged",
+      "current": "null; the comparison target is a fixed scratch SHA, not live main",
+      "reason": "Dated repair erratum preserves the historical distance without asserting a new branch-head observation."
     },
     {
       "field": "behind_by_representation",
       "previous": "0 stable releases behind with development-channel caveat",
-      "current": "null for non-comparable stable-release lag; retain exact source commit distances",
+      "current": "null for non-comparable stable-release lag; keep the fixed stable comparison and historical scratch main distance separate",
       "reason": "Clarification preserves the scratch facts without implying a stable upgrade path."
     }
   ],

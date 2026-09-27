@@ -7,9 +7,10 @@
   "pin": {
     "version": "4.1.1",
     "source_pin": null,
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json",
-      "adoption/pins-linux-x86_64.json"
+      "manifests/stack.json:996",
+      "adoption/pins-linux-x86_64.json:249"
     ],
     "verified_against_worktree_on": "2026-09-27"
   },

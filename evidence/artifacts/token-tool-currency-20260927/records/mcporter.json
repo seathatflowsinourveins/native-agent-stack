@@ -6,20 +6,21 @@
   "upstream_repository": "https://github.com/openclaw/mcporter",
   "pin": {
     "version": "0.14.1",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json:621",
-      "adoption/pins-linux-x86_64.json:131"
+      "manifests/stack.json:623",
+      "adoption/pins-linux-x86_64.json:132"
     ],
     "scope": "Repository metadata; not an installed-client observation",
     "secondary_pins": [
       {
         "version": "0.13.13",
-        "metadata_source": "adoption/pins-macos-arm64.json",
+        "metadata_source": "adoption/pins-macos-arm64.json:106",
         "scope": "scratch macOS policy hold"
       },
       {
         "version": "0.13.13",
-        "metadata_source": "catalogs/landscape/foundation.json",
+        "metadata_source": "catalogs/landscape/foundation.json:4795",
         "scope": "scratch sealed landscape winner"
       }
     ]

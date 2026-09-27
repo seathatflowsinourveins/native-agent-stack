@@ -6,8 +6,9 @@
   "upstream_repository": "https://github.com/andrewyng/context-hub",
   "pin": {
     "version": "0.1.4",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json:377",
+      "manifests/stack.json:379",
       "recipes/README.md:91"
     ],
     "scope": "Repository metadata; not an installed-client observation"

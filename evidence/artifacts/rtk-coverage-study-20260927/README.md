@@ -11,7 +11,7 @@ replay, model run, installation or host qualification. The measured window is
 | --- | --- | --- | --- |
 | [tables.txt](tables.txt) | Historical local measurement; local replay/integration | Recorded decisions for 59,041 calls, replay totals for two RTK revisions and a no-config control, and aggregate classifications for 611 sampled misses. | New execution, provider token savings, or the later M-R1 eligible-part gate. |
 | [frame-summary.txt](frame-summary.txt) | Historical local measurement | Native discover classifications grouped by recorded hook decision: 15,623 missed and 25,954 covered supported parts. | That each part in a rewritten call was rewritten; an eligible-command denominator; any private command or transcript. |
-| [exactness.out](exactness.out) | Historical synthetic fixtures; local integration | Captured native-versus-RTK stdout sizes, digests, exit statuses, branch/log differences and dry-run hook decisions for T1–T7. | Unchanged upstream test-suite acceptance, a rerun on this host, or lossless behavior for arbitrary commands. |
+| [exactness.out](exactness.out) | Historical synthetic fixtures; local integration | Captured native-versus-RTK stdout sizes, digests, exit statuses, branch/log differences and dry-run hook decisions for T1–T7. In T7, rc.467 self-reports `rtk 0.49.0` because its Cargo.toml version is 0.49.0; no stable v0.49.0 trial is established. | Unchanged upstream test-suite acceptance, a rerun on this host, or lossless behavior for arbitrary commands. |
 | [METHOD.md](METHOD.md) | Method/provenance and dated interpretation erratum | Sampling, versions, evidence boundaries, sanitization, source fingerprints and primary upstream references. | Access to the private sample or independent regeneration of the historical population. |
 
 The `ask` bucket records the historical hook rewrite decision. The 62.4%
@@ -20,7 +20,8 @@ command-part classification. The dated erratum in METHOD.md records this
 interpretation limit while preserving the original aggregate numbers.
 
 The publisher checked the source tags and relevant implementation on
-2026-09-27, and checked the local installed client's version/help. No private
+2026-09-27. The dated repair erratum in METHOD.md corrects T7 attribution and
+the cargo-test boundary and removes an unretained version/help observation. No private
 sample commands, source transcripts, hook database rows or credential stores
 were published or reread for a new population study. The unfiltered
 `unsupported top` list was removed because its grouping keys contained private

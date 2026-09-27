@@ -6,10 +6,11 @@
   "upstream_repository": "https://github.com/ast-grep/ast-grep",
   "pin": {
     "version": "0.45.3",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json:138",
+      "manifests/stack.json:140",
       "recipes/README.md:84",
-      "scripts/native_token_ci.py:37"
+      "scripts/native_token_ci.py:60"
     ],
     "scope": "Repository metadata; not an installed-client observation"
   },

@@ -16,9 +16,6 @@ No commands, paths or content from the private sample are included.
 Tag targets were returned by GitHub's
 [stable ref endpoint](https://api.github.com/repos/rtk-ai/rtk/git/ref/tags/v0.50.0)
 and [prerelease ref endpoint](https://api.github.com/repos/rtk-ai/rtk/git/ref/tags/dev-0.51.0-rc.467).
-The installed client returned `rtk 0.50.0`; its `hook check --help` calls the
-operation a dry run, and `discover --help` identifies Claude Code history.
-These are current version/help observations, not new coverage results.
 
 At v0.50.0, [src/main.rs](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs)
 dispatches hook checks, and
@@ -65,8 +62,9 @@ Four evidence classes are kept separate:
 
 No live provider execution is claimed. The original report also mentions native
 `rtk verify` runs; their returned stdout is not part of this publication, so this
-receipt does not assert unchanged upstream-test acceptance. Cargo tests were
-not rerun by the publisher. Whole-call output bytes are **not token savings**,
+receipt does not assert unchanged upstream-test acceptance.
+Cargo tests were not run in the original study or by the publisher.
+Whole-call output bytes are **not token savings**,
 provider usage, billed cost or isolated filter effects.
 
 ## Sample classification
@@ -97,7 +95,9 @@ The original fixture script builds a synthetic repository with a 400-line blob,
 branches and a linked worktree, a merge-containing history, differing/missing
 files, and a nested file-list search. It compares native commands with explicit
 RTK invocation, then queries the host-config hook dry run. T7 separately compares
-60 synthetic rows, seven longer than 120 characters, with v0.50.0 and v0.49.0.
+60 synthetic rows, seven longer than 120 characters, with v0.50.0 and the
+dev-0.51.0-rc.467 binary, which self-reports `rtk 0.49.0` because develop's
+Cargo.toml says 0.49.0 at the tested revision.
 
 | Case | Returned observation retained in exactness.out |
 | --- | --- |
@@ -107,7 +107,7 @@ RTK invocation, then queries the host-config hook dry run. T7 separately compare
 | T4 / T4b | Merge visibility and default log length differ; default RTK output contains ten lines. |
 | T5 | Missing-directory find changes the native nonzero result to zero on both tested revisions. |
 | T6 / T6b | rc.467 folds the returned file list and changes pipeline output. |
-| T7 | Both tested jq filters report 42 lines versus 60 natively, with a 120-character maximum versus 162. |
+| T7 | v0.50.0 and dev-0.51.0-rc.467 both report 42 lines versus 60 natively, with a 120-character maximum versus 162. The rc.467 binary self-reports `rtk 0.49.0` because its Cargo.toml version is 0.49.0. |
 
 These are historical returned observations, not a fresh run or a universal
 behavior guarantee. Synthetic fixture paths such as `src/deep/pkg/f1.txt`,
@@ -115,6 +115,24 @@ behavior guarantee. Synthetic fixture paths such as `src/deep/pkg/f1.txt`,
 sample paths. Captured digests and fixture commit subjects are data, not account
 or credential identifiers. The local recall handle alone is replaced with
 `<omitted>`.
+
+## 2026-09-27 repair erratum: revision and execution provenance
+
+T7 was previously attributed to a stable v0.49.0 run. The supplied REPORT.md
+names only v0.50.0 and rc.467 under "Versions tested", places the standalone
+60-row jq comparison in the rc.467 column, and records the binary version
+hazard. Upstream [Cargo.toml at rc.467's commit, line 3](https://github.com/rtk-ai/rtk/blob/a89a31494670fcec8ffa20d939dd94c64bd998fb/Cargo.toml#L3)
+confirms `version = "0.49.0"`. The label in exactness.out is therefore rc.467,
+not evidence of a stable v0.49.0 trial. Its bytes remain unchanged in this repair.
+The supplied exactness.sh defines only R050 and R467 and has no T7 section;
+the command that produced T7 was not retained. Attribution rests on the report
+and pinned source, not a recovered T7 command or a new run.
+
+The original report says cargo tests were not run; the earlier phrase "not
+rerun by the publisher" did not preserve that limit. The unsupported installed
+client version/help observation was also removed: this receipt retained no
+command, exit code or returned help lines for it. The pinned source references
+above remain source review, not a substitute for native execution evidence.
 
 ## 2026-09-27 erratum: discover coverage is not M-R1
 

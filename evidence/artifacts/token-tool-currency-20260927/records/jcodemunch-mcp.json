@@ -6,9 +6,9 @@
   "upstream_repository": "https://github.com/jgravelle/jcodemunch-mcp",
   "pin": {
     "version": "1.108.319",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json:1674",
-      "manifests/stack.json:1707"
+      "manifests/stack.json:1674"
     ],
     "scope": "Repository metadata; not an installed-client observation",
     "source_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e"

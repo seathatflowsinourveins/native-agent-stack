@@ -25,8 +25,25 @@ TOOLS = {
     "context-hub", "gpt-tokenizer", "agentsview",
 }
 
+# Shared by the publication scan and planted synthetic discriminating controls.
+# Source: docs/acceptance-evidence-policy.md, Discriminating controls;
+# https://docs.python.org/3/library/unittest.html#unittest.TestCase.assertRaises.
+IDENTIFIER_PATTERNS = {
+    "email": r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+    "uuid": r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b",
+    "personal path": r"/(?:home|Users)/[^\s/]+|/tmp/claude-\d+|[A-Z]:\\Users\\",
+    "bearer value": r"\bBearer\s+[A-Za-z0-9._~+/-]{8,}",
+    "credential-shaped value": r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})",
+    "account or connection value": r'"(?:account|connection|request|session)[_-]?id"\s*:\s*"[^"<>]+"',
+}
+
 
 class TokenFullSaveEvidenceTests(unittest.TestCase):
+    def assert_no_identifiers(self, text):
+        for kind, pattern in IDENTIFIER_PATTERNS.items():
+            if re.search(pattern, text, re.I):
+                self.fail(f"forbidden identifier pattern: {kind}")
+
     def test_all_eighteen_records_are_published(self):
         self.assertEqual({p.stem for p in (CURRENCY / "records").glob("*.json")}, TOOLS)
 
@@ -73,6 +90,61 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
         self.assertIn("T2 diff a missing (exit code) | 467 | rc=2", exactness)
         self.assertIn("lines=42 bytes=1387", exactness)
 
+    def test_pin_metadata_lines_contain_the_component_version(self):
+        for tool in sorted(TOOLS):
+            pin = json.loads((CURRENCY / "records" / f"{tool}.json").read_text())["pin"]
+            entries = [(pin["version"], source) for source in pin["metadata_sources"]]
+            entries += [(entry["version"], entry["metadata_source"])
+                        for entry in pin.get("secondary_pins", [])]
+            for version, source in entries:
+                with self.subTest(tool=tool, source=source):
+                    self.assertRegex(source, r"^[^:]+:[1-9][0-9]*$")
+                    filename, number = source.rsplit(":", 1)
+                    lines = (ROOT / filename).read_text().splitlines()
+                    index = int(number) - 1
+                    self.assertLess(index, len(lines))
+                    self.assertIn(version, lines[index])
+                    if filename.endswith(".json"):
+                        # Stack/platform entries use id; landscape winners use
+                        # component_id, not the names of preceding candidates.
+                        identities = re.findall(
+                            r'"(?:id|component_id)"\s*:\s*"([^"\n]+)"',
+                            "\n".join(lines[:index + 1]),
+                        )
+                        self.assertTrue(identities, source)
+                        self.assertEqual(identities[-1], tool)
+                    else:
+                        self.assertIn(tool, "\n".join(lines[max(0, index - 3):index + 1]))
+
+    def test_pin_metadata_names_the_repository_revision_read(self):
+        for tool in sorted(TOOLS):
+            with self.subTest(tool=tool):
+                pin = json.loads((CURRENCY / "records" / f"{tool}.json").read_text())["pin"]
+                self.assertRegex(pin.get("metadata_revision", ""), r"^[0-9a-f]{40}$")
+
+    def test_serena_main_distance_is_not_promoted_from_fixed_sha_comparison(self):
+        record = json.loads((CURRENCY / "records/serena.json").read_text())
+        self.assertEqual(record["scratch_record"]["behind_by"]["main_commits_ahead"], 30)
+        self.assertIsNone(record["behind_by"]["development_commits_behind_main"])
+        self.assertEqual(record["behind_by"]["main_distance_status"], "not_reverified")
+        self.assertNotIn("latest_stable_and_main_distance",
+                         {change["field"] for change in record["changes_since_scratch"]})
+
+    def test_dated_errata_bound_fixture_version_and_publication_checks(self):
+        method = (RTK / "METHOD.md").read_text()
+        self.assertIn("self-reports `rtk 0.49.0`", method)
+        self.assertIn("Cargo tests were not run in the original study or by the publisher.", method)
+        self.assertNotIn("The installed client returned", method)
+        for name in ("METHOD.md", "README.md"):
+            with self.subTest(file=name):
+                self.assertIn("self-reports `rtk 0.49.0`", (RTK / name).read_text())
+                currency = (CURRENCY / name).read_text()
+                self.assertIn("Structural validation", currency)
+        currency_method = (CURRENCY / "METHOD.md").read_text()
+        self.assertIn("batch start time", currency_method)
+        self.assertIn("only a retrieval date", currency_method)
+        self.assertNotIn("unit's verification notes", (CURRENCY / "README.md").read_text())
+
     def test_readmes_bound_each_artifact_class_and_reproduction_limit(self):
         for directory in (RTK, CURRENCY):
             with self.subTest(directory=directory.name):
@@ -91,21 +163,30 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
         self.assertIn("synthetic", method)
 
     def test_public_artifacts_have_no_identifiers_or_private_paths(self):
-        patterns = {
-            "email": r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
-            "uuid": r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b",
-            "personal path": r"/(?:home|Users)/[^\s/]+|/tmp/claude-\d+|[A-Z]:\\Users\\",
-            "bearer value": r"\bBearer\s+[A-Za-z0-9._~+/-]{8,}",
-            "credential-shaped value": r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})",
-            "account or connection value": r'"(?:account|connection|request|session)[_-]?id"\s*:\s*"[^"<>]+"',
-        }
         files = [p for directory in (RTK, CURRENCY) for p in directory.rglob("*") if p.is_file()]
         self.assertTrue(files)
         for path in files:
-            text = path.read_text()
-            for kind, pattern in patterns.items():
-                with self.subTest(file=path.name, kind=kind):
-                    self.assertIsNone(re.search(pattern, text, re.I), kind)
+            with self.subTest(file=path.name):
+                self.assert_no_identifiers(path.read_text())
+
+    def test_identifier_patterns_reject_planted_synthetic_samples(self):
+        # Construct fixtures at runtime so no complete identifier-shaped values
+        # are published. The same assertion above must reject each sample.
+        samples = {
+            "email": "fixture" + "@" + "example.com",
+            "uuid": "-".join(["0" * 8, "1" * 4, "2" * 4, "3" * 4, "4" * 12]),
+            "personal path": "/".join(["", "home", "x", "y"]),
+            "bearer value": "Bearer" + " " + "a" * 20,
+            "credential-shaped value": "ghp_" + "a" * 20,
+            "account or connection value": json.dumps({"session" + "_id": "x"}),
+        }
+        self.assertEqual(samples.keys(), IDENTIFIER_PATTERNS.keys())
+        for kind, sample in samples.items():
+            with self.subTest(kind=kind):
+                self.assertTrue(re.search(IDENTIFIER_PATTERNS[kind], sample, re.I), kind)
+                with self.assertRaisesRegex(AssertionError, re.escape(kind)):
+                    self.assert_no_identifiers(sample)
+        self.assert_no_identifiers("Public release v0.50.0; fixture path src/pkg/f1.txt")
 
 
 if __name__ == "__main__":

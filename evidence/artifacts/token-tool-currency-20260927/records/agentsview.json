@@ -6,8 +6,9 @@
   "upstream_repository": "https://github.com/kenn-io/agentsview",
   "pin": {
     "version": "0.43.0",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
-      "manifests/stack.json:65",
+      "manifests/stack.json:68",
       "recipes/README.md:82"
     ],
     "scope": "Repository metadata; not an installed-client observation"

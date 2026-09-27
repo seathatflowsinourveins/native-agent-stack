@@ -40,8 +40,10 @@ publication, package upload times and retrieval dates are separate fields.
 Where only historical package-channel facts were supplied, those facts remain
 inside `scratch_record`; they are not labelled as a live package-registry check.
 
-Serena's pin is a development commit: it is 123 commits ahead of stable v1.7.0
-and 30 behind the observed main revision. A stable-release lag is therefore
+Serena's pin is a development commit: it is 123 commits ahead of stable v1.7.0.
+The 30-commit main distance belongs to the 2026-09-26 scratch observation and
+was not re-verified against live main; the retained comparison uses fixed SHAs.
+A stable-release lag is therefore
 `null`, not a recommendation to downgrade. Stable release counts for other
 tools exclude prereleases and main-only work. The primary comparison endpoints
 are retained in each record.
@@ -68,9 +70,12 @@ The scratch observations are preserved; these are additions dated **2026-09-27**
   [PR #182](https://api.github.com/repos/andrewyng/context-hub/pulls/182) is closed
   with `merged_at: null`; the scratch prose must not be used as evidence that
   the PR merged. The record preserves this provenance correction.
-- Serena's unchanged development-channel facts are represented with an explicit
-  non-comparable stable lag. MarkItDown's historical main-distance statement
-  remains explicitly unverified by this refresh.
+- Serena's development pin has an explicit non-comparable stable lag. Its main
+  distance and MarkItDown's historical main-distance statement remain explicitly
+  unverified by this refresh.
+- The dated repair erratum in METHOD.md corrects metadata coordinates, names
+  the repository revision read, bounds `retrieved_at` to the latest-release
+  query's batch start, and classifies offline checks as structural validation.
 
 ## Boundaries and sanitization
 
@@ -82,11 +87,13 @@ No pins, configurations or installation state change.
 
 Only allowlisted release fields are retained. Private source transcripts,
 request bodies, account/connection identifiers, credential values and personal
-paths are excluded. The offline checks in
+paths are excluded. **Structural validation:** the offline checks in
 [test_token_full_save_evidence.py](../../../tests/test_token_full_save_evidence.py)
-cover the complete 18-tool set, dated source fields, evidence boundaries and
-identifier patterns. Native Gitleaks scanning is reported separately in the
-unit's verification notes and PR body. Neither kind of scan proves that every
+cover the complete 18-tool set, dated source fields, metadata references,
+evidence boundaries and identifier patterns with planted synthetic controls.
+They establish artifact consistency, not execution or adoption. Native
+Gitleaks commands, exit codes and returned scan lines are reported separately
+in the PR body's Evidence section. Neither kind of scan proves that every
 possible sensitive string is detectable.
 
 ## Sources

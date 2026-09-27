@@ -6,6 +6,7 @@
   "upstream_repository": "https://github.com/niieani/gpt-tokenizer",
   "pin": {
     "version": "3.4.0",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
     "metadata_sources": [
       "tools/token-report/token_manifest.py:161",
       "tools/token-report/token_manifest.py:162",
