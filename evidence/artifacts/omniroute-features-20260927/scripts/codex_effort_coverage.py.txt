@@ -1,0 +1,91 @@
+"""Codex effort coverage on the shared gateway (read-only SELECT of call_logs; counts and quantiles only, no ids, tags,
+accounts or bodies).
+
+Question: do Codex CLI lanes configured for model `codex/gpt-6-astra` with `model_reasoning_effort=max` carry that
+effort on every /v1/responses request? Reported by token-save-practice-gpt6 (row-by-row matching to Codex rollouts:
+the first request of a `codex exec` session and every `spawn_agent` request carried no effort); this script measures
+the gateway side independently.
+
+Output: totals by requested/upstream effort; the size profile of the no-effort rows (task turns or auxiliary calls);
+effort patterns per gateway conversation (`session_tag`); and, for each GPT-6 job of the OmniRoute feature resolution,
+the rows inside its window. Job windows overlap other lanes' traffic on the shared gateway, so those counts bound the
+window, they do not attribute rows to a job.
+
+usage: python3 codex_effort_coverage.py <gpt6-job-usage.json> <since> <until> <out.json>
+"""
+import json
+import os
+import sqlite3
+import sys
+from collections import Counter, defaultdict
+
+jobs_path, since, until, out_path = sys.argv[1:5]
+con = sqlite3.connect("file:" + os.path.expanduser("~/.local/share/omniroute/storage.sqlite") + "?mode=ro", uri=True)
+BASE = ("FROM call_logs WHERE path='/v1/responses' AND requested_model='codex/gpt-6-astra' "
+        "AND timestamp >= ? AND timestamp < ?")
+
+
+def quantiles(values):
+    values = sorted(v or 0 for v in values)
+    if not values:
+        return None
+    pick = lambda p: values[min(len(values) - 1, int(p * (len(values) - 1)))]
+    return {"n": len(values), "p10": pick(.1), "p50": pick(.5), "p90": pick(.9), "max": values[-1]}
+
+
+totals = [{"requested": r, "upstream": u, "rows": n} for r, u, n in con.execute(
+    f"SELECT COALESCE(reasoning_effort_requested,'none'), COALESCE(reasoning_effort_upstream,'none'), COUNT(*) {BASE} "
+    "GROUP BY 1,2 ORDER BY 3 DESC", (since, until))]
+
+profiles = {}
+for label, cond in (("no_effort", "reasoning_effort_requested IS NULL"), ("max", "reasoning_effort_requested='max'")):
+    rows = con.execute(f"SELECT tokens_in, tokens_cache_read, tokens_out, tokens_reasoning, status {BASE} AND {cond}",
+                       (since, until)).fetchall()
+    profiles[label] = {"tokens_in": quantiles(r[0] for r in rows), "tokens_cache_read": quantiles(r[1] for r in rows),
+                       "tokens_out": quantiles(r[2] for r in rows), "tokens_reasoning": quantiles(r[3] for r in rows),
+                       "status": dict(sorted(Counter(r[4] for r in rows).items()))}
+
+by_tag = defaultdict(list)
+untagged = 0
+for tag, eff in con.execute(f"SELECT session_tag, reasoning_effort_requested {BASE} ORDER BY timestamp", (since, until)):
+    if tag:
+        by_tag[tag].append(eff)
+    else:
+        untagged += 1
+patterns = Counter()
+for effs in by_tag.values():
+    if len(effs) == 1:
+        patterns["single row, " + ("no effort" if effs[0] is None else effs[0])] += 1
+    elif effs[0] is None and all(e == "max" for e in effs[1:]):
+        patterns["first row no effort, the rest max"] += 1
+    elif all(e == "max" for e in effs):
+        patterns["all max (2+ rows)"] += 1
+    elif all(e is None for e in effs):
+        patterns["all no effort (2+ rows)"] += 1
+    else:
+        patterns["mixed otherwise"] += 1
+
+windows = []
+for job in json.load(open(jobs_path))["jobs"]:
+    a, b = job.get("started"), job.get("finished")
+    if not a or not b:
+        continue
+    a, b = str(a).replace("+00:00", "Z"), str(b).replace("+00:00", "Z")
+    n = con.execute("SELECT SUM(reasoning_effort_requested IS NULL), SUM(reasoning_effort_requested='max'), COUNT(*) "
+                    "FROM call_logs WHERE path='/v1/responses' AND requested_model LIKE 'codex/gpt-6-astra%' "
+                    "AND timestamp >= ? AND timestamp <= ?", (a, b)).fetchone()
+    windows.append({"job": job.get("job"), "configured": f"{job.get('model')} effort {job.get('effort')}",
+                    "window": [a[:19] + "Z", b[:19] + "Z"], "no_effort_rows": n[0], "max_rows": n[1], "all_rows": n[2]})
+
+json.dump({
+    "source": "read-only SELECT of the shared gateway's call_logs (127.0.0.1:20128, build dd6e9607e); counts only",
+    "scope": {"path": "/v1/responses", "requested_model": "codex/gpt-6-astra", "since": since, "until": until},
+    "totals": totals,
+    "size_profile": profiles,
+    "per_conversation": {"conversations": len(by_tag), "untagged_rows": untagged,
+                         "patterns": dict(patterns.most_common()),
+                         "note": "session_tag is the gateway's conversation id (conversationTracker.ts); it need not map 1:1 to a codex exec session"},
+    "gpt6_job_windows": {"note": "windows overlap other lanes on the shared gateway: counts bound the window, they do not attribute rows to the job",
+                         "jobs": windows},
+}, open(out_path, "w"), indent=1)
+print(json.dumps({"totals": totals, "patterns": dict(patterns)}))
