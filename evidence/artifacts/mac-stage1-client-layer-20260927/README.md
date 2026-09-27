@@ -58,7 +58,7 @@ Undo each with its own native command (all read-only to verify first: `claude pl
 | The `serena` user-scope Claude MCP registration | `claude mcp remove serena -s user` |
 | The Codex MCP servers `serena`, `headroom` and `qmd` | `codex mcp remove serena`, `codex mcp remove headroom`, `codex mcp remove qmd` |
 | The Codex `context-mode` plugin | `codex plugin remove context-mode@context-mode` |
-| `~/.codex/RTK.md` | `rm ~/.codex/RTK.md` (the inline RTK block this file's text was copied into, inside `~/.codex/AGENTS.md` — a pre-existing file, see "Codex" above — needs manual editing to remove; deleting `AGENTS.md` itself would remove more than Stage 1 added) |
+| `~/.codex/RTK.md` | `rm ~/.codex/RTK.md` (the inline RTK block this file's text was copied into, inside `~/.codex/AGENTS.md` — a pre-existing file, see "Codex" below — needs manual editing to remove; deleting `AGENTS.md` itself would remove more than Stage 1 added) |
 | The `updater.autoUpdateEnabled` key this session wrote into `~/.codex/app-server-daemon/settings.json` (whether the file existed before Stage 1 is not recorded; see note below) | conditional, not a blind `rm` — see note below |
 | The 28 skills pinned in [`adoption/skills/manifest.json`](../../../adoption/skills/manifest.json), the skills@1.7.0 manifest Stage 1 installed | one `skills remove <name> -g -y` per skill, listed below |
 
