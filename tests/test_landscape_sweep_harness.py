@@ -722,6 +722,24 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual(done.returncode, 2, done.stdout)
         self.assertIn("--codex-host", done.stderr)
 
+    def test_codex_host_accepts_a_private_host_value_file_by_path(self):
+        private = temp_dir(self) / "privatehost.json"
+        private.write_text((ROOT / "adoption" / "hosts" / "example.json").read_text(encoding="utf-8"), encoding="utf-8")
+        work = stage_work(self)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", private, "--stack-worker-profile", profile)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
+        self.assertIn("[mcp_servers.context-mode]", config)
+        self.assertNotIn(str(private.parent), config)  # the private file's location stays out of the lane record
+        codex = json.loads((work / "staged.json").read_text())["codex"]
+        self.assertEqual(codex["lane_home"]["host"], "privatehost")
+        missing = build(stage_work(self), "--gpt6-provider", "omniroute", "--codex-host", str(private) + ".gone.json",
+                        "--stack-worker-profile", profile)
+        self.assertEqual(missing.returncode, 2)
+        self.assertIn("does not exist", missing.stderr)
+
     def test_require_key_stages_no_placeholder(self):
         work, _, done = self.stage_lane("--omniroute-require-key")
         self.assertEqual(done.returncode, 0, done.stderr)

@@ -106,18 +106,30 @@ def mcp_sections(rendered: str) -> tuple[str, list[str]]:
     return "\n".join(kept).strip() + "\n", names
 
 
+def host_values_from_file(path: Path) -> dict:
+    """A private host value file given by path. Real hosts' files are gitignored (adoption/hosts/*.json), so they
+    exist only in the checkout that owns them, never in a worktree. Same shape render_config requires."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or not all(isinstance(value, str) for value in data.values()):
+        raise ValueError(f"{path} must be a flat JSON object of string values")
+    return data
+
+
 def render_codex_template(repo_root: Path, host: str) -> str:
-    """adoption/templates/codex.config.template.toml rendered for adoption/hosts/<host>.json by the checkout's own
-    tools/adoption/render_config.py (its load_host_values and render_one), never by a copy of its logic."""
+    """adoption/templates/codex.config.template.toml rendered for a host by the checkout's own
+    tools/adoption/render_config.py (render_one), never by a copy of its logic. host is a name
+    (adoption/hosts/<name>.json, via render_config.load_host_values) or a path to a private host value file."""
     sys.path.insert(0, str(repo_root / "tools" / "adoption"))
     try:
         import render_config  # noqa: E402  (the checkout's renderer)
     finally:
         sys.path.pop(0)
     try:
-        return render_config.render_one(repo_root / CODEX_TEMPLATE, render_config.load_host_values(host))
+        values = (host_values_from_file(Path(host)) if host.endswith(".json")
+                  else render_config.load_host_values(host))
+        return render_config.render_one(repo_root / CODEX_TEMPLATE, values)
     except render_config.RenderError as error:
-        raise ValueError(f"rendering {CODEX_TEMPLATE} for host {host!r}: {error}") from None
+        raise ValueError(f"rendering {CODEX_TEMPLATE} for host {Path(host).name!r}: {error}") from None
 
 
 def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile: Path, repo_root: Path,
@@ -125,6 +137,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     """Write <work>/codex-home: config.toml (the OmniRoute provider block plus the rendered token MCP servers) and
     stack-worker.config.toml (the worker profile, verbatim). Return what staged.json records about it."""
     rendered = render_codex_template(repo_root, host)
+    host_label = Path(host).stem if host.endswith(".json") else host  # never a private path in the lane record
     servers_text, servers = mcp_sections(rendered)
     if not servers:
         raise ValueError(f"{CODEX_TEMPLATE} rendered for {host!r} has no [mcp_servers.*] table")
@@ -135,7 +148,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         "# (--gpt6-provider omniroute). It is the lane's whole configuration: Codex runs with CODEX_HOME set here,",
         "# without --ignore-user-config, and with -p stack-worker. Project and hook trust are deliberately absent.",
         f"# MCP servers: the [mcp_servers.*] tables of {CODEX_TEMPLATE} (sha256 {template_sha}) rendered for host",
-        f"# {host!r} by tools/adoption/render_config.py. The provider key comes from ${OMNIROUTE_KEY_ENV}; it is never",
+        f"# {host_label!r} by tools/adoption/render_config.py. The provider key comes from ${OMNIROUTE_KEY_ENV}; it is never",
         "# stored here. supports_websockets stays unset (false): OmniRoute's WebSocket bridge drops the client headers",
         "# that carry the Codex version, which only its HTTP /v1/responses path forwards.",
         f'model = "{model}"',
@@ -168,7 +181,8 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     keyless = {} if require_key else {"api_key_placeholder": OMNIROUTE_KEYLESS_PLACEHOLDER}
     return {"provider": "omniroute", "codex_home": LANE_HOME, "profile": LANE_PROFILE,
             "api_key_env": OMNIROUTE_KEY_ENV, **keyless, "base_url": base_url,
-            "lane_home": {"host": host, "template": str(CODEX_TEMPLATE), "template_sha256": template_sha,
+            "lane_home": {"host": host_label,
+                          "template": str(CODEX_TEMPLATE), "template_sha256": template_sha,
                           "mcp_servers": servers,
                           "config_sha256": sha256_bytes((home / "config.toml").read_bytes()),
                           "profile_sha256": sha256_bytes(profile_bytes)}}
@@ -344,8 +358,9 @@ def main(argv=None) -> int:
     parser.add_argument("--omniroute-base-url", default=OMNIROUTE_DEFAULT_URL,
                         help=f"loopback OmniRoute Responses endpoint (default {OMNIROUTE_DEFAULT_URL})")
     parser.add_argument("--codex-host", metavar="HOST",
-                        help="adoption/hosts/HOST.json, whose values render the lane's token MCP servers "
-                             "(required with --gpt6-provider omniroute)")
+                        help="a host name (adoption/hosts/HOST.json in the checkout) or a path to a private host "
+                             "value file (*.json; real hosts' files are gitignored), whose values render the lane's "
+                             "token MCP servers (required with --gpt6-provider omniroute)")
     parser.add_argument("--stack-worker-profile", type=Path,
                         help=f"the Codex worker profile overlay (default {STACK_WORKER_PROFILE} in the checkout)")
     parser.add_argument("--omniroute-require-key", action="store_true",
@@ -379,8 +394,14 @@ def main(argv=None) -> int:
             if args.quota_stop_percent is not None:
                 raise ValueError("--quota-stop-percent reads the native Codex login; it cannot gate the OmniRoute "
                                  "account pool, so drop it with --gpt6-provider omniroute")
-            if not args.codex_host or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.codex_host):
-                raise ValueError("--gpt6-provider omniroute needs --codex-host HOST (adoption/hosts/HOST.json)")
+            if not args.codex_host:
+                raise ValueError("--gpt6-provider omniroute needs --codex-host HOST (a name under adoption/hosts/ "
+                                 "or a path to a private host value file)")
+            if args.codex_host.endswith(".json"):
+                if not Path(args.codex_host).is_file():
+                    raise ValueError(f"--codex-host file {args.codex_host} does not exist")
+            elif not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.codex_host):
+                raise ValueError("--codex-host must be a host name or a path to a *.json host value file")
             if not LOOPBACK_V1_URL.fullmatch(args.omniroute_base_url):
                 raise ValueError("--omniroute-base-url must be a loopback http URL ending in /v1")
             profile = args.stack_worker_profile or (args.repo_root.resolve() / STACK_WORKER_PROFILE)
