@@ -229,9 +229,9 @@ Use codebase-memory trace_path (include_evidence=true adds resolver class and co
 
 Source: [codebase-memory 0.11.0 MCP tool schemas](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L557), also checked against the connected `trace_path` and `search_graph` schemas. The 0.5 treatment is a local verification rule, not a discard filter or an upstream recall guarantee.
 
-For the indexed catalog, use qmd query (us-equities-foundation / us-equities-catalog), then get. Use ai-memory memory_query with workspace/project from .ai-memory.toml as historical evidence only, never authority.
+Use qmd query with collections (foundation-docs, foundation-adoption, us-equities-foundation, us-equities-catalog), then get a line window. Use ai-memory memory_query with workspace/project from .ai-memory.toml as historical evidence only, never authority.
 
-Sources: [QMD MCP query/get](https://github.com/tobi/qmd/tree/v2.8.3), [this catalog's scoped collections](../catalogs/us-equities/native-workflows.md), and [ai-memory's project-scoped retrieval](https://github.com/akitaonrails/ai-memory/tree/433a19f3d54dea287571b1423591db2a89965fa9). The historical-evidence boundary is this catalog's interpretation policy.
+Sources: QMD v2.8.3 MCP [`query` `collections`](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L330) (without it, a running server searches the default list it read at start-up, [L189](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L189) and [L355](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L355)) and [`get` `fromLine`/`maxLines`](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L412-L413), following the query tool's own hit-window recipe ([L257](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L257)); [this catalog's scoped collections](../catalogs/us-equities/native-workflows.md), and [ai-memory's project-scoped retrieval](https://github.com/akitaonrails/ai-memory/tree/433a19f3d54dea287571b1423591db2a89965fa9). The historical-evidence boundary is this catalog's interpretation policy.
 
 Use TOON for uniform arrays of flat records (same keys in every item); keep compact JSON for nested or non-uniform data, where TOON can be larger (upstream README).
 
