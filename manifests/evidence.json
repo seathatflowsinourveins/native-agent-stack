@@ -9813,8 +9813,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "2cf249f60e74a13e8f0dcbf6e4a747b1502d53eb80a620a78a88f8c556e6332f",
-      "bytes": 82444
+      "sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357",
+      "bytes": 83006
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -9833,7 +9833,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "a17c008f0107b4cdff183c1c2ba786d21260ba5fbd6a3cd79eac5b5747d1bd84",
+      "sha256": "f2832e37855426ff7e296cb085d60b640fb20375e2e1527a715ac734c5fdbf98",
       "bytes": 6969
     },
     {
@@ -9848,8 +9848,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "add7a482377b7f2b06b4f70fe3672b6405b13e1f7c6054763c8dc369cfb42007",
-      "bytes": 83140
+      "sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9",
+      "bytes": 83300
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -37058,8 +37058,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "577b694d5a4719c76d25f94124455b1b0e0423063702fd93684b4fc99cda2d12",
-      "bytes": 85026
+      "sha256": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
+      "bytes": 85779
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -37073,8 +37073,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "214bdd6fb082e3b43ca9e722eb994b74dddde7f31a3993724ac6e467589f07b6",
-      "bytes": 85587
+      "sha256": "68449ba3b2d4164c3c2c45c4c08cf7c51b171fce43e1ce0a0cedf08f32149235",
+      "bytes": 94507
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
@@ -37088,8 +37088,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "593067b70213c916a12f3d0001c10a0114680e85740abb51e2891cef883f2982",
-      "bytes": 101325
+      "sha256": "5899a2498819d66db937e90e4a7fcec862f57fe8c551d8a5ca1f3dbc9e6e3a64",
+      "bytes": 103152
     },
     {
       "path": "tests/test_adoption_bootstrap.py",

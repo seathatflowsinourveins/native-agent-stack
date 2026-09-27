@@ -328,11 +328,13 @@ def timestamp_ns(value):
             raise TransportError("timestamp lacks timezone")
         return int(value.timestamp()) * 1_000_000_000 + value.microsecond * 1000
     if isinstance(value, str):
-        match = re.fullmatch(r"(.+?)(?:\.(\d{1,9}))?(Z|[+-]\d\d:\d\d)", value)
+        # RFC 3339 section 5.6 permits lowercase z and arbitrary fractional
+        # precision. Keep the first nine digits for integer nanoseconds.
+        match = re.fullmatch(r"(.+?)(?:\.(\d+))?([Zz]|[+-]\d\d:\d\d)", value)
         if not match:
             raise TransportError("invalid timestamp")
-        base = datetime.fromisoformat(match[1] + match[3].replace("Z", "+00:00"))
-        return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "").ljust(9, "0"))
+        base = datetime.fromisoformat(match[1] + match[3].upper().replace("Z", "+00:00"))
+        return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "")[:9].ljust(9, "0"))
     raise TransportError("unsupported timestamp")
 
 

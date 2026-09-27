@@ -1431,6 +1431,89 @@ class ExecutionOrderLedger(unittest.TestCase):
                 self.fill("sell", "2", "100", eid="C", price="90", ns=self.now * 10**9 + 3)
                 self.assertEqual(tuple(self.ledger.db.iterdump()), before)
 
+    def untimed_ab(self, *, migrate=False):
+        # Reviewer probe_backfill.py / probe_migration_backfill2.py: B was
+        # observed before A, without execution times. Journal order is fixed.
+        self.hold()
+        self.reserve("buy", "buy", "1", "130")
+        self.reserve("sell", "sell", "1", "90")
+        self.fill("buy", "1", "130", eid="B", price="130")
+        self.fill("sell", "1", "110", eid="A", price="110")
+        if migrate:
+            # Reconstruct 460034e0's execution layout and accounting markers.
+            self.ledger.db.execute("ALTER TABLE executions DROP COLUMN execution_time_ns")
+            self.ledger.db.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+            self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%' "
+                                   "OR key LIKE 'symbol_accounting:%'")
+            self.reopen()
+
+    def redeliver_ab(self, order):
+        stamps = {"A": ("sell", "110", 1), "B": ("buy", "130", 2)}
+        results = []
+        for eid in order:
+            cid, price, offset = stamps[eid]
+            results.append(self.fill(cid, "1", price, eid=eid, price=price,
+                                     ns=self.now * 10**9 + offset))
+        return results
+
+    def test_untimed_redelivery_preserves_journal_order_across_restart(self):
+        for migrate in (False, True):
+            for order in (("A", "B"), ("B", "A")):
+                with self.subTest(migrate=migrate, order=order):
+                    self.new_ledger(f"untimed-{migrate}-{''.join(order)}")
+                    self.untimed_ab(migrate=migrate)
+                    self.redeliver_ab(order)
+                    self.reserve("sell2", "sell", "1", "90")
+                    self.fill("sell2", "1", "90", eid="C", price="90", ns=self.now * 10**9 + 3)
+                    # LEAN average cost, B,A,C: B leaves 3 @ 110, A realizes
+                    # zero, C loses 20. Cash 110 - 130 + 90 = 70; 1 @ 110.
+                    for phase in ("live", "reopened", "rederived"):
+                        if phase == "rederived":
+                            self.ledger.db.execute("DELETE FROM meta WHERE key='execution_accounting:rule'")
+                        if phase != "live":
+                            self.reopen()
+                        state = self.ledger.accounting()
+                        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                          state.cumulative_realized_loss_usd),
+                                         (D(70), D(-20), D(20)), phase)
+                        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(110), phase)
+                    times = [r[0] for r in self.ledger.db.execute(
+                        "SELECT execution_time_ns FROM executions WHERE execution_id IN ('A','B')")]
+                    self.assertEqual(times, [None, None])
+
+    def test_untimed_redelivery_loss_cap_is_order_independent(self):
+        self.limits = replace(self.limits, max_gross_loss_usd=D(25))
+        for order in (("A", "B"), ("B", "A")):
+            with self.subTest(order=order):
+                self.new_ledger("loss-cap-" + "".join(order))
+                self.untimed_ab()
+                self.redeliver_ab(order)
+                self.reserve("sell2", "sell", "1", "90")
+                self.fill("sell2", "1", "90", eid="C", price="90", ns=self.now * 10**9 + 3)
+                self.assertIsNone(self.ledger.halted_reason())
+                self.assertEqual(self.ledger.accounting().cumulative_realized_loss_usd, D(20))
+
+    def test_later_replay_cannot_reprice_untimed_history(self):
+        # probe_backfill_organic.py: D's own late execution must not change
+        # the already-booked loss on C, even though D triggers a symbol replay.
+        self.untimed_ab()
+        self.redeliver_ab(("A", "B"))
+        self.reserve("sell2", "sell", "1", "90")
+        self.fill("sell2", "1", "90", eid="C", price="90", ns=self.now * 10**9 + 3)
+        self.reserve("late", "buy", "1", "100")
+        self.fill("late", "1", "100")
+        before = self.ledger.accounting()
+        self.assertEqual(before.cumulative_realized_loss_usd, D(20))
+        self.fill("late", "1", "100", eid="D", price="100", ns=self.now * 10**9 + 4)
+        self.assertEqual(self.ledger.accounting(), before)
+        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(105))
+
+    def test_timestamped_redelivery_of_untimed_executions_is_noop(self):
+        self.untimed_ab()
+        before = tuple(self.ledger.db.iterdump())
+        self.assertEqual(self.redeliver_ab(("B", "A")), [False, False])
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
     def test_uncovered_booking_anchors_timed_replay(self):
         self.hold(qty="4")
         self.reserve("X", "sell", "2", "80")
@@ -1503,10 +1586,64 @@ class ExecutionOrderLedger(unittest.TestCase):
         self.assertIsNone(row[0])
         self.assertEqual(self.ledger.positions()["SPY"].qty, D(3))
 
+    def test_rule_change_isolates_unreplayable_symbols_at_open(self):
+        for adopted_qty, reason in (("0", "accounting_replay_would_make_short_position"),
+                                    ("3", "accounting_replay_quantity_mismatch")):
+            with self.subTest(reason=reason):
+                self.new_ledger(reason)
+                self.hold("APUS", "2")
+                self.reserve("bad-sell", "sell", "1", "90", "APUS")
+                self.fill("bad-sell", "1", "90")
+                apus = self.ledger.positions()["APUS"]
+                # probe_open_block.py's corruption, retaining a position and
+                # nonzero P&L/loss so preserving booked APUS money is observable.
+                self.ledger.db.execute("UPDATE events SET payload=json_set(payload,'$.qty',?) "
+                                       "WHERE kind='position_adopted'", (adopted_qty,))
+                self.abc("rest_ahead")
+                # Stale SPY derivation: opening must correct this healthy symbol
+                # even when APUS (first alphabetically) cannot be replayed.
+                self.ledger.db.execute("UPDATE positions SET cost_basis='110' WHERE symbol='SPY'")
+                self.ledger.db.execute("UPDATE meta SET value='[\"70\",\"-20\",\"20\"]' "
+                                       "WHERE key='symbol_accounting:SPY'")
+                self.ledger.db.execute("UPDATE meta SET value='-30' WHERE key='realized'")
+                self.ledger.db.execute("UPDATE meta SET value='30' WHERE key='realized_loss'")
+                self.ledger.db.execute("UPDATE meta SET value='v3-old-rule' WHERE key='execution_accounting:rule'")
+                self.reopen()
+                self.assertEqual(self.ledger.positions()["APUS"], apus)
+                self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(115))
+                state = self.ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd), (D(160), D(-25), D(35)))
+                failures = [json.loads(r[0]) for r in self.ledger.db.execute(
+                    "SELECT payload FROM events WHERE kind='execution_accounting_replay_failed'")]
+                self.assertEqual([(e["symbol"], e["reason"]) for e in failures], [("APUS", reason)])
+                before = tuple(self.ledger.db.iterdump())
+                self.reopen()
+                self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+                self.reserve("next", "buy", "1", "130")
+                self.fill("next", "1", "130", eid="next", price="130", ns=self.now * 10**9 + 4)
+                self.assertEqual(self.ledger.positions()["SPY"].qty, D(2))
+
+    def test_unreplayable_legacy_symbol_without_money_checkpoint_fails_atomically(self):
+        self.hold("APUS", "2")
+        self.reserve("bad-sell", "sell", "1", "90", "APUS")
+        self.fill("bad-sell", "1", "90")
+        self.ledger.db.execute("UPDATE events SET payload=json_set(payload,'$.qty','0') "
+                               "WHERE kind='position_adopted'")
+        self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'symbol_accounting:%'")
+        self.ledger.db.execute("UPDATE meta SET value='v3-old-rule' WHERE key='execution_accounting:rule'")
+        before = tuple(self.ledger.db.iterdump())
+        with self.assertRaisesRegex(s.SafetyError, "^accounting_replay_would_make_short_position$"):
+            s.Ledger(self.path, self.limits)
+        # Missing attribution is not evidence of zero cash/P&L/loss. Keep the
+        # old ledger intact when corruption prevents reconstructing that money.
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
     def test_old_accounting_markers_rederive_before_any_new_fill(self):
         self.limits = replace(self.limits, max_gross_loss_usd=D(5))
         for marker in ("execution_accounting:sell", "execution_accounting:v1:sell",
-                       "execution_accounting:v2:sell", "execution_accounting:v3:sell"):
+                       "execution_accounting:v2:sell", "execution_accounting:v3:sell",
+                       "execution_accounting:rule"):
             with self.subTest(marker=marker):
                 self.new_ledger(marker.replace(":", "-"))
                 self.hold()
@@ -1514,9 +1651,15 @@ class ExecutionOrderLedger(unittest.TestCase):
                 self.fill("sell", "2", "100")
                 self.fill("sell", "1", "110", eid="A", price="110", status="partially_filled")
                 self.fill("sell", "2", "100", eid="C", price="90")
-                self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%' "
-                                       "OR key='halted_reason'")
-                self.ledger.db.execute("INSERT INTO meta VALUES (?, '2')", (marker,))
+                if marker == "execution_accounting:rule":
+                    # A present but obsolete rule must upgrade too. The other
+                    # four cases all exercise an absent rule key.
+                    self.ledger.db.execute("UPDATE meta SET value='v3-old-rule' WHERE key=?", (marker,))
+                    self.ledger.db.execute("DELETE FROM meta WHERE key='halted_reason'")
+                else:
+                    self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%' "
+                                           "OR key='halted_reason'")
+                    self.ledger.db.execute("INSERT INTO meta VALUES (?, '2')", (marker,))
                 self.ledger.db.execute("UPDATE meta SET value='0' WHERE key='realized_loss'")
                 self.reopen()
                 state = self.ledger.accounting()

@@ -977,15 +977,14 @@ class Ledger:
         no-op; the same key or id with other values, an overlap, or a price beyond the
         order's limit fails closed. The limit check uses the execution's own price."""
         key = _canonical(cum_qty)
-        existing = self.db.execute("SELECT qty, price, execution_time_ns FROM executions WHERE client_id=? AND cum_qty=?",
+        existing = self.db.execute("SELECT qty, price FROM executions WHERE client_id=? AND cum_qty=?",
                                    (old.client_id, key)).fetchone()
         if existing is not None:
             if (D(existing["qty"]), D(existing["price"])) != (qty, price):
                 raise SafetyError("execution_conflict_requires_reconciliation")
-            if existing["execution_time_ns"] is None and execution_time_ns is not None:
-                self.db.execute("UPDATE executions SET execution_time_ns=? WHERE client_id=? AND cum_qty=?",
-                                (execution_time_ns, old.client_id, key))
-                return True
+            # Legacy/untimed fills keep their fixed journal slots. Backfilling
+            # a time here would change replay order after money was booked;
+            # a repeat with a newly available time is still a no-op.
             return False
         if self.db.execute("SELECT 1 FROM executions WHERE client_id=? AND execution_id=?",
                            (old.client_id, execution_id)).fetchone():
@@ -1099,17 +1098,28 @@ class Ledger:
 
     def _rederive_execution_accounting(self):
         """One atomic open-time upgrade, including pre-v2 netted losses. Populate
-        per-symbol contributions so later corrections never replay another symbol."""
+        per-symbol contributions; retain booked money for an unreplayable symbol."""
         totals = [ZERO, ZERO, ZERO]
         changed = False
         symbols = [r[0] for r in self.db.execute("SELECT symbol FROM positions UNION SELECT symbol FROM intents")]
         for symbol in symbols:
-            (_, cost, *money), _ = self._replay_symbol(symbol)
-            row = self.db.execute("SELECT cost_basis FROM positions WHERE symbol=?", (symbol,)).fetchone()
-            if row and cost != D(row[0]):
-                self.db.execute("UPDATE positions SET cost_basis=? WHERE symbol=?", (str(cost), symbol))
-                changed = True
-            self._set_symbol_money(symbol, money)
+            try:
+                (_, cost, *money), _ = self._replay_symbol(symbol)
+            except SafetyError as exc:
+                # A corrupt symbol must not block other symbols at open. The
+                # read-only replay has left its booked position/money intact.
+                if self._get("symbol_accounting:" + symbol) is None:
+                    # A legacy ledger has no per-symbol checkpoint to retain.
+                    # Fail atomically rather than replace unknown money by zero.
+                    raise
+                money = self._symbol_money(symbol)
+                self._event("execution_accounting_replay_failed", symbol=symbol, reason=str(exc))
+            else:
+                row = self.db.execute("SELECT cost_basis FROM positions WHERE symbol=?", (symbol,)).fetchone()
+                if row and cost != D(row[0]):
+                    self.db.execute("UPDATE positions SET cost_basis=? WHERE symbol=?", (str(cost), symbol))
+                    changed = True
+                self._set_symbol_money(symbol, money)
             totals = [a + b for a, b in zip(totals, money)]
         for name, amount in zip(("cash_delta", "realized", "realized_loss"), totals):
             changed |= amount != D(self._get(name))

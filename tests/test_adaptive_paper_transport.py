@@ -138,6 +138,37 @@ class Normalization(unittest.TestCase):
         with self.assertRaises(t.TransportError):
             t.timestamp_ns("2026-09-21T15:00:00")
 
+    def test_timestamp_rfc3339_offsets_and_zero_to_nine_fraction_digits(self):
+        # RFC 3339 section 5.6 / reviewer probe_ts.py. All clocks below
+        # represent the same UTC second; expected nanoseconds use integers.
+        base = 1_790_002_800_000_000_000
+        fractions = (("", 0), (".1", 100_000_000), (".12", 120_000_000),
+                     (".123", 123_000_000), (".1234", 123_400_000),
+                     (".12345", 123_450_000), (".123456", 123_456_000),
+                     (".1234567", 123_456_700), (".12345678", 123_456_780),
+                     (".123456789", 123_456_789))
+        for clock, zone in (("15:00:00", "Z"), ("15:00:00", "+00:00"),
+                            ("11:00:00", "-04:00"), ("20:30:00", "+05:30")):
+            for fraction, nanos in fractions:
+                value = f"2026-09-21T{clock}{fraction}{zone}"
+                with self.subTest(value=value):
+                    self.assertEqual(t.timestamp_ns(value), base + nanos)
+
+    def test_timestamp_accepts_lowercase_z(self):
+        for fraction, nanos in (("", 0), (".1", 100_000_000), (".123456789", 123_456_789)):
+            with self.subTest(fraction=fraction):
+                self.assertEqual(t.timestamp_ns(f"2026-09-21T15:00:00{fraction}z"),
+                                 1_790_002_800_000_000_000 + nanos)
+
+    def test_timestamp_truncates_subnanosecond_fraction(self):
+        for value in ("2026-09-21T15:00:00.1234567891Z",
+                      "2026-09-21T15:00:00.1234567899+00:00",
+                      "2026-09-21T11:00:00.123456789123-04:00",
+                      "2026-09-21T20:30:00.123456789123+05:30",
+                      "2026-09-21T15:00:00.1234567891z"):
+            with self.subTest(value=value):
+                self.assertEqual(t.timestamp_ns(value), 1_790_002_800_123_456_789)
+
     def test_crossed_and_one_sided_quotes_are_untradable_not_corrupt(self):
         base = {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": "2026-09-23T15:00:00.000000001Z"}
         self.assertEqual(t.normalize_quote(base)["bid"], "100.01")

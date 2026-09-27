@@ -1228,6 +1228,20 @@ class StartupFillDurability(unittest.TestCase):
         self.assertEqual(self.durable_state(), before)
         self.assertEqual(self.executions(), self.expected_executions())
 
+    def test_startup_redelivery_keeps_untimed_executions_in_journal_positions(self):
+        # probe_startup_native.py: an activity can have a transaction time
+        # even though its already-booked stream/legacy execution was untimed.
+        self.deliver(self.deliveries)
+        before = tuple(self.ledger.db.iterdump())
+        reports = self.reports()
+        self.assertEqual(len(reports), 4)
+        self.assertTrue(all(report.ts_event > 0 for report in reports))
+        self.reopen()
+        times = [row[0] for row in self.ledger.db.execute(
+            "SELECT execution_time_ns FROM executions WHERE client_id != 'held-buy'")]
+        self.assertEqual(times, [None] * 4)
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
     def test_startup_report_quantities_and_prices_match_durable_executions(self):
         reports = self.reports()
         reported = {(str(r.client_order_id), str(r.trade_id)):
