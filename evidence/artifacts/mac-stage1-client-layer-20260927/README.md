@@ -136,9 +136,12 @@ skills instead, not the global ones Stage 1 placed
 -g -y` (no `-a`) removes the canonical copy, both links and the lock entry" — the same call
 this repository's own installer runs on a mismatched install,
 [`tools/adoption/install_skills.py`](../../../tools/adoption/install_skills.py) lines 17-21
-and its `remove` call at line 196). The `skills` binary is the pinned 1.7.0 package the
-[Skills](#skills) section below names — there is no separate `<skills-bin>` path to look up.
-`DISABLE_TELEMETRY=1` matches the manifest's own `cli.env` and what the installer sets. There
+and its `remove` call at line 196). The `skills` binary is the `skills@1.7.0` CLI that
+[`adoption/skills/manifest.json`](../../../adoption/skills/manifest.json)'s `cli` block pins
+(`"version": "1.7.0"`), resolved as `skills` first on `PATH` — there is no separate
+`<skills-bin>` path to look up (the [Skills](#skills) section below's own `--skills-bin` flag
+names this same binary, just not by a fixed path). `DISABLE_TELEMETRY=1` matches the
+manifest's own `cli.env` and what the installer sets. There
 is no bulk form here, only one call per skill
 ([`adoption/lifecycle.md`](../../../adoption/lifecycle.md):100, verbatim: "Never uninstall
 all user tools to roll back one package"):
