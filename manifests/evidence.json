@@ -13218,8 +13218,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "658912b57736bf7baab50841dc72f745a1ebbaa7db4986ebb0c1a93b8ede6993",
-      "bytes": 189734
+      "sha256": "88ef34723db563ebb73ec22e463479e18b60d6c3bc986e01d30ad692af3b2775",
+      "bytes": 312456
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -13733,8 +13733,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "13734fa72536f3645b93a3134f7a48df447d42bff102a16fd4b5362ae0fdc527",
-      "bytes": 19505
+      "sha256": "78dca27a48d1cd7e2dcb442033722409e6a7c3aee8688232770578e0772dd8d6",
+      "bytes": 32290
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -13878,8 +13878,8 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "95b658ba105735f5c67999a32c28dc772d8e437e28898f17b4a7d86bb54ce39d",
-      "bytes": 13450
+      "sha256": "21fa9fe27e1e18ff2bdb2072a296f987e92157e66da4472386c9406d7552fec2",
+      "bytes": 14383
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -13918,8 +13918,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "de95e0e075204efe5ade37aa11daad625035b3a2747eb89f1c2aec5ab61cdb55",
-      "bytes": 103223
+      "sha256": "a3f712c8aaf10b69659145558dd469251fdf8c6ed82dd7f393dd9ee07e20b489",
+      "bytes": 108918
     },
     {
       "path": "docs/evidence.md",
@@ -14003,8 +14003,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5505fbf0a6ace1c69d0d13a4e132eff502597d7b4b32903436dfb18727d6aa8c",
-      "bytes": 39562
+      "sha256": "2a40695b8910272d20b2cdc455370d2f59dd384adc20c36eece754138075b678",
+      "bytes": 41101
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -38718,8 +38718,8 @@
     },
     {
       "path": "recipes/saturation-sweep.md",
-      "sha256": "80b0b37a28526d0f06444e981908ed31e0ab76a869590d009df349d195e50960",
-      "bytes": 9082
+      "sha256": "c809f36527203a2db6b73984c9292db8d19352cdcef3850966ce39a956897714",
+      "bytes": 9187
     },
     {
       "path": "recipes/sota-convergence-practice.md",
@@ -38738,8 +38738,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "0a84a2c596512eac0f7e470cd287b9dcbea2c0c2998e14e0f98a2f71160fd150",
-      "bytes": 49805
+      "sha256": "b6770b3f7b0d41781c38576fca7706d104deab31d68e65acc0375dd9260e75e2",
+      "bytes": 57915
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -38753,8 +38753,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "08066e416786b1875666b60e66cad246fe3824ac4d996d2b7cae419bbcb0f02b",
-      "bytes": 37001
+      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
+      "bytes": 72137
     },
     {
       "path": "scripts/credential_status.py",
@@ -39263,8 +39263,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "7a183c1082a91adec1a7f1a3b6189e6ed0993413b71c7a221a3dae640ad6117c",
-      "bytes": 40285
+      "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
+      "bytes": 83131
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
@@ -39303,8 +39303,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "9468971db76fab5c185d1710f4d19e06d1b2a2c80121c65dc916023579cafdfd",
-      "bytes": 58693
+      "sha256": "ba90841894437a10f56f7f5632e1bf44c39a79fbf835718d534397423067ff86",
+      "bytes": 84133
     },
     {
       "path": "tests/test_effort_default_guard.py",
