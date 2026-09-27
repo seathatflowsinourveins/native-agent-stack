@@ -37,9 +37,14 @@ NODE = shutil.which("node")
 SHELLCHECK = shutil.which("shellcheck")
 BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and os.access(
     os.environ["BASH32_BINARY"], os.X_OK) else None
-# prompts_sha256 of the 2026-09-26 run (its templates, sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False)).
-# A change detector: templates.json filled with that run's values must give it. An intended template edit changes
-# every later run's prompts_sha256; update this test with it (the 2026-09-26 value stays in that run's record).
+# A change detector: templates.json filled with the 2026-09-26 run's values (date, layer count, skills date) must give
+# PROMPTS_SHA256_CURRENT, the sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False). An intended template edit
+# changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it.
+# 2026-09-27: the maintenance rule is derived from the OpenSSF Scorecard Maintained check, and licenses are information only
+# (never a refutation reason), per the operator's 2026-09-26/27 decisions.
+PROMPTS_SHA256_CURRENT = "f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d"
+# The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
+# fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
 REQ, PLAT = "a" * 64, "b" * 64
 LIMIT_TEXT = ("You’ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more "
@@ -237,9 +242,32 @@ SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
 
 
 class TemplateTests(unittest.TestCase):
-    def test_filled_templates_reproduce_the_20260926_prompts_sha256(self):
+    def test_filled_templates_match_the_current_prompts_sha256(self):
         frozen = filled_templates("2026-09-26", 32, "2026-09-25")
-        self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_20260926)
+        self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_CURRENT)
+
+    def test_templates_never_refute_on_license_and_name_the_maintenance_rule(self):
+        templates = json.loads((HARNESS / "templates.json").read_text())
+        common, fit = templates["common"], templates["fit"]
+        # Licenses: information only, in the selection principles and in the merit criteria every role receives.
+        self.assertIn("never a reason to exclude, refute or rank down", common)
+        self.assertIn("and platform fit (license is information only)", common)
+        self.assertNotIn("license and platform fit", common)
+        self.assertNotIn("OSI or clearly usable license", common)
+        self.assertNotIn("license is non-commercial", fit)
+        # No role other than the facts refuter's accuracy check may treat a license as a criterion.
+        for key, text in templates.items():
+            for phrase in ("license is non-commercial", "restrictive license", "unclear license", "usable license"):
+                self.assertNotIn(phrase, text, f"{key} still uses a license as a criterion: {phrase!r}")
+        # Maintenance: derived from the Scorecard check, with its evidence command and a flag destination.
+        self.assertIn("derived from the OpenSSF Scorecard Maintained check", common)
+        self.assertIn("commits?since=", common)
+        self.assertIn("not from pushed_at", common)
+        self.assertIn("TOO NEW TO ASSESS (<90 days)", common)
+        self.assertIn("it is stale under the selection principles' maintenance rule", fit)
+        # A lane that cannot reach the commit evidence (the web-only GPT-6 lane) never refutes on it.
+        self.assertIn("never excludes or refutes a repository on unknown maintenance", common)
+        self.assertIn("unknown maintenance is never a reason to refute", fit)
 
     def test_only_per_call_placeholders_remain_after_filling(self):
         frozen = filled_templates()

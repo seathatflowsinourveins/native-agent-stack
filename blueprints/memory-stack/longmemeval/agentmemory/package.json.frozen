@@ -1,0 +1,5 @@
+{
+  "name": "agentmemory-bench",
+  "private": true,
+  "dependencies": { "@agentmemory/agentmemory": "0.9.29" }
+}
