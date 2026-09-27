@@ -205,6 +205,39 @@ class LauncherTests(unittest.TestCase):
         spaced, _ = self.run_launcher(" service.instance.id = chosen ,a=b,,")
         self.assertRegex(spaced, r"^service\.instance\.id=chosen/[0-9a-f-]{36},a=b$")
 
+    def test_inherited_scratch_environment_and_exact_argv_reach_child(self):
+        # POSIX preserves inherited export flags even after assignment. Use a real child process,
+        # not the launcher's shell state, and JSON so empty arguments and newlines remain distinct.
+        child = Path(self.tmp.name) / "environment-and-argv"
+        child.write_text(f"#!{sys.executable}\nimport json, os, sys\n"
+                         "print(json.dumps({'env': dict(os.environ), 'argv': sys.argv[1:]}))\n")
+        child.chmod(0o755)
+        self.launcher.write_text(LAUNCHER.read_text().replace("@CODEX_BIN@", str(child)))
+        names = ("id", "inherited", "kept", "rest", "entry", "key", "value")
+        env = {name: f"sentinel {name}\n'unchanged'" for name in names}
+        # Even a caller using the private prefix must not receive the launcher's scratch values.
+        env.update({f"__codex_identity_{name}": f"private sentinel {name}" for name in names})
+        env["PATH"] = os.environ.get("PATH", "/usr/bin:/bin")
+        env["OTEL_RESOURCE_ATTRIBUTES"] = "service.instance.id=parent,a=b\n"
+        argv = ["", "two words", "'single' and \"double\"", "line one\nline two", "trailing\n"]
+        for shell in ("bash", "sh"):
+            with self.subTest(shell=shell):
+                result = subprocess.run([shell, str(self.launcher), *argv], env=env,
+                                        capture_output=True, text=True, check=True)
+                observed = json.loads(result.stdout)
+                self.assertEqual(observed["argv"], argv)
+                for name, value in env.items():
+                    if name != "OTEL_RESOURCE_ATTRIBUTES":
+                        self.assertEqual(observed["env"][name], value, name)
+                self.assertRegex(observed["env"]["OTEL_RESOURCE_ATTRIBUTES"],
+                                 r"^service\.instance\.id=parent/[0-9a-f-]{36},a=b\n$")
+
+    def test_inherited_identity_follows_sdk_first_equals_and_last_duplicate_rules(self):
+        attrs, _ = self.run_launcher("service.instance.id=first, broken , service.instance.id = last=part ,a=b=c")
+        self.assertRegex(attrs, r"^service\.instance\.id=last=part/[0-9a-f-]{36}, broken ,a=b=c$")
+        attrs, _ = self.run_launcher("service.instance.id=first,service.instance.id= ,a=b")
+        self.assertRegex(attrs, r"^service\.instance\.id=[0-9a-f-]{36},a=b$")
+
     @unittest.skipIf(shutil.which("dash") is None, "no strict POSIX shell (dash) to check portability")
     def test_launcher_runs_under_a_strict_posix_shell(self):
         # macOS runs bin/codex with bash 3.2; dash accepts no bash-4 feature either.

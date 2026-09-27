@@ -14,32 +14,39 @@
 # @CODEX_BIN@ is the absolute path of the real codex executable; see observability/collector/README.md for
 # installing a rendered copy in place of the codex link on PATH.
 set -eu
-id=""
-if [ -r /proc/sys/kernel/random/uuid ]; then
-  id="$(cat /proc/sys/kernel/random/uuid)"
-elif command -v uuidgen >/dev/null 2>&1; then
-  id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
-fi
-[ -n "$id" ] || id="pid$$-$(date +%s)"  # exec keeps this PID for codex, so the pair is unique on the host
-inherited=""
-kept=""
-rest="${OTEL_RESOURCE_ATTRIBUTES:-}"
-while [ -n "$rest" ]; do
-  case "$rest" in
-    *,*) entry="${rest%%,*}"; rest="${rest#*,}" ;;
-    *) entry="$rest"; rest="" ;;
-  esac
-  key="${entry%%=*}"
-  key="${key#"${key%%[![:space:]]*}"}"
-  key="${key%"${key##*[![:space:]]}"}"
-  if [ "$key" = service.instance.id ] && [ "$entry" != "${entry#*=}" ]; then
-    value="${entry#*=}"
-    value="${value#"${value%%[![:space:]]*}"}"
-    inherited="${value%"${value##*[![:space:]]}"}"
-  elif [ -n "$entry" ]; then
-    kept="${kept:+$kept,}$entry"
+# POSIX assignments keep inherited export flags. Isolate scratch assignments so even an inherited private
+# name retains its original value in codex; only OTEL_RESOURCE_ATTRIBUTES changes in the parent shell.
+OTEL_RESOURCE_ATTRIBUTES="$(
+  __codex_identity_id=""
+  if [ -r /proc/sys/kernel/random/uuid ]; then
+    __codex_identity_id="$(cat /proc/sys/kernel/random/uuid)"
+  elif command -v uuidgen >/dev/null 2>&1; then
+    __codex_identity_id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
   fi
-done
-OTEL_RESOURCE_ATTRIBUTES="service.instance.id=${inherited:+$inherited/}${id}${kept:+,$kept}"
+  # exec keeps this PID for codex, so the pair is unique on the host.
+  [ -n "$__codex_identity_id" ] || __codex_identity_id="pid$$-$(date +%s)"
+  __codex_identity_inherited=""
+  __codex_identity_kept=""
+  __codex_identity_rest="${OTEL_RESOURCE_ATTRIBUTES:-}"
+  while [ -n "$__codex_identity_rest" ]; do
+    case "$__codex_identity_rest" in
+      *,*) __codex_identity_entry="${__codex_identity_rest%%,*}"; __codex_identity_rest="${__codex_identity_rest#*,}" ;;
+      *) __codex_identity_entry="$__codex_identity_rest"; __codex_identity_rest="" ;;
+    esac
+    __codex_identity_key="${__codex_identity_entry%%=*}"
+    __codex_identity_key="${__codex_identity_key#"${__codex_identity_key%%[![:space:]]*}"}"
+    __codex_identity_key="${__codex_identity_key%"${__codex_identity_key##*[![:space:]]}"}"
+    if [ "$__codex_identity_key" = service.instance.id ] && [ "$__codex_identity_entry" != "${__codex_identity_entry#*=}" ]; then
+      __codex_identity_value="${__codex_identity_entry#*=}"
+      __codex_identity_value="${__codex_identity_value#"${__codex_identity_value%%[![:space:]]*}"}"
+      __codex_identity_inherited="${__codex_identity_value%"${__codex_identity_value##*[![:space:]]}"}"
+    elif [ -n "$__codex_identity_entry" ]; then
+      __codex_identity_kept="${__codex_identity_kept:+$__codex_identity_kept,}$__codex_identity_entry"
+    fi
+  done
+  # A final sentinel prevents command substitution from stripping an inherited attribute's trailing newlines.
+  printf '%s.' "service.instance.id=${__codex_identity_inherited:+$__codex_identity_inherited/}${__codex_identity_id}${__codex_identity_kept:+,$__codex_identity_kept}"
+)"
+OTEL_RESOURCE_ATTRIBUTES="${OTEL_RESOURCE_ATTRIBUTES%.}"
 export OTEL_RESOURCE_ATTRIBUTES
 exec '@CODEX_BIN@' "$@"

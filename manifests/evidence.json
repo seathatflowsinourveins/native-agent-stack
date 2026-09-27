@@ -13668,8 +13668,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "dd7395c0dbc4ecb68cb4e6bdc1ca99693d1c51b773b097d40d1e9e59f20c9372",
-      "bytes": 26107
+      "sha256": "9719a8cbcda0e64a345f78418be85161e70f728455b0cb421e72880bc54eba51",
+      "bytes": 27908
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -35248,8 +35248,8 @@
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/apply.sh",
-      "sha256": "3cfd2254819a3147e1054d360ff4b02621d2cdcc4588c3440351e72d0eebfbe1",
-      "bytes": 26040
+      "sha256": "dd2833794312c1eebd57d1be34e1c5588ebf87cd103c010f4a24138c03f8c13b",
+      "bytes": 28136
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/claude_setting.py",
@@ -35258,8 +35258,8 @@
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py",
-      "sha256": "3a54a6a747a6b53fd34db6d268c7ecb5d7fac28c4c7b2d911755ab7afea36b86",
-      "bytes": 2870
+      "sha256": "0fc025d1a486924e5f0095160e8d458bfafe55b0dfd1ed8262108d64dfdfb900",
+      "bytes": 6630
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_prometheus.py",
@@ -37543,8 +37543,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "d370dd0ac31a3bf00296f03d0813318e2fb729731a0b84bc1a527280172a7f5b",
-      "bytes": 14402
+      "sha256": "527b9ca53e74f26fa26d9675bb0d4406fae76e5380a3be58b85e404b565862ca",
+      "bytes": 16292
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -37553,8 +37553,8 @@
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
-      "sha256": "8f958005c9281e65ee4b9f14f9f90ba79df4ddada14873476a3c45c5431a3e0b",
-      "bytes": 2283
+      "sha256": "c4b9bc8a880d0e0212604e20ae4046e1e3a8fe01cfae37773cf6e48efefedeac",
+      "bytes": 3517
     },
     {
       "path": "observability/collector/codex.toml.example",
@@ -38533,13 +38533,13 @@
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "90a2edfe7b8338d114e09bb9ea868f518d9b861ff9d36929b3deb0fcc3698820",
-      "bytes": 28525
+      "sha256": "ef64ba46907134593f0c05ea9376820f1524ccffc465396746c5a329920a91f4",
+      "bytes": 30907
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
-      "sha256": "2841b3a502cfb176d0393b11269a04a5a38e65573a575481a1abb0420ae8307e",
-      "bytes": 48851
+      "sha256": "eb28b8254299204a0f5bfd41a73cf51345b36f8106200f9b8aae03a59a2815e9",
+      "bytes": 56687
     },
     {
       "path": "tests/test_offhost_app_state.py",

@@ -632,6 +632,7 @@ exit 0
 '''
 
 FAKE_VERIFY = '''#!/bin/sh
+if [ -n "${FAKE_EDIT_TARGET:-}" ]; then printf '%s\\n' '# edited during validation' >> "$FAKE_EDIT_TARGET"; fi
 [ "${FAKE_VERIFY_RC:-0}" = 0 ] || echo "ecosystem-prometheus.service: Command /x is not executable" >&2
 exit "${FAKE_VERIFY_RC:-0}"
 '''
@@ -675,6 +676,84 @@ def old_prometheus_config(cfg):
     return yaml.safe_dump(doc, sort_keys=False)
 
 
+@unittest.skipUnless(HAVE_YAML, "the Collector merger needs PyYAML")
+class MergeCollectorTests(unittest.TestCase):
+    def run_merge(self, host):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, output = root / "host.yaml", root / "merged.yaml"
+            source.write_text(yaml.safe_dump(host))
+            result = subprocess.run([sys.executable, str(HOST / "merge_collector.py"), "--host", str(source),
+                                     "--repo", str(COLLECTOR), "--output", str(output)],
+                                    capture_output=True, text=True, timeout=30)
+            merged = yaml.safe_load(output.read_text()) if output.exists() else None
+            return result, merged
+
+    def test_extra_host_metric_statement_is_refused_without_output(self):
+        host = yaml.safe_load(old_collector_profile())
+        host["processors"]["transform/privacy"]["metric_statements"][0]["statements"].append(
+            'set(attributes["host.marker"], "must-survive")')
+        result, merged = self.run_merge(host)
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("refusing", result.stderr)
+        self.assertIn("metric_statements", result.stderr)
+        self.assertIsNone(merged)
+
+    def test_statement_and_pipeline_order_and_processor_settings_cannot_be_lost(self):
+        for change in ("statement-order", "group-condition", "pipeline-order", "extra-processor", "delta-settings"):
+            with self.subTest(change=change):
+                host = yaml.safe_load(old_collector_profile())
+                groups = host["processors"]["transform/privacy"]["metric_statements"]
+                pipeline = host["service"]["pipelines"]["metrics"]["processors"]
+                if change == "statement-order":
+                    groups[-1]["statements"].reverse()
+                elif change == "group-condition":
+                    groups[0]["conditions"] = ['attributes["service.name"] == "host-only"']
+                elif change == "pipeline-order":
+                    pipeline[0], pipeline[1] = pipeline[1], pipeline[0]
+                elif change == "extra-processor":
+                    host["processors"]["transform/host"] = {"metric_statements": ['set(description, "host")']}
+                    pipeline.insert(1, "transform/host")
+                else:
+                    host["processors"]["deltatocumulative"]["max_streams"] = 321
+                result, merged = self.run_merge(host)
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn("refusing", result.stderr)
+                self.assertIsNone(merged)
+
+    def test_custom_logs_and_other_pipelines_survive_and_merge_is_idempotent(self):
+        host = yaml.safe_load(old_collector_profile())
+        host["processors"]["transform/privacy"]["log_statements"][0]["statements"].append(
+            'set(attributes["host.marker"], "keep")')
+        host["processors"]["transform/host"] = {"log_statements": ['set(body, "host")']}
+        host["service"]["pipelines"]["logs/host"] = {
+            "receivers": ["otlp"], "processors": ["transform/host", "batch"], "exporters": ["file/events"]}
+        result, merged = self.run_merge(host)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for name, pipeline in host["service"]["pipelines"].items():
+            if name != "metrics":
+                self.assertEqual(merged["service"]["pipelines"][name], pipeline)
+        self.assertEqual(merged["processors"]["transform/privacy"]["log_statements"],
+                         host["processors"]["transform/privacy"]["log_statements"])
+        self.assertEqual(merged["processors"]["transform/host"], host["processors"]["transform/host"])
+        again, repeated = self.run_merge(merged)
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertEqual(repeated, merged)
+
+    def test_yaml_aliases_cannot_hide_changes_to_other_processors_or_pipelines(self):
+        for shared in ("processor", "pipeline"):
+            with self.subTest(shared=shared):
+                host = yaml.safe_load(old_collector_profile())
+                if shared == "processor":
+                    host["processors"]["transform/host"] = host["processors"]["transform/privacy"]
+                else:
+                    host["service"]["pipelines"]["metrics/host-copy"] = host["service"]["pipelines"]["metrics"]
+                result, merged = self.run_merge(host)
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn("refusing", result.stderr)
+                self.assertIsNone(merged)
+
+
 @unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("bash") and HAVE_YAML,
                      "the host recipe targets Linux user services and needs bash and PyYAML")
 class ApplyRollbackTests(unittest.TestCase):
@@ -692,7 +771,7 @@ class ApplyRollbackTests(unittest.TestCase):
         (root / "fake_curl.py").write_text(FAKE_CURL)
         curl = f'#!/bin/sh\nexec "{sys.executable}" "{root / "fake_curl.py"}" "$@"\n'
         for name, body in (("curl", curl), ("systemctl", FAKE_SYSTEMCTL), ("systemd-analyze", FAKE_VERIFY),
-                           ("sleep", "#!/bin/sh\nexit 0\n")):
+                           ("sleep", "#!/bin/sh\nexit 0\n"), ("git", "#!/bin/sh\nexit 0\n")):
             (fake / name).write_text(body)
             (fake / name).chmod(0o755)
         eco = self.home / ".local/share/codex-ecosystem"
@@ -782,6 +861,57 @@ class ApplyRollbackTests(unittest.TestCase):
         result = self.apply("--apply", FAKE_OTELCOL_RC="1")
         self.assertNotEqual(result.returncode, 0, result.stdout)
         self.assertEqual({path: path.read_bytes() for path in self.watched}, self.original)
+        self.assertEqual(self.restarts(), [])
+
+    def test_collector_merge_refusal_installs_nothing(self):
+        path = self.cfg / "collector.yaml"
+        host = yaml.safe_load(path.read_text())
+        host["processors"]["transform/privacy"]["metric_statements"][0]["statements"].append(
+            'set(attributes["host.marker"], "must-survive")')
+        path.write_text(yaml.safe_dump(host))
+        before = {p: p.read_bytes() for p in self.watched}
+        result = self.apply("--apply")
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("refusing", result.stderr)
+        self.assertIn("metric_statements", result.stderr)
+        self.assertNotIn("step prometheus", result.stdout)
+        self.assertEqual({p: p.read_bytes() for p in self.watched}, before)
+        self.assertTrue(self.codex_link.is_symlink())
+        self.assertEqual(self.backups(), [])
+        self.assertEqual(self.restarts(), [])
+
+    def test_target_changed_during_validation_refuses_all_installs(self):
+        # This target is installed after Prometheus: every target must be checked before any replacement.
+        target = self.cfg / "collector.yaml"
+        result = self.apply("--apply", FAKE_EDIT_TARGET=str(target))
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("changed since rendering", result.stderr)
+        self.assertIn(str(target), result.stderr)
+        expected = {**self.original, target: self.original[target] + b"# edited during validation\n"}
+        self.assertEqual({p: p.read_bytes() for p in self.watched}, expected)
+        self.assertTrue(self.codex_link.is_symlink())
+        self.assertEqual(self.backups(), [])
+        self.assertEqual(self.restarts(), [])
+
+    def test_target_changed_after_preflight_is_rechecked_at_install(self):
+        target = self.cfg / "ecosystem-prometheus-rules.yml"
+        # show_diff runs after the whole-plan preflight, just before install_file. Do not add a production hook.
+        fake_diff = Path(self.tmp.name) / "fake-bin/diff"
+        real_diff = shutil.which("diff")
+        fake_diff.write_text('#!/bin/sh\n'
+                             'if [ ! -e "$FAKE_STATE/diff-edited" ]; then\n'
+                             '  printf "%s\\n" "# edited before install" >> "$FAKE_DIFF_TARGET"\n'
+                             '  touch "$FAKE_STATE/diff-edited"\nfi\n'
+                             f'exec "{real_diff}" "$@"\n')
+        fake_diff.chmod(0o755)
+        result = self.apply("--apply", FAKE_DIFF_TARGET=str(target))
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("changed since rendering", result.stderr)
+        self.assertIn(str(target), result.stderr)
+        expected = {**self.original, target: self.original[target] + b"# edited before install\n"}
+        self.assertEqual({p: p.read_bytes() for p in self.watched}, expected)
+        self.assertTrue(self.codex_link.is_symlink())
+        self.assertEqual(self.backups(), [])
         self.assertEqual(self.restarts(), [])
 
     def test_unit_verification_failure_stops_the_script(self):

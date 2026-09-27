@@ -23,6 +23,8 @@
 # rollback command. Prometheus is read at the --web.listen-address of the rendered unit, which carries this
 # host's port overrides. No credential or auth store is read; the Grafana env file configure.py generates in the
 # scratch render root is deleted unread.
+# Target SHA-256 hashes are captured before rendering, checked together before the first install, and checked
+# again by install_file. A target changed since rendering is refused; rerun to render from its current bytes.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -88,6 +90,29 @@ prom_url() {  # unit file: the loopback URL of its --web.listen-address (Prometh
 }
 act() { if [[ $MODE == apply ]]; then say "  + $*"; "$@"; else say "  would: $*"; fi; }
 sha() { if [[ -e "$1" ]]; then sha256sum "$1" | cut -c1-64; else echo absent; fi; }
+link_state() { if [[ -L "$1" ]]; then printf 'symlink:%s' "$(readlink "$1")"; else printf 'not-symlink'; fi; }
+render_targets=()
+render_hashes=()
+render_links=()
+record_target() {  # bind a candidate to the live target before rendering (including absence and symlink target)
+  render_targets+=("$1")
+  render_hashes+=("$(sha "$1")")
+  render_links+=("$(link_state "$1")")
+}
+check_target() {  # the rollback recipe's digest guard, applied to rendering inputs
+  local target="$1" index
+  for index in "${!render_targets[@]}"; do
+    if [[ "${render_targets[$index]}" == "$target" ]]; then
+      if [[ "$(sha "$target")" == "${render_hashes[$index]}" \
+            && "$(link_state "$target")" == "${render_links[$index]}" ]]; then return 0; fi
+      if [[ -f "$BACKUP/manifest.json" ]]; then
+        fail_after_change "refusing stale candidate: $target changed since rendering; rerun to render again"
+      fi
+      die "refusing stale candidate: $target changed since rendering; nothing was installed; rerun to render again"
+    fi
+  done
+  die "refusing: no rendering hash recorded for $target"
+}
 
 backup_dir() {  # private, lasting, created on the first change only (a no-op apply leaves no empty backup)
   if [[ ! -d "$BACKUP" ]]; then
@@ -131,6 +156,7 @@ backup_file() {  # path
 }
 install_file() {  # candidate target [mode]: atomic replace; default mode is the target's own (644 if new or a link)
   local candidate="$1" target="$2" mode="${3:-644}"
+  check_target "$target"
   if [[ -z "${3:-}" && -e "$target" && ! -L "$target" ]]; then mode="$(stat -c %a "$target")"; fi
   backup_file "$target"
   install -m "$mode" "$candidate" "$target.g1-new"
@@ -176,6 +202,18 @@ grep -q 'groupbyattrs/session' "$REPO/observability/collector/collector.yaml" ||
   echo "the repo checkout lacks the writer-identity profile" >&2; exit 2; }
 
 # ---- render every candidate with the repository's own renderers --------------------------------------------
+codex_link="$ECO/bin/codex"
+if want prometheus; then
+  record_target "$CFG/ecosystem-prometheus-rules.yml"
+  record_target "$CFG/ecosystem-prometheus.yml"
+  record_target "$UNITS/ecosystem-prometheus.service"
+fi
+if want dashboards; then
+  record_target "$CFG/ecosystem-grafana-dashboards/ecosystem-dashboard.json"
+  record_target "$CFG/ecosystem-grafana-dashboards/research-grand.json"
+fi
+if want collector; then record_target "$CFG/collector.yaml"; fi
+if want codex-launcher; then record_target "$codex_link"; fi
 RENDER="$WORK/render"
 "$PY" "$REPO/observability/backends/configure.py" --tools-root "$RENDER/tools" --config-root "$RENDER/config" \
   --data-root "$RENDER/data" --unit-root "$RENDER/unit" --port-overrides "$CFG/port-overrides.json" > "$WORK/configure.out"
@@ -187,10 +225,9 @@ cp "$RENDER/config/ecosystem-prometheus-rules.yml" "$WORK/ecosystem-prometheus-r
 cp "$RENDER/config/ecosystem-grafana-dashboards/ecosystem-dashboard.json" "$WORK/ecosystem-dashboard.json"
 "$PY" "$REPO/observability/grand-dashboard/render.py" --output "$WORK/research-grand.json" > /dev/null
 "$PY" "$HERE/merge_collector.py" --host "$CFG/collector.yaml" --repo "$REPO/observability/collector/collector.yaml" \
-  --output "$WORK/collector.yaml"
+  --output "$WORK/collector.yaml" || die "collector merge failed; nothing was changed"
 "$PY" "$HERE/merge_prometheus.py" --host "$CFG/ecosystem-prometheus.yml" \
   --rendered "$RENDER/config/ecosystem-prometheus.yml" --output "$WORK/ecosystem-prometheus.yml"
-codex_link="$ECO/bin/codex"
 codex_real=""
 if [[ -L "$codex_link" ]]; then
   codex_real="$(readlink "$codex_link")"
@@ -340,6 +377,10 @@ exporting before rolling back"
 }
 
 # ---- plan and apply --------------------------------------------------------------------------------------------
+# Refuse a stale later target before replacing any earlier target. install_file also rechecks its own target.
+if [[ $MODE == apply ]]; then
+  for target in "${render_targets[@]}"; do check_target "$target"; done
+fi
 changed_services=()
 if want prometheus; then
   say "step prometheus: rules group native-telemetry-integrity; collector-native drops Codex buckets except token usage; unit --enable-feature=$FEATURES"

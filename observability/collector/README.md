@@ -102,6 +102,13 @@ The profile now gives every writer its own series with upstream mechanisms:
    An inherited id (from a shell, worker or parent codex that set one) becomes
    the prefix, `<inherited>/<fresh>`, so concurrent children of one parent stay
    separate writers, as the repository's workers do for their subprocesses.
+   Scratch variables use the `__codex_identity_` prefix inside a subshell, so
+   inherited exported variables keep their values in the child; only
+   `OTEL_RESOURCE_ATTRIBUTES` changes. Quoted `"$@"` preserves empty arguments,
+   whitespace, quotes and newlines. Attribute parsing follows
+   [opentelemetry-rust v0.31.0](https://github.com/open-telemetry/opentelemetry-rust/blob/v0.31.0/opentelemetry-sdk/src/resource/env.rs):
+   comma-separated entries, the first `=`, trimmed keys and values, and the
+   last duplicate identity. The launcher remains POSIX sh compatible.
    The Loki records of that process carry the same value as
    `service_instance_id`.
 3. In `transform/privacy`, `aggregate_on_attributes("sum", <allowlist>)` adds
@@ -142,7 +149,26 @@ does every step: `apply.sh` renders the configs with the repository renderers
 and this host's port overrides, validates them (`otelcol-contrib validate`,
 `promtool`, `systemd-analyze verify`, the launcher's `--version` against the
 real codex) and shows each diff. Any failed check stops it before the first
-change. `apply.sh --apply` then copies every file it replaces to
+change. The Collector merge checks the resulting config before writing its
+candidate: every original statement, statement-group condition, processor
+setting, pipeline and processor order must survive. The only permitted
+processing changes are the repository's writer-identity additions and the
+`deltatocumulative` alias rename. An extra host statement or incompatible
+order produces a non-zero refusal naming the affected config section;
+`apply.sh` stops before installing anything. These checks respect the
+[pinned transform processor's ordered execution](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/processor/transformprocessor/README.md).
+
+Before rendering, `apply.sh` records each selected file target's SHA-256,
+including absent targets and the launcher's symlink destination. It checks
+all those targets after validation and before the first install, then checks
+each target again in `install_file()`. A change causes a non-zero refusal
+naming the file; rerun to render and validate against the current files.
+This follows the existing rollback digest guard. It detects stale candidates;
+the hash check and filesystem rename are separate operations, so concurrent
+writers still require coordination. The Claude settings step retains its
+existing single-key update and rollback behavior.
+
+`apply.sh --apply` copies every file it replaces to
 `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/g1-writer-identity/backup-<UTC>/`
 (mode 0700, outside `/tmp`), installs, restarts Prometheus and the Collector,
 reads both back and prints the rollback command when a read-back fails. It
