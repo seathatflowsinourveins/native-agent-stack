@@ -8023,12 +8023,12 @@
     },
     {
       "path": "blueprints/memory-stack/longmemeval/v4/README.md",
-      "sha256": "58259637f275bea2817525917025e4d185e874587523bb43e5ef853ba3fa8b1d",
-      "bytes": 25597
+      "sha256": "3d9435b6df24d6c1a29583ddb7babde98869013beb0f1a97acf9503985dfbf50",
+      "bytes": 25842
     },
     {
       "path": "blueprints/memory-stack/longmemeval/v4/SHA256SUMS",
-      "sha256": "a635f51cf8d5ebb3a910972a7dde52b36aeeeea99c207e11eaacca4ef171e3f9",
+      "sha256": "792184b22bda92f7f6ea0a1dd07b428743f32299233a8eaeca8c706ce2541f39",
       "bytes": 2411
     },
     {

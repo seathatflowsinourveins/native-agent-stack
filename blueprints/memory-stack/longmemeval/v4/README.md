@@ -286,6 +286,6 @@ shasum -a 256 -c SHA256SUMS
 | The 25 copied files match `evals/longmemeval/<path>` at agent-ecosystem commit 576689a, byte-exact | `source_review` | `git rev-parse 576689a:evals/longmemeval/<path>` against the blob column above, and sha256 against `SHA256SUMS` |
 | `PREREGISTRATION.md` matches the required hash `a9b1db335eee1ff99d1883e048bcd8e443ca2afee3505a34fd874dd1ef412d5b` | `source_review` | sha256, checked before this commit was written |
 | Which code implements which arm (D2h, C4, X, A16) | `source_review` | reading `lme_harness.py` and `rerank_stage.py` directly, not their docstrings alone |
-| The teardown behavior described above | `source_review` | reading `am_teardown`, `stop`, `mp_kill_mines` in `lme_harness.py` and `stop_bg`/`same_process` in `run_velanext.sh` |
+| The shared-host warning's claims about `_ours`, `am_teardown`, `am_start`, `mp_mine_pids`/`_pid_alive`/`mp_kill_mines` in `lme_harness.py`, `stop_bg`/`same_process` in `run_velanext.sh`, and the Ollama readiness loop in `setup_velanext.sh` | `source_review` | reading each function directly at the line numbers cited above, and reproducing the three `lme_harness.py` cases with inert probes (GPT-6 review at `97697b81`) |
 | `--help` for `lme_harness.py` and `lme_summarize.py` from a clean clone | `local_integration` | see the PR body for the exact commands and results |
 | Any benchmark result | none new | no arm ran for this commit |
