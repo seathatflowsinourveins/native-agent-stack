@@ -408,19 +408,32 @@ or establish tiering for general worker tasks; its findings and limits stay in
 that experiment's receipt. The earlier sentence remains the dated historical
 state, with this addendum supplying its update.
 
-## 2026-09-27 addendum: PR-E custom agents and Context Hub
+## 2026-09-27 addendum: Custom agents and Context Hub
 
-**Scope:** the remaining PR-E items from full-save plan section 3.1. The worker
+**Scope:** custom-agent developer instructions and the worker profile's Context
+Hub opt-outs, with the dated repair below for MCP startup and approval settings. The worker
 installer, base Codex template, AGENTS template and gateway profile already exist.
 This addendum records new repository changes and local checks; the historical
 host receipts above retain their original scope.
 
-**F4 carrier.** The three files under `examples/codex-native/agents/` already define
+**[F4 RTK guidance carrier](2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26).** The three files under `examples/codex-native/agents/` already define
 `evidence-reviewer`, `isolated-builder` and `semantic-evidence-reviewer`. Append
 [rtk-ai/rtk `v0.50.0`, `hooks/rtk-awareness-full.md`](https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md)
 verbatim and the existing marked exceptions from `codex.AGENTS.template.md` to
 each role's `developer_instructions`. Preserve its original task instructions,
-model/effort inheritance and sandbox settings. At openai/codex `rust-v0.157.1`,
+model/effort inheritance and parent sandbox authority. **2026-09-27 erratum:**
+the semantic reviewer's `sandbox_mode = "read-only"` has no effect at this pin.
+A role file cannot set or narrow the sandbox:
+[`role.rs:36–48`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L36-L48)
+lists the allowed overrides,
+[`119–126`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L119-L126)
+builds the projected layer, and
+[`182–189`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L182-L189)
+clones the parent configuration. All three roles inherit the parent's sandbox.
+Launch the parent with `-s read-only` to enforce read-only access for a semantic
+reviewer; its no-edit rule is a prompt instruction. The trusted-project
+template's `danger-full-access` parent passes that authority to its children.
+At openai/codex `rust-v0.157.1`,
 [`agent_role_config.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/agent_role_config.rs)
 parses these files and validates developer instructions,
 [`discovery.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/discovery.rs)
@@ -440,9 +453,12 @@ resolves that directory, and
 [`cli/src/lib/telemetry.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js)
 honours each environment opt-out before loading configuration. Selecting this
 worker profile opts out for shell commands even with a shared home. It does not
-detect home identity. Ordinary user configuration keeps its existing scope.
+detect home identity. The dated amendments in the
+[recipe](../../recipes/README.md#context-hub-opt-out) and
+[macOS guide](../../adoption/platforms/macos-arm64.md) make this profile the one
+unconditional carrier; ordinary invocations retain the home-only environment rule.
 
-**[nv] resolved: yes, in a profile-v2 file.** At `rust-v0.157.1`,
+**Profile environment merge gate: passed for a profile-v2 file.** At `rust-v0.157.1`,
 [`config/src/loader/mod.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs)
 loads `$CODEX_HOME/stack-worker.config.toml` as a second user configuration layer
 over `config.toml`. The field is part of
@@ -464,12 +480,15 @@ worker lane, not an enforced egress boundary.
 payload against the existing template and the pinned upstream hash.
 `tests.test_codex_worker_lane.TemplateTests.test_profile_template` checks the
 profile's two string values. Both failed before the corresponding changes.
-These are repository integration checks; no upstream tests were modified.
+These are structural validation; no upstream tests were modified.
 
 `CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home`
 is local integration with installed `codex-cli 0.157.1`, using scratch `HOME` and
 `CODEX_HOME`, an allowlisted environment and no provider or MCP execution. It
-repeats with `CHUB_DIR` unset and separately overridden. For both cases, actual
+now asserts `chubdir=unset` and the separate override path, demonstrating that
+the profile leaves `CHUB_DIR` unchanged. The override directory exists. **2026-09-27
+erratum:** the original two subcases did not print or assert `CHUB_DIR`, so the
+earlier passing runs established only the other environment values. For both cases, actual
 shell output is asserted as follows (the base opts in to make the control visible):
 
 | Configuration | Telemetry | Feedback | Other base `set` | Base filter |
@@ -479,12 +498,9 @@ shell output is asserted as follows (the base opts in to make the control visibl
 | Profile plus explicit telemetry `-c` override | `1` | `0` | kept | excluded |
 
 Before the profile change, four worker/override subcases failed with feedback
-still `1`; both base controls passed. With the change all six cases pass.
-Run the covering modules with:
-
-```sh
-NAS_CODEX_INTEGRATION=1 python3 -m unittest tests.test_codex_agents tests.test_codex_worker_lane
-```
+still `1`; both base controls passed. With the change all six cases passed for
+the original four-field probe. Returned commands and summaries appear below;
+the later repair run also checks `CHUB_DIR` and sandbox availability.
 
 The fixtures and unittest checks are locally authored; this is neither an
 unchanged upstream test run nor live provider execution. No agent adherence,
@@ -499,6 +515,189 @@ new unconditional CHUB setting. Changing only `CODEX_HOME` does not itself
 change Context Hub's `HOME`/`CHUB_DIR` lookup. F4 changes are portable examples;
 the existing copy/registration recipe remains the deployment path.
 
+Two HOME-overriding launchers **do not receive these opt-outs**:
+[`tools/sota-convergence/codex_lane.py`](../../tools/sota-convergence/codex_lane.py)
+(`ISOLATION_ARGS`, `child_env`) and
+[`gpt6-family-tiering-20260926/run_arm.py`](../../blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py)
+(`CODEX_ARGV`, the per-call environment). They pass `--ignore-user-config` and
+omit `-p stack-worker`. Follow-up for those lane owners: pass
+`-c 'shell_environment_policy.set.CHUB_TELEMETRY="0"'` and
+`-c 'shell_environment_policy.set.CHUB_FEEDBACK="0"'`, citing the pinned
+[Codex environment builder](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/shell_environment.rs)
+and [Context Hub switches](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js),
+then qualify their `codex exec` login-shell path. This template repair does not
+change those launchers or claim they are covered by the gateway sweep.
+
 Recheck the sources and native test when Codex profile loading or Context Hub's
 environment switches change. Fresh named-role execution and any token-savings
 comparison remain separate qualification work.
+
+### 2026-09-27 repair: Worktree MCP settings
+
+The worker profile adds partial `[mcp_servers.serena]` and
+`[mcp_servers.codebase-memory]` tables with `startup_timeout_sec = 60`.
+[`RawMcpServerConfig.startup_timeout_sec`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/config.schema.json)
+defines the setting; [`rmcp_client.rs:103`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L103)
+sets the 30-second default consumed by
+[`connection_manager.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/connection_manager.rs).
+The partial tables retain user-scope commands. The header's existing layering
+rule still applies: profile 21 < project 25 < `-c` 30. This is configuration
+coverage for worktrees; successful server startup awaits the coordinator's host
+matrix rerun after adoption.
+
+The project template sets jcodemunch's `default_tools_approval_mode = "approve"`
+and `enabled_tools = ["route", "menu", "order"]`, retaining its project scope
+from [the scope decision, item 2](2026-09-25-codex-mcp-scope.md).
+[`mcp/mod.rs:89–98`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L98)
+auto-approves `Approve`; the same tag's config schema defines
+`RawMcpServerConfig` and `McpServerToolConfig`. jgravelle/jcodemunch-mcp
+`1.108.319`, commit `8f7b34abe16fb459e0bf1c04747d584216dfe32e`, defines this
+front door in [`counter.py`](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py).
+[`server.py:5500–5511`](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py#L5500-L5511)
+makes `order` read-only by default (`allow_state_change=false`), but explicit
+`true` permits state-changing catalog actions. `route` defaults `execute=false`
+and [rejects state-changing automatic dispatch](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py#L5535-L5577).
+The allowlist limits the exposed tools; it is not an enforced read-only boundary.
+No user-scope jcodemunch entry or host configuration is changed here.
+
+### Returned local evidence, 2026-09-27
+
+These are returned unittest summaries, not generated acceptance claims. Run
+commands from the checkout root. Historical build runs below preceded the
+repair and retain their original scope and output. The original template/hash
+checks are **structural validation**:
+
+```text
+rtk python3 -m unittest tests.test_codex_agents
+before role payload edits: exit=1
+Ran 1 test in 0.001s
+FAILED (failures=3)
+after role edits and correcting the hash separator: exit=0
+Ran 1 test in 0.001s
+OK
+
+rtk python3 -m unittest tests.test_codex_worker_lane.TemplateTests.test_profile_template
+before profile edit: exit=1
+Ran 1 test in 0.001s
+FAILED (failures=1)
+None != {'set': {'CHUB_TELEMETRY': '0', 'CHUB_FEEDBACK': '0'}}
+```
+
+The original environment merge control is **local native integration with
+synthetic inputs**, using installed Codex 0.157.1 and no provider or MCP call:
+
+```text
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home
+before profile edit: exit=1
+Ran 1 test in 0.765s
+FAILED (failures=4)
+Actual failing output: ['telemetry=1', 'feedback=1', 'base=kept', 'filter=absent']
+
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest tests.test_codex_worker_lane.TemplateTests.test_profile_template tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home
+after profile edit: exit=0
+Ran 2 tests in 0.724s
+OK
+```
+
+The second command combines one structural check with one native integration
+check. Its six native cases checked the four fields shown above; preservation
+of `CHUB_DIR` was not yet observed. One later combined run
+(`NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest tests.test_codex_agents tests.test_codex_worker_lane`)
+exceeded its 55-second outer limit. It returned no completed unittest result
+and is not passing evidence. These **two separate commands** completed instead:
+
+```text
+NAS_CODEX_INTEGRATION=0 rtk python3 -m unittest -v tests.test_codex_agents tests.test_codex_worker_lane
+exit=0
+Ran 55 tests in 23.014s
+OK (skipped=8)
+
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests
+exit=0
+Ran 8 tests in 32.551s
+OK
+```
+
+The first command covers structural validation and locally authored synthetic
+fixtures; the second covers the same eight native tests skipped in the first.
+There were 55 distinct tests, not 63. An independent coordinator rerun at
+`4278affa`, with `TMPDIR=/var/tmp/claude-w3-codex-agents`, confirmed collection
+and native execution (local integration evidence, supplied 2026-09-27 ~14:00Z):
+
+```text
+python3 -m unittest -v tests.test_codex_agents tests.test_codex_worker_lane
+exit=0
+Ran 55 tests in 22.392s
+OK (skipped=8)
+
+NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests
+exit=0
+Ran 8 tests in 32.455s
+OK
+```
+
+Both the custom-agent payload test and the CHUB native method were collected.
+All eight native methods passed, including the CHUB and per-project jcodemunch
+registration methods. These reruns precede the repair's new controls.
+
+**Repair controls.** All repair unittest runs set
+`TMPDIR=/var/tmp/claude-w3-codex-agents`. New template controls are structural
+validation; `SandboxProbeControlTests` uses synthetic subprocess results;
+the CHUB observation test executes the native sandbox. Each added control failed
+before its correction:
+
+| Command (after `rtk python3 -m unittest -v`) | Before correction | After correction |
+| --- | --- | --- |
+| `tests.test_codex_worker_lane.TemplateTests.test_worker_startup_timeouts_layer_over_user_servers` | exit 1; `Ran 1 test in 0.002s`; `FAILED (failures=2)`; both tables absent | exit 0; `Ran 1 test in 0.001s`; `OK` |
+| `tests.test_codex_worker_lane.TemplateTests.test_project_jcodemunch_approves_only_read_front_door` | exit 1; `Ran 1 test in 0.001s`; `FAILED (failures=1)`; approval mode absent | exit 0; `Ran 1 test in 0.001s`; `OK` |
+| `tests.test_codex_worker_lane.SandboxProbeControlTests` | exit 1; `Ran 2 tests in 0.009s`; `FAILED (failures=1)`; unavailable sandbox asserted failure | covered by the three-test run below |
+| `tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home` with `NAS_CODEX_INTEGRATION=1` | exit 1; `Ran 1 test in 0.919s`; `FAILED (failures=6)`; `chubdir` absent from output | covered by the three-test run below |
+
+```text
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.SandboxProbeControlTests tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home
+exit=0
+Ran 3 tests in 0.873s
+OK
+```
+
+The probe now collects all six runs, uses the sibling's 120-second timeout,
+and skips when every sandbox invocation fails. Partial failures remain failures.
+The CHUB_DIR path is asserted internally but no scratch path is published here.
+The first repair native-class run
+(`NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests`)
+returned exit 1, `Ran 8 tests in 22.040s`, `FAILED (failures=2)`. Two older
+fixtures reported `invalid transport`: they lacked base registrations for the
+profile's new partial tables.
+The corrected fixtures register both user-scope servers before loading the
+profile, following the pinned config schema. The completed checks are:
+
+```sh
+export TMPDIR=/var/tmp/claude-w3-codex-agents
+NAS_CODEX_INTEGRATION=0 rtk python3 -m unittest -v tests.test_codex_agents tests.test_codex_worker_lane
+NAS_CODEX_INTEGRATION=1 rtk python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests
+NAS_CODEX_INTEGRATION=0 rtk python3 -m unittest -v tests.test_render_config
+```
+
+Returned results, in that order:
+
+```text
+exit=0
+Ran 59 tests in 26.667s
+OK (skipped=8)
+
+exit=0
+Ran 8 tests in 34.110s
+OK
+
+exit=0
+Ran 21 tests in 0.608s
+OK
+```
+
+The 59-test run covers structural checks and synthetic fixtures; the native
+eight cover its skips and passed after the fixture correction. Rendering is
+local integration with synthetic host settings. **Unchanged upstream tests,
+live provider execution, Context Hub network runs and token measurements: none.**
+The `codex exec` login-shell environment path was not separately qualified.
+F4 duplication in a spawned role when user AGENTS already contains F4 remains
+unverified; one block per role file does not establish one block per child rollout.

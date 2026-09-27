@@ -1,4 +1,4 @@
-"""Repository integration checks for PR-E's custom-agent instruction payloads.
+"""Structural validation of custom-agent instruction payloads.
 
 Sources: openai/codex rust-v0.157.1, codex-rs/agent-roles/src/agent_role_config.rs
 and codex-rs/core/src/agent/role.rs; rtk-ai/rtk v0.50.0,

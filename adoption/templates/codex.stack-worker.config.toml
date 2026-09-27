@@ -30,6 +30,18 @@ web_search = "live"
 CHUB_TELEMETRY = "0"
 CHUB_FEEDBACK = "0"
 
+# Allow user-scope servers the same startup window in separate worktrees.
+# RawMcpServerConfig.startup_timeout_sec:
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/config.schema.json
+# Default is 30 s (codex-mcp/src/rmcp_client.rs:103); connection_manager.rs consumes it.
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L103
+# Partial tables retain user commands; profile 21 < project 25 < -c 30 (source in header).
+[mcp_servers.serena]
+startup_timeout_sec = 60
+
+[mcp_servers.codebase-memory]
+startup_timeout_sec = 60
+
 # These three servers declare no MCP tool annotations, so under approval_policy = "never" Codex refuses every call
 # to them ("MCP tool call requires approval, but approval policy is never"). Workers get their read tools, approved.
 [mcp_servers.ai-memory]

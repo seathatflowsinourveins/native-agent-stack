@@ -21,7 +21,7 @@ required. `config_file` resolves against the folder that holds `config.toml`, so
 the value is `agents/<name>.toml`, not `.codex/agents/<name>.toml` (a Codex
 Lane C review confirmed the schema on `codex-cli 0.155.1` and caught that path).
 Not yet exercised as a spawned role in a Codex session on this profile.
-The definitions carry `name`, `description` and `developer_instructions`; they set
+The two definitions above carry `name`, `description` and `developer_instructions`; they set
 no `model`, `model_reasoning_effort` or `sandbox_mode` and inherit the session's
 configuration, so the reviewer's no-edit rule is a prompt instruction, not an
 enforced sandbox. Cross-family review and live coordination are
@@ -33,12 +33,22 @@ end-to-end run of their own in the dated guide
 lane C bridge review run from Claude. Qualify a Codex agent per task before
 relying on it.
 
-## 2026-09-27: PR-E instruction refresh
+## 2026-09-27: Custom-agent instruction refresh
 
 The repository has three custom-agent templates: the two listed above and
 [`semantic-evidence-reviewer`](agents/semantic-evidence-reviewer.toml). That third
-role sets `sandbox_mode = "read-only"`; the earlier inheritance paragraph applies
-to the two roles in the table. PR-E adds the full-save plan's F4 block to all three
+role contains `sandbox_mode = "read-only"`, but **that field has no effect at
+`rust-v0.157.1`**. Dated correction (2026-09-27):
+[`role.rs:36–48,119–126`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L36-L48)
+does not include sandbox authority in its bounded overrides; the child starts
+with a [clone of the parent config](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L182-L189).
+A role file cannot set or narrow the sandbox. All three roles inherit the parent
+session's sandbox. Run the parent with `-s read-only` to enforce read-only access
+for the semantic reviewer; the reviewers' no-edit rules are prompt instructions.
+The trusted-project template's `danger-full-access` parent also passes that
+authority to its children.
+
+This refresh adds the [F4 RTK guidance block](../../docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26) to all three
 `developer_instructions`: [RTK v0.50.0's awareness text](https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md)
 verbatim, followed by the marked exceptions already in the
 [Codex AGENTS template](../../adoption/templates/codex.AGENTS.template.md).
@@ -51,9 +61,9 @@ parses the role file and validates `developer_instructions`,
 loads declared and discovered roles, and
 [`core/src/agent/role.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs)
 applies their developer instructions as bounded role overrides. These existing
-native templates are the PR-E carrier; no new role or installer is needed.
+native templates carry the custom-agent developer instructions; no new role or installer is needed.
 [`tests/test_codex_agents.py`](../../tests/test_codex_agents.py) checks the parsed
 developer payload of every template against the existing F4 block and the pinned
-upstream text's SHA-256. This is local template integration evidence, not a new
+upstream text's SHA-256. This is structural validation, not a new
 spawned-agent run or a measured token saving. See the
-[PR-E decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-pr-e-custom-agents-and-context-hub).
+[decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub).

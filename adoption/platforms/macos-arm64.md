@@ -305,6 +305,16 @@ resolves the config there. No wrapper script is needed. The context-hub row was 
 both platform pin files name those same bytes. This is artifact verification, not a Mac
 installation or native execution receipt; see the [recipe](../../recipes/README.md#context-hub-opt-out).
 
+**2026-09-27 amendment:** the explicit Codex `stack-worker` profile is the one
+carrier that sets `CHUB_TELEMETRY=0 CHUB_FEEDBACK=0` unconditionally whenever
+`-p stack-worker` is selected, whatever `HOME` is. Other invocations keep the
+home-only rule above. Context Hub `v0.1.4`
+[`telemetry.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js#L5-L14)
+checks these variables before configuration; the
+[worker decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub)
+records the profile loading check and its limits. This amendment adds no Mac
+execution receipt.
+
 A Mac that runs the Claude RTK hook at the rtk 0.50.0 pin needs the exclusions from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) in
 `~/Library/Application Support/rtk/config.toml`, the only config file rtk 0.50.0 reads on

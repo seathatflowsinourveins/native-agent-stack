@@ -1,9 +1,12 @@
 name = "semantic-evidence-reviewer"
 description = "Review supplied source claims and advisory semantic judgments within a bounded evidence task."
+# Ignored at rust-v0.157.1: role.rs:36-48,119-126 has no sandbox override.
+# Authority is inherited from the parent; use `-s read-only` on that parent.
 sandbox_mode = "read-only"
-# PR-E: native role developer instructions, openai/codex rust-v0.157.1:
+# Custom-agent developer instructions, openai/codex rust-v0.157.1:
 # https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs
-# F4: https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md
+# F4 decision: docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26
+# Upstream: https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md
 # Exceptions match adoption/templates/codex.AGENTS.template.md.
 developer_instructions = '''
 For this assigned semantic evidence task, read the installed typesafe-ai SKILL.md
