@@ -176,9 +176,11 @@ clients. `client_wiring` checks three places:
 
 - `claude`, the user settings: a Bash `PreToolUse` hook runs `rtk hook claude`; the
   number of hook events that run ai-memory; Context Mode is enabled and installed;
-  subagent spawn depth is 1; a workflow concurrency cap is set; and neither
-  `CLAUDE_CODE_EFFORT_LEVEL` nor the agent-teams opt-in appears in the settings or
-  the checker's environment;
+  subagent spawn depth is 1; a workflow concurrency cap is set; and
+  `CLAUDE_CODE_EFFORT_LEVEL` does not appear in the settings or the checker's
+  environment. The agent-teams opt-in is reported as information only
+  (`agent_teams_opt_in`, 0 or 1), because agent teams are an allowed dispatch mode
+  since 2026-09-27;
 - `project`, this checkout: `.claude/settings.json` sets the depth and the cap, and
   a project `.codex/config.toml` names the Serena, SocratiCode and ai-memory servers
   (optional since 2026-09-25: those servers now live at Codex user scope, so a fresh
