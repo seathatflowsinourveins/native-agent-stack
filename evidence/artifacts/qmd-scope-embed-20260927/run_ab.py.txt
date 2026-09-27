@@ -5,6 +5,7 @@ Arms: lex = `qmd search` (BM25, no LLM); vec = `qmd vsearch` (vector only); hybr
 """
 import hashlib
 import json
+import statistics
 import subprocess
 import sys
 import time
@@ -47,7 +48,7 @@ for arm in ARMS:
     ranks = [r["arms"][arm]["rank"] for r in rows]
     summary[arm] = {"hit@1": sum(1 for x in ranks if x == 1), "hit@5": sum(1 for x in ranks if x),
                     "mrr@5": round(sum(1 / x for x in ranks if x) / len(ranks), 3), "n": len(ranks),
-                    "median_seconds": sorted(r["arms"][arm]["seconds"] for r in rows)[len(rows) // 2]}
+                    "median_seconds": statistics.median(r["arms"][arm]["seconds"] for r in rows)}
 json.dump({"queryset_sha256": (D / "queryset-frozen.sha256").read_text().split()[0], "rows": rows, "summary": summary},
           open(D / "ab-results.json", "w"), indent=1)
 print(json.dumps(summary, indent=1))

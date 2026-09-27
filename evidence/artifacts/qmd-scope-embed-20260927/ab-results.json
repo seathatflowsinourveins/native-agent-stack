@@ -422,14 +422,15 @@
    "hit@5": 9,
    "mrr@5": 0.783,
    "n": 10,
-   "median_seconds": 7.9
+   "median_seconds": 7.8
   },
   "hybrid": {
    "hit@1": 5,
    "hit@5": 10,
    "mrr@5": 0.725,
    "n": 10,
-   "median_seconds": 121.4
+   "median_seconds": 119.65
   }
- }
+ },
+ "summary_note": "median_seconds recomputed as the true median of the 10 rows after review (the first runner took the upper middle sample)"
 }

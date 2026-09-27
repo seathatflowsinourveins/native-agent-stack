@@ -1001,7 +1001,7 @@
    "/api/mcp/"
   ],
   "logToolSources": false,
-  "machineId": "42da5403cdcc63c3",
+  "machineId": "<redacted>",
   "maxBodySizeMb": 10,
   "maxRetryIntervalSec": 30,
   "mcpEnabled": false,

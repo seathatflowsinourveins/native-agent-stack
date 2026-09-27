@@ -1,0 +1,26 @@
+{
+ "run": "wf_baff0093-a39",
+ "total_tool_calls": 2716,
+ "by_tool": {
+  "Bash": {
+   "calls": 1486,
+   "share_pct": 54.7
+  },
+  "Read": {
+   "calls": 662,
+   "share_pct": 24.4
+  },
+  "mcp:plugin_context-mode_context-mode": {
+   "calls": 498,
+   "share_pct": 18.3
+  },
+  "ToolSearch": {
+   "calls": 38,
+   "share_pct": 1.4
+  },
+  "StructuredOutput": {
+   "calls": 32,
+   "share_pct": 1.2
+  }
+ }
+}

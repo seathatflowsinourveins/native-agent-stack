@@ -1,0 +1,164 @@
+{
+ "schema_version": 1,
+ "system": "topoteretes/cognee v1.6.1, S3 candidate arm on the workstation (nativestack-5975wx-20260925), setup-only smoke",
+ "date": "2026-09-27",
+ "status": "installed_smoke_passed",
+ "paths": "lane-relative: <lane> = s3-arms/cognee under the native-agent-stack state directory",
+ "release": {
+  "tag": "v1.6.1",
+  "commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
+  "uv_lock_sha256": "46ec6626a6c06556654a88b0a4d5bc83a5ec48287bc00110c711737cb804513e"
+ },
+ "install_method": {
+  "summary": "Bare metal (no Docker on this host at install time): the tag's committed uv.lock via `uv sync --python 3.12 --frozen --no-dev --no-editable`, mirroring the upstream Dockerfile's python3.12 base (L19) and frozen sync (L66/L86) without the server extras",
+  "scripts": {
+   "install.sh": "6530b92cd2fd2d134f868e2f680ecdd1b8d6b13c7d2b258e3023f1eb58d2eba5",
+   "run.sh": "2d49f818abde1eadece40faeeaeb2a07000b45817d37d7c8a368545624164238",
+   "smoke.py": "810560f8f8d975890c2043bec8ddf377883337cf88a6c23b60ed9d3cd2ed9605"
+  },
+  "uv": "uv 0.12.17",
+  "python": "CPython 3.12.14 (uv-managed, lane-owned)"
+ },
+ "versions": "{'cognee': '1.6.1', 'litellm': '1.96.2', 'fastembed': '0.8.0', 'lancedb': '0.39.0', 'ladybug': '0.19.0', 'onnxruntime': '1.23.2', 'openai': '2.54.0', 'pydantic': '2.13.5', 'instructor': '1.15.1'}",
+ "configuration": {
+  "LLM_PROVIDER": "custom",
+  "LLM_MODEL": "openai/cx/gpt-6-astra-max",
+  "LLM_ENDPOINT": "http://127.0.0.1:20128/v1 (OmniRoute, keyless loopback)",
+  "LLM_API_KEY": "placeholder 'local-loopback'",
+  "LLM_ARGS": {
+   "temperature": 1.0,
+   "extra_headers": {
+    "x-omniroute-session": "s3-cognee-smoke-20260927",
+    "X-OmniRoute-No-Cache": "true"
+   }
+  },
+  "STRUCTURED_OUTPUT_FRAMEWORK": "instructor",
+  "LLM_INSTRUCTOR_MODE": "tool_call",
+  "EMBEDDING_PROVIDER": "fastembed",
+  "EMBEDDING_MODEL": "BAAI/bge-small-en-v1.5 (upstream's local default, CPU)",
+  "databases": "shipped local defaults: sqlite (relational), lancedb (vector), ladybug (graph)",
+  "ENABLE_BACKEND_ACCESS_CONTROL": "true",
+  "TELEMETRY_DISABLED": "1",
+  "isolation": "env -i with lane-owned HOME/XDG/TMP/HF/FASTEMBED caches; CUDA_VISIBLE_DEVICES=''; transient systemd --user units (--wait --collect, UMask 0077); WorkingDirectory is a fresh lane dir with no dotenv file",
+  "why": {
+   "LLM_ARGS temperature": "cognee folds llm_temperature 0.0 into every call (llm/config.py L271-298); temperature 0 makes a request eligible for OmniRoute's armed legacy semantic cache and <=0.1 for in-flight dedup (verdict K02/K04). The gateway strips temperature for codex models, so 1.0 changes cache eligibility only, not GPT-6 sampling. LLM_ARGS keys win over the folded value (L287)",
+   "extra_headers": "stable session key for account affinity; No-Cache blocks legacy semantic-cache reads and writes",
+   "instructor tool_call": "attempt 1 (litellm_native json_object fallback) and attempt 2 (instructor json_schema_mode) were rejected by the Codex Responses backend through the gateway; tool calling works (see attempts)"
+  }
+ },
+ "attempts": [
+  {
+   "n": 1,
+   "unit": "s3-smoke-cognee-1",
+   "mode": "retain",
+   "framework": "litellm_native (default); unmapped model -> json_object fallback (native_adapter.py L123-135, L317-350)",
+   "result": "failed at cognify: 400 'Response input messages must contain the word json \u2026 text.format of type json_object'. Cause: the gateway's chat->Responses translator moves the first system message into instructions (OmniRoute toResponses.ts L120-136) and maps json_object to text.format (L37-38); cognee states JSON only in the system prompt"
+  },
+  {
+   "n": 2,
+   "unit": "s3-smoke-cognee-2",
+   "mode": "retain",
+   "framework": "instructor json_schema_mode",
+   "result": "failed at cognify: 400 \"Invalid schema for response_format 'KnowledgeGraph': 'additionalProperties' is required to be supplied and to be false\" (strict json_schema); instructor retried",
+   "gateway_rows": {
+    "200": 1,
+    "400": 23,
+    "499": 1
+   }
+  },
+  {
+   "n": 3,
+   "unit": "s3-smoke-cognee-3",
+   "mode": "retain",
+   "framework": "instructor tool_call",
+   "result": {
+    "mode": "retain",
+    "data_id": "<uuid>",
+    "steps": [
+     {
+      "step": "add",
+      "seconds": 5.2
+     },
+     {
+      "step": "cognify",
+      "seconds": 50.0
+     },
+     {
+      "step": "search CHUNKS",
+      "seconds": 0.2,
+      "codeword_found": true,
+      "result_chars": 954
+     },
+     {
+      "step": "search GRAPH_COMPLETION",
+      "seconds": 7.2,
+      "codeword_found": true,
+      "result_chars": 162
+     }
+    ],
+    "passed": true
+   }
+  },
+  {
+   "n": 4,
+   "unit": "s3-smoke-cognee-4",
+   "mode": "recall (fresh process, no add or cognify)",
+   "framework": "instructor tool_call",
+   "result": {
+    "mode": "recall",
+    "data_id": "<uuid>",
+    "steps": [
+     {
+      "step": "search CHUNKS",
+      "seconds": 4.1,
+      "codeword_found": true,
+      "result_chars": 954
+     },
+     {
+      "step": "search GRAPH_COMPLETION",
+      "seconds": 16.9,
+      "codeword_found": true,
+      "result_chars": 162
+     }
+    ],
+    "passed": true
+   }
+  }
+ ],
+ "gateway_evidence": {
+  "method": "read-only SELECT of non-sensitive call_logs columns (effort, tokens, status) and COUNT(DISTINCT connection_id) only; no ids retained",
+  "attempts_3_4": {
+   "calls": 7,
+   "status_200": 7,
+   "effort_requested": "None (suffix path)",
+   "effort_upstream": "max on every row",
+   "tokens_in": 7237,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 2045,
+   "distinct_accounts": 1
+  },
+  "affinity_note": "call_logs.session_tag holds a per-request conversation id (chatCore.ts L1134 prefers conversationId over the explicit session header), so the header is not visible there; all 7 calls under one x-omniroute-session landed on one account, while the 8 max-probe calls under 8 distinct session headers spread over 3 accounts (consistent with header-keyed affinity, not a proof)"
+ },
+ "production": {
+  "listeners_before_after_equal": true,
+  "ports": [
+   49474,
+   18231,
+   18232,
+   20128
+  ],
+  "transient_units_left": 0,
+  "sent_to_production": "only OmniRoute inference requests"
+ },
+ "deviations": [
+  "stderr carries a caught ModuleNotFoundError: No module named 'transformers' (optional path; the smoke passed)",
+  "LLM_TEMPERATURE effectively 1.0 via LLM_ARGS (see why)",
+  "structured output switched from the shipped default (litellm_native) to instructor tool_call, because of the two gateway/backend rejections",
+  "embedder is upstream's local default (bge-small), not an r6-selected model; production vLLM on 18231 untouched"
+ ],
+ "open_items": [
+  "r6 must fix per-role models (LLM_EXTRACTION/SUMMARIZATION/QUERY_MODEL) and the structured-output mode; json_object and strict json_schema both fail through the gateway for this schema",
+  "cognee is not a manifests/stack.json component, so scripts/host_receipts.py cannot record it until the S3 owner registers the candidate",
+  "no LongMemEval data used; nothing scored"
+ ]
+}

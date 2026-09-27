@@ -4,7 +4,7 @@ The named index `native-agent-stack-catalog` (qmd 2.8.3) indexes the `native-age
 
 ## What changed on the host
 
-1. **Embeddings, 16:19:06Z–16:25:57Z.** `qmd --index native-agent-stack-catalog embed` embedded 744 chunks from 122 documents in 6m 50s, with `embeddinggemma-300M-Q8_0` (sha256 `b5ce9d77…0d63`, 333,590,944 bytes). Before: 0 vectors (`status-before.txt`). After: 744 (`status-after.txt`).
+1. **Embeddings, 16:19:06Z–16:25:57Z.** `qmd --index native-agent-stack-catalog embed` embedded 744 chunks from 122 documents in 6m 50s, with `embeddinggemma-300M-Q8_0` (sha256 and size in `qmd-model-identity.json`). Before: 0 vectors (`status-before.txt`). After: 744 (`status-after.txt`).
 2. **Scope.**
    - `collection add` created `foundation-adoption` (`adoption/`, 23 docs) and `foundation-docs` (`docs/`, 124 docs) at about 16:42Z.
    - `ignore: ["ecosystem/**"]` was then added to the index's YAML. Per-collection ignore is YAML-only (qmd v2.8.3 README L755).
@@ -12,7 +12,7 @@ The named index `native-agent-stack-catalog` (qmd 2.8.3) indexes the `native-age
    - `embed` ran 16:43:11Z–16:55:44Z: 1,506 chunks from 146 documents in 12m 32s.
    - Final state: 268 documents and 2,250 vectors in 4 collections (`status-after-scope.txt`).
    - The prior YAML and SQLite are backed up privately under the host's state directory.
-3. **Device: CPU.** qmd's loader calls node-llama-cpp `getLlama({gpu:"auto"})` (qmd `dist/llm.js` L634-650). From qmd's own package it resolved `{"gpu":"vulkan","devices":[]}` (`device.mjs.txt`), so the RTX 4090 was not used. It was left that way: the GPU serves production models.
+3. **Device: CPU.** qmd's loader calls node-llama-cpp `getLlama({gpu:"auto"})` (qmd `dist/llm.js` L634-650). From qmd's own package it resolved `{"gpu":"vulkan","devices":[]}` (`device.mjs.txt`; output in `device-probe.txt`), so the RTX 4090 was not used. It was left that way: the GPU serves production models.
 
 ## Why scope first
 
@@ -32,8 +32,10 @@ E1's qmd retraction (failure mode `wrong_document`) was a scope failure. The ans
 | arm | hit@1 | hit@5 | MRR@5 | median s |
 |---|---|---|---|---|
 | lex (`qmd search`, raw question) | 1/10 | 1/10 | 0.10 | 0.2 |
-| vec (`qmd vsearch`) | 7/10 | 9/10 | 0.783 | 7.9 |
-| hybrid (`qmd query`) | 5/10 | 10/10 | 0.725 | 121.4 |
+| vec (`qmd vsearch`) | 7/10 | 9/10 | 0.783 | 7.8 |
+| hybrid (`qmd query`) | 5/10 | 10/10 | 0.725 | 119.65 |
+
+Medians are the true medians of the 10 rows. The first runner took the upper middle sample; this was corrected in `run_ab.py.txt` and `ab-results.json` after review.
 
 **Limits**
 - n=10 synthetic questions.

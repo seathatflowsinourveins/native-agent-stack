@@ -1,0 +1,25 @@
+{
+ "fetched_by": "gh api",
+ "issue": {
+  "closed_at": "2026-09-27T08:46:47Z",
+  "state": "closed",
+  "title": "\ud83d\udd34 Release branch not green: release/v3.8.51"
+ },
+ "last_comments": [
+  {
+   "author": "github-actions[bot]",
+   "body": "The **release-green** validation found HARD failures on `release/v3.8.51`.\nThese are real defects that would block the release PR \u2014 fix them in the\noriginating PR branch (via co-authorship), not by demanding it from contributors.\n\n**Run:** https://github.com/diegosouzapw/OmniRoute/actions/runs/36242",
+   "created_at": "2026-09-26T16:45:51Z"
+  },
+  {
+   "author": "github-actions[bot]",
+   "body": "The **release-green** validation found HARD failures on `release/v3.8.51`.\nThese are real defects that would block the release PR \u2014 fix them in the\noriginating PR branch (via co-authorship), not by demanding it from contributors.\n\n**Run:** https://github.com/diegosouzapw/OmniRoute/actions/runs/36262",
+   "created_at": "2026-09-26T22:46:19Z"
+  },
+  {
+   "author": "github-actions[bot]",
+   "body": "\u2705 `release/v3.8.51` is release-green again at `a58000c76` \u2014 https://github.com/diegosouzapw/OmniRoute/actions/runs/36296016605. Auto-closed by Release-Green (continuous).",
+   "created_at": "2026-09-27T08:46:46Z"
+  }
+ ]
+}

@@ -1,7 +1,7 @@
 import json, re, urllib.request, os, sys
 D = sys.argv[1]
 BASE = "http://127.0.0.1:20128"
-SECRET = re.compile(r"(email|token|access|refresh|secret|password|apikey|api_key|cookie|authorization|connectionid|connection_id)", re.I)
+SECRET = re.compile(r"(email|token|access|refresh|secret|password|apikey|api_key|cookie|authorization|connectionid|connection_id|machineid|machine_id)", re.I)
 UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
 EMAIL = re.compile(r"[^\s\"'@]+@[^\s\"'@]+\.[a-z]{2,}", re.I)
 def red(o):
