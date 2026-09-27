@@ -211,11 +211,12 @@ def codex_user_instructions(repo_root: Path) -> str:
     verbatim, and the RTK exactness exceptions), read through tools/adoption/apply_codex_lane.py's agents_block(),
     never a copy of it. Codex reads $CODEX_HOME/AGENTS.md as global instructions, so a lane home without it gives
     its model neither the top rule nor RTK's instructions, which the native lane's workers get from ~/.codex."""
+    saved = list(sys.path)  # the installer prepends the repository root itself on import (apply_codex_lane.py:69)
     sys.path.insert(0, str(repo_root / "tools" / "adoption"))
     try:
         import apply_codex_lane  # noqa: E402  (the checkout's installer)
     finally:
-        sys.path.pop(0)
+        sys.path[:] = saved
     try:
         return apply_codex_lane.agents_block()
     except apply_codex_lane.Refused as error:

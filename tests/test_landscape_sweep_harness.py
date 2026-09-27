@@ -906,6 +906,15 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         lane = json.loads((work / "staged.json").read_text())["codex"]["lane_home"]
         self.assertEqual(lane["agents_sha256"], hashlib.sha256(template).hexdigest())
 
+    def test_reading_the_instructions_leaves_the_import_path_unchanged(self):
+        # apply_codex_lane.py prepends the repository root on import (its line 69); the whole path must come back,
+        # measured with the installer not yet loaded, so its module-level insert actually runs.
+        sys.modules.pop("apply_codex_lane", None)
+        before = list(sys.path)
+        text = build_args.codex_user_instructions(ROOT)
+        self.assertEqual(sys.path, before)
+        self.assertTrue(text.startswith("<!-- native-agent-stack:codex-user-instructions:begin"))
+
     def test_require_key_stages_no_placeholder(self):
         work, _, done = self.stage_lane("--omniroute-require-key")
         self.assertEqual(done.returncode, 0, done.stderr)
