@@ -1211,7 +1211,7 @@ class RtkConfigReminderTests(unittest.TestCase):
     # Codex's #314 counterexample: the exact recipe text, TOML-valid, but rtk rejects the file.
     REJECTED = CONFIGURED + "[tracking]\nenabled = false\n"
     PROBES = ["git show HEAD:x | tail -n 5", "git -C . show --no-color HEAD:x | tail -n 5", "diff a missing",
-              "git branch -a", "git -C . branch"]
+              "git branch -a", "git -C . branch", "jq -r .x f.json"]
     HINT = "rtk ignores a config it cannot load"
     # `hook check` answers of the stub rtk.
     HOOK = {
@@ -1219,6 +1219,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         "rewrite": 'echo "rtk $3"; exit 0',
         "unsupported": "echo \"error: unrecognized subcommand 'check'\" >&2; exit 2",
         "branch rewritten": 'case "$3" in *branch*) echo "rtk $3"; exit 0 ;; esac; echo "No rewrite for: $3" >&2; exit 1',
+        "jq rewritten": 'case "$3" in jq*) echo "rtk $3"; exit 0 ;; esac; echo "No rewrite for: $3" >&2; exit 1',
         "excluded with a warning": 'echo "rtk: warning: invalid exclude_commands pattern" >&2; echo "No rewrite for: $3" >&2; exit 1',
     }
 
@@ -1454,6 +1455,10 @@ class RtkConfigReminderTests(unittest.TestCase):
             "Codex #291 counterexample: empty list, entries only in comments": (
                 "[hooks]\nexclude_commands = []\n" + "".join(f"# {entry}\n" for entry in self.ENTRIES),
                 "rewrite", self.PROBES[0]),
+            # GPT-6 review of #377: "jq" only in a comment passes the text check while rtk still rewrites
+            # jq; the jq probe catches it.
+            "GPT-6 #377 counterexample: jq only in a comment": (
+                self.CONFIGURED.replace('  "jq",\n', '  # "jq",\n'), "jq rewritten", "jq -r .x f.json"),
         }
         for name, (text, hook, probe) in cases.items():
             with self.subTest(name), tempfile.TemporaryDirectory() as tmp:
@@ -1496,6 +1501,9 @@ class RtkConfigReminderRealBinaryTests(unittest.TestCase):
         # Codex's #314 counterexample: exact text, but TrackingConfig needs history_days, so rtk ignores it.
         "[tracking] without history_days": (RtkConfigReminderTests.REJECTED, 1, True),
         "[tracking] with history_days": (RtkConfigReminderTests.REJECTED + "history_days = 90\n", 0, False),
+        # GPT-6 review of #377: the text check passes on a commented "jq", but the real rtk still rewrites jq.
+        "four entries plus a commented jq": (
+            RtkConfigReminderTests.CONFIGURED.replace('  "jq",\n', '  # "jq",\n'), 1, True),
         "2026-09-25 two-entry line": (RtkConfigReminderTests.OLD_TWO_ENTRY, 1, False),
         "the tested single-regex alternative": (f"[hooks]\nexclude_commands = ['{SINGLE_REGEX}', \"diff\"]\n", 1, False),
         "no config": (None, 1, False),

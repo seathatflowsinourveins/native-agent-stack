@@ -503,7 +503,7 @@ rtk_config_reminder() {
     && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
     && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
     for probe in 'git show HEAD:x | tail -n 5' 'git -C . show --no-color HEAD:x | tail -n 5' 'diff a missing' \
-      'git branch -a' 'git -C . branch'; do
+      'git branch -a' 'git -C . branch' 'jq -r .x f.json'; do
       status=0
       out="$(timeout 30 "$bin_dir/rtk" hook check "$probe" </dev/null 2>&1)" || status=$?
       if [[ "$status" -ne 1 || "$out" != "No rewrite for: $probe" ]]; then
