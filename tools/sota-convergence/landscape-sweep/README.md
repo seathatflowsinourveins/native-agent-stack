@@ -38,12 +38,12 @@ tests). The runner uses no `flock`, `setsid` or `timeout` commands, so it runs u
 
 | Label | Model and effort | Role |
 | --- | --- | --- |
-| `discover:<layer>` | Claude `opus` (claude-opus-5-5 on 2026-09-26), max | Discovery researcher: at most 6 proposals within 12 searches, 8 fetches and 40 GitHub API calls. |
+| `discover:<layer>` | Claude `opus` (claude-opus-5-5 on 2026-09-26), max, as `landscape-sweep-worker` | Discovery researcher: at most 6 proposals within 12 searches, 8 fetches and 40 GitHub API calls. |
 | `gpt6-discover:<layer>` | Claude `sonnet` wrapper, max, running GPT-6-Astra at effort max | Second-family discovery, with the same prompt and the layer input embedded. |
-| `refute-facts:<layer>` | Claude `sonnet` (claude-sonnet-5), max | Facts and identity refuter, within 8 searches, 10 fetches and 30 GitHub API calls. |
-| `refute-fit:<layer>` | Claude `opus`, max | Fit and standing refuter, with the same budget. |
+| `refute-facts:<layer>` | Claude `opus`, max, as `landscape-sweep-worker` | Facts and identity refuter, within 8 searches, 10 fetches and 30 GitHub API calls. |
+| `refute-fit:<layer>` | Claude `opus`, max, as `landscape-sweep-worker` | Fit and standing refuter, with the same budget. |
 | `gpt6-refute-fit:<layer>` | Claude `sonnet` wrapper, max, running GPT-6-Astra at effort max | Second-family fit refuter. |
-| `critic` | Claude `opus`, max | Completeness critic. It flags at most 8 layers for the follow-up round, whose labels end in `:followup`. |
+| `critic` | Claude `opus`, max, as `landscape-sweep-worker` | Completeness critic. It flags at most 8 layers for the follow-up round, whose labels end in `:followup`. |
 
 Survival is two-family on fit. A proposal survives only when the facts refuter, the Claude fit refuter and the
 GPT-6 fit refuter all vote not refuted. Every refuter defaults to refuted, and `convert.py` reads a vote the same
@@ -56,11 +56,17 @@ split nor the next sweep's `previous_sweep` (`not_adjudicated`) treats it as ref
 
 Why the roles are split this way:
 
-- Judgment-heavy roles (discovery, fit, completeness) run on the strongest model of each family.
-- The facts role runs on Sonnet, because facts can be checked against primary sources (`gh api`, release pages).
+- Every Claude judgment role (discovery, facts, fit, completeness) runs on Opus, the strongest Claude model.
+  - The facts role moved from Sonnet to Opus on 2026-09-27. Checking facts is verification, and the user's model rule keeps Sonnet for command wrappers and mechanical extraction.
+  - Sonnet still runs the two GPT-6 wrappers, which only run commands and return the raw result.
 - The GPT-6 lanes add a second family to discovery and to the fit judgment, where single-family bias matters most.
+- The Claude judgment roles run as the **`landscape-sweep-worker`** agent type (`adoption/agents/claude/landscape-sweep-worker.md`): Opus at effort max, with `disallowedTools: WebFetch`.
+  - The type keeps every other inherited tool, including Skill and context-mode's `ctx_*`. So pages come in through `ctx_fetch_and_index` and `ctx_search` as the page's own text, not as a smaller model's answer about the page.
+  - The worker prompts no longer mention WebFetch.
+  - Why: in the 2026-09-27 smoke 2, with WebFetch available and the token-lanes guidance injected, all 15 Claude page fetches used WebFetch and none used context-mode (counted per agent by the token lane).
+  - The built-in `stack-researcher` type also excludes WebFetch, but it has no Skill tool, so the pinned skills the templates name would be lost.
 
-This split is the design of the 2026-09-26 prototype. No measured comparison has tested it.
+The role split is the design of the 2026-09-26 prototype, with these 2026-09-27 changes. No measured comparison has tested it. Moving the facts role to GPT-6 would change a vote's family, which the survival rule and the copy check key on, so it needs its own comparison first.
 
 Every `agent()` call names its model and `effort: 'max'`, so no stage inherits the coordinator's `xhigh`
 ([max-effort decision](../../../docs/decisions/2026-09-23-max-effort-default.md)). The vote objects in
@@ -201,12 +207,21 @@ provides it.
 
 ## Run it
 
-The prerequisites are a Claude Code coordinator session with the Workflow tool (this repository's
-`.claude/settings.json` turns Ultracode on), `gh` signed in, `codex` on PATH signed in natively, node, and python3.
+The prerequisites:
+- a Claude Code coordinator session with the Workflow tool (this repository's `.claude/settings.json` turns Ultracode on);
+- the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`);
+- `gh` signed in;
+- `codex` on PATH, signed in natively;
+- node and python3.
 
 The work directory `W` holds prompts, host paths and raw Codex output, so it must sit outside every git repository.
 Every tool here refuses a work directory inside one; Codex would also load that repository's `AGENTS.md` into the
-lane. Commands run from this checkout.
+lane. A repository marker is a `.git` directory holding `HEAD`, or a non-empty `.git` file. An empty `.git` doesn't
+count: Codex's Linux sandbox creates empty `.git`, `.agents` and `.codex` mount targets under its writable roots,
+`/tmp` included, while a command runs, and removes them afterwards (`codex-rs/linux-sandbox/src/bwrap.rs` at
+rust-v0.157.1, `SyntheticMountTarget`). On 2026-09-27, other sessions' workspace-write Codex jobs made `/tmp/.git`
+appear several times a minute, and the older check refused work directories under `/tmp` at random. Commands run
+from this checkout.
 
 ```sh
 H=tools/sota-convergence/landscape-sweep
