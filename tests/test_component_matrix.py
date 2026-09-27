@@ -26,9 +26,9 @@ def _write_json(path: Path, document: dict) -> None:
 
 
 def _layer(layer_id="layer-a", *, verdict_status="recorded", agreement="same_winner",
-           winners=None, alternatives=None, open_gaps=None) -> dict:
-    return {
-        "catalog": "foundation",
+           winners=None, alternatives=None, open_gaps=None, checked_at="2026-09-22", catalog="foundation") -> dict:
+    layer = {
+        "catalog": catalog,
         "layer_id": layer_id,
         "title": f"Title for {layer_id}",
         "verdict_status": verdict_status,
@@ -37,6 +37,9 @@ def _layer(layer_id="layer-a", *, verdict_status="recorded", agreement="same_win
         "lanes": {"claude": {}, "codex": {}, "agreement": agreement},
         "open_gaps": open_gaps or [],
     }
+    if checked_at is not None:  # scripts/landscape.py requires it on every verdict row
+        layer["checked_at"] = checked_at
+    return layer
 
 
 def _winner(component_id="widget", *, linux="accepted", macos="untested",
@@ -743,6 +746,339 @@ class AliasReceiptTests(unittest.TestCase):
             with self.subTest(repository=repository):
                 built = cm.build_alternative({"repository": repository}, mapping, summary)
                 self.assertEqual(built["e2e_state"], "receipts_recorded")
+
+
+# ------------------------------------------------------------------------------ convergence by layer
+
+
+def _manifest_row(component_id, *, repository=None, compared=True, behind=False, decision=None) -> dict:
+    """A catalogs/sota-convergence/manifest-YYYYMMDD.json component (foundation) or entry (trading) row."""
+    row = {"id": component_id, "repository": repository or f"https://github.com/example/{component_id}",
+           "pin": "1.0.0", "pin_comparison": "compared" if compared else "not_compared",
+           "pin_behind_upstream": behind if compared else None}
+    if decision is not None:
+        row["decision"] = decision
+    return row
+
+
+def _sweep_manifest(checked_at, *, foundation=None, trading=None) -> dict:
+    return {"schema_version": 1, "id": "sota-convergence-" + checked_at.replace("-", ""), "checked_at": checked_at,
+            "foundation": [{"layer": layer_id, "components": rows} for layer_id, rows in (foundation or {}).items()],
+            "trading": [{"layer": layer_id, "entries": rows} for layer_id, rows in (trading or {}).items()]}
+
+
+def _sweep(sweep_id, day, layers, *, status="completed") -> dict:
+    """A catalogs/saturation/ledger.json sweep record, reduced to the fields the metric reads."""
+    return {"sweep_id": sweep_id, "date": day, "status": status,
+            "manifest_ref": "catalogs/sota-convergence/manifest-" + day.replace("-", "") + ".json",
+            "layers": [{"catalog": catalog, "layer_id": layer_id} for catalog, layer_id in layers]}
+
+
+EVERY_FIXTURE_LAYER = ([("foundation", layer_id) for layer_id in
+                        ("f-current", "f-reopened", "f-none", "f-empty", "f-pending")]
+                       + [("us-equities", layer_id) for layer_id in ("u-engines", "u-pending")])
+
+
+def _convergence_root(root: Path) -> None:
+    """Seven layers covering every layer_state, every factor value and every unresolved reason.
+
+    foundation/f-current is recorded on 2026-09-26: a completed sweep the same day, a later completed sweep
+    that covers another layer and a later stopped sweep all leave it confirmed_current. foundation/f-reopened
+    (recorded 2026-09-22) is reopened by the completed sweeps of 2026-09-26 and 2026-09-27. f-none is a
+    no_selection verdict, f-empty a recorded verdict without winners, f-pending and u-pending are
+    pending_lanes, and us-equities/u-engines is recorded on 2026-09-26."""
+    _init_root(root, [
+        _layer("f-current", checked_at="2026-09-26", winners=[
+            _winner("widget"), _winner("gadget", linux="untested"), _winner("relay", linux="untested")]),
+        _layer("f-reopened", winners=[_winner("widget")]),
+        _layer("f-none", verdict_status="no_selection"),
+        _layer("f-empty"),
+        _layer("f-pending", verdict_status="pending_lanes", agreement="disagree"),
+    ])
+    _write_json(root / "catalogs" / "landscape" / "us-equities.json", {
+        "schema_version": 2, "checked_at": "2026-09-22", "scope": "test fixture", "layers": [
+            _layer("u-engines", catalog="us-equities", checked_at="2026-09-26", winners=[
+                _winner("nautilus-trader", repository="https://github.com/example/nautilus"),
+                _winner("engine-x", repository="https://github.com/example/engine-x", linux="conditional"),
+                _winner("data-tracker", repository="https://github.com/example/tracker")]),
+            _layer("u-pending", catalog="us-equities", verdict_status="pending_lanes", agreement="disagree"),
+        ]})
+    _write_json(root / cm.STACK_FILE, {"schema_version": 1, "components": [
+        {"id": component_id, "repository": "https://github.com/example/" + repository, "version": "1.0.0"}
+        for component_id, repository in (("widget", "widget"), ("gadget", "gadget"), ("relay", "relay"),
+                                         ("helper", "helper"), ("gizmo", "gizmo"), ("tool", "tool"),
+                                         ("twin-a", "twin"), ("twin-b", "twin"), ("cli", "cli"))]})
+    _write_json(root / "tools" / "sota-convergence" / "receipt-component-aliases.json", {"schema_version": 1, "aliases": {
+        "gizmo": "data-gizmo", "nautilus-trader": "nautilustrader"}})
+    # relay declares linux untested; its reviewed linux use receipt makes the matrix entry host_verified.
+    _write_receipt(root, _receipt("relay", "linux-wsl2-x86_64"))
+    manifests = root / "catalogs" / "sota-convergence"
+    _write_json(manifests / "manifest-20260927.json", _sweep_manifest("2026-09-27", foundation={
+        "f-current": [
+            _manifest_row("widget"), _manifest_row("relay"), _manifest_row("gadget", behind=True),
+            _manifest_row("helper", compared=False),
+            _manifest_row("data-gizmo", repository="https://github.com/example/gizmo"),
+            _manifest_row("forked-tool", repository="https://github.com/example/tool"),
+            _manifest_row("twin", repository="https://github.com/example/twin"),
+            _manifest_row("stranger")],
+        "f-reopened": [
+            _manifest_row("widget"),
+            _manifest_row("cli-core", repository="https://github.com/example/cli"),
+            _manifest_row("cli-plugin", repository="https://github.com/example/cli")],
+        "f-none": [_manifest_row("helper")],
+        "f-pending": [_manifest_row("widget")],
+    }, trading={
+        "u-engines": [
+            _manifest_row("nautilustrader", repository="https://github.com/example/nautilus", decision="default"),
+            _manifest_row("data-engine-x", repository="https://github.com/example/engine-x", decision="default"),
+            _manifest_row("data-tracker", repository="https://github.com/example/tracker", decision="conditional"),
+            _manifest_row("tracker", repository="https://github.com/example/tracker", compared=False,
+                          decision="default"),
+            _manifest_row("extra", behind=True, decision="default"),
+            _manifest_row("maybe", decision="conditional"),
+            _manifest_row("mystery")],
+        "u-pending": [
+            _manifest_row("alpaca-a", repository="https://github.com/example/alpaca", decision="default"),
+            _manifest_row("alpaca-b", repository="https://github.com/example/alpaca", decision="default")],
+    }))
+    # Older by checked_at (one of them under the latest file name) and a file outside the manifest-YYYYMMDD
+    # pattern: none of them may be read.
+    stale = _sweep_manifest("2026-09-20", foundation={"f-current": [_manifest_row("widget", behind=True)]})
+    _write_json(manifests / "manifest-20260920.json", stale)
+    _write_json(manifests / "manifest-20261001.json", {**stale, "id": "misdated", "checked_at": "2026-09-19"})
+    _write_json(manifests / "layer-verdicts-20261231.json", {**stale, "id": "not-a-manifest", "checked_at": "2026-12-31"})
+    _write_json(root / "catalogs" / "saturation" / "ledger.json", {"schema_version": 1, "sweeps": [
+        _sweep("sweep-0926", "2026-09-26", EVERY_FIXTURE_LAYER),
+        _sweep("sweep-0927", "2026-09-27", [("foundation", "f-reopened")]),
+        _sweep("sweep-0928-stopped", "2026-09-28", EVERY_FIXTURE_LAYER, status="stopped")]})
+
+
+class ConvergenceByLayerTests(unittest.TestCase):
+    """The convergence-by-layer metric frozen on 2026-09-27: layer_state, the in-use denominator, the three
+    true/false/unknown factors, the comparability columns, the unresolved list and the summary."""
+
+    def _document(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        _convergence_root(root)
+        document, flip_violations = cm.build_document(root)
+        self.assertEqual(flip_violations, [])
+        return root, document
+
+    @staticmethod
+    def _rows(document):
+        return {(row["catalog"], row["layer_id"]): row["convergence"] for row in document["rows"]}
+
+    @staticmethod
+    def _factors(convergence):
+        return {name: (counts["true"], counts["false"], counts["unknown"])
+                for name, counts in convergence["factors"].items()}
+
+    @staticmethod
+    def _counts(convergence):
+        return tuple(convergence[key] for key in ("in_use", "converged", "all_rows", "recorded_winner_rows"))
+
+    def test_every_layer_state(self):
+        _root, document = self._document()
+        rows = self._rows(document)
+        self.assertEqual({key: value["layer_state"] for key, value in rows.items()}, {
+            # A same-day completed sweep is not "after"; the later completed sweep covers another layer; the
+            # later sweep that does cover it stopped.
+            ("foundation", "f-current"): "confirmed_current",
+            ("foundation", "f-empty"): "no_selection",       # recorded, no winners
+            ("foundation", "f-none"): "no_selection",        # verdict_status no_selection
+            ("foundation", "f-pending"): "pending_lanes",
+            ("foundation", "f-reopened"): "recorded_reopened",
+            ("us-equities", "u-engines"): "confirmed_current",
+            ("us-equities", "u-pending"): "pending_lanes",
+        })
+        self.assertEqual(rows[("foundation", "f-reopened")]["reopened_by"], [
+            {"sweep_id": "sweep-0926", "date": "2026-09-26"}, {"sweep_id": "sweep-0927", "date": "2026-09-27"}])
+        self.assertEqual(rows[("foundation", "f-current")]["reopened_by"], [])
+        self.assertEqual(rows[("foundation", "f-current")]["verdict_checked_at"], "2026-09-26")
+        self.assertEqual(document["summary"]["convergence"]["layer_states"], {
+            "confirmed_current": 2, "no_selection": 2, "pending_lanes": 2, "recorded_reopened": 1})
+
+    def test_foundation_factors_counts_and_unresolved_rows(self):
+        _root, document = self._document()
+        current = self._rows(document)[("foundation", "f-current")]
+        self.assertEqual(self._counts(current), (6, 2, 8, 3))
+        self.assertEqual(self._factors(current), {
+            "verdict_winner": (3, 3, 0), "pin_current": (4, 1, 1), "host_e2e": (2, 1, 3)})
+        self.assertEqual(current["unresolved"], [
+            {"id": "stranger", "repository": "https://github.com/example/stranger",
+             "reason": "no manifests/stack.json id, alias or repository match"},
+            {"id": "twin", "repository": "https://github.com/example/twin",
+             "reason": "ambiguous repository: manifests/stack.json ids twin-a, twin-b"}])
+        components = {component["id"]: component for component in current["components"]}
+        self.assertEqual([component["id"] for component in current["components"]],
+                         ["data-gizmo", "forked-tool", "gadget", "helper", "relay", "widget"])
+        self.assertEqual({key: (value["resolved_by"], value["adopted_as"]) for key, value in components.items()}, {
+            "data-gizmo": ("alias", "gizmo"), "forked-tool": ("repository", "tool"), "gadget": ("id", "gadget"),
+            "helper": ("id", "helper"), "relay": ("id", "relay"), "widget": ("id", "widget")})
+        self.assertEqual({key: (value["verdict_winner"], value["pin_current"], value["host_e2e"], value["converged"])
+                          for key, value in components.items()}, {
+            "widget": ("true", "true", "true", True),           # declared linux accepted
+            "relay": ("true", "true", "true", True),            # host_verified by its reviewed use receipt
+            "gadget": ("true", "false", "false", False),        # behind upstream; linux untested
+            "helper": ("false", "unknown", "unknown", False),   # not compared; no winner entry in this layer
+            "data-gizmo": ("false", "true", "unknown", False),
+            "forked-tool": ("false", "true", "unknown", False)})
+        reopened = self._rows(document)[("foundation", "f-reopened")]
+        # Every factor is true, but completed sweeps dated after the verdict reopened it.
+        self.assertEqual(self._counts(reopened), (1, 0, 3, 1))
+        self.assertEqual(self._factors(reopened), {
+            "verdict_winner": (1, 0, 0), "pin_current": (1, 0, 0), "host_e2e": (1, 0, 0)})
+        self.assertIs(reopened["components"][0]["converged"], False)
+        # One stack id uses the repository, but so do two sweep-manifest ids (tools/sota-convergence/
+        # lane_packets.py receipts_for): a repository match cannot tell them apart.
+        self.assertEqual([(row["id"], row["reason"]) for row in reopened["unresolved"]], [
+            ("cli-core", "ambiguous repository: manifests/stack.json ids cli; also sweep-manifest ids cli-plugin"),
+            ("cli-plugin", "ambiguous repository: manifests/stack.json ids cli; also sweep-manifest ids cli-core")])
+
+    def test_no_selection_and_pending_layers(self):
+        rows = self._rows(self._document()[1])
+        none, empty, pending = (rows[("foundation", layer_id)] for layer_id in ("f-none", "f-empty", "f-pending"))
+        self.assertEqual(self._counts(none), (1, 0, 1, 0))
+        self.assertEqual(self._factors(none), {
+            "verdict_winner": (0, 1, 0), "pin_current": (1, 0, 0), "host_e2e": (0, 0, 1)})
+        self.assertEqual(self._counts(empty), (0, 0, 0, 0))
+        self.assertEqual(empty["unresolved"], [])
+        self.assertEqual(self._factors(empty), {name: (0, 0, 0) for name in ("verdict_winner", "pin_current", "host_e2e")})
+        # No recorded verdict exists yet: whether the component wins is unknown, not false.
+        self.assertEqual(self._counts(pending), (1, 0, 1, 0))
+        self.assertEqual(self._factors(pending), {
+            "verdict_winner": (0, 0, 1), "pin_current": (1, 0, 0), "host_e2e": (0, 0, 1)})
+        us_pending = rows[("us-equities", "u-pending")]
+        self.assertEqual(self._counts(us_pending), (2, 0, 2, 0))
+        self.assertEqual(self._factors(us_pending), {
+            "verdict_winner": (0, 0, 2), "pin_current": (2, 0, 0), "host_e2e": (0, 0, 2)})
+
+    def test_us_equities_in_use_is_the_default_decision_and_winners_match_by_id_alias_or_repository(self):
+        engines = self._rows(self._document()[1])[("us-equities", "u-engines")]
+        self.assertEqual(self._counts(engines), (4, 1, 7, 4))
+        self.assertEqual(self._factors(engines), {
+            "verdict_winner": (3, 1, 0), "pin_current": (2, 1, 1), "host_e2e": (2, 1, 1)})
+        self.assertEqual({component["id"]: (component["resolved_by"], component["adopted_as"],
+                                            component["winner_match"], component["winner_ids"],
+                                            component["verdict_winner"], component["pin_current"],
+                                            component["host_e2e"], component["converged"])
+                          for component in engines["components"]}, {
+            "nautilustrader": ("decision", None, "alias", ["nautilus-trader"], "true", "true", "true", True),
+            "data-engine-x": ("decision", None, "repository", ["engine-x"], "true", "true", "false", False),
+            "tracker": ("decision", None, "repository", ["data-tracker"], "true", "unknown", "true", False),
+            "extra": ("decision", None, None, [], "false", "false", "unknown", False)})
+        # The comparability column counts winner rows whether or not they are in use (data-tracker is
+        # conditional) and whether or not a later sweep reopened the verdict.
+        self.assertEqual(engines["winner_rows"], [
+            {"id": "data-engine-x", "matched_by": "repository", "winner_ids": ["engine-x"]},
+            {"id": "data-tracker", "matched_by": "id", "winner_ids": ["data-tracker"]},
+            {"id": "nautilustrader", "matched_by": "alias", "winner_ids": ["nautilus-trader"]},
+            {"id": "tracker", "matched_by": "repository", "winner_ids": ["data-tracker"]}])
+        self.assertEqual(engines["unresolved"], [{"id": "mystery", "repository": "https://github.com/example/mystery",
+                                                  "reason": "no default or conditional decision"}])
+
+    def test_summary_totals_newest_manifest_verdict_dates_and_invoke(self):
+        _root, document = self._document()
+        block = document["summary"]["convergence"]
+        self.assertEqual(block["newest_manifest"], {"path": "catalogs/sota-convergence/manifest-20260927.json",
+                                                    "id": "sota-convergence-20260927", "checked_at": "2026-09-27"})
+        self.assertEqual(block["newest_verdict_checked_at"], {"foundation": "2026-09-26", "us-equities": "2026-09-26"})
+        self.assertEqual(block["catalogs"], {
+            "foundation": {"layers": 5, "in_use": 9, "converged": 2, "share": 0.2222, "unresolved": 4},
+            "us-equities": {"layers": 2, "in_use": 6, "converged": 1, "share": 0.1667, "unresolved": 1}})
+        self.assertEqual(block["overall"], {"layers": 7, "in_use": 15, "converged": 3, "share": 0.2, "unresolved": 5})
+        self.assertEqual(block["sources"]["completed_sweeps"], [
+            {"sweep_id": "sweep-0926", "date": "2026-09-26", "layers": 7,
+             "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json"},
+            {"sweep_id": "sweep-0927", "date": "2026-09-27", "layers": 1,
+             "manifest_ref": "catalogs/sota-convergence/manifest-20260927.json"}])
+        self.assertEqual(block["sources"]["host_e2e_platform"], "linux-wsl2-x86_64")
+        self.assertEqual(block["frozen_at"], "2026-09-27")
+        self.assertEqual([item["term"] for item in block["definitions"]], [
+            "layer_state", "in_use", "verdict_winner", "pin_current", "host_e2e", "converged",
+            "all_rows", "recorded_winner_rows", "unresolved", "invoke"])
+        for row in document["rows"]:
+            with self.subTest(layer=row["layer_id"]):
+                self.assertIsNone(row["convergence"]["invoke"])
+                self.assertEqual(row["convergence"]["invoke_reason"], "no post-fix invoke receipt yet")
+                for counts in row["convergence"]["factors"].values():
+                    self.assertEqual(sum(counts.values()), row["convergence"]["in_use"])
+
+    def test_absent_inputs_give_an_empty_denominator_without_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner()]),
+                              _layer("layer-b", verdict_status="pending_lanes", agreement="disagree")])
+            document, _flip = cm.build_document(root)
+            rows = self._rows(document)
+            self.assertEqual(rows[("foundation", "layer-a")]["layer_state"], "confirmed_current")
+            self.assertEqual(self._counts(rows[("foundation", "layer-a")]), (0, 0, 0, 0))
+            block = document["summary"]["convergence"]
+            self.assertIsNone(block["newest_manifest"])
+            self.assertEqual(block["sources"]["completed_sweeps"], [])
+            self.assertEqual(block["overall"], {"layers": 2, "in_use": 0, "converged": 0, "share": None, "unresolved": 0})
+            self.assertEqual(block["catalogs"]["us-equities"],
+                             {"layers": 0, "in_use": 0, "converged": 0, "share": None, "unresolved": 0})
+            self.assertEqual(block["newest_verdict_checked_at"], {"foundation": "2026-09-22", "us-equities": None})
+            self.assertIn("## Convergence by layer", cm.render_markdown(document))
+
+    def test_an_undated_verdict_is_never_confirmed_current_under_a_covering_sweep(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _init_root(root, [_layer(winners=[_winner()], checked_at=None),
+                              _layer("layer-b", winners=[_winner()], checked_at=None)])
+            _write_json(root / "catalogs" / "saturation" / "ledger.json", {"schema_version": 1, "sweeps": [
+                _sweep("sweep-a", "2026-09-23", [("foundation", "layer-a")])]})
+            rows = self._rows(cm.build_document(root)[0])
+            self.assertEqual((rows[("foundation", "layer-a")]["layer_state"],
+                              rows[("foundation", "layer-a")]["verdict_checked_at"]), ("recorded_reopened", None))
+            self.assertEqual(rows[("foundation", "layer-b")]["layer_state"], "confirmed_current")
+
+    def test_markdown_renders_the_convergence_table_from_the_json(self):
+        _root, document = self._document()
+        markdown = cm.render_markdown(document)
+        self.assertLess(markdown.index("## Needs independent review"), markdown.index("## Convergence by layer"))
+        section = markdown.split("## Convergence by layer", 1)[1].split("## How to update this page", 1)[0]
+        for expected in (
+            "| `foundation/f-current` | confirmed_current | 2026-09-26 | - | 6 | 2 | 3/3/0 | 4/1/1 | 2/1/3 | 8 | 3 "
+            "| `stranger`, `twin` | null |",
+            "| `foundation/f-reopened` | recorded_reopened | 2026-09-22 | `sweep-0926`, `sweep-0927` | 1 | 0 | 1/0/0 "
+            "| 1/0/0 | 1/0/0 | 3 | 1 | `cli-core`, `cli-plugin` | null |",
+            "| `us-equities/u-pending` | pending_lanes | 2026-09-22 | - | 2 | 0 | 0/0/2 | 2/0/0 | 0/0/2 | 2 | 0 | - "
+            "| null |",
+            "| foundation | 5 | 2 / 9 | 0.2222 | 4 |",
+            "| us-equities | 2 | 1 / 6 | 0.1667 | 1 |",
+            "| overall | 7 | 3 / 15 | 0.2 | 5 |",
+            "Layer states: confirmed_current 2, no_selection 2, pending_lanes 2, recorded_reopened 1.",
+            "`catalogs/sota-convergence/manifest-20260927.json` (`sota-convergence-20260927`, checked_at 2026-09-27)",
+            "`sweep-0926` (2026-09-26), `sweep-0927` (2026-09-27)",
+            "- `us-equities/u-engines` `mystery`: no default or conditional decision",
+            "- `foundation/f-current` `twin`: ambiguous repository: manifests/stack.json ids twin-a, twin-b",
+        ):
+            self.assertIn(expected, section)
+        for item in document["summary"]["convergence"]["definitions"]:
+            self.assertIn(f"- **{item['term']}**: {item['definition']}", section)
+
+    def test_check_detects_a_later_completed_sweep_and_write_is_deterministic(self):
+        root, _document = self._document()
+        for mode in ("--write", "--check"):
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                self.assertEqual(cm.main(["--root", str(root), mode]), 0, buffer.getvalue())
+        written = (root / cm.OUTPUT_JSON).read_bytes()
+        self.assertEqual(cm.serialize(cm.build_document(root)[0]).encode("utf-8"), written)
+        ledger_path = root / "catalogs" / "saturation" / "ledger.json"
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        ledger["sweeps"].append(_sweep("sweep-0929", "2026-09-29", [("foundation", "f-current")]))
+        _write_json(ledger_path, ledger)
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            self.assertEqual(cm.main(["--root", str(root), "--check"]), 1)
+        self.assertIn("JSON differs from the generated output", buffer.getvalue())
+        current = self._rows(cm.build_document(root)[0])[("foundation", "f-current")]
+        self.assertEqual((current["layer_state"], current["converged"]), ("recorded_reopened", 0))
 
 
 if __name__ == "__main__":

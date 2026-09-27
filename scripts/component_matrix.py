@@ -11,6 +11,15 @@ and writes the result deterministically to
 ``catalogs/landscape/component-evidence-matrix.json`` and
 ``docs/component-evidence-matrix.md``.
 
+Each row also carries the convergence-by-layer metric (``rows[].convergence``,
+summarized in ``summary.convergence``), computed only from committed files: the
+row's verdict and ``checked_at``, the completed sweeps of
+``catalogs/saturation/ledger.json``, the newest
+``catalogs/sota-convergence/manifest-YYYYMMDD.json``, ``manifests/stack.json``,
+``tools/sota-convergence/receipt-component-aliases.json`` and the row's own
+linux-wsl2-x86_64 winner entries. ``CONVERGENCE_DEFINITIONS`` is its single
+source of definitions.
+
 Modes: ``--check`` (default) recomputes both outputs in memory and exits 1 on
 any difference from the checked-in files, or on a flip-rule violation (a
 declared ``platform_status`` above what ``scripts/platform_status.py`` derives,
@@ -21,18 +30,22 @@ and writes them.
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import json
 from pathlib import Path
+import re
 
 try:
     from . import host_receipts
     from . import platform_status as platform_evidence
+    from . import saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
     from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
     import platform_status as platform_evidence
+    import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
     from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from validate import PRIVATE_CONTENT
@@ -43,7 +56,8 @@ SCOPE = (
     "Per-component independent-review status and per-platform E2E state, joined from "
     "catalogs/landscape/{foundation,us-equities}.json winners/alternatives, "
     "catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts "
-    "and the gap crosswalk (open executable_now gaps per layer, when present). It never selects "
+    "and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's "
+    "convergence by layer from the saturation ledger and the newest sweep manifest. It never selects "
     "a winner or records a receipt; it is a read-only join of evidence recorded elsewhere."
 )
 # The same two catalogs a receipt's layer_refs may name.
@@ -59,6 +73,72 @@ OUTPUT_MD = "docs/component-evidence-matrix.md"
 INDEPENDENT_REVIEW_STATES = {
     "dual_lane_same_winner", "dual_lane_adjudicated", "pending_lanes", "single_lane",
 }
+
+# Convergence by layer: the metric frozen on 2026-09-27, before any of its numbers were computed. Integers per
+# layer, three independent true/false/unknown factors, no blended score and no sum across factors.
+CONVERGENCE_FROZEN_AT = "2026-09-27"
+SATURATION_LEDGER_FILE = saturation_ledger.LEDGER
+SWEEP_MANIFEST_DIR = "catalogs/sota-convergence"
+# Only the sweep manifests themselves; the directory also holds layer-verdicts-*, sdk-runtime-coverage-* and
+# layer-verdict-waves.json.
+SWEEP_MANIFEST_NAME = re.compile(r"manifest-\d{8}\.json")
+RECEIPT_ALIASES_FILE = host_receipts.RECEIPT_ALIASES_RELATIVE_PATH
+CONVERGENCE_PLATFORM = "linux-wsl2-x86_64"
+# catalogs/saturation/README.md: a stopped sweep neither counts nor resets (saturation_ledger.STATUSES).
+COMPLETED_SWEEP = "completed"
+CONVERGENCE_LAYER_STATES = ("confirmed_current", "no_selection", "pending_lanes", "recorded_reopened")
+CONVERGENCE_FACTORS = ("verdict_winner", "pin_current", "host_e2e")
+CONVERGENCE_FACTOR_VALUES = ("true", "false", "unknown")
+HOST_E2E_PASSING = ("accepted", "host_verified")
+# tools/sota-convergence/build_manifest.py SELECTED_TRADING_DECISIONS: the decisions a sweep manifest's trading
+# entry carries; only "default" is adopted.
+TRADING_DECISIONS = ("default", "conditional")
+IN_USE_TRADING_DECISION = "default"
+# Strongest first: the winner a row *is* (for host_e2e) comes from the first method that matches.
+WINNER_MATCH_METHODS = ("id", "alias", "repository")
+INVOKE_REASON = "no post-fix invoke receipt yet"
+CONVERGENCE_DEFINITIONS = (
+    ("layer_state",
+     "Exactly one of: pending_lanes (the verdict ledger row's verdict_status is pending_lanes); no_selection "
+     "(verdict_status no_selection, or a recorded verdict with no winners; scripts/landscape.py allows no other "
+     "status); recorded_reopened (a recorded verdict, and a completed sweep in " + SATURATION_LEDGER_FILE
+     + " that covers the layer is dated after the row's checked_at); confirmed_current (a recorded verdict that "
+     "no covering completed sweep is dated after). A sweep on the verdict's own date is not after it, a stopped "
+     "sweep never counts, and a row without an ISO checked_at counts every covering completed sweep as after it."),
+    ("in_use",
+     "The layer's rows in the newest committed sweep manifest (" + SWEEP_MANIFEST_DIR + "/manifest-YYYYMMDD.json "
+     "with the latest checked_at; foundation[].components for a foundation layer, trading[].entries for a "
+     "us-equities layer) that resolve to an adopted component, the headline denominator. A foundation row "
+     "resolves to a manifests/stack.json component by its id, then by a " + RECEIPT_ALIASES_FILE + " alias, then "
+     "by its repository when exactly one stack component and no other sweep-manifest id use it (the "
+     "tools/sota-convergence/lane_packets.py receipts_for rule). A us-equities entry is in use when its decision "
+     "is default; a conditional entry is not in use."),
+    ("verdict_winner",
+     "true when the row is a winner of the layer's recorded verdict by component id, by an alias in either "
+     "direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise; "
+     "unknown in a pending_lanes layer, which has no recorded verdict yet."),
+    ("pin_current",
+     "true when the newest sweep manifest row has pin_comparison compared and pin_behind_upstream false; false "
+     "when it is compared and behind; unknown when it was not compared."),
+    ("host_e2e",
+     "true when this layer's own matrix winner entry for the component (the winner the row matches by the first "
+     "of id, alias and repository) has e2e_state accepted or host_verified on " + CONVERGENCE_PLATFORM + "; false "
+     "for any other e2e_state; unknown when the layer's matrix row has no winner entry for it."),
+    ("converged",
+     "layer_state is confirmed_current and verdict_winner, pin_current and host_e2e are all true; an unknown "
+     "factor is not converged and stays counted as unknown. The summary gives converged / in_use per catalog and "
+     "overall as integers, with a share (four decimal places) only where in_use > 0."),
+    ("all_rows", "Every row of the layer in the newest sweep manifest, in use or not."),
+    ("recorded_winner_rows",
+     "The layer's manifest rows that match a winner of its recorded verdict, whether or not they are in use and "
+     "whether or not a later sweep reopened the verdict. With all_rows it is the comparability column, not a "
+     "score."),
+    ("unresolved",
+     "Manifest rows that could not be resolved (no stack match, an ambiguous alias or repository, or a trading "
+     "entry without a default or conditional decision), counted and listed with the reason, never dropped."),
+    ("invoke",
+     "null until a post-fix invoke receipt exists; every null carries the reason '" + INVOKE_REASON + "'."),
+)
 
 
 # --------------------------------------------------------------------------- loading
@@ -381,6 +461,316 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
     return row, flip_violations
 
 
+# --------------------------------------------------------------------- convergence by layer
+
+
+def _dicts(value) -> list[dict]:
+    return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
+
+
+def parse_iso_date(value) -> date | None:
+    """The ``date`` of an ISO date string (the check scripts/landscape.py applies to ``checked_at``), else None."""
+    if not isinstance(value, str):
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def newest_sweep_manifest(root: Path) -> tuple[str | None, dict | None]:
+    """(path, document) of the ``catalogs/sota-convergence/manifest-YYYYMMDD.json`` with the latest ISO
+    ``checked_at`` (ties: the later file name), or (None, None). Chosen by ``checked_at``, never by file name or
+    by ledger order (``saturation_ledger.latest_manifest_ref``)."""
+    try:
+        directory = safe_file(root, SWEEP_MANIFEST_DIR)
+    except InvalidDecisionIndex:
+        return None, None
+    if not directory.is_dir():
+        return None, None
+    newest = None
+    for name in sorted(path.name for path in directory.iterdir()):
+        if not SWEEP_MANIFEST_NAME.fullmatch(name):
+            continue
+        relative = f"{SWEEP_MANIFEST_DIR}/{name}"
+        document = load_optional(root, relative)
+        day = parse_iso_date(document.get("checked_at")) if isinstance(document, dict) else None
+        if day is not None and (newest is None or (day, name) > newest[0]):
+            newest = ((day, name), relative, document)
+    return (newest[1], newest[2]) if newest else (None, None)
+
+
+def completed_sweeps(ledger_doc) -> list[dict]:
+    """The completed sweeps of ``catalogs/saturation/ledger.json`` with an ISO date, sorted by (date, sweep_id),
+    each with the (catalog, layer_id) pairs its ``layers`` cover. A stopped sweep is left out; a completed
+    sweep's date equals its manifest's ``checked_at`` (scripts/saturation_ledger.py checks that)."""
+    sweeps = []
+    for sweep in _dicts(ledger_doc.get("sweeps") if isinstance(ledger_doc, dict) else None):
+        day = parse_iso_date(sweep.get("date"))
+        if sweep.get("status") != COMPLETED_SWEEP or day is None:
+            continue
+        covers = {(layer["catalog"], layer["layer_id"]) for layer in _dicts(sweep.get("layers"))
+                  if isinstance(layer.get("catalog"), str) and isinstance(layer.get("layer_id"), str)}
+        sweeps.append({
+            "sweep_id": sweep.get("sweep_id") if isinstance(sweep.get("sweep_id"), str) else None,
+            "date": sweep["date"], "day": day, "covers": covers,
+            "manifest_ref": sweep.get("manifest_ref") if isinstance(sweep.get("manifest_ref"), str) else None,
+        })
+    sweeps.sort(key=lambda sweep: (sweep["day"], sweep["sweep_id"] or ""))
+    return sweeps
+
+
+def receipt_aliases(document) -> dict[str, str]:
+    """``tools/sota-convergence/receipt-component-aliases.json``: manifests/stack.json id -> sweep-manifest id."""
+    aliases = document.get("aliases") if isinstance(document, dict) else None
+    if not isinstance(aliases, dict):
+        return {}
+    return {stack_id: sota_id for stack_id, sota_id in sorted(aliases.items())
+            if isinstance(stack_id, str) and isinstance(sota_id, str)}
+
+
+def manifest_section_rows(manifest_doc) -> list[tuple[str, dict]]:
+    """(section, row) for every component/entry row of a sweep manifest, both catalogs."""
+    rows = []
+    for section, key in sorted(saturation_ledger.SELECTION_KEY.items()):
+        for layer in _dicts(manifest_doc.get(section) if isinstance(manifest_doc, dict) else None):
+            rows.extend((section, row) for row in _dicts(layer.get(key)))
+    return rows
+
+
+def adoption_index(stack_doc, aliases: dict[str, str], manifest_doc) -> dict:
+    """What a foundation manifest row resolves against: the manifests/stack.json ids, the stack ids by
+    normalized repository and by alias target, and the sweep-manifest ids (both catalogs) by repository."""
+    stack_ids: set[str] = set()
+    stack_ids_by_repository: dict[str, set[str]] = {}
+    for component in _dicts((stack_doc or {}).get("components") if isinstance(stack_doc, dict) else None):
+        if isinstance(component.get("id"), str):
+            stack_ids.add(component["id"])
+            repository = host_receipts.normalize_repository(component.get("repository"))
+            if repository is not None:
+                stack_ids_by_repository.setdefault(repository, set()).add(component["id"])
+    stack_ids_by_alias: dict[str, set[str]] = {}
+    for stack_id, sota_id in aliases.items():
+        if stack_id in stack_ids:
+            stack_ids_by_alias.setdefault(sota_id, set()).add(stack_id)
+    manifest_ids_by_repository: dict[str, set[str]] = {}
+    for _section, row in manifest_section_rows(manifest_doc):
+        repository = host_receipts.normalize_repository(row.get("repository"))
+        if repository is not None and isinstance(row.get("id"), str):
+            manifest_ids_by_repository.setdefault(repository, set()).add(row["id"])
+    return {"stack_ids": stack_ids, "stack_ids_by_repository": stack_ids_by_repository,
+            "stack_ids_by_alias": stack_ids_by_alias, "manifest_ids_by_repository": manifest_ids_by_repository}
+
+
+def resolve_manifest_row(section: str, row: dict, index: dict) -> dict:
+    """``{"status": "in_use" | "not_in_use" | "unresolved", ...}`` for one sweep-manifest row, by the in_use
+    definition: a trading entry by its decision; a foundation component by manifests/stack.json id, then alias,
+    then a repository exactly one stack component and no other sweep-manifest id use (the precedence and
+    uniqueness of tools/sota-convergence/lane_packets.py receipts_for)."""
+    row_id = row.get("id")
+    if not isinstance(row_id, str) or not row_id:
+        return {"status": "unresolved", "reason": "no component id"}
+    if section == "trading":
+        decision = row.get("decision")
+        if decision == IN_USE_TRADING_DECISION:
+            return {"status": "in_use", "resolved_by": "decision", "adopted_as": None}
+        if decision in TRADING_DECISIONS:
+            return {"status": "not_in_use"}
+        return {"status": "unresolved", "reason": "no default or conditional decision"}
+    if row_id in index["stack_ids"]:
+        return {"status": "in_use", "resolved_by": "id", "adopted_as": row_id}
+    aliased = sorted(index["stack_ids_by_alias"].get(row_id, ()))
+    if len(aliased) == 1:
+        return {"status": "in_use", "resolved_by": "alias", "adopted_as": aliased[0]}
+    if aliased:
+        return {"status": "unresolved", "reason": "ambiguous alias: manifests/stack.json ids " + ", ".join(aliased)}
+    repository = host_receipts.normalize_repository(row.get("repository"))
+    stack_ids = sorted(index["stack_ids_by_repository"].get(repository, ())) if repository else []
+    others = sorted(index["manifest_ids_by_repository"].get(repository, set()) - {row_id}) if repository else []
+    if len(stack_ids) == 1 and not others:
+        return {"status": "in_use", "resolved_by": "repository", "adopted_as": stack_ids[0]}
+    if stack_ids:
+        reason = "ambiguous repository: manifests/stack.json ids " + ", ".join(stack_ids)
+        if others:
+            reason += "; also sweep-manifest ids " + ", ".join(others)
+        return {"status": "unresolved", "reason": reason}
+    return {"status": "unresolved", "reason": "no manifests/stack.json id, alias or repository match"}
+
+
+def winner_match(row: dict, winners: list[dict], aliases: dict[str, str]) -> tuple[str | None, list[str]]:
+    """(method, winner ids) for the strongest way the manifest row matches the layer's recorded winners: its
+    component id, an alias in either direction, or the same normalized repository; (None, []) for no match."""
+    row_id = row.get("id") if isinstance(row.get("id"), str) else None
+    repository = host_receipts.normalize_repository(row.get("repository"))
+    matched: dict[str, set[str]] = {}
+    for winner in winners:
+        winner_id = winner.get("component_id")
+        if not isinstance(winner_id, str):
+            continue
+        if row_id is not None and winner_id == row_id:
+            method = "id"
+        elif row_id is not None and (aliases.get(winner_id) == row_id or aliases.get(row_id) == winner_id):
+            method = "alias"
+        elif repository is not None and repository == host_receipts.normalize_repository(winner.get("repository")):
+            method = "repository"
+        else:
+            continue
+        matched.setdefault(method, set()).add(winner_id)
+    for method in WINNER_MATCH_METHODS:
+        if method in matched:
+            return method, sorted(matched[method])
+    return None, []
+
+
+def pin_current_factor(row: dict) -> str:
+    if row.get("pin_comparison") != "compared":
+        return "unknown"
+    behind = row.get("pin_behind_upstream")
+    return "true" if behind is False else "false" if behind is True else "unknown"
+
+
+def host_e2e_factor(winner_ids: list[str], e2e_states: dict[str, list[str]]) -> str:
+    states = [state for winner_id in winner_ids for state in e2e_states.get(winner_id, [])]
+    if not states:
+        return "unknown"
+    return "true" if all(state in HOST_E2E_PASSING for state in states) else "false"
+
+
+def classify_layer_state(layer: dict, later_sweeps: list[dict]) -> str:
+    status = layer.get("verdict_status")
+    if status == "pending_lanes":
+        return "pending_lanes"
+    if status != "recorded" or not (layer.get("winners") or []):
+        return "no_selection"
+    return "recorded_reopened" if later_sweeps else "confirmed_current"
+
+
+def load_convergence_context(root: Path, stack_doc) -> dict:
+    manifest_path, manifest_doc = newest_sweep_manifest(root)
+    aliases = receipt_aliases(load_optional(root, RECEIPT_ALIASES_FILE))
+    return {
+        "manifest_path": manifest_path, "manifest": manifest_doc, "aliases": aliases,
+        "sweeps": completed_sweeps(load_optional(root, SATURATION_LEDGER_FILE)),
+        "index": adoption_index(stack_doc, aliases, manifest_doc),
+    }
+
+
+def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict) -> dict:
+    """The convergence object of one matrix row (CONVERGENCE_DEFINITIONS), from its verdict ledger row
+    ``layer``, the built matrix ``row`` (its linux-wsl2-x86_64 winner entries) and the loaded context."""
+    verdict_day = parse_iso_date(layer.get("checked_at"))
+    covered = (catalog, layer.get("layer_id"))
+    later = [sweep for sweep in context["sweeps"]
+             if covered in sweep["covers"] and (verdict_day is None or sweep["day"] > verdict_day)]
+    state = classify_layer_state(layer, later)
+    recorded_winners = row["winners"] if layer.get("verdict_status") == "recorded" else []
+    e2e_states: dict[str, list[str]] = {}
+    for winner in recorded_winners:
+        entry = (winner.get("platforms") or {}).get(CONVERGENCE_PLATFORM)
+        if isinstance(entry, dict) and isinstance(winner.get("component_id"), str):
+            e2e_states.setdefault(winner["component_id"], []).append(entry.get("e2e_state"))
+
+    section = saturation_ledger.MANIFEST_SECTION.get(catalog)
+    found = (saturation_ledger.manifest_layer(context["manifest"], catalog, layer.get("layer_id"))
+             if isinstance(context["manifest"], dict) else None)
+    manifest_rows = _dicts(found[2].get(saturation_ledger.SELECTION_KEY[found[0]])) if found else []
+
+    factors = {factor: dict.fromkeys(CONVERGENCE_FACTOR_VALUES, 0) for factor in CONVERGENCE_FACTORS}
+    components, unresolved, winner_rows = [], [], []
+    for manifest_row in manifest_rows:
+        row_id = manifest_row.get("id") if isinstance(manifest_row.get("id"), str) else None
+        method, winner_ids = winner_match(manifest_row, recorded_winners, context["aliases"])
+        if method is not None:
+            winner_rows.append({"id": row_id, "matched_by": method, "winner_ids": winner_ids})
+        resolution = resolve_manifest_row(section, manifest_row, context["index"])
+        if resolution["status"] == "unresolved":
+            repository = manifest_row.get("repository")
+            unresolved.append({"id": row_id, "repository": repository if isinstance(repository, str) else None,
+                               "reason": resolution["reason"]})
+            continue
+        if resolution["status"] != "in_use":
+            continue
+        values = {
+            "verdict_winner": "unknown" if state == "pending_lanes" else "true" if method else "false",
+            "pin_current": pin_current_factor(manifest_row),
+            "host_e2e": host_e2e_factor(winner_ids, e2e_states),
+        }
+        for factor, value in values.items():
+            factors[factor][value] += 1
+        components.append({
+            "id": row_id, "resolved_by": resolution["resolved_by"], "adopted_as": resolution["adopted_as"],
+            "winner_match": method, "winner_ids": winner_ids, **values,
+            "converged": state == "confirmed_current" and all(value == "true" for value in values.values()),
+        })
+    components.sort(key=lambda item: (item["id"], item["adopted_as"] or ""))
+    unresolved.sort(key=lambda item: (item["id"] or "", item["repository"] or "", item["reason"]))
+    winner_rows.sort(key=lambda item: (item["id"] or "", item["matched_by"]))
+    return {
+        "layer_state": state,
+        "verdict_checked_at": layer["checked_at"] if verdict_day is not None else None,
+        "reopened_by": ([{"sweep_id": sweep["sweep_id"], "date": sweep["date"]} for sweep in later]
+                        if state == "recorded_reopened" else []),
+        "in_use": len(components),
+        "converged": sum(1 for component in components if component["converged"]),
+        "factors": factors,
+        "all_rows": len(manifest_rows),
+        "recorded_winner_rows": len(winner_rows),
+        "winner_rows": winner_rows,
+        "unresolved": unresolved,
+        "components": components,
+        "invoke": None,
+        "invoke_reason": INVOKE_REASON,
+    }
+
+
+def build_convergence_summary(rows: list[dict], context: dict) -> dict:
+    """Layer counts by state; converged / in_use per catalog and overall (a share only where in_use > 0); the
+    newest manifest id and checked_at; the newest verdict checked_at per catalog; definitions and sources."""
+    layer_states = dict.fromkeys(CONVERGENCE_LAYER_STATES, 0)
+    counted = ("layers", "in_use", "converged", "unresolved")
+    catalogs = {catalog: dict.fromkeys(counted, 0) for catalog in sorted(LANDSCAPE_FILES)}
+    newest_verdict: dict[str, str | None] = {catalog: None for catalog in sorted(LANDSCAPE_FILES)}
+    for row in rows:
+        convergence = row["convergence"]
+        layer_states[convergence["layer_state"]] += 1
+        scope = catalogs.setdefault(row["catalog"], dict.fromkeys(counted, 0))
+        scope["layers"] += 1
+        scope["in_use"] += convergence["in_use"]
+        scope["converged"] += convergence["converged"]
+        scope["unresolved"] += len(convergence["unresolved"])
+        day = parse_iso_date(convergence["verdict_checked_at"])
+        current = parse_iso_date(newest_verdict.get(row["catalog"]))
+        if day is not None and (current is None or day > current):
+            newest_verdict[row["catalog"]] = convergence["verdict_checked_at"]
+    overall = {key: sum(scope[key] for scope in catalogs.values()) for key in counted}
+    for scope in (*catalogs.values(), overall):
+        scope["share"] = round(scope["converged"] / scope["in_use"], 4) if scope["in_use"] else None
+    manifest = context["manifest"]
+    return {
+        "frozen_at": CONVERGENCE_FROZEN_AT,
+        "definitions": [{"term": term, "definition": text} for term, text in CONVERGENCE_DEFINITIONS],
+        "sources": {
+            "verdict_ledgers": dict(sorted(LANDSCAPE_FILES.items())),
+            "saturation_ledger": SATURATION_LEDGER_FILE,
+            "completed_sweeps": [{"sweep_id": sweep["sweep_id"], "date": sweep["date"],
+                                  "manifest_ref": sweep["manifest_ref"], "layers": len(sweep["covers"])}
+                                 for sweep in context["sweeps"]],
+            "stack": STACK_FILE,
+            "aliases": RECEIPT_ALIASES_FILE,
+            "host_e2e_platform": CONVERGENCE_PLATFORM,
+        },
+        "layer_states": layer_states,
+        "catalogs": catalogs,
+        "overall": overall,
+        "newest_manifest": None if context["manifest_path"] is None else {
+            "path": context["manifest_path"],
+            "id": manifest.get("id") if isinstance(manifest.get("id"), str) else None,
+            "checked_at": manifest["checked_at"],
+        },
+        "newest_verdict_checked_at": newest_verdict,
+    }
+
+
 # --------------------------------------------------------------------------- document
 
 
@@ -401,6 +791,7 @@ def build_document(root: Path):
         f"{catalog}/{layer['layer_id']}": layer for catalog, document in landscape_docs.items()
         for layer in (document or {}).get("layers", []) or []
         if isinstance(layer, dict) and isinstance(layer.get("layer_id"), str)})
+    convergence_context = load_convergence_context(root, stack_doc)
 
     rows: list[dict] = []
     flip_violations: list[str] = []
@@ -414,6 +805,7 @@ def build_document(root: Path):
                 root, catalog, layer, decisions, gap_counts, receipts_summary, repo_to_component, open_gap_counts,
                 status_context, winner_aliases, repo_layers,
             )
+            row["convergence"] = build_layer_convergence(catalog, layer, row, convergence_context)
             rows.append(row)
             flip_violations.extend(row_flip_violations)
 
@@ -466,6 +858,7 @@ def build_document(root: Path):
             "totals": totals,
             "needs_host": needs_host,
             "needs_independent_review": needs_independent_review,
+            "convergence": build_convergence_summary(rows, convergence_context),
         },
     }
     return document, flip_violations
@@ -500,6 +893,65 @@ def alias_summary_sentence(aliases: list[dict]) -> str:
     grandfathered = sum(1 for alias in aliases if alias.get("grandfathered"))
     return (f" Listed: {len(aliases)} alias receipt(s) from host(s) {', '.join(f'`{host}`' for host in hosts)}, "
             f"observed {', '.join(dates)}; {grandfathered} of {len(aliases)} grandfathered.")
+
+
+def render_convergence_markdown(document: dict) -> list[str]:
+    """The "Convergence by layer" section, every number, definition and date read from the document."""
+    block = document["summary"]["convergence"]
+    sources = block["sources"]
+    manifest = block["newest_manifest"]
+    newest = block["newest_verdict_checked_at"]
+    ledgers = " and ".join(f"`{path}` (newest verdict checked_at {newest.get(catalog) or 'not recorded'})"
+                           for catalog, path in sources["verdict_ledgers"].items())
+    manifest_text = (f"`{manifest['path']}` (`{manifest['id']}`, checked_at {manifest['checked_at']})"
+                     if manifest else "none committed")
+    sweeps = ", ".join(f"`{sweep['sweep_id']}` ({sweep['date']})" for sweep in sources["completed_sweeps"])
+    lines = [
+        "## Convergence by layer",
+        "",
+        f"Definitions frozen {block['frozen_at']}, before any count was computed. Every count is an integer per "
+        "layer computed only from committed files; the three factors stay true, false or unknown and are never "
+        "blended into one score or summed across factors.",
+        "",
+        *(f"- **{item['term']}**: {item['definition']}" for item in block["definitions"]),
+        "",
+        f"Sources: verdict ledgers {ledgers}; newest sweep manifest {manifest_text}; completed sweeps in "
+        f"`{sources['saturation_ledger']}`: {sweeps or 'none recorded'}; adopted components from "
+        f"`{sources['stack']}` and `{sources['aliases']}`; host_e2e reads `{sources['host_e2e_platform']}`.",
+        "",
+        "Layer states: " + ", ".join(f"{state} {count}" for state, count in block["layer_states"].items()) + ".",
+        "",
+        "| Scope | Layers | converged / in_use | Share | Unresolved rows |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for label, scope in (*block["catalogs"].items(), ("overall", block["overall"])):
+        share = "-" if scope["share"] is None else scope["share"]
+        lines.append(f"| {label} | {scope['layers']} | {scope['converged']} / {scope['in_use']} | {share} "
+                     f"| {scope['unresolved']} |")
+    lines += [
+        "",
+        "| Layer | layer_state | Verdict checked_at | Reopened by | in_use | converged "
+        "| verdict_winner (true/false/unknown) | pin_current (true/false/unknown) | host_e2e (true/false/unknown) "
+        "| all_rows | recorded_winner_rows | Unresolved | invoke |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in document["rows"]:
+        convergence = row["convergence"]
+        counts = {factor: "/".join(str(convergence["factors"][factor][value]) for value in CONVERGENCE_FACTOR_VALUES)
+                  for factor in CONVERGENCE_FACTORS}
+        reopened = ", ".join(f"`{sweep['sweep_id']}`" for sweep in convergence["reopened_by"]) or "-"
+        unresolved = ", ".join(f"`{item['id'] or 'no id'}`" for item in convergence["unresolved"]) or "-"
+        invoke = "null" if convergence["invoke"] is None else json.dumps(convergence["invoke"], sort_keys=True)
+        lines.append(
+            f"| `{row['catalog']}/{row['layer_id']}` | {convergence['layer_state']} "
+            f"| {convergence['verdict_checked_at'] or '-'} | {reopened} | {convergence['in_use']} "
+            f"| {convergence['converged']} | {counts['verdict_winner']} | {counts['pin_current']} "
+            f"| {counts['host_e2e']} | {convergence['all_rows']} | {convergence['recorded_winner_rows']} "
+            f"| {unresolved} | {invoke} |")
+    lines += ["", "### Unresolved manifest rows", ""]
+    lines += [f"- `{row['catalog']}/{row['layer_id']}` `{item['id'] or 'no id'}`: {item['reason']}"
+              for row in document["rows"] for item in row["convergence"]["unresolved"]] or ["None."]
+    return lines
 
 
 def render_markdown(document: dict) -> str:
@@ -606,6 +1058,7 @@ def render_markdown(document: dict) -> str:
     else:
         for entry in needs_review:
             lines.append(f"- `{entry['catalog']}/{entry['layer_id']}`: {entry['independent_review']}")
+    lines += ["", *render_convergence_markdown(document)]
     lines += [
         "",
         "## How to update this page",
@@ -613,6 +1066,9 @@ def render_markdown(document: dict) -> str:
         "This page and `catalogs/landscape/component-evidence-matrix.json` are generated, not hand-edited. "
         "After adding host receipts, a decision, a gap-crosswalk regeneration or a landscape verdict update, "
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
+        f"Convergence by layer also reads `{SATURATION_LEDGER_FILE}`, the newest "
+        f"`{SWEEP_MANIFEST_DIR}/manifest-YYYYMMDD.json`, `{STACK_FILE}` and `{RECEIPT_ALIASES_FILE}`, so run "
+        "`--write` again after appending a sweep to the ledger or committing a sweep manifest. "
         "`python3 scripts/component_matrix.py --check` (run in CI) recomputes both outputs and also enforces "
         "the flip rule, which `scripts/landscape.py` enforces too through the same function "
         "(`scripts/platform_status.py`): a declared `macos-arm64` `platform_status` may not claim more than "

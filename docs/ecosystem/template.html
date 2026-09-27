@@ -22,6 +22,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 .navigation{flex-wrap:wrap;column-gap:22px;row-gap:0}.navigation button:last-child{margin-left:0}
 .catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
 .foundation-repos{padding-left:18px;font-size:12px}.foundation-repos li{margin:9px 0}.foundation-repos code{display:block;font-size:10px;overflow-wrap:anywhere;color:var(--muted)}.foundation-surfaces{margin:20px 0}.foundation-surfaces h4{font-size:14px;margin:0 0 10px}.foundation-surface{border-left:2px solid var(--line);padding-left:12px;margin:16px 0}.foundation-surface h5{font-size:13px;margin:0 0 6px}.foundation-surface p{font-size:12px;margin:8px 0}.foundation-surface .catalog-sources{margin:9px 0}.foundation-surface .native-code{max-width:100%}
+.convergence-table{min-width:1100px}.convergence-table td{min-width:0}.convergence-detail{margin:24px 0 36px}.convergence-detail .catalog-facts{grid-template-columns:minmax(120px,1fr) minmax(0,4fr)}
 .navigation{gap:20px;overflow-x:auto;flex-wrap:nowrap}.navigation button{flex-shrink:0}.landscape-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0 42px}.landscape-card{border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);min-width:0}.landscape-card h3{margin:12px 0}.landscape-card p{font-size:13px;margin:12px 0}.landscape-choice{background:#edf1e7;border-radius:8px;padding:14px}.landscape-choice strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}.landscape-candidate{border-top:1px solid var(--line);padding:14px 0}.landscape-candidate h4{font-size:14px;margin:0 0 8px}.landscape-candidate a{overflow-wrap:anywhere}.landscape-candidate p{font-size:12px}.landscape-candidate .badges{margin:9px 0}.landscape-card details{margin-top:17px}.landscape-card .catalog-sources{font-size:10px}.landscape-summary{margin-bottom:22px}.landscape-summary p{margin-top:12px}.landscape-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.landscape-tag{display:inline-block;padding:4px 9px;background:var(--sand);border-radius:5px;font-size:10px}.landscape-tag.selected{background:var(--lime)}.landscape-tag.observed_failure{background:#f5ddd2;color:#873f28}.landscape-legend{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}.landscape-legend span{font-size:11px}.landscape-candidate .catalog-sources{display:block}.landscape-candidate .catalog-sources a{display:block;margin-top:6px}.landscape-grid .catalog-empty{grid-column:1/-1}@media(max-width:850px){.landscape-grid{grid-template-columns:1fr}.landscape-card{padding:21px}}
 </style>
 </head>
@@ -40,6 +41,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <button role="tab" id="tab-foundation" aria-controls="foundation" aria-selected="false" tabindex="-1" data-tab="foundation" data-catalog-tab hidden>Foundation</button>
 <button role="tab" id="tab-trading" aria-controls="trading" aria-selected="false" tabindex="-1" data-tab="trading" data-catalog-tab hidden>Trading</button>
 <button role="tab" id="tab-landscape" aria-controls="landscape" aria-selected="false" tabindex="-1" data-tab="landscape" hidden>Choices & alternatives</button>
+<button role="tab" id="tab-convergence" aria-controls="convergence" aria-selected="false" tabindex="-1" data-tab="convergence" hidden>Convergence by layer</button>
 <button role="tab" id="tab-explorer" aria-controls="explorer" aria-selected="false" tabindex="-1" data-tab="explorer"><span class="tab-number">02</span>Repository explorer</button>
 <button role="tab" id="tab-setup" aria-controls="setup" aria-selected="false" tabindex="-1" data-tab="setup"><span class="tab-number">03</span>Selected stack & setup</button>
 <button role="tab" id="tab-efficiency" aria-controls="efficiency" aria-selected="false" tabindex="-1" data-tab="efficiency"><span class="tab-number">04</span>Token efficiency</button>
@@ -78,6 +80,13 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="filter-row"><p id="landscape-count" class="result-count" role="status" aria-live="polite"></p><button class="button secondary small" id="landscape-reset">Reset comparison filters</button></div>
 <p class="small muted">An observed failure applies to its recorded version, host and test. An alternative can remain competitive even when the current choice is retained. Historical candidate cards keep their original dates and do not override the current decision.</p>
 <div id="landscape-layers" class="landscape-grid"></div>
+</section>
+<section id="convergence" role="tabpanel" aria-labelledby="tab-convergence" hidden>
+<div class="page-heading"><div><div class="eyebrow">One frozen metric / every layer</div><h2>Convergence by layer</h2><p>For each layer: how many in-use components are the recorded winner, at a current pin, with host evidence, in a layer that no later completed sweep reopened. Each factor stays true, false or unknown, and nothing is blended into one score. Every count, definition and date below is read from the generated component evidence matrix.</p></div></div>
+<div id="convergence-summary" class="scope-note landscape-summary"></div>
+<div id="convergence-actions" class="landscape-actions"></div>
+<div class="table-wrap"><table class="token-table convergence-table"><thead><tr><th>Layer</th><th>layer_state</th><th>Verdict checked_at</th><th>Reopened by</th><th>in_use</th><th>converged</th><th>verdict_winner true/false/unknown</th><th>pin_current true/false/unknown</th><th>host_e2e true/false/unknown</th><th>all_rows</th><th>recorded_winner_rows</th><th>Unresolved</th><th>invoke</th></tr></thead><tbody id="convergence-rows"></tbody></table></div>
+<details class="catalog-card convergence-detail" open><summary>Definitions and unresolved manifest rows</summary><div id="convergence-definitions"></div></details>
 </section>
 <section id="explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
 <div class="page-heading"><div><div class="eyebrow">Discovery / the broad public index</div><h2>Explore the whole field.</h2><p>Search names, roles, layers and decisions. Open a record to inspect its dated sources, distinct pins and bounded receipts. Repository discovery is broader than either maintained catalog.</p></div><button class="button secondary small" id="reset-filters">Reset filters</button></div>
@@ -147,6 +156,7 @@ const link = (label, url) => { const node = make("a", "", label); node.href = sa
 const layerNames = new Map(data.layers.map(layer => [layer.id, layer.name]));
 document.querySelectorAll("[data-catalog-tab]").forEach(tab => { tab.hidden = !data.grand_catalogs; });
 $("tab-landscape").hidden = !data.landscape;
+$("tab-convergence").hidden = !data.convergence;
 const tabs = [...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
 function showTab(id, focus = false) {
   if(!tabs.some(tab => tab.dataset.tab === id)) id = "overview";
@@ -461,6 +471,38 @@ function initializeLandscape() {
   renderLandscape();
 }
 initializeLandscape();
+function convergenceSummaryLines(convergence) {
+  const scope = (label, row) => label + ": " + row.converged + " of " + row.in_use + " in-use components converged across " + row.layers + " layers" + (row.share === null ? " (no share: nothing in use)" : " (share " + row.share + ")") + "; " + row.unresolved + " unresolved manifest rows";
+  const manifest = convergence.newest_manifest;
+  return [
+    "Layer states: " + Object.entries(convergence.layer_states).map(([state, count]) => state + " " + count).join(" · "),
+    ...Object.entries(convergence.catalogs).map(([catalog, row]) => scope(catalog, row)),
+    scope("overall", convergence.overall),
+    manifest ? "Newest sweep manifest: " + manifest.id + ", checked_at " + manifest.checked_at + " (" + manifest.path + ")" : "Newest sweep manifest: none committed",
+    "Newest verdict checked_at: " + Object.entries(convergence.newest_verdict_checked_at).map(([catalog, day]) => catalog + " " + (day || "not recorded")).join(" · "),
+    "Completed sweeps: " + (convergence.sources.completed_sweeps.map(sweep => sweep.sweep_id + " (" + sweep.date + ")").join(", ") || "none recorded"),
+    "host_e2e platform: " + convergence.sources.host_e2e_platform,
+    "Definitions frozen " + convergence.frozen_at
+  ];
+}
+function convergenceTableRows(convergence) {
+  const counts = value => value.true + "/" + value.false + "/" + value.unknown;
+  return convergence.layers.map(layer => [layer.catalog + "/" + layer.layer_id, layer.layer_state, layer.verdict_checked_at || "-", layer.reopened_by.map(sweep => sweep.sweep_id).join(", ") || "-", String(layer.in_use), String(layer.converged), counts(layer.factors.verdict_winner), counts(layer.factors.pin_current), counts(layer.factors.host_e2e), String(layer.all_rows), String(layer.recorded_winner_rows), layer.unresolved.map(row => row.id || "no id").join(", ") || "-", layer.invoke === null ? "null" : JSON.stringify(layer.invoke)]);
+}
+function renderConvergence() {
+  const convergence = data.convergence;
+  if(!convergence) return;
+  convergenceSummaryLines(convergence).forEach((line, index) => add($("convergence-summary"), make(index ? "p" : "strong", "", line)));
+  add($("convergence-actions"), link("Component evidence matrix (all per-component factors) ↗", convergence.url));
+  convergenceTableRows(convergence).forEach(cells => add($("convergence-rows"), add(make("tr"), ...cells.map(cell => make("td", "", cell)))));
+  const definitions = make("dl", "catalog-facts");
+  convergence.definitions.forEach(item => add(definitions, make("dt", "", item.term), make("dd", "", item.definition)));
+  const unresolved = convergence.layers.flatMap(layer => layer.unresolved.map(row => layer.catalog + "/" + layer.layer_id + " · " + (row.id || "no id") + ": " + row.reason));
+  add($("convergence-definitions"), definitions, make("h3", "", "Unresolved manifest rows"));
+  if(unresolved.length) listLimits($("convergence-definitions"), unresolved);
+  else add($("convergence-definitions"), make("p", "muted", "None."));
+}
+renderConvergence();
 function recipeButton(path, label, component = "") {
   const button = make("button", "button secondary small", label);
   button.addEventListener("click", () => showRecipe(path, component));

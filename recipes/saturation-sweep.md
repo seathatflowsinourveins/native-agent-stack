@@ -131,6 +131,7 @@ Then append and check:
 python3 scripts/saturation_ledger.py --append RESULT.json
 python3 scripts/saturation_ledger.py --check --base origin/main
 python3 -m unittest tests.test_saturation_ledger
+python3 scripts/component_matrix.py --write   # convergence by layer reads the ledger's completed sweeps
 ```
 
 The pull request that adds the record runs the same append-only comparison in `validate.yml`,

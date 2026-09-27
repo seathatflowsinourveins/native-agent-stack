@@ -1004,6 +1004,315 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("supersedes an unknown decision", result.stdout)
 
+    # ------------------------------------------------------------------------- convergence by layer
+
+    MATRIX = "catalogs/landscape/component-evidence-matrix.json"
+
+    @staticmethod
+    def convergence_matrix():
+        """A generated-matrix fixture with one layer per layer_state (scripts/component_matrix.py writes the
+        repository's own; only rows[].convergence and summary.convergence are read)."""
+        def layer(catalog, layer_id, state, counts, factors, unresolved=(), reopened=()):
+            in_use, converged, all_rows, winner_rows = counts
+            return {"catalog": catalog, "layer_id": layer_id, "title": "Title " + layer_id, "winners": [],
+                    "convergence": {
+                        "layer_state": state, "verdict_checked_at": "2026-09-22",
+                        "reopened_by": [{"sweep_id": sweep, "date": day} for sweep, day in reopened],
+                        "in_use": in_use, "converged": converged, "all_rows": all_rows,
+                        "recorded_winner_rows": winner_rows,
+                        "factors": {name: dict(zip(("true", "false", "unknown"), values)) for name, values in
+                                    zip(("verdict_winner", "pin_current", "host_e2e"), factors)},
+                        "unresolved": [{"id": name, "repository": "https://github.com/example/" + name,
+                                        "reason": "no manifests/stack.json id, alias or repository match"}
+                                       for name in unresolved],
+                        "winner_rows": [], "components": [], "invoke": None,
+                        "invoke_reason": "no post-fix invoke receipt yet"}}
+        rows = [
+            layer("foundation", "f-current", "confirmed_current", (3, 1, 4, 2),
+                  ((2, 1, 0), (2, 0, 1), (1, 1, 1)), unresolved=("stranger",)),
+            layer("foundation", "f-reopened", "recorded_reopened", (1, 0, 1, 1),
+                  ((1, 0, 0), (1, 0, 0), (1, 0, 0)), reopened=(("sweep-0926", "2026-09-26"),)),
+            layer("us-equities", "u-none", "no_selection", (1, 0, 2, 0), ((0, 1, 0), (0, 0, 1), (0, 0, 1))),
+            layer("us-equities", "u-pending", "pending_lanes", (2, 0, 2, 0), ((0, 0, 2), (1, 1, 0), (0, 0, 2))),
+        ]
+        block = {
+            "frozen_at": "2026-09-27",
+            "definitions": [{"term": "layer_state", "definition": "Exactly one of four states."},
+                            {"term": "converged", "definition": "Every factor true in a confirmed_current layer."}],
+            "sources": {"verdict_ledgers": {"foundation": "catalogs/landscape/foundation.json",
+                                            "us-equities": "catalogs/landscape/us-equities.json"},
+                        "saturation_ledger": "catalogs/saturation/ledger.json",
+                        "completed_sweeps": [{"sweep_id": "sweep-0926", "date": "2026-09-26", "layers": 4,
+                                              "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json"}],
+                        "stack": "manifests/stack.json",
+                        "aliases": "tools/sota-convergence/receipt-component-aliases.json",
+                        "host_e2e_platform": "linux-wsl2-x86_64"},
+            "layer_states": {"confirmed_current": 1, "no_selection": 1, "pending_lanes": 1, "recorded_reopened": 1},
+            "catalogs": {"foundation": {"layers": 2, "in_use": 4, "converged": 1, "share": 0.25, "unresolved": 1},
+                         "us-equities": {"layers": 2, "in_use": 3, "converged": 0, "share": 0.0, "unresolved": 0}},
+            "overall": {"layers": 4, "in_use": 7, "converged": 1, "share": 0.1429, "unresolved": 1},
+            "newest_manifest": {"path": "catalogs/sota-convergence/manifest-20260926.json",
+                                "id": "sota-convergence-20260926", "checked_at": "2026-09-26"},
+            "newest_verdict_checked_at": {"foundation": "2026-09-22", "us-equities": "2026-09-22"},
+        }
+        return {"schema_version": 1, "checked_at": "2026-09-22", "rows": rows, "summary": {"convergence": block}}
+
+    def write_matrix(self, matrix):
+        self.matrix = matrix
+        self.write(self.MATRIX, matrix)
+
+    def use_real_template(self):
+        self.write("docs/ecosystem/template.html", (ROOT / "docs/ecosystem/template.html").read_text())
+
+    def test_convergence_is_absent_without_the_generated_matrix(self):
+        self.use_real_template()
+        page, _ = self.build()
+        self.assertIsNone(json.loads(page.data)["convergence"])
+        self.assertIn("hidden", page.elements["tab-convergence"])
+
+    def test_convergence_block_is_embedded_from_the_matrix_with_its_hash_and_dates(self):
+        self.use_real_template()
+        self.write_matrix(self.convergence_matrix())
+        page, text = self.build()
+        data = json.loads(page.data)
+        convergence = data["convergence"]
+        self.assertEqual([(row["catalog"], row["layer_id"], row["title"], row["layer_state"])
+                          for row in convergence["layers"]], [
+            ("foundation", "f-current", "Title f-current", "confirmed_current"),
+            ("foundation", "f-reopened", "Title f-reopened", "recorded_reopened"),
+            ("us-equities", "u-none", "Title u-none", "no_selection"),
+            ("us-equities", "u-pending", "Title u-pending", "pending_lanes")])
+        block = self.matrix["summary"]["convergence"]
+        for key in ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
+                    "newest_manifest", "newest_verdict_checked_at"):
+            with self.subTest(key=key):
+                self.assertEqual(convergence[key], block[key])
+        first = self.matrix["rows"][0]["convergence"]
+        embedded = convergence["layers"][0]
+        for key in ("verdict_checked_at", "reopened_by", "in_use", "converged", "all_rows", "recorded_winner_rows",
+                    "factors", "unresolved", "invoke", "invoke_reason"):
+            with self.subTest(key=key):
+                self.assertEqual(embedded[key], first[key])
+        # Per-component detail stays in the matrix; the page links it.
+        self.assertNotIn("components", embedded)
+        self.assertIn("/blob/main/" + self.MATRIX, convergence["url"])
+        hashes = {row["path"]: row["sha256"] for row in data["inputs"]}
+        self.assertEqual(hashes[self.MATRIX], hashlib.sha256((self.root / self.MATRIX).read_bytes()).hexdigest())
+        self.assertEqual(page.elements["convergence"]["role"], "tabpanel")
+        self.assertEqual(page.elements["tab-convergence"]["aria-controls"], "convergence")
+        self.assertIn("Convergence by layer", text)
+        self.assertEqual(len(page.scripts), 2)
+
+        def reopen_another_layer():
+            self.matrix["rows"][0]["convergence"]["reopened_by"] = [{"sweep_id": "sweep-0927", "date": "2026-09-27"}]
+            self.matrix["rows"][0]["convergence"]["layer_state"] = "recorded_reopened"
+            self.matrix["rows"][0]["convergence"]["converged"] = 0
+            summary = self.matrix["summary"]["convergence"]
+            summary["layer_states"].update(confirmed_current=0, recorded_reopened=2)
+            summary["catalogs"]["foundation"].update(converged=0, share=0.0)
+            summary["overall"].update(converged=0, share=0.0)
+            self.write_matrix(self.matrix)
+        self.assert_check_digest_changes(reopen_another_layer)
+
+    def test_convergence_block_must_agree_with_its_rows(self):
+        cases = (
+            (lambda m: m["summary"].pop("convergence"), "component_matrix.py --write"),
+            (lambda m: m["rows"][2].pop("convergence"), "every component matrix row needs a convergence object"),
+            (lambda m: m["rows"][0]["convergence"].update(layer_state="converging"), "unknown convergence layer_state"),
+            (lambda m: m["rows"][0]["convergence"]["factors"]["host_e2e"].update(unknown=2), "must add up to in_use"),
+            (lambda m: m["rows"][1]["convergence"].update(converged=1), "only a confirmed_current layer"),
+            (lambda m: m["rows"][0]["convergence"].update(in_use=-1), "nonnegative integers"),
+            (lambda m: m["rows"][0]["convergence"].update(invoke_reason=""), "null invoke needs its reason"),
+            (lambda m: m["summary"]["convergence"]["overall"].update(converged=2), "differs from its layer rows"),
+            (lambda m: m["summary"]["convergence"]["layer_states"].update(pending_lanes=2), "differs from its layer rows"),
+            (lambda m: m["summary"]["convergence"]["catalogs"]["foundation"].update(share=0.5), "differs from its layer rows"),
+            (lambda m: m["summary"]["convergence"].update(definitions=[]), "convergence definitions"),
+        )
+        for mutate, message in cases:
+            with self.subTest(message=message):
+                matrix = self.convergence_matrix()
+                mutate(matrix)
+                self.write_matrix(matrix)
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+
+    def test_convergence_text_is_inert_public_data(self):
+        self.use_real_template()
+        hostile = '</script><script src="https://invalid.example/steal.js"></script>'
+        matrix = self.convergence_matrix()
+        matrix["rows"][0]["title"] = hostile
+        matrix["rows"][0]["convergence"]["unresolved"][0]["reason"] = hostile
+        matrix["summary"]["convergence"]["definitions"][0]["definition"] = hostile
+        self.write_matrix(matrix)
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        convergence = json.loads(page.data)["convergence"]
+        self.assertEqual(convergence["definitions"][0]["definition"], hostile)
+        self.assertEqual(convergence["layers"][0]["unresolved"][0]["reason"], hostile)
+
+    @unittest.skipUnless(shutil.which("node"), "Convergence rendering check needs Node")
+    def test_convergence_rendering_reads_every_number_date_and_definition_from_the_data(self):
+        self.write_matrix(self.convergence_matrix())
+        page, _ = self.build()
+        convergence = json.loads(page.data)["convergence"]
+        template = (ROOT / "docs/ecosystem/template.html").read_text()
+        functions = [re.search(r"function " + name + r"\(.*?^}", template, re.S | re.M).group(0)
+                     for name in ("convergenceSummaryLines", "convergenceTableRows", "renderConvergence")]
+        for source in functions:
+            # No typed number: every count, share and date on the page comes from the matrix. A digit inside
+            # an identifier (host_e2e) is a name, not a number.
+            self.assertNotRegex(source, r"(?<![A-Za-z_$])\d")
+        script = "\n".join(functions[:2]) + (
+            "\nconst input = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));"
+            "\nprocess.stdout.write(JSON.stringify({summary: convergenceSummaryLines(input),"
+            " rows: convergenceTableRows(input)}));")
+        result = subprocess.run(["node", "-e", script], input=json.dumps(convergence), capture_output=True,
+                                text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rendered = json.loads(result.stdout)
+        self.assertEqual(rendered["rows"], [
+            ["foundation/f-current", "confirmed_current", "2026-09-22", "-", "3", "1", "2/1/0", "2/0/1", "1/1/1",
+             "4", "2", "stranger", "null"],
+            ["foundation/f-reopened", "recorded_reopened", "2026-09-22", "sweep-0926", "1", "0", "1/0/0", "1/0/0",
+             "1/0/0", "1", "1", "-", "null"],
+            ["us-equities/u-none", "no_selection", "2026-09-22", "-", "1", "0", "0/1/0", "0/0/1", "0/0/1", "2", "0",
+             "-", "null"],
+            ["us-equities/u-pending", "pending_lanes", "2026-09-22", "-", "2", "0", "0/0/2", "1/1/0", "0/0/2", "2",
+             "0", "-", "null"]])
+        summary = "\n".join(rendered["summary"])
+        for expected in ("Layer states: confirmed_current 1 · no_selection 1 · pending_lanes 1 · recorded_reopened 1",
+                         "foundation: 1 of 4 in-use components converged across 2 layers (share 0.25); "
+                         "1 unresolved manifest rows",
+                         "overall: 1 of 7 in-use components converged across 4 layers (share 0.1429); "
+                         "1 unresolved manifest rows",
+                         "Newest sweep manifest: sota-convergence-20260926, checked_at 2026-09-26 "
+                         "(catalogs/sota-convergence/manifest-20260926.json)",
+                         "Newest verdict checked_at: foundation 2026-09-22 · us-equities 2026-09-22",
+                         "Completed sweeps: sweep-0926 (2026-09-26)",
+                         "host_e2e platform: linux-wsl2-x86_64",
+                         "Definitions frozen 2026-09-27"):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, summary)
+
+    # Runs a generated page's whole inline script against the page's own elements (every id and data-tab /
+    # data-open / data-catalog-tab element, with its attributes), so a renderer that throws, or looks up an id
+    # the page lacks, shows up here instead of as the page's recovery screen.
+    PAGE_HARNESS = r'''
+const vm = require("node:vm");
+const input = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+class Element {
+  constructor(tag, attrs) {
+    this.tagName = tag.toUpperCase(); this.attrs = {...attrs}; this.children = []; this.text = "";
+    this.hidden = Object.prototype.hasOwnProperty.call(attrs, "hidden"); this.className = attrs.class || "";
+    this.dataset = {}; this.listeners = {}; this.value = ""; this.checked = false; this.open = false;
+    this.type = attrs.type || "";
+    for (const [key, value] of Object.entries(attrs)) if (key.startsWith("data-"))
+      this.dataset[key.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = value === null ? "" : value;
+  }
+  set textContent(value) { this.text = String(value); this.children = []; }
+  get textContent() { return this.text + this.children.map(child => child.textContent).join(""); }
+  appendChild(child) { this.children.push(child); return child; }
+  replaceChildren(...children) { this.children = children; this.text = ""; }
+  get childElementCount() { return this.children.length; }
+  setAttribute(key, value) { this.attrs[key] = String(value); }
+  getAttribute(key) { return key in this.attrs ? this.attrs[key] : null; }
+  addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); }
+  focus() {} click() {} showModal() { this.open = true; } close() { this.open = false; }
+  getBoundingClientRect() { return {left: 0, right: 0, top: 0, bottom: 0}; }
+}
+const byId = {}, ordered = [], missing = [], errors = [];
+for (const [tag, attrs] of input.elements) {
+  const element = new Element(tag, attrs); ordered.push(element); if (attrs.id) byId[attrs.id] = element;
+}
+byId["ecosystem-data"].text = input.data;
+const document = {
+  getElementById(id) { if (!(id in byId)) { missing.push(id); return null; } return byId[id]; },
+  createElement(tag) { return new Element(tag, {}); },
+  querySelectorAll(selector) {
+    const match = selector.match(/^\[([a-z-]+)\]$/);
+    if (!match) throw new Error("Unexpected selector: " + selector);
+    return ordered.filter(element => match[1] in element.attrs);
+  },
+  addEventListener() {}, activeElement: {tagName: "BODY"},
+};
+const location = {hash: "#" + input.tab, href: "https://catalog.example/index.html"};
+vm.runInNewContext(input.script, {document, location, window: {scrollTo() {}, addEventListener() {}, location},
+  history: {replaceState() {}}, requestAnimationFrame(callback) { callback(); }, URL, Blob: class {}, setTimeout, atob,
+  console: {error(message, error) { errors.push(String((error && error.stack) || error || message)); }}});
+const text = id => byId[id] ? byId[id].children.map(child => child.textContent) : null;
+process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-app"].hidden,
+  recovery_hidden: byId["catalog-recovery"].hidden, tab_hidden: (byId["tab-convergence"] || {}).hidden,
+  panel_hidden: (byId["convergence"] || {}).hidden,
+  rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
+  summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null}));
+'''
+
+    @staticmethod
+    def page_elements(html_text):
+        class Elements(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.found = []
+
+            def handle_starttag(self, tag, attrs):
+                attrs = dict(attrs)
+                if "id" in attrs or {"data-tab", "data-open", "data-catalog-tab"} & set(attrs):
+                    self.found.append([tag, attrs])
+
+        parser = Elements()
+        parser.feed(html_text)
+        return parser.found
+
+    def run_page(self, html_text, tab="convergence"):
+        page = Page(html_text)
+        script, = page.inline_scripts
+        result = subprocess.run(["node", "-e", self.PAGE_HARNESS], input=json.dumps({
+            "script": script, "data": page.data, "elements": self.page_elements(html_text), "tab": tab}),
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_convergence_tab(self):
+        self.use_real_template()
+        _, without = self.build()
+        observed = self.run_page(without)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        # No matrix: the tab stays hidden and #convergence falls back to the overview.
+        self.assertEqual((observed["tab_hidden"], observed["panel_hidden"], observed["rows"]), (True, True, []))
+
+        self.write_matrix(self.convergence_matrix())
+        _, with_matrix = self.build()
+        observed = self.run_page(with_matrix)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        self.assertEqual((observed["tab_hidden"], observed["panel_hidden"]), (False, False))
+        self.assertEqual([row[:6] for row in observed["rows"]], [
+            ["foundation/f-current", "confirmed_current", "2026-09-22", "-", "3", "1"],
+            ["foundation/f-reopened", "recorded_reopened", "2026-09-22", "sweep-0926", "1", "0"],
+            ["us-equities/u-none", "no_selection", "2026-09-22", "-", "1", "0"],
+            ["us-equities/u-pending", "pending_lanes", "2026-09-22", "-", "2", "0"]])
+        self.assertEqual(observed["summary"][0],
+                         "Layer states: confirmed_current 1 · no_selection 1 · pending_lanes 1 · recorded_reopened 1")
+        for item in self.matrix["summary"]["convergence"]["definitions"]:
+            self.assertIn(item["term"] + item["definition"], observed["definitions"])
+        self.assertIn("foundation/f-current · stranger: no manifests/stack.json id, alias or repository match",
+                      observed["definitions"])
+
+    def test_the_repository_matrix_convergence_block_is_accepted(self):
+        """The real generated matrix, not the fixture: the page accepts what scripts/component_matrix.py writes."""
+        source = ROOT / self.MATRIX
+        self.write(self.MATRIX, source.read_text(encoding="utf-8"))
+        page, _ = self.build()
+        convergence = json.loads(page.data)["convergence"]
+        real = json.loads(source.read_text(encoding="utf-8"))
+        self.assertEqual(convergence["overall"], real["summary"]["convergence"]["overall"])
+        self.assertEqual([(row["catalog"], row["layer_id"]) for row in convergence["layers"]],
+                         [(row["catalog"], row["layer_id"]) for row in real["rows"]])
+
 
 if __name__ == "__main__":
     unittest.main()
