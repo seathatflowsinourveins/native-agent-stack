@@ -3507,8 +3507,8 @@
     },
     {
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
-      "sha256": "1ff91e40b81403041be293fa3a6f8c63d06bdde1c68c7eb0e5c0997a5a10b61c",
-      "bytes": 1349
+      "sha256": "f4b52841ad4bb2ba8cfb35c20f88e11570c41fddb3e0388a73150d234baa5ae6",
+      "bytes": 1699
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
@@ -13213,7 +13213,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "b4f19de0c0ea4d2febfd5d58d0197667719fe8106aeef0b771431bdfb0e01b70",
+      "sha256": "1368ea8575f2f59cf8b37183ce8dfb76d9a587d8c95804bd4500cb03e2867880",
       "bytes": 189803
     },
     {
@@ -36633,8 +36633,8 @@
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--mcporter--use--20260927.json",
-      "sha256": "a7393a6f59c7d4867275a8a9d00ce9909bb80e49e893d73065da28bb9a356f95",
-      "bytes": 10636
+      "sha256": "336af46f1b39826624b82e766b52c985db33965c06bf8fe1265b6ff2033583b2",
+      "bytes": 11114
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--qdrant--use--20260925.json",
