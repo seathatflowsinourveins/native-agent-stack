@@ -7,7 +7,9 @@
     "socraticode",
     "qmd"
   ],
-  "recorded_at_utc": "2026-09-27T13:11:00Z",
+  "recorded_at_utc": "2026-09-27T13:17:57Z",
+  "observed_canonical_head": "e833e3ef",
+  "publication_base": "ec27a300",
   "claim": "Actual daily heartbeat returned scoped memory/RAG observations. Existing services and publications were healthy; hourly learning is intentionally paused. Stock ai-memory 2.4.1 remains conditional because it lacks the installed query/document-prefix capability.",
   "trigger": {
     "automation_id": "maintain-native-foundation-and-trading-catalogs",
@@ -245,7 +247,8 @@
     "project_tests": {
       "command": "ecosystem-bounded-run python3 -m unittest tests.test_grand_dashboard tests.test_ecosystem_manifest",
       "exit_code": 0,
-      "tests": 63
+      "tests": 64,
+      "before_rebase_tests": 63
     },
     "source_excerpt_matches": true,
     "qmd_document_span_matches": true
