@@ -46,6 +46,21 @@ as supplied. #369 is a **pre-fix reference baseline only**. PR-A's
 all-carrier M3/M5, nested fetches, all-hook context, call-state and token
 extensions are not supplied by this PR.
 
+**Amendment 2 (2026-09-27), role definitions and load order.** #402 (`d022295a`,
+merged 2026-09-27T14:04:25Z) supplies the `stack-verifier`, `isolated-builder`
+and `source-scout` bodies and joins #376's host install/read-back gate. At an
+execution checkout at or after `d022295a`, the project-scope `.claude/agents/*.md`
+definitions shadow the user-scope `~/.claude/agents/*.md` definitions of the same
+name ([sub-agents](https://code.claude.com/docs/en/sub-agents), “Choose the
+subagent scope”: project priority 3 outranks user priority 4; only managed
+settings and the `--agents` flag rank higher, and the launches below pass no
+`--agents`). For every `adoption/agents/claude/*.md` at the execution HEAD, the
+freeze record retains the SHA256 of that file and of its same-named
+`.claude/agents/` and `~/.claude/agents/` copies, read back from disk after
+installation, and requires all three to be byte-identical. A missing copy or any
+difference blocks capability probes and launch. Child `meta.json` types are still
+observed separately (README dependency table).
+
 Use these shell variables as **operator inputs**, with real values recorded
 privately: `E2E_DIR` (owned private output directory), `RUN_TOKEN`,
 `SINCE`/`UNTIL` (UTC ISO timestamps, half-open run window),
@@ -202,7 +217,7 @@ not enough (Workflow reference, “Where the keyword works”, lines 131–141).
 | preregistration_commit | Actual merged revision whose files were checked |
 | gates_verified | true only after inspecting the retained merge/read-back/capability evidence |
 | frozen_tasks | Entire parsed committed `preregistration.json`, without edits |
-| worktree_paths | Every selected task with `worktree_required` mapped to this arm's prepared owned absolute checkout/clone path; six distinct prepared builder paths plus per-arm command-observation checkouts and caller clones, frozen privately before probes. For builders this is a prepared control binding, not proof of the actual child tree; follow the builder section below |
+| worktree_paths | Every selected task with `worktree_required` mapped to this arm's prepared owned absolute checkout/clone path; six distinct prepared builder paths plus per-arm command-observation checkouts and caller clones, frozen privately before probes. For builders this is the owned checkout each arm's brief names (Amendment 2, 2026-09-27), not proof of the edited tree; follow the builder section below |
 | input_paths | Every selected task with `input_required` mapped to its pre-recorded neutral absolute input path; history originals, the sealed table pointer value and the HTML seed retain identical bytes/hash across arms |
 
 The runtime cannot read files or import modules. The coordinator passes JSON
@@ -257,11 +272,21 @@ load. Do not switch silently to `--bare`, which changes authentication.
 
 ### Builder worktrees and hooks restoration
 
-Sources: `adoption/agents/claude/isolated-builder.md:7,10`,
-`examples/claude-native/workflows/test-envelope.mjs:418` and the
-observed shared-configuration failure in `docs/harness-defaults.md:89`.
-Keep `isolation: worktree`; the role may create a child tree different
-from the prepared `<assigned-worktree>` binding.
+**Amendment 2 (2026-09-27).** Sources: `adoption/agents/claude/isolated-builder.md:3,12`
+at `d022295a`, `examples/claude-native/workflows/test-envelope.mjs:418–427`, the
+observed shared-configuration failure in `docs/harness-defaults.md:91`, and
+[sub-agents](https://code.claude.com/docs/en/sub-agents) on the `isolation` field
+and a subagent's starting directory. #402 removed the role's frontmatter worktree
+isolation, which Repair 1 kept here. The builder now edits only in the
+coordinator-prepared owned checkout its brief names, and refuses to edit when the
+brief names none, when that checkout's top level is its starting directory's, or
+when its `HEAD` is not the brief's base. No arm expects a harness-created tree.
+Every builder launch in B, A and A0 carries this arm's frozen prepared path from
+`worktree_paths` in its brief, where it replaces `<assigned-worktree>`, and the
+child must edit there. The frozen task text names that path but no base
+revision, so whether the B role proceeds on it is **[nv]** until the capability
+gate observes it. A refusal is a retained failed attempt, never a reason to
+change task text after seeing results.
 
 Before each builder launch, from its prepared repository, retain the effective
 origin/value and whether local values existed, including all values and exits:
@@ -286,24 +311,29 @@ builder launches. The workflow is sequential, so another builder must not
 race this snapshot/restore.
 
 For each builder identity, independently read the child's native transcript
-and `meta.json`. Record the actual worktree and starting revision from
-the native working-directory/revision observations and available metadata,
-joined by child identity. Do not invent a metadata field or accept the child's
-final answer alone as proof. If metadata does not record the tree, its identity
-must join to transcript observations that do. Require the starting revision and
-fixture bytes to match the frozen execution inputs. Missing or conflicting
-evidence blocks grading.
+and `meta.json`. A subagent starts in the coordinator's working directory, so
+the child's session directory is not its edit location. Record the actual
+edited worktree and starting revision from the transcript's edit and write
+paths, the directories its commands ran in, its revision reads and available
+metadata, joined by child identity. Do not invent a metadata field or accept
+the child's final answer alone as proof. If metadata does not record the tree,
+its identity must join to transcript observations that do. The observed edit
+tree must be the frozen prepared path for this arm and task, with every edited
+or written file inside it; any other tree, including a harness-created one, is
+a conflicting identity. Require the starting revision and fixture bytes to
+match the frozen execution inputs. Missing or conflicting evidence blocks
+grading.
 
-Run the independent tracked **and untracked** diff/checks in that actual child
-tree against its recorded starting revision. Only `fixtures/before.py`
+Run the independent tracked **and untracked** diff/checks in that observed tree
+against its recorded starting revision. Only `fixtures/before.py`
 may change; compare its final bytes to `fixtures/after.py` in the same
 tree, and retain the actual Ada/Grace test output. An empty diff from the
-prepared tree cannot pass. A/A0 use their prepared control tree when no native
-isolated tree was created; apply the same read-back and revision checks.
-The script's `worktreeEvidence.actual_path: null` means pending independent
-read-back, never the supplied path by default. Retain the actual child tree
-until independent grading and patch capture finish, then clean up only the
-owned tree through the native lifecycle.
+prepared tree cannot pass. The same read-back and revision checks apply in every
+arm. The script's `worktreeEvidence.actual_path: null` means pending independent
+read-back, never the supplied path by default. The freeze section's two
+per-tree sentinels and the capability gate's own-tree sentinel checks are
+unchanged. Retain that tree until independent grading and patch capture finish,
+then clean up only the owned tree through the native lifecycle.
 
 ### Codex launches (separate shell step)
 

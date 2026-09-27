@@ -35993,13 +35993,13 @@
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
-      "sha256": "25d3a710ffd9e0d9b097fbfbc1d2c25005dc43b97e6a254100268fa0c07ef3c4",
-      "bytes": 51934
+      "sha256": "4c73b5e26ba7d8ae80e8e76b230b78ffd65a3a1ce1343212a353946b187e2ad4",
+      "bytes": 58358
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md",
-      "sha256": "a8ee0e09ce001db21269f66dc5ec4a4aa39abc3020e86e37d610a4aa9236c5a4",
-      "bytes": 39612
+      "sha256": "537eb1937606879bcdc6fdaf5756efc27cc9f99eae01c76172b2e4c4334d2361",
+      "bytes": 41950
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
@@ -36013,13 +36013,13 @@
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
-      "sha256": "e04c1a08de610356e2f24cf8d1f59a70e8b630e093c93934cd03ab0a8091bee4",
-      "bytes": 133651
+      "sha256": "bd89294442539fab5e9c52e565cea5d24290ccf7ba8bba49cd3603a23ff38839",
+      "bytes": 133997
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/token-e2e-run.mjs",
-      "sha256": "6ca129d94d51c6c99c5a9430e2b7fb0d23b0919001acf789bf5d59d74c7cb828",
-      "bytes": 8099
+      "sha256": "18419164467e0168f189deb65443abf1b64fa91a7d5551bd3b23fea838ed3c6f",
+      "bytes": 8321
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
@@ -39743,8 +39743,8 @@
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
-      "sha256": "cdd0815fe214667134c6c65a2a0ba0d12a87d8a821817ec5b28e6cfd0c327a46",
-      "bytes": 24774
+      "sha256": "055d85cf67d6f7aefab1f9ffb02cfca85083688a366a9923744fd16d15836172",
+      "bytes": 35202
     },
     {
       "path": "tests/test_token_e2e_receipt_checks.py",

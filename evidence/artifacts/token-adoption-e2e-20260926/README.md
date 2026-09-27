@@ -169,12 +169,12 @@ Only `task_text` reaches a child's prompt. The only substitutions bind
 neutral paths and the run token; no instructions are appended. Identical source
 bytes and observation contracts apply across arms. Freeze all six distinct
 builder checkouts plus the per-arm observation checkouts and disposable clones.
-These are prepared bindings: B's `isolation: worktree` may create another tree.
-For builder tasks, derive the actual tree and starting revision from the child's
-native transcript and `meta.json`, and read the diff there, per
-`builder_worktree_policy`. Missing or conflicting identity blocks grading.
-A/A0 use their prepared control trees when the harness creates no separate tree.
-Keep the role's isolation; RUNBOOK's builder section freezes the hooks preflight
+These are prepared bindings. **Amendment 2 (2026-09-27):** #402 removed the builder's frontmatter isolation,
+so no arm expects a harness-created tree; each builder brief names its arm's frozen prepared path, where the child edits.
+For builder tasks, derive the actual edited tree and starting revision from the child's
+native transcript and `meta.json`, require that tree to be the prepared path, and read the diff there, per
+`builder_worktree_policy`. Missing or conflicting identity blocks grading. The same checks apply in A and A0;
+RUNBOOK's builder section freezes the hooks preflight
 and restore procedure. Retained-history, table and HTML input paths are
 supplied explicitly, and resolved
 prompts must pass the same denylist. Eligibility tags, receipt tool
@@ -224,15 +224,15 @@ minimum, and never substitute task counts for call counts (AA §8.3; full-save
 Claude arm order is **B, A, A0**. B uses the role table; A uses
 `general-purpose` on the identical task text and model; A0 omits
 `agentType` on the identical task text and model. This deliberate A0 omission
-is the preregistered experimental exception to AA §9's ordinary dispatch rule.
+is the preregistered experimental exception to AA §9's ordinary dispatch rule. **Amendment 2 (2026-09-27)** moved the verifier and builder rows to Opus and three carriers to #402.
 
 | Frozen role in B | Explicit model | Explicit effort | Carrier |
 | --- | --- | --- | --- |
-| stack-researcher | opus | max | #376 role body, after merge/install proof |
-| stack-verifier | sonnet | max | #376 role body, after merge/install proof |
-| isolated-builder | sonnet | max | Existing role plus #376 additions |
-| evidence-reviewer | opus | max | Existing role body |
-| source-scout | sonnet | max | Existing role plus #376 additions |
+| stack-researcher | opus | max | #376 role body, after merge/install proof; unchanged by #402 |
+| stack-verifier | opus | max | #402 role body at d022295a |
+| isolated-builder | opus | max | #402 role body at d022295a |
+| evidence-reviewer | opus | max | Existing role body; unchanged by #402 |
+| source-scout | sonnet | max | #402 role body at d022295a |
 | blind-lane-reviewer / blind-judge | opus | max | Existing stripped blind bodies; no skill preload |
 
 The Workflow inventory reserves **49 B, 43 A, 43 A0 children**, in JSON order,
@@ -585,6 +585,9 @@ whether any results were already observed, and record the replacement hashes
 and merge chronology before execution. No retroactive eligibility or threshold
 recoding is permitted. Source: [retrieval-quality-v2 Sealing and Amendments](../../../blueprints/retrieval-quality-v2/PREREGISTRATION.md#sealing).
 
+**Amendment 2 (2026-09-27):** the Repair 1 table above is kept as history; the
+launch check uses the Amendment 2 seal below.
+
 ## Amendment 1 (2026-09-26): repair after independent reviews, before execution
 
 This authorized repair changes the unexecuted preregistration in response to
@@ -612,3 +615,56 @@ remain; a blocked task is retained, never deleted or credited as passed.
 The task-specific anti-pattern log is this amendment table, with enforceable
 contracts in `tests/test_token_e2e_preregistration.py`. It records the proven
 mistakes without promoting offline checks to organic adoption evidence.
+
+## Amendment 2 (2026-09-27): adopt the #402 role bodies before execution
+
+This dated amendment changes the merged, unexecuted preregistration. PR-H
+merged as #381 at `c7b78854` (2026-09-27T06:39:20Z). No organic run,
+capability probe or Workflow of this protocol has run since, so
+no result was observed before this change. **Reason:** the user's 2026-09-27
+rule that every verification and build stage runs on Opus 5.5 at effort max.
+#402 (`d022295a`, 2026-09-27T14:04:25Z) made the same
+change to `adoption/agents/claude/{stack-verifier,isolated-builder}.md`, removed
+the builder's frontmatter `isolation: worktree` and added project-scope copies
+in `.claude/agents/` ([harness-settings record](../../../docs/decisions/2026-09-27-claude-harness-settings.md),
+“Effect on frozen preregistrations”; [role-dispatch addendum](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-27-opus-builder-and-verifier-no-frontmatter-isolation)).
+A per-invocation `model` outranks the definition's `model`
+([sub-agents](https://code.claude.com/docs/en/sub-agents), model resolution
+order), and every task here passes one, so the definitions alone would not
+change the run. The amended routes hold in B, A and A0, which share each task's
+model. Tasks and their text, eligibility, lanes, thresholds, M3 exceptions,
+checks and arm order are unchanged; nothing is recoded. Neither role's
+Sonnet-era qualification carries over: the capability gate qualifies the Opus
+routes. Amendment 1 and the Repair 1 seal stay above as history.
+
+| Change | Superseded rule or artifact | Replacement and source |
+| --- | --- | --- |
+| 1. Role models | `stack-verifier` and `isolated-builder` at `sonnet` in the role table, in the six Claude `stack-verifier` tasks (`reuse-296-00`, `seed-acceptance-1` to `-5`) and the two `isolated-builder` tasks (`seed-builder-1`, `-2`), and in the runner's role map | `opus`, effort still `max`. Codex tasks stay on `gpt-6-astra`, including the `stack-verifier` task `reuse-343-13`. `source-scout` stays `sonnet` for pure extraction. The blocked `reuse-296-15` slot and its `role_requirement` are unchanged. Source: `adoption/agents/claude/stack-verifier.md:5` and `isolated-builder.md:5` at `d022295a`. |
+| 2. Carriers | “#376 role body, after merge/install proof” (verifier); “Existing role plus #376 additions” (builder, scout) | “#402 role body at d022295a”. #402 leaves the `stack-researcher` and `evidence-reviewer` bodies unchanged; their rows stay and say so. |
+| 3. Builder worktrees | README: “B's `isolation: worktree` may create another tree”, “A/A0 use their prepared control trees when the harness creates no separate tree” and “Keep the role's isolation”; the RUNBOOK builder section's Repair 1 isolation rule and its `worktree_paths` row's “prepared control binding”; Amendment 1 finding 3's “preserve isolation”; the runner comment citing `isolated-builder.md:7` | Every arm's builder brief carries the frozen prepared path from `worktree_paths` (runner binding and task text unchanged). The grader derives the edited tree from the child transcript and `meta.json` and requires it to be that path; any other tree is a conflicting identity that blocks grading. `builder_worktree_policy` keeps its eight Repair 1 fields and adds seven. The hooks preflight/restore and per-tree sentinel checks stay. The role's base refusal against a brief that names no base is **[nv]**. Sources: `isolated-builder.md:3,12` at `d022295a`; `test-envelope.mjs:418–427`; `docs/harness-defaults.md:91`; sub-agents on `isolation` and a subagent's starting directory. |
+| 4. Load order | RUNBOOK freeze: agent bytes recorded without scope precedence | Project `.claude/agents/*.md` (priority 3) shadow user `~/.claude/agents/*.md` (priority 4). The freeze record retains both and requires byte identity with `adoption/agents/claude/*.md` at the execution HEAD, read back. Sources: sub-agents, “Choose the subagent scope”; decision 3 of the harness-settings record. |
+| 5. Tests | `tests/test_token_e2e_preregistration.py` without these contracts | Five new and two extended tests: models, role-map/JSON and role-table/JSON agreement, carriers, builder policy and text, load order, and this seal. Against the unamended artifacts, `python3 -m unittest tests.test_token_e2e_preregistration` exited 1 (27 tests, `FAILED (failures=42)`, all in those seven tests); it passes on the amended artifacts. |
+| 6. Seal | Repair 1 seal table (kept) | The Amendment 2 seal below; `manifests/evidence.json` re-registered with `register_file` from `scripts/host_receipts.py` ([hot-file protocol](../../../docs/lanes.md#hot-file-protocol)). |
+
+**Merge chronology.** #381 merged this preregistration at `c7b78854`
+(2026-09-27T06:39:20Z); #402 merged at `d022295a` (2026-09-27T14:04:25Z); this
+amendment is built on `d022295a`. Record this amendment's merge revision and
+time before execution: both must precede every capability probe and organic
+arm, and that revision is the `preregistration_commit` checked at launch. At
+`d022295a` the reused table pointer still serializes to the sealed
+`frozen_input` bytes (6,552 bytes, 60 records, the same SHA256).
+
+**Amendment 2 seal, 2026-09-27**, before any organic run. It replaces the
+Repair 1 table for the launch check; the **Sealing** rules apply unchanged.
+
+| Artifact | SHA256 |
+| --- | --- |
+| `preregistration.json` | `bd89294442539fab5e9c52e565cea5d24290ccf7ba8bba49cd3603a23ff38839` |
+| `token-e2e-run.mjs` | `18419164467e0168f189deb65443abf1b64fa91a7d5551bd3b23fea838ed3c6f` |
+| `RUNBOOK.md` | `537eb1937606879bcdc6fdaf5756efc27cc9f99eae01c76172b2e4c4334d2361` |
+| `fixtures/table.json` | `fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448` |
+| `fixtures/events.jsonl` | `81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e` |
+
+Replacement hashes: `preregistration.json` `e04c1a08…` → `bd892944…`;
+`token-e2e-run.mjs` `6ca129d9…` → `18419164…`; `RUNBOOK.md` `a8ee0e09…` →
+`537eb193…`. Both fixtures are unchanged.

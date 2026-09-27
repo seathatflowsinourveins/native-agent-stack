@@ -11,10 +11,12 @@ export const meta = {
 // A Workflow-tool script, not a Node CLI. Node is used only for --check.
 // Runtime has no filesystem, shell or imports. The coordinator supplies the
 // exact parsed committed manifest in args.frozen_tasks (RUNBOOK.md).
+// Amendment 2 (2026-09-27): stack-verifier and isolated-builder run on Opus, as
+// #402's definitions declare; each call's explicit model decides the route.
 const routes = {
   'stack-researcher': { agentType: 'stack-researcher', model: 'opus' },
-  'stack-verifier': { agentType: 'stack-verifier', model: 'sonnet' },
-  'isolated-builder': { agentType: 'isolated-builder', model: 'sonnet' },
+  'stack-verifier': { agentType: 'stack-verifier', model: 'opus' },
+  'isolated-builder': { agentType: 'isolated-builder', model: 'opus' },
   'evidence-reviewer': { agentType: 'evidence-reviewer', model: 'opus' },
   'source-scout': { agentType: 'source-scout', model: 'sonnet' },
   'blind-lane-reviewer': { agentType: 'blind-lane-reviewer', model: 'opus' },
@@ -189,8 +191,9 @@ for (const task of selected) {
   // for independent frozen checks and transcript/usage reconciliation.
   // Workflow has no filesystem. The grader reads the native child transcript
   // and meta.json after return (RUNBOOK builder section), checks starting HEAD,
-  // and diffs that observed tree. The supplied path is only a prepared binding;
-  // isolated-builder.md:7 may create another tree. Never invent an actual path.
+  // and diffs that observed tree, which must be the brief's prepared path: since
+  // #402 the builder declares no frontmatter isolation (Amendment 2). The
+  // supplied path is a binding, not proof. Never invent an actual path.
   const worktreeEvidence = task.worktree_check ? {
     prepared_path: args.worktree_paths[task.id], actual_path: null,
     identity_sources: ['child_transcript', 'meta.json'],

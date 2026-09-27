@@ -1,7 +1,10 @@
 """Offline preregistration contracts; never launch a model or workflow.
 
 Sources: AA sections 8.1 and 8.3; PR-H build specification; unittest/path
-conventions in tests/test_token_report_refresh_units.py:12-25.
+conventions in tests/test_token_report_refresh_units.py:12-25. Amendment 2
+(README, 2026-09-27): the #402 role bodies at d022295a and the sub-agents
+reference (https://code.claude.com/docs/en/sub-agents: scope priority, working
+directory, `isolation` and model resolution order).
 """
 
 import json
@@ -22,6 +25,48 @@ REQUIRED_LANES = {
     "blind", "binding", "attribution", "mcp-errors",
 }
 UUID_SHAPE = re.compile(r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b", re.I)
+# Amendment 2 literals, independent of the manifest. Models: #402's definitions
+# at d022295a (adoption/agents/claude/{stack-verifier,isolated-builder}.md:5 say
+# opus, source-scout.md:5 says sonnet) and the user's Opus rule for build and
+# verification stages.
+AMENDED_CLAUDE_ROLE_MODELS = {
+    "stack-researcher": "opus", "stack-verifier": "opus", "isolated-builder": "opus",
+    "evidence-reviewer": "opus", "source-scout": "sonnet",
+    "blind-lane-reviewer": "opus", "blind-judge": "opus",
+}
+AMENDED_ROLE_TABLE = [
+    "| stack-researcher | opus | max | #376 role body, after merge/install proof; unchanged by #402 |",
+    "| stack-verifier | opus | max | #402 role body at d022295a |",
+    "| isolated-builder | opus | max | #402 role body at d022295a |",
+    "| evidence-reviewer | opus | max | Existing role body; unchanged by #402 |",
+    "| source-scout | sonnet | max | #402 role body at d022295a |",
+    "| blind-lane-reviewer / blind-judge | opus | max | Existing stripped blind bodies; no skill preload |",
+]
+# Repair 1 builder policy (Amendment 1, finding 3). Amendment 2 only adds fields.
+REPAIR_1_BUILDER_POLICY = {
+    "id": "actual_child_worktree", "identity_sources": ["child_transcript", "meta.json"],
+    "diff_root": "observed_child_worktree", "diff_base": "recorded_child_starting_revision",
+    "include_tracked_and_untracked": True, "starting_revision_must_match_frozen_execution": True,
+    "missing_or_conflicting_identity": "block_grading", "prepared_path_is_proof": False,
+}
+AMENDMENT_2_BUILDER_POLICY = {
+    "brief_binding": "worktree_paths", "harness_created_tree_expected": False,
+    "observed_child_worktree_must_equal_prepared_path": True,
+    "observed_worktree_other_than_prepared_path": "conflicting_identity",
+    "hooks_preflight_and_restore_required": True, "per_tree_sentinel_checks_required": True,
+    "amended_by": "Amendment 2 (2026-09-27)",
+}
+# The README amendment rule preserves every earlier seal table: the Repair 1
+# rows, verbatim. Kept as table rows, not "name": "digest" pairs, which the
+# pre-commit gitleaks generic-api-key rule reads as a keyed secret.
+REPAIR_1_SEAL_ROWS = (
+    "| `preregistration.json` | `e04c1a08de610356e2f24cf8d1f59a70e8b630e093c93934cd03ab0a8091bee4` |",
+    "| `token-e2e-run.mjs` | `6ca129d94d51c6c99c5a9430e2b7fb0d23b0919001acf789bf5d59d74c7cb828` |",
+    "| `RUNBOOK.md` | `a8ee0e09ce001db21269f66dc5ec4a4aa39abc3020e86e37d610a4aa9236c5a4` |",
+    "| `fixtures/table.json` | `fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448` |",
+    "| `fixtures/events.jsonl` | `81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e` |",
+)
+SEALED_FILES = tuple(row.split("`")[1] for row in REPAIR_1_SEAL_ROWS)
 
 
 def load_tasks():
@@ -31,6 +76,12 @@ def load_tasks():
 
 def tool_name_pattern(name):
     return r"(?<![A-Za-z0-9])" + re.escape(name) + r"(?![A-Za-z0-9])"
+
+
+def section(text, start, end):
+    """Text after the first start marker, up to the next end marker; empty if absent."""
+    _, found, rest = text.partition(start)
+    return rest.split(end, 1)[0] if found else ""
 
 
 class TokenE2EPreregistrationTests(unittest.TestCase):
@@ -184,6 +235,67 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
             with self.subTest(task=task["id"]):
                 self.assertEqual(task["effort"], "xhigh" if task["dispatch"] == "main" else "max")
 
+    def test_amendment_2_role_models(self):
+        # Amendment 2 change 1: verifier and builder tasks move to Opus (effort
+        # stays max); the scout stays Sonnet; Codex tasks keep gpt-6-astra; the
+        # blocked loopback slot keeps its frozen model.
+        tasks = load_tasks()["tasks"]
+        claude = [task for task in tasks if task["family"] == "claude" and task.get("role")]
+        for task in claude:
+            with self.subTest(task=task["id"]):
+                self.assertEqual(task["model"], AMENDED_CLAUDE_ROLE_MODELS.get(task["role"]))
+        for role, count in (("stack-verifier", 6), ("isolated-builder", 2), ("source-scout", 3)):
+            with self.subTest(role=role, field="claude_task_count"):
+                self.assertEqual(sum(task["role"] == role for task in claude), count)
+        for task in tasks:
+            if task["family"] == "codex":
+                with self.subTest(task=task["id"], field="codex_model"):
+                    self.assertEqual(task["model"], "gpt-6-astra")
+        blocked = next(task for task in tasks if task["id"] == "reuse-296-15")
+        with self.subTest(task=blocked["id"], field="blocked_slot_model"):
+            self.assertEqual((blocked["role"], blocked["model"]), (None, "sonnet"))
+
+    def test_runner_role_map_agrees_with_json(self):
+        # Every Workflow agent() call passes route.model, and a per-invocation
+        # model outranks the definition's (sub-agents, model resolution order),
+        # so the runner's map, not the agent file, decides each child's model.
+        source = (BLUEPRINT / "token-e2e-run.mjs").read_text(encoding="utf-8")
+        block = re.search(r"const routes = \{\n([\s\S]*?)\n\};", source)
+        self.assertIsNotNone(block)
+        lines = block.group(1).splitlines()
+        routes = {}
+        for line in lines:
+            match = re.fullmatch(r"  '([a-z-]+)': \{ agentType: '([a-z-]+)', model: '([a-z0-9-]+)' \},", line)
+            with self.subTest(line=line):
+                self.assertIsNotNone(match)
+            if match:
+                routes[match.group(1)] = (match.group(2), match.group(3))
+        with self.subTest(field="role_map"):
+            self.assertEqual(routes, {role: (role, model)
+                                      for role, model in AMENDED_CLAUDE_ROLE_MODELS.items()})
+        for task in load_tasks()["tasks"]:
+            if task["family"] == "claude" and task["dispatch"] == "workflow" and task.get("role"):
+                with self.subTest(task=task["id"], field="json_agreement"):
+                    self.assertEqual(routes.get(task["role"], (None, None))[1], task["model"])
+
+    def test_readme_role_table_carriers_agree_with_json(self):
+        # Amendment 2 changes 1-2: #402 carriers for verifier, builder and scout;
+        # researcher and reviewer rows stay, marked unchanged by #402.
+        text = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
+        table = section(text, "| Frozen role in B | Explicit model | Explicit effort | Carrier |\n", "\n\n")
+        rows = [line for line in table.splitlines() if not line.startswith("| ---")]
+        with self.subTest(field="rows"):
+            self.assertEqual(rows, AMENDED_ROLE_TABLE)
+        models = {}
+        for row in rows:
+            cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
+            for role in cells[0].split(" / "):
+                models[role] = cells[1]
+        for task in load_tasks()["tasks"]:
+            if task["family"] == "claude" and task.get("role"):
+                with self.subTest(task=task["id"], field="json_agreement"):
+                    self.assertEqual(models.get(task["role"]), task["model"])
+
     def test_task_text_has_no_tool_names(self):
         data = load_tasks()
         self.assertTrue(data["no_tool_names_denylist"])
@@ -230,25 +342,58 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
         self.assertIn("Supply the exact parsed committed preregistration.json", source)
 
     def test_builder_checks_use_observed_child_worktree(self):
-        # isolated-builder.md:7/10; harness-defaults.md:89; AA 8.2 builder row.
+        # isolated-builder.md:3,12 at d022295a (#402: no frontmatter isolation;
+        # edits only in the owned checkout its brief names); harness-defaults.md:91;
+        # AA 8.2 builder row. Amendment 2 change 3 adds to the Repair 1 policy only.
         data = load_tasks()
-        expected = {
-            "id": "actual_child_worktree", "identity_sources": ["child_transcript", "meta.json"],
-            "diff_root": "observed_child_worktree", "diff_base": "recorded_child_starting_revision",
-            "include_tracked_and_untracked": True, "starting_revision_must_match_frozen_execution": True,
-            "missing_or_conflicting_identity": "block_grading", "prepared_path_is_proof": False,
-        }
+        policy = data.get("builder_worktree_policy") or {}
+        with self.subTest(field="repair_1_fields_unchanged"):
+            self.assertEqual({key: policy.get(key) for key in REPAIR_1_BUILDER_POLICY},
+                             REPAIR_1_BUILDER_POLICY)
         with self.subTest(field="policy"):
-            self.assertEqual(data.get("builder_worktree_policy"), expected)
+            self.assertEqual(policy, {**REPAIR_1_BUILDER_POLICY, **AMENDMENT_2_BUILDER_POLICY})
         for task in data["tasks"]:
             if task["id"].startswith("seed-builder-"):
                 with self.subTest(task=task["id"]):
                     self.assertEqual(task.get("worktree_check"), "actual_child_worktree")
                 with self.subTest(task=task["id"], field="check_source"):
                     self.assertIn("child transcript and meta.json", task["pass_fail_check"])
+                with self.subTest(task=task["id"], field="brief_binding"):
+                    self.assertIs(task.get("worktree_required"), True)
+                    self.assertIn("<assigned-worktree>", task["task_text"])
         source = (BLUEPRINT / "token-e2e-run.mjs").read_text(encoding="utf-8")
         with self.subTest(field="runner"):
             self.assertIn("pending_independent_readback", source)
+        with self.subTest(field="runner_brief_binding"):
+            self.assertIn("prompt = prompt.replaceAll('<assigned-worktree>', path);", source)
+
+    def test_builder_worktree_text_follows_amendment_2(self):
+        # Amendment 2 change 3: every arm's brief names the prepared path, the
+        # observed edit tree must be that path, and the hooks preflight/restore
+        # and per-tree sentinels stay; the superseded isolation rule is gone.
+        runbook = (BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8")
+        builder = section(runbook, "### Builder worktrees and hooks restoration\n", "\n### ")
+        for phrase in (
+            "Amendment 2 (2026-09-27)", "isolated-builder.md:3,12", "`worktree_paths`",
+            "must be the frozen prepared path", "**[nv]**", "per-tree sentinels",
+            "git config --show-origin --get core.hooksPath",
+            "git config --local --get-all core.hooksPath",
+            "git config --local --unset-all core.hooksPath",
+            'git config --local --add core.hooksPath "${HOOKS_PATH_BEFORE}"',
+            "Never write global/system config.",
+        ):
+            with self.subTest(file="RUNBOOK.md", phrase=phrase):
+                self.assertIn(phrase, builder)
+        with self.subTest(file="RUNBOOK.md", field="superseded_rule"):
+            self.assertNotIn("Keep `isolation: worktree`", builder)
+        readme = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
+        body = readme.partition("## Sealing")[0]
+        for superseded in ("B's `isolation: worktree` may create another tree",
+                           "Keep the role's isolation"):
+            with self.subTest(file="README.md", superseded=superseded):
+                self.assertNotIn(superseded, body)
+        with self.subTest(file="README.md", field="prepared_path"):
+            self.assertIn("require that tree to be the prepared path", body)
 
     def test_reused_table_binds_frozen_pointer_bytes(self):
         # Same retained-input contract as reuse-296-02; #296 /tools/9, #343 /tools/16.
@@ -409,17 +554,39 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
         with self.subTest(field="freeze_timing"):
             self.assertTrue("PR-H freezes M-R1 after PR-A's baseline" in text)
 
+    def test_freeze_records_project_and_user_role_definitions(self):
+        # Amendment 2 change 4: sub-agents "Choose the subagent scope" (project
+        # .claude/agents/ priority 3 outranks user ~/.claude/agents/ priority 4);
+        # #402 added the project-scope copies.
+        runbook = (BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8")
+        freeze = section(runbook, "## Freeze and preflight", "\n## ")
+        for phrase in ("Amendment 2 (2026-09-27)", "`d022295a`", "`.claude/agents/*.md`",
+                       "`~/.claude/agents/*.md`", "`adoption/agents/claude/*.md`", "shadow",
+                       "byte-identical", "read back", "execution HEAD", "blocks capability probes and launch"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, freeze)
+
     def test_sealing_hashes_and_amendment_rule(self):
-        # retrieval-quality-v2/PREREGISTRATION.md Sealing and Amendments.
+        # retrieval-quality-v2/PREREGISTRATION.md Sealing and Amendments: the
+        # Repair 1 seal stays; the Amendment 2 seal holds the current hashes.
         text = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
-        for term in ("## Sealing", "## Amendment 1 (2026-09-26)", "append-only", "never a silent rewrite"):
+        for term in ("## Sealing", "## Amendment 1 (2026-09-26)", "## Amendment 2 (2026-09-27)",
+                     "append-only", "never a silent rewrite"):
             with self.subTest(term=term):
                 self.assertTrue(term in text, term)
-        for filename in ("preregistration.json", "token-e2e-run.mjs", "RUNBOOK.md",
-                         "fixtures/table.json", "fixtures/events.jsonl"):
+        repair_1 = section(text, "## Sealing", "## Amendment 1 (2026-09-26)")
+        for filename, row in zip(SEALED_FILES, REPAIR_1_SEAL_ROWS):
+            with self.subTest(seal="repair_1", file=filename):
+                self.assertTrue(row in repair_1, filename)
+        amendment_2 = section(text, "## Amendment 2 (2026-09-27)", "\n## ")
+        for filename in SEALED_FILES:
             digest = hashlib.sha256((BLUEPRINT / filename).read_bytes()).hexdigest()
-            with self.subTest(file=filename):
-                self.assertTrue(f"| `{filename}` | `{digest}` |" in text, filename)
+            with self.subTest(seal="amendment_2", file=filename):
+                self.assertTrue(f"| `{filename}` | `{digest}` |" in amendment_2, filename)
+        for term in ("`c7b78854`", "2026-09-27T06:39:20Z", "`d022295a`", "2026-09-27T14:04:25Z",
+                     "no result was observed"):
+            with self.subTest(field="chronology", term=term):
+                self.assertIn(term, amendment_2)
 
 
 if __name__ == "__main__":

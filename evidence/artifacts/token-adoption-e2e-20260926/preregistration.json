@@ -269,7 +269,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "stack-verifier",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -1824,7 +1824,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "stack-verifier",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -1890,7 +1890,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "stack-verifier",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -1956,7 +1956,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "stack-verifier",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -2022,7 +2022,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "stack-verifier",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -2088,7 +2088,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "stack-verifier",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -2203,7 +2203,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "isolated-builder",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -2232,7 +2232,7 @@
       "actor": "child",
       "dispatch": "workflow",
       "role": "isolated-builder",
-      "model": "sonnet",
+      "model": "opus",
       "effort": "max",
       "arms": [
         "B",
@@ -3191,7 +3191,14 @@
     "include_tracked_and_untracked": true,
     "starting_revision_must_match_frozen_execution": true,
     "missing_or_conflicting_identity": "block_grading",
-    "prepared_path_is_proof": false
+    "prepared_path_is_proof": false,
+    "brief_binding": "worktree_paths",
+    "harness_created_tree_expected": false,
+    "observed_child_worktree_must_equal_prepared_path": true,
+    "observed_worktree_other_than_prepared_path": "conflicting_identity",
+    "hooks_preflight_and_restore_required": true,
+    "per_tree_sentinel_checks_required": true,
+    "amended_by": "Amendment 2 (2026-09-27)"
   },
   "codex_role_exclusions": {
     "source-scout": "Claude-only role lane (adoption/agents/claude/source-scout.md); shared Codex information needs run as exec tasks under the arm's profile, never as a Codex source-scout agent.",
