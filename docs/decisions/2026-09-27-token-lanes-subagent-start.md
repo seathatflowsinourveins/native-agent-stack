@@ -337,3 +337,54 @@ list includes WebSearch and `ctx_fetch_and_index` and excludes WebFetch. The
 existing option. Revisit containment if M5 remains above its target; merely
 delivering the text cannot close it. No after-change native workflow run, live
 installation, provider usage or token savings is claimed here.
+
+## Addendum 2026-09-27: qmd scope in the carrier
+
+**Need.** The named QMD index `native-agent-stack-catalog` gained two collections on the workstation on
+2026-09-27: `foundation-docs` (docs/, with `ecosystem/**` ignored because it holds the generated guide) and
+`foundation-adoption` (adoption/). The token E2E session's E1 task needed `adoption/update.md`, which neither
+us-equities collection contains. A QMD MCP server reads its default collection list once, when it is created
+([qmd v2.8.3 `src/mcp/server.ts` L189](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L189)), and a `query` without `collections` searches only that list
+([L355](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L355)). An explicit filter ([L330](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L330)) reaches collections added later. On 2026-09-27 a lexical
+`query` with `collections: ["foundation-adoption"]` and `rerank: false`, sent through this workstation's QMD MCP
+server, returned `foundation-adoption/update.md` as its top hit. That server's start-up instructions still listed
+only the two us-equities collections and 121 documents.
+
+**Change.** The carrier's QMD line now reads: "Use qmd query with collections (foundation-docs,
+foundation-adoption, us-equities-foundation, us-equities-catalog), then get a line window." The window follows the
+query tool's own recipe, `get(file, fromLine = max(1, line - 20), maxLines = 80, lineNumbers = true)`
+([L257](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L257); `get` parameters at [L412-413](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L412-L413)). It is a bounded read, like Read with an offset
+and a limit, not a lossless transform, and line numbers stay on for `file:line` citations. The handbook mirror and
+its sources line changed with it. The portable setup in
+[native-workflows.md](../../catalogs/us-equities/native-workflows.md#use-the-catalog-without-loading-all-of-it) and
+[adoption/update.md](../../adoption/update.md#refresh-only-adopted-retrieval) now creates the two foundation
+collections, so the four names resolve on any host that follows it.
+
+**Size.** The block measures **4,094 UTF-8 bytes**, within the existing **4,100-byte** bound, which does not
+move. Relative to the 4,051-byte block:
+
+| Change | Additional UTF-8 bytes |
+| --- | ---: |
+| Four collection names and the explicit `collections` wording | 29 |
+| "a line window" | 14 |
+| Total | 43 |
+
+**Alternatives rejected.**
+- Keep the two-collection line and restart every QMD MCP server after a collection change. A server's default
+  list is fixed at creation, and long-lived sessions on any host would silently search the old scope.
+- Look up collections with the `status` tool before each search. That adds a call to every task; keep it for
+  troubleshooting.
+- `lineNumbers:false` on `get` and `multi_get` with `maxLines`, from an unmerged first build of this change. The
+  independent review found three problems: `multi_get` is outside the carrier's single ToolSearch list and the
+  `stack-researcher` grant; `maxLines` truncates each file although the first build called it lossless; and those
+  two items pushed the block to 4,152 bytes and the bound to 4,200 without a measured need. Line numbers also
+  serve `file:line` citations. All were withdrawn.
+
+**Overturn.** Revisit if QMD refreshes its default collection list per call (an upstream change at L189 or L355),
+if the index's collections change, or if a measured child run shows the four-name scope missing documents that a
+`status` lookup would have found.
+
+**#381.** The carrier hash changes. #381 freezes carrier and skill hashes at execution
+([sources, boundaries and freeze, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#sources-boundaries-and-freeze)),
+so its run records the installed hash and install time. No other carrier rule changed, and no child run with this
+block is claimed.
