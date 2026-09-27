@@ -76,7 +76,7 @@ documents these fields:
 | `claude_code.api_request`, attribute `event.name="api_request"` | `cost_usd` is estimated USD cost; `input_tokens`, `output_tokens`, `cache_read_tokens` and `cache_creation_tokens` report request usage. |
 | `claude_code.tool_result` / `claude_code.tool_decision`, attributes `event.name="tool_result"` / `"tool_decision"` | `tool_use_id` identifies the invocation and matches hooks. A rejected tool call has a decision event and no result event. |
 | Workflow agents and their descendants, since Claude Code 2.1.202 | `workflow.run_id` is emitted on their API/tool events and starts with `wf_`. It is absent on other events. |
-| Caller-supplied `OTEL_RESOURCE_ATTRIBUTES` | The resource block carries custom attributes. `ecosystem.task.id` is this repository's run key, supplied by the launcher; it is not a built-in Claude event field. |
+| Caller-supplied `OTEL_RESOURCE_ATTRIBUTES` | Custom keys go in the OTLP resource block and are also attached as "attributes on every metric datapoint and event record" ([Multi-team organization support](https://code.claude.com/docs/en/monitoring-usage#multi-team-organization-support)). `ecosystem.task.id` is this repository's launcher-supplied run key; both log copies map to `ecosystem_task_id` in Loki. `transform/privacy` drops the datapoint copy and the metric resource copy. |
 
 The [E2E RUNBOOK](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md#loki-queries-and-reconciliation--aa-7-84-steps-67)
 exports `ecosystem.task.id=<run>` and uses the distinct Workflow identifiers
@@ -98,6 +98,13 @@ underscores. Use pipeline filters, for example:
 {service_name="claude-code"} | ecosystem_task_id="<run>" | session_id="<session>" | tool_use_id="<tool-invocation>"
 ```
 
+For whole-run views that include `<run>.<arm>.<task>.<attempt>` values, use
+Loki's [regex label filter](https://grafana.com/docs/loki/latest/query/log_queries/#label-filter-expression)
+`ecosystem_task_id=~"<run>(\\..+)?"`; escape any regex metacharacters in the
+actual run token. Keep exact matches for single-arm values or the shared run
+value plus a Workflow ID, as above. Equality on `<run>` alone excludes suffixed
+values and undercounts the whole run.
+
 These filters select metadata; the scrubbed body cannot supply it through
 `| json`. Retained identities remain private. Metrics keep their existing
 writer identity and gain no run, tool-invocation or cost labels. `cost_usd`
@@ -110,18 +117,46 @@ The always-on allowlist regression fails if either required field is dropped.
 With PyYAML and the documented Collector **0.161.0** and Loki **3.7.8** binaries,
 the native test sends synthetic OTLP records through the committed logs
 processors and exporters to isolated loopback services. It checks workflow arm
-token sums, resource-only run correlation, session/tool joins, string/numeric/zero
-costs, absent values, content removal and the actual indexed series through
+token sums, matching resource/event copies of the run key, whole-run prefix and
+single-arm queries, session/tool joins, string/numeric/zero costs, absent values,
+Codex argument removal and retained measurement metadata, and indexed series through
 Loki's [query and series APIs](https://grafana.com/docs/loki/latest/reference/loki-http-api/).
 Those native checks skip when their optional dependencies are absent.
 This is **local integration with synthetic fixtures**; it is not a new provider
 run, an unchanged upstream test suite or proof of deployment on the active host.
 
-Dated clarification of the historical RUNBOOK's #364 paragraph: the unit's
-starting configuration already kept `workflow.run_id` and the resource run
-key; `tool_use_id` and `cost_usd` were still missing. That paragraph describes
-an earlier inspected revision and is left intact. No historical receipt or
-Codex `env`/`call_id` residual is changed by this Claude-specific correction.
+**Dated clarification, 2026-09-27:** base `ec27a300` already kept the resource
+run key and `workflow.run_id` (added in #366, `a464d288`, after #364 merged at
+`c71d66d0`); `tool_use_id` and `cost_usd` were still missing. The historical
+RUNBOOK's opening "four merge gates" paragraph, its "Check delivery and
+exporter flushes" paragraph under [Loki queries and reconciliation](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md#loki-queries-and-reconciliation--aa-7-84-steps-67),
+and the [E2E README's #364 dependency row](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#merge-before-run-dependencies-and-unverified-boundaries)
+describe earlier inspected revisions. Each now carries a dated update; their
+original statements remain historical evidence. Host delivery/flush proof and
+Codex `env`/`call_id` reconciliation remain outstanding.
+
+On a host already running the profile, `apply.sh` [leaves log_statements unchanged](../../evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py#L116);
+install the reviewed `collector.yaml` using the [installation recipe above](#native-collector-profile),
+validate it, then restart the user service with `systemctl --user restart ecosystem-otelcol.service`,
+following [#366's byte-identical deployment](../../evidence/artifacts/tool-invoke-rates-20260926/README.md);
+prove delivery and flushes afterward.
+
+Codex **rust-v0.157.1** logs full `arguments` in
+[`tool_result.rs:55-79`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/tool_result.rs#L55);
+`[otel.tool_result] max_bytes=0` limits only the output preview
+([line 94](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/tool_result.rs#L94)).
+The privacy transform explicitly deletes `arguments` as well as excluding it
+from `keep_keys`, after the existing tool-name extraction/content removal.
+It keeps `tool_name`, `tool_namespace`, duration, success, correlation fields,
+`output_truncated` and any supplied `arguments_length`, `output_length` and
+`output_line_count`. Those three sizes belong to upstream's trace branch
+([log/trace split](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/events/shared.rs#L59));
+this logs-only profile does not synthesize them or claim Codex logs emit them.
+The existing guarded mapping of native `mcp_server` to `mcp_server.name` becomes
+`mcp_server_name` in Loki. Use `tool_namespace="mcp__context_mode"` for Codex
+context-mode invoke-rate queries, including calls with absent server metadata;
+the [direct/code-mode source paths](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/call_trace.rs#L38)
+are distinct. No live host privacy acceptance is inferred from fixture results.
 
 ## Writer identity and counter integrity
 
