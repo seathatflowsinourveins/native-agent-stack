@@ -172,15 +172,31 @@ record](2026-09-27-claude-harness-settings.md), item 1). The label now reads "Op
 **Decision.** Keep the b11057 pin. The [workstation refresh record](2026-09-25-workstation-sota-refresh.md#llamacpp-b11146-v050)
 recorded b11146 "not qualified" and set the re-pin gate: a paired acceptance in an owned window, with a freshly
 installed b11057 baseline, fixtures, throughput within 0.90x and placement with `--fit off`, which needs the
-production generation unit stopped. That acceptance has not run. The later receipts show this host serving b11146 and
+production generation unit stopped. That acceptance has not run: on 2026-09-27 `origin/main` (`c8362c02`) held no
+llama.cpp receipt dated after 2026-09-26 and still pinned b11057. The later receipts show this host serving b11146 and
 the li26 experiment running on it: `nativestack-5975wx-20260925--llama-cpp--install--20260926`,
 `nativestack-5975wx-20260925--llama-cpp--install--20260926-2`, `nativestack-5975wx-20260925--llama-cpp--use--20260926`
-and `local-inference-c2-serving-switch-20260926`. They carry only self reviews, compare against no b11057 baseline,
-and each states that it does not rebind the pin.
+and `local-inference-c2-serving-switch-20260926`.
 
-**Qualification needed.** The paired acceptance of the 2026-09-25 record in an owned window, and an independent
-review of the host receipts above. Then re-pin `llama-cpp` to b11146, which is `v0.5.0` (commit `7fe450e1`), in a
-hot-file commit. Builds from b11183 on carry a decode-path rewrite and are the next candidates against that baseline.
+**Review status of those receipts** (their `reviews` and `limitations` fields, read 2026-09-27):
+- Each of the three host receipts carries the recorder's self review and an `independent_session` review from the
+  li26 results PR (#342). The first install receipt's independent verdict is `needs_changes`; `-2` supersedes it,
+  because the first generation's verify-arms call ran without `-B`. The independent verdict on `-2` and on the use
+  receipt is `agree`.
+- `local-inference-c2-serving-switch-20260926` has no `reviews` field. Its `limitations[4]` sentence that the host
+  receipts "carry only self reviews" was recorded at 2026-09-26T12:43:24Z, before the independent reviews (12:57:39Z
+  and 13:02:09Z), and is stale. So is each host receipt's own limitation that it "carries only the recorder's self
+  review".
+- The decision does not rest on review status. Each independent `agree` accepts its receipt's scoped claim, that
+  b11146 is installed and serving, and each receipt states that it does not rebind the pin. None compares against a
+  b11057 baseline, and li26 cannot supply one:
+  [`eval_arm.py`](../../blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py) (lines 114-116)
+  refuses a plan unless every arm names the b11146 runtime.
+
+**Qualification needed.** The paired acceptance of the 2026-09-25 record in an owned window, against a freshly
+installed b11057 baseline, is the remaining gate. Then re-pin `llama-cpp` to b11146, which is `v0.5.0` (commit
+`7fe450e1`), in a hot-file commit. Builds from b11183 on carry a decode-path rewrite and are the next candidates
+against that baseline.
 
 ## Evidence
 
@@ -194,6 +210,9 @@ hot-file commit. Builds from b11183 on carry a decode-path rewrite and are the n
 | The template carries a Fable advisor that pairs with its main model | `structural_validation`, failing-first | `test_the_advisor_is_fable_and_accepted_for_the_main_model` failed at `ec8a4892` (`None != 'fable'`) |
 | Foundation decision labels match the agent definitions | `structural_validation`, failing-first | `CheckedInAgentLabelTests` failed at `ec8a4892` (`('sonnet', 'max') != ('opus', 'max')`) |
 | llama.cpp tag identities | independent observation (platform record) | `gh api` `git/ref/tags/b11057`, `b11146`, `v0.5.0`; `git/tags/c13fcbf6`; `releases/latest`, 2026-09-27 |
+| Review status of the 2026-09-26 llama.cpp receipts; no later llama.cpp receipt | `source_review` (repository records) | the `reviews` and `limitations` fields of the three host receipts under `evidence/hosts/nativestack-5975wx-20260925/` and of `evidence/receipts/local-inference-c2-serving-switch-20260926.json`; the tree and `manifests/stack.json` of `origin/main` at `c8362c02`, 2026-09-27 |
+| `deniedModels` exists and is managed-only; that denying the older Opus IDs would stop the fallback to them without disabling the `opus` wildcard is an inference | `source_review` | CHANGELOG at `7779afb1`, lines 6-7; settings reference, `deniedModels`; model-config lines 350, 353, 364 and 517 (Markdown source, fetched 2026-09-27); not probed |
+| The host's `bin/vllm` link points at the 0.30.0 prefix | the coordinator's host observation (no receipt) | repointed 2026-09-27T19:21:18Z; the 0.25.0 prefix is retained and no systemd unit uses the link |
 
 No native run backs the guard or advisor changes: no request was flagged on purpose (deliberately tripping a safety
 classifier is not an acceptable test), and no session was started with the changed files.
@@ -206,16 +225,33 @@ classifier is not an acceptable test), and no session was started with the chang
    setting. It stays as the documented backstop.
 3. **An `availableModels` allowlist.** Rejected for the reasons in the fallback-guard record: excluding older Opus
    versions disables the family wildcard, so the next Opus would stay excluded until the list is edited.
-4. **A workflow-contract check in `test-envelope.mjs`.** Deferred: it would change the portable contract, its
+4. **The `deniedModels` managed setting (Claude Code 2.1.283).** The CHANGELOG at `7779afb1` adds it "to block
+   specific models, even when `availableModels` allows them" (line 7, beside `availableModelsMatch` on line 6).
+   [Model-config](https://code.claude.com/docs/en/model-config#block-specific-models-or-versions) says a blocked
+   model "is treated as a blocked selection everywhere the allowlist applies" (line 364), that "The fallback model is
+   checked against `availableModels`. When it is blocked, no fallback occurs" (line 517), and that a release no entry
+   blocks stays permitted (line 350); the line numbers are the page's Markdown source, fetched 2026-09-27. Inference,
+   since no page says it in one sentence: denying the older Opus IDs would stop the fallback to them without disabling
+   the `opus` wildcard, so the next Opus would stay permitted. The entries must name the minor version,
+   `claude-opus-5-0` and `claude-opus-4-8`: the [settings
+   reference](https://code.claude.com/docs/en/settings-reference#deniedmodels) says `"claude-opus-5"` also blocks
+   Opus 5.5. As the fallback-guard record notes for the allowlist, the docs do not limit the check to the main
+   session; nothing here probed it. Not adopted: the settings reference gives the key "Scope: Managed", and Claude
+   Code "ignores the key in user, project, and local settings and in `--settings`, with a warning". Those are the
+   Claude Code settings files this repository's portable foundation ships or writes (the user-settings template,
+   `.claude/settings.json` and the portable file for `claude --settings`); it writes no managed settings file, and its
+   effort guard only reads one.
+5. **A workflow-contract check in `test-envelope.mjs`.** Deferred: it would change the portable contract, its
    `SHA256SUMS` and every adopter's vendored copy. The Python tests cover this repository's files.
-5. **Advisor `opus`, or no template default.** `opus` is allowed by the user's rule and by the pairing table, but the
+6. **Advisor `opus`, or no template default.** `opus` is allowed by the user's rule and by the pairing table, but the
    user chose Fable 5.1, which Anthropic's overview keeps as the escalation tier. No default leaves new hosts without
    the assigned advisor.
-6. **`advisorModel` in the project settings.** Rejected: it would turn the advisor, and its Fable billing, on for
+7. **`advisorModel` in the project settings.** Rejected: it would turn the advisor, and its Fable billing, on for
    every session in this repository whatever the contributor's plan; `/advisor` itself saves to user settings.
-7. **Re-pin llama.cpp on the 2026-09-26 receipts and li26.** Rejected: they are self-reviewed and do not compare
-   against the b11057 baseline that the re-pin gate requires. Moving to the newest nightly is rejected too: it is
-   unqualified.
+8. **Re-pin llama.cpp on the 2026-09-26 receipts and li26.** Rejected: the current install and use receipts carry
+   independent `agree` reviews, but none compares against the b11057 baseline that the re-pin gate requires, each
+   states that it does not rebind the pin, and li26 ran every arm on b11146. Moving to the newest nightly is rejected
+   too: it is unqualified.
 
 ## Overturn
 
@@ -228,8 +264,11 @@ classifier is not an acceptable test), and no session was started with the chang
   comparison of this host's advisor calls shows Opus 5.5 at max matching Fable 5.1.
 - **Extraction:** a preregistered rerun that scores credits or included usage finds GPT-6 Luna at medium the cheapest
   routable arm.
-- **Guards:** a documented control stops the content-based fallback in subagents without a version-pinned allowlist;
-  or a client release stops reading the variable, or widens the silent-retry lane to other models.
+- **Guards:** a documented control that user, project or `--settings` files can set stops the content-based fallback
+  in subagents without a version-pinned allowlist; or a client release stops reading the variable, or widens the
+  silent-retry lane to other models. Adopting managed settings would make `deniedModels` (alternative 4, with
+  `claude-opus-5-0` and `claude-opus-4-8`) the preferred guard on that host, with `requiredMinimumVersion` set because
+  earlier clients ignore the key (model-config line 353).
 - **Holds and the llama.cpp pin:** the gates above.
 
 ## Unresolved
@@ -245,9 +284,14 @@ classifier is not an acceptable test), and no session was started with the chang
 - Release dates not confirmed: `gpt-reserve`, `codex-auto-review`, GPT-6 Pro in ChatGPT and
   `tobil/qmd-query-expansion-1.7B-gguf`, and most in-window Hugging Face models, which carry only repository creation
   dates.
-- Workstation boundaries: the host's `bin/vllm` link still points at the 0.25.0 prefix while production runs 0.30.0;
-  FP8 or INT8 serving of the 4B and 8B embedders on Ada in vLLM 0.30.0, GGUF rank-pooling of Qwen3-Reranker-4B and
-  mxbai-rerank-large-v2, and the Qwen3.8-27B derivatives are unmeasured.
+- Workstation boundaries: FP8 or INT8 serving of the 4B and 8B embedders on Ada in vLLM 0.30.0, GGUF rank-pooling of
+  Qwen3-Reranker-4B and mxbai-rerank-large-v2, and the Qwen3.8-27B derivatives are unmeasured. The [refresh
+  record's](2026-09-25-workstation-sota-refresh.md#qmd-283-qdrant-1191-ccusage-20024-worktrunk-0790-vllm-0300)
+  `bin/vllm` follow-up is closed on this host: the link now points at the 0.30.0 prefix (repointed
+  2026-09-27T19:21:18Z), the 0.25.0 prefix is retained and no systemd unit uses the link (the coordinator's host
+  observation).
+- The three 2026-09-26 llama.cpp host receipts and the serving-switch receipt keep their stale limitation sentences
+  about self reviews ([above](#llamacpp-pin-a-recorded-divergence-not-a-re-pin)); this change edits no receipt.
 - Other hosts, such as the Mac, need their own alias-resolution check.
 
 ## Limitations
