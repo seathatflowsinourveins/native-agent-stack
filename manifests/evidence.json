@@ -38523,8 +38523,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "a03eeb6da28ed50f1c841e0d7a553de7cb424c65c09d42994e36002d14a437de",
-      "bytes": 22717
+      "sha256": "17266f1faa2e2ad4b812422a84fc72dc1ee819a5a29c5149adb0ba97b9c8a2cc",
+      "bytes": 30784
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -38543,8 +38543,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "ff229df907411215341a578ff58a4d27783084e2c84248ed9f77454813b89ea8",
-      "bytes": 22426
+      "sha256": "42100c725cc43e0a5a137b7b33e269c1153f01ccb04ebe5ae9eb3b728d0aad91",
+      "bytes": 23677
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -39560,6 +39560,11 @@
       "path": "tests/test_observability_backends_alerts.py",
       "sha256": "944fb543cbb1ba5025a4d1df2a4ffd84a3323f3f67b591bb83a8bdd796fc1a0e",
       "bytes": 16142
+    },
+    {
+      "path": "tests/test_observability_run_correlation.py",
+      "sha256": "821cfe19fadd589a51098d188426780895479ec4c8af009a533b98f3bd849d79",
+      "bytes": 21207
     },
     {
       "path": "tests/test_observability_tool_names.py",
