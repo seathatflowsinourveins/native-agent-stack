@@ -1,0 +1,678 @@
+{
+  "schema_version": 1,
+  "kind": "token_lanes_subagent_start_probe",
+  "host_id": "nativestack-5975wx-20260925",
+  "evidence_class": "local_integration",
+  "evidence_class_note": "A native Claude Code operation on this host through this repository's integration: the SubagentStart hook, run by Claude Code 2.1.283, for Agent-tool subagents. It is not native_proven for Workflow children, because no Workflow subagent ran, and it measures no lane use, compliance or savings.",
+  "question": "Does the SubagentStart token-lanes hook put the block into a non-blind subagent's context, and keep it out of a blind one's; and how does RTK 0.50.0's Claude hook rewrite each Bash shape the block describes?",
+  "catalog_base_revision": "34c56340e636ad3d3daeb8482d48d1d8f0b135ae",
+  "files_under_test": {
+    "note": "The probe ran the carrier's working files before they were committed; these digests identify the exact bytes, which this change commits unchanged. hook_stdout_bytes is the hook's output for a non-blind subagent recomputed from the committed files; the v2-positive child transcript recorded the same byte count.",
+    "files": [
+      {
+        "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
+        "sha256": "7a9228e41235771336189287944d81d998795b025a9a038d022beb21a19ce870",
+        "bytes": 1162
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.md",
+        "sha256": "8b9a60fa425900930c610ba7e3e0f8a0fa1457048a39c79e3136fb5073e7269f",
+        "bytes": 3159
+      }
+    ],
+    "hook_stdout_bytes": 3258
+  },
+  "probe": {
+    "method": "One `claude -p` session per run in this repository's main checkout. The main session launched one Haiku subagent through the Agent tool and relayed its reply verbatim. Positive runs added the settings file below; negative runs used only the host's live settings, whose SubagentStart group runs ai-memory and not this hook. The child transcript was then inspected directly for the block's first-line marker and the SubagentStart hook entries.",
+    "argv": [
+      "timeout",
+      "300",
+      "claude",
+      "-p",
+      "--output-format",
+      "json",
+      "[--settings <scratch>/probe-settings.json]",
+      "<prompt>"
+    ],
+    "stdin": "/dev/null",
+    "cwd": "<main checkout of this repository>",
+    "settings_file": {
+      "hooks": {
+        "SubagentStart": [
+          {
+            "matcher": "",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "python3 \"<worktree>/adoption/hooks/claude/token-lanes-subagent-start.py\"",
+                "timeout": 5
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "settings_note": "The template runs the same script with `2>/dev/null || true` appended; the probe settings do not.",
+    "prompts": {
+      "v1": "Use the Agent tool exactly once to launch one subagent with subagent_type \"general-purpose\" and model \"haiku\". Do not use any other tool yourself, and do not answer from your own context. Give that subagent exactly this task, verbatim, and tell it to use no tools:\n\n\"Without calling any tool, look only at the context and instructions already present in your own prompt for this turn. Does that context contain a block of text whose first line starts with the exact words TOKEN LANES? Answer with a single line: YES or NO. If YES, add a second line quoting the first 60 characters of that block exactly, character for character, in quotes.\"\n\nAfter the subagent replies, return its two lines back to me verbatim and nothing else.",
+      "v2": "Use the Agent tool exactly once to launch one subagent with subagent_type \"general-purpose\" and model \"haiku\". Do not use any other tool yourself, and do not answer from your own context. Give that subagent exactly this task, verbatim, and tell it to use no tools:\n\n\"Without calling any tool, look through everything already in your context for this turn other than this task message itself, including any system reminders or hook-provided context. Is there any text there that contains the phrase TOKEN LANES? Answer FOUND or NOT FOUND on the first line. If FOUND, on the second line quote exactly the 60 characters that begin with TOKEN LANES, character for character, in quotes.\"\n\nAfter the subagent replies, return its reply back to me verbatim and nothing else."
+    },
+    "prompt_v2_blind": "prompt v2 with subagent_type \"general-purpose\" replaced by \"blind-judge\"",
+    "transcript_marker": "TOKEN LANES (source:",
+    "runs": [
+      {
+        "id": "v1-negative",
+        "design": "v1",
+        "arm": "negative",
+        "hook_configured": false,
+        "child_subagent_type": "general-purpose",
+        "start": "2026-09-27T02:37:40Z",
+        "end": "2026-09-27T02:38:02Z",
+        "exit": 0,
+        "event_timestamps_within_window": true,
+        "claude_code_version": "2.1.283",
+        "main_model": "claude-opus-5-5[1m]",
+        "num_turns": 2,
+        "is_error": false,
+        "duration_ms": 18821,
+        "returned_result": "NO",
+        "child_transcript": {
+          "entries_with_block_marker": 0,
+          "marker_entry_kinds": [],
+          "subagentstart_additional_context_attachments": 0,
+          "subagentstart_hook_success_entries": [
+            {
+              "hook": "ai-memory",
+              "exit": 0,
+              "stdout_bytes": 3
+            }
+          ],
+          "context_rendering": "announced"
+        },
+        "usage": {
+          "claude-opus-5-5[1m]": {
+            "inputTokens": 4,
+            "outputTokens": 469,
+            "cacheReadInputTokens": 51726,
+            "cacheCreationInputTokens": 32413,
+            "costUSD": 0.279045
+          },
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 10,
+            "outputTokens": 974,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 19633,
+            "costUSD": 0.029421
+          }
+        }
+      },
+      {
+        "id": "v1-positive",
+        "design": "v1",
+        "arm": "positive",
+        "hook_configured": true,
+        "child_subagent_type": "general-purpose",
+        "start": "2026-09-27T02:49:08Z",
+        "end": "2026-09-27T02:49:28Z",
+        "exit": 0,
+        "event_timestamps_within_window": true,
+        "claude_code_version": "2.1.283",
+        "main_model": "claude-opus-5-5[1m]",
+        "num_turns": 2,
+        "is_error": false,
+        "duration_ms": 17632,
+        "returned_result": "NO",
+        "child_transcript": {
+          "entries_with_block_marker": 2,
+          "marker_entry_kinds": [
+            "attachment:hook_additional_context",
+            "attachment:hook_success"
+          ],
+          "subagentstart_additional_context_attachments": 1,
+          "subagentstart_hook_success_entries": [
+            {
+              "hook": "ai-memory",
+              "exit": 0,
+              "stdout_bytes": 3
+            },
+            {
+              "hook": "token-lanes",
+              "exit": 0,
+              "stdout_bytes": 3258
+            }
+          ],
+          "context_rendering": "announced"
+        },
+        "usage": {
+          "claude-opus-5-5[1m]": {
+            "inputTokens": 4,
+            "outputTokens": 423,
+            "cacheReadInputTokens": 52922,
+            "cacheCreationInputTokens": 30229,
+            "costUSD": 0.260892
+          },
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 10,
+            "outputTokens": 1046,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 20452,
+            "costUSD": 0.030805
+          }
+        }
+      },
+      {
+        "id": "v2-negative",
+        "design": "v2",
+        "arm": "negative",
+        "hook_configured": false,
+        "child_subagent_type": "general-purpose",
+        "start": "2026-09-27T02:50:39Z",
+        "end": "2026-09-27T02:50:57Z",
+        "exit": 0,
+        "event_timestamps_within_window": true,
+        "claude_code_version": "2.1.283",
+        "main_model": "claude-opus-5-5[1m]",
+        "num_turns": 2,
+        "is_error": false,
+        "duration_ms": 15008,
+        "returned_result": "NOT FOUND",
+        "child_transcript": {
+          "entries_with_block_marker": 0,
+          "marker_entry_kinds": [],
+          "subagentstart_additional_context_attachments": 0,
+          "subagentstart_hook_success_entries": [
+            {
+              "hook": "ai-memory",
+              "exit": 0,
+              "stdout_bytes": 3
+            }
+          ],
+          "context_rendering": "announced"
+        },
+        "usage": {
+          "claude-opus-5-5[1m]": {
+            "inputTokens": 4,
+            "outputTokens": 455,
+            "cacheReadInputTokens": 52940,
+            "cacheCreationInputTokens": 30278,
+            "costUSD": 0.261928
+          },
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 10,
+            "outputTokens": 610,
+            "cacheReadInputTokens": 7333,
+            "cacheCreationInputTokens": 12302,
+            "costUSD": 0.019171
+          }
+        }
+      },
+      {
+        "id": "v2-positive",
+        "design": "v2",
+        "arm": "positive",
+        "hook_configured": true,
+        "child_subagent_type": "general-purpose",
+        "start": "2026-09-27T02:50:57Z",
+        "end": "2026-09-27T02:51:16Z",
+        "exit": 0,
+        "event_timestamps_within_window": true,
+        "claude_code_version": "2.1.283",
+        "main_model": "claude-opus-5-5[1m]",
+        "num_turns": 2,
+        "is_error": false,
+        "duration_ms": 16744,
+        "returned_result": "FOUND\n\"TOKEN LANES (source: docs/token-session-handbook.md, \"Token \"",
+        "child_transcript": {
+          "entries_with_block_marker": 3,
+          "marker_entry_kinds": [
+            "assistant message",
+            "attachment:hook_additional_context",
+            "attachment:hook_success"
+          ],
+          "subagentstart_additional_context_attachments": 1,
+          "subagentstart_hook_success_entries": [
+            {
+              "hook": "ai-memory",
+              "exit": 0,
+              "stdout_bytes": 3
+            },
+            {
+              "hook": "token-lanes",
+              "exit": 0,
+              "stdout_bytes": 3258
+            }
+          ],
+          "context_rendering": "announced"
+        },
+        "usage": {
+          "claude-opus-5-5[1m]": {
+            "inputTokens": 4,
+            "outputTokens": 488,
+            "cacheReadInputTokens": 52938,
+            "cacheCreationInputTokens": 30306,
+            "costUSD": 0.262812
+          },
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 10,
+            "outputTokens": 1091,
+            "cacheReadInputTokens": 7333,
+            "cacheCreationInputTokens": 13127,
+            "costUSD": 0.022607
+          }
+        },
+        "quote_matches_block_first_60_chars": true
+      },
+      {
+        "id": "v2-blind-control",
+        "design": "v2-blind",
+        "arm": "positive",
+        "hook_configured": true,
+        "child_subagent_type": "blind-judge",
+        "start": "2026-09-27T02:52:25Z",
+        "end": "2026-09-27T02:52:43Z",
+        "exit": 0,
+        "event_timestamps_within_window": true,
+        "claude_code_version": "2.1.283",
+        "main_model": "claude-opus-5-5[1m]",
+        "num_turns": 2,
+        "is_error": false,
+        "duration_ms": 15424,
+        "returned_result": "NOT FOUND",
+        "child_transcript": {
+          "entries_with_block_marker": 0,
+          "marker_entry_kinds": [],
+          "subagentstart_additional_context_attachments": 0,
+          "subagentstart_hook_success_entries": [
+            {
+              "hook": "ai-memory",
+              "exit": 0,
+              "stdout_bytes": 3
+            }
+          ],
+          "context_rendering": "announced"
+        },
+        "usage": {
+          "claude-opus-5-5[1m]": {
+            "inputTokens": 4,
+            "outputTokens": 509,
+            "cacheReadInputTokens": 52940,
+            "cacheCreationInputTokens": 30332,
+            "costUSD": 0.26344
+          },
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 10,
+            "outputTokens": 569,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 4689,
+            "costUSD": 0.008716
+          }
+        }
+      }
+    ],
+    "usage_total": {
+      "claude-opus-5-5[1m]": {
+        "inputTokens": 20,
+        "outputTokens": 2344,
+        "cacheReadInputTokens": 263466,
+        "cacheCreationInputTokens": 153558,
+        "costUSD": 1.328117
+      },
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 50,
+        "outputTokens": 4290,
+        "cacheReadInputTokens": 14666,
+        "cacheCreationInputTokens": 70203,
+        "costUSD": 0.11072
+      }
+    },
+    "cost_usd_total_cli_reported": 1.4388,
+    "cost_note": "costUSD as reported by the CLI's modelUsage, for all five runs including the failed v1 design."
+  },
+  "rtk_hook_check": {
+    "rtk_version": "rtk 0.50.0",
+    "window_utc": {
+      "start": "2026-09-27T03:28:14Z",
+      "end": "2026-09-27T03:28:15Z"
+    },
+    "method": "Each input through `rtk hook check -- <input>` (dry run) and through `rtk hook claude` with a Claude PreToolUse Bash payload on stdin (cwd /tmp, payload cwd /tmp), the processor the Claude settings template runs. Neither executes the input. The same cases were first observed between 02:28Z and 02:46Z; this run is the retained one.",
+    "cases": [
+      {
+        "label": "single supported command",
+        "input": "git status",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git status\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git status"
+        }
+      },
+      {
+        "label": "and-chain",
+        "input": "git status && git log -n 3",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git status && rtk git log -n 3\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git status && rtk git log -n 3"
+        }
+      },
+      {
+        "label": "multi-line, two supported lines",
+        "input": "git status\ngit log -n 3",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git status\nrtk git log -n 3\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git status\nrtk git log -n 3"
+        }
+      },
+      {
+        "label": "multi-line, two supported lines",
+        "input": "git status\ngit diff --stat",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git status\nrtk git diff --stat\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git status\nrtk git diff --stat"
+        }
+      },
+      {
+        "label": "multi-line, supported then echo",
+        "input": "git status\necho done",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git status\necho done\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git status\necho done"
+        }
+      },
+      {
+        "label": "multi-line, cd then supported",
+        "input": "cd /tmp\ngit status",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "cd /tmp\nrtk git status\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "cd /tmp\nrtk git status"
+        }
+      },
+      {
+        "label": "multi-line, three supported lines",
+        "input": "git status\ngit diff\nls -la",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git status\nrtk git diff\nrtk ls -la\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git status\nrtk git diff\nrtk ls -la"
+        }
+      },
+      {
+        "label": "pipeline, producer feeding head",
+        "input": "git diff | head -n 5",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "rtk git diff | head -n 5\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "rtk git diff | head -n 5"
+        }
+      },
+      {
+        "label": "pipeline, final grep stage",
+        "input": "git log -n 20 | grep fix",
+        "rtk_hook_check": {
+          "exit": 0,
+          "stdout": "git log -n 20 | rtk grep fix\n",
+          "stderr": ""
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": "git log -n 20 | rtk grep fix"
+        }
+      },
+      {
+        "label": "pipeline, gh producer",
+        "input": "gh pr view 1 | head -n 5",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: gh pr view 1 | head -n 5\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "command substitution",
+        "input": "echo $(git status)",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: echo $(git status)\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "backticks",
+        "input": "echo `git status`",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: echo `git status`\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "process substitution",
+        "input": "diff <(git status) <(git status)",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: diff <(git status) <(git status)\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "redirect to a file",
+        "input": "git status > /tmp/x.txt",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: git status > /tmp/x.txt\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "heredoc",
+        "input": "cat <<EOF\nhi\nEOF",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: cat <<EOF\nhi\nEOF\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "multi-line with $(...) on one line",
+        "input": "git status\necho $(git log -n 1)",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: git status\necho $(git log -n 1)\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      },
+      {
+        "label": "multi-line echo only (no RTK rule)",
+        "input": "echo a\necho b",
+        "rtk_hook_check": {
+          "exit": 1,
+          "stdout": "",
+          "stderr": "No rewrite for: echo a\necho b\n"
+        },
+        "rtk_hook_claude": {
+          "exit": 0,
+          "updated_command": null
+        }
+      }
+    ]
+  },
+  "retained_failures": [
+    {
+      "id": "v1 probe design",
+      "what": "Prompt v1 asked whether a block whose first line starts with TOKEN LANES was present. Both arms answered NO, although the v1-positive child transcript held the block as a SubagentStart hook_additional_context attachment, so v1 did not discriminate.",
+      "likely_cause": "Claude Code frames attached context (the child's prompt snapshot records contextRendering 'announced'); the child's reasoning was redacted, so the cause is not observed.",
+      "kept": "Reported as a failed design; prompt v2 replaced it."
+    }
+  ],
+  "raw_files_private": {
+    "note": "Raw CLI output and child transcripts stay private on the host (they carry session, agent and tool-use identifiers and local paths). SHA-256 and counts identify them.",
+    "files": [
+      {
+        "role": "v1-negative: claude -p JSON event list",
+        "sha256": "a28abffec3030c4300c4f9b4647c9d01ea216c3d488627bec4d7ba6ae533b731",
+        "bytes": 30638,
+        "events": 11
+      },
+      {
+        "role": "v1-negative: claude -p stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "lines": 0
+      },
+      {
+        "role": "v1-negative: child (subagent) transcript",
+        "sha256": "791030c3444fea5ace2f2cada1d2c1195fda10ff6a663f353afdbe7c39f0788a",
+        "bytes": 152083,
+        "lines": 17
+      },
+      {
+        "role": "v1-positive: claude -p JSON event list",
+        "sha256": "f6f9f4b96b372a68e683c2c79cb40260fb5ceeb3b71087f26c039c37958f916a",
+        "bytes": 30058,
+        "events": 10
+      },
+      {
+        "role": "v1-positive: claude -p stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "lines": 0
+      },
+      {
+        "role": "v1-positive: child (subagent) transcript",
+        "sha256": "2a592e23cdd0bdd0e5ed322f82defbe4bb67681f034f4c8bf35cc6a4b20c7381",
+        "bytes": 164046,
+        "lines": 19
+      },
+      {
+        "role": "v2-negative: claude -p JSON event list",
+        "sha256": "16919692c17e8d567c9b6374b51a5c18f8dcfb182dafceda2e4bfe570a8ae8fe",
+        "bytes": 30420,
+        "events": 10
+      },
+      {
+        "role": "v2-negative: claude -p stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "lines": 0
+      },
+      {
+        "role": "v2-negative: child (subagent) transcript",
+        "sha256": "64cfcedef73286dfe852afce71740d099499b1e85989df8d06814d871101c747",
+        "bytes": 150651,
+        "lines": 17
+      },
+      {
+        "role": "v2-positive: claude -p JSON event list",
+        "sha256": "da6815bbd5f87844cd47b5fdff6c27e8a565c09b2ec7784e135e1dae92015cc1",
+        "bytes": 30988,
+        "events": 11
+      },
+      {
+        "role": "v2-positive: claude -p stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "lines": 0
+      },
+      {
+        "role": "v2-positive: child (subagent) transcript",
+        "sha256": "7ec4011137ec4aeaf1678e2b0f578444041983a20d90c608a1a60aa0e7154669",
+        "bytes": 161851,
+        "lines": 19
+      },
+      {
+        "role": "v2-blind-control: claude -p JSON event list",
+        "sha256": "44fadb3169984e1b7980ae499c671d96a0f1c4c6a7177ec33f0b1256ed8ec579",
+        "bytes": 30685,
+        "events": 10
+      },
+      {
+        "role": "v2-blind-control: claude -p stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "lines": 0
+      },
+      {
+        "role": "v2-blind-control: child (subagent) transcript",
+        "sha256": "437eaed3bcc7754b4fb27ed32559f066004d5bb733aa4d363efd672e9fa274f3",
+        "bytes": 31953,
+        "lines": 13
+      },
+      {
+        "role": "RTK capture: rtk_capture.py output",
+        "sha256": "0b4b124dbe91dbeec8e494c91cd054b8c5b6b016a7b913cfd27a9d134e48e6b7",
+        "bytes": 8201,
+        "lines": 261
+      }
+    ]
+  },
+  "sanitization": [
+    "Session, agent and tool-use identifiers are omitted.",
+    "Absolute scratch and worktree paths are replaced by <scratch> and <worktree>; the working directory is described.",
+    "Hook commands inside transcripts are reduced to the hook's name (token-lanes or ai-memory).",
+    "No raw transcript text is published beyond each child's returned reply and the block's first 60 characters."
+  ],
+  "claim_boundary": "One native operation per arm for Agent-tool subagents on one host and client version. It shows SubagentStart delivery of the committed block to a general-purpose child and its absence for a blind-judge child and without the hook. It does not cover Workflow children, other hosts, plugin-scoped agent types, lane use, compliance or token savings."
+}

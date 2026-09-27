@@ -3537,8 +3537,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "eb3c9ecc5fd7d25df5f8f93d845c32238a0a2bab2bb5572aef2eb3cc27ebca72",
-      "bytes": 41767
+      "sha256": "65cd3dcbcf23109bb2aa2d19b30de4fd03c5b306b2d8659f477c6de53b55d8c5",
+      "bytes": 42814
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3552,8 +3552,18 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "94b9c17fc579d0b2b7850fad8a6687854f7de7ff00a2732489c2a9500d5fb7de",
-      "bytes": 200
+      "sha256": "dd640276e81077e115713d03d9b4d389654a3d4708fdfd95fc7cf6b137067f0e",
+      "bytes": 383
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-block.md",
+      "sha256": "8b9a60fa425900930c610ba7e3e0f8a0fa1457048a39c79e3136fb5073e7269f",
+      "bytes": 3159
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
+      "sha256": "7a9228e41235771336189287944d81d998795b025a9a038d022beb21a19ce870",
+      "bytes": 1162
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3697,8 +3707,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "7203ca7f223e2bb28d1e6bce314a647e7bf609b1112a8c9f2dd1f69dbab496a4",
-      "bytes": 9132
+      "sha256": "71fd95769a18bf367addd8e5c705948c84bef950347507ec54e83917edd6afd9",
+      "bytes": 9391
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -13677,6 +13687,11 @@
       "bytes": 7782
     },
     {
+      "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
+      "sha256": "9afeaefcb0915e8de59e6f897702d991da310e82cce233044d20b4d2668493d0",
+      "bytes": 14486
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -13808,8 +13823,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "30c6a0769637d7bde5d7f066aa557b10fd6c571a4bc47ac95ac206d6d660bea9",
-      "bytes": 29153
+      "sha256": "b299b913601e7498a1c540b3c25596a7135e39e8b1dce6b604225d77589deae7",
+      "bytes": 31510
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14048,8 +14063,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "18069130d801ecc9b770b8d1a06be5c1c70f0697cf985495df92b8a195172894",
-      "bytes": 58662
+      "sha256": "45b4c6f9c1d576dad3f4d479c681b354b2590de5c01816b86124635bde492c9f",
+      "bytes": 66836
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -35567,6 +35582,16 @@
       "bytes": 147636
     },
     {
+      "path": "evidence/artifacts/token-lanes-subagent-start-20260927/README.md",
+      "sha256": "42bc254fd84b254520f06d9cb9bbd6460bb8ef301b50bff893467470e0c36834",
+      "bytes": 6655
+    },
+    {
+      "path": "evidence/artifacts/token-lanes-subagent-start-20260927/receipt.json",
+      "sha256": "c575243c1efc5886e1f77895606959016bec808493f5dad3b300b506c2d0038a",
+      "bytes": 24371
+    },
+    {
       "path": "evidence/artifacts/token-workflow-hardening-20260926/README.md",
       "sha256": "9a7cffe2d1b60650995a8de94507b8b7aa38e373b69e547728d937f300677a31",
       "bytes": 12122
@@ -38718,8 +38743,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "9a712defd2f8bd10ef68753cfa39e654b9e5fcbdcc3e3ea1c1d2fa3363329d9f",
-      "bytes": 44586
+      "sha256": "19a55aa2fedfe799507a82c9f8c7cfe7940e425f53bf6afa790f09ad64b4a18c",
+      "bytes": 48391
     },
     {
       "path": "tests/test_install_skills.py",
@@ -39052,6 +39077,11 @@
       "bytes": 6838
     },
     {
+      "path": "tests/test_token_lanes_subagent_start.py",
+      "sha256": "3d16aa8faaba13d38e7d853d1afdb6e4ff6fde8d8dccb6bab85785a2a90f7a78",
+      "bytes": 7147
+    },
+    {
       "path": "tests/test_trading_gates.py",
       "sha256": "10b1ce5b0cec4d3e68d792c83a9ad2b4fcbb70863305b0496961650deb34214f",
       "bytes": 35512
@@ -39130,6 +39160,11 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
+    },
+    {
+      "path": "tools/adoption/install_claude_profile.py",
+      "sha256": "653059217d6e23ef5ea2b6311808f4d67e4d565c6cfdfe73dfe2f2104d8cbed9",
+      "bytes": 14105
     },
     {
       "path": "tools/adoption/install_skills.py",

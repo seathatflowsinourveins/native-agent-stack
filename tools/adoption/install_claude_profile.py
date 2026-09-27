@@ -4,7 +4,9 @@
   guard   -- sha256-checked copies of the user-scope hooks to ~/.claude/hooks/:
              adoption/hooks/claude/effort-default-guard.py (effort self-heal) and
              scripts/hooks/secret_path_guard.py (PreToolUse Bash secret guard;
-             the same file the project .claude/settings.json runs)
+             the same file the project .claude/settings.json runs), plus
+             token-lanes-subagent-start.py and its sibling token-lanes-block.md
+             from adoption/hooks/claude/ (non-blind child context)
   agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
   mcp     -- `claude mcp add --scope user` for each server named in
              adoption/mcp/claude-user.json after rendering its ${HOME} and
@@ -39,11 +41,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 GUARD_SRC = ROOT / "adoption" / "hooks" / "claude" / "effort-default-guard.py"
 SECRET_GUARD_SRC = ROOT / "scripts" / "hooks" / "secret_path_guard.py"
+TOKEN_LANES_BLOCK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
+TOKEN_LANES_HOOK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-subagent-start.py"
 SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
-# Installed name under ~/.claude/hooks/ -> checked-in source. The settings template runs both.
+# Installed name under ~/.claude/hooks/ -> checked-in source; includes the carrier's sibling block.
 HOOKS = {
     "effort-default-guard.py": GUARD_SRC,
     "secret_path_guard.py": SECRET_GUARD_SRC,
+    "token-lanes-block.md": TOKEN_LANES_BLOCK_SRC,
+    "token-lanes-subagent-start.py": TOKEN_LANES_HOOK_SRC,
 }
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"
 MCP_TEMPLATE = ROOT / "adoption" / "mcp" / "claude-user.json"

@@ -197,6 +197,16 @@
             "command": "${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${HOME}/.claude/hooks/token-lanes-subagent-start.py\" 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
