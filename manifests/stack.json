@@ -1892,11 +1892,14 @@
         "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
         "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/SETUP_GUIDE.md",
         "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/app/api/compression/preview/route.ts",
-        "https://registry.npmjs.org/omniroute/3.8.50"
+        "https://registry.npmjs.org/omniroute/3.8.50",
+        "https://github.com/diegosouzapw/OmniRoute/commit/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+        "https://github.com/diegosouzapw/OmniRoute/pull/14904",
+        "https://github.com/diegosouzapw/OmniRoute/pull/13788"
       ],
       "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task.",
-      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. Optional only: existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
+      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task. Running build, 2026-09-27: the workstation runs a source build, not this pin. Its base is release/v3.8.51 at a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3. Upstream PRs #14904 and #13788 are cherry-picked onto it, both open and unmerged, with patch-ids equal to upstream's. The BUILD_SHA is dd6e9607e. This manifest has no field for cherry-picks. A version/source_pin pair must also match the landscape freshness snapshot. So the pin stays the published 3.8.50 (npm latest on 2026-09-27) until upstream releases or merges both changes (the #14904 fix and the #13788 feature). Build, service, probes and the recorded keyless loopback posture: docs/decisions/2026-09-27-omniroute-account-pool.md and evidence/artifacts/omniroute-gateway-20260927/.",
+      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. The workstation's source build runs from the values-free adoption/templates/systemd/omniroute.service. It is adopted for pooled GPT-6 access by gateway-routed Codex lanes. By the user's decision that gateway runs keyless and passwordless on loopback only (docs/decisions/2026-09-27-omniroute-account-pool.md, decision 5); a multi-user or non-loopback host keeps this recipe's API key and dashboard login. Native Codex stays the max-quality default, and the agent-sdks layer default waits on the preregistered three-arm comparison. Existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
     },
     {
       "id": "tavily-cli",

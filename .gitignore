@@ -27,6 +27,9 @@ node_modules/
 # CLAUDE_CONFIG_DIR fixture (docs/token-efficiency-stack.md#hosted-ci-coverage-2026-09-26):
 # clearly labelled synthetic content, not host history.
 !fixtures/ccusage-synthetic-claude/**/*.jsonl
+# The OmniRoute gateway's sanitized SEARCH log lines (queries and provider only, no ids), retained as receipt evidence:
+# evidence/artifacts/omniroute-gateway-20260927/README.md.
+!evidence/artifacts/omniroute-gateway-20260927/*.jsonl
 # PR-H's frozen public synthetic log fixture (blind-lane positive control and
 # seed-log-symbol tasks, evidence/artifacts/token-adoption-e2e-20260926/preregistration.json):
 # clearly labelled synthetic content, not host history.
