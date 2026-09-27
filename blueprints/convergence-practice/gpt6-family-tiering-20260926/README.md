@@ -402,3 +402,17 @@ No result exists yet. When results exist, they will not establish:
 
 Offline checks:
 `uv run --no-project --with jsonschema --with pyyaml python -B -m unittest tests.test_gpt6_family_tiering_20260926 -v`.
+
+## Result, recorded 2026-09-27
+
+Everything above this section is the frozen preregistration, unchanged. Its statements that no arm has run
+describe the state before the run.
+
+**2026-09-27:** all six arms ran once, from 07:09:02Z to 07:28:28Z, under the frozen command and loop, and every
+batch completed. `analyze.py` returned `final: true` with outcome `route_mechanical_extraction`: **S1, `gpt-6-sol`
+at `medium`**. It costs 1,620.0 billed tokens per filing against A0's 1,852.3, with micro-F1 0.9935 against 0.9942
+(paired-bootstrap lower bound −0.0037). The decision covers mechanical, deterministically scored 8-K item extraction
+only. Generalization to other stages is untested, judgment roles stay on `gpt-6-astra` at `max`, and no stage's
+command changes here. One deviation: the slot locks were a dedicated directory, not a shared host pool.
+`experiment.json` remains the planned record. The receipt, with the decision, the run record, the scope and the
+deviation, is [`evidence/artifacts/gpt6-family-tiering-20260927/`](../../../evidence/artifacts/gpt6-family-tiering-20260927/README.md).
