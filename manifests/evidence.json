@@ -13208,7 +13208,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "15ab971b4e16347afb29da1a2e6cb05da99471dfe7b255b932b8fa2f74442f42",
+      "sha256": "658912b57736bf7baab50841dc72f745a1ebbaa7db4986ebb0c1a93b8ede6993",
       "bytes": 189734
     },
     {
@@ -13723,7 +13723,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "46b5c8cefc73ba82c0e92f3b06dbd2c3757b2cc01d33c67cf1e2cd6cb651d95f",
+      "sha256": "13734fa72536f3645b93a3134f7a48df447d42bff102a16fd4b5362ae0fdc527",
       "bytes": 19505
     },
     {
@@ -30638,8 +30638,8 @@
     },
     {
       "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
-      "sha256": "bc5fc0040cce6aea059c60fe342e47632526067fe4e83bb61aa470eecaa35575",
-      "bytes": 47670
+      "sha256": "966ac7b98cd0bc01bef6c0ddfa3332c72d41c995b6da95f3c1e82383e6759d6b",
+      "bytes": 61977
     },
     {
       "path": "evidence/artifacts/macos-application-20260924/run-summary.json",
@@ -36575,6 +36575,11 @@
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--claude-code--use--20260927-3.json",
       "sha256": "71f4475c70a2dddf0143f0288218a021728134a7269c5ba36479db480ca8598d",
       "bytes": 9974
+    },
+    {
+      "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--claude-code--use--20260927-4.json",
+      "sha256": "1c7b633b3b3aa2690911aefbeac30c3e0a75d095ef6e573b2f802bfe11797e4a",
+      "bytes": 11377
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--claude-code--use--20260927.json",
