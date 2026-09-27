@@ -47,6 +47,9 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 TOP_RULE_SHA256 = "476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+# The jCodeMunch section closes the managed block, after the RTK exceptions: jcodemunch-mcp 1.108.319 (8f7b34ab)
+# counter.py L616-630; docs/decisions/2026-09-27-token-lanes-subagent-start.md, jCodeMunch route addendum.
+JCODEMUNCH_MARKER = "<!-- native-agent-stack:jcodemunch jcodemunch-mcp 1.108.319 counter.py L616-630 -->\n"
 
 # A minimal TOML writer for the fake (tables, strings, numbers, booleans, string arrays): enough for these fixtures.
 EMITTER = r'''
@@ -188,7 +191,7 @@ def template_segments() -> tuple[str, str, str]:
     body = text.split("\n", 1)[1]  # after the begin marker line
     top, rest = body.split("\n" + UPSTREAM_MARKER, 1)
     upstream, exceptions = rest.split("\n<!-- native-agent-stack:rtk-exceptions -->\n", 1)
-    return top, upstream, exceptions
+    return top, upstream, exceptions.split("\n" + JCODEMUNCH_MARKER, 1)[0]
 
 
 class TemplateTests(unittest.TestCase):
@@ -215,6 +218,26 @@ class TemplateTests(unittest.TestCase):
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
                        "`jq`", "`find`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
+
+    def test_jcodemunch_section_closes_the_block_after_the_rtk_exceptions(self):
+        # Both lanes read this block: agents_block() for ~/.codex/AGENTS.md and build_args.py
+        # codex_user_instructions() for the gateway lane home. jcodemunch-mcp 1.108.319 at 8f7b34ab, counter.py
+        # L616-630: route(execute=true) dispatches {"repo": repo, "query": task}, the whole task.
+        block = lane.agents_block()
+        self.assertEqual(block.count(JCODEMUNCH_MARKER), 1)
+        self.assertIn("\n\n" + JCODEMUNCH_MARKER, block)  # the whole marker line, after a blank separator
+        self.assertLess(block.index("<!-- " + lane.EXCEPTIONS_MARKER + " -->\n"), block.index(JCODEMUNCH_MARKER))
+        section = block.split(JCODEMUNCH_MARKER, 1)[1]
+        self.assertTrue(section.endswith(lane.BLOCK_END + "\n"))
+        section = section[:-len(lane.BLOCK_END + "\n")]
+        self.assertNotIn("<!--", section)  # no other marker inside the section
+        for phrase in ("## jCodeMunch (only where the checkout's .codex/config.toml registers it)",
+                       "`route(task, repo, execute: true)` sends the whole task as the search query",
+                       '`order("search_symbols", {repo: ".", query: NAME, kind, max_results: 1})`',
+                       '`route(task, repo: ".")` without execute',
+                       "arguments you write"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, section)
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex

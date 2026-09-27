@@ -46,4 +46,9 @@ An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is al
 - `find` on a path that may not exist: rtk exits 0 with no output.
 
 Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
+
+<!-- native-agent-stack:jcodemunch jcodemunch-mcp 1.108.319 counter.py L616-630 -->
+## jCodeMunch (only where the checkout's .codex/config.toml registers it)
+
+`route(task, repo, execute: true)` sends the whole task as the search query and can return the wrong symbol. Look up a known name with `order("search_symbols", {repo: ".", query: NAME, kind, max_results: 1})`; for an open task, call `route(task, repo: ".")` without execute, then `order` the recommended action with arguments you write. `repo: "."` is the checkout this session runs in.
 <!-- native-agent-stack:codex-user-instructions:end -->

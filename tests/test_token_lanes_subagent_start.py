@@ -17,7 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "adoption/hooks/claude/token-lanes-subagent-start.py"
 BLOCK = HOOK.with_name("token-lanes-block.md")
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
-BUDGET_BYTES = 4_100  # 4,094 measured bytes; qmd-scope addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
+BUDGET_BYTES = 4_100  # 4,095 measured bytes; jCodeMunch route addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
+# jcodemunch-mcp 1.108.319 (8f7b34ab) counter.py L616-630: route(execute=true) sends the whole task as the query.
+JCODEMUNCH_CLAUSE = 'jcodemunch route(task, repo: ".") (no execute) then order(action, own args) on indexed repos;'
 KEY_PHRASES = (
     "ToolSearch", "ctx_batch_execute", "rtk", "find_referencing_symbols",
     "codebase-memory", "jcodemunch", "TOON", "headroom",
@@ -118,6 +120,20 @@ class TokenLanesHookTests(unittest.TestCase):
                        "otherwise list token tools used and why at the end of your return"):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, rule)
+
+    def test_injected_jcodemunch_rule_leaves_execute_off(self):
+        # jcodemunch-mcp 1.108.319 at 8f7b34ab, counter.py L584-590 and L616-630: route(execute=true) dispatches
+        # {"repo": repo, "query": task}, the whole task; probes in evidence/artifacts/jcodemunch-route-args-20260927/.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        rule = next(line for line in context.splitlines() if line.startswith("- Use Serena"))
+        mirror = next(line for line in HANDBOOK.read_text(encoding="utf-8").splitlines()
+                      if line.startswith("Use Serena find_symbol"))
+        for name, text in (("injected block", rule), ("handbook mirror", mirror)):
+            with self.subTest(text=name):
+                self.assertIn(JCODEMUNCH_CLAUSE, text)
+                self.assertNotIn("execute?", text)
+        self.assertNotIn("execute?", context)
 
     def test_blind_roles_receive_zero_injection(self):
         for role in ("blind-lane-reviewer", "blind-judge", "blind-adjudicator", "blind-anything"):
