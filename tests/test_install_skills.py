@@ -553,7 +553,7 @@ sys.exit(code)
                     self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
                     self.assertEqual(json.loads(forced.stdout)["skills"], {"project-skill": "installed"})
                     self.assertTrue(local.is_symlink())
-                    self.assertEqual(local.resolve(), self.project / ".agents/skills/project-skill")
+                    self.assertEqual(local.resolve(), (self.project / ".agents/skills/project-skill").resolve())
                     self.assertEqual((local / "SKILL.md").read_text(), self.content)
 
     def test_project_claude_foreign_symlink_requires_force(self):
@@ -576,7 +576,7 @@ sys.exit(code)
                 self.assertEqual(calls_log(self.fake_bin)[len(before):], [["--version"]])
                 forced = self.install("--agent", "claude-code", "--force")
                 self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
-                self.assertEqual(local.resolve(), self.project / ".agents/skills/project-skill")
+                self.assertEqual(local.resolve(), (self.project / ".agents/skills/project-skill").resolve())
 
     def test_adding_claude_target_to_existing_universal_install_creates_its_link(self):
         first = self.install()
