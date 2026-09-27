@@ -6,6 +6,7 @@ the user's 2026-09-27 runtime-worker acceptance contract. These are local
 structural/fixture checks, not upstream SDK or live gateway acceptance.
 """
 
+import asyncio
 import json
 import importlib.util
 from pathlib import Path
@@ -110,19 +111,6 @@ class OpenHandsRecipeTests(unittest.TestCase):
                 self.assertNotIn("BEGIN PRIVATE KEY", text)
                 self.assertIsNone(re.search(r"sk-[A-Za-z0-9]{20,}", text))
 
-    def test_checker_rejects_an_empty_result(self):
-        checker = RECIPE / "e2e/check.py"
-        self.assertTrue(checker.is_file())
-        with tempfile.TemporaryDirectory() as tmp:
-            result = subprocess.run(
-                [sys.executable, str(checker), "--result", tmp],
-                capture_output=True, text=True, check=False,
-            )
-        self.assertEqual(result.returncode, 1, result.stderr)
-        report = json.loads(result.stdout)
-        self.assertFalse(report["passed"])
-        self.assertIn("missing_result", report["failures"])
-
     def test_fresh_call_headers_keep_session_affinity(self):
         worker = load_recipe_module("worker.py")
         original = {"x-omniroute-session": "fixture-session"}
@@ -132,16 +120,66 @@ class OpenHandsRecipeTests(unittest.TestCase):
         self.assertEqual(first["x-omniroute-session"], second["x-omniroute-session"])
         self.assertEqual(original, {"x-omniroute-session": "fixture-session"})
 
+    def test_header_transport_preserves_exact_native_llm_type_and_restores_methods(self):
+        worker = load_recipe_module("worker.py")
+
+        class NativeLLM:
+            extra_headers = {"x-omniroute-session": "control-conversation"}
+
+            def generate(self, **kwargs):
+                return kwargs
+
+            async def agenerate(self, **kwargs):
+                return kwargs
+
+        original_sync, original_async = NativeLLM.generate, NativeLLM.agenerate
+        agent, condenser = NativeLLM(), NativeLLM()
+        # The real SDK uses "type(obj) is LLM" for native usage/context binding.
+        with worker.gateway_transport(NativeLLM):
+            self.assertIs(type(agent), NativeLLM)
+            self.assertIs(type(condenser), NativeLLM)
+            calls = [agent.generate(), condenser.generate(), asyncio.run(agent.agenerate())]
+            keys = {call["extra_headers"]["Idempotency-Key"] for call in calls}
+            self.assertEqual(len(keys), 3)
+            self.assertEqual({call["extra_headers"]["x-omniroute-session"] for call in calls},
+                             {"control-conversation"})
+            for kwargs in ({"response_format": {"type": "json_object"}},
+                           {"text": {"format": {"type": "json_schema"}}}, {"temperature": 0.1}):
+                with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                    agent.generate(**kwargs)
+        self.assertIs(NativeLLM.generate, original_sync)
+        self.assertIs(NativeLLM.agenerate, original_async)
+
     def test_runtime_model_override_and_native_tool_filter(self):
         helpers = load_recipe_module("recipe.py")
-        result = helpers.llm_config(self.read_json("config/worker.json"), "cx/future-model-max")
-        self.assertEqual(result["model"], "openai/cx/future-model-max")
+        result = helpers.llm_config(self.read_json("config/worker.json"), "cx/gpt-6-sol-max")
+        self.assertEqual(result["model"], "openai/cx/gpt-6-sol-max")
         self.assertEqual(result["base_url"], "http://10.0.2.2:20128/v1")
         pattern = re.compile(helpers.tool_filter(self.read_json("config/mcp-policy.json")))
         for name in ("terminal", "file_editor", "context-mode_ctx_execute", "serena_find_symbol", "ai-memory_memory_query", "qmd_query", "socraticode_codebase_health", "jcodemunch_order"):
             self.assertIsNotNone(pattern.fullmatch(name), name)
         for name in ("context-mode_ctx_upgrade", "context-mode_ctx_purge", "ai-memory_memory_write", "socraticode_codebase_index", "jcodemunch_delete_index", "headroom_headroom_compress", "memory_query", "qmd_query_evil"):
             self.assertIsNone(pattern.fullmatch(name), name)
+
+    def test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes(self):
+        helpers = load_recipe_module("recipe.py")
+        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-5", "openai/cx/gpt-6-astra-max"):
+            with self.subTest(model=model), self.assertRaises(ValueError):
+                helpers.llm_config(self.read_json("config/worker.json"), model)
+        for change in ({"temperature": 0.1}, {"response_format": {"type": "json_object"}}, {"native_tool_calling": False}):
+            config = self.read_json("config/worker.json")
+            config["llm"].update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                helpers.llm_config(config)
+
+    def test_every_container_is_owned_and_has_no_published_port(self):
+        host = load_recipe_module("host.py")
+        args = host.docker_args(self.read_json("pins.json"), "rw-openhands-control")
+        self.assertIn("com.native-agent-stack.owner=gpt6-omniroute-framework-integration", args)
+        self.assertNotIn("-p", args)
+        self.assertNotIn("--publish", args)
+        with self.assertRaises(ValueError):
+            host.docker_args(self.read_json("pins.json"), "unowned")
 
     def test_qmd_guard_requires_explicit_scope_and_lexical_query(self):
         guard = load_recipe_module("mcp_guard.py")
@@ -161,78 +199,200 @@ class OpenHandsRecipeTests(unittest.TestCase):
         self.assertNotIn("$projectDir/.serena", native)
 
 
-class OpenHandsFrozenOracleTests(unittest.TestCase):
-    # Synthetic positive control for the oracle only. This implementation is
-    # outside the mounted recipe; a real E2E always starts with the broken copy.
-    FIX = '''def compress_ranges(values):
-    ranges = []
-    for value in sorted(set(values)):
-        if ranges and value == ranges[-1][1] + 1:
-            ranges[-1] = (ranges[-1][0], value)
-        else:
-            ranges.append((value, value))
-    return ranges
-'''
+class OpenHandsUpstreamAdapterTests(unittest.TestCase):
+    """Synthetic transport controls from SWE-bench 4.1.0 reporting.py.
+
+    These exercise our parser only; they are not upstream grader executions.
+    """
+    INSTANCE = "django__django-11333"
 
     def setUp(self):
+        self.checker = load_recipe_module("e2e/check.py")
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.result = Path(self.tmp.name)
-        self.checker = load_recipe_module("e2e/check.py")
-        self.helpers = load_recipe_module("recipe.py")
-        shutil.copytree(RECIPE / "e2e/fixture-repo", self.result / "workspace")
-        (self.result / "worker").mkdir()
-        baseline = self.checker.run_tests(self.result / "workspace")
-        self.assertEqual((baseline["exit_code"], baseline["tests_run"], baseline["failures"], baseline["errors"]), (1, 1, 1, 0))
-        (self.result / "baseline.json").write_text(json.dumps(baseline))
-        pristine = self.helpers.inventory(RECIPE / "e2e/fixture-repo")
-        self.events = [
-            {"kind": "ActionEvent", "tool_name": "terminal", "tool_call_id": "synthetic", "action": {"command": "python -B -m unittest discover -s tests -v"}, "workspace": pristine},
-            {"kind": "ObservationEvent", "tool_name": "terminal", "tool_call_id": "synthetic", "observation": {"exit_code": 1, "text": "test_ranges_follow_the_spec FAILED (failures=1)"}, "workspace": pristine},
-        ]
-        self.write_events()
-        (self.result / "workspace/range_utils.py").write_text(self.FIX)
 
-    def write_events(self):
-        (self.result / "worker/events.jsonl").write_text("\n".join(map(json.dumps, self.events)) + "\n")
+    def report(self, bucket):
+        data = {key: [] for key in ("resolved_ids", "unresolved_ids", "error_ids", "empty_patch_ids", "incomplete_ids", "submitted_ids")}
+        data["submitted_ids"] = [self.INSTANCE]
+        data["schema_version"] = 2
+        data[bucket] = [self.INSTANCE]
+        data["total_instances"] = 500
+        # The upstream report can include unsubmitted IDs from the full split.
+        if bucket != "incomplete_ids":
+            data["incomplete_ids"] = ["unsubmitted-other-task"]
+        return data
 
-    def test_fixed_copy_passes_and_frozen_source_stays_broken(self):
-        verdict = self.checker.check(self.result)
-        self.assertTrue(verdict["passed"], verdict)
-        self.assertEqual(verdict["changed_files"], ["range_utils.py"])
-        self.assertEqual(verdict["tests"]["tests_run"], 1)
+    def invoke(self, data):
+        path = self.result / "report.json"
+        path.write_text(json.dumps(data))
+        return subprocess.run([sys.executable, str(RECIPE / "e2e/check.py"),
+                               "--report", str(path), "--instance-id", self.INSTANCE],
+                              capture_output=True, text=True)
 
-    def test_no_native_red_observation_cannot_pass(self):
-        self.events = self.events[:1]
-        self.write_events()
-        verdict = self.checker.check(self.result)
-        self.assertIn("no_native_test_failure_before_edit", verdict["failures"])
+    def test_known_pass_relays_upstream_resolution(self):
+        completed = self.invoke(self.report("resolved_ids"))
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertIs(result["upstream_resolved"], True)
+        self.assertEqual(result["verdict_source"], "swebench==4.1.0")
 
-    def test_red_after_edit_cannot_pass(self):
-        self.events[0]["workspace"] = self.helpers.inventory(self.result / "workspace")
-        self.write_events()
-        self.assertFalse(self.checker.check(self.result)["passed"])
+    def test_known_fail_is_not_a_successful_process_verdict(self):
+        for bucket in ("unresolved_ids", "empty_patch_ids", "error_ids", "incomplete_ids"):
+            with self.subTest(bucket=bucket):
+                completed = self.invoke(self.report(bucket))
+                self.assertEqual(completed.returncode, 1, completed.stderr)
+                self.assertIs(json.loads(completed.stdout)["upstream_resolved"], False)
 
-    def test_deleted_or_skipped_test_and_extra_files_are_rejected(self):
-        test = self.result / "workspace/tests/test_ranges.py"
-        original = test.read_text()
-        for content in ("", "import unittest\n" + original.replace("    def test_ranges", "    @unittest.skip('removed')\n    def test_ranges")):
-            test.write_text(content)
-            self.assertIn("diff_outside_allowed_files_or_empty", self.checker.check(self.result)["failures"])
-        test.write_text(original)
-        (self.result / "workspace/extra.txt").write_text("outside contract")
-        self.assertFalse(self.checker.check(self.result)["passed"])
+    def test_malformed_missing_duplicate_and_conflicting_outputs_fail_closed(self):
+        conflict = self.report("resolved_ids")
+        conflict["unresolved_ids"] = [self.INSTANCE]
+        wrong = self.report("resolved_ids")
+        wrong["submitted_ids"] = ["wrong-task"]
+        for value in ({}, [], {"resolved_ids": "true"}, conflict, wrong):
+            with self.subTest(value=value):
+                self.assertEqual(self.invoke(value).returncode, 2)
+        path = self.result / "broken.json"
+        path.write_text('{"resolved_ids": [')
+        with self.assertRaises(ValueError):
+            self.checker.read_report(path, self.INSTANCE)
 
-    def test_broken_answer_and_symlink_cannot_pass(self):
-        source = self.result / "workspace/range_utils.py"
-        source.write_text("def compress_ranges(values):\n    return []\n")
-        self.assertIn("tests_not_passing_unskipped", self.checker.check(self.result)["failures"])
-        source.unlink()
-        source.symlink_to(RECIPE / "e2e/fixture-repo/range_utils.py")
-        self.assertIn("nonregular_result", self.checker.check(self.result)["failures"])
+    def test_input_sanity_does_not_grade_the_patch(self):
+        path = self.result / "output.jsonl"
+        for patch_text in ("", "diff --git a/a.py b/a.py\n--- a/a.py\n+++ b/a.py\n@@ -1 +1 @@\n-broken\n+fixed\n"):
+            path.write_text(json.dumps({"instance_id": self.INSTANCE, "test_result": {"git_patch": patch_text}}) + "\n")
+            checked = self.checker.check_input(path, self.INSTANCE)
+            self.assertIs(checked["ready_to_grade"], True)
+            self.assertNotIn("passed", checked)
+        for content in ("", "{", json.dumps({"instance_id": self.INSTANCE}),
+                        json.dumps({"instance_id": self.INSTANCE, "test_result": {"git_patch": 1}})):
+            path.write_text(content)
+            with self.subTest(content=content), self.assertRaises(ValueError):
+                self.checker.check_input(path, self.INSTANCE)
+        row = json.dumps({"instance_id": self.INSTANCE, "test_result": {"git_patch": ""}})
+        path.write_text(row + "\n" + row + "\n")
+        with self.assertRaises(ValueError):
+            self.checker.check_input(path, self.INSTANCE)
+
+    def test_shared_skills_installer_is_the_only_install_path(self):
+        host = load_recipe_module("host.py")
+        workspace = self.result / "workspace"
+        (workspace / ".git/info").mkdir(parents=True)
+        with patch.object(host.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as run:
+            host.install_workspace_skills(ROOT, workspace)
+        self.assertEqual(run.call_args.args[0], [
+            sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
+            "--manifest", "blueprints/runtime-workers/skills/manifest.json",
+            "--project-dir", str(workspace), "--agent", "universal",
+        ])
+        self.assertEqual(run.call_args.kwargs["cwd"], ROOT)
+        source = (RECIPE / "host.py").read_text()
+        self.assertNotIn('Path.home() / ".agents/skills"', source)
+        self.assertNotIn("link.symlink_to", source)
+
+    def test_project_skills_bookkeeping_is_excluded_from_worker_patch(self):
+        host = load_recipe_module("host.py")
+        workspace = self.result / "workspace"
+        subprocess.run(["git", "init", "--quiet", str(workspace)], check=True, capture_output=True)
+
+        def installed(*args, **kwargs):
+            (workspace / ".agents/skills/tdd").mkdir(parents=True)
+            (workspace / ".agents/skills/tdd/SKILL.md").write_text("synthetic skill control\n")
+            (workspace / "skills-lock.json").write_text("{}\n")
+            return subprocess.CompletedProcess([], 0)
+
+        with patch.object(host.subprocess, "run", side_effect=installed):
+            host.install_workspace_skills(ROOT, workspace)
+        # Vercel skills 1.7.0 writes exactly these root setup paths. Ask Git
+        # which would be ignored; never stage or commit this synthetic checkout.
+        checked = subprocess.run(["git", "-C", str(workspace), "check-ignore", "--no-index", "--stdin"],
+                                 input=".agents/skills/tdd/SKILL.md\nskills-lock.json\nnested/skills-lock.json\n",
+                                 capture_output=True, text=True)
+        self.assertEqual(checked.stdout.splitlines(), [".agents/skills/tdd/SKILL.md", "skills-lock.json"])
+
+    def test_project_skills_install_refuses_task_path_conflicts(self):
+        host = load_recipe_module("host.py")
+        for reserved in (".agents", "skills-lock.json"):
+            with self.subTest(reserved=reserved):
+                workspace = self.result / reserved.replace(".", "_")
+                workspace.mkdir()
+                (workspace / reserved).write_text("preexisting task content\n")
+                with patch.object(host.subprocess, "run") as run, self.assertRaises(ValueError):
+                    host.install_workspace_skills(ROOT, workspace)
+                run.assert_not_called()
+                self.assertEqual((workspace / reserved).read_text(), "preexisting task content\n")
+
+    def test_official_grader_container_transport_preserves_upstream_settings(self):
+        module = load_recipe_module("e2e/docker_grader.py")
+        original = {"name": "sweb.eval.django__django-11333.attempt", "image": "swebench/example:latest",
+                    "platform": "linux/amd64", "detach": True}
+        changed = module.owned_container_options(original)
+        self.assertEqual(changed["name"], "rw-openhands-sweb.eval.django__django-11333.attempt")
+        self.assertEqual(changed["labels"]["com.native-agent-stack.owner"],
+                         "gpt6-omniroute-framework-integration")
+        self.assertEqual(changed["image"], original["image"])
+        self.assertEqual(original["name"], "sweb.eval.django__django-11333.attempt")
+        for update in ({"ports": {"8000/tcp": 3710}}, {"name": "unowned"}, {"volumes": {"unowned": {}}}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                module.owned_container_options({**original, **update})
+
+    def test_task_adapter_hides_oracle_and_requires_frozen_original_bytes(self):
+        module = load_recipe_module("e2e/task.py")
+        row = {"instance_id": self.INSTANCE, "repo": "django/django", "base_commit": "a" * 40,
+               "problem_statement": "Fix the selected issue.", "version": "1.7",
+               "patch": "gold-hidden", "test_patch": "test-hidden",
+               "FAIL_TO_PASS": '["private-test"]', "PASS_TO_PASS": "[]"}
+        path = self.result / "task.json"
+        path.write_text(json.dumps([row]))
+        import hashlib
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        task = module.load_task(path, digest)
+        prompt = module.worker_instruction(task)
+        self.assertIn(row["problem_statement"], prompt)
+        for secret in ("gold-hidden", "test-hidden", "private-test"):
+            self.assertNotIn(secret, prompt)
+        with self.assertRaises(ValueError):
+            module.load_task(path, "0" * 64)
+        path.write_text(json.dumps([row, row]))
+        with self.assertRaises(ValueError):
+            module.load_task(path, hashlib.sha256(path.read_bytes()).hexdigest())
 
 
 class OpenHandsReceiptTests(unittest.TestCase):
+    def test_local_pass_field_is_never_a_worker_verdict(self):
+        module = load_recipe_module("receipt.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp)
+            (result / "window.json").write_text(json.dumps({
+                "started_at": "2026-09-27T18:00:00Z", "finished_at": "2026-09-27T18:00:02Z",
+                "worker_exit_code": 0,
+            }))
+            (result / "check.json").write_text(json.dumps({"passed": True, "exit_code": 0}))
+            receipt = module.create_receipt(result, database=result / "absent.sqlite")
+            self.assertFalse(receipt["task_passed"])
+            self.assertIsNone(receipt["upstream_grader"]["upstream_resolved"])
+
+    def test_verdict_is_read_from_official_report_even_when_wrapper_claims_pass(self):
+        module = load_recipe_module("receipt.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp)
+            instance = "django__django-11333"
+            (result / "window.json").write_text(json.dumps({
+                "started_at": "2026-09-27T18:00:00Z", "finished_at": "2026-09-27T18:00:02Z",
+                "worker_exit_code": 0, "run_id": "rw-openhands-control", "instance_id": instance,
+            }))
+            (result / "check.json").write_text(json.dumps({
+                "upstream_resolved": True, "grader_exit_code": 0, "conversion_exit_code": 0,
+            }))
+            data = {"schema_version": 2, "submitted_ids": [instance], "resolved_ids": [],
+                    "unresolved_ids": [instance], "empty_patch_ids": [], "error_ids": [], "incomplete_ids": []}
+            report = result / "OpenHands.rw-openhands-control.json"
+            report.write_text(json.dumps(data))
+            self.assertFalse(module.create_receipt(result, database=result / "absent.sqlite")["task_passed"])
+            data.update(resolved_ids=[instance], unresolved_ids=[])
+            report.write_text(json.dumps(data))
+            self.assertTrue(module.create_receipt(result, database=result / "absent.sqlite")["task_passed"])
+
     def test_truncated_native_summary_retains_failed_attempt_receipt(self):
         module = load_recipe_module("receipt.py")
         with tempfile.TemporaryDirectory() as tmp:
@@ -287,7 +447,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
         observed = {"kind": "ObservationEvent", "tool_name": "ai-memory_memory_query", "observation": {"is_error": False}}
         skill = {"kind": "ObservationEvent", "tool_name": "invoke_skill", "observation": {"skill_name": "tdd", "is_error": False}}
         self.assertEqual(module.observations([action])["mcp_calls_observed"], {})
-        report = module.observations([action, observed, skill])
+        report = module.observations([action, observed, skill], ["tdd"])
         self.assertEqual(report["mcp_calls_observed"], {"ai-memory_memory_query": 1})
         self.assertEqual(report["skills_observed"], {"tdd": 1})
 

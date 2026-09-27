@@ -15,6 +15,7 @@ import re
 import sqlite3
 
 from recipe import HERE, read_json, tool_filter
+from e2e.check import read_report
 
 
 COLUMNS = (
@@ -76,11 +77,11 @@ def sanitize_row(row):
     return output
 
 
-def observations(events):
+def observations(events, known_skills=()):
     """A call counts as observed only with a native ObservationEvent."""
     policy = read_json(HERE / "config/mcp-policy.json")
     pattern = re.compile(tool_filter(policy))
-    known_skills = {s["name"] for s in read_json(HERE / "config/skills.lock.json")["skills"]}
+    known_skills = set(known_skills)
     completed, failed, skills = Counter(), Counter(), Counter()
     for event in events:
         if event.get("kind") != "ObservationEvent":
@@ -130,15 +131,28 @@ def create_receipt(result, database=None):
                 versions = {name: candidate[name] for name in ("openhands-sdk", "openhands-tools")}
         except (OSError, ValueError, TypeError):
             pass
-    tests = checked.get("tests") or {}
-    # Never copy arbitrary checker output, file paths or error strings into public evidence.
-    allowed_failures = {
-        "missing_result", "frozen_fixture_changed", "diff_outside_allowed_files_or_empty", "nonregular_result",
-        "baseline_not_one_failing_test", "no_native_test_failure_before_edit", "tests_mutated_workspace",
-        "tests_not_passing_unskipped", "invalid_or_incomplete_result", "checker_did_not_return_json",
-    }
-    task_passed = checked.get("passed") is True and checked.get("exit_code") == 0 and window.get("worker_exit_code") == 0
-    observed = observations(events)
+    # Re-read the actual upstream report; a wrapper's own passed field is never
+    # a task oracle. The official grader determines all resolved/unresolved IDs.
+    verdict = {"upstream_resolved": None, "upstream_bucket": None, "report_sha256": None}
+    run_id, instance_id = window.get("run_id"), window.get("instance_id")
+    if isinstance(run_id, str) and re.fullmatch(r"rw-openhands-[a-z0-9-]+", run_id) and isinstance(instance_id, str):
+        try:
+            verdict = read_report(result / ("OpenHands." + run_id + ".json"), instance_id)
+        except (OSError, ValueError, TypeError):
+            pass
+    task_passed = (verdict["upstream_resolved"] is True and checked.get("grader_exit_code") == 0
+                   and checked.get("conversion_exit_code") == 0 and window.get("worker_exit_code") == 0)
+    listed_skills, skills_match = [], False
+    try:
+        expected = read_json(result / "input/skills.json")["names"]
+        listed = read_json(result / "worker/skills-startup.json")["listed_skills"]
+        if (isinstance(expected, list) and isinstance(listed, list) and expected
+                and all(isinstance(name, str) and re.fullmatch(r"[a-z0-9-]+", name) for name in expected)
+                and sorted(expected) == sorted(listed)):
+            listed_skills, skills_match = sorted(listed), True
+    except (OSError, ValueError, TypeError, KeyError):
+        pass
+    observed = observations(events, listed_skills)
     expected_model = window.get("model")
     matching_gateway_rows = [row for row in rows if (
         row["model"] == expected_model and row["path"] == "/v1/responses"
@@ -151,15 +165,19 @@ def create_receipt(result, database=None):
         except (OSError, ValueError, AttributeError):
             cleanup.append(False)
     return {
-        "schema_version": 1, "evidence_class": "local integration on a synthetic fixture",
+        "schema_version": 2, "evidence_class": "standalone SDK inference adapter with official SWE-bench grading",
         "framework": "OpenHands software-agent-sdk", "expected_version": pins["version"], "observed_versions": versions,
         "image": pins["image"]["ref"], "source_commit": pins["commit"],
         "window": {key: window[key] for key in ("started_at", "finished_at")},
         "worker_exit_code": window.get("worker_exit_code"),
-        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"baseline", "qmd_setup", "agent"} else None,
+        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"prepare", "skills", "qmd_setup", "agent", "export", "grader"} else None,
         "task_passed": task_passed,
         "evidence_complete": bool(matching_gateway_rows) and trace_status == "observed"
-        and versions is not None and observed["skills_observed"].get("tdd", 0) > 0 and bool(cleanup) and all(cleanup),
+        and versions is not None and skills_match
+        and all(observed["skills_observed"].get(name, 0) > 0 for name in ("tdd", "verification-before-completion"))
+        and checked.get("grader_exit_code") == 0 and verdict["upstream_resolved"] is not None
+        and bool(cleanup) and all(cleanup),
+        "skills_listed_at_start": listed_skills, "skill_listing_matches_manifest": skills_match,
         "container_cleanup": {"attempts": len(cleanup), "confirmed_removed": sum(cleanup), "complete": bool(cleanup) and all(cleanup)},
         "gateway": {
             "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, "rows": rows,
@@ -169,12 +187,14 @@ def create_receipt(result, database=None):
             "usage_note": "Rows are not summed or claimed as exclusive worker cost. Cache-read is a subset of input; missing counters remain null.",
         },
         "trace_status": trace_status, **observed,
-        "check": {
-            "passed": checked.get("passed") is True,
-            "exit_code": checked.get("exit_code"),
-            "failures": [reason if reason in allowed_failures else "invalid_or_incomplete_result" for reason in checked.get("failures", [])],
-            "allowed_file_changed": "range_utils.py" in checked.get("changed_files", []),
-            "tests": {key: tests.get(key) for key in ("tests_run", "failures", "errors", "skipped", "exit_code")},
+        "upstream_grader": {
+            **{key: verdict.get(key) for key in ("upstream_resolved", "upstream_bucket", "report_sha256")},
+            "benchmark_commit": pins["grader"]["commit"],
+            "sdk_submodule_commit": pins["grader"]["sdk_submodule_commit"],
+            "swebench_version": pins["grader"]["swebench_version"],
+            "grader_exit_code": checked.get("grader_exit_code"),
+            "conversion_exit_code": checked.get("conversion_exit_code"),
         },
-        "limits": ["Not an upstream SDK test suite", "No matched token-savings comparison", "No SDK cold-start/crash-resume acceptance"],
+        "limits": ["Not unchanged benchmark inference or an upstream SDK test suite",
+                   "No matched A/B or token-savings comparison", "No SDK cold-start/crash-resume acceptance"],
     }

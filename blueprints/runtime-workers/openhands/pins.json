@@ -34,6 +34,20 @@
   },
   "requirements_sha256": "c4ca55604ea0bc85e74ccaa8b2c5bf9fa7b17cec35b830eda653025cb90ebd56",
   "build_requirements_sha256": "4485df6339240d8551488bb18f27e644e8bd55d7d50bf439ca9d9da03ab7318a",
+  "grader": {
+    "repository": "https://github.com/OpenHands/benchmarks",
+    "commit": "405bae7140d7e961a75f4910a0b2e7069731db96",
+    "sdk_submodule_commit": "43376f1868ffd702746080714a59c16d3f69ec12",
+    "swebench_version": "4.1.0",
+    "swebench_wheel_sha256": "1243776f720047cc9e20a427f7a52b75c13a07abda6154fb60fe77f82ec8af57",
+    "installation": "make build",
+    "verdict": "swebench.harness.run_evaluation official Docker tests and resolved_ids",
+    "runner_up": {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "tag": "v0.23.0",
+      "reason": "Terminal-Bench uses a different task contract."
+    }
+  },
   "canvas": {
     "tag": "v1.24.0",
     "repository": "https://github.com/OpenHands/OpenHands",

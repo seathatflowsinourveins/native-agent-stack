@@ -72,8 +72,12 @@ def render_mcp(variables):
 def llm_config(config, model=None):
     result = dict(config["llm"])
     selected = model or result["model"]
-    if not isinstance(selected, str) or not re.fullmatch(r"[A-Za-z0-9_./:-]+", selected):
-        raise ValueError("invalid_model")
+    if not isinstance(selected, str) or not re.fullmatch(r"cx/gpt-6(?:-[a-z0-9]+)*", selected):
+        raise ValueError("gateway_requires_gpt6_route")
+    if result.get("temperature") is not None and result["temperature"] <= 0.1:
+        raise ValueError("gateway_temperature_must_exceed_0_1_or_be_omitted")
+    if result.get("response_format") is not None or result.get("native_tool_calling") is not True:
+        raise ValueError("use_native_tool_calling_for_structured_output")
     # LiteLLM strips its openai provider prefix; the gateway receives selected.
     result["model"] = "openai/" + selected
     result["base_url"] = config["runtime"]["gateway_base_url"]
