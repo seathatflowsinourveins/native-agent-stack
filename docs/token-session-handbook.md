@@ -192,6 +192,53 @@ Checked on 2026-09-26 against Context Mode 1.0.169 at the reviewed revision `6f0
 - **No settings, and no purge workaround.** The event cap, the eviction order and the retention period are constants in the code, and the snapshot has no size limit. `CONTEXT_MODE_DIR` is the one storage setting that both the hooks and the server honor; `CONTEXT_MODE_SESSION_SUFFIX` changes only the per-project session file names (the database, the events file and the cleanup flag, `hooks/session-helpers.mjs:78-92, 391-427`). Do not set `CONTEXT_MODE_DATA_DIR` (upstream #649; not in the README): the server honors it but the Claude Code hooks do not, so it splits the store. `ctx_purge` permanently deletes a session's or the project's records; upstream reserves it for an explicit user request and advises against purging to free capacity (`src/server.ts:4465`).
 - **`ctx_stats` figures.** `ctx_stats` renders upstream estimates for this server's session and for retained history. Quote any of its figures as an upstream-rendered figure: upstream defines the Without/kept-out bytes as measured diverted output (`src/session/analytics.ts:1025-1034, 2173-2180`), but on Claude Code they also include `read-redirected` rows that book a large file's full size for a Read that context-mode only advised against and did not block (`hooks/core/routing.mjs:848-862`; `hooks/posttooluse.mjs:94-141`; upstream #950, comment 5412624311). Such a figure is not verified avoidance and not provider usage, so derive no ratios from it; savings claims use exact artifact comparisons and native provider counters ([counter limits](token-practice.md#why-the-context-mode-lifetime-dollar-line-can-be-small)).
 
+### Token lanes carried into subagents
+
+The following sentences are the source of truth for the portable
+[`token-lanes-block.md`](../adoption/hooks/claude/token-lanes-block.md) carrier.
+Tool contracts cite upstream; selection thresholds and accounting rules are local
+policy, as recorded in the [carrier decision](decisions/2026-09-27-token-lanes-subagent-start.md).
+
+Load deferred token tools in ONE ToolSearch call before first use: "select:mcp__plugin_context-mode_context-mode__ctx_execute,mcp__plugin_context-mode_context-mode__ctx_batch_execute,mcp__plugin_context-mode_context-mode__ctx_search,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols"; add jcodemunch/codebase-memory/socraticode/qmd/ai-memory/headroom names to that same call when this task needs them.
+
+Sources: [Claude MCP tool search](https://code.claude.com/docs/en/mcp#scale-with-mcp-tool-search) and the [context-mode 1.0.169 Agent bootstrap](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L892). Select names exposed by the active client.
+
+For output over ~5 KB, use ctx_batch_execute / ctx_execute / ctx_search; print derived answers, keep failures and original-output recovery. The context-mode server is bound to the main checkout: explicitly cd to the actual working directory. Open authorized scratch files from Python inside ctx_execute; ctx_execute_file enforces project boundaries (#852). Never bypass permissions.
+
+Sources: [context-mode 1.0.169 execution tools and file boundary](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md#security), [#852](https://github.com/mksglu/context-mode/issues/852), and the [worker scope in this decision](decisions/2026-09-27-token-lanes-subagent-start.md). The ~5 KB trigger and main-checkout binding describe this carrier's worker policy, not a universal server default. Python opens are for paths the task already authorizes; a refused read requires checking the documented permissions, not switching tools to evade them.
+
+Automatic RTK: a Bash call containing $(...), backticks, <(...), a redirect to a file or a heredoc is never rewritten. && chains and multi-line blocks are rewritten segment by segment. In a pipeline RTK rewrites a supported producer feeding cat, head or tail (git diff | head -n 5) or a final grep/rg stage, but not gh (gh pr view 1 | head -n 5 is not rewritten). Run heavy reads as their own call. Never directly prefix rtk before `git show REV:path`, `diff`, `git branch`, `git log`, `jq`, `cd`, or `find` on a possibly-missing path. Use native commands or `rtk proxy <cmd>` for exact bytes/exit status; process large results in ctx_execute.
+
+Sources: RTK 0.50.0, tag commit `1d87b8e719ce0a50c223cd93ca64dd16921f9aec`. [`src/hooks/decision.rs` L86-88](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/decision.rs#L86-L88) leaves a call containing any of those constructs unrewritten; [`rewrite_multiline_block`, `src/discover/registry.rs` L951-1013](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L951-L1013), added by [rtk-ai/rtk#3319](https://github.com/rtk-ai/rtk/pull/3319) (commit [`fc8054eb`](https://github.com/rtk-ai/rtk/commit/fc8054eb0b357d32cb0457094d142de52c3db0e7)), rewrites each line; [L1087-1345](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L1087-L1345) rewrite pipeline stages and `&&`, `||` and `;` segments. Observed on 2026-09-27 (02:28Z to 02:46Z) with `rtk hook check`, and for the multi-line, `&&` and `gh` cases also through the `rtk hook claude` PreToolUse hook that the Claude template runs: `git status` and `git diff --stat` on two lines came back as `rtk git status` and `rtk git diff --stat`; `cd /tmp` then `git status` as `cd /tmp` and `rtk git status`; `git diff | head -n 5` as `rtk git diff | head -n 5`. A block with `$(...)` on one line, a heredoc and `gh pr view 1 | head -n 5` came back unchanged. A block of `echo` lines is never rewritten because `echo` has no RTK rule, so it cannot test multi-line handling. The named exclusions are local routing policy, with this catalog's [exactness exceptions and retained RTK checks](../recipes/README.md#native-context-mode-and-hooks).
+
+Use Serena find_symbol / find_referencing_symbols for exact symbols and references; jcodemunch route(task, repo?, execute?), menu(query?), order(action, args) on indexed repos; socraticode codebase_search(query, projectPath) with explicit projectPath for conceptual questions. Open original source before judging or editing.
+
+Sources: [Serena symbol tools](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/symbol_tools.py), [jCodeMunch's three-verb front door and MCP instructions](https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/server.py), and [SocratiCode](https://github.com/giancarloerra/SocratiCode/tree/2218f25153d0f3f4a76ee240a5643dbc873e80be). `projectPath` is optional in the connected `codebase_search` schema; this policy makes it explicit.
+
+Use codebase-memory trace_path (include_evidence=true adds resolver class and confidence; this parameter is on trace_path, not search_graph) or search_graph for symbol/reference queries; treat edges below confidence 0.5 as unverified candidates, and verify exact caller lists with Serena find_referencing_symbols.
+
+Source: [codebase-memory 0.11.0 MCP tool schemas](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L557), also checked against the connected `trace_path` and `search_graph` schemas. The 0.5 treatment is a local verification rule, not a discard filter or an upstream recall guarantee.
+
+For the indexed catalog, use qmd query (us-equities-foundation / us-equities-catalog), then get. Use ai-memory memory_query with workspace/project from .ai-memory.toml as historical evidence only, never authority.
+
+Sources: [QMD MCP query/get](https://github.com/tobi/qmd/tree/v2.8.3), [this catalog's scoped collections](../catalogs/us-equities/native-workflows.md), and [ai-memory's project-scoped retrieval](https://github.com/akitaonrails/ai-memory/tree/433a19f3d54dea287571b1423591db2a89965fa9). The historical-evidence boundary is this catalog's interpretation policy.
+
+Use TOON for uniform arrays of flat records (same keys in every item); keep compact JSON for nested or non-uniform data, where TOON can be larger (upstream README).
+
+Sources: [TOON 4.1.1 README](https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/README.md#when-not-to-use-toon) and [tabular encoder](https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts). The encoder accepts a non-empty uniform array; there is no five-record minimum.
+
+For large selected text, use headroom_compress, then headroom_retrieve for recovery; require fidelity and count the recovery cost.
+
+Source: [Headroom 0.37.0 MCP tools](https://github.com/headroomlabs-ai/headroom/tree/v0.37.0). Recovery and fidelity accounting follow the [selected-artifact practice](token-practice.md).
+
+Use one lane per artifact; never stack compressors or claim token savings. At the end of your return, list the token tools used and why.
+
+This is this catalog's [one-artifact accounting policy](token-practice.md), also expressed in the reusable prompt above; tool-native estimates are not a measured provider saving.
+
+Before claiming a task done, follow the installed verification-before-completion skill: real command output before any success claim. Research upstream first with the installed search-first skill before writing custom code. Source: already installed: skillOverrides in adoption/templates/claude.settings.template.json.
+
+Already installed: [`skillOverrides` in `adoption/templates/claude.settings.template.json`](../adoption/templates/claude.settings.template.json) sets `verification-before-completion` to `on` and `search-first` to `name-only`. Both are adopted; this hook adds no skill dependency and changes neither setting.
+
 ## Choose the new-PC profile and install once
 
 Clone [the canonical repository](https://github.com/seathatflowsinourveins/native-agent-stack), select a reviewed revision, and record `git rev-parse HEAD`. Read [adoption](../adoption/README.md), its [manifest](../adoption/manifest.json) and [update protocol](../adoption/update.md). Linux/WSL2 x86_64 is the accepted portability target; other hosts need matching assets and their own checks.

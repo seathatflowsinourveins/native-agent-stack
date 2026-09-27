@@ -249,6 +249,12 @@ GitHub-hosted macOS runner; see
    and `OTEL_LOG_TOOL_DETAILS` to `"1"`, a dated user exception whose Collector
    filter exports only tool, MCP server, skill and agent names
    ([tool details](../docs/secret-storage.md#telemetry-and-pasted-values)).
+   `claude.settings.template.json` also changed after `v2026.09.26.2`: it adds a
+   `SubagentStart` group that runs `~/.claude/hooks/token-lanes-subagent-start.py`,
+   installed by the **guard hooks** step of `install_claude_profile.py` below, so
+   every non-blind subagent receives the token-lanes block
+   ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md)); while that
+   file is absent the command exits 0 and adds nothing.
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
    The rendered `codex.config.toml` keeps the source host's `trusted_hash`
@@ -311,7 +317,14 @@ GitHub-hosted macOS runner; see
      to `~/.claude/hooks/effort-default-guard.py` and the secret guard
      [`scripts/hooks/secret_path_guard.py`](../scripts/hooks/secret_path_guard.py)
      to `~/.claude/hooks/secret_path_guard.py` (the secret guard and its
-     settings entries were added after `v2026.09.24.1`), refusing to install either unless
+     settings entries were added after `v2026.09.24.1`). This step **changed after `v2026.09.26.2`**:
+     it also copies [`adoption/hooks/claude/token-lanes-subagent-start.py`](hooks/claude/token-lanes-subagent-start.py)
+     and its sibling [`adoption/hooks/claude/token-lanes-block.md`](hooks/claude/token-lanes-block.md)
+     into `~/.claude/hooks/` (both files added after `v2026.09.26.2`).
+     The hook supplies token-lane guidance before each non-blind subagent's first prompt
+     through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart);
+     `blind-*` roles receive no context from this hook.
+     It refuses to install any file unless
      every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
      (paths relative to that file); skipped per file if the installed copy
      already matches.
