@@ -11,7 +11,9 @@ naming a credential store, dumping the environment, echoing a secret
 variable, tracing a process, printing a native token (`gh auth token`,
 `hf auth token`, or through a git credential helper), reading or searching
 credential files or secret variable names, reading or copying the whole
-Hugging Face home, tracing a shell while it sources a
+Hugging Face home or a home credential file (an SSH private key but not its
+`.pub`, the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, and
+Codex's shell snapshots), tracing a shell while it sources a
 credential file, and dumping the environment after sourcing one. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
@@ -87,6 +89,15 @@ POINTER_VARIABLE = re.compile(
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
+# Home credential files as a reader's operand (2026-09-27): an SSH private key (`id_*`, not its `.pub`),
+# ~/.aws/credentials, ~/.docker/config.json, ~/.kube/config, ~/.git-credentials, ~/.netrc, ~/.npmrc and
+# ~/.pypirc, also as an option's `=` value, and anything under a Codex `shell_snapshots` directory, whose
+# files record every exported value (`declare -xp`, codex-rs shell-command/src/shell_snapshot_exports.rs
+# at rust-v0.157.1). Only a reader, copy or search of them is blocked, never a mention, so `ssh -i`,
+# `ssh-add`, `kubectl --kubeconfig`, `chmod` and `ls` on the same paths still pass in every session.
+HOME_CREDENTIAL_FILE = re.compile(
+    r"(?:^|[/=])(?:\.ssh/id_[^/]*(?<!\.pub)|\.aws/credentials|\.docker/config\.json|\.kube/config"
+    r"|\.git-credentials|\.netrc|\.npmrc|\.pypirc)$|(?:^|[/=])shell_snapshots(?:/|$)")
 # A .env-style credential file: `.env`, `.env.local`, `.envrc`, `alpaca-paper.env`, `*.env`,
 # also as the value of `--include=`/`-g` style options. `*.example` templates stay readable.
 ENV_FILE_WORD = re.compile(r"(?:^|[/=])(?:\.env[^/=]*|[^/=]*\.env)$")
@@ -636,7 +647,7 @@ def segment_reason(words: list[str]) -> str | None:
     arguments = reader_arguments(words)
     if arguments is None:
         return None
-    if any(POINTER_VARIABLE.search(w) for w in arguments):
+    if any(POINTER_VARIABLE.search(w) or HOME_CREDENTIAL_FILE.search(w) for w in arguments):
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"

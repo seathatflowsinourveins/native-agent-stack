@@ -334,6 +334,26 @@ KEYRING_BLOCKED = {
     "rg -n TAVILY_API_KEY": "secret_name_search",
     "echo \"$TAVILY_API_KEY\"": "secret_variable_reference",
     "python3 -c 'import os; print(os.environ[\"TAVILY_API_KEY\"])'": "secret_variable_reference",
+    # Home credential files as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key
+    # (a glob too) but not its .pub, the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an
+    # option's `=` value, and Codex shell snapshots, which record every exported value.
+    "cat ~/.ssh/id_ed25519": "credential_file_read",
+    "cp ~/.ssh/id_rsa /tmp/key": "credential_file_read",
+    "base64 \"$HOME/.ssh/id_ecdsa\"": "credential_file_read",
+    "cat ~/.ssh/id_*": "credential_file_read",
+    "cat ~/.aws/credentials": "credential_file_read",
+    "jq . ~/.docker/config.json": "credential_file_read",
+    "grep token ~/.kube/config": "credential_file_read",
+    "cat ~/.git-credentials": "credential_file_read",
+    "cat ~/.netrc": "credential_file_read",
+    "curl --netrc-file=/home/example/.netrc https://example.invalid": "credential_file_read",
+    "head -5 ~/.npmrc": "credential_file_read",
+    "cat ~/.pypirc": "credential_file_read",
+    "grep -r OMNIROUTE ~/.codex/shell_snapshots/": "credential_file_read",
+    "cat \"$CODEX_HOME\"/shell_snapshots/*.sh": "credential_file_read",
+    # OmniRoute keeps its secrets in .env layers and server.env in its data directory: dotenv files.
+    "cat ~/.omniroute/.env": "dotenv_read",
+    "cat ~/.config/omniroute/server.env": "dotenv_read",
 }
 
 ALLOWED = [
@@ -528,6 +548,21 @@ SAFE_CORPUS = [
     "tvly search \"agent harness\" --depth basic --max-results 4 --json",
     "tvly --version",
     "ls ~/.tavily",
+    # The home credential-file rule blocks readers only: clients that use a key or a store, listings,
+    # public keys, SSH config and mode changes pass (the H4 chmod of Codex snapshots included).
+    "ssh-add",
+    "ssh-add ~/.ssh/id_ed25519",
+    "ssh -i ~/.ssh/id_ed25519 git@github.com",
+    "ssh-keygen -y -f ~/.ssh/id_ed25519",
+    "ls -la ~/.ssh",
+    "cat ~/.ssh/id_ed25519.pub",
+    "cp ~/.ssh/id_*.pub /tmp/keys/",
+    "cat ~/.ssh/config",
+    "cat ~/.aws/config",
+    "kubectl --kubeconfig ~/.kube/config get pods",
+    "curl --netrc https://example.invalid",
+    "chmod 600 ~/.codex/shell_snapshots/*.sh",
+    "ls ~/.codex/shell_snapshots",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
@@ -567,6 +602,12 @@ EXPECTED_PASS_THROUGH = [
     f"{DEMO_EXEC} sh -c 'eval echo \\$KK_DEMO_TOK$0' EN",
     f"{EXEC} script -qc 'export -p' /dev/null",
     "watch -n 5 cat .env",
+    # Home credential files: a key under a custom name, a relative read after `cd`, a client that prints
+    # its own store, and a program that opens a store itself (the database file name is illustrative).
+    "cat ~/.ssh/github_deploy_key",
+    "cd ~/.aws && cat credentials",
+    "kubectl config view --raw",
+    "sqlite3 ~/.omniroute/gateway.sqlite .dump",
 ]
 
 
@@ -690,7 +731,15 @@ class SecretPathGuardTests(unittest.TestCase):
                      "Read(**/.config/nativestack/*.key)", "Read(**/.claude/.credentials.json)",
                      "Read(**/.codex/auth.json)", "Read(**/.config/gh/hosts.yml)",
                      "Read(**/.cache/huggingface/token)", "Read(**/.cache/huggingface/stored_tokens)",
-                     "Read(**/proc/*/environ)", "Read(**/.env)", "Read(**/.env.*)"):
+                     "Read(**/proc/*/environ)", "Read(**/.env)", "Read(**/.env.*)",
+                     # Home credential stores (2026-09-27, synthesis H6 and PR-A): SSH, GnuPG, cloud, kube,
+                     # Docker, git-credential, netrc, npm and PyPI files, the OmniRoute data directories
+                     # and Codex's shell snapshots, each with its twin.
+                     "Read(~/.ssh/**)", "Read(**/.ssh/**)", "Read(~/.gnupg/**)", "Read(~/.aws/**)",
+                     "Read(~/.azure/**)", "Read(~/.kube/**)", "Read(~/.docker/config.json)",
+                     "Read(~/.git-credentials)", "Read(~/.netrc)", "Read(~/.npmrc)", "Read(~/.pypirc)",
+                     "Read(~/.omniroute/**)", "Read(~/.config/omniroute/**)",
+                     "Read(~/.codex/shell_snapshots/**)", "Read(**/.codex/shell_snapshots/**)"):
             self.assertIn(rule, deny)
         # A `!` carve-out reaches only the rules listed before it in the same file, so every `.env` rule,
         # twins included, precedes both carve-outs (a twin appended after them would re-deny .env.example).

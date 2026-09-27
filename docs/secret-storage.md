@@ -637,8 +637,8 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 | Store outside every worktree, plus `.gitignore` for `.env*`, `*.env`, `*.key`, `*.pem`, `stored_tokens` and other native-store names (the generic `token` basename is deliberately not listed: it is too broad to ignore repository-wide, and `scripts/credential_status.py`'s `SENSITIVE_BASENAME` makes the same choice) | committing a credential by accident | a value pasted into a tracked file, or a tracked file literally named `token` |
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
-| Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential`; through the `**/` twins, Context Mode's `ctx_execute_file` and `ctx_index` on the same paths | Python or other subprocesses that open the files themselves, including code run by Context Mode's `ctx_execute` or `ctx_batch_execute` that opens a file directly; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file or a secret variable **name**; redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
+| Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location, and since 2026-09-27 the [home and tool credential stores](#home-and-tool-credential-stores-2026-09-27)); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential`; through the `**/` twins, Context Mode's `ctx_execute_file` and `ctx_index` on the same paths | Python or other subprocesses that open the files themselves, including code run by Context Mode's `ctx_execute` or `ctx_batch_execute` that opens a file directly; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, a home credential file or a Codex shell snapshot ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can
@@ -827,6 +827,16 @@ For a host that does not use the template, merge the same rules by hand under
 "Read(//proc/*/environ)", "Read(**/proc/*/environ)",
 "Read(~/.cache/huggingface/token)", "Read(**/.cache/huggingface/token)",
 "Read(~/.cache/huggingface/stored_tokens)", "Read(**/.cache/huggingface/stored_tokens)",
+"Read(~/.ssh/**)", "Read(**/.ssh/**)", "Read(~/.gnupg/**)", "Read(**/.gnupg/**)",
+"Read(~/.aws/**)", "Read(**/.aws/**)", "Read(~/.azure/**)", "Read(**/.azure/**)",
+"Read(~/.kube/**)", "Read(**/.kube/**)", "Read(~/.docker/config.json)", "Read(**/.docker/config.json)",
+"Read(~/.git-credentials)", "Read(**/.git-credentials)", "Read(~/.netrc)", "Read(**/.netrc)",
+"Read(~/.npmrc)", "Read(**/.npmrc)", "Read(~/.pypirc)", "Read(**/.pypirc)",
+"Read(~/.omniroute/**)", "Read(**/.omniroute/**)", "Read(~/.config/omniroute/**)", "Read(**/.config/omniroute/**)",
+"Read(~/.codex/shell_snapshots/**)", "Read(**/.codex/shell_snapshots/**)",
+"Read(//mnt/*/Users/*/AppData/Roaming/omniroute/**)", "Read(**/mnt/*/Users/*/AppData/Roaming/omniroute/**)",
+"Read(//mnt/*/Users/*/.omniroute/**)", "Read(**/mnt/*/Users/*/.omniroute/**)",
+"Edit(~/.bashrc)", "Edit(~/.profile)", "Edit(~/.zshrc)",
 "Bash(printenv)", "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
 "Bash(hf auth token)", "Bash(hf auth token *)",
 "Bash(git credential fill*)", "Bash(gh auth git-credential *)"
@@ -850,6 +860,70 @@ it in the same file, so a twin placed after the carve-outs would deny
 native Read tool. `apply_claude_settings.py` inserts a missing template rule
 next to its template neighbours, so it keeps this order on a host whose file
 already holds the carve-outs.
+
+### Home and tool credential stores (2026-09-27)
+
+The template and the project settings also deny Claude's file tools the
+credential stores that other tools keep in the home directory: `~/.ssh`,
+`~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, `~/.docker/config.json`,
+`~/.git-credentials`, `~/.netrc`, `~/.npmrc` and `~/.pypirc`, each with its
+`**/` twin (corroborated by trailofbits/claude-code-config at `2109be9`,
+`settings.json`). Two more stores join them:
+
+- **OmniRoute's data directory.** It holds the gateway's SQLite database,
+  with the provider OAuth tokens and API keys it holds, its logs and
+  backups (`.env.example`, lines 36-41), and it may hold `.env` layers. Without `DATA_DIR`, upstream uses a legacy `~/.omniroute` when it
+  exists, else `%APPDATA%\omniroute` on Windows, else
+  `$XDG_CONFIG_HOME/omniroute`, else `~/.omniroute`, and it falls back to
+  that default when a configured `DATA_DIR` is not writable
+  (diegosouzapw/OmniRoute `src/lib/dataPaths.ts` at `a58000c7`, lines 40-62
+  and 175-190). The rules deny `~/.omniroute`, `~/.config/omniroute` and,
+  for a Windows gateway reached from WSL2, both Windows defaults under the
+  default `/mnt/<drive>` mount. The template alone carries the two
+  `//mnt/*/Users/*/...` rules. A gateway with a `DATA_DIR` elsewhere needs
+  its own `Read(//<DATA_DIR>/**)` rule and twin in that host's user
+  settings; never commit such a path. `Read(**/.env)` does not cover a
+  `.env` outside the project, so these directory rules are what keep the
+  gateway's `.env` from the Read tool.
+- **Codex shell snapshots.** With `shell_snapshot` on, Codex writes
+  `$CODEX_HOME/shell_snapshots/*.sh`, which record `declare -xp` for every
+  exported name and so hold exported values (openai/codex `rust-v0.157.1`,
+  `codex-rs/shell-command/src/shell_snapshot_exports.rs`), at mode `0644`, as a
+  GPT-6 probe of the landscape-sweep lane reproduced with its provider key
+  ([sweep README](../tools/sota-convergence/landscape-sweep/README.md)). The rules cover
+  `~/.codex/shell_snapshots`; a lane-local `CODEX_HOME` elsewhere is covered
+  only by the guard's reader rule below.
+
+The template alone adds `Edit(~/.bashrc)`, `Edit(~/.profile)` and
+`Edit(~/.zshrc)`: the operator, not an agent, writes the pointer exports of
+[Picking up in a new session](#picking-up-in-a-new-session).
+
+What this changes, from the [permissions](https://code.claude.com/docs/en/permissions)
+reference: a `Read` deny also blocks Edit and Write on the path, applies to
+the file commands Claude Code recognizes in Bash (`cat`, `head`, `tail`,
+`sed`, `tee`, redirections) and, best effort, to Grep and Glob, and it
+holds in `bypassPermissions` too
+([permission modes](https://code.claude.com/docs/en/permission-modes)). It
+does not stop `grep -r` run inside the directory or a subprocess that opens
+the file itself. The whole `~/.ssh` directory is denied, so Claude's file
+tools cannot read `config`, `known_hosts` or `*.pub` either; carving those
+out with `Read(!...)` rules is an open user decision. Because a `**/` twin
+matches under the working directory, a project's own `.npmrc`, `.netrc` or
+`.pypirc` is denied as well, as a project `.env` already is.
+
+`scripts/hooks/secret_path_guard.py` adds a narrower Bash rule: a reader,
+copy or search whose operand is an SSH private key (`id_*`, never its
+`.pub`), `~/.aws/credentials`, `~/.docker/config.json`, `~/.kube/config`,
+`~/.git-credentials`, `~/.netrc`, `~/.npmrc`, `~/.pypirc` or a file under
+any `shell_snapshots` directory is blocked as `credential_file_read`.
+Clients that use a key or a store (`ssh -i`, `ssh-add`, `kubectl
+--kubeconfig`, `curl --netrc`), listings and `chmod` pass, because the
+user hook runs in every session. OmniRoute's `.env` layers and `server.env`
+are dotenv files, which the guard already blocks for readers. Recorded gaps,
+asserted in `tests/test_secret_path_guard.py`: a key under a custom name, a
+relative read after `cd`, a client that prints its own store (`kubectl
+config view --raw`) and a program that opens a store itself, such as
+`sqlite3` on the gateway database.
 
 ### Codex
 
