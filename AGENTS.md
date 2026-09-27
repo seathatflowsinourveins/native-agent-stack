@@ -33,6 +33,7 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 
 - One coordinator integrates. Writing workers need separate worktrees and bounded file ownership.
 - This repository commits `.claude/settings.json` with Ultracode on. The Claude coordinator stays at `xhigh` under Ultracode, because a `max` session turns its workflow orchestration off, and never sets `CLAUDE_CODE_EFFORT_LEVEL` (any value overrides every child's effort). Pass `effort: 'max'` with an explicit task-matched `model` on every ad-hoc workflow `agent()` call: a stage without its own `effort` inherits the coordinator's `xhigh` unless its agent's frontmatter sets one. Probes and overturn conditions: `docs/decisions/2026-09-23-max-effort-default.md`.
+- Dispatch each workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call.
 - Until the trading lane moves to its own repository, `docs/lanes.md` assigns foundation, trading and shared paths, gives the protocol for shared hot files such as `manifests/evidence.json`, and requires one `lane:*` label per PR. Hand off to a live session that owns an area instead of editing it.
 
 ## Hosts, credentials and records

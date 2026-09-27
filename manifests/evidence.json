@@ -3467,8 +3467,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "e59e22ba7dabcbcc53662ae4b14ebbe281e130e6590eb7bec602041dee186f19",
-      "bytes": 11636
+      "sha256": "cf44536f3793cc37187c9800b682bbf3f5d4e01c85fab6ee0be070c77a161a7c",
+      "bytes": 11907
     },
     {
       "path": "CLAUDE.md",
@@ -3501,6 +3501,31 @@
       "bytes": 2892
     },
     {
+      "path": "adoption/agents/claude/isolated-builder.md",
+      "sha256": "daaeca8baaab3c6471f70aa12299fe14ff1de9f54f57e8683ac593f70e7ee370",
+      "bytes": 2857
+    },
+    {
+      "path": "adoption/agents/claude/security-reviewer.md",
+      "sha256": "73eb483d22760e6b75226d58714a1354a848382bad032d8876e172fc8f656b9b",
+      "bytes": 3325
+    },
+    {
+      "path": "adoption/agents/claude/source-scout.md",
+      "sha256": "b879b0b873f6346ca5a2e03154d20d400aac06692267075a3eb8cf982fe768de",
+      "bytes": 2604
+    },
+    {
+      "path": "adoption/agents/claude/stack-researcher.md",
+      "sha256": "a35b015fcf7e8d608b5cf60e4172c6f1033bf4d9b3b8047a008efc5e89dcb446",
+      "bytes": 4260
+    },
+    {
+      "path": "adoption/agents/claude/stack-verifier.md",
+      "sha256": "97b21d6ed2d1747c7e3cc4e80335595670025531ae48debdac18ef4889524503",
+      "bytes": 3339
+    },
+    {
       "path": "adoption/bootstrap-linux.sh",
       "sha256": "45e0badf2951a47a843c902272b34f57faa1106f655532101cfdfd1074d6ce75",
       "bytes": 38949
@@ -3512,8 +3537,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "e0405c0203a264973be1ea92150b596a236736f9d3b0537727ef9496864d7b38",
-      "bytes": 38341
+      "sha256": "975ad3e93a4b872c9409abd125bf7cba11ac41da6862fe61759e3df3f96c09f2",
+      "bytes": 38741
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -13508,8 +13533,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "701d9482554ae3f0cbe84499649bd89a2e971598ac959681efcc977d31f8acda",
-      "bytes": 38568
+      "sha256": "7a80ab24f494702f5f1aa0b8749d5d9736c5fed0cc33606fa614657159524199",
+      "bytes": 41568
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -13520,6 +13545,11 @@
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
       "sha256": "d03879a2770c49ee26daafad0784c74c69837af7a5de91c7e511791a94c6c196",
       "bytes": 18351
+    },
+    {
+      "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
+      "sha256": "56eb363256a2d89db721e2c2f688c1ff3a53c989536ad8b31ee024275f6c7646",
+      "bytes": 14944
     },
     {
       "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
@@ -37203,8 +37233,13 @@
     },
     {
       "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "946c56b2287da1268944128cfbaabeb005aaf26a79e5f7f02e41c4b63fd0a99f",
-      "bytes": 2072
+      "sha256": "daaeca8baaab3c6471f70aa12299fe14ff1de9f54f57e8683ac593f70e7ee370",
+      "bytes": 2857
+    },
+    {
+      "path": "examples/claude-native/agents/security-reviewer.md",
+      "sha256": "73eb483d22760e6b75226d58714a1354a848382bad032d8876e172fc8f656b9b",
+      "bytes": 3325
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
@@ -37213,8 +37248,18 @@
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
-      "sha256": "44c5ffb97ed53e30b90402a49a6f0a2b738843c2c0d14103474b4b7c4ff6e929",
-      "bytes": 2045
+      "sha256": "b879b0b873f6346ca5a2e03154d20d400aac06692267075a3eb8cf982fe768de",
+      "bytes": 2604
+    },
+    {
+      "path": "examples/claude-native/agents/stack-researcher.md",
+      "sha256": "a35b015fcf7e8d608b5cf60e4172c6f1033bf4d9b3b8047a008efc5e89dcb446",
+      "bytes": 4260
+    },
+    {
+      "path": "examples/claude-native/agents/stack-verifier.md",
+      "sha256": "97b21d6ed2d1747c7e3cc4e80335595670025531ae48debdac18ef4889524503",
+      "bytes": 3339
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
@@ -37223,12 +37268,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "3e5f57a8e16a2083dafcae6de3d22df7fcd87a0296cbc38a16311706648ae036",
-      "bytes": 23842
+      "sha256": "c050bd5df2a27786b3d37eb58839a2303c398bff90e65e6fd592eaed0afefa4b",
+      "bytes": 30100
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "22806ae61c77afb5cdac280145860d37af9e9366386dbce028fc857c157bdfdb",
+      "sha256": "e2dabc54e88a8f86db33b0fc81f5bc20f1df9ed50839477b1c278ffb88679e2d",
       "bytes": 1129
     },
     {
@@ -37273,13 +37318,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "2c2626d76e2113e0b86b372864001e45766d118b12fc0bf9441d937fa555069a",
-      "bytes": 15529
+      "sha256": "3027d75134276fee25000ea74832abede9a421ff0d301947eaa6c015b5678e85",
+      "bytes": 19779
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "c2b4b9ec376c156e37186c5de1b586e5a310a94b8dde62282cb164867abdc124",
-      "bytes": 49552
+      "sha256": "bae756a8f2706043c734d07a8cd460ab1c5a812e9a6f1031faf0e8b1b2d9723b",
+      "bytes": 54628
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -37733,8 +37778,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "c4268f3abaabf8747af5c144285e7572640b9ee6e8007c33ac7c4c8a1d734e8b",
-      "bytes": 24853
+      "sha256": "75ac0bbe6748b264838c9139d6c0e86179ff4d8581e40d1fd18fb2038d699b52",
+      "bytes": 26756
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -38388,8 +38433,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "1608649b034f36aaf8952302bf14e3e4336a933a0e1d05d84fde5792adbc663c",
-      "bytes": 38723
+      "sha256": "09931a4c55ce350bce6728b73f368373536594b4cad0902cf4c1b43a72ab0007",
+      "bytes": 44243
     },
     {
       "path": "tests/test_install_skills.py",
