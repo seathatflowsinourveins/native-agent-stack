@@ -142,7 +142,7 @@ position of the text a shell runs, also behind a shell keyword such as `do` or `
 so quoted text and heredoc bodies count only under `sh -c`, `eval`, `ssh` or a shell
 heredoc, escaped characters and comments never count, and `$(...)` or backticks inside
 double quotes or an unquoted heredoc still run (bash(1) QUOTING, COMMENTS and Here
-Documents), with loopback-only calls apart; a fetch run inside a Context Mode sandbox, a
+Documents), with loopback-only calls apart; in these legacy lane counters a fetch run inside a Context Mode sandbox, a
 `gh api` call or an HTTP call in a script is in no lane, so `ctx_fetch_and_index_share`
 compares those three lanes only), the
 SubagentStart hook types, and whether an
@@ -152,6 +152,226 @@ prompt or in SubagentStart hook context. A marker inside tool input or output do
 not count. `--rtk-db <RTK history.db>` also joins each Bash call to RTK's
 `hook_decisions` row by `tool_use_id`, opened read-only through `node:sqlite`
 (Node 22.13 or later); `allow` plus `ask` is RTK's own "covered" outcome.
+
+### PR-A measurement fields (2026-09-27)
+
+`lanes.measurement` in a run, and `actors[].measurement` plus each group's
+`measurement` in a sweep, compute the preregistered M3/M4/M5 fields. A sweep
+also reads main transcript JSONL files under its explicit roots and reports
+them in `main`, separately from child populations. Use the project directory
+as a root to include the native `<session>.jsonl` next to `<session>/subagents`.
+Actor ordinals are local to the supplied roots; private run/task identity joins
+remain the caller's responsibility. Existing lane counters remain available
+for comparison with historical receipts; their three-lane fetch share is **not M4**.
+
+```sh
+node examples/claude-native/workflows/child-usage.mjs --lanes-sweep \
+  --root "${CLAUDE_ROOT}" --since "${SINCE}" --until "${UNTIL}" \
+  --rtk-check --rtk-db "${RTK_DB_PATH}" --exceptions "${PRIVATE_EXCEPTIONS}"
+```
+
+`m3` covers every result carrier, including `rtk proxy`, with `results`, `bytes`,
+`large_results`, `large_bytes`, `large_result_share`, `large_byte_share` and
+`max_bytes`. Large means strictly greater than 5,120 UTF-8 bytes. This tool's
+content-byte rule measures strings directly and sums the UTF-8 bytes of `text`
+fields in text blocks, with no wrapper, escaping or separator bytes. Non-text
+blocks use compact JSON individually. Equal text therefore has equal size in a
+Bash string and a ctx text-block array. The citation to context-mode v1.0.169's
+[UTF-8 accounting](https://github.com/mksglu/context-mode/blob/v1.0.169/src/session/extract.ts#L1060-L1069)
+supports UTF-8 accounting only; this rule is local and does not serialize a
+hook `tool_response` object. Provider tokens remain separate.
+`by_carrier` includes exception bytes; `m3`
+excludes them. Group `m3_large_results_per_actor` gives nearest-rank percentiles.
+`m5` includes **all** ctx results, even M3 exceptions, so a single enormous ctx
+result cannot hide behind a low count share. No threshold verdict is inferred
+from choosing a ctx tool. Missing calls/results and parse errors remain visible.
+
+The three exception classes come from
+[#381 preregistration](../../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).
+A successful Read followed by a successful Edit/Write of the same exact path
+and cwd in that actor's observed transcript is automatic. No future row beyond
+`--until` qualifies it. Other exceptions require a reviewed private JSON array
+passed with `--exceptions`. Each record has `transcript_sha256` (SHA-256 of
+the exact file bytes), `tool_use_id`, `exception`, and a nonempty `witness`.
+Allowed classes are `read_of_subsequently_edited_file`,
+`original_source_quoted_or_line_cited`, and `exact_bytes_required_by_frozen_check`.
+The tool validates binding and vocabulary; the reviewer establishes semantic
+truth. Sidecars, identifiers and witness text are never echoed. A mismatched
+digest removes no bytes. An entry may instead carry `proxy_purpose: "acceptance"`
+and a witness; this classifies M6 without granting an M3 exception.
+Every supplied `exception`, `proxy_purpose` and `rtk_log_find` field must be
+valid, and at least one must be present. A valid class does not mask a malformed
+sibling; present null fields are invalid.
+Top-level `sidecar_records.bound` and `.unbound` count records whose digest
+matches at least one measured transcript or none, respectively. Each sidecar
+record counts once across actors. A bound digest does not prove a call exists,
+a witness is correct or an exception was applied; the exception counters show
+actual removals. Skipped/out-of-window transcripts cannot bind a record.
+
+The legacy `transcripts_found`, `transcripts_skipped_unmodified` and
+`parse_errors` remain child-only, preserving the #369 comparison population.
+`main_transcripts_found`, `main_transcripts_skipped_unmodified` and
+`main_parse_errors` describe main files separately; `all_transcripts_found`
+is their combined discovery count.
+
+`m4` counts confirmed, statically visible remote operations, including individual `requests` in
+`ctx_fetch_and_index`, shell commands in `ctx_batch_execute`, and literal
+subprocess commands in JavaScript/Python ctx code. Loopback fetches are separate.
+The existing `ctx_sandbox_fetch` bucket includes both context-mode sandbox
+curl/wget commands and nested Codex code-mode shell curl/wget commands from the
+[shared adapter](../../../tools/skill-usage/README.md). It measures sandbox
+execution, not exclusive use of context-mode; both stay in the remote denominator.
+Script HTTP calls, dynamic URL fetches and `gh api` are `unclassifiable` and
+stay in the denominator; over 10% makes the metric `incomplete`. The regression
+of one indexed fetch plus nineteen sandbox curls therefore reports 5%.
+Detection follows the [#381 M4 definition](../../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930)
+and extends the maintained
+[context-mode v1.0.169 routing detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L788-L795)
+and the existing shell-text parser. Before inline-HTTP matching, data heredoc
+bodies and shell comments are removed and quoted argument syntax is neutralized.
+Quoted Python `-c` (including combined flags ending in `c`), Node
+`-e`/`--eval`/`-p`/`--print`, Deno `eval`, Bun `-e`/`--eval`, and ctx JS/Python
+code remain visible to the script detector, including dynamic URLs (kept
+unclassifiable). A heredoc body is source only when the simple command that
+contains its `<<` operator runs stdin as source. That command is the text
+between the nearest control operators around the operator, with quotes removed
+and redirection words and their targets dropped, so a pipe, list or redirection
+after the heredoc (`bash <<'EOF' 2>&1 | tail -n 5`, `> log.txt`, `&& ...`) does
+not replace it. A `<<` inside quotes, a comment or `$(( ))` opens no heredoc.
+Two known limits err toward counting a fetch: `$(` is not tracked inside
+double quotes, and a quoted string that a shell runs (`bash -c '...'`) is added
+as executed text without its own heredoc resolution. A heredoc body inside
+`"$( ... )"` (the usual `git commit -m "$(cat <<'EOF' ... EOF)"` form) or inside
+such a string therefore counts as executed even when it is the inner command's
+data: a line-start `curl`/`wget` in it counts as a confirmed fetch (inside
+`"$( ... )"` only when the body has no parentheses) and a `gh api` line as
+unclassifiable. This can lower the routed shares, never raise them.
+Python or Node read stdin with no script operand or with `-`; the retained
+explicit stdin forms apply to other interpreters. A shell reads its script from
+stdin unless `-c` supplies a command string or an operand names a script file:
+`-s` keeps stdin, a shell's `-` equals `--`, `-o`/`+o`/`-O`/`+O` take a name,
+`--rcfile`/`--init-file` take a file, and `-n` reads without executing
+(POSIX sh OPTIONS/STDIN, bash(1) 5.2 OPTIONS/ARGUMENTS). `ssh` runs stdin in the
+remote login shell when no remote command follows the destination, or when the
+remote command itself reads stdin as source; `-n`, `-f`, `-N`, `-s`, `-W`, `-O`,
+`-G`, `-V` and `-Q` never do ([OpenSSH ssh(1)](https://man.openbsd.org/ssh)).
+Python `-c`/`-m`, Node `-e`/`-p`, and script-file invocations leave their stdin
+as data. Each retained body is analyzed separately so its quoting or shift
+syntax cannot consume later shell commands or data heredocs. The legacy
+`bash_curl_wget` lane uses the same rule. Upstream strips every heredoc.
+Entrypoint references:
+[Python](https://docs.python.org/3.13/using/cmdline.html#interface-options),
+[Node](https://nodejs.org/docs/v24.21.0/api/cli.html#-),
+[POSIX sh](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/sh.html),
+[Deno](https://docs.deno.com/runtime/reference/cli/eval/), and
+[Bun](https://bun.sh/docs/runtime).
+Shell-fed source heredocs retain executed commands. A grep pattern containing
+`fetch(`, a comment, or a heredoc writing a script gives zero confirmed fetches.
+
+`fetch_mentions_unconfirmed` separately counts raw detector matches that the
+executed-text analysis did not confirm, per command/code input: `HTTP_SCRIPT`
+matches anywhere in the raw text, `curl`/`wget` in command position of the raw
+text (a line start, or after `;`, `&`, `|`, `(`, a backtick or `$(`, also behind
+a shell keyword or wrapper as in the legacy lane), and `gh api` at a line start
+or after a separator. An executed-text match confirms a raw match only when it
+traces back to that raw offset; matches the analysis creates (backslash-newline
+joins, unescaping, quoted strings a shell runs) confirm nothing. These are
+possible fetches, including data-only mentions such as a heredoc that writes a
+script, not confirmed operations.
+The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`:
+
+- `routed_share = ctx_fetch_and_index / remote_fetches` uses confirmed fetches.
+- `routed_share_lower_bound = ctx_fetch_and_index / (remote_fetches + fetch_mentions_unconfirmed)`
+  treats every possible fetch as unrouted. **The #381 M4 >= 0.9 gate must read
+  `routed_share_lower_bound`.** Confirmed-only share cannot establish that gate.
+
+For one routed fetch plus either a Python shift-syntax parser miss or a Node
+comment containing an apostrophe before `fetch`, the confirmed share is 1,
+the unconfirmed count is 1, and the lower bound is 0.5. A `curl` in a heredoc
+whose command does not run stdin (`ssh -n host <<'EOF'`, `cat <<'EOF' > run.sh`)
+gives the same values. Dropping a raw detector match from confirmed analysis, or
+confirming a created match in its place, therefore cannot inflate the gate's
+share. Counts are summed before shares are recomputed across actors; shares
+retain the existing four-decimal reporting convention, so the gate should
+compare the integer counts. Any unconfirmed mention leaves M4 status
+`incomplete`; a zero denominator gives null for its respective share.
+
+This is a lower bound against these raw detector patterns, not against every
+possible runtime request. A `curl` inside a quoted string the parser does not
+treat as run (`ssh -o Opt=value host 'curl ...'`, `watch 'curl ...'`), behind
+`xargs`, `find -exec` or an unrecognized wrapper, or passed to a subprocess
+inside interpreter code, is in neither count. Loops, dynamic code, external
+scripts, aliases and nonliteral subprocess arguments still require separate
+observation. The static detector cannot prove the absence of fetches in
+arbitrary code.
+
+`--rtk-check` enables M-R1/M6c in `rtk_parts` on Linux, using **a binary on PATH
+self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated
+temporary five-exclusion configuration from
+[the adopted recipe](../../../recipes/README.md#native-context-mode-and-hooks),
+and native `rtk hook check --agent claude` on every simple part and whole call.
+No transcript command executes. Sources:
+[native check](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952),
+[lexer](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/lexer.rs#L488-L526),
+[pipeline rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1087-L1345),
+and [consumer rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1451-L1494).
+These sources identify the reference implementation. The runtime gate does not
+compare the binary hash with the [qualification receipt](../../../evidence/receipts/rtk-050-qualification-20260925.json)
+and therefore does not establish that the binary is the qualified pinned build.
+The adapter retains every part; upstream's analytics splitter stops at the
+first pipe. Native refusals, exclusions and consumers requiring raw input are
+outside eligibility. Redirection is recognized using the splitter's quote state;
+a quoted `>` is data. The native check decides standalone eligibility, including
+its accepted `2>/dev/null` form. Heredocs/arithmetic
+or unsupported shapes stay unknown. `coverage` and `call_coverage` use observed
+command prefixes/recorded hook rewrites, while `replayed_*` fields describe
+potential routing under the fixed config. Replay never proves execution.
+`explicit_rtk_on_excluded_or_sensitive` is the deterministic zero counter used
+by M-R3 and M6c: the five exclusions, `cd`/`export`/`source`, adopted by-design
+refusals, file-target redirects and raw-input pipelines. Conditional log/find
+forms contribute only to `explicit_rtk_log_find_advisory`, not this zero counter
+or an additional exclusion. Syntax cannot establish complete-history intent or
+path existence ([adopted conditional exceptions](../../../adoption/templates/codex.AGENTS.template.md)).
+The advisory is partitioned into `log_find_permitted_parts`,
+`log_find_requires_raw_parts` and `log_find_unresolved_parts`. Resolve it in the
+same digest-bound sidecar with a witness and `rtk_log_find: [{"part": 1,
+"disposition": "permitted"}]` (or `"requires_raw"`); `part` is the one-based
+position among all command segments. M-R3/M6c's deterministic zero is not full
+exception clearance while advisory parts are unresolved or require raw output.
+These semantic adjudications never change the fixed-config eligible denominator.
+
+Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's
+eligible population, including an otherwise eligible `git diff --stat`.
+This follows #381's separate acceptance/raw-proxy population. M6 still requires
+acceptance/exception justification; excluding a proxy from coverage does not
+justify it or remove its output from M3.
+A different self-reported version, a non-Linux platform or a failed exclusion
+probe reports `unavailable`; omitted replay is `not_measured`.
+`rtk.not_logged_share` needs the read-only DB join. `measurement.proxy` reports
+acceptance/exception adjudications and unclassified calls for M6.
+
+`usage.messages` deduplicates Claude messages and reports model, effort and
+ordinary input, cache creation, cache read and output separately, with ordinals
+instead of message IDs. Streamed updates use the largest counter total, following
+[ccusage v20.0.24](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/claude/src/daily.rs#L410-L523).
+Windowed messages subtract their prior snapshot; absent counters remain null.
+`usage.complete` describes accounting, not successful task completion. Failed
+and interrupted attempts still contribute known usage. These numbers cannot be
+added to byte measurements or tool savings estimates.
+
+`hook_context` counts every inserted `hook_additional_context` by event/name,
+separately from stdout claims and marker presence. Stdout alone no longer sets
+the legacy SubagentStart insertion flag. `mcp_states` distinguishes attempts,
+success, failure and unfinished calls; persisted Codex item status supplies state
+when result bytes are absent. `sandbox_operations` counts normalized nested
+code-mode operations, whose results return to code. They contribute M4/RTK/MCP
+state observations but no M3/M5 context bytes or missing-context-result counts.
+The outer exec return is measured once as carrier `code_mode`.
+`loaded_not_called` counts loaded server
+references without an attempted call by that actor. These implement PR-A's
+review controls, but do not supply a rejected/cancelled native-ID reconciliation
+ledger or an E2E acceptance verdict. Synthetic controls run through
+`python3 -m unittest tests.test_token_measurement tests.test_child_usage_suite`.
 
 `--lanes-sweep --root <dir> [--root <dir> ...] --since <ISO> --until <ISO>` aggregates
 the same lanes over every workflow and Agent-tool child transcript under explicit
