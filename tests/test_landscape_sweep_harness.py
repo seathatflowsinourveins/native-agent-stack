@@ -856,6 +856,37 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Python 3.11"):
                 build_args.mcp_sections('[mcp_servers.demo]\ncommand = "a"\n')
 
+    def stage_with_profile_tail(self, tail):
+        work = stage_work(self)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE + tail, encoding="utf-8")
+        return work, build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
+                           "--stack-worker-profile", profile)
+
+    def test_profile_overlay_for_a_rendered_server_stages(self):
+        # Codex merges the profile over config.toml, so a partial table may tune a server the lane config defines.
+        _, done = self.stage_with_profile_tail("\n[mcp_servers.serena]\nstartup_timeout_sec = 60\n")
+        self.assertEqual(done.returncode, 0, done.stderr)
+
+    def test_profile_overlay_for_an_undefined_server_fails_closed(self):
+        # A merged server table with neither command nor url is "invalid transport" in Codex 0.157.1
+        # (codex-rs/config/src/mcp_types.rs:454-510), so -p stack-worker would not load at all.
+        work, done = self.stage_with_profile_tail("\n[mcp_servers.absent-server]\nstartup_timeout_sec = 60\n")
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("absent-server", done.stderr)
+        self.assertIn("invalid transport", done.stderr)
+        self.assertFalse((work / "codex-home" / "config.toml").exists())
+
+    def test_profile_may_define_a_whole_server(self):
+        _, done = self.stage_with_profile_tail('\n[mcp_servers.extra]\ncommand = "extra-mcp"\n')
+        self.assertEqual(done.returncode, 0, done.stderr)
+
+    def test_shipped_profile_overlays_only_rendered_servers(self):
+        # The repository's own stack-worker profile, staged for the example host, must load under Codex.
+        work = stage_work(self)
+        done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example")
+        self.assertEqual(done.returncode, 0, done.stderr)
+
     def test_missing_profile_names_the_flag(self):
         work = stage_work(self)
         done = build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
