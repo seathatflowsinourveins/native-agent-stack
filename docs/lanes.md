@@ -150,6 +150,21 @@ reports through the protocol above does not by itself make a PR shared. A
 on the PR, before merge. Branch names do not encode lanes; the label does. The
 [PR template](../.github/pull_request_template.md) asks for the lane.
 
+Merge with the reviewed head pinned:
+
+```sh
+gh pr merge <N> --squash --match-head-commit <SHA>
+```
+
+`<SHA>` is the head commit that `scripts/validate.py`, CI and the review ran
+on. `gh` refuses the merge if the head has moved since
+([gh pr merge](https://cli.github.com/manual/gh_pr_merge): "Commit SHA that the
+pull request head must match to allow merge"). The ruleset keeps strict
+up-to-date checks off, because concurrent sessions share `main`, and this
+User-owned repository cannot use a merge queue. That makes this flag the guard
+against merging a head nobody reviewed
+([decision record](decisions/2026-09-22-github-automation-closure.md)).
+
 ## Coordination
 
 When another live session owns an area, hand off instead of editing it.
