@@ -1,0 +1,146 @@
+[
+ {
+  "tool": "rtk",
+  "group": "g1-shell-output",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 3
+ },
+ {
+  "tool": "toon",
+  "group": "g1-shell-output",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 3
+ },
+ {
+  "tool": "gpt-tokenizer",
+  "group": "g1-shell-output",
+  "e2e": "partial",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 0
+ },
+ {
+  "tool": "context-mode",
+  "group": "g2-context-sandbox",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "headroom",
+  "group": "g2-context-sandbox",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "mcporter",
+  "group": "g2-context-sandbox",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 0
+ },
+ {
+  "tool": "serena",
+  "group": "g3-code-navigation",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "jcodemunch-mcp",
+  "group": "g3-code-navigation",
+  "e2e": "partial",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 1
+ },
+ {
+  "tool": "codebase-memory-mcp",
+  "group": "g3-code-navigation",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "socraticode",
+  "group": "g4-retrieval-memory",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "qmd",
+  "group": "g4-retrieval-memory",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 1
+ },
+ {
+  "tool": "ai-memory",
+  "group": "g4-retrieval-memory",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 0
+ },
+ {
+  "tool": "repomix",
+  "group": "g5-conversion-packing",
+  "e2e": "partial",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 1
+ },
+ {
+  "tool": "markitdown",
+  "group": "g5-conversion-packing",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "ast-grep",
+  "group": "g5-conversion-packing",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 2
+ },
+ {
+  "tool": "context-hub",
+  "group": "g6-docs-accounting",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 1
+ },
+ {
+  "tool": "ccusage",
+  "group": "g6-docs-accounting",
+  "e2e": "pass",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 0
+ },
+ {
+  "tool": "agentsview",
+  "group": "g6-docs-accounting",
+  "e2e": "partial",
+  "upstream_ready": true,
+  "review_ready": true,
+  "comparisons": 0
+ }
+]

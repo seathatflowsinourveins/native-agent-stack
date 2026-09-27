@@ -40,6 +40,11 @@ REVIEW = "catalogs/convergence-practice/source-review.json"
 ADOPTION = "adoption/manifest.json"
 SATURATION = "blueprints/token-native-focus/saturation-audit.json"
 TOKEN_TOPIC = "docs/token-efficiency-stack.json"
+# A dated topic edition gives every row a per-tool card or an explicit marker. Each
+# card block keeps its own evidence class; pins always come from manifests/stack.json.
+TOKEN_TOPIC_CARD_BLOCKS = ("upstream", "native_adaptation", "e2e_returned_results",
+                           "adapted_performance", "invoke_rates", "gpt6_review")
+TOKEN_TOPIC_NO_CARD = "no card in this edition"
 FOUNDATION_SURFACES = "catalogs/foundation/surfaces.json"
 SETUP_GUIDES = ("adoption/README.md", "adoption/update.md", "tools/token-report/README.md")
 TOKEN_RECEIPTS = (
@@ -428,6 +433,47 @@ def build_convergence(root, read, file_url):
             "layers": layers}
 
 
+def token_topic_card(card, edition_date, stack_version, root):
+    """Validate one topic row's dated tool card. Returns (card, pin drift note, missing-card marker)."""
+    require(edition_date is not None and isinstance(card, dict) and card.get("edition") == edition_date,
+            "token topic row needs a card of this edition")
+    if card.get("status") == TOKEN_TOPIC_NO_CARD:
+        require(set(card) == {"status", "edition"}, "a row without a card carries only the edition marker")
+        return dict(card), None, f"No card in this edition ({edition_date})"
+    require(card.get("status") == "present", "unknown token topic card status")
+    recorded = card.get("recorded_pin")
+    require(isinstance(recorded, str) and bool(recorded.strip()), "token topic card needs its recorded pin")
+    source = card.get("source")
+    require(isinstance(source, dict) and isinstance(source.get("path"), str)
+            and source["path"].startswith("evidence/artifacts/"),
+            "token topic card source must be a public evidence artifact")
+    raw = safe_file(root, source["path"]).read_bytes()
+    require(type(source.get("bytes")) is int and source["bytes"] == len(raw) and source.get("sha256") == digest(raw),
+            "token topic card source hash or size mismatch")
+    for block in TOKEN_TOPIC_CARD_BLOCKS:
+        value = card.get(block)
+        require(isinstance(value, dict) and isinstance(value.get("evidence_class"), str)
+                and bool(value["evidence_class"].strip()),
+                "token topic card needs " + block + " with its evidence class")
+    comparisons = card["adapted_performance"].get("per_payload_and_lane", [])
+    require(isinstance(comparisons, list), "token topic card comparisons must be a list")
+    for entry in comparisons:
+        # Each figure stays in its own lane, payload and evidence class; nothing is summed across them.
+        require(isinstance(entry, dict) and all(isinstance(entry.get(key), str) and entry[key].strip()
+                                                for key in ("lane", "payload", "evidence_class")),
+                "token topic card comparison needs its lane, payload and evidence class")
+        before, after, change = (entry.get(key) for key in ("before_tokens", "after_tokens", "change_pct"))
+        require(type(before) is int and type(after) is int and before > 0 and after >= 0
+                and type(change) in (int, float) and abs((after - before) * 100 / before - change) <= 0.05 + 1e-9,
+                "token topic card comparison counts are inconsistent")
+    drift = None
+    if recorded != stack_version:
+        drift = (f"Pin drift: this card recorded {recorded}; {STACK} now pins {stack_version}. The card's "
+                 f"upstream, E2E, performance and review facts describe {recorded} until a newer card edition "
+                 "is recorded.")
+    return dict(card), drift, None
+
+
 def build_data(root):
     documents, inputs = {}, {}
     current_public_paths = set()
@@ -740,13 +786,31 @@ def build_data(root):
         topic_source = read(TOKEN_TOPIC)
         require(topic_source.get("schema_version") == 1, "unsupported token topic schema")
         require(isinstance(topic_source.get("rows"), list), "token topic rows must be a list")
+        edition = topic_source.get("edition")
+        require(edition is None or (isinstance(edition, dict) and isinstance(edition.get("date_utc"), str)
+                                    and bool(re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", edition["date_utc"]))
+                                    and isinstance(edition.get("source_paths", []), list)),
+                "token topic edition needs its date and evidence paths")
+        edition_date = edition["date_utc"] if edition else None
+        if edition:
+            # A dated edition and its card artifacts are newer than the immutable base:
+            # resolve them at the publication ref, with exact input hashes retained.
+            current_public_paths.add(TOKEN_TOPIC)
+            current_public_paths.update(edition.get("source_paths", []))
+            current_public_paths.update(row["card"]["source"]["path"] for row in topic_source["rows"]
+                                        if isinstance(row.get("card"), dict)
+                                        and isinstance(row["card"].get("source"), dict)
+                                        and isinstance(row["card"]["source"].get("path"), str))
         selected_by_id = {row["id"]: row for row in selected}
+        stack_by_id = {component["id"]: component for component in stack["components"]}
         topic_ids = set()
         topic_rows = []
         for row in topic_source["rows"]:
             identifier = row.get("component_id")
             require(identifier in selected_by_id and identifier not in topic_ids,
                     "token topic component must be selected and unique")
+            require(not {"version", "pin", "repository"} & set(row),
+                    "token topic pins come from manifests/stack.json, not the row")
             require(row.get("group") in {"core", "observation", "runtime"},
                     "unknown token topic group")
             require(isinstance(row.get("source_paths"), list) and row["source_paths"],
@@ -762,14 +826,33 @@ def build_data(root):
                     "token topic needs an upstream use command")
             topic_ids.add(identifier)
             component = selected_by_id[identifier]
+            pinned = stack_by_id[identifier]
             item = dict(row)
             item.update(repository=component["repository"], version=component["version"],
-                        recipe_path=component["recipe_path"], sources=[])
+                        recipe_path=component["recipe_path"], sources=[],
+                        pin={"version": component["version"], "repository": pinned.get("repository", ""),
+                             "source": STACK},
+                        pin_drift=None, card_marker=None)
             for path in item.pop("source_paths"):
                 track(path)
                 item["sources"].append({"path": path, "url": file_url(path)})
+            if edition or "card" in row:
+                card, item["pin_drift"], item["card_marker"] = token_topic_card(
+                    row.get("card"), edition_date, component["version"], root)
+                if "source" in card:
+                    track(card["source"]["path"])
+                    card["source"] = {**card["source"], "url": file_url(card["source"]["path"])}
+                item["card"] = card
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
+        if edition:
+            sources = []
+            for path in edition.get("source_paths", []):
+                require(isinstance(path, str), "token topic edition evidence path must be text")
+                track(path)
+                sources.append({"path": path, "url": file_url(path)})
+            token_topic["edition"] = {**{key: value for key, value in edition.items() if key != "source_paths"},
+                                      "sources": sources}
     grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root)
     landscape = None
     if config.get("landscape_manifest"):

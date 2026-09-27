@@ -1,0 +1,632 @@
+{
+ "tool": "ai-memory",
+ "group": "g4-retrieval-memory",
+ "repo": "https://github.com/akitaonrails/ai-memory",
+ "pin": "2.4.1 (tarball ai-memory-linux-x86_64, sha256 15cafdc4...; source 433a19f3)",
+ "installed_version": "ai-memory 2.4.1 (native `ai-memory --version`)",
+ "role": "Durable scoped memory: recalls prior decisions instead of re-reading transcripts; no savings counter. Lanes: Claude and Codex MCP (HTTP :49474); lifecycle hooks with allowlisted capture (Claude 8 events, Codex 7); CLI. Landscape: durable-memory winner.",
+ "lanes": [
+  "Claude MCP (HTTP)",
+  "Codex MCP (streamable_http)",
+  "lifecycle hooks",
+  "CLI --data-dir"
+ ],
+ "upstream": {
+  "latest_release": "v2.4.1; live rechecked through gh api at 2026-09-27T01:24:04Z (2026-09-26 local), unchanged since the earlier research; tag commit 433a19f3d54dea287571b1423591db2a89965fa9. Sources: https://api.github.com/repos/akitaonrails/ai-memory/releases/latest ; https://api.github.com/repos/akitaonrails/ai-memory/tags?per_page=5 .",
+  "latest_date": "2026-09-25; GitHub published_at 2026-09-25T21:46:32Z. Sources: https://api.github.com/repos/akitaonrails/ai-memory/releases/latest ; https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1 .",
+  "our_pin": "2.4.1; source_pin 433a19f3d54dea287571b1423591db2a89965fa9; MIT; repository https://github.com/akitaonrails/ai-memory. Source: manifests/stack.json, component ai-memory; tag SHA independently matches https://api.github.com/repos/akitaonrails/ai-memory/tags?per_page=5 ; tagged Cargo.toml and LICENSE identify MIT and the same repository: https://github.com/akitaonrails/ai-memory/blob/v2.4.1/Cargo.toml . This is the component/Linux pin; adoption/pins-macos-arm64.json still pins 2.3.2.",
+  "behind_by": "0 releases and 0 commits: main is identical to source pin 433a19f3d54dea287571b1423591db2a89965fa9, with status=identical, ahead_by=0, behind_by=0 and total_commits=0. Nothing changed since the earlier live check. Sources: https://api.github.com/repos/akitaonrails/ai-memory/compare/433a19f3d54dea287571b1423591db2a89965fa9...main ; https://github.com/akitaonrails/ai-memory/compare/v2.4.1...main .",
+  "recommended_install": {
+   "command": "mise use -g github:akitaonrails/ai-memory@2.4.1; alternatively download the matching official v2.4.1 release archive and verify its published SHA256. The native Linux x86_64 asset is ai-memory-linux-x86_64.tar.gz. For a documented source build: git clone --branch v2.4.1 https://github.com/akitaonrails/ai-memory $HOME/.ai-memory && cd $HOME/.ai-memory && cargo build --release --workspace. A Cargo-install alternative is cargo install --locked --git https://github.com/akitaonrails/ai-memory --tag v2.4.1 ai-memory-cli. Do not substitute cargo install ai-memory: the installation cookbook identifies that crates.io name as a different project. Release archives bundle hooks; source installations must also make the hook bundle discoverable.",
+   "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md#running-ai-memory-without-docker"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Initialize and serve one native data/config directory, then use ai-memory install-mcp --client claude-code --server-url http://127.0.0.1:49474/mcp --apply and ai-memory install-hooks --agent claude-code --server-url http://127.0.0.1:49474 --capture-mode allowlist --no-capture-prompts --apply for this stack's endpoint and existing capture choices; omit --apply to preview. Upstream defaults to port 49374, so 49474 is a host adaptation. Static HTTP calls require explicit workspace/project; the optional --session-aware Claude MCP bridge plus auto_scope mode=per_session is a separately qualified alternative for concurrent sessions.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/mcp-install.md#claude-code"
+   },
+   "codex": {
+    "how": "Use ai-memory install-mcp --client codex --server-url http://127.0.0.1:49474/mcp --apply and ai-memory install-hooks --agent codex --server-url http://127.0.0.1:49474 --capture-mode allowlist --apply in the intended CODEX_HOME, preserving the same data directory and authentication. Review new or changed native hook commands in /hooks; registration alone is insufficient. v2.4.1 renders seven Codex lifecycle events and static HTTP MCP, so pass workspace/project explicitly and separately verify worker/subagent capture. This stack's port differs from upstream's 49374 default.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md#openai-codex"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Upstream describes cross-agent durable memory using user-owned Markdown, automatic lifecycle capture and typed claim-once handoffs, with ordinary operation requiring no LLM API calls. This describes capabilities and avoided re-explanation, not a measured percentage of native-client token savings.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/README.md"
+   },
+   {
+    "claim": "As of 2.0, local embeddings are enabled by default: in-process all-MiniLM-L6-v2 inference produces 384-dimensional vectors without a GPU, external embedding server or API key. Model download/startup embedding work is distinct from zero remote LLM calls; the README's broad opt-in wording should not be read as disabling these defaults.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/local-embeddings.md"
+   },
+   {
+    "claim": "Upstream supplies retrieval evaluation over a real ai-memory serve subprocess, including accuracy, latency and returned context-token measurements. A passing memory_status or observation count is not that retrieval evaluation, and neither is a provider-billing savings result.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/evals/README.md"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "Static HTTP MCP cannot correlate a tool call with a lifecycle-hook session ID. Static clients must pass exact workspace and project together; auto_scope=per_session alone does not fix a static entry. Claude's optional stdio bridge forwards a native session ID but has documented /clear/resume limits.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/auto-scope.md"
+   },
+   {
+    "text": "Open issue #930 reports that explicit project-scoped queries, which static clients require, omit the _global preference union. Do not remove project scope or silently search all projects to recover mandatory instructions; retain those instructions in native project/user instruction files.",
+    "url": "https://github.com/akitaonrails/ai-memory/issues/930"
+   },
+   {
+    "text": "Open issue #932 reports cross-project Claude subagent activity attributed to the parent project's cwd/session. Explicit MCP recall scope cannot repair already misattributed hook capture; the report's workaround is a real native session rooted in each target project. This is an upstream report, not a reproduction performed in this review.",
+    "url": "https://github.com/akitaonrails/ai-memory/issues/932"
+   },
+   {
+    "text": "Open issue #929 reports stale search entries after direct wiki-file deletion and missing embeddings after direct rewrites until embed runs. It also notes that --data-dir alone does not redirect thin-client commands away from the default server; specify the intended server URL when qualifying an isolated store.",
+    "url": "https://github.com/akitaonrails/ai-memory/issues/929"
+   },
+   {
+    "text": "The tagged renderer defines nine Claude events but seven Codex events; the Codex set has no SubagentStart or SubagentStop. Complete Codex child lifecycle capture/finalization is therefore not established by matching the seven configured top-level events.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/crates/ai-memory-cli/src/commands/render_shared.rs"
+   },
+   {
+    "text": "Memory scopes are organizational routing, not project authorization boundaries; upstream describes a single-tenant trust model. Captured observations and retrieved text must be treated as data, and native sign-ins/model routes remain separate from memory service configuration.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/security.md"
+   },
+   {
+    "text": "Issue #920 remains an open RFC proposing reduced MCP tool-description/schema/response overhead. Its operator-reported size estimate is not a shipped optimization or proof that every client pays that many uncached billed tokens every turn.",
+    "url": "https://github.com/akitaonrails/ai-memory/issues/920"
+   },
+   {
+    "text": "The pinned MCP memory_query declaration has no read-only tool annotation. Our retained restricted-Codex experiment, and this worker's attempted scoped query, received an approval-required denial under approval_policy=never; a configured HTTP server therefore does not guarantee recall in every sandbox. Native evidence: rr/ai-memory/records.json, ai-memory-d3-codex-exec and ai-memory-e2-codex-exec.",
+    "url": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/crates/ai-memory-mcp/src/server.rs"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "None: the latest release and main are identical to the pinned 2.4.1 commit. The TCP keepalive, Claude bridge preservation, managed-run session association and other 2.4.1 fixes discussed in the earlier report are already pin contents, not changes since our pin.",
+    "url": "https://github.com/akitaonrails/ai-memory/compare/433a19f3d54dea287571b1423591db2a89965fa9...main"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "version": "2.4.1",
+   "license": "MIT",
+   "profile": "core",
+   "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
+   "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+   "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
+  },
+  "how_we_install": "The Linux recipe installs the official v2.4.1 ai-memory-linux-x86_64.tar.gz into tools/ai-memory-2.4.1 and uses the owned bin/ai-memory link; adoption/pins-linux-x86_64.json pins SHA256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4, matching the live release checksum list. Sources: recipes/README.md, component catalog and Project memory; adoption/pins-linux-x86_64.json; https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1 . The WSL service and hooks moved to 2.4.1 after a restored-copy rehearsal and cold-copy V66-to-V67 migration; rollback requires the retained old store and binary because migration is forward-only (evidence/receipts/ai-memory-241-qualification-20260925.json). The macOS platform pin remains 2.3.2 (adoption/pins-macos-arm64.json).",
+  "claude_wiring": "Live $HOME/.claude.json, mcpServers.ai-memory, registers static HTTP http://127.0.0.1:49474/mcp at user scope. adoption/templates/claude.settings.template.json and live $HOME/.claude/settings.json both carry eight versioned ai-memory-2.4.1 commands with the shared data directory and server endpoint: SessionStart, PreToolUse, PostToolUse, PreCompact, Stop, SessionEnd, SubagentStart and SubagentStop. UserPromptSubmit is intentionally absent because recipes/README.md installs Claude hooks with --capture-mode allowlist --no-capture-prompts; it is not a missing ninth hook. examples/claude-native/agents/isolated-builder.md and evidence-reviewer.md explicitly allow memory_query/memory_read_page and treat returned decisions as historical evidence.",
+  "codex_wiring": "Codex USER-scope static streamable HTTP at http://127.0.0.1:49474/mcp, from adoption/templates/codex.config.template.toml [mcp_servers.ai-memory] and live $HOME/.codex/config.toml; the host's untracked .codex/config.toml also retains the same URL. Scope decision: docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1, and docs/token-session-handbook.md, Codex user-scope MCP servers. Live $HOME/.codex/hooks.json names the 2.4.1 executable for seven events: SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, Stop and SessionEnd. The nonmutating scripts/adoption_status.py --profile token-efficiency --client-wiring --json --repo-root check during this review reported ai_memory_hook_events=7 and ai_memory_hook_events_trusted=7, while the overall command exited 2 for its broader readiness result; the retained #344 addendum already proves real capture after trust, with PreCompact still unverified (evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md).",
+  "lane_rule": "Retrieve relevant prior decisions through memory_query, then scoped page reads; treat memory as historical evidence, not current authority. For these static clients pass workspace and project together, taking exact names from the adopted .ai-memory.toml (this main checkout declares workspace=local and project=native-agent-stack). Durable writes are deliberate; hooks capture only opted-in marker scopes, and worktree enrollment also permits claim-once SessionStart handoff consumption. Sources: docs/token-session-handbook.md, Choose one useful context method per artifact and per-tool table; recipes/README.md#project-memory and Worktrees and the capture marker; .ai-memory.toml; docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1. User-scope server availability does not itself enroll an arbitrary worker directory for capture.",
+  "deviations_from_upstream": [
+   {
+    "what": "The native profile uses allowlisted project capture, disables Claude prompt capture and assistant-response capture, and leaves LLM consolidation/reranking unset; it retains local MiniLM embeddings. Upstream permits broader default capture and optional model features. Sources: recipes/README.md#project-memory; examples/ai-memory-config.toml.example; https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md#capture-policy-capability-and-refresh .",
+    "why": "This is an intentional bounded-capture profile: markers select enrolled repositories and the Claude prompt opt-out accounts exactly for eight hooks versus upstream's nine. Codex has no corresponding prompt-disable flag at this pin. Sources: recipes/README.md, hook commands and explanation; rr/ai-memory/records.json, ai-memory-h0a-install-hooks-claude-print and ai-memory-h0b-install-hooks-codex-print.",
+    "fix": "Preserve the opt-out and exact marker scope on upgrades; do not add a ninth Claude hook merely to match an upstream count. Verify marked/unmarked capture separately from memory-query success, and qualify additional model work only if it is intentionally adopted. Sources: recipes/README.md#project-memory; rr/ai-memory/records.json, ai-memory-h2a-check-capture-marked and ai-memory-h2b-check-capture-unmarked.",
+    "pr": null
+   },
+   {
+    "what": "The component's freshness text and original qualification limitations still say the seven changed Codex commands await /hooks trust, but the receipt addendum resolves that condition on this host. Sources: manifests/stack.json, component ai-memory; evidence/receipts/ai-memory-241-qualification-20260925.json, addenda[0]; evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md.",
+    "why": "The original receipt intentionally preserves its at-cutover state; the later #344 addendum records a user-reported trust action and retained real Codex observations, rather than rewriting the old statement. The current readiness read-back also reports all seven commands trusted. Sources: git log commit b5bf62a7 (#344); scripts/adoption_status.py --client-wiring output during this review.",
+    "fix": "Update current summary/freshness wording to cite the resolving addendum while retaining the historical limitation verbatim; do not request re-trust again on the basis of that stale line. Keep PreCompact acceptance pending until an actual compaction observation is retained. Source: evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md, Scope.",
+    "pr": "#344"
+   },
+   {
+    "what": "The shared Claude settings template hardcodes tools/ai-memory-2.4.1 while adoption/pins-macos-arm64.json still installs 2.3.2; its install_note also incorrectly says it matches Linux. Sources: adoption/templates/claude.settings.template.json; adoption/pins-macos-arm64.json; evidence/receipts/ai-memory-241-qualification-20260925.json, limitations[3].",
+    "why": "The 2.4.1 cutover was qualified on Linux/WSL only; the shared hook template advanced with Linux while the Mac pin intentionally did not. This is a portable-template mismatch, not evidence that a Mac was upgraded. Sources: the qualification receipt's host_scope and limitations; git log commit ff20470b (#307).",
+    "fix": "Render hook commands from the selected platform's installed ai-memory prefix, or supply a verified platform override; correct the Mac install-note comparison. Keep Mac promotion separate and require its own migration, hook and retrieval qualification before moving the pin. Sources: adoption/pins-macos-arm64.json; recipes/README.md, migration and native hook refresh procedure.",
+    "pr": "#307"
+   },
+   {
+    "what": "Both clients retain static HTTP MCP rather than Claude's optional session-aware bridge; explicit workspace/project scope is therefore required, and upstream #930 means that scope does not include the default _global preference union. Sources: $HOME/.claude.json and $HOME/.codex/config.toml, ai-memory entries; https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/mcp-install.md#claude-code ; https://github.com/akitaonrails/ai-memory/issues/930 .",
+    "why": "The supported static integration gives cross-client access to a shared server but carries no lifecycle session identity. Explicit scope is the documented safe routing choice, not a defect to remove. Sources: docs/token-session-handbook.md, prior-decisions lane; https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/auto-scope.md .",
+    "fix": "Keep workspace/project explicit and mandatory policy in native instruction files; do not broaden to global=true to work around missing preferences. If concurrent Claude session identity is needed, separately qualify --session-aware with per_session scope, including /clear/resume and cross-project capture cases; leave Codex explicit-scoped. Sources: upstream auto-scope/MCP guides and issues #930/#932.",
+    "pr": null
+   },
+   {
+    "what": "Restricted Codex workers can be denied memory_query despite a registered and healthy server: the retained read-only/approval-never attempt failed, while the separately retained host-policy attempt succeeded. This workspace-write/approval-never review likewise received 'MCP tool call requires approval, but approval policy is never' for its scoped historical query. Sources: rr/ai-memory/records.json, ai-memory-d3-codex-exec and ai-memory-e2-codex-exec; this review's attempted memory_query; https://github.com/akitaonrails/ai-memory/blob/v2.4.1/crates/ai-memory-mcp/src/server.rs .",
+    "why": "The pinned memory_query tool lacks a read-only annotation and the restricted client's approval policy rejects it. That is a client-permission boundary separate from native lifecycle-hook trust; successful capture after #344 does not resolve it. Sources: tagged MCP tool declaration; the two retained Codex attempts above.",
+    "fix": "Preserve the worker's sandbox and use supplied retained evidence/original sources when the MCP call is denied, as in this review. Qualify a narrowly permitted recall integration or upstream tool annotations that accurately describe side effects; require a completed tool result in the intended restricted worker before declaring recall available. Do not treat process exit 0 or an ungrounded final message as query success. Source: rr/ai-memory/records.json, ai-memory-d3-codex-exec.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Correct the current manifest freshness summary to acknowledge #344's resolved hook trust/capture condition, while preserving the historical receipt; retain a real PreCompact case before claiming all configured hook events are exercised (manifests/stack.json; evidence/receipts/ai-memory-241-qualification-20260925.json, addenda[0]).",
+   "Resolve the shared 2.4.1 Claude-hook template versus 2.3.2 macOS install pin and stale Mac install-note wording; do not imply Mac qualification from Linux evidence (adoption/templates/claude.settings.template.json; adoption/pins-macos-arm64.json).",
+   "Qualify memory recall under the actual restricted Codex worker approval policy, preserving sandbox constraints; the supplied read-only failure and this worker's denial remain real availability limits (rr/ai-memory/records.json, ai-memory-d3-codex-exec; tagged MCP server declaration).",
+   "Keep scoped static-client routing and canonical instructions while tracking upstream #930; qualify cross-project subagent capture and Codex child finalization separately from top-level MCP access (#932; tagged render_shared.rs; docs/token-session-handbook.md).",
+   "For direct wiki-file edits/imports, verify deletion and rewrite retrieval/embedding freshness before relying on the watcher, and specify the correct server URL for isolated checks (https://github.com/akitaonrails/ai-memory/issues/929; rr/ai-memory/run.sh).",
+   "Arm-B remains pending and capacity-gated; the card has no exact token comparison or native savings counter to substitute for it (token-cards/cards/ai-memory.json#/adapted_performance; token-cards/cards/ai-memory.json#/invoke_rates/arm_b_native)."
+  ],
+  "assessment": "The Linux adaptation matches the latest release and supported native HTTP/hook interfaces, with intentional capture limits and a separately stale Mac template; the card reports status=pass, records_total=54 (the card's own figure, with exact reconciliation against the retained record sources still open) and evidence_class='local integration (upstream commands on this host, returned data retained)'; retained evidence includes scoped query/read and marked-versus-unmarked capture checks, while the restricted-Codex query failure remains part of that evidence (token-cards/cards/ai-memory.json#/e2e_returned_results; rr/ai-memory/records.json; rr/returned-results.json; html-report/savings.json). The card has exact_comparisons=[] and native_counter=null, so it establishes useful memory behavior without a measured token-savings percentage; hook trust was resolved by #344, with PreCompact still unverified (token-cards/cards/ai-memory.json#/adapted_performance; evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md). Separate invocation evidence_class='local_integration' reports workflow_children agents_using=105, agents=1010 and codex_exec_workers agents_using=3, agents=301; workflow_children_with_lanes_block agents_using=4, agents=22 is too small for a causal claim (token-cards/invoke_by_tool.json; token-cards/cards/ai-memory.json#/invoke_rates). There were no MCP calls observed in that OTel window, and arm_b_native remains 'pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window'; absence in that window does not mean general non-use, and capture counts, invocation counts and provider consumption must not be combined (token-cards/cards/ai-memory.json#/invoke_rates)."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T18:08:36.329Z",
+  "fidelity": {
+   "what": "independent verifier agreement",
+   "result": "verifier: agree, 1 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "ai-memory --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "sha256sum $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.4.1/ai-memory",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "env",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "ss -Hltn sport = :49493",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 ai-memory --data-dir <scratch>/rr/ai-memory/state init",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "ai-memory --data-dir <scratch>/rr/ai-memory/state serve --transport http --bind 127.0.0.1:49493 --no-watcher",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 54,
+  "records_shown": [
+   {
+    "id": "ai-memory-p0-ai-memory-version",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "ai-memory --version",
+    "observation": "evidence: native execution\nexit 0; stdout (16 B, verbatim) \"ai-memory 2.4.1\\n\", stderr 0 B\nreturned 'ai-memory 2.4.1' = manifests/stack.json ai-memory 2.4.1 (source_pin 433a19f3d54d...) at 803bc351\nbinary: codex-ecosystem/bin/ai-memory on PATH (p2) -> tools/ai-memory-2.4.1/ai-memory (p1)",
+    "attachments": 0
+   },
+   {
+    "id": "ai-memory-p1-ai-memory-binary-sha256",
+    "status": "passed",
+    "kind": "host probe (native execution)",
+    "command": "sha256sum $HOME/.local/share/codex-ecosystem/tools/ai-memory-2.4.1/ai-memory",
+    "observation": "evidence: native execution\nexit 0; stderr 0 B\nreturned dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd = the archive binary sha256 in adoption/pins-linux-x86_64.json at 803bc351 (tarball sha256 15cafdc48eab... not re-downloaded)\nsan out/p1-ai-memory-binary-sha256.stdout: raw private copy 139 B sha256 61066431d770a130f8cd248f9650d5a8d84e968e938efc043a5f2450019137ea subs home_path=1\nrule sanitize.py: p",
+    "attachments": 1
+   },
+   {
+    "id": "ai-memory-p2-isolated-env",
+    "status": "passed",
+    "kind": "host probe (native execution)",
+    "command": "env",
+    "observation": "evidence: native execution\nexit 0; stderr 0 B\nreturned run.sh's complete environment after env -i: RR_AIMEM_ENV, RR_LIVE_STORE, PATH, HOME=$RR/ai-memory/iso-home, TMPDIR, LANG, NO_COLOR, DO_NOT_TRACK, AI_MEMORY_SERVER_URL=http://127.0.0.1:49493, AI_MEMORY_EMBEDDING_PROVIDER=none, AI_MEMORY_BACKFILL_ON_START=false, MCPORTER_DAEMON_DIR, MCP_AUTO_OPEN_ENABLED=false, PYTHONDONTWRITEBYTECODE (+PWD/OLDPWD/SHLVL/_)\n$HOME in",
+    "attachments": 1
+   },
+   {
+    "id": "ai-memory-p3-port-check",
+    "status": "passed",
+    "kind": "host probe (native execution)",
+    "command": "ss -Hltn sport = :49493",
+    "observation": "evidence: native execution\nexit 0; stdout 0 B, stderr 0 B\nreturned nothing: 127.0.0.1:49493 free before the disposable server started",
+    "attachments": 0
+   },
+   {
+    "id": "ai-memory-b1-init",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 60 ai-memory --data-dir $RR/ai-memory/state init",
+    "observation": "evidence: native execution\nexit 0; stdout 0 B\nplan B1; returned (stderr log): starting version 2.4.1, data_dir $RR/ai-memory/state; ensured wiki/raw/db/models; wrote default config.toml; init complete (ran before the server started)\nisolation: run.sh re-ran itself under env -i: AI_MEMORY_SERVER_URL named only the disposable server, HOME/TMPDIR were scratch, no provider key or auth token (ai-memory-p2-isolated-env); g",
+    "attachments": 6
+   },
+   {
+    "id": "ai-memory-s0-serve",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "ai-memory --data-dir $RR/ai-memory/state serve --transport http --bind 127.0.0.1:49493 --no-watcher",
+    "observation": "evidence: native execution\nexit 0 after SIGTERM from run.sh's EXIT trap; stdout 0 B, run.sh meta (98 B, verbatim) \"{\\\"label\\\":\\\"s0-serve\\\",\\\"ready_at\\\":\\\"2026-09-26T18:15:43.698Z\\\",\\\"stopped_with\\\":\\\"SIGTERM\\\",\\\"exit_code\\\":0}\\n\"\nbackground for the whole B/H/M run; listening from 2026-09-26T18:15:43.698Z (ss poll)\nlog: 'MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:49493 auth=fals",
+    "attachments": 1
+   },
+   {
+    "id": "ai-memory-b2-status-before",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 60 ai-memory --data-dir $RR/ai-memory/state status --json",
+    "observation": "evidence: native execution\nexit 0; stderr 268 B = the CLI's one-line 'ai-memory starting version=2.4.1' log (not attached; sha256 in ledger)\ncounter before: {\"observations\": 0, \"pages_all\": 0, \"pages_latest\": 0, \"sessions\": 0}\nreply names data_dir $RR/ai-memory/state (thin-client reply from :49493); guard.py isolated=true before any write\nsan out/b2-status-before.stdout: raw private copy 2107 B sha256 e1ba3b3fcc52c68",
+    "attachments": 1
+   },
+   {
+    "id": "ai-memory-b2-guard",
+    "status": "passed",
+    "kind": "local_integration check",
+    "command": "python3 -B $RR/ai-memory/guard.py $RR/ai-memory/out/b2-status-before.stdout $RR/ai-memory/state $HOME/.local/share/ai-memory",
+    "observation": "evidence: local_integration\nexit 0 (run.sh stops before any write on a refusal); times are bounds (end b2, start b3a)\nreturned isolated=true, data_dir_keys [data_dir], live_store_keys [], all page/session/observation counters 0",
+    "attachments": 2
+   },
+   {
+    "id": "ai-memory-b3a-profile-ids",
+    "status": "passed",
+    "kind": "fixture input (native execution)",
+    "command": "jq -r .profiles[] | select(.id==\"token-efficiency\") | .component_ids[] $WT/adoption/manifest.json",
+    "observation": "evidence: native execution\nexit 0; stdout (118 B, verbatim) \"codex\\nclaude-code\\nrtk\\ncontext-mode\\nrepomix\\nheadroom\\ntoon\\nccusage\\nqmd\\nmarkitdown\\nserena\\nsocraticode\\nai-memory\\nmcporter\\n\", stderr 0 B\njq 1.7 returned the 14 token-efficiency ids of $WT/adoption/manifest.json (codex ... mcporter); equal to the plan list: True\nrun.sh wrapped them as a Markdown list: in/token-profile.md, 301 B, sha256 abcf340878a93",
+    "attachments": 0
+   },
+   {
+    "id": "ai-memory-b3-write-page",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 60 ai-memory --data-dir $RR/ai-memory/state write-page --workspace rr --project rr-e2e --path notes/token-profile.md --body -",
+    "observation": "evidence: native execution\nexit 0; stdout (68 B, verbatim) \"✓ wrote notes/token-profile.md (page_id=01a0deee) under rr/rr-e2e\\n\", stderr 268 B = the CLI's one-line 'ai-memory starting version=2.4.1' log (not attached; sha256 in ledger)\nplan B2; stdin = in/token-profile.md (the page body)",
+    "attachments": 1
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 41,
+    "cli_calls": 179,
+    "agents_using": 105,
+    "agents": 1010,
+    "pct_agents_using": 0.104
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 1,
+    "cli_calls": 5,
+    "agents_using": 4,
+    "agents": 22,
+    "pct_agents_using": 0.1818
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 40,
+    "cli_calls": 174,
+    "agents_using": 101,
+    "agents": 988,
+    "pct_agents_using": 0.1022
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 59,
+    "agents_using": 12,
+    "agents": 71,
+    "pct_agents_using": 0.169
+   },
+   "main_sessions": {
+    "mcp_calls": 25,
+    "cli_calls": 80,
+    "agents_using": 6,
+    "agents": 15,
+    "pct_agents_using": 0.4
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 4,
+    "cli_calls": 0,
+    "agents_using": 3,
+    "agents": 301,
+    "pct_agents_using": 0.01
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": [
+    {
+     "client": "codex_exec",
+     "mcp_server_name": "ai-memory",
+     "calls": "1"
+    }
+   ]
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "upstream.recommended_install.command",
+    "issue": "The proposed `cargo install --locked --git https://github.com/akitaonrails/ai-memory --tag v2.4.1` omits the crate selector required for a Git source with multiple packages. The tagged repository is a virtual workspace containing both ai-memory-cli (binary ai-memory) and ai-memory-eval (binary ai-memory-eval). Its cited install guide documents release archives or cloning and `cargo build --release --workspace`, rather than this incomplete Cargo install command. This is a source-based finding; Cargo is not installed on this host.",
+    "fix": "Prefer the documented tagged release archive or source-checkout build. If retaining a Git install alternative, explicitly select the package: `cargo install --locked --git https://github.com/akitaonrails/ai-memory --tag v2.4.1 ai-memory-cli`, and retain the separate hook-bundle discovery requirement.",
+    "source": "https://doc.rust-lang.org/cargo/commands/cargo-install.html#description"
+   },
+   {
+    "severity": "medium",
+    "field": "native_adaptation.stack_entry.freshness",
+    "issue": "This current-summary field says the seven changed Codex hook commands still await /hooks re-trust. The qualification receipt's 2026-09-26 addendum resolves that condition, with retained real Codex capture, and the current readiness check reports seven configured and seven trusted commands. The card's own codex_wiring and deviations_from_upstream already acknowledge the resolution. PreCompact execution remains unverified.",
+    "fix": "ASSEMBLER: Update the current component freshness summary to cite the resolving #344 capture addendum and seven trusted commands, while retaining the original receipt as historical evidence and keeping PreCompact execution explicitly unverified.",
+    "source": "$HOME/code/native-agent-stack/evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md"
+   },
+   {
+    "severity": "low",
+    "field": "e2e_returned_results.records_total",
+    "issue": "The card reports 54 records. rr/ai-memory/records.json contains 48, and the ai-memory component summary in rr/returned-results.json also reports records=48. Filtering the combined file by component_ids yields 59 because it adds eleven cross-tool client records; neither documented scope yields 54.",
+    "fix": "ASSEMBLER: Recompute the per-tool records_total from the retained source and set it to 48. Preserve failed and superseded records within that total, and label any additional cross-tool evidence separately.",
+    "source": "<scratch>/rr/ai-memory/records.json"
+   },
+   {
+    "severity": "low",
+    "field": "native_adaptation.assessment",
+    "issue": "The assessment repeats records_total=54 and describes it as consistent with the retained per-tool evidence, but rr/ai-memory/records.json and the assembled ai-memory component summary both contain 48 records. The scope and permission caveats are otherwise supported.",
+    "fix": "Correct the assessment's per-tool count to 48 after reconciling e2e_returned_results.records_total. Continue to distinguish successful host-policy recall, the restricted-worker denial, lifecycle capture, and the absence of an exact token-savings comparison.",
+    "source": "<scratch>/rr/returned-results.json"
+   }
+  ],
+  "checked": [
+   "<scratch>/token-cards/cards/ai-memory.json",
+   "<scratch>/token-cards/groups/g4-retrieval-memory/ai-memory.upstream.json",
+   "https://api.github.com/repos/akitaonrails/ai-memory/compare/433a19f3d54dea287571b1423591db2a89965fa9...main",
+   "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest",
+   "https://api.github.com/repos/akitaonrails/ai-memory/tags?per_page=5",
+   "https://github.com/akitaonrails/ai-memory",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/Cargo.toml",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/README.md",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/crates/ai-memory-cli/src/commands/render_shared.rs",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/crates/ai-memory-mcp/src/server.rs",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/auto-scope.md",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md#capture-policy-capability-and-refresh",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md#openai-codex",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md#running-ai-memory-without-docker",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/local-embeddings.md",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/mcp-install.md#claude-code",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/security.md",
+   "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/evals/README.md",
+   "https://github.com/akitaonrails/ai-memory/compare/433a19f3d54dea287571b1423591db2a89965fa9...main",
+   "https://github.com/akitaonrails/ai-memory/compare/v2.4.1...main",
+   "https://github.com/akitaonrails/ai-memory/issues/920",
+   "https://github.com/akitaonrails/ai-memory/issues/929",
+   "https://github.com/akitaonrails/ai-memory/issues/930",
+   "https://github.com/akitaonrails/ai-memory/issues/932",
+   "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/Cargo.toml",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/LICENSE",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/README.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/docs/install.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/docs/mcp-install.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/docs/local-embeddings.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/docs/auto-scope.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/docs/security.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/evals/README.md",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/crates/ai-memory-cli/src/commands/render_shared.rs",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/crates/ai-memory-mcp/src/server.rs",
+   "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.1/ai-memory-linux-x86_64.tar.gz.sha256",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/evals/Cargo.toml",
+   "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.4.1/crates/ai-memory-cli/Cargo.toml",
+   "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+   "https://api.github.com/repos/akitaonrails/ai-memory/issues/930",
+   "https://api.github.com/repos/akitaonrails/ai-memory/issues/932",
+   "https://api.github.com/repos/akitaonrails/ai-memory/issues/929",
+   "https://api.github.com/repos/akitaonrails/ai-memory/issues/920",
+   "$HOME/code/native-agent-stack/manifests/stack.json",
+   "$HOME/code/native-agent-stack/docs/token-session-handbook.md",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-25-codex-mcp-scope.md",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-23-claude-user-profile.md",
+   "$HOME/code/native-agent-stack/recipes/README.md",
+   "$HOME/code/native-agent-stack/adoption/templates/codex.config.template.toml",
+   "$HOME/code/native-agent-stack/adoption/templates/claude.settings.template.json",
+   "$HOME/code/native-agent-stack/.codex/config.toml",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/blind-adjudicator.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/blind-lane-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/evidence-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/isolated-builder.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/source-scout.md",
+   "$HOME/code/native-agent-stack/adoption/pins-linux-x86_64.json",
+   "$HOME/code/native-agent-stack/adoption/pins-macos-arm64.json",
+   "$HOME/code/native-agent-stack/examples/ai-memory-config.toml.example",
+   "$HOME/code/native-agent-stack/.ai-memory.toml",
+   "$HOME/code/native-agent-stack/evidence/receipts/ai-memory-241-qualification-20260925.json",
+   "$HOME/code/native-agent-stack/evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+   "$HOME/.claude.json (ai-memory registration only)",
+   "$HOME/.codex/config.toml (ai-memory registration only)",
+   "$HOME/.claude/settings.json (ai-memory hook commands only)",
+   "$HOME/.codex/hooks.json (ai-memory hook commands only)",
+   "$HOME/.local/share/ai-memory/capture-mode",
+   "<scratch>/full-save/cur/ai-memory/gpt6.md",
+   "<scratch>/token-cards/invoke_by_tool.json (ai-memory in all six populations)",
+   "<scratch>/html-report/savings.json (tools[id=ai-memory]; no ai-memory report_comparisons)",
+   "<scratch>/rr/returned-results.json (records filtered by component_ids containing ai-memory; ai-memory component summary)",
+   "<scratch>/rr/ai-memory/records.json",
+   "<scratch>/rr/ai-memory/run.sh",
+   "<scratch>/rr/ai-memory/out/h2a-check-capture-marked.stdout",
+   "<scratch>/rr/ai-memory/out/h2b-check-capture-unmarked.stdout",
+   "<scratch>/rr/ai-memory/out/h0a-install-hooks-claude-print.stdout",
+   "<scratch>/rr/ai-memory/out/h0b-install-hooks-codex-print.stdout",
+   "<scratch>/rr/ai-memory/out/c2-check.stdout",
+   "<scratch>/rr/ai-memory/out/m1-mcp-memory-query.stdout",
+   "<scratch>/rr/ai-memory/out/m2-mcp-memory-read-page.stdout",
+   "$HOME/code/native-agent-stack/scripts/adoption_status.py --profile token-efficiency --client-wiring --json --repo-root $HOME/code/native-agent-stack (exit 2 overall; Claude hook events=8, Codex hook events=7, Codex trusted=7)",
+   "Native ai-memory --version: ai-memory 2.4.1",
+   "http://127.0.0.1:49474 (GET returned HTTP 404; operational endpoint, not a documentation source)",
+   "http://127.0.0.1:49474/mcp (GET returned HTTP 405; static registration independently verified in both client configurations)",
+   "http://127.0.0.1:49493 (GET timed out; retained isolated-fixture endpoint, not a live production source)",
+   "GitHub release/tag/compare API URLs above were re-opened successfully through authenticated gh api after unauthenticated HTTP 403 responses"
+  ],
+  "resolutions": [
+   "fixed: install recommendation leads with documented release and source routes and adds the ai-memory-cli package selector",
+   "deferred: ASSEMBLER-owned field, reported to the coordinator, not edited in this repair round",
+   "deferred: ASSEMBLER-owned field, reported to the coordinator, not edited in this repair round",
+   "fixed: assessment identifies records_total as the card's reported figure with exact reconciliation still open"
+  ],
+  "final_verdict": {
+   "tool": "ai-memory",
+   "verdict": "adapted-with-gaps",
+   "summary": "Installed v2.4.1 matches the latest release, and explicit-scoped HTTP MCP plus allowlisted native hooks are supported upstream choices, but restricted-worker recall and portable hook wiring still have gaps. The retained Claude and host-policy Codex queries returned the same ten hits, but the baseline was deliberately empty and no exact savings comparison exists, so adapted token performance is unverified rather than zero or a pass (../rr/ai-memory/records.json#ai-memory-e2-codex-exec; evidence/artifacts/token-e2e-codex-20260926/receipt.json). Real Codex lifecycle capture after hook trust is proven separately, while PreCompact remains unverified and this restricted worker's recall probe was denied (evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md; groups/final-verdict-evidence.json#live_probes). The fixed scan found invocations in 105/1,010 Ultracode children (10.40%) and 3/301 Codex workers (1.00%), including 4/22 TOKEN LANES children (18.18%); lifecycle capture is not added to these invocation counts (invoke_by_tool.json). Next, qualify recall under the intended restricted worker policy, render hook paths from each platform's installed version, correct stale trust/count summaries, and retain an actual PreCompact observation and a task-matched savings baseline.",
+   "gaps": [
+    {
+     "gap": "Registered memory_query can still be denied in restricted approval-never workers; host-policy success and hook trust do not establish recall in that worker class.",
+     "evidence": "../rr/ai-memory/records.json#ai-memory-d3-codex-exec; ../rr/ai-memory/records.json#ai-memory-e2-codex-exec; groups/final-verdict-evidence.json#live_probes",
+     "action": "Keep the worker's sandbox and use supplied original evidence meanwhile; qualify a narrowly permitted recall integration or accurately annotated upstream tool before claiming restricted-worker availability.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The shared Claude hook template hardcodes 2.4.1 while the macOS pin remains 2.3.2, and the macOS install note incorrectly says it matches Linux.",
+     "evidence": "adoption/templates/claude.settings.template.json; adoption/pins-macos-arm64.json; adoption/pins-linux-x86_64.json; https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md",
+     "action": "Render commands from the selected platform's installed prefix, correct the note, and keep any macOS migration separate from the qualified Linux installation.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Actual PreCompact capture and an exact task-matched token comparison are missing.",
+     "evidence": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md; cards/ai-memory.json#adapted_performance",
+     "action": "Retain a real compaction event and independently measure a same-task recall baseline; do not infer savings from ten hits, store counts, or lifecycle observations.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The merged current freshness text still says hook trust is pending, and records_total is 54 although the retained per-tool set contains 48 records.",
+     "evidence": "cards/ai-memory.json; groups/g4-retrieval-memory/ai-memory.review.json; ../rr/ai-memory/records.json; evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+     "action": "Repair current assembler summaries to acknowledge the capture addendum and count 48 per-tool records; preserve historical limitations and label cross-tool records separately without requesting trust again.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest official v2.4.1 was published 2026-09-25 and matches the retained native executable version.",
+     "evidence": "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest; ../rr/ai-memory/records.json#ai-memory-p0-ai-memory-version",
+     "result": "holds"
+    },
+    {
+     "claim": "Static HTTP and the optional Claude session-aware bridge are documented alternatives; explicit project scope is appropriate for static clients.",
+     "evidence": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/mcp-install.md; groups/g4-retrieval-memory/ai-memory.upstream.json",
+     "result": "holds"
+    },
+    {
+     "claim": "Claude's omitted prompt hook is an intentional supported opt-out, not a missing ninth hook.",
+     "evidence": "https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md; recipes/README.md; adoption/templates/claude.settings.template.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The restricted Codex query failed despite process exit zero, whereas the separately retained host-policy query completed with the same ten hits as Claude.",
+     "evidence": "../rr/ai-memory/records.json#ai-memory-d3-codex-exec; ../rr/ai-memory/records.json#ai-memory-e2-codex-exec",
+     "result": "holds"
+    },
+    {
+     "claim": "Codex capture still awaits hook trust.",
+     "evidence": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md; cards/ai-memory.json#native_adaptation/stack_entry/freshness",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "PreCompact executed successfully in the retained real Codex capture.",
+     "evidence": "evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md",
+     "result": "unverified"
+    },
+    {
+     "claim": "The retained per-tool set contains 48 records and 110 attachment references with matching hashes and sizes; the merged value 54 is not that count.",
+     "evidence": "../rr/ai-memory/records.json; groups/final-verdict-evidence.json#attachments",
+     "result": "holds"
+    },
+    {
+     "claim": "The fixed scan records 41 MCP and 179 CLI invocations across 105/1,010 workflow children, and four MCP invocations across 3/301 Codex workers; TOKEN LANES children were 4/22.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "result": "holds"
+    },
+    {
+     "claim": "Exact adapted token savings or causal provider savings have been measured.",
+     "evidence": "evidence/artifacts/token-e2e-codex-20260926/receipt.json; cards/ai-memory.json#adapted_performance",
+     "result": "unverified"
+    },
+    {
+     "claim": "The review's incomplete Cargo install suggestion is resolved by the upstream file's documented release/source routes and explicit ai-memory-cli selector.",
+     "evidence": "groups/g4-retrieval-memory/ai-memory.review.json; groups/g4-retrieval-memory/ai-memory.upstream.json; https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/install.md",
+     "result": "holds"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "ai-memory (memory_query attempted; approval denied)"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 62,
+     "qmd": 1
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-b.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37,
+     "qmd": 4,
+     "ai-memory": 1,
+     "socraticode": 1,
+     "serena": 2
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 49,
+     "qmd": 3,
+     "ai-memory": 1
+    },
+    "shell_commands": 4,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: memory_query 10 relevant hits (v2.4.0). #343: PASS, 10 hits through Codex MCP over HTTP. #316: PASS (check_ground_truth baseline). #344: Codex capture observed after /hooks trust. Not in #338 C…"
+}

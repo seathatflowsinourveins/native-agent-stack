@@ -1,0 +1,492 @@
+{
+ "tool": "context-hub",
+ "group": "g6-docs-accounting",
+ "repo": "https://github.com/andrewyng/context-hub",
+ "pin": "0.1.4 (npm @aisuite/chub)",
+ "installed_version": "0.1.4 (native `chub --cli-version`; -V/--cli-version is its version flag)",
+ "role": "Curated third-party developer docs instead of raw upstream pages; coverage varies by entry. Lanes: CLI (network). Landscape: document-retrieval alternative.",
+ "lanes": [
+  "CLI: chub search/get"
+ ],
+ "upstream": {
+  "latest_release": "v0.1.4",
+  "latest_date": "2026-04-27",
+  "our_pin": "0.1.4, npm @aisuite/chub; confirmed in $HOME/code/native-agent-stack/manifests/stack.json and cards/context-hub.json. Corresponding upstream package: https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/package.json",
+  "behind_by": "Matches the latest published release; post-tag changes on main are unreleased. Live release identity: https://api.github.com/repos/andrewyng/context-hub/releases/latest ; changes: https://github.com/andrewyng/context-hub/compare/v0.1.4...67dcbeb2eb42c808549f08397920ad58be7c2206",
+  "recommended_install": {
+   "command": "npm install -g @aisuite/chub",
+   "url": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/README.md#install"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Use chub search/get from Bash. Upstream also documents copying the packaged get-api-docs skill into Claude's instructions (https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/README.md#use-as-an-agent-skill). Optional MCP is the packaged chub-mcp executable: configure it as a stdio server if selected; the source connects StdioServerTransport. This option is not required for CLI use.",
+    "url": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/mcp/server.js"
+   },
+   "codex": {
+    "how": "Use chub search/get through CommandExecution. The upstream generic-agent guidance permits copying get-api-docs into the agent's custom-instructions location (https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/README.md#other-agent-tools). An optional MCP registration can launch the packaged chub-mcp executable over stdio; this is an explicit integration option, not automatic registration.",
+    "url": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/mcp/server.js"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Source for latest_release and latest_date: a fresh live check on 2026-09-27 UTC returned tag_name v0.1.4 and published_at 2026-04-27T22:10:03Z. The releases and tags lists showed no newer release or tag.",
+    "url": "https://api.github.com/repos/andrewyng/context-hub/releases/latest"
+   },
+   {
+    "claim": "The live npm latest dist-tag is 0.1.4 for @aisuite/chub, consistent with the GitHub release and our package pin.",
+    "url": "https://registry.npmjs.org/@aisuite%2Fchub"
+   },
+   {
+    "claim": "Upstream offers curated, versioned Markdown documentation and skills; API providers, framework authors and community contributors can submit content through pull requests. This is a retrieval capability claim, not a quantified token-savings guarantee.",
+    "url": "https://github.com/andrewyng/context-hub/blob/67dcbeb2eb42c808549f08397920ad58be7c2206/README.md"
+   },
+   {
+    "claim": "The published package declares both chub and chub-mcp binaries; the MCP surface is therefore already packaged at our pin.",
+    "url": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/package.json"
+   },
+   {
+    "claim": "chub update --force refreshes the downloaded registry; chub update --full downloads the published full bundle for offline use.",
+    "url": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/commands/update.js"
+   },
+   {
+    "claim": "chub build builds a registry from supplied local Markdown content. It is a content-authoring/build operation, not an automatic refresh of third-party API documentation.",
+    "url": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/commands/build.js"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "The reviewed contribution guide describes pull-request-based content maintenance and does not state a curated-document refresh SLA. It therefore supplies no basis for promising that a document tracks the latest provider release.",
+    "url": "https://github.com/andrewyng/context-hub/blob/67dcbeb2eb42c808549f08397920ad58be7c2206/CONTRIBUTING.md"
+   },
+   {
+    "text": "The live source for fastapi/package still declares metadata.versions = \"0.136.3\" and updated-on = \"2026-05-29\". Refreshing a registry cannot itself author a newer version of this document.",
+    "url": "https://github.com/andrewyng/context-hub/blob/67dcbeb2eb42c808549f08397920ad58be7c2206/content/fastapi/docs/package/python/DOC.md"
+   },
+   {
+    "text": "The published CLI and current main differ: annotation inclusion becomes opt-in only in post-release PR #244. Its change also preserves existing client_id files, so upgrading does not automatically rotate an existing identifier.",
+    "url": "https://github.com/andrewyng/context-hub/pull/244"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "Unreleased PR #244 gates appended annotations behind --with-annotations / MCP withAnnotations, labels opted-in notes as untrusted, and changes newly generated client identifiers to random values. It is merged after v0.1.4, not part of a newer published release.",
+    "url": "https://github.com/andrewyng/context-hub/pull/244"
+   },
+   {
+    "text": "Unreleased main fixes rejection of top-level chub --version; the retained pin's --cli-version probe should not be replaced by assuming main's help applies to the published package.",
+    "url": "https://github.com/andrewyng/context-hub/commit/1d4bbccf03b6e78522ea649be31c4f96a365373a"
+   },
+   {
+    "text": "Post-tag content updates include FastAPI/Pydantic/SQLAlchemy refreshes, but the current FastAPI source remains at the content version cited above; package release currency and curated-content currency are separate.",
+    "url": "https://github.com/andrewyng/context-hub/commit/6467ea3691ab44fbf489b3af0126f43153903b7e"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "context-hub",
+   "repository": "https://github.com/andrewyng/context-hub",
+   "version": "0.1.4",
+   "license": "MIT",
+   "profile": "supporting",
+   "role": "Retrieve selected curated developer documentation",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "Isolated npm prefix: npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4 ($HOME/code/native-agent-stack/recipes/README.md:91; manifests/stack.json, component context-hub). cards/context-hub.json, e2e_returned_results.records_shown[id=context-hub-1-cli-version].observation, confirms the installed prefix and PATH-linked chub; chub-mcp is installed in that prefix but not linked on PATH. Repository observations use the current detached checkout at the supplied path; it has no local main ref.",
+  "claude_wiring": "CLI only, invoked from Bash: chub search, choose a returned document ID, then chub get. No context-hub/chub MCP registration is present in $HOME/code/native-agent-stack/adoption/templates/claude.settings.template.json; the workflow is documented in recipes/README.md:91 and docs/token-session-handbook.md:140. Optional upstream MCP is not adopted by these files.",
+  "codex_wiring": "CLI only, invoked from CommandExecution. No context-hub/chub MCP entry is present in $HOME/code/native-agent-stack/adoption/templates/codex.config.template.toml or .codex/config.toml; the documented lane is search/get in docs/token-session-handbook.md:140. These inspected repository files register no server for either client.",
+  "lane_rule": "On-demand curated documentation: select one useful retrieval method per artifact, search before fetching the selected ID/language, and inspect the document's advertised version. Do not automatically submit feedback or annotations. Sources: $HOME/code/native-agent-stack/docs/token-session-handbook.md:106 and :140; recipes/README.md:91. Currency validation is a recommended addition, not an existing recipe check.",
+  "deviations_from_upstream": [
+   {
+    "what": "The native search/get recipe has no explicit currency gate. In cards/context-hub.json, e2e_returned_results.records_shown[id=context-hub-6-search-detail].observation records version_gap.doc_version = \"0.136.3\", version_gap.pin = \"0.141.1\", and version_gap.upstream_release_sections_newer_than_doc = 25.",
+    "why": "The recipe selects curated content without checking its version against the dependency being used. Upstream content is submitted and maintained as Markdown, and the live FastAPI source confirms the retained content version (https://github.com/andrewyng/context-hub/blob/67dcbeb2eb42c808549f08397920ad58be7c2206/content/fastapi/docs/package/python/DOC.md).",
+    "fix": "Extend the documented search/get workflow to refresh the registry with chub update --force when needed, inspect the returned content version, and use current primary documentation when it does not cover the required dependency version. Submit or build an updated curated document separately; neither registry refresh nor downloading the existing bundle guarantees new content.",
+    "pr": null
+   },
+   {
+    "what": "The stack deliberately uses the CLI instead of registering the optional packaged MCP server.",
+    "why": "The adopted on-demand lane is documented in recipes/README.md and docs/token-session-handbook.md; the reviewed client templates/config contain no registration. CLI-only operation is supported upstream, so this is a selection of interface rather than a missing requirement.",
+    "fix": "Keep the CLI lane documented. If MCP is later selected, use the installed chub-mcp path or link it deliberately, register it explicitly, and qualify search/get through the actual client before claiming MCP coverage.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Tracking gap in our own manifest: $HOME/code/native-agent-stack/manifests/stack.json says the latest release identity is separately recorded in manifests/landscape.json, but the current landscape.json contains neither context-hub nor chub. Add a source-backed latest-release entry or correct the freshness wording.",
+   "Add the document-currency gate described above; do not present cache refresh as a content freshness guarantee. No refresh SLA was found in the live README, contribution guide, content guide or CLI reference reviewed here.",
+   "Track and qualify the unreleased annotation/version-flag changes separately from the current npm pin; do not claim main's behavior is installed.",
+   "Retain the exact artifact comparison's task boundary; a provider-level savings claim would need a native end-to-end measurement that the current card does not supply."
+  ],
+  "assessment": "The CLI adaptation matches the latest published upstream release, but it needs a document-currency check before treating curated API guidance as current. In cards/context-hub.json, adapted_performance.exact_comparisons[0] records before_tokens = 70903, after_tokens = 2073 and change_pct = -97.1 for the named Uvicorn fact; that exact artifact result does not establish coverage of the newer FastAPI release. The same card has adapted_performance.native_counter = null, so the demonstrated benefit is this specific retrieval comparison, not measured overall provider-token savings."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed | skip_reason: Runnable with network (registry and the upstream page).",
+  "run_utc": "2026-09-26T18:43:05.386Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " verified in upstream (PASS); verifier: agree, 0 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/chub --cli-version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/chub cache status --json",
+    "exit": 0,
+    "returned": "completed (exit 0)"
+   },
+   {
+    "cmd": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/chub --help",
+    "exit": 0,
+    "returned": "completed (exit 0)"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/chub search fastapi --json",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/chub search fastapi/package --json",
+    "exit": 0,
+    "returned": "completed (exit 0)"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/chub get fastapi/package --lang py -o tool.md",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 31,
+  "records_shown": [
+   {
+    "id": "context-hub-0-harness",
+    "status": "completed: 30 steps, every exit code as expected (0; 2 for cleanup-confirm)",
+    "kind": "capture harness (local_integration; runs the upstream commands exactly as recorded)",
+    "command": "{\"tool\": \"bash run.sh (7 phase invocations, cwd $RR/context-hub)\", \"arguments\": {\"invocations\": [[\"bash\", \"run.sh\", \"retrieve\"], [\"bash\", \"run.sh\", \"get\", \"fastapi/package\"], [\"bash\", \"run.sh\", \"verify\", \"https://fastapi",
+    "observation": "{\"steps\": 30, \"exit_codes\": {\"cli-version\": 0, \"cache-status-before\": 0, \"help\": 0, \"search-fastapi\": 0, \"cache-status-after-search\": 0, \"search-detail\": 0, \"get\": 0, \"cache-status-after-get\": 0, \"curl-baseline\": 0, \"quality-check\": 0, \"mcp-list-schema\": 0, \"mcp-chub-search\": 0, \"mcp-chub-get-text\": 0, \"mcp-chub-get-raw\": 0, \"mcp-cache-status\": 0, \"mcp-daemon-namespace-absent\": 0, \"mcp-check\": 0, \"mcp-chub-get-json\":",
+    "attachments": 5
+   },
+   {
+    "id": "context-hub-1-cli-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/chub --cli-version",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": \"0.1.4\", \"pin\": \"0.1.4\", \"pin_match\": true, \"install\": \"npm prefix $HOME/.local/share/codex-ecosystem/tools/context-hub-0.1.4 (package @aisuite/chub 0.1.4, repository github.com/andrewyng/context-hub); `chub` linked on PATH at $HOME/.local/share/codex-ecosystem/bin/chub; the same prefix installs `chub-mcp` (not linked on PATH, not registered in any cl",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-2-cache-status-before",
+    "status": "completed (exit 0)",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/chub cache status --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": {\"exists\": false, \"sources\": []}, \"counter_note\": \"context-hub 0.1.4 has no upstream savings counter. `chub cache status --json` is its only native state read (registry presence, cached files, bytes); it is recorded before and after as state, never as savings.\", \"reads_as\": \"fresh isolated CHUB_DIR: no cache yet\", \"sanitization\": \"attachments byte-ide",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-3-help",
+    "status": "completed (exit 0)",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/chub --help",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned_first_line\": \"Help source: remote (version 0.1.4, revision git-661f708, updated 2026-05-31T18:40:41.923Z)\", \"stdout_bytes\": 3322, \"role\": \"Step 1 of the upstream get-api-docs skill (skills/get-api-docs/SKILL.md): run `chub --help` and follow it; its Agent Workflow is search -> get -> use -> annotate -> feedback\", \"surfaces\": {\"CLI chub search/get\": \"exe",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-4-search-fastapi",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/chub search fastapi --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"query\": \"fastapi\", \"total\": 15, \"top_id\": \"fastapi/package\", \"top_source_quality\": \"maintainer\", \"result_ids\": [\"fastapi/package\", \"opentelemetry/instrumentation-fastapi\", \"fastapi-mail/package\", \"fastapi-users/package\", \"fastapi-pagination/package\", \"fastapi-limiter/package\", \"fastapi-cache2/package\", \"slowapi/package\", \"strawberry-graphql/package\", \"sqladmin/p",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-5-cache-status-after-search",
+    "status": "completed (exit 0)",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/chub cache status --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": {\"exists\": true, \"sources\": [{\"name\": \"default\", \"type\": \"remote\", \"hasRegistry\": true, \"lastUpdated\": \"2026-09-26T18:43:06.361Z\", \"fullBundle\": false, \"fileCount\": 0, \"dataSize\": 0}]}, \"counter_note\": \"context-hub 0.1.4 has no upstream savings counter. `chub cache status --json` is its only native state read (registry presence, cached files, bytes); ",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-6-search-detail",
+    "status": "completed (exit 0)",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/chub search fastapi/package --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"id\": \"fastapi/package\", \"source_quality\": \"maintainer\", \"language\": \"python\", \"versions\": [\"0.136.3\"], \"recommended\": \"0.136.3\", \"doc_size_bytes\": 12514, \"registry_last_updated\": \"2026-05-29\", \"version_gap\": {\"pin\": \"0.141.1\", \"doc_version\": \"0.136.3\", \"pin_in_tool_md\": 0, \"pin_in_upstream_page\": 5, \"upstream_release_sections_newer_than_doc\": 25, \"newest_upstrea",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-7-get",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/chub get fastapi/package --lang py -o tool.md",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"output_file\": \"tool.md\", \"bytes\": 12514, \"sha256\": \"383ff6ced76ee38ddb0e8dad86e6d0710b1f54c4cf867953aba67d5703198a9f\", \"stdout_bytes\": 0, \"stderr\": \"Written to tool.md\", \"doc_frontmatter_versions\": \"0.136.3\", \"cited_upstream_page\": \"https://fastapi.tiangolo.com/release-notes/\", \"note\": \"-o writes the doc only; without -o the CLI appends a feedback footer, which ",
+    "attachments": 3
+   },
+   {
+    "id": "context-hub-8-cache-status-after-get",
+    "status": "completed (exit 0)",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 30 $HOME/.local/share/codex-ecosystem/bin/chub cache status --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": {\"exists\": true, \"sources\": [{\"name\": \"default\", \"type\": \"remote\", \"hasRegistry\": true, \"lastUpdated\": \"2026-09-26T18:43:06.361Z\", \"fullBundle\": false, \"fileCount\": 1, \"dataSize\": 12514}]}, \"counter_note\": \"context-hub 0.1.4 has no upstream savings counter. `chub cache status --json` is its only native state read (registry presence, cached files, byte",
+    "attachments": 2
+   },
+   {
+    "id": "context-hub-9-curl-baseline",
+    "status": "passed",
+    "kind": "plumbing command (native execution of a system tool; not a context-hub surface)",
+    "command": "timeout -k 5 120 curl -sS -L --max-time 90 -o base.html -w %{http_code} %{num_redirects} %{url_effective} %{content_type} %{size_download}\\n https://fastapi.tiangolo.com/release-notes/",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"http_code\": \"200\", \"redirects\": \"0\", \"url_effective\": \"https://fastapi.tiangolo.com/release-notes/\", \"content_type\": \"text/html; charset=utf-8\", \"size_download\": \"1537147\", \"output_file\": \"base.html\", \"bytes\": 1537147, \"sha256\": \"a6d4fdaf4960151cd76ff5522beaa507a0e94646cc8151c2bdf32216309a5fb4\", \"script_tags\": 10, \"why_this_page\": \"the doc's own 'Official Source",
+    "attachments": 3
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Uvicorn --limit-max-requests-jitter fact: upstream page vs chub get doc; verified in upstream (PASS)",
+    "before_tokens": 70903,
+    "after_tokens": 2073,
+    "change_pct": -97.1,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:15:10.746901+00:00",
+    "last_seen": "2026-09-25T21:15:10.746901+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 0,
+    "cli_calls": 28,
+    "agents_using": 8,
+    "agents": 1010,
+    "pct_agents_using": 0.0079
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 28,
+    "agents_using": 8,
+    "agents": 988,
+    "pct_agents_using": 0.0081
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 6,
+    "agents_using": 1,
+    "agents": 71,
+    "pct_agents_using": 0.0141
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 3,
+    "agents_using": 1,
+    "agents": 15,
+    "pct_agents_using": 0.0667
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 0,
+    "cli_calls": 6,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   }
+  },
+  "live_otel": null,
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "accurate",
+  "findings": [],
+  "checked": [
+   "Read the full assembled card and context-hub.upstream.json, and inspected the context-hub records and component entry in <scratch>/rr/returned-results.json plus its tool and comparison rows in <scratch>/html-report/savings.json.",
+   "Attempted every URL cited under upstream, including embedded links. GitHub's unauthenticated API returned HTTP 403 rate-limit errors; https://github.com/andrewyng/context-hub/releases/latest, /releases and /tags independently corroborated v0.1.4, publication at 2026-04-27T22:10:03Z, and no newer release/tag. The live npm registry confirmed @aisuite/chub latest 0.1.4. API access failure was not treated as a factual contradiction.",
+   "Verified upstream.recommended_install and both recommended_wiring entries against the pinned CLI README, package.json and MCP server source: npm installation, get-api-docs skill placement, packaged chub/chub-mcp binaries and StdioServerTransport.",
+   "Verified upstream.official_baseline_claims against the cited README and pinned update/build implementations: curated versioned Markdown, community contributions, registry/full-bundle refresh and local content-registry building.",
+   "Verified upstream.limitations against the cited contribution guide, FastAPI document and PR #244. The contribution guide states no refresh SLA; FastAPI metadata remains version 0.136.3, updated 2026-05-29; existing client_id files are preserved.",
+   "Verified every upstream.new_since_pin entry against PR #244 and the cited commit diffs: opt-in annotations and random new identifiers, the top-level version-flag fix, and FastAPI/Pydantic/SQLAlchemy content updates all postdate the published pin.",
+   "Checked native_adaptation install, interface selection, currency-gate recommendation and release-tracking gap against the cited local recipes, handbook, stack/landscape manifests and client templates/config. The manifest fields match; the cited configs contain no context-hub registration; the landscape lacks its release entry.",
+   "Matched the retained commands/observations to records_shown. The assembler's selected record total is 31. context-hub-6-search-detail supports the quoted document-version gap and upstream_release_sections_newer_than_doc = 25. The component verifier agrees with 0 defects.",
+   "Matched adapted_performance.exact_comparisons[0] to the raw report_comparisons row and tool comparison in <scratch>/html-report/savings.json: the named Uvicorn fact, before_tokens 70903, after_tokens 2073, change_pct -97.1 and o200k_base encoding. native_counter is null; this is distinct from the later FastAPI integration runs.",
+   "Checked all host-measured quantities quoted in native_adaptation against the same card's evidence fields. No invented measurement or combination of integration results, exact comparisons and invoke populations was found.",
+   "Independently selected context-hub from every population in <scratch>/token-cards/invoke_by_tool.json. All six populations and the measurement window exactly match invoke_rates; the adaptation makes no unsupported invocation-frequency claim.",
+   "Scanned the assembled card and upstream file for literal session scratch paths, raw UUIDs, home-directory usernames and email addresses. No leak found; the explicitly permitted repository prefix was excluded from leak classification."
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "context-hub",
+   "verdict": "adapted-with-gaps",
+   "summary": "The installed 0.1.4 CLI matches the latest published release and upstream's search-then-get workflow, but current CLI version does not guarantee current curated content (groups/g6-docs-accounting/context-hub.upstream.json). The historical Uvicorn fact comparison is 70903→2073 tokens (97.08%) with null card eligibility; separately, retained FastAPI CLI and MCP comparisons each reproduce 503515→3094 o200k_base tokens (99.39%), eligible only for the checked strict_content_type introduction fact and not for complete release coverage (cards/context-hub.json; ../rr/context-hub/out/23-o200k-compare-cli.stdout; ../rr/context-hub/out/24-o200k-compare-mcp.stdout; ../rr/context-hub/out/10-quality-check.stdout). The freshly fetched FastAPI document still declares version 0.136.3, while the retained stack target is 0.141.1 and that target is absent from the retrieved document (https://github.com/andrewyng/context-hub/blob/main/content/fastapi/docs/package/python/DOC.md; ../rr/context-hub/out/10-quality-check.stdout). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 8/1010 Ultracode workflow children (0.79%, 28 CLI detections), 1/301 Codex workers (0.33%, 6), and 0/22 children given the lanes block (invoke_by_tool.json). Next, gate retrieved documentation on the needed version and fact coverage, refresh cache when appropriate and fall back to current primary documentation; native saved-token counters and attributable provider savings remain unverified.",
+   "gaps": [
+    {
+     "gap": "The retrieved and freshly fetched FastAPI guide covers 0.136.3 rather than the retained 0.141.1 target.",
+     "evidence": "https://github.com/andrewyng/context-hub/blob/main/content/fastapi/docs/package/python/DOC.md",
+     "action": "Require version and feature coverage before accepting a curated result; cache refresh can re-download data but cannot author missing coverage, so use current primary docs when needed.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The historical card has null eligibility and the newer high-reduction comparisons accept only one bounded historical fact.",
+     "evidence": "../rr/context-hub/out/10-quality-check.stdout",
+     "action": "Attach explicit per-task acceptance to comparisons and test missing/newer APIs separately; do not treat a successful old fact as complete documentation currency.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Success-confirmed use on eligible documentation tasks is not measured, and no attributable provider-savings result is retained.",
+     "evidence": "cards/context-hub.json#invoke_rates",
+     "action": "Record successful search/get outcomes with document version and fallback cost on relevant worker tasks, keeping artifact counts separate from provider consumption.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Fresh chub --cli-version returned 0.1.4; the latest published release is v0.1.4 dated 2026-04-27.",
+     "evidence": "groups/g5-g6-verification.json#versions/context-hub",
+     "result": "holds"
+    },
+    {
+     "claim": "Upstream recommends CLI search followed by a selected get; optional MCP is an additional surface.",
+     "evidence": "https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/README.md",
+     "result": "holds"
+    },
+    {
+     "claim": "The historical Uvicorn comparison reproduces 70903→2073 tokens, but its card eligibility field is null.",
+     "evidence": "cards/context-hub.json#adapted_performance/exact_comparisons/0",
+     "result": "holds"
+    },
+    {
+     "claim": "Both retained FastAPI comparisons reproduce 503515→3094 tokens; they are separate CLI and MCP presentations, not additive savings.",
+     "evidence": "groups/g5-g6-verification.json#retained_comparisons",
+     "result": "holds"
+    },
+    {
+     "claim": "The primary strict_content_type fact check passes against the FastAPI 0.132.0 release section, and the earlier-version discrimination control behaves as expected.",
+     "evidence": "../rr/context-hub/out/10-quality-check.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "The corrected MCP JSON capture parses, preserves the CLI document text and passes its retained check.",
+     "evidence": "../rr/context-hub/out/20-mcp-check-json.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "Installing the latest CLI guarantees documentation coverage for the retained FastAPI 0.141.1 target.",
+     "evidence": "../rr/context-hub/out/10-quality-check.stdout#pin_gap_probe",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The freshly fetched upstream guide still declares version 0.136.3, revision 2 and update date 2026-05-29.",
+     "evidence": "https://github.com/andrewyng/context-hub/blob/main/content/fastapi/docs/package/python/DOC.md",
+     "result": "holds"
+    },
+    {
+     "claim": "Reported invoke detections are 8/1010 workflow children, 0/22 with lanes, and 1/301 Codex workers.",
+     "evidence": "invoke_by_tool.json#populations",
+     "result": "holds"
+    },
+    {
+     "claim": "The review reports no findings or unresolved resolutions.",
+     "evidence": "groups/g6-docs-accounting/context-hub.review.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The exact reductions establish native saved-token counters or attributable provider-token savings.",
+     "evidence": "cards/context-hub.json#adapted_performance",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "qmd (lookup returned no matching handbook entry)",
+    "serena (symbol lookup unavailable)"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 30
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-c.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 57,
+     "qmd": 1,
+     "serena": 2
+    },
+    "shell_commands": 5,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 53
+    },
+    "shell_commands": 4,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 70,903->2,073 (97.1%) after the first registry miss. #316: 259,649->2,980. #343: content gap (stripe/api lacked the idempotency header and retention). Not in #338 CI."
+}

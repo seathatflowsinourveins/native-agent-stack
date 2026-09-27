@@ -1,0 +1,814 @@
+{
+ "generated_from": "invoke_by_tool.py over the invoke.json window",
+ "window": {
+  "now": "2026-09-26T23:37:28Z",
+  "last_36h_start": "2026-09-25T11:37:28Z",
+  "baseline_since": "2026-09-25T17:18:00Z",
+  "baseline_until": "2026-09-26T15:05:00Z",
+  "otel_name_only_start": "2026-09-26T22:46:00Z",
+  "otel_tool_details_start": "2026-09-26T22:50:00Z"
+ },
+ "evidence_class": "local_integration",
+ "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+ "populations": {
+  "workflow_children": {
+   "agentsview": {
+    "mcp_calls": 0,
+    "cli_calls": 238,
+    "agents_using": 32,
+    "agents": 1010,
+    "pct_agents_using": 0.0317
+   },
+   "ai-memory": {
+    "mcp_calls": 41,
+    "cli_calls": 179,
+    "agents_using": 105,
+    "agents": 1010,
+    "pct_agents_using": 0.104
+   },
+   "ast-grep": {
+    "mcp_calls": 0,
+    "cli_calls": 243,
+    "agents_using": 44,
+    "agents": 1010,
+    "pct_agents_using": 0.0436
+   },
+   "ccusage": {
+    "mcp_calls": 0,
+    "cli_calls": 430,
+    "agents_using": 63,
+    "agents": 1010,
+    "pct_agents_using": 0.0624
+   },
+   "codebase-memory-mcp": {
+    "mcp_calls": 7,
+    "cli_calls": 31,
+    "agents_using": 9,
+    "agents": 1010,
+    "pct_agents_using": 0.0089
+   },
+   "context-hub": {
+    "mcp_calls": 0,
+    "cli_calls": 28,
+    "agents_using": 8,
+    "agents": 1010,
+    "pct_agents_using": 0.0079
+   },
+   "context-mode": {
+    "mcp_calls": 2233,
+    "cli_calls": 125,
+    "agents_using": 162,
+    "agents": 1010,
+    "pct_agents_using": 0.1604
+   },
+   "gpt-tokenizer": {
+    "mcp_calls": 0,
+    "cli_calls": 189,
+    "agents_using": 45,
+    "agents": 1010,
+    "pct_agents_using": 0.0446
+   },
+   "headroom": {
+    "mcp_calls": 6,
+    "cli_calls": 135,
+    "agents_using": 58,
+    "agents": 1010,
+    "pct_agents_using": 0.0574
+   },
+   "jcodemunch-mcp": {
+    "mcp_calls": 24,
+    "cli_calls": 500,
+    "agents_using": 64,
+    "agents": 1010,
+    "pct_agents_using": 0.0634
+   },
+   "markitdown": {
+    "mcp_calls": 0,
+    "cli_calls": 517,
+    "agents_using": 67,
+    "agents": 1010,
+    "pct_agents_using": 0.0663
+   },
+   "mcporter": {
+    "mcp_calls": 0,
+    "cli_calls": 1111,
+    "agents_using": 111,
+    "agents": 1010,
+    "pct_agents_using": 0.1099
+   },
+   "qmd": {
+    "mcp_calls": 16,
+    "cli_calls": 179,
+    "agents_using": 64,
+    "agents": 1010,
+    "pct_agents_using": 0.0634
+   },
+   "repomix": {
+    "mcp_calls": 0,
+    "cli_calls": 345,
+    "agents_using": 55,
+    "agents": 1010,
+    "pct_agents_using": 0.0545
+   },
+   "rtk": {
+    "mcp_calls": 0,
+    "cli_calls": 1454,
+    "agents_using": 192,
+    "agents": 1010,
+    "pct_agents_using": 0.1901
+   },
+   "serena": {
+    "mcp_calls": 9,
+    "cli_calls": 88,
+    "agents_using": 37,
+    "agents": 1010,
+    "pct_agents_using": 0.0366
+   },
+   "socraticode": {
+    "mcp_calls": 21,
+    "cli_calls": 755,
+    "agents_using": 96,
+    "agents": 1010,
+    "pct_agents_using": 0.095
+   },
+   "toon": {
+    "mcp_calls": 0,
+    "cli_calls": 308,
+    "agents_using": 62,
+    "agents": 1010,
+    "pct_agents_using": 0.0614
+   },
+   "_totals": {
+    "agents": 1010,
+    "tool_calls": 57346,
+    "rtk_hook_rewrites": 15426
+   }
+  },
+  "workflow_children_with_lanes_block": {
+   "agentsview": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 22,
+    "pct_agents_using": 0.0455
+   },
+   "ai-memory": {
+    "mcp_calls": 1,
+    "cli_calls": 5,
+    "agents_using": 4,
+    "agents": 22,
+    "pct_agents_using": 0.1818
+   },
+   "ast-grep": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "ccusage": {
+    "mcp_calls": 0,
+    "cli_calls": 9,
+    "agents_using": 1,
+    "agents": 22,
+    "pct_agents_using": 0.0455
+   },
+   "codebase-memory-mcp": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "context-hub": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "context-mode": {
+    "mcp_calls": 253,
+    "cli_calls": 17,
+    "agents_using": 21,
+    "agents": 22,
+    "pct_agents_using": 0.9545
+   },
+   "gpt-tokenizer": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "headroom": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "jcodemunch-mcp": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 22,
+    "pct_agents_using": 0.0455
+   },
+   "markitdown": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "mcporter": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "qmd": {
+    "mcp_calls": 0,
+    "cli_calls": 2,
+    "agents_using": 2,
+    "agents": 22,
+    "pct_agents_using": 0.0909
+   },
+   "repomix": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "rtk": {
+    "mcp_calls": 0,
+    "cli_calls": 47,
+    "agents_using": 10,
+    "agents": 22,
+    "pct_agents_using": 0.4545
+   },
+   "serena": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 22,
+    "pct_agents_using": 0.0455
+   },
+   "socraticode": {
+    "mcp_calls": 0,
+    "cli_calls": 2,
+    "agents_using": 2,
+    "agents": 22,
+    "pct_agents_using": 0.0909
+   },
+   "toon": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "_totals": {
+    "agents": 22,
+    "tool_calls": 1875,
+    "rtk_hook_rewrites": 448
+   }
+  },
+  "workflow_children_without_lanes_block": {
+   "agentsview": {
+    "mcp_calls": 0,
+    "cli_calls": 237,
+    "agents_using": 31,
+    "agents": 988,
+    "pct_agents_using": 0.0314
+   },
+   "ai-memory": {
+    "mcp_calls": 40,
+    "cli_calls": 174,
+    "agents_using": 101,
+    "agents": 988,
+    "pct_agents_using": 0.1022
+   },
+   "ast-grep": {
+    "mcp_calls": 0,
+    "cli_calls": 243,
+    "agents_using": 44,
+    "agents": 988,
+    "pct_agents_using": 0.0445
+   },
+   "ccusage": {
+    "mcp_calls": 0,
+    "cli_calls": 421,
+    "agents_using": 62,
+    "agents": 988,
+    "pct_agents_using": 0.0628
+   },
+   "codebase-memory-mcp": {
+    "mcp_calls": 7,
+    "cli_calls": 31,
+    "agents_using": 9,
+    "agents": 988,
+    "pct_agents_using": 0.0091
+   },
+   "context-hub": {
+    "mcp_calls": 0,
+    "cli_calls": 28,
+    "agents_using": 8,
+    "agents": 988,
+    "pct_agents_using": 0.0081
+   },
+   "context-mode": {
+    "mcp_calls": 1980,
+    "cli_calls": 108,
+    "agents_using": 141,
+    "agents": 988,
+    "pct_agents_using": 0.1427
+   },
+   "gpt-tokenizer": {
+    "mcp_calls": 0,
+    "cli_calls": 189,
+    "agents_using": 45,
+    "agents": 988,
+    "pct_agents_using": 0.0455
+   },
+   "headroom": {
+    "mcp_calls": 6,
+    "cli_calls": 135,
+    "agents_using": 58,
+    "agents": 988,
+    "pct_agents_using": 0.0587
+   },
+   "jcodemunch-mcp": {
+    "mcp_calls": 24,
+    "cli_calls": 499,
+    "agents_using": 63,
+    "agents": 988,
+    "pct_agents_using": 0.0638
+   },
+   "markitdown": {
+    "mcp_calls": 0,
+    "cli_calls": 517,
+    "agents_using": 67,
+    "agents": 988,
+    "pct_agents_using": 0.0678
+   },
+   "mcporter": {
+    "mcp_calls": 0,
+    "cli_calls": 1111,
+    "agents_using": 111,
+    "agents": 988,
+    "pct_agents_using": 0.1123
+   },
+   "qmd": {
+    "mcp_calls": 16,
+    "cli_calls": 177,
+    "agents_using": 62,
+    "agents": 988,
+    "pct_agents_using": 0.0628
+   },
+   "repomix": {
+    "mcp_calls": 0,
+    "cli_calls": 345,
+    "agents_using": 55,
+    "agents": 988,
+    "pct_agents_using": 0.0557
+   },
+   "rtk": {
+    "mcp_calls": 0,
+    "cli_calls": 1407,
+    "agents_using": 182,
+    "agents": 988,
+    "pct_agents_using": 0.1842
+   },
+   "serena": {
+    "mcp_calls": 9,
+    "cli_calls": 87,
+    "agents_using": 36,
+    "agents": 988,
+    "pct_agents_using": 0.0364
+   },
+   "socraticode": {
+    "mcp_calls": 21,
+    "cli_calls": 753,
+    "agents_using": 94,
+    "agents": 988,
+    "pct_agents_using": 0.0951
+   },
+   "toon": {
+    "mcp_calls": 0,
+    "cli_calls": 308,
+    "agents_using": 62,
+    "agents": 988,
+    "pct_agents_using": 0.0628
+   },
+   "_totals": {
+    "agents": 988,
+    "tool_calls": 55471,
+    "rtk_hook_rewrites": 14978
+   }
+  },
+  "agent_subagents": {
+   "agentsview": {
+    "mcp_calls": 0,
+    "cli_calls": 32,
+    "agents_using": 4,
+    "agents": 71,
+    "pct_agents_using": 0.0563
+   },
+   "ai-memory": {
+    "mcp_calls": 0,
+    "cli_calls": 59,
+    "agents_using": 12,
+    "agents": 71,
+    "pct_agents_using": 0.169
+   },
+   "ast-grep": {
+    "mcp_calls": 0,
+    "cli_calls": 22,
+    "agents_using": 3,
+    "agents": 71,
+    "pct_agents_using": 0.0423
+   },
+   "ccusage": {
+    "mcp_calls": 0,
+    "cli_calls": 23,
+    "agents_using": 3,
+    "agents": 71,
+    "pct_agents_using": 0.0423
+   },
+   "codebase-memory-mcp": {
+    "mcp_calls": 1,
+    "cli_calls": 19,
+    "agents_using": 2,
+    "agents": 71,
+    "pct_agents_using": 0.0282
+   },
+   "context-hub": {
+    "mcp_calls": 0,
+    "cli_calls": 6,
+    "agents_using": 1,
+    "agents": 71,
+    "pct_agents_using": 0.0141
+   },
+   "context-mode": {
+    "mcp_calls": 1424,
+    "cli_calls": 6,
+    "agents_using": 51,
+    "agents": 71,
+    "pct_agents_using": 0.7183
+   },
+   "gpt-tokenizer": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 71,
+    "pct_agents_using": 0.0141
+   },
+   "headroom": {
+    "mcp_calls": 0,
+    "cli_calls": 11,
+    "agents_using": 6,
+    "agents": 71,
+    "pct_agents_using": 0.0845
+   },
+   "jcodemunch-mcp": {
+    "mcp_calls": 2,
+    "cli_calls": 19,
+    "agents_using": 5,
+    "agents": 71,
+    "pct_agents_using": 0.0704
+   },
+   "markitdown": {
+    "mcp_calls": 0,
+    "cli_calls": 239,
+    "agents_using": 8,
+    "agents": 71,
+    "pct_agents_using": 0.1127
+   },
+   "mcporter": {
+    "mcp_calls": 0,
+    "cli_calls": 326,
+    "agents_using": 6,
+    "agents": 71,
+    "pct_agents_using": 0.0845
+   },
+   "qmd": {
+    "mcp_calls": 1,
+    "cli_calls": 4,
+    "agents_using": 4,
+    "agents": 71,
+    "pct_agents_using": 0.0563
+   },
+   "repomix": {
+    "mcp_calls": 0,
+    "cli_calls": 18,
+    "agents_using": 3,
+    "agents": 71,
+    "pct_agents_using": 0.0423
+   },
+   "rtk": {
+    "mcp_calls": 0,
+    "cli_calls": 85,
+    "agents_using": 14,
+    "agents": 71,
+    "pct_agents_using": 0.1972
+   },
+   "serena": {
+    "mcp_calls": 0,
+    "cli_calls": 4,
+    "agents_using": 4,
+    "agents": 71,
+    "pct_agents_using": 0.0563
+   },
+   "socraticode": {
+    "mcp_calls": 0,
+    "cli_calls": 70,
+    "agents_using": 10,
+    "agents": 71,
+    "pct_agents_using": 0.1408
+   },
+   "toon": {
+    "mcp_calls": 0,
+    "cli_calls": 17,
+    "agents_using": 3,
+    "agents": 71,
+    "pct_agents_using": 0.0423
+   },
+   "_totals": {
+    "agents": 71,
+    "tool_calls": 8172,
+    "rtk_hook_rewrites": 1626
+   }
+  },
+  "main_sessions": {
+   "agentsview": {
+    "mcp_calls": 0,
+    "cli_calls": 13,
+    "agents_using": 2,
+    "agents": 15,
+    "pct_agents_using": 0.1333
+   },
+   "ai-memory": {
+    "mcp_calls": 25,
+    "cli_calls": 80,
+    "agents_using": 6,
+    "agents": 15,
+    "pct_agents_using": 0.4
+   },
+   "ast-grep": {
+    "mcp_calls": 0,
+    "cli_calls": 13,
+    "agents_using": 2,
+    "agents": 15,
+    "pct_agents_using": 0.1333
+   },
+   "ccusage": {
+    "mcp_calls": 0,
+    "cli_calls": 21,
+    "agents_using": 4,
+    "agents": 15,
+    "pct_agents_using": 0.2667
+   },
+   "codebase-memory-mcp": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 15,
+    "pct_agents_using": 0.0667
+   },
+   "context-hub": {
+    "mcp_calls": 0,
+    "cli_calls": 3,
+    "agents_using": 1,
+    "agents": 15,
+    "pct_agents_using": 0.0667
+   },
+   "context-mode": {
+    "mcp_calls": 171,
+    "cli_calls": 26,
+    "agents_using": 7,
+    "agents": 15,
+    "pct_agents_using": 0.4667
+   },
+   "gpt-tokenizer": {
+    "mcp_calls": 0,
+    "cli_calls": 8,
+    "agents_using": 2,
+    "agents": 15,
+    "pct_agents_using": 0.1333
+   },
+   "headroom": {
+    "mcp_calls": 0,
+    "cli_calls": 38,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "jcodemunch-mcp": {
+    "mcp_calls": 0,
+    "cli_calls": 29,
+    "agents_using": 4,
+    "agents": 15,
+    "pct_agents_using": 0.2667
+   },
+   "markitdown": {
+    "mcp_calls": 0,
+    "cli_calls": 58,
+    "agents_using": 5,
+    "agents": 15,
+    "pct_agents_using": 0.3333
+   },
+   "mcporter": {
+    "mcp_calls": 0,
+    "cli_calls": 106,
+    "agents_using": 5,
+    "agents": 15,
+    "pct_agents_using": 0.3333
+   },
+   "qmd": {
+    "mcp_calls": 0,
+    "cli_calls": 32,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "repomix": {
+    "mcp_calls": 0,
+    "cli_calls": 24,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "rtk": {
+    "mcp_calls": 0,
+    "cli_calls": 84,
+    "agents_using": 7,
+    "agents": 15,
+    "pct_agents_using": 0.4667
+   },
+   "serena": {
+    "mcp_calls": 0,
+    "cli_calls": 20,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "socraticode": {
+    "mcp_calls": 0,
+    "cli_calls": 76,
+    "agents_using": 5,
+    "agents": 15,
+    "pct_agents_using": 0.3333
+   },
+   "toon": {
+    "mcp_calls": 0,
+    "cli_calls": 27,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "_totals": {
+    "agents": 15,
+    "tool_calls": 5642,
+    "rtk_hook_rewrites": 1196
+   }
+  },
+  "codex_exec_workers": {
+   "agentsview": {
+    "mcp_calls": 0,
+    "cli_calls": 11,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "ai-memory": {
+    "mcp_calls": 4,
+    "cli_calls": 0,
+    "agents_using": 3,
+    "agents": 301,
+    "pct_agents_using": 0.01
+   },
+   "ast-grep": {
+    "mcp_calls": 0,
+    "cli_calls": 7,
+    "agents_using": 2,
+    "agents": 301,
+    "pct_agents_using": 0.0066
+   },
+   "ccusage": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "codebase-memory-mcp": {
+    "mcp_calls": 6,
+    "cli_calls": 0,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "context-hub": {
+    "mcp_calls": 0,
+    "cli_calls": 6,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "context-mode": {
+    "mcp_calls": 5293,
+    "cli_calls": 2,
+    "agents_using": 265,
+    "agents": 301,
+    "pct_agents_using": 0.8804
+   },
+   "gpt-tokenizer": {
+    "mcp_calls": 0,
+    "cli_calls": 4,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "headroom": {
+    "mcp_calls": 3,
+    "cli_calls": 2,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "jcodemunch-mcp": {
+    "mcp_calls": 2,
+    "cli_calls": 8,
+    "agents_using": 3,
+    "agents": 301,
+    "pct_agents_using": 0.01
+   },
+   "markitdown": {
+    "mcp_calls": 0,
+    "cli_calls": 4,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   },
+   "mcporter": {
+    "mcp_calls": 0,
+    "cli_calls": 2,
+    "agents_using": 2,
+    "agents": 301,
+    "pct_agents_using": 0.0066
+   },
+   "qmd": {
+    "mcp_calls": 42,
+    "cli_calls": 0,
+    "agents_using": 11,
+    "agents": 301,
+    "pct_agents_using": 0.0365
+   },
+   "repomix": {
+    "mcp_calls": 0,
+    "cli_calls": 7,
+    "agents_using": 2,
+    "agents": 301,
+    "pct_agents_using": 0.0066
+   },
+   "rtk": {
+    "mcp_calls": 0,
+    "cli_calls": 1129,
+    "agents_using": 150,
+    "agents": 301,
+    "pct_agents_using": 0.4983
+   },
+   "serena": {
+    "mcp_calls": 90,
+    "cli_calls": 0,
+    "agents_using": 21,
+    "agents": 301,
+    "pct_agents_using": 0.0698
+   },
+   "socraticode": {
+    "mcp_calls": 8,
+    "cli_calls": 9,
+    "agents_using": 11,
+    "agents": 301,
+    "pct_agents_using": 0.0365
+   },
+   "toon": {
+    "mcp_calls": 0,
+    "cli_calls": 10,
+    "agents_using": 3,
+    "agents": 301,
+    "pct_agents_using": 0.01
+   },
+   "_totals": {
+    "agents": 301,
+    "tool_calls": 8203,
+    "rtk_hook_rewrites": 0
+   }
+  }
+ },
+ "codex_negative_control_sessions": 139
+}
