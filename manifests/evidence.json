@@ -3562,13 +3562,13 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "46a7b9385e8aaaadf9f27b67e6d8bb92f85f30ed0e0cfe9d881adc6cb3f8c3b4",
+      "sha256": "b74c562bc952425a811c8e9300d07950dbe1d89f1da0fb172cfebb5a3120127e",
       "bytes": 383
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "12e01ab910a9a3c06e02cdc1b41de9166902690bddbc6afcd58e59809c4ef490",
-      "bytes": 4094
+      "sha256": "5e69d1f9319e9035e7c36c35a40684fee9e73219d049d9ab221887ed2cb39f02",
+      "bytes": 4095
     },
     {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
@@ -3722,8 +3722,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "7ce4fbc38f1994746c21d7dc5b9d9367d6c7c3b02ee4d725ea859e54ab93f313",
-      "bytes": 3151
+      "sha256": "c898e5f2c4ea45534ff0f660c2929d3eb62b1c9e423c3a3008f89875828e4f33",
+      "bytes": 3698
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -3742,8 +3742,8 @@
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "cf8adbabcd3db19ed32f53d9868e98bbb3b774cb6d1a7f2ab3e709a930ae227e",
-      "bytes": 2701
+      "sha256": "f6ac8b7b9ba611fb2dd303642c880e7eafa6d85bb552ce358bd16d4f6917a358",
+      "bytes": 2912
     },
     {
       "path": "adoption/templates/systemd/omniroute.service",
@@ -13873,8 +13873,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "293b5adef5de1accb95ac5ca104dfab113d4e8b27b0ea8b6ef66fed84710b91c",
-      "bytes": 30831
+      "sha256": "84534afe0d8428889e532d98e12ee21cd358ba200ee4059f33e359933f95061f",
+      "bytes": 40660
     },
     {
       "path": "docs/direct-results.md",
@@ -14008,8 +14008,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2a40695b8910272d20b2cdc455370d2f59dd384adc20c36eece754138075b678",
-      "bytes": 41101
+      "sha256": "d8a7be390eec58dbe95639978776a6419bf4f83a589982d893ab7a9e909a68a7",
+      "bytes": 42147
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14248,8 +14248,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b4304cfbd2169c23d27a80fd938d1bd2aa74cf5294cf28e99340f1bad1c57896",
-      "bytes": 79772
+      "sha256": "421998d26d6f05b114db1faa5890330ed9b165111ae965e9abef42ed298d5fc8",
+      "bytes": 81598
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -29417,6 +29417,16 @@
       "bytes": 2065
     },
     {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/README.md",
+      "sha256": "3691f77945bc13b05210623bc68c34f293a52e6736365eb3ba92f6c12f98eeb9",
+      "bytes": 5147
+    },
+    {
+      "path": "evidence/artifacts/jcodemunch-route-args-20260927/probes.json",
+      "sha256": "b7d415ab6119eeb6ed31bff86a0a805dca14dda5a2fde20389d97a112e2e241f",
+      "bytes": 3031
+    },
+    {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
       "sha256": "801d59237231fddcae82ab5a19d3b25b09388e9b6f6f61e974073cf1251e63be",
       "bytes": 14819
@@ -39253,8 +39263,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "1c0f6253a26296ce7bfd9d672756034270d72af9cdaedcbf0ad981093fe5c30e",
-      "bytes": 2288
+      "sha256": "c3af37253aa33d5ad8311d253c8d78f4ddbbc6eaa350572ebc32a3fc4a99e5e4",
+      "bytes": 2639
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -39263,8 +39273,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf",
-      "bytes": 95109
+      "sha256": "bafec094caf52c27ab2a0ad62ddb863cabf0c67d1a5443450a74623c7b49a5b2",
+      "bytes": 96943
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -39783,8 +39793,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "2c4426392551fc44ac10799423772c1fa79f68d4bb12d83428c29ad192b3d144",
-      "bytes": 12080
+      "sha256": "d89cad927ba73d71ead204cd253e64bd6c127e8fb9de0a60ddf2dc6e983a5bf7",
+      "bytes": 13280
     },
     {
       "path": "tests/test_trading_gates.py",
