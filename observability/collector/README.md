@@ -131,14 +131,16 @@ run key and `workflow.run_id` (added in #366, `a464d288`, after #364 merged at
 RUNBOOK's opening "four merge gates" paragraph, its "Check delivery and
 exporter flushes" paragraph under [Loki queries and reconciliation](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md#loki-queries-and-reconciliation--aa-7-84-steps-67),
 and the [E2E README's #364 dependency row](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#merge-before-run-dependencies-and-unverified-boundaries)
-describe earlier inspected revisions. Each now carries a dated update; their
-original statements remain historical evidence. Host delivery/flush proof and
+describe earlier inspected revisions. Those receipts are sealed by the #381
+preregistration: RUNBOOK.md by hash, and the E2E README through its append-only
+amendment rule. So they stay unchanged here, and their correction belongs to a
+dated #381 amendment. Until that lands, this section supersedes their
+field-gap statements. Host delivery/flush proof and
 Codex `env`/`call_id` reconciliation remain outstanding.
 
 On a host already running the profile, `apply.sh` [leaves log_statements unchanged](../../evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py#L116);
 install the reviewed `collector.yaml` using the [installation recipe above](#native-collector-profile),
-validate it, then restart the user service with `systemctl --user restart ecosystem-otelcol.service`,
-following [#366's byte-identical deployment](../../evidence/artifacts/tool-invoke-rates-20260926/README.md);
+validate it, then restart the user service with `systemctl --user restart ecosystem-otelcol.service`;
 prove delivery and flushes afterward.
 
 Codex **rust-v0.157.1** logs full `arguments` in
