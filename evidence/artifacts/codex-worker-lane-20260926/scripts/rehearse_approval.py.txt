@@ -1,0 +1,42 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch rehearsal of prove_codex_lane.py's approval check and its control (real CODEX_HOME, `-c` overrides for
+the profile's ai-memory keys; the servers the check does not use are off). Saves the raw mcp_tool_call items, with
+result text cut to its first 160 characters. usage: rehearse_approval.py <out.json>"""
+import json
+import sys
+import tomllib
+from pathlib import Path
+
+WT = Path("$SCRATCH/wt-u4")
+sys.path.insert(0, str(WT / "tools/adoption"))
+import prove_codex_lane as prove  # noqa: E402
+
+codex = prove.shutil.which("codex")
+profile = tomllib.loads(prove.lane.PROFILE_TEMPLATE.read_text(encoding="utf-8"))
+allowed, detail = prove.quota_gate(90.0)
+print(detail, flush=True)
+if not allowed:
+    sys.exit(2)
+quiet = [f"mcp_servers.{n}.enabled=false" for n in ("serena", "socraticode", "codebase-memory", "qmd", "headroom")]
+quiet.append('plugins."context-mode@context-mode".mcp_servers.context-mode.enabled=false')
+keys = [f"mcp_servers.ai-memory.{k}={json.dumps(v)}" for k, v in profile["mcp_servers"]["ai-memory"].items()]
+memory = prove.MEMORY_PROMPT % ("local", "native-agent-stack")
+env = prove.worker_env(Path.home() / ".codex")
+specs = []
+for name, pairs in (("with the profile's ai-memory keys", keys + quiet), ("control, without them", quiet)):
+    extra = [x for p in pairs + ['model_reasoning_effort="max"'] for x in ("-c", p)]
+    specs.append({"name": name, "argv": prove.exec_argv(codex, memory, False, extra), "cwd": "/tmp", "env": env})
+runs = prove.run_workers(specs, 900)
+out = []
+for run, refusal in zip(runs, (False, True)):
+    ok, verdict = prove.approval_verdict(run, expect_refusal=refusal)
+    print(("PASS " if ok else "FAIL ") + run["name"] + ": " + verdict)
+    items = []
+    for item in prove.mcp_calls(run["events"], "ai-memory", "memory_query"):
+        for part in ((item.get("result") or {}).get("content") or []):
+            if isinstance(part, dict) and "text" in part:
+                part["text"] = "(result text omitted from the record)" if not refusal else part["text"][:200]
+        items.append(item)
+    out.append({"name": run["name"], "verdict": ok, "detail": verdict, "items": items, "usage": prove.usage(run["events"]),
+                "exit": run["exit"], "seconds": run["seconds"]})
+Path(sys.argv[1]).write_text(json.dumps(out, indent=2) + "\n")

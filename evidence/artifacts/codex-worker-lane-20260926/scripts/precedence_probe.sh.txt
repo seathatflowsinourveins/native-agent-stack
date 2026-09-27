@@ -1,0 +1,33 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+#!/bin/bash
+# Scratch probe: does a project .codex/config.toml outrank the stack-worker profile, and does -c outrank both?
+# Scratch CODEX_HOME: config.toml with stand-in servers (the profile amends registered servers) and a user effort of
+# "max"; the profile template. Scratch project: a git repository whose .codex/config.toml sets "ultra". Each line
+# reads the multi_agent_mode sentence of `codex debug prompt-input` (ultra: proactive delegation; any other effort:
+# "Do not spawn ..."). No sign-in, network namespace off. usage: precedence_probe.sh <scratch-dir> <profile template>
+set -u
+S=$1; T=$2
+rm -rf "$S"; mkdir -p "$S[redacted]" "$S/project/.codex"
+cp "$T" "$S[redacted]stack-worker.config.toml"
+{
+  printf '%s\n' 'model_reasoning_effort = "max"' '[mcp_servers.ai-memory]' 'url = "http://127.0.0.1:1/mcp"' \
+    '[mcp_servers.socraticode]' 'command = "/bin/false"' '[mcp_servers.headroom]' 'command = "/bin/false"' \
+    '[mcp_servers.context-mode]' 'command = "/bin/false"'
+  [ "${TRUST_IN_FILE:-0}" = 1 ] && printf '[projects."%s"]\ntrust_level = "trusted"\n' "$S/project"
+} > "$S[redacted]config.toml"
+printf 'model_reasoning_effort = "ultra"\n' > "$S/project/.codex/config.toml"
+git -C "$S/project" init -q
+CODEX_BIN=$(command -v codex)
+run() {
+  local dir=$1; shift
+  env -i HOME="$S/home" CODEX_HOME="$S[redacted]" PATH="/usr/bin:/bin:$(dirname "$CODEX_BIN")" LANG=C.UTF-8 \
+    bwrap --unshare-net --ro-bind / / --dev /dev --proc /proc --bind "$S" "$S" --chdir "$dir" -- \
+    "$CODEX_BIN" "$@" debug prompt-input probe < /dev/null 2>"$S/err" \
+    | grep -o -E 'Proactive multi-agent delegation is active|Do not spawn sub-agents unless' | head -1
+  [ -s "$S/err" ] && grep -v -E 'PATH aliases|^$' "$S/err" | tail -1 | sed 's/^/    stderr: /'
+}
+TRUST=(-c "projects.\"$S/project\".trust_level=\"trusted\"")
+echo "user max, project ultra, no profile: $(run "$S/project" "${TRUST[@]}")"
+echo "user max, project ultra, -p stack-worker: $(run "$S/project" "${TRUST[@]}" -p stack-worker)"
+echo "user max, project ultra, -p stack-worker + -c max: $(run "$S/project" "${TRUST[@]}" -p stack-worker -c 'model_reasoning_effort="max"')"
+echo "control, outside the project, no profile: $(run "$S" "${TRUST[@]}")"

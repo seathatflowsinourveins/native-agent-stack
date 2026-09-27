@@ -1,0 +1,126 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch: copy this session's retained outputs into evidence/artifacts/codex-worker-lane-20260926/, with the
+scratchpad path, $HOME and the user name masked by scripts/host_receipts.py's own sanitize()."""
+import json
+import re
+import sys
+from pathlib import Path
+
+SP = Path("$SCRATCH")
+WT = SP / "wt-u4"
+OUT = WT / "evidence/artifacts/codex-worker-lane-20260926"
+sys.path.insert(0, str(WT / "scripts"))
+import host_receipts  # noqa: E402
+
+UUID = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b")
+
+
+def clean(text: str) -> str:
+    text = text.replace(str(SP), "$SCRATCH").replace("$TMP/codex-lane-", "$TMP/codex-lane-")
+    text = re.sub(r"/tmp/claude-\d+/[^\s\"')]*", "$SCRATCH/...", text)  # a path cut short in a printed excerpt
+    text = UUID.sub("<uuid>", text)
+    return host_receipts.sanitize(text)
+
+
+def put(name: str, text: str) -> None:
+    path = OUT / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [line.rstrip() for line in clean(text).rstrip("\n").splitlines()]  # no trailing blanks (git diff --check)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+OUT.mkdir(parents=True, exist_ok=True)
+pd = SP / "pd"
+put("host-dry-run.txt",
+    f"# tools/adoption/apply_codex_lane.py --project-config <main checkout>/.codex/config.toml (dry run, real Codex home)\n"
+    f"# started {(pd / 'host-dry.start').read_text().strip()}, ended {(pd / 'host-dry.end').read_text().strip()}\n"
+    + (pd / "host-dry.out").read_text()
+    + "\n# Codex home files before and after (path, sha256 prefix, mtime; the profile's absence last)\n"
+    + (pd / "host-before.txt").read_text() + "# after\n" + (pd / "host-after.txt").read_text())
+put("host-prove-before-apply.txt",
+    "# tools/adoption/prove_codex_lane.py (static checks), real Codex home, before any apply\n"
+    + (pd / "host-prove-before.out").read_text())
+put("rehearsal-cycle.txt",
+    "# dry run, apply, second apply, rollback twice on a scratch Codex home holding copies of this host's\n"
+    "# config.toml, AGENTS.md and RTK.md (no auth.json); driver scripts/cycle.sh.txt\n" + (pd / "cycle4.log").read_text())
+put("rehearsal-static.txt",
+    "# prove before apply, apply, prove after apply on a scratch Codex home; a scratch project stands in for the main\n"
+    "# checkout after the host step; driver scripts/rehearse_static.sh.txt\n" + (pd / "rehearse-static.log").read_text())
+put("integration-test.txt",
+    "# NAS_CODEX_INTEGRATION=1 python -m unittest tests.test_codex_worker_lane.CodexIntegrationTests -v\n"
+    + (pd / "integration.out").read_text())
+
+live = json.loads((pd / "live-rehearsal.json").read_text())
+rtk = json.loads((pd / "rtk-rehearsal.json").read_text())
+approval = json.loads((pd / "approval-rehearsal.json").read_text())
+record = {
+    "what": "Live rehearsal of prove_codex_lane.py's worker checks on the real Codex home, with the post-apply state "
+            "given as -c overrides (scripts/rehearse_live.py.txt); no Codex file changed. Usage counters are Codex's "
+            "own turn.completed fields, per run, never summed.",
+    "first_run": {"window_utc": [(pd / "live.start").read_text().strip(), (pd / "live.end").read_text().strip()],
+                  "output": (pd / "live-rehearsal.out").read_text().splitlines(), **live},
+    "rtk_worker_rerun_with_the_shell_tool_named": rtk,
+    "approval_rerun_with_raw_items": approval,
+    "host_files_before_and_after": {"before": (pd / "live-host-before.txt").read_text().splitlines(),
+                                    "after": (pd / "live-host-after.txt").read_text().splitlines()},
+}
+put("live-rehearsal.json", json.dumps(record, indent=2))
+
+probe = pd / "probe"
+w1 = [line for line in (probe / "w1.out").read_text().splitlines() if "(other)" not in line]
+put("writer-probes.txt",
+    f"# codex app-server config/read and config/batchWrite probes, codex-cli 0.157.1, scratch CODEX_HOME, bwrap\n"
+    f"# --unshare-net; {(probe / 'probes.start').read_text().strip()} to {(probe / 'probes.end').read_text().strip()}\n"
+    "# 1. scripts/probe_as.py.txt: a stale expectedVersion, the lane's two edits, an unknown key, a wrong type, a\n"
+    "#    delete of an absent key\n" + "\n".join(w1)
+    + "\n# config.toml before -> after (diff)\n" + (probe / "w1.diff").read_text()
+    + "\n# 2. scripts/probe_delete.py.txt: write two nested keys, delete the leaves, then delete the table the write created\n"
+    + (probe / "w2.out").read_text())
+
+tools = json.loads((probe / "tools.json").read_text().rsplit("\n}", 1)[0] + "\n}")
+described = json.loads((probe / "tools3.json").read_text().rsplit("\n}", 1)[0] + "\n}")
+for server, entry in described.items():
+    for name, row in entry["tools"].items():
+        tools[server]["tools"][name]["description"] = row["description"][:160]
+socraticode_index = Path.home() / ".local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+source = socraticode_index.read_text()
+tools["socraticode (source, not started)"] = {
+    "source": "npm socraticode 1.14.0 dist/index.js: server.tool(name, description, schema, handler) registrations; "
+              f"'readOnlyHint' occurs {source.count('readOnlyHint')} times",
+    "tools": re.findall(r'server\.tool\("([a-z_]+)"', source)}
+put("tool-annotations.json", json.dumps({
+    "what": "Each server's tools as codex app-server mcpServerStatus/list reports them (detail toolsAndAuthOnly), "
+            "from a scratch CODEX_HOME holding only these servers' tables copied from the user config "
+            "(scripts/list_tools.py.txt); annotations null means the server declares none, which under Codex's auto "
+            "approval mode requires approval for the call. SocratiCode was not started (its automatic watcher could "
+            "write an index); its registrations were read from the installed package instead.",
+    "servers": tools}, indent=2))
+
+pi = {}
+for label, name in (("default (model_reasoning_effort ultra)", "pi0.json"), ("-p stack-worker (max)", "pi1.json")):
+    for item in json.loads((probe / name).read_text()):
+        for part in item.get("content", []):
+            text = part.get("text", "")
+            if text.startswith("<multi_agent_mode>"):
+                pi[label] = text
+put("prompt-input-effort.json", json.dumps({
+    "what": "The multi_agent_mode developer message of `codex debug prompt-input probe` in a scratch CODEX_HOME whose "
+            "config.toml sets model_reasoning_effort = \"ultra\", without and with a profile file setting \"max\" "
+            "(scripts/pi_probe.sh.txt); codex-cli 0.157.1, no sign-in, network namespace off.",
+    "multi_agent_mode": pi}, indent=2))
+
+put("precedence.txt",
+    "# scripts/precedence_probe.sh.txt: which layer sets model_reasoning_effort for a worker. The multi_agent_mode\n"
+    "# sentence of `codex debug prompt-input` tells ultra (proactive delegation) from any other effort.\n"
+    + (probe / "precedence.out").read_text())
+put("model-catalog-efforts.txt", (probe / "catalog-efforts.txt").read_text())
+scripts = {"probe_as.py": probe / "probe_as.py", "precedence_probe.sh": probe / "precedence_probe.sh", "probe_delete.py": probe / "probe_delete.py",
+           "list_tools.py": probe / "list_tools.py", "pi_probe.sh": probe / "pi_probe.sh",
+           "cycle.sh": pd / "cycle.sh", "rehearse_static.sh": pd / "rehearse_static.sh",
+           "host_step_copy.py": pd / "host_step_copy.py", "rehearse_live.py": pd / "rehearse_live.py",
+           "rehearse_rtk.py": pd / "rehearse_rtk.py", "rehearse_approval.py": pd / "rehearse_approval.py",
+           "assemble_agents.py": pd / "build/assemble_agents.py", "build_evidence.py": pd / "build_evidence.py"}
+for name, path in scripts.items():
+    put(f"scripts/{name}.txt", f"# As run on 2026-09-26 (paths masked); a record, not a maintained tool.\n"
+        + path.read_text())
+print(sorted(str(p.relative_to(OUT)) for p in OUT.rglob("*") if p.is_file()))

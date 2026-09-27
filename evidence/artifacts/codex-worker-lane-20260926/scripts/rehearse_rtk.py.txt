@@ -1,0 +1,79 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch rehearsal of prove_codex_lane.py's rtk-worker check alone (real CODEX_HOME, `-c` overrides as in
+rehearse_live.py, the template block as the scratch repository's own AGENTS.md). Saves the raw item events with
+scratch paths masked. usage: rehearse_rtk.py <out.json>"""
+import json
+import sys
+import tempfile
+import tomllib
+from pathlib import Path
+
+WT = Path("$SCRATCH/wt-u4")
+sys.path.insert(0, str(WT / "tools/adoption"))
+import prove_codex_lane as prove  # noqa: E402
+
+lane = prove.lane
+codex = lane.shutil.which("codex")
+codex_home = Path.home() / ".codex"
+eco = str(Path.home() / ".local/share/codex-ecosystem")
+live = tomllib.loads((codex_home / "config.toml").read_text(encoding="utf-8"))
+entry = lane.context_mode_entry(eco, lane.default_host_path(live, eco))
+profile = tomllib.loads(lane.PROFILE_TEMPLATE.read_text(encoding="utf-8"))
+allowed, detail = prove.quota_gate(90.0)
+print(detail, flush=True)
+if not allowed:
+    sys.exit(2)
+
+
+def toml_inline(value):
+    if isinstance(value, dict):
+        return "{" + ", ".join(f"{k} = {toml_inline(v)}" for k, v in value.items()) + "}"
+    return json.dumps(value)
+
+
+with tempfile.TemporaryDirectory(prefix="codex-lane-rtk-rehearsal-") as tmp:
+    scratch = Path(tmp)
+    for sub in ("claude-cfg", "cm-dir"):
+        (scratch / sub).mkdir()
+    env_table = {**entry["env"], "CLAUDE_CONFIG_DIR": str(scratch / "claude-cfg"),
+                 "CONTEXT_MODE_DIR": str(scratch / "cm-dir")}
+    pairs = [f'mcp_servers.context-mode.command={json.dumps(entry["command"])}',
+             f'mcp_servers.context-mode.args={json.dumps(entry["args"])}',
+             f'mcp_servers.context-mode.startup_timeout_sec={entry["startup_timeout_sec"]}',
+             'mcp_servers.context-mode.default_tools_approval_mode="approve"',
+             f"mcp_servers.context-mode.env={toml_inline(env_table)}",
+             'plugins."context-mode@context-mode".mcp_servers.context-mode.enabled=false',
+             f'model_reasoning_effort={json.dumps(profile["model_reasoning_effort"])}',
+             f'web_search={json.dumps(profile["web_search"])}']
+    for name, table in profile["mcp_servers"].items():
+        for key, value in table.items():
+            pairs.append(f"mcp_servers.{name}.{key}={json.dumps(value)}")
+    pairs += [f"mcp_servers.{n}.enabled=false" for n in ("serena", "socraticode", "codebase-memory", "qmd", "headroom")]
+    repo = scratch / "repo"
+    blob = prove.make_repo(repo)
+    (repo / "AGENTS.md").write_text(lane.agents_block(), encoding="utf-8")
+    git = ["git", "-C", str(repo), "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false", "-c", "user.name=x",
+           "-c", "user.email=x@example.invalid"]
+    prove.subprocess.run([*git, "add", "AGENTS.md"], check=True)
+    prove.subprocess.run([*git, "commit", "-q", "-m", "agents"], check=True)
+    argv = prove.exec_argv(codex, prove.RTK_PROMPT, False, [x for p in pairs for x in ("-c", p)])
+    run = prove.run_workers([{"name": "rtk-worker", "argv": argv, "cwd": str(repo), "env": prove.worker_env(codex_home)}],
+                            900)[0]
+    ok, detail = prove.rtk_verdict(run, blob)
+    print(("PASS " if ok else "FAIL ") + detail.replace(tmp, "$SCRATCH"))
+    items = []
+    for event in run["events"]:
+        item = event.get("item") or {}
+        if event.get("type") == "item.completed" and item.get("type") in ("command_execution", "mcp_tool_call"):
+            text = json.dumps(item).replace(tmp, "$SCRATCH")
+            item = json.loads(text)
+            if item.get("aggregated_output") and len(item["aggregated_output"]) > 400:
+                item["aggregated_output_sha256"] = prove.lane.sha256_bytes(
+                    item["aggregated_output"].replace("\r\n", "\n").encode("utf-8"))
+                item["aggregated_output_bytes"] = len(item["aggregated_output"].encode("utf-8"))
+                item["aggregated_output"] = item["aggregated_output"][:200] + " ...(cut for the record)"
+            items.append(item)
+    Path(sys.argv[1]).write_text(json.dumps({"verdict": ok, "detail": detail.replace(tmp, "$SCRATCH"),
+                                             "blob_sha256": prove.lane.sha256_bytes(blob), "blob_bytes": len(blob),
+                                             "items": items, "usage": prove.usage(run["events"]),
+                                             "exit": run["exit"], "seconds": run["seconds"]}, indent=2) + "\n")

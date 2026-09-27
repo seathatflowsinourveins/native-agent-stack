@@ -1,0 +1,117 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch rehearsal of prove_codex_lane.py's live checks before the host apply, with no Codex file changed.
+
+The workers run with this host's real CODEX_HOME (so they sign in natively; auth.json is never read or linked here)
+and express the post-apply state as `-c` overrides instead of files:
+  - the lane's user-config keys: [mcp_servers.context-mode] as the template renders it, and the plugin's server off;
+    context-mode's Claude-side state (CLAUDE_CONFIG_DIR, CONTEXT_MODE_DIR) is pointed at scratch, as the cm-deep
+    npm-live proof did, so no ~/.claude file is written;
+  - the stack-worker profile's keys, from adoption/templates/codex.stack-worker.config.toml;
+  - the servers these checks do not use are switched off for the workers (no socraticode watcher or index writes);
+  - the global AGENTS.md block cannot be expressed as an override, so the rtk worker gets it as the scratch
+    repository's own AGENTS.md (project scope, not the global file the apply writes).
+Verdicts, event parsing and the process-group handling are prove_codex_lane.py's own functions.
+usage: rehearse_live.py <out.json>
+"""
+import json
+import sys
+import tempfile
+import tomllib
+from pathlib import Path
+
+WT = Path("$SCRATCH/wt-u4")
+sys.path.insert(0, str(WT / "tools/adoption"))
+import prove_codex_lane as prove  # noqa: E402
+
+lane = prove.lane
+codex = lane.shutil.which("codex")
+codex_home = Path.home() / ".codex"
+eco = str(Path.home() / ".local/share/codex-ecosystem")
+live = tomllib.loads((codex_home / "config.toml").read_text(encoding="utf-8"))
+host_path = lane.default_host_path(live, eco)
+entry = lane.context_mode_entry(eco, host_path)
+profile = tomllib.loads(lane.PROFILE_TEMPLATE.read_text(encoding="utf-8"))
+results = prove.Results()
+
+allowed, detail = prove.quota_gate(90.0)
+print(("quota gate open: " if allowed else "quota gate closed: ") + detail, flush=True)
+if not allowed:
+    sys.exit(2)
+
+
+def toml_inline(value):
+    if isinstance(value, dict):
+        return "{" + ", ".join(f"{k} = {toml_inline(v)}" for k, v in value.items()) + "}"
+    return json.dumps(value)
+
+
+with tempfile.TemporaryDirectory(prefix="codex-lane-live-rehearsal-") as tmp:
+    scratch = Path(tmp)
+    (scratch / "claude-cfg").mkdir()
+    (scratch / "cm-dir").mkdir()
+    env_table = {**entry["env"], "CLAUDE_CONFIG_DIR": str(scratch / "claude-cfg"),
+                 "CONTEXT_MODE_DIR": str(scratch / "cm-dir")}
+    lane_c = [f'mcp_servers.context-mode.command={json.dumps(entry["command"])}',
+              f'mcp_servers.context-mode.args={json.dumps(entry["args"])}',
+              f'mcp_servers.context-mode.startup_timeout_sec={entry["startup_timeout_sec"]}',
+              f'mcp_servers.context-mode.default_tools_approval_mode={json.dumps(entry["default_tools_approval_mode"])}',
+              f"mcp_servers.context-mode.env={toml_inline(env_table)}",
+              'plugins."context-mode@context-mode".mcp_servers.context-mode.enabled=false']
+    profile_c = [f'model_reasoning_effort={json.dumps(profile["model_reasoning_effort"])}',
+                 f'web_search={json.dumps(profile["web_search"])}']
+    for name, table in profile["mcp_servers"].items():
+        for key, value in table.items():
+            profile_c.append(f"mcp_servers.{name}.{key}={json.dumps(value)}")
+    quiet_c = [f"mcp_servers.{name}.enabled=false"
+               for name in ("serena", "socraticode", "codebase-memory", "qmd", "headroom")]
+
+    def argv(prompt, with_profile, extra=()):
+        pairs = lane_c + (profile_c if with_profile else ['model_reasoning_effort="max"']) + quiet_c
+        return prove.exec_argv(codex, prompt, False, [x for p in pairs for x in ("-c", p)] + list(extra))
+
+    repo = scratch / "repo"
+    blob = prove.make_repo(repo)
+    (repo / "AGENTS.md").write_text(lane.agents_block(), encoding="utf-8")
+    prove.subprocess.run(["git", "-C", str(repo), "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false",
+                          "-c", "user.name=x", "-c", "user.email=x@example.invalid", "add", "AGENTS.md"], check=True)
+    prove.subprocess.run(["git", "-C", str(repo), "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false",
+                          "-c", "user.name=x", "-c", "user.email=x@example.invalid", "commit", "-q", "-m", "agents"],
+                         check=True)
+    env = prove.worker_env(codex_home)
+    one, two, neutral = scratch / "worker-one", scratch / "worker-two", scratch / "neutral"
+    for path in (one, two, neutral):
+        path.mkdir()
+    one, two = str(one.resolve()), str(two.resolve())
+    runs = prove.run_workers([
+        {"name": "worker-one (cwd)", "argv": argv(prove.PWD_PROMPT, True), "cwd": one, "env": env},
+        {"name": "worker-two (-C)", "argv": argv(prove.PWD_PROMPT, True, ["-C", two]), "cwd": str(neutral),
+         "env": env},
+    ], 900)
+    for run, own, other in ((runs[0], one, two), (runs[1], two, one)):
+        ok, detail = prove.pwd_verdict(run, own, other)
+        results.add(f"workers {run['name']}", ok, detail.replace(tmp, "$SCRATCH"))
+    memory = prove.MEMORY_PROMPT % ("local", "native-agent-stack")
+    more = prove.run_workers([
+        {"name": "approval (profile keys)", "argv": argv(memory, True), "cwd": str(neutral), "env": env},
+        {"name": "approval control (no profile keys)", "argv": argv(memory, False), "cwd": str(neutral), "env": env},
+        {"name": "rtk-worker (project AGENTS.md)", "argv": argv(prove.RTK_PROMPT, True), "cwd": str(repo),
+         "env": env},
+    ], 900)
+    ok, detail = prove.approval_verdict(more[0], expect_refusal=False)
+    results.add("approval with the profile keys", ok, detail)
+    ok, detail = prove.approval_verdict(more[1], expect_refusal=True)
+    results.add("approval control without them", ok, detail)
+    ok, detail = prove.rtk_verdict(more[2], blob)
+    results.add("rtk-worker", ok, detail.replace(tmp, "$SCRATCH"))
+    commands = {run["name"]: [item.get("command", "").replace(tmp, "$SCRATCH")
+                              for item in prove.completed_items(run["events"], "command_execution")]
+                for run in runs + more}
+    tools = {run["name"]: [(item.get("server"), item.get("tool"), item.get("status"))
+                           for item in prove.completed_items(run["events"], "mcp_tool_call")] for run in runs + more}
+    out = {"checks": results.rows, "commands": commands, "mcp_calls": tools,
+           "runs": [{k: run[k] for k in ("name", "exit", "timed_out", "seconds")} | {"usage": prove.usage(run["events"])}
+                    for run in runs + more],
+           "claude_cfg_files": sorted(p.name for p in (scratch / "claude-cfg").rglob("*"))}
+    Path(sys.argv[1]).write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+failed = [r["check"] for r in results.rows if not r["ok"]]
+print(f"result: {'PASS' if not failed else 'FAIL'} ({len(results.rows) - len(failed)} pass, {len(failed)} fail)")
