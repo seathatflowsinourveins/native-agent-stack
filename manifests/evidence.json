@@ -3427,8 +3427,8 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "fb06cf92b2397f074db62961109883f12f5acf530d7e324382e1dce84e3b4adf",
-      "bytes": 1891
+      "sha256": "f8b5a1e0abdabdd2569bf8c655d70514aa31a6e9148a02b3bf2bd699126047a3",
+      "bytes": 2529
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
@@ -37377,6 +37377,11 @@
       "bytes": 1207
     },
     {
+      "path": "fixtures/context-mode-build.log",
+      "sha256": "b490c80b7db760dca74f6e7ab96c30458064c1c019e0fb4ec6b627489a55df09",
+      "bytes": 24016
+    },
+    {
       "path": "fixtures/example.sh",
       "sha256": "87d8220c327077583a84920d02a5d609e17431655a81f499a2c39858110704b5",
       "bytes": 75
@@ -37420,6 +37425,11 @@
       "path": "fixtures/records.json",
       "sha256": "3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c",
       "bytes": 96
+    },
+    {
+      "path": "fixtures/rtk-hook-exclusions.toml",
+      "sha256": "0e788d025386c9a97c0adcda270e3c0ce39c679a22b90462599a31805bd81edd",
+      "bytes": 801
     },
     {
       "path": "licenses/README.md",
@@ -37813,8 +37823,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c",
-      "bytes": 65428
+      "sha256": "92ee217b5355233a52aae0434a1ec6e5f8bbdeb9470f48711d2a6fff396a4202",
+      "bytes": 114715
     },
     {
       "path": "scripts/path_safety.py",
@@ -38503,8 +38513,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "c77ffb13f272a030877063eb991cb1dfa2020f2b1825a4a52c2c1ef6af8b68e9",
-      "bytes": 54089
+      "sha256": "d233c0148973fca20352b6df2e93e75fde68b65fee3ee11b9ba282aff8f604e0",
+      "bytes": 104999
     },
     {
       "path": "tests/test_native_worker_fixture.py",
