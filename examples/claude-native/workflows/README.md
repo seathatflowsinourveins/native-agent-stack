@@ -214,7 +214,7 @@ The legacy `transcripts_found`, `transcripts_skipped_unmodified` and
 `main_parse_errors` describe main files separately; `all_transcripts_found`
 is their combined discovery count.
 
-`m4` counts visible remote operations, including individual `requests` in
+`m4` counts confirmed, statically visible remote operations, including individual `requests` in
 `ctx_fetch_and_index`, shell commands in `ctx_batch_execute`, and literal
 subprocess commands in JavaScript/Python ctx code. Loopback fetches are separate.
 The existing `ctx_sandbox_fetch` bucket includes both context-mode sandbox
@@ -224,25 +224,51 @@ execution, not exclusive use of context-mode; both stay in the remote denominato
 Script HTTP calls, dynamic URL fetches and `gh api` are `unclassifiable` and
 stay in the denominator; over 10% makes the metric `incomplete`. The regression
 of one indexed fetch plus nineteen sandbox curls therefore reports 5%.
-Detection extends the maintained
-[context-mode v1.0.169 routing detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804)
+Detection follows the [#381 M4 definition](../../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930)
+and extends the maintained
+[context-mode v1.0.169 routing detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L788-L795)
 and the existing shell-text parser. Before inline-HTTP matching, data heredoc
 bodies and shell comments are removed and quoted argument syntax is neutralized.
 Quoted Python `-c` (including combined flags ending in `c`), Node
 `-e`/`--eval`/`-p`/`--print`, Deno `eval`, Bun `-e`/`--eval`, and ctx JS/Python
 code remain visible to the script detector, including dynamic URLs (kept
-unclassifiable). Heredocs fed to Python, Node, Deno, Bun, Ruby, Perl or PHP also
-remain visible for inline HTTP matching. Upstream strips every heredoc; these
-unrouted operations must still count in M4. Entrypoint references:
-[Python](https://docs.python.org/3.14/using/cmdline.html#interface-options),
-[Node](https://nodejs.org/docs/latest-v24.x/api/cli.html),
+unclassifiable). Heredocs remain source only for recognized invocations that
+execute stdin: Python or Node with no script operand or with `-`, shells with
+no script operand or `-s`, and the retained explicit stdin forms for other
+interpreters. Python `-c`/`-m`, Node `-e`/`-p`, and script-file invocations leave
+their stdin as data. Each retained body is analyzed separately so its quoting
+or shift syntax cannot consume later shell commands or data heredocs.
+Upstream strips every heredoc. Entrypoint references:
+[Python](https://docs.python.org/3.13/using/cmdline.html#interface-options),
+[Node](https://nodejs.org/docs/v24.21.0/api/cli.html#-),
+[POSIX sh](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/sh.html),
 [Deno](https://docs.deno.com/runtime/reference/cli/eval/), and
 [Bun](https://bun.sh/docs/runtime).
-Shell-fed heredocs retain executed commands. A grep pattern containing `fetch(`
-or a heredoc writing a script is data. It counts static call sites/attempts,
-not runtime requests: loops, dynamic code, external scripts, aliases and
-nonliteral subprocess arguments require separate observation. It cannot prove
-the absence of fetches in arbitrary code. A zero denominator is N/A.
+Shell-fed source heredocs retain executed commands. A grep pattern containing
+`fetch(`, a comment, or a heredoc writing a script gives zero confirmed fetches.
+
+`fetch_mentions_unconfirmed` separately counts raw `HTTP_SCRIPT` matches that
+the executed-text analysis did not account for, per command/code input. These
+are possible fetches, including data-only mentions, not confirmed operations.
+The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`:
+
+- `routed_share = ctx_fetch_and_index / remote_fetches` uses confirmed fetches.
+- `routed_share_lower_bound = ctx_fetch_and_index / (remote_fetches + fetch_mentions_unconfirmed)`
+  treats every possible fetch as unrouted. **The #381 M4 >= 0.9 gate must read
+  `routed_share_lower_bound`.** Confirmed-only share cannot establish that gate.
+
+For one routed fetch plus either a Python shift-syntax parser miss or a Node
+comment containing an apostrophe before `fetch`, the confirmed share is 1,
+the unconfirmed count is 1, and the lower bound is 0.5. Dropping a raw HTTP match
+from confirmed analysis therefore cannot inflate the gate's share. Counts are
+summed before shares are recomputed across actors; shares retain the existing
+four-decimal reporting convention. Any unconfirmed mention leaves M4 status
+`incomplete`; a zero denominator gives null for its respective share.
+
+This is a lower bound against visible `HTTP_SCRIPT` matches, not against every
+possible runtime request. Loops, dynamic code, external scripts, aliases and
+nonliteral subprocess arguments still require separate observation. The static
+detector cannot prove the absence of fetches in arbitrary code.
 
 `--rtk-check` enables M-R1/M6c in `rtk_parts` on Linux, using **a binary on PATH
 self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated

@@ -193,8 +193,21 @@ PR-A adds `actors[].measurement` and group `measurement` fields. They reuse
 the existing [child-usage.mjs measurement kernel](../../examples/claude-native/workflows/README.md#pr-a-measurement-fields-2026-09-27)
 through Node; lane reports now require Node as well as Python, with no extra
 package install. The legacy fields above remain historical comparison fields.
-Use `measurement.m4.routed_share` for the denominator including nested ctx
-fetches. M3/M5 use own persisted `function_call_output` and
+`measurement.m4.routed_share` uses confirmed fetches, including nested ctx
+fetches. `fetch_mentions_unconfirmed` counts possible fetches from raw
+`HTTP_SCRIPT` matches that executed-text analysis did not account for.
+`routed_share_lower_bound` adds those possible fetches to the denominator as
+unrouted. **The #381 M4 >= 0.9 gate must use `routed_share_lower_bound`.**
+Both shares and the separate possible-fetch count also appear under
+`measurement.m4.by_carrier`; aggregation sums counts before recomputing shares.
+Any possible fetch leaves M4 status `incomplete`. The source contract is
+[#381 M4](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930)
+and the detector reference is
+[context-mode v1.0.169 routing.mjs:788–795](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L788-L795).
+Ignored interpreter stdin, comments and written scripts can supply possible
+fetches while contributing zero confirmed operations. The bound covers visible
+detector matches; it does not certify arbitrary dynamic code.
+M3/M5 use own persisted `function_call_output` and
 `custom_tool_call_output` content, paired with function, custom or local-shell
 calls; native `item_completed` content is the fallback. A missing context
 result stays visible instead of being supplied as an empty result.

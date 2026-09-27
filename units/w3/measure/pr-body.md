@@ -1,51 +1,59 @@
 ## Summary
 
-PR-A makes the #381 measurement contract available through the existing Claude
-child-usage and Codex skill-usage tools. It counts visible output and remote
-fetch operations, preserves unknown/incomplete evidence, and keeps provider
-usage separate from local byte counts and routing replay.
+This second PR-A fixup prevents visible HTTP calls missed by shell-text analysis
+from inflating the #381 M4 gate. Executed-text analysis remains the primary
+classifier of confirmed fetches. A separate possible-fetch counter supplies a
+conservative denominator, while ignored interpreter stdin stays out of the
+confirmed count.
 
-This narrow fixup restores interpreter HTTP operations omitted by the repair,
-rejects malformed fields in mixed sidecar records, and corrects the documented
-scope of RTK qualification and sandbox fetch buckets.
+The implemented measurement counters do not establish full PR-A acceptance.
+The M1 eligibility and M15 infrastructure-error classification residuals remain.
 
 ## Changes
 
-- Add shared M3/M4/M5 result accounting, digest-bound exceptions, hook-context
-  observations, MCP result states, proxy adjudication and RTK part accounting.
-  Keep the legacy lane comparison fields and actor populations distinct.
-- Normalize Codex persisted outputs and nested code-mode operations through the
-  shared kernel. Preserve provider counter deltas and attempt completeness;
-  count outer code-mode results as context bytes without double-counting nested
-  results.
-- Retain HTTP calls in interpreter-fed heredocs as M4 `unclassifiable` operations.
-  Recognize Python combined flags ending in `c`, Node `-p`/`--print`, Deno `eval`
-  and Bun `-e`/`--eval`, alongside the existing inline-code forms. Written-script
-  heredocs, shell comments and quoted data retain their negative controls.
-- Validate every supplied `exception`, `proxy_purpose` and `rtk_log_find` field
-  and require at least one review class with a witness. Invalid mixed records
-  fail both CLIs and remain visible in `invalid_exceptions` at the export.
-- Document RTK replay as a Linux binary on PATH self-reporting `rtk 0.50.0` that
-  passes the five-exclusion probe. The gate does not verify the qualification
-  receipt's binary hash. State in both READMEs that `ctx_sandbox_fetch` includes
-  nested Codex code-mode shell fetches as well as context-mode sandbox fetches.
-- Add failing-first controls and isolate the existing outside-checkout output
-  test so it works with the required unit-local TMPDIR.
-- Include the coordinator's `manifests/evidence.json` registrations for
-  `examples/claude-native/workflows/{child-usage.mjs,test-child-usage.mjs,README.md}`,
-  `tools/skill-usage/{skill_usage.py,README.md}` and the measurement tests
-  `tests/{test_skill_usage.py,test_token_measurement.py}`.
-- Retain the sanitized fixup receipt and commit handoff under
-  `units/w3/measure/`.
+- In `examples/claude-native/workflows/child-usage.mjs`, select interpreter
+  heredoc source by invocation: default stdin or `-` for Python/Node, supported
+  shell stdin forms, and retained explicit stdin forms for other interpreters.
+  Python command/module/script and Node eval/print/script invocations leave
+  their heredoc as data. Analyze retained bodies separately so interpreter
+  syntax cannot consume subsequent shell commands or written-script heredocs.
+- Add `fetch_mentions_unconfirmed` for raw `HTTP_SCRIPT` matches that primary
+  analysis did not account for. These are possible fetches, not confirmed ones.
+  Report the count and both M4 shares in `m4` and `m4.by_carrier`, summing counts
+  before recomputing aggregate shares.
+- Preserve `routed_share = ctx_fetch_and_index / remote_fetches` over confirmed
+  operations. Add `routed_share_lower_bound = ctx_fetch_and_index /
+  (remote_fetches + fetch_mentions_unconfirmed)`, treating possible fetches as
+  unrouted. **The #381 M4 >= 0.9 gate must read `routed_share_lower_bound`.**
+  Possible fetches leave M4 status incomplete.
+- Extend `tests/test_token_measurement.py` with failing-first ignored-stdin,
+  parser-omission, body-boundary, raw-count and aggregate controls. Keep the
+  existing interpreter positives and pattern/comment/written-script negatives.
+- Update the workflow and skill-usage READMEs with the two shares, carrier
+  counts, gate requirement and remaining static-analysis limits. Refresh
+  workflows `SHA256SUMS` for the changed module and README.
+- Retain dated errata, returned verification excerpts and current commit
+  handoffs in `units/w3/measure/`. The earlier fixup receipt is unchanged.
 
 ## Evidence
 
-**Synthetic fixtures:** the interpreter control initially produced 51 failures
-across 54 carrier/input cases. The mixed-sidecar controls initially produced
-27 failures through the export and both CLIs. Both fixes now pass, including
-the existing written-script, comment, quoted-pattern and standalone review
-controls. The interpreter cases assert one routed operation plus one unknown
-HTTP operation yields a remote denominator of two and routed share of 0.5.
+**Synthetic fixtures:** ignored-stdin controls initially failed all 36 cases
+across the three shell carriers. The first possible-fetch controls produced
+26 missing-counter errors before implementation. Additional stdin-option and
+body-boundary controls also failed before repair. Final M4-only run: **11 tests,
+OK**. For each Python shift/Node apostrophe omission plus one routed fetch:
+
+| Field | Returned value |
+| --- | --- |
+| Confirmed `remote_fetches` | 1 |
+| `fetch_mentions_unconfirmed` | 1 |
+| `routed_share` | 1 |
+| `routed_share_lower_bound` | 0.5 |
+| Status | incomplete |
+
+Ignored stdin, shell comments, grep patterns and written scripts still produce
+zero confirmed operations. Confirmed interpreter HTTP calls are not counted
+again as possible fetches. This is static fixture analysis, not network traffic.
 
 **Local integration:**
 
@@ -53,65 +61,88 @@ HTTP operation yields a remote denominator of two and routed share of 0.5.
 rtk python3 -m unittest tests.test_token_measurement tests.test_skill_usage tests.test_child_usage_suite
 ```
 
-Final result: **128 tests, OK, exit 0**. This includes the existing Node
-child-usage suite through its unittest wrapper and native RTK replay probes.
-All runs used TMPDIR under `units/w3/measure/tmp` with
-GIT_CEILING_DIRECTORIES set to the same directory. `rtk git diff --check`
-returned exit 0. The [fixup receipt](units/w3/measure/fixup-receipt.md) retains
-sanitized output excerpts and failed attempts, including the temporary-directory
-fixture correction.
+Returned **133 tests, OK, exit 0**, including the existing Node suite and native
+RTK replay controls through unittest wrappers. The covering run used TMPDIR
+under `units/w3/measure/tmp`, GIT_CEILING_DIRECTORIES set to that directory, and
+PYTHONDONTWRITEBYTECODE=1. The full-suite retry used the unit-local
+`.pytest_cache/tmp` directory, excluded by the existing scratch-copy fixture.
 
-<!-- Coordinator: append the replayed head's validate.sh and full-suite results
-here after publication replay. Do not copy builder or pre-replay SHA claims. -->
+Workflow `sha256sum --check --strict SHA256SUMS` returned **14 entries OK,
+exit 0**. Node syntax checking and `git diff --check` also returned exit 0.
+
+`python3 scripts/validate.py` returned **exit 1**: SHA-256 and byte-count
+mismatches for seven inventory paths, including three source/test files
+unchanged from the supplied HEAD. The coordinator owns evidence registration;
+this round does not edit `manifests/evidence.json`. No `validate.sh` exists in
+this worktree. The native RTK replay above is local integration evidence,
+not publication replay or a passing publication receipt.
+
+The completed local `python3 -m unittest` retry returned **6,656 tests,
+247 failures, 151 errors, 783 skipped, exit 1** in 633.902 seconds. This is
+**not full-suite acceptance**. Its final summary was retained; intermediate
+failure traces were truncated by the tool, so they are not a complete failure
+inventory. Earlier attempts hit a context-mode timeout and scratch-copy
+recursion, as recorded in the receipt. The supplied historical 6,633-test run
+with two failures and 760 skips remains separate; no result is relabeled as
+passing or used to attribute all failures to this fixup.
+Retained errors include tests requiring temporary/private output outside every
+repository, conflicting with the required unit-local TMPDIR. Those unrelated
+policies and fixtures were not rewritten, and that observation is not a claim
+to explain every failure.
+
+The [second fixup receipt](units/w3/measure/fixup2-receipt.md) retains returned
+summaries, earlier failed attempts and dated corrections.
 
 **Local measurement:** no new private transcript or token-savings run.
-**Unchanged upstream tests:** not run in this fixup; local controls are integration
-evidence. **Live provider execution:** none.
+**Unchanged upstream tests:** none; these are local integration controls.
+**Live provider execution:** none.
 
 ## SOTA sources
 
-- mksglu/context-mode **v1.0.169**:
-  [routing detector and subprocess handling](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804),
+- [#381 preregistration, M4](evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930):
+  all remote fetches including nested/unclassifiable operations; routed rate
+  at least 0.9. The lower-bound rule is the requested local extension to this
+  contract, not an upstream parser feature.
+- mksglu/context-mode **v1.0.169**, commit
+  `589d8214d56740a28b5f7bf63167743d586b0b40`:
+  [mandated detector reference, routing.mjs:788–795](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L788-L795),
   [heredoc stripping](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L228-L229),
-  and [UTF-8 accounting reference](https://github.com/mksglu/context-mode/blob/v1.0.169/src/session/extract.ts#L1060-L1069).
-- rtk-ai/rtk **v0.50.0**:
-  [native hook check](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952),
+  and [release](https://github.com/mksglu/context-mode/releases/tag/v1.0.169).
+  Installed and pinned detector source matched during read-only research.
+- Official interpreter semantics:
+  [Python 3.13 interface options](https://docs.python.org/3.13/using/cmdline.html#interface-options),
+  [Node v24.21.0 stdin](https://nodejs.org/docs/v24.21.0/api/cli.html#-),
+  [Node eval](https://nodejs.org/docs/v24.21.0/api/cli.html#-e---eval-script),
+  and [POSIX.1-2024 sh OPTIONS/STDIN](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/sh.html).
+- Existing native RTK replay reference: rtk-ai/rtk **v0.50.0**,
+  [hook check](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952),
   [lexer](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/lexer.rs#L488-L526),
-  and [pipeline/consumer rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1087-L1494).
-  These identify the reference implementation, not the executable's build.
-- openai/codex **rust-v0.157.1**:
-  [usage protocol](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2234-L2310),
-  [call/output models](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1060-L1165),
-  and [code-mode emission test](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/tests/suite/code_mode.rs#L721-L760).
-- ccusage/ccusage **v20.0.24**:
-  [Claude message deduplication](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/claude/src/daily.rs#L410-L523)
-  and [Codex counter deltas](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/codex/src/parser.rs#L153-L350).
-- Official interpreter entrypoints:
-  [Python stdin and command options](https://docs.python.org/3.14/using/cmdline.html#interface-options),
-  [Node eval/print/stdin](https://nodejs.org/docs/latest-v24.x/api/cli.html),
-  [Deno eval](https://docs.deno.com/runtime/reference/cli/eval/), and
-  [Bun eval](https://bun.sh/docs/runtime).
-- [Object.hasOwn present-field semantics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn)
-  and [unittest.mock.patch.object](https://docs.python.org/3/library/unittest.mock.html#patch-object)
-  for sidecar validation and test-only checkout isolation.
-
-The local metric definitions remain the frozen
-[#381 preregistration](evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).
-These adapters and controls are local integration work derived from the sources
-above; they are not unchanged upstream tests.
+  and [consumer rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1087-L1494).
+  This identifies the reference implementation, not the installed binary build.
 
 ## Residuals and not done
 
-M4 counts statically visible call sites/attempts. Loops, dynamic code, external
-scripts, aliases and nonliteral subprocess arguments require separate
-observation. Interpreter heredocs and the listed eval/print forms are covered.
-Interleaved or resumed code-mode spans without a persisted parent association
-still need independent review. RTK replay checks the declared version and
-exclusion behavior, without binary-hash attestation. The shared sandbox bucket
-does not establish exclusive context-mode use. Semantic sidecar witnesses
-remain reviewer evidence.
-
-No live provider or private-corpus measurement was performed in this fixup.
+- **M1 per-lane eligibility:** attempted/loaded/inserted counters do not compute
+  successful opportunities among eligible tasks separately for every required
+  lane. Those populations and semantic outcomes still require qualification.
+- **M15 infrastructure errors:** attempted/succeeded/failed/unfinished MCP
+  counters do not distinguish infrastructure errors from invoked-command
+  nonzero exits, classify every ctx error, or reproduce new error classes.
+  They do not establish the preregistered per-server error ceiling.
+- **M4 static limits:** the lower bound protects against missed visible
+  `HTTP_SCRIPT` matches. Data-only mentions can reduce it conservatively.
+  Loops, dynamic imports/code, external scripts, aliases and nonliteral
+  subprocess arguments still require independent observation. Neither share
+  certifies arbitrary runtime behavior.
+- **Publication acceptance:** evidence registration, coordinator replay and a
+  passing publication validation receipt are not established here. Historical
+  full-suite failures reported in `tests.test_pre_commit_gate` and
+  `tests.test_secret_path_guard` are not silently replaced or attributed to this
+  fixup.
+- RTK binary-hash attestation, live provider/E2E measurement, semantic sidecar
+  witness review and ambiguous interleaved/resumed code-mode associations
+  remain outside this fixup. The shared sandbox bucket does not establish
+  exclusive context-mode use.
 
 ## Recommended lane label
 

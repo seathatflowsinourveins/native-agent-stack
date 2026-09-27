@@ -137,15 +137,35 @@ const DOUBLE_QUOTED_DATA = /\\[\s\S]|\$\([^()]*\)|`[^`]*`|[;&|()`\n]/g
 const SUBSTITUTION = /\\[\s\S]|\$\([^()]*\)|`[^`]*`/g
 const ESCAPED_DATA = new Set([...' \t;&|()<>`$\'"\\#{}!']) // escaped, these become the data character _
 const WORD_BREAK = new Set([...' \t\n;&|()<>']) // bash metacharacters: a # after one begins a comment
-// The program of the last simple command in `prefix`: assignments, options, wrappers and a timeout duration skipped.
-const programOf = (prefix) => {
+// The last simple command in `prefix`: assignments, wrappers and a timeout duration skipped.
+const invocationOf = (prefix) => {
   const words = prefix.split(/[;&|(]/).pop().trim().split(/\s+/).filter(Boolean)
   for (let i = 0; i < words.length; i++) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[i]) || words[i].startsWith('-') || WRAPPERS.has(words[i])) continue
     if (words[i] === 'timeout') { i++; continue }
-    return words[i].split('/').pop()
+    return { program: words[i].split('/').pop(), args: words.slice(i + 1) }
   }
-  return ''
+  return { program: '', args: [] }
+}
+// Source selection: Python 3.13 using/cmdline.html#interface-options,
+// Node v24.21.0 api/cli.html#-, POSIX.1-2024 utilities/sh.html (OPTIONS/STDIN).
+// Only recognized stdin invocations retain source; other arguments keep input
+// as data. Unknown option forms remain possible fetches in the raw M4 scan.
+const executesStdin = ({ program, args }) => {
+  if (program === 'deno' || program === 'bun') return args.length === 2 && args[0] === 'run' && args[1] === '-'
+  if (program === 'ssh') return false
+  const shell = SHELL_WORD.test(program), python = /^python[\d.]*$/.test(program)
+  let stdin = false
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (arg === '--') return stdin || i + 1 === args.length || args[i + 1] === '-'
+    if (arg === '-') return true
+    if (shell && /^-[abefhiklmpstuvxBCEHPT]+$/.test(arg)) { stdin ||= arg.includes('s'); continue }
+    if (python && /^-[bBdEiIOPqRsSuvx]+$/.test(arg)) continue
+    if (arg.startsWith('-')) return false
+    return stdin
+  }
+  return true
 }
 // The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell (or an
 // interpreter in inlineHttp mode), though with an
@@ -154,17 +174,24 @@ const programOf = (prefix) => {
 // \<newline> joins lines. Data keeps its words (so URL arguments stay) but loses the separators that would put a
 // word in command position.
 export function executedText(command, { inlineHttp = false } = {}) {
-  const lines = String(command || '').split('\n'), kept = []
+  const lines = String(command || '').split('\n'), kept = [], sources = []
   for (let i = 0; i < lines.length; i++) {
     kept.push(lines[i])
     const m = HEREDOC.exec(lines[i])
     if (!m) continue
-    const program = programOf(lines[i].slice(0, m.index))
-    if (SHELL_WORD.test(program) || inlineHttp && INTERPRETER_WORD.test(program)) continue
+    const invocation = invocationOf(lines[i].replace(m[0], ''))
+    const source = executesStdin(invocation) && (SHELL_WORD.test(invocation.program) || inlineHttp && INTERPRETER_WORD.test(invocation.program))
+    const body = []
     while (i + 1 < lines.length && lines[i + 1].replace(/^\t+/, '') !== m[2]) {
       i++
-      kept.push(m[1] ? '' : (lines[i].match(SUBSTITUTION) || []).filter((s) => s[0] !== '\\').join(' '))
+      if (source) body.push(lines[i])
+      else kept.push(m[1] ? '' : (lines[i].match(SUBSTITUTION) || []).filter((s) => s[0] !== '\\').join(' '))
     }
+    // Keep source boundaries: interpreter quotes/shift syntax must not consume
+    // subsequent shell commands or data heredocs. The existing heuristic still
+    // analyzes each source independently; missed HTTP matches stay possible M4 fetches.
+    if (source) sources.push(executedText(body.join('\n'), { inlineHttp }))
+    if (i + 1 < lines.length) i++ // closing delimiter
   }
   const text = kept.join('\n')
   let out = ''
@@ -190,7 +217,7 @@ export function executedText(command, { inlineHttp = false } = {}) {
     else out += "'" + inner.replace(/[;&|()`$\n]/g, ' ') + "'"
     i = j
   }
-  return out
+  return [out, ...sources].join('\n')
 }
 // 'loopback' when every literal URL in an executed curl/wget command is a loopback host, 'fetch' for any
 // other executed curl/wget command (a remote URL, or no literal URL), null when the command runs neither.
@@ -244,11 +271,14 @@ const validReview = (r) => typeof r?.witness === 'string' && !!r.witness.trim()
   && (!Object.hasOwn(r, 'exception') || EXCEPTIONS.includes(r.exception))
   && (!Object.hasOwn(r, 'proxy_purpose') || r.proxy_purpose === 'acceptance')
   && (!Object.hasOwn(r, 'rtk_log_find') || validLogFindReview(r))
-// M4 source: context-mode v1.0.169 src/server.ts tool schemas (`commands`, `code`,
-// `requests`); #381 M4 explicitly keeps script HTTP operations unclassifiable.
+// M4 sources: evidence/artifacts/token-adoption-e2e-20260926/preregistration.json
+// thresholds.M4; context-mode v1.0.169 hooks/core/routing.mjs:788-795 and
+// src/server.ts tool schemas (`commands`, `code`, `requests`). Confirmed script
+// HTTP operations stay unclassifiable; raw matches missed by executed-text
+// analysis are possible fetches, kept separately for the gate's lower bound.
 // These are statically visible operations, not observed network requests: loops,
 // dynamically imported scripts and runtime URL resolution cannot be reconstructed.
-const emptyFetches = () => ({ ctx_fetch_and_index: 0, webfetch: 0, shell_fetch: 0, ctx_sandbox_fetch: 0, loopback: 0, unclassifiable: 0 })
+const emptyFetches = () => ({ ctx_fetch_and_index: 0, webfetch: 0, shell_fetch: 0, ctx_sandbox_fetch: 0, loopback: 0, unclassifiable: 0, fetch_mentions_unconfirmed: 0 })
 const remoteUrl = (url) => { try { return !LOOPBACK.test(new URL(url).hostname) } catch { return null } }
 const HTTP_SCRIPT = /\b(?:fetch\s*\(|(?:requests|httpx|urllib\.request|https?|axios)\s*\.\s*(?:get|post|put|request|urlopen)\s*\()/g
 function countFetches(call, counts) {
@@ -286,15 +316,19 @@ function countFetches(call, counts) {
     // Reuse our bash quoting/comment state as well. Only interpreter code (or
     // ctx JS/Python) gets raw scanning; quoted grep patterns are not operations.
     const httpText = shell ? executedText(code, { inlineHttp: true }) : code
-    counts.unclassifiable += [...httpText.matchAll(HTTP_SCRIPT)].length
+    const confirmedHttp = [...httpText.matchAll(HTTP_SCRIPT)].length
+    counts.unclassifiable += confirmedHttp
+    counts.fetch_mentions_unconfirmed += Math.max(0, [...code.matchAll(HTTP_SCRIPT)].length - confirmedHttp)
     // GitHub API calls are remote operations even when their endpoint is relative.
     counts.unclassifiable += [...text.matchAll(/(?:^|[;\n|&])\s*(?:rtk\s+(?:proxy\s+)?)?gh\s+api\b/g)].length
   }
 }
-const finishFetches = (f) => {
+const finishFetches = (f, carriers = null) => {
   const remote = f.ctx_fetch_and_index + f.webfetch + f.shell_fetch + f.ctx_sandbox_fetch + f.unclassifiable
   return { ...f, remote_fetches: remote, routed_share: share(f.ctx_fetch_and_index, remote),
-    unclassifiable_share: share(f.unclassifiable, remote), status: !remote ? 'not_applicable' : f.unclassifiable / remote > .1 ? 'incomplete' : 'measured' }
+    routed_share_lower_bound: share(f.ctx_fetch_and_index, remote + f.fetch_mentions_unconfirmed),
+    unclassifiable_share: share(f.unclassifiable, remote), status: f.fetch_mentions_unconfirmed ? 'incomplete' : !remote ? 'not_applicable' : f.unclassifiable / remote > .1 ? 'incomplete' : 'measured',
+    ...(carriers ? { by_carrier: Object.fromEntries(Object.entries(carriers).map(([k, v]) => [k, finishFetches(v)])) } : {}) }
 }
 // Reference implementation: rtk-ai/rtk v0.50.0 src/main.rs:2940-2952,
 // src/discover/lexer.rs:119-135,488-526; registry.rs:1087-1345,1451-1494.
@@ -462,7 +496,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       if (row.type === 'user' && b.type === 'tool_result' && !results.has(b.tool_use_id)) results.set(b.tool_use_id, { ...b, row, index })
     }
   }
-  const m3 = emptySizes(), m5 = emptySizes(), carriers = counter(), excluded = counter(), m4 = emptyFetches()
+  const m3 = emptySizes(), m5 = emptySizes(), carriers = counter(), excluded = counter(), m4 = emptyFetches(), fetchCarriers = counter()
   const hookContext = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }
   for (const row of transcript) {
     if (!inside(row)) continue
@@ -476,7 +510,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       try { if (JSON.parse(a.stdout).hookSpecificOutput?.additionalContext) hookContext.claimed++ } catch { /* no claim */ }
     }
   }
-  for (const c of calls.values()) if (inside(c.row)) countFetches(c, m4)
+  for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c)] ||= emptyFetches())
+  for (const f of Object.values(fetchCarriers)) for (const k of Object.keys(m4)) m4[k] += f[k]
   const mcpStates = counter(), loaded = counter(), proxy = { calls: 0, acceptance: 0, exception: 0, unclassified: 0 }
   for (const c of calls.values()) {
     if (!inside(c.row)) continue
@@ -527,7 +562,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   }
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
-  return { m3: finishSizes(m3), m4: finishFetches(m4), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
+  return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
     rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
     usage: transcriptUsage(transcript, window),
     hook_context: hookContext,
@@ -543,9 +578,13 @@ export function aggregateMeasurements(items) {
   const sizes = (rows) => finishSizes(rows.reduce((a, b) => ({ results: a.results + b.results, bytes: a.bytes + b.bytes,
     large_results: a.large_results + b.large_results, large_bytes: a.large_bytes + b.large_bytes, max_bytes: Math.max(a.max_bytes, b.max_bytes) }), emptySizes()))
   const groups = (key) => Object.fromEntries([...new Set(items.flatMap((m) => Object.keys(m[key])))].sort().map((k) => [k, sizes(items.map((m) => m[key][k]).filter(Boolean))]))
-  const f = emptyFetches(), rtk = emptyRtk()
+  const f = emptyFetches(), fetchCarriers = counter(), rtk = emptyRtk()
   for (const m of items) {
     for (const k of Object.keys(f)) f[k] += m.m4[k]
+    for (const [carrier, counts] of Object.entries(m.m4.by_carrier)) {
+      const target = fetchCarriers[carrier] ||= emptyFetches()
+      for (const k of Object.keys(target)) target[k] += counts[k]
+    }
     for (const k of Object.keys(rtk)) rtk[k] += m.rtk_parts[k]
   }
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
@@ -557,7 +596,7 @@ export function aggregateMeasurements(items) {
     for (const [s, n] of Object.entries(m.loaded_not_called)) loaded[s] = (loaded[s] || 0) + n
     for (const k of Object.keys(proxies)) proxies[k] += m.proxy[k]
   }
-  return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f),
+  return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
     hook_context: hooks, mcp_states: states, loaded_not_called: loaded,
     proxy: { ...proxies, acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
     m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),

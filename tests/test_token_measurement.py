@@ -194,9 +194,18 @@ class TokenMeasurement(unittest.TestCase):
                     'grep "requests.get(u)" f', '# requests.get(u)',
                     'cat <<EOF > script.js\nfetch("https://example.org")\nEOF']
         for command in commands:
-            with self.subTest(command=command):
-                got = self.measure([call("c", "Bash", command=command)])["m4"]
-                self.assertEqual(got["remote_fetches"], 0)
+            for name, inputs in [
+                ("Bash", {"command": command}),
+                ("mcp__ctx__ctx_execute", {"language": "shell", "code": command}),
+                ("mcp__ctx__ctx_batch_execute", {"commands": [{"command": command}]}),
+            ]:
+                with self.subTest(command=command, carrier=name):
+                    got = self.measure([call("c", name, **inputs)])["m4"]
+                    self.assertEqual(got["remote_fetches"], 0)
+                    self.assertEqual(got["fetch_mentions_unconfirmed"], 1)
+                    self.assertIsNone(got["routed_share"])
+                    self.assertEqual(got["routed_share_lower_bound"], 0)
+                    self.assertEqual(got["status"], "incomplete")
         for command in ["python3 -c 'import requests; requests.get(u)'",
                         'node -e \'fetch("https://example.org")\'',
                         "bash <<'EOF'\npython3 -c 'requests.get(u)'\nEOF"]:
@@ -229,8 +238,114 @@ class TokenMeasurement(unittest.TestCase):
                     self.assertEqual(got["unclassifiable"], 1)
                     self.assertEqual(got["remote_fetches"], 2)
                     self.assertEqual(got["routed_share"], .5)
+                    self.assertEqual(got["fetch_mentions_unconfirmed"], 0)
+                    self.assertEqual(got["routed_share_lower_bound"], .5)
                     self.assertEqual(got["unclassifiable_share"], .5)
                     self.assertEqual(got["status"], "incomplete")
+
+    def test_m4_ignored_interpreter_stdin_is_data(self):
+        # Python interface options, Node v24 CLI, POSIX sh STDIN: -c/-e or
+        # a script operand executes that source, not the heredoc on stdin.
+        invocations = ["python -c pass", "python3 -Bc pass", "python3 -m module",
+                       "python3 script.py", "node -e 0", "node --eval=0",
+                       "node -p 0", "node script.js", "bash -c :", "sh -c :",
+                       "bash script.sh", "sh script.sh", "python3 -h"]
+        commands = [f"{invocation} <<'EOF'\nrequests.get(u)\nEOF" for invocation in invocations]
+        commands += ["python3 <<'EOF' -c pass\nrequests.get(u)\nEOF",
+                     "node <<'EOF' -e 0\nfetch(u)\nEOF"]
+        for command in commands:
+            for name, inputs in [
+                ("Bash", {"command": command}),
+                ("mcp__ctx__ctx_execute", {"language": "shell", "code": command}),
+                ("mcp__ctx__ctx_batch_execute", {"commands": [{"command": command}]}),
+            ]:
+                with self.subTest(command=command, carrier=name):
+                    got = self.measure([call("code", name, **inputs)])["m4"]
+                    self.assertEqual(got["remote_fetches"], 0)
+                    self.assertEqual(got["unclassifiable"], 0)
+                    self.assertEqual(got["fetch_mentions_unconfirmed"], 1)
+                    self.assertEqual(got["routed_share_lower_bound"], 0)
+
+    def test_m4_stdin_source_options_and_body_boundaries(self):
+        commands = [("python3 -B - <<'PY'\nrequests.get(u)\nPY", 0),
+                    ("bash -- <<'SH'\npython3 -c 'requests.get(u)'\nSH", 0),
+                    ("node - <<'JS'\nfetch(u)\nJS", 0),
+                    ("bash -s argument <<'SH'\npython3 -c 'requests.get(u)'\nSH", 0)]
+        for body in ["python3 - <<'PY'\nx = 1 << bits\nrequests.get(u)\nPY",
+                     "node <<'JS'\n// user's comment\nfetch(u)\nJS"]:
+            commands.append((body + "\npython3 - <<'NEXT'\nrequests.get(v)\nNEXT"
+                             + "\ncat <<'DATA'\nfetch(w)\nDATA", 2))
+        for command, mentions in commands:
+            for name, inputs in [
+                ("Bash", {"command": command}),
+                ("mcp__ctx__ctx_execute", {"language": "shell", "code": command}),
+                ("mcp__ctx__ctx_batch_execute", {"commands": [{"command": command}]}),
+            ]:
+                with self.subTest(command=command, carrier=name):
+                    got = self.measure([call("code", name, **inputs)])["m4"]
+                    self.assertEqual(got["remote_fetches"], 1)
+                    self.assertEqual(got["fetch_mentions_unconfirmed"], mentions)
+
+    def test_m4_parser_omissions_reduce_gate_lower_bound_per_carrier(self):
+        # #381 thresholds.M4 and context-mode v1.0.169 routing.mjs:788-795.
+        # C1/C2 are verification's residual misses, not confirmed operations.
+        commands = ["python3 - <<'PY'\nx = 1 << bits\nrequests.get(u)\nPY",
+                    "node <<'JS'\n// user's comment\nfetch(u)\nJS"]
+        for command in commands:
+            for name, inputs, carrier in [
+                ("Bash", {"command": command}, "bash"),
+                ("mcp__ctx__ctx_execute", {"language": "shell", "code": command}, "ctx"),
+                ("mcp__ctx__ctx_batch_execute", {"commands": [{"command": command}]}, "ctx"),
+            ]:
+                with self.subTest(command=command, carrier=name):
+                    rows = [call("routed", "mcp__ctx__ctx_fetch_and_index", url="https://example.org"),
+                            call("code", name, **inputs)]
+                    got = self.measure(rows)["m4"]
+                    self.assertEqual(got["remote_fetches"], 1)
+                    self.assertEqual(got["routed_share"], 1)
+                    self.assertEqual(got["fetch_mentions_unconfirmed"], 1)
+                    self.assertEqual(got["routed_share_lower_bound"], .5)
+                    self.assertEqual(got["status"], "incomplete")
+                    self.assertEqual(got["by_carrier"][carrier]["fetch_mentions_unconfirmed"], 1)
+
+    def test_m4_possible_fetches_count_per_command_without_double_counting(self):
+        rows = [call("routed", "mcp__ctx__ctx_fetch_and_index", url="https://example.org"),
+                call("batch", "mcp__ctx__ctx_batch_execute", commands=[
+                    {"command": "python3 -c 'requests.get(u)' # requests.get(v)"},
+                    {"command": "grep 'fetch(u); fetch(v)' script.js"}]),
+                call("direct", "mcp__ctx__ctx_execute", language="javascript",
+                     code="await fetch(u)")]
+        got = self.measure(rows)["m4"]
+        self.assertEqual(got["remote_fetches"], 3)
+        self.assertEqual(got["unclassifiable"], 2)
+        self.assertEqual(got["fetch_mentions_unconfirmed"], 3)
+        self.assertEqual(got["routed_share"], .3333)
+        self.assertEqual(got["routed_share_lower_bound"], .1667)
+        self.assertEqual(got["by_carrier"]["ctx"]["fetch_mentions_unconfirmed"], 3)
+
+    def test_m4_aggregate_recomputes_bounds_and_carrier_counts(self):
+        # Aggregation sums counts, never actor percentages. Empty is N/A.
+        script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, aggregateMeasurements} from "
+                  + json.dumps(MODULE.as_uri()) + "; const rows=JSON.parse(readFileSync(0,'utf8')); "
+                  "process.stdout.write(JSON.stringify([aggregateMeasurements(rows.map(r=>measureTranscript(r))), "
+                  "aggregateMeasurements([])]));")
+        rows = [[call("routed", "mcp__ctx__ctx_fetch_and_index", requests=[
+                    {"url": "https://example.org/a"}, {"url": "https://example.org/b"}])],
+                [call("data", "Bash", command="rtk proxy grep 'fetch(u)' app.js")]]
+        p = subprocess.run(["node", "--input-type=module", "-e", script],
+                           input=json.dumps(rows), text=True, capture_output=True, check=False)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        got, empty = json.loads(p.stdout)
+        self.assertEqual(got["m4"]["remote_fetches"], 2)
+        self.assertEqual(got["m4"]["routed_share"], 1)
+        self.assertEqual(got["m4"]["fetch_mentions_unconfirmed"], 1)
+        self.assertEqual(got["m4"]["routed_share_lower_bound"], .6667)
+        self.assertEqual(got["m4"]["by_carrier"]["rtk_proxy"]["fetch_mentions_unconfirmed"], 1)
+        self.assertEqual(got["m4"]["by_carrier"]["ctx"]["routed_share_lower_bound"], 1)
+        self.assertEqual(empty["m4"]["fetch_mentions_unconfirmed"], 0)
+        self.assertIsNone(empty["m4"]["routed_share_lower_bound"])
+        self.assertEqual(empty["m4"]["by_carrier"], {})
+        self.assertEqual(empty["m4"]["status"], "not_applicable")
 
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):
