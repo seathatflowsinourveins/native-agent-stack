@@ -620,8 +620,8 @@ OK
 
 The first command covers structural validation and locally authored synthetic
 fixtures; the second covers the same eight native tests skipped in the first.
-There were 55 distinct tests, not 63. An independent coordinator rerun at
-`4278affa`, with `TMPDIR=/var/tmp/claude-w3-codex-agents`, confirmed collection
+There were 55 distinct tests, not 63. An independent coordinator rerun of the
+pre-repair build state, with `TMPDIR=/var/tmp/claude-w3-codex-agents`, confirmed collection
 and native execution (local integration evidence, supplied 2026-09-27 ~14:00Z):
 
 ```text
