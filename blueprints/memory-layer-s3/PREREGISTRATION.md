@@ -1,10 +1,12 @@
-# Memory layer S3: head-to-head preregistration (DRAFT r4, 2026-09-27)
+# Memory layer S3: head-to-head preregistration (DRAFT r5, 2026-09-27)
 
-**Status: DRAFT r4, not frozen.**
+**Status: DRAFT r5, not frozen.**
+- r5 applies GPT-6's replacement text for its r4 review (2 high, 3 medium, 1 low; section 13).
+  - Its cluster counts were reproduced with the frozen v4 `lme_summarize.clusters` on the pinned dataset (sha256 verified).
 - r4 governs the memory decision on both hosts and proposes that the unwritten A17 plan (the workstation's confirmatory R1 under A1–A16.3) is superseded, not run (section 12, with the amendment file `blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md`). Other r4 changes:
   - reference feasibility on v2.4.0 is established from source (section 1);
   - the arms are defined from the v4 driver (#386), and the harness is v4-based with a new isolated runner (section 3);
-  - agentmemory's primary arm is its shipped hook path (section 2);
+  - agentmemory's primary configuration is its explicitly selected local-MiniLM, zero-LLM setup, and it must prove shipped-hook equivalence (section 2, r5);
   - a late-candidate rule is added (section 2);
   - the Mac production diagnostic arm is added (section 1);
   - the cache proxy's omission is preregistered (section 3);
@@ -33,11 +35,16 @@ The user decided on 2026-09-27 that the memory layer is chosen on merit and the 
   - **C4′:** the same, with ai-memory's LLM reranker.
   - The reference arm is **C4′**, ai-memory's claimed production configuration. **C3′** is a diagnostic ablation outside the decision family.
   - If C4′ cannot run, the reference arm is C3′ and C4′ is reported `pending`.
-  - **Definitions (r4).** C3′ and C4′ are the A-protocol's C3 and C4 configurations run on the official v2.4.0 binary.
-    - **C3′:** Qwen3-Embedding-4B (`qwen3-embedding:4b`) with the production query prefix, reranker off.
-    - **C4′:** C3′ plus `AI_MEMORY_RERANKER=llm` through the openai-compat provider, model `qwen3.5-9b-64k`, reasoning `low`, 3 workers.
-    - Sources: `blueprints/memory-stack/longmemeval/v4/lme_harness.py:1562-1567,1575`, v4 `PREREGISTRATION.md:46-47,221-233,289-300`.
-    - More than 5% rerank fallbacks makes a C4′ result inconclusive (v4 `PREREGISTRATION.md:231-233`).
+  - **Definitions (r5).**
+    - **C3′:** official v2.4.0 with Qwen3-Embedding-4B (`qwen3-embedding:4b`) and its native, unprefixed embedding input, reranker off.
+    - **C4′:** C3′ plus the specified LLM reranker: `AI_MEMORY_RERANKER=llm` through the openai-compat provider, model `qwen3.5-9b-64k`, reasoning `low`, 3 workers.
+    - These are S3 controls, not identical reproductions of the A-protocol's prefixed C3/C4.
+      - v2.4.0 has no embedding-prefix setting and ignores unknown configuration fields (ai-memory v2.4.0 `crates/ai-memory-cli/src/config.rs:239`).
+      - Its OpenAI-compatible embedder sends the supplied text unchanged (`crates/ai-memory-llm/src/embedding.rs:337`).
+      - So the v4 prefix environment would silently start a different configuration.
+    - The bundle must verify the effective embedding-request bytes and configuration on the pinned binary before scoring.
+    - The A-protocol shapes they derive from: `blueprints/memory-stack/longmemeval/v4/lme_harness.py:1562-1567,1575`, v4 `PREREGISTRATION.md:46-47,221-233,289-300`.
+    - More than 5% rerank fallbacks makes a C4′ result inconclusive (v4 `PREREGISTRATION.md:231-233`). Section 7 states the consequence.
   - **Feasibility on v2.4.0, from source (r4).** Official v2.4.0 (tag object `5c4350e3`) ships the LLM reranker.
     - `crates/ai-memory-cli/src/config.rs:413-420,1744-1759` parses and validates `AI_MEMORY_RERANKER=llm`.
     - `crates/ai-memory-llm/src/reranker.rs` implements `LlmReranker`.
@@ -69,7 +76,12 @@ The user decided on 2026-09-27 that the memory layer is chosen on merit and the 
 | [basicmachines-co/basic-memory](https://github.com/basicmachines-co/basic-memory) | v0.23.2 |
 | [zilliztech/memsearch](https://github.com/zilliztech/memsearch) | v0.4.21 |
 
-**agentmemory's primary arm (r4)** is its shipped Claude Code hook path, the A-protocol's D2h shape (`am-minilm-hooks`: v4 `lme_harness.py:759-784,1618-1619`; v4 `PREREGISTRATION.md:456-459,497-498`). Sessions are ingested through the plugin's shipped hook sequence, not a direct import. The pins are:
+**agentmemory's primary configuration (r5)** is the explicitly selected local-MiniLM, zero-LLM configuration (`EMBEDDING_PROVIDER=local`).
+- **Why this is an exception to section 4.1.** Section 4.1's rule is the literal default provider. Without keys or an override, upstream `detectEmbeddingProvider` returns `null` (agentmemory v0.9.29 `src/config.ts:265`).
+- **Hook equivalence is required.** The primary adapter must execute the pinned shipped hooks, or demonstrate equivalent behaviour on frozen client-shaped fixtures, including SessionEnd transcript handling (upstream `src/hooks/session-end.ts:20`).
+- **The existing D2h replay alone does not establish that equivalence.** v4's `am_hook_session` emulates HTTP events and omits transcript replay (`am-minilm-hooks`: v4 `lme_harness.py:759-784,1618-1619`; v4 `PREREGISTRATION.md:456-459,497-498`).
+
+The pins are:
 - agentmemory 0.9.29 at `2d38dafe`;
 - iii 0.11.2, Linux asset `9c83c477…`;
 - Node 24.21.0;
@@ -77,7 +89,7 @@ The user decided on 2026-09-27 that the memory layer is chosen on merit and the 
 
 All four are in v4 `pins.json:36-39,70-77,89-93,1072-1100`. On macOS the runner records its own platform assets.
 
-**Discovery inputs (r4).** The Mac session's five model and repository sweeps (embedders, rerankers, memory LLMs, generation models and memory systems), each Opus-verified and dated 2026-09-27, are committed under `inputs/` with sources and dates. Each is marked vendor-reported or measured. Vendor-reported scores, such as AA-LCR v1.1 and MemReranker's self-reported LongMemEval, are motivation for the candidate list only (section 8), never S3 evidence.
+**Discovery inputs (r4).** The Mac session's five model and repository sweeps (embedders, rerankers, memory LLMs, generation models and memory systems), each Opus-verified and dated 2026-09-27, will be committed under `inputs/`, with source dates and SHA-256 values, before bundle review. Each is marked vendor-reported or measured. Vendor-reported scores, such as AA-LCR v1.1 and MemReranker's self-reported LongMemEval, are motivation for the candidate list only (section 8), never S3 evidence.
 
 **Late candidates (r4).** The 32-layer landscape sweep is held for the user's Gates A and B, so this preregistration does not wait for its durable-memory survivors. Any later survivor, or any other dated discovery, is handled like a reserve admitted after confirmatory execution (section 6):
 - it is exploratory until a separately frozen, dated amendment arm names it before its first run;
@@ -110,7 +122,10 @@ Also pending from the 2026-09-26 sweep, where only a missing vote refuted them: 
   - 500 questions; 30 abstention.
   - Full track: n=470.
   - Official track: n=419, which also excludes the 51 `single-session-assistant` questions.
-- **Tracks:** each track uses the upstream track-specific corpus construction, including user-text session construction and its label changes. Both are frozen as question manifests with sha256, built by upstream code at [LongMemEval @9e0b455f](https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/retrieval/run_retrieval.py).
+- **Tracks (r5):**
+  - **Official track:** upstream's user-text construction and relabelled gold IDs ([LongMemEval @9e0b455f `run_retrieval.py:202`](https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/retrieval/run_retrieval.py#L202), `process_item_flat_index`).
+  - **Full-session track:** presents complete sessions to the native adapters and scores raw session IDs against `answer_session_ids`, including assistant-side evidence, following A2. This construction is a local extension.
+  - Both use unchanged upstream `evaluate_retrieval`, and both are frozen as question manifests with sha256.
 - **What candidates see:**
   - Answers, `has_answer`, gold-session labels and scoring feedback are never visible to candidates.
   - Candidates see opaque session ids. The evaluator alone holds the opaque-to-original provenance map.
@@ -120,7 +135,12 @@ Also pending from the 2026-09-26 sweep, where only a missing vote refuted them: 
   - The scorer receives the complete eligible corpus ids.
   - A system whose output cannot be mapped to source sessions gets retrieval `N/A`, never a constructed score.
 - **Scorer:** upstream [`eval_utils.py` @9e0b455f](https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/retrieval/eval_utils.py), unchanged, run in a pinned environment.
-- **Dependence:** questions share evidence histories (465 gold-session clusters, 5 of them non-singleton), so resampling is by cluster (section 6). Some questions have up to 6 gold sessions, so a perfect `recall_all@5` is unattainable for them; this is reported, not corrected.
+- **Dependence (r5):** questions share evidence histories, so resampling is by cluster (section 6).
+  - **Construction:** union questions whose gold sessions share identical canonical sequences of `(role, content)`, excluding session IDs and gold annotations from the content hash. This is the rule of v4 `lme_summarize.py:234`, `clusters`.
+  - **Counts:** 452 full-track clusters (434 singletons and 18 two-question clusters) and 401 official-track clusters (383 and 18). Both were reproduced with the frozen function on the pinned dataset.
+  - Session-ID matching would give 465 and 414, understating dependence.
+  - The manifest is frozen and hashed before scoring.
+   Some questions have up to 6 gold sessions, so a perfect `recall_all@5` is unattainable for them; this is reported, not corrected.
 - **Harness and runner (r4).**
   - **Base.** The arms' adapter logic comes from the v4 driver (#386, `blueprints/memory-stack/longmemeval/v4/`), where C4 and D2h exist; v3 (#380) has neither. v4's files stay frozen and are never run on a shared host (v4 `README.md:21-24,86-93`). S3's runner is **new code**, and every change lands in new files.
   - **Isolation**, which the runner must implement before any scored run (the requirements come from the GPT-6 reviews on #386):
@@ -203,14 +223,14 @@ Each host selects and qualifies **separately**, against **its own** measured ref
   - RSS, latency and co-residency of every serving model;
   - the reference reranker's latency against ai-memory's reranker timeout, since timeouts become fallbacks and more than 5% fallbacks makes C4′ inconclusive.
 
-  The Mac's numbers come from its #379 PR.
+  Mac qualification is tracked by issue #379, and the bundle must cite its resulting measurement receipt.
 - **Mac Hindsight (r4).** Hindsight 0.10.1 installs on the Mac but cannot start. Its `pg0-embedded` 0.15.2 Postgres is linked to Homebrew OpenSSL, and the Mac has no Homebrew. Relinking would modify the upstream artifact, so it is not a faithful arm. The macOS profile's own Postgres choice, Apple Container, needs the owner's sudo install. Until the user decides, the Mac's Hindsight arm is `pending`, not `refuted`.
 
 ## 6. Statistics (frozen before any confirmatory run)
 
 - **Reference availability** is settled by a frozen preflight before any scoring: C4′ must install, start and return a well-formed reranked result on 5 frozen development questions. If it fails, the reference arm is C3′ and C4′ is `pending`, decided before the confirmatory run.
 - **Frozen before the first confirmatory result:**
-  - the question-to-cluster manifest (sha256), built by merging questions that share any gold session;
+  - the question-to-cluster manifest (sha256), built by section 3's canonical `(role, content)` rule (452 full-track and 401 official-track clusters);
   - seed aggregation: the five paired seeds (20260927–20260931) are averaged within each question;
   - question-weighted differences;
   - the RNG (NumPy `PCG64`, bootstrap seed 20260927);
@@ -248,6 +268,12 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 - This is a practical decision tolerance, not statistical equivalence.
 - If an unknown cost could change the winner, selection is unresolved.
 - An exact residual tie gives joint winners.
+
+**Reference fallbacks (r5).**
+- If confirmatory C4′ exceeds 5% rerank fallbacks, every replacement comparison depending on it is inconclusive, and host selection remains unresolved.
+- C3′ cannot become the comparator after confirmatory scoring. Any subsequent comparison requires a separately frozen protocol.
+- The frozen A15.2 applies the same rule to every decision referencing C4 (v4 `PREREGISTRATION.md:451`).
+- The section 6 preflight settles only whether C4′ can run, not its eventual fallback rate.
 
 **If no eligible candidate replaces the reference:**
 - the host keeps its currently deployed configuration, labelled "no replacement qualified";
@@ -310,6 +336,19 @@ Each host selects and qualifies **separately**, against **its own** measured ref
 
 - **What A17 was.** VelaNext was retired, so the confirmatory rerun R1 of the frozen memory-stack protocol (A1–A16.3, v3 #380 and v4 #386) needed another host and a new amendment naming it before any run (`docs/decisions/2026-09-25-retire-vela-velanext.md:36-44`). The workstation took R1 as "A17" (`docs/decisions/2026-09-25-workstation-sota-refresh.md:542-546`; issue #274). No A17 text was ever written, and no session holds a draft (checked 2026-09-27).
 - **Why S3 supersedes it without spending a look.** No confirmatory arm of A1–A16.3 has ever run on any host: no C3′, C4′, C4 or D2h result exists (`retire-vela-velanext.md:43-44`; `catalogs/foundation/memory-stack-20260925.json:1318`; `docs/decisions/2026-09-27-mac-single-writer-staged.md:48`). Retiring R1 in favour of S3 therefore consumes no confirmatory look and selects nothing after seeing results.
-- **What carries over.** The user's 2026-09-25 choice of official ai-memory v2.4.0 as the control (issue #274; `workstation-sota-refresh.md:228`) becomes S3's reference, and the A-protocol's C3/C4/D2h configurations become S3's C3′, C4′ and agentmemory arm (sections 1 and 2). The historical Mac C3 on `19b6429` stays descriptive.
+- **What carries over.** The user's 2026-09-25 choice of official ai-memory v2.4.0 as the control (issue #274; `workstation-sota-refresh.md:228`) becomes S3's reference, and the A-protocol's C3/C4/D2h configurations are the starting point for S3's C3′, C4′ and agentmemory configuration. There are two stated differences (r5):
+  - C3′/C4′ use Qwen3-Embedding-4B's native, unprefixed input, because v2.4.0 has no prefix setting;
+  - agentmemory's adapter must prove shipped-hook equivalence (sections 1 and 2). The historical Mac C3 on `19b6429` stays descriptive.
 - **What does not carry over.** The A-protocol's statistics and decision rules (section 6), its v4 = v3 reproduction gate and its VelaNext-only drivers. S3's own gates, runner and statistics replace them.
 - **The amendment.** `blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md` records this as a dated amendment in the protocol's own lineage, a new file, since frozen text is never edited. It is **proposed**. It takes effect only when the user confirms it at the S3 freeze (section 9). Until then nothing runs under either protocol.
+
+## 13. r4 review findings and their fixes (r5)
+
+| r4 finding | Fixed in |
+|---|---|
+| high 1: v2.4.0 has no embedding-prefix setting; C3′/C4′ cannot reproduce prefixed C3/C4 | §1 definitions: native unprefixed input; S3 controls, not reproductions; embedding-request bytes verified before scoring; §12 |
+| high 2: session-ID clustering misses shared conversation content | §3 canonical `(role, content)` rule, 452/401 clusters reproduced with frozen v4 code; §6 manifest |
+| medium 3: upstream does not supply both corpus constructions | §3 official track upstream; full-session track the A2 local extension |
+| medium 4: D2h is not the shipped default, and hook replay omits transcripts | §2 explicit local-MiniLM configuration; hook equivalence required |
+| medium 5: C4′ fallbacks not connected to the decision rule | §7 reference fallbacks: comparisons inconclusive, selection unresolved, no post-hoc C3′ comparator |
+| low 6: pending provenance written as present | §2 inputs "will be committed"; §5 #379 is an issue, and the bundle cites its receipt |

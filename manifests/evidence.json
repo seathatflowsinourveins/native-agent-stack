@@ -6873,8 +6873,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "d0967ace50e86ecca62618992858124d26575938809bd655e1d1270ef1dad7e9",
-      "bytes": 28750
+      "sha256": "fc788c50c20e4119d2ec0be82ab5a73e8a0146af076929b03461f6310f5978bf",
+      "bytes": 32995
     },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",
@@ -7953,8 +7953,8 @@
     },
     {
       "path": "blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md",
-      "sha256": "177d7aebab03c8b64e7c4a7e87244d2068184b468130519b7155fa4e4933d1e6",
-      "bytes": 2902
+      "sha256": "377ab0d329aa8629824cde33ec9ab7b8ffed4cbb98f588e20c5103229ce14518",
+      "bytes": 3185
     },
     {
       "path": "blueprints/memory-stack/longmemeval/PREREGISTRATION.md",
