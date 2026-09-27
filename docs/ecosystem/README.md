@@ -63,7 +63,12 @@ and `python3 scripts/landscape.py` checks coverage and reference integrity.
 is present. For every layer it shows the layer state, the in-use and converged
 counts, the true/false/unknown counts of its three factors, the comparability
 columns and any unresolved manifest rows, with the frozen definitions and their
-source dates. The page types no number of its own: the build rejects a matrix
+source dates. The counts are layer-component rows: a component in several layers
+counts once per layer, so the catalog and overall sums are not distinct
+components. Next to the unresolved rows it lists both sides of the
+verdict-to-manifest join: recorded winners without a row in the newest sweep
+manifest, layers missing from that manifest and manifest layers without a
+matrix row. The page types no number of its own: the build rejects a matrix
 whose summary disagrees with its layer rows, and
 `python3 scripts/component_matrix.py --write` regenerates it.
 

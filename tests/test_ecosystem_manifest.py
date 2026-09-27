@@ -1025,6 +1025,7 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
                         "unresolved": [{"id": name, "repository": "https://github.com/example/" + name,
                                         "reason": "no manifests/stack.json id, alias or repository match"}
                                        for name in unresolved],
+                        "manifest_layer_found": True, "winners_without_manifest_row": [],
                         "winner_rows": [], "components": [], "invoke": None,
                         "invoke_reason": "no post-fix invoke receipt yet"}}
         rows = [
@@ -1054,8 +1055,27 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
             "newest_manifest": {"path": "catalogs/sota-convergence/manifest-20260926.json",
                                 "id": "sota-convergence-20260926", "checked_at": "2026-09-26"},
             "newest_verdict_checked_at": {"foundation": "2026-09-22", "us-equities": "2026-09-22"},
+            "manifest_layers_without_matrix_row": [],
         }
         return {"schema_version": 1, "checked_at": "2026-09-22", "rows": rows, "summary": {"convergence": block}}
+
+    def join_gap_matrix(self):
+        """convergence_matrix() plus a recorded layer missing from the newest manifest, whose winner therefore has
+        no manifest row, and a manifest layer without a matrix row."""
+        matrix = self.convergence_matrix()
+        missing = json.loads(json.dumps(matrix["rows"][1]))
+        missing.update(layer_id="f-missing", title="Title f-missing")
+        missing["convergence"].update(
+            in_use=0, converged=0, all_rows=0, recorded_winner_rows=0, manifest_layer_found=False,
+            winners_without_manifest_row=["lonely-winner"],
+            factors={name: {"true": 0, "false": 0, "unknown": 0} for name in ("verdict_winner", "pin_current", "host_e2e")})
+        matrix["rows"].insert(2, missing)
+        summary = matrix["summary"]["convergence"]
+        summary["layer_states"]["recorded_reopened"] += 1
+        summary["catalogs"]["foundation"]["layers"] += 1
+        summary["overall"]["layers"] += 1
+        summary["manifest_layers_without_matrix_row"] = [{"catalog": "us-equities", "layer_id": "u-unlisted"}]
+        return matrix
 
     def write_matrix(self, matrix):
         self.matrix = matrix
@@ -1084,13 +1104,14 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
             ("us-equities", "u-pending", "Title u-pending", "pending_lanes")])
         block = self.matrix["summary"]["convergence"]
         for key in ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
-                    "newest_manifest", "newest_verdict_checked_at"):
+                    "newest_manifest", "newest_verdict_checked_at", "manifest_layers_without_matrix_row"):
             with self.subTest(key=key):
                 self.assertEqual(convergence[key], block[key])
         first = self.matrix["rows"][0]["convergence"]
         embedded = convergence["layers"][0]
         for key in ("verdict_checked_at", "reopened_by", "in_use", "converged", "all_rows", "recorded_winner_rows",
-                    "factors", "unresolved", "invoke", "invoke_reason"):
+                    "factors", "unresolved", "invoke", "invoke_reason", "manifest_layer_found",
+                    "winners_without_manifest_row"):
             with self.subTest(key=key):
                 self.assertEqual(embedded[key], first[key])
         # Per-component detail stays in the matrix; the page links it.
@@ -1127,6 +1148,17 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
             (lambda m: m["summary"]["convergence"]["layer_states"].update(pending_lanes=2), "differs from its layer rows"),
             (lambda m: m["summary"]["convergence"]["catalogs"]["foundation"].update(share=0.5), "differs from its layer rows"),
             (lambda m: m["summary"]["convergence"].update(definitions=[]), "convergence definitions"),
+            (lambda m: m["rows"][0]["convergence"].update(manifest_layer_found="yes"), "manifest_layer_found"),
+            # A layer missing from the newest manifest has no manifest rows to count.
+            (lambda m: m["rows"][0]["convergence"].update(manifest_layer_found=False), "manifest_layer_found"),
+            (lambda m: m["rows"][0]["convergence"].update(winners_without_manifest_row=[None]),
+             "winners_without_manifest_row"),
+            (lambda m: m["summary"]["convergence"].update(manifest_layers_without_matrix_row="none"),
+             "manifest_layers_without_matrix_row"),
+            # A manifest layer listed as having no matrix row while the matrix has that row.
+            (lambda m: m["summary"]["convergence"].update(
+                manifest_layers_without_matrix_row=[{"catalog": "foundation", "layer_id": "f-current"}]),
+             "manifest_layers_without_matrix_row"),
         )
         for mutate, message in cases:
             with self.subTest(message=message):
@@ -1152,26 +1184,32 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         self.assertEqual(convergence["definitions"][0]["definition"], hostile)
         self.assertEqual(convergence["layers"][0]["unresolved"][0]["reason"], hostile)
 
-    @unittest.skipUnless(shutil.which("node"), "Convergence rendering check needs Node")
-    def test_convergence_rendering_reads_every_number_date_and_definition_from_the_data(self):
-        self.write_matrix(self.convergence_matrix())
-        page, _ = self.build()
-        convergence = json.loads(page.data)["convergence"]
+    CONVERGENCE_FUNCTIONS = ("convergenceSummaryLines", "convergenceTableRows", "convergenceListings",
+                             "renderConvergence")
+
+    def render_convergence_functions(self, convergence):
+        """Run the page's pure convergence functions (all but renderConvergence) on ``convergence`` in Node."""
         template = (ROOT / "docs/ecosystem/template.html").read_text()
         functions = [re.search(r"function " + name + r"\(.*?^}", template, re.S | re.M).group(0)
-                     for name in ("convergenceSummaryLines", "convergenceTableRows", "renderConvergence")]
+                     for name in self.CONVERGENCE_FUNCTIONS]
         for source in functions:
             # No typed number: every count, share and date on the page comes from the matrix. A digit inside
             # an identifier (host_e2e) is a name, not a number.
             self.assertNotRegex(source, r"(?<![A-Za-z_$])\d")
-        script = "\n".join(functions[:2]) + (
+        script = "\n".join(functions[:-1]) + (
             "\nconst input = JSON.parse(require('node:fs').readFileSync(0, 'utf8'));"
             "\nprocess.stdout.write(JSON.stringify({summary: convergenceSummaryLines(input),"
-            " rows: convergenceTableRows(input)}));")
+            " rows: convergenceTableRows(input), listings: convergenceListings(input)}));")
         result = subprocess.run(["node", "-e", script], input=json.dumps(convergence), capture_output=True,
                                 text=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
-        rendered = json.loads(result.stdout)
+        return json.loads(result.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "Convergence rendering check needs Node")
+    def test_convergence_rendering_reads_every_number_date_and_definition_from_the_data(self):
+        self.write_matrix(self.convergence_matrix())
+        page, _ = self.build()
+        rendered = self.render_convergence_functions(json.loads(page.data)["convergence"])
         self.assertEqual(rendered["rows"], [
             ["foundation/f-current", "confirmed_current", "2026-09-22", "-", "3", "1", "2/1/0", "2/0/1", "1/1/1",
              "4", "2", "stranger", "null"],
@@ -1182,11 +1220,13 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
             ["us-equities/u-pending", "pending_lanes", "2026-09-22", "-", "2", "0", "0/0/2", "1/1/0", "0/0/2", "2",
              "0", "-", "null"]])
         summary = "\n".join(rendered["summary"])
+        self.assertNotIn("in-use components", summary)
         for expected in ("Layer states: confirmed_current 1 · no_selection 1 · pending_lanes 1 · recorded_reopened 1",
-                         "foundation: 1 of 4 in-use components converged across 2 layers (share 0.25); "
+                         "foundation: 1 of 4 in-use layer-component rows converged across 2 layers (share 0.25); "
                          "1 unresolved manifest rows",
-                         "overall: 1 of 7 in-use components converged across 4 layers (share 0.1429); "
+                         "overall: 1 of 7 in-use layer-component rows converged across 4 layers (share 0.1429); "
                          "1 unresolved manifest rows",
+                         "a component in several layers counts once per layer",
                          "Newest sweep manifest: sota-convergence-20260926, checked_at 2026-09-26 "
                          "(catalogs/sota-convergence/manifest-20260926.json)",
                          "Newest verdict checked_at: foundation 2026-09-22 · us-equities 2026-09-22",
@@ -1195,6 +1235,29 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
                          "Definitions frozen 2026-09-27"):
             with self.subTest(expected=expected):
                 self.assertIn(expected, summary)
+        self.assertEqual(rendered["listings"], [
+            ["Unresolved manifest rows",
+             ["foundation/f-current · stranger: no manifests/stack.json id, alias or repository match"]],
+            ["Recorded winners without a row in the newest sweep manifest", []],
+            ["Layers missing from the newest sweep manifest", []],
+            ["Newest sweep manifest layers without a matrix row", []]])
+
+    @unittest.skipUnless(shutil.which("node"), "Convergence rendering check needs Node")
+    def test_the_page_lists_join_gaps_from_the_data(self):
+        """Next to the unresolved rows, the page lists recorded winners without a manifest row, layers missing
+        from the newest manifest and manifest layers without a matrix row, each read from the matrix."""
+        self.write_matrix(self.join_gap_matrix())
+        page, _ = self.build()
+        convergence = json.loads(page.data)["convergence"]
+        self.assertEqual(convergence["manifest_layers_without_matrix_row"],
+                         [{"catalog": "us-equities", "layer_id": "u-unlisted"}])
+        rendered = self.render_convergence_functions(convergence)
+        self.assertEqual(rendered["listings"][1:], [
+            ["Recorded winners without a row in the newest sweep manifest", ["foundation/f-missing: lonely-winner"]],
+            ["Layers missing from the newest sweep manifest", ["foundation/f-missing"]],
+            ["Newest sweep manifest layers without a matrix row", ["us-equities/u-unlisted"]]])
+        self.assertEqual(rendered["rows"][2][:6], ["foundation/f-missing", "recorded_reopened", "2026-09-22",
+                                                   "sweep-0926", "0", "0"])
 
     # Runs a generated page's whole inline script against the page's own elements (every id and data-tab /
     # data-open / data-catalog-tab element, with its attributes), so a renderer that throws, or looks up an id
@@ -1301,6 +1364,16 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             self.assertIn(item["term"] + item["definition"], observed["definitions"])
         self.assertIn("foundation/f-current · stranger: no manifests/stack.json id, alias or repository match",
                       observed["definitions"])
+        self.assertIn("Recorded winners without a row in the newest sweep manifestNone.", observed["definitions"])
+
+        self.write_matrix(self.join_gap_matrix())
+        _, with_gaps = self.build()
+        observed = self.run_page(with_gaps)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        for expected in ("Recorded winners without a row in the newest sweep manifestfoundation/f-missing: lonely-winner",
+                         "Layers missing from the newest sweep manifestfoundation/f-missing",
+                         "Newest sweep manifest layers without a matrix rowus-equities/u-unlisted"):
+            self.assertIn(expected, observed["definitions"])
 
     def test_the_repository_matrix_convergence_block_is_accepted(self):
         """The real generated matrix, not the fixture: the page accepts what scripts/component_matrix.py writes."""

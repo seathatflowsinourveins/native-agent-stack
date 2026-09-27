@@ -51,7 +51,9 @@ except ImportError:  # running as a plain script, not a package
     from validate import PRIVATE_CONTENT
 
 
-CHECKED_AT = "2026-09-22"
+# The date the scope and the JSON schema below were last checked (the convergence-by-layer fields, 2026-09-27).
+# It is never a build date: the generator reads no clock, and the page header derives its newest input date.
+CHECKED_AT = "2026-09-27"
 SCOPE = (
     "Per-component independent-review status and per-platform E2E state, joined from "
     "catalogs/landscape/{foundation,us-equities}.json winners/alternatives, "
@@ -109,10 +111,14 @@ CONVERGENCE_DEFINITIONS = (
      "The layer's rows in the newest committed sweep manifest (" + SWEEP_MANIFEST_DIR + "/manifest-YYYYMMDD.json "
      "with the latest checked_at; foundation[].components for a foundation layer, trading[].entries for a "
      "us-equities layer) that resolve to an adopted component, the headline denominator. A foundation row "
-     "resolves to a manifests/stack.json component by its id, then by a " + RECEIPT_ALIASES_FILE + " alias, then "
-     "by its repository when exactly one stack component and no other sweep-manifest id use it (the "
-     "tools/sota-convergence/lane_packets.py receipts_for rule). A us-equities entry is in use when its decision "
-     "is default; a conditional entry is not in use."),
+     "resolves to manifests/stack.json components by its id, else by a " + RECEIPT_ALIASES_FILE + " alias, else "
+     "by its repository (scripts/host_receipts.py normalize_repository), with no uniqueness condition: "
+     "adopted_as_candidates lists the stack components matched that way, and adopted_as names the single one or "
+     "is null when several share the alias or repository. A us-equities entry is in use when its decision is "
+     "default; a conditional entry is not in use. The unit is the layer-component row: every resolving row "
+     "counts, so a component in several layers counts once per layer and two rows of one layer that resolve to "
+     "the same stack component both count; per-catalog and overall sums count these rows, not distinct "
+     "components."),
     ("verdict_winner",
      "true when the row is a winner of the layer's recorded verdict by component id, by an alias in either "
      "direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise; "
@@ -133,9 +139,19 @@ CONVERGENCE_DEFINITIONS = (
      "The layer's manifest rows that match a winner of its recorded verdict, whether or not they are in use and "
      "whether or not a later sweep reopened the verdict. With all_rows it is the comparability column, not a "
      "score."),
+    ("manifest_layer_found",
+     "true when the newest sweep manifest has the layer in its catalog's section; false when it does not, or no "
+     "sweep manifest is committed, and then all_rows is 0."),
+    ("winners_without_manifest_row",
+     "The winners of the layer's recorded verdict that no row of the layer in the newest sweep manifest matches "
+     "(the verdict_winner match), listed and never counted, so recorded_winner_rows reconciles with the verdict."),
+    ("manifest_layers_without_matrix_row",
+     "Summary list of the newest sweep manifest's layers, in either section, that have no row in this matrix; "
+     "listed, never counted."),
     ("unresolved",
-     "Manifest rows that could not be resolved (no stack match, an ambiguous alias or repository, or a trading "
-     "entry without a default or conditional decision), counted and listed with the reason, never dropped."),
+     "Manifest rows that could not be resolved (a row without a component id, a foundation row with no "
+     "manifests/stack.json id, alias or repository match, or a trading entry without a default or conditional "
+     "decision), counted and listed with the reason, never dropped."),
     ("invoke",
      "null until a post-fix invoke receipt exists; every null carries the reason '" + INVOKE_REASON + "'."),
 )
@@ -478,10 +494,31 @@ def parse_iso_date(value) -> date | None:
         return None
 
 
+def load_convergence_input(root: Path, relative: str, *, required: bool = False):
+    """The parsed JSON document at ``relative`` for convergence by layer, or ``None`` when it is absent and not
+    ``required``. A required input that is absent, or any input that is present but cannot be read (including a
+    duplicate key), stops the build: read as empty, the saturation ledger would mean "no completed sweep" and
+    confirm every recorded layer, and a skipped sweep manifest could be the newest one."""
+    try:
+        path = safe_file(root, relative)
+    except InvalidDecisionIndex as error:
+        raise SystemExit(f"component_matrix: {relative}: {error}") from error
+    if not path.is_file():
+        if required:
+            raise SystemExit(f"component_matrix: {relative} is missing; convergence by layer cannot tell whether a "
+                             "completed sweep reopened a recorded layer")
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+    except (OSError, UnicodeError, ValueError) as error:
+        raise SystemExit(f"component_matrix: {relative}: cannot read JSON ({error})") from error
+
+
 def newest_sweep_manifest(root: Path) -> tuple[str | None, dict | None]:
     """(path, document) of the ``catalogs/sota-convergence/manifest-YYYYMMDD.json`` with the latest ISO
-    ``checked_at`` (ties: the later file name), or (None, None). Chosen by ``checked_at``, never by file name or
-    by ledger order (``saturation_ledger.latest_manifest_ref``)."""
+    ``checked_at`` (ties: the later file name), or (None, None) when none is committed. Chosen by ``checked_at``,
+    never by file name or by ledger order (``saturation_ledger.latest_manifest_ref``). A manifest that cannot be
+    read or dated stops the build, since it could be the newest one."""
     try:
         directory = safe_file(root, SWEEP_MANIFEST_DIR)
     except InvalidDecisionIndex:
@@ -493,27 +530,40 @@ def newest_sweep_manifest(root: Path) -> tuple[str | None, dict | None]:
         if not SWEEP_MANIFEST_NAME.fullmatch(name):
             continue
         relative = f"{SWEEP_MANIFEST_DIR}/{name}"
-        document = load_optional(root, relative)
+        document = load_convergence_input(root, relative)
         day = parse_iso_date(document.get("checked_at")) if isinstance(document, dict) else None
-        if day is not None and (newest is None or (day, name) > newest[0]):
+        if day is None:
+            raise SystemExit(f"component_matrix: {relative}: a sweep manifest must be an object with an ISO checked_at")
+        if newest is None or (day, name) > newest[0]:
             newest = ((day, name), relative, document)
     return (newest[1], newest[2]) if newest else (None, None)
 
 
 def completed_sweeps(ledger_doc) -> list[dict]:
-    """The completed sweeps of ``catalogs/saturation/ledger.json`` with an ISO date, sorted by (date, sweep_id),
-    each with the (catalog, layer_id) pairs its ``layers`` cover. A stopped sweep is left out; a completed
-    sweep's date equals its manifest's ``checked_at`` (scripts/saturation_ledger.py checks that)."""
+    """The completed sweeps of ``catalogs/saturation/ledger.json``, sorted by (date, sweep_id), each with the
+    (catalog, layer_id) pairs its ``layers`` cover. A stopped sweep is left out (catalogs/saturation/README.md: it
+    neither counts nor resets); a completed sweep's date equals its manifest's ``checked_at``
+    (scripts/saturation_ledger.py checks that). A field the metric reads that is malformed stops the build, since
+    skipping that sweep could confirm a layer it reopened."""
+    sweeps_value = ledger_doc.get("sweeps") if isinstance(ledger_doc, dict) else None
+    if not isinstance(sweeps_value, list):
+        raise SystemExit(f"component_matrix: {SATURATION_LEDGER_FILE}: sweeps must be a list")
     sweeps = []
-    for sweep in _dicts(ledger_doc.get("sweeps") if isinstance(ledger_doc, dict) else None):
-        day = parse_iso_date(sweep.get("date"))
-        if sweep.get("status") != COMPLETED_SWEEP or day is None:
+    for position, sweep in enumerate(sweeps_value):
+        where = f"component_matrix: {SATURATION_LEDGER_FILE}: sweeps[{position}]"
+        if not isinstance(sweep, dict) or sweep.get("status") not in saturation_ledger.STATUSES:
+            raise SystemExit(where + " needs the status " + " or ".join(saturation_ledger.STATUSES))
+        if sweep["status"] != COMPLETED_SWEEP:
             continue
-        covers = {(layer["catalog"], layer["layer_id"]) for layer in _dicts(sweep.get("layers"))
-                  if isinstance(layer.get("catalog"), str) and isinstance(layer.get("layer_id"), str)}
+        day = parse_iso_date(sweep.get("date"))
+        layers = sweep.get("layers")
+        if day is None or not isinstance(layers, list) or not all(
+                isinstance(layer, dict) and isinstance(layer.get("catalog"), str)
+                and isinstance(layer.get("layer_id"), str) for layer in layers):
+            raise SystemExit(where + ": a completed sweep needs an ISO date and layers that name catalog and layer_id")
         sweeps.append({
             "sweep_id": sweep.get("sweep_id") if isinstance(sweep.get("sweep_id"), str) else None,
-            "date": sweep["date"], "day": day, "covers": covers,
+            "date": sweep["date"], "day": day, "covers": {(layer["catalog"], layer["layer_id"]) for layer in layers},
             "manifest_ref": sweep.get("manifest_ref") if isinstance(sweep.get("manifest_ref"), str) else None,
         })
     sweeps.sort(key=lambda sweep: (sweep["day"], sweep["sweep_id"] or ""))
@@ -521,26 +571,29 @@ def completed_sweeps(ledger_doc) -> list[dict]:
 
 
 def receipt_aliases(document) -> dict[str, str]:
-    """``tools/sota-convergence/receipt-component-aliases.json``: manifests/stack.json id -> sweep-manifest id."""
-    aliases = document.get("aliases") if isinstance(document, dict) else None
-    if not isinstance(aliases, dict):
+    """``tools/sota-convergence/receipt-component-aliases.json``: manifests/stack.json id -> sweep-manifest id, or
+    {} when the file is absent. A present file whose aliases are not an object of ids stops the build, since
+    dropping them would turn alias matches into misses."""
+    if document is None:
         return {}
-    return {stack_id: sota_id for stack_id, sota_id in sorted(aliases.items())
-            if isinstance(stack_id, str) and isinstance(sota_id, str)}
+    aliases = document.get("aliases") if isinstance(document, dict) else None
+    if not isinstance(aliases, dict) or not all(isinstance(sota_id, str) and sota_id for sota_id in aliases.values()):
+        raise SystemExit(f"component_matrix: {RECEIPT_ALIASES_FILE}: aliases must map manifests/stack.json ids to "
+                         "sweep-manifest ids")
+    return dict(sorted(aliases.items()))
 
 
-def manifest_section_rows(manifest_doc) -> list[tuple[str, dict]]:
-    """(section, row) for every component/entry row of a sweep manifest, both catalogs."""
-    rows = []
-    for section, key in sorted(saturation_ledger.SELECTION_KEY.items()):
-        for layer in _dicts(manifest_doc.get(section) if isinstance(manifest_doc, dict) else None):
-            rows.extend((section, row) for row in _dicts(layer.get(key)))
-    return rows
+def manifest_layers(manifest_doc) -> list[tuple[str, str]]:
+    """(catalog, layer_id) of every layer in both sections of a sweep manifest, sorted and unique."""
+    catalog_of = {section: catalog for catalog, section in saturation_ledger.MANIFEST_SECTION.items()}
+    return sorted({(catalog_of[section], layer["layer"]) for section in catalog_of
+                   for layer in _dicts(manifest_doc.get(section) if isinstance(manifest_doc, dict) else None)
+                   if isinstance(layer.get("layer"), str)})
 
 
-def adoption_index(stack_doc, aliases: dict[str, str], manifest_doc) -> dict:
-    """What a foundation manifest row resolves against: the manifests/stack.json ids, the stack ids by
-    normalized repository and by alias target, and the sweep-manifest ids (both catalogs) by repository."""
+def adoption_index(stack_doc, aliases: dict[str, str]) -> dict:
+    """What a foundation manifest row resolves against: the manifests/stack.json ids, and those ids by
+    normalized repository and by the sweep-manifest id their alias names."""
     stack_ids: set[str] = set()
     stack_ids_by_repository: dict[str, set[str]] = {}
     for component in _dicts((stack_doc or {}).get("components") if isinstance(stack_doc, dict) else None):
@@ -553,69 +606,63 @@ def adoption_index(stack_doc, aliases: dict[str, str], manifest_doc) -> dict:
     for stack_id, sota_id in aliases.items():
         if stack_id in stack_ids:
             stack_ids_by_alias.setdefault(sota_id, set()).add(stack_id)
-    manifest_ids_by_repository: dict[str, set[str]] = {}
-    for _section, row in manifest_section_rows(manifest_doc):
-        repository = host_receipts.normalize_repository(row.get("repository"))
-        if repository is not None and isinstance(row.get("id"), str):
-            manifest_ids_by_repository.setdefault(repository, set()).add(row["id"])
     return {"stack_ids": stack_ids, "stack_ids_by_repository": stack_ids_by_repository,
-            "stack_ids_by_alias": stack_ids_by_alias, "manifest_ids_by_repository": manifest_ids_by_repository}
+            "stack_ids_by_alias": stack_ids_by_alias}
 
 
 def resolve_manifest_row(section: str, row: dict, index: dict) -> dict:
-    """``{"status": "in_use" | "not_in_use" | "unresolved", ...}`` for one sweep-manifest row, by the in_use
-    definition: a trading entry by its decision; a foundation component by manifests/stack.json id, then alias,
-    then a repository exactly one stack component and no other sweep-manifest id use (the precedence and
-    uniqueness of tools/sota-convergence/lane_packets.py receipts_for)."""
+    """``{"status": "in_use" | "not_in_use" | "unresolved", ...}`` for one sweep-manifest row, by frozen rule 2:
+    a trading entry by its decision; a foundation component by its manifests/stack.json id, else the stack ids
+    whose alias names it, else the stack ids with its repository, with no uniqueness condition.
+    ``adopted_as_candidates`` lists the stack ids so matched, and ``adopted_as`` names the single one (None when
+    several share the alias or repository)."""
     row_id = row.get("id")
     if not isinstance(row_id, str) or not row_id:
         return {"status": "unresolved", "reason": "no component id"}
     if section == "trading":
         decision = row.get("decision")
         if decision == IN_USE_TRADING_DECISION:
-            return {"status": "in_use", "resolved_by": "decision", "adopted_as": None}
+            return {"status": "in_use", "resolved_by": "decision", "adopted_as": None, "adopted_as_candidates": []}
         if decision in TRADING_DECISIONS:
             return {"status": "not_in_use"}
         return {"status": "unresolved", "reason": "no default or conditional decision"}
-    if row_id in index["stack_ids"]:
-        return {"status": "in_use", "resolved_by": "id", "adopted_as": row_id}
-    aliased = sorted(index["stack_ids_by_alias"].get(row_id, ()))
-    if len(aliased) == 1:
-        return {"status": "in_use", "resolved_by": "alias", "adopted_as": aliased[0]}
-    if aliased:
-        return {"status": "unresolved", "reason": "ambiguous alias: manifests/stack.json ids " + ", ".join(aliased)}
     repository = host_receipts.normalize_repository(row.get("repository"))
-    stack_ids = sorted(index["stack_ids_by_repository"].get(repository, ())) if repository else []
-    others = sorted(index["manifest_ids_by_repository"].get(repository, set()) - {row_id}) if repository else []
-    if len(stack_ids) == 1 and not others:
-        return {"status": "in_use", "resolved_by": "repository", "adopted_as": stack_ids[0]}
-    if stack_ids:
-        reason = "ambiguous repository: manifests/stack.json ids " + ", ".join(stack_ids)
-        if others:
-            reason += "; also sweep-manifest ids " + ", ".join(others)
-        return {"status": "unresolved", "reason": reason}
+    for method, candidates in (
+            ("id", [row_id] if row_id in index["stack_ids"] else []),
+            ("alias", sorted(index["stack_ids_by_alias"].get(row_id, ()))),
+            ("repository", sorted(index["stack_ids_by_repository"].get(repository, ())) if repository else [])):
+        if candidates:
+            return {"status": "in_use", "resolved_by": method,
+                    "adopted_as": candidates[0] if len(candidates) == 1 else None,
+                    "adopted_as_candidates": candidates}
     return {"status": "unresolved", "reason": "no manifests/stack.json id, alias or repository match"}
 
 
-def winner_match(row: dict, winners: list[dict], aliases: dict[str, str]) -> tuple[str | None, list[str]]:
-    """(method, winner ids) for the strongest way the manifest row matches the layer's recorded winners: its
-    component id, an alias in either direction, or the same normalized repository; (None, []) for no match."""
+def winner_match_method(row: dict, winner: dict, aliases: dict[str, str]) -> str | None:
+    """How a sweep-manifest row matches one recorded winner, strongest first: the same component id, an alias in
+    either direction, or the same normalized repository; None when it does not match."""
     row_id = row.get("id") if isinstance(row.get("id"), str) else None
+    winner_id = winner.get("component_id")
+    if not isinstance(winner_id, str):
+        return None
+    if row_id is not None and winner_id == row_id:
+        return "id"
+    if row_id is not None and (aliases.get(winner_id) == row_id or aliases.get(row_id) == winner_id):
+        return "alias"
     repository = host_receipts.normalize_repository(row.get("repository"))
+    if repository is not None and repository == host_receipts.normalize_repository(winner.get("repository")):
+        return "repository"
+    return None
+
+
+def winner_match(row: dict, winners: list[dict], aliases: dict[str, str]) -> tuple[str | None, list[str]]:
+    """(method, winner ids) for the strongest way the manifest row matches the layer's recorded winners
+    (``winner_match_method``); (None, []) for no match."""
     matched: dict[str, set[str]] = {}
     for winner in winners:
-        winner_id = winner.get("component_id")
-        if not isinstance(winner_id, str):
-            continue
-        if row_id is not None and winner_id == row_id:
-            method = "id"
-        elif row_id is not None and (aliases.get(winner_id) == row_id or aliases.get(row_id) == winner_id):
-            method = "alias"
-        elif repository is not None and repository == host_receipts.normalize_repository(winner.get("repository")):
-            method = "repository"
-        else:
-            continue
-        matched.setdefault(method, set()).add(winner_id)
+        method = winner_match_method(row, winner, aliases)
+        if method is not None:
+            matched.setdefault(method, set()).add(winner["component_id"])
     for method in WINNER_MATCH_METHODS:
         if method in matched:
             return method, sorted(matched[method])
@@ -647,11 +694,11 @@ def classify_layer_state(layer: dict, later_sweeps: list[dict]) -> str:
 
 def load_convergence_context(root: Path, stack_doc) -> dict:
     manifest_path, manifest_doc = newest_sweep_manifest(root)
-    aliases = receipt_aliases(load_optional(root, RECEIPT_ALIASES_FILE))
+    aliases = receipt_aliases(load_convergence_input(root, RECEIPT_ALIASES_FILE))
     return {
         "manifest_path": manifest_path, "manifest": manifest_doc, "aliases": aliases,
-        "sweeps": completed_sweeps(load_optional(root, SATURATION_LEDGER_FILE)),
-        "index": adoption_index(stack_doc, aliases, manifest_doc),
+        "sweeps": completed_sweeps(load_convergence_input(root, SATURATION_LEDGER_FILE, required=True)),
+        "index": adoption_index(stack_doc, aliases),
     }
 
 
@@ -699,12 +746,18 @@ def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict)
             factors[factor][value] += 1
         components.append({
             "id": row_id, "resolved_by": resolution["resolved_by"], "adopted_as": resolution["adopted_as"],
+            "adopted_as_candidates": resolution["adopted_as_candidates"],
             "winner_match": method, "winner_ids": winner_ids, **values,
             "converged": state == "confirmed_current" and all(value == "true" for value in values.values()),
         })
     components.sort(key=lambda item: (item["id"], item["adopted_as"] or ""))
     unresolved.sort(key=lambda item: (item["id"] or "", item["repository"] or "", item["reason"]))
     winner_rows.sort(key=lambda item: (item["id"] or "", item["matched_by"]))
+    # The other side of the verdict-to-manifest join: winners no manifest row of this layer matches.
+    winners_without_row = sorted({winner["component_id"] for winner in recorded_winners
+                                  if isinstance(winner.get("component_id"), str)
+                                  and not any(winner_match_method(manifest_row, winner, context["aliases"])
+                                              for manifest_row in manifest_rows)})
     return {
         "layer_state": state,
         "verdict_checked_at": layer["checked_at"] if verdict_day is not None else None,
@@ -716,6 +769,8 @@ def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict)
         "all_rows": len(manifest_rows),
         "recorded_winner_rows": len(winner_rows),
         "winner_rows": winner_rows,
+        "manifest_layer_found": found is not None,
+        "winners_without_manifest_row": winners_without_row,
         "unresolved": unresolved,
         "components": components,
         "invoke": None,
@@ -725,7 +780,8 @@ def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict)
 
 def build_convergence_summary(rows: list[dict], context: dict) -> dict:
     """Layer counts by state; converged / in_use per catalog and overall (a share only where in_use > 0); the
-    newest manifest id and checked_at; the newest verdict checked_at per catalog; definitions and sources."""
+    newest manifest id and checked_at; the newest verdict checked_at per catalog; the newest manifest's layers
+    that have no matrix row; definitions and sources."""
     layer_states = dict.fromkeys(CONVERGENCE_LAYER_STATES, 0)
     counted = ("layers", "in_use", "converged", "unresolved")
     catalogs = {catalog: dict.fromkeys(counted, 0) for catalog in sorted(LANDSCAPE_FILES)}
@@ -745,6 +801,7 @@ def build_convergence_summary(rows: list[dict], context: dict) -> dict:
     overall = {key: sum(scope[key] for scope in catalogs.values()) for key in counted}
     for scope in (*catalogs.values(), overall):
         scope["share"] = round(scope["converged"] / scope["in_use"], 4) if scope["in_use"] else None
+    matrix_layers = {(row["catalog"], row["layer_id"]) for row in rows}
     manifest = context["manifest"]
     return {
         "frozen_at": CONVERGENCE_FROZEN_AT,
@@ -768,6 +825,9 @@ def build_convergence_summary(rows: list[dict], context: dict) -> dict:
             "checked_at": manifest["checked_at"],
         },
         "newest_verdict_checked_at": newest_verdict,
+        "manifest_layers_without_matrix_row": [
+            {"catalog": catalog, "layer_id": layer_id} for catalog, layer_id in manifest_layers(manifest)
+            if (catalog, layer_id) not in matrix_layers],
     }
 
 
@@ -895,6 +955,15 @@ def alias_summary_sentence(aliases: list[dict]) -> str:
             f"observed {', '.join(dates)}; {grandfathered} of {len(aliases)} grandfathered.")
 
 
+def newest_source_date(block: dict) -> str | None:
+    """The newest of the dates convergence by layer reads (each catalog's newest verdict checked_at, the newest
+    sweep manifest's checked_at and the completed sweep dates), derived from the document and never typed."""
+    dates = [*block["newest_verdict_checked_at"].values(), (block["newest_manifest"] or {}).get("checked_at"),
+             *(sweep["date"] for sweep in block["sources"]["completed_sweeps"])]
+    days = [day for day in (parse_iso_date(value) for value in dates) if day is not None]
+    return max(days).isoformat() if days else None
+
+
 def render_convergence_markdown(document: dict) -> list[str]:
     """The "Convergence by layer" section, every number, definition and date read from the document."""
     block = document["summary"]["convergence"]
@@ -921,7 +990,11 @@ def render_convergence_markdown(document: dict) -> list[str]:
         "",
         "Layer states: " + ", ".join(f"{state} {count}" for state, count in block["layer_states"].items()) + ".",
         "",
-        "| Scope | Layers | converged / in_use | Share | Unresolved rows |",
+        "in_use and converged count layer-component rows: a component in several layers counts once per layer, "
+        "and two rows of one layer that resolve to the same stack component both count, so the catalog and overall "
+        "sums below are not numbers of distinct components.",
+        "",
+        "| Scope | Layers | converged / in_use (layer-component rows) | Share | Unresolved rows |",
         "| --- | --- | --- | --- | --- |",
     ]
     for label, scope in (*block["catalogs"].items(), ("overall", block["overall"])):
@@ -951,15 +1024,29 @@ def render_convergence_markdown(document: dict) -> list[str]:
     lines += ["", "### Unresolved manifest rows", ""]
     lines += [f"- `{row['catalog']}/{row['layer_id']}` `{item['id'] or 'no id'}`: {item['reason']}"
               for row in document["rows"] for item in row["convergence"]["unresolved"]] or ["None."]
+    # Both sides of the verdict-to-manifest join, listed so recorded_winner_rows reconciles with each verdict.
+    lines += ["", "### Recorded winners without a row in the newest sweep manifest", ""]
+    lines += [f"- `{row['catalog']}/{row['layer_id']}`: "
+              + ", ".join(f"`{winner_id}`" for winner_id in row["convergence"]["winners_without_manifest_row"])
+              for row in document["rows"] if row["convergence"]["winners_without_manifest_row"]] or ["None."]
+    lines += ["", "### Layers missing from the newest sweep manifest", ""]
+    lines += [f"- `{row['catalog']}/{row['layer_id']}`" for row in document["rows"]
+              if not row["convergence"]["manifest_layer_found"]] or ["None."]
+    lines += ["", "### Newest sweep manifest layers without a matrix row", ""]
+    lines += [f"- `{item['catalog']}/{item['layer_id']}`"
+              for item in block["manifest_layers_without_matrix_row"]] or ["None."]
     return lines
 
 
 def render_markdown(document: dict) -> str:
+    newest = newest_source_date(document["summary"]["convergence"]) or "none recorded"
     lines = [
         "# Component evidence matrix",
         "",
-        f"Generated {document['checked_at']} by `python3 scripts/component_matrix.py --write` from "
-        "`catalogs/landscape/component-evidence-matrix.json`. " + document["scope"],
+        f"Scope and schema checked {document['checked_at']}; newest verdict, sweep-manifest or completed-sweep date "
+        f"{newest}. Generated by `python3 scripts/component_matrix.py --write` from "
+        "`catalogs/landscape/component-evidence-matrix.json`, which reads no clock, so neither date is a build "
+        "date. " + document["scope"],
         "",
         "## Totals",
         "",
@@ -1068,7 +1155,9 @@ def render_markdown(document: dict) -> str:
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
         f"Convergence by layer also reads `{SATURATION_LEDGER_FILE}`, the newest "
         f"`{SWEEP_MANIFEST_DIR}/manifest-YYYYMMDD.json`, `{STACK_FILE}` and `{RECEIPT_ALIASES_FILE}`, so run "
-        "`--write` again after appending a sweep to the ledger or committing a sweep manifest. "
+        "`--write` again after appending a sweep to the ledger or committing a sweep manifest. A missing ledger, "
+        "or a ledger, sweep manifest or alias file that cannot be read, stops the build instead of reading as "
+        "empty. "
         "`python3 scripts/component_matrix.py --check` (run in CI) recomputes both outputs and also enforces "
         "the flip rule, which `scripts/landscape.py` enforces too through the same function "
         "(`scripts/platform_status.py`): a declared `macos-arm64` `platform_status` may not claim more than "

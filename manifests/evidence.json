@@ -13218,8 +13218,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "767bfad30c581a5f180483915da88b5f94440aee9dad50924a077fc728181edb",
-      "bytes": 296253
+      "sha256": "382d598c049813c7effdfe98076c0567476d5f6be703adf058dddc79d4a27009",
+      "bytes": 312398
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -13733,8 +13733,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "d0706861c95ceea36e3124b05cd6e5eeaf18b77d58df438ea59ddd0ff22ef269",
-      "bytes": 30110
+      "sha256": "3d77e7f909fecff2846d5a872ad192f34975dd1c9c5ce4ec288d981717e8e33b",
+      "bytes": 32160
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -13878,8 +13878,8 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "f017ff9abd4e9a29dc21379cd3fbc5e81b83c1efe709b7e49d6537a09e1dfdf9",
-      "bytes": 14014
+      "sha256": "21fa9fe27e1e18ff2bdb2072a296f987e92157e66da4472386c9406d7552fec2",
+      "bytes": 14383
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -13918,8 +13918,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "545cb91150525c87d42223902c00a16a588639848950a6850325317d8d659c91",
-      "bytes": 107996
+      "sha256": "a3f712c8aaf10b69659145558dd469251fdf8c6ed82dd7f393dd9ee07e20b489",
+      "bytes": 108918
     },
     {
       "path": "docs/evidence.md",
@@ -38738,8 +38738,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "98aa59689f7cd84837cad6a34baf1bf52fe2a7e6c1393a03570794043992c507",
-      "bytes": 56729
+      "sha256": "b6770b3f7b0d41781c38576fca7706d104deab31d68e65acc0375dd9260e75e2",
+      "bytes": 57915
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -38753,8 +38753,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "4d85c30a82d50d2104b29d6a1fb1b204169ee0a63fc7d1a07b03e62050547892",
-      "bytes": 63767
+      "sha256": "534273ad5bfd198a35fe677c3d7f2b6b1a18611fc4c2c1c3951cecf22d4dd8fa",
+      "bytes": 70532
     },
     {
       "path": "scripts/credential_status.py",
@@ -39263,8 +39263,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "ec8be228ced1b3ecb142950e00981f62702979d729a517569b72db6c3bcf8871",
-      "bytes": 63563
+      "sha256": "ab736fead316e22ce2c83fd16f7d80a1184614bb8c833c39d87c9c688442a027",
+      "bytes": 78431
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
@@ -39303,8 +39303,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "593435ad675ee4d3129bb51a54e9a8ac9c5fb7159d602ae278d0f4eb4737ac19",
-      "bytes": 78972
+      "sha256": "ba90841894437a10f56f7f5632e1bf44c39a79fbf835718d534397423067ff86",
+      "bytes": 84133
     },
     {
       "path": "tests/test_effort_default_guard.py",

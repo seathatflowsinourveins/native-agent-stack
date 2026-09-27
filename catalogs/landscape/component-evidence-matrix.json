@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-22",
+  "checked_at": "2026-09-27",
   "rows": [
     {
       "adjudication_ref": null,
@@ -39,6 +39,9 @@
         "components": [
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "codex",
@@ -73,6 +76,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -94,7 +98,8 @@
               "codex"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "agent-sdks",
@@ -201,6 +206,9 @@
         "components": [
           {
             "adopted_as": "gitleaks",
+            "adopted_as_candidates": [
+              "gitleaks"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "gitleaks",
@@ -212,6 +220,9 @@
           },
           {
             "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qmd",
@@ -223,6 +234,9 @@
           },
           {
             "adopted_as": "repomix",
+            "adopted_as_candidates": [
+              "repomix"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "repomix",
@@ -234,6 +248,9 @@
           },
           {
             "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "rtk",
@@ -245,6 +262,9 @@
           },
           {
             "adopted_as": "syft",
+            "adopted_as_candidates": [
+              "syft"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "syft",
@@ -258,6 +278,9 @@
           },
           {
             "adopted_as": "toon",
+            "adopted_as_candidates": [
+              "toon"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "toon",
@@ -269,6 +292,9 @@
           },
           {
             "adopted_as": "zizmor",
+            "adopted_as_candidates": [
+              "zizmor"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "zizmor",
@@ -303,6 +329,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -331,6 +358,9 @@
               "zizmor"
             ]
           }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:actions-attest"
         ]
       },
       "independent_review": "dual_lane_same_winner",
@@ -514,6 +544,9 @@
         "components": [
           {
             "adopted_as": "ast-grep",
+            "adopted_as_candidates": [
+              "ast-grep"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ast-grep",
@@ -525,6 +558,9 @@
           },
           {
             "adopted_as": "codebase-memory-mcp",
+            "adopted_as_candidates": [
+              "codebase-memory-mcp"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codebase-memory-mcp",
@@ -536,6 +572,9 @@
           },
           {
             "adopted_as": "jcodemunch-mcp",
+            "adopted_as_candidates": [
+              "jcodemunch-mcp"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "jcodemunch-mcp",
@@ -547,6 +586,9 @@
           },
           {
             "adopted_as": "mcp-inspector",
+            "adopted_as_candidates": [
+              "mcp-inspector"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcp-inspector",
@@ -558,6 +600,9 @@
           },
           {
             "adopted_as": "mcporter",
+            "adopted_as_candidates": [
+              "mcporter"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcporter",
@@ -569,6 +614,9 @@
           },
           {
             "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qdrant",
@@ -580,6 +628,9 @@
           },
           {
             "adopted_as": "repomix",
+            "adopted_as_candidates": [
+              "repomix"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "repomix",
@@ -591,6 +642,9 @@
           },
           {
             "adopted_as": "serena",
+            "adopted_as_candidates": [
+              "serena"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "serena",
@@ -604,6 +658,9 @@
           },
           {
             "adopted_as": "socraticode",
+            "adopted_as_candidates": [
+              "socraticode"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "socraticode",
@@ -615,6 +672,9 @@
           },
           {
             "adopted_as": "toon",
+            "adopted_as_candidates": [
+              "toon"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "toon",
@@ -647,6 +707,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -668,7 +729,8 @@
               "serena"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "code-navigation",
@@ -756,6 +818,9 @@
         "components": [
           {
             "adopted_as": "context-hub",
+            "adopted_as_candidates": [
+              "context-hub"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "context-hub",
@@ -767,6 +832,9 @@
           },
           {
             "adopted_as": "markitdown",
+            "adopted_as_candidates": [
+              "markitdown"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "markitdown",
@@ -780,6 +848,9 @@
           },
           {
             "adopted_as": "poppler",
+            "adopted_as_candidates": [
+              "poppler"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "poppler",
@@ -793,6 +864,9 @@
           },
           {
             "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "qmd",
@@ -827,6 +901,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -862,7 +937,8 @@
               "qmd"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "document-retrieval",
@@ -1084,6 +1160,9 @@
         "components": [
           {
             "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "ai-memory",
@@ -1097,6 +1176,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
@@ -1108,6 +1190,9 @@
           },
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex",
@@ -1119,6 +1204,9 @@
           },
           {
             "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qdrant",
@@ -1130,6 +1218,9 @@
           },
           {
             "adopted_as": "restic",
+            "adopted_as_candidates": [
+              "restic"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "restic",
@@ -1162,6 +1253,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -1183,7 +1275,8 @@
               "ai-memory"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "durable-memory",
@@ -1277,6 +1370,9 @@
         "components": [
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex",
@@ -1288,6 +1384,9 @@
           },
           {
             "adopted_as": "codex-for-claude",
+            "adopted_as_candidates": [
+              "codex-for-claude"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex-for-claude",
@@ -1299,6 +1398,9 @@
           },
           {
             "adopted_as": "difftastic",
+            "adopted_as_candidates": [
+              "difftastic"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "difftastic",
@@ -1312,6 +1414,9 @@
           },
           {
             "adopted_as": "playwright-test",
+            "adopted_as_candidates": [
+              "playwright-test"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "playwright-test",
@@ -1323,6 +1428,9 @@
           },
           {
             "adopted_as": "promptfoo",
+            "adopted_as_candidates": [
+              "promptfoo"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "promptfoo",
@@ -1334,6 +1442,9 @@
           },
           {
             "adopted_as": "shellcheck",
+            "adopted_as_candidates": [
+              "shellcheck"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "shellcheck",
@@ -1345,6 +1456,9 @@
           },
           {
             "adopted_as": "worktrunk",
+            "adopted_as_candidates": [
+              "worktrunk"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
@@ -1379,6 +1493,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -1407,6 +1522,9 @@
               "worktrunk"
             ]
           }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:cli-cli"
         ]
       },
       "independent_review": "dual_lane_same_winner",
@@ -1617,6 +1735,9 @@
         "components": [
           {
             "adopted_as": "apple-container",
+            "adopted_as_candidates": [
+              "apple-container"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "apple-container",
@@ -1628,6 +1749,9 @@
           },
           {
             "adopted_as": "fastapi",
+            "adopted_as_candidates": [
+              "fastapi"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "fastapi",
@@ -1641,6 +1765,9 @@
           },
           {
             "adopted_as": "mcp-inspector",
+            "adopted_as_candidates": [
+              "mcp-inspector"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcp-inspector",
@@ -1652,6 +1779,9 @@
           },
           {
             "adopted_as": "mcporter",
+            "adopted_as_candidates": [
+              "mcporter"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcporter",
@@ -1663,6 +1793,9 @@
           },
           {
             "adopted_as": "nextjs",
+            "adopted_as_candidates": [
+              "nextjs"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "nextjs",
@@ -1676,6 +1809,9 @@
           },
           {
             "adopted_as": "omniroute",
+            "adopted_as_candidates": [
+              "omniroute"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "omniroute",
@@ -1687,6 +1823,9 @@
           },
           {
             "adopted_as": "postgresql",
+            "adopted_as_candidates": [
+              "postgresql"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "postgresql",
@@ -1700,6 +1839,9 @@
           },
           {
             "adopted_as": "react",
+            "adopted_as_candidates": [
+              "react"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "react",
@@ -1732,6 +1874,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -1767,7 +1910,8 @@
               "postgresql"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "hosting-services",
@@ -2023,6 +2167,9 @@
         "components": [
           {
             "adopted_as": "affaan-m/ECC",
+            "adopted_as_candidates": [
+              "affaan-m/ECC"
+            ],
             "converged": false,
             "host_e2e": "false",
             "id": "affaan-m/ECC",
@@ -2036,6 +2183,9 @@
           },
           {
             "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
@@ -2047,6 +2197,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
@@ -2058,6 +2211,9 @@
           },
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex",
@@ -2069,6 +2225,9 @@
           },
           {
             "adopted_as": "context-mode",
+            "adopted_as_candidates": [
+              "context-mode"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "context-mode",
@@ -2080,6 +2239,9 @@
           },
           {
             "adopted_as": "davila7/claude-code-templates",
+            "adopted_as_candidates": [
+              "davila7/claude-code-templates"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "davila7/claude-code-templates",
@@ -2091,6 +2253,9 @@
           },
           {
             "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qmd",
@@ -2102,6 +2267,9 @@
           },
           {
             "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "rtk",
@@ -2113,6 +2281,9 @@
           },
           {
             "adopted_as": "shanraisshan/claude-code-best-practice",
+            "adopted_as_candidates": [
+              "shanraisshan/claude-code-best-practice"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "shanraisshan/claude-code-best-practice",
@@ -2124,6 +2295,9 @@
           },
           {
             "adopted_as": "skills-ref",
+            "adopted_as_candidates": [
+              "skills-ref"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "skills-ref",
@@ -2135,6 +2309,9 @@
           },
           {
             "adopted_as": "tavily-cli",
+            "adopted_as_candidates": [
+              "tavily-cli"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "tavily-cli",
@@ -2167,6 +2344,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -2188,6 +2366,10 @@
               "affaan-m/ECC"
             ]
           }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:openai-skills",
+          "candidate:typesafe-ai-skills"
         ]
       },
       "independent_review": "dual_lane_adjudicated",
@@ -2372,6 +2554,9 @@
         "components": [
           {
             "adopted_as": "apple-container",
+            "adopted_as_candidates": [
+              "apple-container"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "apple-container",
@@ -2383,6 +2568,9 @@
           },
           {
             "adopted_as": "sandbox-runtime",
+            "adopted_as_candidates": [
+              "sandbox-runtime"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "sandbox-runtime",
@@ -2396,6 +2584,9 @@
           },
           {
             "adopted_as": "worktrunk",
+            "adopted_as_candidates": [
+              "worktrunk"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
@@ -2430,6 +2621,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -2458,7 +2650,8 @@
               "worktrunk"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "isolation",
@@ -2578,6 +2771,9 @@
         "components": [
           {
             "adopted_as": "mcp-inspector",
+            "adopted_as_candidates": [
+              "mcp-inspector"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "mcp-inspector",
@@ -2591,6 +2787,9 @@
           },
           {
             "adopted_as": "mcporter",
+            "adopted_as_candidates": [
+              "mcporter"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "mcporter",
@@ -2625,6 +2824,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -2653,7 +2853,8 @@
               "mcporter"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "mcp-surfaces",
@@ -2802,6 +3003,9 @@
         "components": [
           {
             "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
@@ -2813,6 +3017,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "claude-code",
@@ -2826,6 +3033,9 @@
           },
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "codex",
@@ -2839,6 +3049,9 @@
           },
           {
             "adopted_as": "context-mode",
+            "adopted_as_candidates": [
+              "context-mode"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "context-mode",
@@ -2850,6 +3063,9 @@
           },
           {
             "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qmd",
@@ -2861,6 +3077,9 @@
           },
           {
             "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "rtk",
@@ -2893,6 +3112,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -2921,7 +3141,8 @@
               "codex"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "native-clients",
@@ -3112,6 +3333,9 @@
         "components": [
           {
             "adopted_as": "agentsview",
+            "adopted_as_candidates": [
+              "agentsview"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "agentsview",
@@ -3123,6 +3347,9 @@
           },
           {
             "adopted_as": "alertmanager",
+            "adopted_as_candidates": [
+              "alertmanager"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "alertmanager",
@@ -3134,6 +3361,9 @@
           },
           {
             "adopted_as": "ccusage",
+            "adopted_as_candidates": [
+              "ccusage"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ccusage",
@@ -3145,6 +3375,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
@@ -3156,6 +3389,9 @@
           },
           {
             "adopted_as": "claude-hud",
+            "adopted_as_candidates": [
+              "claude-hud"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-hud",
@@ -3167,6 +3403,9 @@
           },
           {
             "adopted_as": "grafana",
+            "adopted_as_candidates": [
+              "grafana"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "grafana",
@@ -3178,6 +3417,9 @@
           },
           {
             "adopted_as": "huggingface-hub-native",
+            "adopted_as_candidates": [
+              "huggingface-hub-native"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "huggingface-hub-native",
@@ -3189,6 +3431,9 @@
           },
           {
             "adopted_as": "llama-cpp",
+            "adopted_as_candidates": [
+              "llama-cpp"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "llama-cpp",
@@ -3200,6 +3445,9 @@
           },
           {
             "adopted_as": "loki",
+            "adopted_as_candidates": [
+              "loki"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "loki",
@@ -3213,6 +3461,9 @@
           },
           {
             "adopted_as": "ntfy",
+            "adopted_as_candidates": [
+              "ntfy"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ntfy",
@@ -3224,6 +3475,9 @@
           },
           {
             "adopted_as": "omniroute",
+            "adopted_as_candidates": [
+              "omniroute"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "omniroute",
@@ -3235,6 +3489,9 @@
           },
           {
             "adopted_as": "opentelemetry-collector-contrib",
+            "adopted_as_candidates": [
+              "opentelemetry-collector-contrib"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "opentelemetry-collector-contrib",
@@ -3248,6 +3505,9 @@
           },
           {
             "adopted_as": "otel-tui",
+            "adopted_as_candidates": [
+              "otel-tui"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "otel-tui",
@@ -3259,6 +3519,9 @@
           },
           {
             "adopted_as": "prometheus",
+            "adopted_as_candidates": [
+              "prometheus"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "prometheus",
@@ -3272,6 +3535,9 @@
           },
           {
             "adopted_as": "vllm",
+            "adopted_as_candidates": [
+              "vllm"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "vllm",
@@ -3304,6 +3570,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -3339,7 +3606,8 @@
               "prometheus"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "observation-inference",
@@ -3549,6 +3817,9 @@
         "components": [
           {
             "adopted_as": "difftastic",
+            "adopted_as_candidates": [
+              "difftastic"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "difftastic",
@@ -3560,6 +3831,9 @@
           },
           {
             "adopted_as": "fastapi",
+            "adopted_as_candidates": [
+              "fastapi"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "fastapi",
@@ -3571,6 +3845,9 @@
           },
           {
             "adopted_as": "gitleaks",
+            "adopted_as_candidates": [
+              "gitleaks"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "gitleaks",
@@ -3582,6 +3859,9 @@
           },
           {
             "adopted_as": "nextjs",
+            "adopted_as_candidates": [
+              "nextjs"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "nextjs",
@@ -3593,6 +3873,9 @@
           },
           {
             "adopted_as": "playwright-test",
+            "adopted_as_candidates": [
+              "playwright-test"
+            ],
             "converged": false,
             "host_e2e": "false",
             "id": "playwright-test",
@@ -3606,6 +3889,9 @@
           },
           {
             "adopted_as": "postgresql",
+            "adopted_as_candidates": [
+              "postgresql"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "postgresql",
@@ -3617,6 +3903,9 @@
           },
           {
             "adopted_as": "promptfoo",
+            "adopted_as_candidates": [
+              "promptfoo"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "promptfoo",
@@ -3630,6 +3919,9 @@
           },
           {
             "adopted_as": "react",
+            "adopted_as_candidates": [
+              "react"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "react",
@@ -3641,6 +3933,9 @@
           },
           {
             "adopted_as": "shellcheck",
+            "adopted_as_candidates": [
+              "shellcheck"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "shellcheck",
@@ -3652,6 +3947,9 @@
           },
           {
             "adopted_as": "skills-ref",
+            "adopted_as_candidates": [
+              "skills-ref"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "skills-ref",
@@ -3663,6 +3961,9 @@
           },
           {
             "adopted_as": "syft",
+            "adopted_as_candidates": [
+              "syft"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "syft",
@@ -3674,6 +3975,9 @@
           },
           {
             "adopted_as": "zizmor",
+            "adopted_as_candidates": [
+              "zizmor"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "zizmor",
@@ -3706,6 +4010,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -3734,7 +4039,8 @@
               "promptfoo"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "quality-evaluation",
@@ -3882,6 +4188,9 @@
         "components": [
           {
             "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
@@ -3893,6 +4202,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
@@ -3904,6 +4216,9 @@
           },
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex",
@@ -3915,6 +4230,9 @@
           },
           {
             "adopted_as": "dagu",
+            "adopted_as_candidates": [
+              "dagu"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "dagu",
@@ -3926,6 +4244,9 @@
           },
           {
             "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qdrant",
@@ -3937,6 +4258,9 @@
           },
           {
             "adopted_as": "restic",
+            "adopted_as_candidates": [
+              "restic"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "restic",
@@ -3950,6 +4274,9 @@
           },
           {
             "adopted_as": "systemd",
+            "adopted_as_candidates": [
+              "systemd"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "systemd",
@@ -3982,6 +4309,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -4003,6 +4331,9 @@
               "restic"
             ]
           }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:astral-sh-uv"
         ]
       },
       "independent_review": "dual_lane_same_winner",
@@ -4155,6 +4486,9 @@
         "components": [
           {
             "adopted_as": "beads",
+            "adopted_as_candidates": [
+              "beads"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "beads",
@@ -4166,6 +4500,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
@@ -4177,6 +4514,9 @@
           },
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex",
@@ -4188,6 +4528,9 @@
           },
           {
             "adopted_as": "dagu",
+            "adopted_as_candidates": [
+              "dagu"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "dagu",
@@ -4201,6 +4544,9 @@
           },
           {
             "adopted_as": "systemd",
+            "adopted_as_candidates": [
+              "systemd"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "systemd",
@@ -4235,6 +4581,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -4263,7 +4610,8 @@
               "systemd"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "scheduling-supervision",
@@ -4415,6 +4763,9 @@
         "components": [
           {
             "adopted_as": "gitleaks",
+            "adopted_as_candidates": [
+              "gitleaks"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "gitleaks",
@@ -4428,6 +4779,9 @@
           },
           {
             "adopted_as": "syft",
+            "adopted_as_candidates": [
+              "syft"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "syft",
@@ -4439,6 +4793,9 @@
           },
           {
             "adopted_as": "zizmor",
+            "adopted_as_candidates": [
+              "zizmor"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "zizmor",
@@ -4471,6 +4828,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -4492,7 +4850,8 @@
               "gitleaks"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "secrets-credentials",
@@ -4594,6 +4953,9 @@
         "components": [
           {
             "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
@@ -4605,6 +4967,9 @@
           },
           {
             "adopted_as": "huggingface-hub-native",
+            "adopted_as_candidates": [
+              "huggingface-hub-native"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "huggingface-hub-native",
@@ -4616,6 +4981,9 @@
           },
           {
             "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "qdrant",
@@ -4629,6 +4997,9 @@
           },
           {
             "adopted_as": "restic",
+            "adopted_as_candidates": [
+              "restic"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "restic",
@@ -4640,6 +5011,9 @@
           },
           {
             "adopted_as": "socraticode",
+            "adopted_as_candidates": [
+              "socraticode"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "socraticode",
@@ -4653,6 +5027,9 @@
           },
           {
             "adopted_as": "vllm",
+            "adopted_as_candidates": [
+              "vllm"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "vllm",
@@ -4687,6 +5064,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -4722,7 +5100,8 @@
               "vllm"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "semantic-rag",
@@ -4984,6 +5363,9 @@
         "components": [
           {
             "adopted_as": "ccusage",
+            "adopted_as_candidates": [
+              "ccusage"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "ccusage",
@@ -4997,6 +5379,9 @@
           },
           {
             "adopted_as": "context-mode",
+            "adopted_as_candidates": [
+              "context-mode"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "context-mode",
@@ -5008,6 +5393,9 @@
           },
           {
             "adopted_as": "headroom",
+            "adopted_as_candidates": [
+              "headroom"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "headroom",
@@ -5021,6 +5409,9 @@
           },
           {
             "adopted_as": "jcodemunch-mcp",
+            "adopted_as_candidates": [
+              "jcodemunch-mcp"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "jcodemunch-mcp",
@@ -5032,6 +5423,9 @@
           },
           {
             "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "qmd",
@@ -5043,6 +5437,9 @@
           },
           {
             "adopted_as": "repomix",
+            "adopted_as_candidates": [
+              "repomix"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "repomix",
@@ -5054,6 +5451,9 @@
           },
           {
             "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "rtk",
@@ -5067,6 +5467,9 @@
           },
           {
             "adopted_as": "toon",
+            "adopted_as_candidates": [
+              "toon"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "toon",
@@ -5099,6 +5502,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -5134,7 +5538,8 @@
               "rtk"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "token-efficiency",
@@ -5344,6 +5749,9 @@
         "components": [
           {
             "adopted_as": "agent-browser",
+            "adopted_as_candidates": [
+              "agent-browser"
+            ],
             "converged": false,
             "host_e2e": "false",
             "id": "agent-browser",
@@ -5357,6 +5765,9 @@
           },
           {
             "adopted_as": "openresearch",
+            "adopted_as_candidates": [
+              "openresearch"
+            ],
             "converged": false,
             "host_e2e": "false",
             "id": "openresearch",
@@ -5370,6 +5781,9 @@
           },
           {
             "adopted_as": "playwright-cli",
+            "adopted_as_candidates": [
+              "playwright-cli"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "playwright-cli",
@@ -5381,6 +5795,9 @@
           },
           {
             "adopted_as": "tavily-cli",
+            "adopted_as_candidates": [
+              "tavily-cli"
+            ],
             "converged": false,
             "host_e2e": "false",
             "id": "tavily-cli",
@@ -5415,6 +5832,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -5450,7 +5868,8 @@
               "tavily-cli"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "web-research",
@@ -5679,6 +6098,9 @@
         "components": [
           {
             "adopted_as": "beads",
+            "adopted_as_candidates": [
+              "beads"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "beads",
@@ -5690,6 +6112,9 @@
           },
           {
             "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
             "converged": false,
             "host_e2e": "false",
             "id": "claude-code",
@@ -5703,6 +6128,9 @@
           },
           {
             "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex",
@@ -5714,6 +6142,9 @@
           },
           {
             "adopted_as": "codex-for-claude",
+            "adopted_as_candidates": [
+              "codex-for-claude"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "codex-for-claude",
@@ -5725,6 +6156,9 @@
           },
           {
             "adopted_as": "systemd",
+            "adopted_as_candidates": [
+              "systemd"
+            ],
             "converged": false,
             "host_e2e": "unknown",
             "id": "systemd",
@@ -5736,6 +6170,9 @@
           },
           {
             "adopted_as": "worktrunk",
+            "adopted_as_candidates": [
+              "worktrunk"
+            ],
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
@@ -5770,6 +6207,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -5798,7 +6236,8 @@
               "worktrunk"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "workers",
@@ -6053,6 +6492,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "codex-native-sdk",
@@ -6066,6 +6506,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "foundation-ai-memory",
@@ -6079,6 +6520,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-context-mode",
@@ -6090,6 +6532,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-qdrant",
@@ -6101,6 +6544,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-rtk",
@@ -6112,6 +6556,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-serena",
@@ -6123,6 +6568,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "foundation-socraticode",
@@ -6136,6 +6582,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "vllm",
@@ -6168,6 +6615,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -6203,7 +6651,8 @@
               "foundation-socraticode"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "agents-models-workers",
@@ -6375,6 +6824,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "lean",
@@ -6388,6 +6838,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "nautilustrader",
@@ -6422,6 +6873,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -6450,7 +6902,8 @@
               "nautilustrader"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "backtesting-engine",
@@ -6582,6 +7035,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "data-pandera",
@@ -6616,6 +7070,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -6644,7 +7099,8 @@
               "data-pandera"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "data-quality-orchestration",
@@ -6797,6 +7253,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "inspect-ai",
@@ -6831,6 +7288,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 4,
         "reopened_by": [
           {
@@ -6873,7 +7331,8 @@
               "data-mlflow"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "evaluation-experiments",
@@ -7016,6 +7475,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "adaptive-paper-alpaca-adapter",
@@ -7027,6 +7487,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "alpaca-py",
@@ -7038,6 +7499,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "data-alpaca-py",
@@ -7049,6 +7511,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "lean-alpaca",
@@ -7060,6 +7523,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "nautilus-ibkr-adapter",
@@ -7092,11 +7556,13 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "pending_lanes",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 0,
         "reopened_by": [],
         "unresolved": [],
         "verdict_checked_at": "2026-09-22",
-        "winner_rows": []
+        "winner_rows": [],
+        "winners_without_manifest_row": []
       },
       "independent_review": "pending_lanes",
       "layer_id": "execution-broker",
@@ -7166,6 +7632,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "false",
             "id": "data-dvc",
@@ -7179,6 +7646,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-socraticode",
@@ -7211,6 +7679,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -7232,7 +7701,8 @@
               "data-dvc"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "identity-provenance",
@@ -7357,6 +7827,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "data-alpaca-py",
@@ -7370,6 +7841,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "data-edgartools",
@@ -7383,6 +7855,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "data-exchange-calendars",
@@ -7417,6 +7890,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -7452,7 +7926,8 @@
               "data-exchange-calendars"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "market-data-reference",
@@ -7610,6 +8085,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "alertmanager",
@@ -7621,6 +8097,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "grafana",
@@ -7632,6 +8109,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "loki",
@@ -7643,6 +8121,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "ntfy",
@@ -7654,6 +8133,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "opentelemetry-collector",
@@ -7665,6 +8145,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "opentelemetry-collector-contrib",
@@ -7676,6 +8157,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "prometheus",
@@ -7687,6 +8169,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "restic",
@@ -7698,6 +8181,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "sandbox-runtime",
@@ -7730,11 +8214,13 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "pending_lanes",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 0,
         "reopened_by": [],
         "unresolved": [],
         "verdict_checked_at": "2026-09-22",
-        "winner_rows": []
+        "winner_rows": [],
+        "winners_without_manifest_row": []
       },
       "independent_review": "pending_lanes",
       "layer_id": "observability-hosting",
@@ -7775,6 +8261,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "quantstats",
@@ -7807,6 +8294,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -7828,7 +8316,8 @@
               "skfolio"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "portfolio-risk",
@@ -8033,6 +8522,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "data-edgartools",
@@ -8046,6 +8536,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-markitdown",
@@ -8057,6 +8548,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-qmd",
@@ -8068,6 +8560,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "vllm",
@@ -8100,6 +8593,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 2,
         "reopened_by": [
           {
@@ -8128,7 +8622,8 @@
               "skfolio"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "research-factors-ml",
@@ -8245,6 +8740,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "gitleaks",
@@ -8258,6 +8754,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "syft",
@@ -8292,6 +8789,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 3,
         "reopened_by": [
           {
@@ -8327,7 +8825,8 @@
               "syft"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "security-supply-chain",
@@ -8551,6 +9050,7 @@
         "components": [
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "true",
             "id": "data-duckdb",
@@ -8564,6 +9064,7 @@
           },
           {
             "adopted_as": null,
+            "adopted_as_candidates": [],
             "converged": false,
             "host_e2e": "unknown",
             "id": "data-pandera",
@@ -8596,6 +9097,7 @@
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
         "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
         "recorded_winner_rows": 1,
         "reopened_by": [
           {
@@ -8617,7 +9119,8 @@
               "data-duckdb"
             ]
           }
-        ]
+        ],
+        "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "storage-compute",
@@ -8711,7 +9214,7 @@
           "term": "layer_state"
         },
         {
-          "definition": "The layer's rows in the newest committed sweep manifest (catalogs/sota-convergence/manifest-YYYYMMDD.json with the latest checked_at; foundation[].components for a foundation layer, trading[].entries for a us-equities layer) that resolve to an adopted component, the headline denominator. A foundation row resolves to a manifests/stack.json component by its id, then by a tools/sota-convergence/receipt-component-aliases.json alias, then by its repository when exactly one stack component and no other sweep-manifest id use it (the tools/sota-convergence/lane_packets.py receipts_for rule). A us-equities entry is in use when its decision is default; a conditional entry is not in use.",
+          "definition": "The layer's rows in the newest committed sweep manifest (catalogs/sota-convergence/manifest-YYYYMMDD.json with the latest checked_at; foundation[].components for a foundation layer, trading[].entries for a us-equities layer) that resolve to an adopted component, the headline denominator. A foundation row resolves to manifests/stack.json components by its id, else by a tools/sota-convergence/receipt-component-aliases.json alias, else by its repository (scripts/host_receipts.py normalize_repository), with no uniqueness condition: adopted_as_candidates lists the stack components matched that way, and adopted_as names the single one or is null when several share the alias or repository. A us-equities entry is in use when its decision is default; a conditional entry is not in use. The unit is the layer-component row: every resolving row counts, so a component in several layers counts once per layer and two rows of one layer that resolve to the same stack component both count; per-catalog and overall sums count these rows, not distinct components.",
           "term": "in_use"
         },
         {
@@ -8739,7 +9242,19 @@
           "term": "recorded_winner_rows"
         },
         {
-          "definition": "Manifest rows that could not be resolved (no stack match, an ambiguous alias or repository, or a trading entry without a default or conditional decision), counted and listed with the reason, never dropped.",
+          "definition": "true when the newest sweep manifest has the layer in its catalog's section; false when it does not, or no sweep manifest is committed, and then all_rows is 0.",
+          "term": "manifest_layer_found"
+        },
+        {
+          "definition": "The winners of the layer's recorded verdict that no row of the layer in the newest sweep manifest matches (the verdict_winner match), listed and never counted, so recorded_winner_rows reconciles with the verdict.",
+          "term": "winners_without_manifest_row"
+        },
+        {
+          "definition": "Summary list of the newest sweep manifest's layers, in either section, that have no row in this matrix; listed, never counted.",
+          "term": "manifest_layers_without_matrix_row"
+        },
+        {
+          "definition": "Manifest rows that could not be resolved (a row without a component id, a foundation row with no manifests/stack.json id, alias or repository match, or a trading entry without a default or conditional decision), counted and listed with the reason, never dropped.",
           "term": "unresolved"
         },
         {
@@ -8754,6 +9269,7 @@
         "pending_lanes": 2,
         "recorded_reopened": 30
       },
+      "manifest_layers_without_matrix_row": [],
       "newest_manifest": {
         "checked_at": "2026-09-26",
         "id": "sota-convergence-20260926",

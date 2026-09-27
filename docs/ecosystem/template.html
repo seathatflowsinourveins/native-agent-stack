@@ -82,11 +82,11 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div id="landscape-layers" class="landscape-grid"></div>
 </section>
 <section id="convergence" role="tabpanel" aria-labelledby="tab-convergence" hidden>
-<div class="page-heading"><div><div class="eyebrow">One frozen metric / every layer</div><h2>Convergence by layer</h2><p>For each layer: how many in-use components are the recorded winner, at a current pin, with host evidence, in a layer that no later completed sweep reopened. Each factor stays true, false or unknown, and nothing is blended into one score. Every count, definition and date below is read from the generated component evidence matrix.</p></div></div>
+<div class="page-heading"><div><div class="eyebrow">One frozen metric / every layer</div><h2>Convergence by layer</h2><p>For each layer: how many of its in-use manifest rows are the recorded winner, at a current pin, with host evidence, in a layer that no later completed sweep reopened. Counts are layer-component rows, so a component in several layers counts once per layer. Each factor stays true, false or unknown, and nothing is blended into one score. Every count, definition and date below is read from the generated component evidence matrix.</p></div></div>
 <div id="convergence-summary" class="scope-note landscape-summary"></div>
 <div id="convergence-actions" class="landscape-actions"></div>
 <div class="table-wrap"><table class="token-table convergence-table"><thead><tr><th>Layer</th><th>layer_state</th><th>Verdict checked_at</th><th>Reopened by</th><th>in_use</th><th>converged</th><th>verdict_winner true/false/unknown</th><th>pin_current true/false/unknown</th><th>host_e2e true/false/unknown</th><th>all_rows</th><th>recorded_winner_rows</th><th>Unresolved</th><th>invoke</th></tr></thead><tbody id="convergence-rows"></tbody></table></div>
-<details class="catalog-card convergence-detail" open><summary>Definitions and unresolved manifest rows</summary><div id="convergence-definitions"></div></details>
+<details class="catalog-card convergence-detail" open><summary>Definitions, unresolved rows and join gaps</summary><div id="convergence-definitions"></div></details>
 </section>
 <section id="explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
 <div class="page-heading"><div><div class="eyebrow">Discovery / the broad public index</div><h2>Explore the whole field.</h2><p>Search names, roles, layers and decisions. Open a record to inspect its dated sources, distinct pins and bounded receipts. Repository discovery is broader than either maintained catalog.</p></div><button class="button secondary small" id="reset-filters">Reset filters</button></div>
@@ -472,13 +472,14 @@ function initializeLandscape() {
 }
 initializeLandscape();
 function convergenceSummaryLines(convergence) {
-  const scope = (label, row) => label + ": " + row.converged + " of " + row.in_use + " in-use components converged across " + row.layers + " layers" + (row.share === null ? " (no share: nothing in use)" : " (share " + row.share + ")") + "; " + row.unresolved + " unresolved manifest rows";
+  const scope = (label, row) => label + ": " + row.converged + " of " + row.in_use + " in-use layer-component rows converged across " + row.layers + " layers" + (row.share === null ? " (no share: nothing in use)" : " (share " + row.share + ")") + "; " + row.unresolved + " unresolved manifest rows";
   const manifest = convergence.newest_manifest;
   return [
     "Layer states: " + Object.entries(convergence.layer_states).map(([state, count]) => state + " " + count).join(" · "),
     ...Object.entries(convergence.catalogs).map(([catalog, row]) => scope(catalog, row)),
     scope("overall", convergence.overall),
-    manifest ? "Newest sweep manifest: " + manifest.id + ", checked_at " + manifest.checked_at + " (" + manifest.path + ")" : "Newest sweep manifest: none committed",
+    "Unit: a layer-component row; a component in several layers counts once per layer, so these sums are not numbers of distinct components",
+    manifest ?"Newest sweep manifest: " + manifest.id + ", checked_at " + manifest.checked_at + " (" + manifest.path + ")" : "Newest sweep manifest: none committed",
     "Newest verdict checked_at: " + Object.entries(convergence.newest_verdict_checked_at).map(([catalog, day]) => catalog + " " + (day || "not recorded")).join(" · "),
     "Completed sweeps: " + (convergence.sources.completed_sweeps.map(sweep => sweep.sweep_id + " (" + sweep.date + ")").join(", ") || "none recorded"),
     "host_e2e platform: " + convergence.sources.host_e2e_platform,
@@ -489,6 +490,15 @@ function convergenceTableRows(convergence) {
   const counts = value => value.true + "/" + value.false + "/" + value.unknown;
   return convergence.layers.map(layer => [layer.catalog + "/" + layer.layer_id, layer.layer_state, layer.verdict_checked_at || "-", layer.reopened_by.map(sweep => sweep.sweep_id).join(", ") || "-", String(layer.in_use), String(layer.converged), counts(layer.factors.verdict_winner), counts(layer.factors.pin_current), counts(layer.factors.host_e2e), String(layer.all_rows), String(layer.recorded_winner_rows), layer.unresolved.map(row => row.id || "no id").join(", ") || "-", layer.invoke === null ? "null" : JSON.stringify(layer.invoke)]);
 }
+function convergenceListings(convergence) {
+  const name = layer => layer.catalog + "/" + layer.layer_id;
+  return [
+    ["Unresolved manifest rows", convergence.layers.flatMap(layer => layer.unresolved.map(row => name(layer) + " · " + (row.id || "no id") + ": " + row.reason))],
+    ["Recorded winners without a row in the newest sweep manifest", convergence.layers.filter(layer => layer.winners_without_manifest_row.length).map(layer => name(layer) + ": " + layer.winners_without_manifest_row.join(", "))],
+    ["Layers missing from the newest sweep manifest", convergence.layers.filter(layer => !layer.manifest_layer_found).map(name)],
+    ["Newest sweep manifest layers without a matrix row", convergence.manifest_layers_without_matrix_row.map(name)]
+  ];
+}
 function renderConvergence() {
   const convergence = data.convergence;
   if(!convergence) return;
@@ -497,10 +507,12 @@ function renderConvergence() {
   convergenceTableRows(convergence).forEach(cells => add($("convergence-rows"), add(make("tr"), ...cells.map(cell => make("td", "", cell)))));
   const definitions = make("dl", "catalog-facts");
   convergence.definitions.forEach(item => add(definitions, make("dt", "", item.term), make("dd", "", item.definition)));
-  const unresolved = convergence.layers.flatMap(layer => layer.unresolved.map(row => layer.catalog + "/" + layer.layer_id + " · " + (row.id || "no id") + ": " + row.reason));
-  add($("convergence-definitions"), definitions, make("h3", "", "Unresolved manifest rows"));
-  if(unresolved.length) listLimits($("convergence-definitions"), unresolved);
-  else add($("convergence-definitions"), make("p", "muted", "None."));
+  add($("convergence-definitions"), definitions);
+  convergenceListings(convergence).forEach(([title, items]) => {
+    add($("convergence-definitions"), make("h3", "", title));
+    if(items.length) listLimits($("convergence-definitions"), items);
+    else add($("convergence-definitions"), make("p", "muted", "None."));
+  });
 }
 renderConvergence();
 function recipeButton(path, label, component = "") {

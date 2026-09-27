@@ -110,9 +110,10 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
 # The convergence-by-layer fields the page shows; per-component detail stays in the linked matrix.
 CONVERGENCE_LAYER_FIELDS = ("layer_state", "verdict_checked_at", "reopened_by", "in_use", "converged", "all_rows",
-                            "recorded_winner_rows", "factors", "unresolved", "invoke", "invoke_reason")
+                            "recorded_winner_rows", "factors", "unresolved", "manifest_layer_found",
+                            "winners_without_manifest_row", "invoke", "invoke_reason")
 CONVERGENCE_SUMMARY_FIELDS = ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
-                              "newest_manifest", "newest_verdict_checked_at")
+                              "newest_manifest", "newest_verdict_checked_at", "manifest_layers_without_matrix_row")
 CONVERGENCE_SCOPE_COUNTS = ("layers", "in_use", "converged", "unresolved")
 
 
@@ -378,6 +379,12 @@ def build_convergence(root, read, file_url):
                 and layer["recorded_winner_rows"] <= layer["all_rows"], "convergence counts are inconsistent")
         require(layer["converged"] == 0 or layer["layer_state"] == "confirmed_current",
                 "only a confirmed_current layer can have converged components")
+        found, orphans = layer.get("manifest_layer_found"), layer.get("winners_without_manifest_row")
+        require(isinstance(found, bool) and (found or layer["all_rows"] == 0),
+                "convergence manifest_layer_found must be true or false, and false only for a layer without "
+                "manifest rows")
+        require(isinstance(orphans, list) and all(isinstance(item, str) and bool(item) for item in orphans),
+                "convergence winners_without_manifest_row must list component ids")
         require(layer.get("invoke") is not None
                 or (isinstance(layer.get("invoke_reason"), str) and bool(layer["invoke_reason"].strip())),
                 "a null invoke needs its reason")
@@ -402,6 +409,13 @@ def build_convergence(root, read, file_url):
             and all(isinstance(item, dict) and all(isinstance(item.get(key), str) and item[key].strip()
                                                    for key in ("term", "definition")) for item in definitions),
             "convergence definitions must be a nonempty list of terms and definitions")
+    unmatched = block["manifest_layers_without_matrix_row"]
+    require(isinstance(unmatched, list)
+            and all(isinstance(item, dict) and isinstance(item.get("catalog"), str)
+                    and isinstance(item.get("layer_id"), str) for item in unmatched)
+            and not ({(item["catalog"], item["layer_id"]) for item in unmatched}
+                     & {(layer["catalog"], layer["layer_id"]) for layer in layers}),
+            "convergence manifest_layers_without_matrix_row must list manifest layers that have no matrix row")
     manifest, sources = block["newest_manifest"], block["sources"]
     require(manifest is None or (isinstance(manifest, dict) and isinstance(manifest.get("path"), str)
                                  and isinstance(manifest.get("checked_at"), str)),
