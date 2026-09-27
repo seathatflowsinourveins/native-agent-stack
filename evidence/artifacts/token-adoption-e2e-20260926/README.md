@@ -165,16 +165,17 @@ Seed definitions and checks are in the same JSON:
   blocked is not “ineligible” or an N/A substitution.
 
 Only `task_text` reaches a child's prompt. The only substitutions bind
-`<assigned-worktree>`, `<retained-input>` and `<run-token>` to pre-recorded
-neutral paths and the run token; no instructions are appended. Identical source
+`<assigned-worktree>`, `<assigned-base>`, `<retained-input>` and `<run-token>`
+to pre-recorded neutral paths, the prepared tree's base revision and the run
+token; no instructions are appended. Identical source
 bytes and observation contracts apply across arms. Freeze all six distinct
 builder checkouts plus the per-arm observation checkouts and disposable clones.
-These are prepared bindings: B's `isolation: worktree` may create another tree.
-For builder tasks, derive the actual tree and starting revision from the child's
-native transcript and `meta.json`, and read the diff there, per
-`builder_worktree_policy`. Missing or conflicting identity blocks grading.
-A/A0 use their prepared control trees when the harness creates no separate tree.
-Keep the role's isolation; RUNBOOK's builder section freezes the hooks preflight
+These are prepared bindings. **Amendment 2 (2026-09-27):** #402 removed the builder's frontmatter isolation,
+so no arm expects a harness-created tree; each builder brief names its arm's frozen prepared path, where the child edits, and that tree's exact base (repair round).
+For builder tasks, derive the actual edited tree and starting revision from the child's
+native transcript and `meta.json`, require that tree to be the prepared path, and read the diff there, per
+`builder_worktree_policy`. Missing or conflicting identity blocks grading. The same checks apply in A and A0;
+RUNBOOK's builder section freezes the hooks preflight
 and restore procedure. Retained-history, table and HTML input paths are
 supplied explicitly, and resolved
 prompts must pass the same denylist. Eligibility tags, receipt tool
@@ -224,15 +225,15 @@ minimum, and never substitute task counts for call counts (AA §8.3; full-save
 Claude arm order is **B, A, A0**. B uses the role table; A uses
 `general-purpose` on the identical task text and model; A0 omits
 `agentType` on the identical task text and model. This deliberate A0 omission
-is the preregistered experimental exception to AA §9's ordinary dispatch rule.
+is the preregistered experimental exception to AA §9's ordinary dispatch rule. **Amendment 2 (2026-09-27)** moved the verifier and builder rows to Opus and three carriers to #402. The executed role bodies must equal Amendment 2's role-body SHA256 table.
 
 | Frozen role in B | Explicit model | Explicit effort | Carrier |
 | --- | --- | --- | --- |
-| stack-researcher | opus | max | #376 role body, after merge/install proof |
-| stack-verifier | sonnet | max | #376 role body, after merge/install proof |
-| isolated-builder | sonnet | max | Existing role plus #376 additions |
-| evidence-reviewer | opus | max | Existing role body |
-| source-scout | sonnet | max | Existing role plus #376 additions |
+| stack-researcher | opus | max | #376 role body, after merge/install proof; unchanged by #402 |
+| stack-verifier | opus | max | #402 role body at d022295a |
+| isolated-builder | opus | max | #402 role body at d022295a |
+| evidence-reviewer | opus | max | Existing role body; unchanged by #402 |
+| source-scout | sonnet | max | #402 role body at d022295a |
 | blind-lane-reviewer / blind-judge | opus | max | Existing stripped blind bodies; no skill preload |
 
 The Workflow inventory reserves **49 B, 43 A, 43 A0 children**, in JSON order,
@@ -585,6 +586,9 @@ whether any results were already observed, and record the replacement hashes
 and merge chronology before execution. No retroactive eligibility or threshold
 recoding is permitted. Source: [retrieval-quality-v2 Sealing and Amendments](../../../blueprints/retrieval-quality-v2/PREREGISTRATION.md#sealing).
 
+**Amendment 2 (2026-09-27):** the Repair 1 table above is kept as history; the
+launch check uses the Amendment 2 seal below.
+
 ## Amendment 1 (2026-09-26): repair after independent reviews, before execution
 
 This authorized repair changes the unexecuted preregistration in response to
@@ -612,3 +616,82 @@ remain; a blocked task is retained, never deleted or credited as passed.
 The task-specific anti-pattern log is this amendment table, with enforceable
 contracts in `tests/test_token_e2e_preregistration.py`. It records the proven
 mistakes without promoting offline checks to organic adoption evidence.
+
+## Amendment 2 (2026-09-27): adopt the #402 role bodies before execution
+
+This dated amendment changes the merged, unexecuted preregistration. PR-H
+merged as #381 at `c7b78854` (2026-09-27T06:39:20Z). No organic run,
+capability probe or Workflow of this protocol has run since, so
+no result was observed before this change. **Reason:** the user's 2026-09-27
+rule that every verification and build stage runs on Opus 5.5 at effort max.
+#402 (`d022295a`, 2026-09-27T14:04:25Z) made the same
+change to `adoption/agents/claude/{stack-verifier,isolated-builder}.md`, removed
+the builder's frontmatter `isolation: worktree` and added project-scope copies
+in `.claude/agents/` ([harness-settings record](../../../docs/decisions/2026-09-27-claude-harness-settings.md),
+“Effect on frozen preregistrations”; [role-dispatch addendum](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-27-opus-builder-and-verifier-no-frontmatter-isolation)).
+A per-invocation `model` outranks the definition's `model`
+([sub-agents](https://code.claude.com/docs/en/sub-agents), model resolution
+order), and every task here passes one, so the definitions alone would not
+change the run. The amended routes hold in B, A and A0, which share each task's
+model. Tasks, eligibility, lanes, thresholds, M3 exceptions, checks and arm
+order are unchanged, and so is all task text except the frozen `<assigned-base>`
+placeholder that change 7 adds to the two builder tasks; nothing is recoded. Neither role's
+Sonnet-era qualification carries over: the capability gate qualifies the Opus
+routes. Amendment 1 and the Repair 1 seal stay above as history.
+
+| Change | Superseded rule or artifact | Replacement and source |
+| --- | --- | --- |
+| 1. Role models | `stack-verifier` and `isolated-builder` at `sonnet` in the role table, in the six Claude `stack-verifier` tasks (`reuse-296-00`, `seed-acceptance-1` to `-5`) and the two `isolated-builder` tasks (`seed-builder-1`, `-2`), and in the runner's role map | `opus`, effort still `max`. Codex tasks stay on `gpt-6-astra`, including the `stack-verifier` task `reuse-343-13`. `source-scout` stays `sonnet` for pure extraction. The blocked `reuse-296-15` slot and its `role_requirement` are unchanged. Source: `adoption/agents/claude/stack-verifier.md:5` and `isolated-builder.md:5` at `d022295a`. |
+| 2. Carriers | “#376 role body, after merge/install proof” (verifier); “Existing role plus #376 additions” (builder, scout) | “#402 role body at d022295a”. #402 leaves the `stack-researcher` and `evidence-reviewer` bodies unchanged; their rows stay and say so. |
+| 3. Builder worktrees | README: “B's `isolation: worktree` may create another tree”, “A/A0 use their prepared control trees when the harness creates no separate tree” and “Keep the role's isolation”; the RUNBOOK builder section's Repair 1 isolation rule and its `worktree_paths` row's “prepared control binding”; Amendment 1 finding 3's “preserve isolation”; the runner comment citing `isolated-builder.md:7` | Every arm's builder brief carries the frozen prepared path from `worktree_paths` (change 7 adds its base). The grader derives the edited tree from the child transcript and `meta.json` and requires it to be that path; any other tree is a conflicting identity that blocks grading. `builder_worktree_policy` keeps its eight Repair 1 fields and adds seven. The hooks preflight/restore and per-tree sentinel checks stay. The role's base refusal stays; change 7 names the base in the brief. Sources: `isolated-builder.md:3,12` at `d022295a`; `test-envelope.mjs:418–427`; `docs/harness-defaults.md:91`; sub-agents on `isolation` and a subagent's starting directory. |
+| 4. Load order | RUNBOOK freeze: agent bytes recorded without scope precedence | Project `.claude/agents/*.md` (priority 3) shadow user `~/.claude/agents/*.md` (priority 4). The freeze record retains both and requires byte identity with `adoption/agents/claude/*.md` at the execution HEAD, read back. Sources: sub-agents, “Choose the subagent scope”; decision 3 of the harness-settings record. |
+| 5. Tests | `tests/test_token_e2e_preregistration.py` without these contracts | Five new and two extended tests: models, role-map/JSON and role-table/JSON agreement, carriers, builder policy and text, load order, and this seal. Against the unamended artifacts, `python3 -m unittest tests.test_token_e2e_preregistration` exited 1 (27 tests, `FAILED (failures=42)`, all in those seven tests); it passes on the amended artifacts. |
+| 6. Seal | Repair 1 seal table (kept) | The Amendment 2 seal below; `manifests/evidence.json` re-registered with `register_file` from `scripts/host_receipts.py` ([hot-file protocol](../../../docs/lanes.md#hot-file-protocol)). |
+| 7. Builder base binding (repair round, 2026-09-27; GPT-6 cross-family review) | `seed-builder-1` and `-2` text naming only `<assigned-worktree>`, so no B-arm builder could pass `isolated-builder.md:12`'s stop when `git -C <path> rev-parse HEAD` is not the brief's base; change 3's “task text unchanged” and its **[nv]** deferral of that refusal; the RUNBOOK builder section's “names that path but no base revision” | A **pre-execution input binding**. Both builder texts add `, prepared at the exact base <assigned-base>` directly after `<assigned-worktree>`; nothing else in them changes. A new frozen binding, `worktree_bases`, recorded privately before probes like `worktree_paths`, maps each `worktree_required` Workflow task to the full revision its prepared tree was created at; builder trees are prepared at the frozen execution revision. The runner requires a 40-hex value for each such task and the placeholder in both builder texts, binds it, and refuses to start when a value is missing or malformed or a placeholder stays unbound, following `dispatch_policy.workflow` (only frozen neutral input/worktree/run placeholders are bound). The two reused worktree tasks (`reuse-296-00`, `reuse-296-11`) get a recorded base but no text change. Arms A and A0 reuse the identical task text, so they receive the same bound placeholders. `builder_worktree_policy` adds `base_binding: worktree_bases`. The builder's base refusal stays, and its capability probe uses exactly this brief shape (change 9). No organic result was observed; this changes no eligibility, lane, threshold or check. Source: `isolated-builder.md:3,12` at `d022295a`. |
+| 8. Role-body blobs (repair round; evidence-reviewer) | Carriers naming “#402 role body at d022295a” with no rule tying the executed bodies to those blobs; change 4's identity with `adoption/agents/claude/*.md` at the execution HEAD alone | The role-body SHA256 table below records each body at `d022295a`. The RUNBOOK freeze requires the executed copies in `.claude/agents/`, `~/.claude/agents/` and `adoption/agents/claude/` to equal these values; any later change to these bodies needs another dated amendment. A test checks the two repository copies. |
+| 9. Capability probe shape (repair round; evidence-reviewer) | RUNBOOK capability section with no builder brief rule | The B-route `isolated-builder` probe must use exactly the frozen brief shape: the prepared path plus `<assigned-base>`, and no other base text. A refusal on that shape is a retained gate failure. |
+| 10. Tests and seal (repair round) | Round-1 tests; the unmerged round-1 Amendment 2 seal | Six new tests and one extended test (`base_binding` in the builder policy) cover the builder text, the runner's base binding and refusal (source checks plus a stubbed-`agent` Node harness over an in-memory copy with `reuse-296-15` unblocked: a local synthetic check, not a Workflow run), the role-body table, the probe shape and the superseded phrases. Against the pre-repair artifacts, `python3 -m unittest tests.test_token_e2e_preregistration` exited 1 (33 tests, `FAILED (failures=52)`, all in those seven tests); it passes on the repaired artifacts. The seal below is recomputed. |
+
+**Role-body SHA256 table (repair round).** SHA256 of
+`git show d022295a:adoption/agents/claude/<file>`; #402 made each
+`.claude/agents/<file>` the same blob. The RUNBOOK freeze requires every
+executed copy to equal these values.
+
+| Role body | SHA256 at `d022295a` |
+| --- | --- |
+| `stack-verifier.md` | `a4cc7f5024af7fdea544a0963d8ff6f712c9eb460812582fd93368870eeeabcc` |
+| `isolated-builder.md` | `57452a64ca8b97996aeb35916fb1f1f4d06452857178d6ad6dc7c49723d84cf7` |
+| `source-scout.md` | `f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341` |
+| `stack-researcher.md` | `a35b015fcf7e8d608b5cf60e4172c6f1033bf4d9b3b8047a008efc5e89dcb446` |
+| `evidence-reviewer.md` | `3aa5e3f0aac4b43f7196cb46aee3ce1ef06e795ae93ba2a925ea53ac62f5e256` |
+
+**Merge chronology.** #381 merged this preregistration at `c7b78854`
+(2026-09-27T06:39:20Z); #402 merged at `d022295a` (2026-09-27T14:04:25Z); this
+amendment was written on `d022295a` and, in the repair round, rebased onto
+`f68d13c0`, which leaves the five role bodies in the table above unchanged.
+Record this amendment's merge revision and time before execution: both must
+precede every capability probe and organic arm, and that revision is the
+`preregistration_commit` checked at launch. At `d022295a` and at `f68d13c0` the
+reused table pointer still serializes to the sealed `frozen_input` bytes (6,552
+bytes, 60 records, the same SHA256).
+
+**Amendment 2 seal, 2026-09-27**, before any organic run. It replaces the
+Repair 1 table for the launch check; the **Sealing** rules apply unchanged.
+
+| Artifact | SHA256 |
+| --- | --- |
+| `preregistration.json` | `d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a` |
+| `token-e2e-run.mjs` | `eb7029f9c7f5d6672525b0c8cb59263b78a29b40bc4254cf84a666e99dc47913` |
+| `RUNBOOK.md` | `33810ef7b1583163abb81f3111cfcfc9927863a1f2930d6f9f3de9bcafd2ca93` |
+| `fixtures/table.json` | `fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448` |
+| `fixtures/events.jsonl` | `81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e` |
+
+Replacement hashes: `preregistration.json` `e04c1a08…` → `bd892944…`;
+`token-e2e-run.mjs` `6ca129d9…` → `18419164…`; `RUNBOOK.md` `a8ee0e09…` →
+`537eb193…`. Both fixtures are unchanged.
+
+Repair round (2026-09-27), before merge and any execution:
+`preregistration.json` `bd892944…` → `d41152f4…`; `token-e2e-run.mjs`
+`18419164…` → `eb7029f9…`; `RUNBOOK.md` `537eb193…` → `33810ef7…`. The
+round-1 values were never merged or used by a launch check; both fixtures are
+still unchanged.

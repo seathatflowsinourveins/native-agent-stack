@@ -1,7 +1,10 @@
 """Offline preregistration contracts; never launch a model or workflow.
 
 Sources: AA sections 8.1 and 8.3; PR-H build specification; unittest/path
-conventions in tests/test_token_report_refresh_units.py:12-25.
+conventions in tests/test_token_report_refresh_units.py:12-25. Amendment 2
+(README, 2026-09-27): the #402 role bodies at d022295a and the sub-agents
+reference (https://code.claude.com/docs/en/sub-agents: scope priority, working
+directory, `isolation` and model resolution order).
 """
 
 import json
@@ -22,6 +25,72 @@ REQUIRED_LANES = {
     "blind", "binding", "attribution", "mcp-errors",
 }
 UUID_SHAPE = re.compile(r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b", re.I)
+# Amendment 2 literals, independent of the manifest. Models: #402's definitions
+# at d022295a (adoption/agents/claude/{stack-verifier,isolated-builder}.md:5 say
+# opus, source-scout.md:5 says sonnet) and the user's Opus rule for build and
+# verification stages.
+AMENDED_CLAUDE_ROLE_MODELS = {
+    "stack-researcher": "opus", "stack-verifier": "opus", "isolated-builder": "opus",
+    "evidence-reviewer": "opus", "source-scout": "sonnet",
+    "blind-lane-reviewer": "opus", "blind-judge": "opus",
+}
+AMENDED_ROLE_TABLE = [
+    "| stack-researcher | opus | max | #376 role body, after merge/install proof; unchanged by #402 |",
+    "| stack-verifier | opus | max | #402 role body at d022295a |",
+    "| isolated-builder | opus | max | #402 role body at d022295a |",
+    "| evidence-reviewer | opus | max | Existing role body; unchanged by #402 |",
+    "| source-scout | sonnet | max | #402 role body at d022295a |",
+    "| blind-lane-reviewer / blind-judge | opus | max | Existing stripped blind bodies; no skill preload |",
+]
+# Repair 1 builder policy (Amendment 1, finding 3). Amendment 2 only adds fields.
+REPAIR_1_BUILDER_POLICY = {
+    "id": "actual_child_worktree", "identity_sources": ["child_transcript", "meta.json"],
+    "diff_root": "observed_child_worktree", "diff_base": "recorded_child_starting_revision",
+    "include_tracked_and_untracked": True, "starting_revision_must_match_frozen_execution": True,
+    "missing_or_conflicting_identity": "block_grading", "prepared_path_is_proof": False,
+}
+AMENDMENT_2_BUILDER_POLICY = {
+    "brief_binding": "worktree_paths", "base_binding": "worktree_bases",
+    "harness_created_tree_expected": False,
+    "observed_child_worktree_must_equal_prepared_path": True,
+    "observed_worktree_other_than_prepared_path": "conflicting_identity",
+    "hooks_preflight_and_restore_required": True, "per_tree_sentinel_checks_required": True,
+    "amended_by": "Amendment 2 (2026-09-27)",
+}
+# Amendment 2 repair round (2026-09-27), GPT-6 finding 1: #402's builder stops
+# when `git -C <path> rev-parse HEAD` is not the brief's base
+# (isolated-builder.md:12 at d022295a), so both builder briefs add one clause
+# after the prepared path. Everything else is the unchanged Amendment 1 text.
+BUILDER_TEXT_BEFORE_REPAIR = (
+    "Use the isolated checkout actually assigned by the harness. If the harness creates no "
+    "separate checkout, use the prepared control checkout <assigned-worktree>. Verify and report "
+    "the actual working directory and starting revision before editing; stay inside that "
+    "checkout. There, change fixtures/before.py so greeting('{name}') returns 'Hello, {name}!'. "
+    "Confirm the complete result matches fixtures/after.py and test another name. Do not commit."
+)
+BASE_CLAUSE = ", prepared at the exact base <assigned-base>"
+BUILDER_NAMES = {"seed-builder-1": "Ada", "seed-builder-2": "Grace"}
+# Repair round, evidence-reviewer finding 2: SHA256 of each executed role body,
+# `git show d022295a:adoption/agents/claude/<file> | sha256sum`; #402 made each
+# .claude/agents copy the same blob. Table rows, for the reason given below.
+ROLE_BODY_ROWS = (
+    "| `stack-verifier.md` | `a4cc7f5024af7fdea544a0963d8ff6f712c9eb460812582fd93368870eeeabcc` |",
+    "| `isolated-builder.md` | `57452a64ca8b97996aeb35916fb1f1f4d06452857178d6ad6dc7c49723d84cf7` |",
+    "| `source-scout.md` | `f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341` |",
+    "| `stack-researcher.md` | `a35b015fcf7e8d608b5cf60e4172c6f1033bf4d9b3b8047a008efc5e89dcb446` |",
+    "| `evidence-reviewer.md` | `3aa5e3f0aac4b43f7196cb46aee3ce1ef06e795ae93ba2a925ea53ac62f5e256` |",
+)
+# The README amendment rule preserves every earlier seal table: the Repair 1
+# rows, verbatim. Kept as table rows, not "name": "digest" pairs, which the
+# pre-commit gitleaks generic-api-key rule reads as a keyed secret.
+REPAIR_1_SEAL_ROWS = (
+    "| `preregistration.json` | `e04c1a08de610356e2f24cf8d1f59a70e8b630e093c93934cd03ab0a8091bee4` |",
+    "| `token-e2e-run.mjs` | `6ca129d94d51c6c99c5a9430e2b7fb0d23b0919001acf789bf5d59d74c7cb828` |",
+    "| `RUNBOOK.md` | `a8ee0e09ce001db21269f66dc5ec4a4aa39abc3020e86e37d610a4aa9236c5a4` |",
+    "| `fixtures/table.json` | `fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448` |",
+    "| `fixtures/events.jsonl` | `81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e` |",
+)
+SEALED_FILES = tuple(row.split("`")[1] for row in REPAIR_1_SEAL_ROWS)
 
 
 def load_tasks():
@@ -31,6 +100,76 @@ def load_tasks():
 
 def tool_name_pattern(name):
     return r"(?<![A-Za-z0-9])" + re.escape(name) + r"(?![A-Za-z0-9])"
+
+
+def section(text, start, end):
+    """Text after the first start marker, up to the next end marker; empty if absent."""
+    _, found, rest = text.partition(start)
+    return rest.split(end, 1)[0] if found else ""
+
+
+def flat(text):
+    """Collapse Markdown line wrapping so phrase checks ignore line breaks."""
+    return " ".join(text.split())
+
+
+def builder_text(task_id):
+    """Frozen builder brief after the repair round: one clause after the path."""
+    return (BUILDER_TEXT_BEFORE_REPAIR.format(name=BUILDER_NAMES[task_id])
+            .replace("<assigned-worktree>", "<assigned-worktree>" + BASE_CLAUSE))
+
+
+def runnable_copy():
+    """In-memory manifest copy only; reuse-296-15 stays blocked on disk."""
+    data = load_tasks()
+    for task in data["tasks"]:
+        if task["id"] == "reuse-296-15":
+            task.update(opportunity="organic", blocked_by=None, role="source-scout")
+    return data
+
+
+def synthetic_bindings(data, arm):
+    """Neutral per-arm bindings; each base is a derived 40-hex value, not a revision."""
+    tasks = [task for task in data["tasks"] if task["family"] == "claude"
+             and task["dispatch"] == "workflow" and arm in task["arms"]]
+    return {
+        "arm": arm,
+        "worktree_paths": {task["id"]: f"/synthetic/{arm}/{task['id']}"
+                           for task in tasks if task.get("worktree_required")},
+        "worktree_bases": {task["id"]: hashlib.sha256(task["id"].encode()).hexdigest()[:40]
+                           for task in tasks if task.get("worktree_required")},
+        "input_paths": {task["id"]: f"/synthetic/input/{task['id']}"
+                        for task in tasks if task.get("input_required")},
+    }
+
+
+def run_stubbed_runner(data, bindings):
+    """Evaluate the runner body under Node with stub agent/phase/log.
+
+    No model, Workflow or child runs: the stub agent() only records each prompt.
+    """
+    source = (BLUEPRINT / "token-e2e-run.mjs").read_text(encoding="utf-8")
+    harness = (
+        "const args = JSON.parse(require('fs').readFileSync(0, 'utf8'));\n"
+        "const calls = [];\n"
+        "const agent = async (prompt, options) => {\n"
+        "  calls.push({ prompt, label: options.label });\n"
+        "  return { answer: '', evidence: [] };\n"
+        "};\n"
+        "const phase = () => {};\n"
+        "const log = () => {};\n"
+        "(async () => {\n" + source.replace("export const meta", "const meta", 1) + "\n})().then(\n"
+        "  () => process.stdout.write(JSON.stringify({ error: null, calls })),\n"
+        "  failure => process.stdout.write(JSON.stringify({ error: String(failure), calls })),\n"
+        ");\n"
+    )
+    args = {"run": "synthetic", "attempt": 1, "preregistration_commit": "synthetic",
+            "gates_verified": True, "frozen_tasks": data, **bindings}
+    result = subprocess.run(["node", "-e", harness], input=json.dumps(args),
+                            capture_output=True, text=True, timeout=120)
+    if result.returncode != 0:
+        raise AssertionError(result.stderr)
+    return json.loads(result.stdout)
 
 
 class TokenE2EPreregistrationTests(unittest.TestCase):
@@ -184,6 +323,67 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
             with self.subTest(task=task["id"]):
                 self.assertEqual(task["effort"], "xhigh" if task["dispatch"] == "main" else "max")
 
+    def test_amendment_2_role_models(self):
+        # Amendment 2 change 1: verifier and builder tasks move to Opus (effort
+        # stays max); the scout stays Sonnet; Codex tasks keep gpt-6-astra; the
+        # blocked loopback slot keeps its frozen model.
+        tasks = load_tasks()["tasks"]
+        claude = [task for task in tasks if task["family"] == "claude" and task.get("role")]
+        for task in claude:
+            with self.subTest(task=task["id"]):
+                self.assertEqual(task["model"], AMENDED_CLAUDE_ROLE_MODELS.get(task["role"]))
+        for role, count in (("stack-verifier", 6), ("isolated-builder", 2), ("source-scout", 3)):
+            with self.subTest(role=role, field="claude_task_count"):
+                self.assertEqual(sum(task["role"] == role for task in claude), count)
+        for task in tasks:
+            if task["family"] == "codex":
+                with self.subTest(task=task["id"], field="codex_model"):
+                    self.assertEqual(task["model"], "gpt-6-astra")
+        blocked = next(task for task in tasks if task["id"] == "reuse-296-15")
+        with self.subTest(task=blocked["id"], field="blocked_slot_model"):
+            self.assertEqual((blocked["role"], blocked["model"]), (None, "sonnet"))
+
+    def test_runner_role_map_agrees_with_json(self):
+        # Every Workflow agent() call passes route.model, and a per-invocation
+        # model outranks the definition's (sub-agents, model resolution order),
+        # so the runner's map, not the agent file, decides each child's model.
+        source = (BLUEPRINT / "token-e2e-run.mjs").read_text(encoding="utf-8")
+        block = re.search(r"const routes = \{\n([\s\S]*?)\n\};", source)
+        self.assertIsNotNone(block)
+        lines = block.group(1).splitlines()
+        routes = {}
+        for line in lines:
+            match = re.fullmatch(r"  '([a-z-]+)': \{ agentType: '([a-z-]+)', model: '([a-z0-9-]+)' \},", line)
+            with self.subTest(line=line):
+                self.assertIsNotNone(match)
+            if match:
+                routes[match.group(1)] = (match.group(2), match.group(3))
+        with self.subTest(field="role_map"):
+            self.assertEqual(routes, {role: (role, model)
+                                      for role, model in AMENDED_CLAUDE_ROLE_MODELS.items()})
+        for task in load_tasks()["tasks"]:
+            if task["family"] == "claude" and task["dispatch"] == "workflow" and task.get("role"):
+                with self.subTest(task=task["id"], field="json_agreement"):
+                    self.assertEqual(routes.get(task["role"], (None, None))[1], task["model"])
+
+    def test_readme_role_table_carriers_agree_with_json(self):
+        # Amendment 2 changes 1-2: #402 carriers for verifier, builder and scout;
+        # researcher and reviewer rows stay, marked unchanged by #402.
+        text = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
+        table = section(text, "| Frozen role in B | Explicit model | Explicit effort | Carrier |\n", "\n\n")
+        rows = [line for line in table.splitlines() if not line.startswith("| ---")]
+        with self.subTest(field="rows"):
+            self.assertEqual(rows, AMENDED_ROLE_TABLE)
+        models = {}
+        for row in rows:
+            cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
+            for role in cells[0].split(" / "):
+                models[role] = cells[1]
+        for task in load_tasks()["tasks"]:
+            if task["family"] == "claude" and task.get("role"):
+                with self.subTest(task=task["id"], field="json_agreement"):
+                    self.assertEqual(models.get(task["role"]), task["model"])
+
     def test_task_text_has_no_tool_names(self):
         data = load_tasks()
         self.assertTrue(data["no_tool_names_denylist"])
@@ -230,25 +430,229 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
         self.assertIn("Supply the exact parsed committed preregistration.json", source)
 
     def test_builder_checks_use_observed_child_worktree(self):
-        # isolated-builder.md:7/10; harness-defaults.md:89; AA 8.2 builder row.
+        # isolated-builder.md:3,12 at d022295a (#402: no frontmatter isolation;
+        # edits only in the owned checkout its brief names); harness-defaults.md:91;
+        # AA 8.2 builder row. Amendment 2 change 3 adds to the Repair 1 policy only.
         data = load_tasks()
-        expected = {
-            "id": "actual_child_worktree", "identity_sources": ["child_transcript", "meta.json"],
-            "diff_root": "observed_child_worktree", "diff_base": "recorded_child_starting_revision",
-            "include_tracked_and_untracked": True, "starting_revision_must_match_frozen_execution": True,
-            "missing_or_conflicting_identity": "block_grading", "prepared_path_is_proof": False,
-        }
+        policy = data.get("builder_worktree_policy") or {}
+        with self.subTest(field="repair_1_fields_unchanged"):
+            self.assertEqual({key: policy.get(key) for key in REPAIR_1_BUILDER_POLICY},
+                             REPAIR_1_BUILDER_POLICY)
         with self.subTest(field="policy"):
-            self.assertEqual(data.get("builder_worktree_policy"), expected)
+            self.assertEqual(policy, {**REPAIR_1_BUILDER_POLICY, **AMENDMENT_2_BUILDER_POLICY})
         for task in data["tasks"]:
             if task["id"].startswith("seed-builder-"):
                 with self.subTest(task=task["id"]):
                     self.assertEqual(task.get("worktree_check"), "actual_child_worktree")
                 with self.subTest(task=task["id"], field="check_source"):
                     self.assertIn("child transcript and meta.json", task["pass_fail_check"])
+                with self.subTest(task=task["id"], field="brief_binding"):
+                    self.assertIs(task.get("worktree_required"), True)
+                    self.assertIn("<assigned-worktree>", task["task_text"])
         source = (BLUEPRINT / "token-e2e-run.mjs").read_text(encoding="utf-8")
         with self.subTest(field="runner"):
             self.assertIn("pending_independent_readback", source)
+        with self.subTest(field="runner_brief_binding"):
+            self.assertIn("prompt = prompt.replaceAll('<assigned-worktree>', path);", source)
+
+    def test_builder_worktree_text_follows_amendment_2(self):
+        # Amendment 2 change 3: every arm's brief names the prepared path, the
+        # observed edit tree must be that path, and the hooks preflight/restore
+        # and per-tree sentinels stay; the superseded isolation rule is gone.
+        runbook = (BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8")
+        builder = section(runbook, "### Builder worktrees and hooks restoration\n", "\n### ")
+        for phrase in (
+            "Amendment 2 (2026-09-27)", "isolated-builder.md:3,12", "`worktree_paths`",
+            "must be the frozen prepared path", "**[nv]**", "per-tree sentinels",
+            "git config --show-origin --get core.hooksPath",
+            "git config --local --get-all core.hooksPath",
+            "git config --local --unset-all core.hooksPath",
+            'git config --local --add core.hooksPath "${HOOKS_PATH_BEFORE}"',
+            "Never write global/system config.",
+        ):
+            with self.subTest(file="RUNBOOK.md", phrase=phrase):
+                self.assertIn(phrase, builder)
+        with self.subTest(file="RUNBOOK.md", field="superseded_rule"):
+            self.assertNotIn("Keep `isolation: worktree`", builder)
+        readme = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
+        body = readme.partition("## Sealing")[0]
+        for superseded in ("B's `isolation: worktree` may create another tree",
+                           "Keep the role's isolation"):
+            with self.subTest(file="README.md", superseded=superseded):
+                self.assertNotIn(superseded, body)
+        with self.subTest(file="README.md", field="prepared_path"):
+            self.assertIn("require that tree to be the prepared path", body)
+
+    def test_builder_briefs_name_prepared_path_and_base(self):
+        # Repair round, finding 1: both builder texts gain only BASE_CLAUSE after
+        # the prepared path; no other task carries the base placeholder.
+        for task in load_tasks()["tasks"]:
+            if task["id"] in BUILDER_NAMES:
+                with self.subTest(task=task["id"], field="text"):
+                    self.assertEqual(task["task_text"], builder_text(task["id"]))
+            else:
+                with self.subTest(task=task["id"], field="no_base_placeholder"):
+                    self.assertNotIn("<assigned-base>", task["task_text"])
+        body = flat((BLUEPRINT / "README.md").read_text(encoding="utf-8").partition("## Sealing")[0])
+        with self.subTest(file="README.md", field="bound_placeholders"):
+            self.assertIn("bind `<assigned-worktree>`, `<assigned-base>`, `<retained-input>` "
+                          "and `<run-token>`", body)
+
+    def test_runner_requires_base_binding_before_any_child(self):
+        # dispatch_policy.workflow binds only frozen neutral placeholders; the
+        # refusal sits in the prompt loop, before phase() and the first agent().
+        source = (BLUEPRINT / "token-e2e-run.mjs").read_text(encoding="utf-8")
+        for fragment in (
+            "const base = args.worktree_bases?.[task.id];",
+            "!/^[0-9a-f]{40}$/.test(base)",
+            "(task.worktree_check && !prompt.includes('<assigned-base>'))",
+            "throw new Error('Supply the frozen worktree base binding: ' + task.id);",
+            "prompt = prompt.replaceAll('<assigned-base>', base);",
+            "throw new Error('Unbound frozen base placeholder: ' + task.id);",
+            "prepared_base: args.worktree_bases[task.id]",
+        ):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, source)
+        with self.subTest(field="refusal_before_first_child"):
+            refusal = source.find("Supply the frozen worktree base binding")
+            self.assertGreater(refusal, 0)
+            self.assertLess(refusal, source.index("phase('Frozen child tasks');"))
+        with self.subTest(field="every_arm_sends_the_bound_prompt"):
+            self.assertEqual(re.findall(r"\bawait agent\(([^,]+),", source),
+                             ["prompts.get(task.id)"] * 3)
+
+    def test_runner_binds_base_and_refuses_without_it(self):
+        # Local synthetic harness: stub agent/phase/log under Node over an
+        # in-memory manifest copy; never a Workflow run or a model call.
+        data = runnable_copy()
+        for arm, count in (("B", 49), ("A", 43), ("A0", 43)):
+            bindings = synthetic_bindings(data, arm)
+            outcome = run_stubbed_runner(data, bindings)
+            with self.subTest(arm=arm, field="complete_bindings_start"):
+                self.assertIsNone(outcome["error"])
+                self.assertEqual(len(outcome["calls"]), count)
+            prompts = {call["label"].split(".")[2]: call["prompt"] for call in outcome["calls"]}
+            for task_id in BUILDER_NAMES:
+                expected = (builder_text(task_id)
+                            .replace("<assigned-worktree>", bindings["worktree_paths"][task_id])
+                            .replace("<assigned-base>", bindings["worktree_bases"][task_id]))
+                with self.subTest(arm=arm, task=task_id, field="bound_brief"):
+                    self.assertEqual(prompts.get(task_id), expected)
+            with self.subTest(arm=arm, field="no_unbound_placeholder"):
+                self.assertEqual([key for key, prompt in prompts.items() if "<assigned-" in prompt], [])
+        complete = synthetic_bindings(data, "B")
+        refusals = {
+            "no_bases": ({**complete, "worktree_bases": None}, "reuse-296-00"),
+            "reused_task_base_missing": (
+                {**complete, "worktree_bases": {key: value for key, value in
+                                                complete["worktree_bases"].items()
+                                                if key != "reuse-296-11"}}, "reuse-296-11"),
+            "builder_base_missing": (
+                {**complete, "worktree_bases": {key: value for key, value in
+                                                complete["worktree_bases"].items()
+                                                if key != "seed-builder-1"}}, "seed-builder-1"),
+            "abbreviated_base": (
+                {**complete, "worktree_bases": {**complete["worktree_bases"],
+                                                "seed-builder-2": "0" * 12}}, "seed-builder-2"),
+        }
+        for case, (bindings, task_id) in refusals.items():
+            outcome = run_stubbed_runner(data, bindings)
+            with self.subTest(case=case):
+                self.assertEqual(outcome["error"],
+                                 "Error: Supply the frozen worktree base binding: " + task_id)
+                self.assertEqual(outcome["calls"], [])
+        # Mutation checks on the in-memory text only: a builder text without the
+        # placeholder, and a placeholder on a task with no worktree binding.
+        mutated = runnable_copy()
+        plain = next(task for task in mutated["tasks"] if task["family"] == "claude"
+                     and task["dispatch"] == "workflow" and "B" in task["arms"]
+                     and not task.get("worktree_required")
+                     and not task.get("input_required") and not task.get("run_binding"))
+        for task in mutated["tasks"]:
+            if task["id"] == "seed-builder-1":
+                task["task_text"] = task["task_text"].replace(BASE_CLAUSE, "")
+        outcome = run_stubbed_runner(mutated, complete)
+        with self.subTest(case="builder_text_without_placeholder"):
+            self.assertEqual(outcome["error"],
+                             "Error: Supply the frozen worktree base binding: seed-builder-1")
+            self.assertEqual(outcome["calls"], [])
+        mutated = runnable_copy()
+        for task in mutated["tasks"]:
+            if task["id"] == plain["id"]:
+                task["task_text"] += " <assigned-base>"
+        outcome = run_stubbed_runner(mutated, complete)
+        with self.subTest(case="unbound_placeholder", task=plain["id"]):
+            self.assertEqual(outcome["error"],
+                             "Error: Unbound frozen base placeholder: " + plain["id"])
+            self.assertEqual(outcome["calls"], [])
+
+    def test_capability_probe_uses_frozen_builder_brief_shape(self):
+        # Repair round, findings 1 and 3: the base binding is frozen with the
+        # paths, the builder section keeps the role's base refusal, and the B-route
+        # builder probe uses the frozen brief shape.
+        runbook = (BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8")
+        capability = flat(section(runbook, "## Capability qualification and launch", "\n### "))
+        for phrase in ("B-route `isolated-builder` probe must use exactly the frozen brief shape",
+                       "the prepared path plus `<assigned-base>`", "and no other base text"):
+            with self.subTest(section="capability", phrase=phrase):
+                self.assertIn(phrase, capability)
+        with self.subTest(section="freeze"):
+            self.assertIn("(`worktree_bases`)", section(runbook, "## Freeze and preflight", "\n## "))
+        with self.subTest(section="args"):
+            self.assertIn("| worktree_bases |", runbook)
+        builder = flat(section(runbook, "### Builder worktrees and hooks restoration\n", "\n### "))
+        for phrase in ("`<assigned-base>`", "`worktree_bases`",
+                       "The role's refusal when `HEAD` is not the brief's base is kept",
+                       "receive the same bound placeholders"):
+            with self.subTest(section="builder", phrase=phrase):
+                self.assertIn(phrase, builder)
+        with self.subTest(section="builder", superseded="no_base_revision"):
+            self.assertNotIn("names that path but no base revision", builder)
+        with self.subTest(section="codex"):
+            self.assertIn("No Codex task text carries `<assigned-base>`",
+                          flat(section(runbook, "### Codex launches", "\n## ")))
+
+    def test_amendment_2_pins_executed_role_bodies(self):
+        # Repair round, finding 2: the README table pins the d022295a blobs, the
+        # freeze requires every executed copy to equal them, and the repository
+        # copies still do; a later change needs another dated amendment.
+        readme = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
+        amendment_2 = section(readme, "## Amendment 2 (2026-09-27)", "\n## ")
+        for row in ROLE_BODY_ROWS:
+            filename, digest = row.split("`")[1], row.split("`")[3]
+            with self.subTest(file=filename, field="readme_row"):
+                self.assertIn(row, amendment_2)
+            for copy in ("adoption/agents/claude", ".claude/agents"):
+                with self.subTest(file=filename, copy=copy):
+                    self.assertEqual(
+                        hashlib.sha256((ROOT / copy / filename).read_bytes()).hexdigest(), digest)
+        with self.subTest(file="README.md", field="carrier_rule"):
+            self.assertIn("must equal Amendment 2's role-body SHA256 table",
+                          flat(readme.partition("## Sealing")[0]))
+        freeze = flat(section((BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8"),
+                              "## Freeze and preflight", "\n## "))
+        for phrase in ("must also equal the SHA256 recorded there for `d022295a`",
+                       "byte identity at the execution HEAD alone does not suffice",
+                       "requires another dated amendment"):
+            with self.subTest(file="RUNBOOK.md", phrase=phrase):
+                self.assertIn(phrase, freeze)
+
+    def test_amendment_2_records_builder_base_binding(self):
+        # Repair round: the change table states the input binding and its limits;
+        # the first-round statements it supersedes are gone.
+        amendment_2 = flat(section((BLUEPRINT / "README.md").read_text(encoding="utf-8"),
+                                   "## Amendment 2 (2026-09-27)", "\n## "))
+        for phrase in ("pre-execution input binding", "No organic result was observed",
+                       "this changes no eligibility, lane, threshold or check",
+                       "receive the same bound placeholders",
+                       "except the frozen `<assigned-base>` placeholder"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, amendment_2)
+        for superseded in ("(runner binding and task text unchanged)",
+                           "against a brief that names no base is",
+                           "Tasks and their text, eligibility"):
+            with self.subTest(superseded=superseded):
+                self.assertNotIn(superseded, amendment_2)
 
     def test_reused_table_binds_frozen_pointer_bytes(self):
         # Same retained-input contract as reuse-296-02; #296 /tools/9, #343 /tools/16.
@@ -409,17 +813,39 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
         with self.subTest(field="freeze_timing"):
             self.assertTrue("PR-H freezes M-R1 after PR-A's baseline" in text)
 
+    def test_freeze_records_project_and_user_role_definitions(self):
+        # Amendment 2 change 4: sub-agents "Choose the subagent scope" (project
+        # .claude/agents/ priority 3 outranks user ~/.claude/agents/ priority 4);
+        # #402 added the project-scope copies.
+        runbook = (BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8")
+        freeze = section(runbook, "## Freeze and preflight", "\n## ")
+        for phrase in ("Amendment 2 (2026-09-27)", "`d022295a`", "`.claude/agents/*.md`",
+                       "`~/.claude/agents/*.md`", "`adoption/agents/claude/*.md`", "shadow",
+                       "byte-identical", "read back", "execution HEAD", "blocks capability probes and launch"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, freeze)
+
     def test_sealing_hashes_and_amendment_rule(self):
-        # retrieval-quality-v2/PREREGISTRATION.md Sealing and Amendments.
+        # retrieval-quality-v2/PREREGISTRATION.md Sealing and Amendments: the
+        # Repair 1 seal stays; the Amendment 2 seal holds the current hashes.
         text = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
-        for term in ("## Sealing", "## Amendment 1 (2026-09-26)", "append-only", "never a silent rewrite"):
+        for term in ("## Sealing", "## Amendment 1 (2026-09-26)", "## Amendment 2 (2026-09-27)",
+                     "append-only", "never a silent rewrite"):
             with self.subTest(term=term):
                 self.assertTrue(term in text, term)
-        for filename in ("preregistration.json", "token-e2e-run.mjs", "RUNBOOK.md",
-                         "fixtures/table.json", "fixtures/events.jsonl"):
+        repair_1 = section(text, "## Sealing", "## Amendment 1 (2026-09-26)")
+        for filename, row in zip(SEALED_FILES, REPAIR_1_SEAL_ROWS):
+            with self.subTest(seal="repair_1", file=filename):
+                self.assertTrue(row in repair_1, filename)
+        amendment_2 = section(text, "## Amendment 2 (2026-09-27)", "\n## ")
+        for filename in SEALED_FILES:
             digest = hashlib.sha256((BLUEPRINT / filename).read_bytes()).hexdigest()
-            with self.subTest(file=filename):
-                self.assertTrue(f"| `{filename}` | `{digest}` |" in text, filename)
+            with self.subTest(seal="amendment_2", file=filename):
+                self.assertTrue(f"| `{filename}` | `{digest}` |" in amendment_2, filename)
+        for term in ("`c7b78854`", "2026-09-27T06:39:20Z", "`d022295a`", "2026-09-27T14:04:25Z",
+                     "no result was observed"):
+            with self.subTest(field="chronology", term=term):
+                self.assertIn(term, amendment_2)
 
 
 if __name__ == "__main__":
