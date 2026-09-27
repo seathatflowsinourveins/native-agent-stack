@@ -56,7 +56,9 @@ sys.path.insert(0, str(HERE))
 from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, load_json,  # noqa: E402
                           pointer_token, private_content, private_findings, sanitize, slug, write_json)
 
-ALIASES = {"discover": "opus", "refute-facts": "sonnet", "refute-fit": "opus", "critic": "opus"}
+# The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
+# facts refuter verifies, and the global model rule keeps Sonnet for command wrappers and mechanical extraction.
+ALIASES = {"discover": "opus", "refute-facts": "opus", "refute-fit": "opus", "critic": "opus"}
 GPT6_DEFAULT = {"model": "gpt-6-astra", "effort": "max"}
 MERGE_CAP = 8        # sweep.js MAX_PROPOSALS
 FOLLOWUP_CAP = 8     # sweep.js MAX_FOLLOWUPS

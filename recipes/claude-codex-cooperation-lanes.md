@@ -33,6 +33,32 @@ agreement. Job and gate state are keyed by workspace-root hash, so a review run
 inside a worktree writes to a different plugin state directory than the main
 checkout; read the job id from the command output.
 
+**Headless review of a PR head (2026-09-27).** Where the plugin is not the right
+tool, such as a review of a saved diff from a worker's worktree, run Codex itself,
+read-only, at max effort, with live search and stdin closed (codex-cli 0.157.1
+`codex exec --help`):
+
+```sh
+git diff origin/main...HEAD > <owned dir>/review.diff
+codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" \
+  -o <owned dir>/review.md "<prompt naming review.diff and the cited sources>" < /dev/null
+```
+
+- Keep Claude's reasoning and model family names out of the prompt; ask for one line
+  per finding with severity, file and line, issue and fix.
+- One review round and one repair round: fix each finding that the source supports,
+  re-run the acceptance checks, and record the rest as residuals with reasons rather
+  than starting a second review.
+- `< /dev/null` matters: `codex exec` reads stdin whenever it is not a terminal and
+  otherwise waits until a timeout
+  ([anti-pattern log](../docs/harness-defaults.md#upstream-verification-and-compounding-learning)).
+- Only `-c web_search="live"` was observed to send `external_web_access: true`, and
+  on a local stand-in provider (same log). If this lane moves behind the OmniRoute
+  gateway, re-verify from the sent request that live search still reaches the model:
+  web search through a custom provider is unverified, and OmniRoute 3.8.50 caps the
+  effort of a model its table does not know, `gpt-6-astra` included, at `xhigh`
+  ([foundation stack](../docs/foundation-stack.md)).
+
 ## Lane B: live-session coordination
 
 Same-host Claude peers are discovered with `ListAgents` or
@@ -108,6 +134,9 @@ not an enforced sandbox.
 `[agents] max_concurrent_threads_per_session = 3` is the Codex-side worker bound
 (spawned threads, excluding the primary) and a separate client limit from the
 Claude concurrency setting, which is eight in the portable profile; each carries
-its own dated row. These examples have no end-to-end run of their own in the
+its own dated row. It is also the only hard bound on Codex nesting for V2 models
+such as `gpt-6-astra`: `agents.max_depth` is "Ignored by V2"
+(`codex-rs/config/src/config_toml.rs` L719-720 at `rust-v0.157.1`), and the V2 spawn
+handler records depth without checking it (source reading, 2026-09-27, not a run). These examples have no end-to-end run of their own in the
 dated guide; qualify them per task before relying on them. Role registration and
 its `config_file` path rule are in `examples/codex-native/README.md`.

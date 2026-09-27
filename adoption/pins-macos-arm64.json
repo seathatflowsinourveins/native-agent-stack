@@ -157,7 +157,7 @@
       "sha256": "e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a",
       "checksum_source": "publisher_checksum_sidecar",
       "checksum_ref": "akitaonrails/ai-memory release v2.3.2 asset ai-memory-macos-aarch64.tar.gz.sha256, read 2026-09-22",
-      "install_note": "Same ai-memory version as the linux-x86_64 pin; macos-aarch64 sidecar binary archive. Installs the single ai-memory executable. The MCP server registration, hooks install and any managed run remain separate macOS steps with no receipt yet.",
+      "install_note": "Corrected 2026-09-27: this is no longer the linux-x86_64 pin's version. Linux moved to 2.4.1 after a Linux-only qualification (evidence/receipts/ai-memory-241-qualification-20260925.json), and this pin stays 2.3.2 until a Mac qualifies its own migration, hooks and retrieval. tools/adoption/render_config.py renders the Claude hook commands from this pin (tools/ai-memory-2.3.2) unless a host passes the binary it runs. macos-aarch64 sidecar binary archive. Installs the single ai-memory executable. The MCP server registration, hooks install and any managed run remain separate macOS steps with no receipt yet.",
       "version_probe": {
         "method": "exec",
         "command": "ai-memory",

@@ -125,3 +125,19 @@ is not preload acceptance. Their first-prompt sizes join the researcher/verifier
   `ctx_execute*` can write; named jCodeMunch `order` also requires a read-only action choice.
 - The vendored `readiness-audit` verify stage stays on the default child until its agent-lab source changes.
 - A host at `v2026.09.26` installs the previous seven definitions; `adoption/bootstrap.md` says so.
+
+## Addendum 2026-09-27: Opus builder and verifier, no frontmatter isolation
+
+Recorded before any run of the preregistered comparison above, so it amends arm B rather than any result
+([2026-09-27 record](2026-09-27-claude-harness-settings.md)).
+
+- **The user's rule decides the verifier's model.** The host's global instructions put Opus at effort max on
+  build and verification and keep Sonnet or Haiku for command wrappers, mechanical extraction and probes, and
+  the user asked on 2026-09-27 for Opus on the preregistration and verification workflows. Alternative 4's
+  Sonnet default is superseded: `stack-verifier` and `isolated-builder` declare `model: opus`, and in arm B
+  their stages pass `model: 'opus'`. `source-scout` stays on Sonnet. Neither role's earlier qualification,
+  recorded on Sonnet, carries over.
+- **The builder loses `isolation: worktree`.** It edits only in the owned checkout its brief names and refuses
+  the coordinator's own checkout; see decision 2 of the 2026-09-27 record. Arm B's builder stages therefore get
+  their checkout from the coordinator, as arm A's `general-purpose` stages do.
+- **Tool surfaces are unchanged**, and no role gains `memory`.
