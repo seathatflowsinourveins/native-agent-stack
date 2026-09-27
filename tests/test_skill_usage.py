@@ -598,6 +598,96 @@ def materialize_lanes_root(dest: Path) -> Path:
 
 
 class CodexLanes(unittest.TestCase):
+    def test_measurement_uses_own_outputs_and_differences_cumulative_usage(self):
+        def record(kind, payload, ordinal):
+            return {"type": kind, "timestamp": "2026-10-20T02:01:00Z", "payload": payload, "ordinal": ordinal}
+        def tokens(total, out=0):
+            return {"type": "token_count", "info": {"total_token_usage": {
+                "input_tokens": total, "cached_input_tokens": 20, "output_tokens": out,
+                "reasoning_output_tokens": 0, "total_tokens": total + out}}}
+        rows = [record("session_meta", {"source": {"subagent": {}}, "subagent_history_start_ordinal": 5}, 0),
+                record("event_msg", tokens(100), 2),
+                record("response_item", {"type": "function_call", "call_id": "parent", "name": "exec_command", "arguments": '{"cmd":"ls"}'}, 3),
+                record("response_item", {"type": "function_call_output", "call_id": "parent", "output": "p" * 9000}, 4),
+                record("event_msg", {"type": "task_started", "turn_id": "turn"}, 5),
+                record("response_item", {"type": "function_call", "call_id": "child", "name": "exec_command", "arguments": '{"cmd":"rtk proxy cat a"}'}, 6),
+                record("response_item", {"type": "function_call_output", "call_id": "child", "output": "c" * 6000}, 7),
+                record("event_msg", tokens(110, 3), 8), record("event_msg", tokens(110, 3), 9),
+                record("event_msg", {"type": "turn_aborted"}, 10)]
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m3"]["results"], 1)
+        self.assertEqual(got["by_carrier"]["rtk_proxy"]["bytes"], 6000)
+        self.assertEqual(got["provider_usage"]["totals"]["input_tokens"], 10)
+        self.assertEqual(got["provider_usage"]["totals"]["output_tokens"], 3)
+        self.assertEqual(got["provider_usage"]["attempts"][0]["state"], "interrupted")
+        self.assertFalse(got["provider_usage"]["complete"])
+        self.assertEqual(got["provider_usage"]["duplicate_snapshots"], 1)
+        self.assertNotIn("turn_id", json.dumps(got))
+
+    def test_measurement_includes_ctx_nested_fetches_from_item_arguments(self):
+        rows = []
+        for i in range(20):
+            tool = "ctx_fetch_and_index" if i == 0 else "ctx_execute"
+            args = {"url": "https://example.org"} if i == 0 else {"language": "shell", "code": "curl https://example.org"}
+            rows.append({"type": "event_msg", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                "type": "item_completed", "item": {"id": str(i), "type": "McpToolCall", "server": "context-mode",
+                    "tool": tool, "arguments": args, "result": {"content": [{"type": "text", "text": "ok"}]}}}})
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m4"]["remote_fetches"], 20)
+        self.assertEqual(got["m4"]["routed_share"], .05)
+        self.assertEqual(got["m5"]["results"], 20)
+
+    def test_lane_report_exposes_sanitized_per_actor_metrics(self):
+        report = self.scan()
+        self.assertEqual(len(report["actors"]), report["sessions_in_window"])
+        self.assertIn("m3", report["actors"][0]["measurement"])
+        self.assertIn("provider_usage", report["groups"]["workers"]["measurement"])
+        self.assertNotIn(str(self.root), json.dumps(report))
+
+    def test_measurement_namespace_and_failed_terminal_event(self):
+        def row(kind, payload):
+            return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload}
+        rows = [row("response_item", {"type": "function_call", "call_id": "c", "namespace": "mcp__context_mode",
+                "name": "ctx_execute", "arguments": json.dumps({"language": "shell", "code": "curl https://example.org"})}),
+                row("response_item", {"type": "function_call_output", "call_id": "c", "output": "x" * 6000}),
+                row("event_msg", {"type": "item_completed", "item": {"type": "McpToolCall", "id": "c",
+                    "server": "context_mode", "tool": "ctx_execute", "arguments": {"language": "shell", "code": "curl https://example.org"}}}),
+                row("event_msg", {"type": "task_started"}),
+                row("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, 10)}}),
+                row("event_msg", {"type": "task_complete", "error": {"message": "failed"}})]
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m5"]["large_results"], 1)
+        self.assertEqual(got["m4"]["ctx_sandbox_fetch"], 1)
+        self.assertFalse(got["provider_usage"]["complete"])
+        self.assertEqual(got["provider_usage"]["attempts"][0]["state"], "failed")
+
+    def test_usage_missing_parent_baseline_and_counter_regression_stay_unknown(self):
+        def row(kind, payload, ordinal=10):
+            return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload, "ordinal": ordinal}
+        def snapshot(value):
+            return row("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, value)}})
+        rows = [row("session_meta", {"subagent_history_start_ordinal": 5}, 0),
+                row("event_msg", {"type": "task_started"}), snapshot(100),
+                row("event_msg", {"type": "task_complete"})]
+        got = S.measure_codex_records(rows)["provider_usage"]
+        self.assertIsNone(got["totals"]["input_tokens"])
+        self.assertFalse(got["complete"])
+        regressed = S.measure_codex_records([row("event_msg", {"type": "task_started"}), snapshot(100), snapshot(90),
+                                            row("event_msg", {"type": "task_complete"})])["provider_usage"]
+        self.assertIsNone(regressed["totals"]["input_tokens"])
+        self.assertFalse(regressed["complete"])
+
+    def test_codex_mcp_failure_uses_native_item_state_with_response_bytes(self):
+        rows = [{"type": "response_item", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                    "type": "function_call", "call_id": "c", "namespace": "mcp__qmd", "name": "search", "arguments": "{}"}},
+                {"type": "response_item", "timestamp": "2026-10-20T02:00:01Z", "payload": {
+                    "type": "function_call_output", "call_id": "c", "output": "failed"}},
+                {"type": "event_msg", "timestamp": "2026-10-20T02:00:01Z", "payload": {
+                    "type": "item_completed", "item": {"id": "c", "type": "McpToolCall", "server": "qmd", "tool": "search", "status": "failed"}}}]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["mcp_states"]["qmd"]["failed"], 1)
+        self.assertEqual(got["m3"]["bytes"], 6)
+
     def setUp(self):
         self.manifest = load_fixture_manifest()
         self.names = fixture_names()

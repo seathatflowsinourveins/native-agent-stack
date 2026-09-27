@@ -180,7 +180,7 @@ on the rollout's history mode (`codex-rs/rollout/src/policy.rs`); `response_item
 persisted in every mode. The report therefore gives `sessions_by_history_mode`
 (`session_meta.history_mode`) and `sessions_with_tool_calls_but_no_item_events`, the sessions
 whose own records hold model tool calls but no such event: their shell, MCP and fetch lanes read
-as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page opens,
+as zero. The legacy `ctx_fetch_and_index_share` compares three lanes only (hosted page opens,
 `ctx_fetch_and_index` and remote `curl`/`wget`); a fetch run inside a Context Mode sandbox
 (`ctx_execute` code), a `gh api` call and `fetch()` or an HTTP library in a script are in no lane.
 `curl`/`wget` also counts behind the shell keywords `do`, `then`, `else`, `elif`, `if`, `while`,
@@ -188,6 +188,46 @@ as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page open
 or `timeout N`. Escaped characters and comments are data, and `$(...)` or backticks inside double
 quotes or in the body of a heredoc with an unquoted delimiter still run (bash(1) QUOTING, COMMENTS
 and Here Documents).
+
+PR-A adds `actors[].measurement` and group `measurement` fields. They reuse
+the existing [child-usage.mjs measurement kernel](../../examples/claude-native/workflows/README.md#pr-a-measurement-fields-2026-09-27)
+through Node; lane reports now require Node as well as Python, with no extra
+package install. The legacy fields above remain historical comparison fields.
+Use `measurement.m4.routed_share` for the denominator including nested ctx
+fetches. M3/M5 use own persisted `function_call_output` content, with native
+`item_completed` content as fallback; a missing result stays visible instead
+of being supplied as an empty result. Function namespaces are preserved.
+Structured output is compact JSON UTF-8 bytes; it is not provider tokens.
+Response-item output takes priority when both representations exist. Other
+function results remain in M3's `other` carrier and orphan results are counted.
+
+`--rtk-check` and `--exceptions` have the same pin, isolated five-exclusion
+replay and private digest-bound adjudication contract as the Claude tool.
+For Codex, observed coverage comes from explicit prefixes; the replay fields
+are hypothetical Claude-hook routing, never evidence a Codex hook ran.
+Add these flags to the existing `--lanes` command when measuring M6c.
+
+`measurement.provider_usage` differences cumulative `token_count` counters
+per rollout and attempt, using inherited/pre-window snapshots only as a
+baseline. Repeated totals contribute nothing. Input, cached input, output,
+reasoning output and total tokens remain separate; cached/reasoning values
+are subsets, never additive cost buckets. Missing baselines, absent counters,
+counter regression and missing terminal evidence leave accounting incomplete.
+Known usage remains counted for failed/interrupted turns. A native
+`task_complete` with `error` is failed. Each attempt reports a configured
+model/effort when available; it does not claim provider-resolved routing.
+Supply one rollout per thread; this tool does not reconcile copied files of
+the same thread from multiple archives. Interrupted terminal usage that the
+client never persisted cannot be reconstructed.
+
+Sources: [Codex rust-v0.157.1 native usage protocol](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2234-L2310),
+[native function namespace](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1073-L1088),
+[terminal error](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2146-L2152),
+and [ccusage v20.0.24 baseline/delta parsing](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/codex/src/parser.rs#L153-L350).
+The project-specific measurement contract is
+[#381 preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).
+Tests use synthetic transcripts (`python3 -m unittest tests.test_skill_usage`);
+they are not live provider acceptance or unchanged upstream tests.
 
 Sessions that did not load the user config are negative controls, never workers. Rollouts do not
 record `--ignore-user-config` itself, so the report classifies each session by its skill catalog:
