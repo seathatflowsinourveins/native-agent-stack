@@ -39418,8 +39418,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "94ee9f6484a8b80fe98e0de45fbb71cfae1624c2bbad4bc61091c64586a71b5d",
-      "bytes": 25577
+      "sha256": "9d263c85e8ad583a84aa9b37cefcddb513459a48025069ba2bb948cfe29cd246",
+      "bytes": 25922
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -39868,8 +39868,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "f97f908f3a88111eeeeb5f698e5497b98ace1f5b26fecdab3092f9c2f553cf85",
-      "bytes": 13412
+      "sha256": "ef0b9e8441f755e7fe4d62f9c6fbb6de029e7ba4b10e91169a518e202aa7deef",
+      "bytes": 13793
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
