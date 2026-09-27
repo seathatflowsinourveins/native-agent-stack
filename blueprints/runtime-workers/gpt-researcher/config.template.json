@@ -6,7 +6,7 @@
     "base_url": "http://127.0.0.1:20128/v1",
     "api_key": "local-loopback",
     "temperature": null,
-    "reasoning_effort": null,
+    "reasoning_effort": "max",
     "use_responses_api": true,
     "output_version": "v0",
     "streaming": true,

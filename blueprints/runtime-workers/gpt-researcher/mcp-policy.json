@@ -7,10 +7,10 @@
       "active": true,
       "command": "${ECO_ROOT}/bin/node",
       "args": ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"],
-      "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": "${ECO_ROOT}/bin:${HOST_PATH}", "CONTEXT_MODE_PLATFORM": "codex", "CONTEXT_MODE_PROJECT_DIR": "${WORKER_CWD}", "CONTEXT_MODE_DIR": "${WORKER_STATE}/context-mode"},
-      "cwd": "${WORKER_CWD}",
-      "disabled_tools": ["ctx_upgrade", "ctx_purge"],
-      "enabled_tools": ["ctx_fetch_and_index", "ctx_search", "ctx_index", "ctx_execute", "ctx_execute_file", "ctx_batch_execute"]
+      "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": "${ECO_ROOT}/bin:${HOST_PATH}", "CONTEXT_MODE_PLATFORM": "codex", "CONTEXT_MODE_PROJECT_DIR": "${WORKER_SCRATCH}", "CONTEXT_MODE_DIR": "${WORKER_STATE}/context-mode"},
+      "cwd": "${WORKER_SCRATCH}",
+      "disabled_tools": ["ctx_upgrade", "ctx_purge", "ctx_execute", "ctx_execute_file", "ctx_batch_execute", "ctx_fetch_and_index"],
+      "enabled_tools": ["ctx_search", "ctx_index"]
     },
     "qmd": {
       "active": true,

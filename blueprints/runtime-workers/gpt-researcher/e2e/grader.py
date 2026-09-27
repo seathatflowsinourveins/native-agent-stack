@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import runpy
 import sys
+import uuid
 from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
@@ -140,11 +141,11 @@ def main():
     os.chdir(run_dir)
     os.environ.update(OPENAI_API_URL=CHAT_URL, OPENAI_API_KEY="local-loopback",
                       OPENAI_MODEL=args.model, OPENAI_REASONING_EFFORT="max",
-                      OPENAI_MAX_OUTPUT_TOKENS="12000", OPENAI_TIMEOUT="600")
+                      OPENAI_MAX_OUTPUT_TOKENS="32768", OPENAI_TIMEOUT="600")
     sys.path.insert(0, str(source))
     import gpt_client
-    session = json.loads((run_dir / "config.json").read_text())["LLM_KWARGS"]["default_headers"]["x-omniroute-session"]
-    transport = GatewayTransport(session)
+    transport = GatewayTransport(uuid.uuid4().hex, model=args.model,
+                                 correlation_log=run_dir / "judge-correlations.jsonl")
     original_requests = gpt_client.requests
     # Change this client's transport only, not the shared requests module.
     gpt_client.requests = SimpleNamespace(post=transport.grader_post(original_requests.post))
@@ -152,8 +153,8 @@ def main():
     try:
         sys.argv = [str(source / "run_evaluation.py"), "--pdf_dir", str(run_dir / "frozen-reports"),
                     "--tasks_jsonl", str(run_dir / "tasks-and-rubrics.jsonl"),
-                    "--out_jsonl", str(result_path), "--max_workers", "1", "--max_retries", "2",
-                    "--chunk_size", "0", "--max_paper_chars", str(paper_chars),
+                    "--out_jsonl", str(result_path), "--max_workers", "1", "--max_retries", "5",
+                    "--chunk_size", "50", "--max_paper_chars", str(paper_chars),
                     "--log_file", str(run_dir / "grader-native.log")]
         runpy.run_path(str(source / "run_evaluation.py"), run_name="__main__")
         rows = [json.loads(line) for line in result_path.read_text().splitlines() if line.strip()]

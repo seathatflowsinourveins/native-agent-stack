@@ -30,7 +30,8 @@ uv pip check --python "$prefix/venv/bin/python"
 uv pip check --python "$prefix/proxy-venv/bin/python"
 # DRB-II README installation: uv sync; retain its own native lock, separate from GPTR.
 grader_source="$prefix/grader-source/DeepResearch-Bench-II-b38f360603db9531b102aef8c166cedb8509b6f6"
-UV_PROJECT_ENVIRONMENT="$prefix/grader-venv" uv sync --locked --project "$grader_source" --python "$python_bin"
+# uv native flags refuse sdist builds; DRB-II scripts need dependencies only.
+UV_PROJECT_ENVIRONMENT="$prefix/grader-venv" uv sync --locked --no-build --no-install-project --project "$grader_source" --python "$python_bin"
 uv pip check --python "$prefix/grader-venv/bin/python"
 "$prefix/venv/bin/python" -c 'from importlib.metadata import version; assert version("gpt-researcher") == "0.16.0"; from gpt_researcher.context.select import resolve_context_filter; assert resolve_context_filter("keyword") == "keyword"; print("source package 0.16.0; keyword filter import passed")'
 cp "$recipe_dir/pins.json" "$prefix/installation-pins.json"

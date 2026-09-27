@@ -73,6 +73,22 @@
       "path": "blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json"
     },
     {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/build-requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json"
     },
     {

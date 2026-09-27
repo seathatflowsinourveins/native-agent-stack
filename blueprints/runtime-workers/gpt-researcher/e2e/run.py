@@ -19,23 +19,13 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from mcp_proxy import POLICY, load_host
 from check import check, export_report
-from gateway import GatewayTransport, model_id
+from gateway import BASE_URL, GatewayTransport, model_id, render_config, validate_route
 from grader import load_task, verified_source
-from receipt import write_receipt
+from receipt import compression_snapshot
 
 
 def now():
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
-
-
-class NativeEvents:
-    """Unmodified native websocket events, private only; no synthetic tool events."""
-    def __init__(self, path):
-        self.path = path
-
-    async def send_json(self, event):
-        with self.path.open("a") as output:
-            output.write(json.dumps(event, default=str) + "\n")
 
 
 async def run(args, output):
@@ -51,17 +41,15 @@ async def run(args, output):
         raise ValueError("wrong installed framework version")
     output["framework_version"] = version
     # All nested native researchers reload the same config_path. No source patches.
-    cfg = json.loads((HERE.parent / "config.template.json").read_text())
-    model_id(args.model)
-    for role in ("FAST_LLM", "SMART_LLM", "STRATEGIC_LLM"):
-        cfg[role] = "openai:" + args.model
     session = uuid.uuid4().hex
-    cfg["LLM_KWARGS"]["default_headers"]["x-omniroute-session"] = session
+    cfg = render_config(json.loads((HERE.parent / "config.template.json").read_text()),
+                        {"model": args.model, "base_url": args.base_url}, session)
     cfg["RETRIEVER"] = "duckduckgo,mcp"
     # Pass constructor mcp_configs: Config.__init__ resets cfg.mcp_servers.
     mcp_configs = [{"name": name, "connection_type": "stdio",
                     "command": str(args.prefix / "proxy-venv/bin/python"),
-                    "args": [str(HERE.parent / "mcp_proxy.py"), name, "--host-file", str(args.host_file)],
+                    "args": [str(HERE.parent / "mcp_proxy.py"), name, "--host-file", str(args.host_file),
+                             "--run-dir", str(args.run_dir)],
                     "env": {key: os.environ[key] for key in ("XDG_CACHE_HOME", "XDG_CONFIG_HOME", "XDG_STATE_HOME",
                                                              "HF_HOME", "PYTHON_DOTENV_DISABLED") if key in os.environ}}
                    for name, settings in POLICY["servers"].items() if settings["active"]]
@@ -75,7 +63,7 @@ async def run(args, output):
                        "COMPRESSION_THRESHOLD": "8000", "LANGCHAIN_TRACING_V2": "false",
                        "LANGSMITH_TRACING": "false", "DO_NOT_TRACK": "1",
                        "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1",
-                       "CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0"})
+                       "CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0", "ALLOW_PRIVATE_URLS": "false"})
     os.environ["PYTHON_DOTENV_DISABLED"] = "1"
     for role in ("FAST_LLM", "SMART_LLM", "STRATEGIC_LLM"):
         os.environ[role] = cfg[role]
@@ -91,7 +79,7 @@ async def run(args, output):
     manager = MCPClientManager(mcp_configs)
     try:
         discovered = {tool.name for tool in await manager.get_all_tools()}
-        required = {"query", "get", "ctx_fetch_and_index", "memory_query"}
+        required = {"query", "get", "ctx_index", "memory_query"}
         if not required <= discovered:
             raise ValueError("required scoped MCP tools unavailable")
         permitted = {t for s in POLICY["servers"].values() if s["active"] for t in s["enabled_tools"]}
@@ -100,11 +88,13 @@ async def run(args, output):
     finally:
         await manager.close_client()
     # Use the original benchmark prompt, including its blocked-reference rules.
-    async with GatewayTransport(session).worker_clients():
+    async with GatewayTransport(session, base_url=args.base_url, model=args.model,
+                                correlation_log=args.run_dir / "worker-correlations.jsonl").worker_clients():
         worker = GPTResearcher(query=task["prompt"], report_type=selection["report_type"],
                                config_path=str(private_cfg), mcp_configs=mcp_configs,
-                               mcp_strategy="fast", verbose=True,
-                               websocket=NativeEvents(args.run_dir / "native-events.jsonl"))
+                               mcp_strategy="fast", verbose=True, websocket=None)
+        # GPTR@0957c301 utils/llm.py:120-143 permits ten attempts only without
+        # a websocket during streamed report generation. Native logs stay on.
         await worker.conduct_research()
         output["report"] = await worker.write_report(custom_prompt=task["prompt"])
         # Retain actual fetched sources, never replace them with visited URLs.
@@ -119,17 +109,29 @@ def main():
     parser.add_argument("--prefix", type=Path, required=True)
     parser.add_argument("--host-file", type=Path, required=True)
     parser.add_argument("--model", required=True, type=model_id)
+    parser.add_argument("--base-url", required=True)
     parser.add_argument("--judge-model", required=True, type=model_id)
     args = parser.parse_args()
     args.run_dir = args.run_dir.resolve()
     args.host_file = args.host_file.resolve()
     args.prefix = args.prefix.resolve()
+    validate_route(args.base_url, args.model)
+    validate_route(BASE_URL, args.judge_model)
     # Avoid upstream dotenv discovery of checkout/host provider files.
     os.chdir(args.run_dir)
     logging.basicConfig(filename=args.run_dir / "native.log", level=logging.INFO,
                         format="%(asctime)s %(name)s %(levelname)s %(message)s", force=True)
     started = now()
     (args.run_dir / "window-start.txt").write_text(started)
+    phases = {"worker_started": started}
+    def persist_phases():
+        path = args.run_dir / "phases.json"
+        temporary = path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(phases) + "\n")
+        temporary.replace(path)
+    persist_phases()
+    arm = "engines-on" if args.model.startswith("sharedgw/") else "control"
+    compression = {"before": compression_snapshot(arm)}
     output = {"report": "", "sources": [], "framework_version": None}
     runtime_error = None
     original_stdout, original_stderr = sys.stdout, sys.stderr
@@ -143,9 +145,15 @@ def main():
         finally:
             sys.stdout, sys.stderr = original_stdout, original_stderr
     (args.run_dir / "result.json").write_text(json.dumps(output, indent=2, default=str) + "\n")
+    phases["worker_ended"] = now()
+    persist_phases()
+    compression["after"] = compression_snapshot(arm)
+    (args.run_dir / "compression.json").write_text(json.dumps(compression) + "\n")
     sanity = check(output)
     (args.run_dir / "check.json").write_text(json.dumps(sanity, indent=2) + "\n")
     if runtime_error is None and sanity["ready_for_grading"]:
+        phases["judge_started"] = now()
+        persist_phases()
         try:
             with (args.run_dir / "grader-stdout.log").open("w") as stdout, (args.run_dir / "grader-stderr.log").open("w") as stderr:
                 subprocess.run([str(args.prefix / "grader-venv/bin/python"), str(HERE / "grader.py"),
@@ -154,12 +162,13 @@ def main():
                                stdout=stdout, stderr=stderr)
         except (OSError, subprocess.SubprocessError) as error:
             runtime_error = "Grader" + type(error).__name__
-    ended = now()
-    receipt = write_receipt(args.run_dir, started, ended, args.model, output["framework_version"], runtime_error)
-    print(json.dumps({"execution_complete": receipt["execution_complete"], "evaluation": receipt["evaluation"],
-                      "receipt": "receipt.json in the private attempt directory",
-                      "runtime_error": runtime_error}, sort_keys=True))
-    return 0 if receipt["execution_complete"] else 1
+        finally:
+            phases["judge_ended"] = now()
+            persist_phases()
+    # The supervisor independently validates grades and observes gateway DBs.
+    (args.run_dir / "execution.json").write_text(json.dumps({"runtime_error": runtime_error,
+                                                            "framework_version": output["framework_version"]}) + "\n")
+    return 0 if runtime_error is None and sanity["ready_for_grading"] else 1
 
 
 if __name__ == "__main__":

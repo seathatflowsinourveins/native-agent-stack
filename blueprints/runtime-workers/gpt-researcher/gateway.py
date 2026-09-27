@@ -35,9 +35,46 @@ DRB_RESPONSE_FORMAT = {
 
 
 def model_id(value):
-    if not isinstance(value, str) or not re.fullmatch(r"cx/gpt-6(?:-[a-z0-9]+)*", value):
-        raise ValueError("this gateway recipe accepts only cx/gpt-6 model routes")
+    if not isinstance(value, str) or not re.fullmatch(r"(?:cx/gpt-6(?:-[a-z0-9]+)*|sharedgw/gpt-6-astra-max)", value):
+        raise ValueError("this gateway recipe accepts only approved GPT-6 model routes")
     return value
+
+
+def select_routes(env):
+    """Round-3 common arm contract; CLI CONFIG_PATH: GPTR@0957c301 config.py:158-166."""
+    arm = env.get("RUNTIME_WORKER_ARM", "control")
+    if arm not in ("control", "engines-on"):
+        raise ValueError("unknown worker arm")
+    base = "http://127.0.0.1:20129/v1" if arm == "engines-on" else BASE_URL
+    model = "sharedgw/gpt-6-astra-max" if arm == "engines-on" else "cx/gpt-6-astra-max"
+    worker = {"base_url": env.get("GPTR_BASE_URL", base), "model": env.get("GPTR_MODEL", model)}
+    judge = {"base_url": env.get("GPTR_JUDGE_BASE_URL", BASE_URL),
+             "model": env.get("GPTR_JUDGE_MODEL", "cx/gpt-6-astra-max")}
+    if worker["base_url"] != base or judge["base_url"] != BASE_URL:
+        raise ValueError("base URL does not match worker arm or control judge")
+    for route in (worker, judge):
+        validate_route(**route)
+    return {"arm": arm, "worker": worker, "judge": judge}
+
+
+def validate_route(base_url, model):
+    model_id(model)
+    expected = "http://127.0.0.1:20129/v1" if model.startswith("sharedgw/") else BASE_URL
+    if base_url != expected:
+        raise ValueError("model namespace does not match the allowlisted gateway")
+
+
+def render_config(template, route, session):
+    validate_route(**route)
+    cfg = copy.deepcopy(template)
+    for role in ("FAST_LLM", "SMART_LLM", "STRATEGIC_LLM"):
+        cfg[role] = "openai:" + route["model"]
+    headers = {"x-omniroute-session": session}
+    if route["base_url"].endswith(":20129/v1"):
+        headers["x-omniroute-compression"] = "allow-lossy"
+    cfg["LLM_KWARGS"].update(base_url=route["base_url"], default_headers=headers,
+                             reasoning_effort="max")
+    return cfg
 
 
 def strict_objects(schema):
@@ -56,13 +93,33 @@ def strict_objects(schema):
 
 
 class GatewayTransport:
-    def __init__(self, session):
+    def __init__(self, session, base_url=BASE_URL, model="cx/gpt-6-astra-max", correlation_log=None):
         if not session or not re.fullmatch(r"[a-zA-Z0-9_-]+", session):
             raise ValueError("invalid conversation identifier")
         self.session = session
+        validate_route(base_url, model)
+        self.base_url = base_url
+        self.model = model
+        self.correlation_log = correlation_log
+
+    def record(self, event):
+        if self.correlation_log is not None:
+            with self.correlation_log.open("a") as handle:
+                handle.write(json.dumps(event) + "\n")
+
+    def response_hook(self, response):
+        # HTTPX@0.28.1 docs/advanced/event-hooks.md:5-7,35-40: headers are
+        # available before streamed bodies; never read the body in this hook.
+        correlation = response.headers.get("X-Correlation-Id")
+        if not isinstance(correlation, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,200}", correlation):
+            correlation = None
+        self.record({"event": "response", "correlation_id": correlation})
+
+    async def async_response_hook(self, response):
+        self.response_hook(response)
 
     def headers(self, payload):
-        model_id(payload.get("model"))
+        validate_route(self.base_url, payload.get("model"))
         temperature = payload.get("temperature")
         if temperature is not None and (type(temperature) not in (int, float)
                                         or not math.isfinite(temperature) or temperature <= 0.1):
@@ -78,12 +135,16 @@ class GatewayTransport:
             function = tool.get("function", tool)
             if function.get("strict"):
                 strict_objects(function.get("parameters", {}))
-        return {"x-omniroute-session": self.session, "Idempotency-Key": uuid.uuid4().hex}
+        headers = {"x-omniroute-session": self.session, "Idempotency-Key": uuid.uuid4().hex}
+        if self.base_url == "http://127.0.0.1:20129/v1":
+            headers["x-omniroute-compression"] = "allow-lossy"
+        return headers
 
     def request_hook(self, request):
-        if str(request.url) not in (CHAT_URL, BASE_URL + "/responses"):
+        if str(request.url) not in (self.base_url + "/chat/completions", self.base_url + "/responses"):
             raise ValueError("unexpected model endpoint")
         request.headers.update(self.headers(json.loads(request.content)))
+        self.record({"event": "request"})
 
     async def async_request_hook(self, request):
         self.request_hook(request)
@@ -91,12 +152,15 @@ class GatewayTransport:
     def grader_post(self, sender):
         """Adapt DRB-II's module-local requests.post; leave its prompt intact."""
         def post(url, **kwargs):
-            if url != CHAT_URL:
+            if url != self.base_url + "/chat/completions":
                 raise ValueError("unexpected grader endpoint")
             payload = {**kwargs["json"], "response_format": copy.deepcopy(DRB_RESPONSE_FORMAT)}
             kwargs["json"] = payload
             kwargs["headers"] = {**kwargs.get("headers", {}), **self.headers(payload)}
-            return sender(url, **kwargs)
+            self.record({"event": "request"})
+            response = sender(url, **kwargs)
+            self.response_hook(response)
+            return response
         return post
 
     @asynccontextmanager
@@ -113,14 +177,14 @@ class GatewayTransport:
 
         descriptor = GenericLLMProvider.__dict__["from_provider"]
         original = GenericLLMProvider.from_provider
-        with httpx.Client(event_hooks={"request": [self.request_hook]}, trust_env=False) as sync_client:
-            async with httpx.AsyncClient(event_hooks={"request": [self.async_request_hook]}, trust_env=False) as async_client:
+        with httpx.Client(event_hooks={"request": [self.request_hook], "response": [self.response_hook]}, trust_env=False) as sync_client:
+            async with httpx.AsyncClient(event_hooks={"request": [self.async_request_hook], "response": [self.async_response_hook]}, trust_env=False) as async_client:
                 def factory(cls, provider, **kwargs):
                     if provider != "openai":
                         raise ValueError("only GPT-6 OpenAI-compatible routing is configured")
                     model_id(kwargs.get("model"))
                     kwargs.update(http_client=sync_client, http_async_client=async_client,
-                                  max_retries=0, temperature=None, base_url=BASE_URL)
+                                  max_retries=0, temperature=None, base_url=self.base_url)
                     return original(provider, **kwargs)
                 GenericLLMProvider.from_provider = classmethod(factory)
                 try:

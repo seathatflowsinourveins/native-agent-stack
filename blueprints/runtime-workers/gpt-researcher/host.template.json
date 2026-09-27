@@ -1,7 +1,6 @@
 {
   "ECO_ROOT": "<private ecosystem prefix>",
   "HOST_PATH": "<private native executable search path>",
-  "WORKER_CWD": "<private absolute checkout path>",
   "QMD_CONFIG_DIR": "<private directory containing native-agent-stack-catalog.yml>",
   "QMD_INDEX_PATH": "<private existing native-agent-stack-catalog.sqlite file>",
   "AI_MEMORY_URL": "127.0.0.1:49474",

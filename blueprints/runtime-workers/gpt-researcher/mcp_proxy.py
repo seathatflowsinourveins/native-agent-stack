@@ -24,11 +24,11 @@ def load_host(path):
     if stat.S_IMODE(path.stat().st_mode) != 0o600:
         raise ValueError("host settings must have mode 0600")
     host = json.loads(path.read_text())
-    required = {"ECO_ROOT", "HOST_PATH", "WORKER_CWD", "AI_MEMORY_URL", "MEMORY_PROJECT",
+    required = {"ECO_ROOT", "HOST_PATH", "AI_MEMORY_URL", "MEMORY_PROJECT",
                 "QMD_CONFIG_DIR", "QMD_INDEX_PATH", "MEMORY_WORKSPACE"}
     if set(host) != required or any(not isinstance(v, str) or not v or "<" in v or "\n" in v for v in host.values()):
         raise ValueError("fill all private host settings; unknown fields refused")
-    for field in ("ECO_ROOT", "WORKER_CWD", "QMD_CONFIG_DIR"):
+    for field in ("ECO_ROOT", "QMD_CONFIG_DIR"):
         if not Path(host[field]).is_absolute() or not Path(host[field]).is_dir():
             raise ValueError("host directory unavailable")
     index = Path(host["QMD_INDEX_PATH"])
@@ -51,7 +51,19 @@ def scope_arguments(server, tool, arguments, host):
     if not allowed(server, tool):
         raise ValueError("tool unavailable")
     args = dict(arguments or {})
-    if server == "qmd":
+    if server == "context-mode":
+        # context-mode@v1.0.169 src/server.ts:2267-2309 accepts file paths too.
+        # Only literal content is authorized; fetch is disabled altogether so
+        # redirects, DNS rebinding and a second unguarded network client cannot
+        # bypass the native GPTR URL guard.
+        if tool == "ctx_index":
+            if (set(args) - {"content", "source"} or not isinstance(args.get("content"), str)
+                    or not 0 < len(args["content"]) <= 32000
+                    or not isinstance(args.get("source", ""), str)):
+                raise ValueError("index accepts bounded literal content only")
+        elif tool != "ctx_search":
+            raise ValueError("context-mode tool unavailable")
+    elif server == "qmd":
         collections = POLICY["servers"][server]["collections"]
         if tool == "query":
             selected = args.get("collections", collections)
@@ -90,11 +102,12 @@ def scope_arguments(server, tool, arguments, host):
     return args
 
 
-def server_config(server, host):
+def server_config(server, host, run_dir):
     settings = POLICY["servers"][server]
     if not settings["active"]:
         raise ValueError("server is not active for this role")
-    values = {**host, "WORKER_STATE": str(Path.home() / ".local/state/native-agent-stack/runtime-workers/gpt-researcher")}
+    run_dir = Path(run_dir).resolve()
+    values = {**host, "WORKER_STATE": str(run_dir), "WORKER_SCRATCH": str(run_dir / "mcp-work")}
     def expand(value):
         if isinstance(value, str):
             return Template(value).substitute(values)
@@ -103,7 +116,8 @@ def server_config(server, host):
         return {k: expand(v) for k, v in value.items()}
     config = {k: expand(settings[k]) for k in ("command", "args", "env", "url", "cwd") if k in settings}
     if "command" in config:
-        config.setdefault("cwd", host["WORKER_CWD"])
+        config.setdefault("cwd", values["WORKER_SCRATCH"])
+        config.setdefault("env", {})["HOME"] = str(run_dir / "home")
     return config
 
 
@@ -111,6 +125,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("server", choices=[n for n, s in POLICY["servers"].items() if s["active"]])
     parser.add_argument("--host-file", required=True)
+    parser.add_argument("--run-dir", required=True, type=Path)
     opts = parser.parse_args()
     host = load_host(opts.host_file)
     # Imported only in the separate proxy venv (FastMCP4 needs MCP2).
@@ -165,7 +180,7 @@ def main():
         async def on_get_prompt(self, context, call_next):
             raise ToolError("Prompt access disabled for worker")
 
-    proxy = create_proxy({"mcpServers": {"default": server_config(opts.server, host)}}, name="ScopedResearchTools")
+    proxy = create_proxy({"mcpServers": {"default": server_config(opts.server, host, opts.run_dir)}}, name="ScopedResearchTools")
     proxy.add_middleware(WorkerPolicy())
     proxy.run(transport="stdio", show_banner=False)
 

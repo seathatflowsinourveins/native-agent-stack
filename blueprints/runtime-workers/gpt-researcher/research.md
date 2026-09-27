@@ -1,3 +1,8 @@
+> Historical source research for rounds 1–2. Round-3 policy, dispatch, retry and
+> accounting corrections are in [README.md](README.md) and
+> [round3-verification.json](round3-verification.json); earlier host execution
+> authority and overlapping-usage descriptions below are superseded.
+
 # Source review — 2026-09-27
 
 ## Round 2 source decisions (recorded before implementation)

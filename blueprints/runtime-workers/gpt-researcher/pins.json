@@ -27,7 +27,11 @@
   },
   "upstream_files": {
     "pyproject.toml": "53b8d59bb05e5e1ec854703b6e487ababaeab53d49f0a25a3e549947312dfcd6",
-    "requirements.txt": "6d11deb240ef10a18f2d2ad1f51c0e3c273d65d8f988d3e51e7c85da2cb3259d"
+    "requirements.txt": "6d11deb240ef10a18f2d2ad1f51c0e3c273d65d8f988d3e51e7c85da2cb3259d",
+    "cli.py": "b0cdeb184d592aadc32cb54e20d09b47aca23e0f34f2092cb8ead4f8940f52de",
+    "gpt_researcher/utils/llm.py": "f22942e27b1356724daa3fc8dc0629ecbffe361f84455ee278a72b75668a2768",
+    "gpt_researcher/utils/url_security.py": "c263ac45bd5f26adaca42b57880daca58041756a5748c65a2581602cb4eeba9e",
+    "gpt_researcher/scraper/scraper.py": "225cb5a6387facc05ba9f488ffe68b67a4e01783c723c7d0e8dd02006dea03d4"
   },
   "locks": {
     "requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
@@ -79,5 +83,6 @@
         "sha256": "7b3848f42825aca40165463aa37757051165eb292ba7f24658a2f58f9bb221f9"
       }
     ]
-  }
+  },
+  "round3_source_note": "Added source-file verification at the unchanged 0957c301ed06c2a5857b834358c7227c739041d4 pin: cli.py:306-362; utils/llm.py:120-143; utils/url_security.py:8-25,63-122; scraper/scraper.py:195-212. Hashes computed from exact raw.githubusercontent.com bytes on 2026-09-27; no package, archive or lock pin changed."
 }
