@@ -173,7 +173,7 @@ class LedgerContract(unittest.TestCase):
                 m.capture_report_sources(config,self.db,self.root,commands,issues)
         self.assertEqual(issues,[])
         rows={r["tool"]:r for r in self.db.native_views()}
-        self.assertEqual(rows["ccusage"]["scope"],"Native / ccusage daily")
+        self.assertEqual(rows["ccusage"]["scope"],"Report / ccusage daily")
         self.assertEqual(rows["ccusage"]["snapshot_count"],2)
         for row in rows.values():
             self.assertIsNone(row["latest_success"]["metrics"]["saved"])
@@ -197,7 +197,7 @@ class LedgerContract(unittest.TestCase):
     def test_report_source_entries_are_validated_when_the_configuration_loads(self):
         good=self.report_source()
         for bad in [{**good,"kind":"savings"},{**good,"argv":[]},{**good,"argv":"upstream daily"},{k:v for k,v in good.items() if k!="boundary"},
-                    {**good,"format":"yaml"},{**good,"timeout":0},{**good,"saved":1},[good,good]]:
+                    {**good,"format":"yaml"},{**good,"timeout":0},{**good,"saved":1},[good,good],[good,{**good,"name":"ccusage-daily"}]]:
             path=self.root/"config.json"
             entries=bad if isinstance(bad,list) else [bad]
             path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":entries}))
@@ -219,8 +219,52 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(row["native_lifetime_kind"],"usage report")
         self.assertEqual(row["native_command"],"ccusage daily --offline --json")
         self.assertIn("Consumed tokens, not avoided tokens",row["lifetime_boundary"])
-        self.assertEqual([r["scope"] for r in row["native_reports"]],["Native / ccusage daily"])
+        self.assertEqual([r["scope"] for r in row["native_reports"]],["Report / ccusage daily"])
         self.assertIsNone(row["exact_lifetime_provider_saved"])
+
+    def test_report_failure_keeps_the_last_good_report_on_the_same_ledger(self):
+        from unittest.mock import patch
+        import subprocess
+        config={"report_sources":[self.report_source(timeout=7)],"project":str(self.root)}
+        with patch.object(m,"capture",return_value={"exit_code":0,"stdout_text":'{"totals":{"totalTokens":5}}',"stderr_text":"","completed_at":m.now()}):
+            m.capture_report_sources(config,self.db,self.root,[],[])
+        calls=[];issues=[]
+        def slow(argv,**kwargs):
+            calls.append(kwargs.get("timeout"))
+            raise subprocess.TimeoutExpired(argv,kwargs.get("timeout"),output=b'{"partial":',stderr=b"")
+        run=self.root/"run";run.mkdir()
+        with patch.object(m.subprocess,"run",side_effect=slow):
+            m.capture_report_sources(config,self.db,run,[],issues)
+        self.assertEqual(calls,[7])
+        self.assertEqual(len(issues),1)
+        row=self.db.native_views()[0]
+        self.assertFalse(row["latest"]["success"])
+        self.assertEqual(row["latest"]["evidence"]["stdout_text"],'{"partial":')
+        self.assertEqual(row["latest_success"]["metrics"]["raw"]["totals"]["totalTokens"],5)
+        self.assertEqual(row["snapshot_count"],2)
+
+    def test_report_scope_never_replaces_a_counters_last_good_value(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(rtk="selected-rtk",counter_scopes={"rtk_global":"Native / all retained projects"},
+                      report_sources=[self.report_source(name="all retained projects",tool="rtk",kind="status report")])
+        def returned(argv,cwd,root,label,timeout=60):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"summary":{"total_saved":40}}' if argv[0]=="selected-rtk" else '{"ok":true}',
+                    "stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            m.refresh(config)
+        rows={r["scope"]:r for r in json.loads(Path(config["output_json"]).read_text())["native"] if r["tool"]=="rtk"}
+        self.assertEqual(rows["Native / all retained projects"]["latest_success"]["metrics"]["saved"],40)
+        self.assertIsNone(rows["Report / all retained projects"]["latest_success"]["metrics"]["saved"])
+
+    def test_report_named_by_component_id_joins_the_normalized_row(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config["report_sources"]=[self.report_source(name="jcodemunch receipt",tool="jcodemunch-mcp",kind="usage report",argv=["jcodemunch-mcp","receipt"])]
+        with patch.object(m,"capture",return_value={"argv":["x"],"exit_code":0,"stdout_text":"{}","stderr_text":"","completed_at":m.now()}):
+            m.refresh(config)
+        row=next(r for r in json.loads(Path(config["output_json"]).read_text())["coverage_matrix"] if r["id"]=="jcodemunch-mcp")
+        self.assertEqual([r["scope"] for r in row["native_reports"]],["Report / jcodemunch receipt"])
 
     def test_narrative_dollar_line_does_not_invent_session_or_lifetime_footer(self):
         line="$1.18 of Opus 4.7 tokens your team didn't burn."

@@ -223,20 +223,25 @@ added to a counter. `kind` is one of `usage report` (tokens consumed), `status r
    "argv": ["/abs/agentsview", "usage", "daily", "--no-sync", "--offline", "--json"],
    "boundary": "Archived sessions only; --no-sync reads without syncing new history"},
   {"name": "OmniRoute prompt cache", "tool": "omniroute", "kind": "cache report",
-   "argv": ["curl", "-sS", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
+   "argv": ["curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
    "boundary": "Gateway-lifetime cached input tokens as the provider reported them; not provider billing"},
   {"name": "OmniRoute compression", "tool": "omniroute", "kind": "savings report",
-   "argv": ["curl", "-sS", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
+   "argv": ["curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
    "boundary": "Upstream compression estimate with skip reasons; retained, never counted"}
 ]
 ```
 
-`tool` must be the component id in `manifests/stack.json`, so the report lands on
-that component's row. Its command and boundary also replace the row's generic "no
-counter" text. `format` defaults to `json`; a JSON report that fails to parse, or a
-nonzero exit, is a failed report, and the last good report stays separate. `timeout`
-defaults to 60 seconds (1–600). Select only aggregate routes: OmniRoute's
-`/api/usage/analytics` and call-log routes carry per-account rows with account emails.
+`tool` must be the component id in `manifests/stack.json` (for example
+`jcodemunch-mcp`), so the report lands on that component's row. Its command and
+boundary also replace the row's generic "no counter" text. A report is stored under
+the scope `Report / <name>`, which never equals a counter's scope, so it cannot
+replace a counter's last good value. Names must stay unique after punctuation is
+folded into `-`, because each name becomes a capture folder. `format` defaults to
+`json`; a JSON report that fails to parse, or a nonzero exit, is a failed report,
+and the last good report stays separate. Give `curl` `--fail-with-body`, so an HTTP
+error exits nonzero while its body is still retained. `timeout` defaults to 60
+seconds (1–600). Select only aggregate routes: OmniRoute's `/api/usage/analytics`
+and call-log routes carry per-account rows with account emails.
 
 ## Exact artifact comparisons
 

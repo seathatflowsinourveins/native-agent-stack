@@ -510,11 +510,14 @@ def capture_jcodemunch(config,ledger,run,commands,issues):
 
 REPORT_KINDS=("usage report","status report","cache report","savings report")
 
+def report_label(name):
+    return "report-"+re.sub(r"[^A-Za-z0-9._-]+","-",name).strip("-")
+
 def validate_report_sources(entries):
     """Upstream report commands retained as evidence; they never carry a savings value."""
     if not isinstance(entries,list):
         raise ValueError("report_sources must be a list")
-    names=set()
+    names=set();labels=set()
     for entry in entries:
         if not isinstance(entry,dict) or set(entry)-{"name","tool","kind","argv","boundary","format","timeout"}:
             raise ValueError("report_sources entries take name, tool, kind, argv, boundary, format and timeout only")
@@ -528,16 +531,16 @@ def validate_report_sources(entries):
             raise ValueError("report_sources format must be json or text")
         if "timeout" in entry and (type(entry["timeout"]) is not int or not 1<=entry["timeout"]<=600):
             raise ValueError("report_sources timeout must be an integer from 1 to 600 seconds")
-        if entry["name"] in names:
-            raise ValueError("report_sources names must be unique")
-        names.add(entry["name"])
+        # Names map to capture folders; two names that differ only in punctuation would share one folder.
+        if entry["name"] in names or report_label(entry["name"]) in labels:
+            raise ValueError("report_sources names must be unique, also after punctuation is folded into '-'")
+        names.add(entry["name"]);labels.add(report_label(entry["name"]))
     return entries
 
 def capture_report_sources(config,ledger,run,commands,issues):
     """Retain each selected upstream report; a report is evidence, never a counter to add."""
     for entry in config.get("report_sources",[]):
-        label="report-"+re.sub(r"[^A-Za-z0-9._-]+","-",entry["name"]).strip("-")
-        r=capture(entry["argv"],config["project"],run,label,timeout=entry.get("timeout",60))
+        r=capture(entry["argv"],config["project"],run,report_label(entry["name"]),timeout=entry.get("timeout",60))
         commands.append(r)
         metrics={"saved":None,"kind":entry["kind"],"boundary":entry["boundary"]}
         success=r["exit_code"]==0
@@ -548,7 +551,8 @@ def capture_report_sources(config,ledger,run,commands,issues):
                 success=False;metrics["error"]="Report is not JSON: "+str(exc)
         if not success:
             issues.append(entry["name"]+": upstream report failed; last successful report remains separate")
-        ledger.snapshot(entry["tool"],"Native / "+entry["name"],metrics,success,r["completed_at"],r)
+        # A "Report / " scope never equals a counter's scope, so a report cannot replace a counter's last good value.
+        ledger.snapshot(native_tool_identity(entry["tool"]),"Report / "+entry["name"],metrics,success,r["completed_at"],r)
 
 def native_tool_identity(component_id):
     return {"jcodemunch-mcp":"jcodemunch"}.get(component_id,component_id)
@@ -834,7 +838,7 @@ def refresh(config,context_file=None):
             runtimes=[],prior_scope="Hook and session-database inspection was not selected.")
         for component in matrix:
             component["native_reports"]=[r for r in ledger.native_views() if r["tool"]==native_tool_identity(component["id"])]
-            sources=[s for s in config.get("report_sources",[]) if s["tool"]==native_tool_identity(component["id"])]
+            sources=[s for s in config.get("report_sources",[]) if native_tool_identity(s["tool"])==native_tool_identity(component["id"])]
             if sources and component["native_lifetime_kind"] in ("usage only","no verified native savings counter"):
                 component.update(native_lifetime_kind="; ".join(dict.fromkeys(s["kind"] for s in sources)),
                                  native_command="; ".join(shlex.join(s["argv"]) for s in sources),
