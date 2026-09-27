@@ -6883,8 +6883,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "1dab8a7975a676c9eb2887f9901de40237dcbd36a69f1dbd539a3558dd611322",
-      "bytes": 109814
+      "sha256": "bfc392c8e6d7225a29a0f4e883b92af2af82b8f5b18c5f71891f3cc6555c62a3",
+      "bytes": 120965
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
