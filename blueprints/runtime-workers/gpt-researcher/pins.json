@@ -1,0 +1,63 @@
+{
+  "release": "v3.7.0",
+  "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+  "package_version": "0.16.0",
+  "python_target": "CPython 3.12, Linux x86_64",
+  "source_archive": {
+    "url": "https://codeload.github.com/assafelovic/gpt-researcher/tar.gz/0957c301ed06c2a5857b834358c7227c739041d4",
+    "sha256": "0363b2e46629ee3add884212d09e6a56d9f7602c2adadff506910191b4c84c5c",
+    "hash_origin": "SHA256 of actual codeload bytes, independently repeated by coordinator worker; no upstream signature"
+  },
+  "pypi_artifacts_not_selected": [
+    {
+      "filename": "gpt_researcher-0.16.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/9e/eb/14f41d725affadf9c00f05cbb5399cc5ac614697b9c8b4a68eb6f346c4f6/gpt_researcher-0.16.0-py3-none-any.whl",
+      "sha256": "392432eea1757fa16462604e6579e425d57aa83f7d1ecc622a5807ada94fc043"
+    },
+    {
+      "filename": "gpt_researcher-0.16.0.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/7d/26/1fa27951b0b812901cb6cf68fb2341aa2f892df0192e06a75dc4be7c5e3a/gpt_researcher-0.16.0.tar.gz",
+      "sha256": "5892dcd1f6e03b5f6c26eb24f33e5959c599cd06027eceed692e00d2e147035c"
+    }
+  ],
+  "wheel_comparison": {
+    "shared_python_files": 122,
+    "changed": 55,
+    "missing_filter_files": true
+  },
+  "upstream_files": {
+    "pyproject.toml": "53b8d59bb05e5e1ec854703b6e487ababaeab53d49f0a25a3e549947312dfcd6",
+    "requirements.txt": "6d11deb240ef10a18f2d2ad1f51c0e3c273d65d8f988d3e51e7c85da2cb3259d"
+  },
+  "locks": {
+    "requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+    "build-requirements.lock": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+    "proxy-requirements.lock": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754"
+  },
+  "fastmcp": {
+    "version": "4.0.10",
+    "artifacts": [
+      {
+        "filename": "fastmcp-4.0.10-py3-none-any.whl",
+        "sha256": "1f8462e3d97394a637e1b0f1eaea0002da661c8d98000ad43f0aa3fa1ff523e8"
+      },
+      {
+        "filename": "fastmcp-4.0.10.tar.gz",
+        "sha256": "64539631a7dc5873a1c7a44089b2f7b3395dea3ca857e9f81bfe9665a59038d5"
+      }
+    ]
+  },
+  "langchain-openai": {
+    "version": "1.6.6",
+    "artifacts": [
+      {
+        "filename": "langchain_openai-1.6.6-py3-none-any.whl",
+        "sha256": "60dcaa443ddfdf1559feaf1d25916f394c7dda809aebe22a769fc39f02705be7"
+      },
+      {
+        "filename": "langchain_openai-1.6.6.tar.gz",
+        "sha256": "7b3848f42825aca40165463aa37757051165eb292ba7f24658a2f58f9bb221f9"
+      }
+    ]
+  }
+}

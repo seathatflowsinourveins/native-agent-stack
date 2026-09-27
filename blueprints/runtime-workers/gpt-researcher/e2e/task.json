@@ -1,0 +1,19 @@
+{
+  "name": "python-3.12.0-language-and-library-changes",
+  "report_type": "deep",
+  "question": "Research the frozen CPython 3.12.0 release: what did PEP 695 and PEP 701 change, and what happened to distutils? Use primary sources only. Discover sources with DuckDuckGo; inspect the official release notes and PEP pages. Scope the discussion to 3.12.0, not later maintenance releases. Also use QMD through MCP to retrieve this repository's research evidence or token-practice guidance, scoped to its four configured collections; that local guidance is process context and must not be cited as evidence about Python. Cite at least three distinct fetched HTTPS source pages from docs.python.org, peps.python.org or www.python.org. Cite no URL whose page content was not fetched during this run. Explain the changes and include the three exact fact statements below as separate bullet lines, optionally followed by inline Markdown citations.",
+  "allowed_domains": ["docs.python.org", "peps.python.org", "www.python.org"],
+  "min_distinct_urls": 3,
+  "required_statements": [
+    "Python 3.12 introduced type parameter syntax and the type statement (PEP 695).",
+    "Python 3.12 formalized f-string grammar and allowed quote reuse and backslashes in expressions (PEP 701).",
+    "Python 3.12 removed distutils from the standard library (PEP 632)."
+  ],
+  "primary_oracle_urls": [
+    "https://docs.python.org/3.12/whatsnew/3.12.html",
+    "https://peps.python.org/pep-0695/",
+    "https://peps.python.org/pep-0701/",
+    "https://peps.python.org/pep-0632/"
+  ],
+  "evidence_class": "local integration acceptance; frozen before native execution"
+}
