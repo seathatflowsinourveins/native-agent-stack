@@ -5,6 +5,9 @@ config/variables/default.py, utils/llm.py, mcp/client.py. No framework install.
 """
 
 import json
+import copy
+import hashlib
+from contextlib import closing
 import importlib.util
 from pathlib import Path
 import sqlite3
@@ -76,31 +79,133 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
             checked = subprocess.run([sys.executable, str(RECIPE / "e2e/check.py"), str(result)],
                                      capture_output=True, text=True)
             self.assertEqual(checked.returncode, 1, checked.stdout + checked.stderr)
-            verdict = json.loads(checked.stdout)
-            self.assertFalse(verdict["passed"])
-            self.assertIn("empty_report", verdict["failures"])
+            sanity = json.loads(checked.stdout)
+            self.assertFalse(sanity["ready_for_grading"])
+            self.assertNotIn("passed", sanity)
+            self.assertIn("empty_report", sanity["errors"])
 
-    def test_frozen_oracle_rejects_wrong_facts_and_unfetched_citations(self):
+    def test_report_transport_controls_do_not_grade_content(self):
         checker = load("gptr_check", RECIPE / "e2e/check.py")
-        urls = ["https://peps.python.org/pep-0695/", "https://peps.python.org/pep-0701/",
-                "https://peps.python.org/pep-0632/"]
-        # Synthetic control: proves checker discrimination, never native acceptance.
-        facts = ["Python 3.12 introduced type parameter syntax and the type statement (PEP 695).",
-                 "Python 3.12 formalized f-string grammar and allowed quote reuse and backslashes in expressions (PEP 701).",
-                 "Python 3.12 removed distutils from the standard library (PEP 632)."]
-        result = {"report": "\n".join(f"- {fact} [Primary source]({url})" for fact, url in zip(facts, urls)),
-                  "sources": [{"url": url, "raw_content": "Synthetic fetched-page control. " * 20} for url in urls]}
-        self.assertTrue(checker.check(result)["passed"])
-        missing = {**result, "sources": result["sources"][:2]}
-        self.assertIn("unfetched_citation", checker.check(missing)["failures"])
-        wrong = {**result, "report": result["report"].replace("removed distutils", "retained distutils")}
-        self.assertIn("missing_fact_3", checker.check(wrong)["failures"])
-        outside = {**result, "report": result["report"] + " [extra](https://peps.python.org.evil.test/fake)"}
-        self.assertIn("citation_outside_allowed_domains", checker.check(outside)["failures"])
-        snippets = {**result, "sources": [{"url": u, "raw_content": "search snippet"} for u in urls]}
-        self.assertIn("unfetched_citation", checker.check(snippets)["failures"])
-        fragments = {**result, "report": result["report"].replace(urls[1], urls[0] + "#another")}
-        self.assertIn("too_few_distinct_citations", checker.check(fragments)["failures"])
+        # A valid report and an obviously wrong report both reach the UPSTREAM
+        # grader unchanged. Transport success must never become a quality pass.
+        for report in ("# Report\nAn evidence-bearing answer.\n", "The moon is cheese.\n"):
+            with self.subTest(report=report), tempfile.TemporaryDirectory() as tmp:
+                result = {"report": report}
+                self.assertTrue(checker.check(result)["ready_for_grading"])
+                self.assertNotIn("passed", checker.check(result))
+                destination = Path(tmp) / "idx-12.md"
+                checker.export_report(result, destination)
+                self.assertEqual(destination.read_bytes(), report.encode("utf-8"))
+        for result in ({}, {"report": " \n"}, {"report": None}, {"report": 7}, [], None):
+            with self.subTest(result=result):
+                self.assertFalse(checker.check(result)["ready_for_grading"])
+
+    def test_graded_report_binding_rejects_replaced_and_mismatched_exports(self):
+        grader = load("gptr_grader", RECIPE / "e2e/grader.py")
+        report = b"Original worker report\n"
+        expected = hashlib.sha256(report).hexdigest()
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            exported = run_dir / "frozen-reports/gptr/idx-12.md"
+            exported.parent.mkdir(parents=True)
+            (run_dir / "report.md").write_bytes(report)
+            exported.write_bytes(report)
+            self.assertEqual(grader.read_report(run_dir, 12, expected), report)
+            exported.write_bytes(b"Changed report\n")
+            with self.assertRaises(ValueError):
+                grader.read_report(run_dir, 12, expected)
+            (run_dir / "report.md").write_bytes(b"Changed report\n")
+            with self.assertRaises(ValueError):
+                grader.read_report(run_dir, 12, expected)
+
+    def test_upstream_grade_controls_preserve_scores_and_reject_malformed_output(self):
+        grader = load("gptr_grader", RECIPE / "e2e/grader.py")
+        task = {"idx": 12, "content": {"task": "Frozen control", "rubric": {
+            "info_recall": ["Fact"], "analysis": ["Analysis"], "presentation": ["Presentation"]}}}
+        for score in (1, 0, -1):
+            row = {"model": "gptr", "idx": 12, "result": {"task": "Frozen control", "scores": {
+                dimension: {item: {"score": score, "reason": "Control", "evidence": ""}}
+                for dimension, (item,) in task["content"]["rubric"].items()}}}
+            with self.subTest(score=score):
+                self.assertEqual(grader.validate_grade([row], task), row["result"])
+                self.assertNotIn("passed", grader.validate_grade([row], task))
+        for bad in ([], [row, row], [{"model": "gptr", "idx": 12, "result": {"error": "batch failed"}}],
+                    [{**row, "idx": 13}], [{**row, "model": "wrong-arm"}], [None]):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                grader.validate_grade(bad, task)
+        for replacement in ({"score": 2}, {"score": True}, {"score": 1, "reason": [], "evidence": ""}):
+            bad = copy.deepcopy(row)
+            bad["result"]["scores"]["info_recall"]["Fact"] = replacement
+            with self.subTest(replacement=replacement), self.assertRaises(ValueError):
+                grader.validate_grade([bad], task)
+        bad = copy.deepcopy(row)
+        bad["result"]["scores"]["analysis"] = {}
+        with self.assertRaises(ValueError):
+            grader.validate_grade([bad], task)
+
+    def test_gateway_transport_headers_and_strict_schema_controls(self):
+        gateway = load("gptr_gateway", RECIPE / "gateway.py")
+        transport = gateway.GatewayTransport("fixed-conversation")
+        payload = {"model": "cx/gpt-6-astra-max", "messages": [{"role": "user", "content": "Grade"}]}
+        first = transport.headers(payload)
+        second = transport.headers(payload)
+        self.assertEqual(first["x-omniroute-session"], "fixed-conversation")
+        self.assertEqual(second["x-omniroute-session"], first["x-omniroute-session"])
+        self.assertNotEqual(first["Idempotency-Key"], second["Idempotency-Key"])
+        # Public wire schema is copied from the upstream DRB-II prompt.
+        strict = {**payload, "response_format": gateway.DRB_RESPONSE_FORMAT}
+        self.assertTrue(transport.headers(strict))
+        bad_schema = copy.deepcopy(strict)
+        del bad_schema["response_format"]["json_schema"]["schema"]["properties"]["results"]["items"]["additionalProperties"]
+        for bad in ({**payload, "model": "claude-opus-5-5"},
+                    {**payload, "model": "openai/gpt-5"},
+                    {**payload, "temperature": 0.1},
+                    {**payload, "temperature": float("nan")},
+                    {**payload, "response_format": {"type": "json_object"}}, bad_schema):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                transport.headers(bad)
+        self.assertTrue(transport.headers({**payload, "tools": [{"type": "function"}]}))
+        calls = []
+        def sender(url, **kwargs):
+            calls.append((url, kwargs))
+            return "native response"
+        post = transport.grader_post(sender)
+        self.assertEqual(post(gateway.CHAT_URL, headers={"Authorization": "Bearer local-loopback"},
+                              json=payload, timeout=600, stream=False), "native response")
+        self.assertEqual(calls[0][1]["json"]["messages"], payload["messages"])
+        self.assertEqual(calls[0][1]["json"]["response_format"], gateway.DRB_RESPONSE_FORMAT)
+        self.assertNotIn("temperature", calls[0][1]["json"])
+        self.assertIn("Idempotency-Key", calls[0][1]["headers"])
+        with self.assertRaises(ValueError):
+            post("https://example.invalid/v1/chat/completions", json=payload)
+
+    def test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader(self):
+        grader = load("gptr_grader", RECIPE / "e2e/grader.py")
+        data = b'{"idx":12,"prompt":"Frozen upstream prompt","content":{"task":"Frozen"}}\n'
+        selection = {"idx": 12, "row_sha256": hashlib.sha256(data).hexdigest(),
+                     "prompt_sha256": hashlib.sha256(b"Frozen upstream prompt").hexdigest()}
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "tasks_and_rubrics.jsonl"
+            source.write_bytes(data)
+            task, row = grader.load_task(source, selection)
+            self.assertEqual(task["prompt"], "Frozen upstream prompt")
+            self.assertEqual(row, data)
+            source.write_bytes(data.replace(b"Frozen", b"Changed"))
+            with self.assertRaises(ValueError):
+                grader.load_task(source, selection)
+            source.write_bytes(data + data)
+            with self.assertRaises(ValueError):
+                grader.load_task(source, selection)
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        self.assertEqual(pins["grader"]["commit"], "b38f360603db9531b102aef8c166cedb8509b6f6")
+        self.assertEqual(pins["grader"]["runner_up_commit"], "852f4022d1f98fb707222e395405136e8f0e8d52")
+        self.assertIn("uv sync --locked", (RECIPE / "install.sh").read_text())
+        runner = (RECIPE / "run-e2e.sh").read_text()
+        self.assertIn("${GPTR_JUDGE_MODEL:-cx/gpt-6-astra-max}", runner)
+        self.assertIn("PYTHONDONTWRITEBYTECODE=1", runner)
+        native = (RECIPE / "e2e/run.py").read_text()
+        self.assertIn("worker_clients()", native)
+        self.assertIn("grader-venv/bin/python", native)
 
     def test_mcp_policy_enforces_calls_and_collection_arguments(self):
         proxy = load("gptr_proxy", RECIPE / "mcp_proxy.py")
@@ -142,7 +247,7 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
             sys.path.pop(0)
         with tempfile.TemporaryDirectory() as tmp:
             db = Path(tmp) / "synthetic.sqlite"
-            with sqlite3.connect(db) as con:
+            with closing(sqlite3.connect(db)) as con:
                 con.execute("CREATE TABLE call_logs(timestamp TEXT,path TEXT,status INTEGER,model TEXT,"
                             "reasoning_effort_requested TEXT,reasoning_effort_upstream TEXT,tokens_in INTEGER,"
                             "tokens_cache_read INTEGER,tokens_reasoning INTEGER)")
@@ -150,6 +255,7 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
                             ("2026-09-27T17:20:01Z", "/v1/responses", 200, "cx/gpt-6-astra-max", None, "max", 123, 100, 20))
                 con.execute("INSERT INTO call_logs VALUES(?,?,?,?,?,?,?,?,?)",
                             ("2026-09-27T17:20:02Z", "/private/path", 500, "synthetic@example.invalid", None, None, None, None, None))
+                con.commit()
             before = db.read_bytes()
             rows = receipt.gateway_rows(db, "2026-09-27T17:20:00Z", "2026-09-27T17:20:03Z", "cx/gpt-6-astra-max")
             self.assertEqual(rows["status"], "observed")
@@ -161,6 +267,41 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
             absent = Path(tmp) / "absent.sqlite"
             self.assertEqual(receipt.gateway_rows(absent, "x", "y", "cx/gpt-6-astra-max")["status"], "unavailable")
             self.assertFalse(absent.exists())
+
+    def test_receipt_cannot_promote_report_sanity_to_quality_verdict(self):
+        sys.path.insert(0, str(RECIPE / "e2e"))
+        try:
+            receipt = load("gptr_receipt", RECIPE / "e2e/receipt.py")
+        finally:
+            sys.path.pop(0)
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            (run_dir / "result.json").write_text('{"report":"A complete-looking but ungraded report"}')
+            result = receipt.write_receipt(run_dir, "2026-09-27T00:00:00Z", "2026-09-27T00:01:00Z",
+                                           "cx/gpt-6-astra-max", "0.16.0", database=run_dir / "absent.sqlite")
+            self.assertNotIn("passed", result)
+            self.assertFalse(result["execution_complete"])
+            self.assertEqual(result["evaluation"]["status"], "unavailable_or_malformed")
+            self.assertTrue(result["report_sanity"]["ready_for_grading"])
+            self.assertEqual(result["skills"]["listed_at_start"], [])
+            self.assertEqual(result["skills"]["activation_events"], [])
+            (run_dir / "result.json").write_text('{"report":')
+            interrupted = receipt.write_receipt(run_dir, "2026-09-27T00:00:00Z", "2026-09-27T00:01:00Z",
+                                                 "cx/gpt-6-astra-max", None, database=run_dir / "absent.sqlite")
+            self.assertFalse(interrupted["execution_complete"])
+
+    def test_skills_lifecycle_and_no_listener_recipe(self):
+        readme = (RECIPE / "README.md").read_text()
+        for value in ("tools/adoption/install_skills.py", "--manifest blueprints/runtime-workers/skills/manifest.json",
+                      '--project-dir "$worker_workspace" --agent universal', "pending the skills-program PR",
+                      "127.0.0.1:3730-3799", "rw-gpt-researcher-",
+                      "com.native-agent-stack.owner=gpt6-omniroute-framework-integration"):
+            self.assertIn(value, readme)
+        # This SDK/stdio recipe allocates no Docker resources or listener ports.
+        for name in ("install.sh", "run-e2e.sh", "run-upstream-tests.sh"):
+            source = (RECIPE / name).read_text()
+            self.assertNotIn("docker ", source)
+            self.assertNotRegex(source, r"(?:127\.0\.0\.1|localhost):(?:37[12]\d|543[3-9]|38[01]\d)\b")
 
 
 if __name__ == "__main__":

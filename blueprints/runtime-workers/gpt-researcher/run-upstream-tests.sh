@@ -10,7 +10,7 @@ chmod 700 "$state/upstream-tests"
 output="$(mktemp "$state/upstream-tests/result-XXXXXXXX.txt")"
 cd "$source_dir"
 status=0
-env -i HOME="$HOME" PATH="$PATH" PYTHON_DOTENV_DISABLED=1 \
+env -i HOME="$HOME" PATH="$PATH" PYTHON_DOTENV_DISABLED=1 PYTHONDONTWRITEBYTECODE=1 \
   XDG_CACHE_HOME="$state/cache" OPENAI_API_KEY=local-loopback \
   CONTEXT_FILTER=keyword \
   "$prefix/venv/bin/python" -m pytest -q -p no:cacheprovider \

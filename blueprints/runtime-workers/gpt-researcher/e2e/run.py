@@ -1,4 +1,4 @@
-"""Upstream SDK example with private native artifacts and a frozen oracle.
+"""Upstream SDK example with private native artifacts and upstream DRB-II grading.
 
 Reference: GPT Researcher v3.7.0 README SDK example; agent.py:463-504,684-690;
 deep_research.py:644-646 propagates actual scraped sources from child researchers.
@@ -12,12 +12,15 @@ import logging
 import os
 from pathlib import Path
 import sys
+import subprocess
 import uuid
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from mcp_proxy import POLICY, load_host
-from check import check
+from check import check, export_report
+from gateway import GatewayTransport, model_id
+from grader import load_task, verified_source
 from receipt import write_receipt
 
 
@@ -41,17 +44,19 @@ async def run(args, output):
     installed = json.loads((args.prefix / "installation-pins.json").read_text())
     if installed != expected:
         raise ValueError("installation pins differ from recipe; rerun the installer")
+    if not (args.prefix / "grader-venv/bin/python").is_file():
+        raise ValueError("missing native grader environment; rerun the installer")
     version = importlib.metadata.version("gpt-researcher")
     if version != expected["package_version"]:
         raise ValueError("wrong installed framework version")
     output["framework_version"] = version
     # All nested native researchers reload the same config_path. No source patches.
     cfg = json.loads((HERE.parent / "config.template.json").read_text())
-    if not args.model or any(c.isspace() for c in args.model) or ":" in args.model:
-        raise ValueError("model must be a gateway model identifier, without provider prefix")
+    model_id(args.model)
     for role in ("FAST_LLM", "SMART_LLM", "STRATEGIC_LLM"):
         cfg[role] = "openai:" + args.model
-    cfg["LLM_KWARGS"]["default_headers"]["x-omniroute-session"] = uuid.uuid4().hex
+    session = uuid.uuid4().hex
+    cfg["LLM_KWARGS"]["default_headers"]["x-omniroute-session"] = session
     cfg["RETRIEVER"] = "duckduckgo,mcp"
     # Pass constructor mcp_configs: Config.__init__ resets cfg.mcp_servers.
     mcp_configs = [{"name": name, "connection_type": "stdio",
@@ -74,7 +79,12 @@ async def run(args, output):
     os.environ["PYTHON_DOTENV_DISABLED"] = "1"
     for role in ("FAST_LLM", "SMART_LLM", "STRATEGIC_LLM"):
         os.environ[role] = cfg[role]
-    task = json.loads((HERE / "task.json").read_text())
+    selection = json.loads((HERE / "task.json").read_text())
+    task, raw = load_task(verified_source(args.prefix) / "tasks_and_rubrics.jsonl", selection)
+    (args.run_dir / "tasks-and-rubrics.jsonl").write_bytes(raw)
+    output["skills"] = {"listed_at_start": [], "activation_events": [],
+                        "status": "no SKILL.md loader found in pinned runtime; native inventory unavailable"}
+    print(json.dumps({"skills_at_start": output["skills"]}))
     from gpt_researcher import GPTResearcher
     from gpt_researcher.mcp.client import MCPClientManager
     # Fail on missing tools before spending a model call; this is discovery only.
@@ -89,17 +99,18 @@ async def run(args, output):
             raise ValueError("MCP discovery exposed tools outside the policy")
     finally:
         await manager.close_client()
-    query = task["question"] + "\n\n" + "\n".join("- " + s for s in task["required_statements"])
-    worker = GPTResearcher(query=query, report_type=task["report_type"],
-                           config_path=str(private_cfg), mcp_configs=mcp_configs,
-                           mcp_strategy="fast", verbose=True,
-                           query_domains=task["allowed_domains"],
-                           websocket=NativeEvents(args.run_dir / "native-events.jsonl"))
-    await worker.conduct_research()
-    output["report"] = await worker.write_report(custom_prompt=query)
-    # Never turn discovered/visited URLs into fetched-page evidence.
-    output["sources"] = worker.get_research_sources()
-    (args.run_dir / "report.md").write_text(output["report"])
+    # Use the original benchmark prompt, including its blocked-reference rules.
+    async with GatewayTransport(session).worker_clients():
+        worker = GPTResearcher(query=task["prompt"], report_type=selection["report_type"],
+                               config_path=str(private_cfg), mcp_configs=mcp_configs,
+                               mcp_strategy="fast", verbose=True,
+                               websocket=NativeEvents(args.run_dir / "native-events.jsonl"))
+        await worker.conduct_research()
+        output["report"] = await worker.write_report(custom_prompt=task["prompt"])
+        # Retain actual fetched sources, never replace them with visited URLs.
+        output["sources"] = worker.get_research_sources()
+    export_report(output, args.run_dir / "report.md")
+    export_report(output, args.run_dir / "frozen-reports/gptr" / f"idx-{task['idx']}.md")
 
 
 def main():
@@ -107,7 +118,8 @@ def main():
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--prefix", type=Path, required=True)
     parser.add_argument("--host-file", type=Path, required=True)
-    parser.add_argument("--model", required=True)
+    parser.add_argument("--model", required=True, type=model_id)
+    parser.add_argument("--judge-model", required=True, type=model_id)
     args = parser.parse_args()
     args.run_dir = args.run_dir.resolve()
     args.host_file = args.host_file.resolve()
@@ -130,15 +142,24 @@ def main():
             logging.exception("Native run failed")
         finally:
             sys.stdout, sys.stderr = original_stdout, original_stderr
-    ended = now()
     (args.run_dir / "result.json").write_text(json.dumps(output, indent=2, default=str) + "\n")
-    verdict = check(output)
-    (args.run_dir / "check.json").write_text(json.dumps(verdict, indent=2) + "\n")
+    sanity = check(output)
+    (args.run_dir / "check.json").write_text(json.dumps(sanity, indent=2) + "\n")
+    if runtime_error is None and sanity["ready_for_grading"]:
+        try:
+            with (args.run_dir / "grader-stdout.log").open("w") as stdout, (args.run_dir / "grader-stderr.log").open("w") as stderr:
+                subprocess.run([str(args.prefix / "grader-venv/bin/python"), str(HERE / "grader.py"),
+                                "--prefix", str(args.prefix), "--run-dir", str(args.run_dir),
+                                "--model", args.judge_model], check=True, timeout=1800,
+                               stdout=stdout, stderr=stderr)
+        except (OSError, subprocess.SubprocessError) as error:
+            runtime_error = "Grader" + type(error).__name__
+    ended = now()
     receipt = write_receipt(args.run_dir, started, ended, args.model, output["framework_version"], runtime_error)
-    print(json.dumps({"passed": receipt["passed"], "check": receipt["check"],
+    print(json.dumps({"execution_complete": receipt["execution_complete"], "evaluation": receipt["evaluation"],
                       "receipt": "receipt.json in the private attempt directory",
                       "runtime_error": runtime_error}, sort_keys=True))
-    return 0 if receipt["passed"] else 1
+    return 0 if receipt["execution_complete"] else 1
 
 
 if __name__ == "__main__":

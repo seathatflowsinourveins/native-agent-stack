@@ -12,7 +12,7 @@ mkdir -p "$state" "$state/cache" "$state/downloads" "$state/runs" "$state/work" 
 chmod 700 "$state" "$state/cache" "$state/downloads" "$state/runs" "$state/work" "$state/config"
 exec 9>"$state/install.lock"
 flock 9
-export UV_CACHE_DIR="$state/cache/uv" UV_PYTHON_DOWNLOADS=never
+export UV_CACHE_DIR="$state/cache/uv" UV_PYTHON_DOWNLOADS=never PYTHONDONTWRITEBYTECODE=1
 export XDG_CACHE_HOME="$state/cache" XDG_CONFIG_HOME="$state/config"
 "$python_bin" "$recipe_dir/install_support.py" "$recipe_dir" "$prefix" "$state"
 if [[ ! -x "$prefix/venv/bin/python" ]]; then
@@ -28,7 +28,11 @@ fi
 uv pip install --python "$prefix/proxy-venv/bin/python" --require-hashes --only-binary=:all: --no-deps -r "$recipe_dir/proxy-requirements.lock"
 uv pip check --python "$prefix/venv/bin/python"
 uv pip check --python "$prefix/proxy-venv/bin/python"
+# DRB-II README installation: uv sync; retain its own native lock, separate from GPTR.
+grader_source="$prefix/grader-source/DeepResearch-Bench-II-b38f360603db9531b102aef8c166cedb8509b6f6"
+UV_PROJECT_ENVIRONMENT="$prefix/grader-venv" uv sync --locked --project "$grader_source" --python "$python_bin"
+uv pip check --python "$prefix/grader-venv/bin/python"
 "$prefix/venv/bin/python" -c 'from importlib.metadata import version; assert version("gpt-researcher") == "0.16.0"; from gpt_researcher.context.select import resolve_context_filter; assert resolve_context_filter("keyword") == "keyword"; print("source package 0.16.0; keyword filter import passed")'
 cp "$recipe_dir/pins.json" "$prefix/installation-pins.json"
 chmod 600 "$prefix/installation-pins.json"
-printf '%s\n' 'Installed source release v3.7.0 (package 0.16.0). Live acceptance remains unmeasured.'
+printf '%s\n' 'Installed GPT Researcher v3.7.0 and pinned DRB-II grader. Live acceptance remains unmeasured.'

@@ -1,5 +1,76 @@
 # Source review — 2026-09-27
 
+## Round 2 source decisions (recorded before implementation)
+
+The supplied `eval-frameworks/report.md` and `report2.md` select
+[DeepResearch-Bench-II at b38f360603db9531b102aef8c166cedb8509b6f6](https://github.com/imlrz/DeepResearch-Bench-II/tree/b38f360603db9531b102aef8c166cedb8509b6f6)
+for this direct report-producing worker. Adopt its unchanged evaluator prompt,
+rubric scoring and aggregation through the README's `uv sync` installation.
+The runner-up is [DeepResearch Bench I at 852f4022d1f98fb707222e395405136e8f0e8d52](https://github.com/Ayanami0730/deep_research_bench/tree/852f4022d1f98fb707222e395405136e8f0e8d52):
+RACE/FACT adds reference-report and citation-refetch contracts; it is not the
+selected information/analysis/presentation rubric contract. Neither supplies a
+direct GPT Researcher runner. Keep only report export, gateway transport and
+malformed-output rejection as local glue; remove the local fact-string verdict.
+
+Installed-client preflight found no GPT Researcher, OpenAI SDK or HTTPX in the
+builder's Python. No install or native acceptance is claimed. Release v3.7.0
+notes and exact source were rechecked. Search-first and find-skills discovery
+found the official outer-agent GPT Researcher skill again in the skills.sh
+search API; it does not establish an internal SKILL.md loader. No skill install
+was run. GitHub CLI authentication/network and web.open were unavailable;
+context-mode HTTPS fetched exact public source bytes into external scratch.
+The mapping's maintenance evidence is discovery evidence, not measured quality.
+
+Transport references are GPT Researcher `GenericLLMProvider.from_provider`
+at the existing source pin; [LangChain OpenAI 1.6.6 client injection](https://github.com/langchain-ai/langchain/blob/langchain-openai%3D%3D1.6.6/libs/partners/openai/langchain_openai/chat_models/base.py#L1022-L1034);
+[HTTPX 0.28.1 request hooks](https://github.com/encode/httpx/blob/0.28.1/docs/advanced/event-hooks.md);
+and DRB-II `gpt_client.py:85-138`. These expose the narrowly scoped transport
+seams needed for headers without editing upstream source. DRB-II's prompt
+specifies `results[]` objects with rubric_item, score (-1/0/1), reason and
+evidence; a closed JSON schema can enforce that existing wire contract.
+Native MCP calls already use `bind_tools`; native planner JSON is otherwise
+prompted free text with json_repair, a remaining upstream constraint gap.
+
+Use the upstream dataset's unchanged English task 12, including its original
+blocked-reference rules. Freeze full dataset, raw row and prompt SHA256 before
+any run. Keep scores as upstream scores: the evaluator defines no global binary
+pass threshold. Unit controls here test transport only and are not benchmark
+acceptance. No A/B superiority is claimed without matched real runs.
+
+Round-2 anti-pattern handoff for the coordinator's shared log (outside this
+worker's edit scope): exact fact strings in a locally written checker cannot
+provide the requested upstream research-quality verdict. The old four-test
+suite passed unchanged (exit 0), demonstrating only its local contracts.
+Missing evaluator rows and native evaluator error rows must also fail transport
+completion even when upstream's CLI exits zero. Controls below are retained
+with actual fail-first output after execution.
+
+Additional observed corrections: the read-only SQLite connection context in
+round 1 closed transactions but not the connection (Python emitted an unclosed
+connection ResourceWarning); use `contextlib.closing` and preserve the value-free
+read-only control. A synthetic native-CSV receipt control exposed that matching
+two report copies did not bind them to previously captured scores when both
+copies changed. It failed with `Changed report wrongly accepted alongside old
+upstream scores`, exit 1. The adapter now records the original report SHA256 and
+rechecks it against both exports and the worker result; the same control and the
+unit report-binding control then passed. These checks validate transport only.
+
+The exact DRB-II archive and each pinned file were independently verified
+against archive members. Unchanged `aggregate_scores.py` was executed on three
+synthetic controls using the frozen upstream task: score 1 produced total 1.0
+and blocked_rate 0.0; score 0 produced 0.0/0.0; score -1 produced 0.0/1.0.
+Every native aggregation command exited 0. This is execution of the upstream
+aggregation component, not a new model evaluation or benchmark-quality result.
+
+`PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py` found stale SHA256/byte
+counts for the twelve modified, already registered recipe/test files. The
+coordinator owns `manifests/evidence.json`, outside this worker's bounded file
+ownership. Keep this actual failure in the round-2 receipt; the coordinator
+must re-register the final owned files and new adapter/evidence files before
+publication. Do not replace that result with an imagined passing validation.
+
+## Round 1 source review (historical)
+
 Scope: a recipe only, on the foundation lane; no installation, provider request,
 service startup or git metadata changes. This worker is not adopted by catalog
 inclusion. Installed-client check: `importlib.util.find_spec('gpt_researcher')`

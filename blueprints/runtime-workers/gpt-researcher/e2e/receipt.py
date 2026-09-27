@@ -5,6 +5,7 @@ the nine call_logs columns explicitly authorized in the worker brief.
 Native tool observations follow gpt_researcher/mcp/research.py:93,123 at v3.7.0.
 """
 from collections import Counter
+from contextlib import closing
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -16,6 +17,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from mcp_proxy import POLICY
 from check import check
+from grader import read_grade
 
 SQL = """SELECT timestamp, path, status, model, reasoning_effort_requested,
 reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning
@@ -29,7 +31,7 @@ COLUMNS = ("timestamp", "path", "status", "model", "reasoning_effort_requested",
 def gateway_rows(database, started, ended, model):
     # No fallback schema queries, auth stores, or other tables/columns.
     try:
-        with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True, timeout=5) as connection:
+        with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True, timeout=5)) as connection:
             rows = connection.execute(SQL, (started, ended)).fetchall()
     except (OSError, sqlite3.Error):
         return {"status": "unavailable", "rows": [], "error": "read_only_call_logs_query_failed"}
@@ -81,11 +83,17 @@ def write_receipt(run_dir, started, ended, model, version, runtime_error=None, d
     recipe = Path(__file__).resolve().parents[1]
     pins = json.loads((recipe / "pins.json").read_text())
     result_path = run_dir / "result.json"
-    result = json.loads(result_path.read_text())
-    verdict = check(result)  # Re-evaluate frozen oracle, not a wrapper's 'passed' field.
-    public_verdict = {key: value for key, value in verdict.items() if key != "fetched_cited_urls"}
-    public_verdict["fetched_cited_url_sha256"] = [hashlib.sha256(url.encode()).hexdigest()
-                                                 for url in verdict["fetched_cited_urls"]]
+    try:
+        result = json.loads(result_path.read_text())
+    except (OSError, ValueError):
+        result = {}
+        runtime_error = runtime_error or "MalformedResult"
+    sanity = check(result)
+    try:
+        evaluation = read_grade(run_dir)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        evaluation = {"status": "unavailable_or_malformed", "harness": "DeepResearch-Bench-II",
+                      "commit": pins["grader"]["commit"]}
     gateway = gateway_rows(database or Path.home() / ".local/share/omniroute/storage.sqlite", started, ended, model)
     observed = native_observations(run_dir / "native.log")
     model_rows = [row for row in gateway["rows"] if row["model"] in (model, model.split("/", 1)[-1])]
@@ -94,30 +102,39 @@ def write_receipt(run_dir, started, ended, model, version, runtime_error=None, d
                        and row["reasoning_effort_upstream"] == "max" for row in model_rows)
     qmd_seen = any(item["server"] == "qmd" and item["nonempty_returns"] for item in observed)
     artifact_hashes = {}
-    for filename in ("result.json", "report.md", "native.log", "native-events.jsonl", "stdout.log", "stderr.log"):
+    for filename in ("result.json", "report.md", "native.log", "native-events.jsonl", "stdout.log", "stderr.log",
+                     "tasks-and-rubrics.jsonl", "drb-result.jsonl", "grade-summary.json", "grader-native.log",
+                     "grader-stdout.log", "grader-stderr.log", "scores_inforecall.csv", "scores_analysis.csv",
+                     "scores_presentation.csv", "scores_total.csv", "scores_blocked.csv"):
         path = run_dir / filename
         if path.exists():
             artifact_hashes[filename] = hashlib.sha256(path.read_bytes()).hexdigest()
     receipt = {
-        "schema_version": 1, "evidence_class": "local integration; native host run",
+        "schema_version": 2, "evidence_class": "local transport integration; native worker and upstream grading attempt",
         "framework": {"name": "gpt-researcher", "release": pins["release"],
                       "commit": pins["commit"], "installed_package_version": version},
         "window": {"started": started, "ended": ended},
         "gateway": gateway,
+        "worker_responses_max_corroborated": corroborated,
         "mcp_calls": {"source": "upstream gpt_researcher.mcp.research INFO records",
                       "observed": observed, "qmd_nonempty_return_observed": bool(qmd_seen)},
-        "skills": {"observed": [], "status": "SKILL.md loader not found in pinned runtime; none claimed"},
-        "check": public_verdict,
+        "skills": {"listed_at_start": [], "activation_events": [],
+                   "status": "SKILL.md loader not found in pinned runtime; no native skill activation claimed"},
+        "report_sanity": sanity,
+        "evaluation": evaluation,
         "runtime_error_class": runtime_error,
         "source_archive_sha256": pins["source_archive"]["sha256"],
         "dependency_lock_sha256": pins["locks"],
         "private_artifact_sha256": artifact_hashes,
-        "passed": verdict["passed"] and runtime_error is None and corroborated and bool(qmd_seen),
+        "execution_complete": evaluation["status"] == "graded" and runtime_error is None and sanity["ready_for_grading"],
         "limitations": [
             "Gateway rows corroborate a time window, not an exclusive per-run attribution.",
-            "Fresh per-logical-call Idempotency-Key is not provided by static upstream JSON configuration.",
+            "Fresh keys are supplied per SDK generation; native outer retries are new generation attempts, not deduplicated replays.",
             "Request headers and omitted temperature need independent host wire inspection; allowed DB columns cannot prove them.",
-            "No native SKILL.md loading, GPU acceptance, or measured token-saving comparison is claimed."
+            "DRB-II provides rubric scores, not a global binary quality threshold; execution_complete is not a quality verdict.",
+            "Native free-text JSON planning uses upstream json_repair; constrained planner schemas are not available through this recipe.",
+            "Upstream grader usage omits failed-attempt consumption; retain gateway/provider observations separately.",
+            "No native SKILL.md loading, GPU acceptance, or measured A/B or token-saving comparison is claimed."
         ],
         "sanitization": "No raw report, source bodies, tool arguments, host paths, emails, session IDs or request IDs; unexpected column text redacted."
     }
