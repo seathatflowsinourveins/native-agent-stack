@@ -5,7 +5,8 @@ and `namedScores` (promptfoo@0.123.1:site/docs/configuration/expected-outputs/py
 li26's: eval_arm.parse_items (valid, fenced_valid or invalid) and analyze.filing_scores (TP/FP/FN). Loading
 li26's analyze.py only runs its imports and loads eval_arm.py (analyze.py:23-31). Pass means parse_items
 returned items (valid or fenced_valid, both of which li26 scores) and promptfoo's rendered prompt is the one
-recorded for this filing. Strict-schema validity (status valid) is a separate named score.
+recorded for this filing. li26's parse status is a separate named score; it is not strict-schema validity, which
+the configs' second assertion, promptfoo's is-json with the schema the request sends, decides (build_r02.config).
 """
 import hashlib
 import importlib.util

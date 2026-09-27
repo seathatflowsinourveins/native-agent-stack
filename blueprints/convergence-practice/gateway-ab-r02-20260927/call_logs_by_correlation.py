@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Effort and status OmniRoute recorded for given correlation ids, from call_logs (read-only).
+"""Effort and status OmniRoute recorded for given correlation ids, from call_logs (read-only), as a settled snapshot.
 
 Based on the session's effort_window.py, which selects the same effort columns, keyed by correlation id instead
 of a time window: other gateway clients call the same models in the same window. OmniRoute lines below were
@@ -16,23 +16,32 @@ first relayed by the gateway owner and then read from the pinned commit object (
   reasoning, from the client and upstream request bodies (src/lib/usage/callLogs.ts:634-653); otherwise they
   are NULL, so a NULL is no observation of effort, never "no effort";
 - the gateway writes one row per attempt under the same correlation id: each attempt's row gets a fresh
-  primary key (open-sse/handlers/chatCore/attemptLogging.ts:549-557, 611), stamped with its write time
-  (src/lib/usage/callLogs.ts:680, as toISOString).
+  primary key (open-sse/handlers/chatCore/attemptLogging.ts:549-557, 611).
 
-Final-row rule. An id's rows are ordered by timestamp and then by SQLite rowid, the insertion order, which the
-query uses only to order and never returns. The rows are numbered in that order (`attempt` 1..`attempts`), and the
-last one, the last attempt written, is the call's final row (`final`). Several rows for one id are gateway
-attempts, never separate calls: promptfoo sends one request per call with maxRetries 0.
+No attempt order. The gateway starts each attempt's save without awaiting it (attemptLogging.ts:557-618), stamps
+the row's timestamp after awaited lookups (src/lib/usage/callLogs.ts:538, 597, 602, 680) and inserts it only after
+an awaited artifact write (:759, 824). So neither timestamp nor insertion order shows which attempt came last, and
+this script reports an id's rows without numbering them or marking one as final; the query orders them only to
+make the output stable. analyze_r02.py takes each call's terminal row from the client's own outcome.
+
+Settled snapshot. The gateway drains pending saves with waitForCallLogSaves (callLogs.ts:878-896), in-process and,
+outside its tests, only from graceful shutdown (closeCallLogSaves, :898-910, with a 2 s default budget, called
+from src/lib/gracefulShutdown.ts:114, 129); its own tests wait up to 10 s (tests/unit/call-log-save-drain.test.ts:
+39). A reader of the shared running gateway cannot call it, so this script reads the rows, waits
+--settle-seconds (default 30, fifteen times the shutdown budget) and reads again until two consecutive reads are
+equal, for at most --max-wait-seconds (default 600). Run it after both runs have finished. A save whose error the
+gateway swallows (attemptLogging.ts:618) never lands, and no snapshot can show it. The output records the reads,
+whether they settled, the interval and the bound; analyze_r02.py treats an unsettled snapshot or an interval
+under 30 s as an integrity problem. The exit code is 3 when the reads did not settle.
 
 Selects only correlation_id, timestamp, status, model, reasoning_effort_requested and reasoning_effort_upstream:
 no account, connection, token or path column. The database is opened with SQLite's mode=ro URI parameter.
 
-Usage: call_logs_by_correlation.py <db_path> <ids_json> [--rows]
-<ids_json> maps an arm label to its correlation ids, as `analyze_r02.py ids` writes it. The JSON output has, per
-arm, the id, matched-id and row counts, rows per id, the retried ids (more than one row), counts by (status,
-model, requested, upstream) over the final rows and over all rows, and the unmatched ids; --rows adds every
-matched row with its attempt number, attempt count and final flag. Correlation ids are private run data: keep
-the output out of the repository.
+Usage: call_logs_by_correlation.py <db_path> <ids_json> [--rows] [--settle-seconds S] [--max-wait-seconds S]
+<ids_json> maps an arm label to its correlation ids, as `analyze_r02.py ids` writes it. The JSON output has the
+snapshot record and, per arm, the id, matched-id and row counts, rows per id, the ids with more than one row,
+counts by (status, model, requested, upstream) over all rows, and the unmatched ids; --rows adds every matched
+row, which analyze_r02.py needs. Correlation ids are private run data: keep the output out of the repository.
 """
 import argparse
 from collections import Counter
@@ -40,17 +49,22 @@ import json
 from pathlib import Path
 import sqlite3
 import sys
+import time
 
 COLUMNS = ("correlation_id", "timestamp", "status", "model", "reasoning_effort_requested",
            "reasoning_effort_upstream")
-# rowid orders an id's rows by insertion when timestamps tie; it is not selected (the final-row rule above).
+# Every selected column orders the rows, so equal reads compare equal; the order is not an attempt order.
 QUERY = ("SELECT correlation_id, timestamp, status, model, reasoning_effort_requested, reasoning_effort_upstream "
-         "FROM call_logs WHERE correlation_id IN ({}) ORDER BY correlation_id, timestamp, rowid")
+         "FROM call_logs WHERE correlation_id IN ({}) ORDER BY correlation_id, timestamp, status, model, "
+         "reasoning_effort_requested, reasoning_effort_upstream")
 BATCH = 500
+SETTLE_SECONDS = 30
+MAX_WAIT_SECONDS = 600
+EXIT_UNSETTLED = 3
 
 
 def lookup(db_path, ids):
-    """Rows for the given ids, as dicts of COLUMNS, each id's rows in (timestamp, rowid) order."""
+    """Rows for the given ids, as dicts of COLUMNS, in the query's order."""
     unique = sorted(set(ids))
     connection = sqlite3.connect(Path(db_path).expanduser().resolve().as_uri() + "?mode=ro", uri=True)
     try:
@@ -63,14 +77,18 @@ def lookup(db_path, ids):
     return [dict(zip(COLUMNS, row)) for row in rows]
 
 
-def number_attempts(rows):
-    """Each id's rows, in lookup order, numbered as attempts; the last is the call's final row."""
-    by_id = {}
-    for row in rows:
-        by_id.setdefault(row["correlation_id"], []).append(row)
-    return {identifier: [dict(row, attempt=index + 1, attempts=len(group), final=index == len(group) - 1)
-                         for index, row in enumerate(group)]
-            for identifier, group in by_id.items()}
+def settled_lookup(db_path, ids, interval=SETTLE_SECONDS, max_wait=MAX_WAIT_SECONDS, sleep=time.sleep,
+                   clock=time.monotonic):
+    """lookup() repeated every `interval` seconds until two consecutive reads are equal or the next read would
+    pass `max_wait` seconds; returns the last read and the snapshot record."""
+    deadline = clock() + max_wait
+    rows, reads = lookup(db_path, ids), 1
+    settled = False
+    while not settled and clock() + interval <= deadline:
+        sleep(interval)
+        again, reads = lookup(db_path, ids), reads + 1
+        settled, rows = again == rows, again
+    return rows, {"reads": reads, "settled": settled, "interval_seconds": interval, "max_wait_seconds": max_wait}
 
 
 def row_counts(rows):
@@ -82,7 +100,9 @@ def row_counts(rows):
 
 
 def summarize(arms, rows, include_rows=False):
-    by_id = number_attempts(rows)
+    by_id = {}
+    for row in rows:
+        by_id.setdefault(row["correlation_id"], []).append(row)
     report = {}
     for arm, ids in sorted(arms.items()):
         unique = sorted(set(ids))
@@ -93,8 +113,7 @@ def summarize(arms, rows, include_rows=False):
             "ids_matched": sum(identifier in by_id for identifier in unique),
             "rows": len(matched),
             "rows_per_id": dict(sorted(Counter(len(by_id.get(identifier, [])) for identifier in unique).items())),
-            "retried_ids": [identifier for identifier in unique if len(by_id.get(identifier, [])) > 1],
-            "final_rows_by_status_model_requested_upstream": row_counts([row for row in matched if row["final"]]),
+            "ids_with_several_rows": [identifier for identifier in unique if len(by_id.get(identifier, [])) > 1],
             "all_rows_by_status_model_requested_upstream": row_counts(matched),
             "unmatched": [identifier for identifier in unique if identifier not in by_id],
         }
@@ -109,14 +128,17 @@ def main(argv=None):
     parser.add_argument("db_path")
     parser.add_argument("ids_json")
     parser.add_argument("--rows", action="store_true", help="include every matched row")
+    parser.add_argument("--settle-seconds", type=float, default=SETTLE_SECONDS)
+    parser.add_argument("--max-wait-seconds", type=float, default=MAX_WAIT_SECONDS)
     args = parser.parse_args(argv)
     arms = json.loads(Path(args.ids_json).read_text())
     if not isinstance(arms, dict) or not all(isinstance(ids, list) and all(isinstance(value, str) for value in ids)
                                              for ids in arms.values()):
         raise SystemExit("ids_json must map an arm label to a list of correlation id strings")
-    rows = lookup(args.db_path, [identifier for ids in arms.values() for identifier in ids])
-    print(json.dumps(summarize(arms, rows, args.rows), indent=2))
-    return 0
+    rows, snapshot = settled_lookup(args.db_path, [identifier for ids in arms.values() for identifier in ids],
+                                    args.settle_seconds, args.max_wait_seconds)
+    print(json.dumps({"snapshot": snapshot, "arms": summarize(arms, rows, args.rows)}, indent=2))
+    return 0 if snapshot["settled"] else EXIT_UNSETTLED
 
 
 if __name__ == "__main__":

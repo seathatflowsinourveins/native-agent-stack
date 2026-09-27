@@ -10,13 +10,21 @@ Glue only. Every piece configures an upstream component and names it:
   per-filing object without `accession`), never hand-copied;
 - li26's own code loads the acquisition (eval_arm.load_inputs) and builds each filing's prompt
   (eval_arm.prompt_template and MARKER). The prompt's sha256 goes into the private tests file, so the
-  prompt function and the assertion can check each call against it.
+  prompt function and the assertion can check each call against it;
+- strict-schema validity is promptfoo's own is-json assertion with the same schema the request sends
+  (promptfoo@0.123.1 dist/src/evaluator-DlYW7Rgb.js:2509-2545, registered at :5523), at its default weight: a
+  weight of 0 would turn its pass into true (:5790-5793).
 
-Standard library only.
+`frozen` hashes the harness and every repository file the harness executes, and fails when the frozen code loads
+a repository module outside that set (module_closure: every file passed to importlib.util.spec_from_file_location
+and every imported module file inside the repository, from a fresh interpreter). `promptfoo` records or checks the
+installed promptfoo build that `promptfoo` on PATH runs: its version, a digest of the package files outside
+node_modules and the Node version. Standard library only.
 
   build_r02.py configs [--check]
   build_r02.py subset --acquisition DIR --state-dir DIR [--update-plan | --check]
   build_r02.py frozen [--update-plan | --check]
+  build_r02.py promptfoo [--update-plan | --check]
 """
 from __future__ import annotations
 
@@ -28,6 +36,8 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 
 HERE = Path(__file__).resolve().parent
@@ -55,7 +65,35 @@ UPSTREAM_INPUTS = ("blueprints/convergence-practice/local-inference-latest-20260
                    "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py",
                    "blueprints/convergence-practice/local-inference-latest-20260926/prompt.txt",
                    "blueprints/convergence-practice/local-inference-latest-20260926/plan.json",
-                   "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json")
+                   "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json",
+                   # li26's eval_arm.py executes it (eval_arm.py:54-56); it imports only pathlib and stat.
+                   "scripts/path_safety.py")
+# Each Python entry point of the harness and the function that loads its lazily loaded li26 module.
+ENTRY_POINTS = (("prompt_r02.py", "_eval_arm"), ("assert_r02.py", "_analyze"), ("analyze_r02.py", "li26"),
+                ("build_r02.py", "load_li26"), ("call_logs_by_correlation.py", None))
+CLOSURE_PROBE = """
+import importlib.util, json, sys
+from pathlib import Path
+repo, entries = Path(sys.argv[1]).resolve(), json.loads(sys.argv[2])
+seen, original = set(), importlib.util.spec_from_file_location
+def recording(name, location=None, *args, **kwargs):
+    if location is not None:
+        seen.add(Path(location).resolve())
+    return original(name, location, *args, **kwargs)
+importlib.util.spec_from_file_location = recording
+for path, loader in entries:
+    spec = importlib.util.spec_from_file_location("r02_closure_" + Path(path).stem, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if loader:
+        getattr(module, loader)()
+seen |= {Path(module.__file__).resolve() for module in list(sys.modules.values())
+         if isinstance(getattr(module, "__file__", None), str)}
+print(json.dumps(sorted(path.relative_to(repo).as_posix() for path in seen if path.is_relative_to(repo))))
+"""
+PROMPTFOO_SCOPE = ("files of the promptfoo package that `promptfoo` on PATH runs, outside node_modules (its dist "
+                   "build and package metadata), as sha256 over the sorted '<relative path>\\0<file sha256>\\n' "
+                   "lines; node_modules is not hashed")
 
 
 def sha256_bytes(raw):
@@ -146,7 +184,9 @@ def config(order, schema, url=GATEWAY_URL):
         "description": f"R02 gateway A/B (FW effort), arm order {'-'.join(arms)} per filing",
         "prompts": ["file://prompt_r02.py:build_prompt"],
         "providers": [provider(arm, schema, url) for arm in arms],
-        "defaultTest": {"assert": [{"type": "python", "value": "file://assert_r02.py:get_assert"}]},
+        # li26's scorer, then the sent schema checked by promptfoo's is-json; analyze_r02.py reads both per row.
+        "defaultTest": {"assert": [{"type": "python", "value": "file://assert_r02.py:get_assert"},
+                                   {"type": "is-json", "value": schema}]},
     }
 
 
@@ -266,6 +306,49 @@ def frozen_record():
     return record
 
 
+def module_closure():
+    """Repository-relative paths of every file the harness's Python entry points load, from a fresh interpreter."""
+    entries = [[str(HERE / name), loader] for name, loader in ENTRY_POINTS]
+    completed = subprocess.run([sys.executable, "-c", CLOSURE_PROBE, str(REPO), json.dumps(entries)],
+                               capture_output=True, text=True, check=True, timeout=120)
+    return json.loads(completed.stdout)
+
+
+def closure_problems(closure, record):
+    return [path for path in closure if path not in record]
+
+
+def promptfoo_package(executable=None):
+    """The root of the promptfoo package that `promptfoo` on PATH (or `executable`) runs."""
+    executable = shutil.which("promptfoo") if executable is None else executable
+    if executable is None:
+        raise SystemExit("promptfoo is not on PATH")
+    for parent in Path(executable).resolve().parents:
+        manifest = parent / "package.json"
+        if manifest.is_file() and json.loads(manifest.read_text()).get("name") == "promptfoo":
+            return parent
+    raise SystemExit("the promptfoo on PATH does not resolve into a promptfoo package")
+
+
+def tree_digest(root, excluded=("node_modules",)):
+    """sha256 over sorted '<relative path>\\0<file sha256>\\n' lines of the files under root, skipping the excluded
+    top-level directories; and the number of files."""
+    lines = sorted(f"{path.relative_to(root).as_posix()}\0{sha256_file(path)}\n" for path in root.rglob("*")
+                   if path.relative_to(root).parts[0] not in excluded and path.is_file())
+    return sha256_bytes("".join(lines).encode()), len(lines)
+
+
+def promptfoo_record(executable=None, node=None):
+    root = promptfoo_package(executable)
+    node = shutil.which("node") if node is None else node
+    if node is None:
+        raise SystemExit("node is not on PATH")
+    digest, files = tree_digest(root)
+    version = subprocess.run([node, "--version"], capture_output=True, text=True, check=True, timeout=60)
+    return {"version": json.loads((root / "package.json").read_text())["version"], "node": version.stdout.strip(),
+            "package_tree_sha256": digest, "package_files": files, "scope": PROMPTFOO_SCOPE}
+
+
 def update_plan(key, value):
     plan = json.loads(PLAN.read_text())
     plan[key] = value
@@ -293,6 +376,10 @@ def main(argv=None):
     frozen_mode = frozen.add_mutually_exclusive_group()
     frozen_mode.add_argument("--update-plan", action="store_true")
     frozen_mode.add_argument("--check", action="store_true")
+    build = commands.add_parser("promptfoo", help="record or check the installed promptfoo build and Node version")
+    build_mode = build.add_mutually_exclusive_group()
+    build_mode.add_argument("--update-plan", action="store_true")
+    build_mode.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
 
     if args.command == "configs":
@@ -313,8 +400,18 @@ def main(argv=None):
         elif args.check:
             check_plan("subset", record)
         print(json.dumps({"strata": record["strata"], "tests_files": record["tests_files"]}, indent=2))
+    elif args.command == "promptfoo":
+        record = promptfoo_record()
+        if args.update_plan:
+            update_plan("promptfoo_build", record)
+        elif args.check:
+            check_plan("promptfoo_build", record)
+        print(json.dumps(record, indent=2))
     else:
         record = frozen_record()
+        outside = closure_problems(module_closure(), record)
+        if outside:
+            raise SystemExit("the harness loads repository files outside the frozen inputs: " + ", ".join(outside))
         if args.update_plan:
             update_plan("frozen_inputs", record)
         elif args.check:
