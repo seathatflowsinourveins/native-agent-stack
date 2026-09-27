@@ -37553,8 +37553,8 @@
     },
     {
       "path": "observability/collector/codex-identity-launcher.sh.example",
-      "sha256": "c4b9bc8a880d0e0212604e20ae4046e1e3a8fe01cfae37773cf6e48efefedeac",
-      "bytes": 3517
+      "sha256": "fc52db22a3a0176291427fb687b8bbfebc02bae0dada0b185a08fb7b69916c9d",
+      "bytes": 3874
     },
     {
       "path": "observability/collector/codex.toml.example",
