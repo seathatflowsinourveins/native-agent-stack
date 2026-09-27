@@ -61,6 +61,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "receipt-staleness.yml",
             "saturation-tracking.yml",
             "practice-references-freshness.yml",
+            "runtime-worker-skills-freshness.yml",
         }
         self.assertEqual(
             actual, expected,
