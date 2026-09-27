@@ -83,8 +83,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T13:10:37Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -1626,8 +1626,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T14:39:22Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -1676,8 +1676,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T13:10:37Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -3219,8 +3219,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T14:39:22Z",
+                "pass": 4
               },
               "qualified_models": []
             }
