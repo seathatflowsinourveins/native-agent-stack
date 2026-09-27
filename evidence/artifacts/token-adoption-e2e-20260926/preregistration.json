@@ -1,0 +1,3200 @@
+{
+  "schema_version": 1,
+  "status": "preregistered_not_run",
+  "source_specifications": [
+    "AA §3.1c/d, §3.2, §5, §7, §8.1–§8.5, §9.2, §10, Q1–Q4",
+    "full-save §4.0, §4.3–§4.6, §5 step 9"
+  ],
+  "reference_revision": "34c56340 (integrator-supplied base; no git inspection by builder)",
+  "arm_order": {
+    "claude": [
+      "B",
+      "A",
+      "A0"
+    ],
+    "codex": [
+      "B",
+      "A",
+      "N"
+    ]
+  },
+  "identity_format": "<run>.<arm>.<task>.<attempt>",
+  "required_lanes": {
+    "ctx-containment": {
+      "metrics": [
+        "M3",
+        "M5"
+      ],
+      "eligibility": "Output likely over 5,120 bytes; a derived answer suffices. AA §5 excludes edit bytes, original line citations and frozen exact-byte requirements."
+    },
+    "fetch": {
+      "metrics": [
+        "M4"
+      ],
+      "eligibility": "Multi-page web documentation question, AA §5; remote nested fetches remain in the denominator."
+    },
+    "rtk-claude": {
+      "metrics": [
+        "M6"
+      ],
+      "eligibility": "Claude task has an RTK-supported shell observation outside the exactness exceptions; acceptance exits run raw/proxy. PR-A owns part classification."
+    },
+    "rtk-codex": {
+      "metrics": [
+        "M6c"
+      ],
+      "eligibility": "Codex task needs supported shell inventory/read commands; exceptions are excluded from coverage denominator."
+    },
+    "toon-seeded": {
+      "metrics": [
+        "M7"
+      ],
+      "eligibility": "A seeded uniform array of at least five flat records must enter context; strict round trip is checked."
+    },
+    "symbol-references": {
+      "metrics": [
+        "M8"
+      ],
+      "eligibility": "Definition/reference question in the starting client's own indexed checkout; capability/source binding must pass."
+    },
+    "qmd": {
+      "metrics": [
+        "M8"
+      ],
+      "eligibility": "Answer lies in the named indexed catalog collections. The reused release-repin gap is excluded from this lane."
+    },
+    "ai-memory": {
+      "metrics": [
+        "M8"
+      ],
+      "eligibility": "Prior project decision/history with a scoped source witness, checked as untrusted history."
+    },
+    "adoption": {
+      "metrics": [
+        "M1",
+        "M2"
+      ],
+      "eligibility": "Non-blind, non-scout child-task with at least one eligible token lane; M1 is assessed separately per required retrieval/containment lane."
+    },
+    "guidance": {
+      "metrics": [
+        "M11"
+      ],
+      "eligibility": "Any preregistered child launch with a frozen route/carrier."
+    },
+    "blind": {
+      "metrics": [
+        "M12"
+      ],
+      "eligibility": "Stripped blind packet; controls never contribute to the five organic opportunities."
+    },
+    "binding": {
+      "metrics": [
+        "M13"
+      ],
+      "eligibility": "Organic Codex child-task with a per-tree sentinel; the separate 2 worktrees x 20 probe repetitions do not count here."
+    },
+    "attribution": {
+      "metrics": [
+        "M14"
+      ],
+      "eligibility": "Child-task with client/session/call identity and native transcript."
+    },
+    "mcp-errors": {
+      "metrics": [
+        "M15"
+      ],
+      "eligibility": "Task with an eligible granted MCP lane; classify infrastructure failures by server independently of command exits."
+    }
+  },
+  "arm_b_opportunity_counts": {
+    "ctx-containment": 14,
+    "fetch": 10,
+    "rtk-claude": 8,
+    "rtk-codex": 6,
+    "toon-seeded": 10,
+    "symbol-references": 9,
+    "qmd": 5,
+    "ai-memory": 7,
+    "adoption": 44,
+    "guidance": 71,
+    "blind": 5,
+    "binding": 5,
+    "attribution": 71,
+    "mcp-errors": 40
+  },
+  "optional_lanes": [
+    "repomix",
+    "markitdown",
+    "headroom",
+    "toon-natural",
+    "socraticode",
+    "codebase-memory (blocked until Q3)"
+  ],
+  "no_tool_names_denylist": [
+    "rtk",
+    "RTK proxy",
+    "Rust Token Killer",
+    "ctx_execute",
+    "ctx_batch_execute",
+    "ctx_execute_file",
+    "ctx_search",
+    "ctx_fetch_and_index",
+    "ctx_index",
+    "ctx_stats",
+    "ctx-execute",
+    "ctx-batch-execute",
+    "ctx-execute-file",
+    "ctx-search",
+    "ctx-fetch-and-index",
+    "context-mode",
+    "context mode",
+    "context_mode",
+    "contextmode",
+    "serena",
+    "jcodemunch",
+    "jcodemunch-mcp",
+    "jCodeMunch",
+    "jcode munch",
+    "jcode_munch",
+    "qmd",
+    "ai-memory",
+    "ai memory",
+    "ai_memory",
+    "headroom",
+    "toon",
+    "repomix",
+    "markitdown",
+    "mark it down",
+    "socraticode",
+    "socrati code",
+    "codebase-memory",
+    "codebase-memory-mcp",
+    "codebase memory",
+    "codebase_memory",
+    "WebFetch",
+    "web fetch",
+    "web_fetch",
+    "ast-grep",
+    "ast_grep",
+    "ast grep",
+    "context-hub",
+    "context hub",
+    "context_hub",
+    "chub",
+    "mcporter",
+    "ccusage",
+    "agentsview",
+    "agents view",
+    "claude-hud",
+    "claude hud",
+    "otel-tui",
+    "otel tui",
+    "opentelemetry-collector-contrib",
+    "otelcol-contrib",
+    "prometheus",
+    "promtool",
+    "loki",
+    "grafana",
+    "omniroute",
+    "gpt-tokenizer",
+    "find_symbol",
+    "find_referencing_symbols",
+    "codebase_search",
+    "memory_query",
+    "headroom_compress",
+    "headroom_retrieve",
+    "get_session_stats",
+    "search_symbols",
+    "get_symbol_source",
+    "get_current_config",
+    "codebase_health",
+    "codebase_status",
+    "memory_status",
+    "search_graph",
+    "trace_path"
+  ],
+  "denylist_sources": [
+    "docs/token-efficiency-stack.json#/rows/*/component_id",
+    "docs/token-session-handbook.md:106–151"
+  ],
+  "fixture_provenance": [
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "source": "fixtures/headroom-records.json",
+      "change": "Byte-for-byte neutral-path copy of the 24 flat public synthetic records; AA §8.1 seeded uniform tables."
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "source": "AA §8.1 large-log and acceptance seeds; record shape follows fixtures/headroom-records.json; local synthetic fixture, not upstream acceptance.",
+      "definition": "640 ordered records; event=1..640; level ERROR if divisible by 64, otherwise WARN if divisible by 10, otherwise INFO; value=event modulo 17; fixed public message.",
+      "expected_bytes": 84003,
+      "expected_lines": 640
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/run-efba31d5.patch",
+      "source": "Existing retained retrieval-quality-v2 patch; AA §8.2 large-diff review scenario.",
+      "expected_bytes": 52631,
+      "expected_hunks": 31,
+      "expected_added_lines": 166,
+      "expected_deleted_lines": 581
+    }
+  ],
+  "receipt_sources": [
+    {
+      "path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "sha256": "8b28bf87f8da27aa5a73e36a4ede1b7707ee4e4b21f31b397f1de1197061897b",
+      "entries": 16,
+      "distinct_tools": 16
+    },
+    {
+      "path": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "sha256": "7157e0e668f61cbc6785c9d632d7123013fe85936f1e965018775762ca57b04f",
+      "entries": 17,
+      "distinct_tools": 15
+    }
+  ],
+  "dispatch_policy": {
+    "workflow": "Only Claude workflow tasks, in manifest order, with task_text as the entire agent prompt. Only frozen neutral input/worktree/run placeholders may be bound; no receipt excerpts or LANES block are appended.",
+    "codex": "Separate shell/native launch matrix, never this workflow script. source-scout and evidence-reviewer are Claude-only lanes; the reused Codex exec information needs do not bind those role names (codex_role_exclusions).",
+    "blind": "Five organic packets plus one positive control, B only; strict process repeats all six outside the workflow after Q1.",
+    "attempts": "Initial attempt 1; every retry gets a new identity-table attempt, with all failures and usage retained. No silent retry or counter reset.",
+    "blocked_tasks": "Retain blocked information needs in their planned slots; any selected blocked task stops the whole organic launch before the first child. Do not silently filter it or infer a pass."
+  },
+  "tasks": [
+    {
+      "id": "reuse-296-00",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-verifier",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Command-output fidelity",
+      "task_text": "In <assigned-worktree>, report the newest commit subject, branch state, changed-file summary over the last five revisions, directory inventory, matches for def register_file under scripts, and the tests.test_host_requests outcome including count and status. Answer from the selected command outputs and compare against retained exact originals.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/0",
+          "tool": "rtk"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "rtk-claude",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "The newest commit subject, tests.test_host_requests test count and result status exactly match independently retained raw originals, as in the receipt's actual checker. Retain all six observation outputs, exits and failures. Historical counts are not the new run's expected counts.",
+      "source_note": "Task information need from source task/commands; checker fields from the same receipt's answer_excerpt/notes_excerpt. Original tool-prescribing commands remain provenance, not prompt guidance.",
+      "worktree_required": true,
+      "pre_run_input_gate": "The committed source receipts truncate the original six-command inventory; #343 retains four measured observation commands and its notes/check record the test. Recover and seal the exact six original observation identities and inputs before capability probes; unresolved entries block launch. Do not choose substitute commands or test modules after seeing results. Any changed information need requires a merged protocol amendment."
+    },
+    {
+      "id": "reuse-296-01",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large handbook summary",
+      "task_text": "For docs/grand-catalog-handbook.md, report the number of second-level headings, the first ten in order, and the number of lines containing the word token, case-insensitively. Return only those fields.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/1",
+          "tool": "context-mode"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "ctx-containment",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Compare all three fields with a direct line scan of the frozen original, including heading order.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-02",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Selected-history round trip",
+      "task_text": "For the retained 150-entry history report at <retained-input>, produce a compact representation, recover the complete original, and report whether its bytes match. Keep the original out of the answer.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/2",
+          "tool": "headroom"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Recovered original SHA256 and byte count equal the retained raw report; failed compression/recovery remains a failure, not an empty success.",
+      "source_note": "No default role grant; report M10 N/A and explain any invocation.",
+      "input_required": true,
+      "input_binding": "Freeze the retained original report's private neutral pathname, source revision and SHA256 before probes; identical bytes across arms. Missing originals gate the run, not replacement with a new report."
+    },
+    {
+      "id": "reuse-296-03",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "evidence-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Definition retrieval",
+      "task_text": "Locate register_file in scripts/host_receipts.py and return its definition and source location from this checkout.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/3",
+          "tool": "jcodemunch"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "symbol-references",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Definition text and location equal the function in the frozen original, using Python AST source extraction as the independent check.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-04",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Release pin decision",
+      "task_text": "Find which document states how a new machine pins a release and report the exact step. Explain whether the indexed catalog actually contains that instruction.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/4",
+          "tool": "qmd"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Answer agrees with adoption/update.md and its linked bootstrap step; an index coverage gap is stated rather than a fabricated catalog hit.",
+      "source_note": "Original index-coverage failure retained; not a qmd-eligible opportunity."
+    },
+    {
+      "id": "reuse-296-05",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "evidence-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Definition and references",
+      "task_text": "Locate register_file in scripts/host_receipts.py and list its definition and referencing call sites. Distinguish invocations, imports and textual mentions.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/5",
+          "tool": "serena"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "symbol-references",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Definition and each listed call site agree with original source; comments and string literals do not count as invocations.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-06",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Request trust boundary",
+      "task_text": "Explain how the host request lane decides whether a GitHub request is trusted, naming the author_association and user.type conditions in scripts/host_requests.py.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/6",
+          "tool": "socraticode"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Conditions agree with the frozen scripts/host_requests.py implementation and recipes/host-request-lane.md; quote exact source locations.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-07",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Historical host-lane decision",
+      "task_text": "Retrieve the earlier project decision about the workstation host request lane and GitHub. State its source and what it does and does not establish now.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/7",
+          "tool": "ai-memory"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "ai-memory",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Retain an actual scoped historical hit and verify its claim against recipes/host-request-lane.md; no savings counter or current authority is inferred.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-08",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Selected-file overview",
+      "task_text": "Using scripts/host_requests.py and scripts/credential_status.py as source code only, list all top-level functions in the former. Verify the list against the complete original.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/8",
+          "tool": "repomix"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Exact set equals AST top-level FunctionDef/AsyncFunctionDef names, including status_body; omissions in an outline fail.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-09",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Structured table fidelity",
+      "task_text": "Read the frozen array at <retained-input>. Return its 60 flat records in a compact structured representation and demonstrate exact recovery of the original values and types.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/9",
+          "tool": "toon"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Strict decoded value equals the complete original 60-row array extracted from /summary/needs_host/macos-arm64 at the preregistration commit, including all rows, key values and scalar types. Verify the retained input's SHA256 and 6,552 bytes against frozen_input before grading; record representation sizes separately. Never grade against the execution checkout's regenerated matrix.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt.",
+      "fixture_path": "catalogs/landscape/component-evidence-matrix.json",
+      "fixture_pointer": "/summary/needs_host/macos-arm64",
+      "input_required": true,
+      "frozen_input": {
+        "source_revision": "preregistration_commit",
+        "path": "catalogs/landscape/component-evidence-matrix.json",
+        "pointer": "/summary/needs_host/macos-arm64",
+        "serialization": "UTF-8 JSON; sort_keys=true; ensure_ascii=false; separators=(',',':'); no trailing newline",
+        "sha256": "6899e551b2bea3918b47cba1b41e27e59d8f5cb12a681f98cc77f73d66a2a2c1",
+        "bytes": 6552,
+        "records": 60
+      },
+      "input_binding": "Before probes, extract frozen_input.pointer from frozen_input.path at the merged preregistration commit, serialize exactly as frozen_input.serialization and verify SHA256, byte count and record count. Bind identical retained bytes at a private neutral <retained-input> path in every arm. The execution checkout's regenerated matrix is not the input. Missing bytes or a hash mismatch blocks launch; never substitute the current matrix."
+    },
+    {
+      "id": "reuse-296-10",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Structural call sites",
+      "task_text": "Find every subprocess.run invocation in scripts Python files. Report counts and file locations, excluding mentions in comments and strings.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/10",
+          "tool": "ast-grep"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "An independent Python AST walk over the same frozen files yields exactly the reported call locations and count.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-11",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Caller graph",
+      "task_text": "In the disposable clone at <assigned-worktree>, find real callers of register_file in scripts/host_receipts.py. Report direct callers with exact source locations and the scope of the searched tree.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/11",
+          "tool": "codebase-memory"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Independent AST/source inspection confirms the caller list in that clone. Graph operation remains blocked until Q3; another answer path never proves graph acceptance.",
+      "source_note": "Q3 not qualified here: graph lane blocked; information need retained.",
+      "worktree_required": true
+    },
+    {
+      "id": "reuse-296-12",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Documentation completeness",
+      "task_text": "Find the Stripe idempotency header name and retention rule in curated documentation, and compare with the canonical provider page. State any missing fact explicitly.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/12",
+          "tool": "context-hub"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Report Idempotency-Key and the canonical page's retention qualification, or a faithful content-gap result; a curated source lacking either fact cannot establish that capability.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-13",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Document conversion fidelity",
+      "task_text": "Read https://code.claude.com/docs/en/mcp as a converted text document and identify the three installation scopes. Check those scopes against the retained original HTML.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/13",
+          "tool": "markitdown"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "The answer states local, project and user and agrees with retained original HTML; preserve conversion omissions and exit status.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-296-14",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "source-scout",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Session archive visibility",
+      "task_text": "Check whether native sessions tagged <run-token>, including child sessions, appear in the local history archive. Return bounded counts and identity matches; leave no background process running.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/14",
+          "tool": "agentsview"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Archive observations match the private run identity table; no absent automation is reported as observed and no owned process survives.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt.",
+      "run_binding": true
+    },
+    {
+      "id": "reuse-296-15",
+      "kind": "reused",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": null,
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "blocked",
+      "description": "Scoped span visibility",
+      "task_text": "Send one public synthetic observation to an isolated loopback receiver on unused ports and verify that it is rendered. Keep shared receiver ports untouched and stop the owned receiver.",
+      "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/15",
+          "tool": "otel-tui"
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "task"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Retained sender output and independent receiver observation identify the same synthetic span; exit status and owned-process cleanup are recorded.",
+      "source_note": "Repair 1, 2026-09-26: source-scout.md:11 forbids network use; the loopback task cannot pass under that role. No equivalent Sonnet/max role permitting this operation is evidenced in this checkout. Preserve #296 /tools/15 and all arm slots, but block organic launch until a dated merged amendment names and qualifies a permitted role at the same model/effort/isolation. Do not weaken source-scout or silently skip the task.",
+      "blocked_by": "qualified_loopback_role_amendment",
+      "role_requirement": {
+        "model": "sonnet",
+        "effort": "max",
+        "isolation": "no_added_worktree",
+        "capabilities": [
+          "start_bound_loopback_receiver",
+          "send_public_synthetic_observation",
+          "observe_rendered_span",
+          "stop_owned_receiver"
+        ]
+      }
+    },
+    {
+      "id": "reuse-343-00",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": null,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Session archive visibility",
+      "task_text": "Check whether native sessions tagged <run-token>, including child sessions, appear in the local history archive. Return bounded counts and identity matches; leave no background process running.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/0",
+          "tool": "agentsview",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Archive observations match the private run identity table; no absent automation is reported as observed and no owned process survives.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt.",
+      "run_binding": true,
+      "claude_only_role_provenance": "source-scout",
+      "role_binding": "No Codex role by the Claude provenance name is bound. This is a shared information need on the exec path under the selected arm profile; AA §6:372 supplies only stack-researcher/stack-verifier as Codex custom agents."
+    },
+    {
+      "id": "reuse-343-01",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Historical host-lane decision",
+      "task_text": "Retrieve the earlier project decision about the workstation host request lane and GitHub. State its source and what it does and does not establish now.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/1",
+          "tool": "ai-memory",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "ai-memory",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Retain an actual scoped historical hit and verify its claim against recipes/host-request-lane.md; no savings counter or current authority is inferred.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-02",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Structural call sites",
+      "task_text": "Find every subprocess.run invocation in scripts Python files. Report counts and file locations, excluding mentions in comments and strings.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/2",
+          "tool": "ast-grep",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "An independent Python AST walk over the same frozen files yields exactly the reported call locations and count.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-03",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Caller graph",
+      "task_text": "In the disposable clone at <assigned-worktree>, find real callers of register_file in scripts/host_receipts.py. Report direct callers with exact source locations and the scope of the searched tree.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/3",
+          "tool": "codebase-memory",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Independent AST/source inspection confirms the caller list in that clone. Graph operation remains blocked until Q3; another answer path never proves graph acceptance.",
+      "source_note": "Q3 not qualified here: graph lane blocked; information need retained.",
+      "worktree_required": true
+    },
+    {
+      "id": "reuse-343-04",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Documentation completeness",
+      "task_text": "Find the Stripe idempotency header name and retention rule in curated documentation, and compare with the canonical provider page. State any missing fact explicitly.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/4",
+          "tool": "context-hub",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Report Idempotency-Key and the canonical page's retention qualification, or a faithful content-gap result; a curated source lacking either fact cannot establish that capability.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-05",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Large handbook summary",
+      "task_text": "For docs/grand-catalog-handbook.md, report the number of second-level headings, the first ten in order, and the number of lines containing the word token, case-insensitively. Return only those fields.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/5",
+          "tool": "context-mode",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "ctx-containment",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Compare all three fields with a direct line scan of the frozen original, including heading order.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-06",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Selected-history round trip",
+      "task_text": "For the retained 150-entry history report at <retained-input>, produce a compact representation, recover the complete original, and report whether its bytes match. Keep the original out of the answer.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/6",
+          "tool": "headroom",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Recovered original SHA256 and byte count equal the retained raw report; failed compression/recovery remains a failure, not an empty success.",
+      "source_note": "No default role grant; report M10 N/A and explain any invocation.",
+      "input_required": true,
+      "input_binding": "Freeze the retained original report's private neutral pathname, source revision and SHA256 before probes; identical bytes across arms. Missing originals gate the run, not replacement with a new report."
+    },
+    {
+      "id": "reuse-343-07",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": null,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Definition retrieval",
+      "task_text": "Locate register_file in scripts/host_receipts.py and return its definition and source location from this checkout.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/7",
+          "tool": "jcodemunch",
+          "attempt": 1
+        },
+        {
+          "pointer": "/tools/8",
+          "tool": "jcodemunch",
+          "attempt": 2
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "symbol-references",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Definition text and location equal the function in the frozen original, using Python AST source extraction as the independent check.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt.",
+      "claude_only_role_provenance": "evidence-reviewer",
+      "role_binding": "No Codex role by the Claude provenance name is bound. This is a shared information need on the exec path under the selected arm profile; AA §6:372 supplies only stack-researcher/stack-verifier as Codex custom agents."
+    },
+    {
+      "id": "reuse-343-09",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Document conversion fidelity",
+      "task_text": "Read https://code.claude.com/docs/en/mcp as a converted text document and identify the three installation scopes. Check those scopes against the retained original HTML.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/9",
+          "tool": "markitdown",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "The answer states local, project and user and agrees with retained original HTML; preserve conversion omissions and exit status.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-10",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Release pin decision",
+      "task_text": "Find which document states how a new machine pins a release and report the exact step. Explain whether the indexed catalog actually contains that instruction.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/10",
+          "tool": "qmd",
+          "attempt": 1
+        },
+        {
+          "pointer": "/tools/11",
+          "tool": "qmd",
+          "attempt": 2
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Answer agrees with adoption/update.md and its linked bootstrap step; an index coverage gap is stated rather than a fabricated catalog hit.",
+      "source_note": "Original index-coverage failure retained; not a qmd-eligible opportunity."
+    },
+    {
+      "id": "reuse-343-12",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Selected-file overview",
+      "task_text": "Using scripts/host_requests.py and scripts/credential_status.py as source code only, list all top-level functions in the former. Verify the list against the complete original.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/12",
+          "tool": "repomix",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Exact set equals AST top-level FunctionDef/AsyncFunctionDef names, including status_body; omissions in an outline fail.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-13",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-verifier",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Command-output fidelity",
+      "task_text": "In <assigned-worktree>, report the newest commit subject, branch state, changed-file summary over the last five revisions, directory inventory, matches for def register_file under scripts, and the tests.test_host_requests outcome including count and status. Answer from the selected command outputs and compare against retained exact originals.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/13",
+          "tool": "rtk",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "rtk-codex",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "The newest commit subject, tests.test_host_requests test count and result status exactly match independently retained raw originals, as in the receipt's actual checker. Retain all six observation outputs, exits and failures. Historical counts are not the new run's expected counts.",
+      "source_note": "Task information need from source task/commands; checker fields from the same receipt's answer_excerpt/notes_excerpt. Original tool-prescribing commands remain provenance, not prompt guidance.",
+      "worktree_required": true,
+      "pre_run_input_gate": "The committed source receipts truncate the original six-command inventory; #343 retains four measured observation commands and its notes/check record the test. Recover and seal the exact six original observation identities and inputs before capability probes; unresolved entries block launch. Do not choose substitute commands or test modules after seeing results. Any changed information need requires a merged protocol amendment."
+    },
+    {
+      "id": "reuse-343-14",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": null,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Definition and references",
+      "task_text": "Locate register_file in scripts/host_receipts.py and list its definition and referencing call sites. Distinguish invocations, imports and textual mentions.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/14",
+          "tool": "serena",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "symbol-references",
+        "guidance",
+        "attribution",
+        "adoption",
+        "mcp-errors"
+      ],
+      "pass_fail_check": "Definition and each listed call site agree with original source; comments and string literals do not count as invocations.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt.",
+      "claude_only_role_provenance": "evidence-reviewer",
+      "role_binding": "No Codex role by the Claude provenance name is bound. This is a shared information need on the exec path under the selected arm profile; AA §6:372 supplies only stack-researcher/stack-verifier as Codex custom agents."
+    },
+    {
+      "id": "reuse-343-15",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Request trust boundary",
+      "task_text": "Explain how the host request lane decides whether a GitHub request is trusted, naming the author_association and user.type conditions in scripts/host_requests.py.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/15",
+          "tool": "socraticode",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Conditions agree with the frozen scripts/host_requests.py implementation and recipes/host-request-lane.md; quote exact source locations.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt."
+    },
+    {
+      "id": "reuse-343-16",
+      "kind": "reused",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Structured table fidelity",
+      "task_text": "Read the frozen array at <retained-input>. Return its 60 flat records in a compact structured representation and demonstrate exact recovery of the original values and types.",
+      "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+      "source_entries": [
+        {
+          "pointer": "/tools/16",
+          "tool": "toon",
+          "attempt": 1
+        }
+      ],
+      "source_fields": [
+        "tool",
+        "commands",
+        "attempt"
+      ],
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Strict decoded value equals the complete original 60-row array extracted from /summary/needs_host/macos-arm64 at the preregistration commit, including all rows, key values and scalar types. Verify the retained input's SHA256 and 6,552 bytes against frozen_input before grading; record representation sizes separately. Never grade against the execution checkout's regenerated matrix.",
+      "source_note": "Information need retained; source tool/commands are provenance, never appended to the child prompt.",
+      "fixture_path": "catalogs/landscape/component-evidence-matrix.json",
+      "fixture_pointer": "/summary/needs_host/macos-arm64",
+      "input_required": true,
+      "frozen_input": {
+        "source_revision": "preregistration_commit",
+        "path": "catalogs/landscape/component-evidence-matrix.json",
+        "pointer": "/summary/needs_host/macos-arm64",
+        "serialization": "UTF-8 JSON; sort_keys=true; ensure_ascii=false; separators=(',',':'); no trailing newline",
+        "sha256": "6899e551b2bea3918b47cba1b41e27e59d8f5cb12a681f98cc77f73d66a2a2c1",
+        "bytes": 6552,
+        "records": 60
+      },
+      "input_binding": "Before probes, extract frozen_input.pointer from frozen_input.path at the merged preregistration commit, serialize exactly as frozen_input.serialization and verify SHA256, byte count and record count. Bind identical retained bytes at a private neutral <retained-input> path in every arm. The execution checkout's regenerated matrix is not the input. Missing bytes or a hash mismatch blocks launch; never substitute the current matrix."
+    },
+    {
+      "id": "seed-web-table-1",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 1",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What is the default value of ensure_ascii, and what does it change? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 1 through 8 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ensure_ascii defaults to true; non-ASCII characters are escaped when true. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-web-table-2",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 2",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What does allow_nan=false require when encoding a non-finite number? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 5 through 12 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "allow_nan=false raises ValueError for NaN or infinity instead of emitting nonstandard values. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-web-table-3",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 3",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What does sort_keys=true change? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 9 through 16 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Object/dictionary output keys are sorted; array order is not sorted by this option. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-web-table-4",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 4",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What exception identifies a syntactically invalid JSON document? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 13 through 20 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "JSONDecodeError identifies invalid JSON decoding. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-web-table-5",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 5",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What object type does loads accept besides str? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 17 through 24 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "loads also accepts bytes and bytearray. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-catalog-history-1",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Catalog and prior-decision question 1",
+      "task_text": "Answer from the indexed project catalog: Which engine version and broker are the selected destination, and which adapter remains separate? Separately retrieve the prior project decision about stdin left open in unattended workers; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+      "fixture_path": "catalogs/us-equities/README.md",
+      "lane_tags": [
+        "qmd",
+        "ai-memory",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "NautilusTrader 2.0.0rc5; IBKR; separate Alpaca boundary. Catalog citation must resolve to catalogs/us-equities/README.md. Historical retrieval must contain a scoped result for stdin left open in unattended workers; compare with docs/harness-defaults.md, Anti-pattern log: Close stdin for unattended launches; the retained failure was waiting for input until timeout. A source-only answer without a historical hit does not establish memory adoption.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "historical_fixture": "docs/harness-defaults.md"
+    },
+    {
+      "id": "seed-catalog-history-2",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Catalog and prior-decision question 2",
+      "task_text": "Answer from the indexed project catalog: Does a catalog default mean installed, and what does native_proven establish? Separately retrieve the prior project decision about filtered output mistaken for complete originals; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+      "fixture_path": "catalogs/us-equities/agents-operations.md",
+      "lane_tags": [
+        "qmd",
+        "ai-memory",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Default is preferred design/adoption, not installed; native_proven is only the cited bounded behavior. Catalog citation must resolve to catalogs/us-equities/agents-operations.md. Historical retrieval must contain a scoped result for filtered output mistaken for complete originals; compare with docs/harness-defaults.md, Anti-pattern log: Exact originals and exit statuses require raw recovery; a filtered window is not the full source. A source-only answer without a historical hit does not establish memory adoption.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "historical_fixture": "docs/harness-defaults.md"
+    },
+    {
+      "id": "seed-catalog-history-3",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Catalog and prior-decision question 3",
+      "task_text": "Answer from the indexed project catalog: When did the Meta company ticker change, and when did the Roundhill fund ticker change? Separately retrieve the prior project decision about a wait loop matching its own command line; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+      "fixture_path": "catalogs/us-equities/lifecycle-source-review.md",
+      "lane_tags": [
+        "qmd",
+        "ai-memory",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Company FB to META before June 9, 2022 open; fund META to METV at January 31, 2022 open; distinct identities. Catalog citation must resolve to catalogs/us-equities/lifecycle-source-review.md. Historical retrieval must contain a scoped result for a wait loop matching its own command line; compare with docs/harness-defaults.md, Anti-pattern log: Anchor or bracket the process pattern, or wait on a PID/exit marker with a timeout. A source-only answer without a historical hit does not establish memory adoption.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "historical_fixture": "docs/harness-defaults.md"
+    },
+    {
+      "id": "seed-catalog-history-4",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Catalog and prior-decision question 4",
+      "task_text": "Answer from the indexed project catalog: Which two document directories and collection names make up the portable catalog index? Separately retrieve the prior project decision about a pipeline masking the producing command's failure; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+      "fixture_path": "catalogs/us-equities/native-workflows.md",
+      "lane_tags": [
+        "qmd",
+        "ai-memory",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "catalogs/us-equities -> us-equities-catalog; blueprints/us-equities -> us-equities-foundation; unrelated folders are excluded. Catalog citation must resolve to catalogs/us-equities/native-workflows.md. Historical retrieval must contain a scoped result for a pipeline masking the producing command's failure; compare with docs/harness-defaults.md, Anti-pattern log: Retain stdout/stderr and the command's own exit status; a downstream success is insufficient. A source-only answer without a historical hit does not establish memory adoption.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "historical_fixture": "docs/harness-defaults.md"
+    },
+    {
+      "id": "seed-catalog-history-5",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Catalog and prior-decision question 5",
+      "task_text": "Answer from the indexed project catalog: How many primary memory stores and retrieval lanes per artifact does the foundation recommend? Separately retrieve the prior project decision about assuming a worker owns an independent web-search budget; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+      "fixture_path": "catalogs/us-equities/foundation-memory.md",
+      "lane_tags": [
+        "qmd",
+        "ai-memory",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "One primary memory store and one retrieval lane per artifact. Catalog citation must resolve to catalogs/us-equities/foundation-memory.md. Historical retrieval must contain a scoped result for assuming a worker owns an independent web-search budget; compare with docs/harness-defaults.md, Anti-pattern log: The session search budget is shared across the coordinator and its workers. A source-only answer without a historical hit does not establish memory adoption.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "historical_fixture": "docs/harness-defaults.md"
+    },
+    {
+      "id": "seed-log-symbol-1",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large-log slice and symbol references 1",
+      "task_text": "From evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl report ERROR event numbers in the inclusive range 1 through 128, and their value sum. Locate register_file in scripts/host_receipts.py, returning its definition line and direct Name-call sites across scripts/ and tests/ whose callee spells register_file. Exclude attribute calls, comments, strings and imports.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "symbol-references",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ERROR events equal [64, 128]; value sum equals 22. Python AST of the frozen scripts/host_receipts.py and all Python files under scripts/ and tests/ determines the definition and direct Name-call sites (excluding attribute calls); answer lists each real site exactly once.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "symbol": "register_file",
+      "symbol_fixture": "scripts/host_receipts.py"
+    },
+    {
+      "id": "seed-acceptance-1",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-verifier",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Verbose acceptance partition 1",
+      "task_text": "Before acceptance, run ls evidence/artifacts/token-adoption-e2e-20260926/fixtures and wc -l evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl, and report the inventory and line count. Run this acceptance command in the assigned checkout and report its exit code and final summary verbatim: python3 -c \"import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[127]['event']==128; print('PASS partition 1')\". Explain whether the stated partition check passed.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "rtk-claude",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Original command emits the full 84,003-byte fixture plus PASS partition 1; exit 0 and that exact summary are required. The task answer need only contain the exit and summary, so a whole-output return is not an M3 exact-byte exception. Verify fixture integrity before invoking.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "acceptance_argv": [
+        "python3",
+        "-c",
+        "import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[127]['event']==128; print('PASS partition 1')"
+      ],
+      "eligible_shell_observation": "Listing/counting the fixture is eligible; the exact acceptance command itself is an RTK exception."
+    },
+    {
+      "id": "seed-log-symbol-2",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large-log slice and symbol references 2",
+      "task_text": "From evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl report ERROR event numbers in the inclusive range 129 through 256, and their value sum. Locate normalize_identity in scripts/host_receipts.py, returning its definition line and direct Name-call sites across scripts/ and tests/ whose callee spells normalize_identity. Exclude attribute calls, comments, strings and imports.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "symbol-references",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ERROR events equal [192, 256]; value sum equals 6. Python AST of the frozen scripts/host_receipts.py and all Python files under scripts/ and tests/ determines the definition and direct Name-call sites (excluding attribute calls); answer lists each real site exactly once.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "symbol": "normalize_identity",
+      "symbol_fixture": "scripts/host_receipts.py"
+    },
+    {
+      "id": "seed-acceptance-2",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-verifier",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Verbose acceptance partition 2",
+      "task_text": "Before acceptance, run ls evidence/artifacts/token-adoption-e2e-20260926/fixtures and wc -l evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl, and report the inventory and line count. Run this acceptance command in the assigned checkout and report its exit code and final summary verbatim: python3 -c \"import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[255]['event']==256; print('PASS partition 2')\". Explain whether the stated partition check passed.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "rtk-claude",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Original command emits the full 84,003-byte fixture plus PASS partition 2; exit 0 and that exact summary are required. The task answer need only contain the exit and summary, so a whole-output return is not an M3 exact-byte exception. Verify fixture integrity before invoking.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "acceptance_argv": [
+        "python3",
+        "-c",
+        "import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[255]['event']==256; print('PASS partition 2')"
+      ],
+      "eligible_shell_observation": "Listing/counting the fixture is eligible; the exact acceptance command itself is an RTK exception."
+    },
+    {
+      "id": "seed-log-symbol-3",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large-log slice and symbol references 3",
+      "task_text": "From evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl report ERROR event numbers in the inclusive range 257 through 384, and their value sum. Locate pin_matches in scripts/host_receipts.py, returning its definition line and direct Name-call sites across scripts/ and tests/ whose callee spells pin_matches. Exclude attribute calls, comments, strings and imports.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "symbol-references",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ERROR events equal [320, 384]; value sum equals 24. Python AST of the frozen scripts/host_receipts.py and all Python files under scripts/ and tests/ determines the definition and direct Name-call sites (excluding attribute calls); answer lists each real site exactly once.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "symbol": "pin_matches",
+      "symbol_fixture": "scripts/host_receipts.py"
+    },
+    {
+      "id": "seed-acceptance-3",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-verifier",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Verbose acceptance partition 3",
+      "task_text": "Before acceptance, run ls evidence/artifacts/token-adoption-e2e-20260926/fixtures and wc -l evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl, and report the inventory and line count. Run this acceptance command in the assigned checkout and report its exit code and final summary verbatim: python3 -c \"import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[383]['event']==384; print('PASS partition 3')\". Explain whether the stated partition check passed.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "rtk-claude",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Original command emits the full 84,003-byte fixture plus PASS partition 3; exit 0 and that exact summary are required. The task answer need only contain the exit and summary, so a whole-output return is not an M3 exact-byte exception. Verify fixture integrity before invoking.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "acceptance_argv": [
+        "python3",
+        "-c",
+        "import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[383]['event']==384; print('PASS partition 3')"
+      ],
+      "eligible_shell_observation": "Listing/counting the fixture is eligible; the exact acceptance command itself is an RTK exception."
+    },
+    {
+      "id": "seed-log-symbol-4",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large-log slice and symbol references 4",
+      "task_text": "From evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl report ERROR event numbers in the inclusive range 385 through 512, and their value sum. Locate sanitize in scripts/host_receipts.py, returning its definition line and direct Name-call sites across scripts/ and tests/ whose callee spells sanitize. Exclude attribute calls, comments, strings and imports.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "symbol-references",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ERROR events equal [448, 512]; value sum equals 8. Python AST of the frozen scripts/host_receipts.py and all Python files under scripts/ and tests/ determines the definition and direct Name-call sites (excluding attribute calls); answer lists each real site exactly once.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "symbol": "sanitize",
+      "symbol_fixture": "scripts/host_receipts.py"
+    },
+    {
+      "id": "seed-acceptance-4",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-verifier",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Verbose acceptance partition 4",
+      "task_text": "Before acceptance, run ls evidence/artifacts/token-adoption-e2e-20260926/fixtures and wc -l evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl, and report the inventory and line count. Run this acceptance command in the assigned checkout and report its exit code and final summary verbatim: python3 -c \"import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[511]['event']==512; print('PASS partition 4')\". Explain whether the stated partition check passed.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "rtk-claude",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Original command emits the full 84,003-byte fixture plus PASS partition 4; exit 0 and that exact summary are required. The task answer need only contain the exit and summary, so a whole-output return is not an M3 exact-byte exception. Verify fixture integrity before invoking.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "acceptance_argv": [
+        "python3",
+        "-c",
+        "import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[511]['event']==512; print('PASS partition 4')"
+      ],
+      "eligible_shell_observation": "Listing/counting the fixture is eligible; the exact acceptance command itself is an RTK exception."
+    },
+    {
+      "id": "seed-log-symbol-5",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large-log slice and symbol references 5",
+      "task_text": "From evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl report ERROR event numbers in the inclusive range 513 through 640, and their value sum. Locate load_json in scripts/host_receipts.py, returning its definition line and direct Name-call sites across scripts/ and tests/ whose callee spells load_json. Exclude attribute calls, comments, strings and imports.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "symbol-references",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ERROR events equal [576, 640]; value sum equals 26. Python AST of the frozen scripts/host_receipts.py and all Python files under scripts/ and tests/ determines the definition and direct Name-call sites (excluding attribute calls); answer lists each real site exactly once.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "symbol": "load_json",
+      "symbol_fixture": "scripts/host_receipts.py"
+    },
+    {
+      "id": "seed-acceptance-5",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-verifier",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Verbose acceptance partition 5",
+      "task_text": "Before acceptance, run ls evidence/artifacts/token-adoption-e2e-20260926/fixtures and wc -l evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl, and report the inventory and line count. Run this acceptance command in the assigned checkout and report its exit code and final summary verbatim: python3 -c \"import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[639]['event']==640; print('PASS partition 5')\". Explain whether the stated partition check passed.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "rtk-claude",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Original command emits the full 84,003-byte fixture plus PASS partition 5; exit 0 and that exact summary are required. The task answer need only contain the exit and summary, so a whole-output return is not an M3 exact-byte exception. Verify fixture integrity before invoking.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "acceptance_argv": [
+        "python3",
+        "-c",
+        "import json; from pathlib import Path; s=Path('evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl').read_text(); print(s,end=''); rows=[json.loads(x) for x in s.splitlines()]; assert len(rows)==640; assert sum(r['level']=='ERROR' for r in rows)==10; assert rows[639]['event']==640; print('PASS partition 5')"
+      ],
+      "eligible_shell_observation": "Listing/counting the fixture is eligible; the exact acceptance command itself is an RTK exception."
+    },
+    {
+      "id": "seed-review-diff",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "evidence-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Large-diff review",
+      "task_text": "Review blueprints/retrieval-quality-v2/run-efba31d5.patch without applying it. Report the changed file, hunk count, added and deleted line counts excluding file headers. In the opening contract hunk, explain what changed about interrupted-run receipts and the listed signals.",
+      "fixture_path": "blueprints/retrieval-quality-v2/run-efba31d5.patch",
+      "lane_tags": [
+        "ctx-containment",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "The existing 52,631-byte unified diff changes run.py, has 31 hunks, 166 added lines and 581 deleted lines excluding +++/--- headers. The opening contract removes the SIGINT/SIGTERM/SIGHUP cleanup sentence and the SIGKILL/status-started exception, retaining the no-overwrite rule and a simpler interrupted-run receipt guarantee. Check the original patch without applying it.",
+      "definition_source": "AA §8.2 evidence-reviewer large-diff scenario; existing blueprints/retrieval-quality-v2/run-efba31d5.patch, first hunk."
+    },
+    {
+      "id": "seed-scout-inventory",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "source-scout",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "seed-scout-inventory",
+      "task_text": "Inventory fixtures/before.py and fixtures/after.py: report the exported function name and each file's line count.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Both files define greeting; each has two lines.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false
+    },
+    {
+      "id": "seed-scout-acceptance",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "source-scout",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "seed-scout-acceptance",
+      "task_text": "Run python3 -m py_compile fixtures/before.py fixtures/after.py in the current checkout and report the exit status.",
+      "fixture_path": "fixtures/after.py",
+      "lane_tags": [
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Both compile successfully, exit 0; capture actual output.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false
+    },
+    {
+      "id": "seed-builder-1",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "isolated-builder",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Isolated edit and test 1",
+      "task_text": "Use the isolated checkout actually assigned by the harness. If the harness creates no separate checkout, use the prepared control checkout <assigned-worktree>. Verify and report the actual working directory and starting revision before editing; stay inside that checkout. There, change fixtures/before.py so greeting('Ada') returns 'Hello, Ada!'. Confirm the complete result matches fixtures/after.py and test another name. Do not commit.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "rtk-claude",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Derive the actual child worktree and starting revision from the native child transcript and meta.json, and require agreement with the frozen execution revision. Read the tracked and untracked diff in that actual child worktree against its recorded starting revision, never assume <assigned-worktree> is the edit location. Only fixtures/before.py changes; its final bytes equal fixtures/after.py. greeting('Ada') == 'Hello, Ada!' and greeting('Grace') == 'Hello, Grace!'. Independently retained diff and actual test output are required. Missing or conflicting worktree evidence blocks grading; an empty diff from the prepared path cannot pass.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "worktree_required": true,
+      "worktree_check": "actual_child_worktree"
+    },
+    {
+      "id": "seed-builder-2",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "isolated-builder",
+      "model": "sonnet",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "organic",
+      "description": "Isolated edit and test 2",
+      "task_text": "Use the isolated checkout actually assigned by the harness. If the harness creates no separate checkout, use the prepared control checkout <assigned-worktree>. Verify and report the actual working directory and starting revision before editing; stay inside that checkout. There, change fixtures/before.py so greeting('Grace') returns 'Hello, Grace!'. Confirm the complete result matches fixtures/after.py and test another name. Do not commit.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "rtk-claude",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Derive the actual child worktree and starting revision from the native child transcript and meta.json, and require agreement with the frozen execution revision. Read the tracked and untracked diff in that actual child worktree against its recorded starting revision, never assume <assigned-worktree> is the edit location. Only fixtures/before.py changes; its final bytes equal fixtures/after.py. greeting('Ada') == 'Hello, Ada!' and greeting('Grace') == 'Hello, Grace!'. Independently retained diff and actual test output are required. Missing or conflicting worktree evidence blocks grading; an empty diff from the prepared path cannot pass.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "worktree_required": true,
+      "worktree_check": "actual_child_worktree"
+    },
+    {
+      "id": "seed-blind-1",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "blind-lane-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Small stripped blind packet 1",
+      "task_text": "Read evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json as the entire packet. Does record 1 have status ok and region us-east-1? Return a verdict with the record's id and latency.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "blind",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Verdict yes; id 1; latency 17. Additionally M12's zero-call, zero-injection and first-prompt tests must all pass; strict process repeats the identical packet.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "strict_repeat": true
+    },
+    {
+      "id": "seed-blind-2",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "blind-lane-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Small stripped blind packet 2",
+      "task_text": "Read evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json as the entire packet. Does record 2 have status ok and region us-east-1? Return a verdict with the record's id and latency.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "blind",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Verdict yes; id 2; latency 11. Additionally M12's zero-call, zero-injection and first-prompt tests must all pass; strict process repeats the identical packet.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "strict_repeat": true
+    },
+    {
+      "id": "seed-blind-3",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "blind-lane-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Small stripped blind packet 3",
+      "task_text": "Read evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json as the entire packet. Does record 3 have status ok and region us-east-1? Return a verdict with the record's id and latency.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "blind",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Verdict yes; id 3; latency 18. Additionally M12's zero-call, zero-injection and first-prompt tests must all pass; strict process repeats the identical packet.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "strict_repeat": true
+    },
+    {
+      "id": "seed-blind-4",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "blind-lane-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Small stripped blind packet 4",
+      "task_text": "Read evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json as the entire packet. Does record 4 have status ok and region us-east-1? Return a verdict with the record's id and latency.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "blind",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Verdict yes; id 4; latency 12. Additionally M12's zero-call, zero-injection and first-prompt tests must all pass; strict process repeats the identical packet.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "strict_repeat": true
+    },
+    {
+      "id": "seed-blind-5",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "blind-judge",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Small stripped blind packet 5",
+      "task_text": "Read evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json as the entire packet. Does record 5 have status ok and region us-east-1? Return a verdict with the record's id and latency.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "blind",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Verdict yes; id 5; latency 19. Additionally M12's zero-call, zero-injection and first-prompt tests must all pass; strict process repeats the identical packet.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "strict_repeat": true
+    },
+    {
+      "id": "seed-blind-positive",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "blind-lane-reviewer",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "control",
+      "description": "Large-packet injection positive control",
+      "task_text": "Read only the first five observation records in evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl and report their event numbers and levels in order.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "blind",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Event numbers equal [1, 2, 3, 4, 5], each with level INFO. The file remains 84,003 bytes; AA §3.1 Path 2 says its over-50,000-byte Read advisory fires on every Read, so this bounded read must still yield at least one PreToolUse:Read additional-context row. A zero makes M12 incomplete. All returned result bytes remain in normal M3 accounting; no control-specific exception. This verdict is never blind evidence; the strict repeat must show zero hook rows.",
+      "definition_source": "AA §3.1 Path 2 and §3.1(d), §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "strict_repeat": true
+    },
+    {
+      "id": "seed-main-output",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "main",
+      "dispatch": "main",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "xhigh",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Coordinator large-output observation",
+      "task_text": "Count ERROR records in evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl and return only the count.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [],
+      "pass_fail_check": "Count equals 10; measure main-transcript bytes separately.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false
+    },
+    {
+      "id": "seed-agent-path",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "agent-tool",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A"
+      ],
+      "opportunity": "organic",
+      "description": "Native Agent-path research control",
+      "task_text": "From evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl report the first and last ERROR event numbers.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "lane_tags": [
+        "ctx-containment",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "First 64 and last 640; requested answer returns inline even when a routing block is injected.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition"
+    },
+    {
+      "id": "seed-binding-1",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "sub-agent",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A"
+      ],
+      "opportunity": "organic",
+      "description": "Binding lifecycle case 1",
+      "task_text": "In your assigned tree, read fixtures/sentinel.txt and report its exact value with a source witness. List fixtures and report the line count of fixtures/before.py. Do not supply an explicit working-directory override for the read.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "binding",
+        "rtk-codex",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Returned sentinel equals the private per-tree expected value; no sibling value appears. Directory inventory equals the frozen tree; before.py has two lines. Retain executed calls and binding evidence for M13. Merely printing a directory path is insufficient.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "launch": {
+        "fork_turns": "none",
+        "agent_type": "stack-researcher"
+      },
+      "runtime_fixture": "fixtures/sentinel.txt",
+      "runtime_fixture_rule": "Before capability probes, create different public sentinel values in two owned fixture worktrees; record values and hashes privately. Never create run IDs in committed fixtures."
+    },
+    {
+      "id": "seed-binding-2",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "sub-agent",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Binding lifecycle case 2",
+      "task_text": "In your assigned tree, read fixtures/sentinel.txt and report its exact value with a source witness. List fixtures and report the line count of fixtures/before.py. Do not supply an explicit working-directory override for the read.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "binding",
+        "rtk-codex",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Returned sentinel equals the private per-tree expected value; no sibling value appears. Directory inventory equals the frozen tree; before.py has two lines. Retain executed calls and binding evidence for M13. Merely printing a directory path is insufficient.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "launch": {
+        "fork_turns": 2,
+        "agent_type": "stack-researcher"
+      },
+      "runtime_fixture": "fixtures/sentinel.txt",
+      "runtime_fixture_rule": "Before capability probes, create different public sentinel values in two owned fixture worktrees; record values and hashes privately. Never create run IDs in committed fixtures."
+    },
+    {
+      "id": "seed-binding-3",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "sub-agent",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Binding lifecycle case 3",
+      "task_text": "In your assigned tree, read fixtures/sentinel.txt and report its exact value with a source witness. List fixtures and report the line count of fixtures/before.py. Do not supply an explicit working-directory override for the read.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "binding",
+        "rtk-codex",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Returned sentinel equals the private per-tree expected value; no sibling value appears. Directory inventory equals the frozen tree; before.py has two lines. Retain executed calls and binding evidence for M13. Merely printing a directory path is insufficient.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "launch": {
+        "fork_turns": "all",
+        "agent_type": "stack-researcher"
+      },
+      "runtime_fixture": "fixtures/sentinel.txt",
+      "runtime_fixture_rule": "Before capability probes, create different public sentinel values in two owned fixture worktrees; record values and hashes privately. Never create run IDs in committed fixtures."
+    },
+    {
+      "id": "seed-binding-4",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "sub-agent",
+      "role": null,
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A"
+      ],
+      "opportunity": "organic",
+      "description": "Binding lifecycle case 4",
+      "task_text": "In your assigned tree, read fixtures/sentinel.txt and report its exact value with a source witness. List fixtures and report the line count of fixtures/before.py. Do not supply an explicit working-directory override for the read.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "binding",
+        "rtk-codex",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Returned sentinel equals the private per-tree expected value; no sibling value appears. Directory inventory equals the frozen tree; before.py has two lines. Retain executed calls and binding evidence for M13. Merely printing a directory path is insufficient.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "launch": {
+        "fork_turns": "all",
+        "agent_type": null
+      },
+      "runtime_fixture": "fixtures/sentinel.txt",
+      "runtime_fixture_rule": "Before capability probes, create different public sentinel values in two owned fixture worktrees; record values and hashes privately. Never create run IDs in committed fixtures."
+    },
+    {
+      "id": "seed-binding-5",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "sub-agent",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B"
+      ],
+      "opportunity": "organic",
+      "description": "Binding lifecycle case 5",
+      "task_text": "In your assigned tree, read fixtures/sentinel.txt and report its exact value with a source witness. List fixtures and report the line count of fixtures/before.py. Do not supply an explicit working-directory override for the read.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "binding",
+        "rtk-codex",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Returned sentinel equals the private per-tree expected value; no sibling value appears. Directory inventory equals the frozen tree; before.py has two lines. Retain executed calls and binding evidence for M13. Merely printing a directory path is insufficient.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "launch": {
+        "fork_turns": "resume",
+        "agent_type": "stack-researcher"
+      },
+      "runtime_fixture": "fixtures/sentinel.txt",
+      "runtime_fixture_rule": "Before capability probes, create different public sentinel values in two owned fixture worktrees; record values and hashes privately. Never create run IDs in committed fixtures."
+    },
+    {
+      "id": "seed-overview",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "optional",
+      "description": "seed-overview",
+      "task_text": "Give an overview of the unfamiliar fixtures/before.py and fixtures/after.py pair, including its public interface and exact behavior change.",
+      "fixture_path": "fixtures/before.py",
+      "lane_tags": [
+        "repomix",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Names greeting and the added exclamation mark; confirm against both original files. Optional lane; under five opportunities is N/A.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false
+    },
+    {
+      "id": "seed-conversion",
+      "kind": "seeded",
+      "family": "claude",
+      "actor": "child",
+      "dispatch": "workflow",
+      "role": "stack-researcher",
+      "model": "opus",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "A0"
+      ],
+      "opportunity": "optional",
+      "description": "seed-conversion",
+      "task_text": "Convert the HTML fixture at <retained-input> to readable text. Report its heading hierarchy, ordered steps, nested list, quoted sentence, code, link and image alt text.",
+      "fixture_path": "fixtures/markitdown-multi-element.html",
+      "lane_tags": [
+        "markitdown",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "All ten structure checks from scripts/native_token_ci.py markitdown_multi_element_fixture hold against the original. Optional HTML seed supersedes AA's PDF seed per full-save §1a/§2.3/§8 finding 6; PDF extras are not assumed.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "fixture_binding": "Bind a private neutral input.html path to an exact copy of fixtures/markitdown-multi-element.html before probes; identical source bytes/hash across arms.",
+      "input_required": true
+    },
+    {
+      "id": "seed-graph",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "blocked",
+      "description": "seed-graph",
+      "task_text": "In the assigned qualified disposable clone, report direct callers of register_file with their source locations.",
+      "fixture_path": "scripts/host_receipts.py",
+      "lane_tags": [
+        "codebase-memory",
+        "guidance",
+        "attribution"
+      ],
+      "pass_fail_check": "Graph result agrees with original call sites; only runs after Q3 qualification on the disposable clone. Status blocked until Q3, never ineligible or N/A in its place.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "adoption": false,
+      "blocked_by": "Q3 [nv]"
+    },
+    {
+      "id": "seed-codex-web-table-1",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 1",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What is the default value of ensure_ascii, and what does it change? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 1 through 8 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "ensure_ascii defaults to true; non-ASCII characters are escaped when true. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-codex-web-table-2",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 2",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What does allow_nan=false require when encoding a non-finite number? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 5 through 12 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "allow_nan=false raises ValueError for NaN or infinity instead of emitting nonstandard values. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-codex-web-table-3",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 3",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What does sort_keys=true change? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 9 through 16 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "Object/dictionary output keys are sorted; array order is not sorted by this option. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-codex-web-table-4",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 4",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What exception identifies a syntactically invalid JSON document? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 13 through 20 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "JSONDecodeError identifies invalid JSON decoding. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    },
+    {
+      "id": "seed-codex-web-table-5",
+      "kind": "seeded",
+      "family": "codex",
+      "actor": "child",
+      "dispatch": "exec",
+      "role": "stack-researcher",
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "arms": [
+        "B",
+        "A",
+        "N"
+      ],
+      "opportunity": "organic",
+      "description": "Two-page documentation and flat-table question 5",
+      "task_text": "Read https://docs.python.org/3/library/json.html and https://docs.python.org/3/library/pathlib.html and cite both pages. What object type does loads accept besides str? Explain how a file can be read as text with an explicit encoding. From evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json return records 17 through 24 in a compact structured representation, plus their latency sum; preserve every field and value.",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json",
+      "lane_tags": [
+        "fetch",
+        "toon-seeded",
+        "mcp-errors",
+        "guidance",
+        "attribution",
+        "adoption"
+      ],
+      "pass_fail_check": "loads also accepts bytes and bytearray. Cite pathlib.Path.read_text(encoding=...) from the second page. Selected rows are those whose id is in the inclusive requested range; latency sum equals their integer sum. Strict decode equals the selected original records and types. Record both retained page captures; missing source evidence fails.",
+      "definition_source": "AA §8.1–§8.3; this PR-H seed definition",
+      "urls": [
+        "https://docs.python.org/3/library/json.html",
+        "https://docs.python.org/3/library/pathlib.html"
+      ]
+    }
+  ],
+  "minimum_arm_b_opportunities": 5,
+  "thresholds": {
+    "M1": {
+      "required": true,
+      "population": "Arm B role children, separately per required lane",
+      "criteria": {
+        "successful_opportunity_rate_gte": 0.9,
+        "per_required_lane": true
+      },
+      "source": "AA §8.3"
+    },
+    "M2": {
+      "required": true,
+      "population": "Arm B children except source-scout and blind",
+      "criteria": {
+        "successful_child_rate_gte": 0.9,
+        "exclude_scout_and_blind": true
+      },
+      "source": "AA §8.3"
+    },
+    "M2b": {
+      "required": false,
+      "population": "stack-researcher, stack-verifier, isolated-builder and evidence-reviewer, by role",
+      "criteria": {
+        "descriptive_only": true,
+        "report_by_role": true
+      },
+      "source": "AA §8.3"
+    },
+    "M3": {
+      "required": true,
+      "population": "Arm B children, every carrier, excluding only m3_exceptions",
+      "criteria": {
+        "large_result_bytes_gt": 5120,
+        "median_large_results_per_child_lte": 1,
+        "large_result_byte_share_lte": 0.2,
+        "max_result_bytes_lte": 20480,
+        "large_result_bytes_B_lte_A": true,
+        "matched_tasks": true,
+        "all_carriers_including_proxy": true
+      },
+      "source": "AA §8.3"
+    },
+    "M4": {
+      "required": true,
+      "population": "stack-researcher and Codex B, all remote fetches including nested and unclassifiable fetches",
+      "criteria": {
+        "routed_fetch_rate_gte": 0.9,
+        "unclassifiable_fetch_rate_lte": 0.1,
+        "include_nested_fetches": true,
+        "unknown_excess_outcome": "incomplete"
+      },
+      "source": "AA §8.3"
+    },
+    "M5": {
+      "required": true,
+      "population": "All arm B children using ctx, all ctx result counts and bytes",
+      "criteria": {
+        "large_result_bytes_gt": 5120,
+        "large_result_count_share_lte": 0.1,
+        "large_result_byte_share_lte": 0.2,
+        "max_result_bytes_lte": 20480
+      },
+      "source": "AA §8.3"
+    },
+    "M6": {
+      "required": true,
+      "population": "All Claude Bash children; proxy calls classified separately",
+      "criteria": {
+        "not_logged_rate_lte": 0.01,
+        "proxy_acceptance_or_exception_rate_eq": 1
+      },
+      "source": "AA §8.3"
+    },
+    "M6c": {
+      "required": true,
+      "population": "Codex B vs A; N only after Q2 read-back",
+      "criteria": {
+        "eligible_command_coverage_gte": 0.9,
+        "wrapped_exceptions_eq": 0,
+        "use_N_only_after_Q2": true
+      },
+      "source": "AA §8.3"
+    },
+    "M7": {
+      "required": true,
+      "population": "All arm B; required seeded flat arrays, optional natural payloads",
+      "criteria": {
+        "minimum_flat_array_records": 5,
+        "minimum_seeded_payloads": 5,
+        "seeded_encode_rate_eq": 1,
+        "strict_roundtrip_rate_eq": 1,
+        "ineligible_encodes_eq": 0,
+        "natural_encode_rate_gte": 0.8,
+        "natural_required": false,
+        "natural_NA_below": 5
+      },
+      "source": "AA §8.3"
+    },
+    "M8": {
+      "required": true,
+      "population": "Children granted each required symbol, qmd or ai-memory lane; optional qualified lanes separately",
+      "criteria": {
+        "correct_lane_use_rate_gte": 0.8,
+        "per_required_lane": true,
+        "optional_lanes": [
+          "socraticode",
+          "codebase-memory_after_Q3"
+        ]
+      },
+      "source": "AA §8.3"
+    },
+    "M9": {
+      "required": false,
+      "population": "Seeded repomix and markitdown tasks; reported, never gating",
+      "criteria": {
+        "report_use_and_correctness": true,
+        "gating": false
+      },
+      "source": "AA §8.3"
+    },
+    "M10": {
+      "required": false,
+      "population": "All Headroom MCP calls; reported, never gating",
+      "criteria": {
+        "outcome": "N/A",
+        "explain_default_role_calls": true
+      },
+      "source": "AA §8.3"
+    },
+    "M11": {
+      "required": true,
+      "population": "All lanes, each relevant child launch; Codex lifecycle matrix and parent fallback",
+      "criteria": {
+        "agent_type_match_rate_eq": 1,
+        "claude_model_effort_match_rate_eq": 1,
+        "agent_block_inline_rate_eq": 1,
+        "codex_rtk_body_and_exceptions_rate_eq": 1,
+        "codex_role_or_parent_model_effort_text_bindings_match_rate_eq": 1
+      },
+      "source": "AA §8.3"
+    },
+    "M12": {
+      "required": true,
+      "population": "Every blind Workflow/qualified strict verdict, with the positive control measured separately",
+      "criteria": {
+        "mcp_skill_bash_calls_eq": 0,
+        "memory_index_accesses_eq": 0,
+        "routing_markers_eq": 0,
+        "first_prompt_server_connector_blocks_eq": 0,
+        "all_hook_additional_context_rows_eq": 0,
+        "positive_Read_rows_gte": 1,
+        "positive_control_is_blind_evidence": false,
+        "positive_control_failure_outcome": "incomplete",
+        "strict_replacement_requires_all_criteria": true
+      },
+      "source": "AA §8.3"
+    },
+    "M13": {
+      "required": true,
+      "population": "Two concurrent worktrees, 20 repetitions each, and spawned children, each granted tool class",
+      "criteria": {
+        "concurrent_worktrees": 2,
+        "repetitions_per_tree": 20,
+        "own_tree_sentinel_rate_eq": 1,
+        "wrong_root_results_eq": 0,
+        "pwd_alone_sufficient": false,
+        "tool_classes": [
+          "shell",
+          "ctx_execute_without_cwd",
+          "ctx_execute_file_relative",
+          "ctx_index_then_ctx_search",
+          "serena_or_jcodemunch_where_granted"
+        ]
+      },
+      "source": "AA §8.3"
+    },
+    "M14": {
+      "required": true,
+      "population": "All calls by arm, client, session and state; native transcripts reconciled with Loki",
+      "criteria": {
+        "executed_call_match_rate_gte": 0.99,
+        "duplicate_calls_eq": 0,
+        "rejected_call_decision_rate_eq": 1,
+        "per_run_count_difference_lte": 0.02,
+        "owners_per_call_eq": 1,
+        "qualified_client_session_ids": true,
+        "unknowns_listed_not_zero_filled": true,
+        "global_counter_per_child": false,
+        "states": [
+          "attempted",
+          "decided",
+          "executed",
+          "failed",
+          "cancelled_or_unfinished"
+        ]
+      },
+      "source": "AA §8.3"
+    },
+    "M15": {
+      "required": true,
+      "population": "Attempted MCP calls, per server",
+      "criteria": {
+        "per_server_infrastructure_error_rate_lte": 0.01,
+        "exclude_invoked_command_nonzero_exit": true,
+        "classify_every_ctx_error": true,
+        "new_class_is_misuse_until_reproduced": true
+      },
+      "source": "AA §8.3"
+    },
+    "G-Q": {
+      "required": true,
+      "population": "All B tasks and B/A pass counts",
+      "criteria": {
+        "B_task_pass_rate_eq": 1,
+        "B_pass_count_gte_A": true
+      },
+      "source": "AA §8.3"
+    },
+    "G-C": {
+      "required": true,
+      "population": "Per family/arm, all priced attempts divided by frozen-check successes; unknown usage stays unknown",
+      "criteria": {
+        "priced_tokens_per_success_B_over_A_lte": 1.1,
+        "include_cache_retries_failures_interruptions": true,
+        "list_price_estimate_not_billed": true
+      },
+      "source": "AA §8.3"
+    },
+    "G-T": {
+      "required": true,
+      "population": "Arm B vs A elapsed wall time under identical scheduling",
+      "criteria": {
+        "wall_time_B_over_A_lte": 1.25
+      },
+      "source": "AA §8.3"
+    },
+    "G-P": {
+      "required": true,
+      "population": "Matched stack-researcher and general-purpose first-prompt medians",
+      "criteria": {
+        "researcher_first_prompt_median_lt_general_purpose": true
+      },
+      "source": "AA §8.3"
+    },
+    "G-S": {
+      "required": true,
+      "population": "All credential-path reads and commands, including ctx execution",
+      "criteria": {
+        "credential_path_reads_eq": 0,
+        "ctx_secret_guard_escapes_eq": 0
+      },
+      "source": "AA §8.3"
+    }
+  },
+  "m3_exceptions": [
+    "read_of_subsequently_edited_file",
+    "original_source_quoted_or_line_cited",
+    "exact_bytes_required_by_frozen_check"
+  ],
+  "strict_blind_process": {
+    "candidate": "--safe-mode",
+    "status": "[nv]",
+    "qualification_gate": "Q1",
+    "bare_requires_user_decision": true,
+    "requires": [
+      "native_sign_in_without_key",
+      "resolved_model_effort",
+      "Read_Glob_Grep_inventory_and_denies",
+      "clean_first_prompt",
+      "zero_hook_rows",
+      "no_installed_context_plugin",
+      "verdict_parity"
+    ]
+  },
+  "outcome_rule": {
+    "precedence": [
+      "incomplete",
+      "pass",
+      "fail"
+    ],
+    "incomplete_if": [
+      "required_lane_below_minimum",
+      "failed_positive_control",
+      "M4_unclassifiable_fetch_rate_above_ceiling"
+    ],
+    "pass_if": "all_required_M_and_all_G_pass",
+    "fail_if": "otherwise",
+    "optional_NA_counts_as_pass": false,
+    "on_incomplete": "top_up_and_rerun_same_frozen_checks",
+    "on_fail": "retain_failure_keep_defaults_one_repair_round_then_rerun"
+  },
+  "overturn_conditions": {
+    "WP5": [
+      "B_correctness_below_A",
+      "priced_estimate_B_over_A_gt_1.10"
+    ],
+    "allowlist": "researcher_no_better_than_general_purpose_on_M1_and_M3",
+    "workflow_hook_evidence": "release_or_rerun_workflow_child_without_hook_additional_context",
+    "D2": "spawn_probe_refutes_inference",
+    "strict_blind": [
+      "any_hook_plugin_MCP_or_CLAUDE_md_content",
+      "verdict_parity_failure"
+    ]
+  },
+  "builder_worktree_policy": {
+    "id": "actual_child_worktree",
+    "identity_sources": [
+      "child_transcript",
+      "meta.json"
+    ],
+    "diff_root": "observed_child_worktree",
+    "diff_base": "recorded_child_starting_revision",
+    "include_tracked_and_untracked": true,
+    "starting_revision_must_match_frozen_execution": true,
+    "missing_or_conflicting_identity": "block_grading",
+    "prepared_path_is_proof": false
+  },
+  "codex_role_exclusions": {
+    "source-scout": "Claude-only role lane (adoption/agents/claude/source-scout.md); shared Codex information needs run as exec tasks under the arm's profile, never as a Codex source-scout agent.",
+    "evidence-reviewer": "Claude-only role lane (adoption/agents/claude/evidence-reviewer.md); shared Codex information needs run as exec tasks under the arm's profile, never as a Codex evidence-reviewer agent. AA §6:372 defines only stack-researcher and stack-verifier Codex carriers."
+  }
+}

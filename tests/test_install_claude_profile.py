@@ -9,6 +9,7 @@ placeholder rendering and `claude mcp add` argument order are tested as data.
 
 import io
 import json
+import os
 import re
 import string
 import subprocess
@@ -39,6 +40,34 @@ def template_server_names() -> list[str]:
 
 
 class GuardInstallTests(unittest.TestCase):
+    def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
+        names = ("token-lanes-block.md", "token-lanes-subagent-start.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
+                       "--only", "guard"]
+            env = {**os.environ, "HOME": tmp}
+            planned = subprocess.run(command + ["--dry-run"], env=env, cwd=ROOT,
+                                     capture_output=True, text=True, timeout=30)
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertFalse((home / ".claude").exists())
+            for name in names:
+                self.assertIn(f"would install {home / '.claude/hooks' / name}", planned.stdout)
+            installed = subprocess.run(command, env=env, cwd=ROOT,
+                                       capture_output=True, text=True, timeout=30)
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            for name in names:
+                dest = home / ".claude/hooks" / name
+                self.assertIn(f"installed {dest}", installed.stdout)
+                self.assertEqual(dest.read_bytes(), (ROOT / "adoption/hooks/claude" / name).read_bytes())
+            # The installed script resolves the installed block, even from a different cwd.
+            injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / names[1])],
+                                      input='{"agent_type":"general-purpose"}', env=env, cwd=home,
+                                      capture_output=True, text=True, timeout=30)
+            self.assertEqual(injected.returncode, 0, injected.stderr)
+            self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
+                             (home / ".claude/hooks" / names[0]).read_text(encoding="utf-8"))
+
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
@@ -68,15 +97,44 @@ class SecretGuardProfileTests(unittest.TestCase):
 
     TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
 
-    def test_install_guards_installs_both_hooks_pinned_by_sha256sums(self):
+    def test_install_guards_installs_all_hooks_pinned_by_sha256sums(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_guards(home, dry_run=False)
-            self.assertEqual(results, {"effort-default-guard.py": "installed", "secret_path_guard.py": "installed"})
-            dest = home / ".claude" / "hooks" / "secret_path_guard.py"
-            self.assertEqual(dest.read_bytes(), icp.SECRET_GUARD_SRC.read_bytes())
+            self.assertEqual(results, {name: "installed" for name in icp.HOOKS})
+            for name, source in icp.HOOKS.items():
+                self.assertEqual((home / ".claude" / "hooks" / name).read_bytes(), source.read_bytes())
             self.assertEqual(icp.install_guards(home, dry_run=False),
-                             {"effort-default-guard.py": "skipped", "secret_path_guard.py": "skipped"})
+                             {name: "skipped" for name in icp.HOOKS})
+
+    def test_token_lanes_template_merges_once_alongside_existing_ai_memory(self):
+        import apply_claude_settings as acs
+        with tempfile.TemporaryDirectory() as tmp:
+            template = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
+            incoming = template["hooks"]["SubagentStart"]
+            memory = next(hook for group in incoming for hook in group["hooks"]
+                          if "--event subagent-start" in hook["command"])
+            # The current live shape already carries ai-memory under the empty matcher.
+            base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [memory]}]}}
+            wanted = f'python3 "{tmp}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
+            own_groups = [group for group in incoming
+                          if any(acs.command_key(hook["command"]) == acs.command_key(wanted)
+                                 for hook in group["hooks"])]
+            self.assertEqual(len(own_groups), 1)
+            self.assertEqual(own_groups[0], {"matcher": "", "hooks": [
+                {"type": "command", "command": wanted, "timeout": 5}]})
+            for initial in ({}, base):
+                merged = initial
+                for application in (1, 2):
+                    previous = merged
+                    merged = acs.merge_settings(merged, template)
+                    keys = [acs.command_key(hook["command"])
+                            for group in merged["hooks"]["SubagentStart"] for hook in group["hooks"]]
+                    with self.subTest(existing=bool(initial), application=application):
+                        self.assertEqual(keys.count(acs.command_key(wanted)), 1)
+                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1)
+                        if application == 2:
+                            self.assertEqual(merged, previous)
 
     def test_sha256sums_verifies_like_sha256sum_c(self):
         entries = icp.sha256sums_entries()

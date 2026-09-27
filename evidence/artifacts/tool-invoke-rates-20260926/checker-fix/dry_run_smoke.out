@@ -1,0 +1,17 @@
+PASS dry run query parses and returns no series for a fresh task id: Claude MCP tool_result by server: context-mode plugin >= 1, qmd >= 2 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude skill_activated by name: codebase-design >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude Agent launches (accepted tool_decision) by subagent_type: general-purpose >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude Workflow launches (accepted tool_decision) >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude tool_result by actor: workflow >= 1 and main_or_subagent >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude api_request MCP attribution: subagent/qmd >= 1 and workflow/qmd >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude subagent_completed total_tool_uses for general-purpose >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Claude Bash tool_result carries shell_rtk :: no series
+PASS dry run query parses and returns no series for a fresh task id: Codex MCP tool_result by server: context-mode >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Codex tool_result by actor: main >= 1 and subagent >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: Codex agent_communication spawn sends >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: tool results by client: claude-code >= 1 and codex_exec >= 1 :: no series
+PASS dry run query parses and returns no series for a fresh task id: unparsed tool_parameters == 0 :: no series
+PASS dry run query parses and returns no series for a fresh task id: names replaced by the name pattern == 0 :: no series
+PASS dry run query parses and returns no series for a fresh task id: agent types outside the built-in agents (custom) == 0 (the proof uses general-purpose only) :: no series
+SUMMARY prove: 15 passed, 0 failed
+SUMMARY dry_run_smoke: returncode=0 pass_lines=15 (expect 15) crashed=False ok=True
