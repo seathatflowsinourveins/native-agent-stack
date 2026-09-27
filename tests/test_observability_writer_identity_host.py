@@ -676,6 +676,56 @@ def old_prometheus_config(cfg):
     return yaml.safe_dump(doc, sort_keys=False)
 
 
+@unittest.skipUnless(HAVE_YAML, "the Prometheus merger needs PyYAML")
+class MergePrometheusTests(unittest.TestCase):
+    def setUp(self):
+        self.rendered = yaml.safe_load(SCRAPE.read_text().replace("@CONFIG_ROOT@", "/host/config"))
+        self.host = yaml.safe_load(old_prometheus_config(Path("/host/config")))
+        self.host_rules = [
+            {"source_labels": ["host_env"], "regex": "test", "action": "drop"},
+            {"regex": "host_private", "action": "labeldrop"},
+        ]
+        self.collector_job(self.host)["metric_relabel_configs"] = self.host_rules
+        self.owned_rules = self.collector_job(self.rendered)["metric_relabel_configs"]
+
+    @staticmethod
+    def collector_job(config):
+        return next(job for job in config["scrape_configs"] if job["job_name"] == "collector-native")
+
+    def run_merge(self, host):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, rendered, output = root / "host.yaml", root / "rendered.yaml", root / "merged.yaml"
+            source.write_text(yaml.safe_dump(host, sort_keys=False))
+            rendered.write_text(yaml.safe_dump(self.rendered, sort_keys=False))
+            result = subprocess.run([sys.executable, str(HOST / "merge_prometheus.py"), "--host", str(source),
+                                     "--rendered", str(rendered), "--output", str(output)],
+                                    capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return result, yaml.safe_load(output.read_text()), output.read_bytes()
+
+    def test_host_rules_are_preserved_in_order_before_owned_rules(self):
+        _, merged, _ = self.run_merge(self.host)
+        self.assertEqual(self.collector_job(merged)["metric_relabel_configs"], self.host_rules + self.owned_rules)
+        self.collector_job(merged)["metric_relabel_configs"] = self.host_rules
+        self.assertEqual(merged, self.host)
+
+    def test_second_merge_is_a_noop(self):
+        _, merged, first_bytes = self.run_merge(self.host)
+        result, repeated, second_bytes = self.run_merge(merged)
+        self.assertEqual(self.collector_job(repeated)["metric_relabel_configs"], self.host_rules + self.owned_rules)
+        self.assertEqual(repeated, merged)
+        self.assertEqual(second_bytes, first_bytes)
+        self.assertIn("no change (already applied)", result.stdout)
+
+    def test_existing_owned_rules_stay_in_place(self):
+        self.collector_job(self.host)["metric_relabel_configs"] = (
+            self.host_rules[:1] + self.owned_rules + self.host_rules[1:])
+        result, merged, _ = self.run_merge(self.host)
+        self.assertEqual(merged, self.host)
+        self.assertIn("no change (already applied)", result.stdout)
+
+
 @unittest.skipUnless(HAVE_YAML, "the Collector merger needs PyYAML")
 class MergeCollectorTests(unittest.TestCase):
     def run_merge(self, host):
@@ -862,6 +912,54 @@ class ApplyRollbackTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, result.stdout)
         self.assertEqual({path: path.read_bytes() for path in self.watched}, self.original)
         self.assertEqual(self.restarts(), [])
+
+    def assert_claude_preflight_refuses_without_changes(self):
+        before = {path: path.read_bytes() if path.is_file() else None for path in self.watched}
+        result = self.apply("--apply")
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(self.restarts(), [])
+        self.assertEqual(self.backups(), [])
+        self.assertEqual({path: path.read_bytes() if path.is_file() else None for path in self.watched}, before)
+        self.assertTrue(self.codex_link.is_symlink())
+        self.assertEqual(self.codex_link.resolve(), self.codex_real)
+        self.assertNotIn("step prometheus", result.stdout)
+        self.assertIn("refusing Claude settings", result.stderr)
+        self.assertIn("nothing was changed", result.stderr)
+
+    def test_absent_claude_settings_refuse_before_install_or_restart(self):
+        self.settings.unlink()
+        self.assert_claude_preflight_refuses_without_changes()
+        self.assertFalse(self.settings.exists())
+
+    def test_malformed_claude_settings_refuse_before_install_or_restart(self):
+        self.settings.write_text('{"env":')
+        self.assert_claude_preflight_refuses_without_changes()
+
+    def test_symlinked_claude_settings_refuse_before_install_or_restart(self):
+        target = self.settings.with_name("target.json")
+        target.write_bytes(self.settings.read_bytes())
+        self.settings.unlink()
+        self.settings.symlink_to(target)
+        self.assert_claude_preflight_refuses_without_changes()
+        self.assertTrue(self.settings.is_symlink())
+        self.assertEqual(self.settings.resolve(), target)
+        self.assertEqual(target.read_bytes(), self.original[self.settings])
+
+    def test_non_object_claude_settings_refuse_before_install_or_restart(self):
+        self.settings.write_text("[]\n")
+        self.assert_claude_preflight_refuses_without_changes()
+
+    def test_directory_claude_settings_refuse_before_install_or_restart(self):
+        self.settings.unlink()
+        self.settings.mkdir()
+        self.assert_claude_preflight_refuses_without_changes()
+        self.assertTrue(self.settings.is_dir())
+
+    def test_unselected_claude_setting_does_not_require_settings_file(self):
+        self.settings.unlink()
+        result = self.apply("--apply", "--only", "dashboards")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(self.settings.exists())
 
     def test_collector_merge_refusal_installs_nothing(self):
         path = self.cfg / "collector.yaml"

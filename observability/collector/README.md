@@ -153,10 +153,26 @@ change. The Collector merge checks the resulting config before writing its
 candidate: every original statement, statement-group condition, processor
 setting, pipeline and processor order must survive. The only permitted
 processing changes are the repository's writer-identity additions and the
-`deltatocumulative` alias rename. An extra host statement or incompatible
-order produces a non-zero refusal naming the affected config section;
+`deltatocumulative` alias rename. An extra host metrics processor, an extra
+`transform/privacy` metric statement, or incompatible order produces a
+non-zero refusal naming the affected config section;
 `apply.sh` stops before installing anything. These checks respect the
 [pinned transform processor's ordered execution](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/processor/transformprocessor/README.md).
+
+The Prometheus merge keeps the host's existing `collector-native`
+`metric_relabel_configs` first, in their original order, and appends only
+missing repository bucket rules. Owned rules already present stay in place;
+a second merge makes no change. Its guard checks that the original rules
+survive exactly, only missing owned rules are appended, and all other host
+settings are unchanged. This preserves
+[Prometheus 3.15.0's rule execution order](https://github.com/prometheus/prometheus/blob/v3.15.0/model/relabel/relabel.go).
+
+When `claude-setting` is selected, preflight requires
+`~/.claude/settings.json` to be a regular file, not a symlink, and reads it
+through `claude_setting.py` before rendering or installing any candidate.
+Missing, unreadable, malformed, or non-object JSON settings cause a clear
+refusal before any installation, backup, or service restart. A run that does
+not select `claude-setting` does not require this file.
 
 Before rendering, `apply.sh` records each selected file target's SHA-256,
 including absent targets and the launcher's symlink destination. It checks

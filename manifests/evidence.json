@@ -13668,8 +13668,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "9719a8cbcda0e64a345f78418be85161e70f728455b0cb421e72880bc54eba51",
-      "bytes": 27908
+      "sha256": "30c6a0769637d7bde5d7f066aa557b10fd6c571a4bc47ac95ac206d6d660bea9",
+      "bytes": 29153
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -35248,8 +35248,8 @@
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/apply.sh",
-      "sha256": "dd2833794312c1eebd57d1be34e1c5588ebf87cd103c010f4a24138c03f8c13b",
-      "bytes": 28136
+      "sha256": "0f029a4f68da284ae893da8853a3bc7e5f433cdd9faf202d9ec784c6ac4d40e5",
+      "bytes": 28654
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/claude_setting.py",
@@ -35263,8 +35263,8 @@
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/merge_prometheus.py",
-      "sha256": "c1c4d53acc9ccb72dd96e367663798a6a4ebb45c258844d71be6f588a65f7e8c",
-      "bytes": 2068
+      "sha256": "9472b029834eb87f0d1074117c9b0b8572c757a9c6d28ccd626ed0d61f1fff45",
+      "bytes": 3358
     },
     {
       "path": "evidence/artifacts/telemetry-writer-identity-20260926/host/prove.py",
@@ -37543,8 +37543,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "527b9ca53e74f26fa26d9675bb0d4406fae76e5380a3be58b85e404b565862ca",
-      "bytes": 16292
+      "sha256": "28623b6414a1f7b6cb082f60e50741428a4adfadc314c1afcdb7ca79e607a3c8",
+      "bytes": 17288
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -38538,8 +38538,8 @@
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
-      "sha256": "eb28b8254299204a0f5bfd41a73cf51345b36f8106200f9b8aae03a59a2815e9",
-      "bytes": 56687
+      "sha256": "ed753ba402f5795c0d15d1e8e58430bb8fb71471f0a30d7650e6ddf196417c4a",
+      "bytes": 61935
     },
     {
       "path": "tests/test_offhost_app_state.py",

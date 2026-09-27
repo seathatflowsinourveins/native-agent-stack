@@ -62,6 +62,13 @@ WORK="$(mktemp -d "${TMPDIR:-/tmp}/g1-apply-$STAMP.XXXXXX")"
 want() { [[ -z "$ONLY" || ",$ONLY," == *",$1,"* ]]; }
 say() { printf '%s\n' "$*"; }
 die() { printf 'apply.sh: %s\n' "$*" >&2; exit 1; }
+preflight_claude_settings() {
+  local settings="$HOME/.claude/settings.json"
+  [[ -f "$settings" && ! -L "$settings" ]] \
+    || die "refusing Claude settings: ~/.claude/settings.json must be a regular file, not a symlink; nothing was changed"
+  "$PY" "$HERE/claude_setting.py" --settings "$settings" > /dev/null 2>&1 \
+    || die "refusing Claude settings: ~/.claude/settings.json must be readable and contain a top-level JSON object; nothing was changed"
+}
 newest_backup() {  # what rollback.sh restores by default: the newest backup with a manifest
   local found="" candidate
   for candidate in "$STATE_DIR"/backup-*; do
@@ -200,6 +207,7 @@ done
 "$PY" -c 'import yaml' 2>/dev/null || { echo "$PY lacks PyYAML; set PY to a python that has it" >&2; exit 2; }
 grep -q 'groupbyattrs/session' "$REPO/observability/collector/collector.yaml" || {
   echo "the repo checkout lacks the writer-identity profile" >&2; exit 2; }
+if want claude-setting; then preflight_claude_settings; fi
 
 # ---- render every candidate with the repository's own renderers --------------------------------------------
 codex_link="$ECO/bin/codex"
