@@ -572,6 +572,8 @@ summaries, savings sharing, watchers, cross-repository defaults and external
 context providers disabled. Do not index conversations, credentials or every
 project merely because the server is available.
 
+Reindex this checkout's root with `order` → `index_folder` (`incremental=false`) to apply [`.jcodemunch.jsonc`](../.jcodemunch.jsonc).
+
 The upstream default index root is intentional: in this release, source retrieval
 records its estimate there even when a custom index root was requested. Reading
 stats from a different root can therefore show a misleading zero. Keep the
