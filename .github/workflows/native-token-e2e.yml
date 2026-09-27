@@ -30,6 +30,13 @@ jobs:
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
+      - name: Allow unprivileged user namespaces for the context-hub offline probe
+        # Ubuntu 24.04 restricts them by default (kernel.apparmor_restrict_unprivileged_userns=1);
+        # the hosted ubuntu-24.04 image keeps that restriction (actions/runner-images#10443), so
+        # context_hub_fixture's `unshare -rn` would otherwise fail "Operation not permitted" here.
+        # Passwordless sudo on the runner already grants this; the sysctl only stops AppArmor
+        # denying it to the unprivileged runner user. No SHA pin applies to a `run:` step.
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Check out public fixture source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
