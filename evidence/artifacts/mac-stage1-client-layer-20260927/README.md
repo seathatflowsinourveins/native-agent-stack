@@ -66,8 +66,15 @@ Undo each with its own native command (all read-only to verify first: `claude pl
 repository source, so each removal is gated on a digest read directly from the live file in
 this review-fix pass — recorded 2026-09-27 from the live file, not an install-time digest —
 rather than assumed from the repository copy. As a factual aside, not part of the gate
-itself, all 10 also match their [`adoption/agents/claude/`](../../../adoption/agents/claude/)
-repository copies exactly today:
+itself: 7 of the 10 also match their
+[`adoption/agents/claude/`](../../../adoption/agents/claude/) repository copies exactly as of
+this commit (`blind-adjudicator`, `blind-judge`, `blind-lane-reviewer`, `evidence-reviewer`,
+`security-reviewer`, `semantic-evidence-reviewer`, `stack-researcher`); the other 3
+(`isolated-builder.md`, `source-scout.md`, `stack-verifier.md`) do not, because this branch's
+merge of `origin/main` (below) revised those three agent definitions after this host installed
+its own copies — an ordinary divergence for a file this document never claimed was pinned or
+byte-identical, not evidence of anything wrong with the live install, and exactly why the gate
+below reads the live digest rather than the repository's:
 
 ```sh
 f=~/.claude/agents/blind-adjudicator.md; [ "$(shasum -a 256 "$f" | cut -d' ' -f1)" = "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4" ] && rm "$f" || echo "kept $f (missing, or changed since Stage 1)"
