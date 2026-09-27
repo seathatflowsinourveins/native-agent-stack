@@ -5,24 +5,140 @@
   "run_started": false,
   "created": "2026-09-27",
   "lane": "foundation",
-  "objective": "Matched A/B/C comparison of the auto-compact window for long Ultracode Workflow children; select quality per weighted child token cost before any adoption.",
+  "objective": "Exploratory matched A/B/C pilot of long Ultracode Workflow children: rank observed non-inferior arms by all-attempt weighted child cost per successful task; no persistent adoption from three repetitions.",
   "reference_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1",
   "reused_task_source": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
   "source_read_date": "2026-09-27",
   "sources": [
-    {"id": "client", "source": "Installed claude --version and claude --help", "observed": "2.1.283; --autocompact <auto|tokens>; -p; --effort; --model", "class": "installation_inspection"},
-    {"id": "changelog", "repository": "anthropics/claude-code", "pin": "v2.1.283", "url": "https://github.com/anthropics/claude-code/blob/v2.1.283/CHANGELOG.md", "verification": "gh api contents/CHANGELOG.md?ref=v2.1.283 resolved download_url; fetched that pinned raw URL with ctx_fetch_and_index"},
-    {"id": "window", "url": "https://code.claude.com/docs/en/model-config#set-the-auto-compact-window", "sections": ["Set the auto-compact window", "Default auto-compact thresholds"]},
-    {"id": "environment", "url": "https://code.claude.com/docs/en/env-vars", "sections": ["Set environment variables", "Precedence", "Variables"]},
-    {"id": "workflow", "url": "https://code.claude.com/docs/en/workflows#prompt-caching-in-a-fan-out"},
-    {"id": "native_compaction", "url": "https://code.claude.com/docs/en/sub-agents#auto-compaction"},
-    {"id": "sdk_compaction", "url": "https://code.claude.com/docs/en/agent-sdk/typescript#sdkcompactboundarymessage"},
-    {"id": "cache", "url": "https://code.claude.com/docs/en/prompt-caching#choose-the-ttl-yourself"},
-    {"id": "prices", "url": "https://platform.claude.com/docs/en/about-claude/pricing"},
-    {"id": "local_accounting", "path": "examples/claude-native/workflows/child-usage.mjs", "revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "sha256": "f5ea9c3a1b47cab91e90a515f455bcf6a960fb696db89717e04b7424e4ff42a0"},
-    {"id": "local_conventions", "revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "paths": ["tests/test_token_e2e_preregistration.py", "blueprints/retrieval-quality-v2/PREREGISTRATION.md", "evidence/artifacts/token-adoption-e2e-20260926/README.md", "docs/acceptance-evidence-policy.md", "docs/token-practice.md", "docs/convergence-architecture.md", "docs/lanes.md"]}
+    {
+      "id": "client",
+      "source": "Installed claude --version and claude --help",
+      "observed": "2.1.283; --autocompact <auto|tokens>; -p; --effort; --model",
+      "class": "installation_inspection"
+    },
+    {
+      "id": "changelog",
+      "repository": "anthropics/claude-code",
+      "pin": "v2.1.283",
+      "url": "https://github.com/anthropics/claude-code/blob/v2.1.283/CHANGELOG.md",
+      "verification": "gh api contents/CHANGELOG.md?ref=v2.1.283 resolved download_url; fetched that pinned raw URL with ctx_fetch_and_index"
+    },
+    {
+      "id": "window",
+      "url": "https://code.claude.com/docs/en/model-config#set-the-auto-compact-window",
+      "sections": [
+        "Set the auto-compact window",
+        "Default auto-compact thresholds"
+      ]
+    },
+    {
+      "id": "environment",
+      "url": "https://code.claude.com/docs/en/env-vars",
+      "sections": [
+        "Set environment variables",
+        "Precedence",
+        "Variables"
+      ]
+    },
+    {
+      "id": "workflow",
+      "url": "https://code.claude.com/docs/en/workflows#prompt-caching-in-a-fan-out"
+    },
+    {
+      "id": "native_compaction",
+      "url": "https://code.claude.com/docs/en/sub-agents#auto-compaction"
+    },
+    {
+      "id": "sdk_compaction",
+      "url": "https://code.claude.com/docs/en/agent-sdk/typescript#sdkcompactboundarymessage"
+    },
+    {
+      "id": "cache",
+      "url": "https://code.claude.com/docs/en/prompt-caching#choose-the-ttl-yourself"
+    },
+    {
+      "id": "prices",
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing"
+    },
+    {
+      "id": "local_accounting",
+      "path": "examples/claude-native/workflows/child-usage.mjs",
+      "revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1",
+      "sha256": "f5ea9c3a1b47cab91e90a515f455bcf6a960fb696db89717e04b7424e4ff42a0"
+    },
+    {
+      "id": "local_conventions",
+      "revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1",
+      "paths": [
+        "tests/test_token_e2e_preregistration.py",
+        "blueprints/retrieval-quality-v2/PREREGISTRATION.md",
+        "evidence/artifacts/token-adoption-e2e-20260926/README.md",
+        "docs/acceptance-evidence-policy.md",
+        "docs/token-practice.md",
+        "docs/convergence-architecture.md",
+        "docs/lanes.md"
+      ]
+    },
+    {
+      "id": "otel_requests",
+      "repository": "anthropics/claude-code",
+      "pin": "v2.1.283",
+      "url": "https://code.claude.com/docs/en/monitoring-usage#api-request-event",
+      "read": "2026-09-27",
+      "class": "upstream_provenance",
+      "limitation": "Closed-source client: live schema documentation plus supplied installed-version/changelog review, not source proof of event completeness."
+    },
+    {
+      "id": "loki_query",
+      "url": "https://grafana.com/docs/loki/latest/reference/loki-http-api/",
+      "read": "2026-09-27"
+    },
+    {
+      "id": "ccusage",
+      "repository": "ccusage/ccusage",
+      "pin": "v20.0.26",
+      "url": "https://github.com/ccusage/ccusage/blob/v20.0.26/docs/guide/session-reports.md"
+    },
+    {
+      "id": "inspect_scorers",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "pin": "0.3.271",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/scorer/_match.py"
+    },
+    {
+      "id": "inspect_skills",
+      "repository": "meridianlabs-ai/inspect-skills",
+      "pin": "v0.4.5",
+      "url": "https://github.com/meridianlabs-ai/inspect-skills/blob/v0.4.5/README.md",
+      "disposition": "Source and skills.sh listing inspected; package/log guidance does not supply these task oracles. No installation."
+    },
+    {
+      "id": "process_supervision",
+      "repository": "python/cpython",
+      "pin": "4061bc4c35f7c26f25264666d4ba083b93d2f6f9",
+      "paths": [
+        "Doc/library/subprocess.rst",
+        "Doc/library/os.rst"
+      ],
+      "url": "https://github.com/python/cpython/blob/4061bc4c35f7c26f25264666d4ba083b93d2f6f9/Doc/library/subprocess.rst"
+    },
+    {
+      "id": "precision_reference",
+      "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm",
+      "read": "2026-09-27"
+    },
+    {
+      "id": "repair_review",
+      "artifact": "gpt6-review.md",
+      "sha256": "f27867d62728615952804aa8e04cd540ab0e63ce199545d4893883f0d7c18e2c"
+    },
+    {
+      "id": "framework_mapping",
+      "artifact": "report2.md#W9",
+      "sha256": "b5d204ebe070c26b64fe06ea4726181ad695f7f9e4abd7bc41b6b34dcd2ed5a6"
+    }
   ],
-  "research_disposition": "Extend the repository's existing preregistration and unittest contracts; reuse Claude's supported control, native transcripts and child-usage.mjs. No installation, new runtime, agent orchestrator or host configuration is needed for this draft. Search-first, tdd, context-mode and verification-before-completion were selected from the installed skill catalog. No package search/install is needed for these document contracts.",
+  "research_disposition": "Source-backed extension of the existing document/contract-test seam. Native Claude OTel -> existing collector -> Loki is the request instrument; ccusage v20.0.26 reconciles sessions; Inspect 0.3.271 match scorers grade canonical independent records through thin adapters. No inspect_swe bridge: it changes launch defaults/context selection. Installed Inspect metadata is 0.3.266, so pinned scorer execution remains unqualified. No host changes, Claude sessions or installations in this repair.",
   "native_lever": {
     "variable": "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
     "encoding": "plain integer token count",
@@ -75,8 +191,8 @@
     "cost_reduction_min_fraction": 0.1,
     "repetitions_per_task_arm": 3,
     "washout_seconds": 360,
-    "weekly_usage_cap_percentage_points": 20,
-    "weekly_usage_cancel_percentage_points": 18
+    "run_budget_tokens": 1000000000,
+    "ledger_poll_seconds": 1
   },
   "frozen_corpora": {
     "serialization": "For local inventories: sorted path list selected from git ls-tree -r at reference_revision; objects {path,sha256} from original blob bytes; UTF-8 JSON, sort_keys=true, separators=(',',':'), no trailing newline. Never enumerate the changing worktree.",
@@ -195,73 +311,634 @@
     "fresh_process_per_attempt": true,
     "max_concurrent_coordinators": 1,
     "max_focal_children_per_attempt": 1,
-    "order_by_task": {"builder": ["ABC", "BCA", "CAB"], "web": ["ACB", "CBA", "BAC"], "verification": ["BCA", "CAB", "ABC"], "review": ["CBA", "BAC", "ACB"]},
-    "task_order_by_repetition": [["builder", "web", "verification", "review"], ["web", "verification", "review", "builder"], ["verification", "review", "builder", "web"]],
+    "order_by_task": {
+      "builder": [
+        "ABC",
+        "BCA",
+        "CAB"
+      ],
+      "web": [
+        "ACB",
+        "CBA",
+        "BAC"
+      ],
+      "verification": [
+        "BCA",
+        "CAB",
+        "ABC"
+      ],
+      "review": [
+        "CBA",
+        "BAC",
+        "ACB"
+      ]
+    },
+    "task_order_by_repetition": [
+      [
+        "builder",
+        "web",
+        "verification",
+        "review"
+      ],
+      [
+        "web",
+        "verification",
+        "review",
+        "builder"
+      ],
+      [
+        "verification",
+        "review",
+        "builder",
+        "web"
+      ]
+    ],
     "schedule_algorithm": "For repetition index 0..2, visit task_order_by_repetition[index]; run its three arms in order_by_task[task][index]. Each task occupies each arm-position once; all six permutations occur twice overall. Do not reorder after failures.",
     "washout": "Wait at least 360 seconds after the last request and process-group termination before the next attempt, including same-model wrapper work. Verify 5-minute child TTL. No other Claude use during the experiment. Within-child cache reuse stays native; first-request cache read is measured, not assumed zero.",
     "retries": "No replacement attempts or human repair within this run. Native provider retries remain part of the original attempt's usage. Ordinary completed task failures remain scored failures; protocol interruptions or restarts stop the whole run as incomplete.",
-    "eligibility": "All 12 A focal children must exceed 400000 per-request prompt tokens; all 24 B/C focal children must demonstrate automatic compaction in their assigned validity bands. No padding, wider bands, dropping tasks or adding turns after seeing a short/failing run. Preserve all records and stop incomplete on the first violated eligibility condition."
+    "eligibility": "All 12 A focal children must exceed 400000 per-request prompt tokens; all 24 B/C focal children must demonstrate automatic compaction in their assigned validity bands. No padding, wider bands, dropping tasks or adding turns after seeing a short/failing run. Preserve all records and stop incomplete on the first violated eligibility condition.",
+    "precision": {
+      "scope": "exploratory_frozen_suite_pilot",
+      "paired_unit": "task_by_repetition",
+      "repetitions_per_task": 3,
+      "variance_estimate": null,
+      "variance_source": "No independent pilot variance for paired task costs exists. Max-effort output, tool trajectory, compaction work and cache reuse vary within task; task heterogeneity cannot be treated as independent repeats of one task.",
+      "claimed_confidence_level": null,
+      "confirmatory_repetitions": null,
+      "supported_claim": "Three repeats give position balance, observed ranges and a descriptive finite-suite ranking only. They do not establish a repeatable 10% saving, statistical quality non-inferiority, 95% confidence or general adoption.",
+      "illustrative_precision": "For independent approximately normal paired relative cost differences d, a two-sided 95% t interval has half-width t(0.975,n-1)*s_d/sqrt(n). At n=3, t=4.303: half-width is 2.484*s_d. A half-width <=0.10 would require s_d<=0.0403, which is unmeasured. This illustration is not an interval for the failure-inclusive ratio of sums and not a power calculation.",
+      "future_design": "Use an independent pilot to estimate within-task paired variation and task/check discordance, then preregister a fresh confirmatory cohort and simultaneous inference for both candidates and per-task gates. For mean-difference planning, solve t(0.975,n-1)*s_d/sqrt(n)<=h at the chosen precision h; the actual ratio-per-success needs an appropriate paired ratio/failure model. No numerical confirmatory n is asserted without variance.",
+      "stability": "Report paired costs, check outcomes and ranges by task/repetition. Recompute the same descriptive decision leaving out each complete repetition block in turn (all tasks/all arms together); a changed ranking or loss of any 10% gate is unstable. This sensitivity check is not a confidence interval and cannot promote a pilot winner to adoption.",
+      "source_id": "precision_reference"
+    }
   },
   "metrics": {
-    "quality": {"source": "Frozen task checks independently applied to original outputs and native command/artifact evidence", "window": "Each complete assigned task attempt", "denominator": "Two checks per task attempt, 24 check opportunities and 12 task attempts per arm", "success": "A task succeeds only when every frozen check passes; report each boolean, pass count and successful-task count. Missing evidence is unknown, never pass."},
-    "child_usage": {"source": "examples/claude-native/workflows/child-usage.mjs at reference_revision; node child-usage.mjs <private-transcript-dir> --require-effort max", "window": "Entire fresh Workflow attempt, first request through final/interrupted record, including every failed, restarted or superseded child attempt", "denominator": "Per attempt, per model, and all assigned attempts per successful task within each arm/task and pooled arm", "counters": ["input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens"], "aggregation": "Use by_resolved_model exactly once for the Workflow. Do not also add its children, superseded_attempts, usage_by_model, parent cumulative results or /usage. Greatest output_tokens wins for duplicate message.id (row.uuid fallback). Required missing counters remain unknown; audit against native records because the helper uses zero defaults for absent fields."},
-    "weighted_cost": {"unit": "USD-equivalent at dated public standard API rates, not subscription billing", "source_id": "prices", "prices_read": "2026-09-27", "rates_per_million": {"claude-opus-5-5": {"input_tokens": 4, "cache_creation_input_tokens": 5, "cache_read_input_tokens": 0.2, "output_tokens": 20}, "claude-sonnet-5": {"input_tokens": 2, "cache_creation_input_tokens": 2.5, "cache_read_input_tokens": 0.2, "output_tokens": 10}}, "formula": "W = sum_over_models((p_input*input_tokens + p_write*cache_creation_input_tokens + p_read*cache_read_input_tokens + p_output*output_tokens)/1000000); cost_per_success = sum(W across ALL assigned attempts)/successful_task_count", "normalized_weights": "Opus 5.5: 1,1.25,0.05,5. Sonnet 5: 1,1.25,0.1,5. Never sum these differently based normalized units across models; the dollar-equivalent W is the common weighted total.", "zero_successes": "Undefined, not zero cost; no candidate adoption if any compared task/arm has zero successes.", "separation": "Keep all four token categories separately. Thinking is already in output; do not add transcript bytes or reasoning tokens again. A 1-hour write, unknown model/tier or missing pricing/usage invalidates the comparison. No >200K premium for these models at these rates."},
-    "compaction": {"source": "Native per-child compact_boundary records and deduplicated provider prompt counters; sdk_compaction only as a separately identified schema", "window": "Entire child attempt", "denominator": "Each event and each child; event count, preTokens, last-before/first-after request prompt tokens, maximum prompt tokens", "missing": "No event is a valid censored A observation only with complete transcript; missing transcript/context is unknown."},
-    "wall_time": {"source": "Supervisor monotonic timestamps corroborated by native journal start/end", "window": "Coordinator launch to process-group exit for an attempt; separately child first-to-last record", "denominator": "Seconds per attempt; all-attempt seconds per successful task; total scheduled elapsed also includes washouts", "failures": "Failed/interrupted wall time retained; process liveness is not completion."},
-    "weekly_quota": {"source": "Native /usage, value-only readings for every displayed weekly bucket; reset timestamp", "window": "Whole run, before readiness through final shutdown, plus intermediate readings", "denominator": "Percentage points of the same 100% weekly allowance, including coordinators, probes, wrappers and failed/interrupted attempts", "aggregation": "Use end minus baseline for each bucket; never sum cumulative snapshots or overlapping all-model/model-specific buckets. Track the maximum bucket delta for the cap. Subscription percentage is not API priced cost."},
-    "coordinator": {"source": "Coordinator's own native request records", "window": "Fresh process lifetime", "denominator": "Per attempt, separately from child cost", "boundary": "Exclude child-inclusive cumulative totals; do not add these observations to overlapping reports. Coordinator cache may last 1 hour. A claim about whole-session quality per token would require a separate matched design."}
+    "quality": {
+      "source": "Inspect 0.3.271 match scorers over canonical independent observed/target records from the eight thin adapter contracts; no model self-reported pass flags.",
+      "window": "Each complete assigned task attempt",
+      "denominator": "Two checks per task attempt, 24 check opportunities and 12 task attempts per arm",
+      "success": "A task succeeds only when every frozen check passes; report each boolean, pass count and successful-task count. Missing evidence is unknown, never pass."
+    },
+    "child_usage": {
+      "source": "Authoritative request_ledger OTel rows attributed to focal/wrapper children; unchanged baseline child-usage.mjs is an independent transcript cross-check only.",
+      "window": "Entire fresh Workflow attempt, first request through final/interrupted record, including every failed, restarted or superseded child attempt",
+      "denominator": "Per attempt, per model, and all assigned attempts per successful task within each arm/task and pooled arm",
+      "counters": [
+        "input_tokens",
+        "cache_creation_input_tokens",
+        "cache_read_input_tokens",
+        "output_tokens"
+      ],
+      "aggregation": "Sum the four counters from deduplicated child-attributed request IDs once per model. Include compaction, background preparation, retries, refusals and failed/interrupted work. Do not add child-usage.mjs, ccusage, coordinator cumulative results or /usage totals. Missing counters or unresolved request ownership invalidate comparison."
+    },
+    "weighted_cost": {
+      "unit": "USD-equivalent at dated public standard API rates, not subscription billing",
+      "source_id": "prices",
+      "prices_read": "2026-09-27",
+      "rates_per_million": {
+        "claude-opus-5-5": {
+          "input_tokens": 4,
+          "cache_creation_input_tokens": 5,
+          "cache_read_input_tokens": 0.2,
+          "output_tokens": 20
+        },
+        "claude-sonnet-5": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 2.5,
+          "cache_read_input_tokens": 0.2,
+          "output_tokens": 10
+        }
+      },
+      "formula": "W = sum_over_models((p_input*input_tokens + p_write*cache_creation_input_tokens + p_read*cache_read_input_tokens + p_output*output_tokens)/1000000); cost_per_success = sum(W across ALL assigned attempts)/successful_task_count",
+      "normalized_weights": "Opus 5.5: 1,1.25,0.05,5. Sonnet 5: 1,1.25,0.1,5. Never sum these differently based normalized units across models; the dollar-equivalent W is the common weighted total.",
+      "zero_successes": "Undefined, not zero cost; no candidate adoption if any compared task/arm has zero successes.",
+      "separation": "Keep all four token categories separately. Thinking is already in output; do not add transcript bytes or reasoning tokens again. A 1-hour write, unknown model/tier or missing pricing/usage invalidates the comparison. No >200K premium for these models at these rates."
+    },
+    "compaction": {
+      "source": "Native per-child compact_boundary records and deduplicated provider prompt counters; sdk_compaction only as a separately identified schema",
+      "window": "Entire child attempt",
+      "denominator": "Each event and each child; event count, preTokens, last-before/first-after request prompt tokens, maximum prompt tokens",
+      "missing": "No event is a valid censored A observation only with complete transcript; missing transcript/context is unknown."
+    },
+    "wall_time": {
+      "source": "Supervisor monotonic timestamps corroborated by native journal start/end",
+      "window": "Coordinator launch to process-group exit for an attempt; separately child first-to-last record",
+      "denominator": "Seconds per attempt; all-attempt seconds per successful task; total scheduled elapsed also includes washouts",
+      "failures": "Failed/interrupted wall time retained; process liveness is not completion."
+    },
+    "weekly_quota": {
+      "source": "Native /usage value-only weekly buckets and reset timestamp, before readiness and after settled final shutdown",
+      "role": "descriptive_cross_check_only",
+      "window": "Whole experiment",
+      "denominator": "Percentage points within each unchanged weekly bucket; never aggregate overlapping buckets",
+      "aggregation": "Report per-bucket end minus baseline with reading age and reset identity. Missing/stale readings stay unknown. Cached /usage is not the token stop instrument or a conversion to subscription charge."
+    },
+    "coordinator": {
+      "source": "Coordinator-owned rows in the same request_ledger; always included in the run token budget, reported separately from child cost.",
+      "window": "Fresh process lifetime",
+      "denominator": "Per attempt, separately from child cost",
+      "boundary": "Exclude child-inclusive cumulative totals; do not add these observations to overlapping reports. Coordinator cache may last 1 hour. A claim about whole-session quality per token would require a separate matched design."
+    },
+    "request_ledger": {
+      "instrument": "Claude Code native OTel api_request events",
+      "transport": "existing host collector -> Loki",
+      "source_ids": [
+        "otel_requests",
+        "loki_query",
+        "ccusage"
+      ],
+      "scope": "One private launch/session registry maps owned processes to task/arm/repetition, parent, focal child and wrappers. Capture every request from launch/readiness through final settled shutdown; retain coordinator usage separately from child cost.",
+      "events": [
+        "claude_code.api_request",
+        "claude_code.api_error",
+        "claude_code.api_refusal"
+      ],
+      "event_name_note": "OTel event body/name can be claude_code.api_request while event.name is api_request; qualify the actual Loki mapping before sealing, not a text search of content-omitted bodies.",
+      "required_attributes": [
+        "request_id",
+        "session.id",
+        "event.timestamp",
+        "event.sequence",
+        "model",
+        "query_source",
+        "input_tokens",
+        "output_tokens",
+        "cache_creation_tokens",
+        "cache_read_tokens"
+      ],
+      "attribution": [
+        "request_id",
+        "client_request_id",
+        "session.id",
+        "workflow.run_id",
+        "agent_id",
+        "parent_agent_id",
+        "query_source",
+        "model",
+        "attempt",
+        "server_fallback_hop"
+      ],
+      "attribute_scope": "All four counters and a request_id are mandatory for a metered api_request. Agent/Workflow/parent fields apply when native events provide them; absent main-session parent fields are not invented. Errors/refusals without counters remain unresolved until joined to a metered request or provider evidence establishes no usage.",
+      "counters": {
+        "input_tokens": "input_tokens",
+        "output_tokens": "output_tokens",
+        "cache_creation_tokens": "cache_creation_input_tokens",
+        "cache_read_tokens": "cache_read_input_tokens"
+      },
+      "include": [
+        "ordinary",
+        "compaction",
+        "background_preparation",
+        "retry",
+        "refusal",
+        "fallback",
+        "coordinator",
+        "wrapper",
+        "failed",
+        "interrupted"
+      ],
+      "query": "Read GET /loki/api/v1/query_range with a sealed service/session selector, fixed start/end nanoseconds and direction=forward. Poll every 1 second using overlapping ranges from launch through now. Page/split until no response is limit-truncated; retain every page and its query interval. A full page, missing interval or error cannot be a complete ledger. Re-query the whole interval after shutdown/drain.",
+      "deduplication": {
+        "key": [
+          "provider",
+          "request_id"
+        ],
+        "rule": "Identical retransmitted events collapse once across overlapping queries and exporter retries. Different provider request IDs count separately even under one client request/retry chain. Join error/refusal events onto the request row; they do not add counters. Missing request ID remains unknown; never use timestamps or message text as a substitute.",
+        "conflict_action": "stop_entire_run_incomplete"
+      },
+      "join": "Join transcript response/provider request ID to OTel request_id; retain the qualified transcript-field mapping. Use client_request_id plus attempt to link retry chains, not to deduplicate distinct provider requests. Use native session/Workflow/agent lineage to attribute compact and background requests even if no assistant message exists. Each request has exactly one owner. compact_boundary is treatment evidence, not a usage row.",
+      "unattributed_action": "retain_in_run_budget_stop_comparison",
+      "fallback": "Inspect resolved model and api_refusal.server_fallback_hop as well as launch model. Retain fallback usage in the budget, invalidate the matched cost comparison on any fallback, and keep unreported fallback charge unknown. Never filter fallback/error requests out to make totals agree.",
+      "reconciliation": {
+        "ccusage_pin": "v20.0.26",
+        "command": "ccusage claude session --id \"$SESSION_ID\" --json --offline",
+        "scope": "Run offline for every owned native session after settled exit. Explicitly map focal/wrapper transcripts and parent session scope; prove whether this pin includes each child before comparing like scopes. The transcript helper supplies a separate child attribution check, not the primary total.",
+        "equation": "For each session/model/token category: OTel_total = ccusage_total + OTel_only - ccusage_only. Each residual must be enumerated by private request ID and native source, with complete four-category usage. Expected final ccusage_only=0. OTel-only compact/background usage may be legitimate if independently attributed and metered; equal totals alone do not prove coverage.",
+        "add_totals_to_ledger": false,
+        "unexplained_delta_action": "stop_entire_run_incomplete",
+        "absence_rule": "No usage row is not proof of zero charge. Retain error/refusal/timeout/cancelled requests with unknown counters unless authoritative evidence resolves them; any unresolved amount stops selection."
+      },
+      "qualification": {
+        "request_id_preservation_proven": false,
+        "active_collector_inspected": false,
+        "reporting_lag_measured": false,
+        "note": "Repository observability/collector/collector.yaml allowlist omits request_id, client_request_id and agent_id. Existing running collector is user-specified, but active sanitized request/child joins were not observed. Do not change the collector in this repair or silently substitute session sums. Gate launch on preserved native IDs and reconciled coverage."
+      }
+    }
   },
   "decision_rule": {
     "quality_rule": "For every task and check, any pass in A requires a pass in every repetition of the candidate.",
     "pass_count_rule": "Candidate total passed checks and successful tasks must each be at least A's totals.",
     "cost_rule": "All-attempt weighted child cost per successful task must be at least 10% lower than A, both pooled and for each task.",
-    "selection_rule": "Choose C if eligible, otherwise B if eligible, otherwise retain A.",
+    "selection_rule": "Among quality-eligible candidates meeting the 10% pooled and per-task cost margin versus A, choose the unique lowest pooled all-attempt weighted child cost per successful task; an exact cost tie yields no selection and retains A.",
     "incomplete_rule": "Any stopped, invalid, underlength, or unmeasured run is incomplete; no adoption result.",
     "completeness_gate": "All 36 prescribed attempts and their independent check results, usage and treatment evidence are available, with every eligibility/control/seal gate passed. Completed ordinary task failures count; no imputation or best-of repetitions.",
-    "cost_test": "For candidate X in C,B: for each task and the pool, success_count(A)>0 and success_count(X)>0 and CPS(X)<=0.90*CPS(A). Use unrounded totals for comparison.",
-    "interpretation": "Finite frozen-suite non-inferiority rule, not a statistical confidence bound or proof for all tasks. Equal task weighting is protected by requiring the cost margin per task as well as pooled. Windows below 200000 or between tested values are untested.",
-    "overturn_conditions": ["A matched frozen check regresses after adoption", "A repeat with the same sealed inputs loses the 10% cost margin", "A client/model/compaction-policy/TTL/token-lane change invalidates the treatment or weights", "An independent accounting audit finds missing, duplicated, fallback or misattributed usage", "A larger independently sealed real-task suite contradicts the result"],
-    "reopen_evidence": "A dated amendment with pinned changed inputs/reason and a new complete counterbalanced cohort, independent oracle evidence, native treatment/usage records and all previous failed/stopped attempts. Anecdotes, source claims or selectively rerun winners cannot reopen adoption."
+    "cost_test": "For each candidate independently (no arm order): for each task and the pool require successes(A)>0, successes(X)>0 and CPS(X)<=0.90*CPS(A). Among qualifying quality-non-inferior candidates minimize pooled CPS. Use exact decimal/rational rates and unrounded token totals. No additional effect threshold between B and C; equal minima give no selection, not a larger-cost winner.",
+    "interpretation": "An exploratory finite frozen-suite ranking only. The quality rules operationalize observed non-inferiority, not a statistical confidence bound. Three repetitions and the 10% observed margin do not support persistent adoption or generalization; future confirmation requires an independently preregistered cohort. Equal task relevance is protected by the per-task margin; pooled cost is the explicit ranking objective.",
+    "overturn_conditions": [
+      "A matched frozen check regresses after adoption",
+      "A repeat with the same sealed inputs loses the 10% cost margin",
+      "A client/model/compaction-policy/TTL/token-lane change invalidates the treatment or weights",
+      "An independent accounting audit finds missing, duplicated, fallback or misattributed usage",
+      "A larger independently sealed real-task suite contradicts the result"
+    ],
+    "reopen_evidence": "A dated amendment with pinned changed inputs/reason and a new complete counterbalanced cohort, independent oracle evidence, native treatment/usage records and all previous failed/stopped attempts. Anecdotes, source claims or selectively rerun winners cannot reopen adoption.",
+    "objective": "minimize_pooled_all_attempt_weighted_child_cost_per_success",
+    "minimum_effect_fraction_vs_A": 0.1,
+    "tie_rule": "exact_unrounded_tie_retain_A_no_selection",
+    "worked_examples": [
+      {
+        "id": "review_counterexample",
+        "cost_per_success": {
+          "A": 100,
+          "B": 60,
+          "C": 89
+        },
+        "quality_eligible": [
+          "B",
+          "C"
+        ],
+        "selected": "B"
+      },
+      {
+        "id": "C_cheapest",
+        "cost_per_success": {
+          "A": 100,
+          "B": 89,
+          "C": 60
+        },
+        "quality_eligible": [
+          "B",
+          "C"
+        ],
+        "selected": "C"
+      },
+      {
+        "id": "cost_tie",
+        "cost_per_success": {
+          "A": 100,
+          "B": 60,
+          "C": 60
+        },
+        "quality_eligible": [
+          "B",
+          "C"
+        ],
+        "selected": "A"
+      },
+      {
+        "id": "below_minimum_effect",
+        "cost_per_success": {
+          "A": 100,
+          "B": 91,
+          "C": 95
+        },
+        "quality_eligible": [
+          "B",
+          "C"
+        ],
+        "selected": "A"
+      },
+      {
+        "id": "cheap_quality_regression",
+        "cost_per_success": {
+          "A": 100,
+          "B": 60,
+          "C": 89
+        },
+        "quality_eligible": [
+          "C"
+        ],
+        "selected": "C"
+      }
+    ],
+    "worked_example_scope": "Every task has these same CPS values; all controls and completeness gates hold. Quality eligibility is as listed. Selected means descriptive pilot candidate, not authorization to change a host."
   },
   "stop_rules": {
-    "weekly_hard_cap": "20 percentage points of any displayed weekly allowance relative to the pre-readiness /usage baseline; no increase, extra credits or rollover within this run",
-    "early_cancel": "Cancel all owned processes at 18 percentage points consumed, reserving 2 percentage points for in-flight requests and gauge delay. The reserve is a proposed bound, not a known provider guarantee.",
-    "readings": "Read /usage before readiness, before and after every attempt, at least every 60 seconds while active, and after cancellation has settled. Retain value-only timestamps/reset/bucket values. Gauge age over 60 seconds, inaccessible readings, reset change, other Claude activity or unknown charged usage stops the run.",
-    "hard_cap_gate": "Before any paid/model request, establish a supported nonmutating /usage observation and owned-process cancellation path with a justified worst-case in-flight plus reporting-lag charge no larger than the 2-point reserve. If that bound cannot be established, DO NOT LAUNCH. Polling percentages alone cannot guarantee a hard cap. This unresolved gate must be settled at sealing without a probe outside the cap.",
     "on_usage_limit_error": "stop_entire_run_incomplete",
     "unknown_usage": "stop_entire_run_incomplete",
     "attempt_wall_cap_seconds": 7200,
     "whole_run_wall_cap_seconds": 259200,
-    "other_stops": ["Seal or input hash mismatch", "Wrong actual worktree base or forbidden file edit", "Version/model/effort/permission/MCP/carrier/cache control drift", "Unproven Workflow treatment, manual compaction, missing boundary, out-of-band compaction or underlength A child", "Unsafe or non-offline fixture/check dependency discovered", "Any interrupted coordinator/child, transcript gap or unscheduled restart"],
-    "reporting": "Retain failed and interrupted attempts, all known usage, unknown fields as null, native error category, cap/termination reason and incomplete status. A stopped run never selects a window. No retry in another weekly window without an append-only amendment and new cohort."
+    "other_stops": [
+      "Seal or input hash mismatch",
+      "Wrong actual worktree base or forbidden file edit",
+      "Version/model/effort/permission/MCP/carrier/cache control drift",
+      "Unproven Workflow treatment, manual compaction, missing boundary, out-of-band compaction or underlength A child",
+      "Unsafe or non-offline fixture/check dependency discovered",
+      "Any interrupted coordinator/child, transcript gap or unscheduled restart"
+    ],
+    "reporting": "Retain failed and interrupted attempts, all known usage, unknown fields as null, native error category, cap/termination reason and incomplete status. A stopped run never selects a window. No retry in another weekly window without an append-only amendment and new cohort.",
+    "token_budget": {
+      "limit_tokens": 1000000000,
+      "unit": "input + cache_creation + cache_read + output tokens",
+      "ledger_scope": "all_owned_requests_including_readiness",
+      "rationale": "A fixed proposed resource ceiling for this draft, not a conversion of the former weekly-percent allowance, billing guarantee or evidence that the 36 attempts fit. It includes cache reads once, unlike a monetary budget.",
+      "observed_tokens": "Sum all four native categories over the deduplicated request_ledger, including coordinators, children, preparation, compactions, wrappers, retries, failures, refusals, fallbacks and interruptions.",
+      "cancel_when": "observed_tokens + outstanding_reserve_tokens >= limit_tokens",
+      "admission": "Before every launch require observed_tokens + outstanding_reserve_tokens < limit_tokens and a healthy qualified observer. Stop scheduling at the first trigger. Readiness/model requests, if later authorized, use this same budget; no unmetered calibration probes.",
+      "reporting_lag": {
+        "measured_max_seconds": null,
+        "sample_count": 0,
+        "receipt_sha256": null,
+        "procedure": "For retained permitted native request receipts, join provider completion/OTel event time to first query-visible Loki arrival while polling every P=1 second on a synchronized clock; record query errors, clock uncertainty, min/p50/p95/max and sample count, including compact/error/refusal paths. First query visibility gives an upper sample lag after adding clock uncertainty; event.timestamp is not ingest time. Do not read prompt bodies.",
+        "documented_export_interval_seconds": 5,
+        "interpretation": "The documented default log export interval is not a measured reporting lag or a worst-case delivery bound. Observed maxima/percentiles cannot establish a deterministic future L_bound; native export retries can delay delivery."
+      },
+      "outstanding_bound": {
+        "formula": "R_max * (N_active_max + ceil(lambda_max * (L_bound + P + K_bound)))",
+        "variables": {
+          "R_max": "Proven maximum total of all four token categories for one accepted provider request across all permitted resolved models, including compaction/fallback; cache categories partition input, not duplicate it.",
+          "N_active_max": "Enforced maximum simultaneous uncompleted requests in all owned coordinator/child/background/retry paths, not merely the number of focal children.",
+          "lambda_max": "Enforced upper request-completion rate per second with bursts covered by N_active_max; an observed mean/max is insufficient.",
+          "L_bound": "Enforced upper time from request completion to observer visibility, including exporter queue, transport, Loki query delay and clock uncertainty.",
+          "P": 1,
+          "K_bound": "Proven maximum stop-trigger-to-last-request-admission delay across the owned tree, including TERM grace, KILL and OS scheduling."
+        },
+        "reserve_tokens": null,
+        "qualified": false,
+        "required_proof": "A finite bound requires enforceable request admission/concurrency/rate and delivery/cancellation bounds for every native hidden path, or an upstream pre-admission token reservation mechanism that bounds all unreported requests even during telemetry outage. Post-response api_request events alone provide neither. Keep every unresolved value null; one coordinator/one child and a 5-second export interval do not prove them.",
+        "provider_charge": "Include the FULL allowed charge of all active and admitted-but-unreported requests; killing a client does not undo a server-accepted request. Unknown charge cannot be set to zero. No subscription-percent or dollar cap is inferred."
+      },
+      "cancellation": {
+        "target": "owned_process_group_only",
+        "source_id": "process_supervision",
+        "launch": "Future supervisor uses subprocess.Popen(argv, start_new_session=True) and records PID, PGID, process start identity and descendant membership. Verify all experiment descendants remain in the owned group; escaping descendants block readiness. No global pkill, collector shutdown or signal to unrelated sessions.",
+        "signals": [
+          "SIGTERM",
+          "SIGKILL"
+        ],
+        "term_grace_seconds": 5,
+        "procedure": "Latch stop and prevent further launches. Verify recorded ownership/start identity, signal os.killpg(pgid, SIGTERM), wait up to 5 seconds, then SIGKILL surviving owned group members. Wait/reap every owned process and independently verify the group is gone. Keep the observer/collector alive to drain and reconcile late events. A PID/ownership mismatch is an uncontained-stop error, never successful cleanup.",
+        "server_charge_stops_on_signal": false,
+        "qualification": "Exercise ownership, escalation, descendant cleanup and observer liveness on offline disposable processes before sealing; retain monotonic durations. No cancellation was exercised in this repair."
+      },
+      "health": "Query failure, missing/truncated page, counter/ID gap, lag above a sealed bound, observer failure, other Claude activity or failed cancellation immediately latches stop and incomplete. An independent supervisor watchdog must enforce observer liveness. An outage still needs pre-admission bounds; stop-on-outage alone cannot promise no overshoot.",
+      "settlement": "After owned exit, drain at least the qualified delivery bound and perform two full ledger reads one polling period apart plus offline ccusage reconciliation. Equality of snapshots is necessary but not proof of no lost events. Any unresolved request keeps the run incomplete and charged usage unknown.",
+      "unqualified_action": "do_not_launch",
+      "current_status": "not_supported_as_a_proven_hard_cap: no measured lag, enforceable request bounds or cancellation receipt is available under this no-session repair. Token stop policy is specified; execution remains blocked."
+    }
   },
   "evidence": {
     "policy": "docs/acceptance-evidence-policy.md",
     "this_draft_class": "structural_validation",
-    "future_classes": {"version_help": "installation_inspection", "native_launch_compaction_usage": "upstream_example_or_native_operation", "task_oracles": "local_integration_check", "builder_vectors": "synthetic_fixture", "independent_artifact_oracle_and_process_readback": "independent_observation"},
+    "future_classes": {
+      "version_help": "installation_inspection",
+      "native_launch_compaction_usage": "upstream_example_or_native_operation",
+      "task_oracles": "local_integration_check_using_pinned_upstream_Inspect_scorers",
+      "builder_vectors": "synthetic_fixture",
+      "independent_artifact_oracle_and_process_readback": "independent_observation"
+    },
     "upstream_tests": "None run or claimed here. The repository's test suites and builder vectors are local checks. Documentation/source review, structural validation and actual model operation are separate classes.",
-    "public_receipt_fields": ["schema_version", "status", "preregistration_sha256", "source_revision", "seal_time", "merge_revision_and_time", "start_end_utc", "ordering_observation", "configuration_fingerprint", "client_model_effort_versions", "arm_task_repetition_ordinal", "selected_window_or_unset", "check_booleans_with_oracle_hashes", "output_artifact_hashes", "commands_exit_codes_bounded_sanitized_results", "usage_by_model_four_categories", "weighted_cost_and_denominators", "compaction_events_pre_tokens_and_request_contexts", "wall_seconds", "weekly_usage_baseline_intermediate_final_and_reset", "failure_or_interruption_reason", "unknown_fields", "evidence_classes", "sanitization", "independent_observation"],
+    "public_receipt_fields": [
+      "schema_version",
+      "status",
+      "preregistration_sha256",
+      "source_revision",
+      "seal_time",
+      "merge_revision_and_time",
+      "start_end_utc",
+      "ordering_observation",
+      "configuration_fingerprint",
+      "client_model_effort_versions",
+      "arm_task_repetition_ordinal",
+      "selected_window_or_unset",
+      "check_booleans_with_oracle_hashes",
+      "output_artifact_hashes",
+      "commands_exit_codes_bounded_sanitized_results",
+      "usage_by_model_four_categories",
+      "weighted_cost_and_denominators",
+      "compaction_events_pre_tokens_and_request_contexts",
+      "wall_seconds",
+      "weekly_usage_baseline_intermediate_final_and_reset",
+      "failure_or_interruption_reason",
+      "unknown_fields",
+      "evidence_classes",
+      "sanitization",
+      "independent_observation",
+      "request_ledger_digest_and_category_counts",
+      "reconciliation_residuals_by_ordinal",
+      "reporting_lag_distribution_and_clock_uncertainty",
+      "outstanding_charge_bound_inputs_and_proof",
+      "cancel_trigger_and_owned_group_exit",
+      "oracle_framework_pin_adapter_and_control_hashes",
+      "paired_pilot_stability"
+    ],
     "private_only": "Original transcripts, prompts/responses, source captures and full command output stay in the operator's private evidence store. Public receipts use task/arm/repetition ordinals and content digests only: no native session/run/agent/message ids, personal paths, environment dumps, sign-ins, credentials or raw conversations.",
-    "receipt_statuses": ["not_run", "incomplete", "complete_no_change", "complete_candidate_selected"],
-    "discriminating_controls": "Before launch, independently exercise every oracle on correct data and deliberately wrong/missing input; preserve actual rejected output. Empty coverage, zero tests, self-reported success and placeholder verifier output cannot pass. Offline oracle qualification consumes no Claude usage.",
-    "compaction_usage_audit": "Explicitly reconcile compaction-generation requests and provider retries with the native child transcript accounting. The source reader alone does not prove all hidden requests are present. If those requests consume usage absent from the sealed accounting, retain observed counters with an unknown remainder and mark the comparison incomplete; do not omit compaction cost or add an overlapping coordinator total."
+    "receipt_statuses": [
+      "not_run",
+      "incomplete",
+      "complete_no_change",
+      "complete_candidate_selected"
+    ],
+    "discriminating_controls": "oracle_framework defines hashed known-pass, known-fail, malformed and missing-output controls for all eight checks. They are synthetic definitions only until actual pinned Inspect scorer output is retained; full independent extraction-path controls and fixed-suite readiness are mandatory before sealing.",
+    "compaction_usage_audit": "Use request_ledger as the only cost instrument. Join and deduplicate native api_request/api_error/api_refusal events, include compact/background/retry/refusal/fallback paths, resolve ownership and reconcile offline ccusage session/category totals with enumerated request residuals. The transcript helper is a cross-check; never sum these instruments. Unknown remainder or attribution blocks comparison."
   },
   "sealing": {
     "execution_authorized_by_this_draft": false,
     "append_only_dated_amendments": true,
     "hash_table": "PREREGISTRATION.md: candidate SHA256 table is byte identity only, not a freeze or execution receipt",
-    "before_run": ["Freeze treatment instrumentation and resolve hard quota-cap feasibility; runtime inheritance is tested by each sealed arm's treatment gate, not asserted from a pre-seal model probe", "Materialize and verify all exact input inventories; retain pinned primary-source captures and tool/agent/MCP/carrier fingerprints", "Freeze executable task packets, independent oracle procedures/adapters and order; exercise positive and negative oracle controls offline", "Record separate preregistration/seal commit and merge revision/time preceding all probes and arms; independently observe chronology", "Append the dated sealing amendment with artifact SHA256 table, gate evidence and readiness; rehash before launch and each arm"],
+    "before_run": [
+      "Qualify native OTel request/child joins through the existing collector into Loki; retain measured reporting lag and proven outstanding-token reserve plus owned-process cancellation evidence. A documented export interval is not a bound; do not launch without qualification.",
+      "Materialize and verify all exact input inventories; retain pinned primary-source captures and tool/agent/MCP/carrier fingerprints",
+      "Materialize/hash all independent artifact adapters and output contracts, install Inspect 0.3.271 through its supported isolated path only in a separately authorized setup, and retain actual pinned scorer outputs for every known-pass, known-fail, malformed and missing-output control plus the fixed 97-module offline suite. Definitions alone are not readiness.",
+      "Record separate preregistration/seal commit and merge revision/time preceding all probes and arms; independently observe chronology",
+      "Append the dated sealing amendment with artifact SHA256 table, gate evidence and readiness; rehash before launch and each arm"
+    ],
     "amendment_rule": "Preserve every prior amendment and seal table. Append date, reason, superseded rules/artifacts, whether results were observed, replacement hashes and merge/execution chronology. After any model observation, a changed workload, threshold, eligibility rule, instrument or budget requires a new cohort; retain the old incomplete/failed cohort. Never silently rewrite or retroactively recode eligibility.",
-    "adoption_rule": "No persistent host setting changes before a complete accepted result. This commit neither schedules a process nor launches, freezes or adopts an arm."
+    "adoption_rule": "This three-repetition pilot can nominate a candidate for a new independently preregistered confirmatory cohort only. It cannot authorize persistent host changes even after all 36 attempts. This DRAFT neither schedules, launches, freezes nor adopts an arm.",
+    "pilot_allows_persistent_adoption": false
   },
   "anti_pattern_log": [
-    {"date": "2026-09-27", "mistake": "The initial unsealed draft required all 190 test modules to complete with zero skips.", "verification": "At reference_revision, tests/test_gitleaks_guarded_macos.py lines 95 and 110 use complementary skipIf(IS_MACOS)/skipUnless(IS_MACOS), so that condition cannot hold on any platform.", "correction": "Before any model observation, freeze the conservative 97-module subset and exact new inventory hash; preserve no-skip/readiness gates without claiming the remaining suite was run."},
-    {"date": "2026-09-27", "mistake": "Initial W2/R1 source-support wording allowed a subjective check.", "verification": "Read the pinned CPython json.rst/pathlib.rst through ctx_fetch_and_index and child-usage.mjs lines 458, 460 and 542..548 directly.", "correction": "Freeze literal substring predicates and bounded inclusive original-source line spans; source support is no longer a discretionary grading step."}
+    {
+      "date": "2026-09-27",
+      "mistake": "The initial unsealed draft required all 190 test modules to complete with zero skips.",
+      "verification": "At reference_revision, tests/test_gitleaks_guarded_macos.py lines 95 and 110 use complementary skipIf(IS_MACOS)/skipUnless(IS_MACOS), so that condition cannot hold on any platform.",
+      "correction": "Before any model observation, freeze the conservative 97-module subset and exact new inventory hash; preserve no-skip/readiness gates without claiming the remaining suite was run."
+    },
+    {
+      "date": "2026-09-27",
+      "mistake": "Initial W2/R1 source-support wording allowed a subjective check.",
+      "verification": "Read the pinned CPython json.rst/pathlib.rst through ctx_fetch_and_index and child-usage.mjs lines 458, 460 and 542..548 directly.",
+      "correction": "Freeze literal substring predicates and bounded inclusive original-source line spans; source support is no longer a discretionary grading step."
+    },
+    {
+      "date": "2026-09-27",
+      "finding": "budget",
+      "mistake": "Using a cached weekly-percent gauge and an invented two-point reserve as a hard resource cap.",
+      "verification": "GPT-6 review; native OTel documents completion events and export interval, not request admission or bounded delivery; no lag/cancellation receipt exists.",
+      "correction": "Replace percentages with the fixed all-owned token budget and explicit cancel/reserve formula; retain unmeasured bounds as null and prohibit launch."
+    },
+    {
+      "date": "2026-09-27",
+      "finding": "metering",
+      "mistake": "Assistant-message accounting omitted a specified instrument for hidden and fallback requests.",
+      "verification": "Claude monitoring API event schema and ccusage v20.0.26; collector template omits request/child IDs.",
+      "correction": "One deduplicated OTel request ledger with complete-path inclusion, child joins and scoped ccusage residual reconciliation; active ID preservation remains unqualified."
+    },
+    {
+      "date": "2026-09-27",
+      "finding": "selection",
+      "mistake": "C-first selection chooses cost 89 over B cost 60 at the same quality and A cost 100.",
+      "verification": "Literal counterexample in independent review and fail-first contract assertion.",
+      "correction": "Minimize pooled all-attempt CPS among eligible candidates; keep the 10% per-task/pool margin; exact tied minima yield no selection."
+    },
+    {
+      "date": "2026-09-27",
+      "finding": "oracles",
+      "mistake": "Written oracle prose and a structural test were insufficient evidence of working graders.",
+      "verification": "Pinned Inspect scorer API, eight check contracts and installed package metadata; no 0.3.271 control execution or full adapter bytes.",
+      "correction": "Pin upstream Inspect grading, materialize typed adapter contracts and four hashed controls per check, and keep full executable qualification explicitly not supported until observed."
+    },
+    {
+      "date": "2026-09-27",
+      "finding": "precision",
+      "mistake": "Position balance was used without connecting three repeats to a 10% decision margin.",
+      "verification": "No paired variance source; NIST t half-width at n=3 is approximately 2.484 standard deviations.",
+      "correction": "Reduce scope to an exploratory pilot with paired sensitivity reporting; no confidence or persistent-adoption claim."
+    }
   ],
   "open_questions": [
-    "Workflow inheritance for this exact variable is inferred, not explicitly guaranteed in the inspected docs; native child evidence remains required.",
-    "No supported quota-reading/cancellation method with a proven <=2 percentage-point worst-case reserve has been demonstrated; without it the hard-cap gate blocks launch.",
-    "All four extended real-task bundles and all oracle procedures are unrun; actual >400K A-child eligibility, fixed offline-suite readiness and budget feasibility remain unknown.",
-    "Actual resolved host MCP/agent/carrier/TTL fingerprints and a final sealed oracle adapter are future prelaunch evidence, not supplied by source inspection."
-  ]
+    "Workflow inheritance and actual >400K A-child / B-C compaction eligibility remain unobserved.",
+    "Existing collector/Loki native request IDs, child joins and full compact/background/refusal/fallback coverage are unqualified; repository collector template would discard required IDs.",
+    "Measured reporting lag and enforceable request-rate/concurrency, delivery and cancellation bounds are unknown. Token-denominated monitoring is not a proven hard cap; DO NOT LAUNCH.",
+    "All eight independent artifact adapters still need executable bytes and hashes, Inspect 0.3.271 control runs and the unchanged 97-module offline readiness run. Hashed synthetic definitions are not execution evidence.",
+    "Resolved host MCP/agent/carrier/TTL fingerprints and frozen exact inventories remain sealing work.",
+    "Three repetitions support exploratory observed ranking only; a confirmatory design with independent variance and confidence/stability justification is required before any persistent adoption."
+  ],
+  "oracle_framework": {
+    "package": "inspect-ai==0.3.271",
+    "source_id": "inspect_scorers",
+    "scorer": "inspect_ai.scorer.match",
+    "scorer_args": {
+      "location": "exact",
+      "ignore_case": false,
+      "numeric": false
+    },
+    "uses_inspect_swe_bridge": false,
+    "execution": "Offline Inspect scoring of native task outputs, not Inspect execution of Claude. Keep the existing Workflow launch unchanged except the window. No model-graded scorer or new provider requests.",
+    "canonicalization": "Strict JSON object parsing: reject duplicate keys, NaN/Infinity, extra/missing fields, bad types and absent independent source evidence. Canonical UTF-8 JSON uses sort_keys=true, separators=(comma,colon), ensure_ascii=true, allow_nan=false. Compare SHA256 hex of observed and independently derived target via Inspect match(location=exact,ignore_case=False,numeric=False), avoiding match whitespace normalization of literal JSON values. Invalid/missing evidence supplies a fixed non-hex invalid marker to the same scorer, yielding INCORRECT; infrastructure/source unavailability is unknown and blocks readiness.",
+    "hashing": "Control and contract sha256 covers the whole fixture/contract object with the canonical JSON serialization above, without a trailing newline. Digests bind definitions only, not successful execution.",
+    "adapters": {
+      "B1": {
+        "independent_input": "Independent Git base/diff and chronological process captures with original test bytes",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "B1", "required_fields": ["base_revision", "changed_paths", "red_exit", "green_exit", "red_precedes_edit", "test_bytes_unchanged", "existing_test_exit"], "procedure": "Independently compare the actual worktree base, final git diff names and native test-call ordering. The first regression run must fail because compactionSummary is absent, before implementation changes; the identical test bytes must later pass.", "expected": "Exact frozen base; separate owned worktree; changed paths a subset of the two authorized paths including child-usage.mjs; red exit nonzero then green exit 0; original test-child-usage.mjs bytes unchanged and node examples/claude-native/workflows/test-child-usage.mjs exits 0.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "f61885a1e325f8c6a8a39aac9e54294cf2b9dec671873ff8de8b3ec995f28e63",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "B1", "observed": {"base_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "changed_paths": ["examples/claude-native/workflows/child-usage.mjs", "examples/claude-native/workflows/test-compaction-summary.mjs"], "red_exit": 1, "green_exit": 0, "red_precedes_edit": true, "test_bytes_unchanged": true, "existing_test_exit": 0}, "target": {"base_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "changed_paths": ["examples/claude-native/workflows/child-usage.mjs", "examples/claude-native/workflows/test-compaction-summary.mjs"], "red_exit": 1, "green_exit": 0, "red_precedes_edit": true, "test_bytes_unchanged": true, "existing_test_exit": 0}}, "sha256": "59218422feefd9b0cd7cbc53a15cc1b8c14b6929ccdea1c4b28b8a9ca287b4f1", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "B1", "observed": {"base_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "changed_paths": ["examples/claude-native/workflows/child-usage.mjs", "examples/claude-native/workflows/test-compaction-summary.mjs"], "red_exit": 1, "green_exit": 0, "red_precedes_edit": false, "test_bytes_unchanged": true, "existing_test_exit": 0}, "target": {"base_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "changed_paths": ["examples/claude-native/workflows/child-usage.mjs", "examples/claude-native/workflows/test-compaction-summary.mjs"], "red_exit": 1, "green_exit": 0, "red_precedes_edit": true, "test_bytes_unchanged": true, "existing_test_exit": 0}}, "sha256": "ff7313a15cd24c19619f4ad8cdbf9074afb461f69adfbbdeb2084620a41e9086", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "B1", "raw_output": "{\"truncated\":", "target": {"base_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "changed_paths": ["examples/claude-native/workflows/child-usage.mjs", "examples/claude-native/workflows/test-compaction-summary.mjs"], "red_exit": 1, "green_exit": 0, "red_precedes_edit": true, "test_bytes_unchanged": true, "existing_test_exit": 0}}, "sha256": "9c72b446a68346680b9c079e9eae866e498a2989f3f491bc523529412697c5e9", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "B1", "raw_output": null, "target": {"base_revision": "341ba64186b5631f52c11bd290a4f32fd405b7b1", "changed_paths": ["examples/claude-native/workflows/child-usage.mjs", "examples/claude-native/workflows/test-compaction-summary.mjs"], "red_exit": 1, "green_exit": 0, "red_precedes_edit": true, "test_bytes_unchanged": true, "existing_test_exit": 0}}, "sha256": "60cbc9477ad6107590704fd12076076cbd1e063779c62f5e26529cafb5e8c950", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "B2": {
+        "independent_input": "Independent verifier imports candidate module and applies frozen builder vectors; original Git inventories supply coverage target",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "B2", "required_fields": ["vector_results", "input_unchanged", "coverage"], "procedure": "In a separate verifier process import compactionSummary from the candidate module; apply every builder_oracle vector and compare exact JSON. Also recompute source coverage against the immutable corpus, never the patched files.", "expected": "All vector outputs equal the frozen literal expected objects; output order preserved; no input mutation; coverage has exactly the 250 frozen paths and correct original SHA256 values, without duplicates.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "5c27da940e005bb7141f00004de96606796d4df1d567817b645fc8ade4387b99",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "B2", "observed": {"vector_results": [{"id": "empty", "output": {"max_prompt_tokens": null, "auto_compactions": [], "manual_compactions": 0, "missing_usage_messages": 0}}], "input_unchanged": true, "coverage": [{"path": "control.py", "sha256": "dcaebb0b51455a03dc1a5932dafb412d2d1f72ff8cde24bdd33127277736df2e"}]}, "target": {"vector_results": [{"id": "empty", "output": {"max_prompt_tokens": null, "auto_compactions": [], "manual_compactions": 0, "missing_usage_messages": 0}}], "input_unchanged": true, "coverage": [{"path": "control.py", "sha256": "dcaebb0b51455a03dc1a5932dafb412d2d1f72ff8cde24bdd33127277736df2e"}]}}, "sha256": "ca24964223a26d95b0d9f3eb86cf94fe4ed1b85c7672603ece64b6fff35f8275", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "B2", "observed": {"vector_results": [{"id": "empty", "output": {"max_prompt_tokens": null, "auto_compactions": [], "manual_compactions": 0, "missing_usage_messages": 0}}], "input_unchanged": false, "coverage": [{"path": "control.py", "sha256": "dcaebb0b51455a03dc1a5932dafb412d2d1f72ff8cde24bdd33127277736df2e"}]}, "target": {"vector_results": [{"id": "empty", "output": {"max_prompt_tokens": null, "auto_compactions": [], "manual_compactions": 0, "missing_usage_messages": 0}}], "input_unchanged": true, "coverage": [{"path": "control.py", "sha256": "dcaebb0b51455a03dc1a5932dafb412d2d1f72ff8cde24bdd33127277736df2e"}]}}, "sha256": "ea5e201c8b6c6b366a7b59e01132587238c7650e28e9b36fa90e07606c3be0a0", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "B2", "raw_output": "{\"truncated\":", "target": {"vector_results": [{"id": "empty", "output": {"max_prompt_tokens": null, "auto_compactions": [], "manual_compactions": 0, "missing_usage_messages": 0}}], "input_unchanged": true, "coverage": [{"path": "control.py", "sha256": "dcaebb0b51455a03dc1a5932dafb412d2d1f72ff8cde24bdd33127277736df2e"}]}}, "sha256": "f457e50d21907ae2f1e065fde05063e2aa8a8b83be0fc3dcabf5086e71d43518", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "B2", "raw_output": null, "target": {"vector_results": [{"id": "empty", "output": {"max_prompt_tokens": null, "auto_compactions": [], "manual_compactions": 0, "missing_usage_messages": 0}}], "input_unchanged": true, "coverage": [{"path": "control.py", "sha256": "dcaebb0b51455a03dc1a5932dafb412d2d1f72ff8cde24bdd33127277736df2e"}]}}, "sha256": "12f7c0ead41b830e1eed72e52288d08bd3b8fc5c48763031cae106f0dfa27eef", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "W1": {
+        "independent_input": "Retained pinned RST bytes and independent ctx_fetch_and_index records, compared to frozen Git inventory",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "W1", "required_fields": ["pages"], "procedure": "Compare report rows with the frozen Git tree inventory, original blob bytes and native ctx_fetch_and_index call/capture records. Extract declarations using multiline regex ^\\.\\. module::[ \\t]+([^\\r\\n]+), trimming captured names.", "expected": "Exactly 319 unique pages, exact immutable URLs/blob ids and declarations including empty lists; each page actually fetched via ctx_fetch_and_index; retained source bytes match upstream Git blob identity. Any missing, mismatched or silently substituted page fails.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "ef74525d31da4f655ecefe0fded7e2c1e92cd56308ceed604658e8a0cc175c94",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "W1", "observed": {"pages": [{"path": "Doc/library/json.rst", "blob_identity_matches": true, "module_declarations": ["json"], "fetched": true}]}, "target": {"pages": [{"path": "Doc/library/json.rst", "blob_identity_matches": true, "module_declarations": ["json"], "fetched": true}]}}, "sha256": "1429ee6ad25b9ae3692b9867029aa6080a9e9649ea1df26c2a1e2e0b39ae6c60", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "W1", "observed": {"pages": []}, "target": {"pages": [{"path": "Doc/library/json.rst", "blob_identity_matches": true, "module_declarations": ["json"], "fetched": true}]}}, "sha256": "5ae7033a38ab0b6648add7ecc74fd9fef83623ef123f5bdb31db321ef38da2e0", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "W1", "raw_output": "{\"truncated\":", "target": {"pages": [{"path": "Doc/library/json.rst", "blob_identity_matches": true, "module_declarations": ["json"], "fetched": true}]}}, "sha256": "df5fa9e5c59324f94e0e8a1d9053c3bdb72a385014841af054012d187b76bac7", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "W1", "raw_output": null, "target": {"pages": [{"path": "Doc/library/json.rst", "blob_identity_matches": true, "module_declarations": ["json"], "fetched": true}]}}, "sha256": "590c214b1afa241639af3a18288c2c83a7fa0ad309af0d30a8154aa7aeb9c542", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "W2": {
+        "independent_input": "Original table fixture, immutable json.rst/pathlib.rst bytes and source line spans",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "W2", "required_fields": ["rows", "latency_sum", "nonfinite_exception", "read_text_encoding_parameter", "citation_predicates"], "procedure": "Strictly decode returned table rows and compare with input rows whose id is 5..12 inclusive, preserving types; compute latency sum from originals. Require the two pinned capture identities and structured fact values nonfinite_exception and read_text_encoding_parameter. Each citation supplies inclusive 1-based start/end lines in the ORIGINAL RST blob. Reject out-of-range spans; require at most 30 lines and the corresponding frozen citation_predicates' literal substrings within that span.", "expected": "Exact selected records/types and integer latency sum; nonfinite_exception='ValueError'; read_text_encoding_parameter='encoding'; both exact source identities and literal citation predicates pass. No semantic-support judgment is part of the boolean.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "76c4756b988e3a3fba915a244ac6719349e1f40b3d6ad4a3a081b157a20164fd",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "W2", "observed": {"rows": [{"id": 5, "latency": 7}], "latency_sum": 7, "nonfinite_exception": "ValueError", "read_text_encoding_parameter": "encoding", "citation_predicates": [true, true]}, "target": {"rows": [{"id": 5, "latency": 7}], "latency_sum": 7, "nonfinite_exception": "ValueError", "read_text_encoding_parameter": "encoding", "citation_predicates": [true, true]}}, "sha256": "03e81a3a99628e5a8cd19cdbfa8b9e1b002e5bf22ac3faaea155c2610f6eaf43", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "W2", "observed": {"rows": [{"id": 5, "latency": 7}], "latency_sum": "7", "nonfinite_exception": "ValueError", "read_text_encoding_parameter": "encoding", "citation_predicates": [true, true]}, "target": {"rows": [{"id": 5, "latency": 7}], "latency_sum": 7, "nonfinite_exception": "ValueError", "read_text_encoding_parameter": "encoding", "citation_predicates": [true, true]}}, "sha256": "5dbe2b556f8cec9dc462a483a444a2023105b0ffe9763c87120e252a14f0fa3d", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "W2", "raw_output": "{\"truncated\":", "target": {"rows": [{"id": 5, "latency": 7}], "latency_sum": 7, "nonfinite_exception": "ValueError", "read_text_encoding_parameter": "encoding", "citation_predicates": [true, true]}}, "sha256": "15d83e6806f637bc4b76346dce718874b8050c89810ca5eb63e33748e258537c", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "W2", "raw_output": null, "target": {"rows": [{"id": 5, "latency": 7}], "latency_sum": 7, "nonfinite_exception": "ValueError", "read_text_encoding_parameter": "encoding", "citation_predicates": [true, true]}}, "sha256": "2e21587a67aab6eabb67549bfdfdc580c88c20f892a139125c9b240788913012", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "V1": {
+        "independent_input": "Native command/exit/output captures reconciled against 97-module immutable list and two ordered rounds",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "V1", "required_fields": ["commands", "source_unchanged"], "procedure": "Independently reconcile the native tool-call ledger with the immutable 97-module inventory and both ordered rounds. Compare each submitted exit/count/summary with its actual captured process output, not the child's asserted passed flag.", "expected": "Exactly 194 prescribed module commands, all exit 0, each runs at least one test, no failures/errors/unexpected successes/skips; no source edits. Any unavailable dependency or unsafe/non-offline module blocks readiness rather than silently dropping it.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "6aa95f8f743a8f29157ee811c18b5fe8b6acb6763372e34d0a37c263a21f3216",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "V1", "observed": {"commands": [{"module": "control.py", "round": 1, "exit": 0, "tests": 1, "failures": 0, "errors": 0, "skips": 0, "unexpected_successes": 0}], "source_unchanged": true}, "target": {"commands": [{"module": "control.py", "round": 1, "exit": 0, "tests": 1, "failures": 0, "errors": 0, "skips": 0, "unexpected_successes": 0}], "source_unchanged": true}}, "sha256": "5466bb28b0ceccac2dd6e819c791ea5443d9fe7014d1b12935dbb81102435618", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "V1", "observed": {"commands": [{"module": "control.py", "round": 1, "exit": 0, "tests": 0, "failures": 0, "errors": 0, "skips": 0, "unexpected_successes": 0}], "source_unchanged": true}, "target": {"commands": [{"module": "control.py", "round": 1, "exit": 0, "tests": 1, "failures": 0, "errors": 0, "skips": 0, "unexpected_successes": 0}], "source_unchanged": true}}, "sha256": "241f5ae4a9fd80162d193c8a4fc42f6cb9c99607ab8ceab6b185d184bc55d9e3", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "V1", "raw_output": "{\"truncated\":", "target": {"commands": [{"module": "control.py", "round": 1, "exit": 0, "tests": 1, "failures": 0, "errors": 0, "skips": 0, "unexpected_successes": 0}], "source_unchanged": true}}, "sha256": "7fc337eb2dad8aa120b76d947ca7edc9cdde211b80311794ea4b60517c09baad", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "V1", "raw_output": null, "target": {"commands": [{"module": "control.py", "round": 1, "exit": 0, "tests": 1, "failures": 0, "errors": 0, "skips": 0, "unexpected_successes": 0}], "source_unchanged": true}}, "sha256": "91efebf5c97cf5e0cb26fbd9afa3ed064c1c45b0b85cda530e9ef4a3d3ba1325", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "V2": {
+        "independent_input": "Independent original events hash, partition command capture and validator capture",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "V2", "required_fields": ["events_sha256", "partition_exit", "partition_summary", "validator_exit", "validator_status"], "procedure": "Verify frozen events bytes; independently observe the unchanged seed-acceptance-5 command from the source preregistration and the validator's command output.", "expected": "Partition command exit 0 and exact final summary PASS partition 5, emitted from the 640-row/10-ERROR fixture whose final event is 640; validator exit 0 and status passed. Full 84003-byte log stays outside model context.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "2178077995e55bb906dfef7b473378c770554578b48928610e0280f85e58b7a8",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "V2", "observed": {"events_sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e", "partition_exit": 0, "partition_summary": "PASS partition 5", "validator_exit": 0, "validator_status": "passed"}, "target": {"events_sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e", "partition_exit": 0, "partition_summary": "PASS partition 5", "validator_exit": 0, "validator_status": "passed"}}, "sha256": "28b2f1bf458e99078202cf7b789d4c570327f4c2f162d1ab4e5415125da55e3e", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "V2", "observed": {"events_sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e", "partition_exit": 1, "partition_summary": "PASS partition 5", "validator_exit": 0, "validator_status": "passed"}, "target": {"events_sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e", "partition_exit": 0, "partition_summary": "PASS partition 5", "validator_exit": 0, "validator_status": "passed"}}, "sha256": "243e151507d348021babd4ef150e43154dbdf7cc84035fc057c02b5f3ef4b4ce", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "V2", "raw_output": "{\"truncated\":", "target": {"events_sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e", "partition_exit": 0, "partition_summary": "PASS partition 5", "validator_exit": 0, "validator_status": "passed"}}, "sha256": "29d48682afdd610c6a1731b099dddb11562f85d3c508a738a8be3d84d248c9bd", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "V2", "raw_output": null, "target": {"events_sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e", "partition_exit": 0, "partition_summary": "PASS partition 5", "validator_exit": 0, "validator_status": "passed"}}, "sha256": "84ede937492835ed4231258d43a855fc90ede8c9ffc0cebcaad44ad268673bc8", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "R1": {
+        "independent_input": "Independent AST traversal/original Git hashes and pinned reader citation spans; no candidate-supplied truth flags",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "R1", "required_fields": ["coverage", "usage_dedup_key", "usage_duplicate_choice", "superseded_usage_included", "citation_spans"], "procedure": "Independently regenerate source hashes and the specified AST inventory from the frozen Git blobs and compare exact structured coverage. Check the three literal accounting fact values; citations must name the pinned child-usage.mjs and include the corresponding inclusive original line spans: usage_dedup_key 458..458, usage_duplicate_choice 460..460, superseded_usage_included 542..548. Each span may have at most five extra lines on either side; reject other source identities or out-of-range spans.", "expected": "Exactly 250 unique original paths and exact inventories; usage_dedup_key='message.id or row.uuid'; usage_duplicate_choice='largest output_tokens'; superseded_usage_included=true; all three deterministic citation span predicates pass.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "85a284f03cc0f77669ca7f165d16b2f888fbca5563c87b2e4572b8d3b57dfbca",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "R1", "observed": {"coverage": [{"path": "control.py", "ast": [{"name": "control", "kind": "FunctionDef", "lineno": 1}]}], "usage_dedup_key": "message.id or row.uuid", "usage_duplicate_choice": "largest output_tokens", "superseded_usage_included": true, "citation_spans": [[458, 458], [460, 460], [542, 548]]}, "target": {"coverage": [{"path": "control.py", "ast": [{"name": "control", "kind": "FunctionDef", "lineno": 1}]}], "usage_dedup_key": "message.id or row.uuid", "usage_duplicate_choice": "largest output_tokens", "superseded_usage_included": true, "citation_spans": [[458, 458], [460, 460], [542, 548]]}}, "sha256": "0e2dc9a6ed3312e780fbfff7bc1290a5c0615b2716acee81ac089e9cfad71fa2", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "R1", "observed": {"coverage": [{"path": "control.py", "ast": [{"name": "control", "kind": "FunctionDef", "lineno": 1}]}], "usage_dedup_key": "message.id or row.uuid", "usage_duplicate_choice": "largest output_tokens", "superseded_usage_included": false, "citation_spans": [[458, 458], [460, 460], [542, 548]]}, "target": {"coverage": [{"path": "control.py", "ast": [{"name": "control", "kind": "FunctionDef", "lineno": 1}]}], "usage_dedup_key": "message.id or row.uuid", "usage_duplicate_choice": "largest output_tokens", "superseded_usage_included": true, "citation_spans": [[458, 458], [460, 460], [542, 548]]}}, "sha256": "18f18cfbe935cf9d74356134912587367597b76a0dbb11504145d6dbf1d59f8d", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "R1", "raw_output": "{\"truncated\":", "target": {"coverage": [{"path": "control.py", "ast": [{"name": "control", "kind": "FunctionDef", "lineno": 1}]}], "usage_dedup_key": "message.id or row.uuid", "usage_duplicate_choice": "largest output_tokens", "superseded_usage_included": true, "citation_spans": [[458, 458], [460, 460], [542, 548]]}}, "sha256": "a7fce3c0bd29aa84a10cf0cb0b7c632130ec32f75c0d1a306f96268b57847b59", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "R1", "raw_output": null, "target": {"coverage": [{"path": "control.py", "ast": [{"name": "control", "kind": "FunctionDef", "lineno": 1}]}], "usage_dedup_key": "message.id or row.uuid", "usage_duplicate_choice": "largest output_tokens", "superseded_usage_included": true, "citation_spans": [[458, 458], [460, 460], [542, 548]]}}, "sha256": "2bbd2c0c07678c5b8185603006c69880e15749caa74e8f514059c84789613ee8", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      },
+      "R2": {
+        "independent_input": "Original patch bytes and independent unchanged-worktree inspection using the inherited seed-review-diff oracle",
+        "projection": "Project the full frozen check into required typed fields using independent original artifact/command observations; canonicalize complete observed and target records. Source hashes, coverage identities, duplicates, chronology and citation predicates must be computed by the adapter, never accepted from model assertions.",
+        "contract": {"check_id": "R2", "required_fields": ["file", "hunks", "added", "deleted", "removed_signal_names", "removed_SIGKILL_status_started_exception", "preserves_no_overwrite", "repository_unchanged"], "procedure": "Apply the unchanged seed-review-diff oracle to the original patch; compare literal count fields and interrupt-contract booleans. Confirm the patch was not applied.", "expected": "file=run.py; hunks=31; added=166; deleted=581 excluding +++/--- headers; removed_signal_names=['SIGINT','SIGTERM','SIGHUP']; removed_SIGKILL_status_started_exception=true; preserves_no_overwrite=true; repository unchanged.", "missing_or_malformed": "INCORRECT; never coerce types, fill defaults or accept a self-reported pass field"},
+        "contract_sha256": "5ee092dba944a07c012ff01b59748410953d6fda1021c0960df63894f516d427",
+        "executable_sha256": null,
+        "controls": {
+          "known_pass": {"fixture": {"check_id": "R2", "observed": {"file": "run.py", "hunks": 31, "added": 166, "deleted": 581, "removed_signal_names": ["SIGINT", "SIGTERM", "SIGHUP"], "removed_SIGKILL_status_started_exception": true, "preserves_no_overwrite": true, "repository_unchanged": true}, "target": {"file": "run.py", "hunks": 31, "added": 166, "deleted": 581, "removed_signal_names": ["SIGINT", "SIGTERM", "SIGHUP"], "removed_SIGKILL_status_started_exception": true, "preserves_no_overwrite": true, "repository_unchanged": true}}, "sha256": "2e720aff56b4c439e585b66e63137753781cae8bdaa311493297ca708880cff4", "expected_score": "C"},
+          "known_fail": {"fixture": {"check_id": "R2", "observed": {"file": "run.py", "hunks": 30, "added": 166, "deleted": 581, "removed_signal_names": ["SIGINT", "SIGTERM", "SIGHUP"], "removed_SIGKILL_status_started_exception": true, "preserves_no_overwrite": true, "repository_unchanged": true}, "target": {"file": "run.py", "hunks": 31, "added": 166, "deleted": 581, "removed_signal_names": ["SIGINT", "SIGTERM", "SIGHUP"], "removed_SIGKILL_status_started_exception": true, "preserves_no_overwrite": true, "repository_unchanged": true}}, "sha256": "f494114f5d67fb379004b4783ff348e9fb7fbc3da9c028389fa810ca8972a319", "expected_score": "I"},
+          "malformed_output": {"fixture": {"check_id": "R2", "raw_output": "{\"truncated\":", "target": {"file": "run.py", "hunks": 31, "added": 166, "deleted": 581, "removed_signal_names": ["SIGINT", "SIGTERM", "SIGHUP"], "removed_SIGKILL_status_started_exception": true, "preserves_no_overwrite": true, "repository_unchanged": true}}, "sha256": "d0e5dee583eca92caf6daa2d3fd293701e0077aa329904185474a2c73816f5c8", "expected_score": "I"},
+          "missing_output": {"fixture": {"check_id": "R2", "raw_output": null, "target": {"file": "run.py", "hunks": 31, "added": 166, "deleted": 581, "removed_signal_names": ["SIGINT", "SIGTERM", "SIGHUP"], "removed_SIGKILL_status_started_exception": true, "preserves_no_overwrite": true, "repository_unchanged": true}}, "sha256": "a1a50db1ac08b2caa6e6f6c05f4b42aca16726539455f0aa38468c8d01954390", "expected_score": "I"}
+        },
+        "control_scope": "Synthetic scorer-boundary control with a deliberately bounded record, not acceptance of the full corpus or executable extraction. Before sealing, add hashed native-artifact controls that traverse this check's full extraction path and run them with the pinned scorer; retain these original controls."
+      }
+    },
+    "qualification": {
+      "passed": false,
+      "installed_version_observed": "0.3.266",
+      "pinned_scorer_run": false,
+      "full_artifact_adapters_materialized": false,
+      "fixed_97_module_suite_run": false,
+      "reason": "This bounded three-file repair materializes per-check contracts and hashed controls only. Full independent artifact adapters, exact 0.3.271 execution and native positive/negative/malformed controls are not supported by the current artifacts; no host install or model session is authorized here. They remain mandatory before sealing, not replaced with passing structural tests."
+    }
+  }
 }

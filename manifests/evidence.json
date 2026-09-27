@@ -3822,8 +3822,8 @@
     },
     {
       "path": "blueprints/compaction-window-ab/PREREGISTRATION.md",
-      "sha256": "6c7fd49c2d1e46f4a87515418114c27dc8845abcd3a1bc34da48affcfd64e53d",
-      "bytes": 25141
+      "sha256": "9be4afab23a645ec05e9687ed3246fd6cddaf5fac6426e7a4cc1c40cc9afddd4",
+      "bytes": 44580
     },
     {
       "path": "blueprints/compaction-window-ab/build-evidence.json",
@@ -3837,8 +3837,8 @@
     },
     {
       "path": "blueprints/compaction-window-ab/preregistration.json",
-      "sha256": "4a4f08e172dd95ca2998e9a39a6dbebf38dc605f10859d714a1779ca8249ef1b",
-      "bytes": 44206
+      "sha256": "2d335e15a0d0de7bdacd6421261a2cad83971bbd9053450be0b917c42975730c",
+      "bytes": 99597
     },
     {
       "path": "blueprints/convergence-practice/README.md",
@@ -39328,8 +39328,8 @@
     },
     {
       "path": "tests/test_compaction_window_ab_preregistration.py",
-      "sha256": "47f04aee9892437b3add023c4cf764056bb6af3c2af4a7f09d75b70b76ae30dd",
-      "bytes": 7520
+      "sha256": "4bc86a6aa52d014e29ace37e25ab74c564b4984d3d20534aae21be39d6ffb155",
+      "bytes": 14927
     },
     {
       "path": "tests/test_component_matrix.py",
