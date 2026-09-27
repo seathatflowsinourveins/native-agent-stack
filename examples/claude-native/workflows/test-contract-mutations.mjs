@@ -39,7 +39,10 @@ const MUTATIONS = [
   ['a stage loses its agentType', 'workflows/readiness-audit.js', "agentType: 'source-scout', ", '', 'routes each stage to its reviewed agent, model and effort'],
   ['a call is written as agent (', 'workflows/review-changes.js', "phase('Inventory')", "phase('Inventory')\nif (a.extraStage) await agent ('extra', { label: 'extra' })", 'binds model and effort inside every options literal'],
   ['a later duplicate key overrides the model', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max' }", "agentType: 'evidence-reviewer', model: 'opus', effort: 'max', model: undefined }", 'declares model and effort exactly once'],
-  ['the builder loses worktree isolation', 'agents/isolated-builder.md', 'isolation: worktree\n', '', 'runs in its own worktree'],
+  // Since 2026-09-27 the builder carries no frontmatter isolation and checks a coordinator-created worktree itself.
+  ['the builder regains frontmatter worktree isolation', 'agents/isolated-builder.md', 'effort: max\n', 'effort: max\nisolation: worktree\n', 'declares no frontmatter isolation'],
+  ['the builder drops its own-checkout comparison', 'agents/isolated-builder.md', 'compare `git -C <path> rev-parse --show-toplevel`', 'read `git -C <path> rev-parse --show-toplevel`', 'edits only in a coordinator-created worktree'],
+  ['the builder stops refusing to edit without a worktree', 'agents/isolated-builder.md', 'stop without editing', 'continue editing', 'edits only in a coordinator-created worktree'],
   // Stack agents and dispatch by role (docs/decisions/2026-09-26-stack-agents-role-dispatch.md): a regained fetch,
   // skill, edit or Serena symbol-edit tool, or a role table that reroutes or restates a role, must fail.
   ['the researcher regains WebFetch', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],

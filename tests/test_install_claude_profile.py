@@ -204,6 +204,58 @@ class SecretGuardProfileTests(unittest.TestCase):
         self.assertTrue(any("secret_path_guard.py" in c for c in commands))
 
 
+class ProfileTemplateSettingsTests(unittest.TestCase):
+    """Settings the Claude profile template carries for every new host (2026-09-27 settings synthesis:
+    H1, H6, A3, A6, B1, C4). apply_claude_settings.py never deletes a key, so a template that dropped one of
+    these would leave applied hosts protected but ship new hosts without it."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+    HOME_STORES = ("~/.ssh/**", "~/.gnupg/**", "~/.aws/**", "~/.azure/**", "~/.kube/**", "~/.docker/config.json",
+                   "~/.git-credentials", "~/.netrc", "~/.npmrc", "~/.pypirc", "~/.omniroute/**",
+                   "~/.config/omniroute/**", "~/.codex/shell_snapshots/**",
+                   "//mnt/*/Users/*/AppData/Roaming/omniroute/**", "//mnt/*/Users/*/.omniroute/**")
+    GIT_DENIES = ("Bash(git push --force *)", "Bash(git push * --force)", "Bash(git push * --force *)",
+                  "Bash(git push -f *)", "Bash(git push * -f)", "Bash(git push * -f *)",
+                  "Bash(git reset --hard *)", "Bash(git clean -f*)", "Bash(git clean -*f*)")
+
+    def settings(self) -> dict:
+        return json.loads(self.TEMPLATE.read_text(encoding="utf-8"))
+
+    def test_the_model_fallback_guards_stay(self):
+        # Model config "Automatic model fallback"; docs/decisions/2026-09-25-model-fallback-guard.md.
+        settings = self.settings()
+        self.assertEqual(settings["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"], "1")
+        self.assertIs(settings["switchModelsOnFlag"], False)
+
+    def test_home_credential_stores_are_denied_with_their_context_mode_twins(self):
+        deny = self.settings()["permissions"]["deny"]
+        for path in self.HOME_STORES:
+            rule, twin = f"Read({path})", "Read(**/" + path[2:] + ")"
+            with self.subTest(rule=rule):
+                self.assertIn(rule, deny)
+                self.assertEqual(deny.index(twin), deny.index(rule) + 1, "the twin sits right after its original")
+        for rule in ("Edit(~/.bashrc)", "Edit(~/.profile)", "Edit(~/.zshrc)"):
+            self.assertIn(rule, deny)
+        # Every anchored Read rule of the template has its twin, as the project file's test requires there.
+        for rule in (r for r in deny if re.fullmatch(r"Read\((?:~/|//)[^)]+\)", r)):
+            with self.subTest(anchored=rule):
+                self.assertEqual(deny[deny.index(rule) + 1], "Read(**/" + re.sub(r"^Read\((?:~/|//)", "", rule))
+
+    def test_the_haiku_docs_agent_and_destructive_git_forms_are_denied(self):
+        deny = self.settings()["permissions"]["deny"]
+        self.assertIn("Agent(claude-code-guide)", deny)
+        for rule in self.GIT_DENIES:
+            self.assertIn(rule, deny)
+        # The hot-file protocol's push form must stay possible (docs/lanes.md).
+        self.assertFalse(any("force-with-lease" in rule for rule in deny))
+
+    def test_the_bash_ceiling_and_the_status_line_refresh(self):
+        settings = self.settings()
+        self.assertEqual(settings["env"]["BASH_MAX_TIMEOUT_MS"], "1800000")
+        self.assertNotIn("BASH_DEFAULT_TIMEOUT_MS", settings["env"])
+        self.assertEqual(settings["statusLine"]["refreshInterval"], 5)
+
+
 class AgentsInstallTests(unittest.TestCase):
     def test_installs_every_adoption_agent(self):
         # Seven since 2026-09-23 (the blind layer-verdict roles joined); ten since 2026-09-26, when the
@@ -393,6 +445,39 @@ class ShippedAgentFrontmatterTests(unittest.TestCase):
                 with self.subTest(body=body):
                     self.assertNotEqual(self.problems(path), [])
 
+    # Read-only roles (no Edit, Write or NotebookEdit in `tools`) must not declare `memory`: with memory enabled,
+    # "Read, Write, and Edit tools are automatically enabled so the subagent can manage its memory files"
+    # (https://code.claude.com/docs/en/sub-agents, "Enable persistent memory", read 2026-09-27 against 2.1.283),
+    # which the exact `tools:` pins would not show. Orchestration row 11 of the 2026-09-27 settings synthesis.
+    EDIT_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
+
+    def memory_problems(self, path: Path) -> list[str]:
+        fields = self.top_level_fields(path)
+        tools = {tool.strip() for tool in fields.get("tools", "").split(",") if tool.strip()}
+        if "memory" in fields and not tools & self.EDIT_TOOLS:
+            return [f"read-only role declares memory: {fields['memory']!r}"]
+        return []
+
+    def test_no_read_only_role_declares_memory(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                self.assertEqual(self.memory_problems(path), [])
+
+    def test_the_memory_check_rejects_memory_on_a_read_only_role_only(self):
+        # Failing-first control: each read-only shape fails; a role that already edits files may keep memory.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "a.md"
+            for body, fails in (
+                    ("---\nname: a\ndescription: d\ntools: Read, Grep\nmodel: opus\neffort: max\nmemory: project\n---\nx\n", True),
+                    ("---\nname: a\ndescription: d\nmodel: opus\neffort: max\nmemory: user\n---\nx\n", True),
+                    ("---\nname: a\ndescription: d\ntools: Read, Edit\nmodel: opus\neffort: max\nmemory: local\n---\nx\n", False),
+                    ("---\nname: a\ndescription: d\ntools: Read, Grep\nmodel: opus\neffort: max\n---\nx\n", False)):
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    self.assertEqual(bool(self.memory_problems(path)), fails)
+
     def test_each_shipped_agent_parses_as_a_yaml_mapping_with_documented_types(self):
         try:
             import yaml
@@ -509,6 +594,17 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                 source = icp.AGENTS_SRC_DIR / path.name
                 self.assertTrue(source.is_file(), f"{path.name} has no adoption/agents/claude copy")
                 self.assertEqual(path.read_bytes(), source.read_bytes())
+
+    def test_project_scope_agents_are_the_installed_definitions(self):
+        # .claude/agents/ (project scope, priority 3) shadows ~/.claude/agents/ (priority 4) for sessions in this
+        # repository (https://code.claude.com/docs/en/sub-agents, "Choose the subagent scope"), so it must hold
+        # exactly the definitions the installer copies, byte for byte (since 2026-09-27).
+        project_dir = ROOT / ".claude" / "agents"
+        self.assertEqual(sorted(path.name for path in project_dir.glob("*.md")),
+                         sorted(path.name for path in icp.AGENTS_SRC_DIR.glob("*.md")))
+        for source in sorted(icp.AGENTS_SRC_DIR.glob("*.md")):
+            with self.subTest(agent=source.name):
+                self.assertEqual((project_dir / source.name).read_bytes(), source.read_bytes())
 
     def test_agents_md_points_at_a_role_table_of_shipped_agents(self):
         rows = self.role_rows(self.ROLE_DOC.read_text(encoding="utf-8"))
@@ -777,14 +873,17 @@ class PortableTopRuleTests(unittest.TestCase):
     upstream-verification procedure. It was added on 2026-09-26, after a docs subagent's "no native
     advisor" claim was relayed although the installed client's upstream CHANGELOG documents
     `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the
-    procedure replaced text instead of adding to it: the file stays within 5% of the 881 words
-    (`wc -w`) it had before. docs/harness-defaults.md#upstream-verification-and-compounding-learning
+    procedure replaced text instead of adding to it: the file stayed within 5% of the 881 words
+    (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the
+    four dispatch modes of the user-approved global instructions and the documented named-spawn
+    behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could
+    not hold; the 5% rule applies from the new baseline. docs/harness-defaults.md#upstream-verification-and-compounding-learning
     holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 881  # wc -w of the template at dde28cc2, before the procedure
+    BASELINE_WORDS = 1205  # wc -w after the 2026-09-27 Workers section (881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (

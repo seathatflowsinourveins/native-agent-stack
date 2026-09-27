@@ -415,7 +415,14 @@ function agentOptionLiterals(src) {
     // One effort line, and it is the stage effort: a second, lower line cannot hide behind the first.
     expect('agents: ' + n + ' runs at effort ' + STAGE_EFFORT + ' on a single effort line', (fm.match(/^effort:/mg) || []).length === 1 && new RegExp('^effort: ' + STAGE_EFFORT + '$', 'm').test(fm))
     expect('agents: ' + n + ' declares a tools allowlist', tools.length > 0)
-    expect('agents: ' + n + ' runs in its own worktree when it can edit files', !tools.some((t) => ['Edit', 'Write', 'NotebookEdit'].includes(t)) || /^isolation: worktree$/m.test(fm))
+    // Frontmatter `isolation: worktree` branches from the default branch, not the exact base, and on 2026-09-25 rewrote the
+    // shared core.hooksPath (docs/harness-defaults.md anti-pattern log), so no agent declares it (since 2026-09-27). A
+    // subagent without it starts in the coordinator's working directory (sub-agents docs), so an agent that can edit
+    // files edits only in the owned checkout its brief names, after comparing that checkout's top level with its
+    // starting directory's (git-rev-parse(1) --show-toplevel) and refusing when they match.
+    const body = readFileSync(join(dir, n), 'utf8').split(/^---$/m)[2] || ''
+    expect('agents: ' + n + ' declares no frontmatter isolation', !/^isolation:/m.test(fm))
+    expect('agents: ' + n + ' edits only in a coordinator-created worktree when it can edit files', !tools.some((t) => ['Edit', 'Write', 'NotebookEdit'].includes(t)) || (/git worktree add --no-track/.test(body) && /compare `git -C <path> rev-parse --show-toplevel` with `git rev-parse --show-toplevel`/.test(body) && /stop without editing/.test(body)))
     expect('agents: ' + n + ' grants MCP tools by full name, never a bare server prefix', tools.filter((t) => t.startsWith('mcp__')).every((t) => /^mcp__.+__[A-Za-z0-9_]+$/.test(t) && !t.endsWith('__*')))
     expect('agents: ' + n + ' keeps granted MCP tools deferred behind ToolSearch', !tools.some((t) => t.startsWith('mcp__')) || tools.includes('ToolSearch'))
   }
