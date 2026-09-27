@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--codex--use--20260927-4",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "4212116cb093eef2867e874b72a172f8031fea03",
+  "recorded_by": {
+    "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "codex",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v codex)\necho \"resolved: $p\"\necho \"readlink: $(readlink -f \"$p\" 2>/dev/null || echo \"$p (not a symlink)\")\"\ncodex --version\nrc=$?\necho \"file_type: $(file \"$p\" | sed 's/^[^:]*: //')\"\necho \"chatgpt_app_reference_count: $(grep -c \"ChatGPT.app\" \"$p\" 2>/dev/null || echo 0)\"\nexit \"$rc\"",
+      "exit": 0,
+      "duration_s": 0.035,
+      "output_sha256": "ea61e2c71fcd24712fa4400cd5a5e14e9ad305e8d15bb6278a613db22b348bc9",
+      "output_excerpt": "resolved: ~/.local/bin/codex\nreadlink: ~/.local/bin/codex\ncodex-cli 0.158.0-alpha.2.1\nfile_type: POSIX shell script text executable, ASCII text\nchatgpt_app_reference_count: 1\n"
+    },
+    {
+      "cmd": "D=\"$(mktemp -d)\"\nn=$((7 + RANDOM % 90))\n: > \"$D/fixture.txt\"\nfor i in $(seq 1 \"$n\"); do echo $((RANDOM % 900 + 1)) >> \"$D/fixture.txt\"; done\nreal=$(wc -l < \"$D/fixture.txt\" | tr -d ' ')\n\"$HOME/.local/bin/codex\" exec -C \"$D\" --skip-git-repo-check --sandbox read-only --ephemeral --json \"Count the lines in the file fixture.txt in your working directory using a shell command, then reply with exactly one line of the form COUNT=<n> and nothing else.\" < /dev/null > \"$D/out.jsonl\" 2> \"$D/err.log\"\nrc=$?\npython3 - \"$real\" \"$rc\" \"$D/out.jsonl\" \"$D\" <<'PY'\nimport json, re, sys\nreal, rc, path, scratch = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]\nevents = []\nfor line in open(path):\n    line = line.strip()\n    if not line:\n        continue\n    try:\n        events.append(json.loads(line))\n    except ValueError:\n        continue\n\ndef check(expected):\n    kinds = {}\n    item_kinds = {}\n    ran_command = False\n    fixture_cmd = None\n    got = None\n    for ev in events:\n        item = ev.get(\"item\") or {}\n        t = ev.get(\"type\")\n        kinds[t] = kinds.get(t, 0) + 1\n        if t == \"item.completed\":\n            it = item.get(\"type\")\n            item_kinds[it] = item_kinds.get(it, 0) + 1\n        if t == \"item.completed\" and item.get(\"type\") == \"command_execution\" and item.get(\"exit_code\") == 0:\n            ran_command = True\n            c = item.get(\"command\") or \"\"\n            if fixture_cmd is None and \"fixture.txt\" in c:\n                fixture_cmd = c\n        if t == \"item.completed\" and item.get(\"type\") == \"agent_message\":\n            m = re.search(r\"COUNT=(\\d+)\", item.get(\"text\") or \"\")\n            if m:\n                got = m.group(1)\n    return ran_command, fixture_cmd, got, kinds, item_kinds\n\nran_command, fixture_cmd, got, kinds, item_kinds = check(real)\nok = (rc == \"0\") and ran_command and (fixture_cmd is not None) and (got == real)\nsanitized_cmd = (fixture_cmd or \"\").replace(scratch, \"<scratch>\")\nprint(\"event_kinds=\" + json.dumps(kinds, sort_keys=True))\nprint(\"item_kinds=\" + json.dumps(item_kinds, sort_keys=True))\nprint(\"command_execution_seen=\" + str(ran_command))\nprint(\"fixture_command_execution_seen=\" + str(fixture_cmd is not None))\nprint(\"command_execution_text=\" + sanitized_cmd)\nprint(\"positive_control expected=\" + real + \" got=\" + str(got) + \" match=\" + str(got == real))\n\nwrong = str(int(real) + 1)\nran_command2, fixture_cmd2, got2, _, _ = check(wrong)\nneg_ok = (rc == \"0\") and ran_command2 and (fixture_cmd2 is not None) and (got2 == wrong)\nprint(\"negative_control expected=\" + wrong + \" got=\" + str(got2) + \" correctly_rejected=\" + str(not neg_ok))\n\noverall_ok = ok and (not neg_ok)\nraise SystemExit(0 if overall_ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 10.072,
+      "output_sha256": "104f2baa282db789bce2209a1afe761b06c255714ea62f4384cd2766a7d94675",
+      "output_excerpt": "event_kinds={\"item.completed\": 3, \"item.started\": 1, \"thread.started\": 1, \"turn.completed\": 1, \"turn.started\": 1}\nitem_kinds={\"agent_message\": 2, \"command_execution\": 1}\ncommand_execution_seen=True\nfixture_command_execution_seen=True\ncommand_execution_text=/bin/zsh -lc 'wc -l < fixture.txt'\npositive_control expected=32 got=32 match=True\nnegative_control expected=33 got=32 correctly_rejected=True\n"
+    },
+    {
+      "cmd": "set -o pipefail\n\"$HOME/.local/bin/codex\" mcp list --json < /dev/null 2>/dev/null | python3 -c \"\nimport json, os, sys, tomllib\nraw = sys.stdin.read()\ntry:\n    data = json.loads(raw)\nexcept ValueError:\n    print('PARSE_ERROR: len=' + str(len(raw)))\n    raise SystemExit(1)\nrows = []\nfor item in data:\n    transport = item.get('transport') or {}\n    rows.append((item.get('name'), item.get('enabled'), transport.get('type')))\nrows.sort(key=lambda r: str(r[0]))\ncfg = tomllib.load(open(os.path.expanduser('~/.codex/config.toml'), 'rb'))\ndeclared = set((cfg.get('mcp_servers') or {}).keys())\nlive = {r[0] for r in rows}\nmissing = sorted(declared - live)\nlive_only = sorted(live - declared)\nprint('declared_count=' + str(len(declared)) + ' live_count=' + str(len(rows)) + ' declared_missing_from_live=' + str(missing) + ' live_only_not_in_config_toml=' + str(live_only))\nfor name, enabled, ttype in rows:\n    print(str(name) + ' | enabled=' + str(enabled) + ' | transport=' + str(ttype))\nraise SystemExit(0 if not missing else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.508,
+      "output_sha256": "0e98bae81417ffb609ec72022b0137db70e89ae7b9dc9757d9c807093fa37c31",
+      "output_excerpt": "declared_count=8 live_count=10 declared_missing_from_live=[] live_only_not_in_config_toml=['codex_app', 'cua_repl']\nai-memory | enabled=True | transport=streamable_http\ncodex_app | enabled=False | transport=stdio\ncontext-mode | enabled=True | transport=stdio\ncua_repl | enabled=True | transport=stdio\nheadroom | enabled=True | transport=stdio\nnode_repl | enabled=True | transport=stdio\nopenaiDevelope"
+    },
+    {
+      "cmd": "set -o pipefail\n\"$HOME/.local/bin/codex\" features list < /dev/null 2>/dev/null | python3 -c \"\nimport os, sys, tomllib\nlines = [l.rstrip(chr(10)) for l in sys.stdin if l.strip()]\ntotal = len(lines)\nseen = {}\nfor l in lines:\n    parts = l.split()\n    if len(parts) >= 2 and parts[0] in ('daemon_auto_start', 'hooks'):\n        seen[parts[0]] = parts[-1].lower() == 'true'\ncfg = tomllib.load(open(os.path.expanduser('~/.codex/config.toml'), 'rb'))\ndeclared = cfg.get('features') or {}\nok = True\nfor name in ('daemon_auto_start', 'hooks'):\n    want = bool(declared[name]) if name in declared else None\n    got = seen.get(name)\n    match = (want is None) or (got == want)\n    ok = ok and (got is not None) and match\n    print(name + ': cli=' + str(got) + ' config_declares=' + str(want) + ' match=' + str(match))\nprint('total_features=' + str(total))\nraise SystemExit(0 if ok else 1)\n\"",
+      "exit": 0,
+      "duration_s": 0.041,
+      "output_sha256": "156b7cfc9d55193f581107147102f5435dc4d671b3e707973176a32455d9d237",
+      "output_excerpt": "daemon_auto_start: cli=False config_declares=False match=True\nhooks: cli=True config_declares=True match=True\ntotal_features=150\n"
+    }
+  ],
+  "tool_versions": {
+    "codex": "0.158.0-alpha.2.1"
+  },
+  "observed_at_utc": "2026-09-27T13:10:37Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64), the installed Codex client, resolved and versioned by the first command below (its own exit code, not a later echo's, decides the command's result), performs a real `codex exec --skip-git-repo-check --sandbox read-only --ephemeral` turn from a freshly created scratch working directory: given a fixture file it creates itself with a random line count (7-96) and a prompt that asks for a shell command, the run's `--json` event stream must contain a `command_execution` item whose own command text contains the fixture file's name (`fixture.txt`) and which exited 0 -- not merely the first successful `command_execution` in the transcript, whichever it is, as the superseded `-3` receipt's checker accepted (that generation's own retained excerpt shows a plugin `SKILL.md` read, unrelated to the fixture, satisfied its check). That fixture-referencing command's text is captured and printed (scratch path sanitized), and the transcript's final agent message reports the correct count. The same command then re-runs the identical check against the identical transcript with a deliberately wrong expected count as a negative control and confirms that comparison is rejected (a self-test of the checker's discriminating power on one transcript, not a second turn where the model itself answered wrong). Both `event_kinds` (per top-level event type) and `item_kinds` (per completed item type, e.g. `command_execution`/`agent_message`) are printed. `codex mcp list --json` is compared against this host's own ~/.codex/config.toml `[mcp_servers.*]` tables, run with `set -o pipefail` and codex's own stderr discarded before the pipe rather than merged into the JSON parse (unlike the superseded generations): every server config.toml declares is present live (this alone gates the command's exit code, together with codex's own exit code via pipefail), and any live server config.toml does not declare is printed separately as `live_only_not_in_config_toml`, disclosed rather than treated as a failure (config.toml's declared servers are not this host's whole live MCP surface; see limitations). `codex features list`'s live `daemon_auto_start`/`hooks` booleans are compared against config.toml's own declared values, with the same pipefail fix. This receipt does not assert `approval_policy` or `sandbox_mode`, and does not describe `--sandbox read-only` as a safety boundary: no command here checks either value live, and the read-only sandbox bounds the agent's own shell commands only -- not the declared `context-mode` MCP server (approved individually in config.toml, `default_tools_approval_mode = \"approve\"`) or Codex's plugin-provided tools, both of which run outside it (see limitations, and the evidence-PR README's Codex section, source_review class). All commands exit 0 only when their respective check passes.",
+  "limitations": [
+    "Recorded from a Claude Code session in a git worktree of this repository (see this receipt's own catalog_revision), not a pinned install checkout; the first command's --version reports 0.158.0-alpha.2.1, newer than the catalog's codex pin 0.155.1, so this receipt is recorded with --allow-unbound-version and does not count toward the winner's status.",
+    "The resolved codex on this host is a shell-script launcher at ~/.local/bin/codex whose own comment says it runs \"the ChatGPT-bundled Codex through the app's declared entrypoint\"; the first command's file_type and chatgpt_app_reference_count lines show this without printing the launcher's contents. The tested binary is therefore the ChatGPT desktop app's bundled Codex CLI build, not a separately downloaded openai/codex release of the winner's pin.",
+    "second_physical_machine is declared, not proven by this file: this host's measured profile (evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "Names, booleans, counts, item-type tallies (event_kinds, item_kinds) and the one gated command's own text are captured; no MCP server config, args, env, url or cwd, and no session id or working-directory path is copied into this receipt (the scratch directory is replaced with <scratch> in the printed command text; the mcp/features listings are filtered inline in their own commands before anything reaches stdout; any other command_execution or agent_message item in the transcript is counted in item_kinds but its own text is never printed).",
+    "This receipt exercises the native-clients role (a version/channel check, one bounded exec turn and two read-only listing/feature checks); it does not exercise codex's structured-session-control role in the agent-sdks layer (the streamed events above are read for item-type tallies and one gated command_execution/one final message, not resumed, forked or driven through the SDK).",
+    "codex exec must be run with stdin redirected from /dev/null: without it, it blocks indefinitely on \"Reading additional input from stdin...\" before doing any work. This is documented upstream behavior, not new to this host or build: evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/README.md (codex-cli 0.155.1, tag rust-v0.155.1, codex-rs/exec/src/lib.rs resolve_root_prompt's blocking read_to_end on stdin), observed again here on codex-cli 0.158.0-alpha.2.1. Each exec command above already redirects stdin from /dev/null.",
+    "The live `codex mcp list --json` surface includes two servers this host's config.toml does not declare: cua_repl (enabled) and codex_app (disabled). Both are provided by Codex plugins enabled in config.toml (unified-computer-use@openai-bundled and codex-app-tools@openai-bundled respectively). This command's exit code is gated only on config.toml's declared servers all being present live (declared subset of live); an extra live server is disclosed, not a failure, so it cannot make this receipt fail. That each plugin's own server was installed from the ChatGPT desktop app's bundled openai-bundled marketplace, not from this repository's Stage 1 install, is a direct read of each plugin's own .mcp.json file under ~/.codex/plugins/cache/openai-bundled/, not something this command's name/enabled/transport-only output shows; that provenance detail is source_review class, reported in the evidence-PR README, not a claim of this receipt's command.",
+    "The negative control in command 2 re-runs the same in-transcript check with a deliberately wrong expected value; it demonstrates the comparison logic rejects a mismatch on one real transcript, not that a second, independent model turn produced a wrong answer.",
+    "approval_policy and sandbox_mode are not checked live by any command in this receipt. Command 2's exec turn overrides sandbox to read-only, which is not a safety guarantee for the whole turn: the sandbox flag bounds the agent's own shell command_executions, not the declared context-mode MCP server, which config.toml approves individually (default_tools_approval_mode = \"approve\") and which runs shell commands of its own (ctx_execute) outside that sandbox, or Codex's plugin-provided tools (command 3's live_only servers). Both approval_policy and sandbox_mode are reported only from a direct config.toml read, source_review class, in the evidence-PR README's Codex section, not as a claim of this receipt.",
+    "Command 2's codex exec turn is a real client turn on this host's live, already-running ai-memory service, not a synthetic or isolated one: this host's user-scope Codex hooks (features.hooks, cross-checked live by command 4) fire on it and write a new session and project into that running service's own store (agent=codex), keyed to this command's scratch mktemp directory. `--ephemeral` is codex's own session-history flag (about resuming or forking this run later) and does not disable those hooks or stop that write. Neither this command nor scripts/host_receipts.py cleans up that write; it is left in the production ai-memory store for the owner to review or remove; see the evidence-PR README."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T13:10:37Z",
+      "reviewer": {
+        "identity_sha256": "91719ef8aa813c0bf50b26570098baa57e4c043d7d23d4cc5c26ce7c17710954",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients"
+    }
+  ],
+  "supersedes": "mac-coordinator-64gb-20260925--codex--use--20260927-3"
+}
