@@ -109,15 +109,21 @@ What the lane config also sets:
 
   The capability flag alone enables nothing: OmniRoute must serve a compatible endpoint, and the parity check below has to show it working before a sweep counts on GPT-6 search through the gateway.
 
+  Measured 2026-09-27: `web.run` POSTs `<base_url>/alpha/search`. OmniRoute release/v3.8.51 at `a58000c7` answers 404 there. Upstream PR #13788 adds the route, but answers from OmniRoute's own search registry, not OpenAI's hosted search: the keyless `duckduckgo-free` provider, unless a keyed provider is configured. Through that route, `site:` queries returned nothing and plain queries few results. GPT-6 fell back to fetched pages and the GitHub API through context-mode.
+- **Skills.** Codex lists the pinned skills from its user skill roots: `$CODEX_HOME/skills`, which holds its `.system` cache, and `$HOME/.agents/skills` (`codex-rs/ext/skills/src/host_roots.rs` at rust-v0.157.1).
+  - The lane's GPT-6 loads them with context-mode's `ctx_execute_file`. That tool refuses a path outside its project directory, here the runner's `<work-dir>/empty`, unless a `Read(...)` allow rule in `<project>/.claude/settings.json` names it (context-mode 1.0.169 `build/security.js`, `evaluateProjectContainment`, issue #852).
+  - `build_args.py` therefore writes `<work-dir>/empty/.claude/settings.json`, allowing reads of those two roots and nothing else. `staged.json` records the roots symbolically.
+  - Without it, the 2026-09-27 smoke's GPT-6 workers asked for their skills, were refused, and reported `skills_used: []`.
+  - A native restage of the work directory removes the file, because the native lane has no context-mode.
+
 What the lane does not carry or allow:
 - Project and hook trust are left out, because they describe the host's interactive client.
 - `supports_websockets` stays unset. OmniRoute forwards the Codex client version only on its HTTP `/v1/responses` path.
 - `--omniroute-base-url` must point at loopback.
-- The default worker profile, `adoption/templates/codex.stack-worker.config.toml`, arrives with the Codex worker-lane change. Until the checkout has it, pass `--stack-worker-profile PATH`.
 
 Isolation limits:
 - `CODEX_HOME` replaces the user-config location, but a trusted `.codex/config.toml` in the working directory and the system config still layer in.
-- The runner works in the empty `<work-dir>/empty`, so no project layer applies there. A host system config (`/etc/codex/config.toml`) would, so keep it absent on sweep hosts.
+- The runner works in `<work-dir>/empty`. It holds only `.claude/settings.json`, which context-mode reads and Codex does not, so no Codex project layer applies there. A host system config (`/etc/codex/config.toml`) would apply, so keep it absent on sweep hosts.
 
 How the runner uses it:
 - `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`.

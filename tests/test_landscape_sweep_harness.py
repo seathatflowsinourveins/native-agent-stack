@@ -717,6 +717,26 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual((lane["provider"], lane["codex_home"], lane["profile"]),
                          ("omniroute", work / "codex-home", "stack-worker"))
 
+    def test_lane_lets_context_mode_read_codex_skill_roots_only(self):
+        # context-mode 1.0.169 refuses ctx_execute_file paths outside the runner's cwd unless a Read(...) allow rule in
+        # <cwd>/.claude/settings.json names them (#852); the lane's GPT-6 loads its pinned skills with that tool.
+        work, _, done = self.stage_lane()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        skills_home = Path.home() / ".agents" / "skills"
+        settings = json.loads((work / "empty" / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        self.assertEqual(settings, {"permissions": {"allow": [f"Read({work / 'codex-home' / 'skills'}/**)",
+                                                              f"Read({skills_home}/**)"]}})
+        staged = (work / "staged.json").read_text(encoding="utf-8")
+        self.assertEqual(json.loads(staged)["codex"]["lane_home"]["context_mode_skill_reads"],
+                         {"settings": "empty/.claude/settings.json",
+                          "roots": ["$CODEX_HOME/skills", "$HOME/.agents/skills"]})
+        self.assertNotIn(str(skills_home), staged)  # the lane record keeps the host's paths out
+        # Restaging the same work dir for the native lane, which has no context-mode, removes the rules.
+        native = build(work)
+        self.assertEqual(native.returncode, 0, native.stderr)
+        self.assertFalse((work / "empty" / ".claude").exists())
+        self.assertTrue((work / "empty").is_dir())
+
     def test_lane_refuses_quota_gate_missing_host_and_remote_gateways(self):
         for extra, needle in ((("--quota-stop-percent", "90"), "--quota-stop-percent"),
                               (("--omniroute-base-url", "http://10.0.0.5:20128/v1"), "loopback")):

@@ -79,6 +79,14 @@ OMNIROUTE_KEYLESS_PLACEHOLDER = "local-loopback"
 LOOPBACK_V1_URL = re.compile(r"http://(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?/v1")
 LANE_HOME = "codex-home"
 LANE_PROFILE = "stack-worker"
+# context-mode's ctx_execute_file refuses a path outside its project directory (for the lane, the runner's cwd
+# <work-dir>/empty) unless a Read(...) allow rule in <project>/.claude/settings.json names it (build/security.js
+# evaluateProjectContainment and readToolPermissionPatterns at context-mode 1.0.169, issue #852). The lane's GPT-6 loads
+# its pinned skills with that tool from Codex's user skill roots, $CODEX_HOME/skills (with its .system cache) and
+# $HOME/.agents/skills (codex-rs/ext/skills/src/host_roots.rs at rust-v0.157.1), so the lane allows reads there and
+# nowhere else. Codex reads no .claude/ files, so the file adds no Codex project layer.
+LANE_CONTEXT_SETTINGS = Path("empty") / ".claude" / "settings.json"
+LANE_SKILL_ROOTS = ("$CODEX_HOME/skills", "$HOME/.agents/skills")
 CODEX_TEMPLATE = Path("adoption/templates/codex.config.template.toml")
 STACK_WORKER_PROFILE = Path("adoption/templates/codex.stack-worker.config.toml")
 TABLE_HEADER = re.compile(r"^\s*\[")
@@ -158,10 +166,18 @@ def render_codex_template(repo_root: Path, host: str) -> str:
         raise ValueError(f"rendering {CODEX_TEMPLATE} for host {Path(host).name!r}: {error}") from None
 
 
+def lane_skill_read_rules(work: Path) -> list[str]:
+    """The Read(...) allow rules for Codex's user skill roots in the lane (LANE_SKILL_ROOTS), as absolute globs:
+    context-mode matches a rule's glob literally against the absolute path, with no ~ or variable expansion."""
+    roots = {"$CODEX_HOME/skills": work / LANE_HOME / "skills", "$HOME/.agents/skills": Path.home() / ".agents" / "skills"}
+    return [f"Read({roots[name]}/**)" for name in LANE_SKILL_ROOTS]
+
+
 def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile: Path, repo_root: Path,
                     require_key: bool = False) -> dict:
     """Write <work>/codex-home: config.toml (the OmniRoute provider block plus the rendered token MCP servers) and
-    stack-worker.config.toml (the worker profile, verbatim). Return what staged.json records about it."""
+    stack-worker.config.toml (the worker profile, verbatim), and <work>/empty/.claude/settings.json (read access to
+    Codex's skill roots for context-mode). Return what staged.json records about them."""
     rendered = render_codex_template(repo_root, host)
     host_label = Path(host).stem if host.endswith(".json") else host  # never a private path in the lane record
     servers_text, servers = mcp_sections(rendered)
@@ -215,6 +231,9 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
                 tomllib.loads((home / name).read_text(encoding="utf-8"))
             except tomllib.TOMLDecodeError as error:
                 raise ValueError(f"{LANE_HOME}/{name} is not valid TOML: {error}") from None
+    settings = work / LANE_CONTEXT_SETTINGS
+    settings.parent.mkdir(parents=True, exist_ok=True)
+    write_json(settings, {"permissions": {"allow": lane_skill_read_rules(work)}})
     keyless = {} if require_key else {"api_key_placeholder": OMNIROUTE_KEYLESS_PLACEHOLDER}
     return {"provider": "omniroute", "codex_home": LANE_HOME, "profile": LANE_PROFILE,
             "api_key_env": OMNIROUTE_KEY_ENV, **keyless, "base_url": base_url,
@@ -222,7 +241,10 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
                           "template": str(CODEX_TEMPLATE), "template_sha256": template_sha,
                           "mcp_servers": servers,
                           "config_sha256": sha256_bytes((home / "config.toml").read_bytes()),
-                          "profile_sha256": sha256_bytes(profile_bytes)}}
+                          "profile_sha256": sha256_bytes(profile_bytes),
+                          # symbolic roots only: the file itself holds this host's absolute paths
+                          "context_mode_skill_reads": {"settings": str(LANE_CONTEXT_SETTINGS),
+                                                       "roots": list(LANE_SKILL_ROOTS)}}}
 
 
 def fill_build(templates: dict, run_date: str, layer_count: int, skills_checked_at: str) -> dict:
@@ -324,6 +346,10 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
         first_prompts[layer["layer_id"]] = make_prompt.compose(frozen, "discover", layer_input)
     for name in ("gpt6", "prompts", "empty", "schemas"):
         (work / name).mkdir(exist_ok=True)
+    if lane is None:  # a native lane has no context-mode, so an earlier gateway staging's read rules go
+        (work / LANE_CONTEXT_SETTINGS).unlink(missing_ok=True)
+        if (work / LANE_CONTEXT_SETTINGS.parent).is_dir() and not any((work / LANE_CONTEXT_SETTINGS.parent).iterdir()):
+            (work / LANE_CONTEXT_SETTINGS.parent).rmdir()
     for name in RUNTIME:
         shutil.copy2(HERE / name, work / name)
     shutil.copy2(QUOTA_PROBE, work / QUOTA_PROBE.name)
