@@ -89,7 +89,7 @@ The pins are:
 
 All four are in v4 `pins.json:36-39,70-77,89-93,1072-1100`. On macOS the runner records its own platform assets.
 
-**Discovery inputs (r4).** The Mac session's five model and repository sweeps (embedders, rerankers, memory LLMs, generation models and memory systems), each Opus-verified and dated 2026-09-27, will be committed under `inputs/`, with source dates and SHA-256 values, before bundle review. Each is marked vendor-reported or measured. Vendor-reported scores, such as AA-LCR v1.1 and MemReranker's self-reported LongMemEval, are motivation for the candidate list only (section 8), never S3 evidence.
+**Discovery inputs (r4).** The Mac session's five model and repository sweeps (embedders, rerankers, memory LLMs, generation models and memory systems), each Opus-verified and dated 2026-09-27, are committed verbatim under `inputs/sweep-20260927-mac/` (commit ff12bf13). Each file carries its source comment and date, and its sha256 is in `manifests/evidence.json`. Each is marked vendor-reported or measured. Vendor-reported scores, such as AA-LCR v1.1 and MemReranker's self-reported LongMemEval, are motivation for the candidate list only (section 8), never S3 evidence.
 
 **Late candidates (r4).** The 32-layer landscape sweep is held for the user's Gates A and B, so this preregistration does not wait for its durable-memory survivors. Any later survivor, or any other dated discovery, is handled like a reserve admitted after confirmatory execution (section 6):
 - it is exploratory until a separately frozen, dated amendment arm names it before its first run;
@@ -121,7 +121,7 @@ Also pending from the 2026-09-26 sweep, where only a missing vote refuted them: 
 - **Dataset:** `longmemeval_s_cleaned.json`, sha256 `d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442`, from [xiaowu0162/longmemeval-cleaned @98d7416c](https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/98d7416c24c778c2fee6e6f3006e7a073259d48f/longmemeval_s_cleaned.json).
   - 500 questions; 30 abstention.
   - Full track: n=470.
-  - Official track: n=419, which also excludes the 51 `single-session-assistant` questions.
+  - Official track: n=419, which also excludes 51 of the 56 `single-session-assistant` questions; 5 remain (frozen `eligible-manifest.json`, checked against the pinned dataset).
 - **Tracks (r5):**
   - **Official track:** upstream's user-text construction and relabelled gold IDs ([LongMemEval @9e0b455f `run_retrieval.py:202`](https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/retrieval/run_retrieval.py#L202), `process_item_flat_index`).
   - **Full-session track:** presents complete sessions to the native adapters and scores raw session IDs against `answer_session_ids`, including assistant-side evidence, following A2. This construction is a local extension.

@@ -6873,8 +6873,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "fc788c50c20e4119d2ec0be82ab5a73e8a0146af076929b03461f6310f5978bf",
-      "bytes": 32995
+      "sha256": "a8c85ce013874136663aad73a91b6d213a05cdd91533eb7eb7f0902b524e0c63",
+      "bytes": 33158
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/README.md",
