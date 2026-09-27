@@ -15,7 +15,9 @@ Static checks (no model call):
                 through ${ECO_ROOT}/bin/node, "cwd": null, env keys CONTEXT_MODE_PLATFORM, PATH and
                 RTK_TELEMETRY_DISABLED, no forwarded variables; `codex mcp list --json` names context-mode once
   profile       `codex -p stack-worker debug prompt-input` carries max effort's "do not spawn sub-agents unless
-                asked" and the markers; `codex -p stack-worker mcp get` shows the template's tool lists
+                asked" and the markers, after starting the servers the profile marks required (serena and
+                codebase-memory), as every worker's session start does; `codex -p stack-worker mcp get` shows the
+                template's tool lists
   rtk-exactness in a scratch repository whose committed big.txt is over 8 KiB: `rtk git status` exits 0,
                 native `git show HEAD:big.txt` is byte-exact, and `rtk git show HEAD:big.txt` is not (the
                 reason it is an exception)

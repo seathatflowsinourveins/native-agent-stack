@@ -3732,13 +3732,13 @@
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
-      "sha256": "0751419f445daaa7735e952af41fa93b1b0464de36282d22b38573653891aba8",
-      "bytes": 4932
+      "sha256": "aef7d77408c8d47047ea21056528d9e37a512aef420dc28e35d5a1e1c2d42fe2",
+      "bytes": 5066
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "922e6c5f8fd5f07973345148514c215d7ca9768eee94be92eadb7d5efadbc169",
-      "bytes": 4458
+      "sha256": "51be338ec5cc80261ef7b9a73119e857cf16c87de2968086997003198dea3621",
+      "bytes": 5815
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
@@ -13818,8 +13818,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "15092d762e018a24df27f04019d5d14542ddf739f054380f142224d1837e7f5a",
-      "bytes": 50684
+      "sha256": "d639711f173054c8a3402e5095b2478fa9559d400c9cc53b508b0a8e5b04d555",
+      "bytes": 67334
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -38693,8 +38693,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "1ed331c14a48569a991ee03ae72a5b0af778e1b393ef08d00064b5486ce55ca5",
-      "bytes": 121039
+      "sha256": "bff34a5507ec373fbf2b33bb3d752e2dda50fe37f158763afac7568d04487a5f",
+      "bytes": 122265
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -39263,8 +39263,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf",
-      "bytes": 95109
+      "sha256": "99f339b842989ee38ae85d8d55e29debfa721859d4ecd1bc62e45939437223c5",
+      "bytes": 119866
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -39863,8 +39863,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "a5605cb436cb5fad97394d7c35634e3901c2321a1f7aa33a8aa293a8e4f159db",
-      "bytes": 62148
+      "sha256": "7c452c6d2d8843d42465ceb704f7110bd7b2e8dc9c6cd2e09e2304a859afc2e7",
+      "bytes": 66775
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -39883,8 +39883,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "a399117aa14bec57fd5be59badc0121523148449ae758d7d37ecf052f7c92e23",
-      "bytes": 31531
+      "sha256": "7a7be185540091f164ffe07fdfdaf0ac5262e361e0c6fe3f048bdeec2717703e",
+      "bytes": 31685
     },
     {
       "path": "tools/adoption/render_config.py",

@@ -6,7 +6,8 @@ Evidence classes (docs/acceptance-evidence-policy.md):
 - the apply, dry-run and rollback tests are synthetic: they drive the script against a fake `codex` written below,
   which speaks the app-server stdio protocol as openai/codex rust-v0.157.1 defines it (no "jsonrpc" field,
   `initialize` then `initialized`, `config/read` with layers and a sha256 version, `config/batchWrite` with
-  `expectedVersion`, a null value deleting a key) and answers `mcp get`, `mcp list` and `debug prompt-input`;
+  `expectedVersion`, a null value deleting a key) and answers `mcp get`, `mcp list` and `debug prompt-input`
+  (applying `-c` overrides, and refusing the session when a required MCP server has no executable command);
 - the prove verdict tests read event fixtures cut from real `codex exec --json` runs of codex-cli 0.157.1
   (tests/fixtures/codex-worker-lane/, paths masked; see that directory's items for what each run was);
 - CodexIntegrationTests runs the real codex 0.157.1 app-server against a scratch Codex home, only when
@@ -23,6 +24,7 @@ import itertools
 import json
 import os
 import re
+import shlex
 import shutil
 import signal
 import string
@@ -92,6 +94,9 @@ argv = sys.argv[1:]
 profile = None
 if "-p" in argv:
     i = argv.index("-p"); profile = argv[i + 1]; del argv[i:i + 2]
+overrides = []
+while "-c" in argv:
+    i = argv.index("-c"); overrides.append(argv[i + 1]); del argv[i:i + 2]
 
 def load(path):
     return tomllib.loads(path.read_text()) if path.is_file() else {}
@@ -103,7 +108,14 @@ def merge(base, over):
 
 def effective():
     config = load(HOME / "config.toml")
-    return merge(config, load(HOME / f"{profile}.config.toml")) if profile else config
+    config = merge(config, load(HOME / f"{profile}.config.toml")) if profile else config
+    for override in overrides:  # session flags outrank the profile, key by key
+        key, value = override.split("=", 1)
+        node, path = config, segments(key)
+        for s in path[:-1]:
+            node = node.setdefault(s, {})
+        node[path[-1]] = tomllib.loads("v = " + value)["v"]
+    return config
 
 {emitter}
 
@@ -165,6 +177,16 @@ if argv[:2] == ["mcp", "get"]:
 if argv[:2] == ["mcp", "list"]:
     print(json.dumps([{"name": n} for n in effective().get("mcp_servers", {})])); sys.exit(0)
 if argv[:2] == ["debug", "prompt-input"]:
+    # Session start waits for every enabled server marked required and fails when one cannot start
+    # (codex-mcp/src/connection_manager/required.rs L15-59, core/src/session/session.rs L1860-1867); the message is
+    # the one real codex 0.157.1 prints. Here a server can start when it has a url or an executable command.
+    failed = [f"{name}: No such file or directory (os error 2)"
+              for name, table in sorted(effective().get("mcp_servers", {}).items())
+              if table.get("required") and table.get("enabled", True) and "url" not in table
+              and not (table.get("command") and os.access(table["command"], os.X_OK))]
+    if failed:
+        print("Error: Fatal error: Failed to initialize session: required MCP servers failed to initialize: "
+              + "; ".join(failed), file=sys.stderr); sys.exit(1)
     text = ""
     for name in ("AGENTS.override.md", "AGENTS.md"):
         path = HOME / name
@@ -180,6 +202,160 @@ if argv[:2] == ["debug", "prompt-input"]:
     print(json.dumps(items, indent=2)); sys.exit(0)
 print("fake codex: unsupported " + " ".join(argv), file=sys.stderr); sys.exit(64)
 '''
+
+# A stdio MCP server for the native tests, with the lifecycle of the MCP specification (2025-06-18): `initialize` gets
+# the client's protocolVersion back with a tools capability, notifications get no answer, `tools/list` lists one tool,
+# `ping` gets an empty result and any other request JSON-RPC error -32601. Upstream's own start-up fixture,
+# codex-rs/rmcp-client/src/bin/test_stdio_server.rs at openai/codex rust-v0.157.1, likewise holds `initialize` back
+# (until a barrier file appears, L513-517).
+#   --tool NAME          the one tool it lists
+#   --delay SECONDS      wait this long before answering `initialize` (a slow start)
+#   --require-home PATH  exit 1 at start unless HOME is PATH: codebase-memory-mcp 0.11.0 will not start while its
+#                        account daemon runs with another home's cache directory (measured 2026-09-27)
+# Other arguments are ignored, so a wrapper can stand in for an installed server's command line.
+FIXTURE_MCP_SERVER = r'''import json, os, sys, time
+ARGS = sys.argv[1:]
+
+def option(name, default=None):
+    return ARGS[ARGS.index(name) + 1] if name in ARGS[:-1] else default
+
+TOOL, DELAY, HOME = option("--tool", "fixture_tool"), float(option("--delay", "0")), option("--require-home")
+if HOME is not None and os.environ.get("HOME") != HOME:
+    print("fixture MCP server: HOME is not the home it is bound to", file=sys.stderr); sys.exit(1)
+
+def reply(msg_id, result=None, error=None):
+    message = {"jsonrpc": "2.0", "id": msg_id}
+    message.update({"error": error} if error is not None else {"result": result})
+    sys.stdout.write(json.dumps(message) + "\n"); sys.stdout.flush()
+
+while True:
+    line = sys.stdin.readline()
+    if not line:
+        break
+    try:
+        message = json.loads(line)
+    except ValueError:
+        continue
+    if not isinstance(message, dict) or "id" not in message or "method" not in message:
+        continue
+    method = message["method"]
+    if method == "initialize":
+        time.sleep(DELAY)
+        reply(message["id"], {"protocolVersion": (message.get("params") or {}).get("protocolVersion", "2025-06-18"),
+                              "capabilities": {"tools": {"listChanged": False}},
+                              "serverInfo": {"name": "nas-fixture-mcp", "version": "0.0.0"}})
+    elif method == "tools/list":
+        reply(message["id"], {"tools": [{"name": TOOL, "description": "A fixture tool.",
+                                         "inputSchema": {"type": "object", "properties": {}}}]})
+    elif method == "ping":
+        reply(message["id"], {})
+    else:
+        reply(message["id"], error={"code": -32601, "message": "method not found: " + method})
+'''
+
+# Runs inside the isolation wrapper, so the fake endpoint and codex share one loopback. It serves a fake Responses
+# endpoint, runs ARGV (each "{BASE_URL}" replaced) and records, for each request, when it arrived (from codex's
+# start), whether it carried the exec tool's deferred-tool guidance, and the tool names an earlier `exec` call listed.
+# Its first answer calls code mode's `exec` with CODE, which lists ALL_TOOLS by name; every later answer is a plain
+# "done" message. That is how openai/codex rust-v0.157.1 inspects a turn's tools in its own tests:
+# core/tests/suite/code_mode.rs run_code_mode_turn_with_builder L264-293 and
+# code_mode_exports_all_tools_metadata_for_namespaced_mcp_tools L7133-7175, read back from the next request's
+# custom_tool_call_output as custom_tool_output_last_non_empty_text (L214-229) does. The streams are the ones
+# core/tests/common/responses.rs builds: sse() L717-730, ev_response_created L748-755, ev_custom_tool_call L975-985,
+# ev_assistant_message L785-795, ev_completed L737-745.
+RESPONSES_DRIVER = r'''import http.server, json, os, signal, subprocess, sys, threading, time
+OUT, ARGV = sys.argv[1], json.loads(sys.argv[2])
+GUIDANCE = b"Some deferred nested tools may be omitted"
+CODE = "text(JSON.stringify(ALL_TOOLS.map(({ name }) => name)));"  # names no tool: every listed name came from Codex
+USAGE = {"input_tokens": 0, "input_tokens_details": None, "output_tokens": 0, "output_tokens_details": None,
+         "total_tokens": 0}
+
+def stream(response_id, item):
+    events = [{"type": "response.created", "response": {"id": response_id}},
+              {"type": "response.output_item.done", "item": item},
+              {"type": "response.completed", "response": {"id": response_id, "usage": USAGE}}]
+    return "".join("event: %s\ndata: %s\n\n" % (event["type"], json.dumps(event)) for event in events).encode()
+
+EXEC = stream("resp-exec", {"type": "custom_tool_call", "call_id": "call-1", "name": "exec", "input": CODE})
+DONE = stream("resp-fixture", {"type": "message", "role": "assistant", "id": "msg-fixture",
+                               "content": [{"type": "output_text", "text": "done"}]})
+REQUESTS, STARTED = [], [0.0]
+
+def listed_tools(raw):
+    """The names in this request's custom_tool_call_output for call-1 (its last non-empty text), or None."""
+    try:
+        items = json.loads(raw).get("input") or []
+    except ValueError:
+        return None
+    for item in items:
+        if isinstance(item, dict) and item.get("type") == "custom_tool_call_output" and item.get("call_id") == "call-1":
+            output = item.get("output")
+            parts = [output] if isinstance(output, str) else [part.get("text") or "" for part in output or []]
+            parts = [part for part in parts if part.strip()]
+            try:
+                return json.loads(parts[-1]) if parts else None
+            except ValueError:
+                return None
+    return None
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+        first = not any(request["path"].endswith("/responses") for request in REQUESTS)
+        REQUESTS.append({"path": self.path, "t": round(time.monotonic() - STARTED[0], 2),
+                         "deferred_tool_guidance": GUIDANCE in raw, "listed_tools": listed_tools(raw)})
+        if not self.path.endswith("/responses"):
+            self.send_error(404)
+            return
+        body = EXEC if first else DONE
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        self.send_error(404)
+
+    def log_message(self, *args):
+        pass
+
+server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+threading.Thread(target=server.serve_forever, daemon=True).start()
+url = "http://127.0.0.1:%d/v1" % server.server_address[1]
+with open(OUT + ".stderr", "w") as err:
+    STARTED[0] = time.monotonic()
+    proc = subprocess.Popen([arg.replace("{BASE_URL}", url) for arg in ARGV], stdin=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL, stderr=err, start_new_session=True)
+    try:
+        code = proc.wait(timeout=120)
+    except subprocess.TimeoutExpired:
+        code = "timeout"
+    try:  # codex's own group: a timed-out codex, or background children it left behind
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    proc.wait()
+server.shutdown()
+with open(OUT + ".stderr") as err, open(OUT, "w") as handle:
+    json.dump({"exit": code, "stderr": err.read()[-4000:], "requests": REQUESTS}, handle)
+'''
+
+
+def write_fixture_mcp_server(directory: Path) -> Path:
+    """FIXTURE_MCP_SERVER as a file under `directory`."""
+    path = directory / "fixture_mcp_server.py"
+    path.write_text(FIXTURE_MCP_SERVER, encoding="utf-8")
+    return path
+
+
+def fixture_mcp_wrapper(path: Path, server: Path, *args: str) -> None:
+    """An executable at `path` that runs the fixture MCP server with `args`, standing in for an installed server; the
+    installed server's own arguments pass through and are ignored."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("#!/bin/sh\nexec " + " ".join(shlex.quote(part) for part in (sys.executable, str(server), *args))
+                    + ' "$@"\n', encoding="utf-8")
+    path.chmod(0o755)
 
 
 def template_segments() -> tuple[str, str, str]:
@@ -266,12 +442,21 @@ class TemplateTests(unittest.TestCase):
         # openai/codex rust-v0.157.1: RawMcpServerConfig.startup_timeout_sec in
         # core/config.schema.json; codex-mcp/src/rmcp_client.rs:103 defaults to 30 s.
         # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
+        # required = true (config/src/mcp_types.rs:233-235) makes session start wait for the server and fail when it
+        # cannot start (codex-mcp/src/connection_manager/required.rs:15-59, core/src/session/session.rs:1860-1867).
+        # Without it a server still starting after the shared 1 s grace (codex-mcp/src/mcp/mod.rs:195) is left out of
+        # the first request (codex-mcp/src/connection_manager/tool_catalog.rs:251-277).
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         for name in ("serena", "codebase-memory"):
             with self.subTest(server=name):
                 self.assertIn("command", user["mcp_servers"][name])
-                self.assertEqual(profile["mcp_servers"].get(name), {"startup_timeout_sec": 60})
+                self.assertEqual(profile["mcp_servers"].get(name), {"startup_timeout_sec": 60, "required": True})
+        # The rejected alternative (docs/decisions/2026-09-26-codex-worker-lane.md, addendum 2026-09-27 "Required
+        # start-up"): a zero grace (config/src/config_toml.rs:318-322) waits for every optional server and never fails.
+        self.assertNotIn("mcp_optional_startup_grace_ms", profile)
+        self.assertEqual([name for name, table in profile["mcp_servers"].items() if table.get("required")],
+                         ["serena", "codebase-memory"])
 
     def test_project_jcodemunch_approves_only_read_front_door(self):
         # openai/codex rust-v0.157.1 codex-mcp/src/mcp/mod.rs:89-98 and core/config.schema.json;
@@ -359,11 +544,12 @@ class TemplateTests(unittest.TestCase):
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
-        # home writes the route itself. Every model, provider and feature key it writes must equal the profile's, or
-        # one of them drifted. Its config.toml has no env_key_instructions, key filter or web_search: web_search =
-        # "live" comes from the stack-worker profile and the runner's -c flag, and without the filter a real key in
-        # the sweep's environment reaches the model's commands (recipes/README.md, "Codex through OmniRoute"). No
-        # assertion here pins those absences, so the sweep lane can add the filter without breaking this test.
+        # home writes the route itself. Every model, provider, feature and key-filter setting it writes must equal the
+        # profile's, or one of them drifted. Since #393 its config.toml writes the profile's
+        # [shell_environment_policy.filters] (build_args.py stage_lane_home), which keeps a real key in the sweep's
+        # environment out of the model's commands (recipes/README.md, "Codex through OmniRoute"). It has no
+        # env_key_instructions or web_search: web_search = "live" comes from the stack-worker profile and the runner's
+        # -c flag. No assertion here pins those two absences.
         spec = importlib.util.spec_from_file_location(
             "landscape_sweep_build_args_for_lane_test", ROOT / "tools/sota-convergence/landscape-sweep/build_args.py")
         build_args = importlib.util.module_from_spec(spec)
@@ -386,6 +572,7 @@ class TemplateTests(unittest.TestCase):
         for key, value in staged["model_providers"]["omniroute"].items():
             self.assertEqual(value, provider.get(key), f"model_providers.omniroute.{key}")
         self.assertEqual(staged["features"], profile["features"])
+        self.assertEqual(staged.get("shell_environment_policy"), profile["shell_environment_policy"])
         self.assertEqual(build_args.OMNIROUTE_KEY_ENV, provider["env_key"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_URL, provider["base_url"])
         self.assertEqual(build_args.OMNIROUTE_DEFAULT_MODEL, profile["model"])
@@ -421,9 +608,10 @@ class FakeHost:
         self.codex_home.mkdir(parents=True)
         self.eco = self.tmp / "eco"
         (self.eco / "bin").mkdir(parents=True)
-        node = self.eco / "bin" / "node"
-        node.write_text("#!/bin/sh\nexit 0\n")
-        node.chmod(0o755)
+        for name in ("node", "serena", "codebase-memory-mcp"):
+            stub = self.eco / "bin" / name
+            stub.write_text("#!/bin/sh\nexit 0\n")
+            stub.chmod(0o755)
         start = self.eco / f"tools/context-mode-{lane.CONTEXT_MODE_VERSION}/lib/node_modules/context-mode/start.mjs"
         start.parent.mkdir(parents=True)
         start.write_text("// stand-in for start.mjs\n")
@@ -439,7 +627,11 @@ class FakeHost:
             "shell_environment_policy": {"set": {"PATH": f"{eco}/bin:/usr/bin:/bin"}},
             "mcp_servers": {"ai-memory": {"url": "http://127.0.0.1:1/mcp"},
                             "socraticode": {"command": f"{eco}/bin/node", "args": ["x.js"]},
-                            "headroom": {"command": f"{eco}/bin/headroom", "env": {"HEADROOM_OFFLINE": "1"}}},
+                            "headroom": {"command": f"{eco}/bin/headroom", "env": {"HEADROOM_OFFLINE": "1"}},
+                            # The profile marks these two required, so they are registered as the user template
+                            # registers them, with commands that exist.
+                            "serena": {"command": f"{eco}/bin/serena", "startup_timeout_sec": 60},
+                            "codebase-memory": {"command": f"{eco}/bin/codebase-memory-mcp"}},
             "plugins": {"context-mode@context-mode": {"enabled": True}},
             "projects": {"/home/example/code/x": {"trust_level": "trusted"}},
         }
@@ -747,6 +939,32 @@ class ApplyFlowTests(unittest.TestCase):
         self.assertEqual(code, 0, out)
         self.assertEqual(self.host.read_config(), before)
 
+    def test_the_dry_run_relaxes_required_servers_and_the_apply_read_back_starts_them(self):
+        # The profile marks serena and codebase-memory required, so every -p stack-worker session start waits for them
+        # and fails when one cannot start. The rehearsal's scratch HOME cannot start a server bound to the account's
+        # own home (codebase-memory-mcp 0.11.0 refuses a second cache directory while its account daemon runs), so the
+        # dry run relaxes them with session flags; the apply's read-back runs without them, as a worker starts.
+        self.assertEqual(lane.required_servers(), ["codebase-memory", "serena"])
+        (self.host.eco / "bin" / "codebase-memory-mcp").unlink()  # a registered server that cannot start
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertIn(f"-p {lane.PROFILE_NAME} required servers codebase-memory, serena: relaxed", out)
+        self.assertIn("rehearsal passed", out)
+        code, out = self.host.apply()
+        self.assertEqual(code, 3, out)
+        self.assertIn(f"-p {lane.PROFILE_NAME} prompt input: required MCP servers did not start (read from the error, "
+                      f"best effort: codebase-memory): {lane.REQUIRED_FAILURE}codebase-memory: ", out)
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["status"], "failed")
+        failure = record["readback"]["prompt_input_profile"]["required_failure"]
+        self.assertEqual(failure["names_best_effort"], ["codebase-memory"])
+        self.assertEqual(failure["text"],
+                         lane.REQUIRED_FAILURE + "codebase-memory: No such file or directory (os error 2)")
+        self.assertIn(f"--rollback {run}", out)
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+
     def test_omniroute_profile_is_opt_in_created_read_back_and_rolled_back(self):
         profile = self.host.codex_home / "omniroute.config.toml"
         code, out = self.host.apply()
@@ -830,6 +1048,54 @@ class ApplyFlowTests(unittest.TestCase):
         self.assertNotIn("[model_providers.omniroute]", step)  # no table here, so none is listed
         self.assertIn("`codex debug prompt-input probe`", step)  # the read-back covers a launch without the profile
         self.assertIn("Model provider `omniroute` not found", step)
+
+
+class RequiredStartTests(unittest.TestCase):
+    """Synthetic: stderr lines copied from real codex-cli 0.157.1 runs on 2026-09-27 (this change's native tests)."""
+
+    def test_required_start_failures_name_every_server(self):
+        # The message is built at codex-mcp/src/connection_manager/required.rs L51-58 (rust-v0.157.1); the error text
+        # after each name can be long, so a bounded last line may cut the later names off.
+        prompt_input = ("Error: Fatal error: Failed to initialize session: required MCP servers failed to initialize: "
+                        "codebase-memory: No such file or directory (os error 2); serena: No such file or directory "
+                        "(os error 2)")
+        exec_line = ("Error: thread/start: thread/start failed: error creating thread: Fatal error: Failed to "
+                     "initialize session: required MCP servers failed to initialize: serena: handshaking with MCP "
+                     "server failed: connection closed: initialize response: connection closed: initialize response "
+                     "(code -32603)")
+        self.assertEqual(lane.required_start_failures("Reading additional input from stdin...\n" + prompt_input),
+                         ["codebase-memory", "serena"])
+        self.assertEqual(lane.required_start_failures(exec_line + "\n"), ["serena"])
+        self.assertEqual(lane.required_start_failures("Error: No MCP server named 'x' found.\n"), [])
+
+    def test_required_failure_keeps_the_whole_error_and_its_names_are_best_effort(self):
+        # Codex joins the "<name>: <error>" pairs with "; " unescaped (required.rs L51-58 at rust-v0.157.1), and an
+        # rmcp error keeps its message's newlines and delimiters, so the record keeps the whole text and the names
+        # read from it are best effort.
+        multiline = (lane.REQUIRED_FAILURE + "codebase-memory: startup failed\ncaused by missing executable; "
+                     "serena: missing executable")
+        stderr = "Error: Fatal error: Failed to initialize session: " + multiline + "\n"
+        self.assertEqual(lane.required_start_failures(stderr), ["codebase-memory", "serena"])
+        self.assertEqual(lane.required_failure_text(stderr), multiline)
+        # A "; serena: " inside codebase-memory's own error reads as a second pair: the text cannot tell them apart.
+        embedded = lane.REQUIRED_FAILURE + "codebase-memory: upstream said: a; serena: ready (no error)"
+        self.assertEqual(lane.required_start_failures(embedded), ["codebase-memory", "serena"])
+        self.assertEqual(lane.required_failure_text("a log line\n" + embedded + "\n"), embedded)
+        # A name the profile does not mark required is not taken, and a name is taken once.
+        self.assertEqual(lane.required_start_failures(lane.REQUIRED_FAILURE + "other: x; serena: y; serena: z"),
+                         ["serena"])
+        self.assertEqual(lane.required_failure_text("Error: No MCP server named 'x' found.\n"), "")
+        found = {"prompt_input_profile": {"error": "caused by missing executable; serena: missing executable",
+                                          "required_failure": {"text": multiline,
+                                                               "names_best_effort": ["codebase-memory", "serena"]}}}
+        self.assertIn(f"-p {lane.PROFILE_NAME} prompt input: required MCP servers did not start (read from the "
+                      f"error, best effort: codebase-memory, serena): {multiline}", lane.check_readbacks(found, "/eco"))
+
+    def test_relaxed_flags_follow_the_profile(self):
+        # Session flags (30) outrank the profile (21) key by key (config/src/config_layer_source.rs at rust-v0.157.1),
+        # so each flag moves only `required`.
+        self.assertEqual(lane.relaxed_required_flags(), ["-c", "mcp_servers.codebase-memory.required=false",
+                                                         "-c", "mcp_servers.serena.required=false"])
 
 
 def fixture_events(name: str) -> list[dict]:
@@ -1388,7 +1654,9 @@ class CodexIntegrationTests(unittest.TestCase):
         # recipes/README.md: start stack-worker lanes without --strict-config. Strict mode validates each
         # configuration file on its own as a whole configuration (config/src/loader/mod.rs L594-600 and L625-645 at
         # rust-v0.157.1), and the profile's server tables amend servers the base config registers, naming no command.
-        # The control: without --strict-config the same home renders the profile's prompt input.
+        # The control: without --strict-config the same home renders the profile's prompt input. The profile marks
+        # serena and codebase-memory required, so that session start launches both: fixture MCP servers stand in at
+        # the paths the rendered user template gives them.
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
@@ -1398,6 +1666,10 @@ class CodexIntegrationTests(unittest.TestCase):
             root = Path(tmp)
             env = self.gateway_home(root, "")
             codex_home = Path(env["CODEX_HOME"])
+            fixture["ECO_ROOT"] = str(root / "eco")
+            server = write_fixture_mcp_server(root)
+            for name in ("serena", "codebase-memory-mcp"):
+                fixture_mcp_wrapper(root / "eco" / "bin" / name, server)
             (codex_home / "config.toml").write_text(base.substitute(fixture))
             (codex_home / "stack-worker.config.toml").write_bytes(
                 (TEMPLATES / "codex.stack-worker.config.toml").read_bytes())
@@ -1445,11 +1717,19 @@ class CodexIntegrationTests(unittest.TestCase):
     def test_real_app_server_apply_and_byte_exact_rollback(self):
         host = FakeHost(self)
         host.base_args[1] = shutil.which("codex")
+        # The profile marks serena and codebase-memory required, so the apply's read-back starts both under the real
+        # codex: fixture MCP servers stand in for them. The codebase-memory one starts only under this process's HOME,
+        # as codebase-memory-mcp 0.11.0 does beside its account daemon, so the dry run's rehearsal (a scratch HOME)
+        # passes because it relaxes the two, and the apply's read-back shows they start where workers run.
+        server = write_fixture_mcp_server(host.tmp)
+        fixture_mcp_wrapper(host.eco / "bin" / "serena", server, "--tool", "fixture_serena")
+        fixture_mcp_wrapper(host.eco / "bin" / "codebase-memory-mcp", server, "--tool", "fixture_codebase_memory",
+                            "--require-home", os.environ.get("HOME", ""))
         text = ('# a comment the writer keeps\nmodel = "gpt-6-astra"\nmodel_reasoning_effort = "ultra"\n\n'
                 f'[features]\ndaemon_auto_start = false\n\n[shell_environment_policy.set]\n'
                 f'PATH = "{host.eco}/bin:/usr/bin:/bin"\n\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n\n'
                 f'[mcp_servers.serena]\ncommand = "{host.eco}/bin/serena"\n\n'
-                '[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n\n'
+                f'[mcp_servers.codebase-memory]\ncommand = "{host.eco}/bin/codebase-memory-mcp"\n\n'
                 f'[mcp_servers.socraticode]\ncommand = "{host.eco}/bin/node"\nstartup_timeout_sec = 120\n\n'
                 f'[mcp_servers.headroom]\ncommand = "{host.eco}/bin/headroom"\n\n[mcp_servers.headroom.env]\n'
                 'HEADROOM_OFFLINE = "1"\n\n[plugins."context-mode@context-mode"]\nenabled = true\n')
@@ -1457,8 +1737,11 @@ class CodexIntegrationTests(unittest.TestCase):
         before = {name: (host.codex_home / name).read_bytes() for name in ("config.toml", "AGENTS.md")}
         code, out = host.run()
         self.assertEqual(code, 0, out)
+        self.assertIn(f"-p {lane.PROFILE_NAME} required servers codebase-memory, serena: relaxed", out)
         code, out = host.apply()
         self.assertEqual(code, 0, out)
+        record = json.loads((host.latest_run() / "record.json").read_text())
+        self.assertNotIn("required_failure", record["readback"]["prompt_input_profile"])
         written = (host.codex_home / "config.toml").read_text()
         self.assertIn("# a comment the writer keeps", written)
         self.assertIn("startup_timeout_sec = 120\n", written)  # an integer stays an integer
@@ -1471,17 +1754,20 @@ class CodexIntegrationTests(unittest.TestCase):
         self.assertFalse((host.codex_home / "stack-worker.config.toml").exists())
 
     def test_a_project_config_outranks_the_profile_but_not_the_pinned_flags(self):
-        # The multi_agent_mode sentence tells the efforts apart: ultra delegates proactively, max does not.
+        # The multi_agent_mode sentence tells the efforts apart: ultra delegates proactively, max does not. The profile
+        # marks serena and codebase-memory required, so they are fixture MCP servers that start.
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             home, project = root / "home", root / "project"
             (home / ".codex").mkdir(parents=True)
             (project / ".codex").mkdir(parents=True)
             shutil.copy(TEMPLATES / "codex.stack-worker.config.toml", home / ".codex" / "stack-worker.config.toml")
+            starts = (f"command = {json.dumps(sys.executable)}\n"
+                      f"args = {json.dumps([str(write_fixture_mcp_server(root))])}\n")
             (home / ".codex" / "config.toml").write_text(
                 'model_reasoning_effort = "max"\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n'
                 '[mcp_servers.socraticode]\ncommand = "/bin/false"\n[mcp_servers.headroom]\ncommand = "/bin/false"\n'
-                '[mcp_servers.serena]\ncommand = "/bin/false"\n[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n'
+                f'[mcp_servers.serena]\n{starts}[mcp_servers.codebase-memory]\n{starts}'
                 f'[mcp_servers.context-mode]\ncommand = "/bin/false"\n[projects."{project}"]\ntrust_level = "trusted"\n')
             (project / ".codex" / "config.toml").write_text('model_reasoning_effort = "ultra"\n')
             subprocess.run(["git", "-C", str(project), "init", "-q"], check=True)
@@ -1497,6 +1783,82 @@ class CodexIntegrationTests(unittest.TestCase):
             self.assertIn("Proactive multi-agent delegation is active", rendered("-p", "stack-worker"))
             self.assertIn("Do not spawn sub-agents unless",
                           rendered("-p", "stack-worker", "-c", 'model_reasoning_effort="max"'))
+
+    def test_required_servers_start_before_the_first_request_on_a_custom_provider(self):
+        # The gap measured on 2026-09-27: through the OmniRoute gateway, serena and codebase-memory were missing from
+        # GPT-6's first request. At rust-v0.157.1 a server that is not required gets one shared 1 s grace from the
+        # first tool-list build (codex-mcp/src/mcp/mod.rs L195) and is then left out of that request
+        # (codex-mcp/src/connection_manager/tool_catalog.rs L251-277), and a custom provider has no websocket prewarm
+        # to hide a slower start (core/src/client.rs L1020-1028, model-provider-info/src/lib.rs L190-192). Here both
+        # servers answer `initialize` after `delay` s and a fake Responses endpoint on loopback records each request.
+        # gpt-6-astra runs in code mode, where MCP tools are deferred nested tools of `exec`: the first request names
+        # none of them and carries only the guidance Codex adds when deferred tools exist
+        # (code-mode-protocol/src/description.rs L15 and L291-293). So the endpoint answers it with an `exec` call that
+        # lists ALL_TOOLS by name (RESPONSES_DRIVER), and the second request carries the names that first turn saw.
+        # The relaxed case is the control.
+        delay = 5
+        mcp_tools = {"mcp__serena__fixture_serena", "mcp__codebase_memory__fixture_codebase_memory"}
+        profile = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        cases = {"profile": [], "relaxed": lane.relaxed_required_flags(),
+                 "cannot start": ["-c", 'mcp_servers.serena.command="/bin/false"', "-c", "mcp_servers.serena.args=[]"]}
+        results = {}
+        for label, flags in cases.items():
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                codex_home = root / "home" / ".codex"
+                codex_home.mkdir(parents=True)
+                (root / "cwd").mkdir()
+                server = write_fixture_mcp_server(root)
+                base = ('model_provider = "nasfake"\ncheck_for_update_on_startup = false\n\n'
+                        '[model_providers.nasfake]\nname = "nas-fake"\nbase_url = "http://127.0.0.1:9/v1"\n'
+                        'wire_api = "responses"\nrequires_openai_auth = false\nrequest_max_retries = 0\n'
+                        'stream_max_retries = 0\n')
+                for name in tomllib.loads(profile)["mcp_servers"]:  # register every server the profile amends
+                    if name in ("serena", "codebase-memory"):
+                        args = [str(server), "--tool", "fixture_" + name.replace("-", "_"), "--delay", str(delay)]
+                        base += f'\n[mcp_servers."{name}"]\ncommand = {json.dumps(sys.executable)}\n'
+                        base += f"args = {json.dumps(args)}\n"
+                    else:
+                        base += f'\n[mcp_servers."{name}"]\ncommand = "/bin/false"\n'
+                (codex_home / "config.toml").write_text(base, encoding="utf-8")
+                (codex_home / "stack-worker.config.toml").write_text(profile, encoding="utf-8")
+                driver = root / "responses_driver.py"
+                driver.write_text(RESPONSES_DRIVER, encoding="utf-8")
+                argv = [shutil.which("codex"), "exec", "-p", lane.PROFILE_NAME,
+                        "-c", 'model_providers.nasfake.base_url="{BASE_URL}"', *flags, *lane.worker_pins(),
+                        "-s", "read-only", "--skip-git-repo-check", "reply ok"]
+                env = {"HOME": str(root / "home"), "CODEX_HOME": str(codex_home), "LANG": "C.UTF-8",
+                       "PATH": os.pathsep.join([str(Path(shutil.which("codex")).parent), os.defpath])}
+                out = root / "result.json"
+                got = subprocess.run([*self.isolation(root), sys.executable, str(driver), str(out), json.dumps(argv)],
+                                     cwd=root / "cwd", env=env, stdin=subprocess.DEVNULL, capture_output=True,
+                                     text=True, timeout=300)
+                self.assertTrue(out.is_file(), got.stderr[-400:])
+                results[label] = json.loads(out.read_text())
+        for label, result in results.items():
+            result["responses"] = [request for request in result["requests"] if request["path"].endswith("/responses")]
+            # the names the first turn's exec call listed, carried by the second request
+            result["listed"] = set((result["responses"][1:2] or [{}])[0].get("listed_tools") or [])
+        with self.subTest(case="profile"):  # the first request waits for both servers; that turn lists both tools
+            result = results["profile"]
+            self.assertEqual(result["exit"], 0, result["stderr"][-400:])
+            self.assertGreaterEqual(result["responses"][0]["t"], delay)
+            self.assertTrue(result["responses"][0]["deferred_tool_guidance"])
+            self.assertLessEqual(mcp_tools, result["listed"])
+        with self.subTest(case="relaxed"):  # the control: the first request leaves after the grace, without them
+            result = results["relaxed"]
+            self.assertEqual(result["exit"], 0, result["stderr"][-400:])
+            self.assertLess(result["responses"][0]["t"], delay)
+            self.assertFalse(result["responses"][0]["deferred_tool_guidance"])
+            self.assertTrue(result["listed"])  # the exec call ran and listed the built-in tools
+            self.assertFalse(mcp_tools & result["listed"])
+        with self.subTest(case="difference"):  # only the two servers' tools tell the two first turns apart
+            self.assertEqual(results["profile"]["listed"] ^ results["relaxed"]["listed"], mcp_tools)
+        with self.subTest(case="cannot start"):  # the run stops at session start, before any request
+            result = results["cannot start"]
+            self.assertNotIn(result["exit"], (0, "timeout"), result["stderr"][-400:])
+            self.assertIn("required MCP servers failed to initialize: serena", result["stderr"])
+            self.assertEqual(result["responses"], [])
 
 
 if __name__ == "__main__":
