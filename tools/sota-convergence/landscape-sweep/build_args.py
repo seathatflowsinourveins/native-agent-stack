@@ -205,10 +205,28 @@ def profile_servers_without_base(profile_bytes: bytes, base_servers: list) -> li
                   if name not in base_servers and not (isinstance(table, dict) and ("command" in table or "url" in table)))
 
 
+def codex_user_instructions(repo_root: Path) -> str:
+    """The Codex user instructions a host installs as $CODEX_HOME/AGENTS.md: the managed block of
+    adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk v0.50.0's hooks/rtk-awareness-full.md
+    verbatim, and the RTK exactness exceptions), read through tools/adoption/apply_codex_lane.py's agents_block(),
+    never a copy of it. Codex reads $CODEX_HOME/AGENTS.md as global instructions, so a lane home without it gives
+    its model neither the top rule nor RTK's instructions, which the native lane's workers get from ~/.codex."""
+    sys.path.insert(0, str(repo_root / "tools" / "adoption"))
+    try:
+        import apply_codex_lane  # noqa: E402  (the checkout's installer)
+    finally:
+        sys.path.pop(0)
+    try:
+        return apply_codex_lane.agents_block()
+    except apply_codex_lane.Refused as error:
+        raise ValueError(str(error)) from None
+
+
 def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile: Path, repo_root: Path,
                     require_key: bool = False) -> dict:
-    """Write <work>/codex-home: config.toml (the OmniRoute provider block plus the rendered token MCP servers) and
-    stack-worker.config.toml (the worker profile, verbatim), and <work>/empty/.claude/settings.json (context-mode
+    """Write <work>/codex-home: config.toml (the OmniRoute provider block plus the rendered token MCP servers),
+    stack-worker.config.toml (the worker profile, verbatim) and AGENTS.md (the host's Codex user instructions:
+    the top rule and RTK's, as codex_user_instructions reads them), and <work>/empty/.claude/settings.json (context-mode
     read access to each pinned skill file by its exact path). Return what staged.json records about them."""
     rendered = render_codex_template(repo_root, host)
     host_label = Path(host).stem if host.endswith(".json") else host  # never a private path in the lane record
@@ -261,10 +279,12 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
         "",
         servers_text,
     ])
+    agents_text = codex_user_instructions(repo_root)
     home = work / LANE_HOME
     home.mkdir(exist_ok=True)
     (home / "config.toml").write_text(config, encoding="utf-8")
     (home / f"{LANE_PROFILE}.config.toml").write_bytes(profile_bytes)
+    (home / "AGENTS.md").write_text(agents_text, encoding="utf-8")
     try:
         import tomllib  # Python 3.11+; older interpreters skip this syntax check
     except ImportError:
@@ -287,6 +307,7 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
                           "mcp_servers": servers,
                           "config_sha256": sha256_bytes((home / "config.toml").read_bytes()),
                           "profile_sha256": sha256_bytes(profile_bytes),
+                          "agents_sha256": sha256_bytes(agents_text.encode("utf-8")),
                           # the symbolic root and a count only: the file itself holds this host's absolute paths
                           "context_mode_skill_reads": {"settings": str(LANE_CONTEXT_SETTINGS),
                                                        "root": LANE_SKILL_ROOT, "exact_files": len(skill_rules)}}}
