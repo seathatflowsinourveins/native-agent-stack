@@ -106,6 +106,12 @@
       "Bash(git push -f *)",
       "Bash(git push * -f)",
       "Bash(git push * -f *)",
+      "Bash(rtk git push --force *)",
+      "Bash(rtk git push * --force)",
+      "Bash(rtk git push * --force *)",
+      "Bash(rtk git push -f *)",
+      "Bash(rtk git push * -f)",
+      "Bash(rtk git push * -f *)",
       "Bash(git reset --hard *)",
       "Bash(git clean -f*)",
       "Bash(git clean -*f*)"

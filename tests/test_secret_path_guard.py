@@ -164,6 +164,49 @@ BLOCKED = {
     "sudo -iu root cat .env": "dotenv_read",
     "nice -n 5 cat .env": "dotenv_read",
     "stdbuf -o0 cat .env": "dotenv_read",
+    # Home credential files as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key
+    # (a glob too) but not its .pub, the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an
+    # option's `=` value, and Codex shell snapshots, which record every exported value.
+    "cat ~/.ssh/id_ed25519": "credential_file_read",
+    "cp ~/.ssh/id_rsa /tmp/key": "credential_file_read",
+    "base64 \"$HOME/.ssh/id_ecdsa\"": "credential_file_read",
+    "cat ~/.ssh/id_*": "credential_file_read",
+    "cat ~/.aws/credentials": "credential_file_read",
+    "jq . ~/.docker/config.json": "credential_file_read",
+    "grep token ~/.kube/config": "credential_file_read",
+    "cat ~/.git-credentials": "credential_file_read",
+    "cat ~/.netrc": "credential_file_read",
+    "curl --netrc-file=/home/example/.netrc https://example.invalid": "credential_file_read",
+    "head -5 ~/.npmrc": "credential_file_read",
+    "cat ~/.pypirc": "credential_file_read",
+    "grep -r OMNIROUTE ~/.codex/shell_snapshots/": "credential_file_read",
+    "cat \"$CODEX_HOME\"/shell_snapshots/*.sh": "credential_file_read",
+    "dd if=/home/example/.npmrc of=/tmp/npmrc": "credential_file_read",
+    # GNU cp -t/--target-directory names the destination first, so every other operand is a source (cp(1)).
+    "cp -t /tmp /tmp/lane/shell_snapshots/example.sh": "credential_file_read",
+    "cp -vt /tmp ~/.netrc": "credential_file_read",
+    "cp --target-directory /tmp ~/.pypirc": "credential_file_read",
+    # A search keeps every argument when -e/-f supply the patterns or an option that can take a file or glob
+    # comes before the pattern (`--include .netrc` and rg's `-g .netrc` select that file).
+    "grep -r --include .netrc token ~": "credential_file_read",
+    "rg --hidden -g .netrc token ~": "credential_file_read",
+    "grep -e token ~/.netrc": "credential_file_read",
+    "grep -f ~/.git-credentials notes.txt": "credential_file_read",
+    "grep -A 2 token ~/.netrc": "credential_file_read",
+    # rtk 0.50.0 runs these (`rtk --help`): `read`, `smart`, `json` and `log` read their files, `run` hands its
+    # command to `sh -c`, `proxy`/`summary`/`err`/`test` run the command after them, and `env` prints the
+    # environment. Every rule reads that command (test_every_rule_applies_behind_rtk_proxy).
+    "rtk read ~/.ssh/id_ed25519": "credential_file_read",
+    "rtk grep token ~/.kube/config": "credential_file_read",
+    "rtk json ~/.docker/config.json": "credential_file_read",
+    "rtk run -c 'cat ~/.netrc'": "credential_file_read",
+    "rtk run --skip-env cat ~/.git-credentials": "credential_file_read",
+    "rtk -v summary --ultra-compact cat ~/.aws/credentials": "credential_file_read",
+    "rtk proxy cat .env": "dotenv_read",
+    "rtk env": "environment_dump",
+    # OmniRoute keeps its secrets in .env layers and server.env in its data directory: dotenv files.
+    "cat ~/.omniroute/.env": "dotenv_read",
+    "cat ~/.config/omniroute/server.env": "dotenv_read",
 }
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
@@ -334,26 +377,6 @@ KEYRING_BLOCKED = {
     "rg -n TAVILY_API_KEY": "secret_name_search",
     "echo \"$TAVILY_API_KEY\"": "secret_variable_reference",
     "python3 -c 'import os; print(os.environ[\"TAVILY_API_KEY\"])'": "secret_variable_reference",
-    # Home credential files as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key
-    # (a glob too) but not its .pub, the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an
-    # option's `=` value, and Codex shell snapshots, which record every exported value.
-    "cat ~/.ssh/id_ed25519": "credential_file_read",
-    "cp ~/.ssh/id_rsa /tmp/key": "credential_file_read",
-    "base64 \"$HOME/.ssh/id_ecdsa\"": "credential_file_read",
-    "cat ~/.ssh/id_*": "credential_file_read",
-    "cat ~/.aws/credentials": "credential_file_read",
-    "jq . ~/.docker/config.json": "credential_file_read",
-    "grep token ~/.kube/config": "credential_file_read",
-    "cat ~/.git-credentials": "credential_file_read",
-    "cat ~/.netrc": "credential_file_read",
-    "curl --netrc-file=/home/example/.netrc https://example.invalid": "credential_file_read",
-    "head -5 ~/.npmrc": "credential_file_read",
-    "cat ~/.pypirc": "credential_file_read",
-    "grep -r OMNIROUTE ~/.codex/shell_snapshots/": "credential_file_read",
-    "cat \"$CODEX_HOME\"/shell_snapshots/*.sh": "credential_file_read",
-    # OmniRoute keeps its secrets in .env layers and server.env in its data directory: dotenv files.
-    "cat ~/.omniroute/.env": "dotenv_read",
-    "cat ~/.config/omniroute/server.env": "dotenv_read",
 }
 
 ALLOWED = [
@@ -563,6 +586,23 @@ SAFE_CORPUS = [
     "curl --netrc https://example.invalid",
     "chmod 600 ~/.codex/shell_snapshots/*.sh",
     "ls ~/.codex/shell_snapshots",
+    # A search's own pattern is not a file it reads (grep(1): PATTERNS before FILE), when only plain flags
+    # come before it; dd writes its of= file; cp -t copies a public key into the directory it names.
+    "rg shell_snapshots docs",
+    "grep -nF '.ssh/id_ed25519' README.md",
+    "git grep -n '.kube/config' -- docs",
+    "grep -- ~/.netrc README.md",
+    "dd of=/home/example/.npmrc if=template.npmrc",
+    "cp -t /tmp/keys ~/.ssh/id_ed25519.pub",
+    # Ordinary rtk use: filtered git, raw re-runs through `rtk proxy`, reading a repository file, a listing.
+    "rtk git status",
+    "rtk proxy git show HEAD:README.md",
+    "rtk proxy python3 -m unittest tests.test_secret_path_guard",
+    "rtk read README.md",
+    "rtk grep -n shell_snapshots docs",
+    "rtk ls ~/.ssh",
+    "rtk hook check 'git push origin HEAD'",
+    "rtk --version",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
@@ -637,6 +677,15 @@ class SecretPathGuardTests(unittest.TestCase):
                 expected = {reason, "environment_dump_in_keyring_exec"} if reason.startswith("environment_dump") \
                     else {reason}
                 self.assertIn(guard.check(f"{EXEC} {command}"), expected)
+
+    def test_every_rule_applies_behind_rtk_proxy(self):
+        # rtk 0.50.0's `proxy` runs the command after it unfiltered, and agents are told to re-run a command
+        # that way (`rtk proxy <command>`), so every blocked command stays blocked, for the same reason, behind
+        # it and behind rtk's own flags. Found by the 2026-09-27 cross-family review: `rtk proxy cat F` passed.
+        for command, reason in BLOCKED.items():
+            for prefix in ("rtk proxy ", "rtk -v proxy --skip-env "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
 
     def test_documented_keyring_commands_pass(self):
         # The keyring commands in the fenced blocks of the pages that document them.

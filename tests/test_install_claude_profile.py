@@ -216,10 +216,24 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
                    "//mnt/*/Users/*/AppData/Roaming/omniroute/**", "//mnt/*/Users/*/.omniroute/**")
     GIT_DENIES = ("Bash(git push --force *)", "Bash(git push * --force)", "Bash(git push * --force *)",
                   "Bash(git push -f *)", "Bash(git push * -f)", "Bash(git push * -f *)",
+                  "Bash(rtk git push --force *)", "Bash(rtk git push * --force)", "Bash(rtk git push * --force *)",
+                  "Bash(rtk git push -f *)", "Bash(rtk git push * -f)", "Bash(rtk git push * -f *)",
                   "Bash(git reset --hard *)", "Bash(git clean -f*)", "Bash(git clean -*f*)")
 
     def settings(self) -> dict:
         return json.loads(self.TEMPLATE.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def bash_rule_matches(rule: str, command: str) -> bool:
+        # https://code.claude.com/docs/en/permissions, "Wildcard patterns" (read 2026-09-27, 2.1.283): a `*`
+        # matches any text, spaces included, and a trailing ` *` that is the rule's only wildcard also matches
+        # the bare command.
+        pattern = rule[len("Bash("):-1]
+        if pattern.endswith(" *") and pattern.count("*") == 1:
+            regex = re.escape(pattern[:-2]) + "(?: .*)?"
+        else:
+            regex = ".*".join(re.escape(part) for part in pattern.split("*"))
+        return re.fullmatch(regex, command, re.S) is not None
 
     def test_the_model_fallback_guards_stay(self):
         # Model config "Automatic model fallback"; docs/decisions/2026-09-25-model-fallback-guard.md.
@@ -248,6 +262,29 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
             self.assertIn(rule, deny)
         # The hot-file protocol's push form must stay possible (docs/lanes.md).
         self.assertFalse(any("force-with-lease" in rule for rule in deny))
+
+    def test_the_push_denies_also_match_the_rtk_rewrite(self):
+        # This template registers rtk 0.50.0's Claude hook (`rtk hook claude`). It leaves a command that a deny
+        # rule of the project or user settings files matches untouched, so Claude's own deny applies to it
+        # (rtk-ai/rtk v0.50.0 src/hooks/decision.rs "Deny wins outright", src/hooks/permissions.rs), and it
+        # rewrites a plain `git push ...` to `rtk git push ...`. A model can type the rtk spelling itself, which
+        # the hook passes through unchanged, and a deny rule from a source rtk does not read (managed settings, a
+        # `--settings` payload) is checked only against the rewritten input (https://code.claude.com/docs/en/hooks,
+        # PreToolUse `updatedInput`). So every force-push form is denied in both spellings, and neither spelling of
+        # a plain or `--force-with-lease` push is. Raised by the 2026-09-27 cross-family review.
+        settings = self.settings()
+        pre_tool_use = [hook["command"] for group in settings["hooks"]["PreToolUse"] for hook in group["hooks"]]
+        self.assertIn("rtk hook claude", pre_tool_use)
+        rules = [rule for rule in settings["permissions"]["deny"] if rule.startswith("Bash(")]
+        for command in ("git push --force", "git push --force origin HEAD", "git push origin main --force",
+                        "git push -f origin main", "git push origin -f main"):
+            for spelling in (command, "rtk " + command):
+                with self.subTest(denied=spelling):
+                    self.assertTrue(any(self.bash_rule_matches(rule, spelling) for rule in rules))
+        for command in ("git push origin HEAD", "git push --force-with-lease origin HEAD"):
+            for spelling in (command, "rtk " + command):
+                with self.subTest(allowed=spelling):
+                    self.assertFalse(any(self.bash_rule_matches(rule, spelling) for rule in rules))
 
     def test_the_bash_ceiling_and_the_status_line_refresh(self):
         settings = self.settings()

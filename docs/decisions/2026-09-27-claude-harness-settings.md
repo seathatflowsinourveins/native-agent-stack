@@ -37,8 +37,8 @@ agents, and re-registering MCP servers are separate, coordinated host steps.
 | 2 | `isolated-builder` no longer declares `isolation: worktree`. Its brief names an owned checkout the coordinator prepared at the exact base (normally `git worktree add --no-track <path> -b <branch> <base>`); before the first edit it compares that checkout's `git rev-parse --show-toplevel` with its starting directory's and stops when they match, when no path is named or when `HEAD` is not the base | [sub-agents](https://code.claude.com/docs/en/sub-agents): frontmatter `isolation` branches "from your default branch rather than the parent session's `HEAD`", and "A subagent starts in the main conversation's current working directory", where `cd` does not persist; the 2026-09-25 `core.hooksPath` rewrite in the [anti-pattern log](../harness-defaults.md#upstream-verification-and-compounding-learning); `git-rev-parse(1)` |
 | 3 | `.claude/agents/` holds byte-identical copies of the ten installed definitions | [sub-agents](https://code.claude.com/docs/en/sub-agents), "Choose the subagent scope": project agents (priority 3) outrank user agents (priority 4); "Check them into version control" |
 | 4 | No read-only role may declare `memory` | [sub-agents](https://code.claude.com/docs/en/sub-agents), "Enable persistent memory": "Read, Write, and Edit tools are automatically enabled" |
-| 5 | The settings template keeps both model-fallback guards (`CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, `switchModelsOnFlag: false`, already present and now asserted) and adds: the home and tool credential-store `Read` denies, each with its Context Mode `**/` twin; `Edit(~/.bashrc)`, `Edit(~/.profile)` and `Edit(~/.zshrc)`; `Agent(claude-code-guide)`; nine destructive-git denies; `BASH_MAX_TIMEOUT_MS=1800000`; and `statusLine.refreshInterval: 5`. The project settings gain the same credential-store denies | [permissions](https://code.claude.com/docs/en/permissions) (Read/Edit scope, trailing ` *`, "not a security boundary"); [permission modes](https://code.claude.com/docs/en/permission-modes) ("Deny rules block in every mode"); [sub-agents](https://code.claude.com/docs/en/sub-agents) (`claude-code-guide` runs on Haiku; an `Agent(name)` deny works for built-ins); [env vars](https://code.claude.com/docs/en/env-vars) and [tools reference](https://code.claude.com/docs/en/tools-reference) (the Bash ceiling and what happens at a timeout); [status line](https://code.claude.com/docs/en/statusline) and jarrodwatts/claude-hud `v0.8.0` `README.md` (`refreshInterval`); `model-config` "Automatic model fallback" and [the fallback-guard record](2026-09-25-model-fallback-guard.md); corroboration: trailofbits/claude-code-config `2109be9` `settings.json` |
-| 6 | The secret-path guard blocks a reader, copy or search of a home credential file or a Codex shell snapshot (`credential_file_read`), never a mention | [Secret storage, "Home and tool credential stores"](../secret-storage.md#home-and-tool-credential-stores-2026-09-27); openai/codex `rust-v0.157.1` `codex-rs/shell-command/src/shell_snapshot_exports.rs` |
+| 5 | The settings template keeps both model-fallback guards (`CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, `switchModelsOnFlag: false`, already present and now asserted) and adds: the home and tool credential-store `Read` denies, each with its Context Mode `**/` twin; `Edit(~/.bashrc)`, `Edit(~/.profile)` and `Edit(~/.zshrc)`; `Agent(claude-code-guide)`; nine destructive-git denies, plus the six force-push forms again as `rtk git push ...`, a spelling a model can type past RTK's hook; `BASH_MAX_TIMEOUT_MS=1800000`; and `statusLine.refreshInterval: 5`. The project settings gain the same credential-store denies | [permissions](https://code.claude.com/docs/en/permissions) (Read/Edit scope, trailing ` *`, the fixed wrapper list, "not a security boundary"); [hooks](https://code.claude.com/docs/en/hooks), PreToolUse `updatedInput` (permission rules are evaluated against the input a hook returns); rtk-ai/rtk `v0.50.0` (`1d87b8e7`) `src/hooks/decision.rs` and `src/hooks/permissions.rs` (a command a deny rule of the project or user settings files matches is left untouched; others such as `git push` are rewritten; an `rtk`-prefixed command passes unchanged); [permission modes](https://code.claude.com/docs/en/permission-modes) ("Deny rules block in every mode"); [sub-agents](https://code.claude.com/docs/en/sub-agents) (`claude-code-guide` runs on Haiku; an `Agent(name)` deny works for built-ins); [env vars](https://code.claude.com/docs/en/env-vars) and [tools reference](https://code.claude.com/docs/en/tools-reference) (the Bash ceiling and what happens at a timeout); [status line](https://code.claude.com/docs/en/statusline) and jarrodwatts/claude-hud `v0.8.0` `README.md` (`refreshInterval`); `model-config` "Automatic model fallback" and [the fallback-guard record](2026-09-25-model-fallback-guard.md); corroboration: trailofbits/claude-code-config `2109be9` `settings.json` |
+| 6 | The secret-path guard blocks a reader, copy or search of a home credential file or a Codex shell snapshot (`credential_file_read`), never a mention and never a search's own pattern. Every guard rule also reads the command an `rtk` invocation runs, and `cp -t DIR` counts all its other operands as sources | [Secret storage, "Home and tool credential stores"](../secret-storage.md#home-and-tool-credential-stores-2026-09-27); openai/codex `rust-v0.157.1` `codex-rs/shell-command/src/shell_snapshot_exports.rs`; rtk 0.50.0 `rtk --help` and `rtk hook check`; grep(1) and rg(1) synopses; coreutils cp(1) `-t`; dd(1) `of=` |
 | 7 | The portable instructions carry the user's four dispatch modes and the named-spawn rule: with agent teams on, a named spawn becomes a teammate at the lead's effort in the lead's working directory without its definition's `skills` or `isolation`; name spawns only for teammates; opt a run out with `claude --settings '{"env":{"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS":"0"}}'` | [sub-agents, "Subagent names"](https://code.claude.com/docs/en/sub-agents#subagent-names); [agent teams](https://code.claude.com/docs/en/agent-teams) ("Teammates inherit the lead's effort level", `skills` not applied, `-p` spawns no teammates, the `"0"` override and `--settings` precedence) |
 | 8 | The Ultracode recipe adds the dispatch facts, verification patterns (a)-(h), the prefix-sharing condition and the Codex depth note; the workflows README adds a brief contract and keeps lane text in saved-workflow packets until a Workflow child is observed receiving the SubagentStart block | [workflows](https://code.claude.com/docs/en/workflows); [best practices](https://code.claude.com/docs/en/best-practices); anthropics/claude-code `7779afb` `plugins/code-review/commands/code-review.md`; arXiv:2512.08296 v3; Anthropic, [multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system); [hooks, SubagentStart](https://code.claude.com/docs/en/hooks#subagentstart); [the carrier record](2026-09-27-token-lanes-subagent-start.md); openai/codex `rust-v0.157.1` `codex-rs/config/src/config_toml.rs` L719-720 |
 | 9 | The cooperation recipe gives the headless cross-family review form: `codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" -o <file> "<prompt>" < /dev/null`, one review and one repair round | codex-cli 0.157.1 `codex exec --help`; the stdin and `web_search` rows of the [anti-pattern log](../harness-defaults.md#upstream-verification-and-compounding-learning) |
@@ -86,14 +86,32 @@ intended agent.
 
 | Claim | Class | Source |
 | --- | --- | --- |
-| The agent contract, role tables and copies agree | `local_integration` | `node test-envelope.mjs` (253 passed), `node test-contract-mutations.mjs` (68 passed), `python3 -m unittest tests.test_install_claude_profile`, also with PyYAML through `uv run --with pyyaml` |
-| The builder contract fails closed | `local_integration`, failing-first | three mutations fail the suite: the builder regains `isolation: worktree`, drops its own-checkout comparison, or stops refusing to edit |
+| The agent contract, role tables and copies agree | `structural_validation` | `node test-envelope.mjs` (254 passed), `node test-contract-mutations.mjs` (74 passed), `python3 -m unittest tests.test_install_claude_profile`, also with PyYAML through `uv run --with pyyaml` |
+| The builder contract's text fails closed | `structural_validation`, failing-first | seven mutations fail the suite: the builder regains `isolation: worktree`, drops its own-checkout comparison, its HEAD read, its stop, or any one of its three refusal conditions; before the review repair the last four passed unnoticed (68 of 74 against the earlier suite). This checks the instruction text, not an agent refusing |
+| The push denies also cover the `rtk git push` spelling | `structural_validation`, failing-first | `test_the_push_denies_also_match_the_rtk_rewrite` matches both spellings under the documented wildcard rules; the template at `08b84af3` fails all five `rtk git push` spellings |
+| RTK leaves a denied push alone and passes a typed `rtk git push` through | upstream example or native operation | `rtk hook check` (rtk 0.50.0) in a probe project whose `.claude/settings.json` held the six push denies: "Denied by a permission rule" for all five force-push forms, a rewrite for a plain and a `--force-with-lease` push, "No rewrite" for `rtk git push --force origin HEAD` |
 | The hook commands follow the platform pin | `local_integration`, failing-first | `AiMemoryBinTests`: four failures against the template at `5f3a7c21`, none after |
-| The guard blocks the new readers and passes the clients | `local_integration` | `tests.test_secret_path_guard` blocked, allowed and recorded-gap tables |
-| Documented behaviour of named spawns, teammates, memory, scopes, permissions and timeouts | `source_review` | the Claude Code pages cited above, read 2026-09-27 against 2.1.283 |
+| The guard blocks the new readers and passes the clients | `local_integration`, failing-first | `tests.test_secret_path_guard` blocked, allowed, safe and recorded-gap tables, and every blocked command behind `rtk proxy`; the guard at `08b84af3` fails 11 blocked cases, 204 `rtk proxy` subtests and 5 safe cases |
+| Documented behaviour of named spawns, teammates, memory, scopes, permissions, hooks and timeouts | `source_review` | the Claude Code pages cited above, read 2026-09-27 against 2.1.283 |
 
 No native run backs this record: neither role has run on Opus, no Workflow child has been observed with the
-SubagentStart block, and the host still runs the previous agents, guard and settings.
+SubagentStart block, no permission rule was exercised in a live session, and the host still runs the previous
+agents, guard and settings.
+
+## Cross-family review (2026-09-27)
+
+One read-only GPT-6 round (`cx/gpt-6-astra` through the OmniRoute profile, client effort `max`) on the branch
+diff returned nine findings, each checked against source before acting. One held only in part: the finding that
+no force-push deny matches RTK's `rtk git push` rewrite. RTK 0.50.0 does not rewrite a command that a deny rule
+of the settings files it reads matches (the probe row above), so a typed `git push --force` stays denied; the
+six `rtk git push` rules close the two narrower gaps, a hand-typed rtk spelling and a deny rule from a source
+RTK does not read. Seven held and were fixed: the guard missed `rtk`-wrapped readers and `cp -t` sources and
+took a search's pattern or dd's `of=` for a read (three findings); the verifier's timeout text held only for
+foreground subagents (tools reference, "Background commands"); the builder test did not assert its refusal
+conditions; the workflows README's agent table still said Sonnet, which no check read; and the agent-contract
+evidence was mislabelled `local_integration` ([acceptance evidence policy](../acceptance-evidence-policy.md):
+local contract tests are structural validation). One is kept as a limitation below (`git clean -*f*`). No
+second round was run.
 
 ## Effect on frozen preregistrations
 
@@ -122,6 +140,13 @@ SubagentStart block, and the host still runs the previous agents, guard and sett
    user's text, and the section needs about 600 words.
 7. **A PreToolUse guard against named spawns of these roles.** Waits on a probe: the hooks reference lists
    `prompt`, `description`, `subagent_type` and `model` for the Agent tool, not `name`.
+8. **Leading-wildcard push rules** (`Bash(* git push --force *)`). Rejected: they would also deny a commit
+   message or an `echo` that mentions the command, which this repository writes; the explicit `rtk git push`
+   forms cover the rtk spelling.
+9. **Narrower `git clean` rules or a token-aware hook.** Not adopted: any `*` placed between `-` and `f` also
+   matches spaces, so a rule that avoided paths would miss clusters such as `-dfx`; the configuration this
+   record consulted (trailofbits/claude-code-config `2109be9`) checks option tokens with a hook only for `rm`,
+   and a git hook of our own would have no upstream source.
 
 ## Open user decisions (unchanged here)
 
@@ -147,6 +172,14 @@ Codex `tmp` trust entry; and per-tool MCP approvals in interactive Codex.
   `~/.claude/settings.json` still hold the previous versions, so `test_host_profile_copy_is_verbatim` fails on
   this host until the guard step of `install_claude_profile.py` runs.
 - The deny rules and the guard are not a security boundary: `grep -r` inside a directory, a subprocess that
-  opens a file itself and a program such as `sqlite3` on the gateway database pass.
+  opens a file itself and a program such as `sqlite3` on the gateway database pass. The push denies do not
+  match `git -C . push -f`, a `+ref` refspec or a hand-typed `rtk proxy git push -f`, and `git reset --hard`
+  and `git clean -f` have no `rtk` forms: a model that types `rtk git reset --hard` passes them.
+- `Bash(git clean -*f*)` also denies a dry run whose path contains an `f`, such as `git clean -n foo`, because
+  a `*` matches spaces ([permissions](https://code.claude.com/docs/en/permissions), "Wildcard patterns"). It
+  errs toward blocking (alternative 9); `git clean -n` without a path still runs.
+- The guard still takes a search pattern for a file when an option that can take a value comes before it
+  (`grep -m 1 '.netrc' README.md`), and a `sed` script or an output option such as `curl -o` that spells a
+  credential path; those commands are blocked, not passed.
 - The `//mnt/*/Users/*/...` rules assume WSL2's default automount root.
 - The Codex depth statement is source reading at `rust-v0.157.1`, not a run.

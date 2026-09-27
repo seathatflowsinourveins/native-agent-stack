@@ -14,7 +14,9 @@ credential files or secret variable names, reading or copying the whole
 Hugging Face home or a home credential file (an SSH private key but not its
 `.pub`, the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, and
 Codex's shell snapshots), tracing a shell while it sources a
-credential file, and dumping the environment after sourcing one. For a key
+credential file, and dumping the environment after sourcing one. Every rule
+also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
+`rtk read F`, `rtk run -c '...'`). For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -94,7 +96,8 @@ HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\
 # ~/.pypirc, also as an option's `=` value, and anything under a Codex `shell_snapshots` directory, whose
 # files record every exported value (`declare -xp`, codex-rs shell-command/src/shell_snapshot_exports.rs
 # at rust-v0.157.1). Only a reader, copy or search of them is blocked, never a mention, so `ssh -i`,
-# `ssh-add`, `kubectl --kubeconfig`, `chmod` and `ls` on the same paths still pass in every session.
+# `ssh-add`, `kubectl --kubeconfig`, `chmod` and `ls` on the same paths still pass in every session, and a
+# search's own pattern is not taken for a file it reads (search_paths).
 HOME_CREDENTIAL_FILE = re.compile(
     r"(?:^|[/=])(?:\.ssh/id_[^/]*(?<!\.pub)|\.aws/credentials|\.docker/config\.json|\.kube/config"
     r"|\.git-credentials|\.netrc|\.npmrc|\.pypirc)$|(?:^|[/=])shell_snapshots(?:/|$)")
@@ -138,6 +141,23 @@ SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
 SOURCERS = {".", "source"}
 FIND_EXEC = {"-exec", "-execdir", "-ok", "-okdir"}
 COPIERS = {"cp", "scp", "rsync"}
+# RTK (rtk 0.50.0: `rtk --help` and each subcommand's --help, read 2026-09-27). `proxy`, `summary`, `err` and
+# `test` run the command that follows their own flags; `run` hands its `-c`/`--command` string, or its arguments,
+# to `sh -c`; `read`, `smart`, `json` and `log` read the files they name; every other subcommand runs the native
+# program of the same name (`rtk grep`, `rtk rg`, `rtk find`, `rtk git`, `rtk diff`, `rtk curl`, `rtk env` ...).
+# This hook runs beside RTK's Claude hook and reads the command as Claude wrote it (matching hooks run in
+# parallel), so a typed `cat F` is caught before any rewrite; but agents also write rtk forms themselves (a re-run
+# as `rtk proxy <command>`), so expand() reads the command an rtk invocation runs.
+RTK_RUNNERS = {"proxy", "summary", "err", "test"}
+RTK_RUN_FLAGS = {"--ultra-compact", "--skip-env"}
+RTK_FILE_READERS = {"read", "smart", "json", "log"}
+# Searches whose first positional argument is the pattern, not a file: grep(1) `grep [OPTION...] PATTERNS
+# [FILE...]`, and rg(1), ag(1), ack(1), ugrep, zgrep and `git grep` share the shape, unless -e, -f, --regexp or
+# --file supply the patterns. search_paths drops that argument only when nothing but clusters of these flags
+# comes before it; each is a boolean flag of grep and rg, or takes a value that names no file (rg -r
+# REPLACEMENT, -E ENCODING), so a file- or glob-selecting option (-f, -g, -t, --include ...) keeps every word.
+SEARCHERS = {"grep", "egrep", "fgrep", "rg", "ag", "ack", "ugrep", "zgrep", "pcregrep", "pcre2grep"}
+SEARCH_PLAIN_FLAGS = set("abcEFhHiIlLnNoPqrRsSUvwxz")
 REDIRECT_OUT = re.compile(r"^\d*(?:>|>>|>\||&>|&>>|>&)$")
 # Every redirection operator as shlex (punctuation_chars) splits it: `2>&1` is `2`, `>&`, `1`, and
 # `<<-EOF` is `<<`, `-EOF`. The word after one is its file, descriptor or here-document delimiter.
@@ -381,9 +401,37 @@ def keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
     return None
 
 
+def rtk_command(words: list[str]) -> list[str]:
+    """The command `rtk [flags] <subcommand> ...` runs, as the rules read it (see RTK_RUNNERS): empty when
+    it names none. `rtk run` comes back as `sh -c <command>`, so expand() reads the inner shell too."""
+    index = 1
+    while index < len(words) and words[index].startswith("-"):
+        index += 1  # rtk's own flags (-v, --ultra-compact, --skip-env) take no value
+    if index >= len(words):
+        return []
+    subcommand, rest = words[index], words[index + 1:]
+    if subcommand in RTK_RUNNERS:
+        start = 0
+        while start < len(rest) and rest[start].startswith("-") and rest[start] != "--":
+            start += 1
+        return rest[start + 1:] if rest[start:start + 1] == ["--"] else rest[start:]
+    if subcommand == "run":
+        start = 0
+        while start < len(rest) and rest[start] in RTK_RUN_FLAGS:
+            start += 1
+        if rest[start:start + 1] in (["-c"], ["--command"]) and start + 1 < len(rest):
+            return ["sh", "-c", rest[start + 1]]
+        if rest[start:start + 1] and rest[start].startswith("--command="):
+            return ["sh", "-c", rest[start][len("--command="):]]
+        return ["sh", "-c", " ".join(rest[start:])] if rest[start:] else []
+    if subcommand in RTK_FILE_READERS:
+        return ["cat", *rest]
+    return [subcommand, *rest]
+
+
 def expand(command: str, depth: int = 0) -> list[list[str]]:
-    """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command` and of
-    the command that a keyring exec starts."""
+    """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
+    command that a keyring exec starts and of the command an `rtk` invocation runs."""
     result: list[list[str]] = []
     for raw in segments(tokenize(command)):
         words = strip_prefix(raw)
@@ -395,6 +443,9 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
                 if start is None:
                     break
                 words = strip_prefix(words[start:])
+                continue
+            if program == "rtk":
+                words = strip_prefix(rtk_command(words))
                 continue
             started = keyring_exec(words)
             if started is not None:
@@ -439,7 +490,7 @@ def git_subcommand_args(words: list[str]) -> tuple[str | None, list[str]]:
 
 
 def read_operands(words: list[str]) -> list[str]:
-    """Arguments minus write targets: redirection targets, a copy's destination, tee's files."""
+    """Arguments minus write targets: redirection targets, a copy's destination, tee's files, dd's of=."""
     program = program_of(words)
     if program == "tee":
         return []
@@ -451,11 +502,38 @@ def read_operands(words: list[str]) -> list[str]:
             skip = True
         else:
             operands.append(word)
+    if program == "dd":
+        return [w for w in operands if not w.startswith("of=")]  # dd(1): of=FILE is written, if=FILE read
     if program in COPIERS:
         positional = [w for w in operands if not w.startswith("-")]
-        if len(positional) >= 2:
+        # GNU cp's -t DIRECTORY / --target-directory=DIRECTORY names the destination first, so every
+        # positional word is then a source (cp(1), coreutils). rsync's -t is --times and scp's -t its
+        # remote mode, so only cp counts.
+        target_first = program == "cp" and any(
+            w == "--target-directory" or w.startswith("--target-directory=") or re.fullmatch(r"-[A-Za-z]*t.*", w)
+            for w in operands)
+        if len(positional) >= 2 and not target_first:
             operands.remove(positional[-1])
     return operands
+
+
+def search_paths(words: list[str], arguments: list[str]) -> list[str]:
+    """A search's read arguments without its pattern (see SEARCHERS); any other reader's unchanged."""
+    program = program_of(words)
+    if program not in SEARCHERS and not (program == "git" and git_subcommand_args(words)[0] == "grep"):
+        return arguments
+    if any(w in {"--regexp", "--file"} or w.startswith(("--regexp=", "--file="))
+           or (re.fullmatch(r"-[^-].*", w) and set(w[1:]) & {"e", "f"}) for w in arguments):
+        return arguments  # -e/-f supply the patterns, so every positional word is a file
+    for position, word in enumerate(arguments):
+        if word == "--":
+            return arguments[:position + 1] + arguments[position + 2:]
+        if word.startswith("-") and word != "-":
+            if word.startswith("--") or not set(word[1:]) <= SEARCH_PLAIN_FLAGS:
+                return arguments
+            continue
+        return arguments[:position] + arguments[position + 1:]
+    return arguments
 
 
 def reader_arguments(words: list[str]) -> list[str] | None:
@@ -647,7 +725,8 @@ def segment_reason(words: list[str]) -> str | None:
     arguments = reader_arguments(words)
     if arguments is None:
         return None
-    if any(POINTER_VARIABLE.search(w) or HOME_CREDENTIAL_FILE.search(w) for w in arguments):
+    if any(POINTER_VARIABLE.search(w) for w in arguments) \
+            or any(HOME_CREDENTIAL_FILE.search(w) for w in search_paths(words, arguments)):
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"

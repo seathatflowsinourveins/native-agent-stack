@@ -43,6 +43,13 @@ const MUTATIONS = [
   ['the builder regains frontmatter worktree isolation', 'agents/isolated-builder.md', 'effort: max\n', 'effort: max\nisolation: worktree\n', 'declares no frontmatter isolation'],
   ['the builder drops its own-checkout comparison', 'agents/isolated-builder.md', 'compare `git -C <path> rev-parse --show-toplevel`', 'read `git -C <path> rev-parse --show-toplevel`', 'edits only in a coordinator-created worktree'],
   ['the builder stops refusing to edit without a worktree', 'agents/isolated-builder.md', 'stop without editing', 'continue editing', 'edits only in a coordinator-created worktree'],
+  // Each refusal condition on its own (the 2026-09-27 cross-family review removed either one and the suite still passed).
+  ['the builder drops its no-path refusal', 'agents/isolated-builder.md', 'when the brief names no path, ', '', 'edits only in a coordinator-created worktree'],
+  ['the builder drops its own-checkout refusal', 'agents/isolated-builder.md', 'when both commands print the same top level (the coordinator\'s own checkout) or ', '', 'edits only in a coordinator-created worktree'],
+  ['the builder drops its wrong-base refusal', 'agents/isolated-builder.md', ' or when HEAD is not the brief\'s base', '', 'edits only in a coordinator-created worktree'],
+  ['the builder stops reading its HEAD', 'agents/isolated-builder.md', ', and read `git -C <path> rev-parse HEAD`', '', 'edits only in a coordinator-created worktree'],
+  ['the agent table restates the builder on Sonnet', ROUTING_DOC_FILE, '| `isolated-builder` | Opus, max,', '| `isolated-builder` | Sonnet, max,', 'the agent table restates each listed agent'],
+  ['the agent table restates the verifier on Sonnet', ROUTING_DOC_FILE, '| `stack-verifier` | Opus, max |', '| `stack-verifier` | Sonnet, max |', 'the agent table restates each listed agent'],
   // Stack agents and dispatch by role (docs/decisions/2026-09-26-stack-agents-role-dispatch.md): a regained fetch,
   // skill, edit or Serena symbol-edit tool, or a role table that reroutes or restates a role, must fail.
   ['the researcher regains WebFetch', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
