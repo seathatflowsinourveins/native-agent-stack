@@ -58,9 +58,20 @@ def write_json(path: Path, value, indent=1) -> None:
 
 
 def inside_repository(path: Path) -> Path | None:
+    """The nearest directory at or above path that holds a git repository marker: a .git directory with a HEAD entry
+    (a file, or a symlink, which git allows to point at an unborn branch), or a non-empty .git file (a worktree's or
+    submodule's gitdir pointer). An empty .git is not one. Codex's Linux
+    sandbox creates empty .git mount targets under its writable roots, /tmp included, while a sandboxed command runs,
+    and removes them afterwards (codex-rs/linux-sandbox/src/bwrap.rs at rust-v0.157.1, SyntheticMountTarget). A work
+    directory under /tmp would otherwise be refused at random whenever another Codex job writes on the same host."""
     for candidate in (path, *path.parents):
-        if (candidate / ".git").exists():
-            return candidate
+        marker = candidate / ".git"
+        try:
+            head = marker / "HEAD"
+            if head.is_file() or head.is_symlink() or (marker.is_file() and marker.stat().st_size > 0):
+                return candidate
+        except OSError:  # the marker vanished between the checks: a synthetic target being removed
+            continue
     return None
 
 

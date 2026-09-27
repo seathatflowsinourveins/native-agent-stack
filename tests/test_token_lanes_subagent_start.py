@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "adoption/hooks/claude/token-lanes-subagent-start.py"
 BLOCK = HOOK.with_name("token-lanes-block.md")
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
-BUDGET_BYTES = 3_500  # the carrier's local budget, in UTF-8 bytes (docs/decisions/2026-09-27-token-lanes-subagent-start.md)
+BUDGET_BYTES = 4_100  # 4,051 measured bytes; repair budget decision in docs/decisions/2026-09-27-token-lanes-subagent-start.md
 KEY_PHRASES = (
     "ToolSearch", "ctx_batch_execute", "rtk", "find_referencing_symbols",
     "codebase-memory", "jcodemunch", "TOON", "headroom",
@@ -50,6 +50,75 @@ class TokenLanesHookTests(unittest.TestCase):
         self.assertEqual(result.stderr, "")
         return result.stdout
 
+    def test_injected_bootstrap_names_granted_lane_tools_explicitly(self):
+        # Claude MCP tool-search contract; the 2026-09-27 coordinator matrix
+        # (Claude 2.1.283) in measured-gaps.md records grants, not inferred access.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        bootstrap = next(line for line in context.splitlines() if "ToolSearch" in line)
+        self.assertIn("ONE ToolSearch call", bootstrap)
+        self.assertIn("append task-needed ids to that same call", bootstrap)
+        self.assertIn("ToolSearch returns only tools the agent is granted", bootstrap)
+        self.assertIn("Select names exposed by the active client", bootstrap)
+        for tool in ("mcp__jcodemunch__route", "mcp__jcodemunch__menu", "mcp__jcodemunch__order",
+                     "mcp__socraticode__codebase_search", "mcp__qmd__query", "mcp__qmd__get",
+                     "mcp__ai-memory__memory_query", "mcp__codebase-memory__search_graph",
+                     "mcp__codebase-memory__trace_path", "mcp__headroom__headroom_compress",
+                     "mcp__headroom__headroom_retrieve"):
+            with self.subTest(tool=tool):
+                self.assertIn(tool, bootstrap)
+
+    def test_injected_web_rule_routes_fetches_and_quotes_to_source_text(self):
+        # context-mode v1.0.169 src/server.ts L3423-3478; Claude WebFetch contract:
+        # https://code.claude.com/docs/en/tools-reference#webfetch-tool-behavior
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        bootstrap = next(line for line in context.splitlines() if "ToolSearch" in line)
+        self.assertIn("mcp__plugin_context-mode_context-mode__ctx_fetch_and_index", bootstrap)
+        web_rule = next((line for line in context.splitlines() if line.startswith("- Fetch pages")), "")
+        for phrase in ("ctx_fetch_and_index", "batch requests with concurrency", "quote with ctx_search",
+                       "Do not use WebFetch for evidence", "small fast model's reading of the page"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, web_rule)
+
+    def test_injected_search_rule_limits_specific_queries(self):
+        # context-mode v1.0.169 src/search/ctx-search-schema.ts L88-94:
+        # default limit 3; <=3 is local retrieval policy, not a byte-size cap.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        self.assertIn("Use ctx_search with specific queries and limit <=3", context)
+
+    def test_injected_execution_rule_sets_intent_and_worktree_cwd(self):
+        # context-mode v1.0.169 src/executor.ts L290-312 (#788),
+        # hooks/core/routing.mjs L939-941; src/server.ts L1822, L1979-1980.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        rule = next(line for line in context.splitlines() if line.startswith("- For output"))
+        for phrase in ("output over ~5 KB", "ctx_execute with intent", "indexes output",
+                       "returns only titles/previews", "ctx_search", "print derived answers",
+                       "keep failures and original-output recovery", "ctx_execute cwd",
+                       "cwd = your working directory for every language",
+                       "without it, non-shell code runs at the server's project root",
+                       "(the coordinator's checkout) and its writes persist",
+                       "Rust runs in temp; use absolute project paths"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, rule)
+        self.assertNotIn("explicitly cd", context)
+        self.assertNotIn("sandbox temp", context)
+        self.assertNotIn("shell only", rule)
+
+    def test_injected_accounting_rule_preserves_verbatim_wrapper_returns(self):
+        # tools/sota-convergence/landscape-sweep/sweep.js L83-87 at 5f3a7c21:
+        # return complete stdout unmodified; routing and footers must both yield.
+        context = json.loads(self.run_hook('{"agent_type":"workflow-subagent"}'))[
+            "hookSpecificOutput"]["additionalContext"]
+        rule = next(line for line in context.splitlines() if line.startswith("- Use one lane"))
+        for phrase in ("Agents told to return output unmodified",
+                       "skip output-routing and footer rules",
+                       "otherwise list token tools used and why at the end of your return"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, rule)
+
     def test_blind_roles_receive_zero_injection(self):
         for role in ("blind-lane-reviewer", "blind-judge", "blind-adjudicator", "blind-anything"):
             with self.subTest(agent_type=role):
@@ -65,7 +134,9 @@ class TokenLanesHookTests(unittest.TestCase):
 
     def test_non_blind_roles_receive_one_exact_context_object(self):
         payloads = [{"agent_type": role} for role in
-                    ("general-purpose", "source-scout", "workflow-subagent", "future-role")]
+                    ("general-purpose", "workflow-subagent", "teammate", "future-role",
+                     "stack-researcher", "stack-verifier", "source-scout", "isolated-builder",
+                     "evidence-reviewer", "semantic-evidence-reviewer", "security-reviewer")]
         payloads += [{}] + [{"agent_type": value} for value in
                             ("", None, 7, False, [], ["blind-judge"], {"name": "blind-judge"})]
         for payload in payloads:
@@ -119,9 +190,9 @@ class TokenLanesHookTests(unittest.TestCase):
 
 class TokenLanesTextTests(unittest.TestCase):
     def test_budget_counts_utf8_bytes_not_characters(self):
-        # 3,280 characters but 3,520 UTF-8 bytes: a character count would accept it.
-        text = "é" * 240 + "x" * 3_040
-        self.assertEqual((len(text), len(text.encode("utf-8"))), (3_280, 3_520))
+        # 3,880 characters but 4,120 UTF-8 bytes: a character count would accept it.
+        text = "é" * 240 + "x" * 3_640
+        self.assertEqual((len(text), len(text.encode("utf-8"))), (3_880, 4_120))
         self.assertFalse(fits_budget(text.encode("utf-8")))
         self.assertTrue(fits_budget(b"x" * BUDGET_BYTES))
 

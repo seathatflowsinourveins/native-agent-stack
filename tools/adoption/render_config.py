@@ -11,6 +11,16 @@ trust entries and hook trusted-hash state, is preserved byte-for-byte inside
 the template text (escaped as ``$$`` where the source already used a literal
 ``$`` for shell syntax such as ``$HOME`` inside a status-line script).
 
+One placeholder is derived when neither the host value file nor ``--set``
+supplies it: ``AI_MEMORY_BIN``, the ai-memory executable that the Claude
+hook commands run. It defaults to the selected platform's pinned install,
+``${ECO_ROOT}/tools/ai-memory-<version>/ai-memory`` with ``<version>`` read
+from ``adoption/pins-<os>-<arch>.json`` (``--platform``, default: this
+machine, spelled as ``scripts/adoption_status.py`` does), because upstream's
+native hook commands invoke the installed binary directly and the Linux and
+macOS pins differ. A host whose running ai-memory lives elsewhere passes its
+path with ``--set AI_MEMORY_BIN=...``.
+
 One placeholder is an explicit opt-in instead of a host value:
 ``AI_MEMORY_CAPTURE_ASSISTANT`` renders nothing unless the host value file or
 ``--set`` sets it to ``true``, which appends ai-memory's ``--capture-assistant``
@@ -30,6 +40,8 @@ import argparse
 import difflib
 import json
 import os
+import platform
+import re
 import string
 import subprocess
 import sys
@@ -103,6 +115,38 @@ def parse_set_values(pairs: list[str]) -> dict[str, str]:
 
 
 CAPTURE_ASSISTANT = "AI_MEMORY_CAPTURE_ASSISTANT"
+AI_MEMORY_BIN = "AI_MEMORY_BIN"
+# This catalog's pins-<os>-<arch>.json spelling of platform.system().lower() (as PIN_OS_ALIASES in
+# scripts/adoption_status.py).
+PIN_OS_ALIASES = {"darwin": "macos"}
+
+
+def current_platform() -> str:
+    osname = platform.system().lower()
+    return f"{PIN_OS_ALIASES.get(osname, osname)}-{platform.machine().lower()}"
+
+
+def pinned_version(tool_id: str, platform_id: str) -> str:
+    """The version adoption/pins-<platform_id>.json pins for one tool."""
+    if not re.fullmatch(r"[a-z0-9_]+-[a-z0-9_]+", platform_id):
+        raise RenderError(f"--platform must look like linux-x86_64 or macos-arm64, got {platform_id!r}")
+    path = ROOT / "adoption" / f"pins-{platform_id}.json"
+    if not path.is_file():
+        raise RenderError(f"no pins file for platform {platform_id!r} ({path}); "
+                          f"pass --platform or --set {AI_MEMORY_BIN}=<ai-memory executable>")
+    try:
+        tools = json.loads(path.read_text(encoding="utf-8"))["tools"]
+        return next(tool["version"] for tool in tools if tool.get("id") == tool_id)
+    except (ValueError, KeyError, TypeError, StopIteration):
+        raise RenderError(f"{path.name} pins no {tool_id!r} version") from None
+
+
+def resolve_derived(values: dict[str, str], platform_id: str | None = None) -> dict[str, str]:
+    """Supply AI_MEMORY_BIN from the platform pin when the caller did not (see the module docstring)."""
+    if values.get(AI_MEMORY_BIN) or "ECO_ROOT" not in values:
+        return values  # a missing ECO_ROOT is reported by the substitution itself
+    version = pinned_version("ai-memory", platform_id or current_platform())
+    return {**values, AI_MEMORY_BIN: f"{values['ECO_ROOT']}/tools/ai-memory-{version}/ai-memory"}
 
 
 def resolve_opt_ins(values: dict[str, str]) -> dict[str, str]:
@@ -113,8 +157,10 @@ def resolve_opt_ins(values: dict[str, str]) -> dict[str, str]:
     return {**values, CAPTURE_ASSISTANT: " --capture-assistant" if setting == "true" else ""}
 
 
-def render_one(template_path: Path, values: dict[str, str]) -> str:
+def render_one(template_path: Path, values: dict[str, str], platform_id: str | None = None) -> str:
     text = template_path.read_text(encoding="utf-8")
+    if "${" + AI_MEMORY_BIN + "}" in text:
+        values = resolve_derived(values, platform_id)
     resolved = resolve_opt_ins(values)
     try:
         return string.Template(text).substitute(resolved)
@@ -122,8 +168,8 @@ def render_one(template_path: Path, values: dict[str, str]) -> str:
         raise RenderError(f"{template_path.name}: missing template value {error}") from None
 
 
-def render_all(values: dict[str, str]) -> dict[str, str]:
-    return {name: render_one(path, values) for name, path in TEMPLATE_FILES.items()}
+def render_all(values: dict[str, str], platform_id: str | None = None) -> dict[str, str]:
+    return {name: render_one(path, values, platform_id) for name, path in TEMPLATE_FILES.items()}
 
 
 def collect_values(args: argparse.Namespace) -> dict[str, str]:
@@ -137,7 +183,7 @@ def collect_values(args: argparse.Namespace) -> dict[str, str]:
 def cmd_out(args: argparse.Namespace) -> int:
     values = collect_values(args)
     try:
-        rendered = render_all(values)
+        rendered = render_all(values, args.platform)
     except RenderError as error:
         print(f"render failed: {error}", file=sys.stderr)
         return 1
@@ -152,7 +198,7 @@ def cmd_out(args: argparse.Namespace) -> int:
 def cmd_check(args: argparse.Namespace) -> int:
     values = collect_values(args)
     try:
-        rendered = render_all(values)
+        rendered = render_all(values, args.platform)
     except RenderError as error:
         print(f"render failed: {error}", file=sys.stderr)
         return 1
@@ -240,6 +286,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--host", help="Read adoption/hosts/<host>.json for template values")
     parser.add_argument("--set", action="append", metavar="KEY=VALUE",
                          help="Override or supply a template value; repeatable")
+    parser.add_argument("--platform", metavar="OS-ARCH",
+                         help="Pins file (adoption/pins-<OS-ARCH>.json) whose ai-memory version the default "
+                              "AI_MEMORY_BIN names, e.g. linux-x86_64 or macos-arm64 (default: this machine)")
     parser.add_argument("--out", metavar="DIR",
                          help="Write settings.json, codex.config.toml, project.codex.config.toml here")
     parser.add_argument("--check", action="store_true",

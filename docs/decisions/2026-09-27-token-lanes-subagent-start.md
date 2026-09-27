@@ -199,3 +199,141 @@ test suite or a new native model run.
 This record claims no after measurement, token savings or live installation.
 A native Workflow-child run remains open; text delivery alone does not prove
 tool access, compliance or improved outcomes.
+
+## Addendum 2026-09-27: measured fetch and containment gaps
+
+Repair-round erratum, 2026-09-27: the initial version of this addendum trusted
+stale schema text about `cwd`, mislabelled an out-of-population fetch count as
+M4, and overstated current source/copy equality. The corrections below cite the
+executor, mark the measurement boundaries, and preserve the original count
+tables and counter copies. The decision preceding this addendum is unchanged.
+
+The coordinator's later measurement changes what needs to be instructed, not the
+carrier's delivery mechanism. The [retained result tables and counter records](../../evidence/artifacts/token-lanes-subagent-start-20260927/measured-gaps.md)
+are **local measurement of native transcripts**, copied from the supplied
+`scratchpad/units/w3/lanes-facts.md` report. No workflow was rerun for this unit;
+no prompts, tool inputs or workflow identifiers are published with these counts.
+The original native-probe receipt above remains unchanged.
+
+**M4-style fetch count, outside the preregistered population.** The
+[#381 preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json)
+defines M4 for stack-researcher and Codex B, including nested and unclassifiable
+fetches, with routed rate at least 0.9. Smoke-2 discover/refute-facts are outside
+that population; the following is not a #381 evaluation. Landscape-sweep peer smoke 2 had five agents and the
+original carrier active (installed 08:26:32Z from `main` at `5f3a7c21`). Its
+discover role made five WebFetch calls and refute-facts made ten; all agents
+made zero `ctx_fetch_and_index` calls: **0/15 remote fetches routed through
+context-mode**. Whether each child had `ctx_fetch_and_index` exposed was not
+recorded, so 0/15 is a descriptive tool count, not an access-qualified routing
+or compliance score. Four WebSearch calls are excluded from that count.
+The original block never specified page fetching. The two
+Sonnet wrappers still passed the reported verbatim-return copy check, **2/2**.
+
+**M3/M5, containment.** Each coordinator wave had twelve agents and started before
+installation; smoke 2 ran with the original block. The counts are descriptive,
+with differing workloads and no controlled causal comparison:
+
+| Run | Results | Results over 5,120 bytes | Share of result bytes from those results | ctx_execute results over 5,120 bytes |
+| --- | ---: | ---: | ---: | ---: |
+| Coordinator wave 1 (no block) | 1,452 | 198 (13.6%) | 61.4% | 40/119 (34%) |
+| Coordinator wave 2 (no block) | 1,589 | 314 (19.8%) | 70.7% | 78/214 (36%) |
+| Peer smoke 2 (block) | 126 | 30 (23.8%) | 74.7% | 16/34 (47%) |
+
+The preregistration #381 targets are at most 20% of bytes from results over 5 KB
+(M3) and at most 10% of context-mode results over 5 KB (M5). The table shows
+`ctx_execute` specifically. It also includes legitimate `Read`-before-edit
+exceptions, so these counts are not an adjudicated M3 result or an E2E execution
+of #381. `Read`, `Bash` and `ctx_execute` dominate oversized-result bytes in the
+supplied report. Tool choice alone did not contain what agents printed.
+
+**Upstream verification and selection.** The connected context-mode 1.0.169 tool
+schemas expose `requests`, `concurrency`, `intent` and `cwd`; the executor,
+not the stale shell-only schema description, defines the working directory.
+`claude --version` returned `2.1.283 (Claude Code)`. The
+[context-mode v1.0.169 release notes](https://github.com/mksglu/context-mode/releases/tag/v1.0.169)
+were checked via `gh api`; they describe accounting fixes, not a routing outcome.
+The [Claude changelog at `7779afb1`](https://github.com/anthropics/claude-code/blob/7779afb12e3635f46f56ec823979d68350ae000b/CHANGELOG.md)
+was checked for WebFetch and SubagentStart. The contracts that settle the change
+are:
+
+- [mksglu/context-mode `589d8214d56740a28b5f7bf63167743d586b0b40` (1.0.169), `src/server.ts` L3423-3478](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L3423-L3478): `ctx_fetch_and_index` retains fetched page content for `ctx_search`; multiple URLs use `requests` with `concurrency` (1-8). This is HTTP fetching, not JavaScript rendering.
+- [Claude Code's WebFetch contract](https://code.claude.com/docs/en/tools-reference#webfetch-tool-behavior), read 2026-09-27, agrees with the supplied installed 2.1.283 description: ordinary results answer the extraction prompt through a small fast model. They are not authoritative page quotations. The page-evidence rule is our routing policy based on that distinction.
+- [The same context-mode revision, `src/executor.ts` L295-312](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/executor.ts#L295-L312) runs every language except Rust at `cwdOverride ?? projectRoot` (#788); the [handler, L1822](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1822) passes `cwd` for every language, and [routing.mjs L939-941](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L939-L941) already pins shell calls. Pass `cwd` for every language; non-shell child calls without it use the coordinator's checkout and writes persist. Only script files are temporary. [Rust, L290-292](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/executor.ts#L290-L292), runs in temp regardless of `cwd`, so use absolute project paths.
+- [`src/server.ts` L1733-1740](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1733-L1740): `intent` indexes sufficiently large output and returns section titles/previews for later search. Its [execution guidance](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1675-L1690) still requires deriving answers in code. The [threshold constant](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1979-L1980) is 5,000 bytes; the historical counter deliberately remains at 5,120. Neither is a hard cap on every response.
+- [`ctx_search` schema, L88-94](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/search/ctx-search-schema.ts#L88-L94) defaults to 3 results per query. Specific queries with limit <=3 are local retrieval policy; the coordinator's later peer smoke 3 still had 11/20 search and 27/52 execute results over 5 KB ([separate observations](../../evidence/artifacts/token-lanes-subagent-start-20260927/measured-gaps.md#repair-round-observations-2026-09-27)).
+
+Research used the installed `search-first` quick workflow, the visible skill
+catalog and the [adopted find-skills reference at `7407f389`](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md).
+The supported installed tools already provide these controls, so no new runtime,
+skill installation or custom fetch mechanism is needed. The tool schemas and
+official docs were checked directly; the coordinator's claims remain separately
+attributed measurement evidence.
+
+**Change and size (repair-round measurement, 2026-09-27).** The block adds
+`ctx_fetch_and_index` and exact task-selected lane ids to its single ToolSearch
+bootstrap, states the tool-grant boundary, routes page fetches and quotations,
+uses specific search queries with limit <=3, requests `intent` while retaining
+“print derived answers”, and passes `cwd` explicitly for every language with the
+Rust exception. The
+[handbook source section](../token-session-handbook.md#token-lanes-carried-into-subagents)
+contains every guidance line and its sources. The block now says agents told
+to return output unmodified skip both output-routing and footer rules, following
+[`sweep.js` L83-87 at `5f3a7c21`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/5f3a7c21/tools/sota-convergence/landscape-sweep/sweep.js#L83-L87).
+For all other agents the footer is again at the end of the return; that position
+had been dropped in the first measured-gap build.
+
+The carrier measures **4,051 UTF-8 bytes**. The former **3,500-byte** local bound
+rejects it, so the bound becomes **4,100 bytes**, leaving 49 bytes of headroom.
+The required safety, tool-grant and retrieval instructions cannot fit the prior
+build's 10 spare bytes. The bound grows only by the measured need, and the block stays as short as its rules allow;
+unrelated lane guidance is unchanged. Relative to the 3,490-byte build:
+
+| Required change | Additional UTF-8 bytes |
+| --- | ---: |
+| Exact lane tool ids and exposure/grant boundary | 316 |
+| Executor-backed cwd rule and Rust exception | 122 |
+| Specific search queries and limit <=3 | 54 |
+| Full wrapper exemption and footer position | 69 |
+| Total | 561 |
+
+The original carrier's 3,159 bytes remain historical evidence. The checksum is
+refreshed; `hook_additional_context` delivery to every non-blind child, the
+blind-role gate and fail-open implementation are unchanged. The text test covers
+all seven shipped non-blind roles plus general-purpose, workflow, teammate and
+unknown roles; it verifies the exact additionalContext object, not tool access.
+
+### Dated errata and anti-patterns
+
+| Earlier assumption or omission | Correction and verification path |
+| --- | --- |
+| Trusting the cwd schema text (`server.ts:1731`) over the executor | The executor (`executor.ts:295-312`, #788) uses `cwdOverride ?? projectRoot`; the handler passes cwd for every language and `routing.mjs:939-941` already pins shell calls. Pass cwd explicitly; Rust uses absolute project paths. The original "server is bound to the main checkout" sentence is correct for non-shell child calls without cwd. The first build's shell-only rule and claimed correction were wrong. |
+| Naming `ctx_execute` alone contains large printed output | State `intent` and continue printing derived answers. The connected schema and L1736-1738 document preview/index behavior; M5's smoke-2 16/34 demonstrates the unclosed measured gap. |
+| A WebFetch extraction is page text suitable as quotation evidence | Retrieve page text through `ctx_fetch_and_index` and `ctx_search`, citing both upstream contracts. The descriptive M4-style 0/15 count motivates the rule but cannot score compliance without tool-exposure evidence. |
+
+The earlier size statement describes the original artifact, not this revision.
+The retained counters are unchanged `.txt` records of the copied revisions; the
+tool-profile source later added a ctxSrch column (see the dated provenance erratum
+in measured-gaps.md). Adding the records does
+not turn local measurement into an unchanged upstream test. New text controls
+failed first at the hook's injected-context boundary, including web routing,
+`intent`/`cwd` and the wrapper exemption. The unchanged blind and fail-open tests
+and installer temp-directory checks cover integration, not model compliance.
+
+**Overturn condition.** Re-measure **M4-style routing and M5-style containment
+on the next sweep run and on the next coordinator waves**. For each child,
+record an alias, role/task mix, carrier revision, whether `ctx_fetch_and_index`
+and WebFetch were exposed (yes/no/unknown), the native tool-list or ToolSearch
+evidence for each flag, fetch counts, containment counts and wrapper copy checks.
+Count only fetches by children with confirmed `ctx_fetch_and_index` exposure in
+the routing denominator; report absent and unknown exposure separately rather
+than calling them non-compliant. Include nested/unclassifiable fetches and mark
+their uncertainty. Keep out-of-population results separate from #381's
+stack-researcher/Codex B metric and its >=0.9 threshold. Smoke 2 cannot provide an
+access-qualified baseline retroactively. If routing remains poor in children
+with the tool available, enforce research routing by agent type: dispatch through
+[`stack-researcher`](../../adoption/agents/claude/stack-researcher.md), whose tools
+list includes WebSearch and `ctx_fetch_and_index` and excludes WebFetch. The
+[role-dispatch decision](2026-09-26-stack-agents-role-dispatch.md) supplies that
+existing option. Revisit containment if M5 remains above its target; merely
+delivering the text cannot close it. No after-change native workflow run, live
+installation, provider usage or token savings is claimed here.

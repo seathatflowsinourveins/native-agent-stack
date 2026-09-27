@@ -1,4 +1,6 @@
 # Replace both absolute placeholders with this PC's adopted archive and native binary.
+# --require-auth: without it the dashboard's /api/ routes, including ones that launch programs, check no token.
+# The interface asks once for the archive config.toml auth_token; serve never prints it.
 [Unit]
 Description=AgentsView scoped archive dashboard
 After=network.target
@@ -9,7 +11,7 @@ WorkingDirectory=/ABSOLUTE/SCOPED_ARCHIVE
 Environment=AGENTSVIEW_DATA_DIR=/ABSOLUTE/SCOPED_ARCHIVE
 Environment=AGENTSVIEW_TELEMETRY_ENABLED=0
 Environment=AGENTSVIEW_DISABLE_UPDATE_CHECK=1
-ExecStart=/ABSOLUTE/AGENTSVIEW_BINARY serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check
+ExecStart=/ABSOLUTE/AGENTSVIEW_BINARY serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --require-auth
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=10

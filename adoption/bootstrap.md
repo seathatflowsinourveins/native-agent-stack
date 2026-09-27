@@ -241,6 +241,11 @@ GitHub-hosted macOS runner; see
    ai-memory hook commands name `tools/ai-memory-2.4.1`, the Linux pin; on
    macOS, whose pin is still 2.3.2, see
    [ai-memory hook paths on macOS](platforms/macos-arm64.md#ai-memory-hook-paths-on-macos).
+   Since 2026-09-27 the eight commands run `${AI_MEMORY_BIN}`: `render_config.py`
+   renders `${ECO_ROOT}/tools/ai-memory-<version>/ai-memory` from the pins file of
+   the machine it runs on (`--platform linux-x86_64` or `--platform macos-arm64`
+   chooses another), and `--set AI_MEMORY_BIN=<path>` names a binary installed
+   elsewhere; a platform without a pins file fails until one of the two is given.
    `claude.settings.template.json` changed after `v2026.09.26.2` again: it sets `syncClaudeAiSkills` to `false` and `ENABLE_CLAUDEAI_MCP_SERVERS` to `"false"`, so Claude Code neither syncs the claude.ai account's skills nor loads its claude.ai MCP servers ([decision](../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)), and it adds a `Read(**/…)` twin after each `~/`, `//` and `.env` credential deny rule, the `.env` twins ahead of the `!` carve-outs, because Context Mode's server-side path check does not expand `~/` or `//` ([secret storage](../docs/secret-storage.md#user-level-guards-deployed-by-the-claude-profile)).
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets
    `OTEL_METRICS_INCLUDE_SESSION_ID` to `true` (Claude Code's default), so each

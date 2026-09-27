@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Per-agent tool profile of one workflow run: web and fetch routing, skills and context-mode use.
+
+Reads each agent transcript (agent-*.jsonl) and its meta label. Prints counts only: no prompts, no tool inputs.
+Usage: profile_workflow_tools.py <workflow transcript dir>
+"""
+import collections
+import glob
+import json
+import os
+import sys
+
+WATCH = ("WebFetch", "WebSearch", "Skill", "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+         "mcp__plugin_context-mode_context-mode__ctx_execute", "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+         "mcp__plugin_context-mode_context-mode__ctx_execute_file", "mcp__plugin_context-mode_context-mode__ctx_search",
+         "Bash", "Read", "Grep")
+SHORT = {name: name.replace("mcp__plugin_context-mode_context-mode__", "") for name in WATCH}
+totals = collections.Counter()
+rows = []
+for meta in sorted(glob.glob(os.path.join(sys.argv[1], "*.meta.json"))):
+    info = json.load(open(meta, encoding="utf-8"))
+    label, model = info.get("description", "?"), info.get("model", "?")
+    counts = collections.Counter()
+    for line in open(meta[: -len(".meta.json")] + ".jsonl", encoding="utf-8"):
+        try:
+            record = json.loads(line)
+        except ValueError:
+            continue
+        content = (record.get("message") or {}).get("content")
+        if isinstance(content, list):
+            for block in content:
+                if isinstance(block, dict) and block.get("type") == "tool_use":
+                    counts[block.get("name")] += 1
+    totals.update(counts)
+    web = counts["WebFetch"] + counts["WebSearch"]
+    ctx_fetch = counts["mcp__plugin_context-mode_context-mode__ctx_fetch_and_index"]
+    rows.append((label, model, web, ctx_fetch, counts))
+print(f"{'agent':44} {'model':7} {'WebFetch':>8} {'WebSrch':>7} {'ctxFetch':>8} {'ctxExec':>7} {'Skill':>5} {'Bash':>5}")
+for label, model, web, ctx_fetch, c in rows:
+    ctx_exec = sum(c[n] for n in WATCH if "ctx_execute" in n or "ctx_batch" in n)
+    print(f"{label[:44]:44} {model[:7]:7} {c['WebFetch']:>8} {c['WebSearch']:>7} {ctx_fetch:>8} {ctx_exec:>7} {c['Skill']:>5} {c['Bash']:>5}")
+web_all = totals["WebFetch"]
+fetch_ctx = totals["mcp__plugin_context-mode_context-mode__ctx_fetch_and_index"]
+print(f"TOTAL agents {len(rows)} | WebFetch {web_all} | ctx_fetch_and_index {fetch_ctx} | "
+      f"fetch routed through ctx: {fetch_ctx}/{web_all + fetch_ctx} | WebSearch {totals['WebSearch']} | Skill {totals['Skill']}")

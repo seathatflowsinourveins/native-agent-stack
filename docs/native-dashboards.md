@@ -166,7 +166,7 @@ import scope merely to open its interface:
 env AGENTSVIEW_DATA_DIR="$EXISTING_SCOPED_ARCHIVE" \
   AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
   agentsview serve --host 127.0.0.1 --port 17384 --no-sync \
-  --no-browser --no-update-check --background
+  --no-browser --no-update-check --require-auth --background
 ```
 
 The archive is historical, not live accounting for this task. Both native
@@ -185,11 +185,64 @@ systemctl --user enable --now agentsview-archive.service
 systemctl --user restart agentsview-archive.service
 systemctl --user is-enabled agentsview-archive.service
 curl --fail http://127.0.0.1:17384/
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:17384/api/ping  # 401 without a token
 ```
 
 Do not run a second background daemon beside this unit. It retains the same
 archive and `--no-sync` scope. This is native process supervision, not a new
 session importer or proof of physical-PC reboot recovery.
+
+### Token on the archive API (2026-09-27)
+
+The unit runs with upstream `--require-auth`. Without it, v0.43.0 checks no
+token on the dashboard's own `/api/` routes; only the machine-to-machine
+remote-sync, raw-sync and artifact-exchange routes keep their own authentication
+([auth middleware](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/auth.go#L110-L161)).
+Those dashboard routes include session
+[resume and open](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/huma_routes_sessions.go)
+actions that start programs
+([openers](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/openers.go)),
+and a [terminal setting](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/huma_routes_config.go)
+that chooses what they start. Host and Origin checks stop browser pages, not local
+programs that set those headers, and with WSL mirrored networking, Windows
+processes share this loopback address.
+
+- The interface still loads, because static pages are not gated. Unlike the
+  passwordless first check above, it now asks once for the bearer token stored
+  as `auth_token` in the archive's `config.toml`. Serve logs only that a token
+  is configured.
+- The CLI with `AGENTSVIEW_DATA_DIR` set and no `--server` sends its reads to
+  the archive's running daemon, with the archive's token
+  ([transport](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/transport.go#L275-L303)).
+  An explicit `--server` request needs `--server-token-file`; without it, it
+  returns 401.
+- Set `require_auth = true` in the archive's `config.toml` as well, as the
+  [archive config example](../examples/agentsview.toml.example) does.
+  - When no daemon is running, a read without `--server` starts one itself. That
+    daemon takes its settings from the config, not from the unit's flags.
+  - It also syncs, because `--no-sync` is a runtime option with no config key
+    ([config](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L711)).
+    So keep the unit running while you read in the data-dir form.
+- While the unit runs, a direct write such as `AGENTSVIEW_NO_DAEMON=1 agentsview sync`
+  on the same archive is refused
+  ([write guard](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L1421-L1427)).
+  Refresh a selected file with `agentsview session sync FILE` through the unit.
+- Telemetry and the update check are off, but the pricing refresh still fetches
+  from raw.githubusercontent.com and openrouter.ai at start and every 24 hours
+  ([pricing schedule](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/pricing_schedule.go)).
+- On the workstation, the unit serves the default directory `~/.agentsview`. The
+  2026-09-25 host receipt filled it by default discovery, with no allowlist, so
+  the token protects it, not scoping.
+- Measured on the workstation:
+  - without a token, `/` returned 200, and `/api/ping`, `/api/v1/sessions` and
+    `/api/v1/projects` returned 401;
+  - with the unit running, the data-dir form of `agentsview projects --json`,
+    `session list` and `session search` returned archive rows.
+
+Alternatives were no token (rejected because of the routes above) and a reverse
+proxy with its own login (another layer for a gap the upstream flag already
+closes). An upstream release that removes or separately guards the
+program-starting routes would overturn this.
 
 [Context Mode Insight](https://context-mode.com/insight) is a separate hosted,
 opt-in account. Opening its landing page does not connect local telemetry or

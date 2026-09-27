@@ -19,9 +19,13 @@ from urllib.parse import quote, urlsplit
 
 try:
     from .catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from .component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
+                                   OUTPUT_JSON as COMPONENT_MATRIX)
     from .landscape import build_landscape
 except ImportError:
     from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
+                                  OUTPUT_JSON as COMPONENT_MATRIX)
     from landscape import build_landscape
 
 
@@ -104,6 +108,13 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "blueprints/token-native-focus/saturation-audit.json",
                     "blueprints/us-equities/north-star.md"}
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
+# The convergence-by-layer fields the page shows; per-component detail stays in the linked matrix.
+CONVERGENCE_LAYER_FIELDS = ("layer_state", "verdict_checked_at", "reopened_by", "in_use", "converged", "all_rows",
+                            "recorded_winner_rows", "factors", "unresolved", "manifest_layer_found",
+                            "winners_without_manifest_row", "invoke", "invoke_reason")
+CONVERGENCE_SUMMARY_FIELDS = ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
+                              "newest_manifest", "newest_verdict_checked_at", "manifest_layers_without_matrix_row")
+CONVERGENCE_SCOPE_COUNTS = ("layers", "in_use", "converged", "unresolved")
 
 
 def require(condition, message):
@@ -321,6 +332,100 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, r
         if target.get(key):
             trading[key + "_source"] = sources([target[key]])[0]
     return {"foundation": foundation, "trading": trading}
+
+
+def build_convergence(root, read, file_url):
+    """The convergence-by-layer block of the generated component evidence matrix
+    (scripts/component_matrix.py), or None without that matrix. The page renders only these counts,
+    definitions and dates; a block that disagrees with its own layer rows fails the build."""
+    if not safe_file(root, COMPONENT_MATRIX).is_file():
+        return None
+    matrix = read(COMPONENT_MATRIX)
+    block = (matrix.get("summary") or {}).get("convergence") if isinstance(matrix, dict) else None
+    require(isinstance(block, dict) and all(key in block for key in CONVERGENCE_SUMMARY_FIELDS),
+            "the component matrix has no convergence block; run python3 scripts/component_matrix.py --write")
+    rows = matrix.get("rows")
+    require(isinstance(rows, list) and all(isinstance(row, dict) for row in rows),
+            "component matrix rows must be a list of objects")
+
+    def count(value):
+        return type(value) is int and value >= 0
+
+    layers, states, scopes = [], dict.fromkeys(CONVERGENCE_LAYER_STATES, 0), {}
+    for row in rows:
+        layer = row.get("convergence")
+        require(isinstance(layer, dict), "every component matrix row needs a convergence object")
+        require(isinstance(row.get("catalog"), str) and isinstance(row.get("layer_id"), str),
+                "a convergence row needs its catalog and layer_id")
+        require(layer.get("layer_state") in CONVERGENCE_LAYER_STATES, "unknown convergence layer_state")
+        require(all(count(layer.get(key)) for key in ("in_use", "converged", "all_rows", "recorded_winner_rows")),
+                "convergence counts must be nonnegative integers")
+        factors = layer.get("factors")
+        require(isinstance(factors, dict) and set(factors) == set(CONVERGENCE_FACTORS)
+                and all(isinstance(values, dict) and set(values) == set(CONVERGENCE_FACTOR_VALUES)
+                        and all(count(value) for value in values.values()) for values in factors.values()),
+                "convergence factors need true/false/unknown integer counts")
+        require(all(sum(values.values()) == layer["in_use"] for values in factors.values()),
+                "convergence factor counts must add up to in_use")
+        unresolved, reopened = layer.get("unresolved"), layer.get("reopened_by")
+        require(isinstance(unresolved, list) and all(isinstance(item, dict) and isinstance(item.get("reason"), str)
+                                                     for item in unresolved),
+                "every unresolved convergence row needs its reason")
+        require(isinstance(reopened, list) and all(isinstance(item, dict) and isinstance(item.get("date"), str)
+                                                   for item in reopened),
+                "convergence reopened_by needs dated sweeps")
+        require(layer["converged"] <= min(values["true"] for values in factors.values())
+                and layer["in_use"] + len(unresolved) <= layer["all_rows"]
+                and layer["recorded_winner_rows"] <= layer["all_rows"], "convergence counts are inconsistent")
+        require(layer["converged"] == 0 or layer["layer_state"] == "confirmed_current",
+                "only a confirmed_current layer can have converged components")
+        found, orphans = layer.get("manifest_layer_found"), layer.get("winners_without_manifest_row")
+        require(isinstance(found, bool) and (found or layer["all_rows"] == 0),
+                "convergence manifest_layer_found must be true or false, and false only for a layer without "
+                "manifest rows")
+        require(isinstance(orphans, list) and all(isinstance(item, str) and bool(item) for item in orphans),
+                "convergence winners_without_manifest_row must list component ids")
+        require(layer.get("invoke") is not None
+                or (isinstance(layer.get("invoke_reason"), str) and bool(layer["invoke_reason"].strip())),
+                "a null invoke needs its reason")
+        states[layer["layer_state"]] += 1
+        scope = scopes.setdefault(row["catalog"], dict.fromkeys(CONVERGENCE_SCOPE_COUNTS, 0))
+        for key, value in (("layers", 1), ("in_use", layer["in_use"]), ("converged", layer["converged"]),
+                           ("unresolved", len(unresolved))):
+            scope[key] += value
+        layers.append({"catalog": row["catalog"], "layer_id": row["layer_id"], "title": text(row.get("title")),
+                       **{key: layer.get(key) for key in CONVERGENCE_LAYER_FIELDS}})
+    overall = {key: sum(scope[key] for scope in scopes.values()) for key in CONVERGENCE_SCOPE_COUNTS}
+    for scope in (*scopes.values(), overall):
+        scope["share"] = round(scope["converged"] / scope["in_use"], 4) if scope["in_use"] else None
+    catalogs = block["catalogs"]
+    empty = {**dict.fromkeys(CONVERGENCE_SCOPE_COUNTS, 0), "share": None}
+    require(block["layer_states"] == states and block["overall"] == overall and isinstance(catalogs, dict)
+            and set(scopes) <= set(catalogs)
+            and all(catalogs[catalog] == scopes.get(catalog, empty) for catalog in catalogs),
+            "the convergence summary differs from its layer rows")
+    definitions = block["definitions"]
+    require(isinstance(definitions, list) and bool(definitions)
+            and all(isinstance(item, dict) and all(isinstance(item.get(key), str) and item[key].strip()
+                                                   for key in ("term", "definition")) for item in definitions),
+            "convergence definitions must be a nonempty list of terms and definitions")
+    unmatched = block["manifest_layers_without_matrix_row"]
+    require(isinstance(unmatched, list)
+            and all(isinstance(item, dict) and isinstance(item.get("catalog"), str)
+                    and isinstance(item.get("layer_id"), str) for item in unmatched)
+            and not ({(item["catalog"], item["layer_id"]) for item in unmatched}
+                     & {(layer["catalog"], layer["layer_id"]) for layer in layers}),
+            "convergence manifest_layers_without_matrix_row must list manifest layers that have no matrix row")
+    manifest, sources = block["newest_manifest"], block["sources"]
+    require(manifest is None or (isinstance(manifest, dict) and isinstance(manifest.get("path"), str)
+                                 and isinstance(manifest.get("checked_at"), str)),
+            "the newest convergence sweep manifest needs its path and checked_at")
+    require(isinstance(sources, dict) and isinstance(sources.get("completed_sweeps"), list)
+            and isinstance(sources.get("host_e2e_platform"), str)
+            and isinstance(block["newest_verdict_checked_at"], dict) and isinstance(block["frozen_at"], str),
+            "convergence sources need their sweeps, platform and dates")
+    return {"url": file_url(COMPONENT_MATRIX), **{key: block[key] for key in CONVERGENCE_SUMMARY_FIELDS},
+            "layers": layers}
 
 
 def build_data(root):
@@ -670,6 +775,7 @@ def build_data(root):
     if config.get("landscape_manifest"):
         landscape = build_landscape(root, config["landscape_manifest"], read=read,
                                     track=track, file_url=file_url)
+    convergence = build_convergence(root, read, file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
@@ -679,7 +785,7 @@ def build_data(root):
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
-            "grand_catalogs": grand_catalogs, "landscape": landscape,
+            "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),

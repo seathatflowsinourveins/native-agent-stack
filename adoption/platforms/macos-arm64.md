@@ -79,6 +79,8 @@ release, the note is history and the step is in your checkout (`test -e
    scope, which main leaves to each project.
    `adoption/templates/claude.settings.template.json` changed after `v2026.09.25.2`: its eight
    ai-memory hook commands name `tools/ai-memory-2.4.1`, where the tag's name `tools/ai-memory-2.3.2`.
+   Since 2026-09-27 they run `${AI_MEMORY_BIN}`, rendered from this platform's pin (see
+   [ai-memory hook paths on macOS](#ai-memory-hook-paths-on-macos)).
    It also changed after `v2026.09.26.2`: `OTEL_METRICS_INCLUDE_SESSION_ID` is
    `true`, so each Claude session gets its own Prometheus series, and
    `OTEL_LOG_TOOL_DETAILS` is `"1"`, a dated user exception whose Collector filter
@@ -303,6 +305,16 @@ resolves the config there. No wrapper script is needed. The context-hub row was 
 both platform pin files name those same bytes. This is artifact verification, not a Mac
 installation or native execution receipt; see the [recipe](../../recipes/README.md#context-hub-opt-out).
 
+**2026-09-27 amendment:** the explicit Codex `stack-worker` profile is the one
+carrier that sets `CHUB_TELEMETRY=0 CHUB_FEEDBACK=0` unconditionally whenever
+`-p stack-worker` is selected, whatever `HOME` is. Other invocations keep the
+home-only rule above. Context Hub `v0.1.4`
+[`telemetry.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js#L5-L14)
+checks these variables before configuration; the
+[worker decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub)
+records the profile loading check and its limits. This amendment adds no Mac
+execution receipt.
+
 A Mac that runs the Claude RTK hook at the rtk 0.50.0 pin needs the exclusions from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) in
 `~/Library/Application Support/rtk/config.toml`, the only config file rtk 0.50.0 reads on
@@ -437,11 +449,17 @@ binary, instead of a bare symlink.
 
 ### ai-memory hook paths on macOS
 
-The shared Claude settings template names the Linux pin's ai-memory prefix,
-`${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory`, while this platform's pin stays
-2.3.2 until a Mac qualifies a 2.4.x release itself, so the eight rendered hook commands
-point at a prefix this bootstrap does not install. Rewrite them with the
-installed 2.3.2 binary and the full Claude command from
+Until 2026-09-27 the shared Claude settings template named the Linux pin's ai-memory
+prefix, `${ECO_ROOT}/tools/ai-memory-2.4.1/ai-memory`, while this platform's pin stays
+2.3.2 until a Mac qualifies a 2.4.x release itself. The eight hook commands now run
+`${AI_MEMORY_BIN}`, which `tools/adoption/render_config.py` renders from the selected
+platform's pin: on a Mac, `${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory`, the prefix this
+bootstrap installs (`--platform macos-arm64` renders it from another machine). A Mac
+whose running ai-memory is another install, such as the service the 2026-09-27
+[single-writer decision](../../docs/decisions/2026-09-27-mac-single-writer-staged.md)
+leaves running in stage 1, passes that binary with `--set AI_MEMORY_BIN=<path>`.
+Rendering the path is not a Mac qualification. The capture mode still needs
+storing: run the installed binary with the full Claude command from
 [the recipe's project-memory section](../../recipes/README.md#project-memory):
 `install-hooks --agent claude-code --server-url http://<this host's memory server>
 --capture-mode allowlist --no-capture-prompts --apply`. Do not drop

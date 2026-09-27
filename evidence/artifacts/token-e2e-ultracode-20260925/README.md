@@ -33,6 +33,8 @@ Installing and configuring a tool does not show any saving. This run makes one c
 
 All 16 tools ran inside a subagent, and each subagent's answer passed its baseline check.
 
+**Correction (2026-09-27):** all sixteen tools were exercised inside subagents, but not every answer holds. The QMD and Repomix passes were retracted later (a wrong document; an incomplete function inventory). ai-memory's check was vacuous (`base_empty=True`), so its correctness is untested. The other thirteen are partial, with no recorded failing control, which [the acceptance policy](../../../docs/acceptance-evidence-policy.md#identify-what-each-check-proves) requires before a pass counts. `receipt.json` keeps every recorded value; its `tools[].adjudication` and `errata` fields hold the current acceptance, and [the retained review](review-e1e2-20260927.md) gives the findings. The token counts below are unchanged.
+
 The token counts are exact (`o200k_base`). Each covers one task: the tokens the subagent would have read without the tool, minus what it actually read. They are not provider-billed savings.
 
 | Tool | Channel in the subagent | Task | Baseline → tool output (tokens) | Removed |
@@ -83,6 +85,8 @@ A fresh `claude -p` session on Sonnet 5 listed these MCP servers as `connected` 
 ## Retained failures and gaps
 
 - **Correction (2026-09-26):** QMD's PASS in the Results table only confirmed that the quoted text exists in the document it retrieved. That document, `catalogs/us-equities/engines-strategies.md`, does not describe how a new machine pins a release. The catalog index covers only the us-equities collections, so `adoption/update.md` is out of its scope. The QMD row is a wrong-document retrieval for this question. See [the Codex run](../token-e2e-codex-20260926/README.md).
+
+- **Correction (2026-09-27):** Repomix's `count=47 PASS` in the Results table is a false pass. `scripts/host_requests.py` at `f5812d3f` has 48 top-level functions. `--compress` dropped `status_body`, whose signature spans three lines, because repomix 1.18.1 tests only a definition's first line ([`PythonParseStrategy.ts` L81](https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81)). The [laptop run](../token-e2e-ultracode-laptop-20260926/README.md) found this on the same two files and recorded a FAIL; [`tests/test_token_e2e_receipt_checks.py`](../../../tests/test_token_e2e_receipt_checks.py) rebuilds the inventory, and the QMD, jCodeMunch, ast-grep and Context Mode answers, from Git with failing controls (new local evidence, not controls this run recorded). The Repomix row's token counts are unaffected.
 
 - **Context Mode, attempt 1:** `ctx_execute_file` refused a file outside the session project root. Subagents inherit the parent session's project root.
 - **Serena, attempt 1:** it is bound to the session project (`--project-from-cwd`) and has no project switch in this context.

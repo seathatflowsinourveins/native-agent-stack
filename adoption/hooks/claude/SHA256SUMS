@@ -1,4 +1,4 @@
 df3248659c191d8800dfd64a8c7d415fc13652cebee08c9437bf579862c2e561  effort-default-guard.py
-ed5556f0cb4942859cf9e8e2e6f709de4dbc5b96163fc6ef65fcd0dcab8da153  ../../../scripts/hooks/secret_path_guard.py
-8b9a60fa425900930c610ba7e3e0f8a0fa1457048a39c79e3136fb5073e7269f  token-lanes-block.md
+f2ae894eddeed3583d87da7382b897f1a8b492c160547f99bb7aa91ec0b4b2a7  ../../../scripts/hooks/secret_path_guard.py
+2a9bab79fea04ec2c626973428e7db73fad6ace1267e34c2a9553f586e1f8b76  token-lanes-block.md
 7a9228e41235771336189287944d81d998795b025a9a038d022beb21a19ce870  token-lanes-subagent-start.py

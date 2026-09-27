@@ -192,6 +192,19 @@ def lane_skill_read_rules(home: Path) -> list[str]:
     return rules
 
 
+def profile_servers_without_base(profile_bytes: bytes, base_servers: list) -> list:
+    """The worker profile's [mcp_servers.<name>] tables that define no transport (command or url) and overlay no server
+    of the lane config. Codex merges the profile over config.toml and rejects a merged server table with neither
+    (codex-rs/config/src/mcp_types.rs:454-510 at rust-v0.157.1), so each such name would stop -p stack-worker loading."""
+    import tomllib  # mcp_sections has already required it (Python 3.11+)
+    try:
+        tables = tomllib.loads(profile_bytes.decode("utf-8")).get("mcp_servers") or {}
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
+        raise ValueError(f"the {LANE_PROFILE} profile is not valid TOML: {error}") from None
+    return sorted(name for name, table in tables.items()
+                  if name not in base_servers and not (isinstance(table, dict) and ("command" in table or "url" in table)))
+
+
 def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile: Path, repo_root: Path,
                     require_key: bool = False) -> dict:
     """Write <work>/codex-home: config.toml (the OmniRoute provider block plus the rendered token MCP servers) and
@@ -203,6 +216,12 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
     if not servers:
         raise ValueError(f"{CODEX_TEMPLATE} rendered for {host!r} has no [mcp_servers.*] table")
     profile_bytes = Path(profile).read_bytes()
+    unbased = profile_servers_without_base(profile_bytes, servers)
+    if unbased:
+        raise ValueError(
+            f"{profile} has [mcp_servers.*] tables without command or url for {', '.join(unbased)}, which the "
+            f"{CODEX_TEMPLATE} rendered for host {host_label!r} does not define: Codex 0.157.1 rejects such a server as "
+            f"'invalid transport' (codex-rs/config/src/mcp_types.rs:454-510), so -p {LANE_PROFILE} would not load")
     template_sha = sha256_bytes((repo_root / CODEX_TEMPLATE).read_bytes())
     config = "\n".join([
         "# Lane-local Codex home for the landscape sweep's GPT-6 lane, written by build_args.py",
