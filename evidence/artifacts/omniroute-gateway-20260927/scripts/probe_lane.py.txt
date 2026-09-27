@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""OmniRoute Codex-lane probe: one `codex exec` through the `omniroute` profile, verified from OmniRoute's own call log.
+
+Checks, all from returned data:
+- the exec succeeds and the shell tool returns the marker (client JSONL events);
+- OmniRoute logged the requests (so the profile really routed through the gateway, not a native fallback);
+- the model and the reasoning effort the gateway received and the effort it sent upstream;
+- prompt caching: whether the upstream request carries prompt_cache_key, and cache-read tokens per request;
+- the native rollout's turn_context effort for the same thread.
+
+Prints whitelisted fields only. Never prints headers, account names, connection ids, keys or bodies.
+Usage: probe_lane.py <out_dir> [n_turn_prompt]
+"""
+import datetime
+import glob
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+
+BASE = "http://127.0.0.1:20128"
+LAUNCHER = os.path.expanduser("~/.local/share/codex-ecosystem/bin/codex-omniroute")
+
+
+def get(path):
+    with urllib.request.urlopen(BASE + path, timeout=30) as response:
+        return json.load(response)
+
+
+def find_effort(body):
+    if not isinstance(body, dict):
+        return None
+    direct = body.get("reasoning_effort")
+    if isinstance(direct, str):
+        return direct
+    nested = body.get("reasoning")
+    if isinstance(nested, dict) and isinstance(nested.get("effort"), str):
+        return nested["effort"]
+    return None
+
+
+def walk_bodies(node, depth=0):
+    """Yield (label, dict) pairs for request-like bodies inside pipeline payloads, without printing them."""
+    if depth > 4 or not isinstance(node, dict):
+        return
+    for key, value in node.items():
+        if isinstance(value, str) and value[:1] == "{":
+            try:
+                value = json.loads(value)
+            except ValueError:
+                continue
+        if isinstance(value, dict):
+            if "model" in value or "reasoning" in value or "input" in value:
+                yield key, value
+            yield from walk_bodies(value, depth + 1)
+
+
+out_dir = sys.argv[1]
+os.makedirs(out_dir, exist_ok=True)
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+marker = f"omniroute-probe-{stamp}"
+prompt = (f"Use your shell tool to run exactly: echo {marker}\n"
+          "Then reply with only that command's output, nothing else.")
+started = datetime.datetime.now(datetime.timezone.utc)
+events_path = os.path.join(out_dir, f"probe-events-{stamp}.jsonl")
+t0 = time.time()
+with open(events_path, "w", encoding="utf-8") as events:
+    proc = subprocess.run([LAUNCHER, "exec", "--skip-git-repo-check", "-s", "read-only", "--json", prompt],
+                          stdin=subprocess.DEVNULL, stdout=events, stderr=subprocess.PIPE, text=True, timeout=900)
+elapsed = round(time.time() - t0, 1)
+thread_id, final_text, usage, commands, errors = None, None, None, [], []
+for line in open(events_path, encoding="utf-8"):
+    try:
+        event = json.loads(line)
+    except ValueError:
+        continue
+    kind = event.get("type")
+    if kind == "thread.started":
+        thread_id = event.get("thread_id")
+    elif kind == "item.completed":
+        item = event.get("item", {})
+        if item.get("type") == "agent_message":
+            final_text = item.get("text")
+        elif item.get("type") == "command_execution":
+            commands.append({"exit_code": item.get("exit_code"),
+                             "marker_in_output": marker in (item.get("aggregated_output") or "")})
+    elif kind == "turn.completed":
+        usage = event.get("usage")
+    elif kind in ("error", "turn.failed"):
+        errors.append(str(event.get("message") or event.get("error"))[:300])
+print(json.dumps({"exec_rc": proc.returncode, "elapsed_s": elapsed, "thread_started": bool(thread_id),
+                  "final_is_marker": (final_text or "").strip() == marker, "commands": commands,
+                  "client_usage": usage, "errors": errors,
+                  "stderr_tail": proc.stderr[-400:] if proc.returncode else ""}, indent=1))
+
+time.sleep(3)
+rows = get("/api/usage/call-logs?limit=50")
+rows = rows if isinstance(rows, list) else rows.get("logs") or rows.get("data") or rows.get("items") or []
+mine = [r for r in rows if isinstance(r, dict) and str(r.get("timestamp") or "") >= started.isoformat()[:19]]
+print(f"gateway call-log rows since start: {len(mine)}")
+for row in sorted(mine, key=lambda r: str(r.get("timestamp"))):
+    summary = {k: row.get(k) for k in ("timestamp", "path", "status", "model", "requestedModel", "provider",
+                                         "duration", "tokens", "cacheSource", "requestType", "sourceFormat",
+                                         "targetFormat")}
+    # One-way short hash: shows which requests shared an account without exposing the connection id.
+    summary["conn_hash"] = hashlib.sha256(str(row.get("connectionId")).encode()).hexdigest()[:6]
+    try:
+        detail = get(f"/api/usage/call-logs/{row.get('id')}")
+    except urllib.error.HTTPError as error:
+        detail = {"detail_http_status": error.code}
+    summary["effort_fields"] = {k: v for k, v in detail.items()
+                                if "effort" in k.lower() and not isinstance(v, (dict, list))}
+    bodies = {}
+    for label, body in walk_bodies(detail.get("pipelinePayloads") or {}):
+        bodies.setdefault(label, {
+            "model": body.get("model") if isinstance(body.get("model"), str) else None,
+            "effort": find_effort(body),
+            "prompt_cache_key_present": "prompt_cache_key" in body,
+            "include": body.get("include") if isinstance(body.get("include"), list) else None,
+            "store": body.get("store"),
+            "stream": body.get("stream"),
+        })
+    summary["pipeline_bodies"] = bodies
+    print(json.dumps(summary, indent=1, default=str))
+
+if thread_id:
+    matches = glob.glob(os.path.expanduser(f"~/.codex/sessions/*/*/*/rollout-*{thread_id}.jsonl"))
+    for path in matches[:1]:
+        for line in open(path, encoding="utf-8"):
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if event.get("type") == "turn_context":
+                payload = event.get("payload", {})
+                print("rollout turn_context:", json.dumps({k: payload.get(k) for k in ("model", "effort", "summary")}))
+                break
+    if not matches:
+        print("rollout: not found for this thread")

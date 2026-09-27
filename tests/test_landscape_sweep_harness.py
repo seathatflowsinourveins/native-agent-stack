@@ -703,6 +703,8 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
             self.assertEqual(parsed["model_providers"]["omniroute"]["env_key"], "OMNIROUTE_API_KEY")
             self.assertIs(parsed["model_providers"]["omniroute"]["supports_standalone_web_search"], True)
             self.assertEqual(parsed["features"], {"shell_snapshot": False, "standalone_web_search": True})
+            # Codex 0.157.1 leaves its default *KEY* excludes off, so the key variable is excluded by name.
+            self.assertEqual(parsed["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
             self.assertEqual(sorted(parsed["mcp_servers"]), sorted(TOKEN_MCP_SERVERS))
         codex = json.loads((work / "staged.json").read_text())["codex"]
         self.assertEqual((codex["provider"], codex["codex_home"], codex["profile"], codex["api_key_env"],
@@ -716,6 +718,81 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         lane = codex_job.settings(work)
         self.assertEqual((lane["provider"], lane["codex_home"], lane["profile"]),
                          ("omniroute", work / "codex-home", "stack-worker"))
+
+    def stage_lane_with_skills(self):
+        """Stage the lane with HOME at a fake home: a skill with a reference file and a symlink cycle, a symlinked skill
+        directory, a file outside the skills root, and a file whose name holds a glob character."""
+        home = temp_dir(self)
+        root = home / ".agents" / "skills"
+        (root / "demo" / "references").mkdir(parents=True)
+        (root / "demo" / "SKILL.md").write_text("# demo\n", encoding="utf-8")
+        (root / "demo" / "references" / "notes.md").write_text("notes\n", encoding="utf-8")
+        (root / "demo" / "odd*name.md").write_text("glob character\n", encoding="utf-8")
+        (root / "demo" / "loop").symlink_to(root / "demo", target_is_directory=True)
+        linked = temp_dir(self) / "linked-skill"
+        linked.mkdir()
+        (linked / "SKILL.md").write_text("# linked\n", encoding="utf-8")
+        (root / "linked").symlink_to(linked, target_is_directory=True)
+        (home / "outside.md").write_text("outside\n", encoding="utf-8")
+        work = stage_work(self)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        env = {**os.environ, "HOME": str(home)}
+        common = [sys.executable, HARNESS / "build_args.py", "--work-dir", work, "--sweep-id", "landscape-sweep-20261026",
+                  "--date", "2026-10-26"]
+        done = run([*common, "--gpt6-provider", "omniroute", "--codex-host", "example", "--stack-worker-profile", profile],
+                   env=env)
+        return home, work, done, lambda: run(common, env=env)
+
+    def test_lane_allows_context_mode_exactly_the_skill_files(self):
+        # context-mode 1.0.169 refuses ctx_execute_file paths outside the runner's cwd unless a Read(...) allow rule in
+        # <cwd>/.claude/settings.json names them (#852); the lane's GPT-6 loads its pinned skills with that tool.
+        home, work, done, restage_native = self.stage_lane_with_skills()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        root = home / ".agents" / "skills"
+        settings = json.loads((work / "empty" / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        # One exact rule per file, by the path Codex lists; the cycle is listed once and the glob-character file never.
+        self.assertEqual(settings, {"permissions": {"allow": [
+            f"Read({root / 'demo' / 'SKILL.md'})", f"Read({root / 'demo' / 'references' / 'notes.md'})",
+            f"Read({root / 'linked' / 'SKILL.md'})"]}})
+        staged = (work / "staged.json").read_text(encoding="utf-8")
+        self.assertEqual(json.loads(staged)["codex"]["lane_home"]["context_mode_skill_reads"],
+                         {"settings": "empty/.claude/settings.json", "root": "$HOME/.agents/skills", "exact_files": 3})
+        self.assertNotIn(str(home), staged)  # the lane record keeps the host's paths out
+        # Restaging the same work dir for the native lane, which has no context-mode, removes the rules.
+        native = restage_native()
+        self.assertEqual(native.returncode, 0, native.stderr)
+        self.assertFalse((work / "empty" / ".claude").exists())
+        self.assertTrue((work / "empty").is_dir())
+
+    @unittest.skipUnless(NODE and os.environ.get("CONTEXT_MODE_SECURITY_JS")
+                         and Path(os.environ.get("CONTEXT_MODE_SECURITY_JS", "")).is_file(),
+                         "set CONTEXT_MODE_SECURITY_JS to an installed context-mode build/security.js")
+    def test_context_mode_reads_only_the_listed_skill_files(self):
+        """context-mode's own matcher on the staged file: listed files pass; a sibling, the outside file and ..
+        traversals under the root do not. The control shows why the rules are exact: with a <root>/** rule, the
+        traversal passes too, because context-mode also matches the raw path."""
+        home, work, done, _ = self.stage_lane_with_skills()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        root = home / ".agents" / "skills"
+        script = (
+            "const [url, project, root, home] = process.argv.slice(1);\n"
+            "const m = await import(url);\n"
+            "const allow = m.readToolPermissionPatterns('Read', 'allow', project, project + '/no-global-settings.json');\n"
+            "const check = (rules, p) => m.evaluateProjectContainment(p, project, rules).allowed;\n"
+            "const paths = {skill: root + '/demo/SKILL.md', reference: root + '/demo/references/notes.md',\n"
+            "  linked: root + '/linked/SKILL.md', sibling: root + '/demo/other.md', outside: home + '/outside.md',\n"
+            "  traversal: root + '/demo/../../../outside.md', shallow_traversal: root + '/../../outside.md'};\n"
+            "const out = {};\n"
+            "for (const [name, p] of Object.entries(paths)) out[name] = check(allow, p);\n"
+            "out.control_wildcard_traversal = check([[root + '/**']], paths.traversal);\n"
+            "console.log(JSON.stringify(out));\n")
+        url = Path(os.environ["CONTEXT_MODE_SECURITY_JS"]).resolve().as_uri()
+        done = run([NODE, "--input-type=module", "-e", script, url, work / "empty", root, home])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(json.loads(done.stdout), {
+            "skill": True, "reference": True, "linked": True, "sibling": False, "outside": False,
+            "traversal": False, "shallow_traversal": False, "control_wildcard_traversal": True})
 
     def test_lane_refuses_quota_gate_missing_host_and_remote_gateways(self):
         for extra, needle in ((("--quota-stop-percent", "90"), "--quota-stop-percent"),
