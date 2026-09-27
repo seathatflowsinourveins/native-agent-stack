@@ -91,6 +91,35 @@ The GPT-6 lanes run with `--ignore-user-config`, so per-skill `enabled = false` 
 `config.toml` do not apply there. Which skills Codex lists inside the lane is untested; `skills_used` records what
 each worker says it used.
 
+### GPT-6 through OmniRoute (`--gpt6-provider omniroute`)
+
+With `build_args.py --gpt6-provider omniroute --codex-host <HOST>`, the GPT-6 lane runs through the local OmniRoute gateway. OmniRoute pools the operator's accounts. The lane gets its own Codex home, so the host's interactive config never applies.
+
+`build_args.py` writes `<work-dir>/codex-home/` with two files:
+- `config.toml`:
+  - the provider block: `model = "cx/gpt-6-astra"`, `model_provider = "omniroute"`, `model_reasoning_effort = "max"`, and `[model_providers.omniroute]` with a loopback `base_url` ending in `/v1`, `env_key = "OMNIROUTE_API_KEY"`, `requires_openai_auth = false` and `wire_api = "responses"`. The fields follow the [Codex config reference](https://developers.openai.com/codex/config-reference).
+  - the `[mcp_servers.*]` tables of `adoption/templates/codex.config.template.toml`. The checkout's own `tools/adoption/render_config.py` renders them for `adoption/hosts/<HOST>.json`: serena, ai-memory, socraticode, headroom, codebase-memory, qmd and context-mode.
+- `stack-worker.config.toml`: the Codex worker profile (`--stack-worker-profile`, default `adoption/templates/codex.stack-worker.config.toml`), copied verbatim.
+
+What the lane does not carry or allow:
+- Project and hook trust are left out, because they describe the host's interactive client.
+- `supports_websockets` stays unset. OmniRoute forwards the Codex client version only on its HTTP `/v1/responses` path.
+- `--omniroute-base-url` must point at loopback.
+
+How the runner uses it:
+- `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`.
+- The key comes from `$OMNIROUTE_API_KEY` in the harness's environment. For a keyless loopback gateway, upstream's non-interactive setup with no login or API key, the staged placeholder `local-loopback` fills an unset variable; Codex's `env_key` only needs the variable to exist. `--omniroute-require-key` stages no placeholder, so a job without the variable ends with exit 6 before codex starts.
+- `--quota-stop-percent` is refused with this provider: the quota probe reads the native login, not the gateway's pool.
+- A job's `inputs.json` records the provider, so a gateway run never reuses a native job's result.
+
+Before a full run through the gateway, run the lane's parity check on the staged home, and do not claim a gateway result as max quality until it passes. The check covers:
+- max effort reaching the upstream model, shown in the gateway's request log and the rollout's `turn_context`;
+- the shell tool;
+- an MCP call such as `ctx_execute`;
+- `--output-schema` output;
+- reported usage;
+- whether hosted web search passes through for a custom provider.
+
 ## Evidence contract
 
 `saturation_ledger.py --check` and `--append` need the following. Each item names the part of the harness that
