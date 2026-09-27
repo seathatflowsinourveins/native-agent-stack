@@ -77,7 +77,8 @@ INDEPENDENT_REVIEW_STATES = {
 }
 
 # Convergence by layer: the metric frozen on 2026-09-27, before any of its numbers were computed. Integers per
-# layer, three independent true/false/unknown factors, no blended score and no sum across factors.
+# layer, three independent factors (only pin_current and host_e2e can be unknown), no blended score and no sum
+# across factors.
 CONVERGENCE_FROZEN_AT = "2026-09-27"
 SATURATION_LEDGER_FILE = saturation_ledger.LEDGER
 SWEEP_MANIFEST_DIR = "catalogs/sota-convergence"
@@ -121,8 +122,8 @@ CONVERGENCE_DEFINITIONS = (
      "components."),
     ("verdict_winner",
      "true when the row is a winner of the layer's recorded verdict by component id, by an alias in either "
-     "direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise; "
-     "unknown in a pending_lanes layer, which has no recorded verdict yet."),
+     "direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise, "
+     "including in a pending_lanes layer, which has no recorded verdict yet."),
     ("pin_current",
      "true when the newest sweep manifest row has pin_comparison compared and pin_behind_upstream false; false "
      "when it is compared and behind; unknown when it was not compared."),
@@ -144,7 +145,8 @@ CONVERGENCE_DEFINITIONS = (
      "sweep manifest is committed, and then all_rows is 0."),
     ("winners_without_manifest_row",
      "The winners of the layer's recorded verdict that no row of the layer in the newest sweep manifest matches "
-     "(the verdict_winner match), listed and never counted, so recorded_winner_rows reconciles with the verdict."),
+     "(the verdict_winner match), listed and never counted. Row counts and winner counts differ because one "
+     "winner can match several rows; winner_rows[].winner_ids gives the exact per-row mapping."),
     ("manifest_layers_without_matrix_row",
      "Summary list of the newest sweep manifest's layers, in either section, that have no row in this matrix; "
      "listed, never counted."),
@@ -720,7 +722,16 @@ def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict)
     section = saturation_ledger.MANIFEST_SECTION.get(catalog)
     found = (saturation_ledger.manifest_layer(context["manifest"], catalog, layer.get("layer_id"))
              if isinstance(context["manifest"], dict) else None)
-    manifest_rows = _dicts(found[2].get(saturation_ledger.SELECTION_KEY[found[0]])) if found else []
+    manifest_rows = []
+    if found:
+        selection_key = saturation_ledger.SELECTION_KEY[found[0]]
+        manifest_rows = found[2].get(selection_key)
+        where = f"component_matrix: {context['manifest_path']}: {catalog}/{layer.get('layer_id')}: {selection_key}"
+        if not isinstance(manifest_rows, list):
+            raise SystemExit(where + " must be a list")
+        for position, item in enumerate(manifest_rows):
+            if not isinstance(item, dict):
+                raise SystemExit(f"{where}[{position}] must be an object")
 
     factors = {factor: dict.fromkeys(CONVERGENCE_FACTOR_VALUES, 0) for factor in CONVERGENCE_FACTORS}
     components, unresolved, winner_rows = [], [], []
@@ -738,7 +749,7 @@ def build_layer_convergence(catalog: str, layer: dict, row: dict, context: dict)
         if resolution["status"] != "in_use":
             continue
         values = {
-            "verdict_winner": "unknown" if state == "pending_lanes" else "true" if method else "false",
+            "verdict_winner": "true" if method else "false",
             "pin_current": pin_current_factor(manifest_row),
             "host_e2e": host_e2e_factor(winner_ids, e2e_states),
         }
@@ -979,8 +990,8 @@ def render_convergence_markdown(document: dict) -> list[str]:
         "## Convergence by layer",
         "",
         f"Definitions frozen {block['frozen_at']}, before any count was computed. Every count is an integer per "
-        "layer computed only from committed files; the three factors stay true, false or unknown and are never "
-        "blended into one score or summed across factors.",
+        "layer computed only from committed files; the three factors stay independent, only pin_current and "
+        "host_e2e can be unknown, and factors are never blended into one score or summed across factors.",
         "",
         *(f"- **{item['term']}**: {item['definition']}" for item in block["definitions"]),
         "",
@@ -1024,7 +1035,8 @@ def render_convergence_markdown(document: dict) -> list[str]:
     lines += ["", "### Unresolved manifest rows", ""]
     lines += [f"- `{row['catalog']}/{row['layer_id']}` `{item['id'] or 'no id'}`: {item['reason']}"
               for row in document["rows"] for item in row["convergence"]["unresolved"]] or ["None."]
-    # Both sides of the verdict-to-manifest join, listed so recorded_winner_rows reconciles with each verdict.
+    # List join gaps; one winner can match several rows, so row counts and winner counts differ.
+    # winner_rows[].winner_ids gives the exact per-row mapping.
     lines += ["", "### Recorded winners without a row in the newest sweep manifest", ""]
     lines += [f"- `{row['catalog']}/{row['layer_id']}`: "
               + ", ".join(f"`{winner_id}`" for winner_id in row["convergence"]["winners_without_manifest_row"])

@@ -7481,7 +7481,7 @@
             "id": "adaptive-paper-alpaca-adapter",
             "pin_current": "unknown",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -7493,7 +7493,7 @@
             "id": "alpaca-py",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -7505,7 +7505,7 @@
             "id": "data-alpaca-py",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -7517,7 +7517,7 @@
             "id": "lean-alpaca",
             "pin_current": "unknown",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -7529,7 +7529,7 @@
             "id": "nautilus-ibkr-adapter",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           }
@@ -7547,9 +7547,9 @@
             "unknown": 2
           },
           "verdict_winner": {
-            "false": 0,
+            "false": 5,
             "true": 0,
-            "unknown": 5
+            "unknown": 0
           }
         },
         "in_use": 5,
@@ -8091,7 +8091,7 @@
             "id": "alertmanager",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8103,7 +8103,7 @@
             "id": "grafana",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8115,7 +8115,7 @@
             "id": "loki",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8127,7 +8127,7 @@
             "id": "ntfy",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8139,7 +8139,7 @@
             "id": "opentelemetry-collector",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8151,7 +8151,7 @@
             "id": "opentelemetry-collector-contrib",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8163,7 +8163,7 @@
             "id": "prometheus",
             "pin_current": "false",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8175,7 +8175,7 @@
             "id": "restic",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           },
@@ -8187,7 +8187,7 @@
             "id": "sandbox-runtime",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "unknown",
+            "verdict_winner": "false",
             "winner_ids": [],
             "winner_match": null
           }
@@ -8205,9 +8205,9 @@
             "unknown": 0
           },
           "verdict_winner": {
-            "false": 0,
+            "false": 9,
             "true": 0,
-            "unknown": 9
+            "unknown": 0
           }
         },
         "in_use": 9,
@@ -9218,7 +9218,7 @@
           "term": "in_use"
         },
         {
-          "definition": "true when the row is a winner of the layer's recorded verdict by component id, by an alias in either direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise; unknown in a pending_lanes layer, which has no recorded verdict yet.",
+          "definition": "true when the row is a winner of the layer's recorded verdict by component id, by an alias in either direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise, including in a pending_lanes layer, which has no recorded verdict yet.",
           "term": "verdict_winner"
         },
         {
@@ -9246,7 +9246,7 @@
           "term": "manifest_layer_found"
         },
         {
-          "definition": "The winners of the layer's recorded verdict that no row of the layer in the newest sweep manifest matches (the verdict_winner match), listed and never counted, so recorded_winner_rows reconciles with the verdict.",
+          "definition": "The winners of the layer's recorded verdict that no row of the layer in the newest sweep manifest matches (the verdict_winner match), listed and never counted. Row counts and winner counts differ because one winner can match several rows; winner_rows[].winner_ids gives the exact per-row mapping.",
           "term": "winners_without_manifest_row"
         },
         {

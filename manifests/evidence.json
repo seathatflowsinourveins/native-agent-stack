@@ -13218,8 +13218,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "382d598c049813c7effdfe98076c0567476d5f6be703adf058dddc79d4a27009",
-      "bytes": 312398
+      "sha256": "88ef34723db563ebb73ec22e463479e18b60d6c3bc986e01d30ad692af3b2775",
+      "bytes": 312456
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -13733,8 +13733,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "3d77e7f909fecff2846d5a872ad192f34975dd1c9c5ce4ec288d981717e8e33b",
-      "bytes": 32160
+      "sha256": "78dca27a48d1cd7e2dcb442033722409e6a7c3aee8688232770578e0772dd8d6",
+      "bytes": 32290
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -14003,8 +14003,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5505fbf0a6ace1c69d0d13a4e132eff502597d7b4b32903436dfb18727d6aa8c",
-      "bytes": 39562
+      "sha256": "2a40695b8910272d20b2cdc455370d2f59dd384adc20c36eece754138075b678",
+      "bytes": 41101
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -38753,8 +38753,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "534273ad5bfd198a35fe677c3d7f2b6b1a18611fc4c2c1c3951cecf22d4dd8fa",
-      "bytes": 70532
+      "sha256": "65df749596b8b701c3321ec37e39c669a8399504b30cfb072866c4e2dfb34a68",
+      "bytes": 71155
     },
     {
       "path": "scripts/credential_status.py",
@@ -39263,8 +39263,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "ab736fead316e22ce2c83fd16f7d80a1184614bb8c833c39d87c9c688442a027",
-      "bytes": 78431
+      "sha256": "ebc9a6716390aa1644a6ac1b060b08fb37e2e6251ed70e3bf42f31ec7380b0e9",
+      "bytes": 81816
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",

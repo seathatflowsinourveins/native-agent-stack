@@ -896,7 +896,7 @@ def _join_root(root: Path) -> None:
 
 class ConvergenceByLayerTests(unittest.TestCase):
     """The convergence-by-layer metric frozen on 2026-09-27: layer_state, the in-use denominator, the three
-    true/false/unknown factors, the comparability columns, the unresolved list and the summary."""
+    independent factors, the comparability columns, the unresolved list and the summary."""
 
     def _join_document(self):
         tmp = tempfile.TemporaryDirectory()
@@ -937,7 +937,8 @@ class ConvergenceByLayerTests(unittest.TestCase):
 
     def test_join_gaps_are_listed_on_both_sides(self):
         """A recorded winner without a manifest row, a matrix layer missing from the manifest and a manifest
-        layer without a matrix row are each listed, so recorded_winner_rows reconciles with the verdict."""
+        layer without a matrix row are each listed. One winner can match several rows; winner_rows[].winner_ids
+        gives the exact per-row mapping."""
         document = self._join_document()
         rows = self._rows(document)
         self.assertEqual((rows[("foundation", "f-alias")]["manifest_layer_found"],
@@ -955,6 +956,31 @@ class ConvergenceByLayerTests(unittest.TestCase):
                          "### Newest sweep manifest layers without a matrix row\n\n"
                          "- `foundation/f-unlisted`\n- `us-equities/u-unlisted`\n"):
             self.assertIn(expected, markdown)
+
+    def test_one_recorded_winner_can_match_multiple_manifest_rows(self):
+        """The evaluation-experiments join has two MLflow rows for one recorded winner."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            repository = "https://github.com/mlflow/mlflow"
+            _init_root(root, [_layer("evaluation-experiments", catalog="us-equities", winners=[
+                _winner("data-mlflow", repository=repository)])], catalog_file="us-equities.json")
+            _write_json(root / "catalogs/sota-convergence/manifest-20260927.json", _sweep_manifest(
+                "2026-09-27", trading={"evaluation-experiments": [
+                    _manifest_row("data-mlflow", repository=repository, decision="default"),
+                    _manifest_row("mlflow", repository=repository, decision="default")]}))
+            document, flip_violations = cm.build_document(root)
+        self.assertEqual(flip_violations, [])
+        convergence = self._rows(document)[("us-equities", "evaluation-experiments")]
+        self.assertEqual(document["summary"]["totals"]["winners"], 1)
+        self.assertEqual(convergence["recorded_winner_rows"], 2)
+        self.assertEqual(convergence["winners_without_manifest_row"], [])
+        self.assertEqual(convergence["winner_rows"], [
+            {"id": "data-mlflow", "matched_by": "id", "winner_ids": ["data-mlflow"]},
+            {"id": "mlflow", "matched_by": "repository", "winner_ids": ["data-mlflow"]}])
+        markdown = cm.render_markdown(document)
+        self.assertNotIn("so recorded_winner_rows reconciles with the verdict", markdown)
+        self.assertIn("one winner can match several rows", markdown)
+        self.assertIn("winner_rows[].winner_ids", markdown)
 
     def _document(self):
         tmp = tempfile.TemporaryDirectory()
@@ -1054,14 +1080,20 @@ class ConvergenceByLayerTests(unittest.TestCase):
         self.assertEqual(self._counts(empty), (0, 0, 0, 0))
         self.assertEqual(empty["unresolved"], [])
         self.assertEqual(self._factors(empty), {name: (0, 0, 0) for name in ("verdict_winner", "pin_current", "host_e2e")})
-        # No recorded verdict exists yet: whether the component wins is unknown, not false.
+        # No recorded verdict exists yet, so none of these rows is a winner of a recorded verdict.
         self.assertEqual(self._counts(pending), (1, 0, 1, 0))
         self.assertEqual(self._factors(pending), {
-            "verdict_winner": (0, 0, 1), "pin_current": (1, 0, 0), "host_e2e": (0, 0, 1)})
+            "verdict_winner": (0, 1, 0), "pin_current": (1, 0, 0), "host_e2e": (0, 0, 1)})
         us_pending = rows[("us-equities", "u-pending")]
         self.assertEqual(self._counts(us_pending), (2, 0, 2, 0))
         self.assertEqual(self._factors(us_pending), {
-            "verdict_winner": (0, 0, 2), "pin_current": (2, 0, 0), "host_e2e": (0, 0, 2)})
+            "verdict_winner": (0, 2, 0), "pin_current": (2, 0, 0), "host_e2e": (0, 0, 2)})
+        for convergence in (pending, us_pending):
+            self.assertEqual(convergence["layer_state"], "pending_lanes")
+            for component in convergence["components"]:
+                self.assertEqual(component["verdict_winner"], "false")
+                self.assertEqual(component["winner_ids"], [])
+                self.assertFalse(component["converged"])
 
     def test_us_equities_in_use_is_the_default_decision_and_winners_match_by_id_alias_or_repository(self):
         engines = self._rows(self._document()[1])[("us-equities", "u-engines")]
@@ -1215,6 +1247,26 @@ class ConvergenceByLayerTests(unittest.TestCase):
                     cm.build_document(root)
                 self.assertIn(relative, str(caught.exception))
 
+    def test_non_object_manifest_rows_fail_closed(self):
+        relative = "catalogs/sota-convergence/manifest-20260927.json"
+        for catalog, section, layer_id, key in (
+                ("foundation", "foundation", "f-current", "components"),
+                ("us-equities", "trading", "u-engines", "entries")):
+            for malformed in (None, "not-an-object", 7, []):
+                with self.subTest(catalog=catalog, malformed=malformed), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    _convergence_root(root)
+                    manifest = json.loads((root / relative).read_text(encoding="utf-8"))
+                    layer = next(item for item in manifest[section] if item["layer"] == layer_id)
+                    layer[key].insert(1, malformed)
+                    _write_json(root / relative, manifest)
+                    with self.assertRaises(SystemExit) as caught:
+                        cm.build_document(root)
+                    message = str(caught.exception)
+                    self.assertIn(relative, message)
+                    self.assertIn(f"{catalog}/{layer_id}", message)
+                    self.assertIn(f"{key}[1]", message)
+
     def test_an_undated_verdict_is_never_confirmed_current_under_a_covering_sweep(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -1237,7 +1289,7 @@ class ConvergenceByLayerTests(unittest.TestCase):
             "| `stranger` | null |",
             "| `foundation/f-reopened` | recorded_reopened | 2026-09-22 | `sweep-0926`, `sweep-0927` | 3 | 0 | 1/2/0 "
             "| 3/0/0 | 1/0/2 | 3 | 1 | - | null |",
-            "| `us-equities/u-pending` | pending_lanes | 2026-09-22 | - | 2 | 0 | 0/0/2 | 2/0/0 | 0/0/2 | 2 | 0 | - "
+            "| `us-equities/u-pending` | pending_lanes | 2026-09-22 | - | 2 | 0 | 0/2/0 | 2/0/0 | 0/0/2 | 2 | 0 | - "
             "| null |",
             # The unit is named in the header: a layer-component row, not a distinct component.
             "| Scope | Layers | converged / in_use (layer-component rows) | Share | Unresolved rows |",
