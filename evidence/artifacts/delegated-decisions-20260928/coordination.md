@@ -58,4 +58,4 @@ M1/M2 and M3 were not put to the skills-trial owner or the E2E status peer.
   - six carry the summary "Session ended; N observations recorded.";
   - one is a Codex security review of commit `1bd4e2f7`;
   - none names Gate A, #381 or `token-stack-e2e-proof`.
-- **Lane B ownership ledger.** [`recipes/claude-codex-cooperation-lanes.md`](../../../recipes/claude-codex-cooperation-lanes.md) defines it as a coordination directory outside both repositories. A search of `recipes/`, `docs/` and `adoption/` for a ledger path found only that definition. This host has no ledger in use.
+- **Lane B ownership ledger.** [`recipes/claude-codex-cooperation-lanes.md`](../../../recipes/claude-codex-cooperation-lanes.md) defines it as a coordination directory outside both repositories. A search of `recipes/`, `docs/` and `adoption/` for a ledger path found only that definition, and no peer named one. Directories outside the repositories were not searched, so whether an external ledger exists is not observed.

@@ -77,7 +77,7 @@ The returned lane output is in
 - No live session holds Gate A:
   - the recorded owner `token-stack-e2e-proof` is not in the `ListAgents` output of 2026-09-28;
   - the ai-memory handoff list holds no Gate A handoff;
-  - there is no Lane B coordination ledger on this host.
+  - no Lane B coordination ledger is recorded in the repository or named by a peer (outside directories were not searched).
 - `docs/lanes.md:155` limits handoffs to a live owner. The E2E status peer declined, because it is busy with OmniRoute and the OpenHands PRs.
 
 ## Gate A plan (public part)
