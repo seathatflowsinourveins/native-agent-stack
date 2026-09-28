@@ -138,7 +138,14 @@ def evaluate_cost(total_cost_usd, num_turns) -> bool:
 
 
 def parse_claude_output(raw: str) -> dict:
-    """Parse either a captured stream-json event array or a plain-text /skill-doctor table.
+    """Parse a captured `--output-format json` result object or stream-json event array, or a
+    plain-text /skill-doctor table.
+
+    `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json"
+    (single result)), and with verbose mode on the message array, whose last 'result' element
+    find_result_event selects (the message anthropics/claude-agent-sdk-python@36f95486ee9f
+    src/claude_agent_sdk/_internal/message_parser.py:308 parses as the ResultMessage). An object
+    is read as a one-element array, so an object that is no result event is refused.
 
     Returns {"format", "rows", "total_cost_usd", "num_turns"} and, when the capture is refused
     or malformed, an "error" key with rows left empty. total_cost_usd/num_turns are None for a
@@ -149,13 +156,15 @@ def parse_claude_output(raw: str) -> dict:
     except json.JSONDecodeError:
         return {"format": "text", "rows": parse_skill_doctor_text(raw),
                 "total_cost_usd": None, "num_turns": None}
+    if isinstance(events, dict):
+        events = [events]
     if not isinstance(events, list):
         return {"format": "json", "rows": {}, "total_cost_usd": None, "num_turns": None,
-                "error": "expected a JSON array of stream-json events"}
+                "error": "expected a result object or a JSON array of stream-json events"}
     result_event = find_result_event(events)
     if result_event is None:
         return {"format": "json", "rows": {}, "total_cost_usd": None, "num_turns": None,
-                "error": "no result event in the JSON array"}
+                "error": "no result event in the JSON output"}
     total_cost_usd = result_event.get("total_cost_usd")
     num_turns = result_event.get("num_turns")
     if not evaluate_cost(total_cost_usd, num_turns):
@@ -1321,8 +1330,9 @@ def main(argv=None) -> int:
     claude_source = parser.add_mutually_exclusive_group()
     claude_source.add_argument("--claude-skill-doctor", type=Path, metavar="FILE",
                                 help="Parse a captured 'claude -p \"/skill-doctor\" --output-format "
-                                     "json' JSON array (its result event's 'result' text), or a "
-                                     "plain-text /skill-doctor table, from this file")
+                                     "json' result object or JSON array (its result event's "
+                                     "'result' text), or a plain-text /skill-doctor table, from "
+                                     "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
                                 help="Run 'claude -p \"/skill-doctor\" --output-format json' now "
                                      "(stdin from /dev/null); refused unless total_cost_usd == 0 "
