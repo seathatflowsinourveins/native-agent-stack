@@ -575,9 +575,8 @@ the evidence sentence is what remains.
 - Remove the builder's preload or its body line as well. This change leaves the preload unchanged; the
   [skills-trial record](2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule)
   decides the skill at its review with a with/without comparison on frozen builder tasks.
-- Follow the community setups that keep standing self-verify instructions. The change request's survey (not retained
-  or re-checked here) found them in six of 22 setups, including superpowers, this skill's source. Their number is not
-  evidence, and the primary sources above point the other way.
+- Follow the community setups that keep standing self-verify instructions, such as superpowers, this skill's source.
+  Their popularity is not evidence, and the primary sources above point the other way.
 
 **#381.** The carrier hash changes again. #381 freezes carrier and skill hashes at execution
 ([procedure, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)), so its run

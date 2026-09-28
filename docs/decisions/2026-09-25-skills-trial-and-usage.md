@@ -792,14 +792,17 @@ no agent preload.
 
 **Boundaries.** A host changes condition when `tools/adoption/install_claude_profile.py`
 installs a revision, not at its merge: the hook reads the block files installed beside it. The
-one install time this repository records is this workstation's C1 install at 08:26:32Z on
-2026-09-27, from `main` at `5f3a7c21`
+one install time this repository records is the C1 install that the coordinator reported for its
+local measurement: 08:26:32Z on 2026-09-27, from `main` at `5f3a7c21`
 ([measured-gap addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-measured-fetch-and-containment-gaps)).
 The review therefore reads each host's own install times, and it reports a window that crosses an
-unrecorded boundary as mixed rather than assigning it to a condition. `isolated-builder` has
-preloaded the skill under every condition since the
+unrecorded boundary as mixed rather than assigning it to a condition. A separate boundary lies
+inside C0: `isolated-builder` has preloaded the skill, and its body has named it, since
+[#376](https://github.com/seathatflowsinourveins/native-agent-stack/pull/376) (`623d34fa`, merged
+2026-09-27T03:38:47Z; the
 [targeted role preloads](#addendum-2026-09-26-targeted-role-preloads-security-reviewer-isolated-builder)
-addendum; this record does not establish whether `/skill-doctor` counts a preload as a use.
+addendum). On a host, that boundary is when `install_claude_profile.py` installed the agent
+definition. This record does not establish whether `/skill-doctor` counts a preload as a use.
 
 **Review rule, 2026-10-25.** The review splits each skill's uses by host and condition, within
 its listing state. For `verification-before-completion` (`trial`, `on`, preloaded by
