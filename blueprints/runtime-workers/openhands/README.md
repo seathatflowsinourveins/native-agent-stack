@@ -5,11 +5,19 @@ frozen SWE-bench task with two explicit gateway arms. SDK/server **1.49.6** owns
 the agent loop. **SWE-bench 4.1.0** alone supplies the task verdict through the
 pinned OpenHands/benchmarks converter and official Docker harness. This repair
 ran offline contract tests only. No installation, container, model, gateway
-request or official grading run was performed.
+request or official grading run was performed. The 2026-09-28 phase-1 repair
+added offline fixes and pulled the pinned image only to scan its digest. It
+started no container and made no model or gateway request
+([research.md](research.md#takeover-phase-1-corrections-2026-09-28)).
 
 **Host acceptance is still open.** A verified firewall is required before model
-execution. SDK trace, skill and version files remain worker-reported because the
-terminal shares the server's UID. They cannot establish independent acceptance;
+execution. The model's terminal runs under the server's UID, so it can write
+both `/run-output` and the server's persisted event store. Receipts therefore
+record trace, skill, MCP and version fields as `not_collected`, with the reason,
+instead of reading them from either place (SDK@fcc102a
+`openhands-tools/openhands/tools/terminal/terminal/subprocess_terminal.py:157-170`,
+`openhands-agent-server/openhands/agent_server/event_service.py:420-431`,
+`openhands-sdk/openhands/sdk/conversation/event_store.py:144-169,320-362`).
 `evidence_complete` deliberately stays false until an independent observer is
 qualified. A resolved official task therefore currently exits 2, not 0. This is
 an explicit acceptance gap, not a failed model task.
@@ -37,10 +45,33 @@ The source target at lines 570-576 has a
 different ENTRYPOINT. Do not assume the image contains the source-target venv.
 Request generation uses the separately installed SDK/tools wheels in the same
 image, with network disabled. [pins.json](pins.json) preserves the image, wheel
-and runtime lock hashes. No framework version changed in round 3. The runtime
-lock is a linux/amd64 security relock of the upstream export with four
-dependency upgrades, reproduced from the unchanged upstream workspace
-([research.md](research.md#runtime-lock-security-relock-2026-09-27)).
+and runtime lock hashes. No framework version changed in round 3.
+
+**The runtime-lock relock covers only the recipe venv.** requirements.lock is a
+linux/amd64 security relock of the upstream export with four dependency
+upgrades, reproduced from the unchanged upstream workspace
+([research.md](research.md#runtime-lock-security-relock-2026-09-27)). It builds
+the venv under the install prefix. That venv serializes the request, runs the
+`mcp_guard.py` hook and comes first on the server container's PATH. The server
+process itself is the image's PyInstaller binary
+`/usr/local/bin/openhands-agent-server`. Upstream builds it from its unchanged
+uv.lock with `uv sync --frozen` (SDK@fcc102a
+`openhands-agent-server/openhands/agent_server/docker/Dockerfile:129,139,146-158,583-590`).
+That lock, whose SHA256 is pins.json `uv_lock`, still pins anyio 4.11.0, click 8.1.8,
+pypdf 6.14.2 and soupsieve 2.8.4, the four versions the relock replaces.
+
+[agent-server-image-grype-20260928.json](evidence/agent-server-image-grype-20260928.json)
+records a grype 0.119.0 scan of the pinned linux/amd64 digest, with a database
+built 2026-09-28T06:42:30Z. It found 1,464 unique matches in 164 package
+versions: Critical 32, High 168, Medium 208, Low 57, Negligible 780 and
+Unknown 219. The flagged packages are Debian packages, openvscode-server npm
+modules and Node, Docker/containerd Go binaries and the base Python interpreter.
+The cataloger does not unpack the PyInstaller archive, so the scan neither
+confirms nor excludes the four lock versions inside the binary. The receipt
+lists grype's advisories for those exact versions as lock evidence. On this
+host's containerd image store, `docker image inspect` reports the index digest
+as the image ID, so the receipt verifies the platform manifest and config
+digests instead.
 
 [install.sh](install.sh) installs the worker through the existing hash-required
 wheel/runtime locks and preinstalled hashed build tools. The install container
@@ -129,6 +160,14 @@ Set these private inputs outside all worktrees:
 - `OPENHANDS_GRADER_IMAGE_FILE`, `OPENHANDS_GRADER_IMAGE_SHA256`: frozen image pin.
 - `OPENHANDS_SERVER_ENV`: mode-0600 file containing only this attempt's
   `OH_SESSION_API_KEYS_0` setting. No shared service/provider secrets.
+  Preflight refuses the attempt unless a `OH_SESSION_API_KEYS_0=` line names
+  that variable. It parses Docker's env-file syntax for the name only and never
+  extracts, prints or logs the value (docker/cli@v29.8.1
+  `pkg/kvfile/kvfile.go:92-124`). A bare name, which Docker would fill from the
+  caller's environment, is refused. The server listens on every container
+  interface only when a session key is set (SDK@fcc102a
+  `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
+  `config.py:24`).
 - `OPENHANDS_HEADERS`: mode-0600 file containing the corresponding
   `X-Session-API-Key` header. Commands use curl's `-H @file`; no inline key.
 
@@ -140,6 +179,13 @@ rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" prepare \
   --state "$HOME/.local/state/native-agent-stack/runtime-workers/openhands" \
   --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
 ```
+
+`--port` selects the published loopback port. It must be an integer in
+3730..3799, the range PR #428's crawl4ai recipe enforces (`host.py:44-45` at
+3ad8ba2), and defaults to 3730 for this SWE-bench worker. The resolver uses
+3740 (`--port 3740`). Preparation records the port in the host-owned
+`status.json`; `dispatch.py` has no port flag, reads it from there and checks
+the range again before any request.
 
 The workflow child runs exactly these three Bash commands after preparation:
 
@@ -161,9 +207,12 @@ $HOME/.local/state/native-agent-stack/runtime-workers/openhands/runs/<run-id>/<a
 ```
 
 The adapter uses curl to call these exact upstream routes on
-`http://127.0.0.1:3730`: POST `/api/conversations`, GET
+`http://127.0.0.1:<port>`: POST `/api/conversations`, GET
 `/api/conversations/<uuid>`, then GET
-`/api/conversations/<uuid>/agent_final_response`. Start is asynchronous. The
+`/api/conversations/<uuid>/agent_final_response`. After an `error` status it
+also calls GET `/api/conversations/<uuid>/events/search` with
+`kind=openhands.sdk.event.conversation_error.ConversationErrorEvent`,
+`sort_order=TIMESTAMP_DESC` and `limit=1`. Start is asynchronous. The
 native SDK constructs `StartConversationRequest` and calls
 `model_dump(exclude_defaults=True, mode="json", context={"expose_secrets": True})`;
 only the fixed keyless gateway placeholder is exposed. It includes workspace,
@@ -181,12 +230,27 @@ removal, then exports the candidate patch and invokes official grading.
 A native final message alone is never a task verdict. Sources: SDK@fcc102a
 `conversation_router.py:304-321`; SWE-bench@v4.1.0 `reporting.py:127-157`.
 
+An agent-limit end still grades its partial patch. The SDK ends a detected loop
+with status `stuck`. An exhausted iteration budget ends with status `error` and
+a `ConversationErrorEvent` whose source is `environment` and code is
+`MaxIterationsReached` (SDK@fcc102a `openhands-sdk/openhands/sdk/conversation/state.py:48-79`,
+`conversation/impl/local_conversation.py:727-733,753-755,2021-2043,2339-2360`,
+`event/conversation_error.py:11-42`). For `error`, result reads the newest error
+event through the native search route while the server still runs
+(`openhands-agent-server/openhands/agent_server/event_router.py:68-139`,
+`event_service.py:456-460`, `models.py:95-99`). Only exactly that kind, source
+and code counts as `max_iterations_reached`; any other error stays ungraded and
+exits 3. The receipt records `agent_termination`, and an agent-limit end exits 1
+even when its partial patch resolves the task. The event store is writable by
+the model's UID, so this server-reported value only chooses between exit 1 and 3
+and can never produce a pass.
+
 | Final exit code | Meaning |
 | --- | --- |
 | 0 | Official task resolved and all required evidence complete |
-| 1 | Official unresolved or empty-patch verdict |
-| 2 | Incomplete evidence, including a resolved task with untrusted trace evidence |
-| 3 | Setup/infrastructure failure, deadline, grading error/incomplete bucket, or transport failure |
+| 1 | Official unresolved or empty-patch verdict, or an officially graded partial patch after `stuck` or `max_iterations_reached` |
+| 2 | Incomplete evidence, including a resolved task whose trace evidence is `not_collected` |
+| 3 | Setup/infrastructure failure, other native error, deadline, grading error/incomplete bucket, or transport failure |
 
 Preparation/start/wait exit 0 means that operation succeeded, not that the task
 passed. Duplicate starts do not resubmit a native POST. Retrying a collected
@@ -195,8 +259,9 @@ serializes dispatches from this recipe. It does not exclude unrelated gateway
 clients. Interrupted attempts retain their files; cleanup removes named owned
 containers only, never uses prune, and records whether removal was confirmed.
 The coordinator must reclaim a stale reservation only after confirming its
-recorded container is gone. Port 3730 must be available; another recipe using
-that port must be stopped before this one is prepared.
+recorded container is gone. The selected port must be available. PR #428's
+crawl4ai recipe defaults to 3730, 3731, 3732 and 3734 (its README at 3ad8ba2);
+stop it or choose another port in the range before preparing this recipe.
 
 Invocation counts use existing pipelines: on Claude, child usage and OTel Bash
 events whose command contains `dispatch.py`, the `start` subcommand and
@@ -306,19 +371,32 @@ For engines-on only the endpoint changes to port 20129. This schema is an
 operator evidence gate, not a firewall implementation or proof by itself. Keep
 the actual rule dump and probe outputs privately; reject access to the other
 arm, ai-memory, Qdrant, embedder and other worker listeners before any model run.
-Docker was not found on this repair sandbox's PATH, so rootless rule placement,
-packet behavior and post-restart policy persistence remain unverified. This is
-a host setup gate, not an instruction to accept loopback exposure. Official
-grader containers retain upstream options; the coordinator must separately
-qualify their host-service isolation without misrepresenting altered test
-conditions as an unchanged environment.
 
-Every authoritative status/window/verdict file is outside model mounts. Files
-read from worker output use bounded regular-file reads with O_NOFOLLOW on every
-path component, and are labelled worker-reported. The remaining shared-UID
-trace limitation is explicit at the top of this document; counterfeit events
-cannot cause `evidence_complete=true`. This round does not invent an isolation
-mechanism unsupported by the pin.
+Host loopback is already reachable from containers on the reference host, so
+nothing needs to be switched on for the gateway. Its rootless `docker.service`
+sets `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, and the running
+rootlesskit has no `--disable-host-loopback` flag (read-only checks,
+2026-09-28). The earlier finding F19, that loopback access still had to be
+enabled, is **overturned** for that host. The upstream default does disable it
+(moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`, identical to
+the installed 29.8.1 script), so a new host must set the variable to `false`
+and repeat both checks. With that setting, a model container can address
+every host loopback listener through 10.0.2.2 unless the egress policy above
+blocks it; the missing piece is that limit, not loopback access. No packet probe
+was run in this repair. Rule placement in the rootless network namespace, packet
+behavior and post-restart policy persistence remain unverified. Official grader
+containers retain upstream
+options; the coordinator must separately qualify their host-service isolation
+without misrepresenting altered test conditions as an unchanged environment.
+
+Every authoritative status/window/verdict file is outside model mounts.
+Receipt creation reads nothing from the worker output or the server state
+directory; fields that would need them are `not_collected`. The only file the
+host reads back from worker output is the serialized request, copied with a
+bounded regular-file read (O_NOFOLLOW on every path component) before any model
+runs. The server-reported agent-limit classification can never produce a pass,
+and nothing can cause `evidence_complete=true`. This round does not invent an
+isolation mechanism unsupported by the pin.
 
 ## Official grading and remaining host gates
 

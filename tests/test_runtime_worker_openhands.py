@@ -355,6 +355,50 @@ class OpenHandsRecipeTests(unittest.TestCase):
         self.assertIn("/state/mcp/serena/projects/$projectFolderName", native)
         self.assertNotIn("$projectDir/.serena", native)
 
+    def test_round1_orphans_are_not_shipped(self):
+        # F20: `git grep -F` at 45d40f6c found no reference to these round-1
+        # files outside evidence logs and manifests/evidence.json.
+        for relative in ("config/skills.lock.json", "e2e/frozen.json", "e2e/task.txt",
+                         "e2e/fixture-repo/README.md", "e2e/fixture-repo/range_utils.py",
+                         "e2e/fixture-repo/tests/test_ranges.py", "e2e/fixture-repo"):
+            with self.subTest(path=relative):
+                self.assertFalse(os.path.lexists(RECIPE / relative))
+
+    def test_agent_server_image_scan_receipt_matches_the_pinned_digest(self):
+        # F18: the relock covers only the recipe venv. The image's server binary
+        # is built from upstream's unchanged uv.lock, so the digest is scanned.
+        from scripts.validate import PRIVATE_CONTENT
+        name = "evidence/agent-server-image-grype-20260928.json"
+        all_pins = self.read_json("pins.json")
+        pins = all_pins["image"]
+        receipt = self.read_json(name)
+        keys = ("ref", "platform", "manifest_sha256", "config_sha256")
+        self.assertEqual({k: receipt["image"][k] for k in keys}, {k: pins[k] for k in keys})
+        # A containerd image store reports the index digest as .Id, so identity
+        # rests on the platform descriptor and the cataloged config bytes.
+        identity = receipt["image"]["identity"]
+        self.assertIn(pins["ref"], identity["daemon_repo_digests"])
+        self.assertEqual(identity["daemon_platform_descriptor_digest"], "sha256:" + pins["manifest_sha256"])
+        self.assertEqual(identity["cataloged_image_id"], "sha256:" + pins["config_sha256"])
+        self.assertEqual(identity["cataloged_config_sha256"], pins["config_sha256"])
+        self.assertEqual({k: receipt["scanner"][k] for k in ("name", "version", "repository")},
+                         {"name": "grype", "version": "0.119.0", "repository": "https://github.com/anchore/grype"})
+        self.assertRegex(receipt["database"]["built"], r"^\d{4}-\d{2}-\d{2}T")
+        counts = receipt["counts"]
+        self.assertEqual(set(counts["by_severity"]), {"Critical", "High", "Medium", "Low", "Negligible", "Unknown"})
+        self.assertEqual(sum(counts["by_severity"].values()), counts["total"])
+        self.assertEqual(sum(sum(p["by_severity"].values()) for p in receipt["flagged_packages"]), counts["total"])
+        self.assertEqual(len(receipt["flagged_packages"]), counts["flagged_packages"])
+        self.assertEqual(receipt["upstream_lock"]["sha256"], all_pins["uv_lock"]["sha256"])
+        self.assertEqual({p["name"]: p["version"] for p in receipt["upstream_lock_flagged"]},
+                         {"anyio": "4.11.0", "click": "8.1.8", "pypdf": "6.14.2", "soupsieve": "2.8.4"})
+        # The PyInstaller archive is opaque to the cataloger: lock evidence, not an image observation.
+        self.assertTrue(all(p["observed_by_cataloger"] is False for p in receipt["upstream_lock_flagged"]))
+        text = json.dumps(receipt)
+        for description, pattern in PRIVATE_CONTENT:
+            self.assertIsNone(pattern.search(text), description)
+        self.assertIn(name, (RECIPE / "README.md").read_text())
+
 
 class OpenHandsUpstreamAdapterTests(unittest.TestCase):
     """Synthetic transport controls from SWE-bench 4.1.0 reporting.py.
@@ -508,11 +552,17 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.load_task(path, hashlib.sha256(path.read_bytes()).hexdigest())
 
+    def absent_gateway_receipt(self):
+        # Never open a live gateway database from a unit test.
+        receipts = load_recipe_module("receipt.py")
+        return lambda result: receipts.create_receipt(result, database=result / "absent.sqlite")
+
     def test_preflight_failure_still_has_status_receipt_and_setup_exit(self):
         host = load_recipe_module("host.py")
         output = io.StringIO()
         run_id = "rw-openhands-fixture"
         with patch.object(host, "preflight", side_effect=ValueError("synthetic_setup_failure")), \
+                patch.object(host, "create_receipt", side_effect=self.absent_gateway_receipt()), \
                 contextlib.redirect_stdout(output):
             code = host.run(self.result / "prefix", self.result, run_id=run_id, arm="engines-on")
         self.assertEqual(code, 3)
@@ -531,6 +581,97 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
                                  ({"upstream_grader": {"upstream_resolved": False, "upstream_bucket": "unresolved_ids", "grader_exit_code": 124}}, 3),
                                  ({"failure_stage": "preflight"}, 3)):
             self.assertEqual(host.result_exit(result), expected)
+
+    def test_agent_limit_terminations_are_graded_but_never_success(self):
+        # F16: an officially graded partial patch after an agent limit exits 1;
+        # grading infrastructure failures keep exit 3.
+        host = load_recipe_module("host.py")
+        graded = {"grader_exit_code": 0, "conversion_exit_code": 0}
+        for termination in ("stuck", "max_iterations_reached"):
+            for verdict, expected in (({"upstream_resolved": True, "upstream_bucket": "resolved_ids", **graded}, 1),
+                                      ({"upstream_resolved": False, "upstream_bucket": "unresolved_ids", **graded}, 1),
+                                      ({"upstream_resolved": False, "upstream_bucket": "empty_patch_ids", **graded}, 1),
+                                      ({"upstream_resolved": False, "upstream_bucket": "error_ids", **graded}, 3),
+                                      ({"upstream_resolved": None, "grader_exit_code": 124}, 3)):
+                with self.subTest(termination=termination, verdict=verdict):
+                    self.assertEqual(host.result_exit({
+                        "agent_termination": termination, "failure_stage": None, "task_passed": False,
+                        "evidence_complete": False, "upstream_grader": verdict}), expected)
+
+    def test_session_key_preflight_checks_the_variable_name_only(self):
+        # SDK@fcc102a agent_server/__main__.py:282-285 binds all interfaces only
+        # with a session key; config.py:24 names OH_SESSION_API_KEYS_0. File
+        # format: docker/cli@v29.8.1 pkg/kvfile/kvfile.go:92-124.
+        host = load_recipe_module("host.py")
+        name = "OH_SESSION_API_KEYS_0"
+        marker = "-".join(("synthetic", "fixture", "marker"))
+        env = self.result / "server.env"
+        for text, accepted in ((f"{name}={marker}\n", True),
+                               (f"\N{BYTE ORDER MARK} \t{name}={marker}\r\n", True),
+                               (f"OTHER_NAME=1\n{name}={marker}", True),
+                               (f"# {name}={marker}\n", False),
+                               (f"{name}\n", False),
+                               (f"{name}_1={marker}\n", False),
+                               (f" {name} ={marker}\n", False),
+                               (f"OTHER_NAME={marker}\x0c{name}={marker}\n", False),
+                               ("", False)):
+            with self.subTest(text=text.replace(marker, "<marker>")):
+                env.write_text(text)
+                env.chmod(0o600)
+                with patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": str(env)}):
+                    if accepted:
+                        self.assertEqual(host.check_server_env(), env)
+                        continue
+                    with self.assertRaises(ValueError) as caught:
+                        host.check_server_env()
+                self.assertNotIn(marker, str(caught.exception))
+        env.write_text(f"{name}={marker}\n")
+        env.chmod(0o644)
+        with patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": str(env)}), self.assertRaises(ValueError):
+            host.check_server_env()
+        with patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": ""}), self.assertRaises(ValueError):
+            host.check_server_env()
+
+    def test_missing_session_key_name_stops_preflight_without_exposing_values(self):
+        host = load_recipe_module("host.py")
+        marker = "-".join(("synthetic", "fixture", "marker"))
+        env = self.result / "server.env"
+        env.write_text(f"OTHER_NAME={marker}\n")
+        env.chmod(0o600)
+        output = io.StringIO()
+        with patch.object(host, "preflight", return_value=({}, {}, {})), \
+                patch.object(host, "read_json") as read_json, \
+                patch.object(host, "create_receipt", side_effect=self.absent_gateway_receipt()), \
+                patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": str(env)}), contextlib.redirect_stdout(output):
+            code = host.run(self.result / "prefix", self.result, run_id="rw-openhands-fixture", arm="control")
+        self.assertEqual(code, 3)
+        read_json.assert_not_called()  # Stopped before the installation record.
+        path = self.result / "runs/rw-openhands-fixture/control"
+        self.assertEqual(json.loads(output.getvalue())["failure_stage"], "preflight")
+        self.assertEqual(json.loads((path / "window.json").read_text())["failure_type"], "ValueError")
+        for text in (output.getvalue(), *(p.read_text() for p in path.glob("*.json"))):
+            self.assertNotIn(marker, text)
+
+    def test_port_outside_owned_range_fails_in_preflight(self):
+        # PR #428 crawl4ai host.py:44-45: exact int (bool refused) in 3730..3799.
+        host = load_recipe_module("host.py")
+        self.assertEqual(host.DEFAULT_PORT, 3730)
+        for port in (3730, 3740, 3799):
+            self.assertEqual(host.owned_port(port), port)
+        self.assertEqual(host.cli_port("3740"), 3740)
+        for index, port in enumerate((3729, 3800, True, 3740.0, "3740", None, host.cli_port("37x0"))):
+            with self.subTest(port=port):
+                with self.assertRaises(ValueError):
+                    host.owned_port(port)
+                output = io.StringIO()
+                with patch.object(host, "preflight") as preflight, \
+                        patch.object(host, "create_receipt", side_effect=self.absent_gateway_receipt()), \
+                        contextlib.redirect_stdout(output):
+                    code = host.run(self.result / "prefix", self.result, run_id=f"rw-openhands-port-{index}",
+                                    arm="control", port=port)
+                self.assertEqual(code, 3)
+                self.assertEqual(json.loads(output.getvalue())["failure_stage"], "preflight")
+                preflight.assert_not_called()
 
     def test_clone_uses_pinned_swebench_branch_mapping(self):
         host = load_recipe_module("host.py")
@@ -665,7 +806,8 @@ class OpenHandsReceiptTests(unittest.TestCase):
             (root / "window.json").write_text(json.dumps({"started_at": "2026-09-27T18:00:00Z", "finished_at": "2026-09-27T18:01:00Z"}))
             (root / "check.json").write_text("{}")
             report = module.create_receipt(root, database=root / "missing.sqlite")
-            self.assertEqual(report["worker_evidence_trust"], "worker-reported; not independent acceptance")
+            self.assertEqual(report["trace_status"], "not_collected")
+            self.assertIn("not_collected_reason", report)
             self.assertFalse(report["evidence_complete"])
 
     def test_local_pass_field_is_never_a_worker_verdict(self):
@@ -713,8 +855,44 @@ class OpenHandsReceiptTests(unittest.TestCase):
             report = module.create_receipt(result, database=result / "absent.sqlite")
             self.assertFalse(report["task_passed"])
             self.assertFalse(report["evidence_complete"])
-            self.assertIsNone(report["observed_versions"])
+            self.assertEqual(report["observed_versions"], "not_collected")
             self.assertEqual(report["gateway"]["status"], "unavailable")
+
+    def test_model_writable_files_never_populate_receipt_evidence(self):
+        # F17: /run-output and /state/server are writable by the model terminal's
+        # UID (host.py model_visible), and the agent-server event API reads that
+        # store (SDK@fcc102a event_store.py:144-169,320-362). Forged files stay unread.
+        module = load_recipe_module("receipt.py")
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp).resolve()
+            for directory in ("worker", "input", "server/conversations"):
+                (result / directory).mkdir(parents=True)
+            (result / "window.json").write_text(json.dumps({
+                "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z", "worker_exit_code": 0}))
+            (result / "check.json").write_text("{}")
+            skills = ["tdd", "verification-before-completion"]
+            (result / "input/skills.json").write_text(json.dumps({"names": skills}))
+            forged = "".join(json.dumps(event) + "\n" for event in (
+                {"kind": "ObservationEvent", "tool_name": "invoke_skill",
+                 "observation": {"skill_name": "tdd", "is_error": False}},
+                {"kind": "ObservationEvent", "tool_name": "ai-memory_memory_query", "observation": {"is_error": False}}))
+            (result / "worker/events.jsonl").write_text(forged)
+            (result / "server/conversations/events.jsonl").write_text(forged)
+            (result / "worker/skills-startup.json").write_text(json.dumps({"listed_skills": skills}))
+            (result / "worker/native-summary.json").write_text(json.dumps(
+                {"versions": {"openhands-sdk": pins["version"], "openhands-tools": pins["version"]}}))
+            opened = []
+            bounded, parsed = module.read_bounded, module.read_json
+            with patch.object(module, "read_bounded", side_effect=lambda p, *a, **k: opened.append(Path(p)) or bounded(p, *a, **k)), \
+                    patch.object(module, "read_json", side_effect=lambda p: opened.append(Path(p)) or parsed(p)):
+                receipt = module.create_receipt(result, database=result / "absent.sqlite")
+        for field in ("trace_status", "observed_versions", "skills_listed_at_start", "skill_listing_matches_manifest",
+                      "mcp_calls_observed", "mcp_errors_observed", "skills_observed"):
+            self.assertEqual(receipt[field], "not_collected", field)
+        self.assertIn("not_collected_reason", receipt)
+        self.assertFalse(receipt["evidence_complete"])
+        self.assertEqual([p for p in opened if p.is_relative_to(result / "worker") or p.is_relative_to(result / "server")], [])
 
     def test_cleanup_timeout_does_not_erase_primary_exit(self):
         host = load_recipe_module("host.py")
@@ -953,6 +1131,124 @@ class OpenHandsDispatchTests(unittest.TestCase):
         self.assertEqual(command.call_args.kwargs["env"]["GIT_CONFIG_NOSYSTEM"], "1")
         self.assertIn("--no-ext-diff", diff.call_args.args[0])
         self.assertIn("--no-textconv", diff.call_args.args[0])
+
+    # SDK@fcc102a local_conversation.py:2021-2043,2339-2360 emit this event;
+    # utils/models.py:202-205 serializes kind as the class name.
+    LIMIT_EVENT = {"kind": "ConversationErrorEvent", "source": "environment", "code": "MaxIterationsReached",
+                   "detail": "Agent reached maximum iterations limit (40)."}
+    ERROR_SEARCH = ("/events/search?kind=openhands.sdk.event.conversation_error.ConversationErrorEvent"
+                    "&sort_order=TIMESTAMP_DESC&limit=1")
+
+    def terminal_attempt(self, execution):
+        (self.result / "status.json").write_text(json.dumps({
+            "status": "terminal", "execution_status": execution, "conversation_id": FIXTURE_CONVERSATION_ID,
+            "server_name": "rw-openhands-fixture-engines-on-server"}))
+        (self.result / "window.json").write_text(json.dumps({
+            "arm": self.arm, "run_id": self.run_id, "instance_id": "django__django-11333",
+            "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
+        (self.result / "task-identity.json").write_text(json.dumps({"instance_id": "django__django-11333", "base_commit": "a" * 40}))
+        (self.result / "dataset.json").write_text("[]")
+
+    @staticmethod
+    def synthetic_report(bucket):
+        """Writes a SWE-bench 4.1.0 schema-2 report fixture; no grader runs."""
+        def grade(prefix, result, dataset, instance_id, run_id):
+            report = {key: [] for key in ("resolved_ids", "unresolved_ids", "error_ids", "empty_patch_ids", "incomplete_ids")}
+            report.update({"schema_version": 2, "submitted_ids": [instance_id], bucket: [instance_id]})
+            (result / ("OpenHands." + run_id + ".json")).write_text(json.dumps(report))
+            return {"upstream_resolved": bucket == "resolved_ids", "grader_exit_code": 0, "conversion_exit_code": 0}
+        return grade
+
+    def collect(self, dispatch, replies, grader=None):
+        receipts = load_recipe_module("receipt.py")
+        with patch.object(dispatch, "api_request", side_effect=replies) as api, \
+                patch.object(dispatch, "stop_server", return_value=True), \
+                patch.object(dispatch, "logged_command", return_value=0), \
+                patch.object(dispatch.subprocess, "check_output", return_value=""), \
+                patch.object(dispatch, "grade", side_effect=grader) as grade, \
+                patch.object(dispatch, "create_receipt",
+                             side_effect=lambda result: receipts.create_receipt(result, database=result / "absent.sqlite")), \
+                contextlib.redirect_stdout(io.StringIO()):
+            code = dispatch.execute("result", self.state, self.run_id, self.arm)
+        return code, api, grade, json.loads((self.result / "receipt.json").read_text())
+
+    def test_agent_limit_terminations_grade_the_partial_patch_and_exit_1(self):
+        # F16. SDK@fcc102a conversation/state.py:48-79 terminal statuses;
+        # local_conversation.py:753-755 sets STUCK; :2021-2043 and :2339-2360
+        # set ERROR plus ConversationErrorEvent code "MaxIterationsReached".
+        dispatch = load_recipe_module("dispatch.py")
+        final, limit = {"response": ""}, {"items": [self.LIMIT_EVENT], "next_page_id": None}
+        for execution, replies, bucket, termination in (
+                ("stuck", [final], "unresolved_ids", "stuck"),
+                ("error", [final, limit], "empty_patch_ids", "max_iterations_reached"),
+                ("error", [final, limit], "resolved_ids", "max_iterations_reached")):
+            with self.subTest(execution=execution, bucket=bucket):
+                self.terminal_attempt(execution)
+                code, api, grade, receipt = self.collect(dispatch, replies, self.synthetic_report(bucket))
+                self.assertEqual(code, 1)
+                grade.assert_called_once()
+                self.assertEqual(receipt["agent_termination"], termination)
+                self.assertIsNone(receipt["failure_stage"])
+                self.assertFalse(receipt["task_passed"])
+                self.assertEqual(receipt["upstream_grader"]["upstream_bucket"], bucket)
+                self.assertEqual(api.call_count, len(replies))
+                if execution == "error":
+                    self.assertEqual(api.call_args.args[:2],
+                                     ("GET", f"/api/conversations/{FIXTURE_CONVERSATION_ID}{self.ERROR_SEARCH}"))
+
+    def test_other_native_errors_stay_ungraded_infrastructure_failures(self):
+        # SDK@fcc102a local_conversation.py:2044-2057 emits LLMAuthenticationError.
+        dispatch = load_recipe_module("dispatch.py")
+        other = dict(self.LIMIT_EVENT, code="LLMAuthenticationError")
+        for page in ({"items": [other], "next_page_id": None}, {"items": [], "next_page_id": None},
+                     {"items": [dict(self.LIMIT_EVENT, source="agent")]},
+                     {"items": [dict(self.LIMIT_EVENT, kind="MessageEvent")]},
+                     {"items": [self.LIMIT_EVENT, self.LIMIT_EVENT]}, [self.LIMIT_EVENT]):
+            with self.subTest(page=page):
+                self.terminal_attempt("error")
+                code, _, grade, receipt = self.collect(dispatch, [{"response": ""}, page])
+                self.assertEqual(code, 3)
+                grade.assert_not_called()
+                self.assertEqual(receipt["failure_stage"], "agent")
+                self.assertEqual(receipt["agent_termination"], "error")
+
+    def test_selected_port_flows_from_prepare_to_dispatch(self):
+        host = load_recipe_module("host.py")
+        dispatch = load_recipe_module("dispatch.py")
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        (self.result / "worker").mkdir()
+
+        def rendered(args, name, log, timeout):
+            (self.result / "worker/start.json").write_text(json.dumps({"agent": {"llm": {}}, "workspace": {}, "initial_message": {}}))
+            return 0
+
+        with patch.dict(sys.modules, {"dispatch": dispatch}), \
+                patch.object(host, "execute_container", side_effect=rendered), \
+                patch.object(host, "logged_command", return_value=0) as launch, \
+                patch.object(dispatch, "private_file", side_effect=lambda x: Path(x)), \
+                patch.object(dispatch, "check_server", return_value=None) as check, \
+                patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": "/private/server.env", "OPENHANDS_HEADERS": "/private/headers"}):
+            host.prepare_native_dispatch(self.result, self.state / "prefix", pins, [], "rw-openhands-egress-engines-on",
+                                         {"variables": {"HOST_PATH": "/usr/bin"}},
+                                         load_recipe_module("recipe.py").arm_config(self.arm), self.run_id, port=3740)
+        self.assertIn("127.0.0.1:3740:8000", launch.call_args.args[0])
+        self.assertNotIn("127.0.0.1:3730:8000", launch.call_args.args[0])
+        self.assertEqual(check.call_args.kwargs["port"], 3740)
+        self.assertEqual(json.loads((self.result / "status.json").read_text())["port"], 3740)
+        (self.result / "window.json").write_text(json.dumps({"arm": self.arm, "run_id": self.run_id}))
+        with patch.object(dispatch, "api_request", return_value={"id": FIXTURE_CONVERSATION_ID}) as api, \
+                patch.object(dispatch, "compression_snapshot", return_value=None), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(dispatch.execute("start", self.state, self.run_id, self.arm), 0)
+        self.assertEqual(api.call_args.kwargs["port"], 3740)
+        status = json.loads((self.result / "status.json").read_text())
+        (self.result / "status.json").write_text(json.dumps({**status, "port": 8000}))
+        with patch.object(dispatch, "api_request") as api, patch.object(dispatch, "stop_server"), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(dispatch.execute("wait", self.state, self.run_id, self.arm), 3)
+        api.assert_not_called()
+        args = dispatch.server_command(pins, "rw-openhands-fixture-server", [], "rw-openhands-egress-control",
+                                       "/private/server.env")
+        self.assertIn("127.0.0.1:3730:8000", args)
 
 
 if __name__ == "__main__":

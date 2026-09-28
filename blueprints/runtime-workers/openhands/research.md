@@ -238,6 +238,14 @@ cryptography needs no upgrade: the restriction leaves only upstream's linux
 [evidence/relock-2026-09-27.txt](evidence/relock-2026-09-27.txt); its section F
 holds the final lock.
 
+Scope, corrected 2026-09-28 (F18): this relock changes only the recipe venv
+under the install prefix. The image's server binary is a PyInstaller build from
+upstream's unchanged uv.lock, which still pins anyio 4.11.0, click 8.1.8, pypdf
+6.14.2 and soupsieve 2.8.4 (SDK@fcc102a
+`openhands-agent-server/openhands/agent_server/docker/Dockerfile:129,139,146-158,583-590`).
+[evidence/agent-server-image-grype-20260928.json](evidence/agent-server-image-grype-20260928.json)
+records the digest scan and its limits.
+
 The installed uv 0.12.17 reproduced the previous lock byte for byte in the
 unchanged upstream workspace, whose uv.lock matches the pinned SHA256:
 
@@ -349,3 +357,32 @@ arm64 image.
 | `UV_NO_CONFIG=1` also stops `uv lock` from reading the workspace pyproject.toml. Installed help: "Avoid discovering configuration files (`pyproject.toml`, `uv.toml`)". The first relock printed `Resolving despite existing lockfile due to removal of global exclude newer` and chose soupsieve 2.10 from inside the seven-day window. | Relock without it so `[tool.uv]` applies; `uv lock --check` on the unchanged workspace exits 0. Keep UV_NO_CONFIG=1 only for the `uv pip install` steps, as install-container.sh does. |
 | In the universal resolution, `--upgrade-package cryptography` collapsed the marker-split fork to the constrained 48.0.1. | Read every `Updated` and `Removed` line before accepting a relock. Resolve only the recipe's install environment with `environments` instead of deleting an upstream constraint, and classify every removed or re-marked line. |
 | The coordinator's decision to keep cryptography at 50.0.0 reached the relock builder after it had relocked five packages from an earlier instruction (evidence section C). | A decision that changes a brief goes out as one message naming what it replaces. The final lock was reproduced from the unchanged workspace before commit (evidence section F). |
+
+## Takeover phase 1 corrections (2026-09-28)
+
+These are offline repairs on the round-3 head 45d40f6c. The network and
+isolation design (egress policy, arm endpoints, MCP endpoints) is phase 2 and is
+unchanged here. Red and green unit runs are in
+[evidence/phase1-commands.json](evidence/phase1-commands.json). SDK sources are
+at fcc102a; paths are abbreviated below and given in full in README.md.
+
+| Finding | Correction and source |
+| --- | --- |
+| F16: a run that ended `stuck` or at the iteration limit skipped grading and exited 3. | Status `stuck`, or status `error` whose newest `ConversationErrorEvent` has source `environment` and code `MaxIterationsReached`, now exports and officially grades the partial patch and exits 1, never 0. Sources: `state.py:48-79`, `local_conversation.py:727-733,753-755,2021-2043,2339-2360`, `conversation_error.py:11-42`, `event_router.py:68-139`, `event_service.py:456-460`, `models.py:95-99`. Any other error stays ungraded with exit 3. |
+| F17: receipt trace, skill, MCP and version fields were read from `/run-output`, which the model can write. | The REST event store is not an independent source either: the terminal runs under the server's UID (`subprocess_terminal.py:157-170`), and the server reads persisted events from files it re-indexes from disk (`event_service.py:420-431`, `event_store.py:144-169,320-362`). Those fields are now `not_collected` with the reason (receipt schema 4). The server-reported agent-limit value only selects exit 1 or 3. |
+| F18: the README implied the relock covered the image. | The relock covers only the recipe venv; see the scope note in the relock section. [The digest scan receipt](evidence/agent-server-image-grype-20260928.json) records grype 0.119.0 counts and the cataloger's PyInstaller boundary. |
+| F19: host loopback access still had to be enabled for the gateway. | **Overturned** for the reference host by read-only checks on 2026-09-28: its rootless `docker.service` sets `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, and the running rootlesskit has no `--disable-host-loopback` flag. The upstream default is still to disable it (moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`, identical to the installed 29.8.1 script), so a new host repeats both checks. The open item is the egress limit (phase 2). |
+| F20: round-1 files were no longer used. | `git grep` at 45d40f6c found no reference outside evidence logs and manifests/evidence.json. Removed config/skills.lock.json, e2e/frozen.json, e2e/task.txt and e2e/fixture-repo/. |
+| The server env file was not checked for the session key. Without one the server binds only its container loopback (`__main__.py:282-285`, `config.py:24`). | Preflight parses the file's variable names with Docker's env-file rules (docker/cli@v29.8.1 `pkg/kvfile/kvfile.go:92-124`) and requires `OH_SESSION_API_KEYS_0`. Values are never extracted, printed or logged. |
+| The published port was fixed at 3730, which PR #428's crawl4ai recipe also uses by default. | `--port` accepts integers in 3730..3799, as PR #428's `host.py:44-45` does at 3ad8ba2. The default stays 3730 and the resolver uses 3740. The port is stored in status.json and checked again by dispatch. |
+
+Open findings from this phase, not changed here:
+
+- `install()` compares `docker image inspect` `.Id` with the config digest
+  (host.py:419-421). The reference host's containerd image store reports the
+  index digest as `.Id` (see the scan receipt), so `install()` there would raise
+  `image_configuration_hash_mismatch`. This is inferred from the code and the
+  observed `.Id`; installation was not run.
+- The module-qualified event kind string is source-reviewed only. If the live
+  server used a different kind, the agent-limit check would fail closed to
+  exit 3.

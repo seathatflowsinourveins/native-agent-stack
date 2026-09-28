@@ -1,15 +1,15 @@
-"""Sanitized evidence from native SDK events, independent check and gateway rows.
+"""Sanitized evidence from the official grader report, host files and gateway rows.
 
 Uses Python's sqlite3 URI mode=ro + query_only. The only SQL SELECT reads the
 authorized usage/effort columns from call_logs. Correlation IDs may be used
-in memory for matching, but are never returned in receipts.
+in memory for matching, but are never returned in receipts. SDK trace, skill,
+MCP and version fields are not_collected (NOT_COLLECTED_REASON).
 """
 
 from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
-import json
 import os
 from pathlib import Path
 import re
@@ -25,6 +25,15 @@ COLUMNS = (
     "reasoning_effort_upstream", "tokens_in", "tokens_cache_read", "tokens_reasoning", "correlation_id",
 )
 EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max", "auto"}
+AGENT_TERMINATIONS = {"finished", "error", "stuck", "max_iterations_reached"}
+NOT_COLLECTED = "not_collected"
+NOT_COLLECTED_REASON = (
+    "The model terminal runs under the agent-server's UID, which can write both /run-output "
+    "(host.py model_visible on the worker directory) and the server persistence mounted at "
+    "/state/server. The server's event API reads that same store and rebuilds its index from "
+    "disk (SDK@fcc102a event_service.py:420-431, event_store.py:144-169,320-362). No event "
+    "source outside the model's write reach exists yet, so trace, skill, MCP and version "
+    "fields are not read.")
 
 
 def read_bounded(path, limit=4 * 1024 * 1024):
@@ -164,15 +173,7 @@ def create_receipt(result, database=None):
     result = Path(result)
     window = read_json(result / "window.json")
     checked = read_json(result / "check.json")
-    events_path = result / "worker/events.jsonl"
-    events = []
-    trace_status = "missing"
-    if events_path.is_file():
-        try:
-            events = [json.loads(line) for line in read_bounded(events_path).splitlines() if line]
-            trace_status = "observed" if events else "empty"
-        except (ValueError, OSError):
-            trace_status = "unreadable"
+    # F17: nothing under result/worker or result/server is read (NOT_COLLECTED_REASON).
     selection = arm_config(window.get("arm", "control"), window.get("requested_model", window.get("model")),
                            window.get("base_url"))
     db = database or gateway_database(selection["arm"])
@@ -183,16 +184,6 @@ def create_receipt(result, database=None):
     except (OSError, sqlite3.Error, ValueError, TypeError):
         pass  # Unknown usage is not zero usage. No raw exception text is exported.
     pins = read_json(HERE / "pins.json")
-    versions = None
-    summary = result / "worker/native-summary.json"
-    if summary.is_file():
-        try:
-            native = json.loads(read_bounded(summary))
-            candidate = native.get("versions", {}) if isinstance(native, dict) else {}
-            if isinstance(candidate, dict) and all(candidate.get(name) == pins["version"] for name in ("openhands-sdk", "openhands-tools")):
-                versions = {name: candidate[name] for name in ("openhands-sdk", "openhands-tools")}
-        except (OSError, ValueError, TypeError):
-            pass
     # Re-read the actual upstream report; a wrapper's own passed field is never
     # a task oracle. The official grader determines all resolved/unresolved IDs.
     verdict = {"upstream_resolved": None, "upstream_bucket": None, "report_sha256": None}
@@ -204,17 +195,7 @@ def create_receipt(result, database=None):
             pass
     task_passed = (verdict["upstream_resolved"] is True and checked.get("grader_exit_code") == 0
                    and checked.get("conversion_exit_code") == 0 and window.get("worker_exit_code") == 0)
-    listed_skills, skills_match = [], False
-    try:
-        expected = read_json(result / "input/skills.json")["names"]
-        listed = json.loads(read_bounded(result / "worker/skills-startup.json"))["listed_skills"]
-        if (isinstance(expected, list) and isinstance(listed, list) and expected
-                and all(isinstance(name, str) and re.fullmatch(r"[a-z0-9-]+", name) for name in expected)
-                and sorted(expected) == sorted(listed)):
-            listed_skills, skills_match = sorted(listed), True
-    except (OSError, ValueError, TypeError, KeyError):
-        pass
-    observed = observations(events, listed_skills)
+    termination = window.get("agent_termination")
     usage = summarize_gateway(rows, selection)
     cleanup = []
     for path in sorted(result.glob("*.log.cleanup.json")):
@@ -223,22 +204,26 @@ def create_receipt(result, database=None):
         except (OSError, ValueError, AttributeError):
             cleanup.append(False)
     return {
-        "schema_version": 3, "evidence_class": "SDK inference adapter with official SWE-bench grading",
+        "schema_version": 4, "evidence_class": "SDK inference adapter with official SWE-bench grading",
         **{k: selection[k] for k in ("arm", "base_url", "requested_model", "gateway_model", "gateway_path")},
         "header_names": window.get("header_names", sorted(selection["headers"])),
-        "framework": "OpenHands software-agent-sdk", "expected_version": pins["version"], "observed_versions": versions,
+        "framework": "OpenHands software-agent-sdk", "expected_version": pins["version"],
+        "observed_versions": NOT_COLLECTED,
         "image": pins["image"]["ref"], "source_commit": pins["commit"],
         "window": {key: window[key] for key in ("started_at", "finished_at")},
         "worker_exit_code": window.get("worker_exit_code"),
+        "agent_termination": termination if termination in AGENT_TERMINATIONS else None,
+        "agent_termination_basis": ("agent-server REST status and latest ConversationErrorEvent; the server shares "
+                                    "the model terminal's UID and store, so this selects exit 1 or 3 only"),
         "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start", "wait", "result", "deadline"} else None,
         "task_passed": task_passed,
         # The terminal shares the SDK's UID and writable persistence. Source:
-        # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py. Without a
-        # separate observer these files cannot prove skill use or SDK identity.
+        # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py:157-170.
+        # Without a separate observer nothing can prove skill use or SDK identity.
         "evidence_complete": False,
-        "worker_evidence_trust": "worker-reported; not independent acceptance",
         "independent_trace_required": True,
-        "skills_listed_at_start": listed_skills, "skill_listing_matches_manifest": skills_match,
+        "not_collected_reason": NOT_COLLECTED_REASON,
+        "skills_listed_at_start": NOT_COLLECTED, "skill_listing_matches_manifest": NOT_COLLECTED,
         "container_cleanup": {"attempts": len(cleanup), "confirmed_removed": sum(cleanup), "complete": bool(cleanup) and all(cleanup)},
         "gateway": {
             "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, **usage,
@@ -247,7 +232,8 @@ def create_receipt(result, database=None):
             "usage_note": "Sum each entry row once, including failed calls; never add 20128 to 20129. Cache-read is an input subset. Missing counters keep totals null.",
         },
         "compression": window.get("compression", {"delta": None, "status": "unavailable"}),
-        "trace_status": trace_status, **observed,
+        "trace_status": NOT_COLLECTED, "mcp_calls_observed": NOT_COLLECTED,
+        "mcp_errors_observed": NOT_COLLECTED, "skills_observed": NOT_COLLECTED,
         "upstream_grader": {
             **{key: verdict.get(key) for key in ("upstream_resolved", "upstream_bucket", "report_sha256")},
             "benchmark_commit": pins["grader"]["commit"],

@@ -11,28 +11,27 @@ import os
 from pathlib import Path
 import re
 import signal
-import stat
 import subprocess
 import tempfile
 import time
 import uuid
 
-from recipe import HERE, arm_config, read_json
-from host import DOCKER, cleanup_container, docker_args, grade, logged_command, result_exit, utc_now, write_json
+from recipe import arm_config, read_json
+from host import (AGENT_LIMITS, DEFAULT_PORT, DOCKER, cleanup_container, docker_args, grade, logged_command,
+                  owned_port, private_file, result_exit, utc_now, write_json)
 from receipt import create_receipt, read_bounded
 
 
-SERVER_URL = "http://127.0.0.1:3730"
 TERMINAL = {"finished", "error", "stuck"}
+# Latest ConversationErrorEvent only. SDK@fcc102a event_router.py:68-139 serves
+# the page; event_service.py:456-460 matches kind on the module-qualified class
+# name; models.py:95-99 defines TIMESTAMP_DESC.
+ERROR_EVENT_SEARCH = ("/events/search?kind=openhands.sdk.event.conversation_error.ConversationErrorEvent"
+                      "&sort_order=TIMESTAMP_DESC&limit=1")
 
 
-def private_file(path):
-    path = Path(path).absolute()
-    info = path.stat()
-    if (path.resolve() != path or not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
-            or stat.S_IMODE(info.st_mode) != 0o600 or path.is_relative_to(HERE.parents[2])):
-        raise ValueError("owned_mode_0600_file_outside_checkout_required")
-    return path
+def server_url(port):
+    return f"http://127.0.0.1:{owned_port(port)}"
 
 
 def curl_json(url, *, method="GET", headers=None, body=None):
@@ -52,10 +51,36 @@ def curl_json(url, *, method="GET", headers=None, body=None):
     return json.loads(raw)
 
 
-def api_request(method, path, *, body=None):
-    if not re.fullmatch(r"/api/conversations(?:/[a-f0-9-]{36}(?:/(?:agent_final_response|interrupt))?)?", path):
+def api_request(method, path, *, body=None, port=DEFAULT_PORT):
+    if not (re.fullmatch(r"/api/conversations(?:/[a-f0-9-]{36}(?:/(?:agent_final_response|interrupt))?)?", path)
+            or re.fullmatch(r"/api/conversations/[a-f0-9-]{36}" + re.escape(ERROR_EVENT_SEARCH), path)):
         raise ValueError("unexpected_native_route")
-    return curl_json(SERVER_URL + path, method=method, headers=os.environ["OPENHANDS_HEADERS"], body=body)
+    return curl_json(server_url(port) + path, method=method, headers=os.environ["OPENHANDS_HEADERS"], body=body)
+
+
+def agent_termination(conversation_id, execution, port):
+    """Classify a terminal native status; agent limits keep their partial patch.
+
+    SDK@fcc102a conversation/state.py:48-79 makes finished, error and stuck
+    terminal. local_conversation.py:753-755 sets STUCK; :2021-2043 and
+    :2339-2360 set ERROR with ConversationErrorEvent(source="environment",
+    code="MaxIterationsReached"). Every other ERROR stays an infrastructure
+    failure. The event page is agent-server reported, and the server shares the
+    model terminal's UID and store, so it selects only exit 1 or exit 3; it can
+    never produce a pass. The module-qualified kind is source-reviewed, not yet
+    observed from the image binary; a mismatch fails closed to "error".
+    """
+    if execution in {"finished", "stuck"}:
+        return execution
+    if execution != "error":
+        return "error"
+    page = api_request("GET", f"/api/conversations/{conversation_id}{ERROR_EVENT_SEARCH}", port=port)
+    items = page.get("items") if isinstance(page, dict) else None
+    if (isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict)
+            and {key: items[0].get(key) for key in ("kind", "source", "code")}
+            == {"kind": "ConversationErrorEvent", "source": "environment", "code": "MaxIterationsReached"}):
+        return "max_iterations_reached"
+    return "error"
 
 
 def compression_snapshot():
@@ -82,32 +107,33 @@ def compression_delta(before, after):
             "basis": "entry gateway global analytics delta; separate from call_logs usage; concurrent callers may contribute"}
 
 
-def server_command(pins, name, mounts, network, env_file):
+def server_command(pins, name, mounts, network, env_file, *, port=DEFAULT_PORT):
     # Keep the image ENTRYPOINT. Its binary target is Dockerfile:580-590, not
     # the source target at :571. Supported preload: __main__.py:74-135,240-273.
     return [*docker_args(pins, name, network=network), *mounts, "--detach",
-            "--publish", "127.0.0.1:3730:8000", "--env-file", str(env_file),
+            "--publish", f"127.0.0.1:{owned_port(port)}:8000", "--env-file", str(env_file),
             "--env", "OH_ENABLE_VSCODE=0", "--env", "OH_CONVERSATIONS_PATH=/state/server/conversations",
             "--env", "OH_WORKSPACE_PATH=/workspace", "--env", "OH_BASH_EVENTS_DIR=/state/server/bash_events",
             "--env", "OPENHANDS_OWNED_CONTAINER=1", "--workdir", "/workspace",
             pins["image"]["ref"], "--extra-python-path", "/recipe", "--import-modules", "server_transport"]
 
 
-def check_server(body):
+def check_server(body, *, port=DEFAULT_PORT):
     """Native health/docs gate, then cross-check SDK output against live OpenAPI."""
+    base = server_url(port)
     deadline = time.monotonic() + 60
     while True:
         try:
             for path in ("/health", "/docs"):
                 subprocess.run(["curl", "-fsS", "--noproxy", "*", "--max-time", "5", "-o", os.devnull,
-                                SERVER_URL + path], check=True, stdout=subprocess.DEVNULL,
+                                base + path], check=True, stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL, timeout=6)
             break
         except (OSError, subprocess.SubprocessError):
             if time.monotonic() >= deadline:
                 raise RuntimeError("native_server_health_failed")
             time.sleep(1)
-    schema = curl_json(SERVER_URL + "/openapi.json")
+    schema = curl_json(base + "/openapi.json")
     request = schema["paths"]["/api/conversations"]["post"]["requestBody"]["content"]["application/json"]["schema"]
     if "$ref" in request:
         request = schema["components"]["schemas"][request["$ref"].split("/")[-1]]
@@ -129,15 +155,22 @@ def stop_server(result, status):
 
 def finish_result(result, status, window):
     removed = stop_server(result, status)
-    window["worker_exit_code"] = 0 if status.get("execution_status") == "finished" else 1
-    if window["worker_exit_code"]:
+    termination = status.get("agent_termination") or status.get("execution_status")
+    if termination not in {"finished", "error", *AGENT_LIMITS}:
+        termination = "error"
+    window["agent_termination"] = termination
+    window["worker_exit_code"] = 0 if termination == "finished" else 1
+    # A partial patch after an agent limit is still officially graded; only
+    # other native errors skip export (exit 3).
+    graded = termination == "finished" or termination in AGENT_LIMITS
+    if not graded:
         window["failure_stage"] = "agent"
     checked = {"upstream_resolved": None, "grader_exit_code": None}
     stage = "export"
     try:
         if not removed:
             raise RuntimeError("worker_removal_not_confirmed")
-        if not window["worker_exit_code"]:
+        if graded:
             task = read_json(result / "task-identity.json")
             workspace = result / "workspace"
             # git/git@v2.43.0 Documentation/git.txt (GIT_CONFIG_GLOBAL/NOSYSTEM)
@@ -184,6 +217,8 @@ def execute(action, state, run_id, arm):
         window = json.loads(read_bounded(result / "window.json"))
         if window.get("run_id") != run_id or window.get("arm") != arm:
             raise ValueError("attempt_identity_mismatch")
+        # Prepared by host.py into host-owned status.json; re-validated on read.
+        port = owned_port(status.get("port", DEFAULT_PORT))
         if action == "start":
             if status.get("status") != "prepared":
                 print(json.dumps({"run_id": run_id, "arm": arm, "receipt": str(receipt_path),
@@ -204,7 +239,7 @@ def execute(action, state, run_id, arm):
             window["started_at"] = utc_now()
             window["finished_at"] = None
             write_json(result / "window.json", window)
-            response = api_request("POST", "/api/conversations", body=result / "start.json")
+            response = api_request("POST", "/api/conversations", body=result / "start.json", port=port)
             conversation_id = str(uuid.UUID(response["id"]))
             status.update(status="running", conversation_id=conversation_id)
         elif action == "wait":
@@ -215,10 +250,10 @@ def execute(action, state, run_id, arm):
                 if time.time() >= status["deadline"]:
                     stage = "deadline"
                     try:
-                        api_request("POST", f"/api/conversations/{conversation_id}/interrupt")
+                        api_request("POST", f"/api/conversations/{conversation_id}/interrupt", port=port)
                     finally:
                         raise TimeoutError("native_conversation_deadline")
-                response = api_request("GET", f"/api/conversations/{conversation_id}")
+                response = api_request("GET", f"/api/conversations/{conversation_id}", port=port)
                 execution = response["execution_status"]
                 if execution in TERMINAL:
                     status.update(status="terminal", execution_status=execution)
@@ -238,10 +273,11 @@ def execute(action, state, run_id, arm):
             if status.get("status") != "terminal":
                 raise ValueError("terminal_attempt_required")
             conversation_id = str(uuid.UUID(status["conversation_id"]))
-            response = api_request("GET", f"/api/conversations/{conversation_id}/agent_final_response")
+            response = api_request("GET", f"/api/conversations/{conversation_id}/agent_final_response", port=port)
             if not isinstance(response.get("response"), str):
                 raise ValueError("native_final_response_contract")
             write_json(result / "final-response.json", response)
+            status["agent_termination"] = agent_termination(conversation_id, status.get("execution_status"), port)
             receipt = finish_result(result, status, window)
             write_json(receipt_path, receipt)
             code = result_exit(receipt)

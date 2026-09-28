@@ -31,6 +31,66 @@ from receipt import create_receipt, read_bounded, time_value
 
 
 DOCKER = ["docker", "--context", "rootless"]
+# SWE-bench worker default; the resolver mode uses 3740 (README "Workflow dispatch").
+DEFAULT_PORT = 3730
+# Agent limits whose partial patch is still graded: SDK@fcc102a
+# conversation/impl/local_conversation.py:753-755 (STUCK) and :2021-2043,
+# :2339-2360 (ERROR with ConversationErrorEvent code "MaxIterationsReached").
+AGENT_LIMITS = frozenset({"stuck", "max_iterations_reached"})
+# SDK@fcc102a openhands-agent-server/openhands/agent_server/config.py:24.
+SESSION_KEY_NAME = "OH_SESSION_API_KEYS_0"
+
+
+def owned_port(value):
+    """Mirror PR #428 crawl4ai host.py:44-45: an exact int (bool refused) in 3730..3799."""
+    if type(value) is not int or not 3730 <= value <= 3799:
+        raise ValueError("owned_port_3730_3799_required")
+    return value
+
+
+def cli_port(text):
+    # Non-decimal text reaches run() unchanged, so preflight refuses it with a receipt.
+    return int(text) if re.fullmatch(r"[0-9]{1,5}", text) else text
+
+
+def private_file(path):
+    path = Path(path).absolute()
+    info = path.stat()
+    if (path.resolve() != path or not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
+            or stat.S_IMODE(info.st_mode) != 0o600 or path.is_relative_to(HERE.parents[2])):
+        raise ValueError("owned_mode_0600_file_outside_checkout_required")
+    return path
+
+
+def check_server_env():
+    """Require the session-key variable NAME in the server env file; values stay unread.
+
+    SDK@fcc102a agent_server/__main__.py:282-285 binds all interfaces only with a
+    session API key (config.py:24 names OH_SESSION_API_KEYS_0). Without one the
+    server listens on container loopback, which the published port cannot reach.
+    docker/cli@v29.8.1 pkg/kvfile/kvfile.go:92-124 is the --env-file format:
+    newline-delimited lines, a BOM dropped on line one, leading whitespace
+    trimmed, "#" comments, and the name ends at the first "=". A bare name copies
+    the Docker CLI's own environment, so only the NAME= form is accepted. Only
+    the text before "=" is compared; no value is kept, printed or logged.
+    """
+    name = os.environ.get("OPENHANDS_SERVER_ENV")
+    if not name:
+        raise ValueError("OPENHANDS_SERVER_ENV_required")
+    path = private_file(name)
+    try:
+        text = read_bounded(path, limit=64 * 1024)
+    except UnicodeDecodeError:
+        raise ValueError("server_env_must_be_utf8") from None
+    for number, line in enumerate(text.split("\n")):
+        if number == 0:
+            line = line.removeprefix("\N{BYTE ORDER MARK}")
+        # Go unicode.IsSpace: str.isspace() without U+001C..U+001F.
+        line = re.sub(r"^[^\S\x1c-\x1f]+", "", line)
+        separator = line.find("=")
+        if not line.startswith("#") and separator > 0 and line[:separator] == SESSION_KEY_NAME:
+            return path
+    raise ValueError("server_env_session_key_name_required")
 
 
 def utc_now():
@@ -449,6 +509,8 @@ def result_exit(receipt):
         return 3
     if verdict.get("upstream_resolved") is False:
         return 1 if verdict.get("upstream_bucket") in {"unresolved_ids", "empty_patch_ids"} else 3
+    if verdict.get("upstream_resolved") is True and receipt.get("agent_termination") in AGENT_LIMITS:
+        return 1  # An officially graded partial patch after an agent limit is never a pass.
     if receipt.get("task_passed") and receipt.get("evidence_complete"):
         return 0
     return 2
@@ -488,7 +550,7 @@ def model_visible(root, *, writable):
             raise ValueError("special_file_in_model_mount")
 
 
-def prepare_native_dispatch(result, prefix, pins, base, network, host, selection, run_id):
+def prepare_native_dispatch(result, prefix, pins, base, network, host, selection, run_id, port=DEFAULT_PORT):
     from dispatch import check_server, private_file, server_command
     stem = run_id + "-" + selection["arm"]
     env_file = private_file(os.environ["OPENHANDS_SERVER_ENV"])
@@ -510,18 +572,19 @@ def prepare_native_dispatch(result, prefix, pins, base, network, host, selection
     mounts = base + environment + mount(result / "server", "/state/server", False) + mount(result / "worker", "/run-output", False)
     name = stem + "-server"
     try:
-        if logged_command(server_command(pins, name, mounts, network, env_file),
+        if logged_command(server_command(pins, name, mounts, network, env_file, port=port),
                           result / "server-start.log", cwd=result, timeout=60):
             raise RuntimeError("native_server_launch_failed")
-        check_server(body)
+        check_server(body, port=port)
     except (Exception, KeyboardInterrupt):
         cleanup_container(name, result / "server.log")
         raise
+    # Host-owned status is the dispatch commands' only port source.
     write_json(result / "status.json", {"run_id": run_id, "arm": selection["arm"], "status": "prepared",
-                                        "server_name": name, "receipt": str(result / "receipt.json")})
+                                        "server_name": name, "port": port, "receipt": str(result / "receipt.json")})
 
 
-def run(prefix, state, *, run_id=None, arm=None, prepare_only=False):
+def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAULT_PORT):
     run_id = run_id or os.environ.get("OPENHANDS_RUN_ID", "rw-openhands-e2e-" + uuid.uuid4().hex[:12])
     arm = arm or os.environ.get("OPENHANDS_ARM", "control")
     try:
@@ -537,7 +600,9 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False):
     prepared = False
     native_receipt = None
     try:
+        port = owned_port(port)
         pins, host, mcp = preflight(prefix, state)
+        check_server_env()
         installed = read_json(state / "installation.json")
         if installed.get("exit_code") != 0 or installed.get("requirements_sha256") != pins["requirements_sha256"]:
             raise ValueError("matching_successful_installation_required")
@@ -621,7 +686,7 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False):
         if execute_container(args, stem + "-qmd", result / "qmd-setup.log", 900):
             raise RuntimeError("qmd_setup_failed")
         stage = "start"
-        prepare_native_dispatch(result, prefix, pins, base, network, host, selection, run_id)
+        prepare_native_dispatch(result, prefix, pins, base, network, host, selection, run_id, port=port)
         prepared = True
         write_json(result / "window.json", window)
         if not prepare_only:
@@ -660,6 +725,8 @@ def main():
     parser.add_argument("--state", required=True, type=Path)
     parser.add_argument("--run-id")
     parser.add_argument("--arm", choices=("control", "engines-on"))
+    parser.add_argument("--port", type=cli_port, default=DEFAULT_PORT,
+                        help="published loopback port in 3730..3799 (default 3730; resolver mode 3740)")
     args = parser.parse_args()
     os.umask(0o077)
     # SIGTERM goes through container cleanup and the failed-attempt receipt path.
@@ -667,7 +734,8 @@ def main():
     if args.action == "install":
         install(args.prefix, args.state)
         return 0
-    return run(args.prefix, args.state, run_id=args.run_id, arm=args.arm, prepare_only=args.action == "prepare")
+    return run(args.prefix, args.state, run_id=args.run_id, arm=args.arm,
+               prepare_only=args.action == "prepare", port=args.port)
 
 
 if __name__ == "__main__":
