@@ -847,7 +847,8 @@ class BetterleaksTrialJobTests(unittest.TestCase):
     cosign only after its digest check and betterleaks only after the signed checksums and the pinned digest
     verify, redacts both scans with gitleaks's archive and ignore-file behaviour, uploads nothing and never
     turns on live --validation requests. It is report-only through betterleaks's own --exit-code option
-    and unittest's split of failures from errors, and its step summary holds counts, never values. The
+    and unittest's split of failures from errors, a scan that does not complete in the real fixture module
+    is an error that fails the fixture step, and its step summary holds counts, never values. The
     repository carries none of the suppression channels that only betterleaks reads."""
 
     JOB = "secret-scan-betterleaks"
@@ -919,6 +920,29 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         if "crash" in FLAGS:
             atexit.register(os._exit, 3)
         ''')
+    # Stands in for betterleaks under the real fixture module; STUB_MODE is how each scan ends. Under
+    # --exit-code 0 a completed scan exits 0 after writing its report (cmd/root.go at v1.8.1, lines 610-646),
+    # so every mode but detections-missing is a scan that did not complete. SIGKILL stands for a signal: a
+    # SIGSEGV would start the host's crash reporter.
+    SCAN_END_STUB = textwrap.dedent("""\
+        #!/usr/bin/env bash
+        [ "$1" = version ] && echo 1.8.1 && exit 0
+        report=""
+        while [ "$#" -gt 0 ]; do
+          [ "$1" = --report-path ] && report="$2"
+          shift
+        done
+        case "$STUB_MODE" in
+          detections-missing) echo null > "$report"; exit 0 ;;
+          partial-scan) echo null > "$report"; exit 1 ;;
+          scan-error) exit 1 ;;
+          no-report) exit 0 ;;
+          exit-139) exit 139 ;;
+          killed) kill -KILL "$$" ;;
+          deadlock) echo 'fatal error: all goroutines are asleep - deadlock!' >&2; exit 2 ;;
+        esac
+        exit 99
+        """)
 
     def run_script(self, name):
         """A step's `run: |` script, as the file GitHub writes and runs."""
@@ -1111,6 +1135,37 @@ class BetterleaksTrialJobTests(unittest.TestCase):
                 self.assertIn(f"; {status_line}; unittest exit status ", summary)
                 self.assertNotIn("a detection difference", summary)
                 self.assertNotIn("not an assertion", summary)
+
+    @unittest.skipUnless(shutil.which("bash") and shutil.which("git"), "the fixture step needs bash and git, as the runner has")
+    def test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module(self):
+        """Cross-family review (2026-09-28, P2): a scanner error must not pass the fixture step as a detection
+        difference. The step runs over the real tests/test_gitleaks_config.py, copied with .gitleaks.toml and
+        .gitleaksignore into a checkout outside any repository (the fingerprint test that commits in a worktree
+        of HEAD skips there), and a stand-in scanner. A scan that does not complete (exit 1 with or without a
+        report, 139, a signal, a Go runtime error whose message names a lock, exit 0 without a report) is a
+        unittest error in every scanning test, so the step fails. A completed scan that misses the detections
+        is a failure, which the step reports without failing."""
+        checkout = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, checkout, ignore_errors=True)
+        (checkout / "tests").mkdir()
+        (checkout / "tests" / "__init__.py").write_text("", encoding="utf-8")
+        for name in ("tests/test_gitleaks_config.py", ".gitleaks.toml", ".gitleaksignore"):
+            shutil.copyfile(ROOT / name, checkout / name)
+        environment = {"GITLEAKS_TESTS_REQUIRED": "1", "GIT_CEILING_DIRECTORIES": str(checkout.parent)}
+        for mode in ("detections-missing", "partial-scan", "scan-error", "no-report", "exit-139", "killed", "deadlock"):
+            with self.subTest(mode=mode):
+                rc, output, summary = self.run_step(self.FIXTURE_STEP, self.SCAN_END_STUB,
+                                                    {**environment, "STUB_MODE": mode}, cwd=checkout)
+                # Indented, so the real module's own FAIL:/ERROR: headers do not read as this test's.
+                quoted = textwrap.indent(output, "    | ")
+                status = re.search(r"(?m)^Ran \d+ tests? in [\d.]+s; (.+); unittest exit status (\d+)$", summary)
+                self.assertIsNotNone(status, quoted)
+                if mode == "detections-missing":
+                    self.assertEqual((rc, status.group(2)), (0, "1"), quoted)
+                    self.assertRegex(status.group(1), r"^FAILED \(failures=[1-9]\d*(?:, skipped=\d+)?\)$", quoted)
+                else:
+                    self.assertEqual((rc, status.group(2)), (1, "1"), quoted)
+                    self.assertRegex(status.group(1), r"^FAILED \(errors=[1-9]\d*(?:, skipped=\d+)?\)$", quoted)
 
     def test_fixture_tests_leave_out_the_unredacted_history_class(self):
         """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests scans history without

@@ -396,18 +396,20 @@ jobs:
           GITLEAKS_TESTS_REQUIRED: '1'
         run: |
           # The tests run the `gitleaks` on PATH, so a symlink gives that name to the verified binary.
-          # They read betterleaks's `null` empty report as no findings, so a failure here is a detection
-          # difference. The history-ancestry class is left out: it scans history without --redact and
-          # its failure message quotes the findings; the redacted history scan below covers that ground.
+          # They read betterleaks's `null` empty report as no findings and a scan that does not complete
+          # as an error, so a failure here is a detection difference. The history-ancestry class is left
+          # out: it scans history without --redact and its failure message quotes the findings; the
+          # redacted history scan below covers that ground.
           # Assertion failures are reported, not failed: fixture tests d2, d4 and d5 fail on every run on a
           # rule difference the receipt records (parity.json, fixtures_ported). unittest counts an
           # AssertionError as a failure and any other exception as an error (CPython Lib/unittest/case.py,
           # _addError); its closing status line reads "FAILED (failures=N)" only when every problem is a
           # failure (Lib/unittest/runner.py, TextTestRunner.run), and it exits 1 for an unsuccessful run
           # and 5 when no test ran (Lib/unittest/main.py). Anything else fails this step: an error, no
-          # test run, another exit status or no status line. The tests accept scanner exit status 1 and
-          # turn any other unexpected status into an assertion failure (_run_gitleaks), so this step
-          # cannot tell a scanner error from a detection difference: the scans below check for those.
+          # test run, another exit status or no status line. A scanner error is such an error: the tests
+          # scan with --exit-code 0, under which betterleaks exits 0 only after writing its report
+          # (cmd/root.go at v1.8.1, lines 610-646), and their _scan_findings raises _ScannerError, not an
+          # AssertionError, for any other exit status and for a missing report.
           mkdir -p "$RUNNER_TEMP/betterleaks/as-gitleaks"
           ln -s ../betterleaks "$RUNNER_TEMP/betterleaks/as-gitleaks/gitleaks"
           export PATH="$RUNNER_TEMP/betterleaks/as-gitleaks:$PATH"

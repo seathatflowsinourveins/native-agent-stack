@@ -4,24 +4,29 @@ Local evidence for plan move M3, recorded on host `nativestack-5975wx-20260925` 
 commit `ba1700ad` (the full `catalog_revision` is in [`run-record.json`](run-record.json)). A review round
 followed on 2026-09-28 (UTC); its reruns and controls are under `repair_round` in `run-record.json`. A
 coordinator repair followed the same day ([section 5](#5-report-only-job-and-passphrase-rows-coordinator-repair-2026-09-28);
-`coordinator_repair`). The change adds one job, its tests and one test port:
+`coordinator_repair`), then a repair of a cross-family review finding
+([section 6](#6-scanner-errors-are-unittest-errors-cross-family-review-repair-2026-09-28);
+`scanner_error_repair`). The change adds one job, its tests and one test port:
 
 1. [`.github/workflows/validate.yml`](../../../.github/workflows/validate.yml) gains
    `secret-scan-betterleaks` next to the required `secret-scan` job. Its context is absent from
    [`.github/main-ruleset.json`](../../../.github/main-ruleset.json) and from the live ruleset read back on
    2026-09-28, so no run of it blocks a merge.
 2. [`tests/test_workflow_hardening.py`](../../../tests/test_workflow_hardening.py) gains
-   `BetterleaksTrialJobTests` (7 tests in the review round, 10 since the coordinator repair).
+   `BetterleaksTrialJobTests` (7 tests in the review round, 10 after the coordinator repair, 11 since the
+   scanner-error repair).
 3. [`tests/test_gitleaks_config.py`](../../../tests/test_gitleaks_config.py) reads a JSON report of `null`
    as no findings. betterleaks writes an empty report that way; gitleaks writes `[]` and is unaffected.
+   Since the scanner-error repair, every scan in the module runs through one helper that raises a unittest
+   error for a scan that does not complete, and the module gains `ScannerErrorTests` (section 6).
 
-The required `secret-scan` job, the pre-commit hook, the pins files and `catalog-freshness.yml` are
-unchanged.
+The required `secret-scan` job's steps, the pre-commit hook, the pins files and `catalog-freshness.yml`
+are unchanged. The fixture tests that its unittest step runs are stricter since section 6.
 
 **The trial job is report-only.** Findings and fixture-test assertion failures appear as counts in its step
 summary and do not fail it, so it is red only when verification, the scanner or the test run errors
-(section 5). Its green does not say that a change adds no secret: the required `secret-scan` job stays the
-gate.
+(sections 5 and 6). Its green does not say that a change adds no secret: the required `secret-scan` job
+stays the gate.
 
 **Why betterleaks.** The gitleaks README on `master` (line 12, read 2026-09-28T03:04Z) says: "Gitleaks
 is feature complete. I'm not merging new features into Gitleaks. Future releases will be security
@@ -187,7 +192,7 @@ The history-ancestry class of `tests/test_gitleaks_config.py` is left out, becau
 `--redact` and its failure message quotes the findings. The redacted history scan covers that ground.
 
 The review round ran these checks on its final files (details in `run-record.json`, `repair_round`).
-Section 5 has the coordinator repair's reruns on the files as they now stand.
+Section 5 has the coordinator repair's reruns, and section 6 the reruns on the files as they now stand.
 
 - **Hardening tests.** The 7 new tests pass (rc 0). 17 changes each fail the test that covers them
   (rc 1), and the files were restored byte-identical (`harness/mutation_controls.py`). The changes are:
@@ -241,16 +246,16 @@ fail on every run on the rule difference in section 3, so a failing step would k
 (`Lib/unittest/case.py`, `_addError`). It writes a closing status line (`Lib/unittest/runner.py`) and exits
 1 for an unsuccessful run and 5 when no test ran (`Lib/unittest/main.py`, Python 3.12 and later). The step
 turns exit status 1 into 0 only when that line reads `FAILED (failures=N)`, with at most `skipped=N` added.
-An error, no test run, another exit status or a missing line fails it. One limit remains:
-`_run_gitleaks` accepts scanner exit status 1 and turns any other unexpected status into an
-`AssertionError`, so this step cannot tell a scanner error from a detection difference. The two scans are
-the check for scanner errors.
+An error, no test run, another exit status or a missing line fails it. This repair left one limit:
+`_run_gitleaks` accepted scanner exit status 1 and turned any other unexpected status into an
+`AssertionError`, so the step could not tell a scanner error from a detection difference. Cross-family
+review showed that this let a scanner error pass the step; section 6 removes the limit.
 
 **Step summary.** The scans append their finding count, the count per rule id and the scanner's exit
 status. The fixture step appends unittest's run line, its status line and its exit status. No value, path
 or failure message reaches the summary; the log still lists rule, file and line.
 
-**Checks on the files as they now stand (our-integration).**
+**Checks on the files as the coordinator repair left them (our-integration).**
 
 - **Exit-status controls** on the verified binary (`harness/exit_code_controls.sh`), over one generated
   token-shaped line that is never printed. Default flags exit 1. `--exit-code 0` exits 0 in dir and git
@@ -302,6 +307,135 @@ directories under `/tmp` and `/var/tmp`.
 The same values also sit in 6 tracked files that neither scanner flags (section 3). Before a swap, allowlist
 the three rows by fingerprint, with this record as the reason.
 
+## 6. Scanner errors are unittest errors (cross-family review repair, 2026-09-28)
+
+A read-only cross-family review (GPT-6) returned `changes-needed` with one P2 finding: a scanner crash in
+the fixture step became a successful step. `_run_gitleaks` turned an unexpected exit status into an
+`AssertionError`, which unittest counts as a failure, and the step accepts failures. It also read exit
+status 1 without a report as no findings. The reviewer replaced the scanner's exit in memory with −11, 139
+and 1 and ran the step's own status handling: each gave `FAILED (failures=1)` and a step exit status of 0.
+The reviewer confirmed the rest of the change, among it the digest and identity checks before execution,
+the unchanged required gate and the scan steps' exit statuses. Details are in `run-record.json`,
+`scanner_error_repair`.
+
+**What an exit status means (upstream-unchanged source read).** The local copies of the cited files are
+byte-identical to the files at the gitleaks v8.30.1 and betterleaks v1.8.1 tags, fetched and compared on
+2026-09-28. The tests scan with `--exit-code 0`. With that flag both scanners exit 0 whether or not they
+find anything, and only after writing the report. Line numbers are gitleaks first, then betterleaks, in
+`cmd/root.go`:
+
+- `findingSummaryAndExit` writes the report whenever `--report-path` is set (lines 463-491 and 610-638).
+  A report it cannot write is fatal (lines 489 and 636).
+- It then exits 1 on a scan error (lines 493-495 and 640-642), and with the `--exit-code` value on findings
+  (lines 497-499 and 644-646).
+- A fatal log exits 1 (zerolog v1.33.0 `log.go` line 396, also when the level is off, lines 482-487). An
+  unknown flag exits 126 (lines 226-228 and 325-327). A Go runtime crash exits 2 (Go go1.25.12, the
+  betterleaks toolchain, `src/runtime/panic.go` lines 1287 and 1336), and a signal ends the process
+  without an exit status.
+- `Detector()` creates and removes the report path before the scan starts (lines 352-356 and 485-489), so a
+  scan that dies leaves no report. The JSON reporter always writes a value (`report/json.go` lines 13-16 in
+  both).
+
+So under `--exit-code 0`, exit status 1 is never a findings status in either tool, and exit status 0 always
+comes with a report.
+
+**The change.** `tests/test_gitleaks_config.py` runs every scan through `_scan_findings`. It builds the
+command with `--exit-code 0` and a JSON report. It raises `_ScannerError` for any nonzero exit status, and
+for a missing or empty report after exit status 0. `_ScannerError` is not an `AssertionError`, so unittest
+records it as an error, which the fixture step does not accept. Four scans ran the scanner directly and now
+go through it: `_run_gitleaks`, the `--exit-code 0` test, the git-mode fingerprint test (which never read
+the exit status) and the history-ancestry test. A busy-lock skip now needs the guarded launcher's own
+contract: exit status 75 and "another scan holds the per-user lock" (`adoption/tools/gitleaks-guarded`
+lines 23-32; `gitleaks-guarded-macos` lines 29 and 124-130). Before, any stderr containing "lock" was a
+skip, and the Go runtime's "all goroutines are asleep - deadlock!" contains it. The step's comment in
+`validate.yml` now states this; its commands are unchanged.
+
+**Probe before and after (our-integration; `harness/scanner_error_probe.py`).** Part 1 repeats the review's
+probe on fixture test `test_a`: a child unittest run with the scanner's exit replaced in memory, then the
+step's status handling, cut verbatim from `validate.yml`, under `bash --noprofile --norc -eo pipefail -c`.
+"Before" is the tree at the branch's previous head; "after" is this change.
+
+| Scan ended with | Before | Step | After | Step |
+| --- | --- | --- | --- | --- |
+| SIGSEGV (−11) | `FAILED (failures=1)` | 0 | `FAILED (errors=1)` | 1 |
+| exit 139 | `FAILED (failures=1)` | 0 | `FAILED (errors=1)` | 1 |
+| exit 1, no report | `FAILED (failures=1)` | 0 | `FAILED (errors=1)` | 1 |
+| exit 1 after writing its report (a partial scan) | `FAILED (failures=1)` | 0 | `FAILED (errors=1)` | 1 |
+| exit 0, no report | `FAILED (failures=1)` | 0 | `FAILED (errors=1)` | 1 |
+| exit 2 with the Go deadlock message | `OK (skipped=1)` | 0 | `FAILED (errors=1)` | 1 |
+| Control: exit 0, empty report (a detection difference) | `FAILED (failures=1)` | 0 | `FAILED (failures=1)` | 0 |
+| Control: the launcher's busy lock (exit 75) | `OK (skipped=1)` | 0 | `OK (skipped=1)` | 0 |
+
+Part 2 runs the whole fixture step over the real test module and its two config files, copied into a
+checkout outside git, with a stand-in scanner process. It runs 25 tests; the git-mode fingerprint test
+skips there. SIGKILL stands for a signal, because a real SIGSEGV would start the host's crash reporter.
+
+| Stand-in scan ended with | Before | Step | After | Step |
+| --- | --- | --- | --- | --- |
+| SIGKILL | `FAILED (failures=20, skipped=1)` | 0 | `FAILED (errors=20, skipped=1)` | 1 |
+| exit 139 | `FAILED (failures=20, skipped=1)` | 0 | `FAILED (errors=20, skipped=1)` | 1 |
+| exit 1, no report | `FAILED (failures=15, skipped=1)` | 0 | `FAILED (errors=20, skipped=1)` | 1 |
+| exit 1 after writing its report | `FAILED (failures=15, skipped=1)` | 0 | `FAILED (errors=20, skipped=1)` | 1 |
+| exit 0, no report | `FAILED (failures=15, skipped=1)` | 0 | `FAILED (errors=20, skipped=1)` | 1 |
+| exit 2 with the Go deadlock message | `OK (skipped=21)` | 0 | `FAILED (errors=20, skipped=1)` | 1 |
+| Control: exit 0, empty report | `FAILED (failures=15, skipped=1)` | 0 | `FAILED (failures=15, skipped=1)` | 0 |
+
+Before the repair, in the three rows with 15 failures, the 5 tests that expect no findings passed on a scan
+that did not complete.
+
+**Tests and controls (our-integration).**
+
+- `ScannerErrorTests` (5 tests in `tests/test_gitleaks_config.py`; the scanner is replaced in memory):
+  - exit statuses −11, −9, 139, 1, 2, 126 and 78 raise `_ScannerError`, with or without a report;
+  - exit status 0 needs a written report;
+  - only the launcher's busy lock skips;
+  - a detection test shaped like `test_a` is a unittest error when its scan exits −11, 139 or 1 or
+    writes no report, and a failure when a completed scan misses the value;
+  - every `subprocess.run` in the module outside `_scan_findings` runs git.
+- `test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module`
+  (`BetterleaksTrialJobTests`) runs part 2 as a test: the step exits 1 in the six error modes and 0 for the
+  detection difference.
+- Six controls (`harness/scanner_error_controls.py`) each put one part of the bug back, and every named
+  test failed (rc 1, and only that test). Every named test ran green first, and the module was restored
+  byte-identical. The controls are:
+  - `_ScannerError` as an `AssertionError` (3 tests);
+  - exit status 1 accepted again (3 tests);
+  - a missing or empty report read as no findings (3 tests);
+  - any stderr naming a lock read as the busy lock (2 tests);
+  - a direct scanner call beside `_scan_findings` (1 test);
+  - the whole pre-repair file (the step test).
+
+**Real scanners (our-integration).**
+
+- gitleaks 8.30.1, the host launcher on `PATH`: `tests.test_gitleaks_config` ran 33 tests, OK, none skipped.
+  That is the 28 earlier tests and the 5 new ones.
+- betterleaks 1.8.1, the verified binary with the recorded digest: `harness/sim_job.py` ran the fixture step
+  with GitHub's command for `shell: bash`. Step exit status 0, `Ran 25 tests; FAILED (failures=3)`. The three
+  are d2, d4 and d5, as in `parity.json`, with no error and no skip.
+- The git-mode fingerprint test now checks the exit status. It passed with both scanners.
+
+**Final checks** (`harness/final_checks.sh`, before the re-registration):
+
+- `tests.test_workflow_hardening` ran 72 tests: OK, 2 skipped as before. The freshness-pin and
+  workflow-security modules passed.
+- The 42 earlier controls failed their tests again; their class's green run had 11 tests.
+- zizmor 1.30.1 gave "No findings to report", 43 suppressed. actionlint 1.7.12 with shellcheck 0.11.0, and
+  shellcheck on the harness scripts, printed nothing.
+- `scripts/validate.py` runs after the re-registration in the branch's last commit, whose message records
+  the result.
+
+**Beyond the trial job.**
+
+- The required `secret-scan` job's unittest step is stricter. Its history-ancestry test read a scan that
+  did not complete as zero findings and passed; it now errors. Its fixture tests now error on a scan
+  error, where exit status 1 with a partial report could let a test that expects no findings pass.
+- On a host with the guarded launcher, "could not acquire the per-user lock" (an exit status other than 75)
+  is now an error, not a skip. A busy lock still skips.
+
+**Limit.** The busy-lock skip remains, and the step accepts a run in which every test skipped
+(`OK (skipped=N)`). Only the guarded launcher exits 75 with that message, and the hosted runner has none.
+None of this is a hosted run.
+
 ## Deviations and host side effects
 
 - **betterleaks history attempt 1** ran under the guard's caps and hit the 600 s limit (rc 143).
@@ -338,6 +472,9 @@ the three rows by fingerprint, with this record as the reason.
   also failing `test_fail` and `test_error`. Those were the stand-in module's own headers, quoted in the
   failure message; each control's exit status was 1. The test now indents that output, the harness reads
   only this class's own headers, and the rerun is the recorded one.
+- **Scanner-error repair, first probe run.** An earlier version of `harness/scanner_error_probe.py`, with
+  part 1 only, ran on the base tree shortly before 08:24Z. It gave the same part-1 results, and the 08:24Z
+  runs with both parts are the recorded ones.
 
 A betterleaks pre-commit hook would write the wazero cache on every developer host.
 
@@ -370,7 +507,7 @@ A betterleaks pre-commit hook would write the wazero cache on every developer ho
 | --- | --- |
 | [`run-record.json`](run-record.json) | Sources, download digests, verification outputs and controls, scans with resources, fixture counts, CI simulation, lint, tests, deviations, the review round's reruns, controls and final checks, and the coordinator repair (`coordinator_repair`) |
 | [`parity.json`](parity.json) | Rule, file and line of every new finding with its triage class, the per-test fixture outcomes before and after the port, and the classification |
-| [`harness/`](harness/) | Every local script that produced a result recorded here, including the review round's and the coordinator repair's: scans, fixture collectors, value-blind triage, size measurement, controls (among them the exit-status controls), job simulator, final checks and the `parity.json` generator. They are thin wrappers around the upstream binaries, labelled local integration. |
+| [`harness/`](harness/) | Every local script that produced a result recorded here, including the review round's, the coordinator repair's and the scanner-error repair's: scans, fixture collectors, value-blind triage, size measurement, controls (among them the exit-status and scanner-error controls), the scanner-error probe, job simulator, final checks and the `parity.json` generator. They are thin wrappers around the upstream binaries, labelled local integration. |
 
 The branch's post-commit range scans are reported with the pull request, because recording them here
 would change the commits they scan. Raw reports, logs and tracebacks stay outside the repository. Host

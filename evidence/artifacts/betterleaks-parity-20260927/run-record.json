@@ -6,7 +6,7 @@
  "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
  "host_id": "nativestack-5975wx-20260925",
  "platform_id": "linux-wsl2-x86_64",
- "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T07:07:16Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc; coordinator repair in coordinator_repair.window_utc"},
+ "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T08:29:06Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc; coordinator repair in coordinator_repair.window_utc; scanner-error repair in scanner_error_repair.window_utc"},
  "evidence_classes": {
   "upstream-unchanged": [
    "cosign v3.0.6 verify-blob of betterleaks v1.8.1 checksums.txt against its Sigstore bundle, and six failing controls",
@@ -423,7 +423,8 @@
      "read locally from CPython 3.13.15"
     ],
     "reason": "parity.json fixtures_ported records 22 ok, 3 FAIL and 0 ERROR under betterleaks; the three failures (fixture tests d2, d4 and d5) come from the two tools' rule definitions, so a failing step would be red on every run",
-    "limit": "tests/test_gitleaks_config.py _run_gitleaks accepts scanner exit status 1 and raises AssertionError for any other unexpected status, so the fixture step cannot tell a scanner error from a detection difference; the two scan steps are the check for scanner errors"
+    "limit": "tests/test_gitleaks_config.py _run_gitleaks accepts scanner exit status 1 and raises AssertionError for any other unexpected status, so the fixture step cannot tell a scanner error from a detection difference; the two scan steps are the check for scanner errors",
+    "limit_status": "superseded by scanner_error_repair (2026-09-28): every scan in the module now raises _ScannerError, a unittest error, for any nonzero exit status and for a missing report, so a scanner error fails the fixture step"
    },
    "no_continue_on_error": "the job and its steps carry no continue-on-error (test_is_not_a_required_context_and_cannot_be_forced_green)"
   },
@@ -567,6 +568,112 @@
    "An exploratory run of the eight exit-status cases, from a scratch command that was not kept, came before harness/exit_code_controls.sh; it gave the same exit statuses, and the script's run is the recorded one.",
    "The first run of the 42 controls (2026-09-28T06:57:06Z) counted 4 fixture controls as also failing test_fail and test_error: the stand-in module's own FAIL and ERROR headers, quoted in the failure message. Each of the 4 exited 1. The test now indents that output, the harness reads only this class's own headers, and the 06:57:53Z rerun is the recorded one.",
    "final_checks' first tests.test_gitleaks_config run skipped 21 of 28 tests without a printed reason; the verbose rerun ten seconds later skipped none."
+  ]
+ },
+ "scanner_error_repair": {
+  "window_utc": {"start": "2026-09-28T08:06:43Z", "last_recorded_run": "2026-09-28T08:29:06Z"},
+  "trigger": "read-only cross-family review (GPT-6) of the branch at 1c029808, verdict changes-needed, finding P2 at .github/workflows/validate.yml line 425: the fixture step's failures-only filter turned a scanner error into success, because _run_gitleaks raised AssertionError (a unittest failure) for an unexpected exit status and read exit status 1 without a report as no findings. The reviewer mocked scanner exits -11, 139 and 1 in memory on the existing positive fixture test, then ran the step's filter with bash --noprofile --norc -eo pipefail -c: each gave FAILED (failures=1) and exit status 0",
+  "review_confirmed": "the fixed digest and identity checks precede execution; the required gate is unchanged; import errors and zero-test runs remain failures; a direct scanner error still exits nonzero under --exit-code 0 (betterleaks cmd/root.go line 640 at the v1.8.1 tag commit); the receipt's counts reconcile; the passphrase status is supported within its recorded host scope",
+  "changes": [
+   "tests/test_gitleaks_config.py: _ScannerError, an Exception that is not an AssertionError; _scan_findings builds each scan's command with --exit-code 0 and a JSON report, and raises _ScannerError for any nonzero exit status and for a missing or empty report after exit status 0; _run_gitleaks, the --exit-code 0 test, the git-mode fingerprint test and the history-ancestry test run their scans through it; a busy-lock skip needs exit status 75 and the guarded launcher's busy message; ScannerErrorTests (5 tests); docstrings",
+   "tests/test_workflow_hardening.py BetterleaksTrialJobTests: test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module with its stand-in scanner SCAN_END_STUB; the class docstring",
+   "validate.yml secret-scan-betterleaks fixture step: its comment states that a scanner error is a unittest error; the step's name and commands are unchanged",
+   "harness/scanner_error_probe.py (new): the review's probe (part 1) and the whole fixture step over the real module with a stand-in scanner (part 2)",
+   "harness/scanner_error_controls.py (new): the six controls below",
+   "README.md: section 6, the removed limit in section 5, the header, a deviation and the harness row; in this file, scanner_error_repair, run_window_utc and coordinator_repair's limit_status"
+  ],
+  "exit_status_contract": {
+   "evidence_class": "upstream-unchanged source read of the pinned tags",
+   "local_copies": "cmd/root.go, cmd/directory.go, cmd/git.go and report/json.go of both tools in the scratch source archives are byte-identical to the files at the tags on raw.githubusercontent.com (fetched and compared 2026-09-28T08:06Z); git ls-remote resolved the tags",
+   "tag_commits": {"gitleaks v8.30.1": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e", "betterleaks v1.8.1": "5eab48332cc48565864514e3bc6de89df091a7c4", "zerolog v1.33.0, the version in both go.mod files": "c78e50e2da70f4ae63e1b65222c3acf12e9ba699", "Go go1.25.12, the toolchain line of betterleaks's go.mod": "d80d9a98f7e3a8f9b3a82d2c6079f84eb1101d46"},
+   "lines": [
+    {"source": "gitleaks cmd/root.go 463-491; betterleaks cmd/root.go 610-638", "quote": "// write report if desired / if detector.Reporter != nil { ... detector.Reporter.Write(file, findings) ... logging.Fatal().Err(reportErr).Msg(\"failed to write report\")", "reading": "findingSummaryAndExit writes the report before it exits; an unwritable report is fatal (lines 489 and 636)"},
+    {"source": "gitleaks cmd/root.go 493-499; betterleaks cmd/root.go 640-646", "quote": "if err != nil { os.Exit(1) } / if len(findings) != 0 { os.Exit(exitCode) }", "reading": "a scan error exits 1 before findings exit with --exit-code, which is 0 in every test scan"},
+    {"source": "gitleaks cmd/root.go 348-356 and 404-405; betterleaks cmd/root.go 481-489 and 537-538", "quote": "if f, err := os.Create(reportPath); err != nil { ... } else { _ = f.Close(); _ = os.Remove(reportPath) } / detector.Reporter = reporter", "reading": "a non-empty --report-path sets the reporter, and the path is created and removed before the scan, so a scan that dies leaves no report"},
+    {"source": "gitleaks cmd/root.go 226-228; betterleaks cmd/root.go 325-327", "quote": "if strings.Contains(err.Error(), \"unknown flag\") { ... os.Exit(126)", "reading": "an unknown flag exits 126"},
+    {"source": "zerolog v1.33.0 log.go 389-398 and 482-487", "quote": "func (l *Logger) Fatal() *Event { return l.newEvent(FatalLevel, func(msg string) { ... os.Exit(1) }) } / if !enabled { if done != nil { done(\"\") } return nil }", "reading": "every logging.Fatal() in both tools exits 1, also when the log level is off"},
+    {"source": "Go go1.25.12 src/runtime/panic.go 1262-1290 (fatalthrow) and 1298-1340 (fatalpanic)", "quote": "exit(2)", "reading": "a runtime fatal error or an unrecovered panic exits 2 (lines 1287 and 1336), unless GOTRACEBACK=crash makes it a signal; the stand-in's deadlock mode uses exit status 2 with the runtime's deadlock message"},
+    {"source": "report/json.go 13-16 in both tools", "quote": "encoder := json.NewEncoder(w) ... return encoder.Encode(findings)", "reading": "the JSON report always holds a value: [] in gitleaks, null in betterleaks for no findings"},
+    {"source": "gitleaks cmd/directory.go 73 and cmd/git.go 95; betterleaks cmd/git.go 153 and cmd/directory.go 104", "quote": "findingSummaryAndExit(detector, findings, exitCode, start, err) / findingSummaryAndExit(lastDetector, allFindings, exitCode, start, scanErr)", "reading": "dir and git mode end in findingSummaryAndExit; before it, a command exits only through logging.Fatal() or a crash (the only other os.Exit calls in the non-test sources are the ones above and the separate config generator, cmd/generate/config/main.go)"}
+   ],
+   "decision": "under --exit-code 0 both pinned scanners exit 1 only on a scan error or a fatal log, never for findings, and exit 0 only after writing the report, so _scan_findings raises _ScannerError for every nonzero exit status, exit status 1 included, and for a missing or empty report after exit status 0; no pinned source line gives exit status 1 another meaning under --exit-code 0"
+  },
+  "lock_contract": {
+   "sources": ["adoption/tools/gitleaks-guarded lines 23-32: flock --nonblock --conflict-exit-code 75; on 75 it prints 'gitleaks: another scan holds the per-user lock; retry after it finishes' and exits 75; any other flock failure prints 'could not acquire the per-user lock; scan was not started' and exits with that status", "adoption/tools/gitleaks-guarded-macos line 29 (EXIT_BUSY = 75) and lines 124-130 (the busy message, then sys.exit(EXIT_BUSY))"],
+   "decision": "a skip needs exit status 75 and 'another scan holds the per-user lock' in stderr; before, any stderr containing 'lock' was a skip, and the Go runtime's 'fatal error: all goroutines are asleep - deadlock!' contains it"
+  },
+  "probe": {
+   "script": "harness/scanner_error_probe.py TREE, run from a byte-identical scratch copy",
+   "at": "2026-09-28T08:24:19Z to 08:24:22Z",
+   "before_tree": "1c029808d49e73aea4c6b7d69a9ca8495ba4cf11, the branch's previous head, exported whole with git archive",
+   "after_tree": "the worktree with this change, before commit",
+   "status_handling": "11 lines cut verbatim from each tree's fixture step, from its ran= line to exit \"$status\"; this change edits only the step's comment",
+   "part_1": [
+    {"outcome": "killed by SIGSEGV (-11)", "before": "FAILED (failures=1); unittest 1; step 0", "after": "FAILED (errors=1); unittest 1; step 1"},
+    {"outcome": "exit 139", "before": "FAILED (failures=1); unittest 1; step 0", "after": "FAILED (errors=1); unittest 1; step 1"},
+    {"outcome": "exit 1 without a report", "before": "FAILED (failures=1); unittest 1; step 0", "after": "FAILED (errors=1); unittest 1; step 1"},
+    {"outcome": "exit 1 after writing its report (a partial scan)", "before": "FAILED (failures=1); unittest 1; step 0", "after": "FAILED (errors=1); unittest 1; step 1"},
+    {"outcome": "exit 0 without a report", "before": "FAILED (failures=1); unittest 1; step 0", "after": "FAILED (errors=1); unittest 1; step 1"},
+    {"outcome": "exit 2 with the Go runtime's deadlock message", "before": "OK (skipped=1); unittest 0; step 0", "after": "FAILED (errors=1); unittest 1; step 1"},
+    {"outcome": "control: exit 0 with an empty report (a detection difference)", "before": "FAILED (failures=1); unittest 1; step 0", "after": "FAILED (failures=1); unittest 1; step 0"},
+    {"outcome": "control: the guarded launcher's busy lock (exit 75)", "before": "OK (skipped=1); unittest 0; step 0", "after": "OK (skipped=1); unittest 0; step 0"}
+   ],
+   "part_2": [
+    {"stub_mode": "killed (SIGKILL)", "before": "Ran 25 tests; FAILED (failures=20, skipped=1); step 0", "after": "Ran 25 tests; FAILED (errors=20, skipped=1); step 1"},
+    {"stub_mode": "exit-139", "before": "Ran 25 tests; FAILED (failures=20, skipped=1); step 0", "after": "Ran 25 tests; FAILED (errors=20, skipped=1); step 1"},
+    {"stub_mode": "scan-error (exit 1, no report)", "before": "Ran 25 tests; FAILED (failures=15, skipped=1); step 0", "after": "Ran 25 tests; FAILED (errors=20, skipped=1); step 1"},
+    {"stub_mode": "partial-scan (exit 1 after writing its report)", "before": "Ran 25 tests; FAILED (failures=15, skipped=1); step 0", "after": "Ran 25 tests; FAILED (errors=20, skipped=1); step 1"},
+    {"stub_mode": "no-report (exit 0)", "before": "Ran 25 tests; FAILED (failures=15, skipped=1); step 0", "after": "Ran 25 tests; FAILED (errors=20, skipped=1); step 1"},
+    {"stub_mode": "deadlock (exit 2)", "before": "Ran 25 tests; OK (skipped=21); step 0", "after": "Ran 25 tests; FAILED (errors=20, skipped=1); step 1"},
+    {"stub_mode": "control: detections-missing (exit 0, empty report)", "before": "Ran 25 tests; FAILED (failures=15, skipped=1); step 0", "after": "Ran 25 tests; FAILED (failures=15, skipped=1); step 0"}
+   ],
+   "note": "the skip in part 2 is the git-mode fingerprint test, which cannot resolve HEAD in a checkout outside git; before the repair, the 5 tests that expect no findings passed in the three modes with 15 failures"
+  },
+  "controls": {
+   "script": "harness/scanner_error_controls.py <worktree> 1c029808d49e73aea4c6b7d69a9ca8495ba4cf11, run from a byte-identical scratch copy",
+   "at": "2026-09-28T08:24:31Z to 08:24:40Z",
+   "rc": 0,
+   "all_named_tests_green_before": true,
+   "every_control_failed_each_of_its_tests": true,
+   "module_restored_byte_identical": true,
+   "results": [
+    {"control": "_ScannerError subclasses AssertionError", "failed": {"test_a": "FAILED (failures=1)", "test_d": "FAILED (failures=5)", "step test": "FAILED (failures=6)"}},
+    {"control": "exit status 1 accepted again", "failed": {"test_a": "FAILED (failures=2)", "test_d": "FAILED (failures=1)", "step test": "FAILED (failures=1)"}},
+    {"control": "a missing or empty report read as no findings", "failed": {"test_b": "FAILED (failures=3)", "test_d": "FAILED (failures=1)", "step test": "FAILED (failures=1)"}},
+    {"control": "any stderr naming a lock read as the busy lock", "failed": {"test_c": "FAILED (errors=2)", "step test": "FAILED (failures=1)"}},
+    {"control": "a direct scanner call beside _scan_findings", "failed": {"test_e": "FAILED (failures=1)"}},
+    {"control": "the whole pre-repair file", "failed": {"step test": "FAILED (failures=6)"}}
+   ],
+   "note": "test_a to test_e are ScannerErrorTests; the step test is BetterleaksTrialJobTests.test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module; each named test exited 1 and was its run's only failing test id; the counts are subtests"
+  },
+  "real_scanners": {
+   "gitleaks_8_30_1": {"binary": "the host's ecosystem gitleaks launcher on PATH, reporting 8.30.1", "command": "python3 -B -m unittest tests.test_gitleaks_config -v", "at": "2026-09-28T08:25:01Z to 08:26:20Z", "rc": 0, "result": "Ran 33 tests in 78.721s; OK", "ok": 33, "skipped": 0},
+   "betterleaks_1_8_1": {"binary": "the verified binary, sha256 380a770d9ea9215e7d3b964246a72d8698b2975496addef2627d0e82b174a1f8 as in verification.extracted_binaries, copied to <scratch>/rt-bl/betterleaks/betterleaks", "command": "harness/sim_job.py <worktree> <scratch>/rt-bl \"fixture tests\", from a byte-identical scratch copy", "at": "2026-09-28T08:26:28Z to 08:26:32Z", "step_rc": 0, "step_summary": "Ran 25 tests in 4.412s; FAILED (failures=3); unittest exit status 1", "failing_tests": ["test_d2_other_fields_and_other_paths_stay_detected", "test_d4_unreviewed_values_and_other_paths_stay_detected", "test_d5_retained_sweep_input_pin_lines_only"], "failing_tests_from": "the same three classes run directly at 08:26:46Z with the step's as-gitleaks symlink first on PATH (reporting 1.8.1) and GITLEAKS_TESTS_REQUIRED=1: rc 1, 22 ok, 3 FAIL, 0 ERROR, 0 skipped; only the FAIL and ERROR header lines were read"},
+   "note": "the git-mode fingerprint test, which now reads the exit status, passed with both scanners"
+  },
+  "final_checks": {
+   "script": "harness/final_checks.sh <worktree> <scratch>/lint, run from a byte-identical scratch copy with mutation_controls.py",
+   "window": "2026-09-28T08:27:10Z to 08:29:06Z, on the final bytes of validate.yml, both test modules and the harness, before this file and README.md were written",
+   "gitleaks_on_path": "the host's ecosystem gitleaks launcher, reporting 8.30.1",
+   "python3 -m unittest tests.test_gitleaks_config": {"rc": 0, "result": "Ran 33 tests in 81.172s; OK"},
+   "python3 -m unittest tests.test_workflow_hardening": {"rc": 0, "result": "Ran 72 tests in 2.642s; OK (skipped=2)"},
+   "python3 -m unittest tests.test_catalog_freshness_pins": {"rc": 0, "result": "Ran 6 tests in 0.001s; OK"},
+   "python3 -m unittest tests.test_workflow_security": {"rc": 0, "result": "Ran 2 tests in 0.115s; OK"},
+   "python3 -m unittest tests.test_workflow_security_coverage": {"rc": 0, "result": "Ran 7 tests in 0.319s; OK"},
+   "harness/mutation_controls.py": {"rc": 0, "controls": 42, "all_named_tests_green_before": true, "all_failed_their_test": true, "files_restored_byte_identical": true, "green_rc": 0, "green_summary": "Ran 11 tests in 2.169s; OK"},
+   "zizmor 1.30.1 (validate.yml command, offline)": {"rc": 0, "result": "No findings to report. Good job! (43 suppressed)"},
+   "actionlint 1.7.12 with shellcheck 0.11.0": {"all_workflows_rc": 0, "validate_yml_rc": 0, "output_lines": 0},
+   "shellcheck 0.11.0 on harness/*.sh": {"rc": 0, "output_lines": 0},
+   "scripts/validate.py": {"rc": 1, "note": "before the re-registration: its first error is harness/scanner_error_probe.py, not yet hash-listed. The branch's last commit re-registers the changed and new files in manifests/evidence.json (docs/lanes.md, hot-file protocol), and its message records the run after that"},
+   "real_home_after": {"at": "2026-09-28T08:33:28Z", "~/.sigstore": "absent", "~/.cache/com.github.wasilibs": "absent"}
+  },
+  "behaviour_changes": [
+   "The required secret-scan job's unittest step is stricter; the job's YAML is unchanged. Its history-ancestry test read a scan that did not complete as zero findings and passed; it now errors. Its fixture tests error on a scan error, where exit status 1 with a partial report could let a test that expects no findings pass.",
+   "On a host with the guarded launcher, 'could not acquire the per-user lock' (an exit status other than 75) is now an error, not a skip. A busy lock still skips."
+  ],
+  "limit": "the busy-lock skip remains, and the fixture step accepts a run in which every test skipped (OK (skipped=N)); only the guarded launcher exits 75 with that message, and the hosted runner has none",
+  "deviations": [
+   "An earlier version of harness/scanner_error_probe.py, with part 1 only, ran on the base tree shortly before 08:24Z; it gave the same part-1 results, and the 08:24Z runs with both parts are the recorded ones."
   ]
  },
  "deviations": [
