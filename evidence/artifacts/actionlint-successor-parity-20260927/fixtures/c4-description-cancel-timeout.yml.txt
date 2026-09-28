@@ -1,0 +1,8 @@
+description: Build and test the project
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    cancel-timeout-minutes: 2.5
+    steps:
+      - run: echo test

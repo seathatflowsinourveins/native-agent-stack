@@ -494,3 +494,275 @@ run of these two skills specifically; first-prompt size for all three preloaded
 configurations is unmeasured. They join the researcher/verifier preregistration in the
 stack-agent decision; no default preload is added to every role child (that decision's own
 D3 constraint, narrowed rather than reversed).
+
+## Addendum 2026-09-27: security-audit trial row, stale-upstream flags, sandbox gate
+
+Evidence: [`evidence/artifacts/cloudflare-audit-skill-trial-20260927/`](../../evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md).
+`delta.json` records the pin and its file hashes, each fetched page's size and sha256, and every
+passage quoted here with its file or URL and line (`quoted_passages` holds the skill, schema and
+repository quotes). Repository mechanics cited without a quote are read at the base commit. The
+upstream reads ran on 2026-09-28 between 02:03Z and 02:18Z (UTC), which is the evening of
+2026-09-27 on the host (EDT). A review repair round read again, between about 03:05Z and 03:17Z,
+the pinned `SKILL.md` (same sha256), `report-schema.json` (same size as the tree listing), the
+settings reference, the sandboxing page and the Trust Hub audit page (each the same bytes and
+sha256), and read the local `claude plugin eval --help` (Claude Code 2.1.283). A second repair
+round, at 07:07Z on 2026-09-28 (03:07 EDT, so 2026-09-28 on the host), fetched the skills page, the
+settings reference and the commands reference again with curl (each the same bytes and sha256) and
+corrected the invocation claims (`checks.repair_round_2`). Dates below are host dates.
+
+**Decided by** the user on 2026-09-27: no user invocation; the skill runs through LLM-native
+automation (workflow stages), with the full trial, and the bake-off only if it proves suitable,
+under the token-saving stack for every run. The bake-off budget is high but waits until the
+token-saving practice passes end to end with real evidence (Gate A) and, per the plan of record,
+the GPT-6 route is settled (Gate B). Settings enforce neither restriction (no user invocation,
+workflow stages only). The wiring below carries both as a usage policy, and the `name-only` listing
+leaves the skill invocable by the user and by the model (see **LLM-native wiring** and its
+enforcement residual).
+
+**Added for trial**, under the [selection rule](#selection-rule):
+
+| Name | Source @ ref | Status | Listing | Codex | Gap |
+| --- | --- | --- | --- | --- | --- |
+| security-audit | cloudflare/security-audit-skill@c1c8a8c | trial | name-only | no | No installed procedure audits the whole repository with a coverage ledger and a `confirmed`/`needs_validation`/`rejected` verdict contract (restated below). |
+
+Pin facts, read with `gh api` at the pin:
+
+- `c1c8a8c` is still `main`'s HEAD, committed 2026-09-14.
+- `skills/security-audit` is git tree `ccbc33e` at the pin and at HEAD: 20 files, 314,670 bytes,
+  including two Node validators and their tests.
+- `SKILL.md` is 22,026 bytes (blob `92178da`, re-hashed locally). Its frontmatter holds only `name`
+  and `description`, so upstream does not disable model invocation. The description is 359
+  characters (PyYAML 6.0.3, the manifest's method).
+- License: MIT, from the repository `LICENSE` at the pin. The installed folder carries no license
+  file.
+- `official` is true by the manifest's owner-scoped convention: https://skills.sh/official lists the
+  `cloudflare` owner, as it lists `vercel-labs` for both `vercel-labs` rows.
+
+**Rule 3: audits re-observed.** The skills.sh page and its three audit pages:
+
+| Audit | Page label | Audit page | Audit API (`add-skill.vercel.sh/audit`) |
+| --- | --- | --- | --- |
+| Gen Agent Trust Hub | Pass | "Risk Level: SAFE"; lists COMMAND_EXECUTION, DYNAMIC_EXECUTION and INDIRECT_PROMPT_INJECTION (the Node validators, untrusted target code) | `ath` risk `safe` |
+| Socket | Pass | Pass, analyzed 2026-09-15 | `socket` risk `safe`, 0 alerts, score 90 |
+| Snyk | Warn | "W011: Third-party content exposure detected (indirect prompt injection risk)", MEDIUM, "medium risk: 0.30" | `snyk` risk `medium` |
+
+All three were analyzed on 2026-09-15, after the pin became HEAD on 2026-09-14; no page names the
+revision it scanned. A Warn is not a Fail and does not exclude ([rule 3](#selection-rule)). W011
+describes the skill's purpose, reading untrusted code. The wiring below keeps its listing name-only
+and starts it from workflow stages by usage policy. It does not stop a user or the model from
+invoking the skill by name.
+
+**The 2026-09-23 `not_adopted` proposal and its refutation.** The 2026-09-23 landscape sweep
+proposed `not_adopted` with "No demonstrated gap. The native /security-review and
+security-best-practices skills already cover security review." Both refuters voted it refuted, so it
+did not survive. The citation critic asked the next pass to restate the gap with the qualification
+from `docs/native-skill-practice-20260921.md:13` ("security findings and false-positive control
+remain unqualified") and to "state whether the candidate closes the qualification gap"
+(`catalogs/sota-convergence/manifest-20260923.json`, lines 6035-6060 and 17195-17201; that dated
+file is not edited). The restated gap, from the Claude Code
+[commands reference](https://code.claude.com/docs/en/commands), read 2026-09-27:
+
+- `/security-review` "Reviews the diff between your branch and origin's default branch". It is
+  diff-scoped.
+- `/code-review` reviews "the current diff, or a PR number, branch, or path you pass, for correctness
+  bugs". It can take a path, but its subject is correctness, not security.
+- `security-best-practices` is framework guidance. Its catalog record says "The skill is not a full
+  security audit" (`catalogs/landscape/native-practice.json`).
+- None of the three documents a whole-repository coverage ledger or a per-finding
+  `confirmed`/`needs_validation`/`rejected` contract. The pinned skill defines both and checks them
+  with `validate-coverage-ledger.cjs` and `validate-findings.cjs`.
+
+Whether the skill closes the qualification gap (useful findings with controlled false positives) is
+unknown: nothing has been measured here. The M5c bake-off below is the 2026-09-23 overturn condition
+itself.
+
+**Third-party evidence, weak.** [Issue #20](https://github.com/cloudflare/security-audit-skill/issues/20)
+is open, filed 2026-09-16 by an account with no association to the repository, and reports one
+blind comparison. Quoted, emphasis removed:
+
+- "n = 3 per arm, one target".
+- For the skill, "precision held at a median of 90% across rounds, zero hits on either deliberate
+  look-alike decoy in any round".
+- "median cost per run ...: the skill's quick profile $29.95, a plain single-agent review $2.06, a
+  multi-lens review pipeline of ours $7.66", with quick's median recall equal to the single-agent
+  review's ("0.467 vs 0.467, on 15 seeds").
+- "Disclosure: the multi-lens pipeline is our own tool, so we have an interest here".
+
+The issue says only "pinned to a recent commit", never which. One seeded target, three rounds and an
+interested author make this a discovery signal for the M5c design, not evidence of merit.
+
+**LLM-native wiring.**
+
+- **Listing `name-only`.** "Claude sees the skill by name without its description" (settings
+  reference, `skillOverrides`). Workflow stages and the model can invoke it by name. Its broad
+  description, which says "Use for security questions", stays out of the listing. That narrows what
+  Claude sees, not who can invoke the skill:
+  - The model can still pick the skill by name on any prompt, an ordinary security question
+    included: "By default, Claude can invoke any skill that doesn't have
+    `disable-model-invocation: true` set." How often it would without the description is
+    unmeasured.
+  - The skills page's [visibility table](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings)
+    gives `name-only` as "Name only" to Claude and "Yes" in the column "In `/` menu", so a user can
+    still type `/security-audit`.
+  - Running it only from workflow stages is therefore a usage policy that the stage prompts carry,
+    not a guarantee.
+  - No `skillOverrides` state hides the `/` entry and keeps the skill listed to Claude. Only `off`
+    hides the `/` entry, and then "Claude doesn't see the skill and `/name` is hidden from
+    autocomplete". Invoking such a skill "by its full name still returns the `skillOverrides` error
+    instead of running it", so `off` would stop the workflow stages too.
+  - `user-invocable-only` is not used: the user rejected user invocation, "Claude doesn't see the
+    skill" in that state, and it blocks agent preloads ([listing state and agent
+    preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
+- **Enforcement residual (the user trigger only).** The native control for the user trigger is
+  frontmatter: with `user-invocable: false`, "Claude Code hides it from the `/` menu and doesn't
+  run it when you type `/name`". The field leaves Claude's own invocation on: "With
+  `user-invocable: false`, you can't invoke the skill, but Claude still can." Keeping Claude from
+  invoking it takes `disable-model-invocation: true`, which "removes the skill from Claude's
+  context entirely", so the session that drives the stages could not load it either. Stage-only use
+  therefore stays a usage policy with or without either field. The pinned `SKILL.md` has neither
+  field, and the install is as-is: `tools/adoption/install_skills.py` counts an installed
+  `SKILL.md` as current only when its sha256 matches the pin (`classify_skill`) and rolls back an
+  add that does not match, so a local frontmatter edit would break the pin. Removing the user
+  trigger therefore needs a new upstream pin. Even then, the docs do not say how the field combines
+  with a `name-only` override; their invocation table gives `user-invocable: false` a "Description
+  always in context". A native probe of the combination comes before any claim that the user
+  trigger is gone.
+- **No agent preload.** `SKILL.md` alone is 22,026 bytes and the folder 314,670. Stages paste the
+  companion blocks they need, as the skill intends: `HUNTING.md` and `VALIDATION-AND-REPORTING.md`
+  "carry this procedure as one identical fenced block for hunter and verifier prompts". The six-role
+  preload table above is unchanged.
+- **Guidance by default.** Upstream says: "This skill is guidance by default. Loading it does not
+  authorize the complete audit workflow or file creation." A stage runs full audit mode only when its
+  prompt asks for it explicitly, with a profile, scope, budget and an output directory outside the
+  target.
+- **Parent and children.** The skill is "agent-neutral": its "Task tool" is "the platform's
+  delegation or sub-agent mechanism". A headless coordinator session is the parent and maps that to
+  the Agent tool. Hunters are its direct children, because spawn depth is 1.
+- **Sandbox.** Upstream says: "If every control cannot be enforced, do not execute target code:
+  report the missing sandbox capability as a needs-validation blocker". Without a measured sandbox
+  profile, execution-dependent leads stay `needs_validation`. Those dated blockers are the pressure
+  evidence for the foundation open gate `claude-code-sandbox-profile` in
+  `catalogs/foundation/manifest.json`.
+- **Codex off.** Codex's `[[skills.config]]` has only `enabled`, with no name-only state. Enabled,
+  Codex would list the 359-character description and could fire it on any security question. No M5
+  arm uses Codex as the skill's parent; the GPT-6 lane is the cross-family verifier. The manifest
+  schema requires only a boolean, so `false` needs no schema change. `tools/adoption/install_skills.py`
+  still installs the folder for both agents, so the table from `--print-codex-config` goes into
+  `~/.codex/config.toml` before the install.
+
+**M5b: suitability gate.** The bake-off runs only if all three hold:
+
+1. The unchanged upstream `node --test validate-findings.test.cjs validate-coverage-ledger.test.cjs`
+   passes at the pin.
+2. A labelled fixture exists. An upstream labelled set comes first. Otherwise, use a pre-registered
+   seeded copy of `scripts/`, `.github/workflows` and the installers, with known-pass, known-fail,
+   malformed and decoy controls, labelled as a local integration.
+3. The user sets a per-run budget.
+
+If any fails, record the reason and move the row to watch.
+
+**M5c: bake-off.** Queued behind Gate A and Gate B, with a high budget (user, 2026-09-27).
+
+- Arms, 3 runs each:
+  1. the unchanged skill, `quick` profile, source-only;
+  2. bundled `/security-review` on a branch that introduces the seeds;
+  3. a plain single-agent control.
+- Harnesses, all upstream: skill-creator's paired with-skill/without-skill benchmark, Harbor for
+  native transcripts, and scipy `bootstrap`/`permutation_test` for the statistics. No self-written
+  scorer.
+- A native paired candidate runs beside skill-creator's benchmark. It comes from a 2026-09-27 peer
+  practice sweep and from [M9 of the 2026-09-24 community sweep](2026-09-24-community-sweep.md#keep-but-compare):
+  `claude plugin eval --ablation with-without --model claude-opus-5-5 --judge-model <model> --no-publish --json <path>`.
+  - The judge must not be Haiku. The help (Claude Code 2.1.283) says "Override LLM-grader model
+    (default: haiku)", so `--judge-model` must name another model.
+  - Record the resolved model from the `--json` result. If the result does not name it, record that
+    gap.
+  - The help ties the baseline arm to a plugin: "default: with-without whenever a plugin resolves —
+    by name, or from the target path — and none when nothing does". This skill installs through the
+    skills CLI, not as a plugin, so the `--json` result must show that the no-plugin baseline arm
+    ran, or the arm does not count. The 2026-09-24 sweep lists `claude plugin eval` as "named in M9
+    but not qualified".
+- Scores: recall at equal false positives; precision and decoy hits; complete provider usage,
+  including failed attempts; wall time.
+- Promote only if the skill beats `/security-review` on recall at equal false positives. Otherwise,
+  exclude it with the numbers and keep the method as a cited reference.
+
+**M6: sandbox open gate.** The foundation open gate `claude-code-sandbox-profile` in
+`catalogs/foundation/manifest.json` carries the whole measurement list:
+
+- the deferral's three controls ([2026-09-24 secret storage](2026-09-24-secret-storage.md), lines
+  91-95): `sandbox.enabled`, `allowUnsandboxedCommands: false`, and the `credentials.files` deny.
+  In current settings that deny is a `sandbox.credentials.files` entry with mode `deny` for the
+  store;
+- `failIfUnavailable`, the host check, and the refusals of writes outside the worktree and of
+  `/mnt/c` launches;
+- a credentials arm: with filesystem isolation on, a sandboxed read of a store file fails through a
+  `~/` path and through its absolute path. The sandboxing page says "The file protection is part of
+  the filesystem layer", so the deny does not apply when filesystem isolation is off;
+- a separate `strictAllowlist` arm. With it false, the settings reference leaves a host outside the
+  allowlist to the permission mode, and "in `bypassPermissions` mode and in interactive terminal
+  plan-mode sessions where bypass is available it allows" it. The ungated permission profile stays
+  by user decision (PS-1 in `docs/harness-rules-convergence-20260922.md`);
+- the deferral's gh, git push, codex, paper-runner and systemd-bus items.
+
+The two extra arms come from a 2026-09-27 peer practice sweep. `adoption/manifest.json` now lists
+the gate in `continuation.next_action_refs`, as it listed each open foundation gate before
+(`d17b3cff` and `49c094d9` kept the two lists together), so a resumed task or a new host meets it at
+the entry point. `tests/test_adoption_contract.py` checks only that the list is a subset of the open
+gates, so this listing rests on that precedent, not on a failing test.
+
+**Trial exit and overturn.**
+
+- An M5b failure moves the row to watch. An M5c loss moves it to `excluded[]` with the numbers. An
+  M5c win goes to a sealed verdict re-record ([verdict boundary](#verdict-boundary)).
+- Its prune window starts at its own install on each host, so it is not a prune candidate at the
+  2026-10-25 review.
+- Remove it at once if any audit turns to Fail.
+- Re-decide the listing if a new pin changes the description or adds `disable-model-invocation`,
+  or if a native probe shows that a workflow stage cannot invoke a `name-only` skill by name.
+- Close the user-trigger residual only when a native probe on one host shows both halves: a typed
+  `/security-audit` does not run, and a workflow stage still invokes the skill by name. The
+  candidates are a new pin that adds `user-invocable: false`, probed together with the `name-only`
+  override, or a future `skillOverrides` state with that effect. Closing it does not make
+  stage-only use enforced: Claude can still invoke the skill unprompted, so that stays a usage
+  policy.
+- Re-decide Codex if Codex gains a name-only state.
+
+**Stale upstreams, flagged for the next verdict wave** and re-observed with `gh api` on 2026-09-27.
+
+`openai/skills`:
+
+- `main`'s HEAD is still `49f948f` (2026-06-24), the pin of `gh-fix-ci`, `security-best-practices`,
+  `security-threat-model` and `gh-address-comments`.
+- `main` has had 0 commits since 2026-06-29. The repository's `pushed_at` of 2026-09-08 is not on
+  `main`.
+- The manifest's skill rows have no notes field, so the note lives here: the next verdict wave
+  fields a challenger for the kept `security-best-practices` and the trial `security-threat-model`.
+
+`praetorian-inc/noseyparker`:
+
+- Archived on 2026-04-24. Last push 2026-02-21; last release v0.24.0 (2025-05-08).
+- Its README opens: "Nosey Parker is now Replaced by Titus. Nosey Parker is Officially Retired".
+- No current catalog presents it as a survivor or candidate. It appears only in dated records:
+  - `evidence/artifacts/landscape-sweep-20260926/`;
+  - `catalogs/sota-convergence/manifest-20260926.json`;
+  - the 2026-09-26 sweep in `catalogs/saturation/ledger.json`. That ledger is append-only and
+    hash-chained ("Editing, reordering or deleting a record breaks the chain",
+    `scripts/saturation_ledger.py`).
+- The correction is therefore recorded here:
+  - the 2026-09-26 sweep's facts vote passed a repository archived five months earlier;
+  - `manifest-20260926` carries it into the verdict wave as a `secrets-credentials` survivor;
+  - the ledger learns of it only through the next sweep's record.
+- The verdict wave should refute it on facts.
+
+**Evidence class.**
+
+| Item | Class | Basis |
+| --- | --- | --- |
+| Pin identity, tree, `SKILL.md` hash, license, quoted upstream and docs text | upstream-unchanged | `gh api` and page reads at the pin; proves identity and wording, not behavior |
+| skills.sh labels, audit pages, audit API | upstream-unchanged (independent observation) | Another platform's 2026-09-15 scan; not this repository's behavior |
+| Issue #20 numbers | upstream-unchanged (third-party report, weak) | One seeded target, n = 3, an interested author |
+| `claude plugin eval --help` lines | upstream-unchanged (local native client help, Claude Code 2.1.283) | Wording only; the arm itself is not qualified |
+| Manifest row, template key, foundation gate, tests, `scripts/validate.py` | our-integration | Structural checks, each with a failing control run first |
+| Gate listed in `adoption/manifest.json` `next_action_refs` | our-integration | Precedent check (`d17b3cff`, `49c094d9`); no test fails without it |
+| Install, settings apply, Codex disable, host read-back, `name-only` invocation reach (a typed `/security-audit`, unprompted model invocation), M5b, M5c, sandbox measurement | live-run-pending | The coordinator runs them; nothing was installed here |

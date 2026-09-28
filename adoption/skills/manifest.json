@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-09-26",
+  "checked_at": "2026-09-27",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -738,6 +738,32 @@
       "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-09-26"
+    },
+    {
+      "name": "security-audit",
+      "source": "cloudflare/security-audit-skill",
+      "url": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "path": "skills/security-audit",
+      "tree_sha": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+      "skill_md_sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+      "skill_md_bytes": 22026,
+      "description_chars": 359,
+      "upstream_disable_model_invocation": false,
+      "license": "MIT",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Pass",
+        "socket": "Pass",
+        "snyk": "Warn",
+        "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit",
+        "checked_at": "2026-09-27"
+      },
+      "status": "trial",
+      "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Upstream user-invocable: false (absent at the pin) would remove only the user trigger; Claude could still invoke it, so stage-only use stays a usage policy (same docs, read 2026-09-28). The M5c bake-off against /security-review decides promotion.",
+      "claude_listing": "name-only",
+      "codex_enabled": false,
+      "added": "2026-09-27"
     }
   ],
   "budget": {

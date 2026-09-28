@@ -388,3 +388,115 @@ if the index's collections change, or if a measured child run shows the four-nam
 ([sources, boundaries and freeze, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#sources-boundaries-and-freeze)),
 so its run records the installed hash and install time. No other carrier rule changed, and no child run with this
 block is claimed.
+
+## Addendum 2026-09-27: role-matched blocks
+
+**Need: instructions must match grants.** A subagent whose `tools` field is an explicit allowlist can use only the
+tools it lists; an omitted field inherits the parent's tools ([sub-agents](https://code.claude.com/docs/en/sub-agents)).
+ToolSearch returns only granted tools
+([measured gaps](../../evidence/artifacts/token-lanes-subagent-start-20260927/measured-gaps.md#repair-round-observations-2026-09-27)).
+The Decision above sent the same 4,094-byte block, which names 17 MCP tool ids, to every non-blind child. Seven of
+the eight shipped non-blind roles therefore received instructions to load or use tools they cannot call. The table
+compares each [`adoption/agents/claude/*.md`](../../adoption/agents/claude/) `tools:` line at base `e82e6be7` with
+that block:
+
+| `agent_type` | Ungranted ids named | Lines needing a tool the role lacks |
+| --- | ---: | --- |
+| `stack-researcher` | 5 of 17 | SocratiCode clause, codebase-memory, Headroom; both skills (no Skill tool or `skills:` preload) |
+| `stack-verifier` | 14 of 17 | fetch, code navigation, codebase-memory, QMD and ai-memory, Headroom; both skills |
+| `evidence-reviewer` | 8 of 17 | fetch, RTK (no Bash), jCodeMunch `menu`, codebase-memory, QMD, Headroom; both skills |
+| `security-reviewer` | 8 of 17 | as `evidence-reviewer` (its only preload is `security-best-practices`) |
+| `isolated-builder` | 8 of 17 | fetch, jCodeMunch `menu`, codebase-memory, QMD MCP, Headroom; `search-first` |
+| `source-scout` | 17 of 17 | bootstrap (no ToolSearch), every MCP line, the RTK line's `ctx_execute` clause; both skills |
+| `semantic-evidence-reviewer` | 17 of 17 | every line except TOON and one-lane accounting (no Bash, ToolSearch or Skill) |
+| `landscape-sweep-worker` | 0 | none: it has no `tools:` line and inherits every tool except WebFetch |
+
+The three `blind-*` roles already received 0 bytes.
+
+**Change.** The [hook](../../adoption/hooks/claude/token-lanes-subagent-start.py) keeps the `blind-*` gate and
+adds a literal map from the exact `agent_type` to a sibling block. It never builds a path from `agent_type`:
+`stack-researcher`, `stack-verifier`, `evidence-reviewer` and `security-reviewer` (one shared reviewer block),
+`isolated-builder` and `source-scout` get role blocks; `semantic-evidence-reviewer` joins an exact-name set that
+receives nothing; every other value keeps [`token-lanes-block.md`](../../adoption/hooks/claude/token-lanes-block.md)
+unchanged. A missing, empty or unreadable role block is silent and does not fall back to the default, because the
+default would restore the ungranted ids. Each role block copies its lines from the default block. Where a line
+names ungranted tools, a variant replaces it; the variants are stated verbatim in the
+[handbook](../token-session-handbook.md#token-lanes-carried-into-subagents), with the agent-type table.
+Two corrections from the design's verification apply. The builder's output line says `cwd = the owned worktree
+your brief names`, since [`isolated-builder.md`](../../adoption/agents/claude/isolated-builder.md) starts in the
+coordinator's directory, which is not its to edit. The builder keeps only the verification sentence: that skill
+is preloaded in its frontmatter, and `search-first` would need the Skill tool it lacks.
+
+| Block | UTF-8 bytes | MCP ids named |
+| --- | ---: | ---: |
+| `token-lanes-block.md` (default, unchanged) | 4,094 | 17 |
+| `token-lanes-block.researcher.md` | 3,075 | 12 |
+| `token-lanes-block.builder.md` | 2,883 | 9 |
+| `token-lanes-block.verifier.md` | 2,186 | 4 |
+| `token-lanes-block.reviewer.md` | 2,088 | 9 |
+| `token-lanes-block.scout.md` | 1,089 | 0 |
+| `semantic-evidence-reviewer` | 0 | 0 |
+
+Every block stays within the unchanged 4,100-byte bound. The
+[installer](../../tools/adoption/install_claude_profile.py) `HOOKS` map and
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) add the five role blocks, listed before the script, so an
+upgrade installs a new script after its siblings.
+
+**Tests.** The [text contract test](../../tests/test_token_lanes_subagent_start.py) now expects each type's own
+block, keeps the full-block key phrases on the default and gives each role block its own phrase set. It applies
+the budget, host-path and verbatim-handbook checks to all six files, and adds a grant-agreement test. For each
+shipped agent with a `tools:` line, every `mcp__` id the hook injects for its `agent_type` must be in that line.
+So must every tool a line names or needs: ToolSearch, Bash for the RTK line, `ctx_fetch_and_index` and the other
+bare lane tool names. A named skill must be invocable through the Skill tool or preloaded through `skills:`. As a
+failing-first control, run against the unchanged hook, that test failed for 7 of the 10 allowlisted agents (every
+row above except `landscape-sweep-worker`; the blind roles passed with 0 bytes); it passes after the change. This
+is text-versus-allowlist agreement checked by local subprocess tests, not a native child run, observed tool
+exposure, compliance or a token saving.
+
+**Supersedes.** The Decision's "default routing carrier for every non-blind subagent" now means the default for
+every non-blind type that neither the map nor the silent set (`semantic-evidence-reviewer`) names. Exclusion stays inside the hook. The measured-gap addendum's coverage
+sentence ("covers all seven shipped non-blind roles ... not tool access") is superseded by the per-role
+expectations and the grant-agreement test above.
+
+**No grant in this change.** The repository's own rules reject adding a tool to these roles now:
+- the [role-dispatch record, alternative 5](2026-09-26-stack-agents-role-dispatch.md#alternatives) (L82-83)
+  grants a lane only with a written route in the body and prunes it by measured use;
+- the [harness-settings record, `codebase-memory-mcp#2`](2026-09-27-claude-harness-settings.md#codebase-memory-mcp-codebase-memory-mcp2)
+  (L75-84) says no shipped agent's exact tool list gains codebase-memory tools until each platform has a pinned
+  install and each intended agent has a recorded useful call;
+- the [workflow role-routing notes](../../examples/claude-native/workflows/README.md#role-routing-and-child-prompt-size-2026-09-21) (L494)
+  keeps guarded Headroom coordinator-side;
+- #381's [preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json) says of
+  Headroom "No default role grant; report M10 N/A and explain any invocation."
+
+The five role bodies sealed for #381 are unchanged, so no amendment is needed. A later `stack-researcher` grant of
+the read-only codebase-memory tools remains possible. It would need #381 to have executed or an Amendment 3, the
+`codebase-memory-mcp#2` overturn condition, a written body route and a role-dispatch addendum.
+
+**Alternatives rejected.**
+- Native per-agent `SubagentStart` matchers. Upstream supports a matcher on the agent name. They would add one
+  settings group per role to the template's single empty-matcher group, which the installer merge test pins.
+- One block with "where granted" qualifiers. It would exceed the 4,100-byte bound and still name ungranted ids.
+- Skipping every named role. That would drop carrier-only rules the sealed bodies do not state: `intent`, `cwd`
+  for every language and the RTK rewrite details.
+- Falling back to the default block when a role block is missing. That restores the ungranted ids.
+
+**#381.** The carrier is now the hook and six block files. #381 freezes "carrier and skill hashes" at execution
+([step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)), so its run records
+the installed hash of the hook and of every block file. `SHA256SUMS` lists all seven together. In arm B the frozen
+named roles now receive their role blocks instead of the default block.
+
+**Limitations and open items.** A plugin-scoped `agent_type` such as `my-plugin:stack-verifier` receives the
+default block, as the blind gate already documents for plugin-shipped roles; the installer copies user agents
+with bare names. The map also matches a same-named agent in any other project, because the hook runs from user settings for every project and a project-scope definition overrides the user-scope one; that agent receives the role block written for the shipped allowlist whatever its own `tools:` line grants, and the grant-agreement test checks only the shipped definitions. A new shipped agent with a `tools:` line and no map entry receives the default block, and the
+grant-agreement test fails for it unless its allowlist covers every line. The Codex stack-worker profile's
+codebase-memory and Headroom exposure is outside this Claude carrier and is not reconciled here.
+
+**Overturn.** Revisit a role block when its agent's `tools:` line changes, though the grant-agreement test
+fails only when a block still names a tool the line no longer grants; a new grant or a `disallowedTools` entry fails no test. Also revisit when a native child run shows a role block without a lane that the role uses and is
+granted, or when a SubagentStart hook can read the child's resolved tool list, which would let one block be
+filtered at run time.
+
+| Earlier assumption | Correction and verification path |
+| --- | --- |
+| One carrier text fits every non-blind child | Allowlisted roles receive only lanes their `tools:` line grants; the grant-agreement test compares each shipped allowlist with the injected text. |

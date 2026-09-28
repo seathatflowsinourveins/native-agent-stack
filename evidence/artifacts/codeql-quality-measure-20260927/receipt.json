@@ -1,0 +1,169 @@
+{
+ "id": "codeql-quality-measure-20260927",
+ "kind": "artifact_measurement",
+ "unit": "codeql (plan move M4): measure the CodeQL quality suites before any setup change",
+ "decision": "docs/decisions/2026-09-27-codeql-quality-suites.md",
+ "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "measured_commit": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "repository": "seathatflowsinourveins/native-agent-stack (public)",
+ "measured_at_utc": {"bundle_download": "2026-09-28T02:02:03Z", "first_codeql_step": "2026-09-28T02:05:39Z", "last_codeql_step": "2026-09-28T02:20:37Z"},
+ "host_bounds": "48 CPUs, about 77 GiB available at start; every CodeQL process ran with --threads=8 --ram=12288 and the three language pipelines ran in parallel. Nothing was installed host-wide: the bundle was extracted into the unit's scratch directory <dl>, outside the checkout.",
+ "placeholders": {"<dl>": "the unit's scratch download directory, outside every repository", "<worktree>": "the unit's owned git worktree at measured_commit"},
+ "codeql": {
+  "cli": {"version": "2.27.1", "sha": "938af3639d0709b587251e45d9f8d2bdc3505696", "branch": "codeql-cli-2.27.1", "command": "<dl>/codeql/codeql version --format=json"},
+  "query_packs": {
+   "codeql/python-queries": "1.8.11", "codeql/python-all": "7.2.6",
+   "codeql/javascript-queries": "2.4.6", "codeql/javascript-all": "2.10.2",
+   "codeql/actions-queries": "0.6.36", "codeql/actions-all": "0.6.2",
+   "codeql/suite-helpers": "1.0.58", "codeql/threat-models": "1.0.58",
+   "build_sha": "6e9f9e38390175c41b99070a423c875f450759ca"
+  },
+  "suites_run": {
+   "code-scanning": "<lang>-code-scanning.qls, the default suite (what default setup runs)",
+   "code-quality": "<lang>-code-quality.qls (code-quality-selectors.yml: problem or path-problem, precision high or very-high, tag quality)",
+   "security-and-quality": "<lang>-security-and-quality.qls (python and javascript: security-and-frozen-quality-selectors.yml plus an explicit list of 122 and 102 quality query ids; actions: security-and-quality-selectors.yml)",
+   "security-extended": "<lang>-security-extended.qls, the suite default setup calls Extended (run to measure the deferred fallback)"
+  },
+  "bundle": {
+   "release": "github/codeql-action release codeql-bundle-v2.27.1 (published 2026-09-22T17:10:11Z, immutable; the tag resolves to sha1:416ff0dea110f80f0f56f0046500dbf7420e4bb0)",
+   "asset": "codeql-bundle-linux64.tar.gz",
+   "bytes": 692285664,
+   "sha256": "1d380f79896ededc654c7b21fafb3360136f1aeb678ad4df4df9af3910c6b815",
+   "cli_version_asset": "cli-version-2.27.1.txt reads 2.27.1",
+   "asset_choice": "Default setup downloaded codeql-bundle-linux64.tar.zst from the same release (job log). zstd is not installed on this host and nothing is installed host-wide, so the same release's .tar.gz asset was used; it carries the same CLI version and packs."
+  },
+  "verification_before_execution": [
+   {"check": "local sha256 equals the release API asset digest", "command": "gh api repos/github/codeql-action/releases/tags/codeql-bundle-v2.27.1 (assets[].digest)", "result": "sha256:1d380f79896ededc654c7b21fafb3360136f1aeb678ad4df4df9af3910c6b815, size 692285664: match"},
+   {"check": "published checksum asset", "command": "sha256sum -c codeql-bundle-linux64.tar.gz.checksum.txt", "exit": 0, "output": "codeql-bundle-linux64.tar.gz: OK"},
+   {"check": "immutable-release attestation", "command": "gh release verify-asset codeql-bundle-v2.27.1 codeql-bundle-linux64.tar.gz --repo github/codeql-action", "exit": 0, "output": "Verification succeeded! codeql-bundle-linux64.tar.gz is present in release codeql-bundle-v2.27.1", "attestation": "one attestation for this digest, predicateType https://in-toto.io/attestation/release/v0.2, Sigstore bundle v0.3"},
+   {"check": "SLSA build provenance", "command": "gh attestation verify codeql-bundle-linux64.tar.gz --repo github/codeql-action", "exit": 1, "output": "HTTP 404 for predicate_type=https://slsa.dev/provenance/v1", "meaning": "The release publishes a release attestation, not SLSA provenance; gh release verify-asset is the verifier that matches it."}
+  ],
+  "verification_negative_controls": [
+   {"check": "the same verify-asset command on a 22-byte file that is not the bundle", "exit": 1, "output": "attestation for codeql-bundle-v2.27.1 does not contain subject sha256:a1b4af5958c395e1b8df947d558692dff43741cf9a6c5535d29efef052ae7fe7"},
+   {"check": "sha256sum -c with the bundle digest against that file", "exit": 1, "output": "neg-control.bin: FAILED"}
+  ]
+ },
+ "steps": [
+  {"label": "create-actions", "start": "2026-09-28T02:05:39Z", "end": "2026-09-28T02:05:45Z", "exit": 0, "argv": "<dl>/codeql/codeql database create <dl>/db/actions --language=actions --source-root=<worktree> --threads=8 --ram=12288 --overwrite"},
+  {"label": "create-javascript", "start": "2026-09-28T02:05:39Z", "end": "2026-09-28T02:05:49Z", "exit": 0, "argv": "<dl>/codeql/codeql database create <dl>/db/javascript --language=javascript --build-mode=none --source-root=<worktree> --threads=8 --ram=12288 --overwrite"},
+  {"label": "create-python", "start": "2026-09-28T02:05:39Z", "end": "2026-09-28T02:06:09Z", "exit": 0, "argv": "<dl>/codeql/codeql database create <dl>/db/python --language=python --build-mode=none --source-root=<worktree> --threads=8 --ram=12288 --overwrite"},
+  {"label": "analyze-actions-code-scanning", "start": "2026-09-28T02:05:45Z", "end": "2026-09-28T02:05:56Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/actions codeql/actions-queries:codeql-suites/actions-code-scanning.qls --format=sarif-latest --output=<dl>/sarif/actions-code-scanning.sarif --sarif-category=/language:actions --threads=8 --ram=12288"},
+  {"label": "analyze-actions-code-quality", "start": "2026-09-28T02:05:56Z", "end": "2026-09-28T02:06:03Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/actions codeql/actions-queries:codeql-suites/actions-code-quality.qls --format=sarif-latest --output=<dl>/sarif/actions-code-quality.sarif --sarif-category=/language:actions --threads=8 --ram=12288"},
+  {"label": "analyze-actions-security-and-quality", "start": "2026-09-28T02:06:03Z", "end": "2026-09-28T02:06:12Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/actions codeql/actions-queries:codeql-suites/actions-security-and-quality.qls --format=sarif-latest --output=<dl>/sarif/actions-security-and-quality.sarif --sarif-category=/language:actions --threads=8 --ram=12288"},
+  {"label": "analyze-javascript-code-scanning", "start": "2026-09-28T02:05:49Z", "end": "2026-09-28T02:06:09Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/javascript codeql/javascript-queries:codeql-suites/javascript-code-scanning.qls --format=sarif-latest --output=<dl>/sarif/javascript-code-scanning.sarif --sarif-category=/language:javascript --threads=8 --ram=12288"},
+  {"label": "analyze-javascript-code-quality", "start": "2026-09-28T02:06:09Z", "end": "2026-09-28T02:06:20Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/javascript codeql/javascript-queries:codeql-suites/javascript-code-quality.qls --format=sarif-latest --output=<dl>/sarif/javascript-code-quality.sarif --sarif-category=/language:javascript --threads=8 --ram=12288"},
+  {"label": "analyze-javascript-security-and-quality", "start": "2026-09-28T02:06:20Z", "end": "2026-09-28T02:06:33Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/javascript codeql/javascript-queries:codeql-suites/javascript-security-and-quality.qls --format=sarif-latest --output=<dl>/sarif/javascript-security-and-quality.sarif --sarif-category=/language:javascript --threads=8 --ram=12288"},
+  {"label": "analyze-python-code-scanning", "start": "2026-09-28T02:06:09Z", "end": "2026-09-28T02:06:47Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/python codeql/python-queries:codeql-suites/python-code-scanning.qls --format=sarif-latest --output=<dl>/sarif/python-code-scanning.sarif --sarif-category=/language:python --threads=8 --ram=12288"},
+  {"label": "analyze-python-code-quality", "start": "2026-09-28T02:06:47Z", "end": "2026-09-28T02:07:45Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/python codeql/python-queries:codeql-suites/python-code-quality.qls --format=sarif-latest --output=<dl>/sarif/python-code-quality.sarif --sarif-category=/language:python --threads=8 --ram=12288"},
+  {"label": "analyze-python-security-and-quality", "start": "2026-09-28T02:07:45Z", "end": "2026-09-28T02:08:09Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/python codeql/python-queries:codeql-suites/python-security-and-quality.qls --format=sarif-latest --output=<dl>/sarif/python-security-and-quality.sarif --sarif-category=/language:python --threads=8 --ram=12288"},
+  {"label": "analyze-python-security-extended", "start": "2026-09-28T02:20:14Z", "end": "2026-09-28T02:20:23Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/python codeql/python-queries:codeql-suites/python-security-extended.qls --format=sarif-latest --output=<dl>/sarif/python-security-extended.sarif --sarif-category=/language:python --threads=8 --ram=12288"},
+  {"label": "analyze-javascript-security-extended", "start": "2026-09-28T02:20:23Z", "end": "2026-09-28T02:20:30Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/javascript codeql/javascript-queries:codeql-suites/javascript-security-extended.qls --format=sarif-latest --output=<dl>/sarif/javascript-security-extended.sarif --sarif-category=/language:javascript --threads=8 --ram=12288"},
+  {"label": "analyze-actions-security-extended", "start": "2026-09-28T02:20:30Z", "end": "2026-09-28T02:20:37Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/actions codeql/actions-queries:codeql-suites/actions-security-extended.qls --format=sarif-latest --output=<dl>/sarif/actions-security-extended.sarif --sarif-category=/language:actions --threads=8 --ram=12288"}
+ ],
+ "steps_note": "The first twelve steps ran through run.sh (three language pipelines in parallel); the three security-extended steps ran afterwards on the same databases, invoked as ./codeql/codeql from <dl>. Stderr lines that mention errors or warnings are query names (SyntaxError.bqrs, EncodingError.bqrs, UnhandledErrorInStreamPipeline.bqrs) and 'Interpreting' progress lines, not failures.",
+ "run_integrity": {
+  "claim": "Every step of the recorded run exited 0, so the run.sh defect found in review did not affect these counts. That run.sh waited with a bare `wait`, which returns zero whatever the jobs returned (bash(1), wait), and its analysis loop continued after a failed step, so a replay could record ALL DONE with missing results.",
+  "run_sh_used": "sha256 3346ee74e9b42b9bcac8019bbc30e62eb41614e48d8c7371c5fdc3af40974b9a, 1838 bytes: run.sh as first committed (f137ede7), byte-identical to the retained <dl>/run.sh",
+  "records": [
+   "<dl>/steps.tsv has 15 step lines, each with exit code 0 in its fourth column: the twelve run.sh steps, then 'ALL DONE 2026-09-28T02:08:09Z', then the three security-extended steps. step() records each command's own exit status, so this column is direct evidence; the defect was only in how run.sh acted on those statuses.",
+   "<dl>/logs/create-python.err, create-javascript.err and create-actions.err each end with 'Successfully created database at <dl>/db/<language>.'",
+   "Each of the 12 <dl>/logs/analyze-<language>-<suite>.err files ends with 'Exporting results to SARIF...' and 'Exported results to SARIF (<n>ms).'",
+   "The 12 files in <dl>/sarif hash to sarif_sha256.local, hold the result counts in counts.json, and record invocations[0].executionSuccessful true with no error-level toolExecutionNotifications."
+  ],
+  "fix": "run.sh now stops a language pipeline at its first failed step and waits on each pipeline's PID. It writes ALL DONE and exits 0 only when all three pipelines succeed; otherwise it appends a FAILED line naming them and exits 1. The CodeQL argv is unchanged. In a replay with a stub codeql that returns 23, the old script exited 0 with ALL DONE when all three database creations failed and the new one exited 1 with FAILED.",
+  "class": "our-integration (a reading of the retained <dl> records; the fix and the stub replay concern local glue, not CodeQL)"
+ },
+ "sarif_sha256": {
+  "local": {
+   "actions-code-quality.sarif": "a9ab22ee8d5945945742d45746546a07ae55db45a1d01061b556a39c2a3b46e6",
+   "actions-code-scanning.sarif": "edf11f83f9006a2ce71ec50048da79a8f622b78dab80072c80c86b3ca2fdd324",
+   "actions-security-and-quality.sarif": "efb88800984eded11457cad74d190b3c2a6daabb5e6310c1787692a5caf80bb4",
+   "actions-security-extended.sarif": "0aa41d1d252dd751471874e7b8fd7444c3fe7a80f108bb8c7be8cb3d3766ef08",
+   "javascript-code-quality.sarif": "8152a60b47a62dba01d9e3ba5746cba75b061e4d1ee30e3b616134715aac94c9",
+   "javascript-code-scanning.sarif": "c6130b2f683352ea55545e9827003c0b8032a4e54143ce6efc5b17c9a384dd36",
+   "javascript-security-and-quality.sarif": "27d06f5865a18ca0e574f1ba3cce70344dd6a5990ea38b3b8ff9a043c54874fa",
+   "javascript-security-extended.sarif": "8b19fd11fc0241a0b70ac2c2079ff812c0e5b9a07b3bec0e6dc6d0239c2cfd40",
+   "python-code-quality.sarif": "5ee6929b11fbb4f7899bd0a07ca81a7ce42996e5b3bc162a5be97b7340473677",
+   "python-code-scanning.sarif": "2fbee39dc3b76e6eea4493268cafd18f4497e1db89898a4f734cca852bfa2a7b",
+   "python-security-and-quality.sarif": "e212d514651caa5fb1a78dc5f3eedee9bcc67e7cc5bcaaacc9a22efd1e6cc84a",
+   "python-security-extended.sarif": "46b52b251974a6a76512133ffb2ea58e675a2b4c169833024c2f4a33988b3328"
+  },
+  "live": {
+   "actions.sarif": "ab9a3f4dc84c64a3b4330d229be9f9839f68b10a0f9b64a2cb0cf1490284933b",
+   "csharp.sarif": "60fed6887e368d770b32b80769c9ebc25480b30f89ab25733193913e2d91f9d5",
+   "go.sarif": "6e84f816918f7686116db9fa5ec8f1d26a722654d33c12fee4f0ac3e6003c717",
+   "javascript-typescript.sarif": "3aab147d22c961275409b2404eff929b846a64cf246a4e51a9dcf129913654f0",
+   "python.sarif": "79e9c4e5f684ece190b7cff89f7440dea7bca9a8ae4bc4a71ba377321d5ace66",
+   "rust.sarif": "e59b5088795944c9150e1c3c4850c1447529365ae4a4f61d2f94a06c898cbc35"
+  },
+  "why_not_committed": "CodeQL SARIF records the absolute source root (originalUriBaseIds) and the live SARIF the runner's; the files stay in <dl> and only their hashes and derived counts are published."
+ },
+ "live_default_setup": {
+  "default_setup_get": {"command": "gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/default-setup", "state": "configured", "languages": ["actions", "csharp", "go", "javascript", "javascript-typescript", "python", "rust", "typescript"], "query_suite": "default", "threat_model": "remote", "schedule": "weekly", "runner_type": "standard", "updated_at": "2026-09-23T04:40:46Z"},
+  "run": {"id": 36364716716, "workflow": "dynamic/github-code-scanning/codeql", "display": "Push on main", "conclusion": "success", "head_sha": "ba1700adc6557b03d3c9336c4d3a951791fc8de5"},
+  "job_logs": {
+   "command": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/jobs/<job>/logs",
+   "actions": {"job": 108748731072, "build_mode": "none"},
+   "csharp": {"job": 108748731129, "build_mode": "none", "note": "C# build-mode none reported calls with call target 77% (threshold 85%)"},
+   "go": {"job": 108748731136, "build_mode": "autobuild"},
+   "javascript-typescript": {"job": 108748731115, "build_mode": "none"},
+   "python": {"job": 108748731139, "build_mode": "none"},
+   "rust": {"job": 108748731167, "build_mode": "none"},
+   "cli": "Using CodeQL CLI version 2.27.1 sourced from https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.1/codeql-bundle-linux64.tar.zst",
+   "actions_used": "github/codeql-action/init@v4 and github/codeql-action/analyze@v4 (default setup's own reference)"
+  },
+  "analyses": [
+   {"language": "python", "id": 1848657550, "created_at": "2026-09-28T01:10:50Z", "tool": "CodeQL 2.27.1", "results_count": 16, "rules_count": 43},
+   {"language": "javascript-typescript", "id": 1848651215, "created_at": "2026-09-28T01:08:07Z", "tool": "CodeQL 2.27.1", "results_count": 1, "rules_count": 87},
+   {"language": "actions", "id": 1848650007, "created_at": "2026-09-28T01:07:39Z", "tool": "CodeQL 2.27.1", "results_count": 0, "rules_count": 17},
+   {"language": "csharp", "id": 1848653981, "created_at": "2026-09-28T01:09:14Z", "tool": "CodeQL 2.27.1", "results_count": 0, "rules_count": 52},
+   {"language": "go", "id": 1848650412, "created_at": "2026-09-28T01:07:49Z", "tool": "CodeQL 2.27.1", "results_count": 0, "rules_count": 34},
+   {"language": "rust", "id": 1848650144, "created_at": "2026-09-28T01:07:42Z", "tool": "CodeQL 2.27.1", "results_count": 0, "rules_count": 26}
+  ],
+  "analyses_command": "gh api 'repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses?per_page=40&ref=refs/heads/main'; each SARIF with gh api -H 'Accept: application/sarif+json' .../code-scanning/analyses/<id>",
+  "alert_states": {"command": "gh api --paginate 'repos/seathatflowsinourveins/native-agent-stack/code-scanning/alerts?tool_name=CodeQL&state=<open|dismissed|fixed>&ref=refs/heads/main&per_page=100'", "at": "2026-09-28T02:36:30Z", "open": 0, "dismissed": 17, "fixed": 5, "note": "The 17 live default-suite results at measured_commit (16 python, 1 javascript-typescript) belong to dismissed alerts. Under security-and-quality, the 1,056 python and 189 javascript-typescript results beyond the default suite would be new alerts."},
+  "flag_differences":"Default setup's database init also passed --calculate-language-specific-baseline, --sublanguage-file-coverage, --extractor-include-aliases, --codescanning-config and --overlay-base, and --build-mode=none for actions; the local run passed none of these. The default-suite results still matched exactly (parity below)."
+ },
+ "parity": {
+  "claim": "The local default-suite (code-scanning) SARIF equals the live default-setup SARIF at the same commit, as multisets of (rule id, path, start line, start column), for python (16 = 16 results, 43 = 43 rules), javascript-typescript (1 = 1, 87 = 87) and actions (0 = 0, 17 = 17).",
+  "vacuity": "Actions parity is vacuous for results (0 = 0); only its rule set (17 = 17, same ids) is a non-vacuous match.",
+  "negative_control": "The same comparator on a mismatched pair (local python code-quality SARIF against the live python SARIF) reports identical=false, same_rule_ids=false, 979 local-only results.",
+  "detail": "counts.json: parity, parity_negative_control"
+ },
+ "self_check": {
+  "claim": "The four receipt scripts add no CodeQL results of their own: a python database built from a scratch copy of only these files gives 0 results under code-scanning, code-quality and security-and-quality (CodeQL 2.27.1, --build-mode=none).",
+  "negative_control": "The same code-quality check on a copy of triage.py with a planted unused `import shutil` and an unclosed `open(path).read()` reports 2 results (py/unused-import, py/file-not-closed).",
+  "class": "our-integration (upstream CLI and suites unchanged)"
+ },
+ "evidence_classes": {
+  "upstream-unchanged": [
+   "CodeQL CLI 2.27.1 and its bundled query packs ran unchanged, with the bundle's own suite files; the counts in counts.json are their SARIF output.",
+   "Bundle integrity and release membership were checked with GitHub's native verifiers (release asset digest, published checksum asset, gh release verify-asset), each with a failing negative control, before the CLI ran."
+  ],
+  "our-integration": [
+   "run.sh, summarize_sarif.py, sample_alerts.py and triage.py are thin glue around the upstream CLI and the SARIF 2.1.0 format: counts, lane split (docs/lanes.md read literally), the parity comparison and its negative control, the seeded stratified draw, population heuristics and the volume-weighted extrapolation.",
+   "The 26 verdicts in triage_verdicts.json are this unit's reading of the source, recorded with file:line reasons; they are not an upstream or independent verdict.",
+   "The parity target is GitHub's own default-setup analysis and SARIF for the same commit (a live platform record that was read, not rerun)."
+  ],
+  "live-run-pending": [
+   "No advanced-setup workflow and no Extended default-setup analysis ran on GitHub.",
+   "How merge protection would treat new quality or Extended alerts on a real pull request is taken from GitHub's documentation, not observed on a pull request.",
+   "csharp, go and rust were not analysed locally; only their live default-suite analyses (0 results each) were read."
+  ]
+ },
+ "sources": [
+  {"what": "CodeQL bundle", "ref": "github/codeql-action release codeql-bundle-v2.27.1, asset codeql-bundle-linux64.tar.gz"},
+  {"what": "suite definitions", "ref": "bundle qlpacks codeql/{python,javascript,actions}-queries codeql-suites/*.qls and codeql/suite-helpers 1.0.58 selector files"},
+  {"what": "frozen quality list in security-and-quality", "ref": "github/codeql pull request 19578 'JS: Explicitly Filter Quality Queries for Inclusion in Security-and-Quality' (merged 2025-05-27, commit 37024ade85bb73a443b216406fb9d315a94f0440) and pull request 19891 'Go/Ruby/Python: Freeze quality queries in security-and-quality' (merged 2025-07-01; commits 1fbf3a39fb61f8c6918df990838e421d8d688f90, 3efbed56b0c913482342db984622c9f0e6693b15, 143a91efc4c49d92bd832f5056f2d569f3713cea, 145ada53f2b0f97548caae593c5bce727842f1a2)"},
+  {"what": "action pins", "ref": "github/codeql-action v4.38.1 = 1c5b675653bb5c22dbe9b12b556ec555138e09fd (the repository's pin; src/defaults.json cliVersion 2.27.0); v4.38.2 = 2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 (cliVersion 2.27.1)"},
+  {"what": "starter workflow", "ref": "actions/starter-workflows fbc8bd851e74a7296904aa1a44ac0edded32deaf code-scanning/codeql.yml (sha256 4f13d41a77c5cbed0d561dc6b576c546a307ac465951fbfb7d4ddbf438fbab37); read, not used, because no switch is recommended"},
+  {"what": "GitHub documentation (fetched 2026-09-28 UTC through https://docs.github.com/api/article/body)", "ref": "code-scanning alerts (severity and security severity; alerts in pull requests; non-application-code labels), CodeQL query suites, workflow configuration options, rulesets 'Require code scanning results', set code scanning merge protection, GitHub Code Quality (availability and billing)"}
+ ],
+ "limitations": [
+  "One commit and one host; the counts change with the code and with the CodeQL version.",
+  "Triage covers one alert per sampled rule (20) plus a 6-alert supplement; the volume-weighted figures extrapolate each sampled verdict to its rule's other results, and population heuristics support but do not replace per-result verdicts.",
+  "Actions has no quality coverage at CodeQL 2.27.1: actions-code-quality.qls selects 0 queries. That is missing coverage, not a clean result.",
+  "The lane split applies docs/lanes.md literally: evidence/artifacts/ and non-trading scripts/ are unassigned there and reported as unlisted, although the seven JavaScript pages under evidence/artifacts/gap-wave2-20260923/us-equities__* serve the trading lane in intent (lanes.md names only the blueprints/ form of that glob).",
+  "Raw SARIF, databases and logs stay in <dl> (they record absolute paths); published values are derived counts, hashes and repository-relative locations."
+ ]
+}

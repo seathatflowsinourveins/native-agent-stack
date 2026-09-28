@@ -3447,8 +3447,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "671b6e6ab58abe4d715c2fc76f416ec1987f2386cdd68fbeaed4d2a2a5bc8df0",
-      "bytes": 31402
+      "sha256": "eeabebb17a551cbde664c1416c833d36e3ec9dd8850df68edb4c254f185d56ac",
+      "bytes": 33848
     },
     {
       "path": ".gitignore",
@@ -3547,8 +3547,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "a92b00cbdef4e940508c766714dad00321cf4f4e27a89990bc0ed4ddba041a32",
-      "bytes": 43742
+      "sha256": "9d511ff9ff79f5ad9f743c0478f4645d1ac6725fb214a033a83cd7c47eeee04b",
+      "bytes": 44274
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3562,8 +3562,13 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "46a7b9385e8aaaadf9f27b67e6d8bb92f85f30ed0e0cfe9d881adc6cb3f8c3b4",
-      "bytes": 383
+      "sha256": "3635f6b34ba0d2e5902745eb70862bf6583b575a07707055ec11ff8e137a9ac6",
+      "bytes": 861
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-block.builder.md",
+      "sha256": "87502accaf3a88283c183bf521c71568754bbb4ebe076c74d34489691c8f0549",
+      "bytes": 2883
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
@@ -3571,9 +3576,29 @@
       "bytes": 4094
     },
     {
+      "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
+      "sha256": "47cc80b262468557b8cfe5c243598030757270674bc7bf286fba8c0c573abc28",
+      "bytes": 3075
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-block.reviewer.md",
+      "sha256": "19857a44a201948aa1d1fc9be3e24d5f3f7cc385f333ab3893411889258af4ed",
+      "bytes": 2088
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-block.scout.md",
+      "sha256": "81784c2edc0cc95c0c0eb3b443b5b228dd41e970236239553c66af90ddfc7eae",
+      "bytes": 1089
+    },
+    {
+      "path": "adoption/hooks/claude/token-lanes-block.verifier.md",
+      "sha256": "a2eb3298126efd82622150e5717f10eb700f4aa3076d027c86ae1fe653f29eb0",
+      "bytes": 2186
+    },
+    {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
-      "sha256": "7a9228e41235771336189287944d81d998795b025a9a038d022beb21a19ce870",
-      "bytes": 1162
+      "sha256": "81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd",
+      "bytes": 2082
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3622,8 +3647,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "d367e5acb6c8c111cda46ed1b916a4088c255fe3f51b26a35a4e4627b1c6b3d7",
-      "bytes": 19275
+      "sha256": "a0c1177befa8cb9b2ffabe63c6bc0adb9a7dcf3bf54a21d0a9f61281790fa121",
+      "bytes": 19316
     },
     {
       "path": "adoption/paired/README.md",
@@ -3712,13 +3737,13 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "002312220e4ebe1c920a0d1a2230100498983d4165440ce73e8d09c667f91807",
-      "bytes": 48474
+      "sha256": "056fa8744df94a6b33ff14583a95b3140047cd8a5d44525459ae1b08dfffd90f",
+      "bytes": 50527
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "c3533b6a0c4715a9a6acaf8cb43c5e35bd8b7e2ccac8356b0d69b2cecdefce3f",
-      "bytes": 10848
+      "sha256": "cc0cedc5c70b72765cc6454902dffdded772643eb6739602128fa75498eb5d42",
+      "bytes": 10883
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5085,6 +5110,16 @@
       "path": "blueprints/convergence-practice/offhost-restore/verify.py",
       "sha256": "a3363192e027e7521fda0e03e5a0a2acc9f149abee304d57d6460166bdeae260",
       "bytes": 5199
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-routing-20260928/README.md",
+      "sha256": "9db0823f48a6007881fbf7848d126cb8a6814f1649461d80b644cee73388f328",
+      "bytes": 15796
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+      "sha256": "de31f07cf4ac3f1d32fc64ef94796a98a9aec39fb2a10945dfd1d13e37cdb246",
+      "bytes": 56660
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -13168,8 +13203,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "5c71a32796613ab69da55260c396f426f26fc910d84a29a9419cf4d48347b94a",
-      "bytes": 32277
+      "sha256": "fed211eeaac99fc58f328fa8a86bb911f6f285552aac3352122011dedd0f58a6",
+      "bytes": 32788
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -13183,8 +13218,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "c2df29fe9a937d8d98d6f26dbe5f5728a93b0697dc43722f0d0b9fec5de0ea36",
-      "bytes": 23546
+      "sha256": "1091fc250065d7756a0a27174ee44d2884ea56cbfb79a7bafdcab0d180f8f8aa",
+      "bytes": 25179
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -13808,8 +13843,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "7a80ab24f494702f5f1aa0b8749d5d9736c5fed0cc33606fa614657159524199",
-      "bytes": 41568
+      "sha256": "3464f0a3227d03cdb663a067dffaea5eca4c6dd573e48704a6c339ebd58dabad",
+      "bytes": 61150
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -13828,8 +13863,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
-      "sha256": "3ade1be58d869894e84e19d581a9cbc37e729cbd54e8ace6a28ccd25efa4aa61",
-      "bytes": 16132
+      "sha256": "45d7edeb78ceb42b81553a22c618801d07218da830c213630e50ea1816da9600",
+      "bytes": 17854
     },
     {
       "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
@@ -13862,6 +13897,11 @@
       "bytes": 6492
     },
     {
+      "path": "docs/decisions/2026-09-27-codeql-quality-suites.md",
+      "sha256": "410966614ded535434660197d8ff4a517fc876fd54b2cce8b83d0e87f20c5440",
+      "bytes": 20402
+    },
+    {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
       "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
       "bytes": 7782
@@ -13872,9 +13912,14 @@
       "bytes": 41432
     },
     {
+      "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
+      "sha256": "fbdf296bd68d67cdb753566f84f8647f60f759c0a897478471704a23d1b9a7e4",
+      "bytes": 19971
+    },
+    {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "293b5adef5de1accb95ac5ca104dfab113d4e8b27b0ea8b6ef66fed84710b91c",
-      "bytes": 30831
+      "sha256": "2bab839794db71f8cf07f14540fc45d100b095dd97aacdae71dc3c108b208a98",
+      "bytes": 40279
     },
     {
       "path": "docs/direct-results.md",
@@ -14008,8 +14053,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1322671e911352efe5556c47f0fe77545bff462e25a046886bc6c3a5aa3aba89",
-      "bytes": 45559
+      "sha256": "e7b7988149915e76755f65cf8544c155368a292124f5c1a8d4ba4d4a5938be9e",
+      "bytes": 48768
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14248,8 +14293,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b4304cfbd2169c23d27a80fd938d1bd2aa74cf5294cf28e99340f1bad1c57896",
-      "bytes": 79772
+      "sha256": "9d59564ff7c8ac48be4f19940902baeda79e49e6e7f372d56ec6b4403532ea29",
+      "bytes": 87007
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -14260,6 +14305,86 @@
       "path": "docs/upstream-maintenance-pilot.md",
       "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
       "bytes": 7856
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
+      "sha256": "c282b2ce2ba53dc42867e8e78cf8e69b3b79fa59bffce27660ca46e8ffeb8f78",
+      "bytes": 10531
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/compare.py",
+      "sha256": "6025c1d91e8d59a84fd53585176061d2b9f76cd95a05a61f28dfe290e8cf4930",
+      "bytes": 3512
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixture-compare-no-tools.json",
+      "sha256": "77452d25a339499432eaf4bf88d36d07b80c839220c02ded21ecfef287826998",
+      "bytes": 4480
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixture-compare-shellcheck-0.9.0.json",
+      "sha256": "74fe5182fe701639d8d71006289e0c81feaf849c008104f59ff128c32e581e3f",
+      "bytes": 5034
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c1-shellcheck-integ.yml.txt",
+      "sha256": "a7100888471f57f8faf9f63a213b05cb9b703a8ecc89bcf541561fdbd9e0cd06",
+      "bytes": 363
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c10-max-parallel-zero.yml.txt",
+      "sha256": "d98cafb95d3cb7a1d8cafe49c6127a8aa1da0571f1d6288935477d08da2077fb",
+      "bytes": 181
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c2-step-outputs.yml.txt",
+      "sha256": "9e5a1085f9de0a63cf2dfd984f42414dbe229098c3e06d1d7ee88867391e2666",
+      "bytes": 738
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c3-fromjson-matrix.yml.txt",
+      "sha256": "b41d57df5e879cb9e3bc23a39eb202ca32b00ea350d8940017e8f6cd3299ee07",
+      "bytes": 173
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c4-description-cancel-timeout.yml.txt",
+      "sha256": "71e48b16dde3132b88a8d94559fd215d1829871f7317bf5f8f87bad611e1f229",
+      "bytes": 156
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c5-queue-max.yml.txt",
+      "sha256": "c05f2d92ddbaf06531536c53e9923d4b8c1d89504876533b3f1f1305071423f6",
+      "bytes": 125
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c6-queue-conflict.yml.txt",
+      "sha256": "48311f7bf2a6dde1e73c801ea6edf9f31970266d6f4a33e652c027f94dddf1be",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c7-cache-operation.yml.txt",
+      "sha256": "b8450a0fe24ad8e79480fea67b6cbff68eccf6f1c0612b63a82225d1c3e6f32f",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c8-cache-write-untrusted.yml.txt",
+      "sha256": "12b00e18e4a64ed5c92fc4d66c892cbaff1e6013ecf0930c8bbaba14b9e750cb",
+      "bytes": 117
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c9-schedule-missing-cron.yml.txt",
+      "sha256": "b91b04a9b1ff9377d0025dbdb6cd35bc0d24d430d70374d43460226a17a0ba0c",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/parity_driver.sh",
+      "sha256": "b2b098aded9f0e7251046827cf53a6b8cd92149f192babf7144ad50148514506",
+      "bytes": 3180
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
+      "sha256": "43546a8ab52b3453920b5c2c35aa6bce996cdfed5d0fc959c22cf83687619c99",
+      "bytes": 39050
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",
@@ -15170,6 +15295,66 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
+      "sha256": "ac8f50fbaa4fdcf80422360cf3d2acb3df857daf3862c36a7b07e1b08b1614d1",
+      "bytes": 16064
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
+      "sha256": "a9acbb84eeb8b2a8f9c17c05bf8242d3e437160fe6441c0037fd2d5957ee3dca",
+      "bytes": 52669
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/README.md",
+      "sha256": "4a0d8099271613cd131503a1d7de9ffa7090fa49d66eb67f0ebe25d89e796972",
+      "bytes": 5624
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/counts.json",
+      "sha256": "43ab743c3fac990bfbbe1523d069549e63fc2cf42bdc58753166b446ff41956a",
+      "bytes": 39613
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/heuristics.json",
+      "sha256": "ed3a57619fcdaa9fad94461c389ecf7b990da6f06b1bac32bcaa6a813739d3e0",
+      "bytes": 2497
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/receipt.json",
+      "sha256": "bac0487914398cdf2df19675714d849725b76e76f4e7348b35b70a4be01a86ce",
+      "bytes": 23331
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/run.sh",
+      "sha256": "b64f3aae8eadeedc9fc0925bb22d52500e54da8266d67dfbc5f14b3d2da3c8e7",
+      "bytes": 2506
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/sample_alerts.py",
+      "sha256": "df7a9ccea27bcdc0647895747392a8432591ca5afbbbd79e0d7fe3bc36f3fe6b",
+      "bytes": 3765
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/summarize_sarif.py",
+      "sha256": "5b3e73941ca9e74f10aff81adea700f5d76f0b545e1cf579a61fa154508ce843",
+      "bytes": 13184
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage.json",
+      "sha256": "2656449ae9f060e04110690e5d8c682bb7844169ec6a6e97d6bd01ab76502acd",
+      "bytes": 23322
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage.py",
+      "sha256": "3e1b87d9515f26e3a53d6c0a64b3a15f372fee1464d99b9060153739d491036a",
+      "bytes": 10244
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage_verdicts.json",
+      "sha256": "1e74f31476c5f582b2708da4a2e829901852edc87c458382acd115302c783cde",
+      "bytes": 11808
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",
@@ -29633,8 +29818,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/README.md",
-      "sha256": "30905c3f3202617e4d366825e7c30f58aeedcd855eca9bc509a315c1d6927637",
-      "bytes": 50975
+      "sha256": "1c13638aa4679f300373147695b7b9431b1297d1a3b0e3e93caf0c799d3c1295",
+      "bytes": 51061
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/anthropics-claude-code.json",
@@ -33162,6 +33347,131 @@
       "bytes": 141
     },
     {
+      "path": "evidence/artifacts/omniroute-routing-20260928/README.md",
+      "sha256": "87b1b7f8d5ddb3043a67a7fb942b8b287573899eff83be56b59052626ddd91e9",
+      "bytes": 14467
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/ab-requirements.md",
+      "sha256": "bf3086ee2f4348c3c9da30e556da0b97316b61114227f983d099e7ebcd72ac10",
+      "bytes": 3518
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json",
+      "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915",
+      "bytes": 6118
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/adjudication.json",
+      "sha256": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100",
+      "bytes": 176360
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/decisions.json",
+      "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812",
+      "bytes": 16637
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json",
+      "sha256": "d0821ebf06adbdb24817996fcc9416c694db74521b28ff6401534d87ed8284fd",
+      "bytes": 1774
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/maintenance-gh-20260928.tsv",
+      "sha256": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732",
+      "bytes": 1349
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/offpin-control-prepatch.md",
+      "sha256": "b139b565d84c5687bc94781d03354304988af7491bcc9e93726938a0f8cb6467",
+      "bytes": 4625
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/offpin-control.py.txt",
+      "sha256": "26d99656dd862df971284685cbd3960da22026044aa64016e124197a3991fc88",
+      "bytes": 4760
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/offpin-rerun-team-lead.tsv",
+      "sha256": "4c0bc69682c1f3b062c2c89e204897826790cf60d00a74869fb1bdf704d10411",
+      "bytes": 1268
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/record-review-gpt6.last.json",
+      "sha256": "8ba6f9efe849e5f290099167f845b2f2ae8fe6bab570f0179104e50b1ae8b0f4",
+      "bytes": 43527
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/record-review-gpt6.schema.json",
+      "sha256": "7f5605c749fbe4d44bbeb4737c115a6f90721b240488031832b4460f46343d89",
+      "bytes": 646
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json",
+      "sha256": "3ab36b52201737f6912032b573cbe4b12e2d63ff11026a6dd8d75f46ce265b59",
+      "bytes": 7437
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job1.last.json",
+      "sha256": "e81ce40f4a63e4614d0be87a7484ad4a3ffbb1b2fc21129a643de7a860c9e194",
+      "bytes": 27578
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job1.prompt.txt",
+      "sha256": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140",
+      "bytes": 4124
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job1.schema.json",
+      "sha256": "df09899cfdc435635c30f74f39117190ff088488b16406b0d8ddb1c811a65f8a",
+      "bytes": 3786
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job2.last.json",
+      "sha256": "27a46c9ba7b160f3bad8ce3f52da030f5709117bbbd5b2cf3fe9ab52c3981246",
+      "bytes": 42192
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job2.prompt.txt",
+      "sha256": "015bf2a389c9fd0823e19081486a2055d26e0e014c3d49404a7dda957edf5a1c",
+      "bytes": 34056
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job2.schema.json",
+      "sha256": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507",
+      "bytes": 2779
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json",
+      "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56",
+      "bytes": 27444
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-occupancy-research.md",
+      "sha256": "2bbbd194759ae5bd61a854b26b2d5498b3adf0f3bac7ff535d994f554a875704",
+      "bytes": 7470
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-final.json",
+      "sha256": "f50266a1650351b3822382df45fb99c63e9f013c1d36a138331784dbf0c1884a",
+      "bytes": 36124
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md",
+      "sha256": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625",
+      "bytes": 1730
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md",
+      "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437",
+      "bytes": 6503
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
+      "sha256": "a3fb9cee8dab79992e1178a684ab264f53a64ade4d1894f28f15c0b8b7a5ba83",
+      "bytes": 23100
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -33385,6 +33695,221 @@
       "path": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json",
       "sha256": "c4136fac7d8c341708e65aa7c6a8f78e4adeab57baa8b443065c5f4551318fc1",
       "bytes": 1365997
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/claude.AB.json",
+      "sha256": "490165146b347b7b38255f8309ce4b5d0740bad2f5589775c0ca25bc9a019e57",
+      "bytes": 19350
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/claude.BA.json",
+      "sha256": "514a23eea75fe5b80de4ee20b1860a1b4673dc108cc72c9808e39ebe4fcd6df9",
+      "bytes": 18078
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/gpt6.AB.json",
+      "sha256": "2dbaaa3cc4341536311fbdaa807bb6d8698c6a47351afbbf7317c09b28cc03ee",
+      "bytes": 7764
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/gpt6.BA.json",
+      "sha256": "fb9e6d025ff438b3fcf9e065ac1f9f072a46ef5022185ce73ac224e67c09b0d6",
+      "bytes": 7376
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/input.AB.md",
+      "sha256": "6d8c3b7b271ed0cc36f24b4868068a87b5292d506629872ca8b3b281c6d9a6a0",
+      "bytes": 75722
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/input.BA.md",
+      "sha256": "e246abb5eef3e7092bc8d1d8538d8f639f92a21a241651afb52373a1fc0c0fa5",
+      "bytes": 75722
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/adjudication/mapping.json",
+      "sha256": "5d04f09deaa41964e2f074835965c17fe36bebba06e1b21e103beb2460999985",
+      "bytes": 511
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/env-1-two-failures-on-base.txt",
+      "sha256": "0a80eb098d20b1944a056655c7e7accbc6e311f9291c6968b42772c8ac54d7be",
+      "bytes": 3530
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/f3x7-1-new-test-on-base-templates.txt",
+      "sha256": "88b74718e1dec7e72146d3d41e5959e0e5d45024378611414c45ccd0f697bf04",
+      "bytes": 2626
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/f3x7-2-new-test-on-head-templates.txt",
+      "sha256": "4ed675c087a881c4e9a1b84b395c9a8bcaaee99d17cd550ba216a95012ed080b",
+      "bytes": 818
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/f3x7-3-base-pin-on-head-templates.txt",
+      "sha256": "914c642acfa01d482d771c878996f04fc7fb5d0a458ebb326612ade5b7fadf45",
+      "bytes": 1792
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/n2-1-base-check-on-split-mutant.txt",
+      "sha256": "0565c3e8bc2f5fa42e11549d10068a1b1d900eef2a1c6740fe3a1f0499be37b2",
+      "bytes": 1165
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/n2-2-new-check-on-split-mutant.txt",
+      "sha256": "91b30dba9943a236e76dc22ccf56eca5947d8010ce64f078c2dde8603b17c791",
+      "bytes": 1192
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/n2-3-new-check-on-base-page.txt",
+      "sha256": "76ff91757d5c0443e1d67f89c4b0855583e6f2e2fe30bd215c375c1b6c274f43",
+      "bytes": 1835
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/n2-4-new-check-on-head-page.txt",
+      "sha256": "74dd01723d9873164036f273c791cca51a1f2f9123f4148641b29ae629a5374e",
+      "bytes": 745
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/pr1-modules-after.txt",
+      "sha256": "cfdb0dfd20440a9b1e63a83347f8d0a4fdc53d4f9a7190978e475c8e9b67a760",
+      "bytes": 28426
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/pr2-install-profile-after.txt",
+      "sha256": "a31846986401a798b9b557d139da0bd950e7f2c0653f48086e1717cfe2000b95",
+      "bytes": 14514
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/token-counts-base.txt",
+      "sha256": "4d24771ed6fd1f55a6a0441a3d0afd248e274a23c9264e6a150c5e64f4ca4231",
+      "bytes": 653
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/token-counts-pr1-after.txt",
+      "sha256": "478d4b79ebdc85a8ceae25368af6682d5ffb01afce11138e886d32fabe85fe6f",
+      "bytes": 285
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/controls/token-counts-pr2-after.txt",
+      "sha256": "d0c8d44d4c21f06eaec50a59709c7e272402624a46c683128523e3d85143b64a",
+      "bytes": 241
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/decisions.json",
+      "sha256": "a3c48893959459747cc5f019c3c67d42b6d21f02f84cd24ece2ffdf1bbfe14c2",
+      "bytes": 5062
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/packet.md",
+      "sha256": "8d994d2e31b6f70f54fe4b1e6c1c25ef71e0c44424a147572f713c2966a24c9c",
+      "bytes": 72000
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/prompts/claude-adjudicate-brief.AB.txt",
+      "sha256": "cf5b52d1b3cca8f7f785545e2f65b5f2469463da96f0550bb2100dde1614f989",
+      "bytes": 5685
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/prompts/claude-adjudicate-brief.BA.txt",
+      "sha256": "efa888a1944dd1a9a37cc13f4be38d1d341ec283db9e76296f1e2bb1710726e6",
+      "bytes": 5685
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/prompts/claude-round1-brief.txt",
+      "sha256": "8a1f3d928d936f9948ef207bc9fa930412b349f804cadf99281fe9f57d1f9502",
+      "bytes": 5777
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/prompts/construction.json",
+      "sha256": "7d9d610147d46c646ee53606c2f1d6a54c220eab1ece31d074c50be461e4c84d",
+      "bytes": 2229
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/prompts/gpt6-adjudicate-header.txt",
+      "sha256": "ca2f907e647c980051501240404a37d641819ea0e884188afdbaac7817b03314",
+      "bytes": 335
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/prompts/gpt6-round1-header.txt",
+      "sha256": "11b797fd73bd25e05209cb70a3f7d28ff05c8d2dbb167b23e0031a220d590bb4",
+      "bytes": 601
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/README.md",
+      "sha256": "e1eda7357c7d48c8fa68589badcb98aa28511981f6651de5abbd731c04c5fc25",
+      "bytes": 611
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/claude-brief.txt",
+      "sha256": "98760409af7002aa265048d30278c98696f1d7f6ade2cf999652e758048e659f",
+      "bytes": 7882
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/claude-review.md",
+      "sha256": "115a1bd5cff0fb6e5936fc2d3afe051db0ca7027cb6eb4bae2b4b178be63fb74",
+      "bytes": 10065
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-pr1-prompt.txt",
+      "sha256": "36e136622c606d393f376bda2ae13fa8968a8cec0c5f890edb512ca537b7a3a1",
+      "bytes": 2107
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-pr2-prompt.txt",
+      "sha256": "d6b6df760f07d2df26b50d022a375db64680a720b4f2f5ede09920d6d4438baf",
+      "bytes": 1246
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-review-pr1.md",
+      "sha256": "7801ac688838d656e5a5b874ce0abb8fe6ee00b03e3749fe6d1be79f13fa8f32",
+      "bytes": 1526
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/review/gpt6-review-pr2.md",
+      "sha256": "cf86932d02043c7ecf86aaa27dd6b110f8076f92ac443ccf96c336e681597699",
+      "bytes": 1142
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/round1/claude.json",
+      "sha256": "ecb68fe702f267e50bf27c982dacc868075f2f44273d5f9f3ae0291771a062c1",
+      "bytes": 36831
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/round1/gpt6-probe.json",
+      "sha256": "11a9b0feb731bbd548e1754b3e299cbba1f8126a389b2027b80a833ab2341bcf",
+      "bytes": 823
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/round1/gpt6.json",
+      "sha256": "c08ee8244d6952999b97bbc1d1e368e3244d96da226b8fe3a36145b127663419",
+      "bytes": 17307
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/schemas/adjudicate.json",
+      "sha256": "3748fdf6995f96ac5133cc39d70378c5f6787762bc49fb65ea49d3025d9ab730",
+      "bytes": 1054
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/schemas/audit-judge.json",
+      "sha256": "2990223f078feb067bd9b16e7d48cf4b7fd730b2207875eb120e69dad3ab0530",
+      "bytes": 1234
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/sources-supplement.json",
+      "sha256": "fb93418881269061e46fda2854287a49b7bb004050fb63d6594d1932243b4e1b",
+      "bytes": 1126
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/sources.json",
+      "sha256": "75ded97245f2d5d85b58339c7a50266254efed9ec42db48265686a386f77045a",
+      "bytes": 27658
+    },
+    {
+      "path": "evidence/artifacts/prompt-audit-20260927/usage.json",
+      "sha256": "e8d11b1a2a351e73314e7874bbc85505beb6ef7efd0f4eeec439c57c694a63ae",
+      "bytes": 5145
     },
     {
       "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/native-report-detail-final.png",
@@ -38353,8 +38878,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "3b470618e6807b3a1bb6f2db22366117312884e11ef7804bf93606abdfcf6c34",
-      "bytes": 48914
+      "sha256": "75fd4dccf2613fae423c7c017816c260cc1337e7aaefc9a9daf5c2092b230092",
+      "bytes": 49162
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -39283,8 +39808,8 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "68ca569407332079e1c8dfc1e9c10acfa3a92ea0c5fd9cc5ba3bfa2b84cc14d6",
-      "bytes": 49830
+      "sha256": "19781cd4f1b0b60003b16c772fe536c04dac220bf73ae7367173df837d52e8b5",
+      "bytes": 50561
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -39578,8 +40103,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "5148d477a16b856b7d8e5a5ae544a0c49ccb21a88e57542fe49cc36582c8eee4",
-      "bytes": 57898
+      "sha256": "97e53d4656412d8790071770381a9bc723cd0aa2dc486a29bebbf2c1d8451dbf",
+      "bytes": 58415
     },
     {
       "path": "tests/test_install_skills.py",
@@ -39608,8 +40133,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "5534e20ae52837c6f9d4a075d13fe71447710e85c66316b76bfcda47bbf7cac5",
-      "bytes": 186010
+      "sha256": "1c21b8380bb9a24768e179cd11bd3f06e52e1a51cdd603f06ba694193dccb94e",
+      "bytes": 187023
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -39943,8 +40468,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "2c4426392551fc44ac10799423772c1fa79f68d4bb12d83428c29ad192b3d144",
-      "bytes": 12080
+      "sha256": "ebbd3419b505c16fd738ccf73a4160f39b5b8443e27ccfb29574e97bab42556f",
+      "bytes": 22470
     },
     {
       "path": "tests/test_token_measurement.py",
@@ -40038,8 +40563,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "653059217d6e23ef5ea2b6311808f4d67e4d565c6cfdfe73dfe2f2104d8cbed9",
-      "bytes": 14105
+      "sha256": "c0bfa5d33a78703574ae97a8e90963f036f1a96546e45d79c2b7be55bb15b733",
+      "bytes": 14697
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -40193,8 +40718,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "3eed54a600a05d572b3ef02e3e4fbf9704f46b8b98bf7aa2611aa3ea0aa16544",
-      "bytes": 54710
+      "sha256": "98c89876ed004b13310c5b5e2f5d45e88a1ef21d09d7a4bda2632239f87acf62",
+      "bytes": 54926
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -40273,8 +40798,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/templates.json",
-      "sha256": "56caeef02581a21ad672470718295f8d6f210d13ce4b6ee7783a59ac383ce675",
-      "bytes": 10060
+      "sha256": "69bd43abeefd48a85fa828c13e4fd9e2db67b7ecf69cb877619dc33c61267a49",
+      "bytes": 10389
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
@@ -40361,6 +40886,7 @@
     "evidence/artifacts/local-model-workloads-20260924/experiment.json",
     "evidence/artifacts/memory-stack-20260925/experiment.json",
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
-    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json"
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json"
   ]
 }
