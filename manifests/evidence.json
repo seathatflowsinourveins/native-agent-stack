@@ -3447,8 +3447,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "adf31ec5f407ee45f2a4c03707ec43527cc3896efafe927278704247f5a0bf27",
-      "bytes": 20062
+      "sha256": "e01263517f7ea07c70b6a7c45e3eb902457a7226b5a92b6d61c852d7382341f7",
+      "bytes": 22508
     },
     {
       "path": ".gitignore",
@@ -13193,8 +13193,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "5c71a32796613ab69da55260c396f426f26fc910d84a29a9419cf4d48347b94a",
-      "bytes": 32277
+      "sha256": "fed211eeaac99fc58f328fa8a86bb911f6f285552aac3352122011dedd0f58a6",
+      "bytes": 32788
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -14295,6 +14295,86 @@
       "path": "docs/upstream-maintenance-pilot.md",
       "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
       "bytes": 7856
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
+      "sha256": "c282b2ce2ba53dc42867e8e78cf8e69b3b79fa59bffce27660ca46e8ffeb8f78",
+      "bytes": 10531
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/compare.py",
+      "sha256": "6025c1d91e8d59a84fd53585176061d2b9f76cd95a05a61f28dfe290e8cf4930",
+      "bytes": 3512
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixture-compare-no-tools.json",
+      "sha256": "77452d25a339499432eaf4bf88d36d07b80c839220c02ded21ecfef287826998",
+      "bytes": 4480
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixture-compare-shellcheck-0.9.0.json",
+      "sha256": "74fe5182fe701639d8d71006289e0c81feaf849c008104f59ff128c32e581e3f",
+      "bytes": 5034
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c1-shellcheck-integ.yml.txt",
+      "sha256": "a7100888471f57f8faf9f63a213b05cb9b703a8ecc89bcf541561fdbd9e0cd06",
+      "bytes": 363
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c10-max-parallel-zero.yml.txt",
+      "sha256": "d98cafb95d3cb7a1d8cafe49c6127a8aa1da0571f1d6288935477d08da2077fb",
+      "bytes": 181
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c2-step-outputs.yml.txt",
+      "sha256": "9e5a1085f9de0a63cf2dfd984f42414dbe229098c3e06d1d7ee88867391e2666",
+      "bytes": 738
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c3-fromjson-matrix.yml.txt",
+      "sha256": "b41d57df5e879cb9e3bc23a39eb202ca32b00ea350d8940017e8f6cd3299ee07",
+      "bytes": 173
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c4-description-cancel-timeout.yml.txt",
+      "sha256": "71e48b16dde3132b88a8d94559fd215d1829871f7317bf5f8f87bad611e1f229",
+      "bytes": 156
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c5-queue-max.yml.txt",
+      "sha256": "c05f2d92ddbaf06531536c53e9923d4b8c1d89504876533b3f1f1305071423f6",
+      "bytes": 125
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c6-queue-conflict.yml.txt",
+      "sha256": "48311f7bf2a6dde1e73c801ea6edf9f31970266d6f4a33e652c027f94dddf1be",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c7-cache-operation.yml.txt",
+      "sha256": "b8450a0fe24ad8e79480fea67b6cbff68eccf6f1c0612b63a82225d1c3e6f32f",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c8-cache-write-untrusted.yml.txt",
+      "sha256": "12b00e18e4a64ed5c92fc4d66c892cbaff1e6013ecf0930c8bbaba14b9e750cb",
+      "bytes": 117
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c9-schedule-missing-cron.yml.txt",
+      "sha256": "b91b04a9b1ff9377d0025dbdb6cd35bc0d24d430d70374d43460226a17a0ba0c",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/parity_driver.sh",
+      "sha256": "b2b098aded9f0e7251046827cf53a6b8cd92149f192babf7144ad50148514506",
+      "bytes": 3180
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
+      "sha256": "43546a8ab52b3453920b5c2c35aa6bce996cdfed5d0fc959c22cf83687619c99",
+      "bytes": 39050
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",
