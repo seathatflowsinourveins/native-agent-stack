@@ -14361,6 +14361,11 @@
       "bytes": 16692
     },
     {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "sha256": "6cf9d24e64af05bce2d5f035a0359cf75f5df86289fe69f805a4be203592c5b1",
+      "bytes": 27597
+    },
+    {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
       "sha256": "1a2d28d0a0f998d3945ddbadb2c4ae18dd4e72838a0315a77bfea885483435ab",
       "bytes": 19915
