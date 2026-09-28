@@ -283,6 +283,14 @@ class CatalogValidationTests(unittest.TestCase):
                                      "duplicate of references[0]"),
             "invalid repository": (mutate(lambda d: d["references"][0].update(repository="example")),
                                    ".repository:"),
+            # "$" alone also matches before a trailing newline, so each field is checked with fullmatch().
+            "repository with a trailing newline": (
+                mutate(lambda d: d["references"][0].update(repository=d["references"][0]["repository"] + "\n")),
+                ".repository:"),
+            "pin with a trailing newline": (mutate(lambda d: d["references"][0].update(pin=PIN + "\n")), ".pin:"),
+            "record with a trailing newline": (
+                mutate(lambda d: d["references"][0].update(record=d["references"][0]["record"] + "\n")),
+                ".record:"),
         }
         for name, (document, fragment) in cases.items():
             with self.subTest(case=name):

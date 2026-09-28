@@ -121,6 +121,7 @@ DIMENSION_KEYS = frozenset({"id", "description", "topics"})
 ENTRY_REQUIRED = ("repository", "role", "pin", "pin_date", "stars_at_check", "used_for", "record")
 ENTRY_OPTIONAL = ("paths_read", "release", "prior_pin")
 
+# Validators use fullmatch(): "$" alone also matches just before a trailing newline.
 REPOSITORY_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?/[A-Za-z0-9._-]{1,100}$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -136,7 +137,7 @@ def _is_text(value) -> bool:
 
 
 def _is_date(value) -> bool:
-    if not isinstance(value, str) or not DATE_RE.match(value):
+    if not isinstance(value, str) or not DATE_RE.fullmatch(value):
         return False
     try:
         date.fromisoformat(value)
@@ -146,12 +147,12 @@ def _is_date(value) -> bool:
 
 
 def _is_repository(value) -> bool:
-    return (isinstance(value, str) and bool(REPOSITORY_RE.match(value))
+    return (isinstance(value, str) and bool(REPOSITORY_RE.fullmatch(value))
             and value.split("/", 1)[1] not in {".", ".."})
 
 
 def _is_sha(value) -> bool:
-    return isinstance(value, str) and bool(SHA_RE.match(value))
+    return isinstance(value, str) and bool(SHA_RE.fullmatch(value))
 
 
 def _validate_used_for(used_for, label, dimension_ids) -> list:
@@ -197,7 +198,7 @@ def _validate_entry(entry, label, dimension_ids, checked_at) -> list:
         errors.append(f"{label}.stars_at_check: expected a non-negative integer")
     if "used_for" in entry:
         errors += _validate_used_for(entry["used_for"], f"{label}.used_for", dimension_ids)
-    if "record" in entry and not (isinstance(entry["record"], str) and RECORD_RE.match(entry["record"])):
+    if "record" in entry and not (isinstance(entry["record"], str) and RECORD_RE.fullmatch(entry["record"])):
         errors.append(f"{label}.record: expected a docs/decisions/YYYY-MM-DD-<name>.md path")
     if "paths_read" in entry:
         paths = entry["paths_read"]
@@ -251,7 +252,7 @@ def validate_catalog(catalog) -> list:
                 continue
             errors += [f"{label}: unknown key {key}" for key in sorted(set(dimension) - DIMENSION_KEYS)]
             ident = dimension.get("id")
-            if not isinstance(ident, str) or not KEBAB_RE.match(ident):
+            if not isinstance(ident, str) or not KEBAB_RE.fullmatch(ident):
                 errors.append(f"{label}.id: expected a lower-case kebab-case id")
             elif ident in dimension_ids:
                 errors.append(f"{label}.id: duplicate {ident}")
