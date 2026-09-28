@@ -14028,6 +14028,11 @@
       "bytes": 119015
     },
     {
+      "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+      "sha256": "984cd31892637502ec50e2499c15485063beb78e44e397bb12860d489c61c50b",
+      "bytes": 16000
+    },
+    {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
       "sha256": "85002f8d31fe6ee4d333bf0ee4e2510bb34d549020ea29a6b5345907ef1c92c6",
       "bytes": 15185
@@ -15916,6 +15921,61 @@
       "path": "evidence/artifacts/dashboard-render-e2e-20260921/rendered-observations.json",
       "sha256": "9d443e1005ed9917b1a1c0b0c5f0c8d383583836907171c46cd72ef4a33eee65",
       "bytes": 27781
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/README.md",
+      "sha256": "47eb868631f3a08c0cb794b634c476f40ae0abcb18e67ed2f9230756bb3256ae",
+      "bytes": 4321
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/coordination.md",
+      "sha256": "ab29ece2c67374690251c8b811af6024e91fe56a37a1195cc09e1d2ce6704fe9",
+      "bytes": 4764
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/gpt6-runs.json",
+      "sha256": "3694fada368320eef0afdb96d45ae6449bdf9f23f1818e4297a2f9012553755e",
+      "bytes": 2354
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m12/claude-return.md",
+      "sha256": "d47c560bb628466758d1c11785a49e1745060cf3d143e11044b753cba169e36a",
+      "bytes": 3616
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m12/gpt6-return.md",
+      "sha256": "8ae49fd5a1f1690b98cd7004dc42e563455e8e9cbe1350fac9e4fb9d4a91ab4d",
+      "bytes": 1637
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m12/packet.redacted.md",
+      "sha256": "d762112e359594ae6d2fbcb864e5f82401d2123c848c5414181534a15025b786",
+      "bytes": 3646
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m3/claude-return.md",
+      "sha256": "3658208f77c2610a28f370e282f75cbf86d1d8a0e9145e92d6ca630ae444114b",
+      "bytes": 3460
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m3/gpt6-return.md",
+      "sha256": "c1730fc90ca60f30ff00bf8187e8301fa00ee14d40bfde0259f22dc351798cb2",
+      "bytes": 1368
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m3/packet.redacted.md",
+      "sha256": "ae51a78480434a19e88609ff78d2876176f4f4ee90347341d2a9efe261572428",
+      "bytes": 2877
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md",
+      "sha256": "10ea6764a214f84bb13c3886460af94277f11534c1f5d702df774d9f3d541aec",
+      "bytes": 2150
+    },
+    {
+      "path": "evidence/artifacts/delegated-decisions-20260928/m4/packet.redacted.md",
+      "sha256": "336f98db6d4c9cd4fb4d8c3e1ec2060812b5fa1fe97138e4768fe4b34c70bac6",
+      "bytes": 1624
     },
     {
       "path": "evidence/artifacts/desktop-browser.png",
@@ -40849,8 +40909,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "a31b3551bb9be77f91a3ff841768bb30ef90d61a9870a657044df3b4e98f663a",
-      "bytes": 8680
+      "sha256": "76f9e67b8d2afadd66258329a15466e5faef01cdf12d1b030e3e30296e86da3e",
+      "bytes": 8691
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
