@@ -512,3 +512,7 @@ A betterleaks pre-commit hook would write the wazero cache on every developer ho
 The branch's post-commit range scans are reported with the pull request, because recording them here
 would change the commits they scan. Raw reports, logs and tracebacks stay outside the repository. Host
 paths are written as `<scratch>` and `<worktree>`.
+
+## 7. The history scan redacts (verifier finding, 2026-09-28)
+
+The required `secret-scan` job's unittest step runs `GitleaksBranchAncestryHistoryTests` over the real history. On `main` (from `ba1700ad`) that scan had no `--redact`, and its assertion message printed the findings, so a real secret in `HEAD`'s ancestry would reach the public job log. The scan now passes `--redact` (gitleaks v8.30.1 `report/finding.go` lines 78-86; betterleaks v1.8.1 `cmd/root.go` line 589), and a failure lists rule, file, line and fingerprint only. `ScannerErrorTests.test_f` checks both with an in-memory scanner and a deliberately unredacted report; reverting either half makes it fail (`run-record.json` `history_scan_redaction`).

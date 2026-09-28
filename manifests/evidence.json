@@ -14653,8 +14653,8 @@
     },
     {
       "path": "evidence/artifacts/betterleaks-parity-20260927/README.md",
-      "sha256": "eb60f5c900e4b2b334bfcf519e888203a11b2e49c32f86e832f51507318dd62b",
-      "bytes": 39569
+      "sha256": "dc5585a83eb5718f90c092341cecaa68484064ff1d695b1a6c8f51c859bde445",
+      "bytes": 40290
     },
     {
       "path": "evidence/artifacts/betterleaks-parity-20260927/harness/compare_repair.py",
@@ -14768,8 +14768,8 @@
     },
     {
       "path": "evidence/artifacts/betterleaks-parity-20260927/run-record.json",
-      "sha256": "e3da8514425ab6982016989abc3f3c0461b6c4f441581b92f14a8a3f664ad923",
-      "bytes": 82280
+      "sha256": "3154651346841f052def9834342b2ce10f11866624a879682e7655b5060c975a",
+      "bytes": 83863
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
@@ -40043,8 +40043,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "8c3ecb452d0337f09552ed6049186a7bfea4c50b96e5a22c0daeefc4d5450864",
-      "bytes": 56590
+      "sha256": "8be9742919973a1aae864f43003dcda50559446396fe828a2c63662d8704d700",
+      "bytes": 58636
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

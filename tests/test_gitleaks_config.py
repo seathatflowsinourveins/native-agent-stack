@@ -813,15 +813,20 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     def test_head_ancestry_scoped_scan_has_zero_findings(self):
         report_path = Path(tempfile.mkstemp(suffix=".json")[1])
         try:
+            # This scan reads the real history, and CI logs on this public repository are world-readable, so
+            # it redacts like the secret-scan job (--redact: Finding.Redact masks Secret, Match and Line in
+            # gitleaks v8.30.1 report/finding.go lines 78-86; betterleaks v1.8.1 cmd/root.go line 589), and
+            # the failure message names only non-secret fields.
             try:
                 findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
-                                           "--log-opts=HEAD"], report_path, cwd=ROOT)
+                                           "--log-opts=HEAD", "--redact"], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
+            located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
             self.assertEqual(
-                findings, [],
+                located, [],
                 "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "
-                f"result here is this unit's own regression, not a sibling branch: {findings}",
+                f"result here is this unit's own regression, not a sibling branch: {located}",
             )
         finally:
             report_path.unlink(missing_ok=True)
@@ -913,6 +918,33 @@ class ScannerErrorTests(unittest.TestCase):
         module = ast.parse(Path(__file__).read_text(encoding="utf-8"))
         others = list(calls(module, "<module>"))
         self.assertEqual([function for function, _ in others], ["_scan_findings"], others)
+
+    def test_f_the_history_scan_redacts_and_its_failure_names_no_secret(self):
+        """The branch-ancestry test scans the real history, and CI logs are public: it passes --redact, and a
+        failure lists rule, file, line and fingerprint only. The stand-in report here is deliberately
+        unredacted, so the message is checked on its own."""
+        sentinel = "SENTINEL-" + HEX40
+        finding = {"RuleID": "generic-api-key", "File": "a.json", "StartLine": 3, "Secret": sentinel,
+                   "Match": f"token: {sentinel}", "Line": f'"token": "{sentinel}"',
+                   "Fingerprint": "0123abcd:a.json:generic-api-key:3"}
+        argvs = []
+
+        def run(argv, **kwargs):
+            argvs.append(argv)
+            Path(argv[argv.index("--report-path") + 1]).write_text(json.dumps([finding]))
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        stream = io.StringIO()
+        with mock.patch.object(subprocess, "run", side_effect=run), \
+                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"):
+            unittest.TextTestRunner(stream=stream, verbosity=0).run(
+                GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings"))
+        output = stream.getvalue()
+        self.assertEqual(len(argvs), 1, argvs)
+        self.assertIn("--redact", argvs[0])
+        self.assertEqual(output.strip().splitlines()[-1], "FAILED (failures=1)")
+        self.assertIn(finding["Fingerprint"], output)
+        self.assertNotIn(sentinel, output)
 
 
 class GithubAutomationDocConsistencyTests(unittest.TestCase):
