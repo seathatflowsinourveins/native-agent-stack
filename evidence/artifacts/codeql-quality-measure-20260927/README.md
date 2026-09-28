@@ -28,6 +28,15 @@ multisets of (rule, path, line, column). Python matches 16 = 16 results and
 results, so only its rule set (17 = 17) is a non-vacuous match. The same
 comparator reports a mismatch when given the code-quality SARIF instead.
 
+**Run integrity.** Every one of the 15 recorded CodeQL steps exited 0. The
+retained `steps.tsv` shows it, each database log ends with "Successfully
+created database", each analysis log ends with "Exported results to SARIF",
+and all 12 SARIF files match their recorded hashes. Review later found that
+the `run.sh` used here could report success after a failed step. It was
+fixed afterwards without changing any CodeQL argv, and since no step failed,
+the defect did not affect these counts. Details are under `run_integrity`
+in `receipt.json`.
+
 **Triage.** The 20 stratified code-quality alerts split into:
 - 8 false positives;
 - 8 real and actionable: 7 hygiene findings and 1 reliability finding;
@@ -64,7 +73,9 @@ verdict has its reason in `triage.json`.
    directory.
 4. Run `run.sh <worktree at the commit>`. It writes `db/`, `sarif/`,
    `logs/` and `steps.tsv` beside itself, so keep that directory outside
-   the checkout.
+   the checkout. It exits 0 and ends `steps.tsv` with `ALL DONE` only when
+   every step succeeded. Otherwise it ends `steps.tsv` with a `FAILED` line
+   and exits 1.
 5. Run the three `security-extended` analyses with the argv listed in
    `receipt.json`.
 6. Fetch the live SARIF for each language as `live/<category>.sarif` (the

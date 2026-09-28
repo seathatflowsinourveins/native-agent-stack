@@ -61,6 +61,18 @@
   {"label": "analyze-actions-security-extended", "start": "2026-09-28T02:20:30Z", "end": "2026-09-28T02:20:37Z", "exit": 0, "argv": "<dl>/codeql/codeql database analyze <dl>/db/actions codeql/actions-queries:codeql-suites/actions-security-extended.qls --format=sarif-latest --output=<dl>/sarif/actions-security-extended.sarif --sarif-category=/language:actions --threads=8 --ram=12288"}
  ],
  "steps_note": "The first twelve steps ran through run.sh (three language pipelines in parallel); the three security-extended steps ran afterwards on the same databases, invoked as ./codeql/codeql from <dl>. Stderr lines that mention errors or warnings are query names (SyntaxError.bqrs, EncodingError.bqrs, UnhandledErrorInStreamPipeline.bqrs) and 'Interpreting' progress lines, not failures.",
+ "run_integrity": {
+  "claim": "Every step of the recorded run exited 0, so the run.sh defect found in review did not affect these counts. That run.sh waited with a bare `wait`, which returns zero whatever the jobs returned (bash(1), wait), and its analysis loop continued after a failed step, so a replay could record ALL DONE with missing results.",
+  "run_sh_used": "sha256 3346ee74e9b42b9bcac8019bbc30e62eb41614e48d8c7371c5fdc3af40974b9a, 1838 bytes: run.sh as first committed (f137ede7), byte-identical to the retained <dl>/run.sh",
+  "records": [
+   "<dl>/steps.tsv has 15 step lines, each with exit code 0 in its fourth column: the twelve run.sh steps, then 'ALL DONE 2026-09-28T02:08:09Z', then the three security-extended steps. step() records each command's own exit status, so this column is direct evidence; the defect was only in how run.sh acted on those statuses.",
+   "<dl>/logs/create-python.err, create-javascript.err and create-actions.err each end with 'Successfully created database at <dl>/db/<language>.'",
+   "Each of the 12 <dl>/logs/analyze-<language>-<suite>.err files ends with 'Exporting results to SARIF...' and 'Exported results to SARIF (<n>ms).'",
+   "The 12 files in <dl>/sarif hash to sarif_sha256.local, hold the result counts in counts.json, and record invocations[0].executionSuccessful true with no error-level toolExecutionNotifications."
+  ],
+  "fix": "run.sh now stops a language pipeline at its first failed step and waits on each pipeline's PID. It writes ALL DONE and exits 0 only when all three pipelines succeed; otherwise it appends a FAILED line naming them and exits 1. The CodeQL argv is unchanged. In a replay with a stub codeql that returns 23, the old script exited 0 with ALL DONE when all three database creations failed and the new one exited 1 with FAILED.",
+  "class": "our-integration (a reading of the retained <dl> records; the fix and the stub replay concern local glue, not CodeQL)"
+ },
  "sarif_sha256": {
   "local": {
    "actions-code-quality.sarif": "a9ab22ee8d5945945742d45746546a07ae55db45a1d01061b556a39c2a3b46e6",

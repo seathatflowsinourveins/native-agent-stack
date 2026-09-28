@@ -13863,8 +13863,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-codeql-quality-suites.md",
-      "sha256": "47cd73f4e4db796a4597996ab42dead240f313bad72d016eadbeb237d239bf94",
-      "bytes": 18938
+      "sha256": "410966614ded535434660197d8ff4a517fc876fd54b2cce8b83d0e87f20c5440",
+      "bytes": 20402
     },
     {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
@@ -15058,8 +15058,8 @@
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/README.md",
-      "sha256": "9b4987d4895fd41f808c8a3b9ecb361ebd808ffebf9a5735d80f6e0f8b28e00c",
-      "bytes": 4931
+      "sha256": "4a0d8099271613cd131503a1d7de9ffa7090fa49d66eb67f0ebe25d89e796972",
+      "bytes": 5624
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/counts.json",
@@ -15073,13 +15073,13 @@
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/receipt.json",
-      "sha256": "b7c1c61d759166b16da4f3f4698c8876e9746a2d54f3e66cfbc2d9d6715d8123",
-      "bytes": 21380
+      "sha256": "bac0487914398cdf2df19675714d849725b76e76f4e7348b35b70a4be01a86ce",
+      "bytes": 23331
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/run.sh",
-      "sha256": "3346ee74e9b42b9bcac8019bbc30e62eb41614e48d8c7371c5fdc3af40974b9a",
-      "bytes": 1838
+      "sha256": "b64f3aae8eadeedc9fc0925bb22d52500e54da8266d67dfbc5f14b3d2da3c8e7",
+      "bytes": 2506
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/sample_alerts.py",

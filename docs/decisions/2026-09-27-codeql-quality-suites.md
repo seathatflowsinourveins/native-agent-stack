@@ -273,9 +273,29 @@ gh api -X PATCH repos/seathatflowsinourveins/native-agent-stack/code-scanning/de
 3. **`security-and-quality` with `alerts_threshold: none`.** This changes
    the ruleset, which the plan keeps, and makes quality alerts informational
    only.
-4. **`security-extended` plus each language's `code-quality.qls`.** The
-   gate effect is the same as option 1. It differs only by the unfrozen JS
-   query, which has 0 results.
+4. **`security-extended` plus each language's `code-quality.qls`.** Not
+   equivalent to option 1. JavaScript keeps the same 190 results, 13 of them
+   error-level; the unfrozen `js/unhandled-error-in-stream-pipeline` adds 0.
+   Python omits 43 of the 1,072 `security-and-quality` results, the 77
+   beyond default and code-quality less the 34 that `security-extended`
+   adds:
+   - 30 `py/uninitialized-local-variable`, error level;
+   - 11 `py/cyclic-import`, note level;
+   - 2 `py/unnecessary-delete`, warning level.
+
+   Every `security-extended` result is also a `security-and-quality` result,
+   and none of the 43 carries a security severity. The security-severity
+   alerts are therefore the same, but the `errors` threshold would see 60
+   Python error-level results instead of 90 (`counts.json`: `overlap`,
+   `per_rule` and `error_level_non_security`). The three rules are in the
+   frozen id list of `python-security-and-quality.qls`, but
+   `code-quality-selectors.yml` requires precision high or very-high and the
+   `quality` tag: `py/uninitialized-local-variable` has precision medium, and
+   the other two lack the tag. Rejected for now for the reasons above: the
+   60 remaining Python error-level results are the ones the volume-weighted
+   estimate classes as false positives (S01 to S05 cover their five rules),
+   the 13 JavaScript ones sit in captured evidence pages, and the option
+   needs the same advanced-setup workflow.
 5. **A dedicated hygiene linter for the classes found real here.** Not
    measured in this unit. It would need its own sourced comparison.
 
@@ -334,7 +354,10 @@ result in maintained code (here 0 of 4 sampled).
 
 - **Bundle:** `github/codeql-action` release `codeql-bundle-v2.27.1`, asset
   `codeql-bundle-linux64.tar.gz`, sha256 `1d380f79…c6b815`.
-- **Suite and selector files** in that bundle.
+- **Suite and selector files** in that bundle, and the metadata of the
+  three Python queries in alternative 4 (python-queries 1.8.11:
+  `Variables/UninitializedLocal.ql`, `Imports/CyclicImport.ql` and
+  `Statements/UnnecessaryDelete.ql`).
 - **Frozen quality list:** github/codeql#19578 (JavaScript) and #19891
   (Python).
 - **Action pins:** `github/codeql-action` `src/defaults.json` at v4.38.1 and
