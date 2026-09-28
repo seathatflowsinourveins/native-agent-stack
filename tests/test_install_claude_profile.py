@@ -308,7 +308,7 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         # fetching"), and CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 makes Claude Code ignore advisorModel.
         settings = self.settings()
         self.assertEqual(settings.get("advisorModel"), "fable")
-        self.assertTrue(settings["model"].startswith("opus"), "the pairing table accepts Fable for an Opus main model")
+        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Fable for an Opus main model")
         for name in ("DISABLE_GROWTHBOOK", "DISABLE_TELEMETRY", "DO_NOT_TRACK", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
                      "CLAUDE_CODE_DISABLE_ADVISOR_TOOL"):
             with self.subTest(env=name):

@@ -25,7 +25,11 @@ the npm registry entry for Claude Code, the gateway's model list and the GitHub 
 - Not changed: `manifests/stack.json` keeps the llama.cpp pin at b11057
   ([below](#llamacpp-pin-a-recorded-divergence-not-a-re-pin)).
 
-Nothing is installed or applied on a host by this change.
+This change applies no user-level settings on any host and installs nothing. The committed project settings
+(`.claude/settings.json`) are read by Claude Code in any session opened in this repository once the change is
+merged, so its two fallback guards take effect there
+([settings](https://code.claude.com/docs/en/settings#when-edits-take-effect)); the portable file and the template
+apply only where a host loads or re-applies them.
 
 ## Decision table
 
@@ -300,7 +304,8 @@ classifier is not an acceptable test), and no session was started with the chang
   names minified identifiers that change between releases.
 - The research returns and the synthesis stay private session files; this record states their facts with primary
   sources but does not publish them.
-- Nothing is applied: hosts keep their current user settings until the template is applied again.
+- No host's user settings are changed: hosts keep them until the template is applied again. The committed project
+  guards apply to sessions opened in this repository after the merge.
 
 ## Addendum 2026-09-28: Claude Sonnet 5.5 launched, and what the fallback map now means
 
@@ -318,35 +323,49 @@ stays the 2026-09-27 state; this section records what changed the next day and w
   (`claude-sonnet-5-5`), now the default Sonnet model on the Anthropic API" ([CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)),
   and the [model-config](https://code.claude.com/docs/en/model-config) alias table lists `sonnet` resolving to
   Sonnet 5.5 from v2.1.284 (Sonnet 5 from v2.1.197).
-- **Measured on this host.** A `stack-researcher` child launched with `model: 'sonnet'` under Claude Code 2.1.284 ran
-  all 82 of its assistant messages as `claude-sonnet-5-5` at effort `max`, read from its own subagent transcript. So
-  the `source-scout` and Codex-wrapper stages of the table above, which name the alias, already ran Sonnet 5.5 with
-  no byte changed in this repository.
+- **Observed on this host.** Two children that named the alias `sonnet` under Claude Code 2.1.284 resolved to
+  `claude-sonnet-5-5` at effort `max` in their own transcripts: a `stack-researcher` child (82 of 82 assistant
+  messages) and a workflow stage (its one message). The `source-scout` and Codex-wrapper stages of the table above
+  name the same alias, so they should resolve the same way with no byte changed in this repository; their own
+  transcripts were not read, and a provider other than the Anthropic API or an `ANTHROPIC_DEFAULT_SONNET_MODEL` pin
+  would change the result ([model-config](https://code.claude.com/docs/en/model-config) alias table).
 - **The table above.** The "Pure command wrappers, mechanical extraction and acceptance re-runs" row now resolves to
   `claude-sonnet-5-5`, not `claude-sonnet-5`. The Sonnet half of the "Claude Sonnet 5.5 and Claude Haiku 5.5" hold is
   released on its first gate (a release-notes entry with a model ID). Its second gate, repeating the same-packet
   inventory trial of the workflows README before routing the model, has not run; the alias moved without it, so every
-  `sonnet` stage is on Sonnet 5.5 until that trial says otherwise. Claude Haiku 5.5 still has no model ID (the
+  stage that names `sonnet` is expected to run Sonnet 5.5 until that trial says otherwise. Claude Haiku 5.5 still has no model ID (the
   [Opus 5.5 announcement](https://www.anthropic.com/claude-opus-5-5): "Claude Sonnet 5.5 and Claude Haiku 5.5 will
   follow in the coming weeks"), so Claude Haiku 4.5 stays the newest Haiku and its row stays "keep, not routed".
 - **The routes to an older model, restated.** Model-config's "Automatic model fallback" lists four content-based
   routes to three superseded models: for Fable 5.1, Fable 5 and Opus 5.5, biology-flagged requests re-run on Opus 5
   and cybersecurity-flagged requests on Opus 4.8; for Sonnet 5.5, cybersecurity-flagged requests re-run on Sonnet 5
   (biology-flagged ones end in a refusal); for Opus 5, cybersecurity-flagged requests re-run on Opus 4.8. The Sonnet
-  route is a real downgrade: on Vals AI's Terminal-Bench 4.0 (Terminus 2 harness, average of three runs, read
-  2026-09-28) Claude Sonnet 5.5 scores 53.03% and Claude Sonnet 5 scores 8.08%
-  ([Vals AI](https://www.vals.ai/benchmarks/terminal-bench-4)). The two guards above, `switchModelsOnFlag: false` and
-  `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, are written to stop every switch to another model. The fallback-guard
-  record's watch command still counts 1 on the real 2.1.284 binary (`~/.local/share/claude/versions/2.1.284`, not the
-  `bin/claude` wrapper script, which counts 0), and the gate has the shape the 2.1.283 source review above read:
-  `function iL(){return!a.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&!vne()}` beside `Fo("switchModelsOnFlag",!0)`. The
-  Sonnet 5.5 to Sonnet 5 route was not read separately in 2.1.284 or exercised, so it rests on that generic gate.
-- **Anthropic's lifecycle table** lists every model this repository names as Active on 2026-09-28, so "stale" here
-  means superseded within its tier, not retired: Fable 5 and Mythos 5 (by 5.1), Opus 5 and 4.x (by 5.5), Sonnet 5 and
+  target is a much weaker model on one benchmark: on Vals AI's Terminal-Bench 4.0 (Terminus 2 harness, average of
+  three runs, read 2026-09-28) Claude Sonnet 5.5 scores 53.03% and Claude Sonnet 5 scores 8.08% as separate model
+  rows ([Vals AI](https://www.vals.ai/benchmarks/terminal-bench-4)). That comparison does not measure flagged
+  requests: Vals ran Sonnet 5.5 with Sonnet 5 as its server-side fallback, so the 53.03% includes fallback-assisted
+  attempts, and counting them as failures gives 50.51% (7 of 198). It ran Opus 5.5 with Opus 5 and Opus 4.8 as
+  fallbacks, and the same change takes Opus 5.5 from 61.62% to 53.54% (30 of 198)
+  ([Sonnet 5.5](https://www.vals.ai/models/anthropic_claude-sonnet-5-5) and
+  [Opus 5.5](https://www.vals.ai/models/anthropic_claude-opus-5-5) model pages, updates of 2026-09-28).
+  The two guards above, `switchModelsOnFlag: false` and `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, are meant to stop
+  content-based fallback, the four routes just listed. They do not touch availability fallback
+  ([fallback model chains](https://code.claude.com/docs/en/model-config#fallback-model-chains)), which is a separate
+  mechanism. The fallback-guard record's watch command still counts 1 on the real 2.1.284 binary
+  (`~/.local/share/claude/versions/2.1.284`, not the `bin/claude` wrapper script, which counts 0), and the gate has
+  the shape the 2.1.283 source review above read: `function iL(){return!a.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&!vne()}`
+  beside `Fo("switchModelsOnFlag",!0)`. A count and a code shape show that the variable is read, not that it covers
+  every route: the call path from the Sonnet 5.5 to Sonnet 5 route was not traced in 2.1.284 or exercised, so its
+  coverage is unverified.
+- **Anthropic's lifecycle table** lists every Claude model that the routing surfaces name (agent definitions,
+  workflows, settings and templates) as Active on 2026-09-28; the fixtures of
+  `examples/claude-native/workflows/test-child-usage.mjs` deliberately name a retired model,
+  `claude-3-opus-20240229`. So "stale" here means superseded within its tier, not retired: Fable 5 and Mythos 5 (by 5.1), Opus 5 and 4.x (by 5.5), Sonnet 5 and
   4.x (by 5.5). Claude Sonnet 4.5 has the nearest retirement floor (2026-09-29).
 
 **Still open, and where it moves.** The three version-keyed places named in the hold above are unchanged by this
 addendum. `ALIAS_RESOLUTION` in `examples/claude-native/workflows/child-usage.mjs` has rows for `opus` only, so a
 `sonnet` child that resolved to an older model would not be flagged. The template's `modelSettings` holds only
-`claude-opus-5-5`. `LEGACY_EXACT` in `adoption/hooks/claude/effort-default-guard.py` needs no change: it lists the
-models whose user-level top-level effort still applies, and Sonnet 5.5 is not one of them.
+`claude-opus-5-5`. `LEGACY_EXACT` in `adoption/hooks/claude/effort-default-guard.py` is unchanged: it lists the
+models on which a user-level top-level effort was documented or observed to apply, and no such evidence exists yet
+for Sonnet 5.5; an observation on 2.1.284 would settle whether it belongs there.
