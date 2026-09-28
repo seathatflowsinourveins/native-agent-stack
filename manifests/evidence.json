@@ -3463,6 +3463,11 @@
       "bytes": 750
     },
     {
+      "path": ".github/agent-branch-ruleset.json",
+      "sha256": "bc4df163c810f26dacdfaaae90667fc0cdd4edd3beea35b86ed4efc00c3d5f24",
+      "bytes": 315
+    },
+    {
       "path": ".github/dependabot.yml",
       "sha256": "fcc206e377a1dea01e31e34c43f3276600f89b0e6951c02891bc46e2a49910be",
       "bytes": 2355
@@ -14180,8 +14185,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "549e43dceb9725d522282f353b8fd5532aebfb0bd6605110cd9a78801a6e57a9",
-      "bytes": 85598
+      "sha256": "a186902f149b723de3f707e10b5635cb0fd831e5e6b84fbe2e053b5230c5c7f4",
+      "bytes": 90132
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -42690,8 +42695,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "4f6674dc8b1ec1b19d6ed7439af3c93be258be0a10f16cb438fa3736aac52766",
-      "bytes": 85496
+      "sha256": "b0160874663404114d129875fabb434126ea51bbaf62619aae80f84c62e35645",
+      "bytes": 86878
     },
     {
       "path": "tests/test_workflow_security.py",
