@@ -26,8 +26,8 @@ the npm registry entry for Claude Code, the gateway's model list and the GitHub 
   ([below](#llamacpp-pin-a-recorded-divergence-not-a-re-pin)).
 
 This change applies no user-level settings on any host and installs nothing. The committed project settings
-(`.claude/settings.json`) are read by Claude Code in any session opened in this repository once the change is
-merged, so its two fallback guards take effect there
+(`.claude/settings.json`) are read by Claude Code in a session that loads the updated project file, once the change
+is merged and the session starts or reloads its settings, so its two fallback guards take effect there
 ([settings](https://code.claude.com/docs/en/settings#when-edits-take-effect)); the portable file and the template
 apply only where a host loads or re-applies them.
 
@@ -305,7 +305,7 @@ classifier is not an acceptable test), and no session was started with the chang
 - The research returns and the synthesis stay private session files; this record states their facts with primary
   sources but does not publish them.
 - No host's user settings are changed: hosts keep them until the template is applied again. The committed project
-  guards apply to sessions opened in this repository after the merge.
+  guards apply to sessions that load the updated project file after the merge.
 
 ## Addendum 2026-09-28: Claude Sonnet 5.5 launched, and what the fallback map now means
 
@@ -323,12 +323,13 @@ stays the 2026-09-27 state; this section records what changed the next day and w
   (`claude-sonnet-5-5`), now the default Sonnet model on the Anthropic API" ([CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)),
   and the [model-config](https://code.claude.com/docs/en/model-config) alias table lists `sonnet` resolving to
   Sonnet 5.5 from v2.1.284 (Sonnet 5 from v2.1.197).
-- **Observed on this host.** Two children that named the alias `sonnet` under Claude Code 2.1.284 resolved to
-  `claude-sonnet-5-5` at effort `max` in their own transcripts: a `stack-researcher` child (82 of 82 assistant
-  messages) and a workflow stage (its one message). The `source-scout` and Codex-wrapper stages of the table above
-  name the same alias, so they should resolve the same way with no byte changed in this repository; their own
-  transcripts were not read, and a provider other than the Anthropic API or an `ANTHROPIC_DEFAULT_SONNET_MODEL` pin
-  would change the result ([model-config](https://code.claude.com/docs/en/model-config) alias table).
+- **Observed on this host.** One `stack-researcher` child that named the alias `sonnet` under Claude Code 2.1.284
+  resolved to `claude-sonnet-5-5` at effort `max` in 82 of its 82 assistant messages, read from its own subagent
+  transcript, which stays on the host and is not retained here. The `source-scout` and Codex-wrapper stages of the
+  table above name the same alias, so they should resolve the same way with no byte changed in this repository;
+  their own transcripts were not read, and a provider other than the Anthropic API or an
+  `ANTHROPIC_DEFAULT_SONNET_MODEL` pin would change the result
+  ([model-config](https://code.claude.com/docs/en/model-config) alias table).
 - **The table above.** The "Pure command wrappers, mechanical extraction and acceptance re-runs" row now resolves to
   `claude-sonnet-5-5`, not `claude-sonnet-5`. The Sonnet half of the "Claude Sonnet 5.5 and Claude Haiku 5.5" hold is
   released on its first gate (a release-notes entry with a model ID). Its second gate, repeating the same-packet
@@ -347,7 +348,7 @@ stays the 2026-09-27 state; this section records what changed the next day and w
   attempts, and counting them as failures gives 50.51% (7 of 198). It ran Opus 5.5 with Opus 5 and Opus 4.8 as
   fallbacks, and the same change takes Opus 5.5 from 61.62% to 53.54% (30 of 198)
   ([Sonnet 5.5](https://www.vals.ai/models/anthropic_claude-sonnet-5-5) and
-  [Opus 5.5](https://www.vals.ai/models/anthropic_claude-opus-5-5) model pages, updates of 2026-09-28).
+  [Opus 5.5](https://www.vals.ai/models/anthropic_claude-opus-5-5) model pages, read 2026-09-28).
   The two guards above, `switchModelsOnFlag: false` and `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, are meant to stop
   content-based fallback, the four routes just listed. They do not touch availability fallback
   ([fallback model chains](https://code.claude.com/docs/en/model-config#fallback-model-chains)), which is a separate
