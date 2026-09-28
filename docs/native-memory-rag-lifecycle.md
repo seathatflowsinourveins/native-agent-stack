@@ -14,6 +14,26 @@ session's consolidation finished on attempt 1. No learning run was triggered
 manually for this observation. These outcomes establish lifecycle execution,
 not improved answer quality or token savings.
 
+## September 28 scheduled follow-up
+
+The [September 28 receipt](../observability/memory-scheduled-20260928.json) records
+the next actual wake. Services and existing publications were healthy; the swap
+warning was no longer firing. Learning remains paused, and the upstream report
+still returns 83 runs and 19 approved terminal proposals. Its body matches the
+retained September 27 result apart from the reporting-window timestamps.
+
+Explicit native MCP retrieval confirmed the long Claude session ended at
+01:22:54 UTC, and the scoped store records generation 31,006 completed at
+01:26:43 on attempt 1. This proves recorded completion, not provider success or
+improved answers. The MCP default selects completed sessions by start time;
+it therefore returned the newer-starting September 26 short session. Source
+inspection resolved that difference without restarting a client.
+
+The previous evidence PR's secret scan detected seven upstream rejection
+digests. Source review confirmed their SHA-256 construction. A separate,
+exact-file/seven-value exception preserves unrelated credential detection;
+the original failure, regression checks and bounded native scan are retained.
+
 ## September 27 scheduled follow-up
 
 The [September 27 observation](../observability/memory-scheduled-20260927.json)

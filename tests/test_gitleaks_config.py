@@ -422,6 +422,51 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
                              f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
 
+    RETURNED_REPORT_PATH = "observability/memory-scheduled-results-20260927.json"
+    RETURNED_REPORT_FINGERPRINTS = REVIEWED_FINGERPRINTS + [
+        "20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088",
+        "a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8",
+        "d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555",
+    ]
+
+    def test_e3_returned_report_reviewed_fingerprints_are_not_detected(self):
+        """The seven source-confirmed rejection digests are exempt in this exact report."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, self.RETURNED_REPORT_PATH, {},
+                                      values=self.RETURNED_REPORT_FINGERPRINTS)
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], "reviewed rejection digests must not be flagged")
+
+    def test_e4_returned_report_other_fields_values_and_paths_stay_detected(self):
+        """The new exception does not extend the old path or suppress credential fields."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, self.RETURNED_REPORT_PATH,
+                                      {"api_key": HEX64, "token": HEX64},
+                                      values=[self.RETURNED_REPORT_FINGERPRINTS[0], HEX64[::-1]])
+            self._fingerprint_fixture(target, "observability/memory-scheduled-results-20260928.json",
+                                      {}, values=self.RETURNED_REPORT_FINGERPRINTS)
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json",
+                                      {}, values=self.RETURNED_REPORT_FINGERPRINTS[-3:])
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            own = [f for f in findings if f["File"] == self.RETURNED_REPORT_PATH]
+            self.assertEqual(len(own), 3, "unreviewed key, api_key and token must remain detected")
+            self.assertEqual({f["Secret"] for f in own}, {HEX64, HEX64[::-1]})
+            self.assertEqual(sum(f["File"].endswith("results-20260928.json") for f in findings), 7)
+            self.assertEqual(sum(f["File"].endswith("memory-scheduled-20260923.json") for f in findings), 3)
+
+    def test_e5_returned_report_second_secret_on_same_line_stays_detected(self):
+        """Whole-line matching must not hide an adjacent credential in compact JSON."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            path = target / self.RETURNED_REPORT_PATH
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps({"key": self.RETURNED_REPORT_FINGERPRINTS[0],
+                                        "api_key": HEX64}) + "\n")
+            findings = self._scan(target)
+            self.assertIn(HEX64, {f["Secret"] for f in findings})
+
     SOURCE_HASHES_PATH = "blueprints/us-equities/adaptive-paper/source-hashes.json"
 
     def _source_hashes_fixture(self, target: Path, relative: str, obj: dict, *, compact: bool = False) -> None:
