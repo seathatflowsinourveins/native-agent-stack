@@ -524,8 +524,9 @@ an execution precondition performed by the gateway owner.
 - **Post-run.** Send the gateway owner each arm's correlation ids (`ids.json`, the sent id of every call) with the
   run window, the arm tags (`r02-A`, `r02-B`) and the key prefixes (`r02-a-`, `r02-b-`). The owner returns, per
   arm: the call count; distinct accounts and per-account call counts, under masked labels shared across arms;
-  call_logs status counts, including 429; any unmatched ids; and a masked per-arm account-balance read. No
-  connection or account ids are retained.
+  the calls whose attempts were served by more than one account (see Limitations); call_logs status counts,
+  including 429; any unmatched ids; and a masked per-arm account-balance read. No connection or account ids are
+  retained.
 
 ## Evidence classes
 
@@ -560,6 +561,22 @@ an execution precondition performed by the gateway owner.
 
 - The account behind each call is an uncontrolled factor: per-conversation session keys spread calls across the
   gateway's 4 accounts. No account column is read; the gateway owner supplies the masked per-arm distribution.
+  - Account selection includes the OAuth occupancy override, which no setting disables at this pin. Every chat
+    request asks for it (`reserveOAuthSession: true`, OmniRoute@dd6e9607e:src/sse/handlers/chat.ts:1711), and it
+    moves a call to another OAuth connection of the same or next priority when that one has more session
+    availability (src/sse/services/auth.ts:2159-2176).
+  - The gateway owner measured its effect on 20128's multi-turn Codex traffic on 2026-09-28:
+    - 10.3% of turns were served away from their pinned account;
+    - those turns had a cache-read share of 73.8%, against 92.1% for pinned turns;
+    - 25.8% of Codex turns switched account mid-turn and dropped `x-codex-turn-state`.
+
+    These figures are relayed, not reproduced here.
+  - R02's conversations are single calls, so no call has an earlier pinned account in its conversation. The
+    override acts as part of account selection, and a mid-call switch shows as attempts on more than one account.
+  - Both arms run through it, so it is a shared condition, not part of either treatment. It can move the cached
+    input share and the time to response headers, which are descriptive metrics.
+  - The owner's post-run report gives, per arm, the calls whose attempts were served by more than one account, so
+    an uneven effect between the arms is visible.
 - A call without an observed call_logs row, because the gateway rejected it before its attempt logging or because
   its rows were saved late or never, is counted as unmatched by client-side outcome (see Correlation ids and
   call_logs).
