@@ -78,7 +78,7 @@ class _ScannerError(Exception):
 
 
 # The guarded launchers' busy-lock contract: exit status 75 with this message, and no scan started
-# (adoption/tools/gitleaks-guarded lines 23-32; adoption/tools/gitleaks-guarded-macos lines 29 and 124-130).
+# (adoption/tools/gitleaks-guarded lines 23-32; adoption/tools/gitleaks-guarded-macos lines 29 and 125-130).
 # Any other status is an error, even one whose message contains "lock", such as the Go runtime's
 # "all goroutines are asleep - deadlock!".
 LOCK_BUSY_STATUS = 75

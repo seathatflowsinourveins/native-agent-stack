@@ -346,7 +346,7 @@ records it as an error, which the fixture step does not accept. Four scans ran t
 go through it: `_run_gitleaks`, the `--exit-code 0` test, the git-mode fingerprint test (which never read
 the exit status) and the history-ancestry test. A busy-lock skip now needs the guarded launcher's own
 contract: exit status 75 and "another scan holds the per-user lock" (`adoption/tools/gitleaks-guarded`
-lines 23-32; `gitleaks-guarded-macos` lines 29 and 124-130). Before, any stderr containing "lock" was a
+lines 23-32; `gitleaks-guarded-macos` lines 29 and 125-130). Before, any stderr containing "lock" was a
 skip, and the Go runtime's "all goroutines are asleep - deadlock!" contains it. The step's comment in
 `validate.yml` now states this; its commands are unchanged.
 

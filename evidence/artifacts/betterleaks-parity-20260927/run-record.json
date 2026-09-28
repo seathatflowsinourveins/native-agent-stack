@@ -6,7 +6,7 @@
  "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
  "host_id": "nativestack-5975wx-20260925",
  "platform_id": "linux-wsl2-x86_64",
- "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T08:29:06Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc; coordinator repair in coordinator_repair.window_utc; scanner-error repair in scanner_error_repair.window_utc"},
+ "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T08:33:28Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc; coordinator repair in coordinator_repair.window_utc; scanner-error repair in scanner_error_repair.window_utc"},
  "evidence_classes": {
   "upstream-unchanged": [
    "cosign v3.0.6 verify-blob of betterleaks v1.8.1 checksums.txt against its Sigstore bundle, and six failing controls",
@@ -571,7 +571,7 @@
   ]
  },
  "scanner_error_repair": {
-  "window_utc": {"start": "2026-09-28T08:06:43Z", "last_recorded_run": "2026-09-28T08:29:06Z"},
+  "window_utc": {"start": "2026-09-28T08:06:43Z", "last_recorded_run": "2026-09-28T08:33:28Z", "note": "the checks ran 08:27:10Z to 08:29:06Z; the real-home read-back at 08:33:28Z is the last recorded observation"},
   "trigger": "read-only cross-family review (GPT-6) of the branch at 1c029808, verdict changes-needed, finding P2 at .github/workflows/validate.yml line 425: the fixture step's failures-only filter turned a scanner error into success, because _run_gitleaks raised AssertionError (a unittest failure) for an unexpected exit status and read exit status 1 without a report as no findings. The reviewer mocked scanner exits -11, 139 and 1 in memory on the existing positive fixture test, then ran the step's filter with bash --noprofile --norc -eo pipefail -c: each gave FAILED (failures=1) and exit status 0",
   "review_confirmed": "the fixed digest and identity checks precede execution; the required gate is unchanged; import errors and zero-test runs remain failures; a direct scanner error still exits nonzero under --exit-code 0 (betterleaks cmd/root.go line 640 at the v1.8.1 tag commit); the receipt's counts reconcile; the passphrase status is supported within its recorded host scope",
   "changes": [
@@ -669,7 +669,8 @@
   },
   "behaviour_changes": [
    "The required secret-scan job's unittest step is stricter; the job's YAML is unchanged. Its history-ancestry test read a scan that did not complete as zero findings and passed; it now errors. Its fixture tests error on a scan error, where exit status 1 with a partial report could let a test that expects no findings pass.",
-   "On a host with the guarded launcher, 'could not acquire the per-user lock' (an exit status other than 75) is now an error, not a skip. A busy lock still skips."
+   "On a host with the guarded launcher, 'could not acquire the per-user lock' (an exit status other than 75) is now an error, not a skip. A busy lock still skips.",
+   "The busy-lock skip no longer fires on any stderr that merely contains \"lock\" (the old test). A scan that completed with such a stderr line, for example a git message that gitleaks v8.30.1 forwards from its git source (sources/git.go lines 251-264: listed benign messages as warnings, every other line as an error), used to skip and is now checked. This is stricter, and not limited to scanner errors."
   ],
   "limit": "the busy-lock skip remains, and the fixture step accepts a run in which every test skipped (OK (skipped=N)); only the guarded launcher exits 75 with that message, and the hosted runner has none",
   "deviations": [
