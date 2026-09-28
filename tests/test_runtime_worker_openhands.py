@@ -1847,6 +1847,79 @@ class OpenHandsProbeTests(unittest.TestCase):
                 self.assertEqual((current["status"], current["failure_stage"]), ("failed", "probe"))
                 self.assertEqual(json.loads((self.result / "receipt.json").read_text())["failure_stage"], "probe")
 
+    def test_teardown_action_refuses_while_a_conversation_may_be_live(self):
+        host = self.prepared()
+        status = json.loads((self.result / "status.json").read_text())
+        lock = self.state / "active-dispatch.json"
+        linked = self.state / "runs" / "rw-openhands-linked"
+        linked.mkdir()
+        (linked / self.arm).symlink_to(self.result, target_is_directory=True)
+        cases = [(self.run_id, json.dumps({**status, "status": value}), None)
+                 for value in ("starting", "running", "terminal")]
+        cases += [(self.run_id, json.dumps(status), json.dumps({"run_id": self.run_id, "arm": self.arm})),
+                  (self.run_id, json.dumps(status), "{not json"),
+                  (self.run_id, "{not json", None),
+                  (self.run_id, json.dumps(["prepared"]), None),
+                  ("rw-openhands-absent", json.dumps(status), None),
+                  ("rw-openhands-linked", json.dumps(status), None),
+                  ("not-an-owned-run", json.dumps(status), None)]
+        for run_id, text, reservation in cases:
+            with self.subTest(run_id=run_id, status=text, reservation=reservation):
+                (self.result / "status.json").write_text(text)
+                lock.unlink(missing_ok=True)
+                if reservation is not None:
+                    lock.write_text(reservation)
+                output = io.StringIO()
+                with patch.object(host, "teardown_attempt") as teardown, patch.object(host.subprocess, "run") as run, \
+                        patch.object(host.subprocess, "check_output") as check_output, contextlib.redirect_stdout(output):
+                    self.assertEqual(host.teardown_action(self.state, run_id, self.arm), 3)
+                teardown.assert_not_called()
+                run.assert_not_called()
+                check_output.assert_not_called()
+                self.assertEqual((self.result / "status.json").read_text(), text)
+                self.assertEqual(json.loads(output.getvalue())["teardown"], "refused")
+        self.assertFalse((self.state / "runs" / "rw-openhands-absent").exists())
+
+    def test_teardown_action_removes_the_attempt_once_and_retires_a_prepared_status(self):
+        host = self.prepared()
+        status = json.loads((self.result / "status.json").read_text())
+        dispatch = load_recipe_module("dispatch.py")
+        path = self.result / "status.json"
+        (self.result / "window.json").write_text(json.dumps({"run_id": self.run_id, "arm": self.arm}))
+        # Another attempt's serial reservation does not block this teardown.
+        (self.state / "active-dispatch.json").write_text(json.dumps({"run_id": "rw-openhands-other", "arm": self.arm}))
+        for label, before, outcome, code, after in (
+                ("confirmed", status, {"return_value": True}, 0, "torn_down"),
+                ("unconfirmed", status, {"return_value": False}, 3, "torn_down"),
+                ("raised", status, {"side_effect": subprocess.SubprocessError()}, 3, "torn_down"),
+                ("failed attempt", {**status, "status": "failed", "failure_stage": "probe"},
+                 {"return_value": True}, 0, "failed"),
+                ("repeat", {**status, "status": "torn_down"}, {"return_value": True}, 0, "torn_down"),
+                ("no status", None, {"return_value": True}, 0, None)):
+            with self.subTest(label):
+                path.unlink(missing_ok=True)
+                if before is not None:
+                    path.write_text(json.dumps(before))
+                output = io.StringIO()
+                with patch.object(host, "teardown_attempt", **outcome) as teardown, contextlib.redirect_stdout(output):
+                    self.assertEqual(host.teardown_action(self.state, self.run_id, self.arm), code)
+                teardown.assert_called_once_with(self.state, self.run_id, self.arm)
+                self.assertEqual(json.loads(output.getvalue())["teardown"], "confirmed" if code == 0 else "unconfirmed")
+                if after is None:
+                    self.assertFalse(path.exists())
+                    continue
+                self.assertEqual(json.loads(path.read_text()), {**before, "status": after})
+        # A retired attempt can neither start a conversation nor refresh its probe.
+        path.write_text(json.dumps({**status, "status": "torn_down"}))
+        with patch.object(dispatch, "verify_isolation") as gate, patch.object(host, "run_probe") as probe, \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(dispatch.execute("start", self.state, self.run_id, self.arm), 3)
+            self.assertEqual(host.probe_action(self.state / "prefix", self.state, self.run_id, self.arm), 3)
+        gate.assert_not_called()
+        probe.assert_not_called()
+        args = host.build_parser().parse_args(["teardown", "--prefix", "/p", "--state", "/s", "--run-id", self.run_id])
+        self.assertEqual((args.action, args.run_id), ("teardown", self.run_id))
+
 
 class OpenHandsReceiptTests(unittest.TestCase):
     def test_entry_gateway_usage_and_effort_are_counted_once_without_ids(self):

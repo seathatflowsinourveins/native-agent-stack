@@ -8,10 +8,18 @@ ran offline contract tests only. No installation, container, model, gateway
 request or official grading run was performed. The 2026-09-28 phase-1 repair
 added offline fixes and pulled the pinned image only to scan its digest. It
 started no container and made no model or gateway request
-([research.md](research.md#takeover-phase-1-corrections-2026-09-28)).
+([research.md](research.md#takeover-phase-1-corrections-2026-09-28)). The
+2026-09-28 phase-2 build replaced the DOCKER-USER firewall contract with the
+O1 topology: a per-attempt internal network in gateway mode `isolated` and a
+pinned nginx allowlist proxy ([Security posture](#security-posture); the
+[decision record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md)).
+It ran offline tests with Docker mocked and pulled the nginx image by digest.
+It created no container or network and made no model or gateway request
+([research.md](research.md#takeover-phase-2-corrections-2026-09-28)).
 
-**Host acceptance is still open.** A verified firewall is required before model
-execution. The model's terminal runs under the server's UID, so it can write
+**Host acceptance is still open.** Before any model runs, a P0-P2 isolation
+probe must pass on the live topology; it has not run yet
+([Isolation probe](#isolation-probe-p0-p2-and-the-dispatch-gate)). The model's terminal runs under the server's UID, so it can write
 both `/run-output` and the server's persisted event store. Receipts therefore
 record trace, skill, MCP and version fields as `not_collected`, with the reason,
 instead of reading them from either place (SDK@fcc102a
@@ -136,16 +144,32 @@ Failed attempts are retained. The coordinator runs installation and acceptance.
 
 ## Arms
 
-`OPENHANDS_ARM=control|engines-on` defaults to `control`. `--arm` overrides it.
-`OPENHANDS_MODEL` and `OPENHANDS_BASE_URL` are optional explicit overrides that
-must match the selected arm. The control arm retains the existing `cx/gpt-6-*`
-variant support; the engines-on arm admits only the exact one-slash route below.
-LiteLLM prepends `openai/` for its provider selection.
+`OPENHANDS_ARM=control|engines-on` defaults to `control`, and `--arm` overrides
+it. Control stays the default until the #431 A/B selects the engines arm.
+`OPENHANDS_MODEL`, `OPENHANDS_BASE_URL` and `OPENHANDS_COMPRESSION` are
+optional explicit overrides that must match the selected arm. The control arm
+retains the existing `cx/gpt-6-*` variant support; the engines-on arm admits
+only the exact one-slash route below. LiteLLM prepends `openai/` for its
+provider selection.
 
-| Arm | Container base URL | Requested model | Compression header |
-| --- | --- | --- | --- |
-| control | `http://10.0.2.2:20128/v1` | `cx/gpt-6-astra-max` | absent |
-| engines-on | `http://10.0.2.2:20129/v1` | `sharedgw/gpt-6-astra-max` | `x-omniroute-compression: allow-lossy` |
+Both arms give the agent the same base URL, `http://gw:8081/v1`: the attempt's
+proxy on the internal run network ([Security posture](#security-posture)).
+Each attempt's proxy forwards to exactly one gateway, rendered from the arm:
+
+| Arm | Agent base URL | Proxy upstream | Requested model | Compression header |
+| --- | --- | --- | --- | --- |
+| control | `http://gw:8081/v1` | `http://10.0.2.2:20128/v1` | `cx/gpt-6-astra-max` | absent |
+| engines-on | `http://gw:8081/v1` | `http://10.0.2.2:20129/v1` | `sharedgw/gpt-6-astra-max` | `x-omniroute-compression: <combo>`, default `allow-lossy` |
+
+engines-on accepts one of the seven combos recorded for the 20129 gateway
+(`recipe.COMPRESSION_COMBOS`): `allow-lossy`, `fw-ccr`, `fw-codex-responses`,
+`fw-headroom`, `fw-lite`, `fw-rtk` and `fw-session-dedup`. An unrecorded combo
+is refused, and so is any compression value on control. The proxy, not the SDK,
+sends the header: its allowlist replaces whatever the agent sends for
+`x-omniroute-compression`, `X-Correlation-Id` and `x-omniroute-session` with the
+attempt's fixed values. The agent therefore cannot switch arm or combo, or forge
+the usage join. The LLM key stays the placeholder `local-loopback`, and
+`OMNIROUTE_API_KEY` is never sent.
 
 Both arms use Responses, `reasoning_effort=max`, native function tools, omitted
 temperature, a 40-iteration limit and a 1,200-second conversation deadline.
@@ -157,18 +181,18 @@ The exact switches are:
 ```sh
 export OPENHANDS_ARM=control
 export OPENHANDS_MODEL=cx/gpt-6-astra-max
-export OPENHANDS_BASE_URL=http://10.0.2.2:20128/v1
+export OPENHANDS_BASE_URL=http://gw:8081/v1
 ```
 
 ```sh
 export OPENHANDS_ARM=engines-on
 export OPENHANDS_MODEL=sharedgw/gpt-6-astra-max
-export OPENHANDS_BASE_URL=http://10.0.2.2:20129/v1
+export OPENHANDS_BASE_URL=http://gw:8081/v1
+export OPENHANDS_COMPRESSION=allow-lossy   # optional; any recorded combo
 ```
 
-No separate compression toggle is needed. The arm adds/removes the header.
-The receipt stores the arm, base URL, requested/routed model, expected path and
-**header names only**. A stable `x-omniroute-session` binds the conversation and
+The receipt stores the arm, base URL, proxy upstream, requested/routed model,
+compression combo, expected path and **header names only**. A stable `x-omniroute-session` binds the conversation and
 condenser. `server_transport.py` loads through the native `--import-modules`
 option and supplies a fresh Idempotency-Key per logical `generate/agenerate`
 call, retaining upstream retries and exact native LLM types. It also captures
@@ -181,12 +205,13 @@ Sources: SDK@fcc102a `llm/llm.py:442-446,1130-1138,1588-1642`,
 ## Workflow dispatch
 
 The coordinator first installs the recipe, supplies the frozen task and image
-pin, completes the network gate described below, and prepares **one arm at a
-time**. Preparation clones the task at its SWE-bench base-commit branch,
-installs the shared project skills, builds the scoped lexical QMD index,
-serializes the native request and starts the authenticated native server.
-Preparation can be long and belongs in a background Bash task. The skills
-manifest/installer PR must be available; there is no global-skill fallback.
+pin, and prepares **one arm at a time**. Preparation clones the task at its
+SWE-bench base-commit branch, installs the shared project skills, builds the
+scoped lexical QMD index and serializes the native request. It then builds the
+attempt's O1 topology, starts the authenticated native server behind the proxy
+and runs the P0-P2 isolation probe. Preparation can be long and belongs in a
+background Bash task. The skills manifest/installer PR must be available;
+there is no global-skill fallback.
 
 Set these private inputs outside all worktrees:
 
@@ -194,23 +219,53 @@ Set these private inputs outside all worktrees:
 - `OPENHANDS_STACK_ROOT`: stack checkout with the shared skill installer/manifest.
 - `OPENHANDS_TASK_FILE`, `OPENHANDS_TASK_SHA256`: frozen original SWE-bench row.
 - `OPENHANDS_GRADER_IMAGE_FILE`, `OPENHANDS_GRADER_IMAGE_SHA256`: frozen image pin.
-- `OPENHANDS_SERVER_ENV`: mode-0600 file containing only this attempt's
-  `OH_SESSION_API_KEYS_0` setting. No shared service/provider secrets.
-  Preflight refuses the attempt unless a `OH_SESSION_API_KEYS_0=` line names
-  that variable. It parses Docker's env-file syntax for the name only and never
-  extracts, prints or logs the value (docker/cli@v29.8.1
-  `pkg/kvfile/kvfile.go:92-124`). A bare name, which Docker would fill from the
-  caller's environment, is refused. An empty value (`OH_SESSION_API_KEYS_0=`)
-  still passes. This residual follows from never reading values. SDK@fcc102a
-  `openhands-agent-server/openhands/agent_server/env_parser.py:183-197` then
-  yields a key list holding one empty string, so the server treats
-  authentication as enabled (`__main__.py:30-48`). The coordinator must write a
-  non-empty key for each attempt. The server listens on every container
-  interface only when a session key is set (SDK@fcc102a
-  `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
-  `config.py:24`).
-- `OPENHANDS_HEADERS`: mode-0600 file containing the corresponding
-  `X-Session-API-Key` header. Commands use curl's `-H @file`; no inline key.
+
+The coordinator does not supply the agent-server's session key; each attempt
+generates its own (plan E2). After both attempt networks exist,
+`host.generate_session_files` takes one value from Python's `secrets` module
+and writes two files in
+`$HOME/.local/state/native-agent-stack/runtime-workers/openhands/secrets/`
+(mode 0700). Each file is created with `O_CREAT|O_EXCL|O_NOFOLLOW` at mode
+0600, so an existing file or a planted symlink is refused:
+
+- `<run-id>-<arm>.server.env`: the single line `OH_SESSION_API_KEYS_0=<value>`
+  in Docker env-file syntax, passed to the server as `--env-file`;
+- `<run-id>-<arm>.headers`: `X-Session-API-Key: <value>`, which curl reads
+  with `-H @file`.
+
+The value is never in argv, output or logs. The server is never read with a
+full `docker inspect`, because its Config.Env holds the key; containers are
+read only through fixed `--format` templates. `teardown_attempt` deletes both
+files once the proxy and server are confirmed removed. While either removal is
+unconfirmed the files stay, so the server they belong to can still be reached
+and cleaned up. The server listens on every container interface only when a
+key is set (SDK@fcc102a `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
+`config.py:24`), and it checks the `X-Session-API-Key` header
+(`dependencies.py:19`). Before the server starts, the env file is re-checked
+for the variable name only, using Docker's env-file rules (docker/cli@v29.8.1
+`pkg/kvfile/kvfile.go:92-124`); no value is extracted, printed or logged. The
+inventory row is `openhands-session` in
+[docs/secret-storage.md](../../../docs/secret-storage.md) and
+[adoption/credential-inventory.json](../../../adoption/credential-inventory.json).
+
+**Deviation from the plan (E2).** The plan kept the pointer variables
+`OPENHANDS_SERVER_ENV` and `OPENHANDS_HEADERS`. They are retired. Both paths
+derive from the validated run id and arm alone, so neither a caller's
+environment nor `status.json` can redirect the key files, and a generated key
+is never empty (the phase-1 empty-value residual no longer applies).
+
+Container environment, and only these names: `HOME=/state/home`, `PATH`,
+`PYTHONDONTWRITEBYTECODE`, `UV_PYTHON_DOWNLOADS`, `OPENHANDS_OWNED_CONTAINER`,
+`OPENHANDS_RUN_ID`, `OPENHANDS_ARM`, `OPENHANDS_MODEL`, `OPENHANDS_BASE_URL`,
+`OPENHANDS_COMPRESSION`, `OH_ENABLE_VSCODE`, `OH_CONVERSATIONS_PATH`,
+`OH_WORKSPACE_PATH` and `OH_BASH_EVENTS_DIR`, plus `OH_SESSION_API_KEYS_0` from
+the env file on the server only. Never `OMNIROUTE_API_KEY`, and never a `GH_*`
+or `GITHUB_*` name. **Deviation from the plan:** its closed list has no
+`OPENHANDS_COMPRESSION`. It is added so the request serializer and the
+server's preload rebuild the same arm selection the host checked. Without it
+an engines-on attempt with a non-default combo would render a different
+selection in the container. The value is a recorded combo name or empty, never
+a credential, and the proxy overwrites the header in any case.
 
 ```sh
 RECIPE="$PWD/blueprints/runtime-workers/openhands"
@@ -221,14 +276,33 @@ rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" prepare \
   --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
 ```
 
-`--port` selects the published loopback port. It must be an integer in
-3730..3799, the range PR #428's crawl4ai recipe enforces (`host.py:44-45` at
-3ad8ba2), and defaults to 3730 for this SWE-bench worker. The resolver uses
-3740 (`--port 3740`). Preparation records the port in the host-owned
-`status.json`; `dispatch.py` has no port flag, reads it from there and checks
-the range again before any request.
+`--port` selects the proxy's published loopback port, the host's only way into
+the attempt (`127.0.0.1:<port>` to the proxy's 8080, which forwards to the
+server's 8000). It must be an integer in 3730..3799, the range PR #428's
+crawl4ai recipe enforces (`host.py:44-45` at 3ad8ba2), and defaults to 3730 for
+this SWE-bench worker. The resolver uses 3740 (`--port 3740`). Preparation
+records the port in the host-owned `status.json`; `dispatch.py` has no port
+flag, reads it from there and checks the range again before any request.
 
-The workflow child runs exactly these three Bash commands after preparation:
+Preparation exits 0 only when the probe passed. `dispatch.py start` accepts the
+probe receipt for 900 seconds. If more time passes, re-run the probe on the
+same prepared attempt; it never generates a run id:
+
+```sh
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" probe \
+  --prefix "$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6" \
+  --state "$HOME/.local/state/native-agent-stack/runtime-workers/openhands" \
+  --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
+```
+
+A prepared attempt that will not start a conversation now is removed with
+`host.py teardown` and the same identity flags
+([live probe sequence](#live-probe-sequence-coordinator-not-run-yet)).
+
+No conversation starts until the coordinator has run and recorded P3 on the
+running gateway build (plan gate G7; the code checks only the P0-P2 half, see
+[the gate](#isolation-probe-p0-p2-and-the-dispatch-gate)). After that, the
+workflow child runs exactly these three Bash commands after preparation:
 
 ```sh
 rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/dispatch.py" start --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
@@ -248,12 +322,19 @@ $HOME/.local/state/native-agent-stack/runtime-workers/openhands/runs/<run-id>/<a
 ```
 
 The adapter uses curl to call these exact upstream routes on
-`http://127.0.0.1:<port>`: POST `/api/conversations`, GET
-`/api/conversations/<uuid>`, then GET
+`http://127.0.0.1:<port>`, the proxy's host-side listener (8080), which
+forwards everything to `<run-id>-<arm>-server:8000` on the internal network:
+POST `/api/conversations`, GET `/api/conversations/<uuid>`, then GET
 `/api/conversations/<uuid>/agent_final_response`. After an `error` status it
 also calls GET `/api/conversations/<uuid>/events/search` with
 `kind=openhands.sdk.event.conversation_error.ConversationErrorEvent`,
-`sort_order=TIMESTAMP_DESC` and `limit=1`. Start is asynchronous. The
+`sort_order=TIMESTAMP_DESC` and `limit=1`. At the deadline it calls POST
+`/api/conversations/<uuid>/interrupt`. Each route is paired with its one
+method (plan E3): POST starts or interrupts a conversation, and GET only
+reads. Any other method/path pair is refused before curl runs. `start` first
+requires a fresh probe receipt bound to the live topology
+([gate](#isolation-probe-p0-p2-and-the-dispatch-gate)); a refusal prints
+`failure_stage: probe`, exits 3 and changes nothing. Start is asynchronous. The
 native SDK constructs `StartConversationRequest` and calls
 `model_dump(exclude_defaults=True, mode="json", context={"expose_secrets": True})`;
 only the fixed keyless gateway placeholder is exposed. It includes workspace,
@@ -265,9 +346,10 @@ Sources: SDK@fcc102a `conversation_router.py:72-86,163-228,257-287`,
 `sdk/utils/pydantic_secrets.py:24-37,48-68`.
 
 Polling treats only finished/error/stuck as terminal; idle is not completion.
-At the deadline it calls the native interrupt route and removes the exact owned
-server. Result captures the native final response privately, confirms container
-removal, then exports the candidate patch and invokes official grading.
+At the deadline it calls the native interrupt route and tears the attempt down:
+the proxy, the server and both attempt networks, each by exact name. Result
+captures the native final response privately, confirms container removal, then
+exports the candidate patch and invokes official grading.
 A native final message alone is never a task verdict. Sources: SDK@fcc102a
 `conversation_router.py:304-321`; SWE-bench@v4.1.0 `reporting.py:127-157`.
 
@@ -321,10 +403,11 @@ Preparation/start/wait exit 0 means that operation succeeded, not that the task
 passed. Duplicate starts do not resubmit a native POST. Retrying a collected
 result returns its retained receipt without another API or grader call. A host reservation
 serializes dispatches from this recipe. It does not exclude unrelated gateway
-clients. Interrupted attempts retain their files; cleanup removes named owned
-containers only, never uses prune, and records whether removal was confirmed.
-The coordinator must reclaim a stale reservation only after confirming its
-recorded container is gone. The selected port must be available. PR #428's
+clients. Interrupted attempts retain their files; cleanup removes the named
+owned containers and attempt networks only, never uses prune, and records
+whether each removal was confirmed. The coordinator must reclaim a stale
+reservation only after confirming its recorded containers and networks are
+gone. The selected port must be available. PR #428's
 crawl4ai recipe defaults to 3730, 3731, 3732 and 3734 (its README at 3ad8ba2);
 stop it or choose another port in the range before preparing this recipe.
 
@@ -394,65 +477,17 @@ Sources: SDK@fcc102a `agent_server/docker/Dockerfile:7-9,301-305,343`;
 Git@v2.43.0 `Documentation/git.txt:708-724`, `diff-options.txt:830-840`.
 
 MCP allowlists are not network security. ai-memory HTTP and socraticode are
-**disabled** because their host services would bypass the framework's tool
-filter. context-mode, Serena, jCodeMunch and lexical QMD remain container-local;
-headroom remains disabled. The host mount allowlist accepts only selected
+**disabled**. Their host services would bypass the framework's tool filter,
+and under O1 they are unreachable by design: the internal run network has no
+route to host services, and the proxy forwards only three `/v1` gateway routes
+([config/mcp-policy.json](config/mcp-policy.json)). The host template still
+fixes `AI_MEMORY_URL` and `EMBED_URL` because the MCP template renders them.
+Neither address is reachable from the internal network; P2 checks every host
+listener. context-mode, Serena, jCodeMunch and lexical QMD remain
+container-local; headroom remains disabled. The host mount allowlist accepts only selected
 adoption tool roots and the four document roots, resolves symlinks before
 checking, and rejects authentication stores and every ancestor of the host home.
 No tool can execute directly on the host through this registration.
-
-Model launches require `rw-openhands-egress-control` or
-`rw-openhands-egress-engines-on`. The supported policy mechanism is Docker's
-**DOCKER-USER iptables chain**, with explicit destination/port rules before
-Docker accepts forwarding. Host INPUT must also deny traffic from the worker
-bridge; IPv6 is disabled. Only the selected gateway endpoint is allowed. Plain
-`--internal` alone is insufficient because an internal bridge may still reach
-host listeners. Source: docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f
-`content/manuals/engine/network/firewall-iptables.md:22-24,48-95` and
-`port-publishing.md:186-192`.
-
-The coordinator must provision and **independently probe** that policy in the
-rootless daemon's network namespace. The repair does not change daemon-wide
-firewalls. `model_network` fails closed without a fresh, host-owned mode-0600
-policy receipt whose network ID matches Docker inspect and whose allowed TCP
-endpoint is exactly the selected arm. The host template has per-arm receipt
-paths. The receipt schema is:
-
-```json
-{
-  "mechanism": "docker-user-iptables",
-  "network_id": "<actual Docker network ID>",
-  "verified_at": "<UTC timestamp within the preceding 15 minutes>",
-  "allowed_tcp": ["10.0.2.2:20128"],
-  "default_deny": true,
-  "host_input_denied": true,
-  "ipv6_disabled": true,
-  "gateway_reachable": true,
-  "other_host_ports_denied": true
-}
-```
-
-For engines-on only the endpoint changes to port 20129. This schema is an
-operator evidence gate, not a firewall implementation or proof by itself. Keep
-the actual rule dump and probe outputs privately; reject access to the other
-arm, ai-memory, Qdrant, embedder and other worker listeners before any model run.
-
-Host loopback is already reachable from containers on the reference host, so
-nothing needs to be switched on for the gateway. Its rootless `docker.service`
-sets `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, and the running
-rootlesskit has no `--disable-host-loopback` flag (read-only checks,
-2026-09-28). The earlier finding F19, that loopback access still had to be
-enabled, is **overturned** for that host. The upstream default does disable it
-(moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`, identical to
-the installed 29.8.1 script), so a new host must set the variable to `false`
-and repeat both checks. With that setting, a model container can address
-every host loopback listener through 10.0.2.2 unless the egress policy above
-blocks it; the missing piece is that limit, not loopback access. No packet probe
-was run in this repair. Rule placement in the rootless network namespace, packet
-behavior and post-restart policy persistence remain unverified. Official grader
-containers retain upstream
-options; the coordinator must separately qualify their host-service isolation
-without misrepresenting altered test conditions as an unchanged environment.
 
 Every authoritative status/window/verdict file is outside model mounts.
 Receipt creation reads nothing from the worker output or the server state
@@ -460,8 +495,319 @@ directory; fields that would need them are `not_collected`. The only file the
 host reads back from worker output is the serialized request, copied with a
 bounded regular-file read (O_NOFOLLOW on every path component) before any model
 runs. The server-reported agent-limit classification can never produce a pass,
-and nothing can cause `evidence_complete=true`. This round does not invent an
-isolation mechanism unsupported by the pin.
+and nothing can cause `evidence_complete=true`. The network isolation below is
+composed locally from documented Docker network options and nginx directives;
+no upstream ships it. Until the live P0-P2 probe has run on this host, it is a
+design with offline tests, not host evidence.
+
+### O1 topology
+
+The phase-2 plan (section 1, item E1) replaces the earlier DOCKER-USER
+firewall contract with a topology built per attempt. Every resource is named
+from `S=<run-id>-<arm>` and carries the owner label
+`com.native-agent-stack.owner=gpt6-omniroute-framework-integration`. Below,
+`D` is `docker --context rootless`:
+
+```sh
+D network create --internal --ipv6=false -o com.docker.network.bridge.gateway_mode_ipv4=isolated --label <owner> $S-int
+D network create --ipv6=false --label <owner> $S-gw
+D run --detach --name $S-server <hardening> --network=$S-int --env-file <state>/secrets/$S.server.env ...  # no --publish
+D create --pull=never --name $S-proxy --platform linux/amd64 --label <owner> --network=$S-gw \
+  --publish 127.0.0.1:<port>:8080 --read-only --tmpfs /tmp:rw,nosuid,nodev,mode=1777 --cap-drop=ALL \
+  --security-opt=no-new-privileges --pids-limit 64 --memory 256m \
+  --mount type=bind,src=<result>/proxy/nginx.conf,dst=/etc/nginx/nginx.conf,readonly \
+  --entrypoint nginx <pins.json gateway_proxy ref> -g 'daemon off;'
+D network connect --alias gw $S-int $S-proxy
+D start $S-proxy
+```
+
+- **Server.** The agent-server joins `$S-int` only and publishes nothing. Its
+  hardening is unchanged: UID/GID 10001, all capabilities dropped,
+  no-new-privileges, a read-only root, a tmpfs home, and CPU, memory and PID
+  limits. Its only peer is the proxy, which it reaches as `gw`.
+- **Order.** The proxy is created after the server starts, and connected to
+  `$S-int` before it starts, so nginx resolves `$S-server` when it loads.
+  A created container joins its configured networks when it runs, and
+  `network connect --alias` adds a network-scoped name (docs.docker.com
+  `container run` and `network connect`, fetched 2026-09-28).
+- **Read-back.** `create_topology` reads each network back through a fixed
+  `--format` template. It requires the bridge driver, `Internal` true on
+  `$S-int` and false on `$S-gw`, `EnableIPv6` false, the owner label, a 64-hex
+  ID, and gateway mode `isolated` on `$S-int`.
+- **Fail closed.** If `network create` rejects the isolated option, the
+  attempt fails with `attempt_int_network_create_failed`. It never retries
+  with plain `--internal`.
+- **Why isolated.** docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f
+  `content/manuals/engine/network/port-publishing.md:186-192` states the
+  problem and the remedy: "Mode `isolated` can only be used when the network is
+  also created with CLI flag `--internal`, or equivalent. An address is
+  normally assigned to the bridge device in an `internal` network. So,
+  processes on the Docker host can access the network, and containers in the
+  network can access host services listening on that bridge address (including
+  services listening on "any" host address, `0.0.0.0` or `::`). No address is
+  assigned to the bridge when the network is created with gateway mode
+  `isolated`." The options are listed at `:121-131`. How rootless Docker
+  29.8.1 applies the mode has only been source-reviewed; P2 is the evidence.
+- **Teardown.** The proxy, the server, `$S-int` and `$S-gw` are removed by
+  exact name, never by prune, with a confirmed-removal record for each.
+  Container logs are kept first; the proxy's access log records the denied
+  requests.
+
+Host loopback stays reachable from containers on the reference host, and O1
+relies on it: the proxy reaches the gateway through 10.0.2.2. The host's
+rootless `docker.service` sets
+`DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, and the running
+rootlesskit has no `--disable-host-loopback` flag (read-only checks,
+2026-09-28). The upstream default does disable it (moby/moby@a46e6fa7
+`contrib/dockerd-rootless.sh:23-24,170-173`, identical to the installed 29.8.1
+script), so a new host must set the variable to `false` and repeat both
+checks. Per the phase-2 synthesis, any container on a normal bridge network,
+the proxy included, can then address every host-loopback listener through
+10.0.2.2. The internal network is what keeps the agent-server and its tools
+away from them. A daemon-wide `--disable-host-loopback` was rejected. It would
+cut off every container, the proxy included, and leave the host's
+non-loopback addresses reachable
+([decision record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md)).
+
+Official grader containers keep their upstream options and are not on the
+attempt networks. The coordinator must qualify their host-service isolation
+separately, without presenting altered test conditions as an unchanged
+environment.
+
+### Gateway proxy allowlist
+
+[config/proxy-nginx.conf](config/proxy-nginx.conf) is **composed locally**
+from documented nginx directives. No upstream ships this file, and its tests
+are our integration checks, not upstream acceptance. The closest upstream
+reference for a `/v1`-only front is OmniRoute's split-port bridge allowlist
+(`src/lib/apiBridgeServer.ts:16-24,198-207` at 045aa81f3). That reference is
+cited as reviewed in the phase-2 synthesis; this build did not re-read it. The
+template narrows the idea to three exact routes with fixed methods and fixed
+upstream URIs:
+
+| Agent request to `gw:8081` | Forwarded as |
+| --- | --- |
+| POST `/v1/responses` | POST `http://10.0.2.2:<arm port>/v1/responses` |
+| POST `/v1/chat/completions` | POST `http://10.0.2.2:<arm port>/v1/chat/completions` |
+| GET or HEAD `/v1/models` | the same method to `http://10.0.2.2:<arm port>/v1/models` |
+| any other path or method, or any query string | 403 from the proxy |
+
+`<arm port>` is 20128 on control and 20129 on engines-on; one proxy serves one
+arm.
+
+- **Paths.** `location =` is an exact match that ends the search. Locations
+  are matched against the normalized URI, after decoding `%XX`, resolving `.`
+  and `..` and compressing adjacent slashes (nginx.org `ngx_http_core_module`,
+  `location`, fetched 2026-09-28). A `proxy_pass` that carries a URI replaces
+  the matching part of the normalized URI with its own (`ngx_http_proxy_module`,
+  `proxy_pass`). Each route therefore forwards one fixed upstream path,
+  whatever the request's raw form. Dot-segment and `%2e` forms that normalize
+  to `/api/*` fall through to the 403 fallback.
+- **Methods.** Each route has one `limit_except` block with `deny all`.
+  "Allowing the GET method makes the HEAD method also allowed"
+  (`ngx_http_core_module`, `limit_except`).
+- **Query strings.** A `proxy_pass` with a URI still appends the request's
+  arguments (nginx/nginx@release-1.30.5, 4556c714,
+  `src/http/modules/ngx_http_proxy_module.c:1240-1251,1365-1384`). The
+  server-level `if ($is_args) { return 403; }` refuses every query string.
+  `$is_args` is `?` exactly when arguments exist
+  (`src/http/ngx_http_variables.c:1609-1624`). A variable condition is false
+  only when its value is an empty string or "0" (nginx.org
+  `ngx_http_rewrite_module`, `if`, fetched 2026-09-28), so `?0` is refused too.
+- **Headers.** The template sets `proxy_pass_request_headers off`; the
+  directive "Indicates whether the header fields of the original request are
+  passed to the proxied server" (`ngx_http_proxy_module`). Only the fields the
+  template sets reach the gateway:
+  - a fixed `Host`;
+  - `Content-Type`, `Accept` and `Idempotency-Key`, copied from the request;
+  - `Authorization: Bearer local-loopback`;
+  - `X-Correlation-Id` and `x-omniroute-session`, fixed to the run id;
+  - `x-omniroute-compression`, fixed to the arm's combo.
+
+  "If the value of a header field is an empty string then this field will not
+  be passed" (`proxy_set_header`; source
+  `ngx_http_proxy_module.c:1301-1303,1417-1418`), so control's empty combo
+  sends no compression header. The agent cannot forge the usage join, choose
+  a compression plan, or send `X-Forwarded-For`, `X-Real-IP` or any other
+  `x-omniroute-*` control header.
+- **Host side.** Port 8080 forwards every path to `$S-server:8000` and
+  refuses no arguments, because the driver's error-event search carries a
+  query string. Only the host reaches it, through `127.0.0.1:<port>`. The agent
+  can reach its own server as `gw:8080`, which gives it nothing it lacks.
+- **Rendering.** `render_proxy_config` fills `@PORT@`, `@SERVER@`, `@RUN@` and
+  `@COMPRESSION@` from `recipe.arm_config` and the attempt identity. It refuses:
+  - a selection that differs from `arm_config`'s own output;
+  - any value outside its pattern (`2012[89]`, the attempt's server name, the
+    run-id pattern, or a recorded combo or empty);
+  - a template whose placeholder set changed.
+
+  The rendered file is host-owned at `runs/<run-id>/<arm>/proxy/nginx.conf`,
+  outside every model mount. It is written with `O_EXCL|O_NOFOLLOW` at mode
+  0644, because the image's non-root user reads the bind mount. Its SHA-256
+  goes into `status.json` and the probe receipt, and both the probe and the
+  gate recompute it.
+- **Image.** `pins.json` `gateway_proxy` is
+  `ghcr.io/nginx/nginx-unprivileged@sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e`,
+  an OCI index (tag observed `1.30.5-alpine`), with linux/amd64 manifest
+  `sha256:f4522a5f…`, config `sha256:61640a44…` (user 101) and source
+  nginx/docker-nginx-unprivileged@588b4cbc. It was verified three ways:
+  - the SHA-256 of the registry's index, manifest and config bytes equals each
+    digest;
+  - `install` pulls it by digest;
+  - `pinned_image_identity` finds it in the containerd store.
+
+  Proxy launches use `--pull=never` ([evidence](evidence/phase2-commands.json)).
+  The digest has not been vulnerability-scanned (plan gate G2).
+
+Proxy residuals:
+- The proxy can reach every host-loopback port by design, so a compromised
+  nginx would have host-loopback reach. It runs a static, pinned, non-root,
+  read-only configuration.
+- A `/v1` request body reaches the gateway unchanged and can select any model
+  the arm serves (plan gate G5, open).
+- Three things are unprobed, and P3 and P5 cover them: `--entrypoint nginx`
+  under `--read-only`; body framing and streaming under the header allowlist;
+  and gateway paths the SDK might use beyond the three routes.
+
+### Isolation probe (P0-P2) and the dispatch gate
+
+The vehicle is [e2e/netprobe.py](e2e/netprobe.py), a locally composed
+standard-library script. It runs in the pinned agent-server image with the
+same hardening as every model container (`docker_args`), as `$S-probe-gw` on
+`$S-gw` and `$S-probe-int` on `$S-int`. Its only mounts are the SDK venv and
+the recipe (read-only) and a private output directory. It sends raw request
+targets through `http.client`. It records only the status, the
+`x-omniroute-route-class` value and errno names, never reads a response body,
+and exits nonzero at the first unexpected result. The internal probe runs only
+after P0 passed.
+
+| Probe | From | Passes when |
+| --- | --- | --- |
+| P0, negative control | `$S-gw` | GET `http://10.0.2.2:<arm port>/v1/models` returns 200 with route class `CLIENT_API`, and GET `/api/settings` returns a response with route class `MANAGEMENT`. This shows the vehicle can see the gateway and its management surface. |
+| P1, management isolation | `$S-int` | GET `http://gw:8081/v1/models` returns 200 with `CLIENT_API`. Each of the plan's 26 denied method/target pairs returns 403 with no route-class header, so the proxy refused it rather than the gateway. The pairs cover management paths, dot-segment and `%2e` variants, case and slash variants, query strings and wrong methods. |
+| P2, direct reachability | `$S-int` | No address and port pair accepts a TCP connect. `example.com`, `github.com` and `host.docker.internal` do not resolve, while `gw` and `$S-server` do. The container has no non-loopback IPv6 address. |
+
+P2's targets are computed on the host at probe time:
+- **Addresses:**
+  - 10.0.2.2, 10.0.2.3, 172.17.0.1, 10.0.0.1 and 10.255.255.254;
+  - every non-loopback host IPv4 address from `ip -4 -o addr`;
+  - each attempt network's subnet `.1` and IPAM gateway.
+- **Ports:** every TCP listener from `ss -ltnH`, plus 53.
+
+The probe refuses to run if a target is the address of its own attempt's
+server or proxy. Network inspect values are context only; the failed connects
+are the evidence.
+
+The receipt is `runs/<run-id>/<arm>/isolation-probe.json`: mode 0600,
+host-owned and outside every model mount. It holds:
+- mechanism `internal-isolated+nginx-v1-allowlist`, `run_id` and `arm`;
+- `run_network_id`, `gw_network_id`, `server_container_id` and
+  `proxy_container_id`;
+- `proxy_image`, `proxy_config_sha256` and `probe_script_sha256`;
+- `upstream` (`10.0.2.2:<arm port>`), `host_ingress` (`127.0.0.1:<port>`) and
+  `verified_at`;
+- the probe containers' exit codes, target counts, the P0/P1/P2 counts and
+  booleans, and `passed`.
+
+`dispatch.py start`, including the `host.py run` path, calls `verify_isolation`
+before it takes the serial reservation. The gate requires:
+- an owner-only regular file (0600, no symlink, outside the checkout);
+- `verified_at` between 0 and 900 seconds old;
+- the expected mechanism, identity, upstream, ingress and proxy image;
+- the current rendered config's hash, which must also equal `status.json`'s,
+  and the current netprobe hash;
+- passed P0, P1 and P2;
+- the four IDs equal to the live selected-field reads.
+
+A refusal prints `failure_stage: probe`, exits 3 and changes nothing. The run
+receipt (schema 6) carries an `isolation` summary without IDs, addresses or
+the run id.
+
+**Plan gate G7 is only half enforced in code.** G7 requires P0-P2 within 900 s
+of the start *and* a passed P3 on the running gateway build. The dispatch gate
+checks P0-P2 only. Until the coordinator has run and recorded P3, do not use
+`dispatch.py start` or `host.py run`. Prepare, read the probe receipt and tear
+down instead. The engines-on arm also waits for P4 and P5.
+
+### P3-P5: documented, not run
+
+P3-P5 are live model calls. This build wrote them as the steps below and a
+skeleton, `netprobe.p3_control_call`, which raises `NotImplementedError`. None
+of them has run.
+
+- **P3, control arm.** One SDK LLM call with one tool definition, from a
+  throwaway container on `$S-int` with the recipe's LLM config, through `gw` to
+  20128. The call also sends a forged `X-Correlation-Id`, an `X-Forwarded-For`
+  and one `x-omniroute-*` control header. A second call adds a query string; it
+  must get the proxy's 403 and leave no `call_logs` row. The first call's row
+  must show:
+  - `/v1/responses`, status 200 and model `cx/gpt-6-astra-max`;
+  - effort max, both requested and sent upstream;
+  - the run id as the correlation value, not the forged one.
+
+  The streamed tool call must parse, body framing must work under the header
+  allowlist, and the usage must equal the row. Record the client peer the
+  gateway logged (F10). The proxy access log must show only that allowlisted
+  request.
+- **P4, engines-on arm.** The same through a proxy bound to 20129, plus these
+  checks:
+  - a stacked lossy plan appears in the compression analytics;
+  - reasoning max appears in 20128's outbound request;
+  - which headers survive nginx and the 20129-to-20128 hop;
+  - whether `prompt_cache_key` is forwarded;
+  - the cached-input ratio against control.
+- **P5, SDK compatibility.** Encrypted reasoning include, `prompt_cache_key`
+  and the tool schema. After one full short conversation, the proxy access log
+  must show no denied path, or each denied path must be triaged. LiteLLM paths
+  such as `/v1/responses/{id}` or `input_tokens` are unaudited.
+
+### Live probe sequence (coordinator; not run yet)
+
+**Prerequisites.** The probe runs only through the full preparation path:
+clone, skills, QMD setup, server and proxy. It therefore needs:
+- a successful `host.py install` of this revision, so both images are present
+  by digest;
+- #429's skills manifest under `OPENHANDS_STACK_ROOT`, or preparation stops
+  at `skills_program_pending_pr`;
+- the private inputs above, including a frozen task row and grader image pin;
+- a free port. 3740 stays clear of crawl4ai's defaults.
+
+P0 sends two live GET requests to the selected gateway port (`/v1/models` and
+`/api/settings`) by design. P1 sends one allowlisted GET `/v1/models` through
+the proxy.
+
+```sh
+export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$PATH"
+RECIPE="$PWD/blueprints/runtime-workers/openhands"
+PREFIX="$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6"
+STATE="$HOME/.local/state/native-agent-stack/runtime-workers/openhands"
+OWNER=label=com.native-agent-stack.owner=gpt6-omniroute-framework-integration
+export OPENHANDS_RUN_ID=rw-openhands-probe-001 OPENHANDS_ARM=control
+# 1. Nothing owned is left over: both lists are empty.
+docker --context rootless ps -a --filter "$OWNER" --format '{{.Names}}'
+docker --context rootless network ls --filter "$OWNER" --format '{{.Name}}'
+# 2. Topology, server and proxy, then P0-P2. Exit 0 only when the probe passed.
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" prepare --prefix "$PREFIX" --state "$STATE" \
+  --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM" --port 3740
+# 3. The verdict and counts only; the IDs stay private.
+python3 -c 'import json, sys; r = json.load(open(sys.argv[1])); print(json.dumps({k: r.get(k) for k in ("passed", "exit_codes", "targets", "p0", "p1", "p2")}))' \
+  "$STATE/runs/$OPENHANDS_RUN_ID/$OPENHANDS_ARM/isolation-probe.json"
+# 4. Tear down without a conversation. Exit 0 only when all four removals are confirmed.
+rtk env PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" teardown --prefix "$PREFIX" --state "$STATE" \
+  --run-id "$OPENHANDS_RUN_ID" --arm "$OPENHANDS_ARM"
+# 5. Both lists are empty again, and neither key file exists.
+docker --context rootless ps -a --filter "$OWNER" --format '{{.Names}}'
+docker --context rootless network ls --filter "$OWNER" --format '{{.Name}}'
+for kind in server.env headers; do test ! -e "$STATE/secrets/$OPENHANDS_RUN_ID-$OPENHANDS_ARM.$kind" && echo "$kind deleted"; done
+```
+
+A failed probe exits 3 from `prepare` and tears the attempt down itself. Step 3
+still reads its receipt if the probe got far enough to write one, and step 4
+retries any unconfirmed removal.
+`host.py teardown` refuses, without any Docker call, while `status.json` shows
+`starting`, `running` or `terminal`, or while the serial reservation names the
+attempt. It turns a `prepared` status into `torn_down`, which both
+`dispatch.py start` and `host.py probe` refuse.
 
 ## Official grading and remaining host gates
 
@@ -487,11 +833,14 @@ before a worker verdict is accepted. `e2e/check.py` relays the actual report; an
 error/incomplete bucket is infrastructure, not a model-negative tally.
 
 Host work remaining: native installation and import acceptance; shared skills
-PR; frozen task/image selection; rootless firewall proof and port availability;
-native server health/auth/OpenAPI/preload startup; actual tool names/skills/MCP
-use; response-header capture for streaming and condenser calls; entry-database
-matching and max effort; official positive/negative grading controls; independent
-trace observation; cancellation/cleanup recovery. No A/B or savings result is
+PR; frozen task/image selection; the live P0-P2 probe on the O1 topology
+([sequence](#live-probe-sequence-coordinator-not-run-yet)), then P3, and P4
+and P5 before any engines-on run; a vulnerability scan of both image digests
+(plan gate G2); port availability; native server health/auth/OpenAPI/preload
+startup through the proxy; actual tool names/skills/MCP use; response-header
+capture for streaming and condenser calls; entry-database matching and max
+effort; official positive/negative grading controls; independent trace
+observation; cancellation/cleanup recovery. No A/B or savings result is
 claimed until these observations exist.
 
 [hello]: https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/examples/01_standalone_sdk/01_hello_world.py#L10-L29

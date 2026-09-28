@@ -1013,6 +1013,56 @@ def probe_action(prefix, state, run_id, arm):
     return refuse("probe", str(result / "receipt.json"))
 
 
+def teardown_action(state, run_id, arm):
+    """`host.py teardown`: remove an attempt that will not start a conversation now.
+
+    For example after a probe-only acceptance run, or to retry an unconfirmed
+    cleanup. It refuses, with no Docker call, while a conversation may be live
+    or uncollected (status starting, running or terminal, whose teardown
+    belongs to dispatch wait and result) or while the serial reservation names
+    this attempt. teardown_attempt keeps the proxy and server logs first (the
+    proxy access log holds the denied requests), removes the four resources by
+    exact name and deletes the key files after confirmed container removal. A
+    prepared status becomes "torn_down", which dispatch start and the probe
+    refuse. Exit 0 only when all four removals are confirmed.
+    """
+    def report(outcome, code, **extra):
+        print(json.dumps({"run_id": run_id, "arm": arm, "teardown": outcome, **extra}))
+        return code
+    try:
+        attempt_stem(run_id, arm)
+    except ValueError:
+        return report("refused", 3, reason="owned_attempt_identity_required")
+    result = Path(state) / "runs" / run_id / arm
+    if not result.is_dir() or result.resolve() != result.absolute():
+        return report("refused", 3, reason="owned_attempt_directory_required")
+    try:
+        status = json.loads(read_bounded(result / "status.json"))
+    except FileNotFoundError:
+        status = None
+    except (OSError, ValueError):
+        return report("refused", 3, reason="status_unreadable")
+    if status is not None and (not isinstance(status, dict) or status.get("status") in {"starting", "running", "terminal"}):
+        return report("refused", 3, reason="conversation_may_be_live")
+    try:
+        reservation = json.loads(read_bounded(Path(state) / "active-dispatch.json"))
+    except FileNotFoundError:
+        reservation = None
+    except (OSError, ValueError):
+        return report("refused", 3, reason="reservation_unreadable")
+    if reservation == {"run_id": run_id, "arm": arm}:
+        return report("refused", 3, reason="reservation_names_attempt")
+    try:
+        removed = teardown_attempt(state, run_id, arm) is True
+    except (Exception, KeyboardInterrupt):
+        removed = False  # The cleanup records keep the uncertainty.
+    if status is not None and status.get("status") == "prepared":
+        status = {**status, "status": "torn_down"}
+        write_json(result / "status.json", status)
+    return report("confirmed" if removed else "unconfirmed", 0 if removed else 3,
+                  status=None if status is None else status.get("status"))
+
+
 def clone_command(prefix, task, workspace):
     # SWE-bench@v4.1.0 test_spec/python.py:271-277, including branch exceptions.
     code = ("import json,sys; from importlib.metadata import version; "
@@ -1271,7 +1321,7 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
 
 def build_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("install", "run", "prepare", "probe"))
+    parser.add_argument("action", choices=("install", "run", "prepare", "probe", "teardown"))
     parser.add_argument("--prefix", required=True, type=Path)
     parser.add_argument("--state", required=True, type=Path)
     parser.add_argument("--run-id")
@@ -1293,6 +1343,10 @@ def main():
         # An existing attempt only: no run id is ever generated for a probe.
         return probe_action(args.prefix, args.state, args.run_id or os.environ.get("OPENHANDS_RUN_ID"),
                             args.arm or os.environ.get("OPENHANDS_ARM", "control"))
+    if args.action == "teardown":
+        # Likewise an existing attempt only; it needs no prefix or preflight.
+        return teardown_action(args.state, args.run_id or os.environ.get("OPENHANDS_RUN_ID"),
+                               args.arm or os.environ.get("OPENHANDS_ARM", "control"))
     return run(args.prefix, args.state, run_id=args.run_id, arm=args.arm,
                prepare_only=args.action == "prepare", port=args.port)
 
