@@ -25,6 +25,10 @@ REQUIRED_LANES = {
     "blind", "binding", "attribution", "mcp-errors",
 }
 UUID_SHAPE = re.compile(r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b", re.I)
+# A client project-directory prefix for any user under /home or /Users (-home-<user>-..., -Users-<user>-...),
+# so no host's user name is published here. Conservative: ordinary text such as "take-home-task" also matches.
+# Not covered: a project at the home directory itself (-home-<user> with no separator) or other roots (-root-).
+PROJECT_DIR_SHAPE = re.compile(r"-(?:home|Users)-[A-Za-z0-9_]+-")
 # Amendment 2 literals, independent of the manifest. Models: #402's definitions
 # at d022295a (adoption/agents/claude/{stack-verifier,isolated-builder}.md:5 say
 # opus, source-scout.md:5 says sonnet) and the user's Opus rule for build and
@@ -754,7 +758,7 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
                 continue  # This contract covers text files recursively.
             label = str(document.relative_to(BLUEPRINT))
             self.assertNotIn("/" + "tmp/", text, label)
-            self.assertNotIn("-home-" + "apoth-", text, label)
+            self.assertIsNone(PROJECT_DIR_SHAPE.search(text), label)
             self.assertNotIn("/" + "home/", text, label)
             self.assertNotIn("/" + "Users/", text, label)
             self.assertIsNone(re.search(r"[A-Za-z]:" + r"[\\/]Users[\\/]", text), label)
@@ -762,7 +766,7 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
 
     def test_privacy_guard_rejects_leaks_outside_readme(self):
         # Synthetic values only; no host identity is embedded in the fixture.
-        probes = ["/" + "tmp/example", "-home-" + "apoth-example",
+        probes = ["/" + "tmp/example", "-home-" + "example-x", "-Users-" + "example-x",
                   "/" + "home/example", "/" + "Users/example", "C:" + "\\Users\\example",
                   "-".join(["0" * 8, "0" * 4, "0" * 4, "0" * 4, "0" * 12])]
         read_text = Path.read_text

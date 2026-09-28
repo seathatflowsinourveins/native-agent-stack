@@ -41289,8 +41289,8 @@
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
-      "sha256": "0df4c769c78c7e1341e11bb27bdb4b6cbb15ba7621959f723160553942d0b4cd",
-      "bytes": 50728
+      "sha256": "40e6614fb8117c3cbe4a6f66a35b223801dc166a7a641228cf9f8732c6eb5c48",
+      "bytes": 51154
     },
     {
       "path": "tests/test_token_e2e_receipt_checks.py",
