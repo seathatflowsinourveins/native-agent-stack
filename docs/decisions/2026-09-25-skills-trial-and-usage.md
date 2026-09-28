@@ -776,10 +776,12 @@ gates, so this listing rests on that precedent, not on a failing test.
 through `SubagentStart`. From its first revision, that text told children to follow
 `verification-before-completion` and to research with `search-first`. An instruction that names a
 skill can raise its use count with no change in the skill's listing or usefulness, so the
-[name-only confound](#listing-policy) ("compare only within a listing state") gains a second
-dimension: the carrier condition. This addendum logs the conditions and changes the review rule
-for `verification-before-completion`. It changes no `skillOverrides` state, no manifest entry and
-no agent preload.
+[name-only confound](#listing-policy) ("compare only within a listing state") gains another
+dimension: the instructions a child receives. The carrier is one source; the landscape-sweep
+templates and two role changes are others (other sources and role changes, below). This
+addendum logs these conditions and adds a comparison to the review of
+`verification-before-completion`'s Claude listing. It changes no `skillOverrides` state, no
+manifest entry (the prune rule included) and no agent preload.
 
 **Condition log.**
 
@@ -792,28 +794,60 @@ no agent preload.
 
 **Boundaries.** A host changes condition when `tools/adoption/install_claude_profile.py`
 installs a revision, not at its merge: the hook reads the block files installed beside it. The
-one install time this repository records is the C1 install that the coordinator reported for its
-local measurement: 08:26:32Z on 2026-09-27, from `main` at `5f3a7c21`
+installer writes no install record, and its `shutil.copy2` (L113 for hooks, L143 for agents)
+keeps the source file's modification time; #381's frozen procedure records hashes, not install
+times. The one install time this repository records is the C1 install that the coordinator
+reported for its local measurement: 08:26:32Z on 2026-09-27, from `main` at `5f3a7c21`
 ([measured-gap addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-measured-fetch-and-containment-gaps)).
-The review therefore reads each host's own install times, and it reports a window that crosses an
-unrecorded boundary as mixed rather than assigning it to a condition. A separate boundary lies
-inside C0: `isolated-builder` has preloaded the skill, and its body has named it, since
-[#376](https://github.com/seathatflowsinourveins/native-agent-stack/pull/376) (`623d34fa`, merged
-2026-09-27T03:38:47Z; the
+The review therefore assigns a window to a condition only from a host's own record of its
+installs, and it reports a window that crosses an unrecorded boundary as mixed. A separate
+boundary lies inside C0: `isolated-builder` has preloaded the skill, and its body has named it,
+since [#376](https://github.com/seathatflowsinourveins/native-agent-stack/pull/376) (`623d34fa`,
+merged 2026-09-27T03:38:47Z; the
 [targeted role preloads](#addendum-2026-09-26-targeted-role-preloads-security-reviewer-isolated-builder)
 addendum). On a host, that boundary is when `install_claude_profile.py` installed the agent
 definition. This record does not establish whether `/skill-doctor` counts a preload as a use.
 
-**Review rule, 2026-10-25.** The review splits each skill's uses by host and condition, within
-its listing state. For `verification-before-completion` (`trial`, `on`, preloaded by
-`isolated-builder`), a use count no longer decides: under C1 and C2 the carrier prompted its use,
-and the builder's preload delivers its content without a `Skill` call. Its decision rule becomes a
-with/without comparison on frozen builder tasks, run through an upstream evaluation harness that
-the review record names with its pin before the run, comparing tokens, elapsed time and
-review-found defects. For this skill, that comparison replaces the count-based prune rule at the
-[trial window end](#overturn-conditions). `search-first` is a `kept` verdict winner: its split
-usage is reported, and it changes only through a verdict re-record, as the prune rule already
-states.
+**Other sources and role changes.**
+- The landscape-sweep templates name both skills in every sweep worker's prompt from `1b0e4598`
+  (2026-09-26T05:08:52Z) onward: "Discovery: search-first ... Refutation:
+  verification-before-completion (evidence before any verdict)"
+  ([`templates.json`](../../tools/sota-convergence/landscape-sweep/templates.json), `common`;
+  `TEMPLATE_SKILLS` in [`build_args.py`](../../tools/sota-convergence/landscape-sweep/build_args.py)
+  L59). The Claude workers and the GPT-6 lane, which composes its prompts from the same templates,
+  both receive them, and no carrier revision changes them. In the C0 baseline window, when no child
+  received `SubagentStart` context, 120 workflow-subagent children in one session made 108
+  `verification-before-completion` and 46 `search-first` Skill calls
+  ([child-lane baseline](../../evidence/artifacts/child-lane-baseline-20260926/README.md#results-claude-children-639-in-7-sessions)).
+  That set matches the templates' Discovery and Refutation list, which is consistent with
+  template-driven use but does not prove it.
+- [#398](https://github.com/seathatflowsinourveins/native-agent-stack/pull/398) (`54834120`,
+  merged 2026-09-27T14:27:46Z) moved the sweep's Claude judgment stages to the
+  `landscape-sweep-worker` type on Opus, `refute-facts` from Sonnet. Earlier sweep children carry no
+  such type, so the sweep's own run records identify them.
+- [#402](https://github.com/seathatflowsinourveins/native-agent-stack/pull/402) (`d022295a`,
+  merged 2026-09-27T14:04:25Z), inside C1, moved `isolated-builder` from `model: sonnet` with
+  `isolation: worktree` to `model: opus` without frontmatter isolation.
 
-**Evidence class.** The condition log is structural: merge commits and the block files at each
-revision. It is not a measurement of use, and no review result is claimed.
+**Review rule, 2026-10-25.** The review splits each skill's uses by host and condition, within
+its listing state. On each client it reports sweep workers apart from other children, and it
+reports builder uses before and after each host's #402 install apart. For
+`verification-before-completion`'s Claude listing (`trial`, `on`, preloaded by
+`isolated-builder`), a Claude use count does not show usefulness: under C1 and C2 the carrier
+prompted its use, the sweep templates prompt it, and the builder's preload delivers its content
+without a `Skill` call. The review therefore adds a with/without comparison that varies that
+preload on frozen builder tasks, run through an upstream evaluation harness that the review record
+names with its pin before the run, comparing tokens, elapsed time and review-found defects. The
+count rule still applies as written: this addendum changes no manifest entry, and
+`tools/skill-usage/skill_usage.py` (L516-538) lists a trial skill as a prune candidate when every
+evaluated client shows zero uses and the skill is at least `window_days` old. Codex enablement
+stays under that rule, read with the sweep split. If the comparison and the count rule disagree
+for the Claude listing, the review writes the resulting exception or demotion into the manifest
+update and follow-up decision record that the [trial window end](#overturn-conditions) already
+requires. `search-first` is a `kept` verdict winner: its split usage is reported, and it changes
+only through a verdict re-record, as the prune rule already states.
+
+**Evidence class.** The condition log and the other sources are structural: merge commits, block
+files, templates and agent definitions at each revision. The C0 counts are the baseline's
+retained measurement, quoted as such. This addendum makes no new measurement of use and claims no
+review result.
