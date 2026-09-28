@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "GPT-6 Codex lanes on nativestack-5975wx-20260925 reach a pool of six ChatGPT subscription accounts through OmniRoute: 20128, the shared gateway (build dd6e9607e), and 20129, the full-compression lane chained to it through the sharedgw provider node. The routing had not been checked against maintained upstream practice. Failure found: on 20128 a post-affinity OAuth occupancy override (auth.ts:2159-2177, hardcoded on at chat.ts:1711) served GPT-6 turns on an account other than the session's pin. By the per-conversation pin-creation method, that was 460 of 4,461 matched turns (10.31%, in 64 of 201 conversations) in the 24 h ending about 2026-09-28T00:13Z, with cache-read share 73.76% on those turns against 92.14% on pinned turns (route-mapper-final.json). By a later per-turn method it was 339 of 4,231 turns (8.0%) over 06:58Z-00:13Z, with 85.6% against 94.5%, and the rate rose with load (route-mapper-part1-final.md). The override runs against the intent of OmniRoute PR #8940. Task: adjudicate the routing practices from two model families and the live mapping; record each adopted rule, OmniRoute state, action, verify metric and overturn condition; and record the decisions taken.",
+  "primary_sources_and_pins": [
+    {"url": "https://github.com/diegosouzapw/OmniRoute", "revision": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3"},
+    {"url": "https://github.com/diegosouzapw/OmniRoute/pull/8940", "revision": "d774ccecac46f7315a794d5ce33653eaac3a8192"},
+    {"url": "https://github.com/diegosouzapw/OmniRoute/pull/5943", "revision": "8d2df914f05d816895de11c7331d7057b919a8ad"},
+    {"url": "https://github.com/diegosouzapw/OmniRoute/pull/13102", "revision": "baaaaf318c61aec0dfdfa979df41ec0767a2944b"},
+    {"url": "https://github.com/router-for-me/CLIProxyAPI", "revision": "4a2c81864f31f39308e946c4c65e72147855da6e"},
+    {"url": "https://github.com/Wei-Shaw/sub2api", "revision": "fd80b08c90b55edcad5b00171b53f08721d30da1"},
+    {"url": "https://github.com/BerriAI/litellm", "revision": "d09bbae1c6df463e425558f60d460437193635da"},
+    {"url": "https://github.com/maximhq/bifrost", "revision": "8e99cf8341b60e342a4a6044387290ac5939d2bd"},
+    {"url": "https://github.com/QuantumNous/new-api", "revision": "0aec08fee811ec6136828fda790551b49e410301"},
+    {"url": "https://github.com/llm-d/llm-d-router", "revision": "a5cbe600ebade00cf3e9885beaf2bfacddeabce1"},
+    {"url": "https://github.com/smg-project/smg", "revision": "3be823a700fabaff3add8a390cf78f163479d686"},
+    {"url": "https://github.com/openai/codex", "revision": "36650394c5b38c2990ccf2a3457165ca3e9d9726"},
+    {"url": "https://github.com/openai/openai-python", "revision": "d9f7b7a085d4f2173756590abeffeb7a8c7641dd"},
+    {"url": "https://github.com/open-telemetry/semantic-conventions-genai", "revision": "e57c543b4889619eb2a05702471937db5119165d"},
+    {"url": "https://github.com/vllm-project/semantic-router", "revision": "6573123715e214a9eaa3ad23372ee5157411e519"},
+    {"url": "https://github.com/katanemo/plano", "revision": "003c36aea896ce6fa98567329588baa582e41f9c"},
+    {"url": "https://github.com/vllm-project/production-stack", "revision": "66b60661aa3052810859a417559e9e830772a091"}
+  ],
+  "discovery_provenance": [
+    "Coordinator task of 2026-09-28, following the user's direction of 2026-09-27 that the gateway lanes use SOTA routing practice backed by convergence evidence. The coordinator ran it as an agent team (route-landscape, route-mapper and route-gpt6, all claude-opus-5-5) and then an adjudication workflow.",
+    "route-landscape: shallow clones of each upstream at its release tag, with HEAD verified equal to the gh api tag commit; dynamo, the SDKs and otel-genai read through gh api contents at the ref; docs fetched on 2026-09-27 (route-landscape-catalog.json, field method). The pins in primary_sources_and_pins come from that catalog and the adjudication.",
+    "GPT-6 JOB 1 (an independent answer that never saw the catalog) and JOB 2 (a refutation of the catalog), both gpt-6-astra at effort max through the repository's landscape-sweep runner. Their shells had no network, so each opened its own sources with the Codex web tool, GitHub REST URLs included. The answers' calls fields report web_search 12, web_fetch 28 and gh_api 12 for JOB 1, and 12, 55 and 35 for JOB 2 (route-job1.last.json, route-job2.last.json).",
+    "route-mapper: a read-only inventory of OmniRoute's routing mechanisms and 24 h metrics on this host, then follow-up checks on expiry-first, the quota window and an upstream fix (route-mapper-final.json, route-mapper-resume-parts.md).",
+    "route-landscape's review of OmniRoute PRs #8939, #8940, #5943 and #13102 and of four reference gateways, which produced the cited minimal occupancy fix (route-landscape-occupancy-research.md).",
+    "A local gh api query of 18 upstreams' default branches (maintenance-gh-20260928.tsv). It closed JOB 2's maintenance entries, which were all 'unknown' because its web tool could not reach GitHub's commit endpoints.",
+    "Adjudication by three Claude workflow stages under adjudication-rule.json (adjudication.json). The builder's task text carried the adjudicated table cut at 150,000 characters, inside E9. The builder recovered E9 onward, U1-U4 and M1-M5 from the workflow's private journal, and adjudication.json holds all 51 items from that journal.",
+    "The builder resolved the full merge commit ids of OmniRoute PRs #8940 (merged 2026-08-11) and #5943 (merged 2026-07-02) with gh api on 2026-09-28; the receipts carry their short forms d774cceca and 8d2df914. The open PR #13102 is pinned at its head baaaaf31, as recorded in route-mapper-resume-parts.md.",
+    "Repository context: docs/decisions/2026-09-27-omniroute-account-pool.md and evidence/artifacts/omniroute-gateway-20260927/ (the build, the service and the keyless loopback posture)."
+  ],
+  "license_and_compatibility": "OmniRoute is MIT (manifests/stack.json). This record installs, vendors and runs no new component. The other gateways (CLIProxyAPI, sub2api, LiteLLM, Bifrost, new-api, llm-d-router, SMG and others) were read at pinned revisions only; their licenses were not re-checked here. The approved occupancy patch changes the deployed OmniRoute build and copies its guard form from OmniRoute's own open PR #13102. Its build, tests and any license check belong to the separate patch workflow. GPT-6 was reached through the host's native Codex sign-in, and the GPT-6 prompts carry only the public question, the catalog and public URLs.",
+  "baseline_and_candidate": {
+    "baseline": "The routing as configured before this record. 20128 (build dd6e9607e): session affinity on with a 4 h sliding TTL; providerStrategies.codex round-robin with stickyRoundRobinLimit 1; the post-affinity OAuth occupancy override hardcoded on; quota used only as a hard filter at 99% used. 20129: the sharedgw limiter auto-enabled (60 rpm, 350 ms, 6 concurrent), its own retry layers and compression on. Measured in route-mapper-final.json over the 24 h ending about 2026-09-28T00:13Z, and by hour and load in route-mapper-part1-final.md.",
+    "candidate": "The adjudicated routing rules (51 items, adjudication.json) and the two changes they select. First, the 20129 limiter lift, applied 2026-09-28T01:22:13Z. Second, the approved 20128 affinity-over-occupancy patch: reuse an eligible pin, and bind a fresh pin to the connection that served it; it is applied only after the R02 scored run. Every other setting stays as it is."
+  },
+  "frozen_inputs": {
+    "base_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+    "tasks": [
+      "routing-practice-research",
+      "routing-practice-adjudication",
+      "omniroute-live-mapping",
+      "expiry-first-quota-window-checks",
+      "occupancy-fix-research",
+      "upstream-maintenance-check",
+      "sharedgw-limiter-lift",
+      "r02-freeze-readback",
+      "cutoff-capture-and-load-recheck"
+    ],
+    "roles": [
+      "claude-route-landscape",
+      "gpt6-independent-researcher",
+      "gpt6-catalog-refuter",
+      "claude-route-mapper",
+      "claude-adjudicator-affinity-cache",
+      "claude-adjudicator-resilience-retry",
+      "claude-adjudicator-chain-stream-extra",
+      "coordinator"
+    ],
+    "sources": [
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json", "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-final.json", "sha256": "f50266a1650351b3822382df45fb99c63e9f013c1d36a138331784dbf0c1884a"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md", "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-occupancy-research.md", "sha256": "2bbbd194759ae5bd61a854b26b2d5498b3adf0f3bac7ff535d994f554a875704"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/maintenance-gh-20260928.tsv", "sha256": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/ab-requirements.md", "sha256": "4dff39c833542630d90ff7e48ba896af84e1d4131bdf757f63ed74fde07e9447"}
+    ],
+    "inputs": [
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-job1.prompt.txt", "sha256": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-job1.schema.json", "sha256": "df09899cfdc435635c30f74f39117190ff088488b16406b0d8ddb1c811a65f8a"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-job2.prompt.txt", "sha256": "015bf2a389c9fd0823e19081486a2055d26e0e014c3d49404a7dda957edf5a1c"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/route-job2.schema.json", "sha256": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507"}
+    ],
+    "evaluation": [
+      {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json", "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915"}
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Adjudication (adjudication-rule.json): an item is 'converged' only when both families agree on checked sources, and 'converged_with_amendment' when the checkable GPT-6 amendments were applied; 'single_family' and 'not_checked' mean what they say. Numbers come only from the input files, each with its file. A run's contract check means its output matches its declared schema or request: the GPT-6 answers and the adjudication groups have 0 schema errors, the limiter read-back equals the request, the second R02 read-back was admissible and the maintenance TSV has a row for every queried repository. The teammate reports had no declared schema, so their contract stays null. Semantic quality stays null unless an independent check graded it. The runtime acceptance of the candidate changes is declared here but has not run. After the occupancy patch, on 20128, over load-matched windows (peak in-flight >= 10, or more than about 300 turns/h) against a pre-patch loaded window recorded before the patch, with both route-mapper methods reported: served-not-pin near 0 outside ineligibility (whole-window baselines, mixing loaded and quiet hours: 10.31% per conversation, 460/4461, and 8.0% per turn, 339/4231); cache-read share on formerly overridden conversations above the 73.76% baseline; requested-not-served model still 0 (baseline 0/7070); 429 and 499 rates tracked against 0.0 and 0.028, where a rise sends the item to per-credential admission (P18). The adjudication stage wrote the criteria after the research runs, not before them, and the load-matching requirement comes from the coordinator's log after route-mapper's final part 1 report.",
+    "usage_rule": "GPT-6 jobs use Codex's turn.completed usage: uncached_input = input - cached - cache_write; cache_creation = cache_write (reported 0); cache_read = cached; output includes reasoning; total = input + output. native_retries is null because HTTP-layer retries are not visible in the exec event stream. Usage of the Claude teammates, adjudicators, builder, reviewers and coordinator is unknown and stays null; it is never estimated. The no-model runs (gh api, the PATCH, the read-backs) record zero model tokens; the coordinator's own tokens for issuing them are excluded. There is no savings claim. The adjudication's two uncached-token estimates (P1, about 5,370,000 per 24 h; P7, 7,520,091) come from overlapping methods and are never summed."
+  },
+  "runtime_and_platform": {
+    "platform": "nativestack-5975wx-20260925: WSL2 Ubuntu 24.04.5 x86_64. OmniRoute 20128 and 20129 run on this host on loopback (20129 reaches 20128 at 127.0.0.1:20128). GPT-6 is reached through the native Codex sign-in.",
+    "tools": [
+      {"name": "OmniRoute", "version": "build dd6e9607e (release/v3.8.51 a58000c7 with PRs #14904 and #13788), mapped on both ports"},
+      {"name": "Codex CLI", "version": "codex-cli 0.157.1 (rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726), gpt-6-astra at effort max"},
+      {"name": "Claude Code", "version": "2.1.283; in-process teammates on claude-opus-5-5 (route-landscape and route-mapper as stack-researcher, route-gpt6 as general-purpose); adjudication stages stack-researcher with model opus at effort max"},
+      {"name": "GitHub CLI", "version": "gh 2.101.0"},
+      {"name": "Python", "version": "3.13.15 for the repository validators; 3.14.7 with jsonschema 4.26.0 through uv for the staging script and the schema checks"}
+    ],
+    "isolation": "Research was read-only. route-landscape and route-mapper were in-process Claude teammates that could not write files; the coordinator wrote their reports. route-mapper read sqlite in mode=ro and used GET only. The GPT-6 jobs ran through tools/sota-convergence/landscape-sweep/codex_call.sh in a read-only sandbox whose shell had no network, each holding a runner slot. The only gateway write was the coordinator's PATCH on 20129. 20128 was not changed, and it is frozen from 2026-09-28T01:29:29Z through the R02 scored run. The builder wrote only in its own worktree at base ba1700ad."
+  },
+  "commands": [
+    "Claude teammate route-landscape: git clone --depth 1 --branch <tag> of each reviewed upstream into $SCRATCH, HEAD checked against the gh api tag commit; gh api contents at the ref for dynamo, the SDKs and otel-genai; docs through ctx_fetch_and_index. Exact invocations not retained.",
+    "tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 start route-job1 $SCRATCH/omni-full/route-gpt6/job1.prompt.txt $SCRATCH/omni-full/route-gpt6/job1.schema.json, then wait and result (gpt-6-astra, effort max); logged lines in route-gpt6-runs.json",
+    "python3 $SCRATCH/omni-full/route-gpt6/build_job2.py $SCRATCH/omni-full/route-gpt6 $SCRATCH/omni-full/route-landscape-catalog.json (builds the JOB 2 prompt from the catalog without its withdrawn entry; the builder script is not published, its prompt is), a quota gate check (used 43%), then tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 start route-job2 $SCRATCH/omni-full/route-gpt6/job2.prompt.txt $SCRATCH/omni-full/route-gpt6/job2.schema.json, then wait and result; logged lines in route-gpt6-runs.json",
+    "Claude teammate route-mapper, read-only: sqlite in mode=ro on OmniRoute's databases, GET /api/* on 127.0.0.1:20128 and 127.0.0.1:20129, app.log parsing, request bodies parsed for aggregates only, source at release/v3.8.51 a58000c7 with PR #14904 (routing files identical to dd6e9607e). Exact invocations not retained.",
+    "route-mapper checks 1 and 2, read-only: sqlite in mode=ro on quota_snapshots; source reads of chat.ts, auth.ts, sessionAffinityPin.ts, providerExecutionPipeline.ts, quotaScoring.ts, expiryFirstAccountSelection.ts, codexQuotaFetcher.ts, quota.ts and quotaCache.ts. Exact invocations not retained.",
+    "route-mapper part 3: gh api compare a58000c7...<head> over 547 OmniRoute branches, commit path filters, 10 PR searches and a patch scan of 354 open PRs. Exact invocations not retained.",
+    "route-landscape occupancy review: OmniRoute a58000c7 and PRs #8939, #8940, #5943 and #13102 through gh api; pinned clones of CLIProxyAPI v8.0.2, sub2api v0.2.8, LiteLLM v1.102.1 and llm-d-router v0.11.0. Exact invocations not retained.",
+    "gh api repos/<repo> (.archived, .default_branch) and gh api repos/<repo>/commits?sha=<default branch>&per_page=1 for 18 repositories, run 2026-09-28T02:01:49Z (maintenance-gh-20260928.tsv header)",
+    "Workflow stages adjudicate:affinity-cache, adjudicate:resilience-retry and adjudicate:chain-stream-extra (agent type stack-researcher, model opus, effort max) under adjudication-rule.json",
+    "PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":false}} on 127.0.0.1:20129, then GET /api/resilience and GET /api/rate-limits. Client invocation not retained.",
+    "analyze_r02.py readback <0600 output> at PR #445 revision 00a94b52, declared source GET /api/monitoring/health on 20128",
+    "analyze_r02.py readback <0600 output> at revision bddb0072, amended keyless sources GET /api/system/version (.current) and the BUILD_SHA sentinel in the serving directory",
+    "SCRATCH=<session scratch> WF_JOURNAL=<record workflow journal> uv run --no-project --with jsonschema python evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
+    "route-mapper part 1 final, read-only: quota_snapshots, call_logs, app.log and audit_log on 20128 from 01:22Z to 03:29Z; per-turn off-pin matching of each AUTH affinity line to call_logs within 0.5 s (unique pairs only) over 06:58Z-00:13Z, with the hourly peak in-flight; GET /api/rate-limits, call_logs and app.log on 20129. Exact invocations not retained."
+  ],
+  "observations": [
+    {
+      "id": "landscape-catalog",
+      "task": "routing-practice-research",
+      "role": "claude-route-landscape",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "pinned_source_review",
+      "scope": "route-landscape's catalog: practices P1-P22, risk register R1-R8, exclusions E1-E9 and unknowns U1-U4 from pinned clones, plus the 2026-09-28 addendum (P23, the P1/P7 clarification, the recomputed live finding, and the withdrawn 8.4% finding kept as text). Source review, not runtime acceptance; GPT-6 JOB 2 refuted 3 of its entries and amended 27. The catalog had no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json", "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "gpt6-job1-independent",
+      "task": "routing-practice-research",
+      "role": "gpt6-independent-researcher",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "discovery",
+      "scope": "GPT-6 JOB 1, gpt-6-astra at effort max through codex-cli 0.157.1, 2026-09-28T00:14:24Z to 00:27:52Z: an independent answer to the frozen routing question from sources it opened itself, without the catalog. 6 practices and 5 rejected practices. Discovery-level research; this record did not re-open all of its citations. Exit 0 from the runner's exit file; the answer validates against its frozen schema.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-job1.last.json", "sha256": "e81ce40f4a63e4614d0be87a7484ad4a3ffbb1b2fc21129a643de7a860c9e194"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json", "sha256": "3ab36b52201737f6912032b573cbe4b12e2d63ff11026a6dd8d75f46ce265b59"}
+      ],
+      "usage": {"uncached_input": 173294, "cache_creation": 0, "cache_read": 2356864, "output": 23409, "reasoning_in_output": 11724, "total": 2553567, "native_retries": null}
+    },
+    {
+      "id": "gpt6-job2-refutation",
+      "task": "routing-practice-research",
+      "role": "gpt6-catalog-refuter",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "pinned_source_review",
+      "scope": "GPT-6 JOB 2, gpt-6-astra at effort max through codex-cli 0.157.1, 2026-09-28T00:30:32Z to 00:49:08Z: an adversarial refutation of the catalog, without its withdrawn entry, at sources it opened itself. 46 verdicts (10 confirm, 3 refute, 27 amend, 6 not_checked), 16 maintenance entries all unknown, 3 missed practices; it used all 90 page opens and API calls its budget allowed (web_fetch 55, gh_api 35). Exit 0 from the runner's exit file; the answer validates against its frozen schema.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-job2.last.json", "sha256": "27a46c9ba7b160f3bad8ce3f52da030f5709117bbbd5b2cf3fe9ab52c3981246"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json", "sha256": "3ab36b52201737f6912032b573cbe4b12e2d63ff11026a6dd8d75f46ce265b59"}
+      ],
+      "usage": {"uncached_input": 232411, "cache_creation": 0, "cache_read": 2875776, "output": 34696, "reasoning_in_output": 16448, "total": 3142883, "native_retries": null}
+    },
+    {
+      "id": "live-mapping-attempt-1",
+      "task": "omniroute-live-mapping",
+      "role": "claude-route-mapper",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "route-mapper's first 24 h off-pin measurement on 20128, read-only: 8.4% of pinned GPT-6 turns served by another account, cache-read share 84.1% against 93.9%. Withdrawn because it did not treat call_logs.timestamp as the request end time.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {"semantic": false, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json", "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "live-mapping-attempt-2",
+      "task": "omniroute-live-mapping",
+      "role": "claude-route-mapper",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "route-mapper's mapping of OmniRoute's routing mechanisms (build dd6e9607e) and aggregate metrics for the 24 h ending about 2026-09-28T00:13Z, read-only, with request start = call_logs.timestamp - duration. 20128: 7,007 GPT-6 turns; by the per-conversation pin-creation method, 460 of 4,461 matched turns (10.31%) served off-pin, cache-read share 73.76% off-pin against 92.14% on-pin. 20129: 10 probe turns. Observational, not causally isolated. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-final.json", "sha256": "f50266a1650351b3822382df45fb99c63e9f013c1d36a138331784dbf0c1884a"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "expiry-first-quota-window-checks",
+      "task": "expiry-first-quota-window-checks",
+      "role": "claude-route-mapper",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "route-mapper checks 1 and 2, read-only. Check 1 (source): lever (d) changes only the target of the in-request Codex 429 rotation. Check 2 (sqlite in mode=ro and source): expiry-first scores the minimum remaining over hours to the nearest reset; the binding window is the upstream primary window stored as 'session' and behaves as 7-day (inferred; window_duration_ms is null on all 555 rows); the cutoff is remaining <= 1%. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md", "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "upstream-fix-search",
+      "task": "occupancy-fix-research",
+      "role": "claude-route-mapper",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "discovery",
+      "scope": "route-mapper part 3: a search of OmniRoute for an upstream fix of the post-affinity occupancy override, from base a58000c7 over 547 branches (31 touch the routing files), 10 PR searches and a patch scan of 354 open PRs. None found; #13102 is the only open PR that changes the override, and it exempts API-key-preferred picks only. A token scan could miss a restructure. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md", "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "occupancy-reference-review",
+      "task": "occupancy-fix-research",
+      "role": "claude-route-landscape",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "pinned_source_review",
+      "scope": "route-landscape's source review of OmniRoute a58000c7 and PRs #8939, #8940, #5943 and #13102 (head baaaaf31), and of the keep-or-break order in CLIProxyAPI v8.0.2, sub2api v0.2.8, LiteLLM v1.102.1 and llm-d-router v0.11.0 at pinned clones. Result: a cited minimal fix, (i) the #13102 guard form for reused pins plus (ii) binding fresh pins to the served connection. Source review only. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-occupancy-research.md", "sha256": "2bbbd194759ae5bd61a854b26b2d5498b3adf0f3bac7ff535d994f554a875704"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "upstream-maintenance",
+      "task": "upstream-maintenance-check",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "discovery",
+      "scope": "gh api default-branch and last-commit query for 18 upstreams, run 2026-09-28T02:01:49Z against the 2026-06-30 cutoff: 17 maintained; Portkey-AI/gateway stale (last commit 2026-05-25); OmniRoute release/v3.8.51 head a58000c7 equals the build base. Contract: the TSV has one row for each of the 18 queried repositories, each with its archived flag, default branch, last commit and date. No model. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/maintenance-gh-20260928.tsv", "sha256": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732"}
+      ],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "adjudicate-affinity-cache",
+      "task": "routing-practice-adjudication",
+      "role": "claude-adjudicator-affinity-cache",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "pinned_source_review",
+      "scope": "Workflow stage adjudicate:affinity-cache (model opus, effort max): P1-P8 under adjudication-rule.json, applying GPT-6 amendments checked against pinned clones and mapping each item to route-mapper's OmniRoute state. Source review and decisions, not runtime acceptance; its group has 0 schema errors. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication.json", "sha256": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json", "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "adjudicate-resilience-retry",
+      "task": "routing-practice-adjudication",
+      "role": "claude-adjudicator-resilience-retry",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "pinned_source_review",
+      "scope": "Workflow stage adjudicate:resilience-retry (model opus, effort max): P9-P16 under adjudication-rule.json, applying GPT-6 amendments checked against pinned sources and mapping each item to route-mapper's OmniRoute state. Source review and decisions, not runtime acceptance; its group has 0 schema errors. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication.json", "sha256": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json", "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "adjudicate-chain-stream-extra",
+      "task": "routing-practice-adjudication",
+      "role": "claude-adjudicator-chain-stream-extra",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "pinned_source_review",
+      "scope": "Workflow stage adjudicate:chain-stream-extra (model opus, effort max): P17-P23, ADD-P1P7, ADD-LIVE, R1-R8, E1-E9, U1-U4 and the missed practices M1-M5 under adjudication-rule.json. Source review and decisions, not runtime acceptance; its group has 0 schema errors. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication.json", "sha256": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json", "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "limiter-lift-20129",
+      "task": "sharedgw-limiter-lift",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "native_cli_execution",
+      "scope": "The coordinator on 20129 at 2026-09-28T01:22:13Z: PATCH /api/resilience with requestQueue.autoEnableApiKeyProviders=false, then read-back of /api/resilience and /api/rate-limits. Only that field changed, and the sharedgw limiter went from enabled to disabled. The contract check is that the read-back matches the request; the change's effect on queueing, 429s and completion is not measured. Two later 20129 turns (part1-final-recheck) do not measure it, and their added_wait_ms column may not record limiter waits. HTTP 200 and a matching read-back per the coordinator's log; no process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json", "sha256": "427a55e3212a6dc0d7ea1370c16b422a08140e9cd7f74b22c1b675a9839f1c8d"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+      ],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "r02-readback-attempt-1",
+      "task": "r02-freeze-readback",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 10,
+      "evidence_class": "native_cli_execution",
+      "scope": "R02 dry read-back of 20128's eight gateway_fingerprint fields (among them version, sha and upstream timeouts) at PR #445 revision 00a94b52, 2026-09-28T01:23:33Z, with its declared source GET /api/monitoring/health. Exit status from the coordinator's log; the outputs are private.",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {"semantic": null, "contract": false},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+      ],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "r02-readback-attempt-2",
+      "task": "r02-freeze-readback",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 11,
+      "evidence_class": "native_cli_execution",
+      "scope": "The same read-back at revision bddb0072 with amended keyless sources (GET /api/system/version and the BUILD_SHA sentinel), 2026-09-28T01:29:29Z: admissible. 20128 is frozen from here through the R02 scored run.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+      ],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "part1-final-recheck",
+      "task": "cutoff-capture-and-load-recheck",
+      "role": "claude-route-mapper",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "native_cli_execution",
+      "scope": "route-mapper's final part 1 report, read-only, appended to its input file after the adjudication (file modification time 03:30:26Z) and not adjudicated. No quota cutoff through 03:29Z. 20128 from 01:22Z: 83 Codex turns, all 200, 0 of 66 off-pin at peak in-flight 7. Per-turn method over 06:58Z-00:13Z: 339 of 4,231 turns (8.0%) off-pin, cache-read share 85.6% on moved turns vs 94.5%; mostly 0% in hours with peak 4-8, 16.7-21.7% in hours with peak 13-32. 20129 after the limiter change: 2 turns, both 200 with added_wait_ms 0, a column that may not record limiter waits. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md", "sha256": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    }
+  ],
+  "failures_and_skips": [
+    {"run_id": "live-mapping-attempt-1", "reason": "Withdrawn. call_logs.timestamp is the request end time, so a request's start is timestamp minus duration; the first computation did not use that and reported 8.4% off-pin with cache-read share 84.1% against 93.9%. The per-conversation pin-creation recomputation (live-mapping-attempt-2) gives 460/4461 = 10.31%, 73.76% against 92.14%; route-mapper's later per-turn method gives 339/4231 = 8.0%, 85.6% against 94.5%, over 06:58Z-00:13Z (part1-final-recheck). The withdrawn text stays in route-landscape-catalog.json, addendum_2026_09_28.live_finding_20128_WITHDRAWN, and was removed from the JOB 2 prompt."},
+    {"run_id": "r02-readback-attempt-1", "reason": "Exit 2. /api/monitoring/health requires management auth (alwaysRequireAuth) on the keyless loopback gateway, so version and sha came back null. In the same check the keyless alternates returned exit 0, which led to the amended sources of attempt 2 at bddb0072. The read-back outputs are private (mode 0600); this record rests on the coordinator's log."}
+  ],
+  "limitations": [
+    "Assembled after execution from retained outputs and the coordinator's log; not a prospective registration. adjudication-rule.json was copied from the workflow script after the stages ran.",
+    "The adjudication is source review and decisions. No adopted rule is accepted by runtime evidence here. The only runtime change, the 20129 limiter lift, has a read-back and no measurement of its effect.",
+    "The metrics are one 24 h window ending about 2026-09-28T00:13Z on 20128, route-mapper's later per-turn and hourly recheck of 06:58Z-00:13Z and 01:22Z-03:29Z, and on 20129 the 10 probe turns of the 24 h window plus 2 turns after the limiter change. The two off-pin methods cover different windows and give 10.31% and 8.0%. The off-pin association is not causally isolated: off-pin selection rises with load, and a moved turn can land on an account that already served the thread.",
+    "The two uncached-token estimates (P1 served-not-pin, about 5,370,000 per 24 h; P7 switch-based, 7,520,091) come from overlapping methods and must not be added.",
+    "The binding quota window's length is inferred: it behaves as 7-day, but window_duration_ms is null on all 555 quota_snapshots rows.",
+    "Open unknowns: U1; U3 (not applicable while there is no Claude connection); U4; the binding window length; whether the ChatGPT backend decrypts, rejects or ignores encrypted reasoning minted by another account; and whether 20129 forwards prompt_cache_key to 20128. Ten items carry action open_unknown (adjudication.json, decisions.json).",
+    "GPT-6 JOB 2 spent its budget and left E2-E4 and E6-E8 not_checked; its maintenance entries were all unknown and were closed by the local gh api query. M2-M5 are single_family.",
+    "Usage is unknown and excluded for route-landscape, route-mapper, the route-gpt6 teammate that ran the GPT-6 jobs, the three adjudicators, this builder, the reviewers and the coordinator. GPT-6 usage is complete for the two jobs only, and their native retries are unknown. The coordinator's tokens for the no-model runs are excluded.",
+    "route-mapper and route-landscape results are relayed teammate reports that the coordinator wrote down. The adjudication read route-mapper's interim part 1; the final part 1 report arrived after it (part1-final-recheck) and was not adjudicated. P1 and ADD-LIVE were adjudicated on the 10.31% per-conversation figure, without the 8.0% per-turn figure or the load dependence. The upstream fix search could miss a restructure that touches none of the scanned identifiers, and its date filters use committer dates.",
+    "Context, not runs of this record: the user paused work from 00:38Z to 01:20Z, and at about 01:29Z the Claude account's weekly limit paused the separate 20129 design workflow until the user reported it lifted at about 01:35Z (decisions.json).",
+    "The occupancy patch is approved but not built, tested or applied by this record. Its acceptance, rollback and upstream-drop condition belong to the separate patch workflow and a later record. Its application waits on the R02 scored run, which had not started and had no active owner as of the coordinator log's 03:3xZ entry, so the patch has no application date and 20128 stays frozen (decisions.json).",
+    "Sanitization: CLIProxyAPI internal/home/<file> citations are written in brace form, scratch and home paths are masked, the limiter record is reduced, and the coordinator's log is not published (evidence/artifacts/omniroute-routing-20260928/README.md)."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "GPT-6 lane account routing through OmniRoute on nativestack-5975wx-20260925. Trial: the 20129 sharedgw limiter lift (applied 2026-09-28T01:22:13Z, effect unmeasured) and the approved 20128 affinity-over-occupancy patch (applied only after the R02 scored run, which had not started as of the coordinator log's 03:3xZ entry, then verified live over load-matched windows against a pre-patch loaded window recorded before the patch). Every other routing setting on 20128 and 20129 is retained. The adjudicated rules are this lane's routing standard, not accepted runtime behaviour.",
+    "qualification_run_ids": []
+  },
+  "rollback": "20129: PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":true}} restores the auto-applied sharedgw limiter. Its stored values did not change (60 rpm, 350 ms, 6 concurrent, global 0, max wait 30000 ms, execution max wait 600000 ms, queue depth 0); read back GET /api/rate-limits. 20128 was not changed by this record. Once applied, the occupancy patch is rolled back in its own workflow by restoring build dd6e9607e, and it is dropped on an OmniRoute upgrade that merges an affinity-over-occupancy fix. Reverting this record removes documentation and receipts only.",
+  "next_decision_changing_test": "Before the patch, record a loaded pre-patch window on 20128 (peak in-flight >= 10, or more than about 300 turns/h). After the R02 scored run, apply the occupancy patch to 20128 once its upstream suite passes, and measure a load-matched window with both route-mapper methods: the served-not-pin rate (whole-window baselines 10.31% per conversation and 8.0% per turn, which mix loaded and quiet hours), the share of key and thread groups served by more than one account (27.27%), the cache-read share on formerly overridden conversations (73.76% off-pin, 92.14% on-pin), per-account peak in-flight (2, 2, 8, 8, 10, 11), and the 429 and 499 rates (0.0, 0.028). Before the #431 comparison of 20129 against 20128 is read out, send a synthetic prompt_cache_key through 20129 and read the 20128 affinity key kind. Then run the P5 paired continuation-fidelity probe, and count previous_response_id and configuration_update items at 20128 (M1, M3). A failed criterion reopens the item under its overturn condition in adjudication.json.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

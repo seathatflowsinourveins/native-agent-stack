@@ -1,0 +1,685 @@
+{
+ "from": "route-mapper",
+ "build": "omniroute dd6e9607e (release/v3.8.51 a58000c7 + PR #14904 + PR #13788)",
+ "window": "24h ending ~2026-09-28T00:13Z; call_logs.timestamp = request END (start = ts - duration)",
+ "inventory": [
+  {
+   "id": "R-STRAT",
+   "mechanism": "Provider account strategy (per-provider override > global fallbackStrategy > fill-first); branches round-robin/p2c/random/least-used/expiry-first/cost-optimized/strict-random/fill-first",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:1952-1957",
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:1997-2157",
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:611 (compareP2CConnections)",
+    "omniroute@dd6e9607e:src/sse/services/expiryFirstAccountSelection.ts:123"
+   ],
+   "scope": "runs only when affinity returned no connection (auth.ts:1995). On the chat path every request carries a sessionKey (affinity key, else session id, else request:<uuid>; chat.ts:1685-1686), so with TTL>0 new pins are LRU (sessionAffinityPin.ts:306) and this branch is reached only by the inner Codex 429 rotation, which calls getProviderCredentials without a sessionKey (providerExecutionPipeline.ts:373-405); on 20129 TTL=0 so it always runs (1 connection)",
+   "state_20128": "providerStrategies.codex={fallbackStrategy:round-robin,stickyRoundRobinLimit:1}; global fallbackStrategy unset; global stickyRoundRobinLimit=3",
+   "state_20129": "providerStrategies={} -> fill-first; 1 connection (sharedgw)"
+  },
+  {
+   "id": "R-KEY",
+   "mechanism": "Session-affinity key: x-codex-session-id > x-session-id > x-omniroute-session > metadata.session_id/sessionId > conversation_id > session_id > prompt_cache_key > sha256(first input text)",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:197-222",
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:144-188"
+   ],
+   "state_20128": "observed key kinds on 24h affinity log lines: prompt-cache 7196, header 77, input 41",
+   "state_20129": "not used (TTL 0)"
+  },
+  {
+   "id": "R-PIN",
+   "mechanism": "Session-affinity pin: reuse pin if pinned connection is in the eligible pool; else delete pin and create new pin on LRU connection (not quota-aware)",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:272-320 (TTL gate :278, clear :299, LRU new pin :306 via compareLruConnections :254-264)",
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:1965-1993"
+   ],
+   "state_20128": "sessionAffinityTtlMs=14400000",
+   "state_20129": "sessionAffinityTtlMs=0 (disabled; no local effect with 1 connection)"
+  },
+  {
+   "id": "R-OCC",
+   "mechanism": "OAuth session-occupancy peer override AFTER affinity: if an OAuth peer with priority <= selected.priority+1 has strictly fewer foreign in-flight sessions, it replaces the selected (incl. pinned) connection; pin itself is not updated",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:2159-2177",
+    "omniroute@dd6e9607e:open-sse/services/oauthSessionOccupancy.ts:1 (10-min lease), :19-41, :43-70",
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1685-1686 (occupancy key), :1711 (reserveOAuthSession:true, unconditional)",
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:1078-1079 (reservation)",
+    "upstream PR #8940 commit d774cceca 2026-08-11 (intent: same-session affinity stronger than occupancy)"
+   ],
+   "state_20128": "always on (no setting); 6 OAuth codex connections, priorities 1..6",
+   "state_20129": "no-op (single apikey connection)"
+  },
+  {
+   "id": "R-ORDER",
+   "mechanism": "Candidate ordering: OAuth by priority then occupancy availability",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:1942-1950"
+   ],
+   "state_20128": "priorities 1..6 distinct",
+   "state_20129": "n/a"
+  },
+  {
+   "id": "R-ELIG",
+   "mechanism": "Hard eligibility before affinity: rate-limited, terminal status, codex scope cooldown, model lock, quota exhaustion, quota-limit policy (codex default windows session+weekly, threshold 99% used)",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:500-512",
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:259-268,309-376,384-425",
+    "omniroute@dd6e9607e:src/domain/quotaCache.ts:91 (DEFAULT_QUOTA_THRESHOLD_PERCENT=99)"
+   ],
+   "state_20128": "no limitPolicy/codexLimitPolicy in providerSpecificData -> defaults (enabled, 99%)",
+   "state_20129": "n/a"
+  },
+  {
+   "id": "R-PREFLIGHT",
+   "mechanism": "Quota preflight cutoff (D09)",
+   "src": [
+    "prior D09 sources: open-sse/services/quotaPreflight.ts:111-128,376-403; src/sse/services/auth.ts:2375-2487"
+   ],
+   "state_20128": "resilience.quotaPreflight.enabled=false, defaultThresholdPercent=2",
+   "state_20129": "same"
+  },
+  {
+   "id": "R-RESIL",
+   "mechanism": "Cooldown/breaker/retry (D08)",
+   "src": [
+    "prior D08: src/lib/resilience/settings.ts:78-170; src/sse/services/cooldownAwareRetry.ts:107-160; src/shared/utils/circuitBreaker.ts"
+   ],
+   "state_20128": "oauth cooldown base 5000ms/8 steps/no upstream hints; breaker degrade 5/open 8/reset 60000ms; waitForCooldown on (3, 30s); comboCooldownWait on (budget 300000ms); providerCooldown off; requestRetry=3; maxRetryIntervalSec=30",
+   "state_20129": "identical"
+  },
+  {
+   "id": "R-QUEUE",
+   "mechanism": "Per-connection request queue/limiter (Bottleneck); auto-enabled for apikey-category providers",
+   "src": [
+    "omniroute@dd6e9607e:open-sse/services/rateLimitManager.ts:159-164,279-282,341-352",
+    "omniroute@dd6e9607e:open-sse/config/providerRegistry.ts:304-308 (unknown provider -> apikey)"
+   ],
+   "state_20128": "codex (oauth): limiter disabled on all 6 (GET /api/rate-limits)",
+   "state_20129": "sharedgw limiter enabled=true (auto): 60 rpm, 6 concurrent, 350 ms min gap, maxWaitMs 30000; RATE_LIMIT_AUTO_ENABLE env not read (unknown)"
+  },
+  {
+   "id": "R-ROTATE",
+   "mechanism": "In-request failover: exclude failed account and pick LRU (round-robin fallback), pin deletion on failure",
+   "src": [
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1692-1746",
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:2004-2082",
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:2242,2291",
+    "omniroute@dd6e9607e:open-sse/handlers/chatCore.ts:4180,5059"
+   ],
+   "state_20128": "0 x 429 in 24h call_logs; 4 'affinity cleared' lines 05:51Z-00:16Z",
+   "state_20129": "n/a"
+  },
+  {
+   "id": "R-PCA",
+   "mechanism": "Prompt-cache affinity (combo-only rendezvous stage, D03)",
+   "src": [
+    "omniroute@dd6e9607e:open-sse/services/combo/promptCacheAffinity.ts:96-118,184-271,325"
+   ],
+   "state_20128": "promptCacheAffinityEnabled=true; combos=0 -> inactive",
+   "state_20129": "same"
+  },
+  {
+   "id": "R-STICKY-COMBO",
+   "mechanism": "Combo session stickiness",
+   "src": [
+    "omniroute@dd6e9607e:open-sse/services/combo/sessionStickiness.ts:433-474"
+   ],
+   "state_20128": "disableSessionStickiness=false; combos=0 -> inactive; comboStrategy=fallback, comboDefaults.strategy=priority",
+   "state_20129": "same"
+  },
+  {
+   "id": "R-PCK",
+   "mechanism": "Codex executor prompt-prefix hygiene + prompt_cache_key fill (K01)",
+   "src": [
+    "prior K01 (a58000c7, file unchanged): open-sse/executors/codex.ts:1504-1514,1196-1219,1176-1184,1348-1385; open-sse/config/codexIdentity.ts:171-184"
+   ],
+   "state_20128": "promptCacheEnabled=true, promptCacheStrategy=auto, alwaysPreserveClientCache=auto",
+   "state_20129": "same"
+  },
+  {
+   "id": "R-CHAIN",
+   "mechanism": "20129->20128 hop: DefaultExecutor forwards x-session-id/x-title; Responses translation keeps body prompt_cache_key for OpenAI destinations only",
+   "src": [
+    "omniroute@dd6e9607e:open-sse/executors/index.ts:236",
+    "omniroute@dd6e9607e:open-sse/executors/default.ts:682-685",
+    "omniroute@dd6e9607e:open-sse/utils/opencodeHeaders.ts:116",
+    "omniroute@dd6e9607e:open-sse/handlers/chatCore.ts:543-544",
+    "omniroute@dd6e9607e:open-sse/translator/request/openai-responses/toResponses.ts:399-400",
+    "omniroute@dd6e9607e:open-sse/translator/request/openai-responses.ts:888-893"
+   ],
+   "state_20128": "n/a",
+   "state_20129": "provider node sharedgw apiType=responses baseUrl=127.0.0.1:20128/v1, customHeaders=null; 10 GPT-6 probe turns/24h carried no body prompt_cache_key/session_id"
+  },
+  {
+   "id": "R-RESPCACHE",
+   "mechanism": "Response cache: exact SHA layer + optional vector layer (K02); idempotency window (K04)",
+   "src": [
+    "prior K02/K04"
+   ],
+   "state_20128": "semanticCacheEnabled=true (memory, exact), vector off, requireZeroTemp=true; /api/cache/stats size 1, hits 0; idempotencyWindowMs=5000",
+   "state_20129": "same config; size 0"
+  },
+  {
+   "id": "R-MODELFB",
+   "mechanism": "Model-family fallback, fallback chains, globalFallbackModel, task-aware routing, background degradation, reasoning routing rules",
+   "src": [
+    "prior D11/D12: open-sse/services/modelFamilyFallback.ts:29-101; open-sse/handlers/chatCore/providerExecutionPipeline.ts:517-542"
+   ],
+   "state_20128": "/api/fallback/chains=[]; globalFallbackModel absent; task-routing enabled=false; background-degradation false; reasoning rules []; thinking-budget passthrough",
+   "state_20129": "same"
+  },
+  {
+   "id": "R-LEASE",
+   "mechanism": "Exclusive connection leases (D07)",
+   "src": [
+    "prior D07: src/app/api/v1/session-leases/route.ts:29-94"
+   ],
+   "state_20128": "exclusiveSessions=0",
+   "state_20129": "0"
+  }
+ ],
+ "live_metrics": {
+  "window": "24h ending 2026-09-28T00:13Z; call_logs.timestamp = request END (verified: pin-creation log offset vs ts-duration median -3ms)",
+  "method": "read-only sqlite (mode=ro), GET /api/* on both ports, app.log parse, artifact request bodies parsed in-sandbox for aggregates only (keys hashed, never printed)",
+  "20128": {
+   "gpt6_turns": 7007,
+   "status": {
+    "200": 6771,
+    "499": 196,
+    "400": 35,
+    "502": 4,
+    "503": 1
+   },
+   "rate_429": 0.0,
+   "rate_499": 0.028,
+   "rate_5xx": 0.0007,
+   "499_duration_ms_p10_p50_p90": [
+    15311,
+    25982,
+    32645
+   ],
+   "499_ge_590s": 1,
+   "cache_read_share_gpt6": 0.9271,
+   "cache_by_path": {
+    "/v1/responses": {
+     "n": 6700,
+     "share": 0.9272
+    },
+    "/v1/chat/completions": {
+     "n": 71,
+     "share": 0.1669,
+     "note": "39/71 <1024 input tokens (0 cache by design); >=1024 tokens: 0.176; 35/107 chat turns 400 = strict json_schema/json_object errors (client schemas)"
+    }
+   },
+   "cache_by_model": {
+    "gpt-6-astra": 0.9274,
+    "gpt-6-sol": 0.8944,
+    "gpt-6-astra-max": 0.9319
+   },
+   "account_spread_requests": [
+    0.263,
+    0.237,
+    0.216,
+    0.211,
+    0.047,
+    0.026
+   ],
+   "account_spread_note": "a5/a6 added 18:36Z/21:39Z; hourly spread across all 6 roughly even since 21Z",
+   "affinity_breakage": {
+    "by_session_tag": {
+     "groups": 558,
+     "multi_account": 131,
+     "share": 0.2348,
+     "switch_rate": 0.0594,
+     "cache_after_switch": 0.6517,
+     "cache_same": 0.9508
+    },
+    "by_prompt_cache_key": {
+     "groups": 238,
+     "multi_account": 68,
+     "share": 0.2857,
+     "switch_rate": 0.0444,
+     "cache_after_switch": 0.5424,
+     "cache_same": 0.9332
+    },
+    "by_key_and_thread": {
+     "groups": 286,
+     "multi_account": 78,
+     "share": 0.2727,
+     "pairs": 5246,
+     "switches": 248,
+     "switch_rate": 0.0473,
+     "prev_turn_status_at_switch": {
+      "200": 244,
+      "499": 3,
+      "502": 1
+     },
+     "cache_after_switch": 0.5393,
+     "cache_same": 0.9355,
+     "est_uncached_input_tokens_24h": 7520091
+    },
+    "pinned_vs_served": {
+     "conversations_with_uniquely_matched_pin": 201,
+     "turns": 4461,
+     "served_ne_pin": 460,
+     "rate": 0.1031,
+     "conversations_affected": 64,
+     "served_prio_le_pin_prio_plus1": "460/460 (uniform null 0.7675)",
+     "reconstructed_occupancy": "served less occupied than pin on 334/460 overridden turns vs less-occupied eligible peer on 166/4001 kept turns",
+     "cache_share_served_eq_pin": 0.9214,
+     "cache_share_served_ne_pin": 0.7376,
+     "est_extra_uncached_input_tokens_24h": 5370000
+    },
+    "pin_lifecycle_app_log_0551Z_0016Z": {
+     "prompt_cache_new_pins": 242,
+     "pins_cleared": 4,
+     "codex_429_rotation_lines": 0
+    }
+   },
+   "per_key_rpm": {
+    "max_rpm_p50_p90_max": [
+     5,
+     11,
+     26
+    ],
+    "keys_over_15rpm": 6,
+    "cache_turns_over_15rpm": 0.9429,
+    "cache_turns_le_15rpm": 0.9076
+   },
+   "per_account_peak_inflight": [
+    2,
+    2,
+    8,
+    8,
+    10,
+    11
+   ],
+   "quota_live_0019Z": {
+    "remaining_pct_by_priority_1_6": [
+     7,
+     18,
+     13,
+     6,
+     58,
+     72
+    ],
+    "next_reset": "2026-10-03T17:14Z..2026-10-04T07:02Z",
+    "burn_pct_per_h_6h": [
+     5.14,
+     4.97,
+     4.11,
+     4.8,
+     4.3,
+     5.09
+    ],
+    "hours_to_zero": [
+     1.4,
+     3.6,
+     3.2,
+     1.3,
+     13.5,
+     14.1
+    ],
+    "window_note": "quota_snapshots window_key=session; header x-codex-5h-usage (open-sse/executors/codex/quota.ts:26) but reset ~6 days out: window identity not verified"
+   },
+   "cache_metrics_api_cumulative": {
+    "input": 590799855,
+    "cached": 550608384,
+    "share": 0.932
+   }
+  },
+  "20129": {
+   "gpt6_turns": 10,
+   "status": {
+    "200": 10
+   },
+   "cache_read_share": 0.0,
+   "input_tokens": 18395,
+   "note": "probe traffic only; client bodies had no prompt_cache_key/session_id; sharedgw limiter auto-enabled 60rpm/6 concurrent"
+  },
+  "addendum_final_checks": {
+   "P10_requested_ne_served_model": "0/7070",
+   "P10_effort_mismatch": 0,
+   "P16_codex_null_correlation_id": 90,
+   "P16_corr_ids_with_gt1_row": 1,
+   "P16_20129_corr_ids_seen_on_20128": "0/10",
+   "P6_cache_root_threads": "90.07% (n=4142)",
+   "P6_cache_child_threads": "93.73% (n=1204)",
+   "P19_turns_multi_account": "77/298 (25.8%), 247 within-turn changes",
+   "P5_invalid_encrypted_content_ever": 0,
+   "P5_offpin_turns_with_encrypted_reasoning": "383 (373x200, 10x499)",
+   "pinned_vs_served_offpin": "460/4461 (10.3%), 64/201 conversations, cache 73.8% vs 92.1%"
+  }
+ },
+ "mapping": [
+  {
+   "practice_id": "P1",
+   "omniroute_impl": "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:272-320; auth.ts:1965-1993",
+   "state_20128": "ON, sessionAffinityTtlMs=14400000; pins stable (242 new, 4 cleared 05:51Z-00:16Z)",
+   "state_20129": "OFF, sessionAffinityTtlMs=0 (no effect: 1 connection; 20128 owns affinity)",
+   "gap": "Post-pin OAuth occupancy override (auth.ts:2159-2177; chat.ts:1711 hardcoded) serves 10.3% of turns (460/4461, 64/201 conversations) off the pin; 27.3% of threads served by >1 account",
+   "proposed_change": "none by setting (no knob: chat.ts:1711 hardcodes reserveOAuthSession:true). Upstream: no fix found. Checked only (a) release/v3.8.51 head = a58000c7 itself; (b) gh api compare a58000c7...main: status diverged, main ahead_by 12 / behind_by 4753, and none of the 12 main-only commits' files match auth.ts|chat.ts|sessionAffinityPin|oauthSessionOccupancy (total file count not recorded; compare caps files at 300); (c) PR/issue search. Other branches not checked -> 'no upstream fix' is not verified beyond main and release/v3.8.51. Post-RESUME check: commits?sha=<branch>&path=src/sse/services/auth.ts per active branch. Per rule no self-written patch.",
+   "quality_risk": "cost only so far: cache 73.8% vs 92.1% on moved turns (~5.4M uncached input tokens/24h); P5/P19 exposure (see those rows)",
+   "verify_metric": "served!=pinned rate (app.log new-pin + call_logs start=ts-duration); cache_read/input per thread; target ~0 outside unhealthy/exhausted accounts",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:2159-2177",
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1685-1711",
+    "omniroute@dd6e9607e:open-sse/services/oauthSessionOccupancy.ts:1-70",
+    "github PR #8940 d774cceca"
+   ]
+  },
+  {
+   "practice_id": "P2",
+   "omniroute_impl": "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:197-222 (x-codex-session-id > x-session-id > x-omniroute-session > metadata.session_id > conversation_id > session_id > prompt_cache_key > sha256 first input)",
+   "state_20128": "active; 24h affinity key kinds prompt-cache 7196 / header 77 / input 41 (99.4% explicit)",
+   "state_20129": "affinity off (TTL 0)",
+   "gap": "Codex bare session-id/thread-id headers not in the list (key falls to body prompt_cache_key = session id, equivalent today); keys are not scoped by caller identity (keyless loopback; identical first-input text collides across callers); unkeyed requests get sessionKey request:<uuid> (chat.ts:1685-1686) so every one creates a one-shot pin",
+   "proposed_change": "none by setting; clients that lack prompt_cache_key should send X-Session-Id (FW lane, per D02/L04)",
+   "quality_risk": "none (routing only)",
+   "verify_metric": "share of affinity log lines by key kind; input-hash share target ~0 for FW lane",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:144-222",
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1685-1686"
+   ]
+  },
+  {
+   "practice_id": "P3",
+   "omniroute_impl": "K01: codex executor keeps client prompt_cache_key, derives session_id header from body prompt_cache_key/session_id/conversation_id else workspaceId (omniroute@dd6e9607e:open-sse/executors/codex.ts:1176-1219); translation keeps prompt_cache_key only for OpenAI destinations (omniroute@dd6e9607e:open-sse/translator/request/openai-responses.ts:212,888-893; toResponses.ts:399-400)",
+   "state_20128": "passthrough path: client key kept (K01, 93% cache); translated chat path: no client key -> account-wide workspaceId key (K01)",
+   "state_20129": "sharedgw is openai-compatible (not in OPENAI_PARAM_DESTINATIONS by name, not verified) -> body prompt_cache_key may be dropped on the hop; FW probe bodies carried none",
+   "gap": "default codexFingerprintMode=session rewrites account-scoped identifiers (codexIdentity.ts:98-100,171-183); affinity key does not include a cache-partition field beyond the key itself; 20129 hop may strip prompt_cache_key",
+   "proposed_change": "none tonight (K01 verdict: keep fingerprint unset; A/B codexFingerprintMode=off only on its overturn); verify 20129 destination classification before any FW cache work",
+   "quality_risk": "none",
+   "verify_metric": "outbound prompt_cache_key == inbound (needs upstream-body capture; not available in call_logs artifacts)",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/executors/codex.ts:1176-1219",
+    "omniroute@dd6e9607e:open-sse/translator/request/openai-responses.ts:212,888-893",
+    "omniroute@dd6e9607e:open-sse/config/codexIdentity.ts:98-100,171-183"
+   ]
+  },
+  {
+   "practice_id": "P4",
+   "omniroute_impl": "omniroute@dd6e9607e:open-sse/services/combo/promptCacheAffinity.ts:96-118,184-271,325 (combo-only rendezvous); direct path: first-input hash key (sessionAffinityPin.ts:219-221)",
+   "state_20128": "promptCacheAffinityEnabled=true but combos=0 -> inactive",
+   "state_20129": "same, inactive",
+   "gap": "no prefix-aware placement for keyless traffic on the direct path; FW chat lane cache 16.7% (39/71 turns <1024 tokens)",
+   "proposed_change": "none (D03 enable_after_ab: combo A/B first)",
+   "quality_risk": "combo path changes model slug/behaviour (D04)",
+   "verify_metric": "cache_read/input on requests with no explicit key",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/services/combo/promptCacheAffinity.ts:96-325"
+   ]
+  },
+  {
+   "practice_id": "P5",
+   "omniroute_impl": "no origin-pinning; failover resends the same body incl. encrypted reasoning (omniroute@dd6e9607e:src/sse/handlers/chat.ts:2236-2248, providerExecutionPipeline.ts:373-405); only Grok rs_/tco_ items dropped (responsesInputSanitizer.ts:246-265); upstream replay rejection surfaced as 400 invalid_encrypted_content (codex.ts:862-873), no strip, no fail-fast 429",
+   "state_20128": "store:false + include reasoning.encrypted_content on 5528/5528 bodies; 0 invalid_encrypted_content ever; 383 off-pin turns carrying encrypted reasoning -> 373x200, 10x499; 6 distinct workspaces",
+   "state_20129": "n/a (no Codex-CLI traffic)",
+   "gap": "practice violated by design (moves + resend), but the documented 400 was not observed; whether the backend decrypts foreign items or silently ignores them is NOT verified",
+   "proposed_change": "none by setting; removing the occupancy override (P1) removes most exposure; 429 exposure remains (inner rotation resends body)",
+   "quality_risk": "possible silent loss of reasoning continuity on moved turns (unmeasurable from status codes)",
+   "verify_metric": "count 400 invalid_encrypted_content (target 0); strip events 0; off-pin turns carrying encrypted reasoning",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/executors/codex/reasoningReplayRejection.ts:1-36",
+    "omniroute@dd6e9607e:open-sse/executors/codex.ts:862-873",
+    "omniroute@dd6e9607e:open-sse/services/responsesInputSanitizer.ts:246-265"
+   ]
+  },
+  {
+   "practice_id": "P6",
+   "omniroute_impl": "implicit inheritance: Codex subagents share the parent's prompt_cache_key (pk==session_id 99.87%, ==thread_id 77.5%) -> same affinity key",
+   "state_20128": "child-thread cache 93.7% (1204 turns) vs root 90.1% (4142)",
+   "state_20129": "n/a",
+   "gap": "none against the conditional practice; upstream PR #14907 (open) would add opt-in thread-scoped keys",
+   "proposed_change": "none (K01: do not add codexPromptCacheKeyScope at this pin)",
+   "quality_risk": "none",
+   "verify_metric": "child-thread cache share vs account spread",
+   "sources": [
+    "call_logs artifacts (aggregate)",
+    "github PR #14907 (open)"
+   ]
+  },
+  {
+   "practice_id": "P7",
+   "omniroute_impl": "absent as a bounded rule; the occupancy override is an unbounded break (any peer with fewer foreign in-flight sessions and priority<=pinned+1)",
+   "state_20128": "unbounded break active",
+   "state_20129": "n/a",
+   "gap": "breaks affinity with no penalty/imbalance bound; 334/460 overrides explained by occupancy vs 166/4001 false positives",
+   "proposed_change": "none by setting; no upstream fix",
+   "quality_risk": "cache loss + P19 mid-turn moves",
+   "verify_metric": "rebinding rate; per-thread switch rate (4.7% now)",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:2159-2177"
+   ]
+  },
+  {
+   "practice_id": "P8",
+   "omniroute_impl": "quota telemetry kept (quota_snapshots, codexQuotaStateByScope from x-codex-5h-usage, open-sse/executors/codex/quota.ts:26) but cold bindings use LRU (omniroute@dd6e9607e:sessionAffinityPin.ts:306); quota only as hard filters: limitPolicy 99% (auth.ts:359-376, quotaCache.ts:91), preflight (off), expiry-first/p2c only in inner 429 rotation",
+   "state_20128": "remaining % prio1..6 = 7/18/13/6/58/72; ETA to 0 ~1.3-3.6h for prio1-4; new sessions still spread evenly",
+   "state_20129": "n/a",
+   "gap": "no quota-aware cold-binding placement on the direct path; all quota levers are account-level cutoffs that also move bound sessions",
+   "proposed_change": "HELD pending check 2 (which quota window expiry-first scores; binding window unverified). If released: PATCH /api/settings {\"providerStrategies\":{\"codex\":{\"fallbackStrategy\":\"expiry-first\",\"stickyRoundRobinLimit\":1}}} - affects only the inner 429 rotation target, not new keyed pins (LRU) nor bound sessions. Keep quotaPreflight off (D09 overturn not met).",
+   "quality_risk": "none to bytes/model/effort; one 429 can still move a session twice (rotation target != next LRU pin)",
+   "verify_metric": "new-pin spread per account (app.log), 429 rate per account, window-utilization spread",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:306",
+    "omniroute@dd6e9607e:src/sse/services/expiryFirstAccountSelection.ts:1-12,123",
+    "omniroute@dd6e9607e:open-sse/handlers/chatCore/providerExecutionPipeline.ts:373-405"
+   ]
+  },
+  {
+   "practice_id": "P9",
+   "omniroute_impl": "codex scope cooldown until Retry-After (default 60s) on 429 (omniroute@dd6e9607e:providerExecutionPipeline.ts:380-388); generic connection cooldown ignores upstream hints (useUpstreamRetryHints=false, base 5000ms x8 steps)",
+   "state_20128": "as described; 0x429 in 24h (unexercised)",
+   "state_20129": "same generic settings on sharedgw",
+   "gap": "generic cooldown path ignores Retry-After (D08 kept this deliberately)",
+   "proposed_change": "none tonight (D08 retain)",
+   "quality_risk": "n/a",
+   "verify_metric": "requests sent to a cooled account (target 0); 429 right after cooldown expiry",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/handlers/chatCore/providerExecutionPipeline.ts:380-388",
+    "D08 src/lib/resilience/settings.ts:78-170"
+   ]
+  },
+  {
+   "practice_id": "P10",
+   "omniroute_impl": "same-model account failover (chat.ts retry loop; inner codex rotation); model-family fallback gated allowModelFallback:true (omniroute@dd6e9607e:open-sse/handlers/chatCore.ts:4108,5092; providerExecutionPipeline.ts:516-539) only on model-unavailable errors",
+   "state_20128": "requested!=served model 0/7070; effort requested!=upstream 0; fallback chains [] and no globalFallbackModel",
+   "state_20129": "same",
+   "gap": "hardcoded family fallback is armed on model-unavailable errors (D12 hold); P5 conflict on failover",
+   "proposed_change": "none by setting (D12 hold)",
+   "quality_risk": "family fallback could substitute a weaker sibling",
+   "verify_metric": "requested_model != model count (target 0)",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/handlers/chatCore/providerExecutionPipeline.ts:516-539"
+   ]
+  },
+  {
+   "practice_id": "P11",
+   "omniroute_impl": "provider/connection breaker oauth failure 8/degrade 5/reset 60000ms + connection cooldown + terminal-status exclusion (D08)",
+   "state_20128": "all breakers CLOSED (GET /api/resilience/connections)",
+   "state_20129": "same config",
+   "gap": "none observed",
+   "proposed_change": "none",
+   "quality_risk": "n/a",
+   "verify_metric": "time to eject; false ejections",
+   "sources": [
+    "D08 src/shared/utils/circuitBreaker.ts; src/lib/resilience/settings.ts:78-170"
+   ]
+  },
+  {
+   "practice_id": "P12",
+   "omniroute_impl": "several retry layers: requestRetry=3, waitForCooldown(3/30s), codex 429 same-URL x2, inner rotation (3 attempts), chat.ts account fallback; 20129 repeats its own",
+   "state_20128": "configured as D08",
+   "state_20129": "requestRetry=3, waitForCooldown on -> second retry owner",
+   "gap": "retries at more than one layer and at both hops; attempts per client request not recorded (resilience_actions empty); 1 correlation id with >1 row (cause not traced)",
+   "proposed_change": "none tonight (D08); P17 fix would make 20129 non-retrying",
+   "quality_risk": "duplicate upstream work",
+   "verify_metric": "upstream attempts per client request (needs audit/pipeline details)",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/handlers/chatCore/providerExecutionPipeline.ts:373-405",
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1702-1746,2236-2248",
+    "omniroute@dd6e9607e:src/app/api/resilience/route.ts:129,163",
+    "inventory R-RESIL, R-ROTATE, R-QUEUE"
+   ]
+  },
+  {
+   "practice_id": "P13",
+   "omniroute_impl": "hedging only in combos with zeroLatencyOptimizationsEnabled&&hedging (omniroute@dd6e9607e:src/sse/handlers/chat.ts:405)",
+   "state_20128": "off (no combos; comboDefaults.zeroLatencyOptimizationsEnabled=false)",
+   "state_20129": "off",
+   "gap": "none",
+   "proposed_change": "none",
+   "quality_risk": "n/a",
+   "verify_metric": "n/a",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:405"
+   ]
+  },
+  {
+   "practice_id": "P14",
+   "omniroute_impl": "idempotencyWindowMs=5000 header replay + in-flight dedup (K04)",
+   "state_20128": "idempotencyWindowMs=5000",
+   "state_20129": "5000",
+   "gap": "practice n/a; OmniRoute feature exists (see K04 verdict)",
+   "proposed_change": "none",
+   "quality_risk": "per K04",
+   "verify_metric": "n/a",
+   "sources": [
+    "K04 verdict"
+   ]
+  },
+  {
+   "practice_id": "P15",
+   "omniroute_impl": "task-aware router, background degradation, reasoning routing rules, auto combos",
+   "state_20128": "task-routing enabled=false; background-degradation false; rules []",
+   "state_20129": "same",
+   "gap": "none (excluded class is off)",
+   "proposed_change": "none",
+   "quality_risk": "n/a",
+   "verify_metric": "requested!=served model 0",
+   "sources": [
+    "GET /api/settings/task-routing, /background-degradation, /reasoning-routing-rules"
+   ]
+  },
+  {
+   "practice_id": "P16",
+   "omniroute_impl": "call_logs: correlation_id, connection_id, model, effort requested/upstream, resilience_actions; app.log AUTH lines for affinity (masked prefixes)",
+   "state_20128": "correlation_id: 90 codex rows null; 1 id appears on >1 row (otherwise one row per id); occupancy override not logged anywhere; routing reason not stored",
+   "state_20129": "10/10 20129 correlation ids absent on 20128",
+   "gap": "no routing-reason field; occupancy move invisible; correlation id not propagated across the hop",
+   "proposed_change": "none by setting",
+   "quality_risk": "n/a",
+   "verify_metric": "same correlation id at both hops (0% now); served-by + reason present",
+   "sources": [
+    "call_logs schema",
+    "omniroute@dd6e9607e:open-sse/executors/default.ts:682-685",
+    "omniroute@dd6e9607e:open-sse/utils/opencodeHeaders.ts:116"
+   ]
+  },
+  {
+   "practice_id": "P17",
+   "omniroute_impl": "20129 DefaultExecutor forwards x-session-id/x-title/x-opencode-* only (omniroute@dd6e9607e:default.ts:682-685, opencodeHeaders.ts:116)",
+   "state_20128": "owns affinity",
+   "state_20129": "affinity off (good); own retries + limiter 60rpm/6 concurrent/350ms (rateLimitManager.ts:341-352) + compression enabled",
+   "gap": "second retry owner and pre-throttle on 20129; x-codex-turn-state and correlation id not forwarded",
+   "proposed_change": "20129: PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":false}} (rollback true/60/350/6/0/30000/600000/0); retry ownership: no single setting identified",
+   "quality_risk": "none to bytes",
+   "verify_metric": "GET 20129 /api/rate-limits enabled=false; attempts per request across hops",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/services/rateLimitManager.ts:159-164,279-282,341-358",
+    "omniroute@dd6e9607e:src/app/api/resilience/route.ts:163,189-190"
+   ]
+  },
+  {
+   "practice_id": "P18",
+   "omniroute_impl": "occupancy is used for peer re-selection, not admission (auth.ts:2159-2177); provider_connections.max_concurrent exists (auth.ts:1104) but null on all 6; chat admission (chat_admission_busy, PR #12395) is global",
+   "state_20128": "no per-credential cap; peak in-flight per account 2/2/8/8/10/11",
+   "state_20129": "limiter 6 concurrent on sharedgw",
+   "gap": "occupancy acts as rebalancer instead of admission control on the pinned credential",
+   "proposed_change": "none by setting; upstream-only fix",
+   "quality_risk": "n/a",
+   "verify_metric": "concurrent streams per account; 429 vs concurrency",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/services/auth.ts:1104,2159-2177",
+    "github PR #12395"
+   ]
+  },
+  {
+   "practice_id": "P19",
+   "omniroute_impl": "provenance guard: drops a cross-account x-codex-turn-state echo, forwards same-account echo (omniroute@dd6e9607e:open-sse/config/codexIdentity.ts:250-266; codex.ts:1170-1190; chatCore.ts:3526-3530)",
+   "state_20128": "77/298 turns (25.8%) served by >1 account; 247 within-turn account changes",
+   "state_20129": "turn-state not forwarded by DefaultExecutor (source)",
+   "gap": "one-account-per-turn violated by the occupancy override; guard prevents wrong-account token but the turn loses its sticky token",
+   "proposed_change": "none by setting (fix = P1 upstream)",
+   "quality_risk": "turn continuity; not measurable by status (0 errors)",
+   "verify_metric": "turns with account change within (thread_id,turn_id) (target 0)",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/config/codexIdentity.ts:250-266"
+   ]
+  },
+  {
+   "practice_id": "P20",
+   "omniroute_impl": "Claude paths exist (claudeCodeCompatible.ts) but no Claude connections on either instance",
+   "state_20128": "n/a",
+   "state_20129": "n/a",
+   "gap": "not applicable to current lanes",
+   "proposed_change": "none",
+   "quality_risk": "n/a",
+   "verify_metric": "n/a",
+   "sources": [
+    "provider_connections: codex x6 / sharedgw x1"
+   ]
+  },
+  {
+   "practice_id": "P21",
+   "omniroute_impl": "codex peeks SSE before commit and converts transient-in-200 to 503 for account fallback (omniroute@dd6e9607e:codex.ts:875-885); stream recovery/continuation flags kept false (D08); STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED (chat.ts:1681) env not read",
+   "state_20128": "per D08",
+   "state_20129": "same",
+   "gap": "EOF sibling failover flag state unknown",
+   "proposed_change": "none",
+   "quality_risk": "spliced stream if the EOF flag were on",
+   "verify_metric": "duplicated/spliced streams (not recorded)",
+   "sources": [
+    "omniroute@dd6e9607e:open-sse/executors/codex.ts:875-885",
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1681-1683"
+   ]
+  },
+  {
+   "practice_id": "P22",
+   "omniroute_impl": "compression pipeline (C00-C20); codex prefix hygiene deterministic (K01)",
+   "state_20128": "compression.enabled=false, exclusions [codex/*], liveZone off",
+   "state_20129": "compression.enabled=true, defaultMode off, exclusions [], liveZone on -> proactive/reactive compaction possible above threshold (C00/C18)",
+   "gap": "20129 hop can rewrite earlier turns on large requests",
+   "proposed_change": "none tonight (C-series verdicts; A/B via lane receipts)",
+   "quality_risk": "lossy rewrite + cache invalidation after edit point",
+   "verify_metric": "per-session cache_read/input with vs without the 20129 hop on identical traffic",
+   "sources": [
+    "GET /api/settings/compression both ports",
+    "C00/C18 verdicts"
+   ]
+  },
+  {
+   "practice_id": "P23",
+   "omniroute_impl": "499 returned on abort (omniroute@dd6e9607e:chat.ts:1792,2498); occupancy released on completion/cancel/failure (oauthSessionOccupancy.ts:72+, chat.ts:1860-1984); pin kept on client disconnect (sessionAffinityPin.ts:381-384); upstream aborted via client signal (chat.ts:1211-1214 comment, not traced end-to-end)",
+   "state_20128": "196 x 499 (2.8%), duration p10/p50/p90 15.3/26.0/32.6s; 1 >=590s",
+   "state_20129": "0",
+   "gap": "upstream-still-running time after 499 not measured; slot release on 499 source-only",
+   "proposed_change": "none",
+   "quality_risk": "n/a",
+   "verify_metric": "upstream seconds after 499 (~0); slots held after 499 (0); 499 counted as account failure (0)",
+   "sources": [
+    "omniroute@dd6e9607e:src/sse/handlers/chat.ts:1792,1860-1984,2498",
+    "omniroute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:381-384"
+   ]
+  }
+ ],
+ "open": [
+  "check 2 (which quota window expiry-first scores on; binding window 5h vs weekly): not answered; snapshot window_key='session', header x-codex-5h-usage, reset ~6 days out -> identity not verified",
+  "P5: whether the backend decrypts or silently ignores foreign encrypted reasoning: not verified",
+  "P3/P17: whether sharedgw is classified as an OpenAI destination (prompt_cache_key kept) on 20129: not verified",
+  "P21: STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED state unknown (env not read by rule)",
+  "P23: upstream cancellation after 499 not traced end-to-end"
+ ],
+ "time_sensitive": "PROJECTION from the 00:19Z quota snapshot (burn rates may shift; window identity unverified): the live cutoff is the codex limit policy at 99% used (auth.ts:359-376), not 0%. It excludes the account, clears its pins (sessionAffinityPin.ts:299) and moves bound sessions, which re-pin by LRU (sessionAffinityPin.ts:306, not quota-aware). prio4 (6-1)/4.8 ~1.04h ~01:21Z; prio1 (7-1)/5.14 ~1.17h ~01:29Z; prio3 (13-1)/4.11 ~2.9h ~03:14Z; prio2 (18-1)/4.97 ~3.4h ~03:44Z. prio4 hits the cutoff at about RESUME (01:20Z); sessions moved off prio4 can LRU-land on prio1 and move again ~8 min later. First live exercise of the P5/P19/P9 paths (0 x 429 in 24h). No mapping row changes; timing of any apply or A/B at RESUME does."
+}

@@ -1,0 +1,270 @@
+{
+  "practices": [
+    {
+      "id": "P1",
+      "practice": "Preserve native Responses semantics and the requested model/effort contract before optimizing account selection. Preserve both the top-level reasoning baseline and ordered in-turn configuration updates; inspect the resolved upstream model rather than trusting an alias.",
+      "upstreams": [
+        {
+          "repository": "https://github.com/router-for-me/CLIProxyAPI",
+          "tag": "v8.0.2",
+          "commit": "4a2c81864f31f39308e946c4c65e72147855da6e",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/thinking/apply.go#L229-L271",
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/thinking/apply_codex_usage_test.go#L339-L406"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": false,
+            "checked_via": "https://api.github.com/repos/router-for-me/CLIProxyAPI returned archived=false, default_branch=main and created_at=2025-07-01T19:43:27Z. https://api.github.com/repos/router-for-me/CLIProxyAPI/commits?since=2026-06-30&per_page=1 and an explicit sha=main retry were inaccessible. Default-branch activity remains pending."
+          }
+        }
+      ],
+      "no_maintained_upstream": false,
+      "applicability": "Directly relevant to Codex CLI Responses lanes, including long sessions with changing client-requested effort. The verified preservation branch requires a target supporting configuration updates and no reasoning suffix override. A Responses-to-Claude adapter needs a separate parity gate; sharing an endpoint does not establish model or protocol equivalence.",
+      "quality_risk": {
+        "level": "medium",
+        "description": "This is a preservation component, not a complete no-loss guarantee. Other branches strip unsupported configuration updates or reasoning settings, and the executor performs additional transformations. Reject incompatible routes and gateway-induced effort reductions; disable unvalidated payload overrides."
+      },
+      "verification_metric": "Require zero differences between client intent and upstream resolved model/effective effort, including every configuration_update. Compare ordered instructions, input items, tool schemas/results and opaque reasoning data. Require zero regressions on a predeclared direct-versus-gateway agent-task suite. The inspected upstream test asserts byte preservation; it was not executed.",
+      "evidence": [
+        "The native branch returns the body unchanged while extracting effective effort for logging: [implementation](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/thinking/apply.go#L229-L271).",
+        "Tests cover baseline versus effective effort, successive updates and byte equality: [tests](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/thinking/apply_codex_usage_test.go#L339-L406).",
+        "Tag association was confirmed by opening the v8.0.2 entry and following its commit link: [releases](https://github.com/router-for-me/CLIProxyAPI/releases), [full commit](https://github.com/router-for-me/CLIProxyAPI/commit/4a2c81864f31f39308e946c4c65e72147855da6e)."
+      ]
+    },
+    {
+      "id": "P2",
+      "practice": "Use stable session-to-account affinity and preserve prompt-cache identity. Prefer explicit client session IDs; use structural prefix affinity only when explicit identity is absent. Keep a healthy established binding instead of redistributing every turn.",
+      "upstreams": [
+        {
+          "repository": "https://github.com/router-for-me/CLIProxyAPI",
+          "tag": "v8.0.2",
+          "commit": "4a2c81864f31f39308e946c4c65e72147855da6e",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L917-L1049",
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L1050-L1120",
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_request.go#L117-L154"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": false,
+            "checked_via": "https://api.github.com/repos/router-for-me/CLIProxyAPI verified repository metadata. https://api.github.com/repos/router-for-me/CLIProxyAPI/commits?since=2026-06-30&per_page=1 was inaccessible; maintenance is pending, not stale."
+          }
+        }
+      ],
+      "no_maintained_upstream": false,
+      "applicability": "A strong fit for a single-host pool and cache-read-dominated multi-turn traffic. Enable routing.session-affinity, which defaults to false, and size its TTL for expected idle gaps. The selector handles Claude/Codex identities and optional parent/subagent affinity. Keep prompt_cache_key stable and leave optional identity remapping disabled unless separately justified.",
+      "quality_risk": {
+        "level": "medium",
+        "description": "Steady-state affinity does not require content rewriting. However, automatic rebinding can invalidate cache locality or move account-owned state. Prefix similarity is not proof that continuation state is transferable. Parent affinity can also concentrate concurrent subagents on one account."
+      },
+      "verification_metric": "Measure account switches per established session, normalized cached-read/total-input ratio, uncached tokens per completed task and p95 TTFT at fixed model/effort. Require no unexplained account switches and no regression from the approximately 90% cache-read baseline. Test idle expiry, account failure and subagent forks for context integrity.",
+      "evidence": [
+        "The selector reuses an available binding across priority tiers and invokes fallback when necessary; explicit identity precedes Merkle-prefix matching: [selector](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L904-L1120).",
+        "The Responses path carries prompt_cache_key into the upstream request and Session-Id header: [cache identity](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_request.go#L117-L154).",
+        "Affinity defaults, TTL and subagent behavior are documented in the pinned configuration: [configuration](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/config.example.yaml#L116-L139).",
+        "Claude documents prefix caching and invalidation from tool, thinking and effort changes. Applying this to gateway stability is an inference; these API documents do not establish subscription quota accounting or cross-account cache sharing: [Claude prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)."
+      ]
+    },
+    {
+      "id": "P3",
+      "practice": "Use quota- and load-aware selection primarily for new sessions and necessary rebinding. Rank eligible accounts using load, queue depth, observed errors and latency, with optional reset-time and quota-headroom signals; preserve established affinity ahead of these optimizations.",
+      "upstreams": [
+        {
+          "repository": "https://github.com/Wei-Shaw/sub2api",
+          "tag": "v0.2.8",
+          "commit": "fd80b08c90b55edcad5b00171b53f08721d30da1",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L355-L461",
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L757-L806",
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L908-L981"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": null,
+            "checked_via": "https://api.github.com/repos/Wei-Shaw/sub2api and https://api.github.com/repos/Wei-Shaw/sub2api/commits?since=2026-06-30&per_page=1 were inaccessible. Lowercase-owner and explicit sha=main retries also failed. Creation date, archive status and default-branch activity remain pending."
+          }
+        }
+      ],
+      "no_maintained_upstream": false,
+      "applicability": "The scoring implementation was verified for OpenAI/Codex account scheduling, not independently for Claude scheduling. It is usable with a single-host pool. Reset and quota-headroom weights are opt-in and default to zero. For this workload, avoid letting small latency improvements repeatedly displace warm sessions; subscription quota consumption must be measured rather than inferred from API prices.",
+      "quality_risk": {
+        "level": "low",
+        "description": "Account ranking need not change model, effort or content. Risk arises if model mappings are not equivalent, quota observations are stale, or latency-based sticky escape moves a stateful session. The no-loss deployment policy should restrict selection to verified equivalent routes and disable ungated sticky escape."
+      },
+      "verification_metric": "At fixed model/effort, compare completed agent tasks per quota window, 429 rate, queue latency and remaining quota at reset. Require zero model/effort substitutions and unchanged task success. Record cache-hit ratio and account-switch rate alongside throughput so cold-cache work cannot masquerade as an improvement.",
+      "evidence": [
+        "Selection layers distinguish previous-response ownership, session affinity and load balancing: [selection](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L355-L461).",
+        "The implementation combines scheduling factors and constructs a weighted candidate order: [scores](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L908-L981), [weighted selection](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L757-L806).",
+        "Reset/headroom defaults and configurable sticky escape are visible in the pinned configuration: [configuration](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/deploy/config.example.yaml#L403-L423).",
+        "The v0.2.8 release entry links to the opened full commit: [releases](https://github.com/Wei-Shaw/sub2api/releases), [full commit](https://github.com/Wei-Shaw/sub2api/commit/fd80b08c90b55edcad5b00171b53f08721d30da1)."
+      ]
+    },
+    {
+      "id": "P4",
+      "practice": "Bound per-account concurrency and waiting, and exclude unavailable credentials using account/model-specific cooldowns. When equivalent capacity is exhausted, queue within a defined budget or return an explicit unavailable response.",
+      "upstreams": [
+        {
+          "repository": "https://github.com/Wei-Shaw/sub2api",
+          "tag": "v0.2.8",
+          "commit": "fd80b08c90b55edcad5b00171b53f08721d30da1",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L530-L578",
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L1117-L1178"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": null,
+            "checked_via": "https://api.github.com/repos/Wei-Shaw/sub2api and https://api.github.com/repos/Wei-Shaw/sub2api/commits?since=2026-06-30&per_page=1 were inaccessible; maintenance remains pending."
+          }
+        },
+        {
+          "repository": "https://github.com/router-for-me/CLIProxyAPI",
+          "tag": "v8.0.2",
+          "commit": "4a2c81864f31f39308e946c4c65e72147855da6e",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L774-L855",
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L332-L343"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": false,
+            "checked_via": "https://api.github.com/repos/router-for-me/CLIProxyAPI verified archived=false. https://api.github.com/repos/router-for-me/CLIProxyAPI/commits?since=2026-06-30&per_page=1 was inaccessible; maintenance remains pending."
+          }
+        }
+      ],
+      "no_maintained_upstream": false,
+      "applicability": "Useful for concurrent CLI lanes and long-running generations on one host. Sub2api provides account slots and bounded wait plans; CLIProxyAPI provides credential/model availability checks and cooldown errors. These are separately verified mechanisms, not a recommendation to chain both gateways.",
+      "quality_risk": {
+        "level": "low",
+        "description": "Admission and cooldown control do not inherently alter inference. Queue deadlines must accommodate high-effort generations. Exhaustion must not activate a cheaper model, smaller context, lower effort or truncated retry."
+      },
+      "verification_metric": "Under overload and cancellation tests, require in-flight requests never to exceed configured account limits, all slots to be released, and cooled credentials not to be selected prematurely. Measure queue p95 and 429 rate while requiring zero payload/model/effort changes and zero task regressions.",
+      "evidence": [
+        "Sub2api acquires account slots, constructs bounded sticky wait plans and rechecks eligibility after acquisition: [sticky admission](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L530-L578), [candidate admission](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L1117-L1178).",
+        "CLIProxyAPI checks disabled/expired credentials and model/account quota recovery times, and exposes a 429 cooldown response with Retry-After: [availability](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L774-L855), [cooldown response](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L332-L343)."
+      ]
+    },
+    {
+      "id": "P5",
+      "practice": "Distinguish cache affinity from continuation-state ownership. Route previous_response_id continuations to their owning eligible account; permit migration only when complete context can be transferred through a verified lossless path.",
+      "upstreams": [
+        {
+          "repository": "https://github.com/Wei-Shaw/sub2api",
+          "tag": "v0.2.8",
+          "commit": "fd80b08c90b55edcad5b00171b53f08721d30da1",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L368-L407",
+            "https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_gateway_scheduling.go#L29-L68"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": null,
+            "checked_via": "https://api.github.com/repos/Wei-Shaw/sub2api and https://api.github.com/repos/Wei-Shaw/sub2api/commits?since=2026-06-30&per_page=1 were inaccessible; maintenance remains pending."
+          }
+        }
+      ],
+      "no_maintained_upstream": false,
+      "applicability": "Critical wherever a Responses lane relies on provider-owned continuation state, including WebSocket continuations. Full-history HTTP requests have different recovery requirements. The inspected implementation provides owner-aware selection; a complete fail-closed recovery guarantee was not established.",
+      "quality_risk": {
+        "level": "high",
+        "description": "Dropping a previous-response reference or changing its owner can lose context even with identical model and effort. Sub2api's example configuration enables a recovery that removes previous_response_id after a not-found error. Disable that recovery until complete-context reconstruction passes the quality gate."
+      },
+      "verification_metric": "Exercise continuations across account exhaustion, disconnects, restart and expired response mappings. Require either successful context-identical continuation or an explicit error, never a silently shortened conversation. Track unknown-owner events, missing tool-call/result pairs and long-session task success.",
+      "evidence": [
+        "The scheduler attempts previous-response ownership before ordinary session/load selection and checks compatibility: [owner selection](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L368-L407).",
+        "Stable session headers and prompt_cache_key are handled separately: [session identity](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_gateway_scheduling.go#L29-L68).",
+        "The pinned configuration documents automatic previous_response_id removal during recovery: [recovery configuration](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/deploy/config.example.yaml#L339-L348)."
+      ]
+    },
+    {
+      "id": "P6",
+      "practice": "Use bounded stream-bootstrap buffering and conservative retries. Detect eligible overload failures hidden inside HTTP 200 streams before committing output; after meaningful output begins, surface interruption instead of splicing in a replacement generation.",
+      "upstreams": [
+        {
+          "repository": "https://github.com/router-for-me/CLIProxyAPI",
+          "tag": "v8.0.2",
+          "commit": "4a2c81864f31f39308e946c4c65e72147855da6e",
+          "tag_resolves_to_commit_confirmed": true,
+          "file_lines": [
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L173-L229",
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L264-L291",
+            "https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L356-L372"
+          ],
+          "line_verified": true,
+          "maintenance": {
+            "status": "unknown",
+            "last_default_branch_commit": null,
+            "archived": false,
+            "checked_via": "https://api.github.com/repos/router-for-me/CLIProxyAPI verified archived=false. https://api.github.com/repos/router-for-me/CLIProxyAPI/commits?since=2026-06-30&per_page=1 was inaccessible; maintenance remains pending."
+          }
+        }
+      ],
+      "no_maintained_upstream": false,
+      "applicability": "Directly relevant to Codex HTTP/SSE Responses streams. The inspected implementation buffers startup frames under time, byte and frame limits and distinguishes bootstrap overload from other terminal failures. This does not establish equivalent WebSocket or Claude behavior.",
+      "quality_risk": {
+        "level": "medium",
+        "description": "A retry must retain model, effort and complete context and satisfy state-ownership requirements. Lack of downstream output alone does not prove that upstream side effects never occurred. Unbounded buffering increases latency; replay after tool output risks duplicate actions."
+      },
+      "verification_metric": "Inject overload before output and interruption after the first content/tool delta. Require eligible pre-output recovery, zero model/effort changes, zero duplicated tool actions and no mixed-generation stream. Confirm post-output failure reaches the client explicitly and bootstrap latency stays within configured bounds.",
+      "evidence": [
+        "Bootstrap overload is converted into a failed attempt before downstream commitment, while other terminal failures retain in-stream delivery: [bootstrap classification](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L173-L229).",
+        "Buffering is bounded and later terminal failures are emitted through the stream: [bounds](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L264-L291), [post-bootstrap failure](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L356-L372)."
+      ]
+    }
+  ],
+  "rejected_practices": [
+    {
+      "practice": "Automatic subscription-to-cheap-to-free model fallback.",
+      "reason": "Changes the requested model and supplies no no-quality-loss guarantee. Rejection concerns the policy, not every capability of 9router. Its required maintenance query also failed, so maintenance remains unknown rather than stale.",
+      "source": "[9router's documented three-tier fallback and cross-model combo](https://github.com/decolua/9router/blob/master/gitbook/content/en/faq.md); maintenance attempt: https://api.github.com/repos/decolua/9router/commits?since=2026-06-30&per_page=1"
+    },
+    {
+      "practice": "Ungated prompt compression or summarization as a default throughput optimization.",
+      "reason": "LLMLingua reports compression with some performance loss, which does not satisfy the frozen constraint. Rewriting previously cached prefixes also jeopardizes the dominant cache-read benefit. A passed task-specific quality gate would be required.",
+      "source": "[LLMLingua paper](https://arxiv.org/abs/2310.05736); [Claude cache invalidation documentation](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)"
+    },
+    {
+      "practice": "Treating all Responses account failover as transparent, including deleting previous_response_id.",
+      "reason": "The inspected CLIProxyAPI HTTP stream path deletes previous_response_id, and sub2api documents a recovery that removes it. Neither operation demonstrates reconstruction of missing conversation state. Reject for state-dependent requests unless complete-context recovery is verified.",
+      "source": "[CLIProxyAPI request transformation](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/internal/runtime/executor/codex_executor_stream.go#L49-L75); [sub2api recovery configuration](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/deploy/config.example.yaml#L339-L348)"
+    },
+    {
+      "practice": "Gateway compaction that silently selects a different model.",
+      "reason": "Sub2api's pinned example selects gpt-5.5 for the compact endpoint and explicitly describes using it when newer models are unsupported. That configuration is unacceptable whenever it downgrades the requested model; lossy compaction also requires its own passed quality gate.",
+      "source": "[Pinned compaction configuration](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/deploy/config.example.yaml#L309-L313)"
+    },
+    {
+      "practice": "Unconditional per-turn round-robin or latency-driven migration of established sessions.",
+      "reason": "Rejected as the default for this workload because it lacks the affinity and ownership guarantees needed above. This is a workload-specific inference, not a claim that cross-account cache reuse is universally impossible. Independent stateless requests can still use balancing after measurement.",
+      "source": "[CLIProxyAPI affinity versus fallback selection](https://github.com/router-for-me/CLIProxyAPI/blob/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go#L904-L1049); [sub2api sticky escape](https://github.com/Wei-Shaw/sub2api/blob/fd80b08c90b55edcad5b00171b53f08721d30da1/backend/internal/service/openai_account_scheduler.go#L530-L578)"
+    }
+  ],
+  "calls": {
+    "web_search": 12,
+    "web_fetch": 28,
+    "gh_api": 12
+  },
+  "notes": "Conclusion: the evidence supports native-protocol, model/effort-preserving credential routing, stable session/cache affinity, capacity-aware assignment of new work, bounded admission and conservative state-aware failover. It does not establish a benchmark-proven universal SOTA winner or certify either complete gateway as lossless. As of 2026-09-28 UTC, the maintenance cutoff is 2026-06-30. Required default-branch REST queries were inaccessible; recent releases were not substituted for that evidence, and no repository was excluded as stale. Unknown candidates remain pending. Accordingly, no_maintained_upstream=false means an implementation was found and absence was not established, not that maintenance was confirmed. Tag associations were confirmed through opened GitHub release entries and their full commit links; CLIProxyAPI's git-ref REST request failed. line_verified=true refers to SHA-pinned raw source opened and read, with one-based GitHub source-line anchors. Correction during research: the historical session-affinity.go path returned 404; the actual implementation was verified in selector.go at the pinned commit. All cited substantive sources were opened by this researcher; the search-first helper supplied only unverified planning leads and made no research calls. Counts are disjoint: 12 searches, 28 non-REST page opens/clicks and 12 GitHub REST attempts, totaling 40 opens/API calls, including failures and repeated opens. All REST attempts used the web tool. No candidate code was installed or executed and no credentials were read. Verification metrics are proposed gates, not measured results; finite evaluations cannot prove universal absence of quality loss. The user's maintenance threshold was applied, distinct from Scorecard's fuller scoring criteria: https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained",
+  "skills_used": [
+    "search-first"
+  ]
+}

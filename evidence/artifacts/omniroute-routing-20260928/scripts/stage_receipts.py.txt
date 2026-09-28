@@ -1,0 +1,332 @@
+#!/usr/bin/env python3
+"""Stage the receipts of evidence/artifacts/omniroute-routing-20260928/ from private inputs.
+
+Run from the repository root:
+
+  SCRATCH=<session scratch directory> WF_JOURNAL=<journal.jsonl of the record workflow> \
+    uv run --no-project --with jsonschema python \
+    evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt
+
+It reads only the inputs named below and writes only this receipt directory. It prints a
+JSON summary: the source and output SHA-256 of every file, the substitution counts, the
+split of route-mapper-resume-parts.md and the private-content scan result. The scan reuses
+scripts/validate.py's PRIVATE_CONTENT patterns and adds emails, the home and scratch
+directory strings and the opaque ids of the private limiter record; it reports labels and
+counts, never a matched value. Every generated file is pinned in EXPECTED: a file is
+written only when its bytes equal the pin, so a changed private input cannot silently
+replace a receipt that the record cites. It exits 1 on any scan finding or pin mismatch.
+jsonschema is optional: without it the schema check is "not run".
+"""
+
+from collections import Counter
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import sys
+
+OUT = Path("evidence/artifacts/omniroute-routing-20260928")
+SCRATCH = Path(os.environ["SCRATCH"])
+OF = SCRATCH / "omni-full"
+GPT = OF / "route-gpt6"
+JOURNAL = Path(os.environ["WF_JOURNAL"])
+GROUP_ORDER = ["adjudicate:affinity-cache", "adjudicate:resilience-retry", "adjudicate:chain-stream-extra"]
+
+# CLIProxyAPI's Home-mode package is internal/home/. scripts/validate.py reads
+# "/home/<name>" as a personal home path, so a file name there is written in braces.
+BRACES = (re.compile(r"internal/home/([A-Za-z0-9_.-]+)"), r"internal/home/{\1}")
+SCRATCH_PREFIX = (re.compile(r"\bscratchpad/"), "$SCRATCH/")
+EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+
+# The SHA-256 of every generated receipt, as the record cites it.
+EXPECTED = {
+    "route-job1.last.json": "e81ce40f4a63e4614d0be87a7484ad4a3ffbb1b2fc21129a643de7a860c9e194",
+    "route-job2.last.json": "27a46c9ba7b160f3bad8ce3f52da030f5709117bbbd5b2cf3fe9ab52c3981246",
+    "route-job1.prompt.txt": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140",
+    "route-job1.schema.json": "df09899cfdc435635c30f74f39117190ff088488b16406b0d8ddb1c811a65f8a",
+    "route-job2.schema.json": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507",
+    "route-job2.prompt.txt": "015bf2a389c9fd0823e19081486a2055d26e0e014c3d49404a7dda957edf5a1c",
+    "route-landscape-catalog.json": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56",
+    "route-landscape-occupancy-research.md": "2bbbd194759ae5bd61a854b26b2d5498b3adf0f3bac7ff535d994f554a875704",
+    "route-mapper-final.json": "f50266a1650351b3822382df45fb99c63e9f013c1d36a138331784dbf0c1884a",
+    "route-mapper-resume-parts.md": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437",
+    "route-mapper-part1-final.md": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625",
+    "maintenance-gh-20260928.tsv": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732",
+    "ab-requirements.md": "4dff39c833542630d90ff7e48ba896af84e1d4131bdf757f63ed74fde07e9447",
+    "adjudication.json": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100",
+    "route-gpt6-runs.json": "3ab36b52201737f6912032b573cbe4b12e2d63ff11026a6dd8d75f46ce265b59",
+    "limiter-apply-20129.json": "427a55e3212a6dc0d7ea1370c16b422a08140e9cd7f74b22c1b675a9839f1c8d",
+}
+# Sources whose bytes differ from their receipt: the substituted files and the split file.
+EXPECTED_SOURCE = {
+    "route-job2.prompt.txt": "3911644529f4aaea8e5a8461cf742c82e2b0bc1dfa0685430c9c64291c707124",
+    "route-landscape-catalog.json": "b2c1f2d50941e143ed94572349a6e374501c6f5744408d3bece10fa30f692cb0",
+    "route-landscape-occupancy-research.md": "7ecfd22215faabb34baf4b989983a665563838957fea73ff3b1937b265592ef3",
+    "route-mapper-resume-parts.md": "6ab400e25ae53f58f91b6ab10f2012a9a968363abf892e08e91e63e07812c7cb",
+}
+# route-mapper-resume-parts.md grew after the adjudication stages read it: route-mapper's
+# final part 1 report was appended (file modification time 2026-09-28T03:30:26Z), after the
+# stages ended at 02:32:12Z. Its first ADJUDICATED_BYTES
+# bytes are the version the stages read; the appended part is route-mapper-part1-final.md.
+ADJUDICATED_BYTES = 6503
+
+summary = {"copies": [], "substituted": [], "split": [], "derived": []}
+mismatches = []
+
+
+def sha(raw: bytes) -> str:
+    return hashlib.sha256(raw).hexdigest()
+
+
+def source_name(path: Path) -> str:
+    return "$SCRATCH/" + path.relative_to(SCRATCH).as_posix()
+
+
+def emit(name: str, raw: bytes) -> str:
+    """Write a receipt only when its bytes equal its pin in EXPECTED."""
+    digest = sha(raw)
+    if EXPECTED.get(name) != digest:
+        mismatches.append(f"{name}: output differs from its pin; not written")
+    else:
+        (OUT / name).write_bytes(raw)
+    return digest
+
+
+def check_source(name: str, raw: bytes) -> None:
+    if name in EXPECTED_SOURCE and EXPECTED_SOURCE[name] != sha(raw):
+        mismatches.append(f"{name}: source differs from its pin")
+
+
+def copy(src: Path, name: str) -> None:
+    raw = src.read_bytes()
+    summary["copies"].append({"output": name, "source": source_name(src), "sha256": emit(name, raw)})
+
+
+def substitute(src: Path, name: str, rules) -> None:
+    raw = src.read_bytes()
+    check_source(name, raw)
+    text = raw.decode("utf-8")
+    counts = []
+    for pattern, replacement in rules:
+        text, count = pattern.subn(replacement, text)
+        counts.append({"pattern": pattern.pattern, "replacement": replacement, "count": count})
+    out = text.encode("utf-8")
+    summary["substituted"].append({"output": name, "source": source_name(src), "source_sha256": sha(raw),
+                                   "sha256": emit(name, out), "substitutions": counts})
+
+
+def split(src: Path, name: str, rest_name: str, first_bytes: int) -> None:
+    """Keep the first first_bytes bytes as name and the rest as rest_name, byte for byte."""
+    raw = src.read_bytes()
+    check_source(name, raw)
+    first, rest = raw[:first_bytes], raw[first_bytes:]
+    summary["split"].append({"source": source_name(src), "source_sha256": sha(raw), "source_bytes": len(raw),
+                             "parts": [{"output": name, "bytes": len(first), "sha256": emit(name, first)},
+                                       {"output": rest_name, "bytes": len(rest), "sha256": emit(rest_name, rest)}]})
+
+
+def write_json(name: str, document, compact: bool) -> None:
+    if compact:
+        text = json.dumps(document, ensure_ascii=False, separators=(",", ":"))
+    else:
+        text = json.dumps(document, ensure_ascii=False, indent=1)
+    raw = (text + "\n").encode("utf-8")
+    summary["derived"].append({"output": name, "sha256": emit(name, raw)})
+
+
+def brace_strings(value, counter):
+    if isinstance(value, dict):
+        return {key: brace_strings(item, counter) for key, item in value.items()}
+    if isinstance(value, list):
+        return [brace_strings(item, counter) for item in value]
+    if isinstance(value, str):
+        text, count = BRACES[0].subn(BRACES[1], value)
+        counter["count"] += count
+        return text
+    return value
+
+
+def adjudication() -> None:
+    records = [json.loads(line) for line in JOURNAL.read_text(encoding="utf-8").splitlines() if line.strip()]
+    labels = {item["key"]: item["label"] for item in records if item.get("type") == "started"}
+    results = {labels[item["key"]]: item["result"] for item in records if item.get("type") == "result"}
+    counter = {"count": 0}
+    groups = [brace_strings(results[label], counter) for label in GROUP_ORDER]
+    items = [item for group in groups for item in group["items"]]
+    ids = [item["id"] for item in items]
+    assert len(ids) == len(set(ids)) == 51, len(ids)
+    document = {
+        "kind": "routing_practice_adjudication",
+        "subject": "GPT-6 Codex account-pool lane behind OmniRoute: 20128 shared; 20129, the full-compression lane, chained to it through the sharedgw provider node",
+        "source": "Result records of the workflow stages adjudicate:affinity-cache, adjudicate:resilience-retry and adjudicate:chain-stream-extra (Claude, model opus, agent type stack-researcher, effort max), read from the workflow's private journal. The rule they followed is adjudication-rule.json.",
+        "recovery_note": "The builder's task text carried this table cut at 150,000 characters, inside E9. Every item here comes from the journal's complete result records.",
+        "sanitization": "One change only: CLIProxyAPI's internal/home/<file> is written internal/home/{<file>} (%d substitutions), because scripts/validate.py treats /home/<name> as a personal home path. Removing the braces restores the original text." % counter["count"],
+        "counts": {
+            "items": len(items),
+            "converged": dict(sorted(Counter(item["converged"] for item in items).items())),
+            "action": dict(sorted(Counter(item["action"] for item in items).items())),
+        },
+        "groups": groups,
+    }
+    write_json("adjudication.json", document, compact=True)
+    summary["derived"][-1]["brace_substitutions"] = counter["count"]
+
+
+def gpt6_runs() -> None:
+    home, scratch = str(Path.home()), str(SCRATCH)
+    log = [line.replace(scratch, "$SCRATCH").replace(home, "~")
+           for line in (GPT / "commands.log").read_text(encoding="utf-8").splitlines()]
+    try:
+        import jsonschema
+        from importlib.metadata import version
+        validator_name = f"jsonschema {version('jsonschema')} Draft202012Validator"
+    except ImportError:
+        jsonschema = None
+        validator_name = "not run (jsonschema unavailable)"
+    jobs = []
+    for job, purpose, prompt_name, schema_name in (
+        ("route-job1", "Independent answer to the frozen routing question; the prompt carries no catalog.", "job1.prompt.txt", "job1.schema.json"),
+        ("route-job2", "Adversarial refutation of route-landscape's catalog (the withdrawn addendum entry removed).", "job2.prompt.txt", "job2.schema.json"),
+    ):
+        result = json.loads((GPT / f"{job}.result.json").read_text(encoding="utf-8"))
+        directory = GPT / "gpt6" / job
+        events = [json.loads(line) for line in (directory / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        turn_usage = [event.get("usage") for event in events if event.get("type") == "turn.completed"]
+        usage = result["usage"]
+        last = (directory / "last.json").read_bytes()
+        prompt, schema = (GPT / prompt_name).read_bytes(), (GPT / schema_name).read_bytes()
+        errors = None
+        if jsonschema is not None:
+            errors = len(list(jsonschema.Draft202012Validator(json.loads(schema)).iter_errors(json.loads(last))))
+        jobs.append({
+            "job": job,
+            "purpose": purpose,
+            "model": result["model"],
+            "effort": result["effort"],
+            "codex_version": result["codex_version"],
+            "runner_status": result["status"],
+            "exit": result["exit"],
+            "exit_file": (directory / "exit").read_text(encoding="utf-8").strip(),
+            "started_utc": result["started"],
+            "finished_utc": result["finished"],
+            "usage_limit_hit": result["limit"],
+            "usage_limit_marker": result["limit_marker"],
+            "outer_attempts": result["attempts"],
+            "usage_status": result["usage_status"],
+            "codex_usage": usage,
+            "turn_completed_events": len(turn_usage),
+            "turn_completed_usage_equals_runner_usage": turn_usage == [usage],
+            "record_usage": {
+                "uncached_input": usage["input_tokens"] - usage["cached_input_tokens"] - usage["cache_write_input_tokens"],
+                "cache_creation": usage["cache_write_input_tokens"],
+                "cache_read": usage["cached_input_tokens"],
+                "output": usage["output_tokens"],
+                "reasoning_in_output": usage["reasoning_output_tokens"],
+                "total": usage["input_tokens"] + usage["output_tokens"],
+                "native_retries": None,
+            },
+            "event_counts": dict(sorted(Counter(event.get("type") for event in events).items())),
+            "completed_item_counts": dict(sorted(Counter(event["item"].get("type") for event in events
+                                                         if event.get("type") == "item.completed").items())),
+            "inputs": {
+                "prompt_receipt": f"{job}.prompt.txt",
+                "prompt_sha256_recorded_by_runner": result["inputs"]["prompt_sha256"],
+                "prompt_sha256_of_private_source": sha(prompt),
+                "prompt_sha256_of_receipt": sha((OUT / f"{job}.prompt.txt").read_bytes()),
+                "schema_receipt": f"{job}.schema.json",
+                "schema_sha256_recorded_by_runner": result["inputs"]["schema_sha256"],
+                "schema_sha256_of_private_source": sha(schema),
+            },
+            "output": {
+                "receipt": f"{job}.last.json",
+                "sha256": sha(last),
+                "equals_runner_output_text": json.loads(result["output_text"]) == json.loads(last),
+                "schema_errors": errors,
+                "schema_validator": validator_name,
+            },
+            "stderr_tail": result["stderr_tail"].strip(),
+        })
+    document = {
+        "kind": "gpt6_job_runs",
+        "runner": "tools/sota-convergence/landscape-sweep/codex_call.sh (start, wait, result) in this repository",
+        "usage_rule": "Codex reports input_tokens with cached and cache-write input inside it, and output_tokens with reasoning inside it. record_usage splits input into disjoint categories: uncached_input = input - cached - cache_write; total = input + output. native_retries is null: HTTP-layer retries are not visible in the exec event stream.",
+        "jobs": jobs,
+        "command_log": log,
+        "sanitization": "Derived from the runner's result files without output_text (the receipts route-job1.last.json and route-job2.last.json hold it), the events.jsonl files (counts and the turn.completed usage only) and the command log. In the command log the home directory is written ~ and the session scratch directory $SCRATCH.",
+    }
+    write_json("route-gpt6-runs.json", document, compact=False)
+
+
+def limiter() -> list[str]:
+    record = json.loads((OF / "limiter" / "apply.json").read_text(encoding="utf-8"))
+    before, after = record["rate_limits_before"]["connections"], record["rate_limits_after"]["connections"]
+    assert len(before) == len(after) == 1
+    queue_before = record["resilience_before"]["requestQueue"]
+    queue_after = record["resilience_after"]["requestQueue"]
+    other_before = {key: value for key, value in record["resilience_before"].items() if key != "requestQueue"}
+    other_after = {key: value for key, value in record["resilience_after"].items() if key != "requestQueue"}
+    document = {
+        "kind": "gateway_setting_change",
+        "instance": "OmniRoute 20129, the full-compression lane, chained to 20128 through the sharedgw provider node",
+        "applied_utc": record["applied_utc"],
+        "request": {"method": "PATCH", "path": "/api/resilience", "body": record["patch"]},
+        "requestQueue_before": queue_before,
+        "requestQueue_after": queue_after,
+        "requestQueue_changed_fields": sorted(key for key in queue_before if queue_before[key] != queue_after.get(key)),
+        "other_resilience_settings_unchanged": other_before == other_after,
+        "sharedgw_limiter_enabled_before": before[0]["enabled"],
+        "sharedgw_limiter_enabled_after": after[0]["enabled"],
+        "read_back": "GET /api/resilience and GET /api/rate-limits after the PATCH. The PATCH's HTTP 200 and the absence of an environment override come from the coordinator's log, not from this file.",
+        "reduction": "Reduced from the private apply record: the requestQueue objects, the one connection's limiter enabled flag and the UTC time are kept. Dropped: the connection and provider ids, the connection name, the other resilience settings (compared equal above) and the rate-limit cache statistics.",
+    }
+    write_json("limiter-apply-20129.json", document, compact=False)
+    return [value for connection in before + after for key, value in connection.items()
+            if key in {"connectionId", "provider"} and isinstance(value, str)]
+
+
+def scan(forbidden: list[str]) -> list[str]:
+    sys.path.insert(0, "scripts")
+    from validate import PRIVATE_CONTENT
+    literals = [("home directory", str(Path.home())), ("scratch directory", str(SCRATCH)),
+                ("journal path", str(JOURNAL))] + [("limiter record id", value) for value in forbidden]
+    findings = []
+    for path in sorted(OUT.rglob("*")):
+        if not path.is_file():
+            continue
+        text = path.read_bytes().decode("utf-8")
+        for description, pattern in PRIVATE_CONTENT + (("email", EMAIL),):
+            if pattern.search(text):
+                findings.append(f"{path.relative_to(OUT)}: {description}")
+        for description, value in literals:
+            if value and value in text:
+                findings.append(f"{path.relative_to(OUT)}: {description}")
+    return findings
+
+
+def main() -> int:
+    OUT.mkdir(parents=True, exist_ok=True)
+    copy(GPT / "gpt6" / "route-job1" / "last.json", "route-job1.last.json")
+    copy(GPT / "gpt6" / "route-job2" / "last.json", "route-job2.last.json")
+    copy(GPT / "job1.prompt.txt", "route-job1.prompt.txt")
+    copy(GPT / "job1.schema.json", "route-job1.schema.json")
+    copy(GPT / "job2.schema.json", "route-job2.schema.json")
+    substitute(GPT / "job2.prompt.txt", "route-job2.prompt.txt", [BRACES])
+    substitute(OF / "route-landscape-catalog.json", "route-landscape-catalog.json", [BRACES])
+    substitute(OF / "route-landscape-occupancy-research.md", "route-landscape-occupancy-research.md", [SCRATCH_PREFIX])
+    split(OF / "route-mapper-resume-parts.md", "route-mapper-resume-parts.md", "route-mapper-part1-final.md",
+          ADJUDICATED_BYTES)
+    for name in ("route-mapper-final.json", "maintenance-gh-20260928.tsv", "ab-requirements.md"):
+        copy(OF / name, name)
+    adjudication()
+    gpt6_runs()
+    forbidden = limiter()
+    findings = scan(forbidden)
+    summary["pin_mismatches"] = mismatches
+    summary["scan"] = {"files": sum(1 for path in OUT.rglob("*") if path.is_file()), "findings": findings}
+    print(json.dumps(summary, indent=1))
+    return 1 if findings or mismatches else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

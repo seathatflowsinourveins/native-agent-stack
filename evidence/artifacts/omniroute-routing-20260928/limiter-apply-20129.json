@@ -1,0 +1,42 @@
+{
+ "kind": "gateway_setting_change",
+ "instance": "OmniRoute 20129, the full-compression lane, chained to 20128 through the sharedgw provider node",
+ "applied_utc": "2026-09-28T01:22:13Z",
+ "request": {
+  "method": "PATCH",
+  "path": "/api/resilience",
+  "body": {
+   "requestQueue": {
+    "autoEnableApiKeyProviders": false
+   }
+  }
+ },
+ "requestQueue_before": {
+  "autoEnableApiKeyProviders": true,
+  "requestsPerMinute": 60,
+  "minTimeBetweenRequestsMs": 350,
+  "concurrentRequests": 6,
+  "globalConcurrentRequests": 0,
+  "maxWaitMs": 30000,
+  "executionMaxWaitMs": 600000,
+  "maxQueueDepth": 0
+ },
+ "requestQueue_after": {
+  "autoEnableApiKeyProviders": false,
+  "requestsPerMinute": 60,
+  "minTimeBetweenRequestsMs": 350,
+  "concurrentRequests": 6,
+  "globalConcurrentRequests": 0,
+  "maxWaitMs": 30000,
+  "executionMaxWaitMs": 600000,
+  "maxQueueDepth": 0
+ },
+ "requestQueue_changed_fields": [
+  "autoEnableApiKeyProviders"
+ ],
+ "other_resilience_settings_unchanged": true,
+ "sharedgw_limiter_enabled_before": true,
+ "sharedgw_limiter_enabled_after": false,
+ "read_back": "GET /api/resilience and GET /api/rate-limits after the PATCH. The PATCH's HTTP 200 and the absence of an environment override come from the coordinator's log, not from this file.",
+ "reduction": "Reduced from the private apply record: the requestQueue objects, the one connection's limiter enabled flag and the UTC time are kept. Dropped: the connection and provider ids, the connection name, the other resilience settings (compared equal above) and the rate-limit cache statistics."
+}

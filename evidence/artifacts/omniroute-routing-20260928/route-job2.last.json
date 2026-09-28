@@ -1,0 +1,504 @@
+{
+  "verdicts": [
+    {
+      "id": "P1",
+      "verdict": "refute",
+      "reason": "LiteLLM's async_pre_call_deployment_hook claims affinity before dispatch; CPA's selector also binds before receiving an upstream result. Thus 'write on success, drop on failure' does not describe these implementations. API organization/workspace isolation also does not establish that every subscription-account switch forfeits cache. Affinity remains useful, but the implementation description and subscription-cache justification need correction.",
+      "source": "[LiteLLM affinity at pin](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/deployment_affinity_check.py); [CPA selector at pin](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go); [OpenAI API cache guide](https://developers.openai.com/api/docs/guides/prompt-caching)"
+    },
+    {
+      "id": "P2",
+      "verdict": "amend",
+      "reason": "CPA Pick gives explicit identities precedence over LCP and derived identities. LiteLLM scopes session keys by hashed caller identity, but uses an unscoped namespace when caller identity is absent. Require authenticated caller scoping; it is not unconditional. The complete claimed 12-step extraction order was not checked.",
+      "source": "[CPA selector at pin](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go); [LiteLLM session-key construction](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/deployment_affinity_check.py)"
+    },
+    {
+      "id": "P3",
+      "verdict": "amend",
+      "reason": "Codex's prompt_cache_key and responses_session_id functions support preserving client-generated routing identities. They do not establish subscription cache partitions. GPT-6's API caching behavior is now documented explicitly, resolving that inference for API usage only; see U2. The SMG partition implementation was not checked.",
+      "source": "[Codex client at pin](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/client.rs); [GPT-6 guide](https://developers.openai.com/api/docs/guides/latest-model); [API cache guide](https://developers.openai.com/api/docs/guides/prompt-caching)"
+    },
+    {
+      "id": "P4",
+      "verdict": "amend",
+      "reason": "CPA's pickLCP matches fingerprints and selects the associated available credential when explicit identity is absent. This implements heuristic placement, not observation of the hosted cache or guaranteed reuse after compaction. Keep applicability conditional, subordinate it to continuation constraints, and remove the unverified assertion that hosted cache ownership universally equals account ownership.",
+      "source": "[CPA Pick and pickLCP at pin](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go)"
+    },
+    {
+      "id": "P5",
+      "verdict": "amend",
+      "reason": "LiteLLM permits compatible encryption-boundary peers, returns 429 with Retry-After for quota cooldown, and 503 for other origin unavailability. Its separate previous_response_id check falls through when the origin is absent from healthy deployments; it does not itself enforce fail-fast. Codex includes encrypted reasoning and store:false as claimed. Preserve origin compatibility and prohibit stripping without the quality gate; account-level cryptographic scope on ChatGPT remains unverified.",
+      "source": "[LiteLLM encrypted affinity](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/encrypted_content_affinity_check.py); [previous_response_id handling](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/deployment_affinity_check.py); [Codex request construction](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/client.rs)"
+    },
+    {
+      "id": "P6",
+      "verdict": "amend",
+      "reason": "CPA implements configurable parent-credential inheritance, enabled by default when session affinity is enabled, with availability-dependent fallback. Codex's internal cache-key derivation does not itself implement credential inheritance. For children carrying origin-bound continuation artifacts, inheritance is a correctness constraint rather than merely a cache-versus-quota preference. Bifrost's cited disagreement was not checked.",
+      "source": "[CPA configuration](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/config.example.yaml); [CPA parent binding](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go); [Codex cache identities](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/client.rs)"
+    },
+    {
+      "id": "P7",
+      "verdict": "amend",
+      "reason": "CPA preserves an available binding across priority tiers, supporting availability-bounded stickiness. Remove the claimed 1.25x subscription cache-write penalty: OpenAI documents no separate cache-write charge for Codex credit billing, and does not equate credit prices with included subscription limits. The llm-d and SMG latency thresholds were not checked.",
+      "source": "[CPA selector](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go); [Codex pricing](https://learn.chatgpt.com/docs/pricing)"
+    },
+    {
+      "id": "P8",
+      "verdict": "amend",
+      "reason": "Codex parses the stated primary/secondary headers, but also discovers additional metered limit IDs. Preserve that scope rather than assuming one account-wide codex bucket. The checked client code observes limits; it does not implement gateway credential scheduling. Treat passive-header selection as a conditional design proposal, with no verified scheduling implementation established here.",
+      "source": "[Codex rate-limit parsing at pin](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/codex-api/src/rate_limits.rs)"
+    },
+    {
+      "id": "P9",
+      "verdict": "amend",
+      "reason": "The OpenAI SDK parses server delays and applies bounded client retries; this is not per-account gateway cooldown. At this pin it honors delays up to two minutes and declines retries for excessive finite delays. Claude Code's documented greater-than-60-second stop rule has a retry-watchdog exception. Keep gateway cooldown deadlines distinct from SDK retry timing. LiteLLM's cooldown implementation was not checked.",
+      "source": "[OpenAI SDK retry handling](https://raw.githubusercontent.com/openai/openai-python/d9f7b7a085d4f2173756590abeffeb7a8c7641dd/src/openai/_base_client.py); [Claude gateway response contract](https://code.claude.com/docs/en/llm-gateway-protocol)"
+    },
+    {
+      "id": "P10",
+      "verdict": "amend",
+      "reason": "LiteLLM documents weighted failover within a model group, restricted to supported asynchronous paths and disabled by default. Group membership does not itself certify identical upstream model and reasoning settings. CPA documents additional credential retry rounds, not an unconditional same-model quality guarantee. Require verified target equivalence and continuation compatibility before enabling failover.",
+      "source": "[LiteLLM router at pin](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router.py); [CPA retry configuration](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/config.example.yaml)"
+    },
+    {
+      "id": "P11",
+      "verdict": "amend",
+      "reason": "SMG's CircuitBreakerConfig contains the stated 10/3/60/120 defaults, explicitly for worker reliability. Those declarations do not demonstrate per-subscription-account classification or half-open execution. The practice is applicable after defining credential/model/provider failure scope, but the cited configuration is insufficient implementation evidence for the complete claim.",
+      "source": "[SMG circuit-breaker configuration at pin](https://raw.githubusercontent.com/smg-project/smg/3be823a700fabaff3add8a390cf78f163479d686/model_gateway/src/config/types.rs)"
+    },
+    {
+      "id": "P12",
+      "verdict": "confirm",
+      "reason": "SMG's retry configuration contains five retries, 50 ms initial backoff, 30 s maximum, 1.5 multiplier and 0.2 jitter. The OpenAI SDK implements exponential backoff with jitter. SRE chapter 21 explicitly describes three total attempts, a below-10% client retry ratio, and retrying immediately above the rejecting layer. These support bounded, coordinated retries without changing model or effort; the numerical budgets are examples, not workload-calibrated optima.",
+      "source": "[SMG retry configuration](https://raw.githubusercontent.com/smg-project/smg/3be823a700fabaff3add8a390cf78f163479d686/crates/external_router/src/retry_config.rs); [OpenAI SDK](https://raw.githubusercontent.com/openai/openai-python/d9f7b7a085d4f2173756590abeffeb7a8c7641dd/src/openai/_base_client.py); [SRE chapter 21](https://sre.google/sre-book/handling-overload/)"
+    },
+    {
+      "id": "P13",
+      "verdict": "amend",
+      "reason": "Envoy starts a timeout-triggered retry without cancelling the initial request and returns the first acceptable response. This supports avoiding hedging here, but does not establish exactly doubled subscription consumption or an inevitably cold duplicate. 'Cost only' also understates the possible effect of selecting a different generation. The opened moving documentation is 1.40.0-dev-ac92dd, not the catalog's dev revision.",
+      "source": "[Envoy request hedging](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_routing)"
+    },
+    {
+      "id": "P14",
+      "verdict": "refute",
+      "reason": "Nondeterministic generation does not make operation-key deduplication inapplicable: retries of one explicitly identified operation can reuse that operation's result. The SDK's configurable header construction does not preclude a gateway/client idempotency contract. Applicability should be conditional on a reliable operation ID and replay contract. Content-based deduplication of independent generations would be a different, potentially quality-changing behavior. The draft's expiration was not checked.",
+      "source": "[OpenAI SDK header and idempotency handling](https://raw.githubusercontent.com/openai/openai-python/d9f7b7a085d4f2173756590abeffeb7a8c7641dd/src/openai/_base_client.py)"
+    },
+    {
+      "id": "P15",
+      "verdict": "amend",
+      "reason": "Semantic Router's pinned README describes selecting or composing heterogeneous model paths. OpenRouter documents possible later-turn model changes. Unvalidated substitution is incompatible with the constraint. The exclusion should apply to such configurations, rather than every use of those products or classification itself. Plano and LiteLLM's classifier implementations were not checked.",
+      "source": "[Semantic Router README at pin](https://raw.githubusercontent.com/vllm-project/semantic-router/6573123715e214a9eaa3ad23372ee5157411e519/README.md); [OpenRouter stickiness](https://openrouter.ai/docs/features/prompt-caching)"
+    },
+    {
+      "id": "P16",
+      "verdict": "amend",
+      "reason": "The pinned OpenTelemetry registry defines conversation and cache-read attributes, marked Development. It explicitly discourages inventing conversation IDs from hashes or trace IDs when no conversation identifier exists. CPA logs affinity decisions, but these sources do not establish all requested fields on every request. Keep routing keys, conversation IDs and attempt correlation distinct, and verify served model plus effective effort as well.",
+      "source": "[OpenTelemetry GenAI attributes at pin](https://raw.githubusercontent.com/open-telemetry/semantic-conventions-genai/e57c543b4889619eb2a05702471937db5119165d/docs/registry/attributes/gen-ai.md); [CPA affinity logs](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go)"
+    },
+    {
+      "id": "P17",
+      "verdict": "amend",
+      "reason": "SRE supports preventing retry multiplication, and LiteLLM's Redis script implements first-writer pin claiming. Neither establishes the claimed local two-hop topology or all deadline/header behavior. Applicability is conditional on actually having multiple gateway hops; a single-host endpoint does not imply chaining. Atomic shared affinity and ownership of retry decisions are separate requirements.",
+      "source": "[SRE retry layering](https://sre.google/sre-book/handling-overload/); [LiteLLM claim-pin script](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/deployment_affinity_check.py)"
+    },
+    {
+      "id": "P18",
+      "verdict": "amend",
+      "reason": "CPA's HomeConcurrencyBusyError implements typed 429 responses and rounded-up Retry-After, including credential/model concurrency errors. Its configuration says Home's synthesized policy is authoritative; this is not proof of a standalone local limiter or provider-enforced subscription cap. Admission control can still protect the gateway independently of whether providers publish concurrency limits.",
+      "source": "[CPA concurrency error contract](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/home_concurrency.go); [CPA Home configuration](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/config.example.yaml)"
+    },
+    {
+      "id": "P19",
+      "verdict": "amend",
+      "reason": "Codex explicitly requires unchanged turn-state replay within a turn, prohibits carrying it between turns, and says an auth ownership change clears it. Add those lifetime/reset rules. The source also documents session-id-derived ChatGPT cache affinity, but does not establish cache TTL, isolation scope or a universal server prohibition on account changes.",
+      "source": "[Codex turn-state and session-id contract](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/client.rs)"
+    },
+    {
+      "id": "P20",
+      "verdict": "amend",
+      "reason": "The gateway guide supports the stated Anthropic-format headers, unchanged attribution-first system array, integer Retry-After, rate-limit headers and error bodies. Add the retry-watchdog exception to the 60-second rule and preserve future Anthropic headers/body fields rather than using a fixed allowlist. Other provider dialects have different wire contracts.",
+      "source": "[Claude Code gateway compatibility guide](https://code.claude.com/docs/en/llm-gateway-protocol)"
+    },
+    {
+      "id": "P21",
+      "verdict": "confirm",
+      "reason": "LiteLLM's _anthropic_stream_should_decline_fallback rejects fallback after generated content or a non-pre-first-chunk failure. That directly supports avoiding generation splicing. Envoy's response commitment rules are an additional transport boundary. The rule applies to transparent gateway retries; it does not establish that every protocol-specific continuation mechanism is forbidden.",
+      "source": "[LiteLLM stream fallback gate at pin](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router.py); [Envoy retry semantics](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_routing)"
+    },
+    {
+      "id": "P22",
+      "verdict": "amend",
+      "reason": "Preserve effective prompt content and ordering, rather than requiring identical HTTP serialization bytes. Codex's incremental comparison deliberately ignores some delivery/metadata fields, so 'all request properties match' is too broad. Anthropic documents model-specific invalidation and cache-preserving appended updates. A cache miss does not itself prove a lossy rewrite; the private compression hop's transformations were not checked.",
+      "source": "[Codex incremental request comparison](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/client.rs); [Anthropic cache invalidation](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)"
+    },
+    {
+      "id": "P23",
+      "verdict": "amend",
+      "reason": "LiteLLM cancels the first-chunk task, closes the generator and handles the disconnect as 499; its streaming response also closes upstream generators. SMG's cited request_stream code specifically marks inbound upload failures as client-caused. These support cancellation and correct attribution, but do not verify every retry/health path, concurrency-slot release, or immediate cessation of computation at a hosted provider.",
+      "source": "[LiteLLM disconnect handling at pin](https://github.com/BerriAI/litellm/blob/d09bbae1c6df463e425558f60d460437193635da/litellm/proxy/common_request_processing.py#L757-L828); [SMG inbound-abort tracking](https://raw.githubusercontent.com/smg-project/smg/3be823a700fabaff3add8a390cf78f163479d686/model_gateway/src/routers/http/request_stream.rs)"
+    },
+    {
+      "id": "ADD-P1P7",
+      "verdict": "amend",
+      "reason": "CPA directly returns an available bound credential, and LiteLLM normally narrows candidates to the pinned deployment. Narrow the universal claim to those checked paths: LiteLLM bypasses its affinity callback when _target_order is supplied, and downstream routing paths were not exhaustively inspected. CPA's Home concurrency contract does not alone prove that every admission path preserves pins.",
+      "source": "[CPA bound-credential return](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go); [LiteLLM affinity bypass and filtering](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/deployment_affinity_check.py); [CPA concurrency contract](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/home_concurrency.go)"
+    },
+    {
+      "id": "ADD-LIVE",
+      "verdict": "confirm",
+      "reason": "Upstream-code claim only: PR #8940 explicitly makes existing same-session affinity stronger than occupancy. At a58000c7, src/sse/services/auth.ts selects affinityConnection, then a later reserveOAuthSession block can replace connection with a more available OAuth peer whose priority is at most selectedPriority+1, without an affinity guard. This supports the ordering-defect claim. No private measurements or deployed cherry-pick behavior were evaluated.",
+      "source": "[OmniRoute PR #8940](https://github.com/diegosouzapw/OmniRoute/pull/8940); [auth.ts at the supplied abbreviated commit](https://raw.githubusercontent.com/diegosouzapw/OmniRoute/a58000c7/src/sse/services/auth.ts)"
+    },
+    {
+      "id": "R1",
+      "verdict": "confirm",
+      "reason": "LiteLLM strips encrypted reasoning when the origin is unknown or outside the routed candidate group without a compatible boundary peer. That removes continuation state and is unsafe under the stated constraint without a passed quality gate.",
+      "source": "[LiteLLM encrypted-content stripping](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router_utils/pre_call_checks/encrypted_content_affinity_check.py)"
+    },
+    {
+      "id": "R2",
+      "verdict": "confirm",
+      "reason": "Bifrost's stripUnverifiableReasoning dispatches to routines that remove encrypted content, signatures or thinking blocks. Retaining readable summaries does not preserve the removed state. The quality risk is real.",
+      "source": "[Bifrost encrypted-reasoning stripping at pin](https://raw.githubusercontent.com/maximhq/bifrost/8e99cf8341b60e342a4a6044387290ac5939d2bd/core/encryptedreasoning.go)"
+    },
+    {
+      "id": "R3",
+      "verdict": "amend",
+      "reason": "CPA's pinned template documents switch-preview-model as a legacy compatibility-only option, omitted from the active v8 template. Flag it when configured; do not imply it is an active v8 default. Its execution path was not inspected.",
+      "source": "[CPA legacy compatibility configuration](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/config.example.yaml)"
+    },
+    {
+      "id": "R4",
+      "verdict": "amend",
+      "reason": "LiteLLM supports cross-group fallback, which can change model or settings. Cross-group movement is not inherently a downgrade because groups can contain equivalent targets. The prohibited behavior is an unverified change that violates the requested model/effort or quality contract.",
+      "source": "[LiteLLM fallback configuration and documentation](https://raw.githubusercontent.com/BerriAI/litellm/d09bbae1c6df463e425558f60d460437193635da/litellm/router.py)"
+    },
+    {
+      "id": "R5",
+      "verdict": "confirm",
+      "reason": "OpenRouter explicitly says Auto/Pareto stickiness reuses the resolved model only while it remains eligible, and a later turn may select a different model. This cannot certify the frozen quality constraint.",
+      "source": "[OpenRouter router-model stickiness](https://openrouter.ai/docs/features/prompt-caching)"
+    },
+    {
+      "id": "R6",
+      "verdict": "refute",
+      "reason": "The blanket statement is false. Anthropic explicitly says setting effort to the model's default is equivalent to omission and does not invalidate cache; supported per-message effort changes can also preserve the earlier prefix. Flag effective reasoning changes or discarded state, not every normalization.",
+      "source": "[Anthropic thinking and effort cache rules](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)"
+    },
+    {
+      "id": "R7",
+      "verdict": "amend",
+      "reason": "The checked Semantic Router README supports a heterogeneous-model routing risk. Product-wide prohibition is broader than the evidence: a constrained configuration can avoid model substitution. Plano and LiteLLM classifier code remain unchecked.",
+      "source": "[Semantic Router README at pin](https://raw.githubusercontent.com/vllm-project/semantic-router/6573123715e214a9eaa3ad23372ee5157411e519/README.md)"
+    },
+    {
+      "id": "R8",
+      "verdict": "amend",
+      "reason": "Lossy rewriting requires the quality gate, but neither a changed cache prefix nor lower cache reuse proves semantic loss. The API guide documents compaction-related cache changes; it does not establish what the private compression hop does.",
+      "source": "[OpenAI cache guide](https://developers.openai.com/api/docs/guides/prompt-caching)"
+    },
+    {
+      "id": "E1",
+      "verdict": "confirm",
+      "reason": "TensorZero's repository page explicitly says the owner archived it on 2026-06-12. That independently satisfies the exclusion rule. The catalog's last-push date was not verified.",
+      "source": "[TensorZero archived repository](https://github.com/tensorzero/tensorzero)"
+    },
+    {
+      "id": "E2",
+      "verdict": "not_checked",
+      "reason": "RouteLLM's default-branch activity and release history were not checked within budget. A pushed_at date alone would not establish staleness.",
+      "source": ""
+    },
+    {
+      "id": "E3",
+      "verdict": "not_checked",
+      "reason": "Helicone's default-branch activity and release history were not checked within budget.",
+      "source": ""
+    },
+    {
+      "id": "E4",
+      "verdict": "not_checked",
+      "reason": "vllm-project/router's release history and default-branch activity were not checked within budget.",
+      "source": ""
+    },
+    {
+      "id": "E5",
+      "verdict": "amend",
+      "reason": "Portkey's release page was opened, but metadata and default-branch commit requests failed. Low activity or an old release alone is not an exclusion under the supplied rule. Maintenance remains pending; this does not establish either maintained or stale status.",
+      "source": "[Portkey release](https://github.com/Portkey-AI/gateway/releases/tag/v1.15.2); [inaccessible head request](https://api.github.com/repos/Portkey-AI/gateway/commits/main)"
+    },
+    {
+      "id": "E6",
+      "verdict": "not_checked",
+      "reason": "The claude-code-router tag and scenario-routing implementation were not opened within budget.",
+      "source": ""
+    },
+    {
+      "id": "E7",
+      "verdict": "not_checked",
+      "reason": "The inference-extension implementation was not compared with llm-d; claimed scorer equivalence remains unchecked.",
+      "source": ""
+    },
+    {
+      "id": "E8",
+      "verdict": "not_checked",
+      "reason": "SMG's release was opened, but the corresponding SGLang release and relocation history were not checked.",
+      "source": "[SMG release reviewed](https://github.com/smg-project/smg/releases/tag/v1.11.0)"
+    },
+    {
+      "id": "E9",
+      "verdict": "amend",
+      "reason": "Exclude unvalidated model-substitution configurations under the frozen constraint. Do not extend that conclusion to all configurations of these products. The assertion that all three were reviewed and live was not independently established.",
+      "source": "[Semantic Router's stated routing scope](https://raw.githubusercontent.com/vllm-project/semantic-router/6573123715e214a9eaa3ad23372ee5157411e519/README.md)"
+    },
+    {
+      "id": "U1",
+      "verdict": "confirm",
+      "reason": "The subscription backend's cache isolation, TTL and current included-window accounting remain unestablished in the checked sources. Codex source documents session-id affinity only. Current credit pricing discounts cached input and has no separate cache-write charge, but explicitly separates credit prices from included limits. The 2025-11-24 changelog acknowledges historical cache-miss effects on usage and a smoothing change; it does not specify today's cache-hit multiplier.",
+      "source": "[Codex client](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/core/src/client.rs); [current pricing](https://learn.chatgpt.com/docs/pricing); [dated usage changelog](https://learn.chatgpt.com/docs/changelog)"
+    },
+    {
+      "id": "U2",
+      "verdict": "amend",
+      "reason": "Resolved for the API. The GPT-6 guide, undated, states: \"Prompt caching: When migrating from GPT-5.5 or earlier, replace `prompt_cache_retention` with `prompt_cache_options.ttl` set to `\"30m\"`.\" It also states GPT-6 supports GPT-5.6's API capabilities, including caching. This directly connects GPT-6 to the cache guide's 'GPT-5.6 and later' behavior; it does not establish subscription-backend semantics.",
+      "source": "[GPT-6 model guidance, undated](https://developers.openai.com/api/docs/guides/latest-model); [prompt-caching comparison, undated](https://developers.openai.com/api/docs/guides/prompt-caching)"
+    },
+    {
+      "id": "U3",
+      "verdict": "confirm",
+      "reason": "The checked cache guide specifies API workspace/organization isolation, not claude.ai OAuth subscription isolation. The subscription help page confirms caching can reduce project-content usage, but supplies no subscription cache partition definition. The OAuth isolation question remains unresolved.",
+      "source": "[Anthropic cache isolation](https://platform.claude.com/docs/en/build-with-claude/prompt-caching); [Claude subscription usage guidance](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)"
+    },
+    {
+      "id": "U4",
+      "verdict": "confirm",
+      "reason": "No provider-enforced per-account concurrent-stream limit was established from Codex's rate-limit parser, Codex pricing, or Claude subscription usage guidance. CPA's configured concurrency contract describes gateway admission, not the providers' subscription limits. Unknown does not mean unlimited.",
+      "source": "[Codex rate-limit fields](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/codex-api/src/rate_limits.rs); [Codex pricing](https://learn.chatgpt.com/docs/pricing); [Claude usage guidance](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)"
+    }
+  ],
+  "maintenance": [
+    {
+      "key": "litellm",
+      "repository": "BerriAI/litellm",
+      "pin_tag": "v1.102.1",
+      "pin_commit_confirmed": true,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/BerriAI/litellm); [failed since query](https://api.github.com/repos/BerriAI/litellm/commits?since=2026-06-30T00:00:00Z&per_page=1); [failed head](https://api.github.com/repos/BerriAI/litellm/commits/main); [failed Atom](https://github.com/BerriAI/litellm/commits/main.atom); [release](https://github.com/BerriAI/litellm/releases/tag/v1.102.1); [release commit link followed](https://github.com/BerriAI/litellm/commit/d09bbae1c6df463e425558f60d460437193635da)"
+    },
+    {
+      "key": "smg",
+      "repository": "smg-project/smg",
+      "pin_tag": "v1.11.0",
+      "pin_commit_confirmed": true,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/smg-project/smg); [failed main-head attempt](https://api.github.com/repos/smg-project/smg/commits/main); [release](https://github.com/smg-project/smg/releases/tag/v1.11.0); [release commit link followed](https://github.com/smg-project/smg/commit/3be823a700fabaff3add8a390cf78f163479d686)"
+    },
+    {
+      "key": "llmd",
+      "repository": "llm-d/llm-d-router",
+      "pin_tag": "v0.11.0",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/llm-d/llm-d-router); [failed main-head attempt](https://api.github.com/repos/llm-d/llm-d-router/commits/main); [release opened, full SHA unresolved](https://github.com/llm-d/llm-d-router/releases/tag/v0.11.0)"
+    },
+    {
+      "key": "prodstack",
+      "repository": "vllm-project/production-stack",
+      "pin_tag": "vllm-stack-0.1.12",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/vllm-project/production-stack); [failed main-head attempt](https://api.github.com/repos/vllm-project/production-stack/commits/main); [release shows matching 66b6066 prefix only](https://github.com/vllm-project/production-stack/releases/tag/vllm-stack-0.1.12)"
+    },
+    {
+      "key": "semrouter",
+      "repository": "vllm-project/semantic-router",
+      "pin_tag": "v0.4.0",
+      "pin_commit_confirmed": null,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/vllm-project/semantic-router); [failed head](https://api.github.com/repos/vllm-project/semantic-router/commits/main); [release shows matching 6573123 prefix only](https://github.com/vllm-project/semantic-router/releases/tag/v0.4.0)"
+    },
+    {
+      "key": "aigw",
+      "repository": "theagentrouter/agent-router",
+      "pin_tag": "v1.1.0",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/theagentrouter/agent-router); [failed main-head attempt](https://api.github.com/repos/theagentrouter/agent-router/commits/main); [release opened, full SHA unresolved](https://github.com/theagentrouter/agent-router/releases/tag/v1.1.0)"
+    },
+    {
+      "key": "bifrost",
+      "repository": "maximhq/bifrost",
+      "pin_tag": "core/v1.10.4",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/maximhq/bifrost); [failed main-head attempt](https://api.github.com/repos/maximhq/bifrost/commits/main); [release opened, full SHA unresolved](https://github.com/maximhq/bifrost/releases/tag/core/v1.10.4)"
+    },
+    {
+      "key": "cpa",
+      "repository": "router-for-me/CLIProxyAPI",
+      "pin_tag": "v8.0.2",
+      "pin_commit_confirmed": null,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/router-for-me/CLIProxyAPI); [failed head](https://api.github.com/repos/router-for-me/CLIProxyAPI/commits/main); [release opened, full SHA unresolved](https://github.com/router-for-me/CLIProxyAPI/releases/tag/v8.0.2)"
+    },
+    {
+      "key": "newapi",
+      "repository": "QuantumNous/new-api",
+      "pin_tag": "v1.0.0-rc.40",
+      "pin_commit_confirmed": null,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/QuantumNous/new-api); [failed head](https://api.github.com/repos/QuantumNous/new-api/commits/main); [release opened, full SHA unresolved](https://github.com/QuantumNous/new-api/releases/tag/v1.0.0-rc.40)"
+    },
+    {
+      "key": "plano",
+      "repository": "katanemo/plano",
+      "pin_tag": "0.4.36",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/katanemo/plano); [failed main-head attempt](https://api.github.com/repos/katanemo/plano/commits/main); [release opened, full SHA unresolved](https://github.com/katanemo/plano/releases/tag/0.4.36)"
+    },
+    {
+      "key": "dynamo",
+      "repository": "ai-dynamo/dynamo",
+      "pin_tag": "v1.5.0",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/ai-dynamo/dynamo); [failed main-head attempt](https://api.github.com/repos/ai-dynamo/dynamo/commits/main); [release shows matching b83b1d9 prefix only](https://github.com/ai-dynamo/dynamo/releases/tag/v1.5.0)"
+    },
+    {
+      "key": "codex",
+      "repository": "openai/codex",
+      "pin_tag": "rust-v0.157.1",
+      "pin_commit_confirmed": null,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/openai/codex); [failed head](https://api.github.com/repos/openai/codex/commits/main); [release opened, full SHA unresolved](https://github.com/openai/codex/releases/tag/rust-v0.157.1)"
+    },
+    {
+      "key": "oai-py",
+      "repository": "openai/openai-python",
+      "pin_tag": "v3.19.2",
+      "pin_commit_confirmed": null,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/openai/openai-python); [failed head](https://api.github.com/repos/openai/openai-python/commits/main); [release opened, full SHA unresolved](https://github.com/openai/openai-python/releases/tag/v3.19.2)"
+    },
+    {
+      "key": "ant-py",
+      "repository": "anthropics/anthropic-sdk-python",
+      "pin_tag": "v1.8.0",
+      "pin_commit_confirmed": null,
+      "default_branch": "main",
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": false,
+      "status": "unknown",
+      "source": "[metadata](https://api.github.com/repos/anthropics/anthropic-sdk-python); [failed head](https://api.github.com/repos/anthropics/anthropic-sdk-python/commits/main); [release opened, full SHA unresolved](https://github.com/anthropics/anthropic-sdk-python/releases/tag/v1.8.0)"
+    },
+    {
+      "key": "otel-genai",
+      "repository": "open-telemetry/semantic-conventions-genai",
+      "pin_tag": null,
+      "pin_commit_confirmed": true,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/open-telemetry/semantic-conventions-genai); [failed main-head attempt](https://api.github.com/repos/open-telemetry/semantic-conventions-genai/commits/main); [untagged pinned commit exists; main relationship unresolved](https://github.com/open-telemetry/semantic-conventions-genai/commit/e57c543b4889619eb2a05702471937db5119165d)"
+    },
+    {
+      "key": "portkey",
+      "repository": "Portkey-AI/gateway",
+      "pin_tag": "v1.15.2",
+      "pin_commit_confirmed": null,
+      "default_branch": null,
+      "last_default_branch_commit_date": null,
+      "commit_since_cutoff": null,
+      "archived": null,
+      "status": "unknown",
+      "source": "[failed metadata](https://api.github.com/repos/Portkey-AI/gateway); [failed main-head attempt](https://api.github.com/repos/Portkey-AI/gateway/commits/main); [release opened, full SHA unresolved](https://github.com/Portkey-AI/gateway/releases/tag/v1.15.2)"
+    }
+  ],
+  "missed_practices": [
+    {
+      "practice": "Preserve streaming keepalives and forward-compatible protocol fields.",
+      "reason": "Long reasoning pauses can exceed Claude Code's documented 300-second silence limit if gateways buffer or remove pings. The gateway contract also requires accepting evolving headers and body fields. Header/system preservation alone is insufficient.",
+      "upstream": "none found with maintenance established under the requested rule",
+      "source": "[Claude Code streaming and extensibility contract](https://code.claude.com/docs/en/llm-gateway-protocol)"
+    },
+    {
+      "practice": "Validate effective reasoning effort, including appended configuration updates.",
+      "reason": "GPT-6 can change effective effort through configuration_update items while retaining the original top-level effort. A gateway checking only reasoning.effort can miss a downgrade or discard a legitimate update. Preserve these items and include their effective value in quality validation.",
+      "upstream": "none found with maintenance established under the requested rule",
+      "source": "[GPT-6 configuration-update caching guidance](https://developers.openai.com/api/docs/guides/prompt-caching)"
+    },
+    {
+      "practice": "Scope quota observations and cooldowns by metered limit and affected model.",
+      "reason": "Codex parses additional limit IDs beyond the legacy codex family. CPA distinguishes credential-wide quota from model-specific cooldowns. Flattening these into one account-wide bucket can unnecessarily disable usable lanes or admit exhausted ones.",
+      "upstream": "none found with maintenance established; inspected implementation leads are openai/codex at 36650394c5b38c2990ccf2a3457165ca3e9d9726, rate_limits.rs, and router-for-me/CLIProxyAPI at 4a2c81864f31f39308e946c4c65e72147855da6e, selector.go",
+      "source": "[Codex metered-limit parsing](https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/codex-api/src/rate_limits.rs); [CPA quota-scope handling](https://raw.githubusercontent.com/router-for-me/CLIProxyAPI/4a2c81864f31f39308e946c4c65e72147855da6e/sdk/cliproxy/auth/selector.go)"
+    }
+  ],
+  "calls": {
+    "web_search": 12,
+    "web_fetch": 55,
+    "gh_api": 35
+  },
+  "notes": "Budget exhausted: 90 retrievals, counting failed requests, repeat opens, clicks and find operations. Counts are disjoint: gh_api means GitHub REST URLs accessed through the web tool; no network shell or gh CLI was used. Every requested upstream received metadata, head and release/commit attempts, but no default-branch commit endpoint answered. Maintenance therefore remains unknown, never stale by inference from pushed_at or releases. Only LiteLLM and SMG tag-to-full-commit mappings were verified; the untagged OpenTelemetry commit's existence was verified separately. Verdicts identify the evidence actually checked, not approval of every additional catalog citation. Raw commit URLs were retained because browser-rendered line numbers are not reliable GitHub source-line numbers; not all original numeric anchors were independently verified. No candidate code was executed, and no private gateway measurements were evaluated. These limits prevent certifying a fully maintained SOTA implementation.",
+  "skills_used": [
+    "verification-before-completion",
+    "openai-docs"
+  ]
+}
