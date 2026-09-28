@@ -149,9 +149,10 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         for cited in ("#448", "8315274f", "M5c", "/security-review"):
             self.assertIn(cited, exclusion["reason"] + " " + exclusion["overturn"], cited)
         gate = {s["name"]: s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"]}["security-audit"]
-        # Overturn trigger: once main promotes the skill, this fails and the entry becomes a reuse_ref.
+        # Review trigger: any change to main's gate fails here. A promotion (Codex on or listing on)
+        # overturns the exclusion into a reuse_ref; any other change needs a new review.
         self.assertEqual((gate["codex_enabled"], gate["claude_listing"]), (False, "name-only"),
-                         "main promoted security-audit: overturn its exclusion and reuse it by reference")
+                         "main changed security-audit's gate: review the exclusion (a promotion overturns it)")
 
     def test_print_codex_config_disables_every_reused_skill_main_disables(self):
         base = json.loads(ADOPTION_MANIFEST.read_text())["skills"]

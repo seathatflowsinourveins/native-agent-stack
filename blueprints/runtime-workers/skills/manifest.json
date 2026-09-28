@@ -4085,7 +4085,7 @@
       "source": "cloudflare/security-audit-skill",
       "adoption_ref": "adoption/skills/manifest.json#/skills/28",
       "reason": "Main gates this adoption skill: #448 (8315274f) keeps Codex disabled (codex_enabled false) and the Claude listing name-only pending the M5c bake-off against /security-review. Reusing it here would install it for runtime workers without that gate.",
-      "overturn": "Main promotes security-audit after M5c, that is adoption/skills/manifest.json sets codex_enabled true or a claude_listing other than name-only: replace this exclusion with a reuse_ref entry and assign its scenarios and roles."
+      "overturn": "Main promotes security-audit after M5c, that is adoption/skills/manifest.json sets codex_enabled true or claude_listing on: replace this exclusion with a reuse_ref entry and assign its scenarios and roles. Any other change to main's gate on it also fails the exclusion test and needs a new review."
     }
   ],
   "openhands_inventory": [

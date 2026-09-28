@@ -74,18 +74,24 @@ set, and when a reused entry's pin differs from main's.
   ([Claude Code skills](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings);
   [2026-09-25 decision](../../../docs/decisions/2026-09-25-skills-trial-and-usage.md)).
   It is not applied inside OpenHands or other runtime containers, which have no
-  Claude skill listing. The OpenHands SDK loads project skills only from
-  `.agents/skills`, `.openhands/skills` and `.openhands/microagents`
+  Claude skill listing. The OpenHands SDK's skill loader reads skill directories:
+  project `.agents/skills`, `.openhands/skills` and `.openhands/microagents`
   ([skill.py:1123-1130](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1123-L1130)),
-  lists every SKILL.md skill with its name, description and location
-  ([skill.py:182-185](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L182-L185)),
-  and withholds a skill from the model only through its SKILL.md
-  `disable-model-invocation` frontmatter
+  and user `~/.agents/skills`, the OpenHands persistence directories and
+  OpenHands' own enabled installed skills
+  ([skill.py:936-973](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L936-L973)).
+  It also reads each skill's SKILL.md frontmatter, including
+  `disable-model-invocation`
   ([skill.py:278-284](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L278-L284),
-  [skill.py:528-538](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L528-L538)).
-  `skill.py` is the same blob at `fcc102a6` and at the `da28c773` pin cited
-  elsewhere in this README. A Claude Code worker must apply main's `claude_listing`
-  in its own settings; this installer writes no client settings.
+  [skill.py:528-538](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L528-L538)),
+  and lists SKILL.md skills with their name, description and location
+  ([skill.py:183-186](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L183-L186)).
+  `skill.py` never reads Claude Code settings or a `skillOverrides` key, so main's
+  `claude_listing` has no effect there; OpenHands' own controls are that
+  frontmatter flag and its installed-skill enable state. `skill.py` is the same
+  blob at `fcc102a6` and at the `da28c773` pin cited elsewhere in this README.
+  A Claude Code worker must apply main's `claude_listing` in its own settings;
+  this installer writes no client settings.
 - **Excluded.** `security-audit` (#448, `8315274f`) stays out while main keeps it
   Codex-disabled and name-only pending the M5c bake-off against `/security-review`.
   When main promotes it, replace the exclusion with a `reuse_ref` entry and assign

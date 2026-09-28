@@ -126,8 +126,10 @@ The same review found that reused entries copied only pin keys, so
 main keeps off for Codex. The installer now takes both gates from the adoption
 entry when it resolves a `reuse_ref`, and refuses an entry that restates a gate
 or whose pin drifted. The Claude listing mode is a Claude Code `skillOverrides`
-setting; the OpenHands SDK at `fcc102a697874d54a357e36004e02c95040dbdc0` reads
-only SKILL.md frontmatter from its skill directories (see the README). Each new
+setting. The OpenHands SDK's skill loader at
+`fcc102a697874d54a357e36004e02c95040dbdc0` reads skill directories, SKILL.md
+frontmatter and its own installed-skill enable state, never Claude Code settings
+(see the README). Each new
 test failed before its fix; [validation](validation.json) retains the returned
 summaries. No independent model review was run for this round.
 
