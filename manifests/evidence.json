@@ -40438,8 +40438,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "7683e067b2931d60e42ba8f886bb61823d182bc693924093a7d3cef6429a8362",
-      "bytes": 71049
+      "sha256": "9b57474988bb213ec212504524599bd90865f071501ecb94ba1c0facf16f01d0",
+      "bytes": 76186
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -40678,8 +40678,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "471309cea9fb2cf3088dcb6a1bb9b401009294f5fd20d91b635e4e7640244e44",
-      "bytes": 80259
+      "sha256": "1a787dbb70892a9194ddf058533d11d7ad7d488b1358a17382ffbd0e1272b84c",
+      "bytes": 81906
     },
     {
       "path": "tools/sota-convergence/README.md",
@@ -40828,8 +40828,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "8281bcc79f76dcaf7427b76429613cd45597d990e747f49a917d3dae9c93d261",
-      "bytes": 9569
+      "sha256": "e95afe885137aabc4d39c7c42b6da6f7e70fcbfe9fd7988d776670a64cc1331f",
+      "bytes": 11480
     },
     {
       "path": "tools/sota-convergence/reconciliations-20260922.json",
