@@ -981,11 +981,19 @@ Residuals this amendment does not resolve:
 * No automatic compaction at the new B or C triggers has been observed in an
   arm. F4 comes from historical host sessions, relayed rather than replayed.
 * The four F4 events from sessions launched before the switch (618,371–922,073)
-  are unattributed. The relayed description says those sessions still ran the
-  default window; if so, an A child could auto-compact below 870,300 and
-  invalidate the run. The competing explanation is the superseded record's
-  classification of the coordinator's 902,612 event as a transition
-  observation. A's band is not widened.
+  are classified by the coordinator as **transition events**, not default-window
+  triggers. The [environment-variables documentation](https://code.claude.com/docs/en/env-vars#in-settings-files)
+  (read 2026-09-27) says a running session applies new and changed settings
+  `env` values when the file is saved, and that removing one does not unset it
+  until relaunch. Those sessions therefore took 400000 at 18:59Z, and a request
+  whose context already exceeded the ~367,000 trigger compacted at its
+  then-current size. The superseded record's 902,612 coordinator event is the
+  recorded instance, and no automatic event before the key was added fired
+  below 966,908. A's band stays [870,300, 1,000,000]. Every arm excludes user
+  settings with `--setting-sources project`, and the per-arm readback blocks a
+  changed host condition, so a user-settings save during the pilot cannot
+  change an arm's window. Residual: each event's timing (the session's first
+  request after the save) was not re-checked.
 * The removal instant is unknown (file mtime only), and sessions started before
   it still carry 400000.
 * F5 is undocumented, and it disagrees with the docs on whether the output

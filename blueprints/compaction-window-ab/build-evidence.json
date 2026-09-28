@@ -576,6 +576,13 @@
       "The removal instant is unknown (file mtime only), and sessions started before it still carry 400000.",
       "F5 is undocumented and disagrees with env-vars.md on whether the output reserve is capped; the protocol relies on neither beyond requiring the key absent."
     ],
+    "coordinator_ruling_f4_pre_switch_events": {
+      "ruling": "The four events (618371..922073) are transition events, not default-window triggers; A's band stays [870300, 1000000].",
+      "basis": "env-vars.md (read 2026-09-27): a running session applies new and changed settings env values when the file is saved, and removing one does not unset it until relaunch. No automatic event before the key was added fired below 966908, and the superseded host record's 902612 coordinator event is the recorded transition instance.",
+      "not_checked": "Each event's timing (the session's first request after the save) was not re-checked; the coordinator did not scan host transcripts.",
+      "files": ["blueprints/compaction-window-ab/preregistration.json", "blueprints/compaction-window-ab/PREREGISTRATION.md", "tests/test_compaction_window_ab_preregistration.py"],
+      "checks_after": "python3 -m unittest tests.test_compaction_window_ab_preregistration: Ran 21 tests, OK; both JSON files load; git diff --check clean."
+    },
     "remaining_gates": [
       "Coordinator re-registration of the four changed files in manifests/evidence.json and a validator rerun",
       "Every earlier native readiness gate: per-arm settings/coordinator/child readback, Workflow treatment, collector attributes, retry and TTL instruments, lag/reserve/cancellation, wall bounds, executable Inspect adapters and offline-suite readiness"

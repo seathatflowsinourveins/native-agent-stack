@@ -361,8 +361,10 @@
         "min": 618371,
         "max": 922073,
         "relayed_description": "Sessions launched before the switch, which still ran the default window.",
-        "attribution_status": "unresolved_residual",
-        "residual": "618371 lies below A's lower bound 870300. If these sessions compacted under the default window, an A focal child could auto-compact below 870300 and invalidate the run. The superseded host-condition record classified the coordinator's 902612 event after 18:59Z as a transition observation, which is the competing explanation. Not resolved here, and A's band is not widened."
+        "attribution_status": "transition_documented_mechanism",
+        "attribution": "Coordinator ruling, 2026-09-27: these are transition events, not default-window triggers. The environment-variables documentation (read 2026-09-27) says a running session applies new and changed settings env values when the file is saved, and that removing one does not unset it until relaunch. Sessions launched with the default window therefore took 400000 at 18:59Z, and a request whose context already exceeded the ~367000 trigger compacted at its then-current size. Every automatic event before the key was added fired at 966908..971662, and the superseded host record's 902612 coordinator event is the recorded instance of this transition. A's band stays [870300, 1000000].",
+        "arm_consequence": "Every arm uses --setting-sources project, which excludes user settings, and the per-arm readback blocks a changed host condition, so a user-settings save during the pilot cannot change an arm's window.",
+        "residual": "The per-event timing (each event on the session's first request after the save) was not re-checked; the classification rests on the documented mechanism and the relayed values."
       },
       "before_key_added": {"min": 966908, "max": 971662, "scope": "Every automatic event before the switch, as relayed."},
       "evidence_class": "Peer value-level transcript extraction relayed by the coordinator: historical host sessions, not arm launches, readiness qualification or a replay by this builder.",
@@ -1216,7 +1218,7 @@
     "Eight full executable adapters still need hashes and Inspect 0.3.271 native controls; fixed 97-module readiness and budget feasibility are unobserved.",
     "Three repetitions remain exploratory; an independently preregistered confirmatory cohort is required before any persistent host change to B or C.",
     "The 33k autocompact buffer is a /context display observation on 2.1.283. No automatic compaction at the amended B or C triggers has been observed in an arm, and a client change can move the buffer.",
-    "Four relayed events (618371..922073) from sessions launched before the key was added remain unattributed; whether a default-window child can auto-compact below A's 870300 bound is unresolved."
+    "Four relayed events (618371..922073) from sessions launched before the key was added are classified as transition events by the documented live application of saved settings env values; their per-event timing was not re-checked."
   ],
   "oracle_framework": {
     "package": "inspect-ai==0.3.271",

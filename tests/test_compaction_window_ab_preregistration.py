@@ -611,7 +611,12 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
                          (31, 366209, 368563, 432724))
         default = events["before_key_added"]
         self.assertEqual((default["min"], default["max"]), (966908, 971662))
-        self.assertEqual(events["pre_switch_launched_sessions"]["attribution_status"], "unresolved_residual")
+        transition = events["pre_switch_launched_sessions"]
+        self.assertEqual(transition["attribution_status"], "transition_documented_mechanism")
+        self.assertIn("applies new and changed settings env values when the file is saved", transition["attribution"])
+        self.assertIn("--setting-sources project", transition["arm_consequence"])
+        self.assertLess(transition["max"], default["min"],
+                        "a transition event at or above the lowest default-window trigger would need its own attribution")
         bands = self.bands(spec)
         arms = bands["arms"]
         members = {
