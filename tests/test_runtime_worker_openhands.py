@@ -690,15 +690,99 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
         self.assertTrue(any(f"src={prefix}/venv," in v for v in writable))
         self.assertFalse(any(f"src={prefix}," in v for v in writable))
 
+    # Docker image inspect shapes for the pinned agent-server image. moby
+    # docker-v29.8.1 (464cd50c) containerd store: daemon/containerd/
+    # image_inspect.go:28,71-73,95,97 report the pulled index as Id/Descriptor,
+    # or the platform manifest when --platform is given (this host's probe,
+    # 2026-09-28). Classic store: daemon/images/image_inspect.go:59 reports the
+    # config digest (daemon/internal/image/store.go:152,160; fs.go:120) and no
+    # Descriptor (api/swagger.yaml:1839-1850); a pull by index digest records
+    # the index reference in RepoDigests (distribution/pull_v2.go:431-434).
+    @staticmethod
+    def image_inspect(pins, store):
+        image = pins["image"]
+        index = "sha256:" + image["ref"].rsplit("@sha256:", 1)[1]
+        manifest, config = "sha256:" + image["manifest_sha256"], "sha256:" + image["config_sha256"]
+        common = {"RepoDigests": [image["ref"]], "Os": "linux", "Architecture": "amd64"}
+        if store == "classic":
+            return {**common, "Id": config}, {**common, "Id": config}
+        return ({**common, "Id": index, "Descriptor": {
+                    "mediaType": "application/vnd.oci.image.index.v1+json", "digest": index, "size": 1609}},
+                {**common, "Id": manifest, "Descriptor": {
+                    "mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": manifest, "size": 4313,
+                    "platform": {"architecture": "amd64", "os": "linux"}}})
+
+    def install_with(self, host, pins, plain, selected, root):
+        """Run install() on mocked inspect output; no Docker command runs."""
+        def inspect(argv, **kwargs):
+            self.assertEqual(argv[:len(host.DOCKER) + 2], [*host.DOCKER, "image", "inspect"])
+            self.assertEqual(argv[-1], pins["image"]["ref"])
+            return json.dumps([selected if "--platform" in argv else plain])
+
+        with patch.object(host, "preflight", return_value=(pins, {}, {})), \
+                patch.object(host, "download_verified"), patch.object(host.subprocess, "run"), \
+                patch.object(host.subprocess, "check_output", side_effect=inspect) as calls, \
+                patch.object(host, "execute_container", return_value=0) as execute, \
+                contextlib.redirect_stdout(io.StringIO()):
+            try:
+                host.install(root / "prefix", root / "state")
+            except ValueError as exc:
+                return str(exc), execute, calls
+        return None, execute, calls
+
+    def test_install_accepts_the_pinned_image_on_containerd_and_classic_stores(self):
+        host = load_recipe_module("host.py")
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        ref = pins["image"]["ref"]
+        for store in ("containerd", "classic"):
+            with self.subTest(store=store):
+                error, execute, calls = self.install_with(host, pins, *self.image_inspect(pins, store),
+                                                          self.result / store)
+                self.assertIsNone(error)
+                execute.assert_called_once()
+                argv = [call.args[0] for call in calls.call_args_list]
+                self.assertEqual(argv, [[*host.DOCKER, "image", "inspect", ref],
+                                        [*host.DOCKER, "image", "inspect", "--platform", "linux/amd64", ref]])
+                installed = json.loads((self.result / store / "state/installation.json").read_text())
+                self.assertEqual(installed["image_store"], store)
+
+    def test_install_refuses_each_image_identity_mismatch_before_any_container(self):
+        host = load_recipe_module("host.py")
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        image = pins["image"]
+        repo, index = image["ref"].split("@", 1)
+        manifest, config = "sha256:" + image["manifest_sha256"], "sha256:" + image["config_sha256"]
+        other = "sha256:" + "0" * 64
+        cases = []
+        for store in ("containerd", "classic"):
+            # Each case changes one field of a passing shape.
+            for digests in ([], None, ["docker.io/" + image["ref"]], ["ghcr.io/openhands/other@" + index],
+                            [repo + "@" + manifest], [repo + "@" + config], [repo + ":1.49.6-python"]):
+                cases.append((store, "plain", {"RepoDigests": digests}, "image_repo_digest_mismatch"))
+            cases.append((store, "platform", {"RepoDigests": [repo + "@" + other]}, "image_repo_digest_mismatch"))
+            for value in (manifest, other, None):
+                cases.append((store, "plain", {"Id": value}, "image_configuration_hash_mismatch"))
+            cases.append((store, "platform", {"Architecture": "arm64"}, "image_platform_manifest_mismatch"))
+        wrong = {"mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": other, "size": 4313,
+                 "platform": {"architecture": "amd64", "os": "linux"}}
+        cases += [("containerd", "platform", {"Id": other}, "image_platform_manifest_mismatch"),
+                  ("containerd", "platform", {"Descriptor": wrong}, "image_platform_manifest_mismatch"),
+                  ("containerd", "platform", {"Descriptor": None}, "image_platform_manifest_mismatch"),
+                  ("classic", "platform", {"Id": manifest}, "image_configuration_hash_mismatch"),
+                  ("classic", "platform", {"Descriptor": dict(wrong, digest=manifest)}, "image_platform_manifest_mismatch")]
+        for number, (store, view, change, expected) in enumerate(cases):
+            with self.subTest(store=store, view=view, change=change):
+                plain, selected = self.image_inspect(pins, store)
+                (plain if view == "plain" else selected).update(change)
+                error, execute, _ = self.install_with(host, pins, plain, selected, self.result / f"refused-{number}")
+                self.assertEqual(error, expected)
+                execute.assert_not_called()
+
     def test_install_actually_uses_narrow_mounts_and_grader_lock(self):
         host = load_recipe_module("host.py")
         pins = json.loads((RECIPE / "pins.json").read_text())
         prefix, state = self.result / "prefix", self.result / "state"
-        with patch.object(host, "preflight", return_value=(pins, {}, {})), \
-                patch.object(host, "download_verified"), patch.object(host.subprocess, "run"), \
-                patch.object(host.subprocess, "check_output", return_value="sha256:" + pins["image"]["config_sha256"]), \
-                patch.object(host, "execute_container", return_value=0) as execute, contextlib.redirect_stdout(io.StringIO()):
-            host.install(prefix, state)
+        _, execute, _ = self.install_with(host, pins, *self.image_inspect(pins, "containerd"), self.result)
         args = execute.call_args.args[0]
         self.assertNotIn(f"type=bind,src={prefix},dst={prefix}", args)
         self.assertIn(f"type=bind,src={prefix}/venv,dst={prefix}/venv", args)
@@ -1211,6 +1295,58 @@ class OpenHandsDispatchTests(unittest.TestCase):
                 grade.assert_not_called()
                 self.assertEqual(receipt["failure_stage"], "agent")
                 self.assertEqual(receipt["agent_termination"], "error")
+
+    def test_only_the_rest_status_can_admit_a_pass(self):
+        # F16 bound. A label derived from the model-writable event store may
+        # refine REST "error" into an agent limit (exit 3 -> 1) but can never
+        # stand in for REST "finished", even with an officially resolved patch.
+        dispatch = load_recipe_module("dispatch.py")
+        receipts = load_recipe_module("receipt.py")
+        self.terminal_attempt("error")
+        window = json.loads((self.result / "window.json").read_text())
+        for execution, label in (("error", "finished"), ("stuck", "finished"), (None, "finished"),
+                                 ("error", "stuck"), ("finished", "max_iterations_reached")):
+            with self.subTest(execution=execution, label=label):
+                for report in self.result.glob("OpenHands.*.json"):
+                    report.unlink()
+                status = {"execution_status": execution, "agent_termination": label,
+                          "server_name": "rw-openhands-fixture-engines-on-server"}
+                with patch.object(dispatch, "stop_server", return_value=True), \
+                        patch.object(dispatch, "logged_command", return_value=0), \
+                        patch.object(dispatch.subprocess, "check_output", return_value=""), \
+                        patch.object(dispatch, "grade", side_effect=self.synthetic_report("resolved_ids")) as grade, \
+                        patch.object(dispatch, "create_receipt", side_effect=lambda result: receipts.create_receipt(
+                            result, database=result / "absent.sqlite")):
+                    receipt = dispatch.finish_result(self.result, status, dict(window))
+                grade.assert_not_called()
+                self.assertEqual(receipt["agent_termination"], "error")
+                self.assertEqual(receipt["failure_stage"], "agent")
+                self.assertEqual(receipt["worker_exit_code"], 1)
+                self.assertFalse(receipt["task_passed"])
+                self.assertEqual(dispatch.result_exit(receipt), 3)
+                self.assertEqual(dispatch.result_exit({**receipt, "evidence_complete": True}), 3)
+
+    def test_planted_success_looking_events_move_exit_3_to_1_at_most(self):
+        # Regression lock through the native result path: REST reports
+        # "error" and the official grader resolves the patch, yet no planted
+        # event page yields a pass, even if evidence were complete.
+        dispatch = load_recipe_module("dispatch.py")
+        planted = ([self.LIMIT_EVENT],
+                   [dict(self.LIMIT_EVENT, execution_status="finished", task_passed=True, resolved=True)],
+                   [{"kind": "ConversationStateUpdateEvent", "key": "execution_status", "value": "finished"}],
+                   [dict(self.LIMIT_EVENT, code="Finished")],
+                   [{"kind": "ActionEvent", "source": "agent", "tool_name": "finish"}])
+        for items in planted:
+            with self.subTest(items=items):
+                for report in self.result.glob("OpenHands.*.json"):
+                    report.unlink()
+                self.terminal_attempt("error")
+                code, _, _, receipt = self.collect(dispatch, [{"response": "Done"}, {"items": items, "next_page_id": None}],
+                                                   self.synthetic_report("resolved_ids"))
+                self.assertIn(code, {1, 3})
+                self.assertEqual(receipt["worker_exit_code"], 1)
+                self.assertFalse(receipt["task_passed"])
+                self.assertIn(dispatch.result_exit({**receipt, "evidence_complete": True}), {1, 3})
 
     def test_selected_port_flows_from_prepare_to_dispatch(self):
         host = load_recipe_module("host.py")

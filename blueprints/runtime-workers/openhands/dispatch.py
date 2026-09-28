@@ -23,6 +23,11 @@ from receipt import create_receipt, read_bounded
 
 
 TERMINAL = {"finished", "error", "stuck"}
+# F16 bound: a termination label is kept only as a refinement of the REST
+# execution_status. The event-store label can turn "error" into an agent limit
+# (exit 3 -> 1) but never stands in for "finished", the only route to exit 0.
+PERMITTED_TERMINATIONS = {"finished": {"finished"}, "stuck": {"stuck"},
+                          "error": {"error", "max_iterations_reached"}}
 # Latest ConversationErrorEvent only. SDK@fcc102a event_router.py:68-139 serves
 # the page; event_service.py:456-460 matches kind on the module-qualified class
 # name; models.py:95-99 defines TIMESTAMP_DESC.
@@ -155,8 +160,10 @@ def stop_server(result, status):
 
 def finish_result(result, status, window):
     removed = stop_server(result, status)
-    termination = status.get("agent_termination") or status.get("execution_status")
-    if termination not in {"finished", "error", *AGENT_LIMITS}:
+    execution = status.get("execution_status")
+    termination = status.get("agent_termination") or execution
+    permitted = PERMITTED_TERMINATIONS.get(execution, set()) if isinstance(execution, str) else set()
+    if not isinstance(termination, str) or termination not in permitted:
         termination = "error"
     window["agent_termination"] = termination
     window["worker_exit_code"] = 0 if termination == "finished" else 1

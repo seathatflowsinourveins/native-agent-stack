@@ -73,6 +73,42 @@ host's containerd image store, `docker image inspect` reports the index digest
 as the image ID, so the receipt verifies the platform manifest and config
 digests instead.
 
+`install()` checks the pulled image on either Docker image store before any
+container starts. It runs two inspects, one plain and one with
+`--platform linux/amd64`. The primary check is that both list the exact pinned
+reference in `.RepoDigests`; otherwise it raises `image_repo_digest_mismatch`.
+The plain `.Id` must then be the index digest (containerd store) or the config
+digest (classic store); any other value is refused with
+`image_configuration_hash_mismatch`. A wrong platform manifest raises
+`image_platform_manifest_mismatch`. `installation.json` records the store.
+
+| Check | containerd image store | Classic store |
+| --- | --- | --- |
+| Plain `.Id` | index `sha256:02ef66fd...` | config `sha256:39426d8c...` |
+| Platform `.Id` | manifest `sha256:ec7ed86f...` | config `sha256:39426d8c...` |
+| Platform `.Descriptor.digest` | manifest `sha256:ec7ed86f...` | absent |
+| Config digest | not reported; bound by the content-addressed manifest, as in the scan receipt | checked as `.Id` |
+| Platform manifest | checked | not retained; the pinned index names it |
+
+Sources: moby docker-v29.8.1 (464cd50c, the engine commit this host reports)
+`daemon/containerd/image_inspect.go:28,71-73,95,97` for the containerd store.
+For the classic store: `daemon/images/image_inspect.go:59`,
+`daemon/images/image.go:160-197`, `daemon/internal/image/store.go:152,160`
+and `daemon/internal/image/fs.go:120`. A classic pull by index digest verifies
+the index and the selected platform manifest, then records the pinned index
+reference in RepoDigests
+(`daemon/internal/distribution/pull_v2.go:431-434,705-747,845-867`). Inspect
+with `--platform` needs Engine API v1.49 or later
+(`api/docs/CHANGELOG.md:175-180`). The moby client at the same tag refuses the
+option below that version (`client/image_inspect.go:33-36`), so an older daemon
+fails the install before any container starts. The Engine API reference still
+describes `Id` as the config digest (`api/swagger.yaml:1826-1850`). The earlier
+config-only check followed that description, so it would have refused the
+pinned pull on this host. Docker's containerd image-store page says that store
+is the default for fresh Engine 29 installations (docker/docs@3c117d8e
+`content/manuals/engine/storage/containerd.md:11-14`). It does not describe
+image IDs, so the moby source is the citation here.
+
 [install.sh](install.sh) installs the worker through the existing hash-required
 wheel/runtime locks and preinstalled hashed build tools. The install container
 can write only the worker venv and owned cache; the recipe snapshot is mounted
@@ -164,7 +200,12 @@ Set these private inputs outside all worktrees:
   that variable. It parses Docker's env-file syntax for the name only and never
   extracts, prints or logs the value (docker/cli@v29.8.1
   `pkg/kvfile/kvfile.go:92-124`). A bare name, which Docker would fill from the
-  caller's environment, is refused. The server listens on every container
+  caller's environment, is refused. An empty value (`OH_SESSION_API_KEYS_0=`)
+  still passes. This residual follows from never reading values. SDK@fcc102a
+  `openhands-agent-server/openhands/agent_server/env_parser.py:183-197` then
+  yields a key list holding one empty string, so the server treats
+  authentication as enabled (`__main__.py:30-48`). The coordinator must write a
+  non-empty key for each attempt. The server listens on every container
   interface only when a session key is set (SDK@fcc102a
   `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
   `config.py:24`).
@@ -241,9 +282,33 @@ event through the native search route while the server still runs
 `event_service.py:456-460`, `models.py:95-99`). Only exactly that kind, source
 and code counts as `max_iterations_reached`; any other error stays ungraded and
 exits 3. The receipt records `agent_termination`, and an agent-limit end exits 1
-even when its partial patch resolves the task. The event store is writable by
-the model's UID, so this server-reported value only chooses between exit 1 and 3
-and can never produce a pass.
+even when its partial patch resolves the task.
+
+`finish_result` keeps a termination label only if it refines the REST
+`execution_status`. `finished` stays `finished`, `stuck` stays `stuck`, and
+`error` may become `max_iterations_reached`. Any other pairing becomes an
+ungraded `error`. Only REST `finished` can set `worker_exit_code` 0, so exit 0
+never depends on the event store.
+
+**Residual (F16).** The error-event page is not independent evidence. The
+model's terminal runs as the server's user (SDK@fcc102a
+`openhands-tools/openhands/tools/terminal/terminal/subprocess_terminal.py:157-170`).
+The server serves events from files in the conversation store, reads them back
+and rebuilds a stale index from disk
+(`openhands-sdk/openhands/sdk/conversation/event_store.py:144-169,320-362`,
+`openhands-agent-server/openhands/agent_server/event_service.py:420-431`). A
+planted `MaxIterationsReached` event can therefore turn an ungraded native
+error (exit 3) into a graded agent-limit end (exit 1). No planted event can
+reach exit 0. Tests cover both the 3-to-1 move and planted success-looking
+events. Treating every `error` as exit 3 would remove this move. It would also
+label every honest iteration-limit run an infrastructure failure, a systematic
+bias larger than this bounded forgery.
+
+**Analysis rule.** Every A/B or acceptance tally counts exit 1 and exit 3 alike
+as non-success, and a rerun policy may re-queue only exit 3. A forged 3-to-1
+move therefore cannot improve an arm's success rate; at most it suppresses a
+rerun.
+A receipt with `upstream_resolved: true` that exited 1 is not a success.
 
 | Final exit code | Meaning |
 | --- | --- |

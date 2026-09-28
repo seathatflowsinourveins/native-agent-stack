@@ -376,13 +376,19 @@ at fcc102a; paths are abbreviated below and given in full in README.md.
 | The server env file was not checked for the session key. Without one the server binds only its container loopback (`__main__.py:282-285`, `config.py:24`). | Preflight parses the file's variable names with Docker's env-file rules (docker/cli@v29.8.1 `pkg/kvfile/kvfile.go:92-124`) and requires `OH_SESSION_API_KEYS_0`. Values are never extracted, printed or logged. |
 | The published port was fixed at 3730, which PR #428's crawl4ai recipe also uses by default. | `--port` accepts integers in 3730..3799, as PR #428's `host.py:44-45` does at 3ad8ba2. The default stays 3730 and the resolver uses 3740. The port is stored in status.json and checked again by dispatch. |
 
-Open findings from this phase, not changed here:
+A follow-up commit applied the coordinator's decisions of 2026-09-28. Red and
+green runs are in
+[evidence/phase1-followup-commands.json](evidence/phase1-followup-commands.json).
 
-- `install()` compares `docker image inspect` `.Id` with the config digest
-  (host.py:419-421). The reference host's containerd image store reports the
-  index digest as `.Id` (see the scan receipt), so `install()` there would raise
-  `image_configuration_hash_mismatch`. This is inferred from the code and the
-  observed `.Id`; installation was not run.
+| Item | Decision and source |
+| --- | --- |
+| F16 forgery bound | The newest-`ConversationErrorEvent` design stays. The strict alternative, exit 3 for every `error`, would label every honest iteration-limit run an infrastructure failure. `dispatch.py` `PERMITTED_TERMINATIONS` keeps a label only as a refinement of the REST status, so exit 0 requires REST `finished`. A planted event can move exit 3 to 1 and no further. The README states the residual and the analysis rule: exit 1 and exit 3 are both non-success, and reruns re-queue only exit 3. |
+| `install()` image identity, open after phase 1 | Fixed. Both a plain and a `--platform linux/amd64` inspect must list the exact pinned ref in `.RepoDigests`. The plain `.Id` must be the index digest (containerd store) or the config digest (classic store). On containerd the platform `.Id` and `.Descriptor.digest` must be manifest `ec7ed86f...`; on classic the platform `.Id` must be the config and no descriptor may appear. Sources: moby docker-v29.8.1@464cd50c `daemon/containerd/image_inspect.go:28,71-73,95,97`; `daemon/images/image_inspect.go:59`, `daemon/images/image.go:160-197`, `daemon/internal/image/store.go:152,160`, `daemon/internal/image/fs.go:120`, `daemon/internal/distribution/pull_v2.go:431-434,705-747,845-867`; `api/swagger.yaml:1826-1850`. Inspect with `--platform` needs Engine API v1.49 (`api/docs/CHANGELOG.md:175-180`). On the containerd store no field reports the config digest. That covers inspect, history (`daemon/containerd/image_history.go:113-115`) and the manifest summary (`api/swagger.yaml:8216-8335`). The content-addressed platform manifest binds the config there. The Docker containerd image-store page (docker/docs@3c117d8e `content/manuals/engine/storage/containerd.md`) does not describe image IDs. |
+| Empty `OH_SESSION_API_KEYS_0=` value | Documented residual, because preflight never reads values. SDK@fcc102a `env_parser.py:183-197` turns it into a one-item list holding an empty string, and `__main__.py:30-48` then treats authentication as enabled. |
+| Unused `run_worker`, `record_event`, `observations()` | Kept, because references remain: `worker.py:202,232`, and `observations` is used in `tests/test_runtime_worker_openhands.py`. |
+
+Open finding from this phase, not changed here:
+
 - The module-qualified event kind string is source-reviewed only. If the live
   server used a different kind, the agent-limit check would fail closed to
   exit 3.

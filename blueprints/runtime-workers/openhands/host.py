@@ -408,6 +408,51 @@ def download_verified(artifact, target):
     temporary.replace(target)
 
 
+def pinned_image_identity(image):
+    """Check the pulled image on the containerd or the classic image store.
+
+    moby docker-v29.8.1 (464cd50c). containerd store: daemon/containerd/
+    image_inspect.go:28,71-73,95,97 report the pulled index as Id and
+    Descriptor, or the platform manifest when --platform is given. Classic
+    store: daemon/images/image_inspect.go:59 reports the config digest
+    (daemon/internal/image/store.go:152,160; fs.go:120) and no Descriptor
+    (api/swagger.yaml:1839-1850); its pull by index digest verifies the
+    platform manifest and records the index reference in RepoDigests
+    (daemon/internal/distribution/pull_v2.go:431-434,705-747,845-867). The
+    containerd store reports no config digest; there the content-addressed
+    platform manifest binds it.
+    """
+    ref, platform = image["ref"], image["platform"]
+    index = "sha256:" + ref.rsplit("@sha256:", 1)[1]
+    manifest, config = "sha256:" + image["manifest_sha256"], "sha256:" + image["config_sha256"]
+    views = []
+    for extra in ([], ["--platform", platform]):
+        found = json.loads(subprocess.check_output(DOCKER + ["image", "inspect", *extra, ref], text=True, timeout=30))
+        if not isinstance(found, list) or len(found) != 1 or not isinstance(found[0], dict):
+            raise ValueError("image_configuration_hash_mismatch")
+        views.append(found[0])
+    plain, selected = views
+    # Primary check: the daemon recorded the exact pinned repository digest.
+    if any(ref not in (view.get("RepoDigests") or []) for view in views):
+        raise ValueError("image_repo_digest_mismatch")
+    image_id = plain.get("Id")
+    store = "containerd" if image_id == index else "classic" if image_id == config else None
+    if store is None:
+        raise ValueError("image_configuration_hash_mismatch")
+    if f"{selected.get('Os')}/{selected.get('Architecture')}" != platform:
+        raise ValueError("image_platform_manifest_mismatch")
+    descriptor = selected.get("Descriptor")
+    if store == "containerd":
+        if (selected.get("Id") != manifest or not isinstance(descriptor, dict)
+                or descriptor.get("digest") != manifest):
+            raise ValueError("image_platform_manifest_mismatch")
+    elif selected.get("Id") != config:
+        raise ValueError("image_configuration_hash_mismatch")
+    elif descriptor is not None:
+        raise ValueError("image_platform_manifest_mismatch")
+    return store
+
+
 def install(prefix, state):
     pins, _, _ = preflight(prefix, state)
     for directory in (prefix, prefix / "venv", state, state / "cache"):
@@ -416,9 +461,7 @@ def install(prefix, state):
     download_verified(pins["source_archive"], state / "cache/upstream.tar.gz")
     download_verified(pins["uv_lock"], state / "cache/upstream.uv.lock")
     subprocess.run(DOCKER + ["pull", "--platform", pins["image"]["platform"], pins["image"]["ref"]], check=True)
-    image_id = subprocess.check_output(DOCKER + ["image", "inspect", "--format", "{{.Id}}", pins["image"]["ref"]], text=True).strip()
-    if image_id != "sha256:" + pins["image"]["config_sha256"]:
-        raise ValueError("image_configuration_hash_mismatch")
+    image_store = pinned_image_identity(pins["image"])
     # A reviewable snapshot, with no repository metadata or host configuration.
     if HERE.resolve() != (prefix / "recipe").resolve():
         shutil.copytree(HERE, prefix / "recipe", dirs_exist_ok=True,
@@ -431,6 +474,7 @@ def install(prefix, state):
     attempt = Path(tempfile.mkdtemp(prefix="attempt-", dir=state / "install-attempts"))
     code = execute_container(args, name, attempt / "install.log", 900)
     write_json(state / "installation.json", {"version": pins["version"], "image": pins["image"]["ref"],
+                                            "image_store": image_store,
                                             "requirements_sha256": pins["requirements_sha256"], "exit_code": code})
     if code:
         raise RuntimeError("container_install_failed_see_private_install_log")
