@@ -129,7 +129,7 @@
     "blueprints/runtime-workers/skills/manifest.json": "fe4ea42aecb969a48c7aeb2a67b52f13f5361ed494ec28fa7d34cdd861583c1b",
     "blueprints/runtime-workers/skills/README.md": "1f54c2127b79ed9eaa2ddbe81902cb24c44671205553a3a9760cce163f8d1577",
     ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
-    "docs/harness-defaults.md": "6679275b4d00dd041a58063ca6a90715836a76c1a16bb0e7b9b3eccf94a933e9",
+    "docs/harness-defaults.md": "d7b0261a33ebb14fcf643d122f2dc31783a667ebcf42dcf33900adb13a431130",
     "adoption/skills/manifest.json": "056fa8744df94a6b33ff14583a95b3140047cd8a5d44525459ae1b08dfffd90f"
   },
   "repair_r1_research": {
@@ -159,7 +159,8 @@
   },
   "repair_r2": {
     "base_head": "534af74f",
-    "main_base": "3058b237",
+    "main_base": "8d8f79cd",
+    "main_base_history": "Repair r2 failed first and was fixed on main 3058b237 (fail_first and R2-1 to R2-6). Main then moved to 8d8f79cd (#460), and the branch was rebased onto it: only manifests/evidence.json conflicted, main's side was taken at each stop, and the PR's 13 registered files were re-registered at the tip. 298e5b30 and 882fc6fd became 0f164b2f and 12611122; 534af74f, which only re-registered files, became empty and was dropped. The checks below ran on the rebased tree.",
     "coordinator_direction": "Option (b): exclude security-audit, because runtime workers must not bypass a gate set on main; derive the reused skills' gates from main when the manifest is read.",
     "adoption_contract": {
       "main_adoption_skills": 29,
@@ -183,7 +184,7 @@
     "source_check": "The inspected skill.py blob 134e64051c19dc92ccfd3fde4076b41371f6d869 matched gh api contents at fcc102a697874d54a357e36004e02c95040dbdc0 and at da28c7736ea667ceae51cf3a3b9b37ab5f528f22.",
     "fixture_boundary": "Installer CLI subprocess against the checked-in adoption manifest and synthetic runtime entries, plus the structural contract over the real runtime manifest. Not a native skills run or worker acceptance.",
     "publication_integrity": "scripts/validate.py and scripts/host_receipts.py validate run after the manifests/evidence.json re-registration that follows this file's last edit; their results are reported with the commit, not recorded here.",
-    "independent_review": "None run for repair r2. A same-session advisor review after the 298e5b30 push found the wording and citation issues recorded as R2-6; it is not an independent review.",
+    "independent_review": "None run for repair r2. A same-session advisor review after the 298e5b30 push (rebased as 0f164b2f) found the wording and citation issues recorded as R2-6; it is not an independent review.",
     "environment": {
       "TMPDIR": "temporary directory under /var/tmp; removed after checks",
       "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run, so no stale bytecode was read"
@@ -275,7 +276,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_double_claims_restated_gates_and_bare_exclusions tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_print_codex_config_disables_every_reused_skill_main_disables tests.test_install_skills.ReuseRefGateTests tests.test_install_skills.ProjectInstallTests.test_only_naming_a_pruned_skill_reports_it_as_pruned_not_unknown",
       "exit_code": 0,
-      "returned_excerpt": "Ran 9 tests in 0.226s\n\nOK",
+      "returned_excerpt": "Ran 9 tests in 0.217s\n\nOK",
       "tests": 9,
       "kind": "repair-r2 fail-first tests after the fix"
     },
@@ -283,7 +284,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_install_skills tests.test_runtime_worker_skills tests.test_workflow_security_coverage",
       "exit_code": 0,
-      "returned_excerpt": "Ran 67 tests in 8.930s\n\nOK",
+      "returned_excerpt": "Ran 67 tests in 8.566s\n\nOK",
       "tests": 67,
       "kind": "repair-r2 full local integration and structural checks",
       "limitation": "Fake CLI/gh and structural contracts; not a native skills run, upstream acceptance or model activation."
@@ -292,7 +293,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_blind_checkout",
       "exit_code": 0,
-      "returned_excerpt": "Ran 40 tests in 23.207s\n\nOK",
+      "returned_excerpt": "Ran 40 tests in 23.073s\n\nOK",
       "tests": 40,
       "kind": "repair-r2 blueprint label classification and export checks"
     },
@@ -300,7 +301,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_pre_push_gate",
       "exit_code": 0,
-      "returned_excerpt": "Ran 16 tests in 26.528s\n\nOK",
+      "returned_excerpt": "Ran 16 tests in 26.254s\n\nOK",
       "tests": 16,
       "kind": "repair-r2 pre-push registry gate checks"
     },
@@ -308,7 +309,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_adoption_docs_consistency",
       "exit_code": 0,
-      "returned_excerpt": "Ran 37 tests in 9.164s\n\nOK (skipped=1)",
+      "returned_excerpt": "Ran 37 tests in 8.860s\n\nOK (skipped=1)",
       "tests": 37,
       "kind": "repair-r2 reader of docs/harness-defaults.md",
       "limitation": "The skip reports that no profile's coverage differs between the pinned release and HEAD."
@@ -317,7 +318,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_ecosystem_manifest",
       "exit_code": 0,
-      "returned_excerpt": "Ran 56 tests in 12.136s\n\nOK",
+      "returned_excerpt": "Ran 56 tests in 12.608s\n\nOK",
       "tests": 56,
       "kind": "repair-r2 reader of docs/harness-defaults.md"
     },
@@ -325,7 +326,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_install_claude_profile",
       "exit_code": 0,
-      "returned_excerpt": "Ran 58 tests in 0.248s\n\nOK (skipped=3)",
+      "returned_excerpt": "Ran 58 tests in 0.246s\n\nOK (skipped=3)",
       "tests": 58,
       "kind": "repair-r2 reader of docs/harness-defaults.md",
       "limitation": "The three skips report that PyYAML is not installed on this host."
@@ -334,7 +335,7 @@
       "round": "repair-r2",
       "command": "python3 -m unittest -v tests.test_token_e2e_preregistration",
       "exit_code": 0,
-      "returned_excerpt": "Ran 33 tests in 0.626s\n\nOK",
+      "returned_excerpt": "Ran 33 tests in 0.613s\n\nOK",
       "tests": 33,
       "kind": "repair-r2 reader of docs/harness-defaults.md"
     },
@@ -534,7 +535,7 @@
     {
       "id": "R2-6",
       "severity": "minor",
-      "finding": "After the 298e5b30 push, a same-session advisor review found that the README said OpenHands withholds a skill from the model only through SKILL.md disable-model-invocation and research.md said the SDK reads only SKILL.md frontmatter, although load_user_skills also loads OpenHands' own enabled installed skills; the available_skills citation was off by one line; and the exclusion's overturn treated any claude_listing other than name-only as a promotion.",
+      "finding": "After the 298e5b30 push (rebased as 0f164b2f), a same-session advisor review found that the README said OpenHands withholds a skill from the model only through SKILL.md disable-model-invocation and research.md said the SDK reads only SKILL.md frontmatter, although load_user_skills also loads OpenHands' own enabled installed skills; the available_skills citation was off by one line; and the exclusion's overturn treated any claude_listing other than name-only as a promotion.",
       "disposition": "fixed",
       "resolution": "The README and research.md now say the loader reads skill directories, SKILL.md frontmatter and OpenHands' installed-skill enable state, never Claude Code settings or a skillOverrides key. The citation is lines 183-186, and user directories cite lines 936-973. The overturn names a promotion as codex_enabled true or claude_listing on; any other change to main's gate fails the same test and needs a new review.",
       "sources": [

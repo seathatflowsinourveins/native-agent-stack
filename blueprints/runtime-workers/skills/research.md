@@ -112,7 +112,8 @@ E2E runs were not executed.
 
 ## 2026-09-28 rebase: main's gated skill and the reused gates
 
-The branch was rebased onto main `3058b237`. Main's #448 (`8315274f`) had added
+The branch was rebased onto main `3058b237`, and after the repair onto `8d8f79cd`
+(#460), where only `manifests/evidence.json` conflicted. Main's #448 (`8315274f`) had added
 a 29th adoption skill, `security-audit` from `cloudflare/security-audit-skill`,
 with Codex disabled and a name-only Claude listing pending the M5c bake-off
 against `/security-review`. The coordinator chose to exclude it rather than reuse
