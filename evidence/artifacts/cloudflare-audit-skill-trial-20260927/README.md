@@ -8,6 +8,12 @@ Context Mode `ctx_execute`. `ctx_fetch_and_index` is not granted to this worker,
 fetched with `fetch()` in `ctx_execute`. Raw bytes stayed outside the checkout. Only their size,
 sha256 and quoted lines are here, in [`delta.json`](delta.json).
 
+A review repair round ran from about 03:05Z to 03:17Z on 2026-09-28 (UTC), still 2026-09-27 on the
+host. It read again the pinned `SKILL.md` (same sha256) and `report-schema.json` (same size as the
+tree listing), the settings reference, the sandboxing page and the Trust Hub audit page (each the
+same bytes and sha256 as the first read), and read `claude plugin eval --help` from the local
+Claude Code 2.1.283. `delta.json` `quoted_passages` and `repair_round` hold what it added.
+
 The decision and its reasoning are in the
 [2026-09-27 addendum](../../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-27-security-audit-trial-row-stale-upstream-flags-sandbox-gate).
 Nothing was installed and no host setting changed.
@@ -23,7 +29,7 @@ Nothing was installed and no host setting changed.
 | Issue #20 | Open. Filed by an account with no association to the repository. n = 3 per arm, one target. Precision median 90%. Quick profile median $29.95 vs single-agent $2.06, with equal median recall (0.467). The author ran a competing pipeline and names no commit. | upstream-unchanged (weak third-party report) |
 | `openai/skills` | `main`'s HEAD is still `49f948f` (2026-06-24T02:36:12Z), our pin. 0 commits on `main` since 2026-06-29. Flagged: the next verdict wave fields a challenger for `security-best-practices` (kept) and `security-threat-model` (trial). | upstream-unchanged |
 | `praetorian-inc/noseyparker` | Archived 2026-04-24T16:25:50Z; last release v0.24.0 (2025-05-08). README: "Nosey Parker is now Replaced by Titus. Nosey Parker is Officially Retired". No current catalog names it. The 2026-09-26 dated sweep records and the append-only saturation ledger carry it as a `secrets-credentials` survivor, so the correction is in the addendum. | upstream-unchanged |
-| Sandbox gate | Foundation open gate `claude-code-sandbox-profile` added (owner: foundation coordinator; re-check 2026-10-11). | our-integration |
+| Sandbox gate | Foundation open gate `claude-code-sandbox-profile` added (owner: foundation coordinator; re-check 2026-10-11). Its measurement list carries the deferral's three controls, including the `credentials.files` deny for the store (a `sandbox.credentials.files` entry with mode `deny`); a credentials arm that reads a store file through `~/` and through its absolute path; and a separate `strictAllowlist` arm. `adoption/manifest.json` lists it in `continuation.next_action_refs`. | our-integration |
 
 ## Changes in this branch
 
@@ -39,7 +45,12 @@ Nothing was installed and no host setting changed.
   `worker-cancellation-crash-resume` (`accepted_within_scope`). That row's scope sentence is the
   `evidence_scope` of decision `native-child-interruption-recovery` verbatim, so no claim is lost;
   the other two rows are untouched. `checked_at` stays 2026-09-21, because the validator ties it to
-  `decisions.json` and no decision was re-checked.
+  `decisions.json` and no decision was re-checked. The gap's `source_paths` add
+  `docs/secret-storage.md` and `docs/harness-rules-convergence-20260922.md` (PS-1).
+- `adoption/manifest.json`: `continuation.next_action_refs` lists `claude-code-sandbox-profile`, as it
+  listed each open foundation gate before (`d17b3cff` and `49c094d9` changed the two lists together).
+  `tests/test_adoption_contract.py` checks only that the list is a subset, so no test fails without
+  it; the listing rests on that precedent.
 - `manifests/evidence.json`: hashes for every changed listed file and this receipt.
 
 ## Checks (our-integration)
@@ -76,11 +87,24 @@ Module results, from `python3 -m unittest`:
 40-hex tree SHA. The cause was the key name, not a credential. The key was renamed, with no
 allowlist and no `--no-verify`, and the rerun found no leaks (`checks.failed_attempts`).
 
+**Repair round** (`checks.repair_round`, our-integration):
+
+- `scripts/validate.py` before registering the five changed files: exit 1, with SHA-256 and
+  byte-count mismatches on exactly those files. After registration: exit 0, 7,375 hashed files.
+- `scripts/validate_foundation.py`: exit 0.
+- The nine modules above: exit 0 with the same counts. `test_install_claude_profile` with the cached
+  PyYAML: 58 tests OK.
+- `component_matrix.py --write` and `new_host_grand_list.py --write` changed no tracked file.
+- Quote checks (local integration): each new quote matched its source when read again, and every
+  quoted passage in the addendum (31) and in this README (8) is in `delta.json`.
+- The `next_action_refs` listing has no failing control, because `tests/test_adoption_contract.py`
+  checks only that the list is a subset of the open gates.
+
 ## Not done here (live-run-pending)
 
 - The skill install, the settings apply, the Codex disable table and the host read-back belong to
-  the coordinator. The order matters: install before the `name-only` override and the Codex table
-  are live, and every session lists the full description until they are.
+  the coordinator. If the skill is installed before the `name-only` override and the Codex table are
+  live, every session lists its full description until they are, so apply both first.
 - M5b's unchanged upstream `node --test` at the pin, the labelled fixture and the budget.
 - M5c is queued behind Gate A and Gate B.
 - The sandbox profile measurement, due for re-check 2026-10-11.
@@ -113,6 +137,14 @@ gh api repos/cloudflare/security-audit-skill/issues/20
 curl -s 'https://add-skill.vercel.sh/audit?source=cloudflare%2Fsecurity-audit-skill&skills=security-audit'
 gh api 'repos/openai/skills/commits?sha=main&since=2026-06-29T00:00:00Z&per_page=100' --jq length
 gh api graphql -f query='{repository(owner:"praetorian-inc",name:"noseyparker"){isArchived archivedAt latestRelease{tagName publishedAt}}}'
+# repair round: quoted skill and schema lines, sandbox docs, native eval help
+gh api -H 'Accept: application/vnd.github.raw' 'repos/cloudflare/security-audit-skill/contents/skills/security-audit/SKILL.md?ref=c1c8a8c1471069fb0e188eeaff69b8e8db6564a8' | sed -n '12p;21p;24p;40p;60p;82p;172p;175p'
+gh api -H 'Accept: application/vnd.github.raw' 'repos/cloudflare/security-audit-skill/contents/skills/security-audit/report-schema.json?ref=c1c8a8c1471069fb0e188eeaff69b8e8db6564a8' | sed -n '12p;252p;369p'
+curl -s https://code.claude.com/docs/en/sandboxing.md | sed -n '299p;525p'
+curl -s https://code.claude.com/docs/en/settings-reference.md | sed -n '2176p;2188p;2587p'
+claude plugin eval --help
 python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.test_skills_status
+python3 -m unittest tests.test_foundation_catalog tests.test_adoption_contract
+python3 scripts/validate_foundation.py
 python3 scripts/validate.py
 ```

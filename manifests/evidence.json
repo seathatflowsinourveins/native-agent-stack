@@ -3622,8 +3622,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "d367e5acb6c8c111cda46ed1b916a4088c255fe3f51b26a35a4e4627b1c6b3d7",
-      "bytes": 19275
+      "sha256": "a0c1177befa8cb9b2ffabe63c6bc0adb9a7dcf3bf54a21d0a9f61281790fa121",
+      "bytes": 19316
     },
     {
       "path": "adoption/paired/README.md",
@@ -13183,8 +13183,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "9020be36d326ccfe58b0fd1904f028b2ed10e31994ad6b2a80ac41177c3f60bc",
-      "bytes": 24112
+      "sha256": "1091fc250065d7756a0a27174ee44d2884ea56cbfb79a7bafdcab0d180f8f8aa",
+      "bytes": 25179
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -13808,8 +13808,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "33a39f40b2a146e966fd1cad56e9a2d29018ce75a89443a359a7b6955b3658a6",
-      "bytes": 54011
+      "sha256": "6c1eb6448090de49b8da708d0329dc0c9bf5ab61553245c4118854640ca4be8c",
+      "bytes": 57658
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -15053,13 +15053,13 @@
     },
     {
       "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
-      "sha256": "f4773ef546ac47584eb5e58c255bb810a7b2b3fbf43a884fcc3041ac64212e34",
-      "bytes": 9522
+      "sha256": "a54b62839c16c524e1f71061410f52d126f543935d063e10184275270c82d21e",
+      "bytes": 12503
     },
     {
       "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
-      "sha256": "729ccf8735de8393edb661c8121f779a99d911e2ba04dbc7d0f66b95437865ab",
-      "bytes": 24543
+      "sha256": "3bd2064f3ca276c90420c247a6689c271c1365dab503b105ca95b5d8cb3cb0fe",
+      "bytes": 39180
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",

@@ -5,7 +5,10 @@
  "observed_utc": {
   "first": "2026-09-28T02:03:02Z",
   "last": "2026-09-28T02:17:07Z",
-  "host_date_note": "02:03Z to 02:18Z on 2026-09-28 UTC is the evening of 2026-09-27 on the host (EDT)"
+  "host_date_note": "02:03Z to 02:18Z on 2026-09-28 UTC is the evening of 2026-09-27 on the host (EDT)",
+  "repair_round_first": "2026-09-28T03:05Z (Context Mode index time of the first repair-round fetch, minute precision)",
+  "repair_round_last": "2026-09-28T03:17:14Z (the last verification re-fetch of the settings reference and sandboxing pages; quoting reads ended by 03:12:12Z)",
+  "repair_round_host_date_note": "still 2026-09-27 on the host (EDT)"
  },
  "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
  "base_commit": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
@@ -15,7 +18,8 @@
   "jq": "1.7",
   "python": "3.13.15",
   "pyyaml": "6.0.3 (already present in the host's uv cache; nothing downloaded or installed)",
-  "node_fetch_runtime": "v24.21.0 (Context Mode ctx_execute)"
+  "node_fetch_runtime": "v24.21.0 (Context Mode ctx_execute)",
+  "claude_code": "2.1.283 (claude --version; repair round, read for claude plugin eval --help only)"
  },
  "method": {
   "github": "gh api (REST): repos/<repo>, commits/<sha|branch>, git/trees/<sha>?recursive=1, contents/<path>?ref=<sha>, license?ref=<sha>, issues/20 and its comments, releases/latest; gh api graphql for archivedAt",
@@ -122,12 +126,14 @@
     "label": "Pass",
     "audited": "Sep 15, 2026",
     "risk_level": "SAFE",
+    "risk_level_rendered_note": "the quoted 'Risk Level: SAFE' is the page's rendered text (markup 'Risk Level: <!-- -->SAFE'), quoted in the repair round from a re-fetch with the same bytes and sha256",
     "categories": [
      "COMMAND_EXECUTION",
      "DYNAMIC_EXECUTION",
      "INDIRECT_PROMPT_INJECTION"
     ],
     "quoted": [
+     "Risk Level: SAFE",
      "The skill executes local Node.js scripts ( validate-findings.cjs and validate-coverage-ledger.cjs ) during the workflow's structured output phase.",
      "The skill is designed to ingest and analyze untrusted third-party source code, which could contain instructions meant to influence the agent's auditing logic."
     ]
@@ -265,7 +271,15 @@
    "bytes": 454604,
    "sha256": "19fc12a219077c947744ba81977f1d3559d8b2ab36ac975de754aaef49e00117",
    "L4168": "* `\"name-only\"`: Claude sees the skill by name without its description",
-   "L4169": "* `\"user-invocable-only\"`: Claude doesn't see the skill, but you can still type `/name`"
+   "L4169": "* `\"user-invocable-only\"`: Claude doesn't see the skill, but you can still type `/name`",
+   "repair_round_reread": "same bytes and sha256 on the repair-round fetch; the lines below were quoted then as whole raw lines. The first read's quotes above drop leading indentation; the repair round re-checked each as a substring of its stated line",
+   "L2174": "### `sandbox.credentials`",
+   "L2176": "Declare the credential files and environment variables to [protect from sandboxed commands](/docs/en/sandboxing#protect-credentials). Each entry names a file `path` or a variable `name` and a `mode`: `deny` hides the credential inside the sandbox, and `mask` shows sandboxed commands a placeholder while the [sandbox proxy](/docs/en/sandboxing#mask-credentials) substitutes the real value on outbound requests. Claude Code protects only the entries you list; there is no built-in credential deny list.",
+   "L2180": "* **Default**: unset, so no credentials are protected",
+   "L2188": "      \"files\": [{ \"path\": \"~/.aws/credentials\", \"mode\": \"deny\" }],",
+   "L2580": "### `sandbox.network.strictAllowlist`",
+   "L2584": "* **Scope**: [`User or managed`](#scopes). A repository can't turn it on or off.",
+   "L2587": "  * `false`: unless another trusted settings file sets `true`, Claude Code decides a host outside the allowlist by permission mode instead of denying it outright: in auto mode it checks the host against the command's [per-command allowed domains](/docs/en/sandboxing#per-command-allowed-domains-in-auto-mode), in `dontAsk` mode it denies, in `bypassPermissions` mode and in interactive terminal plan-mode sessions where bypass is available it allows, and otherwise it asks you"
   },
   "sandboxing": {
    "url": "https://code.claude.com/docs/en/sandboxing.md",
@@ -275,8 +289,77 @@
    "L62": "By default, if the sandbox cannot start because dependencies are missing or the platform is unsupported, Claude Code shows a warning and runs commands without sandboxing. To make this a hard failure instead, set [`sandbox.failIfUnavailable`](/docs/en/settings-reference#sandbox-failifunavailable) to `true`.",
    "L67_70_summary": "Linux and WSL2 dependencies: bubblewrap and socat (L69-L70)",
    "L98": "To check whether your environment enforces this restriction, including inside WSL2, run `sysctl kernel.apparmor_restrict_unprivileged_userns`.",
-   "L122": "On WSL2, WSL hands a launch of a Windows binary such as `cmd.exe`, `powershell.exe`, or anything under `/mnt/c/` to the Windows host over a Unix socket, so whether a sandboxed command can launch one follows the sandbox's [Unix-socket settings](/docs/en/settings-reference#sandbox-network-allowunixsockets): the optional seccomp filter has to be installed to block the socket in the first place."
+   "L122": "On WSL2, WSL hands a launch of a Windows binary such as `cmd.exe`, `powershell.exe`, or anything under `/mnt/c/` to the Windows host over a Unix socket, so whether a sandboxed command can launch one follows the sandbox's [Unix-socket settings](/docs/en/settings-reference#sandbox-network-allowunixsockets): the optional seccomp filter has to be installed to block the socket in the first place.",
+   "repair_round_reread": "same bytes and sha256 on the repair-round fetch; the lines below were quoted then as whole raw lines. The first read's quotes above drop leading indentation or quote part of a line; the repair round re-checked each as a substring of its stated line",
+   "L295": "### Protect credentials",
+   "L299": "For entries with `\"mode\": \"deny\"`, file paths are denied for reads inside the sandbox, the same restriction that `filesystem.denyRead` applies, and environment variables are unset before each sandboxed command runs. The file protection is part of the filesystem layer, so it doesn't apply if you [disable filesystem isolation](#disable-filesystem-isolation); the environment variable protection still does.",
+   "L310": "        { \"path\": \"~/.ssh\", \"mode\": \"deny\" }",
+   "L525": "* **Strict allowlist**: if you set [`strictAllowlist`](/docs/en/settings-reference#sandbox-network-strictallowlist) to `true` in user, managed, or CLI `--settings` settings, Claude Code denies sandboxed commands access to any host outside the allowlist instead of prompting. The allowlist is the same one the sandbox otherwise prompts against: `allowedDomains` plus domains from `WebFetch(domain:...)` allow rules, or only the managed settings entries when `allowManagedDomainsOnly` is set. Claude Code enforces this for sandboxed commands only; in-process tools such as `WebFetch` still follow their [permission rules](#permission-rules). Setting it in a repository's `.claude/settings.json` or `.claude/settings.local.json` has no effect. Requires Claude Code v2.1.219 or later."
+  },
+  "plugin_eval_help": {
+   "command": "claude plugin eval --help",
+   "claude_code": "2.1.283",
+   "exit": 0,
+   "bytes": 6172,
+   "sha256": "6cda0b4f2264d4f2429cd95b9989de6ea393038af067101a639857b01dd1dc70",
+   "L1": "Usage: claude plugin eval [options] [command] [target]",
+   "L15_L18": "--ablation <mode>         Run a no-plugin baseline arm and report the score delta (none | with-without; default: with-without whenever a plugin resolves — by name, or from the target path — and none when nothing does; under",
+   "L40_L42": "--json [path]             Print the full run result (prompts, graders, per-run scores) as JSON to stdout, or write it to this .json file",
+   "L43": "--judge-model <model>     Override LLM-grader model (default: haiku)",
+   "L59": "--model <model>           Override model for all cases",
+   "L60_L61": "--no-publish              Keep the HTML report local only; skip publishing it to claude.ai",
+   "joining": "wrapped help lines are joined with one space and their leading indentation dropped"
   }
+ },
+ "quoted_passages": {
+  "read": "repair round, gh api -H 'Accept: application/vnd.github.raw' contents/<file>?ref=c1c8a8c1471069fb0e188eeaff69b8e8db6564a8; line numbers are 1-based lines of the raw file",
+  "skill_md": {
+   "file": "skills/security-audit/SKILL.md",
+   "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+   "bytes": 22026,
+   "sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+   "blob_sha1": "92178dad304d3f63e37582a297026a7874e12c62",
+   "L12": "This skill is guidance by default. Loading it does not authorize the complete audit workflow or file creation.",
+   "L21": "This skill is agent-neutral:",
+   "L24": "- **Task tool** is the platform's delegation or sub-agent mechanism.",
+   "L40_last_sentence": "If every control cannot be enforced, do not execute target code: report the missing sandbox capability as a needs-validation blocker and give a safe validation plan.",
+   "L60": "- `coverage-ledger.json`",
+   "L82": "[HUNTING.md](HUNTING.md) and [VALIDATION-AND-REPORTING.md](VALIDATION-AND-REPORTING.md) carry this procedure as one identical fenced block for hunter and verifier prompts; it states the same rules in the same order as this list.",
+   "L172": "1. **Reconnaissance** — map the source, trust boundaries, local build paths, companion selections, prior evidence, and initial deterministic coverage ledger with [RECONNAISSANCE.md](RECONNAISSANCE.md).",
+   "L175": "4. **Structured output** — write all final `confirmed`, `needs_validation`, and `rejected` records to `findings.json`; validate it with `report-schema.json` and `validate-findings.cjs`, and validate the coverage claim with `validate-coverage-ledger.cjs`."
+  },
+  "report_schema": {
+   "file": "skills/security-audit/report-schema.json",
+   "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+   "bytes": 14494,
+   "sha256": "6575c9de4a62255699ea052ebf9a49ebfb373a32891bcd89af6f55cc84b35519",
+   "blob_sha1": "55815a3687a45fff63d8ebf20068611bd6ad6d9a",
+   "blob_sha1_matches_contents_api": true,
+   "L10": "\"verdict\": {",
+   "L12": "\"const\": \"confirmed\"",
+   "L250": "\"verdict\": {",
+   "L252": "\"const\": \"needs_validation\"",
+   "L367": "\"verdict\": {",
+   "L369": "\"const\": \"rejected\"",
+   "indentation": "leading spaces dropped"
+  },
+  "repository_at_base": {
+   "catalogs/landscape/native-practice.json:148": {
+    "sha256": "9b15860a6b24060eba318e712bee9e1f5e0d124d72a4fba15d6021c9645ab0d6",
+    "quoted": "The skill is not a full security audit or an instruction to review every ordinary coding task."
+   },
+   "scripts/saturation_ledger.py:8": {
+    "sha256": "fbb11a10f831b50d3320c81f134ae64f418ae9e448b213bdaebd7489dda5ec6c",
+    "quoted": "Editing, reordering or deleting a record breaks the chain."
+   },
+   "docs/decisions/2026-09-24-community-sweep.md:253": {
+    "quoted": "`claude plugin eval` is named in M9 but not qualified."
+   },
+   "docs/decisions/2026-09-24-community-sweep.md:178": {
+    "quoted": "Use deterministic `tool_used: Skill` graders or blind-judge on stripped packets, with `--judge-model` pinned to a model other than Haiku."
+   }
+  },
+  "used_by": "the 2026-09-27 addendum's gap, wiring, sandbox and M5c text and this receipt's README"
  },
  "stale_upstreams": {
   "openai/skills": {
@@ -351,16 +434,36 @@
   },
   "checked_at_unchanged": "catalogs/foundation/manifest.json checked_at stays 2026-09-21: validate_foundation.py requires decisions.json checked_at to equal it, and no decision was re-checked; 1c32ad22 (2026-09-27) edited the manifest the same way",
   "deferral_source": "docs/decisions/2026-09-24-secret-storage.md lines 91-95",
+  "deferral_quoted": {
+   "docs/decisions/2026-09-24-secret-storage.md:91-92": "The only OS-level floor is the Claude Code sandbox (`sandbox.enabled`, `allowUnsandboxedCommands: false`, `credentials.files` deny).",
+   "docs/secret-storage.md:1171-1172": "A measured Claude Code sandbox profile (`sandbox.enabled`, `allowUnsandboxedCommands: false`, `credentials.files` deny for the store,",
+   "docs/secret-storage.md:29": "defines `<store>`, the per-provider credential directory; this receipt names it only as <store>"
+  },
   "measurements": [
    "sandbox.enabled true",
    "sandbox.failIfUnavailable true",
    "allowUnsandboxedCommands false",
+   "credentials.files deny for the store (deferral): a sandbox.credentials.files entry with mode deny for <store> (settings reference L2176, L2188)",
+   "credentials arm: with filesystem isolation on (sandboxing L299), a sandboxed read of a store file fails through a ~/ path and through its absolute path",
    "host check: bubblewrap, socat, kernel.apparmor_restrict_unprivileged_userns",
    "writes outside the owned worktree fail",
    "/mnt/c Windows-binary launches fail",
    "network allowlist, gh, git push, codex and the paper runner (deferral)",
+   "separate network arm: sandbox.network.strictAllowlist true through CLI --settings (sandboxing L525); a sandboxed request to a host outside the allowlist is denied. Without it, bypassPermissions mode allows such a host (settings reference L2587)",
    "sandboxed commands cannot reach the user systemd bus (deferral)"
   ],
+  "extra_arms_source": "a 2026-09-27 peer practice sweep (credentials arm through ~/ and absolute paths; separate strictAllowlist arm; permission mode stays the user's decision), checked against the settings reference and sandboxing lines in native_docs",
+  "permission_mode_source": "docs/harness-rules-convergence-20260922.md:88 (PS-1): \"rejected for this profile on 2026-09-22 by user decision (frictionless native practice: the ungated user profile stays)\"",
+  "adoption_next_action_refs": {
+   "file": "adoption/manifest.json",
+   "path": "continuation.next_action_refs",
+   "before": [],
+   "after": [
+    "claude-code-sandbox-profile"
+   ],
+   "precedent": "d17b3cff (2026-09-20) removed worker-cancellation-crash-resume from next_action_refs when its gate closed and kept offhost-keys-and-service-reboot, then the foundation catalog's only open gate; 49c094d9 (2026-09-20) emptied next_action_refs when that gate closed and open_gates became []",
+   "check": "tests/test_adoption_contract.py:73 asserts only that next_action_refs is a subset of the foundation open_gates ids, so no test fails without this listing; precedent check only, no red-to-green control"
+  },
   "owner": "foundation coordinator",
   "recheck": "2026-10-11",
   "pressure_evidence": "each M5 run's missing-sandbox needs_validation blocker"
@@ -523,6 +626,60 @@
    "component_matrix --write": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
    "new_host_grand_list --write": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
    "tracked_changes": "none (both regenerated reports were already current)"
+  },
+  "repair_round": {
+   "evidence_class": "our-integration (structural checks of this repository; no install, host change or model run)",
+   "findings_applied": [
+    "sandbox gate: the deferral's credentials.files deny for the store added to next_action and sandbox_gate.measurements, with a credentials arm and a separate strictAllowlist arm; docs/secret-storage.md and docs/harness-rules-convergence-20260922.md added to source_paths",
+    "adoption/manifest.json continuation.next_action_refs lists claude-code-sandbox-profile (precedent check only)",
+    "quoted_passages records the SKILL.md, report-schema.json and repository quotes; the addendum's completeness sentence now names what delta.json records",
+    "README ordering sentence under Not done here rewritten as a conditional",
+    "M5c harness list gains the claude plugin eval candidate with its judge and resolved-model constraints"
+   ],
+   "validate_pre_registration": {
+    "exit": 1,
+    "errors": [
+     "adoption/manifest.json: SHA-256 mismatch",
+     "adoption/manifest.json: byte count mismatch",
+     "catalogs/foundation/manifest.json: SHA-256 mismatch",
+     "catalogs/foundation/manifest.json: byte count mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: SHA-256 mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: byte count mismatch"
+    ]
+   },
+   "registration": "scripts/host_receipts.py register_file on the five changed files; manifests/evidence.json changed 10 lines (their sha256 and bytes)",
+   "validate": {
+    "exit": 0,
+    "result": "{\"components\": 69, \"hashed_files\": 7375, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}"
+   },
+   "validate_foundation": {
+    "exit": 0,
+    "result": "FOUNDATION catalog valid: layers=20, decisions=54, foundation_components=61, domain_components=7, evidence_receipts=84, candidates=3"
+   },
+   "tests": {
+    "test_skills_manifest": "exit 0, Ran 21 tests, OK",
+    "test_install_skills": "exit 0, Ran 19 tests, OK",
+    "test_skills_status": "exit 0, Ran 43 tests, OK",
+    "test_install_claude_profile": "exit 0, Ran 58 tests, OK (skipped=3)",
+    "test_install_claude_profile_pyyaml": "exit 0, Ran 58 tests, OK",
+    "test_render_config": "exit 0, Ran 25 tests, OK",
+    "test_foundation_catalog": "exit 0, Ran 18 tests, OK",
+    "test_adoption_contract": "exit 0, Ran 12 tests, OK",
+    "test_apply_claude_settings": "exit 0, Ran 23 tests, OK",
+    "test_ecosystem_manifest": "exit 0, Ran 56 tests, OK"
+   },
+   "reports": {
+    "component_matrix --write": "exit 0, {\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
+    "new_host_grand_list --write": "exit 0, {\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
+    "tracked_changes": "none"
+   },
+   "quote_source_check": "local integration: each new quote re-read from its source. SKILL.md and report-schema.json at the pin, the saved help output and repository files at the base: 34 comparisons (hashes, lines, joins), 0 failed. The settings reference and sandboxing pages, re-fetched: both sha256 and sizes matched; the 11 new whole-line quotes and the first read's L58 matched exactly. The first read's L4168, L4169, L62, L98 and L122 quotes match as substrings of their stated lines, with indentation dropped",
+   "quote_coverage_check": "local integration: every straight-quoted passage of six or more characters in the 2026-09-27 addendum, this receipt's README and the gate text (fenced code excluded) must appear in delta.json after whitespace normalization, emphasis removal and splitting at '...'. Result: addendum 31 quoted, 0 missing; README 8 quoted, 0 missing; gate text 0 quoted",
+   "not_a_control": "tests/test_adoption_contract.py checks only that next_action_refs is a subset of the open gate ids, so the new listing has no failing control"
   }
  }
 }

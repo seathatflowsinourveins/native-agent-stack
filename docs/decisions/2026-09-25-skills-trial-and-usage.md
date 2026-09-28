@@ -497,10 +497,16 @@ D3 constraint, narrowed rather than reversed).
 
 ## Addendum 2026-09-27: security-audit trial row, stale-upstream flags, sandbox gate
 
-Evidence: [`evidence/artifacts/cloudflare-audit-skill-trial-20260927/`](../../evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md)
-(`delta.json` holds every source, commit, page hash and quoted line cited here). The upstream reads
-ran on 2026-09-28 between 02:03Z and 02:18Z (UTC), which is the evening of 2026-09-27 on the host
-(EDT); dates below are host dates.
+Evidence: [`evidence/artifacts/cloudflare-audit-skill-trial-20260927/`](../../evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md).
+`delta.json` records the pin and its file hashes, each fetched page's size and sha256, and every
+passage quoted here with its file or URL and line (`quoted_passages` holds the skill, schema and
+repository quotes). Repository mechanics cited without a quote are read at the base commit. The
+upstream reads ran on 2026-09-28 between 02:03Z and 02:18Z (UTC), which is the evening of
+2026-09-27 on the host (EDT). A review repair round read again, between about 03:05Z and 03:17Z,
+the pinned `SKILL.md` (same sha256), `report-schema.json` (same size as the tree listing), the
+settings reference, the sandboxing page and the Trust Hub audit page (each the same bytes and
+sha256), and read the local `claude plugin eval --help` (Claude Code 2.1.283). Dates below are
+host dates.
 
 **Decided by** the user on 2026-09-27: no user invocation; the skill runs through LLM-native
 automation (workflow stages), with the full trial, and the bake-off only if it proves suitable,
@@ -630,10 +636,46 @@ If any fails, record the reason and move the row to watch.
 - Harnesses, all upstream: skill-creator's paired with-skill/without-skill benchmark, Harbor for
   native transcripts, and scipy `bootstrap`/`permutation_test` for the statistics. No self-written
   scorer.
+- A native paired candidate runs beside skill-creator's benchmark. It comes from a 2026-09-27 peer
+  practice sweep and from [M9 of the 2026-09-24 community sweep](2026-09-24-community-sweep.md#keep-but-compare):
+  `claude plugin eval --ablation with-without --model claude-opus-5-5 --judge-model <model> --no-publish --json <path>`.
+  - The judge must not be Haiku. The help (Claude Code 2.1.283) says "Override LLM-grader model
+    (default: haiku)", so `--judge-model` must name another model.
+  - Record the resolved model from the `--json` result. If the result does not name it, record that
+    gap.
+  - The help ties the baseline arm to a plugin: "default: with-without whenever a plugin resolves —
+    by name, or from the target path — and none when nothing does". This skill installs through the
+    skills CLI, not as a plugin, so the `--json` result must show that the no-plugin baseline arm
+    ran, or the arm does not count. The 2026-09-24 sweep lists `claude plugin eval` as "named in M9
+    but not qualified".
 - Scores: recall at equal false positives; precision and decoy hits; complete provider usage,
   including failed attempts; wall time.
 - Promote only if the skill beats `/security-review` on recall at equal false positives. Otherwise,
   exclude it with the numbers and keep the method as a cited reference.
+
+**M6: sandbox open gate.** The foundation open gate `claude-code-sandbox-profile` in
+`catalogs/foundation/manifest.json` carries the whole measurement list:
+
+- the deferral's three controls ([2026-09-24 secret storage](2026-09-24-secret-storage.md), lines
+  91-95): `sandbox.enabled`, `allowUnsandboxedCommands: false`, and the `credentials.files` deny.
+  In current settings that deny is a `sandbox.credentials.files` entry with mode `deny` for the
+  store;
+- `failIfUnavailable`, the host check, and the refusals of writes outside the worktree and of
+  `/mnt/c` launches;
+- a credentials arm: with filesystem isolation on, a sandboxed read of a store file fails through a
+  `~/` path and through its absolute path. The sandboxing page says "The file protection is part of
+  the filesystem layer", so the deny does not apply when filesystem isolation is off;
+- a separate `strictAllowlist` arm. With it false, the settings reference leaves a host outside the
+  allowlist to the permission mode, and "in `bypassPermissions` mode and in interactive terminal
+  plan-mode sessions where bypass is available it allows" it. The ungated permission profile stays
+  by user decision (PS-1 in `docs/harness-rules-convergence-20260922.md`);
+- the deferral's gh, git push, codex, paper-runner and systemd-bus items.
+
+The two extra arms come from a 2026-09-27 peer practice sweep. `adoption/manifest.json` now lists
+the gate in `continuation.next_action_refs`, as it listed each open foundation gate before
+(`d17b3cff` and `49c094d9` kept the two lists together), so a resumed task or a new host meets it at
+the entry point. `tests/test_adoption_contract.py` checks only that the list is a subset of the open
+gates, so this listing rests on that precedent, not on a failing test.
 
 **Trial exit and overturn.**
 
@@ -680,5 +722,7 @@ If any fails, record the reason and move the row to watch.
 | Pin identity, tree, `SKILL.md` hash, license, quoted upstream and docs text | upstream-unchanged | `gh api` and page reads at the pin; proves identity and wording, not behavior |
 | skills.sh labels, audit pages, audit API | upstream-unchanged (independent observation) | Another platform's 2026-09-15 scan; not this repository's behavior |
 | Issue #20 numbers | upstream-unchanged (third-party report, weak) | One seeded target, n = 3, an interested author |
+| `claude plugin eval --help` lines | upstream-unchanged (local native client help, Claude Code 2.1.283) | Wording only; the arm itself is not qualified |
 | Manifest row, template key, foundation gate, tests, `scripts/validate.py` | our-integration | Structural checks, each with a failing control run first |
+| Gate listed in `adoption/manifest.json` `next_action_refs` | our-integration | Precedent check (`d17b3cff`, `49c094d9`); no test fails without it |
 | Install, settings apply, Codex disable, host read-back, M5b, M5c, sandbox measurement | live-run-pending | The coordinator runs them; nothing was installed here |
