@@ -1,0 +1,57 @@
+Review one unpushed pull-request head, read-only, in the current directory (a git worktree). Do not edit, commit,
+install or push anything; the sandbox is read-only. Base: origin/main at `fb14dedf`. The branch has six commits:
+F1/F4 in `AGENTS.md` and X9's second round (both reviewed before), then round 3, the post-rebase edits, the dashboard bound and the
+evidence-manifest registration. Review the new material: `git diff 9e036e7d..HEAD` (0779e91aebd476d8f1c53b3cac705357c66aa657), plus the rebase's
+conflict resolutions in `CLAUDE.md` and `docs/harness-defaults.md` (`git diff origin/main...HEAD -- CLAUDE.md
+docs/harness-defaults.md`).
+
+What the change claims:
+- `CLAUDE.md` lines 3-8 (X9) carry the GPT-6 lane's text, chosen by all four blind adjudications of round 3. Evidence:
+  `evidence/artifacts/prompt-audit-20260927/x9-round3/` (README first) and the decision record
+  `docs/decisions/2026-09-27-prompt-audit-resolution.md`, section "Addendum (2026-09-28): round 3". `main`'s
+  `## Compact Instructions` section (#453) must follow those lines unchanged.
+- `AGENTS.md:3` (X5b) is the operator's 2026-09-28 top-rule paragraph byte for byte
+  (`evidence/artifacts/prompt-audit-20260927/lane-a/round1/user-level-top-rule.txt`, already on main) and
+  `AGENTS.md:37` (S1) tells sessions to build a PR description from `.github/pull_request_template.md`. Both converged
+  in lane A (the record's "Lane A" subsection; lane A's evidence is on main under `lane-a/`).
+- AN-13: `evidence/artifacts/prompt-audit-20260927/an13/` holds the facts of two headless `/doctor prompt-audit` runs
+  (the report text is not published) and each finding's disposition; the record's "AN-13" subsection; a dated
+  anti-pattern row at the end of the log in `docs/harness-defaults.md`.
+- `docs/harness-defaults.md:7` now restates the new top-rule heading (a co-change with X5b).
+- Token counts: `evidence/artifacts/prompt-audit-20260927/controls/token-counts-r3-{f508ffba,base,after}.txt`, cited
+  in the record's Measured results and X9 decision.
+- `observability/grand-dashboard/progress.py`: this branch's registrations take `manifests/evidence.json` past the
+  2,000,000-byte bound the dashboard applied to every source, so the manifest gets its own bound (8,000,000;
+  `SOURCE_MAX_BYTES`) and every other source keeps 2,000,000. `tests/test_grand_dashboard.py` adds a test; receipts
+  `controls/dashboard-bound-{before,after}.txt`; the record's last subsection.
+
+Test behavior, do not only read. Where the sandbox blocks a command (for example a test that needs a writable temp
+directory), say so and use an equivalent read-only computation instead (python3 -B, `sys.dont_write_bytecode`).
+
+1. Texts. Compare `AGENTS.md` line 3 with `lane-a/round1/user-level-top-rule.txt` byte for byte. Check that
+   `CLAUDE.md` is X9's six lines followed by main's Compact Instructions section unchanged, and that the byte, word,
+   line and sha256 values in the token-count files match the files they name (`git show <rev>:<path>` for the named
+   revisions). Run `python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_install_claude_profile` if
+   the sandbox allows it.
+2. Meaning. Would any changed sentence mislead a Claude or Codex session that loads it? Is `docs/harness-defaults.md`
+   line 7 still accurate about `AGENTS.md` and the portable template? Do not propose changing the operator's wording.
+3. Record against evidence. For each factual claim in the round-3 addendum, the Lane A subsection and the AN-13
+   subsection (tallies, confidences, counts, usage, costs, times, exit codes, event counts, agent types, dates), find
+   the retained file that supports it, and report any claim the evidence does not support or contradicts. Recompute
+   round 3's X9 tally from the judges' returns, the mapping and the audit in `x9-round3/judges/`.
+4. Private content. Search the new evidence (x9-round3, an13, the three token-count files) and the record for host
+   paths, a user name, session or thread ids, UUIDs, email addresses, tokens or keys, an installed plugin or skill
+   inventory, and quotations of client configuration or settings values. Placeholders such as `<user>`,
+   `<tmp-root>`, `<session-id>`, `<uuid>` and `~/` are intended; names of settings keys are not values.
+5. Registration. Run `python3 -B scripts/validate.py` if the sandbox allows it, and check that every new or changed
+   file under `evidence/`, `docs/`, `AGENTS.md` and `CLAUDE.md` is registered and that no unrelated manifest entry
+   changed (`git diff origin/main...HEAD -- manifests/evidence.json`).
+6. The new anti-pattern row. Check it against the log's column rules and against `an13/an13-runs.json`.
+7. The dashboard change. Does it keep every other source's bound, the `read(root, relative)` signature the tests
+   patch, and the snapshot's output? Is the new test discriminating (it must fail on main's `progress.py`)? Run
+   `python3 -B -m unittest tests.test_grand_dashboard` if the sandbox allows it.
+
+Return Markdown: first line `VERDICT: agree` or `VERDICT: changes-needed`. Then numbered findings, each with
+severity (blocker / should-fix / nit), file:line, the evidence (command and output, or quoted lines), and the fix.
+Then a short list of the commands you ran with their exit codes. Report only what you verified; mark anything you
+could not check as unchecked.

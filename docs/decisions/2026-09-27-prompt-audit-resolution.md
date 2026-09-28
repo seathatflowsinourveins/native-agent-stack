@@ -18,7 +18,8 @@ The edits land in two pull requests:
 This unit edited no permission text (X8) and no vendored workflow script (X6, X10). F4 rewords one prohibition
 in the trading section of `AGENTS.md` without weakening it: "future experiments must not call it" becomes "no
 experiment may present it", which covers every experiment. Round 1 claimed no change in model behavior. Round 3
-(2026-09-28) measured one, for X9 only, in headless runs.
+(2026-09-28) measured X9's texts in headless runs. Against the line it replaced, the applied text tied on all three
+preregistered metrics; only descriptive counts moved (see the round-3 addendum).
 
 Round 3 decided X9 and took up X5 again as X5a-c, with a new item, S1. It records why the plan's rule not to edit X5
 no longer holds (see the round-3 addendum).
@@ -245,7 +246,10 @@ included.
   block keeps the old line until `tools/adoption/apply_codex_lane.py` is run there again after #458 merges (a dry
   run, then the `--apply` command it prints, with its `--expect-*` hashes). On this workstation it ran after #458
   merged. The dry run planned only the managed `AGENTS.md` block, `--apply` wrote it and read it back, and
-  `tools/adoption/prove_codex_lane.py` passed 7 of 7. Each other host that installed the lane needs its own run.
+  `tools/adoption/prove_codex_lane.py` passed 7 of 7. Those outputs kept no exit codes. A recheck with its exit codes
+  and times found the block in place and passed 7 of 7 again
+  ([`codex-worker-lane-host-20260928/`](../../evidence/artifacts/codex-worker-lane-host-20260928/)). Each other host
+  that installed the lane needs its own run.
 - **X6 and X10:** any change belongs upstream in agent-lab.
 - **F3 and X7:**
   - A verified but stale activity value still refutes a proposal. For example, eslazarev/purged-cross-validation was
@@ -436,7 +440,8 @@ The current line ran as a control, not as a candidate.
 **Runs.** 30 headless runs (2 cases × 3 texts × 5 runs) between 08:14:47 and 08:31:10Z.
 - Client: Claude Code 2.1.283 on `claude-opus-5-5[1m]`. The model was pinned with `--model` and checked in each
   run's init event.
-- Permission mode `bypassPermissions`, at most 10 turns.
+- Permission mode `bypassPermissions`, with `--max-turns 10`. One K5 run's result still reports 11 turns, with
+  subtype `success`.
 - All 30 runs were included. The deterministic graders pass 33 labelled answers written before the first counted run.
 
 | Text | Wrong status | Correct status (K5 + K6) | Non-answers | Named a command | Runs that read settings files | Cost (client's estimate) | o200k tokens |
@@ -463,11 +468,21 @@ The current line ran as a control, not as a candidate.
 **Changed after freezing, before any judge started.** Both files are published twice: a frozen copy with the
 preregistered hash, and the copy as run.
 - **`make_x9_round3.py`.** As first written, it withheld every K5 status sentence, because every K5 run read
-  settings files.
-  - It now withholds a status sentence only when the sentence quotes client configuration or names a settings file.
-  - It still withholds an answer head whenever its run read settings files.
+  settings files. The copy as run differs from the frozen copy in these ways:
+  - It withholds a status sentence only when the sentence quotes client configuration or names a settings file.
+  - It withholds an answer head when its run read settings files, or when the head quotes client configuration or
+    names a settings file. The frozen copy withheld the head and the sentence together and did not test for
+    settings-file names.
   - It adds, for each K5 run, a list of what that run's commands consulted. This list was observed, not
     preregistered.
+  - It cuts each answer head at 200 characters, not 240, and leaves out the status sentence when the head shown
+    starts with it.
+  - It counts each K6 run's server events by kind instead of listing every event.
+  - Its probe descriptions say "in the current line's worktree" where the preregistration says "arm 0".
+  - Its run-conditions line names the setting sources and cuts both values at ", passed" instead of at the first
+    comma.
+  - Two more path rules write scratch-directory paths as `<fixtures>` and `<scratch>`.
+  - It embeds the sources as compact JSON instead of indented JSON.
 - **`check_orders_r3.py`.** It was copied from round 2's revised check, but the copy gained a comma in its clause
   pattern. So it cut per-text clauses at commas and reported a false difference between the two orders.
   - The pattern is now round 2's again.
@@ -480,7 +495,12 @@ The three texts match round 2's published arms byte for byte.
 - The judges were two GPT-6 runner jobs (gpt-6-astra, effort max, read-only) and two `blind-adjudicator` agents, each
   family judging in both orders.
 - `void_patterns_r3.py` was hashed before any return was read. No judgment had a voiding hit, and no judge opened a
-  path outside its input, its packet and the root.
+  path outside its input, its packet and the root. One Claude B/A action in `judge-actions.json` lists `/home`,
+  `/tmp` and `/Users` as outside paths; they come from the pattern of a Grep over the judge's own input.
+- The audit's control ran after review (`judges/audit-control.json`, from `audit_control_r3.py`). On private copies
+  of the four judges' inputs, it reproduced the published verdicts. With one planted access added per judgment, it
+  voided all four: an arm-file read, a web search that names the repository's pull requests, an `mcp__` call and a
+  read of the round-3 results.
 - `isolation-receipt.json` records the steps before dispatch. The GPT-6 judges' first start, at 08:37:36Z, failed
   because their work directory did not exist yet. They started at 08:37:41Z.
 
@@ -496,6 +516,11 @@ The three texts match round 2's published arms byte for byte.
   o200k tokens: from 30 to 96 at `f508ffba`, and from 96 to 162 on `main` at `eb678281` and again at `fb14dedf`, whose
   `CLAUDE.md` also holds #453's `## Compact Instructions` section after these lines (`controls/token-counts-r3-*.txt`).
 - Step 2 was not needed. It would have chosen the same text on correct statuses, 10 to 8.
+- That gap is over the other candidate text. Against the current line, the control, the applied text tied on all
+  three preregistered metrics: 0 wrong statuses, 10 correct and 0 non-answers each. It named a command in 7 runs
+  instead of 10, read settings files in 7 instead of 5, and cost $2.44 instead of $1.98 by the client's estimate.
+  The edit rests on step 1 of the rule and on C1 and C2 (the current line names commands the client refuses to run
+  for the model), not on a measured behavior gain.
 
 The judges' reasons, in brief:
 - **Both families:** the current line names commands the client refuses to run for the model (C1, C2). The two texts
@@ -510,6 +535,9 @@ The judges' reasons, in brief:
   applied text followed Bash reads of the process command line and the fixture's hook state file. A session in
   another permission mode may need approval for those reads.
 - Each text ran 5 times per case. The difference is the output of a decision rule, not a significance claim.
+- The runs used `ba1700ad`'s files: each text as a four-line `CLAUDE.md`, and an `AGENTS.md` without this pull
+  request's F1, F4, X5b and S1. The applied `CLAUDE.md` also holds #453's `## Compact Instructions` section after
+  these lines.
 - The plugin was loaded with `--plugin-dir`, not installed from a marketplace. No MCP server's tools came from the
   discovery cache without a process. The fixture excludes a server that Claude Code restarts successfully (p2).
 - Interactive sessions were not tested. That is the setting where a user can answer a request to run a command. Only
@@ -532,7 +560,8 @@ The judges' reasons, in brief:
 | `stack-researcher` (sources for X9 and lane A) | 85 | 172 | 223,017 | 10,880,165 | 84,381 |
 
 - The four probes cost $1.00 in total by the client's estimate: $0.36, $0.31, $0.28 and $0.05.
-- The two judges and the researcher each made one server-side advisor call.
+- The two Claude judges and the researcher each made one server-side advisor call. The advisor's own model usage is
+  not in these figures.
 
 ### Lane A: S1 and the top rule's three copies
 
@@ -554,9 +583,11 @@ independent lanes: GPT-6 (`gpt-6-astra`, effort max, read-only) through the pack
   this base) on variants of the heading. The GPT-6 lane reports running the workflow's script. The Claude lane reports replicating
   its two lines in Node, a synthetic check, not a CI run.
 - **X5b.** The line is the operator's 2026-09-28 paragraph, byte for byte (`lane-a/round1/user-level-top-rule.txt`).
-  Every obligation of the old line stays, verbatim. "Never self-write without a SOTA source" leaves the heading, while
-  "With no SOTA source, stop and report instead of writing one" keeps its force. No test reads line 3; the
-  consistency tests read the link on line 5 and the dispatch pointer. One co-change follows it:
+  Every sentence of the old line after its heading stays verbatim, and one sentence on compounding is added. The
+  heading changes: "never self-write without a SOTA source" leaves it, while "With no SOTA source, stop and report
+  instead of writing one" keeps that obligation. No test reads line 3: `tests/test_adoption_docs_consistency.py`
+  reads the link on line 5, and `tests/test_install_claude_profile.py` reads the dispatch pointer. One co-change
+  follows it:
   `docs/harness-defaults.md:7` restated the old heading ("research first, and never self-write without a SOTA
   source") and now restates the new one. No test reads that sentence.
 - **X5a and X5c** change `lane:foundation` files, so they land in #458. Its decision record,
@@ -582,8 +613,10 @@ not published, because it quotes the user-level instruction file and names insta
   edited from it:
   - **M1:** the broad trigger of the top rule at `AGENTS.md:3`. It follows the user-level paragraph that X5b copies,
     so it waits for the user's decision on that paragraph (M2).
-  - **M3 and M4:** the other user-level findings are the user's decisions. M4, on a vendored skill, also needs a
-    native before-and-after comparison.
+  - **M3:** a pinned model version in the user-level file, the user's decision.
+  - **M4:** project-side. `.claude/agents/isolated-builder.md:9` preloads the vendored skill it names, so the options
+    are ending the skill's trial or not preloading it there. It is a single-family finding: it needs a second-family
+    lane and the native before-and-after comparison the report describes before any edit.
   - **M5:** `blueprints/convergence-practice/application-delivery/AGENTS.md:15-18`, a single-family candidate. It
     needs a second-family lane before any edit.
   - **The rest:** the low-confidence and plugin findings are recorded flags.
@@ -608,3 +641,19 @@ when the suite ran). The snapshot then refused the manifest, and eight dashboard
   is updated to a `main` that holds it. No reinstall is needed.
 - **Overturn.** When the manifest nears 8,000,000 bytes, count receipts from a smaller source instead of raising the
   bound again.
+
+### Review of round 3
+
+One review round ran on the pull request's head `0779e91a`. The returns, prompts, usage and each finding's
+disposition are in [`review-444/`](../../evidence/artifacts/prompt-audit-20260927/review-444/).
+
+| Reviewer | Verdict | Findings | Usage |
+| --- | --- | --- | --- |
+| GPT-6: `codex exec`, `gpt-6-astra`, effort max, read-only | changes-needed | 1 should-fix | input 1,884,466 (cached 1,797,760), output 15,355 (reasoning 5,572); 10 min 7 s |
+| Claude: one `evidence-reviewer` | changes-needed | 5 should-fix, 3 nits | input 156, cache write 269,091, cache read 11,985,562, output 102,328; one advisor call |
+
+- Every finding concerned this record or the evidence text, not the applied edits, and every one was repaired in one
+  round.
+- The repairs added two pieces of evidence: the audit's control (under X9's judgment) and the Codex lane's host
+  recheck (under Limitations and residuals).
+- No second review round was run.

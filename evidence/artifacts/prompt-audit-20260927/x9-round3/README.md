@@ -11,6 +11,8 @@ blind, in both orders.
   `CLAUDE.md` now holds it at lines 3-8.
 - The preregistered metric order would have chosen the same text: wrong statuses tie at 0, and correct statuses are
   10 to 8.
+- Against the current line, the control, the applied text tied on all three preregistered metrics. Only descriptive
+  counts differ (the decision record's round-3 addendum).
 - Interactive sessions were not tested. Only the user can run them, and they are this decision's overturn condition.
 
 ## Layout
@@ -30,6 +32,7 @@ blind, in both orders.
 | `isolate_r3.sh`, `isolation-receipt.json`, `isolation_receipt_r3.py` | The steps before dispatch (worktrees removed, work moved away, root scanned, orders checked, the sent prompts scanned for configuration text, the GPT-6 judges started), with commands, outputs and times from the coordinator's log | coordinator record |
 | `judges/` | Inputs, packets, prompts, schema and mapping as sent (`sent-sha256.json` holds each file's hash as received), the four returns with the runner's own records, the audit, the judge actions, the tally and their scripts | retained model judgments |
 | `void_patterns_r3.py`, `audit_r3.py`, `tally_r3.py` | The void patterns, audit and tally, hashed before any return was read | protocol |
+| `audit_control_r3.py`, `judges/audit-control.json` | The audit's control, added after review: the audit on private copies of the judges' inputs, unchanged and with one planted access per judgment | protocol |
 | `usage.json` | Provider usage of the comparison runs, the probes, the four judges and the source research, each counter kept separate | usage record |
 | `exposure_scan_dir.py`, `package_x9_round3.py` | The count-only scan run on this directory before its first push (it also counts Claude subagent ids, as lane A's copy does), and the script that wrote this package. The packager writes the host user name as `<user>` in every file, as lane A's does, so the published scan's home pattern reads `<user>` | protocol |
 
@@ -46,20 +49,36 @@ Run these from this directory.
     short. The copy as run uses round 2's revised pattern again.
 - `python3 -B exposure_scan_dir.py .` exits 1 by design and lists 16 files. Every match is a name or pattern text,
   not a value (see "Settings content"), and none is a secret-shaped string or a subagent id.
-- `judges/audit.json`, `judges/judge-actions.json` and the Claude usage cannot be recomputed from this package. Their
-  scripts read the judges' session transcripts, which are withheld because they carry the host's injected session
-  context.
+- `judges/audit.json`, `judges/judge-actions.json`, `judges/audit-control.json` and the Claude usage cannot be
+  recomputed from this package. Their scripts read the judges' session transcripts, which are withheld because they
+  carry the host's injected session context.
+  - `judges/audit-control.json` records the control's two runs. On unchanged copies, the audit reproduced the
+    published verdicts. With one planted access per judgment, it voided all four: an arm-file read, a web search that
+    names the repository's pull requests, an `mcp__` call and a read of the round-3 results.
+  - One Claude B/A action in `judges/judge-actions.json` lists `/home`, `/tmp` and `/Users` as outside paths. They
+    come from the pattern of a Grep over the judge's own input; the list is informational, and the void rule is the
+    audit's.
 
 ## Changed after freezing
 
 Both changes were made after the counted runs and before any judge started. The frozen copies carry the hashes that
-`prereg-r3.json` records.
+`prereg-r3.json` records. `diff make_x9_round3.frozen.py make_x9_round3.py` shows every difference.
 - **`make_x9_round3.py`.** As first written, it withheld every K5 status sentence, because every K5 run read settings
-  files.
-  - It now withholds a status sentence only when the sentence quotes client configuration or names a settings file.
-  - It still withholds an answer head whenever its run read settings files.
+  files. The copy as run differs from the frozen copy in these ways:
+  - It withholds a status sentence only when the sentence quotes client configuration or names a settings file.
+  - It withholds an answer head when its run read settings files, or when the head quotes client configuration or
+    names a settings file. The frozen copy withheld the head and the sentence together and did not test for
+    settings-file names.
   - For each K5 run, it adds a list of what the run's commands consulted, taken from the commands' own text. This
     list was observed, not preregistered.
+  - It cuts each answer head at 200 characters, not 240, and leaves out the status sentence when the head shown
+    starts with it.
+  - It counts each K6 run's server events by kind instead of listing every event.
+  - Its probe descriptions say "in the current line's worktree" where the preregistration says "arm 0".
+  - Its run-conditions line names the setting sources and cuts both values at ", passed" instead of at the first
+    comma.
+  - Two more path rules write scratch-directory paths as `<fixtures>` and `<scratch>`.
+  - It embeds the sources as compact JSON instead of indented JSON.
 - **`check_orders_r3.py`.** Its clause pattern gained a comma when it was copied from round 2's revised check. That
   produced the false difference described above.
 
@@ -79,7 +98,8 @@ Both changes were made after the counted runs and before any judge started. The 
   - `enabledPlugins` once in `judges/claude.BA.json`, where a judgment quotes the packet's list of untested cases;
   - `enabledPlugins` in the preregistration's list of untested cases (`prereg-r3.json` and its draft);
   - `installed_plugins` in `metrics_r3.py`'s `evidence_settings` definition and pattern.
-- The scan's home-path matches are pattern text in the scripts (`/home/`, `/Users/`, `<user>`), not paths.
+- The scan's home-path matches are pattern text (`/home/`, `/Users/`, `<user>`) in the scripts and in this README's
+  own mentions of it, not paths.
 
 ## What is not claimed
 
@@ -88,6 +108,9 @@ Both changes were made after the counted runs and before any judge started. The 
   - The five K5 affirmations under the applied text followed Bash reads of the process command line and the fixture's
     hook state file. A session in another permission mode may need approval for those reads.
   - The difference is the output of a decision rule, not a significance claim.
+  - The runs set `--max-turns 10`, but one K5 run's result reports 11 turns.
+  - The runs used `ba1700ad`'s files: each text as a four-line `CLAUDE.md`, and an `AGENTS.md` without #444's F1,
+    F4, X5b and S1. The applied `CLAUDE.md` also holds #453's `## Compact Instructions` section.
 - **Cases not covered.**
   - A plugin installed from a marketplace and listed in `enabledPlugins`.
   - An MCP server whose tools come from the discovery cache without a process.
