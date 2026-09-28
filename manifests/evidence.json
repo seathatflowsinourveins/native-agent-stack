@@ -5118,8 +5118,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-      "sha256": "08427e91d2a8d786c096c9d7b933cf70e9286d02779a2171d6ca4ab00d186f6c",
-      "bytes": 56436
+      "sha256": "de31f07cf4ac3f1d32fc64ef94796a98a9aec39fb2a10945dfd1d13e37cdb246",
+      "bytes": 56660
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -33103,8 +33103,8 @@
     },
     {
       "path": "evidence/artifacts/omniroute-routing-20260928/decisions.json",
-      "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4",
-      "bytes": 16552
+      "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812",
+      "bytes": 16637
     },
     {
       "path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json",
