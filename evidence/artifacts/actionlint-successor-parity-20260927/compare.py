@@ -5,18 +5,20 @@ Reads the output of actionlint's documented JSON template, -format '{{json .}}' 
 rhysd/actionlint v1.7.12 and kjanat/actionlint v1.17.0), for the same files from two binaries.
 Diagnostics are paired on (filepath, line, column, kind) first and their messages compared second,
 so a reworded finding at the same position is reported once as "reworded" instead of once as
-removed and once as new. A second pass pairs what is left on (filepath, line, kind, message) with a
-different column as "relocated" (kjanat/actionlint v1.11.0 reports ShellCheck findings at their
-exact YAML source location instead of the run: key; CHANGELOG.md at v1.17.0). Prints one JSON
-object; the classification of each unpaired, reworded or relocated diagnostic (new true positive,
-new false positive, default-config change, removed) is a reviewed judgment recorded in the receipt,
-not computed here.
+removed and once as new. Messages are compared as multisets (collections.Counter intersection and
+subtraction, Python docs), so every copy of a duplicated diagnostic is paired or reported once
+instead of disappearing behind a single match. A second pass pairs what is left on (filepath,
+line, kind, message) with a different column as "relocated" (kjanat/actionlint v1.11.0 reports
+ShellCheck findings at their exact YAML source location instead of the run: key; CHANGELOG.md at
+v1.17.0). Prints one JSON object; the classification of each unpaired, reworded or relocated
+diagnostic (new true positive, new false positive, default-config change, removed) is a reviewed
+judgment recorded in the receipt, not computed here.
 
 Usage: compare.py OLD.json NEW.json
 """
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 
 def load(path):
@@ -32,10 +34,12 @@ def main(old_path, new_path):
     old, new = load(old_path), load(new_path)
     result = {"identical": [], "reworded": [], "relocated": [], "only_old": [], "only_new": []}
     for key in sorted(set(old) | set(new)):
-        old_messages, new_messages = sorted(old.get(key, [])), sorted(new.get(key, []))
-        same = [m for m in old_messages if m in new_messages]
-        rest_old = [m for m in old_messages if m not in same]
-        rest_new = [m for m in new_messages if m not in same]
+        # & keeps min(old, new) copies of each message and - keeps only positive differences, so
+        # duplicates count copy by copy; sorted() keeps the output order of the membership version.
+        old_messages, new_messages = Counter(old.get(key, [])), Counter(new.get(key, []))
+        same = sorted((old_messages & new_messages).elements())
+        rest_old = sorted((old_messages - new_messages).elements())
+        rest_new = sorted((new_messages - old_messages).elements())
         entry = {"filepath": key[0], "line": key[1], "column": key[2], "kind": key[3]}
         result["identical"] += [{**entry, "message": m} for m in same]
         while rest_old and rest_new:

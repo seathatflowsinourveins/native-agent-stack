@@ -9,8 +9,9 @@ binaries on this repository's workflows. It also backs the new non-required
 `receipt.json` holds the recorded values this page quotes. It was recorded at
 `catalog_revision` `ba1700adc6557b03d3c9336c4d3a951791fc8de5`, main's tip
 during the run. The upstream observations, verification and parity ran from
-2026-09-28T02:03Z to 02:16Z UTC (2026-09-27 evening EDT). The branch checks
-followed in the same session.
+2026-09-28T02:03Z to 02:16Z UTC (2026-09-27 evening EDT). The branch checks,
+mutation controls, attestation-count query and commit-author query followed
+in the same session.
 Evidence classes follow the brief: **upstream-unchanged** (an upstream tool or
 verifier run as published), **our-integration** (our driver, fixtures,
 mutations and tests) and **live-run-pending** (needs the hosted run).
@@ -35,7 +36,7 @@ Source: `gh api`, at 2026-09-28T02:03:12Z.
   - Commits fa049a71 and fc3cee3c accommodate Claude Code in the fork's own
     development.
 
-## Verification before first execution (upstream-unchanged)
+## Verification (upstream-unchanged)
 
 | Check | 1.7.12 (`rhysd`) | 1.17.0 (`kjanat`) |
 | --- | --- | --- |
@@ -64,6 +65,12 @@ Source: `gh api`, at 2026-09-28T02:03:12Z.
   - the `.deb` SHA-256 matches the Packages index;
   - the Packages hash matches InRelease;
   - `gpgv` reported a good Ubuntu Archive signature.
+- **Order.** Every table row except "Immutable release", the tag lookup and
+  the four negative controls finished before either binary first ran; the
+  first `-version` output is dated 02:05:54Z. The `gh release view` read and
+  the shellcheck checks left no timestamped output, and the 2-attestation
+  count ran after parity, so none of them is claimed as coming first.
+  `receipt.json` `verification.order` gives the sources.
 
 Flags: validate.yml passes `-version` and `-color`, and both exist in the
 1.17.0 `--help` output.
@@ -78,8 +85,12 @@ We ran `parity_driver.sh` from the checkout root:
 
 Every run used `env -i`, the same PATH for both binaries, and no
 `.github/actionlint.yaml`. `compare.py` pairs diagnostics on (file, line,
-column, kind), then compares their messages. A second pass catches findings
-whose column moved.
+column, kind), then compares their messages as multisets, so each copy of a
+duplicated diagnostic counts. A second pass catches findings whose column
+moved. The counts below came from an earlier revision that matched messages
+by membership. After review, the multiset revision was re-run over the six
+retained report pairs: every count is unchanged, and the two fixture
+pairings are byte-identical (`receipt.json` `parity.compare_rerun`).
 
 | Tree | Tools on PATH | 1.7.12 `-color` | 1.17.0 `-color` | Files linted | Differences |
 | --- | --- | --- | --- | --- | --- |
@@ -119,8 +130,11 @@ under shellcheck 0.9.0. Upstream citations are in `receipt.json` under
   - `receipt.json` `fixture_provenance` gives each file's source.
 - **The fixtures fail both binaries.** Both exit 1 on them, so the zero on the
   repository is not a vacuous pass.
-- **Not exercised.** The fixtures give at least one recorded example of each
-  class above, not of every change in the release. These were not exercised:
+- **Not exercised.** The fixtures give at least one recorded example of five
+  classes above: identical, relocated, removed, new true positive and
+  default-config change. They give none of reworded or new false positive
+  (0 in the table), so they do not demonstrate those two, and they do not
+  cover every change in the release. These were not exercised:
   - v1.8.0's runner-label alias remaps;
   - the v1.17.0 action-manifest and composite-step audit;
   - snapshot and matrix `include` expression checks;

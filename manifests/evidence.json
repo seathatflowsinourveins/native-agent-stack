@@ -14263,13 +14263,13 @@
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
-      "sha256": "354cbe9810c930782ce3e7317aa20ccd84ba7c5b946fd9e21d5e1098645e14b3",
-      "bytes": 9425
+      "sha256": "44e7a9dc0ce91ef39e0a32c793a51bd580166837c29b3ad7c7bd8f9985ad0f62",
+      "bytes": 10445
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/compare.py",
-      "sha256": "2b8c2fb843227d951d2f8706dba602ebfa4bb51c52424d18ff1460395fe9d3f5",
-      "bytes": 3075
+      "sha256": "6025c1d91e8d59a84fd53585176061d2b9f76cd95a05a61f28dfe290e8cf4930",
+      "bytes": 3512
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/fixture-compare-no-tools.json",
@@ -14338,8 +14338,8 @@
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
-      "sha256": "5b40b36852f50c6ddcdc8b6fa360274db96dee7a9735316d3838c82264c4fcf5",
-      "bytes": 36562
+      "sha256": "d4b41c6ddfbe4c41a44d34808eb57436f7633751ce4264888b090b7a3ae3d300",
+      "bytes": 38986
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",

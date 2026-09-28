@@ -89,7 +89,7 @@
    "start": "2026-09-28T02:03:55Z",
    "end_of_first_pass": "2026-09-28T02:04:07Z"
   },
-  "order": "Every check below ran before either binary was executed; extraction and the first -version followed only after all passed.",
+  "order": "Completed before either binary was executed (extraction at 02:05:48Z, first -version output at 02:05:54Z): the first pass in window_utc (sha256sum_check, checksums_txt_line and gh_attestation_verify for both archives; gh_release_verify and gh_release_verify_asset for 1.17.0), then, from 02:04:35Z to 02:05:29Z, tag_ref and tag, release_workflow_at_signer_digest, the identity-pinned re-verifies (after the first attempt in retained_failures) and the four negative_controls. Nothing else below is claimed as preceding execution: the 1.17.0 attestations_for_digest query followed parity_end (top-level window_utc.note; its output is dated 02:17:41Z), and gh release view's isImmutable, the 1.7.12 attestations_for_digest value and shellcheck_0.9.0_for_parity left no timestamped output. window_utc gives the first-pass times; the other times are modification times of the retained raw outputs in <scratch>.",
   "rhysd_actionlint_1.7.12": {
    "archive_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz (the URL validate.yml builds)",
    "archive_bytes": 2353908,
@@ -543,6 +543,19 @@
     "no-tools": "fixture-compare-no-tools.json",
     "shellcheck-0.9.0": "fixture-compare-shellcheck-0.9.0.json"
    }
+  },
+  "compare_rerun": {
+   "evidence_class": "our-integration",
+   "at_utc": "2026-09-28T07:16:23Z",
+   "why": "the cross-family review of pull request #449 found that compare.py matched messages by membership, so a duplicated diagnostic could vanish from the pairing; compare.py now pairs messages as collections.Counter multisets. The pairing_counts above and fixture-compare-*.json came from the membership revision.",
+   "inputs": "the retained 1.7.12.json.stdout and 1.17.0.json.stdout of the six runs above (base_workflows, changed_workflows and fixture_controls, each under no-tools and shellcheck-0.9.0), kept in <scratch>; the membership revision, re-run over them, reproduces each run's recorded compare.json and both fixture-compare-*.json files byte for byte",
+   "pairing_counts": {
+    "base_workflows": "no-tools and shellcheck-0.9.0: identical 0, only_new 0, only_old 0, relocated 0, reworded 0",
+    "changed_workflows": "no-tools and shellcheck-0.9.0: identical 0, only_new 0, only_old 0, relocated 0, reworded 0",
+    "fixture_controls": "no-tools: identical 3, only_new 4, only_old 8, relocated 0, reworded 0; shellcheck-0.9.0: identical 3, only_new 4, only_old 8, relocated 2, reworded 0"
+   },
+   "byte_identical": "each of the six outputs equals that run's recorded compare.json, and the two fixture outputs equal fixture-compare-no-tools.json and fixture-compare-shellcheck-0.9.0.json",
+   "classification_figures_changed": false
   }
  },
  "classification": {
@@ -714,5 +727,5 @@
   "Raw gh api and attestation JSON stayed in scratch; only the fields quoted here were extracted.",
   "No credential value was read or passed: zizmor ran without GH_TOKEN (this repository's secret_path_guard hook blocks printing the native token), so its online audits are live-run-pending."
  ],
- "claim_boundary": "On this host, rhysd/actionlint 1.7.12 and kjanat/actionlint 1.17.0 each return exit 0 and no diagnostic for the 18 workflows at ba1700ad and on this branch, with and without the runner's shellcheck 0.9.0. The fixtures give at least one recorded example of each class in classification; the release's other changes were not exercised (classification.not_exercised). That is local evidence for the files and configurations named here; it is not the hosted run of the new job, not a swap of the required gate and not a statement about other repositories. The selection risk stays open: kjanat/actionlint is a fork whose default-branch commits are 242 of 253 by one maintainer who develops with Claude Code, it shipped 12 releases between 2026-08-18 and 2026-09-13, and 1.17.0 turned three cache policies on by default."
+ "claim_boundary": "On this host, rhysd/actionlint 1.7.12 and kjanat/actionlint 1.17.0 each return exit 0 and no diagnostic for the 18 workflows at ba1700ad and on this branch, with and without the runner's shellcheck 0.9.0. The fixtures give at least one recorded example of five classes in classification (identical, relocated, removed, new true positive and default-config change); reworded and new false positive have none (fixtures 0), so the fixtures do not demonstrate those two, and the release's other changes were not exercised (classification.not_exercised). That is local evidence for the files and configurations named here; it is not the hosted run of the new job, not a swap of the required gate and not a statement about other repositories. The selection risk stays open: kjanat/actionlint is a fork whose default-branch commits are 242 of 253 by one maintainer who develops with Claude Code, it shipped 12 releases between 2026-08-18 and 2026-09-13, and 1.17.0 turned three cache policies on by default."
 }
