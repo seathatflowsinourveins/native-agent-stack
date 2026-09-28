@@ -206,7 +206,16 @@ Model text reaches GitHub only inside an adaptive code fence or code span.
      it. The agent branch's `non_fast_forward` rule gives that; stage 2's preflight
      must confirm it, and stage 1 does not.
    - Then one body-only COMMENT review of the head, with its text from the injected
-     reviewer.
+     reviewer. The reviewed diff is `git diff <base>...<head>` in the host clone, with
+     the base an ancestor of the head. `gh pr diff` is not allowlisted, because it
+     fetches the PR's current diff by number (gh `diff.go:127-137` and `212-236`), and
+     a push during the wait would change it.
+   - GitHub accepts a review for an older `commit_id`. So the head is read again
+     immediately before the review is posted, and a moved head refuses with
+     `pr_head_moved` before any write. EXT's PR reviewer
+     (`github-pr-reviewer/scripts/worker.py`) also reviews an exact head (`245-256`)
+     and re-reads the PR before reporting (`318-322`). In its scan and request flows
+     it publishes no review once the head has moved (`289-299`).
 4. **Repair:** one repair from the injected repairer, accepted only when the
    compare API reports `ahead`.
 5. **Stop:** one residuals comment, a final read-back, then stop. A second
@@ -232,7 +241,8 @@ Model text reaches GitHub only inside an adaptive code fence or code span.
   - `finish_result`: after the export, `validate_patch` on a `GitTree` at the base;
     `git apply --index --check`, then apply in a fresh clone; commit with EXT's
     identity and hooks off; `next_branch`; `GhHarness.push`; `open_pull_request`;
-    `ReviewLoop`.
+    `ReviewLoop` with that fresh clone as `clone`. The clone must keep the base and
+    the pushed commit until the review is posted.
   - `execute`: the `rw-openhands-res-<N>-<date>` run id.
 - **`resolver.py run`:** build the harness with the pinned gh and a gitleaks
   scanner, and a guard with the attempt's host paths. Read `op_issue`,

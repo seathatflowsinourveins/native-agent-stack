@@ -257,9 +257,8 @@ def op_run_log(run_id):
     return ["gh", "run", "view", str(run_id), "--log-failed"]
 
 
-def op_pr_diff(number):
-    return ["gh", "pr", "diff", str(number)]
-
+# No `gh pr diff` template: it fetches the PR's current diff by number (diff.go:127-137 and
+# 212-236 at 0cf10924), so the loop reads the reviewed diff from the host clone (review item D4).
 
 def op_review(number, commit_id, body_file):
     """One COMMENT review; a COMMENT review requires a body (plan A11)."""
@@ -438,7 +437,6 @@ def _templates(gh):
         "pr_view": (["gh", "pr", "view", number, "--json", PR_VIEW_FIELDS], None),
         "pr_checks": (["gh", "pr", "checks", number, "--required", "--json", CHECK_FIELDS], None),
         "run_log": (["gh", "run", "view", re.compile(r"[1-9][0-9]{0,19}"), "--log-failed"], None),
-        "pr_diff": (["gh", "pr", "diff", number], None),
         "review": (["gh", "api", "--method", "POST", re.compile(rf"{re.escape(API)}/pulls/{NUMBER}/reviews"),
                     "-f", "event=COMMENT", "-f", re.compile(f"commit_id={SHA}"), "-F",
                     re.compile(f"body=@(?P<body>{ABSOLUTE})")], None),

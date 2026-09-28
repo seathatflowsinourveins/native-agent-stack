@@ -666,7 +666,8 @@ def open_pull_request(harness, guard, receipt, *, branch):
         raise LoopStopped("pr_create_unparseable")
     number = int(found.group(1))
     view = check_read_back(read_back(harness, number), number=number, branch=branch, lane=lane, body=body)
-    return {"number": number, "url": view.get("url"), "head": view["headRefOid"], "branch": branch, "lane": lane}
+    return {"number": number, "url": view.get("url"), "head": view["headRefOid"], "branch": branch, "lane": lane,
+            "base": receipt["base_sha"]}
 
 
 CHECK_BUCKETS = {"pass", "fail", "pending", "skipping", "cancel"}  # checks.go:70-71 at 0cf10924
@@ -794,19 +795,54 @@ REVIEW_DISCLOSURE = "_This review was posted by an AI agent._"
 COMMENT_DISCLOSURE = "_This comment was posted by an AI agent (OpenHands)._"  # EXT main.py:770-775
 
 
-def post_review(harness, guard, number, head, reviewer):
+def reviewed_diff(clone, base, head, *, git="git"):
+    """The reviewed diff, from pinned commits in the host clone (review item D4).
+
+    `gh pr diff` fetches the PR's current diff by number (diff.go:127-137 and 212-236 at
+    0cf10924), so a push during the checks wait changed what was reviewed while the
+    review still named the earlier head. EXT github-pr-reviewer worker.py:245-256 reviews
+    an exact head checked out locally; here both ends are commits the host clone holds.
+    git-diff(1): `<base>...<head>` is the change on `head` since the merge base, and
+    git-merge-base(1) --is-ancestor makes that merge base `base`, so the diff is what the
+    PR adds. Neutral configuration and the export's flags (dispatch.py:196-205 at
+    e45c3cd1); local git only. Local composition.
+    """
+    if not all(isinstance(sha, str) and SHA.fullmatch(sha) for sha in (base, head)):
+        raise LoopStopped("diff_revision_invalid")
+
+    def run(*args):
+        try:
+            return subprocess.run([git, "-C", str(clone), *args], env=patch_policy.GIT_ENV, capture_output=True,
+                                  check=False, timeout=120)
+        except (OSError, subprocess.SubprocessError):
+            raise LoopStopped("diff_failed") from None
+
+    for sha in (base, head):
+        found = run("rev-parse", "--verify", "--quiet", "--end-of-options", f"{sha}^{{commit}}")
+        if found.returncode != 0 or found.stdout.decode("ascii", "replace").strip() != sha:
+            raise LoopStopped("diff_revision_missing")
+    if run("merge-base", "--is-ancestor", base, head).returncode != 0:
+        raise LoopStopped("diff_base_not_ancestor")
+    diffed = run("--no-pager", "diff", "--no-color", "--no-ext-diff", "--no-textconv", "--end-of-options",
+                 f"{base}...{head}", "--")
+    if diffed.returncode != 0:
+        raise LoopStopped("diff_failed")
+    return diffed.stdout.decode("utf-8", "replace")
+
+
+def post_review(harness, guard, pr, head, reviewer, *, clone, git="git"):
     """Plan step 10: exactly one body-only COMMENT review of `head`.
 
     The reviewer is injected by the coordinator (stage 2 runs the isolated `claude -p`
-    reviewer on the diff); this function only fetches the diff, guards the findings and
+    reviewer on the diff); this function reads the diff of `pr["base"]...head` from the
+    host clone (reviewed_diff), guards the findings, reads the PR back once more and
     posts. EXT github-pr-reviewer worker.py:304-312 publishes COMMENT on self-authored
     PRs; the review needs a body (plan A11) and carries no inline threads.
     """
-    diff = harness.run(gh_harness.op_pr_diff(number))
-    if diff.returncode != 0:
-        raise LoopStopped("pr_diff_failed")
+    number = pr["number"]
+    diff = reviewed_diff(clone, pr["base"], head, git=git)
     try:
-        findings = reviewer(diff.stdout)
+        findings = reviewer(diff)
     except Exception:
         raise LoopStopped("reviewer_failed") from None
     if not isinstance(findings, str):
@@ -819,7 +855,13 @@ def post_review(harness, guard, number, head, reviewer):
         *(["Findings (model output, shown as text):", "", outgoing_guard.fence(findings)] if findings.strip()
           else ["The reviewer reported no findings."]),
         "", REVIEW_DISCLOSURE]) + "\n"
-    posted = harness.run(gh_harness.op_review(number, head, guard.register(body, name="review")))
+    body_file = guard.register(body, name="review")
+    # Review item D4: GitHub accepts an older commit_id (docs.github.com/en/rest/pulls/reviews,
+    # "Create a review for a pull request"), so the head is read again immediately before
+    # the POST; any other head refuses with pr_head_moved before the write. EXT worker.py:318-322
+    # re-reads the PR before reporting and, on a moved head, publishes no review (:289-299).
+    check_read_back(read_back(harness, number), number=number, branch=pr["branch"], lane=pr["lane"], head=head)
+    posted = harness.run(gh_harness.op_review(number, head, body_file))
     if posted.returncode != 0:
         raise LoopStopped("review_failed")
     try:
@@ -898,11 +940,14 @@ class ReviewLoop:
 
     Order: read back, wait for checks, one review, failing-check excerpts, one repair
     (fast-forward only), checks again after a push, read back, one residuals comment,
-    a final read-back (A6), stop. A second run() stops before any call.
+    a final read-back (A6), stop. A second run() stops before any call. `clone` is the
+    host clone that holds `pr["base"]` and the PR head the driver pushed; the reviewed
+    diff comes from it (reviewed_diff).
     """
 
-    def __init__(self, harness, guard, *, pr, reviewer, repairer, clock, sleep, bound=3600, interval=60):
-        self.harness, self.guard, self.pr = harness, guard, pr
+    def __init__(self, harness, guard, *, pr, clone, reviewer, repairer, clock, sleep, bound=3600, interval=60,
+                 git="git"):
+        self.harness, self.guard, self.pr, self.clone, self.git = harness, guard, pr, clone, git
         self.reviewer, self.repairer = reviewer, repairer
         self.clock, self.sleep, self.bound, self.interval = clock, sleep, bound, interval
         self.started = False
@@ -921,7 +966,7 @@ class ReviewLoop:
         self.started = True
         head = self._view(self.pr["head"])["headRefOid"]
         checks = self._checks(head)
-        review = post_review(self.harness, self.guard, self.pr["number"], head, self.reviewer)
+        review = post_review(self.harness, self.guard, self.pr, head, self.reviewer, clone=self.clone, git=self.git)
         failing = failing_excerpts(self.harness, checks["checks"])
         repair = repair_once(self.harness, pr=self.pr, head=head, findings=review["findings"], failing=failing,
                              repairer=self.repairer)
@@ -961,7 +1006,7 @@ class FakeGitHub:
                        for item in scenario.get("checks", [])]
         self.compare = scenario.get("compare") or {"status": "ahead", "ahead_by": 1, "behind_by": 0}
         self.rules = json.dumps(scenario.get("rules", []))  # main's rules; none means the wait stops
-        self.diff, self.run_log = scenario.get("diff", ""), scenario.get("run_log", "")
+        self.run_log = scenario.get("run_log", "")
         self.transcript = transcript
 
     def __call__(self, args, **kwargs):
@@ -983,8 +1028,6 @@ class FakeGitHub:
         if argv[:2] == ["pr", "checks"]:
             code, stdout, stderr = self.checks.pop(0) if self.checks else (0, "[]", "")
             return answer(stdout, code, stderr)
-        if argv[:2] == ["pr", "diff"]:
-            return answer(self.diff)
         if argv[:2] == ["run", "view"]:
             return answer(self.run_log)
         if argv[:2] == ["pr", "comment"]:
@@ -1101,7 +1144,7 @@ def _cmd_review(args, *, session_key=None):
             return {"pushed": bool(repair.get("pushed")), "report": repair.get("report", "")}
 
         clock = _FakeClock()
-        loop = ReviewLoop(harness, guard, pr=pr, reviewer=lambda diff: findings, repairer=repairer,
+        loop = ReviewLoop(harness, guard, pr=pr, clone=args.clone, reviewer=lambda diff: findings, repairer=repairer,
                           clock=clock.clock, sleep=clock.sleep)
         try:
             outcome = loop.run()
@@ -1149,6 +1192,9 @@ def build_parser():
     review = commands.add_parser("review", help="run the one-review, one-repair loop against the fake GitHub")
     review.add_argument("--scenario", required=True)
     review.add_argument("--pr", required=True, help="the open-pr record")
+    review.add_argument("--clone", required=True,
+                        help="the local clone that holds the record's base and head commits; the reviewed diff "
+                        "is read from it with local git")
     review.add_argument("--findings", required=True, help="the injected reviewer's findings text")
     review.add_argument("--repair", required=True, help='JSON {"pushed": bool, "head": sha, "report": text}')
     review.add_argument("--transcript", required=True)

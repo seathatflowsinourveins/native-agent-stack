@@ -1003,7 +1003,6 @@ class GhHarnessTests(unittest.TestCase):
             "pr_checks": (h.op_pr_checks(34),
                           ["gh", "pr", "checks", "34", "--required", "--json", "name,state,bucket,link,workflow"]),
             "run_log": (h.op_run_log(987654321), ["gh", "run", "view", "987654321", "--log-failed"]),
-            "pr_diff": (h.op_pr_diff(34), ["gh", "pr", "diff", "34"]),
             "review": (h.op_review(34, sha, self.body),
                        ["gh", "api", "--method", "POST", f"{API}/pulls/34/reviews", "-f", "event=COMMENT",
                         "-f", f"commit_id={sha}", "-F", f"body=@{self.body}"]),
@@ -1105,6 +1104,8 @@ class GhHarnessTests(unittest.TestCase):
             create(label="lane:everything"), create(title="[#13] Another issue"), create(title="[#12] two\nlines"),
             create(title="[#12] " + "x" * 250), create()[:3] + create()[4:],
             ["gh", "pr", "view", "34", "--json", "body", "--jq", ".body"], ["gh", "run", "view", "x1", "--log-failed"],
+            ["gh", "pr", "diff", "34"],  # review item D4: the reviewed diff comes from the host clone
+            ["gh", "api", "-H", "Accept: application/vnd.github.diff", f"{API}/compare/{'a' * 40}...{'b' * 40}"],
             ["gh", "api", "--method", "POST", f"{API}/pulls/34/reviews", "-f", "event=APPROVE",
              "-f", "commit_id=" + "a" * 40, "-F", f"body=@{self.body}"],
             ["git", "ls-remote", "--heads", "https://example.invalid/x.git", "openhands/issue-12*"],
@@ -1749,8 +1750,6 @@ class ScriptedGitHub:
         if argv == ["api", "--paginate", f"{API}/rules/branches/main"]:
             code, stdout, stderr = self.rules if isinstance(self.rules, tuple) else (0, self.rules, "")
             return completed(args, stdout, code, stderr)
-        if argv[:2] == ["pr", "diff"]:
-            return completed(args, "diff --git a/docs/a.md b/docs/a.md\n+new line\n")
         if argv[:2] == ["run", "view"]:
             return completed(args, "".join(f"job\tstep\tline {n}\n" for n in range(200)))
         if argv[:2] == ["pr", "comment"]:
@@ -1810,6 +1809,18 @@ class PullRequestLoopTests(unittest.TestCase):
     def setUpClass(cls):
         cls.r = load_resolver()
         cls.h, cls.g = cls.r.gh_harness, cls.r.outgoing_guard
+        # The host clone: the base, the agent's commit (the PR head) and a later commit that a
+        # push during the loop would move the head to. Local git only.
+        cls.fixture = FixtureRepository()
+        cls.clone = cls.fixture.case()
+        write_file(cls.clone, "docs/a.md", "a\nnew line\n")
+        cls.base, cls.head = cls.fixture.base, commit_all(cls.clone, "agent change")
+        write_file(cls.clone, "docs/b.md", "b\nlater line\n")
+        cls.later = commit_all(cls.clone, "a later push")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.fixture.close()
 
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp(prefix="resolver-loop-"))
@@ -1826,9 +1837,17 @@ class PullRequestLoopTests(unittest.TestCase):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
                                 workdir=self.h.private_workdir(self.tmp), runner=github, guard=self.guard)
 
-    def opened(self, github):
+    def opened(self, github, **changes):
         harness = self.harness(github)
-        return harness, self.r.open_pull_request(harness, self.guard, resolver_receipt(), branch="openhands/issue-12")
+        return harness, self.r.open_pull_request(harness, self.guard, resolver_receipt(**changes),
+                                                 branch="openhands/issue-12")
+
+    def loop(self, harness, record, **kwargs):
+        """A ReviewLoop over the fixture clone; `kwargs` override the reviewer, repairer and clock."""
+        clock = kwargs.pop("clock", FakeClock())
+        options = {"reviewer": lambda diff: "", "repairer": lambda **_: {"pushed": False, "report": ""}, **kwargs}
+        return self.r.ReviewLoop(harness, self.guard, pr=record, clone=str(self.clone), clock=clock.clock,
+                                 sleep=clock.sleep, **options)
 
     def test_sota_check_is_a_port_of_the_ci_job(self):
         workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
@@ -1894,7 +1913,7 @@ class PullRequestLoopTests(unittest.TestCase):
         github = ScriptedGitHub()
         harness, record = self.opened(github)
         self.assertEqual(record, {"number": 34, "head": "a" * 40, "branch": "openhands/issue-12",
-                                  "lane": "lane:foundation",
+                                  "lane": "lane:foundation", "base": "e" * 40,
                                   "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/34"})
         self.assertEqual(github.ops(), ["pr_create", "pr_view"])
         create = github.calls[0]
@@ -2017,15 +2036,11 @@ class PullRequestLoopTests(unittest.TestCase):
                                    sleep=FakeClock().sleep)
         self.assertEqual(caught.exception.reason, "pr_head_moved")
         self.assertEqual(github.ops(), ["rules", "pr_view"])
-        github = ScriptedGitHub(checks=[(0, check_list("pending"), "")] * 5, moves={2: "c" * 40})
-        harness, record = self.opened(github)
+        github = ScriptedGitHub(head=self.head, checks=[(0, check_list("pending"), "")] * 5, moves={2: self.later})
+        harness, record = self.opened(github, base_sha=self.base)
         reviewed = []
-        clock = FakeClock()
-        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=lambda diff: reviewed.append(diff) or "",
-                                 repairer=lambda **kwargs: {"pushed": False, "report": ""}, clock=clock.clock,
-                                 sleep=clock.sleep)
         with self.assertRaises(self.r.LoopStopped) as caught:
-            loop.run()
+            self.loop(harness, record, reviewer=lambda diff: reviewed.append(diff) or "").run()
         self.assertEqual(caught.exception.reason, "pr_head_moved")
         self.assertEqual(reviewed, [])
         self.assertEqual((github.reviews, github.comments), ([], []))
@@ -2035,13 +2050,12 @@ class PullRequestLoopTests(unittest.TestCase):
         # Review item D3 at the loop: "validate" passing while seven required contexts have not
         # reported is not settled. At the bound the checks are incomplete and the residuals
         # comment lists each context that never reported.
-        github = ScriptedGitHub(checks=[(0, named_checks(("validate", "pass")), "")] * 200, required=REQUIRED_CONTEXTS)
-        harness, record = self.opened(github)
+        github = ScriptedGitHub(head=self.head, checks=[(0, named_checks(("validate", "pass")), "")] * 200,
+                                required=REQUIRED_CONTEXTS)
+        harness, record = self.opened(github, base_sha=self.base)
         clock = FakeClock()
-        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=lambda diff: "",
-                                 repairer=lambda **kwargs: {"pushed": False, "report": "Nothing to repair."},
-                                 clock=clock.clock, sleep=clock.sleep)
-        outcome = loop.run()
+        outcome = self.loop(harness, record, clock=clock,
+                            repairer=lambda **kwargs: {"pushed": False, "report": "Nothing to repair."}).run()
         self.assertEqual(outcome["checks"]["status"], "incomplete")
         self.assertEqual(outcome["checks"]["missing"], sorted(REQUIRED_CONTEXTS[1:]))
         self.assertEqual(outcome["checks"]["polls"], 61)
@@ -2053,9 +2067,58 @@ class PullRequestLoopTests(unittest.TestCase):
             with self.subTest(context=context):
                 self.assertIn(f"| `{context}` | `not reported` |", comment)
 
+    def test_the_reviewed_diff_comes_from_the_pinned_revisions_in_the_host_clone(self):
+        # Review item D4: `gh pr diff` fetches the PR's current diff by number (diff.go:127-137
+        # and 212-236 at 0cf10924), so the reviewed diff is `git diff base...head` in the clone.
+        diff = self.r.reviewed_diff(self.clone, self.base, self.head)
+        self.assertTrue(diff.startswith("diff --git a/docs/a.md b/docs/a.md\n"), diff)
+        self.assertIn("\n+new line\n", diff)
+        self.assertNotIn("docs/b.md", diff)
+        self.assertIn("diff --git a/docs/b.md b/docs/b.md\n", self.r.reviewed_diff(self.clone, self.base, self.later))
+        for base, head, reason in ((self.head, self.base, "diff_base_not_ancestor"),
+                                   ("f" * 40, self.head, "diff_revision_missing"),
+                                   (self.base, "f" * 40, "diff_revision_missing"),
+                                   ("HEAD", self.head, "diff_revision_invalid"),
+                                   (self.base, self.head[:12], "diff_revision_invalid"),
+                                   (self.base, "--output=/dev/null", "diff_revision_invalid"),
+                                   (self.base, None, "diff_revision_invalid")):
+            with self.subTest(base=base, head=head), self.assertRaises(self.r.LoopStopped) as caught:
+                self.r.reviewed_diff(self.clone, base, head)
+            self.assertEqual(caught.exception.reason, reason)
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            self.r.reviewed_diff(self.tmp / "no-clone", self.base, self.head)
+        self.assertEqual(caught.exception.reason, "diff_revision_missing")
+
+    def test_a_head_that_moves_while_the_reviewer_runs_gets_no_review(self):
+        # Review item D4: GitHub accepts an explicit older commit_id (docs.github.com/en/rest/
+        # pulls/reviews#create-a-review-for-a-pull-request), so a review of A must not go out
+        # once the head is B. The head is read again immediately before publishing; EXT
+        # github-pr-reviewer worker.py:318-322 re-reads the PR before reporting and, on a moved
+        # head, publishes no review (:289-299).
+        github = ScriptedGitHub(head=self.head, checks=[(0, check_list("pass"), "")])
+        harness, record = self.opened(github, base_sha=self.base)
+        reviewed = []
+
+        def reviewer(diff):
+            reviewed.append(diff)
+            github.head = self.later  # a push lands while the reviewer runs
+            return "low docs/a.md:1 wording"
+
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            self.loop(harness, record, reviewer=reviewer).run()
+        self.assertEqual(caught.exception.reason, "pr_head_moved")
+        self.assertEqual(github.reviews, [])
+        self.assertFalse([argv for argv in github.calls if argv[:3] == ["api", "--method", "POST"]])
+        self.assertEqual(github.comments, [])
+        self.assertEqual(reviewed, [self.r.reviewed_diff(self.clone, self.base, self.head)])
+        self.assertIn("\n+new line\n", reviewed[0])
+        self.assertNotIn("docs/b.md", reviewed[0])
+        self.assertEqual(github.ops()[-2:], ["pr_view", "pr_view"])  # the wait's last read, then the pre-publish read
+
     def test_review_loop_reviews_repairs_once_comments_residuals_and_stops(self):
-        github = ScriptedGitHub(checks=[(0, check_list("fail", "pass"), ""), (0, check_list("pass", "pass"), "")])
-        harness, record = self.opened(github)
+        github = ScriptedGitHub(head=self.head,
+                                checks=[(0, check_list("fail", "pass"), ""), (0, check_list("pass", "pass"), "")])
+        harness, record = self.opened(github, base_sha=self.base)
         seen = {}
 
         def reviewer(diff):
@@ -2067,25 +2130,24 @@ class PullRequestLoopTests(unittest.TestCase):
             github.head = "b" * 40
             return {"pushed": True, "report": "Added the source; nothing left unaddressed."}
 
-        clock = FakeClock()
-        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=reviewer, repairer=repairer,
-                                 clock=clock.clock, sleep=clock.sleep)
+        loop = self.loop(harness, record, reviewer=reviewer, repairer=repairer)
         outcome = loop.run()
         self.assertEqual(github.ops(), ["pr_create", "pr_view", "pr_view", "rules", "pr_view", "pr_checks", "pr_view",
-                                        "pr_diff", "review", "run_view", "pr_view", "compare", "rules", "pr_view",
+                                        "pr_view", "review", "run_view", "pr_view", "compare", "rules", "pr_view",
                                         "pr_checks", "pr_view", "pr_view", "pr_comment", "pr_view"])
         self.assertEqual((outcome["checks"]["status"], outcome["checks"]["missing"]), ("settled", []))
         self.assertEqual(len(github.reviews), 1)
         review = github.reviews[0]
-        self.assertEqual((review["event"], review["commit_id"]), ("event=COMMENT", "a" * 40))
+        self.assertEqual((review["event"], review["commit_id"]), ("event=COMMENT", self.head))
         self.assertIn("```text\nhigh docs/a.md:1 the new line lacks a source; add one\n```", review["body"])
-        self.assertEqual(seen["diff"], "diff --git a/docs/a.md b/docs/a.md\n+new line\n")
-        self.assertEqual(seen["head"], "a" * 40)
+        self.assertEqual(seen["diff"], self.r.reviewed_diff(self.clone, self.base, self.head))
+        self.assertIn("\n+new line\n", seen["diff"])
+        self.assertEqual(seen["head"], self.head)
         self.assertEqual(len(seen["failing"]), 1)
         self.assertEqual(seen["failing"][0]["run_id"], 555)
         self.assertLessEqual(len(seen["failing"][0]["excerpt"].splitlines()), 60)
         compare = next(argv for argv in github.calls if argv[:1] == ["api"] and "/compare/" in argv[1])
-        self.assertTrue(compare[1].endswith(f"/compare/{'a' * 40}...{'b' * 40}"))
+        self.assertTrue(compare[1].endswith(f"/compare/{self.head}...{'b' * 40}"))
         self.assertEqual(len(github.comments), 1)
         self.assertIn("Added the source; nothing left unaddressed.", github.comments[0])
         self.assertIn("| `check-0` | `pass` |", github.comments[0])
@@ -2098,27 +2160,25 @@ class PullRequestLoopTests(unittest.TestCase):
         self.assertEqual(len(github.calls), calls)
 
     def test_a_repair_that_is_not_a_fast_forward_stops_before_the_residuals(self):
-        github = ScriptedGitHub(checks=[(0, check_list("pass"), "")],
+        github = ScriptedGitHub(head=self.head, checks=[(0, check_list("pass"), "")],
                                 compare={"status": "diverged", "ahead_by": 1, "behind_by": 1})
-        harness, record = self.opened(github)
+        harness, record = self.opened(github, base_sha=self.base)
 
         def repairer(*, head, findings, failing):
             github.head = "c" * 40
             return {"pushed": True, "report": "rewrote history"}
 
-        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=lambda diff: "no findings",
-                                 repairer=repairer, clock=FakeClock().clock, sleep=FakeClock().sleep)
+        loop = self.loop(harness, record, reviewer=lambda diff: "no findings", repairer=repairer)
         with self.assertRaises(self.r.LoopStopped) as caught:
             loop.run()
         self.assertEqual(caught.exception.reason, "repair_not_fast_forward")
         self.assertEqual(github.comments, [])
 
     def test_without_a_repair_push_the_residuals_still_close_the_loop(self):
-        github = ScriptedGitHub(checks=[(0, check_list("pass"), "")])
-        harness, record = self.opened(github)
-        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=lambda diff: "",
-                                 repairer=lambda **kwargs: {"pushed": False, "report": "The findings need a human."},
-                                 clock=FakeClock().clock, sleep=FakeClock().sleep)
+        github = ScriptedGitHub(head=self.head, checks=[(0, check_list("pass"), "")])
+        harness, record = self.opened(github, base_sha=self.base)
+        loop = self.loop(harness, record,
+                         repairer=lambda **kwargs: {"pushed": False, "report": "The findings need a human."})
         outcome = loop.run()
         self.assertEqual(outcome["repair"]["status"], "not_pushed")
         self.assertNotIn("compare", github.ops())
@@ -2207,29 +2267,35 @@ class CommandLineTests(unittest.TestCase):
     def test_open_pr_and_review_run_against_the_in_process_fake(self):
         key = secrets.token_urlsafe(32)
         session = self.r.outgoing_guard.SessionKey(key)
+        fixture = FixtureRepository()
+        self.addCleanup(fixture.close)
+        clone = fixture.case()
+        write_file(clone, "docs/a.md", "a reworded\n")
+        head = commit_all(clone, "agent change")
         scenario = self.write_json("scenario.json", {
-            "number": 34, "head": "a" * 40, "diff": "diff --git a/docs/a.md b/docs/a.md\n",
+            "number": 34, "head": head,
             "checks": [{"code": 0, "stdout": check_list("pass"), "stderr": ""}] * 2,
             "rules": json.loads(rules_json("check-0"))})
-        receipt = self.write_json("receipt.json", resolver_receipt())
+        receipt = self.write_json("receipt.json", resolver_receipt(base_sha=fixture.base))
         transcript = self.tmp / "open.jsonl"
         code, printed = self.main("open-pr", "--scenario", scenario, "--receipt", receipt, "--branch",
                                   "openhands/issue-12", "--transcript", str(transcript), session_key=session)
         self.assertEqual(code, 0, printed)
         record = json.loads(printed)
-        self.assertEqual((record["number"], record["branch"], record["lane"]), (34, "openhands/issue-12",
-                                                                                 "lane:foundation"))
+        self.assertEqual((record["number"], record["branch"], record["lane"], record["base"]),
+                         (34, "openhands/issue-12", "lane:foundation", fixture.base))
         opened = [json.loads(line) for line in transcript.read_text(encoding="utf-8").splitlines()]
         self.assertEqual([entry["argv"][:2] for entry in opened], [["pr", "create"], ["pr", "view"]])
         pr = self.write_json("pr.json", record)
         findings = self.write_json("findings.txt", "low docs/a.md:1 wording")
         repair = self.write_json("repair.json", {"pushed": True, "head": "b" * 40, "report": "Reworded."})
         transcript = self.tmp / "review.jsonl"
-        code, printed = self.main("review", "--scenario", scenario, "--pr", pr, "--findings", findings,
-                                  "--repair", repair, "--transcript", str(transcript), session_key=session)
+        code, printed = self.main("review", "--scenario", scenario, "--pr", pr, "--clone", str(clone), "--findings",
+                                  findings, "--repair", repair, "--transcript", str(transcript), session_key=session)
         self.assertEqual(code, 0, printed)
         outcome = json.loads(printed)
         self.assertEqual((outcome["repair"]["status"], outcome["final"]["head"]), ("pushed", "b" * 40))
+        self.assertEqual(outcome["review"]["commit_id"], head)
         reviewed = [json.loads(line) for line in transcript.read_text(encoding="utf-8").splitlines()]
         words = [word for entry in reviewed for word in entry["argv"]]
         self.assertEqual(sum(1 for entry in reviewed if entry["argv"][:3] == ["api", "--method", "POST"]), 1)
