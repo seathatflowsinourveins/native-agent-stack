@@ -480,7 +480,7 @@ class TargetRulesetTests(unittest.TestCase):
 class AgentBranchRulesetTests(unittest.TestCase):
     """The committed agent-branch ruleset, applied as 24132241 (docs/github-automation.md, "Agent branch ruleset").
 
-    The resolver driver pushes with the owner's login, so any bypass actor would free it too: only a
+    The resolver driver pushes with the owner's login, so an admin-role or owner bypass would free it too: only a
     no-bypass rule binds it. Deletion stays allowed because delete_branch_on_merge is on.
     """
 

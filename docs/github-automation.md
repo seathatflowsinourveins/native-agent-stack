@@ -508,14 +508,19 @@ gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/238
 `non_fast_forward` with no bypass to `refs/heads/openhands/*` and
 `refs/heads/openhands/**/*`. These are the branches the host-local OpenHands
 resolver pushes, one per issue. The driver pushes with the owner's `gh` login, so
-a bypass actor would free it too; only a no-bypass rule binds it. The rule enforces
-server-side what the upstream OpenHands resolver does client-side: it opens numbered
-branches instead of force-pushing
+a bypass for the admin role or for the owner's account would free it too. (A bypass
+granted only to a separate GitHub App would not.) The rule therefore has no bypass
+at all. It enforces server-side what the upstream OpenHands resolver does
+client-side, opening numbered branches instead of force-pushing
 ([OpenHands/extensions@bea7a20c](https://github.com/OpenHands/extensions/tree/bea7a20c)
-`github-issue-to-pr` `scripts/main.py` L449-463). Two patterns are listed because
-rule patterns use `fnmatch` with `FNM_PATHNAME`, where `*` does not cross `/`
+`github-issue-to-pr` `scripts/main.py` L449-463).
+
+Rule patterns use `fnmatch` with `FNM_PATHNAME`, where `*` does not cross `/`
 ([creating rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository),
-fetched 2026-09-28).
+fetched 2026-09-28). There, `**/` may match zero directories, so
+`refs/heads/openhands/**/*` alone should also cover single-level names; GitHub's
+docs describe `releases/**/*` the same way. The single-level pattern is kept as an
+explicit, harmless duplicate.
 
 The ruleset leaves three things alone:
 - **Branch deletion.** `delete_branch_on_merge` is on, and a deletion rule would
@@ -532,7 +537,12 @@ The ruleset leaves three things alone:
 
 Overturn it in either of these cases:
 - a receipt shows the driver deleting or recreating an `openhands/*` ref: add
-  `{"type": "deletion"}` without bypass and accept manual cleanup;
+  `{"type": "deletion"}` without bypass. That rule also blocks the owner's manual
+  deletion
+  ([restrict deletions](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#restrict-deletions)),
+  so merged `openhands/*` branches then stay until a cleanup window. In that window,
+  PUT the ruleset with `enforcement: "disabled"`, delete the branches, then restore
+  `active`;
 - any client-side limit above must hold server-side: move the driver to a dedicated
   GitHub App identity without the `workflows` permission.
 
@@ -549,8 +559,12 @@ Overturn it in either of these cases:
      `GH013: Repository rule violations ... Cannot force-push to this branch`, and
      the branch stayed at `9b874acc`.
   3. Deleting the probe branch succeeded, leaving no `openhands/*` refs.
-- No workflow runs on pushes to these branches; every `push:` trigger names
-  `main` or `v*` tags.
+- No `push`-event workflow runs on these branches, because every `push:` trigger
+  names `main` or `v*` tags, so the probe, which had no pull request, started
+  none. Once a pull request is open from an `openhands/*` branch, each push
+  triggers `pull_request` `synchronize` runs (`validate.yml`, `token-report.yml`)
+  as it would for any branch
+  ([pull_request events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
 
 Edit it in place:
 

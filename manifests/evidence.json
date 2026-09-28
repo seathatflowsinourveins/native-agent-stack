@@ -14185,8 +14185,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "558a0f4446b34d8d8b620296bcc9939f671707c51f058c58500c5745436133cf",
-      "bytes": 89047
+      "sha256": "a186902f149b723de3f707e10b5635cb0fd831e5e6b84fbe2e053b5230c5c7f4",
+      "bytes": 90132
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -42695,8 +42695,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "d69686dc5321e034a6cd5c7faf20d64ae996e07ab2fed9d04a3654717742ac8f",
-      "bytes": 86865
+      "sha256": "b0160874663404114d129875fabb434126ea51bbaf62619aae80f84c62e35645",
+      "bytes": 86878
     },
     {
       "path": "tests/test_workflow_security.py",
