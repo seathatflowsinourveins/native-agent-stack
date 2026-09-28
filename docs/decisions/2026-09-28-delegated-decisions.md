@@ -12,16 +12,16 @@ Each item went through these steps:
 2. **A second family** where the item changes an instruction. GPT-6 `gpt-6-astra` at effort max ran through `codex exec -s read-only` on a frozen packet, and an independent Claude `evidence-reviewer` lane read the same packet.
 3. **One objection round with the live peer sessions**, through SendMessage: `resolve-prompt-audit-findings` (owner of #444 and #460), `cloudflare-security-audit-sota-review` (owner of the skills trial), `token-save-practice-e2e-status` and `native-agent-stack-84` (the trading lane).
 
-The returned output is in
-[`evidence/artifacts/delegated-decisions-20260928/`](../../evidence/artifacts/delegated-decisions-20260928/README.md).
+The returned lane output is in
+[`evidence/artifacts/delegated-decisions-20260928/`](../../evidence/artifacts/delegated-decisions-20260928/README.md). The peer positions, the #444 acknowledgement and the Gate A liveness observations are quoted in its [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md).
 
 ## Decision
 
 | Item | Decision | Two-family result | Peers | Executed by |
 | --- | --- | --- | --- | --- |
-| M1/M2, top-rule trigger (`~/.claude/CLAUDE.md:5`, copied at `AGENTS.md:3`) | **Keep verbatim.** No edit to either file. | GPT-6: "DECISION: keep". Claude lane: "DECISION: keep". The refuter rejected the narrowing. | No position; no objection to keep | (no change) |
-| M3, model line (`~/.claude/CLAUDE.md:40`) | **Change** "Opus 5.5 at effort max for …" to "The latest Opus at effort max for …". The portable copy `examples/claude-native/CLAUDE.md:41` changes to "the latest Opus" to match. | GPT-6 and the Claude lane each returned "DECISION: latest-opus" with the identical line | No position; no objection | This coordinator: host edit with backup and read-back, and the portable copy in this PR |
-| M4, the `verification-before-completion` trial skill | **Remove now** under the skills trial's in-force rule (`docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286`). That covers the listing, the builder preload and the host install. | GPT-6: "VERDICT: conflict", "Disposition: remove now". Claude: three separate full readings found the same conflict. | Trial owner: "yes, it triggers :284-286", and it will apply the removal. #460's owner: no objection. | The skills-trial owner, in one PR carrying #381 Amendment 3 |
+| M1/M2, top-rule trigger (`~/.claude/CLAUDE.md:5`, copied at `AGENTS.md:3`) | **Keep verbatim.** No edit to either file. | GPT-6: "DECISION: keep". Claude lane: "DECISION: keep". The refuter rejected the narrowing. | No position on the merits; the #444/#460 owner: "no objection" to keep ([coordination](../../evidence/artifacts/delegated-decisions-20260928/coordination.md)) | (no change) |
+| M3, model line (`~/.claude/CLAUDE.md:40`) | **Change** "Opus 5.5 at effort max for …" to "The latest Opus at effort max for …". The portable copy `examples/claude-native/CLAUDE.md:41` changes to "the latest Opus" to match. | GPT-6 and the Claude lane each returned "DECISION: latest-opus" with the identical line | The #444/#460 owner had no objection to the earlier "keep"; the change to "latest Opus" was sent as a correction, with no reply by 16:25Z ([coordination](../../evidence/artifacts/delegated-decisions-20260928/coordination.md)) | This coordinator: host edit with backup and read-back, and the portable copy in this PR |
+| M4, the `verification-before-completion` trial skill | **Remove now** under the skills trial's in-force rule (`docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286`). That covers the listing, the builder preload and the host install. | GPT-6: "VERDICT: conflict", "Disposition: remove now". Claude: the refuter flagged the untested rule, and the coordinator and the trial owner each found the conflict on a full read. | Trial owner: "yes, it triggers :284-286", and it will apply the removal. #460's owner: no objection. | The skills-trial owner, in one PR carrying #381 Amendment 3 |
 | #444, trading-lane acknowledgement | **The live trading session acknowledges**, as `docs/lanes.md:149` requires. No acknowledgement is made on the delegation, and there is no lanes.md change. | n/a | #444's owner required the trading lane's own acknowledgement naming F4. The trading session posted it. | `native-agent-stack-84`, comment on #444 at 2026-09-28T16:04:57Z, reviewing F4 at head `eb12630a` |
 | Gate A, #381 ownership | **This coordinator session owns Gate A** from 2026-09-28. | n/a | `token-save-practice-e2e-status` declined and asked this session to take it | This session; see "Gate A plan" |
 
@@ -38,9 +38,9 @@ The returned output is in
 ### M3: "The latest Opus"
 
 - Anthropic's prompt-audit rubric (`anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d:skills/claude-api/shared/prompt-audit.md:127-141`) covers CLAUDE.md. It lists version numbers as volatile specifics that "nothing re-checks", and says "pinned model names silently degrade after the next release" and "State the current rule".
-- The repository's rule is the latest model (`docs/decisions/2026-09-25-model-fallback-guard.md:68-70`). That record rejected a version-pinned allowlist because "The next Opus release would then stay excluded until someone edits the list".
+- The repository's rule is the latest model: "The workflow requires the latest models" (`docs/decisions/2026-09-25-model-fallback-guard.md:119-120`). The same record rejected a version-pinned allowlist because "The next Opus release would then stay excluded until someone edits the list" (`:127-129`).
 - A bare "Opus" would drop that constraint. The [model-config](https://code.claude.com/docs/en/model-config) alias definition governs the setting value, not the wording of an instruction, and what the alias resolves to depends on the provider. The refuter and both lanes rejected bare "Opus" on this ground.
-- The wording controls no runtime. Whether a run followed the rule is shown only by the model ID the run itself recorded (`docs/decisions/2026-09-25-model-fallback-guard.md:68-70` records a review "verified on 5.5" whose children ran `claude-opus-4-8`).
+- The wording controls no runtime. Whether a run followed the rule is shown only by the model ID the run itself recorded (`docs/decisions/2026-09-25-model-fallback-guard.md:68-70` records children that requested `opus` and switched to `claude-opus-4-8`, and `:119-120` a review recorded as "verified on 5.5" after that switch).
 - The dated quote of the old line in `docs/decisions/2026-09-27-claude-harness-settings.md:11` stays as history.
 - The coordinator row at `examples/claude-native/workflows/README.md:486` also names "Opus 5.5" and is asserted by `test-contract-mutations.mjs:92`. It belongs to the model-currency lane (#434) and is unchanged here.
 
@@ -53,7 +53,7 @@ The returned output is in
   - L42: "Previous run" listed as Not Sufficient for "Tests pass".
 - **GPT-6's case.** Tests passed earlier and their inputs are unchanged. Reporting the result without re-running violates the skill; re-running only to satisfy the message boundary violates AGENTS.
 - **What held.** GPT-6 judged the broad triggers at L108-114 compatible with `AGENTS.md:15`. The skill's principle (evidence before claims) stays carried by `AGENTS.md`, [`docs/acceptance-evidence-policy.md`](../acceptance-evidence-policy.md) and the token-lanes evidence sentence.
-- **Supersedes.** This overrides the deferral to the 2026-10-25 with/without comparison. #460's M4 record (`docs/decisions/2026-09-28-an13-m4-m5.md` on that PR) adds exactly this overturn condition: "a two-family finding of a conflict removes the skill now". Its two-family rejection covered the prompt-audit rewrite, not the trial rule.
+- **Supersedes.** This overrides the deferral to the 2026-10-25 with/without comparison. #460's M4 record, merged at `8d8f79cd`, names exactly this overturn: "a two-family judgment finds that the skill's instructions conflict with CLAUDE.md or AGENTS.md once read in full. The skills trial's rule then removes it now" ([`2026-09-28-an13-m4-m5.md:240-242`](2026-09-28-an13-m4-m5.md)). Its limitations (`:251-258`) record that its lanes did not test that rule. Its two-family rejection covered the prompt-audit rewrite, not the trial rule.
 - **Scope, per the trial owner's source check at `3058b237`.** The removal changes these together:
   - the manifest row, which becomes excluded;
   - the template `skillOverrides` entry and the budget;
@@ -119,7 +119,7 @@ The private specification copies, retained inputs and host paths stay out of thi
 
 - These are judgments on supplied evidence: two families reading the same frozen packets. No behavior test was run for any wording.
 - The M3 host read-back ran on `claude-sonnet-5` and shows the loaded text, not a changed dispatch.
-- The Claude side of M4 is three separate readings, not one lane on the frozen packet.
+- The Claude side of M4 is the refuter's flag plus two full readings (coordinator, trial owner), not one lane on the frozen packet.
 - The GPT-6 model is the pinned request, because the Codex event stream carries no model field.
 - The trading acknowledgement covers F4 at `eb12630a`. If #444 is rebased, its owner re-verifies F4 byte for byte.
 - `examples/claude-native/workflows/README.md:486` ("Opus 5.5" in the coordinator row) is left to #434.

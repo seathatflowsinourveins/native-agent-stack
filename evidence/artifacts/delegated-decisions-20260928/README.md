@@ -17,10 +17,9 @@ Each item went to two model families. Every lane read one frozen packet, used no
 | M3 | GPT-6 | as above | [`m3/gpt6-return.md`](m3/gpt6-return.md): "DECISION: latest-opus" | input 21,206 (cached 0), output 2,173 (reasoning 1,899) |
 | M3 | Claude | Agent tool, `evidence-reviewer`, `model: opus`, one Read | [`m3/claude-return.md`](m3/claude-return.md): "DECISION: latest-opus" | 42,529 subagent tokens (Agent tool total; split not reported) |
 
-The Claude side of M4 is three separate Claude readings of the full pinned `SKILL.md`, not a lane on this packet:
-- the coordinator's own reading;
-- the skills-trial owner session's reading (a peer message, 2026-09-28);
-- the independent `evidence-reviewer` stage of workflow `wf_811a77e9-a4e`.
+The Claude side of M4 is not a lane on this packet:
+- the independent `evidence-reviewer` stage of workflow `wf_811a77e9-a4e` flagged the untested trial rule and the L20/L28 "surface tension" with `AGENTS.md:16`;
+- the coordinator and the skills-trial owner session then each read the full pinned `SKILL.md` and found a conflict ([coordination](coordination.md)).
 
 The Codex event stream records no model field. The model above is the pinned `-m` request, not an observed resolution.
 
@@ -28,10 +27,16 @@ The Codex event stream records no model field. The model above is the pinned `-m
 
 - `*/packet.redacted.md` is each frozen packet with the user-level `~/.claude/CLAUDE.md` lines replaced by `<… sha256 …>` placeholders. The digest is over the line text only.
 - `gpt6-runs.json` gives:
-  - the SHA256 of each unredacted packet and each return;
+  - the original and published SHA256 of each packet and each return;
   - the returned usage;
   - the digests of M4's three input files: the pinned `SKILL.md` (`2befe7fc…`, obra/superpowers@8ca22dba), `AGENTS.md` at `3058b237`, and the skills-trial excerpt (`docs/decisions/2026-09-25-skills-trial-and-usage.md` lines 270-300 and 825-845 at `3058b237`).
 - Paths in the returns are normalised to repository-relative or `~`.
+- `m12/claude-return.md` quoted two fragments of user-level lines 15 and 16. They are replaced by `<… fragment, redacted>` placeholders, the same redaction the packet uses.
+- `gpt6-runs.json` separates `original_*` digests, over the unredacted local files, from `published_*` digests, over the files here. M4's return differs between the two only by path normalisation.
+
+## Coordination
+
+The peer positions, the #444 acknowledgement permalink and the Gate A liveness observations are in [`coordination.md`](coordination.md).
 
 ## Host read-back (M3)
 

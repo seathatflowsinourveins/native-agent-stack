@@ -1,42 +1,49 @@
 {
  "runs": {
   "m4": {
-   "packet_sha256": "336f98db6d4c9cd4fb4d8c3e1ec2060812b5fa1fe97138e4768fe4b34c70bac6",
-   "final_sha256": "a8af8381ed3f9d268ae7daa9ed922ce67d9affeeb1ab398a41edee693314da10",
    "usage": {
     "input_tokens": 86361,
     "cached_input_tokens": 62720,
     "cache_write_input_tokens": 0,
     "output_tokens": 6422,
     "reasoning_output_tokens": 5176
-   }
+   },
+   "original_packet_sha256": "336f98db6d4c9cd4fb4d8c3e1ec2060812b5fa1fe97138e4768fe4b34c70bac6",
+   "original_return_sha256": "a8af8381ed3f9d268ae7daa9ed922ce67d9affeeb1ab398a41edee693314da10",
+   "published_packet_redacted_sha256": "336f98db6d4c9cd4fb4d8c3e1ec2060812b5fa1fe97138e4768fe4b34c70bac6",
+   "published_gpt6_return_sha256": "10ea6764a214f84bb13c3886460af94277f11534c1f5d702df774d9f3d541aec"
   },
   "m12": {
-   "packet_sha256": "5f2515514c27d6fd9926314f4c9a1082459a8d57f221fe1ec38781b2deb3b360",
-   "final_sha256": "8ae49fd5a1f1690b98cd7004dc42e563455e8e9cbe1350fac9e4fb9d4a91ab4d",
    "usage": {
     "input_tokens": 21535,
     "cached_input_tokens": 17792,
     "cache_write_input_tokens": 0,
     "output_tokens": 2898,
     "reasoning_output_tokens": 2588
-   }
+   },
+   "original_packet_sha256": "5f2515514c27d6fd9926314f4c9a1082459a8d57f221fe1ec38781b2deb3b360",
+   "original_return_sha256": "8ae49fd5a1f1690b98cd7004dc42e563455e8e9cbe1350fac9e4fb9d4a91ab4d",
+   "published_packet_redacted_sha256": "d762112e359594ae6d2fbcb864e5f82401d2123c848c5414181534a15025b786",
+   "published_gpt6_return_sha256": "8ae49fd5a1f1690b98cd7004dc42e563455e8e9cbe1350fac9e4fb9d4a91ab4d"
   },
   "m3": {
-   "packet_sha256": "bb86efc86524dd2c36b63f5300c9f57e095d71ae25b0fd9c3ef12db3d81d3a58",
-   "final_sha256": "c1730fc90ca60f30ff00bf8187e8301fa00ee14d40bfde0259f22dc351798cb2",
    "usage": {
     "input_tokens": 21206,
     "cached_input_tokens": 0,
     "cache_write_input_tokens": 0,
     "output_tokens": 2173,
     "reasoning_output_tokens": 1899
-   }
+   },
+   "original_packet_sha256": "bb86efc86524dd2c36b63f5300c9f57e095d71ae25b0fd9c3ef12db3d81d3a58",
+   "original_return_sha256": "c1730fc90ca60f30ff00bf8187e8301fa00ee14d40bfde0259f22dc351798cb2",
+   "published_packet_redacted_sha256": "ae51a78480434a19e88609ff78d2876176f4f4ee90347341d2a9efe261572428",
+   "published_gpt6_return_sha256": "c1730fc90ca60f30ff00bf8187e8301fa00ee14d40bfde0259f22dc351798cb2"
   }
  },
  "m4_packet_inputs_sha256": {
   "SKILL.md": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
   "AGENTS.md": "cf44536f3793cc37187c9800b682bbf3f5d4e01c85fab6ee0be070c77a161a7c",
   "skills-trial-excerpt.md": "b2a93706817f19ddcd73f78ed2f228356f23bb7b4acacbd66957a771c1f37f36"
- }
+ },
+ "note": "original_* digests are over the unredacted local files (packet as sent; return as written by codex -o). published_* digests are over the sanitized files in this directory: user-level lines replaced by sha256 placeholders and paths normalised."
 }
