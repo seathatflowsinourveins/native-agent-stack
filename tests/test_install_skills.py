@@ -37,6 +37,7 @@ pointed at a second temporary directory.
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -45,6 +46,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools" / "adoption" / "install_skills.py"
+ADOPTION_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
+REUSE_PIN_KEYS = ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256",
+                  "skill_md_bytes", "description_chars", "upstream_disable_model_invocation")
 
 PINNED_VERSION = "1.7.0"
 INSTALL_HINT = "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0"
@@ -597,6 +601,16 @@ sys.exit(code)
         self.assertEqual(json.loads(result.stdout)["skills"], {})
         self.assertEqual(calls_log(self.fake_bin), [["--version"]])
 
+    def test_only_naming_a_pruned_skill_reports_it_as_pruned_not_unknown(self):
+        self.skill["status"] = "pruned"
+        self.manifest = self.write_manifest([self.skill])
+        result = self.install("--only", "project-skill")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("pruned --only name(s)", result.stderr)
+        self.assertIn("project-skill", result.stderr)
+        self.assertNotIn("unknown", result.stderr)
+        self.assertEqual(calls_log(self.fake_bin), [])  # rejected before even the version check
+
     def test_relative_binary_is_resolved_before_changing_to_project_directory(self):
         result = self.run_install(
             self.manifest, "--project-dir", str(self.project), "--agent", "universal",
@@ -828,6 +842,48 @@ class PrintCodexConfigTests(InstallSkillsTestCase):
         self.assertEqual(result.stdout.count("[[skills.config]]"), 3)
         for i in range(3):
             self.assertIn(f'name = "off-{i}"', result.stdout)
+
+
+class ReuseRefGateTests(InstallSkillsTestCase):
+    """A `reuse_ref` entry takes main's per-skill gates when the manifest is read.
+
+    The references resolve against this checkout's adoption/skills/manifest.json, so the
+    fixtures pick real entries by their current gate instead of hard-coding a name.
+    """
+
+    def reuse(self, predicate) -> dict:
+        skills = json.loads(ADOPTION_MANIFEST.read_text())["skills"]
+        index = next(i for i, s in enumerate(skills) if predicate(s))
+        entry = {key: skills[index][key] for key in REUSE_PIN_KEYS}
+        entry.update(status="trial", reuse_ref=f"adoption/skills/manifest.json#/skills/{index}")
+        return entry
+
+    def test_reused_skill_that_main_disables_for_codex_comes_out_disabled(self):
+        off = self.reuse(lambda s: s.get("codex_enabled") is False)
+        on = self.reuse(lambda s: s.get("codex_enabled") is True)
+        result = self.run_install(self.write_manifest([off, on]), "--print-codex-config")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(re.findall(r'(?m)^name = "([^"]+)"$', result.stdout), [off["name"]])
+
+    def test_reused_entry_that_restates_a_gate_is_refused(self):
+        entry = self.reuse(lambda s: s.get("codex_enabled") is False)
+        entry["codex_enabled"] = True  # would silently widen main's Codex gate
+        result = self.run_install(self.write_manifest([entry]), "--print-codex-config")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("restates main's codex_enabled", result.stderr)
+        self.assertNotIn("[[skills.config]]", result.stdout)
+
+    def test_reuse_ref_that_drifted_from_main_is_refused_before_any_install(self):
+        entry = self.reuse(lambda s: s.get("codex_enabled") is False)
+        entry["tree_sha"] = tree_sha("drifted")
+        manifest = self.write_manifest([entry])
+        printed = self.run_install(manifest, "--print-codex-config")
+        self.assertEqual(printed.returncode, 1, printed.stdout + printed.stderr)
+        self.assertIn("reuse_ref", printed.stderr)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {})
+        installed = self.run_install(manifest, fake_bin=fake_bin)
+        self.assertEqual(installed.returncode, 1, installed.stdout + installed.stderr)
+        self.assertEqual(calls_log(fake_bin), [])  # refused before even the version check
 
 
 class VersionRefusalTests(InstallSkillsTestCase):

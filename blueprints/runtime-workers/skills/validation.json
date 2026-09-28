@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-27",
+  "checked_at": "2026-09-28",
   "evidence_class": "local_integration_and_structural_checks",
   "scope": "Source-pinned catalog and wrapper fixtures; not a native skills installation, model run or worker acceptance.",
   "fail_first": [
@@ -79,6 +79,16 @@
       "exit_code": 1,
       "returned_excerpt": "Ran 2 tests in 0.043s\nFAILED (failures=2)",
       "cause": "CLI help omitted gh configured authentication and scoped global removal; README prune contract omitted Claude listing-budget settings and visibility/unknown treatment."
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_double_claims_restated_gates_and_bare_exclusions tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_print_codex_config_disables_every_reused_skill_main_disables tests.test_install_skills.ReuseRefGateTests tests.test_install_skills.ProjectInstallTests.test_only_naming_a_pruned_skill_reports_it_as_pruned_not_unknown",
+      "exit_code": 1,
+      "tests": 9,
+      "failures": 7,
+      "errors": 2,
+      "returned_excerpt": "AssertionError: Lists differ: ['security-audit: neither reused nor excluded'] != []\nAssertionError: Lists differ: ['security-audit: neither reused nor exclud[49 chars]ded'] != ['future-main-skill: neither reused nor excluded']\nStopIteration\nStopIteration\nAssertionError: Lists differ: [] != ['agent-browser', 'agentic-actions-auditor[264 chars]sis']\nAssertionError: 0 != 1 : \nAssertionError: 0 != 1 : \nAssertionError: Lists differ: [] != ['codebase-design']\nAssertionError: 'pruned --only name(s)' not found in \"install-skills failed: unknown --only name(s): ['project-skill']\\n\"\nRan 9 tests in 0.664s\nFAILED (failures=7, errors=2)",
+      "cause": "Main #448 added security-audit, which was neither reused nor excluded; reused entries carried no gates, so --print-codex-config disabled none of the reused skills main keeps off for Codex; a drifted or gate-restating reuse_ref was accepted; --only named a pruned project skill as unknown."
     }
   ],
   "not_run": [
@@ -112,14 +122,15 @@
     "verification": "Full verbose suite: Ran 52 tests in 9.080s; OK (exit 0). See checks and review_findings."
   },
   "input_sha256": {
-    "tools/adoption/install_skills.py": "6fc923015e25089403caa58c631ccad08a1b3136a7576270b82e2161df82baa1",
+    "tools/adoption/install_skills.py": "02724c82401deb36e0b8dd8c5277b3e0292ada62721f29a8cbfa29c3ce10b601",
     "tools/adoption/runtime_skill_freshness.py": "497ea3b22f04d261afcd2ae8adbf9da5b1f1cb4fc12b2051aab74a14c0aeb3f9",
-    "tests/test_install_skills.py": "43a74fcfbbfa98b564623d595f9230e8ce162cafd018b118147f79dc6ed6eb91",
-    "tests/test_runtime_worker_skills.py": "ddab4e6a3ebfc4974c7a52720a28049793cebf317d9115fb1766a6f8a9d99ef1",
-    "blueprints/runtime-workers/skills/manifest.json": "aefae182fce9b964fc390a2eeaa7d407e96353c4bb8808e9a0c1d605adbbc25f",
-    "blueprints/runtime-workers/skills/README.md": "2948fcd23992ac7c66eb3438e22aba399b671c02380da35e30c287f61bd3403c",
+    "tests/test_install_skills.py": "0420a74c910f847df90cada620236ae2195293d36500f399e3717dd03b3cf9fb",
+    "tests/test_runtime_worker_skills.py": "248080f658a2be15f946681b861d5954a391524ff88e70b24ac30db1e1e37be4",
+    "blueprints/runtime-workers/skills/manifest.json": "98596be71d34c9c0e9c15c597691e650164aa2823b97246d2f431dcca3b67809",
+    "blueprints/runtime-workers/skills/README.md": "efa6c9b9a3b615daa04c070478f23aaec71348228d8617e26c924a5afcccf655",
     ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
-    "docs/harness-defaults.md": "0e25525dbc73eff78e8e608c5dc35067542d0e7f0685633a2a4f3322f9525258"
+    "docs/harness-defaults.md": "6679275b4d00dd041a58063ca6a90715836a76c1a16bb0e7b9b3eccf94a933e9",
+    "adoption/skills/manifest.json": "056fa8744df94a6b33ff14583a95b3140047cd8a5d44525459ae1b08dfffd90f"
   },
   "repair_r1_research": {
     "base_head": "5f3eaebf",
@@ -144,6 +155,37 @@
     "environment": {
       "PYTHONDONTWRITEBYTECODE": "1",
       "TMPDIR": "temporary directory inside the owned worktree; removed after checks"
+    }
+  },
+  "repair_r2": {
+    "base_head": "534af74f",
+    "main_base": "3058b237",
+    "coordinator_direction": "Option (b): exclude security-audit, because runtime workers must not bypass a gate set on main; derive the reused skills' gates from main when the manifest is read.",
+    "adoption_contract": {
+      "main_adoption_skills": 29,
+      "reused_by_reuse_ref": 28,
+      "excluded_by_adoption_ref": [
+        "security-audit"
+      ],
+      "reused_codex_disabled_on_main": 16,
+      "pin_comparison": "Test contract against the checked-in adoption manifest; no new gh api fetch in this round."
+    },
+    "sources": [
+      "8315274f adoption/skills/manifest.json skills[28]: security-audit, codex_enabled false, claude_listing name-only",
+      "https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings (read 2026-09-28)",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md:49-56",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1123-L1130",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L182-L185",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L278-L284",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L528-L538"
+    ],
+    "source_check": "The inspected skill.py blob 134e64051c19dc92ccfd3fde4076b41371f6d869 matched gh api contents at fcc102a697874d54a357e36004e02c95040dbdc0 and at da28c7736ea667ceae51cf3a3b9b37ab5f528f22.",
+    "fixture_boundary": "Installer CLI subprocess against the checked-in adoption manifest and synthetic runtime entries, plus the structural contract over the real runtime manifest. Not a native skills run or worker acceptance.",
+    "publication_integrity": "scripts/validate.py and scripts/host_receipts.py validate run after the manifests/evidence.json re-registration that follows this file's last edit; their results are reported with the commit, not recorded here.",
+    "independent_review": "None run for repair r2.",
+    "environment": {
+      "TMPDIR": "temporary directory under /var/tmp; removed after checks",
+      "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run, so no stale bytecode was read"
     }
   },
   "historical_checks": [
@@ -198,10 +240,7 @@
       "exit_code": 0,
       "returned_excerpt": "Ran 43 tests in 3.242s; OK",
       "kind": "final after coding-role research coverage clarification"
-    }
-  ],
-  "historical_checks_scope": "Pre-repair observations retained as history; none is acceptance for this repair. The stale 42-test result is superseded by checks below.",
-  "checks": [
+    },
     {
       "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills -v",
       "exit_code": 0,
@@ -227,6 +266,90 @@
       "exit_code": 0,
       "returned_excerpt": "",
       "kind": "repair-r1 whitespace check"
+    }
+  ],
+  "historical_checks_scope": "Observations before repair r2 retained as history: the pre-repair-r1 checks, then the repair-r1 acceptance checks. None is acceptance for repair r2; checks below supersede them.",
+  "checks": [
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_double_claims_restated_gates_and_bare_exclusions tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_print_codex_config_disables_every_reused_skill_main_disables tests.test_install_skills.ReuseRefGateTests tests.test_install_skills.ProjectInstallTests.test_only_naming_a_pruned_skill_reports_it_as_pruned_not_unknown",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 9 tests in 0.813s\n\nOK",
+      "tests": 9,
+      "kind": "repair-r2 fail-first tests after the fix"
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_install_skills tests.test_runtime_worker_skills tests.test_workflow_security_coverage",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 67 tests in 30.693s\n\nOK",
+      "tests": 67,
+      "kind": "repair-r2 full local integration and structural checks",
+      "limitation": "Fake CLI/gh and structural contracts; not a native skills run, upstream acceptance or model activation."
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_blind_checkout",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 40 tests in 23.257s\n\nOK",
+      "tests": 40,
+      "kind": "repair-r2 blueprint label classification and export checks"
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_pre_push_gate",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 16 tests in 28.853s\n\nOK",
+      "tests": 16,
+      "kind": "repair-r2 pre-push registry gate checks"
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_adoption_docs_consistency",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 37 tests in 9.155s\n\nOK (skipped=1)",
+      "tests": 37,
+      "kind": "repair-r2 reader of docs/harness-defaults.md",
+      "limitation": "The skip reports that no profile's coverage differs between the pinned release and HEAD."
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 56 tests in 47.340s\n\nOK",
+      "tests": 56,
+      "kind": "repair-r2 reader of docs/harness-defaults.md"
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_install_claude_profile",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 58 tests in 0.641s\n\nOK (skipped=3)",
+      "tests": 58,
+      "kind": "repair-r2 reader of docs/harness-defaults.md",
+      "limitation": "The three skips report that PyYAML is not installed on this host."
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 -m unittest -v tests.test_token_e2e_preregistration",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 33 tests in 0.624s\n\nOK",
+      "tests": 33,
+      "kind": "repair-r2 reader of docs/harness-defaults.md"
+    },
+    {
+      "round": "repair-r2",
+      "command": "python3 tools/adoption/install_skills.py --manifest blueprints/runtime-workers/skills/manifest.json --print-codex-config",
+      "exit_code": 0,
+      "returned_excerpt": "16 [[skills.config]] tables with enabled = false: agent-browser agentic-actions-auditor codebase-design codeql find-skills fp-check frontend-design grill-me improve-codebase-architecture mcp-builder property-based-testing resolving-merge-conflicts sarif-parsing semgrep supply-chain-risk-auditor variant-analysis",
+      "kind": "repair-r2 Codex gates derived from main for the 28 reused skills"
+    },
+    {
+      "round": "repair-r2",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_excerpt": "",
+      "kind": "repair-r2 whitespace check"
     }
   ],
   "review_findings": [
@@ -334,6 +457,78 @@
       "verification": [
         "RuntimeWorkerManifestTests.test_prune_contract_records_claude_listing_budget_and_unknown_visibility"
       ]
+    },
+    {
+      "id": "R2-1",
+      "severity": "blocker",
+      "finding": "Main #448 (8315274f) added security-audit as a 29th adoption skill; the reuse contract required every adoption skill to be reused, so the rebased branch failed with 28 != 29.",
+      "disposition": "fixed",
+      "resolution": "Coordinator direction (option b): security-audit is excluded by adoption_ref with a reason and an overturn condition. The contract now requires each main adoption skill to be reused or excluded exactly once, and a synthetic future main skill in neither set fails it.",
+      "sources": [
+        "8315274f adoption/skills/manifest.json skills[28]"
+      ],
+      "verification": [
+        "RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded",
+        "RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set",
+        "RuntimeWorkerManifestTests.test_contract_rejects_double_claims_restated_gates_and_bare_exclusions",
+        "RuntimeWorkerManifestTests.test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it"
+      ]
+    },
+    {
+      "id": "R2-2",
+      "severity": "major",
+      "finding": "Reused entries copied only pin keys, silently widening main's per-skill gates: --print-codex-config on the runtime manifest disabled none of the 16 reused skills main keeps off for Codex.",
+      "disposition": "fixed",
+      "resolution": "install_skills.py resolves each reuse_ref when it reads the manifest, refuses a drifted or gate-restating entry, and takes codex_enabled and claude_listing from the adoption entry. The README states that claude_listing is a Claude Code skillOverrides setting that OpenHands does not read.",
+      "sources": [
+        "https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1123-L1130"
+      ],
+      "verification": [
+        "ReuseRefGateTests.test_reused_skill_that_main_disables_for_codex_comes_out_disabled",
+        "ReuseRefGateTests.test_reused_entry_that_restates_a_gate_is_refused",
+        "ReuseRefGateTests.test_reuse_ref_that_drifted_from_main_is_refused_before_any_install",
+        "RuntimeWorkerManifestTests.test_print_codex_config_disables_every_reused_skill_main_disables"
+      ]
+    },
+    {
+      "id": "R2-3",
+      "severity": "minor",
+      "finding": "In project mode, --only with a pruned skill's name failed as unknown.",
+      "disposition": "fixed",
+      "resolution": "Names are looked up in the whole manifest before pruned skills are filtered; a pruned name fails as pruned before the version check.",
+      "sources": [
+        "tools/adoption/install_skills.py main --only handling"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_only_naming_a_pruned_skill_reports_it_as_pruned_not_unknown"
+      ]
+    },
+    {
+      "id": "R2-4",
+      "severity": "minor",
+      "finding": "--check-only is not offline: it verifies the pinned skills binary, and in project mode it needs gh sign-in and network for the pinned-tree preflight.",
+      "disposition": "retain",
+      "resolution": "Behavior kept by coordinator direction; the README documents both requirements.",
+      "sources": [
+        "tools/adoption/install_skills.py verify_skills_bin and pinned_source_trees"
+      ],
+      "verification": [
+        "README.md lifecycle section"
+      ]
+    },
+    {
+      "id": "R2-5",
+      "severity": "minor",
+      "finding": "input_sha256 was stale for tests/test_install_skills.py and docs/harness-defaults.md.",
+      "disposition": "fixed",
+      "resolution": "Every listed input hash was recomputed after the repair-r2 edits, and adoption/skills/manifest.json was added as an input of the reuse contract.",
+      "sources": [
+        "sha256sum of each listed input at the repair-r2 working tree"
+      ],
+      "verification": [
+        "input_sha256"
+      ]
     }
   ],
   "historical_independent_review": {
@@ -342,8 +537,9 @@
     "verification": "42 focused tests passed before the final README-matrix consistency test was added."
   },
   "open_items": [
-    "Coordinator must re-register changed evidence hashes in manifests/evidence.json and commit the repair.",
-    "Native skills CLI installation, unchanged upstream tests and worker/model E2E remain outside this repair; no such execution is claimed."
+    "Native skills CLI installation, unchanged upstream tests and worker/model E2E remain outside this repair; no such execution is claimed.",
+    "security-audit stays excluded until main promotes it after M5c; then replace the exclusion with a reuse_ref entry and assign its scenarios and roles.",
+    "This installer writes no Claude settings; a Claude Code worker must apply main's claude_listing through its own skillOverrides."
   ],
   "cleanup": {
     "initial_observation": "Post-check inventory found three ignored __pycache__ directories containing eight .pyc files; the initial zero-cache assertion failed. Their origin was not attributed to this repair.",

@@ -110,6 +110,27 @@ Returned summaries and the exact commands are retained in [validation](validatio
 These are local integration fixtures; unchanged upstream CLI tests and worker
 E2E runs were not executed.
 
+## 2026-09-28 rebase: main's gated skill and the reused gates
+
+The branch was rebased onto main `3058b237`. Main's #448 (`8315274f`) had added
+a 29th adoption skill, `security-audit` from `cloudflare/security-audit-skill`,
+with Codex disabled and a name-only Claude listing pending the M5c bake-off
+against `/security-review`. The coordinator chose to exclude it rather than reuse
+it, because runtime workers must not bypass a gate set on main. The manifest
+records that exclusion with an overturn condition. The contract test re-verified
+the 28 `reuse_ref` pins against main (all equal). The selected count stays 138
+and the source count 12.
+
+The same review found that reused entries copied only pin keys, so
+`--print-codex-config` on this manifest disabled none of the 16 reused skills
+main keeps off for Codex. The installer now takes both gates from the adoption
+entry when it resolves a `reuse_ref`, and refuses an entry that restates a gate
+or whose pin drifted. The Claude listing mode is a Claude Code `skillOverrides`
+setting; the OpenHands SDK at `fcc102a697874d54a357e36004e02c95040dbdc0` reads
+only SKILL.md frontmatter from its skill directories (see the README). Each new
+test failed before its fix; [validation](validation.json) retains the returned
+summaries. No independent model review was run for this round.
+
 ## Source pins
 
 <!-- source-pins -->

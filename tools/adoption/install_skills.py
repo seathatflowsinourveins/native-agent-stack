@@ -49,6 +49,12 @@ As with the global verifier, this attests
 the source tree, not all installed support files. No lock or skill is hand-written.
 Reference: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73
 src/local-lock.ts:15-37,65-66; src/add.ts:2086-2160; src/agents.ts:815-820.
+
+A manifest entry with `reuse_ref` (adoption/skills/manifest.json#/skills/<index>)
+is resolved when the manifest is read: its pin must equal the referenced adoption
+entry, and it takes that entry's codex_enabled and claude_listing. An entry that
+restates either gate, or whose pin drifted, is refused before any skill is touched.
+With --only, a name that the manifest marks pruned is reported as pruned, not unknown.
 """
 
 from __future__ import annotations
@@ -66,6 +72,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
+
+# A manifest entry may reuse an adoption skill by a repository-relative reference instead of
+# copying it (blueprints/runtime-workers/skills/manifest.json). load_manifest checks the pin
+# against the referenced entry and copies main's per-skill gates onto it as read, so a reused
+# skill is never enabled where main disables it. An entry that restates a gate is refused.
+REUSE_REF_PREFIX = "adoption/skills/manifest.json#/skills/"
+REUSE_PIN_KEYS = ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256")
+REUSE_GATE_KEYS = ("codex_enabled", "claude_listing")
 
 VERSION_CHECK_TIMEOUT = 30
 ADD_TIMEOUT = 120
@@ -87,9 +101,39 @@ class InstallError(ValueError):
     """A skill could not be safely installed, verified or checked."""
 
 
-def load_manifest(path: Path) -> dict:
+def load_manifest(path: Path, root: Path = ROOT) -> dict:
+    """Read a manifest and resolve each `reuse_ref` entry against root's adoption manifest.
+
+    The reused entry must carry the referenced pin unchanged; it then takes the adoption
+    entry's current codex_enabled/claude_listing, so the two manifests cannot drift."""
     with open(path, "r", encoding="utf-8") as handle:
-        return json.load(handle)
+        manifest = json.load(handle)
+    skills = manifest.get("skills") if isinstance(manifest, dict) else None
+    reused = [s for s in skills if isinstance(s, dict) and "reuse_ref" in s] if isinstance(skills, list) else []
+    if not reused:
+        return manifest
+    adoption_path = root / REUSE_REF_PREFIX.split("#", 1)[0]
+    try:
+        with open(adoption_path, "r", encoding="utf-8") as handle:
+            base = json.load(handle)["skills"]
+        if not isinstance(base, list):
+            raise TypeError("skills is not a list")
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise InstallError(f"cannot resolve reuse_ref entries against {adoption_path}: {error}") from None
+    for skill in reused:
+        ref = str(skill["reuse_ref"])
+        index = ref[len(REUSE_REF_PREFIX):] if ref.startswith(REUSE_REF_PREFIX) else ""
+        if not index.isdigit() or int(index) >= len(base) or not isinstance(base[int(index)], dict):
+            raise InstallError(f"{skill.get('name')}: reuse_ref {ref!r} names no adoption skill")
+        old = base[int(index)]
+        drifted = [key for key in REUSE_PIN_KEYS if skill.get(key) != old.get(key)]
+        if drifted:
+            raise InstallError(f"{skill.get('name')}: reuse_ref {ref} differs from the adoption pin in {drifted}")
+        restated = [key for key in REUSE_GATE_KEYS if key in skill]
+        if restated:
+            raise InstallError(f"{skill.get('name')}: reuse_ref entry restates main's {', '.join(restated)}")
+        skill.update({key: old[key] for key in REUSE_GATE_KEYS if key in old})
+    return manifest
 
 
 def sha256_of(path: Path) -> str:
@@ -357,7 +401,8 @@ def build_parser() -> argparse.ArgumentParser:
                               "(default: refuse it as local-modified)")
     parser.add_argument("--print-codex-config", action="store_true",
                          help="Print [[skills.config]] name/enabled=false lines for every "
-                              "codex_enabled: false manifest skill, then exit")
+                              "codex_enabled: false manifest skill (a reuse_ref entry takes the "
+                              "adoption manifest's value), then exit")
     parser.add_argument("--json", action="store_true",
                          help="Print a compact, value-free {skill: status} summary instead of prose")
     return parser
@@ -377,8 +422,14 @@ def main(argv: list[str] | None = None) -> int:
     manifest_path = Path(args.manifest)
     try:
         manifest = load_manifest(manifest_path)
+    except InstallError as error:
+        print(f"install-skills failed: {error}", file=sys.stderr)
+        return 1
     except (OSError, json.JSONDecodeError) as error:
         print(f"install-skills failed: cannot read manifest {manifest_path}: {error}", file=sys.stderr)
+        return 1
+    except (KeyError, TypeError) as error:
+        print(f"install-skills failed: malformed reuse_ref entry ({error})", file=sys.stderr)
         return 1
     try:
         all_skills = manifest["skills"]
@@ -396,9 +447,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.only:
         wanted = list(dict.fromkeys(args.only))
         by_name = {s["name"]: s for s in skills if isinstance(s, dict) and "name" in s}
-        unknown = [name for name in wanted if name not in by_name]
+        # Look each name up in the whole manifest first: a pruned skill is known, not unknown.
+        known = {s["name"] for s in all_skills if isinstance(s, dict) and "name" in s}
+        unknown = [name for name in wanted if name not in known]
         if unknown:
             print(f"install-skills failed: unknown --only name(s): {unknown}", file=sys.stderr)
+            return 1
+        pruned = [name for name in wanted if name not in by_name]
+        if pruned:
+            print(f"install-skills failed: pruned --only name(s), not installed in project mode: {pruned}",
+                  file=sys.stderr)
             return 1
         skills = [by_name[name] for name in wanted]
 

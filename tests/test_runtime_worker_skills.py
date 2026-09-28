@@ -1,19 +1,65 @@
 """Structural/source-contract checks, not native worker or upstream acceptance."""
 import ast
+import copy
 import importlib.util
 import json
 from pathlib import Path
 import re
+import subprocess
+import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY = ROOT / "blueprints/runtime-workers/skills"
+ADOPTION_MANIFEST = ROOT / "adoption/skills/manifest.json"
+ADOPTION_REF_PREFIX = "adoption/skills/manifest.json#/skills/"
 SCENARIOS = {
     "planning-and-specs", "tdd", "e2e-testing", "ab-testing-and-evaluation", "debugging",
     "code-review", "security", "github-issue-to-pr", "github-pr-review", "github-ci-fix",
     "github-actions", "release-notes", "docs-and-citations", "research", "deployment-uv-docker", "memory",
 }
 ROLES = {"coding", "orchestration", "research", "extraction-caller"}
+PIN_KEYS = ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256",
+            "skill_md_bytes", "description_chars", "upstream_disable_model_invocation")
+# Main's per-skill gates. A reused entry never restates them; the installer reads them from main.
+GATE_KEYS = ("codex_enabled", "claude_listing")
+
+
+def adoption_contract_problems(runtime: dict, base: dict) -> list[str]:
+    """Each skill in main's adoption manifest is claimed exactly once: reused by `reuse_ref`
+    (pins equal to main's, gates not restated) or excluded by `adoption_ref` (with a reason
+    and an overturn condition). Returns one line per violation; empty means the contract holds."""
+    problems = []
+    claims: dict[int, list[tuple[str, dict]]] = {}
+    for kind, entries, key in (("reused", runtime["skills"], "reuse_ref"),
+                               ("excluded", runtime["excluded"], "adoption_ref")):
+        for entry in entries:
+            if key not in entry:
+                continue
+            ref = str(entry[key])
+            index = ref[len(ADOPTION_REF_PREFIX):] if ref.startswith(ADOPTION_REF_PREFIX) else ""
+            if not index.isdigit() or int(index) >= len(base["skills"]):
+                problems.append(f"{entry.get('name')}: {key} {ref!r} names no main adoption skill")
+                continue
+            claims.setdefault(int(index), []).append((kind, entry))
+    for index, old in enumerate(base["skills"]):
+        entries = claims.get(index, [])
+        if len(entries) != 1:
+            kinds = ", ".join(kind for kind, _ in entries) or "neither reused nor excluded"
+            problems.append(f"{old['name']}: {kinds}")
+            continue
+        kind, entry = entries[0]
+        if kind == "reused":
+            problems += [f"{old['name']}: reused {key} differs from main" for key in PIN_KEYS
+                         if entry.get(key) != old.get(key)]
+            problems += [f"{old['name']}: reused entry restates main's {key}" for key in GATE_KEYS
+                         if key in entry]
+        else:
+            if (entry.get("name"), entry.get("source")) != (old["name"], old["source"]):
+                problems.append(f"{old['name']}: exclusion names {entry.get('name')!r} from {entry.get('source')!r}")
+            problems += [f"{old['name']}: exclusion lacks {key}" for key in ("reason", "overturn")
+                         if not entry.get(key)]
+    return problems
 
 
 class RuntimeWorkerManifestTests(unittest.TestCase):
@@ -72,17 +118,54 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
                 self.assertEqual((scenario, role) in gap_keys, not bool(expected))
         self.assertTrue(all(g["reason"] for g in self.manifest["gaps"]))
 
-    def test_all_existing_skills_are_reused_by_reference_without_pin_drift(self):
-        base = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
-        reused = [s for s in self.skills if "reuse_ref" in s]
-        self.assertEqual(len(reused), len(base["skills"]))
-        for skill in reused:
-            prefix, index = skill["reuse_ref"].rsplit("/", 1)
-            self.assertEqual(prefix, "adoption/skills/manifest.json#/skills")
-            old = base["skills"][int(index)]
-            for key in ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256",
-                        "skill_md_bytes", "description_chars", "upstream_disable_model_invocation"):
-                self.assertEqual(skill[key], old[key], (skill["name"], key))
+    def test_every_adoption_skill_is_reused_or_explicitly_excluded(self):
+        base = json.loads(ADOPTION_MANIFEST.read_text())
+        self.assertEqual(adoption_contract_problems(self.manifest, base), [])
+
+    def test_contract_rejects_a_future_main_skill_in_neither_set(self):
+        # Negative control: a skill main adds later that is neither reused nor excluded must fail.
+        base = json.loads(ADOPTION_MANIFEST.read_text())
+        base["skills"].append(dict(base["skills"][0], name="future-main-skill"))
+        self.assertEqual(adoption_contract_problems(self.manifest, base),
+                         ["future-main-skill: neither reused nor excluded"])
+
+    def test_contract_rejects_double_claims_restated_gates_and_bare_exclusions(self):
+        base = json.loads(ADOPTION_MANIFEST.read_text())
+        runtime = copy.deepcopy(self.manifest)
+        reused = [s for s in runtime["skills"] if "reuse_ref" in s]
+        double, restating = reused[0], reused[1]
+        runtime["excluded"].append({"name": double["name"], "source": double["source"],
+                                    "adoption_ref": double["reuse_ref"], "reason": "r", "overturn": "o"})
+        restating["codex_enabled"] = True
+        bare = next(e for e in runtime["excluded"] if e.get("adoption_ref") and e is not runtime["excluded"][-1])
+        del bare["overturn"]
+        problems = adoption_contract_problems(runtime, base)
+        self.assertIn(f"{double['name']}: reused, excluded", problems)
+        self.assertIn(f"{restating['name']}: reused entry restates main's codex_enabled", problems)
+        self.assertIn(f"{bare['name']}: exclusion lacks overturn", problems)
+
+    def test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it(self):
+        exclusion = next(e for e in self.manifest["excluded"] if e.get("name") == "security-audit")
+        for cited in ("#448", "8315274f", "M5c", "/security-review"):
+            self.assertIn(cited, exclusion["reason"] + " " + exclusion["overturn"], cited)
+        gate = {s["name"]: s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"]}["security-audit"]
+        # Overturn trigger: once main promotes the skill, this fails and the entry becomes a reuse_ref.
+        self.assertEqual((gate["codex_enabled"], gate["claude_listing"]), (False, "name-only"),
+                         "main promoted security-audit: overturn its exclusion and reuse it by reference")
+
+    def test_print_codex_config_disables_every_reused_skill_main_disables(self):
+        base = json.loads(ADOPTION_MANIFEST.read_text())["skills"]
+        expected = sorted(
+            [s["name"] for s in self.skills
+             if "reuse_ref" in s and base[int(s["reuse_ref"].rsplit("/", 1)[1])].get("codex_enabled") is False]
+            + [s["name"] for s in self.skills if "reuse_ref" not in s and s.get("codex_enabled") is False])
+        self.assertTrue(expected)  # non-vacuous: main keeps some reused skills off for Codex
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
+             "--manifest", str(DIRECTORY / "manifest.json"), "--print-codex-config"],
+            capture_output=True, text=True, check=False, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(sorted(re.findall(r'(?m)^name = "([^"]+)"$', result.stdout)), expected)
 
     def test_openhands_inventory_has_a_decision_for_every_skill(self):
         inventory = self.manifest["openhands_inventory"]

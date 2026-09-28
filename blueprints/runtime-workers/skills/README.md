@@ -2,9 +2,10 @@
 
 The [manifest](manifest.json) selects **138 skills from 12 pinned sources** for
 a broad worker trial: 77 OpenHands registry skills, all 15 superpowers lifecycle
-skills, all 28 existing adoption skills reused by `reuse_ref`, and targeted
+skills, 28 of the adoption manifest's 29 skills reused by `reuse_ref`, and targeted
 additions for evaluation, research, browser testing and framework review.
-The existing adoption manifest remains unchanged. [Research](research.md)
+The adoption manifest remains unchanged; its gated `security-audit` entry is
+excluded (see [Gates of reused adoption skills](#gates-of-reused-adoption-skills)). [Research](research.md)
 records the source review; each skill has its own `repo@commit path:line`
 merit citation. Selection means `trial`, not native acceptance or measured SOTA.
 
@@ -54,6 +55,43 @@ even if a model explicitly requests that tool call. A client-specific user
 invocation route must be verified separately; it is not established by this
 catalog ([invoke_skill.py:109](https://github.com/OpenHands/software-agent-sdk/blob/da28c7736ea667ceae51cf3a3b9b37ab5f528f22/openhands-sdk/openhands/sdk/tool/builtins/invoke_skill.py#L109)).
 
+## Gates of reused adoption skills
+
+Every skill in `adoption/skills/manifest.json` is either reused by `reuse_ref` or
+listed in `excluded` with an `adoption_ref`, a `reason` and an `overturn` condition.
+`tests.test_runtime_worker_skills` fails when main adds a skill that is in neither
+set, and when a reused entry's pin differs from main's.
+
+- **Codex.** A reused entry carries no `codex_enabled` or `claude_listing` of its
+  own. `install_skills.py` resolves each `reuse_ref` when it reads the manifest,
+  refuses an entry whose pin drifted or that restates a gate, and takes both gates
+  from the adoption entry. `--print-codex-config` on this manifest therefore prints
+  an `enabled = false` table for every reused skill main keeps off for Codex
+  (16 of the 28 on 2026-09-28).
+- **Claude listing.** `claude_listing` (`on`, `name-only`, `user-invocable-only`,
+  `off`) is a Claude Code client setting, applied through the `skillOverrides`
+  settings key rather than the skill's frontmatter
+  ([Claude Code skills](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings);
+  [2026-09-25 decision](../../../docs/decisions/2026-09-25-skills-trial-and-usage.md)).
+  It is not applied inside OpenHands or other runtime containers, which have no
+  Claude skill listing. The OpenHands SDK loads project skills only from
+  `.agents/skills`, `.openhands/skills` and `.openhands/microagents`
+  ([skill.py:1123-1130](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1123-L1130)),
+  lists every SKILL.md skill with its name, description and location
+  ([skill.py:182-185](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L182-L185)),
+  and withholds a skill from the model only through its SKILL.md
+  `disable-model-invocation` frontmatter
+  ([skill.py:278-284](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L278-L284),
+  [skill.py:528-538](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L528-L538)).
+  `skill.py` is the same blob at `fcc102a6` and at the `da28c773` pin cited
+  elsewhere in this README. A Claude Code worker must apply main's `claude_listing`
+  in its own settings; this installer writes no client settings.
+- **Excluded.** `security-audit` (#448, `8315274f`) stays out while main keeps it
+  Codex-disabled and name-only pending the M5c bake-off against `/security-review`.
+  When main promotes it, replace the exclusion with a `reuse_ref` entry and assign
+  its scenarios and roles. `test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it`
+  fails as soon as main's gate changes, so a promotion cannot pass unnoticed.
+
 ## Lifecycle through the existing installer
 
 Use the already provisioned **skills 1.7.0** executable and `gh`. The wrapper
@@ -102,8 +140,12 @@ EXTRACTION_PROJECT="$STACK_ROOT/.runtime/extraction-caller"
 
 Use `--dry-run` to list planned adds; it is not an integrity pass for absent
 skills. `--check-only` exits 1 on missing, modified or drifted entries and makes
-no add/remove calls. `--only NAME` is repeatable for a bounded repair or explicitly
-scoped subset. The broad trial defaults to every non-pruned manifest skill.
+no add/remove calls. It is not offline: it still verifies the pinned `skills`
+binary with `skills --version`, and in project mode it needs `gh` sign-in and
+network access for the pinned-tree preflight above. `--only NAME` is repeatable
+for a bounded repair or explicitly scoped subset; in project mode a name the
+manifest marks pruned fails as pruned, not as unknown. The broad trial defaults
+to every non-pruned manifest skill.
 For `--agent claude-code`, an existing `.claude/skills/<name>` must be a symlink
 resolving to `.agents/skills/<name>`. A real directory, file or foreign symlink
 is `local-modified` with or without a project lock, even if its SKILL.md matches
