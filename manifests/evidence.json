@@ -14019,8 +14019,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
-      "sha256": "7bc0354f163ab217cad39b80edec64b068ad4bd65023d2d31ee7a3cdefe5ed76",
-      "bytes": 17583
+      "sha256": "1affb7b470c3b1c12b51e98065572486c0567db874795d0a319cbf6b76952491",
+      "bytes": 17755
     },
     {
       "path": "docs/decisions/2026-09-28-community-sweep.md",
@@ -14164,8 +14164,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "919b4faf0d6d8ca75d088b0de1cd9347da651174e94b25d7d802a9141666cf75",
-      "bytes": 53240
+      "sha256": "ef044af3e9094667b7865c9e71b39ea5981a642a92a770de328489b8006f9c1c",
+      "bytes": 53289
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -34749,8 +34749,8 @@
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/README.md",
-      "sha256": "12d3b58bb15271cdcc1e147534dc135706ba13919ce99d106c76fffb0a5ebe1f",
-      "bytes": 6082
+      "sha256": "eda104c0bc9b9577c8466466014a001ff5ef766e364bd6af52e1246783592ddb",
+      "bytes": 6161
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/adjudication-inputs/m5.AB.json",
@@ -34859,13 +34859,13 @@
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/template-checks-m45.json",
-      "sha256": "8949457d3ebb472beacadd453c8ed0700bc51c68968a09e625389d8a61ae11f8",
-      "bytes": 1613
+      "sha256": "fcc00cd420bcdff7ad87ea785f8900035da7c583d9626ccd50464b9dc3663941",
+      "bytes": 1630
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/review/README.md",
-      "sha256": "95439937c63a2866ea51bd8dfff554c18c0884b38d328ebda7728929264b104f",
-      "bytes": 5562
+      "sha256": "2bd32a50c9c3d852329b5ff7e56b6cab69f3cae53386670ba54371e47bf931b7",
+      "bytes": 5725
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/review/claude-brief.txt",
@@ -35014,8 +35014,8 @@
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/scripts/reproduce_template_checks_m45.py",
-      "sha256": "48519b51affdd549baa4ba483f82128558a282527935a089b84843ef15b976f0",
-      "bytes": 6470
+      "sha256": "2abffded6a4ba8a86068766b91fcb2f87c6f2b9dcd052886597c32ab07c15025",
+      "bytes": 6528
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/scripts/save_claude_judgment.py",
