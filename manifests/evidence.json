@@ -13887,6 +13887,11 @@
       "bytes": 6492
     },
     {
+      "path": "docs/decisions/2026-09-27-codeql-quality-suites.md",
+      "sha256": "410966614ded535434660197d8ff4a517fc876fd54b2cce8b83d0e87f20c5440",
+      "bytes": 20402
+    },
+    {
       "path": "docs/decisions/2026-09-27-mac-single-writer-staged.md",
       "sha256": "517441575c63c19ff252f6fb53eca2e09a5c910e565aabde45da221e6922247f",
       "bytes": 7782
@@ -15160,6 +15165,56 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/README.md",
+      "sha256": "4a0d8099271613cd131503a1d7de9ffa7090fa49d66eb67f0ebe25d89e796972",
+      "bytes": 5624
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/counts.json",
+      "sha256": "43ab743c3fac990bfbbe1523d069549e63fc2cf42bdc58753166b446ff41956a",
+      "bytes": 39613
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/heuristics.json",
+      "sha256": "ed3a57619fcdaa9fad94461c389ecf7b990da6f06b1bac32bcaa6a813739d3e0",
+      "bytes": 2497
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/receipt.json",
+      "sha256": "bac0487914398cdf2df19675714d849725b76e76f4e7348b35b70a4be01a86ce",
+      "bytes": 23331
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/run.sh",
+      "sha256": "b64f3aae8eadeedc9fc0925bb22d52500e54da8266d67dfbc5f14b3d2da3c8e7",
+      "bytes": 2506
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/sample_alerts.py",
+      "sha256": "df7a9ccea27bcdc0647895747392a8432591ca5afbbbd79e0d7fe3bc36f3fe6b",
+      "bytes": 3765
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/summarize_sarif.py",
+      "sha256": "5b3e73941ca9e74f10aff81adea700f5d76f0b545e1cf579a61fa154508ce843",
+      "bytes": 13184
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage.json",
+      "sha256": "2656449ae9f060e04110690e5d8c682bb7844169ec6a6e97d6bd01ab76502acd",
+      "bytes": 23322
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage.py",
+      "sha256": "3e1b87d9515f26e3a53d6c0a64b3a15f372fee1464d99b9060153739d491036a",
+      "bytes": 10244
+    },
+    {
+      "path": "evidence/artifacts/codeql-quality-measure-20260927/triage_verdicts.json",
+      "sha256": "1e74f31476c5f582b2708da4a2e829901852edc87c458382acd115302c783cde",
+      "bytes": 11808
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",
