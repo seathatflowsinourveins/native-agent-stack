@@ -858,7 +858,7 @@ Evidence: the receipt
 [`skills-listing-restore-20260928`](../../evidence/receipts/skills-listing-restore-20260928.json)
 holds the failing pre-edit run, the edit, the passing post-edit run and the settings-backup states.
 [`evidence/artifacts/skills-listing-restore-20260928/`](../../evidence/artifacts/skills-listing-restore-20260928/README.md)
-holds the `supply-chain-risk-auditor` tree check and its two controls.
+holds the `supply-chain-risk-auditor` tree check and its five controls.
 
 **Decided by** the coordinator, on the user's 2026-09-28 delegation, quoted exactly:
 "the decision should make with evidances andrsearch covnvergence, they should done in your end as you have have full access to them".
@@ -965,8 +965,8 @@ sealed verdict re-record. `on`, like `name-only`, stays preload-eligible
 ([listing state and agent preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
 
 **Upstream guidance and the tiebreak.** Claude Code's
-[skills page](https://code.claude.com/docs/en/skills) (read 2026-09-28T15:16:44Z; 120,554 bytes,
-sha256 `86137b62…`) makes two recommendations:
+[skills page](https://code.claude.com/docs/en/skills) (read 2026-09-28) makes two
+recommendations:
 
 1. `/skill-doctor` "flags skills in the listing that have never been invoked and says where to
    turn them off. Of the skills it tells you where to turn off, start with the ones that have the
@@ -986,8 +986,8 @@ condition 1). How often Claude picks a `name-only` skill on its own is not found
 or the settings reference. The nearest statement is about descriptions dropped for budget, which
 leave Claude "less likely to choose one on its own"
 ([settings reference](https://code.claude.com/docs/en/settings-reference),
-`skillListingBudgetFraction`, read 2026-09-28T15:16:55Z; 454,604 bytes, sha256 `19fc12a2…`). That
-is an analogue for `name-only`, not a statement about it.
+`skillListingBudgetFraction`, read 2026-09-28). That is an analogue for `name-only`, not a
+statement about it.
 
 **Name-only use.** `iterative-retrieval` and `search-first` are `name-only` and still used (58 and
 66 lifetime uses). That is consistent with instruction-driven use but does not prove it. The
@@ -1056,18 +1056,22 @@ trial exit) starts a window at each skill's own install. This addendum departs f
 [tree check](../../evidence/artifacts/skills-listing-restore-20260928/README.md) of 2026-09-28
 lists the pinned tree (`truncated: false`). It finds the same 13 file paths in the installed
 folder once `scripts/.venv/` and `scripts/__pycache__/` are left out, and only `scripts/uv.lock`
-differs. With the fetched upstream blob substituted, the folder hashes to `954cc68e…`, the
-manifest `tree_sha`. This matches the
+differs. With the fetched upstream blob substituted in memory, the folder's rows hash to
+`954cc68e…`, the manifest `tree_sha` and the upstream folder row. This matches the
 [2026-09-26 mechanics correction](#addendum-2026-09-26-two-trial-additions-one-deferral-corrected-counts-on-disk-tree-check):
 the skill's own `uv run` rewrote the pinned `scripts/uv.lock`. There is no reinstall. `SKILL.md`
 and the lock entry match, so `tools/adoption/install_skills.py` classifies the skill `ok`. The
 `folder_tree` check in `skills_status.py` stays informational.
 
 - **Per-blob re-check.** `tree_drift_check.py` in that directory, run with
-  `--allow scripts/uv.lock` as its README shows, fails on any other differing, missing or extra
-  blob. Its two controls each exited 1: no allowance, and a planted one-byte change to
-  `scripts/model.py` in a copy. It runs at the 2026-10-25 review on each trial host, and before
-  any reinstall or re-pin of this skill.
+  `--allow scripts/uv.lock` as its README shows, writes nothing. It fails (exit 1) on any other
+  differing, missing or extra blob. It refuses (exit 2) an installed entry other than a regular
+  file or directory, a `.git` entry, and an upstream row other than a `100644` or `100755` blob or
+  a tree. None of its five controls passed. No allowance, and a planted one-byte change to
+  `scripts/model.py` in a copy, each exited 1. A copy whose `scripts` is a symlink to an outside
+  directory, a copy holding a FIFO and a `.git` file, and a listing rewritten to hold a gitlink
+  each exited 2. It runs at the 2026-10-25 review on each trial host, and before any reinstall or
+  re-pin of this skill.
 - **Escalation.** The `SKILL.md` sha256 and lock checks are required `skills_status.py` checks. A
   `SKILL.md` sha256 mismatch, or a lock entry whose `skillFolderHash` differs from the pin, makes
   `classify_skill` return `install` (`install_skills.py` L117-135). The supported path is then
@@ -1136,10 +1140,18 @@ policy as keeping "on-demand skills out of the listing to save context".
    runs in fresh sessions, with frozen should-trigger prompts and adjacent should-not-trigger
    prompts, graded on Skill tool calls. Action: demote that skill through the manifest, template
    and budget, with an addendum.
-3. **Count rule at the window end.** This applies at 2026-10-25 for hosts whose listing never
-   drifted, and at 2026-10-28T15:09:02Z for these 14 on this host. A trial skill with zero uses
-   across its clean `on` window is demoted one step or removed under the prune rule. The kept pair
-   is excepted.
+3. **Count rule at the window end.** The review is held on 2026-10-25, but each skill's
+   eligibility date is its own, per host. On a host whose listing never drifted, a skill becomes
+   eligible 30 days after its own install on that host (the lock's `installedAt`), as
+   `skill_usage.py` computes it (L473-479, L537-541). The
+   [first 2026-09-26 addendum](#addendum-2026-09-26-two-trial-additions-one-deferral-corrected-counts-on-disk-tree-check)
+   says so for its two additions: "Each addition's prune window starts at its own install on each
+   host (the lock's `installedAt`), so neither is a prune candidate at the 2026-10-25 review." For
+   these 14 on this host, eligibility starts at 2026-10-28T15:09:02Z; their install-based dates,
+   which the exception replaces, are in the receipt's `data.skill_usage_30_day_age_reached`. A
+   trial skill past its eligibility date with zero uses across its clean `on` window is demoted
+   one step or removed under the prune rule. A skill not yet eligible at the review is not a
+   prune candidate there. The kept pair is excepted.
 4. **`semgrep` and `codeql`.** P2 decides at the 2026-10-25 review or a verdict re-record. Measured
    harm before then means removal, as above.
 5. **Kept pair.** Only a sealed verdict re-record changes `gh-fix-ci` or
@@ -1167,8 +1179,10 @@ policy as keeping "on-demand skills out of the listing to save context".
    pin condition covers that skill only. A Claude Code release after 2.1.283 changes the absent-key
    default, `name-only` semantics or the listing budget, or a new pin changes one of the 14's
    description. Action: re-decide that listing.
-9. **Tree drift.** The per-blob re-check exits 1: follow the escalation above. An upstream
-   revision runs the scripts with `uv run --no-project`: re-pin as in this addendum's watch above.
+9. **Tree drift.** The per-blob re-check exits 1, or exits 2 refusing an entry of the installed
+   folder, which lies outside the pinned tree: follow the escalation above. Any other exit 2 is
+   resolved and the check re-run; no exit 2 counts as a pass. An upstream revision runs the
+   scripts with `uv run --no-project`: re-pin as in this addendum's watch above.
 
 **Evidence class.**
 
@@ -1179,6 +1193,7 @@ policy as keeping "on-demand skills out of the listing to save context".
 | Settings-backup states | our-integration | Independent observation | Same receipt; read value-free with `skills_status.py`'s own reader |
 | `command -v semgrep` and `command -v codeql` | native-measurement | Upstream example or native operation | Same receipt, `local_checks`; one shell's `PATH` at one time |
 | `gh api` tree and blob reads | native-measurement | Upstream example or native operation | [Tree check](../../evidence/artifacts/skills-listing-restore-20260928/README.md), with stdout digests |
-| Per-blob comparison and substitution | our-integration | Local integration check | Same directory; two failing controls |
-| Skills page and settings reference wording | upstream wording | None; cited, not executed | Read 2026-09-28 with curl, with byte counts and digests |
+| Scan, per-blob comparison and in-memory substitution | our-integration | Local integration check | Same directory; two self-checks in each run |
+| Tree-check controls | synthetic-fixture | Synthetic fixture | Same directory: five controls built by `run_checks.sh`, two exiting 1 and three exiting 2, none a pass |
+| Skills page and settings reference wording | upstream wording | None; cited, not executed | URL and read date (2026-09-28) only; no copy retained |
 | Who made the 2026-09-26 edits, and why | untrusted-history | None; not evidence | A coordinator memory note |

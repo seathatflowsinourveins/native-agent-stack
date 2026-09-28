@@ -8,34 +8,34 @@
   "supply-chain-risk-auditor",
   "--allow",
   "scripts/uv.lock",
-  "--folder",
-  "/var/tmp/tdc-controls.wfFZOC/planted/supply-chain-risk-auditor"
+  "--gh",
+  "evidence/artifacts/skills-listing-restore-20260928/fixture_gh_gitlink.py"
  ],
- "started_utc": "2026-09-28T16:46:26Z",
+ "started_utc": "2026-09-28T16:46:27Z",
  "runs": [
   {
    "argv": [
-    "gh",
+    "evidence/artifacts/skills-listing-restore-20260928/fixture_gh_gitlink.py",
     "--version"
    ],
-   "started_utc": "2026-09-28T16:46:26Z",
+   "started_utc": "2026-09-28T16:46:27Z",
    "exit": 0,
-   "finished_utc": "2026-09-28T16:46:26Z",
+   "finished_utc": "2026-09-28T16:46:27Z",
    "stdout_bytes": 81,
    "stdout_sha256": "67fa67f4744161d2a5e279ae6395705c1bc33d44ce3130e9330b0165f3607bec",
    "stderr_bytes": 0
   },
   {
    "argv": [
-    "gh",
+    "evidence/artifacts/skills-listing-restore-20260928/fixture_gh_gitlink.py",
     "api",
     "repos/trailofbits/skills/git/trees/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae?recursive=1"
    ],
-   "started_utc": "2026-09-28T16:46:26Z",
+   "started_utc": "2026-09-28T16:46:27Z",
    "exit": 0,
    "finished_utc": "2026-09-28T16:46:27Z",
-   "stdout_bytes": 566463,
-   "stdout_sha256": "1b533474133a0b86c16b286e16fcff5928e2de1dee9700cda11bd7079b686134",
+   "stdout_bytes": 590691,
+   "stdout_sha256": "0ce78c9288d447623be543ae98c9655f7c36966aef0f8749ffb5615d3bfb682b",
    "stderr_bytes": 0
   }
  ],
@@ -64,7 +64,7 @@
   "gh_version": "gh version 2.101.0 (2026-09-15)"
  },
  "local": {
-  "folder": "/var/tmp/tdc-controls.wfFZOC/planted/supply-chain-risk-auditor",
+  "folder": "~/.agents/skills/supply-chain-risk-auditor",
   "left_out_runtime_artifacts": [
    {
     "path": "scripts/.venv",
@@ -75,9 +75,9 @@
     "type": "directory"
    }
   ],
-  "tree_sha_as_on_disk": "4003b4ddc8e390ac14fce7ac5780516e80780e24",
-  "tree_sha_without_runtime_artifacts": "afc61d236cc06895d2a09cec30317fd12bc14a12",
-  "tree_sha_from_rows": "afc61d236cc06895d2a09cec30317fd12bc14a12",
+  "tree_sha_as_on_disk": "1bca3f3eb91394de63ca3d376205a09f32b66548",
+  "tree_sha_without_runtime_artifacts": "ec3f7c42f2a5d57c33c70f66c380b5c3abb445b2",
+  "tree_sha_from_rows": "ec3f7c42f2a5d57c33c70f66c380b5c3abb445b2",
   "skills_status_folder_tree_state": "drift",
   "skill_md_sha256_state": "ok",
   "lock_entry_state": "ok",
@@ -106,7 +106,7 @@
    {
     "path": "scripts/model.py",
     "mode": "100644",
-    "blob": "e948adfcfe124905de4f29618f3a1efd20923f82"
+    "blob": "81407c29544a2a84ca19a286f01c25d76ab927e9"
    },
    {
     "path": "scripts/pyproject.toml",
@@ -152,7 +152,7 @@
   "subtrees": {
    "agents": "c1d1a4abef046ea0d98453c1933007c7459b71d7",
    "assets": "b1735ba734fcf7e7898e1e79941fde53ccfa651c",
-   "scripts": "7ea3331a02b2bb1d8e1b1be101da0eaff3f44733"
+   "scripts": "3a48432338d4c46a482e05a768c9340145b73421"
   }
  },
  "manifest": {
@@ -172,9 +172,9 @@
    "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
    "mode": "040000",
    "type": "tree",
-   "sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b"
+   "sha": "4fdabda2d7567319cfe2cde7e77b3a243a1f2e5a"
   },
-  "rows_under_path": 16,
+  "rows_under_path": 17,
   "rows": [
    {
     "path": "SKILL.md",
@@ -271,42 +271,25 @@
     "mode": "100644",
     "type": "blob",
     "sha": "2fb44882a94a99013d613493e38bb372dfbbdd84"
-   }
-  ],
-  "self_check": {
-   "tree_sha_from_rows": "954cc68e05e24a2a14447b60d1e8946b53323b1b",
-   "equals_folder_row": true,
-   "subtrees_equal_tree_rows": true
-  }
- },
- "comparison": {
-  "upstream_blobs": 13,
-  "local_blobs": 13,
-  "matching": 11,
-  "differing": [
-   {
-    "path": "scripts/model.py",
-    "local_mode": "100644",
-    "local_blob": "e948adfcfe124905de4f29618f3a1efd20923f82",
-    "upstream_mode": "100644",
-    "upstream_blob": "81407c29544a2a84ca19a286f01c25d76ab927e9"
    },
    {
-    "path": "scripts/uv.lock",
-    "local_mode": "100644",
-    "local_blob": "ab864a16ac3b38bf469205ee65831b6737b4c867",
-    "upstream_mode": "100644",
-    "upstream_blob": "2fb44882a94a99013d613493e38bb372dfbbdd84"
+    "path": "vendored",
+    "mode": "160000",
+    "type": "commit",
+    "sha": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae"
    }
   ],
-  "missing": [],
-  "extra": [],
-  "outside_allowed_set": [
-   "scripts/model.py"
+  "refused": [
+   {
+    "path": "vendored",
+    "mode": "160000",
+    "type": "commit",
+    "sha": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae"
+   }
   ]
  },
- "substitution": null,
- "result": "fail",
+ "result": "refused",
+ "error": "Refused: the upstream listing holds 1 row(s) other than a 100644 or 100755 blob or a tree",
  "finished_utc": "2026-09-28T16:46:27Z",
- "exit": 1
+ "exit": 2
 }

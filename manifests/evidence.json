@@ -13960,8 +13960,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "cab8fc8eb38de6b3501ed88d69b990dc94e9645e272ae65a5aff1019613f9930",
-      "bytes": 94404
+      "sha256": "baf7f7a942c636c17340deac4da0566008facd46594f591e52f0e04a29bcb3bd",
+      "bytes": 95873
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -34905,28 +34905,58 @@
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
-      "sha256": "8acb7a58ab60c94f3b13013135e8d2005731256993b3dc7ca9a761be398e9ad8",
-      "bytes": 5122
+      "sha256": "570bee0266a0c28da85324a4ddec29ff792fdbf241376d2a4da6606d826d392e",
+      "bytes": 10634
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/control-no-allowance.json",
-      "sha256": "30d6a45e06cedd37ce734d32d654c9b54cdfa452ea99fd0942ec842e1b82832c",
-      "bytes": 7140
+      "sha256": "42d3ebf8dbf4586dc346b729aaeb909f6627465a14aba3d0817a64ef44972fa3",
+      "bytes": 7491
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/control-planted-blob.json",
-      "sha256": "178ace2f01d79445830011fa17caf81f6514be9b552f3a279b58acd510542778",
-      "bytes": 8045
+      "sha256": "ca7c398a5d374243134abb852884bc6a5ee33b7f6b7537a8ab41cde72ab8ad0b",
+      "bytes": 7878
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/control-special-entries.json",
+      "sha256": "2bc726d77b9232e0cf60b89aa57b852cdd8993dc656a281dd77d8ab90b19f112",
+      "bytes": 1602
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/control-symlink.json",
+      "sha256": "f15942d4813e1bd7144e31ed2dfda1b8b947e89051ab390acd50a6521efc23a0",
+      "bytes": 1339
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/control-upstream-gitlink.json",
+      "sha256": "1a793605ab347ae04f04aea7dad03d4f39953d36f2993ffac21b08a57d2a6ed8",
+      "bytes": 7569
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/fixture_gh_gitlink.py",
+      "sha256": "31ef4cfb387fd948126a2c9d973318aa01a92eabb93936aabb24d3eb351f640c",
+      "bytes": 2749
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/run_checks.log",
+      "sha256": "459888c7e5d4199064583bc84a6abf44ae9de830042643405df9e3f96237d0ef",
+      "bytes": 931
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/run_checks.sh",
+      "sha256": "1a50a1de1a26920dd65368e9be3aaa7ba0e3b1202241903d5f5202e7b236c691",
+      "bytes": 2967
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/tree-drift-check.json",
-      "sha256": "3ec2b01863485a458051abb2b9557edaa39f9f1649ea865e04be71c31f54a608",
-      "bytes": 7705
+      "sha256": "5813e5d3643955df495f796528b3b907a4a0545fc53a113a93be19f6b6977468",
+      "bytes": 8516
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py",
-      "sha256": "264f486d5d29f88d3d796441dac5b959e32601c40b9fe0ee2752248289d6ae52",
-      "bytes": 14088
+      "sha256": "17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b",
+      "bytes": 22435
     },
     {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
@@ -39600,8 +39630,8 @@
     },
     {
       "path": "evidence/receipts/skills-listing-restore-20260928.json",
-      "sha256": "14b048f42788160770dce8621a438e70b96f255261d4c41ac701358ab5b6825b",
-      "bytes": 43918
+      "sha256": "bc7bf6282e47aea4404b891631f4687510675b6b0e228e2a69811188cd6ee1fd",
+      "bytes": 44230
     },
     {
       "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",

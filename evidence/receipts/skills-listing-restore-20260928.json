@@ -885,7 +885,7 @@
   ],
   "references": [
    "docs/decisions/2026-09-25-skills-trial-and-usage.md, Addendum 2026-09-28: host listing drift restored",
-   "evidence/artifacts/skills-listing-restore-20260928/ (the supply-chain-risk-auditor per-blob tree check and its two controls)",
+   "evidence/artifacts/skills-listing-restore-20260928/ (the supply-chain-risk-auditor per-blob tree check, exit 0 pass, and its five controls: no allowance and a planted blob, exit 1 fail; a symlinked scripts directory, a FIFO with a .git file, and an upstream gitlink, exit 2 refused. Each output records the check's sha256, 17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b; the README gives each argument vector and exit)",
    "adoption/skills/manifest.json claude_listing and adoption/templates/claude.settings.template.json skillOverrides (both on for the 15, unchanged)",
    "https://code.claude.com/docs/en/skills, read 2026-09-28T15:16:44Z: 'A skill that is absent from `skillOverrides` is treated as \"on\".'"
   ],

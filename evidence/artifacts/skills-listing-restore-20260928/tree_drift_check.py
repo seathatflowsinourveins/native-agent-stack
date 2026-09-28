@@ -11,24 +11,47 @@ Usage, from the root of a checkout of this repository:
   python3 evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py \
       --checkout . --skill supply-chain-risk-auditor --allow scripts/uv.lock
 
-Method:
-  1. `gh api repos/<source>/git/trees/<ref>?recursive=1` at the manifest pin. The rows under the
-     manifest path are kept, with the response's `truncated` flag.
-  2. The installed folder (default ~/.agents/skills/<skill>, the canonical copy skills_status.py
-     reads) is hashed per blob with skills_status.py's own `_git_blob_sha`, with the file modes its
-     `git_tree_sha` assigns, and with its RUNTIME_ARTIFACT_DIRS left out at every level.
-  3. Every differing, missing or extra path is compared with the --allow set.
-  4. For each allowed path that differs or is missing, `gh api repos/<source>/git/blobs/<sha>`
-     fetches the upstream blob. Its own git blob SHA is verified, it is written into a copy of the
-     folder, and skills_status.git_tree_sha recomputes the tree. That tree must equal the
-     manifest tree_sha and the upstream folder row.
+Method. The check writes nothing. It executes the checkout's scripts/skills_status.py from the
+bytes it hashes (no bytecode cache is read or written) and uses that checker's functions.
+  1. Scan. The installed folder (default ~/.agents/skills/<skill>, the canonical copy that
+     skills_status.py reads) is walked without following a symlink, by the lstat()/open()/fstat()
+     pattern of CPython 3.13's os.fwalk and shutil.rmtree (Lib/os.py _fwalk, Lib/shutil.py
+     _rmtree_safe_fd). Names in RUNTIME_ARTIFACT_DIRS are left out and never entered, as in
+     git_tree_sha. Any other entry that is not a directory or a regular file (a symlink, FIFO,
+     socket or device), an entry named .git in any case, or a folder that is itself a symlink is
+     refused before any file is read or any command runs. Git records a regular file only as mode
+     100644 or 100755 (gitformat-index: "Only 0755 and 0644 are valid for regular files"), never
+     records a .git path component (read-cache.c verify_dotfile), and records a directory holding
+     a repository as a gitlink (builtin/add.c check_embedded_repo).
+  2. Hash. A second walk opens each regular file relative to its directory with O_NOFOLLOW,
+     requires its fstat to match the scanned entry, and hashes it with _git_blob_sha, at the mode
+     git_tree_sha assigns (100755 when the owner-execute bit is set, else 100644).
+  3. Upstream. `gh api repos/<source>/git/trees/<ref>?recursive=1` at the manifest pin must say
+     truncated false. The manifest path must be a tree, and every row under it a 100644 or 100755
+     blob or a 040000 tree; any other row (a 120000 symlink, a 160000 gitlink) is refused.
+  4. Self-checks. tree_sha_from_rows applies git_tree_sha's entry encoding and order to a map of
+     blob rows. From the local rows it must reproduce git_tree_sha of the folder with runtime
+     artifacts left out; from the upstream rows, the upstream folder row and every subtree row.
+  5. Compare. Every path whose blob or mode differs, or that is missing or extra, is compared with
+     the --allow set. A difference outside the set is a fail, and nothing is substituted.
+  6. Substitute, in memory. For each allowed path that differs or is missing,
+     `gh api repos/<source>/git/blobs/<sha>` fetches the upstream blob; its content must hash to
+     that SHA, and its row replaces the local row in a copy of the row map (an allowed extra row
+     is dropped). The resulting tree must equal the manifest tree_sha and the upstream folder row.
 
-Exit status: 0 when every difference is in the --allow set and the substituted tree equals the
-manifest tree_sha; 1 otherwise; 2 on an input or command error, a truncated listing, no upstream
-blob under the path or no local blob (a vacuous comparison is refused, never passed).
+Git's tree object is the reference: one "<mode> <name>\\0" plus the 20-byte object id per entry,
+sorted as base_name_compare sorts (a tree's name compared as if it ended in "/"), after the header
+"tree <size>\\0", hashed with SHA-1 (git v2.43.0 builtin/mktree.c write_tree, tree.c
+base_name_compare, object-file.c format_object_header; Pro Git 2nd ed., "Git Internals - Git
+Objects").
 
-Output: one JSON object on stdout, with the home directory written as "~" and the checkout
-written as "<checkout>". Read-only, except for a temporary directory that it removes.
+Exit status: 0 (pass) when nothing is refused, every difference is in the --allow set and the
+substituted tree equals both the manifest tree_sha and the upstream folder row; 1 (fail)
+otherwise; 2 (refused or error) on an unsupported entry on either side, a truncated listing, no
+upstream or local blob, a failed self-check, or an input or command error. Exit 2 is never a pass.
+
+Output: one JSON object on stdout, with the home directory written as "~" and the checkout as
+"<checkout>". It records this script's sha256 and that of the skills_status.py it executed.
 """
 
 from __future__ import annotations
@@ -39,20 +62,27 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import stat
 import subprocess
 import sys
-import tempfile
+import types
 from datetime import datetime, timezone
 from pathlib import Path
 
 SOURCE_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\Z")
-REF_RE = re.compile(r"[0-9a-f]{40}\Z")
+SHA_RE = re.compile(r"[0-9a-f]{40}\Z")
+BLOB_MODES = frozenset({"100644", "100755"})
+LISTED_TREE_MODE = "040000"  # as the GitHub API lists a tree; the tree object itself writes 40000
+DIR_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_NONBLOCK
+FILE_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
 
 
 class CheckError(Exception):
-    """An input or command failure: exit 2, never a pass."""
+    """An input or command failure, or a failed self-check: exit 2, never a pass."""
+
+
+class Refused(CheckError):
+    """An entry that git's regular-file tree method cannot compare: exit 2, never a pass."""
 
 
 def utc_now() -> str:
@@ -88,146 +118,261 @@ def run(argv: list[str], runs: list[dict]) -> bytes:
     return done.stdout
 
 
-def local_rows(folder: Path, skip: frozenset, blob_sha) -> tuple[dict, list[str]]:
-    """Per-blob rows keyed by folder-relative path, classified as skills_status.git_tree_sha does."""
-    rows: dict[str, dict] = {}
-    left_out: list[str] = []
+def load_checker(checkout: Path) -> tuple[types.ModuleType, str]:
+    """The checkout's scripts/skills_status.py, executed from the bytes whose sha256 is returned."""
+    path = checkout / "scripts" / "skills_status.py"
+    source = path.read_bytes()
+    module = types.ModuleType("skills_status")
+    module.__file__ = str(path)
+    exec(compile(source, str(path), "exec"), module.__dict__)  # the same code an import runs, without a .pyc
+    return module, hashlib.sha256(source).hexdigest()
 
-    def walk(directory: Path, prefix: str) -> None:
-        for name in sorted(os.listdir(directory)):
-            path = directory / name
+
+def entry_type(mode: int) -> str:
+    for test, name in ((stat.S_ISDIR, "directory"), (stat.S_ISREG, "file"), (stat.S_ISLNK, "symlink"),
+                       (stat.S_ISFIFO, "fifo"), (stat.S_ISSOCK, "socket"), (stat.S_ISCHR, "character-device"),
+                       (stat.S_ISBLK, "block-device")):
+        if test(mode):
+            return name
+    return "unknown"
+
+
+def scan_folder(folder: Path, skip: frozenset, blob_sha=None) -> dict:
+    """Walk folder without following a symlink; hash each regular file when blob_sha is given.
+
+    A directory is entered, and a file read, only through an O_NOFOLLOW descriptor whose fstat
+    matches the entry's lstat, so a symlink swapped in during the walk stops it.
+    """
+    rows: dict[str, tuple[str, str | None]] = {}
+    left_out: list[dict] = []
+    refused: list[dict] = []
+
+    def walk(dir_fd: int, prefix: str) -> None:
+        for name in sorted(os.listdir(dir_fd)):
             relative = prefix + name
-            info = os.lstat(path)
+            info = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+            kind = entry_type(info.st_mode)
             if name in skip:
-                left_out.append(relative + ("/" if stat.S_ISDIR(info.st_mode) else ""))
-            elif stat.S_ISLNK(info.st_mode):
-                rows[relative] = {"mode": "120000", "blob": blob_sha(os.readlink(os.fsencode(path))).hex()}
+                left_out.append({"path": relative, "type": kind})
+            elif name.lower() == ".git":
+                refused.append({"path": relative, "type": kind, "reason": "a .git entry: git records a repository as a gitlink"})
             elif stat.S_ISDIR(info.st_mode):
-                walk(path, relative + "/")
+                fd = os.open(name, DIR_FLAGS, dir_fd=dir_fd)
+                try:
+                    if not os.path.samestat(info, os.fstat(fd)):
+                        raise CheckError(f"{relative} changed during the scan")
+                    walk(fd, relative + "/")
+                finally:
+                    os.close(fd)
             elif stat.S_ISREG(info.st_mode):
-                mode = "100755" if info.st_mode & stat.S_IXUSR else "100644"
-                rows[relative] = {"mode": mode, "blob": blob_sha(path.read_bytes()).hex()}
+                blob = None
+                if blob_sha is not None:
+                    fd = os.open(name, FILE_FLAGS, dir_fd=dir_fd)
+                    try:
+                        if not os.path.samestat(info, os.fstat(fd)):
+                            raise CheckError(f"{relative} changed during the scan")
+                        with open(fd, "rb", closefd=False) as handle:
+                            blob = blob_sha(handle.read()).hex()
+                    finally:
+                        os.close(fd)
+                rows[relative] = ("100755" if info.st_mode & stat.S_IXUSR else "100644", blob)
             else:
-                rows[relative] = {"mode": "not-a-file-or-link", "blob": None}
+                refused.append({"path": relative, "type": kind, "reason": "not a regular file or directory"})
 
-    walk(folder, "")
-    return rows, left_out
+    info = os.lstat(folder)
+    if not stat.S_ISDIR(info.st_mode):
+        refused.append({"path": ".", "type": entry_type(info.st_mode), "reason": "the folder is not a directory"})
+    else:
+        top = os.open(folder, DIR_FLAGS)
+        try:
+            if not os.path.samestat(info, os.fstat(top)):
+                raise CheckError("the folder changed during the scan")
+            walk(top, "")
+        finally:
+            os.close(top)
+    return {"rows": rows, "left_out": left_out, "refused": refused}
+
+
+def tree_sha_from_rows(rows: dict[str, tuple[str, str]]) -> tuple[str | None, dict[str, str]]:
+    """The git tree SHA-1 of {folder-relative path: (blob mode, blob SHA-1 hex)}, and each subtree's.
+
+    Entry encoding, order and header are skills_status.git_tree_sha's (L172-176). A subtree with no
+    blob is omitted, as git omits an empty directory.
+    """
+    root: dict = {}
+    for path, (mode, blob) in rows.items():
+        *parents, leaf = path.split("/")
+        node = root
+        for part in parents:
+            node = node.setdefault(part, {})
+            if not isinstance(node, dict):
+                raise CheckError(f"{path} lies under a blob row")
+        if leaf in node:
+            raise CheckError(f"{path} appears twice")
+        node[leaf] = (mode, blob)
+    subtrees: dict[str, str] = {}
+
+    def encode(node: dict, prefix: str) -> str | None:
+        entries = []
+        for name, value in node.items():
+            raw_name = os.fsencode(name)
+            if isinstance(value, dict):
+                subtree = encode(value, prefix + name + "/")
+                if subtree is not None:
+                    subtrees[prefix + name] = subtree
+                    entries.append((raw_name, b"40000", bytes.fromhex(subtree), True))
+            else:
+                entries.append((raw_name, value[0].encode("ascii"), bytes.fromhex(value[1]), False))
+        if not entries:
+            return None
+        entries.sort(key=lambda entry: entry[0] + b"/" if entry[3] else entry[0])
+        body = b"".join(mode + b" " + raw_name + b"\0" + digest for raw_name, mode, digest, _ in entries)
+        return hashlib.sha1(b"tree %d\0" % len(body) + body).hexdigest()
+
+    return encode(root, ""), dict(sorted(subtrees.items()))
 
 
 def check(args: argparse.Namespace, report: dict) -> int:
     checkout = Path(args.checkout).resolve()
-    sys.path.insert(0, str(checkout / "scripts"))
-    import skills_status  # the checker whose folder method this reproduces
-
-    status_file = Path(skills_status.__file__)
+    skills_status, module_sha256 = load_checker(checkout)
+    own = Path(__file__).resolve().read_bytes()
+    skip = skills_status.RUNTIME_ARTIFACT_DIRS
     report["method"] = {
+        "script": Path(__file__).name,
+        "script_sha256": hashlib.sha256(own).hexdigest(),
         "module": "scripts/skills_status.py",
-        "module_sha256": hashlib.sha256(status_file.read_bytes()).hexdigest(),
-        "functions": ["git_tree_sha", "_git_blob_sha", "check_folder_tree", "check_canonical", "check_lock_entry"],
-        "runtime_artifact_dirs": sorted(skills_status.RUNTIME_ARTIFACT_DIRS),
+        "module_sha256": module_sha256,
+        "functions": ["_git_blob_sha", "git_tree_sha", "load_manifest", "check_folder_tree", "check_canonical",
+                      "check_lock_entry"],
+        "runtime_artifact_dirs": sorted(skip),
         "python": sys.version.split()[0],
     }
+
+    # 1. Scan: refuse an unsupported entry before any file is read or any command runs.
+    folder = Path(args.folder).expanduser() if args.folder else Path.home() / ".agents" / "skills" / args.skill
+    report["local"] = {"folder": str(folder)}
+    scan = scan_folder(folder, skip)
+    report["local"]["left_out_runtime_artifacts"] = scan["left_out"]
+    if scan["refused"]:
+        report["local"]["refused"] = scan["refused"]
+        raise Refused(f"the installed folder holds {len(scan['refused'])} unsupported entry(ies)")
+
+    allowed = sorted(set(args.allow))
+    for name in allowed:
+        if not name or name.startswith("/") or any(part in ("", ".", "..") for part in name.split("/")):
+            raise CheckError(f"--allow {name!r} is not a normalized folder-relative path")
     manifest = skills_status.load_manifest(checkout / "adoption/skills/manifest.json")
     skill = next((entry for entry in manifest["skills"] if entry["name"] == args.skill), None)
     if skill is None:
         raise CheckError(f"no manifest skill named {args.skill}")
     source, ref, path, tree_sha = skill.get("source"), skill.get("ref"), skill.get("path"), skill["tree_sha"]
-    if not (isinstance(source, str) and SOURCE_RE.match(source) and isinstance(ref, str) and REF_RE.match(ref)
+    if not (isinstance(source, str) and SOURCE_RE.match(source) and isinstance(ref, str) and SHA_RE.match(ref)
             and isinstance(path, str) and path):
         raise CheckError("manifest entry lacks a source, 40-hex ref or path")
-    allowed = sorted(set(args.allow))
     report["manifest"] = {"skill": args.skill, "source": source, "ref": ref, "path": path, "tree_sha": tree_sha}
     report["allowed_differences"] = allowed
 
-    # 1. Upstream rows at the pin.
+    # 2. Hash the installed folder, then check the in-memory tree against the checker's own.
+    scan = scan_folder(folder, skip, skills_status._git_blob_sha)
+    if scan["refused"]:
+        report["local"]["refused"] = scan["refused"]
+        raise Refused("an unsupported entry appeared in the installed folder during the scan")
+    rows = scan["rows"]
+    if not rows:
+        raise CheckError("the installed folder holds no blob")
+    local_tree, local_subtrees = tree_sha_from_rows(rows)
+    lock_path, _ = skills_status.resolve_lock_path(Path.home(), os.environ)
+    lock_data, lock_state = skills_status.load_lock(lock_path)
+    status_skill = {**skill, "name": folder.name}
+    report["local"].update({
+        "tree_sha_as_on_disk": skills_status.git_tree_sha(folder),
+        "tree_sha_without_runtime_artifacts": skills_status.git_tree_sha(folder, skip),
+        "tree_sha_from_rows": local_tree,
+        "skills_status_folder_tree_state": skills_status.check_folder_tree(folder.parent, status_skill)["state"],
+        "skill_md_sha256_state": skills_status.check_canonical(folder.parent, status_skill)["state"],
+        "lock_entry_state": skills_status.check_lock_entry(lock_data, lock_state, skill)["state"],
+        "blobs": len(rows),
+        "rows": [{"path": name, "mode": mode, "blob": blob} for name, (mode, blob) in sorted(rows.items())],
+        "subtrees": local_subtrees,
+    })
+    if local_tree != report["local"]["tree_sha_without_runtime_artifacts"]:
+        raise CheckError("self-check: the local rows do not hash to skills_status.git_tree_sha of the folder")
+    report["method"]["gh_version"] = run([args.gh, "--version"], report["runs"]).decode("utf-8", "replace").split("\n")[0]
+
+    # 3. Upstream rows at the pin: only regular-file blobs and trees under the manifest path.
     listing = json.loads(run([args.gh, "api", f"repos/{source}/git/trees/{ref}?recursive=1"], report["runs"]))
     prefix = path + "/"
-    folder_row = next((row for row in listing.get("tree", []) if row.get("path") == path), None)
+    listed = [row for row in listing.get("tree", []) if isinstance(row, dict) and isinstance(row.get("path"), str)]
+    folder_row = next((row for row in listed if row["path"] == path), None)
     upstream = [{"path": row["path"][len(prefix):], "mode": row.get("mode"), "type": row.get("type"),
-                 "sha": row.get("sha")} for row in listing.get("tree", []) if str(row.get("path", "")).startswith(prefix)]
+                 "sha": row.get("sha")} for row in listed if row["path"].startswith(prefix)]
     report["upstream"] = {"response_sha": listing.get("sha"), "truncated": listing.get("truncated"),
                           "folder_row": folder_row and {key: folder_row.get(key) for key in ("path", "mode", "type", "sha")},
                           "rows_under_path": len(upstream), "rows": upstream}
     if listing.get("truncated") is not False:
         raise CheckError("the upstream listing is truncated or does not say it is not")
-    upstream_blobs = {row["path"]: row for row in upstream if row["type"] == "blob"}
+    if not (folder_row and folder_row.get("type") == "tree" and folder_row.get("mode") == LISTED_TREE_MODE
+            and SHA_RE.match(str(folder_row.get("sha")))):
+        raise CheckError("the manifest path is not a tree in the upstream listing")
+    unsupported = [row for row in upstream if not SHA_RE.match(str(row["sha"])) or not (
+        (row["type"] == "blob" and row["mode"] in BLOB_MODES) or (row["type"] == "tree" and row["mode"] == LISTED_TREE_MODE))]
+    if unsupported:
+        report["upstream"]["refused"] = unsupported
+        raise Refused(f"the upstream listing holds {len(unsupported)} row(s) other than a 100644 or 100755 blob or a tree")
+    upstream_blobs = {row["path"]: (row["mode"], row["sha"]) for row in upstream if row["type"] == "blob"}
     if not upstream_blobs:
         raise CheckError("no upstream blob lies under the manifest path")
+    upstream_trees = {row["path"]: row["sha"] for row in upstream if row["type"] == "tree"}
+    upstream_tree, upstream_subtrees = tree_sha_from_rows(upstream_blobs)
+    report["upstream"]["self_check"] = {"tree_sha_from_rows": upstream_tree,
+                                        "equals_folder_row": upstream_tree == folder_row["sha"],
+                                        "subtrees_equal_tree_rows": upstream_subtrees == dict(sorted(upstream_trees.items()))}
+    if not all(report["upstream"]["self_check"].values()):
+        raise CheckError("self-check: the upstream rows do not hash to the upstream tree rows")
 
-    # 2. Installed folder, hashed with the checker's own functions.
-    folder = Path(args.folder).expanduser() if args.folder else Path.home() / ".agents" / "skills" / args.skill
-    if not folder.is_dir():
-        raise CheckError("the installed folder is missing")
-    skip = skills_status.RUNTIME_ARTIFACT_DIRS
-    rows, left_out = local_rows(folder, skip, skills_status._git_blob_sha)
-    if not rows:
-        raise CheckError("the installed folder holds no blob")
-    lock_path, _ = skills_status.resolve_lock_path(Path.home(), os.environ)
-    lock_data, lock_state = skills_status.load_lock(lock_path)
-    report["local"] = {
-        "folder": str(folder),
-        "tree_sha_as_on_disk": skills_status.git_tree_sha(folder),
-        "tree_sha_without_runtime_artifacts": skills_status.git_tree_sha(folder, skip),
-        "skills_status_folder_tree_state": skills_status.check_folder_tree(folder.parent, {**skill, "name": folder.name})["state"],
-        "skill_md_sha256_state": skills_status.check_canonical(folder.parent, {**skill, "name": folder.name})["state"],
-        "lock_entry_state": skills_status.check_lock_entry(lock_data, lock_state, skill)["state"],
-        "left_out_runtime_artifacts": left_out,
-        "blobs": len(rows),
-        "rows": [{"path": key, **value} for key, value in sorted(rows.items())],
-        "subtrees": {row["path"]: skills_status.git_tree_sha(folder / row["path"], skip)
-                     for row in upstream if row["type"] == "tree" and (folder / row["path"]).is_dir()},
-    }
-
-    # 3. Path-by-path comparison against the allowed set.
-    differing = sorted(name for name in upstream_blobs.keys() & rows.keys()
-                       if (upstream_blobs[name]["sha"], upstream_blobs[name]["mode"]) != (rows[name]["blob"], rows[name]["mode"]))
+    # 4. Path-by-path comparison; a difference outside the allowed set fails before any substitution.
+    differing = sorted(name for name in upstream_blobs.keys() & rows.keys() if upstream_blobs[name] != rows[name])
     missing = sorted(upstream_blobs.keys() - rows.keys())
     extra = sorted(rows.keys() - upstream_blobs.keys())
     disallowed = sorted(set(differing + missing + extra) - set(allowed))
     report["comparison"] = {
         "upstream_blobs": len(upstream_blobs), "local_blobs": len(rows),
         "matching": len(upstream_blobs.keys() & rows.keys()) - len(differing),
-        "differing": [{"path": name, "local_mode": rows[name]["mode"], "local_blob": rows[name]["blob"],
-                       "upstream_mode": upstream_blobs[name]["mode"], "upstream_blob": upstream_blobs[name]["sha"]}
+        "differing": [{"path": name, "local_mode": rows[name][0], "local_blob": rows[name][1],
+                       "upstream_mode": upstream_blobs[name][0], "upstream_blob": upstream_blobs[name][1]}
                       for name in differing],
         "missing": missing, "extra": extra, "outside_allowed_set": disallowed,
     }
+    if disallowed:
+        report["substitution"] = None
+        report["result"] = "fail"
+        return 1
 
-    # 4. Substitute each allowed upstream blob into a copy and recompute the tree.
-    substitution: dict = {"blobs": []}
-    with tempfile.TemporaryDirectory(prefix="tree-drift-") as temporary:
-        copy = Path(temporary) / folder.name
-        shutil.copytree(folder, copy, symlinks=True, ignore=shutil.ignore_patterns(*skip))
-        for name in sorted((set(differing) | set(missing)) & set(allowed)):
-            row = upstream_blobs[name]
-            blob = json.loads(run([args.gh, "api", f"repos/{source}/git/blobs/{row['sha']}"], report["runs"]))
-            if blob.get("encoding") != "base64":
-                raise CheckError(f"blob {row['sha']} is not base64-encoded")
-            data = base64.b64decode(blob.get("content", ""))
-            verified = skills_status._git_blob_sha(data).hex()
-            if verified != row["sha"]:
-                raise CheckError(f"fetched blob hashes to {verified}, not {row['sha']}")
-            target = copy / name
-            if target.is_symlink():
-                target.unlink()
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(data)
-            mode = os.stat(target).st_mode
-            os.chmod(target, (mode | stat.S_IXUSR) if row["mode"] == "100755" else (mode & ~stat.S_IXUSR))
-            substitution["blobs"].append({"path": name, "upstream_blob": row["sha"], "fetched_bytes": len(data),
-                                          "fetched_blob_sha_verified": True})
-        for name in sorted(set(extra) & set(allowed)):
-            (copy / name).unlink()
-            substitution["blobs"].append({"path": name, "removed_extra": True})
-        substitution["tree_sha"] = skills_status.git_tree_sha(copy, skip)
-        substitution["subtrees"] = {row["path"]: skills_status.git_tree_sha(copy / row["path"], skip)
-                                    for row in upstream if row["type"] == "tree" and (copy / row["path"]).is_dir()}
-    substitution["equals_manifest_tree_sha"] = substitution["tree_sha"] == tree_sha
-    substitution["equals_upstream_folder_row"] = bool(folder_row) and substitution["tree_sha"] == folder_row.get("sha")
-    substitution["subtrees_equal_upstream_rows"] = {
-        row["path"]: substitution["subtrees"].get(row["path"]) == row["sha"] for row in upstream if row["type"] == "tree"}
-    report["substitution"] = substitution
-    passed = not disallowed and substitution["equals_manifest_tree_sha"]
+    # 5. Substitute each allowed upstream blob into a copy of the row map and hash it in memory.
+    substituted = dict(rows)
+    blobs: list[dict] = []
+    for name in sorted(set(differing) | set(missing)):
+        mode, sha = upstream_blobs[name]
+        blob = json.loads(run([args.gh, "api", f"repos/{source}/git/blobs/{sha}"], report["runs"]))
+        if blob.get("encoding") != "base64":
+            raise CheckError(f"blob {sha} is not base64-encoded")
+        data = base64.b64decode(blob.get("content", ""))
+        verified = skills_status._git_blob_sha(data).hex()
+        if verified != sha:
+            raise CheckError(f"fetched blob hashes to {verified}, not {sha}")
+        substituted[name] = (mode, verified)
+        blobs.append({"path": name, "upstream_blob": sha, "fetched_bytes": len(data), "fetched_blob_sha_verified": True})
+    for name in extra:
+        del substituted[name]
+        blobs.append({"path": name, "removed_extra": True})
+    tree, subtrees = tree_sha_from_rows(substituted)
+    report["substitution"] = {
+        "in_memory": True, "blobs": blobs, "tree_sha": tree, "subtrees": subtrees,
+        "equals_manifest_tree_sha": tree == tree_sha,
+        "equals_upstream_folder_row": tree == folder_row["sha"],
+        "subtrees_equal_upstream_rows": {name: subtrees.get(name) == sha for name, sha in sorted(upstream_trees.items())},
+    }
+    passed = report["substitution"]["equals_manifest_tree_sha"] and report["substitution"]["equals_upstream_folder_row"]
     report["result"] = "pass" if passed else "fail"
     return 0 if passed else 1
 
@@ -241,10 +386,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--folder", help="installed folder to check (default ~/.agents/skills/<skill>)")
     parser.add_argument("--gh", default="gh", help="GitHub CLI executable")
     args = parser.parse_args(argv)
-    report: dict = {"schema": "tree_drift_check/1", "argv": sys.argv, "started_utc": utc_now(), "runs": []}
+    report: dict = {"schema": "tree_drift_check/2", "argv": sys.argv, "started_utc": utc_now(), "runs": []}
     try:
         code = check(args, report)
-    except Exception as error:  # any failure is exit 2, never read as a pass or a fail
+    except Refused as error:  # an unsupported entry on either side: exit 2, never a pass
+        report["result"] = "refused"
+        report["error"] = f"Refused: {error}"
+        code = 2
+    except Exception as error:  # any other failure is exit 2, never read as a pass or a fail
         report["result"] = "error"
         report["error"] = f"{type(error).__name__}: {error}"
         code = 2
