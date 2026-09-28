@@ -625,7 +625,7 @@ not published, because it quotes the user-level instruction file and names insta
 
 ### Co-change: the grand dashboard's bound on the evidence manifest
 
-This pull request's registrations take `manifests/evidence.json` from 1,987,653 bytes on `fb14dedf` past the
+This pull request's registrations took `manifests/evidence.json` from 1,987,653 bytes on `fb14dedf` past the
 2,000,000-byte bound that `observability/grand-dashboard/progress.py` applied to every source it reads (2,017,827 bytes
 when the suite ran). The snapshot then refused the manifest, and eight dashboard tests failed in the full suite.
 `controls/dashboard-bound-before.txt` shows them, and the new test, failing on the unchanged reader.
@@ -635,17 +635,19 @@ when the suite ran). The snapshot then refused the manifest, and eight dashboard
   signature, which the dashboard tests patch.
 - **Test.** The new test accepts a manifest just over 2 MB, refuses the same bytes under another name, and refuses a
   manifest over the new bound. `controls/dashboard-bound-after.txt` records 17 tests OK on the same manifest.
-- **Why here.** The dashboard serves both lanes, so the change is `lane:shared`, like this pull request. Any change
-  that adds about 60 evidence files before this one merges crosses the same bound, and it can take this commit.
+- **Where it landed.** #446 crossed the same bound first. It took this change's `progress.py` and
+  `tests/test_grand_dashboard.py` hunks unchanged: their two-file patch-id is `8f693abd4c601190` in both. They are
+  on `main` at `3058b237`. After the rebase onto that commit, this pull request's dashboard commit keeps only this
+  subsection and the two receipts.
 - **Host.** The host's timer runs `progress.py` from its live checkout, so the fix takes effect when that checkout
-  is updated to a `main` that holds it. No reinstall is needed.
+  is updated to `3058b237` or later. No reinstall is needed.
 - **Overturn.** When the manifest nears 8,000,000 bytes, count receipts from a smaller source instead of raising the
   bound again.
 
 ### Review of round 3
 
 One review round ran on `0779e91a`, which was never pushed. The returns, prompts, usage, each finding's disposition
-and the rebased SHAs of the reviewed commits are in
+and how the reviewed commits map to this branch's commits are in
 [`review-444/`](../../evidence/artifacts/prompt-audit-20260927/review-444/).
 
 | Reviewer | Verdict | Findings | Usage |

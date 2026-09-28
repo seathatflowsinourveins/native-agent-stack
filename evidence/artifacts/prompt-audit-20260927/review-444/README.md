@@ -1,9 +1,15 @@
 # Review of #444's round-3 head (2026-09-28)
 
 One review round ran on `0779e91a`, before the head was first pushed. Each family's reviewer ran once, and one
-repair round followed. `0779e91a` was never pushed: it was `7e5eddcd` plus a registration commit. The branch was
-then rebased onto `9f8db582` with every patch unchanged (`git range-diff` shows each pair as `=`), so `9e036e7d`,
-which the prompts name, is now `ce373a79`, and `7e5eddcd` is now `499a661e`.
+repair round followed. `0779e91a` was never pushed: it was `7e5eddcd` plus a registration commit.
+
+The prompts name two commits by SHA, and later rebases changed both SHAs, so find them by subject:
+- `9e036e7d` is "X9 second round: blind two-family re-judgment splits again; CLAUDE.md unchanged".
+- `7e5eddcd` is "Grand dashboard: the evidence manifest gets its own read bound".
+
+`git range-diff` maps each reviewed commit to its commit on this branch. Every patch is unchanged, with one
+exception: the dashboard commit lost its `progress.py` and test hunks, because #446 landed the same hunks on `main`
+first.
 
 | Reviewer | Prompt | Return | Usage |
 | --- | --- | --- | --- |
