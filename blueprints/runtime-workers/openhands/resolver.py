@@ -78,12 +78,124 @@ def owner_authored(item):
             and user.get("type") == "User" and item.get("performed_via_github_app") is None)
 
 
-def select_issue(issue, comments, number):
+def actor_class(actor):
+    """"owner" for the owner's User account, "unknown" for a missing or deleted account
+    (a null Actor), else "other". Actor is the schema's interface with `login`
+    (schema.docs.graphql L252); `__typename` names its concrete type. Local composition."""
+    if not isinstance(actor, dict) or not isinstance(actor.get("login"), str) or not actor["login"]:
+        return "unknown"
+    return "owner" if actor.get("__typename") == "User" and actor["login"] == gh_harness.OWNER else "other"
+
+
+def _combined(classes, unknown=False):
+    if "other" in classes:
+        return "other"
+    return "unknown" if unknown or "unknown" in classes else "owner"
+
+
+def edit_provenance(record):
+    """Who edited one issue or comment: "owner", "other" or "unknown" (review item D2).
+
+    Local composition over the schema's Comment interface (schema.docs.graphql
+    L5336-5431, which Issue and IssueComment implement): `editor` is the last editor,
+    `lastEditedAt` the last edit, and `userContentEdits` the history, each revision
+    (UserContentEdit, L73729) with its `editor` and, when a revision was deleted,
+    `deletedBy`. Every actor must be the owner. A null actor, a history longer than the
+    page, or an editor or edit time without a history (or the reverse) is unknown.
+    """
+    edits = record["userContentEdits"]
+    nodes = edits["nodes"]
+    unknown = edits["pageInfo"]["hasNextPage"] or edits["totalCount"] != len(nodes)
+    unknown = unknown or (record["lastEditedAt"] is None) != (not nodes)
+    unknown = unknown or (not nodes and record["editor"] is not None)
+    actors = [record["editor"]] if nodes or record["editor"] is not None else []
+    for node in nodes:
+        if not isinstance(node, dict):
+            unknown = True
+            continue
+        actors.append(node.get("editor"))
+        if node.get("deletedAt") is not None or node.get("deletedBy") is not None:
+            actors.append(node.get("deletedBy"))
+    return _combined({actor_class(actor) for actor in actors}, unknown)
+
+
+def rename_provenance(renames):
+    """Who renamed the issue: its RenamedTitleEvent actors (schema L50628; the title has no
+    userContentEdits), and "unknown" past the first page. Local composition."""
+    classes = {actor_class(node.get("actor")) if isinstance(node, dict) else "unknown" for node in renames["nodes"]}
+    return _combined(classes, renames["pageInfo"]["hasNextPage"])
+
+
+DATABASE_ID = re.compile(r"[1-9][0-9]*")
+
+
+def _connection(value, *, counted=True):
+    info = value.get("pageInfo") if isinstance(value, dict) else None
+    return (isinstance(info, dict) and type(info.get("hasNextPage")) is bool and isinstance(value.get("nodes"), list)
+            and (not counted or type(value.get("totalCount")) is int))
+
+
+def _content_record(node):
+    return (isinstance(node, dict) and isinstance(node.get("fullDatabaseId"), str)
+            and DATABASE_ID.fullmatch(node["fullDatabaseId"]) is not None and isinstance(node.get("body"), str)
+            and isinstance(node.get("authorAssociation"), str) and "author" in node and "editor" in node
+            and (node.get("lastEditedAt") is None or isinstance(node["lastEditedAt"], str))
+            and "lastEditedAt" in node and _connection(node.get("userContentEdits")))
+
+
+def check_provenance(provenance, number):
+    """The shape of gh_harness.ISSUE_PROVENANCE_QUERY's issue; fail closed on anything else.
+
+    Local composition. fullDatabaseId is a BigInt, which the schema encodes as a string
+    (L2603); it matches the REST `id`. Null comment nodes are skipped, so their REST
+    comments count as unknown provenance.
+    """
+    if not (_content_record(provenance) and type(provenance.get("number")) is int
+            and isinstance(provenance.get("state"), str) and isinstance(provenance.get("title"), str)
+            and _connection(provenance.get("titleRenames"), counted=False) and _connection(provenance.get("comments"))
+            and all(node is None or _content_record(node) for node in provenance["comments"]["nodes"])):
+        raise IssueRefused("provenance_unparseable")
+    ids = [node["fullDatabaseId"] for node in provenance["comments"]["nodes"] if node is not None]
+    if len(ids) != len(set(ids)):
+        raise IssueRefused("provenance_unparseable")
+    if provenance["number"] != number:
+        raise IssueRefused("provenance_mismatch")
+    return provenance
+
+
+def parse_issue_provenance(text, number):
+    """Parse `gh api graphql` output for gh_harness.op_issue_provenance (review item D2).
+
+    gh prints the body and exits non-zero when a GraphQL answer has `errors`
+    (api.go:493-500 and 553-565 at 0cf10924); any `errors` entry here also refuses, so
+    partial data is never used.
+    """
+    try:
+        answer = json.loads(text)
+    except ValueError:
+        raise IssueRefused("provenance_unparseable") from None
+    if not isinstance(answer, dict):
+        raise IssueRefused("provenance_unparseable")
+    if answer.get("errors"):
+        raise IssueRefused("provenance_query_failed")
+    repository = answer.get("data", {}).get("repository") if isinstance(answer.get("data"), dict) else None
+    if not isinstance(repository, dict) or "issue" not in repository:
+        raise IssueRefused("provenance_unparseable")
+    if repository["issue"] is None:
+        raise IssueRefused("provenance_missing")
+    return check_provenance(repository["issue"], number)
+
+
+def select_issue(issue, comments, number, *, provenance):
     """Plan section 2 step 1: an open, owner-authored issue and its owner comments.
 
     EXT main.py:396-408 keeps open issues and drops items that carry `pull_request`.
-    The deviation: only owner-authored text reaches the model, and dropped comments
-    are counted, never kept.
+    The deviations: only owner-authored text reaches the model, and dropped comments
+    are counted, never kept. Review item D2: repository writers can edit other
+    people's issues and comments, so the content is taken from `provenance`
+    (parse_issue_provenance), read in one query with its edit history, and used only
+    when the owner made every edit. The REST items supply the owner triple, which the
+    GraphQL schema lacks (it has no performed-via-app field on issues or comments).
     """
     if not isinstance(issue, dict) or type(number) is not int:
         raise IssueRefused("malformed_issue")
@@ -95,18 +207,42 @@ def select_issue(issue, comments, number):
         raise IssueRefused("issue_not_open")
     if not owner_authored(issue):
         raise IssueRefused("issue_not_owner_authored")
-    title, body = issue.get("title"), issue.get("body") or ""
-    if not isinstance(title, str) or not title.strip() or not isinstance(body, str):
+    provenance = check_provenance(provenance, number)
+    if type(issue.get("id")) is not int or provenance["fullDatabaseId"] != str(issue["id"]):
+        raise IssueRefused("provenance_mismatch")
+    if provenance["state"] != "OPEN":
+        raise IssueRefused("issue_not_open")
+    if provenance["authorAssociation"] != "OWNER" or actor_class(provenance["author"]) != "owner":
+        raise IssueRefused("issue_not_owner_authored")
+    edited, renamed = edit_provenance(provenance), rename_provenance(provenance["titleRenames"])
+    if edited == "other":
+        raise IssueRefused("issue_edited_by_non_owner")
+    if renamed == "other":
+        raise IssueRefused("issue_title_changed_by_non_owner")
+    if "unknown" in (edited, renamed):
+        raise IssueRefused("issue_edit_provenance_unknown")
+    title, body = provenance["title"], provenance["body"]
+    if not title.strip():
         raise IssueRefused("malformed_issue")
-    kept, dropped = [], {"not_owner": 0, "malformed": 0}
+    records = {node["fullDatabaseId"]: node for node in provenance["comments"]["nodes"] if node is not None}
+    kept, dropped = [], {"not_owner": 0, "malformed": 0, "edited_by_non_owner": 0, "edit_provenance_unknown": 0}
     for comment in comments:
-        if not isinstance(comment, dict) or not isinstance(comment.get("body"), str):
+        if (not isinstance(comment, dict) or not isinstance(comment.get("body"), str)
+                or type(comment.get("id")) is not int):
             dropped["malformed"] += 1
-        elif not owner_authored(comment):
+            continue
+        if not owner_authored(comment):
             dropped["not_owner"] += 1
+            continue
+        record = records.get(str(comment["id"]))
+        if record is not None and (record["authorAssociation"] != "OWNER" or actor_class(record["author"]) != "owner"):
+            dropped["not_owner"] += 1
+            continue
+        verdict = "unknown" if record is None else edit_provenance(record)
+        if verdict == "owner":
+            kept.append({"id": comment["id"], "created_at": comment.get("created_at"), "body": record["body"]})
         else:
-            kept.append({"id": comment.get("id"), "created_at": comment.get("created_at"),
-                         "body": comment["body"]})
+            dropped["edited_by_non_owner" if verdict == "other" else "edit_provenance_unknown"] += 1
     return {"number": number, "title": title, "body": body, "comments": kept,
             "kept_comments": len(kept), "dropped_comments": sum(dropped.values()),
             "dropped_reasons": dropped}
@@ -841,7 +977,8 @@ def _read_json(path):
 def _cmd_plan(args, **_):
     comments = parse_paginated_array(Path(args.comments_json).read_text(encoding="utf-8"))
     try:
-        selected = select_issue(_read_json(args.issue_json), comments, args.issue)
+        provenance = parse_issue_provenance(Path(args.provenance_json).read_text(encoding="utf-8"), args.issue)
+        selected = select_issue(_read_json(args.issue_json), comments, args.issue, provenance=provenance)
     except IssueRefused as refused:
         print(json.dumps({"status": "refused", "reason": refused.reason}, sort_keys=True))
         return 4
@@ -917,6 +1054,8 @@ def build_parser():
     plan.add_argument("--issue", type=int, required=True)
     plan.add_argument("--issue-json", required=True, help="output of `gh api repos/.../issues/<N>`")
     plan.add_argument("--comments-json", required=True, help="output of `gh api --paginate .../comments`")
+    plan.add_argument("--provenance-json", required=True,
+                      help="output of the gh_harness.op_issue_provenance query (`gh api graphql`)")
     task = plan.add_mutually_exclusive_group(required=True)
     task.add_argument("--task")
     task.add_argument("--task-file")

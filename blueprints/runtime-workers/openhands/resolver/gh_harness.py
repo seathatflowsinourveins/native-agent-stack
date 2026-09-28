@@ -42,7 +42,7 @@ import subprocess
 import tempfile
 
 REPO = "seathatflowsinourveins/native-agent-stack"
-OWNER = REPO.split("/", 1)[0]
+OWNER, REPO_NAME = REPO.split("/", 1)
 HOST = "github.com"
 ORIGIN_URL = f"https://{HOST}/{REPO}.git"
 API = f"repos/{REPO}"
@@ -167,6 +167,33 @@ def op_issue_comments(number):
     return ["gh", "api", "--paginate", f"{API}/issues/{number}/comments"]
 
 
+# The one GraphQL operation: a read-only query for the edit provenance of the issue and its
+# comments, with the content read in the same snapshot as its history (review item D2).
+# REST issues and comments carry no editor, and neither do gh's issue JSON fields
+# (api/query_builder.go:42-60 and 314-351 at 0cf10924). Fields, from the public schema (docs.github.com/public/fpt/schema.docs.graphql, fetched
+# 2026-09-28): Issue fullDatabaseId, author, editor, lastEditedAt, userContentEdits,
+# timelineItems(itemTypes:) and comments; IssueComment the same content fields;
+# UserContentEdit editor, deletedAt and deletedBy; RenamedTitleEvent actor. gh sends -f
+# `query` top-level and every other field as a variable (pkg/cmd/api/http.go:95-112), and -F
+# types an integer (api.go:112-122); api.go:178 is the upstream example of this shape.
+PROVENANCE_ACTOR = "{ __typename login }"
+PROVENANCE_EDITS = ("userContentEdits(first: 100) { totalCount pageInfo { hasNextPage } nodes { editor "
+                    f"{PROVENANCE_ACTOR} deletedAt deletedBy {PROVENANCE_ACTOR} }} }}")
+PROVENANCE_CONTENT = (f"fullDatabaseId body authorAssociation author {PROVENANCE_ACTOR} editor {PROVENANCE_ACTOR} "
+                      f"lastEditedAt {PROVENANCE_EDITS}")
+ISSUE_PROVENANCE_QUERY = (
+    "query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) { "
+    f"issue(number: $number) {{ number state title {PROVENANCE_CONTENT} "
+    "titleRenames: timelineItems(itemTypes: [RENAMED_TITLE_EVENT], first: 100) { pageInfo { hasNextPage } "
+    f"nodes {{ ... on RenamedTitleEvent {{ actor {PROVENANCE_ACTOR} }} }} }} "
+    f"comments(first: 100) {{ totalCount pageInfo {{ hasNextPage }} nodes {{ {PROVENANCE_CONTENT} }} }} }} }} }}")
+
+
+def op_issue_provenance(number):
+    return ["gh", "api", "graphql", "-f", f"query={ISSUE_PROVENANCE_QUERY}", "-F", f"owner={OWNER}",
+            "-F", f"name={REPO_NAME}", "-F", f"number={number}"]
+
+
 def op_branch_rules(branch):
     return ["gh", "api", f"{API}/rules/branches/{branch}"]
 
@@ -276,6 +303,13 @@ def _api_request(words):
     return method or ("POST" if has_body else "GET"), endpoints
 
 
+def _provenance_query(words):
+    """True only for op_issue_provenance's exact argv, so no other query, variable or flag passes."""
+    expected = op_issue_provenance(1)[1:]
+    return (len(words) == len(expected) and words[:-1] == expected[:-1]
+            and re.fullmatch(f"number={NUMBER}", words[-1]) is not None)
+
+
 def _gh_denied(words):
     head = tuple(words[:2])
     if "--show-token" in words or (head == ("auth", "status") and "-t" in words):
@@ -297,6 +331,8 @@ def _gh_denied(words):
     if words and words[0] in GH_DENIED_GROUPS:
         return GH_DENIED_GROUPS[words[0]]
     if words[:1] == ["api"]:
+        if _provenance_query(words):
+            return None  # the read-only query above; its template below matches it again
         method, endpoints = _api_request(words[1:])
         for endpoint in endpoints:
             if endpoint == "graphql":
@@ -373,6 +409,7 @@ def _templates(gh):
         "issue": (["gh", "api", re.compile(rf"{re.escape(API)}/issues/{NUMBER}")], None),
         "issue_comments": (["gh", "api", "--paginate", re.compile(rf"{re.escape(API)}/issues/{NUMBER}/comments")],
                            None),
+        "issue_provenance": (op_issue_provenance(1)[:-1] + [re.compile(f"number={NUMBER}")], None),
         "branch_rules": (["gh", "api", re.compile(rf"{re.escape(API)}/rules/branches/{BRANCH}")], None),
         "compare": (["gh", "api", re.compile(rf"{re.escape(API)}/compare/{SHA}\.\.\.{SHA}")], None),
         "ls_remote": (["git", "ls-remote", "--heads", ORIGIN_URL, re.compile(rf"openhands/issue-{NUMBER}\*")], None),

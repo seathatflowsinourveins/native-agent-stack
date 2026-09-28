@@ -49,6 +49,33 @@ executables. One test runs the installed gitleaks when it is on
 `PATH`. None of this is upstream acceptance (`docs/acceptance-evidence-policy.md`),
 and none of it is a live GitHub or model run.
 
+## Issue selection
+
+Only the owner's text reaches the model. The REST issue and comments give the owner
+triple: author association `OWNER`, user type `User` and no GitHub App. Repository
+writers can edit other people's issues and comments, and neither REST nor gh's issue
+JSON fields report an editor. So one fixed read-only GraphQL query
+(`gh_harness.ISSUE_PROVENANCE_QUERY`) reads the title, body and comment bodies together
+with their edit history. It reads `editor`, `lastEditedAt`, `userContentEdits` (each
+revision's `editor` and `deletedBy`) and the issue's `RenamedTitleEvent` actors. The
+field names come from the public schema, fetched 2026-09-28, and the query validates
+against it with graphql-core 3.2.6.
+
+The model gets that snapshot's text, and only when the owner made every edit:
+
+- An issue edited or renamed by anyone else is refused.
+- A null actor (a deleted account), a history longer than the fetched page, or an edit
+  time or editor without a history is unknown provenance. The issue is refused.
+- A comment with a non-owner edit, unknown provenance or no record in the query is
+  dropped and counted.
+
+The harness allows this one query with exactly its `-F owner`, `name` and `number`
+variables, and denies every other GraphQL argv.
+
+Limits: the query reads the first 100 comments, revisions and renames. Later comments
+are dropped as unknown, and a longer issue history refuses the issue. The query has
+not yet run against GitHub; stage 2 observes it first.
+
 ## Patch validator
 
 The validator refuses symlinks, gitlinks, other modes, binary hunks, `.git*` and
@@ -119,7 +146,8 @@ Known limits:
   its path. The driver never calls `gh auth token`.
 - **Denied before any subprocess:**
   - `pr ready`, `pr merge` and `--auto`, and other PR state changes;
-  - merge endpoints, ref DELETE, other non-GET methods, and GraphQL;
+  - merge endpoints, ref DELETE, other non-GET methods, and GraphQL other than the
+    provenance query;
   - `auth` changes and `--show-token`;
   - release, workflow, secret, repo and ruleset commands;
   - force, delete, tag, mirror, all and prune pushes, including abbreviated options,
@@ -188,4 +216,5 @@ Model text reaches GitHub only inside an adaptive code fence or code span.
     `ReviewLoop`.
   - `execute`: the `rw-openhands-res-<N>-<date>` run id.
 - **`resolver.py run`:** build the harness with the pinned gh and a gitleaks
-  scanner, and a guard with the attempt's host paths.
+  scanner, and a guard with the attempt's host paths. Read `op_issue`,
+  `op_issue_comments` and `op_issue_provenance` for `select_issue`.

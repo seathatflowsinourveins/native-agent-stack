@@ -13,8 +13,8 @@ The host side is `blueprints/runtime-workers/openhands/resolver.py`; see
 
 ## What the host does
 
-- It fetched the issue and keeps only the owner's text, which your instruction
-  shows between boundary lines as untrusted data.
+- It fetched the issue and keeps only text that the owner wrote and alone edited.
+  Your instruction shows it between boundary lines as untrusted data.
 - It exports your workspace diff, validates it, and only then commits, pushes and
   opens a draft pull request. You never fetch, push or open anything.
 
