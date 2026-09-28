@@ -505,14 +505,19 @@ upstream reads ran on 2026-09-28 between 02:03Z and 02:18Z (UTC), which is the e
 2026-09-27 on the host (EDT). A review repair round read again, between about 03:05Z and 03:17Z,
 the pinned `SKILL.md` (same sha256), `report-schema.json` (same size as the tree listing), the
 settings reference, the sandboxing page and the Trust Hub audit page (each the same bytes and
-sha256), and read the local `claude plugin eval --help` (Claude Code 2.1.283). Dates below are
-host dates.
+sha256), and read the local `claude plugin eval --help` (Claude Code 2.1.283). A second repair
+round, at 07:07Z on 2026-09-28 (03:07 EDT, so 2026-09-28 on the host), fetched the skills page, the
+settings reference and the commands reference again with curl (each the same bytes and sha256) and
+corrected the invocation claims (`checks.repair_round_2`). Dates below are host dates.
 
 **Decided by** the user on 2026-09-27: no user invocation; the skill runs through LLM-native
 automation (workflow stages), with the full trial, and the bake-off only if it proves suitable,
 under the token-saving stack for every run. The bake-off budget is high but waits until the
 token-saving practice passes end to end with real evidence (Gate A) and, per the plan of record,
-the GPT-6 route is settled (Gate B).
+the GPT-6 route is settled (Gate B). Settings enforce neither restriction (no user invocation,
+workflow stages only). The wiring below carries both as a usage policy, and the `name-only` listing
+leaves the skill invocable by the user and by the model (see **LLM-native wiring** and its
+enforcement residual).
 
 **Added for trial**, under the [selection rule](#selection-rule):
 
@@ -543,8 +548,9 @@ Pin facts, read with `gh api` at the pin:
 
 All three were analyzed on 2026-09-15, after the pin became HEAD on 2026-09-14; no page names the
 revision it scanned. A Warn is not a Fail and does not exclude ([rule 3](#selection-rule)). W011
-describes the skill's purpose, reading untrusted code. The wiring below gives it no user trigger and
-keeps its listing name-only.
+describes the skill's purpose, reading untrusted code. The wiring below keeps its listing name-only
+and starts it from workflow stages by usage policy. It does not stop a user or the model from
+invoking the skill by name.
 
 **The 2026-09-23 `not_adopted` proposal and its refutation.** The 2026-09-23 landscape sweep
 proposed `not_adopted` with "No demonstrated gap. The native /security-review and
@@ -589,10 +595,32 @@ interested author make this a discovery signal for the M5c design, not evidence 
 
 - **Listing `name-only`.** "Claude sees the skill by name without its description" (settings
   reference, `skillOverrides`). Workflow stages and the model can invoke it by name. Its broad
-  description, which triggers on "security questions", stays out of the listing, so it cannot fire
-  on an ordinary security question. `user-invocable-only` is not used: the user rejected user
-  invocation, "Claude doesn't see the skill" in that state, and it blocks agent preloads ([listing
-  state and agent preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
+  description, which says "Use for security questions", stays out of the listing. That narrows what
+  Claude sees, not who can invoke the skill:
+  - The model can still pick the skill by name on any prompt, an ordinary security question
+    included: "By default, Claude can invoke any skill that doesn't have
+    `disable-model-invocation: true` set." How often it would without the description is
+    unmeasured.
+  - The skills page's [visibility table](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings)
+    gives `name-only` as "Name only" to Claude and "Yes" in the column "In `/` menu", so a user can
+    still type `/security-audit`.
+  - Running it only from workflow stages is therefore a usage policy that the stage prompts carry,
+    not a guarantee.
+  - No `skillOverrides` state hides the `/` entry and keeps the skill listed to Claude. Only `off`
+    hides the `/` entry, and then "Claude doesn't see the skill and `/name` is hidden from
+    autocomplete". Invoking such a skill "by its full name still returns the `skillOverrides` error
+    instead of running it", so `off` would stop the workflow stages too.
+  - `user-invocable-only` is not used: the user rejected user invocation, "Claude doesn't see the
+    skill" in that state, and it blocks agent preloads ([listing state and agent
+    preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
+- **Enforcement residual.** The native control is frontmatter: with `user-invocable: false`, "Claude
+  Code hides it from the `/` menu and doesn't run it when you type `/name`". The pinned `SKILL.md`
+  has no such field, and the install is as-is: `tools/adoption/install_skills.py` counts an
+  installed `SKILL.md` as current only when its sha256 matches the pin (`classify_skill`) and rolls
+  back an add that does not match, so a local frontmatter edit would break the pin. Enforcement
+  therefore needs a new upstream pin. Even then, the docs do not say how the field combines with a
+  `name-only` override; their invocation table gives `user-invocable: false` a "Description always
+  in context". A native probe of the combination comes before any claim of enforcement.
 - **No agent preload.** `SKILL.md` alone is 22,026 bytes and the folder 314,670. Stages paste the
   companion blocks they need, as the skill intends: `HUNTING.md` and `VALIDATION-AND-REPORTING.md`
   "carry this procedure as one identical fenced block for hunter and verifier prompts". The six-role
@@ -686,6 +714,10 @@ gates, so this listing rests on that precedent, not on a failing test.
 - Remove it at once if any audit turns to Fail.
 - Re-decide the listing if a new pin changes the description or adds `disable-model-invocation`,
   or if a native probe shows that a workflow stage cannot invoke a `name-only` skill by name.
+- Close the enforcement residual only when a native probe on one host shows both halves: a typed
+  `/security-audit` does not run, and a workflow stage still invokes the skill by name. The
+  candidates are a new pin that adds `user-invocable: false`, probed together with the `name-only`
+  override, or a future `skillOverrides` state with that effect.
 - Re-decide Codex if Codex gains a name-only state.
 
 **Stale upstreams, flagged for the next verdict wave** and re-observed with `gh api` on 2026-09-27.
@@ -725,4 +757,4 @@ gates, so this listing rests on that precedent, not on a failing test.
 | `claude plugin eval --help` lines | upstream-unchanged (local native client help, Claude Code 2.1.283) | Wording only; the arm itself is not qualified |
 | Manifest row, template key, foundation gate, tests, `scripts/validate.py` | our-integration | Structural checks, each with a failing control run first |
 | Gate listed in `adoption/manifest.json` `next_action_refs` | our-integration | Precedent check (`d17b3cff`, `49c094d9`); no test fails without it |
-| Install, settings apply, Codex disable, host read-back, M5b, M5c, sandbox measurement | live-run-pending | The coordinator runs them; nothing was installed here |
+| Install, settings apply, Codex disable, host read-back, `name-only` invocation reach (a typed `/security-audit`, unprompted model invocation), M5b, M5c, sandbox measurement | live-run-pending | The coordinator runs them; nothing was installed here |

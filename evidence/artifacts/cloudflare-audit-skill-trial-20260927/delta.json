@@ -8,7 +8,9 @@
   "host_date_note": "02:03Z to 02:18Z on 2026-09-28 UTC is the evening of 2026-09-27 on the host (EDT)",
   "repair_round_first": "2026-09-28T03:05Z (Context Mode index time of the first repair-round fetch, minute precision)",
   "repair_round_last": "2026-09-28T03:17:14Z (the last verification re-fetch of the settings reference and sandboxing pages; quoting reads ended by 03:12:12Z)",
-  "repair_round_host_date_note": "still 2026-09-27 on the host (EDT)"
+  "repair_round_host_date_note": "still 2026-09-27 on the host (EDT)",
+  "repair_round_2_fetch": "2026-09-28T07:07:11Z (date -u just before the curl fetches of the skills, settings reference and commands pages)",
+  "repair_round_2_host_date_note": "03:07 EDT, so 2026-09-28 on the host"
  },
  "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
  "base_commit": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
@@ -19,7 +21,8 @@
   "python": "3.13.15",
   "pyyaml": "6.0.3 (already present in the host's uv cache; nothing downloaded or installed)",
   "node_fetch_runtime": "v24.21.0 (Context Mode ctx_execute)",
-  "claude_code": "2.1.283 (claude --version; repair round, read for claude plugin eval --help only)"
+  "claude_code": "2.1.283 (claude --version; repair round, read for claude plugin eval --help only)",
+  "curl": "8.5.0 (repair round 2 page fetches only)"
  },
  "method": {
   "github": "gh api (REST): repos/<repo>, commits/<sha|branch>, git/trees/<sha>?recursive=1, contents/<path>?ref=<sha>, license?ref=<sha>, issues/20 and its comments, releases/latest; gh api graphql for archivedAt",
@@ -264,7 +267,17 @@
    "sha256": "86137b6232cd54722549525729d1888717d5ee0eed6312a9a089097b2cadc181",
    "L289": "To keep a personal or project skill but stop Claude from invoking it on its own, set [`disable-model-invocation: true`](#control-who-invokes-a-skill) in its frontmatter, or `\"user-invocable-only\"` in [`skillOverrides`](#override-skill-visibility-from-settings) when you don't want to edit the file.",
    "L811": "| `\"name-only\"`           | Name only            | Yes         |",
-   "L812": "| `\"user-invocable-only\"` | Hidden               | Yes         |"
+   "L812": "| `\"user-invocable-only\"` | Hidden               | Yes         |",
+   "repair_round_2_reread": "2026-09-28T07:07:11Z, curl -sS -L of the same URL: HTTP 200, same bytes and sha256. L523, L527, L768, L808, L810 and L813 below are whole raw lines (table rows keep their cell padding); L360 is the user-invocable row's description cell; L766 and L817 are one sentence each of their lines",
+   "L360": "Set to `false` when only Claude should invoke the skill: Claude Code hides it from the `/` menu and doesn't run it when you type `/name`.",
+   "L523": "| Frontmatter                      | You can invoke | Claude can invoke | When loaded into context                                     |",
+   "L527": "| `user-invocable: false`          | No             | Yes               | Description always in context, full skill loads when invoked |",
+   "L766": "By default, Claude can invoke any skill that doesn't have `disable-model-invocation: true` set.",
+   "L768": "Three ways to control which skills Claude can invoke:",
+   "L808": "| Value                   | Listed to Claude     | In `/` menu |",
+   "L810": "| `\"on\"`                  | Name and description | Yes         |",
+   "L813": "| `\"off\"`                 | Hidden               | Hidden      |",
+   "L817": "Invoking a hidden skill by its full name still returns the `skillOverrides` error instead of running it."
   },
   "settings_reference": {
    "url": "https://code.claude.com/docs/en/settings-reference.md",
@@ -279,7 +292,11 @@
    "L2188": "      \"files\": [{ \"path\": \"~/.aws/credentials\", \"mode\": \"deny\" }],",
    "L2580": "### `sandbox.network.strictAllowlist`",
    "L2584": "* **Scope**: [`User or managed`](#scopes). A repository can't turn it on or off.",
-   "L2587": "  * `false`: unless another trusted settings file sets `true`, Claude Code decides a host outside the allowlist by permission mode instead of denying it outright: in auto mode it checks the host against the command's [per-command allowed domains](/docs/en/sandboxing#per-command-allowed-domains-in-auto-mode), in `dontAsk` mode it denies, in `bypassPermissions` mode and in interactive terminal plan-mode sessions where bypass is available it allows, and otherwise it asks you"
+   "L2587": "  * `false`: unless another trusted settings file sets `true`, Claude Code decides a host outside the allowlist by permission mode instead of denying it outright: in auto mode it checks the host against the command's [per-command allowed domains](/docs/en/sandboxing#per-command-allowed-domains-in-auto-mode), in `dontAsk` mode it denies, in `bypassPermissions` mode and in interactive terminal plan-mode sessions where bypass is available it allows, and otherwise it asks you",
+   "repair_round_2_reread": "2026-09-28T07:07:11Z, curl -sS -L of the same URL: HTTP 200, same bytes and sha256. L4163 below is a whole raw line; L4167 and L4170 drop their two-space indentation, as the first read's L4168 and L4169 do",
+   "L4163": "Hide or collapse a [skill](/docs/en/skills#override-skill-visibility-from-settings) without editing its `SKILL.md`. Claude Code applies the value under each skill's name to the skill list Claude sees and to your `/` autocomplete.",
+   "L4167": "* `\"on\"`: Claude sees the skill and you can type `/name`",
+   "L4170": "* `\"off\"`: Claude doesn't see the skill and `/name` is hidden from autocomplete"
   },
   "sandboxing": {
    "url": "https://code.claude.com/docs/en/sandboxing.md",
@@ -489,7 +506,7 @@
    "checked_at": "2026-09-27"
   },
   "status": "trial",
-  "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Driven only by workflow stages, never by user invocation; the M5c bake-off against /security-review decides promotion. Name-only: its 359-character description triggers on any security question.",
+  "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Enforcement would need upstream user-invocable: false, absent at the pin, and a native probe with name-only. The M5c bake-off against /security-review decides promotion.",
   "claude_listing": "name-only",
   "codex_enabled": false,
   "added": "2026-09-27"
@@ -680,6 +697,102 @@
    "quote_source_check": "local integration: each new quote re-read from its source. SKILL.md and report-schema.json at the pin, the saved help output and repository files at the base: 34 comparisons (hashes, lines, joins), 0 failed. The settings reference and sandboxing pages, re-fetched: both sha256 and sizes matched; the 11 new whole-line quotes and the first read's L58 matched exactly. The first read's L4168, L4169, L62, L98 and L122 quotes match as substrings of their stated lines, with indentation dropped",
    "quote_coverage_check": "local integration: every straight-quoted passage of six or more characters in the 2026-09-27 addendum, this receipt's README and the gate text (fenced code excluded) must appear in delta.json after whitespace normalization, emphasis removal and splitting at '...'. Result: addendum 31 quoted, 0 missing; README 8 quoted, 0 missing; gate text 0 quoted",
    "not_a_control": "tests/test_adoption_contract.py checks only that next_action_refs is a subset of the open gate ids, so the new listing has no failing control"
+  },
+  "repair_round_2": {
+   "evidence_class": "our-integration (claim corrections checked against upstream docs wording; no install, host change or model run)",
+   "finding": "cross-family GPT-6 review of PR #448, P2, changes-needed: the addendum's name-only wiring said the skill cannot fire on an ordinary security question and gets no user trigger, and the manifest gap said never by user invocation. name-only hides only the description; Claude can still invoke the skill by name, and it stays in the / menu",
+   "reproduce": [
+    {
+     "command": "rtk proxy jq -r '.native_docs.skills.L811' evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
+     "exit": 0,
+     "output": "| `\"name-only\"`           | Name only            | Yes         |",
+     "reading": "the last column is In `/` menu (skills page L808)"
+    },
+    {
+     "command": "in-memory, host python3: scripts/skills_status.py check_claude_listing({'security-audit': state}, 'ok', the manifest's security-audit row)",
+     "exit": 0,
+     "output": {
+      "name-only": "{'state': 'ok', 'actual': 'name-only'}",
+      "user-invocable-only": "{'state': 'mismatch', 'actual': 'user-invocable-only'}",
+      "off": "{'state': 'mismatch', 'actual': 'off'}"
+     },
+     "reading": "the status check compares the listing string with the manifest and accepts name-only; it checks no invocation restriction"
+    },
+    {
+     "command": "for f in $F; do git show HEAD:$f | grep -n -o -E \"cannot fire|no user trigger|never by user invocation|Driven only by workflow stages\" | sed \"s|^|$f:|\"; done (F: the four files this round changes; HEAD was 90a5c0e3)",
+     "output": [
+      "adoption/skills/manifest.json:763:Driven only by workflow stages",
+      "adoption/skills/manifest.json:763:never by user invocation",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md:546:no user trigger",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md:592:cannot fire",
+      "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json:492:Driven only by workflow stages",
+      "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json:492:never by user invocation"
+     ]
+    }
+   ],
+   "docs_reread": {
+    "at": "2026-09-28T07:07:11Z",
+    "command": "curl -sS -L -o <page>.md -w '%{http_code}' https://code.claude.com/docs/en/<page>.md into the session scratchpad, outside the checkout",
+    "skills": "HTTP 200, 120554 bytes, sha256 86137b6232cd54722549525729d1888717d5ee0eed6312a9a089097b2cadc181, the same as native_docs.skills",
+    "settings_reference": "HTTP 200, 454604 bytes, sha256 19fc12a219077c947744ba81977f1d3559d8b2ab36ac975de754aaef49e00117, the same",
+    "commands": "HTTP 200, 202541 bytes, sha256 f0b71855bab62002c1bf410afc7d0e41b825ba8b3b6b8fa13da6fa142f6b8098, the same"
+   },
+   "settings_only_answer": "No settings-only state hides the / entry and keeps model invocation. Of the four skillOverrides states (skills page L808 to L813; settings reference L4167 to L4170) only off hides the / entry, and off also hides the skill from Claude; invoking a hidden skill by its full name returns the skillOverrides error (L817). The skills page's other controls are ways to control which skills Claude can invoke (L766, L768), and the page does not document any of them as hiding the / entry. The frontmatter field user-invocable: false hides the / entry and keeps Claude's invocation (L360, L527), but it lives in SKILL.md",
+   "residual": "enforcing stage-only use. user-invocable: false is absent from the pinned SKILL.md (frontmatter name and description only). tools/adoption/install_skills.py counts an installed SKILL.md as current only when its sha256 matches the pin (classify_skill) and rolls back an add that does not match, so a local edit would break the pin. The docs do not say how the field combines with a name-only override (L527 gives it the description always in context), so a new pin that adds it needs a native probe of both halves before any enforcement claim",
+   "changes": [
+    "docs/decisions/2026-09-25-skills-trial-and-usage.md: the Decided-by paragraph, the W011 sentence and the name-only item describe reduced visibility and a usage policy; new Enforcement residual item and overturn condition; name-only invocation reach joins the live-run-pending row; the read-times paragraph names this round",
+    "adoption/skills/manifest.json: the security-audit gap replaces the never-by-user-invocation and triggers-on-any-security-question wording; claude_listing stays name-only",
+    "delta.json: manifest_row.gap mirrors the manifest; native_docs.skills and native_docs.settings_reference gain the lines this round cites; observed_utc and tool_versions record the round; this block",
+    "README.md: this round, its reproduce lines and two live-run-pending items"
+   ],
+   "validate_pre_registration": {
+    "exit": 1,
+    "errors": [
+     "adoption/skills/manifest.json: SHA-256 mismatch",
+     "adoption/skills/manifest.json: byte count mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: SHA-256 mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: byte count mismatch"
+    ]
+   },
+   "registration": "scripts/host_receipts.py register_file on the four changed files; manifests/evidence.json changed 8 lines (their sha256 and bytes). Every later edit of these files (this block, the README section, then the Decided-by sentence and the enforcement clause of the manifest gap) was followed by registering the four files again and scripts/validate.py (exit 0). After the last wording edits, validate_foundation, the ten test runs and both report regenerations were repeated with the same results",
+   "validate": {
+    "exit": 0,
+    "result": "{\"components\": 69, \"hashed_files\": 7375, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}"
+   },
+   "validate_foundation": {
+    "exit": 0,
+    "result": "FOUNDATION catalog valid: layers=20, decisions=54, foundation_components=61, domain_components=7, evidence_receipts=84, candidates=3"
+   },
+   "tests": {
+    "test_skills_manifest": "exit 0, Ran 21 tests, OK",
+    "test_install_skills": "exit 0, Ran 19 tests, OK",
+    "test_skills_status": "exit 0, Ran 43 tests, OK",
+    "test_install_claude_profile": "exit 0, Ran 58 tests, OK (skipped=3)",
+    "test_install_claude_profile_pyyaml": "exit 0, Ran 58 tests, OK",
+    "test_render_config": "exit 0, Ran 25 tests, OK",
+    "test_foundation_catalog": "exit 0, Ran 18 tests, OK",
+    "test_adoption_contract": "exit 0, Ran 12 tests, OK",
+    "test_apply_claude_settings": "exit 0, Ran 23 tests, OK",
+    "test_ecosystem_manifest": "exit 0, Ran 56 tests, OK"
+   },
+   "reports": {
+    "component_matrix --write": "exit 0, {\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
+    "new_host_grand_list --write": "exit 0, {\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
+    "tracked_changes": "none"
+   },
+   "quote_source_check": "local integration: every native_docs line this round cites, compared with the 07:07:11Z fetch. New: skills L360, L523, L527, L766, L768, L808, L810, L813, L817 and settings reference L4163, L4167, L4170; rechecked from the first read: skills L289, L811, L812 and settings reference L4168, L4169. 17 comparisons, 0 failed. The whole-line quotes (L523, L527, L768, L808, L810 to L813, L4163) and the indentation-dropped L4167 to L4170 matched exactly; L289, L360, L766 and L817 matched as substrings of their stated lines",
+   "quote_coverage_check": "local integration: the first repair round's rule, re-implemented (straight-quoted passages of six or more characters, fenced code excluded, inline code that contains a double quote set aside, whitespace normalized, ** removed on both sides, split at '...'). On the text at 90a5c0e3 it counts addendum 32 and README 6, all present; the first round's own implementation recorded 31 and 8. After this round: addendum 39 quoted, 0 missing; README 6 quoted, 0 missing",
+   "post_fix_grep": {
+    "command": "grep -n -E 'cannot fire|no user trigger|never by user invocation|Driven only by workflow stages' adoption/skills/manifest.json docs/decisions/2026-09-25-skills-trial-and-usage.md evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md; then jq 'del(.checks.repair_round_2)' on this file piped to grep -c -E with the same pattern",
+    "exit": "1 and 1",
+    "output": "no match; 0",
+    "scope_note": "this block records the finding with those phrases, so grep matches inside checks.repair_round_2 only (9 lines of jq '.checks.repair_round_2' output)"
+   },
+   "post_fix_probe": "check_claude_listing still returns {'state': 'ok', 'actual': 'name-only'} for security-audit and the template's skillOverrides entry is still name-only: the listing stays the user's choice, and only the claims changed"
   }
  }
 }

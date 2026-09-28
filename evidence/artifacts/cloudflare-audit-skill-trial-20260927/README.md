@@ -14,6 +14,12 @@ tree listing), the settings reference, the sandboxing page and the Trust Hub aud
 same bytes and sha256 as the first read), and read `claude plugin eval --help` from the local
 Claude Code 2.1.283. `delta.json` `quoted_passages` and `repair_round` hold what it added.
 
+A second repair round, at 07:07Z on 2026-09-28 (03:07 EDT, so 2026-09-28 on the host), answered a
+cross-family review finding on the invocation claims. It fetched the skills page, the settings
+reference and the commands reference again with curl 8.5.0, each the same bytes and sha256 as the
+first read. `delta.json` `checks.repair_round_2` holds its record, and the new docs lines are under
+`native_docs`.
+
 The decision and its reasoning are in the
 [2026-09-27 addendum](../../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-27-security-audit-trial-row-stale-upstream-flags-sandbox-gate).
 Nothing was installed and no host setting changed.
@@ -35,7 +41,8 @@ Nothing was installed and no host setting changed.
 
 - `adoption/skills/manifest.json`: trial row `security-audit` (cloudflare/security-audit-skill@c1c8a8c,
   `name-only`, Codex off, `added` 2026-09-27), appended last; `checked_at` set to 2026-09-27. Budget
-  sums are unchanged, because name-only and Codex-disabled rows count toward neither.
+  sums are unchanged, because name-only and Codex-disabled rows count toward neither. Its gap text
+  records stage-only use as a usage policy that `name-only` does not enforce (repair round 2).
 - `adoption/templates/claude.settings.template.json`: `skillOverrides` gains
   `"security-audit": "name-only"`, as `tests/test_skills_manifest.py` requires.
 - `docs/decisions/2026-09-25-skills-trial-and-usage.md`: the 2026-09-27 addendum.
@@ -100,11 +107,39 @@ allowlist and no `--no-verify`, and the rerun found no leaks (`checks.failed_att
 - The `next_action_refs` listing has no failing control, because `tests/test_adoption_contract.py`
   checks only that the list is a subset of the open gates.
 
+**Repair round 2** (`checks.repair_round_2`, our-integration). A cross-family GPT-6 review found
+that the addendum and the manifest gap overstated what `name-only` does.
+
+- Reproduced: `jq -r '.native_docs.skills.L811'` on this receipt prints the `name-only` row with
+  `Yes` in the `/` menu column, and the in-memory `check_claude_listing` probe accepts `name-only`
+  (`ok`). The status check compares the listing string only.
+- Correction: `name-only` removes the description from Claude's listing. Claude can still invoke
+  the skill by name, and a user can still type `/security-audit`. Stage-only use is a usage policy
+  that the stage prompts carry. No `skillOverrides` state hides the `/` entry and keeps the skill
+  listed to Claude: only `off` hides the entry, and it hides the skill from Claude too.
+- Residual: the frontmatter field `user-invocable: false` would enforce it, but it is absent at the
+  pin, and a local edit would break the pin. `install_skills.py` counts an installed `SKILL.md` as
+  current only when its sha256 matches, and rolls back an add that does not.
+- `scripts/validate.py` before registering the four changed files: exit 1, with SHA-256 and
+  byte-count mismatches on exactly those files. After registration: exit 0, 7,375 hashed files.
+- `scripts/validate_foundation.py`: exit 0. The nine modules above: exit 0 with the same counts.
+  `test_install_claude_profile` with the cached PyYAML: 58 tests OK.
+- `component_matrix.py --write` and `new_host_grand_list.py --write` changed no tracked file.
+- Quote checks (local integration): 17 docs-line comparisons against the fresh fetch, 0 failed.
+  Every quoted passage in the addendum (39) and in this README (6) is in `delta.json`.
+- After the fix, a grep for the overstated phrases finds none (exit 1) in the decision record, the
+  manifest, this README or `delta.json` outside `checks.repair_round_2`, which records the finding
+  in those words. The listing stays `name-only`, so the probe still returns `ok`.
+
 ## Not done here (live-run-pending)
 
 - The skill install, the settings apply, the Codex disable table and the host read-back belong to
   the coordinator. If the skill is installed before the `name-only` override and the Codex table are
   live, every session lists its full description until they are, so apply both first.
+- A native probe of `name-only` invocation reach: whether a typed `/security-audit` runs, and
+  whether the model invokes the skill unprompted.
+- Enforcing stage-only use stays a residual. `user-invocable: false` needs a new upstream pin, then
+  a native probe together with the `name-only` override.
 - M5b's unchanged upstream `node --test` at the pin, the labelled fixture and the budget.
 - M5c is queued behind Gate A and Gate B.
 - The sandbox profile measurement, due for re-check 2026-10-11.
@@ -143,6 +178,10 @@ gh api -H 'Accept: application/vnd.github.raw' 'repos/cloudflare/security-audit-
 curl -s https://code.claude.com/docs/en/sandboxing.md | sed -n '299p;525p'
 curl -s https://code.claude.com/docs/en/settings-reference.md | sed -n '2176p;2188p;2587p'
 claude plugin eval --help
+# repair round 2: name-only visibility, invocation and the enforcement residual
+jq -r '.native_docs.skills.L811' evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json
+curl -s https://code.claude.com/docs/en/skills.md | sed -n '360p;523p;527p;766p;768p;808,813p;817p'
+curl -s https://code.claude.com/docs/en/settings-reference.md | sed -n '4163p;4167,4170p'
 python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.test_skills_status
 python3 -m unittest tests.test_foundation_catalog tests.test_adoption_contract
 python3 scripts/validate_foundation.py
