@@ -207,6 +207,25 @@ an atomic rename, prints it once and deletes it only after printing; a start
 that loses the claim prints nothing for that notice, and notices older than 7
 days are deleted unseen.
 
+**2026-09-28: what the `xhigh` pins decide.** For Opus 5.5 the platform guidance
+makes `medium` the default and reserves `xhigh` and `max` for work where a
+quality gain was measured; "start with `xhigh`" is the Opus 4.7 and 4.8 advice
+([prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5),
+[effort](https://platform.claude.com/docs/en/build-with-claude/effort), read
+2026-09-27). The `xhigh` saves above carry the user's quality requirement, and
+their reach is narrow. In user settings the top-level `effortLevel` never sets
+Opus 5.5's level, and the per-model key sets it only while Ultracode is off and
+neither `--effort` nor `CLAUDE_CODE_EFFORT_LEVEL` overrides it; an Ultracode
+session already runs its coordinator at `xhigh`
+([model configuration](https://code.claude.com/docs/en/model-config),
+[settings reference](https://code.claude.com/docs/en/settings-reference),
+[environment variables](https://code.claude.com/docs/en/env-vars)). No recorded
+measurement tests them. M7 of the
+[2026-09-24 sweep](../docs/decisions/2026-09-24-community-sweep.md#keep-but-compare)
+covers child roles only; the
+[2026-09-27 review](../docs/decisions/2026-09-28-community-sweep.md#amendments-to-the-2026-09-24-rows)
+adds a session-level arm with Ultracode off for these pins.
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
@@ -229,8 +248,10 @@ current session only
 child's frontmatter and workflow-stage effort, and any value other than `xhigh`
 also turns Ultracode off. The shipped [agent definitions](../adoption/agents/claude/)
 therefore declare `effort: max` beside their task-matched models (Sonnet for
-`source-scout` and `isolated-builder`; Opus for `evidence-reviewer`,
-`semantic-evidence-reviewer` and `blind-judge`), and workflow stages pass
+`source-scout` and Opus for every other shipped role; `isolated-builder` and
+`stack-verifier` declare Opus since 2026-09-27, per item 1 of the
+[settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
+Haiku is not routed), and workflow stages pass
 `effort: 'max'` explicitly: a stage without its own effort inherits the
 coordinator's `xhigh` unless its agent's frontmatter sets one, and a stage's
 effort overrides the frontmatter (probe Q3). Verify each child's resolved
@@ -244,6 +265,38 @@ The [settings receipt](../evidence/receipts/native-quality-defaults-20260920.jso
 records supported values, effective configuration and preservation checks. More
 reasoning can increase time and tokens; no quality improvement or savings is
 established until the actual task is evaluated.
+
+**2026-09-28: fast mode is a per-session choice.** `/fast` persists
+`fastMode: true` to user settings, so later sessions start with it on. On
+subscription plans fast mode bills usage credits, which must be turned on, and
+the first enable in a conversation bills the whole context at the uncached
+fast-mode rate, so enable it at session start
+([fast mode](https://code.claude.com/docs/en/fast-mode)). Use `/fast` only for
+interactive, latency-sensitive sessions, and turn it off before workflows and
+long autonomous runs. Keep `fastMode` out of the settings template;
+`fastModePerSessionOptIn: true` is the documented way to make each session start
+with it off ([settings reference](https://code.claude.com/docs/en/settings-reference#fastmode)).
+
+**2026-09-28: bypass mode runs here outside its documented condition.** The
+[permission modes](https://code.claude.com/docs/en/permission-modes) page says of
+`bypassPermissions`: "Only use this mode in isolated environments like
+containers, VMs, or dev containers without internet access", and that it "offers
+no protection against prompt injection or unintended actions" (see also
+[development containers](https://code.claude.com/docs/en/devcontainer) on running
+it only in isolated containers). This host runs bypass on bare WSL2
+with the `/mnt` automount, network access and no Bash sandbox. The mode is the
+user's 2026-09-22 decision, and that decision is still open. Under bypass, deny
+rules and PreToolUse denials still block, explicit ask rules and critical-path
+`rm`/`rmdir` still prompt, allow rules have no effect, and protected-path writes
+are allowed (for example to `.git`, `.claude` other than `.claude/worktrees`,
+`.husky` and `.vscode`). The denies and the secret-path guard therefore stop
+accidents and are not a security boundary
+([threat model](../docs/secret-storage.md#threat-model-and-what-each-guard-stops)).
+Auto mode (PS-8 in the
+[harness rules convergence](../docs/harness-rules-convergence-20260922.md)) and
+the native Bash sandbox
+([M1](../docs/decisions/2026-09-24-community-sweep.md#keep-but-compare)) remain
+the alternatives.
 
 ## Architectural token practice
 
@@ -267,13 +320,59 @@ These choices follow [Claude cost guidance](https://code.claude.com/docs/en/cost
 [native harness contract](../docs/harness-defaults.md). No default savings
 percentage follows from enabling them.
 
+### Session context commands
+
+Checked against the Claude Code docs on 2026-09-27 and the linked pages re-read
+on 2026-09-28 (client 2.1.283).
+
+- **Rewind instead of stacking corrections.** Rewind (double-tap Escape or
+  `/rewind`) and re-prompt rather than adding corrections on top of a wrong
+  turn; a rewind returns to a prefix that is already cached
+  ([prompt caching](https://code.claude.com/docs/en/prompt-caching#rewinding-the-conversation)).
+  After more than two corrections on one issue, `/clear`
+  ([best practices](https://code.claude.com/docs/en/best-practices)). Record a
+  failed attempt that is evidence before rewinding. Rewind restores only
+  Claude's file-tool edits made in this session. It does not restore Bash
+  changes, the edits of any subagent other than a foreground forked skill
+  (Agent-tool and workflow children included), other sessions' edits in most
+  cases, or symlinked and hard-linked paths
+  ([checkpointing limits](https://code.claude.com/docs/en/checkpointing#limitations)).
+  Use git for those: commits in owned worktrees stay the recovery path.
+- **Name each workstream.** Name each workstream with `/rename <name>` or start
+  it with `--name <name>`, and return with `/resume`. A bare `/clear` keeps that
+  name; `/clear <name>` names the conversation you are leaving, and the new one
+  starts unnamed ([sessions](https://code.claude.com/docs/en/sessions#name-your-sessions)).
+  Resume within the same wave, not across days: Context Mode deletes a
+  session's store seven days after that session started
+  ([session store](../docs/token-session-handbook.md#context-mode-executor-and-session-store)).
+- **Summarize part of the conversation.** In the rewind menu, Summarize from
+  here (2.1.32 or later) compresses the conversation from the selected message
+  onward, and Summarize up to here (2.1.141 or later) compresses what came
+  before it. Both take optional focus text, and the original messages stay in
+  the transcript
+  ([rewind and summarize](https://code.claude.com/docs/en/checkpointing#rewind-and-summarize)).
+- **Side questions with `/btw`.** Use `/btw` for questions about what the
+  session already knows. It has no tools, and its answer never enters the
+  conversation history
+  ([side questions](https://code.claude.com/docs/en/interactive-mode#side-questions-with-%2Fbtw)).
+  Use a subagent to find out something new.
+
 ## Native acceptance and review
 
 Inside an authenticated interactive Claude session, use `/context all`, `/mcp`
 and `/usage` to inspect loaded context, connections and usage. Retain their
-actual output. `/compact` performs model summarization: exercise it when useful
-and verify the next task still has its required facts. Do not treat a headless
-prompt containing `/context` as a zero-cost inspection command.
+actual output. `/compact` performs model summarization. Run it at a natural
+break, such as between tasks, rather than letting auto-compaction fire
+mid-task, and compact before stepping away rather than after: after the cache
+lifetime the summarization request reprocesses the whole history uncached.
+Give it a focus that names what to keep and what to drop, for example
+`/compact keep the acceptance commands, their exit codes and the open gaps; drop the exploratory reads`,
+then verify that the next task still has its facts
+([prompt caching](https://code.claude.com/docs/en/prompt-caching),
+[what survives compaction](https://code.claude.com/docs/en/context-window#what-survives-compaction),
+[Opus 5.5 compaction note](https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context)).
+Do not treat a headless prompt containing `/context` as a zero-cost inspection
+command.
 
 For an independent file review, retain inherited tools so the installed hooks
 and the reviewer's available capabilities agree. Use a bounded prompt that
@@ -288,7 +387,20 @@ Use a trusted checkout and a bounded, explicit file list. Capture stdout/stderr
 privately, preserve a deadline and the returned exit code, and require one
 successful final result plus a grounded report. Inspect the actual `system:init`
 tool inventory and tool calls; a prompt contract is not an operating-system
-sandbox. If enforced read-only access is required, select a separately qualified
+sandbox. Print mode skips the workspace trust dialog and silently ignores a
+settings file that fails validation, dropping the whole file (installed
+`claude --help`, 2.1.283), so a headless run can start without that file's deny
+rules, hooks and permission mode. `system:init` has no settings-source field:
+before trusting a result, check its `permissionMode` and `plugins` and, with
+`--include-hook-events`, that the expected guard hook events fired. `--bare`
+never reads OAuth or the keychain (installed `claude --help`, 2.1.283), and the
+[headless docs](https://code.claude.com/docs/en/headless) say it will become the
+default for `-p` in a future release. On a host signed in with a subscription
+and on the `latest` channel, check each new CHANGELOG entry for that change
+before relying on unattended `claude -p`; keep-but-compare
+[M6](../docs/decisions/2026-09-24-community-sweep.md#keep-but-compare) selects
+the replacement flag set. If enforced read-only access is required, select a
+separately qualified
 isolation boundary. The older receipt's restricted Read/Glob/Grep invocation is
 historical evidence, not the default for every installed hook combination; see
 [restricted-worker compatibility](../docs/restricted-worker-compatibility.md).
@@ -305,6 +417,20 @@ supported disagreements using the source and relevant checks. Reviewer agreement
 alone is not correctness or an independent test. Record complete native usage,
 including failed attempts, and preserve unknowns. Use the existing token report
 after meaningful changes; do not add its native estimates to provider totals.
+
+Plan mode is optional: use it when the approach is uncertain, the change spans
+several files or the code is unfamiliar, and skip it when the diff fits in one
+sentence ([best practices](https://code.claude.com/docs/en/best-practices)).
+Under this profile's `bypassPermissions` default, an interactive terminal
+session does not enforce plan mode's blocks: Claude is only instructed to plan,
+and an edit it attempts runs without prompting. Plan mode
+keeps its blocks in `-p`, Agent SDK and VS Code chat sessions, and explicit ask
+rules and critical-path `rm`/`rmdir` still prompt
+([permission modes](https://code.claude.com/docs/en/permission-modes), re-read
+2026-09-28). Because plan mode is an instruction here, entering it in a
+coordinator can reach running workflow children; resume paused workflow units
+afterwards (recorded 2026-09-27, consistent with the permission-modes page but
+not re-observed). Plan mode is not a read-only guard here.
 
 ## Adoption, maintenance and rollback
 

@@ -60,6 +60,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "hardware-profile-smoke.yml",
             "receipt-staleness.yml",
             "saturation-tracking.yml",
+            "practice-references-freshness.yml",
         }
         self.assertEqual(
             actual, expected,

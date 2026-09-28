@@ -1,0 +1,545 @@
+{
+  "schema_version": 1,
+  "kind": "practice_references",
+  "checked_at": "2026-09-28",
+  "scope": "The Claude Code practice references read by the 2026-09-27 community sweep: the 22 community repositories it surveyed and the four upstream Anthropic repositories its two syntheses cited by pin as primary sources, one of them the rejected anthropics/claude-code-security-review. Other pinned sources the syntheses cite, such as git/git at v2.43.0, are not Claude Code practice references and are not tracked. The decision record named by each entry carries the practices, dispositions and overturn conditions; this file only tracks the pins. The freshness check reports drift and maintenance status and never changes a pin, a disposition or a practice.",
+  "pin_rule": "pin is the full commit SHA the sweep read; pin_date is that commit's committer date in UTC, from gh api repos/{repository}/commits/{pin} (.commit.committer.date), read 2026-09-28.",
+  "stars_at_check_rule": "GitHub stargazers_count from gh api repos/{repository}, read 2026-09-28. Discovery metadata only: stars guide discovery and are never evidence of quality, maintenance or fitness (AGENTS.md top rule).",
+  "freshness_check": {
+    "tool": "tools/sota-convergence/practice_references.py",
+    "workflow": ".github/workflows/practice-references-freshness.yml"
+  },
+  "dimensions": [
+    {
+      "id": "harness-and-token-practice",
+      "description": "The sweep's main synthesis: context, compaction, effort, model tiering, delegation, MCP, instruction-file, permission, plugin and skill practice for the Claude Code harness.",
+      "topics": [
+        "Auto-compact threshold on the 1M Opus 5.5 window",
+        "Fixed context percentages and a 300-400K 'rot boundary'",
+        "Disabling or blocking auto-compaction",
+        "Default effort on Opus 5.5",
+        "Thinking-budget controls",
+        "Cheaper models for subagents, teammates, planning and main",
+        "MCP tool loading",
+        "Standing self-verification instructions",
+        "Delegation volume",
+        "Effort changes and the prompt cache",
+        "CLAUDE.md size",
+        "Generated or compressed instruction files",
+        "Permission mode",
+        "Completion loops",
+        "Agent teams",
+        "1-hour prompt-cache TTL",
+        "MCP output cap",
+        "Plugin and marketplace pinning",
+        "Subagent tool restriction",
+        "Skill description wording"
+      ]
+    },
+    {
+      "id": "git-review-and-automation",
+      "description": "The sweep's supplement synthesis: commit, pull-request, review, CI, scheduling and headless (claude -p) automation practice.",
+      "topics": [
+        "Commit message format",
+        "AI review of every PR",
+        "Human approval before merge",
+        "Action reference pinning",
+        "PR size",
+        "Permission bypass on a real host",
+        "Unattended permission route",
+        "--bare for scripted calls",
+        "Completion loops",
+        "-p JSON output shape",
+        "Scheduler durability and /loop lifetime",
+        "Model routing for CI cost",
+        "Commit attribution",
+        "Security review layers",
+        "Off-minute schedules",
+        "Notifications for waiting sessions",
+        "Headless background waits"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "repository": "obra/superpowers",
+      "role": "community",
+      "pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 292209,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "verification-before-completion skill (the installed copy is byte-identical), subagent context and TDD practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review before merge, a fresh reviewer, worktrees, the headless test harness."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "affaan-m/ECC",
+      "role": "community",
+      "pin": "eaeef53a15854e68cb2be336c2ba47e111fa25c3",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 268467,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "token-optimization defaults (MAX_THINKING_TOKENS, SUBAGENT_MODEL=haiku), strategic-compact thresholds, hooks"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: pre-commit hooks, SHA pinning, external cron. Stale claims: includeCoAuthoredBy, `claude agents`."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "shanraisshan/claude-code-best-practice",
+      "role": "community",
+      "pin": "59dc4f047f850a21dabbdde7685be07c2e3ca5bd",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 66464,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "repository named by the user: context, compaction, effort (Opus 4.7-era), settings and tips"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: small PRs, squash merge, /code-review, auto mode, /loop, --bare, background tasks, attribution. Stale claims: /review, /security-review flags, the 3-day /loop, the PRINT_BG_WAIT description."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "hesreallyhim/awesome-claude-code",
+      "role": "community",
+      "pin": "c1cb4c1705b92c6a0808c2769fbe2c0d53108a1c",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 54712,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "curation list, used for discovery only"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Discovery; the stale claude-code-security-review listing; a cron counter-example."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "shareAI-lab/learn-claude-code",
+      "role": "community",
+      "pin": "0dcafa2ae053a1ddd6a72f265431104b08a5aa13",
+      "pin_date": "2026-08-26",
+      "stars_at_check": 77687,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "subagent context isolation and harness patterns"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The SDK subprocess-cost dissent; worktrees; background tasks."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "luongnv89/claude-howto",
+      "role": "community",
+      "pin": "4f5703855c723a1d0ab0285a497ad0e0ecc5b69a",
+      "pin_date": "2026-09-26",
+      "stars_at_check": 41692,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "commands, settings, hooks and effort tutorials"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: no --no-verify, headless flags, --permission-prompts. The wrong ultrareview exit-code claim."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "Yeachan-Heo/oh-my-claudecode",
+      "role": "community",
+      "pin": "9fd35ece5d6de65b511bf43b55e42c499e4fc194",
+      "pin_date": "2026-09-22",
+      "stars_at_check": 39381,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "orchestration and per-folder context generation"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review and commit rules; the bypass-risk dissent; the conditional --bare."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "wshobson/agents",
+      "role": "community",
+      "pin": "9b15b34b0bfc13a815cbfc2366e14ea549e09422",
+      "pin_date": "2026-09-26",
+      "stars_at_check": 40042,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "model tiering, model: inherit, agent design"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review governance, atomic commits, squash merge, a cron counter-example."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "ruvnet/ruflo",
+      "role": "community",
+      "pin": "b14c79e6f7793a358f13b7e3f9b5eb27317b4988",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 73405,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "compaction settings, hooks, subagent depth ADR"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Headless fan-out and budget caps; the non-UUID --session-id."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "bmad-code-org/BMAD-METHOD",
+      "role": "community",
+      "pin": "5e33d3c03ba53187a40ab679d5479cdd4b6ac2fb",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 53559,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "subagent reconnaissance and instruction-file practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Conventional Commits, pre-commit install, the background-wait dissent."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "thedotmack/claude-mem",
+      "role": "community",
+      "pin": "7d0355413c2aaa3fa57fe6788b2ba2717fa7ff6f",
+      "pin_date": "2026-09-26",
+      "stars_at_check": 94805,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "memory and context-engineering practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "dontAsk tests, the Stop-hook retry hazard, the CI-failure gate caveat."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "ykdojo/claude-code-tips",
+      "role": "community",
+      "pin": "577ac89252195d61283b334c4b9d292b52c82203",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 10151,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "session, compaction and status-line tips"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "gh-driven and draft PRs, interactive review, the auto-mode caution."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "FlorianBruniaux/claude-code-ultimate-guide",
+      "role": "community",
+      "pin": "dfb8bc67d10d52c3005a7e6ed2f4c6b53d3d7e09",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 6047,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "broad guide; Headroom MCP-mode advice; caveman figures"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: CI caps, the multi-provider review caveat. Rejected: @main and direct_prompt examples, Haiku routing, --timeout, the Ralph bash loop."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "zebbern/claude-code-guide",
+      "role": "community",
+      "pin": "0cb35f7f17b212930e14b30deac96fae0e48af1f",
+      "pin_date": "2026-09-26",
+      "stars_at_check": 4640,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "settings and tuning restatements, including stale tunings"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The SHA-pin tip, secrets, bypass only in sandboxes, --bare."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "centminmod/my-claude-code-setup",
+      "role": "community",
+      "pin": "f41310c11cfaa01e4a479eb9d4a2ebd92e810839",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 2649,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "Compact Instructions and CLAUDE.md practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Scoped tools, timeouts, the notifier, the JSON-array observation, the deprecated includeCoAuthoredBy."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "feiskyer/claude-code-settings",
+      "role": "community",
+      "pin": "95dab59a62b2031adcb7abf25ae0a60b8a13fdb2",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 1656,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "settings examples (effort, thinking)"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "-p subprocesses, --allowedTools, --resume, the per-subgoal rule (rejected)."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "fcakyon/claude-codex-settings",
+      "role": "community",
+      "pin": "8c25677efb55b473f7b0bbbb3658273ebc8eb993",
+      "pin_date": "2026-09-24",
+      "stars_at_check": 1157,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "PreCompact priorities reference, status line, advisor"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "No --no-verify, the defaultMode auto config, an off-minute cron."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "Piebald-AI/claude-code-system-prompts",
+      "role": "community",
+      "pin": "2b5a6b763bd090d1b99e04a0cba43bbca23dfa07",
+      "pin_date": "2026-09-26",
+      "stars_at_check": 12788,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "extracted harness prompts, used as behaviour evidence and not counted"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Extracted built-in prompts, treated as copies of the primary side; scheduler and Monitor guidance."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "JuliusBrussee/caveman",
+      "role": "community",
+      "pin": "2fd153c67988e980fb0b2455c90832159a6a5a25",
+      "pin_date": "2026-09-22",
+      "stars_at_check": 108085,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "terse-output compression and its cited studies"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Conventional Commits, small PRs, no attribution, -p evals."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "addyosmani/agent-skills",
+      "role": "community",
+      "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6",
+      "pin_date": "2026-09-26",
+      "stars_at_check": 99528,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "skills and agents practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review before merge, fast hooks, worktrees, the non-interactive skip rule."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "anthropics/skills",
+      "role": "community",
+      "pin": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "pin_date": "2026-09-24",
+      "stars_at_check": 178682,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "skill-creator, prompt-audit and model-migration guidance"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The distinction between the Agent SDK and the Tool Runner."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "anthropics/claude-plugins-official",
+      "role": "community",
+      "pin": "fa59bc9037741ecfa131aa27938272605710d7b2",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 37104,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "security-guidance and LSP plugins, plugin development"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The code-review, commit-commands, security-guidance, ralph-loop and code-modernization plugins (PRINT_BG_WAIT)."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "role": "primary",
+      "pin": "7779afb12e3635f46f56ec823979d68350ae000b",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 148364,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "version facts 2.1.32 to 2.1.283 (prompt-audit, Opus 5.5 default, effort defaults, cacheTtl, summarize)"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "2.0.62 attribution; 2.1.81 --bare; 2.1.223 /review alias; 2.1.229 --no-verify; 2.1.248 --restricted and self-paced /loop; 2.1.259 --permission-prompts; 2.1.269 and 2.1.281 attribution; the 2.1.281 --max-turns fix; 2.1.282 OTel scope; 2.1.283 routine minutes."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md",
+      "paths_read": [
+        "CHANGELOG.md"
+      ]
+    },
+    {
+      "repository": "anthropics/claude-code-action",
+      "role": "primary",
+      "pin": "756cc22e19660d20e8cc9496b4f242475a7f7790",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 9209,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "CI hardening entry (HOST-09)"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "docs/security.md (triggers, checkout, restore, signing, show_full_output), docs/usage.md (deprecations), action.yml (the nested setup-bun pin), examples/claude.yml."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md",
+      "paths_read": [
+        "docs/security.md",
+        "docs/usage.md",
+        "action.yml",
+        "examples/claude.yml"
+      ],
+      "release": "v1.0.235",
+      "prior_pin": {
+        "pin": "8cf3482550831fb35a4fc3fbf7ca139cf8028b4c",
+        "release": "v1.0.233"
+      }
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "role": "primary",
+      "pin": "36f95486ee9fc49d8ee1ed56811f07b5e8e23ac6",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 8176,
+      "used_for": [
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The upstream reference for selecting the message whose type is 'result' (A10 parser)."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md",
+      "paths_read": [
+        "src/claude_agent_sdk/_internal/message_parser.py:95,308"
+      ]
+    },
+    {
+      "repository": "anthropics/claude-code-security-review",
+      "role": "primary",
+      "pin": "0c6a49f1fa56a1d472575da86a94dbc1edb78eda",
+      "pin_date": "2026-02-11",
+      "stars_at_check": 6276,
+      "used_for": [
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Rejected: README.md:45 warns it is not hardened against prompt injection."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md",
+      "paths_read": [
+        "README.md:45"
+      ]
+    }
+  ]
+}

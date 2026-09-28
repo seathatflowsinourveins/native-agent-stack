@@ -182,6 +182,13 @@ rather than a workflow stage, because they spend account usage, with that usage 
 | M13 | wshobson/agents (#19, part 3) | An invalid-key, closed-port headless probe as a local acceptance command that proves every agent and skill loads. | Run it twice, and again after the next auto-update, with `CLAUDE_CONFIG_DIR` at a scratch directory. Adopt only if `system/init` lists all seven agents and all skills every time, with no completed request. |
 | M14 | jarrodwatts/claude-hud | `statusLine.refreshInterval` (5-10 s) plus an env-injected `diff.autoRefreshIndex=false` in the statusLine wrapper. | In one live interactive session with background workers, stay idle. Record whether the agents, todos or git segments go stale, and record the `.git/index` mtime and any `index.lock` errors. Adopt both changes if the segments go stale. |
 
+**2026-09-28:** the [2026-09-27 review](2026-09-28-community-sweep.md#amendments-to-the-2026-09-24-rows)
+amends M1, M2, M3, M6, M7, M8, M9 and M14, and continues this table from M15 and the Rejected
+table below from R41. For M14: #402 (`d022295a`, item 5 of the
+[settings decision](2026-09-27-claude-harness-settings.md)) adopted `refreshInterval: 5` in the
+settings template without the paired `diff.autoRefreshIndex=false`, which follows in the
+template and host halves; M14's idle run stays the check.
+
 ## Rejected
 
 | ID | Source | Practice or premise | Reason |
