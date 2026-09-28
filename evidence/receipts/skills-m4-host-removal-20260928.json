@@ -16,7 +16,8 @@
     "The scratch reproduction combines a local integration check with a synthetic fixture: a one-file local skill, a lock entry seeded by the harness (a local-source add writes none: dist/cli.mjs getOwnerRepo L47-48 and L5595) and an empty .cursor folder as the only detected universal agent. It ran the pinned CLI under env -i with a scratch HOME under /var/tmp and an empty working directory, then deleted its scratch root.",
     "The reproduction's installer runs exercise install_skills.py's global mode only. The project mode's read-back is #429's, and this change reuses it; tests/test_install_skills.py covers both modes with a fake CLI, not with this native run.",
     "The override drop's time is taken from its backup label. evidence/artifacts/skills-m4-host-removal-20260928/drop_override.redacted.py is the coordinator's script with its one backup-directory line replaced by a placeholder, so this receipt names no backup location; provenance.override_drop_script_sha256 is the original file's digest.",
-    "Codex's configuration is unchanged: the skill was enabled for Codex, so it had no disable entry to remove. No Codex-native listing was observed; the read-back shows only that no copy remains where Codex reads skills (~/.agents/skills and ~/.codex/skills)."
+    "Codex's configuration is unchanged: the skill was enabled for Codex, so it had no disable entry to remove. No Codex-native listing was observed; the read-back shows only that no copy remains where Codex reads skills (~/.agents/skills and ~/.codex/skills).",
+    "The review repair round changed install_skills.py after the first reproduction. data.scratch_reproduction ran the pre-repair file (its fixed_install_skills_sha256); data.review_repair_round.reproduction_rerun and claude_config_dir_probe ran the repaired file natively. The malformed-lock, unreadable-lock and missing-binary cases are fake-CLI fault injections in tests/test_install_skills.py only: no native run produced them."
   ],
   "evidence_class": "native-measurement (acceptance-evidence policy class 'upstream example or native operation'): the two skills 1.7.0 remove runs on this host, with their retained exit codes and output, and the same pinned CLI in the scratch reproduction. our-integration (policy class 'local integration check'): scripts/skills_status.py --json after the removal, and install_skills.py at bdf25d28 and as fixed, run end to end against the pinned CLI in the reproduction, whose with-.cursor and control arms discriminate. synthetic-fixture (policy class 'synthetic fixture'): the reproduction's local skill, seeded lock entry and .cursor folder. our-integration (policy class 'independent observation'): the read-only read-back at 18:50:01Z, a separate method from the steps it checks. upstream source: the vercel-labs/skills v1.7.0 files and the installed dist/cli.mjs, cited by line, read and not executed. coordinator-reported: the fields so marked, which are the coordinator's account and not observations here.",
   "recorded_at_utc": "2026-09-28T20:01:46Z",
@@ -318,6 +319,353 @@
         "version": "1.7.0"
       }
     },
+    "review_repair_round": {
+      "trigger": "The cross-family read-only review of PR #467 at 6744c2eb (codex exec, gpt-6-astra, reasoning effort max) returned MERGE-AFTER-FIXES with two major findings, one minor and one nit: the global read-back looked for the Claude link only under ~/.claude while skills 1.7.0 honours CLAUDE_CONFIG_DIR (dist/cli.mjs L1398, L1511); load_lock read a malformed lock as an empty one, so a truncated lock that still held the entry confirmed the rollback; an unreadable lock raised out of the read-back; the decision addendum said 'settings' where the read-back compares only skillOverrides. The independent verifier confirmed all eight claims and noted no test for a missing binary.",
+      "change": "claude_skills_dir resolves the global Claude folder as the CLI does; lock_retains reads the lock strictly; an OSError or ValueError during the read-back is 'error' with the reason 'rollback could not be verified'. The fake CLI mirrors CLAUDE_CONFIG_DIR and gains lock_after_remove faults and a deleted binary.",
+      "before_repair_install_skills_sha256": "f7b9ba2b3b11a16d1d2cbc820eebdb67b1a18ea672a0579def5222c6d7d416df",
+      "repaired_install_skills_sha256": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19",
+      "claude_config_dir_probe": {
+        "started_utc": "2026-09-28T20:57:31Z",
+        "finished_utc": "2026-09-28T20:57:33Z",
+        "output_sha256": "65f4c8b7016a6f8283c3a78b50c29f168af96c31a5d781753077df3c2e41f71b",
+        "output": {
+          "cli": {
+            "cli_blank_value": {
+              "claude_config_dir": "two spaces",
+              "steps": [
+                {
+                  "exit": 0,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "config_dir_link": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "default_claude_entry": {
+                      "exists": true,
+                      "is_symlink_to_canonical": true
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "add"
+                },
+                {
+                  "exit": 0,
+                  "state_after": {
+                    "canonical_folder": false,
+                    "config_dir_link": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "default_claude_entry": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "scoped_remove"
+                }
+              ]
+            },
+            "cli_config_dir": {
+              "claude_config_dir": "<scratch>/claude-config",
+              "steps": [
+                {
+                  "exit": 0,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "config_dir_link": {
+                      "exists": true,
+                      "is_symlink_to_canonical": true
+                    },
+                    "default_claude_entry": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "add"
+                },
+                {
+                  "exit": 0,
+                  "state_after": {
+                    "canonical_folder": false,
+                    "config_dir_link": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "default_claude_entry": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "scoped_remove"
+                }
+              ]
+            }
+          },
+          "installer": {
+            "before_repair_control": {
+              "exit": 1,
+              "other_copy_intact": null,
+              "reported_state": "rolled-back",
+              "state_after": {
+                "canonical_folder": false,
+                "config_dir_link": {
+                  "exists": false,
+                  "is_symlink_to_canonical": false
+                },
+                "default_claude_entry": {
+                  "exists": false,
+                  "is_symlink_to_canonical": false
+                },
+                "lock_entry": false
+              },
+              "stderr_reason": "rolled back"
+            },
+            "before_repair_other_default_copy": {
+              "exit": 1,
+              "other_copy_intact": true,
+              "reported_state": "error",
+              "state_after": {
+                "canonical_folder": false,
+                "config_dir_link": {
+                  "exists": false,
+                  "is_symlink_to_canonical": false
+                },
+                "default_claude_entry": {
+                  "exists": true,
+                  "is_symlink_to_canonical": false
+                },
+                "lock_entry": false
+              },
+              "stderr_reason": "rollback incomplete"
+            },
+            "repaired_control": {
+              "exit": 1,
+              "other_copy_intact": null,
+              "reported_state": "rolled-back",
+              "state_after": {
+                "canonical_folder": false,
+                "config_dir_link": {
+                  "exists": false,
+                  "is_symlink_to_canonical": false
+                },
+                "default_claude_entry": {
+                  "exists": false,
+                  "is_symlink_to_canonical": false
+                },
+                "lock_entry": false
+              },
+              "stderr_reason": "rolled back"
+            },
+            "repaired_other_default_copy": {
+              "exit": 1,
+              "other_copy_intact": true,
+              "reported_state": "rolled-back",
+              "state_after": {
+                "canonical_folder": false,
+                "config_dir_link": {
+                  "exists": false,
+                  "is_symlink_to_canonical": false
+                },
+                "default_claude_entry": {
+                  "exists": true,
+                  "is_symlink_to_canonical": false
+                },
+                "lock_entry": false
+              },
+              "stderr_reason": "rolled back"
+            }
+          },
+          "installer_sha256": {
+            "before_repair": "f7b9ba2b3b11a16d1d2cbc820eebdb67b1a18ea672a0579def5222c6d7d416df",
+            "repaired": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19"
+          },
+          "scratch_root_removed": true,
+          "version": "1.7.0"
+        }
+      },
+      "reproduction_rerun": {
+        "note": "m4_scoped_remove_repro.py unchanged, with the repaired install_skills.py as its fixed argument and bdf25d28's as its unfixed one.",
+        "started_utc": "2026-09-28T20:57:33Z",
+        "finished_utc": "2026-09-28T20:57:34Z",
+        "fixed_install_skills_sha256": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19",
+        "output_sha256": "fed911b88c077b4d95a91e5c06cc5880010f713feef6961c9ce1bef38799797e",
+        "output": {
+          "arms": {
+            "A_scoped_with_cursor": {
+              "dot_dirs_before_remove": [
+                ".agents",
+                ".claude",
+                ".cursor"
+              ],
+              "seeded_lock_version": 3,
+              "state_before_remove": {
+                "canonical_folder": true,
+                "claude_link": true,
+                "codex_native_copy": false,
+                "lock_entry": true
+              },
+              "steps": [
+                {
+                  "argv": "skills add <local fixture> --skill m4probe -g -y -a claude-code codex",
+                  "exit": 0,
+                  "printed_successfully_removed": false,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "claude_link": true,
+                    "codex_native_copy": false,
+                    "lock_entry": false
+                  }
+                },
+                {
+                  "argv": "skills remove m4probe -g -y -a claude-code codex",
+                  "exit": 0,
+                  "printed_successfully_removed": true,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "claude_link": false,
+                    "codex_native_copy": false,
+                    "lock_entry": true
+                  }
+                }
+              ]
+            },
+            "B_scoped_control": {
+              "dot_dirs_before_remove": [
+                ".agents",
+                ".claude"
+              ],
+              "seeded_lock_version": 3,
+              "state_before_remove": {
+                "canonical_folder": true,
+                "claude_link": true,
+                "codex_native_copy": false,
+                "lock_entry": true
+              },
+              "steps": [
+                {
+                  "argv": "skills add <local fixture> --skill m4probe -g -y -a claude-code codex",
+                  "exit": 0,
+                  "printed_successfully_removed": false,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "claude_link": true,
+                    "codex_native_copy": false,
+                    "lock_entry": false
+                  }
+                },
+                {
+                  "argv": "skills remove m4probe -g -y -a claude-code codex",
+                  "exit": 0,
+                  "printed_successfully_removed": true,
+                  "state_after": {
+                    "canonical_folder": false,
+                    "claude_link": false,
+                    "codex_native_copy": false,
+                    "lock_entry": false
+                  }
+                }
+              ]
+            },
+            "C_unscoped_after_A": {
+              "dot_dirs_before_remove": [
+                ".agents",
+                ".claude",
+                ".cursor"
+              ],
+              "state_before_remove": {
+                "canonical_folder": true,
+                "claude_link": false,
+                "codex_native_copy": false,
+                "lock_entry": true
+              },
+              "steps": [
+                {
+                  "argv": "skills remove m4probe -g -y",
+                  "exit": 0,
+                  "printed_successfully_removed": true,
+                  "state_after": {
+                    "canonical_folder": false,
+                    "claude_link": false,
+                    "codex_native_copy": false,
+                    "lock_entry": false
+                  }
+                }
+              ]
+            }
+          },
+          "installer": {
+            "fixed_control": {
+              "dot_dirs_after": [
+                ".agents",
+                ".claude"
+              ],
+              "exit": 1,
+              "reported_state": "rolled-back",
+              "state_after": {
+                "canonical_folder": false,
+                "claude_link": false,
+                "codex_native_copy": false,
+                "lock_entry": false
+              },
+              "stderr_reason": "rolled back"
+            },
+            "fixed_with_cursor": {
+              "dot_dirs_after": [
+                ".agents",
+                ".claude",
+                ".cursor"
+              ],
+              "exit": 1,
+              "reported_state": "error",
+              "state_after": {
+                "canonical_folder": true,
+                "claude_link": false,
+                "codex_native_copy": false,
+                "lock_entry": false
+              },
+              "stderr_reason": "rollback retained, in use by another agent"
+            },
+            "unfixed_control": {
+              "dot_dirs_after": [
+                ".agents",
+                ".claude"
+              ],
+              "exit": 1,
+              "reported_state": "rolled-back",
+              "state_after": {
+                "canonical_folder": false,
+                "claude_link": false,
+                "codex_native_copy": false,
+                "lock_entry": false
+              },
+              "stderr_reason": "rolled back"
+            },
+            "unfixed_with_cursor": {
+              "dot_dirs_after": [
+                ".agents",
+                ".claude",
+                ".cursor"
+              ],
+              "exit": 1,
+              "reported_state": "rolled-back",
+              "state_after": {
+                "canonical_folder": true,
+                "claude_link": false,
+                "codex_native_copy": false,
+                "lock_entry": false
+              },
+              "stderr_reason": "rolled back"
+            }
+          },
+          "scratch_root_removed": true,
+          "version": "1.7.0"
+        }
+      }
+    },
     "capture_files": [
       {"name": "m4-remove-time.txt", "bytes": 21, "sha256": "8bb579db5f16edcadb5456ab76aba76087057a312dbcc6827993fcde62a70853"},
       {"name": "m4-remove.out", "bytes": 243, "sha256": "41a7a69f978b34933e930b73a675d5792bb9fcdf5f531555e5a08f4241a8b60b"},
@@ -336,6 +684,9 @@
     "reproduction_command": "TMPDIR=/var/tmp python3 m4_scoped_remove_repro.py <skills 1.7.0 bin> <fixed install_skills.py> <install_skills.py at bdf25d28>",
     "reproduction_script": "evidence/artifacts/skills-m4-host-removal-20260928/m4_scoped_remove_repro.py",
     "reproduction_script_sha256": "80acc8adb0ecb751a1cd331cd6012161fbd2d841f05fa9f30caa941974f51954",
+    "config_dir_probe_command": "TMPDIR=/var/tmp python3 m4_claude_config_dir_probe.py <skills 1.7.0 bin> <repaired install_skills.py> <install_skills.py at 6744c2eb>",
+    "config_dir_probe_script": "evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py",
+    "config_dir_probe_script_sha256": "622ac2f257f7cb9e4ea55ac899db2fb4edbe59b90b19bd990cb4d6ed1e042ee4",
     "override_drop_script_sha256": "818dc9dfc367565228e8286e2862cd8c61515a3a61cdba23d66753bf53eb730b",
     "override_drop_script_redacted_sha256": "54d040aa053707502a00a9b6c68419a576df86251f7aaf05532c08bec31ac9f1",
     "references": [
@@ -348,7 +699,7 @@
       "vercel-labs/skills commit 4c719f3f91b7 (2026-07-26): 'fix(remove): keep the lock entry while another agent still uses the skill'",
       "https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/ext/skills/src/host_roots.rs#L103-L108 (Codex rust-v0.157.1 lists user skills from $HOME/.agents/skills)",
       "PR #429 (bdf25d28): the project-mode rollback read-back and its reasons, which this change extends to the global mode",
-      "tools/adoption/install_skills.py and tests/test_install_skills.py GlobalRollbackReadBackTests (this change): the global rollback reports error, with #429's reasons, when the remove keeps anything or cannot run"
+      "tools/adoption/install_skills.py and tests/test_install_skills.py GlobalRollbackReadBackTests (this change): the global rollback reports error, with #429's reasons, when the remove keeps anything or cannot run; after the review repair round it reads the Claude link where the CLI puts it and reports a read-back it cannot complete as 'rollback could not be verified', in both modes"
     ]
   }
 }

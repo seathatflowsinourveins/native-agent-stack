@@ -1335,7 +1335,8 @@ host steps on 2026-09-28, through the pinned skills 1.7.0 CLI. The
   The optional drop of the stale `skillOverrides` key ran after a backup labelled
   `settings.json.20260928T183120Z.pre-m4-override-drop`, taking the keys from 29 to 28.
 - A read-only read-back at 18:50:01Z found no copy of the skill and no lock entry. It found 28 skill folders
-  equal to the lock and to the manifest, and settings equal to the template.
+  equal to the lock and to the manifest, and a `skillOverrides` key equal to the template's; it compared no
+  other setting.
 
 For the [condition log](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule), C4's start
 context is in place on this host from 18:31:10Z, the coordinator's time for step 2. By the coordinator's order,
@@ -1411,15 +1412,21 @@ agent. A global remove that could not run raised its exception instead of return
 
 The fix extends #429's read-back to the global rollback and deletes nothing.
 - After the remove, in either mode and whatever it reported, `process_skill` reads back the canonical folder,
-  the lock entry and the claude-code link (L415-436). Globally these are `~/.agents/skills/<name>`, its entry
-  in the global lock and `~/.claude/skills/<name>`.
+  the lock entry and the claude-code link (L442-468). Globally these are `~/.agents/skills/<name>`, its entry
+  in the global lock and the link where skills 1.7.0 puts it (`claude_skills_dir`):
+  `$CLAUDE_CONFIG_DIR/skills/<name>` when that variable is set and not blank, else `~/.claude/skills/<name>`
+  (`dist/cli.mjs` L1398 and L1511).
 - If the remove exited nonzero or any of the three remains, the state is `error` with #429's reasons:
   "rollback retained, in use by another agent" when the remove exited 0 and left the canonical folder, and
   "rollback incomplete" otherwise. The stderr line keeps #429's format, reading `lock=` for the global lock
   where a project reads `project-lock=`, and now names what remains in both modes. There is no new state.
-- A remove that cannot run (`OSError` or a timeout) is reported and returns `error` in both modes (L412-414).
+- A read-back that cannot observe the three is `error` with the one new reason, "rollback could not be
+  verified", in both modes: an `OSError` or `ValueError` while reading them, such as an unreadable lock, or a
+  malformed one. Only a missing lock file, or a lock that parses without the entry, confirms removal
+  (`lock_retains`). `load_lock`, which the install checks still use, reads a malformed lock as empty.
+- A remove that cannot run (`OSError` or a timeout) is reported and returns `error` in both modes (L439-441).
 - It never deletes what remains, because only the skills CLI writes there. The docstring (L17-30) points to
-  this addendum for the manual procedure. The `SKILL_AGENTS` comment (L122-133) states the behaviour with the
+  this addendum for the manual procedure. The `SKILL_AGENTS` comment (L125-136) states the behaviour with the
   upstream lines, including Codex's `host_roots.rs`.
 
 `GlobalRollbackReadBackTests` in `tests/test_install_skills.py` uses the module's fake CLI. Its remove keeps what
@@ -1435,6 +1442,31 @@ The fix extends #429's read-back to the global rollback and deletes nothing.
   `error` with "rollback retained, in use by another agent" from the fixed script, each with the canonical
   folder left in place. Without `.cursor`, both gave `rolled-back`.
 
+**Review repair round.** The cross-family review of PR #467 at `6744c2eb` (read-only `codex exec`,
+`gpt-6-astra` at reasoning effort max) returned MERGE-AFTER-FIXES. Its findings are all fixed above:
+- the global read-back looked for the link only under `~/.claude`, so a set `CLAUDE_CONFIG_DIR` gave a false
+  `error` for another copy there, or missed the CLI's own link;
+- a malformed lock that still held the entry confirmed the rollback;
+- an unreadable lock raised out of the read-back;
+- this addendum said "settings" where the read-back compared only `skillOverrides`.
+
+The independent verifier confirmed all eight claims at `6744c2eb` and noted that no test covered a missing
+binary.
+- The fake CLI now links under `$CLAUDE_CONFIG_DIR/skills` as the CLI does, and adds `lock_after_remove`
+  (`malformed` or `unreadable`) and a deleted binary (`remove_cannot_run` 2). The test module strips a host's
+  `CLAUDE_CONFIG_DIR` as it strips `XDG_STATE_HOME`.
+- With the repair, 57 tests pass. With the pre-repair script from `6744c2eb`, five fail: both
+  `CLAUDE_CONFIG_DIR` tests, the malformed lock in each mode, and the unreadable lock. The blank-value and
+  missing-binary subtests pass on both versions.
+- A scratch-HOME probe ran the pinned CLI and both scripts
+  ([script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py)).
+  - With `CLAUDE_CONFIG_DIR` set, `add` linked the skill only under `$CLAUDE_CONFIG_DIR/skills`. With the value
+    set to two spaces, it linked under `~/.claude/skills`.
+  - With another `SKILL.md` folder at `~/.claude/skills/<name>`, the pre-repair script reported `error`
+    "rollback incomplete". The repaired script reported `rolled-back` and left that folder intact. Both
+    reported `rolled-back` without it.
+- The unchanged reproduction, rerun with the repaired script, gave the same states as its first run.
+
 **Evidence class.**
 
 | Evidence | Class | Acceptance-policy class | Where |
@@ -1443,7 +1475,8 @@ The fix extends #429's read-back to the global rollback and deletes nothing.
 | The first remove's leftovers, the `find`, the profile-install lines and the key counts | coordinator-reported | None; the coordinator's account | Receipt, marked `coordinator_reported` |
 | Read-only read-back at 18:50:01Z | our-integration | Independent observation | Receipt `data.independent_readback`; script in [`skills-m4-host-removal-20260928/`](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_host_readback.py) |
 | Scratch-HOME reproduction | native-measurement, synthetic-fixture | Upstream example or native operation; Synthetic fixture | Receipt `data.scratch_reproduction`; [script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_scoped_remove_repro.py) |
-| `install_skills.py` rollback tests | our-integration | Local integration check | `GlobalRollbackReadBackTests` in `tests/test_install_skills.py`, failing first against `bdf25d28` |
+| `install_skills.py` rollback tests | our-integration | Local integration check | `GlobalRollbackReadBackTests` in `tests/test_install_skills.py`, failing first against `bdf25d28`; the repair round's tests failing first against `6744c2eb` |
+| `CLAUDE_CONFIG_DIR` probe and reproduction rerun | native-measurement, synthetic-fixture | Upstream example or native operation; Synthetic fixture | Receipt `data.review_repair_round`; [probe script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py) |
 | Upstream source and `dist/cli.mjs` lines | upstream source | None; cited, not executed | Links above: skills at commit `7407f389` (tag `v1.7.0`) and Codex `host_roots.rs` at commit `36650394` (tag `rust-v0.157.1`) |
 
 **Overturn.** Suppose a skills release removes the canonical folder and its lock entry under `-a` while another

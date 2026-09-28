@@ -20,8 +20,12 @@ of the real `skills` CLI (v1.7.0) to exercise install_skills.py end to end:
                     entry. Per-fixture fault injection: retain_after_remove
                     keeps the named artifacts ("canonical", "lock",
                     "claude-link"), remove_exit fails the remove before it
-                    deletes anything, and remove_cannot_run leaves the binary
-                    non-executable after add, so the rollback cannot start.
+                    deletes anything, remove_cannot_run leaves the binary
+                    non-executable (1) or deletes it (2) after add, so the
+                    rollback cannot start, and lock_after_remove leaves the
+                    lock "malformed" (truncated, entry kept) or "unreadable".
+                    A set, non-blank $CLAUDE_CONFIG_DIR moves the global link
+                    to $CLAUDE_CONFIG_DIR/skills, as in skills 1.7.0.
 
 Every invocation is also appended to calls.log next to the fake script
 (independent of --home), so tests can assert not just the outcome but
@@ -35,7 +39,8 @@ does across process boundaries with a real (fake) CLI. $XDG_STATE_HOME is
 stripped from the child environment by default so a variable already set on
 the host running these tests can never redirect a lock-file write outside the
 test's own temporary directory; only the dedicated XDG test re-adds it,
-pointed at a second temporary directory.
+pointed at a second temporary directory. $CLAUDE_CONFIG_DIR is stripped the
+same way, and only the tests that name it set it.
 """
 
 import hashlib
@@ -100,6 +105,13 @@ def load_lock(path: Path) -> dict:
     return {"lockfileVersion": 3, "skills": {}}
 
 
+def claude_skills_dir(target: Path, project: bool) -> Path:
+    # skills@1.7.0 npm dist/cli.mjs L1398 and L1511: a set, non-blank CLAUDE_CONFIG_DIR moves the
+    # global claude-code skills folder; project installs keep <project>/.claude/skills.
+    config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip()
+    return (Path(config_dir) if config_dir and not project else target / ".claude") / "skills"
+
+
 argv = sys.argv[1:]
 if not argv:
     sys.exit(2)
@@ -125,7 +137,7 @@ if argv[0] == "add":
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(fixture["skill_md"], encoding="utf-8")
     if not project or "claude-code" in argv:
-        link_dir = target / ".claude" / "skills"
+        link_dir = claude_skills_dir(target, project)
         link_dir.mkdir(parents=True, exist_ok=True)
         link = link_dir / name
         # skills@7407f389 installer.ts:254-264 removes an existing directory
@@ -136,7 +148,7 @@ if argv[0] == "add":
             shutil.rmtree(link)
         elif link.exists():
             link.unlink()
-        os.symlink(os.path.join("..", "..", ".agents", "skills", name), link)
+        os.symlink(os.path.relpath(skill_dir, link_dir), link)
     path = target / "skills-lock.json" if project else lock_path(home)
     path.parent.mkdir(parents=True, exist_ok=True)
     lock = load_lock(path)
@@ -155,7 +167,9 @@ if argv[0] == "add":
             "computedHash": hashlib.sha256(b"SKILL.md" + fixture["skill_md"].encode()).hexdigest(),
         }
     path.write_text(json.dumps(lock))
-    if fixture.get("remove_cannot_run"):
+    if fixture.get("remove_cannot_run") == 2:
+        os.remove(__file__)  # The rollback's exec then fails with FileNotFoundError: the binary is gone.
+    elif fixture.get("remove_cannot_run"):
         # The rollback's exec then fails with PermissionError, an OSError, as for a binary that cannot run.
         os.chmod(__file__, 0o644)
     sys.exit(0)
@@ -193,14 +207,20 @@ if argv[0] == "remove":
             sys.exit(0)
     if "canonical" not in retained:
         shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
-    link = target / ".claude" / "skills" / name
+    link = claude_skills_dir(target, project) / name
     if not project and "claude-link" not in retained and (link.is_symlink() or link.exists()):
         link.unlink()
     path = target / "skills-lock.json" if project else lock_path(home)
     lock = load_lock(path)
-    if "lock" not in retained:
+    # lock_after_remove: "malformed" leaves a truncated lock that still holds the entry;
+    # "unreadable" removes the entry and then makes the lock unreadable.
+    fault = FIXTURES.get(name, {}).get("lock_after_remove")
+    if "lock" not in retained and fault != "malformed":
         lock.get("skills", {}).pop(name, None)
-    path.write_text(json.dumps(lock))
+    text = json.dumps(lock)
+    path.write_text(text[:-1] if fault == "malformed" else text)
+    if fault == "unreadable":
+        os.chmod(path, 0)
     sys.exit(0)
 
 print(f"fake skills: unknown subcommand {argv[0]!r}", file=sys.stderr)
@@ -293,6 +313,7 @@ class InstallSkillsTestCase(unittest.TestCase):
                     fake_bin: Path | None = None) -> subprocess.CompletedProcess:
         full_env = dict(os.environ)
         full_env.pop("XDG_STATE_HOME", None)  # never let the host redirect the lock write
+        full_env.pop("CLAUDE_CONFIG_DIR", None)  # nor the global Claude link
         full_env.update(env or {})
         args = [sys.executable, str(SCRIPT), "--manifest", str(manifest), "--home", str(self.home)]
         if fake_bin is not None:
@@ -532,6 +553,17 @@ sys.exit(code)
                 self.assertEqual(link.is_symlink(), artifact == "claude-link")
                 if artifact == "claude-link":
                     self.assertFalse(link.exists(), "dangling Claude link must still count as retained")
+
+    def test_project_rollback_with_a_malformed_lock_is_error_could_not_be_verified(self):
+        self.write_drifting_fake_bin(lock_after_remove="malformed")
+        result = self.install("--agent", "claude-code", "--json")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "error"})
+        self.assertIn("project-skill: error: rollback could not be verified (exit 0; read-back failed: ",
+                      result.stderr)
+        self.assertNotIn("rolled back", result.stderr)
+        self.assertFalse((self.project / ".agents/skills/project-skill").exists())
 
     def test_wrong_source_ref_or_path_is_not_accepted_even_when_bytes_match(self):
         for field, value in (("source", "other/repo"), ("ref", "b" * 40), ("path", "elsewhere/skill")):
@@ -819,7 +851,8 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
     NAME = "drift-skill"
     CONTENT = "# Drifted skill\n"
 
-    def run_drift(self, home_label: str = "home", **fixture) -> subprocess.CompletedProcess:
+    def run_drift(self, home_label: str = "home", env: dict | None = None,
+                  **fixture) -> subprocess.CompletedProcess:
         """A tree mismatch after add, so the global rollback runs; each label gets its own home and binary."""
         self.home = self.tmp_path / home_label
         self.home.mkdir(exist_ok=True)
@@ -828,7 +861,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
         self.fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {
             "skill_md": self.CONTENT, "tree_sha": tree_sha("actually-installed"), **fixture}})
         manifest = self.write_manifest([make_skill(self.NAME, self.CONTENT, tree_sha("pinned"))])
-        return self.run_install(manifest, "--json", fake_bin=self.fake_bin)
+        return self.run_install(manifest, "--json", fake_bin=self.fake_bin, env=env)
 
     def artifacts(self) -> dict:
         canonical = self.home / ".agents" / "skills" / self.NAME
@@ -879,12 +912,65 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
 
     def test_remove_that_cannot_run_is_error_not_an_exception(self):
         # Fixtures are embedded in the fake CLI as Python source, so flags are ints rather than JSON booleans.
-        result = self.run_drift(remove_cannot_run=1)
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertNotIn("Traceback", result.stderr)
-        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "error"})
-        self.assertIn(f"{self.NAME}: verification failed and rollback could not run (", result.stderr)
-        self.assertEqual([c[0] for c in calls_log(self.fake_bin)], ["--version", "add"])
+        for flag, case in ((1, "not executable"), (2, "missing")):
+            with self.subTest(binary=case):
+                result = self.run_drift(f"home-cannot-run-{flag}", remove_cannot_run=flag)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "error"})
+                self.assertIn(f"{self.NAME}: verification failed and rollback could not run (", result.stderr)
+                self.assertEqual([c[0] for c in calls_log(self.fake_bin)], ["--version", "add"])
+                self.assertEqual(self.fake_bin.exists(), flag == 1)
+
+    def test_malformed_lock_after_remove_is_error_could_not_be_verified(self):
+        # Both copies are gone and the remove exits 0, but a truncated lock may still hold the entry.
+        result = self.run_drift(lock_after_remove="malformed")
+        self.assert_error(result, "rollback could not be verified")
+        self.assertIn("read-back failed: ", result.stderr)
+        lock_text = (self.home / ".agents" / ".skill-lock.json").read_text()
+        self.assertIn(f'"{self.NAME}"', lock_text)
+        self.assertRaises(ValueError, json.loads, lock_text)
+        self.assertFalse((self.home / ".agents" / "skills" / self.NAME).exists())
+
+    @unittest.skipIf(os.geteuid() == 0, "root reads a mode-000 file")
+    def test_unreadable_lock_after_remove_is_error_not_an_exception(self):
+        result = self.run_drift(lock_after_remove="unreadable")
+        self.assert_error(result, "rollback could not be verified")
+        self.assertIn("read-back failed: [Errno 13]", result.stderr)
+
+    def test_claude_config_dir_link_is_read_back_where_the_cli_writes_it(self):
+        config_dir = self.tmp_path / "claude-config"
+        result = self.run_drift(env={"CLAUDE_CONFIG_DIR": str(config_dir)}, retain_after_remove=["claude-link"])
+        self.assert_error(result, "rollback incomplete")
+        link = config_dir / "skills" / self.NAME
+        self.assertTrue(link.is_symlink())
+        self.assertIn("canonical=False, lock=False, claude-link=True", result.stderr)
+        self.assertIn(f"left: {link}", result.stderr)
+        self.assertFalse((self.home / ".claude").exists())
+
+    def test_claude_config_dir_control_ignores_the_default_claude_folder(self):
+        # Another copy under ~/.claude is not the CLI's link while CLAUDE_CONFIG_DIR is set; a blank value is unset.
+        config_dir = self.tmp_path / "claude-config"
+        for label, value, link_dir in (("home-config", str(config_dir), config_dir / "skills"),
+                                       ("home-blank", "  ", None)):
+            with self.subTest(claude_config_dir=value):
+                other = self.tmp_path / label / ".claude" / "skills" / self.NAME / "SKILL.md"
+                if link_dir is not None:
+                    other.parent.mkdir(parents=True)
+                    other.write_text("owned before this run\n")
+                result = self.run_drift(label, env={"CLAUDE_CONFIG_DIR": value})
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
+                self.assertNotIn(": error:", result.stderr)
+                self.assertEqual(self.artifacts()["canonical"], False)
+                self.assertEqual(self.artifacts()["lock"], False)
+                if link_dir is not None:
+                    self.assertEqual(other.read_text(), "owned before this run\n")
+                    self.assertTrue(link_dir.is_dir())
+                    self.assertFalse((link_dir / self.NAME).exists() or (link_dir / self.NAME).is_symlink())
+                else:
+                    self.assertTrue((self.home / ".claude" / "skills").is_dir())
+                    self.assertEqual(self.artifacts()["claude-link"], False)
 
     def test_control_remove_that_deletes_everything_is_rolled_back(self):
         result = self.run_drift()
