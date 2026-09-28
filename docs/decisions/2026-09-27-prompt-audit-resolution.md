@@ -619,6 +619,12 @@ not published, because it quotes the user-level instruction file and names insta
     lane and the native before-and-after comparison the report describes before any edit.
   - **M5:** `blueprints/convergence-practice/application-delivery/AGENTS.md:15-18`, a single-family candidate. It
     needs a second-family lane before any edit.
+  - **Later, M4 and M5 on 2026-09-28:** their second-family lanes ran in a separate `lane:foundation` pull request,
+    recorded in `docs/decisions/2026-09-28-an13-m4-m5.md`.
+    - M4: both lanes rejected the rewrite, so there is no edit. The preload question stays with the skills trial's
+      2026-10-25 comparison.
+    - M5: both lanes amended the lines with different texts, and the blind adjudication split, so the lines are
+      unchanged.
   - **The rest:** the low-confidence and plugin findings are recorded flags.
 - **Usage.** The client reported $22.74 for the first run and $13.97 for the rerun, both at list prices. Both usage
   blocks are in `an13-runs.json`, where they overlap and are never added.
