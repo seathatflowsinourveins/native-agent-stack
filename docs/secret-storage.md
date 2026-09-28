@@ -1042,18 +1042,36 @@ Recorded gaps, asserted in `tests/test_secret_path_guard.py`:
 - a copy or search of a directory that holds an older store file
   (`~/.claude`, whose `.credentials.json` the guard blocks only by name);
 - an OmniRoute `DATA_DIR` elsewhere;
+- a store path the guard sees only after the shell or the program resolves
+  it (2026-09-28 cross-family review; every item passes on the base guard
+  too, for example `cat ~/.config/./omniroute/gateway.sqlite`): a `./` or an
+  interior `//` in the path, since the match is on the literal text; a path
+  relative to a parent (`< runtime-workers/openhands/secrets/F cat` or
+  `tar -cf - runtime-workers/openhands/secrets` from the state directory);
+  and a reader fed by a pipeline (`find DIR -print0 | xargs -0 cat`, `find
+  DIR -exec rtk read {} +`), although `find -exec cat` and `xargs cat` with a
+  store operand are blocked;
 - the OpenHands agent-server's own environment (2026-09-28): `docker exec
   <server> printenv`, or a shell in the container, and a full `docker
   inspect <server>`, whose `Config.Env` holds the key, show the session
   key, and the guard does not model docker subcommands. The variable name
-  `OH_SESSION_API_KEYS_0` is not one of the guard's secret names. It is set
-  only inside the container, never on the host, so `$OH_SESSION_API_KEYS_0`
-  in a host command expands to nothing. Listing it would stop only a shell
-  in the container that expands it (`docker exec <server> sh -c 'echo
-  "$OH_SESSION_API_KEYS_0"'`), not `printenv`, `env` or `docker inspect`,
-  and it would refuse plain code searches of the name (`rg
+  `OH_SESSION_API_KEYS_0` is not one of the guard's secret names. The
+  runtime worker's host driver (#425) never exports it on the host: it
+  writes the value only to the two private files and passes their paths
+  (`--env-file`, `curl -H @file`), so `$OH_SESSION_API_KEYS_0` in a host
+  command expands to nothing. Listing the name would also stop an explicit
+  lookup inside the container (`docker exec <server> sh -c 'echo
+  "$OH_SESSION_API_KEYS_0"'`, or `docker exec <server> python3 -c` code that
+  calls `os.getenv` with the name), but not `printenv`, `env` or `docker
+  inspect`, and it would refuse plain code searches of the name (`rg
   OH_SESSION_API_KEYS_0`), which the runtime worker's code and this page
   contain.
+
+A search whose pattern is given through `-e` or a long option the guard does
+not model (`rg --fixed-strings 'runtime-workers/openhands/secrets' docs`) is
+read as a search of that path and blocked. That is the parser's existing
+behaviour for every store (`rg -e .ssh/ docs` blocks too); a positional
+pattern (`rg -n 'runtime-workers/openhands/secrets' docs`) passes.
 
 Since 2026-09-27 every rule of the guard also reads the command an `rtk`
 invocation runs. The guard runs beside RTK's Claude hook and sees the
