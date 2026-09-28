@@ -158,3 +158,36 @@ These count artifacts, not Claude's tokenizer or billed usage. Words are whitesp
 - This workstation's `~/.claude/CLAUDE.md` predates #196, #272 and #294: it still says "Keep routine tasks at ordinary
   effort" and has no top rule, `effort: 'max'`, StructuredOutput or refusal sentence (grep counts, 2026-09-26). The
   post-merge sync replaces the merged copy whole, as the profile recipe now says.
+
+## Addendum (2026-09-28): `CLAUDE.md` gains a Compact Instructions section
+
+This amends the scope sentence under **Decision** without reversing it. The project `CLAUDE.md` now keeps its
+`@AGENTS.md` import, the one Claude-specific rule and a `## Compact Instructions` section, which is Claude-specific
+too: it names what a compaction summary preserves (modified files with their branch or worktree, test and acceptance
+commands with exit codes, the source behind each open claim, failed attempts, open review findings, unresolved gaps
+and workflow run IDs). Item AN-02 of the [2026-09-27 review](2026-09-28-community-sweep.md#applied-in-this-change).
+
+- **Source.** [How Claude Code works](https://code.claude.com/docs/en/how-claude-code-works): "To control what's
+  preserved during compaction, add a "Compact Instructions" section to CLAUDE.md or run `/compact` with a focus".
+  [Memory](https://code.claude.com/docs/en/memory#instructions-seem-lost-after-compact): project-root CLAUDE.md is
+  re-read from disk after `/compact`. The installed 2.1.283 summarizer prompt contains the `## Compact Instructions`
+  heading (static read of the binary). Both pages fetched 2026-09-28.
+- **Scope of the claim.** This section is the only web-documented way to steer automatic compaction: a `/compact`
+  focus applies to a manual compaction, and the web [hooks page](https://code.claude.com/docs/en/hooks#precompact)
+  documents PreCompact blocking but not its stdout. The 2.1.283 in-product `/hooks` text does document one: for
+  PreCompact, "Exit code 0 - stdout appended as custom compact instructions".
+- **PreCompact audit (precondition, 2026-09-28).** Both installed PreCompact hooks print a JSON object on stdout.
+  ai-memory 2.4.1 `hook --event pre-compact`, run with a scratch data directory and an unreachable server URL, exited 0
+  with 3 bytes of stdout (`{}` and a newline) and no stderr. context-mode 1.0.169 `hooks/precompact.mjs` (line 99,
+  `console.log(JSON.stringify({}))`), run with a scratch `CLAUDE_CONFIG_DIR`, exited 0 with the same 3 bytes and no
+  stderr. Transcripts hold no PreCompact hook records, so whether an empty JSON object reaches the summarizer as
+  custom instructions is not established. The section is added either way.
+- **Timing.** A session already running keeps the `CLAUDE.md` it loaded at start: its next summarization request
+  reuses the conversation's system prompt, tools and history, and the new file loads on the next `/clear`, `/compact`
+  or restart, when the project context layer misses the cache once
+  ([prompt caching](https://code.claude.com/docs/en/prompt-caching)). Land the
+  change before or after a #381 E2E execution, never during one, because `CLAUDE.md` is in every non-blind child's
+  context.
+- **Check and overturn.** In a session started after the edit, `/memory` or `/context` lists the section, and after
+  one `/compact` the summary keeps the listed items. Remove the section if a recorded compaction pair shows it adds
+  nothing.
