@@ -1,0 +1,1615 @@
+{
+ "languages": {
+  "python": {
+   "code-scanning": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/python-queries": "1.8.11+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/python-all": "7.2.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 16,
+    "rules_in_sarif": 43,
+    "rules_with_results": 2,
+    "by_level": {
+     "error": 16
+    },
+    "by_security_band": {
+     "high": 16
+    },
+    "by_kind": {
+     "security": 16
+    },
+    "by_lane": {
+     "unlisted": 8,
+     "foundation": 7,
+     "trading": 1
+    },
+    "by_lane_and_top_dir": {
+     "foundation|blueprints": 2,
+     "foundation|tests": 5,
+     "trading|tests": 1,
+     "unlisted|evidence": 8
+    },
+    "by_lane_and_level": {
+     "foundation|error": 7,
+     "trading|error": 1,
+     "unlisted|error": 8
+    },
+    "by_top_dir": {
+     "evidence": 8,
+     "tests": 6,
+     "blueprints": 2
+    },
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 16,
+    "per_rule": {
+     "py/clear-text-logging-sensitive-data": {
+      "count": 9,
+      "level": "error",
+      "security_severity": 7.5,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "unlisted": 8,
+       "foundation": 1
+      }
+     },
+     "py/clear-text-storage-sensitive-data": {
+      "count": 7,
+      "level": "error",
+      "security_severity": 7.5,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "foundation": 6,
+       "trading": 1
+      }
+     }
+    }
+   },
+   "code-quality": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/python-queries": "1.8.11+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/python-all": "7.2.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 979,
+    "rules_in_sarif": 101,
+    "rules_with_results": 27,
+    "by_level": {
+     "error": 60,
+     "note": 501,
+     "warning": 418
+    },
+    "by_security_band": {},
+    "by_kind": {
+     "quality/reliability": 482,
+     "quality/maintainability": 497
+    },
+    "by_lane": {
+     "foundation": 366,
+     "unlisted": 206,
+     "trading": 407
+    },
+    "by_lane_and_top_dir": {
+     "foundation|adoption": 13,
+     "foundation|blueprints": 250,
+     "foundation|observability": 1,
+     "foundation|tests": 82,
+     "foundation|tools": 20,
+     "trading|blueprints": 262,
+     "trading|tests": 145,
+     "unlisted|evidence": 170,
+     "unlisted|scripts": 36
+    },
+    "by_lane_and_level": {
+     "foundation|error": 7,
+     "foundation|note": 197,
+     "foundation|warning": 162,
+     "trading|error": 52,
+     "trading|note": 247,
+     "trading|warning": 108,
+     "unlisted|error": 1,
+     "unlisted|note": 57,
+     "unlisted|warning": 148
+    },
+    "by_top_dir": {
+     "blueprints": 512,
+     "tests": 227,
+     "evidence": 170,
+     "scripts": 36,
+     "tools": 20,
+     "adoption": 13,
+     "observability": 1
+    },
+    "suppressed": 0,
+    "error_level_non_security": 60,
+    "security_high_or_higher": 0,
+    "per_rule": {
+     "py/file-not-closed": {
+      "count": 248,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 115,
+       "trading": 51,
+       "foundation": 82
+      }
+     },
+     "py/implicit-string-concatenation-in-list": {
+      "count": 145,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 23,
+       "trading": 46,
+       "foundation": 76
+      }
+     },
+     "py/empty-except": {
+      "count": 137,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 30,
+       "foundation": 89,
+       "trading": 18
+      }
+     },
+     "py/unused-import": {
+      "count": 102,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 17,
+       "foundation": 33,
+       "trading": 52
+      }
+     },
+     "py/import-and-import-from": {
+      "count": 93,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 56,
+       "foundation": 37
+      }
+     },
+     "py/call/wrong-arguments": {
+      "count": 53,
+      "level": "error",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1,
+       "trading": 52
+      }
+     },
+     "py/repeated-import": {
+      "count": 49,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 48,
+       "foundation": 1
+      }
+     },
+     "py/unused-local-variable": {
+      "count": 31,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 6,
+       "trading": 20,
+       "foundation": 5
+      }
+     },
+     "py/ineffectual-statement": {
+      "count": 23,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 23
+      }
+     },
+     "py/mixed-returns": {
+      "count": 21,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 9,
+       "unlisted": 1,
+       "foundation": 11
+      }
+     },
+     "py/imprecise-assert": {
+      "count": 17,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 3,
+       "foundation": 14
+      }
+     },
+     "py/catch-base-exception": {
+      "count": 11,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 8,
+       "unlisted": 1,
+       "foundation": 2
+      }
+     },
+     "py/procedure-return-value-used": {
+      "count": 11,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1,
+       "foundation": 1,
+       "unlisted": 9
+      }
+     },
+     "py/unused-global-variable": {
+      "count": 11,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 2,
+       "foundation": 3,
+       "trading": 6
+      }
+     },
+     "py/multiple-definition": {
+      "count": 6,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 5,
+       "foundation": 1
+      }
+     },
+     "py/not-named-self": {
+      "count": 4,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "foundation": 2,
+       "trading": 2
+      }
+     },
+     "py/side-effect-in-assert": {
+      "count": 4,
+      "level": "error",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 3,
+       "unlisted": 1
+      }
+     },
+     "py/missing-equals": {
+      "count": 3,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 1,
+       "trading": 2
+      }
+     },
+     "py/constant-conditional-expression": {
+      "count": 2,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "foundation": 2
+      }
+     },
+     "py/call/wrong-named-argument": {
+      "count": 1,
+      "level": "error",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1
+      }
+     },
+     "py/import-own-module": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/inheritance/signature-mismatch": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/redundant-comparison": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/regex/unmatchable-dollar": {
+      "count": 1,
+      "level": "error",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1
+      }
+     },
+     "py/unexpected-raise-in-special-method": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/unreachable-statement": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/unused-loop-variable": {
+      "count": 1,
+      "level": "error",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1
+      }
+     }
+    }
+   },
+   "security-and-quality": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/python-queries": "1.8.11+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/python-all": "7.2.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 1072,
+    "rules_in_sarif": 172,
+    "rules_with_results": 34,
+    "by_level": {
+     "error": 107,
+     "warning": 453,
+     "note": 512
+    },
+    "by_security_band": {
+     "high": 49,
+     "critical": 1
+    },
+    "by_kind": {
+     "security": 50,
+     "quality/reliability": 523,
+     "quality/maintainability": 499
+    },
+    "by_lane": {
+     "unlisted": 221,
+     "foundation": 406,
+     "trading": 445
+    },
+    "by_lane_and_top_dir": {
+     "foundation|adoption": 13,
+     "foundation|blueprints": 259,
+     "foundation|observability": 2,
+     "foundation|tests": 109,
+     "foundation|tools": 23,
+     "trading|blueprints": 279,
+     "trading|tests": 166,
+     "unlisted|evidence": 183,
+     "unlisted|scripts": 38
+    },
+    "by_lane_and_level": {
+     "foundation|error": 36,
+     "foundation|note": 200,
+     "foundation|warning": 170,
+     "trading|error": 61,
+     "trading|note": 255,
+     "trading|warning": 129,
+     "unlisted|error": 10,
+     "unlisted|note": 57,
+     "unlisted|warning": 154
+    },
+    "by_top_dir": {
+     "blueprints": 538,
+     "tests": 275,
+     "evidence": 183,
+     "scripts": 38,
+     "tools": 23,
+     "adoption": 13,
+     "observability": 2
+    },
+    "suppressed": 0,
+    "error_level_non_security": 90,
+    "security_high_or_higher": 50,
+    "per_rule": {
+     "py/file-not-closed": {
+      "count": 248,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 115,
+       "trading": 51,
+       "foundation": 82
+      }
+     },
+     "py/implicit-string-concatenation-in-list": {
+      "count": 145,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 23,
+       "trading": 46,
+       "foundation": 76
+      }
+     },
+     "py/empty-except": {
+      "count": 137,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 30,
+       "foundation": 89,
+       "trading": 18
+      }
+     },
+     "py/unused-import": {
+      "count": 102,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 17,
+       "foundation": 33,
+       "trading": 52
+      }
+     },
+     "py/import-and-import-from": {
+      "count": 93,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 56,
+       "foundation": 37
+      }
+     },
+     "py/call/wrong-arguments": {
+      "count": 53,
+      "level": "error",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1,
+       "trading": 52
+      }
+     },
+     "py/repeated-import": {
+      "count": 49,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 48,
+       "foundation": 1
+      }
+     },
+     "py/overly-permissive-file": {
+      "count": 33,
+      "level": "warning",
+      "security_severity": 7.8,
+      "precision": "medium",
+      "kind": "security",
+      "lanes": {
+       "unlisted": 6,
+       "foundation": 8,
+       "trading": 19
+      }
+     },
+     "py/unused-local-variable": {
+      "count": 31,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 6,
+       "trading": 20,
+       "foundation": 5
+      }
+     },
+     "py/uninitialized-local-variable": {
+      "count": 30,
+      "level": "error",
+      "security_severity": null,
+      "precision": "medium",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 21,
+       "unlisted": 1,
+       "trading": 8
+      }
+     },
+     "py/ineffectual-statement": {
+      "count": 23,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 23
+      }
+     },
+     "py/mixed-returns": {
+      "count": 21,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 9,
+       "unlisted": 1,
+       "foundation": 11
+      }
+     },
+     "py/imprecise-assert": {
+      "count": 17,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 3,
+       "foundation": 14
+      }
+     },
+     "py/catch-base-exception": {
+      "count": 11,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 8,
+       "unlisted": 1,
+       "foundation": 2
+      }
+     },
+     "py/cyclic-import": {
+      "count": 11,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 8,
+       "foundation": 3
+      }
+     },
+     "py/procedure-return-value-used": {
+      "count": 11,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1,
+       "foundation": 1,
+       "unlisted": 9
+      }
+     },
+     "py/unused-global-variable": {
+      "count": 11,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 2,
+       "foundation": 3,
+       "trading": 6
+      }
+     },
+     "py/clear-text-logging-sensitive-data": {
+      "count": 9,
+      "level": "error",
+      "security_severity": 7.5,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "unlisted": 8,
+       "foundation": 1
+      }
+     },
+     "py/clear-text-storage-sensitive-data": {
+      "count": 7,
+      "level": "error",
+      "security_severity": 7.5,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "foundation": 6,
+       "trading": 1
+      }
+     },
+     "py/multiple-definition": {
+      "count": 6,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 5,
+       "foundation": 1
+      }
+     },
+     "py/not-named-self": {
+      "count": 4,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "foundation": 2,
+       "trading": 2
+      }
+     },
+     "py/side-effect-in-assert": {
+      "count": 4,
+      "level": "error",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 3,
+       "unlisted": 1
+      }
+     },
+     "py/missing-equals": {
+      "count": 3,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 1,
+       "trading": 2
+      }
+     },
+     "py/constant-conditional-expression": {
+      "count": 2,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "foundation": 2
+      }
+     },
+     "py/unnecessary-delete": {
+      "count": 2,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 2
+      }
+     },
+     "py/call/wrong-named-argument": {
+      "count": 1,
+      "level": "error",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1
+      }
+     },
+     "py/import-own-module": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/inheritance/signature-mismatch": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/partial-ssrf": {
+      "count": 1,
+      "level": "error",
+      "security_severity": 9.1,
+      "precision": "medium",
+      "kind": "security",
+      "lanes": {
+       "foundation": 1
+      }
+     },
+     "py/redundant-comparison": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/regex/unmatchable-dollar": {
+      "count": 1,
+      "level": "error",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1
+      }
+     },
+     "py/unexpected-raise-in-special-method": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/unreachable-statement": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "py/unused-loop-variable": {
+      "count": 1,
+      "level": "error",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "foundation": 1
+      }
+     }
+    }
+   },
+   "security-extended": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/python-queries": "1.8.11+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/python-all": "7.2.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 50,
+    "rules_in_sarif": 50,
+    "rules_with_results": 4,
+    "by_level": {
+     "error": 17,
+     "warning": 33
+    },
+    "by_security_band": {
+     "high": 49,
+     "critical": 1
+    },
+    "by_kind": {
+     "security": 50
+    },
+    "by_lane": {
+     "unlisted": 14,
+     "foundation": 16,
+     "trading": 20
+    },
+    "by_lane_and_top_dir": {
+     "foundation|blueprints": 4,
+     "foundation|tests": 10,
+     "foundation|tools": 2,
+     "trading|blueprints": 7,
+     "trading|tests": 13,
+     "unlisted|evidence": 13,
+     "unlisted|scripts": 1
+    },
+    "by_lane_and_level": {
+     "foundation|error": 8,
+     "foundation|warning": 8,
+     "trading|error": 1,
+     "trading|warning": 19,
+     "unlisted|error": 8,
+     "unlisted|warning": 6
+    },
+    "by_top_dir": {
+     "tests": 23,
+     "evidence": 13,
+     "blueprints": 11,
+     "tools": 2,
+     "scripts": 1
+    },
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 50,
+    "per_rule": {
+     "py/overly-permissive-file": {
+      "count": 33,
+      "level": "warning",
+      "security_severity": 7.8,
+      "precision": "medium",
+      "kind": "security",
+      "lanes": {
+       "unlisted": 6,
+       "foundation": 8,
+       "trading": 19
+      }
+     },
+     "py/clear-text-logging-sensitive-data": {
+      "count": 9,
+      "level": "error",
+      "security_severity": 7.5,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "unlisted": 8,
+       "foundation": 1
+      }
+     },
+     "py/clear-text-storage-sensitive-data": {
+      "count": 7,
+      "level": "error",
+      "security_severity": 7.5,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "foundation": 6,
+       "trading": 1
+      }
+     },
+     "py/partial-ssrf": {
+      "count": 1,
+      "level": "error",
+      "security_severity": 9.1,
+      "precision": "medium",
+      "kind": "security",
+      "lanes": {
+       "foundation": 1
+      }
+     }
+    }
+   }
+  },
+  "javascript-typescript": {
+   "code-scanning": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/javascript-queries": "2.4.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 1,
+    "rules_in_sarif": 87,
+    "rules_with_results": 1,
+    "by_level": {
+     "warning": 1
+    },
+    "by_security_band": {
+     "high": 1
+    },
+    "by_kind": {
+     "security": 1
+    },
+    "by_lane": {
+     "foundation": 1
+    },
+    "by_lane_and_top_dir": {
+     "foundation|docs": 1
+    },
+    "by_lane_and_level": {
+     "foundation|warning": 1
+    },
+    "by_top_dir": {
+     "docs": 1
+    },
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 1,
+    "per_rule": {
+     "js/xss-through-dom": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": 7.8,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "foundation": 1
+      }
+     }
+    }
+   },
+   "code-quality": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/javascript-queries": "2.4.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 188,
+    "rules_in_sarif": 98,
+    "rules_with_results": 7,
+    "by_level": {
+     "warning": 173,
+     "note": 2,
+     "error": 13
+    },
+    "by_security_band": {},
+    "by_kind": {
+     "quality/reliability": 24,
+     "quality/maintainability": 164
+    },
+    "by_lane": {
+     "unlisted": 188
+    },
+    "by_lane_and_top_dir": {
+     "unlisted|evidence": 188
+    },
+    "by_lane_and_level": {
+     "unlisted|error": 13,
+     "unlisted|note": 2,
+     "unlisted|warning": 173
+    },
+    "by_top_dir": {
+     "evidence": 188
+    },
+    "suppressed": 0,
+    "error_level_non_security": 13,
+    "security_high_or_higher": 0,
+    "per_rule": {
+     "js/duplicate-property": {
+      "count": 149,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 149
+      }
+     },
+     "js/overwritten-property": {
+      "count": 13,
+      "level": "error",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 13
+      }
+     },
+     "js/duplicate-html-attribute": {
+      "count": 12,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 12
+      }
+     },
+     "js/use-of-returnless-function": {
+      "count": 11,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 11
+      }
+     },
+     "js/unneeded-defensive-code": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 1
+      }
+     },
+     "js/unused-local-variable": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 1
+      }
+     },
+     "js/use-before-declaration": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 1
+      }
+     }
+    }
+   },
+   "security-and-quality": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/javascript-queries": "2.4.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 190,
+    "rules_in_sarif": 201,
+    "rules_with_results": 9,
+    "by_level": {
+     "warning": 175,
+     "note": 2,
+     "error": 13
+    },
+    "by_security_band": {
+     "high": 2
+    },
+    "by_kind": {
+     "security": 2,
+     "quality/reliability": 24,
+     "quality/maintainability": 164
+    },
+    "by_lane": {
+     "foundation": 1,
+     "trading": 1,
+     "unlisted": 188
+    },
+    "by_lane_and_top_dir": {
+     "foundation|docs": 1,
+     "trading|blueprints": 1,
+     "unlisted|evidence": 188
+    },
+    "by_lane_and_level": {
+     "foundation|warning": 1,
+     "trading|warning": 1,
+     "unlisted|error": 13,
+     "unlisted|note": 2,
+     "unlisted|warning": 173
+    },
+    "by_top_dir": {
+     "evidence": 188,
+     "docs": 1,
+     "blueprints": 1
+    },
+    "suppressed": 0,
+    "error_level_non_security": 13,
+    "security_high_or_higher": 2,
+    "per_rule": {
+     "js/duplicate-property": {
+      "count": 149,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 149
+      }
+     },
+     "js/overwritten-property": {
+      "count": 13,
+      "level": "error",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 13
+      }
+     },
+     "js/duplicate-html-attribute": {
+      "count": 12,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 12
+      }
+     },
+     "js/use-of-returnless-function": {
+      "count": 11,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "high",
+      "kind": "quality/reliability",
+      "lanes": {
+       "unlisted": 11
+      }
+     },
+     "js/file-system-race": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": 7.7,
+      "precision": "medium",
+      "kind": "security",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "js/unneeded-defensive-code": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 1
+      }
+     },
+     "js/unused-local-variable": {
+      "count": 1,
+      "level": "note",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 1
+      }
+     },
+     "js/use-before-declaration": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": null,
+      "precision": "very-high",
+      "kind": "quality/maintainability",
+      "lanes": {
+       "unlisted": 1
+      }
+     },
+     "js/xss-through-dom": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": 7.8,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "foundation": 1
+      }
+     }
+    }
+   },
+   "security-extended": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/javascript-queries": "2.4.6+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 2,
+    "rules_in_sarif": 103,
+    "rules_with_results": 2,
+    "by_level": {
+     "warning": 2
+    },
+    "by_security_band": {
+     "high": 2
+    },
+    "by_kind": {
+     "security": 2
+    },
+    "by_lane": {
+     "foundation": 1,
+     "trading": 1
+    },
+    "by_lane_and_top_dir": {
+     "foundation|docs": 1,
+     "trading|blueprints": 1
+    },
+    "by_lane_and_level": {
+     "foundation|warning": 1,
+     "trading|warning": 1
+    },
+    "by_top_dir": {
+     "docs": 1,
+     "blueprints": 1
+    },
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 2,
+    "per_rule": {
+     "js/file-system-race": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": 7.7,
+      "precision": "medium",
+      "kind": "security",
+      "lanes": {
+       "trading": 1
+      }
+     },
+     "js/xss-through-dom": {
+      "count": 1,
+      "level": "warning",
+      "security_severity": 7.8,
+      "precision": "high",
+      "kind": "security",
+      "lanes": {
+       "foundation": 1
+      }
+     }
+    }
+   }
+  },
+  "actions": {
+   "code-scanning": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/actions-queries": "0.6.36+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/actions-all": "0.6.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 0,
+    "rules_in_sarif": 17,
+    "rules_with_results": 0,
+    "by_level": {},
+    "by_security_band": {},
+    "by_kind": {},
+    "by_lane": {},
+    "by_lane_and_top_dir": {},
+    "by_lane_and_level": {},
+    "by_top_dir": {},
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 0,
+    "per_rule": {}
+   },
+   "code-quality": {
+    "versions": {
+     "CodeQL": "2.27.1"
+    },
+    "results": 0,
+    "rules_in_sarif": 0,
+    "rules_with_results": 0,
+    "by_level": {},
+    "by_security_band": {},
+    "by_kind": {},
+    "by_lane": {},
+    "by_lane_and_top_dir": {},
+    "by_lane_and_level": {},
+    "by_top_dir": {},
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 0,
+    "per_rule": {}
+   },
+   "security-and-quality": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/actions-queries": "0.6.36+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/actions-all": "0.6.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 0,
+    "rules_in_sarif": 27,
+    "rules_with_results": 0,
+    "by_level": {},
+    "by_security_band": {},
+    "by_kind": {},
+    "by_lane": {},
+    "by_lane_and_top_dir": {},
+    "by_lane_and_level": {},
+    "by_top_dir": {},
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 0,
+    "per_rule": {}
+   },
+   "security-extended": {
+    "versions": {
+     "CodeQL": "2.27.1",
+     "codeql/actions-queries": "0.6.36+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/actions-all": "0.6.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+     "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+    },
+    "results": 0,
+    "rules_in_sarif": 23,
+    "rules_with_results": 0,
+    "by_level": {},
+    "by_security_band": {},
+    "by_kind": {},
+    "by_lane": {},
+    "by_lane_and_top_dir": {},
+    "by_lane_and_level": {},
+    "by_top_dir": {},
+    "suppressed": 0,
+    "error_level_non_security": 0,
+    "security_high_or_higher": 0,
+    "per_rule": {}
+   }
+  }
+ },
+ "parity": {
+  "python": {
+   "live_versions": {
+    "CodeQL": "2.27.1",
+    "codeql/python-queries": "1.8.11+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/python-all": "7.2.6+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+   },
+   "live_results": 16,
+   "local_results": 16,
+   "live_rules_in_sarif": 43,
+   "local_rules_in_sarif": 43,
+   "same_rule_ids": true,
+   "only_live": [],
+   "only_local_count": 0,
+   "identical_rule_path_line_column_multiset": true
+  },
+  "javascript-typescript": {
+   "live_versions": {
+    "CodeQL": "2.27.1",
+    "codeql/javascript-queries": "2.4.6+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+   },
+   "live_results": 1,
+   "local_results": 1,
+   "live_rules_in_sarif": 87,
+   "local_rules_in_sarif": 87,
+   "same_rule_ids": true,
+   "only_live": [],
+   "only_local_count": 0,
+   "identical_rule_path_line_column_multiset": true
+  },
+  "actions": {
+   "live_versions": {
+    "CodeQL": "2.27.1",
+    "codeql/actions-queries": "0.6.36+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/actions-all": "0.6.2+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/javascript-all": "2.10.2+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+   },
+   "live_results": 0,
+   "local_results": 0,
+   "live_rules_in_sarif": 17,
+   "local_rules_in_sarif": 17,
+   "same_rule_ids": true,
+   "only_live": [],
+   "only_local_count": 0,
+   "identical_rule_path_line_column_multiset": true
+  }
+ },
+ "parity_negative_control": {
+  "python": {
+   "live_versions": {
+    "CodeQL": "2.27.1",
+    "codeql/python-queries": "1.8.11+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/python-all": "7.2.6+6e9f9e38390175c41b99070a423c875f450759ca",
+    "codeql/threat-models": "1.0.58+6e9f9e38390175c41b99070a423c875f450759ca"
+   },
+   "live_results": 16,
+   "local_results": 979,
+   "live_rules_in_sarif": 43,
+   "local_rules_in_sarif": 101,
+   "same_rule_ids": false,
+   "only_local_count": 979,
+   "identical_rule_path_line_column_multiset": false
+  }
+ },
+ "overlap": {
+  "python:extended": {
+   "extended_results_not_in_default": 34,
+   "default_results_not_in_extended": 0,
+   "extended_results_not_in_security_and_quality": 0,
+   "added_by_extended_per_rule": {
+    "py/partial-ssrf": 1,
+    "py/overly-permissive-file": 33
+   },
+   "added_by_extended_bands": {
+    "critical": 1,
+    "high": 33
+   },
+   "added_by_extended_lanes": {
+    "foundation": 9,
+    "unlisted": 6,
+    "trading": 19
+   }
+  },
+  "python": {
+   "results_multiset": {
+    "default": 16,
+    "code_quality": 979,
+    "security_and_quality": 1072
+   },
+   "distinct_rule_path_line_column": {
+    "default": 16,
+    "code_quality": 979,
+    "security_and_quality": 1072
+   },
+   "distinct_rule_path_line": {
+    "code_quality": 969,
+    "security_and_quality": 1061
+   },
+   "code_quality_results_also_in_default": 0,
+   "code_quality_results_not_in_security_and_quality": 0,
+   "default_results_not_in_security_and_quality": 0,
+   "security_and_quality_results_in_neither_default_nor_code_quality": 77,
+   "code_quality_rules_absent_from_security_and_quality_suite": [],
+   "rules_in_suite": {
+    "code-scanning": 43,
+    "code-quality": 101,
+    "security-and-quality": 172,
+    "security-extended": 50
+   }
+  },
+  "javascript-typescript:extended": {
+   "extended_results_not_in_default": 1,
+   "default_results_not_in_extended": 0,
+   "extended_results_not_in_security_and_quality": 0,
+   "added_by_extended_per_rule": {
+    "js/file-system-race": 1
+   },
+   "added_by_extended_bands": {
+    "high": 1
+   },
+   "added_by_extended_lanes": {
+    "trading": 1
+   }
+  },
+  "javascript-typescript": {
+   "results_multiset": {
+    "default": 1,
+    "code_quality": 188,
+    "security_and_quality": 190
+   },
+   "distinct_rule_path_line_column": {
+    "default": 1,
+    "code_quality": 188,
+    "security_and_quality": 190
+   },
+   "distinct_rule_path_line": {
+    "code_quality": 30,
+    "security_and_quality": 32
+   },
+   "code_quality_results_also_in_default": 0,
+   "code_quality_results_not_in_security_and_quality": 0,
+   "default_results_not_in_security_and_quality": 0,
+   "security_and_quality_results_in_neither_default_nor_code_quality": 1,
+   "code_quality_rules_absent_from_security_and_quality_suite": [
+    "js/unhandled-error-in-stream-pipeline"
+   ],
+   "rules_in_suite": {
+    "code-scanning": 87,
+    "code-quality": 98,
+    "security-and-quality": 201,
+    "security-extended": 103
+   }
+  },
+  "actions:extended": {
+   "extended_results_not_in_default": 0,
+   "default_results_not_in_extended": 0,
+   "extended_results_not_in_security_and_quality": 0,
+   "added_by_extended_per_rule": {},
+   "added_by_extended_bands": {},
+   "added_by_extended_lanes": {}
+  },
+  "actions": {
+   "results_multiset": {
+    "default": 0,
+    "code_quality": 0,
+    "security_and_quality": 0
+   },
+   "distinct_rule_path_line_column": {
+    "default": 0,
+    "code_quality": 0,
+    "security_and_quality": 0
+   },
+   "distinct_rule_path_line": {
+    "code_quality": 0,
+    "security_and_quality": 0
+   },
+   "code_quality_results_also_in_default": 0,
+   "code_quality_results_not_in_security_and_quality": 0,
+   "default_results_not_in_security_and_quality": 0,
+   "security_and_quality_results_in_neither_default_nor_code_quality": 0,
+   "code_quality_rules_absent_from_security_and_quality_suite": [],
+   "rules_in_suite": {
+    "code-scanning": 17,
+    "code-quality": 0,
+    "security-and-quality": 27,
+    "security-extended": 23
+   }
+  }
+ }
+}
