@@ -524,7 +524,9 @@ D start $S-proxy
 - **Server.** The agent-server joins `$S-int` only and publishes nothing. Its
   hardening is unchanged: UID/GID 10001, all capabilities dropped,
   no-new-privileges, a read-only root, a tmpfs home, and CPU, memory and PID
-  limits. Its only peer is the proxy, which it reaches as `gw`.
+  limits. Its only standing peer is the proxy, which it reaches as `gw`; the
+  P1/P2 probe container joins `$S-int` only while a probe runs (`prepare` or
+  `host.py probe`).
 - **Order.** The proxy is created after the server starts, and connected to
   `$S-int` before it starts, so nginx resolves `$S-server` when it loads.
   A created container joins its configured networks when it runs, and
@@ -632,8 +634,9 @@ arm.
   `x-omniroute-*` control header.
 - **Host side.** Port 8080 forwards every path to `$S-server:8000` and
   refuses no arguments, because the driver's error-event search carries a
-  query string. Only the host reaches it, through `127.0.0.1:<port>`. The agent
-  can reach its own server as `gw:8080`, which gives it nothing it lacks.
+  query string. The host reaches it through `127.0.0.1:<port>`. The agent can
+  also reach it as `gw:8080`, which leads only to the agent's own server and
+  gives it nothing it lacks.
 - **Rendering.** `render_proxy_config` fills `@PORT@`, `@SERVER@`, `@RUN@` and
   `@COMPRESSION@` from `recipe.arm_config` and the attempt identity. It refuses:
   - a selection that differs from `arm_config`'s own output;

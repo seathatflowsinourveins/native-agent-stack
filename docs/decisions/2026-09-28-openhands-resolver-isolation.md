@@ -14,8 +14,8 @@ research synthesis of 2026-09-28, which is not committed. Each finding used here
 its own source, and a source the build did not re-read is labelled as reviewed in that synthesis.
 
 **Chosen: O1.** Each attempt `S=<run-id>-<arm>` gets its own resources:
-- **`$S-int`,** created with `--internal`, IPv6 off and gateway mode `isolated`. Only the
-  agent-server and the P1/P2 probe container join it.
+- **`$S-int`,** created with `--internal`, IPv6 off and gateway mode `isolated`. Besides the
+  proxy, which joins it as `gw`, only the agent-server and the P1/P2 probe container join it.
 - **`$S-gw`,** a normal bridge network used only by the proxy's upstream side and the P0 probe
   container.
 - **A pinned nginx-unprivileged proxy** on both networks. As `gw:8081` it forwards three exact
