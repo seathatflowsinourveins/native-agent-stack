@@ -70,6 +70,30 @@ At the base commit this gives the directories `.claude`, `scripts/git-hooks`,
 `scripts/hooks` and `tools/sota-convergence`, plus 23 files. A test fails when a hook
 names a tracked file that the derivation misses.
 
+The validator also refuses a file that would change what one of those import names
+loads (`import_shadow`), and any bytecode (`python_bytecode`). CPython v3.12.3's
+`FileFinder.find_spec` (`Lib/importlib/_bootstrap_external.py:1593-1641`) takes a
+package `X/__init__.*` before `X.py`, and extension suffixes come before `.py`
+(`:1724-1732`). A valid `__pycache__/X.*.pyc` runs in place of the source
+(`:1062-1137`). So for each protected module `X.py`, the refused files are:
+
+- anything under `X/`;
+- `X` with an import suffix (`.so`, `.cpython-*.so`, `.abi3.so`, `.pyd`, `.pyc`);
+- `__pycache__/X.*.pyc`;
+- the same names for a module that a hook imports but that does not exist yet;
+- an `__init__` or same-named module for a package on the import path.
+
+Three other loaders were checked, and none has a loading path from the host's commands
+(`ImportLoadingPathTests` runs the pre-push runner):
+
+- **`conftest.py`:** only pytest loads it, and the hooks and CI run unittest.
+- **`sitecustomize` and `usercustomize`:** `site` imports them at startup
+  (`Lib/site.py:552-619`, `Python/pylifecycle.c:1190-1191`). That happens before
+  `Modules/main.c:550-607` adds the working directory to `sys.path`, so a copy in the
+  checkout loads only when `PYTHONPATH` names the checkout.
+- **`*.pth` files:** these are read only inside site directories
+  (`Lib/site.py:161-234`).
+
 Known limits:
 
 - Over-inclusion: every settings string is scanned, and files named only in echo
@@ -78,6 +102,9 @@ Known limits:
   paths in hook text.
 - Not traced: scripts started by `subprocess` with computed paths, and quoted words
   that contain spaces. The evaluator for `sys.path` targets is heuristic.
+- Import names are over-included. A protected file's imports resolve from its own
+  directory as well as the root, so names such as `tests/json.py` are refused. An
+  owner `PYTHONPATH` that names a checkout directory is outside the model.
 
 ## gh harness
 

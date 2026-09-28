@@ -165,6 +165,13 @@ def export_patch(repo, base):
                    "--cached", base, env=env).stdout.decode("utf-8")
 
 
+def added_files_patch(*paths):
+    """A `git diff` adding each path with one line, written by hand, so no ignore rule of the
+    host (such as a global `__pycache__/` entry) can keep a file out of the export."""
+    return "".join(f"diff --git a/{path} b/{path}\nnew file mode 100644\nindex 0000000..1111111\n"
+                   f"--- /dev/null\n+++ b/{path}\n@@ -0,0 +1 @@\n+x\n" for path in paths)
+
+
 BASE_FILES = {
     ".claude/settings.json": json.dumps({
         "permissions": {"deny": ["Read(docs/secret.md)"]},
@@ -361,6 +368,45 @@ class HostExecutedDerivationTests(unittest.TestCase):
         tree = self.p.MemoryTree({".claude/settings.json": "{not json"})
         with self.assertRaises(self.p.DerivationError):
             self.p.derive_host_executed(tree)
+
+    def test_import_names_the_hooks_load_cannot_be_shadowed(self):
+        # Review item D1: a package directory, an extension module or a bytecode file at a
+        # protected module's name is loaded instead of the module (ImportLoadingPathTests).
+        shadow = self.derived.shadows_import
+        for module in ("tests/test_osv_lockfile_coverage", "tests/test_blind_checkout",
+                       "tests/test_workflow_security_coverage"):
+            for path in (f"{module}/__init__.py", f"{module}/sub/x.py", f"{module}.cpython-312-x86_64-linux-gnu.so",
+                         f"{module}.abi3.so", f"{module}.so", f"{module}.pyd", f"{module}.cp312-win_amd64.pyd",
+                         f"{module}.pyc", f"{module.upper()}/__init__.py",
+                         f"tests/__pycache__/{module.rpartition('/')[2]}.cpython-312.pyc"):
+                with self.subTest(path=path):
+                    self.assertTrue(shadow(path))
+        for path in ("tests/__init__.so", "tests/__init__.cpython-313-darwin.so", "tests/__init__.pyc",
+                     "tests/__pycache__/__init__.cpython-312.opt-1.pyc"):
+            with self.subTest(path=path):
+                self.assertTrue(shadow(path))
+        for path in ("tests/test_blind_checkout_extra.py", "tests/test_new_module.py", "tests/test_blind_checkout.md",
+                     "tests/data/x.json", "docs/test_blind_checkout.py"):
+            with self.subTest(allowed=path):
+                self.assertFalse(shadow(path))
+        verdict = self.p.validate_patch(added_files_patch("tests/test_blind_checkout/__init__.py"), tree=self.real,
+                                        owned=["tests"])
+        self.assertEqual(verdict["status"], "refused")
+        self.assertIn({"reason": "import_shadow", "path": "tests/test_blind_checkout/__init__.py"}, verdict["reasons"])
+
+    def test_absent_and_namespace_import_names_are_protected(self):
+        # A hook that runs a module that does not exist yet would run a file the patch adds;
+        # an __init__.py or a same-named module changes what a namespace directory imports.
+        files = {"scripts/git-hooks/pre-push": "#!/bin/sh\nexec python3 -m pkg.missing && python3 -m nsdir.mod\n",
+                 "pkg/__init__.py": "", "nsdir/data.txt": "data\n", "tools/free.py": ""}
+        derived = self.p.derive_host_executed(self.p.MemoryTree(files))
+        for path in ("pkg/missing.py", "pkg/missing/__init__.py", "pkg/missing.abi3.so", "pkg/__init__.so",
+                     "pkg/__pycache__/missing.cpython-312.pyc", "nsdir/__init__.py", "nsdir/mod.py", "nsdir.py"):
+            with self.subTest(path=path):
+                self.assertTrue(derived.shadows_import(path))
+        for path in ("pkg/other.py", "nsdir/data2.txt", "nsdir/other/x.py", "tools/new.py"):
+            with self.subTest(allowed=path):
+                self.assertFalse(derived.shadows_import(path))
 
 
 class PatchParserTests(unittest.TestCase):
@@ -576,6 +622,66 @@ class PatchValidatorTests(unittest.TestCase):
         garbage = self.p.validate_patch("diff --git a/docs/a.md b/docs/a.md\nweird\n", tree=tree, owned=["docs"])
         self.assertEqual(garbage["status"], "refused")
         self.assertEqual(garbage["reasons"][0]["reason"], "unparseable_patch")
+
+    def test_files_that_would_shadow_a_protected_import_are_refused(self):
+        # The fixture's pre-push hook runs tests.test_gate (review item D1).
+        tree = self.p.GitTree(self.fixture.base_repo, self.fixture.base)
+        shadows = ("tests/test_gate/__init__.py", "tests/test_gate.abi3.so", "tests/__init__.pyc",
+                   "tests/__pycache__/test_gate.cpython-312.pyc")
+        verdict = self.p.validate_patch(added_files_patch(*shadows, "tests/test_gate_extra.py", "src/cache.pyc"),
+                                        tree=tree, owned=["tests", "src"])
+        reasons = self.reasons(verdict)
+        for path in shadows:
+            with self.subTest(path=path):
+                self.assertIn(("import_shadow", path), reasons)
+        for path in ("tests/__init__.pyc", "tests/__pycache__/test_gate.cpython-312.pyc", "src/cache.pyc"):
+            with self.subTest(bytecode=path):
+                self.assertIn(("python_bytecode", path), reasons)
+        self.assertEqual({reason for reason in reasons if reason[1] == "tests/test_gate_extra.py"}, set())
+        extra = self.p.validate_patch(added_files_patch("tests/test_gate_extra.py"), tree=tree, owned=["tests"])
+        self.assertEqual(extra["status"], "accepted", extra["reasons"])
+
+
+class ImportLoadingPathTests(unittest.TestCase):
+    """D1 evidence: what the pre-push runner's interpreter loads from a checkout.
+
+    A local-interpreter check of the CPython behaviour patch_policy.py cites, not
+    upstream acceptance: the runner is read from scripts/git-hooks/pre-push itself.
+    """
+
+    def test_the_runner_prefers_a_package_and_loads_no_site_or_pytest_file_from_the_tree(self):
+        hook = (ROOT / "scripts/git-hooks/pre-push").read_text(encoding="utf-8")
+        runner = re.search(r"^runner='(.*?)'$", hook, re.S | re.M).group(1)
+        tree = Path(tempfile.mkdtemp(prefix="resolver-import-"))
+        self.addCleanup(shutil.rmtree, tree, True)
+        marks = tree / "marks"
+        marks.mkdir()
+
+        def mark(name):
+            return f"open({str(marks / name)!r}, 'w').close()\n"
+
+        gate = "import unittest\nclass GateTests(unittest.TestCase):\n    def test_gate(self):\n        pass\n"
+        write_file(tree, "tests/__init__.py", "")
+        write_file(tree, "tests/test_gate.py", gate)
+        write_file(tree, "tests/test_gate/__init__.py", mark("package") + gate)
+        for name in ("sitecustomize", "usercustomize", "conftest"):
+            write_file(tree, f"{name}.py", mark(name))
+            write_file(tree, f"tests/{name}.py", mark("tests-" + name))
+        write_file(tree, "zz.pth", "import os; " + mark("pth"))
+        env = {"PATH": "/usr/bin:/bin", "HOME": str(marks), "PYTHONDONTWRITEBYTECODE": "1"}
+        run = subprocess.run([sys.executable, "-c", runner, "tests.test_gate.GateTests.test_gate"], cwd=tree,
+                             env=env, capture_output=True, text=True, timeout=120)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(sorted(path.name for path in marks.iterdir()), ["package"])
+        # Positive control: with PYTHONPATH naming the tree, site imports sitecustomize at startup,
+        # and a .pth file outside a site directory is still not processed.
+        (marks / "package").unlink()
+        control = subprocess.run([sys.executable, "-c", "pass"], cwd=tree, env={**env, "PYTHONPATH": str(tree)},
+                                 capture_output=True, text=True, timeout=120)
+        self.assertEqual(control.returncode, 0, control.stderr)
+        seen = {path.name for path in marks.iterdir()}
+        self.assertIn("sitecustomize", seen)
+        self.assertFalse(seen & {"pth", "conftest", "tests-sitecustomize", "package"})
 
 
 # -- Unit 3 helpers: fake gh and git executables. They record argv, the names (never the

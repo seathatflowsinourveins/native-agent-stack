@@ -29,6 +29,9 @@ The host side is `blueprints/runtime-workers/openhands/resolver.py`; see
    - `scripts/git-hooks/`, `scripts/hooks/`, `tools/sota-convergence/`, and every
      file the hooks in `.claude/settings.json` or `scripts/git-hooks/` run or
      import;
+   - a file that would be imported in place of one of those modules: a same-named
+     package directory (such as `tests/test_blind_checkout/`), an extension module
+     or a bytecode file. Do not add any `__pycache__` directory or `.pyc` file;
    - `AGENTS.md`, `AGENTS.override.md`, `CLAUDE.md` and `CLAUDE.local.md` at any
      depth;
    - new top-level files or directories;

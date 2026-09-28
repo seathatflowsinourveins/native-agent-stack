@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 from dataclasses import dataclass, field
 import hashlib
+import importlib.machinery
 import json
 import os
 import posixpath
@@ -151,24 +152,82 @@ class DerivationError(RuntimeError):
     """The host-executed set cannot be derived; the validator then refuses."""
 
 
+# What an import name loads, from CPython v3.12.3 Lib/importlib/_bootstrap_external.py:
+# _get_supported_file_loaders (:1724-1732) tries extension modules, then source, then
+# bytecode; FileFinder.find_spec (:1593-1641) takes a package <name>/__init__<suffix>
+# before any <name><suffix> file, and a directory without __init__ only as a namespace
+# portion when no module file matches; SourceLoader.get_code (:1062-1137) runs a valid
+# __pycache__/<name>.<tag>.pyc instead of the source, and an unchecked hash-based one is
+# never compared with it (:1098-1103). A module name has no ".", so everything after a
+# file name's first "." is its suffix. This host's all_suffixes() plus the other
+# platforms' forms (".pyw", ".pyd" and tagged ".<tag>.so" or ".<tag>.pyd") cover any
+# interpreter version the owner runs.
+IMPORT_SUFFIXES = frozenset(importlib.machinery.all_suffixes()) | {".py", ".pyw", ".pyc", ".so", ".pyd"}
+TAGGED_EXTENSION = re.compile(r"\.[^./]+\.(?:so|pyd)")
+BYTECODE_DIR = "__pycache__"
+# Not protected, because the owner's host-executed commands have no loading path for
+# them (ImportLoadingPathTests checks the local interpreter):
+# - conftest.py: only pytest loads it; the pre-push runner (scripts/git-hooks/pre-push)
+#   and CI (validate.yml `python3 -m unittest`) use unittest, whose loader and main
+#   (Lib/unittest/loader.py, main.py at v3.12.3) have no such hook;
+# - sitecustomize and usercustomize: site.main imports them (Lib/site.py:552-556,
+#   :592-619) while the interpreter initialises (Python/pylifecycle.c:1190-1191), before
+#   Modules/main.c:550-607 puts the working or script directory on sys.path, so a
+#   checkout file is found only through a PYTHONPATH entry that names the checkout;
+#   a root-level one is a new top-level entry anyway;
+# - *.pth: processed only inside site directories (Lib/site.py:161-162, :216-234).
+
+
 @dataclass(frozen=True)
 class HostExecuted:
+    """The derived set. `modules` and `packages` are the import names the host-executed
+    code resolves: module stems (<stem>.py exists, or nothing does yet) and the package
+    or namespace directories on the way (derive_host_executed)."""
+
     files: frozenset
     dirs: frozenset
     reasons: tuple = ()
+    modules: frozenset = frozenset()
+    packages: frozenset = frozenset()
     _folded: tuple = field(default=(), compare=False, repr=False)
 
     def __post_init__(self):
+        stems = set(self.modules) | {path[:-len(".py")] for path in self.files if path.endswith(".py")}
         object.__setattr__(self, "_folded", (frozenset(fold(p) for p in self.files),
-                                             frozenset(fold(d) for d in self.dirs)))
+                                             frozenset(fold(d) for d in self.dirs),
+                                             frozenset(fold(s) for s in stems),
+                                             frozenset(fold(p) for p in self.packages)))
 
     def covers(self, path):
         return path in self.files or any(path == d or path.startswith(d + "/") for d in self.dirs)
 
     def covers_folded(self, path):
-        files, dirs = self._folded
+        files, dirs = self._folded[:2]
         key = fold(path)
         return key in files or any(key == d or key.startswith(d + "/") for d in dirs)
+
+    def shadows_import(self, path):
+        """True when adding `path` could change what a host-executed import name loads.
+
+        Review item D1, from the FileFinder order above: a directory at a module stem (a
+        package, or a namespace portion's file), <stem> or <package> with an import
+        suffix, <package>/__init__ with one, and __pycache__/<stem>.<tag>.pyc. Names are
+        compared case-folded, like covers_folded.
+        """
+        _, _, stems, packages = self._folded
+        parts = fold(path).split("/")
+        if any("/".join(parts[:end]) in stems for end in range(1, len(parts))):
+            return True
+        directory, name = "/".join(parts[:-1]), parts[-1]
+        head, dot, rest = name.partition(".")
+        if parts[-2:-1] == [BYTECODE_DIR]:
+            directory = "/".join(parts[:-2])
+            if not name.endswith(".pyc"):
+                return False
+        elif not dot or not ("." + rest in IMPORT_SUFFIXES or TAGGED_EXTENSION.fullmatch("." + rest)):
+            return False
+        candidate = f"{directory}/{head}" if directory else head
+        return candidate in stems or candidate in packages or (head == "__init__" and directory in packages)
 
 
 def settings_strings(settings):
@@ -203,31 +262,39 @@ def executable_lines(data):
     return "\n".join(line for line in lines if not line.lstrip().startswith("#"))
 
 
-def resolve_module(parts, roots, blobs, dirs):
+def resolve_module(parts, roots, blobs, dirs, names=None):
     """Repository files `import a.b.c` runs, searched from each root in turn.
 
     Python's import system: a package runs its __init__.py, a directory without one
     is a namespace package portion (docs.python.org/3/reference/import.html,
     "Regular packages" and "Namespace packages"), and a module is <name>.py.
+    `names`, a (modules, packages) pair of sets, collects every name the walk tries:
+    a module stem that exists or where nothing exists yet (a new file there would be
+    loaded), and each package or namespace directory it passes (review item D1).
     """
     found = set()
+    modules, packages = names if names is not None else (set(), set())
     for root in roots:
         prefix = root + "/" if root else ""
         for end in range(1, len(parts) + 1):
             base = prefix + "/".join(parts[:end])
             if base + "/__init__.py" in blobs:
                 found.add(base + "/__init__.py")
+                packages.add(base)
                 continue
             if base + ".py" in blobs:
                 found.add(base + ".py")
+                modules.add(base)
                 break
             if base in dirs:
+                packages.add(base)
                 continue
+            modules.add(base)
             break
     return found
 
 
-def names_in_text(text, blobs, dirs):
+def names_in_text(text, blobs, dirs, names=None):
     """(kind, path) for each tracked path a hook text names.
 
     Local composition: quotes are dropped so `"${VAR}"/x` reads as one word, words
@@ -249,7 +316,7 @@ def names_in_text(text, blobs, dirs):
         elif "/" in raw and token in dirs:
             found.add(("dir", token))
         elif _DOTTED.fullmatch(token):
-            found.update(("module", path) for path in resolve_module(token.split("."), ("",), blobs, dirs))
+            found.update(("module", path) for path in resolve_module(token.split("."), ("",), blobs, dirs, names))
     return found
 
 
@@ -343,7 +410,7 @@ def _file_relative(node, env, here):
     return None
 
 
-def python_references(path, source, blobs, dirs):
+def python_references(path, source, blobs, dirs, import_names=None):
     """Repository files and directories one Python file imports or runs by path.
 
     Imports resolve from the repository root, where the pre-push runner puts the
@@ -376,7 +443,7 @@ def python_references(path, source, blobs, dirs):
             basenames.add(node.value)
         if isinstance(node, ast.Import):
             for alias in node.names:
-                files |= resolve_module(alias.name.split("."), roots, blobs, dirs)
+                files |= resolve_module(alias.name.split("."), roots, blobs, dirs, import_names)
         elif isinstance(node, ast.ImportFrom):
             prefix = node.module.split(".") if node.module else []
             if node.level:
@@ -387,15 +454,15 @@ def python_references(path, source, blobs, dirs):
             else:
                 search = roots
             if prefix:
-                files |= resolve_module(prefix, search, blobs, dirs)
+                files |= resolve_module(prefix, search, blobs, dirs, import_names)
             for alias in node.names:
-                files |= resolve_module(prefix + [alias.name], search, blobs, dirs)
+                files |= resolve_module(prefix + [alias.name], search, blobs, dirs, import_names)
         elif isinstance(node, ast.Call):
             func = node.func
             called = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
             if (called in {"import_module", "__import__"} and node.args and isinstance(node.args[0], ast.Constant)
                     and isinstance(node.args[0].value, str)):
-                files |= resolve_module(node.args[0].value.split("."), roots, blobs, dirs)
+                files |= resolve_module(node.args[0].value.split("."), roots, blobs, dirs, import_names)
             if _is_sys_path_call(node):
                 for arg in node.args:
                     rule_dirs |= {literal for literal in _path_literals(arg) if literal in dirs}
@@ -434,6 +501,7 @@ def derive_host_executed(tree):
     blobs = {path for path, entry in entries.items() if entry[1] == "blob"}
     dirs = parent_dirs(entries)
     files, rule_dirs, reasons, queue = set(), set(), [], []
+    names = (set(), set())  # import names tried: module stems and package directories (D1)
 
     def add_file(path, why, python=False):
         if path not in files:
@@ -465,7 +533,7 @@ def derive_host_executed(tree):
         add_file(hook, "git hook", python=_is_python(tree, hook))
         texts.append((hook, executable_lines(tree.read(hook))))
     for source, text in texts:
-        for kind, path in sorted(names_in_text(text, blobs, dirs)):
+        for kind, path in sorted(names_in_text(text, blobs, dirs, names)):
             if kind == "dir":
                 add_dir(path, f"named by {source}")
             elif kind == "module":
@@ -481,14 +549,15 @@ def derive_host_executed(tree):
             continue
         parsed.add(path)
         try:
-            found, found_dirs = python_references(path, tree.read(path).decode("utf-8"), blobs, dirs)
+            found, found_dirs = python_references(path, tree.read(path).decode("utf-8"), blobs, dirs, names)
         except (SyntaxError, UnicodeDecodeError, ValueError) as error:
             raise DerivationError(f"unparseable_python:{path}") from error
         for ref in sorted(found):
             add_file(ref, f"imported or loaded by {path}", python=ref.endswith(".py"))
         for directory in sorted(found_dirs):
             add_dir(directory, f"code run by path from {path}")
-    return HostExecuted(frozenset(files), frozenset(rule_dirs), tuple(reasons))
+    return HostExecuted(frozenset(files), frozenset(rule_dirs), tuple(reasons),
+                        modules=frozenset(names[0]), packages=frozenset(names[1]))
 
 
 # -- Parsing the exported patch
@@ -790,6 +859,12 @@ def _rule_reasons(path, owned, host, top_level, folded_existing):
     host_hit = host.covers(path) or host.covers_folded(path)
     if host_hit:
         reasons.add(("host_executed", path))
+    if host.shadows_import(path):
+        reasons.add(("import_shadow", path))
+    # Bytecode is loaded in place of its source (SourceLoader.get_code) or on its own
+    # (SourcelessFileLoader); no patch needs to add one anywhere.
+    if BYTECODE_DIR in folded_parts or folded_parts[-1].endswith((".pyc", ".pyo")):
+        reasons.add(("python_bytecode", path))
     if any(part.startswith(".") for part in raw_parts + folded_parts):
         if not (path in owned and not host_hit and not git_internal):
             reasons.add(("dot_path", path))
