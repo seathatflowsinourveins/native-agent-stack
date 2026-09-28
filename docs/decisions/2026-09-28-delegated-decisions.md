@@ -63,6 +63,10 @@ The returned lane output is in
   - the prose at `examples/claude-native/workflows/README.md:19,81`, `recipes/claude-native-ultracode.md:156`, `adoption/bootstrap.md:346-347`, `catalogs/foundation/practice-references.json:73` and `docs/community-native-practice.md:190`;
   - an evidence sentence added to `adoption/hooks/claude/token-lanes-block.builder.md`. #456 left it out only because it duplicated the preload.
   The host uninstall is the upstream `skills remove verification-before-completion -g -y`, run after merge, because `install_skills.py` has no remove mode.
+  **Dated note, 2026-09-28 (after #464 merged at `c0966da2`):**
+  - This unscoped form is the complete one. Its one precondition is to assert first that no other agent holds a same-named copy, because without `-a` skills 1.7.0 targets every agent (`dist/cli.mjs` L6834-6838).
+  - An agent-scoped `-a claude-code codex` does not remove the skill. A remaining detected universal agent resolves to the canonical `.agents/skills` directory (`getAgentBaseDir` L2214, `isUniversalAgent` L2180). That sets `isStillUsed`, which keeps the canonical folder and its lock entry (L6883-6907).
+  - The skills-trial owner found this during the uninstall. It was re-read from the `skills@1.7.0` npm package.
 - **#381 Amendment 3.** The #381 role-body table pins `isolated-builder.md` at `57452a64…`, and main still equals it. The removal therefore lands with a dated pre-execution Amendment 3 in the same PR, authorised by the Gate A owner.
 
 ### #444: acknowledgement from the live trading lane
