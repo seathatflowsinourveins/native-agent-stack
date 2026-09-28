@@ -73,7 +73,7 @@
   },
   "sanitization": "Red traceback excerpt replaces the worktree prefix with <scratchpad> and omits separator/caret lines. Native version/help and primary-source reads are described in the preregistration. No conversations, session identifiers, credentials or personal paths are published.",
   "limitations": "These checks do not establish Workflow inheritance, long-child eligibility, budget feasibility, frozen task quality or any comparative window result. Candidate hashes and registration establish byte identity, not a freeze or model execution.",
-  "original_record_scope": "Original authoring checks and commit attempt below are historical, preceding f7cc409a. cross_family_repair_20260927 is the earlier repair round and attempted no git mutation commands; host_condition_amendment_20260927 is the current round.",
+  "original_record_scope": "Original authoring checks and commit attempt below are historical, preceding f7cc409a. cross_family_repair_20260927 is the earlier repair round and attempted no git mutation commands; host_condition_amendment_20260927 is the host-condition amendment round, including the coordinator's F4 ruling (52356fee); review_repair_20260927 is the current round.",
   "cross_family_repair_20260927": {
     "date": "2026-09-27",
     "reviewed_head": "f7cc409a3df212375c76f957700b1ebb16ce1e73",
@@ -441,7 +441,8 @@
         "id": "F3",
         "title": "consequence for the old bands",
         "provenance": "coordinator_supplied_arithmetic_rechecked_by_builder",
-        "observation": "The C band 180000..220000 excludes C's 167000 trigger, so every C focal child would be out of band and invalidate the run; B's 360000..440000 includes 367000 by only 7000."
+        "observation": "The C band 180000..220000 excludes C's 167000 trigger, so every C focal child would be out of band and invalidate the run; B's 360000..440000 includes 367000 by only 7000.",
+        "review_correction_20260927": "The observation is kept as supplied, but 'every C focal child' overclaims: the old C band excluded the nominal ~167000 trigger, so a C child compacting near its trigger would have been out of band, while an overshoot into the band, such as 190000, would have met it. The arithmetic stands."
       },
       {
         "id": "F4",
@@ -572,7 +573,13 @@
     "residuals": [
       "The 33k buffer is a /context display observation on 2.1.283, not a measured compaction threshold; the buffer may depend on the client version.",
       "No automatic compaction at the new B or C triggers has been observed in an arm; F4 is relayed from historical host sessions.",
-      "Four F4 events from sessions launched before the switch (618371..922073) are unattributed. If those sessions ran the default window, an A child could auto-compact below 870300 and invalidate the run; the competing explanation is the superseded 902612 transition record. A's band was not widened.",
+      {
+        "status": "superseded",
+        "superseded_by": "coordinator_ruling_f4_pre_switch_events",
+        "marked_superseded_in": "review_repair_20260927",
+        "text": "Four F4 events from sessions launched before the switch (618371..922073) are unattributed. If those sessions ran the default window, an A child could auto-compact below 870300 and invalidate the run; the competing explanation is the superseded 902612 transition record. A's band was not widened.",
+        "live_residual": "Each event's timing (the session's first request after the settings save) was not re-checked; the transition classification rests on the documented mechanism and the relayed values."
+      },
       "The removal instant is unknown (file mtime only), and sessions started before it still carry 400000.",
       "F5 is undocumented and disagrees with env-vars.md on whether the output reserve is capped; the protocol relies on neither beyond requiring the key absent."
     ],
@@ -586,6 +593,176 @@
     "remaining_gates": [
       "Coordinator re-registration of the four changed files in manifests/evidence.json and a validator rerun",
       "Every earlier native readiness gate: per-arm settings/coordinator/child readback, Workflow treatment, collector attributes, retry and TTL instruments, lag/reserve/cancellation, wall bounds, executable Inspect adapters and offline-suite readiness"
+    ],
+    "registration_handoff": {
+      "changed_files": [
+        "blueprints/compaction-window-ab/PREREGISTRATION.md",
+        "blueprints/compaction-window-ab/preregistration.json",
+        "blueprints/compaction-window-ab/build-evidence.json",
+        "tests/test_compaction_window_ab_preregistration.py"
+      ],
+      "manifest_edit_owner": "coordinator",
+      "builder_edited_manifest": false,
+      "final_byte_registration_pending": true
+    }
+  },
+  "review_repair_20260927": {
+    "date": "2026-09-27",
+    "base_revision": "52356fee50d2d623baa2d8bcecfbc081608aea6b",
+    "base_meaning": "The coordinator's F4 ruling commit on top of the host-condition amendment (8cf950f3).",
+    "branch": "claude/compaction-window-ab-prereg-20260927",
+    "worktree": "<scratch>/wt-compact",
+    "status": "DRAFT_not_frozen_not_run",
+    "execution_authorized": false,
+    "builder": {
+      "role": "isolated-builder",
+      "model": "Claude Opus 5.5 (claude-opus-5-5, 1M context)",
+      "brief": "Coordinator review-repair brief: four review findings on the host-condition amendment and the F4 ruling, fail-first tests, a mutation harness on the new checks and one commit."
+    },
+    "boundaries": {
+      "host_settings_changed_by_builder": false,
+      "claude_sessions_started": 0,
+      "model_runs": 0,
+      "claude_client_invocations": [],
+      "credential_reads": 0,
+      "subagents_spawned": 0,
+      "evidence_manifest_changed": false,
+      "edited_paths": [
+        "blueprints/compaction-window-ab/PREREGISTRATION.md",
+        "blueprints/compaction-window-ab/preregistration.json",
+        "blueprints/compaction-window-ab/build-evidence.json",
+        "tests/test_compaction_window_ab_preregistration.py"
+      ]
+    },
+    "findings": [
+      {
+        "id": "RR1",
+        "severity": "major",
+        "location": "build-evidence.json host_condition_amendment_20260927.residuals",
+        "finding": "The residual still called the four pre-switch F4 events unattributed and possible default-window evidence, contradicting coordinator_ruling_f4_pre_switch_events.",
+        "disposition": "fixed",
+        "repair": "Kept verbatim as text and marked status superseded, with superseded_by coordinator_ruling_f4_pre_switch_events; its live_residual is only the unverified per-event timing.",
+        "test": "test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual (new): the ruling and the preregistration's attribution_status classify the same 618371..922073 events as transitions with A's band unchanged, the superseded_by pointer resolves, and no other residual says unattributed or ran the default window."
+      },
+      {
+        "id": "RR2",
+        "severity": "minor",
+        "location": "preregistration.json validity_bands.superseded_reason; PREREGISTRATION.md F3 row",
+        "finding": "'Every C focal child would have invalidated the run' overclaims: an overshoot to 190000 would have met the old 180000..220000 band.",
+        "disposition": "fixed",
+        "repair": "Both now say the old C band excluded the nominal ~167000 trigger, so a C focal child compacting near its trigger would have been out of band, and that an overshoot into the band would have met it. The coordinator-supplied F3 input keeps its text and gains review_correction_20260927.",
+        "test": "test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm (strengthened): the whole old C band lies above C's trigger inside C's current band, and neither record may say 'every C' or omit 'near its trigger'."
+      },
+      {
+        "id": "RR3",
+        "severity": "minor",
+        "location": "tests",
+        "finding": "The tests pinned tables, not operative wording: restoring the obsolete B/C bands in the JSON treatment text or the current Markdown left 21/21 passing.",
+        "disposition": "fixed",
+        "repair": "A new scan covers the Markdown before the first Amendment heading, all current JSON text and keys, and every treatment_proof value including numbers, for 360000, 440000, 180000 or 220000 written plain or with comma, underscore or no-break-space thousands, or K. It excludes only anti_pattern_log, host_condition.superseded_conditions, validity_bands.superseded_window_centred and validity_bands.superseded_reason, which the test names and checks are present and history.",
+        "test": "test_current_text_omits_the_superseded_window_centred_bands (new), with positive and negative pattern controls."
+      },
+      {
+        "id": "RR4",
+        "severity": "minor",
+        "pre_existing": true,
+        "location": "tests test_selection_optimizes_cost_instead_of_arm_order",
+        "finding": "The test compared stored winner labels only: C_cheapest costs of A=100, B=60, C=89 with selected=C still passed.",
+        "disposition": "fixed",
+        "repair": "The test computes each worked example's nomination in fractions.Fraction from its inputs: quality_eligible, cost at most (1 - 0.1) x A pooled and in every task (per worked_example_scope), the unique lowest pooled cost, and no nomination on an exact tie, leaving incumbent A. It compares the result with every stored label and pins the expected labels. Controls cover a per-task miss, the inclusive 0.90 x A boundary and a tie.",
+        "test": "test_selection_optimizes_cost_instead_of_arm_order (strengthened)."
+      }
+    ],
+    "checks": [
+      {
+        "phase": "baseline_at_52356fee_before_edits",
+        "commands": {
+          "tests": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration",
+          "validator": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py"
+        },
+        "exit_codes": {"tests": 0, "validator": 1},
+        "returned_output_excerpt": {
+          "tests": "Ran 21 tests in 0.038s\n\nOK\n",
+          "validator": "Publication validation failed:\nblueprints/compaction-window-ab/PREREGISTRATION.md: SHA-256 mismatch\nblueprints/compaction-window-ab/PREREGISTRATION.md: byte count mismatch\nblueprints/compaction-window-ab/build-evidence.json: SHA-256 mismatch\nblueprints/compaction-window-ab/build-evidence.json: byte count mismatch\nblueprints/compaction-window-ab/preregistration.json: SHA-256 mismatch\nblueprints/compaction-window-ab/preregistration.json: byte count mismatch\ntests/test_compaction_window_ab_preregistration.py: SHA-256 mismatch\ntests/test_compaction_window_ab_preregistration.py: byte count mismatch\n"
+        },
+        "boundary": "The eight validator lines are the pending re-registration of the four files changed at 8cf950f3 and 52356fee, before this round."
+      },
+      {
+        "phase": "red_first_new_tests_against_52356fee_blueprints",
+        "command": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 1,
+        "artifact_state": "Only the test file had changed; git status --porcelain blueprints/ was empty. This first test draft differs from the final file only in writing the three no-break-space separators as literal characters rather than chr() calls; the compiled pattern is the same.",
+        "returned_output_excerpt": "test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm ... FAIL\ntest_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual ... FAIL\nRan 23 tests in 0.044s\n\nFAILED (failures=2)\n"
+      },
+      {
+        "phase": "red_final_test_file_against_exported_52356fee_tree",
+        "command": "git archive 52356fee | tar -x -C <scratch>/rr-base-tree; copy the final test file to <scratch>/rr-base-tree/tests/; then from <scratch>/rr-base-tree: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+        "exit_code": 1,
+        "artifact_state": "The exported preregistration.json, build-evidence.json and PREREGISTRATION.md (SHA256 prefixes 734ca2e9e7ebec9b, 10f7fb992d0553f3, d8851b79559898d2) equal 52356fee's blobs; the test file (SHA256 prefix b0546ccb18a59ff8) is identical to the worktree copy.",
+        "returned_output_excerpt": "test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm ... FAIL\ntest_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual ... FAIL\nRan 23 tests in 0.045s\n\nFAILED (failures=2)\n",
+        "failing_assertions": [
+          "test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm: assertNotRegex for 'every C' matched superseded_reason ('Regex matched: 'every C' ...').",
+          "test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual: assertIsInstance(entry, dict) failed on the plain-string 618371..922073 residual ('... is not an instance of <class 'dict'>')."
+        ],
+        "sanitization": "Retained the status and summary lines; tracebacks and the full assertion text are omitted. The scratch directory is shown as <scratch>, and the export was deleted afterwards.",
+        "result": "23 tests, 2 failures, 0 errors, 21 ok: RR2's regression assertion and RR1's consistency test. RR3's scan and RR4's computed nominations pass at 52356fee because its current text and worked examples have no such defect; mutation_checks shows each gap."
+      },
+      {
+        "phase": "mutation_checks",
+        "method": "Imported the 52356fee test module (from git show, with ROOT set to the worktree) and the new module, pointed each BLUEPRINT at a mutated copy of the blueprint directory under <scratch>/mut, and ran each whole test case once per mutation; the copies were deleted afterwards. The 13 round-1 mutations were rerun unchanged.",
+        "exit_code": 0,
+        "returned_output": [
+          "control_unmutated: old_52356fee(ran 21) failed=[] | new(ran 23) failed=[]",
+          "sel_C_cheapest_costs_100_60_89_label_C: old_52356fee(ran 21) failed=[] | new(ran 23) failed=[\"test_selection_optimizes_cost_instead_of_arm_order (example='C_cheapest')\"]",
+          "sel_below_minimum_effect_B_89_label_null: old_52356fee(ran 21) failed=[] | new(ran 23) failed=[\"test_selection_optimizes_cost_instead_of_arm_order (example='below_minimum_effect')\"]",
+          "sel_cost_tie_C_59_label_null: old_52356fee(ran 21) failed=[] | new(ran 23) failed=[\"test_selection_optimizes_cost_instead_of_arm_order (example='cost_tie')\"]",
+          "json_B_and_C_text_360000_440000: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "json_B_and_C_text_360K_added: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "json_lower_bound_text_180_000: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "json_numeric_treatment_field_360000: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "json_decision_rule_text_220000: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "md_current_360_000_comma_added: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "md_current_180K_added: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_current_text_omits_the_superseded_window_centred_bands']",
+          "json_superseded_reason_renamed_unexcluded: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm', 'test_current_text_omits_the_superseded_window_centred_bands', \"test_current_text_omits_the_superseded_window_centred_bands (excluded='native_lever/treatment_proof/validity_bands/superseded_reason')\"]",
+          "f2_superseded_reason_every_C: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm']",
+          "f2_md_f3_row_every_C: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm']",
+          "f4_residual_plain_string_as_52356fee: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_superseded_by_typo: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_live_residual_dropped: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_status_open: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_ruling_default_window: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_ruling_span_changed: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_prereg_attribution_unattributed: old_52356fee(ran 21) failed=['test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm'] | new(ran 23) failed=['test_bands_hold_each_trigger_and_relayed_native_event_in_exactly_one_arm', 'test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']",
+          "f4_second_unattributed_residual: old_52356fee(ran 21) failed=[] | new(ran 23) failed=['test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual']"
+        ],
+        "round_1_mutations": "Rerun in the same pass, with lines omitted here. For all 13, the 52356fee module fails the same tests as round 1's mutation_checks record. The new module does too, except that json_reversion_to_A also fails test_selection_optimizes_cost_instead_of_arm_order, which now asserts no_selection_host_action.",
+        "finding": "Each of the 21 new mutations fails the new module, and the unmutated control passes both modules. For 20 of them, the 52356fee module passes, which reproduces the reviewed gaps: stale labels, obsolete bands in current text, the restored overclaim and F4 record drift. f4_prereg_attribution_unattributed fails both modules.",
+        "boundary": "A discrimination check of local structural tests, not upstream acceptance."
+      },
+      {
+        "phase": "final_checks_with_round_record_present",
+        "commands": {
+          "tests": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 -m unittest tests.test_compaction_window_ab_preregistration -v",
+          "json_load": "python3 -c \"import json;json.load(open('blueprints/compaction-window-ab/preregistration.json'));json.load(open('blueprints/compaction-window-ab/build-evidence.json'))\"",
+          "validator": "PYTHONDONTWRITEBYTECODE=1 GIT_OPTIONAL_LOCKS=0 python3 scripts/validate.py",
+          "whitespace": "GIT_OPTIONAL_LOCKS=0 git diff --check",
+          "scope": "GIT_OPTIONAL_LOCKS=0 git diff --name-only 52356fee"
+        },
+        "exit_codes": {"tests": 0, "json_load": 0, "validator": 1, "whitespace": 0, "scope": 0},
+        "returned_output_excerpt": {
+          "tests": "Ran 23 tests in 0.049s\n\nOK\n",
+          "json_load": "",
+          "validator": "Publication validation failed:\nblueprints/compaction-window-ab/PREREGISTRATION.md: SHA-256 mismatch\nblueprints/compaction-window-ab/PREREGISTRATION.md: byte count mismatch\nblueprints/compaction-window-ab/build-evidence.json: SHA-256 mismatch\nblueprints/compaction-window-ab/build-evidence.json: byte count mismatch\nblueprints/compaction-window-ab/preregistration.json: SHA-256 mismatch\nblueprints/compaction-window-ab/preregistration.json: byte count mismatch\ntests/test_compaction_window_ab_preregistration.py: SHA-256 mismatch\ntests/test_compaction_window_ab_preregistration.py: byte count mismatch\n",
+          "whitespace": "",
+          "scope": "blueprints/compaction-window-ab/PREREGISTRATION.md\nblueprints/compaction-window-ab/build-evidence.json\nblueprints/compaction-window-ab/preregistration.json\ntests/test_compaction_window_ab_preregistration.py\n"
+        },
+        "result": "All 23 tests passed with 23 'ok' status lines. The validator reports only the SHA-256 and byte-count mismatches of the four edited files, pending coordinator re-registration, and no other error. The whitespace check is clean, and the diff touches only the four allowed paths. Run with this entry present; the final rerun before commit is reported in the handoff."
+      }
+    ],
+    "residuals": [
+      "The four pre-switch events' per-event timing is still not re-checked (RR1's live residual).",
+      "The stale-band scan matches the named spellings only; a bound written in words or as a decimal multiple, such as 0.36M, would pass it.",
+      "The F4 consistency test compares the build record's ruling with the preregistration; the Markdown residual bullet agrees at this commit but is not tested."
     ],
     "registration_handoff": {
       "changed_files": [

@@ -49,6 +49,25 @@ FORBIDDEN_CURRENT_WORDING = (
                r"[\s_]+to[\s_]+A(?![A-Za-z0-9])"),
 )
 JSON_HISTORY_PATHS = {("anti_pattern_log",), ("host_condition", "superseded_conditions")}
+# A bound of the superseded window-centred bands (B 360000-440000, C 180000-220000)
+# in any spelling: plain digits, comma, underscore or no-break-space thousands, or K.
+# The digit form must not touch letters or digits, so hashes and larger numbers pass.
+THOUSANDS = ",_" + chr(0xA0) + chr(0x2009) + chr(0x202F)  # no-break, thin, narrow no-break
+OBSOLETE_BAND_BOUND = re.compile(
+    rf"(?<![A-Za-z0-9.])(?<!\d[{THOUSANDS}])(?:360|440|180|220)"
+    rf"(?:[{THOUSANDS}]?000(?![A-Za-z0-9])(?![{THOUSANDS}]\d)|\s?[Kk](?![A-Za-z0-9]))")
+# The only JSON records the stale-band scan skips: dated history and the named
+# superseded band records, which keep their original numbers.
+SUPERSEDED_BAND_RECORDS = {
+    ("native_lever", "treatment_proof", "validity_bands", "superseded_window_centred"),
+    ("native_lever", "treatment_proof", "validity_bands", "superseded_reason"),
+}
+STALE_BAND_EXCLUSIONS = JSON_HISTORY_PATHS | SUPERSEDED_BAND_RECORDS
+EXPECTED_NOMINATIONS = {
+    "review_counterexample": "B", "C_cheapest": "C", "cost_tie": None,
+    "below_minimum_effect": None, "cheap_quality_regression": "C",
+}
+F4_RULING = "coordinator_ruling_f4_pre_switch_events"
 
 
 class CompactionWindowPreregistrationTests(unittest.TestCase):
@@ -220,21 +239,62 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
                          "stop_entire_run_incomplete")
         self.assertFalse(ledger["qualification"]["request_id_preservation_proven"])
 
+    @staticmethod
+    def nominate(pooled, per_task, quality_eligible, minimum_effect):
+        """The preregistered selection in exact rational arithmetic.
+
+        Quality-eligible candidates must cost at most (1 - minimum effect) x A,
+        pooled and in every task; the unique lowest pooled cost wins, and an
+        exact tie or no qualifying candidate nominates nothing (A stays)."""
+        def exact(value):
+            return Fraction(str(value))
+        keep = 1 - exact(minimum_effect)
+        qualifying = [arm for arm in sorted(quality_eligible)
+                      if all(exact(costs[arm]) <= keep * exact(costs["A"])
+                             for costs in (pooled, *per_task.values()))]
+        lowest = min((exact(pooled[arm]) for arm in qualifying), default=None)
+        winners = [arm for arm in qualifying if exact(pooled[arm]) == lowest]
+        return winners[0] if len(winners) == 1 else None
+
     def test_selection_optimizes_cost_instead_of_arm_order(self):
-        rule = self.spec()["decision_rule"]
+        spec = self.spec()
+        rule = spec["decision_rule"]
         self.assertEqual(rule["selection_rule"], RULES["selection_rule"])
         self.assertEqual(rule["objective"], "minimize_pooled_all_attempt_weighted_child_cost_per_success")
         self.assertEqual(rule["tie_rule"], "exact_unrounded_tie_no_selection_incumbent_A_unchanged")
+        self.assertEqual(rule["no_selection_host_action"], "leave_incumbent_A_unchanged")
         self.assertEqual(rule["minimum_effect_fraction_vs_A"], 0.1)
+        margin = rule["minimum_effect_fraction_vs_A"]
+        # Each example's pooled values hold in every task; that is the basis for
+        # applying the per-task margin to the same values.
+        self.assertTrue(rule["worked_example_scope"].startswith(
+            "Every task has these CPS values and all gates hold."))
+        task_ids = [task["id"] for task in spec["tasks"]]
         examples = {row["id"]: row for row in rule["worked_examples"]}
         # Independent review counterexample and its symmetric/tied controls.
         self.assertEqual(examples["review_counterexample"]["cost_per_success"],
                          {"A": 100, "B": 60, "C": 89})
-        self.assertEqual(examples["review_counterexample"]["selected"], "B")
-        self.assertEqual(examples["C_cheapest"]["selected"], "C")
-        self.assertIsNone(examples["cost_tie"]["selected"])
-        self.assertIsNone(examples["below_minimum_effect"]["selected"])
-        self.assertEqual(examples["cheap_quality_regression"]["selected"], "C")
+        self.assertEqual({row_id: row["selected"] for row_id, row in examples.items()}, EXPECTED_NOMINATIONS)
+        # Every stored nomination must follow from its own inputs, not only its label.
+        for row in rule["worked_examples"]:
+            with self.subTest(example=row["id"]):
+                pooled = row["cost_per_success"]
+                self.assertEqual(set(pooled), {"A", "B", "C"})
+                self.assertLessEqual(set(row["quality_eligible"]), {"B", "C"})
+                per_task = {task_id: pooled for task_id in task_ids}
+                self.assertEqual(self.nominate(pooled, per_task, row["quality_eligible"], margin), row["selected"])
+        # Discriminating controls for the computation itself.
+        pooled = {"A": 100, "B": 60, "C": 89}
+        uniform = {task_id: pooled for task_id in task_ids}
+        self.assertEqual(self.nominate(pooled, uniform, ["B", "C"], margin), "B")
+        # One task missing the margin disqualifies a pooled winner.
+        one_task_short = {**uniform, task_ids[0]: {"A": 100, "B": 91, "C": 89}}
+        self.assertEqual(self.nominate(pooled, one_task_short, ["B", "C"], margin), "C")
+        # The margin is inclusive at exactly 0.90 x A, and exact just above it.
+        self.assertEqual(self.nominate({"A": 100, "B": 90, "C": 95}, {}, ["B", "C"], margin), "B")
+        self.assertIsNone(self.nominate({"A": 100, "B": 90.001, "C": 95}, {}, ["B", "C"], margin))
+        self.assertIsNone(self.nominate({"A": 100, "B": 60, "C": 60}, {}, ["B", "C"], margin))
+        self.assertIsNone(self.nominate(pooled, uniform, [], margin))
 
     def test_inspect_oracle_contracts_have_hashed_discriminating_controls(self):
         spec = self.spec()
@@ -634,6 +694,14 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         self.assertEqual(bands["superseded_window_centred"], {"B": [360000, 440000], "C": [180000, 220000]})
         low, high = bands["superseded_window_centred"]["C"]
         self.assertFalse(low <= EXPECTED_TRIGGERS["C"] <= high)
+        # It missed C's nominal trigger only: the whole old C band lies above that
+        # trigger inside C's current band, so an overshooting C event could have
+        # met it, and neither record may say every C child would have failed.
+        self.assertTrue(EXPECTED_TRIGGERS["C"] < low <= high < arms["C"]["upper_tokens"])
+        f3_row = next(line for line in self.markdown().splitlines() if line.startswith("| F3 consequence |"))
+        for text in (bands["superseded_reason"], f3_row):
+            self.assertNotRegex(text, r"(?i)\bevery C\b")
+            self.assertIn("near its trigger", text)
         self.assertEqual(bands["considered_symmetric_ten_percent"], {"B": [330300, 403700], "C": [150300, 183700]})
         low, high = bands["considered_symmetric_ten_percent"]["B"]
         self.assertFalse(low <= running_b["max"] <= high)
@@ -667,18 +735,26 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         for key in RULES:
             self.assertEqual(contract[key], spec["decision_rule"][key])
 
-    def json_text(self, value, path=()):
-        if path in JSON_HISTORY_PATHS:
+    def json_text(self, value, path=(), skip=JSON_HISTORY_PATHS, numbers=False):
+        if path in skip:
             return
         if isinstance(value, dict):
             for key, item in value.items():
                 yield path + (key,), key
-                yield from self.json_text(item, path + (key,))
+                yield from self.json_text(item, path + (key,), skip, numbers)
         elif isinstance(value, list):
             for index, item in enumerate(value):
-                yield from self.json_text(item, path + (index,))
+                yield from self.json_text(item, path + (index,), skip, numbers)
         elif isinstance(value, str):
             yield path, value
+        elif numbers and isinstance(value, (int, float)) and not isinstance(value, bool):
+            yield path, str(value)
+
+    @staticmethod
+    def resolve(value, path):
+        for key in path:
+            value = value[key]
+        return value
 
     def test_current_text_names_A_as_incumbent_without_reversion_wording(self):
         # Discriminating controls for the wording patterns themselves.
@@ -702,6 +778,79 @@ class CompactionWindowPreregistrationTests(unittest.TestCase):
         for pattern in FORBIDDEN_CURRENT_WORDING:
             match = pattern.search(current)
             self.assertIsNone(match, match and current[max(0, match.start() - 80):match.end() + 20])
+
+    def test_current_text_omits_the_superseded_window_centred_bands(self):
+        # Discriminating controls: each spelling of an old bound matches, while
+        # current bounds, larger numbers and hash-like strings do not.
+        for text in ("B 360000–440000 and C 180000–220000", "lies outside 180000..220000",
+                     "[360000, 440000]", "360,000", "440K", "180 k", "220_000", "360" + chr(0x202F) + "000"):
+            self.assertRegex(text, OBSOLETE_BAND_BOUND)
+        for text in ("3600000", "1360000", "1,360,000", "360,000,000", "0.360000", "18000", "2200K",
+                     "9f180000ab", "180000abcdef", "360Kb", "366209", "330300", "403700",
+                     "150300", "183700", "400000", "200000", "870300", "1,000,000"):
+            self.assertNotRegex(text, OBSOLETE_BAND_BOUND)
+        spec = self.spec()
+        # Each exclusion is named here, still present and explicitly history:
+        # a superseded record or a list of dated entries.
+        for path in sorted(STALE_BAND_EXCLUSIONS):
+            with self.subTest(excluded="/".join(path)):
+                record = self.resolve(spec, path)
+                if not path[-1].startswith("superseded"):
+                    self.assertTrue(record)
+                    self.assertTrue(all(isinstance(entry, dict) and entry.get("date") for entry in record))
+        # The superseded records still hold the old bounds, so the scan is not vacuous.
+        bands = self.bands(spec)
+        self.assertRegex(bands["superseded_reason"], OBSOLETE_BAND_BOUND)
+        for bound in (value for pair in bands["superseded_window_centred"].values() for value in pair):
+            self.assertRegex(str(bound), OBSOLETE_BAND_BOUND)
+        # All current JSON text and keys, plus every treatment-rule value
+        # including numbers, outside the named exclusions.
+        proof_path = ("native_lever", "treatment_proof")
+        scanned = list(self.json_text(spec, skip=STALE_BAND_EXCLUSIONS))
+        scanned += self.json_text(self.resolve(spec, proof_path), proof_path, STALE_BAND_EXCLUSIONS, numbers=True)
+        hits = [f"{'/'.join(map(str, path))}: {text}" for path, text in scanned if OBSOLETE_BAND_BOUND.search(text)]
+        self.assertEqual(hits, [])
+        # The Markdown protocol before the first Amendment heading. Dated
+        # amendments keep their original wording, which still names the old bands.
+        markdown = self.markdown()
+        self.assertIn("\n## Amendment ", markdown)
+        current, history = markdown.split("\n## Amendment ", 1)
+        self.assertRegex(history, OBSOLETE_BAND_BOUND)
+        match = OBSOLETE_BAND_BOUND.search(current)
+        self.assertIsNone(match, match and current[max(0, match.start() - 80):match.end() + 20])
+
+    def test_f4_ruling_agrees_with_attribution_and_supersedes_the_open_residual(self):
+        spec = self.spec()
+        record = json.loads((BLUEPRINT / "build-evidence.json").read_text())["host_condition_amendment_20260927"]
+        ruling = record[F4_RULING]
+        transition = spec["native_lever"]["relayed_native_auto_compaction_events"]["pre_switch_launched_sessions"]
+        span = f"{transition['min']}..{transition['max']}"
+        a_band = self.bands(spec)["arms"]["A"]["notation"]
+        # The build record's ruling and the preregistration classify the same
+        # four events the same way and leave A's band unchanged.
+        self.assertEqual((transition["n"], span), (4, "618371..922073"))
+        self.assertEqual(transition["attribution_status"], "transition_documented_mechanism")
+        for text in (ruling["ruling"], transition["attribution"]):
+            self.assertIn("transition events, not default-window triggers", text)
+            self.assertIn(f"A's band stays {a_band}", text)
+        self.assertIn(f"({span})", ruling["ruling"])
+        for text in (ruling["not_checked"], transition["residual"]):
+            self.assertRegex(text, r"(?i)timing\b.*\bnot re-checked")
+        # The earlier open residual stays verbatim but is marked superseded by
+        # the ruling; only the unverified per-event timing remains live.
+        about_events = [entry for entry in record["residuals"] if span in json.dumps(entry)]
+        self.assertEqual(len(about_events), 1)
+        entry = about_events[0]
+        self.assertIsInstance(entry, dict)
+        self.assertEqual(entry["status"], "superseded")
+        self.assertEqual(entry["superseded_by"], F4_RULING)
+        self.assertIn(entry["superseded_by"], record)
+        self.assertIn("are unattributed", entry["text"])
+        self.assertRegex(entry["live_residual"], r"(?i)timing\b.*\bnot re-checked")
+        self.assertNotIn("unattributed", entry["live_residual"])
+        for other in record["residuals"]:
+            if other is not entry:
+                self.assertNotRegex(json.dumps(other), r"unattributed|ran the default window")
 
     def test_size07_utilization_is_a_descriptive_secondary_outcome_outside_selection(self):
         spec = self.spec()

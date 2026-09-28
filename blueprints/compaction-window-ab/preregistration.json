@@ -255,7 +255,7 @@
           "A": {"window_tokens": 1000000, "expected_trigger_tokens": 967000, "lower_tokens": 870300, "lower_inclusive": true, "upper_tokens": 1000000, "upper_inclusive": true, "notation": "[870300, 1000000]"}
         },
         "superseded_window_centred": {"B": [360000, 440000], "C": [180000, 220000]},
-        "superseded_reason": "Inclusive +/-10% bands centred on each window value rather than on its trigger. C's expected trigger 167000 lies outside 180000..220000, so every C focal child would have invalidated the run; B's 367000 lay only 7000 inside 360000..440000. Replaced before any cohort or model observation.",
+        "superseded_reason": "Inclusive +/-10% bands centred on each window value rather than on its trigger. The old C band 180000..220000 excluded C's nominal ~167000 trigger, so a C focal child compacting near its trigger would have been out of band and invalidated the run; an overshoot into the band, such as 190000, would have met it. B's 367000 lay only 7000 inside 360000..440000. Replaced before any cohort or model observation.",
         "considered_symmetric_ten_percent": {"B": [330300, 403700], "C": [150300, 183700]},
         "considered_rejection_reason": "Symmetric inclusive +/-10% bands around each trigger were the first draft of this amendment. The relayed native event at 432724 in a 400000-window session (+17.9% over 367000, about 1 in 31 such events) falls outside 330300..403700. Focal children can compact more than once, and overshoot is an absolute last-request growth that weighs most on C, so symmetric bands would spuriously invalidate many runs. Replaced by the partition rule before commit."
       }
