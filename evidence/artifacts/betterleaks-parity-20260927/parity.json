@@ -102,14 +102,14 @@
     "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
     24,
     "local_test_passphrase",
-    "readable 25-character passphrase of a test arm's scratch restic repository; same value in paper_arm.sh"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repository it initialises under its scratch-directory argument; the same value is in paper_arm.sh; owner confirmation pending (trading lane)"
    ],
    [
     "generic-password",
     "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
     32,
     "local_test_passphrase",
-    "readable 25-character passphrase of a test arm's scratch restic repository; same value in dagu_arm.sh"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repositories it initialises under its scratch-directory argument; the same value is in dagu_arm.sh; owner confirmation pending (trading lane)"
    ],
    [
     "generic-password",
@@ -123,7 +123,7 @@
     "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
     9,
     "local_test_passphrase",
-    "readable, dated 28-character passphrase of the isolated rerun's scratch restic repository"
+    "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing restic repository under a host state directory; the script lists, checks and restores that repository and does not create it; its comment calls the value a fixed disposable test string; owner confirmation pending"
    ],
    [
     "generic-password",
@@ -203,7 +203,7 @@
     73,
     73,
     "digest",
-    "64-hex content digests under a *_sha256 field of the catalog data embedded in the generated explorer HTML; history only (the file is no longer committed); each fragment is a 6-13 MB single line that gitleaks skips under --max-target-megabytes 2"
+    "64-hex content digests under a *_sha256 field of the catalog data embedded in the generated explorer HTML; history only (the file is no longer committed). Each finding sits on a line of 6,106,817 to 13,080,697 bytes (measure_explorer_lines.py), and gitleaks 8.30.1 skips a git-mode fragment of 3,000,000 bytes or more at --max-target-megabytes 2"
    ],
    [
     "generic-credential-uri",
@@ -281,7 +281,7 @@
     1,
     1,
     "local_test_passphrase",
-    "readable 25-character passphrase of a test arm's scratch restic repository; same value in paper_arm.sh"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repository it initialises under its scratch-directory argument; the same value is in paper_arm.sh; owner confirmation pending (trading lane)"
    ],
    [
     "generic-password",
@@ -292,7 +292,7 @@
     1,
     1,
     "local_test_passphrase",
-    "readable 25-character passphrase of a test arm's scratch restic repository; same value in dagu_arm.sh"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repositories it initialises under its scratch-directory argument; the same value is in dagu_arm.sh; owner confirmation pending (trading lane)"
    ],
    [
     "generic-password",
@@ -325,7 +325,7 @@
     1,
     1,
     "local_test_passphrase",
-    "readable, dated 28-character passphrase of the isolated rerun's scratch restic repository"
+    "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing restic repository under a host state directory; the script lists, checks and restores that repository and does not create it; its comment calls the value a fixed disposable test string; owner confirmation pending"
    ],
    [
     "generic-password",
@@ -365,7 +365,7 @@
   "note": "Attempt 2 of the betterleaks scan (raised caps); attempt 1 under the host gitleaks guard's caps was stopped at 600 s with no result (run-record.json, scans)."
  },
  "fixtures": {
-  "driver": "unchanged tests/test_gitleaks_config.py classes GitleaksPresenceTests, GitleaksConfigContextRestrictionTests and GitleaksIgnoreFingerprintTests, run with a PATH directory whose `gitleaks` symlink points at each verified binary, GITLEAKS_TESTS_REQUIRED=1",
+  "driver": "tests/test_gitleaks_config.py classes GitleaksPresenceTests, GitleaksConfigContextRestrictionTests and GitleaksIgnoreFingerprintTests, unchanged at the base commit, run with a PATH directory whose `gitleaks` symlink points at each verified binary, GITLEAKS_TESTS_REQUIRED=1",
   "gitleaks": {
    "tests_run": 25,
    "ok": 25,
@@ -605,13 +605,75 @@
    }
   ]
  },
+ "fixtures_ported": {
+  "change": "tests/test_gitleaks_config.py reads a JSON report of `null` as no findings (_findings); gitleaks writes [] and is unaffected. Same classes, symlinks and environment as above (harness/run_fixtures_ported.sh).",
+  "gitleaks": {
+   "tests_run": 25,
+   "ok": 25,
+   "FAIL": 0,
+   "ERROR": 0,
+   "skipped": 0
+  },
+  "betterleaks": {
+   "tests_run": 25,
+   "ok": 22,
+   "FAIL": 3,
+   "ERROR": 0,
+   "skipped": 0
+  },
+  "betterleaks_not_ok": [
+   "GitleaksConfigContextRestrictionTests.test_d2_other_fields_and_other_paths_stay_detected",
+   "GitleaksConfigContextRestrictionTests.test_d4_unreviewed_values_and_other_paths_stay_detected",
+   "GitleaksConfigContextRestrictionTests.test_d5_retained_sweep_input_pin_lines_only"
+  ],
+  "betterleaks_changed_by_the_port": {
+   "GitleaksConfigContextRestrictionTests.test_b_allowlisted_path_named_digest_field_is_not_detected": [
+    "FAIL",
+    "ok"
+   ],
+   "GitleaksConfigContextRestrictionTests.test_d3_reviewed_manifest_pin_ids_are_not_detected": [
+    "ERROR",
+    "ok"
+   ],
+   "GitleaksConfigContextRestrictionTests.test_d_manifest_pin_commit_ids_are_not_detected": [
+    "ERROR",
+    "ok"
+   ],
+   "GitleaksConfigContextRestrictionTests.test_e_memory_rejection_fingerprints_are_not_detected": [
+    "ERROR",
+    "ok"
+   ],
+   "GitleaksConfigContextRestrictionTests.test_f_path_keyed_digest_in_the_reviewed_manifest_is_not_detected": [
+    "ERROR",
+    "ok"
+   ]
+  }
+ },
  "classification": {
   "superset": false,
   "missing": "fixtures only: 13 sourcegraph-access-token detections of bare 40-hex values in tests d2, d4 and d5; betterleaks 1.8.1 requires the sgp_ prefix (config/betterleaks.toml) where gitleaks 8.30.1 also matches any 40-hex value near the keyword (config/gitleaks.toml). Both real scans had no gitleaks finding to miss.",
   "extra_in_fixtures": "3 generic-api-key detections at lines where gitleaks reported the sourcegraph rule (one per test d2, d4, d5)",
-  "schema": "betterleaks writes an empty JSON report as null, gitleaks as []; 5 negative fixture tests fail on that alone",
+  "schema": "betterleaks writes an empty JSON report as null, gitleaks as []; 5 negative fixture tests failed on that alone until the tests read null as no findings (fixtures_ported)",
   "new_findings": "16 in dir mode and 91 in git mode, from betterleaks-only rules generic-password and generic-credential-uri and from generic-api-key on explorer HTML that gitleaks skips by size",
-  "real_secret_found": false,
+  "real_secret_status": "pending_owner_confirmation",
+  "real_secret_note": "Value-blind triage matched no live credential, but it cannot close the three local_test_passphrase rows: an owner must confirm that no retained restic repository still uses their two values. Two rows sit in trading-lane paths. The 25-character value is also in 4 retained round copies of the step script the paper arm generates (raw/paper-arm-round5..8/cfg/hot_step.sh), and the 28-character value is also quoted in 2 receipts of the same recovery wave, one of which records it as the password of restic round trips that include a repository on the Windows drive. Neither scanner flags those 6 files.",
+  "pending_rows": [
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
+    24
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
+    32
+   ],
+   [
+    "generic-password",
+    "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
+    9
+   ]
+  ],
   "triage_method": "each finding's line was re-read from the tree or from its commit, the rule's upstream regex was re-applied at the reported byte columns, and only key text, value length, character classes, structural shape and marker words were printed (harness/triage.py, harness/triage_history.py); no value was printed or stored"
  }
 }

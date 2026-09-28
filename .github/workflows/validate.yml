@@ -318,13 +318,21 @@ jobs:
     # successor the gitleaks README on master names: "feature complete", "security patches only", focus
     # moved to Betterleaks. Its context is not in .github/main-ruleset.json, so a red run informs and never
     # blocks a merge; the required secret-scan job above is unchanged. Verification, parity and triage:
-    # evidence/artifacts/betterleaks-parity-20260927/.
+    # evidence/artifacts/betterleaks-parity-20260927/. Until the findings recorded there are triaged, this
+    # job is red on every run, so its status does not say whether a change adds a secret: secret-scan
+    # stays the gate.
     runs-on: ubuntu-24.04
     # On the recording workstation the full-history scan took 55 s wall, 1,546 CPU-seconds and a 7.9 GiB
     # peak resident set (gitleaks: 74 s, 3.3 GiB); the hosted-runner figures are pending its first run.
     timeout-minutes: 20
     permissions:
       contents: read
+    defaults:
+      run:
+        # GitHub runs an unspecified shell as `bash -e {0}` and `shell: bash` as
+        # `bash --noprofile --norc -eo pipefail {0}` (workflow syntax, jobs.<job_id>.steps[*].shell), so
+        # a check that fails inside a pipeline also fails its step.
+        shell: bash
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -387,8 +395,9 @@ jobs:
           GITLEAKS_TESTS_REQUIRED: '1'
         run: |
           # The tests run the `gitleaks` on PATH, so a symlink gives that name to the verified binary.
-          # The history-ancestry class is left out: it scans history without --redact and its failure
-          # message quotes the findings; the redacted history scan below covers that ground.
+          # They read betterleaks's `null` empty report as no findings, so a failure here is a detection
+          # difference. The history-ancestry class is left out: it scans history without --redact and
+          # its failure message quotes the findings; the redacted history scan below covers that ground.
           mkdir -p "$RUNNER_TEMP/betterleaks/as-gitleaks"
           ln -s ../betterleaks "$RUNNER_TEMP/betterleaks/as-gitleaks/gitleaks"
           export PATH="$RUNNER_TEMP/betterleaks/as-gitleaks:$PATH"
@@ -401,11 +410,17 @@ jobs:
           # The secret-scan job's arguments. betterleaks 1.8.1 applies --max-target-megabytes to dir-mode
           # files only (cmd/directory.go); its git source (cmd/git.go) has no size limit, so this scan
           # also reads the generated explorer HTML in history that gitleaks skips as over 2 MB.
+          # Two flags keep gitleaks's behaviour (betterleaks cmd/root.go at v1.8.1):
+          # --max-archive-depth 0, because betterleaks opens archives to depth 8 by default (line 103)
+          # and gitleaks 8.30.1 does not open them (its cmd/root.go line 92); and --gitleaks-ignore-path
+          # .gitleaksignore, which always loads the reviewed fingerprints, where the default "." would
+          # prefer a .betterleaksignore (lines 100 and 281-291). A .betterleaksignore in the scanned
+          # directory is still read (lines 465-469), so tests/test_workflow_hardening.py keeps it absent.
           # The redacted report stays on the runner; the log lists rule, file and line only.
           report="$RUNNER_TEMP/betterleaks/history.json"
           status=0
           "$RUNNER_TEMP/betterleaks/betterleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
-            --log-opts="HEAD" \
+            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="HEAD" \
             --redact --no-banner --report-format json --report-path "$report" || status=$?
           if [ -s "$report" ]; then
             jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort | uniq -c
@@ -414,9 +429,11 @@ jobs:
       - name: Scan working tree for secrets with betterleaks
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
+          # The same flags as the history scan above.
           report="$RUNNER_TEMP/betterleaks/tree.json"
           status=0
           "$RUNNER_TEMP/betterleaks/betterleaks" dir . --config .gitleaks.toml --max-target-megabytes 2 \
+            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore \
             --redact --no-banner --report-format json --report-path "$report" || status=$?
           if [ -s "$report" ]; then
             jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort

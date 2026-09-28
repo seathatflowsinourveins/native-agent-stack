@@ -5,7 +5,10 @@ Reads the --redact'ed JSON report for rule/file/line/column positions, re-reads 
 scanned tree, re-applies the rule's upstream regex (betterleaks v1.8.1 config/betterleaks.toml, commit
 5eab4833) to locate the secret group, and prints only derived facts: the matched text with the value
 replaced by a descriptor, the value's length and character classes, placeholder/expansion markers, and
-left context with every long token masked. It never prints a candidate value.
+the length and character classes of the text left of the match. It never prints a candidate value.
+The recorded triage printed that left text with only 12-character tokens masked, which would have shown
+a shorter credential or a spaced passphrase verbatim (repair-round review); it now prints the same
+descriptor as for the value, as triage_history.py does.
 """
 import json
 import re
@@ -51,7 +54,7 @@ for f in json.loads(report.read_text()):
             found = m
             break
     if found is None:
-        print(f"{f['RuleID']} {f['File']}:{f['StartLine']} regex-relocation-failed; left={mask(line[max(0, start - 60):start])!r}")
+        print(f"{f['RuleID']} {f['File']}:{f['StartLine']} regex-relocation-failed; left={describe(line[max(0, start - 60):start])}")
         continue
     if f["RuleID"] == "generic-credential-uri":
         g = found.groupdict()
@@ -64,4 +67,4 @@ for f in json.loads(report.read_text()):
         idx = next(i for i in range(1, (found.re.groups or 0) + 1) if found.group(i) is not None)
         value = found.group(idx)
         shown = mask(line[found.start():found.start(idx)]) + describe(value) + mask(line[found.end(idx):found.end()])
-    print(f"{f['RuleID']} {f['File']}:{f['StartLine']}\n    match: {shown}\n    left : {mask(line[max(0, found.start() - 70):found.start()])!r}")
+    print(f"{f['RuleID']} {f['File']}:{f['StartLine']}\n    match: {shown}\n    left : {describe(line[max(0, found.start() - 70):found.start()])}")

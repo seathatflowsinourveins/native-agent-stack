@@ -837,11 +837,15 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
 class BetterleaksTrialJobTests(unittest.TestCase):
     """The non-required betterleaks trial beside secret-scan (plan move M3; receipt
     evidence/artifacts/betterleaks-parity-20260927/): it stays out of the required contexts and cannot be
-    forced green, reads only, runs cosign only after its digest check and betterleaks only after the signed
-    checksums verify, redacts both scans, uploads nothing and never turns on live --validation requests."""
+    forced green, reads only, runs bash with pipefail, runs cosign only after its digest check and
+    betterleaks only after the signed checksums and the pinned digest verify, redacts both scans with
+    gitleaks's archive and ignore-file behaviour, uploads nothing and never turns on live --validation
+    requests; and the repository carries none of the suppression channels that only betterleaks reads."""
 
     JOB = "secret-scan-betterleaks"
     job = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))[JOB]
+    FIXTURE_CLASSES = ("GitleaksPresenceTests", "GitleaksConfigContextRestrictionTests",
+                       "GitleaksIgnoreFingerprintTests")
 
     def scans(self):
         """Each betterleaks scan command, with its backslash continuation lines joined."""
@@ -873,16 +877,40 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         self.assertNotIn("upload-artifact", self.job)
         self.assertNotIn("GH_TOKEN", self.job)
 
+    def test_runs_bash_with_pipefail(self):
+        """GitHub runs an unspecified shell as `bash -e {0}` and `shell: bash` as
+        `bash --noprofile --norc -eo pipefail {0}` (workflow syntax, jobs.<job_id>.steps[*].shell), so only
+        an explicit bash makes a check that fails inside a pipeline fail its step."""
+        head, steps = self.job.split("\n    steps:\n", 1)
+        self.assertRegex(head, r"(?m)^    defaults:\n      run:\n(?:        #.*\n)*        shell: bash[ \t]*$")
+        self.assertNotRegex(steps, r"(?m)^\s+shell:", "a step must not override the job's bash default")
+
     def test_binaries_run_only_after_verification(self):
         cosign = step_block(self.job, "Install cosign")
-        self.assertLess(cosign.index("sha256sum --check"), cosign.index('"$RUNNER_TEMP/cosign/cosign" version'))
+        self.assertRegex(cosign, r"(?m)^          COSIGN_SHA256: [0-9a-f]{64}$")
+        order = [cosign.index(marker) for marker in ('"$COSIGN_SHA256" "$RUNNER_TEMP/cosign/cosign" | sha256sum --check',
+                                                     'chmod +x "$RUNNER_TEMP/cosign/cosign"',
+                                                     '"$RUNNER_TEMP/cosign/cosign" version')]
+        self.assertEqual(order, sorted(order))
         install = step_block(self.job, "Install betterleaks")
-        order = [install.index(marker) for marker in ('cosign" verify-blob', "sha256sum --check --ignore-missing",
+        order = [install.index(marker) for marker in ('cosign" verify-blob',
+                                                      "sha256sum --check --ignore-missing --strict checksums.txt",
+                                                      '"$BETTERLEAKS_SHA256" "$archive" | sha256sum --check',
                                                       "tar -xzf", "./betterleaks version")]
         self.assertEqual(order, sorted(order))
-        self.assertIn(r"'^https://github\.com/betterleaks/betterleaks/\.github/workflows/release\.yml@refs/tags/"
-                      r"v1\.8\.1$'", install)
-        self.assertIn("--certificate-oidc-issuer https://token.actions.githubusercontent.com", install)
+        verify_blob = install[order[0]:order[1]]
+        for constraint in ("--bundle checksums.txt.sigstore.json",
+                           '--certificate-identity-regexp "$SIGNER_IDENTITY_REGEXP"',
+                           "--certificate-oidc-issuer https://token.actions.githubusercontent.com",
+                           "--certificate-github-workflow-repository betterleaks/betterleaks",
+                           '--certificate-github-workflow-ref "refs/tags/v${BETTERLEAKS_VERSION}"',
+                           '--certificate-github-workflow-sha "$SIGNER_COMMIT"',
+                           "--certificate-github-workflow-trigger push"):
+            self.assertIn(constraint, verify_blob)
+        self.assertIn(r"SIGNER_IDENTITY_REGEXP: '^https://github\.com/betterleaks/betterleaks/\.github/workflows/"
+                      r"release\.yml@refs/tags/v1\.8\.1$'", install)
+        self.assertRegex(install, r"(?m)^          SIGNER_COMMIT: [0-9a-f]{40}$")
+        self.assertRegex(install, r"(?m)^          BETTERLEAKS_SHA256: [0-9a-f]{64}$")
 
     def test_later_steps_need_the_verified_install_and_both_scans_redact(self):
         self.assertIn("id: install", step_block(self.job, "Install betterleaks"))
@@ -892,18 +920,45 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         scans = self.scans()
         self.assertEqual([re.search(r'" (git|dir) ', scan).group(1) for scan in scans], ["git", "dir"])
         for scan in scans:
-            self.assertIn("--redact", scan)
+            # A bare --redact redacts 100%; --redact=0 would print values (cmd/root.go lines 94-95).
+            self.assertRegex(scan, r"(?:^|\s)--redact(?:=100)?(?:\s|$)")
             self.assertIn("--config .gitleaks.toml", scan)
+            # gitleaks 8.30.1 opens no archives by default (its cmd/root.go line 92) and betterleaks
+            # 1.8.1 opens them to depth 8 (cmd/root.go line 103); an ignore-file path always loads the
+            # reviewed fingerprints (cmd/root.go lines 450-455).
+            self.assertIn("--max-archive-depth 0", scan)
+            self.assertIn("--gitleaks-ignore-path .gitleaksignore", scan)
             self.assertNotIn("--exit-code", scan)
         self.assertNotIn("--validation", self.job)
         self.assertNotIn("--experiments", self.job)
 
     def test_fixture_tests_leave_out_the_unredacted_history_class(self):
+        """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests scans history without
+        --redact and quotes its findings in its failure message, so naming it, or the whole module, would
+        print candidate values into a public log."""
         step = step_block(self.job, "fixture tests with betterleaks")
         self.assertIn("GITLEAKS_TESTS_REQUIRED: '1'", step)
-        (invocation,) = re.findall(r"(?m)^\s*python3 -m unittest .*$", step)
-        self.assertIn("GitleaksConfigContextRestrictionTests", invocation)
-        self.assertNotIn("GitleaksBranchAncestryHistoryTests", invocation)
+        self.assertEqual(len(unittest_invocations(self.job)), 1, "the fixture step is the job's only unittest run")
+        (args,) = unittest_invocations(step)
+        (module,) = re.findall(r"(?m)^\s*m=(\S+)\s*$", step)
+        named = [arg.strip('"').replace("$m", module) for arg in args if arg not in QUIET_FLAGS]
+        self.assertEqual(named, [f"tests.test_gitleaks_config.{name}" for name in self.FIXTURE_CLASSES])
+
+    def test_no_suppression_channel_that_only_betterleaks_reads(self):
+        """betterleaks 1.8.1 reads three suppression channels that gitleaks does not: a .betterleaksignore
+        in the scanned directory (cmd/root.go lines 281-291 and 465-469), a .betterleaks.toml wherever a run
+        gives no --config (lines 269-279), and an inline allow comment that names betterleaks
+        (detect/detect.go lines 57 and 962). None of them gets the review that .gitleaksignore and
+        .gitleaks.toml get, so none may exist."""
+        tracked = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True,
+                                 check=True).stdout.decode("utf-8", "replace").split("\0")
+        for name in (".betterleaksignore", ".betterleaks.toml"):
+            self.assertFalse((ROOT / name).exists(), f"{name} at the repository root")
+            self.assertEqual([path for path in tracked if path.rsplit("/", 1)[-1] == name], [], name)
+        marker = "betterleaks" + ":allow"  # assembled, so this file does not carry the marker itself
+        grep = subprocess.run(["git", "-C", str(ROOT), "grep", "-l", "-I", "-F", "-e", marker],
+                              capture_output=True, text=True)
+        self.assertEqual(grep.returncode, 1, f"{marker!r} in tracked files: {grep.stdout.split()} {grep.stderr}")
 
 
 class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):

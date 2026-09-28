@@ -1,18 +1,24 @@
 # betterleaks v1.8.1 beside gitleaks 8.30.1: verification, parity and a non-required trial job (2026-09-27)
 
 Local evidence for plan move M3, recorded on host `nativestack-5975wx-20260925` (WSL2, x86_64) from base
-commit `ba1700ad` (the full `catalog_revision` is in [`run-record.json`](run-record.json)). The change
-adds one job and its tests:
+commit `ba1700ad` (the full `catalog_revision` is in [`run-record.json`](run-record.json)). A review round
+followed on 2026-09-28 (UTC); its reruns and controls are under `repair_round` in `run-record.json`. The
+change adds one job, its tests and one test port:
 
 1. [`.github/workflows/validate.yml`](../../../.github/workflows/validate.yml) gains
    `secret-scan-betterleaks` next to the required `secret-scan` job. Its context is absent from
-   [`.github/main-ruleset.json`](../../../.github/main-ruleset.json), so a red run informs and never blocks
-   a merge.
+   [`.github/main-ruleset.json`](../../../.github/main-ruleset.json) and from the live ruleset read back on
+   2026-09-28, so a red run informs and never blocks a merge.
 2. [`tests/test_workflow_hardening.py`](../../../tests/test_workflow_hardening.py) gains
-   `BetterleaksTrialJobTests` (5 tests).
+   `BetterleaksTrialJobTests` (7 tests).
+3. [`tests/test_gitleaks_config.py`](../../../tests/test_gitleaks_config.py) reads a JSON report of `null`
+   as no findings. betterleaks writes an empty report that way; gitleaks writes `[]` and is unaffected.
 
 The required `secret-scan` job, the pre-commit hook, the pins files and `catalog-freshness.yml` are
 unchanged.
+
+**The trial job is red on every run until the triage below lands**, so its status does not say whether a
+change adds a secret. The required `secret-scan` job stays the gate.
 
 **Why betterleaks.** The gitleaks README on `master` (line 12, read 2026-09-28T03:04Z) says: "Gitleaks
 is feature complete. I'm not merging new features into Gitleaks. Future releases will be security
@@ -24,9 +30,12 @@ and GitHub holds no attestation for its archive.
 
 - `upstream-unchanged`: the verification steps and their controls, run with cosign v3.0.6, sha256sum and
   gh 2.101.0. Also zizmor 1.30.1 (offline) and actionlint 1.7.12 with shellcheck 0.11.0.
-- `our-integration`: the unchanged binaries run over this repository and over the unchanged fixture
-  classes of `tests/test_gitleaks_config.py`, our value-blind triage of the redacted reports, a local
-  simulation of the job's run steps, and the new hardening tests.
+- `our-integration`: the unchanged binaries run over this repository and over the fixture classes of
+  `tests/test_gitleaks_config.py`, our value-blind triage of the redacted reports, the review round's
+  reruns and controls, a local simulation of the job's run steps, and the new hardening tests with their
+  failing controls.
+- `independent observation` (the policy's platform-record class): the repository's active ruleset, read
+  back with `gh api`. This is a configuration read, not a CI run.
 - `live-run-pending`: the job on a GitHub-hosted runner, and zizmor's online audits.
 
 None of this is a hosted Actions run.
@@ -35,7 +44,7 @@ None of this is a hosted Actions run.
 
 | Step | Result |
 | --- | --- |
-| cosign v3.0.6 bootstrap | Its digest matched three sources before it ran: `sigstore/cosign-installer` v4.1.2 `action.yml` line 108 (the installer's own bootstrap pin), the release's `cosign_checksums.txt`, and the GitHub release asset digest. cosign's own signature was not verified. GitHub holds no attestation for the binary: `gh attestation verify` returned HTTP 404 and `gh release verify v3.0.6` found none (checked after its first run). Its release bundle needs a Sigstore verifier, and cosign checking itself shows only self-consistency. |
+| cosign v3.0.6 bootstrap | Its digest matched three sources before it ran: `sigstore/cosign-installer` v4.1.2 `action.yml` line 108 (the installer's own bootstrap pin), the release's `cosign_checksums.txt`, and the GitHub release asset digest. cosign's own signature was not verified, and the release is not immutable (`immutable: false`). GitHub holds no attestation for the binary: `gh attestation verify` returned HTTP 404 and `gh release verify v3.0.6` found none (checked after its first run). Its release bundle needs a Sigstore verifier, and cosign checking itself shows only self-consistency. |
 | betterleaks `checksums.txt` | `cosign verify-blob --bundle checksums.txt.sigstore.json` printed `Verified OK`. It pinned the identity regexp `^https://github\.com/betterleaks/betterleaks/\.github/workflows/release\.yml@refs/tags/v1\.8\.1$`, issuer `https://token.actions.githubusercontent.com`, repository, ref `refs/tags/v1.8.1`, the tag commit and trigger `push`. |
 | betterleaks archive | `sha256sum --check --ignore-missing --strict checksums.txt`: `betterleaks_1.8.1_linux_x64.tar.gz: OK` |
 | Signer certificate | SAN and build signer: `release.yml@refs/tags/v1.8.1`. Source repository digest: the tag commit. Trigger: `push`. Rekor `hashedrekord` entry, log index 2507892221. |
@@ -45,33 +54,57 @@ None of this is a hosted Actions run.
 
 ## 2. What betterleaks reads, and flag mapping (v1.8.1 source)
 
-- **Config discovery** (`cmd/root.go` lines 38-44, 270-272). The order is `--config`, then
+- **Config discovery** (`cmd/root.go` lines 38-44, 269-279). The order is `--config`, then
   `BETTERLEAKS_CONFIG` or `GITLEAKS_CONFIG`, then the matching `_TOML` variables, then
-  `.betterleaks.toml` or `.gitleaks.toml` in the target. Ignore files are read the same way:
-  `.betterleaksignore` first, then `.gitleaksignore` (lines 282-284). This change adds no
-  `.betterleaks.*` file, so `.gitleaks.toml` and `.gitleaksignore` are read as they are.
+  `.betterleaks.toml` or `.gitleaks.toml` in the target. Both jobs pass `--config .gitleaks.toml`.
+- **Ignore files** (`cmd/root.go` lines 445-469). betterleaks loads the `--gitleaks-ignore-path` file,
+  then the ignore file inside that path if it is a directory, then the scanned directory's own ignore
+  file. In each directory `.betterleaksignore` wins over `.gitleaksignore` (lines 281-291). The trial
+  job passes `--gitleaks-ignore-path .gitleaksignore`, so the reviewed fingerprints always load.
+- **Suppression channels that only betterleaks reads.** These are a `.betterleaksignore` in the scanned
+  directory, a `.betterleaks.toml` for runs without `--config`, and an inline allow comment that names
+  betterleaks (`detect/detect.go` lines 57 and 962). betterleaks also honours the gitleaks comment, as
+  gitleaks does. None of the three exists in this repository, and
+  `test_no_suppression_channel_that_only_betterleaks_reads` keeps it that way.
 - **Allowlists** become expression filters (`config/translate_filters.go`, `TranslateLegacyFilters`).
-  In the fixture run, every "is not detected" case produced no finding. Every `.gitleaksignore`
-  fingerprint test passed.
+  In the fixture run, every "is not detected" case produced no finding.
+- **Fingerprints.** The four `.gitleaksignore` tests passed, but they do not show suppression: three
+  only parse files, and `test_c` checks that a new commit is *not* suppressed. Every in-ancestry
+  fingerprint in `.gitleaksignore` names `sourcegraph-access-token`, which betterleaks does not fire on
+  those lines, so their effect cannot be observed. A scratch control shows that betterleaks applies
+  fingerprints. One fingerprint from the recorded report, passed as `--gitleaks-ignore-path`, removed
+  exactly that finding: git mode went from 91 to 90 findings and dir mode from 16 to 15. An empty
+  directory in the same place removed none.
 - **`[extend] useDefault = true`** extends each tool's own embedded defaults (`config/config.go` line
   352). betterleaks has 417 rules in `config/betterleaks.toml`; gitleaks has 222 in
   `config/gitleaks.toml`. The same file therefore selects different rules.
 - **Flags.** `git`, `dir`, `--config`, `--max-target-megabytes`, `--log-opts`, `--redact`,
   `--no-banner`, `--report-format json` and `--report-path` are accepted unchanged: the scans below use
-  the `secret-scan` job's argument list. There are four differences:
+  the `secret-scan` job's argument list. There are five differences:
   - betterleaks applies `--max-target-megabytes` to file sources only (`cmd/directory.go` lines 42 and
     66; `cmd/git.go` has no size limit). gitleaks 8.30.1 also enforces it on every fragment
-    (`detect/detect.go` lines 431-436). So a history scan by betterleaks reads blobs over 2 MB that
+    (`detect/detect.go` lines 431-438). So a history scan by betterleaks reads blobs over 2 MB that
     gitleaks skips.
-  - An empty JSON report is `null` in betterleaks and `[]` in gitleaks.
+  - An empty JSON report is `null` in betterleaks (`cmd/git.go` line 74 and `cmd/directory.go` line
+    72 start from a nil slice) and `[]` in gitleaks (`detect/detect.go` line 127). The fixture tests now
+    read `null` as no findings.
   - The `sourcegraph-access-token` rules differ. gitleaks matches any bare 40-hex value near the
     keywords `sgp_` or `sourcegraph` (`config/gitleaks.toml` lines 3051-3058). betterleaks requires
     the `sgp_` prefix (`config/betterleaks.toml` lines 8784-8786).
+  - **Archives.** betterleaks opens archives to depth 8 by default (`cmd/root.go` line 103); gitleaks
+    8.30.1 does not open them ("no archive traversal is done", its `cmd/root.go` line 92). The trial job
+    passes `--max-archive-depth 0`, for like-for-like coverage and so that it does not unpack archives
+    from pull-request content. None of the parity rows is an archive member.
   - `--validation` is off by default (`cmd/root.go` line 112). It would send candidates to provider
     endpoints, so the job never passes it and a hardening test forbids it.
+
+  With both added flags, the recorded commit set and the worktree gave the same findings as the recorded
+  scans: 91 and 16, at the same rule, file, line and columns, and in git mode the same commit.
 - **`.git` in dir mode.** Both default configs skip a path matching `(?:^|/)\.git$` (line 49 of
-  `config/betterleaks.toml` and of `config/gitleaks.toml`), so a runner's `.git` directory should not be
-  read. The local worktree's `.git` is a file, so only the hosted run shows it.
+  `config/betterleaks.toml` and of `config/gitleaks.toml`). A local control confirms it with this
+  repository's config. A scratch directory held the same synthetic token-shaped line in
+  `.git/planted.txt` and in `planted/planted.txt`, and both scanners reported only the second
+  (`harness/git_dir_skip_control.sh`). The hosted run still has to show it on the runner's checkout.
 
 ## 3. Parity on this repository (our-integration)
 
@@ -82,7 +115,8 @@ Both tools ran on the clean worktree at the base commit with `--config .gitleaks
 | --- | --- | --- |
 | Full history: `git . --log-opts=HEAD --max-target-megabytes 2` | rc 0, no findings, 697 commits, 72.7 s | rc 1, 91 findings, 55.3 s (attempt 2) |
 | Working tree: `dir . --max-target-megabytes 2` | rc 0, no findings, 10.6 s | rc 1, 16 findings, 1.0 s |
-| Fixture classes (25 tests, `GITLEAKS_TESTS_REQUIRED=1`) | 25 ok | 17 ok, 4 FAIL, 4 ERROR |
+| Fixture classes (25 tests, `GITLEAKS_TESTS_REQUIRED=1`), tests as at the base commit | 25 ok | 17 ok, 4 FAIL, 4 ERROR |
+| The same classes after the `null`-report port | 25 ok | 22 ok, 3 FAIL |
 | History scan resources, raised caps (`/usr/bin/time -v`) | 3.3 GiB peak RSS, 1:13.83 wall | 7.9 GiB peak RSS, 0:55.23 wall |
 
 betterleaks is **not a superset** on the fixtures:
@@ -90,9 +124,9 @@ betterleaks is **not a superset** on the fixtures:
 - **13 detections are missing.** gitleaks's `sourcegraph-access-token` flags bare 40-hex values in
   fixtures d2, d4 and d5. At three of those lines betterleaks reports `generic-api-key` instead. The
   real scans had no gitleaks finding to miss.
-- **Five tests fail on the empty-report format alone.** The negative tests b, d, d3, e and f fail only
-  because an empty report is `null`. In each, betterleaks reported nothing, which is what the test
-  requires.
+- **Five tests failed on the empty-report format alone.** The negative tests b, d, d3, e and f failed
+  only because an empty report is `null`. In each, betterleaks reported nothing, which is what the test
+  requires. After the port they pass, and only d2, d4 and d5 fail.
 
 The new findings come from betterleaks-only rules (`generic-password`, `generic-credential-uri`) and
 from `generic-api-key` on generated explorer HTML in history, which gitleaks skips by size. Each
@@ -102,14 +136,21 @@ value length, character classes, shape and marker words were printed; no value w
 
 | Category | Tree | History |
 | --- | --- | --- |
-| Content digests under a `*_sha256` field of the generated explorer HTML (history only; each fragment is a 6-13 MB line) | 0 | 73 |
+| Content digests under a `*_sha256` field of the generated explorer HTML (history only). The 73 findings sit on lines of 6,106,817 to 13,080,697 bytes, and gitleaks skips a git-mode fragment of 3,000,000 bytes or more (`harness/measure_explorer_lines.py`) | 0 | 73 |
 | False positives: code expressions, a printf template, prose | 7 | 8 |
 | Test fixtures: URL and redaction fixtures with placeholder passwords | 4 | 4 |
-| Readable passphrases of the scratch restic repositories that test-arm scripts create | 3 | 3 |
+| Restic passphrases in test scripts: two test arms export one value for the repositories they initialise under their scratch-directory argument; `rerun-isolated.sh` uses another for an existing repository under a host state directory, which it does not create | 3 | 3 |
 | Example URLs quoted from advisory text in retained scanner output | 2 | 2 |
 | An all-caps `REPLACE_...` placeholder in an example config (history only) | 0 | 1 |
 
-**No real secret was found.** Before any swap, each class needs an allowlist, a fingerprint or a fix.
+**Value-blind triage identified no live credential, and it cannot confirm that none exists.** The three
+passphrase rows need an owner to confirm that no retained restic repository still uses their values;
+two of them sit in trading-lane paths. `rerun-isolated.sh` calls its value a fixed disposable test
+string. On the recording host, the state directory that the script names was absent (stat only,
+2026-09-28T04:16Z). The same 25-character value is also in 4 retained round copies of the step script
+that the paper arm generates. The 28-character value is also quoted in 2 receipts of the same recovery
+wave. Neither scanner flags those 6 files. Before any swap, each class needs an allowlist, a fingerprint
+or a fix.
 
 Resources: under the host gitleaks guard's caps (4G high, 6G max, no swap, 600 s), the first betterleaks
 history scan was stopped at 602.7 s with no report. At 542 s it had a 5.3 GiB resident set and 43.1%
@@ -118,7 +159,9 @@ in 72.7 s.
 
 ## 4. The trial job
 
-The job runs these steps in order:
+The job runs its steps with `shell: bash`, which GitHub runs as `bash --noprofile --norc -eo pipefail`,
+so a check that fails inside a pipeline fails its step. An unspecified shell would be `bash -e`,
+without pipefail. The steps run in this order:
 
 1. `step-security/harden-runner`, audit only.
 2. Checkout with `persist-credentials: false` and full history.
@@ -126,7 +169,8 @@ The job runs these steps in order:
 4. betterleaks: `verify-blob` with the identity above, then the signed checksums, then the archive
    digest pin, then extraction.
 5. The three fixture classes, run through a `gitleaks` symlink to the verified binary.
-6. The redacted history and tree scans, which print rule, file and line only.
+6. The redacted history and tree scans, with `--max-archive-depth 0` and `--gitleaks-ignore-path
+   .gitleaksignore`. They print rule, file and line only.
 
 Permissions are `contents: read`. The actions are pinned by SHA. The job uploads no artifact, no step
 receives `GH_TOKEN`, and checkout does not persist credentials. Steps 5 and 6 need a successful install
@@ -135,20 +179,40 @@ step.
 The history-ancestry class of `tests/test_gitleaks_config.py` is left out, because it scans without
 `--redact` and its failure message quotes the findings. The redacted history scan covers that ground.
 
-These checks were run:
+These checks were run on the final files (details in `run-record.json`, `repair_round`):
 
-- **Hardening tests.** The new tests pass (rc 0). Three mutations each fail their test (rc 1): the dir
-  scan without `--redact`, the job named `secret-scan`, and extraction before `verify-blob`. The
-  workflow was restored byte-identical after the mutations.
-- **Local simulation** (`harness/sim_job.py`). The install steps returned 0. The fixture step and both
-  scans returned 1, with 8 fixture failures, 91 history findings and 16 tree findings. So until the
-  triage above is resolved, **the job's first hosted run is expected to be red**.
-- **zizmor 1.30.1** (the `validate.yml` command, offline): rc 0 before and after the change, with
-  "No findings to report" and 42 then 43 suppressed. The added suppressed finding is
-  `anonymous-definition` at the new job, which carries no `name:` so it can never take the required
-  context's name.
+- **Hardening tests.** The 7 new tests pass (rc 0). 17 changes each fail the test that covers them
+  (rc 1), and the files were restored byte-identical (`harness/mutation_controls.py`). The changes are:
+  - the dir scan without `--redact`, and with `--redact=0`;
+  - either scan without one of the two added flags;
+  - the job named `secret-scan`;
+  - an upload-artifact step;
+  - the job's bash default removed, and a step with its own shell;
+  - extraction before `verify-blob`;
+  - the pinned-digest check after extraction;
+  - one certificate flag removed;
+  - the cosign digest check after cosign's first run;
+  - the history class, or the whole test module, added to the fixture run;
+  - a `.betterleaksignore` or `.betterleaks.toml` at the root, or the inline betterleaks allow comment
+    in a tracked file.
+- **Local simulation** (`harness/sim_job.py`, with GitHub's command for `shell: bash`). The install
+  steps returned 0. The fixture step and both scans returned 1: `Ran 25 tests; FAILED (failures=3)`,
+  91 history findings and 16 tree findings. So until the triage above is resolved, **the job's first
+  hosted run is expected to be red**.
+- **zizmor 1.30.1** (the `validate.yml` command, offline): rc 0 with "No findings to report" and 43
+  suppressed findings, one more than before the change. The added one is `anonymous-definition` at the
+  new job, which carries no `name:` so it can never take the required context's name.
 - **actionlint 1.7.12**: rc 0 on all workflows and on `validate.yml`, with shellcheck 0.11.0 on `PATH`.
   A control proved shellcheck was active: rc 1 with SC2086 when it was on `PATH`, rc 0 without it.
+- **Tests, lint and self-scan** (`harness/final_checks.sh`, `harness/scan_changed.sh`; details under
+  `repair_round.final_checks`):
+  - `tests.test_gitleaks_config` passed 28 of 28 with gitleaks 8.30.1. The first run skipped one test
+    while another gitleaks scan held the per-user lock; the rerun after it cleared skipped none.
+  - `tests.test_workflow_hardening` ran 68 tests: OK, 2 skipped as before. The freshness-pin and
+    workflow-security modules passed.
+  - The 17 changes above failed their tests again, zizmor gave the same output, actionlint and
+    shellcheck (also on the harness scripts) printed nothing, and `scripts/validate.py` passed.
+  - Both scanners found nothing in the 25 changed or new files, or in the branch's commit.
 
 ## Deviations and host side effects
 
@@ -161,17 +225,42 @@ These checks were run:
   HTML. It now uses byte offsets, with 0 relocation failures.
 - **The first simulation** ran cosign with the real home directory, which created `~/.sigstore`: 6
   files, the TUF cache. The first betterleaks run created `~/.cache/com.github.wasilibs`: a 2.5 MB
-  wazero compilation cache. Both were enumerated and removed as literal paths. The simulator now keeps
-  `TUF_ROOT`, `HOME` and `XDG_CACHE_HOME` in scratch.
+  wazero compilation cache. Both were enumerated and removed as literal paths. The simulator keeps
+  `TUF_ROOT`, `HOME` and `XDG_CACHE_HOME` in scratch, and since the review round so do
+  `harness/run_scans.sh` and `harness/run_bl_git2.sh`. The review round's runs left both paths absent.
+- **The first-round final checks** (tests, lint, a scan of the new files, and scans of the branch's
+  commits) came from two scripts that stayed in scratch, and their results appeared only in the
+  handoff. They are now in `run-record.json` (`first_round_checks`), and the committed
+  `harness/final_checks.sh` and `harness/scan_changed.sh` replace those scripts.
+- **The recorded triage** printed up to 70 characters left of each match with only 12-character tokens
+  masked. A shorter credential there would have been printed. `harness/triage.py` now prints only the
+  length and character classes of that text. The triage output was never committed. The changed script
+  ran once on the recorded tree report: 16 findings, 0 relocation failures, and every left text printed
+  as a descriptor.
+- **A rule keyword in `run-record.json`.** An intermediate edit named the `sourcegraph-access-token`
+  rule there. gitleaks tests every bare 40-hex value in a fragment that holds one of that rule's
+  keywords, so the post-commit self-scan reported the file's commit ids: 12 findings in dir mode and 3
+  in the branch range, all redacted. betterleaks reported none. The entry was reworded without the
+  keywords, the commits were rebuilt, and the scans were repeated clean. Keep that rule's keywords out
+  of any receipt file that holds commit ids.
 
-A betterleaks pre-commit hook would write that cache on every developer host.
+A betterleaks pre-commit hook would write the wazero cache on every developer host.
 
 ## Open before a swap
 
-- **Triage.** Allowlist, fingerprint or fix the 16 tree findings and 91 history findings, including
-  the three test-arm passphrases.
-- **Tests.** Adapt the tests to a `null` empty report.
-- **The `sourcegraph-access-token` difference.** Decide whether it matters.
+- **Owner confirmation.** An owner must confirm that no retained restic repository uses the three
+  passphrase values, including the 6 unflagged files that hold the same values. Two rows need the
+  trading lane.
+- **Triage.** Allowlist, fingerprint or fix the 16 tree findings and 91 history findings.
+- **The `sourcegraph-access-token` difference.** Decide whether it matters; the three fixture tests
+  d2, d4 and d5 fail on it.
+- **Archives.** The trial passes `--max-archive-depth 0`. Decide whether the swapped gate should open
+  archives, and give the pre-commit hook the same flags as the job.
+- **Suppression channels.** Keep `test_no_suppression_channel_that_only_betterleaks_reads` and the
+  explicit `--gitleaks-ignore-path` through the swap.
+- **Signal.** The trial is red on every run until the triage lands. A baseline report or a trial-only
+  ignore file would make red mean "new finding", but either would accept the untriaged rows first. Plan
+  M3 swaps only when every new hit is triaged.
 - **Memory.** The history scan's 7.9 GiB peak must be measured on a hosted runner.
 - **Unenforced size limit.** `--max-target-megabytes` is not enforced in git mode.
 - **Freshness.** The betterleaks and cosign pins are not in the catalog-freshness table; this change
@@ -183,9 +272,10 @@ A betterleaks pre-commit hook would write that cache on every developer host.
 
 | File | What it is |
 | --- | --- |
-| [`run-record.json`](run-record.json) | Sources, download digests, verification outputs and controls, scans with resources, fixture counts, CI simulation, lint, tests and deviations |
-| [`parity.json`](parity.json) | Rule, file and line of every new finding with its triage class, the per-test fixture outcomes, and the classification |
-| [`harness/`](harness/) | The local scripts that produced these files: scans, fixture collector, value-blind triage, job simulator and `parity.json` generator. They are thin wrappers around the upstream binaries, labelled local integration. |
+| [`run-record.json`](run-record.json) | Sources, download digests, verification outputs and controls, scans with resources, fixture counts, CI simulation, lint, tests, deviations, and the review round's reruns, controls and final checks |
+| [`parity.json`](parity.json) | Rule, file and line of every new finding with its triage class, the per-test fixture outcomes before and after the port, and the classification |
+| [`harness/`](harness/) | Every local script that produced a result recorded here, including the review round's: scans, fixture collectors, value-blind triage, size measurement, controls, job simulator, final checks and the `parity.json` generator. They are thin wrappers around the upstream binaries, labelled local integration. |
 
-Raw reports, logs and tracebacks stay outside the repository. Host paths are written as `<scratch>` and
-`<worktree>`.
+The branch's post-commit range scans are reported with the pull request, because recording them here
+would change the commits they scan. Raw reports, logs and tracebacks stay outside the repository. Host
+paths are written as `<scratch>` and `<worktree>`.

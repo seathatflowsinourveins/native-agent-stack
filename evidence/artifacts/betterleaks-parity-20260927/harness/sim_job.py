@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Local simulation of validate.yml's secret-scan-betterleaks `run:` steps (local integration helper,
 scratch only; not a GitHub Actions run). Steps are cut out with tests/test_workflow_hardening.py's own
-jobs()/step_block() helpers; each run block executes under GitHub's default Linux shell
-(`bash --noprofile --norc -eo pipefail`, docs.github.com: workflow syntax, jobs.<job_id>.steps[*].shell)
-with the step's env, RUNNER_TEMP pointed at a scratch directory and the checkout as cwd. A step whose
+jobs()/step_block() helpers. The job sets `defaults: run: shell: bash`, which GitHub runs as
+`bash --noprofile --norc -eo pipefail {0}` (docs.github.com: workflow syntax, jobs.<job_id>.steps[*].shell;
+an unspecified shell would be `bash -e {0}`, without pipefail), so each run block executes with that
+command, the step's env, RUNNER_TEMP pointed at a scratch directory and the checkout as cwd. A step whose
 `if:` requires steps.install.outcome == 'success' is skipped when the install step failed.
 Prints step names, exit codes and the last output lines (scanner logs are --redact'ed)."""
 import os
@@ -17,6 +18,8 @@ sys.path.insert(0, str(root))
 from tests.test_workflow_hardening import jobs, step_block  # noqa: E402
 
 job = jobs((root / ".github/workflows/validate.yml").read_text(encoding="utf-8"))["secret-scan-betterleaks"]
+# The command below is GitHub's for an explicit bash; refuse to simulate a job that no longer sets it.
+assert re.search(r"(?m)^    defaults:\n      run:\n(?:        #.*\n)*        shell: bash[ \t]*$", job), "job shell"
 names = re.findall(r"(?m)^      - name: (.+)$", job)
 outcome = {}
 for name in names:

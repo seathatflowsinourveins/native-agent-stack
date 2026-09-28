@@ -65,6 +65,16 @@ class _LockBusy(Exception):
     pass
 
 
+def _findings(report_text: str) -> list:
+    """The findings in a JSON report. gitleaks 8.30.1 writes an empty report as `[]` (its detector
+    starts from make([]report.Finding, 0), detect/detect.go line 127); betterleaks 1.8.1 writes `null`
+    (cmd/git.go line 74 and cmd/directory.go line 72 start from a nil slice, which report/json.go
+    encodes as is). Both mean no findings, so the betterleaks trial job
+    (evidence/artifacts/betterleaks-parity-20260927/) fails only on detection differences."""
+    findings = json.loads(report_text)
+    return [] if findings is None else findings
+
+
 def _run_gitleaks(target_dir: Path) -> list:
     """Run `gitleaks dir .` (cwd = target_dir) with the real repo config.
 
@@ -89,7 +99,7 @@ def _run_gitleaks(target_dir: Path) -> list:
         raise AssertionError(f"gitleaks failed unexpectedly: {proc.returncode} {proc.stderr}")
     if not report_path.exists():
         return []
-    return json.loads(report_path.read_text())
+    return _findings(report_path.read_text())
 
 
 @unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
@@ -509,7 +519,7 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             )
             if "lock" in proc.stderr.lower():
                 self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-            findings = json.loads(report_path.read_text()) if report_path.exists() else []
+            findings = _findings(report_path.read_text()) if report_path.exists() else []
             self.assertTrue(findings, "fixture must contain a detected leak for this test to be meaningful")
             self.assertEqual(
                 proc.returncode, 0,
@@ -754,7 +764,7 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         )
         if "lock" in proc.stderr.lower():
             self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-        findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+        findings = _findings(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
         matches = [
             f for f in findings
             if injected_marker in (f.get("Match") or "") or injected_marker in (f.get("Secret") or "")
@@ -807,7 +817,7 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
             )
             if "lock" in proc.stderr.lower():
                 self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-            findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+            findings = _findings(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
             self.assertEqual(
                 findings, [],
                 "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "

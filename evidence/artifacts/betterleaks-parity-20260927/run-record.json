@@ -6,7 +6,7 @@
  "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
  "host_id": "nativestack-5975wx-20260925",
  "platform_id": "linux-wsl2-x86_64",
- "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T03:18:00Z"},
+ "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T04:38:27Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc"},
  "evidence_classes": {
   "upstream-unchanged": [
    "cosign v3.0.6 verify-blob of betterleaks v1.8.1 checksums.txt against its Sigstore bundle, and six failing controls",
@@ -16,10 +16,14 @@
    "zizmor 1.30.1 (offline) and actionlint 1.7.12 with shellcheck 0.11.0 on the changed workflow"
   ],
   "our-integration": [
-   "parity scans of both unchanged binaries over this repository (git mode, dir mode) and the unchanged tests/test_gitleaks_config.py fixture classes",
+   "parity scans of both unchanged binaries over this repository (git mode, dir mode) and the tests/test_gitleaks_config.py fixture classes, unchanged at the base commit and after the null-report port",
    "value-blind triage of the redacted reports (parity.json)",
    "local simulation of the new job's run steps (harness/sim_job.py); not a GitHub Actions run",
-   "tests/test_workflow_hardening.py BetterleaksTrialJobTests, with three failing controls"
+   "tests/test_workflow_hardening.py BetterleaksTrialJobTests, with three failing controls in the first round and seventeen in the repair round",
+   "repair round: the job's final argument vectors over the recorded commit set and the worktree, the fingerprint-suppression and .git controls, and the explorer line-size measurement (repair_round)"
+  ],
+  "independent-observation": [
+   "the repository's active ruleset, read back with gh api (repair_round.live_ruleset_readback); a configuration read, not a CI run"
   ],
   "live-run-pending": [
    "the secret-scan-betterleaks job on a GitHub-hosted runner (memory, time, live logs, and dir mode against a full .git directory: both default configs skip a path matching (?:^|/)\\.git$, line 49 of config/betterleaks.toml and of config/gitleaks.toml, but the local worktree's .git is a file, so only the hosted run shows it)",
@@ -35,19 +39,27 @@
    "release_immutable": true,
    "files_consulted_at_tag": ["README.md", "docs/scanning.md", "cmd/root.go", "cmd/git.go", "cmd/directory.go", "cmd/detect.go",
                               "config/config.go", "config/translate_filters.go", "config/betterleaks.toml", ".goreleaser.yml",
-                              ".github/workflows/release.yml", "internal/confidence/confidence.go", "go.mod"]
+                              ".github/workflows/release.yml", "internal/confidence/confidence.go", "go.mod",
+                              "report/json.go", "detect/detect.go", "detect/deprecated.go"]
   },
+  "github_actions_docs": {"url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax", "read_at": "2026-09-28T03:54:24Z",
+                          "shell_table": "unspecified: bash -e {0}; bash: bash --noprofile --norc -eo pipefail {0}",
+                          "quote": "When shell: bash is specified, -o pipefail is also applied to enforce early exit from pipelines that generate a non-zero exit status."},
   "gitleaks": {
    "repository": "https://github.com/gitleaks/gitleaks",
    "tag": "v8.30.1",
+   "tag_commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+   "tag_commit_check": "git ls-remote at 2026-09-28T03:50:59Z; the source archive consulted reports the same commit (git get-tar-commit-id), as the betterleaks source archive reports its tag commit",
    "release_published": "2026-03-21T02:17:58Z",
    "release_immutable": false,
-   "files_consulted_at_tag": ["detect/detect.go", "detect/files.go", "cmd/detect.go", "cmd/directory.go", "config/gitleaks.toml"],
+   "files_consulted_at_tag": ["detect/detect.go", "detect/files.go", "cmd/detect.go", "cmd/directory.go", "config/gitleaks.toml",
+                              "cmd/root.go", "cmd/git.go", "sources/git.go", "report/json.go"],
    "readme_on_master": {"read_at": "2026-09-28T03:04:13Z", "branch_head": "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b", "line": 12,
                         "quote": "Gitleaks is feature complete. I'm not merging new features into Gitleaks. Future releases will be security patches only. I'm shifting my focus to [Betterleaks](https://github.com/betterleaks/betterleaks)",
                         "note": "the README at the v8.30.1 tag has no such line; the notice is on master"}
   },
-  "cosign": {"repository": "https://github.com/sigstore/cosign", "tag": "v3.0.6", "git_commit": "f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f"},
+  "cosign": {"repository": "https://github.com/sigstore/cosign", "tag": "v3.0.6", "git_commit": "f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f",
+             "release_immutable": false, "release_immutable_read_at": "2026-09-28T03:50:59Z (gh api repos/sigstore/cosign/releases/tags/v3.0.6)"},
   "cosign_installer": {"repository": "https://github.com/sigstore/cosign-installer", "tag": "v4.1.2",
                        "commit": "6f9f17788090df1f26f669e9d70d6ae9567deba6", "file": "action.yml",
                        "bootstrap_version": "v3.0.6", "bootstrap_digest_line": 108}
@@ -190,7 +202,8 @@
   "workflow_restored_byte_identical_after_controls": true
  },
  "tests_on_changed_tree": {
-  "window": "2026-09-28T03:07:32Z to 2026-09-28T03:08:58Z, on the final bytes of validate.yml and tests/test_workflow_hardening.py, before commit",
+  "window": "2026-09-28T03:07:32Z to 2026-09-28T03:08:58Z, on the first round's final bytes of validate.yml and tests/test_workflow_hardening.py, before commit",
+  "produced_by": "the first-round form of harness/final_checks.sh, which stayed in scratch then (its cache path matched scripts/validate.py's personal-home-path pattern); superseded by repair_round.final_checks",
   "gitleaks_on_path": "the host's ecosystem gitleaks launcher, reporting 8.30.1",
   "python3 -m unittest tests.test_gitleaks_config": {"rc": 0, "result": "Ran 28 tests in 84.117s; OK"},
   "python3 -m unittest tests.test_workflow_hardening": {"rc": 0, "result": "Ran 66 tests in 0.780s; OK (skipped=2)"},
@@ -200,6 +213,188 @@
   "zizmor 1.30.1 (validate.yml command, offline)": {"rc": 0, "result": "No findings to report. Good job! (43 suppressed)"},
   "actionlint 1.7.12 with shellcheck 0.11.0": {"all_workflows_rc": 0, "validate_yml_rc": 0, "output_lines": 0},
   "earlier_run": "2026-09-28T02:47:26Z: the same five modules passed with the same counts before the new job's header comment was corrected (it now names the gitleaks README on master and the recorded resource figures)"
+ },
+ "first_round_checks": {
+  "note": "results the first round reported only in its handoff, from scripts that stayed in scratch; quoted from their retained logs",
+  "changed_file_self_scan": {"log_written": "2026-09-28T03:20:55Z",
+   "targets": ["evidence/artifacts/betterleaks-parity-20260927", ".github/workflows/validate.yml", "tests/test_workflow_hardening.py"],
+   "gitleaks_8_30_1": "rc 0, findings 0 on each target", "betterleaks_1_8_1": "rc 0, findings 0 on each target"},
+  "branch_range_scans": {"reports_written": "2026-09-28T03:21:35Z",
+   "gitleaks_8_30_1": "2 commits scanned; scanned ~93946 bytes (93.95 KB) in 183ms; no leaks found; report of 0 findings",
+   "betterleaks_1_8_1": "scanned ~93946 bytes (93.95 KB) in 119ms; no leaks found; report of 0 findings",
+   "argv": "--log-opts=ba1700ad..HEAD according to the first round's handoff; the argument vector itself was not logged"},
+  "generated_reports": {"at": "2026-09-28T03:21:03Z",
+   "scripts/component_matrix.py --write": {"flip_rule_violations": 0, "rows": 32, "status": "written"},
+   "scripts/new_host_grand_list.py --write": {"status": "written", "layers": 32, "winners": 66}},
+  "scripts/validate.py": {"log_written": "2026-09-28T03:21:19Z", "output": {"components": 69, "hashed_files": 7385, "profiles": 4, "receipts": 159, "status": "passed"}},
+  "post_commit_tests": {"log_written": "2026-09-28T03:22:56Z",
+   "python3 -m unittest tests.test_gitleaks_config": "Ran 28 tests in 80.657s; OK",
+   "python3 -m unittest tests.test_workflow_hardening": "Ran 66 tests in 0.716s; OK (skipped=2)"}
+ },
+ "repair_round": {
+  "window_utc": {"start": "2026-09-28T03:50:59Z", "last_recorded_run": "2026-09-28T04:38:27Z"},
+  "trigger": "one review round (18 findings) of the first-round branch",
+  "changes": [
+   "validate.yml secret-scan-betterleaks: defaults.run.shell bash; --max-archive-depth 0 and --gitleaks-ignore-path .gitleaksignore on both scans; header and step comments",
+   "tests/test_gitleaks_config.py: _findings reads a JSON report of null as no findings at the four report parses; gitleaks writes [] and is unaffected",
+   "tests/test_workflow_hardening.py BetterleaksTrialJobTests: 7 tests, adding the bash default, the pinned-digest and certificate-flag order, the exact fixture classes, both added flags, --redact without a lower value, and no betterleaks-only suppression channel",
+   "receipt: conditional real-secret status, corrected passphrase descriptions, measured explorer line sizes, the fifth flag difference, the qualified fingerprint claim, and every script that produced a recorded result",
+   "harness: HOME and XDG_CACHE_HOME isolation in run_scans.sh and run_bl_git2.sh; triage.py prints only a descriptor of the text left of a match"
+  ],
+  "flag_differences": {
+   "sources": "betterleaks at the v1.8.1 tag commit 5eab4833; gitleaks at the v8.30.1 tag commit 83d9cd68 (source reads, upstream-unchanged)",
+   "accepted_unchanged": "git, dir, --config, --max-target-megabytes, --log-opts, --redact, --no-banner, --report-format json, --report-path",
+   "differences": [
+    {"item": "--max-target-megabytes", "betterleaks": "file sources only (cmd/directory.go lines 42 and 66; cmd/git.go sets no size limit)", "gitleaks": "also every fragment (detect/detect.go lines 431-438)", "job": "passes 2, as the secret-scan job does; history blobs over 2 MB are read by betterleaks only"},
+    {"item": "empty JSON report", "betterleaks": "null (cmd/git.go line 74, cmd/directory.go line 72 start from a nil slice; report/json.go)", "gitleaks": "[] (detect/detect.go line 127)", "job": "tests/test_gitleaks_config.py reads null as no findings (_findings)"},
+    {"item": "the access-token rule behind fixture tests d2, d4 and d5 (rule id in README section 2 and parity.json; not named here because its keyword would make gitleaks test every bare 40-hex commit id in this file)", "betterleaks": "requires the token prefix (config/betterleaks.toml lines 8784-8786)", "gitleaks": "any bare 40-hex value in a fragment that holds one of its two keywords (config/gitleaks.toml lines 3051-3058)", "job": "unchanged; fixture tests d2, d4 and d5 fail on it"},
+    {"item": "--max-archive-depth default", "betterleaks": "8 (cmd/root.go line 103)", "gitleaks": "0, 'no archive traversal is done' (cmd/root.go line 92)", "job": "passes --max-archive-depth 0 on both scans (like-for-like; no unpacking of pull-request archives)",
+     "measured": "the job-argv runs G1 and T1 (depth 0) returned the same findings as the recorded runs (default depth 8), so no recorded finding is an archive member (job_argv_and_fingerprint_controls.comparison)"},
+    {"item": "--validation", "betterleaks": "off by default (cmd/root.go line 112); when on, it sends candidates to provider endpoints", "gitleaks": "no such flag (no validation flag under cmd/ at v8.30.1)", "job": "never passes it; test_later_steps_need_the_verified_install_and_both_scans_redact asserts that the job does not contain it"}
+   ]
+  },
+  "live_ruleset_readback": {
+   "at": "2026-09-28T03:50:59Z", "tool": "gh api (gh --version in the same round: 2.101.0)", "evidence_class": "independent observation (platform record); not a CI run",
+   "argv": ["gh api repos/<owner>/<repo>/rulesets", "gh api repos/<owner>/<repo>/rules/branches/main"],
+   "rulesets": [{"name": "Native foundation required checks", "target": "branch", "enforcement": "active", "source_type": "Repository"},
+                {"name": "Native foundation tag creation", "target": "tag", "enforcement": "active", "source_type": "Repository"},
+                {"name": "Native foundation tag protection", "target": "tag", "enforcement": "active", "source_type": "Repository"}],
+   "required_status_checks_on_main": {"ruleset": "Native foundation required checks", "enforcement": "active", "strict": false,
+    "contexts": ["validate", "token-report", "secret-scan", "dependency-review", "osv-scanner", "verdict-review-gate", "validate-macos", "sota-sources"]},
+   "same_context_set_as_committed_copy": true,
+   "secret-scan-betterleaks_required": false
+  },
+  "explorer_line_sizes": {
+   "at": "2026-09-28T04:00:30Z", "script": "harness/measure_explorer_lines.py", "input": "the recorded git-mode report (attempt 2)",
+   "output": {"file": "docs/ecosystem/index.html", "findings": 73, "distinct_commits": 73, "distinct_lines": 73,
+              "line_bytes": {"min": 6106817, "max": 13080697}, "blob_bytes": {"min": 6187636, "max": 13183892},
+              "newlines_per_blob": {"min": 546, "max": 752}, "findings_on_lines_of_at_least_3000000_bytes": 73},
+   "gitleaks_skip_rule": "gitleaks 8.30.1 skips a fragment when len(raw) / 1_000_000 exceeds --max-target-megabytes (detect/detect.go lines 431-438); a git-mode fragment is the added lines of one hunk (sources/git.go lines 394-402), so a finding's line length is a lower bound on its fragment"
+  },
+  "triage_history_rerun": {"at": "2026-09-28T04:13:43Z", "script": "harness/triage_history.py (unchanged)", "rows": 19, "relocation_failures": 0,
+   "explorer_aggregate": "generic-api-key, 73 findings, key text api_sha256, value class hex64"},
+  "job_argv_and_fingerprint_controls": {
+   "scripts": ["harness/prepare_ignore_controls.py", "harness/run_repair_scans.sh <worktree> ecosystem-bounded-run ba1700adc6557b03d3c9336c4d3a951791fc8de5", "harness/compare_repair.py"],
+   "containment": "ecosystem-bounded-run, 28G memory.high, 32G memory.max, no swap, 3600 s; HOME and XDG_CACHE_HOME in scratch",
+   "common_flags": "--config .gitleaks.toml --max-target-megabytes 2 --max-archive-depth 0 --gitleaks-ignore-path <path> --redact --no-banner --report-format json --report-path <scratch>",
+   "chosen_fingerprints": {"git": ["generic-password", "observability/backends/configure.py", 43], "dir": ["generic-password", "observability/backends/configure.py", 144],
+                           "note": "a false_positive row; every recorded fingerprint names exactly one finding (91 of 91 in git mode, 16 of 16 in dir mode)"},
+   "runs": [
+    {"label": "G1-job-argv", "source": "git . --log-opts=<base commit>", "ignore_path": ".gitleaksignore", "start": "2026-09-28T04:06:24Z", "elapsed_s": 62.8, "rc": 1, "findings": 91, "log": "scanned ~1156384789 bytes (1.16 GB) in 1m2.5s; leaks found: 91"},
+    {"label": "G2-one-fingerprint", "source": "git . --log-opts=<base commit>", "ignore_path": "<scratch>/repair/ignore-git.txt", "start": "2026-09-28T04:07:26Z", "elapsed_s": 58.0, "rc": 1, "findings": 90, "log": "scanned ~1156384789 bytes (1.16 GB) in 57.8s; leaks found: 90"},
+    {"label": "G3-empty-dir", "source": "git . --log-opts=<base commit>", "ignore_path": "<scratch>/repair/empty", "start": "2026-09-28T04:08:24Z", "elapsed_s": 52.0, "rc": 1, "findings": 91, "log": "scanned ~1156384789 bytes (1.16 GB) in 51.7s; leaks found: 91"},
+    {"label": "T1-job-argv", "source": "dir .", "ignore_path": ".gitleaksignore", "start": "2026-09-28T04:09:16Z", "elapsed_s": 0.9, "rc": 1, "findings": 16, "log": "scanned ~138844544 bytes (138.84 MB) in 805ms; leaks found: 16"},
+    {"label": "T2-one-fingerprint", "source": "dir .", "ignore_path": "<scratch>/repair/ignore-dir.txt", "start": "2026-09-28T04:09:17Z", "elapsed_s": 0.9, "rc": 1, "findings": 15, "log": "scanned ~138844544 bytes (138.84 MB) in 805ms; leaks found: 15"},
+    {"label": "T3-empty-dir", "source": "dir .", "ignore_path": "<scratch>/repair/empty", "start": "2026-09-28T04:09:18Z", "elapsed_s": 0.9, "rc": 1, "findings": 16, "log": "scanned ~138844544 bytes (138.84 MB) in 785ms; leaks found: 16"}
+   ],
+   "comparison": {
+    "git": {"recorded": 91, "job_argv": 91, "one_fingerprint": 90, "empty_dir": 91, "job_argv_same_findings_as_recorded": true,
+            "one_fingerprint_equals_job_argv_minus_that_fingerprint": true, "findings_named_by_the_fingerprint": 1,
+            "empty_dir_same_findings_as_job_argv": true, "secret_fields_redacted": true},
+    "dir": {"recorded": 16, "job_argv": 16, "one_fingerprint": 15, "empty_dir": 16, "job_argv_same_findings_as_recorded": true,
+            "one_fingerprint_equals_job_argv_minus_that_fingerprint": true, "findings_named_by_the_fingerprint": 1,
+            "empty_dir_same_findings_as_job_argv": true, "secret_fields_redacted": true},
+    "keys": "rule, file, start and end line, start and end column, and in git mode the commit"
+   },
+   "note": "betterleaks also reads the scanned directory's own ignore file (cmd/root.go lines 465-469), so the repository's .gitleaksignore was loaded in every run. T1 to T3 scanned the worktree with the review-round edits in place (138,844,544 bytes, against 138,080,098 at the base); the changed files carry no finding (final_checks.self_scan). Each T run logged the same two files skipped as too large as the recorded dir runs (evidence/artifacts/landscape-sweep-20260926/returns.json and one gap-wave2 candidate-ledger.json)."
+  },
+  "git_dir_skip_control": {
+   "at": "2026-09-28T04:11:43Z", "script": "harness/git_dir_skip_control.sh <worktree>",
+   "planted": "one synthetic GitHub-token-shaped line, generated at run time and never printed, in .git/planted.txt and planted/planted.txt of a scratch `git init` directory",
+   "gitleaks_8_30_1": {"rc": 1, "findings": [["github-pat", "planted/planted.txt", 1]]},
+   "betterleaks_1_8_1": {"rc": 1, "findings": [["github-pat", "planted/planted.txt", 1]]},
+   "secret_fields": "REDACTED in both reports", "control_directory_removed": true
+  },
+  "fixtures_ported": {
+   "at": "2026-09-28T04:09:45Z", "script": "harness/run_fixtures_ported.sh <worktree>", "elapsed_s": 16,
+   "gitleaks_8_30_1": {"tests_run": 25, "ok": 25, "FAIL": 0, "ERROR": 0, "skipped": 0, "collector_rc": 0},
+   "betterleaks_1_8_1": {"tests_run": 25, "ok": 22, "FAIL": 3, "ERROR": 0, "skipped": 0, "collector_rc": 0},
+   "per_test": "parity.json, fixtures_ported"
+  },
+  "local_simulation": {
+   "at": "2026-09-28T04:10:13Z", "elapsed_s": 62, "simulator_rc": 0, "script": "harness/sim_job.py <worktree> <scratch>/repair/ci-sim",
+   "shell": "bash --noprofile --norc -eo pipefail, GitHub's command for the job's defaults.run.shell: bash",
+   "steps": {
+    "Harden the runner (audit-only network egress)": "uses-step, not simulated",
+    "Check out repository with full history": "uses-step, not simulated",
+    "Install cosign pinned by digest": 0,
+    "Install betterleaks after Sigstore and checksum verification": 0,
+    "Run the gitleaks allowlist fixture tests with betterleaks": 1,
+    "Scan git history for secrets with betterleaks": 1,
+    "Scan working tree for secrets with betterleaks": 1},
+   "install_output_tail": {"stdout": ["betterleaks_1.8.1_linux_x64.tar.gz: OK", "betterleaks_1.8.1_linux_x64.tar.gz: OK", "1.8.1"], "stderr": ["Verified OK"],
+                           "note": "the simulator prints a step's stdout before its stderr, so this is not the execution order; the step checks the signed checksums.txt and then the pinned digest"},
+   "cosign_version_tail": ["GitCommit: f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f", "GitTreeState: clean", "BuildDate: 2026-04-06T21:39:58Z", "GoVersion: go1.25.7", "Platform: linux/amd64"],
+   "fixture_summary": "Ran 25 tests in 5.211s; FAILED (failures=3)",
+   "history": "scanned ~1156478735 bytes (1.16 GB) in 53.1s; leaks found: 91",
+   "tree": "scanned ~138845647 bytes (138.85 MB) in 887ms; leaks found: 16",
+   "real_home_after": "no ~/.sigstore and no wazero cache under ~/.cache"
+  },
+  "passphrase_rows": {
+   "method": "value-blind: each value was located by re-applying the rule's regex and masked in every read; occurrences were counted by exact match over tracked files; host checks were stat only",
+   "test_arms": "paper_arm.sh:32 and dagu_arm.sh:24 export one 25-character value (lowercase words, digits and hyphens) as RESTIC_PASSWORD, with HOME and DAGU_HOME under the scratch-directory argument R; both run restic init at $R/restic-repo, and paper_arm.sh also at $R/restic-hot",
+   "rerun_isolated": "rerun-isolated.sh:9 exports a 28-character value (lowercase words, an 8-digit run and hyphens) commented as a fixed disposable test string; line 6 points S at a state directory under the user's home; lines 14-16 list the snapshots of, check and restore the existing repository at $S/repo; the script has no restic init",
+   "host_state_check": {"at": "2026-09-28T04:16:07Z", "method": "stat only",
+                        "state directory named on line 6, its repo subdirectory and the wave's state root": "absent",
+                        "gap-resolution-restic directories on the Windows drive": 0},
+   "other_tracked_occurrences": {
+    "25-character value": "4 files: evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5..8/cfg/hot_step.sh",
+    "28-character value": "2 files: evidence/artifacts/gap-resolution-20260922/recovery-portability/local-ai-memory-qdrant-rebind.json (line 161) and restic-filesystem-semantics.json (line 141), whose limitations call it a fixed test string, acceptable for a disposable scratch repo",
+    "flagged_by_either_scanner": 0},
+   "status": "owner confirmation pending; two rows are trading-lane paths"
+  },
+  "hardening_test_controls": {
+   "at": "2026-09-28T04:06:09Z", "script": "harness/mutation_controls.py <worktree>",
+   "controls": [
+    {"control": "--redact removed from the dir scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "--redact=0 on the dir scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "--max-archive-depth 0 removed from the history scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "--gitleaks-ignore-path removed from the dir scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "job given name: secret-scan", "test": "test_is_not_a_required_context_and_cannot_be_forced_green", "rc": 1},
+    {"control": "an upload-artifact step added", "test": "test_read_only_hardened_and_uploads_nothing", "rc": 1},
+    {"control": "the job's bash default removed", "test": "test_runs_bash_with_pipefail", "rc": 1},
+    {"control": "a step overriding the shell", "test": "test_runs_bash_with_pipefail", "rc": 1},
+    {"control": "tar -xzf moved before cosign verify-blob", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "the pinned BETTERLEAKS_SHA256 check moved after extraction", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "--certificate-github-workflow-sha removed", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "the cosign digest check moved after cosign's first run", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "the history-ancestry class added to the fixture run", "test": "test_fixture_tests_leave_out_the_unredacted_history_class", "rc": 1},
+    {"control": "the whole module added to the fixture run", "test": "test_fixture_tests_leave_out_the_unredacted_history_class", "rc": 1},
+    {"control": ".betterleaksignore created at the root", "test": "test_no_suppression_channel_that_only_betterleaks_reads", "rc": 1},
+    {"control": ".betterleaks.toml created at the root", "test": "test_no_suppression_channel_that_only_betterleaks_reads", "rc": 1},
+    {"control": "the inline betterleaks allow comment appended to a tracked file", "test": "test_no_suppression_channel_that_only_betterleaks_reads", "rc": 1}
+   ],
+   "each_failed_only_its_test": true, "files_restored_byte_identical": true, "green_rc": 0, "green_summary": "Ran 7 tests; OK"
+  },
+  "final_checks": {
+   "window": "2026-09-28T04:27:01Z to 2026-09-28T04:28:46Z, on the review round's final bytes of validate.yml, both test modules and the harness, before commit; this file's final_checks and window fields were written afterwards",
+   "script": "harness/final_checks.sh <worktree> <scratch>/lint, run from a byte-identical scratch copy beside the verified binaries (betterleaks sha256 380a770d..., gitleaks sha256 88f91962..., re-read before the run)",
+   "gitleaks_on_path": "the host's ecosystem gitleaks launcher, reporting 8.30.1",
+   "python3 -m unittest tests.test_gitleaks_config": {"rc": 0, "result": "Ran 28 tests in 80.671s; OK (skipped=1)",
+    "skip": "the plain output names no reason. A verbose run at 2026-09-28T04:29:02Z skipped 22 tests with 'gitleaks per-user lock held by another scan' while a gitleaks history scan that this run did not start was running",
+    "rerun_after_the_lock_cleared": {"window": "2026-09-28T04:29:41Z to 2026-09-28T04:31:03Z", "rc": 0, "result": "Ran 28 tests in 81.645s; OK", "skipped": 0}},
+   "python3 -m unittest tests.test_workflow_hardening": {"rc": 0, "result": "Ran 68 tests in 1.091s; OK (skipped=2)"},
+   "python3 -m unittest tests.test_catalog_freshness_pins": {"rc": 0, "result": "Ran 6 tests in 0.001s; OK"},
+   "python3 -m unittest tests.test_workflow_security": {"rc": 0, "result": "Ran 2 tests in 0.158s; OK"},
+   "python3 -m unittest tests.test_workflow_security_coverage": {"rc": 0, "result": "Ran 7 tests in 0.437s; OK"},
+   "harness/mutation_controls.py": {"rc": 0, "controls": 17, "all_failed_their_test": true, "files_restored_byte_identical": true, "green_rc": 0, "green_summary": "Ran 7 tests in 0.209s; OK",
+    "note": "the same 17 controls and tests as hardening_test_controls above"},
+   "zizmor 1.30.1 (validate.yml command, offline)": {"rc": 0, "result": "No findings to report. Good job! (43 suppressed)", "note": "the same output line as the first round's final checks"},
+   "actionlint 1.7.12 with shellcheck 0.11.0": {"all_workflows_rc": 0, "validate_yml_rc": 0, "output_lines": 0},
+   "shellcheck 0.11.0 on harness/*.sh": {"rc": 0, "output_lines": 0},
+   "scripts/validate.py": {"rc": 0, "output": {"components": 69, "hashed_files": 7394, "profiles": 4, "receipts": 159, "status": "passed"}},
+   "self_scan": {"at": "2026-09-28T04:29:31Z", "script": "harness/scan_changed.sh <worktree> ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+    "changed_or_new_files": 25, "branch_commits": 1,
+    "gitleaks_8_30_1": {"dir_changed_files": {"rc": 0, "findings": 0}, "git_base_to_HEAD": {"rc": 0, "findings": 0}},
+    "betterleaks_1_8_1": {"dir_changed_files": {"rc": 0, "findings": 0}, "git_base_to_HEAD": {"rc": 0, "findings": 0}},
+    "note": "HEAD was the first-round commit at the time, so the git-mode range covered that commit and the dir-mode copy covered the uncommitted review-round bytes; the range scans after the review-round commits are reported with the pull request"},
+   "real_home_after": {"at": "2026-09-28T04:29:38Z", "~/.sigstore": "absent", "~/.cache/com.github.wasilibs": "absent"}
+  },
+  "deviations": [
+   "harness/run_scans.sh and harness/run_bl_git2.sh gained HOME and XDG_CACHE_HOME isolation after they produced the recorded first-round scans, so the committed bytes differ from the scripts that ran; their argument vectors and caps are unchanged. The repair round's scans used the same isolation.",
+   "harness/triage.py now prints a descriptor of the text left of a match instead of that text with 12-character tokens masked; the first-round triage ran the earlier form, and its output was never committed. The changed script ran once at 2026-09-28T04:26:46Z on the recorded dir report: rc 0, 16 findings, 0 relocation failures, 16 left texts printed as descriptors.",
+   "An intermediate edit of this file named the access-token rule of fixture tests d2, d4 and d5 by its id. At 2026-09-28T04:38:27Z the post-commit harness/scan_changed.sh run then had gitleaks 8.30.1 report that rule on this file's bare 40-hex commit ids (12 findings in dir mode, 3 in the git range; every Secret field REDACTED; betterleaks 0), because gitleaks tests every 40-hex value in a fragment that holds one of the rule's keywords. The entry was reworded without the keywords and the commits were rebuilt before the final scans."
+  ]
  },
  "deviations": [
   "GitHub's attestations for the cosign v3.0.6 binary digest were not queried before its first execution (an earlier lookup used a digest that is not this binary's); the checks ran at 2026-09-28T03:18:00Z and found none, so the pre-execution trust anchor stays the three-source digest match.",

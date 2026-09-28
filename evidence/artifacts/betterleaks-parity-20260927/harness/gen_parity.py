@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Build evidence/artifacts/betterleaks-parity-20260927/parity.json from the scratch reports and logs
 (local helper). Copies rule/file/line rows and counts from the --redact'ed reports; adds the value-blind
-triage classes recorded in this run. Writes no value, commit, fingerprint, author or hex digest."""
+triage classes recorded in this run, the explorer line sizes (measure_explorer_lines.py) and the fixture
+outcomes after the null-report port (run_fixtures_ported.sh). Writes no value, commit, fingerprint,
+author or hex digest."""
 import collections
 import json
 import re
@@ -14,7 +16,11 @@ git_rep = json.loads((D / "reports/betterleaks-git-attempt2.json").read_text())
 fx_diff = json.loads((D / "logs/fixtures-diff.json").read_text())
 fx_gl = json.loads((D / "logs/fixtures-gl-fixture-classes.json").read_text())
 fx_bl = json.loads((D / "logs/fixtures-bl-fixture-classes.json").read_text())
+ported = {tool: json.loads((D / f"repair/fixtures-{tool}-ported.json").read_text()) for tool in ("gl", "bl")}
+explorer = json.loads((D / "repair/explorer-lines.json").read_text())
 assert all(f["Secret"] == "REDACTED" for f in dir_rep + git_rep)
+ARMS = "blueprints/gap-wave2-20260923/us-equities__observability-hosting/"
+RERUN = "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh"
 
 CLASS = {  # file -> (category, value-blind description); from the triage recorded in README.md
     "tests/test_codex_lane.py#generic-password": ("false_positive", "/etc/passwd inside test command strings; the matched value is a prose JSON string"),
@@ -24,12 +30,19 @@ CLASS = {  # file -> (category, value-blind description); from the triage record
     "observability/backends/configure.py": ("false_positive", "code expression between the quotes (a secrets.token_hex call), not a literal"),
     "blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/auth_none_with_basic_block.sh":
         ("false_positive", "printf template (%s), not a literal password"),
-    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh":
-        ("local_test_passphrase", "readable 25-character passphrase of a test arm's scratch restic repository; same value in dagu_arm.sh"),
-    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh":
-        ("local_test_passphrase", "readable 25-character passphrase of a test arm's scratch restic repository; same value in paper_arm.sh"),
-    "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh":
-        ("local_test_passphrase", "readable, dated 28-character passphrase of the isolated rerun's scratch restic repository"),
+    ARMS + "paper_arm.sh":
+        ("local_test_passphrase", "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports "
+                                  "for the restic repositories it initialises under its scratch-directory argument; the same "
+                                  "value is in dagu_arm.sh; owner confirmation pending (trading lane)"),
+    ARMS + "dagu_arm.sh":
+        ("local_test_passphrase", "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports "
+                                  "for the restic repository it initialises under its scratch-directory argument; the same "
+                                  "value is in paper_arm.sh; owner confirmation pending (trading lane)"),
+    RERUN:
+        ("local_test_passphrase", "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing "
+                                  "restic repository under a host state directory; the script lists, checks and restores "
+                                  "that repository and does not create it; its comment calls the value a fixed disposable "
+                                  "test string; owner confirmation pending"),
     "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json": ("false_positive", "four-word prose phrase in a catalog note about CLI login"),
     "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/osv-positive.json":
         ("example", "the advisory text's own username:password example URL in retained scanner output"),
@@ -37,9 +50,12 @@ CLASS = {  # file -> (category, value-blind description); from the triage record
         ("example", "the advisory text's own username:password example URL in retained scanner output"),
     "blueprints/us-equities/hosting/config.yaml.example": ("placeholder", "all-caps REPLACE_... placeholder in an example config; history only"),
     "docs/ecosystem/index.html": ("digest", "64-hex content digests under a *_sha256 field of the catalog data embedded in the "
-                                            "generated explorer HTML; history only (the file is no longer committed); each "
-                                            "fragment is a 6-13 MB single line that gitleaks skips under --max-target-megabytes 2"),
+                                            "generated explorer HTML; history only (the file is no longer committed). Each finding "
+                                            f"sits on a line of {explorer['line_bytes']['min']:,} to {explorer['line_bytes']['max']:,} "
+                                            "bytes (measure_explorer_lines.py), and gitleaks 8.30.1 skips a git-mode fragment of "
+                                            "3,000,000 bytes or more at --max-target-megabytes 2"),
 }
+assert explorer["findings_on_lines_of_at_least_3000000_bytes"] == explorer["findings"]
 
 
 def klass(rule, path):
@@ -67,6 +83,10 @@ cat = collections.Counter(r[3] for r in dir_rows)
 gcat = collections.Counter()
 for r in git_rows:
     gcat[r[5]] += r[3]
+pending = [r[:3] for r in dir_rows if r[3] == "local_test_passphrase"]
+assert sorted(p[1] for p in pending) == sorted([ARMS + "dagu_arm.sh", ARMS + "paper_arm.sh", RERUN]), pending
+unported = {r["id"]: r["outcome"] for r in fx_bl["rows"]}
+ported_rows = {tool: {r["id"]: r["outcome"] for r in doc["rows"]} for tool, doc in ported.items()}
 doc = {
     "schema_version": 1,
     "kind": "secret_scanner_parity",
@@ -99,12 +119,21 @@ doc = {
                 "at 600 s with no result (run-record.json, scans).",
     },
     "fixtures": {
-        "driver": "unchanged tests/test_gitleaks_config.py classes GitleaksPresenceTests, GitleaksConfigContextRestrictionTests "
-                  "and GitleaksIgnoreFingerprintTests, run with a PATH directory whose `gitleaks` symlink points at each "
-                  "verified binary, GITLEAKS_TESTS_REQUIRED=1",
+        "driver": "tests/test_gitleaks_config.py classes GitleaksPresenceTests, GitleaksConfigContextRestrictionTests "
+                  "and GitleaksIgnoreFingerprintTests, unchanged at the base commit, run with a PATH directory whose "
+                  "`gitleaks` symlink points at each verified binary, GITLEAKS_TESTS_REQUIRED=1",
         "gitleaks": {"tests_run": fx_gl["tests_run"], **fx_gl["counts"]},
         "betterleaks": {"tests_run": fx_bl["tests_run"], **fx_bl["counts"]},
         "tests": fixture_rows,
+    },
+    "fixtures_ported": {
+        "change": "tests/test_gitleaks_config.py reads a JSON report of `null` as no findings (_findings); gitleaks writes "
+                  "[] and is unaffected. Same classes, symlinks and environment as above (harness/run_fixtures_ported.sh).",
+        "gitleaks": {"tests_run": ported["gl"]["tests_run"], **ported["gl"]["counts"]},
+        "betterleaks": {"tests_run": ported["bl"]["tests_run"], **ported["bl"]["counts"]},
+        "betterleaks_not_ok": sorted(k for k, v in ported_rows["bl"].items() if v != "ok"),
+        "betterleaks_changed_by_the_port": {k: [unported[k], v] for k, v in sorted(ported_rows["bl"].items())
+                                             if unported[k] != v},
     },
     "classification": {
         "superset": False,
@@ -112,10 +141,19 @@ doc = {
                    "betterleaks 1.8.1 requires the sgp_ prefix (config/betterleaks.toml) where gitleaks 8.30.1 also matches any "
                    "40-hex value near the keyword (config/gitleaks.toml). Both real scans had no gitleaks finding to miss.",
         "extra_in_fixtures": "3 generic-api-key detections at lines where gitleaks reported the sourcegraph rule (one per test d2, d4, d5)",
-        "schema": "betterleaks writes an empty JSON report as null, gitleaks as []; 5 negative fixture tests fail on that alone",
+        "schema": "betterleaks writes an empty JSON report as null, gitleaks as []; 5 negative fixture tests failed on that alone "
+                  "until the tests read null as no findings (fixtures_ported)",
         "new_findings": f"{len(dir_rep)} in dir mode and {len(git_rep)} in git mode, from betterleaks-only rules generic-password and "
                         "generic-credential-uri and from generic-api-key on explorer HTML that gitleaks skips by size",
-        "real_secret_found": False,
+        "real_secret_status": "pending_owner_confirmation",
+        "real_secret_note": "Value-blind triage matched no live credential, but it cannot close the three local_test_passphrase "
+                            "rows: an owner must confirm that no retained restic repository still uses their two values. Two "
+                            "rows sit in trading-lane paths. The 25-character value is also in 4 retained round copies of the "
+                            "step script the paper arm generates (raw/paper-arm-round5..8/cfg/hot_step.sh), and the "
+                            "28-character value is also quoted in 2 receipts of the same recovery wave, one of which records "
+                            "it as the password of restic round trips that include a repository on the Windows drive. "
+                            "Neither scanner flags those 6 files.",
+        "pending_rows": pending,
         "triage_method": "each finding's line was re-read from the tree or from its commit, the rule's upstream regex was "
                          "re-applied at the reported byte columns, and only key text, value length, character classes, "
                          "structural shape and marker words were printed (harness/triage.py, harness/triage_history.py); "
