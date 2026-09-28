@@ -78,6 +78,8 @@
       "Read(**/mnt/*/Users/*/AppData/Roaming/omniroute/**)",
       "Read(//mnt/*/Users/*/.omniroute/**)",
       "Read(**/mnt/*/Users/*/.omniroute/**)",
+      "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+      "Read(**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
       "Edit(~/.bashrc)",
       "Edit(~/.profile)",
       "Edit(~/.zshrc)",
