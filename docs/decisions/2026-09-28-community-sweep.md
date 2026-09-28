@@ -571,7 +571,7 @@ which items this change closes in part.
   (PS-8, M46).
 - The gateway caveat and the proxy-arm control change when a Claude Code release keeps tool
   search on behind a non-first-party `ANTHROPIC_BASE_URL`, or when a gateway is shown to
-  forward `tool_reference` blocks with `ENABLE_TOOL_SEARCH=true`.
+  forward `tool_reference` blocks.
 - The advisor note shrinks to a pointer once `child-usage.mjs` counts `advisor_message`
   iterations (AN-10, part 3).
 - The background-wait sentence changes if the environment-variable page changes the ceiling's
