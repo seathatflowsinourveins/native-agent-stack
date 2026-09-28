@@ -369,10 +369,11 @@ class TranscriptAuditTests(unittest.TestCase):
 
     def test_locate_reads_either_json_output_shape(self):
         # `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json" (single result);
-        # code.claude.com/docs/en/headless.md:357 reads it with jq -r '.session_id'), and with verbose mode on the
-        # message array, whose last "result" element holds the session id (the element skill_usage.py
-        # find_result_event selects; anthropics/claude-agent-sdk-python@36f95486ee9f
-        # src/claude_agent_sdk/_internal/message_parser.py:308, case "result").
+        # code.claude.com/docs/en/headless.md:357 reads it with jq -r '.session_id') or, when verbose is on, the whole
+        # message array (a 2.1.283 binary read, not a live reproduction; see transcript_audit.result_message). The
+        # session id is taken from the last element of type "result", the selection skill_usage.py find_result_event
+        # makes; anthropics/claude-agent-sdk-python@36f95486ee9f src/claude_agent_sdk/_internal/message_parser.py:308
+        # parses a message of that type, with its session_id (:317), as the ResultMessage.
         home = self.base / "home"
         runs = self.session_runs(home, "s-object", "s-array", "s-earlier")
         result = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 1, "result": "ok"}
@@ -391,11 +392,14 @@ class TranscriptAuditTests(unittest.TestCase):
                 self.assertEqual(self.locate_main(json.dumps(document), home), (0, f"{runs[session]}\n", ""))
 
     def test_locate_fails_closed_on_any_other_json(self):
-        # Anything but a result object or a message array with a result element still exits 2, even though the
-        # session id it carries elsewhere has a workflow run.
+        # Anything but a result object or a message array with a result element still exits 2, even when a message
+        # of another type carries a session id that has a workflow run (s1), as an object or in an array: the 2.1.283
+        # print path writes no object whose type is not "result" (see transcript_audit.result_message).
         home = self.base / "home"
         self.session_runs(home, "s1")
-        for text in (json.dumps([{"type": "system", "subtype": "init", "session_id": "s1"}]), json.dumps([]),
+        for text in (json.dumps({"type": "system", "subtype": "init", "session_id": "s1"}),
+                     json.dumps({"session_id": "s1"}),
+                     json.dumps([{"type": "system", "subtype": "init", "session_id": "s1"}]), json.dumps([]),
                      json.dumps("s1"), json.dumps(7), json.dumps(None), json.dumps({"type": "result"}),
                      json.dumps([{"type": "result"}]), "{not json"):
             with self.subTest(text=text):
