@@ -161,7 +161,7 @@
     {
       "id": "ccusage",
       "repository": "https://github.com/ccusage/ccusage",
-      "version": "20.0.24",
+      "version": "20.0.26",
       "license": "MIT",
       "profile": "supporting",
       "role": "Read existing native provider usage logs",
@@ -175,13 +175,14 @@
         "current-session-observation-20260920",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "ccusage-20026-qualification-20260927"
       ],
       "upstream_sources": [
         "https://github.com/ccusage/ccusage",
-        "https://github.com/ccusage/ccusage/releases/tag/v20.0.24"
+        "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
       ],
-      "source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+      "source_pin": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
     },
@@ -957,7 +958,7 @@
     {
       "id": "socraticode",
       "repository": "https://github.com/giancarloerra/SocratiCode",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "license": "AGPL-3.0-only; upstream commercial alternative",
       "profile": "core",
       "role": "Automatically refreshed semantic code retrieval and native code graph",
@@ -982,12 +983,13 @@
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "socraticode-1150-qualification-20260927"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
       ],
-      "source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
