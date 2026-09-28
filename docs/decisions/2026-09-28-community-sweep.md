@@ -115,42 +115,50 @@ settings env block and the settings template):
   `tools/skill-usage/skill_usage.py` and their tests, outside this change's paths.
 
 **Host scope, applied on 2026-09-28 with the user's approval** (not in any PR). The user
-settings were hand-edited with a backup, never through the applier, and each item was read
-back through the consuming tool:
+settings were hand-edited with a backup, never through the applier. The resulting state is
+read back, value-free, in the
+[host read-back receipt](../../evidence/receipts/claude-host-practice-readback-20260928.json)
+(`claude-host-practice-readback-20260928`, one host, Claude Code 2.1.283):
 
-- AN-17: the user settings' `permissions.deny` now holds the template's 86 entries in template
-  order plus one host-only entry (54 before; 33 added, none removed). A headless
-  `claude -p --permission-mode bypassPermissions` run was refused `git clean -fn` with
-  "matches deny pattern Bash(git clean -f*)". `git push --force-with-lease` is not denied.
+- AN-17: the user settings' `permissions.deny` holds the template's 86 entries in template
+  order plus one host-only entry, and no entry names `--force-with-lease`. Under
+  `--permission-mode bypassPermissions`, a `claude -p` run's Bash call of `git clean -fn` came
+  back as an error result with one permission denial. A Bash call of
+  `git push --force-with-lease --dry-run origin main`, against a throwaway bare remote, came
+  back without error or denial.
 - AN-18, host half: a logging-only ConfigChange hook appends one JSON line per settings change
-  to a log outside every worktree and ends in `|| true`, so it never blocks a change. The log
-  received lines after the edits.
+  (timestamp, source and file only) to a log outside every worktree. It ends in `|| true`, so it
+  never blocks a change. The receipt counts the log's lines.
 - AN-19, part (2): the statusLine command exports `diff.autoRefreshIndex=false` through
   `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0` and sets `"refreshInterval": 5`.
-  The command exited 0 and left the checkout's `.git/index` modification time unchanged.
-- AN-26: the user `CLAUDE.md` now spawns a one-subagent task without a `name`, and names a spawn
+  claude-hud 0.8.0 runs `--no-optional-locks status --porcelain`, which never writes the index,
+  and runs `diff --numstat HEAD` only on a dirty tree (`dist/git.js:35-48`). The probe used a
+  throwaway repository with one modified file and one file whose mtime alone changed. There,
+  the configured command left `.git/index` unrewritten, while the same command without the
+  export rewrote it; plain `git diff --numstat HEAD` behaves the same way.
+- AN-26: the user `CLAUDE.md` now spawns a one-subagent task without a `name`. It names a spawn
   only for a teammate whose role needs neither `skills`, `omitClaudeMd` nor `isolation`
-  (source: `examples/claude-native/CLAUDE.md`). A fresh session loaded the file.
+  (source: `examples/claude-native/CLAUDE.md`). This is private instruction text, so it is not
+  in the receipt.
 - A09-notification-channel: `preferredNotifChannel` is `terminal_bell` in the host settings
-  only; the template stays at the default `auto`, which already notifies in Ghostty, Kitty and
+  only. The template stays at the default `auto`, which already notifies in Ghostty, Kitty and
   iTerm2 ([terminal configuration](https://code.claude.com/docs/en/terminal-config)). A
   Notification hook stays the fallback. How Windows Terminal's bellStyle responds to BEL is
   not reproduced (see [Not covered](#not-covered)).
 
-The same approval covered the install audit's native-installation gaps (a read-only
-`stack-verifier` pass of 26 rows at `f508ffba`; the core token stack, its upstream hooks and its
-MCP servers were already installed and connected):
+The same approval covered the install audit's native-installation gaps. That audit was a
+read-only `stack-verifier` pass of 26 rows at `f508ffba`, which found the core token stack, its
+upstream hooks and its MCP servers already installed and connected. The receipt reads back:
 
-- Headroom's Claude registration was replaced at user scope with the four no-egress variables
-  of [the recipe](../../recipes/README.md) (`HEADROOM_OFFLINE`, `HF_HUB_OFFLINE`,
+- Headroom's Claude registration was replaced at user scope with the recipe's four no-egress
+  variables ([the recipe](../../recipes/README.md): `HEADROOM_OFFLINE`, `HF_HUB_OFFLINE`,
   `TRANSFORMERS_OFFLINE`, `DO_NOT_TRACK`), and MCPorter's Headroom entry got the same
-  environment. `claude mcp get headroom` reported it connected with all four.
-- `BASH_MAX_TIMEOUT_MS=1800000`, the template's value, was added to the host environment.
-- agent-browser 0.38.1 was installed with the recipe's `npm install --global --prefix`
-  command and `agent-browser install`; a smoke run opened a data URL, read its title and
-  closed.
-- The QMD catalog index was refreshed with `qmd --index native-agent-stack-catalog update`
-  and `embed`.
+  environment. `claude mcp get headroom` reports it connected with all four.
+- `BASH_MAX_TIMEOUT_MS` in the host environment equals the template's value.
+- agent-browser 0.38.1 was installed with the recipe's `npm install --global --prefix` command
+  and `agent-browser install`. Its open, get-title and close smoke steps exit 0.
+- The QMD catalog index was refreshed with `qmd --index native-agent-stack-catalog update` and
+  `embed`, leaving 0 files pending embedding at the read-back.
 
 **Host drift recorded, owner decision pending:** `claude mcp get jcodemunch` on this host
 reports `Scope: User config` and `Connected` on 2026-09-28, against the
@@ -211,7 +219,7 @@ with M52 (dynamic prompt sections).
 | M28 | KC-19 | A deterministic Stop-hook completion gate. This merges hooks-security stop-hook-verification-gate and verification stop-hook-gate. | Scratch-worktree trial replaying recorded turns whose validate failure was caught only at review or CI. The gate exits 0 when stop_hook_active is true (one forced continuation per stop), or when background_tasks or session_crons is non-empty (RG-4). It runs only the tests for changed files, under a timeout. Worker edits need SubagentStop, and CLAUDE_CODE_STOP_HOOK_BLOCK_CAP is configurable. Record latency, blocks and false blocks from other sessions. Adopt only if it catches such a failure with no false block and no stall (COOP-01). |
 | M29 | KC-20 | /goal completion conditions for long or unattended runs. | The user decides first. The evaluator is Haiku by default (goal.md L120), which would be an exception to 'Haiku is not routed'. The native alternative is a prompt-type Stop hook with an explicit model (hooks.md L3549), scoped with --settings. If allowed, trial it on one unattended run. Note: the loop stops after turns without progress (L126), and evaluation is skipped while subagents or background shells run (L152-157). A met goal only ends the continuation. |
 | M30 | KC-21 | Bundled /code-review as the pre-push correctness check. | Seeded-defect arm in the manifest-20260923.json:5714 comparison, with the review level pinned, because the level is remembered across runs (commands.md L129). Record that Claude can start it on its own since 2.1.246 (code-review.md L358, L372). Adopt if it catches the seeded defects at acceptable usage. |
-| M31 | KC-22 | Ultrareview (/code-review ultra) before merging substantial changes. | The operator launches it from a clean owned worktree on the same seeded patch (A14). Record findings, reproductions, false positives and time beside /code-review, the /codex:review lanes, review-changes.js and OCR. Plan tier is unknown: free runs exist only on Pro and Max, it is otherwise billed to usage credits, and it is a research preview. claude -p stops before a billed launch. |
+| M31 | KC-22 | Ultrareview (/code-review ultra) before merging substantial changes. | The operator launches it from a clean owned worktree on the same seeded patch (A14). Record findings, reproductions, false positives and time beside M42's arms: /code-review, the /codex:review lanes and review-changes.js (open-code-review is excluded; see [closure 2](#closures)). Plan tier is unknown: free runs exist only on Pro and Max, it is otherwise billed to usage credits, and it is a research preview. claude -p stops before a billed launch. |
 | M32 | KC-23 | The security-guidance plugin layer (anthropics/claude-plugins-official@fa59bc903774). | Load it for one session only with --plugin-dir. Set SECURITY_REVIEW_MODEL and SG_AGENTIC_MODEL to the current Opus (the claude-opus-4-7 defaults are stale) and record the model each review ran on. Own and remove the ~/.claude/security venv. Auth on this OAuth host is unverified. Use per-layer ENABLE_\* arms, a `claude plugin eval` no-plugin baseline and `claude plugin details` per-session cost. Compare against security-reviewer and /security-review on a seeded-vulnerability diff. Adopt only if it catches a seeded issue that both others miss. |
 | M33 | KC-24 | Native LSP plugins (pyright-lsp, typescript-lsp) instead of Serena diagnostics. | Re-run the code-navigation comparison (manifest-20260926 :2805-2849, refuted only by a missing GPT-6 fit vote) with a diagnostics arm: seeded type errors and missing imports in scripts/ and examples/claude-native/workflows/. The run loads the plugins with --plugin-dir and installs the language servers itself; the plugins work in terminal sessions only. Install nothing beforehand. |
 | M34 | KC-25 | Periodic /insights reports. | Run it once interactively. The report stays at ~/.claude/usage-data/report.html and is not copied into the repo or receipts. Adopt a recurring run only if it names a friction pattern that is in neither the anti-pattern log (harness-defaults.md:83) nor ai-memory. Record the plan usage it consumed. |
@@ -342,13 +350,13 @@ or [Deferred, handed-off and host-scope items](#deferred-handed-off-and-host-sco
 | Unattended permission route | 5 repos prefer auto mode to bypass (fcakyon sets defaultMode auto). luongnv89 and thedotmack use dontAsk for CI. | `--permission-mode auto --permission-prompts none` for unattended runs (headless.md:295). dontAsk is 'useful for locked-down CI runs' (headless.md:277). | Four blueprint runners already use dontAsk plus none. The recipe invocations inherit the host default and go to a qualification row. auto is PS-8's question. |
 | --bare for scripted calls | 6 of 22 repos recommend --bare (Boris's 'up to 10x', FlorianBruniaux). oh-my-claudecode drops it when there is no API key. | '`--bare` is the recommended mode for scripted and SDK calls, and will become the default for `-p` in a future release' (headless.md:62). But it never reads OAuth or the keychain (help, 2.1.283). | Unusable on this OAuth host. M6 selects a replacement, and the tripwire note lands now. |
 | Completion loops | 8 repos want completion checked by machine, many through Ralph loops: bash `while` loops and the ralph-wiggum / ralph-loop plugins. | Native /goal (checked after each turn; runs to completion in -p) and Stop hooks (goal.md, hooks.md). | /goal and verifying checks. Ralph is rejected as the completion mechanism. |
-| -p JSON output shape | 6 repos parse JSON output. centminmod and our own fixtures observed an array. | The help and best-practices say `json` returns a single result object. The 2.1.283 binary writes the full message array when verbose is set. | Both are right under different settings. Apply the either-shape parser (handed off to the A10 unit). This host sets verbose: true, so the binary read and the fixture put its captures in the array shape; the live `-p` array was not reproduced here (see [Not covered](#not-covered)). |
+| -p JSON output shape | 6 repos parse JSON output. centminmod and our own fixtures observed an array. | The help and best-practices say `json` returns a single result object. The 2.1.283 binary writes the full message array when verbose is set. | Both are right under different settings. Apply the either-shape parser (handed off to the A10 unit). This host sets verbose: true. Both live `claude -p` runs of the [host read-back receipt](../../evidence/receipts/claude-host-practice-readback-20260928.json) returned the array shape, which matches the binary read and the fixtures. |
 | Scheduler durability and /loop lifetime | 9 repos choose the scheduler by durability. shanraisshan still says /loop lasts 3 days. | Session-scoped tasks expire after 7 days. For durability, use Routines, Desktop tasks or GitHub Actions (scheduled-tasks.md). | Covered: durable host jobs run as oneshot systemd --user timers. The 3-day claim stays rejected (R5). |
 | Model routing for CI cost | FlorianBruniaux routes triage to Haiku and reviews to Sonnet. | The docs cap cost with --max-turns, timeouts and concurrency (github-actions.md:311-313). They give no model-downgrade guidance. | Rejected: it predates Opus 5, R25 measured against it, and the user's rule is quality first. |
 | Commit attribution | Split. caveman and ECC hide it, ECC through the deprecated includeCoAuthoredBy. claude-plugins-official keeps it. | The trailer is on by default. The `attribution` setting is the deterministic control, and a CLAUDE.md or memory rule overrides it since 2.1.269. includeCoAuthoredBy is deprecated since 2.0.62. | Keep the native default as model provenance. Use the object form if it is ever changed. |
 | Security review layers | 3 repos layer security review. hesreallyhim lists the stale claude-code-security-review action. | security-guidance.md's defense-in-depth table: the in-session plugin, on-demand Claude Security or /security-review, PR review, and CI scanners. | The CI and on-demand layers are covered. The in-session plugin and Claude Security go to a scratch trial. The stale action is rejected. |
 | Off-minute schedules | Mixed: 3 repos use off-minute crons, and 3 counter-examples run on :00, including Anthropic's own claude-plugins-official check-mcp-urls.yml ('0 6 \* \* \*'). | Endorsed for Claude Code's scheduler (scheduled-tasks.md). Neutral for Actions: the github-actions.md example uses `0 9 * * *`. | Covered: all our crons and timers are off-minute or jittered. |
-| Notifications for waiting sessions | 7 repos configure Notification hooks or notifiers. | terminal-config.md: outside Ghostty, Kitty and iTerm2, set preferredNotifChannel to terminal_bell or add a Notification hook. | Apply terminal_bell on this Windows Terminal host (host scope, awaiting the user's go-ahead). The hook stays the fallback. |
+| Notifications for waiting sessions | 7 repos configure Notification hooks or notifiers. | terminal-config.md: outside Ghostty, Kitty and iTerm2, set preferredNotifChannel to terminal_bell or add a Notification hook. | Applied on 2026-09-28: terminal_bell on this Windows Terminal host only, with the user's approval (A09 under [host scope](#deferred-handed-off-and-host-scope-items)). The hook stays the fallback. |
 | Headless background waits | One repo describes the ceiling correctly (claude-plugins-official code-modernization) and one wrongly (shanraisshan). | env-vars.md: a ceiling on idle waiting after the final turn; default 10 minutes; 0 waits indefinitely. | Apply now: document it in the portable adopt step and the Ultracode recipe. |
 
 ## Closures
@@ -543,13 +551,14 @@ which items this change closes in part.
   - 0 of the template's 15 destructive-git denies are on the host;
   - gh-fix-ci is name-only on the host but on in the template;
   - BASH_MAX_TIMEOUT_MS is absent. The fix is the recorded coordinated install step, tools/adoption/install_claude_profile.py. The docs/decisions/2026-09-27-claude-harness-settings.md Limitations section records that the host is unchanged and that test_host_profile_copy_is_verbatim fails here. Not scheduled here: the step also changes agents, the guard hook and MCP registration, and it touches the open ~/.ssh carve-out decision. The hooks-security or agents-skills resolution owns it.
+  - Update 2026-09-28: with the user's approval, the deny rules and BASH_MAX_TIMEOUT_MS were hand-edited to the template values without the install step (see the host read-back receipt under host scope above); gh-fix-ci stays name-only (skills lane).
 - Usage limits in unattended runs: `claude -p`, Agent SDK and background runs do not wait for a reset (workflows.md; recipes/claude-native-ultracode.md:384-385). No lane detects the limit failure and reschedules after the reset.
 - Pre-flight settings validation for unattended lanes: -p silently drops an invalid settings file whole, and system:init has no settings-source field. No native validator was checked, so the recipe caveat is the only mitigation.
 - There is no automated detector for the --bare default flip. scripts/adoption_status.py --client-wiring is the recorded Watch home (docs/decisions/2026-09-25-model-fallback-guard.md:145-154).
 - Secret-scanning validity checks and non-provider patterns stay disabled with no disposition. Whether they are available, and at what cost, for this public repository was not verified.
 - claude-code-action: whether the selected-actions allowlist must also name the nested oven-sh/setup-bun@0c5077e5 is untested, and GitHub's settings page is silent on it.
 - Not reproduced here:
-  - the live -p JSON array (established from the binary and the fixture), and the effect of `--settings '{"verbose":false}'`;
+  - the effect of `--settings '{"verbose":false}'` on the -p JSON shape (the live array is now in the host read-back receipt);
   - auto plus --permission-prompts none on the subscription -p path;
   - FlorianBruniaux's 81% FNR stress test of auto mode;
   - '--bare up to 10x';

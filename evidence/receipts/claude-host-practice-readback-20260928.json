@@ -1,0 +1,154 @@
+{
+ "schema_version": 1,
+ "id": "claude-host-practice-readback-20260928",
+ "kind": "native_cli_e2e",
+ "component_ids": [
+  "claude-code",
+  "claude-hud",
+  "headroom",
+  "mcporter",
+  "jcodemunch-mcp",
+  "agent-browser",
+  "qmd"
+ ],
+ "claim": "A value-free read-back on this host from 2026-09-28T09:00:29Z to 2026-09-28T09:00:54Z (Claude Code 2.1.283) of the host-scope settings that the 2026-09-28 community sweep record lists as applied. permissions.deny held 87 entries: the settings template's 86 in template order plus 1 host-only entry, none naming force-with-lease. Under --permission-mode bypassPermissions, a claude -p run's Bash call of exactly `git clean -fn` came back as an error result with one permission denial, while a run's Bash call of exactly `git push --force-with-lease --dry-run origin main` against a local bare remote came back without error and with no denial. The ConfigChange hook (1 command, ending in `|| true`) had written 15 log lines, each with only timestamp, source and file keys. The status line sets refreshInterval 5 and exports diff.autoRefreshIndex=false. In a throwaway repository with one modified file and one file whose mtime alone changed, the configured command left .git/index unrewritten, while the same command with that export removed rewrote it; plain `git diff --numstat HEAD` rewrote it too, and did not with the export. preferredNotifChannel was terminal_bell, and BASH_MAX_TIMEOUT_MS equalled the template's. `claude mcp get headroom` reported Connected with all four no-egress variables set to 1, and MCPorter's headroom entry carried the same four. `claude mcp get jcodemunch` reported scope User and Connected. agent-browser reported 0.38.1; its open, get title and close smoke steps exited 0 and matched the title. The QMD catalog index reported 276 files indexed and 0 pending embedding, after an update and embed run just before the read-back.",
+ "limitations": [
+  "Local observation on one host (the independent-observation class of docs/acceptance-evidence-policy.md). Another host collects its own read-back.",
+  "Value-free by construction: counts, booleans, versions and exit codes only. No settings values, deny entries, status-line command, paths, session identifiers or model text are retained, and the host-only deny entry is counted, not named.",
+  "Each deny probe is a single claude -p run. The attempt and its outcome are read from the Bash tool_use and tool_result blocks and the result message's permission_denials, not from the model's text. The force-with-lease dry run touched only a throwaway bare repository.",
+  "The status-line probe feeds the command a minimal stdin payload in a throwaway repository. It shows the git-config export's effect on claude-hud 0.8.0's `diff --numstat HEAD` step (dist/git.js:35-48), not on every claude-hud code path or version.",
+  "The settings were hand-edited before this read-back, with backups kept on the host. The read-back checks the resulting state, not the edit history. The jCodeMunch scope is recorded as drift against the 2026-09-25 addendum, not as a decision.",
+  "The QMD embed run just before the read-back is part of the observed state; later edits make the index pending again."
+ ],
+ "evidence_class": "independent observation: native Claude Code, git, agent-browser and QMD commands run on this host, with a negative control for the status-line export and a positive control for the force-with-lease dry run",
+ "recorded_at_utc": "2026-09-28T09:00:54Z",
+ "host_scope": {
+  "host": "nativestack-5975wx-20260925",
+  "platform": "NativeStack workstation, WSL2 Linux x86_64",
+  "identity": "one workstation; the running user's own Claude Code user settings and MCP registrations"
+ },
+ "data": {
+  "started_at_utc": "2026-09-28T09:00:29Z",
+  "finished_at_utc": "2026-09-28T09:00:54Z",
+  "client_version": "2.1.283 (Claude Code)",
+  "deny_rules": {
+   "host_count": 87,
+   "template_count": 86,
+   "template_entries_present": 86,
+   "host_starts_with_template_in_order": true,
+   "host_only_entries": 1,
+   "entries_naming_force_with_lease": 0
+  },
+  "config_change_hook": {
+   "hook_commands": 1,
+   "hook_ends_with_or_true": true,
+   "log_lines": 15,
+   "log_lines_with_keys_timestamp_source_file": 15
+  },
+  "status_line": {
+   "refreshInterval": 5,
+   "command_sets_autoRefreshIndex_false": true,
+   "arms": {
+    "as_configured": {
+     "exit_code": 0,
+     "printed_output": true,
+     "index_rewritten": false
+    },
+    "control_without_git_config": {
+     "exit_code": 0,
+     "printed_output": true,
+     "index_rewritten": true
+    }
+   },
+   "control_removed_the_export": true,
+   "plain_git_diff_numstat_head_rewrites_index_in_this_state": true,
+   "git_diff_numstat_head_with_the_export_rewrites_index": false
+  },
+  "preferredNotifChannel_is_terminal_bell": true,
+  "bash_max_timeout_equals_template": true,
+  "deny_probe_git_clean": {
+   "exit_code": 0,
+   "output_shape": "array",
+   "elements": 9,
+   "result_elements": 1,
+   "result_subtype": "success",
+   "result_is_error": false,
+   "permission_denials": 1,
+   "denied_tools": [
+    "Bash"
+   ],
+   "denied_commands": [
+    "git clean -fn"
+   ],
+   "bash_tool_uses": 1,
+   "bash_tool_uses_equal_to_requested": 1,
+   "bash_tool_results": 1,
+   "bash_tool_results_with_is_error": 1
+  },
+  "deny_probe_force_with_lease_dry_run": {
+   "exit_code": 0,
+   "output_shape": "array",
+   "elements": 9,
+   "result_elements": 1,
+   "result_subtype": "success",
+   "result_is_error": false,
+   "permission_denials": 0,
+   "denied_tools": [],
+   "denied_commands": [],
+   "bash_tool_uses": 1,
+   "bash_tool_uses_equal_to_requested": 1,
+   "bash_tool_results": 1,
+   "bash_tool_results_with_is_error": 0
+  },
+  "untracked_file_still_present": true,
+  "headroom_claude": {
+   "exit_code": 0,
+   "connected": true,
+   "no_egress_vars_present": [
+    "HEADROOM_OFFLINE",
+    "HF_HUB_OFFLINE",
+    "TRANSFORMERS_OFFLINE",
+    "DO_NOT_TRACK"
+   ]
+  },
+  "headroom_mcporter_no_egress_vars": [
+   "HEADROOM_OFFLINE",
+   "HF_HUB_OFFLINE",
+   "TRANSFORMERS_OFFLINE",
+   "DO_NOT_TRACK"
+  ],
+  "jcodemunch_claude": {
+   "exit_code": 0,
+   "scope_word": "User",
+   "connected": true
+  },
+  "agent_browser": {
+   "version_exit_code": 0,
+   "version": "0.38.1",
+   "smoke": {
+    "exit_codes": [
+     0,
+     0,
+     0
+    ],
+    "title_matched": true
+   }
+  },
+  "qmd_catalog_index": {
+   "status_exit_code": 0,
+   "files_indexed": 276,
+   "pending_embedding": 0
+  }
+ },
+ "provenance": {
+  "command": "TMPDIR=/dev/shm python3 host_readback.py <checkout>",
+  "script_sha256": "3e1262fd0440595150d729eeba2cfb71fa1d9058a8e47de2d60c7ea47449d04b",
+  "script": "#!/usr/bin/env python3\n\"\"\"Value-free read-back of the 2026-09-28 host-scope Claude Code settings (community sweep record).\n\nUsage: python3 host_readback.py <repository checkout> > readback.json\n\nRecords counts, booleans, versions and exit codes only: no settings values, commands, paths,\nsession identifiers or model text. Probes run in throwaway git repositories under a temporary\ndirectory; the two `claude -p` probes are the only model calls.\n\"\"\"\nimport json, os, re, shutil, subprocess, sys, tempfile, time\nfrom pathlib import Path\n\nHOME = Path.home()\nSETTINGS = HOME / \".claude\" / \"settings.json\"\nAUDIT_LOG = HOME / \"claude-config-audit.log\"\nMCPORTER = Path(os.environ.get(\"ECO_INSTALL_ROOT\", HOME / \".local/share/codex-ecosystem\")) / \"config/mcporter.json\"\nNO_EGRESS = [\"HEADROOM_OFFLINE\", \"HF_HUB_OFFLINE\", \"TRANSFORMERS_OFFLINE\", \"DO_NOT_TRACK\"]\n\n\ndef run(cmd, cwd=None, stdin=subprocess.DEVNULL, input=None, timeout=300, env=None):\n    kw = {\"input\": input} if input is not None else {\"stdin\": stdin}\n    p = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=timeout, env=env, **kw)\n    return p.returncode, p.stdout, p.stderr\n\n\ndef git_repo(root: Path, name: str) -> Path:\n    repo = root / name\n    repo.mkdir()\n    for cmd in ([\"git\", \"init\", \"-q\", \"-b\", \"main\"], [\"git\", \"config\", \"user.email\", \"probe@example.invalid\"],\n                [\"git\", \"config\", \"user.name\", \"probe\"]):\n        run(cmd, cwd=repo)\n    (repo / \"a.txt\").write_text(\"a\\n\")\n    (repo / \"b.txt\").write_text(\"b\\n\")\n    run([\"git\", \"add\", \"a.txt\", \"b.txt\"], cwd=repo)\n    run([\"git\", \"commit\", \"-q\", \"-m\", \"a\"], cwd=repo)\n    return repo\n\n\ndef make_stat_dirty(repo: Path):\n    # a.txt gets new content, so the tree is dirty and claude-hud 0.8.0 (dist/git.js:35-48) goes on\n    # from `--no-optional-locks status --porcelain` to `diff --numstat HEAD`. b.txt keeps its content\n    # with a newer mtime: its cached stat no longer matches, so a diff with diff.autoRefreshIndex=true\n    # (git's default) rewrites .git/index after comparing content.\n    (repo / \"a.txt\").write_text(\"a changed\\n\")\n    later = time.time() + 5\n    os.utime(repo / \"b.txt\", (later, later))\n    time.sleep(1.1)\n\n\ndef index_mtime(repo: Path) -> int:\n    return (repo / \".git\" / \"index\").stat().st_mtime_ns\n\n\ndef claude_p(prompt: str, cwd: Path, requested: str) -> dict:\n    code, out, _ = run([\"claude\", \"-p\", prompt, \"--permission-mode\", \"bypassPermissions\",\n                        \"--output-format\", \"json\", \"--no-session-persistence\"], cwd=cwd, timeout=600)\n    try:\n        doc = json.loads(out)\n    except ValueError:\n        return {\"exit_code\": code, \"output_shape\": \"not-json\"}\n    messages = doc if isinstance(doc, list) else [doc]\n    results = [m for m in messages if isinstance(m, dict) and m.get(\"type\") == \"result\"]\n    result = results[-1] if results else {}\n    denials = result.get(\"permission_denials\") or []\n    uses, errors = {}, []\n    for m in messages:\n        content = ((m or {}).get(\"message\") or {}).get(\"content\") if isinstance(m, dict) else None\n        for block in content if isinstance(content, list) else []:\n            if isinstance(block, dict) and block.get(\"type\") == \"tool_use\" and block.get(\"name\") == \"Bash\":\n                uses[block.get(\"id\")] = (block.get(\"input\") or {}).get(\"command\")\n            if isinstance(block, dict) and block.get(\"type\") == \"tool_result\" and block.get(\"tool_use_id\") in uses:\n                errors.append(bool(block.get(\"is_error\")))\n    commands = [d.get(\"tool_input\", {}).get(\"command\") for d in denials if isinstance(d, dict)]\n    return {\"exit_code\": code, \"output_shape\": \"array\" if isinstance(doc, list) else \"object\",\n            \"elements\": len(messages), \"result_elements\": len(results),\n            \"result_subtype\": result.get(\"subtype\"), \"result_is_error\": result.get(\"is_error\"),\n            \"permission_denials\": len(denials), \"denied_tools\": sorted({d.get(\"tool_name\") for d in denials\n                                                                          if isinstance(d, dict)}),\n            \"denied_commands\": commands,\n            \"bash_tool_uses\": len(uses), \"bash_tool_uses_equal_to_requested\": sum(c == requested for c in uses.values()),\n            \"bash_tool_results\": len(errors), \"bash_tool_results_with_is_error\": sum(errors)}\n\n\ndef main(repo_root: Path) -> dict:\n    settings = json.loads(SETTINGS.read_text())\n    template = json.loads((repo_root / \"adoption/templates/claude.settings.template.json\").read_text())\n    deny, tdeny = settings[\"permissions\"][\"deny\"], template[\"permissions\"][\"deny\"]\n    data = {\"client_version\": run([\"claude\", \"--version\"])[1].strip()}\n    data[\"deny_rules\"] = {\n        \"host_count\": len(deny), \"template_count\": len(tdeny),\n        \"template_entries_present\": sum(e in deny for e in tdeny),\n        \"host_starts_with_template_in_order\": deny[:len(tdeny)] == tdeny,\n        \"host_only_entries\": len([e for e in deny if e not in tdeny]),\n        \"entries_naming_force_with_lease\": sum(\"force-with-lease\" in e for e in deny),\n    }\n    hooks = settings.get(\"hooks\", {}).get(\"ConfigChange\", [])\n    commands = [h.get(\"command\", \"\") for g in hooks for h in g.get(\"hooks\", [])]\n    lines = AUDIT_LOG.read_text().splitlines() if AUDIT_LOG.exists() else []\n    parsed = []\n    for line in lines:\n        try:\n            parsed.append(set(json.loads(line)))\n        except ValueError:\n            parsed.append(None)\n    data[\"config_change_hook\"] = {\n        \"hook_commands\": len(commands), \"hook_ends_with_or_true\": all(c.rstrip().endswith(\"|| true\") for c in commands),\n        \"log_lines\": len(lines), \"log_lines_with_keys_timestamp_source_file\": sum(k == {\"timestamp\", \"source\", \"file\"} for k in parsed),\n    }\n    status = settings.get(\"statusLine\", {})\n    data[\"status_line\"] = {\"refreshInterval\": status.get(\"refreshInterval\"),\n                           \"command_sets_autoRefreshIndex_false\": \"GIT_CONFIG_VALUE_0=false\" in status.get(\"command\", \"\")\n                           and \"diff.autoRefreshIndex\" in status.get(\"command\", \"\")}\n    data[\"preferredNotifChannel_is_terminal_bell\"] = settings.get(\"preferredNotifChannel\") == \"terminal_bell\"\n    data[\"bash_max_timeout_equals_template\"] = (settings.get(\"env\", {}).get(\"BASH_MAX_TIMEOUT_MS\")\n                                                == template.get(\"env\", {}).get(\"BASH_MAX_TIMEOUT_MS\"))\n\n    tmp = Path(tempfile.mkdtemp(prefix=\"host-readback-\"))\n    try:\n        # Status line: the configured command against a negative control with the git-config export removed.\n        arms = {}\n        cmd = status.get(\"command\", \"\")\n        control_cmd = re.sub(r\"export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=diff\\.autoRefreshIndex GIT_CONFIG_VALUE_0=false; \", \"\", cmd)\n        arms_cmds = {\"as_configured\": cmd, \"control_without_git_config\": control_cmd}\n        for arm, arm_cmd in arms_cmds.items():\n            repo = git_repo(tmp, f\"status-{arm}\")\n            make_stat_dirty(repo)\n            before = index_mtime(repo)\n            payload = json.dumps({\"cwd\": str(repo), \"workspace\": {\"current_dir\": str(repo), \"project_dir\": str(repo)},\n                                  \"model\": {\"id\": \"claude-opus-5-5\", \"display_name\": \"Opus\"}, \"session_id\": \"probe\",\n                                  \"transcript_path\": str(tmp / \"none.jsonl\")})\n            code, out, _ = run([\"bash\", \"-c\", arm_cmd], cwd=repo, input=payload, timeout=60)\n            arms[arm] = {\"exit_code\": code, \"printed_output\": bool(out.strip()),\n                         \"index_rewritten\": index_mtime(repo) != before}\n        data[\"status_line\"][\"arms\"] = arms\n        data[\"status_line\"][\"control_removed_the_export\"] = control_cmd != cmd\n        repo = git_repo(tmp, \"status-git-diff-control\")\n        make_stat_dirty(repo)\n        before = index_mtime(repo)\n        run([\"git\", \"diff\", \"--numstat\", \"HEAD\"], cwd=repo)\n        data[\"status_line\"][\"plain_git_diff_numstat_head_rewrites_index_in_this_state\"] = index_mtime(repo) != before\n        repo = git_repo(tmp, \"status-git-diff-configured\")\n        make_stat_dirty(repo)\n        before = index_mtime(repo)\n        run([\"git\", \"diff\", \"--numstat\", \"HEAD\"], cwd=repo,\n            env={**os.environ, \"GIT_CONFIG_COUNT\": \"1\", \"GIT_CONFIG_KEY_0\": \"diff.autoRefreshIndex\",\n                 \"GIT_CONFIG_VALUE_0\": \"false\"})\n        data[\"status_line\"][\"git_diff_numstat_head_with_the_export_rewrites_index\"] = index_mtime(repo) != before\n\n        # Deny rules under bypass: git clean -fn must be denied; a --force-with-lease dry run must not be.\n        repo = git_repo(tmp, \"deny\")\n        (repo / \"untracked.txt\").write_text(\"u\\n\")\n        bare = tmp / \"remote.git\"\n        run([\"git\", \"init\", \"-q\", \"--bare\", str(bare)])\n        run([\"git\", \"remote\", \"add\", \"origin\", str(bare)], cwd=repo)\n        run([\"git\", \"push\", \"-q\", \"origin\", \"main\"], cwd=repo)\n        data[\"deny_probe_git_clean\"] = claude_p(\n            \"Use the Bash tool once to run exactly this command, with no other text or commands: git clean -fn\", repo,\n            \"git clean -fn\")\n        data[\"deny_probe_force_with_lease_dry_run\"] = claude_p(\n            \"Use the Bash tool once to run exactly this command, with no other text or commands: \"\n            \"git push --force-with-lease --dry-run origin main\", repo,\n            \"git push --force-with-lease --dry-run origin main\")\n        data[\"untracked_file_still_present\"] = (repo / \"untracked.txt\").exists()\n    finally:\n        shutil.rmtree(tmp, ignore_errors=True)\n\n    code, out, _ = run([\"claude\", \"mcp\", \"get\", \"headroom\"], timeout=120)\n    data[\"headroom_claude\"] = {\"exit_code\": code, \"connected\": \"Connected\" in out,\n                               \"no_egress_vars_present\": [v for v in NO_EGRESS if re.search(rf\"\\b{v}=1\\b\", out)]}\n    mcporter = json.loads(MCPORTER.read_text()) if MCPORTER.exists() else {}\n    env = (mcporter.get(\"mcpServers\", {}).get(\"headroom\", {}) or {}).get(\"env\", {})\n    data[\"headroom_mcporter_no_egress_vars\"] = [v for v in NO_EGRESS if env.get(v) == \"1\"]\n    code, out, _ = run([\"claude\", \"mcp\", \"get\", \"jcodemunch\"], timeout=120)\n    scope = re.search(r\"Scope:\\s*(\\w+)\", out)\n    data[\"jcodemunch_claude\"] = {\"exit_code\": code, \"scope_word\": scope.group(1) if scope else None,\n                                 \"connected\": \"Connected\" in out}\n\n    code, out, _ = run([\"agent-browser\", \"--version\"])\n    data[\"agent_browser\"] = {\"version_exit_code\": code, \"version\": out.strip().split()[-1] if out.strip() else None}\n    title = \"agent-browser-ok\"\n    steps = [[\"agent-browser\", \"open\", f\"data:text/html,<title>{title}</title>\"], [\"agent-browser\", \"get\", \"title\"],\n             [\"agent-browser\", \"close\"]]\n    results = [run(s, timeout=120) for s in steps]\n    data[\"agent_browser\"][\"smoke\"] = {\"exit_codes\": [r[0] for r in results], \"title_matched\": title in results[1][1]}\n\n    code, out, _ = run([\"qmd\", \"--index\", \"native-agent-stack-catalog\", \"status\"], timeout=120)\n    total = re.search(r\"Total:\\s+(\\d+) files indexed\", out)\n    pending = re.search(r\"Pending:\\s+(\\d+)\", out)\n    data[\"qmd_catalog_index\"] = {\"status_exit_code\": code, \"files_indexed\": int(total.group(1)) if total else None,\n                                 \"pending_embedding\": int(pending.group(1)) if pending else 0}\n    return data\n\n\nif __name__ == \"__main__\":\n    print(json.dumps(main(Path(sys.argv[1]).resolve()), indent=1))\n",
+  "references": [
+   "docs/decisions/2026-09-28-community-sweep.md (Deferred, handed-off and host-scope items): AN-17, AN-18 host half, AN-19 part (2), AN-26, A09",
+   "claude-hud 0.8.0 dist/git.js:35 (`--no-optional-locks status --porcelain`) and :48 (`diff --numstat HEAD`, run only when the tree is dirty)",
+   "https://code.claude.com/docs/en/permission-modes (deny rules still apply in bypassPermissions)",
+   "https://code.claude.com/docs/en/terminal-config (preferredNotifChannel terminal_bell)"
+  ]
+ }
+}
