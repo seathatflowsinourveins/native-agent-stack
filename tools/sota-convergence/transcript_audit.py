@@ -313,6 +313,22 @@ def workflow_transcript_dir(cwd, session_id: str, projects_root=None) -> Path:
     return runs[0]
 
 
+def result_message(document) -> dict:
+    """The result message of a ``claude -p --output-format json`` capture: the document itself when it is an object
+    (``claude --help`` 2.1.283: "json" (single result); code.claude.com/docs/en/headless.md:357 reads its session_id),
+    or, when it is the message array Claude Code prints in verbose mode, its last element of type "result" (the element
+    tools/skill-usage/skill_usage.py find_result_event selects, which anthropics/claude-agent-sdk-python@36f95486ee9f
+    src/claude_agent_sdk/_internal/message_parser.py:308 parses as the ResultMessage). ValueError for anything else."""
+    if isinstance(document, dict):
+        return document
+    if isinstance(document, list):
+        for message in reversed(document):
+            if isinstance(message, dict) and message.get("type") == "result":
+                return message
+        raise ValueError("the session JSON array holds no result message")
+    raise ValueError("the session JSON is neither a result object nor a message array")
+
+
 def main(argv=None) -> int:
     import argparse
     import sys
@@ -321,10 +337,11 @@ def main(argv=None) -> int:
     locate = sub.add_parser("locate", help="Print the workflow run's agent transcript directory.")
     locate.add_argument("--cwd", required=True, type=Path, help="The directory the session ran from (the export).")
     locate.add_argument("--session-json", required=True, type=Path,
-                        help="The session's `claude -p --output-format json` output (its session_id).")
+                        help="The session's `claude -p --output-format json` output, a result object or the message "
+                             "array of verbose mode (its result's session_id).")
     args = parser.parse_args(argv)
     try:
-        session_id = json.loads(args.session_json.read_text(encoding="utf-8"))["session_id"]
+        session_id = result_message(json.loads(args.session_json.read_text(encoding="utf-8")))["session_id"]
         print(workflow_transcript_dir(args.cwd, session_id))
     except (OSError, ValueError, KeyError, TypeError) as error:
         print(f"transcript_audit: {error}", file=sys.stderr)

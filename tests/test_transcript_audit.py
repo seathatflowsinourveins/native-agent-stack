@@ -3,12 +3,15 @@
 
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import json
 import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("transcript_audit", ROOT / "tools/sota-convergence/transcript_audit.py")
@@ -344,6 +347,61 @@ class TranscriptAuditTests(unittest.TestCase):
         long_run = projects / "-long" / "s5" / "subagents" / "workflows" / "wf_c"
         long_run.mkdir(parents=True)
         self.assertEqual(transcript_audit.workflow_transcript_dir(deep, "s5", projects), long_run)
+
+    def locate_main(self, text, home):
+        """``transcript_audit.py locate`` through main() on a session JSON file holding ``text``, with ``home`` as the
+        home directory Claude Code keeps its projects under: (exit code, stdout, stderr)."""
+        session_json = self.base / "session.json"
+        session_json.write_text(text, encoding="utf-8")
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, {"HOME": str(home)}), contextlib.redirect_stdout(stdout), \
+                contextlib.redirect_stderr(stderr):
+            code = transcript_audit.main(["locate", "--cwd", str(self.export), "--session-json", str(session_json)])
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def session_runs(self, home, *sessions):
+        """One workflow run directory per session id, under ``home``'s project directory for the export."""
+        projects = home / ".claude" / "projects" / transcript_audit.project_slug(self.export)
+        runs = {session: projects / session / "subagents" / "workflows" / "wf_1" for session in sessions}
+        for run in runs.values():
+            run.mkdir(parents=True)
+        return runs
+
+    def test_locate_reads_either_json_output_shape(self):
+        # `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json" (single result);
+        # code.claude.com/docs/en/headless.md:357 reads it with jq -r '.session_id'), and with verbose mode on the
+        # message array, whose last "result" element holds the session id (the element skill_usage.py
+        # find_result_event selects; anthropics/claude-agent-sdk-python@36f95486ee9f
+        # src/claude_agent_sdk/_internal/message_parser.py:308, case "result").
+        home = self.base / "home"
+        runs = self.session_runs(home, "s-object", "s-array", "s-earlier")
+        result = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 1, "result": "ok"}
+        shapes = {
+            "object": (dict(result, session_id="s-object"), "s-object"),
+            "array": ([{"type": "system", "subtype": "init", "session_id": "s-array"},
+                       {"type": "assistant", "session_id": "s-array",
+                        "message": {"role": "assistant", "content": [{"type": "text", "text": "ok"}]}},
+                       dict(result, session_id="s-array")], "s-array"),
+            # The last element of type "result": neither the first result nor the last element.
+            "array, last result": ([dict(result, session_id="s-earlier"), dict(result, session_id="s-array"),
+                                    {"type": "system", "subtype": "status"}], "s-array"),
+        }
+        for shape, (document, session) in shapes.items():
+            with self.subTest(shape=shape):
+                self.assertEqual(self.locate_main(json.dumps(document), home), (0, f"{runs[session]}\n", ""))
+
+    def test_locate_fails_closed_on_any_other_json(self):
+        # Anything but a result object or a message array with a result element still exits 2, even though the
+        # session id it carries elsewhere has a workflow run.
+        home = self.base / "home"
+        self.session_runs(home, "s1")
+        for text in (json.dumps([{"type": "system", "subtype": "init", "session_id": "s1"}]), json.dumps([]),
+                     json.dumps("s1"), json.dumps(7), json.dumps(None), json.dumps({"type": "result"}),
+                     json.dumps([{"type": "result"}]), "{not json"):
+            with self.subTest(text=text):
+                code, stdout, stderr = self.locate_main(text, home)
+                self.assertEqual((code, stdout), (2, ""))
+                self.assertTrue(stderr.startswith("transcript_audit: "), stderr)
 
 
 if __name__ == "__main__":
