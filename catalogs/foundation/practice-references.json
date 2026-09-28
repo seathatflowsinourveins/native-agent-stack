@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "practice_references",
   "checked_at": "2026-09-28",
-  "scope": "The Claude Code practice references read by the 2026-09-27 community sweep: the 22 community repositories it surveyed and the three upstream Anthropic repositories its two syntheses cited by pin as primary sources. The decision record named by each entry carries the practices, dispositions and overturn conditions; this file only tracks the pins. The freshness check reports drift and maintenance status and never changes a pin, a disposition or a practice.",
+  "scope": "The Claude Code practice references read by the 2026-09-27 community sweep: the 22 community repositories it surveyed and the four upstream Anthropic repositories its two syntheses cited by pin as primary sources, one of them the rejected anthropics/claude-code-security-review. Other pinned sources the syntheses cite, such as git/git at v2.43.0, are not Claude Code practice references and are not tracked. The decision record named by each entry carries the practices, dispositions and overturn conditions; this file only tracks the pins. The freshness check reports drift and maintenance status and never changes a pin, a disposition or a practice.",
   "pin_rule": "pin is the full commit SHA the sweep read; pin_date is that commit's committer date in UTC, from gh api repos/{repository}/commits/{pin} (.commit.committer.date), read 2026-09-28.",
   "stars_at_check_rule": "GitHub stargazers_count from gh api repos/{repository}, read 2026-09-28. Discovery metadata only: stars guide discovery and are never evidence of quality, maintenance or fitness (AGENTS.md top rule).",
   "freshness_check": {
@@ -465,6 +465,10 @@
       "stars_at_check": 148364,
       "used_for": [
         {
+          "dimension": "harness-and-token-practice",
+          "use": "version facts 2.1.32 to 2.1.283 (prompt-audit, Opus 5.5 default, effort defaults, cacheTtl, summarize)"
+        },
+        {
           "dimension": "git-review-and-automation",
           "use": "2.0.62 attribution; 2.1.81 --bare; 2.1.223 /review alias; 2.1.229 --no-verify; 2.1.248 --restricted and self-paced /loop; 2.1.259 --permission-prompts; 2.1.269 and 2.1.281 attribution; the 2.1.281 --max-turns fix; 2.1.282 OTel scope; 2.1.283 routine minutes."
         }
@@ -518,6 +522,23 @@
       "record": "docs/decisions/2026-09-28-community-sweep.md",
       "paths_read": [
         "src/claude_agent_sdk/_internal/message_parser.py:95,308"
+      ]
+    },
+    {
+      "repository": "anthropics/claude-code-security-review",
+      "role": "primary",
+      "pin": "0c6a49f1fa56a1d472575da86a94dbc1edb78eda",
+      "pin_date": "2026-02-11",
+      "stars_at_check": 6276,
+      "used_for": [
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Rejected: README.md:45 warns it is not hardened against prompt injection."
+        }
+      ],
+      "record": "docs/decisions/2026-09-28-community-sweep.md",
+      "paths_read": [
+        "README.md:45"
       ]
     }
   ]
