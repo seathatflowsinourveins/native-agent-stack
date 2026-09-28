@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "adoption/hooks/claude/token-lanes-subagent-start.py"
 BLOCK = HOOK.with_name("token-lanes-block.md")
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
-BUDGET_BYTES = 4_100  # 4,051 measured bytes; repair budget decision in docs/decisions/2026-09-27-token-lanes-subagent-start.md
+BUDGET_BYTES = 4_100  # 4,094 measured bytes; qmd-scope addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
 KEY_PHRASES = (
     "ToolSearch", "ctx_batch_execute", "rtk", "find_referencing_symbols",
     "codebase-memory", "jcodemunch", "TOON", "headroom",
