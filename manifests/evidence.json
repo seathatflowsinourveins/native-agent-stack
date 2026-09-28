@@ -3447,8 +3447,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "adf31ec5f407ee45f2a4c03707ec43527cc3896efafe927278704247f5a0bf27",
-      "bytes": 20062
+      "sha256": "d669d65342584c61235cbc848eda75b80631f8b9360a6fa8b704bafb8dcc3ec4",
+      "bytes": 31261
     },
     {
       "path": ".gitignore",
@@ -14525,6 +14525,116 @@
       "path": "evidence/artifacts/alpaca-platform-landscape-20260926/tavily-research-pro.json",
       "sha256": "ce37813de0fbbf22f80cc7340a337a8379b26d931a81bb24aa43ccecc38f8a2b",
       "bytes": 24195
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/README.md",
+      "sha256": "ee0bb75f30d1844eb1db7e427e25e520dbbfd9141c4f43fb7423c7a360615d40",
+      "bytes": 29689
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/compare_repair.py",
+      "sha256": "80877a5d9466fc9298d01d472bca94dd6bd51238d099d0a0266c33f1b8f468ad",
+      "bytes": 1725
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/diff_fixtures.py",
+      "sha256": "e0e3c6195dbfae2e55bc34d059cc7ecd70267d1029518bd6d651932c87da8213",
+      "bytes": 1550
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/exit_code_controls.sh",
+      "sha256": "bc60ae37ac80a44e5568aebc9cf0626e72b25ef4c6d5c9321b9f654e0367e792",
+      "bytes": 3759
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/final_checks.sh",
+      "sha256": "c7dfc9cc86f52427f2f10c4210e9d4b55bf2137c9b52bc705dbbdb83e15cfbac",
+      "bytes": 2417
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/gen_parity.py",
+      "sha256": "e808d47a078c166f5ba9db06f31011f291d6caeea5cf310db0fc9a6e4638e95b",
+      "bytes": 14786
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/git_dir_skip_control.sh",
+      "sha256": "4810847f8dca80ada7fa675844499463779d873e567aac7d873b1503e17b5199",
+      "bytes": 1966
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/measure_explorer_lines.py",
+      "sha256": "569f4f70b0471332135b53c458768ff5c873318bfa4bddb950cb249ff30c7e94",
+      "bytes": 2020
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/mutation_controls.py",
+      "sha256": "8ed33988bee29546556d592a38659ff7f29f4eef9e689b2e281885d9c5e545ae",
+      "bytes": 13937
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/prepare_ignore_controls.py",
+      "sha256": "7d62435803938130e16eaee0b34db8db806fe7306bf7ad30d24883b05b7dfe59",
+      "bytes": 1506
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/run_bl_git2.sh",
+      "sha256": "463c9109c846d13c94ebb0171fb3ff9a6e48c8567cd3a1dc3ea7b4823722f6dd",
+      "bytes": 1715
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/run_fixtures.py",
+      "sha256": "86c1c046717ec59283fca4235f482ca7b2780a18fa1f0cfe8da5409536ab1f8c",
+      "bytes": 2355
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/run_fixtures_ported.sh",
+      "sha256": "0f3ca9135bec4a808c402c714cab52e441e4ddfa122fc3598f2779d6f497faf6",
+      "bytes": 1103
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/run_fixtures_recorded.py",
+      "sha256": "c2253d61f0fe5e77bb744b67e2388c044e9695c2abaff1b910c060c0c09ab6d7",
+      "bytes": 1482
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/run_repair_scans.sh",
+      "sha256": "16f627cbb5dfe0add5f3e2fa6daf89df15311fb6eb1e04330fb7cad5d906b037",
+      "bytes": 2552
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/run_scans.sh",
+      "sha256": "a3aa6c22f06f570c6c30c683627e9a72dbc96c03432d14bd891ba25adb154d3e",
+      "bytes": 2309
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/scan_changed.sh",
+      "sha256": "1e266e54e3cd8d4e9cc1240404356a0d45c2d389af5953f26d456eacf9e1a5b6",
+      "bytes": 2188
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/sim_job.py",
+      "sha256": "b4dda7123c3952f1abddbca084127aca1e7f93ae42e911cc4d3272e0a630b891",
+      "bytes": 3807
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/triage.py",
+      "sha256": "d9c7beedf3bcf5852a4dfe4b69182857001d08c4b1fca9ece5f6f754dd5b4828",
+      "bytes": 3678
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/harness/triage_history.py",
+      "sha256": "732743a9ddf46031b54594e2099d55c89983c301b2560148d8a5afb4f6ba6489",
+      "bytes": 3281
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/parity.json",
+      "sha256": "5710a107f6f4756658311fd21c5d41e4b58726f7ddd6be6c450ee8815fa885c5",
+      "bytes": 22899
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-parity-20260927/run-record.json",
+      "sha256": "7351ba230dbed9b20d7bcb237c68af59574c8784033ee26adb0f9cdc2e177860",
+      "bytes": 65423
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
@@ -39398,8 +39508,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "26d7dcdfe7a91c6a6554d6ef75e8d6029a1ab2b015fe35b666404282e95580ae",
-      "bytes": 49211
+      "sha256": "10ff9465d80e4e72ac1cce284251750a17c04ed846cbb883398da90ced5fa7ae",
+      "bytes": 49803
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -39863,8 +39973,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "8f920495cb3cfeb48e9ac5ee77fcda46641884cc0a116935e5110b17f066a9ab",
-      "bytes": 62438
+      "sha256": "7f25f3c4c9fba6d91fddf4605a2f1bdb6eba13a47aa58b48334143da14050e91",
+      "bytes": 81714
     },
     {
       "path": "tests/test_workflow_security.py",
