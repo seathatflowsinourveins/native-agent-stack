@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "round": 3,
+  "acceptance_checks": [
+    {
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher -v",
+      "exit_code": 0,
+      "output": "test_arm_routes_are_explicit_and_judge_stays_on_control (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control) ... ok\ntest_cli_dispatch_runs_unchanged_native_main_with_guarded_transport (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport) ... ok\ntest_dispatch_result_classes_do_not_invent_a_quality_threshold (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold) ... ok\ntest_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths) ... ok\ntest_dispatch_start_wait_result_preserves_setup_failure_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle) ... ok\ntest_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) ... ok\ntest_e2e_persists_disjoint_phases_and_uses_dispatch_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle) ... ok\ntest_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots) ... ok\ntest_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader) ... ok\ntest_gateway_captures_response_correlations_privately_for_worker_and_judge (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge) ... ok\ntest_gateway_reader_uses_only_authorized_columns_and_is_read_only (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_reader_uses_only_authorized_columns_and_is_read_only) ... ok\ntest_gateway_transport_headers_and_strict_schema_controls (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_transport_headers_and_strict_schema_controls) ... ok\ntest_graded_report_binding_rejects_replaced_and_mismatched_exports (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_graded_report_binding_rejects_replaced_and_mismatched_exports) ... ok\ntest_grader_install_refuses_builds_and_retains_upstream_lock (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock) ... ok\ntest_judge_uses_documented_batch_budget_and_separate_session (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session) ... ok\ntest_mcp_policy_enforces_calls_and_collection_arguments (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_mcp_policy_enforces_calls_and_collection_arguments) ... ok\ntest_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) ... ok\ntest_read_grade_checks_native_csv_controls_and_artifact_bindings (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_read_grade_checks_native_csv_controls_and_artifact_bindings) ... ok\ntest_receipt_cannot_promote_report_sanity_to_quality_verdict (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_cannot_promote_report_sanity_to_quality_verdict) ... ok\ntest_receipt_records_separate_entry_gateways_phases_and_header_names (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names) ... ok\ntest_recipe_contract_and_empty_result (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result) ... ok\ntest_report_transport_controls_do_not_grade_content (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) ... ok\ntest_skills_lifecycle_and_no_listener_recipe (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_skills_lifecycle_and_no_listener_recipe) ... ok\ntest_upstream_grade_controls_preserve_scores_and_reject_malformed_output (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_upstream_grade_controls_preserve_scores_and_reject_malformed_output) ... ok\ntest_usage_does_not_call_partial_correlations_complete (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_does_not_call_partial_correlations_complete) ... ok\ntest_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids) ... ok\ntest_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config) ... ok\n\n----------------------------------------------------------------------\nRan 27 tests in 0.940s\n\nOK\n{\"skills_at_start\": {\"listed_at_start\": [], \"activation_events\": [], \"status\": \"no SKILL.md loader found in pinned runtime; native inventory unavailable\"}}\n"
+    },
+    {
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "exit_code": 1,
+      "output": "Publication validation failed:\nblueprints/runtime-workers/gpt-researcher/README.md: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/README.md: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/config.template.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/config.template.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/grader.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/grader.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/gateway.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/gateway.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/host.template.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/host.template.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/install.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/install.sh: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/mcp-policy.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/mcp-policy.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/mcp_proxy.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/mcp_proxy.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/pins.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/research.md: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/research.md: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/run-e2e.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/run-e2e.sh: byte count mismatch\ntests/test_runtime_worker_gpt_researcher.py: SHA-256 mismatch\ntests/test_runtime_worker_gpt_researcher.py: byte count mismatch\n"
+    },
+    {
+      "command": "rtk env GIT_OPTIONAL_LOCKS=0 git diff --check",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "acceptance_interpretation": "27 local offline tests passed. Publication validation reports only SHA-256/byte-count mismatches for 14 changed registered files, permitted by this repair brief; coordinator must re-register hashes. git diff --check returned no output and exit 0. No bytecode/cache paths remained. Temporary source copies were removed after recording their identities.",
+  "date": "2026-09-27",
+  "base_head": "177472394f31",
+  "pr": 426,
+  "scope": "Offline repair in the owned gpt-researcher worktree; no staging/commit, host install, container start, model call or gateway request. Evidence manifest remains coordinator-owned.",
+  "skills": {
+    "used": [
+      "search-first (inline, no delegation)",
+      "find-skills (read-only directory discovery)",
+      "tdd (authorized public recipe seams)",
+      "verification-before-completion"
+    ],
+    "discovery": "Skills directory leaderboard and installed catalog inspected; selected maintained upstream CLI and existing proxy/client APIs. No skills installed."
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "input": "Claude finding 1",
+      "severity": "major",
+      "disposition": "fixed",
+      "change": "Use websocket=None and native logging; preserve the native ten-attempt streamed-report loop with SDK retries disabled.",
+      "evidence": [
+        "tests: test_worker_uses_native_retry_without_websocket_and_arm_config",
+        "assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4 gpt_researcher/utils/llm.py:120-143",
+        "native_retry_control: one transient synthetic failure fails with a websocket and recovers on attempt two without it."
+      ]
+    },
+    {
+      "id": "R2",
+      "input": "Claude finding 2",
+      "severity": "major",
+      "disposition": "fixed",
+      "change": "Judge uses 32768 tokens, chunk size 50 and 5 attempts; explicit max reasoning and one worker are documented task-required deviations.",
+      "evidence": [
+        "test_judge_uses_documented_batch_budget_and_separate_session",
+        "imlrz/DeepResearch-Bench-II@b38f360603db9531b102aef8c166cedb8509b6f6 README.md:271-280; run_evaluation.py:26-29"
+      ]
+    },
+    {
+      "id": "R3",
+      "input": "Claude finding 3",
+      "severity": "major",
+      "disposition": "fixed",
+      "change": "Select worker route from RUNTIME_WORKER_ARM and optional GPTR_BASE_URL; judge remains separately validated on control.",
+      "evidence": [
+        "test_arm_routes_are_explicit_and_judge_stays_on_control",
+        "rw3-common.md section 1 supersedes reviewer container suggestions: this recipe already uses host loopback only."
+      ]
+    },
+    {
+      "id": "R4",
+      "input": "Claude finding 4",
+      "severity": "major",
+      "disposition": "fixed",
+      "change": "Exactly one-slash sharedgw/gpt-6-astra-max accepted only at 20129; control GPT-6 variants retained; other providers and two-slash slugs rejected.",
+      "evidence": [
+        "test_arm_routes_are_explicit_and_judge_stays_on_control",
+        "rw3-common.md section 1; assafelovic/gpt-researcher@0957c301 gpt_researcher/config/config.py:158-166"
+      ]
+    },
+    {
+      "id": "R5",
+      "input": "Claude finding 5",
+      "severity": "major",
+      "disposition": "fixed",
+      "change": "Stable Bash start/wait/result, deterministic status/result/receipt paths, per-attempt failures, busy 75 and separate pass/negative/setup/incomplete classes. Selected upstream CLI main is invoked unchanged inside scoped transport.",
+      "evidence": [
+        "test_dispatch_start_wait_result_preserves_setup_failure_handle",
+        "test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report",
+        "test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths",
+        "test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport",
+        "assafelovic/gpt-researcher@0957c301 cli.py:306-362; python/cpython@v3.12.12 Doc/library/subprocess.rst:565-599"
+      ]
+    },
+    {
+      "id": "R6",
+      "input": "Claude finding 6",
+      "severity": "minor",
+      "disposition": "fixed",
+      "change": "Separate worker/judge phases and sessions; per-arm entry gateway with private response correlations and no IDs in receipts. The common requirement supersedes the review's suggestion to count both arms at 20128.",
+      "evidence": [
+        "test_receipt_records_separate_entry_gateways_phases_and_header_names",
+        "test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids",
+        "test_gateway_captures_response_correlations_privately_for_worker_and_judge",
+        "rw3-common.md sections 2-3; encode/httpx@0.28.1 docs/advanced/event-hooks.md:5-7,35-40"
+      ]
+    },
+    {
+      "id": "R7",
+      "input": "Claude finding 7",
+      "severity": "minor",
+      "disposition": "fixed",
+      "change": "Added read_grade CSV high/zero/blocked controls, missing/extra indices, invalid numeric cells and changed CSV/report hash controls. Existing read_grade already rejected these; no fake red failure is claimed for this coverage-only change.",
+      "evidence": [
+        "test_read_grade_checks_native_csv_controls_and_artifact_bindings",
+        "test_judge_uses_documented_batch_budget_and_separate_session covers main's post-aggregation summary flow with a synthetic native-command seam",
+        "imlrz/DeepResearch-Bench-II@b38f360 aggregate_scores.py:249-289"
+      ]
+    },
+    {
+      "id": "S1",
+      "input": "Security finding 1",
+      "severity": "blocker",
+      "disposition": "fixed",
+      "change": "Remove execute/file-execute/batch/fetch MCP tools; index accepts literal text only and rejects path/directory arguments. Per-run scratch, context store and HOME replace checkout binding. Existing native scraper private-address guard is forced on.",
+      "evidence": [
+        "test_model_cannot_execute_fetch_or_index_host_files",
+        "mksglu/context-mode@v1.0.169 src/server.ts:2237-2309; PrefectHQ/fastmcp@v4.0.10 docs/servers/middleware.mdx:751-768",
+        "assafelovic/gpt-researcher@0957c301 gpt_researcher/utils/url_security.py:8-25,63-122; scraper/scraper.py:195-212"
+      ]
+    },
+    {
+      "id": "S1-container/S2/S9",
+      "input": "Security finding 1 suggested container migration; cross-cutting host-loopback reachability and container hardening",
+      "severity": "major/minor recommendations",
+      "disposition": "declined",
+      "change": "Do not introduce a new unqualified container/runtime. This selected CLI/stdio recipe has no model shell or existing container runtime to apply per-port networking or container flags to. Removed model execution and context fetch instead; document native scraper DNS-rebinding/redirect residual. This is not a claim of OS network isolation.",
+      "evidence": [
+        "rw3-common.md section 5 (container controls where supported by the recipe's actual runtime)",
+        "assafelovic/gpt-researcher@0957c301 cli.py:306-336; utils/url_security.py:23-25; scraper/beautiful_soup/beautiful_soup.py:60-73",
+        "README.md Security posture",
+        "test_model_cannot_execute_fetch_or_index_host_files"
+      ]
+    },
+    {
+      "id": "S8",
+      "input": "Security finding 8 plus cross-cutting unlocked grader installs",
+      "severity": "minor",
+      "disposition": "fixed",
+      "change": "Retain upstream uv.lock with --locked --no-build --no-install-project. No build backend download is permitted. Other recipes' pip/npm grader installers are outside this owned recipe.",
+      "evidence": [
+        "test_grader_install_refuses_builds_and_retains_upstream_lock",
+        "installed uv 0.12.17 sync --help",
+        "imlrz/DeepResearch-Bench-II@b38f360 pyproject.toml:1-12"
+      ]
+    },
+    {
+      "id": "COMMON-usage/effort",
+      "severity": "required",
+      "disposition": "fixed",
+      "change": "Entry-gateway correlation matching, verified 20129 DB opt-in, model/path/window fallback, missing-correlation detection, no double counting, separate cumulative compression snapshots/delta and effort diagnostics.",
+      "evidence": [
+        "test_usage_does_not_call_partial_correlations_complete",
+        "test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots",
+        "diegosouzapw/OmniRoute@a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 src/lib/usage/callLogs.ts:645-654; src/app/api/analytics/compression/route.ts:13-25; src/lib/db/compressionAnalytics.ts:52-55"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "All streamed report calls used the outer retry loop.",
+      "correction": "stream=True plus a websocket forces one attempt. Remove the websocket; native logger preserves observations.",
+      "verification": "R1 regression failed on the retained NativeEvents object, then passed. Unchanged upstream create_chat_completion synthetic probe also demonstrates one vs two attempts."
+    },
+    {
+      "claim": "The review described native code retry defaults as 5.",
+      "correction": "README configuration says 5; run_evaluation.py:28 fallback is 10. The repair explicitly selects the documented 5.",
+      "verification": "Pinned DRB-II source hash matches pins.json; inspected README:280 and run_evaluation.py:28."
+    },
+    {
+      "claim": "Removing execution tools alone eliminates context-mode host-file access.",
+      "correction": "ctx_index also accepts path/directory arguments. The repair refuses them and allows literal content only.",
+      "verification": "context-mode@v1.0.169 src/server.ts:2267-2309; test_model_cannot_execute_fetch_or_index_host_files failed on path controls before enforcement."
+    },
+    {
+      "claim": "Observed correlated rows necessarily represent complete usage capture.",
+      "correction": "A captured response can still be missing from the database. Such observations remain incomplete.",
+      "verification": "test_usage_does_not_call_partial_correlations_complete: observed vs incomplete failed first, then passed."
+    },
+    {
+      "claim": "Setup failure could print deterministic paths before their artifacts existed.",
+      "correction": "Valid attempts now reserve status first and persist setup-failure result and receipt.",
+      "verification": "test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths failed on a missing result before the fix."
+    }
+  ],
+  "commands": [
+    {
+      "id": "arms-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control -v",
+      "exit_code": 1,
+      "output": "test_arm_routes_are_explicit_and_judge_stays_on_control (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control) ... ERROR\n\n======================================================================\nERROR: test_arm_routes_are_explicit_and_judge_stays_on_control (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 36, in test_arm_routes_are_explicit_and_judge_stays_on_control\n    control = gateway.select_routes({})\n              ^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'gptr_gateway' has no attribute 'select_routes'\n\n----------------------------------------------------------------------\nRan 1 test in 0.006s\n\nFAILED (errors=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "arms-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control -v",
+      "exit_code": 0,
+      "output": "test_arm_routes_are_explicit_and_judge_stays_on_control (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.003s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "security-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files -v",
+      "exit_code": 1,
+      "output": "test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) ... \n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_execute') ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_execute_file') ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_batch_execute') ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_fetch_and_index') ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'path': '/etc/passwd'}) ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'content': 'ok', 'path': '/etc/passwd'}) ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'content': 'ok', 'followSymlinks': True}) ... FAIL\n  test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'content': 42}) ... FAIL\ntest_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) ... ERROR\n\n======================================================================\nERROR: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 49, in test_model_cannot_execute_fetch_or_index_host_files\n    cfg = proxy.server_config(\"context-mode\", host, run_dir)\nTypeError: server_config() takes 2 positional arguments but 3 were given\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_execute')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 37, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(name=name), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_execute_file')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 37, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(name=name), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_batch_execute')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 37, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(name=name), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (name='ctx_fetch_and_index')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 37, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(name=name), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'path': '/etc/passwd'})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 41, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(args=args), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'content': 'ok', 'path': '/etc/passwd'})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 41, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(args=args), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'content': 'ok', 'followSymlinks': True})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 41, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(args=args), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) (args={'content': 42})\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 41, in test_model_cannot_execute_fetch_or_index_host_files\n    with self.subTest(args=args), self.assertRaises(ValueError):\n                                  ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 1 test in 0.007s\n\nFAILED (failures=8, errors=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "security-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files -v",
+      "exit_code": 0,
+      "output": "test_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.005s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "install-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock -v",
+      "exit_code": 1,
+      "output": "test_grader_install_refuses_builds_and_retains_upstream_lock (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock) ... FAIL\n\n======================================================================\nFAIL: test_grader_install_refuses_builds_and_retains_upstream_lock (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 39, in test_grader_install_refuses_builds_and_retains_upstream_lock\n    self.assertIn(flag, command)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^\nAssertionError: '--no-build' not found in 'UV_PROJECT_ENVIRONMENT=\"$prefix/grader-venv\" uv sync --locked --project \"$grader_source\" --python \"$python_bin\"'\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "install-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock -v",
+      "exit_code": 0,
+      "output": "test_grader_install_refuses_builds_and_retains_upstream_lock (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "worker-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config -v",
+      "exit_code": 1,
+      "output": "test_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config) ... ERROR\n\n======================================================================\nERROR: test_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 76, in test_worker_uses_native_retry_without_websocket_and_arm_config\n    asyncio.run(runner.run(args, {}))\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py\", line 196, in run\n    return runner.run(main)\n           ~~~~~~~~~~^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py\", line 119, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py\", line 726, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"<worktree>/blueprints/runtime-workers/gpt-researcher/e2e/run.py\", line 96, in run\n    raise ValueError(\"required scoped MCP tools unavailable\")\nValueError: required scoped MCP tools unavailable\n\n----------------------------------------------------------------------\nRan 1 test in 0.022s\n\nFAILED (errors=1)\n{\"skills_at_start\": {\"listed_at_start\": [], \"activation_events\": [], \"status\": \"no SKILL.md loader found in pinned runtime; native inventory unavailable\"}}\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "retry-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config -v",
+      "exit_code": 1,
+      "output": "test_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config) ... FAIL\n\n======================================================================\nFAIL: test_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 77, in test_worker_uses_native_retry_without_websocket_and_arm_config\n    self.assertIsNone(constructed[0].get(\"websocket\"))\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: <gptr_run.NativeEvents object at <object-address>> is not None\n\n----------------------------------------------------------------------\nRan 1 test in 0.020s\n\nFAILED (failures=1)\n{\"skills_at_start\": {\"listed_at_start\": [], \"activation_events\": [], \"status\": \"no SKILL.md loader found in pinned runtime; native inventory unavailable\"}}\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "worker-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config -v",
+      "exit_code": 0,
+      "output": "test_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.020s\n\nOK\n{\"skills_at_start\": {\"listed_at_start\": [], \"activation_events\": [], \"status\": \"no SKILL.md loader found in pinned runtime; native inventory unavailable\"}}\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "judge-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session -v",
+      "exit_code": 1,
+      "output": "test_judge_uses_documented_batch_budget_and_separate_session (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session) ... FAIL\n\n======================================================================\nFAIL: test_judge_uses_documented_batch_budget_and_separate_session (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 77, in test_judge_uses_documented_batch_budget_and_separate_session\n    self.assertEqual(env[\"OPENAI_MAX_OUTPUT_TOKENS\"], \"32768\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '12000' != '32768'\n- 12000\n+ 32768\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.009s\n\nFAILED (failures=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "judge-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session -v",
+      "exit_code": 0,
+      "output": "test_judge_uses_documented_batch_budget_and_separate_session (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.008s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "csv-existing-controls",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_read_grade_checks_native_csv_controls_and_artifact_bindings -v",
+      "exit_code": 0,
+      "output": "test_read_grade_checks_native_csv_controls_and_artifact_bindings (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_read_grade_checks_native_csv_controls_and_artifact_bindings) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.030s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "usage-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids -v",
+      "exit_code": 1,
+      "output": "test_gateway_captures_response_correlations_privately_for_worker_and_judge (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge) ... ERROR\ntest_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids) ... ERROR\n\n======================================================================\nERROR: test_gateway_captures_response_correlations_privately_for_worker_and_judge (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 40, in test_gateway_captures_response_correlations_privately_for_worker_and_judge\n    transport = gateway.GatewayTransport(\"worker\", correlation_log=path)\nTypeError: GatewayTransport.__init__() got an unexpected keyword argument 'correlation_log'\n\n======================================================================\nERROR: test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 73, in test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids\n    rows = receipt.gateway_rows(db, \"2026-09-27T00:00:00Z\", \"2026-09-27T00:00:06Z\",\n                                \"sharedgw/gpt-6-astra-max\", correlation_ids={\"ours\", \"no-reasoning\"})\nTypeError: gateway_rows() got an unexpected keyword argument 'correlation_ids'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.041s\n\nFAILED (errors=2)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "usage-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids -v",
+      "exit_code": 0,
+      "output": "test_gateway_captures_response_correlations_privately_for_worker_and_judge (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge) ... ok\ntest_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.068s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "phase-receipt-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names -v",
+      "exit_code": 1,
+      "output": "test_receipt_records_separate_entry_gateways_phases_and_header_names (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names) ... ERROR\n\n======================================================================\nERROR: test_receipt_records_separate_entry_gateways_phases_and_header_names (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 54, in test_receipt_records_separate_entry_gateways_phases_and_header_names\n    result = receipt.write_receipt(root, phases[\"worker_started\"], phases[\"judge_ended\"], routes[\"worker\"][\"model\"],\n                                   \"0.16.0\", routes=routes, phases=phases, engines_verified=True)\nTypeError: write_receipt() got an unexpected keyword argument 'routes'\n\n----------------------------------------------------------------------\nRan 1 test in 0.019s\n\nFAILED (errors=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "phase-receipt-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names -v",
+      "exit_code": 0,
+      "output": "test_receipt_records_separate_entry_gateways_phases_and_header_names (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.019s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "dispatch-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport -v",
+      "exit_code": 1,
+      "output": "test_dispatch_start_wait_result_preserves_setup_failure_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle) ... FAIL\ntest_dispatch_result_classes_do_not_invent_a_quality_threshold (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold) ... ERROR\ntest_cli_dispatch_runs_unchanged_native_main_with_guarded_transport (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport) ... ERROR\n\n======================================================================\nERROR: test_dispatch_result_classes_do_not_invent_a_quality_threshold (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 64, in test_dispatch_result_classes_do_not_invent_a_quality_threshold\n    dispatch = load(\"gptr_dispatch\", RECIPE / \"dispatch.py\")\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 33, in load\n    spec.loader.exec_module(module)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1019, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1156, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1214, in get_data\nFileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/gpt-researcher/dispatch.py'\n\n======================================================================\nERROR: test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 73, in test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport\n    cli = load(\"gptr_cli_runner\", RECIPE / \"cli_runner.py\")\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 33, in load\n    spec.loader.exec_module(module)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<frozen importlib._bootstrap_external>\", line 1019, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1156, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1214, in get_data\nFileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/gpt-researcher/cli_runner.py'\n\n======================================================================\nFAIL: test_dispatch_start_wait_result_preserves_setup_failure_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 48, in test_dispatch_start_wait_result_preserves_setup_failure_handle\n    self.assertEqual(started.returncode, 0, started.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 127 != 0 : bash: <worktree>/blueprints/runtime-workers/gpt-researcher/dispatch.sh: No such file or directory\n\n\n----------------------------------------------------------------------\nRan 3 tests in 0.005s\n\nFAILED (failures=1, errors=2)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "dispatch-green-attempt",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport -v",
+      "exit_code": 0,
+      "output": "test_dispatch_start_wait_result_preserves_setup_failure_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle) ... ok\ntest_dispatch_result_classes_do_not_invent_a_quality_threshold (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold) ... ok\ntest_cli_dispatch_runs_unchanged_native_main_with_guarded_transport (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.224s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "e2e-dispatch-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle -v",
+      "exit_code": 1,
+      "output": "test_e2e_persists_disjoint_phases_and_uses_dispatch_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle) ... usage: run.py [-h] --run-dir RUN_DIR --prefix PREFIX --host-file HOST_FILE\n              --model MODEL --judge-model JUDGE_MODEL\nrun.py: error: unrecognized arguments: --base-url http://127.0.0.1:20129/v1\nERROR\n\n======================================================================\nERROR: test_e2e_persists_disjoint_phases_and_uses_dispatch_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 55, in test_e2e_persists_disjoint_phases_and_uses_dispatch_handle\n    self.assertEqual(runner.main(), 0)\n                     ~~~~~~~~~~~^^\n  File \"<worktree>/blueprints/runtime-workers/gpt-researcher/e2e/run.py\", line 112, in main\n    args = parser.parse_args()\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/argparse.py\", line 1930, in parse_args\n    self.error(msg)\n    ~~~~~~~~~~^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/argparse.py\", line 2686, in error\n    self.exit(2, _('%(prog)s: error: %(message)s\\n') % args)\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/argparse.py\", line 2673, in exit\n    _sys.exit(status)\n    ~~~~~~~~~^^^^^^^^\nSystemExit: 2\n\n----------------------------------------------------------------------\nRan 1 test in 0.025s\n\nFAILED (errors=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "e2e-dispatch-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle -v",
+      "exit_code": 0,
+      "output": "test_e2e_persists_disjoint_phases_and_uses_dispatch_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.204s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "suite-intermediate",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher -v",
+      "exit_code": 1,
+      "output": "test_arm_routes_are_explicit_and_judge_stays_on_control (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_arm_routes_are_explicit_and_judge_stays_on_control) ... ok\ntest_cli_dispatch_runs_unchanged_native_main_with_guarded_transport (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_cli_dispatch_runs_unchanged_native_main_with_guarded_transport) ... ok\ntest_dispatch_result_classes_do_not_invent_a_quality_threshold (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_result_classes_do_not_invent_a_quality_threshold) ... ok\ntest_dispatch_start_wait_result_preserves_setup_failure_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_start_wait_result_preserves_setup_failure_handle) ... ok\ntest_e2e_persists_disjoint_phases_and_uses_dispatch_handle (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_e2e_persists_disjoint_phases_and_uses_dispatch_handle) ... ok\ntest_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader) ... FAIL\ntest_gateway_captures_response_correlations_privately_for_worker_and_judge (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_captures_response_correlations_privately_for_worker_and_judge) ... ok\ntest_gateway_reader_uses_only_authorized_columns_and_is_read_only (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_reader_uses_only_authorized_columns_and_is_read_only) ... FAIL\ntest_gateway_transport_headers_and_strict_schema_controls (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_transport_headers_and_strict_schema_controls) ... ERROR\ntest_graded_report_binding_rejects_replaced_and_mismatched_exports (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_graded_report_binding_rejects_replaced_and_mismatched_exports) ... ok\ntest_grader_install_refuses_builds_and_retains_upstream_lock (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_grader_install_refuses_builds_and_retains_upstream_lock) ... ok\ntest_judge_uses_documented_batch_budget_and_separate_session (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_judge_uses_documented_batch_budget_and_separate_session) ... ok\ntest_mcp_policy_enforces_calls_and_collection_arguments (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_mcp_policy_enforces_calls_and_collection_arguments) ... ok\ntest_model_cannot_execute_fetch_or_index_host_files (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_model_cannot_execute_fetch_or_index_host_files) ... ok\ntest_read_grade_checks_native_csv_controls_and_artifact_bindings (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_read_grade_checks_native_csv_controls_and_artifact_bindings) ... ok\ntest_receipt_cannot_promote_report_sanity_to_quality_verdict (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_cannot_promote_report_sanity_to_quality_verdict) ... ok\ntest_receipt_records_separate_entry_gateways_phases_and_header_names (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_records_separate_entry_gateways_phases_and_header_names) ... ok\ntest_recipe_contract_and_empty_result (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result) ... FAIL\ntest_report_transport_controls_do_not_grade_content (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) ... ok\ntest_skills_lifecycle_and_no_listener_recipe (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_skills_lifecycle_and_no_listener_recipe) ... ok\ntest_upstream_grade_controls_preserve_scores_and_reject_malformed_output (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_upstream_grade_controls_preserve_scores_and_reject_malformed_output) ... ok\ntest_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_filters_by_phase_model_path_and_correlation_without_retaining_ids) ... ok\ntest_worker_uses_native_retry_without_websocket_and_arm_config (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_worker_uses_native_retry_without_websocket_and_arm_config) ... ok\n{\"skills_at_start\": {\"listed_at_start\": [], \"activation_events\": [], \"status\": \"no SKILL.md loader found in pinned runtime; native inventory unavailable\"}}\n\n======================================================================\nERROR: test_gateway_transport_headers_and_strict_schema_controls (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_transport_headers_and_strict_schema_controls)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 577, in test_gateway_transport_headers_and_strict_schema_controls\n    self.assertEqual(post(gateway.CHAT_URL, headers={\"Authorization\": \"Bearer local-loopback\"},\n                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                          json=payload, timeout=600, stream=False), \"native response\")\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<worktree>/blueprints/runtime-workers/gpt-researcher/gateway.py\", line 162, in post\n    self.response_hook(response)\n    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"<worktree>/blueprints/runtime-workers/gpt-researcher/gateway.py\", line 113, in response_hook\n    correlation = response.headers.get(\"X-Correlation-Id\")\n                  ^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'headers'\n\n======================================================================\nFAIL: test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 608, in test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader\n    self.assertIn(\"${GPTR_JUDGE_MODEL:-cx/gpt-6-astra-max}\", runner)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '${GPTR_JUDGE_MODEL:-cx/gpt-6-astra-max}' not found in '#!/usr/bin/env bash\\n# Same persistent contract as CLI dispatch. Pass GPTR_RUN_ID or --run-id.\\nset -euo pipefail\\numask 077\\nrecipe_dir=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\"\\nexport PYTHONDONTWRITEBYTECODE=1\\nexec python3 \"$recipe_dir/dispatch.py\" run --mode e2e \"$@\"\\n'\n\n======================================================================\nFAIL: test_gateway_reader_uses_only_authorized_columns_and_is_read_only (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_reader_uses_only_authorized_columns_and_is_read_only)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 665, in test_gateway_reader_uses_only_authorized_columns_and_is_read_only\n    self.assertEqual(rows[\"status\"], \"observed\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'unavailable' != 'observed'\n- unavailable\n+ observed\n\n\n======================================================================\nFAIL: test_recipe_contract_and_empty_result (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 451, in test_recipe_contract_and_empty_result\n    self.assertIn(\"${GPTR_MODEL:-cx/gpt-6-astra-max}\", runner)\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '${GPTR_MODEL:-cx/gpt-6-astra-max}' not found in '#!/usr/bin/env bash\\n# Same persistent contract as CLI dispatch. Pass GPTR_RUN_ID or --run-id.\\nset -euo pipefail\\numask 077\\nrecipe_dir=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\"\\nexport PYTHONDONTWRITEBYTECODE=1\\nexec python3 \"$recipe_dir/dispatch.py\" run --mode e2e \"$@\"\\n'\n\n----------------------------------------------------------------------\nRan 23 tests in 0.636s\n\nFAILED (failures=3, errors=1)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "fault-paths-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_does_not_call_partial_correlations_complete -v",
+      "exit_code": 1,
+      "output": "test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) ... ok\ntest_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths) ... FAIL\ntest_usage_does_not_call_partial_correlations_complete (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_does_not_call_partial_correlations_complete) ... FAIL\n\n======================================================================\nFAIL: test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 87, in test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths\n    self.assertTrue((root / \"state\" / parsed[\"result\"]).is_file())\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true\n\n======================================================================\nFAIL: test_usage_does_not_call_partial_correlations_complete (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_does_not_call_partial_correlations_complete)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 107, in test_usage_does_not_call_partial_correlations_complete\n    self.assertEqual(result[\"status\"], \"incomplete\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'observed' != 'incomplete'\n- observed\n+ incomplete\n\n\n----------------------------------------------------------------------\nRan 3 tests in 0.163s\n\nFAILED (failures=2)\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "fault-paths-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_does_not_call_partial_correlations_complete -v",
+      "exit_code": 0,
+      "output": "test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) ... ok\ntest_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_setup_errors_have_persistent_results_and_no_ambiguous_paths) ... ok\ntest_usage_does_not_call_partial_correlations_complete (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_usage_does_not_call_partial_correlations_complete) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.246s\n\nOK\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "validate-intermediate",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "exit_code": 1,
+      "output": "Publication validation failed:\nblueprints/runtime-workers/gpt-researcher/config.template.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/config.template.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/grader.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/grader.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/gateway.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/gateway.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/host.template.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/host.template.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/install.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/install.sh: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/mcp-policy.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/mcp-policy.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/mcp_proxy.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/mcp_proxy.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/pins.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/run-e2e.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/run-e2e.sh: byte count mismatch\ntests/test_runtime_worker_gpt_researcher.py: SHA-256 mismatch\ntests/test_runtime_worker_gpt_researcher.py: byte count mismatch\n.round3-sources/context-mode_src__server.ts: contains possible personal home path\ntests/test_runtime_worker_gpt_researcher.py: contains possible local session identifier\n",
+      "output_was_truncated": false
+    },
+    {
+      "id": "evidence-hardening-red",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots -v",
+      "exit_code": 1,
+      "output": "Warning: truncated output (original token count: 3316)\nTotal output lines: 131\n\ntest_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) ... \n  test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) (native_exit=0, expected=0) ... FAIL\n  test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) (native_exit=7, expected=10) ... FAIL\n  test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) (native_exit=124, expected=30) ... FAIL\n  test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) (native_exit=0, expected=30) ... FAIL\n  test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) (native_exit=0, expected=30) ... FAIL\ntest_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots) ... ERROR\n\n======================================================================\nERROR: test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 119, in test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots\n    self.assertFalse(receipt.gateway_evidence_complete(observed))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'gptr_receipt' has no attribute 'gateway_evidence_complete'\n\n======================================================================\nFAIL: test_dispatch_supervisor_pass_failure_timeou\u20261916 tokens truncated\u2026l(*args, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py\", line 1240, in _execute_mock_call\n    result = effect(*args, **kwargs)\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 56, in native\n    self.assertEqual(len(kwargs.get(\"pass_fds\", ())), 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n======================================================================\nFAIL: test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) (native_exit=0, expected=30)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 68, in test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report\n    result = dispatch.supervise(run)\n  File \"<worktree>/blueprints/runtime-workers/gpt-researcher/dispatch.py\", line 174, in supervise\n    completed = subprocess.run(native_command(run_dir, job), cwd=run_dir,\n                               env=child_environment(run_dir, job[\"routes\"]), stdout=stdout, stderr=stderr)\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py\", line 1169, in __call__\n    return self._mock_call(*args, **kwargs)\n           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py\", line 1173, in _mock_call\n    return self._execute_mock_call(*args, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"<installed-python>/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py\", line 1240, in _execute_mock_call\n    result = effect(*args, **kwargs)\n  File \"<worktree>/tests/test_runtime_worker_gpt_researcher.py\", line 56, in native\n    self.assertEqual(len(kwargs.get(\"pass_fds\", ())), 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n----------------------------------------------------------------------\nRan 2 tests in 0.040s\n\nFAILED (failures=5, errors=1)\n",
+      "output_was_truncated": true
+    },
+    {
+      "id": "evidence-hardening-green",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots -v",
+      "exit_code": 0,
+      "output": "test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_dispatch_supervisor_pass_failure_timeout_busy_and_malformed_report) ... ok\ntest_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots (tests.test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_evidence_requires_a_successful_gateway_row_and_preserves_compression_snapshots) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.042s\n\nOK\n",
+      "output_was_truncated": false
+    }
+  ],
+  "native_retry_control": {
+    "source": "assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4 gpt_researcher/utils/llm.py:42-161",
+    "source_sha256": "f22942e27b1356724daa3fc8dc0629ecbffe361f84455ee278a72b75668a2768",
+    "method": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 via heredoc: compile the unchanged AST function; stub get_llm with a provider raising one synthetic 503; replace asyncio.sleep with a no-op; call stream=True with an object websocket and then None. This is a synthetic integration control, not an unchanged full upstream test or a provider run.",
+    "exit_code": 0,
+    "output": "{\n  \"evidence_class\": \"local synthetic control using unchanged upstream function; no model or gateway call\",\n  \"before\": {\n    \"websocket_present\": true,\n    \"attempts\": 1,\n    \"result\": \"failed\"\n  },\n  \"after\": {\n    \"websocket_present\": false,\n    \"attempts\": 2,\n    \"result\": \"recovered report\"\n  }\n}\n"
+  },
+  "research_limits": [
+    "Host worker/proxy/grader venvs absent at the configured prefix; no runtime installation/help acceptance claimed.",
+    "Direct shell gh api could not connect. Web open tool returned unsupported-operation; public raw-source fetching through context-mode worked. GitHub release API fallback was rate limited; the retained v3.7.0 upstream release record was inspected.",
+    "No latest-version or full isolation absence claims are inferred from those unavailable channels."
+  ],
+  "host_verification_required": [
+    "Coordinator re-register changed and new evidence hashes; run native installation, then run-upstream-tests.sh.",
+    "Validate both real CLI and E2E arms, with the same task, budget and control judge.",
+    "Verify 20129's database identity before GPTR_ENGINES_DB_VERIFIED=1; verify 20128 control path, actual timestamp format and forwarded route.",
+    "Observe request headers, one-slash route, max effort, both response correlation hooks, partial/streamed failures and delayed call-log flush.",
+    "Inject one transient report 5xx; verify retry, preserved research artifacts and bounded timeout/descendant cleanup.",
+    "Inspect native grader for empty text and JSON parse warnings; compare per-batch reasoning/output budgets. Worker 12000-token cap/report completeness remains unmeasured.",
+    "Check context-mode content-only policy, per-run state, QMD/memory scope and native MCP1/MCP2 compatibility on the actual host.",
+    "Reconcile Claude child-usage and OTel Bash launches with native CLI logs/completions; test detached-child survival, busy and cancellation/recovery.",
+    "Include native scraper DNS-rebinding/redirect residual in host security acceptance; no OS egress isolation or container hardening is claimed."
+  ],
+  "upstream_source_reads": [
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "src/app/api/analytics/compression/route.ts",
+      "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/analytics/compression/route.ts",
+      "sha256": "4159741eb6a3a6f0529bf290d0ec2287c56ff604af7ffb7a1689f36353c40fd5"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "src/lib/db/compressionAnalytics.ts",
+      "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compressionAnalytics.ts",
+      "sha256": "2989f4d16a331bd20624748a8624dba0065e0e70dee96e6cf3227449e9b28f66"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3",
+      "file": "src/lib/usage/callLogs.ts",
+      "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/callLogs.ts",
+      "sha256": "64269db02cb0ed73f6f7d0a3daaf314a1aa08df2993accd559ec078aff764e9c"
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "pin": "v1.0.169",
+      "file": "src/server.ts",
+      "url": "https://raw.githubusercontent.com/mksglu/context-mode/v1.0.169/src/server.ts",
+      "sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59"
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "v3.12.12",
+      "file": "Doc/library/fcntl.rst",
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.12.12/Doc/library/fcntl.rst",
+      "sha256": "2ffc6287c7de996a831f77b0ce46f1e4b8aba20ab4ba17afad5bc4e8a26ade43"
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "v3.12.12",
+      "file": "Doc/library/sqlite3.rst",
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.12.12/Doc/library/sqlite3.rst",
+      "sha256": "ae534aa61fb6ab8d7bff2e7d33ac3f79e3b06e18acf4ec8081250ef7ff542d76"
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "v3.12.12",
+      "file": "Doc/library/subprocess.rst",
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.12.12/Doc/library/subprocess.rst",
+      "sha256": "4742471faba4e77a685fca0297fc7884d7fe1a7ff3fdb8a6858476fbc07a76db"
+    },
+    {
+      "repository": "PrefectHQ/fastmcp",
+      "pin": "v4.0.10",
+      "file": "docs/servers/middleware.mdx",
+      "url": "https://raw.githubusercontent.com/PrefectHQ/fastmcp/v4.0.10/docs/servers/middleware.mdx",
+      "sha256": "1d7557d00f9dea8623113523f2654d1d837e4403eec6562b660a379adedc05bf"
+    },
+    {
+      "repository": "PrefectHQ/fastmcp",
+      "pin": "v4.0.10",
+      "file": "docs/servers/providers/proxy.mdx",
+      "url": "https://raw.githubusercontent.com/PrefectHQ/fastmcp/v4.0.10/docs/servers/providers/proxy.mdx",
+      "sha256": "b224f6c6bba50be1b77f6d603227be2523e50fefab18d5e0f88d3a6f6e7799c0"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "cli.py",
+      "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/cli.py",
+      "sha256": "b0cdeb184d592aadc32cb54e20d09b47aca23e0f34f2092cb8ead4f8940f52de"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "gpt_researcher/llm_provider/generic/base.py",
+      "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/llm_provider/generic/base.py",
+      "sha256": "d4247a548188ca5e2a3710658884dbbda95a1096fb2c3e3a7a0a410134823818"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "gpt_researcher/scraper/beautiful_soup/beautiful_soup.py",
+      "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/scraper/beautiful_soup/beautiful_soup.py",
+      "sha256": "c2561f9c1410c146090898afffff3771711d9e8c5dcbd438790ae2ea35bc282a"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "gpt_researcher/scraper/scraper.py",
+      "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/scraper/scraper.py",
+      "sha256": "225cb5a6387facc05ba9f488ffe68b67a4e01783c723c7d0e8dd02006dea03d4"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "gpt_researcher/utils/llm.py",
+      "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/utils/llm.py",
+      "sha256": "f22942e27b1356724daa3fc8dc0629ecbffe361f84455ee278a72b75668a2768"
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "pin": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "file": "gpt_researcher/utils/url_security.py",
+      "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/utils/url_security.py",
+      "sha256": "c263ac45bd5f26adaca42b57880daca58041756a5748c65a2581602cb4eeba9e"
+    },
+    {
+      "repository": "encode/httpx",
+      "pin": "0.28.1",
+      "file": "docs/advanced/event-hooks.md",
+      "url": "https://raw.githubusercontent.com/encode/httpx/0.28.1/docs/advanced/event-hooks.md",
+      "sha256": "96d292f95b3412c54f7f862fd38a569b0efb2bd51a6cacdd5b391072262b9558"
+    }
+  ],
+  "retained_grader_source_hashes_match_recipe": true,
+  "discovery_notes": {
+    "installed_worker_proxy_and_grader": "absent at the configured prefix; no installs attempted",
+    "uv_version": "uv 0.12.17 (x86_64-unknown-linux-gnu)",
+    "uv_sync_help_returned": [
+      "--locked Assert that the uv.lock will remain unchanged",
+      "--no-build Do not build source distributions",
+      "--no-install-project Do not install the current project"
+    ],
+    "selected": "Existing pinned GPTR CLI and client/proxy APIs; no new orchestrator, MCP server or container runtime adopted.",
+    "rejected_alternatives": "The supplied integration recommendation selected cli.py over gptr-mcp/FastAPI. No unsupported gptr-mcp absence or maintenance claim is needed by this repair."
+  }
+}

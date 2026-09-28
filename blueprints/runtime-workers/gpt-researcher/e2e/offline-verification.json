@@ -1,0 +1,32 @@
+{
+  "evidence_class": "offline local integration / structural verification; no native runtime or model execution",
+  "fail_first": {
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_gpt_researcher.py -v",
+    "exit_code": 1,
+    "result": "Ran 1 test; FAILED (failures=1); README.md absent",
+    "output_file": "offline-red.txt"
+  },
+  "pass": {
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_gpt_researcher.py -v",
+    "exit_code": 0,
+    "stdout": "test_frozen_oracle_rejects_wrong_facts_and_unfetched_citations (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_frozen_oracle_rejects_wrong_facts_and_unfetched_citations) ... ok\ntest_gateway_reader_uses_only_authorized_columns_and_is_read_only (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_reader_uses_only_authorized_columns_and_is_read_only) ... ok\ntest_mcp_policy_enforces_calls_and_collection_arguments (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_mcp_policy_enforces_calls_and_collection_arguments) ... ok\ntest_recipe_contract_and_empty_result (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.081s\n\nOK\n"
+  },
+  "syntax": {
+    "command": "bash -n install.sh run-e2e.sh run-upstream-tests.sh",
+    "exit_code": 0
+  },
+  "publication_validation": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "stdout": "{\"components\": 69, \"hashed_files\": 7345, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+  },
+  "controls": "Wrong facts, unfetched citations, foreign domains, short snippets, duplicate page fragments, denied MCP tools and collections, alternate memory scope/global requests, read-only synthetic SQLite",
+  "not_run": [
+    "framework installation",
+    "unchanged upstream tests",
+    "live gateway call",
+    "MCP backend startup",
+    "real E2E",
+    "provider/GPU acceptance"
+  ]
+}

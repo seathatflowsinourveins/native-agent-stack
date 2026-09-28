@@ -3408,8 +3408,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
-      "bytes": 9814
+      "sha256": "941649753f346f7f4d4b4ab8a7212f717b18c9db5cab910862665fa645eadc3f",
+      "bytes": 10369
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -8521,6 +8521,166 @@
       "path": "blueprints/retrieval-quality-v2/verification-review-20260926/rederive_real_qmd_receipts.py",
       "sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
       "bytes": 2690
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/README.md",
+      "sha256": "07fe4cd0a95cad2882e6b2f1532e8fdfaafa7188989e0449451c87f0f74275fc",
+      "bytes": 20023
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/build-requirements.in",
+      "sha256": "fe1d3c1bcc3db9e25991e2d037db4f13b6830004f82e2e04448f1956b92f9b4c",
+      "bytes": 137
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/build-requirements.lock",
+      "sha256": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+      "bytes": 748
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/cli_runner.py",
+      "sha256": "9aa7c94183f14c342b09070217446b3c6c811d47f106d7d02f14ba9825576194",
+      "bytes": 2710
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/config.template.json",
+      "sha256": "6602a06de958ed1e69ebe38243d9c9590592c124034f3f99384d7acecbc0d6d4",
+      "bytes": 1181
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/dispatch.py",
+      "sha256": "5a6981a663ff10e929724c357b71eca5606176d2e08d0b5d9d7ca5754b1949d5",
+      "bytes": 15896
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/dispatch.sh",
+      "sha256": "51fcef07d220105e2e9d6f2d8427db17e8c7535fdb38bf797b2e471ae68ad821",
+      "bytes": 271
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/check.py",
+      "sha256": "a68e7b04c7448617f58038257e08aeedef7175cc870b3d5f4303f2afd46bc8d7",
+      "bytes": 1645
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/grader.py",
+      "sha256": "a015272a4a972279fbfc18bf9801c05c7171e89a2b8c97ca7291393319fc785b",
+      "bytes": 9857
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/offline-red.txt",
+      "sha256": "cc383b1910f9514b464f7fb52326093dc5a1854308411c9fee31e92f905e96f1",
+      "bytes": 968
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/offline-verification.json",
+      "sha256": "92c1ecdefb0fa4c0c4e49b4e00ec2f840254cef209c4a50d8b156adba5576938",
+      "bytes": 2166
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/receipt.py",
+      "sha256": "24a2c62d8fbb1971301e973fb2cbc741047b3a341836f006ee094f300f297da8",
+      "bytes": 14371
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/round2-red.txt",
+      "sha256": "5b021a742078aad24849101297006819a92c39b0b331688631db7c8901685c07",
+      "bytes": 9790
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/round2-verification.json",
+      "sha256": "5ab5fc42a70e134531f6e5cc3426cbe6c783bad1deea2f22f1fc02b7d56710a0",
+      "bytes": 10254
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/run.py",
+      "sha256": "370ec49b8f436df82500bcf08307f5bba99d7212943df0330009936edab0d7b9",
+      "bytes": 9646
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/task.json",
+      "sha256": "f0548f2477113f1eb107110b9bb31bbccab0f15eb37b2dd543f1edfc7bc878bc",
+      "bytes": 522
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/evidence/nltk-reachability.json",
+      "sha256": "6915dd28fc7cbaf0918ce64f939f1870d77d77e006d01b763d0a73ea850b8b7f",
+      "bytes": 19270
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/gateway.py",
+      "sha256": "7b87b5f7d3bb3cd479261111c9fd74e30c13f582b26343b5333d490ea3f0131a",
+      "bytes": 9221
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/host.template.json",
+      "sha256": "8a07054c702d98dcc613ad4e2b2396d0aeb3e32aae5ed83bf1efeb9f76ef10f3",
+      "bytes": 426
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/install.sh",
+      "sha256": "93934687147c7ed3929b7d2ad121f508a853d50b234cf6ea3a42624884453e89",
+      "bytes": 3071
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/install_support.py",
+      "sha256": "a18890c66862e077d50b239e7a6592061349ca85ac7757b25ae5974f128dd28d",
+      "bytes": 2426
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/mcp-policy.json",
+      "sha256": "de646e3bbddc1ff809537258bac0cac810be0b516149683a00c7d3c54333bf1b",
+      "bytes": 2386
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/mcp_proxy.py",
+      "sha256": "b07428bf921d0512ecbbaa2e1d67b925360fd707e813ac4d21448f08fad32058",
+      "bytes": 9409
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/pins.json",
+      "sha256": "fdf3e7bc7b4fa773923383734a68df75124e1b28a686c16d090fee763a545278",
+      "bytes": 4538
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.in",
+      "sha256": "e7e64a4f4b8b49b0c1640218f231efb7583c0677e011bf5fdec9b6cef9803197",
+      "bytes": 101
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock",
+      "sha256": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754",
+      "bytes": 69181
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.in",
+      "sha256": "e023289c152a9cd6e55dfb3d245d316886e83001ea8297d6f331841117981be8",
+      "bytes": 2776
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.lock",
+      "sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+      "bytes": 372179
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/research.md",
+      "sha256": "2f5f9b58f1241d45d16baf4d794a72d374ffbf8266a70fc2ddcbdf6c438a1d1b",
+      "bytes": 14575
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/round3-verification.json",
+      "sha256": "19d49dfcc4a4340f6a454873b1a5846360ec7ced2576e1e1de20a2c677c367f0",
+      "bytes": 85966
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/run-e2e.sh",
+      "sha256": "e65e0809bf490801064bbd79c75d3135e4e7b10f823a6cd3939fc798135241ed",
+      "bytes": 279
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/run-upstream-tests.sh",
+      "sha256": "f1302b0d499681e824907919ceb142cc1ab445581c15a03b7ca9e0d08a69af40",
+      "bytes": 1109
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -41114,8 +41274,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "16c28c3e8ce639349a6a1f0cf8ef2dc167b85ffa299320bc86b9895f1a103df6",
-      "bytes": 37014
+      "sha256": "9b2ec37d323acaf529efd610113fb1f1f65c25940fa2ac6dd52baefd85792e88",
+      "bytes": 37320
     },
     {
       "path": "tests/test_path_safety.py",
@@ -41196,6 +41356,11 @@
       "path": "tests/test_retrieval_quality_v2.py",
       "sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
       "bytes": 58079
+    },
+    {
+      "path": "tests/test_runtime_worker_gpt_researcher.py",
+      "sha256": "4e20b7cdbf95840b2495627e51fc1fa4c88090be62c7a7b0484ccc88fcacfb49",
+      "bytes": 52334
     },
     {
       "path": "tests/test_saturation_ledger.py",
@@ -41499,8 +41664,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
-      "bytes": 55626
+      "sha256": "a0d5ee50ecdca6e5f733355187113e62992c2982a3c01fe3ec92ee1fb6db8056",
+      "bytes": 55655
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
