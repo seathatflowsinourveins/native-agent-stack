@@ -909,7 +909,7 @@ history into segments:
 - `tools/skill-usage/skill_usage.py` takes each skill's listing label from the manifest (L469) and
   its age from the lock's `installedAt` (L473-479), so it kept labelling the 14's counts `on`. With
   zero lifetime uses (L537-558), it would list the eleven 2026-09-25 trial skills under
-  `prune_candidates` from 2026-10-25T22:50:51Z, `gh-fix-ci` and `security-best-practices` under
+  `prune_candidates` from 2026-10-25T22:50:51Z to 22:51:17Z (per install), `gh-fix-ci` and `security-best-practices` under
   `verdict_recheck` ("verdict re-record required") from 2026-10-25T04:15:04Z, and
   `variant-analysis` from 2026-10-26T09:33:36Z.
 - Two kept verdict winners changed listing without the verdict re-record that the prune rule
@@ -1193,7 +1193,7 @@ policy as keeping "on-demand skills out of the listing to save context".
 | Settings-backup states | our-integration | Independent observation | Same receipt; read value-free with `skills_status.py`'s own reader |
 | `command -v semgrep` and `command -v codeql` | native-measurement | Upstream example or native operation | Same receipt, `local_checks`; one shell's `PATH` at one time |
 | `gh api` tree and blob reads | native-measurement | Upstream example or native operation | [Tree check](../../evidence/artifacts/skills-listing-restore-20260928/README.md), with stdout digests |
-| Scan, per-blob comparison and in-memory substitution | our-integration | Local integration check | Same directory; two self-checks in each run |
+| Scan, per-blob comparison and in-memory substitution | our-integration | Local integration check | Same directory; both self-checks in each run that passes the entry scan |
 | Tree-check controls | synthetic-fixture | Synthetic fixture | Same directory: five controls built by `run_checks.sh`, two exiting 1 and three exiting 2, none a pass |
 | Skills page and settings reference wording | upstream wording | None; cited, not executed | URL and read date (2026-09-28) only; no copy retained |
 | Who made the 2026-09-26 edits, and why | untrusted-history | None; not evidence | A coordinator memory note |

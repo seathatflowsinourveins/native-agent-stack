@@ -13960,8 +13960,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "baf7f7a942c636c17340deac4da0566008facd46594f591e52f0e04a29bcb3bd",
-      "bytes": 95873
+      "sha256": "eb07a4d41b8e8e6af80adb0ed8bde1c44b5874e4e227ad6ee7204d147a658c6b",
+      "bytes": 95928
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -34905,8 +34905,8 @@
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
-      "sha256": "570bee0266a0c28da85324a4ddec29ff792fdbf241376d2a4da6606d826d392e",
-      "bytes": 10634
+      "sha256": "598a2a4598c9bef43fbc08ad59c505d552fb8fbf2048075a8c9adcc0d1428b5b",
+      "bytes": 10827
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/control-no-allowance.json",

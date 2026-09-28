@@ -32,7 +32,7 @@ and `check_lock_entry` from it.
    `100755` blob or a tree. Any other row, such as a `120000` symlink or a `160000` gitlink, is
    refused.
 3. **In-memory tree.** `tree_sha_from_rows` hashes a map of blob rows with `git_tree_sha`'s entry
-   encoding and order (`skills_status.py` L172-176). Two self-checks run each time. From the local
+   encoding and order (`skills_status.py` L172-176). Two self-checks run in every run that gets past the entry scan (the retained pass, no-allowance and planted-blob runs); a run refused at the scan reaches neither, and the upstream-gitlink control reaches only the local one. From the local
    rows it must reproduce `git_tree_sha` of the folder, and from the upstream rows the upstream
    folder row and every subtree row.
 4. **Compare, then substitute in memory.** A difference outside the `--allow` set fails before
