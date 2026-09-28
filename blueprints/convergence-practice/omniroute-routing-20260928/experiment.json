@@ -37,7 +37,7 @@
   "license_and_compatibility": "OmniRoute is MIT (manifests/stack.json). This record installs, vendors and runs no new component. The other gateways (CLIProxyAPI, sub2api, LiteLLM, Bifrost, new-api, llm-d-router, SMG and others) were read at pinned revisions only; their licenses were not re-checked here. The approved occupancy patch changes the deployed OmniRoute build and copies its guard form from OmniRoute's own open PR #13102. Its build, tests and any license check belong to the separate patch workflow. GPT-6 was reached through the host's native Codex sign-in, and the GPT-6 prompts carry only the public question, the catalog and public URLs.",
   "baseline_and_candidate": {
     "baseline": "The routing as configured before this record. 20128 (build dd6e9607e): session affinity on with a 4 h sliding TTL; providerStrategies.codex round-robin with stickyRoundRobinLimit 1; the post-affinity OAuth occupancy override hardcoded on; quota used only as a hard filter at 99% used. 20129: the sharedgw limiter auto-enabled (60 rpm, 350 ms, 6 concurrent), its own retry layers and compression on. Measured in route-mapper-final.json over the 24 h ending about 2026-09-28T00:13Z, and by hour and load in route-mapper-part1-final.md.",
-    "candidate": "The adjudicated routing rules (51 items, adjudication.json) and the two changes they select. First, the 20129 limiter lift, applied 2026-09-28T01:22:13Z. Second, the approved 20128 affinity-over-occupancy patch: reuse an eligible pin, and bind a fresh pin to the connection that served it; it is applied only after the R02 scored run. Every other setting stays as it is."
+    "candidate": "The adjudicated routing rules (51 items, adjudication.json; 47 fields in 37 items await re-adjudication after the GPT-6 record review) and the two changes they select. First, the 20129 limiter lift, applied 2026-09-28T01:22:13Z. Second, the approved 20128 affinity-over-occupancy patch: reuse an eligible pin, and bind a fresh pin to the connection that served it; it is applied only after the R02 scored run. This record changed no other setting. At 2026-09-28T03:49:59Z a separate 20129 design workflow changed 20129's fallback, context-handoff, context-length, combo and compression settings (decisions.json, context_changes)."
   },
   "frozen_inputs": {
     "base_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
@@ -45,12 +45,15 @@
       "routing-practice-research",
       "routing-practice-adjudication",
       "omniroute-live-mapping",
-      "expiry-first-quota-window-checks",
+      "expiry-first-scope-check",
+      "quota-window-check",
       "occupancy-fix-research",
       "upstream-maintenance-check",
       "sharedgw-limiter-lift",
       "r02-freeze-readback",
-      "cutoff-capture-and-load-recheck"
+      "cutoff-capture-and-load-recheck",
+      "prepatch-offpin-control",
+      "record-review"
     ],
     "roles": [
       "claude-route-landscape",
@@ -60,7 +63,8 @@
       "claude-adjudicator-affinity-cache",
       "claude-adjudicator-resilience-retry",
       "claude-adjudicator-chain-stream-extra",
-      "coordinator"
+      "coordinator",
+      "gpt6-record-reviewer"
     ],
     "sources": [
       {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json", "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56"},
@@ -68,7 +72,7 @@
       {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md", "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437"},
       {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-occupancy-research.md", "sha256": "2bbbd194759ae5bd61a854b26b2d5498b3adf0f3bac7ff535d994f554a875704"},
       {"path": "evidence/artifacts/omniroute-routing-20260928/maintenance-gh-20260928.tsv", "sha256": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732"},
-      {"path": "evidence/artifacts/omniroute-routing-20260928/ab-requirements.md", "sha256": "4dff39c833542630d90ff7e48ba896af84e1d4131bdf757f63ed74fde07e9447"}
+      {"path": "evidence/artifacts/omniroute-routing-20260928/ab-requirements.md", "sha256": "bf3086ee2f4348c3c9da30e556da0b97316b61114227f983d099e7ebcd72ac10"}
     ],
     "inputs": [
       {"path": "evidence/artifacts/omniroute-routing-20260928/route-job1.prompt.txt", "sha256": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140"},
@@ -77,11 +81,12 @@
       {"path": "evidence/artifacts/omniroute-routing-20260928/route-job2.schema.json", "sha256": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507"}
     ],
     "evaluation": [
-      {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json", "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915"}
+      {"path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json", "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915"},
+      {"path": "evidence/artifacts/omniroute-routing-20260928/offpin-control.py.txt", "sha256": "26d99656dd862df971284685cbd3960da22026044aa64016e124197a3991fc88"}
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Adjudication (adjudication-rule.json): an item is 'converged' only when both families agree on checked sources, and 'converged_with_amendment' when the checkable GPT-6 amendments were applied; 'single_family' and 'not_checked' mean what they say. Numbers come only from the input files, each with its file. A run's contract check means its output matches its declared schema or request: the GPT-6 answers and the adjudication groups have 0 schema errors, the limiter read-back equals the request, the second R02 read-back was admissible and the maintenance TSV has a row for every queried repository. The teammate reports had no declared schema, so their contract stays null. Semantic quality stays null unless an independent check graded it. The runtime acceptance of the candidate changes is declared here but has not run. After the occupancy patch, on 20128, over load-matched windows (peak in-flight >= 10, or more than about 300 turns/h) against a pre-patch loaded window recorded before the patch, with both route-mapper methods reported: served-not-pin near 0 outside ineligibility (whole-window baselines, mixing loaded and quiet hours: 10.31% per conversation, 460/4461, and 8.0% per turn, 339/4231); cache-read share on formerly overridden conversations above the 73.76% baseline; requested-not-served model still 0 (baseline 0/7070); 429 and 499 rates tracked against 0.0 and 0.028, where a rise sends the item to per-credential admission (P18). The adjudication stage wrote the criteria after the research runs, not before them, and the load-matching requirement comes from the coordinator's log after route-mapper's final part 1 report.",
+    "quality_rule": "Adjudication (adjudication-rule.json): an item is 'converged' only when both families agree on checked sources, and 'converged_with_amendment' when the checkable GPT-6 amendments were applied; 'single_family' and 'not_checked' mean what they say. Numbers come only from the input files, each with its file. A run's contract check means its output matches its declared schema or request: the GPT-6 answers and the adjudication groups have 0 schema errors, the limiter read-back equals the request, the second R02 read-back was admissible and the maintenance TSV has a row for every queried repository. The teammate reports had no declared schema, so their contract stays null. Semantic quality stays null unless an independent check graded it. The runtime acceptance of the candidate changes is declared here but has not run. After the occupancy patch, on 20128, by rerunning the frozen control script (offpin-control.py.txt) over a post-patch window whose length, minimum matched turns per peak stratum and regression margins are declared before it starts; comparing hours with peak in-flight >= 10, stratified by peak and at matched account availability and quota headroom, with the frozen pre-patch control (offpin-control-prepatch.md); and reporting the per-conversation method alongside: no unexplained move off an eligible pin (whole-window baselines, mixing loaded and quiet hours: 10.31% per conversation, 460/4461, and 8.0% per turn, 339/4231); cache-read share compared within the same peak strata (the 73.76% whole-window figure is context); requested-not-served model still 0 (baseline 0/7070); 429s classified by type (concurrency, quota or rate) and 499s, against 0.0 and 0.028, with the rise that sends the item to per-credential admission (P18) declared before the run. The adjudication stage wrote the criteria after the research runs, not before them, and the load-matching requirement comes from the coordinator's log after route-mapper's final part 1 report; the frozen control and the peak-stratified acceptance come from the coordinator's log at 03:4xZ.",
     "usage_rule": "GPT-6 jobs use Codex's turn.completed usage: uncached_input = input - cached - cache_write; cache_creation = cache_write (reported 0); cache_read = cached; output includes reasoning; total = input + output. native_retries is null because HTTP-layer retries are not visible in the exec event stream. Usage of the Claude teammates, adjudicators, builder, reviewers and coordinator is unknown and stays null; it is never estimated. The no-model runs (gh api, the PATCH, the read-backs) record zero model tokens; the coordinator's own tokens for issuing them are excluded. There is no savings claim. The adjudication's two uncached-token estimates (P1, about 5,370,000 per 24 h; P7, 7,520,091) come from overlapping methods and are never summed."
   },
   "runtime_and_platform": {
@@ -93,7 +98,7 @@
       {"name": "GitHub CLI", "version": "gh 2.101.0"},
       {"name": "Python", "version": "3.13.15 for the repository validators; 3.14.7 with jsonschema 4.26.0 through uv for the staging script and the schema checks"}
     ],
-    "isolation": "Research was read-only. route-landscape and route-mapper were in-process Claude teammates that could not write files; the coordinator wrote their reports. route-mapper read sqlite in mode=ro and used GET only. The GPT-6 jobs ran through tools/sota-convergence/landscape-sweep/codex_call.sh in a read-only sandbox whose shell had no network, each holding a runner slot. The only gateway write was the coordinator's PATCH on 20129. 20128 was not changed, and it is frozen from 2026-09-28T01:29:29Z through the R02 scored run. The builder wrote only in its own worktree at base ba1700ad."
+    "isolation": "Research was read-only. route-landscape and route-mapper were in-process Claude teammates that could not write files; the coordinator wrote their reports. route-mapper read sqlite in mode=ro and used GET only. The GPT-6 jobs ran through tools/sota-convergence/landscape-sweep/codex_call.sh in a read-only sandbox whose shell had no network, each holding a runner slot. This record's only gateway write was the coordinator's PATCH on 20129; the 03:49:59Z 20129 design apply belongs to a separate workflow. 20128 was not changed, and it is frozen from 2026-09-28T01:29:29Z through the R02 scored run. The builder wrote only in its own worktree at base ba1700ad."
   },
   "commands": [
     "Claude teammate route-landscape: git clone --depth 1 --branch <tag> of each reviewed upstream into $SCRATCH, HEAD checked against the gh api tag commit; gh api contents at the ref for dynamo, the SDKs and otel-genai; docs through ctx_fetch_and_index. Exact invocations not retained.",
@@ -108,8 +113,11 @@
     "PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":false}} on 127.0.0.1:20129, then GET /api/resilience and GET /api/rate-limits. Client invocation not retained.",
     "analyze_r02.py readback <0600 output> at PR #445 revision 00a94b52, declared source GET /api/monitoring/health on 20128",
     "analyze_r02.py readback <0600 output> at revision bddb0072, amended keyless sources GET /api/system/version (.current) and the BUILD_SHA sentinel in the serving directory",
-    "SCRATCH=<session scratch> WF_JOURNAL=<record workflow journal> uv run --no-project --with jsonschema python evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
-    "route-mapper part 1 final, read-only: quota_snapshots, call_logs, app.log and audit_log on 20128 from 01:22Z to 03:29Z; per-turn off-pin matching of each AUTH affinity line to call_logs within 0.5 s (unique pairs only) over 06:58Z-00:13Z, with the hourly peak in-flight; GET /api/rate-limits, call_logs and app.log on 20129. Exact invocations not retained."
+    "SCRATCH=<session scratch> WF_JOURNAL=<record workflow journal> AB_LABELS=<three local labels> uv run --no-project --with jsonschema python evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
+    "route-mapper part 1 final, read-only: quota_snapshots, call_logs, app.log and audit_log on 20128 from 01:22Z to 03:29Z; per-turn off-pin matching of each AUTH affinity line to call_logs within 0.5 s (unique pairs only) over 06:58Z-00:13Z, with the hourly peak in-flight; GET /api/rate-limits, call_logs and app.log on 20129. Exact invocations not retained.",
+    "route-mapper, read-only: python3 offpin_control.py 2026-09-27T06:00:00Z 2026-09-28T04:00:00Z, run 2026-09-28T03:31:57Z (script sha256 c4515e7660c47d725c79696c7211b71f26bd0c5d789b3f2a7e9a444f1d778477; storage.sqlite in mode=ro and logs/application/app.log*), relayed by the coordinator",
+    "coordinator rerun of the same script over 2026-09-27T06:00:00Z to 2026-09-28T03:00:00Z (the TSV meta line); exact invocation not retained",
+    "tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/gpt6-record-review start routing-record-review <prompt.txt> <schema.json>, then wait and result (gpt-6-astra, effort max, codex-cli 0.157.1; quota gate 100%, 49% used at 03:53:01Z)"
   ],
   "observations": [
     {
@@ -179,7 +187,7 @@
       "quality": {"semantic": false, "contract": null},
       "artifacts": [
         {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json", "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56"},
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
     },
@@ -191,7 +199,7 @@
       "attempt": 2,
       "command_index": 3,
       "evidence_class": "native_cli_execution",
-      "scope": "route-mapper's mapping of OmniRoute's routing mechanisms (build dd6e9607e) and aggregate metrics for the 24 h ending about 2026-09-28T00:13Z, read-only, with request start = call_logs.timestamp - duration. 20128: 7,007 GPT-6 turns; by the per-conversation pin-creation method, 460 of 4,461 matched turns (10.31%) served off-pin, cache-read share 73.76% off-pin against 92.14% on-pin. 20129: 10 probe turns. Observational, not causally isolated. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "scope": "route-mapper's mapping of OmniRoute's routing mechanisms (build dd6e9607e) and aggregate metrics for the 24 h ending about 2026-09-28T00:13Z, read-only, with request start = call_logs.timestamp - duration. 20128: 7,007 GPT-6 turns; by the per-conversation pin-creation method, 460 of 4,461 matched turns (10.31%) served off-pin, cache-read share 73.76% off-pin against 92.14% on-pin. 20129: 10 probe turns. Observational, not causally isolated. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion. Its mechanism inventory is source review at a58000c7 with PR #14904; only the metrics are execution.",
       "status": "passed",
       "exit_code": 0,
       "quality": {"semantic": null, "contract": null},
@@ -201,14 +209,31 @@
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
     },
     {
-      "id": "expiry-first-quota-window-checks",
-      "task": "expiry-first-quota-window-checks",
+      "id": "expiry-first-scope-check",
+      "task": "expiry-first-scope-check",
+      "role": "claude-route-mapper",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "pinned_source_review",
+      "scope": "route-mapper check 1, read-only source review: lever (d) changes only the target of the in-request Codex 429 rotation, the basis for not applying lever (d). A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md", "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "quota-window-check",
+      "task": "quota-window-check",
       "role": "claude-route-mapper",
       "condition": "baseline",
       "attempt": 1,
       "command_index": 4,
       "evidence_class": "native_cli_execution",
-      "scope": "route-mapper checks 1 and 2, read-only. Check 1 (source): lever (d) changes only the target of the in-request Codex 429 rotation. Check 2 (sqlite in mode=ro and source): expiry-first scores the minimum remaining over hours to the nearest reset; the binding window is the upstream primary window stored as 'session' and behaves as 7-day (inferred; window_duration_ms is null on all 555 rows); the cutoff is remaining <= 1%. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "scope": "route-mapper check 2, read-only (sqlite in mode=ro over 555 quota_snapshots rows, plus source): expiry-first scores the minimum remaining over hours to the nearest reset; the binding window is the upstream primary window stored as 'session' and behaves as 7-day (inferred; window_duration_ms is null on all 555 rows); the cutoff is remaining <= 1%. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
       "status": "passed",
       "exit_code": 0,
       "quality": {"semantic": null, "contract": null},
@@ -335,8 +360,8 @@
       "exit_code": 0,
       "quality": {"semantic": null, "contract": true},
       "artifacts": [
-        {"path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json", "sha256": "427a55e3212a6dc0d7ea1370c16b422a08140e9cd7f74b22c1b675a9839f1c8d"},
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json", "sha256": "d0821ebf06adbdb24817996fcc9416c694db74521b28ff6401534d87ed8284fd"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
       ],
       "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
     },
@@ -353,7 +378,7 @@
       "exit_code": 2,
       "quality": {"semantic": null, "contract": false},
       "artifacts": [
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
       ],
       "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
     },
@@ -370,7 +395,7 @@
       "exit_code": 0,
       "quality": {"semantic": null, "contract": true},
       "artifacts": [
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
       ],
       "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
     },
@@ -382,15 +407,68 @@
       "attempt": 1,
       "command_index": 13,
       "evidence_class": "native_cli_execution",
-      "scope": "route-mapper's final part 1 report, read-only, appended to its input file after the adjudication (file modification time 03:30:26Z) and not adjudicated. No quota cutoff through 03:29Z. 20128 from 01:22Z: 83 Codex turns, all 200, 0 of 66 off-pin at peak in-flight 7. Per-turn method over 06:58Z-00:13Z: 339 of 4,231 turns (8.0%) off-pin, cache-read share 85.6% on moved turns vs 94.5%; mostly 0% in hours with peak 4-8, 16.7-21.7% in hours with peak 13-32. 20129 after the limiter change: 2 turns, both 200 with added_wait_ms 0, a column that may not record limiter waits. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "scope": "route-mapper's final part 1 report, read-only, appended to its input file after the adjudication (file modification time 03:30:26Z) and not adjudicated. No quota cutoff observed in the retained snapshots and logs through 03:29Z. Snapshots persist only on change and a failed save is only logged (quotaCache.ts:569-588), so poll freshness and persistence success are not established. 20128 from 01:22Z: 83 Codex turns, all 200, 0 of 66 off-pin at peak in-flight 7. Per-turn method over 06:58Z-00:13Z: (the report does not state its start-time basis; route-mapper's frozen control, with the same pairing rule and the same 339 off-pin turns, uses start = timestamp - duration/1000, so the 8.0% does not repeat the withdrawn computation's error) 339 of 4,231 turns (8.0%) off-pin, cache-read share 85.6% on moved turns vs 94.5%; mostly 0% in hours with peak 4-8. The report names 12Z 16.7% (peak 13), 14Z 17.4% (peak 14) and 16Z 21.7% (peak 32); the frozen control (prepatch-offpin-control) shows other loaded hours lower: 15Z 9.2% at peak 13, 17Z 3.6% at 15, 18Z 2.8% at 18. 20129 after the limiter change: 2 turns, both 200 with added_wait_ms 0, a column that may not record limiter waits. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
       "status": "passed",
       "exit_code": 0,
       "quality": {"semantic": null, "contract": null},
       "artifacts": [
         {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md", "sha256": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625"},
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "30458a7e2d776e12aaa6c8e99ad2fdb591f333c7cbf06bbbb1154d78e4e80a54"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "prepatch-offpin-control",
+      "task": "prepatch-offpin-control",
+      "role": "claude-route-mapper",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 14,
+      "evidence_class": "native_cli_execution",
+      "scope": "route-mapper's pre-patch off-pin control on 20128, read-only, run 2026-09-28T03:31:57Z over 2026-09-27T06:00:00Z to 2026-09-28T04:00:00Z (the 03Z hour partial) and frozen by the coordinator at about 03:4xZ: per-hour per-turn off-pin with request start = timestamp - duration/1000. From the table rows, 284/2756 = 10.3% in hours with peak_total >= 10 (12Z, 14Z-20Z; 2.8-21.7% per hour), 55/1614 = 3.4% in the other hours, 339/4370 = 7.8% overall. A relayed teammate report with no declared schema, so its contract stays null. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": null},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/offpin-control-prepatch.md", "sha256": "b139b565d84c5687bc94781d03354304988af7491bcc9e93726938a0f8cb6467"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/offpin-control.py.txt", "sha256": "26d99656dd862df971284685cbd3960da22026044aa64016e124197a3991fc88"}
+      ],
+      "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
+    },
+    {
+      "id": "prepatch-offpin-control-rerun",
+      "task": "prepatch-offpin-control",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "native_cli_execution",
+      "scope": "The coordinator's rerun of the frozen control script over 2026-09-27T06:00:00Z to 2026-09-28T03:00:00Z (the TSV meta line): 21 hourly rows (06Z-02Z), 4370 matched turns, 339 off-pin (7.8%) and 247 mid-turn changes. The contract check is that its 21 hourly rows equal the control's. No model. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/offpin-rerun-team-lead.tsv", "sha256": "4c0bc69682c1f3b062c2c89e204897826790cf60d00a74869fb1bdf704d10411"}
+      ],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "gpt6-record-review",
+      "task": "record-review",
+      "role": "gpt6-record-reviewer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 16,
+      "evidence_class": "pinned_source_review",
+      "scope": "GPT-6 cross-family review of this record, gpt-6-astra at effort max through codex-cli 0.157.1, run 03:53:02Z-04:13:48Z. It reviewed this record's experiment.json (sha256 7e0d78f7c6c01694dc13460c789392da1f3fb15db7f753a43aa6668311761d5e) and the blueprint README.md (sha256 3b1a3cf9550ddbdae51010fddea37703c5807c48e196d3376d4bb749f608d46b) as first committed, both embedded whole in its prompt; the prompt (sha256 2f99ab8bf1d1d889dc359e56c6dc8d028a9457c2f8e0cb796c4afef80d62db8c) is not published because it contains private paths. 78 findings (21 confirm, 17 refute, 40 amend), of which 65 judge adjudicated item fields (18/16/31) and 13 judge the record or add risks; the synthesis re-opened the cited sources for P1:action, P1:upstream_sources, P3:omniroute_state, P9:verify_metric, P13:omniroute_state, P14:omniroute_state, the README failure claim, observation 15's cutoff wording (part1-final-recheck in the reviewed bytes) and harm:1, and each finding held; the item fields are not re-adjudicated. Exit 0 from the runner's exit file; the answer validates against its frozen schema (0 errors, jsonschema 4.26.0).",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": null, "contract": true},
+      "artifacts": [
+        {"path": "evidence/artifacts/omniroute-routing-20260928/record-review-gpt6.last.json", "sha256": "8ba6f9efe849e5f290099167f845b2f2ae8fe6bab570f0179104e50b1ae8b0f4"},
+        {"path": "evidence/artifacts/omniroute-routing-20260928/record-review-gpt6.schema.json", "sha256": "7f5605c749fbe4d44bbeb4737c115a6f90721b240488031832b4460f46343d89"}
+      ],
+      "usage": {"uncached_input": 188806, "cache_creation": 0, "cache_read": 4856064, "output": 34819, "reasoning_in_output": 12650, "total": 5079689, "native_retries": null}
     }
   ],
   "failures_and_skips": [
@@ -398,26 +476,30 @@
     {"run_id": "r02-readback-attempt-1", "reason": "Exit 2. /api/monitoring/health requires management auth (alwaysRequireAuth) on the keyless loopback gateway, so version and sha came back null. In the same check the keyless alternates returned exit 0, which led to the amended sources of attempt 2 at bddb0072. The read-back outputs are private (mode 0600); this record rests on the coordinator's log."}
   ],
   "limitations": [
-    "Assembled after execution from retained outputs and the coordinator's log; not a prospective registration. adjudication-rule.json was copied from the workflow script after the stages ran.",
-    "The adjudication is source review and decisions. No adopted rule is accepted by runtime evidence here. The only runtime change, the 20129 limiter lift, has a read-back and no measurement of its effect.",
+    "Assembled after execution from retained outputs and the coordinator's log; not a prospective registration. adjudication-rule.json was copied from the workflow script after the stages ran. This record covers the coordinator's log through its 03:50Z entry and the GPT-6 record review that ended at 04:13:48Z. Later work, including the occupancy patch workflow's review rounds from about 04:0xZ, belongs to that workflow and a later record.",
+    "The adjudication is source review and decisions. No adopted rule is accepted by runtime evidence here. The only runtime change this record made, the 20129 limiter lift, has a read-back and no measurement of its effect.",
     "The metrics are one 24 h window ending about 2026-09-28T00:13Z on 20128, route-mapper's later per-turn and hourly recheck of 06:58Z-00:13Z and 01:22Z-03:29Z, and on 20129 the 10 probe turns of the 24 h window plus 2 turns after the limiter change. The two off-pin methods cover different windows and give 10.31% and 8.0%. The off-pin association is not causally isolated: off-pin selection rises with load, and a moved turn can land on an account that already served the thread.",
     "The two uncached-token estimates (P1 served-not-pin, about 5,370,000 per 24 h; P7 switch-based, 7,520,091) come from overlapping methods and must not be added.",
     "The binding quota window's length is inferred: it behaves as 7-day, but window_duration_ms is null on all 555 quota_snapshots rows.",
     "Open unknowns: U1; U3 (not applicable while there is no Claude connection); U4; the binding window length; whether the ChatGPT backend decrypts, rejects or ignores encrypted reasoning minted by another account; and whether 20129 forwards prompt_cache_key to 20128. Ten items carry action open_unknown (adjudication.json, decisions.json).",
     "GPT-6 JOB 2 spent its budget and left E2-E4 and E6-E8 not_checked; its maintenance entries were all unknown and were closed by the local gh api query. M2-M5 are single_family.",
-    "Usage is unknown and excluded for route-landscape, route-mapper, the route-gpt6 teammate that ran the GPT-6 jobs, the three adjudicators, this builder, the reviewers and the coordinator. GPT-6 usage is complete for the two jobs only, and their native retries are unknown. The coordinator's tokens for the no-model runs are excluded.",
+    "Usage is unknown and excluded for route-landscape, route-mapper, the route-gpt6 teammate that ran the GPT-6 jobs, the three adjudicators, this builder, the reviewers and the coordinator. GPT-6 usage is complete for the three GPT-6 jobs only, and their native retries are unknown. The coordinator's tokens for the no-model runs are excluded.",
     "route-mapper and route-landscape results are relayed teammate reports that the coordinator wrote down. The adjudication read route-mapper's interim part 1; the final part 1 report arrived after it (part1-final-recheck) and was not adjudicated. P1 and ADD-LIVE were adjudicated on the 10.31% per-conversation figure, without the 8.0% per-turn figure or the load dependence. The upstream fix search could miss a restructure that touches none of the scanned identifiers, and its date filters use committer dates.",
     "Context, not runs of this record: the user paused work from 00:38Z to 01:20Z, and at about 01:29Z the Claude account's weekly limit paused the separate 20129 design workflow until the user reported it lifted at about 01:35Z (decisions.json).",
     "The occupancy patch is approved but not built, tested or applied by this record. Its acceptance, rollback and upstream-drop condition belong to the separate patch workflow and a later record. Its application waits on the R02 scored run, which had not started and had no active owner as of the coordinator log's 03:3xZ entry, so the patch has no application date and 20128 stays frozen (decisions.json).",
-    "Sanitization: CLIProxyAPI internal/home/<file> citations are written in brace form, scratch and home paths are masked, the limiter record is reduced, and the coordinator's log is not published (evidence/artifacts/omniroute-routing-20260928/README.md)."
+    "Sanitization: CLIProxyAPI internal/home/<file> citations are written in brace form, scratch and home paths are masked, the limiter record is reduced, and the coordinator's log is not published (evidence/artifacts/omniroute-routing-20260928/README.md).",
+    "The 03:49:59Z 20129 design apply, outside this record, changed settings on the limiter lift's lane. A later 20129 measurement therefore cannot attribute an effect to the lift alone (P17's overturn condition): use a matched baseline after 03:50:11Z, or attribute both changes.",
+    "The kept TTL does not preserve continuation ownership past expiry. An expired pin is deleted, and the next turn gets a fresh LRU pin even when the original account is healthy (sessionAccountAffinity.ts:63-83; sessionAffinityPin.ts:280-319).",
+    "The GPT-6 record review names further untested risks. The 20129-to-20128 hop forwards x-session-id but not session-id, thread-id or x-codex-turn-state (harm:2). Threshold-triggered context compaction on sharedgw can rewrite earlier input (harm:3; recheck it against the 20129 settings after 03:49:59Z). Model, tier and effective-effort preservation across both hops is unproven (harm:4). OAuth refresh concurrency needs review before pinned traffic concentrates (missing:1). HTTP 200 is not completion without the terminal SSE event (missing:2). The all-200 counts in part1-final-recheck and limiter-lift-20129 are HTTP status only.",
+    "A passed run whose scope says no process exit status was retained carries exit_code 0 because scripts/validate_convergence.py:120-121 requires 0 for a passed run. Read it as reported completion, not an observed exit. The limiter-lift and R02 exit statuses come from the coordinator's log."
   ],
   "decision_and_scope": {
     "decision": "trial",
-    "scope": "GPT-6 lane account routing through OmniRoute on nativestack-5975wx-20260925. Trial: the 20129 sharedgw limiter lift (applied 2026-09-28T01:22:13Z, effect unmeasured) and the approved 20128 affinity-over-occupancy patch (applied only after the R02 scored run, which had not started as of the coordinator log's 03:3xZ entry, then verified live over load-matched windows against a pre-patch loaded window recorded before the patch). Every other routing setting on 20128 and 20129 is retained. The adjudicated rules are this lane's routing standard, not accepted runtime behaviour.",
+    "scope": "GPT-6 lane account routing through OmniRoute on nativestack-5975wx-20260925. Trial: the 20129 sharedgw limiter lift (applied 2026-09-28T01:22:13Z, effect unmeasured) and the approved 20128 affinity-over-occupancy patch (applied only after the R02 scored run, which had not started as of the coordinator log's 03:3xZ entry, then verified live by rerunning the frozen control script over peak-stratified hours with peak in-flight >= 10 against the pre-patch control frozen at 2026-09-28T03:31:57Z). Every other routing setting on 20128 is retained. On 20129 this record changed nothing else, but the separate 03:49:59Z design apply did. The adjudicated rules are this lane's routing standard except the 47 fields awaiting re-adjudication, and none is accepted runtime behaviour.",
     "qualification_run_ids": []
   },
   "rollback": "20129: PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":true}} restores the auto-applied sharedgw limiter. Its stored values did not change (60 rpm, 350 ms, 6 concurrent, global 0, max wait 30000 ms, execution max wait 600000 ms, queue depth 0); read back GET /api/rate-limits. 20128 was not changed by this record. Once applied, the occupancy patch is rolled back in its own workflow by restoring build dd6e9607e, and it is dropped on an OmniRoute upgrade that merges an affinity-over-occupancy fix. Reverting this record removes documentation and receipts only.",
-  "next_decision_changing_test": "Before the patch, record a loaded pre-patch window on 20128 (peak in-flight >= 10, or more than about 300 turns/h). After the R02 scored run, apply the occupancy patch to 20128 once its upstream suite passes, and measure a load-matched window with both route-mapper methods: the served-not-pin rate (whole-window baselines 10.31% per conversation and 8.0% per turn, which mix loaded and quiet hours), the share of key and thread groups served by more than one account (27.27%), the cache-read share on formerly overridden conversations (73.76% off-pin, 92.14% on-pin), per-account peak in-flight (2, 2, 8, 8, 10, 11), and the 429 and 499 rates (0.0, 0.028). Before the #431 comparison of 20129 against 20128 is read out, send a synthetic prompt_cache_key through 20129 and read the 20128 affinity key kind. Then run the P5 paired continuation-fidelity probe, and count previous_response_id and configuration_update items at 20128 (M1, M3). A failed criterion reopens the item under its overturn condition in adjudication.json.",
+  "next_decision_changing_test": "The loaded pre-patch control is frozen (offpin-control-prepatch.md; hours with peak >= 10: 284/2756 = 10.3%). After the R02 scored run, apply the occupancy patch to 20128 once its upstream suite passes. First declare the window, the minimum matched turns per peak stratum and the margins. Then rerun the same script stratified by peak, with the per-conversation method alongside, and require no unexplained move off an eligible pin, no model or effort mismatch, and idle-gap continuation cases around the 4 h TTL. Report as context the whole-window figures: the served-not-pin rate (whole-window baselines 10.31% per conversation and 8.0% per turn, which mix loaded and quiet hours), the share of key and thread groups served by more than one account (27.27%), the cache-read share on formerly overridden conversations (73.76% off-pin, 92.14% on-pin), per-account peak in-flight (2, 2, 8, 8, 10, 11), and the 429 and 499 rates (0.0, 0.028). In every run, record terminal SSE events and per-attempt model, tier and effective effort. Before the #431 comparison of 20129 against 20128 is read out, send a synthetic prompt_cache_key through 20129 and compare the inbound and outbound prompt_cache_key, session-id/session_id and thread-id at both hops, accounting for OmniRoute's Codex identity rewrite (codexIdentity.ts:453-480); the 20128 affinity key kind is auxiliary. Then run the paired P5 probe with repeated state-sensitive tasks, a same-origin positive control, a visible-history-only negative control and a fidelity margin declared first; equal answers alone do not show that foreign encrypted reasoning was honored. Count previous_response_id and configuration_update items at 20128 (M1, M3). A failed criterion reopens the item under its overturn condition in adjudication.json.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

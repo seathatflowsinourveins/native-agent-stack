@@ -4,6 +4,7 @@
 Run from the repository root:
 
   SCRATCH=<session scratch directory> WF_JOURNAL=<journal.jsonl of the record workflow> \
+    AB_LABELS=<peer session A>,<peer session B>,<Codex home label> \
     uv run --no-project --with jsonschema python \
     evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt
 
@@ -11,11 +12,17 @@ It reads only the inputs named below and writes only this receipt directory. It 
 JSON summary: the source and output SHA-256 of every file, the substitution counts, the
 split of route-mapper-resume-parts.md and the private-content scan result. The scan reuses
 scripts/validate.py's PRIVATE_CONTENT patterns and adds emails, the home and scratch
-directory strings and the opaque ids of the private limiter record; it reports labels and
-counts, never a matched value. Every generated file is pinned in EXPECTED: a file is
-written only when its bytes equal the pin, so a changed private input cannot silently
-replace a receipt that the record cites. It exits 1 on any scan finding or pin mismatch.
-jsonschema is optional: without it the schema check is "not run".
+directory strings, the opaque ids of the private limiter record and the three local labels
+that ab-requirements.md replaces; it reports labels and counts, never a matched value.
+Every generated file is pinned in EXPECTED: a file is written only when its bytes equal the
+pin, so a changed private input cannot silently replace a receipt that the record cites. It
+exits 1 on any scan finding or pin mismatch. jsonschema is optional: without it the schema
+check is "not run".
+
+AB_LABELS holds the local labels of two peer Claude sessions and one Codex home directory,
+comma-separated in that order, as they appear in the private ab-requirements.md. They come
+from the environment so that this script does not publish them, and the substitution
+summary prints a description in place of each private literal.
 """
 
 from collections import Counter
@@ -30,13 +37,32 @@ OUT = Path("evidence/artifacts/omniroute-routing-20260928")
 SCRATCH = Path(os.environ["SCRATCH"])
 OF = SCRATCH / "omni-full"
 GPT = OF / "route-gpt6"
+REVIEW = OF / "gpt6-record-review"
 JOURNAL = Path(os.environ["WF_JOURNAL"])
+AB_LABELS = [value.strip() for value in os.environ["AB_LABELS"].split(",")]
+if len(AB_LABELS) != 3 or not all(AB_LABELS):
+    raise SystemExit("AB_LABELS: give three non-empty comma-separated labels (peer session A, peer session B, Codex home)")
 GROUP_ORDER = ["adjudicate:affinity-cache", "adjudicate:resilience-retry", "adjudicate:chain-stream-extra"]
 
 # CLIProxyAPI's Home-mode package is internal/home/. scripts/validate.py reads
 # "/home/<name>" as a personal home path, so a file name there is written in braces.
 BRACES = (re.compile(r"internal/home/([A-Za-z0-9_.-]+)"), r"internal/home/{\1}")
 SCRATCH_PREFIX = (re.compile(r"\bscratchpad/"), "$SCRATCH/")
+# A rule's optional third element describes a private literal; the summary prints it in place
+# of the pattern. The home directory comes from Path.home(), so this script does not hold it.
+HOME_PREFIX = (re.compile(re.escape(str(Path.home()))), "~", "<home directory>")
+AB_RULES = [(re.compile(re.escape(label)), placeholder, description) for label, placeholder, description in zip(
+    AB_LABELS, ("<peer-session-A>", "<peer-session-B>", "<codex-home>"),
+    ("peer session label A", "peer session label B", "Codex home label"))]
+# route-mapper's frozen control report reached the coordinator inside a message wrapper. The receipt drops only the
+# wrapper's lines: the first line, the <teammate-message ...> opening tag line that follows it and a closing tag line
+# if one ends the file. The rules run in order and are anchored to the start or end of the text, so no body line can
+# match. Everything else stays byte for byte, including the "route-mapper:" lead-in.
+WRAPPER = [
+    (re.compile(r"\AAnother Claude session sent a message:\n"), "", "message wrapper: first line"),
+    (re.compile(r"\A<teammate-message\b[^\n]*>\n"), "", "message wrapper: opening tag line"),
+    (re.compile(r"\n</teammate-message>\n?\Z"), "\n", "message wrapper: closing tag line"),
+]
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
 # The SHA-256 of every generated receipt, as the record cites it.
@@ -53,10 +79,15 @@ EXPECTED = {
     "route-mapper-resume-parts.md": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437",
     "route-mapper-part1-final.md": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625",
     "maintenance-gh-20260928.tsv": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732",
-    "ab-requirements.md": "4dff39c833542630d90ff7e48ba896af84e1d4131bdf757f63ed74fde07e9447",
+    "ab-requirements.md": "bf3086ee2f4348c3c9da30e556da0b97316b61114227f983d099e7ebcd72ac10",
     "adjudication.json": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100",
     "route-gpt6-runs.json": "3ab36b52201737f6912032b573cbe4b12e2d63ff11026a6dd8d75f46ce265b59",
-    "limiter-apply-20129.json": "427a55e3212a6dc0d7ea1370c16b422a08140e9cd7f74b22c1b675a9839f1c8d",
+    "limiter-apply-20129.json": "d0821ebf06adbdb24817996fcc9416c694db74521b28ff6401534d87ed8284fd",
+    "offpin-control-prepatch.md": "b139b565d84c5687bc94781d03354304988af7491bcc9e93726938a0f8cb6467",
+    "offpin-rerun-team-lead.tsv": "4c0bc69682c1f3b062c2c89e204897826790cf60d00a74869fb1bdf704d10411",
+    "offpin-control.py.txt": "26d99656dd862df971284685cbd3960da22026044aa64016e124197a3991fc88",
+    "record-review-gpt6.last.json": "8ba6f9efe849e5f290099167f845b2f2ae8fe6bab570f0179104e50b1ae8b0f4",
+    "record-review-gpt6.schema.json": "7f5605c749fbe4d44bbeb4737c115a6f90721b240488031832b4460f46343d89",
 }
 # Sources whose bytes differ from their receipt: the substituted files and the split file.
 EXPECTED_SOURCE = {
@@ -64,6 +95,14 @@ EXPECTED_SOURCE = {
     "route-landscape-catalog.json": "b2c1f2d50941e143ed94572349a6e374501c6f5744408d3bece10fa30f692cb0",
     "route-landscape-occupancy-research.md": "7ecfd22215faabb34baf4b989983a665563838957fea73ff3b1937b265592ef3",
     "route-mapper-resume-parts.md": "6ab400e25ae53f58f91b6ab10f2012a9a968363abf892e08e91e63e07812c7cb",
+    "ab-requirements.md": "4dff39c833542630d90ff7e48ba896af84e1d4131bdf757f63ed74fde07e9447",
+    "offpin-control.py.txt": "c4515e7660c47d725c79696c7211b71f26bd0c5d789b3f2a7e9a444f1d778477",
+    "offpin-control-prepatch.md": "a87794c7a814346e7c294278dc467733909eaf253bdef5a21d842c0198023063",
+}
+# A private input that is checked but not published: the GPT-6 record review's prompt names
+# private paths. The review runner recorded the same SHA-256 in its inputs.json.
+UNPUBLISHED = {
+    "gpt6-record-review/prompt.txt": "2f99ab8bf1d1d889dc359e56c6dc8d028a9457c2f8e0cb796c4afef80d62db8c",
 }
 # route-mapper-resume-parts.md grew after the adjudication stages read it: route-mapper's
 # final part 1 report was appended (file modification time 2026-09-28T03:30:26Z), after the
@@ -71,7 +110,7 @@ EXPECTED_SOURCE = {
 # bytes are the version the stages read; the appended part is route-mapper-part1-final.md.
 ADJUDICATED_BYTES = 6503
 
-summary = {"copies": [], "substituted": [], "split": [], "derived": []}
+summary = {"copies": [], "substituted": [], "split": [], "derived": [], "unpublished": []}
 mismatches = []
 
 
@@ -108,9 +147,11 @@ def substitute(src: Path, name: str, rules) -> None:
     check_source(name, raw)
     text = raw.decode("utf-8")
     counts = []
-    for pattern, replacement in rules:
+    for rule in rules:
+        pattern, replacement = rule[0], rule[1]
         text, count = pattern.subn(replacement, text)
-        counts.append({"pattern": pattern.pattern, "replacement": replacement, "count": count})
+        counts.append({"pattern": rule[2] if len(rule) > 2 else pattern.pattern, "replacement": replacement,
+                       "count": count})
     out = text.encode("utf-8")
     summary["substituted"].append({"output": name, "source": source_name(src), "source_sha256": sha(raw),
                                    "sha256": emit(name, out), "substitutions": counts})
@@ -274,11 +315,13 @@ def limiter() -> list[str]:
         "requestQueue_before": queue_before,
         "requestQueue_after": queue_after,
         "requestQueue_changed_fields": sorted(key for key in queue_before if queue_before[key] != queue_after.get(key)),
+        "waitForCooldown_before": record["resilience_before"]["waitForCooldown"],
+        "waitForCooldown_after": record["resilience_after"]["waitForCooldown"],
         "other_resilience_settings_unchanged": other_before == other_after,
         "sharedgw_limiter_enabled_before": before[0]["enabled"],
         "sharedgw_limiter_enabled_after": after[0]["enabled"],
         "read_back": "GET /api/resilience and GET /api/rate-limits after the PATCH. The PATCH's HTTP 200 and the absence of an environment override come from the coordinator's log, not from this file.",
-        "reduction": "Reduced from the private apply record: the requestQueue objects, the one connection's limiter enabled flag and the UTC time are kept. Dropped: the connection and provider ids, the connection name, the other resilience settings (compared equal above) and the rate-limit cache statistics.",
+        "reduction": "Reduced from the private apply record: the requestQueue and waitForCooldown objects, the one connection's limiter enabled flag and the UTC time are kept. Dropped: the connection and provider ids, the connection name, the other resilience settings (compared equal above) and the rate-limit cache statistics.",
     }
     write_json("limiter-apply-20129.json", document, compact=False)
     return [value for connection in before + after for key, value in connection.items()
@@ -289,7 +332,8 @@ def scan(forbidden: list[str]) -> list[str]:
     sys.path.insert(0, "scripts")
     from validate import PRIVATE_CONTENT
     literals = [("home directory", str(Path.home())), ("scratch directory", str(SCRATCH)),
-                ("journal path", str(JOURNAL))] + [("limiter record id", value) for value in forbidden]
+                ("journal path", str(JOURNAL))] + [("limiter record id", value) for value in forbidden] \
+        + [("ab-requirements label", value) for value in AB_LABELS]
     findings = []
     for path in sorted(OUT.rglob("*")):
         if not path.is_file():
@@ -316,8 +360,19 @@ def main() -> int:
     substitute(OF / "route-landscape-occupancy-research.md", "route-landscape-occupancy-research.md", [SCRATCH_PREFIX])
     split(OF / "route-mapper-resume-parts.md", "route-mapper-resume-parts.md", "route-mapper-part1-final.md",
           ADJUDICATED_BYTES)
-    for name in ("route-mapper-final.json", "maintenance-gh-20260928.tsv", "ab-requirements.md"):
+    for name in ("route-mapper-final.json", "maintenance-gh-20260928.tsv"):
         copy(OF / name, name)
+    substitute(OF / "ab-requirements.md", "ab-requirements.md", AB_RULES)
+    substitute(OF / "offpin_control_prepatch_20260928T0331Z.md", "offpin-control-prepatch.md", WRAPPER)
+    copy(OF / "offpin_rerun_team-lead.tsv", "offpin-rerun-team-lead.tsv")
+    substitute(OF / "offpin_control.py", "offpin-control.py.txt", [HOME_PREFIX])
+    copy(REVIEW / "gpt6" / "routing-record-review" / "last.json", "record-review-gpt6.last.json")
+    copy(REVIEW / "gpt6" / "routing-record-review" / "schema.json", "record-review-gpt6.schema.json")
+    for relative, pin in UNPUBLISHED.items():
+        digest = sha((OF / relative).read_bytes())
+        summary["unpublished"].append({"source": source_name(OF / relative), "sha256": digest})
+        if digest != pin:
+            mismatches.append(f"{relative}: unpublished input differs from its pin")
     adjudication()
     gpt6_runs()
     forbidden = limiter()

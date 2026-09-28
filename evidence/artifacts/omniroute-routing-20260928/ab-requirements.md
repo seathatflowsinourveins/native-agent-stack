@@ -1,6 +1,6 @@
 # 20129-full vs 20128 A/B: requirements gathered before preregistration (2026-09-27)
 
-Source: token-efficiency-gpt6-workers, 23:3xZ, from #423 findings at 3.8.51 and tonight's promptfoo echo-provider evals.
+Source: <peer-session-A>, 23:3xZ, from #423 findings at 3.8.51 and tonight's promptfoo echo-provider evals.
 
 ## Deterministic fidelity checks (a GPT-6 judge alone misses silent corruption)
 - The Responses JSON minifier changes integers (…6711 → …6800) and turns 1.50 into 1.5. Needs a numeric round-trip probe.
@@ -25,9 +25,9 @@ Source: token-efficiency-gpt6-workers, 23:3xZ, from #423 findings at 3.8.51 and 
 ## Constraints
 - 20128 stays unchanged through any scored R02 or S3 r6 (#390) run.
 - The capability-gate recording and the GPT-6 reviews use the built-in OpenAI provider, not OmniRoute.
-- "b1-runtime-workers-20260927" codex-home: not token-efficiency-gpt6-workers' lane (that session could not confirm it). Find its owner before switching it.
+- "<codex-home>" codex-home: not <peer-session-A>' lane (that session could not confirm it). Find its owner before switching it.
 
-## Gate owner: token-save-practice-gpt6 (reply 2026-09-27 ~23:40Z)
+## Gate owner: <peer-session-B> (reply 2026-09-27 ~23:40Z)
 - It runs the H1–H6 A/B itself. Preregistration: PR #431 (draft), blueprints/gpt6-lane-compression-ab/{PREREGISTRATION.md,preregistration.json}, branch claude/gpt6-lane-compression-ab-prereg-20260927, head 73fc873e.
 - Blockers:
   - the arm model must be `sharedgw/gpt-6-astra-max` (one slash; #439 refuses the two-slash slug);
@@ -36,6 +36,6 @@ Source: token-efficiency-gpt6-workers, 23:3xZ, from #423 findings at 3.8.51 and 
 - The A3 seal is held until the verdict; my gateway changes are pre-run conditions.
 - Effort evidence: the call_logs effort columns are null unless encrypted reasoning came back. Outbound effort is in the detail's pipelinePayloads.providerRequest, which needs detailed logging (call_log_pipeline_enabled or ENABLE_REQUEST_LOGS=true; detailedLogs.ts L56-64). A non-null reasoning_effort_upstream also counts.
 
-## Update 00:5xZ from token-save-practice-gpt6
+## Update 00:5xZ from <peer-session-B>
 - Blocker 1 retracted: #431 already uses sharedgw/gpt-6-astra-max (repair 73fc873e).
 - Still needed: the 20129 patch, its read-back digest and the apply UTC. Cells D0/D1 are "headerless defaults" and assume defaultMode off; if the full stack turns defaultMode on, what D0/D1 measure changes. A0/A1 = 12 engines + allow-lossy header; C = 20128 control.

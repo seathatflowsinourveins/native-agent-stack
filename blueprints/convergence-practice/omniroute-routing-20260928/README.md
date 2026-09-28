@@ -4,8 +4,13 @@
 six ChatGPT subscription accounts through OmniRoute, and what was decided about it. It was assembled after the work
 ran, from the sanitized receipts in
 [`evidence/artifacts/omniroute-routing-20260928/`](../../../evidence/artifacts/omniroute-routing-20260928/README.md).
-The decision is `trial`. The adjudicated rules are this lane's routing standard; none of them is accepted runtime
-behaviour yet.
+The decision is `trial`. The adjudicated rules are this lane's routing standard, except 47 fields in 37 of the 51 items
+that a later GPT-6 review of this record refuted (16) or amended (31); those await re-adjudication (`decisions.json`,
+`gpt6-record-review`). None of the rules is accepted runtime behaviour yet.
+
+This record covers the coordinator's log through its 03:50Z entry and the GPT-6 record review that ended at 04:13:48Z.
+Later work, including the occupancy patch workflow's review rounds from about 04:0xZ, belongs to that workflow and a
+later record.
 
 - 20128 is the shared gateway, build `dd6e9607e` (release/v3.8.51 `a58000c7` with PRs #14904 and #13788).
 - 20129 is the full-compression lane. It reaches 20128 through the `sharedgw` provider node.
@@ -13,23 +18,31 @@ behaviour yet.
 ## The failure
 
 On 20128, OmniRoute's post-affinity OAuth occupancy override (`auth.ts:2159-2177`, always on from `chat.ts:1711`)
-moves a turn off the session's pinned account when an account of equal or next priority has fewer foreign in-flight
-sessions. The pin itself is not updated. Two measurements of how often a turn lands on another account:
+moves a turn off the session's pinned account when another OAuth account whose priority number is at most the pinned
+account's plus one (any better, equal or next priority) has fewer foreign in-flight sessions. The pin itself is not
+updated. Two measurements of how often a turn lands on another account:
 
 - **Per-conversation pin-creation method, 24 h ending about 2026-09-28T00:13Z:** 460 of 4,461 matched GPT-6 turns
   (10.31%, in 64 of 201 conversations). Cache-read share was 73.76% on those turns and 92.14% on pinned turns
   (`route-mapper-final.json`). The adjudication used this figure.
-- **Per-turn method, 06:58Z to 00:13Z, reported after the adjudication:** 339 of 4,231 turns (8.0%), with 85.6% against
-  94.5% (`route-mapper-part1-final.md`). The rate depends on load: mostly 0% in hours with peak in-flight 4-8, and
-  16.7-21.7% in hours with peak 13-32.
+- **Per-turn method, 06:58Z to 00:13Z, reported after the adjudication:** (the report does not state its start-time
+  basis; route-mapper's frozen control, with the same pairing rule and the same 339 off-pin turns, uses start =
+  timestamp - duration/1000, so the 8.0% does not repeat the withdrawn computation's error) 339 of 4,231 turns (8.0%),
+  with 85.6% against 94.5% (`route-mapper-part1-final.md`). The rate depends on load, unevenly: mostly 0% in hours with
+  peak in-flight 4-8, and 16.7% at 12Z (peak 13), 17.4% at 14Z (peak 14) and 21.7% at 16Z (peak 32). From the frozen
+  control's table rows (`offpin-control-prepatch.md`), the eight hours with peak at least 10 give 284 of 2,756 (10.3%;
+  2.8-21.7% per hour), and the other hours give 55 of 1,614 (3.4%).
 
 Both are observational: off-pin selection rises with load, so the association with cache loss is not causally
 isolated.
 
 OmniRoute PR #8940, which introduced the occupancy signal, lists existing same-session affinity among the stronger
-routing constraints, yet its own merge already has the override. The four reviewed gateways (CLIProxyAPI, sub2api,
-LiteLLM, llm-d-router) keep a live binding while the bound account is eligible, and none moves a bound session because
-a peer is less occupied.
+routing constraints, yet its own merge already has the override. In their checked strict-affinity paths, the four
+reviewed gateways (CLIProxyAPI, sub2api, LiteLLM, llm-d-router) keep a live binding while the bound account is
+eligible. There are opt-in or failure-driven exceptions. sub2api's weighted-sticky mode scores the sticky account
+against load (`openai_account_scheduler.go:1023-1037, 1064-1085`), and its sticky escape leaves the bound account on
+error rate, TTFT or full concurrency (565-601). LiteLLM skips affinity for an ordered fallback target
+(`deployment_affinity_check.py:432-433`). These exceptions do not negate OmniRoute's always-on post-affinity override.
 
 ## How the practices were settled
 
@@ -48,12 +61,21 @@ a peer is less occupied.
 6. Three adjudication stages (model `opus`, effort `max`) settled all 51 items under
    [`adjudication-rule.json`](../../../evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json). None
    ended in an unresolved disagreement. The stages ended at 02:32:12Z.
-7. route-mapper's final part 1 report arrived at about 03:30Z, after the adjudication. It found no quota cutoff
-   through 03:29Z and measured off-pin per turn and by load. It is recorded as its own run and was not adjudicated.
+7. route-mapper's final part 1 report arrived at about 03:30Z, after the adjudication. It observed no quota cutoff in
+   the retained snapshots and logs through 03:29Z and measured off-pin per turn and by load. It is recorded as its own
+   run and was not adjudicated.
+8. route-mapper's pre-patch off-pin control ran read-only at 03:31:57Z over 06:00Z to 04:00Z, and the coordinator froze
+   it at about 03:4xZ (`offpin-control-prepatch.md`, with the script as `offpin-control.py.txt`). The coordinator's
+   rerun to 03:00Z reproduced all 21 hourly rows (`offpin-rerun-team-lead.tsv`). Both are recorded as runs and were not
+   adjudicated.
+9. A GPT-6 review of this record (`gpt-6-astra` at effort `max`, 03:53:02Z to 04:13:48Z) read its `experiment.json` and
+   this README as first committed. It returned 78 findings: 21 confirm, 17 refute and 40 amend. 65 of them judge
+   adjudicated item fields (18 confirm, 16 refute, 31 amend), and 13 judge the record or add risks
+   (`record-review-gpt6.last.json`). The synthesis re-opened the sources behind nine of the findings, and each held.
 
 ## Adjudicated items
 
-| Action | Converged | Converged with amendment | Single family | Not checked by GPT-6 |
+| Action | Converged | Converged with amendment | Single family | Not checked by GPT-6 JOB 2 |
 | --- | --- | --- | --- | --- |
 | applied | | P17 | | |
 | approved_pending | ADD-LIVE | P1, P7, P18, P19, ADD-P1P7 | | |
@@ -62,6 +84,10 @@ a peer is less occupied.
 | not_applicable | U3 | P20 | | E4, E7, E8 |
 | open_unknown | U1, U4, M1 | P3, P5, U2 | M2, M3, M4, M5 | |
 | rejected | E1 | P8, E5, E9 | | E2, E3, E6 |
+
+The later GPT-6 record review refuted E6's action, amended E3 and E5, confirmed E7's action, and confirmed that E2, E4
+and E8 stay unchecked. It refuted fields of P1, P3, P5, P9, P14, P18, P19, ADD-P1P7, R3, R4, U2, M4, M5 and E6
+(`decisions.json`).
 
 [`adjudication.json`](../../../evidence/artifacts/omniroute-routing-20260928/adjudication.json) holds, for each item,
 the adopted rule, the pinned upstream sources, OmniRoute's state with file and line, the action, a verify metric and
@@ -79,13 +105,16 @@ an overturn condition.
   As of the coordinator log's 03:3xZ entry that run had not started and had no active owner, so the freeze has no end
   date.
 - **About 01:35Z, approved, acceptance pending: the 20128 affinity-over-occupancy patch** ("Full patch after R02").
-  Part (i) skips the occupancy override when an eligible pin was reused, in the guard form of OmniRoute PR #13102.
-  Part (ii) binds a fresh pin to the connection that served it. A separate workflow builds it, and it is applied only
-  after the R02 scored run.
-- **About 03:3xZ, acceptance must be load-matched.** After route-mapper's final part 1 report, the patch's acceptance
-  compares loaded windows (peak in-flight at least 10, or more than about 300 turns/h), and a loaded pre-patch window
-  is recorded before the patch is applied.
-- **Kept.** 20128's 4 h affinity TTL and Codex round-robin with `stickyRoundRobinLimit` 1 are unchanged.
+  Part (i) skips the occupancy override when an eligible pin was reused (told apart from a fresh pin explicitly;
+  `decisions.json`), in the guard form of OmniRoute PR #13102. Part (ii) binds a fresh pin to the connection that
+  served it. A separate workflow builds it, and it is applied only after the R02 scored run.
+- **About 03:3xZ, acceptance must use loaded hours.** After route-mapper's final part 1 report, the patch's acceptance
+  compares hours with peak in-flight at least 10, stratified by peak.
+- **About 03:4xZ, frozen: the pre-patch control.** route-mapper's script ran at 03:31:57Z, and the coordinator's rerun
+  reproduced its hourly rows. Acceptance reruns the same script after the patch (`offpin-control-prepatch.md`).
+- **Kept.** 20128's 4 h affinity TTL and Codex round-robin with `stickyRoundRobinLimit` 1 are unchanged. The kept TTL
+  does not preserve continuation ownership past expiry. An expired pin is deleted, and the next turn gets a fresh LRU
+  pin even when the original account is healthy (`sessionAccountAffinity.ts:63-83`; `sessionAffinityPin.ts:280-319`).
 
 ## Failed and withdrawn conditions
 
@@ -110,9 +139,10 @@ an overturn condition.
 | --- | ---: | ---: | ---: | ---: | ---: |
 | JOB 1, independent answer | 173,294 | 2,356,864 | 23,409 | 11,724 | 2,553,567 |
 | JOB 2, refutation | 232,411 | 2,875,776 | 34,696 | 16,448 | 3,142,883 |
+| Record review | 188,806 | 4,856,064 | 34,819 | 12,650 | 5,079,689 |
 
-- Both counts are Codex's own `turn.completed` usage. Cache creation was 0 for both jobs, and native retries are
-  unknown.
+- All three counts are Codex's own `turn.completed` usage. Cache creation was 0 for all three jobs, and native retries
+  are unknown.
 - The usage of every Claude worker is unknown and is not estimated. That covers the three teammates (route-landscape,
   route-mapper and route-gpt6, which ran the GPT-6 jobs), the three adjudicators, the builder, the reviewers and the
   coordinator.
@@ -123,19 +153,20 @@ an overturn condition.
 
 | Unknown | Next check |
 | --- | --- |
-| U1: the backend's cache scope and TTL, and whether cached tokens cost less quota | regress per-account quota burn on uncached and cached input |
+| U1: the backend's cache scope and TTL, and whether cached tokens cost less quota | regress per-account quota burn on complete account traffic over identified quota windows, controlling output and reasoning, with uncertainty and stability criteria declared first; report an association, not a provider accounting rule |
 | U3: cache isolation for Claude OAuth accounts | not applicable until a Claude OAuth lane exists |
-| U4: per-account concurrency limits | 429 rate by per-account in-flight bin after the patch |
+| U4: per-account concurrency limits | 429s classified by type (concurrency, quota or rate) in each per-account in-flight bin, at matched model, quota headroom and load, with the rise that activates P18 admission declared first |
 | The binding quota window's length (behaves as 7-day; inferred) | record each window's length from the upstream headers |
-| Whether encrypted reasoning minted by another account is decrypted, rejected or ignored | the paired P5 continuation-fidelity probe |
-| Whether 20129 forwards `prompt_cache_key` to 20128 | a synthetic key through 20129, before the #431 cache comparison is read out |
+| Whether encrypted reasoning minted by another account is decrypted, rejected or ignored | the paired P5 probe with repeated state-sensitive tasks, a same-origin positive control, a visible-history-only negative control and a fidelity margin declared first; equal answers alone do not show that foreign encrypted reasoning was honored |
+| Whether 20129 forwards `prompt_cache_key` to 20128 | a synthetic key through 20129, comparing the inbound and outbound `prompt_cache_key`, `session-id`/`session_id` and `thread-id` at both hops and accounting for OmniRoute's Codex identity rewrite (`codexIdentity.ts:453-480`), before the #431 cache comparison is read out; the 20128 affinity key kind is auxiliary |
 
 ## Next test and rollback
 
-Before the patch, record a loaded pre-patch window on 20128 (peak in-flight at least 10, or more than about 300
-turns/h). After the R02 scored run, apply the occupancy patch once its upstream suite passes, and measure a
-load-matched window with both methods. Compare it with the loaded pre-patch window and with these whole-window
-baselines, which mix loaded and quiet hours:
+The loaded pre-patch control is frozen. After the R02 scored run, apply the occupancy patch once its upstream suite
+passes. Declare the window, the minimum sample per peak stratum and the margins, then rerun the control script
+stratified by peak, with the per-conversation method alongside. Require no unexplained move off an eligible pin and no
+model or effort mismatch. Compare with the frozen control and, as context, with these whole-window baselines, which
+mix loaded and quiet hours:
 
 - served-not-pin rate, 10.31% per conversation and 8.0% per turn;
 - key and thread groups served by more than one account, 27.27%;
@@ -152,8 +183,8 @@ patch has its own rollback: restore build `dd6e9607e`.
 
 ## Limits
 
-- This is source review and decisions. The only runtime change is the limiter lift, and it has a read-back but no
-  measured effect. The 2 later 20129 turns do not measure it, and their `added_wait_ms` column may not record limiter
+- This is source review and decisions. The only runtime change this record made is the limiter lift, and it has a
+  read-back but no measured effect. The 2 later 20129 turns do not measure it, and their `added_wait_ms` column may not record limiter
   waits.
 - The metrics are one 24 h window on 20128 and route-mapper's later per-turn and hourly recheck. On 20129 they are the
   10 probe turns of that window and 2 turns after the limiter change.
@@ -161,3 +192,9 @@ patch has its own rollback: restore build `dd6e9607e`.
 - The patch waits on the R02 scored run, which had no active owner as of the coordinator log's 03:3xZ entry.
 - The route-mapper and route-landscape results are teammate reports that the coordinator wrote down.
 - The adjudication rule and the post-patch criteria were written after the research runs, not before them.
+- The GPT-6 record review names further untested risks. The 20129-to-20128 hop forwards `x-session-id` but not
+  `session-id`, `thread-id` or `x-codex-turn-state` (harm:2). Threshold-triggered context compaction on `sharedgw` can
+  rewrite earlier input (harm:3; recheck it against the 20129 settings after 03:49:59Z). Model, tier and
+  effective-effort preservation across both hops is unproven (harm:4). OAuth refresh concurrency needs review before
+  pinned traffic concentrates (missing:1). HTTP 200 is not completion without the terminal SSE event (missing:2). The
+  all-200 counts in part1-final-recheck and limiter-lift-20129 are HTTP status only.

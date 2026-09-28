@@ -1,0 +1,120 @@
+import sys, json, re, glob, sqlite3, bisect, collections, datetime as dt
+START, END = sys.argv[1], sys.argv[2]
+DB = "~/.local/share/omniroute/storage.sqlite"
+LOGS = sorted(glob.glob("~/.local/share/omniroute/logs/application/app.log*"))
+ART = "~/.local/share/omniroute/call_logs/"
+W = 0.5
+SQL_PRIO = "select id, priority from provider_connections where provider = 'codex'"
+SQL_ROWS = "select timestamp, duration, status, connection_id, tokens_in, tokens_cache_read, artifact_relpath from call_logs where provider = 'codex' and timestamp >= ? and timestamp < ? order by timestamp"
+def ts(s):
+    return dt.datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+A, B = ts(START), ts(END)
+con = sqlite3.connect("file:" + DB + "?mode=ro", uri=True)
+prio = {r[0][:8]: r[1] for r in con.execute(SQL_PRIO)}
+lo = dt.datetime.fromtimestamp(A - 3600, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+hi = dt.datetime.fromtimestamp(B + 3600, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+rows = con.execute(SQL_ROWS, (lo, hi)).fetchall()
+T = sorted((ts(r[0]) - (r[1] or 0) / 1000.0, ts(r[0]), (r[3] or "")[:8], r[2], r[4] or 0, r[5] or 0, r[6]) for r in rows)
+starts = [x[0] for x in T]
+rx = re.compile(r"-> connection ([0-9a-f]{8})")
+L = []
+first_log = None
+for path in LOGS:
+    for line in open(path, errors="replace"):
+        if not line.startswith("{"):
+            continue
+        try:
+            j = json.loads(line)
+            t = ts(str(j.get("time")))
+        except Exception:
+            continue
+        first_log = t if first_log is None else min(first_log, t)
+        if j.get("tag") != "AUTH":
+            continue
+        m = rx.search(str(j.get("msg", "")))
+        if m:
+            L.append((t, m.group(1)))
+L.sort()
+lt = [x[0] for x in L]
+nh = int((B - A + 3599) // 3600)
+def H(t):
+    return int((t - A) // 3600)
+row = [collections.Counter() for _ in range(nh)]
+cache = [[0, 0, 0, 0] for _ in range(nh)]
+for t, pin in L:
+    if not (A <= t < B):
+        continue
+    i = bisect.bisect_left(starts, t - W)
+    k = bisect.bisect_right(starts, t + W)
+    p = bisect.bisect_left(lt, t - 2 * W)
+    q = bisect.bisect_right(lt, t + 2 * W)
+    if k - i != 1 or q - p != 1:
+        continue
+    s = T[i]
+    h = H(t)
+    moved = s[2] != pin
+    row[h]["matched"] += 1
+    if moved:
+        row[h]["off"] += 1
+        if prio.get(s[2], 999) <= prio.get(pin, 999) + 1:
+            row[h]["rule_ok"] += 1
+    if s[3] == 200:
+        c = cache[h]
+        if moved:
+            c[0] += s[4]
+            c[1] += s[5]
+        else:
+            c[2] += s[4]
+            c[3] += s[5]
+ev = []
+for s in T:
+    ev.append((s[0], 1, s[2]))
+    ev.append((s[1], -1, s[2]))
+ev.sort(key=lambda e: (e[0], e[1]))
+cur = collections.Counter()
+tot = 0
+pk = [0] * nh
+pka = [0] * nh
+for t, d, a in ev:
+    cur[a] += d
+    tot += d
+    if d == 1 and A <= t < B:
+        h = H(t)
+        pk[h] = max(pk[h], tot)
+        pka[h] = max(pka[h], cur[a])
+for s in T:
+    if A <= s[0] < B:
+        row[H(s[0])]["turns"] += 1
+turns = collections.defaultdict(list)
+for s in T:
+    if not s[6] or not (A <= s[0] < B):
+        continue
+    try:
+        body = json.load(open(ART + s[6])).get("requestBody")
+    except Exception:
+        continue
+    cm = body.get("client_metadata") if isinstance(body, dict) else None
+    if not isinstance(cm, dict) or not cm.get("turn_id"):
+        continue
+    turns[(cm.get("thread_id"), cm.get("turn_id"))].append((s[0], s[2]))
+for v in turns.values():
+    v.sort()
+    for x in v:
+        row[H(x[0])]["tid_req"] += 1
+    for a, b in zip(v, v[1:]):
+        if b[1] != a[1]:
+            row[H(b[0])]["midturn"] += 1
+def pct(n, d):
+    return "%.1f" % (100.0 * n / d) if d else "-"
+print("meta", "window", START, END, "log_files", len(LOGS), "first_log", dt.datetime.fromtimestamp(first_log, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") if first_log else None, "affinity_lines", len(L), "codex_rows", len(T), "turn_groups", len(turns))
+print("hour_utc\tturns\tpeak_total\tpeak_acct\tmatched\toff\toff_pct\toff_rule_ok\tcache_moved_pct\tcache_kept_pct\treq_with_turn_id\tmidturn_changes")
+tt = collections.Counter()
+tc = [0, 0, 0, 0]
+for h in range(nh):
+    r = row[h]
+    c = cache[h]
+    tt.update(r)
+    tc = [x + y for x, y in zip(tc, c)]
+    hs = dt.datetime.fromtimestamp(A + 3600 * h, dt.timezone.utc).strftime("%m-%dT%H")
+    print("\t".join(str(x) for x in (hs, r["turns"], pk[h], pka[h], r["matched"], r["off"], pct(r["off"], r["matched"]), r["rule_ok"], pct(c[1], c[0]), pct(c[3], c[2]), r["tid_req"], r["midturn"])))
+print("\t".join(str(x) for x in ("TOTAL", tt["turns"], max(pk), max(pka), tt["matched"], tt["off"], pct(tt["off"], tt["matched"]), tt["rule_ok"], pct(tc[1], tc[0]), pct(tc[3], tc[2]), tt["tid_req"], tt["midturn"])))

@@ -34,9 +34,19 @@
  "requestQueue_changed_fields": [
   "autoEnableApiKeyProviders"
  ],
+ "waitForCooldown_before": {
+  "enabled": true,
+  "maxRetries": 3,
+  "maxRetryWaitSec": 30
+ },
+ "waitForCooldown_after": {
+  "enabled": true,
+  "maxRetries": 3,
+  "maxRetryWaitSec": 30
+ },
  "other_resilience_settings_unchanged": true,
  "sharedgw_limiter_enabled_before": true,
  "sharedgw_limiter_enabled_after": false,
  "read_back": "GET /api/resilience and GET /api/rate-limits after the PATCH. The PATCH's HTTP 200 and the absence of an environment override come from the coordinator's log, not from this file.",
- "reduction": "Reduced from the private apply record: the requestQueue objects, the one connection's limiter enabled flag and the UTC time are kept. Dropped: the connection and provider ids, the connection name, the other resilience settings (compared equal above) and the rate-limit cache statistics."
+ "reduction": "Reduced from the private apply record: the requestQueue and waitForCooldown objects, the one connection's limiter enabled flag and the UTC time are kept. Dropped: the connection and provider ids, the connection name, the other resilience settings (compared equal above) and the rate-limit cache statistics."
 }
