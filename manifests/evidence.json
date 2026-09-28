@@ -3608,18 +3608,18 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "3635f6b34ba0d2e5902745eb70862bf6583b575a07707055ec11ff8e137a9ac6",
+      "sha256": "3d29fac6976f4d2748c5f8a273fe9103a6b15a77d4392fc6e2c476875b5eadcf",
       "bytes": 861
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
-      "sha256": "87502accaf3a88283c183bf521c71568754bbb4ebe076c74d34489691c8f0549",
-      "bytes": 2883
+      "sha256": "c665c230cc81b45167ae88bc98e0288e5642a262a90ba1794b9535e543c8e668",
+      "bytes": 2747
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "12e01ab910a9a3c06e02cdc1b41de9166902690bddbc6afcd58e59809c4ef490",
-      "bytes": 4094
+      "sha256": "d6c3c19d6e94d3f48d2788963c8c9be45ec57e6bb81cab92b2c30d9fd5c8e8d6",
+      "bytes": 4088
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
@@ -13894,8 +13894,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "f6d224756987d4cb12b8e46d43764e17c2fa22904b99753faecec839e74bb86f",
-      "bytes": 61765
+      "sha256": "d9696babcb53de6378349ddfd10a8a044f766a5fd778fbedbf8d4585d7d9cdea",
+      "bytes": 68979
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -13969,8 +13969,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "2bab839794db71f8cf07f14540fc45d100b095dd97aacdae71dc3c108b208a98",
-      "bytes": 40279
+      "sha256": "f3f8f83324fca6b217274c3bb7e6c17bd33c09924cb74033fc0278482fd0ca81",
+      "bytes": 51216
     },
     {
       "path": "docs/decisions/2026-09-28-community-sweep.md",
@@ -14349,8 +14349,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "9d59564ff7c8ac48be4f19940902baeda79e49e6e7f372d56ec6b4403532ea29",
-      "bytes": 87007
+      "sha256": "e65d2257f06dba6c5160219f1f2ac3dda7a447bc864e8cc94b584aaa81fccb8d",
+      "bytes": 87821
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -40554,8 +40554,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "ebbd3419b505c16fd738ccf73a4160f39b5b8443e27ccfb29574e97bab42556f",
-      "bytes": 22470
+      "sha256": "ae969ac1df3ff92e9dbb541a28797965e0702906f6703fbca91ac45e2a87f261",
+      "bytes": 22935
     },
     {
       "path": "tests/test_token_measurement.py",
