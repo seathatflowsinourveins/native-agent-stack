@@ -3712,13 +3712,13 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "002312220e4ebe1c920a0d1a2230100498983d4165440ce73e8d09c667f91807",
-      "bytes": 48474
+      "sha256": "74622f3a9cef07d3905f012ed331b26de77397f126b891d1876622f7079d0784",
+      "bytes": 50146
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "c3533b6a0c4715a9a6acaf8cb43c5e35bd8b7e2ccac8356b0d69b2cecdefce3f",
-      "bytes": 10848
+      "sha256": "cc0cedc5c70b72765cc6454902dffdded772643eb6739602128fa75498eb5d42",
+      "bytes": 10883
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -13183,8 +13183,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "c2df29fe9a937d8d98d6f26dbe5f5728a93b0697dc43722f0d0b9fec5de0ea36",
-      "bytes": 23546
+      "sha256": "9020be36d326ccfe58b0fd1904f028b2ed10e31994ad6b2a80ac41177c3f60bc",
+      "bytes": 24112
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -13808,8 +13808,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "7a80ab24f494702f5f1aa0b8749d5d9736c5fed0cc33606fa614657159524199",
-      "bytes": 41568
+      "sha256": "33a39f40b2a146e966fd1cad56e9a2d29018ce75a89443a359a7b6955b3658a6",
+      "bytes": 54011
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -15050,6 +15050,16 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
+      "sha256": "f4773ef546ac47584eb5e58c255bb810a7b2b3fbf43a884fcc3041ac64212e34",
+      "bytes": 9522
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
+      "sha256": "729ccf8735de8393edb661c8121f779a99d911e2ba04dbc7d0f66b95437865ab",
+      "bytes": 24543
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",

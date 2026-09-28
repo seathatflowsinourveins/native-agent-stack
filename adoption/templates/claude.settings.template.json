@@ -338,6 +338,7 @@
     "agent-browser": "name-only",
     "find-skills": "user-invocable-only",
     "variant-analysis": "on",
-    "writing-for-agents": "on"
+    "writing-for-agents": "on",
+    "security-audit": "name-only"
   }
 }
