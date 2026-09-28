@@ -2963,31 +2963,6 @@
       "merit_note": "Adds framework-specific performance or accessibility criteria to review. Source: vercel-labs/agent-skills@063bee94c3f4df8453406c830b0a7df0f2860278 skills/react-best-practices/SKILL.md:1"
     },
     {
-      "name": "verification-before-completion",
-      "source": "obra/superpowers",
-      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion",
-      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
-      "path": "skills/verification-before-completion",
-      "tree_sha": "a4cb0b69aaefeab540947a7f1642bdaad810e37a",
-      "skill_md_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
-      "skill_md_bytes": 3646,
-      "description_chars": 225,
-      "upstream_disable_model_invocation": false,
-      "scenarios": [
-        "tdd",
-        "github-ci-fix",
-        "code-review"
-      ],
-      "roles": [
-        "coding",
-        "orchestration",
-        "extraction-caller"
-      ],
-      "status": "trial",
-      "merit_note": "Requires returned verification evidence before completion claims, including caller integration checks. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/verification-before-completion/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json"
-    },
-    {
       "name": "web-design-guidelines",
       "source": "vercel-labs/agent-skills",
       "url": "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines",
@@ -3243,8 +3218,7 @@
         "spark-version-upgrade",
         "tdd",
         "test-driven-development",
-        "to-java-migration",
-        "verification-before-completion"
+        "to-java-migration"
       ],
       "orchestration": [
         "build-setup",
@@ -3255,15 +3229,13 @@
         "spark-version-upgrade",
         "tdd",
         "test-driven-development",
-        "to-java-migration",
-        "verification-before-completion"
+        "to-java-migration"
       ],
       "research": [],
       "extraction-caller": [
         "property-based-testing",
         "tdd",
-        "test-driven-development",
-        "verification-before-completion"
+        "test-driven-development"
       ]
     },
     "e2e-testing": {
@@ -3372,7 +3344,6 @@
         "score-style",
         "vercel-composition-patterns",
         "vercel-react-best-practices",
-        "verification-before-completion",
         "web-design-guidelines"
       ],
       "orchestration": [
@@ -3389,14 +3360,12 @@
         "score-quality",
         "score-style",
         "vercel-react-best-practices",
-        "verification-before-completion",
         "web-design-guidelines"
       ],
       "research": [],
       "extraction-caller": [
         "codebase-design",
-        "improve-codebase-architecture",
-        "verification-before-completion"
+        "improve-codebase-architecture"
       ]
     },
     "security": {
@@ -3495,19 +3464,15 @@
       "coding": [
         "gh-fix-ci",
         "github-stale-ci-pr-closer",
-        "iterate",
-        "verification-before-completion"
+        "iterate"
       ],
       "orchestration": [
         "gh-fix-ci",
         "github-stale-ci-pr-closer",
-        "iterate",
-        "verification-before-completion"
+        "iterate"
       ],
       "research": [],
-      "extraction-caller": [
-        "verification-before-completion"
-      ]
+      "extraction-caller": []
     },
     "github-actions": {
       "coding": [
@@ -3816,6 +3781,11 @@
       "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
     },
     {
+      "scenario": "github-ci-fix",
+      "role": "extraction-caller",
+      "reason": "The cell's only selection, verification-before-completion, is excluded since main removed it under M4 (#464); no other selected skill has a substantiated direct extraction-caller fit for CI repair. Route CI repair to a coding worker and measure that handoff."
+    },
+    {
       "scenario": "github-actions",
       "role": "research",
       "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
@@ -4087,6 +4057,20 @@
       "adoption_ref": "adoption/skills/manifest.json",
       "reason": "Main gates this adoption skill: #448 (8315274f) keeps Codex disabled (codex_enabled false) and the Claude listing name-only pending the M5c bake-off against /security-review. Reusing it here would install it for runtime workers without that gate.",
       "overturn": "Main promotes security-audit after M5c, that is adoption/skills/manifest.json sets codex_enabled true or claude_listing on: replace this exclusion with a reuse_ref entry and assign its scenarios and roles. Any other change to main's gate on it also fails the exclusion test and needs a new review."
+    },
+    {
+      "name": "verification-before-completion",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/verification-before-completion",
+      "tree_sha": "a4cb0b69aaefeab540947a7f1642bdaad810e37a",
+      "skill_md_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+      "skill_md_bytes": 3646,
+      "description_chars": 225,
+      "upstream_disable_model_invocation": false,
+      "reason": "Main removed it from its skills trial under the conflict rule M4 (#464, c0966da2; decision docs/decisions/2026-09-28-delegated-decisions.md, #462) and lists it under its own excluded. Its SKILL.md at this pin requires a fresh run of the verification command before any completion claim and rates a previous run as not sufficient (L17-20, L42), which conflicts with AGENTS.md:16, \"Reuse passing evidence when its inputs still match\". A worker whose work directory is a checkout of this repository loads that AGENTS.md too: OpenHands with project loading on reads it from the work directory and the Git root (skill.py:1084-1106 at fcc102a6), and Claude Code imports it through CLAUDE.md's first line, @AGENTS.md. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
+      "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists verification-before-completion under skills again (main's own overturn: an upstream revision drops the absolute freshness requirement, is re-read in full and is re-pinned there). Then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios (tdd, github-ci-fix, code-review) and roles (coding, orchestration, extraction-caller). test_verification_before_completion_stays_excluded_until_main_readmits_it and the coverage contract both fail as soon as main re-admits it."
     }
   ],
   "openhands_inventory": [
@@ -4557,7 +4541,7 @@
       "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
       "resolved_via": "gh api repos/obra/superpowers/commits/8ca22dba9a94f28898bbce59f2537ff4d87c747d",
       "commit_date": "2026-09-25T18:06:27Z",
-      "selected_skills": 15,
+      "selected_skills": 14,
       "tree_response_truncated": false
     },
     {
@@ -4610,9 +4594,9 @@
     }
   ],
   "budget": {
-    "selected_count": 138,
-    "skill_md_bytes": 1024601,
-    "description_chars": 36964,
+    "selected_count": 137,
+    "skill_md_bytes": 1020955,
+    "description_chars": 36739,
     "provider_input_tokens_before": null,
     "provider_input_tokens_after": null,
     "meaning": "Catalog byte/character sums only, not first-prompt tokens. Measure native requests as specified in README."

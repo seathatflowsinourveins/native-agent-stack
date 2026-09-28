@@ -108,6 +108,25 @@
       "failures": 2,
       "returned_excerpt": "AssertionError: 3 != 4 : an action is not SHA-pinned\nAssertionError: 14 != 0\nFAILED (failures=2)",
       "cause": "GPT6-C5: with a floating tag, the offline zizmor analysis of the real workflow exits 14 and the pin count no longer covers every uses line. The same three tests passed on the unmodified workflow."
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills",
+      "exit_code": 1,
+      "tests": 67,
+      "failures": 6,
+      "errors": 2,
+      "returned_excerpt": "install_skills_under_test.InstallError: verification-before-completion: reuse_ref 'adoption/skills/manifest.json' names no single adoption/skills/manifest.json skill of that name\nKeyError: 'verification-before-completion'\nAssertionError: 'scoped to projects' not found in \"install-skills failed: verification-before-completion: reuse_ref 'adoption/skills/manifest.json' names no single adoption/skills/manifest.json skill of that name\\n\"\nAssertionError: Lists differ: [\"verification-before-completion: reuse_re[116 chars]ded'] != ['future-main-skill: neither reused nor excluded']\nAssertionError: Lists differ: [\"verification-before-completion: reuse_re[66 chars]ill\"] != []\nFAILED (failures=6, errors=2)",
+      "cause": "Unchanged runtime manifest and tests on the tree rebased onto c0966da2: the reuse_ref entry for verification-before-completion named a skill main no longer lists. The coverage contract, its reorder variant and the negative control reported it; the installer refused to load the manifest, so the three scope subtests met that refusal first; and the print-codex-config expectation raised KeyError."
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_verification_before_completion_stays_excluded_until_main_readmits_it tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_superpowers_lifecycle_and_collisions_are_explicit tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_source_counts_match_the_selected_skills_and_the_research_table",
+      "exit_code": 1,
+      "tests": 3,
+      "failures": 2,
+      "returned_excerpt": "AssertionError: unexpectedly None : main excludes verification-before-completion; the runtime must too\nAssertionError: Items in the second set but not the first:\n'verification-before-completion'\nFAILED (failures=2)",
+      "cause": "The new exclusion test and the revised superpowers lifecycle test ran against the unchanged runtime manifest, which still reused the skill and had no exclusion for it. A first draft of the exclusion test raised StopIteration there; its lookup was made an explicit assertion before this run. The third test, a source-count guard, passed before and after the change."
     }
   ],
   "not_run": [
@@ -125,7 +144,8 @@
     "sources": 12,
     "skills": 138,
     "adoption_entries_rechecked": 28,
-    "metadata_normalization": "description string is YAML-parsed and trimmed; hashes and byte sizes use unmodified SKILL.md"
+    "metadata_normalization": "description string is YAML-parsed and trimmed; hashes and byte sizes use unmodified SKILL.md",
+    "counts_as_of": "The original build. Repair r4 moved verification-before-completion, with its verified pin, from skills to excluded, so the manifest now selects 137 of these 138 verified pins."
   },
   "measurements": {
     "first_prompt_before": null,
@@ -143,16 +163,16 @@
     "verification": "Full verbose suite: Ran 52 tests in 9.080s; OK (exit 0). See checks and review_findings."
   },
   "input_sha256": {
-    "tools/adoption/install_skills.py": "edea23a88809d68327bdea526f6704a6679cea00f0bfc9486a31ec83abd29988",
+    "tools/adoption/install_skills.py": "f9c94cbd12e3825382a41afeab0dbaf0e8f4e1b2b4359076c84f256a77057a63",
     "tools/adoption/runtime_skill_freshness.py": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
     "tests/test_install_skills.py": "55533df4a38eb803bdf203b85d0fd7964e46a1f703589e3dc464c759391575ef",
-    "tests/test_runtime_worker_skills.py": "b7d0770362fd507a3493bac0033f5d7fc3f7ec0810e8e80d2e14d4f57b519cff",
+    "tests/test_runtime_worker_skills.py": "e021cb1b2e615c35de09a4029dc5c0f21d49a31f5c3c72109c40d1f9acfcd25f",
     "tests/test_workflow_security_coverage.py": "9ad3bc3bb6ad5c9edf8db5fe350e822bdea815720a4a8edc9a28d8e4422ccf0c",
-    "blueprints/runtime-workers/skills/manifest.json": "52fcec65eb70da64d0a6517d7ce7c4dde634e1b617ddb4677d317692896ea2cb",
-    "blueprints/runtime-workers/skills/README.md": "9f67ffbaf385140f3940c123a576c0e757a7f155b27a3bcacb84baa0c81481e0",
+    "blueprints/runtime-workers/skills/manifest.json": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
+    "blueprints/runtime-workers/skills/README.md": "4a367abac888f8ac75da50b0cc3b37fe98f112630c1f98195f32b9f68130efac",
     ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
-    "docs/harness-defaults.md": "5f76e06791ad67aad8c25072b20b81ad8334c84a30dbb184d16e4f7f46d076bc",
-    "adoption/skills/manifest.json": "056fa8744df94a6b33ff14583a95b3140047cd8a5d44525459ae1b08dfffd90f"
+    "docs/harness-defaults.md": "04486bc0d542434d7d19bf594945b59b48d85dc4235ade7f5d7555ef6c531426",
+    "adoption/skills/manifest.json": "d1a76acad46578d314529b1ab57fce987b4382c6eca95e78cc9f576230a62d72"
   },
   "repair_r1_research": {
     "base_head": "5f3eaebf",
@@ -246,7 +266,14 @@
       }
     ],
     "raw_verdicts": "Attached to the pull request as comments by the coordinator; not part of this tree.",
-    "not_relayed": "The GPT-6 review's GPT6-C2 to GPT6-C4 were not relayed to this repair and are not dispositioned here.",
+    "confirmed": [
+      "GPT6-C1-manifest-pins",
+      "GPT6-C2-adoption-coverage",
+      "GPT6-C3-reuse-gates",
+      "GPT6-C4-pruned-selection",
+      "GPT6-C7-validation-evidence"
+    ],
+    "confirmed_note": "CONFIRM verdicts of the GPT-6 review with no defect, so nothing needed relaying. Repair r4 replaced an inaccurate not_relayed line that called GPT6-C2 to GPT6-C4 unrelayed findings. GPT6-C1-manifest-pins is a different item from the relayed containment finding GPT6-C1.",
     "method": "One repair round. Each code item first failed against the unchanged installer, manifest, freshness tool or workflow (fail_first, round repair-r3); each documentation item was checked against the pinned upstream source before the edit. Dispositions are under review_findings.",
     "checks_scope": "Entries under checks with round repair-r3 are this round's acceptance, run on the tree rebased onto c61e6657; the repair-r2 entries there are now history.",
     "sources": [
@@ -274,6 +301,55 @@
     "fixture_boundary": "Installer CLI subprocess with fake skills and gh executables in isolated home and project directories, structural contracts over the real manifests, freshness comparisons with a stub API and offline zizmor analysis of workflow copies. Not a native skills run, upstream acceptance or worker activation.",
     "publication_integrity": "scripts/validate.py and scripts/host_receipts.py validate run after the manifests/evidence.json re-registration that follows this file's last edit; their results are reported with the commit, not recorded here.",
     "dated_artifact": "freshness-20260927.json was produced by the earlier runtime_skill_freshness.py. The tool no longer emits that report's native_check fields semantics_verified_version and version_matches_semantics; it reports pinned_version and pinned_ref from the manifest's cli pin.",
+    "environment": {
+      "TMPDIR": "temporary directory under /var/tmp; removed after checks",
+      "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run"
+    }
+  },
+  "repair_r4": {
+    "base_head": "e979fc03",
+    "main_base": "c0966da2",
+    "main_base_history": "Main moved from c61e6657 to c0966da2 (#464). The branch was rebased onto it without conflicts (git exit 0). The previous re-registration commit applied cleanly; it was then uncommitted, main's manifests/evidence.json restored, and the PR's files re-registered in the final commit.",
+    "coordinator_direction": "Stop reusing verification-before-completion and exclude it, citing main's M4 exclusion (#464) and its conflict with AGENTS.md:16; overturn when main re-admits it. Recount, and replace repair_r3.not_relayed with the five confirmed ids.",
+    "main_change": "c0966da2 (#464) moved verification-before-completion from skills to excluded in adoption/skills/manifest.json under the skills-trial conflict rule M4 (decision docs/decisions/2026-09-28-delegated-decisions.md, #462) and recomputed main's budget: claude_on_description_chars 7409 to 7184 and codex_enabled_description_chars 3054 to 2829. No entry of a reused skill changed.",
+    "adoption_contract": {
+      "main_adoption_skills": 28,
+      "reused_by_reuse_ref": 27,
+      "excluded_by_adoption_ref": [
+        "security-audit"
+      ],
+      "excluded_with_main_without_adoption_ref": [
+        "verification-before-completion"
+      ],
+      "reused_codex_disabled_on_main": 16
+    },
+    "counts": {
+      "skills": 137,
+      "sources": 12,
+      "obra_superpowers_selected": 14,
+      "exclusions": 9,
+      "empty_role_scenario_cells": 15,
+      "skill_md_bytes": 1020955,
+      "description_chars": 36739
+    },
+    "coverage_change": "verification-before-completion left the tdd, code-review and github-ci-fix cells of coding, orchestration and extraction-caller. github-ci-fix for extraction-caller had no other selection and is now a recorded gap.",
+    "sources": [
+      "https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md#L17-L20",
+      "https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md#L42",
+      "AGENTS.md:16",
+      "CLAUDE.md:1",
+      "docs/decisions/2026-09-28-delegated-decisions.md:24",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1106",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L10",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L224-L232"
+    ],
+    "source_check": "gh api contents of skills/verification-before-completion/SKILL.md at 8ca22dba9a94f28898bbce59f2537ff4d87c747d returned 3646 bytes with SHA-256 2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3, equal to the pin; L17-20 and L42 were read with sed -n. The recursive tree at that commit was untruncated and listed 15 skills/<name>/SKILL.md files. src/agents.ts lines 10 and 224-232 at 7407f389 were re-read for the Codex detection wording.",
+    "wording_fix": "research.md, the docs/harness-defaults.md rollback row and an install_skills.py comment now state Codex detection as the README does: $CODEX_HOME, or ~/.codex when it is unset, or /etc/codex.",
+    "unchanged_on_purpose": "Dated or historical records keep their values: freshness-20260927.json still lists the skill, repair_r1_research.discovery names the skills that session used, pins_verified counts the original build, and the r2 and r3 notes in research.md and the 2026-09-28 harness-defaults row keep 28 reused and 16 Codex-disabled.",
+    "checks_scope": "Entries under checks with round repair-r4 are this round's acceptance on the tree rebased onto c0966da2; earlier rounds' entries there are history.",
+    "fixture_boundary": "Structural contracts over the real runtime and adoption manifests, the installer's subprocess fixtures with fake skills and gh executables, and offline zizmor analysis. Not a native skills run, upstream acceptance or worker activation.",
+    "publication_integrity": "scripts/validate.py and scripts/host_receipts.py validate run after the manifests/evidence.json re-registration that follows this file's last edit; their results are reported with the commit, not recorded here.",
+    "independent_review": "None run for repair r4.",
     "environment": {
       "TMPDIR": "temporary directory under /var/tmp; removed after checks",
       "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run"
@@ -515,6 +591,88 @@
       "exit_code": 0,
       "returned_excerpt": "",
       "kind": "repair-r3 whitespace check"
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_install_skills tests.test_runtime_worker_skills tests.test_workflow_security_coverage",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 79 tests in 10.926s\n\nOK",
+      "tests": 79,
+      "kind": "repair-r4 full local integration and structural checks",
+      "limitation": "Fake CLI/gh, structural contracts and offline zizmor analysis; not a native skills run, upstream acceptance or model activation."
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_verification_before_completion_stays_excluded_until_main_readmits_it tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_superpowers_lifecycle_and_collisions_are_explicit tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_source_counts_match_the_selected_skills_and_the_research_table tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded tests.test_install_skills.ReuseRefGateTests",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 9 tests in 0.198s\n\nOK",
+      "tests": 9,
+      "kind": "repair-r4 fail-first and contract tests after the fix"
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_blind_checkout",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 40 tests in 23.151s\n\nOK",
+      "tests": 40,
+      "kind": "repair-r4 blueprint label classification and export checks",
+      "limitation": "Run after this file's confirmed list and repair_r4 block were added, before these checks entries; rerun on the final file and reported with the commit."
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_pre_push_gate",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 16 tests in 26.706s\n\nOK",
+      "tests": 16,
+      "kind": "repair-r4 pre-push registry gate checks"
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_adoption_docs_consistency",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 37 tests in 9.085s\n\nOK (skipped=1)",
+      "tests": 37,
+      "kind": "repair-r4 reader of docs/harness-defaults.md",
+      "limitation": "The skip reports that no profile's coverage differs between the pinned release and HEAD."
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 56 tests in 12.101s\n\nOK",
+      "tests": 56,
+      "kind": "repair-r4 reader of docs/harness-defaults.md"
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_install_claude_profile",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 58 tests in 0.265s\n\nOK (skipped=3)",
+      "tests": 58,
+      "kind": "repair-r4 reader of docs/harness-defaults.md",
+      "limitation": "The three skips report that PyYAML is not installed on this host."
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 -m unittest -v tests.test_token_e2e_preregistration",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 34 tests in 0.629s\n\nOK",
+      "tests": 34,
+      "kind": "repair-r4 reader of docs/harness-defaults.md; the module has one more test than in repair r3 since main's #464"
+    },
+    {
+      "round": "repair-r4",
+      "command": "python3 tools/adoption/install_skills.py --manifest blueprints/runtime-workers/skills/manifest.json --print-codex-config",
+      "exit_code": 0,
+      "returned_excerpt": "16 [[skills.config]] tables with enabled = false: agent-browser agentic-actions-auditor codebase-design codeql find-skills fp-check frontend-design grill-me improve-codebase-architecture mcp-builder property-based-testing resolving-merge-conflicts sarif-parsing semgrep supply-chain-risk-auditor variant-analysis",
+      "kind": "repair-r4 Codex gates from main for the 27 reused skills, matched by name; print-only, so allowed without --project-dir"
+    },
+    {
+      "round": "repair-r4",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_excerpt": "",
+      "kind": "repair-r4 whitespace check"
     }
   ],
   "review_findings": [
@@ -878,6 +1036,7 @@
   "open_items": [
     "Native skills CLI installation, unchanged upstream tests and worker/model E2E remain outside this repair; no such execution is claimed.",
     "security-audit stays excluded until main promotes it after M5c (codex_enabled true or claude_listing on); then replace the exclusion with a reuse_ref entry and assign its scenarios and roles. Any other change to main's gate on it needs a new review.",
+    "verification-before-completion stays excluded while main excludes it under M4 (#464); when main re-admits it, replace the exclusion with a reuse_ref entry at main's pin and restore its tdd, github-ci-fix and code-review assignments for coding, orchestration and extraction-caller.",
     "This installer writes no Claude settings; a Claude Code worker must apply main's claude_listing through its own skillOverrides."
   ],
   "cleanup": {

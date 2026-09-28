@@ -104,6 +104,19 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         for role in ROLES:
             self.assertTrue(any(role in s["roles"] for s in self.skills))
 
+    def test_source_counts_match_the_selected_skills_and_the_research_table(self):
+        counted = {}
+        for skill in self.skills:
+            counted[skill["source"]] = counted.get(skill["source"], 0) + 1
+        self.assertEqual({s["source"]: s["selected_skills"] for s in self.manifest["sources"]}, counted)
+        table = (DIRECTORY / "research.md").read_text().split("<!-- source-pins -->", 1)[1]
+        rows = [line for line in table.splitlines() if line.startswith("| ")][2:]
+        parsed = {}
+        for row in rows:
+            repository, ref, count = [cell.strip() for cell in row.strip("|").split("|")]
+            parsed[repository] = (ref.strip("`"), int(count))
+        self.assertEqual(parsed, {s["source"]: (s["ref"], s["selected_skills"]) for s in self.manifest["sources"]})
+
     def test_every_scenario_role_cell_has_real_skills_or_explicit_gap(self):
         self.assertEqual(set(self.manifest["scenarios"]), SCENARIOS)
         self.assertEqual(set(self.manifest["coverage"]), SCENARIOS)
@@ -162,6 +175,29 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         self.assertEqual((gate["codex_enabled"], gate["claude_listing"]), (False, "name-only"),
                          "main changed security-audit's gate: review the exclusion (a promotion overturns it)")
 
+    def test_verification_before_completion_stays_excluded_until_main_readmits_it(self):
+        name = "verification-before-completion"
+        base = json.loads(ADOPTION_MANIFEST.read_text())
+
+        def listed(entry):
+            names = entry.get("skills")
+            return [names] if isinstance(names, str) else list(names or [])
+
+        # Overturn trigger: main re-admitting the skill fails here, and the coverage contract then finds
+        # it neither reused nor excluded. Replace this exclusion with a reuse_ref entry at main's new pin.
+        self.assertNotIn(name, [s["name"] for s in base["skills"]],
+                         "main re-admitted verification-before-completion: overturn the runtime exclusion")
+        self.assertTrue(any(name in listed(e) and e.get("source") == "obra/superpowers"
+                            for e in base["excluded"]))
+        exclusion = next((e for e in self.manifest["excluded"] if e.get("name") == name), None)
+        self.assertIsNotNone(exclusion, "main excludes verification-before-completion; the runtime must too")
+        self.assertEqual(exclusion["source"], "obra/superpowers")
+        self.assertNotIn("adoption_ref", exclusion)  # main lists it under excluded, not under skills
+        self.assertNotIn(name, [s["name"] for s in self.skills])
+        for cited in ("#464", "M4", "AGENTS.md:16", "Reuse passing evidence when its inputs still match"):
+            self.assertIn(cited, exclusion["reason"], cited)
+        self.assertIn("re-admits", exclusion["overturn"])
+
     def test_print_codex_config_disables_every_reused_skill_main_disables(self):
         base = {s["name"]: s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"]}
         expected = sorted(
@@ -189,12 +225,17 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         self.assertTrue(all(s["reason"] for s in self.manifest["excluded"]))
 
     def test_superpowers_lifecycle_and_collisions_are_explicit(self):
+        # The 15 skills of the pinned superpowers tree: each is selected or excluded, never both.
         lifecycle = {"brainstorming", "writing-plans", "executing-plans", "test-driven-development",
                      "systematic-debugging", "using-git-worktrees", "dispatching-parallel-agents",
                      "subagent-driven-development", "requesting-code-review", "receiving-code-review",
                      "finishing-a-development-branch", "verification-before-completion",
                      "using-superpowers", "writing-skills", "diagnosing-superpowers"}
-        self.assertEqual({s["name"] for s in self.skills if s["source"] == "obra/superpowers"}, lifecycle)
+        selected = {s["name"] for s in self.skills if s["source"] == "obra/superpowers"}
+        excluded = {e["name"] for e in self.manifest["excluded"] if e["source"] == "obra/superpowers"}
+        self.assertEqual(excluded, {"verification-before-completion"})  # main's M4 removal, #464
+        self.assertEqual(selected | excluded, lifecycle)
+        self.assertFalse(selected & excluded)
         by_name = {s["name"]: s for s in self.skills}
         for collision in self.manifest["collisions"]:
             winner = by_name[collision["name"]]

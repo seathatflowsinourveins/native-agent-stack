@@ -1,11 +1,12 @@
 # Runtime-worker skills trial
 
-The [manifest](manifest.json) selects **138 skills from 12 pinned sources** for
-a broad worker trial: 77 OpenHands registry skills, all 15 superpowers lifecycle
-skills, 28 of the adoption manifest's 29 skills reused by `reuse_ref`, and targeted
-additions for evaluation, research, browser testing and framework review.
-The adoption manifest remains unchanged; its gated `security-audit` entry is
-excluded (see [Gates of reused adoption skills](#gates-of-reused-adoption-skills)). [Research](research.md)
+The [manifest](manifest.json) selects **137 skills from 12 pinned sources** for
+a broad worker trial: 77 OpenHands registry skills, 14 of the 15 superpowers
+lifecycle skills, 27 of the adoption manifest's 28 skills reused by `reuse_ref`,
+and targeted additions for evaluation, research, browser testing and framework
+review. The adoption manifest remains unchanged. Its gated `security-audit` entry
+is excluded, and so is `verification-before-completion`, which main removed from
+its trial under M4 (#464); see [Gates of reused adoption skills](#gates-of-reused-adoption-skills). [Research](research.md)
 records the source review; each skill has its own `repo@commit path:line`
 merit citation. Selection means `trial`, not native acceptance or measured SOTA.
 
@@ -39,9 +40,11 @@ by a SKILL.md package installation.
 | `linear` | OpenHands | Fits the registry's ticket and automation procedures. |
 
 The manifest records all conflicting repository/ref/path triples. Superpowers
-contributes planning, isolated execution, TDD, debugging, review, verification
-and branch completion as separate skills; that composable lifecycle merits a
-trial. Its Claude/Codex tool assumptions, namespaced skill references and hooks
+contributes planning, isolated execution, TDD, debugging, review and branch
+completion as separate skills; that composable lifecycle merits a trial. Its
+verification skill, `verification-before-completion`, is excluded as on main (see
+[Gates of reused adoption skills](#gates-of-reused-adoption-skills)). The
+lifecycle's Claude/Codex tool assumptions, namespaced skill references and hooks
 need native worker acceptance. Installing its files does not register a
 `superpowers:` namespace or SessionStart hook. Worker calls use installed skill
 names; session/user instructions retain precedence over skill workflows.
@@ -69,7 +72,7 @@ that is in neither set, and when a reused entry's pin differs from main's.
   refuses an entry whose pin drifted, that restates a gate or whose name main does
   not carry exactly once, and takes both gates from the adoption entry. `--print-codex-config` on this manifest therefore prints
   an `enabled = false` table for every reused skill main keeps off for Codex
-  (16 of the 28 on 2026-09-28).
+  (16 of the 27 on 2026-09-28).
 - **Claude listing.** `claude_listing` (`on`, `name-only`, `user-invocable-only`,
   `off`) is a Claude Code client setting, applied through the `skillOverrides`
   settings key rather than the skill's frontmatter
@@ -127,6 +130,22 @@ that is in neither set, and when a reused entry's pin differs from main's.
   When main promotes it, replace the exclusion with a `reuse_ref` entry and assign
   its scenarios and roles. `test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it`
   fails as soon as main's gate changes, so a promotion cannot pass unnoticed.
+- **Excluded with main.** `verification-before-completion` stays out because main
+  removed it from its trial under the skills-trial conflict rule M4 (#464;
+  [decision](../../../docs/decisions/2026-09-28-delegated-decisions.md)). Its
+  SKILL.md at `8ca22db` requires a fresh run of the verification command before any
+  completion claim and rates a previous run as not sufficient, while `AGENTS.md:16`
+  says to reuse passing evidence when its inputs still match. A worker whose work
+  directory is a checkout of this repository loads that `AGENTS.md` too: OpenHands
+  with project loading on (above), and Claude Code through the `@AGENTS.md` first
+  line of `CLAUDE.md`. Main now lists the skill under its own `excluded` rather
+  than `skills`, so this exclusion keeps the reviewed pin but carries no
+  `adoption_ref`. If main re-admits it,
+  `test_verification_before_completion_stays_excluded_until_main_readmits_it` fails
+  and the coverage contract finds it neither reused nor excluded: replace the
+  exclusion with a `reuse_ref` entry and restore its `tdd`, `github-ci-fix` and
+  `code-review` assignments. Until then extraction callers have no direct CI-fix
+  skill (see [Explicit capability gaps](#explicit-capability-gaps)).
 
 ## Lifecycle through the existing installer
 
@@ -421,20 +440,22 @@ worker/manifest revisions and matched task IDs. Do not sum overlapping usage.
 
 Measure a neutral first task and a fixed activating task separately: some native
 triggers inject bodies immediately. Use a model's own tokenizer only as a labeled
-estimate when no provider count is available. Catalog sums are **1,024,601
-SKILL.md bytes and 36,964 trimmed description characters**; neither is a prompt
+estimate when no provider count is available. Catalog sums are **1,020,955
+SKILL.md bytes and 36,739 trimmed description characters**; neither is a prompt
 size or token count. Both provider-token fields remain `null` until a real run.
 Also record end-to-end input/output usage, latency and task quality so a smaller
 first prompt cannot hide repeated reads or failed work.
 
 ## Explicit capability gaps
 
-The matrix below has 14 empty role/scenario cells, each also recorded in the
+The matrix below has 15 empty role/scenario cells, each also recorded in the
 manifest's `gaps`. These are direct-role gaps; a coding-worker handoff remains
 available but does not turn the empty cell into an accepted native capability.
 Research has no selected direct TDD, E2E, code-review, security, GitHub workflow,
 release-note or deployment skill assignment; extraction callers have no direct
-issue-to-PR, PR-review, Actions or release-note assignment.
+issue-to-PR, PR-review, CI-fix, Actions or release-note assignment. The CI-fix
+cell became empty when `verification-before-completion`, its only selection, was
+excluded with main.
 
 Further limits: skill-output blind A/B evaluation does not implement product
 traffic randomization, statistical power or sequential testing; repository memory
@@ -453,15 +474,15 @@ empty cell is marked **GAP** and recorded in `manifest.json`; the machine-readab
 | Scenario | Coding | Orchestration | Research | Extraction caller |
 | --- | --- | --- | --- | --- |
 | planning-and-specs | `add-javadoc`, `agent-canvas-environment`, `agent-creator`, `agent-readiness-report`, `agent-sdk-builder`, `azure-devops`, `bitbucket`, `bitbucket-cloud`, `bitbucket-data-center`, `brainstorming`, `build-setup`, `canvas-extension-api`, `cobol-modernization`, `codebase-design`, `dispatching-parallel-agents`, `domain-modeling`, `executing-plans`, `frontend-design`, `gitlab`, `gitlab-issue-to-mr`, `grill-me`, `improve-agent-readiness`, `improve-codebase-architecture`, `linear`, `linear-triage`, `mainframe-planning`, `mainframe-removal`, `mcp-builder`, `openhands-api`, `openhands-automation`, `openhands-sdk`, `prd`, `setup-agents-md`, `spark-version-upgrade`, `subagent-driven-development`, `to-java-migration`, `to-spec`, `to-tickets`, `using-git-worktrees`, `using-superpowers`, `vercel-composition-patterns`, `writing-for-agents`, `writing-plans` | `add-javadoc`, `agent-canvas-environment`, `agent-creator`, `agent-readiness-report`, `agent-sdk-builder`, `azure-devops`, `bitbucket`, `bitbucket-cloud`, `bitbucket-data-center`, `brainstorming`, `build-setup`, `canvas-extension-api`, `cobol-modernization`, `codebase-design`, `dispatching-parallel-agents`, `domain-modeling`, `executing-plans`, `gitlab`, `gitlab-issue-to-mr`, `grill-me`, `improve-agent-readiness`, `improve-codebase-architecture`, `linear`, `linear-triage`, `mainframe-planning`, `mainframe-removal`, `mcp-builder`, `openhands-api`, `openhands-automation`, `openhands-sdk`, `prd`, `setup-agents-md`, `spark-version-upgrade`, `subagent-driven-development`, `to-java-migration`, `to-spec`, `to-tickets`, `using-git-worktrees`, `using-superpowers`, `writing-for-agents`, `writing-plans` | `brainstorming`, `domain-modeling`, `grill-me`, `prd`, `to-spec`, `writing-plans` | `brainstorming`, `codebase-design`, `domain-modeling`, `grill-me`, `improve-codebase-architecture`, `prd`, `to-spec`, `writing-plans` |
-| tdd | `build-setup`, `cobol-modernization`, `mainframe-planning`, `mainframe-removal`, `property-based-testing`, `spark-version-upgrade`, `tdd`, `test-driven-development`, `to-java-migration`, `verification-before-completion` | `build-setup`, `cobol-modernization`, `mainframe-planning`, `mainframe-removal`, `property-based-testing`, `spark-version-upgrade`, `tdd`, `test-driven-development`, `to-java-migration`, `verification-before-completion` | **GAP** | `property-based-testing`, `tdd`, `test-driven-development`, `verification-before-completion` |
+| tdd | `build-setup`, `cobol-modernization`, `mainframe-planning`, `mainframe-removal`, `property-based-testing`, `spark-version-upgrade`, `tdd`, `test-driven-development`, `to-java-migration` | `build-setup`, `cobol-modernization`, `mainframe-planning`, `mainframe-removal`, `property-based-testing`, `spark-version-upgrade`, `tdd`, `test-driven-development`, `to-java-migration` | **GAP** | `property-based-testing`, `tdd`, `test-driven-development` |
 | e2e-testing | `agent-browser`, `playwright`, `qa-changes`, `webapp-testing` | `agent-browser`, `playwright`, `qa-changes`, `webapp-testing` | **GAP** | `agent-browser`, `playwright`, `qa-changes`, `webapp-testing` |
 | ab-testing-and-evaluation | `diagnosing-superpowers`, `jupyter`, `jupyter-notebook`, `migration-mapping`, `migration-report`, `migration-scoring`, `property-based-testing`, `score-quality`, `score-style`, `skill-creator`, `typesafe-ai`, `vercel-optimize`, `writing-skills` | `diagnosing-superpowers`, `migration-mapping`, `migration-report`, `migration-scoring`, `property-based-testing`, `score-quality`, `score-style`, `skill-creator`, `typesafe-ai`, `vercel-optimize`, `writing-skills` | `jupyter`, `jupyter-notebook`, `skill-creator`, `writing-skills` | `jupyter`, `jupyter-notebook`, `property-based-testing`, `skill-creator`, `typesafe-ai`, `writing-skills` |
 | debugging | `datadog`, `diagnosing-bugs`, `diagnosing-superpowers`, `openhands-enterprise-troubleshooting`, `systematic-debugging` | `datadog`, `diagnosing-bugs`, `diagnosing-superpowers`, `openhands-enterprise-troubleshooting`, `systematic-debugging` | `diagnosing-bugs`, `systematic-debugging` | `diagnosing-bugs`, `systematic-debugging` |
-| code-review | `code-review`, `code-simplifier`, `codebase-design`, `frontend-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-composition-patterns`, `vercel-react-best-practices`, `verification-before-completion`, `web-design-guidelines` | `code-review`, `code-simplifier`, `codebase-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-react-best-practices`, `verification-before-completion`, `web-design-guidelines` | **GAP** | `codebase-design`, `improve-codebase-architecture`, `verification-before-completion` |
+| code-review | `code-review`, `code-simplifier`, `codebase-design`, `frontend-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-composition-patterns`, `vercel-react-best-practices`, `web-design-guidelines` | `code-review`, `code-simplifier`, `codebase-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-react-best-practices`, `web-design-guidelines` | **GAP** | `codebase-design`, `improve-codebase-architecture` |
 | security | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | **GAP** | `security`, `security-best-practices`, `security-threat-model` |
 | github-issue-to-pr | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `resolving-merge-conflicts`, `ticket-to-code-change`, `upstream-fork-sync` | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `resolving-merge-conflicts`, `ticket-to-code-change`, `upstream-fork-sync` | **GAP** | **GAP** |
 | github-pr-review | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `resolving-merge-conflicts`, `setup-pr-review`, `upstream-fork-sync` | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `resolving-merge-conflicts`, `setup-pr-review`, `upstream-fork-sync` | **GAP** | **GAP** |
-| github-ci-fix | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate`, `verification-before-completion` | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate`, `verification-before-completion` | **GAP** | `verification-before-completion` |
+| github-ci-fix | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate` | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate` | **GAP** | **GAP** |
 | github-actions | `agentic-actions-auditor`, `github-actions`, `setup-openhands` | `agentic-actions-auditor`, `github-actions`, `setup-openhands` | **GAP** | **GAP** |
 | release-notes | `release-notes` | `release-notes` | **GAP** | **GAP** |
 | docs-and-citations | `add-javadoc`, `agent-memory`, `agent-readiness-report`, `doc-coauthoring`, `docx`, `evidence-based-citations`, `find-skills`, `github-agents-md-maintainer`, `handoff`, `improve-agent-readiness`, `iterative-retrieval`, `learn-from-code-review`, `mcp-builder`, `pdf`, `pdflatex`, `plain-english-content`, `pptx`, `release-notes`, `research`, `search-first`, `setup-agents-md`, `technical-writing`, `theme-factory`, `writing-for-agents`, `writing-skills`, `xlsx` | `add-javadoc`, `agent-memory`, `agent-readiness-report`, `discord`, `doc-coauthoring`, `docx`, `evidence-based-citations`, `find-skills`, `github-agents-md-maintainer`, `gpt-researcher`, `handoff`, `improve-agent-readiness`, `incident-retrospective`, `iterative-retrieval`, `learn-from-code-review`, `mcp-builder`, `notion`, `pdf`, `pdflatex`, `plain-english-content`, `pptx`, `release-notes`, `research`, `research-brief`, `search-first`, `setup-agents-md`, `slack-channel-monitor`, `slack-standup-digest`, `technical-writing`, `theme-factory`, `writing-for-agents`, `writing-skills`, `xlsx` | `agent-memory`, `discord`, `doc-coauthoring`, `docx`, `evidence-based-citations`, `find-skills`, `github-agents-md-maintainer`, `gpt-researcher`, `handoff`, `incident-retrospective`, `iterative-retrieval`, `learn-from-code-review`, `notion`, `pdf`, `pdflatex`, `plain-english-content`, `pptx`, `research`, `research-brief`, `search-first`, `slack-channel-monitor`, `slack-standup-digest`, `technical-writing`, `theme-factory`, `writing-skills`, `xlsx` | `agent-memory`, `doc-coauthoring`, `docx`, `evidence-based-citations`, `find-skills`, `github-agents-md-maintainer`, `gpt-researcher`, `handoff`, `iterative-retrieval`, `learn-from-code-review`, `pdf`, `pdflatex`, `plain-english-content`, `pptx`, `research`, `research-brief`, `search-first`, `technical-writing`, `theme-factory`, `writing-skills`, `xlsx` |

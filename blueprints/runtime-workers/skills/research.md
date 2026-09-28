@@ -79,7 +79,8 @@ with/without baseline and repeated evaluation loop at
 [anthropics/skills@33375500 skills/skill-creator/SKILL.md:163](https://github.com/anthropics/skills/blob/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/skill-creator/SKILL.md#L163).
 Superpowers' individual lifecycle skills merit testing for coherent planning,
 red/green implementation and evidence-based completion; native hook and namespace
-adaptation remain unproven. Framework-specific Vercel review and measurement
+adaptation remain unproven. Its completion skill, `verification-before-completion`,
+was later excluded with main (see repair round 4 below). Framework-specific Vercel review and measurement
 skills complement general code review. Matt Pocock supplies primary-source
 research, spec/ticket synthesis and handoffs in addition to the seven existing
 pins. Trail of Bits' nine existing selections already cover scanning, dependency
@@ -155,7 +156,8 @@ received a failing test or a source check before its fix, and
 - **Pin identity before add (CL-D1).** A pinned-tree mismatch used to be found
   only after `add` and rolled back. The native in-use guard keeps the canonical
   folder and lock whenever a detected agent that is not a target reads that
-  folder (Codex whenever `$CODEX_HOME` or `~/.codex` exists). The comparison
+  folder (Codex whenever `$CODEX_HOME`, or `~/.codex` when it is unset, or
+  `/etc/codex` exists). The comparison
   therefore moved into the preflight, and a mismatch refuses the run with no add.
 - **Scope and pruning (CL-D3).** The manifest carries `"scope": "project"`, and
   the installer refuses it without `--project-dir`. A pruned entry is never
@@ -186,6 +188,45 @@ The branch was rebased onto main `c1581fa2` (#462) before the repairs, where onl
 `b9eb62d2` named in the repair brief. The coordinator attaches the raw review
 verdicts to the pull request as comments; they are not part of this tree.
 
+## 2026-09-28 repair round 4: main's M4 removal
+
+Main `c0966da2` (#464) removed `verification-before-completion` from its skills
+trial under the conflict rule M4 and moved it to its own `excluded` list
+([decision](../../../docs/decisions/2026-09-28-delegated-decisions.md), #462).
+The pinned SKILL.md (`8ca22db`, SHA-256 prefix `2befe7fc`, re-read with `gh api`
+for this round) requires fresh verification evidence before any completion claim
+(L17-20) and rates a previous run as not sufficient (L42), while `AGENTS.md:16`
+says to reuse passing evidence when its inputs still match. A worker whose work
+directory is a checkout of this repository loads both texts.
+
+The branch was rebased onto `c0966da2` without conflicts (git exit 0). The
+previous re-registration commit applied cleanly; it was then uncommitted, main's
+`manifests/evidence.json` restored, and the re-registration redone as the last
+commit. On the rebased tree the unchanged tests failed as the contract intends
+(67 tests, 6 failures, 2 errors):
+`test_every_adoption_skill_is_reused_or_explicitly_excluded` reported
+`verification-before-completion: reuse_ref 'adoption/skills/manifest.json' names
+no single main adoption skill`, and the installer refused the manifest for the
+same reason.
+
+The runtime manifest now excludes the skill with its reviewed pin, a reason and
+an overturn condition: main re-admits it. The exclusion carries no `adoption_ref`,
+because main lists the skill under `excluded` rather than `skills`. The new test
+`test_verification_before_completion_stays_excluded_until_main_readmits_it` and
+the revised superpowers lifecycle test failed before the exclusion. The current
+counts are 137 skills from 12 sources (obra/superpowers 14 of its 15), 27 reused
+adoption skills (16 of them Codex-disabled on main) and nine exclusions. There are
+15 empty role/scenario cells, since the extraction caller's CI-fix cell lost its
+only selection. Catalog sums are 1,020,955 SKILL.md bytes and 36,739 description
+characters. A new source-count test ties `sources` and the table below to the
+selected skills.
+
+The round-3 record's `not_relayed` line was wrong. The GPT-6 review's
+GPT6-C1-manifest-pins, C2-adoption-coverage, C3-reuse-gates, C4-pruned-selection
+and C7-validation-evidence were CONFIRM verdicts without a defect, so nothing
+needed relaying; [validation](validation.json) now lists them under
+`repair_r3.confirmed`.
+
 ## Source pins
 
 <!-- source-pins -->
@@ -197,7 +238,7 @@ verdicts to the pull request as comments; they are not part of this tree.
 | anthropics/skills | `33375500bcea98d610eb30ce10ac4e59b89c390d` | 9 |
 | assafelovic/gpt-researcher | `0957c301ed06c2a5857b834358c7227c739041d4` | 1 |
 | mattpocock/skills | `c55ee46073ed923f86ce59a5eb3b6d895095d1b7` | 12 |
-| obra/superpowers | `8ca22dba9a94f28898bbce59f2537ff4d87c747d` | 15 |
+| obra/superpowers | `8ca22dba9a94f28898bbce59f2537ff4d87c747d` | 14 |
 | openai/skills | `49f948faa9258a0c61caceaf225e179651397431` | 6 |
 | trailofbits/skills | `0cc1c73a5e96749ab32d7ea5e14892fafa6972ae` | 9 |
 | typesafe-ai/skills | `65a39f393687675ce170e6094757de20370365b9` | 1 |

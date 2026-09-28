@@ -563,7 +563,8 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         # Compare every selected pin before any add. A rollback after add cannot be relied on:
         # src/remove.ts:293-331 keeps the canonical folder and lock for a detected agent that reads
-        # it (Codex from ~/.codex, src/agents.ts:224-232; universal agents, src/installer.ts:151-158).
+        # it (Codex from $CODEX_HOME, ~/.codex when unset, or /etc/codex, src/agents.ts:10 and 224-232;
+        # universal agents, src/installer.ts:151-158).
         mismatched = [skill["name"] for skill in skills
                       if pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"]) != skill["tree_sha"]]
         if mismatched:
