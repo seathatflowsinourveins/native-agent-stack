@@ -20,7 +20,7 @@ HOOK = ROOT / "adoption/hooks/claude/token-lanes-subagent-start.py"
 BLOCK = HOOK.with_name("token-lanes-block.md")
 AGENTS = ROOT / "adoption/agents/claude"
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
-BUDGET_BYTES = 4_100  # 4,094 measured bytes; qmd-scope addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
+BUDGET_BYTES = 4_100  # 4,088 measured bytes; verification-line addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
 # Exact agent_type -> sibling block; every other non-blind type receives BLOCK.
 ROLE_BLOCKS = {
     "stack-researcher": "token-lanes-block.researcher.md",
@@ -35,8 +35,11 @@ BLOCK_FILES = (BLOCK,) + tuple(HOOK.with_name(name) for name in sorted(set(ROLE_
 KEY_PHRASES = (  # the default block only; role blocks carry ROLE_KEY_PHRASES
     "ToolSearch", "ctx_batch_execute", "rtk", "find_referencing_symbols",
     "codebase-memory", "jcodemunch", "TOON", "headroom",
-    "verification-before-completion", "search-first",
+    "Show evidence before a success claim", "search-first",
 )
+# No block names a verification skill or step (Opus 5 guide L61, L81; verification-line addendum).
+# isolated-builder still preloads the skill through its own `skills:` frontmatter.
+WITHDRAWN_PHRASES = ("verification-before-completion",)
 ROLE_KEY_PHRASES = {
     "token-lanes-block.researcher.md": (
         "ToolSearch", "ctx_fetch_and_index", "ctx_batch_execute", "rtk", "find_referencing_symbols",
@@ -49,7 +52,7 @@ ROLE_KEY_PHRASES = {
     "token-lanes-block.builder.md": (
         "ToolSearch", "ctx_batch_execute", "cwd = the owned worktree your brief names", "rtk",
         "find_referencing_symbols", "jcodemunch", "codebase_search", "memory_query", "TOON",
-        "one lane per artifact", "verification-before-completion"),
+        "one lane per artifact"),
     "token-lanes-block.scout.md": ("rtk", "rtk proxy <cmd>", "TOON", "one lane per artifact"),
 }
 CORRECTED_PHRASES = (
@@ -363,6 +366,9 @@ class TokenLanesTextTests(unittest.TestCase):
                 with self.subTest(block=path.name, phrase=phrase):
                     self.assertIn(phrase, block)
                     self.assertIn(phrase, handbook)
+            for phrase in WITHDRAWN_PHRASES:
+                with self.subTest(block=path.name, withdrawn=phrase):
+                    self.assertNotIn(phrase, block)
             # Every guidance line is copied verbatim from the source of truth.
             for line in block.splitlines()[1:]:
                 with self.subTest(block=path.name, line=line):
