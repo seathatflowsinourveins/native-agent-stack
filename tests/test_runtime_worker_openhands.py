@@ -1342,6 +1342,21 @@ class OpenHandsIsolationTests(unittest.TestCase):
         for path in re.findall(r"_temp_path\s+(\S+);", body):
             self.assertTrue(path.startswith("/tmp/"), path)
 
+    def test_host_side_access_log_records_no_request_line(self):
+        # GPT-6 review session-key-logging: the combined format logs "$request"
+        # (nginx release-1.30.5 src/http/modules/ngx_http_log_module.c:230-232),
+        # so a URI sent to gw:8080 would reach the retained proxy log whole.
+        _, body, agent, host_side = self.proxy_blocks()
+        http_level = body[:body.index("listen 8081;")]
+        formats = dict(re.findall(r"log_format\s+(\w+)\s+'([^']*)';", body))
+        self.assertEqual(list(formats), ["ingress"])
+        self.assertIn("log_format ingress", http_level)
+        self.assertEqual(re.findall(r"\$\w+", formats["ingress"]), ["$time_iso8601", "$request_method", "$status"])
+        self.assertEqual(re.findall(r"access_log\s+([^;]+);", host_side), ["/dev/stdout ingress"])
+        # P5 triages the agent side's full request lines, so 8081 keeps the combined default.
+        self.assertEqual(re.findall(r"access_log\s+([^;]+);", http_level), ["/dev/stdout"])
+        self.assertEqual(re.findall(r"access_log\s+([^;]+);", agent), [])
+
     def test_proxy_render_fills_each_placeholder_from_the_arm_selection(self):
         host = load_recipe_module("host.py")
         recipe = load_recipe_module("recipe.py")
@@ -2727,6 +2742,38 @@ class OpenHandsReceiptTests(unittest.TestCase):
         self.assertNotIn("SELECT *", source)
         self.assertNotIn("sqlite_master", source)
         self.assertIn("?mode=ro", source)
+
+    def test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids(self):
+        # Repair R5, source-checked. At OmniRoute@045aa81f3 and @dd6e9607e the
+        # /v1/responses route hands handleChat a fresh randomUUID
+        # (src/app/api/v1/responses/route.ts:193,213; src/shared/utils/requestId.ts:100-102),
+        # and call_logs.correlation_id records it (chatCore/attemptLogging.ts:611).
+        # The proxy's fixed run id never reaches that column, so filtering on it
+        # would turn this attempt's usage into a false empty window.
+        module = load_recipe_module("receipt.py")
+        # Built at runtime, like the gateway's own IDs (publication identifier policy).
+        generated = (str(uuid.uuid4()), str(uuid.uuid4()))
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp).resolve()
+            db = result / "fixture.sqlite"
+            connection = sqlite3.connect(db)
+            connection.execute("CREATE TABLE call_logs (timestamp, path, status, model, reasoning_effort_requested, reasoning_effort_upstream, tokens_in, tokens_cache_read, tokens_reasoning, correlation_id)")
+            connection.executemany("INSERT INTO call_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (
+                ("2026-09-28T18:00:01Z", "/v1/responses", 200, "gpt-6-astra-max", "max", "max", 30, 20, 4, generated[0]),
+                ("2026-09-28T18:00:02Z", "/v1/responses", 200, "gpt-6-astra-max", None, None, 10, 0, 0, generated[1])))
+            connection.commit()
+            connection.close()
+            (result / "check.json").write_text("{}")
+            (result / "window.json").write_text(json.dumps({
+                "arm": "control", "run_id": "rw-openhands-fixture", "instance_id": "django__django-11333",
+                "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:03Z"}))
+            gateway = module.create_receipt(result, database=db)["gateway"]
+        self.assertEqual(gateway["status"], "observed")
+        self.assertEqual(len(gateway["rows"]), 2)
+        self.assertEqual(gateway["totals"], {"tokens_in": 40, "tokens_cache_read": 20, "tokens_reasoning": 4})
+        for phrase in ("/v1/responses", "gateway-generated", "concurrent callers"):
+            self.assertIn(phrase, gateway["attribution"])
+        self.assertFalse(any(value in json.dumps(gateway) for value in generated))
 
     def test_skills_and_mcp_require_observations(self):
         # Phase 2 disables the unreachable host services in the policy, so the

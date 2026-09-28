@@ -333,10 +333,16 @@ def p3_control_call(*_args, **_kwargs):
     sending a forged X-Correlation-Id, X-Forwarded-For and one x-omniroute-*
     header; then a second call with a query string, which must get the
     proxy's 403 and no call_logs row. The call_logs row must show
-    /v1/responses, 200, cx/gpt-6-astra-max, effort max requested and sent
-    upstream, and the proxy's fixed run id as the correlation value. The
-    streamed tool call must parse and its usage equal the row; record the
-    client peer the gateway logged (F10) and the proxy access log lines.
+    /v1/responses, 200, cx/gpt-6-astra-max, and effort max requested and sent
+    upstream. Its correlation value is gateway-generated, neither the forged
+    one nor the run id: at OmniRoute@045aa81f3 and @dd6e9607e /v1/responses
+    ignores the caller's X-Correlation-Id (src/app/api/v1/responses/route.ts:193,213).
+    A third call shows the proxy's replacement: one POST /v1/chat/completions
+    with the same forged header. That route keeps a caller ID
+    (src/app/api/v1/chat/completions/route.ts:292-322), so its row, whatever
+    its status, must carry the run id. The streamed tool call must parse and
+    its usage equal the row; record the client peer the gateway logged (F10)
+    and the proxy access log lines.
     """
     raise NotImplementedError("p3_is_a_documented_skeleton_not_run")
 

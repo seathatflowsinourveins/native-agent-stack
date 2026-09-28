@@ -122,7 +122,10 @@ def private_file(path):
 
 
 def check_server_env(path):
-    """Require the session-key variable NAME in the server env file; values stay unread.
+    """Require the session-key variable NAME in the server env file.
+
+    Reads the file and compares only the variable name; the value is never
+    logged or returned.
 
     SDK@fcc102a agent_server/__main__.py:282-285 binds all interfaces only with a
     session API key (config.py:24 names OH_SESSION_API_KEYS_0). Without one the
@@ -130,8 +133,7 @@ def check_server_env(path):
     docker/cli@v29.8.1 pkg/kvfile/kvfile.go:92-124 is the --env-file format:
     newline-delimited lines, a BOM dropped on line one, leading whitespace
     trimmed, "#" comments, and the name ends at the first "=". A bare name copies
-    the Docker CLI's own environment, so only the NAME= form is accepted. Only
-    the text before "=" is compared; no value is kept, printed or logged.
+    the Docker CLI's own environment, so only the NAME= form is accepted.
     """
     path = private_file(path)
     try:

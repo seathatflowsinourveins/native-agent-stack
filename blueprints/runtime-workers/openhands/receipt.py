@@ -226,6 +226,14 @@ def create_receipt(result, database=None):
                            window.get("base_url"), window.get("compression_combo"))
     db = database or gateway_database(selection["arm"])
     rows, db_status = [], "unavailable"
+    # No run-id match (repair R5, checked against source). At OmniRoute@045aa81f3
+    # (20128) and @dd6e9607e (20129), whose files here are identical, /v1/responses
+    # hands handleChat a fresh randomUUID (src/app/api/v1/responses/route.ts:193,213;
+    # src/shared/utils/requestId.ts:100-102; src/sse/handlers/chat.ts:436), and
+    # call_logs.correlation_id stores it (open-sse/handlers/chatCore/attemptLogging.ts:611;
+    # src/lib/usage/callLogs.ts:713,786,801). Only /v1/chat/completions keeps a
+    # caller X-Correlation-Id (route.ts:292-322). arm_config fixes /v1/responses,
+    # so matching the proxy's run id would drop every row and report false zeros.
     try:
         rows = gateway_rows(db, window["started_at"], window["finished_at"])
         db_status = "observed" if rows else "empty_window"
@@ -283,7 +291,10 @@ def create_receipt(result, database=None):
         "gateway": {
             "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, **usage,
             "entry_port": selection["gateway_port"],
-            "attribution": "Time window + model + path at the arm entry gateway; concurrent callers cannot be excluded by the recipe lock.",
+            "attribution": ("Time window + model + path at the arm entry gateway. The proxy fixes X-Correlation-Id "
+                            "to the run id, but at the pinned OmniRoute builds /v1/responses logs a gateway-generated "
+                            "correlation ID instead, so rows are not matched by run id and concurrent callers of the "
+                            "same model and path are included; the recipe lock cannot exclude them."),
             "usage_note": "Sum each entry row once, including failed calls; never add 20128 to 20129. Cache-read is an input subset. Missing counters keep totals null.",
         },
         "compression": window.get("compression", {"delta": None, "status": "unavailable"}),
