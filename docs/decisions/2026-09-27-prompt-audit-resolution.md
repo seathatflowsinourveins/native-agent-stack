@@ -30,7 +30,7 @@ experiment may present it", which covers every experiment. The unit claims no ch
 | X5 | `AGENTS.md:3` and `examples/claude-native/CLAUDE.md:5` | agree / agree | not needed | Recorded, not edited. The broader rule covers the narrower one. |
 | X6 | the shared worker packet | agree / agree | not needed | No change. The packet is vendored and test-pinned, so a fix belongs in agent-lab. |
 | X8 | "after the current foundation work" | agree / agree | not needed | Recorded, not edited. This is permission text. |
-| X9 | `CLAUDE.md:3-4` | amend / amend | split, 2 and 2 | No edit. The user decides (see below). |
+| X9 | `CLAUDE.md:3-4` | amend / amend | split, 2 and 2 | No edit. A second round on 2026-09-28 split the same way, so the user decides (see the addendum). |
 | X10 | `review-changes.js:72`, `readiness-audit.js:96` | agree / agree | not needed | No change. The scripts are vendored and each emphasis is reasoned. |
 | N1 | landscape-sweep `README.md:192-195` and `:435-439`, and lines 17-19 of the 2026-09-26 run's evidence `README.md` | agree / amend | 4 of 4 for the amendment | Applied. The text now points at `PROMPTS_SHA256_CURRENT`, names the ledger entry as the run's registered record and dates the claim that went stale. |
 | N2 | `docs/harness-defaults.md`, the anti-pattern log | agree / agree | not needed | Applied. The blank line is gone, and the log check rejects a split table. |
@@ -197,13 +197,14 @@ included.
   - a vendor statement on all-caps wording for the current models.
 - **F1:** a saved workflow outside the vendored directory that should keep unrouted stages. Broaden the README's rule
   first, then this line.
-- **X9:** the user's choice between the two texts below, or a client release that lets the model invoke `/mcp` or
-  `/context`.
+- **X9:** the comparison named in the addendum of 2026-09-28, the user's choice between the two texts below, or a
+  client release that lets the model invoke `/mcp` or `/context`.
 - **N2 and N3:** a GitHub rendering of the log that differs from the GFM spec. No rendering was observed.
 
 ## Limitations and residuals
 
-- **X9 is for the user.** Both families agree that `CLAUDE.md:3-4` tells the model to run commands it cannot type.
+- **X9 is for the user.** The second round (addendum of 2026-09-28) did not change this. Both families agree that
+  `CLAUDE.md:3-4` tells the model to run commands it cannot type.
   They differ on the fallback.
   - GPT-6 lane:
 
@@ -248,3 +249,141 @@ included.
     lane's acknowledgement.
 - **Evidence classes:** source review, local checks and retained model judgments. No sweep ran for this unit, and no
   model-behavior claim is made.
+
+## Addendum (2026-09-28): X9's second round
+
+After round 1 split on X9, the user asked to "proceed with research convergence". The method above provides one
+adjudication round, so this second round goes beyond it. It keeps the same rule: a text is applied only when all four
+judgments choose it. The evidence is in
+[`evidence/artifacts/prompt-audit-20260927/x9-round2/`](../../evidence/artifacts/prompt-audit-20260927/x9-round2/).
+
+### New evidence given to both families
+
+- **The installed client's own responses** (Claude Code 2.1.283):
+  - the Skill tool refuses `context` and `mcp` and tells the model to ask the user to run them (C1, C2);
+  - a headless session's command list has `mcp` and `context` but not `plugin` (C4).
+- **An executed comparison of the three texts** (the current line and the two returns): 36 headless `claude -p` runs
+  of Claude Code 2.1.283 through promptfoo 0.123.1.
+  - K1-K3: 27 runs on Opus 5.5 (02:23-02:36Z), preregistered before the first counted run, on three questions a
+    session can settle from its own tools.
+  - K4: 9 runs on Sonnet 5 (02:55-03:03Z), preregistered after attempt 1 was voided, meant as a claim the session
+    cannot settle. It was added to exercise the fallback, which K1-K3 never did. Of the three returns seen from
+    attempt 1, the Claude return called the fallback decisive, and both GPT-6 returns held that coverage outweighs
+    it. The packet disclosed this origin but said the returns seen had named the fallback as the difference that
+    decides.
+- **38 dated sources** with verbatim quotes, and 5 recorded searches that found nothing.
+- **The packet misstated K4's model.** It said every run used the host's default model, Opus 5.5, gave K4 the "Same
+  harness", and listed Sonnet as untested. Why K4 ran on Sonnet 5 is not recorded. Both Claude judgments cite that
+  scope. The outcome stands, because a split means no edit either way.
+
+| Text | K1-K3 correct | Successful MCP call, K1 and K3 | Asked the user (K1-K4) | K4 status given | K4 runs that read settings files | Cost, K1-K3 (Opus 5.5) | Cost, K4 (Sonnet 5) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GPT-6 lane's text | 9 of 9 | 6 of 6 | 0 of 12 | 2 of 3 | 3 of 3 | $2.45 | $0.82 |
+| Claude lane's text | 9 of 9 | 6 of 6 | 0 of 12 | 3 of 3 | 2 of 3 | $2.07 | $0.40 |
+| current line | 9 of 9 | 3 of 6 | 0 of 12 | 3 of 3 | 3 of 3 | $1.77 | $0.65 |
+
+- The MCP-call column counts K1's calls to its target server and K3's calls to any server. K2's target does not
+  exist, so no K2 run has one.
+- `settings-reads.json` lists the settings file names each run's commands named: every K2 run, the K4 runs in the
+  table and one K3 run.
+- No run called the Skill tool for a built-in command, and no K4 answer gave a wrong status. The GPT-6 lane's text
+  gave a K4 status in 2 of 3 runs because one run's final result was a reply to a background-command notification.
+- K4's premise did not hold. Seven of nine answers cited the plugin's commands from the session's own skill list
+  (`k4/skill-list-mentions.json` keeps those sentences). The skills page says "Custom commands have been merged into
+  skills." (`sources-supplement.json`). So the fallback on which the two texts differ was never exercised.
+- Cost is the client's estimate and descriptive only: the runs went in one fixed order and share a cached prompt
+  prefix.
+
+### Attempt 1 was void
+
+- Its judges read a repository root at `ed3cd96c`, which holds this record, and this record names the lanes.
+- Nothing kept a judge out of the coordinator's work directory. One GPT-6 judgment read both. One Claude judgment read
+  this record, and the other's searches returned a line of each text from it (the evidence README explains that
+  judgment's self-test hits).
+- The void was recorded before any Claude choice was seen (`attempt1/void.json`). The attempt-2 audit, run on
+  these transcripts, marks all four void (`attempt1/audit-selftest.json`).
+- The rules for attempt 2 were recorded before any attempt-2 judge started:
+  - attempt 2 is final;
+  - any void judgment makes the round a split.
+
+### Attempt 2, blind
+
+- **Root:** a plain export of `ba1700ad`, which predates this record. None of its 7,935 files holds a string that maps
+  a text to a lane. `isolation-receipt.json` gives the times of the steps before dispatch: the worktrees removed,
+  the attempt-1 files and the work directory moved away, the root scanned, then the GPT-6 judges started.
+- **Judges:** two families, each judging in the orders A/B and B/A:
+  - two GPT-6 jobs of the packaged runner (gpt-6-astra at effort max, `-s read-only` per `codex_job.py:434` at
+    `ba1700ad`, with explicit read limits);
+  - two `blind-adjudicator` agents (Read, Glob and Grep only).
+- **Audit:** `void_patterns.py`, applied to every command, output, search, tool result, advisor result and injected
+  context. It was hashed with the audit and tally scripts before any return was read.
+  - No judgment had a voiding hit.
+  - No judge opened a path outside its input, its packet and the root.
+
+| Judgment | Choice | Confidence |
+| --- | --- | ---: |
+| GPT-6, A/B | GPT-6 lane's text | 0.86 |
+| GPT-6, B/A | GPT-6 lane's text | 0.88 |
+| Claude, A/B | Claude lane's text | 0.58 |
+| Claude, B/A | Claude lane's text | 0.60 |
+
+**Decision:** split, no edit. `CLAUDE.md` stays at 30 tokens.
+
+**Where the families agree:**
+- All four rejected keeping the current line. The two Claude judgments give the reason: the client refuses the
+  commands it names (C1, C2). Both GPT-6 judgments cite C1 and C2. All eight judgments across both rounds reject
+  the current line.
+- `/plugin` is a real interactive command. Its absence from the headless list does not contradict the GPT-6 lane's
+  text.
+- K1-K3 tie on the primary metric, and K4 did not exercise the fallback.
+
+**Where they differ:**
+- **GPT-6: the verification standard decides.**
+  - Its text separates listed availability from successful execution. Tools can be listed from the discovery cache
+    before a server connects.
+  - Its text also covers plugin agents.
+  - It grants that the Claude lane's text has the clearer fallback for unattended runs.
+- **Claude: the fallback decides.**
+  - "Report it as unconfirmed and name the command" gives a status whether or not anyone can answer.
+  - `CLAUDE.md` also loads in headless runs and workflow children.
+  - It grants that the GPT-6 lane's text covers more, but the runs did not show that coverage changing behavior.
+- **Family alignment.** Each family chose its own lane's text in both orders, blind and audit-clean.
+  - That is two judgments per family on one unit, so it is recorded as a fact about X9, not as a general bias.
+  - The round-1 note above covers all units and still stands.
+  - The confidence gap is descriptive.
+
+**Comparison that would decide it:** a preregistered comparison of the two texts in headless and interactive
+sessions, on two cases:
+- a component that nothing in the session lists, such as a plugin with hooks only. This tests the fallback.
+- an MCP server whose tools are listed but which is not connected: a failed server, or tools loaded from the
+  discovery cache. This tests the listed-versus-executed clause.
+
+**Usage** (`usage.json`; each counter is kept separate; the coordinator session is not included):
+
+| Job | Input (cached) | Output (reasoning) | Wall time |
+| --- | ---: | ---: | --- |
+| GPT-6, A/B | 361,404 (282,624) | 6,398 (4,652) | 3 min 28 s |
+| GPT-6, B/A | 453,960 (366,592) | 6,756 (5,240) | 3 min 50 s |
+
+| Agent | Calls | Input | Cache write | Cache read | Output |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `blind-adjudicator`, A/B | 8 | 20 | 124,928 | 621,147 | 64,422 |
+| `blind-adjudicator`, B/A | 11 | 24 | 107,000 | 777,846 | 53,580 |
+
+- The Claude judges made 2 and 1 server-side advisor calls. The advisor's own usage is not in these fields.
+- `usage.json` also holds the usage of the void attempt 1 and of the 36 comparison runs. Its attempt-1 buckets
+  include the round's source research (a `stack-researcher` agent, 73 API calls) and the GPT-6 runner probe.
+
+**Limits:**
+- The runs were headless, and each case ran on one model: K1-K3 on Opus 5.5, the host's default, and K4 on
+  Sonnet 5. Interactive sessions and other effort levels were not tested.
+- The K2 and K4 runs read client settings files under `bypassPermissions`, the host's default permission mode. The
+  evidence keeps the file names, the K1-K3 answers' first 240 characters, each K4 answer's first sentence and the K4
+  sentences that cite the plugin's commands. The K4 answer heads quote client configuration, so every published
+  copy withholds them, including the packets as sent to the judges.
+- The fallback remains untested.
+
+**Anti-pattern log:** three dated rows in `docs/harness-defaults.md` record this round's proven mistakes:
+- a model scope taken from the preregistration instead of each run's recorded model;
+- a check that reported a mismatch and still exited 0;
+- judge inputs published with answer text that quotes client configuration.
