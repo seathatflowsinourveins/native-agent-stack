@@ -41,7 +41,10 @@ def template_server_names() -> list[str]:
 
 class GuardInstallTests(unittest.TestCase):
     def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
-        names = ("token-lanes-block.md", "token-lanes-subagent-start.py")
+        script = "token-lanes-subagent-start.py"
+        names = ("token-lanes-block.md", "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
+                 "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md",
+                 script)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
@@ -60,13 +63,16 @@ class GuardInstallTests(unittest.TestCase):
                 dest = home / ".claude/hooks" / name
                 self.assertIn(f"installed {dest}", installed.stdout)
                 self.assertEqual(dest.read_bytes(), (ROOT / "adoption/hooks/claude" / name).read_bytes())
-            # The installed script resolves the installed block, even from a different cwd.
-            injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / names[1])],
-                                      input='{"agent_type":"general-purpose"}', env=env, cwd=home,
-                                      capture_output=True, text=True, timeout=30)
-            self.assertEqual(injected.returncode, 0, injected.stderr)
-            self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
-                             (home / ".claude/hooks" / names[0]).read_text(encoding="utf-8"))
+            # The installed script resolves the installed default or role block, even from a different cwd.
+            for agent_type, block in (("general-purpose", "token-lanes-block.md"),
+                                      ("stack-verifier", "token-lanes-block.verifier.md")):
+                with self.subTest(agent_type=agent_type):
+                    injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / script)],
+                                              input=json.dumps({"agent_type": agent_type}), env=env, cwd=home,
+                                              capture_output=True, text=True, timeout=30)
+                    self.assertEqual(injected.returncode, 0, injected.stderr)
+                    self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
+                                     (home / ".claude/hooks" / block).read_text(encoding="utf-8"))
 
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
