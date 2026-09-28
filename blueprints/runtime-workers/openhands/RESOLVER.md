@@ -152,6 +152,13 @@ Known limits:
   - release, workflow, secret, repo and ruleset commands;
   - force, delete, tag, mirror, all and prune pushes, including abbreviated options,
     `+` and `:` refspecs, and `git credential`.
+- **main's rules:** `gh api --paginate repos/<owner>/<repo>/rules/branches/main` is the
+  only read of main's rules, for the checks wait. GitHub's "Get rules for a branch"
+  (docs.github.com/en/rest/repos/rules) returns every active rule, 30 to a page by
+  default, so the read takes every page. Read-only GETs on 2026-09-28 found eight
+  required contexts in main's rules, and a 404 "Branch not protected" for classic
+  branch protection. So the harness allows no protection read, and it refuses rules,
+  ruleset and protection writes.
 - **Push:** `git remote get-url --push --all origin` must list only this
   repository. The push resets every inherited credential helper with empty values,
   then uses gh's own helper for github.com only (gitcredentials(7); gh
@@ -185,9 +192,21 @@ Model text reaches GitHub only inside an adaptive code fence or code span.
    port of the CI regex. The body ends with `Closes #N` and EXT's disclosure.
 2. **Read-back:** confirms an open draft on `main`, the label, the body, no merge
    and no auto-merge.
-3. **Checks and review:** the required checks are polled, bounded at 60 minutes;
-   "no checks reported" counts as pending. Then one body-only COMMENT review of the
-   head, with its text from the injected reviewer.
+3. **Checks and review:** the required checks are polled, bounded at 60 minutes.
+   - `gh pr checks --required` lists only the required checks that have reported
+     (gh `aggregate.go:36-41`; cli/cli#6448). So the required contexts come from
+     main's rules, and an empty set stops the loop.
+   - The checks are settled only when every required context has a completed result.
+     An absent or pending context, including "no checks reported", keeps the wait
+     pending. At the bound the checks are "incomplete", never settled, and the
+     residuals comment lists each context that never reported.
+   - gh reads the PR's latest commit, not a named one, so the head is read before the
+     first poll and after each. A moved head stops the loop (`pr_head_moved`). This
+     proves the listing belongs to the head only if the branch cannot move back to
+     it. The agent branch's `non_fast_forward` rule gives that; stage 2's preflight
+     must confirm it, and stage 1 does not.
+   - Then one body-only COMMENT review of the head, with its text from the injected
+     reviewer.
 4. **Repair:** one repair from the injected repairer, accepted only when the
    compare API reports `ahead`.
 5. **Stop:** one residuals comment, a final read-back, then stop. A second
@@ -217,4 +236,6 @@ Model text reaches GitHub only inside an adaptive code fence or code span.
   - `execute`: the `rw-openhands-res-<N>-<date>` run id.
 - **`resolver.py run`:** build the harness with the pinned gh and a gitleaks
   scanner, and a guard with the attempt's host paths. Read `op_issue`,
-  `op_issue_comments` and `op_issue_provenance` for `select_issue`.
+  `op_issue_comments` and `op_issue_provenance` for `select_issue`. Before the
+  loop, confirm with `op_branch_rules` and `check_branch_rules` that the agent
+  branch has `non_fast_forward`, which the checks wait's head reads rely on.

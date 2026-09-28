@@ -673,33 +673,99 @@ CHECK_BUCKETS = {"pass", "fail", "pending", "skipping", "cancel"}  # checks.go:7
 NO_CHECKS_YET = ("no checks reported", "no required checks reported")  # checks.go:300-308
 
 
-def wait_for_checks(harness, number, *, clock, sleep, bound=3600, interval=60):
-    """Plan step 10: poll the required checks until none is pending, for at most `bound` seconds.
+def current_head(harness, number):
+    """The PR's head commit, read through the pr view template (review items D3 and D4)."""
+    view = read_back(harness, number)
+    if view.get("number") != number:
+        raise LoopStopped("pr_number_mismatch")
+    if not isinstance(view.get("headRefOid"), str) or not SHA.fullmatch(view["headRefOid"]):
+        raise LoopStopped("pr_view_unparseable")
+    return view["headRefOid"]
+
+
+def required_contexts(harness):
+    """main's required status check contexts, sorted (review item D3).
+
+    `gh pr checks --required` lists only the required checks that have reported
+    (aggregate.go:36-41 at 0cf10924; cli/cli#6448), so it cannot show that one is
+    missing. GitHub's "Get rules for a branch" (docs.github.com/en/rest/repos/rules)
+    returns every active rule for main; a required_status_checks rule lists
+    parameters.required_status_checks[].context. main has no classic branch
+    protection (gh_harness.op_base_rules), so these rules are the whole required set.
+    Local composition; an empty set fails closed instead of making the wait vacuous.
+    """
+    listed = harness.run(gh_harness.op_base_rules())
+    if listed.returncode != 0:
+        raise LoopStopped("required_checks_failed")
+    try:
+        rules = parse_paginated_array(listed.stdout)
+    except ValueError:
+        raise LoopStopped("required_checks_unparseable") from None
+    contexts = set()
+    for rule in rules:
+        if not isinstance(rule, dict) or not isinstance(rule.get("type"), str):
+            raise LoopStopped("required_checks_unparseable")
+        if rule["type"] != "required_status_checks":
+            continue
+        parameters = rule.get("parameters")
+        checks = parameters.get("required_status_checks") if isinstance(parameters, dict) else None
+        if not isinstance(checks, list) or not all(
+                isinstance(check, dict) and isinstance(check.get("context"), str) and check["context"]
+                for check in checks):
+            raise LoopStopped("required_checks_unparseable")
+        contexts.update(check["context"] for check in checks)
+    if not contexts:
+        raise LoopStopped("required_checks_missing")
+    return sorted(contexts)
+
+
+def wait_for_checks(harness, number, *, head, clock, sleep, bound=3600, interval=60):
+    """Plan step 10 and review item D3: poll until every required context has a completed
+    result on `head`, for at most `bound` seconds.
 
     With --json, gh exits 0 whatever the results (checks.go:189-191); before any check
     is reported it fails with "no checks reported" or "no required checks reported"
-    (checks.go:300-308), which counts as pending. Any other failure stops the loop.
+    (checks.go:300-308), an empty listing here. Any other failure stops the loop. A
+    listed name is the check run's name or the status context (aggregate.go:56-59),
+    which is what a rule's `context` names. A required context that is absent or
+    pending keeps the wait pending, and the bound ends it as "incomplete" with the
+    absent contexts in `missing`, never as settled.
+
+    gh reads the PR's latest commit, not a named one (api/query_builder.go:270-311), so
+    the PR head is read before the first poll and after each; any other head stops the
+    loop (pr_head_moved). Two reads of `head` around a listing show that the listing is
+    `head`'s only if the branch cannot return to `head` after moving: the agent
+    branch's non_fast_forward rule (gh_harness.check_branch_rules), which stage 2's
+    preflight must confirm. Stage 1 does not check it.
     """
-    start, checks, polls = clock(), [], 0
+    required = required_contexts(harness)
+    if current_head(harness, number) != head:
+        raise LoopStopped("pr_head_moved")
+    start, polls = clock(), 0
     while True:
         polls += 1
         result = harness.run(gh_harness.op_pr_checks(number))
-        pending = True
         if result.returncode == 0:
             try:
                 checks = json.loads(result.stdout)
             except ValueError:
                 raise LoopStopped("checks_unparseable") from None
             if not isinstance(checks, list) or not all(
-                    isinstance(check, dict) and check.get("bucket") in CHECK_BUCKETS for check in checks):
+                    isinstance(check, dict) and isinstance(check.get("name"), str)
+                    and check.get("bucket") in CHECK_BUCKETS for check in checks):
                 raise LoopStopped("checks_unparseable")
-            pending = any(check["bucket"] == "pending" for check in checks)
-        elif not any(message in result.stderr for message in NO_CHECKS_YET):
+        elif any(message in result.stderr for message in NO_CHECKS_YET):
+            checks = []
+        else:
             raise LoopStopped("checks_failed")
-        if not pending:
-            return {"status": "settled", "checks": checks, "polls": polls}
+        if current_head(harness, number) != head:
+            raise LoopStopped("pr_head_moved")
+        listed = {check["name"] for check in checks}
+        missing = [context for context in required if context not in listed]
+        if not missing and not any(check["bucket"] == "pending" for check in checks):
+            return {"status": "settled", "checks": checks, "missing": [], "polls": polls}
         if clock() - start >= bound:
-            return {"status": "timeout", "checks": checks, "polls": polls}
+            return {"status": "incomplete", "checks": checks, "missing": missing, "polls": polls}
         sleep(interval)
 
 
@@ -813,11 +879,13 @@ def residuals_body(*, repair, checks, guard):
     lines += [""]
     lines += (["Report from the repair attempt (model output, shown as text):", "", outgoing_guard.fence(report)]
               if report.strip() else ["The repair attempt gave no report."])
-    lines += ["", "Final required checks" + (" (still pending at the 60-minute bound):" if checks["status"] == "timeout"
+    lines += ["", "Final required checks" + (" (incomplete at the 60-minute bound):" if checks["status"] == "incomplete"
                                               else ":"), ""]
-    if checks["checks"]:
+    rows = [(str(check.get("name") or "unnamed"), check["bucket"]) for check in checks["checks"]]
+    rows += [(context, "not reported") for context in checks["missing"]]
+    if rows:
         lines += ["| Check | Result |", "| --- | --- |"]
-        lines += [f"| {span(str(check.get('name') or 'unnamed'))} | {span(check['bucket'])} |" for check in checks["checks"]]
+        lines += [f"| {span(name)} | {span(result)} |" for name, result in rows]
     else:
         lines.append("No required check was reported.")
     lines += ["", "The pull request stays a draft: the driver never marks it ready, merges it or enables "
@@ -843,8 +911,8 @@ class ReviewLoop:
         return check_read_back(read_back(self.harness, self.pr["number"]), number=self.pr["number"],
                                branch=self.pr["branch"], lane=self.pr["lane"], head=head)
 
-    def _checks(self):
-        return wait_for_checks(self.harness, self.pr["number"], clock=self.clock, sleep=self.sleep,
+    def _checks(self, head):
+        return wait_for_checks(self.harness, self.pr["number"], head=head, clock=self.clock, sleep=self.sleep,
                                bound=self.bound, interval=self.interval)
 
     def run(self):
@@ -852,13 +920,13 @@ class ReviewLoop:
             raise LoopStopped("review_repeated")
         self.started = True
         head = self._view(self.pr["head"])["headRefOid"]
-        checks = self._checks()
+        checks = self._checks(head)
         review = post_review(self.harness, self.guard, self.pr["number"], head, self.reviewer)
         failing = failing_excerpts(self.harness, checks["checks"])
         repair = repair_once(self.harness, pr=self.pr, head=head, findings=review["findings"], failing=failing,
                              repairer=self.repairer)
         if repair["status"] == "pushed":
-            checks = self._checks()
+            checks = self._checks(repair["head"])
         self._view(repair["head"])
         body = residuals_body(repair=repair, checks=checks, guard=self.guard)
         commented = self.harness.run(gh_harness.op_pr_comment(self.pr["number"],
@@ -868,7 +936,7 @@ class ReviewLoop:
         final = self._view(repair["head"])
         return {"pr": self.pr["number"], "review": {"id": review["id"], "commit_id": review["commit_id"]},
                 "repair": {key: value for key, value in repair.items() if key != "report"},
-                "checks": {"status": checks["status"], "polls": checks["polls"],
+                "checks": {"status": checks["status"], "polls": checks["polls"], "missing": checks["missing"],
                            "buckets": sorted({check["bucket"] for check in checks["checks"]})},
                 "final": {"head": final["headRefOid"], "isDraft": final["isDraft"], "state": final["state"]}}
 
@@ -892,6 +960,7 @@ class FakeGitHub:
         self.checks = [(item.get("code", 0), item.get("stdout", "[]"), item.get("stderr", ""))
                        for item in scenario.get("checks", [])]
         self.compare = scenario.get("compare") or {"status": "ahead", "ahead_by": 1, "behind_by": 0}
+        self.rules = json.dumps(scenario.get("rules", []))  # main's rules; none means the wait stops
         self.diff, self.run_log = scenario.get("diff", ""), scenario.get("run_log", "")
         self.transcript = transcript
 
@@ -920,6 +989,8 @@ class FakeGitHub:
             return answer(self.run_log)
         if argv[:2] == ["pr", "comment"]:
             return answer(f"{url}#issuecomment-1\n")
+        if argv == gh_harness.op_base_rules()[1:]:
+            return answer(self.rules)
         if argv[:3] == ["api", "--method", "POST"]:
             commit = next(word.split("=", 1)[1] for word in argv if word.startswith("commit_id="))
             return answer(json.dumps({"id": 1, "state": "COMMENTED", "commit_id": commit}))

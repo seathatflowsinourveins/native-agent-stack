@@ -198,6 +198,17 @@ def op_branch_rules(branch):
     return ["gh", "api", f"{API}/rules/branches/{branch}"]
 
 
+def op_base_rules():
+    """GET every page of main's active rules, for its required status checks (review item D3).
+
+    GitHub's "Get rules for a branch" (docs.github.com/en/rest/repos/rules, read
+    2026-09-28) returns every active rule, 30 to a page by default, so --paginate reads
+    them all. main has no classic branch protection (GET .../branches/main/protection
+    answered 404 "Branch not protected" on 2026-09-28), so no protection read is allowed.
+    """
+    return ["gh", "api", "--paginate", f"{API}/rules/branches/main"]
+
+
 def op_compare(base, head):
     """GET compare, whose status must read "ahead" for a fast-forward repair (plan A5)."""
     return ["gh", "api", f"{API}/compare/{base}...{head}"]
@@ -411,6 +422,7 @@ def _templates(gh):
                            None),
         "issue_provenance": (op_issue_provenance(1)[:-1] + [re.compile(f"number={NUMBER}")], None),
         "branch_rules": (["gh", "api", re.compile(rf"{re.escape(API)}/rules/branches/{BRANCH}")], None),
+        "base_rules": (op_base_rules(), None),
         "compare": (["gh", "api", re.compile(rf"{re.escape(API)}/compare/{SHA}\.\.\.{SHA}")], None),
         "ls_remote": (["git", "ls-remote", "--heads", ORIGIN_URL, re.compile(rf"openhands/issue-{NUMBER}\*")], None),
         "push_urls": (["git", "-C", clone, "remote", "get-url", "--push", "--all", "origin"], None),

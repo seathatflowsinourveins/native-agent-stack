@@ -983,6 +983,7 @@ class GhHarnessTests(unittest.TestCase):
             "issue_comments": (h.op_issue_comments(12), ["gh", "api", "--paginate", f"{API}/issues/12/comments"]),
             "branch_rules": (h.op_branch_rules("openhands/issue-12"),
                              ["gh", "api", f"{API}/rules/branches/openhands/issue-12"]),
+            "base_rules": (h.op_base_rules(), ["gh", "api", "--paginate", f"{API}/rules/branches/main"]),
             "compare": (h.op_compare(sha, head), ["gh", "api", f"{API}/compare/{sha}...{head}"]),
             "ls_remote": (h.op_ls_remote(12), ["git", "ls-remote", "--heads", ORIGIN, "openhands/issue-12*"]),
             "push_urls": (h.op_push_urls(self.clone),
@@ -1155,6 +1156,60 @@ class GhHarnessTests(unittest.TestCase):
         self.assertEqual(calls, [])
         harness.run(argv)
         self.assertEqual([call["args"][1:4] for call in calls], [["api", "graphql", "-f"]])
+
+    def test_main_rules_are_the_one_new_rules_read_and_protection_stays_refused(self):
+        # Review item D3: the checks wait reads main's required contexts through one fixed GET,
+        # every page of it. main has no classic protection (a GET answered 404 on 2026-09-28), so
+        # no protection read is allowed; rules, ruleset and protection writes stay refused.
+        h = self.h
+        argv = h.op_base_rules()
+        self.assertEqual(argv, ["gh", "api", "--paginate", f"{API}/rules/branches/main"])
+        self.assertEqual(h.check_argv(argv, gh=self.fake.gh), "base_rules")
+        self.assertEqual(h.check_argv(h.op_branch_rules("openhands/issue-12"), gh=self.fake.gh), "branch_rules")
+        cases = [
+            (["gh", "api", f"{API}/rules/branches/main"], "not_allowlisted"),
+            (["gh", "api", f"{API}/rules/branches/main", "--paginate"], "not_allowlisted"),
+            (["gh", "api", "--paginate", f"{API}/rules/branches/develop"], "not_allowlisted"),
+            (["gh", "api", "--paginate", f"{API}/rules/branches/main?per_page=1"], "not_allowlisted"),
+            (["gh", "api", "--paginate", f"{API}/rules/branches/main/x"], "not_allowlisted"),
+            (["gh", "api", "--paginate", f"{API}/rules/branches/openhands/issue-12"], "not_allowlisted"),
+            (["gh", "api", "--paginate", "repos/someone/fork/rules/branches/main"], "not_allowlisted"),
+            (["gh", "api", "--paginate", f"{API}/rules/branches/main", "--jq", ".[].type"], "not_allowlisted"),
+            (["gh", "api", "--paginate", f"{API}/rules/branches/main", "-H", "Accept: application/json"],
+             "not_allowlisted"),
+            (["gh", "api", "--paginate", "--method", "GET", f"{API}/rules/branches/main"], "not_allowlisted"),
+            (["gh", "api", f"{API}/rulesets"], "not_allowlisted"),
+            (["gh", "api", f"{API}/rulesets/1"], "not_allowlisted"),
+            (["gh", "api", f"{API}/rulesets/rule-suites"], "not_allowlisted"),
+            (["gh", "api", f"{API}/branches/main"], "not_allowlisted"),
+            (["gh", "api", f"{API}/branches/main/protection"], "not_allowlisted"),
+            (["gh", "api", f"{API}/branches/main/protection/required_status_checks"], "not_allowlisted"),
+            (["gh", "api", f"{API}/branches/main/protection/required_status_checks/contexts"], "not_allowlisted"),
+            (["gh", "api", "--method", "PUT", f"{API}/branches/main/protection", "--input", self.body], "method_denied"),
+            (["gh", "api", "-X", "DELETE", f"{API}/branches/main/protection"], "method_denied"),
+            (["gh", "api", "--method", "PATCH", f"{API}/branches/main/protection/required_status_checks",
+              "-F", "strict=false"], "method_denied"),
+            (["gh", "api", f"{API}/branches/main/protection/required_status_checks/contexts", "-f", "contexts[]=x"],
+             "method_denied"),
+            (["gh", "api", "--method", "POST", f"{API}/rulesets", "--input", self.body], "method_denied"),
+            (["gh", "api", "--method", "PUT", f"{API}/rulesets/1", "--input", self.body], "method_denied"),
+            (["gh", "api", "--method", "DELETE", f"{API}/rulesets/1"], "method_denied"),
+            (["gh", "api", "--method", "POST", f"{API}/rules/branches/main"], "method_denied"),
+            (["gh", "api", "graphql", "-f", "query={ repository(owner: \"o\", name: \"r\") { "
+              "branchProtectionRules(first: 5) { nodes { pattern } } } }"], "graphql_denied"),
+            (["gh", "ruleset", "check", "main"], "ruleset_denied"),
+            (["gh", "ruleset", "view", "1"], "ruleset_denied"),
+        ]
+        calls = []
+        harness = self.harness(runner=recording_runner(calls), guard=StubGuard(files=[self.body]))
+        with mock.patch.object(h.subprocess, "Popen", side_effect=AssertionError("a subprocess started")):
+            for variant, reason in cases:
+                with self.subTest(argv=variant), self.assertRaises(h.HarnessRefused) as caught:
+                    harness.run(variant)
+                self.assertEqual(caught.exception.reason, reason, variant)
+        self.assertEqual(calls, [])
+        harness.run(argv)  # positive control
+        self.assertEqual([call["args"][1:] for call in calls], [argv[1:]])
 
     def test_write_operations_need_an_approving_outgoing_guard(self):
         writes = {"pr_create": self.h.op_pr_create("openhands/issue-12", "[#12] Fix", self.body, "lane:foundation"),
@@ -1632,15 +1687,45 @@ def completed(args, stdout="", code=0, stderr=""):
     return subprocess.CompletedProcess(list(args), code, stdout, stderr)
 
 
-class ScriptedGitHub:
-    """Answers the allowlisted gh calls of one PR from a small state; a runner for GhHarness."""
+# The required contexts of main's rules, read with a GET on 2026-09-28 (review item D3).
+REQUIRED_CONTEXTS = ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
+                     "verdict-review-gate", "validate-macos", "sota-sources")
 
-    def __init__(self, *, number=34, head="a" * 40, checks=(), compare=None):
+
+def rules_json(*contexts):
+    """`gh api --paginate .../rules/branches/main` output in the shape of GitHub's "Get rules
+    for a branch" (docs.github.com/en/rest/repos/rules): a required_status_checks rule among others."""
+    return json.dumps([
+        {"type": "deletion", "ruleset_source_type": "Repository", "ruleset_id": 1},
+        {"type": "required_status_checks", "ruleset_source_type": "Repository", "ruleset_id": 1,
+         "parameters": {"strict_required_status_checks_policy": False, "do_not_enforce_on_create": False,
+                        "required_status_checks": [{"context": context, "integration_id": 1} for context in contexts]}},
+        {"type": "non_fast_forward", "ruleset_source_type": "Repository", "ruleset_id": 1}])
+
+
+def named_checks(*pairs):
+    """`gh pr checks --required --json ...` output for (name, bucket) pairs."""
+    return json.dumps([{"name": name, "state": bucket.upper(), "bucket": bucket, "link": "", "workflow": "validate"}
+                       for name, bucket in pairs])
+
+
+class ScriptedGitHub:
+    """Answers the allowlisted gh calls of one PR from a small state; a runner for GhHarness.
+
+    `required` names the contexts of main's required_status_checks rule (`rules` replaces the
+    whole answer: a text, or a (code, stdout, stderr) triple). `moves` maps the n-th checks
+    answer to the head the branch has after it, as a push during the wait would leave it.
+    """
+
+    def __init__(self, *, number=34, head="a" * 40, checks=(), compare=None, required=("check-0",), rules=None,
+                 moves=None):
         self.number, self.head = number, head
         self.state = {"isDraft": True, "state": "OPEN", "baseRefName": "main", "headRefName": None, "labels": [],
                       "body": None, "autoMergeRequest": None, "mergedAt": None}
         self.checks = list(checks)
         self.compare = compare or {"status": "ahead", "ahead_by": 1, "behind_by": 0}
+        self.rules = rules_json(*required) if rules is None else rules
+        self.moves, self.checks_answered = dict(moves or {}), 0
         self.calls, self.reviews, self.comments, self.title = [], [], [], None
 
     def __call__(self, args, **kwargs):
@@ -1658,6 +1743,11 @@ class ScriptedGitHub:
                                                **self.state}))
         if argv[:2] == ["pr", "checks"]:
             code, stdout, stderr = self.checks.pop(0) if self.checks else (0, "[]", "")
+            self.checks_answered += 1
+            self.head = self.moves.get(self.checks_answered, self.head)
+            return completed(args, stdout, code, stderr)
+        if argv == ["api", "--paginate", f"{API}/rules/branches/main"]:
+            code, stdout, stderr = self.rules if isinstance(self.rules, tuple) else (0, self.rules, "")
             return completed(args, stdout, code, stderr)
         if argv[:2] == ["pr", "diff"]:
             return completed(args, "diff --git a/docs/a.md b/docs/a.md\n+new line\n")
@@ -1680,7 +1770,7 @@ class ScriptedGitHub:
         names = []
         for argv in self.calls:
             if argv[:1] == ["api"]:
-                names.append("review" if argv[1] == "--method" else "compare")
+                names.append("review" if argv[1] == "--method" else "rules" if argv[1] == "--paginate" else "compare")
             else:
                 names.append("_".join(argv[:2]))
         return names
@@ -1830,19 +1920,138 @@ class PullRequestLoopTests(unittest.TestCase):
         missing = (1, "", "no required checks reported on the 'openhands/issue-12' branch\n")
         github = ScriptedGitHub(checks=[missing, (0, check_list("pending", "pass"), ""), (0, check_list("pass", "fail"), "")])
         clock = FakeClock()
-        waited = self.r.wait_for_checks(self.harness(github), 34, clock=clock.clock, sleep=clock.sleep)
+        waited = self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=clock.clock, sleep=clock.sleep)
         self.assertEqual(waited["status"], "settled")
         self.assertEqual([check["bucket"] for check in waited["checks"]], ["pass", "fail"])
         self.assertEqual(clock.sleeps, [60, 60])
         github = ScriptedGitHub(checks=[(0, check_list("pending"), "")] * 100)
         clock = FakeClock()
-        waited = self.r.wait_for_checks(self.harness(github), 34, clock=clock.clock, sleep=clock.sleep)
-        self.assertEqual(waited["status"], "timeout")
+        waited = self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=clock.clock, sleep=clock.sleep)
+        self.assertEqual(waited["status"], "incomplete")
         self.assertEqual(sum(clock.sleeps), 3600)
-        for failure in ((1, "", "HTTP 502: Bad Gateway\n"), (0, "not json", ""), (0, json.dumps([{"bucket": "odd"}]), "")):
+        for failure, reason in (((1, "", "HTTP 502: Bad Gateway\n"), "checks_failed"),
+                                ((0, "not json", ""), "checks_unparseable"),
+                                ((0, json.dumps([{"bucket": "odd"}]), ""), "checks_unparseable"),
+                                ((0, json.dumps([{"bucket": "pass"}]), ""), "checks_unparseable")):
             github = ScriptedGitHub(checks=[failure])
-            with self.subTest(failure=failure), self.assertRaises(self.r.LoopStopped):
-                self.r.wait_for_checks(self.harness(github), 34, clock=FakeClock().clock, sleep=FakeClock().sleep)
+            clock = FakeClock()
+            with self.subTest(failure=failure), self.assertRaises(self.r.LoopStopped) as caught:
+                self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=clock.clock, sleep=clock.sleep)
+            self.assertEqual(caught.exception.reason, reason)
+
+    def test_checks_settle_only_when_every_required_context_has_a_completed_result(self):
+        # Review item D3: `--required` lists only the required checks that have reported
+        # (aggregate.go:36-41 at 0cf10924; cli/cli#6448), so an absent context is pending, and
+        # the bound ends the wait as "incomplete" with the absent contexts, never as settled.
+        partial = (0, named_checks(("validate", "pass")), "")
+        nothing = (1, "", "no required checks reported on the 'openhands/issue-12' branch\n")
+        almost = (0, named_checks(*[(context, "pass") for context in REQUIRED_CONTEXTS[:-1]],
+                                  (REQUIRED_CONTEXTS[-1], "pending")), "")
+        done = (0, named_checks(*[(context, "skipping" if context == "validate-macos" else
+                                   "fail" if context == "osv-scanner" else "pass") for context in REQUIRED_CONTEXTS]), "")
+        cases = {
+            "partial results": ([partial] * 100, "incomplete", sorted(REQUIRED_CONTEXTS[1:]), 61),
+            "wholly missing results": ([nothing] * 100, "incomplete", sorted(REQUIRED_CONTEXTS), 61),
+            "an empty listing": ([(0, "[]", "")] * 100, "incomplete", sorted(REQUIRED_CONTEXTS), 61),
+            "all present, one still pending": ([almost] * 100, "incomplete", [], 61),
+            "all present and completed": ([partial, nothing, almost, done], "settled", [], 4),
+        }
+        for name, (answers, status, missing, polls) in cases.items():
+            github = ScriptedGitHub(checks=answers, required=REQUIRED_CONTEXTS)
+            clock = FakeClock()
+            with self.subTest(case=name):
+                waited = self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=clock.clock,
+                                                sleep=clock.sleep)
+                self.assertEqual((waited["status"], waited["missing"], waited["polls"]), (status, missing, polls))
+                self.assertEqual(sum(clock.sleeps), 60 * (polls - 1))
+                self.assertEqual(github.ops()[:2], ["rules", "pr_view"])
+                self.assertEqual(github.ops()[2:], ["pr_checks", "pr_view"] * polls)
+        settled = self.r.wait_for_checks(self.harness(ScriptedGitHub(checks=[done], required=REQUIRED_CONTEXTS)), 34,
+                                         head="a" * 40, clock=FakeClock().clock, sleep=FakeClock().sleep)
+        self.assertEqual(sorted(check["bucket"] for check in settled["checks"]), ["fail", "pass", "pass", "pass", "pass",
+                                                                                 "pass", "pass", "skipping"])
+
+    def test_required_contexts_come_from_every_page_of_the_base_branch_rules(self):
+        pages = rules_json("validate", "sota-sources") + json.dumps([
+            {"type": "required_status_checks", "parameters": {"strict_required_status_checks_policy": True,
+                                                              "required_status_checks": [{"context": "token-report"},
+                                                                                         {"context": "validate"}]}}])
+        github = ScriptedGitHub(rules=pages)
+        self.assertEqual(self.r.required_contexts(self.harness(github)), ["sota-sources", "token-report", "validate"])
+        self.assertEqual(github.ops(), ["rules"])
+        bad_check = [{"type": "required_status_checks", "parameters": {"required_status_checks": [{"context": ""}]}}]
+        for rules, reason in (((1, "", "HTTP 404: Not Found\n"), "required_checks_failed"),
+                              ("not json", "required_checks_unparseable"), ("{}", "required_checks_unparseable"),
+                              ("", "required_checks_unparseable"), (json.dumps(["x"]), "required_checks_unparseable"),
+                              (json.dumps([{"type": "required_status_checks"}]), "required_checks_unparseable"),
+                              (json.dumps(bad_check), "required_checks_unparseable"),
+                              ("[]", "required_checks_missing"),
+                              (json.dumps([{"type": "non_fast_forward"}]), "required_checks_missing"),
+                              (rules_json(), "required_checks_missing")):
+            with self.subTest(rules=rules), self.assertRaises(self.r.LoopStopped) as caught:
+                self.r.required_contexts(self.harness(ScriptedGitHub(rules=rules)))
+            self.assertEqual(caught.exception.reason, reason)
+        # A deliberate choice beyond the brief: with no required context known, the wait stops
+        # before its first poll rather than settle on whatever has reported.
+        github = ScriptedGitHub(rules="[]", checks=[(0, check_list("pass"), "")])
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=FakeClock().clock,
+                                   sleep=FakeClock().sleep)
+        self.assertEqual(caught.exception.reason, "required_checks_missing")
+        self.assertEqual(github.ops(), ["rules"])
+
+    def test_a_head_that_moves_during_the_checks_wait_stops_before_the_review(self):
+        # `gh pr checks` reads the PR's latest commit, not a named one (query_builder.go:270-311
+        # at 0cf10924), so the head is read before the first poll and after each. A deliberate
+        # choice beyond the brief: a moved head stops the wait at once, before any review.
+        github = ScriptedGitHub(checks=[(0, check_list("pending"), "")] * 5, moves={2: "c" * 40})
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=FakeClock().clock,
+                                   sleep=FakeClock().sleep)
+        self.assertEqual(caught.exception.reason, "pr_head_moved")
+        self.assertEqual(github.ops(), ["rules", "pr_view", "pr_checks", "pr_view", "pr_checks", "pr_view"])
+        github = ScriptedGitHub(checks=[(0, check_list("pass"), "")])
+        github.head = "c" * 40
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            self.r.wait_for_checks(self.harness(github), 34, head="a" * 40, clock=FakeClock().clock,
+                                   sleep=FakeClock().sleep)
+        self.assertEqual(caught.exception.reason, "pr_head_moved")
+        self.assertEqual(github.ops(), ["rules", "pr_view"])
+        github = ScriptedGitHub(checks=[(0, check_list("pending"), "")] * 5, moves={2: "c" * 40})
+        harness, record = self.opened(github)
+        reviewed = []
+        clock = FakeClock()
+        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=lambda diff: reviewed.append(diff) or "",
+                                 repairer=lambda **kwargs: {"pushed": False, "report": ""}, clock=clock.clock,
+                                 sleep=clock.sleep)
+        with self.assertRaises(self.r.LoopStopped) as caught:
+            loop.run()
+        self.assertEqual(caught.exception.reason, "pr_head_moved")
+        self.assertEqual(reviewed, [])
+        self.assertEqual((github.reviews, github.comments), ([], []))
+        self.assertFalse([argv for argv in github.calls if argv[:3] == ["api", "--method", "POST"]])
+
+    def test_the_loop_reports_required_checks_that_never_reported_as_incomplete(self):
+        # Review item D3 at the loop: "validate" passing while seven required contexts have not
+        # reported is not settled. At the bound the checks are incomplete and the residuals
+        # comment lists each context that never reported.
+        github = ScriptedGitHub(checks=[(0, named_checks(("validate", "pass")), "")] * 200, required=REQUIRED_CONTEXTS)
+        harness, record = self.opened(github)
+        clock = FakeClock()
+        loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=lambda diff: "",
+                                 repairer=lambda **kwargs: {"pushed": False, "report": "Nothing to repair."},
+                                 clock=clock.clock, sleep=clock.sleep)
+        outcome = loop.run()
+        self.assertEqual(outcome["checks"]["status"], "incomplete")
+        self.assertEqual(outcome["checks"]["missing"], sorted(REQUIRED_CONTEXTS[1:]))
+        self.assertEqual(outcome["checks"]["polls"], 61)
+        self.assertEqual(sum(clock.sleeps), 3600)
+        comment = github.comments[0]
+        self.assertIn("Final required checks (incomplete at the 60-minute bound):", comment)
+        self.assertIn("| `validate` | `pass` |", comment)
+        for context in REQUIRED_CONTEXTS[1:]:
+            with self.subTest(context=context):
+                self.assertIn(f"| `{context}` | `not reported` |", comment)
 
     def test_review_loop_reviews_repairs_once_comments_residuals_and_stops(self):
         github = ScriptedGitHub(checks=[(0, check_list("fail", "pass"), ""), (0, check_list("pass", "pass"), "")])
@@ -1862,9 +2071,10 @@ class PullRequestLoopTests(unittest.TestCase):
         loop = self.r.ReviewLoop(harness, self.guard, pr=record, reviewer=reviewer, repairer=repairer,
                                  clock=clock.clock, sleep=clock.sleep)
         outcome = loop.run()
-        self.assertEqual(github.ops(), ["pr_create", "pr_view", "pr_view", "pr_checks", "pr_diff", "review",
-                                        "run_view", "pr_view", "compare", "pr_checks", "pr_view", "pr_comment",
-                                        "pr_view"])
+        self.assertEqual(github.ops(), ["pr_create", "pr_view", "pr_view", "rules", "pr_view", "pr_checks", "pr_view",
+                                        "pr_diff", "review", "run_view", "pr_view", "compare", "rules", "pr_view",
+                                        "pr_checks", "pr_view", "pr_view", "pr_comment", "pr_view"])
+        self.assertEqual((outcome["checks"]["status"], outcome["checks"]["missing"]), ("settled", []))
         self.assertEqual(len(github.reviews), 1)
         review = github.reviews[0]
         self.assertEqual((review["event"], review["commit_id"]), ("event=COMMENT", "a" * 40))
@@ -1999,7 +2209,8 @@ class CommandLineTests(unittest.TestCase):
         session = self.r.outgoing_guard.SessionKey(key)
         scenario = self.write_json("scenario.json", {
             "number": 34, "head": "a" * 40, "diff": "diff --git a/docs/a.md b/docs/a.md\n",
-            "checks": [{"code": 0, "stdout": check_list("pass"), "stderr": ""}]})
+            "checks": [{"code": 0, "stdout": check_list("pass"), "stderr": ""}] * 2,
+            "rules": json.loads(rules_json("check-0"))})
         receipt = self.write_json("receipt.json", resolver_receipt())
         transcript = self.tmp / "open.jsonl"
         code, printed = self.main("open-pr", "--scenario", scenario, "--receipt", receipt, "--branch",
@@ -2022,6 +2233,9 @@ class CommandLineTests(unittest.TestCase):
         reviewed = [json.loads(line) for line in transcript.read_text(encoding="utf-8").splitlines()]
         words = [word for entry in reviewed for word in entry["argv"]]
         self.assertEqual(sum(1 for entry in reviewed if entry["argv"][:3] == ["api", "--method", "POST"]), 1)
+        self.assertEqual(outcome["checks"]["status"], "settled")
+        self.assertEqual(sum(1 for entry in reviewed if entry["argv"] == ["api", "--paginate",
+                                                                         f"{API}/rules/branches/main"]), 2)
         for denied in ("ready", "merge", "--auto", "DELETE"):
             self.assertNotIn(denied, words)
         for text in (printed, (self.tmp / "open.jsonl").read_text(encoding="utf-8"),
