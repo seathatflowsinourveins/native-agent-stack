@@ -1,0 +1,344 @@
+{
+ "note": "usage: settings_reads.py RESULTS_JSON [RESULTS_JSON...] OUT_JSON\nThe compact results drop Bash command text, because K2 and K4 commands printed client settings. This keeps only\nthe configuration file names each run's commands mention, so the claim that K2 and K4 runs read them can be\nchecked from retained data.",
+ "pattern": "(?:~|\\$HOME|\\$\\{CLAUDE_CONFIG_DIR[^}]*\\})?/?\\.claude\\.json|\\.mcp\\.json|settings(?:\\.local)?\\.json|installed_plugins\\.json|known_marketplaces\\.json|plugins/cache",
+ "runs": [
+  {
+   "arm": "g",
+   "case": "K1",
+   "transcript": "20260928T022359Z-1137529.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "c",
+   "case": "K1",
+   "transcript": "20260928T022414Z-1142940.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K1",
+   "transcript": "20260928T022429Z-1151282.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "g",
+   "case": "K1",
+   "transcript": "20260928T022446Z-1155075.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "c",
+   "case": "K1",
+   "transcript": "20260928T022511Z-1161048.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K1",
+   "transcript": "20260928T022523Z-1164248.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "g",
+   "case": "K1",
+   "transcript": "20260928T022541Z-1172140.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "c",
+   "case": "K1",
+   "transcript": "20260928T022556Z-1180183.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K1",
+   "transcript": "20260928T022609Z-1187549.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "g",
+   "case": "K2",
+   "transcript": "20260928T022626Z-1201189.jsonl",
+   "bash_calls": 1,
+   "config_files_named": [
+    ".mcp.json",
+    "settings.json",
+    "settings.local.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K2",
+   "transcript": "20260928T022649Z-1210454.jsonl",
+   "bash_calls": 1,
+   "config_files_named": [
+    ".mcp.json",
+    "settings.json",
+    "settings.local.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "0",
+   "case": "K2",
+   "transcript": "20260928T022715Z-1220695.jsonl",
+   "bash_calls": 3,
+   "config_files_named": [
+    ".mcp.json"
+   ]
+  },
+  {
+   "arm": "g",
+   "case": "K2",
+   "transcript": "20260928T022746Z-1230887.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    ".mcp.json",
+    "settings.json",
+    "settings.local.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K2",
+   "transcript": "20260928T022817Z-1237326.jsonl",
+   "bash_calls": 1,
+   "config_files_named": [
+    ".mcp.json",
+    "settings.json"
+   ]
+  },
+  {
+   "arm": "0",
+   "case": "K2",
+   "transcript": "20260928T022841Z-1241960.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    ".mcp.json",
+    "installed_plugins.json",
+    "settings.json",
+    "settings.local.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "g",
+   "case": "K2",
+   "transcript": "20260928T022905Z-1248866.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    ".mcp.json",
+    "settings.json",
+    "settings.local.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K2",
+   "transcript": "20260928T022938Z-1256818.jsonl",
+   "bash_calls": 1,
+   "config_files_named": [
+    ".mcp.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "0",
+   "case": "K2",
+   "transcript": "20260928T023003Z-1263908.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    ".mcp.json",
+    "settings.json",
+    "settings.local.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "g",
+   "case": "K3",
+   "transcript": "20260928T023026Z-1273890.jsonl",
+   "bash_calls": 1,
+   "config_files_named": [
+    ".mcp.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K3",
+   "transcript": "20260928T023125Z-1296103.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K3",
+   "transcript": "20260928T023210Z-1314557.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "g",
+   "case": "K3",
+   "transcript": "20260928T023233Z-1322232.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "c",
+   "case": "K3",
+   "transcript": "20260928T023324Z-1335970.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K3",
+   "transcript": "20260928T023415Z-1351223.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "g",
+   "case": "K3",
+   "transcript": "20260928T023437Z-1356811.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "c",
+   "case": "K3",
+   "transcript": "20260928T023529Z-1372010.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K3",
+   "transcript": "20260928T023617Z-1383533.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "g",
+   "case": "K4",
+   "transcript": "20260928T025524Z-1683412.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    "installed_plugins.json",
+    "plugins/cache",
+    "settings.json",
+    "settings.local.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K4",
+   "transcript": "20260928T025605Z-1690071.jsonl",
+   "bash_calls": 0,
+   "config_files_named": []
+  },
+  {
+   "arm": "0",
+   "case": "K4",
+   "transcript": "20260928T025633Z-1693371.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    "/.claude.json",
+    "plugins/cache",
+    "settings.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "g",
+   "case": "K4",
+   "transcript": "20260928T025722Z-1700425.jsonl",
+   "bash_calls": 3,
+   "config_files_named": [
+    "plugins/cache",
+    "settings.json",
+    "settings.local.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K4",
+   "transcript": "20260928T030010Z-1724341.jsonl",
+   "bash_calls": 2,
+   "config_files_named": [
+    "plugins/cache",
+    "settings.json"
+   ]
+  },
+  {
+   "arm": "0",
+   "case": "K4",
+   "transcript": "20260928T030040Z-1727411.jsonl",
+   "bash_calls": 4,
+   "config_files_named": [
+    "plugins/cache",
+    "settings.json"
+   ]
+  },
+  {
+   "arm": "g",
+   "case": "K4",
+   "transcript": "20260928T030119Z-1732785.jsonl",
+   "bash_calls": 3,
+   "config_files_named": [
+    "plugins/cache",
+    "settings.json",
+    "settings.local.json"
+   ]
+  },
+  {
+   "arm": "c",
+   "case": "K4",
+   "transcript": "20260928T030157Z-1738123.jsonl",
+   "bash_calls": 1,
+   "config_files_named": [
+    "settings.json",
+    "settings.local.json",
+    "~/.claude.json"
+   ]
+  },
+  {
+   "arm": "0",
+   "case": "K4",
+   "transcript": "20260928T030223Z-1742767.jsonl",
+   "bash_calls": 7,
+   "config_files_named": [
+    "installed_plugins.json",
+    "settings.json"
+   ]
+  }
+ ],
+ "runs_naming_a_config_file": {
+  "K1 0": "0 of 3",
+  "K1 c": "0 of 3",
+  "K1 g": "0 of 3",
+  "K2 0": "3 of 3",
+  "K2 c": "3 of 3",
+  "K2 g": "3 of 3",
+  "K3 0": "0 of 3",
+  "K3 c": "0 of 3",
+  "K3 g": "1 of 3",
+  "K4 0": "3 of 3",
+  "K4 c": "2 of 3",
+  "K4 g": "3 of 3"
+ }
+}

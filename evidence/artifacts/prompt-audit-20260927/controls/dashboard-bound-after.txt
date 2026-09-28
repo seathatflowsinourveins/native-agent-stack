@@ -1,0 +1,4 @@
+$ python3 -B -m unittest tests.test_grand_dashboard   # progress.py with SOURCE_MAX_BYTES; the same manifest (2017827 bytes)
+Ran 17 tests in 0.336s
+OK
+exit 0

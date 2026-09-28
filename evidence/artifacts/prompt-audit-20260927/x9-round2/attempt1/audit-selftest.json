@@ -1,0 +1,247 @@
+{
+ "note": "audit_attempt2.py run on attempt 1's four transcripts before any attempt-2 return was read; each hit's pattern, scope and match. The audit's text windows are kept only for claude-AB, from the judgment's input directory, the Grep options or the record path on (added after review).",
+ "patterns_sha256": "d16e99d67d8ee5d0b809782d8d2035fccb36c5d290acc367cc90d846499ec3c4",
+ "judgments": {
+  "gpt6-AB": {
+   "void": true,
+   "hits": [
+    [
+     "ACCESS",
+     "command",
+     "convergence-prompt-audit"
+    ],
+    [
+     "ACCESS",
+     "command",
+     "git -C <attempt1-root> diff"
+    ],
+    [
+     "ACCESS",
+     "command",
+     "prompt-audit-x9-round2"
+    ],
+    [
+     "MAPPING",
+     "command",
+     "2026-09-27-prompt-audit-resolution"
+    ],
+    [
+     "MAPPING",
+     "command output",
+     "2026-09-27-prompt-audit-resolution"
+    ],
+    [
+     "MAPPING",
+     "command output",
+     "adjudication-mapping"
+    ]
+   ],
+   "items": {
+    "agent_message": 4,
+    "command_execution": 26,
+    "web_search": 3
+   }
+  },
+  "gpt6-BA": {
+   "void": true,
+   "hits": [
+    [
+     "ACCESS",
+     "command",
+     "prompt-audit-x9-round2"
+    ]
+   ],
+   "items": {
+    "agent_message": 4,
+    "command_execution": 20,
+    "web_search": 2
+   }
+  },
+  "claude-AB": {
+   "void": true,
+   "hits": [
+    [
+     "ACCESS",
+     "tool call Glob",
+     "prompt-audit-x9-round2"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2"
+    ],
+    [
+     "MAPPING",
+     "tool call Grep",
+     "prompt-audit-20260927"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "2026-09-27-prompt-audit-resolution"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "2026-09-27-prompt-audit-resolution"
+    ]
+   ],
+   "windows": [
+    [
+     "ACCESS",
+     "tool call Glob",
+     "prompt-audit-x9-round2-judgment\"}}"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2-judgment/input.AB.md\"}}"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2-judgment/schemas/judge.json\"}}"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2-judgment/sources-round2.json\"}}"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2-judgment/sources-supplement.json\"}}"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2-judgment/sources.json\"}}"
+    ],
+    [
+     "MAPPING",
+     "tool call Grep",
+     "\"output_mode\": \"content\", \"glob\": \"!evidence/artifacts/prompt-audit-20260927/**\", \"head_limit\": 40}}"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "docs/decisions/2026-09-27-prompt-audit-resolution.md:214:    diagnostics first; if the claim remains unresolved, ask for the rele"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "docs/decisions/2026-09-27-prompt-audit-resolution.md:224:    when your session cannot settle the claim, report it as unconfirmed "
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "docs/decisions/2026-09-27-prompt-audit-resolution.md:97:| Not found | none | An Anthropic statement on all-caps wording for the 5"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "docs/decisions/2026-09-27-prompt-audit-resolution.md:214:    diagnostics first; if the claim remains unresolved, ask for the rele"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "docs/decisions/2026-09-27-prompt-audit-resolution.md:224:    when your session cannot settle the claim, report it as unconfirmed "
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "docs/decisions/2026-09-27-prompt-audit-resolution.md:97:| Not found | none | An Anthropic statement on all-caps wording for the 5"
+    ]
+   ],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 45,
+    "attachment hook_additional_context": 3,
+    "attachment deferred_tools_delta": 1,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment instructions": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 13,
+    "tool_use": 20,
+    "tool_result": 20,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 11,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  },
+  "claude-BA": {
+   "void": true,
+   "hits": [
+    [
+     "ACCESS",
+     "tool call Read",
+     "prompt-audit-x9-round2"
+    ],
+    [
+     "MAPPING",
+     "tool call Grep",
+     "prompt-audit-20260927"
+    ],
+    [
+     "MAPPING",
+     "tool call Read",
+     "2026-09-27-prompt-audit-resolution"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "2026-09-27-prompt-audit-resolution"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "prompt-audit-20260927"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "2026-09-27-prompt-audit-resolution"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "family's own lane"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "prompt-audit-20260927"
+    ]
+   ],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 41,
+    "attachment hook_additional_context": 2,
+    "attachment deferred_tools_delta": 1,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment instructions": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 13,
+    "tool_use": 19,
+    "tool_result": 19,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 12,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  }
+ }
+}

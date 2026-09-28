@@ -1,0 +1,11 @@
+Adjudicate unit X9.
+Input file: <judges>/adjudication-inputs/x9.BA.json
+Packet file: <judges>/packets/x9.BA.json
+Repository root: <root>
+
+The input holds the question, the current line, Return A, Return B, the choices and the rules; the packet holds the
+evidence and every source. The repository root is a plain export of main at ba1700ad. Read only these two files and
+files under the root.
+Return only this JSON: {"leak": false, "leak_text": "", "items": [{"id": "X9", "choice": "A" | "B" | "neither",
+"reasons": "...", "sources": [{"locator": "...", "quote": "..."}], "confidence": 0..1}]}. If you find a leak,
+return {"leak": true, "leak_text": "<the offending text>", "items": []} and stop.

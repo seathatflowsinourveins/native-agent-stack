@@ -1,0 +1,67 @@
+{
+ "lane": "GPT-6 packaged runner (codex_call.sh start/result)",
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-28T08:37:41Z",
+  "finished": "2026-09-28T08:41:09Z",
+  "usage": {
+   "input_tokens": 493758,
+   "cached_input_tokens": 402048,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 6004,
+   "reasoning_output_tokens": 4254
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X9",
+    "choice": "B",
+    "reasons": "B provides broader component coverage and explicitly distinguishes listed tools from successful execution; cached tool lists cannot establish a live connection. Its diagnostics-first instruction matches repository policy. /plugin is a documented interactive command, so its absence from C4’s headless list does not contradict B. K5-K6 supports B: both returns had zero wrong statuses, but B gave 10 correct statuses versus A’s 8. That evidence is limited to one model, headless sessions and bypassPermissions; it did not exercise B’s unresolved fallback. A handles that fallback more clearly, but B’s coverage and observed results outweigh this advantage. C1-C2 undermine retaining the current instruction.",
+    "sources": [
+     {
+      "locator": "docs/harness-defaults.md:21",
+      "quote": "Resolve discoverable names and capabilities before asking the user"
+     },
+     {
+      "locator": "C1",
+      "quote": "context is a built-in CLI command, not a skill."
+     },
+     {
+      "locator": "C2",
+      "quote": "mcp is a UI command, not a skill."
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/mcp#server-status-detail",
+      "quote": "Claude Code loaded the server’s tool list from its discovery cache, saved in a previous session, instead of connecting at startup"
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/plugins",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components"
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/features-overview",
+      "quote": "Nothing by default. Hooks execute outside the main conversation."
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/plugins/troubleshooting",
+      "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+     },
+     {
+      "locator": "K5-K6",
+      "quote": "wrong_status: Return B's text 0, Return A's text 0; correct_status: Return B's text 10, Return A's text 8"
+     }
+    ],
+    "confidence": 0.91
+   }
+  ]
+ }
+}
