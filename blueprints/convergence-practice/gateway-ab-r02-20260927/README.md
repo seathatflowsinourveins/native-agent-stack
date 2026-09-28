@@ -471,11 +471,26 @@ schema compilation (dist/src/logger-ChlKG5Wv.js:214-221).
 
 ## Gateway owner: read-backs and post-run step
 
-Every gateway read that exposes the build or the effort-relevant settings needs a credential at dd6e9607e. The
-build and version come only through management auth that ignores the no-login setting
-(OmniRoute@dd6e9607e:src/app/api/monitoring/health/route.ts:52-66, 122-123, 306-310;
-src/lib/api/requireManagementAuth.ts:49-69), while the keyless `/api/health` returns only status and time
-(src/app/api/health/route.ts:13-29). Compression settings need a login (src/app/api/settings/compression/route.ts:
+Every gateway read that exposes the build or the effort-relevant settings needs a credential or host access at
+dd6e9607e.
+- Over HTTP, the health route gives the build and version only through management auth, which ignores the no-login
+  setting (OmniRoute@dd6e9607e:src/app/api/monitoring/health/route.ts:52-66, 122-123, 306-310;
+  src/lib/api/requireManagementAuth.ts:49-69). The keyless `/api/health` returns only status and time
+  (src/app/api/health/route.ts:13-29).
+- The owner does not read the management credential, so the fingerprint takes the two identity fields from other
+  sources (`field_sources`; the owner's dry read-back on 2026-09-28 found the health route's fields null):
+  - the version from `current` of `GET /api/system/version` (src/app/api/system/version/route.ts:39, 67-72). It is
+    the same `APP_CONFIG.version` as the health route's, and the route answers without a credential only while login
+    is off (src/shared/utils/apiAuth.ts:410-414);
+  - the build sha as `readRunningBuildSha` resolves it for the serving process (src/lib/monitoring/buildSha.ts:
+    29-51): `OMNIROUTE_BUILD_SHA` from the unit's environment, else the first non-empty of `dist/BUILD_SHA`,
+    `.build/next/standalone/BUILD_SHA` and `BUILD_SHA` under the process's working directory.
+- The unit's private EnvironmentFile is not read (host policy), so an `OMNIROUTE_BUILD_SHA` or timeout set there is
+  unknown. The same holds for the upstream timeouts, which no HTTP route exposes: the owner resolves them from the
+  unit's `Environment=` lines and upstream's defaults. The running process caches the build sha at its first read
+  (buildSha.ts:27-30), so an install replaced without a restart would not show.
+
+Compression settings need a login (src/app/api/settings/compression/route.ts:
 8-15). The combos, model-combo mappings, provider connections, reasoning rules and thinking-budget mode need
 management auth (src/app/api/combos/route.ts:19-20; src/app/api/model-combo-mappings/route.ts:23-24;
 src/app/api/providers/route.ts:108-109; src/app/api/settings/reasoning-routing-rules/route.ts:12-13;
@@ -524,7 +539,8 @@ an execution precondition performed by the gateway owner.
 - **Post-run.** Send the gateway owner each arm's correlation ids (`ids.json`, the sent id of every call) with the
   run window, the arm tags (`r02-A`, `r02-B`) and the key prefixes (`r02-a-`, `r02-b-`). The owner returns, per
   arm: the call count; distinct accounts and per-account call counts, under masked labels shared across arms;
-  the calls whose attempts were served by more than one account (see Limitations); call_logs status counts,
+  the calls whose attempts were served by more than one account and the account limit-policy cutoff times observed
+  inside each run half's window (see Limitations); call_logs status counts,
   including 429; any unmatched ids; and a masked per-arm account-balance read. No connection or account ids are
   retained.
 
@@ -560,7 +576,8 @@ an execution precondition performed by the gateway owner.
 ## Limitations
 
 - The account behind each call is an uncontrolled factor: per-conversation session keys spread calls across the
-  gateway's 4 accounts. No account column is read; the gateway owner supplies the masked per-arm distribution.
+  gateway's pooled Codex accounts, six on 2026-09-28 by the gateway owner's report. No account column is read; the
+  gateway owner supplies the masked per-arm distribution.
   - Account selection includes the OAuth occupancy override, which no setting disables at this pin. Every chat
     request asks for it (`reserveOAuthSession: true`, OmniRoute@dd6e9607e:src/sse/handlers/chat.ts:1711), and it
     moves a call to another OAuth connection of the same or next priority when that one has more session
@@ -577,6 +594,15 @@ an execution precondition performed by the gateway owner.
     input share and the time to response headers, which are descriptive metrics.
   - The owner's post-run report gives, per arm, the calls whose attempts were served by more than one account, so
     an uneven effect between the arms is visible.
+- Account limit-policy cutoffs are a shared, time-varying condition. By the gateway owner's report (relayed, not
+  reproduced):
+  - when a 20128 Codex account reaches the gateway's limit-policy cutoff (99%), the gateway moves that account's
+    sessions to other accounts;
+  - on 2026-09-28 the owner's projection put cutoffs for two accounts at about 01:21Z and 01:29Z, then about 03:14Z
+    and 03:44Z.
+
+  Within one repeat promptfoo runs the two arms back to back (`plan.json` `run.order`), so both arms are exposed
+  alike. The owner's post-run report gives the cutoff times observed inside each run half's window.
 - A call without an observed call_logs row, because the gateway rejected it before its attempt logging or because
   its rows were saved late or never, is counted as unmatched by client-side outcome (see Correlation ids and
   call_logs).
