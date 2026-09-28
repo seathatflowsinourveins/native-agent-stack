@@ -15,9 +15,13 @@ The edits land in two pull requests:
 - **`lane:foundation`:** the landscape-sweep templates, their test, two READMEs and the anti-pattern log.
 - **`lane:shared`:** `AGENTS.md`. It needs the trading lane's acknowledgement.
 
-This unit edited no permission text (X5, X8) and no vendored workflow script (X6, X10). F4 rewords one prohibition
+This unit edited no permission text (X8) and no vendored workflow script (X6, X10). F4 rewords one prohibition
 in the trading section of `AGENTS.md` without weakening it: "future experiments must not call it" becomes "no
-experiment may present it", which covers every experiment. The unit claims no change in model behavior.
+experiment may present it", which covers every experiment. Round 1 claimed no change in model behavior. Round 3
+(2026-09-28) measured one, for X9 only, in headless runs.
+
+Round 3 decided X9 and took up X5 again as X5a-c, with a new item, S1. It records why the plan's rule not to edit X5
+no longer holds (see the round-3 addendum).
 
 ## Decision
 
@@ -27,14 +31,15 @@ experiment may present it", which covers every experiment. The unit claims no ch
 | F2 | `templates.json`, 11 all-caps scope words | reject / agree | 4 of 4 for reject | Kept. No source shows that the capitals misdirect the current models (`sources.json` not found, Q1 and Q3), so lowercasing would change style, not behavior. |
 | F3, X7 | `templates.json` `facts` | agree, agree / amend, amend | 4 of 4 for the amendment | Applied. One sentence after "Default to refuted=true when uncertain." names the exceptions for unknown fields, maintenance and licenses. |
 | F4 | `AGENTS.md:73-74` | agree / agree | not needed | Applied in the `lane:shared` pull request, pending the trading lane's acknowledgement. The inspected 2021 control segment is described in current-state wording. |
-| X5 | `AGENTS.md:3` and `examples/claude-native/CLAUDE.md:5` | agree / agree | not needed | Recorded, not edited. The broader rule covers the narrower one. |
+| X5 | `AGENTS.md:3` and `examples/claude-native/CLAUDE.md:5` | agree / agree | not needed | Round 1 recorded it without an edit: the broader rule covers the narrower one. Round 3 took it up again as X5a-c after the operator's user-level top rule changed on 2026-09-28. X5b (`AGENTS.md:3`) is applied here, pending the trading lane's acknowledgement. X5a and X5c are applied in #458 (round-3 addendum, lane A). |
 | X6 | the shared worker packet | agree / agree | not needed | No change. The packet is vendored and test-pinned, so a fix belongs in agent-lab. |
 | X8 | "after the current foundation work" | agree / agree | not needed | Recorded, not edited. This is permission text. |
-| X9 | `CLAUDE.md:3-4` | amend / amend | split, 2 and 2 | No edit. A second round on 2026-09-28 split the same way, so the user decides (see the addendum). |
+| X9 | `CLAUDE.md:3-4` | amend / amend | split, 2 and 2; round 3: 4 of 4 for the GPT-6 lane's text | Applied on 2026-09-28. Rounds 1 and 2 split 2 and 2. Round 3 ran the comparison that round 2 named, and all four blind judgments then chose the same text (round-3 addendum). |
 | X10 | `review-changes.js:72`, `readiness-audit.js:96` | agree / agree | not needed | No change. The scripts are vendored and each emphasis is reasoned. |
 | N1 | landscape-sweep `README.md:192-195` and `:435-439`, and lines 17-19 of the 2026-09-26 run's evidence `README.md` | agree / amend | 4 of 4 for the amendment | Applied. The text now points at `PROMPTS_SHA256_CURRENT`, names the ledger entry as the run's registered record and dates the claim that went stale. |
 | N2 | `docs/harness-defaults.md`, the anti-pattern log | agree / agree | not needed | Applied. The blank line is gone, and the log check rejects a split table. |
 | N3 | the same log | amend / amend | 4 of 4 for one lane's rows | Applied. Four dated rows were added. |
+| S1 | `AGENTS.md:37` (round 3) | lane A: agree / agree | not needed | Applied here, pending the trading lane's acknowledgement. Each PR description is built from the pull-request template, whose `sota-sources` check is required. |
 
 ## Method
 
@@ -134,9 +139,9 @@ Exact counts come from `count_files` in [`tools/token-report/token_manifest.py`]
 
 | File | Loaded | Tokens | Words | Lines |
 | --- | --- | ---: | ---: | ---: |
-| `AGENTS.md` | Claude (via `@AGENTS.md`) and Codex sessions in this repository | 2,374 → 2,401 (+27) | 1,477 → 1,495 | 103 → 103 |
+| `AGENTS.md` | Claude (via `@AGENTS.md`) and Codex sessions in this repository | 2,374 → 2,401 (+27); round 3's S1 and X5b: → 2,484 (+83) | 1,477 → 1,495; → 1,549 | 103 → 103 |
 | `tools/sota-convergence/landscape-sweep/templates.json` | the `facts` key: the Claude refute-facts stage, once per layer and round that has proposals | 2,239 → 2,305 (+66) | 1,413 → 1,466 | 8 → 8 |
-| `CLAUDE.md` | Claude sessions in this repository | 30, unchanged (X9 split) | 18 | 4 |
+| `CLAUDE.md` | Claude sessions in this repository | round 3's X9: 30 → 96 (+66) at `f508ffba`; 96 → 162 (+66) on `main` at `eb678281`, which added the `## Compact Instructions` section (#453) | 18 → 65; 62 → 109 | 4 → 8; 11 → 15 |
 
 Provider usage is recorded in `usage.json`, once per job or agent. The coordinator session's own usage is not
 included.
@@ -197,16 +202,22 @@ included.
   - a vendor statement on all-caps wording for the current models.
 - **F1:** a saved workflow outside the vendored directory that should keep unrouted stages. Broaden the README's rule
   first, then this line.
-- **X9:** the comparison named in the addendum of 2026-09-28, the user's choice between the two texts below, or a
-  client release that lets the model invoke `/mcp` or `/context`.
+- **X9:** any of these reopens it:
+  - the interactive half of round 3's comparison, which only the user can run, with the same preregistered cases and
+    metrics, showing fewer wrong or more correct statuses under the Claude lane's text;
+  - the same comparison on another session model or effort level, or on a plugin installed from a marketplace;
+  - a client release that lets the model invoke `/mcp` or `/context`.
 - **N2 and N3:** a GitHub rendering of the log that differs from the GFM spec. No rendering was observed.
+- **S1:** a change to the `sota-sources` check's heading rule or to the pull-request template. The sentence follows
+  the check.
+- **X5b:** the operator rewords the user-level top rule again. The line follows it.
 
 ## Limitations and residuals
 
-- **X9 is for the user.** The second round (addendum of 2026-09-28) did not change this. Both families agree that
-  `CLAUDE.md:3-4` tells the model to run commands it cannot type.
-  They differ on the fallback.
-  - GPT-6 lane:
+- **X9 is applied; its interactive half is the user's.** Rounds 1 and 2 split. Round 3's comparison and blind
+  judgment chose the GPT-6 lane's text unanimously (round-3 addendum). The comparison ran headless only, and an
+  interactive run, which only the user can make, is its overturn condition. The two texts were:
+  - GPT-6 lane, now `CLAUDE.md:3-8`:
 
     ```text
     Before claiming a plugin or MCP server is active, verify the relevant component in this
@@ -225,11 +236,14 @@ included.
     when your session cannot settle the claim, report it as unconfirmed and name the command that would.
     ```
 
-  - In both orders, each family's adjudications chose that family's own lane.
-  - This split is not a general preference for one's own lane: the GPT-6 adjudications chose the Claude lane's
-    return on four units, and both Claude adjudications chose the GPT-6 lane's reject on F2.
+  - In rounds 1 and 2, each family's adjudications chose that family's own lane, in both orders. In round 3, both
+    Claude judgments chose the GPT-6 lane's text.
+  - The earlier split was not a general preference for one's own lane: the GPT-6 adjudications chose the Claude
+    lane's return on four units, and both Claude adjudications chose the GPT-6 lane's reject on F2.
 - **X8:** "after the current foundation work" is undefined in eight places, and only the user can define or close it.
-- **X5:** the portable template's top rule differs from the host's user-level file. That is the operator's call.
+- **X5:** resolved in round 3 (lane A). The one remaining step is on hosts: a Codex home that installed the lane
+  block keeps the old line until `tools/adoption/apply_codex_lane.py` is run there again after #458 merges (a dry
+  run, then the `--apply` command it prints, with its `--expect-*` hashes).
 - **X6 and X10:** any change belongs upstream in agent-lab.
 - **F3 and X7:**
   - A verified but stale activity value still refutes a proposal. For example, eslazarev/purged-cross-validation was
@@ -387,3 +401,187 @@ sessions, on two cases:
 - a model scope taken from the preregistration instead of each run's recorded model;
 - a check that reported a mismatch and still exited 0;
 - judge inputs published with answer text that quotes client configuration.
+
+## Addendum (2026-09-28): round 3
+
+The user's direction of 2026-09-28 started a third round: "please resolute cleanly with the sota repos
+convergence,resolute all in your end and state the jobs that only beable to run by end,decide with your evidances and
+sota repos evidances convergence". The round ran the comparison that the second round named for X9. It also took up
+X5 again, with a new item, S1. For X5, this direction and the user's own user-level file supersede the plan's rule
+that X5 is not edited; that file's top rule changed on 2026-09-28. X8 stays with the user. The evidence is in
+[`x9-round3/`](../../evidence/artifacts/prompt-audit-20260927/x9-round3/) and
+[`lane-a/`](../../evidence/artifacts/prompt-audit-20260927/lane-a/).
+
+### X9: the comparison the second round named
+
+**Preregistration.** `prereg-r3.json` was frozen before the first counted run, with its sha256 in
+`prereg-r3.sha256`. It asks which lane text makes a Claude Code session claim a plugin or MCP server status that its
+own run contradicts less often. It tests the two cases the second round named:
+- **K5:** `workspace-guard`, a plugin with one `SessionStart` hook and nothing else. The hook writes one line to its
+  state file and prints nothing, so nothing in the session names the plugin. The plugin is active in every run.
+- **K6:** `ticket-tracker`, a stdio MCP server built on the official MCP Python SDK 2.2.0, with two tools. It answers
+  `initialize` and `tools/list`, then ends itself 1 s after its first `tools/list`. It fails every tool call and
+  refuses to start again, so its tools stay listed while it is not connected.
+
+The decision rule was fixed before the runs:
+1. The per-arm table goes into a blind judgment of the two texts, done as in round 2's attempt 2. A text is applied
+   when all four judgments choose it. Four "neither" keep the line.
+2. Otherwise the metrics decide, in this order: fewer wrong statuses, more correct statuses, fewer non-answers, fewer
+   o200k tokens.
+
+The current line ran as a control, not as a candidate.
+
+**Runs.** 30 headless runs (2 cases × 3 texts × 5 runs) between 08:14:47 and 08:31:10Z.
+- Client: Claude Code 2.1.283 on `claude-opus-5-5[1m]`. The model was pinned with `--model` and checked in each
+  run's init event.
+- Permission mode `bypassPermissions`, at most 10 turns.
+- All 30 runs were included. The deterministic graders pass 33 labelled answers written before the first counted run.
+
+| Text | Wrong status | Correct status (K5 + K6) | Non-answers | Named a command | Runs that read settings files | Cost (client's estimate) | o200k tokens |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GPT-6 lane's text | 0 | 10 (5 + 5) | 0 | 7 | 7 | $2.44 | 96 |
+| Claude lane's text | 0 | 8 (3 + 5) | 0 | 8 | 5 | $1.99 | 72 |
+| current line (control) | 0 | 10 (5 + 5) | 0 | 10 | 5 | $1.98 | 30 |
+
+- The Claude lane's text missed twice on K5. Both runs answered "unconfirmed", as that text's fallback directs, so
+  they count as neither correct nor wrong.
+- On K6, every text gave the correct status in 5 of 5 runs. Every K6 run called the target tool, and every call
+  failed, by design.
+- No run called the Skill tool for a built-in command, and no run asked the user anything.
+
+**Probes (uncounted, before freezing).** Four runs of the current line, recorded in `probe/facts.json`:
+- **p1:** the fixture plugin and server loaded, and the server showed as connected with its two tools at init.
+- **p3:** told to call no tool, the session found no text that named the plugin, although its hook ran.
+- **p2:** Claude Code 2.1.283 started the stdio server again for a tool call after the server had ended. The MCP docs
+  say stdio servers are not reconnected automatically (`mcp.md` L363). The fixture was then changed to refuse a
+  restart.
+- **p4:** with the changed fixture, both restart attempts were refused. The call's error was `MCP server
+  "ticket-tracker" is not connected`.
+
+**Changed after freezing, before any judge started.** Both files are published twice: a frozen copy with the
+preregistered hash, and the copy as run.
+- **`make_x9_round3.py`.** As first written, it withheld every K5 status sentence, because every K5 run read
+  settings files.
+  - It now withholds a status sentence only when the sentence quotes client configuration or names a settings file.
+  - It still withholds an answer head whenever its run read settings files.
+  - It adds, for each K5 run, a list of what that run's commands consulted. This list was observed, not
+    preregistered.
+- **`check_orders_r3.py`.** It was copied from round 2's revised check, but the copy gained a comma in its clause
+  pattern. So it cut per-text clauses at commas and reported a false difference between the two orders.
+  - The pattern is now round 2's again.
+  - The check then reported the same evidence in both orders, and its negative control still exits 1.
+
+The three texts match round 2's published arms byte for byte.
+
+**Judgment.** It followed round 2's attempt-2 procedure:
+- The root was a plain export of `ba1700ad`. None of its 7,935 files maps a text to a lane.
+- The judges were two GPT-6 runner jobs (gpt-6-astra, effort max, read-only) and two `blind-adjudicator` agents, each
+  family judging in both orders.
+- `void_patterns_r3.py` was hashed before any return was read. No judgment had a voiding hit, and no judge opened a
+  path outside its input, its packet and the root.
+- `isolation-receipt.json` records the steps before dispatch. The GPT-6 judges' first start, at 08:37:36Z, failed
+  because their work directory did not exist yet. They started at 08:37:41Z.
+
+| Judgment | Choice | Confidence |
+| --- | --- | ---: |
+| GPT-6, A/B | GPT-6 lane's text | 0.91 |
+| GPT-6, B/A | GPT-6 lane's text | 0.90 |
+| Claude, A/B | GPT-6 lane's text | 0.60 |
+| Claude, B/A | GPT-6 lane's text | 0.60 |
+
+**Decision: applied under step 1 of the rule, unanimously.**
+- `CLAUDE.md` lines 3-8 now hold the GPT-6 lane's text, quoted under Limitations and residuals. The file grows by 66
+  o200k tokens: from 30 to 96 at `f508ffba`, and from 96 to 162 on `main` at `eb678281`, whose `CLAUDE.md` also
+  holds #453's `## Compact Instructions` section after these lines.
+- Step 2 was not needed. It would have chosen the same text on correct statuses, 10 to 8.
+
+The judges' reasons, in brief:
+- **Both families:** the current line names commands the client refuses to run for the model (C1, C2). The two texts
+  tie on wrong statuses, and the whole difference is in K5.
+- **GPT-6:** the text's coverage and its separation of listed availability from successful execution, together with
+  the measured K5 result, outweigh the other text's clearer fallback for unattended runs.
+- **Claude:** the preregistered order ranks this text first, and its five K5 runs did what its "Use available
+  read-only diagnostics first" asks. The gap is 2 runs of 5, in headless runs only.
+
+**Limits:**
+- The runs were headless, on one model (Opus 5.5), under `bypassPermissions`. The five K5 affirmations under the
+  applied text followed Bash reads of the process command line and the fixture's hook state file. A session in
+  another permission mode may need approval for those reads.
+- Each text ran 5 times per case. The difference is the output of a decision rule, not a significance claim.
+- The plugin was loaded with `--plugin-dir`, not installed from a marketplace. No MCP server's tools came from the
+  discovery cache without a process. The fixture excludes a server that Claude Code restarts successfully (p2).
+- Interactive sessions were not tested. That is the setting where a user can answer a request to run a command. Only
+  the user can run those sessions, and they are this decision's overturn condition.
+
+**Usage** (`usage.json`; each counter is kept separate; the coordinator session is not included):
+
+| Job | Input (cached) | Output (reasoning) | Wall time |
+| --- | ---: | ---: | --- |
+| GPT-6, A/B | 493,758 (402,048) | 6,004 (4,254) | 3 min 28 s |
+| GPT-6, B/A | 449,411 (349,696) | 6,526 (4,912) | 3 min 35 s |
+
+| Agent or runs | Calls | Input | Cache write | Cache read | Output |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| comparison, GPT-6 lane's text | 10 runs | 104 | 161,824 | 2,416,575 | 33,112 |
+| comparison, Claude lane's text | 10 runs | 94 | 137,010 | 2,127,386 | 23,361 |
+| comparison, current line | 10 runs | 86 | 144,559 | 1,913,987 | 22,170 |
+| `blind-adjudicator`, A/B | 14 | 30 | 126,988 | 1,189,561 | 51,047 |
+| `blind-adjudicator`, B/A | 14 | 30 | 125,278 | 1,145,903 | 55,650 |
+| `stack-researcher` (sources for X9 and lane A) | 85 | 172 | 223,017 | 10,880,165 | 84,381 |
+
+- The four probes cost $1.00 in total by the client's estimate: $0.36, $0.31, $0.28 and $0.05.
+- The two judges and the researcher each made one server-side advisor call.
+
+### Lane A: S1 and the top rule's three copies
+
+Lane A judged four items from one frozen packet (`lane-a/round1/packet.md`, sha256 in `packet.sha256`) in two
+independent lanes: GPT-6 (`gpt-6-astra`, effort max, read-only) through the packaged runner, and Claude through an
+`evidence-reviewer` (`lane-a/round1/claude-usage.json`). The convergence rule was round 1's.
+
+| Item | Location | Lane A (GPT-6 / Claude) | Later rounds | Result |
+| --- | --- | --- | --- | --- |
+| S1 | `AGENTS.md:37` | agree 0.97 / agree 0.80 | not needed | Applied here |
+| X5b | `AGENTS.md:3` | agree 0.99 / agree 0.85 | not needed | Applied here |
+| X5a | `examples/claude-native/CLAUDE.md:3` | amend / amend, two different texts | final round: agree / agree | Applied in #458 |
+| X5c | `adoption/templates/codex.AGENTS.template.md:3` | reject / agree | final round: agree / amend; blind adjudication: 4 of 4 for the amendment | Applied in #458, with its pin |
+
+- **S1.** The added sentence tells each session to build a PR description from `.github/pull_request_template.md`.
+  The required `sota-sources` check fails a description without a non-empty `## SOTA sources` or `### SOTA sources`
+  section. `lane-a/round1/facts-s1.json` records the live ruleset's required checks and #410, whose description had
+  no such heading and whose check failed. Both lanes tested the check's heading rule (`validate.yml:335-336`) on
+  variants of the heading. The GPT-6 lane reports running the workflow's script. The Claude lane reports replicating
+  its two lines in Node, a synthetic check, not a CI run.
+- **X5b.** The line is the operator's 2026-09-28 paragraph, byte for byte (`lane-a/round1/user-level-top-rule.txt`).
+  Every obligation of the old line stays, verbatim. "Never self-write without a SOTA source" leaves the heading, while
+  "With no SOTA source, stop and report instead of writing one" keeps its force. No test reads line 3; the
+  consistency tests read the link on line 5 and the dispatch pointer.
+- **X5a and X5c** change `lane:foundation` files, so they land in #458. Its decision record,
+  [`2026-09-28-top-rule-templates.md`](2026-09-28-top-rule-templates.md), holds the adjudication attempts, the final
+  round, the checks and the usage. Both templates keep "The installed client is also a source of truth; never
+  self-write without a SOTA source", which the portable template's phrase check requires.
+- **Tokens.** S1 and X5b take `AGENTS.md` from 2,401 to 2,484 o200k tokens (Measured results).
+- **Usage.** Lane A's first round is in `lane-a/round1/claude-usage.json` and `gpt6.runner.json`. Later rounds are in
+  their own directories and in #458's record.
+
+### AN-13: a headless `/doctor prompt-audit` run
+
+The 2026-09-28 community sweep left AN-13, the operator's `/doctor` prompt-audit run, open with the prompt-audit owner
+([`2026-09-28-community-sweep.md`](2026-09-28-community-sweep.md)). It ran headless twice, on `main` at `eb678281`
+with this pull request's and #458's changes applied. The facts of both runs are in
+`evidence/artifacts/prompt-audit-20260927/an13/`, and its README gives each finding's disposition. The report text is
+not published, because it quotes the user-level instruction file and names installed plugins and skills.
+
+- **First run.** Exit 0, but the result was an interim note. After print mode's default 600 s wait, the client stopped
+  the four background agents the skill had started. The dated row in `docs/harness-defaults.md` records the mistake.
+- **Rerun.** It set `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` and returned the full report with exit 0. The report has
+  no high-confidence item, six medium findings, three low-confidence flags and four plugin findings. Nothing was
+  edited from it:
+  - **M1:** the broad trigger of the top rule at `AGENTS.md:3`. It follows the user-level paragraph that X5b copies,
+    so it waits for the user's decision on that paragraph (M2).
+  - **M3 and M4:** the other user-level findings are the user's decisions. M4, on a vendored skill, also needs a
+    native before-and-after comparison.
+  - **M5:** `blueprints/convergence-practice/application-delivery/AGENTS.md:15-18`, a single-family candidate. It
+    needs a second-family lane before any edit.
+  - **The rest:** the low-confidence and plugin findings are recorded flags.
+- **Usage.** The client reported $22.74 for the first run and $13.97 for the rerun, both at list prices. Both usage
+  blocks are in `an13-runs.json`, where they overlap and are never added.

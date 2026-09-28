@@ -1,0 +1,5 @@
+{"event": "start", "ts": 1790582928.954, "pid": 327041}
+{"event": "tools/list", "ts": 1790582928.97}
+{"event": "exit", "ts": 1790582929.97, "reason": "timer"}
+{"event": "start-refused", "ts": 1790582934.892, "pid": 328635}
+{"event": "start-refused", "ts": 1790582935.728, "pid": 328866}

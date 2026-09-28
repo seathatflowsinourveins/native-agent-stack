@@ -1,0 +1,63 @@
+{
+ "lane": "GPT-6 packaged runner (codex_call.sh start/result)",
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-28T08:37:41Z",
+  "finished": "2026-09-28T08:41:16Z",
+  "usage": {
+   "input_tokens": 449411,
+   "cached_input_tokens": 349696,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 6526,
+   "reasoning_output_tokens": 4912
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X9",
+    "choice": "A",
+    "reasons": "A provides the stronger verification procedure: it covers plugin agents and silent hooks, distinguishes listed availability from execution, and checks read-only diagnostics before asking. B’s presence-based wording can underverify disconnected MCP servers and overlooks agent-only plugins. Official documentation confirms /plugin exists; C4’s headless command list does not establish otherwise. C1–C2 support A’s conditional Skill guard and replacing the current instruction. The reported K5–K6 comparison favors A under its preregistered order: both had zero wrong statuses, but A had 10 correct versus B’s 8. K6 tied. This small, single-model headless comparison does not establish interactive performance or exercise a genuinely unresolvable fallback. B handles that unattended fallback more explicitly, but A’s coverage and observed results outweigh this limitation.",
+    "sources": [
+     {
+      "locator": "docs/harness-defaults.md:21",
+      "quote": "Resolve discoverable names and capabilities before asking the user"
+     },
+     {
+      "locator": "C1",
+      "quote": "context is a built-in CLI command, not a skill."
+     },
+     {
+      "locator": "C2",
+      "quote": "mcp is a UI command, not a skill."
+     },
+     {
+      "locator": "[Claude Code plugins](https://code.claude.com/docs/en/plugins)",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components"
+     },
+     {
+      "locator": "[MCP server status detail](https://code.claude.com/docs/en/mcp#server-status-detail)",
+      "quote": "Claude Code loaded the server’s tool list from its discovery cache, saved in a previous session, instead of connecting at startup"
+     },
+     {
+      "locator": "[Commands: /plugin](https://code.claude.com/docs/en/commands#all-commands)",
+      "quote": "Run with no argument to open the plugin menu"
+     },
+     {
+      "locator": "K5-K6",
+      "quote": "wrong_status: Return A's text 0, Return B's text 0; correct_status: Return A's text 10, Return B's text 8"
+     }
+    ],
+    "confidence": 0.9
+   }
+  ]
+ }
+}

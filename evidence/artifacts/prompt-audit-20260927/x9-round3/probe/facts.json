@@ -1,0 +1,294 @@
+{
+ "note": "Uncounted probes p1-p4 (prereg-r3.json, uncounted_probes): probe_facts.py's fixture-only facts, the answer withheld by the packets' rule; the raw transcripts are not published.",
+ "probes": {
+  "p1-ok": {
+   "version": "2.1.283",
+   "model": "claude-opus-5-5[1m]",
+   "permission_mode": "bypassPermissions",
+   "session_id_set": true,
+   "fixture_plugin_in_init": [
+    {
+     "name": "workspace-guard",
+     "path_tail": "ce-r3/x9-round3/fixtures/workspace-guard"
+    }
+   ],
+   "fixture_plugin_errors": [],
+   "init_plugin_count": 6,
+   "fixture_server_in_init": [
+    {
+     "name": "ticket-tracker",
+     "status": "connected",
+     "source": "dynamic"
+    }
+   ],
+   "fixture_tools_in_init": [
+    "mcp__ticket-tracker__get_ticket",
+    "mcp__ticket-tracker__list_open_tickets"
+   ],
+   "hook_events": {
+    "hook_started:SessionStart": [
+     6,
+     0
+    ],
+    "hook_response:SessionStart": [
+     6,
+     0
+    ]
+   },
+   "hook_marker": [
+    "{\"ts\": 1790582838.093, \"event\": \"SessionStart\", \"source\": \"startup\"}"
+   ],
+   "server_log": [
+    {
+     "event": "start",
+     "pid": 303214,
+     "t": 0.0
+    },
+    {
+     "event": "tools/list",
+     "t": 0.02
+    }
+   ],
+   "calls": [],
+   "result": {
+    "subtype": "success",
+    "num_turns": 1,
+    "duration_ms": 1674,
+    "total_cost_usd": 0.36208799999999997
+   },
+   "answer": "ok",
+   "consulted": []
+  },
+  "p2-k6-view": {
+   "version": "2.1.283",
+   "model": "claude-opus-5-5[1m]",
+   "permission_mode": "bypassPermissions",
+   "session_id_set": true,
+   "fixture_plugin_in_init": [
+    {
+     "name": "workspace-guard",
+     "path_tail": "ce-r3/x9-round3/fixtures/workspace-guard"
+    }
+   ],
+   "fixture_plugin_errors": [],
+   "init_plugin_count": 6,
+   "fixture_server_in_init": [
+    {
+     "name": "ticket-tracker",
+     "status": "connected",
+     "source": "dynamic"
+    }
+   ],
+   "fixture_tools_in_init": [
+    "mcp__ticket-tracker__get_ticket",
+    "mcp__ticket-tracker__list_open_tickets"
+   ],
+   "hook_events": {
+    "hook_started:SessionStart": [
+     6,
+     0
+    ],
+    "hook_response:SessionStart": [
+     6,
+     0
+    ]
+   },
+   "hook_marker": [
+    "{\"ts\": 1790582875.83, \"event\": \"SessionStart\", \"source\": \"startup\"}"
+   ],
+   "server_log": [
+    {
+     "event": "start",
+     "pid": 314032,
+     "t": 0.0
+    },
+    {
+     "event": "tools/list",
+     "t": 0.02
+    },
+    {
+     "event": "exit",
+     "reason": "timer",
+     "t": 1.02
+    },
+    {
+     "event": "start",
+     "pid": 314704,
+     "t": 5.57
+    },
+    {
+     "event": "tools/call",
+     "name": "list_open_tickets",
+     "t": 5.59
+    }
+   ],
+   "calls": [
+    {
+     "name": "ToolSearch",
+     "query": "select:mcp__ticket-tracker__list_open_tickets",
+     "is_error": false
+    },
+    {
+     "name": "mcp__ticket-tracker__list_open_tickets",
+     "query": null,
+     "is_error": true
+    }
+   ],
+   "result": {
+    "subtype": "success",
+    "num_turns": 3,
+    "duration_ms": 10132,
+    "total_cost_usd": 0.3092102
+   },
+   "answer": "Probe results:\n\n**Step 1, tool names containing \"ticket\":** two deferred tools matched before any tool call:\n- `mcp__ticket-tracker__get_ticket`\n- `mcp__ticket-tracker__list_open_tickets`\n\n**Step 2, `ToolSearch` with `select:mcp__ticket-tracker__list_open_tickets`:**\n- Error: no. It loaded the tool's schema.\n- First 300 characters of the result:\n  ```\n  <functions>\n  <function>{\"description\": \"List the open tickets in the team's ticket tracker.\", \"name\": \"mcp__ticket-tracker__list_open_tickets\", \"parameters\": {\"properties\": {}, \"title\": \"list_open_ticketsArguments\", \"type\": \"object\"}}</function>\n  </functions>\n  ```\n  The whole result is shorter than 300 characters, so this is all of it.\n\n**Step 3, `mcp__ticket-tracker__list_open_tickets` called once with no arguments:**\n- Error: yes.\n- First 300 characters of the result (all of it):\n  ```\n  <error>Error executing tool list_open_tickets</error>\n  ```\n  The server gave no further detail, so this output doesn't say why it failed. It could be a server-side exception, a missing backend or credential, or something else.\n\nI didn't call `get_ticket` or retry, since the probe asked for one call only.",
+   "consulted": []
+  },
+  "p3-k5-view": {
+   "version": "2.1.283",
+   "model": "claude-opus-5-5[1m]",
+   "permission_mode": "bypassPermissions",
+   "session_id_set": true,
+   "fixture_plugin_in_init": [
+    {
+     "name": "workspace-guard",
+     "path_tail": "ce-r3/x9-round3/fixtures/workspace-guard"
+    }
+   ],
+   "fixture_plugin_errors": [],
+   "init_plugin_count": 6,
+   "fixture_server_in_init": [
+    {
+     "name": "ticket-tracker",
+     "status": "connected",
+     "source": "dynamic"
+    }
+   ],
+   "fixture_tools_in_init": [
+    "mcp__ticket-tracker__get_ticket",
+    "mcp__ticket-tracker__list_open_tickets"
+   ],
+   "hook_events": {
+    "hook_started:SessionStart": [
+     6,
+     0
+    ],
+    "hook_response:SessionStart": [
+     6,
+     0
+    ]
+   },
+   "hook_marker": [
+    "{\"ts\": 1790582875.861, \"event\": \"SessionStart\", \"source\": \"startup\"}"
+   ],
+   "server_log": [
+    {
+     "event": "start",
+     "pid": 314043,
+     "t": 0.0
+    },
+    {
+     "event": "tools/list",
+     "t": 0.02
+    },
+    {
+     "event": "exit",
+     "reason": "timer",
+     "t": 1.02
+    }
+   ],
+   "calls": [],
+   "result": {
+    "subtype": "success",
+    "num_turns": 1,
+    "duration_ms": 5859,
+    "total_cost_usd": 0.2802672
+   },
+   "answer": "No. Apart from your message, nothing in my context contains the string \"workspace-guard\": not the system prompt, the system reminders, the CLAUDE.md, RTK.md, AGENTS.md or MEMORY.md contents, the hook context, or the tool, skill, agent and command lists. The nearest text is the word \"workspace\" in the ai-memory server instructions, which is a different string.",
+   "consulted": []
+  },
+  "p4-k6-refused": {
+   "version": "2.1.283",
+   "model": "claude-opus-5-5[1m]",
+   "permission_mode": "bypassPermissions",
+   "session_id_set": true,
+   "fixture_plugin_in_init": [
+    {
+     "name": "workspace-guard",
+     "path_tail": "ce-r3/x9-round3/fixtures/workspace-guard"
+    }
+   ],
+   "fixture_plugin_errors": [],
+   "init_plugin_count": 6,
+   "fixture_server_in_init": [
+    {
+     "name": "ticket-tracker",
+     "status": "connected",
+     "source": "dynamic"
+    }
+   ],
+   "fixture_tools_in_init": [
+    "mcp__ticket-tracker__get_ticket",
+    "mcp__ticket-tracker__list_open_tickets"
+   ],
+   "hook_events": {
+    "hook_started:SessionStart": [
+     6,
+     0
+    ],
+    "hook_response:SessionStart": [
+     6,
+     0
+    ]
+   },
+   "hook_marker": [
+    "{\"ts\": 1790582927.015, \"event\": \"SessionStart\", \"source\": \"startup\"}"
+   ],
+   "server_log": [
+    {
+     "event": "start",
+     "pid": 327041,
+     "t": 0.0
+    },
+    {
+     "event": "tools/list",
+     "t": 0.02
+    },
+    {
+     "event": "exit",
+     "reason": "timer",
+     "t": 1.02
+    },
+    {
+     "event": "start-refused",
+     "pid": 328635,
+     "t": 5.94
+    },
+    {
+     "event": "start-refused",
+     "pid": 328866,
+     "t": 6.77
+    }
+   ],
+   "calls": [
+    {
+     "name": "ToolSearch",
+     "query": "select:mcp__ticket-tracker__list_open_tickets",
+     "is_error": false
+    },
+    {
+     "name": "mcp__ticket-tracker__list_open_tickets",
+     "query": null,
+     "is_error": true
+    }
+   ],
+   "result": {
+    "subtype": "success",
+    "num_turns": 3,
+    "duration_ms": 12635,
+    "total_cost_usd": 0.0526458
+   },
+   "answer": "Here are the probe results. Loading the tool worked, but calling it failed because the ticket-tracker server isn't connected.\n\n**Step 1: tool names containing \"ticket\"** (read from the deferred tool list, no tool called):\n- `mcp__ticket-tracker__get_ticket`\n- `mcp__ticket-tracker__list_open_tickets`\n\n**Step 2: `ToolSearch` with `select:mcp__ticket-tracker__list_open_tickets`**\n- **Error:** no. It loaded the tool's schema.\n- **Result text:** the whole result is under 300 characters, so here it is in full:\n  ```\n  <functions>\n  <function>{\"description\": \"List the open tickets in the team's ticket tracker.\", \"name\": \"mcp__ticket-tracker__list_open_tickets\", \"parameters\": {\"properties\": {}, \"title\": \"list_open_ticketsArguments\", \"type\": \"object\"}}</function>\n  </functions>\n  ```\n\n**Step 3: `mcp__ticket-tracker__list_open_tickets` with no arguments**\n- **Error:** yes.\n- **Result text** (also under 300 characters, shown in full):\n  ```\n  <error>MCP server \"ticket-tracker\" is not connected</error>\n  ```\n\nThe tool is still listed, and its schema loads, even though its server isn't connected.",
+   "consulted": []
+  }
+ }
+}
