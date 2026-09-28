@@ -248,8 +248,8 @@ current session only
 child's frontmatter and workflow-stage effort, and any value other than `xhigh`
 also turns Ultracode off. The shipped [agent definitions](../adoption/agents/claude/)
 therefore declare `effort: max` beside their task-matched models (Sonnet for
-`source-scout`; Opus for `isolated-builder`, `stack-verifier` and the reviewers,
-since 2026-09-27 per item 1 of the
+`source-scout` and Opus for every other shipped role; `isolated-builder` and
+`stack-verifier` declare Opus since 2026-09-27, per item 1 of the
 [settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
 Haiku is not routed), and workflow stages pass
 `effort: 'max'` explicitly: a stage without its own effort inherits the
@@ -268,9 +268,9 @@ established until the actual task is evaluated.
 
 **2026-09-28: fast mode is a per-session choice.** `/fast` persists
 `fastMode: true` to user settings, so later sessions start with it on. On
-subscription plans fast mode draws only on usage credits, which the account must
-turn on, and the first enable in a conversation bills the whole context at the
-uncached fast-mode rate, so enable it at session start
+subscription plans fast mode bills usage credits, which must be turned on, and
+the first enable in a conversation bills the whole context at the uncached
+fast-mode rate, so enable it at session start
 ([fast mode](https://code.claude.com/docs/en/fast-mode)). Use `/fast` only for
 interactive, latency-sensitive sessions, and turn it off before workflows and
 long autonomous runs. Keep `fastMode` out of the settings template;
@@ -281,10 +281,9 @@ with it off ([settings reference](https://code.claude.com/docs/en/settings-refer
 [permission modes](https://code.claude.com/docs/en/permission-modes) page says of
 `bypassPermissions`: "Only use this mode in isolated environments like
 containers, VMs, or dev containers without internet access", and that it "offers
-no protection against prompt injection or unintended actions"; the
-[development containers](https://code.claude.com/docs/en/devcontainer) page adds
-that even a dev container run this way does not stop a malicious project from
-exfiltrating what the container can reach. This host runs bypass on bare WSL2
+no protection against prompt injection or unintended actions" (see also
+[development containers](https://code.claude.com/docs/en/devcontainer) on running
+it only in isolated containers). This host runs bypass on bare WSL2
 with the `/mnt` automount, network access and no Bash sandbox. The mode is the
 user's 2026-09-22 decision, and that decision is still open. Under bypass, deny
 rules and PreToolUse denials still block, explicit ask rules and critical-path
@@ -363,14 +362,15 @@ on 2026-09-28 (client 2.1.283).
 Inside an authenticated interactive Claude session, use `/context all`, `/mcp`
 and `/usage` to inspect loaded context, connections and usage. Retain their
 actual output. `/compact` performs model summarization. Run it at a natural
-break, between tasks or before stepping away, rather than letting
-auto-compaction fire mid-task: after the cache lifetime the summarization
-request reprocesses the whole history uncached. Give it a focus that names what
-to keep and what to drop, for example
+break, such as between tasks, rather than letting auto-compaction fire
+mid-task, and compact before stepping away rather than after: after the cache
+lifetime the summarization request reprocesses the whole history uncached.
+Give it a focus that names what to keep and what to drop, for example
 `/compact keep the acceptance commands, their exit codes and the open gaps; drop the exploratory reads`,
 then verify that the next task still has its facts
 ([prompt caching](https://code.claude.com/docs/en/prompt-caching),
-[what survives compaction](https://code.claude.com/docs/en/context-window#what-survives-compaction)).
+[what survives compaction](https://code.claude.com/docs/en/context-window#what-survives-compaction),
+[Opus 5.5 compaction note](https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context)).
 Do not treat a headless prompt containing `/context` as a zero-cost inspection
 command.
 
@@ -423,7 +423,7 @@ several files or the code is unfamiliar, and skip it when the diff fits in one
 sentence ([best practices](https://code.claude.com/docs/en/best-practices)).
 Under this profile's `bypassPermissions` default, an interactive terminal
 session does not enforce plan mode's blocks: Claude is only instructed to plan,
-and a file edit or shell command it attempts runs without prompting. Plan mode
+and an edit it attempts runs without prompting. Plan mode
 keeps its blocks in `-p`, Agent SDK and VS Code chat sessions, and explicit ask
 rules and critical-path `rm`/`rmdir` still prompt
 ([permission modes](https://code.claude.com/docs/en/permission-modes), re-read
