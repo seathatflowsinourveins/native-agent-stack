@@ -437,8 +437,8 @@ jobs:
           # The tests run the `gitleaks` on PATH, so a symlink gives that name to the verified binary.
           # They read betterleaks's `null` empty report as no findings and a scan that does not complete
           # as an error, so a failure here is a detection difference. The history-ancestry class is left
-          # out: it scans history without --redact and its failure message quotes the findings; the
-          # redacted history scan below covers that ground.
+          # out: the redacted history scan below covers that ground. (That class now redacts too; until
+          # 2026-09-28 it scanned without --redact and quoted its findings.)
           # Assertion failures are reported, not failed: fixture tests d2, d4 and d5 fail on every run on a
           # rule difference the receipt records (parity.json, fixtures_ported). unittest counts an
           # AssertionError as a failure and any other exception as an error (CPython Lib/unittest/case.py,

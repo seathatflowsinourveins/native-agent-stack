@@ -1168,9 +1168,9 @@ class BetterleaksTrialJobTests(unittest.TestCase):
                     self.assertRegex(status.group(1), r"^FAILED \(errors=[1-9]\d*(?:, skipped=\d+)?\)$", quoted)
 
     def test_fixture_tests_leave_out_the_unredacted_history_class(self):
-        """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests scans history without
-        --redact and quotes its findings in its failure message, so naming it, or the whole module, would
-        print candidate values into a public log."""
+        """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests is left out: the job's
+        redacted history scan covers that ground. Until 2026-09-28 that class also scanned without --redact
+        and quoted its findings; it now redacts (tests/test_gitleaks_config.py ScannerErrorTests.test_f)."""
         step = step_block(self.job, "fixture tests with betterleaks")
         self.assertIn("GITLEAKS_TESTS_REQUIRED: '1'", step)
         self.assertEqual(len(unittest_invocations(self.job)), 1, "the fixture step is the job's only unittest run")

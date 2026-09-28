@@ -3447,8 +3447,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "eeabebb17a551cbde664c1416c833d36e3ec9dd8850df68edb4c254f185d56ac",
-      "bytes": 33848
+      "sha256": "44486711225483ec7ca0ab904c36697a0d53249c2d5439eb40d728f5604bd697",
+      "bytes": 33869
     },
     {
       "path": ".gitignore",
@@ -40523,8 +40523,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "f7a674879153acfc85acdb59fde7458ab16bc27a1eefa9e7731216e0f25389ae",
-      "bytes": 85437
+      "sha256": "4f6674dc8b1ec1b19d6ed7439af3c93be258be0a10f16cb438fa3736aac52766",
+      "bytes": 85496
     },
     {
       "path": "tests/test_workflow_security.py",
