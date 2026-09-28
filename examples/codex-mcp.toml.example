@@ -10,7 +10,7 @@ url = "http://127.0.0.1:49374/mcp"
 
 [mcp_servers.socraticode]
 command = "/ABSOLUTE/NODE_EXECUTABLE"
-args = ["/ABSOLUTE/STACK_HOME/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+args = ["/ABSOLUTE/STACK_HOME/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"]
 startup_timeout_sec = 120
 
 [mcp_servers.socraticode.env]

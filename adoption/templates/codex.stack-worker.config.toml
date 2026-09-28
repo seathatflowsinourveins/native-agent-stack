@@ -48,7 +48,7 @@ startup_timeout_sec = 60
 default_tools_approval_mode = "approve"
 enabled_tools = ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"]
 
-# SocratiCode 1.14.0 starts a file watcher, which then updates the shared index, on any search or status call
+# SocratiCode 1.15.0 starts a file watcher, which then updates the shared index, on any search or status call
 # while SOCRATICODE_WATCHER is "auto" (the user config's value): dist/tools/query-tools.js handleQueryTool and
 # dist/services/watcher.js ensureWatcherStarted. "manual" starts none. Graph and symbol tools are left out as
 # well, since under "auto" they build a missing graph. A project config that sets the variable outranks this.

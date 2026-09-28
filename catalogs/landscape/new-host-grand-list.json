@@ -1747,7 +1747,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "1.14.0"
+              "bootstrap_version": "1.15.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1925,12 +1925,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "20.0.24"
+              "bootstrap_version": "20.0.26"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "20.0.24"
+              "bootstrap_version": "20.0.26"
             }
           },
           "why_selected": "The requirement has two parts: supply useful context with recoverable originals, and measure artifact reductions separately from provider usage. Three candidates cover it. (1) RTK (c4) formats supported command output. Evidence: docs/token-practice.md lines 105-107 record one retained RTK Git log artifact pair, measured with o200k_base, of 537 -> 178 tokens at a fixed six-commit input. catalogs/foundation/decisions.json lines 1472-1502 (clean-token-tool-ci) records that local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks on local fixtures. docs/full-stack-convergence.md lines 132-137 says that run was a hosted clean install of RTK, QMD, Repomix and TOON on local fixtures. docs/token-native-saturation.md line 109 lists RTK as core with an accepted use stage only. docs/token-practice.md lines 191-193 says native Claude's Bash rewrite is configured. (2) Headroom (c5) is the only adopted candidate whose decision is specifically compression with exact-source recovery. catalogs/foundation/decisions.json lines 1195-1223 records that owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed. docs/token-native-saturation.md lines 3-8 says Headroom restored identical original content after restart, and line 82 lists accepted install, use, persistence, restart, cleanup and recovery stages with 11 retained pairs. docs/token-practice.md lines 215-217 and 233-234 retain both reductions and growth cases: 2,732 vs 5,105 tokens, or 18,777 when the full original is also fetched; 19,714 vs 36,625; and 191 vs 26,529 on a guarded log fixture. (3) ccusage (c1) covers the provider-usage half. catalogs/foundation/decisions.json lines 1309-1336 (native-usage-reading) records offline native usage parsing and scoped current-session observations with retained outputs, and keeps provider consumption, estimated savings, billing and cache subsets separate. docs/token-practice.md lines 291-296 confirms offline ccusage parsing within its stated gate. docs/full-stack-convergence.md lines 124-128 records the 20.0.24 upgrade with captured upstream test subsets. How the evidence was observed: RTK by native CLI execution on fixtures plus one artifact pair; Headroom by synthetic owned fixtures with isolated lifecycle; ccusage by offline local parsing. None of it is a matched provider-savings measurement. This is my own source review. The packet withheld the provider selections. When I opened decisions.json, every one of these decisions reads \"selection\": \"conditional\", and I did not use that as authority.",
@@ -2248,7 +2248,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "1.14.0"
+              "bootstrap_version": "1.15.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",

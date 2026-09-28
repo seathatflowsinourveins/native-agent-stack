@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "id": "socraticode-1150-qualification-20260927",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-28T02:29:58Z",
+  "component_ids": [
+    "socraticode"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, socraticode 1.15.0 (tag v1.15.0, commit f6191f076a42405f0d5508139f3a8b505cfef93a, released 2026-09-24T10:58:58Z) was qualified and switched into production after the user waived the recorded 7-day cooldown. The npm tarball https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz (1,053,928 bytes) had sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, sha512 equal to npm dist.integrity sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ== and sha1 equal to dist.shasum 607f909997dcf40bd5722a08f2e7c0e4b90e8334 (read 2026-09-27T21:39:34Z); dist-tags.latest was 1.15.0, the package ships no npm-shrinkwrap.json and its dist/index.js reads no process.argv. The upstream suite passed at the tag: in a clean clone at f6191f07 with Node v24.21.0, npm ci exited 0 (425 packages), npm run test:unit exited 0 (103 files, 2,475 of 2,475 tests passed, 72.83 s), npm run check:release-versions exited 0 ('release manifests match 1.15.0'), npx biome check src/ tests/ exited 0 (175 files, no fixes), npx tsc --noEmit exited 0, and ci.yml's Qdrant-backed regressions with REQUIRE_QDRANT=1 against a disposable Qdrant 1.19.1 exited 0 (4 files, 12 of 12 tests, 28.16 s). Before the cutover, the staged tools/socraticode-1.15.0 prefix served native checks against the production external Qdrant and local embedding endpoint with the production launcher environment. Through mcporter 0.14.1 `call --output text`: codebase_health exited 0 (External Qdrant reachable, embedding endpoint reachable, model nvidia/Nemotron-3-Embed-1B-BF16 loaded); codebase_search exited 0 with stdout byte-identical to the 1.14.0 launcher's for the same query (sha256 e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7, 5 matches); codebase_status exited 0 (Status: green, 89,567 indexed chunks); codebase_graph_status exited 0 (Status: READY, 1,305 files, 441 edges, 'Built by: v1.15.0'). None of the four stdout captures held a notifications/message or JSON-RPC line. A headless Claude Code 2.1.283 session with --strict-mcp-config reported the server connected and completed codebase_status with is_error false. A Codex exec 0.157.1 run with an args override first failed the call with 'MCP tool call requires approval, but approval policy is never'; the rerun with default_tools_approval_mode=\"approve\" completed the mcp_tool_call with no error and returned Status: green, 89,567 chunks and 'Built by v1.14.0, this server is v1.15.0', because a 1.14.0 server had rebuilt the shared graph 30 s earlier. At 2026-09-27T21:42:49Z the coordinator repointed seven launchers and the bin/socraticode symlink together from tools/socraticode-1.14.0 to tools/socraticode-1.15.0, and restarted the mcporter daemon at 21:42:50Z. At read-back, claude mcp get and codex mcp get showed the 1.15.0 args; a production mcporter codebase_status at 21:43:01Z returned Status: green, 89,567 indexed chunks and no notifications/message line; codebase_graph_status at 21:43:00Z read 'Built by: v1.14.0 — STALE, this server is v1.15.0' (last built 21:35:09.670Z), because 12 already-running 1.14.0 servers remained in live sessions.",
+  "limitations": [
+    "Not every live session runs 1.15.0 yet, and nothing in the claim rests on that. At the cutover read-back 12 already-running 1.14.0 servers remained; at 2026-09-28T02:03:14Z a process listing still showed 2 processes on the 1.14.0 prefix, the MCP children of two long-running Claude Code sessions that each need their own /mcp reconnect. A codebase_graph_status read-back at about 02:07Z, served by one of those 1.14.0 servers, showed the stored graph still 'Built by: v1.15.0' (last built 2026-09-27T21:43:08.450Z). A 1.14.0 server that rebuilds the graph before its session reconnects would restart the flip-flop (data.all_sessions_on_1150).",
+    "The pre-cutover checks ran from the staged 1.15.0 prefix against production services while 1.14.0 servers were still running, and shared their lock directory. The 1.15.0 server rebuilt the production code graph ('Built by: v1.15.0', last built 2026-09-27T21:34:21.531Z); a 1.14.0 server rebuilt it again at 21:35:09.670Z, as the post-cutover graph status shows. The decision record predicted this graph flip-flop from source (graph-inputs.ts:609); this is the first native observation of it on this host. No vector reindex was observed: the collection stayed green at 89,567 chunks throughout.",
+    "Evidence classes differ by part. The upstream suite is the unchanged upstream test code at the tag, with the deviations in data.upstream_suite.deviations. The client checks are local integration evidence, one run per client; the Claude probe ran on claude-haiku-4-5 as a connectivity check, and its model does not change the server's behaviour. The cutover and its read-back are native operations by the coordinator: the mcporter read-backs quote retained captures, while the claude mcp get and codex mcp get results are the coordinator's reported observations, whose raw output is not retained. The 2026-09-25 qualification is documented in docs/decisions/2026-09-25-workstation-sota-refresh.md, but its artifacts were never published, so it is not cited as output here.",
+    "The Codex check needed default_tools_approval_mode=\"approve\": socraticode declares no MCP tool annotations, and `codex exec` runs with approval policy never, so an unapproved call is refused (docs/decisions/2026-09-26-codex-worker-lane.md, decisions 4 and 5). This is not a 1.15.0 change: the src/tools tree is 7044488e at both tags, so tool names and parameters are unchanged.",
+    "The upstream suite does not cover everything upstream CI runs. Node 24.21.0 is outside the CI unit matrix (18/20/22/26), and the Qdrant job runs on Node 26. Qdrant 1.19.1 replaced CI's v1.17.0. npm run build was skipped before the regressions, because no test references dist/. Not run: the Docker-backed test:integration and test:e2e suites (this host has no Docker), the rust-graph-vs-cargo job, and the packaged-artifact consumer jobs. npm ci warned that 19 packages have install scripts not yet covered by allowScripts, and its audit reported 3 moderate severity vulnerabilities; neither was reviewed here.",
+    "The sha256 pin covers socraticode's own tarball only. The package ships no shrinkwrap, and later releases inside its dependency ranges now resolve: undici 6.29.0 (2026-09-25T09:45:19.865Z) and @lumis-sh/wasm-eex 0.26.2 (2026-09-26T00:38:34.735Z). recipes/README.md therefore installs with --before=2026-09-24T12:00:00Z. adoption/bootstrap-linux.sh install_npm passes no --before, so a bootstrap install can resolve a different dependency tree from the qualified one.",
+    "The landscape ledger does not move: catalogs/landscape/foundation.json keeps the winner pin socraticode 1.14.0 from the sealed 2026-09-22 layer-verdict packets (decision record, Scope). A host receipt recorded at 1.15.0 therefore matches no winner pin. scripts/host_receipts.py record refuses it unless --allow-unbound-version is passed, and it stays unbound until a new verdict wave re-records the layer.",
+    "Linux x86_64 only: adoption/pins-macos-arm64.json keeps socraticode 1.14.0. The npm tarball is platform-independent, but a Mac needs its own acceptance, and nothing here is macOS evidence.",
+    "The user waived the recorded 7-day cooldown (earliest cutover 2026-10-01T11:01Z), so it was not served; the release was about 3.4 days old at the decision. The upstream check at 2026-09-27T21:45Z found no newer release, main 9 commits ahead with documentation changes only, and no issue reporting a 1.15.0 regression. That rules out only regressions already reported.",
+    "Not repointed: 16 ephemeral scratch CODEX_HOMEs under other sessions' scratchpads, plus dated backups and archived documents, which the coordinator classed as historical rather than live launchers. Any server still running from one of them stays on 1.14.0 until its session ends.",
+    "Not exercised: interactive sessions over time with the newly delivered notifications/message stream, beyond the single calls here (its volume at SOCRATICODE_LOG_LEVEL info); the mcporter daemon keep-alive path under load; and the two mixed-session hazards known from source only, the cross-process symbol-graph staging cleanup race (symbol-graph-store.ts:843-866, startup.ts:324-336) and codebase_stop's SIGTERM to another session's indexer (index-tools.ts:478-499)."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-27",
+    "previous_version": "1.14.0",
+    "version": "1.15.0",
+    "release": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
+    "tag_commit": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+    "tag_object": "0f5a8658b64b46018d534ece4e316da61b9cb781",
+    "released_at_utc": "2026-09-24T10:58:58Z",
+    "npm_published_at_utc": "2026-09-24T11:01:27.714Z",
+    "tarball": "https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz",
+    "tarball_bytes": 1053928,
+    "tarball_sha256": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1",
+    "tarball_integrity": "sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ==",
+    "tarball_shasum": "607f909997dcf40bd5722a08f2e7c0e4b90e8334",
+    "registry_check": "npm view socraticode@1.15.0 dist.integrity dist.shasum dist.fileCount dist-tags.latest (exit 0, 231 files, latest 1.15.0) and curl -fsSL of the tarball (exit 0) hashed with sha256sum, openssl dgst -sha512 and sha1sum at 2026-09-27T21:39:34Z; all three digests matched",
+    "install": "npm install --global --prefix <STACK_HOME>/tools/socraticode-1.15.0 --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0 (the staged prefix from the 2026-09-25 qualification; not reinstalled for this receipt)",
+    "launcher": "<STACK_HOME>/bin/node <STACK_HOME>/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js, working directory the repository checkout",
+    "launcher_env": {
+      "QDRANT_MODE": "external",
+      "EMBEDDING_PROVIDER": "lmstudio",
+      "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "EMBEDDING_DIMENSIONS": "2048",
+      "EMBEDDING_CONTEXT_LENGTH": "4096",
+      "EMBEDDING_QUERY_PREFIX": "'query: ' (trailing space, intended)",
+      "EMBEDDING_DOCUMENT_PREFIX": "'passage: ' (trailing space, intended)",
+      "EMBEDDING_DOCUMENT_INCLUDE_PATH": "true",
+      "RESPECT_GITIGNORE": "true",
+      "INCLUDE_DOT_FILES": "false",
+      "SOCRATICODE_WATCHER": "auto",
+      "SEARCH_DEFAULT_LIMIT": "3",
+      "note": "QDRANT_URL and LMSTUDIO_URL name loopback services; the lmstudio adapter targets the local OpenAI-compatible embeddings endpoint and does not require LM Studio (docs/foundation-stack.md)"
+    },
+    "upstream_suite": {
+      "evidence_class": "unchanged upstream test",
+      "clone_head": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+      "node": "v24.21.0",
+      "npm_ci": "exit 0; 'added 425 packages, and audited 426 packages in 9s'; '3 moderate severity vulnerabilities'; 'npm warn install-scripts 19 packages have install scripts not yet covered by allowScripts'",
+      "package_lock_sha256": "1367b45b6cd876c3f3dc0418a08a7f2550871ed1aca93f6701d0df9b7b7f1862 (unchanged by npm ci)",
+      "tree_after": "git status clean",
+      "runs": [
+        {
+          "command": "npm run test:unit (vitest run tests/unit/, vitest v4.1.10)",
+          "exit_code": 0,
+          "result": "Test Files 103 passed (103); Tests 2475 passed (2475); Duration 72.83s"
+        },
+        {
+          "command": "npm run check:release-versions",
+          "exit_code": 0,
+          "result": "release manifests match 1.15.0"
+        },
+        {
+          "command": "npx biome check src/ tests/",
+          "exit_code": 0,
+          "result": "Checked 175 files in 82ms. No fixes applied."
+        },
+        {
+          "command": "npx tsc --noEmit",
+          "exit_code": 0,
+          "result": "no output"
+        },
+        {
+          "command": "REQUIRE_QDRANT=1 QDRANT_MODE=external QDRANT_URL=<loopback> QDRANT_HOST=127.0.0.1 QDRANT_PORT=<port> npx vitest run tests/integration/partial-upsert-skip.test.ts tests/integration/interrupted-resume-recovery.test.ts tests/integration/char-cap-split-retrieval.test.ts tests/integration/prune-reclamation.test.ts (ci.yml node-26-consumer-qdrant at v1.15.0)",
+          "exit_code": 0,
+          "result": "Test Files 4 passed (4); Tests 12 passed (12); Duration 28.16s",
+          "backend": "disposable Qdrant 'Version: 1.19.1, build: 6ab21cac' on a loopback port with scratch storage; 480 HTTP requests in its log; stopped by its own PID afterwards (coordinator)"
+        }
+      ],
+      "deviations": [
+        "Node v24.21.0, outside the CI unit matrix (18/20/22/26); the Qdrant job runs on Node 26",
+        "Qdrant 1.19.1 instead of CI's v1.17.0",
+        "npm run build skipped before the regressions; no test references dist/",
+        "npm cache kept in scratch"
+      ],
+      "not_run": [
+        "npm run test:integration and npm run test:e2e (need Docker; this host has none)",
+        "tests/integration/rust-graph-vs-cargo.test.ts",
+        "the packaged-artifact consumer jobs (npm pack and verify-packaged-qdrant.mjs)"
+      ]
+    },
+    "pre_cutover_native": [
+      {
+        "client": "mcporter 0.14.1",
+        "call": "call socraticode.codebase_health --args '{}' --output text --no-oauth, scratch config naming the 1.15.0 prefix",
+        "at_utc": "about 2026-09-27T21:34:09Z",
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout": "SocratiCode — Infrastructure Health Check: Qdrant mode: external; [OK] External Qdrant (<loopback>): Reachable; Embedding provider: lmstudio; [OK] LM Studio: Reachable at <loopback>/v1; [OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded; External Qdrant mode — Docker is not required for the vector database."
+      },
+      {
+        "client": "mcporter 0.14.1",
+        "call": "call socraticode.codebase_search --output text --no-oauth, query 'SubagentStart hook injects token lanes block', once through the production 1.14.0 launcher and once through the 1.15.0 prefix",
+        "at_utc": "about 2026-09-27T21:34:23Z (1.14.0) and 21:34:24Z (1.15.0)",
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout_sha256": {
+          "1.14.0": "e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7",
+          "1.15.0": "e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7"
+        },
+        "stdout_bytes": 9531,
+        "matches": [
+          "adoption/hooks/claude/token-lanes-subagent-start.py (lines 1-41) score 0.8333",
+          "examples/claude-native/workflows/test-child-usage.mjs (lines 214-221) score 0.5667",
+          "evidence/artifacts/token-lanes-subagent-start-20260927/README.md (lines 1-29)",
+          "docs/decisions/2026-09-27-token-lanes-subagent-start.md (lines 141-171)",
+          "docs/decisions/2026-09-27-token-lanes-subagent-start.md (lines 30-53)"
+        ]
+      },
+      {
+        "client": "mcporter 0.14.1",
+        "call": "call socraticode.codebase_status --output text --no-oauth",
+        "at_utc": "about 2026-09-27T21:34:24Z",
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout": "Status: green; Indexed chunks: 89567; File watcher: active (watched by another process); Code graph: 1305 files, 441 edges; Last built: 3s ago"
+      },
+      {
+        "client": "mcporter 0.14.1",
+        "call": "call socraticode.codebase_graph_status --output text --no-oauth",
+        "at_utc": "about 2026-09-27T21:34:24Z",
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout": "Status: READY; Files (nodes): 1305; Dependencies (edges): 441; Last built: 2026-09-27T21:34:21.531Z (3s ago); Built by: v1.15.0; Symbol graph: 1305 files, 22282 symbols, 201878 call edges, 77.2% unresolved; AST grammars: 5 built-in, 17 dynamic"
+      },
+      {
+        "check": "notifications/message in mcporter --output text stdout",
+        "result": "0 lines matching notifications/message and 0 lines holding a JSON-RPC envelope across the four 1.15.0 stdout captures above"
+      },
+      {
+        "client": "Claude Code 2.1.283, claude -p --strict-mcp-config with a config naming only socraticode at the 1.15.0 prefix",
+        "at_utc": "about 2026-09-27T21:34:45Z",
+        "init_mcp_servers": "socraticode: connected",
+        "tool_call": "mcp__socraticode__codebase_status, returned 'Status: green, Indexed chunks: 89567, Code graph: 1305 files, 441 edges, Last built: 22s ago'",
+        "result": "subtype success, is_error false, num_turns 3, stop_reason end_turn"
+      },
+      {
+        "client": "Codex exec 0.157.1, args override to the 1.15.0 prefix, attempt 1",
+        "at_utc": "about 2026-09-27T21:35:17Z",
+        "mcp_tool_call": "socraticode codebase_status, status failed",
+        "error": "MCP tool call requires approval, but approval policy is never"
+      },
+      {
+        "client": "Codex exec 0.157.1, args override plus default_tools_approval_mode=\"approve\", attempt 2",
+        "at_utc": "about 2026-09-27T21:35:43Z",
+        "mcp_tool_call": "socraticode codebase_status, status completed, error null",
+        "result": "Status: green; Indexed chunks: 89567; File watcher: active (watched by another process); Code graph: 1305 files, 441 edges; Last built: 30s ago; Built by v1.14.0, this server is v1.15.0 — run codebase_graph_build to pick up newer resolvers."
+      }
+    ],
+    "upstream_state": "Checked 2026-09-27T21:45Z with gh api: releases/latest v1.15.0; no release newer than v1.15.0 on GitHub or npm; compare v1.15.0...main ahead 9, behind 0, touching README.md and docs/guides only; issues since 2026-09-24: #189 (open feature request), #188 and #185 closed, plus merged PRs #190 (docs) and #187 (PHP graph).",
+    "source_review": "src/tools tree 7044488ece0ac86a0fa1727aa0cf15bf8b88f2da at both tags (tool names and parameters unchanged); graph-inputs.ts, lock.ts and symbol-graph-store.ts blobs identical at both tags (gh api contents, 2026-09-27).",
+    "cooldown_waiver": {
+      "gate": "7-day cooldown for a release that is not a security fix; earliest cutover 2026-10-01T11:01Z (docs/decisions/2026-09-25-workstation-sota-refresh.md)",
+      "decided_utc": "about 2026-09-27T21:20Z",
+      "user_choice": "Waive, cut over tonight"
+    },
+    "cutover": {
+      "evidence_class": "native operation (coordinator)",
+      "cutover_utc": "2026-09-27T21:42:49Z",
+      "launchers_repointed": [
+        "the Claude Code local-scope config entry",
+        "the Codex user config",
+        "the project .codex config (untracked)",
+        "config/mcporter.json, with the mcporter daemon restarted at 2026-09-27T21:42:50Z",
+        "the b1-runtime-workers Codex home config",
+        "the agent-lab .mcp.json",
+        "the agent-lab .codex config"
+      ],
+      "change": "tools/socraticode-1.14.0/ to tools/socraticode-1.15.0/ in each launcher, all together",
+      "bin_symlink": "bin/socraticode repointed to the 1.15.0 prefix",
+      "backups": "pre-cutover copies of every repointed config kept outside the repository",
+      "rollback_prefix": "tools/socraticode-1.14.0 retained",
+      "not_repointed": "16 ephemeral scratch CODEX_HOMEs under other sessions' scratchpads, plus dated backups and archived documents (historical, not live launchers)"
+    },
+    "post_cutover_readback": {
+      "claude_mcp_get": "Local config scope, Connected, args on the 1.15.0 prefix (coordinator observation; raw output not retained)",
+      "codex_mcp_get": "enabled, args on the 1.15.0 prefix (coordinator observation; raw output not retained)",
+      "mcporter_codebase_status": {
+        "at_utc": "about 2026-09-27T21:43:01Z",
+        "exit_code": 0,
+        "stdout": "Status: green; Indexed chunks: 89567; File watcher: active (watched by another process); Code graph: 1305 files, 441 edges; Last built: 471s ago; Built by v1.14.0, this server is v1.15.0 — run codebase_graph_build to pick up newer resolvers.",
+        "notifications_message_lines": 0
+      },
+      "mcporter_codebase_graph_status": {
+        "at_utc": "about 2026-09-27T21:43:00Z",
+        "stdout": "Status: READY; Files (nodes): 1305; Dependencies (edges): 441; Last built: 2026-09-27T21:35:09.670Z (471s ago); Built by: v1.14.0 — STALE, this server is v1.15.0"
+      },
+      "live_1140_servers_remaining": "12 already-running 1.14.0 servers in live sessions, until those sessions reconnect (coordinator observation)"
+    },
+    "all_sessions_on_1150": {
+      "status": "partial: not every live session runs 1.15.0 yet",
+      "remaining_1140_processes": {
+        "observed_at_utc": "2026-09-28T02:03:14Z",
+        "method": "ps -eo pid,lstart,args, counting command lines that name a socraticode-<version> prefix",
+        "result": "2 processes on the 1.14.0 prefix and 4 on the 1.15.0 prefix; a count of processes, not of sessions or servers",
+        "parents": "By parent PID, the two 1.14.0 processes are the MCP children of two long-running Claude Code sessions started 2026-09-27T20:24:41Z and 20:27:43Z (the coordinator's session and one peer session); each needs its own /mcp reconnect (coordinator observation)"
+      },
+      "graph_status_readback": {
+        "at_utc": "about 2026-09-28T02:07Z",
+        "served_by": "the coordinator session's 1.14.0 server (coordinator observation)",
+        "stdout_lines": [
+          "Status: READY",
+          "Last built: 2026-09-27T21:43:08.450Z",
+          "Built by: v1.15.0"
+        ],
+        "graph_size": "1305 files, 22282 symbols",
+        "reading": "A 1.15.0 server rebuilt the stored graph at 21:43:08.450Z, 19 s after the 21:42:49Z cutover, and its last-built time was unchanged at the read-back, so no server had rebuilt it since."
+      },
+      "open": "The time at which every live session runs 1.15.0 is not recorded; the two sessions above had not reconnected at 02:03:14Z."
+    },
+    "host_receipt_binding": "The landscape winner pin stays 1.14.0, so record a 1.15.0 host receipt with scripts/host_receipts.py record --allow-unbound-version; it stays unbound until a new verdict wave.",
+    "rollback": "Re-point every launcher's args and the bin/socraticode symlink to the retained tools/socraticode-1.14.0 prefix (or restore the pre-cutover config backups), close 1.15.0 sessions normally, stop the mcporter daemon with `mcporter daemon stop`, then run codebase_graph_build once; the version change rebuilds the graph as 1.14.0. No vector reindex is needed."
+  }
+}

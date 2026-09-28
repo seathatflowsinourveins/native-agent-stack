@@ -66,7 +66,7 @@ retained in the receipt. No restart persistence or new cross-client E2E is claim
 | Layer | Accepted upstream | Current qualification |
 | --- | --- | --- |
 | Shared memory | ai-memory 2.3.2 | Scoped native MCP, allowlisted hooks, local MiniLM embeddings, native Codex consolidation, hourly learning configuration. |
-| Semantic code retrieval | SocratiCode 1.14.0 | Current stable release; both clients registered, direct project watcher active. |
+| Semantic code retrieval | SocratiCode 1.15.0 | Current stable release; both clients registered, direct project watcher active. 1.14.0 until the 2026-09-27 cutover ([receipt](../evidence/receipts/socraticode-1150-qualification-20260927.json)). |
 | Vector store | Qdrant 1.19.1 | Current stable release; existing native loopback service and persistent project collection. |
 | Local embedding inference | vLLM 0.25.0 with pinned NVIDIA Nemotron-3-Embed-1B-BF16 | Retained qualified version. Newer 0.29.0 has an actual host initialization failure; newer is not automatically usable. |
 | Exact source navigation | Serena 2.0.0.dev0 at c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | Current native symbol lookup returned the original scope-selection implementation. |

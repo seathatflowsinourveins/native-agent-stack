@@ -261,6 +261,8 @@ class PinsSchemaTests(unittest.TestCase):
         "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
         # Linux switched 2026-09-26; the Mac keeps 0.155.1 until its own qualification (the receipt's limitation).
         "codex": ("0.155.1", "0.157.1", "evidence/receipts/codex-01571-qualification-20260926.json"),
+        # Linux moved 2026-09-27 (cooldown waived by the user); the Mac keeps 1.14.0 until its own qualification.
+        "socraticode": ("1.14.0", "1.15.0", "evidence/receipts/socraticode-1150-qualification-20260927.json"),
     }
 
     def test_shared_components_keep_the_linux_pinned_version(self):
@@ -328,6 +330,10 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
     # runs these copies (and rtk_config_reminder, whose config check alone is
     # shared with the Linux reminder) under bash 3.2.
     PORTED_FUNCTIONS = ("fetch", "verify_sha256", "install_uv_tool", "install_uv_tool_from_git")
+    # Pins that moved after the 2026-09-26 digest check: (version, receipt that re-checked its digests).
+    MOVED_AFTER_DIGEST_CHECK = {
+        "ccusage": ("20.0.26", "evidence/receipts/ccusage-20026-qualification-20260927.json"),
+    }
 
     def setUp(self):
         self.pins = load(PINS_PATH)
@@ -403,6 +409,12 @@ class TokenEfficiencyPinPortabilityTests(unittest.TestCase):
         self.assertTrue((ROOT / artifact).is_file())
         for tool_id in self.NEW_IDS_AND_KINDS:
             with self.subTest(tool=tool_id):
+                moved = self.MOVED_AFTER_DIGEST_CHECK.get(tool_id)
+                if moved is not None:
+                    self.assertEqual(self.by_id[tool_id]["version"], moved[0])
+                    self.assertTrue((ROOT / moved[1]).is_file())
+                    self.assertIn(moved[1], self.by_id[tool_id]["checksum_ref"])
+                    continue
                 self.assertIn(artifact, self.by_id[tool_id]["checksum_ref"])
 
     def test_bootstrap_macos_gained_the_uv_tool_dispatch_cases(self):

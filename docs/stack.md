@@ -36,7 +36,7 @@ Snapshot: September 19, 2026. The 47 entries below are adopted tools, integratio
 | [serena](https://github.com/oraios/serena) | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | Language-server symbol and reference retrieval | core |
 | [shanraisshan/claude-code-best-practice](https://github.com/shanraisshan/claude-code-best-practice) | 15969ed2471a177d938c889255d2f23f07e4742a | Selective on-demand community guidance | optional |
 | [shellcheck](https://github.com/koalaman/shellcheck/releases/tag/v0.11.0) | 0.11.0 | Static shell review | supporting |
-| [socraticode](https://github.com/giancarloerra/SocratiCode) | 1.14.0 | Automatically refreshed semantic code retrieval and native code graph | core |
+| [socraticode](https://github.com/giancarloerra/SocratiCode) | 1.15.0 | Automatically refreshed semantic code retrieval and native code graph | core |
 | [toon](https://github.com/toon-format/toon/releases/tag/v4.1.1) | 4.1.1 | Compact suitable structured data with explicit decode | supporting |
 | [vllm](https://github.com/vllm-project/vllm) | 0.25.0 | Native GPU serving for pinned recent local embeddings | core |
 | [worktrunk](https://github.com/max-sixty/worktrunk) | 0.78.0 | Native Git worktree convenience CLI | optional |

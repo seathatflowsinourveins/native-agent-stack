@@ -249,7 +249,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `qmd` | 2.8.3 | `qmd-2.8.3.tgz` | `2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0` | `npm_registry_integrity_crosscheck` |
 | `repomix` | 1.18.1 | `repomix-1.18.1.tgz` | `d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f` | `npm_registry_integrity_crosscheck` |
 | `toon` | 4.1.1 | `cli-4.1.1.tgz` (`@toon-format/cli`) | `93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6` | `npm_registry_integrity_crosscheck` |
-| `ccusage` | 20.0.24 | `ccusage-20.0.24.tgz` | `69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183` | `npm_registry_integrity_crosscheck` |
+| `ccusage` | 20.0.26 | `ccusage-20.0.26.tgz` | `b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2` | `npm_registry_integrity_crosscheck` |
 | `headroom` | 0.37.0 | `headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl` | `b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c` | `pypi_json_digest_plus_local_rehash` |
 | `markitdown` | 0.1.8 | `markitdown-0.1.8.tar.gz` (sdist, platform-independent) | `17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed` | `pypi_json_digest_plus_local_rehash` |
 | `serena` | 2.0.0.dev0 | git commit `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` on oraios/serena (no released archive) | sha256 null; the commit above is the integrity anchor | `github_commit_existence_verified` |
@@ -263,7 +263,10 @@ the two `foundation-cpu` components this file lacked. Each pin has the Linux pin
 and each digest was re-checked against a fresh download of its upstream artifact on
 2026-09-26 ([`digest-check.txt`](../../evidence/artifacts/macos-token-pins-20260926/digest-check.txt),
 a local harness; its failed earlier runs and a negative control that it fails on wrong pins
-are kept beside it). The `rtk` archive holds one bare
+are kept beside it). `ccusage` moved with the Linux pin to 20.0.26 on 2026-09-27; its digests
+were re-checked against a fresh registry download for
+[its qualification receipt](../../evidence/receipts/ccusage-20026-qualification-20260927.json),
+and no Mac has run that version. The `rtk` archive holds one bare
 `rtk` executable, so the existing single-binary tarball installer applies unchanged. `qmd`,
 `repomix`, `toon` and `ccusage` are the same npm registry tarballs as their Linux pins;
 `qmd`'s `sqlite-vec-darwin-arm64` and `ccusage`'s `@ccusage/ccusage-darwin-arm64` optional
@@ -417,7 +420,8 @@ have an entry in `adoption/pins-macos-arm64.json` at that tag and at `v2026.09.2
 it keeps ai-memory 2.3.2 and mcporter 0.13.13 until a Mac qualifies the new
 versions itself, and its socraticode entry matches the new Linux one. It changed
 after `v2026.09.26`, gaining the other seven of those ten and `qmd` at their Linux
-versions; its `claude-code` pin is unchanged.)
+versions; its `claude-code` pin is unchanged. On 2026-09-27 the Linux `socraticode` pin moved
+to 1.15.0, and this file keeps 1.14.0 until a Mac qualifies the new version.)
 
 The pin is a floor: when `~/.local/bin/claude --version` already reports the
 pinned version or newer, `install_native` keeps that launcher, downloads and
