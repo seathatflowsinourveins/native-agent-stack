@@ -3367,8 +3367,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
-      "bytes": 9814
+      "sha256": "941649753f346f7f4d4b4ab8a7212f717b18c9db5cab910862665fa645eadc3f",
+      "bytes": 10369
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -8443,8 +8443,8 @@
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/README.md",
-      "sha256": "fdf32109e65b913c9ea2a62891de857644f484abcfabf9b28b0a01e3ca473753",
-      "bytes": 27438
+      "sha256": "07fe4cd0a95cad2882e6b2f1532e8fdfaafa7188989e0449451c87f0f74275fc",
+      "bytes": 20023
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/build-requirements.in",
@@ -8457,9 +8457,24 @@
       "bytes": 748
     },
     {
+      "path": "blueprints/runtime-workers/gpt-researcher/cli_runner.py",
+      "sha256": "9aa7c94183f14c342b09070217446b3c6c811d47f106d7d02f14ba9825576194",
+      "bytes": 2710
+    },
+    {
       "path": "blueprints/runtime-workers/gpt-researcher/config.template.json",
-      "sha256": "753a2290d5256fd98b9c54e131037f1c1679a37cbc685df0191b4be958e35c26",
-      "bytes": 1180
+      "sha256": "6602a06de958ed1e69ebe38243d9c9590592c124034f3f99384d7acecbc0d6d4",
+      "bytes": 1181
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/dispatch.py",
+      "sha256": "5a6981a663ff10e929724c357b71eca5606176d2e08d0b5d9d7ca5754b1949d5",
+      "bytes": 15896
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/dispatch.sh",
+      "sha256": "51fcef07d220105e2e9d6f2d8427db17e8c7535fdb38bf797b2e471ae68ad821",
+      "bytes": 271
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/check.py",
@@ -8468,8 +8483,8 @@
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/grader.py",
-      "sha256": "b2e11941887a9b57a8208b56177d13d2d70ff4bb070fa970159a08fb09f1e32f",
-      "bytes": 9850
+      "sha256": "a015272a4a972279fbfc18bf9801c05c7171e89a2b8c97ca7291393319fc785b",
+      "bytes": 9857
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/offline-red.txt",
@@ -8483,8 +8498,8 @@
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/receipt.py",
-      "sha256": "ac585b1719872a94df7dfb28ba83f8fff31e7f811c97718c4404d7856312d18f",
-      "bytes": 8861
+      "sha256": "24a2c62d8fbb1971301e973fb2cbc741047b3a341836f006ee094f300f297da8",
+      "bytes": 14371
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/round2-red.txt",
@@ -8498,8 +8513,8 @@
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/run.py",
-      "sha256": "04aa84c9115bf283faac7d6f04abadfeee59603f54f62702b3e9a34053bdbff8",
-      "bytes": 8912
+      "sha256": "370ec49b8f436df82500bcf08307f5bba99d7212943df0330009936edab0d7b9",
+      "bytes": 9646
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/e2e/task.json",
@@ -8507,19 +8522,24 @@
       "bytes": 522
     },
     {
+      "path": "blueprints/runtime-workers/gpt-researcher/evidence/nltk-reachability.json",
+      "sha256": "6915dd28fc7cbaf0918ce64f939f1870d77d77e006d01b763d0a73ea850b8b7f",
+      "bytes": 19270
+    },
+    {
       "path": "blueprints/runtime-workers/gpt-researcher/gateway.py",
-      "sha256": "374c78072f4d22e55e306a2a49162564edf691c574121cbc5b64462217cdb20a",
-      "bytes": 6048
+      "sha256": "7b87b5f7d3bb3cd479261111c9fd74e30c13f582b26343b5333d490ea3f0131a",
+      "bytes": 9221
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/host.template.json",
-      "sha256": "095f7fbb14ef73e69e6bbad039491bac196b3c25dc290ee815c3e47b345fe39b",
-      "bytes": 478
+      "sha256": "8a07054c702d98dcc613ad4e2b2396d0aeb3e32aae5ed83bf1efeb9f76ef10f3",
+      "bytes": 426
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/install.sh",
-      "sha256": "dd3944d881021457dab27cf59f3279a36ff6ca29b5dc3e04c5db4477f721e57b",
-      "bytes": 2961
+      "sha256": "93934687147c7ed3929b7d2ad121f508a853d50b234cf6ea3a42624884453e89",
+      "bytes": 3071
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/install_support.py",
@@ -8528,18 +8548,18 @@
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/mcp-policy.json",
-      "sha256": "53119352d32faa35e5d981c1d967b6fc4468e770108467bda96951e61bdad5da",
-      "bytes": 2378
+      "sha256": "de646e3bbddc1ff809537258bac0cac810be0b516149683a00c7d3c54333bf1b",
+      "bytes": 2386
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/mcp_proxy.py",
-      "sha256": "1fde0c7be465fc58218bdc9fd4f52ebfe2e424fc797187a7b16ec12720cfb686",
-      "bytes": 8515
+      "sha256": "b07428bf921d0512ecbbaa2e1d67b925360fd707e813ac4d21448f08fad32058",
+      "bytes": 9409
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/pins.json",
-      "sha256": "79b99b989a17460d5f98e3ef85a3c8576877838c9891814b9c0f3d5a520cd9bb",
-      "bytes": 3795
+      "sha256": "fdf3e7bc7b4fa773923383734a68df75124e1b28a686c16d090fee763a545278",
+      "bytes": 4538
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.in",
@@ -8563,13 +8583,18 @@
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/research.md",
-      "sha256": "bb01ebe26fa61631079e54d1c2ae1c0f6a9677e8d2a82edfaf2221003770df2e",
-      "bytes": 14284
+      "sha256": "2f5f9b58f1241d45d16baf4d794a72d374ffbf8266a70fc2ddcbdf6c438a1d1b",
+      "bytes": 14575
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/round3-verification.json",
+      "sha256": "19d49dfcc4a4340f6a454873b1a5846360ec7ced2576e1e1de20a2c677c367f0",
+      "bytes": 85966
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/run-e2e.sh",
-      "sha256": "79d36a7b5825a6548ab74b65ef527cc6b32ad76d8785b56e31d1ffaadb9dd409",
-      "bytes": 1720
+      "sha256": "e65e0809bf490801064bbd79c75d3135e4e7b10f823a6cd3939fc798135241ed",
+      "bytes": 279
     },
     {
       "path": "blueprints/runtime-workers/gpt-researcher/run-upstream-tests.sh",
@@ -39793,8 +39818,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "16c28c3e8ce639349a6a1f0cf8ef2dc167b85ffa299320bc86b9895f1a103df6",
-      "bytes": 37014
+      "sha256": "9b2ec37d323acaf529efd610113fb1f1f65c25940fa2ac6dd52baefd85792e88",
+      "bytes": 37320
     },
     {
       "path": "tests/test_path_safety.py",
@@ -39873,8 +39898,8 @@
     },
     {
       "path": "tests/test_runtime_worker_gpt_researcher.py",
-      "sha256": "74a3aed27864090cee76c85bc072ccac55fafe2a718ef55e64ee192b0f3d5823",
-      "bytes": 18734
+      "sha256": "4e20b7cdbf95840b2495627e51fc1fa4c88090be62c7a7b0484ccc88fcacfb49",
+      "bytes": 52334
     },
     {
       "path": "tests/test_saturation_ledger.py",
@@ -40178,8 +40203,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
-      "bytes": 55626
+      "sha256": "a0d5ee50ecdca6e5f733355187113e62992c2982a3c01fe3ec92ee1fb6db8056",
+      "bytes": 55655
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

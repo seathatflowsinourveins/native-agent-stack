@@ -60,6 +60,11 @@ IGNORE_ALLOWED_LOCKS = {
         "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
         "evidence": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json",
     },
+    "blueprints/runtime-workers/gpt-researcher/requirements.lock": {
+        "advisories": ["GHSA-8mgp-746c-j5xp"],
+        "sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+        "evidence": "blueprints/runtime-workers/gpt-researcher/evidence/nltk-reachability.json",
+    },
 }
 
 # Requirements files follow pip's format (https://pip.pypa.io/en/stable/reference/requirements-file-format/): a line
