@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "id": "claude-advisor-usage-scan-20260928",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "A count-only scan of this host's Claude Code transcripts at 2026-09-28T03:09:00Z (Claude Code 2.1.283), deduplicated by message.id, found advisor_message entries in usage.iterations[]: 1,018 in 660 of 2,912 subagent transcripts (712 on claude-fable-5-1 with 138,494,287 input and 6,207,417 output tokens; 306 on claude-opus-5-5 with 62,850,042 input and 2,432,917 output tokens) and 58 in 21 of 238 main-session transcripts (38 on claude-fable-5-1, 20 on claude-opus-5-5). examples/claude-native/workflows/child-usage.mjs at ed3cd96c sums only the top-level usage counters (transcriptUsage) and reads no usage.iterations, so its per-child usage excludes these advisor iterations.",
+  "limitations": [
+    "Local observation of one host's retained transcripts (the independent-observation class of docs/acceptance-evidence-policy.md), not a provider ledger or bill. The counts move as sessions run (a scan two minutes earlier counted 1,016 subagent iterations), and a transcript that was deleted or never written is not counted.",
+    "Counts only: no paths, session identifiers or transcript content are retained, so no count is attributed to a run, task or role.",
+    "The populations are this scan's own: subagent transcripts are agent-*.jsonl files below a subagents directory (Agent-tool and workflow children; workflow journal.jsonl files are skipped), and main-session transcripts are <project>/<session>.jsonl files. A count taken with other boundaries or at another time is not comparable.",
+    "Token figures are the counters each advisor_message entry reports; every counted entry reported 0 cache-read and 0 cache-creation tokens. No price, plan-usage share or quality effect is derived.",
+    "The scan's rules (one kept row per message.id, <synthetic> rows and journal files skipped) were checked on a synthetic fixture (data.controls), not against a provider-side record.",
+    "Whether ccusage or ecosystem-token-report count these entries was not checked."
+  ],
+  "evidence_class": "independent observation: a count-only scan of this host's native Claude Code transcripts (local observation), with a synthetic-fixture check of the scan's rules",
+  "recorded_at_utc": "2026-09-28T03:09:00Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the scanning user's own ~/.claude/projects tree"
+  },
+  "data": {
+    "client_version": "2.1.283 (Claude Code)",
+    "scanned_at_utc": "2026-09-28T03:09:00Z",
+    "populations": {
+      "main_session_transcripts": {
+        "advisor_by_model": {
+          "claude-fable-5-1": {
+            "advisor_iterations": 38,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 8072351,
+            "output_tokens": 290105
+          },
+          "claude-opus-5-5": {
+            "advisor_iterations": 20,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 5197587,
+            "output_tokens": 148911
+          }
+        },
+        "advisor_iterations": 58,
+        "assistant_rows_without_message_id": 0,
+        "messages_with_advisor_iterations": 58,
+        "transcripts": 238,
+        "transcripts_with_advisor_iterations": 21,
+        "unique_assistant_messages": 18290,
+        "unparsed_lines": 0
+      },
+      "subagent_transcripts": {
+        "advisor_by_model": {
+          "claude-fable-5-1": {
+            "advisor_iterations": 712,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 138494287,
+            "output_tokens": 6207417
+          },
+          "claude-opus-5-5": {
+            "advisor_iterations": 306,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "input_tokens": 62850042,
+            "output_tokens": 2432917
+          }
+        },
+        "advisor_iterations": 1018,
+        "assistant_rows_without_message_id": 0,
+        "messages_with_advisor_iterations": 1014,
+        "transcripts": 2912,
+        "transcripts_with_advisor_iterations": 660,
+        "unique_assistant_messages": 117853,
+        "unparsed_lines": 0
+      }
+    },
+    "controls": {
+      "fixture": "Synthetic transcripts in a scratch HOME: one main-session transcript holding three streamed rows of one message whose last two rows carry one advisor_message entry (model-x, 10 input, 2 output), one message without iterations, and one <synthetic> row carrying an advisor_message entry (model-z); one subagent transcript holding the same row twice (model-y, 5 input, 1 output); one workflow journal.jsonl carrying an advisor_message entry (model-j).",
+      "expected": "main: 1 advisor iteration (model-x, 10/2) and 2 unique messages; subagents: 1 advisor iteration (model-y, 5/1); model-z and model-j absent. Without deduplication model-x and model-y would count 2 each; without the <synthetic> and journal rules model-z and model-j would appear.",
+      "observed": {
+        "main_session_transcripts": {
+          "advisor_by_model": {
+            "model-x": {
+              "advisor_iterations": 1,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "input_tokens": 10,
+              "output_tokens": 2
+            }
+          },
+          "advisor_iterations": 1,
+          "assistant_rows_without_message_id": 0,
+          "messages_with_advisor_iterations": 1,
+          "transcripts": 1,
+          "transcripts_with_advisor_iterations": 1,
+          "unique_assistant_messages": 2,
+          "unparsed_lines": 0
+        },
+        "subagent_transcripts": {
+          "advisor_by_model": {
+            "model-y": {
+              "advisor_iterations": 1,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "input_tokens": 5,
+              "output_tokens": 1
+            }
+          },
+          "advisor_iterations": 1,
+          "assistant_rows_without_message_id": 0,
+          "messages_with_advisor_iterations": 1,
+          "transcripts": 1,
+          "transcripts_with_advisor_iterations": 1,
+          "unique_assistant_messages": 1,
+          "unparsed_lines": 0
+        }
+      },
+      "passed": true
+    }
+  },
+  "provenance": {
+    "command": "python3 advisor_scan.py",
+    "script_sha256": "d55e30b94419c052649021789bcd63ac864e01b877b3a43946533faca3121260",
+    "script": "#!/usr/bin/env python3\n\"\"\"Count-only scan of this host's Claude Code transcripts for advisor iterations.\n\nPopulations: subagent transcripts (agent-*.jsonl below a \"subagents\" directory,\nAgent-tool and workflow children; workflow journal.jsonl files are not agent\ntranscripts and are skipped) and main-session transcripts (<project>/<session>.jsonl).\nWithin each transcript, assistant rows are deduplicated by message.id, keeping the\nrow with the largest total of the four usage counters and skipping <synthetic> rows,\nas transcriptUsage in examples/claude-native/workflows/child-usage.mjs does. Each\nkept message's usage.iterations[] entries of type advisor_message are summed by\nmodel. Prints counts only: no paths, identifiers or transcript content.\n\"\"\"\nimport json\nimport os\nimport sys\nfrom collections import Counter, defaultdict\nfrom datetime import datetime, timezone\n\nCOUNTERS = (\"input_tokens\", \"output_tokens\", \"cache_read_input_tokens\", \"cache_creation_input_tokens\")\nROOT = os.path.expanduser(\"~/.claude/projects\")\n\n\ndef total(usage):\n    usage = usage if isinstance(usage, dict) else {}\n    return sum(usage[k] for k in COUNTERS if isinstance(usage.get(k), int))\n\n\ndef populations():\n    subagents, main = [], []\n    for directory, _folders, names in os.walk(ROOT):\n        parts = os.path.relpath(directory, ROOT).split(os.sep)\n        for name in names:\n            if not name.endswith(\".jsonl\"):\n                continue\n            if \"subagents\" in parts:\n                if name.startswith(\"agent-\"):\n                    subagents.append(os.path.join(directory, name))\n            elif len(parts) == 1 and parts[0] != \".\":\n                main.append(os.path.join(directory, name))\n    return {\"subagent_transcripts\": sorted(subagents), \"main_session_transcripts\": sorted(main)}\n\n\ndef scan(files):\n    out = Counter(transcripts=len(files), unparsed_lines=0, assistant_rows_without_message_id=0)\n    by_model = defaultdict(Counter)\n    for path in files:\n        kept = {}\n        with open(path, encoding=\"utf-8\", errors=\"replace\") as handle:\n            for index, line in enumerate(handle):\n                try:\n                    row = json.loads(line)\n                except ValueError:\n                    out[\"unparsed_lines\"] += 1\n                    continue\n                if not isinstance(row, dict) or row.get(\"type\") != \"assistant\":\n                    continue\n                message = row.get(\"message\")\n                if not isinstance(message, dict) or message.get(\"model\") == \"<synthetic>\":\n                    continue\n                key = message.get(\"id\") or (\"missing\", index)\n                if not message.get(\"id\"):\n                    out[\"assistant_rows_without_message_id\"] += 1\n                if key not in kept or total(message.get(\"usage\")) >= total(kept[key].get(\"usage\")):\n                    kept[key] = message\n        out[\"unique_assistant_messages\"] += len(kept)\n        with_advisor = False\n        for message in kept.values():\n            usage = message.get(\"usage\") if isinstance(message.get(\"usage\"), dict) else {}\n            iterations = [item for item in (usage.get(\"iterations\") or [])\n                          if isinstance(item, dict) and item.get(\"type\") == \"advisor_message\"]\n            if not iterations:\n                continue\n            with_advisor = True\n            out[\"messages_with_advisor_iterations\"] += 1\n            for item in iterations:\n                counts = by_model[str(item.get(\"model\") or \"(unresolved)\")]\n                counts[\"advisor_iterations\"] += 1\n                for key in COUNTERS:\n                    if isinstance(item.get(key), int):\n                        counts[key] += item[key]\n        out[\"transcripts_with_advisor_iterations\"] += with_advisor\n    out[\"advisor_iterations\"] = sum(counts[\"advisor_iterations\"] for counts in by_model.values())\n    result = dict(sorted(out.items()))\n    result[\"advisor_by_model\"] = {model: dict(sorted(counts.items())) for model, counts in sorted(by_model.items())}\n    return result\n\n\ndef main():\n    scanned_at = datetime.now(timezone.utc).strftime(\"%Y-%m-%dT%H:%M:%SZ\")\n    report = {\"scanned_at_utc\": scanned_at,\n              \"populations\": {name: scan(files) for name, files in populations().items()}}\n    json.dump(report, sys.stdout, indent=2, sort_keys=True)\n    sys.stdout.write(\"\\n\")\n    return 0\n\n\nif __name__ == \"__main__\":\n    sys.exit(main())\n",
+    "references": [
+      "examples/claude-native/workflows/child-usage.mjs:610-638 at ed3cd96c2b299d9ec33c8a48848effff7e334dc9 (transcriptUsage: one kept row per message.id with the largest total of the COUNTERS at :44, <synthetic> rows skipped); the file contains no 'iterations' reference",
+      "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing (re-read 2026-09-28): 'Usage is reported in the usage.iterations[] array' and 'Top-level usage fields reflect executor tokens only.'",
+      "https://code.claude.com/docs/en/advisor (re-read 2026-09-28): 'Subagents inherit the configured advisor and apply the same pairing check against their own model.' and 'Advisor usage counts toward the session totals shown by /usage.'"
+    ]
+  }
+}
