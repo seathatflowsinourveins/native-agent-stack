@@ -462,6 +462,10 @@ bootstrap installs (`--platform macos-arm64` renders it from another machine). A
 whose running ai-memory is another install, such as the service the 2026-09-27
 [single-writer decision](../../docs/decisions/2026-09-27-mac-single-writer-staged.md)
 leaves running in stage 1, passes that binary with `--set AI_MEMORY_BIN=<path>`.
+The Codex user template's SocratiCode server follows the same rule since 2026-09-28: it runs
+`${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/`, which renders as this platform's
+`tools/socraticode-1.14.0` while the Linux pin is 1.15.0, and `--set SOCRATICODE_VERSION=<version>`
+names another install.
 Rendering the path is not a Mac qualification. The capture mode still needs
 storing: run the installed binary with the full Claude command from
 [the recipe's project-memory section](../../recipes/README.md#project-memory):

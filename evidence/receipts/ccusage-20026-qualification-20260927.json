@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "ccusage-20026-qualification-20260927",
   "kind": "native_cli_e2e",
-  "recorded_at_utc": "2026-09-28T02:24:59Z",
+  "recorded_at_utc": "2026-09-28T03:32:15Z",
   "component_ids": [
     "ccusage"
   ],
@@ -17,7 +17,8 @@
     "20.0.26's cost figures use upstream snapshot prices. On the same tokens the range's totalCost rose from 3423.92 (two models unpriced) to 9894.33; neither is a qualified contract price, and the recorded use commands keep --no-cost.",
     "The landscape winner pin in catalogs/landscape/foundation.json stays 20.0.24 (manifest-20260922), so a 20.0.26 host receipt needs scripts/host_receipts.py record --allow-unbound-version and stays unbound until a new verdict wave. No host receipt is recorded here.",
     "The launcher repoint is the coordinator's operation; this receipt records its time and a later read-back, not the operation's own output.",
-    "docs/token-efficiency-stack.json still names the 20.0.24 install command; its owner updates it separately. New hosts receive this pin only after the next release tag."
+    "The daily native-history comparison is a coordinator record from 2026-09-27T21:50Z whose argument vector was not retained (data.native_checks.native_histories.daily.retained_output); only its JSON outputs are. The weekly and monthly comparisons and the pricing probe record their commands.",
+    "New hosts receive this pin only after the next release tag."
   ],
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
@@ -76,7 +77,7 @@
     "source_review": {
       "cli_flags": "No flag was removed; `codex session` gained codex_session_options (rust/crates/ccusage-cli-parser/src/cli-commands.json).",
       "json_keys": "No key this repository reads was removed or renamed; the costUSD to totalCost rename is only in the new `codex session --id` detail output, which nothing here calls.",
-      "consumers": "scripts/native_token_ci.py ccusage_fixture is the only ccusage JSON parser here; tools/token-report/token_manifest.py only copies the manifest version."
+      "consumers": "scripts/native_token_ci.py ccusage_fixture is the only maintained ccusage JSON parser here; tools/token-report/token_manifest.py only copies the manifest version. The dated blueprint script blueprints/gap-resolution-20260922/ccusage-real-log-coverage/run.sh also reads session-report keys (sessionId, inputTokens, outputTokens, cacheReadTokens, cacheCreationTokens) and was not rechecked on 20.0.26."
     },
     "upstream_suite": {
       "evidence_class": "unchanged upstream test",
@@ -84,7 +85,7 @@
       "runs": [
         {
           "command": "cargo test --workspace (in rust/)",
-          "environment": "Rust 1.97.1 installed by rustup into a scratch RUSTUP_HOME and CARGO_HOME; CCUSAGE_PRICING_JSON_PATH set to model_prices_and_context_window.json from BerriAI/litellm@e73abe6c72785ad91d4927da26de3a5d1b54300b (the flake.lock pin; file sha256 fbb16319dc9b1e1ced94cd532ee7a8cb8edbdb22e311b12514872633067f7537), CCUSAGE_VERSION=20.0.26, TZ=UTC, mirroring nix/tests.nix",
+          "environment": "Rust 1.97.1 installed by rustup into a scratch RUSTUP_HOME and CARGO_HOME; CCUSAGE_PRICING_JSON_PATH set to model_prices_and_context_window.json from BerriAI/litellm@e73abe6c72785ad91d4927da26de3a5d1b54300b (the flake.lock pin; file sha256 fbb16319dc9b1e1ced94cd532ee7a8cb8edbdb22e311b12514872633067f7537), CCUSAGE_VERSION=20.0.26, TZ=UTC, and a scratch HOME seeded with .claude/projects and .config/claude/projects as nix/tests.nix does; the host's system zoneinfo stood in for that file's TZDIR (nixpkgs tzdata)",
           "exit_code": 0,
           "result": "58 test result lines: 944 passed, 0 failed, 3 ignored; the test profile compiled in 27.98s"
         },

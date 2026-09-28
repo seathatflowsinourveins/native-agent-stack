@@ -357,7 +357,8 @@ environment:
 - mcporter 0.14.1 `call --output text`: `codebase_health`, `codebase_search`,
   `codebase_status` and `codebase_graph_status` all exited 0.
 - The search output was byte-identical to the 1.14.0 launcher's for the same query.
-- None of the four stdout captures held a `notifications/message` line.
+- None of the four stdout captures held a `notifications/message` line. No capture shows that
+  check failing with such a line present, so the receipt records it as untested.
 - A headless Claude Code session (`--strict-mcp-config`) reported the server connected and
   completed `codebase_status`.
 - `codex exec` 0.157.1 first refused the call ("MCP tool call requires approval, but approval
@@ -379,11 +380,14 @@ after the tag. The bootstrap's `install_npm` passes no `--before`.
 The coordinator repointed the seven launcher configs and the `bin/socraticode` symlink
 together at 21:42:49Z, and restarted the mcporter daemon at 21:42:50Z. At the read-back:
 - `claude mcp get` and `codex mcp get` showed the 1.15.0 args.
-- mcporter `codebase_status` was green at 89,567 chunks, with no `notifications/message` line.
-- `codebase_graph_status` still read "Built by: v1.14.0 — STALE". 12 already-running 1.14.0
-  servers remained in live sessions, and the flip-flop continues until they reconnect.
+- mcporter `codebase_status` was green at 89,567 chunks.
+- `codebase_graph_status` still read "Built by: v1.14.0 — STALE": a 1.14.0 server had built the
+  stored graph at 21:35:09Z, before the cutover, and no 1.15.0 rebuild happened until
+  21:43:08Z. 12 already-running 1.14.0 servers remained in live sessions, and each can restart
+  the flip-flop until it reconnects.
 
-The time every session runs 1.15.0 is still open in the receipt.
+The time every session runs 1.15.0 is still open in the receipt. At 2026-09-28T02:03Z two
+1.14.0 processes remained, and at about 02:07Z the stored graph still read "Built by: v1.15.0".
 
 Step 1 named three launchers; the complete inventory on this host is:
 1. The Claude Code local-scope `socraticode` entry in `~/.claude.json` for this checkout.
@@ -401,8 +405,11 @@ Step 1 named three launchers; the complete inventory on this host is:
    run here; repoint it anyway so that no config names 1.14.0.
 8. Ephemeral scratch `CODEX_HOME`s under session scratchpads. The coordinator counted 16 at
    the cutover, for example envprobe, gpt6-lane, landscape-sweep and parity attempts,
-   skillprobe and trial-stage. They are not repointed. Each ends with its session, and a
-   server still running from one stays on 1.14.0 and keeps the flip-flop going until then.
+   skillprobe and trial-stage. They are not repointed, and they are live launchers rather than
+   history: the PR #446 review found a peer session's scratch Codex review home created at
+   22:37:21Z, 54 min after the cutover, from main's pre-merge template and naming
+   `tools/socraticode-1.14.0`. Such homes keep launching 1.14.0, and can restart the flip-flop,
+   until this change merges and they are re-rendered.
 
 Two mixed-session hazards apply during the handover, both from the source review above and
 neither reproduced:

@@ -238,7 +238,7 @@ python3 tools/adoption/apply_codex_lane.py --apply --omniroute-profile --expect-
 
 ## Native project MCP
 
-Merge [codex-mcp.toml.example](../examples/codex-mcp.toml.example) into the project's `.codex/config.toml` and [claude-mcp.json.example](../examples/claude-mcp.json.example) into `.mcp.json`. They contain only server entries; there are no model, account, approval or sandbox overrides. Replace paths with installed upstream executables. Serena's context is `codex` for Codex and `claude-code` for Claude. Start clients in the selected project so `--project-from-cwd` resolves correctly.
+Merge [codex-mcp.toml.example](../examples/codex-mcp.toml.example) into the project's `.codex/config.toml` and [claude-mcp.json.example](../examples/claude-mcp.json.example) into `.mcp.json`. They contain only server entries; there are no model, account, approval or sandbox overrides. Replace paths with installed upstream executables. Their SocratiCode path names the linux-x86_64 pin, `socraticode-1.15.0`; on macos-arm64 use `socraticode-1.14.0` until a Mac qualifies 1.15.0. Serena's context is `codex` for Codex and `claude-code` for Claude. Start clients in the selected project so `--project-from-cwd` resolves correctly.
 
 Native CLI registration is also supported. For a server that needs no environment map, these examples add a **separate** named server rather than replacing an existing one:
 
@@ -290,7 +290,7 @@ qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
 
 This is a roughly 2.3 GB pinned model download, not a metadata-only check. vLLM selects its native pooling/embedding implementation without `trust_remote_code`. Queries use `query: ` and documents `passage: `, including the trailing spaces. SocratiCode's supported `lmstudio` provider is the generic OpenAI-compatible local adapter pointing to vLLM here; LM Studio itself is not installed. These settings do not change Claude/Codex generation models.
 
-The [MCPorter example](../examples/mcporter.json.example) pins one project working directory, sets `imports: []`, and retains the SocratiCode connection so its upstream watcher stays alive. Edit only the corresponding absolute paths, then save a local copy at `$MCPORTER_CONFIG`. The MCPorter daemon is shared per OS user; do not restart it without checking for other users' connections/active calls.
+The [MCPorter example](../examples/mcporter.json.example) pins one project working directory, sets `imports: []`, and retains the SocratiCode connection so its upstream watcher stays alive. Edit only the corresponding absolute paths, then save a local copy at `$MCPORTER_CONFIG`; its SocratiCode path names the linux-x86_64 pin, `socraticode-1.15.0`, so on macos-arm64 it becomes `socraticode-1.14.0`. The MCPorter daemon is shared per OS user; do not restart it without checking for other users' connections/active calls.
 
 ```sh
 curl --fail --silent --show-error http://127.0.0.1:16333/healthz

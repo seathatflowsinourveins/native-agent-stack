@@ -1392,7 +1392,7 @@ class CodexIntegrationTests(unittest.TestCase):
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
-                   "EMBED_URL": "127.0.0.1:1"}
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0"}
         base = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
