@@ -12,7 +12,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY = ROOT / "blueprints/runtime-workers/skills"
 ADOPTION_MANIFEST = ROOT / "adoption/skills/manifest.json"
-ADOPTION_REF_PREFIX = "adoption/skills/manifest.json#/skills/"
+# A reuse_ref or adoption_ref names main's adoption manifest; the entry is matched there by skill name,
+# so main can reorder or insert skills without moving a reference.
+ADOPTION_REF = "adoption/skills/manifest.json"
 SCENARIOS = {
     "planning-and-specs", "tdd", "e2e-testing", "ab-testing-and-evaluation", "debugging",
     "code-review", "security", "github-issue-to-pr", "github-pr-review", "github-ci-fix",
@@ -26,24 +28,23 @@ GATE_KEYS = ("codex_enabled", "claude_listing")
 
 
 def adoption_contract_problems(runtime: dict, base: dict) -> list[str]:
-    """Each skill in main's adoption manifest is claimed exactly once: reused by `reuse_ref`
+    """Each skill in main's adoption manifest is claimed exactly once, by name: reused by `reuse_ref`
     (pins equal to main's, gates not restated) or excluded by `adoption_ref` (with a reason
     and an overturn condition). Returns one line per violation; empty means the contract holds."""
     problems = []
-    claims: dict[int, list[tuple[str, dict]]] = {}
+    main_names = [old["name"] for old in base["skills"]]
+    claims: dict[str, list[tuple[str, dict]]] = {}
     for kind, entries, key in (("reused", runtime["skills"], "reuse_ref"),
                                ("excluded", runtime["excluded"], "adoption_ref")):
         for entry in entries:
             if key not in entry:
                 continue
-            ref = str(entry[key])
-            index = ref[len(ADOPTION_REF_PREFIX):] if ref.startswith(ADOPTION_REF_PREFIX) else ""
-            if not index.isdigit() or int(index) >= len(base["skills"]):
-                problems.append(f"{entry.get('name')}: {key} {ref!r} names no main adoption skill")
+            if entry[key] != ADOPTION_REF or main_names.count(entry.get("name")) != 1:
+                problems.append(f"{entry.get('name')}: {key} {entry[key]!r} names no single main adoption skill")
                 continue
-            claims.setdefault(int(index), []).append((kind, entry))
-    for index, old in enumerate(base["skills"]):
-        entries = claims.get(index, [])
+            claims.setdefault(entry["name"], []).append((kind, entry))
+    for old in base["skills"]:
+        entries = claims.get(old["name"], [])
         if len(entries) != 1:
             kinds = ", ".join(kind for kind, _ in entries) or "neither reused nor excluded"
             problems.append(f"{old['name']}: {kinds}")
@@ -71,6 +72,7 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
     def test_schema_and_pins_are_well_formed(self):
         self.assertEqual(self.manifest["schema_version"], 1)
         self.assertEqual(self.manifest["kind"], "skills_trial_manifest")
+        self.assertEqual(self.manifest["scope"], "project")  # the installer refuses it without --project-dir
         self.assertEqual(self.manifest["cli"]["version"], "1.7.0")
         self.assertEqual(self.manifest["cli"]["ref"], "7407f3893ad4dceab546ac002c3ef806e4000c73")
         for skill in self.skills:
@@ -129,6 +131,12 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         self.assertEqual(adoption_contract_problems(self.manifest, base),
                          ["future-main-skill: neither reused nor excluded"])
 
+    def test_contract_survives_main_reordering_its_skills(self):
+        # References are matched by name, so a reorder on main moves no claim.
+        base = json.loads(ADOPTION_MANIFEST.read_text())
+        base["skills"].reverse()
+        self.assertEqual(adoption_contract_problems(self.manifest, base), [])
+
     def test_contract_rejects_double_claims_restated_gates_and_bare_exclusions(self):
         base = json.loads(ADOPTION_MANIFEST.read_text())
         runtime = copy.deepcopy(self.manifest)
@@ -155,10 +163,10 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
                          "main changed security-audit's gate: review the exclusion (a promotion overturns it)")
 
     def test_print_codex_config_disables_every_reused_skill_main_disables(self):
-        base = json.loads(ADOPTION_MANIFEST.read_text())["skills"]
+        base = {s["name"]: s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"]}
         expected = sorted(
             [s["name"] for s in self.skills
-             if "reuse_ref" in s and base[int(s["reuse_ref"].rsplit("/", 1)[1])].get("codex_enabled") is False]
+             if "reuse_ref" in s and base[s["name"]].get("codex_enabled") is False]
             + [s["name"] for s in self.skills if "reuse_ref" not in s and s.get("codex_enabled") is False])
         self.assertTrue(expected)  # non-vacuous: main keeps some reused skills off for Codex
         result = subprocess.run(
@@ -271,7 +279,7 @@ class FreshnessComparisonTests(unittest.TestCase):
     def test_fetch_failure_stays_unknown_not_current(self):
         def unavailable(endpoint):
             raise ValueError("unavailable")
-        manifest = {"cli": {"version": "1.7.0"}, "skills": [{
+        manifest = {"cli": {"version": "1.7.0", "ref": "7407f3893ad4dceab546ac002c3ef806e4000c73"}, "skills": [{
             "name": "sample", "source": "example/skills", "path": "skills/sample",
             "status": "trial", "ref": "a" * 40, "tree_sha": "1" * 40}]}
         report = freshness.build_report(manifest, api=unavailable)
@@ -279,6 +287,34 @@ class FreshnessComparisonTests(unittest.TestCase):
         self.assertEqual(report["skills"][0]["state"], "unfetched")
         self.assertIsNone(report["skills"][0]["manifest_tree_matches_pin"])
         self.assertFalse(report["native_check"]["executed"])
+
+    def test_cli_version_and_ref_come_from_the_manifest_pin(self):
+        # A pin bump in the manifest must not need a code edit here, and must not fail as a version mismatch.
+        ref, head = "c" * 40, "d" * 40
+        skill = {"name": "sample", "source": "example/skills", "path": "skills/sample",
+                 "status": "trial", "ref": "a" * 40, "tree_sha": "1" * 40}
+
+        def api(endpoint):
+            if endpoint == "repos/vercel-labs/skills/releases/latest":
+                return {"tag_name": "v9.9.9"}
+            if endpoint.endswith("/commits/HEAD"):
+                return {"sha": head}
+            return {"tree": [{"path": "skills/sample", "type": "tree", "sha": "1" * 40}], "truncated": False}
+
+        report = freshness.build_report({"cli": {"version": "9.9.9", "ref": ref}, "skills": [skill]}, api=api)
+        self.assertTrue(report["ok"], report["errors"])
+        self.assertEqual(report["cli"], {"pinned": "9.9.9", "latest": "v9.9.9", "drift": False})
+        self.assertEqual((report["native_check"]["pinned_version"], report["native_check"]["pinned_ref"]),
+                         ("9.9.9", ref))
+        self.assertIn(f"/blob/{ref}/", report["native_check"]["source"])
+        markdown = freshness.render_markdown(report)
+        self.assertIn("9.9.9", markdown)
+        self.assertNotIn("1.7.0", json.dumps(report) + markdown)
+        for broken in ({"version": "9.9.9"}, {"version": "", "ref": ref}, {"version": "9.9.9", "ref": "main"}):
+            with self.subTest(cli=broken):
+                report = freshness.build_report({"cli": broken, "skills": [skill]}, api=api)
+                self.assertFalse(report["ok"])
+                self.assertTrue(any("cli pin" in error for error in report["errors"]), report["errors"])
 
     def test_truncated_tree_is_rejected(self):
         def truncated(endpoint):

@@ -129,10 +129,62 @@ entry when it resolves a `reuse_ref`, and refuses an entry that restates a gate
 or whose pin drifted. The Claude listing mode is a Claude Code `skillOverrides`
 setting. The OpenHands SDK's skill loader at
 `fcc102a697874d54a357e36004e02c95040dbdc0` reads skill directories, SKILL.md
-frontmatter and its own installed-skill enable state, never Claude Code settings
-(see the README). Each new
+frontmatter and its own installed-skill enable state, never Claude Code settings.
+With `load_project_skills` on (it is `False` by default), it also loads
+`AGENTS.md`, `CLAUDE.md` and the other third-party instruction files from the work
+directory and its Git root as permanent context, and `AgentContext.disabled_skills`
+is its deny-list by name across every source (see the README; repair round 3
+added the last two points). Each new
 test failed before its fix; [validation](validation.json) retains the returned
 summaries. No independent model review was run for this round.
+
+## 2026-09-28 repair round 3: two independent reviews
+
+Two independent reviews of `8efdc35d` returned changes-needed with no blocker or
+high finding: a GPT-6 cross-family review (codex_call.sh, gpt-6-astra max) and a
+headless Claude session review. The coordinator relayed eleven findings; each
+received a failing test or a source check before its fix, and
+[validation](validation.json) records every finding's disposition under
+`repair_r3`.
+
+- **Project containment (GPT6-C1).** skills 1.7.0 recreates
+  `<project>/.agents/skills/<name>` with `rm` and `mkdir`. Through a symlinked
+  target directory or lock, or with `--project-dir` at `--home`, an add and its
+  rollback could replace and then delete a global skill. The installer now
+  refuses those layouts before any CLI or `gh` call.
+- **Pin identity before add (CL-D1).** A pinned-tree mismatch used to be found
+  only after `add` and rolled back. The native in-use guard keeps the canonical
+  folder and lock whenever a detected agent that is not a target reads that
+  folder (Codex whenever `$CODEX_HOME` or `~/.codex` exists). The comparison
+  therefore moved into the preflight, and a mismatch refuses the run with no add.
+- **Scope and pruning (CL-D3).** The manifest carries `"scope": "project"`, and
+  the installer refuses it without `--project-dir`. A pruned entry is never
+  installed in either mode.
+- **Reference key (CL-D6).** `reuse_ref` and `adoption_ref` now name the
+  adoption manifest and match by skill name, so main can reorder or insert skills.
+- **Freshness pin (CL-D7).** `runtime_skill_freshness.py` reads the expected CLI
+  version and source ref from the manifest's `cli` pin.
+- **Workflow analysis (GPT6-C5).** `tests.test_workflow_security_coverage` now
+  analyzes the freshness workflow with zizmor. It also shows that a floating tag,
+  a dropped `persist-credentials: false` or a dropped permissions block each
+  become a finding. zizmor 1.30.1's regular persona reports nothing for a
+  workflow-level `contents: write`, so the read-only grant is asserted on the text.
+- **Documentation (GPT6-C6a, GPT6-C6b, CL-D2, CL-D4).** The README now says four
+  things. The rendered skill list omits `<location>`. `disabled_skills` and the
+  source flags are OpenHands' controls. Third-party instruction files load from
+  the work directory and Git root, so the example worker projects moved outside
+  this repository. A rollback is retained whenever Codex or another
+  `.agents/skills` agent is detected and not targeted, and the retained copy
+  stays loadable.
+- **Review record (CL-D5).** The earlier `skills-review-r1.json` was never
+  published. It is now labelled as unpublished, and its seven findings remain
+  transcribed in [validation](validation.json).
+
+The branch was rebased onto main `c1581fa2` (#462) before the repairs, where only
+`manifests/evidence.json` conflicted and main's side was taken, and onto
+`c61e6657` (#461) after them without conflicts; main had moved past the
+`b9eb62d2` named in the repair brief. The coordinator attaches the raw review
+verdicts to the pull request as comments; they are not part of this tree.
 
 ## Source pins
 

@@ -35,6 +35,7 @@ pointed at a second temporary directory.
 """
 
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -47,8 +48,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools" / "adoption" / "install_skills.py"
 ADOPTION_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
+RUNTIME_MANIFEST = ROOT / "blueprints" / "runtime-workers" / "skills" / "manifest.json"
+# A reused entry names main's adoption manifest and is matched there by its skill name.
+ADOPTION_REF = "adoption/skills/manifest.json"
 REUSE_PIN_KEYS = ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256",
                   "skill_md_bytes", "description_chars", "upstream_disable_model_invocation")
+
+
+def load_installer_module():
+    """The installer as a module, for load_manifest against a synthetic adoption manifest root."""
+    spec = importlib.util.spec_from_file_location("install_skills_under_test", SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
 
 PINNED_VERSION = "1.7.0"
 INSTALL_HINT = "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0"
@@ -423,16 +436,34 @@ sys.exit(code)
         self.assertEqual(json.loads(result.stdout)["skills"],
                          {"project-skill": "installed", "second-skill": "installed", "third-skill": "installed"})
 
-    def test_project_tree_mismatch_rolls_back_only_in_project(self):
-        self.write_gh_tree(tree_sha("other"))
-        result = self.install()
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("rolled back", result.stderr)
-        self.assertEqual(calls_log(self.fake_bin)[-1], ["remove", "project-skill", "-y", "-a", "universal"])
-        self.assertFalse((self.project / ".agents/skills/project-skill").exists())
-        self.assertFalse((self.home / ".agents").exists())
+    def test_project_tree_mismatch_is_refused_before_any_add(self):
+        # A rollback after add cannot be relied on: on a host where Codex is detected, the native remove keeps
+        # the canonical folder and lock for it (skills@7407f389 remove.ts:293-310, agents.ts:224-232).
+        (self.home / ".codex").mkdir()
+        other_path = {"truncated": False, "tree": [{"path": "skills/other", "type": "tree", "sha": tree_sha("x")}]}
+        endpoint = f"repos/{self.skill['source']}/git/trees/{self.skill['ref']}?recursive=1"
+        for label, response in (("different tree", None), ("path absent at the pinned ref", other_path)):
+            with self.subTest(label):
+                if response is None:
+                    self.write_gh_tree(tree_sha("other"))
+                else:
+                    self.write_gh_responses({endpoint: (0, json.dumps(response))})
+                before = calls_log(self.fake_bin)
+                for mode in ((), ("--dry-run",), ("--check-only",)):
+                    result = self.install(*mode)
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertIn("pinned source tree differs from the manifest tree_sha", result.stderr)
+                    self.assertIn("project-skill", result.stderr)
+                self.assertEqual(calls_log(self.fake_bin)[len(before):], [["--version"]] * 3)  # no add, no remove
+                self.assertEqual(list(self.project.iterdir()), [])
+
+    def write_drifting_fake_bin(self, **extra):
+        """Installs different SKILL.md bytes than the pin, so verification after add fails and rolls back."""
+        self.fake_bin = write_fake_skills_bin(self.bin_dir, {"project-skill": {
+            "skill_md": "# Drifted bytes\n", "tree_sha": self.skill["tree_sha"], **extra}})
 
     def test_project_rollback_preserves_other_agents_and_source_directories(self):
+        self.write_drifting_fake_bin()
         for agent, targets in (("universal", ["universal"]),
                                ("codex", ["universal", "codex"]),
                                ("claude-code", ["universal", "claude-code"])):
@@ -443,7 +474,6 @@ sys.exit(code)
                     sentinel.parent.mkdir(parents=True, exist_ok=True)
                     sentinel.write_text("owned before this run\n")
                     sentinels.append(sentinel)
-                self.write_gh_tree(tree_sha("other"))
                 result = self.install("--agent", agent)
                 self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
                 self.assertIn("rolled back", result.stderr)
@@ -459,7 +489,7 @@ sys.exit(code)
 
     def test_project_rollback_reports_canonical_retained_for_another_agent(self):
         (self.home / ".codex").mkdir()
-        self.write_gh_tree(tree_sha("other"))
+        self.write_drifting_fake_bin()
         result = self.install("--agent", "claude-code", "--json")
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "error"})
@@ -473,12 +503,13 @@ sys.exit(code)
         self.assertEqual([call[0] for call in calls_log(self.fake_bin)], ["--version", "add", "remove"])
 
     def test_project_rollback_checks_each_artifact_independently(self):
-        self.write_gh_tree(tree_sha("other"))
+        projects = self.project
         for artifact in ("canonical", "lock", "claude-link"):
             with self.subTest(artifact=artifact):
-                self.fake_bin = write_fake_skills_bin(self.bin_dir, {"project-skill": {
-                    "skill_md": self.content, "tree_sha": self.skill["tree_sha"],
-                    "retain_after_remove": [artifact]}})
+                # A retained drifted copy is local content to the next run, so each case gets its own project.
+                self.project = projects / artifact
+                self.project.mkdir()
+                self.write_drifting_fake_bin(retain_after_remove=[artifact])
                 result = self.install("--agent", "claude-code", "--json")
                 self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
                 self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "error"})
@@ -581,6 +612,52 @@ sys.exit(code)
                 forced = self.install("--agent", "claude-code", "--force")
                 self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
                 self.assertEqual(local.resolve(), (self.project / ".agents/skills/project-skill").resolve())
+
+    def test_project_paths_the_cli_writes_must_stay_inside_the_project(self):
+        # skills@7407f389 installer.ts:388 recreates <cwd>/.agents/skills/<name> with rm and mkdir
+        # (installer.ts:193-200), and remove.ts:296 keeps it for another detected agent. Through a symlink,
+        # or with --project-dir at --home, a project install would recreate and then roll back a global
+        # skill and leave the global lock stale. Each case is refused before any skills or gh call.
+        global_skills = self.home / ".agents" / "skills"
+        (global_skills / "project-skill").mkdir(parents=True)
+        (global_skills / "project-skill" / "SKILL.md").write_text(self.content)  # matching bytes
+        global_lock = self.home / ".agents" / ".skill-lock.json"
+        global_lock.write_text(json.dumps({"lockfileVersion": 3, "skills": {}}))
+        (self.home / ".claude" / "skills" / "project-skill").mkdir(parents=True)
+        projects, gh_log = self.project, self.bin_dir / "gh_calls.log"
+        cases = (
+            ("universal", ".agents/skills", global_skills),
+            ("codex", ".agents", self.home / ".agents"),
+            ("universal", ".claude/skills", self.home / ".claude" / "skills"),
+            ("universal", "skills-lock.json", global_lock),
+            ("universal", ".agents/skills", "inside"),  # a symlinked target directory, even one inside
+            ("universal", ".agents/skills/project-skill", global_skills / "project-skill"),
+            ("claude-code", ".claude/skills/project-skill", self.home / ".claude" / "skills" / "project-skill"),
+            ("universal", None, None),  # --project-dir is --home itself
+        )
+        for index, (agent, relative, target) in enumerate(cases):
+            with self.subTest(agent=agent, path=relative, target=str(target)):
+                if relative is None:
+                    self.project = self.home
+                else:
+                    self.project = projects / f"case-{index}"
+                    link = self.project / relative
+                    link.parent.mkdir(parents=True, exist_ok=True)
+                    if target == "inside":
+                        target = self.project / "elsewhere"
+                        target.mkdir()
+                    link.symlink_to(target)
+                calls_before = calls_log(self.fake_bin)
+                gh_before = gh_log.read_text() if gh_log.exists() else ""
+                for mode in ((), ("--dry-run",), ("--check-only",)):
+                    result = self.install("--agent", agent, *mode)
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertIn("project containment", result.stderr)
+                self.assertEqual(calls_log(self.fake_bin), calls_before)  # not even --version ran
+                self.assertEqual(gh_log.read_text() if gh_log.exists() else "", gh_before)
+                self.assertEqual((global_skills / "project-skill" / "SKILL.md").read_text(), self.content)
+                self.assertEqual(json.loads(global_lock.read_text()), {"lockfileVersion": 3, "skills": {}})
+                self.assertFalse((self.home / "skills-lock.json").exists())
 
     def test_adding_claude_target_to_existing_universal_install_creates_its_link(self):
         first = self.install()
@@ -820,6 +897,55 @@ class XdgStateHomeLockPathTests(InstallSkillsTestCase):
         self.assertEqual([c[0] for c in calls_log(fake_bin)], ["--version", "add", "--version"])
 
 
+class ManifestScopeAndPruneTests(InstallSkillsTestCase):
+    """A manifest marked "scope": "project" never runs without --project-dir, and a pruned
+    entry is never installed, in either mode."""
+
+    def test_project_scoped_manifest_refuses_to_run_without_project_dir(self):
+        skill = make_skill("scoped-skill", "# scoped\n", tree_sha("scoped"))
+        fake_bin = write_fake_skills_bin(self.bin_dir, {"scoped-skill": {"skill_md": "# scoped\n",
+                                                                         "tree_sha": tree_sha("scoped")}})
+        data = dict(make_manifest([skill]), scope="project")
+        scoped = self.tmp_path / "scoped.json"
+        scoped.write_text(json.dumps(data))
+        for manifest in (scoped, RUNTIME_MANIFEST):
+            for mode in ((), ("--dry-run",), ("--check-only",)):
+                with self.subTest(manifest=manifest.name, mode=mode):
+                    result = self.run_install(manifest, *mode, fake_bin=fake_bin)
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertIn("scoped to projects", result.stderr)
+                    self.assertIn("--project-dir", result.stderr)
+        self.assertEqual(calls_log(fake_bin), [])  # refused before even the version check
+        self.assertFalse((self.home / ".agents").exists())
+        printed = self.run_install(scoped, "--print-codex-config")  # print-only; installs nothing
+        self.assertEqual(printed.returncode, 0, printed.stdout + printed.stderr)
+        scoped.write_text(json.dumps(dict(data, scope="planet")))
+        for mode in ((), ("--print-codex-config",)):
+            with self.subTest(scope="planet", mode=mode):
+                unknown = self.run_install(scoped, *mode, fake_bin=fake_bin)
+                self.assertEqual(unknown.returncode, 1, unknown.stdout + unknown.stderr)
+                self.assertIn("unknown manifest scope", unknown.stderr)
+        self.assertEqual(calls_log(fake_bin), [])
+        self.assertFalse((self.home / ".agents").exists())
+
+    def test_pruned_entries_are_never_installed_in_global_mode_either(self):
+        kept = make_skill("kept-skill", "# kept\n", tree_sha("kept"))
+        pruned = dict(make_skill("pruned-skill", "# pruned\n", tree_sha("pruned")), status="pruned")
+        fake_bin = write_fake_skills_bin(self.bin_dir, {
+            "kept-skill": {"skill_md": "# kept\n", "tree_sha": tree_sha("kept")},
+            "pruned-skill": {"skill_md": "# pruned\n", "tree_sha": tree_sha("pruned")}})
+        manifest = self.write_manifest([kept, pruned])
+        result = self.run_install(manifest, "--json", fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"kept-skill": "installed"})
+        self.assertEqual([call[3] for call in calls_log(fake_bin) if call[0] == "add"], ["kept-skill"])
+        self.assertFalse((self.home / ".agents" / "skills" / "pruned-skill").exists())
+        only = self.run_install(manifest, "--only", "pruned-skill", fake_bin=fake_bin)
+        self.assertEqual(only.returncode, 1, only.stdout + only.stderr)
+        self.assertIn("pruned --only name(s)", only.stderr)
+        self.assertNotIn("unknown", only.stderr)
+
+
 class PrintCodexConfigTests(InstallSkillsTestCase):
     def test_prints_only_codex_disabled_skills_and_never_touches_the_binary(self):
         on_skill = make_skill("codex-on", "# on\n", tree_sha("on"), codex_enabled=True)
@@ -848,15 +974,37 @@ class ReuseRefGateTests(InstallSkillsTestCase):
     """A `reuse_ref` entry takes main's per-skill gates when the manifest is read.
 
     The references resolve against this checkout's adoption/skills/manifest.json, so the
-    fixtures pick real entries by their current gate instead of hard-coding a name.
+    fixtures pick real entries by their current gate instead of hard-coding a name. An entry
+    is matched there by its skill name, not by an array index.
     """
 
     def reuse(self, predicate) -> dict:
-        skills = json.loads(ADOPTION_MANIFEST.read_text())["skills"]
-        index = next(i for i, s in enumerate(skills) if predicate(s))
-        entry = {key: skills[index][key] for key in REUSE_PIN_KEYS}
-        entry.update(status="trial", reuse_ref=f"adoption/skills/manifest.json#/skills/{index}")
+        old = next(s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"] if predicate(s))
+        entry = {key: old[key] for key in REUSE_PIN_KEYS}
+        entry.update(status="trial", reuse_ref=ADOPTION_REF)
         return entry
+
+    def test_runtime_manifest_still_loads_after_main_reorders_or_inserts_entries(self):
+        base = json.loads(ADOPTION_MANIFEST.read_text())
+        gates = {s["name"]: (s.get("codex_enabled"), s.get("claude_listing")) for s in base["skills"]}
+        base["skills"].reverse()
+        base["skills"].insert(0, dict(base["skills"][0], name="inserted-main-skill"))
+        root = self.tmp_path / "reordered-root"
+        (root / "adoption" / "skills").mkdir(parents=True)
+        (root / "adoption" / "skills" / "manifest.json").write_text(json.dumps(base))
+        manifest = load_installer_module().load_manifest(RUNTIME_MANIFEST, root=root)
+        reused = [s for s in manifest["skills"] if "reuse_ref" in s]
+        self.assertTrue(reused)
+        for skill in reused:
+            self.assertEqual((skill.get("codex_enabled"), skill.get("claude_listing")), gates[skill["name"]],
+                             skill["name"])
+
+    def test_reuse_ref_without_a_same_named_main_skill_is_refused(self):
+        entry = dict(self.reuse(lambda s: True), name="not-in-main")
+        result = self.run_install(self.write_manifest([entry]), "--print-codex-config")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("not-in-main", result.stderr)
+        self.assertIn("names no single", result.stderr)
 
     def test_reused_skill_that_main_disables_for_codex_comes_out_disabled(self):
         off = self.reuse(lambda s: s.get("codex_enabled") is False)

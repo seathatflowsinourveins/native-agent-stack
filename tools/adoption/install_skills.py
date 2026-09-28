@@ -44,16 +44,33 @@ without -g, targeting --agent (default universal). The project lock is
 skills-lock.json. Its computedHash is NOT a Git tree SHA: project verification
 binds source/ref/skillPath to the manifest, resolves that pinned tree through
 `gh api` before any add, and checks SKILL.md bytes. Every selected source/ref is
-fetched first; unavailable verification is reported as unverified, not mismatch.
+fetched first; unavailable verification is reported as unverified, not mismatch,
+and a selected skill whose pinned tree differs from its manifest tree_sha refuses
+the whole run before any add. A rollback cannot be relied on to undo such an add:
+the native remove keeps the canonical folder and its lock entry while a detected
+agent that is not a target reads that folder, as Codex does whenever $CODEX_HOME
+(when unset, ~/.codex) or /etc/codex exists (src/remove.ts:293-331,
+src/agents.ts:10,224-232, src/installer.ts:151-158).
+Before any CLI or gh call, project containment is checked: .agents/skills,
+.claude/skills and skills-lock.json, which the CLI recreates or writes
+(src/installer.ts:128-131,193-200,388; src/agents.ts:158; src/local-lock.ts:65-66),
+must not pass through a symlink; each selected skill's canonical and Claude paths
+must resolve inside --project-dir; and --project-dir must not be --home.
 As with the global verifier, this attests
 the source tree, not all installed support files. No lock or skill is hand-written.
 Reference: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73
 src/local-lock.ts:15-37,65-66; src/add.ts:2086-2160; src/agents.ts:815-820.
 
-A manifest entry with `reuse_ref` (adoption/skills/manifest.json#/skills/<index>)
-is resolved when the manifest is read: its pin must equal the referenced adoption
-entry, and it takes that entry's codex_enabled and claude_listing. An entry that
-restates either gate, or whose pin drifted, is refused before any skill is touched.
+A manifest marked "scope": "project" (the runtime-worker manifest) is refused
+without --project-dir; --print-codex-config, which only prints, still runs. A
+skill whose status is pruned is never installed, in either mode.
+
+A manifest entry with `reuse_ref` ("adoption/skills/manifest.json") is resolved
+when the manifest is read, against the one adoption skill of the same name: its pin
+must equal that entry, and it takes that entry's codex_enabled and claude_listing.
+An entry that restates either gate, whose pin drifted, or whose name the adoption
+manifest does not carry exactly once is refused before any skill is touched. The
+name, not an array index, is the key, so main may reorder or insert skills.
 With --only, a name that the manifest marks pruned is reported as pruned, not unknown.
 """
 
@@ -73,13 +90,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = ROOT / "adoption" / "skills" / "manifest.json"
 
-# A manifest entry may reuse an adoption skill by a repository-relative reference instead of
-# copying it (blueprints/runtime-workers/skills/manifest.json). load_manifest checks the pin
-# against the referenced entry and copies main's per-skill gates onto it as read, so a reused
-# skill is never enabled where main disables it. An entry that restates a gate is refused.
-REUSE_REF_PREFIX = "adoption/skills/manifest.json#/skills/"
+# A manifest entry may reuse an adoption skill by naming that manifest instead of copying the
+# entry (blueprints/runtime-workers/skills/manifest.json); the same-named adoption skill is the
+# referenced one. load_manifest checks the pin against it and copies main's per-skill gates onto
+# the entry as read, so a reused skill is never enabled where main disables it. An entry that
+# restates a gate is refused.
+REUSE_REF = "adoption/skills/manifest.json"
 REUSE_PIN_KEYS = ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256")
 REUSE_GATE_KEYS = ("codex_enabled", "claude_listing")
+
+# A manifest with "scope": "project" is only installed into a project (--project-dir).
+PROJECT_SCOPE = "project"
+
+# Paths the pinned CLI recreates or writes in a project (skills@7407f389): the canonical
+# .agents/skills (src/installer.ts:128-131, rm and mkdir at 193-200 and 388), the Claude alias
+# directory .claude/skills (src/agents.ts:158) and the project lock (src/local-lock.ts:65-66).
+PROJECT_WRITE_PATHS = (".agents/skills", ".claude/skills", "skills-lock.json")
 
 VERSION_CHECK_TIMEOUT = 30
 ADD_TIMEOUT = 120
@@ -104,15 +130,15 @@ class InstallError(ValueError):
 def load_manifest(path: Path, root: Path = ROOT) -> dict:
     """Read a manifest and resolve each `reuse_ref` entry against root's adoption manifest.
 
-    The reused entry must carry the referenced pin unchanged; it then takes the adoption
-    entry's current codex_enabled/claude_listing, so the two manifests cannot drift."""
+    The reused entry is matched there by name and must carry that pin unchanged; it then takes
+    the adoption entry's current codex_enabled/claude_listing, so the two manifests cannot drift."""
     with open(path, "r", encoding="utf-8") as handle:
         manifest = json.load(handle)
     skills = manifest.get("skills") if isinstance(manifest, dict) else None
     reused = [s for s in skills if isinstance(s, dict) and "reuse_ref" in s] if isinstance(skills, list) else []
     if not reused:
         return manifest
-    adoption_path = root / REUSE_REF_PREFIX.split("#", 1)[0]
+    adoption_path = root / REUSE_REF
     try:
         with open(adoption_path, "r", encoding="utf-8") as handle:
             base = json.load(handle)["skills"]
@@ -121,14 +147,14 @@ def load_manifest(path: Path, root: Path = ROOT) -> dict:
     except (OSError, ValueError, KeyError, TypeError) as error:
         raise InstallError(f"cannot resolve reuse_ref entries against {adoption_path}: {error}") from None
     for skill in reused:
-        ref = str(skill["reuse_ref"])
-        index = ref[len(REUSE_REF_PREFIX):] if ref.startswith(REUSE_REF_PREFIX) else ""
-        if not index.isdigit() or int(index) >= len(base) or not isinstance(base[int(index)], dict):
-            raise InstallError(f"{skill.get('name')}: reuse_ref {ref!r} names no adoption skill")
-        old = base[int(index)]
+        ref = skill["reuse_ref"]
+        matches = [old for old in base if isinstance(old, dict) and old.get("name") == skill.get("name")]
+        if ref != REUSE_REF or len(matches) != 1:
+            raise InstallError(f"{skill.get('name')}: reuse_ref {ref!r} names no single {REUSE_REF} skill of that name")
+        old = matches[0]
         drifted = [key for key in REUSE_PIN_KEYS if skill.get(key) != old.get(key)]
         if drifted:
-            raise InstallError(f"{skill.get('name')}: reuse_ref {ref} differs from the adoption pin in {drifted}")
+            raise InstallError(f"{skill.get('name')}: reuse_ref differs from the adoption pin in {drifted}")
         restated = [key for key in REUSE_GATE_KEYS if key in skill]
         if restated:
             raise InstallError(f"{skill.get('name')}: reuse_ref entry restates main's {', '.join(restated)}")
@@ -144,6 +170,30 @@ def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) 
     """The upstream CLI's one canonical copy; Codex reads this directly and
     claude-code gets a relative symlink onto it (../../.agents/skills/<name>)."""
     return (project_dir or home) / ".agents" / "skills" / name
+
+
+def project_containment_problem(project_dir: Path, home: Path, names: list[str]) -> str | None:
+    """Why a project install could write outside the (resolved) project_dir, else None.
+
+    skills@7407f389 recreates <project>/.agents/skills/<name> with rm and mkdir
+    (src/installer.ts:193-200,388) and keeps it for another detected agent on remove
+    (src/remove.ts:293-331). Through a symlink, or with --project-dir at --home, an add and its
+    rollback would replace and then delete a global skill. No existing component of a path the
+    CLI writes may be a symlink. A selected skill's own Claude entry may be the CLI's relative
+    link onto the canonical copy, so for those paths only the resolved location is checked."""
+    if home.resolve() == project_dir:
+        return "--project-dir is --home, where the global skills and their lock live"
+    for relative in PROJECT_WRITE_PATHS:
+        path = project_dir
+        for part in Path(relative).parts:
+            path = path / part
+            if path.is_symlink():
+                return f"{relative} passes through the symlink {path.relative_to(project_dir)}"
+    for name in names:
+        for relative in (Path(".agents/skills") / name, Path(".claude/skills") / name):
+            if not (project_dir / relative).resolve().is_relative_to(project_dir):
+                return f"{relative} resolves outside --project-dir"
+    return None
 
 
 def lock_file_path(home: Path, project_dir: Path | None = None) -> Path:
@@ -436,14 +486,22 @@ def main(argv: list[str] | None = None) -> int:
     except (KeyError, TypeError) as error:
         print(f"install-skills failed: manifest missing 'skills' ({error})", file=sys.stderr)
         return 1
+    scope = manifest.get("scope")
+    if scope not in (None, PROJECT_SCOPE):
+        print(f"install-skills failed: unknown manifest scope {scope!r}", file=sys.stderr)
+        return 1
 
     if args.print_codex_config:
         print_codex_config(all_skills)
         return 0
 
+    if scope == PROJECT_SCOPE and project_dir is None:
+        print(f'install-skills failed: this manifest is scoped to projects ("scope": "{PROJECT_SCOPE}"); '
+              f"pass --project-dir", file=sys.stderr)
+        return 1
+
     home = Path(args.home)
-    skills = all_skills if project_dir is None else [
-        s for s in all_skills if not isinstance(s, dict) or s.get("status") != "pruned"]
+    skills = [s for s in all_skills if not isinstance(s, dict) or s.get("status") != "pruned"]
     if args.only:
         wanted = list(dict.fromkeys(args.only))
         by_name = {s["name"]: s for s in skills if isinstance(s, dict) and "name" in s}
@@ -455,8 +513,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         pruned = [name for name in wanted if name not in by_name]
         if pruned:
-            print(f"install-skills failed: pruned --only name(s), not installed in project mode: {pruned}",
-                  file=sys.stderr)
+            print(f"install-skills failed: pruned --only name(s), never installed: {pruned}", file=sys.stderr)
             return 1
         skills = [by_name[name] for name in wanted]
 
@@ -477,6 +534,12 @@ def main(argv: list[str] | None = None) -> int:
             if not valid:
                 print("install-skills failed: malformed pinned project skill", file=sys.stderr)
                 return 1
+        # After the schema check, so each name joined below is a single bounded path component.
+        problem = project_containment_problem(project_dir, home, [skill["name"] for skill in skills])
+        if problem:
+            print(f"install-skills failed: project containment: {problem}; refusing before any add",
+                  file=sys.stderr)
+            return 1
 
     try:
         verify_skills_bin(args.skills_bin, manifest["cli"], home)
@@ -497,6 +560,15 @@ def main(argv: list[str] | None = None) -> int:
                 pinned_source_trees(source, ref)
         except InstallError as error:
             print(f"install-skills failed: {error}", file=sys.stderr)
+            return 1
+        # Compare every selected pin before any add. A rollback after add cannot be relied on:
+        # src/remove.ts:293-331 keeps the canonical folder and lock for a detected agent that reads
+        # it (Codex from ~/.codex, src/agents.ts:224-232; universal agents, src/installer.ts:151-158).
+        mismatched = [skill["name"] for skill in skills
+                      if pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"]) != skill["tree_sha"]]
+        if mismatched:
+            print(f"install-skills failed: pinned source tree differs from the manifest tree_sha before any add: "
+                  f"{mismatched}", file=sys.stderr)
             return 1
 
     results: dict[str, str] = {}

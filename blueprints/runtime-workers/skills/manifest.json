@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
+  "scope": "project",
   "checked_at": "2026-09-27",
   "decision_record": "blueprints/runtime-workers/skills/research.md",
   "cli": {
@@ -100,7 +101,7 @@
       ],
       "status": "trial",
       "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: vercel-labs/agent-browser@d01253d9db28d75080e36da3c1c31ef89454731e skills/agent-browser/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/24"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "agent-canvas-environment",
@@ -233,7 +234,7 @@
       ],
       "status": "trial",
       "merit_note": "Checks attacker-controlled workflow inputs reaching AI agents and their credentials. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/agentic-actions-auditor/skills/agentic-actions-auditor/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/17"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "azure-devops",
@@ -474,7 +475,7 @@
       ],
       "status": "trial",
       "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/codebase-design/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/7"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "codeql",
@@ -496,7 +497,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/static-analysis/skills/codeql/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/15"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "datadog",
@@ -563,7 +564,7 @@
       ],
       "status": "trial",
       "merit_note": "Uses hypothesis-driven diagnosis and root-cause evidence before proposing fixes. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/diagnosing-bugs/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/5"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "diagnosing-superpowers",
@@ -788,7 +789,7 @@
       ],
       "status": "trial",
       "merit_note": "Uses the upstream skills directory and CLI to discover installable sources before selecting a capability. Source: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 skills/find-skills/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/25"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "finishing-a-development-branch",
@@ -832,7 +833,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/fp-check/skills/fp-check/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/21"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "frontend-design",
@@ -854,7 +855,7 @@
       ],
       "status": "trial",
       "merit_note": "Adds intentional UI design or reusable component-interface criteria to coding work. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/frontend-design/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/23"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "gh-address-comments",
@@ -877,7 +878,7 @@
       ],
       "status": "trial",
       "merit_note": "Resolves concrete review feedback using GitHub CLI and authenticated repository state. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/gh-address-comments/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/13"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "gh-fix-ci",
@@ -899,7 +900,7 @@
       ],
       "status": "trial",
       "merit_note": "Diagnoses failing checks or manages stalled CI work; explicit authorization still controls external mutations. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/gh-fix-ci/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/1"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "github",
@@ -1202,7 +1203,7 @@
       ],
       "status": "trial",
       "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/productivity/grill-me/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/9"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "handoff",
@@ -1272,7 +1273,7 @@
       ],
       "status": "trial",
       "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/improve-codebase-architecture/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/10"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "incident-retrospective",
@@ -1340,7 +1341,7 @@
       ],
       "status": "trial",
       "merit_note": "Refines retrieval in bounded passes so workers obtain the context needed for an implementation or research question. Source: affaan-m/ECC@2b6e839771e53096d8451a213d40dc64ec8acac0 skills/iterative-retrieval/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/3"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "jira-issue-to-pr",
@@ -1562,7 +1563,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/mcp-builder/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/22"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "migration-mapping",
@@ -1651,7 +1652,7 @@
       ],
       "status": "trial",
       "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/modern-python/skills/modern-python/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/19"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "news-digest",
@@ -1962,7 +1963,7 @@
       ],
       "status": "trial",
       "merit_note": "Covers whole parser and numeric input domains with shrinking rather than selected examples alone. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/property-based-testing/skills/property-based-testing/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/18"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "qa-changes",
@@ -2120,7 +2121,7 @@
       ],
       "status": "trial",
       "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/resolving-merge-conflicts/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/8"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "sarif-parsing",
@@ -2142,7 +2143,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/static-analysis/skills/sarif-parsing/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/20"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "score-quality",
@@ -2211,7 +2212,7 @@
       ],
       "status": "trial",
       "merit_note": "Compares existing repositories, packages and skills before writing integration code, directly supporting coding and orchestration work. Source: affaan-m/ECC@2b6e839771e53096d8451a213d40dc64ec8acac0 skills/search-first/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/4"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "security",
@@ -2256,7 +2257,7 @@
       ],
       "status": "trial",
       "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/security-best-practices/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/2"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "security-threat-model",
@@ -2279,7 +2280,7 @@
       ],
       "status": "trial",
       "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/security-threat-model/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/12"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "semgrep",
@@ -2301,7 +2302,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/static-analysis/skills/semgrep/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/14"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "setup-agents-md",
@@ -2519,7 +2520,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/16"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "swift-linux",
@@ -2587,7 +2588,7 @@
       ],
       "status": "trial",
       "merit_note": "Defines a red/green loop and behavior-level tests; callers can test deterministic extraction contracts. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/tdd/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/6"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "technical-writing",
@@ -2765,7 +2766,7 @@
       ],
       "status": "trial",
       "merit_note": "Provides typed judgments for routing and verification; trial requires task-specific quality evaluation. Source: typesafe-ai/skills@65a39f393687675ce170e6094757de20370365b9 skills/typesafe-ai/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/0"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "upstream-fork-sync",
@@ -2873,7 +2874,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/variant-analysis/skills/variant-analysis/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/26"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "vercel",
@@ -2984,7 +2985,7 @@
       ],
       "status": "trial",
       "merit_note": "Requires returned verification evidence before completion claims, including caller integration checks. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/verification-before-completion/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/11"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "web-design-guidelines",
@@ -3050,7 +3051,7 @@
       ],
       "status": "trial",
       "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/productivity/writing-for-agents/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json#/skills/27"
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "writing-plans",
@@ -4083,7 +4084,7 @@
     {
       "name": "security-audit",
       "source": "cloudflare/security-audit-skill",
-      "adoption_ref": "adoption/skills/manifest.json#/skills/28",
+      "adoption_ref": "adoption/skills/manifest.json",
       "reason": "Main gates this adoption skill: #448 (8315274f) keeps Codex disabled (codex_enabled false) and the Claude listing name-only pending the M5c bake-off against /security-review. Reusing it here would install it for runtime workers without that gate.",
       "overturn": "Main promotes security-audit after M5c, that is adoption/skills/manifest.json sets codex_enabled true or claude_listing on: replace this exclusion with a reuse_ref entry and assign its scenarios and roles. Any other change to main's gate on it also fails the exclusion test and needs a new review."
     }

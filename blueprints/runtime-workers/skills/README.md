@@ -59,13 +59,15 @@ catalog ([invoke_skill.py:109](https://github.com/OpenHands/software-agent-sdk/b
 
 Every skill in `adoption/skills/manifest.json` is either reused by `reuse_ref` or
 listed in `excluded` with an `adoption_ref`, a `reason` and an `overturn` condition.
-`tests.test_runtime_worker_skills` fails when main adds a skill that is in neither
-set, and when a reused entry's pin differs from main's.
+Both references are the value `"adoption/skills/manifest.json"` and match the
+adoption skill of the same name, so main can reorder or insert skills without
+moving a reference. `tests.test_runtime_worker_skills` fails when main adds a skill
+that is in neither set, and when a reused entry's pin differs from main's.
 
 - **Codex.** A reused entry carries no `codex_enabled` or `claude_listing` of its
   own. `install_skills.py` resolves each `reuse_ref` when it reads the manifest,
-  refuses an entry whose pin drifted or that restates a gate, and takes both gates
-  from the adoption entry. `--print-codex-config` on this manifest therefore prints
+  refuses an entry whose pin drifted, that restates a gate or whose name main does
+  not carry exactly once, and takes both gates from the adoption entry. `--print-codex-config` on this manifest therefore prints
   an `enabled = false` table for every reused skill main keeps off for Codex
   (16 of the 28 on 2026-09-28).
 - **Claude listing.** `claude_listing` (`on`, `name-only`, `user-invocable-only`,
@@ -80,16 +82,44 @@ set, and when a reused entry's pin differs from main's.
   and user `~/.agents/skills`, the OpenHands persistence directories and
   OpenHands' own enabled installed skills
   ([skill.py:936-973](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L936-L973)).
+  With project loading on, it also reads the third-party instruction files
+  `.cursorrules`, `AGENTS.md`, `agent.md`, `CLAUDE.md` and `GEMINI.md`
+  ([skill.py:346-352](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L346-L352))
+  from the work directory and from the Git repository root, the nearest ancestor
+  holding `.git`
+  ([skill.py:981-992](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L981-L992),
+  [skill.py:1084-1106](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1106)),
+  and nested copies below the work directory as path-scoped rules
+  ([skill.py:1108-1121](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1108-L1121)).
+  Each such file becomes a skill without a trigger, which is permanent context
+  rather than an on-demand listing
+  ([skill.py:635-651](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L635-L651),
+  [skill.py:874](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L874)).
   It also reads each skill's SKILL.md frontmatter, including
   `disable-model-invocation`
   ([skill.py:278-284](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L278-L284),
-  [skill.py:528-538](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L528-L538)),
-  and lists SKILL.md skills with their name, description and location
-  ([skill.py:183-186](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L183-L186)).
+  [skill.py:528-538](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L528-L538)).
+  Its rendered `<available_skills>` block gives each SKILL.md skill's name and
+  description only: `<location>` is omitted on purpose, so that `invoke_skill`
+  stays the one invocation path
+  ([skill.py:1524-1530](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1524-L1530)),
+  although the class docstring still lists a location
+  ([skill.py:184](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L184)).
   `skill.py` never reads Claude Code settings or a `skillOverrides` key, so main's
-  `claude_listing` has no effect there; OpenHands' own controls are that
-  frontmatter flag and its installed-skill enable state. `skill.py` is the same
-  blob at `fcc102a6` and at the `da28c773` pin cited elsewhere in this README.
+  `claude_listing` has no effect there. OpenHands' own controls are that
+  frontmatter flag; `AgentContext.disabled_skills`, a deny-list applied by name
+  after every source has loaded
+  ([agent_context.py:171-182](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L171-L182),
+  [agent_context.py:291-297](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L291-L297));
+  and the source flags `load_user_skills`, `load_public_skills` and
+  `load_project_skills`, each `False` by default
+  ([agent_context.py:93-109](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L93-L109),
+  [agent_context.py:127-142](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L127-L142)).
+  The installed-skill enable state covers only skills under
+  `~/.openhands/skills/installed/`; it does not disable a same-named copy found in
+  a project directory, and a project skill overrides a same-named explicit skill.
+  `skill.py` is the same blob at `fcc102a6` and at the `da28c773` pin cited
+  elsewhere in this README; `agent_context.py` is cited at `fcc102a6` only.
   A Claude Code worker must apply main's `claude_listing` in its own settings;
   this installer writes no client settings.
 - **Excluded.** `security-audit` (#448, `8315274f`) stays out while main keeps it
@@ -100,14 +130,30 @@ set, and when a reused entry's pin differs from main's.
 
 ## Lifecycle through the existing installer
 
-Use the already provisioned **skills 1.7.0** executable and `gh`. The wrapper
-verifies its version; project checks first fetch every selected `(source, ref)`
+Use the already provisioned **skills 1.7.0** executable and `gh`. The manifest
+carries `"scope": "project"`: the wrapper refuses it without `--project-dir`,
+before any CLI call, so a global run cannot place the whole trial in
+`~/.agents/skills`, which Codex and OpenHands user loading read
+(`--print-codex-config`, which only prints, still runs). The wrapper verifies the
+CLI version; project checks first fetch every selected `(source, ref)`
 through `gh api`, before any add, then use those cached trees to bind project
 lock entries to their pins. A failed lookup stops without changing the project;
-`unverified (gh unavailable)` is distinct from a content mismatch. This lookup
-also runs for project dry-run/check-only. It never copies a skill, writes a
-lock, or patches upstream SKILL.md. Default invocation without `--project-dir`
-retains the existing global Claude Code/Codex behavior.
+`unverified (gh unavailable)` is distinct from a content mismatch. A selected
+skill whose pinned tree differs from its manifest `tree_sha` also stops the whole
+run before any add, because a rollback after add is not reliable (see the in-use
+guard below). This lookup and comparison also run for project dry-run/check-only.
+It never copies a skill, writes a lock, or patches upstream SKILL.md.
+
+Before the version check, the wrapper also refuses a project that could redirect
+a write outside itself: `.agents/skills`, `.claude/skills` or `skills-lock.json`
+passing through a symlink, a selected skill's canonical or Claude path resolving
+outside `--project-dir`, or `--project-dir` equal to `--home`. The pinned CLI
+recreates `<project>/.agents/skills/<name>` with `rm` and `mkdir`, so through such
+a link an add and its rollback would replace and then delete a global skill
+([installer.ts:193-200](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L193-L200),
+[installer.ts:388](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L388)).
+Default invocation of a manifest without a scope (main's adoption manifest)
+without `--project-dir` retains the existing global Claude Code/Codex behavior.
 
 The project interface supports `universal`, `claude-code` and `codex`. Other CLI
 agent adapters are outside this wrapper's verified path contract. For Claude,
@@ -130,12 +176,20 @@ worker_skills() {
 }
 
 # Set these to the owned workspaces already allocated by the runtime launcher.
-# They must be existing directories. These are examples, not active host config.
-OH_PROJECT="$STACK_ROOT/.runtime/openhands"
-DF_PROJECT="$STACK_ROOT/.runtime/deerflow"
-RESEARCH_PROJECT="$STACK_ROOT/.runtime/research-caller"
-EXTRACTION_PROJECT="$STACK_ROOT/.runtime/extraction-caller"
+# They must be existing directories outside this repository and outside any Git
+# checkout whose AGENTS.md or CLAUDE.md should not reach the worker (see below).
+# These are examples, not active host config.
+WORKER_ROOT="$HOME/runtime-workers"
+OH_PROJECT="$WORKER_ROOT/openhands"
+DF_PROJECT="$WORKER_ROOT/deerflow"
+RESEARCH_PROJECT="$WORKER_ROOT/research-caller"
+EXTRACTION_PROJECT="$WORKER_ROOT/extraction-caller"
 ```
+
+A worker project inside this checkout would make `$STACK_ROOT` its Git root: an
+OpenHands worker with project loading on would then take this repository's
+`AGENTS.md` and `CLAUDE.md` as permanent context (see
+[Gates of reused adoption skills](#gates-of-reused-adoption-skills)).
 
 | Worker target | Add (broad trial) | Check installed pins, read only | Update after reviewed manifest repin |
 | --- | --- | --- | --- |
@@ -149,9 +203,10 @@ skills. `--check-only` exits 1 on missing, modified or drifted entries and makes
 no add/remove calls. It is not offline: it still verifies the pinned `skills`
 binary with `skills --version`, and in project mode it needs `gh` sign-in and
 network access for the pinned-tree preflight above. `--only NAME` is repeatable
-for a bounded repair or explicitly scoped subset; in project mode a name the
-manifest marks pruned fails as pruned, not as unknown. The broad trial defaults
-to every non-pruned manifest skill.
+for a bounded repair or explicitly scoped subset; a name the manifest marks
+pruned fails as pruned, not as unknown. A pruned entry is never installed, with
+or without `--project-dir`. The broad trial defaults to every non-pruned
+manifest skill.
 For `--agent claude-code`, an existing `.claude/skills/<name>` must be a symlink
 resolving to `.agents/skills/<name>`. A real directory, file or foreign symlink
 is `local-modified` with or without a project lock, even if its SKILL.md matches
@@ -164,9 +219,10 @@ source, ref and `skillPath`; they do not carry global `skillFolderHash` (Git tre
 SHA). Verification checks installed SKILL.md SHA-256, requested target placement,
 lock source/ref/path and independently fetched pinned directory tree SHA.
 This retains the original verifier's boundary: it does not hash all installed
-support files. A mismatch after a successful add removes that skill with the
-native CLI, checks removal and returns failure. This is cleanup, not restoration
-of a previous version. Recover by rerunning a retained previous manifest.
+support files. A pinned-tree mismatch is refused before any add (above). A
+SKILL.md or lock-identity mismatch after a successful add removes that skill with
+the native CLI, checks removal and returns failure. This is cleanup, not
+restoration of a previous version. Recover by rerunning a retained previous manifest.
 See [vercel-labs/skills@7407f389 local-lock.ts:15](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/local-lock.ts#L15)
 and [add.ts:2066](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/add.ts#L2066).
 
@@ -174,10 +230,21 @@ Remove uses the CLI in the same target project, without `-g` and with exactly
 the `-a` targets used for add. Omitting `-a` targets every agent, including an
 OpenClaw `skills/<name>` source directory. Check the canonical folder, project
 lock entry and, for Claude, `.claude/skills/<name>` independently after removal;
-a dangling link also means cleanup is incomplete. The native in-use guard can
-retain the canonical folder and lock for another detected agent. The wrapper
-then returns `error: rollback retained, in use by another agent`; keep that
-failure visible and never widen the deletion to other agents.
+a dangling link also means cleanup is incomplete. The native in-use guard keeps
+the canonical folder and its lock entry while any detected agent outside the
+`-a` targets has an install path there. For an agent whose project directory is
+`.agents/skills`, that path is the canonical folder itself, so retention is
+certain whenever such an agent is detected under the wrapper's `HOME` and not
+targeted: Codex whenever `$CODEX_HOME` (when unset, `~/.codex`) or `/etc/codex`
+exists, unless `--agent codex` targets it
+([agents.ts:10](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L10),
+[remove.ts:293-331](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L331),
+[agents.ts:224-232](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L224-L232)).
+The retained copy stays loadable by every loader that reads the project's
+`.agents/skills`, including Codex and, with project loading on, the OpenHands SDK.
+The wrapper then returns
+`error: rollback retained, in use by another agent`; keep that failure visible,
+remove the copy deliberately, and never widen the deletion to other agents.
 Sources: [remove.ts:209-333](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L209-L333),
 [agents.ts:166-169](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L166-L169).
 
@@ -191,7 +258,7 @@ SKILL_NAME=example-skill
 
 Run only the relevant target's remove command. For a prune, retain the entry,
 set `status: "pruned"`, attach `prune_evidence` and update the coverage/gap cells;
-subsequent project installs skip it. For a removed skill still marked trial,
+subsequent installs skip it. For a removed skill still marked trial,
 `--check-only` correctly reports it missing and a subsequent add reinstalls it.
 Refresh worker discovery after removal and start a new session: an old prompt
 may still contain instructions that were loaded earlier.
@@ -237,7 +304,13 @@ SDK loads `.agents/skills` natively and prefers it over the legacy location.
 Reference: [OpenHands/software-agent-sdk@da28c773 skill.py:1052](https://github.com/OpenHands/software-agent-sdk/blob/da28c7736ea667ceae51cf3a3b9b37ab5f528f22/openhands-sdk/openhands/sdk/skills/skill.py#L1052).
 This source pin is an inspected capability, not an implicit SDK upgrade. Match
 the worker's installed revision before claiming it follows this path, then start
-a fresh conversation with the normal native project loader enabled.
+a fresh conversation with the native project loader enabled: `load_project_skills`
+is `False` by default. Enabling it also loads the work directory's and its Git
+root's `AGENTS.md`, `CLAUDE.md` and other third-party instruction files as
+permanent context
+([skill.py:1084-1121](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1121)),
+so keep the worker project outside this repository; exclude any unwanted skill by
+name with `disabled_skills`.
 
 **DeerFlow:** the repository's recorded native pin is
 `42334f26d7025d905678f9075b079fc65f9beaf9` (see its

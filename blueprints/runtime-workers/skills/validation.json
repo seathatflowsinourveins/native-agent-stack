@@ -89,6 +89,25 @@
       "errors": 2,
       "returned_excerpt": "StopIteration\nStopIteration\nAssertionError: Lists differ: ['security-audit: neither reused nor excluded'] != []\nAssertionError: Lists differ: ['security-audit: neither reused nor exclud[49 chars]ded'] != ['future-main-skill: neither reused nor excluded']\nAssertionError: Lists differ: [] != ['agent-browser', 'agentic-actions-auditor[264 chars]sis']\nAssertionError: 0 != 1 : \nAssertionError: 0 != 1 : \nAssertionError: Lists differ: [] != ['codebase-design']\nAssertionError: 'pruned --only name(s)' not found in \"install-skills failed: unknown --only name(s): ['project-skill']\\n\"\nRan 9 tests in 0.664s\nFAILED (failures=7, errors=2)",
       "cause": "Main #448 added security-audit, which was neither reused nor excluded; reused entries carried no gates, so --print-codex-config disabled none of the reused skills main keeps off for Codex; a drifted or gate-restating reuse_ref was accepted; --only named a pruned project skill as unknown."
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills",
+      "exit_code": 1,
+      "tests": 67,
+      "failures": 28,
+      "errors": 2,
+      "returned_excerpt": "AssertionError: 0 != 1 : project-skill: installed; SKILL.md sha256 and project lock identity match pinned source tree 98f54143ab4e86b28c3afee0f50f2f51cfb2ed38\nAssertionError: 'pinned source tree differs from the manifest tree_sha' not found in 'project-skill: error: rollback retained, in use by another agent (exit 0; canonical=True, project-lock=True, claude-link=False)\\n'\nAssertionError: 0 != 1 : scoped-skill: installed; SKILL.md sha256 matches the pin and the lock records tree 6543f14e1af1780b3287690c48954014bb2aed72\nAssertionError: {'kept-skill': 'installed', 'pruned-skill': 'installed'} != {'kept-skill': 'installed'}\nKeyError: 'scope'\ninstall_skills_under_test.InstallError: agent-browser: reuse_ref adoption/skills/manifest.json#/skills/24 differs from the adoption pin in ['name', 'source', 'url', 'ref', 'path', 'tree_sha', 'skill_md_sha256']\nAssertionError: 'names no single' not found in \"install-skills failed: not-in-main: reuse_ref 'adoption/skills/manifest.json' names no adoption skill\\n\"\nAssertionError: False is not true : []\nFAILED (failures=28, errors=2)",
+      "cause": "Unchanged installer, manifest and freshness tool. GPT6-C1: six of the eight containment layouts ran through to an installed status, one was refused only as local-modified and one failed inside the fake CLI; none got a containment refusal. CL-D1: a pinned-tree mismatch reached add and, with a Codex home present, the rollback was retained. CL-D3: a project-scoped manifest, and the runtime manifest, ran without --project-dir; a pruned entry was installed globally; the runtime manifest had no scope. CL-D6: index references failed against a reordered main, a missing name gave the old message, and the name-keyed reuse fixtures were refused. CL-D7: a 9.9.9 pin reported ok false with no error. Two of the 28 failures (test_project_rollback_checks_each_artifact_independently, lock and claude-link) came from this round's fixture change: its byte-mismatch trigger left a drifted canonical copy that the next case in the same project treated as local content. Each case now has its own project, and that test passed against the unchanged installer."
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_workflow_security_coverage.RuntimeWorkerSkillsFreshnessWorkflowTests (with the checkout step's actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 replaced by actions/checkout@v7, then restored; git diff --exit-code on the workflow returned 0)",
+      "exit_code": 1,
+      "tests": 3,
+      "failures": 2,
+      "returned_excerpt": "AssertionError: 3 != 4 : an action is not SHA-pinned\nAssertionError: 14 != 0\nFAILED (failures=2)",
+      "cause": "GPT6-C5: with a floating tag, the offline zizmor analysis of the real workflow exits 14 and the pin count no longer covers every uses line. The same three tests passed on the unmodified workflow."
     }
   ],
   "not_run": [
@@ -116,20 +135,23 @@
   "output_retention": "Returned compact excerpts are transcribed from tool output; temporary personal paths and research response bodies are not published.",
   "independent_review": {
     "source": "skills-review-r1.json",
+    "source_published": false,
+    "source_note": "A session-local review file from repair r1 that was never committed and is not in this tree. Its seven findings are transcribed as R1-1 to R1-7 under review_findings; source_sha256 identifies only that unpublished file (CL-D5, repair r3).",
     "source_sha256": "e5b3369b9b3170bce0333d358b0887f0248d521483a31953f07af60f43b217c0",
     "scope": "Seven independent Claude review findings rechecked against pinned source or the relevant local execution/official documentation; repair starts at rebased 5f3eaebf.",
     "result": "All seven findings fixed, including preservation of the already-fixed global target scope. No post-repair independent model review was run.",
     "verification": "Full verbose suite: Ran 52 tests in 9.080s; OK (exit 0). See checks and review_findings."
   },
   "input_sha256": {
-    "tools/adoption/install_skills.py": "02724c82401deb36e0b8dd8c5277b3e0292ada62721f29a8cbfa29c3ce10b601",
-    "tools/adoption/runtime_skill_freshness.py": "497ea3b22f04d261afcd2ae8adbf9da5b1f1cb4fc12b2051aab74a14c0aeb3f9",
-    "tests/test_install_skills.py": "0420a74c910f847df90cada620236ae2195293d36500f399e3717dd03b3cf9fb",
-    "tests/test_runtime_worker_skills.py": "31e311a2963498104a2c55f55a40c1b7905fed208a94289144384a10a3781f0f",
-    "blueprints/runtime-workers/skills/manifest.json": "fe4ea42aecb969a48c7aeb2a67b52f13f5361ed494ec28fa7d34cdd861583c1b",
-    "blueprints/runtime-workers/skills/README.md": "1f54c2127b79ed9eaa2ddbe81902cb24c44671205553a3a9760cce163f8d1577",
+    "tools/adoption/install_skills.py": "edea23a88809d68327bdea526f6704a6679cea00f0bfc9486a31ec83abd29988",
+    "tools/adoption/runtime_skill_freshness.py": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
+    "tests/test_install_skills.py": "55533df4a38eb803bdf203b85d0fd7964e46a1f703589e3dc464c759391575ef",
+    "tests/test_runtime_worker_skills.py": "b7d0770362fd507a3493bac0033f5d7fc3f7ec0810e8e80d2e14d4f57b519cff",
+    "tests/test_workflow_security_coverage.py": "9ad3bc3bb6ad5c9edf8db5fe350e822bdea815720a4a8edc9a28d8e4422ccf0c",
+    "blueprints/runtime-workers/skills/manifest.json": "52fcec65eb70da64d0a6517d7ce7c4dde634e1b617ddb4677d317692896ea2cb",
+    "blueprints/runtime-workers/skills/README.md": "9f67ffbaf385140f3940c123a576c0e757a7f155b27a3bcacb84baa0c81481e0",
     ".github/workflows/runtime-worker-skills-freshness.yml": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
-    "docs/harness-defaults.md": "d7b0261a33ebb14fcf643d122f2dc31783a667ebcf42dcf33900adb13a431130",
+    "docs/harness-defaults.md": "5f76e06791ad67aad8c25072b20b81ad8334c84a30dbb184d16e4f7f46d076bc",
     "adoption/skills/manifest.json": "056fa8744df94a6b33ff14583a95b3140047cd8a5d44525459ae1b08dfffd90f"
   },
   "repair_r1_research": {
@@ -187,7 +209,74 @@
     "independent_review": "None run for repair r2. A same-session advisor review after the 298e5b30 push (rebased as 0f164b2f) found the wording and citation issues recorded as R2-6; it is not an independent review.",
     "environment": {
       "TMPDIR": "temporary directory under /var/tmp; removed after checks",
-      "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run, so no stale bytecode was read"
+      "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run, so no run reused repository bytecode cached by an earlier run"
+    }
+  },
+  "repair_r3": {
+    "base_head": "8efdc35d",
+    "main_base": "c61e6657",
+    "main_base_history": "The repair brief named main b9eb62d2. Main had moved to c1581fa2 (#462) when this round started and the branch was rebased onto it before the repairs, where only manifests/evidence.json conflicted and main's side was taken; main then moved to c61e6657 (#461) and the branch was rebased again without conflicts. manifests/evidence.json is main's, with the PR's files re-registered in the final commit.",
+    "reviews": [
+      {
+        "reviewer": "GPT-6 cross-family review (codex_call.sh, gpt-6-astra max)",
+        "reviewed_head": "8efdc35d",
+        "verdict": "changes-needed",
+        "blocker_or_high_findings": 0,
+        "relayed_findings": [
+          "GPT6-C1",
+          "GPT6-C5",
+          "GPT6-C6a",
+          "GPT6-C6b"
+        ]
+      },
+      {
+        "reviewer": "headless Claude session review",
+        "reviewed_head": "8efdc35d",
+        "verdict": "changes-needed",
+        "blocker_or_high_findings": 0,
+        "relayed_findings": [
+          "CL-D1",
+          "CL-D2",
+          "CL-D3",
+          "CL-D4",
+          "CL-D5",
+          "CL-D6",
+          "CL-D7"
+        ]
+      }
+    ],
+    "raw_verdicts": "Attached to the pull request as comments by the coordinator; not part of this tree.",
+    "not_relayed": "The GPT-6 review's GPT6-C2 to GPT6-C4 were not relayed to this repair and are not dispositioned here.",
+    "method": "One repair round. Each code item first failed against the unchanged installer, manifest, freshness tool or workflow (fail_first, round repair-r3); each documentation item was checked against the pinned upstream source before the edit. Dispositions are under review_findings.",
+    "checks_scope": "Entries under checks with round repair-r3 are this round's acceptance, run on the tree rebased onto c61e6657; the repair-r2 entries there are now history.",
+    "sources": [
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L128-L131",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L151-L158",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L193-L200",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L388",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L10",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L158",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L224-L232",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L331",
+      "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/local-lock.ts#L65-L66",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1524-L1530",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L346-L352",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L635-L651",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L981-L992",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1121",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L93-L109",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L127-L142",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L171-L182",
+      "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L291-L297"
+    ],
+    "source_check": "gh api contents at fcc102a697874d54a357e36004e02c95040dbdc0 returned blob 134e64051c19dc92ccfd3fde4076b41371f6d869 for openhands-sdk/openhands/sdk/skills/skill.py and dd36a9fb5a8eeec3b1a56d645f5c37e8f4c5db28 for openhands-sdk/openhands/sdk/context/agent_context.py; the cited ranges were read with sed -n. The skills 1.7.0 ranges were read from the pinned 7407f389 sources.",
+    "zizmor_measurement": "zizmor 1.30.1, offline, regular persona, on copies of the freshness workflow: actions/checkout pinned by tag v7 gave exit 14 with unpinned-uses; a workflow-level contents: write and permissions: write-all each gave exit 0 with no findings, so the read-only grant is asserted on the text.",
+    "fixture_boundary": "Installer CLI subprocess with fake skills and gh executables in isolated home and project directories, structural contracts over the real manifests, freshness comparisons with a stub API and offline zizmor analysis of workflow copies. Not a native skills run, upstream acceptance or worker activation.",
+    "publication_integrity": "scripts/validate.py and scripts/host_receipts.py validate run after the manifests/evidence.json re-registration that follows this file's last edit; their results are reported with the commit, not recorded here.",
+    "dated_artifact": "freshness-20260927.json was produced by the earlier runtime_skill_freshness.py. The tool no longer emits that report's native_check fields semantics_verified_version and version_matches_semantics; it reports pinned_version and pinned_ref from the manifest's cli pin.",
+    "environment": {
+      "TMPDIR": "temporary directory under /var/tmp; removed after checks",
+      "PYTHONPYCACHEPREFIX": "fresh directory under that TMPDIR for each run"
     }
   },
   "historical_checks": [
@@ -352,6 +441,80 @@
       "exit_code": 0,
       "returned_excerpt": "",
       "kind": "repair-r2 whitespace check"
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_install_skills tests.test_runtime_worker_skills tests.test_workflow_security_coverage",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 77 tests in 10.956s\n\nOK",
+      "tests": 77,
+      "kind": "repair-r3 full local integration and structural checks",
+      "limitation": "Fake CLI/gh, structural contracts and offline zizmor analysis; not a native skills run, upstream acceptance or model activation."
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_blind_checkout",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 40 tests in 23.364s\n\nOK",
+      "tests": 40,
+      "kind": "repair-r3 blueprint label classification and export checks",
+      "limitation": "Run before this file's repair-r3 checks entries were added; rerun on the final file and reported with the commit."
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_pre_push_gate",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 16 tests in 27.026s\n\nOK",
+      "tests": 16,
+      "kind": "repair-r3 pre-push registry gate checks"
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_adoption_docs_consistency",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 37 tests in 9.830s\n\nOK (skipped=1)",
+      "tests": 37,
+      "kind": "repair-r3 reader of docs/harness-defaults.md, including the two new anti-pattern rows",
+      "limitation": "The skip reports that no profile's coverage differs between the pinned release and HEAD."
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 56 tests in 12.335s\n\nOK",
+      "tests": 56,
+      "kind": "repair-r3 reader of docs/harness-defaults.md"
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_install_claude_profile",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 58 tests in 0.250s\n\nOK (skipped=3)",
+      "tests": 58,
+      "kind": "repair-r3 reader of docs/harness-defaults.md",
+      "limitation": "The three skips report that PyYAML is not installed on this host."
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 -m unittest -v tests.test_token_e2e_preregistration",
+      "exit_code": 0,
+      "returned_excerpt": "Ran 33 tests in 0.621s\n\nOK",
+      "tests": 33,
+      "kind": "repair-r3 reader of docs/harness-defaults.md"
+    },
+    {
+      "round": "repair-r3",
+      "command": "python3 tools/adoption/install_skills.py --manifest blueprints/runtime-workers/skills/manifest.json --print-codex-config",
+      "exit_code": 0,
+      "returned_excerpt": "16 [[skills.config]] tables with enabled = false: agent-browser agentic-actions-auditor codebase-design codeql find-skills fp-check frontend-design grill-me improve-codebase-architecture mcp-builder property-based-testing resolving-merge-conflicts sarif-parsing semgrep supply-chain-risk-auditor variant-analysis",
+      "kind": "repair-r3 Codex gates from main for the 28 reused skills, matched by name; print-only, so allowed without --project-dir"
+    },
+    {
+      "round": "repair-r3",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_excerpt": "",
+      "kind": "repair-r3 whitespace check"
     }
   ],
   "review_findings": [
@@ -546,6 +709,164 @@
         "sed -n of each cited range in skill.py blob 134e64051c19dc92ccfd3fde4076b41371f6d869",
         "grep -n -i for settings, skilloverrides and claude in that blob returned only lines 350 and 492, neither a settings read",
         "RuntimeWorkerManifestTests.test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it"
+      ]
+    },
+    {
+      "id": "GPT6-C1",
+      "severity": "medium",
+      "finding": "Project mode checked no path before add. A symlinked <project>/.agents/skills, .claude/skills or skills-lock.json, a selected skill's path resolving outside the project, or --project-dir equal to --home let the pinned CLI's rm and mkdir of <project>/.agents/skills/<name>, and the rollback's remove, reach the global skills and lock (reviewed at install_skills.py:146).",
+      "disposition": "fixed",
+      "resolution": "project_containment_problem runs after the project schema check and before the version check and any gh call. It refuses a symlink in any existing component of .agents/skills, .claude/skills or skills-lock.json (the Claude directory for every agent), a selected skill's .agents/skills/<name> or .claude/skills/<name> that resolves outside --project-dir, and --project-dir equal to --home. The CLI's own relative Claude link onto the canonical copy still passes.",
+      "sources": [
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L193-L200",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L388",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L331",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/local-lock.ts#L65-L66"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_project_paths_the_cli_writes_must_stay_inside_the_project: eight layouts in real, dry-run and check-only modes, each refused with no skills or gh call and the global skill and lock unchanged"
+      ]
+    },
+    {
+      "id": "CL-D1",
+      "severity": "medium",
+      "finding": "The project preflight fetched every pinned tree but compared it with the manifest's tree_sha only after add (install_skills.py:490-500 against 310-316), so a mismatch was installed and then rolled back. The native in-use guard keeps the canonical folder and lock while a detected agent that is not a target reads that folder, as Codex does whenever $CODEX_HOME (or ~/.codex) or /etc/codex exists.",
+      "disposition": "fixed",
+      "resolution": "After the preflight fetch, every selected skill's pinned tree is compared with its tree_sha before any add; a different tree or a path absent at the pinned ref refuses the run in real, dry-run and check-only modes. Rollback tests now reach rollback through different SKILL.md bytes after add.",
+      "sources": [
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L224-L232",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L151-L158",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L331"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_project_tree_mismatch_is_refused_before_any_add: only the version check ran in each mode and the project stayed empty",
+        "ProjectInstallTests rollback tests pass with the byte-mismatch trigger"
+      ]
+    },
+    {
+      "id": "GPT6-C5",
+      "severity": "low",
+      "finding": "tests/test_workflow_security_coverage.py listed runtime-worker-skills-freshness.yml in its coverage set but never analyzed it, so a floating tag or a dropped hardening block would not fail that module.",
+      "disposition": "fixed",
+      "resolution": "RuntimeWorkerSkillsFreshnessWorkflowTests runs the module's offline zizmor analysis on the workflow and expects no findings. On copies, a floating tag for each pinned action gives unpinned-uses, dropping persist-credentials: false gives artipacked and dropping the permissions block gives excessive-permissions. contents: read as the only grant is asserted on the text, because zizmor 1.30.1's regular persona reports nothing for contents: write or write-all.",
+      "sources": [
+        "zizmor 1.30.1 offline runs on the workflow and its copies (repair_r3.zizmor_measurement)"
+      ],
+      "verification": [
+        "Red: the real workflow with actions/checkout@v7 failed two of the three tests (zizmor exit 14); green after restoring the pin"
+      ]
+    },
+    {
+      "id": "CL-D3",
+      "severity": "low",
+      "finding": "Nothing stopped a global install of the runtime manifest, which would place all 138 trial skills in ~/.agents/skills for Codex and OpenHands user loading, and pruned entries were skipped only in project mode.",
+      "disposition": "fixed",
+      "resolution": "The manifest carries \"scope\": \"project\". The installer refuses a project-scoped manifest without --project-dir before any CLI call (--print-codex-config, which only prints, still runs), refuses an unknown scope, and skips pruned entries in both modes; --only naming a pruned skill fails as pruned.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L936-L973"
+      ],
+      "verification": [
+        "ManifestScopeAndPruneTests in tests/test_install_skills.py",
+        "RuntimeWorkerManifestTests.test_schema_and_pins_are_well_formed asserts the scope"
+      ]
+    },
+    {
+      "id": "CL-D6",
+      "severity": "low",
+      "finding": "reuse_ref and adoption_ref were JSON pointers by array index into main's adoption manifest, so the runtime manifest depended on main's order.",
+      "disposition": "fixed",
+      "resolution": "Both references are now the value adoption/skills/manifest.json and are matched by skill name, which main must carry exactly once. A changed pin under that name is still refused as drift. The installer and the contract test both key by name.",
+      "sources": [
+        "adoption/skills/manifest.json"
+      ],
+      "verification": [
+        "ReuseRefGateTests.test_runtime_manifest_still_loads_after_main_reorders_or_inserts_entries and test_reuse_ref_without_a_same_named_main_skill_is_refused",
+        "RuntimeWorkerManifestTests.test_contract_survives_main_reordering_its_skills"
+      ]
+    },
+    {
+      "id": "CL-D7",
+      "severity": "low",
+      "finding": "runtime_skill_freshness.py hard-coded the CLI version 1.7.0 in ok (lines 96-97) and in native_check, and the cli.ts source ref in a constant.",
+      "disposition": "fixed",
+      "resolution": "The tool reads cli.version and cli.ref from the manifest; a missing or malformed pin is a report error, ok no longer compares with a literal, and native_check carries pinned_version and pinned_ref with a source link at that ref.",
+      "sources": [
+        "blueprints/runtime-workers/skills/manifest.json cli.version and cli.ref"
+      ],
+      "verification": [
+        "FreshnessComparisonTests.test_cli_version_and_ref_come_from_the_manifest_pin"
+      ]
+    },
+    {
+      "id": "GPT6-C6a",
+      "severity": "docs",
+      "finding": "The README said the OpenHands loader lists SKILL.md skills with their location, citing the class docstring, but the renderer omits <location>.",
+      "disposition": "fixed",
+      "resolution": "The README says the rendered <available_skills> block gives name and description only, so that invoke_skill stays the one invocation path, cites lines 1524-1530 and notes that the docstring at line 184 still lists a location.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1524-L1530"
+      ],
+      "verification": [
+        "sed -n 1518,1535p of skill.py blob 134e64051c19dc92ccfd3fde4076b41371f6d869"
+      ]
+    },
+    {
+      "id": "GPT6-C6b",
+      "severity": "docs",
+      "finding": "The README named OpenHands' controls as the frontmatter flag and the installed-skill enable state; it omitted AgentContext.disabled_skills and the source-loading flags, and installed-skill state does not disable a project-directory copy.",
+      "disposition": "fixed",
+      "resolution": "The README names disabled_skills, a deny-list by name applied after every source, and load_user_skills, load_public_skills and load_project_skills, each False by default. It says the installed-skill enable state covers only ~/.openhands/skills/installed/ and does not disable a same-named project copy, and that a project skill overrides a same-named explicit skill.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L171-L182",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L291-L297",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L93-L109",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/context/agent_context.py#L127-L142"
+      ],
+      "verification": [
+        "sed -n of each cited range in agent_context.py blob dd36a9fb5a8eeec3b1a56d645f5c37e8f4c5db28 and of skill.py lines 943-973"
+      ]
+    },
+    {
+      "id": "CL-D2",
+      "severity": "docs",
+      "finding": "The README and research.md did not say that, with project loading on (default False), the loader also reads .cursorrules, AGENTS.md, agent.md, CLAUDE.md and GEMINI.md as always-on skills from the work directory and the Git repository root, and the example worker projects sat inside $STACK_ROOT.",
+      "disposition": "fixed",
+      "resolution": "The README's gates section, examples and Native loader wiring, and research.md, now say so. The examples use $HOME/runtime-workers, with a caveat that a worker project inside this checkout would take its AGENTS.md and CLAUDE.md as permanent context.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L346-L352",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L635-L651",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L981-L992",
+        "https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1121"
+      ],
+      "verification": [
+        "sed -n of each cited range in skill.py blob 134e64051c19dc92ccfd3fde4076b41371f6d869, including line 874 (trigger=None skills are permanent context)"
+      ]
+    },
+    {
+      "id": "CL-D4",
+      "severity": "docs",
+      "finding": "The README described rollback retention as possible. It is certain whenever Codex or another agent whose project directory is .agents/skills is detected and not targeted, and the retained content stays loadable.",
+      "disposition": "fixed",
+      "resolution": "The README says retention is certain in that case (Codex whenever $CODEX_HOME, or ~/.codex when it is unset, or /etc/codex exists, unless --agent codex targets it), that the retained copy stays loadable by Codex and, with project loading on, by OpenHands, and that it must be removed deliberately. The preflight comparison (CL-D1) keeps a pinned-tree mismatch from reaching that path.",
+      "sources": [
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L10",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L331"
+      ],
+      "verification": [
+        "ProjectInstallTests.test_project_rollback_reports_canonical_retained_for_another_agent"
+      ]
+    },
+    {
+      "id": "CL-D5",
+      "severity": "docs",
+      "finding": "independent_review cited skills-review-r1.json as its source, but the file is not in the tree.",
+      "disposition": "fixed",
+      "resolution": "independent_review marks that source as unpublished and says where its seven findings are transcribed. This round's two reviews, their verdicts and each finding's disposition are recorded under repair_r3 and here; the coordinator attaches the raw verdicts to the pull request.",
+      "sources": [
+        "blueprints/runtime-workers/skills/validation.json independent_review and repair_r3"
+      ],
+      "verification": [
+        "No copy of skills-review-r1.json was found under the session scratch, /var/tmp or the local code checkouts, so none could be published"
       ]
     }
   ],

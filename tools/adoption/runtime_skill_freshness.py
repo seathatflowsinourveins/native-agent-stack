@@ -5,6 +5,9 @@ References: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73
 src/cli.ts:398-401 aliases check to update; src/update.ts:549-574,849-868
 resolves the recorded ref, not HEAD. Source-tree comparison follows
 src/skill-lock.ts:168-171. Workflow/artifact pattern: catalog-freshness.yml.
+The expected CLI version and the source commit cited for `skills check` are read
+from the manifest's cli pin (cli.version, cli.ref), so a pin bump needs no edit here;
+a missing or malformed pin is reported as an error, not replaced by a default.
 This checks manifest source identity, not an installed worker or its lock.
 """
 from __future__ import annotations
@@ -14,12 +17,26 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = ROOT / "blueprints/runtime-workers/skills/manifest.json"
-CLI_REF = "7407f3893ad4dceab546ac002c3ef806e4000c73"
-CHECK_SOURCE = f"https://github.com/vercel-labs/skills/blob/{CLI_REF}/src/cli.ts#L398"
+RELEASE_VERSION = re.compile(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.+-]+)?")
+COMMIT_REF = re.compile(r"[0-9a-f]{40}")
+
+
+def cli_pin(manifest: dict) -> tuple[str | None, str | None, list[str]]:
+    """The manifest's pinned CLI version and source commit, each None with an error when malformed."""
+    cli = manifest.get("cli") if isinstance(manifest.get("cli"), dict) else {}
+    version, ref, errors = cli.get("version"), cli.get("ref"), []
+    if not (isinstance(version, str) and RELEASE_VERSION.fullmatch(version)):
+        errors.append(f"cli pin: version {version!r} is not a release version")
+        version = None
+    if not (isinstance(ref, str) and COMMIT_REF.fullmatch(ref)):
+        errors.append(f"cli pin: ref {ref!r} is not a 40-hex commit")
+        ref = None
+    return version, ref, errors
 
 
 def gh_json(endpoint: str) -> dict:
@@ -78,31 +95,35 @@ def build_report(manifest: dict, api=gh_json, workers: int = 4) -> dict:
     sources = {s["source"]: s for s in fetched}
     entries = [compare_skill(s, sources[s["source"]]) for s in manifest["skills"]]
     errors = [error for source in fetched for error in source["errors"]]
-    cli = {"pinned": manifest["cli"]["version"], "latest": None, "drift": None}
+    version, ref, pin_errors = cli_pin(manifest)
+    errors += pin_errors
+    cli = {"pinned": version, "latest": None, "drift": None}
     try:
         release = api("repos/vercel-labs/skills/releases/latest")
-        cli.update(latest=release["tag_name"], drift=release["tag_name"].removeprefix("v") != cli["pinned"])
+        cli.update(latest=release["tag_name"], drift=release["tag_name"].removeprefix("v") != version)
     except (OSError, ValueError, KeyError, subprocess.TimeoutExpired) as error:
         errors.append(str(error))
     return {
         "schema_version": 1, "kind": "runtime_skill_freshness_report",
         "checked_at": datetime.now(timezone.utc).isoformat(), "report_only": True,
         "cli": cli,
-        "native_check": {"executed": False, "source": CHECK_SOURCE,
-                         "semantics_verified_version": "1.7.0",
-                         "version_matches_semantics": manifest["cli"]["version"] == "1.7.0",
-                         "reason": "check aliases update and can reinstall/remove. Commit refs remain pinned; HEAD comparison is separate. No worker lock or installation was read or changed."},
+        "native_check": {"executed": False,
+                         "source": f"https://github.com/vercel-labs/skills/blob/{ref}/src/cli.ts" if ref else None,
+                         "pinned_version": version, "pinned_ref": ref,
+                         "reason": "check aliases update and can reinstall/remove (the manifest's cli.notes for this pin). Commit refs remain pinned; HEAD comparison is separate. No worker lock or installation was read or changed."},
         "skills": entries, "errors": errors,
-        "ok": not errors and all(e["manifest_tree_matches_pin"] is True for e in entries)
-              and manifest["cli"]["version"] == "1.7.0",
+        "ok": not errors and all(e["manifest_tree_matches_pin"] is True for e in entries),
     }
 
 
 def render_markdown(report: dict) -> str:
+    check = report["native_check"]
+    command = f"[`skills check`]({check['source']})" if check["source"] else "`skills check`"
     lines = ["# Runtime-worker skills freshness (report only)", "",
              f"Checked: {report['checked_at']}", "",
-             f"CLI pin: {report['cli']['pinned']}; latest release: {report['cli']['latest'] or 'unfetched'}.", "",
-             f"[`skills check`]({CHECK_SOURCE}) aliases update at 1.7.0 and was not executed. "
+             f"CLI pin: {report['cli']['pinned'] or 'invalid'}; latest release: {report['cli']['latest'] or 'unfetched'}.", "",
+             f"{command} aliases update in the pinned CLI {check['pinned_version'] or '(invalid pin)'} "
+             "and was not executed. "
              "It follows recorded refs; these commit pins do not advance to HEAD. "
              "This report checks source trees, not installed files or native worker invocation.", "",
              "| Skill | Source | Pin | HEAD | Result |", "| --- | --- | --- | --- | --- |"]
