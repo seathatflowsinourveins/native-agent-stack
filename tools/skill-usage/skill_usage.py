@@ -142,10 +142,13 @@ def parse_claude_output(raw: str) -> dict:
     plain-text /skill-doctor table.
 
     `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json"
-    (single result)), and with verbose mode on the message array, whose last 'result' element
-    find_result_event selects (the message anthropics/claude-agent-sdk-python@36f95486ee9f
-    src/claude_agent_sdk/_internal/message_parser.py:308 parses as the ResultMessage). An object
-    is read as a one-element array, so an object that is no result event is refused.
+    (single result)) or, when verbose is on, the whole message array (a read of the 2.1.283
+    binary's headless print path, not a live reproduction; retained captures of both shapes are
+    cited at tools/sota-convergence/transcript_audit.py result_message). An object is read as a
+    one-element array, so find_result_event makes the same selection in both shapes, the last
+    element of type 'result' (a message of that type is what
+    anthropics/claude-agent-sdk-python@36f95486ee9f src/claude_agent_sdk/_internal/message_parser.py:308
+    parses as the ResultMessage), and an object that is no result event is refused.
 
     Returns {"format", "rows", "total_cost_usd", "num_turns"} and, when the capture is refused
     or malformed, an "error" key with rows left empty. total_cost_usd/num_turns are None for a

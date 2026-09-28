@@ -137,8 +137,9 @@ class SkillDoctorParsing(unittest.TestCase):
         self.assertEqual(parsed["num_turns"], 1)
 
     def test_refuses_a_nonzero_cost_result_object(self):
-        # The zero-cost check holds for the single result object `claude -p --output-format json` prints when verbose
-        # mode is off (`claude --help` 2.1.283: "json" (single result)), as it does for the message array.
+        # The zero-cost check holds for the single result object `claude -p --output-format json` prints
+        # (`claude --help` 2.1.283: "json" (single result)) as it does for the message array printed when verbose is
+        # on (a 2.1.283 binary read, not a live reproduction; see S.parse_claude_output).
         messages = json.loads((FIXTURES / "skill-doctor-nonzero-cost.json").read_text())
         parsed = S.parse_claude_output(json.dumps(S.find_result_event(messages)))
         self.assertIn("refusing a nonzero-cost result", parsed.get("error", ""))
@@ -185,9 +186,11 @@ class RunSkillDoctor(unittest.TestCase):
         self.assertEqual(result["rows"]["gh-fix-ci"]["uses"], 6)
 
     def test_run_reads_either_json_output_shape(self):
-        # `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json" (single result)),
-        # and with verbose mode on the message array whose last "result" element find_result_event selects
-        # (anthropics/claude-agent-sdk-python@36f95486ee9f src/claude_agent_sdk/_internal/message_parser.py:308).
+        # `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json" (single result))
+        # or, when verbose is on, the message array (a 2.1.283 binary read, not a live reproduction; see
+        # S.parse_claude_output). find_result_event takes the last element of type "result" from either, this
+        # repository's selection; anthropics/claude-agent-sdk-python@36f95486ee9f
+        # src/claude_agent_sdk/_internal/message_parser.py:308 parses a message of that type as the ResultMessage.
         sample = (FIXTURES / "skill-doctor-sample.json").read_text()
         stdouts = {"array": sample, "object": json.dumps(S.find_result_event(json.loads(sample)))}
         results = {}
@@ -540,9 +543,8 @@ class RenderTextAndCli(unittest.TestCase):
 
     def test_main_measures_either_json_output_shape(self):
         # A capture of `claude -p "/skill-doctor" --output-format json` is one result object (`claude --help` 2.1.283:
-        # "json" (single result)), or with verbose mode on the message array whose last "result" element
-        # find_result_event selects (anthropics/claude-agent-sdk-python@36f95486ee9f
-        # src/claude_agent_sdk/_internal/message_parser.py:308); both yield the same report.
+        # "json" (single result)) or, when verbose is on, the message array (a 2.1.283 binary read, not a live
+        # reproduction; see S.parse_claude_output); both yield the same report.
         messages = json.loads(self.claude_file.read_text())
         object_file = Path(self.enterContext(tempfile.TemporaryDirectory())) / "skill-doctor-object.json"
         object_file.write_text(json.dumps(S.find_result_event(messages)), encoding="utf-8")
