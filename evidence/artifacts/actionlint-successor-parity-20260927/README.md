@@ -18,7 +18,8 @@ mutations and tests) and **live-run-pending** (needs the hosted run).
 
 ## Upstream status, re-observed (upstream-unchanged)
 
-Source: `gh api`, at 2026-09-28T02:03:12Z.
+Source: `gh api`, at 2026-09-28T02:03:12Z; the commit-author tally at
+02:21:31Z.
 
 - **`rhysd/actionlint`.**
   - The last commit on main is 011a6d15 (2026-04-19), and main has no commit
@@ -32,7 +33,8 @@ Source: `gh api`, at 2026-09-28T02:03:12Z.
   - It was forked on 2026-08-07.
   - It has shipped 12 immutable releases, v1.8.0 (2026-08-18) to v1.17.0
     (2026-09-13).
-  - `kjanat` wrote 242 of the 253 default-branch commits.
+  - `kjanat` wrote 242 of the 253 default-branch commits dated since
+    2026-08-07.
   - Commits fa049a71 and fc3cee3c accommodate Claude Code in the fork's own
     development.
 

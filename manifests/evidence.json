@@ -14293,8 +14293,8 @@
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
-      "sha256": "4e2db0176dccbc6797253b1ecf449c7579b4ead6ed97be665979866ee1b2d147",
-      "bytes": 10466
+      "sha256": "c282b2ce2ba53dc42867e8e78cf8e69b3b79fa59bffce27660ca46e8ffeb8f78",
+      "bytes": 10531
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/compare.py",
@@ -14368,8 +14368,8 @@
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
-      "sha256": "d4b41c6ddfbe4c41a44d34808eb57436f7633751ce4264888b090b7a3ae3d300",
-      "bytes": 38986
+      "sha256": "43546a8ab52b3453920b5c2c35aa6bce996cdfed5d0fc959c22cf83687619c99",
+      "bytes": 39050
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",

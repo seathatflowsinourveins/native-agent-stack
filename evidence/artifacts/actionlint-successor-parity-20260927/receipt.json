@@ -78,7 +78,8 @@
      "muzimuzhi": 1,
      "autofix-ci[bot]": 1
     },
-    "method": "gh api --paginate repos/kjanat/actionlint/commits?since=2026-08-07T00:00:00Z"
+    "method": "gh api --paginate repos/kjanat/actionlint/commits?since=2026-08-07T00:00:00Z",
+    "observed_at_utc": "2026-09-28T02:21:31Z"
    },
    "ai_assisted_signal": "commit fa049a7162 (2026-08-22) turns off the race detector when CLAUDECODE is set, and fc3cee3c1a (2026-08-21) excludes .claude/ paths: the maintainer develops with Claude Code"
   }
@@ -727,5 +728,5 @@
   "Raw gh api and attestation JSON stayed in scratch; only the fields quoted here were extracted.",
   "No credential value was read or passed: zizmor ran without GH_TOKEN (this repository's secret_path_guard hook blocks printing the native token), so its online audits are live-run-pending."
  ],
- "claim_boundary": "On this host, rhysd/actionlint 1.7.12 and kjanat/actionlint 1.17.0 each return exit 0 and no diagnostic for the 18 workflows at ba1700ad and on this branch, with and without the runner's shellcheck 0.9.0. The fixtures give at least one recorded example of five classes in classification (identical, relocated, removed, new true positive and default-config change); reworded and new false positive have none (fixtures 0), so the fixtures do not demonstrate those two, and the release's other changes were not exercised (classification.not_exercised). That is local evidence for the files and configurations named here; it is not the hosted run of the new job, not a swap of the required gate and not a statement about other repositories. The selection risk stays open: kjanat/actionlint is a fork whose default-branch commits are 242 of 253 by one maintainer who develops with Claude Code, it shipped 12 releases between 2026-08-18 and 2026-09-13, and 1.17.0 turned three cache policies on by default."
+ "claim_boundary": "On this host, rhysd/actionlint 1.7.12 and kjanat/actionlint 1.17.0 each return exit 0 and no diagnostic for the 18 workflows at ba1700ad and on this branch, with and without the runner's shellcheck 0.9.0. The fixtures give at least one recorded example of five classes in classification (identical, relocated, removed, new true positive and default-config change); reworded and new false positive have none (fixtures 0), so the fixtures do not demonstrate those two, and the release's other changes were not exercised (classification.not_exercised). That is local evidence for the files and configurations named here; it is not the hosted run of the new job, not a swap of the required gate and not a statement about other repositories. The selection risk stays open: kjanat/actionlint is a fork whose default-branch commits since 2026-08-07 are 242 of 253 by one maintainer who develops with Claude Code, it shipped 12 releases between 2026-08-18 and 2026-09-13, and 1.17.0 turned three cache policies on by default."
 }
