@@ -621,8 +621,9 @@ not published, because it quotes the user-level instruction file and names insta
     needs a second-family lane before any edit.
   - **Later, M4 and M5 on 2026-09-28:** their second-family lanes ran in a separate `lane:foundation` pull request,
     recorded in `docs/decisions/2026-09-28-an13-m4-m5.md`.
-    - M4: both lanes rejected the rewrite, so there is no edit. The preload question stays with the skills trial's
-      2026-10-25 comparison.
+    - M4: both lanes rejected the rewrite, so there is no edit. The lanes did not test the skills trial's rule that
+      removes a trial skill whose instructions conflict with CLAUDE.md or AGENTS.md, and that record leaves the
+      question open. Otherwise the preload question stays with the trial's 2026-10-25 comparison.
     - M5: both lanes amended the lines with different texts, and the blind adjudication split, so the lines are
       unchanged.
   - **The rest:** the low-confidence and plugin findings are recorded flags.
