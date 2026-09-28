@@ -3501,8 +3501,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
-      "bytes": 9814
+      "sha256": "c0025db3159bef98f27abaa32cbd1522067a7d3f114f5c339893883d6fc39dcd",
+      "bytes": 10060
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -3696,8 +3696,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "a37085f2a47af3e97de2ee34912cf233e1a196bc46e7e976b28bede947a1444d",
-      "bytes": 16338
+      "sha256": "5e20ce0d08dd203b5b9d86ee2375cd03131a4c1f3c18b096bb48f66371bb6e1a",
+      "bytes": 17862
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -8619,6 +8619,256 @@
       "path": "blueprints/retrieval-quality-v2/verification-review-20260926/rederive_real_qmd_receipts.py",
       "sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
       "bytes": 2690
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "sha256": "23bb0ae8f02c4d40baf0f65f20b169808f5348b3e9010e8d3a80d9be9afd46c9",
+      "bytes": 71896
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
+      "sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
+      "bytes": 286
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/config/host.example.json",
+      "sha256": "25e8499980ad05e3dac6a042e23d3ba3fc2b5015791d5ffb41d1c4a8f17d9e01",
+      "bytes": 857
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/config/mcp-policy.json",
+      "sha256": "e229f8b36b2a7ffd7a023fa59e45b96e070411bf14872cde0b73f6fdc330374e",
+      "bytes": 1663
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/config/mcp.template.json",
+      "sha256": "7e452b37fa45c7d3cd653a7e43bc99ccc07168b2bd7bbdf1ca1467b1309a6a53",
+      "bytes": 3059
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/config/proxy-nginx.conf",
+      "sha256": "cbbb64f01eabbac149142e98a6697d54eabe2fad41a4f9095d782af64b1a5630",
+      "bytes": 4358
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/config/serena_config.yml",
+      "sha256": "c49c6f0e2e7b33116483b8ab10bfc5cb9056efa0f7f3b7bf05064a0491a06565",
+      "bytes": 395
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/config/worker.json",
+      "sha256": "0363f132b82aa838b45b8d612508cf6c2ff636ca891aae29b25caf65ecb73c2f",
+      "bytes": 1283
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/dispatch.py",
+      "sha256": "a579f6ce525ddffc05989c05425e485562c982ae9d0c78b92af97424691d8ca2",
+      "bytes": 19469
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/e2e/check.py",
+      "sha256": "bcb8ee028037d39c385e80884b0b2fc492f47a418bf872ba0e6dcf1b96530a7b",
+      "bytes": 3522
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/e2e/docker_grader.py",
+      "sha256": "b75fd7cbb250d24b58f788d4e465910983ecc24599b828687c213c657dde4799",
+      "bytes": 5871
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/e2e/netprobe.py",
+      "sha256": "52650f68e8c0ab48dcef57f2a7a82c4a29ea88d4ce691df83cc6219aa9e3ebcb",
+      "bytes": 21917
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/e2e/task.py",
+      "sha256": "832043a6733b112cc9cc79d5a82524849bc357374bb1eb0ba267747cf24fcaa7",
+      "bytes": 2956
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/agent-server-image-grype-20260928.json",
+      "sha256": "8eceed55832600bd1c728e47d7e3cbcaa5f081e5b8167374cd18dc5e6def6dca",
+      "bytes": 36999
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/expanded-tests.txt",
+      "sha256": "b291a1d1f4af02653c53d4f9eeb0aaecf4985d079ae5ed77c4979bb6cdb136c6",
+      "bytes": 3118
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/fail-first.txt",
+      "sha256": "499168343f4f33d8a54294f350ff38c3c69cdcb6e06c6b691eb2fd927504d76f",
+      "bytes": 8151
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",
+      "sha256": "cbd76e3a31da13c27566b24f6c6c083b351d2cfe7e1b140a868419ff4334ec6f",
+      "bytes": 34970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/phase1-followup-commands.json",
+      "sha256": "56a5db9f436dd117f63e2fe98d6a203632e18cd06a185adacd8b944fe3f057be",
+      "bytes": 40180
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/phase2-commands.json",
+      "sha256": "843768ab93898fbd3e41b44d388d6d1411ad5c322c482c18066c6f1dc169b7de",
+      "bytes": 50331
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/publication-first.txt",
+      "sha256": "1f8791713a42ea92c498d4f1bd352f345b3a7c6f0d5a115462cad25fdc9527ed",
+      "bytes": 114
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/publication-pass.txt",
+      "sha256": "4c6f58444061b23b0b40dc27ffb52e3f55ffdd02e3e4195407ec57992d1e5be2",
+      "bytes": 212
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/receipt-red.txt",
+      "sha256": "fb365ecd833144fc3112e44373c1b152fe69298dd77b4dff388e68f70e0bf9e4",
+      "bytes": 6368
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-27.txt",
+      "sha256": "7e23a33b38eee053064b4152baf5543caec46d33ed33a8f683f470c618375373",
+      "bytes": 33599
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
+      "sha256": "89e32d55231db27386ed16dc077fa56dbd710c9c45f80433fa02c6b42e13b54e",
+      "bytes": 24151
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-fail-first.txt",
+      "sha256": "221598a5ce0669d5521e07c4b96e510d95244491d0febfacfcc99466547f9122",
+      "bytes": 46977
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-publication-first.txt",
+      "sha256": "bb5a392ee7ea7f1a5dd1729eeef3ef7ac557e9570bead139f7eabeac088f64ad",
+      "bytes": 1711
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-publication.txt",
+      "sha256": "1f8829c06c4222a0e029d6255979db4dfba7ac9cbb5373eec7e0456c0b1a890a",
+      "bytes": 1570
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-static-checks.txt",
+      "sha256": "49efbda45452a34a6c3e4f224b0fcaeb9f47356ca3ce55db69be875aad26822a",
+      "bytes": 2175
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-unit-pass.txt",
+      "sha256": "ccf01200e5abc65a74ce8b77a78cc3db03783dd107424b10e32dbc425c3188c6",
+      "bytes": 4894
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round2-verification.md",
+      "sha256": "3b38e242c6a73000d6874013fe674e26d7edb767057c8c3e1dca7ebf5535819f",
+      "bytes": 4649
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round3-commands.json",
+      "sha256": "1df821aa25a43514b57f6cca68878a13ce47ae05d967d66f543237998c56eed6",
+      "bytes": 136251
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/round3-verification.md",
+      "sha256": "6d689203155b396bf2f9a1c9824579814886397b0e343082f94b94ea47aa9abb",
+      "bytes": 30470
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/serena-red.txt",
+      "sha256": "d3872f7b0505b7e096af32ccf7ae99d7b655ea7ac5a5e7268718fc0b0122de18",
+      "bytes": 3568
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
+      "sha256": "6576e0f1b0ea27a22909854a90299ffef78034239d7147629eec595f6f520de0",
+      "bytes": 3013
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/verification.md",
+      "sha256": "51c90be86ab3fb3535f42aeb9227bff1479f101a3232860b47a98765c3e37269",
+      "bytes": 2872
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-source-comparison.json",
+      "sha256": "fcbc715b373c55bdd4a14c240ecc423cd338ff1b6a44a0c387929b43e33df325",
+      "bytes": 388
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/host.py",
+      "sha256": "c6a609b51403353da7fc16bc131cd2f76904b00f498d9478e30b742e6bc89e4c",
+      "bytes": 84290
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/install-container.sh",
+      "sha256": "1b639d729d7a3e2384e39c2817269aaa786615b2806d7d8123b8e18b081f098a",
+      "bytes": 1291
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/install-grader.sh",
+      "sha256": "84c23ee6ab190562761d65aca61d50d8a4bf33e0285f180dc00a1df3a288a243",
+      "bytes": 2359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/install.sh",
+      "sha256": "8c79bfc0a512ad31653b428e19da458309ff3866cb6ec7d1410c0d2e7109cdd8",
+      "bytes": 690
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/mcp_guard.py",
+      "sha256": "b3d6012c8b2e65e3923d64bc39a2cf6ae9ea7042de9d4f6a0c342cfbc69eed03",
+      "bytes": 1326
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "sha256": "cbefaf39340c43d2ce7f6411e93e62fb11979f29c2a09b67c7b957ea50f7c683",
+      "bytes": 4460
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/qmd-setup.py",
+      "sha256": "f419df9eef4ba3c48d3916a86ea46a735a091ca67f2868c59190bdb02571b7f4",
+      "bytes": 1126
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/receipt.py",
+      "sha256": "f8d04162b554157cf958d72ebc80f9adbc1f07a98a3b39bed4d72a16f0b00cc8",
+      "bytes": 17709
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/recipe.py",
+      "sha256": "8de3c2159a137c477716ba2871bbb9efa5275169f746a84ba5c98c16ecabce77",
+      "bytes": 6670
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+      "bytes": 106002
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/research.md",
+      "sha256": "1d47c05cfc3a1bb3541b6b80aaf4f1bed2949962a2d67115aa36cd5c07ddc2d2",
+      "bytes": 60078
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
+      "sha256": "a14cf4b25484b77c5f5b6d3103877d9eae3dee660b087b1e264710dd93c207a4",
+      "bytes": 442
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/server_transport.py",
+      "sha256": "39a26c5588f5865a129c982d0f60c591c4e745b35547816e68328e118cb97ac4",
+      "bytes": 629
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/worker.py",
+      "sha256": "ea5d67a538f87feac8a4d0b8a66cfdcbaef44f86a8ee7cb11efc332272bb1f5c",
+      "bytes": 11141
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
@@ -14111,6 +14361,11 @@
       "bytes": 16692
     },
     {
+      "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
+      "sha256": "1a2d28d0a0f998d3945ddbadb2c4ae18dd4e72838a0315a77bfea885483435ab",
+      "bytes": 19915
+    },
+    {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
       "sha256": "85002f8d31fe6ee4d333bf0ee4e2510bb34d549020ea29a6b5345907ef1c92c6",
       "bytes": 15185
@@ -14407,8 +14662,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "cd2c4275b86d0908cb102e7676f68d18faf22a5f39401046fd9e304438985d48",
-      "bytes": 81526
+      "sha256": "6d7a9d5e33efc186c2876daa5990713be7cc8e3f7491190de2022b4d952624f2",
+      "bytes": 82026
     },
     {
       "path": "docs/stack.md",
@@ -42644,6 +42899,11 @@
       "path": "tests/test_retrieval_quality_v2.py",
       "sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
       "bytes": 58079
+    },
+    {
+      "path": "tests/test_runtime_worker_openhands.py",
+      "sha256": "1103b1cd52507997cd6a3c628970d7fe46007fc0ddcf3fb43027f53f05a4b981",
+      "bytes": 220324
     },
     {
       "path": "tests/test_runtime_worker_skills.py",

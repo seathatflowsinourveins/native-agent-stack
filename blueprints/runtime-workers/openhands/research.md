@@ -451,8 +451,11 @@ Open items from this phase:
     enabled. It has not run against the live stores;
   - F10, the client peer the gateway logs;
   - normal-bridge containers such as cognee-live still reach host loopback.
-- **Outside this recipe's paths:** the repository's secret-path guard does not
-  yet cover the new `secrets/` directory.
+- **Outside this recipe's paths:** the repository's secret-path guard covers
+  the `secrets/` directory since #468 (merged 2026-09-28, `11a23f1b`): readers,
+  copies and searches of it, its files and a glob in it are blocked, and the
+  settings template denies `Read` of it. `docker exec` into the agent-server and
+  a full `docker inspect` of it still show the key (recorded guard gap).
 
 ## Repair round (2026-09-28)
 
