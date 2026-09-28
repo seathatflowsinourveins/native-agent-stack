@@ -141,3 +141,26 @@ Recorded before any run of the preregistered comparison above, so it amends arm 
   the coordinator's own checkout; see decision 2 of the 2026-09-27 record. Arm B's builder stages therefore get
   their checkout from the coordinator, as arm A's `general-purpose` stages do.
 - **Tool surfaces are unchanged**, and no role gains `memory`.
+
+## Addendum 2026-09-27: SubagentStart text for the named roles
+
+Alternative 2 rejected SubagentStart injection for these agents: a second block would duplicate lane text in
+the first prompt, and each agent type should keep one byte-stable text. The
+[SubagentStart carrier](2026-09-27-token-lanes-subagent-start.md) reached them anyway, because its gate
+excluded only `blind-*` types. Each named role received the full block with 17 tool ids, and most of those ids
+were outside its `tools:` allowlist. The carrier's
+[role-matched addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)
+reconciles the two records:
+
+- Each allowlisted role receives one byte-stable role block that names only lanes its `tools:` line grants.
+  `semantic-evidence-reviewer` and the blind roles receive nothing. The agent bodies remain the role-specific
+  rules and are unchanged, so the five bodies sealed for #381 keep their hashes.
+- The duplication that alternative 2 foresaw is reduced but still present. A role block repeats a few body rules,
+  such as one lane per artifact and the exact RTK command shapes. It also adds carrier-only rules the sealed
+  bodies do not state: `intent`, `cwd` for every language and the RTK rewrite details. On a host with the hook
+  installed, arm B above runs with a body plus a role block, so record the carrier revision with each run.
+- Alternative 5 is unchanged: no role gained a lane. The carrier's grant-agreement test fails when a role block
+  names a lane that the role's allowlist lacks.
+
+**Overturn.** Remove a role block if a measured child run shows that its lines duplicate the body without
+changing lane use, and record that here.
