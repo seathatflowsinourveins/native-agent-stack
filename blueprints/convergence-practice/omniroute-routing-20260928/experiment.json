@@ -34,7 +34,7 @@
     "The builder resolved the full merge commit ids of OmniRoute PRs #8940 (merged 2026-08-11) and #5943 (merged 2026-07-02) with gh api on 2026-09-28; the receipts carry their short forms d774cceca and 8d2df914. The open PR #13102 is pinned at its head baaaaf31, as recorded in route-mapper-resume-parts.md.",
     "Repository context: docs/decisions/2026-09-27-omniroute-account-pool.md and evidence/artifacts/omniroute-gateway-20260927/ (the build, the service and the keyless loopback posture)."
   ],
-  "license_and_compatibility": "OmniRoute is MIT (manifests/stack.json). This record installs, vendors and runs no new component. The other gateways (CLIProxyAPI, sub2api, LiteLLM, Bifrost, new-api, llm-d-router, SMG and others) were read at pinned revisions only; their licenses were not re-checked here. The approved occupancy patch changes the deployed OmniRoute build and copies its guard form from OmniRoute's own open PR #13102. Its build, tests and any license check belong to the separate patch workflow. GPT-6 was reached through the host's native Codex sign-in, and the GPT-6 prompts carry only the public question, the catalog and public URLs.",
+  "license_and_compatibility": "OmniRoute is MIT (manifests/stack.json). This record installs, vendors and runs no new component. The other gateways (CLIProxyAPI, sub2api, LiteLLM, Bifrost, new-api, llm-d-router, SMG and others) were read at pinned revisions only; their licenses were not re-checked here. The approved occupancy patch changes the deployed OmniRoute build and copies its guard form from OmniRoute's own open PR #13102. Its build, tests and any license check belong to the separate patch workflow. GPT-6 was reached through the host's native Codex sign-in. The two research jobs' GPT-6 prompts (JOB 1 and JOB 2) carry only the public question, the catalog and public URLs; the record-review prompt embeds this record's own files and is not published because it contains private paths.",
   "baseline_and_candidate": {
     "baseline": "The routing as configured before this record. 20128 (build dd6e9607e): session affinity on with a 4 h sliding TTL; providerStrategies.codex round-robin with stickyRoundRobinLimit 1; the post-affinity OAuth occupancy override hardcoded on; quota used only as a hard filter at 99% used. 20129: the sharedgw limiter auto-enabled (60 rpm, 350 ms, 6 concurrent), its own retry layers and compression on. Measured in route-mapper-final.json over the 24 h ending about 2026-09-28T00:13Z, and by hour and load in route-mapper-part1-final.md.",
     "candidate": "The adjudicated routing rules (51 items, adjudication.json; 47 fields in 37 items await re-adjudication after the GPT-6 record review) and the two changes they select. First, the 20129 limiter lift, applied 2026-09-28T01:22:13Z. Second, the approved 20128 affinity-over-occupancy patch: reuse an eligible pin, and bind a fresh pin to the connection that served it; it is applied only after the R02 scored run. This record changed no other setting. At 2026-09-28T03:49:59Z a separate 20129 design workflow changed 20129's fallback, context-handoff, context-length, combo and compression settings (decisions.json, context_changes)."
@@ -187,7 +187,7 @@
       "quality": {"semantic": false, "contract": null},
       "artifacts": [
         {"path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json", "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56"},
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
     },
@@ -361,7 +361,7 @@
       "quality": {"semantic": null, "contract": true},
       "artifacts": [
         {"path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json", "sha256": "d0821ebf06adbdb24817996fcc9416c694db74521b28ff6401534d87ed8284fd"},
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812"}
       ],
       "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
     },
@@ -378,7 +378,7 @@
       "exit_code": 2,
       "quality": {"semantic": null, "contract": false},
       "artifacts": [
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812"}
       ],
       "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
     },
@@ -395,7 +395,7 @@
       "exit_code": 0,
       "quality": {"semantic": null, "contract": true},
       "artifacts": [
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812"}
       ],
       "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
     },
@@ -413,7 +413,7 @@
       "quality": {"semantic": null, "contract": null},
       "artifacts": [
         {"path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md", "sha256": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625"},
-        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "93f7cfa4a62ec5b17c09a8992bff004f3aca3e928107e9e5d21c0830eed95ac4"}
+        {"path": "evidence/artifacts/omniroute-routing-20260928/decisions.json", "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812"}
       ],
       "usage": {"uncached_input": null, "cache_creation": null, "cache_read": null, "output": null, "reasoning_in_output": null, "total": null, "native_retries": null}
     },
@@ -491,7 +491,7 @@
     "The 03:49:59Z 20129 design apply, outside this record, changed settings on the limiter lift's lane. A later 20129 measurement therefore cannot attribute an effect to the lift alone (P17's overturn condition): use a matched baseline after 03:50:11Z, or attribute both changes.",
     "The kept TTL does not preserve continuation ownership past expiry. An expired pin is deleted, and the next turn gets a fresh LRU pin even when the original account is healthy (sessionAccountAffinity.ts:63-83; sessionAffinityPin.ts:280-319).",
     "The GPT-6 record review names further untested risks. The 20129-to-20128 hop forwards x-session-id but not session-id, thread-id or x-codex-turn-state (harm:2). Threshold-triggered context compaction on sharedgw can rewrite earlier input (harm:3; recheck it against the 20129 settings after 03:49:59Z). Model, tier and effective-effort preservation across both hops is unproven (harm:4). OAuth refresh concurrency needs review before pinned traffic concentrates (missing:1). HTTP 200 is not completion without the terminal SSE event (missing:2). The all-200 counts in part1-final-recheck and limiter-lift-20129 are HTTP status only.",
-    "A passed run whose scope says no process exit status was retained carries exit_code 0 because scripts/validate_convergence.py:120-121 requires 0 for a passed run. Read it as reported completion, not an observed exit. The limiter-lift and R02 exit statuses come from the coordinator's log."
+    "A passed run whose scope says no process exit status was retained carries exit_code 0 because scripts/validate_convergence.py:120-121 requires 0 for a passed run. Read it as reported completion, not an observed exit. The R02 read-back exit statuses come from the coordinator's log; the limiter lift has an HTTP 200 and a matching read-back, not a process exit status."
   ],
   "decision_and_scope": {
     "decision": "trial",

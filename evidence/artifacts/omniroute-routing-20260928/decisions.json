@@ -76,7 +76,7 @@
   {
    "id": "cutoff-projection-not-held",
    "utc": "2026-09-28T01:22Z",
-   "what": "The 00:19Z projection that the 99%-used limit policy would cut prio4 off at about 01:21Z and prio1 at about 01:29Z did not hold. Codex turns per 5 min fell from 33-67 to 0-14 during the pause, and no cutoff had happened by 01:22Z (route-mapper-resume-parts.md, part 1, interim). The final part 1 report observed no cutoff through 03:29Z in the retained snapshots and logs: no retained row reached <=1% remaining or was marked exhausted (route-mapper-part1-final.md). A missing row is either an unchanged value or a failed save (quotaCache.ts:569-588)."
+   "what": "The 00:19Z projection that the 99%-used limit policy would cut prio4 off at about 01:21Z and prio1 at about 01:29Z did not hold. Codex turns per 5 min fell from 33-67 to 0-14 during the pause, and no cutoff had happened by 01:22Z (route-mapper-resume-parts.md, part 1, interim). The final part 1 report observed no cutoff through 03:29Z in the retained snapshots and logs: no retained row reached <=1% remaining or was marked exhausted (route-mapper-part1-final.md). A missing row can mean an unchanged value, a failed save, or an update skipped before persistence (quotaCache.ts:524-547, 569-588), so poll freshness is not established."
   },
   {
    "id": "window-source-correction",
