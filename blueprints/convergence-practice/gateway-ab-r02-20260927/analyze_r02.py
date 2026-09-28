@@ -2,6 +2,7 @@
 """Paired analysis of the R02 promptfoo results and the preregistered decision.
 
   analyze_r02.py ids --results-ab AB.json --results-ba BA.json --state-dir DIR
+  analyze_r02.py readback READBACK.json
   uv run --no-project --python 3.14 --with numpy==2.5.3 --with scipy==1.18.1 --with statsmodels==0.15.0 \
       python analyze_r02.py analyze --results-ab AB.json --results-ba BA.json --state-dir DIR \
       --call-logs CALL_LOGS.json --gateway-readbacks AB_BEFORE AB_AFTER BA_BEFORE BA_AFTER [--out DECISION.json]
@@ -53,21 +54,26 @@ sanitized read-backs. The integrity phase and the `ids` command need only the st
   frozen one is an integrity problem. A failure after the gateway committed a slow-path 200 stream arrives in-band
   as a data-only error chunk (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685), which the
   transform reports as sse_error_event.
-- call_logs. Each call is joined on its sent id to the rows of a settled snapshot (call_logs_by_correlation.py
-  re-reads until two consecutive reads at least 30 s apart agree). Attempt order is not observable: the gateway
-  logs attempts without awaiting persistence (OmniRoute@dd6e9607e:open-sse/handlers/chatCore/attemptLogging.ts:
-  557-618), stamps a row after awaited lookups (src/lib/usage/callLogs.ts:538, 597, 602, 680) and inserts it only
-  after an awaited artifact write (:759, 824). Its own drain, waitForCallLogSaves (:878-896), runs in-process and
-  outside tests only from graceful shutdown (:898-910; src/lib/gracefulShutdown.ts:114, 129), so a reader of a
-  shared, running gateway settles instead. A call's terminal row is taken from the client's own outcome, never
-  from timestamps or insertion order. A call promptfoo graded received a complete stream and must have a success
-  row; a call whose HTTP status the client saw (the transform's http_status_<code>, a thrown 429) narrows to rows
-  with that status, and no such row is an integrity problem. For other failures the client's status says nothing
-  about the log: a slow-path stream commits 200 before the gateway's attempts end and then frames their error
-  in-band (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685), so all of the call's rows are
-  candidates. The terminal row is known only when the candidates agree on status, model and both effort columns;
-  otherwise it is unknown, an integrity problem. A graded call with no row is an integrity problem; an error call
-  with no row is counted by client-side outcome.
+- call_logs. Each call is joined on its sent id to the rows of an observed snapshot (call_logs_by_correlation.py
+  re-reads until two consecutive reads at least 30 s apart agree). The snapshot is not a complete log, and
+  settling is a heuristic: the gateway starts each attempt's save without awaiting it (OmniRoute@dd6e9607e:
+  open-sse/handlers/chatCore/attemptLogging.ts:557-618), stamps the row after awaited lookups
+  (src/lib/usage/callLogs.ts:538, 597, 602, 680) and inserts it only after an awaited artifact write (:759, 824), so
+  a save can land after the last read; a save whose error is swallowed (attemptLogging.ts:618) or that is skipped
+  (callLogs.ts:867) never lands. Its own drain, waitForCallLogSaves (:878-896), runs in-process and outside tests
+  only from graceful shutdown (:898-910; src/lib/gracefulShutdown.ts:114, 129), so a reader of a shared, running
+  gateway cannot call it. Every call_logs figure is therefore of observed rows (CALL_LOG_SCOPE, in the report):
+  row counts are lower bounds, a call without a row may have rows saved late or never, and the terminal status is
+  the observed one. Attempt order is not observable either, so a call's observed terminal row is taken from the
+  client's own outcome, never from timestamps or insertion order. A call promptfoo graded received a complete
+  stream and must have an observed success row; a call whose HTTP status the client saw (the transform's
+  http_status_<code>, a thrown 429) narrows to observed rows with that status, and no such row is an integrity
+  problem. For other failures the client's status says nothing about the log: a slow-path stream commits 200
+  before the gateway's attempts end and then frames their error in-band (OmniRoute@dd6e9607e:
+  open-sse/utils/earlyStreamKeepalive.ts:664-685), so all of the call's observed rows are candidates. The observed
+  terminal row is taken only when the candidates agree on status, model and both effort columns; otherwise it is
+  unknown, an integrity problem. A graded call with no observed row is an integrity problem, so a late or lost save
+  can void a run but cannot change a verdict; an error call with no observed row is counted by client-side outcome.
 - Scores. li26's own eval_arm.parse_items and analyze.filing_scores rescore every returned output; the python
   assertion's namedScores must agree. A call without output scores as filing_scores(gold, None), li26's rule for a
   call that returned nothing usable.
@@ -110,8 +116,16 @@ sanitized read-backs. The integrity phase and the `ids` command need only the st
   reasoning (OmniRoute@dd6e9607e:src/lib/usage/callLogs.ts:646-653), so a NULL is no observation.
 - Gateway fingerprint. Every gateway read that exposes the build or the effort-relevant settings needs a
   credential, so the gateway owner performs it before and after each run half and returns a sanitized read-back
-  with exactly the top-level keys in plan.json gateway_fingerprint.fields. This command hashes each (canonical
-  JSON) and treats a missing read-back, another key set or any difference between the four as an integrity problem.
+  with exactly the top-level keys in plan.json gateway_fingerprint.fields. Every field's value must equal one of
+  the values plan.json gateway_fingerprint.admissible lists for it, with JSON Schema enum semantics (JSON Schema
+  Validation 2020-12, section 6.1.2; equality as python-jsonschema 4.26.0 implements it in jsonschema/_utils.py:
+  106-153, used by jsonschema/_keywords.py:269-271): four identical read-backs that all show, for example, a rule
+  forcing max effort or compression on are not admissible, so both arms cannot silently run the wrong treatment.
+  The code holds no admissible value; another study declares its own in its plan. This command hashes each read-
+  back (canonical JSON) and treats a missing read-back, another key set, a value outside the declaration, a
+  declaration that does not give each field a non-empty list and, as a supplementary check, any difference between
+  the four as an integrity problem. Problems name the read-back and field, never the value. `analyze_r02.py
+  readback FILE` checks one read-back against the declaration, for the owner's dry read-back before freezing.
 """
 from __future__ import annotations
 
@@ -144,7 +158,10 @@ TERMINAL_KEYS = ("status", "model", "reasoning_effort_requested", "reasoning_eff
 READBACK_POINTS = ("ab_before", "ab_after", "ba_before", "ba_after")
 REDACTED = "[REDACTED]"  # promptfoo's sanitizer marker, dist/src/logger-ChlKG5Wv.js:494
 READ_VARS = ("accession", "labels_json")  # the test vars this analysis reads from a results file
-MIN_SETTLE_SECONDS = 30
+MIN_SETTLE_SECONDS = 30  # the preregistered re-read interval; a heuristic, not a bound on save latency
+CALL_LOG_SCOPE = ("observed snapshot: rows saved after the last read or never saved are not in it, so row counts "
+                  "are lower bounds, a call without a row may have unsaved rows, and a terminal status is the one "
+                  "the observed rows agree on (plan.json correlation.snapshot)")
 SEED = 20260927
 RESAMPLES = 10000
 CONFIDENCE = 0.95
@@ -191,7 +208,8 @@ def frozen_spec(plan=None):
             "call_deadline_ms": int(environment["PROMPTFOO_EVAL_TIMEOUT_MS"]),
             "request_timeout_ms": int(environment["REQUEST_TIMEOUT_MS"]),
             "environment": dict(plan["analysis_environment"]["versions"]),
-            "gateway_fields": sorted(plan["gateway_fingerprint"]["fields"])}
+            "gateway_fields": sorted(plan["gateway_fingerprint"]["fields"]),
+            "gateway_admissible": plan["gateway_fingerprint"].get("admissible")}
 
 
 def result_rows(data):
@@ -325,24 +343,71 @@ def environment_problems(required, versions):
     return problems
 
 
-def gateway_fingerprint(readbacks, fields):
-    """The sha256 (canonical JSON) of the gateway owner's four sanitized read-backs, and the problems: a missing
-    read-back, top-level keys other than the allowlisted fields, or read-backs that differ."""
-    digests, problems = {}, []
+def json_equal(one, two):
+    """JSON Schema instance equality (JSON Schema Core 2020-12, section 4.2.2), ported from python-jsonschema
+    4.26.0's equal, _sequence_equal, _mapping_equal and unbool (jsonschema/_utils.py:106-153), which its enum
+    keyword uses (jsonschema/_keywords.py:269-271): a boolean equals only the same boolean, never 1 or 0; other
+    numbers compare by value, so 600000 equals 600000.0; arrays compare item by item in order, objects by their keys
+    and values."""
+    if isinstance(one, str) or isinstance(two, str):
+        return one == two
+    if isinstance(one, list) and isinstance(two, list):
+        return len(one) == len(two) and all(json_equal(first, second) for first, second in zip(one, two))
+    if isinstance(one, dict) and isinstance(two, dict):
+        return len(one) == len(two) and all(key in two and json_equal(value, two[key]) for key, value in one.items())
+    if isinstance(one, bool) or isinstance(two, bool):
+        return one is two
+    return one == two
+
+
+def admissible_problems(fields, admissible):
+    """The declaration's own problems: plan.json gateway_fingerprint.admissible must list, for exactly the declared
+    fields, a non-empty list of admissible values each."""
+    if isinstance(admissible, dict) and sorted(admissible) == sorted(fields) and \
+            all(isinstance(values, list) and values for values in admissible.values()):
+        return []
+    return ["plan.json gateway_fingerprint.admissible does not give each gateway field a non-empty list of "
+            "admissible values"]
+
+
+def readback_problems(point, value, fields, admissible=None):
+    """One sanitized read-back: a JSON object with exactly the declared fields and, given the declaration, every
+    field's value equal (json_equal) to one of its admissible values, as a JSON Schema enum. Problems name the
+    read-back and the field, never the value."""
+    if not isinstance(value, dict):
+        return [f"gateway read-back {point} is missing or not a JSON object"]
+    if sorted(value) != sorted(fields):
+        return [f"gateway read-back {point} does not have exactly the allowlisted top-level keys"]
+    if admissible is None:
+        return []
+    return [f"gateway read-back {point}: {field} is not an admissible value" for field in sorted(fields)
+            if not any(json_equal(value[field], allowed) for allowed in admissible[field])]
+
+
+def gateway_fingerprint(readbacks, fields, admissible):
+    """The gateway owner's four sanitized read-backs against plan.json gateway_fingerprint: the sha256 (canonical
+    JSON) of each, whether all are admissible and identical, and the problems. A missing read-back, other top-level
+    keys, a value outside the declaration (readback_problems) and a broken declaration (admissible_problems) are
+    problems; so is, as a supplementary check, any difference between the four. The admissible values are data from
+    the plan, so identical read-backs of the wrong treatment fail here."""
+    problems = admissible_problems(fields, admissible)
+    declared = None if problems else admissible
+    digests, value_problems = {}, []
     readbacks = readbacks if isinstance(readbacks, dict) else {}
     for point in READBACK_POINTS:
         value = readbacks.get(point)
-        if not isinstance(value, dict):
-            problems.append(f"gateway read-back {point} is missing or not a JSON object")
-            continue
-        if sorted(value) != sorted(fields):
-            problems.append(f"gateway read-back {point} does not have exactly the allowlisted top-level keys")
-            continue
-        digests[point] = sha256_text(canonical(value))
+        found = readback_problems(point, value, fields, declared)
+        if isinstance(value, dict) and sorted(value) == sorted(fields):
+            digests[point] = sha256_text(canonical(value))
+            value_problems += found
+        else:
+            problems += found
+    problems += value_problems
     if len(set(digests.values())) > 1:
         problems.append("the gateway read-backs differ between the points of the run")
-    return {"sha256": digests, "identical": len(digests) == len(READBACK_POINTS) and len(set(digests.values())) == 1}, \
-        problems
+    complete = len(digests) == len(READBACK_POINTS)
+    return {"sha256": digests, "admissible": complete and declared is not None and not value_problems,
+            "identical": complete and len(set(digests.values())) == 1}, problems
 
 
 # --- calls ----------------------------------------------------------------------------------------------------
@@ -506,21 +571,23 @@ def client_status(call):
 
 
 def terminal_row(call, rows):
-    """(row, None) with the call's terminal call_logs row, or (None, reason) when it is not determined. Attempt
-    order is never inferred from timestamps or insertion order."""
+    """(row, None) with the call's observed terminal call_logs row, or (None, reason) when it is not determined.
+    `rows` are the call's rows in the observed snapshot; a row saved late or never is not among them. Attempt order
+    is never inferred from timestamps or insertion order."""
     status = client_status(call)
     if status == "success":
         candidates = [row for row in rows if isinstance(row.get("status"), int) and 200 <= row["status"] < 300]
         if not candidates:
-            return None, "promptfoo graded this call but none of its call_logs rows is a success"
+            return None, "promptfoo graded this call but none of its observed call_logs rows is a success"
     elif status is not None:
         candidates = [row for row in rows if row.get("status") == status]
         if not candidates:
-            return None, f"the client received HTTP {status} but none of the call's call_logs rows has it"
+            return None, f"the client received HTTP {status} but none of the call's observed call_logs rows has it"
     else:
         candidates = list(rows)
     if len({tuple(row.get(key) for key in TERMINAL_KEYS) for row in candidates}) != 1:
-        return None, "terminal call_logs status unknown: the candidate rows disagree and attempt order is not known"
+        return None, ("terminal call_logs status unknown: the observed candidate rows disagree and attempt order is "
+                      "not known")
     return candidates[0], None
 
 
@@ -546,11 +613,12 @@ def call_log_rows(call_logs):
 
 
 def call_log_summary(call_logs, calls):
-    """Per arm, each call joined on its sent correlation id to the settled call_logs rows, its terminal row taken
-    from the client's outcome (terminal_row). Rows per call and 429 rows count all rows. A NULL effort column is
-    no observation, never "no effort". Returns the report and its problems."""
+    """Per arm, each call joined on its sent correlation id to the rows of the observed snapshot, its observed
+    terminal row taken from the client's outcome (terminal_row). Every figure is of observed rows (CALL_LOG_SCOPE):
+    rows per call and 429 rows count all observed rows and are lower bounds. A NULL effort column is no
+    observation, never "no effort". Returns the report and its problems."""
     rows, snapshot, problems = call_log_rows(call_logs)
-    report = {"snapshot": snapshot}
+    report = {"scope": CALL_LOG_SCOPE, "snapshot": snapshot}
     for arm in ("A", "B"):
         arm_calls = [call for call in calls if call["arm"] == arm]
         terminals, unmatched, all_rows, row_counts = [], [], [], []
@@ -558,7 +626,8 @@ def call_log_summary(call_logs, calls):
             matched = rows.get(call["sent_id"], [])
             if not matched:
                 if call["error_kind"] is None:
-                    problems.append(f"{arm} {call['sent_id']}: promptfoo graded this call but call_logs has no row")
+                    problems.append(f"{arm} {call['sent_id']}: promptfoo graded this call but the call_logs "
+                                    "snapshot has no row for it (none written, or saved late or never)")
                 unmatched.append(call)
                 continue
             all_rows += matched
@@ -576,12 +645,12 @@ def call_log_summary(call_logs, calls):
             "rows": len(all_rows),
             "rows_per_call": dict(sorted(Counter(row_counts).items())),
             "calls_with_several_rows": sum(count > 1 for count in row_counts),
-            "terminal_status": dict(sorted(Counter(str(row["status"]) for _, row in terminals).items())),
+            "observed_terminal_status": dict(sorted(Counter(str(row["status"]) for _, row in terminals).items())),
             "row_status": dict(sorted(Counter(str(row.get("status")) for row in all_rows).items())),
             "http_429_rows": sum(row.get("status") == 429 for row in all_rows),
-            "http_429_terminal": sum(row["status"] == 429 for _, row in terminals),
-            "client_outcome_by_terminal_status": [
-                {"client": client, "terminal_status": status, "count": count}
+            "http_429_observed_terminal": sum(row["status"] == 429 for _, row in terminals),
+            "client_outcome_by_observed_terminal_status": [
+                {"client": client, "observed_terminal_status": status, "count": count}
                 for (client, status), count in sorted(Counter(
                     [(client_outcome(call), str(row["status"])) for call, row in terminals] +
                     [(client_outcome(call), "no_row") for call in unmatched]).items())],
@@ -814,7 +883,8 @@ def integrity(results_by_run, tests_raw_by_run, call_logs, gateway_readbacks, fr
     (installed_versions()); None skips that check, for synthetic tests outside the pinned environment."""
     _, problems = input_problems(results_by_run, tests_raw_by_run, frozen)
     report = {"rule": RULE, "repeats": frozen["repeats"]}
-    fingerprint, fingerprint_problems = gateway_fingerprint(gateway_readbacks, frozen["gateway_fields"])
+    fingerprint, fingerprint_problems = gateway_fingerprint(gateway_readbacks, frozen["gateway_fields"],
+                                                            frozen["gateway_admissible"])
     report["gateway_fingerprint"] = fingerprint
     if versions is not None:
         report["versions"] = versions
@@ -912,9 +982,19 @@ def correlation_ids(results_by_run, tests_raw_by_run, frozen=None):
     return ids
 
 
+def dry_readback(value, frozen):
+    """The owner's dry read-back before freezing, against the plan's declaration: (admissible, problems)."""
+    problems = admissible_problems(frozen["gateway_fields"], frozen["gateway_admissible"]) or \
+        readback_problems("dry-run", value, frozen["gateway_fields"], frozen["gateway_admissible"])
+    return not problems, problems
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
+    check = commands.add_parser("readback", help="one gateway read-back against plan.json gateway_fingerprint."
+                                                 "admissible, for the owner's dry read-back before freezing")
+    check.add_argument("readback")
     ids = commands.add_parser("ids", help="the sent correlation id of every call per arm, for "
                                           "call_logs_by_correlation.py")
     run = commands.add_parser("analyze", help="integrity checks, then paired statistics and the decision")
@@ -928,6 +1008,10 @@ def main(argv=None):
     run.add_argument("--out")
     args = parser.parse_args(argv)
     frozen = frozen_spec()
+    if args.command == "readback":
+        admissible, problems = dry_readback(read_json(args.readback), frozen)
+        print(json.dumps({"admissible": admissible, "problems": problems}, indent=2))
+        return 0 if admissible else EXIT_INVALID
     results = {"ab": read_json(args.results_ab), "ba": read_json(args.results_ba)}
     tests = read_tests(args.state_dir, frozen)
     if args.command == "ids":

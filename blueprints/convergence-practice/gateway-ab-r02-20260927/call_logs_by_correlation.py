@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Effort and status OmniRoute recorded for given correlation ids, from call_logs (read-only), as a settled snapshot.
+"""Effort and status OmniRoute recorded for given correlation ids, from call_logs (read-only), as an observed snapshot.
 
 Based on the session's effort_window.py, which selects the same effort columns, keyed by correlation id instead
 of a time window: other gateway clients call the same models in the same window. OmniRoute lines below were
@@ -24,15 +24,19 @@ an awaited artifact write (:759, 824). So neither timestamp nor insertion order 
 this script reports an id's rows without numbering them or marking one as final; the query orders them only to
 make the output stable. analyze_r02.py takes each call's terminal row from the client's own outcome.
 
-Settled snapshot. The gateway drains pending saves with waitForCallLogSaves (callLogs.ts:878-896), in-process and,
-outside its tests, only from graceful shutdown (closeCallLogSaves, :898-910, with a 2 s default budget, called
-from src/lib/gracefulShutdown.ts:114, 129); its own tests wait up to 10 s (tests/unit/call-log-save-drain.test.ts:
-39). A reader of the shared running gateway cannot call it, so this script reads the rows, waits
---settle-seconds (default 30, fifteen times the shutdown budget) and reads again until two consecutive reads are
-equal, for at most --max-wait-seconds (default 600). Run it after both runs have finished. A save whose error the
-gateway swallows (attemptLogging.ts:618) never lands, and no snapshot can show it. The output records the reads,
-whether they settled, the interval and the bound; analyze_r02.py treats an unsettled snapshot or an interval
-under 30 s as an integrity problem. The exit code is 3 when the reads did not settle.
+Observed snapshot. The output is what call_logs held when it was read, not a complete log. This script reads the
+rows, waits --settle-seconds (default 30) and reads again until two consecutive reads are equal, for at most
+--max-wait-seconds (default 600); run it after both runs have finished. Settling is a heuristic for saves still in
+flight, not a completeness check. A save can land after the last read, because its row is stamped after awaited
+lookups and inserted after an awaited artifact write (above) and nothing bounds those waits. A save can also never
+land: its error is swallowed (attemptLogging.ts:618), and it is skipped while persistence to disk is off or saves
+are closing (callLogs.ts:867). No read can show either case. The gateway's own drain, waitForCallLogSaves
+(callLogs.ts:878-896), runs in-process and, outside its tests, only from graceful shutdown (closeCallLogSaves,
+:898-910, called from src/lib/gracefulShutdown.ts:114, 129), so a reader of the shared running gateway cannot call
+it; its 2 s shutdown budget and the 10 s its tests wait (tests/unit/call-log-save-drain.test.ts:39) bound no save
+latency. Counts in the output are of observed rows, and an unmatched id may have rows saved late or never. The
+output records the reads, whether they settled, the interval and the bound; analyze_r02.py treats an unsettled
+snapshot or an interval under 30 s as an integrity problem. The exit code is 3 when the reads did not settle.
 
 Selects only correlation_id, timestamp, status, model, reasoning_effort_requested and reasoning_effort_upstream:
 no account, connection, token or path column. The database is opened with SQLite's mode=ro URI parameter.

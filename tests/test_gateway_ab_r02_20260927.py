@@ -613,11 +613,18 @@ class PlanTests(unittest.TestCase):
         environment = PLAN["run"]["environment"]
         self.assertEqual(environment, {"PROMPTFOO_EVAL_TIMEOUT_MS": "1320000", "REQUEST_TIMEOUT_MS": "660000",
                                        "PROMPTFOO_DISABLE_TELEMETRY": "1"})
-        # The gateway's stream cap and upstream fetch timeout, each plus the gateway's 60,000 ms margin
-        # (OmniRoute@dd6e9607e:src/shared/utils/runtimeTimeouts.ts:9, 20-21).
-        self.assertEqual(int(environment["PROMPTFOO_EVAL_TIMEOUT_MS"]), 1_260_000 + 60_000)
-        self.assertEqual(int(environment["REQUEST_TIMEOUT_MS"]), 600_000 + 60_000)
+        # 22 minutes per step, preregistered as an independent deadline: pre-stream waiting and gateway retries count
+        # toward it, the gateway's stream watchdogs start later, so no gateway limit guarantees a call ends before it.
+        self.assertEqual(int(environment["PROMPTFOO_EVAL_TIMEOUT_MS"]), 22 * 60 * 1000)
         self.assertEqual(set(PLAN["run"]["environment_reasons"]), set(environment))
+        reasons = PLAN["run"]["environment_reasons"]
+        self.assertIn("preregistered as an independent experimental deadline", reasons["PROMPTFOO_EVAL_TIMEOUT_MS"])
+        self.assertIn("every gateway attempt and retry", reasons["PROMPTFOO_EVAL_TIMEOUT_MS"])
+        self.assertIn("a failure of its arm", reasons["PROMPTFOO_EVAL_TIMEOUT_MS"])
+        for claim in ("fires only when the gateway does not end a stream", "A call that fits the gateway's limits",
+                      "re-derive it before freezing", "before promptfoo gives up"):
+            self.assertNotIn(claim, json.dumps(reasons))
+        self.assertIn("per arm", PLAN["metrics"]["timeouts"])
         self.assertTrue({"PROMPTFOO_STRIP_PROMPT_TEXT", "PROMPTFOO_STRIP_RESPONSE_OUTPUT", "PROMPTFOO_STRIP_TEST_VARS",
                          "PROMPTFOO_STRIP_GRADING_RESULT", "PROMPTFOO_STRIP_METADATA",
                          "PROMPTFOO_SHORT_CIRCUIT_TEST_FAILURES"} <= set(PLAN["run"]["must_not_set"]))
@@ -637,8 +644,33 @@ class PlanTests(unittest.TestCase):
         fingerprint = PLAN["gateway_fingerprint"]
         self.assertTrue(fingerprint["status"].startswith("execution precondition performed by the gateway owner"))
         self.assertEqual(len(set(fingerprint["fields"])), len(fingerprint["fields"]))
-        self.assertEqual(sorted(fingerprint["fields"]), sorted(fingerprint["field_sources"]))
-        self.assertEqual(ANALYZE.frozen_spec()["gateway_fields"], sorted(fingerprint["fields"]))
+        for record in ("field_sources", "admissible", "admissible_provenance"):
+            self.assertEqual(sorted(fingerprint[record]), sorted(fingerprint["fields"]), record)
+        frozen = ANALYZE.frozen_spec()
+        self.assertEqual(frozen["gateway_fields"], sorted(fingerprint["fields"]))
+        self.assertEqual(frozen["gateway_admissible"], fingerprint["admissible"])
+        self.assertEqual(ANALYZE.admissible_problems(frozen["gateway_fields"], frozen["gateway_admissible"]), [])
+        self.assertIn("readback", fingerprint["procedure"])
+        self.assertIn("analyze_r02.py readback", PLAN["freeze"])
+
+    def test_the_admissible_gateway_values_are_the_r02_treatment(self):
+        admissible = PLAN["gateway_fingerprint"]["admissible"]
+        # Each arm reaches its own model: no combo or mapping takes either arm's model string.
+        self.assertEqual(admissible["arm_model_combos"],
+                         [{PLAN["arms"]["A"]["model"]: None, PLAN["arms"]["B"]["model"]: None}])
+        # No enabled reasoning-routing rule of any mode, and no connection default effort or service tier.
+        self.assertEqual((admissible["reasoning_routing_rules"], admissible["codex_connection_request_defaults"]),
+                         ([[]], [[]]))
+        self.assertEqual(admissible["thinking_budget_mode"], ["passthrough"])
+        self.assertEqual(admissible["compression"],
+                         [{"enabled": False, "defaultMode": "off", "exclusions": ["codex/*"]}])
+        self.assertEqual((admissible["omniroute_app_version"], admissible["omniroute_build_sha"]),
+                         (["3.8.51"], ["dd6e9607e"]))
+        self.assertEqual(admissible["upstream_timeouts"][0]["streamActiveTimeoutMs"], 3_600_000)
+        # The admissible values are the plan's data; the analyzer holds none of them.
+        source = (HERE / "analyze_r02.py").read_text()
+        for value in ("3.8.51", "dd6e9607e\"", "passthrough\"", "codex/*", "3600000"):
+            self.assertNotIn(value, source)
 
     def test_time_to_headers_is_labelled_and_no_path_is_inferred_from_it(self):
         self.assertIn("time_to_response_headers", PLAN["metrics"])
@@ -648,6 +680,31 @@ class PlanTests(unittest.TestCase):
         self.assertNotIn("most likely took the slow path", json.dumps(PLAN))
         self.assertIn("terminal_row_rule", PLAN["correlation"])
         self.assertNotIn("final_row_rule", PLAN["correlation"])
+
+    def test_call_logs_are_an_observed_snapshot(self):
+        correlation = PLAN["correlation"]
+        for text in ("observed snapshot, not as a complete log", "heuristic", "can land after the last read",
+                     "never land", "lower bounds", "cannot change a verdict"):
+            self.assertIn(text, correlation["snapshot"])
+        self.assertIn("observed terminal row", correlation["terminal_row_rule"])
+        self.assertIn("saved late or never", correlation["unmatched_calls"])
+        script = (HERE / "call_logs_by_correlation.py").read_text()
+        self.assertIn("not a completeness check", script)
+        # The shutdown budget and the gateway's test wait are not save-latency bounds.
+        for text in (json.dumps(PLAN), script, (HERE / "README.md").read_text()):
+            self.assertNotIn("fifteen times", text)
+
+    def test_config_revisions_anchor_the_checks(self):
+        revisions = PLAN["config_revisions"]
+        self.assertEqual(revisions["f58a4a65"]["configs_sha256"],
+                         {run: PLAN["frozen_inputs"][f"{REL}/promptfooconfig.{run}.json"] for run in ("ab", "ba")})
+        self.assertEqual(revisions["9d03c1ea"]["configs_sha256"], PLAN["wire_recheck"]["configs_sha256"])
+        self.assertIn("b2a64101", PLAN["wire_check"]["configs_note"])
+        self.assertIn("9d03c1ea", PLAN["echo_check"]["configs"])
+        self.assertIn("offline evidence only", revisions["evidence_by_revision"])
+        for run in ("ab", "ba"):
+            self.assertEqual(hashlib.sha256((HERE / f"promptfooconfig.{run}.json").read_bytes()).hexdigest(),
+                             revisions["f58a4a65"]["configs_sha256"][run])
 
     @unittest.skipUnless(ACQUISITION.is_dir(), "li26's private acquisition is not on this host")
     def test_subset_rebuilds_from_the_acquisition(self):
@@ -815,8 +872,14 @@ def synthetic_frozen():
 
 
 FROZEN = synthetic_frozen()
-READBACKS = {point: {field: f"synthetic {field}" for field in PLAN["gateway_fingerprint"]["fields"]}
+# Four read-backs of the declared treatment: each field holds its first admissible value from plan.json.
+READBACKS = {point: {field: copy.deepcopy(values[0])
+                     for field, values in PLAN["gateway_fingerprint"]["admissible"].items()}
              for point in ANALYZE.READBACK_POINTS}
+# A rule in the read-back shape (plan.json gateway_fingerprint.field_sources) that forces max on every arm model.
+FORCE_MAX_RULE = {"scope": "global", "modelPattern": "cx/gpt-6-astra*", "sourceEffort": "any", "requestTags": [],
+                  "tagMatchMode": "any", "effortMode": "force", "targetEffort": "max", "targetKind": "keep",
+                  "targetModel": None, "budgetAction": "preserve", "budgetTokens": None, "priority": 100}
 SETTLED = {"reads": 2, "settled": True, "interval_seconds": 30, "max_wait_seconds": 600}
 DEADLINE_ERROR = "Evaluation timed out after 1320000ms: Error: Evaluation timed out after 1320000ms"
 HEADERS_ERROR = "Error: Request failed after 0 retries: Error: Request timed out after 660000 ms"
@@ -1148,14 +1211,18 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(problems, ["numpy 2.4.0 is not the frozen 2.5.3"])
 
     def test_gateway_read_backs(self):
-        fields = FROZEN["gateway_fields"]
-        fingerprint, problems = ANALYZE.gateway_fingerprint(READBACKS, fields)
-        self.assertEqual((problems, fingerprint["identical"]), ([], True))
+        fields, admissible = FROZEN["gateway_fields"], FROZEN["gateway_admissible"]
+        fingerprint, problems = ANALYZE.gateway_fingerprint(READBACKS, fields, admissible)
+        self.assertEqual((problems, fingerprint["admissible"], fingerprint["identical"]), ([], True, True))
         self.assertEqual(sorted(fingerprint["sha256"]), sorted(ANALYZE.READBACK_POINTS))
+        # Equality stays a supplementary check: with two admissible modes, read-backs that change between them are
+        # each admissible but not identical.
+        two_modes = {**admissible, "thinking_budget_mode": ["passthrough", "auto"]}
         changed = copy.deepcopy(READBACKS)
-        changed["ba_after"]["model_aliases"] = "another alias"
-        self.assertEqual(ANALYZE.gateway_fingerprint(changed, fields)[1],
-                         ["the gateway read-backs differ between the points of the run"])
+        changed["ba_after"]["thinking_budget_mode"] = "auto"
+        fingerprint, problems = ANALYZE.gateway_fingerprint(changed, fields, two_modes)
+        self.assertEqual((problems, fingerprint["admissible"], fingerprint["identical"]),
+                         (["the gateway read-backs differ between the points of the run"], True, False))
         extra = copy.deepcopy(READBACKS)
         extra["ab_after"]["connection_id"] = "conn-secret-9"
         missing = copy.deepcopy(READBACKS)
@@ -1163,14 +1230,102 @@ class AnalysisTests(unittest.TestCase):
         absent = copy.deepcopy(READBACKS)
         del absent["ba_before"]
         for readbacks in (extra, missing, absent, {**READBACKS, "ab_before": ["not", "an", "object"]}):
-            fingerprint, problems = ANALYZE.gateway_fingerprint(readbacks, fields)
-            self.assertEqual((len(problems), fingerprint["identical"]), (1, False))
+            fingerprint, problems = ANALYZE.gateway_fingerprint(readbacks, fields, admissible)
+            self.assertEqual((len(problems), fingerprint["admissible"], fingerprint["identical"]), (1, False, False))
         # Neither an unexpected key nor its value reaches the report.
-        self.assertNotIn("conn", json.dumps(ANALYZE.gateway_fingerprint(extra, fields)))
+        self.assertNotIn("conn-secret-9", json.dumps(ANALYZE.gateway_fingerprint(extra, fields, admissible)))
         results, tests = run_inputs()
         self.assertEqual(self.integrity(results, tests, readbacks={})[1],
                          [f"gateway read-back {point} is missing or not a JSON object"
                           for point in ANALYZE.READBACK_POINTS])
+
+    @staticmethod
+    def readbacks_with(field, value):
+        """Four agreeing read-backs of the declared treatment except `value` for `field`."""
+        readbacks = copy.deepcopy(READBACKS)
+        for point in ANALYZE.READBACK_POINTS:
+            readbacks[point][field] = copy.deepcopy(value)
+        return readbacks
+
+    def readback_run(self, field, value):
+        """analyze() of an otherwise valid synthetic run with readbacks_with(field, value). Only for inadmissible
+        values: a valid run would go on to the statistics, which need numpy."""
+        results, tests = run_inputs()
+        return ANALYZE.analyze(results, tests, call_logs(results), self.readbacks_with(field, value), FROZEN)
+
+    def test_identical_read_backs_of_a_force_to_max_rule_void_the_run(self):
+        # Both arms would run at max (the forced effort comes first, OmniRoute@dd6e9607e:open-sse/executors/
+        # codex.ts:1451-1456); four agreeing read-backs must not certify that.
+        report = self.readback_run("reasoning_routing_rules", [FORCE_MAX_RULE])
+        self.assertEqual((report["status"], report["decision"]["result"]), ("invalid", "invalid"))
+        self.assertEqual(report["problems"], [f"gateway read-back {point}: reasoning_routing_rules is not an "
+                                              "admissible value" for point in ANALYZE.READBACK_POINTS])
+        self.assertEqual((report["gateway_fingerprint"]["admissible"], report["gateway_fingerprint"]["identical"]),
+                         (False, True))
+        self.assertNotIn("targetEffort", json.dumps(report))
+
+    def test_identical_read_backs_of_compression_on_void_the_run(self):
+        for compression in ({"enabled": True, "defaultMode": "standard", "exclusions": ["codex/*"]},
+                            {"enabled": True, "defaultMode": "off", "exclusions": []},
+                            {"enabled": False, "defaultMode": "off", "exclusions": []}):
+            report = self.readback_run("compression", compression)
+            self.assertEqual((report["status"], report["decision"]["result"]), ("invalid", "invalid"), compression)
+            self.assertEqual(report["problems"], [f"gateway read-back {point}: compression is not an admissible value"
+                                                  for point in ANALYZE.READBACK_POINTS])
+
+    def test_other_inadmissible_treatments_void_the_run(self):
+        default_high = {**FORCE_MAX_RULE, "effortMode": "default", "targetEffort": "high"}
+        cases = {"reasoning_routing_rules": [default_high],  # sets arm A's effort (policy.ts:394-404, 591-601)
+                 "codex_connection_request_defaults": [{"reasoningEffort": "high"}],
+                 "thinking_budget_mode": "auto",
+                 "arm_model_combos": {"cx/gpt-6-astra": "effort-combo", "cx/gpt-6-astra-max": None},
+                 "omniroute_build_sha": "0000000",
+                 "upstream_timeouts": {**READBACKS["ab_before"]["upstream_timeouts"], "streamActiveTimeoutMs": 1260000}}
+        for field, value in cases.items():
+            report = self.readback_run(field, value)
+            self.assertEqual(report["status"], "invalid", field)
+            self.assertEqual(report["problems"], [f"gateway read-back {point}: {field} is not an admissible value"
+                                                  for point in ANALYZE.READBACK_POINTS], field)
+
+    def test_admissibility_uses_json_schema_equality(self):
+        equal = ANALYZE.json_equal
+        self.assertTrue(equal({"a": 600000, "b": [1, "x"]}, {"b": [1.0, "x"], "a": 600000.0}))
+        self.assertFalse(equal(True, 1))
+        self.assertFalse(equal(False, 0))
+        self.assertFalse(equal(None, False))
+        self.assertFalse(equal([1, 2], [2, 1]))
+        self.assertFalse(equal({"a": 1}, {"a": 1, "b": None}))
+        self.assertFalse(equal("1", 1))
+        results, tests = run_inputs()
+        floats = {key: float(value) for key, value in READBACKS["ab_before"]["upstream_timeouts"].items()}
+        self.assertEqual(self.integrity(results, tests, readbacks=self.readbacks_with("upstream_timeouts", floats))[1],
+                         [])
+        compression = {**READBACKS["ab_before"]["compression"], "enabled": 0}
+        self.assertEqual(len(self.readback_run("compression", compression)["problems"]), 4)
+
+    def test_a_broken_declaration_is_an_integrity_problem(self):
+        fields, admissible = FROZEN["gateway_fields"], FROZEN["gateway_admissible"]
+        text = ("plan.json gateway_fingerprint.admissible does not give each gateway field a non-empty list of "
+                "admissible values")
+        missing = {field: values for field, values in admissible.items() if field != "compression"}
+        for declaration in (None, missing, {**admissible, "compression": []}, {**admissible, "compression": "off"},
+                            {**admissible, "extra_field": [None]}):
+            fingerprint, problems = ANALYZE.gateway_fingerprint(READBACKS, fields, declaration)
+            self.assertEqual((problems, fingerprint["admissible"]), ([text], False))
+
+    def test_the_owner_dry_read_back_command(self):
+        with tempfile.TemporaryDirectory() as directory:
+            good, forced = Path(directory) / "good.json", Path(directory) / "forced.json"
+            good.write_text(json.dumps(READBACKS["ab_before"]))
+            forced.write_text(json.dumps({**READBACKS["ab_before"], "reasoning_routing_rules": [FORCE_MAX_RULE]}))
+            outputs = []
+            for path in (good, forced, Path(directory) / "absent.json"):
+                with contextlib.redirect_stdout(io.StringIO()) as stdout:
+                    outputs.append((ANALYZE.main(["readback", str(path)]), json.loads(stdout.getvalue())))
+        self.assertEqual(outputs[0], (0, {"admissible": True, "problems": []}))
+        self.assertEqual(outputs[1], (ANALYZE.EXIT_INVALID, {"admissible": False, "problems": [
+            "gateway read-back dry-run: reasoning_routing_rules is not an admissible value"]}))
+        self.assertEqual(outputs[2][0], ANALYZE.EXIT_INVALID)
 
     # P2-5: split timeouts with the frozen values.
 
@@ -1238,26 +1393,33 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(problems, [])
         summary = report["call_logs"]
         self.assertEqual(summary["snapshot"], SETTLED)
-        self.assertEqual(summary["A"]["terminal_status"], {"200": 17, "429": 1})
-        self.assertEqual((summary["A"]["http_429_rows"], summary["A"]["http_429_terminal"]), (1, 1))
+        # Every figure is of the observed snapshot; the report says so rather than claiming a complete log.
+        self.assertEqual(summary["scope"], ANALYZE.CALL_LOG_SCOPE)
+        self.assertIn("lower bounds", summary["scope"])
+        self.assertEqual(summary["A"]["observed_terminal_status"], {"200": 17, "429": 1})
+        self.assertEqual((summary["A"]["http_429_rows"], summary["A"]["http_429_observed_terminal"]), (1, 1))
         self.assertEqual(summary["A"]["effort_not_observed_calls"], {"requested": 18, "upstream": 18})
         self.assertEqual((summary["B"]["calls_matched"], summary["B"]["calls_unmatched"]), (17, 1))
         self.assertEqual(summary["B"]["unmatched_by_client_outcome"], {"call_deadline": 1})
         self.assertEqual((summary["B"]["calls_with_several_rows"], summary["B"]["rows_per_call"]), (1, {1: 16, 2: 1}))
-        self.assertEqual(summary["B"]["terminal_status"], {"200": 17})
+        self.assertEqual(summary["B"]["observed_terminal_status"], {"200": 17})
         self.assertEqual(summary["B"]["row_status"], {"200": 17, "503": 1})
         self.assertEqual(summary["B"]["effort_observed"]["upstream"], {"max": 17})
-        self.assertIn({"client": "call_deadline", "terminal_status": "no_row", "count": 1},
-                      summary["B"]["client_outcome_by_terminal_status"])
-        self.assertIn({"client": "http_429", "terminal_status": "429", "count": 1},
-                      summary["A"]["client_outcome_by_terminal_status"])
+        self.assertIn({"client": "call_deadline", "observed_terminal_status": "no_row", "count": 1},
+                      summary["B"]["client_outcome_by_observed_terminal_status"])
+        self.assertIn({"client": "http_429", "observed_terminal_status": "429", "count": 1},
+                      summary["A"]["client_outcome_by_observed_terminal_status"])
+        self.assertFalse({"terminal_status", "http_429_terminal", "client_outcome_by_terminal_status"} &
+                         set(summary["A"]))
 
     def test_call_log_integrity_problems(self):
         results, tests = run_inputs()
         rows = graded_rows(results)
+        # A graded call's row that the snapshot did not observe, whether never written or saved late or never,
+        # voids the run: a lost save cannot change a verdict.
         problems = self.integrity(results, tests, call_logs(results, rows[1:]))[1]
         self.assertEqual(len(problems), 1)
-        self.assertIn("promptfoo graded this call but call_logs has no row", problems[0])
+        self.assertIn("promptfoo graded this call but the call_logs snapshot has no row for it", problems[0])
         extra = rows + [log_row(rows[0]["correlation_id"], 9, 200, upstream="max")]
         problems = self.integrity(results, tests, call_logs(results, extra))[1]
         self.assertEqual(len(problems), 1)
@@ -1490,7 +1652,8 @@ class StatisticsTests(unittest.TestCase):
         self.assertEqual(report["cost_per_filing"]["completion"]["supported"], True)
         self.assertEqual((report["cost_per_filing"]["completion"]["A"], report["cost_per_filing"]["completion"]["B"]),
                          (20.0, 60.0))
-        self.assertEqual(report["gateway_fingerprint"]["identical"], True)
+        self.assertEqual((report["gateway_fingerprint"]["admissible"], report["gateway_fingerprint"]["identical"]),
+                         (True, True))
 
     def test_identical_quality_and_cheaper_medium_keeps_medium(self):
         per_filing = {}

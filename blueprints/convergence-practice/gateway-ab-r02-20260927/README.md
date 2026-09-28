@@ -4,7 +4,8 @@
 permitted gateway calls, below), plus an echo check against a local go-httpbin that made no gateway call. No scored
 call has been made, and the wire checks do not freeze the design. Before the first scored call the plan is frozen
 with its hashes and gets the GPT-6 review the design requires. The first GPT-6 review found the draft not ready to
-freeze; its eight findings and the repair are listed under [Review repair](#review-repair-2026-09-27).
+freeze; its eight findings and the repair are listed under [Review repair](#review-repair-2026-09-27). Its second
+review found four more, repaired under [Second review repair](#second-review-repair-2026-09-27).
 
 Machine-readable plan: [plan.json](plan.json). Offline checks: `tests/test_gateway_ab_r02_20260927.py`.
 
@@ -16,7 +17,7 @@ enough to pay for its reasoning tokens?
 | Arm | Model | Effort |
 | --- | --- | --- |
 | A | `cx/gpt-6-astra` | no `reasoning_effort` sent; the gateway default, medium per the gateway owner's measurement (PR #423) |
-| B | `cx/gpt-6-astra-max` | max, selected by the model alias |
+| B | `cx/gpt-6-astra-max` | max, from the built-in `-max` suffix alias (OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1424-1431) |
 
 Prompts, schema, headers and call order are identical apart from the model and the arm prefix in the two keys.
 This is the li26 part of R02. Memory-role effort is decided on the S3 r6 development runs, not here.
@@ -113,17 +114,19 @@ Per arm, from the paired calls:
   dist/src/providers-BUaNtf-O.js:12932-12934; dist/src/evaluator-DlYW7Rgb.js:7836), so it is not the call's
   duration, which is not recorded. A thrown provider error keeps 0 (:8036, 8075, 8150) and a deadline row the
   deadline (:8893), so neither is counted;
-- **timeouts**, split: `headers`, calls that failed with `Request timed out after <ms> ms` (`REQUEST_TIMEOUT_MS`,
-  dist/src/fetch-DpK1Rb6J.js:1183), and `call_deadline`, calls that failed with `Evaluation timed out after <ms>ms`
-  (`PROMPTFOO_EVAL_TIMEOUT_MS`, dist/src/evaluator-DlYW7Rgb.js:8888). A timeout that names another value than
-  the run environment's is an integrity problem;
+- **timeouts** per arm, split: `headers`, calls that failed with `Request timed out after <ms> ms`
+  (`REQUEST_TIMEOUT_MS`, dist/src/fetch-DpK1Rb6J.js:1183), and `call_deadline`, calls that failed with `Evaluation
+  timed out after <ms>ms` (`PROMPTFOO_EVAL_TIMEOUT_MS`, dist/src/evaluator-DlYW7Rgb.js:8888). A timed-out call stays
+  in its arm as a failure, scored as returning nothing and without usage; it is never dropped or rerun (see Run
+  commands). A timeout that names another value than the run environment's is an integrity problem;
 - **429s**, on both sides of each call. A 429 that reaches promptfoo as an HTTP status is thrown before the
   transform and counted from the error text (promptfoo@0.123.1:src/util/fetch/index.ts:681-714, 768-770). A
   failure after the gateway has committed a slow-path 200 stream arrives as an in-band error chunk
   (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685), so only call_logs shows whether it was a
   429. Every call's sent correlation id is rebuilt (see Correlation ids and call_logs), so both kinds join their
-  call_logs rows. Per arm the analysis reports client-side 429 errors, 429 rows over all attempts and terminal
-  rows with status 429, and cross-tabulates each call's client-side outcome with its terminal call_logs status;
+  call_logs rows. Per arm the analysis reports client-side 429 errors, observed 429 rows over all observed attempts
+  and observed terminal rows with status 429, and cross-tabulates each call's client-side outcome with its observed
+  terminal call_logs status. The call_logs figures are of an observed snapshot and so are lower bounds;
 - **rate-limit headers**: per arm, the calls whose response carried a rate-limit-class header and the names seen,
   and the calls carrying the gateway's dropped-header count;
 - other errors by kind.
@@ -138,7 +141,7 @@ Per arm, from the paired calls:
   measurement, relayed by the coordinator on 2026-09-27; not measured here), so a per-call zero is not a defect.
   The arms are compared by distribution.
 - **Secondary, where non-NULL:** call_logs `reasoning_effort_requested` and `reasoning_effort_upstream` of each
-  call's terminal row (see Correlation ids and call_logs), read by its sent correlation id with
+  call's observed terminal row (see Correlation ids and call_logs), read by its sent correlation id with
   `call_logs_by_correlation.py`. They are filled only when
   the response carried encrypted reasoning (OmniRoute@dd6e9607e:src/lib/usage/callLogs.ts:646-653), so a NULL is
   no observation, never "no effort". The script's six-column allowlist is unchanged, and request bodies stay
@@ -177,31 +180,48 @@ Per arm, from the paired calls:
   the insertion order therefore shows which attempt came last, and neither is used. The coordinator relayed an
   observation on :20128 from 2026-09-27: one id had a 503 row and a 200 row, and no 429 rows were seen. It was not
   reproduced here.
-- **Terminal row.** The client's own outcome decides:
-  - a call promptfoo graded received a complete stream and must have a 2xx row;
-  - a call whose HTTP status the client saw (the transform's `http_status_<code>`, a thrown 429) narrows to rows
-    with that status and must have one;
+- **Terminal row.** Only the rows the snapshot observed count (see Observed snapshot). The client's own outcome
+  decides:
+  - a call promptfoo graded received a complete stream and must have an observed 2xx row;
+  - a call whose HTTP status the client saw (the transform's `http_status_<code>`, a thrown 429) narrows to
+    observed rows with that status and must have one;
   - for a transform stream error, a `rate_limit_header` failure, a timeout or another thrown error, all of the
-    call's rows are candidates, because a slow-path stream commits 200 before the gateway's attempts end and then
-    frames their error in-band (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685).
+    call's observed rows are candidates, because a slow-path stream commits 200 before the gateway's attempts end
+    and then frames their error in-band (OmniRoute@dd6e9607e:open-sse/utils/earlyStreamKeepalive.ts:664-685).
 
-  The terminal row is known only when the candidates agree on status, model and both effort columns. A missing
-  required row or disagreeing candidates make the terminal status unknown, an integrity problem. Rows per call,
-  calls with several rows and 429 rows count all rows. Several rows for one id are gateway attempts, never separate
-  calls: with `maxRetries: 0` promptfoo sends one request per result row.
-- **Settled snapshot.** The gateway's own drain, `waitForCallLogSaves` (src/lib/usage/callLogs.ts:878-896), runs
-  in-process and, outside its tests, only from graceful shutdown (`closeCallLogSaves`, :898-910, with a 2 s
-  default budget; src/lib/gracefulShutdown.ts:114, 129), so a reader of the shared running gateway cannot call it.
-  After both runs, `call_logs_by_correlation.py` reads the ids' rows, waits 30 s and reads again until two
-  consecutive reads are equal, for at most 600 s, and exits 3 if they never are. 30 s is fifteen times that budget,
-  and the gateway's own tests wait up to 10 s (tests/unit/call-log-save-drain.test.ts:39). `analyze_r02.py`
-  requires a settled snapshot with an interval of at least 30 s. A save whose error the gateway swallows
-  (attemptLogging.ts:618) never lands, and no snapshot can show it.
-- **Unmatched calls.** A sent id with no call_logs row is counted per arm by the call's client-side outcome, never
-  dropped, unless promptfoo graded the call, which is an integrity problem. Such calls include requests that the
-  gateway rejects before its attempt logging: a peer rejection, or backpressure when
-  `OMNI_MAX_CONCURRENT_CONNECTIONS` is set (src/sse/handlers/chat.ts:432-433, 439-442;
-  src/sse/utils/backpressure.ts:25-67). The rebuild was chosen over a lookup by the run's `evalId` prefix because,
+  The observed terminal row is taken only when the candidates agree on status, model and both effort columns. It
+  is the terminal row as far as the saved rows show; an attempt whose row was never saved could differ. A missing
+  required row or disagreeing candidates make the terminal status unknown, an integrity problem, and a required row
+  saved late or never looks the same, so it also voids the run. Rows per call, calls with several rows and 429
+  rows count all observed rows. Several rows for one id are gateway attempts, never separate calls: with
+  `maxRetries: 0` promptfoo sends one request per result row.
+- **Observed snapshot.** call_logs is read as what it held at the reads, not as a complete log. After both runs,
+  `call_logs_by_correlation.py` reads the ids' rows, waits 30 s and reads again until two consecutive reads are
+  equal, for at most 600 s, and exits 3 if they never are; `analyze_r02.py` requires a settled snapshot with an
+  interval of at least 30 s. Settling is a heuristic for saves still in flight, not a completeness check:
+  - a save can land after the last read. The gateway starts it without awaiting it
+    (open-sse/handlers/chatCore/attemptLogging.ts:557-618), stamps the row after awaited lookups
+    (src/lib/usage/callLogs.ts:538, 597, 602, 680) and inserts it only after an awaited artifact write (:759, 824),
+    and nothing bounds those waits;
+  - a save can never land: its error is swallowed (attemptLogging.ts:618), and a save is skipped while persistence
+    to disk is off or saves are closing (callLogs.ts:867);
+  - the gateway's own drain, `waitForCallLogSaves` (:878-896), runs in-process and, outside its tests, only from
+    graceful shutdown (`closeCallLogSaves`, :898-910; src/lib/gracefulShutdown.ts:114, 129), so a reader of the
+    shared running gateway cannot call it. Its 2 s shutdown budget and the 10 s its tests wait
+    (tests/unit/call-log-save-drain.test.ts:39) bound no save latency.
+
+  No snapshot can show a late or lost save. So every call_logs figure is of observed rows, and the analysis report
+  says so in `call_logs.scope`: rows per call, calls with several rows, 429 rows and the effort columns are lower
+  bounds or observed values, a call without an observed row may have rows saved late or never, and a terminal
+  status is the observed one (`observed_terminal_status`). The fail-closed checks stay: a graded call or a status
+  the client saw without its observed row voids the run, so a late or lost save can void a run but cannot change
+  a verdict.
+- **Unmatched calls.** A sent id with no observed call_logs row is counted per arm by the call's client-side
+  outcome, never dropped, unless promptfoo graded the call, which is an integrity problem. Such calls include
+  requests that the gateway rejects before its attempt logging (a peer rejection, or backpressure when
+  `OMNI_MAX_CONCURRENT_CONNECTIONS` is set: src/sse/handlers/chat.ts:432-433, 439-442;
+  src/sse/utils/backpressure.ts:25-67) and calls whose rows were saved late or never; the count cannot tell them
+  apart. The rebuild was chosen over a lookup by the run's `evalId` prefix because,
   for a completed run, the rebuilt ids already cover every sent request. **Gap:** a run that stops before promptfoo
   writes `-o` has no results file to rebuild from, and the prefix lookup is not implemented.
 
@@ -211,12 +231,28 @@ Three bounded checks. They used 4 of the 6 permitted gateway calls; the echo che
 under `~/.local/state/native-agent-stack/gateway-ab-r02-20260927/wire-check/` (directory 0700, files 0600) or in
 a private scratch directory, never in the repository.
 
+**Config revisions** (`plan.json` `config_revisions`, from `git show <revision>:<config>` and a recursive
+comparison of consecutive revisions). The committed configs changed twice after the first check:
+
+| Revision | AB, BA sha256 | Change | Used by |
+| --- | --- | --- | --- |
+| b2a64101 | 450b74cd…, f1905fcc… | first committed configs, li26's Python assertion | first check (as described below) |
+| 9d03c1ea | d05d542a…, 4c665f04… | adds the `X-Correlation-Id` header to each provider, nothing else | echo check, re-check |
+| f58a4a65 | 85df8752…, 506cdd45… | adds `defaultTest.assert[1]`, the `is-json` assertion, nothing else | no run; the current configs |
+
+The current two-assertion configs have offline evidence only: `NativeSchemaTests` grades the committed AB config's
+assertions, `is-json` included, through the installed promptfoo's `runAssertions` (the BA config's `defaultTest`
+is identical), `NativePersistenceTests` passes rows through its `EvalResult`, and `promptfoo validate` accepts both
+configs. No gateway, echo or eval run has used them. Their providers are unchanged since 9d03c1ea, so the echo
+check's request evidence covers their requests, but not the `is-json` assertion.
+
 ### First check (19:49:17-19:49:36 UTC)
 
 One filing (0000073756-20-000025, the first AB test) through both arms in AB order, `--repeat 1`, into a scratch
-output that is not committed: 2 of the 6 permitted gateway calls; promptfoo exit 0, 2 passed. Its configs (sha256
-f8eaf75c… and 32ef20c2…) differ from the committed ones in the description string and in the `X-Correlation-Id`
-header, which was added afterwards.
+output that is not committed: 2 of the 6 permitted gateway calls; promptfoo exit 0, 2 passed. Its scratch configs
+(sha256 f8eaf75c… and 32ef20c2…) are, as the b2a64101 record describes them, the configs committed at b2a64101
+apart from the description string, which then ended with `; DRAFT, not frozen`. They predate the
+`X-Correlation-Id` header (9d03c1ea) and the `is-json` assertion (f58a4a65).
 
 - **(a) Keys: not observed here, which was the brief's stop condition; resolved by the echo check below.**
   `requestHeaders` is absent from both result rows because promptfoo adds it only when `context.debug` is set
@@ -248,9 +284,10 @@ Both regenerated configs were run against go-httpbin v2.25.0
 checksums.txt, and the binary matched the archive). go-httpbin was started with `-host 127.0.0.1` on a free port
 and stopped afterwards; it exited and the port was closed.
 
-- **Echo configs.** Generated in a private 0700 directory. A recursive comparison showed they differ from the
-  committed configs only in `url` (`http://127.0.0.1:<port>/anything`), `transformResponse: json`, the removed
-  `defaultTest`, the description and an absolute prompt path.
+- **Echo configs.** Generated from the configs committed at 9d03c1ea, in a private 0700 directory. A recursive
+  comparison showed they differ from those only in `url` (`http://127.0.0.1:<port>/anything`),
+  `transformResponse: json`, the removed `defaultTest`, the description and an absolute prompt path. The `is-json`
+  assertion added at f58a4a65 is not in them.
 - **URL guard.** Before the first eval, every provider `url` in both echo configs was checked to be exactly the
   go-httpbin loopback URL, with no `:20128` and no `omniroute`. The guard passed twice, at generation and again
   immediately before running.
@@ -276,9 +313,9 @@ From the echoed requests (counts only):
 
 ### Re-check with the caller correlation id (21:16:07-21:16:27 UTC)
 
-The first AB filing only (`-n 1 --repeat 1`), using the committed AB config (sha256 d05d542a…) and transform
-(c0ae04eb…), following the first check's procedure: 2 more gateway calls, 4 of the 6 in total; promptfoo exit 0,
-2 passed.
+The first AB filing only (`-n 1 --repeat 1`), using the AB config committed at 9d03c1ea (sha256 d05d542a…, li26's
+Python assertion only; the `is-json` assertion came later) and transform (c0ae04eb…), following the first check's
+procedure: 2 more gateway calls, 4 of the 6 in total; promptfoo exit 0, 2 passed.
 
 - **(f) Caller correlation id: kept.**
   - Both calls returned HTTP 200.
@@ -315,7 +352,8 @@ The first AB filing only (`-n 1 --repeat 1`), using the committed AB config (sha
 
 First, **invalid**: any integrity problem voids the run. These are the frozen schedule, tests files and promptfoo
 and Node versions; li26 rescoring and the prompt check; the `is-json` schema; correlation echoes; the call_logs
-snapshot and terminal rows; the timeouts' values; the analysis environment; and the gateway read-backs.
+snapshot and observed terminal rows; the timeouts' values; the analysis environment; and the gateway read-backs
+and their admissible values.
 `analyze_r02.py` then reports status and `decision.result` `invalid`, computes no statistic, writes `--out` and
 exits 2. Otherwise, with the one-sided 95% bounds below:
 
@@ -381,7 +419,7 @@ date -u +%Y-%m-%dT%H:%M:%S.%3NZ >> $RUN/window.txt
 # The sent id of every call, rebuilt; exits non-zero if the inputs miss the frozen schedule or an echo differs.
 python3 $BP/analyze_r02.py ids --results-ab $RUN/results-ab.json --results-ba $RUN/results-ba.json \
   --state-dir $STATE > $RUN/ids.json
-# A settled snapshot; exit 3 means the reads did not settle within 600 s.
+# An observed snapshot, re-read until it stops changing; exit 3 means the reads did not settle within 600 s.
 python3 $BP/call_logs_by_correlation.py ~/.local/share/omniroute/storage.sqlite $RUN/ids.json --rows \
   --settle-seconds 30 --max-wait-seconds 600 > $RUN/call-logs.json
 # Exit 2 means an integrity problem voided the run; decision.json then says why.
@@ -397,16 +435,32 @@ set. The run makes 360 calls (60 filings, 3 repeats, 2 arms). Results, ids, read
 filings, correlation ids or gateway settings: keep them in the private state directory and publish only a
 sanitized decision receipt.
 
-The environment values are derived in `plan.json` `run.environment_reasons`. `REQUEST_TIMEOUT_MS` bounds only the
-wait for response headers: promptfoo clears its timer when they arrive (dist/src/fetch-DpK1Rb6J.js:1177-1195) and
-reads the body afterwards (dist/src/cache-CwCWVUtJ.js:422-432). It is the gateway's upstream fetch timeout,
-600,000 ms, plus the gateway's 60,000 ms margin (OmniRoute@dd6e9607e:src/shared/utils/runtimeTimeouts.ts:9, 20).
-`PROMPTFOO_EVAL_TIMEOUT_MS` (dist/src/logger-ChlKG5Wv.js:134-136) bounds the whole eval step, stream included: on
-expiry promptfoo aborts the call and records an error row `Evaluation timed out after <ms>ms`
-(dist/src/evaluator-DlYW7Rgb.js:9191-9230, 8875-8898). It is the gateway's cap on a stream's active time,
-1,260,000 ms, plus the same margin (runtimeTimeouts.ts:11-21), because neither arm's model registers its own
-timeout (open-sse/config/providers/registry/codex/index.ts:33, 35). It is not derived from measured durations,
-which were never recorded. The results do not record these variables (dist/src/evaluator-DlYW7Rgb.js:9193;
+The environment values and their reasons are in `plan.json` `run.environment_reasons`. Both timeouts are
+preregistered client bounds of this experiment, not derived from and not guaranteed by any gateway limit.
+
+- `PROMPTFOO_EVAL_TIMEOUT_MS=1320000`, 22 minutes per eval step, is an independent experimental deadline
+  (dist/src/logger-ChlKG5Wv.js:134-136). promptfoo races each step against it and, on expiry, aborts the call and
+  records an error row `Evaluation timed out after <ms>ms` (dist/src/evaluator-DlYW7Rgb.js:9191-9230, 8875-8898).
+  It clears the timer only when the step's rows are ready (:9125-9133), so everything from the step's start counts
+  toward it: the gateway's queueing and account selection, every gateway attempt and retry, the wait for the
+  upstream's response and reading the stream.
+- The gateway's own limits start at different points and do not add up to a bound under the deadline. Its stream
+  watchdogs are armed only when the streaming pipeline is built on an upstream response it already has
+  (OmniRoute@dd6e9607e:open-sse/utils/streamHandler.ts:1135-1141; open-sse/handlers/chatCore.ts:6386), so
+  pre-stream waiting and retries are outside them. A call within every gateway limit can therefore still reach the
+  deadline.
+- A call that reaches it is a failure of its arm: error kind `call_deadline`, scored as a call that returned
+  nothing, without usage (so the cost leg becomes unsupported), and reported per arm. Max effort may reach it more
+  often, which then counts against arm B. The value is not derived from measured durations, which were never
+  recorded.
+- `REQUEST_TIMEOUT_MS=660000` bounds only the wait for response headers: promptfoo clears its timer when they
+  arrive (dist/src/fetch-DpK1Rb6J.js:1177-1195) and reads the body afterwards (dist/src/cache-CwCWVUtJ.js:422-432).
+  It was chosen above the gateway's default upstream fetch timeout, 600,000 ms
+  (OmniRoute@dd6e9607e:src/shared/utils/runtimeTimeouts.ts:9), but queueing, account selection and retries before
+  the headers count toward it too, so it is no promise that the gateway answers first. A call that reaches it fails
+  as `headers_timeout` of its arm.
+
+The results do not record these variables (dist/src/evaluator-DlYW7Rgb.js:9193;
 dist/src/logger-ChlKG5Wv.js:706-713), so a timeout shows only when it fires, and the analysis then requires the
 frozen value in its error text. The `PROMPTFOO_STRIP_*` projections (dist/src/evalResult-yO_CeNru.js:784-791)
 would remove what the analysis reads, `PROMPTFOO_SHORT_CIRCUIT_TEST_FAILURES` would drop the `is-json` result after
@@ -419,20 +473,50 @@ Every gateway read that exposes the build or the effort-relevant settings needs 
 build and version come only through management auth that ignores the no-login setting
 (OmniRoute@dd6e9607e:src/app/api/monitoring/health/route.ts:52-66, 122-123, 306-310;
 src/lib/api/requireManagementAuth.ts:49-69), while the keyless `/api/health` returns only status and time
-(src/app/api/health/route.ts:13-29). Model aliases need a Bearer key (src/app/api/cloud/models/alias/route.ts:80-97)
-and compression settings a login (src/app/api/settings/compression/route.ts:8-15). The reasoning rules and the
-thinking-budget mode need management auth (src/app/api/settings/reasoning-routing-rules/route.ts:12-13;
+(src/app/api/health/route.ts:13-29). Compression settings need a login (src/app/api/settings/compression/route.ts:
+8-15). The combos, model-combo mappings, provider connections, reasoning rules and thinking-budget mode need
+management auth (src/app/api/combos/route.ts:19-20; src/app/api/model-combo-mappings/route.ts:23-24;
+src/app/api/providers/route.ts:108-109; src/app/api/settings/reasoning-routing-rules/route.ts:12-13;
 src/app/api/settings/thinking-budget/route.ts:12-16), keyless only when login is off
 (src/server/authz/policies/management.ts:253-330). No credentialed read belongs to this lane, so the fingerprint is
 an execution precondition performed by the gateway owner.
 
+- **Admissible values.** `plan.json` `gateway_fingerprint.admissible` declares, per field, the values that make
+  the run the intended treatment, and `field_sources` gives each field's exact shape. Every read-back value must
+  equal one of them, with JSON Schema `enum` semantics (`admissible_rule`; equality as python-jsonschema 4.26.0
+  implements it, jsonschema/_utils.py:106-153 and _keywords.py:269-271). Four identical read-backs of the wrong
+  treatment therefore void the run. The analyzer holds no admissible value, so the gateway owner's
+  20128-versus-20129 comparison can reuse it with its own declaration. For R02:
+
+  | Field | Admissible | Why | Provenance |
+  | --- | --- | --- | --- |
+  | `omniroute_app_version`, `omniroute_build_sha` | `3.8.51`, `dd6e9607e` | the reviewed build | observed (`installed-build-identity.txt`) |
+  | `arm_model_combos` | both arm models map to `null` | no combo or model-combo mapping takes an arm's model (src/sse/services/model.ts:686-711) | documented: "no combo and no router alias" |
+  | `reasoning_routing_rules` | `[]` | no enabled rule of any mode or scope (below) | declared intent |
+  | `thinking_budget_mode` | `passthrough` | A's no-effort fallback exists only in this mode (open-sse/executors/codex.ts:1275-1277, 1439-1441) | observed (`gateway-settings-readback.json`) |
+  | `codex_connection_request_defaults` | `[]` | no connection sets a default effort or service tier (codex.ts:1291-1296, 1439-1441) | declared intent |
+  | `compression` | `enabled: false`, `defaultMode: "off"`, `exclusions: ["codex/*"]` | compression off for Codex (open-sse/handlers/chatCore.ts:1429-1449) | observed (`gateway-settings-readback.json`) |
+  | `upstream_timeouts` | fetch, headers, idle, readiness and readiness max 600,000 ms; active 3,600,000 ms; heartbeat 15,000 ms | the reviewed service configuration | documented (unit template :71-75 and defaults); the private `server.env` can override |
+
+  Two premises of the second review were narrower than the source. Force rules are not the only rules that change
+  arm A: a `default` rule sets its effort on a request with no reasoning signal (src/lib/reasoningRouting/policy.ts:
+  394-404, 591-601), and any rule can retarget the model or a combo (:380-392, 557) or change the thinking budget
+  (:543-548). So the field lists every enabled rule (src/lib/db/reasoningRoutingRules.ts:126-137), including
+  connection-scope rules (src/sse/handlers/reasoningRouting.ts:216-244). Configurable model aliases do not route the
+  arms: `cx/<model>` parses as provider and model (open-sse/services/model.ts:471-477) and is resolved without an
+  alias lookup (:821-829). What can take an arm's model is a combo or model-combo mapping, so the field is the
+  combo per arm model. Arm B's `-max` is the executor's built-in suffix alias (codex.ts:1424-1431, 1442-1445).
+  Context editing does not depend on `enabled` but applies only to Claude-protocol providers
+  (open-sse/executors/base.ts:1348-1352), so it has no field.
+- **Dry read-back before freezing.** The owner reads the fields once and runs `python3 $BP/analyze_r02.py readback
+  <file>`; exit 0 means every field is admissible. A failure changes the host or, after review, the declaration
+  before the run, never after it.
 - **Read-backs.** Immediately before and after each run half the owner reads the fields in `plan.json`
-  `gateway_fingerprint.fields`: app version, build sha, the `gpt-6-astra` model aliases, the reasoning rules that
-  force an effort, the thinking-budget mode, each Codex connection's `requestDefaults` under masked labels, the
-  20128 endpoint's compression settings and the effective timeouts. The owner returns four sanitized JSON objects
-  with exactly those top-level keys and no account id, connection id, key or token. `analyze_r02.py analyze
-  --gateway-readbacks` records the sha256 of each as canonical JSON and treats a missing read-back, another key set
-  or any difference among the four as an integrity problem.
+  `gateway_fingerprint.fields`, in the shapes of `field_sources`, and returns four sanitized JSON objects with
+  exactly those top-level keys and no account id, connection id, key or token. `analyze_r02.py analyze
+  --gateway-readbacks` records the sha256 of each as canonical JSON and treats as an integrity problem a missing
+  read-back, another key set, any value that is not admissible and, as a supplementary check, any difference among
+  the four. Its problems name the read-back and the field, never the value.
 - **Post-run.** Send the gateway owner each arm's correlation ids (`ids.json`, the sent id of every call) with the
   run window, the arm tags (`r02-A`, `r02-B`) and the key prefixes (`r02-a-`, `r02-b-`). The owner returns, per
   arm: the call count; distinct accounts and per-account call counts, under masked labels shared across arms;
@@ -444,7 +528,8 @@ an execution precondition performed by the gateway owner.
 - The two gateway wire checks are actual provider executions of 2 calls each through the running gateway. They are
   evidence for the request shape and the observations above on this host and day, not for quality or cost.
 - The echo check is an actual promptfoo 0.123.1 execution against go-httpbin. It is evidence for the requests
-  promptfoo renders from the committed configs, not for how the gateway handles them.
+  promptfoo renders from the configs committed at 9d03c1ea, whose providers the current configs keep unchanged. It
+  is not evidence for the `is-json` assertion added later or for how the gateway handles the requests.
 - The offline tests are our integration checks on synthetic fixtures. They are not upstream acceptance. Two of
   them import the installed promptfoo 0.123.1 and run its own code offline, with no provider call: the committed
   config's `is-json` assertion through `assertions.runAssertions`, and synthetic rows through `EvalResult`, whose
@@ -471,8 +556,9 @@ an execution precondition performed by the gateway owner.
 
 - The account behind each call is an uncontrolled factor: per-conversation session keys spread calls across the
   gateway's 4 accounts. No account column is read; the gateway owner supplies the masked per-arm distribution.
-- A call that the gateway rejects before its attempt logging has no call_logs row. Such calls are counted as
-  unmatched, by client-side outcome (see Correlation ids and call_logs).
+- A call without an observed call_logs row, because the gateway rejected it before its attempt logging or because
+  its rows were saved late or never, is counted as unmatched by client-side outcome (see Correlation ids and
+  call_logs).
 - promptfoo treats a 200 response that carries `x-ratelimit-remaining-requests`, `x-ratelimit-remaining-tokens` or
   `X-RateLimit-Remaining` equal to 0 as rate limited and, with `maxRetries: 0`, fails the call
   (promptfoo@0.123.1:src/util/fetch/index.ts:375-388, 712-714; installed dist/src/fetch-DpK1Rb6J.js:1200-1204,
@@ -487,16 +573,20 @@ an execution precondition performed by the gateway owner.
   disagree or lack the status the client saw, so if the gateway returns one status and logs another, every such
   call voids the run. Any call without usage makes the cost leg unsupported, so keep medium needs all 360 calls
   to return usage.
-- The deadline and the header timeout are not recorded in the results; they show only when one fires. The
-  deadline is derived from the gateway's configured caps, not from measured durations.
-- The gateway configuration is the owner's sanitized report, not an independent observation. By the pinned source,
-  arm A (no suffix, no effort in the body) runs at medium only when no force rule matches and the thinking-budget
-  mode is PASSTHROUGH with no `reasoningEffort` default on the serving connection
-  (OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1275-1277, 1439-1441, 1451-1456). In another mode its effort
-  comes from the thinking-budget handling or the upstream's default, which this plan does not trace.
+- The deadline and the header timeout are preregistered client bounds, not gateway guarantees: a call within every
+  gateway limit can still reach them and then counts as a failure of its arm. They are not recorded in the
+  results and show only when one fires. Neither is derived from measured durations.
+- The gateway configuration is the owner's sanitized report, not an independent observation, checked against the
+  declared admissible values. It covers the settings this plan traced, not every setting of the gateway. By the
+  pinned source, arm A (no suffix, no effort in the body) runs at medium only when no rule sets its effort, the
+  thinking-budget mode is PASSTHROUGH and the serving connection has no `reasoningEffort` default
+  (OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1275-1277, 1439-1441, 1451-1456); the admissible values require
+  exactly that. In another mode its effort would come from the thinking-budget handling or the upstream's default,
+  which this plan does not trace.
 - `promptfoo_build` hashes the promptfoo package outside `node_modules`; its dependencies are not hashed.
-- The call_logs snapshot settles by re-reading; a save the gateway failed and swallowed never lands and cannot be
-  detected.
+- call_logs is an observed snapshot: a save that lands after the last read, or never lands, is not in it and
+  cannot be detected. Row counts are lower bounds, a terminal status is the observed one, and a required row lost
+  this way voids the run rather than changing a verdict.
 
 ## Deviations from the brief
 
@@ -541,17 +631,40 @@ the pinned sources, and all eight held. One bounded repair round followed; the s
    repository file the harness loads, `scripts/path_safety.py` included, and `build_r02.py frozen` fails on any
    file outside it. `build_r02.py promptfoo` records and checks the installed promptfoo build and Node version, the
    analysis environment is pinned and checked, and the gateway owner supplies four sanitized read-backs that must
-   agree.
+   agree (and, since the second review repair, hold admissible values).
 5. **The timeout did not bound the stream.** The run sets `PROMPTFOO_EVAL_TIMEOUT_MS=1320000` for the whole call
    and `REQUEST_TIMEOUT_MS=660000` for the headers, and the analysis rejects a timeout naming another value (Run
    commands).
 6. **A snapshot could mark an intermediate attempt final.** The attempt order is no longer inferred. The terminal
-   row follows the client's outcome, a disagreement is unknown and voids the run, and call_logs is read as a
-   settled snapshot. The gateway's own drain runs only inside its process, so a settled re-read stands in for it.
+   row follows the client's outcome, a disagreement is unknown and voids the run, and call_logs is re-read until it
+   stops changing. The second review repair records what that re-read does not establish.
 7. **Header latency was read as duration.** The metric is now time to response headers, and the path inference
    for arm A is removed without a replacement.
 8. **Strict-schema validity did not check the sent schema.** It is now promptfoo's `is-json` with the exact schema
    sent, at its default weight, beside li26's parse status (Metrics).
+
+## Second review repair (2026-09-27)
+
+The GPT-6 second review of the repair (at 4b7c58de) returned not freeze-ready with four findings. Each was checked
+against the pinned sources and held; two premises of the first were narrower than the source and were widened.
+One targeted repair round followed; the status stays draft.
+
+1. **Identical read-backs could certify the wrong treatment (P1).** The fingerprint checked field names and
+   equality only, so four read-backs that all showed a rule forcing max would pass while both arms ran at max. Now
+   `plan.json` `gateway_fingerprint.admissible` declares each field's admissible values as data, with their shapes
+   and provenance, and every read-back value must match one of them with JSON Schema `enum` semantics; equality
+   stays a supplementary check, and `analyze_r02.py readback` checks the owner's dry read-back before freezing
+   (Gateway owner). The fields now cover every enabled reasoning-routing rule, not only force rules, and the
+   combos that could take an arm's model, since configurable aliases do not route the arms.
+2. **The timeout rationale overlooked pre-stream time (P2).** The gateway's stream watchdogs start only after it
+   has the upstream response, so the claim that the deadline fires only when the gateway fails to end a stream did
+   not hold. The 22-minute deadline is now an independent preregistered deadline that pre-stream waiting and
+   retries count toward, and a call that reaches it is a failure of its arm, reported per arm (Run commands).
+3. **Two unchanged reads did not establish log completeness (P2).** call_logs is now an observed snapshot. Late
+   and permanently failed saves are named, settling is a heuristic, counts are lower bounds, the terminal status is
+   the observed one, and the report carries `call_logs.scope` (Correlation ids and call_logs).
+4. **The historical config notes were stale (P3).** The checks are anchored to the config revisions they used,
+   and the current two-assertion configs are recorded as having offline evidence only (Wire checks).
 
 ## Decision record (2026-09-27)
 
@@ -593,8 +706,8 @@ promptfoo 0.123.1's HTTP provider with the glue in this directory. Alternatives:
 | `prompt_r02.py` | promptfoo Python prompt function, li26's prompt |
 | `assert_r02.py` | promptfoo Python assertion, li26's parser and scorer |
 | `transform_r02.js` | promptfoo transformResponse for the gateway's SSE stream, with its rate-limit-class headers |
-| `call_logs_by_correlation.py` | read-only call_logs lookup by correlation id, six columns, settled snapshot, no attempt order |
-| `analyze_r02.py` | integrity gate, rebuilt sent correlation ids, paired statistics, effort measures, the call_logs join and the decision |
+| `call_logs_by_correlation.py` | read-only call_logs lookup by correlation id, six columns, an observed snapshot re-read until it stops changing, no attempt order |
+| `analyze_r02.py` | integrity gate with the gateway read-backs' admissible values, rebuilt sent correlation ids, paired statistics, effort measures, the call_logs join and the decision; `readback` checks a dry read-back |
 | `plan.json` | the machine-readable plan with the subset, `frozen_inputs` and `promptfoo_build` hashes |
 
 ## Sources
@@ -616,17 +729,32 @@ promptfoo 0.123.1's HTTP provider with the glue in this directory. Alternatives:
   dist/src/logger-ChlKG5Wv.js:134-136, 214-221, 494, 563-642, 706-730, 1049-1057, 1137-1170;
   dist/src/util-BE6VXITn.js:2087-2088, 2162-2196; dist/src/eval-CUIvWaK2.js:1576-1597; dist/src/index.js,
   the `assertions` export (`runAssertions`).
-- OmniRoute at dd6e9607e, credentialed reads and timeouts: src/app/api/monitoring/health/route.ts:52-66, 122-123,
-  306-310; src/lib/api/requireManagementAuth.ts:49-69; src/lib/monitoring/buildSha.ts:13-51;
-  src/app/api/health/route.ts:13-29; src/app/api/cloud/models/alias/route.ts:80-97;
-  src/app/api/settings/compression/route.ts:8-15; src/app/api/settings/reasoning-routing-rules/route.ts:12-13;
-  src/app/api/settings/thinking-budget/route.ts:12-16; src/server/authz/policies/management.ts:253-330;
-  src/shared/utils/runtimeTimeouts.ts:9-25; open-sse/config/providers/registry/codex/index.ts:33, 35;
-  open-sse/config/providers/shared.ts:338-346; open-sse/executors/codex.ts:1275-1277, 1291-1296, 1439-1441,
-  1451-1456; src/lib/providers/requestDefaults.ts:424-435; open-sse/utils/reasoningRuleContext.ts:6-28;
-  open-sse/handlers/chatCore.ts:3036-3045. call_logs persistence: src/lib/usage/callLogs.ts:538, 597, 602, 759,
-  824, 878-910; src/lib/gracefulShutdown.ts:114, 129; open-sse/handlers/chatCore/attemptLogging.ts:557-618;
+- OmniRoute at dd6e9607e, credentialed reads: src/app/api/monitoring/health/route.ts:52-66, 122-123, 306-310;
+  src/lib/api/requireManagementAuth.ts:49-69; src/shared/constants/appConfig.ts:1-7;
+  src/lib/monitoring/buildSha.ts:13-51; src/app/api/health/route.ts:13-29;
+  src/app/api/settings/compression/route.ts:8-15; src/app/api/combos/route.ts:19-20;
+  src/app/api/model-combo-mappings/route.ts:23-24; src/app/api/providers/route.ts:108-109;
+  src/app/api/settings/reasoning-routing-rules/route.ts:12-13; src/app/api/settings/thinking-budget/route.ts:12-17;
+  src/server/authz/policies/management.ts:253-330.
+- OmniRoute at dd6e9607e, the admissible gateway settings: model routing, src/sse/handlers/chat.ts:966-989,
+  src/sse/services/model.ts:686-711, open-sse/services/model.ts:471-477, 821-829; reasoning rules,
+  src/lib/db/reasoningRoutingRules.ts:8, 12-35, 126-137, src/lib/reasoningRouting/policy.ts:380-404, 443-448,
+  543-557, 591-601, src/sse/handlers/reasoningRouting.ts:216-244, open-sse/utils/reasoningRuleContext.ts:6-28,
+  open-sse/handlers/chatCore.ts:3036-3045; effort and service tier, open-sse/executors/codex.ts:1275-1277,
+  1291-1296, 1424-1431, 1439-1445, 1451-1456, src/lib/providers/requestDefaults.ts:424-435,
+  open-sse/services/thinkingBudget.ts:18-23, open-sse/config/providers/registry/codex/index.ts:33, 35,
+  open-sse/config/providers/shared.ts:338-346; compression, src/lib/db/compression.ts:663-670,
+  open-sse/services/compression/types.ts:421-423, open-sse/handlers/chatCore.ts:1429-1450,
+  open-sse/executors/base.ts:1348-1352; timeouts, src/shared/utils/runtimeTimeouts.ts:9-25, 122-211, and the stream
+  watchdogs, open-sse/utils/streamHandler.ts:1135-1141, open-sse/handlers/chatCore.ts:6386.
+- OmniRoute at dd6e9607e, call_logs persistence: src/lib/usage/callLogs.ts:538, 597, 602, 680, 759, 824, 867,
+  878-910; src/lib/gracefulShutdown.ts:114, 129; open-sse/handlers/chatCore/attemptLogging.ts:557-618;
   tests/unit/call-log-save-drain.test.ts:39.
+- The admissible values' provenance: `evidence/artifacts/omniroute-gateway-20260927/installed-build-identity.txt`
+  and `gateway-settings-readback.json`; `docs/decisions/2026-09-27-omniroute-account-pool.md`:137, 231-256;
+  `adoption/templates/systemd/omniroute.service`:36, 61, 71-75.
+- JSON Schema 2020-12: Validation section 6.1.2 (`enum`) and Core section 4.2.2 (instance equality), as
+  python-jsonschema 4.26.0 implements them: jsonschema/_utils.py:106-153, jsonschema/_keywords.py:269-271.
 - OmniRoute at dd6e9607e: open-sse/executors/codex.ts:1370-1378, 1488, 1490-1494, 1550-1573;
   open-sse/executors/codex/stripPassthroughRejectedParams.ts:13-15, 26; open-sse/translator/paramSupport.ts:48;
   open-sse/translator/request/openai-responses/toResponses.ts:35-56, 109-113, 120-137, 432-453;
