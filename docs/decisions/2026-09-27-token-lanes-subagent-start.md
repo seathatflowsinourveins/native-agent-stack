@@ -516,8 +516,10 @@ own behavior and add cost without improving results." The
 keeps the Opus 5 patterns as "a reasonable starting point", and
 [prompting best practices, L780](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md)
 makes Opus 5 the exception to its self-check advice: "remove these instructions rather than rewriting them." The
-sentence also assumes Bash. A child whose tools omit Bash, such as a plugin-scoped or unmapped allowlisted agent
-(role-matched addendum, limitations), still receives the default block and cannot return command output. This
+sentence also assumes a command runner. A child whose tools include neither Bash nor Context Mode's `ctx_execute`,
+such as a plugin-scoped or unmapped allowlisted agent (role-matched addendum, limitations), still receives the
+default block and cannot return command output. A role without Bash but with `ctx_execute`, such as
+[`security-reviewer`](../../adoption/agents/claude/security-reviewer.md), can. This
 carrier's own unit wrote the line, so, as with the qmd scope, a dated addendum changes it. Each documentation quote
 in this addendum was re-read at its cited line of the page's Markdown source at 08:55Z on 2026-09-28.
 
