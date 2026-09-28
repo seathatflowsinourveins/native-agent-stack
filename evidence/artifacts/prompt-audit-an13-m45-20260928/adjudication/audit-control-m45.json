@@ -1,0 +1,206 @@
+{
+ "note": "audit_control_m45.py: audit_m45.py on private copies of the four judges' inputs, unchanged (clean) and with one planted access per judgment (planted). Hits are pattern, scope and match only. The copies are not published, because the Claude transcripts carry the host's injected session context.",
+ "patterns_sha256": "c65977ca034624d333a87e330d51c92bdc7c98742a16f89d434bbb1051d394b7",
+ "plants": {
+  "gpt6-AB": {
+   "type": "item.completed",
+   "item": {
+    "type": "command_execution",
+    "command": "cat planted/convergence-m45/returns/gpt6-m45.json",
+    "aggregated_output": "planted"
+   }
+  },
+  "gpt6-BA": {
+   "type": "item.completed",
+   "item": {
+    "type": "web_search",
+    "query": "native-agent-stack pull/444",
+    "action": {
+     "type": "search"
+    }
+   }
+  },
+  "claude-AB": {
+   "type": "assistant",
+   "message": {
+    "content": [
+     {
+      "type": "tool_use",
+      "name": "mcp__planted__search",
+      "input": {
+       "query": "planted"
+      }
+     }
+    ]
+   }
+  },
+  "claude-BA": {
+   "type": "assistant",
+   "message": {
+    "content": [
+     {
+      "type": "tool_use",
+      "name": "Read",
+      "input": {
+       "file_path": "planted/convergence-m45/adjudication/m45-mapping.json"
+      }
+     }
+    ]
+   }
+  }
+ },
+ "clean": {
+  "gpt6-AB": {
+   "void": false,
+   "hits": []
+  },
+  "gpt6-BA": {
+   "void": false,
+   "hits": []
+  },
+  "claude-AB": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "evidence-reviewer"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "evidence-reviewer"
+    ]
+   ]
+  },
+  "claude-BA": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "evidence-reviewer"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "evidence-reviewer"
+    ]
+   ]
+  }
+ },
+ "clean_matches_published_audit": true,
+ "planted": {
+  "gpt6-AB": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "command",
+     "gpt6-m45"
+    ],
+    [
+     "ACCESS",
+     "command",
+     "convergence-m45"
+    ]
+   ]
+  },
+  "gpt6-BA": {
+   "void": true,
+   "hits": [
+    [
+     "WEB",
+     "web search",
+     "native-agent-stack"
+    ]
+   ]
+  },
+  "claude-AB": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "evidence-reviewer"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "evidence-reviewer"
+    ],
+    [
+     "mcp__ call",
+     "tool call",
+     "mcp__planted__search"
+    ]
+   ]
+  },
+  "claude-BA": {
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ],
+    [
+     "MAPPING",
+     "tool_result",
+     "evidence-reviewer"
+    ],
+    [
+     "MAPPING",
+     "tool result (structured)",
+     "evidence-reviewer"
+    ],
+    [
+     "MAPPING",
+     "tool call Read",
+     "m45-mapping"
+    ],
+    [
+     "ACCESS",
+     "tool call Read",
+     "convergence-m45"
+    ]
+   ]
+  }
+ },
+ "every_planted_judgment_void": true
+}

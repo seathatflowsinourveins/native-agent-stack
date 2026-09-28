@@ -1,0 +1,46 @@
+{
+ "leak": false,
+ "leak_text": "",
+ "items": [
+  {
+   "id": "M5",
+   "choice": "B",
+   "reasons": "Neither return says anything the repository or the sources contradict, so the choice turns on whether the models of both clients will follow the rule as intended. Lines 15-18 carry two things. One is a reason: project-readiness's installer writes worktree-root guidance and actions. The other is a rule buried in a 'so' clause: this bounded application keeps its reviewable nested contract for the coordinator to integrate, without modifying the enclosing repository's native actions. Return B states the rule as direct instructions. It keeps the reason in the present tense and credits it to project-readiness, which AGENTS.md:15-16 and receipt.json:88 support. It names the one concrete thing a worker here could run, the installer; receipt.json:88 shows project-readiness is installed. It also hands the installer, the root guidance and the root actions to the coordinator by name, which matches root AGENTS.md:34. Return A is accurate, but it drops the installer sentence (AGENTS.md:15-16) that told the reader which actions are meant. Its unconditional 'Leave the enclosing repository's native actions unchanged' applies to every model that loads this nested file (CLAUDE.md:1 imports it), including a coordinator working here. README.md:88-90 and receipt.json:88, however, describe leaving those actions unchanged as a property of this bounded contribution, and A does not say who owns the root work. S1 favors clear, specific instructions, and S10 says one client's model is more sensitive to instructions in AGENTS.md. Both favor B's clearly scoped assignment. B's extension to the root guidance and the installer is inferred from the original 'so' clause, and nothing in the repository contradicts it. B drops 'reviewable', a minor loss. Either edit changes the sha256 and byte count recorded at manifests/evidence.json:3906-3907, so the manifest does not favor either return. Because B replaces the past-tense narrative with a direct rule that nothing contradicts, 'neither' is not warranted.",
+   "sources": [
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:15-18",
+     "quote": "Project-readiness inspected the enclosing public worktree. Its installer writes worktree-root guidance and actions, so this bounded application retains the reviewable nested contract for the coordinator to integrate without modifying the enclosing repository's native actions."
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/receipt.json:88",
+     "quote": "validated against installed project-readiness contract validator; enclosing worktree actions not modified"
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/README.md:88-90",
+     "quote": "The nested [project contract](project-contract.json) supplies actual setup, run, test and verify commands for native Codex/Claude integration. The enclosing repository's global actions were not modified by this bounded contribution."
+    },
+    {
+     "locator": "AGENTS.md:34",
+     "quote": "One coordinator integrates. Writing workers need separate worktrees and bounded file ownership."
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/CLAUDE.md:1",
+     "quote": "@AGENTS.md"
+    },
+    {
+     "locator": "S1",
+     "quote": "Claude responds well to clear, explicit instructions. Being specific about your desired output can help enhance results."
+    },
+    {
+     "locator": "S10",
+     "quote": "It can be more sensitive to instructions contained in skills and other files, such as `AGENTS.md`."
+    },
+    {
+     "locator": "manifests/evidence.json:3906-3907",
+     "quote": "\"sha256\": \"12ec72f9a905c105ee44e6daa6c0767bbb9978ad0b51e1ec570372afb54d8bd2\", \"bytes\": 1040"
+    }
+   ],
+   "confidence": 0.65
+  }
+ ]
+}
