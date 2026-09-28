@@ -1,0 +1,78 @@
+{
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-28T09:00:06Z",
+  "finished": "2026-09-28T09:06:17Z",
+  "usage": {
+   "input_tokens": 634068,
+   "cached_input_tokens": 557568,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 11242,
+   "reasoning_output_tokens": 6370
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X5a",
+    "choice": "A",
+    "reasons": "Both amendments pass the two focused tests in memory and remain below 1,265 words. A retains installed-client-first verification in unchanged step 2. A also explicitly directs template re-registration; that co-change is necessary despite its 'non-blocking' label. B omits it, leaving the manifest's hash and byte count stale. Under the exact-resolution rule, A is the supported complete change.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/CLAUDE.md:6",
+      "quote": "2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:967",
+      "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+     },
+     {
+      "locator": "manifests/evidence.json:38815",
+      "quote": "\"path\": \"examples/claude-native/CLAUDE.md\",\n      \"sha256\": \"bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0\",\n      \"bytes\": 8480"
+     },
+     {
+      "locator": "scripts/validate.py:384",
+      "quote": "if hashlib.sha256(content).hexdigest() != digest:\n                    self.error(f\"{path_value}: SHA-256 mismatch\")\n                if len(content) != size:\n                    self.error(f\"{path_value}: byte count mismatch\")"
+     }
+    ],
+    "confidence": 0.83
+   },
+   {
+    "id": "X5c",
+    "choice": "B",
+    "reasons": "A's required hash/count co-changes do repair the focused tests in memory. However, the modified test file is itself manifest-pinned. Its resulting SHA-256 is 51e9378b64832313343c12255ec46fd3b6d6b4d04331bd86f4eae9d4325dc24e. A specifies re-registering only the template, leaving the test-file entry stale and mandatory validation failing. Repairing that entry would require another unlisted co-change. B preserves the passing original.",
+    "sources": [
+     {
+      "locator": "tests/test_codex_worker_lane.py:209",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 120)"
+     },
+     {
+      "locator": "manifests/evidence.json:39930",
+      "quote": "\"path\": \"tests/test_codex_worker_lane.py\",\n      \"sha256\": \"3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf\",\n      \"bytes\": 95109"
+     },
+     {
+      "locator": "scripts/host_receipts.py:721",
+      "quote": "if isinstance(existing, dict) and existing.get(\"path\") == relative_path:\n            files[index] = record\n            break"
+     },
+     {
+      "locator": "scripts/validate.py:384",
+      "quote": "if hashlib.sha256(content).hexdigest() != digest:\n                    self.error(f\"{path_value}: SHA-256 mismatch\")"
+     },
+     {
+      "locator": ".github/workflows/validate.yml:80",
+      "quote": "- name: Validate manifests and evidence integrity\n        run: python3 scripts/validate.py"
+     }
+    ],
+    "confidence": 0.93
+   }
+  ]
+ }
+}

@@ -1,0 +1,10 @@
+# verify_lane_a.py with this directory copied into a clean detached worktree of origin/main at 4a610e18, before this change
+$ python3 -B evidence/artifacts/prompt-audit-20260927/lane-a/verify_lane_a.py
+final round X5a: apply the proposed change
+final round X5c: adjudicate
+X5c adjudication: {'gpt6-AB': 'c', 'gpt6-BA': 'c', 'claude-AB': 'c', 'claude-BA': 'c'} -> apply the amendment (c)
+repository: CLAUDE.md:3 and template:3 checked; top-rule block 476b73c5 120 words
+MISMATCH: examples/claude-native/CLAUDE.md:3 is not X5a's applied text
+MISMATCH: adoption/templates/codex.AGENTS.template.md:3 is not X5c's applied text
+2 mismatch(es)
+exit 1

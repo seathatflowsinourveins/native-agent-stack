@@ -1,0 +1,65 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "items"
+ ],
+ "properties": {
+  "items": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "choice",
+     "reasons",
+     "sources",
+     "confidence"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "enum": [
+       "X5a",
+       "X5c"
+      ]
+     },
+     "choice": {
+      "type": "string",
+      "enum": [
+       "A",
+       "B",
+       "neither"
+      ]
+     },
+     "reasons": {
+      "type": "string"
+     },
+     "sources": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "locator",
+        "quote"
+       ],
+       "properties": {
+        "locator": {
+         "type": "string"
+        },
+        "quote": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "confidence": {
+      "type": "number"
+     }
+    }
+   }
+  }
+ }
+}
