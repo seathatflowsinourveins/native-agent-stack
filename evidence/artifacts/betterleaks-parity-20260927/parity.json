@@ -1,0 +1,617 @@
+{
+ "schema_version": 1,
+ "kind": "secret_scanner_parity",
+ "recorded_on": "2026-09-27",
+ "baseline": "gitleaks 8.30.1 (pinned, checksum-verified linux_x64 archive)",
+ "candidate": "betterleaks 1.8.1 (Sigstore- and checksum-verified linux_x64 archive)",
+ "config": ".gitleaks.toml at the catalog_revision in run-record.json, passed with --config to both tools",
+ "evidence_class": "our-integration: both unchanged upstream binaries executed on this host over this repository and the unchanged tests/test_gitleaks_config.py fixtures; classification is our value-blind triage of --redact'ed reports. Not an upstream test and not a CI run.",
+ "row_formats": {
+  "dir_mode.new_findings": [
+   "rule",
+   "file",
+   "line",
+   "category",
+   "description"
+  ],
+  "git_mode.new_findings": [
+   "rule",
+   "file",
+   "lines",
+   "findings",
+   "distinct_commits",
+   "category",
+   "description"
+  ],
+  "missing_in_betterleaks / extra_in_betterleaks": [
+   "rule",
+   "fixture file",
+   "line"
+  ]
+ },
+ "dir_mode": {
+  "argv": "dir . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --report-format json --report-path <scratch>",
+  "gitleaks": {
+   "rc": 0,
+   "findings": 0,
+   "bytes_scanned": 138080098,
+   "skipped_over_2mb": 2
+  },
+  "betterleaks": {
+   "rc": 1,
+   "findings": 16,
+   "bytes_scanned": 138080098,
+   "skipped_over_2mb": 2,
+   "by_rule": {
+    "generic-password": 10,
+    "generic-credential-uri": 6
+   }
+  },
+  "new_findings": [
+   [
+    "generic-credential-uri",
+    "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/osv-positive.json",
+    1980,
+    "example",
+    "the advisory text's own username:password example URL in retained scanner output"
+   ],
+   [
+    "generic-credential-uri",
+    "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/pip-audit-positive.json",
+    1,
+    "example",
+    "the advisory text's own username:password example URL in retained scanner output"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_codex_lane.py",
+    1380,
+    "fixture",
+    "URL fixture whose password is a six-letter placeholder word"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_ecosystem_manifest.py",
+    309,
+    "fixture",
+    "bad-URL and redaction fixtures whose password is a six-letter placeholder word"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_ecosystem_manifest.py",
+    841,
+    "fixture",
+    "bad-URL and redaction fixtures whose password is a six-letter placeholder word"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_host_requests.py",
+    422,
+    "fixture",
+    "URL userinfo parsing fixture; two-letter password; loopback host"
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/auth_none_with_basic_block.sh",
+    10,
+    "false_positive",
+    "printf template (%s), not a literal password"
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
+    24,
+    "local_test_passphrase",
+    "readable 25-character passphrase of a test arm's scratch restic repository; same value in paper_arm.sh"
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
+    32,
+    "local_test_passphrase",
+    "readable 25-character passphrase of a test arm's scratch restic repository; same value in dagu_arm.sh"
+   ],
+   [
+    "generic-password",
+    "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+    5091,
+    "false_positive",
+    "four-word prose phrase in a catalog note about CLI login"
+   ],
+   [
+    "generic-password",
+    "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
+    9,
+    "local_test_passphrase",
+    "readable, dated 28-character passphrase of the isolated rerun's scratch restic repository"
+   ],
+   [
+    "generic-password",
+    "observability/backends/configure.py",
+    144,
+    "false_positive",
+    "code expression between the quotes (a secrets.token_hex call), not a literal"
+   ],
+   [
+    "generic-password",
+    "tests/test_codex_lane.py",
+    833,
+    "false_positive",
+    "/etc/passwd inside test command strings; the matched value is a prose JSON string"
+   ],
+   [
+    "generic-password",
+    "tests/test_codex_lane.py",
+    834,
+    "false_positive",
+    "/etc/passwd inside test command strings; the matched value is a prose JSON string"
+   ],
+   [
+    "generic-password",
+    "tests/test_codex_lane.py",
+    923,
+    "false_positive",
+    "/etc/passwd inside test command strings; the matched value is a prose JSON string"
+   ],
+   [
+    "generic-password",
+    "tests/test_codex_lane.py",
+    949,
+    "false_positive",
+    "/etc/passwd inside test command strings; the matched value is a prose JSON string"
+   ]
+  ],
+  "new_findings_by_category": {
+   "example": 2,
+   "fixture": 4,
+   "false_positive": 7,
+   "local_test_passphrase": 3
+  }
+ },
+ "git_mode": {
+  "argv": "git . --config .gitleaks.toml --max-target-megabytes 2 --log-opts=HEAD --redact --no-banner --report-format json --report-path <scratch>",
+  "gitleaks": {
+   "rc": 0,
+   "findings": 0,
+   "commits_scanned": 697,
+   "bytes_scanned": 1156580072
+  },
+  "betterleaks": {
+   "rc": 1,
+   "findings": 91,
+   "bytes_scanned": 1156384789,
+   "commits_scanned": "not reported by betterleaks 1.8.1",
+   "by_rule": {
+    "generic-password": 12,
+    "generic-credential-uri": 6,
+    "generic-api-key": 73
+   }
+  },
+  "new_findings": [
+   [
+    "generic-api-key",
+    "docs/ecosystem/index.html",
+    [
+     103,
+     104,
+     105,
+     106,
+     116,
+     122,
+     123
+    ],
+    73,
+    73,
+    "digest",
+    "64-hex content digests under a *_sha256 field of the catalog data embedded in the generated explorer HTML; history only (the file is no longer committed); each fragment is a 6-13 MB single line that gitleaks skips under --max-target-megabytes 2"
+   ],
+   [
+    "generic-credential-uri",
+    "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/osv-positive.json",
+    [
+     1980
+    ],
+    1,
+    1,
+    "example",
+    "the advisory text's own username:password example URL in retained scanner output"
+   ],
+   [
+    "generic-credential-uri",
+    "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/pip-audit-positive.json",
+    [
+     1
+    ],
+    1,
+    1,
+    "example",
+    "the advisory text's own username:password example URL in retained scanner output"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_codex_lane.py",
+    [
+     1125
+    ],
+    1,
+    1,
+    "fixture",
+    "URL fixture whose password is a six-letter placeholder word"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_ecosystem_manifest.py",
+    [
+     162,
+     625
+    ],
+    2,
+    2,
+    "fixture",
+    "bad-URL and redaction fixtures whose password is a six-letter placeholder word"
+   ],
+   [
+    "generic-credential-uri",
+    "tests/test_host_requests.py",
+    [
+     422
+    ],
+    1,
+    1,
+    "fixture",
+    "URL userinfo parsing fixture; two-letter password; loopback host"
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/auth_none_with_basic_block.sh",
+    [
+     10
+    ],
+    1,
+    1,
+    "false_positive",
+    "printf template (%s), not a literal password"
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
+    [
+     24
+    ],
+    1,
+    1,
+    "local_test_passphrase",
+    "readable 25-character passphrase of a test arm's scratch restic repository; same value in paper_arm.sh"
+   ],
+   [
+    "generic-password",
+    "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
+    [
+     32
+    ],
+    1,
+    1,
+    "local_test_passphrase",
+    "readable 25-character passphrase of a test arm's scratch restic repository; same value in dagu_arm.sh"
+   ],
+   [
+    "generic-password",
+    "blueprints/us-equities/hosting/config.yaml.example",
+    [
+     14
+    ],
+    1,
+    1,
+    "placeholder",
+    "all-caps REPLACE_... placeholder in an example config; history only"
+   ],
+   [
+    "generic-password",
+    "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+    [
+     5091
+    ],
+    1,
+    1,
+    "false_positive",
+    "four-word prose phrase in a catalog note about CLI login"
+   ],
+   [
+    "generic-password",
+    "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
+    [
+     9
+    ],
+    1,
+    1,
+    "local_test_passphrase",
+    "readable, dated 28-character passphrase of the isolated rerun's scratch restic repository"
+   ],
+   [
+    "generic-password",
+    "observability/backends/configure.py",
+    [
+     43,
+     128
+    ],
+    2,
+    2,
+    "false_positive",
+    "code expression between the quotes (a secrets.token_hex call), not a literal"
+   ],
+   [
+    "generic-password",
+    "tests/test_codex_lane.py",
+    [
+     833,
+     834,
+     923,
+     949
+    ],
+    4,
+    1,
+    "false_positive",
+    "/etc/passwd inside test command strings; the matched value is a prose JSON string"
+   ]
+  ],
+  "new_findings_by_category": {
+   "digest": 73,
+   "example": 2,
+   "fixture": 4,
+   "false_positive": 8,
+   "local_test_passphrase": 3,
+   "placeholder": 1
+  },
+  "note": "Attempt 2 of the betterleaks scan (raised caps); attempt 1 under the host gitleaks guard's caps was stopped at 600 s with no result (run-record.json, scans)."
+ },
+ "fixtures": {
+  "driver": "unchanged tests/test_gitleaks_config.py classes GitleaksPresenceTests, GitleaksConfigContextRestrictionTests and GitleaksIgnoreFingerprintTests, run with a PATH directory whose `gitleaks` symlink points at each verified binary, GITLEAKS_TESTS_REQUIRED=1",
+  "gitleaks": {
+   "tests_run": 25,
+   "ok": 25,
+   "FAIL": 0,
+   "ERROR": 0,
+   "skipped": 0
+  },
+  "betterleaks": {
+   "tests_run": 25,
+   "ok": 17,
+   "FAIL": 4,
+   "ERROR": 4,
+   "skipped": 0
+  },
+  "tests": [
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_a_non_allowlisted_path_hex_secrets_are_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_b2_non_allowlisted_directory_same_field_name_is_still_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_b_allowlisted_path_named_digest_field_is_not_detected",
+    "gitleaks": "ok",
+    "betterleaks": "FAIL (AssertionError)",
+    "betterleaks_empty_report_written_as_null": 1
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_c2_sha256_and_api_key_sharing_one_line_the_api_key_is_still_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_c3_unrelated_key_sharing_the_cursors_base64_shape_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_c_ghp_token_on_a_different_line_from_the_allowlisted_cursor_is_still_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_d2_other_fields_and_other_paths_stay_detected",
+    "gitleaks": "ok",
+    "betterleaks": "FAIL (AssertionError)",
+    "missing_in_betterleaks": [
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260923.json",
+      17
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260924.json",
+      5
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260924.json",
+      9
+     ]
+    ],
+    "extra_in_betterleaks": [
+     [
+      "generic-api-key",
+      "catalogs/sota-convergence/manifest-20260923.json",
+      17
+     ]
+    ]
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_d3_reviewed_manifest_pin_ids_are_not_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ERROR (TypeError)",
+    "betterleaks_empty_report_written_as_null": 1
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_d4_unreviewed_values_and_other_paths_stay_detected",
+    "gitleaks": "ok",
+    "betterleaks": "FAIL (AssertionError)",
+    "missing_in_betterleaks": [
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260925.json",
+      5
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260925.json",
+      9
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260925.json",
+      13
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260925.json",
+      17
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      23
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      26
+     ],
+     [
+      "sourcegraph-access-token",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      29
+     ]
+    ],
+    "extra_in_betterleaks": [
+     [
+      "generic-api-key",
+      "catalogs/sota-convergence/manifest-20260926.json",
+      23
+     ]
+    ]
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_d5_retained_sweep_input_pin_lines_only",
+    "gitleaks": "ok",
+    "betterleaks": "FAIL (AssertionError)",
+    "missing_in_betterleaks": [
+     [
+      "sourcegraph-access-token",
+      "evidence/artifacts/landscape-sweep-20260926/inputs/code-navigation.json",
+      17
+     ],
+     [
+      "sourcegraph-access-token",
+      "evidence/artifacts/landscape-sweep-20260926/inputs/semantic-rag.json",
+      5
+     ],
+     [
+      "sourcegraph-access-token",
+      "evidence/artifacts/landscape-sweep-20260926/inputs/semantic-rag.json",
+      9
+     ]
+    ],
+    "extra_in_betterleaks": [
+     [
+      "generic-api-key",
+      "evidence/artifacts/landscape-sweep-20260926/inputs/code-navigation.json",
+      17
+     ]
+    ]
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_d_manifest_pin_commit_ids_are_not_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ERROR (TypeError)",
+    "betterleaks_empty_report_written_as_null": 1
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_e2_other_fields_and_other_paths_stay_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_e_memory_rejection_fingerprints_are_not_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ERROR (TypeError)",
+    "betterleaks_empty_report_written_as_null": 1
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_exit_code_zero_flag_always_returns_zero_even_with_findings",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_f2_credential_shaped_key_in_the_same_file_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_f2b_dot_segment_path_key_holding_a_digest_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_f3_non_hex_value_under_a_path_shaped_key_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_f4_second_secret_on_the_same_line_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_f5_same_path_keyed_line_in_a_different_file_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksConfigContextRestrictionTests.test_f_path_keyed_digest_in_the_reviewed_manifest_is_not_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ERROR (TypeError)",
+    "betterleaks_empty_report_written_as_null": 1
+   },
+   {
+    "test": "GitleaksIgnoreFingerprintTests.test_a2_out_of_ancestry_exceptions_stay_out_of_head_history",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksIgnoreFingerprintTests.test_a_every_line_is_a_fingerprint_naming_a_narrative_file_and_rule",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksIgnoreFingerprintTests.test_b_gitleaks_toml_has_no_allowlist_naming_the_narrative_files",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksIgnoreFingerprintTests.test_c_a_later_commit_sharing_a_narrative_line_with_an_injected_secret_is_detected",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   },
+   {
+    "test": "GitleaksPresenceTests.test_gitleaks_is_on_path_when_the_ci_step_requires_it",
+    "gitleaks": "ok",
+    "betterleaks": "ok"
+   }
+  ]
+ },
+ "classification": {
+  "superset": false,
+  "missing": "fixtures only: 13 sourcegraph-access-token detections of bare 40-hex values in tests d2, d4 and d5; betterleaks 1.8.1 requires the sgp_ prefix (config/betterleaks.toml) where gitleaks 8.30.1 also matches any 40-hex value near the keyword (config/gitleaks.toml). Both real scans had no gitleaks finding to miss.",
+  "extra_in_fixtures": "3 generic-api-key detections at lines where gitleaks reported the sourcegraph rule (one per test d2, d4, d5)",
+  "schema": "betterleaks writes an empty JSON report as null, gitleaks as []; 5 negative fixture tests fail on that alone",
+  "new_findings": "16 in dir mode and 91 in git mode, from betterleaks-only rules generic-password and generic-credential-uri and from generic-api-key on explorer HTML that gitleaks skips by size",
+  "real_secret_found": false,
+  "triage_method": "each finding's line was re-read from the tree or from its commit, the rule's upstream regex was re-applied at the reported byte columns, and only key text, value length, character classes, structural shape and marker words were printed (harness/triage.py, harness/triage_history.py); no value was printed or stored"
+ }
+}

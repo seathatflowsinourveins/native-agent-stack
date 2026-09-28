@@ -1,0 +1,214 @@
+{
+ "schema_version": 1,
+ "kind": "betterleaks_parity_run_record",
+ "recorded_on": "2026-09-27",
+ "plan_move": "M3: betterleaks beside gitleaks, then swap only if parity holds",
+ "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "host_id": "nativestack-5975wx-20260925",
+ "platform_id": "linux-wsl2-x86_64",
+ "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T03:18:00Z"},
+ "evidence_classes": {
+  "upstream-unchanged": [
+   "cosign v3.0.6 verify-blob of betterleaks v1.8.1 checksums.txt against its Sigstore bundle, and six failing controls",
+   "sha256sum --check of the betterleaks archive against the signed checksums.txt, and a tampered-archive control",
+   "gh release verify and gh release verify-asset (GitHub immutable-release attestation), and a tampered-archive control",
+   "gitleaks 8.30.1 archive digest against the repository pins and the upstream checksums file",
+   "zizmor 1.30.1 (offline) and actionlint 1.7.12 with shellcheck 0.11.0 on the changed workflow"
+  ],
+  "our-integration": [
+   "parity scans of both unchanged binaries over this repository (git mode, dir mode) and the unchanged tests/test_gitleaks_config.py fixture classes",
+   "value-blind triage of the redacted reports (parity.json)",
+   "local simulation of the new job's run steps (harness/sim_job.py); not a GitHub Actions run",
+   "tests/test_workflow_hardening.py BetterleaksTrialJobTests, with three failing controls"
+  ],
+  "live-run-pending": [
+   "the secret-scan-betterleaks job on a GitHub-hosted runner (memory, time, live logs, and dir mode against a full .git directory: both default configs skip a path matching (?:^|/)\\.git$, line 49 of config/betterleaks.toml and of config/gitleaks.toml, but the local worktree's .git is a file, so only the hosted run shows it)",
+   "zizmor's online audits (impostor-commit, known-vulnerable-actions, ref-confusion, ref-version-mismatch), which need the CI token"
+  ]
+ },
+ "sources": {
+  "betterleaks": {
+   "repository": "https://github.com/betterleaks/betterleaks",
+   "tag": "v1.8.1",
+   "tag_commit": "5eab48332cc48565864514e3bc6de89df091a7c4",
+   "release_published": "2026-08-18T21:15:55Z",
+   "release_immutable": true,
+   "files_consulted_at_tag": ["README.md", "docs/scanning.md", "cmd/root.go", "cmd/git.go", "cmd/directory.go", "cmd/detect.go",
+                              "config/config.go", "config/translate_filters.go", "config/betterleaks.toml", ".goreleaser.yml",
+                              ".github/workflows/release.yml", "internal/confidence/confidence.go", "go.mod"]
+  },
+  "gitleaks": {
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "tag": "v8.30.1",
+   "release_published": "2026-03-21T02:17:58Z",
+   "release_immutable": false,
+   "files_consulted_at_tag": ["detect/detect.go", "detect/files.go", "cmd/detect.go", "cmd/directory.go", "config/gitleaks.toml"],
+   "readme_on_master": {"read_at": "2026-09-28T03:04:13Z", "branch_head": "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b", "line": 12,
+                        "quote": "Gitleaks is feature complete. I'm not merging new features into Gitleaks. Future releases will be security patches only. I'm shifting my focus to [Betterleaks](https://github.com/betterleaks/betterleaks)",
+                        "note": "the README at the v8.30.1 tag has no such line; the notice is on master"}
+  },
+  "cosign": {"repository": "https://github.com/sigstore/cosign", "tag": "v3.0.6", "git_commit": "f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f"},
+  "cosign_installer": {"repository": "https://github.com/sigstore/cosign-installer", "tag": "v4.1.2",
+                       "commit": "6f9f17788090df1f26f669e9d70d6ae9567deba6", "file": "action.yml",
+                       "bootstrap_version": "v3.0.6", "bootstrap_digest_line": 108}
+ },
+ "downloads": [
+  {"release": "sigstore/cosign v3.0.6", "asset": "cosign-linux-amd64", "bytes": 135178161, "sha256": "c956e5dfcac53d52bcf058360d579472f0c1d2d9b69f55209e256fe7783f4c74"},
+  {"release": "sigstore/cosign v3.0.6", "asset": "cosign_checksums.txt", "bytes": 3906, "sha256": "90ee0c2fd4003333ccb4324cc1783d012fa1e3dd3ad9843328670a5ecc285cfe"},
+  {"release": "sigstore/cosign v3.0.6", "asset": "cosign-linux-amd64.sigstore.json", "bytes": 6339, "sha256": "b3a04913f3a3f4a38e4a7a42b8d590834b8791de99ddeaad66c608b6aa8e02a4"},
+  {"release": "sigstore/cosign-installer v4.1.2 (raw file at the commit above)", "asset": "action.yml", "sha256": "71e926bd0fb5115735340d0e9aadf031210548b8346c70cdacb27447003528ec"},
+  {"release": "betterleaks/betterleaks v1.8.1", "asset": "betterleaks_1.8.1_linux_x64.tar.gz", "bytes": 9906578, "sha256": "efa407244e1ea8e35f582b8a42becdeac08bdead04f68eb752adda722d583c2a"},
+  {"release": "betterleaks/betterleaks v1.8.1", "asset": "checksums.txt", "bytes": 612, "sha256": "08caab663c63b92f976014986cecd54e9411033578ff46a8de2c2ccbbfba5da5"},
+  {"release": "betterleaks/betterleaks v1.8.1", "asset": "checksums.txt.sigstore.json", "bytes": 10419, "sha256": "28abe579d38828d088b7d9e146f9dc858147a42aa80561076eb4bf9ddd83a7c4"},
+  {"release": "gitleaks/gitleaks v8.30.1", "asset": "gitleaks_8.30.1_linux_x64.tar.gz", "bytes": 8230402, "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"},
+  {"release": "gitleaks/gitleaks v8.30.1", "asset": "gitleaks_8.30.1_checksums.txt", "bytes": 999, "sha256": "061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae"},
+  {"release": "koalaman/shellcheck v0.11.0", "asset": "shellcheck-v0.11.0.linux.x86_64.tar.xz", "bytes": 2559196, "sha256": "8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"}
+ ],
+ "verification": {
+  "cosign": {
+   "executed_only_after": "the binary's digest matched three sources",
+   "digest_sources_agreeing": [
+    "sigstore/cosign-installer v4.1.2 action.yml line 108 (bootstrap_linux_amd64_sha)",
+    "cosign v3.0.6 cosign_checksums.txt entry for cosign-linux-amd64",
+    "the GitHub release asset digest for cosign-linux-amd64"
+   ],
+   "rc": {"installer_digest": 0, "release_checksums": 0, "release_asset_digest": 0},
+   "signature_of_cosign_itself": {
+    "verified": false,
+    "reason": "no verifier independent of cosign was available; the installer repository's pinned digest is the trust anchor, as sigstore/cosign-installer uses it for its own bootstrap",
+    "github_attestation_checks": {"at": "2026-09-28T03:18:00Z, after cosign's first execution (see deviations)",
+     "attestations list for the binary digest": "HTTP 404",
+     "gh attestation verify cosign-linux-amd64 --repo sigstore/cosign": "rc 1, HTTP 404",
+     "gh release verify v3.0.6 -R sigstore/cosign": "rc 1, no attestations for tag v3.0.6"},
+    "release_bundle": "cosign-linux-amd64.sigstore.json was downloaded but not used: a Sigstore verifier is needed to check it, and cosign checking its own bundle would show self-consistency only"
+   },
+   "version_output": {"GitVersion": "v3.0.6", "GitCommit": "f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f", "BuildDate": "2026-04-06T21:39:58Z", "GoVersion": "go1.25.7"},
+   "tuf_cache": "TUF_ROOT and HOME pointed at the scratch directory for the verification runs (the CI simulation is the exception recorded under deviations)"
+  },
+  "betterleaks": {
+   "path": "cosign verify-blob (the path the brief names first); gh release verify-asset as a second, independent verifier",
+   "verify_blob": {
+    "argv": "cosign verify-blob --bundle checksums.txt.sigstore.json --certificate-identity-regexp '^https://github\\.com/betterleaks/betterleaks/\\.github/workflows/release\\.yml@refs/tags/v1\\.8\\.1$' --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-github-workflow-repository betterleaks/betterleaks --certificate-github-workflow-ref refs/tags/v1.8.1 --certificate-github-workflow-sha 5eab48332cc48565864514e3bc6de89df091a7c4 --certificate-github-workflow-trigger push checksums.txt",
+    "output": "Verified OK",
+    "rc": 0,
+    "at": "2026-09-28T02:12:18Z"
+   },
+   "archive_against_signed_checksums": {"argv": "sha256sum --check --ignore-missing --strict checksums.txt", "output": "betterleaks_1.8.1_linux_x64.tar.gz: OK", "rc": 0, "checksums_lines": 6},
+   "signer_certificate": {
+    "subject_alternative_name": "https://github.com/betterleaks/betterleaks/.github/workflows/release.yml@refs/tags/v1.8.1",
+    "oidc_issuer": "https://token.actions.githubusercontent.com",
+    "build_signer_uri": "https://github.com/betterleaks/betterleaks/.github/workflows/release.yml@refs/tags/v1.8.1",
+    "source_repository_uri": "https://github.com/betterleaks/betterleaks",
+    "source_repository_digest": "5eab48332cc48565864514e3bc6de89df091a7c4",
+    "source_repository_digest_equals_tag_commit": true,
+    "source_repository_ref": "refs/tags/v1.8.1",
+    "build_trigger": "push",
+    "certificate_issuer": "O = sigstore.dev, CN = sigstore-intermediate",
+    "not_before": "2026-08-18T21:15:19Z",
+    "not_after": "2026-08-18T21:25:19Z",
+    "bundle_media_type": "application/vnd.dev.sigstore.bundle.v0.3+json",
+    "rekor_log_index": 2507892221,
+    "rekor_integrated_time": "2026-08-18T21:15:20Z",
+    "rekor_entry_kind": "hashedrekord 0.0.1",
+    "signing_step": ".goreleaser.yml signs: id checksum, cmd cosign, args sign-blob --bundle=${signature} ${artifact} --yes, artifacts: checksum; release.yml runs sigstore/cosign-installer at the v4.1.2 commit with cosign-release v3.0.6"
+   },
+   "failing_controls": [
+    {"control": "identity regexp naming refs/tags/v1.8.0", "rc": 1, "output_excerpt": "no matching CertificateIdentity found, last error: expected SAN value to match regex"},
+    {"control": "identity regexp naming gitleaks/gitleaks", "rc": 1, "output_excerpt": "no matching CertificateIdentity found, last error: expected SAN value to match regex"},
+    {"control": "issuer https://accounts.google.com", "rc": 1, "output_excerpt": "expected issuer value \"https://accounts.google.com\", got \"https://token.actions.githubusercontent.com\""},
+    {"control": "workflow sha of forty zeros", "rc": 1, "output_excerpt": "expected GithubWorkflowSHA to be <forty zeros>, got the tag commit above"},
+    {"control": "checksums.txt with its first byte changed by one bit", "rc": 1, "output_excerpt": "invalid signature when validating ASN.1 encoded signature"},
+    {"control": "archive with its middle byte changed by one bit, against the signed checksums.txt", "rc": 1, "output_excerpt": "betterleaks_1.8.1_linux_x64.tar.gz: FAILED; sha256sum: WARNING: 1 computed checksum did NOT match"}
+   ],
+   "github_release_attestation": {
+    "tool": "gh 2.101.0",
+    "gh_release_verify": {"argv": "gh release verify v1.8.1 -R betterleaks/betterleaks", "rc": 0, "output": ["Resolved tag v1.8.1 to sha1:<tag_commit above>", "Release v1.8.1 verified!"], "assets_listed": 8},
+    "gh_release_verify_asset": {"argv": "gh release verify-asset v1.8.1 betterleaks_1.8.1_linux_x64.tar.gz -R betterleaks/betterleaks", "rc": 0, "output": "Verification succeeded! betterleaks_1.8.1_linux_x64.tar.gz is present in release v1.8.1"},
+    "tampered_archive_control": {"rc": 1, "output": "attestation for v1.8.1 does not contain subject sha256:<tampered digest>"},
+    "attestation_predicate_type": "https://in-toto.io/attestation/release/v0.2",
+    "attestation_subjects": 9
+   }
+  },
+  "gitleaks": {
+   "archive_digest_checks": {"validate_yml_pin": 0, "wsl_native_tools_pins_json": 0, "upstream_checksums_file": 0},
+   "published_signature_assets": 0,
+   "github_attestations": "none (HTTP 404 for the archive digest)"
+  },
+  "extracted_binaries": {
+   "betterleaks": {"version_output": "1.8.1", "sha256": "380a770d9ea9215e7d3b964246a72d8698b2975496addef2627d0e82b174a1f8"},
+   "gitleaks": {"version_output": "8.30.1", "sha256": "88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509"}
+  }
+ },
+ "scans": {
+  "cwd": "<worktree at catalog_revision, clean>",
+  "containment": "ecosystem-bounded-run (the host's systemd --user scope runner) with the caps the host gitleaks guard applies: ECOSYSTEM_JOB_MEMORY_HIGH=4G, ECOSYSTEM_JOB_MEMORY_MAX=6G, ECOSYSTEM_JOB_SWAP_MAX=0, ECOSYSTEM_JOB_SECONDS=600 (harness/run_scans.sh)",
+  "runs": [
+   {"tool": "gitleaks 8.30.1", "mode": "git", "start": "2026-09-28T02:14:23Z", "elapsed_s": 72.7, "rc": 0, "caps": "guard", "log": "697 commits scanned; scanned ~1156580072 bytes (1.16 GB) in 1m12.2s; no leaks found"},
+   {"tool": "gitleaks 8.30.1", "mode": "dir", "start": "2026-09-28T02:15:36Z", "elapsed_s": 10.6, "rc": 0, "caps": "guard", "log": "2 files skipped as too large; scanned ~138080098 bytes (138.08 MB) in 10.2s; no leaks found"},
+   {"tool": "betterleaks 1.8.1", "mode": "git", "attempt": 1, "start": "2026-09-28T02:15:46Z", "elapsed_s": 602.7, "rc": 143, "caps": "guard", "log": "none; stopped by the 600 s limit with no report",
+    "ps_sample": {"columns": "pid,etimes,pcpu,rss,nlwp (pcpu is ps's lifetime average)", "etimes_s": 542, "pcpu": 43.1, "rss_kb": 5545540, "threads": 51}},
+   {"tool": "betterleaks 1.8.1", "mode": "dir", "start": "2026-09-28T02:25:49Z", "elapsed_s": 1.0, "rc": 1, "caps": "guard", "log": "the same 2 files skipped as too large; scanned ~138080098 bytes (138.08 MB) in 864ms; leaks found: 16"},
+   {"tool": "betterleaks 1.8.1", "mode": "git", "attempt": 2, "start": "2026-09-28T02:28:59Z", "elapsed_s": 55.3, "rc": 1, "caps": "28G memory.high, 32G memory.max, no swap, 3600 s (harness/run_bl_git2.sh)", "log": "scanned ~1156384789 bytes (1.16 GB) in 54.9s; leaks found: 91",
+    "time_v": {"max_rss_kb": 8333804, "user_s": 1473.97, "system_s": 71.93, "cpu_percent": 2798, "wall": "0:55.23"}},
+   {"tool": "gitleaks 8.30.1", "mode": "git", "attempt": "same caps as betterleaks attempt 2, for the resource comparison", "start": "2026-09-28T02:34:36Z", "elapsed_s": 73.9, "rc": 0, "caps": "28G memory.high, 32G memory.max, no swap, 3600 s", "log": "697 commits scanned; scanned ~1156580072 bytes (1.16 GB) in 1m13.4s; no leaks found",
+    "time_v": {"max_rss_kb": 3500880, "user_s": 1749.82, "system_s": 14.84, "cpu_percent": 2389, "wall": "1:13.83"}}
+  ],
+  "reports": "--redact'ed JSON reports kept in the scratch directory, never copied into the repository; every finding's Secret field read REDACTED"
+ },
+ "fixtures": {
+  "gitleaks_8_30_1": {"tests_run": 25, "ok": 25, "FAIL": 0, "ERROR": 0, "skipped": 0, "collector_rc": 0, "elapsed_s": 21},
+  "betterleaks_1_8_1": {"tests_run": 25, "ok": 17, "FAIL": 4, "ERROR": 4, "skipped": 0, "collector_rc": 0, "elapsed_s": 6},
+  "note": "collector_rc is harness/run_fixtures.py's own exit status; outcomes and per-test differences are in parity.json"
+ },
+ "ci_job": {
+  "job": "validate.yml secret-scan-betterleaks (non-required: absent from .github/main-ruleset.json required_status_checks)",
+  "local_simulation": {"log_written": "2026-09-28T02:42:23Z", "elapsed_s": 63, "simulator_rc": 0,
+   "steps": {
+    "Harden the runner (audit-only network egress)": "uses-step, not simulated",
+    "Check out repository with full history": "uses-step, not simulated",
+    "Install cosign pinned by digest": 0,
+    "Install betterleaks after Sigstore and checksum verification": 0,
+    "Run the gitleaks allowlist fixture tests with betterleaks": 1,
+    "Scan git history for secrets with betterleaks": 1,
+    "Scan working tree for secrets with betterleaks": 1},
+   "history_findings": 91, "tree_findings": 16,
+   "fixture_summary": "Ran 25 tests in 5.081s; FAILED (failures=4, errors=4)"},
+  "actionlint_1_7_12": {"archive_digest_check": 0, "all_workflows_rc": 0, "validate_yml_rc": 0,
+                        "shellcheck": "0.11.0 on PATH, verified against the GitHub release asset digest only (rc 0); the asset has no GitHub attestation (HTTP 404)",
+                        "shellcheck_active_control": "a scratch workflow with an unquoted expansion, passed as a file: rc 1 with one SC2086 when shellcheck is on PATH, rc 0 with none without it"},
+  "zizmor_1_30_1": {"install": "scratch venv, pip --require-hashes -r .github/requirements-ci.txt", "argv": "zizmor --no-config --no-ignores --persona regular --strict-collection . (validate.yml line 66)",
+                    "mode": "offline (no token; zizmor warns that it runs offline)", "rc_before_change": 0, "rc_after_change": 0,
+                    "output_before_change": "No findings to report. Good job! (42 suppressed)",
+                    "output_after_change": "No findings to report. Good job! (43 suppressed)",
+                    "suppressed_delta": "+1; a --persona auditor run lists info anonymous-definition (workflow or action definition without a name) at .github/workflows/validate.yml:316:3, the new job, which carries no name: so that it can never take the required context's name"},
+  "hardening_test_controls": [
+   {"mutation": "--redact removed from the dir scan", "rc": 1, "failed": "test_later_steps_need_the_verified_install_and_both_scans_redact"},
+   {"mutation": "job given name: secret-scan", "rc": 1, "failed": "test_is_not_a_required_context_and_cannot_be_forced_green"},
+   {"mutation": "tar -xzf moved before cosign verify-blob", "rc": 1, "failed": "test_binaries_run_only_after_verification"}
+  ],
+  "hardening_test_green_rc": 0,
+  "workflow_restored_byte_identical_after_controls": true
+ },
+ "tests_on_changed_tree": {
+  "window": "2026-09-28T03:07:32Z to 2026-09-28T03:08:58Z, on the final bytes of validate.yml and tests/test_workflow_hardening.py, before commit",
+  "gitleaks_on_path": "the host's ecosystem gitleaks launcher, reporting 8.30.1",
+  "python3 -m unittest tests.test_gitleaks_config": {"rc": 0, "result": "Ran 28 tests in 84.117s; OK"},
+  "python3 -m unittest tests.test_workflow_hardening": {"rc": 0, "result": "Ran 66 tests in 0.780s; OK (skipped=2)"},
+  "python3 -m unittest tests.test_catalog_freshness_pins": {"rc": 0, "result": "Ran 6 tests in 0.001s; OK"},
+  "python3 -m unittest tests.test_workflow_security": {"rc": 0, "result": "Ran 2 tests in 0.125s; OK"},
+  "python3 -m unittest tests.test_workflow_security_coverage": {"rc": 0, "result": "Ran 7 tests in 0.329s; OK"},
+  "zizmor 1.30.1 (validate.yml command, offline)": {"rc": 0, "result": "No findings to report. Good job! (43 suppressed)"},
+  "actionlint 1.7.12 with shellcheck 0.11.0": {"all_workflows_rc": 0, "validate_yml_rc": 0, "output_lines": 0},
+  "earlier_run": "2026-09-28T02:47:26Z: the same five modules passed with the same counts before the new job's header comment was corrected (it now names the gitleaks README on master and the recorded resource figures)"
+ },
+ "deviations": [
+  "GitHub's attestations for the cosign v3.0.6 binary digest were not queried before its first execution (an earlier lookup used a digest that is not this binary's); the checks ran at 2026-09-28T03:18:00Z and found none, so the pre-execution trust anchor stays the three-source digest match.",
+  "betterleaks git attempt 1 ran under the host gitleaks guard's caps and was stopped at 602.7 s (rc 143) with no report; attempt 2 raised only the caps. Both are recorded.",
+  "gh attestation verify with --predicate-type https://in-toto.io/attestation/release/v0.1 returned HTTP 404 (rc 1): our filter named the wrong predicate version (the attestation is release/v0.2). The dedicated gh release verify-asset path passed.",
+  "The first shellcheck control ran actionlint on a scratch directory outside any git repository and exited 3 (no project was found) with and without shellcheck; it was repeated with the workflow file passed explicitly (actionlint_1_7_12.shellcheck_active_control).",
+  "The first history triage relocated findings in the generated explorer HTML by character offset and missed them; betterleaks reports byte columns, so harness/triage_history.py slices the raw bytes and recorded 0 relocation failures.",
+  "The first local simulation of the job's steps ran cosign with the real HOME, so cosign created its TUF cache at ~/.sigstore (6 files, 4 directories, created 2026-09-28T02:41:22Z; absent at run start). Those exact paths were removed, and harness/sim_job.py now sets TUF_ROOT, HOME and XDG_CACHE_HOME inside the scratch directory.",
+  "The first betterleaks run created ~/.cache/com.github.wasilibs (a wazero v1.12.0 compilation cache; go.mod at the tag lists github.com/betterleaks/go-re2, tetratelabs/wazero v1.12.0 and wasilibs/wazero-helpers; 2 directories, 2 files, 2.5 MB; created 2026-09-28T02:15:47Z). Those exact paths were removed. A betterleaks pre-commit hook would create this cache on every developer host."
+ ],
+ "sanitization": "Host paths are replaced by <scratch> and <worktree>. No candidate value, commit, fingerprint, author, e-mail or commit message from any finding is recorded; parity.json holds rule, file and line only. Raw reports, stderr and tracebacks stay in the scratch directory."
+}

@@ -833,6 +833,79 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
         self.assertLess(install, job.index("gitleaks allowlist regression tests"),
                         "the tests must run after the pinned binary is installed")
 
+
+class BetterleaksTrialJobTests(unittest.TestCase):
+    """The non-required betterleaks trial beside secret-scan (plan move M3; receipt
+    evidence/artifacts/betterleaks-parity-20260927/): it stays out of the required contexts and cannot be
+    forced green, reads only, runs cosign only after its digest check and betterleaks only after the signed
+    checksums verify, redacts both scans, uploads nothing and never turns on live --validation requests."""
+
+    JOB = "secret-scan-betterleaks"
+    job = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))[JOB]
+
+    def scans(self):
+        """Each betterleaks scan command, with its backslash continuation lines joined."""
+        lines, found = self.job.splitlines(), []
+        for index, line in enumerate(lines):
+            if re.search(r'/betterleaks" (?:git|dir) ', line):
+                command = line.strip()
+                while command.endswith("\\"):
+                    index += 1
+                    command = command[:-1] + " " + lines[index].strip()
+                found.append(command)
+        return found
+
+    def test_is_not_a_required_context_and_cannot_be_forced_green(self):
+        ruleset = __import__("json").loads((ROOT / ".github/main-ruleset.json").read_text(encoding="utf-8"))
+        contexts = {check["context"] for rule in ruleset["rules"] if rule["type"] == "required_status_checks"
+                    for check in rule["parameters"]["required_status_checks"]}
+        self.assertIn("secret-scan", contexts)
+        self.assertNotIn(self.JOB, contexts)
+        self.assertNotRegex(self.job, r"(?m)^    name:", "a job name would become its check context")
+        self.assertNotIn("continue-on-error", self.job)
+
+    def test_read_only_hardened_and_uploads_nothing(self):
+        self.assertEqual(scopes(self.job), [{"contents": "read"}])
+        step = first_step(self.job)
+        self.assertIn(HARDEN, step)
+        self.assertIn("egress-policy: audit", step)
+        self.assertIn("persist-credentials: false", step_block(self.job, "Check out repository"))
+        self.assertNotIn("upload-artifact", self.job)
+        self.assertNotIn("GH_TOKEN", self.job)
+
+    def test_binaries_run_only_after_verification(self):
+        cosign = step_block(self.job, "Install cosign")
+        self.assertLess(cosign.index("sha256sum --check"), cosign.index('"$RUNNER_TEMP/cosign/cosign" version'))
+        install = step_block(self.job, "Install betterleaks")
+        order = [install.index(marker) for marker in ('cosign" verify-blob', "sha256sum --check --ignore-missing",
+                                                      "tar -xzf", "./betterleaks version")]
+        self.assertEqual(order, sorted(order))
+        self.assertIn(r"'^https://github\.com/betterleaks/betterleaks/\.github/workflows/release\.yml@refs/tags/"
+                      r"v1\.8\.1$'", install)
+        self.assertIn("--certificate-oidc-issuer https://token.actions.githubusercontent.com", install)
+
+    def test_later_steps_need_the_verified_install_and_both_scans_redact(self):
+        self.assertIn("id: install", step_block(self.job, "Install betterleaks"))
+        for name in ("fixture tests with betterleaks", "Scan git history", "Scan working tree"):
+            self.assertEqual(block_if(step_block(self.job, name)),
+                             "${{ !cancelled() && steps.install.outcome == 'success' }}", name)
+        scans = self.scans()
+        self.assertEqual([re.search(r'" (git|dir) ', scan).group(1) for scan in scans], ["git", "dir"])
+        for scan in scans:
+            self.assertIn("--redact", scan)
+            self.assertIn("--config .gitleaks.toml", scan)
+            self.assertNotIn("--exit-code", scan)
+        self.assertNotIn("--validation", self.job)
+        self.assertNotIn("--experiments", self.job)
+
+    def test_fixture_tests_leave_out_the_unredacted_history_class(self):
+        step = step_block(self.job, "fixture tests with betterleaks")
+        self.assertIn("GITLEAKS_TESTS_REQUIRED: '1'", step)
+        (invocation,) = re.findall(r"(?m)^\s*python3 -m unittest .*$", step)
+        self.assertIn("GitleaksConfigContextRestrictionTests", invocation)
+        self.assertNotIn("GitleaksBranchAncestryHistoryTests", invocation)
+
+
 class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
     """validate-macos required-check readiness (docs/decisions/2026-09-22-github-automation-closure.md,
     "validate-macos required (2026-09-25)"): validate-macos must report a status on every
