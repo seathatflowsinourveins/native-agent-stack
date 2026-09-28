@@ -1,0 +1,3 @@
+round 3 after: this pull request's AGENTS.md (F1, F4, S1, X5b) and CLAUDE.md (X9) on fb14dedf; tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+AGENTS.md bytes 12425 tokens 2484 words 1549 lines 103 sha256 1accde42618ac579a0df02f644d869274d8ce4ae1fa9532b9c05825474d9d441
+CLAUDE.md bytes 766 tokens 162 words 109 lines 15 sha256 9321c84716393baef05243d70d83030c27453d99235007800069f6d2534f22d0

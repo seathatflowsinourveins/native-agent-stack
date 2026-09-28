@@ -1,0 +1,7 @@
+Adjudicate unit M5.
+Input file: <adj>/adjudication-inputs/m5.BA.json
+Packet file: <adj>/packets/m5.BA.json
+Repository root: <adj>/root
+
+The input holds the question, the current lines, Return A, Return B, the choices and the rules; the packet holds the evidence and the sources. The repository root is a plain export of main at 9f8db582. Read only these two files and files under the root.
+Return only this JSON: {"leak": false, "leak_text": "", "items": [{"id": "M5", "choice": "A" | "B" | "neither", "reasons": "...", "sources": [{"locator": "...", "quote": "..."}], "confidence": 0..1}]}. If you find a leak, return {"leak": true, "leak_text": "<the offending text>", "items": []} and stop.

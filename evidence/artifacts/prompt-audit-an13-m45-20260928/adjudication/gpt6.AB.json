@@ -1,0 +1,36 @@
+{
+ "items": [
+  {
+   "id": "M5",
+   "choice": "B",
+   "reasons": "B directly preserves the reviewable nested contract, coordinator integration, and unchanged enclosing native actions. A correctly attributes the installer, but leaving root guidance and actions to the coordinator could imply permission to modify them; it does not retain the explicit no-change constraint. B therefore better preserves intended behavior for both clients. This judgment follows the emphasis on explicit instructions in [Claude guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices) and instruction-file sensitivity in [OpenAI guidance](https://developers.openai.com/api/docs/guides/latest-model); it is an inference, not a measured model comparison.",
+   "sources": [
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:16-18",
+     "quote": "worktree-root guidance and actions, so this bounded application retains the\nreviewable nested contract for the coordinator to integrate without modifying\nthe enclosing repository's native actions."
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/receipt.json:88",
+     "quote": "\"nested_project_contract\": \"validated against installed project-readiness contract validator; enclosing worktree actions not modified\","
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/README.md:88-90",
+     "quote": "The nested [project contract](project-contract.json) supplies actual setup, run,\ntest and verify commands for native Codex/Claude integration. The enclosing\nrepository's global actions were not modified by this bounded contribution."
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/CLAUDE.md:1",
+     "quote": "@AGENTS.md"
+    },
+    {
+     "locator": "S1",
+     "quote": "Claude responds well to clear, explicit instructions."
+    },
+    {
+     "locator": "S10",
+     "quote": "It can be more sensitive to instructions contained in skills and other files, such as `AGENTS.md`."
+    }
+   ],
+   "confidence": 0.91
+  }
+ ]
+}

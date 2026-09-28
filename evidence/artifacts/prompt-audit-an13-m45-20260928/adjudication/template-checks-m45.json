@@ -1,0 +1,49 @@
+{
+ "note": "Reproduction, after the fact: the lane-A template's two checks, which the anti-pattern log names, applied to this round's audit and patterns without running the template's own scripts. Both fail.",
+ "template": {
+  "file": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/audit_selftest_final.py",
+  "commit": "9f8db582",
+  "sha256": "11508d0f40f81025573719db0f931d75c1c505181a533f371aad3ddd8d3b19ad"
+ },
+ "patterns_sha256": "c65977ca034624d333a87e330d51c92bdc7c98742a16f89d434bbb1051d394b7",
+ "self_test_payloads": {
+  "prompt_snapshot: the judge's own agent definition (template lines 136-138)": {
+   "template_expects": "clean",
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "attachment prompt_snapshot",
+     "Codex lane"
+    ]
+   ]
+  },
+  "tool_result: repository prose about the lanes (template line 131)": {
+   "template_expects": "clean",
+   "void": true,
+   "hits": [
+    [
+     "MAPPING",
+     "tool_result",
+     "GPT-6 lane"
+    ]
+   ]
+  }
+ },
+ "synthetic_gpt6_jobs_clean": true,
+ "root_scan": {
+  "commit": "9f8db582",
+  "tracked_files": 8223,
+  "paths_matching_mapping": [
+   ".claude/agents/evidence-reviewer.md",
+   ".claude/agents/semantic-evidence-reviewer.md",
+   "adoption/agents/claude/evidence-reviewer.md",
+   "adoption/agents/claude/semantic-evidence-reviewer.md",
+   "examples/claude-native/agents/evidence-reviewer.md",
+   "examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "examples/codex-native/agents/evidence-reviewer.toml",
+   "examples/codex-native/agents/semantic-evidence-reviewer.toml"
+  ],
+  "files_whose_text_matches_mapping": 242
+ }
+}

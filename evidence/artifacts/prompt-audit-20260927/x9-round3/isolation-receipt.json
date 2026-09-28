@@ -1,0 +1,29 @@
+{
+ "note": "Receipt for round 3's pre-dispatch isolation and dispatch: the isolation script (worktrees removed, work moved into\nthe held directory, root scanned, orders checked), the configuration-text scan of the prompts and the GPT-6 judges'\nstart, taken from the coordinator session's own log (commands, their outputs and timestamps only). Round 2's\nisolation_receipt.py with round 3's steps and window.",
+ "steps": [
+  {
+   "step": "isolation script",
+   "at": "2026-09-28T08:36:50.783Z",
+   "command": "S=<scratch>; git -C $S/wt-pa-r3 log -1 --format=%H; git -C $S/wt-x5 log -1 --format=%H; date -u +%FT%T.%3NZ; bash $S/convergence-r3/x9-round3/isolate_r3.sh \"$S\" 2>&1 | sed \"s#$S#<S>#g\"; date -u +%FT%T.%3NZ",
+   "output": "46184751ca4bfa09ac0905797dfd8e938c280351\nf508ffba4dc38257f96e7589f4ad74c60f1d3bd5\n2026-09-28T08:36:51.088Z\narms match the worktrees\nworktree states as expected\nworktrees of this session left: 0\nscratchpad now: .hold3 j3 \nheld: 38\n<S>/j3:\nx9\n\n<S>/j3/x9:\nadjudication-inputs\npackets\nprompts\nroot\nschemas\n7935 root files; {'MAPPING': 0, 'PHRASES': 0} {'MAPPING': [], 'PHRASES': []}\nadjudication-inputs/x9.AB.json: config-text matches 0; mapping False\nadjudication-inputs/x9.BA.json: config-text matches 0; mapping False\npackets/x9.AB.json: config-text matches 5; mapping False\npackets/x9.BA.json: config-text matches 5; mapping False\nprompts/claude-task-AB.txt: config-text matches 0; mapping False\nprompts/claude-task-BA.txt: config-text matches 0; mapping False\nprompts/judge-AB.txt: config-text matches 5; mapping False\nprompts/judge-BA.txt: config-text matches 5; mapping False\nschemas/judge.json: config-text matches 0; mapping False\nsame evidence in both orders: True | other packet keys identical: True ['requirement', 'unit_section', 'round_1', 'round_1_points', 'installed_client', 'comparison_method', 'sources', 'comparison_k5_k6_method']\n2026-09-28T08:37:15.286Z"
+  },
+  {
+   "step": "configuration-text scan of the sent prompts",
+   "at": "2026-09-28T08:37:24.502Z",
+   "command": "S=<scratch>; python3 - \"$S/j3/x9/prompts/judge-AB.txt\" <<'EOF'\nimport re, sys\nt = open(sys.argv[1]).read()\nCONFIG = re.compile(r\"enabledPlugins|statusLine|status-?line (?:command|is wired|wiring)|installed_plugins|known_marketplaces|plugins/cache|[a-z0-9-]+@[a-z0-9-]+\\\"?\\s*:\\s*true\")\nfor m in CONFIG.finditer(t):\n    sec = t.rfind(\"\\n## \", 0, m.start())\n    print(repr(m.group(0)), \"| section:\", t[sec+1:t.index(\"\\n\", sec+1)][:60], \"|\", repr(t[max(0, m.start()-90):m.end()+50]))\nEOF",
+   "output": "'installed_plugins' | section: ## New evidence 3: K4, preregistered as a claim the session  | ' in K1-K3 above.\\n- evidence_settings: a Read path or Bash command naming a settings file, installed_plugins.json, .claude.json or the\\n  plugins directory und'\n'statusLine' | section: ## New evidence 3: K4, preregistered as a claim the session  | 'laude-hud question in the previous turn using more targeted checks (settings.json config, statusLine wiring, and d\"; answer: [withheld in the publishe'\n'installed_plugins' | section: ## New evidence 3: K4, preregistered as a claim the session  | 'ession cannot settle.\\n- 8 of 9 runs also read client configuration files (user settings, `installed_plugins.json`, the plugin cache) through Bash, under the '\n'installed_plugins' | section: ## New evidence 4: K5-K6, the headless half of the compariso | 'y.\\n- evidence_settings (descriptive): a Read path or Bash command naming a settings file, installed_plugins.json,\\n  .claude.json, .mcp.json or the plugins di'\n'enabledPlugins' | section: ## New evidence 4: K5-K6, the headless half of the compariso | 'her session models and effort levels; a plugin installed from a marketplace and listed in enabledPlugins, rather than loaded with --plugin-dir; an MCP ser'"
+  },
+  {
+   "step": "GPT-6 judges started",
+   "at": "2026-09-28T08:37:36.367Z",
+   "command": "J=<judges>; H=$J/root/tools/sota-convergence/landscape-sweep; date -u +%FT%TZ; bash $H/codex_call.sh --work-dir $J/runs start x9r3-judge-AB $J/prompts/judge-AB.txt $J/schemas/judge.json; bash $H/codex_call.sh --work-dir $J/runs start x9r3-judge-BA $J/prompts/judge-BA.txt $J/schemas/judge.json; ls -A $J/runs; echo ----; cat $J/prompts/claude-task-AB.txt",
+   "output": "2026-09-28T08:37:36Z\ncodex_call.sh: work directory <judges>/runs does not exist\ncodex_call.sh: work directory <judges>/runs does not exist\n/usr/bin/ls: cannot access '<judges>/runs': No such file or directory\n----\nAdjudicate unit X9.\nInput file: <judges>/adjudication-inputs/x9.AB.json\nPacket file: <judges>/packets/x9.AB.json\nRepository root: <root>\n\nThe input holds the question, the current line, Return A, Return B, the choices and the rules; the packet holds the\nevidence and every source. The repository root is a plain export of main at ba1700ad. Read only these two files and\nfiles under the root.\nReturn only this JSON: {\"leak\": false, \"leak_text\": \"\", \"items\": [{\"id\": \"X9\", \"choice\": \"A\" | \"B\" | \"neither\",\n\"reasons\": \"...\", \"sources\": [{\"locator\": \"...\", \"quote\": \"...\"}], \"confidence\": 0..1}]}. If you find a leak,\nreturn {\"leak\": true, \"leak_text\": \"<the offending text>\", \"items\": []} and stop."
+  },
+  {
+   "step": "GPT-6 judges started",
+   "at": "2026-09-28T08:37:41.336Z",
+   "command": "J=<judges>; H=$J/root/tools/sota-convergence/landscape-sweep; mkdir $J/runs && date -u +%FT%TZ && bash $H/codex_call.sh --work-dir $J/runs start x9r3-judge-AB $J/prompts/judge-AB.txt $J/schemas/judge.json && bash $H/codex_call.sh --work-dir $J/runs start x9r3-judge-BA $J/prompts/judge-BA.txt $J/schemas/judge.json; ls -A $J/runs",
+   "output": "2026-09-28T08:37:41Z\nstarted x9r3-judge-AB\nstarted x9r3-judge-BA\nempty/\ngpt6/\nlocks/"
+  }
+ ]
+}

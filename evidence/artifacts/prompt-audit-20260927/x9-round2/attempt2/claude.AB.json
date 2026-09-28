@@ -1,0 +1,184 @@
+{
+ "lane": "Claude Agent tool, blind-adjudicator (frontmatter model opus, effort max; Read, Glob and Grep only)",
+ "usage": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 8,
+  "advisor_calls": 2,
+  "provider_usage": {
+   "input_tokens": 20,
+   "cache_creation_input_tokens": 124928,
+   "cache_read_input_tokens": 621147,
+   "output_tokens": 64422
+  },
+  "harness_counters": {
+   "subagent_tokens": 135281,
+   "tool_uses": 14,
+   "duration_ms": 724644
+  }
+ },
+ "return": {
+  "leak": false,
+  "leak_text": "",
+  "items": [
+   {
+    "id": "X9",
+    "choice": "A",
+    "reasons": "Rule 3 first: neither return states anything the installed client, repository or sources contradict. A's statements hold: the client says /mcp and /context cannot be invoked via the Skill tool and tells the model to ask the user to run them (C1, C2); the repository uses them inside an interactive session (recipes/claude-native-profile.md:272-273); ToolSearch loads deferred MCP tools (T2, R49). B's statements hold: /plugin is real in the interactive client (R48, CHANGELOG 2.1.275, which the repository ranks above docs per docs/harness-defaults.md:58; R10, R43), the Skill tool exposes only some built-in commands (R5), and plugins include agents (T1). The current line (CLAUDE.md:3-4) tells the model to use /mcp and /context, which C1 and C2 show it cannot invoke, so 'neither' is not warranted. Executed comparison (headless claude -p per comparison_method; host's default model only): A and B tie on the primary and secondary metrics (correct 9/9, answered 9/9, no_builtin_skill 9/9). They also match on the descriptive loaded_schema (9, 9; current line 5) and executed_target (6, 6; current line 3), which the packet counts as behavior, not better or worse. asks_user was 0 in all 36 runs, question_only was 0 in all 9 K4 runs, and K4's premise did not hold. So the fallback on which A and B differ was never exercised, and the decision below is reasoning from sources, not a measured result. Decisive point, Rule 4's 'interactive and headless': the line is read in headless runs (the claude -p comparison's loaded_schema changed with the CLAUDE.md text) and in this repository's workflow agent() stages (AGENTS.md:36), where no user may answer (round_1_points[0]). A's fallback (report it as unconfirmed and name the command that would) gives a status in a headless run and still tells an interactive user which command to run. It fits AGENTS.md:15 (recorded limitations are context; stop only for sign-in, OS consent or an unresolved material decision), R63 (sample prompt: say exactly what you left out and why) and R50 (evidence that works for sessions you weren't watching). B's fallback (ask for the relevant /plugin, /mcp or /context output) suits interactive sessions but leaves an unattended run or workflow child with a request no one may be present to act on. R7 lets a -p caller type /mcp, but that is a separate run. That its summary would reflect the asking session is inference, and NF3 records no source showing that claude mcp list run from inside a session reports that session's connections. Counter-evidence weighed: C1, C2 and R15 show the client's own pattern is to ask the user, and R61 supports pausing for input only the user can provide; A's named command keeps that path open without blocking. On /plugin, B is not contradicted, but the reference adds little for 'active in this session': it is absent from the headless command list (C4), its list reports settings enablement and load errors (R43, R44), and a plugin can be installed without being activated in the session (R45). A names the two commands R42 documents for the current session's context and each server's connection status. Coverage favors B in principle: it covers agents (T1), and listed tool names are not proof of a live server (R27, R29), matching the repository's own practice of making one useful call (docs/token-session-handbook.md:67). Coverage does not decide the case: A's text, with no execute instruction, matched B on executed_target (6 vs 6) and correct, and its K3 runs report a read-only call to every server with tools (comparison_k1_k3 run list). Where A's list misses a component, its fallback yields 'unconfirmed', not a false 'active'. This was tested on the host's default model only. Length is a minor factor (A 3 lines, B 6; Rule 4 says not on style). Cost, duration and turns are descriptive only and are not used. The one K4 run without a status (a reply to a background-command notification) is a harness artifact and is not held against B.",
+    "sources": [
+     {
+      "locator": "C1",
+      "quote": "context is a built-in CLI command, not a skill. Ask the user to run /context themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "C2",
+      "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "CLAUDE.md:3-4",
+      "quote": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before\nclaiming a plugin is active."
+     },
+     {
+      "locator": "recipes/claude-native-profile.md:272-273",
+      "quote": "Inside an authenticated interactive Claude session, use `/context all`, `/mcp`\nand `/usage` to inspect loaded context, connections and usage."
+     },
+     {
+      "locator": "T2",
+      "quote": "Tool search is enabled by default: MCP tools are deferred and discovered on demand."
+     },
+     {
+      "locator": "R49",
+      "quote": "The following deferred tools are now available via ToolSearch. Their schemas are NOT loaded — calling them directly will fail with InputValidationError."
+     },
+     {
+      "locator": "R48",
+      "quote": "Improved the `ListPlugins` tool description so Claude knows it lists plugins enabled on your claude.ai account, not plugins installed locally with `/plugin`"
+     },
+     {
+      "locator": "docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "R10",
+      "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+     },
+     {
+      "locator": "R5",
+      "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not."
+     },
+     {
+      "locator": "T1",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit."
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_method",
+      "quote": "Claude Code 2.1.283 in headless mode (`claude -p`, stream-json)"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_method",
+      "quote": "Only `correct` is primary; `answered` and `no_builtin_skill` are secondary"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_method",
+      "quote": "Not tested: interactive sessions, where a user can answer a request to run a command;"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_k1_k3 (table)",
+      "quote": "| Return A's text | 9 | 9 | 9 | 9 | 9 | 6 | 0 | 0 | 8 | 4 | 25.1425 | 0.1678 | 2.067 |\n| Return B's text | 9 | 9 | 9 | 9 | 9 | 6 | 0 | 0 | 6 | 5 | 31.8625 | 0.2628 | 2.4542 |\n| current line (neither) | 9 | 9 | 9 | 9 | 5 | 3 | 0 | 0 | 9 | 4 | 22.8875 | 0.1308 | 1.7699 |"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_k1_k3 (run list)",
+      "quote": "current line (neither), K3: calls []; true: correct, answered, no_builtin_skill, names_command"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_k1_k3 (run list)",
+      "quote": "Instead I sent a read-only call to every MCP server that has tools in this session. **All 8 replied.**"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_k4 (table)",
+      "quote": "| Return A's text | 3 | 3 | 3 | 0 | 1 | 0 | 0 | 0 | 1 | 2 | 0 | 3 | 0.4031 |\n| Return B's text | 3 | 2 | 2 | 0 | 1 | 0 | 0 | 0 | 1 | 3 | 0 | 3 | 0.8152 |\n| current line (neither) | 3 | 3 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 3 | 0 | 3 | 0.6469 |"
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_k4 (Observed, not preregistered)",
+      "quote": "The case's premise did not hold."
+     },
+     {
+      "locator": "packet x9.AB.json, comparison_k4 (Observed, not preregistered)",
+      "quote": "1 run's final result is its reply to a background-command notification (quoted above), not its answer to the question"
+     },
+     {
+      "locator": "packet x9.AB.json, round_1_points[0]",
+      "quote": "CLAUDE.md also loads in headless runs and workflow children, where no user may answer."
+     },
+     {
+      "locator": "AGENTS.md:36",
+      "quote": "Dispatch each workflow `agent()` stage by role"
+     },
+     {
+      "locator": "AGENTS.md:15",
+      "quote": "Recorded limitations are context, not automatic new approval steps. Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work."
+     },
+     {
+      "locator": "R63",
+      "quote": "If one part turns out to be blocked, complete every other part in full and say exactly what you left out and why"
+     },
+     {
+      "locator": "R50",
+      "quote": "Reviewing evidence is faster than re-running the verification yourself, and it works for sessions you weren't watching."
+     },
+     {
+      "locator": "R7",
+      "quote": "Also available in non-interactive mode (`-p`), where running it with no argument prints a text summary of server status instead of opening the list"
+     },
+     {
+      "locator": "NF3",
+      "quote": "A statement that the model can read its own session's system/init message, or that `claude mcp list` run from inside a session reports that session's connections"
+     },
+     {
+      "locator": "R15",
+      "quote": "Improved the refusal when Claude tries to invoke a skill with `disable-model-invocation`: Claude is now told to ask you to run the skill instead of replicating its workflow"
+     },
+     {
+      "locator": "R61",
+      "quote": "Pause for the user only when the work genuinely requires them: a destructive or irreversible action, a real scope change, or input that only they can provide."
+     },
+     {
+      "locator": "C4",
+      "quote": "slash_commands (107 entries) includes \"mcp\", \"context\" and \"reload-plugins\" and no \"plugin\""
+     },
+     {
+      "locator": "R43",
+      "quote": "Run `/plugin` and open **Installed**. Confirm the plugin is listed and enabled. `claude plugin list` in your shell prints the same list with each plugin's version, scope, and `Status: ✔ enabled`."
+     },
+     {
+      "locator": "R44",
+      "quote": "Whether the plugin is enabled in your merged settings\nLoad errors, when the plugin failed to load"
+     },
+     {
+      "locator": "R45",
+      "quote": "The install summary in `/plugin` ended with `Run /reload-plugins to activate.` instead of `Plugin is now active.`"
+     },
+     {
+      "locator": "R42",
+      "quote": "The `/context` command shows everything occupying the context window for the current session, broken down by category: system prompt, system tools, MCP tools, custom subagents with the source each loaded from, memory files, skills, and conversation messages.\nRun `/mcp` to see every configured server, its connection status, and whether you have approved it for the current project."
+     },
+     {
+      "locator": "R27",
+      "quote": "Claude Code loaded the server's tool list from its discovery cache, saved in a previous session, instead of connecting at startup, and Claude Code connects the server the first time Claude calls one of the server's tools."
+     },
+     {
+      "locator": "R29",
+      "quote": "If the status is `failed` or `needs-auth`, see [Error handling](#error-handling) before trusting the result, since Claude can fall back to built-in tools when the server is unavailable."
+     },
+     {
+      "locator": "docs/token-session-handbook.md:67",
+      "quote": "After a relevant setup change, inspect connected servers with `/mcp`, then make one useful call and check its returned content. `codex mcp list` lists configuration; it does not prove that this task connected or used a tool."
+     }
+    ],
+    "confidence": 0.58
+   }
+  ]
+ }
+}

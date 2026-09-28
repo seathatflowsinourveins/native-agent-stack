@@ -1,0 +1,223 @@
+{
+ "note": "Provider usage of X9's second round, including the void attempt 1. Anthropic usage fields are disjoint and listed side by side, never added; each Codex runner record is its own. The comparison's cost is the client's per-run total_cost_usd estimate. The coordinator session is not included.",
+ "claude_agents": {
+  "attempt1": {
+   "note": "Per-call provider usage of these Claude subagents, read from their transcripts and deduplicated by API message id. Anthropic usage fields are disjoint (input_tokens excludes cache reads and cache writes), so they are listed side by side, never added. advisor_calls counts server-side advisor calls, whose own model usage is not in these fields. harness_counters are the completion notification's own counters. The coordinator session is not included.",
+   "sources-stack-researcher-round2": {
+    "agent_type": "stack-researcher",
+    "models": [
+     "claude-opus-5-5"
+    ],
+    "api_calls": 73,
+    "advisor_calls": 1,
+    "provider_usage": {
+     "input_tokens": 304,
+     "cache_creation_input_tokens": 256705,
+     "cache_read_input_tokens": 10966545,
+     "output_tokens": 110024
+    }
+   },
+   "judge-AB": {
+    "agent_type": "evidence-reviewer",
+    "models": [
+     "claude-opus-5-5"
+    ],
+    "api_calls": 12,
+    "advisor_calls": 1,
+    "provider_usage": {
+     "input_tokens": 26,
+     "cache_creation_input_tokens": 119371,
+     "cache_read_input_tokens": 940429,
+     "output_tokens": 49593
+    }
+   },
+   "judge-BA": {
+    "agent_type": "evidence-reviewer",
+    "models": [
+     "claude-opus-5-5"
+    ],
+    "api_calls": 13,
+    "advisor_calls": 1,
+    "provider_usage": {
+     "input_tokens": 26,
+     "cache_creation_input_tokens": 129192,
+     "cache_read_input_tokens": 1002017,
+     "output_tokens": 32923
+    }
+   }
+  },
+  "attempt2": {
+   "note": "Per-call provider usage of these Claude subagents, read from their transcripts and deduplicated by API message id. Anthropic usage fields are disjoint (input_tokens excludes cache reads and cache writes), so they are listed side by side, never added. advisor_calls counts server-side advisor calls, whose own model usage is not in these fields. harness_counters are the completion notification's own counters. The coordinator session is not included.",
+   "judge-AB": {
+    "agent_type": "blind-adjudicator",
+    "models": [
+     "claude-opus-5-5"
+    ],
+    "api_calls": 8,
+    "advisor_calls": 2,
+    "provider_usage": {
+     "input_tokens": 20,
+     "cache_creation_input_tokens": 124928,
+     "cache_read_input_tokens": 621147,
+     "output_tokens": 64422
+    },
+    "harness_counters": {
+     "subagent_tokens": 135281,
+     "tool_uses": 14,
+     "duration_ms": 724644
+    }
+   },
+   "judge-BA": {
+    "agent_type": "blind-adjudicator",
+    "models": [
+     "claude-opus-5-5"
+    ],
+    "api_calls": 11,
+    "advisor_calls": 1,
+    "provider_usage": {
+     "input_tokens": 24,
+     "cache_creation_input_tokens": 107000,
+     "cache_read_input_tokens": 777846,
+     "output_tokens": 53580
+    },
+    "harness_counters": {
+     "subagent_tokens": 132998,
+     "tool_uses": 17,
+     "duration_ms": 579136
+    }
+   }
+  }
+ },
+ "gpt6_runner": {
+  "attempt1": {
+   "probe": {
+    "status": "done",
+    "exit": 0,
+    "usage": {
+     "input_tokens": 77333,
+     "cached_input_tokens": 44288,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 690,
+     "reasoning_output_tokens": 395
+    },
+    "limit": false
+   },
+   "judge-AB": {
+    "status": "done",
+    "exit": 0,
+    "usage": {
+     "input_tokens": 746855,
+     "cached_input_tokens": 653824,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 11129,
+     "reasoning_output_tokens": 6424
+    },
+    "limit": false
+   },
+   "judge-BA": {
+    "status": "done",
+    "exit": 0,
+    "usage": {
+     "input_tokens": 486199,
+     "cached_input_tokens": 399488,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 10317,
+     "reasoning_output_tokens": 7842
+    },
+    "limit": false
+   }
+  },
+  "attempt2": {
+   "judge-AB": {
+    "status": "done",
+    "exit": 0,
+    "usage": {
+     "input_tokens": 361404,
+     "cached_input_tokens": 282624,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 6398,
+     "reasoning_output_tokens": 4652
+    },
+    "limit": false
+   },
+   "judge-BA": {
+    "status": "done",
+    "exit": 0,
+    "usage": {
+     "input_tokens": 453960,
+     "cached_input_tokens": 366592,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 6756,
+     "reasoning_output_tokens": 5240
+    },
+    "limit": false
+   }
+  }
+ },
+ "comparison_runs": {
+  "k1_k3": {
+   "0": {
+    "runs": 9,
+    "sum_cost_usd": 1.7699,
+    "provider_usage": {
+     "input_tokens": 44,
+     "cache_creation_input_tokens": 154434,
+     "cache_read_input_tokens": 872995,
+     "output_tokens": 17984
+    }
+   },
+   "c": {
+    "runs": 9,
+    "sum_cost_usd": 2.067,
+    "provider_usage": {
+     "input_tokens": 50,
+     "cache_creation_input_tokens": 192761,
+     "cache_read_input_tokens": 1008508,
+     "output_tokens": 16149
+    }
+   },
+   "g": {
+    "runs": 9,
+    "sum_cost_usd": 2.4542,
+    "provider_usage": {
+     "input_tokens": 56,
+     "cache_creation_input_tokens": 226491,
+     "cache_read_input_tokens": 1134038,
+     "output_tokens": 20761
+    }
+   }
+  },
+  "k4": {
+   "0": {
+    "runs": 3,
+    "sum_cost_usd": 0.6469,
+    "provider_usage": {
+     "input_tokens": 30,
+     "cache_creation_input_tokens": 90281,
+     "cache_read_input_tokens": 838216,
+     "output_tokens": 11809
+    }
+   },
+   "c": {
+    "runs": 3,
+    "sum_cost_usd": 0.4031,
+    "provider_usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 70572,
+     "cache_read_input_tokens": 281640,
+     "output_tokens": 6444
+    }
+   },
+   "g": {
+    "runs": 3,
+    "sum_cost_usd": 0.8152,
+    "provider_usage": {
+     "input_tokens": 16,
+     "cache_creation_input_tokens": 107935,
+     "cache_read_input_tokens": 394955,
+     "output_tokens": 6647
+    }
+   }
+  }
+ }
+}
