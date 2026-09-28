@@ -1,0 +1,5 @@
+- No finding — AGENTS.md:36 — F1 matches the workflow README’s vendor exception and role table; the cited dispatch rule is now at README:439, formerly 219.
+- No finding — AGENTS.md:73–74 — F4 matches simulation-research/README.md:20–24 and research-evaluation/README.md:32–49,113–114; the warning stays scoped to the inspected control.
+- No finding — tests/test_install_claude_profile.py:648 — Four dispatch tests passed; one skipped for missing PyYAML. All 254 workflow assertions passed. The full installer suite was not run because it writes temporary installations.
+- No finding — manifests/evidence.json:3474 — AGENTS.md’s hash and size match; publication validation, workflow hashes and diff checks passed. No conflicting linked rule found.
+- No finding, static assessment — AGENTS.md:36,73–74 — Both edits have clear scope under [Claude’s import mechanism](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools) and [Codex’s instruction loading](https://developers.openai.com/codex/guides/agents-md). Expected adherence is reasonable; actual model behavior was not tested.
