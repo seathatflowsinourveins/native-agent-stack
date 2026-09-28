@@ -8,9 +8,10 @@ a dedicated output directory mounted:
 - mode gw, on <stem>-gw: P0, the negative control. The vehicle must see the
   gateway (GET /v1/models -> 200 + CLIENT_API) and its management exposure
   (GET /api/settings -> MANAGEMENT).
-- mode int, on <stem>-int: P1, only the proxy's three /v1 routes answer and
-  every other method or target gets the proxy's own 403 with no route-class
-  header; then P2. Its positive control, a TCP connect to gw:8081, must
+- mode int, on <stem>-int: P1, on gw:8081 only the proxy's three /v1 routes
+  answer and every other method or target gets the proxy's own 403 with no
+  route-class header (gw:8080, which leads to the agent's own server, is not
+  probed); then P2. Its positive control, a TCP connect to gw:8081, must
   succeed. Every TCP connect to a host-side address must fail, and one
   outside the run subnet must fail for want of a route (ENETUNREACH or
   EHOSTUNREACH), not by timing out. One DNS datagram to 10.0.2.3:53 must get
@@ -333,10 +334,11 @@ def p3_control_call(*_args, **_kwargs):
     sending a forged X-Correlation-Id, X-Forwarded-For and one x-omniroute-*
     header; then a second call with a query string, which must get the
     proxy's 403 and no call_logs row. The call_logs row must show
-    /v1/responses, 200, cx/gpt-6-astra-max, and effort max requested and sent
-    upstream. Its correlation value is gateway-generated, neither the forged
-    one nor the run id: at OmniRoute@045aa81f3 and @dd6e9607e /v1/responses
-    ignores the caller's X-Correlation-Id (src/app/api/v1/responses/route.ts:193,213).
+    /v1/responses, 200, the routed model the receipt matches
+    (gpt-6-astra-max), and effort max requested and sent upstream. Its
+    correlation value is gateway-generated, neither the forged one nor the
+    run id: at OmniRoute@045aa81f3 and @dd6e9607e /v1/responses ignores the
+    caller's X-Correlation-Id (src/app/api/v1/responses/route.ts:193,213).
     A third call shows the proxy's replacement: one POST /v1/chat/completions
     with the same forged header. That route keeps a caller ID
     (src/app/api/v1/chat/completions/route.ts:292-322), so its row, whatever

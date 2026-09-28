@@ -384,7 +384,7 @@ green runs are in
 | --- | --- |
 | F16 forgery bound | The newest-`ConversationErrorEvent` design stays. The strict alternative, exit 3 for every `error`, would label every honest iteration-limit run an infrastructure failure. `dispatch.py` `PERMITTED_TERMINATIONS` keeps a label only as a refinement of the REST status, so exit 0 requires REST `finished`. A planted event can move exit 3 to 1 and no further. The README states the residual and the analysis rule: exit 1 and exit 3 are both non-success, and reruns re-queue only exit 3. |
 | `install()` image identity, open after phase 1 | Fixed. Both a plain and a `--platform linux/amd64` inspect must list the exact pinned ref in `.RepoDigests`. The plain `.Id` must be the index digest (containerd store) or the config digest (classic store). On containerd the platform `.Id` and `.Descriptor.digest` must be manifest `ec7ed86f...`; on classic the platform `.Id` must be the config and no descriptor may appear. Sources: moby docker-v29.8.1@464cd50c `daemon/containerd/image_inspect.go:28,71-73,95,97`; `daemon/images/image_inspect.go:59`, `daemon/images/image.go:160-197`, `daemon/internal/image/store.go:152,160`, `daemon/internal/image/fs.go:120`, `daemon/internal/distribution/pull_v2.go:431-434,705-747,845-867`; `api/swagger.yaml:1826-1850`. Inspect with `--platform` needs Engine API v1.49 (`api/docs/CHANGELOG.md:175-180`). On the containerd store no field reports the config digest. That covers inspect, history (`daemon/containerd/image_history.go:113-115`) and the manifest summary (`api/swagger.yaml:8216-8335`). The content-addressed platform manifest binds the config there. The Docker containerd image-store page (docker/docs@3c117d8e `content/manuals/engine/storage/containerd.md`) does not describe image IDs. |
-| Empty `OH_SESSION_API_KEYS_0=` value | Documented residual, because preflight never reads values. SDK@fcc102a `env_parser.py:183-197` turns it into a one-item list holding an empty string, and `__main__.py:30-48` then treats authentication as enabled. |
+| Empty `OH_SESSION_API_KEYS_0=` value | Documented residual, because preflight compares only the name: it reads the file, but never checks, logs or returns the value. SDK@fcc102a `env_parser.py:183-197` turns it into a one-item list holding an empty string, and `__main__.py:30-48` then treats authentication as enabled. |
 | Unused `run_worker`, `record_event`, `observations()` | Kept, because references remain: `worker.py:202,232`, and `observations` is used in `tests/test_runtime_worker_openhands.py`. |
 
 Open finding from this phase, not changed here:
@@ -453,3 +453,51 @@ Open items from this phase:
   - normal-bridge containers such as cognee-live still reach host loopback.
 - **Outside this recipe's paths:** the repository's secret-path guard does not
   yet cover the new `secrets/` directory.
+
+## Repair round (2026-09-28)
+
+Two independent reviews of e45c3cd1 returned changes-needed: a headless Claude
+review and a GPT-6 review. This single repair round adds commits on top of
+e45c3cd1 and nothing else. Every code item had a failing test first. Each red run
+and each fixed commit's suite, re-run from `git archive`, is in
+[evidence/repair-round-commands.json](evidence/repair-round-commands.json). No
+container, network, gateway or model request was made. The G5 tests read
+synthetic sqlite stores, and an audit hook showed that the suite opened nothing
+under the live OmniRoute data directories.
+
+| Finding | Correction and source |
+| --- | --- |
+| R1 (Claude blocker; GPT-6 containment-grader, high). The official grader ran the model's patch on Docker's default bridge, which reaches host loopback. | **Grading has no network (9302ec23).** Every grader container gets network mode `none`, "No networking for this container" (docker/docker-py@7.1.0 `docker/models/containers.py:686-694`). The adapter refuses other options, checks the SDK create body (`api/container.py:445-457`, `types/containers.py:351`) and refuses to grade a container whose inspect shows another network. moby@docker-v29.8.1 records mode `none` as the single network `none` and refuses to connect it elsewhere (`daemon/create.go:251`, `daemon/container_operations.go:202-204,363-406`). Verdicts are offline verdicts (SWE-bench@v4.1.0 `test_spec/python.py:443-444`, `test_spec/test_spec.py:55-60`). |
+| R2 (Claude, medium). Every live probe would have refused its own server: the isolated network has no gateway, so the server holds `.1`, which the probe targeted. | **Targets come only from recorded IPAM gateways (92de42e8).** moby@464cd50c skips the gateway in isolated mode (`bridge_linux.go:700-713`, `network.go:1594-1602`). The attempt containers' own addresses are excluded and recorded by role, never refused. The fixtures now model the isolated network. |
+| R4 (Claude, low). P2 counted timeouts as containment, tried TCP only and asserted no route table. | **Stronger P2 (92de42e8).** A positive control to `gw:8081` runs first. Off-subnet pairs must fail with `ENETUNREACH` or `EHOSTUNREACH`. One DNS datagram (RFC 1035 4.1.1-4.1.2) to 10.0.2.3:53 (rootlesskit@v3.1.0 `docs/network.md:81-82`) must get no answer. `/proc/net/route` (linux@v6.18 `net/ipv4/fib_trie.c:2940-3000`) must hold no default or gateway route. |
+| Addendum b (Claude C4, info). DNS negatives did not tell `EAI_AGAIN` from `EAI_NONAME`. | The resolver's error class is recorded in the observation and the receipt (92de42e8). The pass condition stays "no address resolved". |
+| R6 (Claude, low) and GPT-6 probe-receipt-trust (low). G7, G2 and G5 held only in documents, and the gate trusted `passed` flags. | **Recorded stage gates and re-derived counts (185de718).** The gate re-derives P0-P2 from the recorded counts and refuses a contradictory receipt. It also requires the host-owned `stage-gates.json` with P3 (plus P4 and P5 for engines-on), G2 for both pinned images and G5, each bound to the proxy image and template. In the docs commit the README calls P0-P2 bounded observations and states the trusted-producer limit. |
+| R3/G5 (Claude, high). The request body picks the model, and nothing enforced G5. | **G5 at every start (726849b3).** The gate reads each store the arm reaches read-only and refuses providers outside the host file's per-arm allowlist. Row-less no-auth and anonymous-fallback providers must be disabled in settings, and routing combos are refused. Sources: OmniRoute@045aa81f3 and @dd6e9607e, listed in the decision record. |
+| R5 (Claude, low). "Pass `correlation_ids={run_id}`." | **Not applied as written (5a0b0a54).** At both builds `/v1/responses` hands `handleChat` a fresh `randomUUID()` (`src/app/api/v1/responses/route.ts:193,213`, `src/shared/utils/requestId.ts:100-102`, `src/sse/handlers/chat.ts:436`), and `call_logs.correlation_id` stores it (`open-sse/handlers/chatCore/attemptLogging.ts:611`, `src/lib/usage/callLogs.ts:713,786,801`). Only `/v1/chat/completions` keeps a caller ID (`route.ts:292-322`). The recipe fixes `/v1/responses`, so the filter would drop every row; entry 11 of the evidence shows it turning the fixture's usage into `empty_window`. Receipts keep time-window attribution, and the attribution string now says why. A regression test counts rows with gateway-generated IDs. P3's correlation check moved to a `/v1/chat/completions` call. |
+| GPT-6 session-key-logging (low). "Never in output or logs" was too strong: the model can put the key into a request line, and the combined log keeps it. | The host side (8080) logs time, method and status only (`ingress`; nginx release-1.30.5 `ngx_http_log_module.c:170-171,230-232`). The README now says the driver does not intentionally log the key. The agent side's access log and request-bound error entries (`ngx_http_request.c:4103-4107`) can still hold it, and the retained proxy log survives key-file deletion. |
+| GPT-6 gw-8080 (info). "Only three routes are reachable" was false: nginx listens on every interface, so the agent reaches `gw:8080`. | Every such claim now says that three routes reach OmniRoute and that `gw:8080` reaches only the agent's own server: README, decision record, MCP policy reasons and the netprobe docstring. |
+| GPT-6 nginx-headers (info). The header description omitted fields nginx generates. | The README lists the defaults (`ngx_http_proxy_module.c:747-757`, merged at `:4210-4228`). At release-1.30.5 these are the generated `Content-Length` or `Transfer-Encoding: chunked` and an empty, so omitted, `Connection`, with no `Connection: close`. It also lists the framing refusals (`ngx_http_request.c:2034-2064`). |
+| C9 (Claude, medium). The decision record said isolation "holds by construction" and the narrowing said "no host access". | The record now separates three parts. The agent-server's containment and grading's lack of a network hold by construction. What the three routes reach is G5's checked gateway state. Nothing has been observed live. Narrowing condition 2 names the proxy routes, the session key, G5 and offline grading, and G5 joins the narrowing's overturn list. |
+| Addendum a (GPT-6 session-key-lifecycle wording). "Values stay unread" was inaccurate. | `check_server_env`, the README and this file now say that the host reads the file and compares only the variable name, and never logs or returns the value (5a0b0a54 and the docs commit). |
+| Found while editing P3. P3 expected model `cx/gpt-6-astra-max` in the row, but the receipt matches the routed model. | P3 now expects `gpt-6-astra-max`, the value `receipt.summarize_gateway` matches. |
+
+Open after the repair round:
+- **Live and unrun:** P0-P5, G2's scans and G5 against the live stores. The
+  stage-gates file does not exist, so `dispatch.py start` refuses. G5 will
+  likely refuse the live stores until three things are done. The ten no-auth
+  providers must be blocked and the four anonymous-fallback providers disabled
+  in both gateways' settings. Routing combos must be removed.
+- **Source-derived only:** that off-subnet connects on the rootless isolated
+  network fail with `ENETUNREACH` or `EHOSTUNREACH`, and that nginx accepts the
+  `ingress` log format (no running nginx has parsed the template).
+- **Per-attempt usage attribution** needs a host-trusted capture of
+  OmniRoute's returned ID or an upstream change. The agent side's access log
+  could record `$upstream_http_x_correlation_id`. The streaming
+  `/v1/responses` route passes no extra headers to its early response, though,
+  so that capture may miss streamed calls. Until one is shown, receipts
+  include concurrent callers of the same model and path.
+- **Grading is offline:** an evaluation that needs downloads fails. The gold
+  and negative controls run under the same condition.
+- **G5's limits:** it cannot see a Codex connection's app-server opt-in
+  (`open-sse/executors/codex.ts:415-439`). It counts inactive rows as served. Its
+  provider lists are tied to the two builds read.

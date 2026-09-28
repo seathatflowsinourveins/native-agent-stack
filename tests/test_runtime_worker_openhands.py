@@ -566,6 +566,31 @@ class OpenHandsRecipeTests(unittest.TestCase):
         for document in ("README.md", "research.md"):
             self.assertIn("evidence/phase2-commands.json", (RECIPE / document).read_text())
 
+    def test_repair_round_evidence_pairs_each_red_run_with_a_green_commit(self):
+        # The repair round on e45c3cd1: every code item's failing run, then the
+        # suite on the commit that fixed it. Our integration checks, publishable.
+        from scripts.validate import PRIVATE_CONTENT
+        name = "evidence/repair-round-commands.json"
+        record = self.read_json(name)
+        self.assertEqual(record["base"], "e45c3cd1c274aff47b82129bf8d22ed374bd577b")
+        commands = {item["id"]: item for item in record["commands"]}
+        self.assertEqual(len(commands), len(record["commands"]))
+        self.assertTrue(record["item_runs"])
+        for item, (red, green) in record["item_runs"].items():
+            with self.subTest(item=item):
+                self.assertEqual(commands[red]["exit_code"], 1)
+                self.assertTrue(commands[red]["summary"][-1].startswith("FAILED"))
+                self.assertTrue(commands[red]["non_ok_tests"])
+                self.assertEqual((commands[green]["exit_code"], commands[green]["summary"][-1]), (0, "OK"))
+                commit = re.match(r"Commit ([0-9a-f]{40})\b", commands[green]["tree"])
+                self.assertIsNotNone(commit)
+                self.assertIn(commit.group(1), record["commits"].values())
+        text = json.dumps(record, ensure_ascii=False)
+        for description, pattern in PRIVATE_CONTENT:
+            self.assertIsNone(pattern.search(text), description)
+        self.assertIn(name, (RECIPE / "research.md").read_text())
+        self.assertIn(name, (ROOT / "docs/decisions/2026-09-28-openhands-resolver-isolation.md").read_text())
+
 
 class OpenHandsUpstreamAdapterTests(unittest.TestCase):
     """Synthetic transport controls from SWE-bench 4.1.0 reporting.py.

@@ -168,8 +168,11 @@ is refused, and so is any compression value on control. The proxy, not the SDK,
 sends the header: its allowlist replaces whatever the agent sends for
 `x-omniroute-compression`, `X-Correlation-Id` and `x-omniroute-session` with the
 attempt's fixed values. The agent therefore cannot switch arm or combo, or forge
-the usage join. The LLM key stays the placeholder `local-loopback`, and
-`OMNIROUTE_API_KEY` is never sent.
+the correlation and session values the gateway receives. On the recipe's
+`/v1/responses` path the pinned gateways log their own correlation ID instead,
+so usage is not joined on the run id ([Usage accounting](#usage-accounting)).
+The LLM key stays the placeholder `local-loopback`, and `OMNIROUTE_API_KEY` is
+never sent.
 
 Both arms use Responses, `reasoning_effort=max`, native function tools, omitted
 temperature, a 40-iteration limit and a 1,200-second conversation deadline.
@@ -235,17 +238,25 @@ and writes two files in
 - `<run-id>-<arm>.headers`: `X-Session-API-Key: <value>`, which curl reads
   with `-H @file`.
 
-The value is never in argv, output or logs. The server is never read with a
-full `docker inspect`, because its Config.Env holds the key; containers are
-read only through fixed `--format` templates. `teardown_attempt` deletes both
+The driver never puts the value in argv and does not intentionally log or print
+it. That is not a guarantee that no log holds it: the model can read the key
+inside its container (the accepted design) and place it in any request it sends
+through the proxy. The agent side's access log keeps whole request lines, and
+so do request-bound error-log entries on both listeners (nginx
+release-1.30.5 `src/http/ngx_http_request.c:4103-4107`). The host side's access
+log keeps only time, method and status. Teardown retains the proxy log, and
+deleting the key files does not remove such copies. The server is never read
+with a full `docker inspect`, because its Config.Env holds the key; containers
+are read only through fixed `--format` templates. `teardown_attempt` deletes both
 files once the proxy and server are confirmed removed. While either removal is
 unconfirmed the files stay, so the server they belong to can still be reached
 and cleaned up. The server listens on every container interface only when a
 key is set (SDK@fcc102a `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
 `config.py:24`), and it checks the `X-Session-API-Key` header
-(`dependencies.py:19`). Before the server starts, the env file is re-checked
-for the variable name only, using Docker's env-file rules (docker/cli@v29.8.1
-`pkg/kvfile/kvfile.go:92-124`); no value is extracted, printed or logged. The
+(`dependencies.py:19`). Before the server starts, the host reads the env file
+and compares only the variable name, using Docker's env-file rules
+(docker/cli@v29.8.1 `pkg/kvfile/kvfile.go:92-124`); the value is never logged
+or returned. The
 inventory row is `openhands-session` in
 [docs/secret-storage.md](../../../docs/secret-storage.md) and
 [adoption/credential-inventory.json](../../../adoption/credential-inventory.json).
@@ -441,10 +452,25 @@ Never add forwarded 20128 rows to engines-on 20129 rows.
 
 Reads are restricted to timestamp, path, status, model, tokens_in,
 tokens_cache_read, tokens_reasoning and correlation_id, plus the two explicitly
-required effort columns. IDs are discarded before returning rows. The private
-native capture may lack headers on streaming paths and shares the model's trust
-boundary, so receipts conservatively use **time window + model + path** at the
-entry gateway. They state the concurrent-caller limitation. Per-arm totals sum
+required effort columns. IDs are discarded before returning rows. Receipts use
+**time window + model + path** at the entry gateway and state the
+concurrent-caller limitation. Two sources could have narrowed that, and neither
+can:
+- The proxy's fixed `X-Correlation-Id` does not reach the row. At
+  OmniRoute@045aa81f3 and @dd6e9607e, whose files here are identical,
+  `/v1/responses` passes a fresh `randomUUID()` to `handleChat`
+  (`src/app/api/v1/responses/route.ts:193,213`,
+  `src/shared/utils/requestId.ts:100-102`, `src/sse/handlers/chat.ts:436`). That
+  ID is what `call_logs.correlation_id` stores
+  (`open-sse/handlers/chatCore/attemptLogging.ts:611`,
+  `src/lib/usage/callLogs.ts:713,786,801`). Only `/v1/chat/completions` keeps
+  a caller's ID (`src/app/api/v1/chat/completions/route.ts:292-322`). Matching
+  the run id on this path would drop every row and report false zeros, so
+  receipts do not (repair R5; a regression test pins this).
+- The private native capture of returned IDs may lack headers on streaming
+  paths and shares the model's trust boundary.
+
+Per-arm totals sum
 each matched row once, including failed calls; if any requested counter is
 missing, totals remain null. Cache-read tokens are an input subset, not an
 additional cost. No output-token or complete-provider-cost total is invented.
@@ -482,7 +508,8 @@ Git@v2.43.0 `Documentation/git.txt:708-724`, `diff-options.txt:830-840`.
 MCP allowlists are not network security. ai-memory HTTP and socraticode are
 **disabled**. Their host services would bypass the framework's tool filter,
 and under O1 they are unreachable by design: the internal run network has no
-route to host services, and the proxy forwards only three `/v1` gateway routes
+route to host services, only three `/v1` routes reach the gateway, and the
+proxy's other listener, `gw:8080`, reaches only the agent's own server
 ([config/mcp-policy.json](config/mcp-policy.json)). The host template still
 fixes `AI_MEMORY_URL` and `EMBED_URL` because the MCP template renders them.
 Neither address is reachable from the internal network; P2 checks every host
@@ -622,7 +649,10 @@ upstream URIs:
 | any other path or method, or any query string | 403 from the proxy |
 
 `<arm port>` is 20128 on control and 20129 on engines-on; one proxy serves one
-arm.
+arm. These are the only routes that reach the gateway, not the only ones the
+agent can reach: nginx listens on every proxy interface, so the agent can also
+use the host side below as `gw:8080`, which forwards every path to its own
+agent-server.
 
 - **Paths.** `location =` is an exact match that ends the search. Locations
   are matched against the normalized URI, after decoding `%XX`, resolving `.`
@@ -645,25 +675,39 @@ arm.
   `ngx_http_rewrite_module`, `if`, fetched 2026-09-28), so `?0` is refused too.
 - **Headers.** The template sets `proxy_pass_request_headers off`; the
   directive "Indicates whether the header fields of the original request are
-  passed to the proxied server" (`ngx_http_proxy_module`). Only the fields the
-  template sets reach the gateway:
+  passed to the proxied server" (`ngx_http_proxy_module`). Of the agent's
+  fields, only the three the template copies reach the gateway. The gateway
+  receives the fields the template sets:
   - a fixed `Host`;
   - `Content-Type`, `Accept` and `Idempotency-Key`, copied from the request;
   - `Authorization: Bearer local-loopback`;
   - `X-Correlation-Id` and `x-omniroute-session`, fixed to the run id;
   - `x-omniroute-compression`, fixed to the arm's combo.
 
+  nginx adds its own defaults for any name the template leaves unset
+  (`ngx_http_proxy_module.c:747-757`, merged at `:4210-4228`). At
+  release-1.30.5 these are the body framing it generates itself,
+  `Content-Length` or `Transfer-Encoding: chunked` (`:750-751`), and empty
+  `Connection`, `TE`, `Keep-Alive`, `Expect` and `Upgrade` (`:749,752-755`).
   "If the value of a header field is an empty string then this field will not
   be passed" (`proxy_set_header`; source
-  `ngx_http_proxy_module.c:1301-1303,1417-1418`), so control's empty combo
-  sends no compression header. The agent cannot forge the usage join, choose
-  a compression plan, or send `X-Forwarded-For`, `X-Real-IP` or any other
-  `x-omniroute-*` control header.
+  `ngx_http_proxy_module.c:1301-1303,1417-1418`). So no `Connection` field is
+  sent; the `Connection: close` in older documentation is not the pinned
+  behaviour. Before proxying, nginx refuses `Transfer-Encoding` on HTTP/1.0,
+  `Transfer-Encoding` together with `Content-Length` (400 each) and any
+  transfer coding other than `chunked` (501)
+  (`src/http/ngx_http_request.c:2034-2064`); live framing is still P3's to
+  show. Control's empty combo sends no compression header either. The
+  agent cannot forge the correlation or session value, choose a compression
+  plan, or send `X-Forwarded-For`, `X-Real-IP` or any other `x-omniroute-*`
+  control header.
 - **Host side.** Port 8080 forwards every path to `$S-server:8000` and
   refuses no arguments, because the driver's error-event search carries a
   query string. The host reaches it through `127.0.0.1:<port>`. The agent can
   also reach it as `gw:8080`, which leads only to the agent's own server and
-  gives it nothing it lacks.
+  gives it nothing it lacks. Its access log uses the `ingress` format (time,
+  method and status) instead of combined, which logs the whole request line as
+  `$request` (`src/http/modules/ngx_http_log_module.c:230-232`).
 - **Rendering.** `render_proxy_config` fills `@PORT@`, `@SERVER@`, `@RUN@` and
   `@COMPRESSION@` from `recipe.arm_config` and the attempt identity. It refuses:
   - a selection that differs from `arm_config`'s own output;
@@ -697,7 +741,12 @@ Proxy residuals:
   the arm serves. The G5 preflight below bounds which providers that can be.
 - Three things are unprobed, and P3 and P5 cover them: `--entrypoint nginx`
   under `--read-only`; body framing and streaming under the header allowlist;
-  and gateway paths the SDK might use beyond the three routes.
+  and gateway paths the SDK might use beyond the three routes. No running
+  nginx has parsed the template yet, including the host side's `ingress` log
+  format; the first live `prepare` does.
+- The retained proxy log can hold the session key if the model puts it in a
+  request line on the agent side, or in any request that produces a
+  request-bound error entry.
 
 ### G5: gateway provider preflight
 
@@ -797,6 +846,19 @@ not resolve, the receipt keeps the resolver's error class, such as `EAI_NONAME`
 or `EAI_AGAIN`. The pass condition is still only that no address resolved.
 Network inspect values are context only; the failed connects are the evidence.
 
+P0-P2 are bounded observations, not proof of every path:
+- they run in probe containers on the attempt networks, not in the
+  agent-server's own network namespace;
+- UDP is tried only as the one DNS datagram to 10.0.2.3:53;
+- no probe sends a request body, so body framing under the header allowlist is
+  source-reviewed only;
+- no probe makes a successful LLM request. P3 and P5 cover the last two live.
+
+The gate re-derives the verdict from the recorded counts and refuses a
+contradictory receipt. It still trusts the host that wrote the receipt: a
+consistent receipt forged, or re-dated, by the owning user would pass. No
+model write path to it exists.
+
 The receipt is `runs/<run-id>/<arm>/isolation-probe.json`: mode 0600,
 host-owned and outside every model mount. It holds:
 - mechanism `internal-isolated+nginx-v1-allowlist`, `run_id` and `arm`;
@@ -864,14 +926,19 @@ of them has run.
   and one `x-omniroute-*` control header. A second call adds a query string; it
   must get the proxy's 403 and leave no `call_logs` row. The first call's row
   must show:
-  - `/v1/responses`, status 200 and model `cx/gpt-6-astra-max`;
+  - `/v1/responses`, status 200 and the routed model the receipt matches,
+    `gpt-6-astra-max`;
   - effort max, both requested and sent upstream;
-  - the run id as the correlation value, not the forged one.
+  - a gateway-generated correlation value, neither the forged one nor the run
+    id, because `/v1/responses` ignores a caller's `X-Correlation-Id` at the
+    pinned builds ([Usage accounting](#usage-accounting)).
 
-  The streamed tool call must parse, body framing must work under the header
-  allowlist, and the usage must equal the row. Record the client peer the
-  gateway logged (F10). The proxy access log must show only that allowlisted
-  request.
+  A third call shows the proxy's replacement: one POST `/v1/chat/completions`
+  with the same forged header. That route keeps a caller's ID, so its row,
+  whatever its status, must carry the run id. The streamed tool call must
+  parse, body framing must work under the header allowlist, and the usage
+  must equal the row. Record the client peer the gateway logged (F10). The
+  proxy's agent-side access log must show exactly these three requests.
 - **P4, engines-on arm.** The same through a proxy bound to 20129, plus these
   checks:
   - a stacked lossy plan appears in the compression analytics;

@@ -12,13 +12,13 @@
   "ai-memory": {
     "enabled": false,
     "enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"],
-    "reason": "Disabled because it is unreachable by design under O1: the internal run network has no route to host services, and the proxy forwards only three /v1 gateway routes (docs/decisions/2026-09-28-openhands-resolver-isolation.md)."
+    "reason": "Disabled because it is unreachable by design under O1: the internal run network has no route to host services, only three /v1 routes reach the gateway, and the proxy's other listener, gw:8080, reaches only the agent's own server (docs/decisions/2026-09-28-openhands-resolver-isolation.md)."
   },
   "socraticode": {
     "enabled": false,
     "enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
     "env": {"SOCRATICODE_WATCHER": "manual"},
-    "reason": "Disabled because it is unreachable by design under O1: the internal run network has no route to host services (Qdrant, the embedder), and the proxy forwards only three /v1 gateway routes (docs/decisions/2026-09-28-openhands-resolver-isolation.md)."
+    "reason": "Disabled because it is unreachable by design under O1: the internal run network has no route to host services (Qdrant, the embedder), only three /v1 routes reach the gateway, and the proxy's other listener, gw:8080, reaches only the agent's own server (docs/decisions/2026-09-28-openhands-resolver-isolation.md)."
   },
   "headroom": {
     "enabled": false,
