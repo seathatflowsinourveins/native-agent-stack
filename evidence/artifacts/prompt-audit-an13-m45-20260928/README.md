@@ -93,6 +93,8 @@ python3 -B scripts/reproduce_template_checks_m45.py <clone holding 9f8db582> 9f8
 ## What is not claimed
 
 - **No behavior was measured.** Neither the M5 texts nor the skill's wording was tested.
+- **M4 does not decide the trial's immediate-removal question.** The packet did not include the skills trial's rule
+  for a skill that conflicts with CLAUDE.md or AGENTS.md; the decision record's limitations explain it.
 - **The audit was not built from the log's template, and its checks ran after the judges.** `docs/harness-defaults.md`
   records the lapse. Both Claude judgments are void on false positives, and the decision record explains why the
   outcome does not depend on them.
