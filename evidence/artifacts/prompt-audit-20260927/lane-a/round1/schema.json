@@ -1,0 +1,71 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "items"
+ ],
+ "properties": {
+  "items": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "verdict",
+     "resolution_text",
+     "reasons",
+     "sources",
+     "confidence"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "enum": [
+       "S1",
+       "X5a",
+       "X5b",
+       "X5c"
+      ]
+     },
+     "verdict": {
+      "type": "string",
+      "enum": [
+       "agree",
+       "amend",
+       "reject"
+      ]
+     },
+     "resolution_text": {
+      "type": "string"
+     },
+     "reasons": {
+      "type": "string"
+     },
+     "sources": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "locator",
+        "quote"
+       ],
+       "properties": {
+        "locator": {
+         "type": "string"
+        },
+        "quote": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "confidence": {
+      "type": "number"
+     }
+    }
+   }
+  }
+ }
+}

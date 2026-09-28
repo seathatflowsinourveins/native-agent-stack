@@ -1,0 +1,17 @@
+{
+ "date": "2026-09-28",
+ "facts": [
+  {
+   "fact": "The live ruleset on main requires the status checks validate, token-report, secret-scan, dependency-review, osv-scanner, verdict-review-gate, validate-macos and sota-sources",
+   "command": "gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main"
+  },
+  {
+   "fact": "Open PR #410's description has the headings '## The answer the request asks for', '## Steps', '## Not claimed' and '## Checks at head', and no SOTA sources heading; its sota-sources check fails (Actions run 36329683998, job 108649197610)",
+   "command": "gh pr view 410 --json body; gh pr checks 410"
+  },
+  {
+   "fact": "PR #430's description (2026-09-27) records: 'Each of the last 60 merged PRs (#344-#424) has a successful sota-sources run; 4 of them also show an earlier failed or cancelled run', and 'At PUT time #410 fails sota-sources, #205 and #216 have no run (they predate the job and need a rebase), and #415 and #417 pass'. #430 restored sota-sources to the live ruleset on 2026-09-27 at 21:00Z",
+   "command": "gh pr view 430 --json body"
+  }
+ ]
+}

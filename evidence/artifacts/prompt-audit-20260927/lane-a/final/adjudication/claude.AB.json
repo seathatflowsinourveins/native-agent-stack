@@ -1,0 +1,98 @@
+{
+ "usage": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 20,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 42,
+   "cache_creation_input_tokens": 111141,
+   "cache_read_input_tokens": 1566491,
+   "output_tokens": 36988
+  }
+ },
+ "return": {
+  "leak": false,
+  "leak_text": "",
+  "items": [
+   {
+    "id": "X5c",
+    "choice": "A",
+    "reasons": "Neither resolution breaks anything, so the choice rests on meaning. The coordinator's runs pass for both: 'Ran 353 tests' with 'OK (skipped=15)', and validate.py reports 'status': 'passed'. Each tree matches its diff. amended/ pins ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d, with a 153-word block (line 3 is 51 words) and a 3371-byte template. proposed/ pins 71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f, with a 144-word block (line 3 is 42 words) and a 3323-byte template. I checked the counts by hand against base line 3 (18 words, 108 bytes). Both templates are under the 8192-byte assertion (tests :205). The prover and the installer count only the top-rule marker, not the text of line 3. The packet asks each text to keep 'the file's tested obligations and its existing meaning' (packet.md:23). Base :3 makes 'upstream and the installed client' the source of truth. B drops the installed client from the top rule. Its reasons rest on the check order in line 5 and do not address the dropped clause or the mismatch with X5a. That is an omission, not a contradiction by another file. A keeps the clause with the exact sentence of X5a. Both reviews agreed with X5a, and both trees apply it (amended/examples/claude-native/CLAUDE.md:3). The packet's own reason for keeping the clause in X5a is docs/harness-defaults.md:58 (packet.md:61-62). That section is the long form of the portable instructions. Its check order names `codex --version` and `codex debug prompt-input` (:62), so the same reasoning covers the Codex template. With B, the two templates of one rule would disagree on the installed client's status. With A, line 3 matches X5a apart from the bold. For a Codex session, B's single anchor 'current upstream SOTA is the source of truth' can lead a worker to trust current upstream over the installed version, while line 5 checks 'that version' and 'that tag'. A's explicit sentence removes that ambiguity. A also keeps the operator's heading sentence whole, with its own period, and the compounds sentence verbatim; B joins 'never self-write...' to the heading with a semicolon. B's point that line 5 still puts the installed client first is valid, so confidence is moderate.",
+    "sources": [
+     {
+      "locator": "base/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth."
+     },
+     {
+      "locator": "packet.md:23",
+      "quote": "keeps the file's tested obligations and its existing meaning, and whether the co-changes are complete and correct."
+     },
+     {
+      "locator": "amended/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "proposed/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "amended/examples/claude-native/CLAUDE.md:3",
+      "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "packet.md:61",
+      "quote": "It also keeps the installed client as a source of"
+     },
+     {
+      "locator": "packet.md:62",
+      "quote": "truth: `docs/harness-defaults.md:58`, the section that calls itself the long form of this template's top rule,"
+     },
+     {
+      "locator": "base/docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "base/docs/harness-defaults.md:62",
+      "quote": "1. **Installed client.** Its version, commands, `--help` and the settings it reads: `claude --version`, `codex --version`, `/help` and `/config` in a session."
+     },
+     {
+      "locator": "base/adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "amended/tests/test_codex_worker_lane.py:47",
+      "quote": "TOP_RULE_SHA256 = \"ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d\""
+     },
+     {
+      "locator": "amended/tests/test_codex_worker_lane.py:210",
+      "quote": "self.assertEqual(len(top.split()), 153)"
+     },
+     {
+      "locator": "amendment.diff:36",
+      "quote": "+      \"bytes\": 3371"
+     },
+     {
+      "locator": "base/tests/test_codex_worker_lane.py:205",
+      "quote": "self.assertLess(len(text.encode(\"utf-8\")), 8192)"
+     },
+     {
+      "locator": "base/tools/adoption/prove_codex_lane.py:140",
+      "quote": "top, exceptions = grep_count(got.stdout, lane.TOP_RULE_MARKER), grep_count(got.stdout, lane.EXCEPTIONS_MARKER)"
+     },
+     {
+      "locator": "adjudication-inputs/x5c.AB.json:91",
+      "quote": "Ran 353 tests in 55.195s"
+     },
+     {
+      "locator": "packet.md:401",
+      "quote": "Ran 353 tests in 55.314s"
+     }
+    ],
+    "confidence": 0.75
+   }
+  ]
+ }
+}

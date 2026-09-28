@@ -1,6 +1,6 @@
 # Native engineering defaults
 
-**Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.
+**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
 
 1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job, with their supported install and test commands, and name each source (repository and pin, file or paper). Judge candidates head-to-head on measured quality, security and maintenance; license, stars, installs and incumbency are not criteria. With no SOTA source, stop and report.
 2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs. An absence claim needs at least the first two, else write "not found in X, Y".

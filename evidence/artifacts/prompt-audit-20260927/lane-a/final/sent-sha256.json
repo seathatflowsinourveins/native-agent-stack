@@ -1,0 +1,10 @@
+{
+ "note": "sha256 of each file as the lanes received it; the published prompts replace host paths with <k2> and <root>. proposal.diff and the packet are byte for byte.",
+ "files": {
+  "packets/packet.md": "31c496f8d079ce0f9499527c432ea9948ab6f13b28fd3083af596c8d889a7133",
+  "prompts/gpt6-prompt.txt": "7eb0eb1d0167b2d5f93a5a17994e107dff46537ff2c96c375a19a041cafd291c",
+  "prompts/claude-brief.txt": "4ebaea86047da81c27da672d1adbb56de65a38fe1cb505881932a700637ae45f",
+  "schemas/lane.json": "200d094b7944d6915f92bdf7848327c27c303fd866e8a167d7224bd6ea462aa4",
+  "root/proposal.diff": "59f7bd4f827bf386d9c7ab420f21424bb9c6738f6a56a83e25ca46f13d36fb6f"
+ }
+}

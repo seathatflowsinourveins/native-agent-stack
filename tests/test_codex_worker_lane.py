@@ -42,9 +42,9 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0
+# The staged top-rule block (153 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0
 # hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311"
+TOP_RULE_SHA256 = "ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -207,7 +207,7 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 120)
+        self.assertEqual(len(top.split()), 153)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     def test_exceptions_name_every_raw_sensitive_form(self):
