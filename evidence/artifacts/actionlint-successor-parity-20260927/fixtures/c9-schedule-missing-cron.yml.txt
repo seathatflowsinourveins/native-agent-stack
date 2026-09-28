@@ -1,0 +1,9 @@
+on:
+  schedule:
+    - cron: '0 0 * * *'
+    - timezone: Europe/Amsterdam
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test

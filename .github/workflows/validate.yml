@@ -142,6 +142,45 @@ jobs:
       - name: Test semantic evidence contract boundaries
         run: node --test blueprints/native-skill-practice/test-contract.cjs
 
+  actionlint-successor:
+    # Non-required parity trial (2026-09-27): the maintained fork kjanat/actionlint beside the
+    # validate job's pinned rhysd/actionlint 1.7.12, whose upstream has had no commit on main since
+    # 2026-04-19 (rhysd/actionlint#719, "rhysd (the author) inactive", open). v1.17.0 is an immutable
+    # release; its linux_amd64 archive carries SLSA provenance signed by
+    # kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0 (commit 08bb2c4f). It parses
+    # concurrency `queue` and `cache-mode`, and enables three cache policies by default. This job is
+    # not in .github/main-ruleset.json's required_status_checks; the required validate job keeps
+    # 1.7.12 until the parity trial shows no unexplained difference
+    # (evidence/artifacts/actionlint-successor-parity-20260927/).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check workflow syntax and expressions with the kjanat/actionlint successor candidate
+        env:
+          ACTIONLINT_VERSION: '1.17.0'
+          # https://github.com/kjanat/actionlint/releases/tag/v1.17.0, asset
+          # actionlint_1.17.0_linux_amd64.tar.gz (the release's digest and actionlint_1.17.0_checksums.txt)
+          ACTIONLINT_SHA256: 620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a
+        run: |
+          mkdir -p "$RUNNER_TEMP/actionlint-successor"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/kjanat/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+            --output "$RUNNER_TEMP/actionlint-successor/archive.tar.gz"
+          printf '%s  %s\n' "$ACTIONLINT_SHA256" "$RUNNER_TEMP/actionlint-successor/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/actionlint-successor/archive.tar.gz" -C "$RUNNER_TEMP/actionlint-successor" actionlint
+          "$RUNNER_TEMP/actionlint-successor/actionlint" -version
+          "$RUNNER_TEMP/actionlint-successor/actionlint" -color
+
   verdict-review-gate:
     # Required check (docs/decisions/2026-09-22-github-automation-closure.md, "verdict-review-gate
     # (2026-09-23)"): with one maintainer and zero required approvals, a PR that changes a
