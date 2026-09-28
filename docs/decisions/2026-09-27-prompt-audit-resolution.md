@@ -589,3 +589,22 @@ not published, because it quotes the user-level instruction file and names insta
   - **The rest:** the low-confidence and plugin findings are recorded flags.
 - **Usage.** The client reported $22.74 for the first run and $13.97 for the rerun, both at list prices. Both usage
   blocks are in `an13-runs.json`, where they overlap and are never added.
+
+### Co-change: the grand dashboard's bound on the evidence manifest
+
+This pull request's registrations take `manifests/evidence.json` from 1,987,653 bytes on `fb14dedf` past the
+2,000,000-byte bound that `observability/grand-dashboard/progress.py` applied to every source it reads (2,017,827 bytes
+when the suite ran). The snapshot then refused the manifest, and eight dashboard tests failed in the full suite.
+`controls/dashboard-bound-before.txt` shows them, and the new test, failing on the unchanged reader.
+
+- **Change.** The snapshot reads only the manifest's receipt count, so the manifest now has its own bound of
+  8,000,000 bytes, and every other source keeps 2,000,000 (`SOURCE_MAX_BYTES`). `read(root, relative)` keeps its
+  signature, which the dashboard tests patch.
+- **Test.** The new test accepts a manifest just over 2 MB, refuses the same bytes under another name, and refuses a
+  manifest over the new bound. `controls/dashboard-bound-after.txt` records 17 tests OK on the same manifest.
+- **Why here.** The dashboard serves both lanes, so the change is `lane:shared`, like this pull request. Any change
+  that adds about 60 evidence files before this one merges crosses the same bound, and it can take this commit.
+- **Host.** The host's timer runs `progress.py` from its live checkout, so the fix takes effect when that checkout
+  is updated to a `main` that holds it. No reinstall is needed.
+- **Overturn.** When the manifest nears 8,000,000 bytes, count receipts from a smaller source instead of raising the
+  bound again.
