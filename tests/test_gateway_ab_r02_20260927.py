@@ -1313,6 +1313,21 @@ class AnalysisTests(unittest.TestCase):
             fingerprint, problems = ANALYZE.gateway_fingerprint(READBACKS, fields, declaration)
             self.assertEqual((problems, fingerprint["admissible"]), ([text], False))
 
+    def test_another_study_declares_its_own_fields_and_values(self):
+        # A 20128-versus-20129 study whose arms need different values declares one field per gateway, as data.
+        off = READBACKS["ab_before"]["compression"]
+        on = {**off, "enabled": True}
+        fields = ["compression_20128", "compression_20129"]
+        intended = {point: {"compression_20128": off, "compression_20129": on} for point in ANALYZE.READBACK_POINTS}
+        swapped = {point: {"compression_20128": on, "compression_20129": off} for point in ANALYZE.READBACK_POINTS}
+        per_gateway = {"compression_20128": [off], "compression_20129": [on]}
+        self.assertEqual(ANALYZE.gateway_fingerprint(intended, fields, per_gateway)[1], [])
+        fingerprint, problems = ANALYZE.gateway_fingerprint(swapped, fields, per_gateway)
+        self.assertEqual((fingerprint["admissible"], fingerprint["identical"], len(problems)), (False, True, 8))
+        # One field per setting listing both gateways' values would admit the arms swapped.
+        pooled = {field: [off, on] for field in fields}
+        self.assertEqual(ANALYZE.gateway_fingerprint(swapped, fields, pooled)[1], [])
+
     def test_the_owner_dry_read_back_command(self):
         with tempfile.TemporaryDirectory() as directory:
             good, forced = Path(directory) / "good.json", Path(directory) / "forced.json"

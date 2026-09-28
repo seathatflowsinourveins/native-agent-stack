@@ -321,9 +321,11 @@ procedure: 2 more gateway calls, 4 of the 6 in total; promptfoo exit 0, 2 passed
   - Both calls returned HTTP 200.
   - Each response's `X-Correlation-Id` equals the id sent. The sent id is the one rebuilt from the results, a rebuild
     the echo check validated, because promptfoo persists no request headers. `analyze_r02.py ids` exited 0.
-  - `call_logs_by_correlation.py` (six allowlisted columns) found exactly those two ids, one row each, with none
-    retried and none unmatched. A: status 200, model `gpt-6-astra`, requested NULL, upstream NULL (no observation).
-    B: status 200, model `gpt-6-astra-max`, requested NULL, upstream `max`.
+  - `call_logs_by_correlation.py` (six allowlisted columns) observed exactly those two ids, one row each: no id
+    with a second row and none unmatched. That read is an observed snapshot, so it does not show that no retry
+    happened, because a retry's row can be saved late or never (Correlation ids and call_logs). A: status 200, model
+    `gpt-6-astra`, requested NULL, upstream NULL (no observation). B: status 200, model `gpt-6-astra-max`,
+    requested NULL, upstream `max`.
   - The analysis's call_logs join reported no problems.
   - Both outputs parsed `valid` with TP 1. Usage: A 1493 prompt and 19 completion tokens, with no reasoning
     detail; B 1493 prompt, 59 completion and 38 reasoning tokens. Time to response headers (promptfoo
@@ -486,7 +488,9 @@ an execution precondition performed by the gateway owner.
   equal one of them, with JSON Schema `enum` semantics (`admissible_rule`; equality as python-jsonschema 4.26.0
   implements it, jsonschema/_utils.py:106-153 and _keywords.py:269-271). Four identical read-backs of the wrong
   treatment therefore void the run. The analyzer holds no admissible value, so the gateway owner's
-  20128-versus-20129 comparison can reuse it with its own declaration. For R02:
+  20128-versus-20129 comparison can reuse it with its own declaration. Where that comparison's arms need different
+  values of a setting, it declares one field per gateway (for example `compression_20128` and `compression_20129`),
+  each with its own values: one field listing both gateways' values would admit the arms swapped. For R02:
 
   | Field | Admissible | Why | Provenance |
   | --- | --- | --- | --- |
