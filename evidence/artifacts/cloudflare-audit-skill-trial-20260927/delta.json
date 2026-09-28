@@ -274,6 +274,8 @@
    "L527": "| `user-invocable: false`          | No             | Yes               | Description always in context, full skill loads when invoked |",
    "L766": "By default, Claude can invoke any skill that doesn't have `disable-model-invocation: true` set.",
    "L768": "Three ways to control which skills Claude can invoke:",
+   "L796": "**Hide individual skills** by adding `disable-model-invocation: true` to their frontmatter. This removes the skill from Claude's context entirely.",
+   "L799": "  With `user-invocable: false`, you can't invoke the skill, but Claude still can. To keep Claude from invoking it through the Skill tool, set `disable-model-invocation: true`.",
    "L808": "| Value                   | Listed to Claude     | In `/` menu |",
    "L810": "| `\"on\"`                  | Name and description | Yes         |",
    "L813": "| `\"off\"`                 | Hidden               | Hidden      |",
@@ -506,7 +508,7 @@
    "checked_at": "2026-09-27"
   },
   "status": "trial",
-  "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Enforcement would need upstream user-invocable: false, absent at the pin, and a native probe with name-only. The M5c bake-off against /security-review decides promotion.",
+  "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Upstream user-invocable: false (absent at the pin) would remove only the user trigger; Claude could still invoke it, so stage-only use stays a usage policy (same docs, read 2026-09-28). The M5c bake-off against /security-review decides promotion.",
   "claude_listing": "name-only",
   "codex_enabled": false,
   "added": "2026-09-27"
@@ -738,7 +740,7 @@
     "commands": "HTTP 200, 202541 bytes, sha256 f0b71855bab62002c1bf410afc7d0e41b825ba8b3b6b8fa13da6fa142f6b8098, the same"
    },
    "settings_only_answer": "No settings-only state hides the / entry and keeps model invocation. Of the four skillOverrides states (skills page L808 to L813; settings reference L4167 to L4170) only off hides the / entry, and off also hides the skill from Claude; invoking a hidden skill by its full name returns the skillOverrides error (L817). The skills page's other controls are ways to control which skills Claude can invoke (L766, L768), and the page does not document any of them as hiding the / entry. The frontmatter field user-invocable: false hides the / entry and keeps Claude's invocation (L360, L527), but it lives in SKILL.md",
-   "residual": "enforcing stage-only use. user-invocable: false is absent from the pinned SKILL.md (frontmatter name and description only). tools/adoption/install_skills.py counts an installed SKILL.md as current only when its sha256 matches the pin (classify_skill) and rolls back an add that does not match, so a local edit would break the pin. The docs do not say how the field combines with a name-only override (L527 gives it the description always in context), so a new pin that adds it needs a native probe of both halves before any enforcement claim",
+   "residual": "removing the user trigger. Stage-only use stays a usage policy even with user-invocable: false: with it \"Claude still can\" invoke the skill (L799), and disable-model-invocation: true \"removes the skill from Claude's context entirely\" (L796), which would stop the session that drives the stages too. user-invocable: false is absent from the pinned SKILL.md (frontmatter name and description only). tools/adoption/install_skills.py counts an installed SKILL.md as current only when its sha256 matches the pin (classify_skill) and rolls back an add that does not match, so a local edit would break the pin. The docs do not say how the field combines with a name-only override (L527 gives it the description always in context), so a new pin that adds it needs a native probe of both halves before any claim that the user trigger is gone",
    "changes": [
     "docs/decisions/2026-09-25-skills-trial-and-usage.md: the Decided-by paragraph, the W011 sentence and the name-only item describe reduced visibility and a usage policy; new Enforcement residual item and overturn condition; name-only invocation reach joins the live-run-pending row; the read-times paragraph names this round",
     "adoption/skills/manifest.json: the security-audit gap replaces the never-by-user-invocation and triggers-on-any-security-question wording; claude_listing stays name-only",
@@ -793,6 +795,13 @@
     "scope_note": "this block records the finding with those phrases, so grep matches inside checks.repair_round_2 only (9 lines of jq '.checks.repair_round_2' output)"
    },
    "post_fix_probe": "check_claude_listing still returns {'state': 'ok', 'actual': 'name-only'} for security-audit and the template's skillOverrides entry is still name-only: the listing stays the user's choice, and only the claims changed"
+  },
+  "repair_round_2_verification": {
+   "evidence_class": "our integration (independent Claude stack-verifier re-run of the round-2 probes, then a coordinator text correction)",
+   "verdict_before_correction": "fail: the round-2 finding is fixed, but a new claim (N1) said the frontmatter field user-invocable: false plus a probe would enforce stage-only use",
+   "source": "skills docs L799 (user-invocable: false leaves Claude's own invocation on) and L796 (disable-model-invocation: true removes the skill from Claude's context entirely); the same fetch as native_docs.skills (sha256 86137b62...)",
+   "correction": "the residual is limited to the user trigger; stage-only use stays a usage policy with or without either field. Changed: the decision addendum's Enforcement residual item and its overturn condition, README residual lines, the manifest gap (mirrored in manifest_row.gap) and checks.repair_round_2.residual",
+   "check": "the correction's quoted docs text is L796 and L799 in native_docs.skills"
   }
  }
 }

@@ -117,8 +117,9 @@ that the addendum and the manifest gap overstated what `name-only` does.
   the skill by name, and a user can still type `/security-audit`. Stage-only use is a usage policy
   that the stage prompts carry. No `skillOverrides` state hides the `/` entry and keeps the skill
   listed to Claude: only `off` hides the entry, and it hides the skill from Claude too.
-- Residual: the frontmatter field `user-invocable: false` would enforce it, but it is absent at the
-  pin, and a local edit would break the pin. `install_skills.py` counts an installed `SKILL.md` as
+- Residual: the frontmatter field `user-invocable: false` would remove only the user trigger. With
+  it, "Claude still can" invoke the skill, so stage-only use stays a usage policy even then. The
+  field is absent at the pin, and a local edit would break the pin. `install_skills.py` counts an installed `SKILL.md` as
   current only when its sha256 matches, and rolls back an add that does not.
 - `scripts/validate.py` before registering the four changed files: exit 1, with SHA-256 and
   byte-count mismatches on exactly those files. After registration: exit 0, 7,375 hashed files.
@@ -138,8 +139,9 @@ that the addendum and the manifest gap overstated what `name-only` does.
   live, every session lists its full description until they are, so apply both first.
 - A native probe of `name-only` invocation reach: whether a typed `/security-audit` runs, and
   whether the model invokes the skill unprompted.
-- Enforcing stage-only use stays a residual. `user-invocable: false` needs a new upstream pin, then
-  a native probe together with the `name-only` override.
+- Removing the user trigger stays a residual. `user-invocable: false` needs a new upstream pin, then
+  a native probe together with the `name-only` override. Stage-only use stays a usage policy
+  either way, because the field leaves Claude's own invocation on.
 - M5b's unchanged upstream `node --test` at the pin, the labelled fixture and the budget.
 - M5c is queued behind Gate A and Gate B.
 - The sandbox profile measurement, due for re-check 2026-10-11.
@@ -186,4 +188,6 @@ python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.t
 python3 -m unittest tests.test_foundation_catalog tests.test_adoption_contract
 python3 scripts/validate_foundation.py
 python3 scripts/validate.py
+# repair round 2 verification: the user-trigger residual (skills docs L796, L799)
+curl -s https://code.claude.com/docs/en/skills.md | sed -n '796p;799p'
 ```

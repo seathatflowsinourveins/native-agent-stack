@@ -613,14 +613,20 @@ interested author make this a discovery signal for the M5c design, not evidence 
   - `user-invocable-only` is not used: the user rejected user invocation, "Claude doesn't see the
     skill" in that state, and it blocks agent preloads ([listing state and agent
     preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
-- **Enforcement residual.** The native control is frontmatter: with `user-invocable: false`, "Claude
-  Code hides it from the `/` menu and doesn't run it when you type `/name`". The pinned `SKILL.md`
-  has no such field, and the install is as-is: `tools/adoption/install_skills.py` counts an
-  installed `SKILL.md` as current only when its sha256 matches the pin (`classify_skill`) and rolls
-  back an add that does not match, so a local frontmatter edit would break the pin. Enforcement
-  therefore needs a new upstream pin. Even then, the docs do not say how the field combines with a
-  `name-only` override; their invocation table gives `user-invocable: false` a "Description always
-  in context". A native probe of the combination comes before any claim of enforcement.
+- **Enforcement residual (the user trigger only).** The native control for the user trigger is
+  frontmatter: with `user-invocable: false`, "Claude Code hides it from the `/` menu and doesn't
+  run it when you type `/name`". The field leaves Claude's own invocation on: "With
+  `user-invocable: false`, you can't invoke the skill, but Claude still can." Keeping Claude from
+  invoking it takes `disable-model-invocation: true`, which "removes the skill from Claude's
+  context entirely", so the session that drives the stages could not load it either. Stage-only use
+  therefore stays a usage policy with or without either field. The pinned `SKILL.md` has neither
+  field, and the install is as-is: `tools/adoption/install_skills.py` counts an installed
+  `SKILL.md` as current only when its sha256 matches the pin (`classify_skill`) and rolls back an
+  add that does not match, so a local frontmatter edit would break the pin. Removing the user
+  trigger therefore needs a new upstream pin. Even then, the docs do not say how the field combines
+  with a `name-only` override; their invocation table gives `user-invocable: false` a "Description
+  always in context". A native probe of the combination comes before any claim that the user
+  trigger is gone.
 - **No agent preload.** `SKILL.md` alone is 22,026 bytes and the folder 314,670. Stages paste the
   companion blocks they need, as the skill intends: `HUNTING.md` and `VALIDATION-AND-REPORTING.md`
   "carry this procedure as one identical fenced block for hunter and verifier prompts". The six-role
@@ -714,10 +720,12 @@ gates, so this listing rests on that precedent, not on a failing test.
 - Remove it at once if any audit turns to Fail.
 - Re-decide the listing if a new pin changes the description or adds `disable-model-invocation`,
   or if a native probe shows that a workflow stage cannot invoke a `name-only` skill by name.
-- Close the enforcement residual only when a native probe on one host shows both halves: a typed
+- Close the user-trigger residual only when a native probe on one host shows both halves: a typed
   `/security-audit` does not run, and a workflow stage still invokes the skill by name. The
   candidates are a new pin that adds `user-invocable: false`, probed together with the `name-only`
-  override, or a future `skillOverrides` state with that effect.
+  override, or a future `skillOverrides` state with that effect. Closing it does not make
+  stage-only use enforced: Claude can still invoke the skill unprompted, so that stays a usage
+  policy.
 - Re-decide Codex if Codex gains a name-only state.
 
 **Stale upstreams, flagged for the next verdict wave** and re-observed with `gh api` on 2026-09-27.
