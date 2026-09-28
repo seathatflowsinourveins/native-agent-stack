@@ -70,7 +70,7 @@
       "used_for": [
         {
           "dimension": "harness-and-token-practice",
-          "use": "verification-before-completion skill (the installed copy is byte-identical), subagent context and TDD practice"
+          "use": "verification-before-completion skill (installed byte-identical as a trial skill until its removal on 2026-09-28 under the skills trial's conflict rule; superpowers stays an alternative), subagent context and TDD practice"
         },
         {
           "dimension": "git-review-and-automation",

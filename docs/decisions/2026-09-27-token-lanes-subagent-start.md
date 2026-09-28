@@ -619,3 +619,67 @@ with its pin before the run, on frozen tasks, and counts review-found defects, t
 | Earlier assumption | Correction and verification path |
 | --- | --- |
 | A standing instruction to follow the verification skill belongs in every child's start context | The Opus 5 guide (L61, L81), carried forward by the 5.5 guide (L9), says to remove explicit verification instructions. The carrier now asks only for evidence, the builder gets the skill from its own preload, and the withdrawn-phrase test keeps the skill name out of every block. |
+
+## Addendum 2026-09-28: builder evidence sentence
+
+**Need.** The [verification-line addendum](#addendum-2026-09-28-verification-line) removed the builder's line for one
+reason: "Its line goes for another reason: it was the third copy of one instruction." It rejected the evidence
+sentence as the builder's line for the same reason: "so the line would still duplicate the preload." Both rest on the
+builder's `verification-before-completion` preload and the body line that named it. On 2026-09-28 the skills trial
+removed that skill under its conflict rule, and with it the preload and the body line in all three copies of
+`isolated-builder.md` ([removal addendum](2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-verification-before-completion-removed-conflict-rule)).
+The hook gives `isolated-builder` its role block instead of the default block
+([role-matched addendum](#addendum-2026-09-27-role-matched-blocks)), so the default block's line 13 does not reach it.
+Its body still says "Run the appropriate existing checks and report their outcomes", which names no form of evidence.
+Without a change here, the builder's definition and role block would carry no evidence rule.
+
+**Change.** [`token-lanes-block.builder.md`](../../adoption/hooks/claude/token-lanes-block.builder.md) gains, as its
+last line, the first sentence of the default block's line 13: "Show evidence before a success claim: the command and
+what it returned (code.claude.com best practices), or the file:line read." This is the builder text the
+verification-line addendum weighed and rejected as a duplicate, at the size it gave: the block goes from 2,747 to
+2,877 UTF-8 bytes and from 9 to 10 lines. The `search-first` and Source sentences stay out because the builder has no
+Skill tool; C2 gave the builder the verification sentence alone for the same reason. As in the default block, the
+sentence asks for the evidence of work already done, adds no verification step and names no skill, so the Opus 5
+advice to remove explicit verification instructions (L61, L81) does not apply to it.
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) lists the new hash: `c665c230…` becomes `c81a91c4…`. The
+[handbook](../token-session-handbook.md#token-lanes-carried-into-subagents) adds "builder evidence" to the builder's
+table row and a builder-evidence variant that gives the reason.
+
+**The verification-line addendum's builder overturn.** It reads "Restore the builder line only if a comparison that
+varies that line, with the preload held on, shows the same gain." This change neither meets nor relies on it. That condition
+governs the removed verification line and presupposes the preload, which no longer exists. The new line is the
+evidence sentence, which the verification-line addendum turned down for the builder only because it duplicated the
+preload.
+
+**Tests.** In the [text contract test](../../tests/test_token_lanes_subagent_start.py), the builder's key phrases gain
+`Show evidence before a success claim`. The withdrawn-phrase check and the grant-agreement test's skill guard are
+unchanged; the check's comment now says that no agent preloads the skill and that the builder block carries the
+evidence sentence instead. As a failing-first control, the changed module ran against the base (`3058b237`) builder
+block with this change's handbook, so the verbatim-handbook check still held.
+`python3 -m unittest tests.test_token_lanes_subagent_start` returned "Ran 17 tests" and "FAILED (failures=2)": the
+builder block file and the hook's `isolated-builder` payload each lacked the new key phrase. With this change the same
+command returns "Ran 17 tests" and "OK". This is local text agreement, not a native child run, compliance or a
+measured saving.
+
+**#381.** The builder block hash changes again, and #381 records each block file's hash at execution
+([procedure, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)). The
+preload removal also changes the builder's role body, which #381 pins by hash:
+[its Amendment 3](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#amendment-3-2026-09-28-the-isolated-builder-body-without-verification-before-completion-before-execution)
+replaces the `isolated-builder.md` row before execution. A host receives the new block and body at its next
+`python3 tools/adoption/install_claude_profile.py --only guard --only agents`; this change runs no installer, and no
+child run with this text is claimed.
+
+**Supersedes.** In the verification-line addendum, "The frontmatter preload and the body line stay as they are", the
+rejected alternatives "Reword the builder line to the evidence sentence (2,877 bytes)" and "Remove the builder's
+preload or its body line as well", and the table cell "the builder gets the skill from its own preload" describe the
+previous revision.
+
+**Overturn.**
+- Remove the builder's evidence line if the builder again receives the same rule at start from another source, such
+  as a re-pinned skill preload or a body line, since the verification-line addendum's duplication reason then returns.
+- Remove it if a comparison that varies this line alone, run as the verification-line addendum's overturn conditions
+  describe, shows no fewer review-found defects with the line and a larger token or time cost.
+
+| Earlier assumption | Correction and verification path |
+| --- | --- |
+| The builder's own preload gives it the evidence rule, so a block line would only duplicate it | Since 2026-09-28 no agent preloads the skill. The builder block's last line carries the evidence sentence, and the builder's key-phrase test keeps it there. |

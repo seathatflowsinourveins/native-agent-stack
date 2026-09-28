@@ -1197,3 +1197,123 @@ policy as keeping "on-demand skills out of the listing to save context".
 | Tree-check controls | synthetic-fixture | Synthetic fixture | Same directory: five controls built by `run_checks.sh`, two exiting 1 and three exiting 2, none a pass |
 | Skills page and settings reference wording | upstream wording | None; cited, not executed | URL and read date (2026-09-28) only; no copy retained |
 | Who made the 2026-09-26 edits, and why | untrusted-history | None; not evidence | A coordinator memory note |
+
+## Addendum 2026-09-28: verification-before-completion removed (conflict rule)
+
+**Rule.** The [overturn conditions](#overturn-conditions) (L284-286) say: "A trial skill shows
+measurable harm, or gives instructions that conflict with CLAUDE.md/AGENTS.md once actually read
+in full → remove it immediately, not at the trial window's end." This addendum applies that rule
+to `verification-before-completion` (`obra/superpowers` at `8ca22dba`, SKILL.md sha256
+`2befe7fc…`). It was a `trial` skill, listed `on` for Claude, enabled for Codex, and preloaded by
+`isolated-builder`.
+
+**Findings.** Each was made on 2026-09-28 from a full read.
+
+| # | Evidence class and source | Finding |
+| --- | --- | --- |
+| 1 | Primary-source read by the trial owner, the coordinating session, whose position is quoted in [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md#m4-claude-readings) (item 3). Its line citations were re-read for this record in the installed copy, whose SKILL.md matched the pinned sha256 under `sha256sum`. | The 120-line SKILL.md says at L20 "If you haven't run the verification command in this message, you cannot claim it passes" and at L28 "Execute the FULL command (fresh, complete)". Its Common Failures table (L42) lists "Previous run" as Not Sufficient for "Tests pass". Its rationalization table answers "Just this once" with "No exceptions" (L67) and "Partial check is enough" with "Partial proves nothing" (L71). [AGENTS.md](../../AGENTS.md) L16 says "Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap". |
+| 2 | Claude readings in the practice-sweep session (`native-agent-stack-a9`), quoted in [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md#m4-claude-readings) (items 1 and 2): first the independent `evidence-reviewer` stage of workflow `wf_811a77e9-a4e` (Opus, max), then that session's coordinator on a full read. Neither was a lane on the GPT-6 packet. | The refuter found that the first "keep" recommendation never tested the in-force rule, and that "Read in full, the pinned text sits in surface tension with AGENTS.md:16". The coordinator found that L20 and L28 conflict with AGENTS.md L16. |
+| 3 | Cross-family model judgment on a frozen packet ([`m4/packet.redacted.md`](../../evidence/artifacts/delegated-decisions-20260928/m4/packet.redacted.md)): `codex exec -s read-only` (codex-cli 0.157.1), requesting `gpt-6-astra` at `model_reasoning_effort=max`. The Codex event stream records no model field, so the model is the pinned request, not an observed resolution. The return is retained at [`m4/gpt6-return.md`](../../evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md). | "VERDICT: conflict", citing SKILL L20, L28 and L42 against AGENTS.md L16. If tests passed earlier and the inputs are unchanged, a status reply that reuses the result violates the skill, and a re-run violates AGENTS.md. It found L108-114 compatible with AGENTS.md L15. Disposition: "remove now". |
+
+Findings 1 and 2 are not shown to be independent of each other: the practice-sweep coordinator's
+reading "was sent to both peers before the GPT-6 verdict returned" (`coordination.md`, item 2).
+The GPT-6 lane read only its frozen packet. The user delegated this decision to the practice-sweep
+session, which recorded it in its
+[M4 decision](2026-09-28-delegated-decisions.md#m4-remove-the-trial-skill) (#462, `c1581fa2`), and
+the trial owner accepted the result.
+
+**What was removed, and where.**
+- [`manifest.json`](../../adoption/skills/manifest.json): the row moves from `skills` to
+  `excluded` with a dated reason and an overturn condition, leaving 28 skills and 28 excluded
+  entries, and `checked_at` becomes 2026-09-28. The budget was recomputed by its
+  `description_chars_method` from the installed SKILL.md copies, each hash-identical to its pin,
+  and agrees with the sum of the remaining rows' `description_chars`. Against the manifest at
+  `3058b237`, `claude_on_description_chars` goes from 7,409 to 7,184 of the 8,000 cap, leaving
+  816, and `codex_enabled_description_chars` goes from 3,054 to 2,829. Each drops by the skill's
+  225 characters.
+- [`claude.settings.template.json`](../../adoption/templates/claude.settings.template.json): the
+  `skillOverrides` key.
+- `isolated-builder.md` in `.claude/agents/`,
+  [`adoption/agents/claude/`](../../adoption/agents/claude/isolated-builder.md) and
+  `examples/claude-native/agents/`: the `skills:` preload entry. The body sentence "Use the
+  preloaded verification-before-completion skill before claiming success; when the brief names
+  another project skill, Read its SKILL.md path." now reads "When the brief names a project skill,
+  Read its SKILL.md path." The three copies stay byte-identical, and
+  `tests/test_install_claude_profile.py` expects `context-mode:context-mode` as the builder's only
+  preload.
+- The builder's token-lanes block gains the evidence sentence
+  ([token-lanes addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-builder-evidence-sentence)).
+  The #381 preregistration replaces the builder's role-body row in
+  [its Amendment 3](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#amendment-3-2026-09-28-the-isolated-builder-body-without-verification-before-completion-before-execution).
+- The landscape-sweep templates: `templates.json` `common`, `TEMPLATE_SKILLS` in `build_args.py`
+  and the sweep README. The refutation role keeps "evidence before any verdict" as plain text that
+  names no skill. `PROMPTS_SHA256_CURRENT` in `tests/test_landscape_sweep_harness.py` records the
+  new prompt hash.
+- The workflow suites' reviewed builder preload set becomes `['context-mode:context-mode']` in
+  `test-envelope.mjs` and `test-contract-mutations.mjs`, and their `SHA256SUMS` lines change.
+- Current-state prose: the workflows README, the Ultracode recipe, `adoption/bootstrap.md`,
+  `catalogs/foundation/practice-references.json` and `docs/community-native-practice.md`, where
+  superpowers stays an `alternative`.
+
+Dated decision records and earlier addenda, including this record's, stay as written.
+
+**The evidence principle stays.** The skill's core principle, "Evidence before claims, always"
+(L10), does not leave with it. Three carriers remain:
+- [AGENTS.md](../../AGENTS.md) L16 states when earlier evidence still counts.
+- [`acceptance-evidence-policy.md`](../acceptance-evidence-policy.md) counts a passing check only
+  after the same check has failed with its condition absent (L42-45). It also requires retained
+  argument vectors, exit codes, output and artifact hashes (L57-59).
+- The builder block's last line: "Show evidence before a success claim: the command and what it
+  returned (code.claude.com best practices), or the file:line read." The same sentence opens line
+  13 of the default block.
+
+**Condition C4.** This extends the [condition log](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule):
+
+| Condition | Change (date) | What children's start context says about the two skills |
+| --- | --- | --- |
+| C4 | this removal (2026-09-28) | default-block types: as C3; `isolated-builder`: the evidence sentence, with no preload and no body line naming the skill; the landscape-sweep templates name `search-first` only |
+
+On a host, C4 starts when the host steps below have run. As for C1 to C3, the review dates it only
+from that host's own record of those steps, and it reports a window that crosses an unrecorded
+boundary as mixed.
+
+**Host steps after the merge.** This change runs none of them.
+1. `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y -a claude-code codex`,
+   through the pinned skills 1.7.0 CLI. This is the rollback that
+   [`install_skills.py`](../../tools/adoption/install_skills.py) runs (L201), including its
+   agent list. Without `-a`, skills 1.7.0's `remove` selects every known agent and would delete a
+   same-named skill that another agent owns (L60-62). The practice-sweep record's M4 section gives
+   the form without `-a`; run the form above.
+2. `python3 tools/adoption/install_claude_profile.py --only guard --only agents` installs the new
+   builder block beside the hook and the new agent definitions.
+3. `python3 scripts/skills_status.py` reads the result back. The skill is no longer among the
+   manifest rows it checks. A leftover canonical folder or lock entry appears under "extra skills
+   not in manifest" (L360-366), which never affects the exit code, so the read-back must read that
+   list, not only the exit status. The script does not look for a leftover
+   `~/.claude/skills` link for a name outside the manifest, so check that path directly.
+
+The host's `skillOverrides` key for the skill in `~/.claude/settings.json` survives
+`apply_claude_settings.py`, whose merge keeps "base keys the template does not mention"
+(`deep_merge_dict`, L141-145). `skills_status.py` checks overrides only for manifest skills
+(L418-432), so the key is inert once the skill is gone, and removing it by hand is optional.
+
+**Review rule and counts.** The [carrier-conditions addendum](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule)
+added a with/without comparison of the builder's preload for this skill's Claude listing. That
+comparison no longer runs, because no preload or listing remains to vary. The
+[host-listing addendum](#addendum-2026-09-28-host-listing-drift-restored) (#461) records 153
+lifetime `/skill-doctor` uses of the skill as an observational count; this record did not measure
+them. They do not bear on the removal, because the rule triggers on conflict, not on use. Whether
+`/skill-doctor` counts a preload as a use stays open, as the carrier-conditions addendum left it.
+
+**Evidence class.** The rule and the removed text are structural: this record, the manifest, the
+template, and the agent and block files. Finding 1's citations were re-read in the hash-matching
+installed copy. Findings 2 and 3 are the practice-sweep session's retained quotes and lane return,
+linked above, and the use count is #461's observational count. None was re-run here. The budget
+totals were recomputed with the manifest's method from installed SKILL.md copies that match their
+pins. No host removal, native child run or review result is claimed.
+
+**Overturn.** Re-add the skill as a trial row only if all three hold:
+- an upstream revision drops the absolute freshness requirement (L20, L28 and the "Previous run"
+  entry at L42);
+- that revision is read in full against CLAUDE.md and AGENTS.md again;
+- it is re-pinned through this manifest with its tree, SKILL.md hash and budget.

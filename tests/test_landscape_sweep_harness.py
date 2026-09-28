@@ -43,7 +43,10 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # 2026-09-27: the maintenance rule is derived from the OpenSSF Scorecard Maintained check, and licenses are information only
 # (never a refutation reason), per the operator's 2026-09-26/27 decisions. Later on 2026-09-27 the facts refuter
 # gained the unknown-field, maintenance and license exceptions (docs/decisions/2026-09-27-prompt-audit-resolution.md).
-PROMPTS_SHA256_CURRENT = "11fcd52312b96845a23d14ff739322bb9827eae33fd8760dff241585453b0107"
+# 2026-09-28: the common Skills paragraph drops verification-before-completion, which the skills trial removed under
+# its conflict rule (docs/decisions/2026-09-25-skills-trial-and-usage.md, 2026-09-28 removal addendum); the refutation
+# rule "evidence before any verdict" stays as plain text. Previous value: 11fcd52312b9…0107.
+PROMPTS_SHA256_CURRENT = "9c34fa7211bcd90e8ebc3bc5f45ed308fede34098b59dbc308a8f25edd07f14b"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"

@@ -87,7 +87,8 @@ lane. The GPT-6 model is a per-run choice (`build_args.py --gpt6-model`, default
 `staged.json`, in each job directory and in every GPT-6 vote.
 
 The templates tell each role which pinned skills to use (search-first and iterative-retrieval for discovery;
-verification-before-completion, supply-chain-risk-auditor and fp-check for refutation, plus layer-specific skills).
+supply-chain-risk-auditor and fp-check for refutation, which takes evidence before any verdict, plus layer-specific
+skills).
 Each worker reports the skills it used in `skills_used`, and `returns.json` totals them in `skills_usage`.
 
 `build_args.py` refuses to stage a run when the templates name a skill that `adoption/skills/manifest.json` does not
