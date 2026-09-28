@@ -14019,8 +14019,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
-      "sha256": "1affb7b470c3b1c12b51e98065572486c0567db874795d0a319cbf6b76952491",
-      "bytes": 17755
+      "sha256": "ab2c308ae656680d3eda27e91d78e2965245c9f178b36ad27ab1e2af695987c6",
+      "bytes": 18885
     },
     {
       "path": "docs/decisions/2026-09-28-community-sweep.md",
@@ -34749,8 +34749,8 @@
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/README.md",
-      "sha256": "eda104c0bc9b9577c8466466014a001ff5ef766e364bd6af52e1246783592ddb",
-      "bytes": 6161
+      "sha256": "e6912072eb9579da7fcfc042e235b978aa03f83a17bcb076930b21715538a388",
+      "bytes": 6381
     },
     {
       "path": "evidence/artifacts/prompt-audit-an13-m45-20260928/adjudication/adjudication-inputs/m5.AB.json",
