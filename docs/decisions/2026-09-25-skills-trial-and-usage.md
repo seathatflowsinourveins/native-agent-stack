@@ -768,3 +768,86 @@ gates, so this listing rests on that precedent, not on a failing test.
 | Install, settings apply, Codex disable, host read-back | our-integration, with Claude Code's own `/skill-doctor` as the native read-back (one host, 2026-09-28) | [security-audit-host-install-20260928](../../evidence/artifacts/security-audit-host-install-20260928/README.md): `installed`, every `skills_status` check `ok`, listing `name-only` at 20 context tokens. The Codex disable went in 10 s after the install, not before |
 | M5b gate 1: the unchanged upstream `node --test` at the pin | upstream-unchanged (one host, 2026-09-28) | Same receipt: 65 of 65 pass on Node v24.21.0. The four test and validator files match the pin byte for byte |
 | `name-only` invocation reach (a typed `/security-audit`, unprompted model invocation), M5b gates 2 and 3, M5c, sandbox measurement | live-run-pending | M5c waits for Gate A and Gate B; no labelled fixture exists yet |
+
+## Addendum 2026-09-28: carrier conditions and the verification review rule
+
+**Why the trial needs this.** The TOKEN LANES carrier
+([decision](2026-09-27-token-lanes-subagent-start.md)) adds text to a subagent's start context
+through `SubagentStart`. From its first revision, that text told children to follow
+`verification-before-completion` and to research with `search-first`. An instruction that names a
+skill can raise its use count with no change in the skill's listing or usefulness, so the
+[name-only confound](#listing-policy) ("compare only within a listing state") gains another
+dimension: the instructions a child receives. The carrier is one source; the landscape-sweep
+templates and two role changes are others (other sources and role changes, below). This
+addendum logs these conditions and adds a comparison to the review of
+`verification-before-completion`'s Claude listing. It changes no `skillOverrides` state, no
+manifest entry (the prune rule included) and no agent preload.
+
+**Condition log.**
+
+| Condition | Carrier revision (merge, UTC) | What children's start context says about the two skills |
+| --- | --- | --- |
+| C0 | none | nothing from the carrier |
+| C1 | [#378](https://github.com/seathatflowsinourveins/native-agent-stack/pull/378), `0c33b37a` (2026-09-27T06:11:54Z) | every non-blind child: "follow the installed verification-before-completion skill: real command output before any success claim", then the `search-first` sentence; #412 and #421 left both instructions unchanged |
+| C2 | [#447](https://github.com/seathatflowsinourveins/native-agent-stack/pull/447), `f508ffba` (2026-09-28T03:39:00Z) | default-block types: both sentences; `isolated-builder`: the verification sentence only; `stack-researcher`, `stack-verifier`, `evidence-reviewer`, `security-reviewer` and `source-scout`: neither; `semantic-evidence-reviewer` and `blind-*` types: nothing ([role-matched addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)) |
+| C3 | the [verification-line addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-verification-line), dated 2026-09-28 and merged with this addendum | default-block types: an evidence sentence that names no skill, then the `search-first` sentence; no role block names either skill |
+
+**Boundaries.** A host changes condition when `tools/adoption/install_claude_profile.py`
+installs a revision, not at its merge: the hook reads the block files installed beside it. The
+installer writes no install record, and its `shutil.copy2` (L113 for hooks, L143 for agents)
+keeps the source file's modification time; #381's frozen procedure records hashes, not install
+times. The one install time this repository records is the C1 install that the coordinator
+reported for its local measurement: 08:26:32Z on 2026-09-27, from `main` at `5f3a7c21`
+([measured-gap addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-measured-fetch-and-containment-gaps)).
+The review therefore assigns a window to a condition only from a host's own record of its
+installs, and it reports a window that crosses an unrecorded boundary as mixed. A separate
+boundary lies inside C0: `isolated-builder` has preloaded the skill, and its body has named it,
+since [#376](https://github.com/seathatflowsinourveins/native-agent-stack/pull/376) (`623d34fa`,
+merged 2026-09-27T03:38:47Z; the
+[targeted role preloads](#addendum-2026-09-26-targeted-role-preloads-security-reviewer-isolated-builder)
+addendum). On a host, that boundary is when `install_claude_profile.py` installed the agent
+definition. This record does not establish whether `/skill-doctor` counts a preload as a use.
+
+**Other sources and role changes.**
+- The landscape-sweep templates name both skills in every sweep worker's prompt from `1b0e4598`
+  (2026-09-26T05:08:52Z) onward: "Discovery: search-first ... Refutation:
+  verification-before-completion (evidence before any verdict)"
+  ([`templates.json`](../../tools/sota-convergence/landscape-sweep/templates.json), `common`;
+  `TEMPLATE_SKILLS` in [`build_args.py`](../../tools/sota-convergence/landscape-sweep/build_args.py)
+  L59). The Claude workers and the GPT-6 lane, which composes its prompts from the same templates,
+  both receive them, and no carrier revision changes them. In the C0 baseline window, when no child
+  received `SubagentStart` context, 120 workflow-subagent children in one session made 108
+  `verification-before-completion` and 46 `search-first` Skill calls
+  ([child-lane baseline](../../evidence/artifacts/child-lane-baseline-20260926/README.md#results-claude-children-639-in-7-sessions)).
+  That set matches the templates' Discovery and Refutation list, which is consistent with
+  template-driven use but does not prove it.
+- [#398](https://github.com/seathatflowsinourveins/native-agent-stack/pull/398) (`54834120`,
+  merged 2026-09-27T14:27:46Z) moved the sweep's Claude judgment stages to the
+  `landscape-sweep-worker` type on Opus, `refute-facts` from Sonnet. Earlier sweep children carry no
+  such type, so the sweep's own run records identify them.
+- [#402](https://github.com/seathatflowsinourveins/native-agent-stack/pull/402) (`d022295a`,
+  merged 2026-09-27T14:04:25Z), inside C1, moved `isolated-builder` from `model: sonnet` with
+  `isolation: worktree` to `model: opus` without frontmatter isolation.
+
+**Review rule, 2026-10-25.** The review splits each skill's uses by host and condition, within
+its listing state. On each client it reports sweep workers apart from other children, and it
+reports builder uses before and after each host's #402 install apart. For
+`verification-before-completion`'s Claude listing (`trial`, `on`, preloaded by
+`isolated-builder`), a Claude use count does not show usefulness: under C1 and C2 the carrier
+prompted its use, the sweep templates prompt it, and the builder's preload delivers its content
+without a `Skill` call. The review therefore adds a with/without comparison that varies that
+preload on frozen builder tasks, run through an upstream evaluation harness that the review record
+names with its pin before the run, comparing tokens, elapsed time and review-found defects. The
+count rule still applies as written: this addendum changes no manifest entry, and
+`tools/skill-usage/skill_usage.py` (L516-538) lists a trial skill as a prune candidate when every
+evaluated client shows zero uses and the skill is at least `window_days` old. Codex enablement
+stays under that rule, read with the sweep split. If the comparison and the count rule disagree
+for the Claude listing, the review writes the resulting exception or demotion into the manifest
+update and follow-up decision record that the [trial window end](#overturn-conditions) already
+requires. `search-first` is a `kept` verdict winner: its split usage is reported, and it changes
+only through a verdict re-record, as the prune rule already states.
+
+**Evidence class.** The condition log and the other sources are structural: merge commits, block
+files, templates and agent definitions at each revision. The C0 counts are the baseline's
+retained measurement, quoted as such. This addendum makes no new measurement of use and claims no
+review result.
