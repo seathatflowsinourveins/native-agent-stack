@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+import json
 import os
 from pathlib import Path
 import re
@@ -20,6 +21,15 @@ from recipe import HERE, arm_config, read_json, tool_filter
 from e2e.check import read_report
 
 
+# host.run_probe's receipt (plan E1); the summary copies counts and booleans only.
+PROBE_MECHANISM = "internal-isolated+nginx-v1-allowlist"
+PROBE_FIELDS = {
+    "p0": ("requests", "observed", "matched", "passed"),
+    "p1": ("requests", "observed", "matched", "passed"),
+    "p2": ("connects", "observed", "connected", "errors", "dns", "dns_matched", "ipv6_non_loopback",
+           "ipv6_link_local", "ipv6_loopback", "passed"),
+    "targets": ("addresses", "ports", "pairs"),
+}
 COLUMNS = (
     "timestamp", "path", "status", "model", "reasoning_effort_requested",
     "reasoning_effort_upstream", "tokens_in", "tokens_cache_read", "tokens_reasoning", "correlation_id",
@@ -169,6 +179,42 @@ def observations(events, known_skills=()):
             "skills_observed": dict(skills), "basis": "native ObservationEvent fields; registration alone is not usage"}
 
 
+def summary_value(value):
+    """Numbers, booleans, errno-name counts and port lists only; anything else becomes None."""
+    if value is None or type(value) in (bool, int):
+        return value
+    if isinstance(value, dict):
+        return {key: count for key, count in value.items()
+                if isinstance(key, str) and re.fullmatch(r"[A-Za-z_<>]{1,32}", key) and type(count) is int}
+    if isinstance(value, list) and all(type(item) is int for item in value):
+        return value
+    return None
+
+
+def isolation_summary(result):
+    """The host-written probe receipt without its network/container IDs or run id."""
+    try:
+        probe = json.loads(read_bounded(Path(result) / "isolation-probe.json", limit=1024 * 1024))
+    except (OSError, ValueError):
+        return {"status": "absent"}
+    if not isinstance(probe, dict):
+        return {"status": "unreadable"}
+    try:
+        time_value(probe.get("verified_at"))
+        verified_at = probe["verified_at"] if isinstance(probe["verified_at"], str) else None
+    except (ValueError, TypeError, OverflowError, OSError):
+        verified_at = None
+    codes = probe.get("exit_codes") if isinstance(probe.get("exit_codes"), dict) else {}
+    summary = {"status": "observed",
+               "mechanism": PROBE_MECHANISM if probe.get("mechanism") == PROBE_MECHANISM else "<other>",
+               "verified_at": verified_at, "passed": probe.get("passed") is True,
+               "exit_codes": {role: summary_value(codes.get(role)) for role in ("gw", "int")}}
+    for section, keys in PROBE_FIELDS.items():
+        values = probe.get(section) if isinstance(probe.get(section), dict) else {}
+        summary[section] = {key: summary_value(values[key]) for key in keys if key in values}
+    return summary
+
+
 def create_receipt(result, database=None):
     result = Path(result)
     window = read_json(result / "window.json")
@@ -197,16 +243,16 @@ def create_receipt(result, database=None):
                    and checked.get("conversion_exit_code") == 0 and window.get("worker_exit_code") == 0)
     termination = window.get("agent_termination")
     usage = summarize_gateway(rows, selection)
-    def removals(pattern):
+    def removals(*patterns):
         found = []
-        for path in sorted(result.glob(pattern)):
+        for path in sorted(path for pattern in patterns for path in result.glob(pattern)):
             try:
                 found.append(read_json(path).get("confirmed_removed") is True)
             except (OSError, ValueError, AttributeError):
                 found.append(False)
         return {"attempts": len(found), "confirmed_removed": sum(found), "complete": bool(found) and all(found)}
     return {
-        "schema_version": 5, "evidence_class": "SDK inference adapter with official SWE-bench grading",
+        "schema_version": 6, "evidence_class": "SDK inference adapter with official SWE-bench grading",
         **{k: selection[k] for k in ("arm", "base_url", "gateway_upstream", "requested_model", "gateway_model",
                                      "gateway_path", "compression_combo")},
         "header_names": window.get("header_names", sorted(selection["headers"])),
@@ -218,7 +264,7 @@ def create_receipt(result, database=None):
         "agent_termination": termination if termination in AGENT_TERMINATIONS else None,
         "agent_termination_basis": ("agent-server REST status and latest ConversationErrorEvent; the server shares "
                                     "the model terminal's UID and store, so this selects exit 1 or 3 only"),
-        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start", "wait", "result", "deadline"} else None,
+        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start", "probe", "wait", "result", "deadline"} else None,
         "task_passed": task_passed,
         # The terminal shares the SDK's UID and writable persistence. Source:
         # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py:157-170.
@@ -227,9 +273,11 @@ def create_receipt(result, database=None):
         "independent_trace_required": True,
         "not_collected_reason": NOT_COLLECTED_REASON,
         "skills_listed_at_start": NOT_COLLECTED, "skill_listing_matches_manifest": NOT_COLLECTED,
-        # host.cleanup_container and host.cleanup_network records, counted separately.
-        "container_cleanup": removals("*.log.cleanup.json"),
+        # host.cleanup_container and host.cleanup_network records, counted
+        # separately; probe containers log beside their output directories.
+        "container_cleanup": removals("*.log.cleanup.json", "probes/*/*.log.cleanup.json"),
         "network_cleanup": removals("network-*.cleanup.json"),
+        "isolation": isolation_summary(result),
         "gateway": {
             "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, **usage,
             "entry_port": selection["gateway_port"],

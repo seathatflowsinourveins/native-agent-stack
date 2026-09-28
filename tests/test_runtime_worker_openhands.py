@@ -8,7 +8,9 @@ structural/fixture checks, not upstream SDK or live gateway acceptance.
 
 import asyncio
 import contextlib
+from datetime import datetime, timedelta, timezone
 import hashlib
+import http.server
 import io
 import json
 import os
@@ -16,11 +18,13 @@ import importlib.util
 from pathlib import Path
 import re
 import shutil
+import socket
 import sqlite3
 import stat
 import subprocess
 import sys
 import tempfile
+import threading
 from types import SimpleNamespace
 import unittest
 import uuid
@@ -669,6 +673,71 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
                                  ({"failure_stage": "preflight"}, 3)):
             self.assertEqual(host.result_exit(result), expected)
 
+    def run_to_probe(self, host, probe_passed):
+        """host.run through prepare and the P0-P2 probe, with every host and Docker step mocked."""
+        prefix, state = self.result / "prefix", self.result / "state"
+        (prefix / "venv/bin").mkdir(parents=True)
+        (prefix / "venv/bin/python").write_text("")
+        state.mkdir()
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        (state / "installation.json").write_text(json.dumps({"exit_code": 0, "requirements_sha256": pins["requirements_sha256"]}))
+        task_file = self.result / "task.json"
+        task_file.write_text("[]")
+        stack = self.result / "stack"
+        (stack / "blueprints/runtime-workers/skills").mkdir(parents=True)
+        (stack / "blueprints/runtime-workers/skills/manifest.json").write_text("{}")
+        task = {"instance_id": self.INSTANCE, "repo": "django/django", "base_commit": "a" * 40}
+        output = io.StringIO()
+        with contextlib.ExitStack() as stack_context:
+            enter = stack_context.enter_context
+            enter(patch.dict(os.environ, {"OPENHANDS_TASK_FILE": str(task_file), "OPENHANDS_TASK_SHA256": "0" * 64,
+                                          "OPENHANDS_STACK_ROOT": str(stack)}))
+            for name in ("OPENHANDS_ARM", "OPENHANDS_MODEL", "OPENHANDS_BASE_URL", "OPENHANDS_COMPRESSION"):
+                os.environ.pop(name, None)
+            enter(patch.object(host, "preflight", return_value=(
+                pins, {"variables": {"HOST_PATH": "/usr/bin"}, "mcp_readonly_mounts": [], "qmd_collections": {}}, {})))
+            enter(patch.object(host, "pinned_image_identity", return_value="containerd"))
+            enter(patch.object(host, "load_task", return_value=task))
+            enter(patch.object(host, "clone_command", return_value=["true"]))
+            enter(patch.object(host, "logged_command", return_value=0))
+            enter(patch.object(host.subprocess, "check_output",
+                               side_effect=lambda argv, **kwargs: "" if "tag" in argv else "a" * 40 + "\n"))
+            enter(patch.object(host, "install_workspace_skills"))
+            enter(patch.object(host, "workspace_skills", return_value={}))
+            enter(patch.object(host, "worker_instruction", return_value="task"))
+            enter(patch.object(host, "model_visible"))
+            enter(patch.object(host, "execute_container", return_value=0))
+            prepare = enter(patch.object(host, "prepare_native_dispatch"))
+            probe = enter(patch.object(host, "run_probe", return_value=probe_passed))
+            teardown = enter(patch.object(host, "teardown_attempt", return_value=True))
+            enter(patch.object(host, "create_receipt", side_effect=self.absent_gateway_receipt()))
+            enter(contextlib.redirect_stdout(output))
+            code = host.run(prefix, state, run_id="rw-openhands-probe", arm="control", prepare_only=True)
+        return SimpleNamespace(code=code, prepare=prepare, probe=probe, teardown=teardown, prefix=prefix, state=state,
+                               pins=pins, result=state / "runs/rw-openhands-probe/control",
+                               output=json.loads(output.getvalue()))
+
+    def test_probe_failure_in_run_tears_down_once_and_exits_3(self):
+        # Plan E1/G7: a failed containment probe leaves no prepared attempt.
+        host = load_recipe_module("host.py")
+        run = self.run_to_probe(host, probe_passed=False)
+        self.assertEqual(run.code, 3)
+        run.prepare.assert_called_once()
+        run.probe.assert_called_once_with(run.state, "rw-openhands-probe", "control", run.prefix, run.pins)
+        run.teardown.assert_called_once_with(run.state, "rw-openhands-probe", "control")
+        status = json.loads((run.result / "status.json").read_text())
+        self.assertEqual((status["status"], status["failure_stage"]), ("failed", "probe"))
+        self.assertEqual(json.loads((run.result / "receipt.json").read_text())["failure_stage"], "probe")
+        self.assertEqual(run.output["failure_stage"], "probe")
+
+    def test_probe_pass_in_run_leaves_the_attempt_prepared(self):
+        host = load_recipe_module("host.py")
+        run = self.run_to_probe(host, probe_passed=True)
+        self.assertEqual(run.code, 0)
+        run.probe.assert_called_once()
+        run.teardown.assert_not_called()
+        self.assertIsNone(run.output["failure_stage"])
+
     def test_agent_limit_terminations_are_graded_but_never_success(self):
         # F16: an officially graded partial patch after an agent limit exits 1;
         # grading infrastructure failures keep exit 3.
@@ -1194,6 +1263,591 @@ class OpenHandsIsolationTests(unittest.TestCase):
         self.assertIs(json.loads((self.result / "network-gw.cleanup.json").read_text())["confirmed_removed"], True)
 
 
+class OpenHandsProbeTests(unittest.TestCase):
+    """Locally composed P0-P2 probe and dispatch gate (plan section 1, E1, G7).
+
+    Our integration checks with Docker mocked, not upstream tests. Nothing here
+    creates a container or network or sends a gateway request; the HTTP
+    fixture is an in-process server on 127.0.0.1. The live probe sequence in
+    README "Security posture" is the evidence for the topology itself.
+    """
+    OWNER = {"com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"}
+    ISOLATED = "com.docker.network.bridge.gateway_mode_ipv4"
+    # The plan's P1 denied list (section 1), in its order.
+    PLAN_DENIED = (
+        *(("GET", target) for target in (
+            "/api/settings", "/api/providers", "/api/keys", "/dashboard", "/v1/ws", "/v1/alpha/search",
+            "/v1/files", "/V1/models", "/v1/models/", "/v1/responses/x", "/v1/../api/settings",
+            "/v1/%2e%2e/api/settings", "/v1/models/../../api/keys", "//api/settings", "/codex/responses",
+            "/api/v1/responses", "/v1/models?x=1", "/v1/models?0")),
+        *(("POST", target) for target in (
+            "/responses", "/chat/completions", "/api/v1/responses", "/api/settings/require-login",
+            "/v1/responses?provider=x")),
+        ("DELETE", "/v1/models"), ("PUT", "/v1/responses"), ("GET", "/v1/responses"))
+    # iproute2 output shapes; 192.0.2.20 is an RFC 5737 documentation address.
+    SS = ("LISTEN 0      4096       127.0.0.1:20128      0.0.0.0:*\n"
+          "LISTEN 0      511            [::1]:3000          [::]:*\n"
+          "LISTEN 0      4096               *:8080             *:*\n"
+          "LISTEN 0      128    127.0.0.53%lo:53         0.0.0.0:*\n"
+          "LISTEN 0      4096 [::ffff:127.0.0.1]:9000          *:*\n"
+          "LISTEN 0      4096       127.0.0.1:3730       0.0.0.0:*\n"
+          "LISTEN 0      4096         0.0.0.0:20128      0.0.0.0:*\n")
+    IP = ("1: lo    inet 127.0.0.1/8 scope host lo\\       valid_lft forever preferred_lft forever\n"
+          "1: lo    inet 10.255.255.254/32 brd 10.255.255.254 scope global lo\\       valid_lft forever preferred_lft forever\n"
+          "2: eth0    inet 192.0.2.20/24 brd 192.0.2.255 scope global noprefixroute eth0\\       valid_lft forever preferred_lft forever\n"
+          "3: docker0    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0\\       valid_lft forever preferred_lft forever\n")
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.state = Path(self.tmp.name).resolve()
+        self.run_id, self.arm = "rw-openhands-fixture", "control"
+        self.stem = self.run_id + "-" + self.arm
+        self.result = self.state / "runs" / self.run_id / self.arm
+        self.result.mkdir(parents=True)
+        self.pins = json.loads((RECIPE / "pins.json").read_text())
+
+    @staticmethod
+    def closed_port():
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", 0))
+            return probe.getsockname()[1]
+
+    def serve(self, replies):
+        """In-process HTTP fixture on 127.0.0.1:0 recording each raw request line."""
+        seen = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def reply(self):
+                # self.path rewrites a leading "//" (CPython gh-87389); the raw
+                # request line keeps the target byte-identical.
+                method, target, _ = self.requestline.split(" ", 2)
+                length = int(self.headers.get("Content-Length") or 0)
+                body = self.rfile.read(length) if length else b""
+                seen.append((method, target, body, self.headers.get("Content-Type")))
+                status, route = replies.get((method, target), (403, None))
+                payload = b"fixture-body-never-recorded"
+                self.send_response(status)
+                if route:
+                    self.send_header("x-omniroute-route-class", route)
+                self.send_header("Set-Cookie", "session=fixture-cookie")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+
+            do_GET = do_POST = do_PUT = do_DELETE = reply
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        return server.server_address[1], seen
+
+    def test_netprobe_lists_are_the_plan_lists_and_import_does_no_work(self):
+        with patch("socket.socket", side_effect=AssertionError("socket at import")), \
+                patch("socket.getaddrinfo", side_effect=AssertionError("dns at import")), \
+                patch("socket.create_connection", side_effect=AssertionError("connect at import")):
+            netprobe = load_recipe_module("e2e/netprobe.py")
+        self.assertEqual(netprobe.DENIED, self.PLAN_DENIED)
+        self.assertEqual(len(netprobe.DENIED), 26)
+        self.assertEqual(netprobe.P1_EXPECTED, (("gw", 8081, "GET", "/v1/models", 200, "CLIENT_API"),
+                                                *(("gw", 8081, m, t, 403, None) for m, t in self.PLAN_DENIED)))
+        self.assertEqual(netprobe.p0_expected(20129), (("10.0.2.2", 20129, "GET", "/v1/models", 200, "CLIENT_API"),
+                                                        ("10.0.2.2", 20129, "GET", "/api/settings", None, "MANAGEMENT")))
+        self.assertEqual(netprobe.dns_expected(self.stem + "-server"), (
+            ("example.com", False), ("github.com", False), ("host.docker.internal", False),
+            ("gw", True), (self.stem + "-server", True)))
+        self.assertEqual(netprobe.FIXED_ADDRESSES, ("10.0.2.2", "10.0.2.3", "172.17.0.1", "10.0.0.1", "10.255.255.254"))
+        self.assertEqual(netprobe.EXTRA_PORTS, (53,))
+        # P3 is a documented skeleton; it is never run in phase 2.
+        with self.assertRaises(NotImplementedError):
+            netprobe.p3_control_call()
+
+    def test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies(self):
+        netprobe = load_recipe_module("e2e/netprobe.py")
+        port, seen = self.serve({("GET", "/v1/models"): (200, "CLIENT_API"), ("GET", "/management-class"): (200, "MANAGEMENT"),
+                                 ("GET", "/other-class"): (403, "SOMETHING-ELSE")})
+        pairs = (("GET", "/v1/models"), ("GET", "/management-class"), ("GET", "/other-class"), *self.PLAN_DENIED)
+        records = [netprobe.http_probe("127.0.0.1", port, method, target) for method, target in pairs]
+        self.assertEqual([(method, target) for method, target, _, _ in seen], list(pairs))
+        for raw in ("/v1/%2e%2e/api/settings", "//api/settings", "/v1/models?0", "/V1/models", "/v1/../api/settings"):
+            self.assertIn(("GET", raw), [(method, target) for method, target, _, _ in seen])
+        self.assertEqual([(body, kind) for method, _, body, kind in seen if method == "POST"],
+                         [(b"{}", "application/json")] * 5)
+        self.assertEqual([(r["status"], r["route_class"]) for r in records[:3]],
+                         [(200, "CLIENT_API"), (200, "MANAGEMENT"), (403, "<other>")])
+        self.assertTrue(all(r["status"] == 403 and r["route_class"] is None and r["error"] is None for r in records[3:]))
+        self.assertEqual(set(records[0]), {"host", "port", "method", "target", "status", "route_class", "error"})
+        text = json.dumps(records)
+        for marker in ("fixture-body-never-recorded", "fixture-cookie", "Set-Cookie"):
+            self.assertNotIn(marker, text)
+        refused = netprobe.http_probe("127.0.0.1", self.closed_port(), "GET", "/v1/models")
+        self.assertEqual((refused["status"], refused["route_class"], refused["error"]), (None, None, "ECONNREFUSED"))
+
+    def test_netprobe_connects_resolves_and_reads_ipv6_without_defaults(self):
+        netprobe = load_recipe_module("e2e/netprobe.py")
+        listener = socket.socket()
+        self.addCleanup(listener.close)
+        listener.bind(("127.0.0.1", 0))
+        listener.listen()
+        open_port, closed = listener.getsockname()[1], self.closed_port()
+        records = netprobe.connect_all([("127.0.0.1", open_port), ("127.0.0.1", closed)], timeout=2, workers=2)
+        self.assertEqual([(r["address"], r["port"], r["connected"], r["error"]) for r in records],
+                         [("127.0.0.1", open_port, True, None), ("127.0.0.1", closed, False, "ECONNREFUSED")])
+        with patch.object(netprobe.socket, "getaddrinfo", side_effect=socket.gaierror(socket.EAI_NONAME, "fixture")):
+            self.assertEqual(netprobe.resolve("example.com"), {"name": "example.com", "resolved": False, "error": "EAI_NONAME"})
+        with patch.object(netprobe.socket, "getaddrinfo",
+                          return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("172.30.0.3", 0))]):
+            self.assertEqual(netprobe.resolve("gw"), {"name": "gw", "resolved": True, "error": None})
+        # /proc/net/if_inet6: address, ifindex, prefix, scope, flags, name.
+        lo = "00000000000000000000000000000001 01 80 10 80       lo\n"
+        link = "fe80000000000000004200fffeac1e02 02 40 20 80     eth0\n"
+        other = "20010db8000000000000000000000005 02 40 00 00     eth0\n"
+        self.assertEqual(netprobe.ipv6_summary(lo), {"available": True, "loopback": 1, "non_loopback": 0, "link_local": 0})
+        self.assertEqual(netprobe.ipv6_summary(lo + link), {"available": True, "loopback": 1, "non_loopback": 1, "link_local": 1})
+        self.assertEqual(netprobe.ipv6_summary(lo + link + other)["non_loopback"], 2)
+        with self.assertRaises(ValueError):
+            netprobe.ipv6_summary("garbage\n")
+
+    def expected_http(self, host_name, port, method, target):
+        status = 200 if (method, target) == ("GET", "/v1/models") else 403
+        return {"host": host_name, "port": port, "method": method, "target": target, "status": status,
+                "route_class": "CLIENT_API" if status == 200 else None, "error": None}
+
+    def test_netprobe_stops_at_the_first_unexpected_result(self):
+        netprobe = load_recipe_module("e2e/netprobe.py")
+        out = self.result / "probe-output"
+        out.mkdir()
+        target = out / "observations.json"
+
+        def forwarded(host_name, port, method, path, **kwargs):
+            record = self.expected_http(host_name, port, method, path)
+            return dict(record, status=404) if (method, path) == ("GET", "/v1/files") else record
+        previous = os.umask(0o077)
+        self.addCleanup(os.umask, previous)
+        with patch.object(netprobe, "http_probe", side_effect=forwarded) as http, \
+                patch.object(netprobe, "connect_all") as connects, patch.object(netprobe, "resolve") as resolve:
+            code = netprobe.main(["int", "--out", str(target), "--server", self.stem + "-server",
+                                  "--addresses", "10.0.2.2", "--ports", "20128"])
+        self.assertEqual(code, 1)
+        stop = self.PLAN_DENIED.index(("GET", "/v1/files")) + 2
+        data = json.loads(target.read_text())
+        self.assertEqual(len(data["p1"]), stop)
+        self.assertEqual(http.call_count, stop)
+        connects.assert_not_called()
+        resolve.assert_not_called()
+        self.assertNotIn("p2", data)
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o644)
+
+    def test_netprobe_int_mode_passes_only_when_everything_is_refused(self):
+        netprobe = load_recipe_module("e2e/netprobe.py")
+        server = self.stem + "-server"
+        for label, connected, resolvable, ipv6 in (("contained", False, False, 0), ("connect", True, False, 0),
+                                                   ("dns", False, True, 0), ("ipv6", False, False, 1)):
+            with self.subTest(label):
+                target = self.result / f"{label}.json"
+
+                def connects(pairs, **kwargs):
+                    return [{"address": a, "port": p, "connected": connected, "error": None if connected else "ENETUNREACH"}
+                            for a, p in pairs]
+
+                def resolve(name):
+                    ok = name in {"gw", server} or resolvable
+                    return {"name": name, "resolved": ok, "error": None if ok else "EAI_NONAME"}
+                with patch.object(netprobe, "http_probe", side_effect=self.expected_http), \
+                        patch.object(netprobe, "connect_all", side_effect=connects) as batch, \
+                        patch.object(netprobe, "resolve", side_effect=resolve), \
+                        patch.object(netprobe, "read_ipv6", return_value={
+                            "available": True, "loopback": 1, "non_loopback": ipv6, "link_local": ipv6}):
+                    code = netprobe.main(["int", "--out", str(target), "--server", server,
+                                          "--addresses", "10.0.2.2,192.0.2.20", "--ports", "53,20128"])
+                self.assertEqual(code, 0 if label == "contained" else 1)
+                self.assertEqual(batch.call_args.args[0], [("10.0.2.2", 53), ("10.0.2.2", 20128),
+                                                           ("192.0.2.20", 53), ("192.0.2.20", 20128)])
+                data = json.loads(target.read_text())
+                verdict = netprobe.evaluate_p2(data.get("p2"), ["10.0.2.2", "192.0.2.20"], [53, 20128], server)
+                self.assertEqual(verdict["passed"], label == "contained")
+        for argv in (["int", "--out", str(self.result / "x.json"), "--server", "other", "--addresses", "10.0.2.2", "--ports", "53"],
+                     ["int", "--out", str(self.result / "y.json"), "--server", server, "--addresses", "gw", "--ports", "53"],
+                     ["int", "--out", str(self.result / "z.json"), "--server", server, "--addresses", "10.0.2.2", "--ports", "0"]):
+            with self.subTest(argv=argv), patch.object(netprobe, "http_probe") as http, self.assertRaises(ValueError):
+                netprobe.main(argv)
+            http.assert_not_called()
+
+    def test_probe_targets_come_from_ss_ip_and_the_attempt_networks(self):
+        host = load_recipe_module("host.py")
+        self.assertEqual(host.listener_ports(self.SS), [53, 3000, 3730, 8080, 9000, 20128])
+        # Container loopback is its own namespace: 127.0.0.0/8 is excluded by address.
+        self.assertEqual(host.host_ipv4_addresses(self.IP), ["10.255.255.254", "172.17.0.1", "192.0.2.20"])
+        views = self.views()
+        networks = {"int": views[("network", self.stem + "-int")], "gw": views[("network", self.stem + "-gw")]}
+        addresses, ports = host.probe_targets(networks, self.SS, self.IP)
+        self.assertEqual(addresses, ["10.0.0.1", "10.0.2.2", "10.0.2.3", "10.255.255.254", "172.17.0.1",
+                                     "172.30.0.1", "172.31.0.1", "192.0.2.20"])
+        self.assertEqual(ports, [53, 3000, 3730, 8080, 9000, 20128])
+        no_gateway = dict(networks, int=dict(networks["int"], ipam=[{"Subnet": "172.29.0.0/16"}]))
+        self.assertIn("172.29.0.1", host.probe_targets(no_gateway, self.SS, self.IP)[0])
+        for bad in ("LISTEN 0 4096 127.0.0.1:notaport 0.0.0.0:*\n", "garbage\n", "LISTEN 0 4096 127.0.0.1:70000 0.0.0.0:*\n"):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                host.listener_ports(bad)
+        with self.assertRaises(ValueError):
+            host.probe_targets(dict(networks, int=dict(networks["int"], ipam=[])), self.SS, self.IP)
+
+    def test_probe_containers_use_the_agent_image_hardening_and_only_their_mounts(self):
+        host = load_recipe_module("host.py")
+        prefix = self.state / "prefix"
+        for role, network in (("gw", self.stem + "-gw"), ("int", self.stem + "-int")):
+            with self.subTest(role=role):
+                output = self.result / "probes" / role
+                name, argv = host.probe_command(self.pins, prefix, self.stem, role, output, ["--upstream-port", "20128"])
+                self.assertEqual(name, f"{self.stem}-probe-{role}")
+                self.assertEqual(argv[:len(host.DOCKER) + 2], [*host.DOCKER, "run", "--rm"])
+                for flag in ("--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--pull=never",
+                             "--network=" + network):
+                    self.assertIn(flag, argv)
+                self.assertEqual(argv[argv.index("--user") + 1], "10001:10001")
+                mounts = [argv[i + 1] for i, arg in enumerate(argv) if arg == "--mount"]
+                self.assertEqual(mounts, [f"type=bind,src={prefix}/venv,dst={prefix}/venv,readonly",
+                                          f"type=bind,src={host.HERE},dst=/recipe,readonly",
+                                          f"type=bind,src={output},dst=/probe-output"])
+                self.assertFalse(any(arg == "--publish" or arg.startswith(("-p", "--publish=", "--env-file"))
+                                     for arg in argv))
+                self.assertEqual(argv[argv.index("--entrypoint") + 1], f"{prefix}/venv/bin/python")
+                tail = argv[argv.index(self.pins["image"]["ref"]):]
+                self.assertEqual(tail, [self.pins["image"]["ref"], "/recipe/e2e/netprobe.py", role,
+                                        "--out", "/probe-output/observations.json", "--upstream-port", "20128"])
+        for role in ("server", "proxy", "gw-int"):
+            with self.subTest(role=role), self.assertRaises(ValueError):
+                host.probe_command(self.pins, prefix, self.stem, role, self.result, [])
+
+    def views(self):
+        """Selected-field inspect views (host.NETWORK_FORMAT, host.CONTAINER_FORMAT) of one attempt."""
+        names = {role: f"{self.stem}-{role}" for role in ("int", "gw", "server", "proxy")}
+        ids = {role: hashlib.sha256(name.encode()).hexdigest() for role, name in names.items()}
+
+        def network(role, prefix, internal):
+            return {"id": ids[role], "name": names[role], "driver": "bridge", "internal": internal, "ipv6": False,
+                    "options": {self.ISOLATED: "isolated"} if internal else {}, "labels": dict(self.OWNER),
+                    "ipam": [{"Subnet": prefix + ".0.0/16", "Gateway": prefix + ".0.1"}]}
+
+        def endpoint(role, address, aliases=None):
+            return {"NetworkID": ids[role], "IPAddress": address, "Aliases": aliases}
+        return {
+            ("network", names["int"]): network("int", "172.30", True),
+            ("network", names["gw"]): network("gw", "172.31", False),
+            ("container", names["server"]): {
+                "id": ids["server"], "name": "/" + names["server"], "running": True, "labels": dict(self.OWNER),
+                "networks": {names["int"]: endpoint("int", "172.30.0.2")}},
+            ("container", names["proxy"]): {
+                "id": ids["proxy"], "name": "/" + names["proxy"], "running": True, "labels": dict(self.OWNER),
+                "networks": {names["gw"]: endpoint("gw", "172.31.0.2"),
+                             names["int"]: endpoint("int", "172.30.0.3", ["gw"])}},
+        }
+
+    def commands(self, host, views):
+        """subprocess.check_output fake: selected-field inspects, ss and ip; nothing else."""
+        templates = {"network": host.NETWORK_FORMAT, "container": host.CONTAINER_FORMAT}
+
+        def check_output(argv, **kwargs):
+            argv = list(argv)
+            if argv[:len(host.DOCKER)] == host.DOCKER:
+                kind, verb, flag, template, name = argv[len(host.DOCKER):]
+                # Never a full inspect: the server's Config.Env holds the session key.
+                self.assertEqual((verb, flag, template), ("inspect", "--format", templates[kind]))
+                return json.dumps(views[(kind, name)])
+            if argv == ["ss", "-ltnH"]:
+                return self.SS
+            if argv == ["ip", "-4", "-o", "addr"]:
+                return self.IP
+            raise AssertionError(argv)
+        return check_output
+
+    def prepared(self, port=3740):
+        """A prepared attempt's host files, as host.prepare_native_dispatch writes them."""
+        host = load_recipe_module("host.py")
+        selection = load_recipe_module("recipe.py").arm_config(self.arm)
+        _, sha = host.write_proxy_config(self.result, host.render_proxy_config(selection, self.run_id))
+        (self.result / "status.json").write_text(json.dumps({
+            "run_id": self.run_id, "arm": self.arm, "status": "prepared", "server_name": self.stem + "-server",
+            "proxy_name": self.stem + "-proxy", "port": port, "proxy_config_sha256": sha}))
+        return host
+
+    @staticmethod
+    def option(argv, flag):
+        return argv[argv.index(flag) + 1]
+
+    def observations(self, netprobe, argv):
+        """What netprobe writes when every result is the expected one."""
+        mode = argv[argv.index("/recipe/e2e/netprobe.py") + 1]
+
+        def record(item):
+            host_name, port, method, target, status, route = item
+            return {"host": host_name, "port": port, "method": method, "target": target,
+                    "status": 200 if status is None else status, "route_class": route, "error": None}
+        if mode == "gw":
+            return {"probe": "netprobe-v1", "mode": mode,
+                    "p0": [record(item) for item in netprobe.p0_expected(int(self.option(argv, "--upstream-port")))]}
+        addresses = self.option(argv, "--addresses").split(",")
+        ports = [int(port) for port in self.option(argv, "--ports").split(",")]
+        return {"probe": "netprobe-v1", "mode": mode, "p1": [record(item) for item in netprobe.P1_EXPECTED],
+                "p2": {"connects": [{"address": a, "port": p, "connected": False, "error": "ENETUNREACH"}
+                                    for a in addresses for p in ports],
+                       "dns": [{"name": name, "resolved": ok, "error": None if ok else "EAI_NONAME"}
+                               for name, ok in netprobe.dns_expected(self.option(argv, "--server"))],
+                       "ipv6": {"available": True, "loopback": 1, "non_loopback": 0, "link_local": 0}}}
+
+    def probe(self, host, views=None, mutate=None, codes=None):
+        """host.run_probe with the two probe containers faked through execute_container."""
+        netprobe = load_recipe_module("e2e/netprobe.py")
+        runs = []
+
+        def execute(argv, name, logfile, timeout):
+            runs.append((name, list(argv)))
+            mounts = [dict(part.split("=", 1) for part in argv[i + 1].split(",") if "=" in part)
+                      for i, arg in enumerate(argv) if arg == "--mount"]
+            output = Path(next(m["src"] for m in mounts if m["dst"] == "/probe-output"))
+            data = self.observations(netprobe, argv)
+            if mutate:
+                mutate(data)
+            (output / "observations.json").write_text(json.dumps(data))
+            return (codes or {}).get(data["mode"], 0)
+        with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views or self.views())), \
+                patch.object(host, "execute_container", side_effect=execute):
+            passed = host.run_probe(self.state, self.run_id, self.arm, self.state / "prefix", self.pins)
+        return passed, runs
+
+    def gate(self, host, now, views=None):
+        with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views or self.views())):
+            return host.verify_isolation(self.state, self.run_id, self.arm, 3740, now=now)
+
+    def test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate(self):
+        host = self.prepared()
+        previous = os.umask(0o022)
+        self.addCleanup(os.umask, previous)
+        passed, runs = self.probe(host)
+        self.assertTrue(passed)
+        path = self.result / "isolation-probe.json"
+        self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+        receipt = json.loads(path.read_text())
+        views = self.views()
+        self.assertEqual({key: receipt[key] for key in (
+            "mechanism", "run_id", "arm", "run_network_id", "gw_network_id", "server_container_id",
+            "proxy_container_id", "proxy_image", "proxy_config_sha256", "probe_script_sha256", "upstream",
+            "host_ingress", "exit_codes", "passed")}, {
+            "mechanism": "internal-isolated+nginx-v1-allowlist", "run_id": self.run_id, "arm": self.arm,
+            "run_network_id": views[("network", self.stem + "-int")]["id"],
+            "gw_network_id": views[("network", self.stem + "-gw")]["id"],
+            "server_container_id": views[("container", self.stem + "-server")]["id"],
+            "proxy_container_id": views[("container", self.stem + "-proxy")]["id"],
+            "proxy_image": self.pins["gateway_proxy"]["ref"],
+            "proxy_config_sha256": hashlib.sha256((self.result / "proxy/nginx.conf").read_bytes()).hexdigest(),
+            "probe_script_sha256": hashlib.sha256((RECIPE / "e2e/netprobe.py").read_bytes()).hexdigest(),
+            "upstream": "10.0.2.2:20128", "host_ingress": "127.0.0.1:3740", "exit_codes": {"gw": 0, "int": 0},
+            "passed": True})
+        self.assertEqual((receipt["p0"]["requests"], receipt["p1"]["requests"]), (2, 27))
+        self.assertEqual(receipt["targets"], {"addresses": 8, "ports": [53, 3000, 3730, 8080, 9000, 20128], "pairs": 48})
+        self.assertEqual((receipt["p2"]["connects"], receipt["p2"]["connected"], receipt["p2"]["dns_matched"]), (48, 0, 5))
+        self.assertTrue(all(receipt[section]["passed"] for section in ("p0", "p1", "p2")))
+        for address in ("192.0.2.20", "172.30.0.2", "172.30.0.3", "10.255.255.254"):
+            self.assertNotIn(address, path.read_text())
+        # One container per network, each with an output directory of its own.
+        self.assertEqual([name for name, _ in runs], [self.stem + "-probe-gw", self.stem + "-probe-int"])
+        self.assertIn("--network=" + self.stem + "-gw", runs[0][1])
+        self.assertIn("--network=" + self.stem + "-int", runs[1][1])
+        outputs = [arg for _, argv in runs for arg in argv if "dst=/probe-output" in arg]
+        self.assertEqual(len(set(outputs)), 2)
+        self.assertEqual(self.option(runs[0][1], "--upstream-port"), "20128")
+        self.assertEqual(self.option(runs[1][1], "--ports"), "53,3000,3730,8080,9000,20128")
+        self.assertEqual(self.option(runs[1][1], "--server"), self.stem + "-server")
+        # The gate accepts the real writer's output while the live IDs match.
+        verified = host.time_value(receipt["verified_at"])
+        self.assertEqual(self.gate(host, verified + timedelta(seconds=900))["passed"], True)
+
+    def test_gate_refuses_stale_future_mismatched_or_rebound_receipts(self):
+        host = self.prepared()
+        passed, _ = self.probe(host)
+        self.assertTrue(passed)
+        path = self.result / "isolation-probe.json"
+        original = json.loads(path.read_text())
+        verified = host.time_value(original["verified_at"])
+        soon = verified + timedelta(seconds=60)
+        self.gate(host, soon)
+        rebound = self.views()
+        new_id = hashlib.sha256(b"re-created network").hexdigest()
+        rebound[("network", self.stem + "-int")]["id"] = new_id
+        for key in (("container", self.stem + "-server"), ("container", self.stem + "-proxy")):
+            rebound[key]["networks"][self.stem + "-int"]["NetworkID"] = new_id
+        for label, now, views in (("901 s old", verified + timedelta(seconds=901), None),
+                                  ("future-dated", verified - timedelta(seconds=1), None),
+                                  ("re-created network", soon, rebound)):
+            with self.subTest(label), self.assertRaises(ValueError):
+                self.gate(host, now, views)
+        for label, change in (("cross-arm upstream", {"upstream": "10.0.2.2:20129"}),
+                              ("other arm", {"arm": "engines-on"}),
+                              ("not passed", {"passed": False}),
+                              ("p2 not passed", {"p2": dict(original["p2"], passed=False)}),
+                              ("other mechanism", {"mechanism": "docker-user-v1"}),
+                              ("other ingress", {"host_ingress": "127.0.0.1:3730"}),
+                              ("other probe script", {"probe_script_sha256": "0" * 64}),
+                              ("other proxy image", {"proxy_image": "nginx:latest"}),
+                              ("other server", {"server_container_id": "f" * 64})):
+            with self.subTest(label):
+                host.write_private_json(path, {**original, **change})
+                with self.assertRaises(ValueError):
+                    self.gate(host, soon)
+        host.write_private_json(path, original)
+        self.gate(host, soon)
+        config = self.result / "proxy/nginx.conf"
+        saved = config.read_text()
+        config.write_text(saved + "# changed\n")
+        with self.assertRaises(ValueError):
+            self.gate(host, soon)
+        config.write_text(saved)
+        status = json.loads((self.result / "status.json").read_text())
+        (self.result / "status.json").write_text(json.dumps({**status, "proxy_config_sha256": "0" * 64}))
+        with self.assertRaises(ValueError):
+            self.gate(host, soon)
+        (self.result / "status.json").write_text(json.dumps(status))
+        path.chmod(0o644)
+        with self.assertRaises(ValueError):
+            self.gate(host, soon)
+        path.unlink()
+        with self.assertRaises(OSError):
+            self.gate(host, soon)
+
+    def test_any_unexpected_observation_fails_the_probe_and_the_gate(self):
+        host = self.prepared()
+
+        def inside(change):
+            return lambda data: change(data) if data["mode"] == "int" else None
+        cases = (
+            ("host port reachable", inside(lambda d: d["p2"]["connects"][5].update(connected=True)), None),
+            ("denied path forwarded", inside(lambda d: d["p1"][3].update(status=404)), None),
+            ("management answered", inside(lambda d: d["p1"][2].update(route_class="MANAGEMENT")), None),
+            ("public name resolved", inside(lambda d: d["p2"]["dns"][0].update(resolved=True)), None),
+            ("server unresolvable", inside(lambda d: d["p2"]["dns"][4].update(resolved=False)), None),
+            ("ipv6 link-local", inside(lambda d: d["p2"]["ipv6"].update(non_loopback=1, link_local=1)), None),
+            ("truncated connects", inside(lambda d: d["p2"]["connects"].pop()), None),
+            ("reordered denied list", inside(lambda d: d["p1"].reverse()), None),
+            ("probe exit code", None, {"int": 1}),
+        )
+        for label, mutate, codes in cases:
+            with self.subTest(label):
+                passed, runs = self.probe(host, mutate=mutate, codes=codes)
+                self.assertFalse(passed)
+                self.assertEqual(len(runs), 2)
+                receipt = json.loads((self.result / "isolation-probe.json").read_text())
+                self.assertFalse(receipt["passed"])
+                with self.assertRaises(ValueError):
+                    self.gate(host, host.time_value(receipt["verified_at"]))
+        # A blind negative control stops before the internal probe runs.
+        blind = lambda data: data["p0"][1].update(route_class=None) if data["mode"] == "gw" else None
+        passed, runs = self.probe(host, mutate=blind)
+        self.assertFalse(passed)
+        self.assertEqual([name for name, _ in runs], [self.stem + "-probe-gw"])
+        receipt = json.loads((self.result / "isolation-probe.json").read_text())
+        self.assertEqual((receipt["p0"]["passed"], receipt["p1"]["observed"], receipt["exit_codes"]["int"]),
+                         (False, 0, None))
+
+    def test_probe_refuses_targets_that_are_its_own_attempt_containers(self):
+        # If IPAM does not reserve .1 in isolated mode, a container could hold it.
+        host = self.prepared()
+        views = self.views()
+        views[("container", self.stem + "-server")]["networks"][self.stem + "-int"]["IPAddress"] = "172.30.0.1"
+        with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views)), \
+                patch.object(host, "execute_container") as execute, self.assertRaises(ValueError) as caught:
+            host.run_probe(self.state, self.run_id, self.arm, self.state / "prefix", self.pins)
+        self.assertEqual(str(caught.exception), "probe_target_is_attempt_container")
+        execute.assert_not_called()
+
+    def test_probe_requires_each_attempt_container_on_its_own_networks(self):
+        host = self.prepared()
+        server, proxy = ("container", self.stem + "-server"), ("container", self.stem + "-proxy")
+        internal, gateway = self.stem + "-int", self.stem + "-gw"
+        cases = (
+            ("proxy lacks the gw alias", proxy, lambda v: v["networks"][internal].update(Aliases=["other"])),
+            ("server also on the gateway network", server,
+             lambda v: v["networks"].update({gateway: {"NetworkID": "e" * 64, "IPAddress": "172.31.0.9"}})),
+            ("proxy not on the internal network", proxy, lambda v: v["networks"].pop(internal)),
+            ("server stopped", server, lambda v: v.update(running=False)),
+            ("proxy unlabelled", proxy, lambda v: v.update(labels={})),
+            ("other name", server, lambda v: v.update(name="/other")),
+            ("endpoint on another network", server, lambda v: v["networks"][internal].update(NetworkID="f" * 64)),
+            ("short id", proxy, lambda v: v.update(id="abc")),
+        )
+        for label, key, update in cases:
+            with self.subTest(label):
+                views = self.views()
+                update(views[key])
+                with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views)), \
+                        patch.object(host, "execute_container") as execute, self.assertRaises(ValueError):
+                    host.run_probe(self.state, self.run_id, self.arm, self.state / "prefix", self.pins)
+                execute.assert_not_called()
+        # moby@464cd50c api/swagger.yaml:5637-5643: the name "may be" prefixed with "/".
+        views = self.views()
+        views[server]["name"] = self.stem + "-server"
+        self.assertTrue(self.probe(host, views=views)[0])
+        # Only a prepared attempt is probed.
+        status = json.loads((self.result / "status.json").read_text())
+        (self.result / "status.json").write_text(json.dumps({**status, "status": "running"}))
+        with patch.object(host.subprocess, "check_output") as docker, self.assertRaises(ValueError):
+            host.run_probe(self.state, self.run_id, self.arm, self.state / "prefix", self.pins)
+        docker.assert_not_called()
+
+    def test_probe_action_needs_an_explicit_prepared_attempt(self):
+        host = load_recipe_module("host.py")
+        output = io.StringIO()
+        (self.result / "status.json").write_text(json.dumps({"run_id": self.run_id, "arm": self.arm, "status": "running"}))
+        with patch.object(host, "run_probe") as probe, patch.object(host, "teardown_attempt") as teardown, \
+                patch.object(host, "preflight") as preflight, contextlib.redirect_stdout(output):
+            self.assertEqual(host.probe_action(self.state / "prefix", self.state, None, self.arm), 3)
+            self.assertEqual(host.probe_action(self.state / "prefix", self.state, "rw-openhands-absent", self.arm), 3)
+            self.assertEqual(host.probe_action(self.state / "prefix", self.state, self.run_id, self.arm), 3)
+        probe.assert_not_called()
+        teardown.assert_not_called()
+        preflight.assert_not_called()
+        self.assertEqual(json.loads((self.result / "status.json").read_text())["status"], "running")
+        self.assertFalse((self.state / "runs" / "rw-openhands-absent").exists())
+        self.assertEqual([json.loads(line)["failure_stage"] for line in output.getvalue().splitlines()],
+                         ["preflight", "probe", "probe"])
+        args = host.build_parser().parse_args(["probe", "--prefix", "/p", "--state", "/s", "--run-id", self.run_id])
+        self.assertEqual((args.action, args.run_id), ("probe", self.run_id))
+
+    def test_probe_action_failure_tears_down_and_records_the_probe_stage(self):
+        host = self.prepared()
+        status = json.loads((self.result / "status.json").read_text())
+        (self.result / "window.json").write_text(json.dumps({
+            "run_id": self.run_id, "arm": self.arm, "started_at": "2026-09-28T18:00:00Z", "finished_at": None}))
+        (self.result / "check.json").write_text(json.dumps({"upstream_resolved": None, "grader_exit_code": None}))
+        receipts = load_recipe_module("receipt.py")
+        for label, outcome in (("passed", {"return_value": True}), ("failed", {"return_value": False}),
+                               ("raised", {"side_effect": ValueError("attempt_container_contract_mismatch")})):
+            with self.subTest(label):
+                (self.result / "status.json").write_text(json.dumps(status))
+                with patch.object(host, "preflight", return_value=(self.pins, {}, {})), \
+                        patch.object(host, "run_probe", **outcome) as probe, \
+                        patch.object(host, "teardown_attempt", return_value=True) as teardown, \
+                        patch.object(host, "create_receipt", side_effect=lambda result: receipts.create_receipt(
+                            result, database=result / "absent.sqlite")), \
+                        contextlib.redirect_stdout(io.StringIO()):
+                    code = host.probe_action(self.state / "prefix", self.state, self.run_id, self.arm)
+                probe.assert_called_once_with(self.state, self.run_id, self.arm, self.state / "prefix", self.pins)
+                current = json.loads((self.result / "status.json").read_text())
+                if label == "passed":
+                    self.assertEqual(code, 0)
+                    teardown.assert_not_called()
+                    self.assertEqual(current, status)
+                    continue
+                self.assertEqual(code, 3)
+                teardown.assert_called_once_with(self.state, self.run_id, self.arm)
+                self.assertEqual((current["status"], current["failure_stage"]), ("failed", "probe"))
+                self.assertEqual(json.loads((self.result / "receipt.json").read_text())["failure_stage"], "probe")
+
+
 class OpenHandsReceiptTests(unittest.TestCase):
     def test_entry_gateway_usage_and_effort_are_counted_once_without_ids(self):
         module = load_recipe_module("receipt.py")
@@ -1388,7 +2042,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
                         **window, "base_url": "http://gw:8081/v1",
                         "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
                     receipt = module.create_receipt(result, database=result / "absent.sqlite")
-                    self.assertEqual(receipt["schema_version"], 5)
+                    self.assertEqual(receipt["schema_version"], 6)
                     self.assertEqual(receipt["base_url"], "http://gw:8081/v1")
                     self.assertEqual(receipt["gateway_upstream"], f"http://10.0.2.2:{port}/v1")
                     self.assertEqual(receipt["compression_combo"], combo)
@@ -1407,6 +2061,44 @@ class OpenHandsReceiptTests(unittest.TestCase):
             receipt = module.create_receipt(result, database=result / "absent.sqlite")
         self.assertEqual(receipt["container_cleanup"], {"attempts": 2, "confirmed_removed": 2, "complete": True})
         self.assertEqual(receipt["network_cleanup"], {"attempts": 2, "confirmed_removed": 1, "complete": False})
+
+    def test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses(self):
+        module = load_recipe_module("receipt.py")
+        ids = {key: hashlib.sha256(key.encode()).hexdigest()
+               for key in ("run_network_id", "gw_network_id", "server_container_id", "proxy_container_id")}
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp).resolve()
+            (result / "check.json").write_text("{}")
+            (result / "window.json").write_text(json.dumps({
+                "arm": "control", "failure_stage": "probe",
+                "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
+            receipt = module.create_receipt(result, database=result / "absent.sqlite")
+            self.assertEqual(receipt["failure_stage"], "probe")
+            self.assertEqual(receipt["isolation"], {"status": "absent"})
+            probe = {"mechanism": "internal-isolated+nginx-v1-allowlist", **ids, "run_id": "rw-openhands-fixture",
+                     "verified_at": "2026-09-28T17:59:00.000Z", "passed": True, "upstream": "10.0.2.2:20128",
+                     "host_ingress": "127.0.0.1:3730", "exit_codes": {"gw": 0, "int": 0},
+                     "p0": {"requests": 2, "observed": 2, "matched": 2, "passed": True},
+                     "p1": {"requests": 27, "observed": 27, "matched": 27, "passed": True},
+                     "p2": {"connects": 16, "observed": 16, "connected": 0, "errors": {"ENETUNREACH": 16},
+                            "dns": 5, "dns_matched": 5, "ipv6_non_loopback": 0, "ipv6_link_local": 0,
+                            "ipv6_loopback": 1, "passed": True},
+                     "targets": {"addresses": 8, "ports": [53, 20128], "pairs": 16}}
+            (result / "isolation-probe.json").write_text(json.dumps(probe))
+            (result / "probes/probe-fixture").mkdir(parents=True)
+            (result / "probes/probe-fixture/gw.log.cleanup.json").write_text(
+                json.dumps({"confirmed_removed": True, "error_type": None}))
+            receipt = module.create_receipt(result, database=result / "absent.sqlite")
+        self.assertEqual(receipt["isolation"], {
+            "status": "observed", "mechanism": "internal-isolated+nginx-v1-allowlist",
+            "verified_at": "2026-09-28T17:59:00.000Z", "passed": True, "exit_codes": {"gw": 0, "int": 0},
+            "p0": probe["p0"], "p1": probe["p1"], "p2": probe["p2"], "targets": probe["targets"]})
+        text = json.dumps(receipt)
+        for value in ids.values():
+            self.assertNotIn(value, text)
+        self.assertNotIn("rw-openhands-fixture", text)
+        # Probe containers count with the attempt's other container removals.
+        self.assertEqual(receipt["container_cleanup"], {"attempts": 1, "confirmed_removed": 1, "complete": True})
 
 
 class OpenHandsDispatchTests(unittest.TestCase):
@@ -1429,6 +2121,7 @@ class OpenHandsDispatchTests(unittest.TestCase):
         replies = [{"id": FIXTURE_CONVERSATION_ID}, {"execution_status": "finished"}, {"response": "Done"}]
         output = io.StringIO()
         with patch.object(dispatch, "api_request", side_effect=replies) as api, \
+                patch.object(dispatch, "verify_isolation", return_value={"passed": True}) as gate, \
                 patch.object(dispatch, "compression_snapshot", return_value={"totalRequests": 5, "totalTokensSaved": 12}), \
                 patch.object(dispatch, "finish_result", return_value={"task_passed": True, "evidence_complete": False, "failure_stage": None}), \
                 contextlib.redirect_stdout(output):
@@ -1439,10 +2132,66 @@ class OpenHandsDispatchTests(unittest.TestCase):
         self.assertEqual(routes, [("POST", "/api/conversations"),
                                  ("GET", f"/api/conversations/{FIXTURE_CONVERSATION_ID}"),
                                  ("GET", f"/api/conversations/{FIXTURE_CONVERSATION_ID}/agent_final_response")])
+        # Only start is gated on the probe receipt (plan E1, G7).
+        gate.assert_called_once_with(self.state, self.run_id, self.arm, 3730)
         for row in output.getvalue().splitlines():
             self.assertEqual(json.loads(row)["receipt"], str(self.result / "receipt.json"))
         self.assertEqual(json.loads((self.result / "status.json").read_text())["status"], "collected")
         self.assertNotIn(FIXTURE_CONVERSATION_ID, (self.result / "receipt.json").read_text())
+
+    def test_start_requires_a_fresh_owner_only_probe_receipt(self):
+        # Plan E1/G7: refused before the serial lock, with nothing mutated.
+        dispatch = load_recipe_module("dispatch.py")
+        host = load_recipe_module("host.py")
+        status = {"run_id": self.run_id, "arm": self.arm, "status": "prepared", "port": 3740,
+                  "proxy_config_sha256": "0" * 64}
+        receipt = self.result / "isolation-probe.json"
+        now = datetime.now(timezone.utc)
+        for label, verified_at, mode in (("missing", None, None),
+                                         ("901 s old", (now - timedelta(seconds=901)).isoformat(), 0o600),
+                                         ("mode 0644", now.isoformat(), 0o644)):
+            with self.subTest(label):
+                receipt.unlink(missing_ok=True)
+                if verified_at:
+                    host.write_private_json(receipt, {"mechanism": "internal-isolated+nginx-v1-allowlist",
+                                                      "verified_at": verified_at, "passed": True})
+                    receipt.chmod(mode)
+                (self.result / "status.json").write_text(json.dumps(status))
+                (self.result / "window.json").write_text(json.dumps({"arm": self.arm, "run_id": self.run_id}))
+                (self.result / "start.json").write_text("{}")
+                output = io.StringIO()
+                with patch.object(dispatch, "api_request") as api, patch.object(dispatch, "stop_server") as stop, \
+                        patch("subprocess.check_output") as docker, contextlib.redirect_stdout(output):
+                    self.assertEqual(dispatch.execute("start", self.state, self.run_id, self.arm), 3)
+                api.assert_not_called()
+                stop.assert_not_called()
+                docker.assert_not_called()
+                self.assertEqual(json.loads((self.result / "status.json").read_text()), status)
+                self.assertFalse((self.state / "active-dispatch.json").exists())
+                self.assertFalse((self.result / "receipt.json").exists())
+                self.assertEqual(json.loads(output.getvalue())["failure_stage"], "probe")
+
+    def test_native_routes_pair_each_path_with_its_one_method(self):
+        # Plan E3: POST only creates or interrupts a conversation; GET only reads.
+        dispatch = load_recipe_module("dispatch.py")
+        base = f"/api/conversations/{FIXTURE_CONVERSATION_ID}"
+        allowed = (("POST", "/api/conversations"), ("POST", base + "/interrupt"), ("GET", base),
+                   ("GET", base + "/agent_final_response"), ("GET", base + self.ERROR_SEARCH))
+        refused = (("GET", "/api/conversations"), ("POST", base), ("POST", base + "/agent_final_response"),
+                   ("GET", base + "/interrupt"), ("POST", base + self.ERROR_SEARCH), ("DELETE", base),
+                   ("PUT", "/api/conversations"), ("PATCH", base), ("get", base), ("HEAD", base),
+                   ("GET", "/api/conversations/../settings"), ("POST", "/api/conversations?x=1"))
+        headers = self.result / "headers"
+        with patch.object(dispatch, "curl_json", return_value={}) as curl:
+            for method, path in allowed:
+                dispatch.api_request(method, path, headers=headers, port=3740)
+            self.assertEqual([(call.kwargs["method"], call.args[0]) for call in curl.call_args_list],
+                             [(method, "http://127.0.0.1:3740" + path) for method, path in allowed])
+            curl.reset_mock()
+            for method, path in refused:
+                with self.subTest(method=method, path=path), self.assertRaises(ValueError):
+                    dispatch.api_request(method, path, headers=headers, port=3740)
+            curl.assert_not_called()
 
     def test_wait_deadline_interrupts_and_emits_setup_failure(self):
         dispatch = load_recipe_module("dispatch.py")
@@ -1787,7 +2536,7 @@ class OpenHandsDispatchTests(unittest.TestCase):
         (self.result / "window.json").write_text(json.dumps({"arm": self.arm, "run_id": self.run_id}))
         headers = prepared.host.session_files(self.state, self.run_id, self.arm)[1]
         with patch.object(dispatch, "api_request", return_value={"id": FIXTURE_CONVERSATION_ID}) as api, \
-                patch.object(dispatch, "verify_isolation", return_value=None, create=True), \
+                patch.object(dispatch, "verify_isolation", return_value={"passed": True}), \
                 patch.object(dispatch, "compression_snapshot", return_value=None), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(dispatch.execute("start", self.state, self.run_id, self.arm), 0)
         self.assertEqual(api.call_args.kwargs["port"], 3740)

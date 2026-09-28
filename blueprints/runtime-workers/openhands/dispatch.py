@@ -18,7 +18,7 @@ import uuid
 
 from recipe import read_json
 from host import (AGENT_LIMITS, DEFAULT_PORT, docker_args, grade, logged_command, owned_port, private_file,
-                  result_exit, session_files, teardown_attempt, utc_now, write_json)
+                  result_exit, session_files, teardown_attempt, utc_now, verify_isolation, write_json)
 from receipt import create_receipt, read_bounded
 
 
@@ -33,6 +33,17 @@ PERMITTED_TERMINATIONS = {"finished": {"finished"}, "stuck": {"stuck"},
 # name; models.py:95-99 defines TIMESTAMP_DESC.
 ERROR_EVENT_SEARCH = ("/events/search?kind=openhands.sdk.event.conversation_error.ConversationErrorEvent"
                       "&sort_order=TIMESTAMP_DESC&limit=1")
+# Plan E3: each native route has exactly one method. POST starts or
+# interrupts a conversation; GET only reads (conversation_router.py:163-228,
+# 257-287, 304-321; event_router.py:68-139).
+CONVERSATION = r"/api/conversations/[a-f0-9-]{36}"
+NATIVE_ROUTES = (
+    ("POST", r"/api/conversations"),
+    ("POST", CONVERSATION + r"/interrupt"),
+    ("GET", CONVERSATION),
+    ("GET", CONVERSATION + r"/agent_final_response"),
+    ("GET", CONVERSATION + re.escape(ERROR_EVENT_SEARCH)),
+)
 
 
 def server_url(port):
@@ -58,8 +69,7 @@ def curl_json(url, *, method="GET", headers=None, body=None):
 
 def api_request(method, path, *, headers, body=None, port=DEFAULT_PORT):
     """headers is the attempt's host.session_files header file, checked by private_file."""
-    if not (re.fullmatch(r"/api/conversations(?:/[a-f0-9-]{36}(?:/(?:agent_final_response|interrupt))?)?", path)
-            or re.fullmatch(r"/api/conversations/[a-f0-9-]{36}" + re.escape(ERROR_EVENT_SEARCH), path)):
+    if not any(method == allowed and re.fullmatch(pattern, path) for allowed, pattern in NATIVE_ROUTES):
         raise ValueError("unexpected_native_route")
     return curl_json(server_url(port) + path, method=method, headers=headers, body=body)
 
@@ -236,6 +246,15 @@ def execute(action, state, run_id, arm):
                 print(json.dumps({"run_id": run_id, "arm": arm, "receipt": str(receipt_path),
                                   "failure_stage": "start", "task_passed": False, "evidence_complete": False}))
                 return 3  # Do not mutate the running attempt or release its lock.
+            # Plan E1/G7: a fresh P0-P2 receipt bound to this live topology,
+            # checked before the serial lock. A refusal changes nothing; run
+            # `host.py probe` again, or tear the attempt down.
+            try:
+                verify_isolation(state, run_id, arm, port)
+            except Exception:
+                print(json.dumps({"run_id": run_id, "arm": arm, "receipt": str(receipt_path),
+                                  "failure_stage": "probe", "task_passed": False, "evidence_complete": False}))
+                return 3
             try:
                 fd = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             except FileExistsError:

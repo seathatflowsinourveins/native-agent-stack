@@ -13,6 +13,7 @@ import hashlib
 from datetime import datetime, timezone
 import json
 import io
+import ipaddress
 import os
 from pathlib import Path
 import re
@@ -28,8 +29,9 @@ import uuid
 
 from recipe import (COMPRESSION_COMBOS, HERE, arm_config, digest, environment_selection, llm_config, read_json,
                     render_mcp)
+from e2e import netprobe
 from e2e.task import load_task, worker_instruction
-from receipt import create_receipt, read_bounded, time_value
+from receipt import PROBE_MECHANISM, create_receipt, read_bounded, time_value
 
 
 DOCKER = ["docker", "--context", "rootless"]
@@ -62,6 +64,9 @@ CONTAINER_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"running":{{json .
                     '"labels":{{json .Config.Labels}},"networks":{{json .NetworkSettings.Networks}}}')
 PROXY_TEMPLATE = HERE / "config/proxy-nginx.conf"
 PLACEHOLDER = re.compile(r"@[A-Z]+@")
+# Plan section 1 and E1: a P0-P2 receipt gates dispatch start for at most 900 s
+# and only for the topology whose network and container IDs it records.
+PROBE_MAX_AGE_SECONDS = 900
 
 
 def owned_port(value):
@@ -122,6 +127,21 @@ def write_json(path, value):
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(value, indent=2) + "\n")
     temporary.replace(path)
+
+
+def write_private_json(path, value):
+    """Owner-only (0600) whatever the umask: mkstemp beside the target, then an atomic replace."""
+    path = Path(path)
+    descriptor, temporary = tempfile.mkstemp(prefix="." + path.name + ".", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w") as stream:
+            os.fchmod(stream.fileno(), 0o600)
+            stream.write(json.dumps(value, indent=2) + "\n")
+        os.replace(temporary, path)
+    except BaseException:
+        with contextlib.suppress(FileNotFoundError):
+            os.unlink(temporary)
+        raise
 
 
 def private_directory(path):
@@ -733,6 +753,266 @@ def teardown_attempt(state, run_id, arm):
     return all(containers) and all(networks)
 
 
+def listener_ports(text):
+    """TCP listener ports from `ss -ltnH` (iproute2); the fourth column is Local-Address:Port."""
+    ports = set()
+    for line in text.splitlines():
+        fields = line.split()
+        if not fields:
+            continue
+        port = fields[3].rsplit(":", 1)[-1] if len(fields) >= 5 and fields[0] == "LISTEN" else ""
+        if not re.fullmatch(r"[0-9]{1,5}", port) or not 0 < int(port) < 65536:
+            raise ValueError("unexpected_ss_output")
+        ports.add(int(port))
+    return sorted(ports)
+
+
+def host_ipv4_addresses(text):
+    """Host IPv4 addresses from `ip -4 -o addr`, loopback excluded by address.
+
+    127.0.0.0/8 inside the probe is the container's own loopback, not the
+    host's. Other addresses on lo (WSL's 10.255.255.254) stay.
+    """
+    found = set()
+    for line in text.splitlines():
+        fields = line.split()
+        if "inet" not in fields:
+            continue
+        position = fields.index("inet") + 1
+        if position >= len(fields):
+            raise ValueError("unexpected_ip_output")
+        address = ipaddress.IPv4Interface(fields[position]).ip
+        if not address.is_loopback:
+            found.add(address)
+    return [str(address) for address in sorted(found)]
+
+
+def probe_targets(networks, listeners, interfaces):
+    """P2 targets (plan section 1): addresses times ports, both sorted and deduplicated.
+
+    Addresses: netprobe.FIXED_ADDRESSES, every non-loopback host IPv4 address,
+    and each attempt network's IPAM gateway and subnet .1. Ports: every host
+    TCP listener at probe time plus netprobe.EXTRA_PORTS (53).
+    """
+    addresses = {ipaddress.IPv4Address(value) for value in netprobe.FIXED_ADDRESSES}
+    addresses |= {ipaddress.IPv4Address(value) for value in host_ipv4_addresses(interfaces)}
+    for kind in ("int", "gw"):
+        entries = [entry for entry in networks[kind].get("ipam") or []
+                   if isinstance(entry, dict) and ":" not in str(entry.get("Subnet", ""))]
+        if not entries:
+            raise ValueError("attempt_network_ipam_required")
+        for entry in entries:
+            addresses.add(ipaddress.IPv4Network(entry["Subnet"]).network_address + 1)
+            if entry.get("Gateway"):
+                addresses.add(ipaddress.IPv4Address(entry["Gateway"]))
+    ports = sorted(set(listener_ports(listeners)) | set(netprobe.EXTRA_PORTS))
+    return [str(address) for address in sorted(addresses)], ports
+
+
+def checked_container(name, networks, aliases=None):
+    """Read one attempt container through CONTAINER_FORMAT and require its attachments.
+
+    moby@464cd50c api/swagger.yaml: the name "may be prefixed with a
+    forward-slash" (:5637-5643); EndpointSettings.Aliases holds the
+    network-scoped aliases (:3369-3375) and NetworkID binds each attachment
+    to its network (:3400). Never a full inspect: the server's Config.Env
+    holds the session key.
+    """
+    info = inspect_selected("container", CONTAINER_FORMAT, name)
+    attached = info.get("networks") if isinstance(info.get("networks"), dict) else {}
+    labels = info.get("labels") if isinstance(info.get("labels"), dict) else {}
+    if (info.get("name") not in (name, "/" + name) or info.get("running") is not True
+            or labels.get(OWNER_KEY) != OWNER_VALUE or not re.fullmatch(r"[a-f0-9]{64}", str(info.get("id")))
+            or set(attached) != set(networks)
+            or any(not isinstance(attached[network], dict) or attached[network].get("NetworkID") != identity
+                   for network, identity in networks.items())
+            or any(alias not in (attached[network].get("Aliases") or [])
+                   for network, alias in (aliases or {}).items())):
+        raise ValueError("attempt_container_contract_mismatch")
+    return info
+
+
+def attempt_bindings(stem):
+    """Live selected-field reads of the attempt's two networks and two containers."""
+    names = network_names(stem)
+    networks = {kind: checked_network(names[kind], kind) for kind in ("int", "gw")}
+    server = checked_container(stem + "-server", {names["int"]: networks["int"]["id"]})
+    proxy = checked_container(stem + "-proxy", {names["gw"]: networks["gw"]["id"], names["int"]: networks["int"]["id"]},
+                              aliases={names["int"]: "gw"})
+    return networks, server, proxy
+
+
+def probe_command(pins, prefix, stem, role, output, arguments):
+    """e2e/netprobe.py in the pinned agent image, with docker_args hardening and three mounts only.
+
+    The venv, /recipe read-only and this container's own output directory:
+    no workspace, server state, key file or published port.
+    """
+    if role not in ("gw", "int"):
+        raise ValueError("probe_role_required")
+    name = f"{stem}-probe-{role}"
+    args = docker_args(pins, name, network=network_names(stem)[role])
+    args += (mount(Path(prefix) / "venv", Path(prefix) / "venv") + mount(HERE, "/recipe")
+             + mount(output, "/probe-output", False))
+    args += ["--entrypoint", str(Path(prefix) / "venv/bin/python"), pins["image"]["ref"],
+             "/recipe/e2e/netprobe.py", role, "--out", "/probe-output/observations.json", *arguments]
+    return name, args
+
+
+def run_probe(state, run_id, arm, prefix, pins):
+    """Run P0 on <stem>-gw, then P1 and P2 on <stem>-int; True only if everything passes.
+
+    The attempt must be prepared, its rendered proxy config unchanged, and
+    its networks and containers must pass the live contract reads. P0 is the
+    negative control: if it fails, P1 and P2 do not run. The verdict is
+    re-derived from the observation files with netprobe.evaluate and also
+    needs both exit codes to be 0. <result>/isolation-probe.json is written
+    at 0600 whether or not the probe passes; it holds counts and IDs, never
+    host addresses.
+    """
+    stem = attempt_stem(run_id, arm)
+    result = Path(state) / "runs" / run_id / arm
+    status = json.loads(read_bounded(result / "status.json"))
+    if (not isinstance(status, dict) or status.get("status") != "prepared" or status.get("run_id") != run_id
+            or status.get("arm") != arm):
+        raise ValueError("prepared_attempt_required")
+    port = owned_port(status.get("port"))
+    upstream = arm_config(arm)["gateway_port"]
+    config = digest(result / "proxy/nginx.conf")
+    if status.get("proxy_config_sha256") != config:
+        raise ValueError("proxy_config_changed_since_prepare")
+    networks, server, proxy = attempt_bindings(stem)
+    listeners = subprocess.check_output(["ss", "-ltnH"], text=True, timeout=30)
+    interfaces = subprocess.check_output(["ip", "-4", "-o", "addr"], text=True, timeout=30)
+    addresses, ports = probe_targets(networks, listeners, interfaces)
+    # A target holding one of the attempt's own containers would connect and
+    # read as a containment failure; refuse the probe instead.
+    internal = networks["int"]["name"]
+    if {view["networks"][internal].get("IPAddress") for view in (server, proxy)} & set(addresses):
+        raise ValueError("probe_target_is_attempt_container")
+    private_directory(result / "probes")
+    directory = Path(tempfile.mkdtemp(prefix="probe-", dir=result / "probes"))
+    arguments = {"gw": ["--upstream-port", str(upstream)],
+                 "int": ["--server", stem + "-server", "--addresses", ",".join(addresses),
+                         "--ports", ",".join(map(str, ports))]}
+    observed, codes = {"gw": None, "int": None}, {"gw": None, "int": None}
+    for role in ("gw", "int"):
+        output = directory / role
+        output.mkdir(mode=0o700)
+        model_visible(output, writable=True)
+        name, argv = probe_command(pins, prefix, stem, role, output, arguments[role])
+        codes[role] = execute_container(argv, name, directory / (role + ".log"), 300)
+        with contextlib.suppress(OSError, ValueError):
+            observed[role] = json.loads(read_bounded(output / "observations.json"))
+        if role == "gw" and (codes["gw"] != 0 or not netprobe.evaluate_http(
+                observed["gw"].get("p0") if isinstance(observed["gw"], dict) else None,
+                netprobe.p0_expected(upstream))["passed"]):
+            break
+    verdict = netprobe.evaluate(observed["gw"], observed["int"], upstream, addresses, ports, stem + "-server")
+    passed = verdict["passed"] and codes == {"gw": 0, "int": 0}
+    write_private_json(result / "isolation-probe.json", {
+        "mechanism": PROBE_MECHANISM, "run_id": run_id, "arm": arm,
+        "run_network_id": networks["int"]["id"], "gw_network_id": networks["gw"]["id"],
+        "server_container_id": server["id"], "proxy_container_id": proxy["id"],
+        "proxy_image": pins["gateway_proxy"]["ref"], "proxy_config_sha256": config,
+        "probe_script_sha256": digest(HERE / "e2e/netprobe.py"),
+        "upstream": f"{netprobe.GATEWAY_HOST}:{upstream}", "host_ingress": f"127.0.0.1:{port}",
+        "verified_at": utc_now(), "exit_codes": codes,
+        "targets": {"addresses": len(addresses), "ports": ports, "pairs": len(addresses) * len(ports)},
+        "p0": verdict["p0"], "p1": verdict["p1"], "p2": verdict["p2"], "passed": passed,
+    })
+    return passed
+
+
+def verify_isolation(state, run_id, arm, port, *, now=None):
+    """The dispatch-start gate (plan E1, G7): a fresh passed probe bound to the live attempt.
+
+    Refuses unless <result>/isolation-probe.json is an owner-only regular file
+    written at most PROBE_MAX_AGE_SECONDS ago, for this arm's upstream, this
+    ingress port, the pinned proxy image, the rendered config and this probe
+    script, with every section passed, and unless the live network and
+    container IDs still match. File and time checks come before any Docker
+    read. A pure check: it changes nothing.
+    """
+    stem = attempt_stem(run_id, arm)
+    result = Path(state) / "runs" / run_id / arm
+    receipt = json.loads(read_bounded(private_file(result / "isolation-probe.json"), limit=1024 * 1024))
+    if not isinstance(receipt, dict):
+        raise ValueError("isolation_probe_receipt_shape")
+    age = ((now or datetime.now(timezone.utc)) - time_value(receipt.get("verified_at"))).total_seconds()
+    if not 0 <= age <= PROBE_MAX_AGE_SECONDS:
+        raise ValueError("isolation_probe_not_fresh")
+    status = json.loads(read_bounded(result / "status.json"))
+    config = digest(result / "proxy/nginx.conf")
+    expected = {"mechanism": PROBE_MECHANISM, "run_id": run_id, "arm": arm,
+                "upstream": f"{netprobe.GATEWAY_HOST}:{arm_config(arm)['gateway_port']}",
+                "host_ingress": f"127.0.0.1:{owned_port(port)}",
+                "proxy_image": read_json(HERE / "pins.json")["gateway_proxy"]["ref"],
+                "proxy_config_sha256": config, "probe_script_sha256": digest(HERE / "e2e/netprobe.py"),
+                "passed": True}
+    if (any(receipt.get(key) != value for key, value in expected.items())
+            or not isinstance(status, dict) or status.get("proxy_config_sha256") != config
+            or any(not isinstance(receipt.get(section), dict) or receipt[section].get("passed") is not True
+                   for section in ("p0", "p1", "p2"))):
+        raise ValueError("isolation_probe_mismatch")
+    networks, server, proxy = attempt_bindings(stem)
+    live = {"run_network_id": networks["int"]["id"], "gw_network_id": networks["gw"]["id"],
+            "server_container_id": server["id"], "proxy_container_id": proxy["id"]}
+    if any(receipt.get(key) != value for key, value in live.items()):
+        raise ValueError("isolation_probe_bound_to_other_resources")
+    return receipt
+
+
+def probe_action(prefix, state, run_id, arm):
+    """`host.py probe`: re-run P0-P2 on a prepared attempt, e.g. to refresh its receipt.
+
+    Needs an explicit run id and never mints one. A refusal before the probe
+    runs changes nothing. A failed or crashed probe tears the attempt down
+    and records failure_stage "probe" (exit 3), as run() does.
+    """
+    def refuse(stage, receipt=None):
+        print(json.dumps({"run_id": run_id, "arm": arm, "receipt": receipt, "failure_stage": stage,
+                          "task_passed": False, "evidence_complete": False}))
+        return 3
+    try:
+        attempt_stem(run_id, arm)
+    except ValueError:
+        return refuse("preflight")
+    result = Path(state) / "runs" / run_id / arm
+    # Nothing has run before the probe starts; these refusals leave the attempt unchanged.
+    try:
+        status = json.loads(read_bounded(result / "status.json"))
+        if not isinstance(status, dict) or status.get("status") != "prepared":
+            raise ValueError("prepared_attempt_required")
+    except (OSError, ValueError):
+        return refuse("probe")
+    try:
+        pins, _, _ = preflight(prefix, state)
+    except Exception:
+        return refuse("preflight")
+    failure_type = "RuntimeError"
+    try:
+        if run_probe(state, run_id, arm, prefix, pins):
+            print(json.dumps({"run_id": run_id, "arm": arm, "isolation_probe": str(result / "isolation-probe.json"),
+                              "passed": True}))
+            return 0
+    except (Exception, KeyboardInterrupt) as exc:
+        failure_type = type(exc).__name__
+    with contextlib.suppress(OSError, ValueError, subprocess.SubprocessError):
+        teardown_attempt(state, run_id, arm)  # The cleanup records keep any uncertainty.
+    try:
+        window = json.loads(read_bounded(result / "window.json"))
+    except (OSError, ValueError):
+        window = {"run_id": run_id, "arm": arm, "started_at": utc_now()}
+    window.update(failure_stage="probe", failure_type=failure_type, finished_at=window.get("finished_at") or utc_now())
+    write_json(result / "window.json", window)
+    if not (result / "check.json").is_file():
+        write_json(result / "check.json", {"upstream_resolved": None, "grader_exit_code": None})
+    write_json(result / "receipt.json", create_receipt(result))
+    write_json(result / "status.json", {**status, "status": "failed", "failure_stage": "probe"})
+    return refuse("probe", str(result / "receipt.json"))
+
+
 def clone_command(prefix, task, workspace):
     # SWE-bench@v4.1.0 test_spec/python.py:271-277, including branch exceptions.
     code = ("import json,sys; from importlib.metadata import version; "
@@ -947,6 +1227,11 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
             raise RuntimeError("qmd_setup_failed")
         stage = "start"
         prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=port)
+        # Plan E1/G7: P0-P2 before any conversation; dispatch start re-checks the receipt.
+        stage = "probe"
+        if not run_probe(state, run_id, arm, prefix, pins):
+            raise RuntimeError("isolation_probe_failed")
+        stage = "start"
         prepared = True
         write_json(result / "window.json", window)
         if not prepare_only:
@@ -959,7 +1244,7 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
     except (Exception, KeyboardInterrupt) as exc:
         window["failure_stage"] = stage
         window["failure_type"] = type(exc).__name__
-        if stage == "start":
+        if stage in {"start", "probe"}:
             # Resources may exist from the first network onward; remove them by name.
             try:
                 teardown_attempt(state, run_id, arm)
@@ -984,22 +1269,30 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
     return result_exit(receipt)
 
 
-def main():
+def build_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("install", "run", "prepare"))
+    parser.add_argument("action", choices=("install", "run", "prepare", "probe"))
     parser.add_argument("--prefix", required=True, type=Path)
     parser.add_argument("--state", required=True, type=Path)
     parser.add_argument("--run-id")
     parser.add_argument("--arm", choices=("control", "engines-on"))
     parser.add_argument("--port", type=cli_port, default=DEFAULT_PORT,
                         help="published loopback port in 3730..3799 (default 3730; resolver mode 3740)")
-    args = parser.parse_args()
+    return parser
+
+
+def main():
+    args = build_parser().parse_args()
     os.umask(0o077)
     # SIGTERM goes through container cleanup and the failed-attempt receipt path.
     signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     if args.action == "install":
         install(args.prefix, args.state)
         return 0
+    if args.action == "probe":
+        # An existing attempt only: no run id is ever generated for a probe.
+        return probe_action(args.prefix, args.state, args.run_id or os.environ.get("OPENHANDS_RUN_ID"),
+                            args.arm or os.environ.get("OPENHANDS_ARM", "control"))
     return run(args.prefix, args.state, run_id=args.run_id, arm=args.arm,
                prepare_only=args.action == "prepare", port=args.port)
 
