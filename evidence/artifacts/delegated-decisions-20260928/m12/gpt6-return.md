@@ -1,0 +1,8 @@
+**DECISION: keep** — retain the current wording on the supplied evidence.
+
+- **The proposed scope change is insufficiently supported.** The recorded user intent explicitly includes “ALL ACTION,” although the triggering failure concerned self-written implementations. That incident alone does not establish the intended exemption for other actions (4).
+- **The audit identifies a plausible ambiguity, not demonstrated harm.** No retained behavior shows over-application, and “write … anything” could still encompass ordinary answers, leaving the proposed benefit uncertain (5).
+- **The documentation supports specificity and testing, but does not select this wording.** Evidence (2–3) supports evaluating a revision. The connected-app example in (1) neither establishes a universal SOTA-sourcing requirement nor directly contradicts narrowing this particular rule; that objection in (8) is overstated.
+- **Consensus and governance do not resolve the substance.** Abstaining peers provide no consensus (7), and model-family diversity alone cannot establish correctness (8). The verbatim-copy requirement governs how an approved change propagates, rather than whether narrowing is appropriate (6). Delegation authorizes this judgment; it does not supply missing behavioral evidence (4).
+
+**Overturn condition:** A paired test using the same pinned model/client and predefined tasks shows that narrowed wording reduces SOTA-discovery calls by at least 50% from a nonzero baseline across 20 read/answer tasks containing all necessary evidence, while preserving full sourcing compliance across 20 write/build/install/adopt tasks.
