@@ -3418,6 +3418,27 @@
         "New hosts receive this pin only after the next release tag."
       ],
       "path": "evidence/receipts/ccusage-20026-qualification-20260927.json"
+    },
+    {
+      "id": "skills-listing-restore-20260928",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "A value-free record, on this host, of the 2026-09-28 restore of 14 skills' Claude listing in the user settings' skillOverrides, read before and after with scripts/skills_status.py --json and with Claude Code's native /skill-doctor through tools/skill-usage/skill_usage.py --run-skill-doctor --json. Before the edit (captured 2026-09-28T15:08:39Z; /skill-doctor report generated 15:08:27Z), skills_status.py exited 1 with result fail: 14 of 29 skills failed, each only on claude_listing (actual name-only where the manifest says on), and /skill-doctor listed those 14 at 20 context tokens each, 280 in all. The edit ran at 2026-09-28T15:09:02Z after a backup labelled settings.json.20260928T150902Z.pre-listing-restore and left 29 skillOverrides keys, one more than that backup held. After it (/skill-doctor report generated 15:09:02Z; captured 15:09:12Z), skills_status.py exited 0 with result ok and 0 mismatches, and /skill-doctor listed the 14 at 30 to 250 context tokens, 1,750 in all (+1,470); writing-for-agents read on at 40 tokens in both runs. Both /skill-doctor runs exited 0 with 0 model turns at $0, and the 14 had 0 lifetime uses in both. The lock, the Codex disable entries, the manifest's 7,409-character on-description sum and every other required check were ok in both runs, and supply-chain-risk-auditor's informational folder_tree drift appeared in both. Read with skills_status.py's own load_skill_overrides, the settings backups hold the 14 effectively on at 2026-09-26T20:00:20Z (13 set on, variant-analysis absent), off at 2026-09-26T20:12:39Z together with agent-browser, grill-me and improve-codebase-architecture (17), and name-only at 2026-09-27T05:31:10Z and in the pre-restore backup. Two Codex backup labels, from 2026-09-26T20:01:18Z and 20:12:39Z, exist.",
+      "limitations": [
+        "One host only. Another host collects its own read-back; this receipt says nothing about any other host's listing.",
+        "Value-free by construction: the four skillOverrides state strings, 'absent', counts, digests, UTC stamps and backup labels only. No other settings value, no path and no session identifier is retained. The Codex backups are listed by label; their content was not opened.",
+        "The coordinator ran the capture commands and the edit. This receipt summarizes the retained capture files, whose sha256 digests are in data.capture_files, with the embedded script, and it reads the settings backups itself. The capture files are not published.",
+        "/skill-doctor context tokens are Claude Code's listing-cost estimates (docs/decisions/2026-09-25-skills-trial-and-usage.md, Mechanics), not provider-counted tokens. No child-usage.mjs first-request measurement was run, so the restored listing's per-request cost is unmeasured.",
+        "The edit script prints its apply line only after its three assertions (the top-level key list, every non-target skillOverrides entry and all 15 targets at on), and that line was retained, so the assertions held. That the unchanged content round-tripped byte for byte is the coordinator's account: the script's roundtrip_exact output was not retained.",
+        "The backup stamps bound the listing segments. The edit times are inferred from the labels, each backup being named for the edit that followed it. Who made the 2026-09-26 edits and why is recorded only in a coordinator memory note, which is untrusted history and not evidence here.",
+        "Lifetime /skill-doctor use counts are observational: preloads, templates and instructions also drive uses, so they do not show that a listing state causes or prevents use. Codex was not measured (codex measured false in both usage runs), and nothing here changes Codex.",
+        "skills_status.py reads only the user settings file. /skill-doctor reports on the skills in the session (Claude Code skills page, 'Find unused skills'), and its report shows the same change.",
+        "The two command -v checks in provenance.local_checks ran later, in the recorder's own shell on the same host; they show only that neither executable was on that shell's PATH at that time.",
+        "The embedded edit script (provenance.edit_script_redacted) is the coordinator's file with the right-hand side of its one backup-directory line replaced by a placeholder, so this receipt names no backup location. provenance.edit_script_sha256 is the original file's digest and provenance.edit_script_redacted_sha256 the embedded text's. The generator takes the backup directory as an argument and records none."
+      ],
+      "path": "evidence/receipts/skills-listing-restore-20260928.json"
     }
   ],
   "files": [
@@ -13939,8 +13960,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "d9696babcb53de6378349ddfd10a8a044f766a5fd778fbedbf8d4585d7d9cdea",
-      "bytes": 68979
+      "sha256": "cab8fc8eb38de6b3501ed88d69b990dc94e9645e272ae65a5aff1019613f9930",
+      "bytes": 94404
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -14159,8 +14180,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "507fb186df3d6c81459ad4c9cc088dd359c100b52cb128f6c99ec9e9eae040c4",
-      "bytes": 51642
+      "sha256": "0ac4cc82e5430801d2199bfc88f6ccd81f4631dfc39406f16e0c2bb259f2781b",
+      "bytes": 52965
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -34883,6 +34904,31 @@
       "bytes": 6747
     },
     {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
+      "sha256": "8acb7a58ab60c94f3b13013135e8d2005731256993b3dc7ca9a761be398e9ad8",
+      "bytes": 5122
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/control-no-allowance.json",
+      "sha256": "30d6a45e06cedd37ce734d32d654c9b54cdfa452ea99fd0942ec842e1b82832c",
+      "bytes": 7140
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/control-planted-blob.json",
+      "sha256": "178ace2f01d79445830011fa17caf81f6514be9b552f3a279b58acd510542778",
+      "bytes": 8045
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/tree-drift-check.json",
+      "sha256": "3ec2b01863485a458051abb2b9557edaa39f9f1649ea865e04be71c31f54a608",
+      "bytes": 7705
+    },
+    {
+      "path": "evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py",
+      "sha256": "264f486d5d29f88d3d796441dac5b959e32601c40b9fe0ee2752248289d6ae52",
+      "bytes": 14088
+    },
+    {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
       "sha256": "0f3d4e68227108db70730487a65991c71bad01544147962263b3b996f722e2f2",
       "bytes": 11280
@@ -39551,6 +39597,11 @@
       "path": "evidence/receipts/runtime-tools.json",
       "sha256": "67b25345616bf4ff12abb62439b69f4f38d9589ca94134fd455ef61ea0e24540",
       "bytes": 1840
+    },
+    {
+      "path": "evidence/receipts/skills-listing-restore-20260928.json",
+      "sha256": "14b048f42788160770dce8621a438e70b96f255261d4c41ac701358ab5b6825b",
+      "bytes": 43918
     },
     {
       "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",

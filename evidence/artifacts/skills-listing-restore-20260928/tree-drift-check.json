@@ -1,0 +1,308 @@
+{
+ "schema": "tree_drift_check/1",
+ "argv": [
+  "evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py",
+  "--checkout",
+  ".",
+  "--skill",
+  "supply-chain-risk-auditor",
+  "--allow",
+  "scripts/uv.lock"
+ ],
+ "started_utc": "2026-09-28T15:26:31Z",
+ "runs": [
+  {
+   "argv": [
+    "gh",
+    "api",
+    "repos/trailofbits/skills/git/trees/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae?recursive=1"
+   ],
+   "started_utc": "2026-09-28T15:26:31Z",
+   "exit": 0,
+   "finished_utc": "2026-09-28T15:26:31Z",
+   "stdout_bytes": 566463,
+   "stdout_sha256": "1b533474133a0b86c16b286e16fcff5928e2de1dee9700cda11bd7079b686134",
+   "stderr_bytes": 0
+  },
+  {
+   "argv": [
+    "gh",
+    "api",
+    "repos/trailofbits/skills/git/blobs/2fb44882a94a99013d613493e38bb372dfbbdd84"
+   ],
+   "started_utc": "2026-09-28T15:26:31Z",
+   "exit": 0,
+   "finished_utc": "2026-09-28T15:26:33Z",
+   "stdout_bytes": 751,
+   "stdout_sha256": "dd89b0e1d808722c70adc29bab6d25079058ecc49547bce5c30026cf85656ab5",
+   "stderr_bytes": 0
+  }
+ ],
+ "method": {
+  "module": "scripts/skills_status.py",
+  "module_sha256": "adf89cd8d0846c273164201f06bb7a6ea4b80b6bea6158048a060b28eb559246",
+  "functions": [
+   "git_tree_sha",
+   "_git_blob_sha",
+   "check_folder_tree",
+   "check_canonical",
+   "check_lock_entry"
+  ],
+  "runtime_artifact_dirs": [
+   ".mypy_cache",
+   ".pytest_cache",
+   ".ruff_cache",
+   ".venv",
+   "__pycache__",
+   "node_modules"
+  ],
+  "python": "3.13.15"
+ },
+ "manifest": {
+  "skill": "supply-chain-risk-auditor",
+  "source": "trailofbits/skills",
+  "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+  "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+  "tree_sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b"
+ },
+ "allowed_differences": [
+  "scripts/uv.lock"
+ ],
+ "upstream": {
+  "response_sha": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+  "truncated": false,
+  "folder_row": {
+   "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+   "mode": "040000",
+   "type": "tree",
+   "sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b"
+  },
+  "rows_under_path": 16,
+  "rows": [
+   {
+    "path": "SKILL.md",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "83affaaf2841182c5eb610338256f7f540b270aa"
+   },
+   {
+    "path": "agents",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "c1d1a4abef046ea0d98453c1933007c7459b71d7"
+   },
+   {
+    "path": "agents/openai.yaml",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "e5b0835efdd8b2fb3b9b5ba6d586656e259e7a05"
+   },
+   {
+    "path": "assets",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "b1735ba734fcf7e7898e1e79941fde53ccfa651c"
+   },
+   {
+    "path": "assets/trail-of-bits-mark.svg",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "7cd6e7ca7348897984f2498f301a888bb2f3ca71"
+   },
+   {
+    "path": "scripts",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "eaedb5d0840e7b155657478dd547e66abec537d1"
+   },
+   {
+    "path": "scripts/collect.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "d3238e3fdfb700c6e239f6f41d359be2bad4fca8"
+   },
+   {
+    "path": "scripts/model.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "81407c29544a2a84ca19a286f01c25d76ab927e9"
+   },
+   {
+    "path": "scripts/pyproject.toml",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "e435affcc1cc64171dcd449fa61fd6afb588785e"
+   },
+   {
+    "path": "scripts/render.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "b4aa9ca5f40ea76bc7b7f56cf6cb59a77d0487af"
+   },
+   {
+    "path": "scripts/sources.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "0d65664fa3bc18f1fad72e01704eed0d9e4b32c5"
+   },
+   {
+    "path": "scripts/test_collect.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "12dd8e6200a760002450c9e348220ec1685d5549"
+   },
+   {
+    "path": "scripts/test_model.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "efbe08366de7b78bf333a51769f4a420d1bec9a4"
+   },
+   {
+    "path": "scripts/test_render.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "54b1a5fef092855ee99be92be6393108609f8738"
+   },
+   {
+    "path": "scripts/test_sources.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "42d9772a0320b28aaf44a94c8776cc2a92700345"
+   },
+   {
+    "path": "scripts/uv.lock",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "2fb44882a94a99013d613493e38bb372dfbbdd84"
+   }
+  ]
+ },
+ "local": {
+  "folder": "~/.agents/skills/supply-chain-risk-auditor",
+  "tree_sha_as_on_disk": "1bca3f3eb91394de63ca3d376205a09f32b66548",
+  "tree_sha_without_runtime_artifacts": "ec3f7c42f2a5d57c33c70f66c380b5c3abb445b2",
+  "skills_status_folder_tree_state": "drift",
+  "skill_md_sha256_state": "ok",
+  "lock_entry_state": "ok",
+  "left_out_runtime_artifacts": [
+   "scripts/.venv/",
+   "scripts/__pycache__/"
+  ],
+  "blobs": 13,
+  "rows": [
+   {
+    "path": "SKILL.md",
+    "mode": "100644",
+    "blob": "83affaaf2841182c5eb610338256f7f540b270aa"
+   },
+   {
+    "path": "agents/openai.yaml",
+    "mode": "100644",
+    "blob": "e5b0835efdd8b2fb3b9b5ba6d586656e259e7a05"
+   },
+   {
+    "path": "assets/trail-of-bits-mark.svg",
+    "mode": "100644",
+    "blob": "7cd6e7ca7348897984f2498f301a888bb2f3ca71"
+   },
+   {
+    "path": "scripts/collect.py",
+    "mode": "100644",
+    "blob": "d3238e3fdfb700c6e239f6f41d359be2bad4fca8"
+   },
+   {
+    "path": "scripts/model.py",
+    "mode": "100644",
+    "blob": "81407c29544a2a84ca19a286f01c25d76ab927e9"
+   },
+   {
+    "path": "scripts/pyproject.toml",
+    "mode": "100644",
+    "blob": "e435affcc1cc64171dcd449fa61fd6afb588785e"
+   },
+   {
+    "path": "scripts/render.py",
+    "mode": "100644",
+    "blob": "b4aa9ca5f40ea76bc7b7f56cf6cb59a77d0487af"
+   },
+   {
+    "path": "scripts/sources.py",
+    "mode": "100644",
+    "blob": "0d65664fa3bc18f1fad72e01704eed0d9e4b32c5"
+   },
+   {
+    "path": "scripts/test_collect.py",
+    "mode": "100644",
+    "blob": "12dd8e6200a760002450c9e348220ec1685d5549"
+   },
+   {
+    "path": "scripts/test_model.py",
+    "mode": "100644",
+    "blob": "efbe08366de7b78bf333a51769f4a420d1bec9a4"
+   },
+   {
+    "path": "scripts/test_render.py",
+    "mode": "100644",
+    "blob": "54b1a5fef092855ee99be92be6393108609f8738"
+   },
+   {
+    "path": "scripts/test_sources.py",
+    "mode": "100644",
+    "blob": "42d9772a0320b28aaf44a94c8776cc2a92700345"
+   },
+   {
+    "path": "scripts/uv.lock",
+    "mode": "100644",
+    "blob": "ab864a16ac3b38bf469205ee65831b6737b4c867"
+   }
+  ],
+  "subtrees": {
+   "agents": "c1d1a4abef046ea0d98453c1933007c7459b71d7",
+   "assets": "b1735ba734fcf7e7898e1e79941fde53ccfa651c",
+   "scripts": "3a48432338d4c46a482e05a768c9340145b73421"
+  }
+ },
+ "comparison": {
+  "upstream_blobs": 13,
+  "local_blobs": 13,
+  "matching": 12,
+  "differing": [
+   {
+    "path": "scripts/uv.lock",
+    "local_mode": "100644",
+    "local_blob": "ab864a16ac3b38bf469205ee65831b6737b4c867",
+    "upstream_mode": "100644",
+    "upstream_blob": "2fb44882a94a99013d613493e38bb372dfbbdd84"
+   }
+  ],
+  "missing": [],
+  "extra": [],
+  "outside_allowed_set": []
+ },
+ "substitution": {
+  "blobs": [
+   {
+    "path": "scripts/uv.lock",
+    "upstream_blob": "2fb44882a94a99013d613493e38bb372dfbbdd84",
+    "fetched_bytes": 337,
+    "fetched_blob_sha_verified": true
+   }
+  ],
+  "tree_sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b",
+  "subtrees": {
+   "agents": "c1d1a4abef046ea0d98453c1933007c7459b71d7",
+   "assets": "b1735ba734fcf7e7898e1e79941fde53ccfa651c",
+   "scripts": "eaedb5d0840e7b155657478dd547e66abec537d1"
+  },
+  "equals_manifest_tree_sha": true,
+  "equals_upstream_folder_row": true,
+  "subtrees_equal_upstream_rows": {
+   "agents": true,
+   "assets": true,
+   "scripts": true
+  }
+ },
+ "result": "pass",
+ "finished_utc": "2026-09-28T15:26:33Z",
+ "exit": 0
+}
