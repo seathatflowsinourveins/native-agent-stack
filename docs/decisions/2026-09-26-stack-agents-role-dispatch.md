@@ -147,7 +147,7 @@ Recorded before any run of the preregistered comparison above, so it amends arm 
 Alternative 2 rejected SubagentStart injection for these agents: a second block would duplicate lane text in
 the first prompt, and each agent type should keep one byte-stable text. The
 [SubagentStart carrier](2026-09-27-token-lanes-subagent-start.md) reached them anyway, because its gate
-excluded only `blind-*` types. Each named role received the full block with 17 tool ids, and most of those ids
+excluded only `blind-*` types. Each non-blind named role received the full block with 17 tool ids, and 5 to 17 of those ids, by role,
 were outside its `tools:` allowlist. The carrier's
 [role-matched addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)
 reconciles the two records:

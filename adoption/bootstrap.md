@@ -257,7 +257,7 @@ GitHub-hosted macOS runner; see
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it adds a
    `SubagentStart` group that runs `~/.claude/hooks/token-lanes-subagent-start.py`,
    installed by the **guard hooks** step of `install_claude_profile.py` below, so
-   every non-blind subagent receives the token-lanes block matched to its role
+   every non-blind subagent except `semantic-evidence-reviewer` receives the token-lanes block matched to its role
    ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)); while that
    file is absent the command exits 0 and adds nothing.
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.

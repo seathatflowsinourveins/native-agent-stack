@@ -402,7 +402,7 @@ that block:
 
 | `agent_type` | Ungranted ids named | Lines needing a tool the role lacks |
 | --- | ---: | --- |
-| `stack-researcher` | 5 of 17 | SocratiCode clause, codebase-memory, Headroom; `search-first` without the Skill tool |
+| `stack-researcher` | 5 of 17 | SocratiCode clause, codebase-memory, Headroom; both skills (no Skill tool or `skills:` preload) |
 | `stack-verifier` | 14 of 17 | fetch, code navigation, codebase-memory, QMD and ai-memory, Headroom; both skills |
 | `evidence-reviewer` | 8 of 17 | fetch, RTK (no Bash), jCodeMunch `menu`, codebase-memory, QMD, Headroom; both skills |
 | `security-reviewer` | 8 of 17 | as `evidence-reviewer` (its only preload is `security-best-practices`) |
@@ -454,7 +454,7 @@ is text-versus-allowlist agreement checked by local subprocess tests, not a nati
 exposure, compliance or a token saving.
 
 **Supersedes.** The Decision's "default routing carrier for every non-blind subagent" now means the default for
-every non-blind type the map does not name. Exclusion stays inside the hook. The measured-gap addendum's coverage
+every non-blind type that neither the map nor the silent set (`semantic-evidence-reviewer`) names. Exclusion stays inside the hook. The measured-gap addendum's coverage
 sentence ("covers all seven shipped non-blind roles ... not tool access") is superseded by the per-role
 expectations and the grant-agreement test above.
 
@@ -464,7 +464,7 @@ expectations and the grant-agreement test above.
 - the [harness-settings record, `codebase-memory-mcp#2`](2026-09-27-claude-harness-settings.md#codebase-memory-mcp-codebase-memory-mcp2)
   (L75-84) says no shipped agent's exact tool list gains codebase-memory tools until each platform has a pinned
   install and each intended agent has a recorded useful call;
-- the [workflow role-routing notes](../../examples/claude-native/workflows/README.md#role-routing-and-child-prompt-size-2026-09-21) (L274)
+- the [workflow role-routing notes](../../examples/claude-native/workflows/README.md#role-routing-and-child-prompt-size-2026-09-21) (L494)
   keeps guarded Headroom coordinator-side;
 - #381's [preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json) says of
   Headroom "No default role grant; report M10 N/A and explain any invocation."
@@ -488,12 +488,12 @@ named roles now receive their role blocks instead of the default block.
 
 **Limitations and open items.** A plugin-scoped `agent_type` such as `my-plugin:stack-verifier` receives the
 default block, as the blind gate already documents for plugin-shipped roles; the installer copies user agents
-with bare names. A new shipped agent with a `tools:` line and no map entry receives the default block, and the
+with bare names. The map also matches a same-named agent in any other project, because the hook runs from user settings for every project and a project-scope definition overrides the user-scope one; that agent receives the role block written for the shipped allowlist whatever its own `tools:` line grants, and the grant-agreement test checks only the shipped definitions. A new shipped agent with a `tools:` line and no map entry receives the default block, and the
 grant-agreement test fails for it unless its allowlist covers every line. The Codex stack-worker profile's
 codebase-memory and Headroom exposure is outside this Claude carrier and is not reconciled here.
 
-**Overturn.** Revisit a role block when its agent's `tools:` line changes, which the grant-agreement test
-surfaces first. Also revisit when a native child run shows a role block without a lane that the role uses and is
+**Overturn.** Revisit a role block when its agent's `tools:` line changes, though the grant-agreement test
+fails only when a block still names a tool the line no longer grants; a new grant or a `disallowedTools` entry fails no test. Also revisit when a native child run shows a role block without a lane that the role uses and is
 granted, or when a SubagentStart hook can read the child's resolved tool list, which would let one block be
 filtered at run time.
 

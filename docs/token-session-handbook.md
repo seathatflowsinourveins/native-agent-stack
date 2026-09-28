@@ -207,7 +207,7 @@ full block told these roles to load tools they cannot call
 A role block copies its lines from the full block below, except for the role variants listed after the table.
 Types that inherit their tools keep the full block. The
 [text contract test](../tests/test_token_lanes_subagent_start.py) checks, for every shipped agent with a `tools:`
-line, that each tool its injected text names or needs is in that line.
+line, that each lane tool its injected text names or needs (ToolSearch, Bash for the RTK line, and the Context Mode, Serena, jCodeMunch, SocratiCode, QMD, ai-memory, codebase-memory and Headroom tools) is in that line; a tool the text only prohibits, such as WebFetch, is not checked.
 
 | `agent_type` | Block | Lines, in order |
 | --- | --- | --- |
