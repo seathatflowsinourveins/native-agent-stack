@@ -29,6 +29,15 @@ its own source, and a source the build did not re-read is labelled as reviewed i
 - **Before the first conversation,** a P0-P2 probe receipt must be at most 900 seconds old and
   bound to the live network and container IDs. The dispatch gate enforces this. The coordinator
   must also have recorded P3 on the running gateway build; code does not enforce that half.
+- **Official grading has no network.** Every grader container is created with network mode
+  `none`, "No networking for this container" (docker/docker-py@7.1.0
+  `docker/models/containers.py:686-694`). The adapter refuses any other mode, any SDK create body
+  without it, and any created container whose inspect shows another network; that container is
+  removed, not graded. moby/moby@docker-v29.8.1 records the mode as the single network `none`
+  and refuses to connect such a container elsewhere (`daemon/create.go:251`,
+  `daemon/container_operations.go:202-204,363-406`). This fails closed: an evaluation step that
+  needs to download fails, so the verdict is an offline verdict
+  (SWE-bench@v4.1.0 `test_spec/python.py:443-444`, `test_spec/test_spec.py:55-60`).
 
 Isolation then holds by construction, whatever OmniRoute's authentication state. It also covers
 the other host-loopback listeners, not only OmniRoute. Gateway settings cannot provide it. The
@@ -87,6 +96,8 @@ calls inside the container.
 - **Split-port proves simpler.** Reopen if a probe shows split-port plus a layer-4 rule that
   allows only `10.0.2.2:<API_PORT>`, and that combination blocks `/api/*` for the agent,
   including dot-segment and `%2e` variants, with fewer moving parts than O1.
+- **Graders need a network.** Replace mode `none` only with a separately probed internal network
+  for graders, backed by its own P0-P2-style receipt.
 
 ## Agent-branch ruleset (resolver mode; applied by the owner)
 
@@ -218,6 +229,11 @@ host evidence for this design is the live P0-P2 probe
 - `ghcr.io/nginx/nginx-unprivileged@sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e`,
   source nginx/docker-nginx-unprivileged@588b4cbc (`pins.json` `gateway_proxy`).
 - moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`.
+- docker/docker-py@7.1.0 (a3652028, the SDK in OpenHands/benchmarks@405bae7 `uv.lock`)
+  `docker/models/containers.py:686-694,913-936`, `docker/api/container.py:445-457` and
+  `docker/types/containers.py:351`; moby/moby@docker-v29.8.1 (464cd50c) `daemon/create.go:251`
+  and `daemon/container_operations.go:202-204,363-406`; SWE-bench@v4.1.0 (726c5461)
+  `swebench/harness/test_spec/python.py:443-444` and `test_spec/test_spec.py:55-60`.
 - OpenHands/software-agent-sdk@fcc102a `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
   `config.py:24` and `dependencies.py:19`.
 - OmniRoute@045aa81f3, as reviewed in the phase-2 synthesis and not re-read here:

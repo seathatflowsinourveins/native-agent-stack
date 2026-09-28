@@ -571,10 +571,34 @@ cut off every container, the proxy included, and leave the host's
 non-loopback addresses reachable
 ([decision record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md)).
 
-Official grader containers keep their upstream options and are not on the
-attempt networks. The coordinator must qualify their host-service isolation
-separately, without presenting altered test conditions as an unchanged
-environment.
+Official grader containers are not on the attempt networks and have **no
+network at all**. `e2e/docker_grader.py` creates each one with network mode
+`none`, "No networking for this container" (docker/docker-py@7.1.0, the grader
+lock's SDK, `docker/models/containers.py:686-694`). It enforces this at three
+points:
+- it refuses any upstream network, network-mode, networking-config or
+  network-disabled option;
+- it refuses any SDK create body whose `HostConfig.NetworkMode` is not `none`
+  (`api/container.py:445-457`, `types/containers.py:351`);
+- it refuses to grade when the created container's inspect shows a mode other
+  than `none` or any network besides `none`, and removes that container.
+
+moby/moby@docker-v29.8.1 records mode `none` as the single network entry `none`
+at create (`daemon/create.go:251`, `daemon/container_operations.go:363-406`).
+It also refuses to connect such a container to another network (`:202-204`).
+Grading therefore has no path to the host's loopback listeners, the gateways or
+the internet.
+
+This is a fail-closed deviation from the upstream grading environment. The
+evaluation script re-runs the repository's install command
+(SWE-bench@v4.1.0 `test_spec/python.py:443-444`), and the script sets
+`-uxo pipefail` but not `-e` (`test_spec/test_spec.py:55-60`). An install step
+that must download therefore fails, and the tests run against the image's
+preinstalled environment. A verdict that depends on network access during
+evaluation is an offline verdict, not an unchanged-environment verdict. The
+official gold and known-negative controls for the selected instance run under
+the same condition. **Overturn:** give graders a separately probed internal
+network, with its own P0-P2-style receipt, and record that before using it.
 
 ### Gateway proxy allowlist
 
@@ -829,10 +853,11 @@ rechecks that identity; mutable pulls and builds are refused. Sources:
 SWE-bench@v4.1.0 `test_spec/test_spec.py:106-120`, `docker_build.py:516-524`;
 docker/docker-py@7.1.0 `docker/models/resource.py:28-33`.
 
-`e2e/docker_grader.py` adapts names and ownership labels only. It adds **no memory,
+`e2e/docker_grader.py` adapts names, ownership labels and the network mode
+(`none`; see [Security posture](#security-posture)) only. It adds **no memory,
 CPU, PID, capability or user changes** to the official grading container. Gold
-patch and known-negative official controls must run under the frozen image
-before a worker verdict is accepted. `e2e/check.py` relays the actual report; an
+patch and known-negative official controls must run under the frozen image, with
+no network, before a worker verdict is accepted. `e2e/check.py` relays the actual report; an
 error/incomplete bucket is infrastructure, not a model-negative tally.
 
 Host work remaining: native installation and import acceptance; shared skills

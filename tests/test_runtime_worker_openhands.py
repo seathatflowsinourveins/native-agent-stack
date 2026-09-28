@@ -641,11 +641,131 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
         self.assertEqual(changed["labels"]["com.native-agent-stack.owner"],
                          "gpt6-omniroute-framework-integration")
         self.assertEqual(changed["image"], original["image"])
-        self.assertEqual(set(changed) - set(original), {"labels"})
+        # docker-py 7.1.0 models/containers.py:686-694: network_mode "none" is
+        # "No networking for this container".
+        self.assertEqual(set(changed) - set(original), {"labels", "network_mode"})
+        self.assertEqual(changed["network_mode"], "none")
         self.assertEqual(original["name"], "sweb.eval.django__django-11333.attempt")
-        for update in ({"ports": {"8000/tcp": 3710}}, {"name": "unowned"}, {"volumes": {"unowned": {}}}):
+        self.assertEqual(module.owned_container_options({**original, "network_mode": "none"})["network_mode"], "none")
+        for update in ({"ports": {"8000/tcp": 3710}}, {"name": "unowned"}, {"volumes": {"unowned": {}}},
+                       {"network_mode": "bridge"}, {"network_mode": "host"}, {"network_mode": "default"},
+                       {"network_mode": "container:rw-openhands-other"}, {"network": "bridge"},
+                       {"networking_config": {"bridge": {}}}, {"network_disabled": True}):
             with self.subTest(update=update), self.assertRaises(ValueError):
                 module.owned_container_options({**original, **update})
+
+    def networked(self, mode, networks):
+        removed = []
+        container = SimpleNamespace(attrs={"HostConfig": {"NetworkMode": mode},
+                                           "NetworkSettings": {"Networks": networks}},
+                                    remove=lambda force: removed.append(force))
+        return container, removed
+
+    def test_grader_container_is_created_with_network_none_and_inspected(self):
+        module = load_recipe_module("e2e/docker_grader.py")
+        image_id = "sha256:" + "a" * 64
+        collection = SimpleNamespace(client=SimpleNamespace(images=SimpleNamespace(
+            get=lambda image: SimpleNamespace(id=image_id))))
+        record = self.result / "docker-created.jsonl"
+        spec = {"name": "sweb.eval.django__django-11333.attempt", "image": "swebench/example:latest",
+                "detach": True, "command": "tail -f /dev/null"}
+        created = []
+        # moby docker-v29.8.1 daemon/create.go:251 and container_operations.go:363-406:
+        # mode "none" is recorded as the single NetworkSettings.Networks entry "none".
+        good, removed = self.networked("none", {"none": {"IPAddress": ""}})
+
+        def create(collection, *args, **kwargs):
+            created.append(kwargs)
+            return good
+        self.assertIs(module.owned_create(create, collection, (), spec, image_id, record), good)
+        self.assertEqual(created[0]["network_mode"], "none")
+        self.assertEqual(created[0]["name"], "rw-openhands-" + spec["name"])
+        self.assertEqual(json.loads(record.read_text()), {"name": "rw-openhands-" + spec["name"]})
+        self.assertEqual(removed, [])
+        # A spec that asks for any network is refused before the Docker call.
+        for update in ({"network_mode": "bridge"}, {"network": "rw-openhands-other"}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                module.owned_create(create, collection, (), {**spec, **update}, image_id, record)
+        self.assertEqual(len(created), 1)
+        # Refuse to grade when the created container's inspect shows another network.
+        for mode, networks in (("default", {"bridge": {"IPAddress": "172.17.0.2"}}),
+                               ("none", {"none": {}, "bridge": {}}), ("none", {}), ("none", None),
+                               ("bridge", {"none": {}})):
+            bad, removed = self.networked(mode, networks)
+            with self.subTest(mode=mode, networks=networks):
+                with self.assertRaisesRegex(ValueError, "grader_container_network_not_none"):
+                    module.owned_create(lambda collection, *a, **k: bad, collection, (), spec, image_id, record)
+                self.assertEqual(removed, [True])
+
+    def test_grader_sdk_create_body_requires_network_none(self):
+        module = load_recipe_module("e2e/docker_grader.py")
+        # docker-py 7.1.0 types/containers.py:351 writes NetworkMode (default "default");
+        # api/container.py:445-457 posts that body to /containers/create.
+        config = {"Image": "swebench/example:latest", "HostConfig": {"NetworkMode": "none"}}
+        self.assertIs(module.checked_create_config(config), config)
+        for bad in ({"HostConfig": {"NetworkMode": "default"}}, {"HostConfig": {"NetworkMode": "bridge"}},
+                    {"HostConfig": {"NetworkMode": "host"}}, {"HostConfig": {}}, {}, None,
+                    {"HostConfig": {"NetworkMode": "none"}, "NetworkingConfig": {"EndpointsConfig": {"bridge": {}}}}):
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, "grader_container_requires_network_none"):
+                module.checked_create_config(bad)
+
+    def test_grader_main_installs_the_network_none_transport(self):
+        module = load_recipe_module("e2e/docker_grader.py")
+        image_id = "sha256:" + "a" * 64
+        posted, created = [], []
+
+        class APIClient:
+            def create_container_from_config(self, config, name=None, platform=None):
+                posted.append(config)
+                return {"Id": "fixture"}
+
+            def build(self, *args, **kwargs):
+                return "built"
+
+        class ContainerCollection:
+            client = SimpleNamespace(images=SimpleNamespace(get=lambda image: SimpleNamespace(id=image_id)))
+
+            def create(self, image, command=None, **kwargs):
+                created.append(kwargs)
+                return SimpleNamespace(attrs={"HostConfig": {"NetworkMode": kwargs.get("network_mode")},
+                                              "NetworkSettings": {"Networks": {"none": {}}}})
+
+        class Other:
+            def pull(self, *args, **kwargs):
+                return "pulled"
+
+            def create(self, *args, **kwargs):
+                return "created"
+
+        modules = {name: SimpleNamespace() for name in (
+            "docker", "docker.models", "docker.api", "docker.models.containers", "docker.models.networks",
+            "docker.models.volumes", "docker.models.images", "docker.api.client")}
+        modules["docker.models.containers"].ContainerCollection = ContainerCollection
+        modules["docker.api.client"].APIClient = APIClient
+        networks, volumes, images = type("N", (Other,), {}), type("V", (Other,), {}), type("I", (Other,), {})
+        modules["docker.models.networks"].NetworkCollection = networks
+        modules["docker.models.volumes"].VolumeCollection = volumes
+        modules["docker.models.images"].ImageCollection = images
+        ran = []
+        with patch.dict(sys.modules, modules), \
+                patch.object(module.importlib.metadata, "version", return_value="4.1.0"), \
+                patch.object(module.runpy, "run_module", side_effect=lambda *a, **k: ran.append(a)), \
+                patch.dict(os.environ, {"OPENHANDS_GRADER_IMAGE_ID": image_id}), \
+                contextlib.chdir(self.result):
+            module.main()
+            ContainerCollection().create("swebench/example:latest", name="sweb.eval.fixture.run")
+            with self.assertRaises(ValueError):
+                ContainerCollection().create("swebench/example:latest", name="sweb.eval.fixture.run",
+                                             network_mode="bridge")
+            with self.assertRaisesRegex(ValueError, "grader_container_requires_network_none"):
+                APIClient().create_container_from_config({"HostConfig": {"NetworkMode": "default"}})
+            APIClient().create_container_from_config({"HostConfig": {"NetworkMode": "none"}})
+            for forbidden in (APIClient().build, images().pull, volumes().create, networks().create):
+                with self.subTest(forbidden=forbidden), self.assertRaises(RuntimeError):
+                    forbidden()
+        self.assertEqual(ran, [("swebench.harness.run_evaluation",)])
+        self.assertEqual([options["network_mode"] for options in created], ["none"])
+        self.assertEqual(posted, [{"HostConfig": {"NetworkMode": "none"}}])
 
     def test_task_adapter_hides_oracle_and_requires_frozen_original_bytes(self):
         module = load_recipe_module("e2e/task.py")
@@ -1020,7 +1140,14 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
             module.checked_image(collection, "swebench/example:latest", "sha256:" + "b" * 64)
         with self.assertRaises(ValueError):
             module.checked_image(collection, "swebench/example:latest", None)
-        self.assertIn("ImageCollection.pull = forbidden", (RECIPE / "e2e/docker_grader.py").read_text())
+        # Pulls stay forbidden once the transport is installed (see
+        # test_grader_main_installs_the_network_none_transport for main()).
+        images = type("ImageCollection", (), {"pull": lambda self, *a, **k: "pulled"})
+        others = [type(name, (), {"create": lambda self, *a, **k: "created"}) for name in ("C", "V", "N")]
+        api = type("APIClient", (), {"build": lambda self: "built", "create_container_from_config": lambda self, c: c})
+        module.install_transport(others[0], api, images, others[1], others[2], "sha256:" + "a" * 64)
+        with self.assertRaisesRegex(RuntimeError, "use_prebuilt_images"):
+            images().pull("swebench/example:latest")
 
     def test_frozen_grader_digest_is_checked_before_retagging(self):
         host = load_recipe_module("host.py")
