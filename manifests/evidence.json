@@ -13469,8 +13469,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "45300ec8e1306d2203a4d6447d432315852959d73cc0aa902df2d6091204fa83",
-      "bytes": 17344
+      "sha256": "057ff7c549fcaf527d86e4131e97babbc243179b383c1b96b125454fbf6bfa41",
+      "bytes": 17353
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -13714,8 +13714,8 @@
     },
     {
       "path": "catalogs/us-equities/research-20260928-movers.md",
-      "sha256": "7ff5afca44bbae0298bd1bc31b44b19e51aceee47830eb2cdd998b303a21afc2",
-      "bytes": 12830
+      "sha256": "d97b17683f4d061958d9da306898212511f5889a0e6d52d2af5a500f11a5dcab",
+      "bytes": 14870
     },
     {
       "path": "catalogs/us-equities/research-receipt.json",

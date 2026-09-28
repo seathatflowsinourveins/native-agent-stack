@@ -31,8 +31,8 @@ Its bounded operational paper lane uses 120 requests/minute against the observed
 The [September 28 mover research refresh](research-20260928-movers.md) records
 historical extreme-mover data sources, the factor evidence for pre-positioning
 versus post-detection continuation, and the layer changes since the September 26
-convergence. No selection changed. The paper series frozen that day waits on a
-rejected (HTTP 401) paper key.
+convergence. No recorded selection changed. The paper series frozen that day
+waits on a rejected (HTTP 401) paper key.
 
 The [September 24 mover v3 sweep](mover-v3-sweep-20260924.json) records the
 catalog actions behind the [mover v3 research plan](../../blueprints/us-equities/mover-v3/README.md):
