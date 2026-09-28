@@ -188,12 +188,15 @@ change implements none of it.
 
 ## Evidence class
 
-The evidence so far has two parts:
+The evidence so far has three parts
+([evidence/phase2-commands.json](../../blueprints/runtime-workers/openhands/evidence/phase2-commands.json)):
 - offline unit checks with Docker mocked, which are our integration checks and not upstream
   tests;
 - read-only host observations: registry byte hashes of the pinned proxy image, one pull by
-  digest, image identity checks and one selected-field inspect of the default bridge network
-  ([evidence/phase2-commands.json](../../blueprints/runtime-workers/openhands/evidence/phase2-commands.json)).
+  digest, image identity checks and one selected-field inspect of the default bridge network;
+- the repository's own validate-job checks and full unit suite, run in a network namespace with
+  only loopback. Every failure there also occurs at the base, and the evidence entries show that
+  comparison.
 
 No attempt network or container was created. No gateway or model request was made. The first
 host evidence for this design is the live P0-P2 probe

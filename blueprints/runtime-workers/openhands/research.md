@@ -398,7 +398,9 @@ Open finding from this phase, not changed here:
 This phase is an offline build on efa73f40 following the coordinator's
 phase-2 plan: section 1 (isolation design) and items E1, E2, E3 and E5. Item
 E4, resolver mode, goes to a follow-up PR. The phase ran unit tests with Docker
-mocked plus read-only host observations. It created no attempt network or
+mocked plus read-only host observations, then the repository's validate-job
+checks and full unit suite in a network namespace with only loopback. Each
+failure there also occurs at the base. It created no attempt network or
 container and made no gateway or model request.
 - Commands and outputs:
   [evidence/phase2-commands.json](evidence/phase2-commands.json).
