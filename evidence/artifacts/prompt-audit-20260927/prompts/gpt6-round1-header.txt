@@ -1,0 +1,7 @@
+Task: judge the 13 items in the packet below and answer only in the required JSON, one entry per item id.
+- The repository is checked out read-only at <base> (main at 55fc8d17). Read the original files there (for example
+  sed -n, rg, git -C <base> log/blame/show). Do not write, install or change anything.
+- Primary sources with verbatim quotes, gathered for this task, are in <work>/sources.json and follow the packet below.
+  You may search the web for current official documentation; cite official sources only.
+- Packet sha256: 0e6b6430a06f1de9f92d7c5a3316e698e7f365aac85515db7d2d32645da27877.
+
