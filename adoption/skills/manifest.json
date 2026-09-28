@@ -860,7 +860,7 @@
     {
       "skills": "second-opinion, post-patch-validation, dimensional-analysis and the smart-contract, fuzzing-handbook, trailmark, C/C++/Rust and cryptography skills",
       "source": "trailofbits/skills",
-      "reason": "second-opinion duplicates the installed codex plugin and tools/sota-convergence/codex_lane.py; post-patch-validation duplicates verification-before-completion and fp-check (Socket Warn); dimensional-analysis targets DeFi arithmetic with no unit-bug history here; the rest are off-domain or need the uninstalled trailmark tool.",
+      "reason": "second-opinion duplicates the installed codex plugin and tools/sota-convergence/codex_lane.py; post-patch-validation duplicates fp-check (Socket Warn), and duplicated verification-before-completion until that skill's removal on 2026-09-28; dimensional-analysis targets DeFi arithmetic with no unit-bug history here; the rest are off-domain or need the uninstalled trailmark tool.",
       "overturn": "A concrete gap appears (a unit-mismatch defect in numeric or order code, a native fuzzing target) and the skill passes its audits."
     },
     {

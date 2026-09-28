@@ -3849,8 +3849,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "069fd29fbea5d6fb6f60a4da517b0302e27c032790b9e6fed40e6a2d3a5a8210",
-      "bytes": 50559
+      "sha256": "d1a76acad46578d314529b1ab57fce987b4382c6eca95e78cc9f576230a62d72",
+      "bytes": 50612
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
