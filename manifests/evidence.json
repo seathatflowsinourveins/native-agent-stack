@@ -13843,8 +13843,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "3464f0a3227d03cdb663a067dffaea5eca4c6dd573e48704a6c339ebd58dabad",
-      "bytes": 61150
+      "sha256": "f6d224756987d4cb12b8e46d43764e17c2fa22904b99753faecec839e74bb86f",
+      "bytes": 61765
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -33900,6 +33900,21 @@
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/sandbox-worker-runtimes.json",
       "sha256": "3706f2888e0b28bd4bec5327267715ba78e910ce2854daf81aaa1017760839ca",
       "bytes": 248046
+    },
+    {
+      "path": "evidence/artifacts/security-audit-host-install-20260928/README.md",
+      "sha256": "d966c5ee27bb53eec21003ea1533b3e11636290c32ab9bad231c95291d8fd323",
+      "bytes": 3663
+    },
+    {
+      "path": "evidence/artifacts/security-audit-host-install-20260928/node-test.txt",
+      "sha256": "5a83b061db631b46bdd450b9949f4f7e85d79df65a81875e606175b23721822a",
+      "bytes": 4698
+    },
+    {
+      "path": "evidence/artifacts/security-audit-host-install-20260928/receipt.json",
+      "sha256": "e8b1027a68149bea8c219fb80c2d2f504ea1ff8ee2a4340d313f66f4b310cd97",
+      "bytes": 6435
     },
     {
       "path": "evidence/artifacts/skills-agents-layer-20260926/README.md",
