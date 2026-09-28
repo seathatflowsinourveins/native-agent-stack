@@ -37,8 +37,9 @@ KEY_PHRASES = (  # the default block only; role blocks carry ROLE_KEY_PHRASES
     "codebase-memory", "jcodemunch", "TOON", "headroom",
     "Show evidence before a success claim", "search-first",
 )
-# No block names a verification skill or step (Opus 5 guide L61, L81; verification-line addendum).
-# isolated-builder still preloads the skill through its own `skills:` frontmatter.
+# No block file names the withdrawn verification skill (Opus 5 guide L61, L81; verification-line addendum).
+# A literal-name check: it does not detect other verification wording. isolated-builder still preloads
+# the skill through its own `skills:` frontmatter.
 WITHDRAWN_PHRASES = ("verification-before-completion",)
 ROLE_KEY_PHRASES = {
     "token-lanes-block.researcher.md": (
