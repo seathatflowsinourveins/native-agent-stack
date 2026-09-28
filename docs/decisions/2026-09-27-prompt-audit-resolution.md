@@ -139,9 +139,9 @@ Exact counts come from `count_files` in [`tools/token-report/token_manifest.py`]
 
 | File | Loaded | Tokens | Words | Lines |
 | --- | --- | ---: | ---: | ---: |
-| `AGENTS.md` | Claude (via `@AGENTS.md`) and Codex sessions in this repository | 2,374 → 2,401 (+27); round 3's S1 and X5b: → 2,484 (+83) | 1,477 → 1,495; → 1,549 | 103 → 103 |
+| `AGENTS.md` | Claude (via `@AGENTS.md`) and Codex sessions in this repository | 2,374 → 2,401 (+27); round 3's S1 and X5b: → 2,484 (+83), `controls/token-counts-r3-after.txt` | 1,477 → 1,495; → 1,549 | 103 → 103 |
 | `tools/sota-convergence/landscape-sweep/templates.json` | the `facts` key: the Claude refute-facts stage, once per layer and round that has proposals | 2,239 → 2,305 (+66) | 1,413 → 1,466 | 8 → 8 |
-| `CLAUDE.md` | Claude sessions in this repository | round 3's X9: 30 → 96 (+66) at `f508ffba`; 96 → 162 (+66) on `main` at `eb678281`, which added the `## Compact Instructions` section (#453) | 18 → 65; 62 → 109 | 4 → 8; 11 → 15 |
+| `CLAUDE.md` | Claude sessions in this repository | round 3's X9: 30 → 96 (+66) at `f508ffba`; 96 → 162 (+66) on `main` at `eb678281` and at `fb14dedf`, whose `CLAUDE.md` also holds the `## Compact Instructions` section (#453); `controls/token-counts-r3-*.txt` | 18 → 65; 62 → 109 | 4 → 8; 11 → 15 |
 
 Provider usage is recorded in `usage.json`, once per job or agent. The coordinator session's own usage is not
 included.
@@ -243,7 +243,9 @@ included.
 - **X8:** "after the current foundation work" is undefined in eight places, and only the user can define or close it.
 - **X5:** resolved in round 3 (lane A). The one remaining step is on hosts: a Codex home that installed the lane
   block keeps the old line until `tools/adoption/apply_codex_lane.py` is run there again after #458 merges (a dry
-  run, then the `--apply` command it prints, with its `--expect-*` hashes).
+  run, then the `--apply` command it prints, with its `--expect-*` hashes). On this workstation it ran after #458
+  merged. The dry run planned only the managed `AGENTS.md` block, `--apply` wrote it and read it back, and
+  `tools/adoption/prove_codex_lane.py` passed 7 of 7. Each other host that installed the lane needs its own run.
 - **X6 and X10:** any change belongs upstream in agent-lab.
 - **F3 and X7:**
   - A verified but stale activity value still refutes a proposal. For example, eslazarev/purged-cross-validation was
@@ -491,8 +493,8 @@ The three texts match round 2's published arms byte for byte.
 
 **Decision: applied under step 1 of the rule, unanimously.**
 - `CLAUDE.md` lines 3-8 now hold the GPT-6 lane's text, quoted under Limitations and residuals. The file grows by 66
-  o200k tokens: from 30 to 96 at `f508ffba`, and from 96 to 162 on `main` at `eb678281`, whose `CLAUDE.md` also
-  holds #453's `## Compact Instructions` section after these lines.
+  o200k tokens: from 30 to 96 at `f508ffba`, and from 96 to 162 on `main` at `eb678281` and again at `fb14dedf`, whose
+  `CLAUDE.md` also holds #453's `## Compact Instructions` section after these lines (`controls/token-counts-r3-*.txt`).
 - Step 2 was not needed. It would have chosen the same text on correct statuses, 10 to 8.
 
 The judges' reasons, in brief:
@@ -548,13 +550,15 @@ independent lanes: GPT-6 (`gpt-6-astra`, effort max, read-only) through the pack
 - **S1.** The added sentence tells each session to build a PR description from `.github/pull_request_template.md`.
   The required `sota-sources` check fails a description without a non-empty `## SOTA sources` or `### SOTA sources`
   section. `lane-a/round1/facts-s1.json` records the live ruleset's required checks and #410, whose description had
-  no such heading and whose check failed. Both lanes tested the check's heading rule (`validate.yml:335-336`) on
-  variants of the heading. The GPT-6 lane reports running the workflow's script. The Claude lane reports replicating
+  no such heading and whose check failed. Both lanes tested the check's heading rule (`validate.yml:335-336` at `f508ffba`, `:544-545` on
+  this base) on variants of the heading. The GPT-6 lane reports running the workflow's script. The Claude lane reports replicating
   its two lines in Node, a synthetic check, not a CI run.
 - **X5b.** The line is the operator's 2026-09-28 paragraph, byte for byte (`lane-a/round1/user-level-top-rule.txt`).
   Every obligation of the old line stays, verbatim. "Never self-write without a SOTA source" leaves the heading, while
   "With no SOTA source, stop and report instead of writing one" keeps its force. No test reads line 3; the
-  consistency tests read the link on line 5 and the dispatch pointer.
+  consistency tests read the link on line 5 and the dispatch pointer. One co-change follows it:
+  `docs/harness-defaults.md:7` restated the old heading ("research first, and never self-write without a SOTA
+  source") and now restates the new one. No test reads that sentence.
 - **X5a and X5c** change `lane:foundation` files, so they land in #458. Its decision record,
   [`2026-09-28-top-rule-templates.md`](2026-09-28-top-rule-templates.md), holds the adjudication attempts, the final
   round, the checks and the usage. Both templates keep "The installed client is also a source of truth; never

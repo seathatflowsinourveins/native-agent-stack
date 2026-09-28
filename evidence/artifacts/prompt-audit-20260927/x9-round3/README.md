@@ -31,7 +31,7 @@ blind, in both orders.
 | `judges/` | Inputs, packets, prompts, schema and mapping as sent (`sent-sha256.json` holds each file's hash as received), the four returns with the runner's own records, the audit, the judge actions, the tally and their scripts | retained model judgments |
 | `void_patterns_r3.py`, `audit_r3.py`, `tally_r3.py` | The void patterns, audit and tally, hashed before any return was read | protocol |
 | `usage.json` | Provider usage of the comparison runs, the probes, the four judges and the source research, each counter kept separate | usage record |
-| `exposure_scan_dir.py`, `package_x9_round3.py` | The count-only scan run on this directory before its first push, and the script that wrote this package | protocol |
+| `exposure_scan_dir.py`, `package_x9_round3.py` | The count-only scan run on this directory before its first push (it also counts Claude subagent ids, as lane A's copy does), and the script that wrote this package. The packager writes the host user name as `<user>` in every file, as lane A's does, so the published scan's home pattern reads `<user>` | protocol |
 
 ## Checks you can repeat
 
@@ -44,6 +44,8 @@ Run these from this directory.
   - `python3 -B check_orders_r3.frozen.py judges/packets judges/mapping.json` reproduces the false difference and exits
     1. The frozen copy's clause pattern also stops at commas, so a clause such as `[c] K1 0, K2 3, K3 1` is cut
     short. The copy as run uses round 2's revised pattern again.
+- `python3 -B exposure_scan_dir.py .` exits 1 by design and lists 16 files. Every match is a name or pattern text,
+  not a value (see "Settings content"), and none is a secret-shaped string or a subagent id.
 - `judges/audit.json`, `judges/judge-actions.json` and the Claude usage cannot be recomputed from this package. Their
   scripts read the judges' session transcripts, which are withheld because they carry the host's injected session
   context.
@@ -71,7 +73,13 @@ Both changes were made after the counted runs and before any judge started. The 
   - a round-2 K4 summary line names the kinds of file its runs read;
   - one round-2 K4 status sentence lists the checks its run made (a settings file, the status-line wiring);
   - the list of untested cases names `enabledPlugins`.
-- The scan's other matches in this directory are its own pattern text, in the scripts and in `isolation-receipt.json`.
+- The scan's other matches in this directory are names, not values:
+  - its own pattern text, in the scripts and in `isolation-receipt.json`;
+  - this README's own mentions;
+  - `enabledPlugins` once in `judges/claude.BA.json`, where a judgment quotes the packet's list of untested cases;
+  - `enabledPlugins` in the preregistration's list of untested cases (`prereg-r3.json` and its draft);
+  - `installed_plugins` in `metrics_r3.py`'s `evidence_settings` definition and pattern.
+- The scan's home-path matches are pattern text in the scripts (`/home/`, `/Users/`, `<user>`), not paths.
 
 ## What is not claimed
 
