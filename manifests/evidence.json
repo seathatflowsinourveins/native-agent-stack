@@ -14050,8 +14050,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-delegated-decisions.md",
-      "sha256": "984cd31892637502ec50e2499c15485063beb78e44e397bb12860d489c61c50b",
-      "bytes": 16000
+      "sha256": "ef93948f54a2ed1695a1d332f01423d2ba6266c5429146fe547142c16e986698",
+      "bytes": 16692
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -38785,8 +38785,8 @@
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
-      "sha256": "2849838d915afa5a58bedd9d01a6a91bbd5e416d86a9b91c33d04bba202969d9",
-      "bytes": 70927
+      "sha256": "a3bc6729bc53859782337027c8af22f64ebfe276104d54907c580dad36c0b13b",
+      "bytes": 76920
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md",
