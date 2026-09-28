@@ -115,8 +115,8 @@ settings env block and the settings template):
   `tools/skill-usage/skill_usage.py` and their tests, outside this change's paths.
 
 **Host scope, applied on 2026-09-28 with the user's approval** (not in any PR). The user
-settings were hand-edited with a backup, never through the applier. The resulting state is
-read back, value-free, in the
+settings were hand-edited with a backup, never through the applier; that edit history is the
+operator's account. The resulting state is read back, value-free, in the
 [host read-back receipt](../../evidence/receipts/claude-host-practice-readback-20260928.json)
 (`claude-host-practice-readback-20260928`, one host, Claude Code 2.1.283):
 
@@ -126,9 +126,10 @@ read back, value-free, in the
   back as an error result with one permission denial. A Bash call of
   `git push --force-with-lease --dry-run origin main`, against a throwaway bare remote, came
   back without error or denial.
-- AN-18, host half: a logging-only ConfigChange hook appends one JSON line per settings change
-  (timestamp, source and file only) to a log outside every worktree. It ends in `|| true`, so it
-  never blocks a change. The receipt counts the log's lines.
+- AN-18, host half: one ConfigChange hook command writes timestamp, source and file to a log
+  outside every worktree and ends in `|| true`. The receipt found the log's lines to be JSON
+  objects with only those three keys. It triggered no settings change, so it does not test one
+  line per change or that the hook never blocks one.
 - AN-19, part (2): the statusLine command exports `diff.autoRefreshIndex=false` through
   `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0` and sets `"refreshInterval": 5`.
   claude-hud 0.8.0 runs `--no-optional-locks status --porcelain`, which never writes the index,
@@ -138,8 +139,8 @@ read back, value-free, in the
   export rewrote it; plain `git diff --numstat HEAD` behaves the same way.
 - AN-26: the user `CLAUDE.md` now spawns a one-subagent task without a `name`. It names a spawn
   only for a teammate whose role needs neither `skills`, `omitClaudeMd` nor `isolation`
-  (source: `examples/claude-native/CLAUDE.md`). This is private instruction text, so it is not
-  in the receipt.
+  (source: `examples/claude-native/CLAUDE.md`). The receipt checks both phrases as booleans and
+  keeps none of the private instruction text; whether a session follows them is not tested.
 - A09-notification-channel: `preferredNotifChannel` is `terminal_bell` in the host settings
   only. The template stays at the default `auto`, which already notifies in Ghostty, Kitty and
   iTerm2 ([terminal configuration](https://code.claude.com/docs/en/terminal-config)). A
@@ -148,17 +149,20 @@ read back, value-free, in the
 
 The same approval covered the install audit's native-installation gaps. That audit was a
 read-only `stack-verifier` pass of 26 rows at `f508ffba`, which found the core token stack, its
-upstream hooks and its MCP servers already installed and connected. The receipt reads back:
+upstream hooks and its MCP servers already installed and connected. By the operator's account,
+Headroom was re-registered at user scope with the recipe's four no-egress variables
+([the recipe](../../recipes/README.md): `HEADROOM_OFFLINE`, `HF_HUB_OFFLINE`,
+`TRANSFORMERS_OFFLINE`, `DO_NOT_TRACK`) and MCPorter's Headroom entry got the same environment;
+agent-browser 0.38.1 was installed with the recipe's `npm install --global --prefix` command and
+`agent-browser install`; and the QMD catalog index was refreshed with
+`qmd --index native-agent-stack-catalog update` and `embed`. The receipt reads back only the
+resulting state:
 
-- Headroom's Claude registration was replaced at user scope with the recipe's four no-egress
-  variables ([the recipe](../../recipes/README.md): `HEADROOM_OFFLINE`, `HF_HUB_OFFLINE`,
-  `TRANSFORMERS_OFFLINE`, `DO_NOT_TRACK`), and MCPorter's Headroom entry got the same
-  environment. `claude mcp get headroom` reports it connected with all four.
+- `claude mcp get headroom` reports scope User, Connected and all four variables set to 1, and
+  MCPorter's Headroom entry carries the same four.
 - `BASH_MAX_TIMEOUT_MS` in the host environment equals the template's value.
-- agent-browser 0.38.1 was installed with the recipe's `npm install --global --prefix` command
-  and `agent-browser install`. Its open, get-title and close smoke steps exit 0.
-- The QMD catalog index was refreshed with `qmd --index native-agent-stack-catalog update` and
-  `embed`, leaving 0 files pending embedding at the read-back.
+- `agent-browser --version` reports 0.38.1, and its open, get-title and close smoke steps exit 0.
+- `qmd --index native-agent-stack-catalog status` reports 0 files pending embedding.
 
 **Host drift recorded, owner decision pending:** `claude mcp get jcodemunch` on this host
 reports `Scope: User config` and `Connected` on 2026-09-28, against the
@@ -350,7 +354,7 @@ or [Deferred, handed-off and host-scope items](#deferred-handed-off-and-host-sco
 | Unattended permission route | 5 repos prefer auto mode to bypass (fcakyon sets defaultMode auto). luongnv89 and thedotmack use dontAsk for CI. | `--permission-mode auto --permission-prompts none` for unattended runs (headless.md:295). dontAsk is 'useful for locked-down CI runs' (headless.md:277). | Four blueprint runners already use dontAsk plus none. The recipe invocations inherit the host default and go to a qualification row. auto is PS-8's question. |
 | --bare for scripted calls | 6 of 22 repos recommend --bare (Boris's 'up to 10x', FlorianBruniaux). oh-my-claudecode drops it when there is no API key. | '`--bare` is the recommended mode for scripted and SDK calls, and will become the default for `-p` in a future release' (headless.md:62). But it never reads OAuth or the keychain (help, 2.1.283). | Unusable on this OAuth host. M6 selects a replacement, and the tripwire note lands now. |
 | Completion loops | 8 repos want completion checked by machine, many through Ralph loops: bash `while` loops and the ralph-wiggum / ralph-loop plugins. | Native /goal (checked after each turn; runs to completion in -p) and Stop hooks (goal.md, hooks.md). | /goal and verifying checks. Ralph is rejected as the completion mechanism. |
-| -p JSON output shape | 6 repos parse JSON output. centminmod and our own fixtures observed an array. | The help and best-practices say `json` returns a single result object. The 2.1.283 binary writes the full message array when verbose is set. | Both are right under different settings. Apply the either-shape parser (handed off to the A10 unit). This host sets verbose: true. Both live `claude -p` runs of the [host read-back receipt](../../evidence/receipts/claude-host-practice-readback-20260928.json) returned the array shape, which matches the binary read and the fixtures. |
+| -p JSON output shape | 6 repos parse JSON output. centminmod and our own fixtures observed an array. | The help and best-practices say `json` returns a single result object. The 2.1.283 binary writes the full message array when verbose is set. | Both are right under different settings. Apply the either-shape parser (handed off to the A10 unit). This host's user settings set `verbose` to true, and both live `claude -p` runs of the [host read-back receipt](../../evidence/receipts/claude-host-practice-readback-20260928.json) returned the array shape, which matches the binary read and the fixtures. |
 | Scheduler durability and /loop lifetime | 9 repos choose the scheduler by durability. shanraisshan still says /loop lasts 3 days. | Session-scoped tasks expire after 7 days. For durability, use Routines, Desktop tasks or GitHub Actions (scheduled-tasks.md). | Covered: durable host jobs run as oneshot systemd --user timers. The 3-day claim stays rejected (R5). |
 | Model routing for CI cost | FlorianBruniaux routes triage to Haiku and reviews to Sonnet. | The docs cap cost with --max-turns, timeouts and concurrency (github-actions.md:311-313). They give no model-downgrade guidance. | Rejected: it predates Opus 5, R25 measured against it, and the user's rule is quality first. |
 | Commit attribution | Split. caveman and ECC hide it, ECC through the deprecated includeCoAuthoredBy. claude-plugins-official keeps it. | The trailer is on by default. The `attribution` setting is the deterministic control, and a CLAUDE.md or memory rule overrides it since 2.1.269. includeCoAuthoredBy is deprecated since 2.0.62. | Keep the native default as model provenance. Use the object form if it is ever changed. |
