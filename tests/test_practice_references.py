@@ -5,6 +5,7 @@ observe() output; the command line replays them with --observations; observe() i
 against a fake ``gh`` (subprocess.run patched, as tests/test_sota_convergence.py does for
 github_freshness.py). The stale boundary follows ossf/scorecard@8788fc28
 probes/hasRecentCommits/impl.go:52-57: a commit counts only when it is after now - 90 days.
+The gh error strings are the ones gh 2.101.0 returned on 2026-09-28 (see GhErrorTests).
 """
 import copy
 import importlib.util
@@ -12,6 +13,7 @@ import io
 import json
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
@@ -34,6 +36,9 @@ _spec.loader.exec_module(practice_references)
 NOW = datetime(2026, 9, 28, 3, 0, tzinfo=timezone.utc)
 PIN = "8ca22dba9a94f28898bbce59f2537ff4d87c747d"
 HEAD = "0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c"
+# SHAs whose hex digits spell an HTTP status: a status must never be read from them.
+PIN_404 = "8ca22dba9a94f28898bbce59f2537ff4d87c7404"
+PIN_429 = "8ca22dba9a94f28898bbce59f2537ff4d87c7429"
 RECORD = "docs/decisions/2026-09-28-community-sweep.md"
 DIMENSION = "harness-and-token-practice"
 
@@ -78,6 +83,14 @@ def catalog(repositories=tuple(FIXTURES)):
         "scope": "fixture", "dimensions": [{"id": DIMENSION, "description": "fixture", "topics": ["t"]}],
         "references": [entry(repository) for repository in repositories],
     }
+
+
+def write_record(root, record=RECORD):
+    """A decision record at ``record`` under a scratch repository root."""
+    path = Path(root) / record
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("# Decision: fixture\n", encoding="utf-8")
+    return path
 
 
 def row_for(repository):
@@ -156,8 +169,72 @@ class ClassificationTests(unittest.TestCase):
         self.assertEqual(row["pin_date_observed"], "2026-09-26")
 
 
+def timeout_error(path):
+    """What github_freshness.gh_api() returns for a timed-out call: str(TimeoutExpired), which
+    quotes the whole command, so the path and both compared SHAs are in the text."""
+    return str(subprocess.TimeoutExpired(["gh", "api", path], 60))
+
+
+class GhErrorTests(unittest.TestCase):
+    """A gh api failure is classified by the HTTP status gh prints on its error line, never by
+    digits elsewhere in the text. gh 2.101.0 prints "gh: <message> (HTTP <status>)" or
+    "gh: HTTP <status>" (cli/cli@0cf10924, tag v2.101.0, pkg/cmd/api/api.go:684-685 and :553-557). On
+    2026-09-28 it returned "gh: Not Found (HTTP 404)" for a missing repository and for an
+    unknown SHA on either side of repos/{repo}/compare, and "gh: No commit found for SHA:
+    <sha> (HTTP 422)" for repos/{repo}/commits/<unknown sha>."""
+
+    def compare_row(self, pin, compare_error):
+        observation = observed("example/pin", comparison=None)
+        observation["compare_error"] = compare_error
+        return practice_references.classify(entry("example/pin", pin=pin), observation, NOW)
+
+    def test_status_is_read_only_from_the_gh_error_line(self):
+        cases = {
+            "gh: Not Found (HTTP 404)": 404,
+            f"gh: No commit found for SHA: {PIN_429} (HTTP 422)": 422,
+            "gh: HTTP 502": 502,
+            "gh: Not Found (HTTP 404)\ngh: This API operation needs the \"admin:org\" scope.": 404,
+            timeout_error(f"repos/example/pin/compare/{PIN_404}...{HEAD}?per_page=1"): None,
+            "[Errno 2] No such file or directory: 'gh'": None,
+            "no HTTP 404 here": None,
+            "": None,
+            None: None,
+        }
+        for error, status in cases.items():
+            with self.subTest(error=error):
+                self.assertEqual(practice_references.gh_http_status(error), status)
+
+    def test_a_compare_timeout_is_a_fetch_error_whatever_the_shas_contain(self):
+        for pin in (PIN_404, PIN_429, PIN):
+            with self.subTest(pin=pin):
+                row = self.compare_row(pin, timeout_error(f"repos/example/pin/compare/{pin}...{HEAD}?per_page=1"))
+                self.assertEqual(row["flags"], ["fetch_error"])
+                self.assertIn("timed out", row["error"])
+
+    def test_an_unresolved_pin_is_reported_whatever_its_sha_contains(self):
+        for pin in (PIN_404, PIN_429, PIN):
+            for error in ("gh: Not Found (HTTP 404)", f"gh: No commit found for SHA: {pin} (HTTP 422)"):
+                with self.subTest(pin=pin, error=error):
+                    self.assertEqual(self.compare_row(pin, error)["flags"], ["pin_unresolved"])
+
+    def test_only_a_404_on_the_repository_is_missing(self):
+        cases = {
+            "gh: Not Found (HTTP 404)": ["missing"],
+            timeout_error("repos/example/http-404-pages"): ["fetch_error"],
+            timeout_error("repos/example/not-found-tool"): ["fetch_error"],
+            "gh: API rate limit exceeded for installation ID 4041. (HTTP 403)": ["fetch_error"],
+            "gh: Bad credentials (HTTP 401)": ["fetch_error"],
+        }
+        for error, flags in cases.items():
+            with self.subTest(error=error):
+                result = practice_references.classify(entry("example/x"), {"error": error}, NOW)
+                self.assertEqual(result["flags"], flags)
+
+
 class CatalogValidationTests(unittest.TestCase):
     def test_committed_catalog_is_well_formed(self):
+        # Format only: the record lands with the wave's decision-record change, and main()
+        # checks that it exists (RecordTests).
         loaded, errors = practice_references.load_catalog(CATALOG)
         self.assertEqual(errors, [])
         references = loaded["references"]
@@ -223,17 +300,68 @@ class CatalogValidationTests(unittest.TestCase):
         self.assertTrue(errors)
 
 
+class RecordTests(unittest.TestCase):
+    """Each entry's record must be an existing file confined to the repository root, the rule
+    scripts/landscape.py's single_lane_decision_path_issue() applies to a single-lane record,
+    checked with scripts/catalog_decisions.py's safe_file()."""
+
+    def test_existing_record_passes_and_a_missing_one_is_reported_once(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            errors = practice_references.record_issues(catalog(), root)
+            self.assertEqual(len(errors), 1, errors)  # six entries, one shared record
+            self.assertIn(f"{RECORD} does not exist", errors[0])
+            write_record(root)
+            self.assertEqual(practice_references.record_issues(catalog(), root), [])
+
+    def test_symlinked_record_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "elsewhere.md"
+            target.write_text("# not a record\n", encoding="utf-8")
+            link = root / RECORD
+            link.parent.mkdir(parents=True)
+            link.symlink_to(target)
+            errors = practice_references.record_issues(catalog(), root)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("not a confined repository file", errors[0])
+
+    def test_load_catalog_checks_records_only_under_a_given_root(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            path = directory / "catalog.json"
+            path.write_text(json.dumps(catalog()), encoding="utf-8")
+            self.assertEqual(practice_references.load_catalog(path)[1], [])
+            loaded, errors = practice_references.load_catalog(path, root=directory)
+            self.assertIsNone(loaded)
+            self.assertTrue(any("does not exist" in error for error in errors), errors)
+            write_record(directory)
+            self.assertEqual(practice_references.load_catalog(path, root=directory)[1], [])
+
+
 class CommandLineTests(unittest.TestCase):
-    def run_main(self, directory, document, observations):
+    def run_main(self, directory, document, observations, record=True):
         catalog_path, observations_path = directory / "catalog.json", directory / "observations.json"
         catalog_path.write_text(json.dumps(document), encoding="utf-8")
         observations_path.write_text(json.dumps(observations), encoding="utf-8")
+        root = directory / "root"
+        root.mkdir()
+        if record:
+            write_record(root)
         out, markdown = directory / "report.json", directory / "report.md"
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()) as stderr:
             status = practice_references.main([
-                "--catalog", str(catalog_path), "--observations", str(observations_path),
+                "--catalog", str(catalog_path), "--observations", str(observations_path), "--root", str(root),
                 "--now", iso(NOW), "--out", str(out), "--markdown", str(markdown)])
         return status, out, markdown, stderr.getvalue()
+
+    def test_a_missing_record_exits_non_zero_without_a_report(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            status, out, markdown, stderr = self.run_main(Path(temporary), catalog(), FIXTURES, record=False)
+            self.assertEqual(status, 2)
+            self.assertIn(f"malformed catalog: references[0].record: {RECORD} does not exist", stderr)
+            self.assertFalse(out.exists())
+            self.assertFalse(markdown.exists())
 
     def test_drift_stale_archived_renamed_and_missing_are_report_only(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -291,21 +419,36 @@ class _FakeProc:
 class ObserveTests(unittest.TestCase):
     """observe() through github_freshness.fetch_repository() and gh_api() with a fake gh."""
 
-    def fake_gh(self, answers, calls):
+    def fake_gh(self, answers, calls, timeouts=()):
         def run(cmd, capture_output=True, text=True, timeout=60):
             path = cmd[2]
             calls.append(path)
+            if path in timeouts:
+                raise subprocess.TimeoutExpired(cmd, timeout)
             answer = answers.get(path)
             if answer is None:
                 return _FakeProc(1, stderr="gh: Not Found (HTTP 404)")
             return _FakeProc(0, stdout=json.dumps(answer))
         return run
 
-    def observe(self, repository, answers):
+    def observe(self, repository, answers, pin=PIN, timeouts=()):
         calls = []
-        with mock.patch("subprocess.run", side_effect=self.fake_gh(answers, calls)):
-            observation = practice_references.observe(entry(repository))
+        with mock.patch("subprocess.run", side_effect=self.fake_gh(answers, calls, timeouts)):
+            observation = practice_references.observe(entry(repository, pin=pin))
         return observation, calls
+
+    def test_a_timed_out_comparison_is_a_fetch_error_not_an_unresolved_pin(self):
+        compare = f"repos/example/tool/compare/{PIN_404}...{HEAD}?per_page=1"
+        answers = {
+            "repos/example/tool": {"full_name": "example/tool", "archived": False, "default_branch": "main"},
+            "repos/example/tool/tags?per_page=1": [],
+            "repos/example/tool/commits/main": {"sha": HEAD, "commit": {"committer": {"date": iso(NOW)}}},
+        }
+        observation, calls = self.observe("example/tool", answers, pin=PIN_404, timeouts=(compare,))
+        self.assertIn(compare, calls)
+        self.assertIn(PIN_404, observation["compare_error"])
+        row = practice_references.classify(entry("example/tool", pin=PIN_404), observation, NOW)
+        self.assertEqual((row["flags"], row["commits_since_pin"]), (["fetch_error"], None))
 
     def test_observation_compares_the_pin_with_the_observed_head(self):
         answers = {

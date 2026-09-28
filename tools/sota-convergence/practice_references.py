@@ -14,9 +14,10 @@ signed-in ``gh`` CLI:
 It writes a deterministic JSON report (``--out``) and a Markdown table for a job summary
 (``--markdown``). Drift, staleness, renames, missing repositories and fetch errors are
 report-only: the exit status is 0 for every well-formed catalog, and 2 only when the
-catalog is malformed (unreadable, invalid JSON, a duplicate key, or a validate_catalog()
-error) or an argument is invalid. Nothing here edits a pin, a disposition or a practice.
-validate_catalog(), classify(), build_report() and render_markdown() are pure, so
+catalog is malformed (unreadable, invalid JSON, a duplicate key, a validate_catalog()
+error, or a record that is not an existing file under ``--root``) or an argument is
+invalid. Nothing here edits a pin, a disposition or a practice. validate_catalog(),
+classify(), build_report() and render_markdown() are pure, so
 tests/test_practice_references.py runs offline; ``--observations`` replays recorded
 observations instead of calling gh.
 
@@ -24,9 +25,21 @@ Sources:
 
 * In-repo reference implementation: tools/sota-convergence/github_freshness.py.
   fetch_repository() (archived, full_name, default_branch, the head commit and its
-  committer date), gh_api() (never raises) and is_expected_missing() (a 404 is an answer;
-  a timeout, 429 or 5xx is not) are imported from it, not re-written.
-  scripts/catalog_decisions.py's unique_json() rejects duplicate JSON keys.
+  committer date) and gh_api() (never raises: a failure comes back as gh's stderr, or as
+  str(exc) for a timeout or a missing binary) are imported from it, not re-written.
+  scripts/catalog_decisions.py's unique_json() rejects duplicate JSON keys, and its
+  safe_file() confines a path to the repository without symlinks; record_issues() applies
+  it the way scripts/landscape.py's single_lane_decision_path_issue() requires a confined,
+  existing record under docs/decisions/.
+  github_freshness.is_expected_missing() is not reused. It matches "404", "not found" and
+  "429" anywhere in the text, and gh_api() returns a timeout as str(TimeoutExpired), which
+  quotes the command's path with both compared SHAs, so a SHA containing "404" made a
+  timeout read as an unresolved pin. Its own docstring also excludes the repos/{slug} call.
+* gh errors: gh api prints "gh: <message> (HTTP <status>)" when the error body carries a
+  message and "gh: HTTP <status>" otherwise (cli/cli@0cf1092493af067646fc5f3db9421c6a6ec9c938,
+  tag v2.101.0, pkg/cmd/api/api.go:684-685 and :553-557). gh_http_status() reads the status
+  from that first stderr line only and returns None for anything else, which classify()
+  reports as fetch_error.
 * Stale: the Maintained check, https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained,
   read at ossf/scorecard@8788fc28f563f5a68b4ba67a7a65eb7de6a0a5dd: docs/checks.md:400-408
   (an archived project receives the lowest score; activity is judged over the previous
@@ -43,12 +56,32 @@ Sources:
   ahead_by, behind_by) in github/rest-api-description@c6721f32a17a71397ae46be21be90d7f1a173b6e
   descriptions/api.github.com/api.github.com.json:55402 (the path) and :148219-148273 (the
   schema). The pin is BASE and the observed head SHA is HEAD, so commits_since_pin is
-  ahead_by; a 404 or 422 answer (the operation's documented error responses) means the
-  pin does not resolve.
+  ahead_by. The operation documents two client errors, 404 and 422, besides the server
+  errors 500 and 503 (:55474-55483); a 404 or 422 means the pin does not resolve. On
+  2026-09-28 gh 2.101.0 returned 404 for an unknown SHA on either side of a comparison.
 * Renamed: repos/get answers 301 moved_permanently for a moved repository (same
   description, :39424), and the REST best practices say to follow it
   (https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api#follow-redirects);
   gh follows it, so the returned full_name differs from the catalog's owner/name.
+
+Decision, 2026-09-28: a separate weekly report-only checker. Alternatives compared:
+
+* Run the OpenSSF Scorecard Maintained check itself (``--checks=Maintained``,
+  ossf/scorecard@8788fc28 README.md:525-528). It yields a score out of 10 (README.md:387)
+  that credits weekly commits and maintainers' issue activity (docs/checks.md:404-408),
+  never sees the pin the sweep read, and its Action targets projects you own
+  (README.md:181-184). Pin drift needs the comparison either way, so only the no-commit
+  condition is re-derived here.
+* Add these repositories to the Monday catalog-freshness lane. Its fetch_repository()
+  records the head, archived state and renames but compares no pin; this checker reuses
+  that fetch instead.
+* No scheduled check, re-reading each pin at the next sweep. The rejection of
+  anthropics/claude-code-security-review rests partly on its last commit (2026-02-11), so
+  only a scheduled observation reports the maintenance change that would reopen it.
+
+Overturn: retire this checker when the Monday lane compares the catalogued pins itself, or
+when a Scorecard Maintained run disagrees with this checker's stale flag for a catalogued
+repository.
 """
 from __future__ import annotations
 
@@ -67,8 +100,8 @@ for _path in (str(REPO_ROOT), str(HERE)):
         sys.path.insert(0, _path)
 
 # Reused, not re-written (see the module docstring).
-from github_freshness import fetch_repository, gh_api, is_expected_missing  # noqa: E402
-from scripts.catalog_decisions import unique_json  # noqa: E402
+from github_freshness import fetch_repository, gh_api  # noqa: E402
+from scripts.catalog_decisions import safe_file, unique_json  # noqa: E402
 
 SCHEMA = "practice-references-freshness/1"
 CATALOG_KIND = "practice_references"
@@ -93,6 +126,9 @@ SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 KEBAB_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 RECORD_RE = re.compile(r"^docs/decisions/\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
+# gh api's error line: "gh: <message> (HTTP <status>)" or "gh: HTTP <status>"
+# (cli/cli@0cf10924, tag v2.101.0, pkg/cmd/api/api.go:684-685 and :553-557).
+GH_ERROR_LINE_RE = re.compile(r"^gh: (?:HTTP ([1-5][0-9]{2})|.* \(HTTP ([1-5][0-9]{2})\))$")
 
 
 def _is_text(value) -> bool:
@@ -180,8 +216,8 @@ def _validate_entry(entry, label, dimension_ids, checked_at) -> list:
 def validate_catalog(catalog) -> list:
     """Every structural problem in a parsed catalog, in document order; [] when well-formed.
 
-    The record path's format is checked, not its existence: a wave's decision record can
-    land in a separate pull request from its catalog entries."""
+    Pure: the record path's format is checked here and its existence by record_issues(),
+    which load_catalog() applies when given a repository root."""
     if not isinstance(catalog, dict):
         return ["catalog: expected a JSON object"]
     errors = [f"catalog: missing {key}" for key in TOP_LEVEL_REQUIRED if key not in catalog]
@@ -244,13 +280,37 @@ def validate_catalog(catalog) -> list:
     return errors
 
 
-def load_catalog(path: Path):
-    """(catalog, errors) for a catalog file; errors is non-empty when it is malformed."""
+def record_issues(catalog: dict, root: Path) -> list:
+    """For a catalog validate_catalog() accepts: one error per distinct record path that is
+    not an existing regular file confined to ``root`` (safe_file() refuses a symlink, a
+    non-canonical path and an escape); [] when every record exists."""
+    errors, seen = [], set()
+    for index, entry in enumerate(catalog["references"]):
+        record = entry["record"]
+        if record in seen:
+            continue
+        seen.add(record)
+        label = f"references[{index}].record: {record}"
+        try:
+            path = safe_file(Path(root), record)
+        except ValueError as exc:
+            errors.append(f"{label} is not a confined repository file ({exc})")
+            continue
+        if not path.is_file():
+            errors.append(f"{label} does not exist")
+    return errors
+
+
+def load_catalog(path: Path, root: Path | None = None):
+    """(catalog, errors) for a catalog file; errors is non-empty when it is malformed. With
+    ``root``, every record must also exist under that repository root (record_issues())."""
     try:
         catalog = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
     except (OSError, UnicodeError, ValueError) as exc:
         return None, [f"{path.name}: not a readable JSON document without duplicate keys ({type(exc).__name__})"]
     errors = validate_catalog(catalog)
+    if not errors and root is not None:
+        errors = record_issues(catalog, root)
     return (None if errors else catalog), errors
 
 
@@ -299,13 +359,20 @@ def _one_line(text, limit=160) -> str:
     return " ".join(str(text).split())[:limit]
 
 
+def gh_http_status(error):
+    """The HTTP status of a failed gh api call, read only from gh's error line (the first
+    stderr line), or None: a timeout's str(TimeoutExpired) quotes the command with its SHAs,
+    and a missing binary, another failure or a line truncated before its status has none."""
+    if not isinstance(error, str) or not error.strip():
+        return None
+    match = GH_ERROR_LINE_RE.match(error.strip().splitlines()[0])
+    return int(match.group(1) or match.group(2)) if match else None
+
+
 def is_unresolvable_pin(error) -> bool:
-    """True when a failed comparison means the pin does not resolve in the repository (404 or
-    422), not a transient failure (timeout, 429, 5xx), which is_expected_missing() excludes."""
-    if is_expected_missing(error):
-        return True
-    lowered = str(error or "").lower()
-    return "429" not in lowered and bool(re.search(r"\b422\b", lowered))
+    """True when a failed comparison means the pin does not resolve in the repository (HTTP
+    404 or 422), not a transient failure such as a timeout, a rate limit or a 5xx."""
+    return gh_http_status(error) in (404, 422)
 
 
 def _finish(row: dict, flags: set, errors: list) -> dict:
@@ -329,7 +396,9 @@ def classify(entry: dict, observation, now: datetime) -> dict:
     if not isinstance(observation, dict):
         observation = {"error": "not observed"}
     if observation.get("error"):
-        flags.add("missing" if is_expected_missing(observation["error"]) else "fetch_error")
+        # repos/get answers 404 for a missing (or inaccessible) repository; anything else,
+        # a timeout included, is a fetch error.
+        flags.add("missing" if gh_http_status(observation["error"]) == 404 else "fetch_error")
         errors.append(observation["error"])
         return _finish(row, flags, errors)
 
@@ -494,6 +563,8 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--catalog", type=Path, default=DEFAULT_CATALOG,
                         help="Catalog to check (default: catalogs/foundation/practice-references.json).")
+    parser.add_argument("--root", type=Path, default=REPO_ROOT,
+                        help="Repository root that each entry's record path resolves against (default: this checkout).")
     parser.add_argument("--out", type=Path, help="Write the JSON report here (default: standard output).")
     parser.add_argument("--markdown", type=Path, help="Write the Markdown summary table here.")
     parser.add_argument("--observations", type=Path,
@@ -506,7 +577,7 @@ def parse_args(argv=None):
 
 def main(argv=None) -> int:
     args = parse_args(argv)
-    catalog, errors = load_catalog(args.catalog)
+    catalog, errors = load_catalog(args.catalog, root=args.root)
     if errors:
         for error in errors:
             print(f"malformed catalog: {error}", file=sys.stderr)
