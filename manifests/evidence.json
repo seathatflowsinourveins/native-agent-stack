@@ -5112,6 +5112,16 @@
       "bytes": 5199
     },
     {
+      "path": "blueprints/convergence-practice/omniroute-routing-20260928/README.md",
+      "sha256": "9db0823f48a6007881fbf7848d126cb8a6814f1649461d80b644cee73388f328",
+      "bytes": 15796
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+      "sha256": "de31f07cf4ac3f1d32fc64ef94796a98a9aec39fb2a10945dfd1d13e37cdb246",
+      "bytes": 56660
+    },
+    {
       "path": "blueprints/convergence-practice/protocol.json",
       "sha256": "7176889bb4f8e3839c5230918c1e23ff89bdd3778a8f333db2ea881731a08e45",
       "bytes": 2595
@@ -33207,6 +33217,131 @@
       "bytes": 141
     },
     {
+      "path": "evidence/artifacts/omniroute-routing-20260928/README.md",
+      "sha256": "87b1b7f8d5ddb3043a67a7fb942b8b287573899eff83be56b59052626ddd91e9",
+      "bytes": 14467
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/ab-requirements.md",
+      "sha256": "bf3086ee2f4348c3c9da30e556da0b97316b61114227f983d099e7ebcd72ac10",
+      "bytes": 3518
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/adjudication-rule.json",
+      "sha256": "9b701cb2b6bb2f392417706ac91da5f1574d9e4377987eaf622c94346eebd915",
+      "bytes": 6118
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/adjudication.json",
+      "sha256": "94183e4d8967c924618aeb44e06f7f3ff71ae6e597c9c08981b8c24d0b85b100",
+      "bytes": 176360
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/decisions.json",
+      "sha256": "d39d74a156d3a7d102d29829c619bf2db8c3daa346667625f4c01480afc57812",
+      "bytes": 16637
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json",
+      "sha256": "d0821ebf06adbdb24817996fcc9416c694db74521b28ff6401534d87ed8284fd",
+      "bytes": 1774
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/maintenance-gh-20260928.tsv",
+      "sha256": "b921e64e1770bec96585e4c4fb034424e306717a0c42ce29b211d786ed586732",
+      "bytes": 1349
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/offpin-control-prepatch.md",
+      "sha256": "b139b565d84c5687bc94781d03354304988af7491bcc9e93726938a0f8cb6467",
+      "bytes": 4625
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/offpin-control.py.txt",
+      "sha256": "26d99656dd862df971284685cbd3960da22026044aa64016e124197a3991fc88",
+      "bytes": 4760
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/offpin-rerun-team-lead.tsv",
+      "sha256": "4c0bc69682c1f3b062c2c89e204897826790cf60d00a74869fb1bdf704d10411",
+      "bytes": 1268
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/record-review-gpt6.last.json",
+      "sha256": "8ba6f9efe849e5f290099167f845b2f2ae8fe6bab570f0179104e50b1ae8b0f4",
+      "bytes": 43527
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/record-review-gpt6.schema.json",
+      "sha256": "7f5605c749fbe4d44bbeb4737c115a6f90721b240488031832b4460f46343d89",
+      "bytes": 646
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json",
+      "sha256": "3ab36b52201737f6912032b573cbe4b12e2d63ff11026a6dd8d75f46ce265b59",
+      "bytes": 7437
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job1.last.json",
+      "sha256": "e81ce40f4a63e4614d0be87a7484ad4a3ffbb1b2fc21129a643de7a860c9e194",
+      "bytes": 27578
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job1.prompt.txt",
+      "sha256": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140",
+      "bytes": 4124
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job1.schema.json",
+      "sha256": "df09899cfdc435635c30f74f39117190ff088488b16406b0d8ddb1c811a65f8a",
+      "bytes": 3786
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job2.last.json",
+      "sha256": "27a46c9ba7b160f3bad8ce3f52da030f5709117bbbd5b2cf3fe9ab52c3981246",
+      "bytes": 42192
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job2.prompt.txt",
+      "sha256": "015bf2a389c9fd0823e19081486a2055d26e0e014c3d49404a7dda957edf5a1c",
+      "bytes": 34056
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-job2.schema.json",
+      "sha256": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507",
+      "bytes": 2779
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-catalog.json",
+      "sha256": "489074fa22fe8a337dbe8e98048a3baa32b5805c3ea237548148bf24be7d3c56",
+      "bytes": 27444
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-landscape-occupancy-research.md",
+      "sha256": "2bbbd194759ae5bd61a854b26b2d5498b3adf0f3bac7ff535d994f554a875704",
+      "bytes": 7470
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-final.json",
+      "sha256": "f50266a1650351b3822382df45fb99c63e9f013c1d36a138331784dbf0c1884a",
+      "bytes": 36124
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md",
+      "sha256": "901a7eb50e2274087df770dd0b547b2a12125c64813407498da9fb15f43bc625",
+      "bytes": 1730
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-mapper-resume-parts.md",
+      "sha256": "0a205329ceebeaa9cdfaa801348916fc8e565a8f57af6a07d7f70aa66f3fb437",
+      "bytes": 6503
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
+      "sha256": "a3fb9cee8dab79992e1178a684ab264f53a64ade4d1894f28f15c0b8b7a5ba83",
+      "bytes": 23100
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -40621,6 +40756,7 @@
     "evidence/artifacts/local-model-workloads-20260924/experiment.json",
     "evidence/artifacts/memory-stack-20260925/experiment.json",
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
-    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json"
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json"
   ]
 }

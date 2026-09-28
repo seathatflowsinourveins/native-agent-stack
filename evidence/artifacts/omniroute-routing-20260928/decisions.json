@@ -1,0 +1,149 @@
+{
+ "kind": "decision_log_extract",
+ "subject": "GPT-6 lane account routing through OmniRoute: 20128 (shared, build dd6e9607e) and 20129 (full-compression lane chained to 20128 through the sharedgw provider node)",
+ "source": "The coordinator's private decision log for this session, which is not published. Only decision facts and their UTC times are extracted here. Workflow and task handles, peer session names and the user's directives are left out, except the one decision quote below. Times ending in Z without seconds are as precise as the log. This record covers the coordinator's log through its 03:50Z entry and the GPT-6 record review that ended at 04:13:48Z. Later work, including the occupancy patch workflow's review rounds from about 04:0xZ, belongs to that workflow and a later record.",
+ "decisions": [
+  {
+   "id": "limiter-lift-20129",
+   "utc": "2026-09-28T01:22:13Z",
+   "decision": "applied",
+   "what": "On 20129, PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":false}} returned HTTP 200. The read-back showed autoEnableApiKeyProviders false and the sharedgw limiter enabled true -> false, with no environment override. The requestQueue values (60 rpm, 350 ms, 6 concurrent) stay stored but are no longer auto-applied.",
+   "approval": "Approved before the 00:38Z pause; the only 20129 action during the pause was a GET of the limiter's before-state.",
+   "receipt": "limiter-apply-20129.json",
+   "rollback": "PATCH /api/resilience {\"requestQueue\":{\"autoEnableApiKeyProviders\":true}} on 20129, then read back GET /api/rate-limits.",
+   "effect_measured": false
+  },
+  {
+   "id": "expiry-first-d",
+   "utc": "2026-09-28T01:20Z (resume entry; the log gives no finer time)",
+   "decision": "not_applied",
+   "what": "Lever (d), PATCH providerStrategies.codex.fallbackStrategy=expiry-first on 20128.",
+   "reasons": [
+    "It changes only the target of the in-request Codex 429 rotation (providerExecutionPipeline.ts:373-405, called without a sessionKey). New keyed pins stay LRU and bound sessions are untouched (route-mapper-resume-parts.md, check 1).",
+    "Check 2 (which quota window expiry-first scores on) was still open when the decision was logged; it closed later in route-mapper-resume-parts.md.",
+    "20128 was to be frozen for the R02 scored run; the freeze began at the 01:29:29Z read-back."
+   ],
+   "reopen": "Run it as the D01 A/B only if Codex 429 rotations occur (0 rotation lines in the 05:51Z-00:16Z app.log window) and the double move is observed: 'affinity cleared' then 'new affinity created' on the same key, plus an audit_log codex.account_rotation entry (adjudication.json, P8)."
+  },
+  {
+   "id": "r02-freeze-20128",
+   "utc": "2026-09-28T01:29:29Z",
+   "decision": "freeze",
+   "what": "20128 is frozen from the admissible R02 dry read-back through the R02 scored run of the token-efficiency lane (PR #445). No routing change is applied to 20128 in that period.",
+   "status_at_03_3xZ": "The R02 scored run had not started: PR #445 was still not frozen and not run at bddb0072, and the owner of that run was no longer active. The freeze therefore holds with no end date; the affinity patch stays staged and 20128 is not restarted."
+  },
+  {
+   "id": "occupancy-patch-20128",
+   "utc": "about 2026-09-28T01:35Z",
+   "decision": "approved; acceptance pending; apply after R02",
+   "user_quote": "Full patch after R02",
+   "what": "Part (i): skip the OAuth occupancy override when an existing eligible pin was reused (a selectedBySessionAffinity flag at auth.ts:1984-1987 and '&& !selectedBySessionAffinity' at :2159; guard form from OmniRoute PR #13102 head baaaaf31). Part (ii): bind a fresh pin to the connection actually served (CLIProxyAPI selector.go:1066-1077; sub2api openai_account_scheduler.go:1237-1238, ordinary selection, which binds the acquired account unless a sticky escape set PreserveStickyBinding; 1327-1330 is the weighted-sticky fallback). As written, a flag set in the if (affinityConnection) block at auth.ts:1984-1987 cannot tell a reused pin from a fresh one, because selectSessionAffinityConnection returns a connection for both (sessionAffinityPin.ts:280-319). The implementation must distinguish them explicitly (GPT-6 record review, P1:action); the patch workflow owns it.",
+   "procedure": "Upstream suite, rebuild and restart of 20128 only after the R02 scored run, then live verification by rerunning the frozen pre-patch control script over peak-stratified loaded hours (prepatch-offpin-control-frozen); the route-mapper-final.json whole-window figures are context.",
+   "built_in": "A separate workflow on a local branch at dd6e9607e with a new install prefix. This record neither builds nor applies it.",
+   "receipt": "route-landscape-occupancy-research.md (the cited fix and the decision); adjudication.json (P1, P7, P18, P19, ADD-P1P7, ADD-LIVE)"
+  },
+  {
+   "id": "unchanged-20128-settings",
+   "utc": "2026-09-28 (coordinator read-back)",
+   "decision": "kept",
+   "what": "sessionAffinityTtlMs 14400000 and providerStrategies.codex round-robin with stickyRoundRobinLimit 1 are unchanged."
+  }
+ ],
+ "failed_or_withdrawn_conditions": [
+  {
+   "id": "withdrawn-8.4pct",
+   "utc": "before 2026-09-28T00:30:21Z, when the JOB 2 prompt was built without the entry",
+   "what": "route-mapper's first off-pin figure: 8.4% of pinned GPT-6 turns on 20128 served by a different account, with cache-read share 84.1% vs 93.9%.",
+   "why_withdrawn": "call_logs.timestamp is the request END time, so a request's start is timestamp minus duration. The first computation did not use that.",
+   "later_figures": [
+    "Per-conversation pin-creation method, 24 h ending about 00:13Z: 460 of 4,461 turns (10.31%) in 64 of 201 conversations, cache-read share 73.76% off-pin vs 92.14% on-pin (route-mapper-final.json, live_metrics.20128.affinity_breakage.pinned_vs_served). Its window note records the check: pin-creation log offset against timestamp minus duration, median -3 ms. The adjudication used this figure.",
+    "Per-turn method (each AUTH affinity line matched to call_logs within 0.5 s, unique pairs only), 06:58Z to 00:13Z (the report does not state its start-time basis; route-mapper's frozen control, with the same pairing rule and the same 339 off-pin turns, uses start = timestamp - duration/1000, so the 8.0% does not repeat the withdrawn computation's error): 339 of 4,231 turns (8.0%), cache-read share 85.6% on moved turns vs 94.5% on the rest (route-mapper-part1-final.md, received after the adjudication). The rate depends on load."
+   ],
+   "retained_in": "route-landscape-catalog.json, addendum_2026_09_28.live_finding_20128_WITHDRAWN"
+  },
+  {
+   "id": "r02-readback-attempt-1",
+   "utc": "2026-09-28T01:23:33Z",
+   "what": "R02 dry read-back of 20128 at PR #445 revision 00a94b52 with its declared source, GET /api/monitoring/health: exit 2. That endpoint requires management auth (alwaysRequireAuth), so version and sha came back null. In the same check the keyless alternates (GET /api/system/version .current and the BUILD_SHA sentinel in the serving directory) returned exit 0. upstream_timeouts were resolved from the unit's Environment= and source defaults; the EnvironmentFile was not read.",
+   "outputs": "Private (mode 0600); only the JSON and exit status were sent to the R02 owners."
+  },
+  {
+   "id": "r02-readback-attempt-2",
+   "utc": "2026-09-28T01:29:29Z",
+   "what": "The same read-back at revision bddb0072 with the amended keyless sources: exit 0, admissible. The 20128 freeze starts here.",
+   "outputs": "Private (mode 0600)."
+  },
+  {
+   "id": "cutoff-projection-not-held",
+   "utc": "2026-09-28T01:22Z",
+   "what": "The 00:19Z projection that the 99%-used limit policy would cut prio4 off at about 01:21Z and prio1 at about 01:29Z did not hold. Codex turns per 5 min fell from 33-67 to 0-14 during the pause, and no cutoff had happened by 01:22Z (route-mapper-resume-parts.md, part 1, interim). The final part 1 report observed no cutoff through 03:29Z in the retained snapshots and logs: no retained row reached <=1% remaining or was marked exhausted (route-mapper-part1-final.md). A missing row can mean an unchanged value, a failed save, or an update skipped before persistence (quotaCache.ts:524-547, 569-588), so poll freshness is not established."
+  },
+  {
+   "id": "window-source-correction",
+   "utc": "after 2026-09-28T01:20Z",
+   "what": "An earlier route-mapper statement that the stored 'session' window came from the x-codex-5h-usage header was corrected. window_key records the position in the upstream usage response (primary -> session, secondary -> weekly), and x-codex-5h-usage feeds a separate cooldown snapshot (route-mapper-resume-parts.md, check 2)."
+  },
+  {
+   "id": "gpt6-maintenance-unknown",
+   "utc": "2026-09-28T00:49:08Z (JOB 2 end); closed 2026-09-28T02:01:49Z",
+   "what": "JOB 2 recorded maintenance 'unknown' for all 16 upstreams because its web tool could not reach GitHub's commit endpoints. A local gh api run closed it: every cited upstream has a default-branch commit after the 2026-06-30 cutoff except Portkey-AI/gateway (last commit 2026-05-25, stale) (maintenance-gh-20260928.tsv)."
+  },
+  {
+   "id": "gpt6-job2-budget",
+   "utc": "2026-09-28T00:49:08Z",
+   "what": "JOB 2 spent its whole budget of 90 page opens and API calls (55 fetches, 35 gh api) and left E2-E4 and E6-E8 not_checked (route-job2.last.json)."
+  }
+ ],
+ "after_adjudication": [
+  {
+   "id": "part1-final-load-dependence",
+   "utc": "about 2026-09-28T03:30Z (the report's file modification time is 03:30:26Z; the adjudication stages ended at 02:32:12Z)",
+   "what": "route-mapper's final part 1 report (route-mapper-part1-final.md). Off-pin is 8.0% by the per-turn method (06:58Z-00:13Z) and 10.31% by the per-conversation method (24 h ending about 00:13Z), and it depends on load: mostly 0% in hours with peak in-flight 4-8, 16.7% at 12Z (peak 13), 17.4% at 14Z (peak 14) and 21.7% at 16Z (peak 32). Since 01:22Z it was 0 of 66 at peak 7, which the report says is not evidence of a fix. On 20129, 2 turns after the limiter change were both 200 with added_wait_ms 0, but the 18 turns before the change also show 0, so that column may not record limiter waits.",
+   "decision": "The affinity-patch acceptance must compare loaded hours (peak in-flight >= 10), stratified by peak, with the same script as the frozen pre-patch control (prepatch-offpin-control-frozen).",
+   "adjudicated": false
+  },
+  {
+   "id": "prepatch-offpin-control-frozen",
+   "utc": "about 2026-09-28T03:4xZ (script run 03:31:57Z, files 03:33Z)",
+   "what": "route-mapper's per-hour off-pin control, script sha256 c4515e7660c47d725c79696c7211b71f26bd0c5d789b3f2a7e9a444f1d778477, window 06:00Z-04:00Z. The coordinator's rerun to 03:00Z reproduced every hourly row (4370 matched, 339 off, 7.8%; 247 mid-turn changes). Hours with peak >= 10: 284/2756 = 10.3%.",
+   "decision": "Acceptance after the patch: the same script, loaded hours stratified by peak.",
+   "receipt": "offpin-control-prepatch.md, offpin-control.py.txt, offpin-rerun-team-lead.tsv",
+   "adjudicated": false
+  },
+  {
+   "id": "gpt6-record-review",
+   "utc": "2026-09-28T03:53:02Z to 04:13:48Z",
+   "refuted_fields": ["P1:overturn_condition", "P18:adopted_rule", "P19:overturn_condition", "ADD-P1P7:adopted_rule", "P9:verify_metric", "P14:omniroute_state", "R3:overturn_condition", "R4:adopted_rule", "P3:omniroute_state", "P5:adopted_rule", "P5:omniroute_state", "P5:overturn_condition", "U2:verify_metric", "M4:omniroute_state", "M5:overturn_condition", "E6:action"],
+   "amended_fields": ["P1:action", "P1:adopted_rule", "P1:upstream_sources", "P7:overturn_condition", "P18:verify_metric", "P19:adopted_rule", "ADD-LIVE:overturn_condition", "P17:overturn_condition", "P6:omniroute_state", "P10:omniroute_state", "P11:verify_metric", "P13:omniroute_state", "P16:adopted_rule", "P16:verify_metric", "P22:action", "P23:verify_metric", "R6:adopted_rule", "R7:overturn_condition", "R8:verify_metric", "P4:verify_metric", "P12:adopted_rule", "P12:verify_metric", "P3:verify_metric", "U1:verify_metric", "U4:verify_metric", "M1:omniroute_state", "M2:omniroute_state", "E3:adopted_rule", "E5:adopted_rule", "E9:overturn_condition", "P20:adopted_rule"],
+   "verified_by_synthesis": ["P1:action", "P1:upstream_sources", "P3:omniroute_state", "P9:verify_metric", "P13:omniroute_state", "P14:omniroute_state"],
+   "not_reverified": "the other 41 fields: GPT-6-cited, not re-opened by Claude",
+   "receipt": "record-review-gpt6.last.json",
+   "adjudicated": false
+  }
+ ],
+ "context_interruptions": [
+  {
+   "utc": "2026-09-28T00:38Z to 01:20Z",
+   "what": "The user paused the work until 01:20Z. Nothing was applied on either gateway and all teammates held. The 20129 full-stack design workflow, which is separate from this record, had no stoppable task; it was left to finish its GPT-6 review step, and its output was not acted on before the resume. GPT-6 JOB 2, a detached read-only codex exec started at 00:30:32Z, finished at 00:49:08Z; its result was relayed after the resume."
+  },
+  {
+   "utc": "about 2026-09-28T01:29Z to 01:35Z",
+   "what": "A Claude teammate working another lane hit the Claude account's weekly usage limit, and the design workflow paused (the log notes that its six verifiers were started again when the run resumed). At about 01:35Z the user reported the limit lifted, and the design workflow was running again after that."
+  }
+ ],
+ "context_changes": [
+  {
+   "utc": "2026-09-28T03:49:59.685Z to 03:49:59.882Z",
+   "what": "A separate 20129 design workflow applied W2-W15: EMERGENCY_FALLBACK and CONTEXT_HANDOFF false; context_length 872000 for three sharedgw models; seven combos; default-caveman no longer default; compression master on, with all 12 engines, liveZone and output styles off. W16 deferred. Read back 03:50:11Z-03:50:26Z.",
+   "effect": "Confounds any later 20129 measurement of the P17 limiter lift."
+  }
+ ],
+ "open_unknowns": [
+  {"id": "U1", "what": "The ChatGPT subscription backend's cache scope and TTL, and whether cached tokens count less against the subscription window.", "next": "Regress per-account quota burn on complete account traffic over identified quota windows, controlling output and reasoning, with uncertainty and stability criteria declared first; report an association, not a provider accounting rule (adjudication.json, U1)."},
+  {"id": "U3", "what": "Cache isolation for Claude subscription (OAuth) accounts. Not applicable while neither instance has a Claude connection.", "next": "Reopen when a Claude OAuth lane is added (adjudication.json, U3)."},
+  {"id": "U4", "what": "Per-account concurrency limits on either subscription; unknown, not unlimited. Observed per-account peak in-flight 2/2/8/8/10/11 with 0 x 429 in the 24 h window.", "next": "429s classified by type (concurrency, quota or rate) in each per-account in-flight bin, at matched model, quota headroom and load, with the rise that activates P18 admission declared first (adjudication.json, U4 and P18)."},
+  {"id": "binding-window-length", "what": "The binding quota window behaves as 7-day: no reset in 18 h, and the prio1-4 resets fall exactly 7 days after first use. Inferred, because window_duration_ms is null on all 555 quota_snapshots rows (route-mapper-resume-parts.md, check 2).", "next": "Record each window's length from the upstream headers (adjudication.json, M5)."},
+  {"id": "foreign-encrypted-reasoning", "what": "Whether the ChatGPT backend decrypts, rejects or silently ignores encrypted reasoning minted by another account. 383 off-pin turns carried encrypted reasoning in the 24 h window and invalid_encrypted_content has never been seen.", "next": "The paired P5 probe with repeated state-sensitive tasks, a same-origin positive control, a visible-history-only negative control and a fidelity margin declared first; equal answers alone do not show that foreign encrypted reasoning was honored (adjudication.json, P5)."},
+  {"id": "20129-prompt-cache-key", "what": "Whether 20129 forwards the client prompt_cache_key to 20128. The source reading is mixed: the Responses-to-Chat translator deletes it for providers outside {openai, codex}, and same-format requests skip translation, but sharedgw's effective target format is not verified.", "next": "Send a synthetic prompt_cache_key through 20129 and compare the inbound and outbound prompt_cache_key, session-id/session_id and thread-id at both hops, accounting for OmniRoute's Codex identity rewrite (codexIdentity.ts:453-480), before the #431 cache comparison is read out; the 20128 affinity key kind is auxiliary (adjudication.json, P3)."}
+ ]
+}
