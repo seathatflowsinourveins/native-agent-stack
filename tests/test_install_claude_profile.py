@@ -624,7 +624,7 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                         self.assertIn(listing.get(skill), {"on", "name-only"},
                                       f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
         for agent, expected in {
-            "isolated-builder": ["context-mode:context-mode", "verification-before-completion"],
+            "isolated-builder": ["context-mode:context-mode"],
             "security-reviewer": ["security-best-practices"],
         }.items():
             with self.subTest(agent=agent):

@@ -38,8 +38,8 @@ KEY_PHRASES = (  # the default block only; role blocks carry ROLE_KEY_PHRASES
     "Show evidence before a success claim", "search-first",
 )
 # No block file names the withdrawn verification skill (Opus 5 guide L61, L81; verification-line addendum).
-# A literal-name check: it does not detect other verification wording. isolated-builder still preloads
-# the skill through its own `skills:` frontmatter.
+# A literal-name check: it does not detect other verification wording. Since 2026-09-28 no agent preloads
+# the skill (builder evidence-sentence addendum); the builder block carries the evidence sentence instead.
 WITHDRAWN_PHRASES = ("verification-before-completion",)
 ROLE_KEY_PHRASES = {
     "token-lanes-block.researcher.md": (
@@ -53,7 +53,7 @@ ROLE_KEY_PHRASES = {
     "token-lanes-block.builder.md": (
         "ToolSearch", "ctx_batch_execute", "cwd = the owned worktree your brief names", "rtk",
         "find_referencing_symbols", "jcodemunch", "codebase_search", "memory_query", "TOON",
-        "one lane per artifact"),
+        "one lane per artifact", "Show evidence before a success claim"),
     "token-lanes-block.scout.md": ("rtk", "rtk proxy <cmd>", "TOON", "one lane per artifact"),
 }
 CORRECTED_PHRASES = (

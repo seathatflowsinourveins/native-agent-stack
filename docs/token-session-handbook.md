@@ -214,7 +214,7 @@ line, that each lane tool its injected text names or needs (ToolSearch, Bash for
 | `stack-researcher` | [`token-lanes-block.researcher.md`](../adoption/hooks/claude/token-lanes-block.researcher.md) | researcher bootstrap, fetch, `ctx_search`, output, RTK, researcher code line, QMD and ai-memory, TOON, one lane |
 | `stack-verifier` | [`token-lanes-block.verifier.md`](../adoption/hooks/claude/token-lanes-block.verifier.md) | verifier bootstrap, `ctx_search`, output, RTK, TOON, one lane |
 | `evidence-reviewer`, `security-reviewer` | [`token-lanes-block.reviewer.md`](../adoption/hooks/claude/token-lanes-block.reviewer.md) | reviewer and builder bootstrap, `ctx_search`, output, reviewer and builder code line, memory line, TOON, one lane |
-| `isolated-builder` | [`token-lanes-block.builder.md`](../adoption/hooks/claude/token-lanes-block.builder.md) | reviewer and builder bootstrap, `ctx_search`, builder output, RTK, reviewer and builder code line, memory line, TOON, one lane |
+| `isolated-builder` | [`token-lanes-block.builder.md`](../adoption/hooks/claude/token-lanes-block.builder.md) | reviewer and builder bootstrap, `ctx_search`, builder output, RTK, reviewer and builder code line, memory line, TOON, one lane, builder evidence |
 | `source-scout` | [`token-lanes-block.scout.md`](../adoption/hooks/claude/token-lanes-block.scout.md) | scout RTK, TOON, one lane |
 | `semantic-evidence-reviewer` and every `blind-*` type | none (0 bytes) | none |
 | any other value, or none: `general-purpose`, Workflow children without an `agentType`, `Explore`, `landscape-sweep-worker`, teammates, plugin-scoped names | [`token-lanes-block.md`](../adoption/hooks/claude/token-lanes-block.md) | every line below |
@@ -229,6 +229,7 @@ Role variants, each replacing the full-block line on the same topic:
 - Researcher code line (no SocratiCode grant): Use Serena find_symbol / find_referencing_symbols for exact symbols and references; jcodemunch route(task, repo?, execute?), menu(query?), order(action, args) on indexed repos. Open original source before judging or editing.
 - Reviewer and builder code line (no jCodeMunch `menu` grant): Use Serena find_symbol / find_referencing_symbols for exact symbols and references; jcodemunch route(task, repo?, execute?), order(action, args) on indexed repos; socraticode codebase_search(query, projectPath) with explicit projectPath for conceptual questions. Open original source before judging or editing.
 - Memory line (no QMD MCP grant; the builder's body keeps the `qmd search` CLI): Use ai-memory memory_query with workspace/project from .ai-memory.toml as historical evidence only, never authority.
+- Builder evidence (no skill preload carries this rule since 2026-09-28; it has no Skill tool for `search-first`): Show evidence before a success claim: the command and what it returned (code.claude.com best practices), or the file:line read.
 
 `semantic-evidence-reviewer` holds Read, Glob and Grep and makes no service calls, so only the TOON and one-lane
 lines would fit; it receives nothing, like the blind roles. No role gained a grant with these blocks.

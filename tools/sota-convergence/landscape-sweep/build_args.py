@@ -56,7 +56,7 @@ SCHEMAS = ("discover", "votes", "critic", "probe")
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
 # Every skill the templates name, in the order of the "Skills (...)" paragraph of templates.json "common". A test
 # keeps this list, the paragraph and the pinned skills manifest in step.
-TEMPLATE_SKILLS = ("search-first", "iterative-retrieval", "verification-before-completion",
+TEMPLATE_SKILLS = ("search-first", "iterative-retrieval",
                    "supply-chain-risk-auditor", "fp-check", "agentic-actions-auditor", "security-threat-model",
                    "codeql", "semgrep", "sarif-parsing", "property-based-testing", "mcp-builder", "modern-python",
                    "agent-browser")

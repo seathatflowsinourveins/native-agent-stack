@@ -344,7 +344,8 @@ GitHub-hosted macOS runner; see
      byte-identical. They changed after `v2026.09.26`: `stack-researcher`,
      `stack-verifier` and `security-reviewer` were added (the security role
      preloads `security-best-practices`), and `isolated-builder` preloads
-     `context-mode:context-mode` and `verification-before-completion` and lost Serena's
+     `context-mode:context-mode` (its `verification-before-completion` preload was
+     removed on 2026-09-28 with that skill's trial) and lost Serena's
      symbol-edit tools, which would edit the parent session's checkout rather
      than the builder's worktree.
    - **MCP servers**: for each entry in

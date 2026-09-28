@@ -322,7 +322,6 @@
     "resolving-merge-conflicts": "on",
     "grill-me": "user-invocable-only",
     "improve-codebase-architecture": "user-invocable-only",
-    "verification-before-completion": "on",
     "security-threat-model": "on",
     "gh-address-comments": "on",
     "semgrep": "on",
