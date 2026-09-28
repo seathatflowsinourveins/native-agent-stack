@@ -23,11 +23,20 @@ This package holds the evidence for [`docs/decisions/2026-09-28-an13-m4-m5.md`](
   - `runner/` holds the runner's records of the two GPT-6 judgments.
   - The four judgments are `{gpt6,claude}.{AB,BA}.json`, and `m45-mapping.json` holds each order's assignment of
     returns to lanes.
-  - The audit is `audit-m45.json`, its control `audit-control-m45.json` and the tally `tally-m45.json`.
+  - The audit and the tally:
+    - `audit-m45.json` holds each hit's pattern, scope and match;
+    - `audit-m45-windows.json` holds each hit's window, with host details replaced;
+    - `tally-m45.json` is the tally.
+  - Two checks ran after the judges:
+    - `audit-control-m45.json` reproduces the audit and voids planted accesses;
+    - `template-checks-m45.json` runs the lane-A template's self-test payloads and root scan with this round's audit
+      and patterns.
 - **`scripts/`: the scripts as run, with host paths replaced.**
-  - `frozen-sha256.txt` holds the hashes taken before the judges started.
+  - `frozen-sha256.txt` holds the hashes taken before dispatch. The package keeps no record of when.
   - `isolation.log` records the steps taken before dispatch.
 - **`usage.json`:** each run's provider usage, one provider at a time and never added up.
+- **`tool-counts.json`:** the tools each Claude run called, by name.
+- **`review/`:** the two reviews of this change, their prompts and usage, and what happened to each finding.
 
 The published copies replace host paths with these placeholders:
 
@@ -38,6 +47,7 @@ The published copies replace host paths with these placeholders:
 | `<adj>` | the adjudication directory |
 | `<runs>` | the adjudication runner's directory |
 | `<scratch>` | any other scratch path |
+| `<worktree>` | the reviewed worktree |
 | `~` | the home directory |
 | `<user>` | the host user name |
 | `<uuid>` | a session or agent UUID |
@@ -51,12 +61,13 @@ The published copies replace host paths with these placeholders:
   - These are judgments on a frozen packet, not measurements of model behavior.
 - **Runner records.** These are the packaged runner's own records of each GPT-6 job: model, effort, codex-cli version,
   status, exit, limit and usage.
-- **Scripted checks on local files.** These are the packet hash, the frozen hashes, the audit, its control and the
-  tally.
-- **Not published:**
-  - the transcripts and the private work directory;
-  - the audit's hit windows, which quote the Claude judges' injected session context. The published audit keeps
-    each hit's pattern, scope and match.
+- **Scripted checks on local files:**
+  - the packet hash and the frozen hashes;
+  - the audit, its windows and the reproduction after the fact;
+  - the template checks;
+  - the tally and the tool counts.
+- **Not published:** the transcripts and the private work directory. The transcripts carry the host's session
+  context.
 
 ## Repeatable checks
 
@@ -65,24 +76,29 @@ From this directory:
 ```sh
 (cd round1 && sha256sum -c packet.sha256)
 (cd scripts && sha256sum -c frozen-sha256.txt)
+python3 -B scripts/reproduce_template_checks_m45.py <clone holding 9f8db582> 9f8db582 <empty dir> <out.json>
 ```
 
-- **The frozen hashes.** Both commands print `OK` for every file. The frozen scripts contain no host paths, so their
-  published copies still match.
+- **The frozen hashes.** The first two commands print `OK` for every file. The frozen scripts contain no host paths,
+  so their published copies still match.
+- **The template checks.** The third command exits 0 when both of the lane-A template's checks fail on this round's
+  audit and patterns, as they do.
 - **What was sent.** The inputs, packets and judge schema match `adjudication/sent-sha256.json`. The four prompts
   differ from their sent hashes only by the host-path placeholders.
 - **The tally.** Check it by hand. For each judgment, map its `choice` through `m45-mapping.json` for its order, then
   drop the judgments that `audit-m45.json` marks `void`.
   - The two valid judgments name different lanes' texts, so no text has the four votes the rule needs.
-  - The scripts as run read the private work layout, so they do not run from this package unchanged.
+  - The other scripts as run read the private work layout, so they do not run from this package unchanged.
 
 ## What is not claimed
 
 - **No behavior was measured.** Neither the M5 texts nor the skill's wording was tested.
-- **The audit's control ran after the judges.** The log's rule says to run it before dispatch.
-  `docs/harness-defaults.md` records the lapse. Both Claude judgments are void on false positives, and the decision
-  record explains why the outcome does not depend on them.
-- **The two lanes had different access.** The Claude lane had no web access and relied on the packet's sources.
+- **The audit was not built from the log's template, and its checks ran after the judges.** `docs/harness-defaults.md`
+  records the lapse. Both Claude judgments are void on false positives, and the decision record explains why the
+  outcome does not depend on them.
+- **The adjudication packet stated a wrong premise.** Its round-1 summary says `receipt.json:88` credits the
+  installer, and the decision record's limitations explain it.
+- **The two lanes had different access.** The Claude lane had no web tool and relied on the packet's sources.
 - **Usage leaves two things out.** It excludes the coordinator session and the server-side advisor's own usage.
 - **Earlier work lives in #444.**
   - `audit_m45.py` adapts the X9 round-3 audit, `evidence/artifacts/prompt-audit-20260927/x9-round3/audit_r3.py`.
