@@ -768,3 +768,49 @@ gates, so this listing rests on that precedent, not on a failing test.
 | Install, settings apply, Codex disable, host read-back | our-integration, with Claude Code's own `/skill-doctor` as the native read-back (one host, 2026-09-28) | [security-audit-host-install-20260928](../../evidence/artifacts/security-audit-host-install-20260928/README.md): `installed`, every `skills_status` check `ok`, listing `name-only` at 20 context tokens. The Codex disable went in 10 s after the install, not before |
 | M5b gate 1: the unchanged upstream `node --test` at the pin | upstream-unchanged (one host, 2026-09-28) | Same receipt: 65 of 65 pass on Node v24.21.0. The four test and validator files match the pin byte for byte |
 | `name-only` invocation reach (a typed `/security-audit`, unprompted model invocation), M5b gates 2 and 3, M5c, sandbox measurement | live-run-pending | M5c waits for Gate A and Gate B; no labelled fixture exists yet |
+
+## Addendum 2026-09-28: carrier conditions and the verification review rule
+
+**Why the trial needs this.** The TOKEN LANES carrier
+([decision](2026-09-27-token-lanes-subagent-start.md)) adds text to a subagent's start context
+through `SubagentStart`. From its first revision, that text told children to follow
+`verification-before-completion` and to research with `search-first`. An instruction that names a
+skill can raise its use count with no change in the skill's listing or usefulness, so the
+[name-only confound](#listing-policy) ("compare only within a listing state") gains a second
+dimension: the carrier condition. This addendum logs the conditions and changes the review rule
+for `verification-before-completion`. It changes no `skillOverrides` state, no manifest entry and
+no agent preload.
+
+**Condition log.**
+
+| Condition | Carrier revision (merge, UTC) | What children's start context says about the two skills |
+| --- | --- | --- |
+| C0 | none | nothing from the carrier |
+| C1 | [#378](https://github.com/seathatflowsinourveins/native-agent-stack/pull/378), `0c33b37a` (2026-09-27T06:11:54Z) | every non-blind child: "follow the installed verification-before-completion skill: real command output before any success claim", then the `search-first` sentence; #412 and #421 left both instructions unchanged |
+| C2 | [#447](https://github.com/seathatflowsinourveins/native-agent-stack/pull/447), `f508ffba` (2026-09-28T03:39:00Z) | default-block types: both sentences; `isolated-builder`: the verification sentence only; `stack-researcher`, `stack-verifier`, `evidence-reviewer`, `security-reviewer` and `source-scout`: neither; `semantic-evidence-reviewer` and `blind-*` types: nothing ([role-matched addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)) |
+| C3 | the [verification-line addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-verification-line), dated 2026-09-28 and merged with this addendum | default-block types: an evidence sentence that names no skill, then the `search-first` sentence; no role block names either skill |
+
+**Boundaries.** A host changes condition when `tools/adoption/install_claude_profile.py`
+installs a revision, not at its merge: the hook reads the block files installed beside it. The
+one install time this repository records is this workstation's C1 install at 08:26:32Z on
+2026-09-27, from `main` at `5f3a7c21`
+([measured-gap addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-measured-fetch-and-containment-gaps)).
+The review therefore reads each host's own install times, and it reports a window that crosses an
+unrecorded boundary as mixed rather than assigning it to a condition. `isolated-builder` has
+preloaded the skill under every condition since the
+[targeted role preloads](#addendum-2026-09-26-targeted-role-preloads-security-reviewer-isolated-builder)
+addendum; this record does not establish whether `/skill-doctor` counts a preload as a use.
+
+**Review rule, 2026-10-25.** The review splits each skill's uses by host and condition, within
+its listing state. For `verification-before-completion` (`trial`, `on`, preloaded by
+`isolated-builder`), a use count no longer decides: under C1 and C2 the carrier prompted its use,
+and the builder's preload delivers its content without a `Skill` call. Its decision rule becomes a
+with/without comparison on frozen builder tasks, run through an upstream evaluation harness that
+the review record names with its pin before the run, comparing tokens, elapsed time and
+review-found defects. For this skill, that comparison replaces the count-based prune rule at the
+[trial window end](#overturn-conditions). `search-first` is a `kept` verdict winner: its split
+usage is reported, and it changes only through a verdict re-record, as the prune rule already
+states.
+
+**Evidence class.** The condition log is structural: merge commits and the block files at each
+revision. It is not a measurement of use, and no review result is claimed.

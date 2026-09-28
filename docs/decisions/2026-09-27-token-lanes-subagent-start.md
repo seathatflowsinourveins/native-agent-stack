@@ -500,3 +500,100 @@ filtered at run time.
 | Earlier assumption | Correction and verification path |
 | --- | --- |
 | One carrier text fits every non-blind child | Allowlisted roles receive only lanes their `tools:` line grants; the grant-agreement test compares each shipped allowlist with the injected text. |
+
+## Addendum 2026-09-28: verification line
+
+**Need.** Since the original carrier ([#378](https://github.com/seathatflowsinourveins/native-agent-stack/pull/378),
+merged 2026-09-27T06:11:54Z), its last line has told every child that receives the default block: "Before claiming a
+task done, follow the installed verification-before-completion skill: real command output before any success claim."
+The role-matched blocks kept that sentence for `isolated-builder`. It is an explicit verification instruction. The
+[Opus 5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md),
+read 2026-09-28, says at L61 that Claude Opus 5 "verifies its own work without being told to", that explicit
+verification instructions "cause over-verification" and should be removed, and that "The same applies to legacy
+harness scaffolding that adds separate verification steps." At L81, re-check instructions "compound with the model's
+own behavior and add cost without improving results." The
+[Opus 5.5 guide, L9](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md)
+keeps the Opus 5 patterns as "a reasonable starting point", and
+[prompting best practices, L780](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md)
+makes Opus 5 the exception to its self-check advice: "remove these instructions rather than rewriting them." The
+sentence also assumes Bash. A child whose tools omit Bash, such as a plugin-scoped or unmapped allowlisted agent
+(role-matched addendum, limitations), still receives the default block and cannot return command output. This
+carrier's own unit wrote the line, so, as with the qmd scope, a dated addendum changes it.
+
+**Change: default block.** Line 13 of [`token-lanes-block.md`](../../adoption/hooks/claude/token-lanes-block.md) now
+reads: "Show evidence before a success claim: the command and what it returned, or the file:line read
+(code.claude.com best practices). Research upstream first with the installed search-first skill before writing custom
+code. Source: skillOverrides in adoption/templates/claude.settings.template.json." The first sentence follows
+[Claude Code best practices, L52](https://code.claude.com/docs/en/best-practices.md): "Have Claude show evidence
+rather than asserting success: the test output, the command it ran and what it returned, or a screenshot of the
+result." It asks for the evidence of work already done. It adds no verification step and names no skill, and a
+file:line read is evidence that a child without Bash can give. The `search-first` sentence and its source are
+unchanged. The [handbook](../token-session-handbook.md#token-lanes-carried-into-subagents) mirrors the line, and its
+sources paragraph now names only `search-first` under `skillOverrides`, with the sources above.
+
+**Builder line, decided on its own merits: removed.** `isolated-builder` has Bash, so the argument about children
+without Bash does not apply to it. Its line goes for another reason: it was the third copy of one instruction. The
+unchanged [`isolated-builder.md`](../../adoption/agents/claude/isolated-builder.md) preloads
+`verification-before-completion` in its frontmatter (L7-9), and "The full content of each listed skill is injected
+into the subagent's context at startup" ([sub-agents reference, L600](https://code.claude.com/docs/en/sub-agents.md)).
+Its body at L12 says "Use the preloaded verification-before-completion skill before claiming success". It runs
+`model: opus` (L5), so the Opus 5 guidance applies to this role directly. The role-matched addendum kept the sentence
+because the role could follow it: the skill is preloaded, while `search-first` would need a Skill tool the role
+lacks. That makes a line admissible, not needed. The frontmatter preload and the body line stay as they are; agent
+definitions are outside this change, which also leaves the skill's `on` listing unchanged. The handbook drops the
+builder-verification variant and that item from the builder's table row.
+
+| Block | Before (UTF-8 bytes) | After | Change |
+| --- | ---: | ---: | --- |
+| `token-lanes-block.md` | 4,094 | 4,088 | line 13 goes from 301 to 295 bytes |
+| `token-lanes-block.builder.md` | 2,883 | 2,747 | the 135-byte verification line and its newline are removed |
+
+The 4,100-byte bound does not move, and the other four role blocks are unchanged.
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) lists both new hashes.
+
+**Tests.** In the [text contract test](../../tests/test_token_lanes_subagent_start.py), the default block's key phrase
+`verification-before-completion` becomes `Show evidence before a success claim`, and the builder's phrase set drops
+the skill name. A new withdrawn-phrase check requires that no block file names `verification-before-completion`; the
+grant-agreement test's skill guard is unchanged. As a failing-first control, the new module ran against the base
+(`f508ffba`) default block, builder block and handbook together, so the verbatim-handbook check still held. It failed
+19 subtests: the withdrawn phrase in both blocks, and the new key phrase missing from the default block file and from
+each of the 16 hook payloads that receive the default block. With this change the module passes (17 tests). This is
+local text agreement, not a native child run, compliance or a measured saving.
+
+**Boundary.** The upstream removal advice is written for Claude Opus 5 and carried forward to Opus 5.5. For other
+models, best practices L780 still says a self-check "catches errors reliably, especially for coding and math". The
+default block also reaches children on other models, such as the Haiku probe and the Sonnet wrappers above; for them
+the evidence sentence is what remains.
+
+**Alternatives rejected.**
+- Keep the default line with a model or tool qualifier. Best practices L780 says to remove such instructions on
+  Opus 5 rather than rewrite them, and the carrier text cannot see the child's model or tools.
+- Reword the builder line to the evidence sentence (2,877 bytes). The preloaded skill's core principle is already
+  "Evidence before claims, always"
+  ([obra/superpowers `8ca22db`, `skills/verification-before-completion/SKILL.md` L10](https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md#L10);
+  the installed copy matches the manifest's `skill_md_sha256`), so the line would still duplicate the preload.
+- Remove the builder's preload or its body line as well. This change leaves the preload unchanged; the
+  [skills-trial record](2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule)
+  decides the skill at its review with a with/without comparison on frozen builder tasks.
+- Follow the community setups that keep standing self-verify instructions. The change request's survey (not retained
+  or re-checked here) found them in six of 22 setups, including superpowers, this skill's source. Their number is not
+  evidence, and the primary sources above point the other way.
+
+**#381.** The carrier hash changes again. #381 freezes carrier and skill hashes at execution
+([procedure, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)), so its run
+records the installed hash of every block file and the install time. At `f508ffba` its README still reads "frozen
+protocol, not executed or accepted"; that is the committed record, not live state, and this change lands only if the
+E2E has not started. A host receives the new text at its next
+`python3 tools/adoption/install_claude_profile.py --only guard`; this change runs no installer, and no child run with
+this text is claimed.
+
+**Supersedes.** In the [role-matched addendum](#addendum-2026-09-27-role-matched-blocks), "The builder keeps only the
+verification sentence" and the byte counts 4,094 (default) and 2,883 (builder) describe the previous revision.
+
+**Overturn.** Restore an explicit verification instruction if the skills-trial review's with/without comparison shows
+fewer review-found defects with it at no larger token or time cost, or if a Claude prompting guide for the running
+model reverses the L61 and L81 advice.
+
+| Earlier assumption | Correction and verification path |
+| --- | --- |
+| A standing instruction to follow the verification skill belongs in every child's start context | The Opus 5 guide (L61, L81), carried forward by the 5.5 guide (L9), says to remove explicit verification instructions. The carrier now asks only for evidence, the builder gets the skill from its own preload, and the withdrawn-phrase test keeps the skill name out of every block. |
