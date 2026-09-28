@@ -3553,6 +3553,11 @@
       "bytes": 19723
     },
     {
+      "path": ".github/workflows/runtime-worker-skills-freshness.yml",
+      "sha256": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
+      "bytes": 2020
+    },
+    {
       "path": ".github/workflows/supply-chain.yml",
       "sha256": "a752c1be5c7e73642085b3fd91f3e97c4b42167dbe5b3452b2bd1191652e9c24",
       "bytes": 7411
@@ -8592,6 +8597,31 @@
       "path": "blueprints/retrieval-quality-v2/verification-review-20260926/rederive_real_qmd_receipts.py",
       "sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
       "bytes": 2690
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/README.md",
+      "sha256": "4a367abac888f8ac75da50b0cc3b37fe98f112630c1f98195f32b9f68130efac",
+      "bytes": 44212
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
+      "sha256": "1b2fe2e6f97d279e17590c3d8fb7c0fee188d3e3bb7650993fc68c810a85db14",
+      "bytes": 82752
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
+      "bytes": 186305
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/research.md",
+      "sha256": "e5aa7711fd73817f95c63188ebea90728cbf64da0b21ef48179be47e4ea67c8a",
+      "bytes": 15834
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/validation.json",
+      "sha256": "f2ee2781d09cab4024114452a72f69512552b94c9e72e0c68d007a29b1d597a0",
+      "bytes": 80029
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -14195,8 +14225,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ddcc2ddf9ec5b9a716afac294f8ea5b4ced3130467859e1274c2d2a5cbed6ea1",
-      "bytes": 57916
+      "sha256": "04486bc0d542434d7d19bf594945b59b48d85dc4235ade7f5d7555ef6c531426",
+      "bytes": 67572
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -42290,8 +42320,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "9d263c85e8ad583a84aa9b37cefcddb513459a48025069ba2bb948cfe29cd246",
-      "bytes": 25922
+      "sha256": "55533df4a38eb803bdf203b85d0fd7964e46a1f703589e3dc464c759391575ef",
+      "bytes": 62241
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -42569,6 +42599,11 @@
       "bytes": 58079
     },
     {
+      "path": "tests/test_runtime_worker_skills.py",
+      "sha256": "e021cb1b2e615c35de09a4029dc5c0f21d49a31f5c3c72109c40d1f9acfcd25f",
+      "bytes": 22707
+    },
+    {
       "path": "tests/test_saturation_ledger.py",
       "sha256": "a446a451a6244819a7d601e29a82e1d81c8825e02c487ee4910dd24134f35a5b",
       "bytes": 61882
@@ -42705,8 +42740,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "f06249f48f15b23e3531a42317f8a5b750d7f09eec60c69e3306f21242186e47",
-      "bytes": 6720
+      "sha256": "9ad3bc3bb6ad5c9edf8db5fe350e822bdea815720a4a8edc9a28d8e4422ccf0c",
+      "bytes": 10492
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -42755,8 +42790,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "ef0b9e8441f755e7fe4d62f9c6fbb6de029e7ba4b10e91169a518e202aa7deef",
-      "bytes": 13793
+      "sha256": "f9c94cbd12e3825382a41afeab0dbaf0e8f4e1b2b4359076c84f256a77057a63",
+      "bytes": 32108
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -42772,6 +42807,11 @@
       "path": "tools/adoption/render_launchd.py",
       "sha256": "253a3f4591fa1eb22314a7d085988464f3a3c7c009c7a52b5ee2566d160f0749",
       "bytes": 5605
+    },
+    {
+      "path": "tools/adoption/runtime_skill_freshness.py",
+      "sha256": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
+      "bytes": 8628
     },
     {
       "path": "tools/capability-gate/README.md",
@@ -42870,8 +42910,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
-      "bytes": 55626
+      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
+      "bytes": 55711
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
