@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import fnmatch
 import hashlib
 from datetime import datetime, timezone
 import json
@@ -20,6 +21,7 @@ import re
 import secrets
 import shutil
 import signal
+import sqlite3
 import stat
 import subprocess
 import sys
@@ -31,7 +33,7 @@ from recipe import (COMPRESSION_COMBOS, HERE, arm_config, digest, environment_se
                     render_mcp)
 from e2e import netprobe
 from e2e.task import load_task, worker_instruction
-from receipt import PROBE_MECHANISM, create_receipt, read_bounded, time_value
+from receipt import PROBE_MECHANISM, create_receipt, gateway_database, read_bounded, time_value
 
 
 DOCKER = ["docker", "--context", "rootless"]
@@ -74,6 +76,28 @@ PROBE_MAX_AGE_SECONDS = 900
 STAGE_GATES = "stage-gates.json"
 STAGE_GATES_SCHEMA = "openhands-stage-gates-v1"
 STAGE_PROBES = {"control": ("p3",), "engines-on": ("p3", "p4", "p5")}
+# Plan G5 (repair R3). OmniRoute@045aa81f3 (20128) and @dd6e9607e (20129),
+# whose provider constants and settings helpers are identical: these
+# providers are served with a synthetic credential and no provider_connections
+# row. No-auth ones (src/shared/constants/providers/noauth.ts, noAuth: true at
+# :14,32,51,67,86,100,120,138,162,181) are refused only when
+# settings.blockedProviders names their id or alias
+# (src/sse/services/auth.ts:1193-1201 at 045aa81f3; noAuthProviderSettings.ts:5-18;
+# src/shared/utils/noAuthProviders.ts:19-31). Anonymous-fallback ones
+# (anonymousFallback: true at apikey/gateways.ts:741,756,
+# apikey/specialty-media.ts:56 and oauth.ts:243) are refused only when
+# settings.noAuthFallbackDisabledProviders names them (auth.ts:739-800).
+# devin-cli-agentic, auggie and zcode have subprocess executors
+# (open-sse/executors/devin-cli-agentic.ts:1, auggie.ts:26, zcodeProtocol.ts:1).
+NO_AUTH_PROVIDERS = {"devin-cli-agentic": "dva", "opencode": "oc", "duckduckgo-web": "ddgw",
+                     "cloudflare-playground": "cfp", "veoaifree-web": "veo-free", "auggie": "aug", "zcode": "zc",
+                     "codex-app-server": "cxa", "uncloseai": "unc", "aihorde": "horde"}
+ANONYMOUS_FALLBACK_PROVIDERS = {"opencode-zen": "opencode-zen", "opencode-go": "opencode-go",
+                                "pollinations": "pol", "kilocode": "kc"}
+# The stores each arm's requests can reach, with the allowlist that applies to
+# each: the engines-on gateway forwards to 20128 (README "P3-P5", P4).
+GATEWAY_CHAIN = {"control": ("control",), "engines-on": ("engines-on", "control")}
+ALLOWLIST_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]{0,63}\*?")
 
 
 def owned_port(value):
@@ -198,19 +222,8 @@ def selected_mcp_roots(eco):
     )]
 
 
-def preflight(prefix, state):
-    pins = read_json(HERE / "pins.json")
-    if digest(HERE / "requirements.lock") != pins["requirements_sha256"]:
-        raise ValueError("runtime_lock_hash_mismatch")
-    if digest(HERE / "build-requirements.lock") != pins["build_requirements_sha256"]:
-        raise ValueError("build_lock_hash_mismatch")
-    expected_prefix = Path.home() / ".local/share/codex-ecosystem/tools" / ("openhands-" + pins["version"])
-    expected_state = Path.home() / ".local/state/native-agent-stack/runtime-workers/openhands"
-    if prefix != expected_prefix or state != expected_state:
-        raise ValueError("unexpected_owned_prefix")
-    for path in (prefix, state):
-        if path.resolve() != path:
-            raise ValueError("owned_path_must_not_follow_symlinks")
+def read_host_file():
+    """The private OPENHANDS_HOST_FILE: owned, mode 0600, outside the checkout, placeholders filled."""
     private_name = os.environ.get("OPENHANDS_HOST_FILE")
     if not private_name:
         raise ValueError("OPENHANDS_HOST_FILE_required")
@@ -224,6 +237,101 @@ def preflight(prefix, state):
     host = read_json(path)
     if "<" in json.dumps(host):
         raise ValueError("host_file_has_unfilled_placeholders")
+    return host
+
+
+def gateway_allowlists(host):
+    """Plan G5: the provider ids each arm's gateway may serve (host file gateway_providers).
+
+    Exactly the two arms, each a non-empty list of lowercase ids, of which only
+    a trailing "*" may be a wildcard, so no pattern can match every provider.
+    """
+    lists = host.get("gateway_providers") if isinstance(host, dict) else None
+    if (not isinstance(lists, dict) or set(lists) != {"control", "engines-on"}
+            or any(not isinstance(patterns, list) or not patterns
+                   or any(not isinstance(pattern, str) or not ALLOWLIST_PATTERN.fullmatch(pattern)
+                          for pattern in patterns)
+                   for patterns in lists.values())):
+        raise ValueError("gateway_provider_allowlists_required")
+    return {arm: tuple(patterns) for arm, patterns in lists.items()}
+
+
+def gateway_surface(database):
+    """Plan G5 inputs from one OmniRoute store, read-only (sqlite URI mode=ro and query_only).
+
+    Four statements: the provider column of provider_connections and never a
+    credential column (OmniRoute src/lib/db/core.ts:220), the row count of
+    the routing combos table (:291-298), and the values of the two named
+    settings keys that disable row-less providers. OmniRoute keeps each
+    setting as JSON under key_value namespace "settings" (src/lib/db/settings.ts:
+    154,283-293). That namespace also holds secrets, so no other key is read.
+    A value that is not a JSON list of strings reads as empty, which refuses.
+    """
+    database = Path(database)
+    if not database.is_file() or database.is_symlink():
+        raise ValueError("gateway_database_must_be_existing_regular_file")
+    connection = sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True, timeout=3)
+    try:
+        connection.execute("PRAGMA query_only = ON")
+        providers = sorted({row[0] for row in connection.execute("SELECT provider FROM provider_connections")})
+        combos = connection.execute("SELECT count(*) FROM combos").fetchone()[0]
+        settings = {}
+        for key in ("blockedProviders", "noAuthFallbackDisabledProviders"):
+            row = connection.execute("SELECT value FROM key_value WHERE namespace = 'settings' AND key = ?",
+                                     (key,)).fetchone()
+            try:
+                value = json.loads(row[0]) if row else []
+            except (TypeError, ValueError):
+                value = []
+            settings[key] = sorted({item for item in value if isinstance(item, str)}) if isinstance(value, list) else []
+    finally:
+        connection.close()
+    return {"providers": providers, "combos": combos, **settings}
+
+
+def check_gateway_surface(surface, allowed):
+    """Refuse unless every provider this store can serve is in the arm's allowlist.
+
+    Served means a provider_connections row, or a no-auth or anonymous-fallback
+    provider that the settings do not disable. Any routing combo is refused:
+    its targets are not read. Returns counts only.
+    """
+    def permitted(provider):
+        return isinstance(provider, str) and any(fnmatch.fnmatchcase(provider, pattern) for pattern in allowed)
+    if not all(permitted(provider) for provider in surface["providers"]):
+        raise ValueError("gateway_provider_outside_allowlist")
+    if surface["combos"] != 0:
+        raise ValueError("gateway_routing_combo_refused")
+    for providers, key, reason in (
+            (NO_AUTH_PROVIDERS, "blockedProviders", "gateway_no_auth_provider_not_blocked"),
+            (ANONYMOUS_FALLBACK_PROVIDERS, "noAuthFallbackDisabledProviders", "gateway_anonymous_fallback_not_disabled")):
+        named = set(surface[key])
+        if any(not permitted(provider) and not {provider, alias} & named for provider, alias in providers.items()):
+            raise ValueError(reason)
+    return {"providers": len(surface["providers"]), "combos": 0}
+
+
+def verify_gateway_providers(arm, allowlists):
+    """Plan G5 at dispatch start: every store the arm's requests can reach (GATEWAY_CHAIN)."""
+    for store in GATEWAY_CHAIN[arm_config(arm)["arm"]]:
+        check_gateway_surface(gateway_surface(gateway_database(store)), allowlists[store])
+
+
+def preflight(prefix, state):
+    pins = read_json(HERE / "pins.json")
+    if digest(HERE / "requirements.lock") != pins["requirements_sha256"]:
+        raise ValueError("runtime_lock_hash_mismatch")
+    if digest(HERE / "build-requirements.lock") != pins["build_requirements_sha256"]:
+        raise ValueError("build_lock_hash_mismatch")
+    expected_prefix = Path.home() / ".local/share/codex-ecosystem/tools" / ("openhands-" + pins["version"])
+    expected_state = Path.home() / ".local/state/native-agent-stack/runtime-workers/openhands"
+    if prefix != expected_prefix or state != expected_state:
+        raise ValueError("unexpected_owned_prefix")
+    for path in (prefix, state):
+        if path.resolve() != path:
+            raise ValueError("owned_path_must_not_follow_symlinks")
+    host = read_host_file()
+    gateway_allowlists(host)
     variables = host["variables"]
     # These endpoints belong to the disabled ai-memory and socraticode entries
     # (config/mcp-policy.json). Under O1 they are unreachable by design from
@@ -1050,8 +1158,10 @@ def verify_isolation(state, run_id, arm, port, *, now=None):
     written at most PROBE_MAX_AGE_SECONDS ago, for this arm's upstream, this
     ingress port, the pinned proxy image, the rendered config and this probe
     script, whose counts re-derive a pass (checked_probe_counts); unless the
-    coordinator's stage gates are recorded (verify_stage_gates); and unless the
-    live network and container IDs still match. File and time checks come
+    coordinator's stage gates are recorded (verify_stage_gates); unless every
+    provider the arm's gateway stores can serve is allowlisted in the host file
+    (verify_gateway_providers, plan G5); and unless the live network and
+    container IDs still match. File, time and read-only store checks come
     before any Docker read. A pure check: it changes nothing.
     """
     stem = attempt_stem(run_id, arm)
@@ -1079,6 +1189,7 @@ def verify_isolation(state, run_id, arm, port, *, now=None):
         raise ValueError("isolation_probe_mismatch")
     checked_probe_counts(receipt, upstream)
     verify_stage_gates(state, arm, now=now)
+    verify_gateway_providers(arm, gateway_allowlists(read_host_file()))
     networks, server, proxy = attempt_bindings(stem)
     live = {"run_network_id": networks["int"]["id"], "gw_network_id": networks["gw"]["id"],
             "server_container_id": server["id"], "proxy_container_id": proxy["id"]}

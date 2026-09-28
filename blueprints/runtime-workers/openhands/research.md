@@ -444,7 +444,11 @@ Open items from this phase:
   cause a refusal.
 - **Still open from the plan:**
   - G2, the image scans;
-  - G5, the model surface: a `/v1` body can pick any model the arm serves;
+  - G5, the model surface: a `/v1` body can pick any model the arm serves.
+    *(Repair round)* The dispatch gate now reads each reachable store
+    read-only and refuses providers outside a per-arm allowlist, including
+    row-less no-auth and anonymous-fallback providers that settings leave
+    enabled. It has not run against the live stores;
   - F10, the client peer the gateway logs;
   - normal-bridge containers such as cognee-live still reach host loopback.
 - **Outside this recipe's paths:** the repository's secret-path guard does not

@@ -42,6 +42,15 @@ its own source, and a source the build did not re-read is labelled as reviewed i
   `daemon/container_operations.go:202-204,363-406`). This fails closed: an evaluation step that
   needs to download fails, so the verdict is an offline verdict
   (SWE-bench@v4.1.0 `test_spec/python.py:443-444`, `test_spec/test_spec.py:55-60`).
+- **G5, the gateway provider surface, is checked at every start (repair R3).** The gate reads
+  each OmniRoute store the arm reaches, read-only: the provider column, the routing-combo count
+  and two named settings keys. It refuses unless every provider the store can serve is in the
+  host file's allowlist for that store's arm (control `codex`; engines-on
+  `openai-compatible-responses-*`, plus the 20128 store it forwards to). OmniRoute serves
+  no-auth and anonymous-fallback providers without a provider row, unless settings disable them
+  (`src/sse/services/auth.ts:739-800,1193-1201` at 045aa81f3). Some of these providers have
+  subprocess executors, so the gate requires every one to be disabled by id or alias. Routing
+  combos are refused. The stage-gates file must also carry the coordinator's G5 record.
 
 Isolation then holds by construction, whatever OmniRoute's authentication state. It also covers
 the other host-loopback listeners, not only OmniRoute. Gateway settings cannot provide it. The
@@ -102,6 +111,9 @@ calls inside the container.
   including dot-segment and `%2e` variants, with fewer moving parts than O1.
 - **Graders need a network.** Replace mode `none` only with a separately probed internal network
   for graders, backed by its own P0-P2-style receipt.
+- **G5 needs a routing combo, or OmniRoute changes its row-less providers.** For a combo, resolve
+  its targets against the allowlist rather than refusing. For a gateway upgrade, re-read the
+  no-auth and anonymous-fallback lists from its source before the next start.
 
 ## Agent-branch ruleset (resolver mode; applied by the owner)
 
@@ -241,6 +253,13 @@ host evidence for this design is the live P0-P2 probe
   `swebench/harness/test_spec/python.py:443-444` and `test_spec/test_spec.py:55-60`.
 - OpenHands/software-agent-sdk@fcc102a `openhands-agent-server/openhands/agent_server/__main__.py:282-285`,
   `config.py:24` and `dependencies.py:19`.
+- OmniRoute@045aa81f3 (20128) and @dd6e9607e (20129), read for G5 in the repair round:
+  `src/sse/services/auth.ts:739-800,1193-1201` (lines shifted by one at dd6e9607e),
+  `src/sse/services/noAuthProviderSettings.ts:5-18`, `src/shared/utils/noAuthProviders.ts:19-31`,
+  `src/shared/constants/providers/noauth.ts`, `apikey/gateways.ts:741,756`,
+  `apikey/specialty-media.ts:56`, `oauth.ts:243`, `src/lib/db/core.ts` and
+  `src/lib/db/settings.ts:154,283-293`; `open-sse/executors/codex.ts:415-439` and the
+  `child_process` importers of plan N6.
 - OmniRoute@045aa81f3, as reviewed in the phase-2 synthesis and not re-read here:
   `src/lib/apiBridgeServer.ts`, `.env.example`, `policies/management.ts`, `apiAuth.ts`,
   `require-login/route.ts`, `apiKeys.ts`, at the lines cited above.

@@ -49,6 +49,56 @@ def load_recipe_module(filename):
     return module
 
 
+# Plan G5 (repair R3) fixtures. OmniRoute@045aa81f3 and @dd6e9607e (identical
+# files): providers served with a synthetic credential and no
+# provider_connections row, src/shared/constants/providers/noauth.ts (noAuth)
+# and apikey/gateways.ts:741,756, apikey/specialty-media.ts:56, oauth.ts:243
+# (anonymousFallback).
+NO_AUTH_PROVIDERS = {"devin-cli-agentic": "dva", "opencode": "oc", "duckduckgo-web": "ddgw",
+                     "cloudflare-playground": "cfp", "veoaifree-web": "veo-free", "auggie": "aug", "zcode": "zc",
+                     "codex-app-server": "cxa", "uncloseai": "unc", "aihorde": "horde"}
+ANONYMOUS_FALLBACK_PROVIDERS = {"opencode-zen": "opencode-zen", "opencode-go": "opencode-go",
+                                "pollinations": "pol", "kilocode": "kc"}
+GATEWAY_SECRETS = ("SECRET-ACCESS", "SECRET-REFRESH", "SECRET-API-KEY", "SECRET-ID-TOKEN", "SECRET-PSD",
+                   "SECRET-OIDC", "SECRET-COMBO")
+ENGINES_NODE = "openai-compatible-responses-" + str(uuid.UUID(int=7))
+
+
+def gateway_store(path, providers, *, combos=0, blocked=tuple(NO_AUTH_PROVIDERS),
+                  fallback=tuple(ANONYMOUS_FALLBACK_PROVIDERS), settings=None, tables=None):
+    """A fixture OmniRoute storage.sqlite (src/lib/db/core.ts schema subset), with credential columns filled."""
+    connection = sqlite3.connect(path)
+    try:
+        connection.executescript(tables or """
+            CREATE TABLE provider_connections (id TEXT PRIMARY KEY, provider TEXT NOT NULL, auth_type TEXT,
+              access_token TEXT, refresh_token TEXT, api_key TEXT, id_token TEXT, provider_specific_data TEXT,
+              is_active INTEGER);
+            CREATE TABLE key_value (namespace TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL,
+              PRIMARY KEY (namespace, key));
+            CREATE TABLE combos (id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, data TEXT NOT NULL,
+              sort_order INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+        """)
+        for number, provider in enumerate(providers):
+            connection.execute("INSERT INTO provider_connections VALUES (?, ?, 'oauth', 'SECRET-ACCESS', "
+                               "'SECRET-REFRESH', 'SECRET-API-KEY', 'SECRET-ID-TOKEN', '{\"t\":\"SECRET-PSD\"}', 1)",
+                               (f"connection-{number}", provider))
+        for number in range(combos):
+            connection.execute("INSERT INTO combos VALUES (?, ?, '{\"models\":[\"SECRET-COMBO\"]}', 0, 't', 't')",
+                               (f"combo-{number}", f"combo-{number}"))
+        values = {"oidcClientSecret": json.dumps("SECRET-OIDC")}
+        if blocked is not None:
+            values["blockedProviders"] = json.dumps(list(blocked))
+        if fallback is not None:
+            values["noAuthFallbackDisabledProviders"] = json.dumps(list(fallback))
+        values.update(settings or {})
+        for key, value in values.items():
+            connection.execute("INSERT INTO key_value VALUES ('settings', ?, ?)", (key, value))
+        connection.commit()
+    finally:
+        connection.close()
+    return path
+
+
 class OpenHandsRecipeTests(unittest.TestCase):
     def read_json(self, relative):
         return json.loads((RECIPE / relative).read_text())
@@ -1459,6 +1509,13 @@ class OpenHandsProbeTests(unittest.TestCase):
         self.result = self.state / "runs" / self.run_id / self.arm
         self.result.mkdir(parents=True)
         self.pins = json.loads((RECIPE / "pins.json").read_text())
+        # G5 fixtures only; no unit test opens a live gateway store.
+        self.stores = {"control": gateway_store(self.state / "omniroute.sqlite", ["codex"] * 6),
+                       "engines-on": gateway_store(self.state / "omniroute-fw.sqlite", [ENGINES_NODE])}
+        self.host_file = self.state / "host.json"
+        self.host_file.write_text(json.dumps({"gateway_providers": {
+            "control": ["codex"], "engines-on": ["openai-compatible-responses-*"]}}))
+        self.host_file.chmod(0o600)
 
     @staticmethod
     def closed_port():
@@ -1933,8 +1990,34 @@ class OpenHandsProbeTests(unittest.TestCase):
         return passed, runs
 
     def gate(self, host, now, views=None):
-        with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views or self.views())):
+        with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views or self.views())), \
+                patch.dict(os.environ, {"OPENHANDS_HOST_FILE": str(self.host_file)}), \
+                patch.object(host, "gateway_database", side_effect=lambda arm: self.stores[arm]):
             return host.verify_isolation(self.state, self.run_id, self.arm, 3740, now=now)
+
+    def test_gate_runs_the_g5_provider_preflight_on_fixture_stores(self):
+        # Repair R3: the provider surface is read at each start, before any Docker read.
+        host = self.prepared()
+        passed, _ = self.probe(host)
+        self.assertTrue(passed)
+        soon = host.time_value(json.loads((self.result / "isolation-probe.json").read_text())["verified_at"])
+        soon += timedelta(seconds=60)
+        self.gate(host, soon)
+        gateway_store(self.state / "wider.sqlite", ["codex", "openai"])
+        with patch.object(host, "attempt_bindings") as docker, self.assertRaisesRegex(
+                ValueError, "gateway_provider_outside_allowlist"):
+            self.stores["control"] = self.state / "wider.sqlite"
+            self.gate(host, soon)
+        docker.assert_not_called()
+        self.stores["control"] = gateway_store(self.state / "unblocked.sqlite", ["codex"], blocked=["opencode"])
+        with self.assertRaisesRegex(ValueError, "gateway_no_auth_provider_not_blocked"):
+            self.gate(host, soon)
+        self.stores["control"] = self.state / "omniroute.sqlite"
+        with patch.dict(os.environ, {"OPENHANDS_HOST_FILE": ""}), \
+                patch.object(host.subprocess, "check_output", side_effect=self.commands(host, self.views())), \
+                patch.object(host, "gateway_database", side_effect=lambda arm: self.stores[arm]), \
+                self.assertRaisesRegex(ValueError, "OPENHANDS_HOST_FILE_required"):
+            host.verify_isolation(self.state, self.run_id, self.arm, 3740, now=soon)
 
     def test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate(self):
         host = self.prepared()
@@ -2336,6 +2419,145 @@ class OpenHandsProbeTests(unittest.TestCase):
         probe.assert_not_called()
         args = host.build_parser().parse_args(["teardown", "--prefix", "/p", "--state", "/s", "--run-id", self.run_id])
         self.assertEqual((args.action, args.run_id), ("teardown", self.run_id))
+
+
+class OpenHandsGatewaySurfaceTests(unittest.TestCase):
+    """Plan G5 (repair R3): each arm's provider surface from fixture OmniRoute stores.
+
+    Our integration checks on synthetic sqlite files, never the live stores.
+    """
+    ALLOWLISTS = {"control": ("codex",), "engines-on": ("openai-compatible-responses-*",)}
+
+    def setUp(self):
+        self.host = load_recipe_module("host.py")
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name).resolve()
+
+    def test_provider_lists_are_the_omniroute_source_lists(self):
+        self.assertEqual(self.host.NO_AUTH_PROVIDERS, NO_AUTH_PROVIDERS)
+        self.assertEqual(self.host.ANONYMOUS_FALLBACK_PROVIDERS, ANONYMOUS_FALLBACK_PROVIDERS)
+        self.assertEqual(self.host.GATEWAY_CHAIN, {"control": ("control",), "engines-on": ("engines-on", "control")})
+
+    def test_surface_reads_only_the_provider_column_combo_count_and_two_settings_keys(self):
+        path = gateway_store(self.root / "store.sqlite", ["codex", "codex", ENGINES_NODE], combos=2,
+                             blocked=["zc", "opencode"], fallback=["kc"])
+        before = hashlib.sha256(path.read_bytes()).hexdigest()
+        statements, real = [], sqlite3.connect
+
+        def traced(*args, **kwargs):
+            connection = real(*args, **kwargs)
+            connection.set_trace_callback(statements.append)
+            return connection
+        with patch.object(self.host.sqlite3, "connect", side_effect=traced) as connect:
+            surface = self.host.gateway_surface(path)
+        self.assertEqual(connect.call_args.args[0], path.as_uri() + "?mode=ro")
+        self.assertIs(connect.call_args.kwargs["uri"], True)
+        self.assertEqual(statements, [
+            "PRAGMA query_only = ON",
+            "SELECT provider FROM provider_connections",
+            "SELECT count(*) FROM combos",
+            "SELECT value FROM key_value WHERE namespace = 'settings' AND key = 'blockedProviders'",
+            "SELECT value FROM key_value WHERE namespace = 'settings' AND key = 'noAuthFallbackDisabledProviders'"])
+        self.assertEqual(surface, {"providers": ["codex", ENGINES_NODE], "combos": 2,
+                                   "blockedProviders": ["opencode", "zc"], "noAuthFallbackDisabledProviders": ["kc"]})
+        text = json.dumps(surface)
+        for secret in GATEWAY_SECRETS:
+            self.assertNotIn(secret, text)
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), before)
+        for bad in (self.root / "absent.sqlite",):
+            with self.assertRaises(ValueError):
+                self.host.gateway_surface(bad)
+        link = self.root / "link.sqlite"
+        link.symlink_to(path)
+        with self.assertRaises(ValueError):
+            self.host.gateway_surface(link)
+        # A store without the combos table is refused rather than read as empty.
+        bare = gateway_store(self.root / "bare.sqlite", ["codex"], tables="""
+            CREATE TABLE provider_connections (id TEXT PRIMARY KEY, provider TEXT NOT NULL, auth_type TEXT,
+              access_token TEXT, refresh_token TEXT, api_key TEXT, id_token TEXT, provider_specific_data TEXT,
+              is_active INTEGER);
+            CREATE TABLE key_value (namespace TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL,
+              PRIMARY KEY (namespace, key));""")
+        with self.assertRaises(sqlite3.Error):
+            self.host.gateway_surface(bare)
+
+    def test_provider_allowlist_refuses_every_other_served_provider(self):
+        check = self.host.check_gateway_surface
+        control, engines = self.ALLOWLISTS["control"], self.ALLOWLISTS["engines-on"]
+
+        def surface(providers, **options):
+            return self.host.gateway_surface(gateway_store(self.root / (uuid.uuid4().hex + ".sqlite"),
+                                                           providers, **options))
+        self.assertEqual(check(surface(["codex"] * 6), control), {"providers": 1, "combos": 0})
+        self.assertEqual(check(surface([ENGINES_NODE]), engines), {"providers": 1, "combos": 0})
+        # Blocking by alias is enough (OmniRoute noAuthProviders.ts isProviderBlockedByIdOrAlias).
+        self.assertEqual(check(surface(["codex"], blocked=list(NO_AUTH_PROVIDERS.values()),
+                                       fallback=list(ANONYMOUS_FALLBACK_PROVIDERS.values())), control)["combos"], 0)
+        refusals = (
+            ("other provider row", surface(["codex", "openai"]), control, "gateway_provider_outside_allowlist"),
+            ("chat node on engines-on", surface(["openai-compatible-chat-x"]), engines,
+             "gateway_provider_outside_allowlist"),
+            ("codex on engines-on", surface(["codex"]), engines, "gateway_provider_outside_allowlist"),
+            ("routing combo", surface(["codex"], combos=1), control, "gateway_routing_combo_refused"),
+            ("subprocess no-auth provider open", surface(["codex"], blocked=[p for p in NO_AUTH_PROVIDERS if p != "zcode"]),
+             control, "gateway_no_auth_provider_not_blocked"),
+            ("no-auth settings absent", surface(["codex"], blocked=None), control,
+             "gateway_no_auth_provider_not_blocked"),
+            ("no-auth settings not a list", surface(["codex"], blocked=None, settings={"blockedProviders": "{}"}),
+             control, "gateway_no_auth_provider_not_blocked"),
+            ("no-auth settings not JSON", surface(["codex"], blocked=None, settings={"blockedProviders": "zcode"}),
+             control, "gateway_no_auth_provider_not_blocked"),
+            ("anonymous fallback open", surface(["codex"], fallback=["opencode-zen", "opencode-go", "pol"]),
+             control, "gateway_anonymous_fallback_not_disabled"),
+            ("anonymous fallback blocked but not disabled",
+             surface(["codex"], blocked=[*NO_AUTH_PROVIDERS, *ANONYMOUS_FALLBACK_PROVIDERS], fallback=[]),
+             control, "gateway_anonymous_fallback_not_disabled"),
+        )
+        for label, value, allowed, reason in refusals:
+            with self.subTest(label), self.assertRaisesRegex(ValueError, reason):
+                check(value, allowed)
+
+    def test_engines_on_also_checks_the_control_store_it_forwards_to(self):
+        stores = {"control": gateway_store(self.root / "control.sqlite", ["codex"] * 6),
+                  "engines-on": gateway_store(self.root / "fw.sqlite", [ENGINES_NODE])}
+        read = []
+
+        def database(arm):
+            read.append(arm)
+            return stores[arm]
+        with patch.object(self.host, "gateway_database", side_effect=database):
+            self.host.verify_gateway_providers("engines-on", self.ALLOWLISTS)
+            self.assertEqual(read, ["engines-on", "control"])
+            read.clear()
+            self.host.verify_gateway_providers("control", self.ALLOWLISTS)
+            self.assertEqual(read, ["control"])
+            stores["control"] = gateway_store(self.root / "wider.sqlite", ["codex", "openrouter"])
+            for arm in ("control", "engines-on"):
+                with self.subTest(arm=arm), self.assertRaisesRegex(ValueError, "gateway_provider_outside_allowlist"):
+                    self.host.verify_gateway_providers(arm, self.ALLOWLISTS)
+
+    def test_host_file_allowlists_are_exact_arms_and_bounded_patterns(self):
+        template = json.loads((RECIPE / "config/host.example.json").read_text())
+        self.assertEqual(self.host.gateway_allowlists(template), self.ALLOWLISTS)
+        for bad in ({}, {"control": ["codex"]}, {"control": ["codex"], "engines-on": []},
+                    {"control": ["*"], "engines-on": ["openai-compatible-responses-*"]},
+                    {"control": ["co*dex"], "engines-on": ["openai-compatible-responses-*"]},
+                    {"control": ["codex"], "engines-on": ["openai-compatible-responses-*"], "other": ["x"]},
+                    {"control": "codex", "engines-on": ["openai-compatible-responses-*"]}):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                self.host.gateway_allowlists({"gateway_providers": bad})
+        path = self.root / "host.json"
+        path.write_text(json.dumps({"gateway_providers": {"control": ["codex"],
+                                                          "engines-on": ["openai-compatible-responses-*"]}}))
+        for mode, expected in ((0o600, None), (0o644, "private_host_file_requires_mode_0600")):
+            path.chmod(mode)
+            with self.subTest(mode=oct(mode)), patch.dict(os.environ, {"OPENHANDS_HOST_FILE": str(path)}):
+                if expected:
+                    with self.assertRaisesRegex(ValueError, expected):
+                        self.host.read_host_file()
+                else:
+                    self.assertIn("gateway_providers", self.host.read_host_file())
 
 
 class OpenHandsReceiptTests(unittest.TestCase):

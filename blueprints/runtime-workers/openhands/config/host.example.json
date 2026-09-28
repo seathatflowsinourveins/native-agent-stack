@@ -15,5 +15,9 @@
     "foundation-adoption": "<private adoption directory>",
     "us-equities-foundation": "<private foundation blueprint directory>",
     "us-equities-catalog": "<private US-equities catalog directory>"
+  },
+  "gateway_providers": {
+    "control": ["codex"],
+    "engines-on": ["openai-compatible-responses-*"]
   }
 }

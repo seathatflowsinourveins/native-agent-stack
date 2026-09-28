@@ -215,7 +215,9 @@ there is no global-skill fallback.
 
 Set these private inputs outside all worktrees:
 
-- `OPENHANDS_HOST_FILE`: filled mode-0600 [host template](config/host.example.json).
+- `OPENHANDS_HOST_FILE`: filled mode-0600 [host template](config/host.example.json),
+  including the per-arm `gateway_providers` allowlists; `dispatch.py start`
+  also reads it ([G5](#g5-gateway-provider-preflight)).
 - `OPENHANDS_STACK_ROOT`: stack checkout with the shared skill installer/manifest.
 - `OPENHANDS_TASK_FILE`, `OPENHANDS_TASK_SHA256`: frozen original SWE-bench row.
 - `OPENHANDS_GRADER_IMAGE_FILE`, `OPENHANDS_GRADER_IMAGE_SHA256`: frozen image pin.
@@ -692,10 +694,67 @@ Proxy residuals:
   nginx would have host-loopback reach. It runs a static, pinned, non-root,
   read-only configuration.
 - A `/v1` request body reaches the gateway unchanged and can select any model
-  the arm serves (plan gate G5, open).
+  the arm serves. The G5 preflight below bounds which providers that can be.
 - Three things are unprobed, and P3 and P5 cover them: `--entrypoint nginx`
   under `--read-only`; body framing and streaming under the header allowlist;
   and gateway paths the SDK might use beyond the three routes.
+
+### G5: gateway provider preflight
+
+Some OmniRoute executors on the `/v1` path spawn local processes (plan N6;
+`open-sse/executors/devin-cli.ts:29`, `devin-cli-agentic.ts:1`,
+`auggie.ts:26`, `zcodeProtocol.ts:1`, `open-sse/services/qoderCli.ts:1` and
+`open-sse/vendor/codex-chatgpt-web/process.ts:2` at 045aa81f3). A model
+reaching one of them would reach the host. So at every `dispatch.py start`,
+before any Docker read, the gate checks which providers each gateway store the
+arm reaches can serve:
+- **Stores.** Control reads the 20128 store
+  (`~/.local/share/omniroute/storage.sqlite`). Engines-on reads the 20129 store
+  (`omniroute-fw`) and also the 20128 store, because 20129 forwards to 20128.
+  Each store is checked against its own arm's allowlist.
+- **Allowlists.** They come from the host file's `gateway_providers`: control
+  `codex`, engines-on `openai-compatible-responses-*`. Only a trailing `*` is
+  a wildcard. `dispatch.py start` therefore also needs `OPENHANDS_HOST_FILE`.
+- **Reads.** The store is opened with sqlite `mode=ro` and `query_only`. Four
+  statements run: `SELECT provider FROM provider_connections`, which reads no
+  credential column; `SELECT count(*) FROM combos`; and one value read each for
+  the settings keys `blockedProviders` and `noAuthFallbackDisabledProviders`.
+  The settings namespace also holds secrets, so no other key is read.
+- **Refusals.** The gate refuses when:
+  - a provider row falls outside the allowlist;
+  - any routing combo exists (its targets are not read);
+  - a no-auth provider is named, by id or alias, in neither the allowlist nor
+    `blockedProviders`;
+  - an anonymous-fallback provider is named in neither the allowlist nor
+    `noAuthFallbackDisabledProviders`.
+
+The settings keys matter because a provider row is not the only way in.
+OmniRoute serves its ten no-auth providers with a synthetic credential and no
+row, unless `blockedProviders` names them (`src/sse/services/auth.ts:1193-1201`,
+`noAuthProviderSettings.ts:5-18`, `src/shared/utils/noAuthProviders.ts:19-31`).
+Those ten include the subprocess-backed devin-cli-agentic, auggie and zcode,
+plus codex-app-server. Four anonymous-fallback providers (opencode-zen,
+opencode-go, pollinations and kilocode) are also served without a row, unless
+`noAuthFallbackDisabledProviders` names them (`auth.ts:739-800`). A row-only
+check would pass while all of these stay reachable. Both lists are copied from
+OmniRoute 045aa81f3 (20128) and dd6e9607e (20129), where the files are
+identical. A gateway upgrade must re-read them.
+
+**Consequence.** The gate refuses until the operator disables those providers
+in each store's OmniRoute settings. The coordinator's read-only observation on
+2026-09-28 found six codex rows on 20128 and one
+`openai-compatible-responses-<uuid>` node on 20129. It did not read settings or
+combos, so whether the live stores pass is unknown. The unit tests use fixture
+stores only.
+
+**Limits.**
+- A codex connection can opt into an app-server transport
+  (`providerSpecificData.codexTransport`, behind
+  `OMNIROUTE_CODEX_APP_SERVER_ENABLED`; `open-sse/executors/codex.ts:415-439`).
+  G5 does not read `provider_specific_data`, which may hold key material, so it
+  cannot see that opt-in.
+- Inactive rows count as served.
+- Routing combos are refused, not resolved.
 
 ### Isolation probe (P0-P2) and the dispatch gate
 
@@ -763,6 +822,8 @@ before it takes the serial reservation. The gate requires:
   answer, every name matched, and no IPv6 address, default route or gateway
   route. A contradictory receipt is refused;
 - the recorded stage gates below;
+- the [G5 provider preflight](#g5-gateway-provider-preflight) for every store
+  the arm reaches;
 - the four IDs equal to the live selected-field reads.
 
 A refusal prints `failure_stage: probe`, exits 3 and changes nothing. The run
