@@ -392,3 +392,51 @@ Open finding from this phase, not changed here:
 - The module-qualified event kind string is source-reviewed only. If the live
   server used a different kind, the agent-limit check would fail closed to
   exit 3.
+
+## Takeover phase 2 corrections (2026-09-28)
+
+This phase is an offline build on efa73f40 following the coordinator's
+phase-2 plan: section 1 (isolation design) and items E1, E2, E3 and E5. Item
+E4, resolver mode, goes to a follow-up PR. The phase ran unit tests with Docker
+mocked plus read-only host observations. It created no attempt network or
+container and made no gateway or model request.
+- Commands and outputs:
+  [evidence/phase2-commands.json](evidence/phase2-commands.json).
+- The choice and its alternatives:
+  [decision record](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md).
+- Full detail: README.md, [Security posture](README.md#security-posture).
+
+| Finding | Correction and source |
+| --- | --- |
+| The phase-1 contract was a DOCKER-USER rule plus an operator receipt (R12 and the host-loopback row in the round-2 log above). An L4 rule to the gateway port cannot separate `/v1/*` from `/api/*` on the same port, and its placement in the rootlesskit namespace was never probed. | **Replaced by O1 (E1).** `$S-int` is created with `--internal`, IPv6 off and gateway mode `isolated`; `$S-gw` is a normal bridge; a pinned proxy joins both. The same docker/docs@4e9a5751 page that R12 cites for the caveat also gives the remedy: `port-publishing.md:186-192` ("No address is assigned to the bridge when the network is created with gateway mode `isolated`"), with the options at `:121-131`. If the option is rejected, the attempt fails closed with no retry on plain `--internal`. Networks are read back through a fixed `--format` template. R12's DOCKER-USER mechanism is superseded; the row stays as history. |
+| F19 (host loopback), overturned for this host in phase 1. | No longer a design input. O1 relies on host loopback for the proxy's upstream and keeps the agent-server off it through the internal network. |
+| Each arm's base URL pointed at its gateway port directly. | **Both arms now use `http://gw:8081/v1`.** The proxy's upstream is `10.0.2.2:20128` for control or `10.0.2.2:20129` for engines-on, taken from `recipe.arm_config`. Engines-on accepts only the seven recorded combos (`allow-lossy`, the default, plus `fw-ccr`, `fw-codex-responses`, `fw-headroom`, `fw-lite`, `fw-rtk` and `fw-session-dedup`); control sends no compression header. Control stays the default arm until the #431 A/B. |
+| New: the gateway proxy. | **Composed locally; no upstream ships it.** Directive sources are nginx.org `ngx_http_core_module` (`location` matching on the normalized URI, `=` exact match, `limit_except`, where GET also allows HEAD), `ngx_http_proxy_module` (`proxy_pass` with a URI, `proxy_pass_request_headers`, and `proxy_set_header`, where an empty value is not passed) and `ngx_http_rewrite_module` (`if`, false only for "" or "0"), all fetched 2026-09-28. Source lines are from nginx/nginx@release-1.30.5 (4556c714): `ngx_http_proxy_module.c:1240-1251,1365-1384` shows arguments are appended even to a fixed URI, hence `if ($is_args) { return 403; }`; `:1301-1303,1417-1418` shows empty headers are skipped; `ngx_http_variables.c:1609-1624` defines `$is_args`. |
+| The proxy image needed a pin. | `ghcr.io/nginx/nginx-unprivileged@sha256:ed04ec1f…`, tag observed `1.30.5-alpine`. The SHA-256 of the registry's index, linux/amd64 manifest (`f4522a5f…`) and config (`61640a44…`, user 101, revision 588b4cbc) bytes equals each digest. A pull by index digest reported "Image is up to date", and `pinned_image_identity` returned the containerd store. The digest has not been vulnerability-scanned (plan gate G2). |
+| The session key came from a coordinator-supplied file (E2). | **Generated per attempt** with Python's `secrets` module. Two files, `<stem>.server.env` (Docker env-file syntax) and `<stem>.headers`, are written with `O_CREAT\|O_EXCL\|O_NOFOLLOW` at 0600 under `<state>/secrets/` (0700). The key is never in argv, and no full inspect is run. The files are deleted after confirmed container removal and kept while removal is unconfirmed. **Deviation:** the pointer variables `OPENHANDS_SERVER_ENV` and `OPENHANDS_HEADERS` are retired, because the paths derive from the validated identity. This also ends the phase-1 empty-value residual. The inventory row is `openhands-session` (`generated_local`). |
+| The container environment list. | **Deviation:** `OPENHANDS_COMPRESSION` was added to the plan's closed list, so the request serializer and the server's preload rebuild the arm selection the host checked. |
+| Native routes were checked by path only (E3). | Each route is now paired with exactly one method: POST `/api/conversations` and `.../interrupt`, and GET for the conversation, the final response and the error-event search. Any other pair is refused before curl runs. |
+| No proof of containment before a model runs. | **P0-P2 probe and dispatch gate.** `e2e/netprobe.py` runs in the pinned agent image with the model-container hardening. The host writes the receipt `isolation-probe.json` at 0600, bound to the two network IDs and the two container IDs. `dispatch.py start` requires it to be at most 900 s old and to match the live IDs, the rendered-config hash and the probe-script hash. The run receipt moves to schema 6, with an `isolation` summary carrying no IDs or addresses. |
+| MCP endpoints on the host. | ai-memory and socraticode stay disabled, now with the reason that they are unreachable by design under O1. The proxy has no route to either. |
+| Addition, not a plan item. | `host.py teardown` removes a prepared attempt after a probe-only run and retries unconfirmed removals. It refuses while a conversation may be live or the serial reservation names the attempt. |
+
+Open items from this phase:
+
+- **Not run:** the live P0-P2 probe, and the P3-P5 model calls, which exist as
+  documented steps and a skeleton. G7's P3 half is not enforced in code.
+- **Unprobed:**
+  - gateway mode `isolated` under rootless Docker 29.8.1;
+  - nginx under `--read-only` with `--entrypoint nginx`;
+  - body framing and streaming under the header allowlist;
+  - the container `--format` template, checked live only for its network
+    counterpart.
+- **P2 is strict** about IPv6. Any non-loopback IPv6 address, including a
+  link-local one, fails it. An attempt network's subnet `.1` that belongs to
+  its own server or proxy makes the probe refuse to run rather than report.
+- **Still open from the plan:**
+  - G2, the image scans;
+  - G5, the model surface: a `/v1` body can pick any model the arm serves;
+  - F10, the client peer the gateway logs;
+  - normal-bridge containers such as cognee-live still reach host loopback.
+- **Outside this recipe's paths:** the repository's secret-path guard does not
+  yet cover the new `secrets/` directory.

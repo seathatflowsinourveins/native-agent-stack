@@ -490,6 +490,31 @@ class OpenHandsRecipeTests(unittest.TestCase):
             self.assertIsNone(pattern.search(text), description)
         self.assertIn(name, (RECIPE / "README.md").read_text())
 
+    def test_proxy_image_evidence_matches_the_pin_and_is_publishable(self):
+        # Phase 2: the gateway_proxy pin rests on registry byte hashes, a pull
+        # by digest and pinned_image_identity (evidence/phase2-commands.json).
+        from scripts.validate import PRIVATE_CONTENT
+        pins = self.read_json("pins.json")["gateway_proxy"]
+        record = self.read_json("evidence/phase2-commands.json")
+        commands = {item["id"]: item for item in record["commands"]}
+        self.assertEqual(len(commands), len(record["commands"]))
+        registry = commands["15-registry-bytes"]
+        index = pins["ref"].rsplit("@", 1)[1]
+        self.assertIn(index, registry["command"])
+        found = registry["output_excerpt"]
+        self.assertEqual((found["top_sha256_of_bytes"], found["top_bytes_match_reference"]), (index, True))
+        self.assertEqual((found["amd64_manifest"]["sha256_of_bytes"], found["amd64_manifest"]["bytes_match"]),
+                         ("sha256:" + pins["manifest_sha256"], True))
+        self.assertEqual((found["config"]["sha256_of_bytes"], found["config"]["bytes_match"], found["config"]["os_arch"]),
+                         ("sha256:" + pins["config_sha256"], True, pins["platform"]))
+        self.assertIn("gateway_proxy store=containerd", commands["17-pull-and-identity"]["output"])
+        self.assertEqual(record["base"], "efa73f40453911d3ac9583218530273677983053")
+        text = json.dumps(record, ensure_ascii=False)
+        for description, pattern in PRIVATE_CONTENT:
+            self.assertIsNone(pattern.search(text), description)
+        for document in ("README.md", "research.md"):
+            self.assertIn("evidence/phase2-commands.json", (RECIPE / document).read_text())
+
 
 class OpenHandsUpstreamAdapterTests(unittest.TestCase):
     """Synthetic transport controls from SWE-bench 4.1.0 reporting.py.
