@@ -50,11 +50,12 @@ home gets RTK's instructions from the global `AGENTS.md` block of the
 (changed after `v2026.09.26.2`), because Codex does not expand the `@RTK.md`
 pointer that `rtk init` writes. An installed executable alone does not prove
 either behavior.
-A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's four
-`exclude_commands` entries, which keep blob reads, `git branch` and `diff` native.
-The recipe explains how RTK anchors each entry. On 2026-09-26 it grew from two
-entries to four: `^git show [^ ]*:` alone missed spellings such as
-`git -C . show HEAD:x`. Confirm the file with `rtk hook check`, since RTK can ignore
+A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's five
+`exclude_commands` entries, which keep blob reads, `git branch`, `diff` and
+standalone `jq` native. The recipe explains how RTK anchors each entry. On
+2026-09-26 it grew from two entries to four: `^git show [^ ]*:` alone missed
+spellings such as `git -C . show HEAD:x`. On 2026-09-27 standalone `jq` became
+the fifth. Confirm the file with `rtk hook check`, since RTK can ignore
 a TOML-valid file. The exclusions cover only hook rewrites, never an explicit `rtk`
 command.
 Preserve canonical generated instructions and the host's hook policy; historical

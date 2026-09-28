@@ -21,8 +21,9 @@ headless runs (IDs A01-A22, PERM-03 and named rows). Both are merged here, as th
 This change applies the items under [Applied in this change](#applied-in-this-change), amends
 eight rows of the [2026-09-24 sweep](2026-09-24-community-sweep.md), continues its
 keep-but-compare IDs from M15 and its rejection IDs from R41, and lists every deferred,
-handed-off and host-scope item. Nothing here installs a repository, edits live settings or calls
-a model. The two host observations are the count-only advisor scan
+handed-off and host-scope item. This change itself installs no repository, edits no live
+settings and calls no model; the host-scope items were applied separately with the user's
+approval and are recorded with their read-back. The two host observations are the count-only advisor scan
 [receipt](../../evidence/receipts/claude-advisor-usage-scan-20260928.json) and the PreCompact
 hook audit in the
 [cleanup addendum](2026-09-26-harness-rules-cleanup.md#addendum-2026-09-28-claudemd-gains-a-compact-instructions-section).
@@ -96,32 +97,71 @@ settings env block and the settings template):
 
 **Handed off:**
 
-- conventions-in-claude-md: the SOTA-sources line of `AGENTS.md` goes to the prompt-audit owner
-  (draft PR #444 edits `AGENTS.md`).
-- AN-13: the `/doctor` prompt-audit operator run goes to the prompt-audit owner.
-- AN-15: making the TOKEN LANES verification line tool-agnostic goes to the token-lanes owner,
-  as the packet hands it off. Since #447 (`f508ffba`) that line sits in two carrier files,
+- conventions-in-claude-md: the SOTA-sources line of `AGENTS.md` goes to the prompt-audit owner,
+  who folds it into draft PR #444 (which already edits `AGENTS.md`); that owner accepted the
+  handoff on 2026-09-28.
+- AN-13: the `/doctor` prompt-audit operator run stays open with the prompt-audit owner. The
+  `/claude-api prompt-audit` arm already ran
+  ([prompt-audit resolution](2026-09-27-prompt-audit-resolution.md), #443), and #444 carries its
+  X9 second round; neither is the `/doctor` run.
+- AN-15: making the TOKEN LANES verification line tool-agnostic lands in its own follow-up change
+  after #447 (`f508ffba`) put that line in two carrier files,
   `adoption/hooks/claude/token-lanes-block.md:13` and
-  `adoption/hooks/claude/token-lanes-block.builder.md:10`, and `adoption/**` is outside this
-  change. MI-7's carrier sizes are re-measured after it lands.
+  `adoption/hooks/claude/token-lanes-block.builder.md:10`; `adoption/**` is outside this change.
+  MI-7's carrier sizes are re-measured after it lands.
 - A10-json-output-shape: the either-shape `claude -p --output-format json` parser, which the
   supplement consensus map's "-p JSON output shape" resolution applies, goes to the separate
   A10 unit. That unit edits `tools/sota-convergence/transcript_audit.py`,
   `tools/skill-usage/skill_usage.py` and their tests, outside this change's paths.
 
-**Host scope, awaiting the user's go-ahead** (not in any PR):
+**Host scope, applied on 2026-09-28 with the user's approval** (not in any PR). The user
+settings were hand-edited with a backup, never through the applier, and each item was read
+back through the consuming tool:
 
-- AN-17: the host deny rules that still block under bypass.
-- AN-18, host half: the logging-only ConfigChange hook in the host settings.
-- AN-19, part (2): the same statusLine insertion plus `"refreshInterval": 5` in the host
-  settings, hand-edited in the AN-17 window rather than through the applier.
-- AN-26: the named-spawn teammate hazard.
-- A09: the packet lists this ID without its text; the coordinator holds its description.
-- terminal_bell (no packet item ID; the supplement consensus map's "Notifications for waiting
-  sessions" resolution): set `preferredNotifChannel` to `terminal_bell` on this Windows
-  Terminal host, with a Notification hook as the fallback
-  ([terminal configuration](https://code.claude.com/docs/en/terminal-config)). How Windows
-  Terminal's bellStyle responds to BEL is not reproduced (see [Not covered](#not-covered)).
+- AN-17: the user settings' `permissions.deny` now holds the template's 86 entries in template
+  order plus one host-only entry (54 before; 33 added, none removed). A headless
+  `claude -p --permission-mode bypassPermissions` run was refused `git clean -fn` with
+  "matches deny pattern Bash(git clean -f*)". `git push --force-with-lease` is not denied.
+- AN-18, host half: a logging-only ConfigChange hook appends one JSON line per settings change
+  to a log outside every worktree and ends in `|| true`, so it never blocks a change. The log
+  received lines after the edits.
+- AN-19, part (2): the statusLine command exports `diff.autoRefreshIndex=false` through
+  `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0` and sets `"refreshInterval": 5`.
+  The command exited 0 and left the checkout's `.git/index` modification time unchanged.
+- AN-26: the user `CLAUDE.md` now spawns a one-subagent task without a `name`, and names a spawn
+  only for a teammate whose role needs neither `skills`, `omitClaudeMd` nor `isolation`
+  (source: `examples/claude-native/CLAUDE.md`). A fresh session loaded the file.
+- A09-notification-channel: `preferredNotifChannel` is `terminal_bell` in the host settings
+  only; the template stays at the default `auto`, which already notifies in Ghostty, Kitty and
+  iTerm2 ([terminal configuration](https://code.claude.com/docs/en/terminal-config)). A
+  Notification hook stays the fallback. How Windows Terminal's bellStyle responds to BEL is
+  not reproduced (see [Not covered](#not-covered)).
+
+The same approval covered the install audit's native-installation gaps (a read-only
+`stack-verifier` pass of 26 rows at `f508ffba`; the core token stack, its upstream hooks and its
+MCP servers were already installed and connected):
+
+- Headroom's Claude registration was replaced at user scope with the four no-egress variables
+  of [the recipe](../../recipes/README.md) (`HEADROOM_OFFLINE`, `HF_HUB_OFFLINE`,
+  `TRANSFORMERS_OFFLINE`, `DO_NOT_TRACK`), and MCPorter's Headroom entry got the same
+  environment. `claude mcp get headroom` reported it connected with all four.
+- `BASH_MAX_TIMEOUT_MS=1800000`, the template's value, was added to the host environment.
+- agent-browser 0.38.1 was installed with the recipe's `npm install --global --prefix`
+  command and `agent-browser install`; a smoke run opened a data URL, read its title and
+  closed.
+- The QMD catalog index was refreshed with `qmd --index native-agent-stack-catalog update`
+  and `embed`.
+
+**Host drift recorded, owner decision pending:** `claude mcp get jcodemunch` on this host
+reports `Scope: User config` and `Connected` on 2026-09-28, against the
+[2026-09-25 addendum](2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)
+that registers jCodeMunch per project. The options are (1) remove the user-scope entry and keep
+per-project opt-in, as the addendum decides, or (2) keep it and record a dated amendment that
+meets the addendum's overturn condition. The token-lanes owner recommends no change until that
+decision; this record changes neither. Other drift from the same audit: ccusage 20.0.26 and
+SocratiCode 1.15.0 are ahead of their pins (open PR #446), 14 skills are name-only against a
+manifest that says on (skills lane), and the host `model` stays `opus` by the user's choice
+where the template says `opus[1m]`.
 
 ## Amendments to the 2026-09-24 rows
 
