@@ -1,0 +1,11 @@
+{
+ "adjudication-inputs/m5.AB.json": "fdc62b9b607c4bebabbb847ac468ca813e2673d2579e5a44ceb8ca5398f76a64",
+ "packets/m5.AB.json": "d5a1d046be2cd71880bba8f21ae6bedfc9490193d6f9aa68513d270afafee34f",
+ "prompts/judge-AB.txt": "f7a3b963aef423fabbd3f11505588e0837f206f05ddd27c757d04ba634ad2454",
+ "prompts/claude-task-AB.txt": "d13ba4937ab746ce5b876b82b5725a405af1a65bc646dc3cd31b9dbee5e1d7c9",
+ "adjudication-inputs/m5.BA.json": "5acb3a5f1edab9d7b2210ba3be89f2934e3e66e58086cc08153700fca8f0fbcd",
+ "packets/m5.BA.json": "d5a1d046be2cd71880bba8f21ae6bedfc9490193d6f9aa68513d270afafee34f",
+ "prompts/judge-BA.txt": "18f601316ec0d82dcbe2d20cbbc65e49dd7a77e2c5258f751fb99991a4fd6ce9",
+ "prompts/claude-task-BA.txt": "086355ab62b0a2b678111b91a0718bbccb5bfa7b7382a29aaf102a23a015da99",
+ "schemas/judge.json": "3b769d9af6120107ca5487efd70744ce80a4ca15979356136625bcd87e088dba"
+}

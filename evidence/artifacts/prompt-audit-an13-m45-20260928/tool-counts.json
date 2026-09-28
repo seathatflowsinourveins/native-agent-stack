@@ -1,0 +1,20 @@
+{
+ "claude-lane": {
+  "Glob": 3,
+  "Grep": 27,
+  "Read": 29,
+  "advisor": 1
+ },
+ "claude-judge-BA": {
+  "Glob": 3,
+  "Grep": 14,
+  "Read": 13,
+  "advisor": 1
+ },
+ "claude-judge-AB": {
+  "Glob": 7,
+  "Grep": 9,
+  "Read": 12,
+  "advisor": 1
+ }
+}
