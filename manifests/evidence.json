@@ -3373,6 +3373,51 @@
         "The user CLAUDE.md check tests two phrases by substring; whether a session follows them is not tested. The jCodeMunch scope is recorded as drift against the 2026-09-25 addendum, not as a decision."
       ],
       "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+    },
+    {
+      "id": "socraticode-1150-qualification-20260927",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "socraticode"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, socraticode 1.15.0 (tag v1.15.0, commit f6191f076a42405f0d5508139f3a8b505cfef93a, released 2026-09-24T10:58:58Z) was qualified and switched into production after the user waived the recorded 7-day cooldown. The npm tarball https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz (1,053,928 bytes) had sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, sha512 equal to npm dist.integrity sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ== and sha1 equal to dist.shasum 607f909997dcf40bd5722a08f2e7c0e4b90e8334 (read 2026-09-27T21:39:34Z); dist-tags.latest was 1.15.0, the package ships no npm-shrinkwrap.json and its dist/index.js reads no process.argv. The upstream suite passed at the tag: in a clean clone at f6191f07 with Node v24.21.0, npm ci exited 0 (425 packages), npm run test:unit exited 0 (103 files, 2,475 of 2,475 tests passed, 72.83 s), npm run check:release-versions exited 0 ('release manifests match 1.15.0'), npx biome check src/ tests/ exited 0 (175 files, no fixes), npx tsc --noEmit exited 0, and ci.yml's Qdrant-backed regressions with REQUIRE_QDRANT=1 against a disposable Qdrant 1.19.1 exited 0 (4 files, 12 of 12 tests, 28.16 s). Before the cutover, the staged tools/socraticode-1.15.0 prefix served native checks against the production external Qdrant and local embedding endpoint with the production launcher environment. Through mcporter 0.14.1 `call --output text`: codebase_health exited 0 (External Qdrant reachable, embedding endpoint reachable, model nvidia/Nemotron-3-Embed-1B-BF16 loaded); codebase_search exited 0 with stdout byte-identical to the 1.14.0 launcher's for the same query (sha256 e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7, 5 matches); codebase_status exited 0 (Status: green, 89,567 indexed chunks); codebase_graph_status exited 0 (Status: READY, 1,305 files, 441 edges, 'Built by: v1.15.0'). A headless Claude Code 2.1.283 session with --strict-mcp-config reported the server connected and completed codebase_status with is_error false. A Codex exec 0.157.1 run with an args override first failed the call with 'MCP tool call requires approval, but approval policy is never'; the rerun with default_tools_approval_mode=\"approve\" completed the mcp_tool_call with no error and returned Status: green, 89,567 chunks and 'Built by v1.14.0, this server is v1.15.0', because a 1.14.0 server had rebuilt the shared graph 30 s earlier. At 2026-09-27T21:42:49Z the coordinator repointed seven launchers and the bin/socraticode symlink together from tools/socraticode-1.14.0 to tools/socraticode-1.15.0, and restarted the mcporter daemon at 21:42:50Z. At read-back, claude mcp get and codex mcp get showed the 1.15.0 args; a production mcporter codebase_status at 21:43:01Z returned Status: green and 89,567 indexed chunks; codebase_graph_status at 21:43:00Z read 'Built by: v1.14.0 \u2014 STALE, this server is v1.15.0' (last built 21:35:09.670Z), because a 1.14.0 server had built the stored graph at 21:35:09.670Z, before the 21:42:49Z cutover, and no 1.15.0 rebuild happened until 21:43:08.450Z.",
+      "limitations": [
+        "Not every live session runs 1.15.0 yet, and nothing in the claim rests on that. At the cutover read-back 12 already-running 1.14.0 servers remained; at 2026-09-28T02:03:14Z a process listing still showed 2 processes on the 1.14.0 prefix, the MCP children of two long-running Claude Code sessions that each need their own /mcp reconnect. A codebase_graph_status read-back at about 02:07Z, served by one of those 1.14.0 servers, showed the stored graph still 'Built by: v1.15.0' (last built 2026-09-27T21:43:08.450Z). A 1.14.0 server that rebuilds the graph before its session reconnects would restart the flip-flop (data.all_sessions_on_1150).",
+        "The pre-cutover checks ran from the staged 1.15.0 prefix against production services while 1.14.0 servers were still running, and shared their lock directory. The 1.15.0 server rebuilt the production code graph ('Built by: v1.15.0', last built 2026-09-27T21:34:21.531Z); a 1.14.0 server rebuilt it again at 21:35:09.670Z, as the post-cutover graph status shows. The decision record predicted this graph flip-flop from source (graph-inputs.ts:609); this is the first native observation of it on this host. No vector reindex was observed: the collection stayed green at 89,567 chunks throughout.",
+        "Evidence classes differ by part. The upstream suite is the unchanged upstream test code at the tag, with the deviations in data.upstream_suite.deviations. The client checks are local integration evidence, one run per client; the Claude probe ran on claude-haiku-4-5 as a connectivity check, and its model does not change the server's behaviour. The cutover and its read-back are native operations by the coordinator: the mcporter read-backs quote retained captures, while the claude mcp get and codex mcp get results are the coordinator's reported observations, whose raw output is not retained. The 2026-09-25 qualification is documented in docs/decisions/2026-09-25-workstation-sota-refresh.md, but its artifacts were never published, so it is not cited as output here.",
+        "The Codex check needed default_tools_approval_mode=\"approve\": socraticode declares no MCP tool annotations, and `codex exec` runs with approval policy never, so an unapproved call is refused (docs/decisions/2026-09-26-codex-worker-lane.md, decisions 4 and 5). This is not a 1.15.0 change: the src/tools tree is 7044488e at both tags, so tool names and parameters are unchanged.",
+        "The upstream suite does not cover everything upstream CI runs. Node 24.21.0 is outside the CI unit matrix (18/20/22/26), and the Qdrant job runs on Node 26. Qdrant 1.19.1 replaced CI's v1.17.0. npm run build was skipped before the regressions, because no test references dist/. Not run: the Docker-backed test:integration and test:e2e suites (this host has no Docker), the rust-graph-vs-cargo job, and the packaged-artifact consumer jobs. npm ci warned that 19 packages have install scripts not yet covered by allowScripts, and its audit reported 3 moderate severity vulnerabilities; neither was reviewed here.",
+        "The sha256 pin covers socraticode's own tarball only. The package ships no shrinkwrap, and later releases inside its dependency ranges now resolve: undici 6.29.0 (2026-09-25T09:45:19.865Z) and @lumis-sh/wasm-eex 0.26.2 (2026-09-26T00:38:34.735Z). recipes/README.md therefore installs with --before=2026-09-24T12:00:00Z. adoption/bootstrap-linux.sh install_npm passes no --before, so a bootstrap install can resolve a different dependency tree from the qualified one.",
+        "The landscape ledger does not move: catalogs/landscape/foundation.json keeps the winner pin socraticode 1.14.0 from the sealed 2026-09-22 layer-verdict packets (decision record, Scope). A host receipt recorded at 1.15.0 therefore matches no winner pin. scripts/host_receipts.py record refuses it unless --allow-unbound-version is passed, and it stays unbound until a new verdict wave re-records the layer.",
+        "Linux x86_64 only: adoption/pins-macos-arm64.json keeps socraticode 1.14.0. The npm tarball is platform-independent, but a Mac needs its own acceptance, and nothing here is macOS evidence.",
+        "The user waived the recorded 7-day cooldown (earliest cutover 2026-10-01T11:01Z), so it was not served; the release was about 3.4 days old at the decision. The upstream check at 2026-09-27T21:45Z found no newer release, main 9 commits ahead with documentation changes only, and no issue reporting a 1.15.0 regression. That rules out only regressions already reported.",
+        "Not repointed: 16 ephemeral scratch CODEX_HOMEs under other sessions' scratchpads, plus dated backups and archived documents. The scratch homes are live launchers, not history: a dated reviewer observation (PR #446 review, 2026-09-28) found a peer session's scratch Codex review home whose config.toml was created at 2026-09-27T22:37:21Z, 54 min after the cutover, from main's pre-merge template, and names tools/socraticode-1.14.0. Such homes keep launching 1.14.0 until this change merges and they are re-rendered, and each such server can rebuild the shared graph as 1.14.0, restarting the flip-flop in the first limitation.",
+        "The notifications/message counts are untested (no discriminating control): the zero matches in data.pre_cutover_native and data.post_cutover_readback come from captures with no failing control of the same predicate, so docs/acceptance-evidence-policy.md records them as untested and the claim does not rest on them.",
+        "Not exercised: interactive sessions over time with the newly delivered notifications/message stream, beyond the single calls here (its volume at SOCRATICODE_LOG_LEVEL info); the mcporter daemon keep-alive path under load; and the two mixed-session hazards known from source only, the cross-process symbol-graph staging cleanup race (symbol-graph-store.ts:843-866, startup.ts:324-336) and codebase_stop's SIGTERM to another session's indexer (index-tools.ts:478-499)."
+      ],
+      "path": "evidence/receipts/socraticode-1150-qualification-20260927.json"
+    },
+    {
+      "id": "ccusage-20026-qualification-20260927",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ccusage"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, ccusage 20.0.26 (tag v20.0.26, commit d9821088b98aa536c7a385aa1a4579d6fa02269b, released 2026-09-27T16:26:00Z) was qualified and switched in, reopening qualification as the 2026-09-26 publication trigger requires. The npm tarball https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz (24,216 bytes) had sha256 b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2, and its sha512 and sha1 matched the registry integrity and shasum. At that commit the upstream Rust suite (cargo test --workspace, Rust 1.97.1, in an environment mirroring nix/tests.nix) exited 0 with 944 passed, 0 failed and 3 ignored, and the Node tests passed 34 of 34. On the native_token_ci synthetic fixture the installed 20.0.24 and 20.0.26 executables returned byte-identical output: 2 rows, 1,900 input, 380 output and 2,430 total tokens, and a totalCost within 1e-9 of 0.0328. On the host's native histories, daily, weekly and monthly token totals were identical between the two versions; 20.0.24 left claude-opus-5-5 and gpt-6-luna unpriced there, and 20.0.26 left no model unpriced. A synthetic pricing probe gave claude-opus-5-5 a cost of 0.0 on 20.0.24 and 4.0 on 20.0.26 for 1,000,000 input tokens, with a claude-opus-5 control at 5.0 on both. The coordinator repointed the production launcher to 20.0.26 at 2026-09-27T22:01:01Z; the read-back resolves it to the 20.0.26 prefix, which prints 'ccusage 20.0.26', and the 20.0.24 prefix is retained for rollback.",
+      "limitations": [
+        "macOS is registry-only: the macOS pin carries the same tarball digests, but no Mac installed or ran 20.0.26, and @ccusage/ccusage-darwin-arm64@20.0.26 stays unpinned (its registry integrity is recorded in data only).",
+        "The pinned sha256 covers only the npm launcher tarball (5 files). The Rust executable comes from the optional dependency @ccusage/ccusage-linux-x64@20.0.26, which npm resolves at install time outside that hash; this receipt records its registry integrity but did not compare it with the installed copy.",
+        "npm dist.gitHead is null, so the tarball binds to commit d9821088 only through the git tag. The registry lists an SLSA provenance attestation for 20.0.26, which was not fetched or verified here.",
+        "Upstream CI was not reproduced: nix flake check, nix build .#ccusage-tests, just test-node under pnpm 12.5.1, the Nushell contribution-gate test and the Babashka compare-pr-performance test did not run (Nix, just and pnpm are absent). The Rust suite ran under an isolated rustup 1.97.1 toolchain with a script mirroring the nix/tests.nix environment, not inside the Nix derivation, and the Node tests ran on Node 24.21.0.",
+        "The Node tests do not discriminate this bump: the two test files are identical between v20.0.24 and v20.0.26.",
+        "The native-history comparison covers one range (2026-09-20 to 2026-09-26, with rows only for 2026-09-24 to 2026-09-26, Claude and Codex together). It shows token parity between the versions, not agreement with provider billing, and session and blocks reports were not compared.",
+        "20.0.26's cost figures use upstream snapshot prices. On the same tokens the range's totalCost rose from 3423.92 (two models unpriced) to 9894.33; neither is a qualified contract price, and the recorded use commands keep --no-cost.",
+        "The landscape winner pin in catalogs/landscape/foundation.json stays 20.0.24 (manifest-20260922), so a 20.0.26 host receipt needs scripts/host_receipts.py record --allow-unbound-version and stays unbound until a new verdict wave. No host receipt is recorded here.",
+        "The launcher repoint is the coordinator's operation; this receipt records its time and a later read-back, not the operation's own output.",
+        "The daily native-history comparison is a coordinator record from 2026-09-27T21:50Z whose argument vector was not retained (data.native_checks.native_histories.daily.retained_output); only its JSON outputs are. The weekly and monthly comparisons and the pricing probe record their commands.",
+        "New hosts receive this pin only after the next release tag."
+      ],
+      "path": "evidence/receipts/ccusage-20026-qualification-20260927.json"
     }
   ],
   "files": [
@@ -3593,8 +3638,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9d511ff9ff79f5ad9f743c0478f4645d1ac6725fb214a033a83cd7c47eeee04b",
-      "bytes": 44274
+      "sha256": "0459c55ac1a5d6285307c63dad21ba988831a29d77b73b40d59d25c6dea6f254",
+      "bytes": 44570
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3728,13 +3773,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "713f8551bfef83940e1797f44716d9abcb0ea26480816222b960958eebedaada",
-      "bytes": 29517
+      "sha256": "d23ca533bd2b9e80a5e3ecfd0e004180f486ecfbe60f7592cec46241300ef27a",
+      "bytes": 30182
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "85244a728c53a82e5dfc437e72255d59811bef3666c34aa3568baa2979ab1691",
-      "bytes": 41193
+      "sha256": "b2b139271b52fceffc1cb92960a0a8542b89506d660b8d145bdbe6656f61418a",
+      "bytes": 41774
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3743,8 +3788,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "6277fdecdd9dce7660d391749891a43041bcc43b81e7a3ee5920ec0486c700ee",
-      "bytes": 56349
+      "sha256": "68c0a967e9978ba0b047386aca4a7f460b578feee5cd116a565b5442286d4592",
+      "bytes": 57036
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3798,8 +3843,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "98fa731425078d2e763adaa349b332700a31dec3f15d8c57d173d1729e2d3ac6",
-      "bytes": 12102
+      "sha256": "f84f0e0836db9bc59cf0676bfceff94b0812c1f972d7844a004a165a7df0f6a6",
+      "bytes": 12118
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -3808,7 +3853,7 @@
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "922e6c5f8fd5f07973345148514c215d7ca9768eee94be92eadb7d5efadbc169",
+      "sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
       "bytes": 4458
     },
     {
@@ -8524,8 +8569,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "ddb3ece9df05a247f3f0aa49f11b45602bd9de24bae7c7654e614d16382d762b",
-      "bytes": 482163
+      "sha256": "a7236b40f4e14dc9e552072d1d8fa76236912837707e7a3cf361c8a25f08460a",
+      "bytes": 482575
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -13359,7 +13404,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "b082dd8a05519d0cc435cd7720061adce858cdfadfdcb629794c5adca8e34bb6",
+      "sha256": "52c4d091e788297f33a4f6f390063d387062b2e7b0c3ff1fb6d4f3d0b1610871",
       "bytes": 287241
     },
     {
@@ -13369,7 +13414,7 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "d8c1923306b6d0af6f06540a6d782dd131f67c7cc7d668caca5377bc072019ea",
+      "sha256": "29b654414d30ac80cbc9659c2fd6316b044c30834706b3f5a129d8f492e70c15",
       "bytes": 249282
     },
     {
@@ -13899,8 +13944,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "ecc1967ff6ad96b4e1cdfb3871e46d49b800ccb7338e114749ca3486e1f1b061",
-      "bytes": 39216
+      "sha256": "fc8fcb14204d10b459d0cbbeafcb7c89a3e07e5b89b1e3a9ebbeead982c1d3e8",
+      "bytes": 46043
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
@@ -13924,8 +13969,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-token-practice-f1-f9.md",
-      "sha256": "80c7d2e54c921ea8b0100266b312faf7aa8fb1d6e9d020080259116f26ca1230",
-      "bytes": 10959
+      "sha256": "38e27eb98ffffdb02b9908356b5c797e76f47c15841b16749ffc9d0de4fe3d1c",
+      "bytes": 12182
     },
     {
       "path": "docs/decisions/2026-09-26-token-workflow-hardening.md",
@@ -14064,8 +14109,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "b230317167b2d8a32279b13bc3e2808b4490631d0be687e6843e44b5e8675502",
-      "bytes": 34139
+      "sha256": "d0116cb7f5969955e617774aac6ede3c578c2134cc830da1d1c2e3c51a907f88",
+      "bytes": 34382
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -14169,8 +14214,8 @@
     },
     {
       "path": "docs/memory-rag-native-practice.md",
-      "sha256": "691a9f2599429a6b90343c628320ca184bbdb9883059f89110fcae96470867d1",
-      "bytes": 8400
+      "sha256": "ceedaee1bd35c3b3f3a3b4376bae7b14a24dc592192dad9cc6429a24025459a8",
+      "bytes": 8539
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -14199,8 +14244,8 @@
     },
     {
       "path": "docs/native-memory-rag-lifecycle.md",
-      "sha256": "2e0fe582de409cf4c4d2f41222601b632d85dffc2a77a09afbf01a80ca7e976c",
-      "bytes": 11540
+      "sha256": "5a60d79327c2cf5361ec88400f2dee0e8e0024c4a8534bd2db12ae93d4db4943",
+      "bytes": 11656
     },
     {
       "path": "docs/native-returned-results.md",
@@ -14234,7 +14279,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "02b6bef1a26d5844194892419c79628a8de1da6d37d39782ed8e5e9e22465a8d",
+      "sha256": "fafd15a46b0da092b2f6651751223cdab804aaf46e9a44d63601a25c9dc34e2e",
       "bytes": 18181
     },
     {
@@ -14334,8 +14379,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "9de4a4b5f23658a49a32dd8d95ffe51eb0011691665a713d58273b904e76c020",
-      "bytes": 158486
+      "sha256": "74972fbdd1b96313845ffca5ea3f6108847c43ae33b10456b998d85f43cdb32d",
+      "bytes": 158732
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -39063,6 +39108,11 @@
       "bytes": 1231
     },
     {
+      "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
+      "sha256": "0d610a6415fbd9eb173047e57286626205f5312b2c90aba1aae7c67a4b69b427",
+      "bytes": 14696
+    },
+    {
       "path": "evidence/receipts/claude-advisor-usage-scan-20260928.json",
       "sha256": "dd8ee8959b438fdcea61d7b6c67aa22af64d6b8abfa08abae4ef9a765732fd87",
       "bytes": 12062
@@ -39503,6 +39553,11 @@
       "bytes": 1840
     },
     {
+      "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
+      "sha256": "bbd65485d3c14ddee589aba4287d547d62cf6d451a1b6aaacd4c0e503c74fc32",
+      "bytes": 24103
+    },
+    {
       "path": "evidence/receipts/sota-convergence-20260922.json",
       "sha256": "24be77b12057c9cc7d29d0edbd0ba8af5005ceff82c2f1b1ffe34e5c424d1ab2",
       "bytes": 4906
@@ -39634,7 +39689,7 @@
     },
     {
       "path": "examples/claude-mcp.json.example",
-      "sha256": "a115e56aef95f31779d06c6dc023bc67b137bb684b84d69f4af9775351fb39c5",
+      "sha256": "cb89602bd91721c072c4a5b8adebe4d583e624e01c77772f10aaedeb77ac4810",
       "bytes": 1511
     },
     {
@@ -39754,8 +39809,8 @@
     },
     {
       "path": "examples/codex-mcp.toml.example",
-      "sha256": "b8dc6458522ea7524024172bf45c24cc78f4f09e743076b6673945c3f33ac99d",
-      "bytes": 1300
+      "sha256": "6203fdcb819d183fae1ac01ae2eda447252f2f8d07de53d82cf947845a07e6c0",
+      "bytes": 1474
     },
     {
       "path": "examples/codex-native/README.md",
@@ -39784,7 +39839,7 @@
     },
     {
       "path": "examples/mcporter.json.example",
-      "sha256": "72357722714386ffc54c5a2571f1d6b68bf994ae6ced348a1afcfd739b45d8d8",
+      "sha256": "cdb2e40a8b2feab0db591f5421b1ece60548bc572ddb384cd4d073d88c1cc0b4",
       "bytes": 1589
     },
     {
@@ -39909,13 +39964,13 @@
     },
     {
       "path": "manifests/landscape.json",
-      "sha256": "909860c97f5b059424bb0e0bdba759f90fb291a614768a74baf0bf44bc757eed",
+      "sha256": "bdb43cf59a1875cd49578d025a3ac76fcc173b7b63c449fd9921d1fe45558f48",
       "bytes": 21467
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "40252da6336cad19d8a9443287709355ea5f197067eb9d03d0737a21fc6c5162",
-      "bytes": 95520
+      "sha256": "d6254ed9aee6b586283bdd41fa5e2187ebfe1e461a70ff32bb900e4317a3d5c8",
+      "bytes": 95619
     },
     {
       "path": "observability/README.md",
@@ -40094,8 +40149,8 @@
     },
     {
       "path": "observability/grand-dashboard/progress.py",
-      "sha256": "e233469df9de5733bb5151d91606023be8f66dd00152a57536b10cceeac1c5ce",
-      "bytes": 13720
+      "sha256": "9c386558e4f07d659179750d218bd78a8898c68b198e70e73484040a63110740",
+      "bytes": 14046
     },
     {
       "path": "observability/grand-dashboard/receipt.json",
@@ -40194,8 +40249,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "1ed331c14a48569a991ee03ae72a5b0af778e1b393ef08d00064b5486ce55ca5",
-      "bytes": 121039
+      "sha256": "0551a170707f0845237942f210ce67f10b3118cdb7c6c9c5f775d84b71e83596",
+      "bytes": 121895
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -40309,7 +40364,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "92ee217b5355233a52aae0434a1ec6e5f8bbdeb9470f48711d2a6fff396a4202",
+      "sha256": "df9d794668e8942a053cc3c76f2cb5e063c55671f286abdb14788b3dde04737b",
       "bytes": 114715
     },
     {
@@ -40624,8 +40679,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "89ec6ea37261c0bc0419588bec5cfe718d809a216c814c28f6e074e049d93c2f",
-      "bytes": 226595
+      "sha256": "e567ae3cad54a41dc328d5290bc0d501cbcb78f6eff0d7c2a21f87d48b67a572",
+      "bytes": 227418
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -40769,8 +40824,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "b00f272b2167ea269fe0134657bcbb51b4ac78c03b91e6ecc4ccc2baaba1d1dd",
-      "bytes": 95109
+      "sha256": "41dc80dcfc66c88b597ecd4fc3591210b86f30e77573afd37fff7d4bdb04096e",
+      "bytes": 95142
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -40889,8 +40944,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "78176c87eb7e0c977289272efcadbb8eb348d486f6043ca8f70e075eb4d4ccff",
-      "bytes": 14161
+      "sha256": "695a11868546649f5780170b423cd82322a72a811dd1fe9c49abf4b57a06428e",
+      "bytes": 15259
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
@@ -41189,8 +41244,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "565ef9a7addc8ef789381d941066b35a39e459ff10aca3215e55d3a1846e4645",
-      "bytes": 30351
+      "sha256": "162e942e2bc0cbea9e47f8e95da937e1066d02af4ba5c4d9706d38774a4ac9fc",
+      "bytes": 35227
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -41409,8 +41464,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "a6f4338ad445207ba030b77d746fb53f7acbb9d016684c0a18a1ac93f3ba8d3f",
-      "bytes": 14691
+      "sha256": "430e544cf245d500a78c2b748422e95c177db68316c08a7e85db3baa49d84c09",
+      "bytes": 15821
     },
     {
       "path": "tools/adoption/render_launchd.py",
