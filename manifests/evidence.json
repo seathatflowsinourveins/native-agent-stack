@@ -4338,33 +4338,33 @@
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/README.md",
-      "sha256": "1b5c7e3ebefb189e4bbbd1cbe222b531af7e0b0f3abb66ddd7b99049aa11dc46",
-      "bytes": 35723
+      "sha256": "06d8f0e0b7b154e181dbaf20c340ac47555df87cc2e3a369aa24850ee3dec4fa",
+      "bytes": 65299
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/analyze_r02.py",
-      "sha256": "63cfb2606ac82f1e0cb621ba7638111fab46c5cb97fe6312fc7499f7671931fa",
-      "bytes": 32738
+      "sha256": "b7a113e71c6f7a1d0fd8693b75f9bae2ffb26632e62e503fa0de03e008f4cf8d",
+      "bytes": 60802
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/assert_r02.py",
-      "sha256": "f42225eef40064c0b5e5523e3004f716de90a93bfd58e175aad72039d6fda0b8",
-      "bytes": 2009
+      "sha256": "acab8fd0ac691b073b10c7d205f8aad6042b0dbe84cf20637a00f0d3b4fbc832",
+      "bytes": 2145
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/build_r02.py",
-      "sha256": "1ef73e1d40ad039cebc682271c401c24d6ad43870e906a4525eab76c7ef06b8d",
-      "bytes": 15760
+      "sha256": "e4114084e958c6318990edc4f4fd4907b8ebcdcb229b41da045a35dcab3421f7",
+      "bytes": 21435
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/call_logs_by_correlation.py",
-      "sha256": "84b63b2353d232fbd94ee3e115ce936e4b024ff47cadc3f68fdb4dbc26dee6e2",
-      "bytes": 6909
+      "sha256": "1c8345d443378798737c49ff6e05eba5685f9098f3ce7cc18b58eb4ac3eb66dd",
+      "bytes": 9163
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json",
-      "sha256": "7230023d4286998dbf057d67c408836a10336c35fa860cf80d0dbaa2e3ab9d3f",
-      "bytes": 32245
+      "sha256": "7e98c448012ed6cd966fcf0af2412c033c071ea0379cda7b6f67522dc2cf915d",
+      "bytes": 62407
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/prompt_r02.py",
@@ -4373,13 +4373,13 @@
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ab.json",
-      "sha256": "d05d542a8e1c3b2be00134f98d2f1bbe293b5dcc81dfc2f6e14751c2e2e014c9",
-      "bytes": 5621
+      "sha256": "85df87522f8289633cd2fd33055e5fb5412b06bfea22e3ccd43e6fe812b1e8c0",
+      "bytes": 6928
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/promptfooconfig.ba.json",
-      "sha256": "4c665f0490668b02e1950740ba93b777803feaef124c84a50741d89dbb5b910d",
-      "bytes": 5621
+      "sha256": "506cdd45829569222ed477f4fa6e5d9e36e2be64f336d7d294b8a7c883f34442",
+      "bytes": 6928
     },
     {
       "path": "blueprints/convergence-practice/gateway-ab-r02-20260927/transform_r02.js",
@@ -39448,8 +39448,8 @@
     },
     {
       "path": "tests/test_gateway_ab_r02_20260927.py",
-      "sha256": "dd5f3fe226c77127e83fcc7a7422e9eb25ff0df7991e055fd7ce2af693ca1187",
-      "bytes": 54829
+      "sha256": "ca9733e57a26d1c4482e0fc8010042b741b36569e8aa24f6c3eb27130ae7288c",
+      "bytes": 111349
     },
     {
       "path": "tests/test_gitleaks_config.py",
