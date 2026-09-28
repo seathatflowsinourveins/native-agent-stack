@@ -3647,8 +3647,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "d367e5acb6c8c111cda46ed1b916a4088c255fe3f51b26a35a4e4627b1c6b3d7",
-      "bytes": 19275
+      "sha256": "a0c1177befa8cb9b2ffabe63c6bc0adb9a7dcf3bf54a21d0a9f61281790fa121",
+      "bytes": 19316
     },
     {
       "path": "adoption/paired/README.md",
@@ -3737,13 +3737,13 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "002312220e4ebe1c920a0d1a2230100498983d4165440ce73e8d09c667f91807",
-      "bytes": 48474
+      "sha256": "056fa8744df94a6b33ff14583a95b3140047cd8a5d44525459ae1b08dfffd90f",
+      "bytes": 50527
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "c3533b6a0c4715a9a6acaf8cb43c5e35bd8b7e2ccac8356b0d69b2cecdefce3f",
-      "bytes": 10848
+      "sha256": "cc0cedc5c70b72765cc6454902dffdded772643eb6739602128fa75498eb5d42",
+      "bytes": 10883
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -13218,8 +13218,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "c2df29fe9a937d8d98d6f26dbe5f5728a93b0697dc43722f0d0b9fec5de0ea36",
-      "bytes": 23546
+      "sha256": "1091fc250065d7756a0a27174ee44d2884ea56cbfb79a7bafdcab0d180f8f8aa",
+      "bytes": 25179
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -13843,8 +13843,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "7a80ab24f494702f5f1aa0b8749d5d9736c5fed0cc33606fa614657159524199",
-      "bytes": 41568
+      "sha256": "3464f0a3227d03cdb663a067dffaea5eca4c6dd573e48704a6c339ebd58dabad",
+      "bytes": 61150
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -15175,6 +15175,16 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
+      "sha256": "ac8f50fbaa4fdcf80422360cf3d2acb3df857daf3862c36a7b07e1b08b1614d1",
+      "bytes": 16064
+    },
+    {
+      "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
+      "sha256": "a9acbb84eeb8b2a8f9c17c05bf8242d3e437160fe6441c0037fd2d5957ee3dca",
+      "bytes": 52669
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/README.md",

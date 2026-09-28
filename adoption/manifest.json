@@ -453,7 +453,9 @@
       "observability/grand-dashboard/README.md",
       "blueprints/us-equities/catalyst-convergence/README.md"
     ],
-    "next_action_refs": [],
+    "next_action_refs": [
+      "claude-code-sandbox-profile"
+    ],
     "next_action_scope": "Foundation required gate IDs only; an empty list does not establish comparative saturation. Optional comparison work lives in research_refs.",
     "research_refs": [
       "docs/landscape-continuation.md",
