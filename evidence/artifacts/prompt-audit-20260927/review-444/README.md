@@ -1,7 +1,9 @@
 # Review of #444's round-3 head (2026-09-28)
 
 One review round ran on `0779e91a`, before the head was first pushed. Each family's reviewer ran once, and one
-repair round followed.
+repair round followed. `0779e91a` was never pushed: it was `7e5eddcd` plus a registration commit. The branch was
+then rebased onto `9f8db582` with every patch unchanged (`git range-diff` shows each pair as `=`), so `9e036e7d`,
+which the prompts name, is now `ce373a79`, and `7e5eddcd` is now `499a661e`.
 
 | Reviewer | Prompt | Return | Usage |
 | --- | --- | --- | --- |

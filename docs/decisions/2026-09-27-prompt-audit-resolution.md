@@ -644,8 +644,9 @@ when the suite ran). The snapshot then refused the manifest, and eight dashboard
 
 ### Review of round 3
 
-One review round ran on the pull request's head `0779e91a`. The returns, prompts, usage and each finding's
-disposition are in [`review-444/`](../../evidence/artifacts/prompt-audit-20260927/review-444/).
+One review round ran on `0779e91a`, which was never pushed. The returns, prompts, usage, each finding's disposition
+and the rebased SHAs of the reviewed commits are in
+[`review-444/`](../../evidence/artifacts/prompt-audit-20260927/review-444/).
 
 | Reviewer | Verdict | Findings | Usage |
 | --- | --- | --- | --- |
