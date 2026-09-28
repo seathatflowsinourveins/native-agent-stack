@@ -163,15 +163,19 @@ These count artifacts, not Claude's tokenizer or billed usage. Words are whitesp
 
 This amends the scope sentence under **Decision** without reversing it. The project `CLAUDE.md` now keeps its
 `@AGENTS.md` import, the one Claude-specific rule and a `## Compact Instructions` section, which is Claude-specific
-too: it names what a compaction summary preserves (modified files with their branch or worktree, test and acceptance
-commands with exit codes, the source behind each open claim, failed attempts, open review findings, unresolved gaps
-and workflow run IDs). Item AN-02 of the [2026-09-27 review](2026-09-28-community-sweep.md#applied-in-this-change).
+too: it names what a compaction summary preserves (each modified file's branch or worktree, test and acceptance
+commands with exit codes, each open claim's provenance, failed attempts, open review findings, unresolved gaps and
+workflow run IDs). Item AN-02 of the [2026-09-27 review](2026-09-28-community-sweep.md#applied-in-this-change).
 
 - **Source.** [How Claude Code works](https://code.claude.com/docs/en/how-claude-code-works): "To control what's
   preserved during compaction, add a "Compact Instructions" section to CLAUDE.md or run `/compact` with a focus".
   [Memory](https://code.claude.com/docs/en/memory#instructions-seem-lost-after-compact): project-root CLAUDE.md is
   re-read from disk after `/compact`. The installed 2.1.283 summarizer prompt contains the `## Compact Instructions`
   heading (static read of the binary). Both pages fetched 2026-09-28.
+- **Wording.** Checked against the installed writing-for-agents skill (its no-op, negation and leading-word tests):
+  the section states positive targets and names only what the built-in summary lacks. The 2.1.283 summarizer prompt
+  already asks for the files "examined, modified, or created" (static read of the binary), so the section asks for
+  each modified file's branch or worktree rather than the file list.
 - **Scope of the claim.** This section is the only web-documented way to steer automatic compaction: a `/compact`
   focus applies to a manual compaction, and the web [hooks page](https://code.claude.com/docs/en/hooks#precompact)
   documents PreCompact blocking but not its stdout. The 2.1.283 in-product `/hooks` text does document one: for
