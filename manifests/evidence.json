@@ -3408,8 +3408,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
-      "bytes": 9814
+      "sha256": "214af252f9e96fbda591389db5231c266ac16316962e5a6a42ee0e48919ea19c",
+      "bytes": 10307
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -8521,6 +8521,221 @@
       "path": "blueprints/retrieval-quality-v2/verification-review-20260926/rederive_real_qmd_receipts.py",
       "sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
       "bytes": 2690
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/.gitignore",
+      "sha256": "6fa9c435f133f59f9198b520765a85fee8d71a16f1439e53fed49c95dc39158f",
+      "bytes": 24
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/README.md",
+      "sha256": "443bb04e8ab4df11cff416939b70c8c0ee65987f0e5a04a2a77bf4e000f8f770",
+      "bytes": 43039
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/browser-artifacts.json",
+      "sha256": "2ccc245dc89b29d7586e8278d808301117d22740ad171810b06245201601da2d",
+      "bytes": 1052
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/common.sh",
+      "sha256": "0c9414dd3c52e78c0121e54a1d53e816278b6aea9b91483209334ac1e5cdf0dd",
+      "bytes": 877
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/compose.yaml",
+      "sha256": "611a731b9a83db7931e48dd38b2fe89a9761d0f820d6050debe91a95f6f42277",
+      "bytes": 3018
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/host.example.json",
+      "sha256": "e096e196c7324a67de265fb58371747b72ef94a4f4e445ea66e216b8c44ed9b4",
+      "bytes": 349
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/logging.ini",
+      "sha256": "b495284f90c1b328e98e7ab6dc48c7be37b7a35140a90e270ead4fef133098d8",
+      "bytes": 600
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/mcp-policy.json",
+      "sha256": "7c253c5e14045a7310025b71ff21d45a8ef6002c22f7dc917084d3e1d152e8e1",
+      "bytes": 2681
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/server.yml",
+      "sha256": "2d77b444912fa70eac926a87b37ad4e5335f6953475a0702ecf52900972acac9",
+      "bytes": 320
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/supervisord.conf",
+      "sha256": "a145e5d4db3d7f659a74246eaabf5d11e547d4368008bb796afb2e7fbbb7a548",
+      "bytes": 1952
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/worker.json",
+      "sha256": "eb325aafc083225396b2d42cf470650342f77a56e3ad80bbd89477b0ca7ef848",
+      "bytes": 1693
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/container-entrypoint.sh",
+      "sha256": "591fd0c640d0ffef42e8071fd1ba3ec9bd118290181178157f1a40182bf2502f",
+      "bytes": 1258
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/container.sh",
+      "sha256": "a2e0f05358137487a31580558d576cf1e776b8b2ebc44987b12e50c611f27fee",
+      "bytes": 2627
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/dispatch.py",
+      "sha256": "e731f2dcf5f9586e6da1dbf768e2bd8c40ad980c857742f1a49358c468a95639",
+      "bytes": 10903
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/dispatch.sh",
+      "sha256": "449ad2bed799e1fe97f513160a6246e4beed9bb8bbdaa0d87f92aaf6e4bab913",
+      "bytes": 296
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/assertions.json",
+      "sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "bytes": 81
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/check.py",
+      "sha256": "7878f98bea665d4111e3ce76580b26b8d495e84651ed236f108492e381623dd7",
+      "bytes": 831
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/expected.json",
+      "sha256": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+      "bytes": 414
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/fixtures/beacon.html",
+      "sha256": "d743937367e843d738223dc1dc7aac0db363ef5173c53d188a68136d63f8739e",
+      "bytes": 828
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/fixtures/flask.html",
+      "sha256": "b643e3617fc0681d2775da7f53bced1c8b60235b5f940af712bcad44d9a1d852",
+      "bytes": 838
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/fixtures/lamp.html",
+      "sha256": "5d3e3fdc038def93ef353119fbbb06ed6fc8e311c89f1eed1785363b6256348f",
+      "bytes": 834
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/grade.py",
+      "sha256": "cefc9125e6d505778cdb9f25f09c3ae9c072894ad8902c612f52c3e61d7e348f",
+      "bytes": 5734
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/mcp_probe.py",
+      "sha256": "9f2f8e4e97c0ca59a6ed01338f000a1b9187edf9d8f71b8267e84801fb11a93d",
+      "bytes": 5078
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/receipt.py",
+      "sha256": "521fb9ada9ef128201300396cea1130f031356ce6f12600a41305f16178c3fa5",
+      "bytes": 14568
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/run.py",
+      "sha256": "49bbd9598e5ac6c271b268523ca6c223b497821b5ebd2d9fd0dfe57ba549ea4b",
+      "bytes": 9372
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/schema.json",
+      "sha256": "69747f245f545a29151f17cd4fcbe5dee1418f9176970a67b4ce9f6f094e4d36",
+      "bytes": 426
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/evidence/nltk-reachability.json",
+      "sha256": "3ae7461b5852631d7fd9a8aad8ade3eddb71ed84e1f7c08599977202adae81ae",
+      "bytes": 17876
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
+      "sha256": "b3577cbcf13a57c7a1e2e961f2b3db4d56e1990d765822c810ac8dbafbb12e1f",
+      "bytes": 468157
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/grader/package.json",
+      "sha256": "79175f1717f9e414523b915b7b3a63d71876ffdc1a7090e6c98c47980ed4190f",
+      "bytes": 140
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/host.py",
+      "sha256": "38687eb528d63bb115654dbcb7c9d45c02f4f061625a198d1f9bb0363cbc47d8",
+      "bytes": 4270
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/install-browser.py",
+      "sha256": "7919165002ce74da8274c70ff294ff6eee11481bcbd6a1e45b8539fea9e25729",
+      "bytes": 2646
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/install.sh",
+      "sha256": "4e61aedd842faf0c920344ec1cffb06fd09d03705f604f8be41b006e29657078",
+      "bytes": 4177
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/mcp-config.py",
+      "sha256": "971c419bd49be9817684f9a04bda045c988ba540dee57f20272765870a3d8591",
+      "bytes": 1468
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/pins.json",
+      "sha256": "828040419e4f5d03cc3ada9d19d56b6b559b2f0d5d5e9b9f751041fdf0f53cb3",
+      "bytes": 2675
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/registry-evidence.json",
+      "sha256": "710dc54f473150f9209e76e0a5a889abda8c56c793b3f52b064b624e9a290d29",
+      "bytes": 645
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/requirements.in",
+      "sha256": "f922a5a3f6b978192899aa94a0b64a82e01dbb4782b4cc151ad8a7d2ca5f3d38",
+      "bytes": 157
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/requirements.lock",
+      "sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+      "bytes": 248729
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/research.md",
+      "sha256": "d274a10ab488bc1b03b3d50b64ab8da06241b4e85e3beecd26953b9e6b1001ec",
+      "bytes": 24368
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/run-e2e.sh",
+      "sha256": "18bcb24f04aa349cbeaa65e2d722fb214d06699ecd57d51da99f71aad571e039",
+      "bytes": 397
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification-round2.json",
+      "sha256": "76c7dc531a0397c11dfaa97508d78eb383b8fef042533d9a0376723d3e533d97",
+      "bytes": 12483
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification-round3.json",
+      "sha256": "d6ca0f856c4711c5b85f3fcf94a2b3c3a4e3d8a02cba2e40f383e59e19806034",
+      "bytes": 32018
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification.json",
+      "sha256": "ca2b276cce40925a31242bed3f6949e3459aea4cdd7a6e1c53672d2c75c8d70e",
+      "bytes": 4893
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/worker.py",
+      "sha256": "c663c3c0ed0f391a2c0b9703916b12db8476554ac4f1e06c9b3d79c1c99edafb",
+      "bytes": 8903
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -41114,8 +41329,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "16c28c3e8ce639349a6a1f0cf8ef2dc167b85ffa299320bc86b9895f1a103df6",
-      "bytes": 37014
+      "sha256": "8bd3d5907d7b5c666af657f5a5471916bf425aa4cfbc41430f235d8755431f71",
+      "bytes": 37308
     },
     {
       "path": "tests/test_path_safety.py",
@@ -41196,6 +41411,11 @@
       "path": "tests/test_retrieval_quality_v2.py",
       "sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
       "bytes": 58079
+    },
+    {
+      "path": "tests/test_runtime_worker_crawl4ai.py",
+      "sha256": "2d6a201f6309ac217f6f8e68475488ba6b980a0d38de304455e5afa650f139c5",
+      "bytes": 37833
     },
     {
       "path": "tests/test_saturation_ledger.py",
@@ -41499,8 +41719,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
-      "bytes": 55626
+      "sha256": "a0d5ee50ecdca6e5f733355187113e62992c2982a3c01fe3ec92ee1fb6db8056",
+      "bytes": 55655
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
