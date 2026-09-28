@@ -1,0 +1,3 @@
+# Upstream GAIA README documented pip extra; report.md/report2.md exact pins.
+inspect-evals[gaia]==0.22.0
+inspect-ai==0.3.271

@@ -1,0 +1,77 @@
+{
+  "evidence_class": "Offline local integration fail-first observations from this builder turn, not upstream/native acceptance",
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_owned_compose_resources_and_loopback_ports -v",
+      "exit_code": 1,
+      "observed_result": "AssertionError: 'runtime-worker-deerflow' != 'rw-deerflow'"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_gateway_structured_output_uses_upstream_tool_calling DeerFlowRecipeTests.test_gateway_rejects_non_gpt6_model_routes -v",
+      "exit_code": 1,
+      "observed_result": "FAILED (errors=2): missing method policy and missing worker_model"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_skills_use_coordinator_project_installer -v",
+      "exit_code": 1,
+      "observed_result": "AttributeError: module 'deerflow_skills' has no attribute 'install_skills'"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_adapter_preserves_known_pass_and_fail_without_a_local_verdict DeerFlowRecipeTests.test_adapter_rejects_missing_malformed_and_unfinished_output -v",
+      "exit_code": 1,
+      "observed_result": "FAILED (errors=2): read_completion did not exist"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_inspect_solver_transports_only_input_and_preserves_upstream_task -v",
+      "exit_code": 1,
+      "observed_result": "FileNotFoundError: e2e/gaia.py did not exist"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts -v",
+      "exit_code": 1,
+      "observed_result": "AttributeError: module 'deerflow_run' has no attribute 'run_worker'"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts DeerFlowRecipeTests.test_native_trace_distinguishes_skill_inventory_metadata_and_loads -v",
+      "exit_code": 1,
+      "observed_result": "FAILED (errors=2): missing transport and skills_listed_at_start receipt fields"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_grader_install_and_launch_use_exact_upstream_pins -v",
+      "exit_code": 1,
+      "observed_result": "AttributeError: module 'deerflow_grader_install' has no attribute 'install_grader'"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_gateway_headers_preserve_affinity_and_new_call_identity -v",
+      "exit_code": 1,
+      "observed_result": "AssertionError: lead/child x-omniroute-session hashes differed"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource -v",
+      "exit_code": 1,
+      "observed_result": "CalledProcessError on the first already absent container; later literal cleanup calls were not made"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 tests/test_runtime_worker_deerflow.py DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts -v",
+      "exit_code": 1,
+      "observed_result": "Malformed native version data=null interrupted receipt writing with AttributeError; repaired while preserving transport rejection."
+    }
+  ],
+  "additional_failed_attempts": [
+    {
+      "command": "solver seam before loader-path correction",
+      "exit_code": 1,
+      "result": "ModuleNotFoundError: receipt; corrected test import boundary before behavioral red run"
+    },
+    {
+      "command": "initial solver green attempt with OS asyncio executor",
+      "exit_code": 130,
+      "result": "Interrupted after hang; bounded independent asyncio.to_thread reproduction exited 1 in executor shutdown"
+    },
+    {
+      "command": "inline shell Python ast.parse",
+      "exit_code": 1,
+      "result": "SyntaxError: unmatched ')'; corrected and parsed successfully"
+    }
+  ]
+}

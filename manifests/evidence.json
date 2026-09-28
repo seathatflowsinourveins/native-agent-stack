@@ -3408,8 +3408,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "d1cab283114c18e009752d9489851ef733f7ac0fedaa4981426724005aeacfef",
-      "bytes": 9814
+      "sha256": "4547a225babeb71ad1bf87c14593d2365feb2e0ea323c3d9751147532d83695e",
+      "bytes": 10023
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -8521,6 +8521,276 @@
       "path": "blueprints/retrieval-quality-v2/verification-review-20260926/rederive_real_qmd_receipts.py",
       "sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
       "bytes": 2690
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/.gitignore",
+      "sha256": "e45917dd7b440fbd1c22bd736185121a7bee518481d164b2963f5c0075dc3edb",
+      "bytes": 30
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/README.md",
+      "sha256": "f81704720a06e67d6be52b7e886c70c31fc8d94773fd61c73a5a47578f428a5c",
+      "bytes": 29946
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/compose.json.template",
+      "sha256": "736b75050339f8876a6b0f75336b453fe7d02ae98c5c91b4cd144c594cb0d7c8",
+      "bytes": 6128
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/config.yaml.template",
+      "sha256": "b9643186de7a2c48224d7dd03bfb654fcdbb7e6925774b12652d0df772da4940",
+      "bytes": 3551
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/deerflow-run",
+      "sha256": "d1cf1bfc2361d1c16df13dd59aba6236258edf1913746c8109d64f302cdbbc0b",
+      "bytes": 434
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/defaults.json",
+      "sha256": "18d1a1183471c110ea1ad0bb35468c1fe6ae08156a6d0d5e1e7d3d14b4602e96",
+      "bytes": 150
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/dispatch.py",
+      "sha256": "3133d1dbc1e21a286bcedf5e02a591039036d2fc87ba9c7265611110bd4ee18d",
+      "bytes": 15056
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/check.py",
+      "sha256": "f3915481b82f6f54cc37de0551010829dc14f71fd2df9607efdc92754a8cba3a",
+      "bytes": 2825
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/drive.py",
+      "sha256": "0b5ca3da35ac4fd30854a3558dd08dff0693f50360dadf835ac9202137524cb2",
+      "bytes": 1406
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/evaluate.py",
+      "sha256": "0a29a38366371c347290539ddc21aeae9cadcca47f5457ad97a129c96d58d988",
+      "bytes": 5250
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/expected.json",
+      "sha256": "e0ce9a88c8160152b3e1aa1e8d456dda690e6fbf155cb4260aaab04fc309fe41",
+      "bytes": 1269
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/gaia.py",
+      "sha256": "f651e12568e83fe3e23534dd99dc287127f21c887b08fa9fef6aeb975eb352ce",
+      "bytes": 1910
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/receipt.py",
+      "sha256": "d879be1df6adb2caadeabc8d0a35a880c6804f68816e4504ae3a570686e51ba9",
+      "bytes": 15883
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+      "sha256": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+      "bytes": 221764
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/requirements.txt",
+      "sha256": "45495375bf4f4c0e4df3fb77c15e1ca030f38e6bd807fcfaf5bcf908b277275d",
+      "bytes": 126
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/run.py",
+      "sha256": "a3112e387bf6c9bfb7c39dd273f591dd78162f9e05f5e664d8c073f0939b7518",
+      "bytes": 7668
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/task.md",
+      "sha256": "4155ef3b6c83d5333cc63f9006845a2b0ab57b2161fdf7a3c8e31f695936680b",
+      "bytes": 1206
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/egress.conf.template",
+      "sha256": "7ddc16d3210178072f1f77ef5881896f3f832d081207a92bd97ba09284b3fb4e",
+      "bytes": 906
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/artifacts.txt",
+      "sha256": "f5b71a3d3a1347dbb03b6943218ba070c0f96a2ef71aa34f0c5cb407db362e36",
+      "bytes": 196
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/fail-first.json",
+      "sha256": "00b3442bbc17b12961402e6b756b7e650b09bc9f0294220057aca338af48c99a",
+      "bytes": 238
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/fail-first.txt",
+      "sha256": "14c46a6a37e7ff027eda6cede10421063037dfa50663bbacfb11c87dd48877fb",
+      "bytes": 14628
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/followup-checks.json",
+      "sha256": "6ee8a4dc183f7ce6861a2e648f5b1be5831e6b510b090a81a0dce5d686848fb1",
+      "bytes": 4418
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/repository.txt",
+      "sha256": "78a0346f79291fd2a46e1733990afe47f789101156ca3b17ac9cc8bf32c745c5",
+      "bytes": 162
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-cleanup-red.txt",
+      "sha256": "bb53b58b4c5256f7374366d1dc93083b5299cd1ff4e3a139df1f312a15e56af3",
+      "bytes": 1293
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-fail-first.json",
+      "sha256": "5227cfcd7c5fd75ae6a47daa6e2e483f49a747bd4606f00d97a4b3a2031dfe48",
+      "bytes": 4443
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-malformed-red.txt",
+      "sha256": "7a9f09071eec49d69564dfb3606aadeb214276ab4ff4f9bbb4ec6a12d589c4e6",
+      "bytes": 1744
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-repository.txt",
+      "sha256": "99690377fa19c747ba60d638a20ca8ea447ced7ecc56f8702b6e5c8139eadf2e",
+      "bytes": 2136
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-syntax.txt",
+      "sha256": "7d0e81027d9d2599a6f9bbce1a3f7aa2aa90f4666c1729a76017e096f036430c",
+      "bytes": 133
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-unit.txt",
+      "sha256": "28caed9cb3d4bc5101a2a88a7b1b53c38f05db4255b6a0363def8e945641c084",
+      "bytes": 3741
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-verification.json",
+      "sha256": "71b5fb6c415d66d41b9f9803b8e07448898376c1b267b58eed648f7962e1c776",
+      "bytes": 2633
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/syntax.txt",
+      "sha256": "5b5bb0acadd5fcaae84ee069c582e528ee7d78f66bf3b1a1fa9a8fea80f406d5",
+      "bytes": 165
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/unit.txt",
+      "sha256": "4f70d173753c7a34e721db7e939bce534101339b17f335ee8fcc8b8a45fff2a3",
+      "bytes": 1754
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/verification.json",
+      "sha256": "84e7119b34d980a21751fc654fd514230416dbb5380177dffb86d29c9874b1ac",
+      "bytes": 7618
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/extensions_config.json.template",
+      "sha256": "28db94d8c2d9a5e56a731e0f3a960a0309b9c5d2e47b096786ee7c8094f020f4",
+      "bytes": 3345
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/host.json.example",
+      "sha256": "b01b6e7a14aecb58481f146a3182e985f3665f0a9f29605b294d9e5a75e987f5",
+      "bytes": 1270
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/install.sh",
+      "sha256": "55583f70dda2a84f33ed8d15fb1e3b2671fb2454b52cd5fd177bf174669d4fcf",
+      "bytes": 278
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/lifecycle.sh",
+      "sha256": "d975500081382db565b786c693df288defe4d7abca39c801daac7c78cb2a7f39",
+      "bytes": 286
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/pins.json",
+      "sha256": "ccaa5cbccc831eaf41f62462633dfdf01920ba4dd30ea42c4453a2b8825babd2",
+      "bytes": 2942
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/recipe.py",
+      "sha256": "5b1fbd65a6a1bf5f544e5c67132e37cc7e604ec7d4a1a8c877bf6e24faf21d0a",
+      "bytes": 21434
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/research.json",
+      "sha256": "c401025560888ca978609f26bbb5eeaa8ff0f2f52279292ec9d5b02b97cc3281",
+      "bytes": 19999
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/round2-research.json",
+      "sha256": "cb0c8b65a2ce00776f08b6fe0e180b3db8ff439b3d3bb7f72c31d8c2c0407d0e",
+      "bytes": 9611
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/round3-verification.json",
+      "sha256": "549e7db9fa3897a58703b2a2d6899e39f7d15ee7ac10c64547a3d7502d285e8e",
+      "bytes": 104650
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/round3-verification.md",
+      "sha256": "ad8afdabfc7f943abbcc8215d627cf67fcf113ff323a352b596942926b24a8cc",
+      "bytes": 24134
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/run-e2e.sh",
+      "sha256": "38e542377e15b801836560cd26920394a99a0eb1a64f1d6754e4358e7c311ff3",
+      "bytes": 258
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/frontend-start.sh",
+      "sha256": "31c5523812bd6be031df233f1a31e84380a012a40b190b245a2ccf553d0f46ae",
+      "bytes": 159
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/gateway-start.sh",
+      "sha256": "906bd7593e5318b66920921d30790dea51be38ed550c7137992d75ae03ba321e",
+      "bytes": 472
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/gateway_headers.py",
+      "sha256": "e2915a83652467d89dfcb62fc5e9baa62641805d2965d7593bdb8e89c66470a5",
+      "bytes": 909
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/gateway_model.py",
+      "sha256": "fcd75cd69a542b07bf4e8f15910e87991e393c5c579fbd8ec93b6a5328f398ea",
+      "bytes": 2170
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/nginx-start.sh",
+      "sha256": "656d66f6dc7c715c014980701727b2bc8ac9d4c61f7bc7326a145ea74d98c21e",
+      "bytes": 421
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/preflight.py",
+      "sha256": "2a05cf1be2c29462afbcb542a5a95f14412a321e85d953d137d2e4bf007b4603",
+      "bytes": 2845
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/redis-start.sh",
+      "sha256": "1d5dabef9396f2dbb4cd23ecbba3442c6dd74b0fe6f0a123f8cdb8065c708c73",
+      "bytes": 534
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/stdio.sh",
+      "sha256": "c2574cf58651121a2280a7b220ab437213d15427c30b426f0e742ba3aaf6c659",
+      "bytes": 196
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/tool-policy.json",
+      "sha256": "a28ab9d1813028527671b19259de43a51cbc1af79f0d1c92b8f3d99a647a1b31",
+      "bytes": 1351
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/worker_policy.py",
+      "sha256": "0d5a2f51a2ccdde7187cb43f9a172c22fb8ce9ddcdb52ee83bdf283674b183dc",
+      "bytes": 3036
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -41198,6 +41468,11 @@
       "bytes": 58079
     },
     {
+      "path": "tests/test_runtime_worker_deerflow.py",
+      "sha256": "f685cb2fae74d1a5e0806868cebac50429cfa507d283037e7cfda2f9702be860",
+      "bytes": 62925
+    },
+    {
       "path": "tests/test_saturation_ledger.py",
       "sha256": "a446a451a6244819a7d601e29a82e1d81c8825e02c487ee4910dd24134f35a5b",
       "bytes": 61882
@@ -41499,8 +41774,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0e5a9ba4c8f852b7a552cdda746d7c2aded9879a8a7eee34baa315659141b484",
-      "bytes": 55626
+      "sha256": "41b7628b4baeb843c9510eb1664079f710b40545246b75df099e8568bc345edf",
+      "bytes": 55727
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

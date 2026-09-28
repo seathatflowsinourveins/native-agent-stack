@@ -1,0 +1,16 @@
+test_checker_accepts_a_computed_result_and_rejects_hard_coding (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_checker_accepts_a_computed_result_and_rejects_hard_coding) ... ok
+test_gateway_headers_preserve_affinity_and_new_call_identity (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_headers_preserve_affinity_and_new_call_identity) ... ok
+test_gateway_reader_is_read_only_and_uses_only_approved_columns (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... ok
+test_mcp_launches_preserve_the_adoption_commands (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_mcp_launches_preserve_the_adoption_commands) ... ok
+test_model_context_and_container_contract (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract) ... ok
+test_native_trace_does_not_count_failed_children_as_completed (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed) ... ok
+test_pins_and_script_boundaries (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_pins_and_script_boundaries) ... ok
+test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_renderer_and_qmd_snapshot_keep_state_owned_and_index_scoped) ... ok
+test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) ... ok
+test_tool_limits_are_enforced_not_only_described (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_tool_limits_are_enforced_not_only_described) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.303s
+
+OK
+

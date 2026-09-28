@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "evidence_class": "offline local integration and structural checks",
+  "source": "bytedance/deer-flow v2.1.0 at 345f08be00c8a9495079b732a39b46aa9af1584e; see research.json and pins.json",
+  "fail_first": {
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -v",
+    "exit_code": 1,
+    "result": "FAILED (failures=11, errors=4)",
+    "recipe_files_absent": true,
+    "returned_output_file": "fail-first.txt"
+  },
+  "final_checks": [
+    {
+      "name": "unit",
+      "command": "python3 -W error::ResourceWarning -m unittest discover -s tests -p test_runtime_worker_deerflow.py -v",
+      "exit_code": 0,
+      "returned_output_file": "unit.txt",
+      "result": "Ran 10 tests; OK"
+    },
+    {
+      "name": "syntax",
+      "command": "python3 - <<'PY'\nimport json, subprocess\nfrom pathlib import Path\nroot=Path('blueprints/runtime-workers/deerflow')\nfiles=[p for p in root.rglob('*') if p.is_file() and '.research' not in p.parts and '__pycache__' not in p.parts]\ncounts={'python':0,'shell':0,'json':0}\nfor path in [*files, Path('tests/test_runtime_worker_deerflow.py')]:\n    if path.suffix == '.py':\n        compile(path.read_text(), str(path), 'exec'); counts['python']+=1\n    elif path.suffix == '.sh':\n        shell='bash' if path.parent==root else 'sh'\n        subprocess.run([shell,'-n',str(path)],check=True); counts['shell']+=1\n    elif path.suffix in ('.json','.template','.example'):\n        json.loads(path.read_text()); counts['json']+=1\n    if path.suffix not in ('.pyc','.txt'):\n        assert all(line.rstrip()==line for line in path.read_text().splitlines()), path.name\nprint(json.dumps({'status':'passed','syntax_files':counts,'whitespace':'checked delivered source/config; retained raw command output excluded'}))\nPY",
+      "exit_code": 0,
+      "returned_output_file": "syntax.txt",
+      "result": "Python/shell/JSON syntax passed; source/config whitespace passed"
+    },
+    {
+      "name": "diff",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_output_file": null,
+      "result": "No whitespace errors in tracked diff"
+    },
+    {
+      "name": "repository",
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_output_file": "repository.txt",
+      "result": "passed; integrity and scope only",
+      "repeated_after_evidence_write": true
+    },
+    {
+      "name": "artifacts",
+      "command": "stdlib SHA256/JSON/local-link audit and git status --porcelain --untracked-files=all",
+      "exit_code": 0,
+      "returned_output_file": "artifacts.txt",
+      "result": "29 recipe payload hashes and offline test hash match; local README links resolve; changed paths within the authorized recipe/test scope."
+    }
+  ],
+  "additional_returned_attempts": "followup-checks.json",
+  "source_audit": {
+    "configuration_sections_checked_against_pinned_source_ast": 23,
+    "unknown_fields": [],
+    "upstream_lockfile_hash_matches": 2,
+    "limitation": "AST shape comparison is not Pydantic/runtime validation; model passthrough reviewed separately against LangChain source."
+  },
+  "warnings": [
+    "Tracked git diff is empty while new files are untracked; the separate syntax/whitespace check inspected delivered source files.",
+    "A whitespace check initially rejected a trailing space in retained unittest output. The output was preserved unchanged and raw .txt logs were excluded from source-whitespace checks."
+  ],
+  "unchanged_upstream_tests": {
+    "executed": false,
+    "command_provided": "bash lifecycle.sh upstream-tests"
+  },
+  "host_acceptance": {
+    "executed": false,
+    "installer_executed": false,
+    "images_pulled": false,
+    "services_started": false,
+    "live_gateway_database_read": false,
+    "model_calls": 0,
+    "token_usage": null,
+    "token_usage_reason": "No model or provider invocation was performed; no provider usage was measured.",
+    "pending": [
+      "private host dependency mounts and QMD snapshot",
+      "image digests/revision verification after pull",
+      "Compose config, startup and loopback binding",
+      "native upstream test subset",
+      "MCP discovery and actual tool results",
+      "referenced skills visible in native runtime",
+      "actual Responses/max/streaming/header forwarding and prompt caching",
+      "frozen task and independent checker",
+      "exclusive gateway-window attribution",
+      "timeout cancellation/cleanup",
+      "restart/recovery and persistence"
+    ]
+  },
+  "scope": {
+    "allowed_changes": [
+      "blueprints/runtime-workers/deerflow/",
+      "tests/test_runtime_worker_deerflow.py"
+    ],
+    "git_metadata_written": false,
+    "shared_manifests_changed": false,
+    "trading_paths_changed": false
+  },
+  "delivered_file_sha256": {
+    ".gitignore": "e45917dd7b440fbd1c22bd736185121a7bee518481d164b2963f5c0075dc3edb",
+    "README.md": "b415c09a4f4212bddcaa5487bf051ff01068ae3b9da19bff0b5c1f347bfc0c6c",
+    "compose.json.template": "17d0e5454874d236a330451f183c615eea31f0b59de82e26c305833f63fe41f5",
+    "config.yaml.template": "37a1b5bf651358ac56c667920b0527c46b76053f0ddadaa67e4fd322c10de6b8",
+    "defaults.json": "18d1a1183471c110ea1ad0bb35468c1fe6ae08156a6d0d5e1e7d3d14b4602e96",
+    "e2e/check.py": "11205522696ff272773438d9c5d31fd1458520a3338bb432e9fbf83cb4522447",
+    "e2e/drive.py": "bbe45a6b50aec39cd7de91a44f8305c1902f0d705a23294438b6e4dc9ec1908e",
+    "e2e/expected.json": "e0ce9a88c8160152b3e1aa1e8d456dda690e6fbf155cb4260aaab04fc309fe41",
+    "e2e/receipt.py": "12a22518201be4e6941c0d8a973c98b5971819859bff975d0d2348d659400885",
+    "e2e/run.py": "df811508667313995aef6e0c7abdde3a9b4ac6cf68b88e2ffd5eb320eeb7ddd8",
+    "e2e/task.md": "752f493a7a9b522464d1f52ad09ea2edbf794e98eb512ff9b6b468ca26decdbf",
+    "extensions_config.json.template": "f2b6270d2ccd404c11425d348a18c0b57f561c1260495cfd1a85df43571c6d4e",
+    "host.json.example": "592316aa46ba4705bb5389c93c8612b3c548474762e96694b310bf948a7dfd76",
+    "install.sh": "55583f70dda2a84f33ed8d15fb1e3b2671fb2454b52cd5fd177bf174669d4fcf",
+    "lifecycle.sh": "d975500081382db565b786c693df288defe4d7abca39c801daac7c78cb2a7f39",
+    "pins.json": "daf6343c7ba0a5c1bf6467d3250a5b0c87d5dc2e795d67a403f7929d6ed3e858",
+    "recipe.py": "5255073c96098301ad8291238859db8cd7a8041a0d0f7f865493e8adc1babb7d",
+    "research.json": "c401025560888ca978609f26bbb5eeaa8ff0f2f52279292ec9d5b02b97cc3281",
+    "run-e2e.sh": "26e6902baa8579d22b1629562f76830d6bdc08cbd77fb2bbfa983532d9677fe6",
+    "runtime/frontend-start.sh": "31c5523812bd6be031df233f1a31e84380a012a40b190b245a2ccf553d0f46ae",
+    "runtime/gateway-start.sh": "8d4570e6bf8e097d188a931381321854d91a56d1863a43fc25da8e7b1f8e5b85",
+    "runtime/gateway_headers.py": "d33f3d1053dc67fb6f2655a508a3992b3dcacdc659f183dd07e7e71039046825",
+    "runtime/gateway_model.py": "ff892c7cbf6a1e4620ca75d2ff0f1a076c0f696f773105eab1c69c4af91492f5",
+    "runtime/nginx-start.sh": "046b05e78ae08cebee7510108dc6329ff20e28702ac99a78e27ee431448b63a0",
+    "runtime/preflight.py": "a11c9ff15ab50eb676ab7454a203259ee6bdb9ed0b2e7655472a53529872349e",
+    "runtime/redis-start.sh": "f3a38ee9e11db625ebe5f0b83d49093b7089f4f403e250fa66692ac25ab7da62",
+    "runtime/stdio.sh": "c2574cf58651121a2280a7b220ab437213d15427c30b426f0e742ba3aaf6c659",
+    "runtime/tool-policy.json": "a28ab9d1813028527671b19259de43a51cbc1af79f0d1c92b8f3d99a647a1b31",
+    "runtime/worker_policy.py": "0d5a2f51a2ccdde7187cb43f9a172c22fb8ce9ddcdb52ee83bdf283674b183dc"
+  },
+  "offline_test_sha256": "6b70ac77aa8cc50d8eaf4a534fe2e77db838a78d22b0b39174f3f991f4bf2878"
+}
