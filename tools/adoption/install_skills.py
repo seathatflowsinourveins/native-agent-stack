@@ -19,7 +19,18 @@ For every manifest skill, in order:
       add-time audit call) and re-check the same two conditions as (a). A
       mismatch after add (wrong tree, wrong bytes, or the CLI silently
       installing something else) runs `skills remove <name> -g -y -a
-      claude-code codex` and is reported as 'rolled-back'.
+      claude-code codex`, then reads back the canonical folder, the lock
+      entry and the claude-code link ($CLAUDE_CONFIG_DIR/skills when set, as
+      the CLI resolves it), whatever that remove reported: 'rolled-back' when
+      all three are gone, else 'error' with "rollback retained, in use by
+      another agent" (only the remove's exit 0 with the canonical folder
+      kept) or "rollback incomplete", naming what remains (see SKILL_AGENTS).
+      A remove that cannot run is 'error' too, and so is a read-back that
+      cannot observe them, such as an unreadable or malformed lock ("rollback
+      could not be verified"). Nothing is
+      deleted by hand; docs/decisions/2026-09-25-skills-trial-and-usage.md
+      (Addendum 2026-09-28: M4 host removal and the scoped-remove correction)
+      gives the manual procedure.
 
 Exit status is 1 when any processed skill ends anywhere but 'ok' or
 'installed' (or, under --dry-run, anywhere but 'ok' or 'planned' -- a
@@ -114,6 +125,14 @@ REMOVE_TIMEOUT = 30
 # The only agents this installer writes for. `add` and the rollback `remove` both pass them, because skills
 # v1.7.0's `remove` without -a selects every known agent (vercel-labs/skills src/remove.ts#L209) and would delete
 # a same-named skill that another agent owns. -a stays last: the CLI reads trailing words as agent names.
+# With -a, that `remove` uninstalls for the named agents only: it keeps the canonical ~/.agents/skills/<name> and
+# its lock entry while any other detected agent resolves to that folder, as every universal agent (project skillsDir
+# .agents/skills) does, and reports success either way. Codex reads the canonical folder while it exists, and the
+# skills CLI still counts it as installed for every universal agent. So process_skill reads a rollback back from
+# disk in both modes and reports what remains, or a read-back it cannot complete, as 'error'.
+# Sources: skills v1.7.0 (commit 7407f389) src/remove.ts L293-340, src/agents.ts L910-912, src/installer.ts
+# L157-159, and the skills@1.7.0 npm dist/cli.mjs L6834-6838, L6883-6914, isUniversalAgent L2180 and getAgentBaseDir
+# L2214; Codex rust-v0.157.1 (commit 36650394) codex-rs/ext/skills/src/host_roots.rs L103-108.
 SKILL_AGENTS = ("claude-code", "codex")
 
 # Real-run and --dry-run each have their own notion of "nothing left to fix":
@@ -172,6 +191,26 @@ def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) 
     return (project_dir or home) / ".agents" / "skills" / name
 
 
+# What JavaScript's String.prototype.trim removes (ECMA-262 WhiteSpace and LineTerminator): the 25 code points
+# node's trim() removed when run over every code point on 2026-09-28. str.strip() differs: it keeps U+FEFF and
+# strips U+001C-U+001F and U+0085.
+JS_TRIM_CHARS = ("\t\n\v\f\r              "
+                 "    　﻿")
+
+
+def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
+    """Where the CLI links claude-code skills: <project>/.claude/skills, or globally
+    $CLAUDE_CONFIG_DIR/skills when that is set and not blank, else home/.claude/skills
+    (skills@1.7.0 npm dist/cli.mjs L1398 claudeHome, L1511 globalSkillsDir). The global
+    path is trimmed and normalized as the CLI's trim() and path.join do: os.path.normpath,
+    except that a leading // collapses to / as in Node."""
+    if project_dir is not None:
+        return project_dir / ".claude" / "skills"
+    claude_config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
+    joined = os.path.normpath(os.path.join(claude_config_dir or str(home / ".claude"), "skills"))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
+
+
 def project_containment_problem(project_dir: Path, home: Path, names: list[str]) -> str | None:
     """Why a project install could write outside the (resolved) project_dir, else None.
 
@@ -214,6 +253,20 @@ def load_lock(home: Path, project_dir: Path | None = None) -> dict:
     except json.JSONDecodeError:
         return {}
     return data if isinstance(data, dict) else {}
+
+
+def lock_retains(home: Path, name: str, project_dir: Path | None = None) -> bool:
+    """A rollback's read-back of the lock. Unlike load_lock, only a missing lock file or a lock that
+    parses without an entry for name confirms removal: an unreadable or malformed lock raises OSError
+    or ValueError, since it may still hold the entry."""
+    path = lock_file_path(home, project_dir)
+    if not path.exists() and not path.is_symlink():
+        return False
+    data = json.loads(path.read_text(encoding="utf-8"))
+    skills = data.get("skills", {}) if isinstance(data, dict) else None
+    if not isinstance(skills, dict):
+        raise ValueError(f"{path} has no skills table")
+    return name in skills
 
 
 def read_lock_entry(home: Path, name: str, project_dir: Path | None = None) -> dict | None:
@@ -394,23 +447,35 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
     try:
         removed = run_skills_bin(skills_bin, remove_args, home, timeout=REMOVE_TIMEOUT, project_dir=project_dir)
     except (OSError, subprocess.TimeoutExpired) as error:
-        if project_dir is None:
-            raise  # preserve the existing global behavior
         print(f"{name}: verification failed and rollback could not run ({error})", file=sys.stderr)
         return "error"
-    if project_dir is not None:
-        canonical = canonical_skill_dir(home, name, project_dir)
+    # Read back what the remove left in either mode, whatever it reported (see SKILL_AGENTS): the global
+    # canonical folder, lock and Claude link (where the CLI puts it, claude_skills_dir), or the project's.
+    # The CLI alone deletes them. A read-back that cannot observe them does not confirm the rollback.
+    canonical = canonical_skill_dir(home, name, project_dir)
+    claude_link = claude_skills_dir(home, project_dir) / name
+    try:
         canonical_retained = canonical.exists() or canonical.is_symlink()
-        lock_skills = load_lock(home, project_dir).get("skills")
-        lock_retained = isinstance(lock_skills, dict) and name in lock_skills
-        claude_link = project_dir / ".claude" / "skills" / name
-        claude_retained = agent == "claude-code" and (claude_link.exists() or claude_link.is_symlink())
-        if removed.returncode or canonical_retained or lock_retained or claude_retained:
-            reason = ("rollback retained, in use by another agent" if canonical_retained and not removed.returncode
-                      else "rollback incomplete")
-            print(f"{name}: error: {reason} (exit {removed.returncode}; canonical={canonical_retained}, "
-                  f"project-lock={lock_retained}, claude-link={claude_retained})", file=sys.stderr)
-            return "error"
+        lock_retained = lock_retains(home, name, project_dir)
+        claude_retained = ((project_dir is None or agent == "claude-code")
+                           and (claude_link.exists() or claude_link.is_symlink()))
+    except (OSError, ValueError) as error:
+        print(f"{name}: error: rollback could not be verified (exit {removed.returncode}; "
+              f"read-back failed: {error})", file=sys.stderr)
+        return "error"
+    if removed.returncode or canonical_retained or lock_retained or claude_retained:
+        reason = ("rollback retained, in use by another agent" if canonical_retained and not removed.returncode
+                  else "rollback incomplete")
+        left = [str(canonical)] if canonical_retained else []
+        if lock_retained:
+            left.append(f"its entry in {lock_file_path(home, project_dir)}")
+        if claude_retained:
+            left.append(str(claude_link))
+        lock_label = "project-lock" if project_dir is not None else "lock"
+        print(f"{name}: error: {reason} (exit {removed.returncode}; canonical={canonical_retained}, "
+              f"{lock_label}={lock_retained}, claude-link={claude_retained})"
+              + (f"; left: {', '.join(left)}" if left else ""), file=sys.stderr)
+        return "error"
     print(f"{name}: installed content did not match the pinned manifest hash/tree; rolled back",
           file=sys.stderr)
     return "rolled-back"

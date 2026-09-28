@@ -17,7 +17,15 @@ of the real `skills` CLI (v1.7.0) to exercise install_skills.py end to end:
                     sides of that contract at once.
   remove <name> -g -y -a claude-code codex
                     deletes the canonical folder, the symlink and the lock
-                    entry.
+                    entry. Per-fixture fault injection: retain_after_remove
+                    keeps the named artifacts ("canonical", "lock",
+                    "claude-link"), remove_exit fails the remove before it
+                    deletes anything, remove_cannot_run leaves the binary
+                    non-executable (1) or deletes it (2) after add, so the
+                    rollback cannot start, and lock_after_remove leaves the
+                    lock "malformed" (truncated, entry kept) or "unreadable".
+                    A set, non-blank $CLAUDE_CONFIG_DIR moves the global link
+                    to $CLAUDE_CONFIG_DIR/skills, as in skills 1.7.0.
 
 Every invocation is also appended to calls.log next to the fake script
 (independent of --home), so tests can assert not just the outcome but
@@ -31,7 +39,8 @@ does across process boundaries with a real (fake) CLI. $XDG_STATE_HOME is
 stripped from the child environment by default so a variable already set on
 the host running these tests can never redirect a lock-file write outside the
 test's own temporary directory; only the dedicated XDG test re-adds it,
-pointed at a second temporary directory.
+pointed at a second temporary directory. $CLAUDE_CONFIG_DIR is stripped the
+same way, and only the tests that name it set it.
 """
 
 import hashlib
@@ -39,6 +48,7 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -66,12 +76,18 @@ def load_installer_module():
 PINNED_VERSION = "1.7.0"
 INSTALL_HINT = "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0"
 
+# JavaScript trim()'s whitespace (ECMA-262 WhiteSpace and LineTerminator), used by the fake CLI;
+# test_js_trim_chars_match_node checks it against node and against install_skills.JS_TRIM_CHARS.
+JS_TRIM_CHARS = ("\t\n\v\f\r \u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a"
+                 "\u2028\u2029\u202f\u205f\u3000\ufeff")
+
 FAKE_SKILLS_BIN_TEMPLATE = r'''#!/usr/bin/env python3
 import json, os, sys, shutil, hashlib
 from pathlib import Path
 
 VERSION = "__VERSION__"
 FIXTURES = __FIXTURES_JSON__
+JS_TRIM_CHARS = __JS_TRIM_CHARS__
 
 LOG = Path(__file__).resolve().parent / "calls.log"
 with open(LOG, "a", encoding="utf-8") as fh:
@@ -94,6 +110,17 @@ def load_lock(path: Path) -> dict:
         except json.JSONDecodeError:
             pass
     return {"lockfileVersion": 3, "skills": {}}
+
+
+def claude_skills_dir(target: Path, project: bool) -> Path:
+    # skills@1.7.0 npm dist/cli.mjs L1398 and L1511: a set, non-blank CLAUDE_CONFIG_DIR moves the
+    # global claude-code skills folder, trimmed by JavaScript's trim() and normalized by path.join;
+    # project installs keep <project>/.claude/skills.
+    if project:
+        return target / ".claude" / "skills"
+    config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
+    joined = os.path.normpath(os.path.join(config_dir or str(target / ".claude"), "skills"))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
 argv = sys.argv[1:]
@@ -121,7 +148,7 @@ if argv[0] == "add":
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(fixture["skill_md"], encoding="utf-8")
     if not project or "claude-code" in argv:
-        link_dir = target / ".claude" / "skills"
+        link_dir = claude_skills_dir(target, project)
         link_dir.mkdir(parents=True, exist_ok=True)
         link = link_dir / name
         # skills@7407f389 installer.ts:254-264 removes an existing directory
@@ -132,7 +159,7 @@ if argv[0] == "add":
             shutil.rmtree(link)
         elif link.exists():
             link.unlink()
-        os.symlink(os.path.join("..", "..", ".agents", "skills", name), link)
+        os.symlink(os.path.relpath(skill_dir, link_dir), link)
     path = target / "skills-lock.json" if project else lock_path(home)
     path.parent.mkdir(parents=True, exist_ok=True)
     lock = load_lock(path)
@@ -151,12 +178,20 @@ if argv[0] == "add":
             "computedHash": hashlib.sha256(b"SKILL.md" + fixture["skill_md"].encode()).hexdigest(),
         }
     path.write_text(json.dumps(lock))
+    if fixture.get("remove_cannot_run") == 2:
+        os.remove(__file__)  # The rollback's exec then fails with FileNotFoundError: the binary is gone.
+    elif fixture.get("remove_cannot_run"):
+        # The rollback's exec then fails with PermissionError, an OSError, as for a binary that cannot run.
+        os.chmod(__file__, 0o644)
     sys.exit(0)
 
 if argv[0] == "remove":
     name = argv[1]
     # Synthetic fault injection for independently checking cleanup artifacts.
     retained = FIXTURES.get(name, {}).get("retain_after_remove", [])
+    if FIXTURES.get(name, {}).get("remove_exit"):
+        print(f"fake skills remove: simulated failure for {name!r}", file=sys.stderr)
+        sys.exit(FIXTURES[name]["remove_exit"])
     if project:
         # Relevant subset of skills@7407f389 remove.ts:209-333. A same-named
         # OpenClaw source directory is a removal target even if not detected.
@@ -183,14 +218,20 @@ if argv[0] == "remove":
             sys.exit(0)
     if "canonical" not in retained:
         shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
-    link = target / ".claude" / "skills" / name
-    if not project and (link.is_symlink() or link.exists()):
+    link = claude_skills_dir(target, project) / name
+    if not project and "claude-link" not in retained and (link.is_symlink() or link.exists()):
         link.unlink()
     path = target / "skills-lock.json" if project else lock_path(home)
     lock = load_lock(path)
-    if "lock" not in retained:
+    # lock_after_remove: "malformed" leaves a truncated lock that still holds the entry;
+    # "unreadable" removes the entry and then makes the lock unreadable.
+    fault = FIXTURES.get(name, {}).get("lock_after_remove")
+    if "lock" not in retained and fault != "malformed":
         lock.get("skills", {}).pop(name, None)
-    path.write_text(json.dumps(lock))
+    text = json.dumps(lock)
+    path.write_text(text[:-1] if fault == "malformed" else text)
+    if fault == "unreadable":
+        os.chmod(path, 0)
     sys.exit(0)
 
 print(f"fake skills: unknown subcommand {argv[0]!r}", file=sys.stderr)
@@ -200,7 +241,7 @@ sys.exit(2)
 
 def write_fake_skills_bin(directory: Path, fixtures: dict, version: str = PINNED_VERSION) -> Path:
     text = FAKE_SKILLS_BIN_TEMPLATE.replace("__VERSION__", version).replace(
-        "__FIXTURES_JSON__", json.dumps(fixtures))
+        "__FIXTURES_JSON__", json.dumps(fixtures)).replace("__JS_TRIM_CHARS__", ascii(JS_TRIM_CHARS))
     path = directory / "skills"
     path.write_text(text, encoding="utf-8")
     path.chmod(0o755)
@@ -283,6 +324,7 @@ class InstallSkillsTestCase(unittest.TestCase):
                     fake_bin: Path | None = None) -> subprocess.CompletedProcess:
         full_env = dict(os.environ)
         full_env.pop("XDG_STATE_HOME", None)  # never let the host redirect the lock write
+        full_env.pop("CLAUDE_CONFIG_DIR", None)  # nor the global Claude link
         full_env.update(env or {})
         args = [sys.executable, str(SCRIPT), "--manifest", str(manifest), "--home", str(self.home)]
         if fake_bin is not None:
@@ -522,6 +564,17 @@ sys.exit(code)
                 self.assertEqual(link.is_symlink(), artifact == "claude-link")
                 if artifact == "claude-link":
                     self.assertFalse(link.exists(), "dangling Claude link must still count as retained")
+
+    def test_project_rollback_with_a_malformed_lock_is_error_could_not_be_verified(self):
+        self.write_drifting_fake_bin(lock_after_remove="malformed")
+        result = self.install("--agent", "claude-code", "--json")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"project-skill": "error"})
+        self.assertIn("project-skill: error: rollback could not be verified (exit 0; read-back failed: ",
+                      result.stderr)
+        self.assertNotIn("rolled back", result.stderr)
+        self.assertFalse((self.project / ".agents/skills/project-skill").exists())
 
     def test_wrong_source_ref_or_path_is_not_accepted_even_when_bytes_match(self):
         for field, value in (("source", "other/repo"), ("ref", "b" * 40), ("path", "elsewhere/skill")):
@@ -796,6 +849,172 @@ class MismatchRollbackTests(InstallSkillsTestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("rolled back", result.stderr)
         self.assertEqual([c[0] for c in calls_log(fake_bin)], ["--version", "add", "remove"])
+
+
+class GlobalRollbackReadBackTests(InstallSkillsTestCase):
+    """A global rollback is read back from disk, as the project rollback is. skills 1.7.0's scoped
+    `remove` keeps the canonical folder and its lock entry while any other detected agent resolves to
+    that folder, and exits 0 either way (vercel-labs/skills v1.7.0 src/remove.ts L293-340). Codex reads
+    the canonical folder while it exists, and the skills CLI still counts it as installed for every
+    universal agent. What remains is reported as 'error' with the project path's reasons, and the
+    script deletes nothing itself. Fake-CLI integration fixtures, not a native CLI run."""
+
+    NAME = "drift-skill"
+    CONTENT = "# Drifted skill\n"
+
+    def run_drift(self, home_label: str = "home", env: dict | None = None,
+                  **fixture) -> subprocess.CompletedProcess:
+        """A tree mismatch after add, so the global rollback runs; each label gets its own home and binary."""
+        self.home = self.tmp_path / home_label
+        self.home.mkdir(exist_ok=True)
+        bin_dir = self.tmp_path / f"bin-{home_label}"
+        bin_dir.mkdir()
+        self.fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {
+            "skill_md": self.CONTENT, "tree_sha": tree_sha("actually-installed"), **fixture}})
+        manifest = self.write_manifest([make_skill(self.NAME, self.CONTENT, tree_sha("pinned"))])
+        return self.run_install(manifest, "--json", fake_bin=self.fake_bin, env=env)
+
+    def artifacts(self) -> dict:
+        canonical = self.home / ".agents" / "skills" / self.NAME
+        link = self.home / ".claude" / "skills" / self.NAME
+        return {"canonical": canonical.exists() or canonical.is_symlink(),
+                "lock": self.NAME in self.lock_data().get("skills", {}),
+                "claude-link": link.exists() or link.is_symlink()}
+
+    def assert_error(self, result: subprocess.CompletedProcess, reason: str) -> None:
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "error"})
+        self.assertIn(f"{self.NAME}: error: {reason} (exit ", result.stderr)
+        self.assertNotIn("rolled back", result.stderr)
+
+    def test_retained_canonical_folder_and_lock_are_error_in_use_by_another_agent(self):
+        # What skills 1.7.0 does while another universal agent is detected: both stay and remove exits 0.
+        result = self.run_drift(retain_after_remove=["canonical", "lock"])
+        self.assert_error(result, "rollback retained, in use by another agent")
+        calls = calls_log(self.fake_bin)
+        self.assertEqual([c[0] for c in calls], ["--version", "add", "remove"])
+        self.assertEqual(calls[-1], ["remove", self.NAME, "-g", "-y", "-a", "claude-code", "codex"])
+        self.assertEqual(self.artifacts(), {"canonical": True, "lock": True, "claude-link": False})
+        # The message names what remains, and nothing was deleted by the script itself.
+        self.assertIn("canonical=True, lock=True, claude-link=False", result.stderr)
+        self.assertIn(str(self.home / ".agents" / "skills" / self.NAME), result.stderr)
+        self.assertIn(str(self.home / ".agents" / ".skill-lock.json"), result.stderr)
+        self.assertEqual((self.home / ".agents" / "skills" / self.NAME / "SKILL.md").read_text(), self.CONTENT)
+
+    def test_each_retained_artifact_is_error_on_its_own(self):
+        for artifact, reason in (("canonical", "rollback retained, in use by another agent"),
+                                 ("lock", "rollback incomplete"), ("claude-link", "rollback incomplete")):
+            with self.subTest(artifact=artifact):
+                # A retained drifted copy is local content to the next run, so each case gets its own home.
+                result = self.run_drift(f"home-{artifact}", retain_after_remove=[artifact])
+                self.assert_error(result, reason)
+                self.assertEqual(self.artifacts(),
+                                 {key: key == artifact for key in ("canonical", "lock", "claude-link")})
+                if artifact == "claude-link":
+                    link = self.home / ".claude" / "skills" / self.NAME
+                    self.assertFalse(link.exists(), "a dangling Claude link must still count as retained")
+
+    def test_remove_that_exits_nonzero_is_error_rollback_incomplete(self):
+        result = self.run_drift(remove_exit=1)
+        self.assert_error(result, "rollback incomplete")
+        self.assertIn("(exit 1; canonical=True, lock=True, claude-link=True)", result.stderr)
+        self.assertEqual(self.artifacts(), {"canonical": True, "lock": True, "claude-link": True})
+
+    def test_remove_that_cannot_run_is_error_not_an_exception(self):
+        # Fixtures are embedded in the fake CLI as Python source, so flags are ints rather than JSON booleans.
+        for flag, case in ((1, "not executable"), (2, "missing")):
+            with self.subTest(binary=case):
+                result = self.run_drift(f"home-cannot-run-{flag}", remove_cannot_run=flag)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "error"})
+                self.assertIn(f"{self.NAME}: verification failed and rollback could not run (", result.stderr)
+                self.assertEqual([c[0] for c in calls_log(self.fake_bin)], ["--version", "add"])
+                self.assertEqual(self.fake_bin.exists(), flag == 1)
+
+    def test_malformed_lock_after_remove_is_error_could_not_be_verified(self):
+        # Both copies are gone and the remove exits 0, but a truncated lock may still hold the entry.
+        result = self.run_drift(lock_after_remove="malformed")
+        self.assert_error(result, "rollback could not be verified")
+        self.assertIn("read-back failed: ", result.stderr)
+        lock_text = (self.home / ".agents" / ".skill-lock.json").read_text()
+        self.assertIn(f'"{self.NAME}"', lock_text)
+        self.assertRaises(ValueError, json.loads, lock_text)
+        self.assertFalse((self.home / ".agents" / "skills" / self.NAME).exists())
+
+    @unittest.skipIf(os.geteuid() == 0, "root reads a mode-000 file")
+    def test_unreadable_lock_after_remove_is_error_not_an_exception(self):
+        result = self.run_drift(lock_after_remove="unreadable")
+        self.assert_error(result, "rollback could not be verified")
+        self.assertIn("read-back failed: [Errno 13]", result.stderr)
+
+    def test_claude_config_dir_link_is_read_back_where_the_cli_writes_it(self):
+        config_dir = self.tmp_path / "claude-config"
+        result = self.run_drift(env={"CLAUDE_CONFIG_DIR": str(config_dir)}, retain_after_remove=["claude-link"])
+        self.assert_error(result, "rollback incomplete")
+        link = config_dir / "skills" / self.NAME
+        self.assertTrue(link.is_symlink())
+        self.assertIn("canonical=False, lock=False, claude-link=True", result.stderr)
+        self.assertIn(f"left: {link}", result.stderr)
+        self.assertFalse((self.home / ".claude").exists())
+
+    def test_claude_config_dir_is_trimmed_and_normalized_as_the_cli_does(self):
+        # dist/cli.mjs L1398 trims with JavaScript's trim() and L1511 joins with path.join, which collapses "..".
+        # U+FEFF is JS whitespace; U+0085 is Python whitespace only, so it stays part of the folder name.
+        config_dir = self.tmp_path / "claude-config"
+        cases = (("home-dotdot", str(self.tmp_path / "missing" / ".." / "claude-config"), config_dir / "skills"),
+                 ("home-bom", "\ufeff", None),
+                 ("home-nel", str(config_dir) + "\u0085", Path(str(config_dir) + "\u0085") / "skills"))
+        for label, value, link_dir in cases:
+            with self.subTest(case=label):
+                result = self.run_drift(label, env={"CLAUDE_CONFIG_DIR": value}, retain_after_remove=["claude-link"])
+                self.assert_error(result, "rollback incomplete")
+                link = (link_dir or self.home / ".claude" / "skills") / self.NAME
+                self.assertTrue(link.is_symlink())
+                self.assertIn(f"left: {link}", result.stderr)
+                self.assertFalse((self.tmp_path / "missing").exists())
+
+    @unittest.skipUnless(shutil.which("node"), "node is not on PATH")
+    def test_js_trim_chars_match_node(self):
+        script = ('const out = []; for (let c = 0; c <= 0x10FFFF; c++) { if (c >= 0xD800 && c <= 0xDFFF) continue; '
+                  'if (String.fromCodePoint(c).trim() === "") out.push(c); } console.log(JSON.stringify(out));')
+        result = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True, timeout=60)
+        node_set = set(json.loads(result.stdout))
+        self.assertEqual({ord(c) for c in load_installer_module().JS_TRIM_CHARS}, node_set)
+        self.assertEqual({ord(c) for c in JS_TRIM_CHARS}, node_set)
+
+    def test_claude_config_dir_control_ignores_the_default_claude_folder(self):
+        # Another copy under ~/.claude is not the CLI's link while CLAUDE_CONFIG_DIR is set; a blank value is unset.
+        config_dir = self.tmp_path / "claude-config"
+        for label, value, link_dir in (("home-config", str(config_dir), config_dir / "skills"),
+                                       ("home-blank", "  ", None)):
+            with self.subTest(claude_config_dir=value):
+                other = self.tmp_path / label / ".claude" / "skills" / self.NAME / "SKILL.md"
+                if link_dir is not None:
+                    other.parent.mkdir(parents=True)
+                    other.write_text("owned before this run\n")
+                result = self.run_drift(label, env={"CLAUDE_CONFIG_DIR": value})
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
+                self.assertNotIn(": error:", result.stderr)
+                self.assertEqual(self.artifacts()["canonical"], False)
+                self.assertEqual(self.artifacts()["lock"], False)
+                if link_dir is not None:
+                    self.assertEqual(other.read_text(), "owned before this run\n")
+                    self.assertTrue(link_dir.is_dir())
+                    self.assertFalse((link_dir / self.NAME).exists() or (link_dir / self.NAME).is_symlink())
+                else:
+                    self.assertTrue((self.home / ".claude" / "skills").is_dir())
+                    self.assertEqual(self.artifacts()["claude-link"], False)
+
+    def test_control_remove_that_deletes_everything_is_rolled_back(self):
+        result = self.run_drift()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
+        self.assertIn("rolled back", result.stderr)
+        self.assertNotIn(": error:", result.stderr)
+        self.assertEqual(self.artifacts(), {"canonical": False, "lock": False, "claude-link": False})
 
 
 class LocalModifiedTests(InstallSkillsTestCase):
