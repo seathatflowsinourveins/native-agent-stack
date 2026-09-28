@@ -1,0 +1,7 @@
+on: push
+jobs:
+  test:
+    strategy: ${{ fromJSON('{"matrix":{"os":["ubuntu-latest","windows-latest"]}}') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: echo test

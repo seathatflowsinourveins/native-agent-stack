@@ -1,0 +1,10 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    cache-mode: read
+    steps:
+      - uses: actions/cache/save@v6
+        with:
+          path: .cache
+          key: build-${{ github.sha }}
