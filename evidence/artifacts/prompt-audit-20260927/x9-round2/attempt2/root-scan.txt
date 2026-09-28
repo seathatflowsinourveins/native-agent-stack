@@ -1,0 +1,2 @@
+root: plain export of main at ba1700ad (git archive), no .git; scanned 2026-09-28T03:29:06Z, after attempt 2; `diff -rq` against a fresh `git archive ba1700ad` export found no difference, so the judges saw this tree. The same scan ran before dispatch with the same result.
+7935 files scanned; files with a MAPPING match: 0; with a PHRASES match: 0

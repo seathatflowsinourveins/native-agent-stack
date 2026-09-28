@@ -1,0 +1,62 @@
+{
+ "note": "Each file prereg-r3.json hashes, checked against its published copy when this directory was written. The arm files are round 2's published arms (identical bytes). promptfooconfig-r3.yaml names the harness directory by its host path, so its hash was checked on the file as run and the published copy has that path replaced. The four raw probe transcripts are not published (they hold the host's init data). Two files changed after freezing and are published twice: the frozen copy carries the preregistered hash, the as-run copy is what ran.",
+ "checked": [
+  "../make_x9_round3.py",
+  "<worktree 0>/CLAUDE.md",
+  "<worktree c>/CLAUDE.md",
+  "<worktree g>/CLAUDE.md",
+  "analyze_r3.py",
+  "audit_r3.py",
+  "check_orders_r3.py",
+  "fixtures/ticket-tracker/server.py",
+  "fixtures/workspace-guard/.claude-plugin/plugin.json",
+  "fixtures/workspace-guard/hooks/hooks.json",
+  "fixtures/workspace-guard/hooks/mark.py",
+  "freeze_prereg_r3.py",
+  "grader_selftest.py",
+  "metrics.py",
+  "metrics_r3.py",
+  "prereg-r3.draft.json",
+  "probe_facts.py",
+  "probe_r3.sh",
+  "promptfooconfig-r3.yaml",
+  "run_arm_r3.sh",
+  "summarize.py",
+  "summarize_r3.py",
+  "tally_r3.py",
+  "void_patterns_r3.py"
+ ],
+ "not_published": [
+  "probe/p1-ok.jsonl",
+  "probe/p2-k6-view.jsonl",
+  "probe/p3-k5-view.jsonl",
+  "probe/p4-k6-refused.jsonl"
+ ],
+ "published_with_host_paths_replaced": [
+  "promptfooconfig-r3.yaml"
+ ],
+ "arms": {
+  "g": {
+   "published": "../x9-round2/arms/CLAUDE.g.md",
+   "sha256": "bb155b03e7e90dccea42de00a5febd8c7979c817f26988a856f07d5dd72695d6"
+  },
+  "c": {
+   "published": "../x9-round2/arms/CLAUDE.c.md",
+   "sha256": "db6cdc6f456fa88dc0f22c41d59268582624e8b33a1c48097bd6f048bdc09aa5"
+  },
+  "0": {
+   "published": "../x9-round2/arms/CLAUDE.0.md",
+   "sha256": "1a55ee0b21f83c543529caf5e020af65dc53298223b15cac8b6f22c6614d0f64"
+  }
+ },
+ "changed_after_freezing": {
+  "../make_x9_round3.py": {
+   "frozen": "89573303c9508729002d21110e2405c8a54f46eaf51d9475ff7547e7a72f69b3",
+   "as_run": "c8b3b8df1ae57f77bb7cc5cdef91b61cc816083e298e3039e8ceb4734bb40ea6"
+  },
+  "check_orders_r3.py": {
+   "frozen": "c6185cab21f4ec11f74e6b9c14d834f25e943867d5abae2ecc7c17c5a2132629",
+   "as_run": "91525bf40444bb3d1c3e1b826d5d5c7557c3f0d132942d530931882eea0a3814"
+  }
+ }
+}
