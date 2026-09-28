@@ -175,7 +175,7 @@ def create_receipt(result, database=None):
     checked = read_json(result / "check.json")
     # F17: nothing under result/worker or result/server is read (NOT_COLLECTED_REASON).
     selection = arm_config(window.get("arm", "control"), window.get("requested_model", window.get("model")),
-                           window.get("base_url"))
+                           window.get("base_url"), window.get("compression_combo"))
     db = database or gateway_database(selection["arm"])
     rows, db_status = [], "unavailable"
     try:
@@ -204,8 +204,9 @@ def create_receipt(result, database=None):
         except (OSError, ValueError, AttributeError):
             cleanup.append(False)
     return {
-        "schema_version": 4, "evidence_class": "SDK inference adapter with official SWE-bench grading",
-        **{k: selection[k] for k in ("arm", "base_url", "requested_model", "gateway_model", "gateway_path")},
+        "schema_version": 5, "evidence_class": "SDK inference adapter with official SWE-bench grading",
+        **{k: selection[k] for k in ("arm", "base_url", "gateway_upstream", "requested_model", "gateway_model",
+                                     "gateway_path", "compression_combo")},
         "header_names": window.get("header_names", sorted(selection["headers"])),
         "framework": "OpenHands software-agent-sdk", "expected_version": pins["version"],
         "observed_versions": NOT_COLLECTED,

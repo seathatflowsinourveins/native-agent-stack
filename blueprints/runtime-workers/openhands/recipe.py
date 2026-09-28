@@ -14,6 +14,17 @@ from string import Template
 
 
 HERE = Path(__file__).resolve().parent
+# Phase 2 (O1): the agent reaches its arm's gateway only through the per-attempt
+# proxy alias on the internal run network (config/proxy-nginx.conf); the
+# proxy's upstream port selects the arm.
+PROXY_BASE_URL = "http://gw:8081/v1"
+# Header-selected combos in the 20129 apply record read back at
+# 2026-09-28T03:50:11Z (all twelve engines globally off there). The engines-on
+# default stays the round-3 "allow-lossy"; the control arm sends none.
+COMPRESSION_COMBOS = frozenset({
+    "allow-lossy", "fw-ccr", "fw-codex-responses", "fw-headroom", "fw-lite", "fw-rtk", "fw-session-dedup",
+})
+DEFAULT_COMPRESSION = "allow-lossy"
 
 
 def read_json(path):
@@ -69,11 +80,13 @@ def render_mcp(variables):
     return config
 
 
-def arm_config(arm="control", model=None, base_url=None):
+def arm_config(arm="control", model=None, base_url=None, compression=None):
     """Round-3 common contract; provider prefix belongs to LiteLLM only.
 
     SDK@fcc102a llm/llm.py:442-446; coordinator's 2026-09-27 one-slash probe.
     Entry-gateway model matching is explicit: OmniRoute logs the routed model.
+    Both arms call PROXY_BASE_URL; gateway_upstream is the proxy's fixed
+    upstream, so the rendered proxy config and this selection cannot disagree.
     """
     if arm not in {"control", "engines-on"}:
         raise ValueError("unknown_arm")
@@ -83,18 +96,36 @@ def arm_config(arm="control", model=None, base_url=None):
              if arm == "control" else selected == "sharedgw/gpt-6-astra-max")
     if not valid:
         raise ValueError("gateway_requires_gpt6_route_for_selected_arm")
-    expected_url = f"http://10.0.2.2:{port}/v1"
-    if base_url is not None and base_url != expected_url:
+    if base_url is not None and base_url != PROXY_BASE_URL:
         raise ValueError("base_url_must_match_arm")
-    return {"arm": arm, "requested_model": selected, "base_url": expected_url,
-            "gateway_port": port, "gateway_model": selected.split("/", 1)[1],
-            "gateway_path": "/v1/responses",
-            "headers": {"x-omniroute-compression": "allow-lossy"} if arm == "engines-on" else {}}
+    if arm == "control":
+        if compression is not None:
+            raise ValueError("control_arm_sends_no_compression_header")
+        combo = None
+    else:
+        combo = DEFAULT_COMPRESSION if compression is None else compression
+        if combo not in COMPRESSION_COMBOS:
+            raise ValueError("unrecorded_compression_combo")
+    return {"arm": arm, "requested_model": selected, "base_url": PROXY_BASE_URL,
+            "gateway_port": port, "gateway_upstream": f"http://10.0.2.2:{port}/v1",
+            "gateway_model": selected.split("/", 1)[1], "gateway_path": "/v1/responses",
+            "compression_combo": combo,
+            "headers": {"x-omniroute-compression": combo} if combo else {}}
 
 
-def llm_config(config, model=None, *, arm="control", base_url=None):
+def environment_selection(environment, arm=None):
+    """The one reader of OPENHANDS_* selection variables for host and worker.
+
+    An explicit arm (the host CLI flag) wins over OPENHANDS_ARM. An empty
+    OPENHANDS_COMPRESSION means unset: the control arm's container gets "".
+    """
+    return arm_config(arm or environment.get("OPENHANDS_ARM", "control"), environment.get("OPENHANDS_MODEL"),
+                      environment.get("OPENHANDS_BASE_URL"), environment.get("OPENHANDS_COMPRESSION") or None)
+
+
+def llm_config(config, model=None, *, arm="control", base_url=None, compression=None):
     result = dict(config["llm"])
-    selected = arm_config(arm, model, base_url)
+    selected = arm_config(arm, model, base_url, compression)
     if result.get("reasoning_effort") != "max":
         raise ValueError("max_reasoning_effort_required")
     if result.get("temperature") is not None and result["temperature"] <= 0.1:

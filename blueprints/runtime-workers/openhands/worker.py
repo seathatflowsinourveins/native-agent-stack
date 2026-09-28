@@ -17,7 +17,7 @@ import shlex
 import sys
 import uuid
 
-from recipe import HERE, llm_config, read_json, tool_filter
+from recipe import HERE, environment_selection, llm_config, read_json, tool_filter
 
 
 def headers_for_call(static_headers):
@@ -25,10 +25,12 @@ def headers_for_call(static_headers):
 
 
 def worker_llm_config(environment, dispatch_id):
+    # The phase-2 proxy replaces these three headers with its own fixed values
+    # (config/proxy-nginx.conf); the SDK copies stay equal to them by design.
     cfg = read_json(HERE / "config/worker.json")
-    fields = llm_config(cfg, environment.get("OPENHANDS_MODEL"),
-                        arm=environment.get("OPENHANDS_ARM", "control"),
-                        base_url=environment.get("OPENHANDS_BASE_URL"))
+    selection = environment_selection(environment)
+    fields = llm_config(cfg, selection["requested_model"], arm=selection["arm"],
+                        base_url=selection["base_url"], compression=selection["compression_combo"])
     fields["extra_headers"].update({"x-omniroute-session": dispatch_id, "X-Correlation-Id": dispatch_id})
     fields["usage_id"] = "agent"
     return fields

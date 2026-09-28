@@ -61,8 +61,14 @@ class OpenHandsRecipeTests(unittest.TestCase):
         self.assertIn('--python "$grader_dir/.venv/bin/python"', sync)
 
     def test_explicit_arms_keep_one_slash_routes_and_compression_separate(self):
+        # Phase 2 (F21 refresh): both arms call the proxy alias, whose upstream
+        # port selects the arm. The 20129 apply record read back at
+        # 2026-09-28T03:50:11Z has seven header-selected combos and all twelve
+        # engines globally off; default-caveman is outside that set.
         helpers = load_recipe_module("recipe.py")
         cfg = self.read_json("config/worker.json")
+        self.assertEqual(helpers.COMPRESSION_COMBOS, frozenset({
+            "allow-lossy", "fw-ccr", "fw-codex-responses", "fw-headroom", "fw-lite", "fw-rtk", "fw-session-dedup"}))
         for arm, model, port, headers in (
             ("control", "cx/gpt-6-astra-max", 20128, {}),
             ("engines-on", "sharedgw/gpt-6-astra-max", 20129,
@@ -71,18 +77,33 @@ class OpenHandsRecipeTests(unittest.TestCase):
             with self.subTest(arm=arm):
                 selected = helpers.arm_config(arm)
                 self.assertEqual(selected["requested_model"], model)
-                self.assertEqual(selected["base_url"], f"http://10.0.2.2:{port}/v1")
+                self.assertEqual(selected["base_url"], "http://gw:8081/v1")
+                self.assertEqual(selected["gateway_port"], port)
+                self.assertEqual(selected["gateway_upstream"], f"http://10.0.2.2:{port}/v1")
                 self.assertEqual(selected["headers"], headers)
                 llm = helpers.llm_config(cfg, arm=arm)
                 self.assertEqual(llm["model"], "openai/" + model)
+                self.assertEqual(llm["base_url"], "http://gw:8081/v1")
+                self.assertEqual(llm["api_key"], "local-loopback")
                 self.assertEqual(llm["reasoning_effort"], "max")
                 self.assertEqual(llm["extra_headers"], headers)
+        for combo in sorted(helpers.COMPRESSION_COMBOS):
+            with self.subTest(combo=combo):
+                selected = helpers.arm_config("engines-on", compression=combo)
+                self.assertEqual(selected["compression_combo"], combo)
+                self.assertEqual(selected["headers"], {"x-omniroute-compression": combo})
+        self.assertIsNone(helpers.arm_config("control")["compression_combo"])
         for kwargs in (
             {"arm": "engines-on", "model": "sharedgw/cx/gpt-6-astra-max"},
             {"arm": "engines-on", "model": "sharedgw/claude-opus-5-5"},
             {"arm": "control", "model": "sharedgw/gpt-6-astra-max"},
-            {"arm": "engines-on", "base_url": "http://10.0.2.2:20128/v1"},
+            {"arm": "engines-on", "base_url": "http://10.0.2.2:20129/v1"},
+            {"arm": "control", "base_url": "http://10.0.2.2:20128/v1"},
             {"arm": "control", "base_url": "https://example.invalid/v1"},
+            {"arm": "control", "compression": "allow-lossy"},
+            {"arm": "engines-on", "compression": "default-caveman"},
+            {"arm": "engines-on", "compression": ""},
+            {"arm": "engines-on", "compression": "ALLOW-LOSSY"},
             {"arm": "other"},
         ):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
@@ -93,17 +114,19 @@ class OpenHandsRecipeTests(unittest.TestCase):
 
     def test_gateway_model_and_container_topology(self):
         config = self.read_json("config/worker.json")
-        self.assertEqual(config["llm"]["base_url"], "http://127.0.0.1:20128/v1")
+        self.assertEqual(config["llm"]["base_url"], "http://gw:8081/v1")
         self.assertEqual(config["llm"]["model"], "cx/gpt-6-astra-max")
         self.assertEqual(config["model_env"], "OPENHANDS_MODEL")
         self.assertEqual(config["llm"]["api_key"], "local-loopback")
         self.assertEqual(config["llm"]["api_mode"], "responses")
         self.assertIsNone(config["llm"].get("temperature"))
         self.assertNotEqual(config["llm"].get("reasoning_effort"), "auto")
-        self.assertEqual(config["runtime"]["gateway_base_url"], "http://10.0.2.2:20128/v1")
+        self.assertEqual(config["runtime"]["gateway_base_url"], "http://gw:8081/v1")
         self.assertEqual(config["runtime"]["agent_loop"], "container")
-        self.assertEqual(config["runtime"]["published_ports"], ["127.0.0.1:3730:8000"])
+        # Only the proxy publishes, on loopback, to its host-driver server.
+        self.assertEqual(config["runtime"]["published_ports"], ["127.0.0.1:3730:8080"])
         self.assertEqual(config["arm_env"], "OPENHANDS_ARM")
+        self.assertEqual(config["compression_env"], "OPENHANDS_COMPRESSION")
         self.assertEqual(config["base_url_env"], "OPENHANDS_BASE_URL")
         self.assertEqual(config["condenser"]["kind"], "LLMSummarizingCondenser")
         self.assertGreater(config["condenser"]["max_tokens"], 0)
@@ -127,6 +150,30 @@ class OpenHandsRecipeTests(unittest.TestCase):
             "headroom_compress", "headroom_retrieve", "headroom_stats",
         })
         self.assertIn("serena", policy)
+        # Phase 2 (O1): host services have no route from the internal run
+        # network, so both remote servers are documented as unreachable by
+        # design; no proxy route is added for them.
+        for name in ("ai-memory", "socraticode"):
+            with self.subTest(server=name):
+                self.assertIs(policy[name]["enabled"], False)
+                self.assertIn("unreachable by design", policy[name]["reason"])
+                self.assertIn("internal run network", policy[name]["reason"])
+
+    def test_environment_selection_maps_empty_compression_to_unset(self):
+        # One helper serves host.run and the container worker, so both sides
+        # read OPENHANDS_COMPRESSION the same way ("" means unset).
+        helpers = load_recipe_module("recipe.py")
+        self.assertIsNone(helpers.environment_selection({"OPENHANDS_COMPRESSION": ""})["compression_combo"])
+        self.assertEqual(helpers.environment_selection({}, "engines-on")["compression_combo"], "allow-lossy")
+        self.assertEqual(helpers.environment_selection({"OPENHANDS_ARM": "control"}, "engines-on")["arm"], "engines-on")
+        selected = helpers.environment_selection({"OPENHANDS_ARM": "engines-on", "OPENHANDS_COMPRESSION": "fw-lite"})
+        self.assertEqual((selected["arm"], selected["compression_combo"]), ("engines-on", "fw-lite"))
+        self.assertEqual(selected["headers"], {"x-omniroute-compression": "fw-lite"})
+        for environment in ({"OPENHANDS_COMPRESSION": "fw-lite"},
+                            {"OPENHANDS_ARM": "engines-on", "OPENHANDS_COMPRESSION": "fw-unknown"},
+                            {"OPENHANDS_ARM": "engines-on", "OPENHANDS_BASE_URL": "http://10.0.2.2:20129/v1"}):
+            with self.subTest(environment=environment), self.assertRaises(ValueError):
+                helpers.environment_selection(environment)
 
     def test_immutable_artifacts(self):
         pins = self.read_json("pins.json")
@@ -179,6 +226,13 @@ class OpenHandsRecipeTests(unittest.TestCase):
             cfg = worker.worker_llm_config({"OPENHANDS_ARM": arm}, "dispatch-fixture")
             self.assertEqual(cfg["extra_headers"]["x-omniroute-session"], "dispatch-fixture")
             self.assertEqual("x-omniroute-compression" in cfg["extra_headers"], arm == "engines-on")
+            self.assertEqual(cfg["base_url"], "http://gw:8081/v1")
+        selected = worker.worker_llm_config({"OPENHANDS_ARM": "engines-on", "OPENHANDS_COMPRESSION": "fw-rtk"}, "d")
+        self.assertEqual(selected["extra_headers"]["x-omniroute-compression"], "fw-rtk")
+        unset = worker.worker_llm_config({"OPENHANDS_ARM": "control", "OPENHANDS_COMPRESSION": ""}, "d")
+        self.assertNotIn("x-omniroute-compression", unset["extra_headers"])
+        with self.assertRaises(ValueError):
+            worker.worker_llm_config({"OPENHANDS_ARM": "control", "OPENHANDS_COMPRESSION": "fw-rtk"}, "d")
         response = SimpleNamespace(raw_response=SimpleNamespace(
             _hidden_params={"headers": {"X-Correlation-Id": "opaque-response-id"}}))
 
@@ -263,11 +317,15 @@ class OpenHandsRecipeTests(unittest.TestCase):
         helpers = load_recipe_module("recipe.py")
         result = helpers.llm_config(self.read_json("config/worker.json"), "cx/gpt-6-sol-max")
         self.assertEqual(result["model"], "openai/cx/gpt-6-sol-max")
-        self.assertEqual(result["base_url"], "http://10.0.2.2:20128/v1")
+        self.assertEqual(result["base_url"], "http://gw:8081/v1")
         pattern = re.compile(helpers.tool_filter(self.read_json("config/mcp-policy.json")))
-        for name in ("terminal", "file_editor", "context-mode_ctx_execute", "serena_find_symbol", "ai-memory_memory_query", "qmd_query", "socraticode_codebase_health", "jcodemunch_order"):
+        for name in ("terminal", "file_editor", "context-mode_ctx_execute", "serena_find_symbol", "qmd_query", "jcodemunch_order"):
             self.assertIsNotNone(pattern.fullmatch(name), name)
-        for name in ("context-mode_ctx_upgrade", "context-mode_ctx_purge", "ai-memory_memory_write", "socraticode_codebase_index", "jcodemunch_delete_index", "headroom_headroom_compress", "memory_query", "qmd_query_evil"):
+        # Phase 2 contract change: tools of the unreachable host services are
+        # no longer admitted by the native filter either.
+        for name in ("context-mode_ctx_upgrade", "context-mode_ctx_purge", "ai-memory_memory_query", "ai-memory_memory_write",
+                     "socraticode_codebase_health", "socraticode_codebase_index", "jcodemunch_delete_index",
+                     "headroom_headroom_compress", "memory_query", "qmd_query_evil"):
             self.assertIsNone(pattern.fullmatch(name), name)
 
     def test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes(self):
@@ -1013,14 +1071,36 @@ class OpenHandsReceiptTests(unittest.TestCase):
         self.assertIn("?mode=ro", source)
 
     def test_skills_and_mcp_require_observations(self):
+        # Phase 2 disables the unreachable host services in the policy, so the
+        # fixture uses a container-local server the native filter still admits.
         module = load_recipe_module("receipt.py")
-        action = {"kind": "ActionEvent", "tool_name": "ai-memory_memory_query"}
-        observed = {"kind": "ObservationEvent", "tool_name": "ai-memory_memory_query", "observation": {"is_error": False}}
+        action = {"kind": "ActionEvent", "tool_name": "jcodemunch_order"}
+        observed = {"kind": "ObservationEvent", "tool_name": "jcodemunch_order", "observation": {"is_error": False}}
+        disabled = {"kind": "ObservationEvent", "tool_name": "ai-memory_memory_query", "observation": {"is_error": False}}
         skill = {"kind": "ObservationEvent", "tool_name": "invoke_skill", "observation": {"skill_name": "tdd", "is_error": False}}
         self.assertEqual(module.observations([action])["mcp_calls_observed"], {})
-        report = module.observations([action, observed, skill], ["tdd"])
-        self.assertEqual(report["mcp_calls_observed"], {"ai-memory_memory_query": 1})
+        report = module.observations([action, observed, disabled, skill], ["tdd"])
+        self.assertEqual(report["mcp_calls_observed"], {"jcodemunch_order": 1})
         self.assertEqual(report["skills_observed"], {"tdd": 1})
+
+    def test_receipt_records_proxy_base_url_and_selected_compression_combo(self):
+        module = load_recipe_module("receipt.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp).resolve()
+            (result / "check.json").write_text("{}")
+            for window, combo, port in (({"arm": "engines-on", "compression_combo": "fw-rtk"}, "fw-rtk", 20129),
+                                        ({"arm": "engines-on"}, "allow-lossy", 20129),
+                                        ({"arm": "control"}, None, 20128)):
+                with self.subTest(window=window):
+                    (result / "window.json").write_text(json.dumps({
+                        **window, "base_url": "http://gw:8081/v1",
+                        "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
+                    receipt = module.create_receipt(result, database=result / "absent.sqlite")
+                    self.assertEqual(receipt["schema_version"], 5)
+                    self.assertEqual(receipt["base_url"], "http://gw:8081/v1")
+                    self.assertEqual(receipt["gateway_upstream"], f"http://10.0.2.2:{port}/v1")
+                    self.assertEqual(receipt["compression_combo"], combo)
+                    self.assertEqual(receipt["gateway"]["entry_port"], port)
 
 
 class OpenHandsDispatchTests(unittest.TestCase):
@@ -1110,6 +1190,8 @@ class OpenHandsDispatchTests(unittest.TestCase):
                                          selection, self.run_id)
         self.assertIn("--network=none", calls[0])
         self.assertIn("OPENHANDS_ARM=engines-on", calls[0])
+        self.assertIn("OPENHANDS_BASE_URL=http://gw:8081/v1", calls[0])
+        self.assertIn("OPENHANDS_COMPRESSION=allow-lossy", calls[0])
         self.assertEqual(calls[0][-1], "--request")
         launched = launch.call_args.args[0]
         self.assertNotIn("--entrypoint", launched)

@@ -25,7 +25,7 @@ import tempfile
 import urllib.request
 import uuid
 
-from recipe import HERE, arm_config, digest, llm_config, read_json, render_mcp
+from recipe import HERE, arm_config, digest, environment_selection, llm_config, read_json, render_mcp
 from e2e.task import load_task, worker_instruction
 from receipt import create_receipt, read_bounded, time_value
 
@@ -178,6 +178,9 @@ def preflight(prefix, state):
     if "<" in json.dumps(host):
         raise ValueError("host_file_has_unfilled_placeholders")
     variables = host["variables"]
+    # These endpoints belong to the disabled ai-memory and socraticode entries
+    # (config/mcp-policy.json). Under O1 they are unreachable by design from
+    # the internal run network; the values only keep the template renderable.
     if variables["AI_MEMORY_URL"] != "10.0.2.2:49474":
         raise ValueError("ai_memory_container_endpoint_required")
     if variables["EMBED_URL"] != "10.0.2.2:18232":
@@ -603,6 +606,7 @@ def prepare_native_dispatch(result, prefix, pins, base, network, host, selection
                    "--env", "OPENHANDS_RUN_ID=" + run_id, "--env", "OPENHANDS_ARM=" + selection["arm"],
                    "--env", "OPENHANDS_MODEL=" + selection["requested_model"],
                    "--env", "OPENHANDS_BASE_URL=" + selection["base_url"],
+                   "--env", "OPENHANDS_COMPRESSION=" + (selection["compression_combo"] or ""),
                    "--env", f"PATH={prefix}/venv/bin:" + host["variables"]["HOST_PATH"]]
     render = docker_args(pins, stem + "-request") + base + mount(result / "worker", "/run-output", False)
     render += environment + ["--entrypoint", str(prefix / "venv/bin/python"), pins["image"]["ref"], "/recipe/worker.py", "--request"]
@@ -653,8 +657,9 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
         if not os.path.lexists(prefix / "venv/bin/python"):
             raise ValueError("owned_sdk_venv_missing")
         cfg = read_json(HERE / "config/worker.json")
-        selection = arm_config(arm, os.environ.get("OPENHANDS_MODEL"), os.environ.get("OPENHANDS_BASE_URL"))
-        llm_config(cfg, selection["requested_model"], arm=arm, base_url=selection["base_url"])
+        selection = environment_selection(os.environ, arm)
+        llm_config(cfg, selection["requested_model"], arm=arm, base_url=selection["base_url"],
+                   compression=selection["compression_combo"])
         window.update({k: v for k, v in selection.items() if k != "headers"})
         window["header_names"] = sorted([*selection["headers"], "x-omniroute-session", "X-Correlation-Id", "Idempotency-Key"])
         network = model_network(host, arm)
