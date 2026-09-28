@@ -65,12 +65,14 @@ Source: `gh api`, at 2026-09-28T02:03:12Z.
   - the `.deb` SHA-256 matches the Packages index;
   - the Packages hash matches InRelease;
   - `gpgv` reported a good Ubuntu Archive signature.
-- **Order.** Every table row except "Immutable release", the tag lookup and
-  the four negative controls finished before either binary first ran; the
-  first `-version` output is dated 02:05:54Z. The `gh release view` read and
-  the shellcheck checks left no timestamped output, and the 2-attestation
-  count ran after parity, so none of them is claimed as coming first.
-  `receipt.json` `verification.order` gives the sources.
+- **Order.** The `gh release view` read and the shellcheck checks left no
+  timestamped output, and the 2-attestation count ran after parity, so none
+  of them is claimed as coming before either binary first ran (the first
+  `-version` output is dated 02:05:54Z). `receipt.json` `verification.order`
+  gives the sources. These did finish before it:
+  - every table row except "Immutable release";
+  - the tag lookup;
+  - the four negative controls.
 
 Flags: validate.yml passes `-version` and `-color`, and both exist in the
 1.17.0 `--help` output.
