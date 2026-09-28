@@ -5,7 +5,9 @@ underlying binary directly) in no-git `dir` mode against small synthetic fixture
 directories built under a temp dir, using the real repository `.gitleaks.toml`.
 Skips the whole test module if gitleaks is not on PATH, and skips individual
 cases if the guarded launcher reports its per-user scan lock is held by another
-scan (a busy lock is not a passing or failing result here).
+scan (a busy lock is not a passing or failing result here). A scan that does not
+complete raises _ScannerError, which unittest records as an error, never as a
+detection result (_scan_findings).
 
 `gitleaks dir` is invoked with the fixture directory as the *current working
 directory* and "." as the source argument, matching how validate.yml's
@@ -22,6 +24,8 @@ full-history scan counts, which are a separate, manually recorded evidence
 class).
 """
 
+import ast
+import io
 import json
 import os
 import re
@@ -30,6 +34,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / ".gitleaks.toml"
@@ -65,31 +70,71 @@ class _LockBusy(Exception):
     pass
 
 
+class _ScannerError(Exception):
+    """A scan that did not complete. Deliberately not an AssertionError: unittest records an AssertionError
+    as a failure and any other exception as an error (CPython Lib/unittest/case.py, _addError), and the
+    betterleaks trial job's fixture step accepts failures only (.github/workflows/validate.yml,
+    secret-scan-betterleaks), so a scanner error fails that step instead of passing as a detection difference."""
+
+
+# The guarded launchers' busy-lock contract: exit status 75 with this message, and no scan started
+# (adoption/tools/gitleaks-guarded lines 23-32; adoption/tools/gitleaks-guarded-macos lines 29 and 125-130).
+# Any other status is an error, even one whose message contains "lock", such as the Go runtime's
+# "all goroutines are asleep - deadlock!".
+LOCK_BUSY_STATUS = 75
+LOCK_BUSY_MESSAGE = "another scan holds the per-user lock"
+
+
+def _findings(report_text: str) -> list:
+    """The findings in a JSON report. gitleaks 8.30.1 writes an empty report as `[]` (its detector
+    starts from make([]report.Finding, 0), detect/detect.go line 127); betterleaks 1.8.1 writes `null`
+    (cmd/git.go line 74 and cmd/directory.go line 72 start from a nil slice, which report/json.go
+    encodes as is). Both mean no findings, so the betterleaks trial job
+    (evidence/artifacts/betterleaks-parity-20260927/) fails only on detection differences."""
+    findings = json.loads(report_text)
+    return [] if findings is None else findings
+
+
+def _scan_findings(scan_args: list, report_path: Path, cwd=None) -> list:
+    """Run `gitleaks <scan_args>` with --exit-code 0 and a JSON report at report_path; return its findings.
+
+    With --exit-code 0 both pinned scanners exit 0 whether or not they find anything, and only after
+    writing the report. In gitleaks v8.30.1 and betterleaks v1.8.1 (cmd/root.go), findingSummaryAndExit
+    writes the report whenever --report-path is set (gitleaks lines 463-491, betterleaks 610-638), and a
+    report it cannot write is fatal (lines 489 and 636). It then exits 1 on a scan error (lines 493-495
+    and 640-642) and with --exit-code on findings (lines 497-499 and 644-646). A fatal log exits 1
+    (zerolog v1.33.0 log.go, Logger.Fatal, line 396), an unknown flag exits 126 (lines 226-228 and
+    325-327), and a Go runtime crash or a signal gives another status. Detector() creates and removes the
+    report path before the scan starts (lines 352-356 and 485-489), so a scan that dies leaves no report.
+    Any nonzero status, and a missing or empty report after status 0, therefore raise _ScannerError:
+    findings are read only from a completed scan. Raises _LockBusy for the guarded launcher's busy lock,
+    so the caller can skipTest instead.
+    """
+    argv = [GITLEAKS, *scan_args, "--no-banner", "--exit-code", "0",
+            "--report-format", "json", "--report-path", str(report_path)]
+    proc = subprocess.run(argv, cwd=None if cwd is None else str(cwd), capture_output=True, text=True, check=False)
+    if proc.returncode == LOCK_BUSY_STATUS and LOCK_BUSY_MESSAGE in proc.stderr:
+        raise _LockBusy(proc.stderr.strip())
+    stderr_tail = "\n".join(proc.stderr.strip().splitlines()[-20:])
+    if proc.returncode != 0:
+        raise _ScannerError(f"gitleaks {scan_args[0]} exited {proc.returncode} under --exit-code 0, so the scan "
+                            f"did not complete: {stderr_tail}")
+    report = report_path.read_text() if report_path.exists() else ""
+    if not report.strip():
+        raise _ScannerError(f"gitleaks {scan_args[0]} exited 0 without writing its report: {stderr_tail}")
+    return _findings(report)
+
+
 def _run_gitleaks(target_dir: Path) -> list:
     """Run `gitleaks dir .` (cwd = target_dir) with the real repo config.
 
     Returns the parsed JSON findings list. Raises _LockBusy if the guarded
     launcher reports its per-user scan lock is held by another scan, so the
-    caller can skipTest instead of failing.
+    caller can skipTest instead of failing, and _ScannerError if the scan
+    did not complete (_scan_findings).
     """
-    report_path = target_dir / "gitleaks-report.json"
-    proc = subprocess.run(
-        [
-            GITLEAKS, "dir", ".",
-            "--config", str(CONFIG_PATH),
-            "--no-banner", "--exit-code", "0",
-            "--report-format", "json", "--report-path", str(report_path),
-        ],
-        cwd=str(target_dir),
-        capture_output=True, text=True, check=False,
-    )
-    if "lock" in proc.stderr.lower():
-        raise _LockBusy(proc.stderr.strip())
-    if proc.returncode not in (0, 1):
-        raise AssertionError(f"gitleaks failed unexpectedly: {proc.returncode} {proc.stderr}")
-    if not report_path.exists():
-        return []
-    return json.loads(report_path.read_text())
+    return _scan_findings(["dir", ".", "--config", str(CONFIG_PATH)], target_dir / "gitleaks-report.json",
+                          cwd=target_dir)
 
 
 @unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
@@ -489,34 +534,16 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
         exit 0"). Pass/fail must be read from the report/log output, never from the
         process exit code, whenever this flag is used. This pins that behavior
         against the installed binary so a similar mis-recorded result cannot recur
-        unnoticed.
+        unnoticed: the scan runs through _scan_findings, which raises _ScannerError
+        for any nonzero exit status, so a nonzero status here errors this test.
         """
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp)
             nonallow = target / "some" / "other" / "path"
             nonallow.mkdir(parents=True)
             (nonallow / "data.json").write_text(json.dumps({"api_key": HEX64}))
-            report_path = target / "gitleaks-report.json"
-            proc = subprocess.run(
-                [
-                    GITLEAKS, "dir", ".",
-                    "--config", str(CONFIG_PATH),
-                    "--no-banner", "--exit-code", "0",
-                    "--report-format", "json", "--report-path", str(report_path),
-                ],
-                cwd=str(target),
-                capture_output=True, text=True, check=False,
-            )
-            if "lock" in proc.stderr.lower():
-                self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-            findings = json.loads(report_path.read_text()) if report_path.exists() else []
+            findings = self._scan(target)
             self.assertTrue(findings, "fixture must contain a detected leak for this test to be meaningful")
-            self.assertEqual(
-                proc.returncode, 0,
-                "`--exit-code 0` must yield process exit code 0 even though a leak was found "
-                f"(got {proc.returncode}); a nonzero code here means the earlier mis-recorded "
-                "exit-code finding could recur",
-            )
 
 
 class GitleaksIgnoreFingerprintTests(unittest.TestCase):
@@ -741,20 +768,11 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         # contain), so the test reflects the actual working-tree config even
         # when run before these files are committed. No --redact: the test
         # needs to find the injected marker in the report.
-        proc = subprocess.run(
-            [
-                GITLEAKS, "git", str(worktree),
-                "--config", str(CONFIG_PATH),
-                "--gitleaks-ignore-path", str(ROOT),
-                f"--log-opts=-1 {sha}",
-                "--no-banner", "--exit-code", "0",
-                "--report-format", "json", "--report-path", str(report_path),
-            ],
-            capture_output=True, text=True, check=False,
-        )
-        if "lock" in proc.stderr.lower():
-            self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-        findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+        try:
+            findings = _scan_findings(["git", str(worktree), "--config", str(CONFIG_PATH),
+                                       "--gitleaks-ignore-path", str(ROOT), f"--log-opts=-1 {sha}"], report_path)
+        except _LockBusy as exc:
+            self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
         matches = [
             f for f in findings
             if injected_marker in (f.get("Match") or "") or injected_marker in (f.get("Secret") or "")
@@ -782,7 +800,9 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     This is a local integration check against the real git history in this
     worktree (not a synthetic fixture): it is slower (full-history scan, ~30s)
     than the synthetic-fixture tests above, and it is skipped, not failed, if
-    gitleaks is absent or its per-user scan lock is held by another scan.
+    gitleaks is absent or its per-user scan lock is held by another scan. A scan
+    that does not complete errors it (_scan_findings) instead of reading as zero
+    findings.
     """
 
     def setUp(self):
@@ -793,28 +813,138 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     def test_head_ancestry_scoped_scan_has_zero_findings(self):
         report_path = Path(tempfile.mkstemp(suffix=".json")[1])
         try:
-            proc = subprocess.run(
-                [
-                    GITLEAKS, "git", ".",
-                    "--config", str(CONFIG_PATH),
-                    "--max-target-megabytes", "2",
-                    "--no-banner", "--exit-code", "0",
-                    "--log-opts=HEAD",
-                    "--report-format", "json", "--report-path", str(report_path),
-                ],
-                cwd=str(ROOT),
-                capture_output=True, text=True, check=False,
-            )
-            if "lock" in proc.stderr.lower():
-                self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-            findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+            # This scan reads the real history, and CI logs on this public repository are world-readable, so
+            # it redacts like the secret-scan job (--redact: Finding.Redact masks Secret, Match and Line in
+            # gitleaks v8.30.1 report/finding.go lines 78-86; betterleaks v1.8.1 cmd/root.go line 589), and
+            # the failure message names only non-secret fields.
+            try:
+                findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
+                                           "--log-opts=HEAD", "--redact"], report_path, cwd=ROOT)
+            except _LockBusy as exc:
+                self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
+            located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
             self.assertEqual(
-                findings, [],
+                located, [],
                 "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "
-                f"result here is this unit's own regression, not a sibling branch: {findings}",
+                f"result here is this unit's own regression, not a sibling branch: {located}",
             )
         finally:
             report_path.unlink(missing_ok=True)
+
+
+class ScannerErrorTests(unittest.TestCase):
+    """A scan that does not complete must reach unittest as an error, never as a detection result.
+    Cross-family review of the betterleaks trial (2026-09-28, P2): _run_gitleaks turned an unexpected exit
+    status into an AssertionError, which the trial job's fixture step accepts as a detection difference, and
+    it read exit status 1 without a report as no findings. The scanner is replaced in memory, so these tests
+    need no gitleaks and run none."""
+
+    BUSY = "gitleaks: another scan holds the per-user lock; retry after it finishes\n"
+
+    @staticmethod
+    def _scanner(returncode, report=None, stderr=""):
+        """A stand-in for subprocess.run: writes `report` to the --report-path when it is not None, then
+        returns `returncode` and `stderr`."""
+        def run(argv, **kwargs):
+            if report is not None:
+                Path(argv[argv.index("--report-path") + 1]).write_text(report)
+            return subprocess.CompletedProcess(argv, returncode, "", stderr)
+        return run
+
+    def _scan_with(self, returncode, report=None, stderr=""):
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(subprocess, "run", side_effect=self._scanner(returncode, report, stderr)):
+            return _run_gitleaks(Path(tmp))
+
+    def test_a_nonzero_exit_status_is_a_scanner_error_with_or_without_a_report(self):
+        """--exit-code 0 makes findings exit 0, so any other status, a signal included, is a scan that did not
+        complete, even when a report was written first (a partial scan exits 1 after writing it)."""
+        self.assertFalse(issubclass(_ScannerError, AssertionError))
+        for returncode in (-11, -9, 139, 1, 2, 126, 78):
+            for report in (None, "null\n", "[]\n"):
+                with self.subTest(returncode=returncode, report=report), self.assertRaises(_ScannerError):
+                    self._scan_with(returncode, report)
+
+    def test_b_exit_0_needs_a_written_report(self):
+        for report in (None, "", "\n"):
+            with self.subTest(report=report), self.assertRaises(_ScannerError):
+                self._scan_with(0, report)
+        self.assertEqual(self._scan_with(0, "null\n"), [])
+        self.assertEqual(self._scan_with(0, "[]\n"), [])
+        self.assertEqual(self._scan_with(0, '[{"RuleID": "rule-a"}]\n'), [{"RuleID": "rule-a"}])
+
+    def test_c_only_the_guarded_launchers_busy_lock_skips(self):
+        with self.assertRaises(_LockBusy):
+            self._scan_with(75, stderr=self.BUSY)
+        for returncode, stderr in ((2, "fatal error: all goroutines are asleep - deadlock!\n"), (75, ""),
+                                   (1, "gitleaks: could not acquire the per-user lock; scan was not started\n")):
+            with self.subTest(returncode=returncode, stderr=stderr), self.assertRaises(_ScannerError):
+                self._scan_with(returncode, stderr=stderr)
+
+    def test_d_a_detection_test_errors_when_its_scan_does_not_complete(self):
+        """The review's probe as a test: a detection test shaped like test_a is a unittest error when its scan
+        exits -11, 139 or 1 or writes no report, and still a failure when a completed scan misses the value."""
+        class Detection(unittest.TestCase):
+            def test_detected(inner):
+                with tempfile.TemporaryDirectory() as tmp:
+                    inner.assertIn(HEX64, {f["Secret"] for f in _run_gitleaks(Path(tmp))})
+
+        for returncode, report, status_line in ((-11, None, "FAILED (errors=1)"), (139, None, "FAILED (errors=1)"),
+                                                (1, None, "FAILED (errors=1)"), (1, "null\n", "FAILED (errors=1)"),
+                                                (0, None, "FAILED (errors=1)"), (0, "null\n", "FAILED (failures=1)")):
+            with self.subTest(returncode=returncode, report=report):
+                stream = io.StringIO()
+                with mock.patch.object(subprocess, "run", side_effect=self._scanner(returncode, report)):
+                    unittest.TextTestRunner(stream=stream, verbosity=0).run(Detection("test_detected"))
+                self.assertEqual(stream.getvalue().strip().splitlines()[-1], status_line)
+
+    def test_e_every_scan_in_this_module_goes_through_scan_findings(self):
+        """Outside _scan_findings, every subprocess.run here runs git (an argument list that starts with
+        "git"), so no scan can bypass the classification above."""
+        def calls(node, function):
+            for child in ast.iter_child_nodes(node):
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    yield from calls(child, child.name)
+                    continue
+                if (isinstance(child, ast.Call) and isinstance(child.func, ast.Attribute) and child.func.attr == "run"
+                        and isinstance(child.func.value, ast.Name) and child.func.value.id == "subprocess"):
+                    first = child.args[0] if child.args else None
+                    runs_git = (isinstance(first, ast.List) and bool(first.elts)
+                                and isinstance(first.elts[0], ast.Constant) and first.elts[0].value == "git")
+                    if not runs_git:
+                        yield function, child.lineno
+                yield from calls(child, function)
+
+        module = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+        others = list(calls(module, "<module>"))
+        self.assertEqual([function for function, _ in others], ["_scan_findings"], others)
+
+    def test_f_the_history_scan_redacts_and_its_failure_names_no_secret(self):
+        """The branch-ancestry test scans the real history, and CI logs are public: it passes --redact, and a
+        failure lists rule, file, line and fingerprint only. The stand-in report here is deliberately
+        unredacted, so the message is checked on its own."""
+        sentinel = "SENTINEL-" + HEX40
+        finding = {"RuleID": "generic-api-key", "File": "a.json", "StartLine": 3, "Secret": sentinel,
+                   "Match": f"token: {sentinel}", "Line": f'"token": "{sentinel}"',
+                   "Fingerprint": "0123abcd:a.json:generic-api-key:3"}
+        argvs = []
+
+        def run(argv, **kwargs):
+            argvs.append(argv)
+            Path(argv[argv.index("--report-path") + 1]).write_text(json.dumps([finding]))
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        stream = io.StringIO()
+        with mock.patch.object(subprocess, "run", side_effect=run), \
+                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"):
+            unittest.TextTestRunner(stream=stream, verbosity=0).run(
+                GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings"))
+        output = stream.getvalue()
+        self.assertEqual(len(argvs), 1, argvs)
+        self.assertIn("--redact", argvs[0])
+        self.assertEqual(output.strip().splitlines()[-1], "FAILED (failures=1)")
+        self.assertIn(finding["Fingerprint"], output)
+        self.assertNotIn(sentinel, output)
 
 
 class GithubAutomationDocConsistencyTests(unittest.TestCase):
