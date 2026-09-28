@@ -10,8 +10,11 @@ Same isolation as m4_scoped_remove_repro.py: every run gets `env -i` with HOME s
 directory under $TMPDIR, PATH set to node's directory plus /usr/bin:/bin, DISABLE_TELEMETRY=1, TMPDIR
 and, per arm, CLAUDE_CONFIG_DIR, in an empty working directory. The skill is a local fixture and no
 arm detects a universal agent other than the two the installer names.
-- cli_config_dir and cli_blank_value: the pinned CLI's scoped add and remove, with CLAUDE_CONFIG_DIR
-  set to a scratch folder or to two spaces, and where the claude-code link lands.
+- cli_*: the pinned CLI's scoped add and remove, with CLAUDE_CONFIG_DIR set to a scratch folder, to
+  two spaces, to that folder reached through a missing folder and "..", or to U+FEFF alone, and where
+  the claude-code link lands.
+- node_trim: the code points node's String.prototype.trim removes, run over every code point, and
+  the node version, which is the runtime the CLI runs on.
 - installer_*: each installer's global install. The manifest pins a tree the local add never records,
   so the rollback runs. CLAUDE_CONFIG_DIR is set, and in the other_default_copy arms an unrelated
   SKILL.md folder already sits at ~/.claude/skills/<name>, where the CLI does not link while
@@ -78,15 +81,25 @@ def main() -> int:
         report["version"] = run([str(skills_bin), "--version"], root, root, node_dir, "").stdout.strip()
         add = [str(skills_bin), "add", str(root / "src"), "--skill", NAME, "-g", "-y", "-a", "claude-code", "codex"]
         remove = [str(skills_bin), "remove", NAME, "-g", "-y", "-a", "claude-code", "codex"]
-        for arm, blank in (("cli_config_dir", False), ("cli_blank_value", True)):
+        arms = (("cli_config_dir", "<scratch>/claude-config", lambda config: str(config)),
+                ("cli_blank_value", "two spaces", lambda config: "  "),
+                ("cli_dotdot_value", "<scratch>/missing/../claude-config",
+                 lambda config: str(config.parent / "missing" / ".." / "claude-config")),
+                ("cli_bom_value", "U+FEFF alone", lambda config: "\ufeff"))
+        for arm, shown, value_of in arms:
             home, cwd, config = fresh(root, arm)
-            value = "  " if blank else str(config)
+            value = value_of(config)
             steps = []
             for label, argv in (("add", add), ("scoped_remove", remove)):
                 result = run(argv, home, cwd, node_dir, value)
-                steps.append({"step": label, "exit": result.returncode, "state_after": state(home, config)})
-            report["cli"][arm] = {"claude_config_dir": "two spaces" if blank else "<scratch>/claude-config",
-                                  "steps": steps}
+                steps.append({"step": label, "exit": result.returncode, "state_after": state(home, config),
+                              "missing_folder_created": (config.parent / "missing").exists()})
+            report["cli"][arm] = {"claude_config_dir": shown, "steps": steps}
+        trim = ('const out = []; for (let c = 0; c <= 0x10FFFF; c++) { if (c >= 0xD800 && c <= 0xDFFF) continue; '
+                'if (String.fromCodePoint(c).trim() === "") out.push(c.toString(16)); } console.log(JSON.stringify(out));')
+        report["node_trim"] = {
+            "node_version": run(["node", "--version"], root, root, node_dir, "").stdout.strip(),
+            "code_points": json.loads(run(["node", "-e", trim], root, root, node_dir, "").stdout)}
 
         manifest = {"schema_version": 1, "cli": {"version": "1.7.0", "install": "the pinned skills 1.7.0 prefix"},
                     "skills": [{"name": NAME, "url": str(root / "src"), "tree_sha": "1" * 40,

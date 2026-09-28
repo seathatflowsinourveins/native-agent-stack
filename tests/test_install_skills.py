@@ -48,6 +48,7 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -75,12 +76,18 @@ def load_installer_module():
 PINNED_VERSION = "1.7.0"
 INSTALL_HINT = "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0"
 
+# JavaScript trim()'s whitespace (ECMA-262 WhiteSpace and LineTerminator), used by the fake CLI;
+# test_js_trim_chars_match_node checks it against node and against install_skills.JS_TRIM_CHARS.
+JS_TRIM_CHARS = ("\t\n\v\f\r \u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a"
+                 "\u2028\u2029\u202f\u205f\u3000\ufeff")
+
 FAKE_SKILLS_BIN_TEMPLATE = r'''#!/usr/bin/env python3
 import json, os, sys, shutil, hashlib
 from pathlib import Path
 
 VERSION = "__VERSION__"
 FIXTURES = __FIXTURES_JSON__
+JS_TRIM_CHARS = __JS_TRIM_CHARS__
 
 LOG = Path(__file__).resolve().parent / "calls.log"
 with open(LOG, "a", encoding="utf-8") as fh:
@@ -107,9 +114,13 @@ def load_lock(path: Path) -> dict:
 
 def claude_skills_dir(target: Path, project: bool) -> Path:
     # skills@1.7.0 npm dist/cli.mjs L1398 and L1511: a set, non-blank CLAUDE_CONFIG_DIR moves the
-    # global claude-code skills folder; project installs keep <project>/.claude/skills.
-    config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip()
-    return (Path(config_dir) if config_dir and not project else target / ".claude") / "skills"
+    # global claude-code skills folder, trimmed by JavaScript's trim() and normalized by path.join;
+    # project installs keep <project>/.claude/skills.
+    if project:
+        return target / ".claude" / "skills"
+    config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
+    joined = os.path.normpath(os.path.join(config_dir or str(target / ".claude"), "skills"))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
 argv = sys.argv[1:]
@@ -230,7 +241,7 @@ sys.exit(2)
 
 def write_fake_skills_bin(directory: Path, fixtures: dict, version: str = PINNED_VERSION) -> Path:
     text = FAKE_SKILLS_BIN_TEMPLATE.replace("__VERSION__", version).replace(
-        "__FIXTURES_JSON__", json.dumps(fixtures))
+        "__FIXTURES_JSON__", json.dumps(fixtures)).replace("__JS_TRIM_CHARS__", ascii(JS_TRIM_CHARS))
     path = directory / "skills"
     path.write_text(text, encoding="utf-8")
     path.chmod(0o755)
@@ -947,6 +958,31 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
         self.assertIn("canonical=False, lock=False, claude-link=True", result.stderr)
         self.assertIn(f"left: {link}", result.stderr)
         self.assertFalse((self.home / ".claude").exists())
+
+    def test_claude_config_dir_is_trimmed_and_normalized_as_the_cli_does(self):
+        # dist/cli.mjs L1398 trims with JavaScript's trim() and L1511 joins with path.join, which collapses "..".
+        # U+FEFF is JS whitespace; U+0085 is Python whitespace only, so it stays part of the folder name.
+        config_dir = self.tmp_path / "claude-config"
+        cases = (("home-dotdot", str(self.tmp_path / "missing" / ".." / "claude-config"), config_dir / "skills"),
+                 ("home-bom", "\ufeff", None),
+                 ("home-nel", str(config_dir) + "\u0085", Path(str(config_dir) + "\u0085") / "skills"))
+        for label, value, link_dir in cases:
+            with self.subTest(case=label):
+                result = self.run_drift(label, env={"CLAUDE_CONFIG_DIR": value}, retain_after_remove=["claude-link"])
+                self.assert_error(result, "rollback incomplete")
+                link = (link_dir or self.home / ".claude" / "skills") / self.NAME
+                self.assertTrue(link.is_symlink())
+                self.assertIn(f"left: {link}", result.stderr)
+                self.assertFalse((self.tmp_path / "missing").exists())
+
+    @unittest.skipUnless(shutil.which("node"), "node is not on PATH")
+    def test_js_trim_chars_match_node(self):
+        script = ('const out = []; for (let c = 0; c <= 0x10FFFF; c++) { if (c >= 0xD800 && c <= 0xDFFF) continue; '
+                  'if (String.fromCodePoint(c).trim() === "") out.push(c); } console.log(JSON.stringify(out));')
+        result = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True, timeout=60)
+        node_set = set(json.loads(result.stdout))
+        self.assertEqual({ord(c) for c in load_installer_module().JS_TRIM_CHARS}, node_set)
+        self.assertEqual({ord(c) for c in JS_TRIM_CHARS}, node_set)
 
     def test_claude_config_dir_control_ignores_the_default_claude_folder(self):
         # Another copy under ~/.claude is not the CLI's link while CLAUDE_CONFIG_DIR is set; a blank value is unset.

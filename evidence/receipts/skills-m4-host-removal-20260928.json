@@ -17,7 +17,7 @@
     "The reproduction's installer runs exercise install_skills.py's global mode only. The project mode's read-back is #429's, and this change reuses it; tests/test_install_skills.py covers both modes with a fake CLI, not with this native run.",
     "The override drop's time is taken from its backup label. evidence/artifacts/skills-m4-host-removal-20260928/drop_override.redacted.py is the coordinator's script with its one backup-directory line replaced by a placeholder, so this receipt names no backup location; provenance.override_drop_script_sha256 is the original file's digest.",
     "Codex's configuration is unchanged: the skill was enabled for Codex, so it had no disable entry to remove. No Codex-native listing was observed; the read-back shows only that no copy remains where Codex reads skills (~/.agents/skills and ~/.codex/skills).",
-    "The review repair round changed install_skills.py after the first reproduction. data.scratch_reproduction ran the pre-repair file (its fixed_install_skills_sha256); data.review_repair_round.reproduction_rerun and claude_config_dir_probe ran the repaired file natively. The malformed-lock, unreadable-lock and missing-binary cases are fake-CLI fault injections in tests/test_install_skills.py only: no native run produced them."
+    "The review repair rounds changed install_skills.py after the first reproduction. data.scratch_reproduction ran the pre-repair file (its fixed_install_skills_sha256); data.review_repair_round.reproduction_rerun and claude_config_dir_probe ran the final file natively. The probe shows the CLI's trim and '..' handling for a folder, a blank value, a '..' value and U+FEFF alone; the other trim code points rest on node's measured trim set and fake-CLI tests. The malformed-lock, unreadable-lock and missing-binary cases are fake-CLI fault injections in tests/test_install_skills.py only: no native run produced them."
   ],
   "evidence_class": "native-measurement (acceptance-evidence policy class 'upstream example or native operation'): the two skills 1.7.0 remove runs on this host, with their retained exit codes and output, and the same pinned CLI in the scratch reproduction. our-integration (policy class 'local integration check'): scripts/skills_status.py --json after the removal, and install_skills.py at bdf25d28 and as fixed, run end to end against the pinned CLI in the reproduction, whose with-.cursor and control arms discriminate. synthetic-fixture (policy class 'synthetic fixture'): the reproduction's local skill, seeded lock entry and .cursor folder. our-integration (policy class 'independent observation'): the read-only read-back at 18:50:01Z, a separate method from the steps it checks. upstream source: the vercel-labs/skills v1.7.0 files and the installed dist/cli.mjs, cited by line, read and not executed. coordinator-reported: the fields so marked, which are the coordinator's account and not observations here.",
   "recorded_at_utc": "2026-09-28T20:01:46Z",
@@ -320,14 +320,14 @@
       }
     },
     "review_repair_round": {
-      "trigger": "The cross-family read-only review of PR #467 at 6744c2eb (codex exec, gpt-6-astra, reasoning effort max) returned MERGE-AFTER-FIXES with two major findings, one minor and one nit: the global read-back looked for the Claude link only under ~/.claude while skills 1.7.0 honours CLAUDE_CONFIG_DIR (dist/cli.mjs L1398, L1511); load_lock read a malformed lock as an empty one, so a truncated lock that still held the entry confirmed the rollback; an unreadable lock raised out of the read-back; the decision addendum said 'settings' where the read-back compares only skillOverrides. The independent verifier confirmed all eight claims and noted no test for a missing binary.",
-      "change": "claude_skills_dir resolves the global Claude folder as the CLI does; lock_retains reads the lock strictly; an OSError or ValueError during the read-back is 'error' with the reason 'rollback could not be verified'. The fake CLI mirrors CLAUDE_CONFIG_DIR and gains lock_after_remove faults and a deleted binary.",
+      "trigger": "The cross-family read-only review of PR #467 at 6744c2eb (codex exec, gpt-6-astra, reasoning effort max) returned MERGE-AFTER-FIXES with two major findings, one minor and one nit: the global read-back looked for the Claude link only under ~/.claude while skills 1.7.0 honours CLAUDE_CONFIG_DIR (dist/cli.mjs L1398, L1511); load_lock read a malformed lock as an empty one, so a truncated lock that still held the entry confirmed the rollback; an unreadable lock raised out of the read-back; the decision addendum said 'settings' where the read-back compares only skillOverrides. The independent verifier confirmed all eight claims and noted no test for a missing binary. The re-check of that repair at bb3c88fb (same model and effort) found F2 to F4 fixed and F1 partial: Python's str.strip and pathlib resolve CLAUDE_CONFIG_DIR differently from the CLI's JavaScript trim() and Node path.join (U+FEFF, U+001C to U+001F and U+0085; a '..' after a missing folder), and one stale line reference. A second independent verifier confirmed nine of ten claims and found the same two.",
+      "change": "claude_skills_dir resolves the global Claude folder as the CLI does; lock_retains reads the lock strictly; an OSError or ValueError during the read-back is 'error' with the reason 'rollback could not be verified'. The fake CLI mirrors CLAUDE_CONFIG_DIR and gains lock_after_remove faults and a deleted binary. The final round trims with JS_TRIM_CHARS, the 25 code points node's trim() removes, and normalizes the global path as path.join does (os.path.normpath, with a leading // collapsed).",
       "before_repair_install_skills_sha256": "f7b9ba2b3b11a16d1d2cbc820eebdb67b1a18ea672a0579def5222c6d7d416df",
-      "repaired_install_skills_sha256": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19",
+      "repaired_install_skills_sha256": "aa6827ec0b7c16d8539ed204f7e47fe70371d7eb4ae675e30054575a769069d5",
       "claude_config_dir_probe": {
-        "started_utc": "2026-09-28T20:57:31Z",
-        "finished_utc": "2026-09-28T20:57:33Z",
-        "output_sha256": "65f4c8b7016a6f8283c3a78b50c29f168af96c31a5d781753077df3c2e41f71b",
+        "started_utc": "2026-09-28T21:24:05Z",
+        "finished_utc": "2026-09-28T21:24:07Z",
+        "output_sha256": "d41e562b5340ab2bc2516335b096545a0c2d7bd3cf7014a00de08d81c832e842",
         "output": {
           "cli": {
             "cli_blank_value": {
@@ -335,6 +335,7 @@
               "steps": [
                 {
                   "exit": 0,
+                  "missing_folder_created": false,
                   "state_after": {
                     "canonical_folder": true,
                     "config_dir_link": {
@@ -351,6 +352,46 @@
                 },
                 {
                   "exit": 0,
+                  "missing_folder_created": false,
+                  "state_after": {
+                    "canonical_folder": false,
+                    "config_dir_link": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "default_claude_entry": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "scoped_remove"
+                }
+              ]
+            },
+            "cli_bom_value": {
+              "claude_config_dir": "U+FEFF alone",
+              "steps": [
+                {
+                  "exit": 0,
+                  "missing_folder_created": false,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "config_dir_link": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "default_claude_entry": {
+                      "exists": true,
+                      "is_symlink_to_canonical": true
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "add"
+                },
+                {
+                  "exit": 0,
+                  "missing_folder_created": false,
                   "state_after": {
                     "canonical_folder": false,
                     "config_dir_link": {
@@ -372,6 +413,7 @@
               "steps": [
                 {
                   "exit": 0,
+                  "missing_folder_created": false,
                   "state_after": {
                     "canonical_folder": true,
                     "config_dir_link": {
@@ -388,6 +430,46 @@
                 },
                 {
                   "exit": 0,
+                  "missing_folder_created": false,
+                  "state_after": {
+                    "canonical_folder": false,
+                    "config_dir_link": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "default_claude_entry": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "scoped_remove"
+                }
+              ]
+            },
+            "cli_dotdot_value": {
+              "claude_config_dir": "<scratch>/missing/../claude-config",
+              "steps": [
+                {
+                  "exit": 0,
+                  "missing_folder_created": false,
+                  "state_after": {
+                    "canonical_folder": true,
+                    "config_dir_link": {
+                      "exists": true,
+                      "is_symlink_to_canonical": true
+                    },
+                    "default_claude_entry": {
+                      "exists": false,
+                      "is_symlink_to_canonical": false
+                    },
+                    "lock_entry": false
+                  },
+                  "step": "add"
+                },
+                {
+                  "exit": 0,
+                  "missing_folder_created": false,
                   "state_after": {
                     "canonical_folder": false,
                     "config_dir_link": {
@@ -481,7 +563,37 @@
           },
           "installer_sha256": {
             "before_repair": "f7b9ba2b3b11a16d1d2cbc820eebdb67b1a18ea672a0579def5222c6d7d416df",
-            "repaired": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19"
+            "repaired": "aa6827ec0b7c16d8539ed204f7e47fe70371d7eb4ae675e30054575a769069d5"
+          },
+          "node_trim": {
+            "code_points": [
+              "9",
+              "a",
+              "b",
+              "c",
+              "d",
+              "20",
+              "a0",
+              "1680",
+              "2000",
+              "2001",
+              "2002",
+              "2003",
+              "2004",
+              "2005",
+              "2006",
+              "2007",
+              "2008",
+              "2009",
+              "200a",
+              "2028",
+              "2029",
+              "202f",
+              "205f",
+              "3000",
+              "feff"
+            ],
+            "node_version": "v24.21.0"
           },
           "scratch_root_removed": true,
           "version": "1.7.0"
@@ -489,9 +601,9 @@
       },
       "reproduction_rerun": {
         "note": "m4_scoped_remove_repro.py unchanged, with the repaired install_skills.py as its fixed argument and bdf25d28's as its unfixed one.",
-        "started_utc": "2026-09-28T20:57:33Z",
-        "finished_utc": "2026-09-28T20:57:34Z",
-        "fixed_install_skills_sha256": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19",
+        "started_utc": "2026-09-28T21:24:07Z",
+        "finished_utc": "2026-09-28T21:24:09Z",
+        "fixed_install_skills_sha256": "aa6827ec0b7c16d8539ed204f7e47fe70371d7eb4ae675e30054575a769069d5",
         "output_sha256": "fed911b88c077b4d95a91e5c06cc5880010f713feef6961c9ce1bef38799797e",
         "output": {
           "arms": {
@@ -686,7 +798,7 @@
     "reproduction_script_sha256": "80acc8adb0ecb751a1cd331cd6012161fbd2d841f05fa9f30caa941974f51954",
     "config_dir_probe_command": "TMPDIR=/var/tmp python3 m4_claude_config_dir_probe.py <skills 1.7.0 bin> <repaired install_skills.py> <install_skills.py at 6744c2eb>",
     "config_dir_probe_script": "evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py",
-    "config_dir_probe_script_sha256": "622ac2f257f7cb9e4ea55ac899db2fb4edbe59b90b19bd990cb4d6ed1e042ee4",
+    "config_dir_probe_script_sha256": "07666a3045615409d1495499b0596ea48f7e28ff1274ce43f9e139f2501dc81c",
     "override_drop_script_sha256": "818dc9dfc367565228e8286e2862cd8c61515a3a61cdba23d66753bf53eb730b",
     "override_drop_script_redacted_sha256": "54d040aa053707502a00a9b6c68419a576df86251f7aaf05532c08bec31ac9f1",
     "references": [

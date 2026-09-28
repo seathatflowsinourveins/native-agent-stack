@@ -1412,10 +1412,11 @@ agent. A global remove that could not run raised its exception instead of return
 
 The fix extends #429's read-back to the global rollback and deletes nothing.
 - After the remove, in either mode and whatever it reported, `process_skill` reads back the canonical folder,
-  the lock entry and the claude-code link (L442-468). Globally these are `~/.agents/skills/<name>`, its entry
+  the lock entry and the claude-code link (L452-478). Globally these are `~/.agents/skills/<name>`, its entry
   in the global lock and the link where skills 1.7.0 puts it (`claude_skills_dir`):
   `$CLAUDE_CONFIG_DIR/skills/<name>` when that variable is set and not blank, else `~/.claude/skills/<name>`
-  (`dist/cli.mjs` L1398 and L1511).
+  (`dist/cli.mjs` L1398 and L1511). Like the CLI, it trims with JavaScript's `trim()` set (`JS_TRIM_CHARS`,
+  the 25 code points node removes) and normalizes as `path.join` does.
 - If the remove exited nonzero or any of the three remains, the state is `error` with #429's reasons:
   "rollback retained, in use by another agent" when the remove exited 0 and left the canonical folder, and
   "rollback incomplete" otherwise. The stderr line keeps #429's format, reading `lock=` for the global lock
@@ -1424,8 +1425,8 @@ The fix extends #429's read-back to the global rollback and deletes nothing.
   verified", in both modes: an `OSError` or `ValueError` while reading them, such as an unreadable lock, or a
   malformed one. Only a missing lock file, or a lock that parses without the entry, confirms removal
   (`lock_retains`). `load_lock`, which the install checks still use, reads a malformed lock as empty.
-- A remove that cannot run (`OSError` or a timeout) is reported and returns `error` in both modes (L439-441).
-- It never deletes what remains, because only the skills CLI writes there. The docstring (L17-30) points to
+- A remove that cannot run (`OSError` or a timeout) is reported and returns `error` in both modes (L449-451).
+- It never deletes what remains, because only the skills CLI writes there. The docstring (L17-33) points to
   this addendum for the manual procedure. The `SKILL_AGENTS` comment (L125-136) states the behaviour with the
   upstream lines, including Codex's `host_roots.rs`.
 
@@ -1466,6 +1467,23 @@ binary.
     "rollback incomplete". The repaired script reported `rolled-back` and left that folder intact. Both
     reported `rolled-back` without it.
 - The unchanged reproduction, rerun with the repaired script, gave the same states as its first run.
+
+The re-check of that repair at `bb3c88fb` (same model and effort) found the lock and error findings and the
+nit fixed, and the `CLAUDE_CONFIG_DIR` finding partial. A second independent verifier confirmed nine of ten
+claims and found the same two gaps.
+- Python's `str.strip()` and `pathlib` differ from the CLI's `trim()` and `path.join`. `strip()` keeps U+FEFF
+  and removes U+001C to U+001F and U+0085. `pathlib` keeps a `..`, so a value such as `…/missing/../x` named
+  a path that cannot exist while the CLI linked under `…/x`. Either way a kept link could read as removed.
+- One line reference in this addendum was stale.
+
+The final round mirrors both rules in `claude_skills_dir` and in the fake CLI. The trim set is the 25 code points
+that node's `trim()` removed when run over every code point, and a test compares it with node when node is on
+`PATH`.
+- 59 tests pass. With the script from `bb3c88fb`, the three trim and `..` subtests (`..`, U+FEFF alone, a
+  trailing U+0085) fail and the trim-set test errors.
+- The probe's new arms ran the pinned CLI on node v24.21.0. A `…/missing/../claude-config` value linked under
+  the normalized folder without creating `missing`. U+FEFF alone linked under `~/.claude/skills`. The installer
+  arms and the reproduction gave the same results as before with the final script.
 
 **Evidence class.**
 

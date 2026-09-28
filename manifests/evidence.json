@@ -3458,7 +3458,7 @@
         "The reproduction's installer runs exercise install_skills.py's global mode only. The project mode's read-back is #429's, and this change reuses it; tests/test_install_skills.py covers both modes with a fake CLI, not with this native run.",
         "The override drop's time is taken from its backup label. evidence/artifacts/skills-m4-host-removal-20260928/drop_override.redacted.py is the coordinator's script with its one backup-directory line replaced by a placeholder, so this receipt names no backup location; provenance.override_drop_script_sha256 is the original file's digest.",
         "Codex's configuration is unchanged: the skill was enabled for Codex, so it had no disable entry to remove. No Codex-native listing was observed; the read-back shows only that no copy remains where Codex reads skills (~/.agents/skills and ~/.codex/skills).",
-        "The review repair round changed install_skills.py after the first reproduction. data.scratch_reproduction ran the pre-repair file (its fixed_install_skills_sha256); data.review_repair_round.reproduction_rerun and claude_config_dir_probe ran the repaired file natively. The malformed-lock, unreadable-lock and missing-binary cases are fake-CLI fault injections in tests/test_install_skills.py only: no native run produced them."
+        "The review repair rounds changed install_skills.py after the first reproduction. data.scratch_reproduction ran the pre-repair file (its fixed_install_skills_sha256); data.review_repair_round.reproduction_rerun and claude_config_dir_probe ran the final file natively. The probe shows the CLI's trim and '..' handling for a folder, a blank value, a '..' value and U+FEFF alone; the other trim code points rest on node's measured trim set and fake-CLI tests. The malformed-lock, unreadable-lock and missing-binary cases are fake-CLI fault injections in tests/test_install_skills.py only: no native run produced them."
       ],
       "path": "evidence/receipts/skills-m4-host-removal-20260928.json"
     }
@@ -14017,8 +14017,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "8008b6b0053cd5a279fb41d0472738abe59fb683e4675df0cf150624fc567664",
-      "bytes": 121205
+      "sha256": "bcd6f0c663474919a04e1cf765e4eb86770e7f2869bfbf7fa9a7bbe1b3ff4181",
+      "bytes": 122680
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -36237,8 +36237,8 @@
     },
     {
       "path": "evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py",
-      "sha256": "622ac2f257f7cb9e4ea55ac899db2fb4edbe59b90b19bd990cb4d6ed1e042ee4",
-      "bytes": 6867
+      "sha256": "07666a3045615409d1495499b0596ea48f7e28ff1274ce43f9e139f2501dc81c",
+      "bytes": 7902
     },
     {
       "path": "evidence/artifacts/skills-m4-host-removal-20260928/m4_host_readback.py",
@@ -40927,8 +40927,8 @@
     },
     {
       "path": "evidence/receipts/skills-m4-host-removal-20260928.json",
-      "sha256": "86d5e904ecb5983e83b53cca443eb69474c45423fc214ed47417724681462e3e",
-      "bytes": 38548
+      "sha256": "7c7628554f1df7adbf5e18f8ee459d8ca58b2473fe3e2f9097dae8bc129e1e7b",
+      "bytes": 42942
     },
     {
       "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
@@ -42367,8 +42367,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "fea2322a0f713ada87bc44644692370d4aab5a0ca455e5d57bc90f979861364c",
-      "bytes": 74441
+      "sha256": "4b11b20693ec7f2d4ee03ffe76dff4a1418df1fcd52b41890fda41899054e5df",
+      "bytes": 76944
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -42837,8 +42837,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "98d55af55991cb027d0f54a284e24a1abb3b2544f7c02a07210030d34b151c19",
-      "bytes": 35775
+      "sha256": "aa6827ec0b7c16d8539ed204f7e47fe70371d7eb4ae675e30054575a769069d5",
+      "bytes": 36401
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",

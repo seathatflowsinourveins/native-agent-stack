@@ -191,14 +191,24 @@ def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) 
     return (project_dir or home) / ".agents" / "skills" / name
 
 
+# What JavaScript's String.prototype.trim removes (ECMA-262 WhiteSpace and LineTerminator): the 25 code points
+# node's trim() removed when run over every code point on 2026-09-28. str.strip() differs: it keeps U+FEFF and
+# strips U+001C-U+001F and U+0085.
+JS_TRIM_CHARS = ("\t\n\v\f\r              "
+                 "    　﻿")
+
+
 def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
     """Where the CLI links claude-code skills: <project>/.claude/skills, or globally
     $CLAUDE_CONFIG_DIR/skills when that is set and not blank, else home/.claude/skills
-    (skills@1.7.0 npm dist/cli.mjs L1398 claudeHome, L1511 globalSkillsDir)."""
+    (skills@1.7.0 npm dist/cli.mjs L1398 claudeHome, L1511 globalSkillsDir). The global
+    path is trimmed and normalized as the CLI's trim() and path.join do: os.path.normpath,
+    except that a leading // collapses to / as in Node."""
     if project_dir is not None:
         return project_dir / ".claude" / "skills"
-    claude_config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip()
-    return (Path(claude_config_dir) if claude_config_dir else home / ".claude") / "skills"
+    claude_config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
+    joined = os.path.normpath(os.path.join(claude_config_dir or str(home / ".claude"), "skills"))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
 def project_containment_problem(project_dir: Path, home: Path, names: list[str]) -> str | None:
