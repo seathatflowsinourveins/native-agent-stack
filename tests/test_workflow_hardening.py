@@ -477,6 +477,33 @@ class TargetRulesetTests(unittest.TestCase):
         self.assertEqual(len(self.rule("code_scanning")), 1)
 
 
+class AgentBranchRulesetTests(unittest.TestCase):
+    """The committed agent-branch ruleset, applied as 24132241 (docs/github-automation.md, "Agent branch ruleset").
+
+    The resolver driver pushes with the owner's login, so any bypass actor would free it too: only a
+    no-bypass rule binds it. Deletion stays allowed because delete_branch_on_merge is on.
+    """
+
+    PATH = ROOT / ".github/agent-branch-ruleset.json"
+
+    def ruleset(self):
+        return json.loads(self.PATH.read_text(encoding="utf-8"))
+
+    def test_blocks_history_rewrite_on_both_agent_prefix_patterns_without_bypass(self):
+        ruleset = self.ruleset()
+        self.assertEqual((ruleset["target"], ruleset["enforcement"]), ("branch", "active"))
+        self.assertEqual(ruleset["bypass_actors"], [])
+        self.assertEqual(ruleset["conditions"]["ref_name"],
+                         {"include": ["refs/heads/openhands/*", "refs/heads/openhands/**/*"], "exclude": []})
+        self.assertEqual(ruleset["rules"], [{"type": "non_fast_forward"}])
+
+    def test_never_targets_main_or_blocks_post_merge_branch_deletion(self):
+        ruleset = self.ruleset()
+        for pattern in ruleset["conditions"]["ref_name"]["include"]:
+            self.assertTrue(pattern.startswith("refs/heads/openhands/"), pattern)
+        self.assertNotIn("deletion", {rule["type"] for rule in ruleset["rules"]})
+
+
 class VerdictReviewGateTests(unittest.TestCase):
     """The required verdict-review-gate job (docs/decisions/2026-09-22-github-automation-closure.md,
     "verdict-review-gate (2026-09-23)")."""
