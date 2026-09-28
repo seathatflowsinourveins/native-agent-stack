@@ -3503,8 +3503,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "cdb25ac04ece3a3d99ea3d5abb6d3e10e31842ae1f26981f8aa6fe1cad75739a",
-      "bytes": 30652
+      "sha256": "13ed17cef6456fae390a2c0555ef2fd3442c7e306466e38c4e31134067e803a5",
+      "bytes": 31945
     },
     {
       "path": ".gitleaksignore",
@@ -14114,8 +14114,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1ad7568004e334bb3e20da1eaed96147c86e05ef9f42c58e8ce0c7006bb2bce3",
-      "bytes": 50349
+      "sha256": "507fb186df3d6c81459ad4c9cc088dd359c100b52cb128f6c99ec9e9eae040c4",
+      "bytes": 51642
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14164,8 +14164,8 @@
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
-      "sha256": "27daf45f98aa686811e5a70ffd21b803bdc6572813a188ec39934640a588bd78",
-      "bytes": 12614
+      "sha256": "656958c2f7a373052514a8929e880ef7fa933d4e09838e6b90868704f6f73804",
+      "bytes": 13119
     },
     {
       "path": "docs/memory-rag-native-practice.md",
@@ -14199,8 +14199,8 @@
     },
     {
       "path": "docs/native-memory-rag-lifecycle.md",
-      "sha256": "6247eee887593412a55b36a468f25100c4ffe8c11550e417fa79b9b191e7e5e8",
-      "bytes": 8572
+      "sha256": "2e0fe582de409cf4c4d2f41222601b632d85dffc2a77a09afbf01a80ca7e976c",
+      "bytes": 11540
     },
     {
       "path": "docs/native-returned-results.md",
@@ -40118,9 +40118,24 @@
       "bytes": 15847
     },
     {
+      "path": "observability/memory-scheduled-20260927.json",
+      "sha256": "86c543a3166929de60fd26f5b044bbfa2d278ec15f7c6918203f5fbc255d072a",
+      "bytes": 11930
+    },
+    {
+      "path": "observability/memory-scheduled-20260928.json",
+      "sha256": "1d204e72c5bc6300305fb539e50698f3ae5ea62551f6e01d6bb1cf853729a2c8",
+      "bytes": 9430
+    },
+    {
       "path": "observability/memory-scheduled-results-20260923.json",
       "sha256": "2893695fe5319cc59949f375b71f70065dff878dcf213fc2a868d3cd3a3acf89",
       "bytes": 24855
+    },
+    {
+      "path": "observability/memory-scheduled-results-20260927.json",
+      "sha256": "01ad8fbfadc51bcef2156b4f6ca07cbefbb8ab3b74d266023e5e2c47ba0e0703",
+      "bytes": 22654
     },
     {
       "path": "observability/native-data/README.md",
@@ -40854,8 +40869,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "8be9742919973a1aae864f43003dcda50559446396fe828a2c63662d8704d700",
-      "bytes": 58636
+      "sha256": "23fadc780ce36235dc4a120e01b2312ca5a5266493d62acce896869d895a8e24",
+      "bytes": 61651
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
