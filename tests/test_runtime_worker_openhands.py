@@ -1867,7 +1867,23 @@ class OpenHandsProbeTests(unittest.TestCase):
         (self.result / "status.json").write_text(json.dumps({
             "run_id": self.run_id, "arm": self.arm, "status": "prepared", "server_name": self.stem + "-server",
             "proxy_name": self.stem + "-proxy", "port": port, "proxy_config_sha256": sha}))
+        self.stage_gates(host)
         return host
+
+    def stage_gates(self, host, **changes):
+        """<state>/stage-gates.json as the coordinator records it after live P3-P5, G2 and G5 (repair R6)."""
+        when = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+        probe = {"passed": True, "recorded_at": when, "gateway_build": "045aa81f3",
+                 "proxy_image": self.pins["gateway_proxy"]["ref"],
+                 "proxy_template_sha256": hashlib.sha256((RECIPE / "config/proxy-nginx.conf").read_bytes()).hexdigest()}
+        gates = {"schema": "openhands-stage-gates-v1",
+                 "g2": {ref: {"passed": True, "recorded_at": when}
+                        for ref in (self.pins["image"]["ref"], self.pins["gateway_proxy"]["ref"])},
+                 "probes": {name: dict(probe) for name in ("p3", "p4", "p5")},
+                 "g5": {arm: {"passed": True, "recorded_at": when} for arm in ("control", "engines-on")}}
+        gates.update(changes)
+        host.write_private_json(self.state / "stage-gates.json", gates)
+        return gates
 
     @staticmethod
     def option(argv, flag):
@@ -1989,15 +2005,36 @@ class OpenHandsProbeTests(unittest.TestCase):
                                   ("re-created network", soon, rebound)):
             with self.subTest(label), self.assertRaises(ValueError):
                 self.gate(host, now, views)
+        p2, targets = original["p2"], original["targets"]
         for label, change in (("cross-arm upstream", {"upstream": "10.0.2.2:20129"}),
                               ("other arm", {"arm": "engines-on"}),
                               ("not passed", {"passed": False}),
-                              ("p2 not passed", {"p2": dict(original["p2"], passed=False)}),
+                              ("p2 not passed", {"p2": dict(p2, passed=False)}),
                               ("other mechanism", {"mechanism": "docker-user-v1"}),
                               ("other ingress", {"host_ingress": "127.0.0.1:3730"}),
                               ("other probe script", {"probe_script_sha256": "0" * 64}),
                               ("other proxy image", {"proxy_image": "nginx:latest"}),
-                              ("other server", {"server_container_id": "f" * 64})):
+                              ("other server", {"server_container_id": "f" * 64}),
+                              # The gate re-derives the verdict from the counts; passed flags alone are not trusted.
+                              ("a connect succeeded", {"p2": dict(p2, connected=1)}),
+                              ("no observations", {"p2": dict(p2, connects=0, observed=0, errors={}),
+                                                   "targets": dict(targets, addresses=0, pairs=0)}),
+                              ("probe exit code", {"exit_codes": {"gw": 0, "int": 1}}),
+                              ("probe exit code missing", {"exit_codes": {"gw": 0}}),
+                              ("p0 unobserved", {"p0": {"passed": True}}),
+                              ("p1 short", {"p1": dict(original["p1"], observed=26, matched=26)}),
+                              ("pairs inconsistent", {"targets": dict(targets, pairs=1)}),
+                              ("connects short", {"p2": dict(p2, observed=41)}),
+                              ("errors do not cover every connect", {"p2": dict(p2, errors={"ENETUNREACH": 1})}),
+                              ("an off-subnet connect timed out", {"p2": dict(p2, off_subnet_unreachable=41)}),
+                              ("nothing off-subnet", {"p2": dict(p2, off_subnet=0, off_subnet_unreachable=0)}),
+                              ("positive control failed", {"p2": dict(p2, control_connected=False)}),
+                              ("udp answered", {"p2": dict(p2, udp_answered=True)}),
+                              ("dns short", {"p2": dict(p2, dns_matched=4)}),
+                              ("ipv6 present", {"p2": dict(p2, ipv6_non_loopback=1)}),
+                              ("default route", {"p2": dict(p2, default_routes=1)}),
+                              ("gateway route", {"p2": dict(p2, gateway_routes=1)}),
+                              ("route table unread", {"p2": dict(p2, routes_available=False)})):
             with self.subTest(label):
                 host.write_private_json(path, {**original, **change})
                 with self.assertRaises(ValueError):
@@ -2021,6 +2058,59 @@ class OpenHandsProbeTests(unittest.TestCase):
         path.unlink()
         with self.assertRaises(OSError):
             self.gate(host, soon)
+
+    def test_gate_requires_the_host_recorded_stage_gates(self):
+        # Repair R6 (plan G7's P3 half, G2 and G5): a host-owned file the coordinator records live.
+        host = self.prepared()
+        passed, _ = self.probe(host)
+        self.assertTrue(passed)
+        soon = host.time_value(json.loads((self.result / "isolation-probe.json").read_text())["verified_at"])
+        soon += timedelta(seconds=60)
+        self.gate(host, soon)
+        gates = json.loads((self.state / "stage-gates.json").read_text())
+        agent, proxy = self.pins["image"]["ref"], self.pins["gateway_proxy"]["ref"]
+        later = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
+
+        def probe(**change):
+            return dict(gates, probes={**gates["probes"], "p3": dict(gates["probes"]["p3"], **change)})
+        cases = (("other schema", dict(gates, schema="openhands-stage-gates-v0")),
+                 ("agent image not scanned", dict(gates, g2={proxy: gates["g2"][proxy]})),
+                 ("proxy scan not passed", dict(gates, g2={**gates["g2"], proxy: {"passed": False,
+                                                                                  "recorded_at": gates["g2"][proxy]["recorded_at"]}})),
+                 ("scan recorded in the future", dict(gates, g2={**gates["g2"], agent: {"passed": True, "recorded_at": later}})),
+                 ("p3 not passed", probe(passed=False)),
+                 ("p3 under another proxy template", probe(proxy_template_sha256="0" * 64)),
+                 ("p3 under another proxy image", probe(proxy_image="nginx:latest")),
+                 ("p3 recorded in the future", probe(recorded_at=later)),
+                 ("p3 without a gateway build", probe(gateway_build="main")),
+                 ("p3 absent", dict(gates, probes={"p4": gates["probes"]["p4"], "p5": gates["probes"]["p5"]})),
+                 ("g5 for the other arm only", dict(gates, g5={"engines-on": gates["g5"]["engines-on"]})),
+                 ("not an object", []))
+        for label, value in cases:
+            with self.subTest(label):
+                host.write_private_json(self.state / "stage-gates.json", value)
+                with self.assertRaises(ValueError):
+                    self.gate(host, soon)
+        # P4 and P5 bind only the engines-on arm.
+        host.write_private_json(self.state / "stage-gates.json", dict(gates, probes={"p3": gates["probes"]["p3"]}))
+        self.gate(host, soon)
+        with self.assertRaises(ValueError):
+            host.verify_stage_gates(self.state, "engines-on", now=soon)
+        host.write_private_json(self.state / "stage-gates.json", gates)
+        self.assertEqual(host.verify_stage_gates(self.state, "engines-on", now=soon), gates)
+        # Owner-only and present, or refused.
+        (self.state / "stage-gates.json").chmod(0o644)
+        with self.assertRaises(ValueError):
+            self.gate(host, soon)
+        (self.state / "stage-gates.json").unlink()
+        with self.assertRaisesRegex(ValueError, "stage_gates_not_recorded"):
+            self.gate(host, soon)
+        # The recipe only reads the file; the resolver PR's live run records it.
+        self.assertEqual(host.STAGE_GATES, "stage-gates.json")
+        for source in RECIPE.rglob("*.py"):
+            with self.subTest(source=source.name):
+                self.assertNotRegex(source.read_text(),
+                                    r"(?:write\w*|open|replace|rename|touch)\([^)\n]*(?:STAGE_GATES|stage-gates)")
 
     def test_any_unexpected_observation_fails_the_probe_and_the_gate(self):
         host = self.prepared()

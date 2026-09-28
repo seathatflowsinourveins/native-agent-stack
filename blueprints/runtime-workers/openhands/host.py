@@ -67,6 +67,13 @@ PLACEHOLDER = re.compile(r"@[A-Z]+@")
 # Plan section 1 and E1: a P0-P2 receipt gates dispatch start for at most 900 s
 # and only for the topology whose network and container IDs it records.
 PROBE_MAX_AGE_SECONDS = 900
+# Plan G7's P3 half, G2 (both image digests scanned and triaged) and G5, as the
+# coordinator records them live in <state>/stage-gates.json (repair R6). This
+# recipe never writes that file. The engines-on arm also waits for P4 and P5
+# (README "P3-P5").
+STAGE_GATES = "stage-gates.json"
+STAGE_GATES_SCHEMA = "openhands-stage-gates-v1"
+STAGE_PROBES = {"control": ("p3",), "engines-on": ("p3", "p4", "p5")}
 
 
 def owned_port(value):
@@ -952,28 +959,115 @@ def run_probe(state, run_id, arm, prefix, pins):
     return passed
 
 
+def checked_probe_counts(receipt, upstream_port):
+    """Re-derive the probe verdict from the recorded counts; a passed flag alone is not evidence.
+
+    Requires both probe exit codes 0, fully observed and matched P0 and P1,
+    a non-empty target set whose pair count is addresses times ports, and a
+    P2 in which every pair was observed and failed with a named error, every
+    off-subnet pair failed for want of a route, the positive control
+    connected, the DNS datagram got no answer, every expected name matched,
+    and no IPv6 address, default route or gateway route was found. Any
+    contradiction refuses.
+    """
+    section = {name: receipt.get(name) if isinstance(receipt.get(name), dict) else {}
+               for name in ("p0", "p1", "p2", "targets")}
+    p2, targets = section["p2"], section["targets"]
+    addresses, ports, pairs = targets.get("addresses"), targets.get("ports"), targets.get("pairs")
+    errors = p2.get("errors") if isinstance(p2.get("errors"), dict) else {}
+    off_subnet = p2.get("off_subnet")
+    consistent = (
+        receipt.get("exit_codes") == {"gw": 0, "int": 0}
+        and all(section[name].get("requests") == section[name].get("observed") == section[name].get("matched")
+                == expected and section[name].get("passed") is True
+                for name, expected in (("p0", len(netprobe.p0_expected(upstream_port))),
+                                       ("p1", len(netprobe.P1_EXPECTED))))
+        and type(addresses) is int and addresses > 0 and isinstance(ports, list) and bool(ports)
+        and all(type(value) is int for value in ports) and pairs == addresses * len(ports)
+        and p2.get("connects") == p2.get("observed") == pairs and p2.get("connected") == 0
+        and all(type(value) is int for value in errors.values()) and sum(errors.values()) == pairs
+        and type(off_subnet) is int and 0 < off_subnet <= pairs and p2.get("off_subnet_unreachable") == off_subnet
+        and p2.get("control_connected") is True and p2.get("udp_answered") is False
+        and p2.get("dns") == p2.get("dns_matched") == len(netprobe.UNRESOLVABLE) + 2
+        and p2.get("ipv6_non_loopback") == 0 and p2.get("routes_available") is True
+        and p2.get("default_routes") == 0 and p2.get("gateway_routes") == 0 and p2.get("passed") is True)
+    if not consistent:
+        raise ValueError("isolation_probe_contradiction")
+    return receipt
+
+
+def recorded(entry, now, **fields):
+    """A stage-gate entry: passed, recorded no later than now, and carrying these exact fields."""
+    if not isinstance(entry, dict) or entry.get("passed") is not True:
+        return False
+    if any(entry.get(key) != value for key, value in fields.items()):
+        return False
+    try:
+        return time_value(entry.get("recorded_at")) <= now
+    except (ValueError, TypeError, OverflowError, OSError):
+        return False
+
+
+def verify_stage_gates(state, arm, *, now):
+    """The coordinator's live records that code cannot observe (repair R6).
+
+    <state>/stage-gates.json must be an owner-only regular file outside the
+    checkout. It must hold passed G2 scans of both pinned image references
+    and each STAGE_PROBES entry for this arm, recorded under the pinned proxy
+    image and the current proxy template, with the gateway build it ran on.
+    It must also hold this arm's G5 record. Only the declared build is kept;
+    this check cannot tell which build is running. The file stays absent
+    until the gates are observed, so dispatch start refuses until then.
+    """
+    arm_config(arm)
+    path = Path(state) / STAGE_GATES
+    if not path.exists():
+        raise ValueError("stage_gates_not_recorded")
+    gates = json.loads(read_bounded(private_file(path), limit=1024 * 1024))
+    if not isinstance(gates, dict) or gates.get("schema") != STAGE_GATES_SCHEMA:
+        raise ValueError("stage_gates_schema")
+    pins = read_json(HERE / "pins.json")
+    scans = gates.get("g2") if isinstance(gates.get("g2"), dict) else {}
+    if not all(recorded(scans.get(ref), now) for ref in (pins["image"]["ref"], pins["gateway_proxy"]["ref"])):
+        raise ValueError("stage_gate_g2_not_recorded")
+    probes = gates.get("probes") if isinstance(gates.get("probes"), dict) else {}
+    template = digest(PROXY_TEMPLATE)
+    if not all(recorded(probes.get(name), now, proxy_image=pins["gateway_proxy"]["ref"],
+                        proxy_template_sha256=template)
+               and re.fullmatch(r"[0-9a-f]{7,40}", str(probes[name].get("gateway_build")))
+               for name in STAGE_PROBES[arm]):
+        raise ValueError("stage_gate_probe_not_recorded")
+    surfaces = gates.get("g5") if isinstance(gates.get("g5"), dict) else {}
+    if not recorded(surfaces.get(arm), now):
+        raise ValueError("stage_gate_g5_not_recorded")
+    return gates
+
+
 def verify_isolation(state, run_id, arm, port, *, now=None):
     """The dispatch-start gate (plan E1, G7): a fresh passed probe bound to the live attempt.
 
     Refuses unless <result>/isolation-probe.json is an owner-only regular file
     written at most PROBE_MAX_AGE_SECONDS ago, for this arm's upstream, this
     ingress port, the pinned proxy image, the rendered config and this probe
-    script, with every section passed, and unless the live network and
-    container IDs still match. File and time checks come before any Docker
-    read. A pure check: it changes nothing.
+    script, whose counts re-derive a pass (checked_probe_counts); unless the
+    coordinator's stage gates are recorded (verify_stage_gates); and unless the
+    live network and container IDs still match. File and time checks come
+    before any Docker read. A pure check: it changes nothing.
     """
     stem = attempt_stem(run_id, arm)
+    now = now or datetime.now(timezone.utc)
     result = Path(state) / "runs" / run_id / arm
     receipt = json.loads(read_bounded(private_file(result / "isolation-probe.json"), limit=1024 * 1024))
     if not isinstance(receipt, dict):
         raise ValueError("isolation_probe_receipt_shape")
-    age = ((now or datetime.now(timezone.utc)) - time_value(receipt.get("verified_at"))).total_seconds()
+    age = (now - time_value(receipt.get("verified_at"))).total_seconds()
     if not 0 <= age <= PROBE_MAX_AGE_SECONDS:
         raise ValueError("isolation_probe_not_fresh")
     status = json.loads(read_bounded(result / "status.json"))
     config = digest(result / "proxy/nginx.conf")
+    upstream = arm_config(arm)["gateway_port"]
     expected = {"mechanism": PROBE_MECHANISM, "run_id": run_id, "arm": arm,
-                "upstream": f"{netprobe.GATEWAY_HOST}:{arm_config(arm)['gateway_port']}",
+                "upstream": f"{netprobe.GATEWAY_HOST}:{upstream}",
                 "host_ingress": f"127.0.0.1:{owned_port(port)}",
                 "proxy_image": read_json(HERE / "pins.json")["gateway_proxy"]["ref"],
                 "proxy_config_sha256": config, "probe_script_sha256": digest(HERE / "e2e/netprobe.py"),
@@ -983,6 +1077,8 @@ def verify_isolation(state, run_id, arm, port, *, now=None):
             or any(not isinstance(receipt.get(section), dict) or receipt[section].get("passed") is not True
                    for section in ("p0", "p1", "p2"))):
         raise ValueError("isolation_probe_mismatch")
+    checked_probe_counts(receipt, upstream)
+    verify_stage_gates(state, arm, now=now)
     networks, server, proxy = attempt_bindings(stem)
     live = {"run_network_id": networks["int"]["id"], "gw_network_id": networks["gw"]["id"],
             "server_container_id": server["id"], "proxy_container_id": proxy["id"]}

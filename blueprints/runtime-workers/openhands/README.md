@@ -299,9 +299,10 @@ A prepared attempt that will not start a conversation now is removed with
 `host.py teardown` and the same identity flags
 ([live probe sequence](#live-probe-sequence-coordinator-not-run-yet)).
 
-No conversation starts until the coordinator has run and recorded P3 on the
-running gateway build (plan gate G7; the code checks only the P0-P2 half, see
-[the gate](#isolation-probe-p0-p2-and-the-dispatch-gate)). After that, the
+No conversation starts until the coordinator has run P3 on the running gateway
+build and recorded it, with G2 and G5, in the host-owned stage-gates file (plan
+gate G7). `dispatch.py start` refuses without that file; see
+[the gate](#isolation-probe-p0-p2-and-the-dispatch-gate). After that, the
 workflow child runs exactly these three Bash commands after preparation:
 
 ```sh
@@ -755,18 +756,40 @@ before it takes the serial reservation. The gate requires:
 - the expected mechanism, identity, upstream, ingress and proxy image;
 - the current rendered config's hash, which must also equal `status.json`'s,
   and the current netprobe hash;
-- passed P0, P1 and P2;
+- passed P0, P1 and P2, re-derived from the recorded counts rather than the
+  `passed` flags: both exit codes 0, every request observed and matched, a
+  non-empty target set, every pair observed and failed with a named error,
+  every off-subnet pair unreachable, the positive control connected, no DNS
+  answer, every name matched, and no IPv6 address, default route or gateway
+  route. A contradictory receipt is refused;
+- the recorded stage gates below;
 - the four IDs equal to the live selected-field reads.
 
 A refusal prints `failure_stage: probe`, exits 3 and changes nothing. The run
 receipt (schema 6) carries an `isolation` summary without IDs, addresses or
 the run id.
 
-**Plan gate G7 is only half enforced in code.** G7 requires P0-P2 within 900 s
-of the start *and* a passed P3 on the running gateway build. The dispatch gate
-checks P0-P2 only. Until the coordinator has run and recorded P3, do not use
-`dispatch.py start` or `host.py run`. Prepare, read the probe receipt and tear
-down instead. The engines-on arm also waits for P4 and P5.
+**Stage gates (plan G7's P3 half, G2 and G5).** The gate also requires
+`<state>/stage-gates.json`. The coordinator writes it after observing those
+gates live; this recipe only reads it. Until it exists, `dispatch.py start`
+and `host.py run` refuse, so prepare, read the probe receipt and tear down
+instead. The file must be owner-only (0600) and outside the checkout:
+
+```json
+{"schema": "openhands-stage-gates-v1",
+ "g2": {"<pins.json image.ref>": {"passed": true, "recorded_at": "<ISO time>"},
+        "<pins.json gateway_proxy.ref>": {"passed": true, "recorded_at": "<ISO time>"}},
+ "probes": {"p3": {"passed": true, "recorded_at": "<ISO time>", "gateway_build": "<commit>",
+                   "proxy_image": "<pins.json gateway_proxy.ref>",
+                   "proxy_template_sha256": "<SHA-256 of config/proxy-nginx.conf>"},
+            "p4": "<same shape>", "p5": "<same shape>"},
+ "g5": {"control": {"passed": true, "recorded_at": "<ISO time>"}, "engines-on": "<same shape>"}}
+```
+
+The control arm needs P3; engines-on also needs P4 and P5. No record may be
+dated after the check. A probe record binds to the pinned proxy image and the
+current proxy template, so changing either needs new records. The gateway
+build is recorded, but this code cannot tell which build is running.
 
 ### P3-P5: documented, not run
 

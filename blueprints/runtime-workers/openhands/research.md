@@ -425,7 +425,9 @@ container and made no gateway or model request.
 Open items from this phase:
 
 - **Not run:** the live P0-P2 probe, and the P3-P5 model calls, which exist as
-  documented steps and a skeleton. G7's P3 half is not enforced in code.
+  documented steps and a skeleton. G7's P3 half was not enforced in code;
+  *(repair round)* the dispatch gate now requires the coordinator's recorded
+  stage-gates file.
 - **Unprobed:**
   - gateway mode `isolated` under rootless Docker 29.8.1;
   - nginx under `--read-only` with `--entrypoint nginx`;
