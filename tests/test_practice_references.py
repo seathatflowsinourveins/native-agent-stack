@@ -233,8 +233,7 @@ class GhErrorTests(unittest.TestCase):
 
 class CatalogValidationTests(unittest.TestCase):
     def test_committed_catalog_is_well_formed(self):
-        # Format only: the record lands with the wave's decision-record change, and main()
-        # checks that it exists (RecordTests).
+        # Format only; test_committed_catalog_records_exist checks that each record exists.
         loaded, errors = practice_references.load_catalog(CATALOG)
         self.assertEqual(errors, [])
         references = loaded["references"]
@@ -248,6 +247,9 @@ class CatalogValidationTests(unittest.TestCase):
         # The main synthesis read the CHANGELOG at the same pin as the supplement.
         self.assertEqual([use["dimension"] for use in by_repository["anthropics/claude-code"]["used_for"]],
                          ["harness-and-token-practice", "git-review-and-automation"])
+
+    def test_committed_catalog_records_exist(self):
+        self.assertEqual(practice_references.load_catalog(CATALOG, root=ROOT)[1], [])
 
     def test_fixture_catalog_is_well_formed(self):
         self.assertEqual(practice_references.validate_catalog(catalog()), [])

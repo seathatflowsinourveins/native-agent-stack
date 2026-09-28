@@ -365,6 +365,14 @@ findings by severity). Since 2026-09-22 it runs grype with `--config .grype.yaml
 path-filtered, so it is not a required check (see "Automation closure,
 2026-09-22").
 
+Update 2026-09-28: `practice-references-freshness.yml` (Thursdays 06:41 UTC, plus
+manual dispatch) runs `tools/sota-convergence/practice_references.py` over
+`catalogs/foundation/practice-references.json`. It reports archived, stale (no
+default-branch commit in 90 days), renamed or missing repositories and
+default-branch commits since each pin, and never changes a pin. It is not a
+required check; it fails only when the checker's offline tests fail or the
+catalog is malformed, including a decision record that does not exist.
+
 ## Secret and supply-chain scanning, 2026-09-22
 
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified

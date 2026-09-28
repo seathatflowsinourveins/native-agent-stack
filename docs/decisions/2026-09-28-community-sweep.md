@@ -366,6 +366,12 @@ Anthropic repositories read beside them:
 | [anthropics/claude-agent-sdk-python](https://github.com/anthropics/claude-agent-sdk-python/tree/36f95486ee9fc49d8ee1ed56811f07b5e8e23ac6) | `36f95486ee9fc49d8ee1ed56811f07b5e8e23ac6` | 2026-09-25T22:32Z | the reference for selecting the `result` message (`src/claude_agent_sdk/_internal/message_parser.py:95`, `:308`), used by the separate A10 unit |
 | [anthropics/claude-code-security-review](https://github.com/anthropics/claude-code-security-review/tree/0c6a49f1fa56a1d472575da86a94dbc1edb78eda) | `0c6a49f1fa56a1d472575da86a94dbc1edb78eda` | 2026-02-11T18:01Z (stale) | rejected as R68 |
 
+These 26 pins are tracked in `catalogs/foundation/practice-references.json`;
+`tools/sota-convergence/practice_references.py` reports their drift and maintenance weekly,
+report-only. The alternatives compared (running the OpenSSF Scorecard Maintained check,
+extending the Monday catalog-freshness lane, no scheduled check) and the overturn condition
+are in its module docstring (Decision, 2026-09-28).
+
 ## Primary sources
 
 The syntheses read these pages on 2026-09-27; the pages this change cites directly were re-read
