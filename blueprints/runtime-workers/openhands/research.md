@@ -433,8 +433,13 @@ Open items from this phase:
   - the container `--format` template, checked live only for its network
     counterpart.
 - **P2 is strict** about IPv6. Any non-loopback IPv6 address, including a
-  link-local one, fails it. An attempt network's subnet `.1` that belongs to
-  its own server or proxy makes the probe refuse to run rather than report.
+  link-local one, fails it. *(Corrected in the repair round.)* This build also
+  added each network's subnet `.1` as a target and refused to probe when an
+  attempt container held one. On the isolated `$S-int` the server always holds
+  `.1`, because moby allocates no gateway there, so every live probe would
+  have refused. Targets now come only from recorded IPAM gateways. The attempt
+  containers' own addresses are excluded and recorded by role, and never
+  cause a refusal.
 - **Still open from the plan:**
   - G2, the image scans;
   - G5, the model surface: a `/v1` body can pick any model the arm serves;

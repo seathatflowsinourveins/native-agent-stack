@@ -712,18 +712,30 @@ after P0 passed.
 | --- | --- | --- |
 | P0, negative control | `$S-gw` | GET `http://10.0.2.2:<arm port>/v1/models` returns 200 with route class `CLIENT_API`, and GET `/api/settings` returns a response with route class `MANAGEMENT`. This shows the vehicle can see the gateway and its management surface. |
 | P1, management isolation | `$S-int` | GET `http://gw:8081/v1/models` returns 200 with `CLIENT_API`. Each of the plan's 26 denied method/target pairs returns 403 with no route-class header, so the proxy refused it rather than the gateway. The pairs cover management paths, dot-segment and `%2e` variants, case and slash variants, query strings and wrong methods. |
-| P2, direct reachability | `$S-int` | No address and port pair accepts a TCP connect. `example.com`, `github.com` and `host.docker.internal` do not resolve, while `gw` and `$S-server` do. The container has no non-loopback IPv6 address. |
+| P2, direct reachability | `$S-int` | A positive control first: a TCP connect to `gw:8081` succeeds. Then no address and port pair accepts a TCP connect, and every pair outside the run subnet fails for want of a route (`ENETUNREACH` or `EHOSTUNREACH`), not by timing out. One DNS datagram to 10.0.2.3:53 gets no answer, and fails the same way. `example.com`, `github.com` and `host.docker.internal` do not resolve, while `gw` and `$S-server` do. The container has no non-loopback IPv6 address, and `/proc/net/route` holds no default route and no route via a gateway. |
 
 P2's targets are computed on the host at probe time:
 - **Addresses:**
   - 10.0.2.2, 10.0.2.3, 172.17.0.1, 10.0.0.1 and 10.255.255.254;
   - every non-loopback host IPv4 address from `ip -4 -o addr`;
-  - each attempt network's subnet `.1` and IPAM gateway.
+  - each gateway that an attempt network's IPAM actually records.
 - **Ports:** every TCP listener from `ss -ltnH`, plus 53.
 
-The probe refuses to run if a target is the address of its own attempt's
-server or proxy. Network inspect values are context only; the failed connects
-are the evidence.
+`$S-int` records no gateway. moby@464cd50c (docker-v29.8.1) skips gateway
+allocation in isolated mode (`daemon/libnetwork/drivers/bridge/bridge_linux.go:700-713`,
+`daemon/libnetwork/network.go:1594-1602`), so the server, the first endpoint,
+holds the subnet's `.1`. The attempt containers' own addresses (the server's
+and the proxy's on `$S-int`, the proxy's on `$S-gw`) are removed from the
+targets. The receipt records, by role, any that coincided with a target; they
+never stop the probe. The host passes the run subnet to the probe, and the
+host-side verdict classifies each pair as inside or outside it from the
+expected list, never from the probe's own record.
+
+The route-table check reads the main table only, as the kernel writes it
+(linux@v6.18 `net/ipv4/fib_trie.c:2940-3000`). For the three names that must
+not resolve, the receipt keeps the resolver's error class, such as `EAI_NONAME`
+or `EAI_AGAIN`. The pass condition is still only that no address resolved.
+Network inspect values are context only; the failed connects are the evidence.
 
 The receipt is `runs/<run-id>/<arm>/isolation-probe.json`: mode 0600,
 host-owned and outside every model mount. It holds:
@@ -733,8 +745,8 @@ host-owned and outside every model mount. It holds:
 - `proxy_image`, `proxy_config_sha256` and `probe_script_sha256`;
 - `upstream` (`10.0.2.2:<arm port>`), `host_ingress` (`127.0.0.1:<port>`) and
   `verified_at`;
-- the probe containers' exit codes, target counts, the P0/P1/P2 counts and
-  booleans, and `passed`.
+- the probe containers' exit codes, target counts and excluded roles, the
+  P0/P1/P2 counts, error-name counts and booleans, and `passed`.
 
 `dispatch.py start`, including the `host.py run` path, calls `verify_isolation`
 before it takes the serial reservation. The gate requires:

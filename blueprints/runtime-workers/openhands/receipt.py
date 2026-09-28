@@ -26,9 +26,11 @@ PROBE_MECHANISM = "internal-isolated+nginx-v1-allowlist"
 PROBE_FIELDS = {
     "p0": ("requests", "observed", "matched", "passed"),
     "p1": ("requests", "observed", "matched", "passed"),
-    "p2": ("connects", "observed", "connected", "errors", "dns", "dns_matched", "ipv6_non_loopback",
-           "ipv6_link_local", "ipv6_loopback", "passed"),
-    "targets": ("addresses", "ports", "pairs"),
+    "p2": ("control_connected", "connects", "observed", "connected", "errors", "off_subnet",
+           "off_subnet_unreachable", "udp_answered", "udp_errors", "dns", "dns_matched", "dns_errors",
+           "ipv6_non_loopback", "ipv6_link_local", "ipv6_loopback", "routes_available", "routes",
+           "default_routes", "gateway_routes", "passed"),
+    "targets": ("addresses", "ports", "pairs", "excluded"),
 }
 COLUMNS = (
     "timestamp", "path", "status", "model", "reasoning_effort_requested",

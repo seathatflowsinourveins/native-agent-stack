@@ -9,6 +9,7 @@ structural/fixture checks, not upstream SDK or live gateway acceptance.
 import asyncio
 import contextlib
 from datetime import datetime, timedelta, timezone
+import errno
 import hashlib
 import http.server
 import io
@@ -1515,6 +1516,13 @@ class OpenHandsProbeTests(unittest.TestCase):
             ("gw", True), (self.stem + "-server", True)))
         self.assertEqual(netprobe.FIXED_ADDRESSES, ("10.0.2.2", "10.0.2.3", "172.17.0.1", "10.0.0.1", "10.255.255.254"))
         self.assertEqual(netprobe.EXTRA_PORTS, (53,))
+        # Repair R4: off-subnet connects must fail for want of a route, not time out.
+        self.assertEqual(netprobe.UNREACHABLE, ("ENETUNREACH", "EHOSTUNREACH"))
+        self.assertEqual(netprobe.UDP_TARGET, ("10.0.2.3", 53))
+        self.assertEqual(netprobe.ROUTES, "/proc/net/route")
+        # RFC 1035 section 4.1.1-4.1.2: one recursive A/IN question for example.com.
+        self.assertEqual(netprobe.DNS_QUERY[2:12], bytes.fromhex("01000001000000000000"))
+        self.assertEqual(netprobe.DNS_QUERY[12:], b"\x07example\x03com\x00\x00\x01\x00\x01")
         # P3 is a documented skeleton; it is never run in phase 2.
         with self.assertRaises(NotImplementedError):
             netprobe.p3_control_call()
@@ -1552,6 +1560,9 @@ class OpenHandsProbeTests(unittest.TestCase):
                          [("127.0.0.1", open_port, True, None), ("127.0.0.1", closed, False, "ECONNREFUSED")])
         with patch.object(netprobe.socket, "getaddrinfo", side_effect=socket.gaierror(socket.EAI_NONAME, "fixture")):
             self.assertEqual(netprobe.resolve("example.com"), {"name": "example.com", "resolved": False, "error": "EAI_NONAME"})
+        # Addendum (b): a temporary failure stays distinguishable from "no such name".
+        with patch.object(netprobe.socket, "getaddrinfo", side_effect=socket.gaierror(socket.EAI_AGAIN, "fixture")):
+            self.assertEqual(netprobe.resolve("github.com"), {"name": "github.com", "resolved": False, "error": "EAI_AGAIN"})
         with patch.object(netprobe.socket, "getaddrinfo",
                           return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("172.30.0.3", 0))]):
             self.assertEqual(netprobe.resolve("gw"), {"name": "gw", "resolved": True, "error": None})
@@ -1564,6 +1575,74 @@ class OpenHandsProbeTests(unittest.TestCase):
         self.assertEqual(netprobe.ipv6_summary(lo + link + other)["non_loopback"], 2)
         with self.assertRaises(ValueError):
             netprobe.ipv6_summary("garbage\n")
+
+    @staticmethod
+    def closed_udp_port():
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+            probe.bind(("127.0.0.1", 0))
+            return probe.getsockname()[1]
+
+    def test_netprobe_reads_routes_sends_one_udp_query_and_runs_the_positive_control(self):
+        netprobe = load_recipe_module("e2e/netprobe.py")
+        # linux@v6.18 net/ipv4/fib_trie.c:2940-3000 writes /proc/net/route from the main table:
+        # iface, destination, gateway, flags, refcnt, use, metric, mask, mtu, window, irtt.
+        header = "Iface\tDestination\tGateway \tFlags\tRefCnt\tUse\tMetric\tMask\t\tMTU\tWindow\tIRTT".ljust(127) + "\n"
+        subnet = "eth0\t00001EAC\t00000000\t0001\t0\t0\t0\t0000FFFF\t0\t0\t0".ljust(127) + "\n"
+        default = "eth0\t00000000\t01001EAC\t0003\t0\t0\t0\t00000000\t0\t0\t0".ljust(127) + "\n"
+        via = "eth0\t0002000A\t01001EAC\t0003\t0\t0\t0\t00FFFFFF\t0\t0\t0".ljust(127) + "\n"
+        self.assertEqual(netprobe.route_summary(header + subnet),
+                         {"available": True, "routes": 1, "default": 0, "gateway": 0})
+        self.assertEqual(netprobe.route_summary(header + subnet + default),
+                         {"available": True, "routes": 2, "default": 1, "gateway": 1})
+        self.assertEqual(netprobe.route_summary(header + subnet + via),
+                         {"available": True, "routes": 2, "default": 0, "gateway": 1})
+        self.assertEqual(netprobe.route_summary(header), {"available": True, "routes": 0, "default": 0, "gateway": 0})
+        for bad in ("", "garbage\n", header + "eth0\t0\t0\n", header + subnet.replace("\t0001\t", "\tzz01\t")):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                netprobe.route_summary(bad)
+        with patch.object(netprobe, "ROUTES", str(self.result / "absent-route-table")):
+            self.assertEqual(netprobe.read_routes(), {"available": False, "routes": 0, "default": 0, "gateway": 0})
+        # One DNS datagram: answered, refused by ICMP, and unroutable.
+        answering = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.addCleanup(answering.close)
+        answering.bind(("127.0.0.1", 0))
+        received = []
+
+        def answer():
+            data, peer = answering.recvfrom(512)
+            received.append(data)
+            answering.sendto(data[:2] + b"\x81\x80" + data[4:], peer)
+        thread = threading.Thread(target=answer, daemon=True)
+        thread.start()
+        port = answering.getsockname()[1]
+        self.assertEqual(netprobe.udp_probe("127.0.0.1", port, timeout=2),
+                         {"address": "127.0.0.1", "port": port, "answered": True, "error": None})
+        thread.join(2)
+        self.assertEqual(received, [netprobe.DNS_QUERY])
+        # Whether a closed loopback port reports ICMP refusal or stays silent differs
+        # between hosts (this WSL2 host times out); both are "no answer".
+        silent = netprobe.udp_probe("127.0.0.1", self.closed_udp_port(), timeout=0.5)
+        self.assertEqual(silent["answered"], False)
+        self.assertIn(silent["error"], ("timeout", "ECONNREFUSED"))
+        with patch.object(netprobe.socket.socket, "recv", side_effect=ConnectionRefusedError(errno.ECONNREFUSED, "fixture")):
+            refused = netprobe.udp_probe("127.0.0.1", self.closed_udp_port())
+        self.assertEqual((refused["answered"], refused["error"]), (False, "ECONNREFUSED"))
+        with patch.object(netprobe.socket.socket, "connect", side_effect=OSError(errno.ENETUNREACH, "fixture")):
+            self.assertEqual(netprobe.udp_probe("10.0.2.3", 53),
+                             {"address": "10.0.2.3", "port": 53, "answered": False, "error": "ENETUNREACH"})
+        # The positive control connects to gw:8081 by name; here a local listener stands in.
+        listener = socket.socket()
+        self.addCleanup(listener.close)
+        listener.bind(("127.0.0.1", 0))
+        listener.listen()
+        with patch.object(netprobe, "PROXY_HOST", "127.0.0.1"), \
+                patch.object(netprobe, "PROXY_PORT", listener.getsockname()[1]):
+            self.assertEqual(netprobe.control_probe(timeout=2), {"host": "127.0.0.1", "port": listener.getsockname()[1],
+                                                                 "connected": True, "error": None})
+        closed = self.closed_port()
+        with patch.object(netprobe, "PROXY_HOST", "127.0.0.1"), patch.object(netprobe, "PROXY_PORT", closed):
+            self.assertEqual(netprobe.control_probe(timeout=2), {"host": "127.0.0.1", "port": closed,
+                                                                 "connected": False, "error": "ECONNREFUSED"})
 
     def expected_http(self, host_name, port, method, target):
         status = 200 if (method, target) == ("GET", "/v1/models") else 403
@@ -1582,51 +1661,94 @@ class OpenHandsProbeTests(unittest.TestCase):
         previous = os.umask(0o077)
         self.addCleanup(os.umask, previous)
         with patch.object(netprobe, "http_probe", side_effect=forwarded) as http, \
+                patch.object(netprobe, "control_probe") as control, patch.object(netprobe, "udp_probe") as udp, \
                 patch.object(netprobe, "connect_all") as connects, patch.object(netprobe, "resolve") as resolve:
             code = netprobe.main(["int", "--out", str(target), "--server", self.stem + "-server",
-                                  "--addresses", "10.0.2.2", "--ports", "20128"])
+                                  "--addresses", "10.0.2.2", "--ports", "20128", "--subnets", "172.30.0.0/16"])
         self.assertEqual(code, 1)
         stop = self.PLAN_DENIED.index(("GET", "/v1/files")) + 2
         data = json.loads(target.read_text())
         self.assertEqual(len(data["p1"]), stop)
         self.assertEqual(http.call_count, stop)
-        connects.assert_not_called()
-        resolve.assert_not_called()
+        for later in (control, udp, connects, resolve):
+            later.assert_not_called()
         self.assertNotIn("p2", data)
         self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o644)
 
     def test_netprobe_int_mode_passes_only_when_everything_is_refused(self):
         netprobe = load_recipe_module("e2e/netprobe.py")
         server = self.stem + "-server"
-        for label, connected, resolvable, ipv6 in (("contained", False, False, 0), ("connect", True, False, 0),
-                                                   ("dns", False, True, 0), ("ipv6", False, False, 1)):
+        routes = {"available": True, "routes": 1, "default": 0, "gateway": 0}
+        cases = {"contained": {}, "connect": {"connected": True}, "off-subnet timeout": {"error": "timeout"},
+                 "dns": {"resolvable": True}, "ipv6": {"ipv6": 1}, "control refused": {"control": False},
+                 "udp answered": {"answered": True}, "udp timeout": {"udp_error": "timeout"},
+                 "default route": {"routes": dict(routes, default=1, gateway=1)},
+                 "gateway route": {"routes": dict(routes, gateway=1)},
+                 "no route table": {"routes": {"available": False, "routes": 0, "default": 0, "gateway": 0}}}
+        for label, case in cases.items():
             with self.subTest(label):
-                target = self.result / f"{label}.json"
+                target = self.result / (label.replace(" ", "-") + ".json")
+                connected, reached = case.get("connected", False), case.get("control", True)
 
                 def connects(pairs, **kwargs):
-                    return [{"address": a, "port": p, "connected": connected, "error": None if connected else "ENETUNREACH"}
-                            for a, p in pairs]
+                    return [{"address": a, "port": p, "connected": connected,
+                             "error": None if connected else case.get("error", "ENETUNREACH")} for a, p in pairs]
 
                 def resolve(name):
-                    ok = name in {"gw", server} or resolvable
-                    return {"name": name, "resolved": ok, "error": None if ok else "EAI_NONAME"}
+                    ok = name in {"gw", server} or case.get("resolvable", False)
+                    return {"name": name, "resolved": ok, "error": None if ok else "EAI_AGAIN"}
+                control = {"host": "gw", "port": 8081, "connected": reached, "error": None if reached else "ECONNREFUSED"}
+                udp = {"address": "10.0.2.3", "port": 53, "answered": case.get("answered", False),
+                       "error": None if case.get("answered") else case.get("udp_error", "ENETUNREACH")}
                 with patch.object(netprobe, "http_probe", side_effect=self.expected_http), \
+                        patch.object(netprobe, "control_probe", return_value=control), \
                         patch.object(netprobe, "connect_all", side_effect=connects) as batch, \
+                        patch.object(netprobe, "udp_probe", return_value=udp) as datagram, \
                         patch.object(netprobe, "resolve", side_effect=resolve), \
                         patch.object(netprobe, "read_ipv6", return_value={
-                            "available": True, "loopback": 1, "non_loopback": ipv6, "link_local": ipv6}):
+                            "available": True, "loopback": 1, "non_loopback": case.get("ipv6", 0),
+                            "link_local": case.get("ipv6", 0)}), \
+                        patch.object(netprobe, "read_routes", return_value=case.get("routes", routes)):
                     code = netprobe.main(["int", "--out", str(target), "--server", server,
-                                          "--addresses", "10.0.2.2,192.0.2.20", "--ports", "53,20128"])
+                                          "--addresses", "10.0.2.2,192.0.2.20", "--ports", "53,20128",
+                                          "--subnets", "172.30.0.0/16"])
                 self.assertEqual(code, 0 if label == "contained" else 1)
-                self.assertEqual(batch.call_args.args[0], [("10.0.2.2", 53), ("10.0.2.2", 20128),
-                                                           ("192.0.2.20", 53), ("192.0.2.20", 20128)])
+                if reached:
+                    self.assertEqual(batch.call_args.args[0], [("10.0.2.2", 53), ("10.0.2.2", 20128),
+                                                               ("192.0.2.20", 53), ("192.0.2.20", 20128)])
+                else:  # The positive control failed, so nothing negative is attempted.
+                    batch.assert_not_called()
                 data = json.loads(target.read_text())
-                verdict = netprobe.evaluate_p2(data.get("p2"), ["10.0.2.2", "192.0.2.20"], [53, 20128], server)
+                verdict = netprobe.evaluate_p2(data.get("p2"), ["10.0.2.2", "192.0.2.20"], [53, 20128], server,
+                                               ["172.30.0.0/16"])
                 self.assertEqual(verdict["passed"], label == "contained")
-        for argv in (["int", "--out", str(self.result / "x.json"), "--server", "other", "--addresses", "10.0.2.2", "--ports", "53"],
-                     ["int", "--out", str(self.result / "y.json"), "--server", server, "--addresses", "gw", "--ports", "53"],
-                     ["int", "--out", str(self.result / "z.json"), "--server", server, "--addresses", "10.0.2.2", "--ports", "0"]):
-            with self.subTest(argv=argv), patch.object(netprobe, "http_probe") as http, self.assertRaises(ValueError):
+                if label == "contained":
+                    datagram.assert_called_once_with("10.0.2.3", 53)
+                    self.assertEqual({key: verdict[key] for key in (
+                        "control_connected", "off_subnet", "off_subnet_unreachable", "udp_answered", "udp_errors",
+                        "dns_errors", "routes_available", "routes", "default_routes", "gateway_routes")}, {
+                        "control_connected": True, "off_subnet": 4, "off_subnet_unreachable": 4,
+                        "udp_answered": False, "udp_errors": {"ENETUNREACH": 1}, "dns_errors": {"EAI_AGAIN": 3},
+                        "routes_available": True, "routes": 1, "default_routes": 0, "gateway_routes": 0})
+        # A target inside the run subnet (a host address that collides with it) may time out, never connect.
+        inside = {"control": {"host": "gw", "port": 8081, "connected": True, "error": None},
+                  "connects": [{"address": "10.0.2.2", "port": 53, "connected": False, "error": "ENETUNREACH"},
+                               {"address": "172.30.0.9", "port": 53, "connected": False, "error": "timeout"}],
+                  "udp": {"address": "10.0.2.3", "port": 53, "answered": False, "error": "EHOSTUNREACH"},
+                  "dns": [{"name": name, "resolved": ok, "error": None if ok else "EAI_NONAME"}
+                          for name, ok in netprobe.dns_expected(server)],
+                  "ipv6": {"available": True, "loopback": 1, "non_loopback": 0, "link_local": 0}, "routes": routes}
+        verdict = netprobe.evaluate_p2(inside, ["10.0.2.2", "172.30.0.9"], [53], server, ["172.30.0.0/16"])
+        self.assertEqual((verdict["passed"], verdict["off_subnet"], verdict["off_subnet_unreachable"]), (True, 1, 1))
+        inside["connects"][1].update(connected=True, error=None)
+        self.assertFalse(netprobe.evaluate_p2(inside, ["10.0.2.2", "172.30.0.9"], [53], server, ["172.30.0.0/16"])["passed"])
+        base = ["--server", server, "--addresses", "10.0.2.2", "--ports", "53", "--subnets", "172.30.0.0/16"]
+        for index, change in enumerate(({"--server": "other"}, {"--addresses": "gw"}, {"--ports": "0"},
+                                        {"--subnets": ""}, {"--subnets": "172.30.0.1/16"}, {"--subnets": "gw"})):
+            argv = ["int", "--out", str(self.result / f"refused-{index}.json")]
+            for flag, value in zip(base[::2], base[1::2]):
+                argv += [flag, change.get(flag, value)]
+            with self.subTest(change=change), patch.object(netprobe, "http_probe") as http, self.assertRaises(ValueError):
                 netprobe.main(argv)
             http.assert_not_called()
 
@@ -1637,17 +1759,33 @@ class OpenHandsProbeTests(unittest.TestCase):
         self.assertEqual(host.host_ipv4_addresses(self.IP), ["10.255.255.254", "172.17.0.1", "192.0.2.20"])
         views = self.views()
         networks = {"int": views[("network", self.stem + "-int")], "gw": views[("network", self.stem + "-gw")]}
-        addresses, ports = host.probe_targets(networks, self.SS, self.IP)
+        own = {"server_int": "172.30.0.1", "proxy_int": "172.30.0.2", "proxy_gw": "172.31.0.2"}
+        addresses, ports, excluded = host.probe_targets(networks, self.SS, self.IP, own)
+        # Repair R2: only recorded IPAM gateways are added. The isolated $S-int has none,
+        # and its first endpoint, the server, holds 172.30.0.1.
         self.assertEqual(addresses, ["10.0.0.1", "10.0.2.2", "10.0.2.3", "10.255.255.254", "172.17.0.1",
-                                     "172.30.0.1", "172.31.0.1", "192.0.2.20"])
+                                     "172.31.0.1", "192.0.2.20"])
         self.assertEqual(ports, [53, 3000, 3730, 8080, 9000, 20128])
-        no_gateway = dict(networks, int=dict(networks["int"], ipam=[{"Subnet": "172.29.0.0/16"}]))
-        self.assertIn("172.29.0.1", host.probe_targets(no_gateway, self.SS, self.IP)[0])
+        self.assertEqual(excluded, [])
+        self.assertEqual(host.ipv4_subnets(networks["int"]), ["172.30.0.0/16"])
+        gatewayed = dict(networks, int=dict(networks["int"], ipam=[{"Subnet": "172.29.0.0/16", "Gateway": "172.29.0.1"}]))
+        self.assertIn("172.29.0.1", host.probe_targets(gatewayed, self.SS, self.IP, own)[0])
+        # An attempt container's own address is excluded and recorded by role, never refused.
+        addresses, _, excluded = host.probe_targets(networks, self.SS, self.IP, dict(own, proxy_gw="192.0.2.20"))
+        self.assertNotIn("192.0.2.20", addresses)
+        self.assertEqual(excluded, ["proxy_gw"])
+        addresses, _, excluded = host.probe_targets(networks, self.SS, self.IP, dict(own, proxy_gw="172.31.0.1"))
+        self.assertEqual((excluded, "172.31.0.1" in addresses), (["proxy_gw"], False))
         for bad in ("LISTEN 0 4096 127.0.0.1:notaport 0.0.0.0:*\n", "garbage\n", "LISTEN 0 4096 127.0.0.1:70000 0.0.0.0:*\n"):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 host.listener_ports(bad)
         with self.assertRaises(ValueError):
-            host.probe_targets(dict(networks, int=dict(networks["int"], ipam=[])), self.SS, self.IP)
+            host.probe_targets(dict(networks, int=dict(networks["int"], ipam=[])), self.SS, self.IP, own)
+        for role in own:
+            with self.subTest(role=role), self.assertRaises(ValueError):
+                host.probe_targets(networks, self.SS, self.IP, dict(own, **{role: ""}))
+        with self.assertRaises(ValueError):
+            host.probe_targets(networks, self.SS, self.IP, {"server_int": "172.30.0.1"})
 
     def test_probe_containers_use_the_agent_image_hardening_and_only_their_mounts(self):
         host = load_recipe_module("host.py")
@@ -1682,9 +1820,12 @@ class OpenHandsProbeTests(unittest.TestCase):
         ids = {role: hashlib.sha256(name.encode()).hexdigest() for role, name in names.items()}
 
         def network(role, prefix, internal):
+            # moby@464cd50c (docker-v29.8.1): gateway mode isolated allocates no gateway
+            # (bridge_linux.go:700-713, network.go:1594-1602), so the first endpoint takes .1.
+            ipam = {"Subnet": prefix + ".0.0/16"} if internal else {"Subnet": prefix + ".0.0/16", "Gateway": prefix + ".0.1"}
             return {"id": ids[role], "name": names[role], "driver": "bridge", "internal": internal, "ipv6": False,
                     "options": {self.ISOLATED: "isolated"} if internal else {}, "labels": dict(self.OWNER),
-                    "ipam": [{"Subnet": prefix + ".0.0/16", "Gateway": prefix + ".0.1"}]}
+                    "ipam": [ipam]}
 
         def endpoint(role, address, aliases=None):
             return {"NetworkID": ids[role], "IPAddress": address, "Aliases": aliases}
@@ -1693,11 +1834,11 @@ class OpenHandsProbeTests(unittest.TestCase):
             ("network", names["gw"]): network("gw", "172.31", False),
             ("container", names["server"]): {
                 "id": ids["server"], "name": "/" + names["server"], "running": True, "labels": dict(self.OWNER),
-                "networks": {names["int"]: endpoint("int", "172.30.0.2")}},
+                "networks": {names["int"]: endpoint("int", "172.30.0.1")}},
             ("container", names["proxy"]): {
                 "id": ids["proxy"], "name": "/" + names["proxy"], "running": True, "labels": dict(self.OWNER),
                 "networks": {names["gw"]: endpoint("gw", "172.31.0.2"),
-                             names["int"]: endpoint("int", "172.30.0.3", ["gw"])}},
+                             names["int"]: endpoint("int", "172.30.0.2", ["gw"])}},
         }
 
     def commands(self, host, views):
@@ -1746,11 +1887,14 @@ class OpenHandsProbeTests(unittest.TestCase):
         addresses = self.option(argv, "--addresses").split(",")
         ports = [int(port) for port in self.option(argv, "--ports").split(",")]
         return {"probe": "netprobe-v1", "mode": mode, "p1": [record(item) for item in netprobe.P1_EXPECTED],
-                "p2": {"connects": [{"address": a, "port": p, "connected": False, "error": "ENETUNREACH"}
+                "p2": {"control": {"host": "gw", "port": 8081, "connected": True, "error": None},
+                       "connects": [{"address": a, "port": p, "connected": False, "error": "ENETUNREACH"}
                                     for a in addresses for p in ports],
+                       "udp": {"address": "10.0.2.3", "port": 53, "answered": False, "error": "ENETUNREACH"},
                        "dns": [{"name": name, "resolved": ok, "error": None if ok else "EAI_NONAME"}
                                for name, ok in netprobe.dns_expected(self.option(argv, "--server"))],
-                       "ipv6": {"available": True, "loopback": 1, "non_loopback": 0, "link_local": 0}}}
+                       "ipv6": {"available": True, "loopback": 1, "non_loopback": 0, "link_local": 0},
+                       "routes": {"available": True, "routes": 1, "default": 0, "gateway": 0}}}
 
     def probe(self, host, views=None, mutate=None, codes=None):
         """host.run_probe with the two probe containers faked through execute_container."""
@@ -1801,10 +1945,16 @@ class OpenHandsProbeTests(unittest.TestCase):
             "upstream": "10.0.2.2:20128", "host_ingress": "127.0.0.1:3740", "exit_codes": {"gw": 0, "int": 0},
             "passed": True})
         self.assertEqual((receipt["p0"]["requests"], receipt["p1"]["requests"]), (2, 27))
-        self.assertEqual(receipt["targets"], {"addresses": 8, "ports": [53, 3000, 3730, 8080, 9000, 20128], "pairs": 48})
-        self.assertEqual((receipt["p2"]["connects"], receipt["p2"]["connected"], receipt["p2"]["dns_matched"]), (48, 0, 5))
+        self.assertEqual(receipt["targets"], {"addresses": 7, "ports": [53, 3000, 3730, 8080, 9000, 20128], "pairs": 42,
+                                              "excluded": {}})
+        self.assertEqual((receipt["p2"]["connects"], receipt["p2"]["connected"], receipt["p2"]["dns_matched"]), (42, 0, 5))
+        self.assertEqual({key: receipt["p2"][key] for key in (
+            "control_connected", "off_subnet", "off_subnet_unreachable", "udp_answered", "dns_errors",
+            "routes_available", "default_routes", "gateway_routes")}, {
+            "control_connected": True, "off_subnet": 42, "off_subnet_unreachable": 42, "udp_answered": False,
+            "dns_errors": {"EAI_NONAME": 3}, "routes_available": True, "default_routes": 0, "gateway_routes": 0})
         self.assertTrue(all(receipt[section]["passed"] for section in ("p0", "p1", "p2")))
-        for address in ("192.0.2.20", "172.30.0.2", "172.30.0.3", "10.255.255.254"):
+        for address in ("192.0.2.20", "172.30.0.1", "172.30.0.2", "172.31.0.2", "10.255.255.254", "172.30.0.0"):
             self.assertNotIn(address, path.read_text())
         # One container per network, each with an output directory of its own.
         self.assertEqual([name for name, _ in runs], [self.stem + "-probe-gw", self.stem + "-probe-int"])
@@ -1815,6 +1965,7 @@ class OpenHandsProbeTests(unittest.TestCase):
         self.assertEqual(self.option(runs[0][1], "--upstream-port"), "20128")
         self.assertEqual(self.option(runs[1][1], "--ports"), "53,3000,3730,8080,9000,20128")
         self.assertEqual(self.option(runs[1][1], "--server"), self.stem + "-server")
+        self.assertEqual(self.option(runs[1][1], "--subnets"), "172.30.0.0/16")
         # The gate accepts the real writer's output while the live IDs match.
         verified = host.time_value(receipt["verified_at"])
         self.assertEqual(self.gate(host, verified + timedelta(seconds=900))["passed"], True)
@@ -1886,6 +2037,14 @@ class OpenHandsProbeTests(unittest.TestCase):
             ("truncated connects", inside(lambda d: d["p2"]["connects"].pop()), None),
             ("reordered denied list", inside(lambda d: d["p1"].reverse()), None),
             ("probe exit code", None, {"int": 1}),
+            ("off-subnet connect timed out", inside(lambda d: d["p2"]["connects"][0].update(error="timeout")), None),
+            ("default route", inside(lambda d: d["p2"]["routes"].update(default=1, gateway=1)), None),
+            ("gateway route", inside(lambda d: d["p2"]["routes"].update(gateway=1)), None),
+            ("route table unread", inside(lambda d: d["p2"]["routes"].update(available=False)), None),
+            ("positive control refused", inside(lambda d: d["p2"]["control"].update(connected=False)), None),
+            ("positive control missing", inside(lambda d: d["p2"].pop("control")), None),
+            ("udp answered", inside(lambda d: d["p2"]["udp"].update(answered=True, error=None)), None),
+            ("udp timed out", inside(lambda d: d["p2"]["udp"].update(error="timeout")), None),
         )
         for label, mutate, codes in cases:
             with self.subTest(label):
@@ -1905,15 +2064,31 @@ class OpenHandsProbeTests(unittest.TestCase):
         self.assertEqual((receipt["p0"]["passed"], receipt["p1"]["observed"], receipt["exit_codes"]["int"]),
                          (False, 0, None))
 
-    def test_probe_refuses_targets_that_are_its_own_attempt_containers(self):
-        # If IPAM does not reserve .1 in isolated mode, a container could hold it.
+    def test_probe_excludes_and_records_its_own_attempt_containers(self):
+        # Repair R2: in isolated mode the server holds 172.30.0.1, which is no target
+        # and never a refusal.
         host = self.prepared()
         views = self.views()
-        views[("container", self.stem + "-server")]["networks"][self.stem + "-int"]["IPAddress"] = "172.30.0.1"
+        self.assertEqual(views[("container", self.stem + "-server")]["networks"][self.stem + "-int"]["IPAddress"],
+                         "172.30.0.1")
+        passed, runs = self.probe(host, views=views)
+        self.assertTrue(passed)
+        self.assertNotIn("172.30.0.1", self.option(runs[1][1], "--addresses").split(","))
+        # A host address that an attempt container also holds is excluded and recorded by role.
+        views[("container", self.stem + "-proxy")]["networks"][self.stem + "-gw"]["IPAddress"] = "192.0.2.20"
+        passed, runs = self.probe(host, views=views)
+        self.assertTrue(passed)
+        self.assertNotIn("192.0.2.20", self.option(runs[1][1], "--addresses").split(","))
+        path = self.result / "isolation-probe.json"
+        receipt = json.loads(path.read_text())
+        self.assertEqual(receipt["targets"], {"addresses": 6, "ports": [53, 3000, 3730, 8080, 9000, 20128],
+                                              "pairs": 36, "excluded": {"proxy_gw": 1}})
+        self.assertNotIn("192.0.2.20", path.read_text())
+        # A container with no address on its own network breaks the live contract.
+        views[("container", self.stem + "-server")]["networks"][self.stem + "-int"]["IPAddress"] = ""
         with patch.object(host.subprocess, "check_output", side_effect=self.commands(host, views)), \
-                patch.object(host, "execute_container") as execute, self.assertRaises(ValueError) as caught:
+                patch.object(host, "execute_container") as execute, self.assertRaises(ValueError):
             host.run_probe(self.state, self.run_id, self.arm, self.state / "prefix", self.pins)
-        self.assertEqual(str(caught.exception), "probe_target_is_attempt_container")
         execute.assert_not_called()
 
     def test_probe_requires_each_attempt_container_on_its_own_networks(self):
@@ -2305,10 +2480,13 @@ class OpenHandsReceiptTests(unittest.TestCase):
                      "host_ingress": "127.0.0.1:3730", "exit_codes": {"gw": 0, "int": 0},
                      "p0": {"requests": 2, "observed": 2, "matched": 2, "passed": True},
                      "p1": {"requests": 27, "observed": 27, "matched": 27, "passed": True},
-                     "p2": {"connects": 16, "observed": 16, "connected": 0, "errors": {"ENETUNREACH": 16},
-                            "dns": 5, "dns_matched": 5, "ipv6_non_loopback": 0, "ipv6_link_local": 0,
-                            "ipv6_loopback": 1, "passed": True},
-                     "targets": {"addresses": 8, "ports": [53, 20128], "pairs": 16}}
+                     "p2": {"control_connected": True, "connects": 16, "observed": 16, "connected": 0,
+                            "errors": {"ENETUNREACH": 16}, "off_subnet": 16, "off_subnet_unreachable": 16,
+                            "udp_answered": False, "udp_errors": {"ENETUNREACH": 1}, "dns": 5, "dns_matched": 5,
+                            "dns_errors": {"EAI_AGAIN": 3}, "ipv6_non_loopback": 0, "ipv6_link_local": 0,
+                            "ipv6_loopback": 1, "routes_available": True, "routes": 1, "default_routes": 0,
+                            "gateway_routes": 0, "passed": True},
+                     "targets": {"addresses": 8, "ports": [53, 20128], "pairs": 16, "excluded": {"proxy_gw": 1}}}
             (result / "isolation-probe.json").write_text(json.dumps(probe))
             (result / "probes/probe-fixture").mkdir(parents=True)
             (result / "probes/probe-fixture/gw.log.cleanup.json").write_text(

@@ -787,26 +787,50 @@ def host_ipv4_addresses(text):
     return [str(address) for address in sorted(found)]
 
 
-def probe_targets(networks, listeners, interfaces):
+ATTEMPT_ROLES = ("server_int", "proxy_int", "proxy_gw")
+
+
+def ipv4_entries(network):
+    entries = [entry for entry in network.get("ipam") or []
+               if isinstance(entry, dict) and ":" not in str(entry.get("Subnet", ""))]
+    if not entries:
+        raise ValueError("attempt_network_ipam_required")
+    return entries
+
+
+def ipv4_subnets(network):
+    """The network's IPv4 subnets as strict CIDR strings, from its selected-field IPAM view."""
+    return [str(ipaddress.IPv4Network(entry["Subnet"])) for entry in ipv4_entries(network)]
+
+
+def probe_targets(networks, listeners, interfaces, attempt_addresses):
     """P2 targets (plan section 1): addresses times ports, both sorted and deduplicated.
 
-    Addresses: netprobe.FIXED_ADDRESSES, every non-loopback host IPv4 address,
-    and each attempt network's IPAM gateway and subnet .1. Ports: every host
-    TCP listener at probe time plus netprobe.EXTRA_PORTS (53).
+    Addresses: netprobe.FIXED_ADDRESSES, every non-loopback host IPv4 address
+    and each gateway the attempt networks' IPAM actually records. The isolated
+    $S-int records none: moby@464cd50c (docker-v29.8.1) skips gateway
+    allocation in isolated mode (daemon/libnetwork/drivers/bridge/
+    bridge_linux.go:700-713, network.go:1594-1602), so its first endpoint, the
+    server, holds the subnet's .1. The attempt containers' own addresses are
+    removed: a connect there reaches the attempt, not the host. The roles
+    removed are returned so the receipt can record them; they never cause a
+    refusal. Ports: every host TCP listener at probe time plus
+    netprobe.EXTRA_PORTS (53).
     """
+    if set(attempt_addresses) != set(ATTEMPT_ROLES):
+        raise ValueError("attempt_container_addresses_required")
+    own = {role: ipaddress.IPv4Address(attempt_addresses[role]) for role in ATTEMPT_ROLES}
     addresses = {ipaddress.IPv4Address(value) for value in netprobe.FIXED_ADDRESSES}
     addresses |= {ipaddress.IPv4Address(value) for value in host_ipv4_addresses(interfaces)}
     for kind in ("int", "gw"):
-        entries = [entry for entry in networks[kind].get("ipam") or []
-                   if isinstance(entry, dict) and ":" not in str(entry.get("Subnet", ""))]
-        if not entries:
-            raise ValueError("attempt_network_ipam_required")
-        for entry in entries:
-            addresses.add(ipaddress.IPv4Network(entry["Subnet"]).network_address + 1)
+        for entry in ipv4_entries(networks[kind]):
+            ipaddress.IPv4Network(entry["Subnet"])
             if entry.get("Gateway"):
                 addresses.add(ipaddress.IPv4Address(entry["Gateway"]))
+    excluded = [role for role in ATTEMPT_ROLES if own[role] in addresses]
+    addresses -= set(own.values())
     ports = sorted(set(listener_ports(listeners)) | set(netprobe.EXTRA_PORTS))
-    return [str(address) for address in sorted(addresses)], ports
+    return [str(address) for address in sorted(addresses)], ports, excluded
 
 
 def checked_container(name, networks, aliases=None):
@@ -882,19 +906,21 @@ def run_probe(state, run_id, arm, prefix, pins):
     if status.get("proxy_config_sha256") != config:
         raise ValueError("proxy_config_changed_since_prepare")
     networks, server, proxy = attempt_bindings(stem)
+    internal, gateway = networks["int"]["name"], networks["gw"]["name"]
+    own = {"server_int": server["networks"][internal].get("IPAddress"),
+           "proxy_int": proxy["networks"][internal].get("IPAddress"),
+           "proxy_gw": proxy["networks"][gateway].get("IPAddress")}
     listeners = subprocess.check_output(["ss", "-ltnH"], text=True, timeout=30)
     interfaces = subprocess.check_output(["ip", "-4", "-o", "addr"], text=True, timeout=30)
-    addresses, ports = probe_targets(networks, listeners, interfaces)
-    # A target holding one of the attempt's own containers would connect and
-    # read as a containment failure; refuse the probe instead.
-    internal = networks["int"]["name"]
-    if {view["networks"][internal].get("IPAddress") for view in (server, proxy)} & set(addresses):
-        raise ValueError("probe_target_is_attempt_container")
+    # An attempt container's own address is no host target; it is excluded and
+    # recorded by role (repair R2), never a reason to refuse.
+    addresses, ports, excluded = probe_targets(networks, listeners, interfaces, own)
+    subnets = ipv4_subnets(networks["int"])
     private_directory(result / "probes")
     directory = Path(tempfile.mkdtemp(prefix="probe-", dir=result / "probes"))
     arguments = {"gw": ["--upstream-port", str(upstream)],
                  "int": ["--server", stem + "-server", "--addresses", ",".join(addresses),
-                         "--ports", ",".join(map(str, ports))]}
+                         "--ports", ",".join(map(str, ports)), "--subnets", ",".join(subnets)]}
     observed, codes = {"gw": None, "int": None}, {"gw": None, "int": None}
     for role in ("gw", "int"):
         output = directory / role
@@ -908,7 +934,8 @@ def run_probe(state, run_id, arm, prefix, pins):
                 observed["gw"].get("p0") if isinstance(observed["gw"], dict) else None,
                 netprobe.p0_expected(upstream))["passed"]):
             break
-    verdict = netprobe.evaluate(observed["gw"], observed["int"], upstream, addresses, ports, stem + "-server")
+    verdict = netprobe.evaluate(observed["gw"], observed["int"], upstream, addresses, ports, stem + "-server",
+                                subnets)
     passed = verdict["passed"] and codes == {"gw": 0, "int": 0}
     write_private_json(result / "isolation-probe.json", {
         "mechanism": PROBE_MECHANISM, "run_id": run_id, "arm": arm,
@@ -918,7 +945,8 @@ def run_probe(state, run_id, arm, prefix, pins):
         "probe_script_sha256": digest(HERE / "e2e/netprobe.py"),
         "upstream": f"{netprobe.GATEWAY_HOST}:{upstream}", "host_ingress": f"127.0.0.1:{port}",
         "verified_at": utc_now(), "exit_codes": codes,
-        "targets": {"addresses": len(addresses), "ports": ports, "pairs": len(addresses) * len(ports)},
+        "targets": {"addresses": len(addresses), "ports": ports, "pairs": len(addresses) * len(ports),
+                    "excluded": {role: 1 for role in excluded}},
         "p0": verdict["p0"], "p1": verdict["p1"], "p2": verdict["p2"], "passed": passed,
     })
     return passed
