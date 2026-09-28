@@ -6,7 +6,9 @@ jobs()/step_block() helpers. The job sets `defaults: run: shell: bash`, which Gi
 an unspecified shell would be `bash -e {0}`, without pipefail), so each run block executes with that
 command, the step's env, RUNNER_TEMP pointed at a scratch directory and the checkout as cwd. A step whose
 `if:` requires steps.install.outcome == 'success' is skipped when the install step failed.
-Prints step names, exit codes and the last output lines (scanner logs are --redact'ed)."""
+Prints step names, exit codes and the last output lines (scanner logs are --redact'ed). Since the
+coordinator repair (2026-09-28) the steps write a step summary, so GITHUB_STEP_SUMMARY points at a scratch
+file, which is printed at the end (counts only)."""
 import os
 import re
 import subprocess
@@ -31,7 +33,8 @@ for name in names:
         continue
     # cosign keeps its TUF cache under $TUF_ROOT (default ~/.sigstore); keep it in scratch, not the real home.
     env = dict(os.environ, RUNNER_TEMP=str(runner_temp), TUF_ROOT=str(runner_temp / "tuf"),
-               HOME=str(runner_temp / "home"), XDG_CACHE_HOME=str(runner_temp / "cache"))
+               HOME=str(runner_temp / "home"), XDG_CACHE_HOME=str(runner_temp / "cache"),
+               GITHUB_STEP_SUMMARY=str(runner_temp / "step-summary.md"))
     env_part = re.search(r"(?ms)^        env:\n(.*?)(?=^        \S)", block)
     if env_part:
         for line in env_part.group(1).splitlines():
@@ -56,3 +59,7 @@ for name in names:
     print(f"-- {name}: rc={proc.returncode}")
     for line in tail:
         print("     " + re.sub(r"/tmp/\S+", "<scratch>", line)[:170])
+summary = runner_temp / "step-summary.md"
+print("-- step summary:")
+for line in (summary.read_text(encoding="utf-8").splitlines() if summary.exists() else ["(none)"]):
+    print("     " + line[:170])

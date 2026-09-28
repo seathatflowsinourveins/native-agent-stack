@@ -3,7 +3,8 @@
 (local helper). Copies rule/file/line rows and counts from the --redact'ed reports; adds the value-blind
 triage classes recorded in this run, the explorer line sizes (measure_explorer_lines.py) and the fixture
 outcomes after the null-report port (run_fixtures_ported.sh). Writes no value, commit, fingerprint,
-author or hex digest."""
+author or hex digest. Since the coordinator repair (2026-09-28) the three passphrase rows carry the
+coordinator's host observation (run-record.json, coordinator_repair.passphrase_rows)."""
 import collections
 import json
 import re
@@ -33,16 +34,19 @@ CLASS = {  # file -> (category, value-blind description); from the triage record
     ARMS + "paper_arm.sh":
         ("local_test_passphrase", "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports "
                                   "for the restic repositories it initialises under its scratch-directory argument; the same "
-                                  "value is in dagu_arm.sh; owner confirmation pending (trading lane)"),
+                                  "value is in dagu_arm.sh; a fixed disposable test value, no retained repository "
+                                  "(coordinator observation, 2026-09-28)"),
     ARMS + "dagu_arm.sh":
         ("local_test_passphrase", "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports "
                                   "for the restic repository it initialises under its scratch-directory argument; the same "
-                                  "value is in paper_arm.sh; owner confirmation pending (trading lane)"),
+                                  "value is in paper_arm.sh; a fixed disposable test value, no retained repository "
+                                  "(coordinator observation, 2026-09-28)"),
     RERUN:
         ("local_test_passphrase", "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing "
                                   "restic repository under a host state directory; the script lists, checks and restores "
                                   "that repository and does not create it; its comment calls the value a fixed disposable "
-                                  "test string; owner confirmation pending"),
+                                  "test string; that repository is not retained on the host that ran the script "
+                                  "(coordinator observation, 2026-09-28)"),
     "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json": ("false_positive", "four-word prose phrase in a catalog note about CLI login"),
     "evidence/artifacts/gap-wave2-20260923/us-equities__security-supply-chain/raw/compare/osv-positive.json":
         ("example", "the advisory text's own username:password example URL in retained scanner output"),
@@ -83,8 +87,8 @@ cat = collections.Counter(r[3] for r in dir_rows)
 gcat = collections.Counter()
 for r in git_rows:
     gcat[r[5]] += r[3]
-pending = [r[:3] for r in dir_rows if r[3] == "local_test_passphrase"]
-assert sorted(p[1] for p in pending) == sorted([ARMS + "dagu_arm.sh", ARMS + "paper_arm.sh", RERUN]), pending
+passphrase_rows = [r[:3] for r in dir_rows if r[3] == "local_test_passphrase"]
+assert sorted(p[1] for p in passphrase_rows) == sorted([ARMS + "dagu_arm.sh", ARMS + "paper_arm.sh", RERUN]), passphrase_rows
 unported = {r["id"]: r["outcome"] for r in fx_bl["rows"]}
 ported_rows = {tool: {r["id"]: r["outcome"] for r in doc["rows"]} for tool, doc in ported.items()}
 doc = {
@@ -145,15 +149,23 @@ doc = {
                   "until the tests read null as no findings (fixtures_ported)",
         "new_findings": f"{len(dir_rep)} in dir mode and {len(git_rep)} in git mode, from betterleaks-only rules generic-password and "
                         "generic-credential-uri and from generic-api-key on explorer HTML that gitleaks skips by size",
-        "real_secret_status": "pending_owner_confirmation",
-        "real_secret_note": "Value-blind triage matched no live credential, but it cannot close the three local_test_passphrase "
-                            "rows: an owner must confirm that no retained restic repository still uses their two values. Two "
-                            "rows sit in trading-lane paths. The 25-character value is also in 4 retained round copies of the "
-                            "step script the paper arm generates (raw/paper-arm-round5..8/cfg/hot_step.sh), and the "
-                            "28-character value is also quoted in 2 receipts of the same recovery wave, one of which records "
-                            "it as the password of restic round trips that include a repository on the Windows drive. "
-                            "Neither scanner flags those 6 files.",
-        "pending_rows": pending,
+        "real_secret_status": "disposable_test_values_no_retained_repository",
+        "real_secret_note": "Value-blind triage matched no live credential. The three local_test_passphrase rows hold two fixed "
+                            "disposable test values for synthetic fixtures, and no restic repository they protected is "
+                            "retained: the coordinator's host observation of 2026-09-28 (our-integration; run-record.json, "
+                            "coordinator_repair.passphrase_rows). dagu_arm.sh and paper_arm.sh initialise their repositories "
+                            "under a per-run scratch-directory argument, rerun-isolated.sh comments its value as a fixed "
+                            "disposable test string, and restic-filesystem-semantics.json backs up trees that fixture.py "
+                            "builds. Neither the ai-memory rerun repository under the host state directory nor the "
+                            "Windows-drive gap-resolution-restic* directories exist on the host that ran them, and a depth-7 "
+                            "search of the home directory, /var/tmp and /tmp found no directory named restic-repo, "
+                            "restic-hot or gap-resolution-restic*. Two rows sit in trading-lane paths. The 25-character value "
+                            "is also in 4 retained round copies of the step script the paper arm generates "
+                            "(raw/paper-arm-round5..8/cfg/hot_step.sh), and the 28-character value is also quoted in 2 "
+                            "receipts of the same recovery wave, one of which records it as the password of restic round "
+                            "trips that include a repository on the Windows drive. Neither scanner flags those 6 files. "
+                            "Before a swap, allowlist these three rows by fingerprint, with this note as the reason.",
+        "local_test_passphrase_rows": passphrase_rows,
         "triage_method": "each finding's line was re-read from the tree or from its commit, the rule's upstream regex was "
                          "re-applied at the reported byte columns, and only key text, value length, character classes, "
                          "structural shape and marker words were printed (harness/triage.py, harness/triage_history.py); "

@@ -13,9 +13,15 @@ from datetime import date
 from pathlib import Path
 import fnmatch
 import hashlib
+import json
+import os
 import re
+import shlex
+import shutil
 import subprocess
+import sys
 import tempfile
+import textwrap
 import unittest
 
 import tests
@@ -837,15 +843,113 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
 class BetterleaksTrialJobTests(unittest.TestCase):
     """The non-required betterleaks trial beside secret-scan (plan move M3; receipt
     evidence/artifacts/betterleaks-parity-20260927/): it stays out of the required contexts and cannot be
-    forced green, reads only, runs bash with pipefail, runs cosign only after its digest check and
-    betterleaks only after the signed checksums and the pinned digest verify, redacts both scans with
-    gitleaks's archive and ignore-file behaviour, uploads nothing and never turns on live --validation
-    requests; and the repository carries none of the suppression channels that only betterleaks reads."""
+    forced green past a verification, scanner or test-run error, reads only, runs bash with pipefail, runs
+    cosign only after its digest check and betterleaks only after the signed checksums and the pinned digest
+    verify, redacts both scans with gitleaks's archive and ignore-file behaviour, uploads nothing and never
+    turns on live --validation requests. It is report-only through betterleaks's own --exit-code option
+    and unittest's split of failures from errors, and its step summary holds counts, never values. The
+    repository carries none of the suppression channels that only betterleaks reads."""
 
     JOB = "secret-scan-betterleaks"
     job = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))[JOB]
     FIXTURE_CLASSES = ("GitleaksPresenceTests", "GitleaksConfigContextRestrictionTests",
                        "GitleaksIgnoreFingerprintTests")
+    SCAN_STEPS = ("Scan git history", "Scan working tree")
+    FIXTURE_STEP = "fixture tests with betterleaks"
+    # Stands in for betterleaks 1.8.1's exit status (cmd/root.go at the v1.8.1 tag): --exit-code (line 82,
+    # default 1) is the status for findings (lines 644-645), a scan error exits 1 whatever it says (lines
+    # 640-641), and the report is written before either. STUB_MODE is clean, findings or scan-error.
+    SCAN_STUB = textwrap.dedent("""\
+        #!/usr/bin/env bash
+        report="" exit_code=1
+        while [ "$#" -gt 0 ]; do
+          case "$1" in
+            --report-path) report="$2"; shift ;;
+            --report-path=*) report="${1#*=}" ;;
+            --exit-code) exit_code="$2"; shift ;;
+            --exit-code=*) exit_code="${1#*=}" ;;
+          esac
+          shift
+        done
+        case "$STUB_MODE" in
+          clean) echo null > "$report"; exit 0 ;;
+          findings) cp "$STUB_REPORT" "$report"; exit "$exit_code" ;;
+          scan-error) cp "$STUB_REPORT" "$report"; exit 1 ;;
+        esac
+        exit 99
+        """)
+    VERSION_STUB = '#!/bin/sh\n[ "$1" = version ] && echo "${STUB_VERSION:-1.8.1}" && exit 0\nexit 99\n'
+    # Stands in for tests/test_gitleaks_config.py: FIXTURE_OUTCOME names the outcomes to produce.
+    FIXTURE_MODULE = textwrap.dedent('''\
+        import atexit
+        import os
+        import unittest
+
+        FLAGS = set(os.environ["FIXTURE_OUTCOME"].split("+"))
+
+
+        class GitleaksPresenceTests(unittest.TestCase):
+            pass
+
+
+        class GitleaksConfigContextRestrictionTests(unittest.TestCase):
+            pass
+
+
+        class GitleaksIgnoreFingerprintTests(unittest.TestCase):
+            pass
+
+
+        def fails(self):
+            self.fail("a detection difference")
+
+
+        def errors(self):
+            raise RuntimeError("not an assertion")
+
+
+        if "ok" in FLAGS:
+            GitleaksPresenceTests.test_ok = lambda self: None
+        if "fail" in FLAGS:
+            GitleaksConfigContextRestrictionTests.test_fail = fails
+        if "error" in FLAGS:
+            GitleaksConfigContextRestrictionTests.test_error = errors
+        if "skip" in FLAGS:
+            GitleaksIgnoreFingerprintTests.test_skip = lambda self: self.skipTest("lock busy")
+        if "crash" in FLAGS:
+            atexit.register(os._exit, 3)
+        ''')
+
+    def run_script(self, name):
+        """A step's `run: |` script, as the file GitHub writes and runs."""
+        block = step_block(self.job, name)
+        return "\n".join(line[10:] for line in block.split("\n        run: |\n", 1)[1].splitlines()) + "\n"
+
+    def run_step(self, name, stub, environment, cwd=None):
+        """Run step ``name`` as GitHub runs the job's `shell: bash`: `bash --noprofile --norc -eo pipefail {0}`
+        (workflow syntax, jobs.<job_id>.steps[*].shell). RUNNER_TEMP and GITHUB_STEP_SUMMARY are in scratch,
+        ``stub`` is the betterleaks binary and `python3` is this interpreter. Returns the exit status, the
+        output and the step summary."""
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        runner_temp = scratch / "runner-temp"
+        (runner_temp / "betterleaks").mkdir(parents=True)
+        tools = scratch / "bin"
+        tools.mkdir()
+        for path, text in ((runner_temp / "betterleaks" / "betterleaks", stub),
+                           (tools / "python3", f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n')):
+            path.write_text(text, encoding="utf-8")
+            path.chmod(0o755)
+        script = scratch / "step.sh"
+        script.write_text(self.run_script(name), encoding="utf-8")
+        summary = scratch / "summary.md"
+        env = {"PATH": f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", "HOME": str(scratch), "LC_ALL": "C",
+               "PYTHONDONTWRITEBYTECODE": "1", "RUNNER_TEMP": str(runner_temp),
+               "GITHUB_STEP_SUMMARY": str(summary), **environment}
+        proc = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", str(script)], cwd=cwd or scratch,
+                              env=env, capture_output=True, text=True, timeout=120)
+        return (proc.returncode, proc.stdout + proc.stderr,
+                summary.read_text(encoding="utf-8") if summary.exists() else "")
 
     def scans(self):
         """Each betterleaks scan command, with its backslash continuation lines joined."""
@@ -928,9 +1032,85 @@ class BetterleaksTrialJobTests(unittest.TestCase):
             # reviewed fingerprints (cmd/root.go lines 450-455).
             self.assertIn("--max-archive-depth 0", scan)
             self.assertIn("--gitleaks-ignore-path .gitleaksignore", scan)
-            self.assertNotIn("--exit-code", scan)
         self.assertNotIn("--validation", self.job)
         self.assertNotIn("--experiments", self.job)
+
+    def test_findings_exit_0_through_the_scanners_own_option(self):
+        """Report-only through betterleaks's own option: each scan passes --exit-code 0 (cmd/root.go line 82,
+        default 1), which sets the exit status for findings only (lines 644-645). A scan error exits 1 before
+        it is used (lines 640-641) and a report that cannot be written is fatal (line 636). Each scan step keeps
+        that status and exits with it, at its end and nowhere else."""
+        scans = self.scans()
+        self.assertEqual(len(scans), 2)
+        for scan in scans:
+            self.assertEqual(re.findall(r"--exit-code(?:=|\s+)(\S+)", scan), ["0"], scan)
+            self.assertTrue(scan.endswith(" || status=$?"), scan)
+        for name in self.SCAN_STEPS:
+            script = uncommented(self.run_script(name))
+            self.assertEqual(re.findall(r"\bstatus=\S*", script), ["status=0", "status=$?"], name)
+            self.assertEqual(re.findall(r"(?m)^\s*exit\b.*$", script), ['exit "$status"'], name)
+            self.assertEqual(script.rstrip().splitlines()[-1], 'exit "$status"', name)
+
+    @unittest.skipUnless(shutil.which("bash") and shutil.which("jq"), "the scan steps need bash and jq, as the runner has")
+    def test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule(self):
+        """With a stand-in scanner, each scan step exits 0 with findings or none and 1 on a scan error, and its
+        step summary counts findings by rule without a value or a path."""
+        sentinel = "-".join(("never", "in", "the", "summary"))
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        report = scratch / "report.json"
+        report.write_text(json.dumps([{"RuleID": rule, "File": path, "StartLine": line, "Secret": sentinel,
+                                       "Match": sentinel}
+                                      for rule, path, line in (("rule-alpha", "one/first.txt", 3),
+                                                               ("rule-alpha", "two/second.txt", 5),
+                                                               ("rule-beta", "one/first.txt", 9))]),
+                          encoding="utf-8")
+        for name in self.SCAN_STEPS:
+            for mode, expected in (("findings", 0), ("clean", 0), ("scan-error", 1)):
+                with self.subTest(step=name, mode=mode):
+                    rc, output, summary = self.run_step(name, self.SCAN_STUB,
+                                                        {"STUB_MODE": mode, "STUB_REPORT": str(report)})
+                    self.assertEqual(rc, expected, output)
+                    self.assertNotIn(sentinel, output + summary)
+                    self.assertNotIn("first.txt", summary)
+                    counts = re.findall(r"(?m)^(Findings: \d+|- [\w-]+: \d+)$", summary)
+                    self.assertEqual(counts, ["Findings: 0"] if mode == "clean"
+                                     else ["Findings: 3", "- rule-alpha: 2", "- rule-beta: 1"], summary)
+                    self.assertIn(f"betterleaks exit status: {expected}", summary)
+
+    @unittest.skipUnless(shutil.which("bash"), "the fixture step needs bash, as the runner has")
+    def test_fixture_step_reports_assertion_failures_and_fails_on_anything_else(self):
+        """Over a stand-in test module, the fixture step exits 0 when every problem is an assertion failure.
+        It fails on an error, on no test run (unittest exits 5 since Python 3.12), on any other unittest exit
+        status and on a betterleaks version other than the pinned one. Its step summary holds unittest's
+        counts and never a failure message."""
+        checkout = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, checkout, ignore_errors=True)
+        (checkout / "tests").mkdir()
+        (checkout / "tests" / "__init__.py").write_text("", encoding="utf-8")
+        (checkout / "tests" / "test_gitleaks_config.py").write_text(self.FIXTURE_MODULE, encoding="utf-8")
+        no_test_run = (5, "NO TESTS RAN") if sys.version_info >= (3, 12) else (0, "OK")
+        for outcome, version, expected, status_line in (("ok", "1.8.1", 0, "OK"),
+                                                        ("ok+fail", "1.8.1", 0, "FAILED (failures=1)"),
+                                                        ("ok+fail+skip", "1.8.1", 0, "FAILED (failures=1, skipped=1)"),
+                                                        ("ok+error", "1.8.1", 1, "FAILED (errors=1)"),
+                                                        ("ok+fail+error", "1.8.1", 1, "FAILED (failures=1, errors=1)"),
+                                                        ("ok+fail+crash", "1.8.1", 3, "FAILED (failures=1)"),
+                                                        ("none", "1.8.1", *no_test_run),
+                                                        ("ok", "1.8.0", 1, None)):
+            with self.subTest(outcome=outcome, version=version):
+                rc, output, summary = self.run_step(self.FIXTURE_STEP, self.VERSION_STUB,
+                                                    {"FIXTURE_OUTCOME": outcome, "STUB_VERSION": version,
+                                                     "GITLEAKS_TESTS_REQUIRED": "1"}, cwd=checkout)
+                # Indented, so the stand-in's own FAIL:/ERROR: headers do not read as this test's.
+                self.assertEqual(rc, expected, textwrap.indent(output, "    | "))
+                if status_line is None:
+                    self.assertEqual(summary, "", "the version check comes before the tests")
+                    continue
+                self.assertRegex(summary, r"(?m)^Ran \d+ tests? in [\d.]+s; ")
+                self.assertIn(f"; {status_line}; unittest exit status ", summary)
+                self.assertNotIn("a detection difference", summary)
+                self.assertNotIn("not an assertion", summary)
 
     def test_fixture_tests_leave_out_the_unredacted_history_class(self):
         """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests scans history without

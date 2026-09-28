@@ -102,14 +102,14 @@
     "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",
     24,
     "local_test_passphrase",
-    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repository it initialises under its scratch-directory argument; the same value is in paper_arm.sh; owner confirmation pending (trading lane)"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repository it initialises under its scratch-directory argument; the same value is in paper_arm.sh; a fixed disposable test value, no retained repository (coordinator observation, 2026-09-28)"
    ],
    [
     "generic-password",
     "blueprints/gap-wave2-20260923/us-equities__observability-hosting/paper_arm.sh",
     32,
     "local_test_passphrase",
-    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repositories it initialises under its scratch-directory argument; the same value is in dagu_arm.sh; owner confirmation pending (trading lane)"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repositories it initialises under its scratch-directory argument; the same value is in dagu_arm.sh; a fixed disposable test value, no retained repository (coordinator observation, 2026-09-28)"
    ],
    [
     "generic-password",
@@ -123,7 +123,7 @@
     "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
     9,
     "local_test_passphrase",
-    "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing restic repository under a host state directory; the script lists, checks and restores that repository and does not create it; its comment calls the value a fixed disposable test string; owner confirmation pending"
+    "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing restic repository under a host state directory; the script lists, checks and restores that repository and does not create it; its comment calls the value a fixed disposable test string; that repository is not retained on the host that ran the script (coordinator observation, 2026-09-28)"
    ],
    [
     "generic-password",
@@ -281,7 +281,7 @@
     1,
     1,
     "local_test_passphrase",
-    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repository it initialises under its scratch-directory argument; the same value is in paper_arm.sh; owner confirmation pending (trading lane)"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repository it initialises under its scratch-directory argument; the same value is in paper_arm.sh; a fixed disposable test value, no retained repository (coordinator observation, 2026-09-28)"
    ],
    [
     "generic-password",
@@ -292,7 +292,7 @@
     1,
     1,
     "local_test_passphrase",
-    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repositories it initialises under its scratch-directory argument; the same value is in dagu_arm.sh; owner confirmation pending (trading lane)"
+    "25-character passphrase (lowercase words, digits and hyphens) that the test arm exports for the restic repositories it initialises under its scratch-directory argument; the same value is in dagu_arm.sh; a fixed disposable test value, no retained repository (coordinator observation, 2026-09-28)"
    ],
    [
     "generic-password",
@@ -325,7 +325,7 @@
     1,
     1,
     "local_test_passphrase",
-    "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing restic repository under a host state directory; the script lists, checks and restores that repository and does not create it; its comment calls the value a fixed disposable test string; owner confirmation pending"
+    "28-character passphrase (lowercase words, an 8-digit run and hyphens) for an existing restic repository under a host state directory; the script lists, checks and restores that repository and does not create it; its comment calls the value a fixed disposable test string; that repository is not retained on the host that ran the script (coordinator observation, 2026-09-28)"
    ],
    [
     "generic-password",
@@ -655,9 +655,9 @@
   "extra_in_fixtures": "3 generic-api-key detections at lines where gitleaks reported the sourcegraph rule (one per test d2, d4, d5)",
   "schema": "betterleaks writes an empty JSON report as null, gitleaks as []; 5 negative fixture tests failed on that alone until the tests read null as no findings (fixtures_ported)",
   "new_findings": "16 in dir mode and 91 in git mode, from betterleaks-only rules generic-password and generic-credential-uri and from generic-api-key on explorer HTML that gitleaks skips by size",
-  "real_secret_status": "pending_owner_confirmation",
-  "real_secret_note": "Value-blind triage matched no live credential, but it cannot close the three local_test_passphrase rows: an owner must confirm that no retained restic repository still uses their two values. Two rows sit in trading-lane paths. The 25-character value is also in 4 retained round copies of the step script the paper arm generates (raw/paper-arm-round5..8/cfg/hot_step.sh), and the 28-character value is also quoted in 2 receipts of the same recovery wave, one of which records it as the password of restic round trips that include a repository on the Windows drive. Neither scanner flags those 6 files.",
-  "pending_rows": [
+  "real_secret_status": "disposable_test_values_no_retained_repository",
+  "real_secret_note": "Value-blind triage matched no live credential. The three local_test_passphrase rows hold two fixed disposable test values for synthetic fixtures, and no restic repository they protected is retained: the coordinator's host observation of 2026-09-28 (our-integration; run-record.json, coordinator_repair.passphrase_rows). dagu_arm.sh and paper_arm.sh initialise their repositories under a per-run scratch-directory argument, rerun-isolated.sh comments its value as a fixed disposable test string, and restic-filesystem-semantics.json backs up trees that fixture.py builds. Neither the ai-memory rerun repository under the host state directory nor the Windows-drive gap-resolution-restic* directories exist on the host that ran them, and a depth-7 search of the home directory, /var/tmp and /tmp found no directory named restic-repo, restic-hot or gap-resolution-restic*. Two rows sit in trading-lane paths. The 25-character value is also in 4 retained round copies of the step script the paper arm generates (raw/paper-arm-round5..8/cfg/hot_step.sh), and the 28-character value is also quoted in 2 receipts of the same recovery wave, one of which records it as the password of restic round trips that include a repository on the Windows drive. Neither scanner flags those 6 files. Before a swap, allowlist these three rows by fingerprint, with this note as the reason.",
+  "local_test_passphrase_rows": [
    [
     "generic-password",
     "blueprints/gap-wave2-20260923/us-equities__observability-hosting/dagu_arm.sh",

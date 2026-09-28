@@ -6,7 +6,7 @@
  "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
  "host_id": "nativestack-5975wx-20260925",
  "platform_id": "linux-wsl2-x86_64",
- "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T04:38:27Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc"},
+ "run_window_utc": {"start": "2026-09-28T02:11:31Z", "last_recorded_run": "2026-09-28T07:07:16Z", "rounds": "first round from 02:11:31Z (its last retained check at 03:22:56Z, first_round_checks); review round in repair_round.window_utc; coordinator repair in coordinator_repair.window_utc"},
  "evidence_classes": {
   "upstream-unchanged": [
    "cosign v3.0.6 verify-blob of betterleaks v1.8.1 checksums.txt against its Sigstore bundle, and six failing controls",
@@ -20,7 +20,8 @@
    "value-blind triage of the redacted reports (parity.json)",
    "local simulation of the new job's run steps (harness/sim_job.py); not a GitHub Actions run",
    "tests/test_workflow_hardening.py BetterleaksTrialJobTests, with three failing controls in the first round and seventeen in the repair round",
-   "repair round: the job's final argument vectors over the recorded commit set and the worktree, the fingerprint-suppression and .git controls, and the explorer line-size measurement (repair_round)"
+   "repair round: the job's final argument vectors over the recorded commit set and the worktree, the fingerprint-suppression and .git controls, and the explorer line-size measurement (repair_round)",
+   "coordinator repair: the report-only job's exit-status controls on the verified binary, BetterleaksTrialJobTests with 42 failing controls, the local simulation, the final checks, and the coordinator's host observation for the three passphrase rows with a value-blind recheck (coordinator_repair)"
   ],
   "independent-observation": [
    "the repository's active ruleset, read back with gh api (repair_round.live_ruleset_readback); a configuration read, not a CI run"
@@ -341,7 +342,7 @@
     "25-character value": "4 files: evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5..8/cfg/hot_step.sh",
     "28-character value": "2 files: evidence/artifacts/gap-resolution-20260922/recovery-portability/local-ai-memory-qdrant-rebind.json (line 161) and restic-filesystem-semantics.json (line 141), whose limitations call it a fixed test string, acceptable for a disposable scratch repo",
     "flagged_by_either_scanner": 0},
-   "status": "owner confirmation pending; two rows are trading-lane paths"
+   "status": "owner confirmation pending at the end of the review round; two rows are trading-lane paths. Superseded by coordinator_repair.passphrase_rows (disposable_test_values_no_retained_repository)"
   },
   "hardening_test_controls": {
    "at": "2026-09-28T04:06:09Z", "script": "harness/mutation_controls.py <worktree>",
@@ -394,6 +395,178 @@
    "harness/run_scans.sh and harness/run_bl_git2.sh gained HOME and XDG_CACHE_HOME isolation after they produced the recorded first-round scans, so the committed bytes differ from the scripts that ran; their argument vectors and caps are unchanged. The repair round's scans used the same isolation.",
    "harness/triage.py now prints a descriptor of the text left of a match instead of that text with 12-character tokens masked; the first-round triage ran the earlier form, and its output was never committed. The changed script ran once at 2026-09-28T04:26:46Z on the recorded dir report: rc 0, 16 findings, 0 relocation failures, 16 left texts printed as descriptors.",
    "An intermediate edit of this file named the access-token rule of fixture tests d2, d4 and d5 by its id. At 2026-09-28T04:38:27Z the post-commit harness/scan_changed.sh run then had gitleaks 8.30.1 report that rule on this file's bare 40-hex commit ids (12 findings in dir mode, 3 in the git range; every Secret field REDACTED; betterleaks 0), because gitleaks tests every 40-hex value in a fragment that holds one of the rule's keywords. The entry was reworded without the keywords and the commits were rebuilt before the final scans."
+  ]
+ },
+ "coordinator_repair": {
+  "window_utc": {"start": "2026-09-28T06:56:56Z", "last_recorded_run": "2026-09-28T07:07:16Z"},
+  "trigger": "coordinator repair before the pull request opens (integrity wave, plan move M3): make the non-required trial job report-only, and resolve the three passphrase rows with the coordinator's host evidence",
+  "changes": [
+   "validate.yml secret-scan-betterleaks: --exit-code 0 on both scans, whose steps still exit with the scanner's own status; the fixture step turns unittest exit status 1 into 0 only when its last status line is FAILED (failures=N), with at most skipped=N added; the three steps append counts to the step summary; the step names say that findings or assertion failures do not fail the job; header and step comments",
+   "tests/test_workflow_hardening.py BetterleaksTrialJobTests: the assertion that no scan passes --exit-code is removed; three tests are added, one reading the flag and each scan step's exit path, two running the steps with GitHub's command for shell: bash over a stand-in scanner and a stand-in fixture module; the class docstring",
+   "harness/mutation_controls.py: 25 controls for the new assertions, the renamed step in one existing control, a green run of every named test before the controls, and failing test ids read from this class's own headers only",
+   "harness/sim_job.py: GITHUB_STEP_SUMMARY in scratch, printed at the end",
+   "harness/exit_code_controls.sh (new): the exit-status controls below",
+   "harness/gen_parity.py and parity.json: the three passphrase rows' descriptions, real_secret_status and real_secret_note, and pending_rows renamed local_test_passphrase_rows. The unchanged generator first reproduced the committed parity.json byte for byte from the scratch inputs; the regenerated file differs from it in those 10 fields only",
+   "README.md: the report-only job, section 5, the passphrase paragraph, deviations and Open before a swap; in this file, coordinator_repair and the superseded review-round status"
+  ],
+  "report_only_mechanism": {
+   "evidence_class": "upstream-unchanged source read of betterleaks at the v1.8.1 tag commit (the source archive of sources.betterleaks) and the verified binary's --help",
+   "flag": "cmd/root.go line 82 registers --exit-code with default 1, 'exit code when leaks have been encountered'; --help prints '--exit-code int  exit code when leaks have been encountered (default 1)'",
+   "exit_paths": "findingSummaryAndExit (cmd/root.go from line 571): a report that cannot be written is fatal (line 636, logging.Fatal on zerolog, exit 1); a scan error exits 1 (lines 640-641) before findings exit with --exit-code (lines 644-645). cmd/git.go and cmd/directory.go collect every source error of the run into that error",
+   "precedent": "security-scan.yml, zizmor online audits: --no-exit-codes and the step name '(findings do not fail this job)'; any non-zero exit is an analyzer failure that fails the step",
+   "fixture_step": {
+    "choice": "report-only for assertion failures, failing on anything else",
+    "sources": [
+     "CPython Lib/unittest/case.py _addError: an exception that subclasses the test's failureException (AssertionError) goes to addFailure, any other to addError",
+     "Lib/unittest/runner.py TextTestRunner.run: the closing line is FAILED with failures=N, errors=M and skipped=K as they apply, or OK, or NO TESTS RAN",
+     "Lib/unittest/main.py: exit 1 for an unsuccessful run, 5 when no test ran (Python 3.12 and later)",
+     "read locally from CPython 3.13.15"
+    ],
+    "reason": "parity.json fixtures_ported records 22 ok, 3 FAIL and 0 ERROR under betterleaks; the three failures (fixture tests d2, d4 and d5) come from the two tools' rule definitions, so a failing step would be red on every run",
+    "limit": "tests/test_gitleaks_config.py _run_gitleaks accepts scanner exit status 1 and raises AssertionError for any other unexpected status, so the fixture step cannot tell a scanner error from a detection difference; the two scan steps are the check for scanner errors"
+   },
+   "no_continue_on_error": "the job and its steps carry no continue-on-error (test_is_not_a_required_context_and_cannot_be_forced_green)"
+  },
+  "exit_code_controls": {
+   "at": "2026-09-28T06:56:56Z", "script": "harness/exit_code_controls.sh <worktree>, run from a byte-identical scratch copy beside the verified binary", "harness_rc": 0,
+   "planted": "one synthetic GitHub-token-shaped line, generated at run time and never printed, in a scratch directory removed afterwards",
+   "flags": "the job's dir-mode or git-mode flags with this repository's .gitleaks.toml and --redact; HOME and XDG_CACHE_HOME in scratch",
+   "results": {
+    "A dir, default --exit-code": {"rc": 1, "findings": 1},
+    "B dir, --exit-code 0": {"rc": 0, "findings": 1},
+    "C dir, --exit-code 0, an unreadable file": {"rc": 0, "findings": 1, "note": "the unreadable file is skipped without a scan error"},
+    "D dir, --exit-code 0, an unreadable directory": {"rc": 1, "findings": 1, "note": "permission denied is a scan error: a partial scan, the report written, exit 1"},
+    "E dir, --exit-code 0, a missing --config": {"rc": 1, "findings": "no report"},
+    "F dir, --exit-code 0, a report path in a missing directory": {"rc": 1},
+    "G git, --exit-code 0": {"rc": 0, "findings": 1},
+    "H git, --exit-code 0, an unknown revision": {"rc": 1, "findings": 0, "note": "git log fails: a partial scan, an empty report, exit 1"}
+   },
+   "control_directory_removed": true,
+   "real_home_after": {"~/.sigstore": "absent", "~/.cache/com.github.wasilibs": "absent"}
+  },
+  "hardening_test_controls": {
+   "at": "2026-09-28T06:57:53Z", "elapsed_s": 11, "script": "harness/mutation_controls.py <worktree>, run from a byte-identical scratch copy", "harness_rc": 0,
+   "green_before": "each of the 10 named tests ran alone on the unchanged files first: rc 0, one test, OK",
+   "controls": [
+    {"control": "--redact removed from the dir scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "--redact=0 on the dir scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "--max-archive-depth 0 removed from the history scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "--gitleaks-ignore-path removed from the dir scan", "test": "test_later_steps_need_the_verified_install_and_both_scans_redact", "rc": 1},
+    {"control": "job given name: secret-scan", "test": "test_is_not_a_required_context_and_cannot_be_forced_green", "rc": 1},
+    {"control": "an upload-artifact step added", "test": "test_read_only_hardened_and_uploads_nothing", "rc": 1},
+    {"control": "the job's bash default removed", "test": "test_runs_bash_with_pipefail", "rc": 1},
+    {"control": "a step overriding the shell", "test": "test_runs_bash_with_pipefail", "rc": 1},
+    {"control": "tar -xzf moved before cosign verify-blob", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "the pinned BETTERLEAKS_SHA256 check moved after extraction", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "--certificate-github-workflow-sha removed", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "the cosign digest check moved after cosign's first run", "test": "test_binaries_run_only_after_verification", "rc": 1},
+    {"control": "the history-ancestry class added to the fixture run", "test": "test_fixture_tests_leave_out_the_unredacted_history_class", "rc": 1},
+    {"control": "the whole module added to the fixture run", "test": "test_fixture_tests_leave_out_the_unredacted_history_class", "rc": 1},
+    {"control": ".betterleaksignore created at the root", "test": "test_no_suppression_channel_that_only_betterleaks_reads", "rc": 1},
+    {"control": ".betterleaks.toml created at the root", "test": "test_no_suppression_channel_that_only_betterleaks_reads", "rc": 1},
+    {"control": "the inline betterleaks allow comment appended to a tracked file", "test": "test_no_suppression_channel_that_only_betterleaks_reads", "rc": 1},
+    {"control": "--exit-code 0 removed from the history scan", "test": "test_findings_exit_0_through_the_scanners_own_option", "rc": 1},
+    {"control": "--exit-code 1 on the dir scan", "test": "test_findings_exit_0_through_the_scanners_own_option", "rc": 1},
+    {"control": "|| true in place of || status=$? on the dir scan", "test": "test_findings_exit_0_through_the_scanners_own_option", "rc": 1},
+    {"control": "status reset to 0 after the dir scan", "test": "test_findings_exit_0_through_the_scanners_own_option", "rc": 1},
+    {"control": "the history scan step exits 0", "test": "test_findings_exit_0_through_the_scanners_own_option", "rc": 1},
+    {"control": "an early exit 0 in the dir scan step", "test": "test_findings_exit_0_through_the_scanners_own_option", "rc": 1},
+    {"control": "--exit-code 0 removed from the history scan", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "--exit-code 1 on the dir scan", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "|| true in place of || status=$? on the dir scan", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the history scan step exits 0", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the history summary also prints each finding's Secret", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the dir summary counts by file", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "no step summary from the history scan", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the dir summary reads a null report without the [] default", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the history log lists each finding's Secret instead of its line", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the dir summary leaves out the exit status", "test": "test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule", "rc": 1},
+    {"control": "the fixture step exits 0 whatever the tests did", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the report-only pattern accepts any FAILED line", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the report-only branch removed", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "any nonzero unittest exit status accepted", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the betterleaks version check removed", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the version check moved after the step summary", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the unittest log copied into the step summary", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the status line left out of the step summary", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1},
+    {"control": "the run line left out of the step summary", "test": "test_fixture_step_reports_assertion_failures_and_fails_on_anything_else", "rc": 1}
+   ],
+   "each_failed_only_its_test": true, "files_restored_byte_identical": true, "green_rc": 0, "green_summary": "Ran 10 tests; OK",
+   "removed_assertion": "test_later_steps_need_the_verified_install_and_both_scans_redact no longer asserts that no scan passes --exit-code; test_findings_exit_0_through_the_scanners_own_option asserts --exit-code 0 instead, so the removal has no control of its own",
+   "repeat": "final_checks ran the same 42 controls again on the same bytes with the same result"
+  },
+  "local_simulation": {
+   "at": "2026-09-28T06:58:20Z", "elapsed_s": 117, "simulator_rc": 0,
+   "script": "harness/sim_job.py <worktree> <scratch>/ci-sim, run from a byte-identical scratch copy",
+   "containment": "ecosystem-bounded-run with the caps of harness/run_bl_git2.sh: 28G memory.high, 32G memory.max, no swap, 3600 s, 256 tasks",
+   "shell": "bash --noprofile --norc -eo pipefail, GitHub's command for the job's defaults.run.shell: bash",
+   "steps": {
+    "Harden the runner (audit-only network egress)": "uses-step, not simulated",
+    "Check out repository with full history": "uses-step, not simulated",
+    "Install cosign pinned by digest": 0,
+    "Install betterleaks after Sigstore and checksum verification": 0,
+    "Run the gitleaks allowlist fixture tests with betterleaks (assertion failures do not fail this job)": 0,
+    "Scan git history for secrets with betterleaks (findings do not fail this job)": 0,
+    "Scan working tree for secrets with betterleaks (findings do not fail this job)": 0},
+   "install_output_tail": {"stdout": ["betterleaks_1.8.1_linux_x64.tar.gz: OK", "betterleaks_1.8.1_linux_x64.tar.gz: OK", "1.8.1"], "stderr": ["Verified OK"]},
+   "fixture_summary": "Ran 25 tests in 5.985s; FAILED (failures=3)",
+   "history": "scanned ~1156561899 bytes (1.16 GB) in 1m48s; leaks found: 91",
+   "tree": "scanned ~138935645 bytes (138.94 MB) in 900ms; leaks found: 16",
+   "step_summary": [
+    "### betterleaks fixture tests (assertion failures do not fail this job)",
+    "Ran 25 tests in 5.985s; FAILED (failures=3); unittest exit status 1",
+    "### betterleaks history scan (findings do not fail this job; secret-scan is the gate)",
+    "Findings: 91", "- generic-api-key: 73", "- generic-credential-uri: 6", "- generic-password: 12", "betterleaks exit status: 0",
+    "### betterleaks working-tree scan (findings do not fail this job; secret-scan is the gate)",
+    "Findings: 16", "- generic-credential-uri: 6", "- generic-password: 10", "betterleaks exit status: 0"
+   ],
+   "per_rule_counts_match_parity_json": true,
+   "note": "this run's history scan took 1m48s under the bounded runner; the review round's simulation recorded 53.1 s",
+   "real_home_after": {"~/.sigstore": "absent", "~/.cache/com.github.wasilibs": "absent"}
+  },
+  "passphrase_rows": {
+   "status": "disposable_test_values_no_retained_repository",
+   "supersedes": "repair_round.passphrase_rows.status",
+   "coordinator_observation": {
+    "evidence_class": "our-integration: the coordinator's observation on the host that ran the scripts, 2026-09-28, given to this repair; no values, host paths or usernames",
+    "facts": [
+     "All three rows are the scripts' fixed disposable test strings for synthetic fixtures: rerun-isolated.sh comments its value as a fixed disposable test string; dagu_arm.sh and paper_arm.sh create their repositories under the per-run scratch-directory argument $R; restic-filesystem-semantics.json backs up trees built by fixture.py",
+     "None of the recorded repositories exists on the host that ran them: not the ai-memory rerun repository under the host state directory, and not the Windows-drive gap-resolution-restic* directories",
+     "find over the home directory, /var/tmp and /tmp at depth 7 found no directory named restic-repo, restic-hot or gap-resolution-restic*"
+    ]
+   },
+   "repair_recheck": {
+    "at": "2026-09-28T07:01:57Z",
+    "evidence_class": "our-integration: value-blind; existence and counts only",
+    "repository": "dagu_arm.sh line 16 and paper_arm.sh line 22 set R from the required first argument (usage: <scratch-dir>), and their restic repositories sit under $R; rerun-isolated.sh carries the fixed-disposable-test-string comment and no restic init; the commands of restic-filesystem-semantics.json build their source tree with fixture.py",
+    "host": {"the wave's state root, the app-state directory rerun-isolated.sh names and its repo": "absent", "Windows-drive gap-resolution-restic* under any user profile": 0, "find over the home directory, /var/tmp and /tmp, depth 7, the three names": 0},
+    "find_positive_control": {"at": "2026-09-28T07:02:08Z", "planted": "one empty scratch directory named restic-repo under /var/tmp", "matches": 1, "removed": true},
+    "find_coverage": "142,683 directories visited; find exits 1 because it could not read 9 directories, all systemd or snap private service directories under /tmp and /var/tmp, none in the home directory"
+   },
+   "still_open": "the 25-character value is also in 4 retained round copies of the paper arm's step script and the 28-character value in 2 receipts of the same recovery wave; neither scanner flags those 6 files. Before a swap, allowlist the three rows by fingerprint, with this record as the reason"
+  },
+  "final_checks": {
+   "window": "2026-09-28T07:06:36Z to 2026-09-28T07:07:06Z, then the rerun below, on the final bytes of validate.yml, both test modules and the harness, before commit; this file's final_checks and window fields and README.md were written afterwards",
+   "script": "harness/final_checks.sh <worktree> <scratch>/lint, run from a byte-identical scratch copy",
+   "gitleaks_on_path": "the host's ecosystem gitleaks launcher, reporting 8.30.1",
+   "python3 -m unittest tests.test_gitleaks_config": {"rc": 0, "result": "Ran 28 tests in 2.492s; OK (skipped=21)",
+    "skip": "the plain output names no reason; the module skips a test when the guarded launcher reports its per-user lock held by another scan",
+    "rerun": {"at": "2026-09-28T07:07:16Z", "elapsed_s": 82, "verbose": true, "rc": 0, "result": "Ran 28 tests in 82.339s; OK", "skipped": 0}},
+   "python3 -m unittest tests.test_workflow_hardening": {"rc": 0, "result": "Ran 71 tests in 1.430s; OK (skipped=2)"},
+   "python3 -m unittest tests.test_catalog_freshness_pins": {"rc": 0, "result": "Ran 6 tests in 0.001s; OK"},
+   "python3 -m unittest tests.test_workflow_security": {"rc": 0, "result": "Ran 2 tests in 0.115s; OK"},
+   "python3 -m unittest tests.test_workflow_security_coverage": {"rc": 0, "result": "Ran 7 tests in 0.340s; OK"},
+   "harness/mutation_controls.py": {"rc": 0, "controls": 42, "all_named_tests_green_before": true, "all_failed_their_test": true, "files_restored_byte_identical": true, "green_rc": 0, "green_summary": "Ran 10 tests in 0.668s; OK"},
+   "zizmor 1.30.1 (validate.yml command, offline)": {"rc": 0, "result": "No findings to report. Good job! (43 suppressed)", "note": "the same output line as the review round's final checks"},
+   "actionlint 1.7.12 with shellcheck 0.11.0": {"all_workflows_rc": 0, "validate_yml_rc": 0, "output_lines": 0},
+   "shellcheck 0.11.0 on harness/*.sh": {"rc": 0, "output_lines": 0, "note": "includes harness/exit_code_controls.sh"},
+   "scripts/validate.py": {"rc": 1, "note": "before the re-registration: SHA-256 and byte-count mismatches for the changed hash-listed files, and harness/exit_code_controls.sh not yet hash-listed. The branch's last commit re-registers them in manifests/evidence.json (docs/lanes.md, hot-file protocol), and its message records the run after that"},
+   "real_home_after": {"at": "2026-09-28T07:10:08Z", "~/.sigstore": "absent", "~/.cache/com.github.wasilibs": "absent"}
+  },
+  "deviations": [
+   "An exploratory run of the eight exit-status cases, from a scratch command that was not kept, came before harness/exit_code_controls.sh; it gave the same exit statuses, and the script's run is the recorded one.",
+   "The first run of the 42 controls (2026-09-28T06:57:06Z) counted 4 fixture controls as also failing test_fail and test_error: the stand-in module's own FAIL and ERROR headers, quoted in the failure message. Each of the 4 exited 1. The test now indents that output, the harness reads only this class's own headers, and the 06:57:53Z rerun is the recorded one.",
+   "final_checks' first tests.test_gitleaks_config run skipped 21 of 28 tests without a printed reason; the verbose rerun ten seconds later skipped none."
   ]
  },
  "deviations": [

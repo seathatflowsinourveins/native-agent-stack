@@ -2,23 +2,26 @@
 
 Local evidence for plan move M3, recorded on host `nativestack-5975wx-20260925` (WSL2, x86_64) from base
 commit `ba1700ad` (the full `catalog_revision` is in [`run-record.json`](run-record.json)). A review round
-followed on 2026-09-28 (UTC); its reruns and controls are under `repair_round` in `run-record.json`. The
-change adds one job, its tests and one test port:
+followed on 2026-09-28 (UTC); its reruns and controls are under `repair_round` in `run-record.json`. A
+coordinator repair followed the same day ([section 5](#5-report-only-job-and-passphrase-rows-coordinator-repair-2026-09-28);
+`coordinator_repair`). The change adds one job, its tests and one test port:
 
 1. [`.github/workflows/validate.yml`](../../../.github/workflows/validate.yml) gains
    `secret-scan-betterleaks` next to the required `secret-scan` job. Its context is absent from
    [`.github/main-ruleset.json`](../../../.github/main-ruleset.json) and from the live ruleset read back on
-   2026-09-28, so a red run informs and never blocks a merge.
+   2026-09-28, so no run of it blocks a merge.
 2. [`tests/test_workflow_hardening.py`](../../../tests/test_workflow_hardening.py) gains
-   `BetterleaksTrialJobTests` (7 tests).
+   `BetterleaksTrialJobTests` (7 tests in the review round, 10 since the coordinator repair).
 3. [`tests/test_gitleaks_config.py`](../../../tests/test_gitleaks_config.py) reads a JSON report of `null`
    as no findings. betterleaks writes an empty report that way; gitleaks writes `[]` and is unaffected.
 
 The required `secret-scan` job, the pre-commit hook, the pins files and `catalog-freshness.yml` are
 unchanged.
 
-**The trial job is red on every run until the triage below lands**, so its status does not say whether a
-change adds a secret. The required `secret-scan` job stays the gate.
+**The trial job is report-only.** Findings and fixture-test assertion failures appear as counts in its step
+summary and do not fail it, so it is red only when verification, the scanner or the test run errors
+(section 5). Its green does not say that a change adds no secret: the required `secret-scan` job stays the
+gate.
 
 **Why betterleaks.** The gitleaks README on `master` (line 12, read 2026-09-28T03:04Z) says: "Gitleaks
 is feature complete. I'm not merging new features into Gitleaks. Future releases will be security
@@ -33,7 +36,8 @@ and GitHub holds no attestation for its archive.
 - `our-integration`: the unchanged binaries run over this repository and over the fixture classes of
   `tests/test_gitleaks_config.py`, our value-blind triage of the redacted reports, the review round's
   reruns and controls, a local simulation of the job's run steps, and the new hardening tests with their
-  failing controls.
+  failing controls. Also the coordinator repair's exit-status controls, tests and simulation, and the
+  coordinator's host observation for the three passphrase rows (section 5).
 - `independent observation` (the policy's platform-record class): the repository's active ruleset, read
   back with `gh api`. This is a configuration read, not a CI run.
 - `live-run-pending`: the job on a GitHub-hosted runner, and zizmor's online audits.
@@ -144,13 +148,14 @@ value length, character classes, shape and marker words were printed; no value w
 | An all-caps `REPLACE_...` placeholder in an example config (history only) | 0 | 1 |
 
 **Value-blind triage identified no live credential, and it cannot confirm that none exists.** The three
-passphrase rows need an owner to confirm that no retained restic repository still uses their values;
-two of them sit in trading-lane paths. `rerun-isolated.sh` calls its value a fixed disposable test
-string. On the recording host, the state directory that the script names was absent (stat only,
-2026-09-28T04:16Z). The same 25-character value is also in 4 retained round copies of the step script
-that the paper arm generates. The 28-character value is also quoted in 2 receipts of the same recovery
-wave. Neither scanner flags those 6 files. Before any swap, each class needs an allowlist, a fingerprint
-or a fix.
+passphrase rows are fixed disposable test values for synthetic fixtures, and no repository they protected
+is retained. Their status is `disposable_test_values_no_retained_repository`, from the coordinator's host
+observation of 2026-09-28 (section 5). Two of them sit in trading-lane paths. `rerun-isolated.sh` calls its
+value a fixed disposable test string. On the recording host, the state directory that the script names was
+absent (stat only, 2026-09-28T04:16Z). The same 25-character value is also in 4 retained round copies of the
+step script that the paper arm generates. The 28-character value is also quoted in 2 receipts of the same
+recovery wave. Neither scanner flags those 6 files. Before any swap, each class needs an allowlist, a
+fingerprint or a fix; the three passphrase rows get fingerprints, with section 5 as the reason.
 
 Resources: under the host gitleaks guard's caps (4G high, 6G max, no swap, 600 s), the first betterleaks
 history scan was stopped at 602.7 s with no report. At 542 s it had a 5.3 GiB resident set and 43.1%
@@ -168,9 +173,11 @@ without pipefail. The steps run in this order:
 3. cosign fetched by URL and checked against the installer's pinned digest.
 4. betterleaks: `verify-blob` with the identity above, then the signed checksums, then the archive
    digest pin, then extraction.
-5. The three fixture classes, run through a `gitleaks` symlink to the verified binary.
-6. The redacted history and tree scans, with `--max-archive-depth 0` and `--gitleaks-ignore-path
-   .gitleaksignore`. They print rule, file and line only.
+5. The three fixture classes, run through a `gitleaks` symlink to the verified binary. Assertion failures
+   are reported, not failed (section 5).
+6. The redacted history and tree scans, with `--max-archive-depth 0`, `--gitleaks-ignore-path
+   .gitleaksignore` and `--exit-code 0`. They print rule, file and line only, and count findings by rule
+   in the step summary.
 
 Permissions are `contents: read`. The actions are pinned by SHA. The job uploads no artifact, no step
 receives `GH_TOKEN`, and checkout does not persist credentials. Steps 5 and 6 need a successful install
@@ -179,7 +186,8 @@ step.
 The history-ancestry class of `tests/test_gitleaks_config.py` is left out, because it scans without
 `--redact` and its failure message quotes the findings. The redacted history scan covers that ground.
 
-These checks were run on the final files (details in `run-record.json`, `repair_round`):
+The review round ran these checks on its final files (details in `run-record.json`, `repair_round`).
+Section 5 has the coordinator repair's reruns on the files as they now stand.
 
 - **Hardening tests.** The 7 new tests pass (rc 0). 17 changes each fail the test that covers them
   (rc 1), and the files were restored byte-identical (`harness/mutation_controls.py`). The changes are:
@@ -197,8 +205,8 @@ These checks were run on the final files (details in `run-record.json`, `repair_
     in a tracked file.
 - **Local simulation** (`harness/sim_job.py`, with GitHub's command for `shell: bash`). The install
   steps returned 0. The fixture step and both scans returned 1: `Ran 25 tests; FAILED (failures=3)`,
-  91 history findings and 16 tree findings. So until the triage above is resolved, **the job's first
-  hosted run is expected to be red**.
+  91 history findings and 16 tree findings. That was before the job became report-only; in section 5's
+  rerun every run step returns 0.
 - **zizmor 1.30.1** (the `validate.yml` command, offline): rc 0 with "No findings to report" and 43
   suppressed findings, one more than before the change. The added one is `anonymous-definition` at the
   new job, which carries no `name:` so it can never take the required context's name.
@@ -213,6 +221,86 @@ These checks were run on the final files (details in `run-record.json`, `repair_
   - The 17 changes above failed their tests again, zizmor gave the same output, actionlint and
     shellcheck (also on the harness scripts) printed nothing, and `scripts/validate.py` passed.
   - Both scanners found nothing in the 25 changed or new files, or in the branch's commit.
+
+## 5. Report-only job and passphrase rows (coordinator repair, 2026-09-28)
+
+Before the pull request opened, the coordinator repaired two things. Details are in `run-record.json`,
+`coordinator_repair`.
+
+**Report-only through the scanner's own option.** Both scans pass `--exit-code 0`. In betterleaks v1.8.1,
+`cmd/root.go` line 82 registers that flag ("exit code when leaks have been encountered", default 1); the
+verified binary's `--help` prints the same text. `findingSummaryAndExit` exits 1 on a scan error before it
+uses that status (lines 640-641, then 644-645), and a report it cannot write is fatal (line 636). So
+findings exit 0, a scanner error still exits 1, and each scan step exits with the scanner's own status.
+The precedent is `security-scan.yml`'s zizmor online audits: `--no-exit-codes`, "findings do not fail this
+job". The job has no `continue-on-error`.
+
+**The fixture step reports assertion failures and fails on anything else.** Fixture tests d2, d4 and d5
+fail on every run on the rule difference in section 3, so a failing step would keep the job red. CPython's
+`unittest` counts an `AssertionError` as a failure and any other exception as an error
+(`Lib/unittest/case.py`, `_addError`). It writes a closing status line (`Lib/unittest/runner.py`) and exits
+1 for an unsuccessful run and 5 when no test ran (`Lib/unittest/main.py`, Python 3.12 and later). The step
+turns exit status 1 into 0 only when that line reads `FAILED (failures=N)`, with at most `skipped=N` added.
+An error, no test run, another exit status or a missing line fails it. One limit remains:
+`_run_gitleaks` accepts scanner exit status 1 and turns any other unexpected status into an
+`AssertionError`, so this step cannot tell a scanner error from a detection difference. The two scans are
+the check for scanner errors.
+
+**Step summary.** The scans append their finding count, the count per rule id and the scanner's exit
+status. The fixture step appends unittest's run line, its status line and its exit status. No value, path
+or failure message reaches the summary; the log still lists rule, file and line.
+
+**Checks on the files as they now stand (our-integration).**
+
+- **Exit-status controls** on the verified binary (`harness/exit_code_controls.sh`), over one generated
+  token-shaped line that is never printed. Default flags exit 1. `--exit-code 0` exits 0 in dir and git
+  mode. With `--exit-code 0`, four cases each exit 1: an unreadable directory (a partial scan), a missing
+  `--config`, a report path in a missing directory, and an unknown revision in `--log-opts`. An unreadable
+  file is skipped without a scan error (rc 0).
+- **Hardening tests.** `BetterleaksTrialJobTests` has 10 tests. The review round's assertion that no scan
+  passes `--exit-code` is removed. Three tests are new:
+  - one reads the flag and each scan step's exit path;
+  - two run the steps with GitHub's command for `shell: bash`, one with a stand-in scanner that follows
+    the exit paths above, the other with a stand-in fixture module.
+
+  42 controls each fail their test and only that test (`harness/mutation_controls.py`): the review round's
+  17, one of them updated for the renamed step, and 25 new. Every named test ran green first, and the
+  files were restored byte-identical.
+- **Local simulation** (`harness/sim_job.py` with a scratch step summary, under the bounded runner with the
+  review round's raised caps). Every run step returned 0. The fixture step reported `Ran 25 tests; FAILED
+  (failures=3)`. The scans reported 91 and 16 findings, with the same per-rule counts as `parity.json`. The
+  job's first hosted run is expected to be green unless verification, the scanner or the test run errors
+  there.
+- **Final checks** (`harness/final_checks.sh`, before commit):
+  - `tests.test_workflow_hardening` ran 71 tests: OK, 2 skipped as before.
+  - `tests.test_gitleaks_config` passed 28 of 28 with gitleaks 8.30.1. The first run skipped 21 without a
+    printed reason; a verbose rerun ten seconds later skipped none.
+  - The freshness-pin and workflow-security modules passed, and the 42 controls failed their tests again.
+  - zizmor 1.30.1 gave the review round's output line: "No findings to report", 43 suppressed.
+  - actionlint 1.7.12 with shellcheck 0.11.0, and shellcheck on the harness scripts, printed nothing.
+  - `scripts/validate.py` runs after the re-registration in the branch's last commit, whose message records
+    the result.
+
+**Passphrase rows: `disposable_test_values_no_retained_repository`.** The coordinator recorded these facts
+on 2026-09-28, on the host that ran the scripts (our-integration; no values, host paths or usernames):
+
+- All three rows are the scripts' fixed disposable test strings for synthetic fixtures:
+  - `rerun-isolated.sh` comments its value as a fixed disposable test string;
+  - `dagu_arm.sh` and `paper_arm.sh` create their repositories under the per-run scratch-directory
+    argument `$R`;
+  - `restic-filesystem-semantics.json` backs up synthetic trees built by `fixture.py`.
+- None of the recorded repositories exists on that host: not the ai-memory rerun repository under the host
+  state directory, and not the Windows-drive `gap-resolution-restic*` directories.
+- `find` over the home directory, `/var/tmp` and `/tmp` at depth 7 found no directory named
+  `restic-repo`, `restic-hot` or `gap-resolution-restic*`.
+
+A value-blind recheck by the repair at 2026-09-28T07:01Z matched each point. The search was
+positive-controlled: a planted `restic-repo` directory under `/var/tmp` was found (1 match) and then
+removed. It visited 142,683 directories. The 9 it could not read are systemd or snap private service
+directories under `/tmp` and `/var/tmp`.
+
+The same values also sit in 6 tracked files that neither scanner flags (section 3). Before a swap, allowlist
+the three rows by fingerprint, with this record as the reason.
 
 ## Deviations and host side effects
 
@@ -243,24 +331,32 @@ These checks were run on the final files (details in `run-record.json`, `repair_
   in the branch range, all redacted. betterleaks reported none. The entry was reworded without the
   keywords, the commits were rebuilt, and the scans were repeated clean. Keep that rule's keywords out
   of any receipt file that holds commit ids.
+- **Coordinator repair, exploratory exit-status run.** Before `harness/exit_code_controls.sh` existed, a
+  scratch command that was not kept ran the same eight cases. It gave the same exit statuses, and the
+  script's run is the recorded one.
+- **Coordinator repair, first control run.** The first run of the 42 controls counted 4 fixture controls as
+  also failing `test_fail` and `test_error`. Those were the stand-in module's own headers, quoted in the
+  failure message; each control's exit status was 1. The test now indents that output, the harness reads
+  only this class's own headers, and the rerun is the recorded one.
 
 A betterleaks pre-commit hook would write the wazero cache on every developer host.
 
 ## Open before a swap
 
-- **Owner confirmation.** An owner must confirm that no retained restic repository uses the three
-  passphrase values, including the 6 unflagged files that hold the same values. Two rows need the
-  trading lane.
+- **Passphrase rows.** Allowlist the three rows by fingerprint, with section 5 as the reason: fixed
+  disposable test values for synthetic fixtures, and no retained repository. The 6 unflagged files that
+  hold the same values need nothing from either scanner. Two rows are trading-lane paths.
 - **Triage.** Allowlist, fingerprint or fix the 16 tree findings and 91 history findings.
 - **The `sourcegraph-access-token` difference.** Decide whether it matters; the three fixture tests
-  d2, d4 and d5 fail on it.
+  d2, d4 and d5 fail on it, and the trial reports those failures without failing.
 - **Archives.** The trial passes `--max-archive-depth 0`. Decide whether the swapped gate should open
   archives, and give the pre-commit hook the same flags as the job.
 - **Suppression channels.** Keep `test_no_suppression_channel_that_only_betterleaks_reads` and the
   explicit `--gitleaks-ignore-path` through the swap.
-- **Signal.** The trial is red on every run until the triage lands. A baseline report or a trial-only
-  ignore file would make red mean "new finding", but either would accept the untriaged rows first. Plan
-  M3 swaps only when every new hit is triaged.
+- **Signal.** The trial is report-only (section 5): it stays green with findings, and its step summary
+  counts them by rule. A baseline report or a trial-only ignore file would make a finding mean "new", but
+  either would accept the untriaged rows first. Plan M3 swaps only when every new hit is triaged, and the
+  swapped gate must fail on findings again, without `--exit-code 0`.
 - **Memory.** The history scan's 7.9 GiB peak must be measured on a hosted runner.
 - **Unenforced size limit.** `--max-target-megabytes` is not enforced in git mode.
 - **Freshness.** The betterleaks and cosign pins are not in the catalog-freshness table; this change
@@ -272,9 +368,9 @@ A betterleaks pre-commit hook would write the wazero cache on every developer ho
 
 | File | What it is |
 | --- | --- |
-| [`run-record.json`](run-record.json) | Sources, download digests, verification outputs and controls, scans with resources, fixture counts, CI simulation, lint, tests, deviations, and the review round's reruns, controls and final checks |
+| [`run-record.json`](run-record.json) | Sources, download digests, verification outputs and controls, scans with resources, fixture counts, CI simulation, lint, tests, deviations, the review round's reruns, controls and final checks, and the coordinator repair (`coordinator_repair`) |
 | [`parity.json`](parity.json) | Rule, file and line of every new finding with its triage class, the per-test fixture outcomes before and after the port, and the classification |
-| [`harness/`](harness/) | Every local script that produced a result recorded here, including the review round's: scans, fixture collectors, value-blind triage, size measurement, controls, job simulator, final checks and the `parity.json` generator. They are thin wrappers around the upstream binaries, labelled local integration. |
+| [`harness/`](harness/) | Every local script that produced a result recorded here, including the review round's and the coordinator repair's: scans, fixture collectors, value-blind triage, size measurement, controls (among them the exit-status controls), job simulator, final checks and the `parity.json` generator. They are thin wrappers around the upstream binaries, labelled local integration. |
 
 The branch's post-commit range scans are reported with the pull request, because recording them here
 would change the commits they scan. Raw reports, logs and tracebacks stay outside the repository. Host
