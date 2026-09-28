@@ -681,7 +681,7 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
 | Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location, and since 2026-09-27 the [home and tool credential stores](#home-and-tool-credential-stores-2026-09-27)); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential`; through the `**/` twins, Context Mode's `ctx_execute_file` and `ctx_index` on the same paths | Python or other subprocesses that open the files themselves, including code run by Context Mode's `ctx_execute` or `ctx_batch_execute` that opens a file directly; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, or any path the template's credential-store `Read` denies cover: anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, an OmniRoute data directory or a `shell_snapshots` directory, each directory and a glob in it, the Docker home, the Docker, git-credential, netrc, npm and PyPI files, and `nativestack/*.key` ([2026-09-27](#home-and-tool-credential-stores-2026-09-27), which on an RTK host is what stops `cat` of them); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal, and every rule reads the command an `rtk` invocation runs ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)) | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, the credential-store gaps recorded under [2026-09-27](#home-and-tool-credential-stores-2026-09-27) (an archiver, a copy or search of `~/.config`, `~/.codex` or `~/.claude`, a client that prints its own store, an OmniRoute `DATA_DIR` elsewhere), obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, or any path the template's credential-store `Read` denies cover: anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, an OmniRoute data directory, a `shell_snapshots` directory or the OpenHands runtime-worker `runtime-workers/openhands/secrets` directory, each directory and a glob in it, the Docker home, the Docker, git-credential, netrc, npm and PyPI files, and `nativestack/*.key` ([2026-09-27](#home-and-tool-credential-stores-2026-09-27), which on an RTK host is what stops `cat` of them); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal, and every rule reads the command an `rtk` invocation runs ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)) | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, the credential-store gaps recorded under [2026-09-27](#home-and-tool-credential-stores-2026-09-27) (an archiver, a copy or search of `~/.config`, `~/.codex`, `~/.claude` or the runtime-worker state directory, a client that prints its own store, an OmniRoute `DATA_DIR` elsewhere, and `docker exec` into the OpenHands agent-server or a full `docker inspect` of it, which show its session key), obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can
@@ -879,6 +879,8 @@ For a host that does not use the template, merge the same rules by hand under
 "Read(~/.codex/shell_snapshots/**)", "Read(**/.codex/shell_snapshots/**)",
 "Read(//mnt/*/Users/*/AppData/Roaming/omniroute/**)", "Read(**/mnt/*/Users/*/AppData/Roaming/omniroute/**)",
 "Read(//mnt/*/Users/*/.omniroute/**)", "Read(**/mnt/*/Users/*/.omniroute/**)",
+"Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+"Read(**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
 "Edit(~/.bashrc)", "Edit(~/.profile)", "Edit(~/.zshrc)",
 "Bash(printenv)", "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
 "Bash(hf auth token)", "Bash(hf auth token *)",
@@ -911,7 +913,7 @@ credential stores that other tools keep in the home directory: `~/.ssh`,
 `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, `~/.docker/config.json`,
 `~/.git-credentials`, `~/.netrc`, `~/.npmrc` and `~/.pypirc`, each with its
 `**/` twin (corroborated by trailofbits/claude-code-config at `2109be9`,
-`settings.json`). Two more stores join them:
+`settings.json`). Three more stores join them:
 
 - **OmniRoute's data directory.** It holds the gateway's SQLite database,
   with the provider OAuth tokens and API keys it holds, its logs and
@@ -936,6 +938,17 @@ credential stores that other tools keep in the home directory: `~/.ssh`,
   ([sweep README](../tools/sota-convergence/landscape-sweep/README.md)). The rules cover
   `~/.codex/shell_snapshots`; a lane-local `CODEX_HOME` elsewhere is covered
   only by the guard's reader rule below.
+- **OpenHands runtime-worker session keys (2026-09-28).** For each attempt
+  the runtime worker's host driver (PR #425, which adds the
+  `openhands-session` inventory row) generates an agent-server session key
+  and writes it at mode `0600`, in a `0700` directory, to
+  `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/`:
+  `<run-id>-<arm>.server.env` in Docker env-file syntax
+  (`OH_SESSION_API_KEYS_0=<value>`) and `<run-id>-<arm>.headers`, a header
+  line that curl reads with `-H @file`. It deletes both once the attempt's
+  containers are confirmed removed. The template alone carries
+  `Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)`
+  and its twin, because the user settings reach every session on the host.
 
 The template alone adds `Edit(~/.bashrc)`, `Edit(~/.profile)` and
 `Edit(~/.zshrc)`: the operator, not an agent, writes the pointer exports of
@@ -982,7 +995,10 @@ match").
 `scripts/hooks/secret_path_guard.py` therefore blocks a reader, copy or
 search of every path those `Read` denies cover as `credential_file_read`.
 That is anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`,
-an OmniRoute data directory or any `shell_snapshots` directory, each
+an OmniRoute data directory, any `shell_snapshots` directory or a
+`runtime-workers/openhands/secrets` directory (since 2026-09-28; its
+`.server.env` files, which the dotenv rule already caught, are now reported
+as reads of the directory), each
 directory itself and a glob in it (`cp -r ~/.ssh`, `grep -r BEGIN
 ~/.ssh`, `cat ~/.aws/*`, `find ~/.ssh -type f -exec cat {} +`). It also
 covers the files `~/.docker/config.json`, `~/.git-credentials`,
@@ -996,11 +1012,13 @@ project settings, and expects `cat`, `head -n`, `tail -n` and `rtk read`
 of that path to be blocked.
 
 Clients that use a key or a store (`ssh -i`, `ssh-add`, `ssh-keygen -y
--f`, `kubectl --kubeconfig`, `curl --netrc`, `gh ssh-key add`), listings,
-`stat` and `chmod` pass, because the user hook runs in every session.
-Three clients name a store as the operand of a program the guard treats
+-f`, `kubectl --kubeconfig`, `curl --netrc`, `gh ssh-key add`, `docker run
+--env-file`), listings, `stat` and `chmod` pass, because the user hook runs
+in every session.
+Four clients name a store as the operand of a program the guard treats
 as a reader, so they are blocked too: `scp -i KEY`, `rsync -e 'ssh -i
-KEY'` and `gpg --homedir ~/.gnupg`. A key named in `~/.ssh/config` or
+KEY'`, `gpg --homedir ~/.gnupg` and `curl -H @FILE` on an OpenHands header
+file named by its path. A key named in `~/.ssh/config` or
 loaded with `ssh-add`, and `gpg` without `--homedir`, avoid that. A search's own
 pattern is not a file it reads (grep(1): `PATTERNS [FILE...]`), so `rg
 shell_snapshots docs` and `grep -nF '.ssh/id_ed25519' README.md` pass.
@@ -1018,11 +1036,24 @@ Recorded gaps, asserted in `tests/test_secret_path_guard.py`:
   database;
 - an archiver (`tar czf k.tgz ~/.ssh`);
 - a glob that names a store only after the shell expands it (`~/.n*rc`);
-- a copy or search of an ancestor of a store (`~/.config`, or `~/.codex`,
-  which holds `shell_snapshots`);
+- a copy or search of an ancestor of a store (`~/.config`, `~/.codex`,
+  which holds `shell_snapshots`, or the runtime-worker state directory
+  `runtime-workers/openhands`, which holds `secrets`);
 - a copy or search of a directory that holds an older store file
   (`~/.claude`, whose `.credentials.json` the guard blocks only by name);
-- an OmniRoute `DATA_DIR` elsewhere.
+- an OmniRoute `DATA_DIR` elsewhere;
+- the OpenHands agent-server's own environment (2026-09-28): `docker exec
+  <server> printenv`, or a shell in the container, and a full `docker
+  inspect <server>`, whose `Config.Env` holds the key, show the session
+  key, and the guard does not model docker subcommands. The variable name
+  `OH_SESSION_API_KEYS_0` is not one of the guard's secret names. It is set
+  only inside the container, never on the host, so `$OH_SESSION_API_KEYS_0`
+  in a host command expands to nothing. Listing it would stop only a shell
+  in the container that expands it (`docker exec <server> sh -c 'echo
+  "$OH_SESSION_API_KEYS_0"'`), not `printenv`, `env` or `docker inspect`,
+  and it would refuse plain code searches of the name (`rg
+  OH_SESSION_API_KEYS_0`), which the runtime worker's code and this page
+  contain.
 
 Since 2026-09-27 every rule of the guard also reads the command an `rtk`
 invocation runs. The guard runs beside RTK's Claude hook and sees the
