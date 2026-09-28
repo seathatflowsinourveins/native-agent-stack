@@ -1,5 +1,5 @@
-"""Run the lane-A template's own checks, which the anti-pattern log names, against this round's audit and patterns.
-A reproduction of the round's mistake: both checks must fail on it.
+"""Apply the lane-A template's two checks, which the anti-pattern log names, to this round's audit and patterns,
+without running the template's own scripts. A reproduction of the round's mistake: both checks must fail on it.
 
 The template is evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/:
 1. Its self-test (audit_selftest_final.py) requires two Claude payloads to come back clean (`set()`):
@@ -94,8 +94,8 @@ for oid, p in entries:
         text_hits.append(p)
 
 result = {
-    "note": "Reproduction, after the fact, of this round's mistake against the lane-A template's checks, which the "
-            "anti-pattern log names. Both checks fail on this round's audit and patterns.",
+    "note": "Reproduction, after the fact: the lane-A template's two checks, which the anti-pattern log names, "
+            "applied to this round's audit and patterns without running the template's own scripts. Both fail.",
     "template": {"file": TEMPLATE, "commit": COMMIT, "sha256": hashlib.sha256(template.encode()).hexdigest()},
     "patterns_sha256": hashlib.sha256((X / "void_patterns_m45.py").read_bytes()).hexdigest(),
     "self_test_payloads": payloads,

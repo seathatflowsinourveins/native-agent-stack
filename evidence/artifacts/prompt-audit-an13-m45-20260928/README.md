@@ -29,8 +29,8 @@ This package holds the evidence for [`docs/decisions/2026-09-28-an13-m4-m5.md`](
     - `tally-m45.json` is the tally.
   - Two checks ran after the judges:
     - `audit-control-m45.json` reproduces the audit and voids planted accesses;
-    - `template-checks-m45.json` runs the lane-A template's self-test payloads and root scan with this round's audit
-      and patterns.
+    - `template-checks-m45.json` applies the lane-A template's self-test payloads, and a root scan like the
+      template's, to this round's audit and patterns, without running the template's own scripts.
 - **`scripts/`: the scripts as run, with host paths replaced.**
   - `frozen-sha256.txt` holds the hashes taken before dispatch. The package keeps no record of when.
   - `isolation.log` records the steps taken before dispatch.
@@ -81,8 +81,8 @@ python3 -B scripts/reproduce_template_checks_m45.py <clone holding 9f8db582> 9f8
 
 - **The frozen hashes.** The first two commands print `OK` for every file. The frozen scripts contain no host paths,
   so their published copies still match.
-- **The template checks.** The third command exits 0 when both of the lane-A template's checks fail on this round's
-  audit and patterns, as they do.
+- **The template checks.** The third command exits 0 when both of the lane-A template's checks, applied to this
+  round's audit and patterns, fail, as they do.
 - **What was sent.** The inputs, packets and judge schema match `adjudication/sent-sha256.json`. The four prompts
   differ from their sent hashes only by the host-path placeholders.
 - **The tally.** Check it by hand. For each judgment, map its `choice` through `m45-mapping.json` for its order, then

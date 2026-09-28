@@ -3,7 +3,8 @@
 One review per family ran on `31ab17f7`, the change's first head, while it was still local. That head was pushed
 unchanged to open the pull request, and one repair round followed both returns. The returns are kept as written,
 with the worktree path written as `<worktree>`. `final_text.py` took the Claude return from the agent's transcript,
-which is not published.
+which is not published. After the squash merge, `a82e5e79` and `31ab17f7` are reachable from this pull request's head
+ref (`refs/pull/460/head`), not from `main`.
 
 | Reviewer | Prompt | Return | Usage |
 | --- | --- | --- | --- |
@@ -23,7 +24,7 @@ The three helper scripts are copies of #444's, from `evidence/artifacts/prompt-a
 | GPT-6 5 and Claude 4: `receipt.json:88` names the validator, not the installer, and the adjudication packet stated that premise to all four judges | Fixed in the record. `AGENTS.md:15-16` is cited for the installer. A limitation says the packet's round-1 summary stated the wrong premise; the Claude B/A judgment repeated it, the A/B judgment read the receipt correctly; a new round's packet must drop it; this round's outcome is unaffected. The packet itself is unchanged, since it is the evidence as sent |
 | GPT-6 6: `sha256sum -c round1/packet.sha256` fails from the package directory | Fixed. The record runs it in `round1/` |
 | Claude 1: the round adapted X9 round 3's audit instead of the lane-A template the log names, and the template already covers both false positives | Fixed. The anti-pattern row and the record's Checks now say so, and the row's rule starts every judge audit from the template |
-| Claude 2: the row's "Where enforced" cited `audit-control-m45.json`, whose pass condition cannot fail on this mistake | Fixed. The record calls that file a reproduction after the fact. `reproduce_template_checks_m45.py` ran the template's self-test payloads and root scan with this round's audit and patterns. Both fail: the two payloads come back void, and MAPPING matches 8 paths and the text of 242 of the 8,223 files at `9f8db582` (`adjudication/template-checks-m45.json`). The row names those checks |
+| Claude 2: the row's "Where enforced" cited `audit-control-m45.json`, whose pass condition cannot fail on this mistake | Fixed. The record calls that file a reproduction after the fact. `reproduce_template_checks_m45.py` applied the template's two checks to this round's audit and patterns, without running the template's own scripts. Both fail: the two payloads come back void, and MAPPING matches 8 paths and the text of 242 of the 8,223 files at `9f8db582` (`adjudication/template-checks-m45.json`). The row names those checks |
 | Claude 8: the README's reason for withholding the hit windows did not match the recorded hits | Fixed. `publish_windows_m45.py` publishes the eight windows with host details replaced (`adjudication/audit-m45-windows.json`), the evidence that the hits are false positives |
 | Claude 9a: "the packet's first source" for U1, which is the eleventh entry | Fixed: "Source U1" |
 | Claude 9b: D2 deletes and adds nothing | Fixed: "D1 replaces … with one sentence, and D2 deletes …" |

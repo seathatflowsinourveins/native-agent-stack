@@ -1,5 +1,5 @@
 {
- "note": "Reproduction, after the fact, of this round's mistake against the lane-A template's checks, which the anti-pattern log names. Both checks fail on this round's audit and patterns.",
+ "note": "Reproduction, after the fact: the lane-A template's two checks, which the anti-pattern log names, applied to this round's audit and patterns without running the template's own scripts. Both fail.",
  "template": {
   "file": "evidence/artifacts/prompt-audit-20260927/lane-a/final/adjudication/audit_selftest_final.py",
   "commit": "9f8db582",
