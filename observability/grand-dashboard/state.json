@@ -303,7 +303,7 @@
       "kind": "gate",
       "id": "claude-code-sandbox-profile",
       "title": "Claude Code sandbox profile (M6)",
-      "state": "open gate registered 2026-09-28 / later wave tracked / re-check 2026-10-11 / profile not measured / project settings unchanged",
+      "state": "open gate registered 2026-09-27 (merged 2026-09-28) / raised at every wave review / re-check 2026-10-11 / profile not measured / project settings unchanged",
       "evidence_ref": "catalogs/foundation/manifest.json"
     },
     {
@@ -324,7 +324,7 @@
       "kind": "gate",
       "id": "betterleaks-successor-trial",
       "title": "betterleaks successor trial (M3)",
-      "state": "non-required 1.8.1 job merged 2026-09-28 / not a superset on fixtures / required gitleaks gate unchanged / swap after allowlist triage",
+      "state": "non-required report-only 1.8.1 job merged 2026-09-28 / not a superset on fixtures / required gitleaks gate unchanged / swap only if parity holds after triage",
       "evidence_ref": "evidence/artifacts/betterleaks-parity-20260927/run-record.json"
     },
     {
