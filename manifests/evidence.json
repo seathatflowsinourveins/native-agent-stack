@@ -3439,6 +3439,27 @@
         "The embedded edit script (provenance.edit_script_redacted) is the coordinator's file with the right-hand side of its one backup-directory line replaced by a placeholder, so this receipt names no backup location. provenance.edit_script_sha256 is the original file's digest and provenance.edit_script_redacted_sha256 the embedded text's. The generator takes the backup directory as an argument and records none."
       ],
       "path": "evidence/receipts/skills-listing-restore-20260928.json"
+    },
+    {
+      "id": "skills-m4-host-removal-20260928",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "A value-free record, on this host, of the 2026-09-28 host removal of the trial skill verification-before-completion after #464 (M4), including its failed first attempt. At 18:30:15Z the pinned skills 1.7.0 CLI ran the agent-scoped `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y -a claude-code codex` that the M4 addendum names. It exited 0 and printed 'Found 29 unique installed skill(s)' and 'Successfully removed 1 skill(s)', but by the coordinator's account it removed only the ~/.claude/skills link, and the canonical ~/.agents/skills folder and its lock entry remained. That is skills 1.7.0's design: with -a, remove keeps the canonical folder and its lock entry while any other detected agent resolves to that folder, as every agent whose project skillsDir is .agents/skills does, and it reports success either way (vercel-labs/skills v1.7.0, commit 7407f389, src/remove.ts L293-340). After a set assertion (the coordinator's find returned only the canonical folder), the unscoped `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y` at 18:30:55Z exited 0 with the same two lines. Its count of 29 shows that the first run had left the skill discoverable. The profile install from c0966da2 (`install_claude_profile.py --only guard --only agents`) and `skills_status.py --json` followed; the retained status reads result ok, 28 skills, no extra skills and only supply-chain-risk-auditor's informational folder_tree drift. The stale skillOverrides key was then dropped after a backup labelled settings.json.20260928T183120Z.pre-m4-override-drop. A read-only read-back at 18:50:01Z found no copy of the skill (canonical folder, Claude link, Codex-native copy) and no lock entry. It found 28 skill folders equal to the lock and to the manifest at c0966da2, and both installed profile files identical to the repository's at c0966da2, naming the skill 0 times. It also found 28 skillOverrides keys equal to the template, and the labelled backup (mode 0600, 29 keys, the skill's key present). In a scratch HOME the same CLI reproduced the difference. With a .cursor folder present, the scoped remove exited 0 and printed its success line but kept the canonical folder and a seeded lock entry; without that folder, the same command removed both. The unscoped form removed both with .cursor present. In fresh scratch homes with .cursor present, install_skills.py at bdf25d28 reported rolled-back while the canonical folder remained, and the fixed script reported error with the reason 'rollback retained, in use by another agent'; without .cursor, both reported rolled-back.",
+      "limitations": [
+        "One host only. Another host collects its own record; this receipt says nothing about any other host's skills folders or settings.",
+        "Value-free by construction: exit codes, the CLI's two count lines, counts, booleans, digests, UTC stamps and backup labels. No settings value, no path and no session identifier is retained; `~` stands for the running user's home.",
+        "The coordinator ran the six host steps. Retained from them are the time, exit and output files of both removes, the skills_status.py JSON and the override-drop script (data.capture_files; not published). The first remove's lock-entry booleans and what it removed, the find, the profile install's exit, output lines and file hashes, the status run's exit, the override drop's key counts and the so_drift.py comparison are the coordinator's account, marked coordinator_reported. The read-back in data.independent_readback confirms their end state, not their order or timing.",
+        "The retained bytes corroborate the first remove's leftover only indirectly. Both runs printed 'Found 29 unique installed skill(s)', and skills 1.7.0 counts the SKILL.md folders in the canonical folder and in every agent's global folder before it removes anything (src/remove.ts L127-146), so the second run still found the skill.",
+        "Which detected agent kept the canonical folder on this host was not identified. The scratch reproduction shows that one detected universal agent (Cursor, detected by a ~/.cursor folder alone) is enough.",
+        "The set assertion's find searched to depth 5 below home, excluding node_modules, the checkout, .cache and the plugin cache. The read-back adds three checks. In the recorder's shell every variable that relocates an agent's folder was unset, and with them unset every skills 1.7.0 agent's default global skill path parsed from agents.ts lies at depth 5 or less below home (OpenClaw's, chosen by a function, is at depth 3; agents.ts L34-46). The checkout neither tracks at c0966da2 nor holds on disk a project-scope copy, which an unscoped remove run from it would also delete. There is no ~/agent/skills copy. The coordinator's shell environment and the unscoped remove's working directory were not recorded.",
+        "The scratch reproduction combines a local integration check with a synthetic fixture: a one-file local skill, a lock entry seeded by the harness (a local-source add writes none: dist/cli.mjs getOwnerRepo L47-48 and L5595) and an empty .cursor folder as the only detected universal agent. It ran the pinned CLI under env -i with a scratch HOME under /var/tmp and an empty working directory, then deleted its scratch root.",
+        "The reproduction's installer runs exercise install_skills.py's global mode only. The project mode's read-back is #429's, and this change reuses it; tests/test_install_skills.py covers both modes with a fake CLI, not with this native run.",
+        "The override drop's time is taken from its backup label. evidence/artifacts/skills-m4-host-removal-20260928/drop_override.redacted.py is the coordinator's script with its one backup-directory line replaced by a placeholder, so this receipt names no backup location; provenance.override_drop_script_sha256 is the original file's digest.",
+        "Codex's configuration is unchanged: the skill was enabled for Codex, so it had no disable entry to remove. No Codex-native listing was observed; the read-back shows only that no copy remains where Codex reads skills (~/.agents/skills and ~/.codex/skills)."
+      ],
+      "path": "evidence/receipts/skills-m4-host-removal-20260928.json"
     }
   ],
   "files": [
@@ -13995,8 +14016,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "42a45529083b6e35a3d280a87e3d4e22f9bb487d894b8d8732a5cb591528d616",
-      "bytes": 106608
+      "sha256": "4496973e0c9ab817fe134bbd3eb437a357536cebd6334cfa827bbe746f1409e1",
+      "bytes": 118322
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -14225,8 +14246,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "04486bc0d542434d7d19bf594945b59b48d85dc4235ade7f5d7555ef6c531426",
-      "bytes": 67572
+      "sha256": "6d79a42f0e4fa5fe482e9522a9aeeb4a4df6983bd455385ed58e144bb61a1aae",
+      "bytes": 69598
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -36209,6 +36230,21 @@
       "bytes": 22435
     },
     {
+      "path": "evidence/artifacts/skills-m4-host-removal-20260928/drop_override.redacted.py",
+      "sha256": "54d040aa053707502a00a9b6c68419a576df86251f7aaf05532c08bec31ac9f1",
+      "bytes": 1425
+    },
+    {
+      "path": "evidence/artifacts/skills-m4-host-removal-20260928/m4_host_readback.py",
+      "sha256": "b9badd809b5004d63c1bb0962feedae2594ac28f80b51313883dfbe1fc2d3719",
+      "bytes": 7942
+    },
+    {
+      "path": "evidence/artifacts/skills-m4-host-removal-20260928/m4_scoped_remove_repro.py",
+      "sha256": "80acc8adb0ecb751a1cd331cd6012161fbd2d841f05fa9f30caa941974f51954",
+      "bytes": 8119
+    },
+    {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
       "sha256": "0f3d4e68227108db70730487a65991c71bad01544147962263b3b996f722e2f2",
       "bytes": 11280
@@ -40884,6 +40920,11 @@
       "bytes": 44230
     },
     {
+      "path": "evidence/receipts/skills-m4-host-removal-20260928.json",
+      "sha256": "efe5592f87dddcf89bbab185ec9b8cc454913225d99cfdd27cd6dea4f33ea475",
+      "bytes": 24366
+    },
+    {
       "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
       "sha256": "bbd65485d3c14ddee589aba4287d547d62cf6d451a1b6aaacd4c0e503c74fc32",
       "bytes": 24103
@@ -42320,8 +42361,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "55533df4a38eb803bdf203b85d0fd7964e46a1f703589e3dc464c759391575ef",
-      "bytes": 62241
+      "sha256": "028700aace183b352d74bef5b1f79eaa1a80681358df85784c4161796f8e13c2",
+      "bytes": 68792
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -42790,8 +42831,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "f9c94cbd12e3825382a41afeab0dbaf0e8f4e1b2b4359076c84f256a77057a63",
-      "bytes": 32108
+      "sha256": "f7b9ba2b3b11a16d1d2cbc820eebdb67b1a18ea672a0579def5222c6d7d416df",
+      "bytes": 33985
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",

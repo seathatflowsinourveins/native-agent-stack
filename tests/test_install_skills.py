@@ -17,7 +17,11 @@ of the real `skills` CLI (v1.7.0) to exercise install_skills.py end to end:
                     sides of that contract at once.
   remove <name> -g -y -a claude-code codex
                     deletes the canonical folder, the symlink and the lock
-                    entry.
+                    entry. Per-fixture fault injection: retain_after_remove
+                    keeps the named artifacts ("canonical", "lock",
+                    "claude-link"), remove_exit fails the remove before it
+                    deletes anything, and remove_cannot_run leaves the binary
+                    non-executable after add, so the rollback cannot start.
 
 Every invocation is also appended to calls.log next to the fake script
 (independent of --home), so tests can assert not just the outcome but
@@ -151,12 +155,18 @@ if argv[0] == "add":
             "computedHash": hashlib.sha256(b"SKILL.md" + fixture["skill_md"].encode()).hexdigest(),
         }
     path.write_text(json.dumps(lock))
+    if fixture.get("remove_cannot_run"):
+        # The rollback's exec then fails with PermissionError, an OSError, as for a binary that cannot run.
+        os.chmod(__file__, 0o644)
     sys.exit(0)
 
 if argv[0] == "remove":
     name = argv[1]
     # Synthetic fault injection for independently checking cleanup artifacts.
     retained = FIXTURES.get(name, {}).get("retain_after_remove", [])
+    if FIXTURES.get(name, {}).get("remove_exit"):
+        print(f"fake skills remove: simulated failure for {name!r}", file=sys.stderr)
+        sys.exit(FIXTURES[name]["remove_exit"])
     if project:
         # Relevant subset of skills@7407f389 remove.ts:209-333. A same-named
         # OpenClaw source directory is a removal target even if not detected.
@@ -184,7 +194,7 @@ if argv[0] == "remove":
     if "canonical" not in retained:
         shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
     link = target / ".claude" / "skills" / name
-    if not project and (link.is_symlink() or link.exists()):
+    if not project and "claude-link" not in retained and (link.is_symlink() or link.exists()):
         link.unlink()
     path = target / "skills-lock.json" if project else lock_path(home)
     lock = load_lock(path)
@@ -796,6 +806,93 @@ class MismatchRollbackTests(InstallSkillsTestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("rolled back", result.stderr)
         self.assertEqual([c[0] for c in calls_log(fake_bin)], ["--version", "add", "remove"])
+
+
+class GlobalRollbackReadBackTests(InstallSkillsTestCase):
+    """A global rollback is read back from disk, as the project rollback is. skills 1.7.0's scoped
+    `remove` keeps the canonical folder and its lock entry while any other detected agent resolves to
+    that folder, and exits 0 either way (vercel-labs/skills v1.7.0 src/remove.ts L293-340). Codex reads
+    the canonical folder while it exists, and the skills CLI still counts it as installed for every
+    universal agent. What remains is reported as 'error' with the project path's reasons, and the
+    script deletes nothing itself. Fake-CLI integration fixtures, not a native CLI run."""
+
+    NAME = "drift-skill"
+    CONTENT = "# Drifted skill\n"
+
+    def run_drift(self, home_label: str = "home", **fixture) -> subprocess.CompletedProcess:
+        """A tree mismatch after add, so the global rollback runs; each label gets its own home and binary."""
+        self.home = self.tmp_path / home_label
+        self.home.mkdir(exist_ok=True)
+        bin_dir = self.tmp_path / f"bin-{home_label}"
+        bin_dir.mkdir()
+        self.fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {
+            "skill_md": self.CONTENT, "tree_sha": tree_sha("actually-installed"), **fixture}})
+        manifest = self.write_manifest([make_skill(self.NAME, self.CONTENT, tree_sha("pinned"))])
+        return self.run_install(manifest, "--json", fake_bin=self.fake_bin)
+
+    def artifacts(self) -> dict:
+        canonical = self.home / ".agents" / "skills" / self.NAME
+        link = self.home / ".claude" / "skills" / self.NAME
+        return {"canonical": canonical.exists() or canonical.is_symlink(),
+                "lock": self.NAME in self.lock_data().get("skills", {}),
+                "claude-link": link.exists() or link.is_symlink()}
+
+    def assert_error(self, result: subprocess.CompletedProcess, reason: str) -> None:
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "error"})
+        self.assertIn(f"{self.NAME}: error: {reason} (exit ", result.stderr)
+        self.assertNotIn("rolled back", result.stderr)
+
+    def test_retained_canonical_folder_and_lock_are_error_in_use_by_another_agent(self):
+        # What skills 1.7.0 does while another universal agent is detected: both stay and remove exits 0.
+        result = self.run_drift(retain_after_remove=["canonical", "lock"])
+        self.assert_error(result, "rollback retained, in use by another agent")
+        calls = calls_log(self.fake_bin)
+        self.assertEqual([c[0] for c in calls], ["--version", "add", "remove"])
+        self.assertEqual(calls[-1], ["remove", self.NAME, "-g", "-y", "-a", "claude-code", "codex"])
+        self.assertEqual(self.artifacts(), {"canonical": True, "lock": True, "claude-link": False})
+        # The message names what remains, and nothing was deleted by the script itself.
+        self.assertIn("canonical=True, lock=True, claude-link=False", result.stderr)
+        self.assertIn(str(self.home / ".agents" / "skills" / self.NAME), result.stderr)
+        self.assertIn(str(self.home / ".agents" / ".skill-lock.json"), result.stderr)
+        self.assertEqual((self.home / ".agents" / "skills" / self.NAME / "SKILL.md").read_text(), self.CONTENT)
+
+    def test_each_retained_artifact_is_error_on_its_own(self):
+        for artifact, reason in (("canonical", "rollback retained, in use by another agent"),
+                                 ("lock", "rollback incomplete"), ("claude-link", "rollback incomplete")):
+            with self.subTest(artifact=artifact):
+                # A retained drifted copy is local content to the next run, so each case gets its own home.
+                result = self.run_drift(f"home-{artifact}", retain_after_remove=[artifact])
+                self.assert_error(result, reason)
+                self.assertEqual(self.artifacts(),
+                                 {key: key == artifact for key in ("canonical", "lock", "claude-link")})
+                if artifact == "claude-link":
+                    link = self.home / ".claude" / "skills" / self.NAME
+                    self.assertFalse(link.exists(), "a dangling Claude link must still count as retained")
+
+    def test_remove_that_exits_nonzero_is_error_rollback_incomplete(self):
+        result = self.run_drift(remove_exit=1)
+        self.assert_error(result, "rollback incomplete")
+        self.assertIn("(exit 1; canonical=True, lock=True, claude-link=True)", result.stderr)
+        self.assertEqual(self.artifacts(), {"canonical": True, "lock": True, "claude-link": True})
+
+    def test_remove_that_cannot_run_is_error_not_an_exception(self):
+        # Fixtures are embedded in the fake CLI as Python source, so flags are ints rather than JSON booleans.
+        result = self.run_drift(remove_cannot_run=1)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "error"})
+        self.assertIn(f"{self.NAME}: verification failed and rollback could not run (", result.stderr)
+        self.assertEqual([c[0] for c in calls_log(self.fake_bin)], ["--version", "add"])
+
+    def test_control_remove_that_deletes_everything_is_rolled_back(self):
+        result = self.run_drift()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
+        self.assertIn("rolled back", result.stderr)
+        self.assertNotIn(": error:", result.stderr)
+        self.assertEqual(self.artifacts(), {"canonical": False, "lock": False, "claude-link": False})
 
 
 class LocalModifiedTests(InstallSkillsTestCase):

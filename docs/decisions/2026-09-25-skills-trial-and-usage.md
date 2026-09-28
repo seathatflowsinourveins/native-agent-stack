@@ -1317,3 +1317,135 @@ pins. No host removal, native child run or review result is claimed.
   entry at L42);
 - that revision is read in full against CLAUDE.md and AGENTS.md again;
 - it is re-pinned through this manifest with its tree, SKILL.md hash and budget.
+
+## Addendum 2026-09-28: M4 host removal and the scoped-remove correction
+
+**What ran.** The coordinator ran the [M4 addendum](#addendum-2026-09-28-verification-before-completion-removed-conflict-rule)'s
+host steps on 2026-09-28, through the pinned skills 1.7.0 CLI. The
+[receipt](../../evidence/receipts/skills-m4-host-removal-20260928.json) records them value-free.
+- 18:30:15Z: step 1, `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y -a claude-code codex`,
+  exited 0 and printed "Successfully removed 1 skill(s)". It removed only the `~/.claude/skills` link. The
+  canonical `~/.agents/skills/verification-before-completion` folder and its lock entry stayed. The receipt
+  keeps this run as a failed attempt.
+- A `find` to depth 5 below home then returned only the canonical folder.
+- 18:30:55Z: the unscoped `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y` exited 0 and
+  removed the folder and the lock entry. 28 skill folders remain.
+- Steps 2 and 3 followed. The profile install from `c0966da2` wrote only the builder block and the
+  `isolated-builder` definition. `skills_status.py --json` returned result ok for 28 skills with no extra skills.
+  The optional drop of the stale `skillOverrides` key ran after a backup labelled
+  `settings.json.20260928T183120Z.pre-m4-override-drop`, taking the keys from 29 to 28.
+- A read-only read-back at 18:50:01Z found no copy of the skill and no lock entry. It found 28 skill folders
+  equal to the lock and to the manifest, and settings equal to the template.
+
+For the [condition log](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule), C4's start
+context is in place on this host from 18:31:10Z, the coordinator's time for step 2. By the coordinator's order,
+step 3 followed before the 18:31:20Z key drop, and it changes no context. The read-back confirms the installed
+files, not those times. A review window that includes 18:30:15Z to 18:31:10Z is mixed.
+
+**Correction: the scoped form does not remove the skill.** Step 1 of the M4 host steps is incomplete on any
+host where skills 1.7.0 detects a universal agent other than the two it names.
+- Without `-a`, `remove` targets every known agent
+  ([`src/remove.ts` L209-217](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L209-L217)).
+  With `-a`, it cleans the named agents' paths only. It then keeps the canonical folder and the lock entry if
+  any other detected agent's install path exists
+  ([L293-324](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L324)),
+  and reports success either way (L335-340).
+- A universal agent is one whose project `skillsDir` is `.agents/skills`
+  ([`src/agents.ts` L910-912](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L910-L912)).
+  22 of v1.7.0's 79 agent entries qualify, among them Codex, Cursor, Gemini CLI, GitHub Copilot and OpenCode.
+  Each one's install path is the canonical folder, whatever its `globalSkillsDir`
+  ([`src/installer.ts` L157-159](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L157-L159)).
+  One detected universal agent is therefore enough to keep the folder.
+- Codex goes on reading the kept folder. At the pinned Codex 0.157.1, it lists user skills from
+  `$HOME/.agents/skills`
+  ([`codex-rs/ext/skills/src/host_roots.rs` L103-108](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/ext/skills/src/host_roots.rs#L103-L108),
+  tag `rust-v0.157.1`). For the other universal agents, the skills CLI treats the folder as their install. This
+  record did not check whether each of those agents reads it.
+- The installed `skills@1.7.0` npm `dist/cli.mjs` has the same code. The relevant lines are L6834-6838 (no
+  `-a`), L6883-6907 (`isStillUsed`), L6909-6914 and L6943 (success), `isUniversalAgent` at L2180 and
+  `getAgentBaseDir` at L2214. The practice-sweep session verified the same lines independently. Its matching
+  note on the #462 uninstall line is in the
+  [delegated-decisions record](2026-09-28-delegated-decisions.md#m4-remove-the-trial-skill) (PR #466, merged
+  as `08aec098`).
+- Upstream intends this. The code's comments cite upstream #287 (do not break the other agents) and #1718 (keep
+  the lock entry while the folder survives), and commit `4c719f3f` (2026-07-26) added the lock half. `-a` means
+  "uninstall for these agents". On 2026-09-28, v1.7.0 is the latest release and npm `latest`, and `main` keeps
+  the same logic.
+- A scratch-HOME run of the pinned CLI discriminates, under `env -i` with an empty working directory.
+  - With an empty `.cursor` folder, the scoped remove exited 0 and printed its success line, but kept the
+    canonical folder and a seeded lock entry.
+  - Without that folder, the same command removed both.
+  - The unscoped form removed both with `.cursor` present.
+
+The M4 addendum's reason for `-a` still holds, since without it `remove` deletes a same-named skill that
+another agent owns. The flag does not make the scoped form a removal.
+
+**Complete host procedure.** To remove a skill from a host entirely:
+1. Assert that the canonical folder is the only copy. Without `-a`, `remove` cleans every agent's global
+   folder, so search every one of them for the skill's name. At skills 1.7.0, with no relocating variable set,
+   each lies at most 5 levels below home. `XDG_CONFIG_HOME`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR`, `VIBE_HOME`,
+   `HERMES_HOME`, `AUTOHAND_HOME`, `GROK_HOME` and `SARVAM_HOME` move one
+   ([`src/agents.ts` L9-16](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L9-L16)),
+   so search there too when any of them is set. If another copy exists, stop: the unscoped form would delete it.
+2. Change to an empty directory. Two agents, PromptScript and Eve, have no global folder. For them, a `-g`
+   remove without `-a` also deletes `<cwd>/.agents/skills/<name>`, `<cwd>/agent/skills/<name>` and each Eve
+   subagent's copy
+   ([`src/remove.ts` L260-270](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L260-L270)).
+3. Run `DISABLE_TELEMETRY=1 skills remove <name> -g -y` through the pinned CLI.
+4. Read back. Check that the canonical folder, the lock entry, `~/.claude/skills/<name>` and
+   `~/.codex/skills/<name>` are gone, and that `python3 scripts/skills_status.py` lists no extra skill.
+
+On this host the read-back checked two of step 1's conditions. It found no relocating variable set in the
+recorder's shell. It also found no project-scope copy tracked at `c0966da2` or present on disk in the checkout.
+The coordinator's environment and the unscoped run's working directory were not recorded.
+
+**The installer's rollback.** [`install_skills.py`](../../tools/adoption/install_skills.py) rolls back a
+mismatched global add with the same scoped form. At `bdf25d28` (#429) it read back only a project rollback: the
+project's canonical folder, its lock entry and, for a claude-code install, the `.claude/skills/<name>` link,
+reported as `error` with "rollback retained, in use by another agent" or "rollback incomplete" (the
+[runtime-workers skills blueprint](../../blueprints/runtime-workers/skills/README.md#lifecycle-through-the-existing-installer)
+describes it). Its global rollback read nothing back. On a host where skills 1.7.0 detects another universal
+agent, a bad global install therefore stayed on disk while the script reported `rolled-back`. Codex reads the
+canonical folder while it exists, and the skills CLI still counted the copy as installed for every universal
+agent. A global remove that could not run raised its exception instead of returning a state.
+
+The fix extends #429's read-back to the global rollback and deletes nothing.
+- After the remove, in either mode and whatever it reported, `process_skill` reads back the canonical folder,
+  the lock entry and the claude-code link (L415-436). Globally these are `~/.agents/skills/<name>`, its entry
+  in the global lock and `~/.claude/skills/<name>`.
+- If the remove exited nonzero or any of the three remains, the state is `error` with #429's reasons:
+  "rollback retained, in use by another agent" when the remove exited 0 and left the canonical folder, and
+  "rollback incomplete" otherwise. The stderr line keeps #429's format, reading `lock=` for the global lock
+  where a project reads `project-lock=`, and now names what remains in both modes. There is no new state.
+- A remove that cannot run (`OSError` or a timeout) is reported and returns `error` in both modes (L412-414).
+- It never deletes what remains, because only the skills CLI writes there. The docstring (L17-30) points to
+  this addendum for the manual procedure. The `SKILL_AGENTS` comment (L122-133) states the behaviour with the
+  upstream lines, including Codex's `host_roots.rs`.
+
+`GlobalRollbackReadBackTests` in `tests/test_install_skills.py` uses the module's fake CLI. Its remove keeps what
+`retain_after_remove` names, and this change adds `remove_exit` (the remove exits nonzero) and
+`remove_cannot_run` (the rollback cannot execute the CLI).
+- Against the script at `bdf25d28`, the module ran 52 tests with 6 failures. Five read
+  `{'drift-skill': 'rolled-back'} != {'drift-skill': 'error'}`: the kept canonical folder and lock entry, each
+  of the three artifacts kept alone, and a remove that exited 1. The sixth was the `PermissionError` traceback
+  that the global rollback raised when the remove could not run. The control and the 47 tests already on main
+  passed.
+- With the fix, all 52 pass.
+- In the scratch run, the pinned CLI with `.cursor` present gave `rolled-back` from the script at `bdf25d28` and
+  `error` with "rollback retained, in use by another agent" from the fixed script, each with the canonical
+  folder left in place. Without `.cursor`, both gave `rolled-back`.
+
+**Evidence class.**
+
+| Evidence | Class | Acceptance-policy class | Where |
+| --- | --- | --- | --- |
+| The two host removes | native-measurement | Upstream example or native operation | [Receipt](../../evidence/receipts/skills-m4-host-removal-20260928.json): retained exit codes and output lines |
+| The first remove's leftovers, the `find`, the profile-install lines and the key counts | coordinator-reported | None; the coordinator's account | Receipt, marked `coordinator_reported` |
+| Read-only read-back at 18:50:01Z | our-integration | Independent observation | Receipt `data.independent_readback`; script in [`skills-m4-host-removal-20260928/`](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_host_readback.py) |
+| Scratch-HOME reproduction | native-measurement, synthetic-fixture | Upstream example or native operation; Synthetic fixture | Receipt `data.scratch_reproduction`; [script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_scoped_remove_repro.py) |
+| `install_skills.py` rollback tests | our-integration | Local integration check | `GlobalRollbackReadBackTests` in `tests/test_install_skills.py`, failing first against `bdf25d28` |
+| Upstream source and `dist/cli.mjs` lines | upstream source | None; cited, not executed | Links above: skills at commit `7407f389` (tag `v1.7.0`) and Codex `host_roots.rs` at commit `36650394` (tag `rust-v0.157.1`) |
+
+**Overturn.** Suppose a skills release removes the canonical folder and its lock entry under `-a` while another
+detected agent still resolves to that folder, or documents a flag that does. The scoped form is then complete on
+that release. Re-pin the CLI and rerun the reproduction's `.cursor` arm before relying on it.
