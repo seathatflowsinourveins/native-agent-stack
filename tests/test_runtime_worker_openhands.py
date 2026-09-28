@@ -8,6 +8,7 @@ structural/fixture checks, not upstream SDK or live gateway acceptance.
 
 import asyncio
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -16,6 +17,7 @@ from pathlib import Path
 import re
 import shutil
 import sqlite3
+import stat
 import subprocess
 import sys
 import tempfile
@@ -182,6 +184,14 @@ class OpenHandsRecipeTests(unittest.TestCase):
         for name in ("source_archive", "uv_lock"):
             self.assertRegex(pins[name]["sha256"], r"^[0-9a-f]{64}$")
         self.assertRegex(pins["image"]["ref"], r"^ghcr\.io/openhands/agent-server@sha256:[0-9a-f]{64}$")
+        # Phase 2: the gateway proxy image is pinned by index digest, with its
+        # linux/amd64 manifest and config digests for pinned_image_identity.
+        proxy = pins["gateway_proxy"]
+        self.assertRegex(proxy["ref"], r"^ghcr\.io/nginx/nginx-unprivileged@sha256:[0-9a-f]{64}$")
+        self.assertEqual(proxy["platform"], "linux/amd64")
+        for key in ("manifest_sha256", "config_sha256"):
+            self.assertRegex(proxy[key], r"^[0-9a-f]{64}$")
+            self.assertNotEqual(proxy[key], proxy["ref"].rsplit(":", 1)[1])
 
     def test_installer_and_runtime_are_scoped(self):
         for filename in ("install.sh", "run-e2e.sh"):
@@ -348,19 +358,31 @@ class OpenHandsRecipeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             host.docker_args(self.read_json("pins.json"), "unowned")
 
-    def test_model_container_is_nonroot_and_network_is_explicit(self):
+    def test_model_container_is_nonroot_and_network_is_per_attempt(self):
+        # Plan E1: "none", or one of the attempt's own two networks for exactly
+        # the roles that need it. No shared or cross-attempt network is allowed.
         host = load_recipe_module("host.py")
         pins = self.read_json("pins.json")
         args = host.docker_args(pins, "rw-openhands-fixture")
         self.assertEqual(args[args.index("--user") + 1], "10001:10001")
         self.assertIn("--network=none", args)
-        with self.assertRaises(ValueError):
-            host.docker_args(pins, "rw-openhands-agent", network="bridge")
-        args = host.docker_args(pins, "rw-openhands-agent", network="rw-openhands-egress-control")
-        self.assertIn("--network=rw-openhands-egress-control", args)
         self.assertIn("--cap-drop=ALL", args)
         self.assertIn("--security-opt=no-new-privileges", args)
         self.assertIn("HOME=/state/home", args)
+        stem = "rw-openhands-fixture-control"
+        for name, network in ((stem + "-server", stem + "-int"), (stem + "-probe-int", stem + "-int"),
+                              (stem + "-probe-gw", stem + "-gw"), (stem + "-request", "none")):
+            with self.subTest(name=name, network=network):
+                self.assertIn("--network=" + network, host.docker_args(pins, name, network=network))
+        for name, network in (("rw-openhands-agent", "bridge"), (stem + "-server", stem + "-gw"),
+                              (stem + "-request", stem + "-int"), (stem + "-qmd", stem + "-gw"),
+                              (stem + "-server", "rw-openhands-other-control-int"),
+                              ("rw-openhands-other-control-server", stem + "-int"),
+                              (stem + "-server", "rw-openhands-egress-control"), (stem + "-server", "host"),
+                              (stem + "-server", stem + "-int-x"),
+                              ("rw-openhands-fixture-other-server", "rw-openhands-fixture-other-int")):
+            with self.subTest(name=name, network=network), self.assertRaises(ValueError):
+                host.docker_args(pins, name, network=network)
 
     def test_mount_allowlist_checks_resolved_targets_and_secret_ancestors(self):
         host = load_recipe_module("host.py")
@@ -389,12 +411,19 @@ class OpenHandsRecipeTests(unittest.TestCase):
         self.assertFalse(mcp["ai-memory"]["enabled"])
         self.assertFalse(mcp["socraticode"]["enabled"])
 
-    def test_host_template_names_the_two_required_network_policy_receipts(self):
+    def test_host_template_has_no_firewall_receipt_contract(self):
+        # F19 superseded (plan section 5): containment comes from the
+        # per-attempt topology and its probe, not a DOCKER-USER receipt.
         host = self.read_json("config/host.example.json")
-        self.assertEqual(set(host["egress"]), {"control", "engines-on"})
-        for arm, entry in host["egress"].items():
-            self.assertEqual(entry["network"], "rw-openhands-egress-" + arm)
-            self.assertIn("policy_receipt", entry)
+        self.assertNotIn("egress", host)
+        source = (RECIPE / "host.py").read_text()
+        for retired in ("model_network", "docker-user-iptables", "policy_receipt", "rw-openhands-egress-"):
+            self.assertNotIn(retired, source)
+        # The pointer variables are retired: the driver generates the key files.
+        for name in ("host.py", "dispatch.py"):
+            text = (RECIPE / name).read_text()
+            self.assertNotIn("OPENHANDS_SERVER_ENV", text)
+            self.assertNotIn("OPENHANDS_HEADERS", text)
 
     def test_qmd_guard_requires_explicit_scope_and_lexical_query(self):
         guard = load_recipe_module("mcp_guard.py")
@@ -676,39 +705,50 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
             with self.subTest(text=text.replace(marker, "<marker>")):
                 env.write_text(text)
                 env.chmod(0o600)
-                with patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": str(env)}):
-                    if accepted:
-                        self.assertEqual(host.check_server_env(), env)
-                        continue
-                    with self.assertRaises(ValueError) as caught:
-                        host.check_server_env()
+                if accepted:
+                    self.assertEqual(host.check_server_env(env), env)
+                    continue
+                with self.assertRaises(ValueError) as caught:
+                    host.check_server_env(env)
                 self.assertNotIn(marker, str(caught.exception))
         env.write_text(f"{name}={marker}\n")
         env.chmod(0o644)
-        with patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": str(env)}), self.assertRaises(ValueError):
-            host.check_server_env()
-        with patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": ""}), self.assertRaises(ValueError):
-            host.check_server_env()
+        with self.assertRaises(ValueError):
+            host.check_server_env(env)
 
-    def test_missing_session_key_name_stops_preflight_without_exposing_values(self):
+    def test_session_key_is_generated_per_attempt_and_never_returned(self):
+        # Plan E2: generated with Python's secrets module, written with
+        # O_CREAT|O_EXCL|O_NOFOLLOW at 0600 under the state root, in docker
+        # env-file syntax (N4), plus the curl header file. SDK@fcc102a
+        # agent_server/dependencies.py:19 names the X-Session-API-Key header.
         host = load_recipe_module("host.py")
-        marker = "-".join(("synthetic", "fixture", "marker"))
-        env = self.result / "server.env"
-        env.write_text(f"OTHER_NAME={marker}\n")
-        env.chmod(0o600)
-        output = io.StringIO()
-        with patch.object(host, "preflight", return_value=({}, {}, {})), \
-                patch.object(host, "read_json") as read_json, \
-                patch.object(host, "create_receipt", side_effect=self.absent_gateway_receipt()), \
-                patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": str(env)}), contextlib.redirect_stdout(output):
-            code = host.run(self.result / "prefix", self.result, run_id="rw-openhands-fixture", arm="control")
-        self.assertEqual(code, 3)
-        read_json.assert_not_called()  # Stopped before the installation record.
-        path = self.result / "runs/rw-openhands-fixture/control"
-        self.assertEqual(json.loads(output.getvalue())["failure_stage"], "preflight")
-        self.assertEqual(json.loads((path / "window.json").read_text())["failure_type"], "ValueError")
-        for text in (output.getvalue(), *(p.read_text() for p in path.glob("*.json"))):
-            self.assertNotIn(marker, text)
+        env_path, headers_path = host.generate_session_files(self.result, "rw-openhands-fixture", "control")
+        self.assertEqual((env_path, headers_path), host.session_files(self.result, "rw-openhands-fixture", "control"))
+        self.assertEqual(env_path.parent, self.result / "secrets")
+        self.assertEqual(stat.S_IMODE(env_path.parent.stat().st_mode), 0o700)
+        for path in (env_path, headers_path):
+            self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+            self.assertEqual(host.private_file(path), path)
+        name, value = env_path.read_text().rstrip("\n").split("=", 1)
+        self.assertEqual(name, "OH_SESSION_API_KEYS_0")
+        self.assertRegex(value, r"^[A-Za-z0-9_-]{43}$")
+        self.assertEqual(env_path.read_text().count("\n"), 1)
+        self.assertEqual(headers_path.read_text(), "X-Session-API-Key: " + value + "\n")
+        self.assertEqual(host.check_server_env(env_path), env_path)
+        with self.assertRaises(FileExistsError):
+            host.generate_session_files(self.result, "rw-openhands-fixture", "control")
+        other, _ = host.generate_session_files(self.result, "rw-openhands-fixture", "engines-on")
+        self.assertNotEqual(other.read_text().split("=", 1)[1], value + "\n")
+        # A planted symlink is neither followed nor replaced.
+        target = self.result / "planted-target"
+        target.write_text("unchanged")
+        host.session_files(self.result, "rw-openhands-planted", "control")[0].symlink_to(target)
+        with self.assertRaises(OSError):
+            host.generate_session_files(self.result, "rw-openhands-planted", "control")
+        self.assertEqual(target.read_text(), "unchanged")
+        for run_id, arm in (("../escape", "control"), ("rw-openhands-fixture", "other"), ("rw-openhands-A", "control")):
+            with self.subTest(run_id=run_id, arm=arm), self.assertRaises(ValueError):
+                host.session_files(self.result, run_id, arm)
 
     def test_port_outside_owned_range_fails_in_preflight(self):
         # PR #428 crawl4ai host.py:44-45: exact int (bool refused) in 3730..3799.
@@ -757,8 +797,8 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
     # Descriptor (api/swagger.yaml:1839-1850); a pull by index digest records
     # the index reference in RepoDigests (distribution/pull_v2.go:431-434).
     @staticmethod
-    def image_inspect(pins, store):
-        image = pins["image"]
+    def image_inspect(pins, store, key="image"):
+        image = pins[key]
         index = "sha256:" + image["ref"].rsplit("@sha256:", 1)[1]
         manifest, config = "sha256:" + image["manifest_sha256"], "sha256:" + image["config_sha256"]
         common = {"RepoDigests": [image["ref"]], "Os": "linux", "Architecture": "amd64"}
@@ -770,18 +810,22 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
                     "mediaType": "application/vnd.oci.image.manifest.v1+json", "digest": manifest, "size": 4313,
                     "platform": {"architecture": "amd64", "os": "linux"}}})
 
-    def install_with(self, host, pins, plain, selected, root):
+    def install_with(self, host, pins, plain, selected, root, proxy=None):
         """Run install() on mocked inspect output; no Docker command runs."""
+        views = {pins["image"]["ref"]: (plain, selected),
+                 pins["gateway_proxy"]["ref"]: proxy or self.image_inspect(pins, "containerd", "gateway_proxy")}
+
         def inspect(argv, **kwargs):
             self.assertEqual(argv[:len(host.DOCKER) + 2], [*host.DOCKER, "image", "inspect"])
-            self.assertEqual(argv[-1], pins["image"]["ref"])
-            return json.dumps([selected if "--platform" in argv else plain])
+            found_plain, found_selected = views[argv[-1]]
+            return json.dumps([found_selected if "--platform" in argv else found_plain])
 
         with patch.object(host, "preflight", return_value=(pins, {}, {})), \
-                patch.object(host, "download_verified"), patch.object(host.subprocess, "run"), \
+                patch.object(host, "download_verified"), patch.object(host.subprocess, "run") as run, \
                 patch.object(host.subprocess, "check_output", side_effect=inspect) as calls, \
                 patch.object(host, "execute_container", return_value=0) as execute, \
                 contextlib.redirect_stdout(io.StringIO()):
+            self.install_runs = run
             try:
                 host.install(root / "prefix", root / "state")
             except ValueError as exc:
@@ -791,18 +835,25 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
     def test_install_accepts_the_pinned_image_on_containerd_and_classic_stores(self):
         host = load_recipe_module("host.py")
         pins = json.loads((RECIPE / "pins.json").read_text())
-        ref = pins["image"]["ref"]
+        ref, proxy = pins["image"]["ref"], pins["gateway_proxy"]["ref"]
         for store in ("containerd", "classic"):
             with self.subTest(store=store):
                 error, execute, calls = self.install_with(host, pins, *self.image_inspect(pins, store),
-                                                          self.result / store)
+                                                          self.result / store,
+                                                          self.image_inspect(pins, store, "gateway_proxy"))
                 self.assertIsNone(error)
                 execute.assert_called_once()
                 argv = [call.args[0] for call in calls.call_args_list]
                 self.assertEqual(argv, [[*host.DOCKER, "image", "inspect", ref],
-                                        [*host.DOCKER, "image", "inspect", "--platform", "linux/amd64", ref]])
+                                        [*host.DOCKER, "image", "inspect", "--platform", "linux/amd64", ref],
+                                        [*host.DOCKER, "image", "inspect", proxy],
+                                        [*host.DOCKER, "image", "inspect", "--platform", "linux/amd64", proxy]])
+                pulls = [call.args[0] for call in self.install_runs.call_args_list if "pull" in call.args[0]]
+                self.assertEqual(pulls, [[*host.DOCKER, "pull", "--platform", "linux/amd64", ref],
+                                         [*host.DOCKER, "pull", "--platform", "linux/amd64", proxy]])
                 installed = json.loads((self.result / store / "state/installation.json").read_text())
                 self.assertEqual(installed["image_store"], store)
+                self.assertEqual((installed["gateway_proxy"], installed["gateway_proxy_store"]), (proxy, store))
 
     def test_install_refuses_each_image_identity_mismatch_before_any_container(self):
         host = load_recipe_module("host.py")
@@ -835,6 +886,20 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
                 error, execute, _ = self.install_with(host, pins, plain, selected, self.result / f"refused-{number}")
                 self.assertEqual(error, expected)
                 execute.assert_not_called()
+        # The gateway proxy pin goes through the same identity check.
+        proxy_repo = pins["gateway_proxy"]["ref"].split("@", 1)[0]
+        for number, (view, change, expected) in enumerate((
+                ("plain", {"RepoDigests": [proxy_repo + ":1.30.5-alpine"]}, "image_repo_digest_mismatch"),
+                ("plain", {"Id": other}, "image_configuration_hash_mismatch"),
+                ("platform", {"Architecture": "arm64"}, "image_platform_manifest_mismatch"))):
+            with self.subTest(proxy=view, change=change):
+                proxy_plain, proxy_selected = self.image_inspect(pins, "containerd", "gateway_proxy")
+                (proxy_plain if view == "plain" else proxy_selected).update(change)
+                error, execute, _ = self.install_with(host, pins, *self.image_inspect(pins, "containerd"),
+                                                      self.result / f"proxy-refused-{number}",
+                                                      (proxy_plain, proxy_selected))
+                self.assertEqual(error, expected)
+                execute.assert_not_called()
 
     def test_install_actually_uses_narrow_mounts_and_grader_lock(self):
         host = load_recipe_module("host.py")
@@ -862,13 +927,6 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.checked_image(collection, "swebench/example:latest", None)
         self.assertIn("ImageCollection.pull = forbidden", (RECIPE / "e2e/docker_grader.py").read_text())
-
-    def test_egress_policy_missing_or_wrong_arm_fails_before_model_start(self):
-        host = load_recipe_module("host.py")
-        with self.assertRaises(ValueError):
-            host.model_network({}, "control")
-        with self.assertRaises(ValueError):
-            host.model_network({"egress": {"control": {"network": "bridge"}}}, "control")
 
     def test_frozen_grader_digest_is_checked_before_retagging(self):
         host = load_recipe_module("host.py")
@@ -900,6 +958,240 @@ class OpenHandsUpstreamAdapterTests(unittest.TestCase):
         self.assertIn('"$@"', (RECIPE / "run-e2e.sh").read_text())
         self.assertIn("PYTHONDONTWRITEBYTECODE=1", (RECIPE / "install.sh").read_text())
         self.assertIn("locked grader", (RECIPE / "install.sh").read_text())
+
+
+class OpenHandsIsolationTests(unittest.TestCase):
+    """Phase-2 O1 topology with Docker mocked: our integration checks only.
+
+    Nothing here creates a network or container; the live probe sequence in
+    README "Security posture" is the evidence for the topology itself.
+    """
+    OWNER = {"com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"}
+    ISOLATED = "com.docker.network.bridge.gateway_mode_ipv4"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.state = Path(self.tmp.name).resolve()
+        self.run_id, self.arm = "rw-openhands-fixture", "control"
+        self.stem = self.run_id + "-" + self.arm
+        self.result = self.state / "runs" / self.run_id / self.arm
+        self.result.mkdir(parents=True)
+
+    def network_view(self, name, **changes):
+        internal = name.endswith("-int")
+        view = {"id": hashlib.sha256(name.encode()).hexdigest(), "name": name, "driver": "bridge",
+                "internal": internal, "ipv6": False, "options": {self.ISOLATED: "isolated"} if internal else {},
+                "labels": dict(self.OWNER), "ipam": [{"Subnet": "172.30.0.0/16", "Gateway": "172.30.0.1"}]}
+        view.update(changes)
+        return view
+
+    def test_topology_creates_an_isolated_internal_network_and_a_gateway_network(self):
+        # docker/docs@4e9a5751 port-publishing.md:186-192 (plan N1): no bridge
+        # address in gateway mode isolated; network_create.md: --internal.
+        host = load_recipe_module("host.py")
+        commands = []
+        views = {self.stem + kind: self.network_view(self.stem + kind) for kind in ("-int", "-gw")}
+        with patch.object(host, "logged_command", side_effect=lambda argv, *a, **k: commands.append(argv) or 0), \
+                patch.object(host.subprocess, "check_output",
+                             side_effect=lambda argv, **k: json.dumps(views[argv[-1]])) as inspect:
+            networks = host.create_topology(self.result, self.stem)
+        label = "com.native-agent-stack.owner=gpt6-omniroute-framework-integration"
+        self.assertEqual(commands, [
+            [*host.DOCKER, "network", "create", "--internal", "--ipv6=false",
+             "-o", "com.docker.network.bridge.gateway_mode_ipv4=isolated", "--label", label, self.stem + "-int"],
+            [*host.DOCKER, "network", "create", "--ipv6=false", "--label", label, self.stem + "-gw"]])
+        self.assertEqual([call.args[0] for call in inspect.call_args_list],
+                         [[*host.DOCKER, "network", "inspect", "--format", host.NETWORK_FORMAT, self.stem + kind]
+                          for kind in ("-int", "-gw")])
+        self.assertEqual({kind: view["name"] for kind, view in networks.items()},
+                         {"int": self.stem + "-int", "gw": self.stem + "-gw"})
+
+    def test_topology_fails_closed_when_the_isolated_gateway_mode_is_rejected(self):
+        host = load_recipe_module("host.py")
+        commands = []
+        with patch.object(host, "logged_command", side_effect=lambda argv, *a, **k: commands.append(argv) or 1), \
+                patch.object(host.subprocess, "check_output") as inspect, self.assertRaises(RuntimeError):
+            host.create_topology(self.result, self.stem)
+        # No retry without the option (never a plain --internal fallback).
+        self.assertEqual(len(commands), 1)
+        inspect.assert_not_called()
+
+    def test_topology_refuses_networks_whose_inspect_differs(self):
+        host = load_recipe_module("host.py")
+        for kind, change in (("-int", {"internal": False}), ("-int", {"options": {}}),
+                             ("-int", {"options": {self.ISOLATED: "nat"}}), ("-int", {"ipv6": True}),
+                             ("-int", {"labels": {}}), ("-int", {"driver": "macvlan"}),
+                             ("-int", {"name": "other"}), ("-int", {"id": "short"}),
+                             ("-gw", {"internal": True}), ("-gw", {"ipv6": True}), ("-gw", {"labels": {}})):
+            with self.subTest(kind=kind, change=change):
+                views = {self.stem + k: self.network_view(self.stem + k) for k in ("-int", "-gw")}
+                views[self.stem + kind].update(change)
+                with patch.object(host, "logged_command", return_value=0), \
+                        patch.object(host.subprocess, "check_output",
+                                     side_effect=lambda argv, **k: json.dumps(views[argv[-1]])), \
+                        self.assertRaises(ValueError):
+                    host.create_topology(self.result, self.stem)
+
+    @staticmethod
+    def proxy_blocks():
+        text = (RECIPE / "config/proxy-nginx.conf").read_text()
+        body = "\n".join(line.split("#", 1)[0] for line in text.splitlines())
+        return text, body, body[body.index("listen 8081;"):body.index("listen 8080;")], body[body.index("listen 8080;"):]
+
+    def test_proxy_template_is_the_three_route_v1_allowlist(self):
+        text, body, agent, host_side = self.proxy_blocks()
+        placeholders = re.findall(r"@[A-Z]+@", text)
+        self.assertEqual(sorted(set(placeholders)), ["@COMPRESSION@", "@PORT@", "@RUN@", "@SERVER@"])
+        self.assertEqual(text.count("@"), 2 * len(placeholders))
+        self.assertEqual(re.findall(r"listen\s+([^;]+);", body), ["8081", "8080"])
+        self.assertEqual(re.findall(r"location\s+(=?)\s*(\S+)\s*\{", agent),
+                         [("=", "/v1/responses"), ("=", "/v1/chat/completions"), ("=", "/v1/models"), ("", "/")])
+        for route, method in (("/v1/responses", "POST"), ("/v1/chat/completions", "POST"), ("/v1/models", "GET")):
+            self.assertRegex(agent, r"location = " + re.escape(route) + r"\s*\{\s*limit_except " + method
+                             + r"\s*\{ deny all; \}\s*proxy_pass http://10\.0\.2\.2:@PORT@" + re.escape(route) + r";\s*\}")
+        self.assertRegex(agent, r"location / \{ return 403; \}")
+        self.assertRegex(agent, r"if \(\$is_args\) \{ return 403; \}")
+        self.assertIn("proxy_pass_request_headers off;", agent)
+        self.assertEqual(dict(re.findall(r'proxy_set_header\s+(\S+)\s+("[^"]*"|\$\w+);', agent)), {
+            "Host": '"10.0.2.2:@PORT@"', "Content-Type": "$content_type", "Accept": "$http_accept",
+            "Idempotency-Key": "$http_idempotency_key", "Authorization": '"Bearer local-loopback"',
+            "X-Correlation-Id": '"@RUN@"', "x-omniroute-session": '"@RUN@"',
+            "x-omniroute-compression": '"@COMPRESSION@"'})
+        self.assertEqual(agent.count("proxy_set_header"), 8)
+        self.assertEqual(set(re.findall(r"\$http_\w+", agent)), {"$http_accept", "$http_idempotency_key"})
+        # The host side carries the event-search query string, so it refuses none.
+        self.assertNotIn("$is_args", host_side)
+        self.assertNotIn("proxy_pass_request_headers", host_side)
+        self.assertRegex(host_side, r"location / \{ proxy_pass http://@SERVER@:8000; \}")
+        self.assertNotIn("resolver", body)
+        self.assertIn("server_tokens off;", body)
+        self.assertIn("pid /tmp/nginx.pid;", body)
+        for path in re.findall(r"_temp_path\s+(\S+);", body):
+            self.assertTrue(path.startswith("/tmp/"), path)
+
+    def test_proxy_render_fills_each_placeholder_from_the_arm_selection(self):
+        host = load_recipe_module("host.py")
+        recipe = load_recipe_module("recipe.py")
+        for selection, port, other, combo in (
+                (recipe.arm_config("control"), 20128, 20129, ""),
+                (recipe.arm_config("engines-on"), 20129, 20128, "allow-lossy"),
+                (recipe.arm_config("engines-on", compression="fw-rtk"), 20129, 20128, "fw-rtk")):
+            with self.subTest(arm=selection["arm"], combo=combo):
+                stem = self.run_id + "-" + selection["arm"]
+                text = host.render_proxy_config(selection, self.run_id)
+                self.assertNotIn("@", text)
+                self.assertEqual(text.count(f"proxy_pass http://10.0.2.2:{port}/v1/"), 3)
+                self.assertNotIn(f"10.0.2.2:{other}", text)
+                self.assertIn(f"proxy_pass http://{stem}-server:8000;", text)
+                values = dict(re.findall(r'proxy_set_header\s+(\S+)\s+"([^"]*)";', text))
+                self.assertEqual(values, {"Host": f"10.0.2.2:{port}", "Authorization": "Bearer local-loopback",
+                                          "X-Correlation-Id": self.run_id, "x-omniroute-session": self.run_id,
+                                          "x-omniroute-compression": combo})
+
+    def test_proxy_render_refuses_values_outside_their_patterns(self):
+        host = load_recipe_module("host.py")
+        recipe = load_recipe_module("recipe.py")
+        control, engines = recipe.arm_config("control"), recipe.arm_config("engines-on")
+        for run_id in ("rw-openhands-UPPER", "rw-openhands-x;", "rw-openhands-x\n", 'rw-openhands-x"',
+                       "rw-openhands-x}", "other-run", "rw-openhands-" + "a" * 65):
+            with self.subTest(run_id=run_id), self.assertRaises(ValueError):
+                host.render_proxy_config(control, run_id)
+        for forged in (dict(control, gateway_port=20129), dict(engines, gateway_port=20128),
+                       dict(control, compression_combo="allow-lossy"), dict(engines, compression_combo=None),
+                       dict(engines, compression_combo="default-caveman"), dict(engines, compression_combo='x";'),
+                       dict(control, arm="other"), dict(control, base_url="http://10.0.2.2:20128/v1"),
+                       dict(control, gateway_upstream="http://10.0.2.2:20129/v1")):
+            with self.subTest(forged=forged), self.assertRaises(ValueError):
+                host.render_proxy_config(forged, self.run_id)
+        template = self.result / "proxy-template.conf"
+        template.write_text((RECIPE / "config/proxy-nginx.conf").read_text() + "# @EXTRA@\n")
+        with patch.object(host, "PROXY_TEMPLATE", template), self.assertRaises(ValueError):
+            host.render_proxy_config(control, self.run_id)
+
+    def test_rendered_proxy_config_is_host_owned_0644_outside_model_mounts(self):
+        host = load_recipe_module("host.py")
+        text = "events {}\n"
+        path, sha = host.write_proxy_config(self.result, text)
+        self.assertEqual(path, self.result / "proxy/nginx.conf")
+        self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o644)
+        self.assertEqual(stat.S_IMODE(path.parent.stat().st_mode), 0o700)
+        self.assertEqual(path.stat().st_uid, os.getuid())
+        self.assertEqual(sha, hashlib.sha256(text.encode()).hexdigest())
+        with self.assertRaises(FileExistsError):
+            host.write_proxy_config(self.result, text)
+
+    def test_proxy_launch_is_create_connect_start_with_loopback_ingress_only(self):
+        host = load_recipe_module("host.py")
+        pins = json.loads((RECIPE / "pins.json").read_text())
+        config = self.result / "proxy/nginx.conf"
+        create, connect, start = host.proxy_commands(pins, self.stem, config, 3740)
+        self.assertEqual(create[:len(host.DOCKER) + 1], [*host.DOCKER, "create"])
+        for flag in ("--pull=never", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges",
+                     "--network=" + self.stem + "-gw"):
+            self.assertIn(flag, create)
+        options = {create[i]: create[i + 1] for i in range(len(create) - 1) if create[i].startswith("--")}
+        self.assertEqual(options["--name"], self.stem + "-proxy")
+        self.assertEqual(options["--label"], "com.native-agent-stack.owner=gpt6-omniroute-framework-integration")
+        self.assertEqual(options["--publish"], "127.0.0.1:3740:8080")
+        self.assertEqual(options["--platform"], "linux/amd64")
+        self.assertEqual(options["--tmpfs"], "/tmp:rw,nosuid,nodev,mode=1777")
+        self.assertEqual((options["--pids-limit"], options["--memory"]), ("64", "256m"))
+        self.assertEqual(options["--mount"], f"type=bind,src={config},dst=/etc/nginx/nginx.conf,readonly")
+        self.assertEqual(options["--entrypoint"], "nginx")
+        self.assertEqual(create[-3:], [pins["gateway_proxy"]["ref"], "-g", "daemon off;"])
+        self.assertEqual(sum(arg == "--publish" or re.match(r"-p\b", arg) is not None for arg in create), 1)
+        self.assertEqual(connect, [*host.DOCKER, "network", "connect", "--alias", "gw", self.stem + "-int",
+                                   self.stem + "-proxy"])
+        self.assertEqual(start, [*host.DOCKER, "start", self.stem + "-proxy"])
+        for port in (3729, 3800, True):
+            with self.subTest(port=port), self.assertRaises(ValueError):
+                host.proxy_commands(pins, self.stem, config, port)
+        with self.assertRaises(ValueError):
+            host.proxy_commands(pins, self.run_id, config, 3740)
+
+    def docker_run_fake(self, host, *, removed=True, listed=""):
+        calls = []
+
+        def run(argv, **kwargs):
+            calls.append(list(argv))
+            tail = argv[len(host.DOCKER):]
+            if tail[:1] == ["rm"]:
+                return subprocess.CompletedProcess(argv, 0 if removed else 1)
+            if tail[:1] == ["ps"]:
+                return subprocess.CompletedProcess(argv, 0, stdout="" if removed else "still-there\n")
+            if tail[:2] == ["network", "ls"]:
+                return subprocess.CompletedProcess(argv, 0, stdout="bridge\nhost\nnone\n" + listed)
+            return subprocess.CompletedProcess(argv, 0, stdout="")
+        return calls, run
+
+    def test_teardown_removes_proxy_then_server_then_networks_by_exact_name(self):
+        host = load_recipe_module("host.py")
+        keys = host.generate_session_files(self.state, self.run_id, self.arm)
+        calls, run = self.docker_run_fake(host)
+        with patch.object(host.subprocess, "run", side_effect=run):
+            self.assertTrue(host.teardown_attempt(self.state, self.run_id, self.arm))
+        self.assertEqual([argv[len(host.DOCKER):] for argv in calls], [
+            ["logs", self.stem + "-proxy"], ["rm", "-f", self.stem + "-proxy"],
+            ["logs", self.stem + "-server"], ["rm", "-f", self.stem + "-server"],
+            ["network", "rm", self.stem + "-int"], ["network", "ls", "--format", "{{.Name}}"],
+            ["network", "rm", self.stem + "-gw"], ["network", "ls", "--format", "{{.Name}}"]])
+        self.assertNotIn("prune", json.dumps(calls))
+        for record in ("proxy.log.cleanup.json", "server.log.cleanup.json",
+                       "network-int.cleanup.json", "network-gw.cleanup.json"):
+            self.assertIs(json.loads((self.result / record).read_text())["confirmed_removed"], True, record)
+        self.assertFalse(any(path.exists() for path in keys))
+
+    def test_teardown_keeps_key_files_while_removal_is_unconfirmed(self):
+        host = load_recipe_module("host.py")
+        keys = host.generate_session_files(self.state, self.run_id, self.arm)
+        calls, run = self.docker_run_fake(host, removed=False, listed=self.stem + "-int\n")
+        with patch.object(host.subprocess, "run", side_effect=run):
+            self.assertFalse(host.teardown_attempt(self.state, self.run_id, self.arm))
+        self.assertTrue(all(path.exists() for path in keys))
+        self.assertIs(json.loads((self.result / "server.log.cleanup.json").read_text())["confirmed_removed"], False)
+        self.assertIs(json.loads((self.result / "network-int.cleanup.json").read_text())["confirmed_removed"], False)
+        self.assertIs(json.loads((self.result / "network-gw.cleanup.json").read_text())["confirmed_removed"], True)
 
 
 class OpenHandsReceiptTests(unittest.TestCase):
@@ -1102,6 +1394,20 @@ class OpenHandsReceiptTests(unittest.TestCase):
                     self.assertEqual(receipt["compression_combo"], combo)
                     self.assertEqual(receipt["gateway"]["entry_port"], port)
 
+    def test_receipt_counts_network_removal_separately_from_containers(self):
+        module = load_recipe_module("receipt.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            result = Path(tmp).resolve()
+            (result / "check.json").write_text("{}")
+            (result / "window.json").write_text(json.dumps({
+                "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
+            for name, removed in (("server.log.cleanup.json", True), ("proxy.log.cleanup.json", True),
+                                  ("network-int.cleanup.json", True), ("network-gw.cleanup.json", False)):
+                (result / name).write_text(json.dumps({"confirmed_removed": removed, "error_type": None}))
+            receipt = module.create_receipt(result, database=result / "absent.sqlite")
+        self.assertEqual(receipt["container_cleanup"], {"attempts": 2, "confirmed_removed": 2, "complete": True})
+        self.assertEqual(receipt["network_cleanup"], {"attempts": 2, "confirmed_removed": 1, "complete": False})
+
 
 class OpenHandsDispatchTests(unittest.TestCase):
     """Synthetic native REST transport, not an agent-server/model execution."""
@@ -1151,12 +1457,16 @@ class OpenHandsDispatchTests(unittest.TestCase):
     def test_server_preserves_native_entrypoint_and_uses_supported_preload(self):
         dispatch = load_recipe_module("dispatch.py")
         pins = json.loads((RECIPE / "pins.json").read_text())
-        args = dispatch.server_command(pins, "rw-openhands-fixture-server", [],
-                                       "rw-openhands-egress-control", "/private/server.env")
+        stem = self.run_id + "-control"
+        args = dispatch.server_command(pins, stem + "-server", [], stem + "-int", "/private/server.env")
         self.assertNotIn("--entrypoint", args)
-        self.assertIn("127.0.0.1:3730:8000", args)
+        # Plan E1: the agent-server publishes nothing; only the proxy does.
+        self.assertFalse(any(arg == "--publish" or arg.startswith(("--publish=", "-p")) for arg in args))
+        self.assertIn("--network=" + stem + "-int", args)
         self.assertEqual(args[-4:], ["--extra-python-path", "/recipe", "--import-modules", "server_transport"])
-        self.assertIn("--env-file", args)
+        self.assertEqual(args[args.index("--env-file") + 1], "/private/server.env")
+        with self.assertRaises(ValueError):
+            dispatch.server_command(pins, stem + "-server", [], stem + "-gw", "/private/server.env")
 
     def test_compression_delta_is_separate_and_missing_or_reset_is_unknown(self):
         dispatch = load_recipe_module("dispatch.py")
@@ -1166,37 +1476,77 @@ class OpenHandsDispatchTests(unittest.TestCase):
         self.assertIsNone(dispatch.compression_delta(None, after)["delta"])
         self.assertIsNone(dispatch.compression_delta(after, before)["delta"])
 
-    def test_prepare_serializes_body_offline_then_launches_native_server(self):
+    def prepare(self, port=3730, render_exit=0, arm=None):
+        """prepare_native_dispatch with Docker mocked; no container or network."""
         host = load_recipe_module("host.py")
         dispatch = load_recipe_module("dispatch.py")
         pins = json.loads((RECIPE / "pins.json").read_text())
-        (self.result / "worker").mkdir()
-        selection = load_recipe_module("recipe.py").arm_config("engines-on")
-        calls = []
+        arm = arm or self.arm
+        result = self.state / "runs" / self.run_id / arm
+        (result / "worker").mkdir(parents=True, exist_ok=True)
+        stem = self.run_id + "-" + arm
+        rendered, commands = [], []
 
-        def rendered(args, name, log, timeout):
-            calls.append(args)
-            (self.result / "worker/start.json").write_text(json.dumps({"agent": {"llm": {}}, "workspace": {}, "initial_message": {}}))
-            return 0
+        def render(args, name, log, timeout):
+            rendered.append(args)
+            (result / "worker/start.json").write_text(json.dumps({"agent": {"llm": {}}, "workspace": {}, "initial_message": {}}))
+            return render_exit
 
+        topology = {kind: {"name": f"{stem}-{kind}", "id": hashlib.sha256(kind.encode()).hexdigest()}
+                    for kind in ("int", "gw")}
         with patch.dict(sys.modules, {"dispatch": dispatch}), \
-                patch.object(host, "execute_container", side_effect=rendered), \
-                patch.object(host, "logged_command", return_value=0) as launch, \
-                patch.object(dispatch, "private_file", side_effect=lambda x: Path(x)), \
-                patch.object(dispatch, "check_server", return_value=None), \
-                patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": "/private/server.env", "OPENHANDS_HEADERS": "/private/headers"}):
-            host.prepare_native_dispatch(self.result, self.state / "prefix", pins, [],
-                                         "rw-openhands-egress-engines-on", {"variables": {"HOST_PATH": "/usr/bin"}},
-                                         selection, self.run_id)
-        self.assertIn("--network=none", calls[0])
-        self.assertIn("OPENHANDS_ARM=engines-on", calls[0])
-        self.assertIn("OPENHANDS_BASE_URL=http://gw:8081/v1", calls[0])
-        self.assertIn("OPENHANDS_COMPRESSION=allow-lossy", calls[0])
-        self.assertEqual(calls[0][-1], "--request")
-        launched = launch.call_args.args[0]
-        self.assertNotIn("--entrypoint", launched)
-        self.assertTrue((self.result / "start.json").exists())
-        self.assertEqual(json.loads((self.result / "status.json").read_text())["status"], "prepared")
+                patch.object(host, "execute_container", side_effect=render), \
+                patch.object(host, "create_topology", return_value=topology) as create, \
+                patch.object(host, "logged_command", side_effect=lambda argv, *a, **k: commands.append(argv) or 0), \
+                patch.object(dispatch, "check_server", return_value=None) as check:
+            host.prepare_native_dispatch(self.state, self.run_id, load_recipe_module("recipe.py").arm_config(arm),
+                                         self.state / "prefix", pins, [], {"variables": {"HOST_PATH": "/usr/bin"}},
+                                         port=port)
+        return SimpleNamespace(host=host, dispatch=dispatch, result=result, stem=stem, rendered=rendered,
+                               commands=commands, create=create, check=check, pins=pins)
+
+    def test_prepare_serializes_body_offline_then_launches_native_server(self):
+        prepared = self.prepare()
+        host, result, stem, commands = prepared.host, prepared.result, prepared.stem, prepared.commands
+        request = prepared.rendered[0]
+        self.assertIn("--network=none", request)
+        self.assertIn("OPENHANDS_ARM=engines-on", request)
+        self.assertIn("OPENHANDS_BASE_URL=http://gw:8081/v1", request)
+        self.assertIn("OPENHANDS_COMPRESSION=allow-lossy", request)
+        self.assertEqual(request[-1], "--request")
+        prepared.create.assert_called_once_with(result, stem)
+        # Order: server on the internal network, then proxy create/connect/start.
+        server, create, connect, start = commands
+        self.assertNotIn("--entrypoint", server)
+        self.assertIn("--network=" + stem + "-int", server)
+        self.assertFalse(any(arg == "--publish" or arg.startswith("-p") for arg in server))
+        env_file, headers = host.session_files(self.state, self.run_id, self.arm)
+        self.assertEqual(server[server.index("--env-file") + 1], str(env_file))
+        self.assertEqual(create[len(host.DOCKER)], "create")
+        self.assertIn("--network=" + stem + "-gw", create)
+        self.assertEqual(create[create.index("--publish") + 1], "127.0.0.1:3730:8080")
+        self.assertIn(f"type=bind,src={result}/proxy/nginx.conf,dst=/etc/nginx/nginx.conf,readonly", create)
+        self.assertEqual(connect[len(host.DOCKER):], ["network", "connect", "--alias", "gw", stem + "-int", stem + "-proxy"])
+        self.assertEqual(start[len(host.DOCKER):], ["start", stem + "-proxy"])
+        # The key is generated per attempt and is never part of any argv.
+        value = env_file.read_text().split("=", 1)[1].strip()
+        self.assertTrue(value and headers.is_file())
+        for argv in prepared.rendered + commands:
+            self.assertNotIn(value, " ".join(map(str, argv)))
+        # The rendered proxy config sits outside every model mount.
+        config = result / "proxy/nginx.conf"
+        self.assertEqual(stat.S_IMODE(config.stat().st_mode), 0o644)
+        self.assertIn("proxy_pass http://10.0.2.2:20129/v1/responses;", config.read_text())
+        for argv in [request, server]:
+            self.assertFalse(any(f"src={result}/proxy" in arg for arg in argv))
+        prepared.check.assert_called_once()
+        self.assertEqual(prepared.check.call_args.kwargs["port"], 3730)
+        self.assertTrue((result / "start.json").exists())
+        status = json.loads((result / "status.json").read_text())
+        self.assertEqual(status["status"], "prepared")
+        self.assertEqual((status["server_name"], status["proxy_name"], status["port"]),
+                         (stem + "-server", stem + "-proxy", 3730))
+        self.assertEqual(status["proxy_config_sha256"], hashlib.sha256(config.read_bytes()).hexdigest())
 
     def test_model_mount_permissions_do_not_follow_symlinks(self):
         host = load_recipe_module("host.py")
@@ -1271,17 +1621,14 @@ class OpenHandsDispatchTests(unittest.TestCase):
         self.assertEqual(report["failure_stage"], "export")
 
     def test_request_serialization_failure_cannot_leave_prepared_receipt(self):
+        with self.assertRaises(RuntimeError):
+            self.prepare(render_exit=7)
+        # Nothing was created: no network, key file, server or proxy.
         host = load_recipe_module("host.py")
-        dispatch = load_recipe_module("dispatch.py")
-        with patch.dict(sys.modules, {"dispatch": dispatch}), \
-                patch.object(dispatch, "private_file", side_effect=lambda x: Path(x)), \
-                patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": "/private/server.env", "OPENHANDS_HEADERS": "/private/headers"}), \
-                patch.object(host, "execute_container", return_value=7), \
-                patch.object(host, "logged_command") as launch, self.assertRaises(RuntimeError):
-            host.prepare_native_dispatch(self.result, self.state / "prefix", json.loads((RECIPE / "pins.json").read_text()), [],
-                                         "rw-openhands-egress-engines-on", {"variables": {"HOST_PATH": "/usr/bin"}},
-                                         load_recipe_module("recipe.py").arm_config(self.arm), self.run_id)
-        launch.assert_not_called()
+        self.assertFalse((self.state / "secrets").exists())
+        self.assertFalse(any(path.exists() for path in host.session_files(self.state, self.run_id, self.arm)))
+        self.assertFalse((self.result / "status.json").exists())
+        self.assertFalse((self.result / "proxy").exists())
 
     def test_patch_export_cannot_use_host_git_filters_or_external_diff(self):
         dispatch = load_recipe_module("dispatch.py")
@@ -1431,42 +1778,28 @@ class OpenHandsDispatchTests(unittest.TestCase):
                 self.assertIn(dispatch.result_exit({**receipt, "evidence_complete": True}), {1, 3})
 
     def test_selected_port_flows_from_prepare_to_dispatch(self):
-        host = load_recipe_module("host.py")
-        dispatch = load_recipe_module("dispatch.py")
-        pins = json.loads((RECIPE / "pins.json").read_text())
-        (self.result / "worker").mkdir()
-
-        def rendered(args, name, log, timeout):
-            (self.result / "worker/start.json").write_text(json.dumps({"agent": {"llm": {}}, "workspace": {}, "initial_message": {}}))
-            return 0
-
-        with patch.dict(sys.modules, {"dispatch": dispatch}), \
-                patch.object(host, "execute_container", side_effect=rendered), \
-                patch.object(host, "logged_command", return_value=0) as launch, \
-                patch.object(dispatch, "private_file", side_effect=lambda x: Path(x)), \
-                patch.object(dispatch, "check_server", return_value=None) as check, \
-                patch.dict(os.environ, {"OPENHANDS_SERVER_ENV": "/private/server.env", "OPENHANDS_HEADERS": "/private/headers"}):
-            host.prepare_native_dispatch(self.result, self.state / "prefix", pins, [], "rw-openhands-egress-engines-on",
-                                         {"variables": {"HOST_PATH": "/usr/bin"}},
-                                         load_recipe_module("recipe.py").arm_config(self.arm), self.run_id, port=3740)
-        self.assertIn("127.0.0.1:3740:8000", launch.call_args.args[0])
-        self.assertNotIn("127.0.0.1:3730:8000", launch.call_args.args[0])
-        self.assertEqual(check.call_args.kwargs["port"], 3740)
+        prepared = self.prepare(port=3740)
+        dispatch, commands = prepared.dispatch, prepared.commands
+        published = [argv[argv.index("--publish") + 1] for argv in commands if "--publish" in argv]
+        self.assertEqual(published, ["127.0.0.1:3740:8080"])
+        self.assertEqual(prepared.check.call_args.kwargs["port"], 3740)
         self.assertEqual(json.loads((self.result / "status.json").read_text())["port"], 3740)
         (self.result / "window.json").write_text(json.dumps({"arm": self.arm, "run_id": self.run_id}))
+        headers = prepared.host.session_files(self.state, self.run_id, self.arm)[1]
         with patch.object(dispatch, "api_request", return_value={"id": FIXTURE_CONVERSATION_ID}) as api, \
+                patch.object(dispatch, "verify_isolation", return_value=None, create=True), \
                 patch.object(dispatch, "compression_snapshot", return_value=None), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(dispatch.execute("start", self.state, self.run_id, self.arm), 0)
         self.assertEqual(api.call_args.kwargs["port"], 3740)
+        # The headers path is derived from the attempt identity, never read
+        # from status.json or the environment.
+        self.assertEqual(api.call_args.kwargs["headers"], headers)
         status = json.loads((self.result / "status.json").read_text())
         (self.result / "status.json").write_text(json.dumps({**status, "port": 8000}))
         with patch.object(dispatch, "api_request") as api, patch.object(dispatch, "stop_server"), \
                 contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(dispatch.execute("wait", self.state, self.run_id, self.arm), 3)
         api.assert_not_called()
-        args = dispatch.server_command(pins, "rw-openhands-fixture-server", [], "rw-openhands-egress-control",
-                                       "/private/server.env")
-        self.assertIn("127.0.0.1:3730:8000", args)
 
 
 if __name__ == "__main__":

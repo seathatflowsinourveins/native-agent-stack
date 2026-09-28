@@ -16,6 +16,7 @@ import io
 import os
 from pathlib import Path
 import re
+import secrets
 import shutil
 import signal
 import stat
@@ -25,7 +26,8 @@ import tempfile
 import urllib.request
 import uuid
 
-from recipe import HERE, arm_config, digest, environment_selection, llm_config, read_json, render_mcp
+from recipe import (COMPRESSION_COMBOS, HERE, arm_config, digest, environment_selection, llm_config, read_json,
+                    render_mcp)
 from e2e.task import load_task, worker_instruction
 from receipt import create_receipt, read_bounded, time_value
 
@@ -37,8 +39,29 @@ DEFAULT_PORT = 3730
 # conversation/impl/local_conversation.py:753-755 (STUCK) and :2021-2043,
 # :2339-2360 (ERROR with ConversationErrorEvent code "MaxIterationsReached").
 AGENT_LIMITS = frozenset({"stuck", "max_iterations_reached"})
-# SDK@fcc102a openhands-agent-server/openhands/agent_server/config.py:24.
+# SDK@fcc102a openhands-agent-server/openhands/agent_server/config.py:24 and
+# dependencies.py:19 (the header the server checks).
 SESSION_KEY_NAME = "OH_SESSION_API_KEYS_0"
+SESSION_HEADER = "X-Session-API-Key"
+OWNER_KEY, OWNER_VALUE = "com.native-agent-stack.owner", "gpt6-omniroute-framework-integration"
+OWNER_LABEL = OWNER_KEY + "=" + OWNER_VALUE
+# Every Docker resource of one attempt is named from S = <run-id>-<arm>
+# (O1 topology, README "Security posture").
+RUN_ID = re.compile(r"rw-openhands-[a-z0-9-]{1,64}")
+STEM = re.compile(RUN_ID.pattern + r"-(?:control|engines-on)")
+# docker/docs@4e9a5751 content/manuals/engine/network/port-publishing.md:121-131,186-192.
+ISOLATED_OPTION = "com.docker.network.bridge.gateway_mode_ipv4"
+# Selected fields only. The Docker CLI inspector falls back to the raw JSON
+# field names when the typed template fails; checked read-only against this
+# host's default bridge network on 2026-09-28 (evidence/phase2-commands.json).
+NETWORK_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"driver":{{json .Driver}},'
+                  '"internal":{{json .Internal}},"ipv6":{{json .EnableIPv6}},"options":{{json .Options}},'
+                  '"labels":{{json .Labels}},"ipam":{{json .IPAM.Config}}}')
+# Never a full container inspect: the server's Config.Env holds the session key.
+CONTAINER_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"running":{{json .State.Running}},'
+                    '"labels":{{json .Config.Labels}},"networks":{{json .NetworkSettings.Networks}}}')
+PROXY_TEMPLATE = HERE / "config/proxy-nginx.conf"
+PLACEHOLDER = re.compile(r"@[A-Z]+@")
 
 
 def owned_port(value):
@@ -62,22 +85,19 @@ def private_file(path):
     return path
 
 
-def check_server_env():
+def check_server_env(path):
     """Require the session-key variable NAME in the server env file; values stay unread.
 
     SDK@fcc102a agent_server/__main__.py:282-285 binds all interfaces only with a
     session API key (config.py:24 names OH_SESSION_API_KEYS_0). Without one the
-    server listens on container loopback, which the published port cannot reach.
+    server listens on container loopback, which the proxy cannot reach.
     docker/cli@v29.8.1 pkg/kvfile/kvfile.go:92-124 is the --env-file format:
     newline-delimited lines, a BOM dropped on line one, leading whitespace
     trimmed, "#" comments, and the name ends at the first "=". A bare name copies
     the Docker CLI's own environment, so only the NAME= form is accepted. Only
     the text before "=" is compared; no value is kept, printed or logged.
     """
-    name = os.environ.get("OPENHANDS_SERVER_ENV")
-    if not name:
-        raise ValueError("OPENHANDS_SERVER_ENV_required")
-    path = private_file(name)
+    path = private_file(path)
     try:
         text = read_bounded(path, limit=64 * 1024)
     except UnicodeDecodeError:
@@ -235,18 +255,46 @@ def workspace_skills(stack_root, workspace):
     return {"names": sorted(names), "manifest_sha256": digest(manifest)}
 
 
+def attempt_stem(run_id, arm):
+    if not isinstance(run_id, str) or not RUN_ID.fullmatch(run_id) or arm not in {"control", "engines-on"}:
+        raise ValueError("owned_attempt_identity_required")
+    return run_id + "-" + arm
+
+
+def network_names(stem):
+    if not STEM.fullmatch(stem):
+        raise ValueError("owned_attempt_identity_required")
+    return {"int": stem + "-int", "gw": stem + "-gw"}
+
+
+def network_allowed(name, network, installer):
+    """Allow no network, the installer's bridge, or the attempt's own network per role.
+
+    Only the agent-server and the P1/P2 probe join <stem>-int; only the P0
+    probe joins <stem>-gw. The proxy is created by proxy_commands, not here.
+    """
+    if network == "none":
+        return True
+    if installer:
+        return network == "bridge" and "-install-" in name
+    for kind, roles in (("-int", ("-server", "-probe-int")), ("-gw", ("-probe-gw",))):
+        stem = network.removesuffix(kind)
+        if network.endswith(kind) and STEM.fullmatch(stem):
+            return name in {stem + role for role in roles}
+    return False
+
+
 def docker_args(pins, name, *, network="none", installer=False):
     if not re.fullmatch(r"rw-openhands-[a-z0-9-]+", name):
         raise ValueError("owned_container_name_required")
     limits = read_json(HERE / "config/worker.json")["runtime"]
     if network is False:
         network = "none"
-    if network not in {"none", "rw-openhands-egress-control", "rw-openhands-egress-engines-on"}:
-        if not (installer and network == "bridge" and "-install-" in name):
-            raise ValueError("explicit_scoped_model_network_required")
+    if not isinstance(network, str) or not network_allowed(name, network, installer):
+        raise ValueError("attempt_scoped_network_required")
     args = DOCKER + [
         "run", "--rm", "--pull=never", "--name", name, "--platform", pins["image"]["platform"],
-        "--label", "com.native-agent-stack.owner=gpt6-omniroute-framework-integration",
+        "--label", OWNER_LABEL,
         "--user", "0:0" if installer else "10001:10001", "--cap-drop=ALL", "--security-opt=no-new-privileges",
         "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev,mode=1777",
         "--tmpfs", "/state/home:rw,nosuid,nodev,mode=0700," + ("uid=0,gid=0" if installer else "uid=10001,gid=10001"),
@@ -255,7 +303,7 @@ def docker_args(pins, name, *, network="none", installer=False):
         "--cpus", limits["cpus"], "--memory", limits["memory"], "--pids-limit", str(limits["pids_limit"]),
     ]
     args += ["--network=" + network]
-    # Base launches publish nothing; dispatch adds only the loopback mapping.
+    # Launches built here publish nothing; only the proxy publishes loopback ingress.
     return args
 
 
@@ -463,8 +511,13 @@ def install(prefix, state):
     # Source bytes are retained for reproducibility, not executed or patched.
     download_verified(pins["source_archive"], state / "cache/upstream.tar.gz")
     download_verified(pins["uv_lock"], state / "cache/upstream.uv.lock")
-    subprocess.run(DOCKER + ["pull", "--platform", pins["image"]["platform"], pins["image"]["ref"]], check=True)
-    image_store = pinned_image_identity(pins["image"])
+    stores = {}
+    # The agent-server image, then the pinned gateway proxy image; each is
+    # checked before anything else is pulled or any container runs.
+    for key in ("image", "gateway_proxy"):
+        subprocess.run(DOCKER + ["pull", "--platform", pins[key]["platform"], pins[key]["ref"]], check=True)
+        stores[key] = pinned_image_identity(pins[key])
+    image_store = stores["image"]
     # A reviewable snapshot, with no repository metadata or host configuration.
     if HERE.resolve() != (prefix / "recipe").resolve():
         shutil.copytree(HERE, prefix / "recipe", dirs_exist_ok=True,
@@ -478,6 +531,8 @@ def install(prefix, state):
     code = execute_container(args, name, attempt / "install.log", 900)
     write_json(state / "installation.json", {"version": pins["version"], "image": pins["image"]["ref"],
                                             "image_store": image_store,
+                                            "gateway_proxy": pins["gateway_proxy"]["ref"],
+                                            "gateway_proxy_store": stores["gateway_proxy"],
                                             "requirements_sha256": pins["requirements_sha256"], "exit_code": code})
     if code:
         raise RuntimeError("container_install_failed_see_private_install_log")
@@ -501,36 +556,181 @@ def install_mounts(prefix, state):
             + mount(prefix / "recipe", "/recipe"))
 
 
-def model_network(host, arm):
-    """Require coordinator network-policy evidence before granting any egress.
+def inspect_selected(kind, template, name):
+    """One `docker <kind> inspect --format` read of selected fields, as JSON."""
+    value = json.loads(subprocess.check_output(DOCKER + [kind, "inspect", "--format", template, name],
+                                               text=True, timeout=30))
+    if not isinstance(value, dict):
+        raise ValueError("unexpected_inspect_shape")
+    return value
 
-    Docker docs@4e9a575 firewall-iptables.md:22-24,48-95 defines DOCKER-USER.
-    Rootless namespace placement and actual rule effects require host probes.
-    A network name or MCP allowlist alone is never network acceptance.
+
+def checked_network(name, kind):
+    """Read one attempt network back and require its contract (plan E1)."""
+    info = inspect_selected("network", NETWORK_FORMAT, name)
+    internal = kind == "int"
+    if (info.get("name") != name or info.get("driver") != "bridge" or info.get("internal") is not internal
+            or info.get("ipv6") is not False or (info.get("labels") or {}).get(OWNER_KEY) != OWNER_VALUE
+            or not re.fullmatch(r"[a-f0-9]{64}", str(info.get("id")))
+            or (internal and (info.get("options") or {}).get(ISOLATED_OPTION) != "isolated")):
+        raise ValueError(f"attempt_{kind}_network_contract_mismatch")
+    return info
+
+
+def create_topology(result, stem):
+    """Create the attempt's internal and gateway networks; fail closed.
+
+    docker/docs@4e9a5751 content/manuals/engine/network/port-publishing.md:
+    186-192: containers on an internal network can reach host services through
+    the bridge address, including services listening on all host addresses;
+    no address is assigned to the bridge with gateway mode isolated (options
+    :121-131). A rejected option is never retried without it.
     """
-    selection = arm_config(arm)
-    entry = host.get("egress", {}).get(arm, {})
-    name = "rw-openhands-egress-" + arm
-    if entry.get("network") != name or not entry.get("policy_receipt"):
-        raise ValueError("verified_per_port_egress_policy_required")
-    path = Path(entry["policy_receipt"])
-    if path.stat().st_uid != os.getuid() or stat.S_IMODE(path.stat().st_mode) != 0o600:
-        raise ValueError("private_host_policy_receipt_required")
-    proof = json.loads(read_bounded(path))
-    age = datetime.now(timezone.utc) - time_value(proof["verified_at"])
-    if not 0 <= age.total_seconds() <= 900:
-        raise ValueError("fresh_egress_verification_required")
-    if (proof.get("mechanism") != "docker-user-iptables"
-            or proof.get("allowed_tcp") != [f"10.0.2.2:{selection['gateway_port']}"]
-            or any(proof.get(k) is not True for k in (
-                "default_deny", "host_input_denied", "ipv6_disabled", "gateway_reachable", "other_host_ports_denied"))):
-        raise ValueError("egress_policy_contract_mismatch")
-    info = json.loads(subprocess.check_output(DOCKER + ["network", "inspect", name], text=True, timeout=30))[0]
-    if (info.get("Id") != proof.get("network_id") or info.get("Driver") != "bridge"
-            or info.get("EnableIPv6") or info.get("Labels", {}).get("com.native-agent-stack.owner")
-            != "gpt6-omniroute-framework-integration"):
-        raise ValueError("egress_network_identity_mismatch")
-    return name
+    names = network_names(stem)
+    commands = {
+        "int": ["network", "create", "--internal", "--ipv6=false", "-o", ISOLATED_OPTION + "=isolated",
+                "--label", OWNER_LABEL, names["int"]],
+        "gw": ["network", "create", "--ipv6=false", "--label", OWNER_LABEL, names["gw"]],
+    }
+    for kind in ("int", "gw"):
+        if logged_command(DOCKER + commands[kind], result / f"network-{kind}-create.log", cwd=result, timeout=60):
+            raise RuntimeError(f"attempt_{kind}_network_create_failed")
+    return {kind: checked_network(names[kind], kind) for kind in ("int", "gw")}
+
+
+def session_files(state, run_id, arm):
+    """The attempt's key files under the state root, derived from its identity only."""
+    stem = attempt_stem(run_id, arm)
+    directory = Path(state) / "secrets"
+    return directory / (stem + ".server.env"), directory / (stem + ".headers")
+
+
+def generate_session_files(state, run_id, arm):
+    """Generate this attempt's agent-server key; return the two paths, never the value.
+
+    One value from Python's secrets module goes into <stem>.server.env in
+    docker env-file syntax (NAME=value, docs.docker.com container run
+    --env-file) and into <stem>.headers for curl -H @file. Each file is created
+    with O_CREAT|O_EXCL|O_NOFOLLOW at 0600, so an existing file or a planted
+    symlink is refused. teardown_attempt deletes both after confirmed removal.
+    """
+    paths = session_files(state, run_id, arm)
+    private_directory(paths[0].parent)
+    value = secrets.token_urlsafe(32)
+    for path, line in zip(paths, (f"{SESSION_KEY_NAME}={value}\n", f"{SESSION_HEADER}: {value}\n")):
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(descriptor, "w") as stream:
+            os.fchmod(stream.fileno(), 0o600)
+            stream.write(line)
+    return paths
+
+
+def render_proxy_config(selection, run_id):
+    """Fill config/proxy-nginx.conf for one attempt; refuse anything unexpected.
+
+    The selection must equal what arm_config returns for its own fields, so a
+    cross-arm pairing or an unrecorded compression combo cannot be rendered,
+    and every value must match its own pattern before substitution.
+    """
+    checked = arm_config(selection.get("arm"), selection.get("requested_model"), selection.get("base_url"),
+                         selection.get("compression_combo"))
+    if checked != selection:
+        raise ValueError("proxy_selection_mismatch")
+    stem = attempt_stem(run_id, checked["arm"])
+    values = {"@PORT@": str(checked["gateway_port"]), "@SERVER@": stem + "-server", "@RUN@": run_id,
+              "@COMPRESSION@": checked["compression_combo"] or ""}
+    patterns = {"@PORT@": r"2012[89]", "@SERVER@": STEM.pattern + "-server", "@RUN@": RUN_ID.pattern,
+                "@COMPRESSION@": "|".join(map(re.escape, sorted(COMPRESSION_COMBOS))) + "|"}
+    text = PROXY_TEMPLATE.read_text()
+    found = PLACEHOLDER.findall(text)
+    if set(found) != set(values) or text.count("@") != 2 * len(found):
+        raise ValueError("proxy_template_placeholders_changed")
+    for key, value in values.items():
+        if not re.fullmatch(patterns[key], value):
+            raise ValueError("proxy_value_outside_pattern")
+        text = text.replace(key, value)
+    return text
+
+
+def write_proxy_config(result, text):
+    """Host-owned 0644 file outside every model mount: <result>/proxy/nginx.conf."""
+    directory = result / "proxy"
+    private_directory(directory)
+    path = directory / "nginx.conf"
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
+    with os.fdopen(descriptor, "w") as stream:
+        # umask 077 would leave 0600; the image's non-root user reads the bind mount.
+        os.fchmod(stream.fileno(), 0o644)
+        stream.write(text)
+    return path, digest(path)
+
+
+def proxy_commands(pins, stem, config, port):
+    """Create on <stem>-gw with loopback ingress, join <stem>-int as "gw", start.
+
+    A created container joins its configured networks when it runs, and
+    network connect --alias adds a network-scoped name (docs.docker.com
+    container run and network connect, fetched 2026-09-28). Starting after the
+    connect lets nginx resolve <stem>-server when it loads. --entrypoint nginx
+    bypasses the image's entrypoint scripts, unprobed under --read-only.
+    """
+    image, names = pins["gateway_proxy"], network_names(stem)
+    name = stem + "-proxy"
+    create = DOCKER + [
+        "create", "--pull=never", "--name", name, "--platform", image["platform"], "--label", OWNER_LABEL,
+        "--network=" + names["gw"], "--publish", f"127.0.0.1:{owned_port(port)}:8080",
+        "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev,mode=1777", "--cap-drop=ALL",
+        "--security-opt=no-new-privileges", "--pids-limit", "64", "--memory", "256m",
+        *mount(config, "/etc/nginx/nginx.conf"), "--entrypoint", "nginx", image["ref"], "-g", "daemon off;",
+    ]
+    return create, DOCKER + ["network", "connect", "--alias", "gw", names["int"], name], DOCKER + ["start", name]
+
+
+def launch_proxy(result, pins, stem, config, port):
+    for step, argv in zip(("create", "connect", "start"), proxy_commands(pins, stem, config, port)):
+        if logged_command(argv, result / f"proxy-{step}.log", cwd=result, timeout=60):
+            raise RuntimeError(f"proxy_{step}_failed")
+
+
+def cleanup_network(name, record):
+    """Remove one network by exact name; confirm by exact membership in network ls."""
+    cleanup = {"confirmed_removed": False, "error_type": None}
+    try:
+        subprocess.run(DOCKER + ["network", "rm", name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                       check=False, timeout=30)
+        listed = subprocess.run(DOCKER + ["network", "ls", "--format", "{{.Name}}"], capture_output=True,
+                                text=True, check=False, timeout=30)
+        cleanup["confirmed_removed"] = listed.returncode == 0 and name not in listed.stdout.splitlines()
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        cleanup["error_type"] = type(exc).__name__
+    write_json(record, cleanup)
+    return cleanup["confirmed_removed"]
+
+
+def teardown_attempt(state, run_id, arm):
+    """Remove the attempt's proxy, server and networks by exact name; never prune.
+
+    Container logs go to private files first (the proxy access log is the
+    denied-path evidence). The key files are deleted only after both
+    containers are confirmed removed. True only if all four are confirmed.
+    """
+    stem = attempt_stem(run_id, arm)
+    result = Path(state) / "runs" / run_id / arm
+    containers = []
+    for role in ("proxy", "server"):
+        name, logfile = f"{stem}-{role}", result / f"{role}.log"
+        try:
+            logged_command(DOCKER + ["logs", name], logfile, cwd=result, timeout=30)
+        finally:
+            cleanup_container(name, logfile)
+        record = read_json(logfile.with_suffix(logfile.suffix + ".cleanup.json"))
+        containers.append(record.get("confirmed_removed") is True)
+    networks = [cleanup_network(name, result / f"network-{kind}.cleanup.json")
+                for kind, name in network_names(stem).items()]
+    if all(containers):
+        for path in session_files(state, run_id, arm):
+            path.unlink(missing_ok=True)
+    return all(containers) and all(networks)
 
 
 def clone_command(prefix, task, workspace):
@@ -597,11 +797,19 @@ def model_visible(root, *, writable):
             raise ValueError("special_file_in_model_mount")
 
 
-def prepare_native_dispatch(result, prefix, pins, base, network, host, selection, run_id, port=DEFAULT_PORT):
-    from dispatch import check_server, private_file, server_command
-    stem = run_id + "-" + selection["arm"]
-    env_file = private_file(os.environ["OPENHANDS_SERVER_ENV"])
-    private_file(os.environ["OPENHANDS_HEADERS"])
+def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=DEFAULT_PORT):
+    """Serialize the request offline, then build the O1 topology around the server.
+
+    Order: request render with no network; the two attempt networks; the
+    per-attempt key; the agent-server on <stem>-int with no published port;
+    the rendered proxy config; proxy create/connect/start; the native health
+    and OpenAPI gate through the proxy's loopback ingress. The caller tears
+    everything down on any failure (teardown_attempt).
+    """
+    from dispatch import check_server, server_command
+    stem = attempt_stem(run_id, selection["arm"])
+    result = Path(state) / "runs" / run_id / selection["arm"]
+    port = owned_port(port)
     environment = ["--env", "OPENHANDS_OWNED_CONTAINER=1",
                    "--env", "OPENHANDS_RUN_ID=" + run_id, "--env", "OPENHANDS_ARM=" + selection["arm"],
                    "--env", "OPENHANDS_MODEL=" + selection["requested_model"],
@@ -617,19 +825,22 @@ def prepare_native_dispatch(result, prefix, pins, base, network, host, selection
     write_json(result / "start.json", body)
     private_directory(result / "server")
     model_visible(result / "server", writable=True)
+    networks = create_topology(result, stem)
+    env_file, _ = generate_session_files(state, run_id, selection["arm"])
+    check_server_env(env_file)
     mounts = base + environment + mount(result / "server", "/state/server", False) + mount(result / "worker", "/run-output", False)
     name = stem + "-server"
-    try:
-        if logged_command(server_command(pins, name, mounts, network, env_file, port=port),
-                          result / "server-start.log", cwd=result, timeout=60):
-            raise RuntimeError("native_server_launch_failed")
-        check_server(body, port=port)
-    except (Exception, KeyboardInterrupt):
-        cleanup_container(name, result / "server.log")
-        raise
+    if logged_command(server_command(pins, name, mounts, networks["int"]["name"], env_file),
+                      result / "server-start.log", cwd=result, timeout=60):
+        raise RuntimeError("native_server_launch_failed")
+    config, config_sha256 = write_proxy_config(result, render_proxy_config(selection, run_id))
+    launch_proxy(result, pins, stem, config, port)
+    check_server(body, port=port)
     # Host-owned status is the dispatch commands' only port source.
     write_json(result / "status.json", {"run_id": run_id, "arm": selection["arm"], "status": "prepared",
-                                        "server_name": name, "port": port, "receipt": str(result / "receipt.json")})
+                                        "server_name": name, "proxy_name": stem + "-proxy", "port": port,
+                                        "proxy_config_sha256": config_sha256,
+                                        "receipt": str(result / "receipt.json")})
 
 
 def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAULT_PORT):
@@ -650,19 +861,19 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
     try:
         port = owned_port(port)
         pins, host, mcp = preflight(prefix, state)
-        check_server_env()
         installed = read_json(state / "installation.json")
         if installed.get("exit_code") != 0 or installed.get("requirements_sha256") != pins["requirements_sha256"]:
             raise ValueError("matching_successful_installation_required")
         if not os.path.lexists(prefix / "venv/bin/python"):
             raise ValueError("owned_sdk_venv_missing")
+        # Present locally by digest (install pulls it); proxy launches never pull.
+        pinned_image_identity(pins["gateway_proxy"])
         cfg = read_json(HERE / "config/worker.json")
         selection = environment_selection(os.environ, arm)
         llm_config(cfg, selection["requested_model"], arm=arm, base_url=selection["base_url"],
                    compression=selection["compression_combo"])
         window.update({k: v for k, v in selection.items() if k != "headers"})
         window["header_names"] = sorted([*selection["headers"], "x-omniroute-session", "X-Correlation-Id", "Idempotency-Key"])
-        network = model_network(host, arm)
         stage = "prepare"
         original = Path(os.environ["OPENHANDS_TASK_FILE"]).resolve()
         task_sha = os.environ["OPENHANDS_TASK_SHA256"]
@@ -735,7 +946,7 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
         if execute_container(args, stem + "-qmd", result / "qmd-setup.log", 900):
             raise RuntimeError("qmd_setup_failed")
         stage = "start"
-        prepare_native_dispatch(result, prefix, pins, base, network, host, selection, run_id, port=port)
+        prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=port)
         prepared = True
         write_json(result / "window.json", window)
         if not prepare_only:
@@ -748,6 +959,12 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
     except (Exception, KeyboardInterrupt) as exc:
         window["failure_stage"] = stage
         window["failure_type"] = type(exc).__name__
+        if stage == "start":
+            # Resources may exist from the first network onward; remove them by name.
+            try:
+                teardown_attempt(state, run_id, arm)
+            except (OSError, ValueError, subprocess.SubprocessError):
+                pass  # The cleanup records keep the uncertainty.
     finally:
         if native_receipt is not None:
             receipt = native_receipt

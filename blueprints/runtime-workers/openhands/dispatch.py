@@ -16,9 +16,9 @@ import tempfile
 import time
 import uuid
 
-from recipe import arm_config, read_json
-from host import (AGENT_LIMITS, DEFAULT_PORT, DOCKER, cleanup_container, docker_args, grade, logged_command,
-                  owned_port, private_file, result_exit, utc_now, write_json)
+from recipe import read_json
+from host import (AGENT_LIMITS, DEFAULT_PORT, docker_args, grade, logged_command, owned_port, private_file,
+                  result_exit, session_files, teardown_attempt, utc_now, write_json)
 from receipt import create_receipt, read_bounded
 
 
@@ -56,14 +56,15 @@ def curl_json(url, *, method="GET", headers=None, body=None):
     return json.loads(raw)
 
 
-def api_request(method, path, *, body=None, port=DEFAULT_PORT):
+def api_request(method, path, *, headers, body=None, port=DEFAULT_PORT):
+    """headers is the attempt's host.session_files header file, checked by private_file."""
     if not (re.fullmatch(r"/api/conversations(?:/[a-f0-9-]{36}(?:/(?:agent_final_response|interrupt))?)?", path)
             or re.fullmatch(r"/api/conversations/[a-f0-9-]{36}" + re.escape(ERROR_EVENT_SEARCH), path)):
         raise ValueError("unexpected_native_route")
-    return curl_json(server_url(port) + path, method=method, headers=os.environ["OPENHANDS_HEADERS"], body=body)
+    return curl_json(server_url(port) + path, method=method, headers=headers, body=body)
 
 
-def agent_termination(conversation_id, execution, port):
+def agent_termination(conversation_id, execution, port, headers):
     """Classify a terminal native status; agent limits keep their partial patch.
 
     SDK@fcc102a conversation/state.py:48-79 makes finished, error and stuck
@@ -79,7 +80,7 @@ def agent_termination(conversation_id, execution, port):
         return execution
     if execution != "error":
         return "error"
-    page = api_request("GET", f"/api/conversations/{conversation_id}{ERROR_EVENT_SEARCH}", port=port)
+    page = api_request("GET", f"/api/conversations/{conversation_id}{ERROR_EVENT_SEARCH}", port=port, headers=headers)
     items = page.get("items") if isinstance(page, dict) else None
     if (isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict)
             and {key: items[0].get(key) for key in ("kind", "source", "code")}
@@ -112,11 +113,12 @@ def compression_delta(before, after):
             "basis": "entry gateway global analytics delta; separate from call_logs usage; concurrent callers may contribute"}
 
 
-def server_command(pins, name, mounts, network, env_file, *, port=DEFAULT_PORT):
+def server_command(pins, name, mounts, network, env_file):
     # Keep the image ENTRYPOINT. Its binary target is Dockerfile:580-590, not
     # the source target at :571. Supported preload: __main__.py:74-135,240-273.
-    return [*docker_args(pins, name, network=network), *mounts, "--detach",
-            "--publish", f"127.0.0.1:{owned_port(port)}:8000", "--env-file", str(env_file),
+    # O1: the server joins only <stem>-int and publishes nothing; host ingress
+    # is the proxy's loopback port (host.proxy_commands).
+    return [*docker_args(pins, name, network=network), *mounts, "--detach", "--env-file", str(env_file),
             "--env", "OH_ENABLE_VSCODE=0", "--env", "OH_CONVERSATIONS_PATH=/state/server/conversations",
             "--env", "OH_WORKSPACE_PATH=/workspace", "--env", "OH_BASH_EVENTS_DIR=/state/server/bash_events",
             "--env", "OPENHANDS_OWNED_CONTAINER=1", "--workdir", "/workspace",
@@ -147,15 +149,16 @@ def check_server(body, *, port=DEFAULT_PORT):
         raise ValueError("live_openapi_request_mismatch")
 
 
-def stop_server(result, status):
-    name = status.get("server_name")
-    if not isinstance(name, str) or not re.fullmatch(r"rw-openhands-[a-z0-9-]+-server", name):
-        return False
+def stop_server(result, status=None):
+    """Tear down the attempt at result = <state>/runs/<run-id>/<arm> (host.begin_attempt).
+
+    host.teardown_attempt removes the proxy, the server and both networks by
+    exact name and deletes the key files after confirmed container removal.
+    """
     try:
-        logged_command(DOCKER + ["logs", name], result / "server.log", cwd=result, timeout=30)
-    finally:
-        cleanup_container(name, result / "server.log")
-    return read_json(result / "server.log.cleanup.json").get("confirmed_removed") is True
+        return teardown_attempt(result.parents[2], result.parent.name, result.name)
+    except ValueError:
+        return False
 
 
 def finish_result(result, status, window):
@@ -226,6 +229,8 @@ def execute(action, state, run_id, arm):
             raise ValueError("attempt_identity_mismatch")
         # Prepared by host.py into host-owned status.json; re-validated on read.
         port = owned_port(status.get("port", DEFAULT_PORT))
+        # Derived from the validated identity only; curl_json re-checks the file.
+        headers = session_files(state, run_id, arm)[1]
         if action == "start":
             if status.get("status") != "prepared":
                 print(json.dumps({"run_id": run_id, "arm": arm, "receipt": str(receipt_path),
@@ -246,7 +251,7 @@ def execute(action, state, run_id, arm):
             window["started_at"] = utc_now()
             window["finished_at"] = None
             write_json(result / "window.json", window)
-            response = api_request("POST", "/api/conversations", body=result / "start.json", port=port)
+            response = api_request("POST", "/api/conversations", body=result / "start.json", port=port, headers=headers)
             conversation_id = str(uuid.UUID(response["id"]))
             status.update(status="running", conversation_id=conversation_id)
         elif action == "wait":
@@ -257,10 +262,10 @@ def execute(action, state, run_id, arm):
                 if time.time() >= status["deadline"]:
                     stage = "deadline"
                     try:
-                        api_request("POST", f"/api/conversations/{conversation_id}/interrupt", port=port)
+                        api_request("POST", f"/api/conversations/{conversation_id}/interrupt", port=port, headers=headers)
                     finally:
                         raise TimeoutError("native_conversation_deadline")
-                response = api_request("GET", f"/api/conversations/{conversation_id}", port=port)
+                response = api_request("GET", f"/api/conversations/{conversation_id}", port=port, headers=headers)
                 execution = response["execution_status"]
                 if execution in TERMINAL:
                     status.update(status="terminal", execution_status=execution)
@@ -280,11 +285,12 @@ def execute(action, state, run_id, arm):
             if status.get("status") != "terminal":
                 raise ValueError("terminal_attempt_required")
             conversation_id = str(uuid.UUID(status["conversation_id"]))
-            response = api_request("GET", f"/api/conversations/{conversation_id}/agent_final_response", port=port)
+            response = api_request("GET", f"/api/conversations/{conversation_id}/agent_final_response", port=port,
+                                   headers=headers)
             if not isinstance(response.get("response"), str):
                 raise ValueError("native_final_response_contract")
             write_json(result / "final-response.json", response)
-            status["agent_termination"] = agent_termination(conversation_id, status.get("execution_status"), port)
+            status["agent_termination"] = agent_termination(conversation_id, status.get("execution_status"), port, headers)
             receipt = finish_result(result, status, window)
             write_json(receipt_path, receipt)
             code = result_exit(receipt)

@@ -197,12 +197,14 @@ def create_receipt(result, database=None):
                    and checked.get("conversion_exit_code") == 0 and window.get("worker_exit_code") == 0)
     termination = window.get("agent_termination")
     usage = summarize_gateway(rows, selection)
-    cleanup = []
-    for path in sorted(result.glob("*.log.cleanup.json")):
-        try:
-            cleanup.append(read_json(path).get("confirmed_removed") is True)
-        except (OSError, ValueError, AttributeError):
-            cleanup.append(False)
+    def removals(pattern):
+        found = []
+        for path in sorted(result.glob(pattern)):
+            try:
+                found.append(read_json(path).get("confirmed_removed") is True)
+            except (OSError, ValueError, AttributeError):
+                found.append(False)
+        return {"attempts": len(found), "confirmed_removed": sum(found), "complete": bool(found) and all(found)}
     return {
         "schema_version": 5, "evidence_class": "SDK inference adapter with official SWE-bench grading",
         **{k: selection[k] for k in ("arm", "base_url", "gateway_upstream", "requested_model", "gateway_model",
@@ -225,7 +227,9 @@ def create_receipt(result, database=None):
         "independent_trace_required": True,
         "not_collected_reason": NOT_COLLECTED_REASON,
         "skills_listed_at_start": NOT_COLLECTED, "skill_listing_matches_manifest": NOT_COLLECTED,
-        "container_cleanup": {"attempts": len(cleanup), "confirmed_removed": sum(cleanup), "complete": bool(cleanup) and all(cleanup)},
+        # host.cleanup_container and host.cleanup_network records, counted separately.
+        "container_cleanup": removals("*.log.cleanup.json"),
+        "network_cleanup": removals("network-*.cleanup.json"),
         "gateway": {
             "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, **usage,
             "entry_port": selection["gateway_port"],

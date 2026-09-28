@@ -20,6 +20,15 @@
     "config_sha256": "39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f",
     "provenance": "GHCR returned manifest bytes SHA256; image config OPENHANDS_BUILD_GIT_SHA and OPENHANDS_BUILD_GIT_REF match the SDK tag."
   },
+  "gateway_proxy": {
+    "tag_observed": "1.30.5-alpine",
+    "ref": "ghcr.io/nginx/nginx-unprivileged@sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e",
+    "platform": "linux/amd64",
+    "manifest_sha256": "f4522a5f23f9caebcae9be6e3940ea0599a2b9eb05222c7118d01fc887e848d6",
+    "config_sha256": "61640a44f99dcfd7f1af9f144f023195e82fdefd2f5aba7f917548867d4f3a6f",
+    "source": "https://github.com/nginx/docker-nginx-unprivileged/tree/588b4cbc88065a313909f47a02510639e01cc508",
+    "provenance": "Anonymous GHCR OCI reads on 2026-09-28: the SHA256 of the returned index, linux/amd64 manifest and config bytes equal their digests. Config: NGINX_VERSION=1.30.5, org.opencontainers.image.version 1.30.5-alpine, revision 588b4cbc, user 101, exposed 8080/tcp. Pulled by index digest into the rootless store and checked with host.pinned_image_identity."
+  },
   "wheels": {
     "openhands-sdk": {
       "url": "https://files.pythonhosted.org/packages/e9/ac/d27c5becc3b59b8cc46a1614ac478cc94eb73e626ab15831906fcdaafb29/openhands_sdk-1.49.6-py3-none-any.whl",
