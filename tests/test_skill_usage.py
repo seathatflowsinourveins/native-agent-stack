@@ -157,6 +157,24 @@ class SkillDoctorParsing(unittest.TestCase):
                 self.assertIn("error", parsed)
                 self.assertEqual(parsed["rows"], {})
 
+    def test_refuses_an_error_result_in_either_shape(self):
+        # is_error can be true with subtype "success" (an API error; claude-agent-sdk-python types.py:1358-1360),
+        # and a zero-cost error result must not be read as a measured /skill-doctor table.
+        messages = json.loads((FIXTURES / "skill-doctor-sample.json").read_text())
+        result = S.find_result_event(messages)
+        for change in ({"is_error": True}, {"subtype": "error_during_execution", "is_error": True},
+                       {"subtype": "error_max_turns"}, {"is_error": None}):
+            for shape in ("object", "array"):
+                with self.subTest(change=change, shape=shape):
+                    event = {**result, **change}
+                    raw = json.dumps(event if shape == "object" else
+                                     [m if m is not result else event for m in messages])
+                    parsed = S.parse_claude_output(raw)
+                    self.assertIn("refusing an error result", parsed.get("error", ""))
+                    self.assertEqual(parsed["rows"], {})
+        missing = {k: v for k, v in result.items() if k != "is_error"}
+        self.assertIn("refusing an error result", S.parse_claude_output(json.dumps(missing)).get("error", ""))
+
     def test_refuses_array_with_no_result_event(self):
         parsed = S.parse_claude_output(json.dumps([{"type": "system"}, {"type": "assistant"}]))
         self.assertIn("error", parsed)

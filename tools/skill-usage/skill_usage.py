@@ -148,7 +148,8 @@ def parse_claude_output(raw: str) -> dict:
     one-element array, so find_result_event makes the same selection in both shapes, the last
     element of type 'result' (a message of that type is what
     anthropics/claude-agent-sdk-python@36f95486ee9f src/claude_agent_sdk/_internal/message_parser.py:308
-    parses as the ResultMessage), and an object that is no result event is refused.
+    parses as the ResultMessage), and an object that is no result event is refused, as is a
+    result whose subtype is not "success" or whose is_error is not false.
 
     Returns {"format", "rows", "total_cost_usd", "num_turns"} and, when the capture is refused
     or malformed, an "error" key with rows left empty. total_cost_usd/num_turns are None for a
@@ -170,6 +171,13 @@ def parse_claude_output(raw: str) -> dict:
                 "error": "no result event in the JSON output"}
     total_cost_usd = result_event.get("total_cost_usd")
     num_turns = result_event.get("num_turns")
+    # subtype and is_error are required fields of the SDK's ResultMessage (types.py:1343,1346 at the
+    # pin above), and is_error can be true while subtype is "success" (an API error, types.py:1358-1360),
+    # so only a result that is both "success" and not is_error carries a /skill-doctor table.
+    if result_event.get("subtype") != "success" or result_event.get("is_error") is not False:
+        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
+                "error": f"refusing an error result (subtype={result_event.get('subtype')!r}, "
+                         f"is_error={result_event.get('is_error')!r})"}
     if not evaluate_cost(total_cost_usd, num_turns):
         return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
                 "error": f"refusing a nonzero-cost result (total_cost_usd={total_cost_usd!r}, "
