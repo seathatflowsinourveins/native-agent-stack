@@ -1,0 +1,294 @@
+{
+ "F4": {
+  "round1": [
+   "agree",
+   "agree"
+  ],
+  "outcome": "apply packet proposal",
+  "result": "applied: both lanes agreed with the packet's proposal"
+ },
+ "X5": {
+  "round1": [
+   "agree",
+   "agree"
+  ],
+  "outcome": "recorded, not edited (fixed rule)",
+  "result": "recorded, not edited (fixed rule for permission text); both lanes agreed with no edit"
+ },
+ "X6": {
+  "round1": [
+   "agree",
+   "agree"
+  ],
+  "outcome": "apply packet proposal",
+  "result": "no change: both lanes agreed with the no-change proposal"
+ },
+ "X8": {
+  "round1": [
+   "agree",
+   "agree"
+  ],
+  "outcome": "recorded, not edited (fixed rule)",
+  "result": "recorded, not edited (fixed rule for permission text); both lanes agreed with no edit"
+ },
+ "X10": {
+  "round1": [
+   "agree",
+   "agree"
+  ],
+  "outcome": "apply packet proposal",
+  "result": "no change: both lanes agreed with the no-change proposal"
+ },
+ "N2": {
+  "round1": [
+   "agree",
+   "agree"
+  ],
+  "outcome": "apply packet proposal",
+  "result": "applied: both lanes agreed with the packet's proposal"
+ },
+ "F1": {
+  "round1": [
+   [
+    "agree",
+    "amend"
+   ]
+  ],
+  "adjudication": [
+   {
+    "family": "gpt6",
+    "order": "AB",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.96
+   },
+   {
+    "family": "gpt6",
+    "order": "BA",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.96
+   },
+   {
+    "family": "claude",
+    "order": "AB",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.65
+   },
+   {
+    "family": "claude",
+    "order": "BA",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.68
+   }
+  ],
+  "outcome": "apply lane c return",
+  "result": "applied: the Claude lane's amendment, chosen by all four adjudications"
+ },
+ "F2": {
+  "round1": [
+   [
+    "reject",
+    "agree"
+   ]
+  ],
+  "adjudication": [
+   {
+    "family": "gpt6",
+    "order": "AB",
+    "choice": "A",
+    "lane": "g",
+    "confidence": 0.82
+   },
+   {
+    "family": "gpt6",
+    "order": "BA",
+    "choice": "B",
+    "lane": "g",
+    "confidence": 0.91
+   },
+   {
+    "family": "claude",
+    "order": "AB",
+    "choice": "A",
+    "lane": "g",
+    "confidence": 0.58
+   },
+   {
+    "family": "claude",
+    "order": "BA",
+    "choice": "B",
+    "lane": "g",
+    "confidence": 0.6
+   }
+  ],
+  "outcome": "apply lane g return",
+  "result": "kept: the GPT-6 lane's reject, chosen by all four adjudications"
+ },
+ "F3X7": {
+  "round1": [
+   [
+    "agree",
+    "amend"
+   ],
+   [
+    "agree",
+    "amend"
+   ]
+  ],
+  "adjudication": [
+   {
+    "family": "gpt6",
+    "order": "AB",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.99
+   },
+   {
+    "family": "gpt6",
+    "order": "BA",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.98
+   },
+   {
+    "family": "claude",
+    "order": "AB",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.72
+   },
+   {
+    "family": "claude",
+    "order": "BA",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.72
+   }
+  ],
+  "outcome": "apply lane c return",
+  "result": "applied: the Claude lane's amendment, chosen by all four adjudications"
+ },
+ "N1": {
+  "round1": [
+   [
+    "agree",
+    "amend"
+   ]
+  ],
+  "adjudication": [
+   {
+    "family": "gpt6",
+    "order": "AB",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.99
+   },
+   {
+    "family": "gpt6",
+    "order": "BA",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.98
+   },
+   {
+    "family": "claude",
+    "order": "AB",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.68
+   },
+   {
+    "family": "claude",
+    "order": "BA",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.66
+   }
+  ],
+  "outcome": "apply lane c return",
+  "result": "applied: the Claude lane's amendment, chosen by all four adjudications"
+ },
+ "X9": {
+  "round1": [
+   [
+    "amend",
+    "amend"
+   ]
+  ],
+  "adjudication": [
+   {
+    "family": "gpt6",
+    "order": "AB",
+    "choice": "A",
+    "lane": "g",
+    "confidence": 0.92
+   },
+   {
+    "family": "gpt6",
+    "order": "BA",
+    "choice": "B",
+    "lane": "g",
+    "confidence": 0.94
+   },
+   {
+    "family": "claude",
+    "order": "AB",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.55
+   },
+   {
+    "family": "claude",
+    "order": "BA",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.58
+   }
+  ],
+  "outcome": "split: no edit, residual",
+  "result": "no edit: the adjudications split; both positions are a recorded residual"
+ },
+ "N3": {
+  "round1": [
+   [
+    "amend",
+    "amend"
+   ]
+  ],
+  "adjudication": [
+   {
+    "family": "gpt6",
+    "order": "AB",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.98
+   },
+   {
+    "family": "gpt6",
+    "order": "BA",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.98
+   },
+   {
+    "family": "claude",
+    "order": "AB",
+    "choice": "A",
+    "lane": "c",
+    "confidence": 0.72
+   },
+   {
+    "family": "claude",
+    "order": "BA",
+    "choice": "B",
+    "lane": "c",
+    "confidence": 0.72
+   }
+  ],
+  "outcome": "apply lane c return",
+  "result": "applied: the Claude lane's amendment, chosen by all four adjudications"
+ }
+}

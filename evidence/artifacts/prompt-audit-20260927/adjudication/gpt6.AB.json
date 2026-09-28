@@ -1,0 +1,164 @@
+{
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-27T22:48:56Z",
+  "finished": "2026-09-27T22:58:54Z",
+  "usage": {
+   "input_tokens": 1358260,
+   "cached_input_tokens": 1233536,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 18359,
+   "reasoning_output_tokens": 8270
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "inputs": {
+   "effort": "max",
+   "model": "gpt-6-astra",
+   "prompt_sha256": "c51ccd65f784a816897c2f341f881526f36dd63899fcbcd2d029a812a51da0ba",
+   "schema_sha256": "3748fdf6995f96ac5133cc39d70378c5f6787762bc49fb65ea49d3025d9ab730"
+  },
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "F1",
+    "choice": "A",
+    "reasons": "A preserves the documented exception specifically for vendored scripts. B broadens it to saved scripts generally, beyond the README's stated rationale. Both replacements preserve the tested README/agentType pointer.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/workflows/README.md:219",
+      "quote": "The saved scripts keep their reviewed routing, since they are vendored byte-identical"
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:9",
+      "quote": "`review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are\nbyte-identical to agent-lab `b31f640`"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:656",
+      "quote": "self.assertTrue(any(\"agentType\" in line for line in pointer), \"no AGENTS.md line points dispatch at the table\")"
+     }
+    ],
+    "confidence": 0.96
+   },
+   {
+    "id": "F2",
+    "choice": "A",
+    "reasons": "The replacements pass the existing phrase and skills checks, but that establishes compatibility, not improved model behavior. The cited overtriggering advice concerns aggressive prompting for named earlier models; general CLAUDE.md emphasis guidance does not establish that these bounded scope and quantifier emphases cause a problem.",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:3",
+      "quote": "Task: find the strongest CURRENT candidates that could beat, replace or usefully complement this layer's winners for THIS requirement on these hosts."
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:39",
+      "quote": "Claude `opus` (claude-opus-5-5 on 2026-09-26), max, as `landscape-sweep-worker`"
+     },
+     {
+      "locator": "[Anthropic prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md)",
+      "quote": "Claude Opus 4.5 and Claude Opus 4.6 are also more responsive to the system prompt than previous models."
+     },
+     {
+      "locator": "[Claude Code best practices](https://code.claude.com/docs/en/best-practices)",
+      "quote": "test changes by observing whether Claude’s behavior actually shifts."
+     }
+    ],
+    "confidence": 0.82
+   },
+   {
+    "id": "F3X7",
+    "choice": "A",
+    "reasons": "A also resolves the proven misinterpretation of permitted null upstream_now fields. B leaves that case unresolved and instructs correction of an unverifiable license; A explicitly permits recording unknown. Both preserve existing checks, and A's specified regression assertions fail on the base and pass with its replacement in memory.",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:3",
+      "quote": "upstream_now (latest_release tag, released_at date, stars, pushed_at, archived, license -- from the GitHub API or page; null when unknowable)"
+     },
+     {
+      "locator": "evidence/artifacts/landscape-sweep-20260926/returns.json:17006",
+      "quote": "the proposal's own upstream_now block states latest_release=null, released_at=null and pushed_at=null, which is factually false"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:2",
+      "quote": "licenses are recorded as information only and are never a reason to exclude, refute or rank down a candidate"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:2",
+      "quote": "never excludes or refutes a repository on unknown maintenance, because a missing result is pending, never refuted"
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "N1",
+    "choice": "B",
+    "reasons": "Recomputation confirms both current and historical hash pins. A leaves the evidence README's contradictory present-tense hash claim intact. B corrects both READMEs and identifies the ledger as the registered run record while preserving the distinction between local checks and retained run evidence.",
+    "sources": [
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:45",
+      "quote": "PROMPTS_SHA256_CURRENT = \"f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d\""
+     },
+     {
+      "locator": "catalogs/saturation/ledger.json:2839",
+      "quote": "\"prompts_sha256\": \"3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4\""
+     },
+     {
+      "locator": "evidence/artifacts/landscape-sweep-20260926/README.md:18",
+      "quote": "The packaged templates, filled with this run's values, give the same hash (a local check\nin `tests/test_landscape_sweep_harness.py`)."
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "X9",
+    "choice": "A",
+    "reasons": "A covers agent-only plugins, distinguishes listed availability from successful execution, and makes Skill invocation conditional on actual client exposure. B omits agents. A's read-only-first diagnostic fallback does not itself instruct the model to stop independent work, so B's claimed conflict with AGENTS.md is not established.",
+    "sources": [
+     {
+      "locator": "[Claude Code plugins](https://code.claude.com/docs/en/plugins)",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components"
+     },
+     {
+      "locator": "[Claude Code skills](https://code.claude.com/docs/en/skills)",
+      "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`."
+     },
+     {
+      "locator": "AGENTS.md:15",
+      "quote": "Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work."
+     }
+    ],
+    "confidence": 0.92
+   },
+   {
+    "id": "N3",
+    "choice": "A",
+    "reasons": "Both row sets pass the existing five-cell shape check in memory. A more accurately locates the gap after the fifth dated row and the exemption in the Workflow contract bullet, rather than the linked role-table section. Its additional null-field and evidence-README details are proven and consistent with the selected F3X7, F1 and N1 resolutions.",
+    "sources": [
+     {
+      "locator": "docs/harness-defaults.md:91",
+      "quote": "Recheck on a Codex upgrade |\n\n| 2026-09-27 | Guessing version-specific CLI syntax or source paths |"
+     },
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:809",
+      "quote": "rows = [line for line in section.splitlines() if line.startswith(\"|\")]"
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:219",
+      "quote": "The saved scripts keep their reviewed routing, since they are vendored byte-identical"
+     },
+     {
+      "locator": "[GitHub Flavored Markdown, tables](https://github.github.com/gfm/#tables-extension-)",
+      "quote": "The table is broken at the first empty line, or beginning of another block-level structure:"
+     }
+    ],
+    "confidence": 0.98
+   }
+  ]
+ }
+}

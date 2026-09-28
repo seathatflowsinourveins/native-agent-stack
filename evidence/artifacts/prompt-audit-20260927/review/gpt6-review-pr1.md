@@ -1,0 +1,7 @@
+- **medium** — `evidence/artifacts/prompt-audit-20260927/packet.md:288`: retains a Claude session URL/identifier, duplicated in `adjudication/input.AB.md:370` and `input.BA.md:370`; redact all three and refresh dependent hashes.
+- **medium** — `docs/decisions/2026-09-27-prompt-audit-resolution.md:6`: three runner prompt hashes cannot be verified from retained inputs; retain documented prompt construction/sanitization provenance, or explicitly disclose that exact execution prompts are unavailable.
+- **low** — `docs/decisions/2026-09-27-prompt-audit-resolution.md:24`: README line 219 refers to frozen revision `55fc8d17`; HEAD’s rule is at line 439. Qualify the citation with its revision.
+- **No finding — Behavior:** facts, tests, README edits and log rows are consistent with repository evidence; the split-table rule agrees with [GFM §4.10](https://github.github.com/gfm/#tables-extension-).
+- **No finding — Pin:** recomputed `11fcd52312b96845a23d14ff739322bb9827eae33fd8760dff241585453b0107`, exactly matching `tests/test_landscape_sweep_harness.py:46`.
+- **No finding — Controls:** reproduced the claimed base failures, HEAD passes and mutant results; all 10 relevant read-only tests passed. Broader tests requiring filesystem writes were not run.
+- **No further finding — Decision/integrity:** judgment totals, usage arithmetic, quotations and retained-file hashes reconcile; publication and ledger-chain validators pass. Exact tokenizer counts were not rerun because the module was unavailable.
