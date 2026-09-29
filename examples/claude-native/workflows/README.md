@@ -257,17 +257,22 @@ A double-quoted one first loses the backslashes the outer shell removes before
 `$`, `` ` ``, `"`, `\` and newline
 ([XCU 2.2.3](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_02_03)),
 and a heredoc the outer shell already resolved inside its `"$( )"` is not read
-twice. Reading text as data never drops a raw detector match: the match moves
-from the confirmed count to `fetch_mentions_unconfirmed`, so `routed_share` can
-rise while the denominator of `routed_share_lower_bound` stays the same. A
-nested run string can add a confirmed fetch that no raw detector sees
-(`ssh host 'bash -c "curl ..."'`). Remaining limits: a backquoted span inside
-double quotes is kept as it is, so a heredoc or quoted separator in it is not
-resolved; a `case` pattern's `)` inside a double-quoted `"$( )"` ends the
-substitution early; analyses nested more than 32 levels deep read as data; and
-text that bash rejects as incomplete (an unterminated quote, backquote or `$(`)
-is read to the end of the command as that construct, so its counts can move in
-either direction.
+twice. A raw detector match is never dropped: it moves between the confirmed
+counts and `fetch_mentions_unconfirmed` and stays in the denominator of
+`routed_share_lower_bound`, unless it is now confirmed as a loopback fetch,
+which leaves it. A match with no raw counterpart can appear or disappear: a
+nested run string (`ssh host 'bash -c "curl ..."'`) or an escaped command word
+(`"$(\curl ...)"`) now adds a confirmed fetch, and a match the old reading
+created in text it misread as executed is gone (the `\curl` in
+`echo "$(echo " ; \curl ...")"`, which bash prints as data), so the lower bound
+can rise there. Remaining limits: a backquoted span inside double quotes is kept
+as it is, so a heredoc or quoted separator in it is not resolved; outside quotes
+a backquoted span is read as plain command text, so a quote that it leaves open
+runs past its closing backquote; a `case` pattern's `)` inside a double-quoted
+`"$( )"` ends the substitution early; analyses nested more than 32 levels deep
+read as data; and text that bash rejects as incomplete (an unterminated quote,
+backquote or `$(`) is read to the end of the command as that construct, so its
+counts can move in either direction.
 Python or Node read stdin with no script operand or with `-`; the retained
 explicit stdin forms apply to other interpreters. A shell reads its script from
 stdin unless `-c` supplies a command string or an operand names a script file:
