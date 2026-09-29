@@ -1228,6 +1228,9 @@ function commandSegments(node, src, fields, extra = [], folded = []) {
     prev = child
     if (child.type === 'herestring_redirect') segments[segments.length - 1].herestrings.push(child) // a here-string belongs to the command it follows
     const field = node.fieldNameForChild(i)
+    // A name glued to the assignment before it, with no blank between, is the tail of that assignment's word that the grammar cut off
+    // (`a=$x/$y-$z`: tree-sitter-bash 0.25.1 ends the value at the second `$`); the words after it are then the command's own.
+    if (field === 'name' && i > 0 && node.child(i - 1).type === 'variable_assignment' && node.child(i - 1).endIndex === child.startIndex) continue
     if (field === 'name') { const inner = child.namedChild(0); segments[segments.length - 1].words.push(inner ? { ...wordOf(inner), assignment: false } : { v: '', s: null, x: true }) }
     else if (fields.includes(field)) segments[segments.length - 1].words.push({ ...wordOf(child), assignment: (child.type === 'word' || child.type === 'concatenation') && isAssignment(child.text) })
   }
