@@ -182,12 +182,34 @@ class TripwireControls(unittest.TestCase):
         self.assertTrue(f"reason={reason}" in done.stderr, f"the tripwire run did not report reason={reason}")
         self.assertFalse("skipped" in done.stderr, "the tripwire run skipped instead of failing")
 
+    def assert_skipped(self, done, why):
+        self.assertEqual(done.returncode, 0, f"the tripwire run exited {done.returncode}, not 0")
+        self.assertTrue("skipped" in done.stderr, "the tripwire run did not skip")
+        self.assertTrue(why in done.stderr, f"the tripwire run did not give the reason '{why}' for skipping")
+
     def copy_install(self, scratch):
         copy = Path(scratch) / "copy"
         for rel in [*load_pin()["files"], "package-lock.json"]:
             (copy / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(self.install / rel, copy / rel)
         return copy
+
+    # GITHUB_ACTIONS=true and nothing else that names a job: the condition the brief gives for the tripwire.
+    BARE = ("GITHUB_JOB", "GITHUB_WORKFLOW_REF")
+
+    def flipped_wasm_fails(self, drop=()):
+        if self.install is None:
+            self.skipTest("no verified tree-sitter-bash install on this host to copy (CHILD_USAGE_SHELL_PARSER or the pin's default directory)")
+        with tempfile.TemporaryDirectory() as scratch:
+            copy = self.copy_install(scratch)
+            unflipped = self.run_tripwire(scratch, drop, **{ENV_NAME: str(copy)})
+            self.assertEqual(unflipped.returncode, 0, "the unflipped scratch copy must pass, or the flip proves nothing")
+            self.assertFalse("skipped" in unflipped.stderr, "the unflipped scratch copy skipped, or the flip proves nothing")
+            wasm = copy / "node_modules/tree-sitter-bash/tree-sitter-bash.wasm"
+            data = bytearray(wasm.read_bytes())
+            data[len(data) >> 1] ^= 1  # bit 0 of the middle byte: the same length, so only the hash can tell
+            wasm.write_bytes(bytes(data))
+            self.assert_failed(self.run_tripwire(scratch, drop, **{ENV_NAME: str(copy)}), "hash_mismatch")
 
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_no_install_anywhere_fails_the_tripwire(self):
@@ -201,17 +223,40 @@ class TripwireControls(unittest.TestCase):
             self.assert_failed(self.run_tripwire(home, **{ENV_NAME: str(Path(home) / "absent")}), "not_installed")
 
     def test_a_one_bit_flipped_wasm_fails_the_tripwire(self):
-        if self.install is None:
-            self.skipTest("no verified tree-sitter-bash install on this host to copy (CHILD_USAGE_SHELL_PARSER or the pin's default directory)")
-        with tempfile.TemporaryDirectory() as scratch:
-            copy = self.copy_install(scratch)
-            done = self.run_tripwire(scratch, **{ENV_NAME: str(copy)})
-            self.assertEqual(done.returncode, 0, "the unflipped scratch copy must pass, or the flip proves nothing")
-            wasm = copy / "node_modules/tree-sitter-bash/tree-sitter-bash.wasm"
-            data = bytearray(wasm.read_bytes())
-            data[len(data) >> 1] ^= 1  # bit 0 of the middle byte: the same length, so only the hash can tell
-            wasm.write_bytes(bytes(data))
-            self.assert_failed(self.run_tripwire(scratch, **{ENV_NAME: str(copy)}), "hash_mismatch")
+        self.flipped_wasm_fails()
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_actions_alone_with_no_install_fails_the_tripwire(self):
+        with tempfile.TemporaryDirectory() as home:
+            self.assert_failed(self.run_tripwire(home, self.BARE), "not_installed")
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_actions_alone_with_a_nonexistent_directory_fails_the_tripwire(self):
+        with tempfile.TemporaryDirectory() as home:
+            self.assert_failed(self.run_tripwire(home, self.BARE, **{ENV_NAME: str(Path(home) / "absent")}), "not_installed")
+
+    def test_actions_alone_with_a_one_bit_flipped_wasm_fails_the_tripwire(self):
+        self.flipped_wasm_fails(self.BARE)
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_an_unlisted_job_fails_the_tripwire(self):
+        # Fail closed: only a recorded gap is exempt, so a job that is not one of them needs the install even when its
+        # name is a gap's name in another workflow, or its workflow reference is missing.
+        unlisted = {"another job of the validate workflow": {"GITHUB_JOB": "another-job"},
+                    "the validate job's name in another workflow": {"GITHUB_WORKFLOW_REF": "owner/repo/.github/workflows/other.yml@refs/heads/main"},
+                    "a gap's job name in the validate workflow": {"GITHUB_JOB": "validate-macos"},
+                    "a gap's job name with no workflow reference": {"GITHUB_JOB": "validate-macos", "GITHUB_WORKFLOW_REF": ""}}
+        for label, extra in unlisted.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as home:
+                self.assert_failed(self.run_tripwire(home, **extra), "not_installed")
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_a_recorded_gap_skips_and_says_so(self):
+        for key in sorted(KNOWN_UNPROVISIONED):
+            workflow, _, job = key.partition(":")
+            extra = {"GITHUB_JOB": job, "GITHUB_WORKFLOW_REF": f"owner/repo/.github/workflows/{workflow}@refs/heads/main"}
+            with self.subTest(key), tempfile.TemporaryDirectory() as home:
+                self.assert_skipped(self.run_tripwire(home, **extra), "a recorded gap")
 
     def test_the_verified_install_passes_the_tripwire_without_skipping(self):
         if self.install is None:
