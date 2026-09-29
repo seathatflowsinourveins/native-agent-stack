@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Deterministic host driver for the OpenHands PR resolver.
 
-Stage 1 builds the driver's core and a CLI skeleton that exercises it with fakes.
-Stage 2 wires it into host.prepare and dispatch; `run` raises until then.
+Stage 1 built the driver's core and a CLI that exercises it with fakes. Stage 2
+wires it into host.run and dispatch: `run` performs one attempt end to end
+(RESOLVER.md "Stage 2"), and `run --dry-run` stops after the read-only steps.
 
 Design: the resolver plan of 2026-09-28, section 2 (resolver_loop) and section 3
 (gh_harness). Upstream references, read at their pins:
@@ -18,17 +19,25 @@ holds our integration checks; they are not upstream acceptance
 from __future__ import annotations
 
 import argparse
+import contextlib
+from datetime import datetime, timezone
 import hashlib
+import importlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import pwd
 import re
 import secrets
+import shlex
+import shutil
+import signal
 import subprocess
 import sys
 import tempfile
+import time
 
 HERE = Path(__file__).resolve().parent
 REPO = "seathatflowsinourveins/native-agent-stack"
@@ -1154,15 +1163,440 @@ def _cmd_review(args, *, session_key=None):
     return 0
 
 
-def _cmd_run(args, **_):
-    """Plan section 2 step 0. Stage 2 wires this to host.prepare and dispatch."""
-    raise NotImplementedError("stage 2: integrate with host.prepare and dispatch")
+# -- Stage 2: one attempt end to end (RESOLVER.md "Stage 2")
+
+CLONE_URL = gh_harness.ORIGIN_URL  # the fresh host clone's source; tests use a local bare repository
+COMMIT_NAME, COMMIT_EMAIL = "OpenHands", "openhands@all-hands.dev"  # EXT main.py:65-66
+COMMIT_SUBJECT_LIMIT = 72  # EXT main.py:604
+DECISION_RECORD = "docs/decisions/2026-09-28-openhands-resolver-isolation.md"
+WORKER_CHECK = "python3 scripts/validate.py"
+GUARD_REASONS = frozenset({"not_text", "session_key", "private_content", "host_path", "host_user_name",
+                           "scanner_error", "scanner_finding", "closing_keyword", "mention"})
+REVIEWER_TIMEOUT = 900
+MAX_REVIEW_INPUT = 400_000
+MAX_REVIEW_OUTPUT = 20_000
+
+
+def _recipe(name):
+    """A recipe module (host, dispatch, receipt) under its own name, as dispatch.py and
+    host.py import each other; the recipe directory goes on sys.path once."""
+    if str(HERE) not in sys.path:
+        sys.path.insert(0, str(HERE))
+    return importlib.import_module(name)
+
+
+def run_id_for(number, now):
+    """The plan's run id (section 2 step 0): rw-openhands-res-<N>-<UTC yyyymmdd>."""
+    return f"rw-openhands-res-{number}-{now.astimezone(timezone.utc):%Y%m%d}"
+
+
+def _git_env(home):
+    return _recipe("host").resolver_git_env(home)
+
+
+class ResolverAttempt:
+    """The resolver side of one attempt, in memory only.
+
+    host.run writes identity() beside the attempt and passes session_sink to
+    prepare_native_dispatch, which hands it the attempt's agent-server key. The key
+    lives only here, inside an outgoing_guard.SessionKey, never in a file this class
+    writes. dispatch.finish_result calls finish() after the export.
+    """
+
+    def __init__(self, *, number, title, base_sha, branch, owned_paths, lane, instruction, run_id, gh, git, gitleaks,
+                 gitleaks_config, host_paths, user_name, base_env, runner=subprocess.run, clone_url=None):
+        if not isinstance(base_sha, str) or not SHA.fullmatch(base_sha):
+            raise ValueError("base_sha_required")
+        self.number, self.title, self.base_sha, self.branch = number, title, base_sha, branch
+        self.owned_paths = patch_policy.normalize_owned(owned_paths)
+        self.lane, self.instruction, self.run_id = lane, instruction, run_id
+        self.gh, self.git, self.gitleaks, self.gitleaks_config = gh, git, gitleaks, gitleaks_config
+        self.host_paths, self.user_name, self.base_env, self.runner = list(host_paths), user_name, base_env, runner
+        self.clone_url = clone_url or CLONE_URL
+        self._key = None
+        self.harness = self.guard = self.clone = self.pr = self.clone_home = None
+
+    def identity(self):
+        return {"issue": self.number, "base_sha": self.base_sha, "owned_paths": self.owned_paths, "lane": self.lane,
+                "run_id": self.run_id,
+                "instruction_sha256": hashlib.sha256(self.instruction.encode("utf-8")).hexdigest()}
+
+    def session_sink(self, value):
+        self._key = outgoing_guard.SessionKey(value)
+
+    def _session(self, result):
+        """The guard, with gitleaks as its scanner, and the harness that journals every write."""
+        if self._key is None:
+            raise RuntimeError("session_key_missing")
+        private = Path(result) / "resolver-private"
+        private.mkdir(mode=0o700)
+        scanner = outgoing_guard.gitleaks_scanner(self.gitleaks, config=self.gitleaks_config,
+                                                  workdir=gh_harness.private_workdir(str(private)))
+        self.guard = outgoing_guard.OutgoingGuard(
+            directory=outgoing_guard.private_directory(str(private)), session_key=self._key,
+            host_paths=[*self.host_paths, str(private)], user_name=self.user_name, scanners=[scanner])
+        self.harness = gh_harness.GhHarness(self.gh, git=self.git, base_env=self.base_env,
+                                            workdir=gh_harness.private_workdir(str(private)), runner=self.runner,
+                                            guard=self.guard)
+        return private
+
+    def _commit_message(self):
+        return f"Address issue #{self.number}: {' '.join(str(self.title).split())}"[:COMMIT_SUBJECT_LIMIT]
+
+    def _fresh_clone(self, result):
+        """Plan section 2 step 7: a fresh anonymous clone at the base, with origin kept for the push.
+
+        Neutral git (host.resolver_git_env), no credential helper, no tags, and no
+        template hooks (git-clone(1) --template with an empty value). The clone keeps
+        the base and, after the commit, the pushed head for the review diff.
+        """
+        self.clone_home = Path(result) / "clone-home"
+        self.clone_home.mkdir(mode=0o700)
+        env = _git_env(self.clone_home)
+        clone = Path(result) / "resolver-clone"
+        steps = ([self.git, "-c", "credential.helper=", "-c", "core.hooksPath=/dev/null", "clone", "--template=",
+                  "--no-checkout", "--single-branch", "--branch", "main", "--no-tags", "--", self.clone_url,
+                  str(clone)],
+                 [self.git, "-C", str(clone), "-c", "core.hooksPath=/dev/null", "checkout", "-q", "--detach",
+                  self.base_sha])
+        for argv in steps:
+            if subprocess.run(argv, env=env, capture_output=True, timeout=900, check=False,
+                              stdin=subprocess.DEVNULL).returncode:
+                raise LoopStopped("clone_failed")
+        if self.clone_url != gh_harness.ORIGIN_URL:  # tests clone a local bare repository
+            subprocess.run([self.git, "-C", str(clone), "remote", "set-url", "origin", gh_harness.ORIGIN_URL],
+                           env=env, capture_output=True, timeout=30, check=True)
+        return clone
+
+    def _git(self, clone, *args, check=True, input_bytes=None):
+        return subprocess.run([self.git, "-C", str(clone), "-c", "core.hooksPath=/dev/null", *args],
+                              env=_git_env(self.clone_home), capture_output=True, timeout=300, check=check,
+                              input=input_bytes)
+
+    def _apply_and_commit(self, clone, patch_text, patch_path):
+        """`git apply --index --check`, then `git apply --index` (git-apply(1): out-of-tree paths are
+        refused and --unsafe-paths has no effect with --index), then one commit with EXT's identity
+        and every hook off. The commit's diff must equal the validated patch byte for byte."""
+        for check in (["--check"], []):
+            if self._git(clone, "apply", "--index", *check, str(patch_path), check=False).returncode:
+                raise LoopStopped("apply_failed")
+        committed = self._git(clone, "-c", f"user.name={COMMIT_NAME}", "-c", f"user.email={COMMIT_EMAIL}",
+                              "-c", "commit.gpgSign=false", "commit", "--no-verify", "-q", "-F", "-",
+                              check=False, input_bytes=(self._commit_message() + "\n").encode("utf-8"))
+        if committed.returncode:
+            raise LoopStopped("commit_failed")
+        head = self._git(clone, "rev-parse", "HEAD").stdout.decode("ascii").strip()
+        diff = self._git(clone, "--no-pager", "diff", "--no-color", "--no-ext-diff", "--no-textconv", "--full-index",
+                         self.base_sha, head).stdout
+        if diff != patch_text.encode("utf-8", "surrogateescape"):
+            raise LoopStopped("commit_patch_mismatch")
+        return head
+
+    def finish(self, result, *, patch_text, final_message):
+        """Plan section 2 steps 6-9 after the export; nothing the model wrote runs on the host.
+
+        Order: validate the patch at the base (GitTree); guard every text GitHub would
+        receive (commit message, title, PR body) before any write; fresh clone; apply;
+        commit; branch; push; draft PR and its read-back. Each outcome is host-written;
+        a refusal means no GitHub write, only a receipt.
+        """
+        outcome = {"status": None, "failure_stage": None, "reasons": [], "writes": []}
+        if not patch_text.strip():
+            # validate_patch's empty verdict, before any clone: nothing to validate or write.
+            outcome.update(status="patch_empty", paths_changed=0,
+                           patch_sha256=hashlib.sha256(patch_text.encode("utf-8", "surrogateescape")).hexdigest())
+            return outcome
+        stage = "export"
+        try:
+            private = self._session(result)
+            stage = "clone"
+            clone = self._fresh_clone(result)
+            self.clone = clone
+            verdict = patch_policy.validate_patch(patch_text, tree=patch_policy.GitTree(clone, self.base_sha,
+                                                                                          git=self.git),
+                                                  owned=self.owned_paths)
+            outcome.update(patch_sha256=verdict["patch_sha256"], paths_changed=len(verdict["paths"]))
+            if verdict["status"] != "accepted":
+                self.clone = None
+                shutil.rmtree(clone, ignore_errors=True)
+                outcome.update(status="patch_empty" if verdict["status"] == "empty" else "patch_refused",
+                               reasons=sorted({item["reason"] for item in verdict["reasons"]}))
+                return outcome
+            sources = select_sota_sources(final_message, git_citation_resolver(clone, self.base_sha, git=self.git))
+            outcome["sota_sources"] = {"kept": len(sources["kept"]), "dropped": sources["dropped"]}
+            receipt = {"issue": {"number": self.number, "title": self.title}, "run_id": self.run_id,
+                       "base_sha": self.base_sha, "patch_sha256": verdict["patch_sha256"], "paths": verdict["paths"],
+                       "lane": self.lane, "sota_sources": sources["kept"],
+                       "worker_checks": {"command": WORKER_CHECK, "exit_code": None},
+                       "final_message": final_message, "decision_record": None}
+            try:
+                self.guard.check(self._commit_message())
+                if not self.guard.approved_text(pr_title(self.number, self.title)):
+                    raise outgoing_guard.GuardRefused("title")
+                build_pr_body(receipt, guard=self.guard)
+            except outgoing_guard.GuardRefused as refused:
+                outcome.update(status="text_refused", reasons=[refused.reason if refused.reason in GUARD_REASONS
+                                                               else "title"])
+                return outcome
+            except ValueError as error:
+                outcome.update(status="text_refused", reasons=["no_sota_sources" if str(error) == "no_sota_sources"
+                                                               else "pr_body_invalid"])
+                return outcome
+            stage = "apply"
+            patch_path = private / "patch.diff"
+            patch_path.write_bytes(patch_text.encode("utf-8", "surrogateescape"))
+            head = self._apply_and_commit(clone, patch_text, patch_path)
+            stage = "push"
+            branch = next_branch(self.harness, self.number)
+            if branch != self.branch:
+                self.harness.branch_rules(branch)  # a new name: its rules are read again before the push
+            pushed = self.harness.push(str(clone), branch)
+            if pushed.returncode != 0:
+                raise LoopStopped("push_failed")
+            outcome.update(branch=branch, head=head)
+            stage = "pr"
+            self.pr = open_pull_request(self.harness, self.guard, receipt, branch=branch)
+            if self.pr["head"] != head:
+                raise LoopStopped("pr_head_moved")
+            outcome.update(status="pr_opened", pr=self.pr["number"])
+        except (LoopStopped, gh_harness.HarnessRefused, BranchLookupFailed, BranchesExhausted) as stopped:
+            outcome.update(failure_stage=stage, reasons=[getattr(stopped, "reason", type(stopped).__name__.lower())])
+        except outgoing_guard.GuardRefused as refused:
+            outcome.update(failure_stage=stage, reasons=[refused.reason])
+        except (OSError, subprocess.SubprocessError, ValueError, RuntimeError) as error:
+            outcome.update(failure_stage=stage, reasons=[type(error).__name__.lower()])
+        finally:
+            if self.harness is not None:
+                outcome["writes"] = [dict(write) for write in self.harness.writes]
+        return outcome
+
+
+def command_reviewer(argv, *, workdir, env, timeout=REVIEWER_TIMEOUT):
+    """The injected reviewer (plan section 2 step 10): the coordinator's command, run with the
+    reviewed diff on stdin from an empty private directory, with an allowlisted environment.
+
+    The plan's invocation is `claude -p` with flags that gate G4 qualifies, so the
+    command comes from the coordinator; its output is model text, which post_review
+    guards. A non-zero exit, a timeout or oversized output raises (reviewer_failed).
+    """
+    def review(diff):
+        if len(diff) > MAX_REVIEW_INPUT:
+            raise ValueError("diff_too_large")
+        completed = subprocess.run(argv, input=diff, cwd=workdir, env=dict(env), capture_output=True,
+                                   encoding="utf-8", errors="replace", timeout=timeout, check=False)
+        if completed.returncode != 0 or len(completed.stdout) > MAX_REVIEW_OUTPUT:
+            raise RuntimeError("reviewer_failed")
+        return completed.stdout
+    return review
+
+
+def _no_repair(*, head, findings, failing):
+    """Stage 2's one repair round pushes nothing: the plan's repair attempt S' (section 2 step 11)
+    is not wired yet, so the residuals comment lists the findings and the final checks."""
+    return {"pushed": False, "report": "No repair attempt ran: stage 2 wires the review and residuals only."}
+
+
+REVIEW_STATUSES = frozenset({"completed", "stopped", "not_run"})
+REASON_CODE = re.compile(r"[a-z][a-z0-9_]{0,63}")
+
+
+def review_summary(loop_outcome=None, *, status, reason=None):
+    """The review loop's outcome in the receipt: codes, ids and counts only."""
+    summary = {"status": status, "reason": reason if isinstance(reason, str) and REASON_CODE.fullmatch(reason) else None,
+               "id": None, "commit_id": None, "checks": None, "repair": None, "final": None}
+    if loop_outcome:
+        review = loop_outcome.get("review") or {}
+        checks = loop_outcome.get("checks") or {}
+        summary.update(
+            id=review.get("id") if type(review.get("id")) is int else None,
+            commit_id=review.get("commit_id") if isinstance(review.get("commit_id"), str)
+            and SHA.fullmatch(review["commit_id"]) else None,
+            checks={"status": checks.get("status"), "polls": checks.get("polls"),
+                    "missing": len(checks.get("missing") or [])},
+            repair=(loop_outcome.get("repair") or {}).get("status"),
+            final={key: (loop_outcome.get("final") or {}).get(key) for key in ("isDraft", "state")})
+    return summary
+
+
+def resolver_exit(receipt):
+    """The run's exit status, from host-observed results only (RESOLVER.md "Exit status").
+
+    0: the draft PR is open and its one review loop completed; 5: the PR is open but the
+    loop stopped; 1: an attempt that ends without a PR (empty or refused patch, refused
+    text, or an agent that did not finish); 3: any setup, gate or host-step failure.
+    task_passed and evidence_complete never set it: resolver mode has no task verdict,
+    and no model-writable file is read (receipt.resolver_summary).
+    """
+    section = receipt.get("resolver") if isinstance(receipt, dict) else None
+    if receipt.get("failure_stage") or not isinstance(section, dict):
+        return 3
+    status = section.get("status")
+    if status == "pr_opened":
+        review = section.get("review") or {}
+        return 0 if review.get("status") == "completed" else 5
+    if status in {"patch_empty", "patch_refused", "text_refused", "agent_not_finished"}:
+        return 1
+    return 3
+
+
+class RunRefused(Exception):
+    """A read-only step refused the run before any container or GitHub write."""
+
+    def __init__(self, stage, reason):
+        super().__init__(reason)
+        self.stage, self.reason = stage, reason
+
+
+def _absolute_executable(path, reason):
+    if not isinstance(path, str) or not os.path.isabs(path) or not os.access(path, os.X_OK):
+        raise RunRefused("preflight", reason)
+    return path
+
+
+def _host_paths(state, prefix):
+    account = pwd.getpwuid(os.getuid())
+    paths = [str(Path(state).absolute()), str(Path(prefix).absolute()), account.pw_dir, str(HERE.parents[2])]
+    return [path for path in paths if len([part for part in path.split("/") if part]) >= 2]
+
+
+def plan_run(args, *, runner, now):
+    """The read-only half of `run`: preflight, gates, issue selection, base read and plan.
+
+    Nothing here starts a container or writes to GitHub. The stage gates and G5 are
+    read here, before any container; host.run and the dispatch gate read them again.
+    """
+    host = _recipe("host")
+    if args.lane not in gh_harness.LANE_LABELS:
+        raise RunRefused("preflight", "lane_required")
+    task = args.task if args.task is not None else Path(args.task_file).read_text(encoding="utf-8")
+    owned = patch_policy.normalize_owned(args.owned_path)
+    gh = _absolute_executable(args.gh, "gh_path_required")
+    git = _absolute_executable(args.git, "git_path_required")
+    gitleaks = _absolute_executable(args.gitleaks, "gitleaks_path_required")
+    try:
+        # The host preflight host.run repeats: locks, owned paths, the host file, rootless Docker.
+        _, host_file, _ = host.preflight(args.prefix, args.state, resolver=True)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
+        raise RunRefused("preflight", str(error) if isinstance(error, ValueError) else type(error).__name__.lower())
+    try:
+        host.verify_stage_gates(args.state, args.arm, now=now)
+        host.verify_gateway_providers(args.arm, host.gateway_allowlists(host_file))
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise RunRefused("gates", str(error) if isinstance(error, ValueError) else type(error).__name__.lower())
+    workroot = Path(tempfile.mkdtemp(prefix="resolver-run-", dir=args.state))
+    try:
+        base_env = {key: os.environ[key] for key in ("HOME", "XDG_CONFIG_HOME") if os.environ.get(key)}
+        harness = gh_harness.GhHarness(gh, git=git, base_env=base_env,
+                                       workdir=gh_harness.private_workdir(str(workroot)), runner=runner)
+        try:
+            identity = harness.preflight()
+            repository = harness.repository()
+        except gh_harness.HarnessRefused as refused:
+            raise RunRefused("preflight", refused.reason) from None
+        try:
+            issue = harness.run(gh_harness.op_issue(args.issue))
+            comments = harness.run(gh_harness.op_issue_comments(args.issue))
+            provenance = harness.run(gh_harness.op_issue_provenance(args.issue))
+            if issue.returncode or comments.returncode:
+                raise IssueRefused("issue_read_failed")
+            selected = select_issue(json.loads(issue.stdout), parse_paginated_array(comments.stdout), args.issue,
+                                    provenance=parse_issue_provenance(provenance.stdout, args.issue))
+        except IssueRefused as refused:
+            raise RunRefused("issue", refused.reason) from None
+        except ValueError:
+            raise RunRefused("issue", "issue_unparseable") from None
+        try:
+            base = harness.base_sha()
+            branch = next_branch(harness, args.issue)
+            rules = harness.branch_rules(branch)
+        except gh_harness.HarnessRefused as refused:
+            raise RunRefused("preflight", refused.reason) from None
+        except (BranchLookupFailed, BranchesExhausted, ValueError):
+            raise RunRefused("preflight", "branch_lookup_failed") from None
+        try:
+            skill = host.resolver_skill_pin(Path(os.environ.get("OPENHANDS_STACK_ROOT", str(HERE.parents[2]))))
+        except ValueError as error:
+            raise RunRefused("preflight", str(error)) from None
+    finally:
+        shutil.rmtree(workroot, ignore_errors=True)
+    instruction = resolver_instruction(selected, task=task, owned_paths=owned)
+    run_id = run_id_for(args.issue, now)
+    plan = {"status": "planned", "run_id": run_id, "issue": args.issue, "base_sha": base, "branch": branch,
+            "branch_rules": rules, "owned_paths": owned, "lane": args.lane, "arm": args.arm, "port": args.port,
+            "kept_comments": selected["kept_comments"], "dropped_comments": selected["dropped_comments"],
+            "dropped_reasons": selected["dropped_reasons"], "preflight": identity, "repository": repository,
+            "gates": "passed", "resolver_skill": skill, "instruction_chars": len(instruction),
+            "instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest()}
+    attempt = ResolverAttempt(
+        number=args.issue, title=selected["title"], base_sha=base, branch=branch, owned_paths=owned, lane=args.lane,
+        instruction=instruction, run_id=run_id, gh=gh, git=git, gitleaks=gitleaks,
+        gitleaks_config=str(HERE.parents[2] / ".gitleaks.toml"), host_paths=_host_paths(args.state, args.prefix),
+        user_name=pwd.getpwuid(os.getuid()).pw_name, base_env=base_env, runner=runner)
+    return plan, attempt
+
+
+def _write_final_receipt(receipt_path, receipt):
+    host = _recipe("host")
+    host.write_json(receipt_path, receipt)
+
+
+def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sleep, now=None, **_):
+    """Plan section 2 steps 0-12 for one attempt (RESOLVER.md "Stage 2").
+
+    The read-only plan first (plan_run); --dry-run prints it and stops. Otherwise
+    host.run prepares the attempt on the O1 topology, the P0-P2 probe and the dispatch
+    gates run as in SWE-bench mode, and dispatch.finish_result hands the export to
+    ResolverAttempt.finish, which opens the draft PR. After host.run returns, with the
+    serial reservation released, one review loop runs (ReviewLoop). Exit status:
+    resolver_exit; 4 for a refused issue.
+    """
+    now = now or datetime.now(timezone.utc)
+    args.state, args.prefix = Path(args.state).absolute(), Path(args.prefix).absolute()
+    try:
+        if not args.dry_run and not args.reviewer_command:
+            raise RunRefused("preflight", "reviewer_command_required")
+        plan, attempt = plan_run(args, runner=runner, now=now)
+    except RunRefused as refused:
+        print(json.dumps({"status": "refused", "stage": refused.stage, "reason": refused.reason}, sort_keys=True))
+        return 4 if refused.stage == "issue" else 3
+    if args.dry_run:
+        print(json.dumps(plan, sort_keys=True))
+        return 0
+    host = _recipe("host")
+    with contextlib.redirect_stdout(io.StringIO()):
+        host.run(args.prefix, args.state, run_id=plan["run_id"], arm=args.arm, port=args.port, resolver=attempt)
+    result = args.state / "runs" / plan["run_id"] / args.arm
+    receipt_path = result / "receipt.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    review = review_summary(status="not_run")
+    if isinstance(receipt.get("resolver"), dict) and receipt["resolver"].get("status") == "pr_opened" and attempt.pr:
+        workdir = Path(tempfile.mkdtemp(prefix="reviewer-", dir=result))
+        env = {"PATH": "/usr/bin:/bin", "HOME": os.environ.get("HOME", pwd.getpwuid(os.getuid()).pw_dir),
+               "LANG": "C.UTF-8"}
+        loop = ReviewLoop(attempt.harness, attempt.guard, pr=attempt.pr, clone=str(attempt.clone), git=attempt.git,
+                          reviewer=command_reviewer(shlex.split(args.reviewer_command), workdir=workdir, env=env),
+                          repairer=_no_repair, clock=clock, sleep=sleep)
+        try:
+            review = review_summary(loop.run(), status="completed")
+        except STOPPED as stopped:
+            review = review_summary(status="stopped", reason=stopped.reason)
+        receipt["resolver"]["writes"] = [dict(write) for write in attempt.harness.writes]
+    if isinstance(receipt.get("resolver"), dict):
+        receipt["resolver"]["review"] = review
+    _write_final_receipt(receipt_path, receipt)
+    section = receipt.get("resolver") or {}
+    code = resolver_exit(receipt)
+    print(json.dumps({"run_id": plan["run_id"], "receipt": str(receipt_path), "status": section.get("status"),
+                      "failure_stage": receipt.get("failure_stage"), "pr": section.get("pr"),
+                      "review": review["status"], "exit": code}, sort_keys=True))
+    return code
 
 
 def build_parser():
     parser = argparse.ArgumentParser(
-        prog="resolver.py", description="OpenHands PR resolver driver, stage 1: the core with fakes. "
-        "open-pr and review use an in-process fake GitHub; nothing reaches GitHub.")
+        prog="resolver.py", description="OpenHands PR resolver driver. plan, validate-patch, open-pr and review "
+        "exercise the core offline (open-pr and review against an in-process fake GitHub); run performs one "
+        "attempt end to end, and run --dry-run stops after the read-only steps.")
     commands = parser.add_subparsers(dest="command", required=True)
     plan = commands.add_parser("plan", help="select an owner issue and write the agent instruction")
     plan.add_argument("--issue", type=int, required=True)
@@ -1199,22 +1633,49 @@ def build_parser():
     review.add_argument("--repair", required=True, help='JSON {"pushed": bool, "head": sha, "report": text}')
     review.add_argument("--transcript", required=True)
     review.set_defaults(handler=_cmd_review)
-    run = commands.add_parser("run", help="the full resolver run (stage 2; not implemented)")
+    home = Path(os.environ.get("HOME") or pwd.getpwuid(os.getuid()).pw_dir)
+    run = commands.add_parser(
+        "run", help="one resolver attempt end to end; --dry-run stops after the read-only steps",
+        description="One attempt: preflight (gh 2.101.0, owner login, repository, the agent branch's "
+        "non_fast_forward rule), the stage gates and G5, owner-issue selection, the pinned origin/main base and "
+        "the plan; then host.run on the O1 topology with the P0-P2 probe, the draft PR from the validated patch, "
+        "one review and the residuals comment. The run id is rw-openhands-res-<N>-<UTC yyyymmdd>. Exit 0: PR "
+        "opened and its review loop completed; 1: no PR (empty or refused patch or text, or an unfinished "
+        "agent); 3: setup, gate or host-step failure; 4: issue refused; 5: PR opened, loop stopped.")
     run.add_argument("--issue", type=int, required=True)
-    run.add_argument("--owned-path", action="append")
-    run.add_argument("--lane", choices=gh_harness.LANE_LABELS)
-    run.add_argument("--arm", choices=("control", "engines-on"))
-    run.add_argument("--port", type=int)
-    run.add_argument("--run-id")
+    run.add_argument("--owned-path", action="append", required=True,
+                     help="a path the patch may change; repeatable (plan section 2 step 0)")
+    run_task = run.add_mutually_exclusive_group(required=True)
+    run_task.add_argument("--task", help="the coordinator's task text")
+    run_task.add_argument("--task-file")
+    run.add_argument("--lane", choices=gh_harness.LANE_LABELS, required=True)
+    run.add_argument("--arm", choices=("control", "engines-on"), default="control")
+    run.add_argument("--port", type=int, default=3740, help="owned loopback port in 3730..3799 (default 3740)")
+    run.add_argument("--prefix", type=Path, default=home / ".local/share/codex-ecosystem/tools/openhands-1.49.6")
+    run.add_argument("--state", type=Path, default=home / ".local/state/native-agent-stack/runtime-workers/openhands")
+    run.add_argument("--gh", default=shutil.which("gh"), help="absolute path of the pinned gh 2.101.0")
+    run.add_argument("--git", default=shutil.which("git"), help="absolute path of git")
+    run.add_argument("--gitleaks", default=shutil.which("gitleaks"),
+                     help="absolute path of gitleaks, the outgoing guard's scanner")
+    run.add_argument("--reviewer-command",
+                     help="the reviewer, shell-split and run with the diff on stdin (required unless --dry-run)")
+    run.add_argument("--dry-run", action="store_true",
+                     help="print the plan as JSON after the read-only steps; no container, no GitHub write")
     run.set_defaults(handler=_cmd_run)
     return parser
 
 
-def main(argv=None, *, session_key=None):
-    """Entry point. `session_key` lets a caller (stage 2 or a test) pass the attempt's key in memory."""
+def main(argv=None, *, session_key=None, **injected):
+    """Entry point. `session_key` lets a caller (a test) pass a fake-mode key in memory;
+    `injected` (runner, clock, sleep, now) replaces the run command's gh runner and clocks in tests."""
     args = build_parser().parse_args(argv)
+    if args.command == "run":
+        return args.handler(args, **injected)
     return args.handler(args, session_key=session_key)
 
 
 if __name__ == "__main__":
+    # As host.py main: owner-only files, and SIGTERM through host.run's container cleanup.
+    os.umask(0o077)
+    signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     raise SystemExit(main())

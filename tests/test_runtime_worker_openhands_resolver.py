@@ -7,14 +7,17 @@ Credential-shaped values, home paths and identifiers are built at runtime so thi
 file passes `python3 scripts/validate.py --scan-file`.
 """
 
+import contextlib
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import pwd
 import re
 import secrets
+import shlex
 import shutil
 import stat
 import subprocess
@@ -2316,19 +2319,25 @@ class CommandLineTests(unittest.TestCase):
         self.assertNotIn(key, printed)
         self.assertEqual((self.tmp / "leaky.jsonl").read_text(encoding="utf-8"), "")
 
-    def test_run_is_reserved_for_stage_2(self):
-        with self.assertRaises(NotImplementedError) as caught:
-            self.main("run", "--issue", "12")
-        self.assertEqual(str(caught.exception), "stage 2: integrate with host.prepare and dispatch")
+    def test_run_takes_the_stage_2_options_and_refuses_without_them(self):
+        # Stage 2 replaced the stage-1 NotImplementedError with the wired run command.
         script = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), "run", "--issue", "12"],
                                 capture_output=True, text=True, timeout=60, env=hermetic_git_environment())
-        self.assertNotEqual(script.returncode, 0)
-        self.assertIn("NotImplementedError: stage 2: integrate with host.prepare and dispatch", script.stderr)
+        self.assertEqual(script.returncode, 2)
+        self.assertIn("the following arguments are required", script.stderr)
+        self.assertNotIn("NotImplementedError", script.stderr)
         listed = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), "--help"], capture_output=True,
                                 text=True, timeout=60, env=hermetic_git_environment())
         self.assertEqual(listed.returncode, 0)
         for command in ("plan", "validate-patch", "open-pr", "review", "run"):
             self.assertIn(command, listed.stdout)
+        options = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), "run", "--help"], capture_output=True,
+                                 text=True, timeout=60, env=hermetic_git_environment())
+        self.assertEqual(options.returncode, 0)
+        for option in ("--issue", "--owned-path", "--task", "--task-file", "--lane", "--arm", "--port", "--prefix",
+                       "--state", "--gh", "--git", "--gitleaks", "--reviewer-command", "--dry-run"):
+            self.assertIn(option, options.stdout)
+        self.assertNotIn("--run-id", options.stdout)
 
 
 class ResolverSkillTests(unittest.TestCase):
@@ -3040,13 +3049,13 @@ class ResolverResultTests(unittest.TestCase):
         self.window = {"arm": "control", "run_id": RUN_ID, "mode": "resolver", "started_at": "2026-09-28T18:00:00Z",
                        "finished_at": "2026-09-28T18:10:00Z", "stage_gates_sha256": "9" * 64}
 
-    def finish(self, execution, driver, *, removed=True):
+    def finish(self, execution, driver, *, removed=True, label=None):
+        status = {"execution_status": execution, **({"agent_termination": label} if label else {})}
         with mock.patch.object(self.dispatch, "stop_server", return_value=removed), \
                 mock.patch.object(self.dispatch, "grade") as grade, \
                 mock.patch.object(self.dispatch, "create_receipt", side_effect=lambda result: self.receipts.create_receipt(
                     result, database=result / "absent.sqlite")):
-            receipt = self.dispatch.finish_result(self.result, {"execution_status": execution}, dict(self.window),
-                                                  resolver=driver)
+            receipt = self.dispatch.finish_result(self.result, status, dict(self.window), resolver=driver)
         grade.assert_not_called()
         return receipt
 
@@ -3088,10 +3097,13 @@ class ResolverResultTests(unittest.TestCase):
         self.assertFalse((self.result / "resolver-patch.diff").exists())
 
     def test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver(self):
-        for execution, stage in (("stuck", None), ("error", "agent")):
-            with self.subTest(execution=execution):
+        # F16 bound: a "finished" label from the model-writable event store never stands in for
+        # the REST status (dispatch.PERMITTED_TERMINATIONS), so it opens no pull request either.
+        for execution, label, stage in (("stuck", None, None), ("error", None, "agent"), ("stuck", "finished", "agent"),
+                                        ("error", "finished", "agent")):
+            with self.subTest(execution=execution, label=label):
                 driver = RecordingDriver(PR_OPENED)
-                receipt = self.finish(execution, driver)
+                receipt = self.finish(execution, driver, label=label)
                 self.assertEqual(driver.calls, [])
                 self.assertEqual(receipt["resolver"]["status"], "agent_not_finished")
                 self.assertEqual(receipt["failure_stage"], stage)
@@ -3113,6 +3125,437 @@ class ResolverResultTests(unittest.TestCase):
                          (None, ["push_failed"], None, None, None, None, None))
         self.assertEqual(section["writes"], [{"op": "push", "exit_code": 1}, {"op": "pr_create", "exit_code": None}])
         self.assertNotIn("extra", section)
+
+
+REAL_GIT = shutil.which("git")
+ORIGIN_FILES = {**BASE_FILES, "AGENTS.md": "# Rules\n"}
+SKILL_PIN = {"ref": "1" * 40, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64}
+CONVERSATION = "00000000-0000-0000-0000-000000000005"
+
+
+def full_export(repo, base):
+    """dispatch.export_resolver_patch's flags on a fixture clone: `add -A`, then the cached diff
+    against the base with full object names."""
+    env = {**hermetic_git_environment(), "GIT_CONFIG_GLOBAL": os.devnull}
+    run_git(repo, "add", "-A", env=env)
+    return run_git(repo, "--no-pager", "diff", "--no-color", "--no-ext-diff", "--no-textconv", "--full-index",
+                   "--cached", base, env=env).stdout.decode("utf-8")
+
+
+class ResolverGitHub(ScriptedGitHub):
+    """ScriptedGitHub plus the preflight, issue, base and branch reads, and a push whose head is
+    read from the host clone with local git. `seen` keeps every argv the harness ran."""
+
+    def __init__(self, *, base, issue=None, provenance=None, push_code=0, **kwargs):
+        super().__init__(**kwargs)
+        self.base, self.issue = base, issue or issue_fixture()
+        self.provenance = provenance or provenance_json()
+        self.push_code, self.pushes, self.seen = push_code, [], []
+
+    def __call__(self, args, **kwargs):
+        argv = list(args[1:])
+        self.seen.append(argv)
+        if argv == ["--version"]:
+            return completed(args, "gh version 2.101.0 (2026-09-01)\nhttps://github.com/cli/cli/releases/tag/v2.101.0\n")
+        if argv[:2] == ["auth", "status"]:
+            return completed(args, auth_status_json())
+        if argv == ["api", API]:
+            return completed(args, json.dumps(REPOSITORY_JSON))
+        if argv == ["api", f"{API}/issues/12"]:
+            return completed(args, json.dumps(self.issue))
+        if argv == ["api", "--paginate", f"{API}/issues/12/comments"]:
+            return completed(args, "[]")
+        if argv[:2] == ["api", "graphql"]:
+            return completed(args, self.provenance)
+        if argv == ["ls-remote", ORIGIN, "refs/heads/main"]:
+            return completed(args, SHA_BASE_LINE.format(sha=self.base))
+        if argv[:2] == ["ls-remote", "--heads"]:
+            return completed(args, "")
+        if argv == ["api", f"{API}/rules/branches/openhands/issue-12"]:
+            return completed(args, rules_json())
+        if argv[-5:] == ["remote", "get-url", "--push", "--all", "origin"]:
+            return completed(args, ORIGIN + "\n")
+        if "push" in argv:
+            clone = argv[argv.index("-C") + 1]
+            head = subprocess.run([REAL_GIT, "-C", clone, "rev-parse", "HEAD"], capture_output=True, text=True,
+                                  env=hermetic_git_environment(), check=True).stdout.strip()
+            self.pushes.append({"refspec": argv[-1], "head": head})
+            if self.push_code == 0:
+                self.head = head
+            return completed(args, "", self.push_code)
+        return super().__call__(args, **kwargs)
+
+    def words(self):
+        return [word for argv in self.seen for word in argv]
+
+
+class ResolverAttemptTests(unittest.TestCase):
+    """resolver.ResolverAttempt.finish: validate, guard, apply, commit, push and open (local git, scripted GitHub)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.r = load_resolver()
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-attempt-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.bare, self.base, _ = origin_fixture(self.tmp, ORIGIN_FILES)
+        self.fake = FakeTools(self.tmp)
+        self.gitleaks = self.tmp / "bin/gitleaks"
+        self.gitleaks.write_text(FAKE_GITLEAKS.format(python=sys.executable, log=str(self.tmp / "gitleaks.jsonl")),
+                                 encoding="utf-8")
+        self.gitleaks.chmod(0o755)
+        self.home = self.tmp / "home"
+        self.home.mkdir()
+        self.key = secrets.token_urlsafe(32)
+
+    def result_for(self, name):
+        result = self.tmp / "state/runs" / RUN_ID / name
+        result.mkdir(parents=True, mode=0o700)
+        return result
+
+    def patch_for(self, edits):
+        work = self.tmp / f"work-{len(list(self.tmp.glob('work-*')))}"
+        subprocess.run(["git", "clone", "-q", str(self.bare), str(work)], check=True, capture_output=True,
+                       env=hermetic_git_environment())
+        for relative, data in edits.items():
+            write_file(work, relative, data)
+        return full_export(work, self.base)
+
+    def attempt(self, github):
+        attempt = self.r.ResolverAttempt(
+            number=12, title="Fix the widget", base_sha=self.base, branch="openhands/issue-12", owned_paths=["docs"],
+            lane="lane:foundation", instruction="Resolve issue 12.\n", run_id=RUN_ID, gh=self.fake.gh, git=REAL_GIT,
+            gitleaks=str(self.gitleaks), gitleaks_config=str(ROOT / ".gitleaks.toml"),
+            host_paths=[str(self.tmp / "state")], user_name="fixtureuser", base_env=planted_base(self.home),
+            runner=github, clone_url=str(self.bare))
+        attempt.session_sink(self.key)
+        return attempt
+
+    def test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr(self):
+        patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
+        github = ResolverGitHub(base=self.base)
+        attempt = self.attempt(github)
+        outcome = attempt.finish(self.result_for("accepted"), patch_text=patch, final_message=FINAL_MESSAGE)
+        self.assertEqual(outcome["status"], "pr_opened", outcome)
+        head = github.pushes[0]["head"]
+        self.assertEqual(github.pushes, [{"refspec": "HEAD:refs/heads/openhands/issue-12", "head": head}])
+        self.assertEqual({key: outcome[key] for key in ("failure_stage", "branch", "pr", "head", "paths_changed",
+                                                         "sota_sources", "patch_sha256", "writes")},
+                         {"failure_stage": None, "branch": "openhands/issue-12", "pr": 34, "head": head,
+                          "paths_changed": 1, "sota_sources": {"kept": 1, "dropped": 0},
+                          "patch_sha256": hashlib.sha256(patch.encode("utf-8")).hexdigest(),
+                          "writes": [{"op": "push", "exit_code": 0}, {"op": "pr_create", "exit_code": 0}]})
+        clone = attempt.clone
+        self.assertFalse((clone / ".git/hooks").exists())
+        shown = run_git(clone, "log", "-1", "--format=%an <%ae>%n%s%n%P").stdout.decode().splitlines()
+        self.assertEqual(shown, ["OpenHands <openhands@all-hands.dev>", "Address issue #12: Fix the widget", self.base])
+        neutral = {**hermetic_git_environment(), "GIT_CONFIG_GLOBAL": os.devnull}
+        committed = run_git(clone, "--no-pager", "diff", "--no-color", "--no-ext-diff", "--no-textconv", "--full-index",
+                            self.base, "HEAD", env=neutral).stdout.decode("utf-8")
+        self.assertEqual(committed, patch)
+        self.assertEqual(run_git(clone, "remote", "get-url", "origin").stdout.decode().strip(), ORIGIN)
+        for text in ("Closes #12", "### SOTA sources", "- `docs/guide.md`", self.r.DISCLOSURE):
+            self.assertIn(text, github.state["body"])
+        self.assertEqual(github.title, "[#12] Fix the widget")
+        self.assertEqual(attempt.pr["number"], 34)
+        for denied in ("ready", "merge", "--force", "--auto", "--delete"):
+            self.assertNotIn(denied, github.words())
+        self.assertNotIn(self.key, json.dumps(outcome))
+
+    def test_model_text_that_fails_the_guard_is_refused_before_any_write(self):
+        patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
+        for message, reason in ((FINAL_MESSAGE + f"\nThe key is {self.key}\n", "session_key"),
+                                ("Changed docs/a.md.\n", "no_sota_sources"),
+                                ("Fixes #3.\n\n## SOTA sources\n- docs/guide.md\n", "closing_keyword"),
+                                ("Thanks @someone.\n\n## SOTA sources\n- docs/guide.md\n", "mention")):
+            with self.subTest(reason=reason):
+                github = ResolverGitHub(base=self.base)
+                outcome = self.attempt(github).finish(self.result_for(reason.replace("_", "-")), patch_text=patch,
+                                                      final_message=message)
+                self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+                                 ("text_refused", [reason], None))
+                self.assertEqual((outcome["writes"], github.pushes), ([], []))
+                self.assertFalse(any(argv[:2] == ["pr", "create"] for argv in github.seen))
+
+    def test_refused_and_empty_patches_write_nothing(self):
+        github = ResolverGitHub(base=self.base)
+        refused = self.attempt(github).finish(self.result_for("refused"),
+                                              patch_text=added_files_patch(".github/workflows/x.yml"),
+                                              final_message=FINAL_MESSAGE)
+        self.assertEqual(refused["status"], "patch_refused")
+        self.assertLessEqual({"github_path", "not_owned"}, set(refused["reasons"]))
+        self.assertEqual((refused["writes"], github.pushes, github.seen), ([], [], []))
+        attempt = self.attempt(github)
+        empty = attempt.finish(self.result_for("empty"), patch_text="", final_message=FINAL_MESSAGE)
+        self.assertEqual((empty["status"], empty["writes"], attempt.clone), ("patch_empty", [], None))
+        self.assertEqual(github.seen, [])
+
+    def test_a_commit_that_differs_from_the_validated_patch_is_never_pushed(self):
+        # git apply takes a hunk at an offset (it matched "a" one line below its header), so the
+        # commit's diff differs from the validated text; the byte comparison stops the push.
+        (self.tmp / "offset").mkdir()
+        self.bare, self.base, _ = origin_fixture(self.tmp / "offset", {**ORIGIN_FILES, "docs/long.md": "x\ny\na\nz\n"})
+        patch = ("diff --git a/docs/long.md b/docs/long.md\nindex 1111111..2222222 100644\n--- a/docs/long.md\n"
+                 "+++ b/docs/long.md\n@@ -2,2 +2,3 @@\n a\n+new line\n z\n")
+        github = ResolverGitHub(base=self.base)
+        outcome = self.attempt(github).finish(self.result_for("offset"), patch_text=patch, final_message=FINAL_MESSAGE)
+        self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"]),
+                         (None, "apply", ["commit_patch_mismatch"]))
+        self.assertEqual((outcome["writes"], github.pushes), ([], []))
+        self.assertFalse(any(argv[:2] == ["pr", "create"] for argv in github.seen))
+
+    def test_a_failed_push_stops_before_the_pull_request(self):
+        patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
+        github = ResolverGitHub(base=self.base, push_code=1)
+        outcome = self.attempt(github).finish(self.result_for("push"), patch_text=patch, final_message=FINAL_MESSAGE)
+        self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"]), (None, "push", ["push_failed"]))
+        self.assertEqual(outcome["writes"], [{"op": "push", "exit_code": 1}])
+        self.assertFalse(any(argv[:2] == ["pr", "create"] for argv in github.seen))
+
+    def test_exit_status_comes_from_host_observed_github_results_only(self):
+        exit_code = self.r.resolver_exit
+
+        def receipt(**section):
+            return {"failure_stage": None, "task_passed": False, "evidence_complete": False,
+                    "resolver": {"status": None, "review": None, **section}}
+
+        completed_review = {"status": "completed", "reason": None}
+        self.assertEqual(exit_code(receipt(status="pr_opened", review=completed_review)), 0)
+        self.assertEqual(exit_code(receipt(status="pr_opened", review={"status": "stopped", "reason": "pr_head_moved"})), 5)
+        self.assertEqual(exit_code(receipt(status="pr_opened")), 5)
+        for status in ("patch_empty", "patch_refused", "text_refused", "agent_not_finished"):
+            self.assertEqual(exit_code(receipt(status=status, review=completed_review)), 1)
+        self.assertEqual(exit_code({**receipt(status="pr_opened", review=completed_review), "failure_stage": "push"}), 3)
+        self.assertEqual(exit_code(receipt()), 3)
+        self.assertEqual(exit_code({"failure_stage": None}), 3)
+        # A claimed pass, complete evidence or a grader verdict never counts.
+        planted = {**receipt(status="patch_refused"), "task_passed": True, "evidence_complete": True,
+                   "upstream_grader": {"upstream_resolved": True}}
+        self.assertEqual(exit_code(planted), 1)
+
+
+class ResolverRunTests(unittest.TestCase):
+    """`resolver.py run`: the read-only plan, and end-to-end fake runs through host.run and dispatch.
+
+    Docker, the agent-server, gh, network git and gitleaks are fakes; the workspace clone,
+    the export, the validator, the fresh clone, apply and commit run with local git.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.r = load_resolver()
+        cls.host, cls.dispatch, cls.receipts = (cls.r._recipe(name) for name in ("host", "dispatch", "receipt"))
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-run-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.bare, self.base, _ = origin_fixture(self.tmp, ORIGIN_FILES)
+        self.fake = FakeTools(self.tmp)
+        self.gitleaks = self.tmp / "bin/gitleaks"
+        self.gitleaks.write_text(FAKE_GITLEAKS.format(python=sys.executable, log=str(self.tmp / "gitleaks.jsonl")),
+                                 encoding="utf-8")
+        self.gitleaks.chmod(0o755)
+        self.pins = json.loads((RECIPE / "pins.json").read_text(encoding="utf-8"))
+        self.prefix, self.state = self.tmp / "prefix", self.tmp / "state"
+        (self.prefix / "venv/bin").mkdir(parents=True)
+        (self.prefix / "venv/bin/python").write_text("")
+        self.state.mkdir(mode=0o700)
+        (self.state / "installation.json").write_text(json.dumps({
+            "exit_code": 0, "requirements_sha256": self.pins["requirements_sha256"]}))
+        review = "import sys; sys.stdin.read(); print('low docs/a.md:2 a heading would help')"
+        self.reviewer = f"{shlex.quote(sys.executable)} -c {shlex.quote(review)}"
+
+    def argv(self, *extra):
+        return ["run", "--issue", "12", "--owned-path", "docs", "--task", "Fix the widget as the issue asks.",
+                "--lane", "lane:foundation", "--arm", "control", "--prefix", str(self.prefix), "--state", str(self.state),
+                "--gh", self.fake.gh, "--git", REAL_GIT, "--gitleaks", str(self.gitleaks), *extra]
+
+    def run_cli(self, github, *, edits=None, message=FINAL_MESSAGE, gates=None, dry_run=False, plant=False):
+        """resolver.main(["run", ...]) with Docker, the agent-server, gh and network git replaced."""
+        host, dispatch, state = self.host, self.dispatch, self.state
+
+        def api(method, path, *, headers, body=None, port):
+            if (method, path) == ("POST", "/api/conversations"):
+                workspace = next(state.glob("runs/*/control/workspace"))
+                for relative, data in (edits or {}).items():
+                    write_file(workspace, relative, data)
+                if plant:  # success-looking model-writable files; nothing on the host reads them
+                    worker = workspace.parent / "worker"
+                    (worker / "native-summary.json").write_text(json.dumps({"execution_status": "finished",
+                                                                             "task_passed": True}))
+                    (worker / "events.jsonl").write_text(json.dumps({"kind": "PullRequestMerged"}) + "\n")
+                return {"id": CONVERSATION}
+            if (method, path) == ("GET", f"/api/conversations/{CONVERSATION}"):
+                return {"execution_status": "finished"}
+            if (method, path) == ("GET", f"/api/conversations/{CONVERSATION}/agent_final_response"):
+                return {"response": message}
+            raise AssertionError((method, path))
+
+        def prepare(state_, run_id, selection, prefix, pins, base, host_file, port=3730, *, resolver=False,
+                    session_sink=None):
+            result = Path(state_) / "runs" / run_id / selection["arm"]
+            session_sink(secrets.token_urlsafe(32))
+            host.write_json(result / "start.json", {})
+            host.write_json(result / "status.json", {"run_id": run_id, "arm": selection["arm"], "status": "prepared",
+                                                     "port": port, "proxy_config_sha256": "0" * 64,
+                                                     "receipt": str(result / "receipt.json")})
+
+        def install(stack_root, workspace, result):
+            for name in ("resolver", "search-first", "tdd"):
+                write_file(workspace, f".agents/skills/{name}/SKILL.md", f"---\nname: {name}\n---\n")
+            with (workspace / ".git/info/exclude").open("a") as stream:
+                stream.write("\n/.agents/\n/skills-lock.json\n")
+            return {"names": ["resolver", "search-first", "tdd"], "manifest_sha256": "0" * 64}
+
+        def absent_gateway(result):
+            return self.receipts.create_receipt(result, database=result / "absent.sqlite")
+
+        host_file = {"variables": {"HOST_PATH": "/usr/bin"}, "gateway_providers": GATE_PROVIDERS}
+        clock, out, mocks = FakeClock(), io.StringIO(), {}
+        with contextlib.ExitStack() as stack:
+            enter = stack.enter_context
+            for name in ("OPENHANDS_ARM", "OPENHANDS_MODEL", "OPENHANDS_BASE_URL", "OPENHANDS_COMPRESSION",
+                         "OPENHANDS_STACK_ROOT"):
+                enter(mock.patch.dict(os.environ, {name: ""}))
+                os.environ.pop(name)
+            for module, name, replacement in (
+                    (host, "preflight", mock.Mock(return_value=(self.pins, host_file, {}))),
+                    (host, "verify_stage_gates", gates or mock.Mock(return_value={})),
+                    (host, "verify_gateway_providers", mock.Mock(return_value=None)),
+                    (host, "pinned_image_identity", mock.Mock(return_value="containerd")),
+                    (host, "RESOLVER_ORIGIN", str(self.bare)),
+                    (host, "install_resolver_skills", mock.Mock(side_effect=install)),
+                    (host, "resolver_skill_pin", mock.Mock(return_value=SKILL_PIN)),
+                    (host, "prepare_native_dispatch", mock.Mock(side_effect=prepare)),
+                    (host, "run_probe", mock.Mock(return_value=True)),
+                    (host, "execute_container", mock.Mock(return_value=0)),
+                    (host, "teardown_attempt", mock.Mock(return_value=True)),
+                    (host, "create_receipt", mock.Mock(side_effect=absent_gateway)),
+                    (host, "run", mock.Mock(side_effect=host.run)),
+                    (dispatch, "api_request", mock.Mock(side_effect=api)),
+                    (dispatch, "verify_isolation", mock.Mock(return_value={"passed": True})),
+                    (dispatch, "stop_server", mock.Mock(return_value=True)),
+                    (dispatch, "create_receipt", mock.Mock(side_effect=absent_gateway)),
+                    (self.r, "CLONE_URL", str(self.bare))):
+                mocks[name] = enter(mock.patch.object(module, name, replacement))
+            enter(contextlib.redirect_stdout(out))
+            extra = ["--dry-run"] if dry_run else ["--reviewer-command", self.reviewer]
+            code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep)
+        return code, json.loads(out.getvalue()), mocks
+
+    def receipt(self, printed):
+        return json.loads(Path(printed["receipt"]).read_text())
+
+    def test_dry_run_performs_every_read_only_step_and_stops_before_any_container_or_write(self):
+        github = ResolverGitHub(base=self.base)
+        code, plan, mocks = self.run_cli(github, dry_run=True)
+        self.assertEqual(code, 0, plan)
+        self.assertEqual(plan["status"], "planned")
+        self.assertRegex(plan["run_id"], r"^rw-openhands-res-12-[0-9]{8}$")
+        self.assertEqual({key: plan[key] for key in ("issue", "base_sha", "branch", "owned_paths", "lane", "arm", "port",
+                                                      "kept_comments", "dropped_comments", "gates", "resolver_skill")},
+                         {"issue": 12, "base_sha": self.base, "branch": "openhands/issue-12", "owned_paths": ["docs"],
+                          "lane": "lane:foundation", "arm": "control", "port": 3740, "kept_comments": 0,
+                          "dropped_comments": 0, "gates": "passed", "resolver_skill": SKILL_PIN})
+        self.assertIn("non_fast_forward", plan["branch_rules"])
+        self.assertEqual(plan["preflight"]["gh_version"], "2.101.0")
+        self.assertEqual(plan["repository"], {"full_name": REPOSITORY_JSON["full_name"], "default_branch": "main"})
+        self.assertRegex(plan["instruction_sha256"], r"^[0-9a-f]{64}$")
+        for name in ("run", "prepare_native_dispatch", "execute_container", "install_resolver_skills", "run_probe"):
+            mocks[name].assert_not_called()
+        mocks["verify_stage_gates"].assert_called_once()
+        mocks["verify_gateway_providers"].assert_called_once()
+        self.assertFalse((self.state / "runs").exists())
+        # Only reads reached the runner: no push, pr create, review or comment.
+        self.assertEqual({tuple(argv[:2]) for argv in github.seen},
+                         {("--version",), ("auth", "status"), ("api", API), ("api", f"{API}/issues/12"),
+                          ("api", "--paginate"), ("api", "graphql"), ("ls-remote", ORIGIN), ("ls-remote", "--heads"),
+                          ("api", f"{API}/rules/branches/openhands/issue-12")})
+
+    def test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops(self):
+        github = ResolverGitHub(base=self.base, checks=[(0, check_list("pass"), "")] * 2)
+        code, printed, mocks = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"}, plant=True)
+        self.assertEqual(code, 0, printed)
+        receipt = self.receipt(printed)
+        section = receipt["resolver"]
+        head = github.pushes[0]["head"]
+        self.assertEqual({key: section[key] for key in ("issue", "base_sha", "status", "branch", "pr", "head")},
+                         {"issue": 12, "base_sha": self.base, "status": "pr_opened", "branch": "openhands/issue-12",
+                          "pr": 34, "head": head})
+        self.assertEqual([write["op"] for write in section["writes"]], ["push", "pr_create", "review", "pr_comment"])
+        self.assertEqual({write["exit_code"] for write in section["writes"]}, {0})
+        self.assertEqual({key: section["review"][key] for key in ("status", "reason", "id", "commit_id")},
+                         {"status": "completed", "reason": None, "id": 901, "commit_id": head})
+        self.assertEqual(section["review"]["checks"]["status"], "settled")
+        self.assertEqual(section["review"]["repair"], "not_pushed")
+        self.assertEqual(section["review"]["final"], {"isDraft": True, "state": "OPEN"})
+        self.assertEqual((receipt["failure_stage"], receipt["task_passed"], receipt["evidence_complete"]),
+                         (None, False, False))
+        self.assertEqual(len(github.reviews), 1)
+        self.assertEqual(github.reviews[0]["commit_id"], head)
+        self.assertIn("a heading would help", github.reviews[0]["body"])
+        self.assertEqual(len(github.comments), 1)
+        for denied in ("ready", "merge", "--auto", "--force"):
+            self.assertNotIn(denied, github.words())
+        # The O1 path ran unchanged: prepare, the probe and the dispatch gate, with the resolver
+        # request and its session-key sink.
+        prepare = mocks["prepare_native_dispatch"]
+        self.assertIs(prepare.call_args.kwargs["resolver"], True)
+        self.assertEqual(prepare.call_args.kwargs["port"], 3740)
+        mocks["run_probe"].assert_called_once()
+        mocks["verify_isolation"].assert_called_once()
+        mocks["execute_container"].assert_not_called()
+        self.assertRegex(printed["run_id"], r"^rw-openhands-res-12-[0-9]{8}$")
+        self.assertEqual((printed["status"], printed["pr"], printed["review"], printed["exit"]),
+                         ("pr_opened", 34, "completed", 0))
+
+    def test_end_to_end_refused_patch_makes_no_github_write(self):
+        github = ResolverGitHub(base=self.base)
+        code, printed, _ = self.run_cli(github, edits={".github/workflows/evil.yml": "on: push\n",
+                                                       "docs/a.md": "a\nnew line\n"},
+                                        message="Done; the pull request is merged.\n\n## SOTA sources\n- docs/guide.md\n",
+                                        plant=True)
+        self.assertEqual(code, 1, printed)
+        section = self.receipt(printed)["resolver"]
+        self.assertEqual(section["status"], "patch_refused")
+        self.assertIn("github_path", section["reasons"])
+        self.assertEqual((section["writes"], github.pushes, github.reviews, github.comments), ([], [], [], []))
+        self.assertIsNone(section["pr"])
+        self.assertEqual(section["review"]["status"], "not_run")
+        self.assertFalse(any(argv[:2] == ["pr", "create"] or "push" in argv for argv in github.seen))
+
+    def test_end_to_end_head_move_stops_before_the_review(self):
+        github = ResolverGitHub(base=self.base, checks=[(0, check_list("pass"), "")] * 2, moves={1: "d" * 40})
+        code, printed, _ = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"})
+        self.assertEqual(code, 5, printed)
+        section = self.receipt(printed)["resolver"]
+        self.assertEqual((section["status"], section["review"]["status"], section["review"]["reason"]),
+                         ("pr_opened", "stopped", "pr_head_moved"))
+        self.assertEqual([write["op"] for write in section["writes"]], ["push", "pr_create"])
+        self.assertEqual((github.reviews, github.comments), ([], []))
+
+    def test_end_to_end_gate_refusal_starts_no_container(self):
+        github = ResolverGitHub(base=self.base)
+        refusal = mock.Mock(side_effect=ValueError("stage_gate_g2_not_recorded"))
+        code, printed, mocks = self.run_cli(github, edits={"docs/a.md": "a\n"}, gates=refusal)
+        self.assertEqual(code, 3, printed)
+        self.assertEqual({key: printed[key] for key in ("status", "stage", "reason")},
+                         {"status": "refused", "stage": "gates", "reason": "stage_gate_g2_not_recorded"})
+        for name in ("run", "prepare_native_dispatch", "execute_container", "run_probe", "install_resolver_skills",
+                     "api_request"):
+            mocks[name].assert_not_called()
+        self.assertFalse((self.state / "runs").exists())
+        self.assertEqual(github.pushes, [])
+
+    def test_issue_refusal_exits_4_before_any_attempt(self):
+        github = ResolverGitHub(base=self.base, issue=issue_fixture(author_association="CONTRIBUTOR"))
+        code, printed, mocks = self.run_cli(github)
+        self.assertEqual(code, 4)
+        self.assertEqual({key: printed[key] for key in ("status", "stage", "reason")},
+                         {"status": "refused", "stage": "issue", "reason": "issue_not_owner_authored"})
+        mocks["run"].assert_not_called()
+        self.assertFalse((self.state / "runs").exists())
 
 
 if __name__ == "__main__":
