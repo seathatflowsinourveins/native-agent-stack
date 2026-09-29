@@ -1741,6 +1741,49 @@ export function callState(call, result) {
 }
 // The per-call flag M14 reads: the call never ran (a rejection, an invalid call or a cancellation that has a result, or a declined call).
 export const notExecuted = (call, result) => callState(call, result).not_executed === true
+// M14 call states (PR-A item 7; U2 design 4.2 with the review's corrections): callState projected onto the sealed M14 names (E2E README.md M14
+// row; preregistration.json thresholds.M14.criteria.states: attempted, decided, executed, failed, cancelled_or_unfinished). A call that has a
+// transcript result is never "no result": it executed (succeeded, failed, or interrupted after it started), was rejected (by source, config,
+// hook, user, other or a native declined state; the tool_result event is "Not emitted if the tool call was rejected", monitoring-usage doc),
+// was invalid (a <tool_use_error> the client raised before running it) or was cancelled with a result (the client's "Not run" or "Cancelled"
+// results: cancelled_with_result, kept apart until a Loki probe shows whether such a call emits tool_result). cancelled_or_unfinished is the
+// sealed state, the calls with no result and no native status that decides them; unknown is an outcome an adapter could not read. decided is
+// null: a transcript cannot observe the tool_decision event. attempted = executed + rejected + invalid + cancelled_with_result +
+// cancelled_or_unfinished + unknown, per actor and per MCP server. calls_without_result keeps its published meaning: the calls with no result,
+// which are the cancelled_or_unfinished ones plus those a native status decided (completed, failed or declined).
+const M14_STATES = ['succeeded', 'failed', 'interrupted', 'rejected', 'invalid', 'cancelled_with_result', 'cancelled_or_unfinished', 'unknown']
+const M14_EXECUTED = new Set(['succeeded', 'failed', 'interrupted'])
+const REJECTION_SOURCES = ['config', 'hook', 'user', 'other', 'declined']
+const M14_SERVER_KEYS = ['attempted', 'executed', ...M14_STATES]
+const projectState = (s) => s.not_executed ? (s.cause === 'invalid' ? 'invalid' : s.cause === 'cancelled' ? 'cancelled_with_result' : 'rejected')
+  : s.state === 'unfinished' ? 'cancelled_or_unfinished' : s.state
+const m14Of = (s) => { const state = projectState(s); return { state, cause: s.cause ?? null, executed: M14_EXECUTED.has(state), background: Boolean(s.background) } }
+// One call's M14 state: { state (one of M14_STATES), cause (callState's, or null), executed, background }.
+export const m14State = (call, result) => m14Of(callState(call, result))
+const emptyServerStates = () => Object.fromEntries(M14_SERVER_KEYS.map((k) => [k, 0]))
+const emptyCallStates = () => ({ attempted: 0, decided: null, executed: 0, ...Object.fromEntries(M14_STATES.map((k) => [k, 0])),
+  rejected_by_source: Object.fromEntries(REJECTION_SOURCES.map((k) => [k, 0])), background: 0, sandbox: 0, by_server: counter() })
+function addCallState(states, m, server, sandbox) {
+  states.attempted++
+  states[m.state]++
+  if (m.executed) states.executed++
+  if (m.state === 'rejected') states.rejected_by_source[REJECTION_SOURCES.includes(m.cause) ? m.cause : 'other']++
+  if (m.background) states.background++
+  if (sandbox) states.sandbox++
+  if (!server) return
+  const row = states.by_server[server] ||= emptyServerStates()
+  row.attempted++
+  row[m.state]++
+  if (m.executed) row.executed++
+}
+function sumCallStates(target, source) {
+  for (const k of ['attempted', 'executed', ...M14_STATES, 'background', 'sandbox']) target[k] += source?.[k] || 0
+  for (const k of REJECTION_SOURCES) target.rejected_by_source[k] += source?.rejected_by_source?.[k] || 0
+  for (const [server, row] of Object.entries(source?.by_server || {})) {
+    const total = target.by_server[server] ||= emptyServerStates()
+    for (const k of M14_SERVER_KEYS) total[k] += row[k] || 0
+  }
+}
 const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted', 'background', 'ambiguous', 'via_mcporter']
 const CLI_CARRIERS = ['bash', 'rtk_proxy', 'ctx', 'nested']
 const DOWNSTREAM_COUNTERS = ['calls', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted']
@@ -2281,6 +2324,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   // mcpAttempted splits the MCP calls attempted in the window by tool: a ctx_ tool (isCtx, as M5 and the ctx carrier read it) or another,
   // for the AA §1 per-actor figures "children with any MCP call" and "children with a non-ctx MCP call" (aggregateMeasurements).
   const mcpStates = counter(), loaded = counter(), notCalled = counter(), mcpAttempted = { ctx: 0, non_ctx: 0 }, cli = emptyCliLanes()
+  // PR-A item 7: every call attempted in the window, in M14's names (callStates above); one callState per call, which cli_lanes reads too.
+  const callStates = emptyCallStates()
   // measurement.proxy: the M6 population is the Bash calls carried by rtk proxy (sandbox-nested Codex calls included, as
   // before), with its invocations; rtk proxy in ctx shell code is reported apart and left out of M6, and the prefix rule's
   // count is kept for comparison with earlier receipts.
@@ -2288,7 +2333,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     rule: lanesOn ? 'command_position' : 'prefix_fallback' }
   for (const c of calls.values()) {
     if (!inside(c.row)) continue
-    const server = mcpServer(c.name), r = results.get(c.id)
+    const server = mcpServer(c.name), r = results.get(c.id), s = callState(c, r)
+    addCallState(callStates, m14Of(s), server, c.sandbox)
     if (server) {
       const state = mcpStates[server] ||= { attempted: 0, succeeded: 0, failed: 0, unfinished: 0 }
       // Codex UI items can retain status without a model-visible result payload
@@ -2309,7 +2355,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
         : validReview(review) && EXCEPTIONS.includes(review.exception) ? 'exception' : 'unclassified']++
     } else if (lanesOn && isCtx(c.name) && analysis.proxy) proxy.in_ctx_code++
     if (lanesOn && analysis.errors) cli.parse_errors++ // calls whose shell text has a syntax error, not nodes
-    if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
+    if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, s, c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
   }
   // PR-A item 5: loaded counts the tool references a ToolSearch result inside the window returned, per MCP server, whether or not the actor
   // called the server; loaded_not_called keeps the #432 unit, the references of servers the actor attempted no call on inside the window
@@ -2352,6 +2398,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
     usage: transcriptUsage(transcript, window),
     hook_context: hookContext,
+    call_states: callStates,
     mcp_states: mcpStates, mcp_attempted: mcpAttempted, loaded_not_called: notCalled, loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
     cli_lanes: lanesOn ? { status: 'measured', parser: { versions: parserState.versions, wasm_sha256: parserState.wasm_sha256 }, ...cli } : { status: 'parser_unavailable', reason: parserState.reason },
@@ -2382,6 +2429,8 @@ export function aggregateMeasurements(items) {
   // the actors with at least one such reference: the unit of the historical 'Loaded, never called' baseline row (children per server).
   const hooks = { ...Object.fromEntries(HOOK_SCALARS.map((k) => [k, 0])), actors_with_insertion: 0, ...Object.fromEntries(HOOK_MAPS.map((k) => [k, counter()])) }
   const states = counter(), notCalled = counter(), loaded = counter(), loadedActors = counter(), notCalledActors = counter()
+  const callStates = emptyCallStates() // M14 counters add up over actors; decided stays null
+  for (const m of items) sumCallStates(callStates, m.call_states)
   const addCounts = (target, source) => { for (const [s, n] of Object.entries(source || {})) target[s] = (target[s] || 0) + n }
   const proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
   // CLI lanes sum their counters over the actors whose lanes were measured; actors_with_success counts the actors with at least one
@@ -2417,7 +2466,7 @@ export function aggregateMeasurements(items) {
     for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations', 'parse_errors']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
-    hook_context: hooks, mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
+    hook_context: hooks, call_states: callStates, mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
     proxy: { ...proxies, rule: rules.size === 1 ? [...rules][0] : 'mixed', acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
     cli_lanes: !items.length ? { status: 'not_measured' }
       : unavailable.length === items.length ? { status: 'parser_unavailable', reason: unavailable[0].cli_lanes.reason }
