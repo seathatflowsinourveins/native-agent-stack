@@ -302,6 +302,14 @@ integration check, not upstream acceptance, and its judge calls are separate mod
   preregistration. Every ambiguity of its register takes the harder reading the spec names, and the other readings are
   published under `alternatives`; production code has no default reading. `regrade --from <private dir>` repeats the grading
   from a private directory alone, optionally with other judgments.
+  A fact is read from the answer by a closed grammar (g1): integers next to their label word, a fact named by its field name
+  (`latency_ms 17`, `latency_sum: 124`, a quoted JSON key), a level word only when no negation disowns it (`no ERROR among
+  them`) and quoted raw rows by their `event` field. A fact no form matches is `unknown(unparsed)`; the D-extract fallback
+  (a blind judge quotes the words verbatim, and the grader reads the quote again) covers only the T0 test-run words, which
+  are read with an extraction-only reader of number words (`forty-nine`), and the payload of T9 and the web-table tasks.
+  The web-table sum and the blind tasks' facts have no fallback: what the grammar cannot read stays unknown. A quote is
+  used only when it is verbatim in the answer and every value lies inside a quote, whether the judgment came from `judge`
+  or from a `--judgments` file.
 - **Judges.** `judge packets` builds scrubbed packets (values, identifiers, paths and tool names replaced, spans kept so a
   quote maps back to the answer) and the blind calibration controls of each template and route. Claude answers are judged by
   gpt-6-astra at `max` effort through the packaged Codex lane (`codex_lane.build_command` with its isolation arguments, an
@@ -329,8 +337,13 @@ integration check, not upstream acceptance, and its judge calls are separate mod
   `render_reports` only neutral `origin` and `path` values anywhere in its data, capture from a neutral directory, and run
   `check-html --from` on the result.
 - **Privacy and exit codes.** Private files are 0600, create-only and refused inside any git work tree; the aggregate holds
-  counts and statuses only (no `tool_use_id`, call id, path, host, user name or command text). Exit 0 when G-Q, M7, M8 and
-  M12 pass, 1 otherwise, 2 on a refusal with a code and a field, never a value (a crash is a refusal, `E_INTERNAL`).
+  counts and statuses only (no `tool_use_id`, call id, path, host, user name or command text). The canary gathers the run
+  token, the identifier fields of the identity rows (identity, label, ids and locators), the input paths and roots, the home
+  directory and the user name; row vocabulary (actor names) and the instruction-file anchor lines are not identifiers and
+  are not gathered. Flags are taken as written (`--flag value` or `--flag=value`; an abbreviation is `E_ARGS`), the recorded
+  command carries a placeholder for every private path in both spellings, and `export` refuses (`E_EXPORT_INPUT
+  reason=argv`) a recorded command that still holds a path shape. Exit 0 when G-Q, M7, M8 and M12 pass, 1 otherwise, 2 on a
+  refusal with a code and a field, never a value (a crash is a refusal, `E_INTERNAL`).
 
 Limits:
 
@@ -341,6 +354,12 @@ Limits:
   repository whose grading block names the decided readings. Calibration keys are self-contained synthetic keys; only the E1
   group of `controls` uses real receipts.
 - A judged answer is screened for identifiers and the canary, not for hit text it quotes from a retrieval (recorded residual).
+- A historical memory hit is a result that names a frozen record's whole path or its content digest; the bare file name never
+  counts, because another page can share it. The freeze holds a path and a digest per record (the search rows carry no page
+  id), and how the real records for the memory tasks are named in real results is unmeasured until they are frozen.
+- A payload extraction may be requested for a web-table answer whose payload decoded and only whose sum is unparsed; the
+  grader ignores it (it reads a payload extraction only when no payload decoded), so that packet costs one judge call and
+  decides nothing.
 - The suite checks this code against synthetic hosts and fixtures; only a real grade run measures a real run.
 
 Tests: `PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest -v tests.test_token_e2e_grader` (needs `git`, `node` and the `toon`

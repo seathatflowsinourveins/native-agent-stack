@@ -55,6 +55,25 @@ retained evidence offline (`regrade`) with byte-identical results.
 - **Calibration alignment (2026-09-29).** The class D controls are rendered through the same `source_sections` a real packet uses, so a
   control shows the judge the section labels a real packet shows; T13's packet also carries the recorded conversion facts (call state,
   converted bytes, scope terms missing) without the tool name.
+- **Repair round (2026-09-29, review of head 705df138).** Two high and six medium findings, each fixed with a failing-first test and a
+  disarmed-guard mutant (`F19d_RepairRoundMutants`):
+  - *Facts named by their field name.* `_` stays a word character (the whole-word reading of T1 depends on it); the label sets name the
+    facts as the frozen key does (`record_id`, `latency_ms`; a sum through the words of `latency_sum`), and a label that is a field name
+    takes its value after it only. D-extract still covers only the T0 test-run words and the payload (T9, T16 to T20), so the claim that
+    the fallback may decide an unparsed sum or blind-task fact was wrong and is withdrawn: those facts stay `unknown(unparsed)`. The
+    design's R3 sends every unparsed key fact to D-extract; extending it to them needs new extraction controls and is left to Amendment 4's
+    review.
+  - *D-extract contract.* The judge check (`check_judgment`) already required every value to lie inside a quote; the grader now
+    re-checks it (and the quote against the raw answer) for every extraction, because `--judgments` files are outside data. Number words
+    are read only from a verified quote, by an extraction-only reader (up to 999); grammar g1 is unchanged, which is the design's F7 case.
+  - *Historical memory.* A hit names the frozen record's whole path or its content digest. The bare file name is no id: the shared store
+    can hold a later page that quotes another file with the same base name. No id field is invented (search rows carry none).
+  - *M7 and toon commands.* Only a fenced or line-block payload that fails to decode is an unequal trip (TOON CLI 4.1.1 refuses text after
+    a root array, so a whole answer with a sum line never decodes); each simple command of a call is read for its own options, so an
+    encode beside a decode counts and `curl -d` or `sort -o` is not a toon option.
+  - *Positive control.* A level word a negation disowns is no level, and quoted raw rows are read by their `event` field.
+  - *Privacy.* The canary is identifiers and paths (R22), not vocabulary or instruction-file lines; the recorded command holds a placeholder
+    for a private path in both flag spellings, abbreviated flags are refused, and `export` refuses a command with a path shape.
 
 ## Overturn conditions
 
