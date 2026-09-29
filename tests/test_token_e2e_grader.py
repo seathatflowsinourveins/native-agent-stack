@@ -4176,7 +4176,10 @@ class F31c_T14Facts(GraderCase):
         capture can see a process that left the session)."""
         rollout = {"status": "ok", "records": self.rollout(self.CARRIERS["command_item"])}
         alive = {"count": 1, "processes": [{"pid": 700, "pgid": 700, "start_time": ts(10), "command": "/usr/bin/sleep 300"}]}
-        got = self.facts(family="codex", rollout=rollout, attempt={"start": None, "end": None}, post={"processes": []},
+        ran = evm().codex_calls([{"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": "sleep 300 &", "aggregated_output": "", "exit_code": 0,
+            "status": "completed"}}])
+        got = self.facts(family="codex", rollout=rollout, calls=ran, attempt={"start": None, "end": None}, post={"processes": []},
                          survivors_record=alive)
         self.assertEqual((got["survivors"], got["survival_observed"]), ([{"comm": "sleep", "start": ts(10)}], True))
         missing = self.facts(family="codex", rollout=rollout, attempt={"start": None, "end": None}, post={"processes": []},
@@ -4195,6 +4198,26 @@ class F31c_T14Facts(GraderCase):
                              post={"processes": [{"pid": 800, "start": ts(20), "comm": "sleep", "ppid": 1}]},
                              survivors_record=self.NO_SURVIVORS)
         self.assertEqual(escaped["survivors"], [{"comm": "sleep", "start": ts(20)}])
+
+    def test_only_session_processes_the_child_ran_are_owned_and_the_rest_are_unattributed(self):
+        """The record has no parent pid, so a process is owned by its program name alone (the Claude path also follows
+        descendants); a count larger than the listed processes leaves the remainder unattributed."""
+        rollout = {"status": "ok", "records": self.rollout(self.CARRIERS["command_item"])}
+        record = {"count": 4, "processes": [
+            {"pid": 701, "pgid": 701, "start_time": ts(10), "command": "node /srv/mcp/server.js"},
+            {"pid": 702, "pgid": 702, "start_time": ts(11), "command": "/usr/bin/sleep 300"},
+            {"pid": 703, "pgid": 703, "start_time": ts(12), "command": None}]}
+
+        def ran(*commands):
+            return evm().codex_calls([{"type": "item.completed", "item": {
+                "id": f"item_{number}", "type": "command_execution", "command": command, "aggregated_output": "", "exit_code": 0,
+                "status": "completed"}} for number, command in enumerate(commands)])
+        unrelated = self.facts(family="codex", rollout=rollout, calls=ran("agentsview stats"), attempt={"start": None, "end": None},
+                               post={}, survivors_record=record)
+        self.assertEqual((unrelated["survivors"], unrelated["unattributed"]), ([], 4))
+        started = self.facts(family="codex", rollout=rollout, calls=ran("agentsview stats", "sleep 300 &"),
+                             attempt={"start": None, "end": None}, post={}, survivors_record=record)
+        self.assertEqual((started["survivors"], started["unattributed"]), ([{"comm": "sleep", "start": ts(11)}], 3))
 
     def test_an_archive_query_row_without_a_timestamp_is_unobserved_not_absent(self):
         """fc.archive_query_time returns ok(q=None) for a matching row that has no timestamp; that is a query whose time is
@@ -4228,10 +4251,11 @@ class F31c_T14Facts(GraderCase):
         self.assertEqual(self.facts(family="codex", calls=lookalike, attempt={"start": None, "end": None}, rollout=missing)["q_status"],
                          "none")
 
-    def codex_t14_run(self, *, with_rollout, survivors=None):
+    def codex_t14_run(self, *, with_rollout, survivors=None, ran=()):
         run = MiniRun(self)
         blind = run.blind("seed-blind-1", "Verdict: yes. id 1, latency 17 ms.", agent_id="fx1", strict=False)
-        label = run.codex_exec("reuse-343-00", f"1 session matched: {blind}", shell=[("agentsview session list", "ok")],
+        label = run.codex_exec("reuse-343-00", f"1 session matched: {blind}",
+                               shell=[("agentsview session list", "ok")] + [(command, "") for command in ran],
                                rollout=self.rollout(self.CARRIERS["custom_tool_call"]) if with_rollout else None,
                                survivors=survivors)
         write_json(run.captures / "arm-codex-B-post-arm.json", {"schema": "token-e2e-capture/1", "phase": "post-arm", "family": "codex",
@@ -4255,9 +4279,18 @@ class F31c_T14Facts(GraderCase):
         """U10 lists the processes of the attempt's session as `attempts/<identity>/survivors.json` and ends them before any
         post-arm capture, so that record is the only evidence of an owned Codex process that survived (design 2.8 step 6)."""
         record = {"count": 1, "processes": [{"pid": 700, "pgid": 700, "start_time": ts(10), "command": "/usr/bin/sleep 300"}]}
-        row = self.codex_t14_run(with_rollout=True, survivors=record)
+        row = self.codex_t14_run(with_rollout=True, survivors=record, ran=("sleep 300 &",))
         component = next(part for part in row["components"] if part["id"] == "B")
         self.assertEqual((component["status"], component["reason"]), ("fail", "owned_process_survives"))
+
+    def test_a_harness_process_of_the_session_is_not_an_owned_survivor(self):
+        """U10's list is every process of the session but the main one, which includes what codex itself started (an MCP
+        server still shutting down). As on the Claude path, only a process the child ran, by program name, is owned; the rest
+        is unattributed and never fails the child."""
+        record = {"count": 1, "processes": [{"pid": 701, "pgid": 701, "start_time": ts(10), "command": "node /srv/mcp/server.js"}]}
+        row = self.codex_t14_run(with_rollout=True, survivors=record)
+        component = next(part for part in row["components"] if part["id"] == "B")
+        self.assertEqual((component["status"], component["reason"]), ("pass", None))
 
     def test_a_codex_attempt_without_its_survivors_record_is_unknown_never_a_pass(self):
         row = self.codex_t14_run(with_rollout=True, survivors=None)
@@ -5177,6 +5210,28 @@ class F16_GradeCommand(GraderCase):
         self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
         qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
         self.assertEqual((qmd["O"], qmd["R"]), (5, 0), "reuse-296-01 does not carry the qmd tag")
+
+    def test_an_unlisted_row_and_a_record_of_the_same_attempt_are_one_opportunity(self):
+        """An identity the ledger calls unlisted but U9 has a graded record for is counted once, not as a row and again as
+        a record."""
+        run = MiniRun(self)
+        label = run.workflow("B", "seed-catalog-history-1", answer_rows("x"), {"answer": "x", "evidence": []}, agent_id="fxq1")
+        for row in run.join_rows:
+            if row["identity"] == label:
+                row.update(source="unlisted", reason="unlisted_attempt",
+                           lanes={"qmd": {"state": "unknown", "reason": "unlisted_attempt", "via": []}})
+        tasks = json.loads(run.spec.read_text(encoding="utf-8"))["tasks"]
+        others = [task["id"] for task in tasks if "qmd" in task["lane_tags"] and task["id"] != "seed-catalog-history-1"]
+        for task in others:
+            run.join_rows.append({"schema": "token-e2e-adoption-join/1", "identity": None, "actor": "workflow_child", "arm": "B",
+                                  "task": task, "attempt": 0, "source": "not_launched", "join": "unjoined", "reason": "not_launched",
+                                  "complete": False, "incomplete_cause": None, "agent_id": None, "excluded_kind": None,
+                                  "lanes": {"qmd": {"state": "unknown", "reason": "not_launched", "via": []}}})
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
+        self.assertEqual((qmd["O"], qmd["R"]), (5, 1))
 
     def test_regrade_keeps_the_join_ledger_in_the_private_directory(self):
         run = MiniRun(self)
