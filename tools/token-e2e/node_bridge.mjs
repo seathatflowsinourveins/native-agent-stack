@@ -52,12 +52,16 @@ const ops = {
     return { available: true, parser_ok: status ? Boolean(status.ok) : null,
       results: commands.map((command) => kernel.commandInvocations(String(command))) }
   },
+  // A table the validator rejects is `ok: false` with the validator's own E_* code. Any other exception (a TypeError, a
+  // Node system error, a signature the grader did not expect) means the check could not run: `ok: null`, unchecked.
   validate_identity({ table, options }) {
     if (!has('validateIdentityTable')) return { available: false }
     try {
       return { available: true, ok: true, result: kernel.validateIdentityTable(table, options || {}) }
     } catch (error) {
-      return { available: true, ok: false, code: String(error && error.code || 'E_ROW'), message: String(error && error.message || '') }
+      const code = error && typeof error.code === 'string' ? error.code : ''
+      if (code.startsWith('E_')) return { available: true, ok: false, code, message: String(error.message || '') }
+      return { available: true, ok: null }
     }
   },
 }

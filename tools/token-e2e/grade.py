@@ -623,12 +623,8 @@ def cmd_identity(args):
     launches = load_json(args.launch_records, "launch_records", "E_IDENTITY_SOURCE")
     codex = load_json(args.codex_rows, "codex_rows", "E_IDENTITY_SOURCE") if args.codex_rows else None
     table, counts = ev.build_identity_table(spec, bindings, os.environ.get("RUN_TOKEN", ""), launches, codex)
-    validator = "absent"
     try:
-        answer = ev.bridge({"op": "validate_identity", "table": table, "options": {}})
-        validator = "agrees" if answer.get("available") and answer.get("ok") else "absent"
-        if answer.get("available") and not answer.get("ok"):
-            raise fc.Refusal("E_IDENTITY_INVALID", code=str(answer.get("code") or "E_ROW"))
+        validator = ev.validator_state(ev.bridge({"op": "validate_identity", "table": table, "options": {}}))
     except fc.Refusal as stop:
         if stop.code == "E_IDENTITY_INVALID":
             raise
@@ -695,9 +691,9 @@ def _jsonl(rows):
     return "".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n" for row in rows).encode("utf-8")
 
 
-def _finish(spec, keys, bindings, table, records, captures, judgments, meta, out_private, out, copies):
+def _finish(spec, keys, bindings, table, records, captures, judgments, meta, out_private, out, copies, join=None):
     """Evaluate, run the canary, then write; nothing is written when a check refuses (R22)."""
-    rows, aggregate = ev.evaluate(spec, keys, bindings, records, captures, judgments, meta=meta)
+    rows, aggregate = ev.evaluate(spec, keys, bindings, records, captures, judgments, meta=meta, join=join)
     aggregate["privacy"]["canary_values_checked"] = ev.assert_no_private(aggregate, ev.canary_values(bindings, table, records))
     make_private_dir(out_private)
     files = dict(copies)
@@ -732,10 +728,11 @@ def cmd_grade(args):
         raise fc.Refusal("E_KEYS_MISMATCH")
     table_data = read_file(args.identity_table, "identity_table", "E_ARGS")
     table = load_json(args.identity_table, "identity_table", "E_ARGS")
-    joins = {}
+    joins, join_rows = {}, {}
     for family, path in _pairs(args.join_ledger, ("claude", "codex"), "join_ledger").items():
-        joins[family] = {(row["identity"], row["actor"]): row for row in _read_lines(path, "join_ledger")
-                         if isinstance(row, dict) and "identity" in row and "actor" in row}
+        join_rows[family] = [row for row in _read_lines(path, "join_ledger") if isinstance(row, dict)]
+        joins[family] = {(row["identity"], row["actor"]): row for row in join_rows[family]
+                         if row.get("identity") and "actor" in row}
     run_mode = {}
     for arm, path in _pairs(args.run_mode, CLAUDE_ARMS, "run_mode").items():
         document = load_json(path, "run_mode", "E_ARGS")
@@ -758,8 +755,10 @@ def cmd_grade(args):
     copies = {"spec.json": spec_data, "keys.json": keys_data, "bindings.json": bindings_data,
               "identity-table.json": table_data, "captures.json": fc.canonical(captures),
               "judgments.jsonl": _jsonl(judgment_rows)}
+    for family, rows in sorted(join_rows.items()):  # M8's opportunities follow these rows, so regrade needs them
+        copies[f"join-{family}.jsonl"] = _jsonl(rows)
     return _finish(spec, keys, bindings, table, records, captures, _load_judgments(judgment_rows), meta, args.out_private,
-                   args.out, copies)
+                   args.out, copies, join_rows or None)
 
 
 def cmd_regrade(args):
@@ -774,6 +773,14 @@ def cmd_regrade(args):
         copies[name] = read_file(os.path.join(source, name), name, "E_REGRADE")
         if fc.sha256_hex(copies[name]) != (context.get("files") or {}).get(name):
             raise fc.Refusal("E_REGRADE", field="digest")
+    join = {}
+    for family in ("claude", "codex"):
+        name = f"join-{family}.jsonl"
+        if name in (context.get("files") or {}):
+            copies[name] = read_file(os.path.join(source, name), name, "E_REGRADE")
+            if fc.sha256_hex(copies[name]) != context["files"][name]:
+                raise fc.Refusal("E_REGRADE", field="digest")
+            join[family] = [json.loads(line) for line in copies[name].decode("utf-8").split("\n") if line.strip()]
     spec, keys, bindings = (json.loads(copies[name].decode("utf-8")) for name in ("spec.json", "keys.json", "bindings.json"))
     table = json.loads(copies["identity-table.json"].decode("utf-8"))
     captures = json.loads(copies["captures.json"].decode("utf-8"))
@@ -786,7 +793,7 @@ def cmd_regrade(args):
     else:
         judgment_rows, _ = ev.read_jsonl(os.path.join(source, "judgments.jsonl"))
     return _finish(spec, keys, bindings, table, records, captures, _load_judgments(judgment_rows or []), context["meta"],
-                   args.out_private, args.out, copies)
+                   args.out_private, args.out, copies, join or None)
 
 
 HANDLERS = {"spec": cmd_spec, "bind": cmd_bind, "keys": cmd_keys, "capture": cmd_capture, "grade": cmd_grade,

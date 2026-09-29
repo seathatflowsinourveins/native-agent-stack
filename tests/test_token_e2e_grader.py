@@ -3899,7 +3899,7 @@ class F28_M7(GraderCase):
         self.assertEqual((got["roundtrip"]["rate_lower"], got["roundtrip"]["rate_upper"], got["sensitive"]), (0.8, 1.0, True))
 
     def test_natural_payloads_are_not_applicable_below_five(self):
-        rows = self.attempts(5, 5) + [dict(self.attempts(1, 1)[0], seeded=False)]
+        rows = self.attempts(5, 5) + [dict(self.attempts(1, 1)[0], seeded=False, has_payload=True)]
         got = evm().m7(rows, self.CRITERIA, DECIDED)
         self.assertEqual((got["natural"]["payloads"], got["natural"]["status"]), (1, "not_applicable"))
         self.assertEqual(got["status"], "pass", "natural payloads are optional and never gate")
@@ -4166,7 +4166,8 @@ class F31c_T14Facts(GraderCase):
     def test_a_codex_t14_attempt_without_a_rollout_copy_is_unknown_not_a_failure(self):
         row = self.codex_t14_run(with_rollout=False)
         component = next(part for part in row["components"] if part["id"] == "B")
-        self.assertEqual((component["status"], component["reason"]), ("unknown", "archive_query_unobserved"))
+        self.assertEqual((component["status"], component["reason"]), ("unknown", "archive_query_unobserved,survival_unobserved"),
+                         "with no rollout copy neither the query time nor the lifetime of the child is known")
 
 
 class F34_TreeDrift(GraderCase):
@@ -5378,8 +5379,9 @@ export function validateIdentityTable(table, options) {
         self.assertEqual(ev.validator_state({"available": False}), "absent")
         self.assertEqual(ev.validator_state({"available": True, "ok": True}), "agrees")
         self.assertEqual(ev.validator_state({"available": True, "ok": None}), "unchecked")
-        self.assertRefused(lambda: ev.validator_state({"available": True, "ok": False, "code": "E_ROW"}), "E_IDENTITY_INVALID",
-                           code="E_ROW")
+        with self.assertRaises(Exception) as caught:
+            ev.validator_state({"available": True, "ok": False, "code": "E_ROW"})
+        self.assertEqual(str(caught.exception), "E_IDENTITY_INVALID code=E_ROW")
 
 
 # ---- F19 (stage-2 subset): disarmed-guard mutants --------------------------------------------------------------------

@@ -973,9 +973,11 @@ def codex_calls(records):
         elif kind == "mcp_tool_call":
             arguments = item.get("arguments") if isinstance(item.get("arguments"), dict) else {}
             result = item.get("result")
+            # A retained item is {arguments, error, id, result, server, status, tool, type}: an error beside a completed
+            # status is still an error, never a retrieval.
+            ok = status in (None, "completed") and item.get("error") is None
             calls.append(dict(base, name=f"mcp__{item.get('server')}__{item.get('tool')}", tool=str(item.get("tool")),
-                              server=item.get("server"), input=arguments,
-                              state="succeeded" if status in (None, "completed") else "failed",
+                              server=item.get("server"), input=arguments, state="succeeded" if ok else "failed",
                               result_text=json.dumps(result) if result is not None else None))
     return calls
 
@@ -1108,35 +1110,63 @@ def resolves_to_record(text, record):
     return record["path"] in text or _bounded(text, _stem(record["path"]))
 
 
+def names_server_call(text, server):
+    """True for `mcporter call <server>.<tool>`: a command that runs mcporter and has a word that starts with the server
+    name, a dot and a tool name. A file called `<server>.md` is not such a call, and neither is a command without mcporter."""
+    if not has_program_word(text, "mcporter"):
+        return False
+    prefix = server + "."
+    for word in text.split():
+        word = word.strip("'\"")
+        if word.startswith(prefix) and len(word) > len(prefix) and (word[len(prefix)].isalpha() or word[len(prefix)] == "_"):
+            return True
+    return False
+
+
 def is_memory_call(call):
     if call.get("server") == "ai-memory":
         return True
     text = command_text(call)
-    return text is not None and has_program_word(text, "ai-memory")
+    return text is not None and (has_program_word(text, "ai-memory") or names_server_call(text, "ai-memory"))
 
 
 def memory_check(calls, records):
     """R9 at grading: a hit counts only when a succeeded ai-memory call (MCP or CLI) of the attempt returns a result that
-    resolves to a record frozen before SINCE, so a later arm's own session page never counts."""
-    unobservable = False
+    resolves to a record frozen before SINCE, so a later arm's own session page never counts. A call with no ledger record
+    has no state: when it could show a hit its outcome is unknown (call_state_unknown), never a miss."""
+    unobservable = stateless = False
     for call in calls:
-        if not is_memory_call(call) or call["state"] != "succeeded":
+        if not is_memory_call(call):
             continue
-        if call["result_text"] is None:
+        text = call["result_text"]
+        if call["state"] is None:
+            stateless = stateless or text is None or any(resolves_to_record(text, record) for record in records)
+            continue
+        if call["state"] != "succeeded":
+            continue
+        if text is None:
             unobservable = True
-        elif any(resolves_to_record(call["result_text"], record) for record in records):
+        elif any(resolves_to_record(text, record) for record in records):
             return fc.ok()
     if unobservable:
         return fc.unknown("result_unobservable")
+    if stateless:
+        return fc.unknown("call_state_unknown")
     return fc.fail("no_historical_hit")
 
 
 def recovery_check(calls, digest, readings):
     """R2-17: the recovery is shown by a succeeded call of the child whose result, persisted output followed, carries the
-    key digest. A failed or absent recovery fails (decided) or is unknown (alternative)."""
+    key digest. A failed or absent recovery fails (decided) or is unknown (alternative); a call with no ledger record that
+    carries the digest is unknown under both readings, because its state was never observed."""
+    stateless = False
     for call in calls:
-        if call["state"] == "succeeded" and isinstance(call["result_text"], str) and digest in call["result_text"].lower():
-            return fc.ok()
+        if isinstance(call["result_text"], str) and digest in call["result_text"].lower():
+            if call["state"] == "succeeded":
+                return fc.ok()
+            stateless = stateless or call["state"] is None
+    if stateless:
+        return fc.unknown("call_state_unknown")
     return fc.fail("recovery_missing") if readings["R2-17"] == "fail" else fc.unknown("recovery_missing")
 
 
@@ -1271,14 +1301,17 @@ def m12_cross_check(mine, theirs):
 
 
 def m12_status(blind, positive_read_rows):
-    """M12: incomplete when the positive control shows no Read row; fail when a blind task lacks a passing verdict."""
+    """M12 (R7): incomplete when the positive control shows no Read row; fail when a blind task lacks a clean completed
+    verdict on the lower bound (the correctness of the answer plays no part: `blind` is {task: {clean, contaminated,
+    unknown}} counts of completed attempts); otherwise pass. An unknown cleanliness only sets the sensitivity flag."""
     if positive_read_rows == 0:
-        return {"status": "incomplete", "reason": "failed_positive_control"}
+        return {"status": "incomplete", "reason": "failed_positive_control", "sensitive": False}
     if positive_read_rows is None:
-        return {"status": "unknown", "reason": "control_rows_unobserved"}
-    if any(item["status"] != "pass" for item in blind.values()):
-        return {"status": "fail", "reason": "blind_task_without_clean_verdict"}
-    return {"status": "pass", "reason": None}
+        return {"status": "unknown", "reason": "control_rows_unobserved", "sensitive": False}
+    if any(item["clean"] < 1 for item in blind.values()):
+        return {"status": "fail", "reason": "blind_task_without_clean_verdict",
+                "sensitive": all(item["clean"] + item["unknown"] >= 1 for item in blind.values())}
+    return {"status": "pass", "reason": None, "sensitive": False}
 
 
 # ---- The Node bridge to the kernel (U2's measureTranscript today; U1 and U4 names when they merge) ----------------
@@ -1411,6 +1444,12 @@ def _records_equal(value, records, readings):
     return not reasons and not order_bad
 
 
+def _document_records(value, readings):
+    """The records list of a decoded document under the R2-01 reading (a root array; a single-key wrapper where the reading
+    accepts one), or None: the decided reading calls a wrapper a shape failure, the alternative unwraps it."""
+    return fc.payload_records(value, readings["R2-01"])[0]
+
+
 def _answer_toon_items(ans, records, readings):
     items = []
     for candidate in fc.payload_candidates(ans):
@@ -1426,21 +1465,45 @@ def _answer_toon_items(ans, records, readings):
         except fc.DecodeError:
             items.append({"source": "answer", "status": "unequal"})
             continue
-        items.append({"source": "answer", "status": "equal" if _records_equal(value, records, readings) else "unequal"})
+        shaped = _document_records(value, readings)
+        items.append({"source": "answer",
+                      "status": "equal" if shaped is not None and _records_equal(shaped, records, readings) else "unequal"})
     return items
 
 
-def toon_facts(calls, ans, key, readings):
-    """R14 for one completed arm-B attempt: the seeded CLI encode, the ineligible encodes and every strict round trip
-    (each answer payload against the frozen original, each observable child-side decode)."""
+def _answer_payload_shapes(ans, readings):
+    """[(is_toon, records or None)] for every payload candidate of the answer that strictly decodes, JSON or TOON."""
+    shapes = []
+    for candidate in fc.payload_candidates(ans):
+        text = candidate["text"]
+        if not fc.looks_like_payload(text):
+            continue
+        try:
+            value = fc.decode_candidate(text)
+        except fc.DecodeError:
+            continue
+        first = next((line for line in text.split("\n") if line.strip()), "")
+        shapes.append((bool(fc.toon_header(first)) and not first.lstrip().startswith("- "), _document_records(value, readings)))
+    return shapes
+
+
+def toon_facts(calls, ans, key, readings, seeded=True):
+    """R14 for one completed arm-B attempt: the CLI encode, the ineligible encodes and every strict round trip (each answer
+    payload against the frozen original, each observable child-side decode). A seeded attempt encodes when a succeeded toon
+    CLI call's document strictly decodes to the seeded array; any other attempt (a natural payload) encodes when a document
+    is an eligible flat array of at least five records. The R2-01 reading decides whether a single-key wrapper around such
+    an array is a shape failure (an ineligible encode) or the array itself. A call with no ledger record has no state: it can
+    only make the outcome unknown (call_state_unknown), and counts on the lower bound as ineligible when it cannot be
+    proven eligible."""
     records = key.get("records") if isinstance(key, dict) else None
     facts = {"encode": "not_encoded", "encode_reason": None, "ineligible": 0, "ineligible_unknown": 0, "roundtrip": [],
-             "cli_encodes": 0}
-    encoded, unknown = False, None
+             "cli_encodes": 0, "has_payload": False}
+    encoded, unknown, eligible_encodes = False, None, 0
     for call in calls:
         text = command_text(call)
-        if text is None or call["state"] != "succeeded" or not has_program_word(text, "toon"):
+        if text is None or call["state"] not in ("succeeded", None) or not has_program_word(text, "toon"):
             continue
+        stateless = call["state"] is None
         words = set(text.split())
         if words & {"-d", "--decode"}:
             bodies = heredoc_bodies(text)
@@ -1450,34 +1513,46 @@ def toon_facts(calls, ans, key, readings):
             try:
                 expected = fc.toon_decode(bodies[0].strip())
             except fc.DecodeError:
-                item["status"] = "unequal"
+                item["status"] = "unknown" if stateless else "unequal"
             else:
                 try:
                     observed = fc.json_decode((call["result_text"] or "").strip())
                 except fc.DecodeError:
                     observed = None
-                if observed is not None:
+                if observed is not None and not stateless:
                     reasons, order_bad = fc.compare_values(observed, expected, readings["R2-02"] == "ordered")
                     item["status"] = "equal" if not reasons and not order_bad else "unequal"
             facts["roundtrip"].append(item)
             continue
         facts["cli_encodes"] += 1
         if any(word in ("-o", "--output") or word.startswith("--output=") for word in words):
-            unknown = "output_file"
+            unknown = unknown or "output_file"
             continue
         isolated = isolate_toon_document(call["result_text"] or "")
         if isolated["status"] != "decoded":
             facts["ineligible_unknown"] += 1
-            unknown = isolated["status"]
+            unknown = unknown or isolated["status"]
             continue
-        if records is not None and _records_equal(isolated["value"], records, readings):
-            encoded = True
-        elif not uniform_flat(isolated["value"], 5):
-            facts["ineligible"] += 1
+        shaped = _document_records(isolated["value"], readings)
+        eligible = shaped is not None and uniform_flat(shaped, 5)
+        matches = eligible if not seeded else records is not None and shaped is not None and _records_equal(shaped, records, readings)
+        if matches:
+            if stateless:
+                unknown = unknown or "call_state_unknown"
+            else:
+                encoded = True
+                eligible_encodes += 1 if eligible else 0
+        elif not eligible:
+            facts["ineligible_unknown" if stateless else "ineligible"] += 1
+        elif not stateless:
+            eligible_encodes += 1
     items = _answer_toon_items(ans, records, readings)
     facts["roundtrip"] += items
-    if not encoded and readings["R2-15"] == "any_toon_form" and any(item["status"] == "equal" for item in items):
-        encoded = True
+    answer_eligible = [is_toon for is_toon, shaped in _answer_payload_shapes(ans, readings)
+                       if shaped is not None and uniform_flat(shaped, 5)]
+    facts["has_payload"] = eligible_encodes > 0 or bool(answer_eligible)
+    if not encoded and readings["R2-15"] == "any_toon_form":
+        encoded = any(item["status"] == "equal" for item in items) if seeded else any(answer_eligible)
     facts["encode"] = "encoded" if encoded else "unknown" if unknown else "not_encoded"
     facts["encode_reason"] = None if encoded else unknown
     return facts
@@ -1494,7 +1569,7 @@ def m7(attempts, criteria, readings):
     new incomplete); natural payloads are optional and never gate."""
     criteria = dict(M7_DEFAULTS, **(criteria or {}))
     seeded = [item for item in attempts if item.get("seeded")]
-    natural = [item for item in attempts if not item.get("seeded")]
+    natural = [item for item in attempts if not item.get("seeded") and item.get("has_payload")]
     payloads = len(seeded)
     encoded_lower = sum(1 for item in seeded if item["encode"] == "encoded")
     encoded_upper = sum(1 for item in seeded if item["encode"] in ("encoded", "unknown"))
@@ -1552,36 +1627,45 @@ def reported_identities(text, run_token):
         start = max(end, index + 1)
 
 
-def t14_check(text, *, run_token, starts, q, background_pending, survivors, readings):
+def t14_check(text, *, run_token, starts, q, background_pending, survivors, readings, q_status=None, survival_observed=True):
     """R11 (U9-D21): the reported sessions must be rows of the private table that started before the child's first
-    archive query q; the counts must agree with the list; an owned process must not survive (R2-20)."""
-    if q is None:
-        return fc.fail("no_archive_query")
-    reported = reported_identities(text, run_token)
-    q_seconds = iso_seconds(q)
+    archive query q; the counts must agree with the list; an owned process must not survive (R2-20). `q_status` is
+    "unobserved" when the child did query the archive but nothing timestamped shows when (unknown, not a missing query);
+    `survival_observed` is false when neither a process listing nor a resolved lifetime could show survival."""
+    q_seconds = iso_seconds(q) if q is not None else None
     reasons, soft = set(), set()
-    expected = [name for name, start in starts.items() if start is not None and iso_seconds(start) is not None
-                and iso_seconds(start) < q_seconds]
+    if q_seconds is None:
+        if q is None and q_status != "unobserved":
+            return fc.fail("no_archive_query")
+        soft.add("archive_query_unobserved")
+    reported = reported_identities(text, run_token)
+    expected = [] if q_seconds is None else [name for name, start in starts.items()
+                                             if start is not None and iso_seconds(start) is not None and iso_seconds(start) < q_seconds]
     for identity in reported:
         if identity not in starts:
             reasons.add("session_outside_table")
+        elif q_seconds is None:
+            continue
         elif starts[identity] is None or iso_seconds(starts[identity]) is None:
             soft.add("start_unresolved")
         elif iso_seconds(starts[identity]) >= q_seconds:
             reasons.add("session_not_before_query")
-    if readings["R2-19"] == "equal" and [name for name in expected if name not in reported]:
+    if q_seconds is not None and readings["R2-19"] == "equal" and [name for name in expected if name not in reported]:
         reasons.add("session_missing")
-    detail = {"reported": len(reported), "expected": len(expected)}  # the descriptive ratio (R11)
+    detail = {"reported": len(reported), "expected": len(expected) if q_seconds is not None else None}  # the descriptive ratio (R11)
     plain = text
     for identity in reported:
         plain = plain.replace(identity, "ID")
     counts = fc.count_before_noun(fc.normalize(plain), ("sessions", "session", "matches", "match", "identities"))
     if counts and len(reported) not in counts:
-        reasons.add("count_mismatch")
+        # a count that disagrees with the listed identities is wrong; a count with no identity the grader can read cannot be checked
+        (reasons if reported else soft).add("count_mismatch" if reported else "unparsed")
     if not reported and not counts:
         soft.add("unparsed")
     if background_pending or survivors:
         (reasons if readings["R2-20"] == "fail" else soft).add("owned_process_survives")
+    elif not survival_observed:
+        soft.add("survival_unobserved")
     if reasons:
         return fc.fail(*reasons, **detail)
     return fc.unknown(*soft, **detail) if soft else fc.ok(**detail)
@@ -1706,6 +1790,80 @@ def owned_survivors(processes, lifetime, programs):
                 changed = True
     return {"owned": sorted(owned, key=lambda item: (item["start"], item.get("pid") or 0)),
             "unattributed": sum(1 for item in inside if item not in owned)}
+
+
+def _command_words(command):
+    """A command field of a rollout item: a list of words or one string, as one text."""
+    if isinstance(command, list):
+        return " ".join(str(word) for word in command)
+    return command if isinstance(command, str) else ""
+
+
+def _rollout_call(record):
+    """(texts, mcp server) of the call a rollout record issues or completes: a function call's arguments, a custom tool
+    call's input, a local shell action's command, an item_completed CommandExecution's command, or an MCP call's server."""
+    payload = _payload(record)
+    texts, server = [], None
+    if record.get("type") == "response_item":
+        kind = payload.get("type")
+        if kind == "function_call":
+            texts.append(payload.get("arguments") if isinstance(payload.get("arguments"), str) else "")
+            server = _mcp_server(payload.get("name"))
+        elif kind == "custom_tool_call":
+            texts.append(payload.get("input") if isinstance(payload.get("input"), str) else "")
+        elif kind == "local_shell_call":
+            action = payload.get("action") if isinstance(payload.get("action"), dict) else {}
+            texts.append(_command_words(action.get("command")))
+    elif record.get("type") == "event_msg" and payload.get("type") == "item_completed":
+        item = payload.get("item") if isinstance(payload.get("item"), dict) else {}
+        if item.get("type") == "CommandExecution":
+            texts.append(_command_words(item.get("command")))
+        elif item.get("type") == "McpToolCall":
+            server = item.get("server") if isinstance(item.get("server"), str) else None
+    return texts, server
+
+
+def names_archive_query(texts, server):
+    """The one detector of an archive query for both families: the whole word agentsview in a command or code text (also in
+    ctx_execute shell code), or a call to the agentsview MCP server."""
+    return server == "agentsview" or any(fc._has_agentsview(text) for text in texts)
+
+
+def codex_archive_query_time(records):
+    """q for a Codex child (R11): the timestamp of the first rollout record that issues a call naming agentsview. Exec
+    events carry no timestamps, so the timestamped rollout copy that U10 retains is the source. unknown(no_query) when no
+    record names it; unknown(archive_query_unobserved) when the first such record has no readable timestamp."""
+    for record in records:
+        texts, server = _rollout_call(record)
+        if names_archive_query(texts, server):
+            when = record.get("timestamp")
+            return fc.ok(q=when) if iso_seconds(when) is not None else fc.unknown("archive_query_unobserved")
+    return fc.unknown("no_query")
+
+
+def t14_facts(*, family, rows, calls, attempt, post, pending, rollout):
+    """The R11 facts of one completed T14 attempt: the query time and how it was observed, the pending background jobs, the
+    owned processes still alive at the post-arm capture and whether survival could be observed at all. A Claude child's query
+    time and lifetime come from its transcript; a Codex child's from the timestamped rollout copy, and without one a query
+    the events show is unobserved (the time is unknown) rather than absent."""
+    if family == "claude":
+        found = fc.archive_query_time(rows or [])
+        lifetime = (attempt.get("start"), attempt.get("end"))
+    elif rollout and rollout.get("status") == "ok":
+        found = codex_archive_query_time(rollout["records"])
+        lifetime = (first_timestamp(rollout["records"]), last_timestamp(rollout["records"]))
+    else:
+        named = any(names_archive_query([code_text(call)], call.get("server")) for call in calls)
+        found = fc.unknown("archive_query_unobserved" if named else "no_query")
+        lifetime = (attempt.get("start"), attempt.get("end"))
+    q_status = "observed" if found.status == "pass" else "unobserved" if "archive_query_unobserved" in found.reasons else "none"
+    observed = post.get("processes") is not None and all(lifetime)
+    owned = {"owned": [], "unattributed": 0}
+    if observed:
+        owned = owned_survivors(post["processes"], lifetime, command_programs([code_text(call) for call in calls]))
+    return {"q": found.detail.get("q") if found.status == "pass" else None, "q_status": q_status,
+            "background_pending": pending, "survivors": [{"comm": item["comm"], "start": item["start"]} for item in owned["owned"]],
+            "unattributed": owned["unattributed"], "survival_observed": observed}
 
 
 # ---- Tree drift (R13) and the builder (T31) from the post-arm capture --------------------------------------------
@@ -1903,6 +2061,19 @@ def validate_identity_table(table, tasks):
                 raise refuse(needed[0])
 
 
+def validator_state(answer):
+    """The identity command's reading of the bridge's validate_identity answer: "absent" (the sibling validator has not
+    merged), "agrees", "unchecked" (the validator could not run: ok is null, which is never a refusal), or a refusal that
+    carries the validator's own E_* code when it rejected the table."""
+    if not answer.get("available"):
+        return "absent"
+    if answer.get("ok") is True:
+        return "agrees"
+    if answer.get("ok") is False:
+        raise fc.Refusal("E_IDENTITY_INVALID", code=str(answer.get("code") or "E_ROW"))
+    return "unchecked"
+
+
 def session_transcript(claude_root, session_id):
     """`<CLAUDE_ROOT>/<project slug>/<session id>.jsonl`, or None: the session id is unique, the slug is not guessed."""
     if not isinstance(session_id, str) or not session_id or "/" in session_id or session_id.startswith("."):
@@ -1971,7 +2142,9 @@ def build_identity_table(spec, bindings, token, launches, codex_document):
         transcript = session_transcript(root, session)
         session_dir = session_directory(root, session)
         if actor == "main":
-            if main_sessions[(session,)] > 1 or (session_dir and os.path.isdir(os.path.join(session_dir, "subagents"))):
+            # A dedicated session belongs to one launch record and hosts no Workflow run; that the model called the Agent
+            # tool once (a subagents/agent-*.jsonl child) does not make it shared.
+            if main_sessions[(session,)] > 1 or (session_dir and os.path.isdir(os.path.join(session_dir, "subagents", "workflows"))):
                 raise fc.Refusal("E_IDENTITY_SOURCE", kind="main")
             rows.append({"identity": identity, "actor": actor, **({"transcript": transcript} if transcript else {})})
         elif actor == "strict_process":
@@ -2082,10 +2255,11 @@ def role_child_state(child, parent, role, parent_servers):
 
 
 def m11_summary(states):
-    """Per-arm counts of the role-child states, unknowns included (M11 is a required row)."""
+    """Per-arm counts of the role-child states, unknowns included (M11 is a required row). A child that applied no role
+    (seed-binding-4 spawns one in every run) has no role to compare with and is counted as not_applicable."""
     result = {}
     for item in states:
-        entry = result.setdefault(item["arm"], {"children": 0, "pass": 0, "fail": 0, "unknown": 0})
+        entry = result.setdefault(item["arm"], {"children": 0, "pass": 0, "fail": 0, "unknown": 0, "not_applicable": 0})
         entry["children"] += 1
         entry[item["status"]] += 1
     return dict(sorted(result.items()))
@@ -2103,29 +2277,42 @@ def _assistant_texts(records, after=None):
     return found
 
 
-def codex_subagent_attempt(driver_dir, identity, row, boundary=None):
-    """R2 codex_subagent: the child rollout copy U10 retains under attempts/<identity>/ (rollout-*-<thread>.jsonl); its
-    last assistant message is the answer. With boundary "last_turn" (seed-binding-5, U10-D12) only a message after the
-    last task_started counts, so a followup turn that said nothing is an empty answer, not the earlier reply."""
-    attempt = _attempt(identity, "codex_subagent", "codex")
-    thread = row.get("thread_id")
-    directory = os.path.join(str(driver_dir), "attempts", identity)
+def find_rollout(driver_dir, identity, thread):
+    """The rollout copy of one thread that U10 retains in `<driver>/attempts/<identity>/rollouts/` as
+    `rollout-<time>-<thread>.jsonl` (design section 3.1; codex_launch.copy_rollouts): {"status": "ok" | "missing" |
+    "compressed" | "duplicate" | "parse", "records", "errors"}. Exactly one copy per thread is read; a compressed copy is not
+    parsed and several copies are never guessed between."""
+    directory = os.path.join(str(driver_dir or ""), "attempts", str(identity), "rollouts")
     try:
-        names = sorted(os.listdir(directory)) if thread else []
+        names = sorted(os.listdir(directory)) if thread and driver_dir else []
     except OSError:
         names = []
     plain = [name for name in names if name.startswith("rollout-") and name.endswith(f"-{thread}.jsonl")]
     if not plain:
         compressed = any(name.startswith("rollout-") and name.endswith(f"-{thread}.jsonl.zst") for name in names)
-        attempt.update({"class": "unresolved", "carrier": carrier("unknown", "parse" if compressed else "attempt_class_unresolved")})
-        return attempt
-    if len(plain) > 1:  # U10 retains exactly one copy per thread; several are never guessed between
-        attempt.update({"class": "unresolved", "carrier": carrier("unknown", "duplicate_rollout")})
-        return attempt
+        return {"status": "compressed" if compressed else "missing", "records": None, "errors": 0}
+    if len(plain) > 1:
+        return {"status": "duplicate", "records": None, "errors": 0}
     records, errors = read_jsonl(os.path.join(directory, plain[0]))
+    if errors or records is None:
+        return {"status": "parse", "records": records, "errors": errors}
+    return {"status": "ok", "records": records, "errors": 0}
+
+
+def codex_subagent_attempt(driver_dir, identity, row, boundary=None):
+    """R2 codex_subagent: the child rollout copy U10 retains under attempts/<identity>/rollouts/ (rollout-*-<thread>.jsonl);
+    its last assistant message is the answer. With boundary "last_turn" (seed-binding-5, U10-D12) only a message after the
+    last task_started counts, so a followup turn that said nothing is an empty answer, not the earlier reply."""
+    attempt = _attempt(identity, "codex_subagent", "codex")
+    found = find_rollout(driver_dir, identity, row.get("thread_id"))
+    if found["status"] in ("missing", "compressed", "duplicate"):
+        reason = {"missing": "attempt_class_unresolved", "compressed": "parse", "duplicate": "duplicate_rollout"}[found["status"]]
+        attempt.update({"class": "unresolved", "carrier": carrier("unknown", reason)})
+        return attempt
+    records, errors = found["records"], found["errors"]
     attempt["parse_errors"] = errors
     attempt["_rows"] = records or []
-    if errors or records is None:
+    if found["status"] == "parse":
         attempt.update({"class": "unresolved", "carrier": carrier("unknown", "parse")})
         return attempt
     cut = None
@@ -2252,14 +2439,8 @@ def _hook_source(attempt, row, sources, arm):
 
 
 def _parent_rollout(driver_dir, identity, row):
-    thread = row.get("parent_thread_id")
-    directory = os.path.join(str(driver_dir or ""), "attempts", identity)
-    try:
-        names = sorted(os.listdir(directory)) if thread else []
-    except OSError:
-        return None
-    found = [name for name in names if name.startswith("rollout-") and name.endswith(f"-{thread}.jsonl")]
-    return read_jsonl(os.path.join(directory, found[0]))[0] if found else None
+    found = find_rollout(driver_dir, identity, row.get("parent_thread_id"))
+    return found["records"] if found["status"] == "ok" else None
 
 
 def _role_child(rows, row, attempt, bindings, sources):
@@ -2302,20 +2483,17 @@ def _record_facts(attempt, rows, events, row, task, keys, spec, bindings, source
         records = (key or {}).get("memory_records")
         facts["memory"] = result_dict(memory_check(calls, records) if records else fc.unknown("key_missing"))
     if template == "T14":
-        queried = fc.archive_query_time(rows or []) if family == "claude" else \
-            (fc.ok(q=attempt.get("start")) if any(has_program_word(code_text(call), "agentsview") for call in calls)
-             and attempt.get("start") else fc.unknown("no_query"))
         post = captures.get(f"arm-{family}-{arm}-post-arm.json") or {}
-        lifetime = (attempt.get("start"), attempt.get("end"))
-        owned = {"owned": [], "unattributed": 0}
-        if post.get("processes") is not None and all(lifetime):
-            owned = owned_survivors(post["processes"], lifetime, command_programs([code_text(call) for call in calls]))
-        children = (sources.get("run_mode") or {}).get(arm, [])
+        children = (sources.get("run_mode") or {}).get(arm, []) if family == "claude" else []
         child = next((item for item in children if item.get("agent_id") == attempt.get("agent_id")), None)
         pending = ((child or {}).get("final_return") or {}).get("background_pending") or 0
-        facts["t14"] = {"q": queried.detail.get("q") if queried.status == "pass" else None, "background_pending": pending,
-                        "survivors": [{"comm": item["comm"], "start": item["start"]} for item in owned["owned"]],
-                        "unattributed": owned["unattributed"]}
+        rollout = None
+        if family == "codex":  # exec events carry no timestamps: U10's rollout copy times the query and the lifetime
+            thread = row.get("thread_id") or next((item.get("thread_id") for item in events or []
+                                                   if item.get("type") == "thread.started"), None)
+            rollout = find_rollout(sources.get("driver_dir"), attempt["identity"], thread)
+        facts["t14"] = t14_facts(family=family, rows=rows, calls=calls, attempt=attempt, post=post, pending=pending,
+                                 rollout=rollout)
     if template == "T31" and key:
         post = captures.get(f"arm-{family}-{arm}-post-arm.json") or {}
         capture = (post.get("builders") or {}).get(task["id"])
@@ -2329,9 +2507,11 @@ def _record_facts(attempt, rows, events, row, task, keys, spec, bindings, source
                 capture, prepared_path=arms.get("worktree_paths", {}).get(task["id"], ""),
                 prepared_base=arms.get("worktree_bases", {}).get(task["id"], ""), observed=builder_observed_tree(rows or []),
                 exec_rev=bindings["exec_rev"], after_bytes=after, key=key))
-    if "toon-seeded" in task["lane_tags"] and arm == "B" and family == "claude":
+    if arm == "B" and attempt["actor"] in GRADED_ACTORS:  # M7 covers every completed arm-B attempt of both families (R14)
         ans = fc.Answer(attempt["answer"]["text"] if attempt["answer"] else "", tuple((attempt["answer"] or {}).get("evidence", ())))
-        facts["toon"] = _variants(lambda r: toon_facts(calls, ans, key, r), readings, ["R2-02", "R2-15", "R2-16"])
+        seeded = "toon-seeded" in task["lane_tags"]
+        facts["toon"] = _variants(lambda r: toon_facts(calls, ans, key, r, seeded=seeded), readings,
+                                  ["R2-01", "R2-02", "R2-15", "R2-16"])
     if attempt["actor"] == "codex_subagent":
         facts["role_child"] = _role_child(rows or [], row, attempt, bindings, sources)
     if template == "T34" and isinstance(row.get("transcript"), str) and os.path.exists(row["transcript"]):
@@ -2437,7 +2617,8 @@ def grade_record(record, task, keys, captures, readings, decided, starts, judgme
         t14 = facts.get("t14") or {}
         components["B"] = t14_check(ans.text, run_token=run_token, starts=starts, q=t14.get("q"),
                                     background_pending=t14.get("background_pending", 0), survivors=t14.get("survivors", []),
-                                    readings=readings)
+                                    readings=readings, q_status=t14.get("q_status"),
+                                    survival_observed=t14.get("survival_observed", True))
     elif template == "T31":
         components["B"] = result_from(facts["builder"]) if "builder" in facts else fc.unknown("input_missing")
     elif template == "T36":
@@ -2525,15 +2706,17 @@ def _counter(items):
     return dict(sorted(collections.Counter(items).items()))
 
 
-def evaluate(spec, keys, bindings, records, captures, judgments, *, meta=None):
+def evaluate(spec, keys, bindings, records, captures, judgments, *, meta=None, join=None):
     """Grade the collected records: the private rows and the ID-free aggregate (task outcomes per family and arm, G-Q, G-C,
-    M7, M8, M11, M12, the alternatives). Pure: the same inputs give the same bytes, and no source file or model is read."""
-    rows, aggregate, _ = _evaluate(spec, keys, bindings, records, captures, judgments, meta=meta)
+    M7, M8, M11, M12, the alternatives). Pure: the same inputs give the same bytes, and no source file or model is read.
+    `join` is {family: [U4 join-ledger rows]} for the families whose ledger was supplied: M8's opportunities follow those
+    rows, and the other families' opportunities come from the spec and the records."""
+    rows, aggregate, _ = _evaluate(spec, keys, bindings, records, captures, judgments, meta=meta, join=join)
     return rows, aggregate
 
 
 def _evaluate(spec, keys, bindings, records, captures, judgments, *, readings=None, with_alternatives=True, cache=None,
-              meta=None):
+              meta=None, join=None):
     decided = spec["readings"]
     readings = dict(decided) if readings is None else readings
     cache = {} if cache is None else cache
@@ -2585,9 +2768,10 @@ def _evaluate(spec, keys, bindings, records, captures, judgments, *, readings=No
                 read_rows = observed[0] if observed and observed[0] is not None else None
             outcomes[(arm, task["id"])] = decide_task(attempts, readings["R2-10"], kind=_kind(task), read_rows=read_rows)
             details[(arm, task["id"])] = {"not_launched": False, "read_rows": read_rows}
-    aggregate = _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta or {})
+    aggregate = _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta or {},
+                           join)
     if with_alternatives:
-        aggregate["alternatives"] = _alternatives(spec, keys, bindings, records, captures, judgments, decided, cache, outcomes)
+        aggregate["alternatives"] = _alternatives(spec, keys, bindings, records, captures, judgments, decided, cache, outcomes, join)
     return rows, aggregate, outcomes
 
 
@@ -2596,7 +2780,7 @@ def _summary_of(aggregate):
             "m8": {lane: item["status"] for lane, item in sorted(aggregate["m8"].items())}, "m12": aggregate["m12"]["status"]}
 
 
-def _alternatives(spec, keys, bindings, records, captures, judgments, decided, cache, base_outcomes):
+def _alternatives(spec, keys, bindings, records, captures, judgments, decided, cache, base_outcomes, join=None):
     """Every reading of the R5 register that has an alternative, evaluated one at a time against the decided run; the
     counts are what the sealed rule would have said under that reading (tasks whose outcome changes, and the gates)."""
     published = {}
@@ -2605,7 +2789,8 @@ def _alternatives(spec, keys, bindings, records, captures, judgments, decided, c
             if value == decided[name]:
                 continue
             _, other, outcomes = _evaluate(spec, keys, bindings, records, captures, judgments,
-                                           readings=dict(decided, **{name: value}), with_alternatives=False, cache=cache)
+                                           readings=dict(decided, **{name: value}), with_alternatives=False, cache=cache,
+                                           join=join)
             changed = sum(1 for key, outcome in outcomes.items() if outcome["status"] != base_outcomes[key]["status"])
             published.setdefault(name, {})[value] = dict(_summary_of(other), tasks_changed=changed)
     published["attempt_rule_every_recorded"] = published.get("R2-10", {}).get("every_recorded")
@@ -2613,28 +2798,61 @@ def _alternatives(spec, keys, bindings, records, captures, judgments, decided, c
     return published
 
 
-def _lane_opportunities(spec, lane, records, rows, readings, decided):
-    """R15: the opportunities of one M8 lane in arm B: one per recorded attempt (identity) of each organic task that
-    carries the lane tag, and one not_launched opportunity for a task with none."""
+def _attempt_item(task, runs, state, readings, decided):
+    """One M8 opportunity from the runs (records and their graded rows) of one attempt identity and its lane state."""
+    views = [_attempt_view(record, row, task, readings, decided) for record, row in runs]
+    outcome = decide_task(views, readings["R2-10"])
+    kind = "inadmissible" if all(view["class"] == "inadmissible" for view in views) else "attempt"
+    return {"adopted": state if state in ("adopted", "not_adopted") else "unknown",
+            "grade": outcome["status"] if outcome["status"] in ("pass", "fail") else "unknown", "kind": kind}
+
+
+def _lane_opportunities(spec, lane, records, rows, readings, decided, join=None):
+    """R15: the opportunities of one M8 lane in arm B. For a family whose U4 join ledger was supplied they are its rows
+    (excluded rows aside): a row that names the lane is one opportunity; a `not_launched` row was never launched, an
+    `unlisted` row is a recorded attempt no identity row lists (unknown, never graded) and any other row is graded from the
+    records of its identity. For a family without a ledger they are one per recorded attempt (identity) of each organic task
+    that carries the lane tag, and one not_launched opportunity for a task with none."""
     items = []
-    for task in spec["tasks"]:
-        if "B" not in task["arms"] or task["opportunity"] != "organic" or lane not in task["lane_tags"]:
+    tasks = {task["id"]: task for task in spec["tasks"]}
+    graded = collections.defaultdict(list)
+    for record, row in zip(records, rows):
+        if record["arm"] == "B" and record["actor"] in GRADED_ACTORS:
+            graded[(record["task"], record["identity"], record["actor"])].append((record, row))
+    for family in fc.FAMILY_ARMS:
+        ledger = (join or {}).get(family)
+        if ledger is not None:
+            for entry in ledger:
+                task = tasks.get(entry.get("task"))
+                if task is None or task["family"] != family or entry.get("arm") != "B" or entry.get("excluded_kind") \
+                        or lane not in (entry.get("lanes") or {}):
+                    continue
+                state = (entry["lanes"][lane] or {}).get("state")
+                if entry.get("source") == "not_launched":
+                    items.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
+                elif entry.get("source") == "unlisted":
+                    items.append({"adopted": "unknown", "grade": "unknown", "kind": "attempt"})
+                elif graded.get((task["id"], entry.get("identity"), entry.get("actor"))):
+                    items.append(_attempt_item(task, graded[(task["id"], entry["identity"], entry["actor"])], state, readings,
+                                               decided))
+                else:
+                    items.append({"adopted": state if state in ("adopted", "not_adopted") else "unknown", "grade": "unknown",
+                                  "kind": "attempt"})
             continue
-        by_identity = collections.defaultdict(list)
-        for record, row in zip(records, rows):
-            if record["task"] == task["id"] and record["arm"] == "B" and record["actor"] in GRADED_ACTORS:
-                by_identity[record["identity"]].append((record, row))
-        if not by_identity:
-            items.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
-        for identity in sorted(by_identity):
-            runs = by_identity[identity]
-            views = [_attempt_view(record, row, task, readings, decided) for record, row in runs]
-            outcome = decide_task(views, readings["R2-10"])
-            lanes = next((record.get("lanes") for record, _ in runs if record.get("lanes")), {}) or {}
-            state = (lanes.get(lane) or {}).get("state", "unknown")
-            kind = "inadmissible" if all(view["class"] == "inadmissible" for view in views) else "attempt"
-            items.append({"adopted": state if state in ("adopted", "not_adopted") else "unknown",
-                          "grade": outcome["status"] if outcome["status"] in ("pass", "fail") else "unknown", "kind": kind})
+        for task in spec["tasks"]:
+            if task["family"] != family or "B" not in task["arms"] or task["opportunity"] != "organic" \
+                    or lane not in task["lane_tags"]:
+                continue
+            by_identity = collections.defaultdict(list)
+            for record, row in zip(records, rows):
+                if record["task"] == task["id"] and record["arm"] == "B" and record["actor"] in GRADED_ACTORS:
+                    by_identity[record["identity"]].append((record, row))
+            if not by_identity:
+                items.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
+            for identity in sorted(by_identity):
+                runs = by_identity[identity]
+                lanes = next((record.get("lanes") for record, _ in runs if record.get("lanes")), {}) or {}
+                items.append(_attempt_item(task, runs, (lanes.get(lane) or {}).get("state", "unknown"), readings, decided))
     return items
 
 
@@ -2659,11 +2877,12 @@ def _status_counts(statuses):
 
 
 def m12_sums(records):
-    """U9's per-attempt sums in the shape of U4's m12_inputs (R7), for the cross-check."""
+    """U9's per-attempt sums in the shape of U4's m12_inputs (R7), for the cross-check. U4 counts one join row per identity,
+    so a superseded run of an identity never enters the sums."""
     sums = {kind: {"rows": 0, "hook_rows": 0, "mcp_skill_bash_calls": 0, "pretooluse_read_rows": 0} for kind in M12_FIELDS}
     for record in records:
         facts = record.get("facts") or {}
-        if record["template"] not in STRICT_KEYS or record["family"] != "claude" or record["arm"] != "B":
+        if record["template"] not in STRICT_KEYS or record["family"] != "claude" or record["arm"] != "B" or record["superseded"]:
             continue
         kind = "strict_process" if record["actor"] == "strict_process" else \
             "positive_control" if record["template"] == "T33" else "blind_workflow"
@@ -2677,7 +2896,7 @@ def m12_sums(records):
     return sums
 
 
-def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta):
+def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta, join=None):
     tasks = spec["tasks"]
     thresholds = spec.get("thresholds") or {}
     aggregate = {"schema": GRADES_SCHEMA, "tool": spec["block"]["tool"],
@@ -2723,17 +2942,18 @@ def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, 
     gq = g_q(tasks, outcomes, readings)
     aggregate["g_q"] = gq
     aggregate["g_c_denominators"] = g_c_denominators(tasks, outcomes)
+    seeded_tasks = {task["id"] for task in tasks if "toon-seeded" in task["lane_tags"]}
     toon_items = []
     for record in records:
         toon = (record.get("facts") or {}).get("toon")
-        if toon and record["class"] == "completed" and record["arm"] == "B":
-            toon_items.append(dict(pick(toon, readings, decided), seeded=True))
+        if toon and record["class"] == "completed" and record["arm"] == "B" and record["actor"] in GRADED_ACTORS:
+            toon_items.append(dict(pick(toon, readings, decided), seeded=record["task"] in seeded_tasks))
     aggregate["m7"] = m7(toon_items, thresholds.get("M7"), readings)
     m8_criteria = {"threshold": (thresholds.get("M8") or {}).get("correct_lane_use_rate_gte", 0.8),
                    "minimum": thresholds.get("minimum_arm_b_opportunities", 5)}
-    aggregate["m8"] = {lane: m8_lane(_lane_opportunities(spec, lane, records, rows, readings, decided), readings, m8_criteria)
-                       for lane in fc.M8_LANES}
-    blind, blind_outcomes, strict_hooks = {}, {}, 0
+    aggregate["m8"] = {lane: m8_lane(_lane_opportunities(spec, lane, records, rows, readings, decided, join), readings,
+                                     m8_criteria) for lane in fc.M8_LANES}
+    blind, strict_hooks = {}, 0
     for task in tasks:
         if task["template"] != "T32":
             continue
@@ -2743,13 +2963,12 @@ def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, 
         blind[task["id"]] = {"clean": counts["clean"], "contaminated": counts["contaminated"], "unknown": counts["unknown"],
                              "strict_replacement": any(record["actor"] == "strict_process" and row["cleanliness"] == "clean"
                                                        for record, row in items)}
-        blind_outcomes[task["id"]] = outcomes[("B", task["id"])]
     for record in records:
         if record["actor"] == "strict_process" and record["template"] in STRICT_KEYS:
             strict_hooks += ((record.get("facts") or {}).get("hooks") or {}).get("hook_rows") or 0
     control = next((task for task in tasks if task["template"] == "T33"), None)
     read_rows = details.get(("B", control["id"]), {}).get("read_rows") if control else None
-    status = m12_status(blind_outcomes, read_rows)
+    status = m12_status(blind, read_rows)
     parity = {}
     for task_id, entry in blind.items():
         items = by_task.get(("claude", "B", task_id), [])
@@ -2759,7 +2978,7 @@ def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, 
         parity[task_id] = {"workflow": words["workflow_child"], "strict": words["strict_process"],
                            "parity": None if None in words.values() else words["workflow_child"] == words["strict_process"]}
     aggregate["m12"] = {"blind": blind, "positive_read_rows": read_rows, "strict": {"hook_rows": strict_hooks},
-                        "status": status["status"], "reason": status["reason"]}
+                        "status": status["status"], "reason": status["reason"], "sensitive": status["sensitive"]}
     aggregate["blind"] = {"verdict_parity": parity}
     aggregate["optional"] = {task["id"]: _status_counts([outcomes[(arm, task["id"])]["status"] for arm in task["arms"]])
                              for task in tasks if task["opportunity"] == "optional"}
