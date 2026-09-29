@@ -41,6 +41,24 @@ class CredentialStatusTests(unittest.TestCase):
         self.fake_a = "SENTINELA" + os.urandom(12).hex()
         self.fake_b = "SENTINELB" + os.urandom(12).hex()
         self.env = {"HOME": str(self.home), "XDG_CONFIG_HOME": str(self.config)}
+        # The kernel's key list is a fixture file: no test reads this host's /proc/keys.
+        self.proc_keys = Path(temporary.name) / "proc-keys"
+        self.proc_keys.write_text("")
+
+    def keyring_inventory(self, status="optional"):
+        """The inventory with the tavily row back in the kernel keyring, its store until 2026-09-29.
+
+        The real inventory has no memory-only row since then, so the keyring tests plant this one."""
+        inventory = copy.deepcopy(self.inventory)
+        row = next(e for e in inventory["entries"] if e["id"] == "tavily")
+        row["status"] = status
+        row["store"] = {"kind": "kernel_keyring", "path_template": "", "key_name": "tavily_api_key"}
+        return inventory
+
+    def planted(self, inventory):
+        path = self.home.parent / "planted-inventory.json"
+        path.write_text(json.dumps(inventory))
+        return path
 
     def write_alpaca(self, mode=0o600):
         path = self.store / "alpaca-paper.env"
@@ -50,6 +68,7 @@ class CredentialStatusTests(unittest.TestCase):
         return path
 
     def report(self, env=None, **kwargs):
+        kwargs.setdefault("proc_keys", self.proc_keys)
         return cs.inspect(ROOT, self.inventory, self.env if env is None else env, **kwargs)
 
     def entry(self, report, identifier="alpaca-paper"):
@@ -63,8 +82,8 @@ class CredentialStatusTests(unittest.TestCase):
 
     def run_cli(self, *args):
         env = {"PATH": os.environ.get("PATH", ""), **self.env}
-        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), *args],
-                                env=env, capture_output=True, text=True, timeout=60)
+        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), "--proc-keys", str(self.proc_keys),
+                                 *args], env=env, capture_output=True, text=True, timeout=60)
         self.assert_no_values(result.stdout, result.stderr)
         return result
 
@@ -97,26 +116,173 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertTrue(any("uppercase variable names" in e for e in errors))
 
     def test_kernel_keyring_row_is_validated_and_never_inspected(self):
-        row = next(e for e in self.inventory["entries"] if e["id"] == "tavily")
+        # No real row is memory only since 2026-09-29 (test_tavily_row_is_a_stored_file_entry); a planted one is
+        # still validated, never inspected as a file, and the keyring is never queried for it.
+        inventory = self.keyring_inventory()
+        row = next(e for e in inventory["entries"] if e["id"] == "tavily")
         self.assertEqual((row["class"], row["variables"], row["store"]),
                          ("provider_api_key", ["TAVILY_API_KEY"],
                           {"kind": "kernel_keyring", "path_template": "", "key_name": "tavily_api_key"}))
-        report = self.report()
+        self.assertEqual(cs.inventory_errors(inventory, ROOT), [])
+        report = cs.inspect(ROOT, inventory, self.env, proc_keys=self.proc_keys)
         entry = self.entry(report, "tavily")
         self.assertEqual((entry["state"], entry["key_name"], entry["findings"]), ("unchecked", "tavily_api_key", []))
         self.assertNotIn("mode", entry)
         self.assertEqual(report["result"], "ok")
         self.assertIn("unchecked tavily", cs.render_text(report))
         self.assertIn("(kernel keyring tavily_api_key; check: kernel_keyring.py status)", cs.render_text(report))
-        result = self.run_cli()
+        result = self.run_cli("--inventory", str(self.planted(inventory)))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("unchecked tavily", result.stdout)
         # Exported in the launcher's environment instead, it is reported by name only.
-        exported_report = self.report({**self.env, "TAVILY_API_KEY": self.fake_a})
+        exported_report = cs.inspect(ROOT, inventory, {**self.env, "TAVILY_API_KEY": self.fake_a},
+                                     proc_keys=self.proc_keys)
         exported = self.entry(exported_report, "tavily")
         self.assertEqual(exported["variables_in_environment"], ["TAVILY_API_KEY"])
         self.assertIn("store_variables_exported_in_environment", exported["warnings"])
         self.assert_no_values(json.dumps(exported_report), cs.render_text(exported_report))
+
+    def test_tavily_row_is_a_stored_file_entry(self):
+        # 2026-09-29 (docs/decisions/2026-09-29-key-management.md): the key moved from the kernel keyring, which a
+        # kernel restart erases, to its own 0600 file in the store. No real row is memory only any more.
+        row = next(e for e in self.inventory["entries"] if e["id"] == "tavily")
+        self.assertEqual((row["class"], row["status"], row["variables"], row["optional_variables"],
+                          row["pointer_variables"]), ("provider_api_key", "optional", ["TAVILY_API_KEY"], [], []))
+        self.assertEqual(row["store"], {"kind": "private_env_file",
+                                        "path_template": "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/tavily.env"})
+        self.assertIn("open_credential_terminal.sh tavily", row["rotation"])
+        self.assertIn("docs/decisions/2026-09-29-key-management.md", row["notes"])
+        self.assertEqual([e["id"] for e in self.inventory["entries"] if e["store"]["kind"] in cs.MEMORY_KINDS], [])
+        self.assertEqual(self.entry(self.report(), "tavily")["state"], "missing")
+        path = self.store / "tavily.env"
+        path.write_text(f"export TAVILY_API_KEY={self.fake_a}\n")
+        path.chmod(0o600)
+        report = self.report()
+        entry = self.entry(report, "tavily")
+        self.assertEqual((entry["state"], entry["mode"], entry["findings"]), ("ok", "0600", []))
+        self.assertNotIn("persistence", entry)
+        self.assertEqual(report["coverage"]["undeclared_store_files"], [])
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
+        path.chmod(0o644)
+        self.assertIn("mode_not_0600", self.entry(self.report(), "tavily")["findings"])
+
+    def test_keyring_row_reports_memory_only_lost_on_restart(self):
+        inventory = self.keyring_inventory()
+        report = cs.inspect(ROOT, inventory, self.env, proc_keys=self.proc_keys)
+        entry = self.entry(report, "tavily")
+        self.assertEqual((entry["state"], entry["persistence"]), ("unchecked", "memory_only"))
+        self.assertIn("memory_only_lost_on_restart", entry["warnings"])
+        self.assertEqual(report["result"], "ok")  # a warning, not a failure
+        self.assertIn("warnings=memory_only_lost_on_restart", cs.render_text(report))
+        result = self.run_cli("--inventory", str(self.planted(inventory)), "--json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        listed = self.entry(json.loads(result.stdout), "tavily")
+        self.assertEqual((listed["state"], listed["persistence"]), ("unchecked", "memory_only"))
+        self.assertIn("memory_only_lost_on_restart", listed["warnings"])
+
+    def test_required_keyring_row_is_an_inventory_error(self):
+        # A required key must survive a restart, and nothing in the kernel keyring does.
+        errors = cs.inventory_errors(self.keyring_inventory("required"), ROOT)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("required", errors[0])
+        self.assertIn("restart", errors[0])
+        self.assertEqual(cs.inventory_errors(self.keyring_inventory("optional"), ROOT), [])
+        result = self.run_cli("--inventory", str(self.planted(self.keyring_inventory("required"))))
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("required", result.stderr)
+
+    def test_undeclared_store_file_is_reported_by_name_only(self):
+        self.write_alpaca()  # declared by alpaca-paper
+        stray = self.store / "stray.env"
+        stray.write_text(f"export STRAY_API_KEY={self.fake_b}\n")
+        stray.chmod(0o600)
+        leftover = self.store / ".tavily.env.0123456789abcdef.tmp"  # what an interrupted write would leave
+        leftover.write_text(f"export TAVILY_API_KEY={self.fake_a}\n")
+        (self.store / "link.env").symlink_to(stray)  # listed, never followed
+        (self.store / "subdirectory").mkdir()  # directories are not listed
+        opened = []
+        real_open, real_os_open = builtins.open, os.open
+
+        def watch_open(file, *args, **kwargs):
+            opened.append(str(file))
+            return real_open(file, *args, **kwargs)
+
+        def watch_os_open(file, *args, **kwargs):
+            opened.append(str(file))
+            return real_os_open(file, *args, **kwargs)
+
+        with patch("builtins.open", watch_open), patch("os.open", watch_os_open), \
+                patch.object(Path, "read_text", side_effect=AssertionError("read_text called")), \
+                patch.object(Path, "read_bytes", side_effect=AssertionError("read_bytes called")):
+            report = self.report()
+        self.assertFalse([p for p in opened if str(self.store) in p])
+        names = [".tavily.env.0123456789abcdef.tmp", "link.env", "stray.env"]
+        self.assertEqual(report["coverage"]["undeclared_store_files"], names)
+        self.assertIn("undeclared_store_file", report["warnings"])
+        self.assertEqual(report["result"], "ok")  # a warning, not a failure
+        text = cs.render_text(report)
+        self.assertIn("undeclared store files (names only): " + ",".join(names), text)
+        self.assert_no_values(json.dumps(report), text)
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(",".join(names), result.stdout)
+        # Nothing undeclared, or no store yet: an empty list and no warning.
+        for path in (stray, leftover, self.store / "link.env"):
+            path.unlink()
+        clean = self.report()
+        self.assertEqual((clean["coverage"]["undeclared_store_files"], clean["warnings"]), ([], []))
+        self.assertEqual(self.report({**self.env, "XDG_CONFIG_HOME": str(self.home / "none")})[
+            "coverage"]["undeclared_store_files"], [])
+        # A store root that is a symbolic link is never listed through the link.
+        elsewhere = self.home / "elsewhere"
+        elsewhere.mkdir()
+        (elsewhere / "other.env").write_text(f"export OTHER_API_KEY={self.fake_b}\n")
+        (self.home / "linked").mkdir()
+        (self.home / "linked" / "native-agent-stack").symlink_to(elsewhere)
+        linked = self.report({**self.env, "XDG_CONFIG_HOME": str(self.home / "linked")})
+        self.assertIsNone(linked["coverage"]["undeclared_store_files"])
+        self.assertIn("undeclared store files (names only): unknown", cs.render_text(linked))
+
+    def test_undeclared_keyring_key_is_reported_from_a_proc_keys_fixture(self):
+        # Lines in the kernel's format (linux v6.18 security/keys/proc.c, proc_keys_show(): serial, the seven flags
+        # I R D Q U N i, usage, expiry, permissions, uid, gid, type; a user key's description then ends with
+        # ": <payload length>", user_describe() in security/keys/user_defined.c). Only live keys of this uid named
+        # native-agent-stack:<name> count, by name, and a kernel_keyring row claims its key_name.
+        uid = os.getuid()
+
+        def line(serial, flags, expiry, owner, kind, description):
+            return f"{serial:08x} {flags} {1:5d} {expiry:>4} 3f0b0000 {owner:5d} {owner:5d} {kind:<9.9} {description}\n"
+
+        self.proc_keys.write_text("".join([
+            line(0x1a2b3c4d, "I--Q---", "perm", uid, "user", "native-agent-stack:alpaca-paper-1-id: 26"),
+            line(0x1a2b3c4e, "I--Q---", "perm", uid, "user", "native-agent-stack:tavily_api_key: 41"),
+            line(0x1a2b3c4f, "I--Q---", "59m", uid, "user", "native-agent-stack:alpaca-paper-2-secret: 44"),
+            line(0x1a2b3c50, "IR-Q---", "perm", uid, "user", "native-agent-stack:revoked-spare"),
+            line(0x1a2b3c51, "I--Q--i", "perm", uid, "user", "native-agent-stack:invalidated-spare: 20"),
+            line(0x1a2b3c52, "I--Q---", "expd", uid, "user", "native-agent-stack:expired-spare: 20"),
+            line(0x1a2b3c53, "I--Q-N-", "perm", uid, "user", "native-agent-stack:negative-spare"),
+            line(0x1a2b3c54, "I--Q---", "perm", uid + 1, "user", "native-agent-stack:another-uid: 20"),
+            line(0x1a2b3c55, "I--Q---", "perm", uid, "user", "another-project:key: 20"),
+            line(0x1a2b3c56, "I--Q---", "perm", uid, "keyring", f"_uid.{uid}: 2"),
+        ]))
+        report = self.report()
+        # The real inventory has no kernel_keyring row, so tavily_api_key is undeclared until the kernel restarts.
+        undeclared = ["alpaca-paper-1-id", "alpaca-paper-2-secret", "tavily_api_key"]
+        self.assertEqual(report["coverage"]["undeclared_keyring_keys"], undeclared)
+        self.assertIn("undeclared_keyring_key", report["warnings"])
+        self.assertEqual(report["result"], "ok")  # a warning, not a failure
+        self.assertIn(",".join(undeclared), cs.render_text(report))
+        claimed = cs.inspect(ROOT, self.keyring_inventory(), self.env, proc_keys=self.proc_keys)
+        self.assertEqual(claimed["coverage"]["undeclared_keyring_keys"], undeclared[:2])
+        result = self.run_cli("--json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["coverage"]["undeclared_keyring_keys"], undeclared)
+        # No readable key list (macOS has none): reported as not checked, without a warning.
+        absent = self.report(proc_keys=self.home / "no-proc-keys")
+        self.assertIsNone(absent["coverage"]["undeclared_keyring_keys"])
+        self.assertNotIn("undeclared_keyring_key", absent["warnings"])
+        self.assertIn("undeclared kernel keyring keys (names only): not checked", cs.render_text(absent))
+        self.assertEqual(cs.PROC_KEYS, Path("/proc/keys"))  # the CLI's default
 
     def test_inventory_rejects_a_keyring_row_with_a_path_or_bad_key_name(self):
         index = next(i for i, e in enumerate(self.inventory["entries"]) if e["id"] == "tavily")
@@ -394,6 +560,8 @@ class HuggingFaceNativeStoreTests(unittest.TestCase):
         self.inventory = json.loads((ROOT / cs.INVENTORY).read_text())
         self.fake = "SENTINELHF" + os.urandom(12).hex()  # never shaped like a real token
         self.env = {"HOME": str(self.home)}
+        self.proc_keys = Path(temporary.name) / "proc-keys"  # a fixture, never this host's /proc/keys
+        self.proc_keys.write_text("")
 
     def sign_in(self, directory=None, mode=0o600, directory_mode=0o700):
         """What `hf auth login` leaves behind: both files 0600, their directory 0700."""
@@ -413,8 +581,8 @@ class HuggingFaceNativeStoreTests(unittest.TestCase):
 
     def run_cli(self, env=None, *args):
         cli_env = {"PATH": os.environ.get("PATH", ""), **(self.env if env is None else env)}
-        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), *args],
-                                env=cli_env, capture_output=True, text=True, timeout=60)
+        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), "--proc-keys", str(self.proc_keys),
+                                 *args], env=cli_env, capture_output=True, text=True, timeout=60)
         for text in (result.stdout, result.stderr):
             self.assertNotIn(self.fake, text)
             self.assertNotIn(str(self.home), text)

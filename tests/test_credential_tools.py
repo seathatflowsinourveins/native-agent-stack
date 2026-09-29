@@ -97,11 +97,21 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(list(target.iterdir()), [])
 
     def test_only_operator_supplied_stored_entries(self):
-        # tavily lives in the kernel keyring only (operator decision 2026-09-26), never in a file.
-        for entry in ("alpaca-live", "grafana-admin", "claude-native", "tavily", "no-such-entry"):
+        for entry in ("alpaca-live", "grafana-admin", "claude-native", "no-such-entry"):
             with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
                 store_mod.load_entry(entry, env=self.env)
         self.assertEqual(store_mod.load_entry("typesafe", env=self.env)["id"], "typesafe")
+        # tavily lived in the kernel keyring only from 2026-09-26 and moved to its own file on 2026-09-29
+        # (docs/decisions/2026-09-29-key-management.md). A kernel keyring row is still never written to a file.
+        self.assertEqual(store_mod.load_entry("tavily", env=self.env)["store"]["kind"], "private_env_file")
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+        row = next(e for e in inventory["entries"] if e["id"] == "tavily")
+        row["store"] = {"kind": "kernel_keyring", "path_template": "", "key_name": "tavily_api_key"}
+        planted = Path(self.tmp.name) / "planted-inventory.json"
+        planted.write_text(json.dumps(inventory), encoding="utf-8")
+        with mock.patch.object(store_mod.cs, "INVENTORY", str(planted)), \
+                self.assertRaisesRegex(store_mod.Refused, "not an operator-supplied stored entry"):
+            store_mod.load_entry("tavily", env=self.env)
 
     def test_value_encoding(self):
         self.assertEqual(store_mod.encode("A", "abc-123"), "export A=abc-123\n")
