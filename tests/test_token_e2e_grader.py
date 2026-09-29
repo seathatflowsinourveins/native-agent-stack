@@ -3427,11 +3427,36 @@ class F22_M12(GraderCase):
 
     def test_m12_status_incomplete_fail_or_pass(self):
         ev = evm()
-        blind = {"seed-blind-1": {"status": "pass"}, "seed-blind-2": {"status": "pass"}}
+        blind = {"seed-blind-1": {"clean": 1, "contaminated": 0, "unknown": 0},
+                 "seed-blind-2": {"clean": 2, "contaminated": 0, "unknown": 0}}
         self.assertEqual(ev.m12_status(blind, positive_read_rows=1)["status"], "pass")
         self.assertEqual(ev.m12_status(blind, positive_read_rows=0)["status"], "incomplete")
-        failing = dict(blind, **{"seed-blind-3": {"status": "unknown"}})
-        self.assertEqual(ev.m12_status(failing, positive_read_rows=2)["status"], "fail")
+        self.assertEqual(ev.m12_status(blind, positive_read_rows=None)["status"], "unknown")
+        failing = dict(blind, **{"seed-blind-3": {"clean": 0, "contaminated": 1, "unknown": 0}})
+        got = ev.m12_status(failing, positive_read_rows=2)
+        self.assertEqual((got["status"], got["reason"]), ("fail", "blind_task_without_clean_verdict"))
+
+    def test_m12_status_asks_for_a_clean_verdict_and_never_for_a_correct_answer(self):
+        """Stage-2 review: the status counts clean completed attempts per blind task (R7); a contaminated workflow attempt
+        with a clean strict replacement is a clean verdict, and an unknown cleanliness is only the upper bound."""
+        ev = evm()
+        replaced = {"seed-blind-1": {"clean": 1, "contaminated": 1, "unknown": 0}}
+        self.assertEqual(ev.m12_status(replaced, positive_read_rows=1)["status"], "pass")
+        unknown = {"seed-blind-1": {"clean": 0, "contaminated": 0, "unknown": 1}}
+        got = ev.m12_status(unknown, positive_read_rows=1)
+        self.assertEqual((got["status"], got["sensitive"]), ("fail", True))
+        contaminated = {"seed-blind-1": {"clean": 0, "contaminated": 2, "unknown": 0}}
+        self.assertEqual(ev.m12_status(contaminated, positive_read_rows=1)["sensitive"], False)
+
+    def test_the_summed_rows_count_one_run_per_identity(self):
+        """Stage-2 review: U4 counts one join row per identity, so a superseded run never enters U9's sums."""
+        ev = evm()
+
+        def record(superseded, hook_rows, calls):
+            return {"template": "T32", "family": "claude", "arm": "B", "actor": "workflow_child", "superseded": superseded,
+                    "facts": {"hooks": {"hook_rows": hook_rows, "read_rows": 0}, "mcp_skill_bash_calls": calls}}
+        sums = ev.m12_sums([record(True, 1, 2), record(False, 0, 0)])
+        self.assertEqual(sums["blind_workflow"], {"rows": 1, "hook_rows": 0, "mcp_skill_bash_calls": 0, "pretooluse_read_rows": 0})
 
 
 class F24_Retrieval(GraderCase):
@@ -3538,6 +3563,25 @@ class F24_Retrieval(GraderCase):
                              "arguments": {"url": PATHLIB_URL, "source": "s"}})
         self.result(self.check(failed), "fail", "missing_source")
 
+    def test_the_retained_exec_item_spellings_read_their_status_result_and_error(self):
+        """Real 0.157.1 exec items (retained streams): command_execution {aggregated_output, command, exit_code, id, status,
+        type} and mcp_tool_call {arguments, error, id, result, server, status, tool, type}."""
+        done = {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_fetch_and_index", "arguments": {"url": JSON_URL, "source": "s"},
+                "result": {"content": [{"type": "text", "text": "fetched"}], "structured_content": None}, "error": None,
+                "status": "completed"}
+        errored = dict(done, arguments={"url": PATHLIB_URL, "source": "s"}, result=None, error={"message": "tool call failed"},
+                       status="failed")
+        calls = self.codex(done, errored)
+        self.assertEqual([call["state"] for call in calls], ["succeeded", "failed"])
+        self.assertIn("fetched", calls[0]["result_text"])
+        self.result(self.check(calls), "fail", "missing_source")
+
+    def test_an_mcp_item_that_carries_an_error_never_counts_as_a_success(self):
+        """A completed status beside a non-null error is not a retrieval: the error wins."""
+        odd = {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_fetch_and_index",
+               "arguments": {"url": JSON_URL, "source": "s"}, "result": None, "error": {"message": "denied"}, "status": "completed"}
+        self.assertEqual(self.codex(odd)[0]["state"], "failed")
+
 
 class F25b_MemoryHits(GraderCase):
     """R9 at grading: a hit counts only when a succeeded ai-memory call returns a frozen record."""
@@ -3575,6 +3619,34 @@ class F25b_MemoryHits(GraderCase):
         elsewhere = self.calls("pages/mem-fx-1.md", name="Bash", tool_input={"command": "cat notes.txt"})
         self.result(self.check(elsewhere), "fail", "no_historical_hit")
 
+    def stateless(self, result_text, **kw):
+        """The same call with no record in the call ledger: its state is unknown, never a failure."""
+        rows = [r_user("t", ts(0)), r_use(kw.get("name", MEMORY_QUERY), kw.get("tool_input", {"query": "host request lane"}),
+                                          "toolu-fx-a1", ts(1)), r_result("toolu-fx-a1", result_text, ts(2))]
+        calls = evm().claude_calls(rows, [], "main")
+        self.assertIsNone(calls[0]["state"])
+        return calls
+
+    def test_a_call_without_a_ledger_record_that_shows_a_hit_is_unknown_never_a_miss(self):
+        """Stage-2 review: a missing ledger record must not grade as a failure of the child."""
+        self.result(self.check(self.stateless("hits: pages/mem-fx-1.md (score 0.9)")), "unknown", "call_state_unknown")
+
+    def test_a_stateless_call_leaves_a_hit_of_a_succeeded_call_a_pass(self):
+        first = self.calls("pages/mem-fx-1.md")
+        second = self.stateless("hits: pages/mem-fx-1.md")
+        self.result(self.check(second + first), "pass")
+
+    def test_a_stateless_call_that_names_no_frozen_record_is_still_a_miss(self):
+        self.result(self.check(self.stateless("hits: pages/session-2026-10-01-fx.md")), "fail", "no_historical_hit")
+
+    def test_a_dotted_mcporter_call_is_an_ai_memory_call_but_a_file_name_is_not(self):
+        """`mcporter call ai-memory.memory_query` names the server with a dot; `cat ai-memory.md` is only a file name."""
+        dotted = self.calls("pages/mem-fx-1.md", name="Bash",
+                            tool_input={"command": "mcporter call ai-memory.memory_query query=host"})
+        self.result(self.check(dotted), "pass")
+        named = self.calls("pages/mem-fx-1.md", name="Bash", tool_input={"command": "cat ai-memory.md"})
+        self.result(self.check(named), "fail", "no_historical_hit")
+
 
 STATUS_LINES = ("● Token estimates: ~136 (JSON) → ~52 (TOON)", "✔ Saved ~84 tokens (-61.8%)")
 ANSI_STATUS_LINES = ("\x1b[36m●\x1b[39m Token estimates: ~136 (JSON) → ~52 (TOON)", "\x1b[32m✔\x1b[39m Saved ~84 tokens (-61.8%)")
@@ -3601,10 +3673,11 @@ class F28_M7(GraderCase):
             rows.append(r_result(f"toolu-fx-t{number}", result, ts(1, 30 + number)))
         return evm().claude_calls(rows, ledger_for(rows), "main", roots=list(roots))
 
-    def facts(self, calls, text="", key=None, **readings):
+    def facts(self, calls, text="", key=None, seeded=True, **readings):
         fc = load("frozen_checks")
+        extra = {} if seeded else {"seeded": False}
         return evm().toon_facts(calls, answer(fc, text), key if key is not None else self.key(),
-                                dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}))
+                                dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}), **extra)
 
     def encode_call(self, result, command="toon --stats seed.json"):
         return [("Bash", {"command": command}, result)]
@@ -3709,6 +3782,76 @@ class F28_M7(GraderCase):
         alternative = self.facts([], text, key={}, R2_16="excluded")
         self.assertEqual(alternative["roundtrip"], [])
 
+    def test_a_wrapper_encode_is_ineligible_under_the_decided_reading_only(self):
+        """Stage-2 review (RC-N15): {records: [...]} around an eligible array is the R2-01 wrapper reading; the decided
+        root-array reading calls its encode ineligible and the alternative accepts it as the seeded encode."""
+        wrapped = toon_encode({"records": web_key()["records"]}) + "\n" + "\n".join(STATUS_LINES)
+        got = self.facts(self.calls(self.encode_call(wrapped)))
+        self.assertEqual((got["encode"], got["ineligible"]), ("not_encoded", 1))
+        alternative = self.facts(self.calls(self.encode_call(wrapped)), R2_01="single_key_wrapper")
+        self.assertEqual((alternative["encode"], alternative["ineligible"]), ("encoded", 0))
+
+    def stateless_calls(self, command, result):
+        rows = [r_user("t", ts(0)), r_use("Bash", {"command": command}, "toolu-fx-t0", ts(1)), r_result("toolu-fx-t0", result, ts(2))]
+        calls = evm().claude_calls(rows, [], "main")
+        self.assertIsNone(calls[0]["state"])
+        return calls
+
+    def test_a_seeded_encode_without_a_ledger_record_is_unknown_never_not_encoded(self):
+        """Stage-2 review: a missing ledger record leaves the call's state unknown; M7's upper bound may count it."""
+        got = self.facts(self.stateless_calls("toon --stats seed.json", self.doc()))
+        self.assertEqual((got["encode"], got["encode_reason"]), ("unknown", "call_state_unknown"))
+
+    def test_a_child_decode_without_a_ledger_record_is_an_unknown_round_trip(self):
+        command = "toon --decode <<'EOF'\n" + self.doc() + "\nEOF"
+        got = self.facts(self.stateless_calls(command, json.dumps(web_key()["records"])))
+        self.assertEqual([item["status"] for item in got["roundtrip"] if item["source"] == "child_decode"], ["unknown"])
+
+    def test_a_small_encode_without_a_ledger_record_counts_on_the_lower_bound_only(self):
+        small = self.doc(web_key()["records"][:3])
+        got = self.facts(self.stateless_calls("toon --stats seed.json", small))
+        self.assertEqual((got["ineligible"], got["ineligible_unknown"]), (0, 1))
+
+    def test_a_codex_command_item_encodes_like_a_claude_call(self):
+        """Design R14: the seeded encode is a toon CLI call 'in any carrier U1 scans or in a Codex command_execution'."""
+        item = {"type": "command_execution", "command": "toon --stats seed.json", "exit_code": 0, "status": "completed",
+                "aggregated_output": self.doc() + "\n" + "\n".join(STATUS_LINES)}
+        calls = evm().codex_calls([{"type": "item.completed", "item": dict({"id": "item_0"}, **item)}])
+        self.assertEqual(self.facts(calls)["encode"], "encoded")
+
+    def test_a_natural_payload_is_an_eligible_flat_array_in_the_answer_or_an_eligible_encode(self):
+        """Stage-2 review: design R14 leaves natural payloads optional; here a payload is a strictly decoded flat array of at
+        least five records, and the natural encode is an eligible toon CLI encode (any TOON form under R2-15)."""
+        records = web_key()["records"]
+        plain = self.facts([], "```json\n" + json.dumps(records) + "\n```", key={}, seeded=False)
+        self.assertEqual((plain["has_payload"], plain["encode"]), (True, "not_encoded"))
+        short = self.facts([], "```json\n" + json.dumps(records[:3]) + "\n```", key={}, seeded=False)
+        self.assertEqual(short["has_payload"], False)
+        prose = self.facts([], "no payload at all", key={}, seeded=False)
+        self.assertEqual(prose["has_payload"], False)
+        encoded = self.facts(self.calls(self.encode_call(self.doc(records[2:8]) + "\n" + "\n".join(STATUS_LINES))), key={}, seeded=False)
+        self.assertEqual((encoded["has_payload"], encoded["encode"], encoded["ineligible"]), (True, "encoded", 0))
+        as_toon = "```toon\n" + self.doc() + "\n```"
+        self.assertEqual(self.facts([], as_toon, key={}, seeded=False)["encode"], "not_encoded")
+        self.assertEqual(self.facts([], as_toon, key={}, seeded=False, R2_15="any_toon_form")["encode"], "encoded")
+
+    def test_a_seeded_attempt_encodes_only_the_seeded_array(self):
+        other = self.doc(web_key(9, 16)["records"])
+        got = self.facts(self.calls(self.encode_call(other + "\n" + "\n".join(STATUS_LINES))))
+        self.assertEqual((got["encode"], got["ineligible"]), ("not_encoded", 0))
+
+    def natural(self, encoded, total):
+        item = {"encode": "encoded", "ineligible": 0, "ineligible_unknown": 0, "roundtrip": [], "has_payload": True, "seeded": False}
+        return [dict(item) for _ in range(encoded)] + [dict(item, encode="not_encoded") for _ in range(total - encoded)]
+
+    def test_natural_payloads_are_the_unseeded_attempts_that_carry_a_payload(self):
+        rows = self.attempts(5, 5) + self.natural(4, 5) + [dict(self.natural(1, 1)[0], has_payload=False, encode="not_encoded")]
+        got = evm().m7(rows, self.CRITERIA, DECIDED)
+        self.assertEqual(got["natural"], {"payloads": 5, "encoded": 4, "status": "pass"})
+        failing = evm().m7(self.attempts(5, 5) + self.natural(3, 5), self.CRITERIA, DECIDED)
+        self.assertEqual(failing["natural"], {"payloads": 5, "encoded": 3, "status": "fail"})
+        self.assertEqual(failing["status"], "pass", "natural payloads are optional and never gate")
+
     def attempts(self, encoded, total, **extra):
         item = {"encode": "encoded", "ineligible": 0, "ineligible_unknown": 0,
                 "roundtrip": [{"source": "answer", "status": "equal"}]}
@@ -3789,9 +3932,15 @@ class F31b_T14Check(GraderCase):
     STARTS = {R1: "2026-10-01T01:00:00Z", R2: "2026-10-01T01:10:00Z", R3: "2026-10-01T01:40:00Z"}
     Q = "2026-10-01T01:30:00Z"
 
-    def check(self, text, *, q=Q, starts=None, pending=0, survivors=(), **readings):
+    def check(self, text, *, q=Q, starts=None, pending=0, survivors=(), q_status=None, survival_observed=True, **readings):
+        extra = {}
+        if q_status is not None:
+            extra["q_status"] = q_status
+        if survival_observed is not True:
+            extra["survival_observed"] = survival_observed
         return evm().t14_check(text, run_token=RUN_TOKEN, starts=starts or self.STARTS, q=q, background_pending=pending,
-                               survivors=list(survivors), readings=dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}))
+                               survivors=list(survivors), readings=dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}),
+                               **extra)
 
     def test_an_expected_session_reported_alone_passes_under_the_subset_reading(self):
         self.result(self.check(f"1 session matched: {self.R1}"), "pass")
@@ -3824,6 +3973,31 @@ class F31b_T14Check(GraderCase):
     def test_no_identity_and_no_count_is_unparsed_and_zero_matches_is_a_subset(self):
         self.result(self.check("I looked at the archive and found some related history."), "unknown", "unparsed")
         self.result(self.check("0 sessions matched."), "pass")
+
+    def test_a_count_with_no_parsed_identity_is_unparsed_not_a_mismatch(self):
+        """Stage-2 review: a stated count of three with no identity the grader can read cannot be checked against the list;
+        it is unknown(unparsed) and never fail(count_mismatch). Zero matches is still a pass, and a count that disagrees with
+        the identities that were listed stays a failure."""
+        self.result(self.check("3 sessions matched."), "unknown", "unparsed")
+        self.result(self.check("0 sessions matched."), "pass")
+        self.result(self.check(f"3 sessions matched: {self.R1}, {self.R2}"), "fail", "count_mismatch")
+
+    def test_an_archive_query_that_could_not_be_timed_is_unknown_not_a_missing_query(self):
+        """Stage-2 review: with no timestamped record of the child the query time is unobserved, which is not the same as no
+        query (fail(no_archive_query)); a failure that does not depend on the query time still fails."""
+        text = f"1 session matched: {self.R1}"
+        self.result(self.check(text, q=None, q_status="unobserved"), "unknown", "archive_query_unobserved")
+        self.result(self.check(text, q=None, q_status="none"), "fail", "no_archive_query")
+        outside = f"1 session matched: {RUN_TOKEN}.B.seed-web-table-9.1"
+        self.result(self.check(outside, q=None, q_status="unobserved"), "fail", "session_outside_table")
+
+    def test_a_survival_that_was_not_observed_is_unknown_and_never_a_pass(self):
+        """Stage-2 review: with neither a post-arm process listing nor a resolved lifetime the run cannot show that no owned
+        process survived; a demonstrated failure still fails."""
+        self.result(self.check(f"1 session matched: {self.R1}", survival_observed=False), "unknown", "survival_unobserved")
+        self.result(self.check(f"1 session matched: {self.R3}", survival_observed=False), "fail", "session_not_before_query")
+        self.result(self.check(f"1 session matched: {self.R1}", pending=1, survival_observed=False), "fail", "owned_process_survives")
+        self.result(self.check(f"1 session matched: {self.R1}", survival_observed=True), "pass")
 
     def test_the_equal_reading_needs_every_expected_session(self):
         self.result(self.check(f"1 session matched: {self.R1}", R2_19="equal"), "fail", "session_missing")
@@ -3868,6 +4042,131 @@ class F31b_T14Check(GraderCase):
             sleeper.kill()
             sleeper.wait()
         self.assertEqual([item["pid"] for item in found], [sleeper.pid])
+
+
+class F31c_T14Facts(GraderCase):
+    """Stage-2 review: the facts of one T14 attempt. One detector (the whole word agentsview) finds the archive query in both
+    families; a Codex child's query time and lifetime come from the timestamped rollout copy that U10 retains (exec events
+    carry no timestamps); a survival that no capture could show is unobserved, not absent."""
+
+    QUERY = ts(30)
+    CARRIERS = {
+        "custom_tool_call": {"type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec", "call_id": "call-fx-1",
+                                                                  "input": "const out = await tools.exec_command({cmd: 'agentsview stats'})"}},
+        "function_call": {"type": "response_item", "payload": {"type": "function_call", "name": "shell", "call_id": "call-fx-1",
+                                                               "arguments": json.dumps({"command": ["bash", "-lc", "agentsview stats"]})}},
+        "local_shell_call": {"type": "response_item", "payload": {"type": "local_shell_call", "call_id": "call-fx-1",
+                                                                  "action": {"type": "exec", "command": ["bash", "-lc", "agentsview stats"]}}},
+        "command_item": {"type": "event_msg", "payload": {"type": "item_completed", "item": {
+            "type": "CommandExecution", "id": "item-fx-1", "command": ["/bin/bash", "-lc", "agentsview stats"], "status": "completed",
+            "exit_code": 0}}},
+        "mcp_item": {"type": "event_msg", "payload": {"type": "item_completed", "item": {
+            "type": "McpToolCall", "id": "item-fx-2", "server": "agentsview", "tool": "sessions", "arguments": {}, "status": "completed"}}},
+    }
+
+    def claude_rows(self, text="agentsview session list", when=None):
+        return [r_user("t", ts(0)), r_use("Bash", {"command": text}, "toolu-fx-q1", when or self.QUERY),
+                r_result("toolu-fx-q1", "ok", ts(31)), r_text("done", ts(40))]
+
+    def rollout(self, item=None, when=None):
+        records = [{"timestamp": ts(0), "type": "session_meta", "payload": {"id": "thread-fx1"}},
+                   {"timestamp": ts(1), "type": "event_msg", "payload": {"type": "task_started"}},
+                   {"timestamp": ts(5), "type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec",
+                                                                             "call_id": "call-fx-0", "input": "ls"}}]
+        if item is not None:
+            records.append(dict(item, timestamp=when or self.QUERY))
+        records.append({"timestamp": ts(45), "type": "event_msg", "payload": {"type": "task_complete"}})
+        return records
+
+    def test_the_codex_query_time_is_the_timestamp_of_the_first_call_naming_agentsview(self):
+        for name, item in self.CARRIERS.items():
+            with self.subTest(name):
+                got = evm().codex_archive_query_time(self.rollout(item))
+                self.result(got, "pass")
+                self.assertEqual(got.detail["q"], self.QUERY)
+
+    def test_a_rollout_with_no_call_naming_agentsview_has_no_query(self):
+        self.result(evm().codex_archive_query_time(self.rollout()), "unknown", "no_query")
+
+    def test_one_detector_serves_both_families(self):
+        fc = load("frozen_checks")
+        table = [("agentsview session list", True), ("cd x && sudo agentsview stats", True), ("/opt/bin/agentsview query", True),
+                 ("echo agentsviewer", False), ("my_agentsview run", False), ("agentsview.db", True), ("AGENTSVIEW stats", False),
+                 ("ls -la", False)]
+        for text, expected in table:
+            with self.subTest(text):
+                claude = fc.archive_query_time(self.claude_rows(text))
+                item = {"type": "response_item", "payload": {"type": "custom_tool_call", "name": "exec", "call_id": "call-fx-1", "input": text}}
+                codex = evm().codex_archive_query_time(self.rollout(item))
+                word = "pass" if expected else "unknown"
+                self.assertEqual((claude.status, codex.status), (word, word))
+
+    def facts(self, **kw):
+        defaults = dict(family="claude", rows=None, calls=[], attempt={"start": ts(0), "end": ts(45)}, post={"processes": []},
+                        pending=0, rollout=None)
+        return evm().t14_facts(**dict(defaults, **kw))
+
+    def test_a_claude_attempt_reads_its_query_time_from_its_transcript(self):
+        got = self.facts(rows=self.claude_rows())
+        self.assertEqual((got["q"], got["q_status"], got["survival_observed"]), (self.QUERY, "observed", True))
+        none = self.facts(rows=self.claude_rows("ls"))
+        self.assertEqual((none["q"], none["q_status"]), (None, "none"))
+
+    def test_survival_is_observed_only_with_a_process_listing_and_a_resolved_lifetime(self):
+        rows = self.claude_rows()
+        self.assertEqual(self.facts(rows=rows, post={})["survival_observed"], False)
+        self.assertEqual(self.facts(rows=rows, post={"processes": None})["survival_observed"], False)
+        self.assertEqual(self.facts(rows=rows, attempt={"start": None, "end": ts(45)})["survival_observed"], False)
+        self.assertEqual(self.facts(rows=rows, pending=2)["background_pending"], 2)
+
+    def test_a_codex_attempt_takes_its_query_time_and_lifetime_from_the_rollout_copy(self):
+        rollout = {"status": "ok", "records": self.rollout(self.CARRIERS["command_item"])}
+        calls = evm().codex_calls([{"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": "sleep 300 &", "aggregated_output": "", "exit_code": 0,
+            "status": "completed"}}])
+        processes = [{"pid": 600, "start": ts(20), "comm": "sleep", "ppid": 1}, {"pid": 601, "start": ts(50), "comm": "sleep", "ppid": 1}]
+        got = self.facts(family="codex", calls=calls, attempt={"start": None, "end": None}, rollout=rollout,
+                         post={"processes": processes})
+        self.assertEqual((got["q"], got["q_status"], got["survival_observed"]), (self.QUERY, "observed", True))
+        self.assertEqual(got["survivors"], [{"comm": "sleep", "start": ts(20)}], "only the process inside the rollout's lifetime")
+
+    def test_a_codex_query_that_the_events_show_but_no_rollout_can_time_is_unobserved(self):
+        named = evm().codex_calls([{"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": "agentsview stats", "aggregated_output": "ok", "exit_code": 0,
+            "status": "completed"}}])
+        missing = {"status": "missing", "records": None}
+        got = self.facts(family="codex", calls=named, attempt={"start": None, "end": None}, rollout=missing)
+        self.assertEqual((got["q"], got["q_status"], got["survival_observed"]), (None, "unobserved", False))
+        lookalike = evm().codex_calls([{"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": "echo agentsviewer", "aggregated_output": "", "exit_code": 0,
+            "status": "completed"}}])
+        self.assertEqual(self.facts(family="codex", calls=lookalike, attempt={"start": None, "end": None}, rollout=missing)["q_status"],
+                         "none")
+
+    def codex_t14_run(self, *, with_rollout):
+        run = MiniRun(self)
+        blind = run.blind("seed-blind-1", "Verdict: yes. id 1, latency 17 ms.", agent_id="fx1", strict=False)
+        label = run.codex_exec("reuse-343-00", f"1 session matched: {blind}", shell=[("agentsview session list", "ok")],
+                               rollout=self.rollout(self.CARRIERS["custom_tool_call"]) if with_rollout else None)
+        write_json(run.captures / "arm-codex-B-post-arm.json", {"schema": "token-e2e-capture/1", "phase": "post-arm", "family": "codex",
+                                                              "arm": "B", "completed_at": "2026-10-01T01:59:00Z", "t0": {},
+                                                              "builders": {}, "processes": [], "clones": {}})
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        rows = [json.loads(line) for line in (private / "grades.jsonl").read_text(encoding="utf-8").splitlines()]
+        return next(row for row in rows if row["identity"] == label)
+
+    def test_a_codex_t14_attempt_is_graded_from_the_rollout_copy_end_to_end(self):
+        row = self.codex_t14_run(with_rollout=True)
+        component = next(part for part in row["components"] if part["id"] == "B")
+        self.assertEqual((component["status"], component["reason"]), ("pass", None))
+        self.assertEqual(row["recorded"]["t14"], {"reported": 1, "expected": 1})
+
+    def test_a_codex_t14_attempt_without_a_rollout_copy_is_unknown_not_a_failure(self):
+        row = self.codex_t14_run(with_rollout=False)
+        component = next(part for part in row["components"] if part["id"] == "B")
+        self.assertEqual((component["status"], component["reason"]), ("unknown", "archive_query_unobserved"))
 
 
 class F34_TreeDrift(GraderCase):
@@ -3997,6 +4296,22 @@ class F4b_RecoveryEvidence(GraderCase):
         self.result(self.check(self.calls(f"{self.DIGEST}", state="failed")), "fail", "recovery_missing")
         self.result(self.check(self.calls("no digest here")), "fail", "recovery_missing")
         self.result(self.check(self.calls("no digest here"), R2_17="unknown"), "unknown", "recovery_missing")
+
+    def stateless(self, result):
+        rows = [r_user("t", ts(0)), r_use("Bash", {"command": "sha256sum retained.txt"}, "toolu-fx-r1", ts(1)),
+                r_result("toolu-fx-r1", result, ts(2))]
+        calls = evm().claude_calls(rows, [], "main")
+        self.assertIsNone(calls[0]["state"])
+        return calls
+
+    def test_a_call_without_a_ledger_record_that_shows_the_digest_is_unknown_under_both_readings(self):
+        """Stage-2 review: a missing ledger record is not a failed recovery (R2-17 asks about failed or absent evidence)."""
+        calls = self.stateless(f"{self.DIGEST}  retained.txt")
+        self.result(self.check(calls), "unknown", "call_state_unknown")
+        self.result(self.check(calls, R2_17="unknown"), "unknown", "call_state_unknown")
+
+    def test_a_stateless_call_without_the_digest_is_still_a_missing_recovery(self):
+        self.result(self.check(self.stateless("no digest here")), "fail", "recovery_missing")
 
 
 class H2_StageOneGaps(GraderCase):
@@ -4145,23 +4460,33 @@ class MiniRun:
         self.launches.append({"identity": label, "actor": "agent_child", "session_id": session})
         return label
 
-    def codex_exec(self, task, text, *, arm="B", attempt=1, fetch=()):
+    def codex_exec(self, task, text, *, arm="B", attempt=1, fetch=(), shell=(), rollout=None):
+        """A Codex exec launch: the events file, U10's row (with the thread id) and, when given, the rollout copy that U10
+        retains under attempts/<identity>/rollouts/. `shell` is [(command, output)] of succeeded command items."""
         label = self.ident(arm, task, attempt)
         path = self.e2e / f"{label}.events.jsonl"
         records = [{"type": "thread.started", "thread_id": "thread-fx1"}]
         for number, url in enumerate(fetch):
             records.append({"type": "item.completed", "item": {"id": f"item_w{number}", "type": "web_search", "query": "q",
                                                               "action": {"type": "open_page", "url": url}, "status": "completed"}})
+        for number, (command, output) in enumerate(shell):
+            records.append({"type": "item.completed", "item": {"id": f"item_s{number}", "type": "command_execution",
+                                                              "command": command, "aggregated_output": output, "exit_code": 0,
+                                                              "status": "completed"}})
         records += [{"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": text}},
                     {"type": "turn.completed", "usage": {"input_tokens": 1, "output_tokens": 1}}]
         write_jsonl(path, records)
-        self.codex_rows.append({"identity": label, "actor": "codex_exec", "events_file": str(path)})
+        if rollout is not None:
+            write_jsonl(self.e2e / "codex-driver" / "attempts" / label / "rollouts" / "rollout-2026-10-05T01-00-00-thread-fx1.jsonl",
+                        rollout)
+        self.codex_rows.append({"identity": label, "actor": "codex_exec", "events_file": str(path), "thread_id": "thread-fx1"})
         return label
 
     def codex_subagent(self, task="seed-binding-1", *, arm="B", **child):
-        """A Codex sub-agent launch: the parent's and the child's rollout copies under the driver's attempts directory."""
+        """A Codex sub-agent launch: the parent's and the child's rollout copies under the driver's attempts directory
+        (U10 keeps them in attempts/<identity>/rollouts/)."""
         label = self.ident(arm, task)
-        directory = self.e2e / "codex-driver" / "attempts" / label
+        directory = self.e2e / "codex-driver" / "attempts" / label / "rollouts"
         write_jsonl(directory / "rollout-2026-10-05T01-00-00-thread-fx1.jsonl",
                     rollout({"type": "session_meta", "payload": {"id": "thread-fx1"}}, turn_context()))
         records = child_rollout(**child)
@@ -4308,6 +4633,16 @@ class F27_Identity(GraderCase):
         run = MiniRun(self).default_run()
         run.launches.append({"identity": run.ident("B", "seed-main-output", 2), "actor": "main", "session_id": "sess-main-1"})
         self.assertRefusal(run.identity(), "E_IDENTITY_SOURCE", kind="main")
+
+    def test_a_dedicated_main_session_that_called_an_agent_is_not_refused(self):
+        """Stage-2 review: a main session of one launch record is dedicated even when the model called the Agent tool once;
+        only a session that hosts Workflow runs (subagents/workflows/) or several launch records is shared."""
+        run = MiniRun(self).default_run()
+        write_jsonl(run.root / "proj-fixture" / "sess-main-1" / "subagents" / "agent-fx4.jsonl", [r_user("t", ts(0))])
+        proc = run.identity()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        _, rows = self.rows()
+        self.assertIn((run.ident("B", "seed-main-output"), "main"), rows)
 
     def test_two_agent_calls_in_the_harness_session_are_refused(self):
         run = MiniRun(self)
@@ -4473,8 +4808,9 @@ class F16_GradeCommand(GraderCase):
         proc, private, out = run.grade()
         self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
         aggregate = json.loads(out.read_text(encoding="utf-8"))
-        self.assertEqual(aggregate["m11_roles"], {"A": {"children": 1, "pass": 0, "fail": 1, "unknown": 0},
-                                                  "B": {"children": 1, "pass": 1, "fail": 0, "unknown": 0}})
+        self.assertEqual(aggregate["m11_roles"],
+                         {"A": {"children": 1, "pass": 0, "fail": 1, "unknown": 0, "not_applicable": 0},
+                          "B": {"children": 1, "pass": 1, "fail": 0, "unknown": 0, "not_applicable": 0}})
 
     def test_a_role_child_without_its_inputs_is_unknown_never_a_pass(self):
         run = MiniRun(self)  # no role file at exec_rev and no parent server set in the bindings
@@ -4482,7 +4818,17 @@ class F16_GradeCommand(GraderCase):
         self.assertEqual(run.identity().returncode, 0)
         proc, private, out = run.grade()
         aggregate = json.loads(out.read_text(encoding="utf-8"))
-        self.assertEqual(aggregate["m11_roles"], {"B": {"children": 1, "pass": 0, "fail": 0, "unknown": 1}})
+        self.assertEqual(aggregate["m11_roles"], {"B": {"children": 1, "pass": 0, "fail": 0, "unknown": 1, "not_applicable": 0}})
+
+    def test_a_no_role_child_does_not_stop_the_grade(self):
+        """Stage-2 review: every run has a no-role child (seed-binding-4); the grade must publish it, not crash."""
+        run = MiniRun(self, roles=True)
+        run.codex_subagent("seed-binding-4", arm="B", agent_role=None)
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["m11_roles"], {"B": {"children": 1, "pass": 0, "fail": 0, "unknown": 0, "not_applicable": 1}})
 
     def write_judgments(self, run, name, **judgment):
         path = run.tmp / name
@@ -4592,6 +4938,112 @@ class F16_GradeCommand(GraderCase):
         proc = run_grade(run.grade_args(private, out))
         self.assertRefusal(proc, "E_M12_INPUTS", kind="blind_workflow", field="hook_rows")
         self.assertFalse(private.exists() or out.exists(), "nothing is written when a refusal stops the grade")
+
+    def test_m12_measures_cleanliness_and_never_the_correctness_of_the_blind_answers(self):
+        """Stage-2 review: five clean blind attempts with wrong verdicts still pass M12 (their tasks fail G-Q, not M12)."""
+        run = MiniRun(self)
+        for number in range(1, 6):
+            run.blind(f"seed-blind-{number}", "Verdict: no.", agent_id=f"fxb{number}", strict=False)
+        run.blind("seed-blind-positive", "Events [1, 2, 3, 4, 5], all INFO.", agent_id="fxp", strict=False, read_hook=True, hooks=1)
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["m12"]["blind"]["seed-blind-1"]["clean"], 1)
+        self.assertEqual((aggregate["m12"]["status"], aggregate["m12"]["reason"]), ("pass", None), aggregate["m12"])
+        self.assertEqual(json.loads(proc.stdout)["m12"], "pass")
+
+    def test_codex_toon_seeded_attempts_count_toward_m7(self):
+        """Stage-2 review: design R14 counts the toon-seeded tasks of both families (five and five), through a Codex
+        command_execution item as well as a Claude Bash call."""
+        run = MiniRun(self)
+        encoded = toon_encode(web_key()["records"]) + "\n" + "\n".join(STATUS_LINES)
+        run.codex_exec("seed-codex-web-table-1", run.web_answer(), fetch=(JSON_URL, PATHLIB_URL),
+                       shell=[("toon --stats seed.json", encoded)])
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        m7 = json.loads(out.read_text(encoding="utf-8"))["m7"]
+        self.assertEqual((m7["seeded_payloads"], m7["encoded_lower"], m7["ineligible_encodes_lower"]), (1, 1, 0))
+
+    def test_the_toon_facts_keep_the_wrapper_reading_as_a_stored_alternative(self):
+        """RC-N15: the private record holds the M7 facts under the decided root-array reading and under the single-key
+        wrapper alternative, so the published alternatives can re-evaluate M7 without the transcript."""
+        run = MiniRun(self)
+        wrapped = toon_encode({"records": web_key()["records"]}) + "\n" + "\n".join(STATUS_LINES)
+        label = run.codex_exec("seed-codex-web-table-1", run.web_answer(), fetch=(JSON_URL, PATHLIB_URL),
+                               shell=[("toon --stats seed.json", wrapped)])
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        record = next(json.loads(line) for line in (private / "evidence.jsonl").read_text(encoding="utf-8").splitlines()
+                      if json.loads(line)["identity"] == label)
+        toon = record["facts"]["toon"]
+        self.assertEqual((toon["base"]["encode"], toon["base"]["ineligible"]), ("not_encoded", 1))
+        alternative = toon["variants"]["R2-01|single_key_wrapper"]
+        self.assertEqual((alternative["encode"], alternative["ineligible"]), ("encoded", 0))
+
+    def test_a_toon_payload_in_any_arm_b_answer_is_a_round_trip_item(self):
+        """Design R14: 'every TOON payload in any arm-B answer' (T9 and T16-T20), not only the seeded attempts'. This
+        fixture has no frozen original for T9, so the item is unknown under the decided R2-16 reading."""
+        run = MiniRun(self)
+        text = "```toon\n" + toon_encode(web_key()["records"]) + "\n```"
+        run.workflow("B", "reuse-296-09", answer_rows(text), {"answer": text, "evidence": []}, agent_id="fx3")
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        m7 = json.loads(out.read_text(encoding="utf-8"))["m7"]
+        self.assertEqual((m7["seeded_payloads"], m7["roundtrip"]["checked"], m7["roundtrip"]["unknown"]), (0, 1, 1))
+
+    def unlisted_qmd_rows(self, run):
+        spec = json.loads(run.spec.read_text(encoding="utf-8"))
+        qmd = [task["id"] for task in spec["tasks"] if "qmd" in task["lane_tags"] and "B" in task["arms"]]
+        self.assertEqual(len(qmd), 5)
+        base = {"schema": "token-e2e-adoption-join/1", "actor": "workflow_child", "arm": "B", "join": "unjoined", "complete": False,
+                "incomplete_cause": None, "agent_id": None, "excluded_kind": None}
+        lanes = {"qmd": {"state": "unknown", "reason": "unlisted_attempt", "via": []},
+                 "ai-memory": {"state": "unknown", "reason": "unlisted_attempt", "via": []}}
+        rows = [dict(base, identity=run.ident("B", qmd[0], number), task=qmd[0], attempt=number, source="unlisted",
+                     reason="unlisted_attempt", lanes=lanes) for number in (1, 2)]
+        rows += [dict(base, identity=None, task=task, attempt=0, source="not_launched", reason="not_launched",
+                      lanes={lane: dict(state, reason="not_launched") for lane, state in lanes.items()}) for task in qmd[1:]]
+        return rows
+
+    def test_m8_opportunities_follow_the_join_ledger_rows(self):
+        """Design R15: O counts U4's join-ledger rows: an unlisted attempt is an opportunity and a recorded attempt, and a task
+        with none has a not_launched row. Two unlisted attempts of one qmd task and four never launched give O 6 and R 2."""
+        run = MiniRun(self)
+        run.join_rows += self.unlisted_qmd_rows(run)
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
+        self.assertEqual((qmd["O"], qmd["R"], qmd["correct_lower"], qmd["correct_upper"], qmd["status"]), (6, 2, 0, 6, "incomplete"))
+        for name in ("join-claude.jsonl", "join-codex.jsonl"):
+            self.assertEqual(stat.S_IMODE((private / name).stat().st_mode), 0o600)
+
+    def test_m8_falls_back_to_the_records_for_a_family_without_a_ledger(self):
+        run = MiniRun(self)
+        self.assertEqual(run.identity().returncode, 0)
+        private, out = run.tmp / "private-nojoin", run.tmp / "aggregate-nojoin.json"
+        args = run.grade_args(private, out)
+        stripped = [item for index, item in enumerate(args) if item != "--join-ledger" and args[index - 1] != "--join-ledger"]
+        proc = run_grade(stripped)
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
+        self.assertEqual((qmd["O"], qmd["R"]), (5, 0), "five planned tasks, none launched")
+        self.assertFalse((private / "join-claude.jsonl").exists())
+
+    def test_regrade_keeps_the_join_ledger_in_the_private_directory(self):
+        run = MiniRun(self)
+        run.join_rows += self.unlisted_qmd_rows(run)
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        again, out2 = self.tmp / "private-again", self.tmp / "aggregate-again.json"
+        redo = run_grade(["regrade", "--from", private, "--out-private", again, "--out", out2])
+        self.assertIn(redo.returncode, (0, 1), sanitize(redo.stderr))
+        self.assertEqual(sha256_file(out), sha256_file(out2))
+        self.assertEqual((private / "join-claude.jsonl").read_bytes(), (again / "join-claude.jsonl").read_bytes())
 
     def test_the_grade_needs_its_inputs_after_the_spec_check(self):
         run = MiniRun(self).default_run()
@@ -4715,9 +5167,11 @@ def mcp_item(server, number=0):
 
 def child_rollout(*, agent_role="stack-researcher", texts=(ROLE["developer_instructions"],), context=None, servers=("ai-memory",),
                   inherited=(), item_servers=()):
-    records = [{"type": "session_meta", "payload": {"id": "thread-fx2", "agent_role": agent_role, "parent_thread_id": "thread-fx1",
-                                                     "source": {"subagent": {}},
-                                                     "subagent_history_start_ordinal": len(inherited) + 1}}]
+    meta = {"id": "thread-fx2", "parent_thread_id": "thread-fx1", "source": {"subagent": {}},
+            "subagent_history_start_ordinal": len(inherited) + 1}
+    if agent_role is not None:  # a child that applied no role has no agent_role in its session_meta
+        meta["agent_role"] = agent_role
+    records = [{"type": "session_meta", "payload": meta}]
     records += list(inherited)
     records += [dev_message(text) for text in texts]
     records += [context or turn_context()]
@@ -4797,9 +5251,17 @@ class F36_RoleChildState(GraderCase):
 
     def test_the_arm_counts_are_published(self):
         got = evm().m11_summary([{"arm": "B", "status": "pass"}, {"arm": "B", "status": "fail"},
-                                 {"arm": "B", "status": "unknown"}, {"arm": "A", "status": "pass"}])
-        self.assertEqual(got, {"A": {"children": 1, "pass": 1, "fail": 0, "unknown": 0},
-                               "B": {"children": 3, "pass": 1, "fail": 1, "unknown": 1}})
+                                 {"arm": "B", "status": "unknown"}, {"arm": "A", "status": "pass"},
+                                 {"arm": "B", "status": "not_applicable"}])
+        self.assertEqual(got, {"A": {"children": 1, "pass": 1, "fail": 0, "unknown": 0, "not_applicable": 0},
+                               "B": {"children": 4, "pass": 1, "fail": 1, "unknown": 1, "not_applicable": 1}})
+
+    def test_a_child_that_applied_no_role_is_not_applicable_not_an_error(self):
+        """Stage-2 review: seed-binding-4 spawns a no-role child in every run; it has no role to compare with."""
+        child = child_rollout(agent_role=None)
+        self.assertNotIn("agent_role", child[0]["payload"])
+        got = evm().m11_summary([{"arm": "B", "status": "not_applicable"}])
+        self.assertEqual(got, {"B": {"children": 1, "pass": 0, "fail": 0, "unknown": 0, "not_applicable": 1}})
 
 
 class F37_CodexSubagent(GraderCase):
@@ -4809,8 +5271,9 @@ class F37_CodexSubagent(GraderCase):
     IDENT = f"{RUN_TOKEN}.B.seed-binding-1.1"
 
     def driver(self, records, name="rollout-2026-10-05T01-00-00-thread-fx2.jsonl", root=None):
+        """U10 keeps its rollout copies in attempts/<identity>/rollouts/ (design section 3.1; codex_launch.copy_rollouts)."""
         root = root or self.tmp / "codex-driver"
-        write_jsonl(root / "attempts" / self.IDENT / name, records)
+        write_jsonl(root / "attempts" / self.IDENT / "rollouts" / name, records)
         return root
 
     @staticmethod
@@ -4852,11 +5315,71 @@ class F37_CodexSubagent(GraderCase):
 
     def test_a_missing_or_compressed_rollout_is_not_guessed(self):
         self.assertEqual(self.attempt(self.tmp / "codex-driver")["class"], "unresolved")
-        directory = self.tmp / "codex-driver" / "attempts" / self.IDENT
+        directory = self.tmp / "codex-driver" / "attempts" / self.IDENT / "rollouts"
         directory.mkdir(parents=True)
         (directory / "rollout-x-thread-fx2.jsonl.zst").write_bytes(b"\x28\xb5\x2f\xfd")
         attempt = self.attempt(self.tmp / "codex-driver")
         self.assertEqual(attempt["carrier"], {"status": "unknown", "reasons": ["parse"]})
+
+    def test_a_copy_beside_the_rollouts_directory_is_not_where_u10_keeps_it(self):
+        """Stage-2 review: the copies are read from attempts/<identity>/rollouts/ only; a file one level up is not guessed."""
+        records = rollout({"type": "session_meta", "payload": {"id": "thread-fx2"}}, self.said("one"))
+        write_jsonl(self.tmp / "codex-driver" / "attempts" / self.IDENT / "rollout-2026-10-05T01-00-00-thread-fx2.jsonl", records)
+        self.assertEqual(self.attempt(self.tmp / "codex-driver")["class"], "unresolved")
+
+
+class F38_BridgeValidation(GraderCase):
+    """Stage-2 review: the bridge reports a failed table only for an error the validator itself coded E_*; any other exception
+    means the check could not run, which is unchecked (ok null) and never a refusal. The kernel here is a fixture module in a
+    copy of the bridge's tree, so the answer does not depend on which sibling names have merged."""
+
+    KERNEL = """
+export function validateIdentityTable(table, options) {
+  if (table.mode === 'coded') { const error = new Error('bad row'); error.code = 'E_ROW'; throw error }
+  if (table.mode === 'system') { const error = new Error('bad argument'); error.code = 'ERR_INVALID_ARG_TYPE'; throw error }
+  if (table.mode === 'type') { return table.missing.field }
+  return { rows: 0, options }
+}
+"""
+
+    def bridge_copy(self):
+        root = self.tmp / "bridge-copy"
+        (root / "tools" / "token-e2e").mkdir(parents=True, exist_ok=True)
+        (root / "examples" / "claude-native" / "workflows").mkdir(parents=True, exist_ok=True)
+        shutil.copy(TOOLS / "node_bridge.mjs", root / "tools" / "token-e2e" / "node_bridge.mjs")
+        (root / "examples" / "claude-native" / "workflows" / "child-usage.mjs").write_text(self.KERNEL, encoding="utf-8")
+        return root / "tools" / "token-e2e" / "node_bridge.mjs"
+
+    def ask(self, mode):
+        require_node()
+        proc = subprocess.run(["node", str(self.bridge_copy())], input=json.dumps({"op": "validate_identity", "table": {"mode": mode},
+                                                                                    "options": {}}),
+                              capture_output=True, text=True, timeout=60)
+        self.assertEqual(proc.returncode, 0, proc.stderr[:200])
+        return json.loads(proc.stdout)
+
+    def test_a_coded_validation_error_is_a_failed_table(self):
+        got = self.ask("coded")
+        self.assertEqual((got["available"], got["ok"], got["code"]), (True, False, "E_ROW"))
+
+    def test_an_exception_without_a_validator_code_is_unchecked(self):
+        for mode in ("type", "system"):
+            with self.subTest(mode):
+                got = self.ask(mode)
+                self.assertEqual((got["available"], got["ok"]), (True, None))
+                self.assertNotIn("code", got)
+
+    def test_a_table_the_validator_accepts_is_ok(self):
+        got = self.ask("fine")
+        self.assertEqual((got["available"], got["ok"]), (True, True))
+
+    def test_the_identity_command_reads_the_answer_in_three_ways(self):
+        ev = evm()
+        self.assertEqual(ev.validator_state({"available": False}), "absent")
+        self.assertEqual(ev.validator_state({"available": True, "ok": True}), "agrees")
+        self.assertEqual(ev.validator_state({"available": True, "ok": None}), "unchecked")
+        self.assertRefused(lambda: ev.validator_state({"available": True, "ok": False, "code": "E_ROW"}), "E_IDENTITY_INVALID",
+                           code="E_ROW")
 
 
 # ---- F19 (stage-2 subset): disarmed-guard mutants --------------------------------------------------------------------
