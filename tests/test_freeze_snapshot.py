@@ -563,9 +563,12 @@ class FixtureSanityTests(HostCase):
         self.assertEqual(sorted(shown.split()), ["LoadState=loaded", "MainPID=1001"])
         self.assertIn("not-found", out("systemctl", "--user", "show", "cognee-live", "-p", "LoadState"))
         self.assertNotIn("UNIT_SECRET", out("systemctl", "--user", "show", "omniroute", "-p", "ActiveState"))
-        self.assertEqual(subprocess.run(["systemctl", "--user", "show", "x", "-p", "A"], env={**env, "PATH": str(self.host.sysbin)},
-                                        capture_output=True).returncode if shutil.which("systemctl", path=str(self.host.sysbin)) else 127, 127,
-                         "the real systemctl must not be reachable from the fixture PATH")
+        self.assertEqual(env["PATH"].split(os.pathsep), [str(self.host.bin), str(self.host.sysbin)],
+                         "the fixture PATH holds only the fakes and a few symlinked utilities")
+        for name in ("claude", "codex", "rtk", "node", "python3", "qmd", "systemctl", "git"):
+            found = shutil.which(name, path=env["PATH"])
+            self.assertIsNotNone(found, name)
+            self.assertEqual(Path(found).parent, self.host.bin, f"{name} must resolve to the fake, never to a real command")
 
     def test_fake_repo_is_a_clean_checkout_with_the_repo_scripts(self):
         self.assertEqual(self.host.git("--no-optional-locks", "status", "--porcelain", "--untracked-files=no"), "")
