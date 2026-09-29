@@ -882,8 +882,7 @@ def end_group(command) -> None:
     still unreaped and so holds the group's number (Command). Nothing is signalled when nothing but the command's own
     zombie is left. run_command calls it on every way out, and reaps the command afterwards. A descendant that left the
     group (setsid or setpgid) is out of reach. The same order as bazelbuild/bazel@d2545923
-    src/main/tools/process-tools.cc KillEverything (L94-110: SIGTERM to -pgrp, a timeout, SIGKILL to -pgrp), which
-    signals after waitpid has reaped its child.
+    src/main/tools/process-tools.cc KillEverything (L94-110: SIGTERM to -pgrp, a timeout, SIGKILL to -pgrp).
 
     Where the exit cannot be seen without reaping (command.pinned is False) the group cannot be seen to empty either,
     and once the command is reaped it may not be signalled: a command that is still unreaped (the runner failed while

@@ -209,7 +209,8 @@ not a boundary.
   acts, the group's number is nobody's for a moment: on a host with a small
   process-id space (macOS numbers stop at 99,999) it could in theory have
   been given to a stranger, whose group the watchdog would then signal. The
-  watchdog reacts within milliseconds, which bounds that window. The runner
+  watchdog reacts within milliseconds (about 1.3 ms, measured once on an
+  idle host), which bounds that window. The runner
   itself never signals a group after it has reaped the command, but it can
   see the exit without reaping the command, and count the group's live
   members, only on Linux: macOS has no `/proc`, and its Python has no

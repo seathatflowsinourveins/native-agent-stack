@@ -728,7 +728,10 @@ is.
   that pipes crash dumps; the rest pass), and one run of coreutils
   `timeout -k` against the runner with a command and a descendant that both
   ignore `SIGTERM`, in a synthetic store: `timeout` killed the runner, and
-  both were gone about 3 s after it returned.
+  both were gone about 3 s after it returned; and the watchdog's reaction,
+  25 runs on an idle host, from the pipe's closing to the death by
+  `SIGTERM` of a sleeping member of its group: median 1.3 ms, largest
+  1.4 ms (the figure behind "promptly").
 - *Not yet observed*: the runner on macOS, including the Command Line Tools
   `python3` and the watchdog, a
   real key through it (the canary harness is a later change), a host that
