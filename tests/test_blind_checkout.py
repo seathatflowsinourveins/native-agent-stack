@@ -552,6 +552,11 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
         (self.source / "docs" / "new-host-grand-list.md").write_text("| Workers | retain | `codex` |\n", encoding="utf-8")
         (self.source / "docs" / "component-evidence-matrix.md").write_text("| workers | codex |\n", encoding="utf-8")
         self.write("catalogs/landscape/blind-convergence.json", {"rows": [{"coordinator_disposition": "codex"}]})
+        # The ranked catalog index names each layer's winner by value (placements[].role), under no key the scan
+        # below looks for, so its removal is asserted by path.
+        self.write("catalogs/landscape/catalog-index.json",
+                   {"layers": [{"ref": "layer:foundation/workers",
+                                "placements": [{"entity": "repo:openai/codex", "role": "winner", "position": 1}]}]})
         self.write("catalogs/sota-convergence/manifest-20260923.json",
                    {"components": [{"id": "codex", "why_selected": "incumbent"}]})
         self.write("catalogs/sota-convergence/sdk-runtime-coverage-20260923.json", {"incumbents": ["codex"]})
@@ -569,11 +574,13 @@ class CatalogWinnerKeyTests(BlindCheckoutFixture):
         self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
         for removed in ("catalogs/landscape/component-evidence-matrix.json",
                         "catalogs/landscape/new-host-grand-list.json", "catalogs/landscape/blind-convergence.json",
+                        "catalogs/landscape/catalog-index.json",
                         "docs/component-evidence-matrix.md", "docs/new-host-grand-list.md",
                         "catalogs/sota-convergence/manifest-20260923.json",
                         "catalogs/sota-convergence/sdk-runtime-coverage-20260923.json"):
             self.assertFalse((export / removed).exists(), removed)
-        for removed in ("docs/component-evidence-matrix.md", "docs/new-host-grand-list.md"):
+        for removed in ("docs/component-evidence-matrix.md", "docs/new-host-grand-list.md",
+                        "catalogs/landscape/catalog-index.json"):
             self.assertFalse((self.dest / removed).exists(), removed)
         pattern = re.compile(r"winners|incumbent|disposition|why_selected|current_selection_record", re.IGNORECASE)
         offending = []

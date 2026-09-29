@@ -86,7 +86,8 @@ and treat the projection as superseded guidance rather than looking for it to ha
    for its bootstrap, Codex user-scope MCP servers and coverage-check order.
 5. Record each component that ran with `python3 scripts/host_receipts.py record`
    (`--qualified-model` for any local runtime model you qualified there), then
-   `python3 scripts/component_matrix.py --write` and `python3 scripts/new_host_grand_list.py --write`.
+   `python3 scripts/component_matrix.py --write`, `python3 scripts/new_host_grand_list.py --write` and
+   `python3 scripts/catalog_index.py --write`.
    A `--stage use` receipt of a component that several catalog layers list names the layer(s) it
    exercised with `--layer-ref <catalog>/<layer_id>`
    ([contributing evidence](contributing-evidence.md), section 3 step 3; changed after `v2026.09.26`).

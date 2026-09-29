@@ -38,8 +38,9 @@ winner, records a landscape verdict, or flips a `platform_status`):
    with `--layer-ref <catalog>/<layer_id>` (section 3 step 3;
    changed after `v2026.09.26`).
 4. **Refresh the derived views.** `python3 scripts/component_matrix.py
-   --write`, then `python3 scripts/new_host_grand_list.py --write` (section 5
-   below). The grand list's "Qualified local models" section is built from
+   --write`, then `python3 scripts/new_host_grand_list.py --write`, then
+   `python3 scripts/catalog_index.py --write` (section 5 below). The grand
+   list's "Qualified local models" section is built from
    step 3's receipts; the runtime component's own winner row in the matrix
    carries them per platform too.
 5. **See what could flip.** `python3 scripts/verdict_flip_candidates.py`
@@ -307,10 +308,12 @@ Every receipt also names one `stage`. Two decide a platform status:
    ```sh
    python3 scripts/component_matrix.py --write
    python3 scripts/new_host_grand_list.py --write
+   python3 scripts/catalog_index.py --write
    ```
 
-   The second command refreshes the new-host grand list, which joins the matrix; its `--check` also
-   runs in CI.
+   The second command refreshes the new-host grand list, which joins the matrix; the third refreshes
+   the ranked catalog index, which joins the matrix and reads the host receipts too. Both `--check`
+   runs are in CI.
 
    `--write` recomputes and writes both
    `catalogs/landscape/component-evidence-matrix.json` and
@@ -412,9 +415,10 @@ Every receipt also names one `stage`. Two decide a platform status:
    for a reviewer that really is separate. `review` refuses to run when this
    host's clock is behind the receipt's `observed_at_utc`, because the review
    would be dated before the observation. This step re-registers
-   the file's hash after the review is appended; rerun step 5's
-   `component_matrix.py --write` afterward, since a new review can change the
-   matrix's receipt counts and derived status.
+   the file's hash after the review is appended; rerun step 5's three
+   `--write` commands afterward, since a new review can change the
+   matrix's receipt counts and derived status, which the grand list and the
+   ranked catalog index join.
 9. **Merge.** A maintainer merges once CI's
    `python3 scripts/host_receipts.py validate` step is green and at least one
    independent review is present or explicitly requested in the PR (the

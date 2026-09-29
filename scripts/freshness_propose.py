@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """Build the catalog-freshness drift report, and turn a detected drift into a
 reviewable, report-only evidence branch: copy the artifact, write a
-``scripts/validate.py``-shaped receipt, register every new file's hash, and
-(only when it is still a tracked, non-build-artifact file) rebuild and rehash
-the public explorer.
+``scripts/validate.py``-shaped receipt, register every new file's hash,
+regenerate the ranked catalog index when git tracks it, and (only when it is
+still a tracked, non-build-artifact file) rebuild and rehash the public
+explorer.
 
-This module never selects, evaluates, or writes to a catalog file:
+This module never selects, evaluates, or edits a catalog file:
 ``catalogs/sota-convergence/*``, ``catalogs/landscape/*.json``,
 ``manifests/stack.json`` and ``layer-verdicts*`` stay owned by the separate
 SOTA-convergence lane review (see ``recipes/sota-convergence-practice.md``).
-It only ever adds files under ``evidence/artifacts/`` and
-``evidence/receipts/``, and updates ``manifests/evidence.json``'s
-registration and receipt list. It is invoked from two places in
+It adds files under ``evidence/artifacts/`` and ``evidence/receipts/``,
+updates ``manifests/evidence.json``'s registration and receipt list, and
+rewrites exactly one generated file, ``catalogs/landscape/catalog-index.json``,
+through ``scripts/catalog_index.py --write`` and only when git tracks it: that
+index joins every ``receipts[]`` entry, so the new receipt would otherwise
+leave it stale and CI's ``--check`` would refuse the evidence PR (see the
+2026-09-29 addendum of ``docs/decisions/2026-09-23-bot-pr-dispatch.md``). It
+is invoked from two places in
 ``.github/workflows/catalog-freshness.yml``: ``build_drift_report()`` from
 the ``freshness`` job's own diff step (so the drift-table header text and
 the drift-vs-unfetched rule live in exactly one place, not duplicated
@@ -62,6 +68,8 @@ TRADING_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- | --- | ---
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
+# The one generated catalog file this module rewrites (scripts/catalog_index.py OUTPUT_JSON).
+CATALOG_INDEX_PATH = "catalogs/landscape/catalog-index.json"
 PUBLISHED_MANIFEST_DIR = "catalogs/sota-convergence"
 # Mirrors tools/sota-convergence/build_manifest.py's github_repo_slug() (kept
 # independent here, the same way that module's own copy mirrors
@@ -459,8 +467,10 @@ def build_receipt(receipt_id: str, component_ids: list[str], drifted_component_c
             f"Scheduled catalog-freshness run ({run_url}) rebuilt the SOTA-convergence manifest and "
             f"found {drifted_component_count} component(s) with pin/upstream drift against the "
             "currently published manifest. This receipt, and the branch/PR it is registered from, are "
-            "report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, "
-            "manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this "
+            "report-only: no catalogs/sota-convergence/*, manifests/stack.json or layer-verdicts* file, "
+            "and no catalogs/landscape/*.json file other than the generated "
+            "catalogs/landscape/catalog-index.json (which scripts/catalog_index.py --write regenerates, "
+            "when git tracks it, so that it joins this receipt), was selected, evaluated, or changed by this "
             "run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, "
             "produced by the existing SOTA-convergence lane review, not by this automation."
         ),
@@ -609,12 +619,33 @@ def rebuild_explorer(root: Path, attempts: int = 3) -> None:
     )
 
 
+def regenerate_catalog_index(root: Path) -> None:
+    """Rewrite catalogs/landscape/catalog-index.json with ``scripts/catalog_index.py --write``,
+    which re-registers its own hash in manifests/evidence.json.
+
+    The index joins every ``receipts[]`` entry
+    (docs/decisions/2026-09-29-catalog-index-ranking.md), so after ``register_receipt`` it
+    is stale until rewritten, and the evidence PR's validate run would fail at
+    ``catalog_index.py --check``. Like rebuild_explorer(), the subprocess's one-line JSON
+    summary is captured, never inherited, so main() still prints exactly one JSON document;
+    a failure raises with the tail of its output."""
+    result = subprocess.run(
+        ["python3", "scripts/catalog_index.py", "--write"],
+        cwd=root, check=False, capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        raise FreshnessProposeError(
+            f"scripts/catalog_index.py --write failed with exit {result.returncode}: "
+            f"{((result.stdout or '') + (result.stderr or ''))[-2000:]}"
+        )
+
+
 def apply(root: Path, artifact_dir: Path, run_url: str, checked_at_utc: str | None = None) -> dict:
     """Build the artifact copy, receipt and registration for one catalog-freshness run.
 
     Returns a small JSON-serializable summary the calling workflow step reads
     (receipt path, artifact paths, resolved component_ids, and whether the
-    explorer was rehashed).
+    catalog index was regenerated and the explorer rehashed).
     """
     checked_at_utc = checked_at_utc or utc_now()
     date_stamp = checked_at_utc[:10].replace("-", "")
@@ -649,6 +680,12 @@ def apply(root: Path, artifact_dir: Path, run_url: str, checked_at_utc: str | No
         register_file(root, relative)
     register_receipt(root, receipt, receipt_relative)
 
+    # After register_receipt, which the index joins, and before the explorer, which embeds the index.
+    regenerated_catalog_index = False
+    if is_git_tracked(root, CATALOG_INDEX_PATH):
+        regenerate_catalog_index(root)
+        regenerated_catalog_index = True
+
     rehashed_explorer = False
     if is_git_tracked(root, EXPLORER_PATH):
         rebuild_explorer(root)
@@ -660,6 +697,7 @@ def apply(root: Path, artifact_dir: Path, run_url: str, checked_at_utc: str | No
         "artifact_paths": [drift_relative, manifest_relative],
         "component_ids": component_ids,
         "drifted_component_count": len(drifted_ids),
+        "regenerated_catalog_index": regenerated_catalog_index,
         "rehashed_explorer": rehashed_explorer,
     }
 

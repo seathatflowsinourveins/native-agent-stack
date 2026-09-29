@@ -23,6 +23,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 .catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
 .foundation-repos{padding-left:18px;font-size:12px}.foundation-repos li{margin:9px 0}.foundation-repos code{display:block;font-size:10px;overflow-wrap:anywhere;color:var(--muted)}.foundation-surfaces{margin:20px 0}.foundation-surfaces h4{font-size:14px;margin:0 0 10px}.foundation-surface{border-left:2px solid var(--line);padding-left:12px;margin:16px 0}.foundation-surface h5{font-size:13px;margin:0 0 6px}.foundation-surface p{font-size:12px;margin:8px 0}.foundation-surface .catalog-sources{margin:9px 0}.foundation-surface .native-code{max-width:100%}
 .convergence-table{min-width:1100px}.convergence-table td{min-width:0}.convergence-detail{margin:24px 0 36px}.convergence-detail .catalog-facts{grid-template-columns:minmax(120px,1fr) minmax(0,4fr)}
+.ranking-controls{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:20px}.ranking-card{margin:0 0 22px}.ranking-card .table-wrap{margin-top:12px}.ranking-table{min-width:1100px}.ranking-table td{min-width:0}.ranking-note{font-size:12px;color:var(--muted)}@media(max-width:670px){.ranking-controls{grid-template-columns:1fr 1fr}}
 .navigation{gap:20px;overflow-x:auto;flex-wrap:nowrap}.navigation button{flex-shrink:0}.landscape-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0 42px}.landscape-card{border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);min-width:0}.landscape-card h3{margin:12px 0}.landscape-card p{font-size:13px;margin:12px 0}.landscape-choice{background:#edf1e7;border-radius:8px;padding:14px}.landscape-choice strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}.landscape-candidate{border-top:1px solid var(--line);padding:14px 0}.landscape-candidate h4{font-size:14px;margin:0 0 8px}.landscape-candidate a{overflow-wrap:anywhere}.landscape-candidate p{font-size:12px}.landscape-candidate .badges{margin:9px 0}.landscape-card details{margin-top:17px}.landscape-card .catalog-sources{font-size:10px}.landscape-summary{margin-bottom:22px}.landscape-summary p{margin-top:12px}.landscape-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.landscape-tag{display:inline-block;padding:4px 9px;background:var(--sand);border-radius:5px;font-size:10px}.landscape-tag.selected{background:var(--lime)}.landscape-tag.observed_failure{background:#f5ddd2;color:#873f28}.landscape-legend{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}.landscape-legend span{font-size:11px}.landscape-candidate .catalog-sources{display:block}.landscape-candidate .catalog-sources a{display:block;margin-top:6px}.landscape-grid .catalog-empty{grid-column:1/-1}@media(max-width:850px){.landscape-grid{grid-template-columns:1fr}.landscape-card{padding:21px}}
 </style>
 </head>
@@ -42,6 +43,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <button role="tab" id="tab-trading" aria-controls="trading" aria-selected="false" tabindex="-1" data-tab="trading" data-catalog-tab hidden>Trading</button>
 <button role="tab" id="tab-landscape" aria-controls="landscape" aria-selected="false" tabindex="-1" data-tab="landscape" hidden>Choices & alternatives</button>
 <button role="tab" id="tab-convergence" aria-controls="convergence" aria-selected="false" tabindex="-1" data-tab="convergence" hidden>Convergence by layer</button>
+<button role="tab" id="tab-ranking" aria-controls="ranking" aria-selected="false" tabindex="-1" data-tab="ranking" hidden>Ranked by evidence</button>
 <button role="tab" id="tab-explorer" aria-controls="explorer" aria-selected="false" tabindex="-1" data-tab="explorer"><span class="tab-number">02</span>Repository explorer</button>
 <button role="tab" id="tab-setup" aria-controls="setup" aria-selected="false" tabindex="-1" data-tab="setup"><span class="tab-number">03</span>Selected stack & setup</button>
 <button role="tab" id="tab-efficiency" aria-controls="efficiency" aria-selected="false" tabindex="-1" data-tab="efficiency"><span class="tab-number">04</span>Token efficiency</button>
@@ -87,6 +89,15 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div id="convergence-actions" class="landscape-actions"></div>
 <div class="table-wrap"><table class="token-table convergence-table"><thead><tr><th>Layer</th><th>layer_state</th><th>Verdict checked_at</th><th>Reopened by</th><th>in_use</th><th>converged</th><th>verdict_winner true/false/unknown</th><th>pin_current true/false/unknown</th><th>host_e2e true/false/unknown</th><th>all_rows</th><th>recorded_winner_rows</th><th>Unresolved</th><th>invoke</th></tr></thead><tbody id="convergence-rows"></tbody></table></div>
 <details class="catalog-card convergence-detail" open><summary>Definitions, unresolved rows and join gaps</summary><div id="convergence-definitions"></div></details>
+</section>
+<section id="ranking" role="tabpanel" aria-labelledby="tab-ranking" hidden>
+<div class="page-heading"><div><div class="eyebrow">Evidence order / within each layer</div><h2>Ranked by evidence</h2><p>Order within each layer uses, in turn, recorded role, evidence tier, host verification at the pin on linux-wsl2-x86_64, then comparable measurement (none recorded yet). Host verification at the pin means an independently reviewed use-stage host receipt on that platform that records the winner's verdict pin or, for an alternative, the manifests/stack.json version of the component sharing its repository; below it, winners order by their derived status. Nothing is blended into a score; tied entries share a position. Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.</p></div></div>
+<div id="ranking-summary" class="scope-note landscape-summary"></div>
+<div id="ranking-actions" class="landscape-actions"></div>
+<div class="controls ranking-controls"><div class="control"><label for="ranking-layer">Layer</label><select id="ranking-layer"><option value="">All layers</option></select></div><div class="control"><label for="ranking-catalog">Catalog</label><select id="ranking-catalog"><option value="">Both catalogs</option><option value="foundation">Foundation</option><option value="us-equities">US equities</option></select></div><div class="control"><label for="ranking-role">Role</label><select id="ranking-role"><option value="">All roles</option><option value="winner">Recorded winner</option><option value="alternative">Verdict alternative</option><option value="candidate">Candidate card only</option></select></div><div class="control"><label for="ranking-tier">Evidence tier</label><select id="ranking-tier"><option value="">All tiers</option><option value="A">A · native execution or measured</option><option value="B">B · local integration or synthetic</option><option value="C">C · source review</option><option value="U">U · no policy row</option></select></div></div>
+<div class="filter-row"><p id="ranking-count" class="result-count" role="status" aria-live="polite"></p></div>
+<div id="ranking-layers"></div>
+<details class="catalog-card convergence-detail"><summary>Status items, coverage and definitions</summary><div id="ranking-details"></div></details>
 </section>
 <section id="explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
 <div class="page-heading"><div><div class="eyebrow">Discovery / the broad public index</div><h2>Explore the whole field.</h2><p>Search names, roles, layers and decisions. Open a record to inspect its dated sources, distinct pins and bounded receipts. Repository discovery is broader than either maintained catalog.</p></div><button class="button secondary small" id="reset-filters">Reset filters</button></div>
@@ -157,6 +168,7 @@ const layerNames = new Map(data.layers.map(layer => [layer.id, layer.name]));
 document.querySelectorAll("[data-catalog-tab]").forEach(tab => { tab.hidden = !data.grand_catalogs; });
 $("tab-landscape").hidden = !data.landscape;
 $("tab-convergence").hidden = !data.convergence;
+$("tab-ranking").hidden = !data.ranking;
 const tabs = [...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
 function showTab(id, focus = false) {
   if(!tabs.some(tab => tab.dataset.tab === id)) id = "overview";
@@ -515,6 +527,82 @@ function renderConvergence() {
   });
 }
 renderConvergence();
+function rankingVerification(row) {
+  const verification = row.verification, counts = verification.receipt_versions;
+  if(verification.state === "not_applicable") return "not applicable";
+  if(row.role === "winner") return verification.state + " (Linux)" + (verification.macos ? " · macOS " + verification.macos : "");
+  if(verification.state === "host_verified_at_stack_pin") return "host_verified_at_stack_pin (Linux)";
+  if(verification.state === "host_verified") return "host_verified by repository, not at the stack pin on Linux"
+    + (counts ? " (Linux receipts: " + counts.other_version + " other version, " + counts.unknown_version + " unknown version)" : "");
+  return verification.state === "not_run" ? "not_run" : verification.state + " (by repository)";
+}
+function rankingCells(row) {
+  return [(row.shared ? "=" : "") + row.position, row.entity.replace(/^repo:/, ""), row.role,
+    row.evidence.recorded + " · tier " + row.evidence.tier, rankingVerification(row), row.freshness.pin_current || "-", row.measured.basis,
+    row.flags.join(", ") || "-"];
+}
+function rankingSummaryLines(ranking) {
+  const counts = ranking.counts.placements, rule = ranking.rule;
+  return [
+    counts.layers + " layers · " + counts.ranked + " ranked placements · " + counts.outside_ranking + " outside this ranking · " + counts.caution + " under caution",
+    "Rule version " + rule.version + ", frozen " + rule.frozen_at + ": keys " + rule.keys.join(", ") + "; ties: " + rule.tie + " ranking; blended score: " + (rule.blended_score ? "yes" : "none"),
+    "Verification platform: " + rule.verification_platform + "; universal superiority: " + ranking.universal_superiority.replaceAll("_", " "),
+    ranking.scope
+  ];
+}
+function renderRanking() {
+  const ranking = data.ranking;
+  if(!ranking) return;
+  rankingSummaryLines(ranking).forEach((line, index) => add($("ranking-summary"), make(index ? "p" : "strong", "", line)));
+  add($("ranking-actions"), link("Ranked catalog index (JSON, with entities and status items) ↗", ranking.url));
+  ranking.layers.forEach(layer => { const option = make("option", "", layer.catalog + "/" + layer.layer_id + " · " + layer.title); option.value = layer.ref; add($("ranking-layer"), option); });
+  const repositoryById = new Map(data.repositories.map(repo => [repo.repository_id, repo]));
+  const draw = () => {
+    const chosen = $("ranking-layer").value, catalog = $("ranking-catalog").value, role = $("ranking-role").value, tier = $("ranking-tier").value;
+    const grid = $("ranking-layers"); grid.replaceChildren(); let shown = 0;
+    ranking.layers.forEach(layer => {
+      if((chosen && layer.ref !== chosen) || (catalog && layer.catalog !== catalog)) return;
+      const rows = layer.placements.filter(row => (!role || row.role === role) && (!tier || row.evidence.tier === tier));
+      if(!rows.length && (role || tier)) return;
+      shown += rows.length;
+      const banner = layer.banner;
+      const card = add(make("article", "catalog-card ranking-card"), make("div", "eyebrow", layer.catalog === "foundation" ? "Foundation" : "US equities"), make("h3", "", layer.title));
+      catalogFacts(card, {decision: banner.decision, verdict_status: banner.verdict_status, independent_review: banner.independent_review, layer_state: banner.layer_state, verdict_checked_at: banner.verdict_checked_at, reopened_by: banner.reopened_by.map(sweep => sweep.sweep_id + " (" + sweep.date + ")").join(", "), open_gaps: banner.open_gaps === null ? "" : String(banner.open_gaps), overturn_metric: banner.overturn_metric});
+      if(banner.note) add(card, make("p", "ranking-note", banner.note));
+      const table = make("table", "token-table ranking-table");
+      add(table, add(make("thead"), add(make("tr"), ...["Position", "Repository", "Role", "Evidence", "Verification", "Pin current", "Measured", "Flags"].map(label => make("th", "", label)))));
+      const body = make("tbody");
+      rows.forEach(row => {
+        const cells = rankingCells(row), repo = repositoryById.get(cells[1]), name = make("td");
+        if(repo) { const inspect = make("button", "text-button", cells[1]); inspect.setAttribute("aria-label", "Inspect " + cells[1]); inspect.addEventListener("click", () => inspectRecord(repo)); add(name, inspect); }
+        else add(name, link(cells[1], "https://github.com/" + cells[1]));
+        add(body, add(make("tr"), make("td", "", cells[0]), name, ...cells.slice(2).map(cell => make("td", "", cell))));
+      });
+      add(card, add(make("div", "table-wrap"), add(table, body)));
+      [["Outside this ranking", layer.outside_ranking], ["Caution", layer.caution]].forEach(([label, entries]) => {
+        if(entries.length) add(card, make("p", "small", label + ": " + entries.map(entry => entry.entity.replace(/^repo:/, "") + " (" + entry.reason + ")").join(", ")));
+      });
+      add(grid, card);
+    });
+    $("ranking-count").textContent = grid.childElementCount + " layers · " + shown + " ranked placements shown";
+    if(!grid.childElementCount) add(grid, make("p", "catalog-empty", "No placements match. Clear a filter."));
+  };
+  ["ranking-layer", "ranking-catalog", "ranking-role", "ranking-tier"].forEach(id => $(id).addEventListener("change", draw));
+  draw();
+  const details = $("ranking-details");
+  add(details, make("h3", "", "Status items by type"));
+  listLimits(details, Object.entries(ranking.counts.status_items || {}).filter(([, count]) => count).map(([type, count]) => type + ": " + count));
+  add(details, make("h3", "", "Global status items"));
+  if(ranking.global_items.length) listLimits(details, ranking.global_items.map(item => item.type + " (" + item.level + "): " + item.message));
+  else add(details, make("p", "muted", "None."));
+  add(details, make("h3", "", "Coverage of catalog files"));
+  listLimits(details, Object.entries(ranking.counts.coverage || {}).map(([reached, count]) => readable(reached) + ": " + count));
+  add(details, make("h3", "", "Definitions"));
+  const definitions = make("dl", "catalog-facts");
+  ranking.rule.definitions.forEach(item => add(definitions, make("dt", "", item.term), make("dd", "", item.definition)));
+  add(details, definitions);
+}
+renderRanking();
 function recipeButton(path, label, component = "") {
   const button = make("button", "button secondary small", label);
   button.addEventListener("click", () => showRecipe(path, component));

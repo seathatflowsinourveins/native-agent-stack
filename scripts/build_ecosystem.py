@@ -18,11 +18,13 @@ import sys
 from urllib.parse import quote, urlsplit
 
 try:
+    from . import catalog_index
     from .catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
     from .component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
                                    OUTPUT_JSON as COMPONENT_MATRIX)
     from .landscape import build_landscape
 except ImportError:
+    import catalog_index
     from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
     from component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
                                   OUTPUT_JSON as COMPONENT_MATRIX)
@@ -120,6 +122,10 @@ CONVERGENCE_LAYER_FIELDS = ("layer_state", "verdict_checked_at", "reopened_by", 
 CONVERGENCE_SUMMARY_FIELDS = ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
                               "newest_manifest", "newest_verdict_checked_at", "manifest_layers_without_matrix_row")
 CONVERGENCE_SCOPE_COUNTS = ("layers", "in_use", "converged", "unresolved")
+# The ranked catalog index fields the page shows; entities and per-record detail stay in the linked JSON.
+RANKING_ENTRY_LISTS = ("placements", "outside_ranking", "caution")
+RANKING_LAYER_FIELDS = ("ref", "catalog", "layer_id", "title", "banner", *RANKING_ENTRY_LISTS)
+RANKING_RULE_FIELDS = ("version", "frozen_at", "keys", "tie", "blended_score", "verification_platform", "definitions")
 
 
 def require(condition, message):
@@ -431,6 +437,74 @@ def build_convergence(root, read, file_url):
             "convergence sources need their sweeps, platform and dates")
     return {"url": file_url(COMPONENT_MATRIX), **{key: block[key] for key in CONVERGENCE_SUMMARY_FIELDS},
             "layers": layers}
+
+
+def build_ranking(root, read, file_url):
+    """The ranked catalog index (scripts/catalog_index.py), or None without it. Every position and sort key is
+    re-derived with the index module's own rule (catalog_index.sort_key and catalog_index.positions), so a block that
+    disagrees with that rule, claims universal superiority or a blended score, names an entity the index does not
+    list or miscounts its layers fails the build. The page renders only these layers, counts, global status items
+    and definitions; the entities stay in the linked JSON (the page already carries the repositories)."""
+    if not safe_file(root, catalog_index.OUTPUT_JSON).is_file():
+        return None
+    index = read(catalog_index.OUTPUT_JSON)
+    require(isinstance(index, dict) and index.get("id") == "catalog-index", "the ranked catalog index needs its id")
+    require(index.get("universal_superiority") == "not_established",
+            "the ranked catalog index must keep universal_superiority not_established")
+    rule = index.get("rule")
+    require(isinstance(rule, dict) and rule.get("blended_score") is False,
+            "the ranked catalog index must declare blended_score false")
+    definitions = rule.get("definitions")
+    require(isinstance(definitions, list) and bool(definitions)
+            and all(isinstance(item, dict) and all(isinstance(item.get(key), str) and item[key].strip()
+                                                   for key in ("term", "definition")) for item in definitions),
+            "the ranked catalog index definitions must be a nonempty list of terms and definitions")
+    entities = index.get("entities")
+    require(isinstance(entities, list) and all(isinstance(item, dict) for item in entities),
+            "the ranked catalog index entities must be a list of objects")
+    known = {item.get("ref") for item in entities}
+    layers = index.get("layers")
+    require(isinstance(layers, list) and all(isinstance(layer, dict) for layer in layers),
+            "the ranked catalog index layers must be a list of objects")
+    embedded, ranked, outside, caution = [], 0, 0, 0
+    for layer in layers:
+        placements, outside_entries, caution_entries = (layer.get(key) for key in RANKING_ENTRY_LISTS)
+        require(all(isinstance(entries, list) and all(isinstance(entry, dict) for entry in entries)
+                    for entries in (placements, outside_entries, caution_entries)),
+                "a ranked catalog index layer needs placements, outside_ranking and caution lists")
+        require(all(entry.get("entity") in known for entry in placements + outside_entries + caution_entries),
+                "a ranked placement names an entity the catalog index does not list")
+        try:
+            keys = [catalog_index.sort_key(placement) for placement in placements]
+        except catalog_index.InvalidIndex as error:
+            raise ValueError(f"the ranked catalog index does not follow its rule: {error}") from error
+        require(keys == [placement.get("sort_key") for placement in placements],
+                "a ranked placement's sort_key differs from the catalog index rule")
+        require([(placement.get("position"), placement.get("shared")) for placement in placements]
+                == [tuple(item) for item in catalog_index.positions(keys)],
+                "a ranked position or shared flag differs from the catalog index rule")
+        ranked, outside, caution = ranked + len(placements), outside + len(outside_entries), caution + len(caution_entries)
+        embedded.append({key: layer.get(key) for key in RANKING_LAYER_FIELDS})
+    counts = index.get("counts")
+    items = index.get("status_items")
+    require(isinstance(items, list) and all(isinstance(item, dict) and isinstance(item.get("type"), str)
+                                            and isinstance(item.get("refs"), list) for item in items),
+            "the ranked catalog index status_items must be typed objects with refs")
+    placement_counts = (counts or {}).get("placements") if isinstance(counts, dict) else None
+    item_counts = (counts or {}).get("status_items") if isinstance(counts, dict) else None
+    require(isinstance(placement_counts, dict) and isinstance(item_counts, dict)
+            and tuple(placement_counts.get(key) for key in ("ranked", "outside_ranking", "caution"))
+            == (ranked, outside, caution)
+            and {item["type"] for item in items} <= set(item_counts)
+            and all(item_counts[item_type] == sum(1 for item in items if item["type"] == item_type)
+                    for item_type in item_counts),
+            "the ranked catalog index counts differ from its layers or status items")
+    return {"url": file_url(catalog_index.OUTPUT_JSON), "scope": text(index.get("scope")),
+            "universal_superiority": index["universal_superiority"],
+            "rule": {key: rule.get(key) for key in RANKING_RULE_FIELDS}, "counts": counts,
+            "global_items": [item for item in items
+                             if not any(isinstance(ref, str) and ref.startswith("layer:") for ref in item["refs"])],
+            "layers": embedded}
 
 
 def token_topic_card(card, edition_date, stack_version, root):
@@ -872,6 +946,7 @@ def build_data(root):
         landscape = build_landscape(root, config["landscape_manifest"], read=read,
                                     track=track, file_url=file_url)
     convergence = build_convergence(root, read, file_url)
+    ranking = build_ranking(root, read, file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
@@ -881,7 +956,7 @@ def build_data(root):
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
-            "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence,
+            "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence, "ranking": ranking,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),

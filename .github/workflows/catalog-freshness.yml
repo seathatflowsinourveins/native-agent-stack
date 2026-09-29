@@ -176,10 +176,13 @@ jobs:
   # The only write-permitted job in this workflow (docs/decisions/2026-09-23-bot-pr-dispatch.md).
   # It opens/updates a human-reviewable evidence branch and PR from this run's own drift
   # artifact; scripts/freshness_propose.py enforces that it only ever adds files under
-  # evidence/artifacts/ and evidence/receipts/ and updates manifests/evidence.json's
-  # registration -- it never selects, evaluates, or writes catalogs/sota-convergence/*,
-  # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
-  # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
+  # evidence/artifacts/ and evidence/receipts/, updates manifests/evidence.json's
+  # registration, and, when git tracks it, rewrites the one generated file
+  # catalogs/landscape/catalog-index.json with scripts/catalog_index.py --write (the index
+  # joins every receipt; 2026-09-29 addendum of that record) -- it never selects, evaluates,
+  # or edits catalogs/sota-convergence/*, any other catalogs/landscape/*.json,
+  # manifests/stack.json, or layer-verdicts* (owned by the separate SOTA-convergence lane
+  # review). Off by default: it only runs from an explicit
   # manual `open_pr: true` dispatch, or from a schedule when the repository variable
   # CATALOG_FRESHNESS_PROPOSE is set to 'true' -- and, either way, only when this run's own
   # freshness fetch was unbounded and free of both full fetch errors and partial errors (a
@@ -274,6 +277,11 @@ jobs:
           set -euo pipefail
           python3 scripts/validate.py
           python3 scripts/host_receipts.py validate
+          # The same --check the PR's validate run makes; scripts/freshness_propose.py regenerated
+          # the index, which joins every receipt, whenever git tracks it.
+          if git ls-files --error-unmatch catalogs/landscape/catalog-index.json >/dev/null 2>&1; then
+            python3 scripts/catalog_index.py --check
+          fi
       - name: Check the ecosystem explorer only if it is still a tracked file
         run: |
           set -euo pipefail
@@ -289,6 +297,9 @@ jobs:
         run: |
           set -euo pipefail
           git add evidence/artifacts evidence/receipts manifests/evidence.json
+          if git ls-files --error-unmatch catalogs/landscape/catalog-index.json >/dev/null 2>&1; then
+            git add catalogs/landscape/catalog-index.json
+          fi
           if git ls-files --error-unmatch docs/ecosystem/index.html >/dev/null 2>&1; then
             git add docs/ecosystem/index.html
           fi
