@@ -605,7 +605,7 @@ SYMBOL_FILES = {
         "def register_file(path):\n"                       # 1 definition
         "    return path\n"
         "\n"
-        "def caller():\n"
+        "def use_registry():\n"
         "    return register_file('x')\n"                  # 5 direct Name call
     ),
     "scripts/other.py": (
@@ -638,13 +638,17 @@ class F5_SymbolSites(GraderCase):
             "Definition: scripts/host_receipts.py:1\n"
             "Direct Name-call site: scripts/host_receipts.py:5\n")
 
+    def symbol_key(self):
+        if not hasattr(self, "_symbol_key"):
+            self._symbol_key = synthetic_symbol_key(self.tmp)
+        return self._symbol_key
+
     def grade(self, text, reading=None):
         fc = load("frozen_checks")
-        key = synthetic_symbol_key(self.tmp)
-        return fc.ORACLES["T26"](SITE_KEY_PARAMS, key, answer(fc, text), reading or DECIDED)["A"]
+        return fc.ORACLES["T26"](SITE_KEY_PARAMS, self.symbol_key(), answer(fc, text), reading or DECIDED)["A"]
 
     def test_synthetic_key(self):
-        key = synthetic_symbol_key(self.tmp)
+        key = self.symbol_key()
         self.assertEqual(key["def"], ["scripts/host_receipts.py", 1, 2])
         self.assertEqual(key["name_calls"], [["scripts/host_receipts.py", 5]])
         self.assertEqual(key["attr_calls"], [["scripts/other.py", 5]])
@@ -681,7 +685,7 @@ class F5_SymbolSites(GraderCase):
 
     def test_t5_precision_only_alternative(self):
         fc = load("frozen_checks")
-        key = synthetic_symbol_key(self.tmp)
+        key = self.symbol_key()
         partial = answer(fc, "Definition: scripts/host_receipts.py:1\nInvocations: none listed beyond the definition.")
         decided = fc.ORACLES["T5"]({}, key, partial, DECIDED)["A"]
         self.result(decided, "fail", "sites_missing")
@@ -692,7 +696,7 @@ class F5_SymbolSites(GraderCase):
 
     def test_t5_labelled_imports_and_mentions_are_not_invocations(self):
         fc = load("frozen_checks")
-        key = synthetic_symbol_key(self.tmp)
+        key = self.symbol_key()
         text = ("Definition: scripts/host_receipts.py:1\nInvocation: scripts/host_receipts.py:5\n"
                 "Import: scripts/other.py:2\nTextual mention (comment): scripts/other.py:6")
         self.result(fc.ORACLES["T5"]({}, key, answer(fc, text), DECIDED)["A"], "pass")
@@ -702,9 +706,9 @@ class F5_SymbolSites(GraderCase):
         repo = self.tmp / "clone"
         commit = make_repo(repo, SYMBOL_FILES)
         key = fc.key_T11(fc.DirSources(repo), {"symbol": "register_file", "symbol_fixture": "scripts/host_receipts.py"})
-        self.assertEqual(key["sites"], [["scripts/host_receipts.py", 5, "caller"]])
+        self.assertEqual(key["sites"], [["scripts/host_receipts.py", 5, "use_registry"]])
         sites_only = answer(fc, "Direct caller: scripts/host_receipts.py:5. Searched tree: the whole clone.")
-        both = answer(fc, "Direct caller: scripts/host_receipts.py:5 in caller(). Searched tree: the whole clone.")
+        both = answer(fc, "Direct caller: scripts/host_receipts.py:5 in use_registry(). Searched tree: the whole clone.")
         self.result(fc.ORACLES["T11"]({}, key, both, DECIDED)["A"], "pass")
         self.result(fc.ORACLES["T11"]({}, key, sites_only, DECIDED)["A"], "fail", "functions_missing")
         self.result(fc.ORACLES["T11"]({}, key, sites_only, readings(R2_05="sites_only"))["A"], "pass")
