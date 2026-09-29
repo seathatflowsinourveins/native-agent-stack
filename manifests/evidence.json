@@ -3651,8 +3651,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "0c9cae84deded9dda6822c9092315fd5efb087ad4c5b989f21215897bbcb4252",
-      "bytes": 39257
+      "sha256": "bcfcb91c7a1bc0ec16eb1223776ff91c8e4311dc2be6a55312ddbf387bc0bc1f",
+      "bytes": 39478
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3711,8 +3711,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a3f160fa747ba093e8d1b3f3e80fe9cbfdcb394e71293a3ee2532b2a446dbf31",
-      "bytes": 32590
+      "sha256": "4fdf0f1d62dfab721596c67d490454334339bcbf82335d959a201b8904bf6521",
+      "bytes": 32977
     },
     {
       "path": ".gitignore",
