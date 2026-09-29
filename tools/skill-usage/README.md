@@ -329,10 +329,41 @@ are remote-denominator operations; this bucket does not identify exclusive
 context-mode use. This mapping follows the adapter's sandbox normalization and
 the [context-mode v1.0.169 subprocess detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804).
 Native MCP `status` supplies completion/failure state when result bytes were not persisted.
-The adapter uses direct response call IDs first; other items in an open exec
-span are sandbox operations until its return, the next direct model call or a
-turn boundary. This local span rule covers the retained fixture. Interleaved or
-resumed cells without a persisted parent association need independent review.
+
+Code-mode attribution (U3 design section 7, commit 7, with the review's position, item-kind and
+`web_search_call` findings) has no persisted parent field to read, so it is positional:
+
+- An item whose id is a model call's is direct: a function, custom, local-shell or tool-search call,
+  or a hosted `web_search_call`
+  ([models.rs:1182-1203](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1182-L1203)).
+- Any other emitted item (a `CommandExecution`, an `McpToolCall` or a `web.search` `Extension`) is
+  nested when an own `exec` call came earlier in its turn. A cell keeps running after `exec`
+  returns, through `yield_control()` and the code-mode `wait` tool that resumes it
+  ([description.rs:19-51](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/code-mode-protocol/src/description.rs#L19-L51),
+  [lib.rs:51-52](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/code-mode-protocol/src/lib.rs#L51-L52)),
+  so neither the exec return nor another direct call ends it; only the turn does. Every turn event
+  the tool reads ends a turn: `task_started` (alias `turn_started`), `task_complete` (alias
+  `turn_complete`) ([protocol.rs:1403-1415](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L1403-L1415)),
+  `turn_aborted`, and the attempt ends `task_completed`, `turn_completed` and `turn_failed`.
+- Such an item before its turn's first `exec`, or in a turn without one, stays direct and counts in
+  `measurement.code_mode.unattributed_items`. Reasoning, message, `clock.sleep` and `FileChange`
+  items are no tool calls and count nowhere, nor do the skipped `user_shell` and interaction commands.
+- A `wait` call without a namespace after an `exec` of its turn is code mode: its output is the
+  cell's, so its bytes count under M3's `code_mode` carrier. The multi-agent `wait_agent` stays
+  `other`.
+- `measurement.code_mode` counts `exec_calls`, `wait_calls`, `nested_items` and
+  `unattributed_items`, each once at its first record inside `[since, until)`, and groups sum them.
+- Concurrent cells are not told apart: a nested item belongs to its turn, not to one `exec`.
+  A hosted web search's own item (`TurnItem::WebSearch`,
+  [items.rs:57-61](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/items.rs#L57-L61))
+  is not emitted, as the Claude kernel counts no server tool; this host's store holds none.
+
+Before commit 7 an item was nested only until the exec return, the next direct model call or a turn
+boundary. On this host's store 271 items moved from direct to nested and 352 `wait` outputs from
+`other` to `code_mode` (the differential in
+[pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md)),
+which changes `sandbox_operations`, M3 `by_carrier`, the M4 `shell_fetch`/`ctx_sandbox_fetch` split and
+U1's `proxy.nested` and `cli_lanes` carrier `nested`.
 
 `--rtk-check` uses the same Linux gate as the Claude tool: a binary on PATH
 self-reporting `rtk 0.50.0` that passes the isolated five-exclusion probe.

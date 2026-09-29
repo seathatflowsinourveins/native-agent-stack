@@ -2634,7 +2634,6 @@ class CodexCodeModeAttribution(unittest.TestCase):
                 pass  # the worker fixture includes one malformed row
         return rows
 
-    @pending("commit 7: nested attribution and the wait carrier")
     def test_items_after_the_exec_return_and_wait_outputs_are_code_mode(self):
         # D: a nested curl that completes after the exec returned, and a code-mode wait with its output.
         got = u3_measure(PAGINATED_META, exec_call("call_priv_x", EXEC_FETCH_JS), exec_output("call_priv_x", "started"),
@@ -2653,7 +2652,6 @@ class CodexCodeModeAttribution(unittest.TestCase):
                           for key in ("exec_calls", "wait_calls", "nested_items", "unattributed_items")},
                          {"exec_calls": 1, "wait_calls": 1, "nested_items": 1, "unattributed_items": 0})
 
-    @pending("commit 7: nested attribution and the wait carrier")
     def test_nesting_is_bounded_by_the_exec_position_and_the_turn(self):
         # The review's position finding: an item before the turn's first exec, or in a later turn without one, is direct.
         got = u3_measure(PAGINATED_META, codex_row("event_msg", {"type": "task_started"}),
@@ -2670,7 +2668,6 @@ class CodexCodeModeAttribution(unittest.TestCase):
                          {"nested_items": 1, "unattributed_items": 2})
 
     @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
-    @pending("commit 7: nested attribution and the wait carrier")
     def test_a_nested_rtk_proxy_after_the_exec_return_counts_as_nested(self):
         # U1's nested counters move with the attribution (the design's list of changed meanings).
         got = u3_measure(PAGINATED_META, exec_call("call_priv_x", "await tools.exec_command({cmd: 'rtk proxy pytest -q'})"),

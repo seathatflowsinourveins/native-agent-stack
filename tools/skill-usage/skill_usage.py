@@ -1090,6 +1090,19 @@ EXEC_RUNNING = "Process running with session ID "
 # NTSTATUS (-1073741819) reads unknown, not failed (the review's low finding; both count as not successful, and no Windows Codex
 # was available to check). int() never sees a digit string over CPython's conversion limit (4,300 digits, which raises ValueError).
 EXEC_CODE_DIGITS = 9
+# PR-A 10e (U3 design section 7 with its review). The model's own calls: CALL_PAYLOAD_TYPES and a hosted web search
+# (ResponseItem::WebSearchCall, openai/codex rust-v0.157.1 protocol/src/models.rs:1182-1203, persisted by
+# rollout/src/policy.rs:56). An item whose id is one of theirs is never nested.
+MODEL_CALL_TYPES = CALL_PAYLOAD_TYPES | {"web_search_call"}
+# Every turn event this module reads ends the turn's code-mode nesting: TurnStarted is task_started (alias turn_started) and
+# TurnComplete task_complete (alias turn_complete) (protocol/src/protocol.rs:1403-1415), turn_aborted, and the attempt ends
+# task_completed, turn_completed and turn_failed that measure_codex_records also reads.
+TURN_EVENTS = ("task_started", "turn_started", "task_complete", "turn_complete", "task_completed", "turn_completed",
+               "turn_failed", "turn_aborted")
+# The code-mode wait tool, which resumes a running exec cell (code-mode-protocol/src/lib.rs:51-52, description.rs:44-51); the
+# multi-agent wait is wait_agent (core/src/tools/handlers/multi_agents_spec.rs:268-291).
+CODE_MODE_WAIT = "wait"
+CODE_MODE_COUNTERS = ("exec_calls", "wait_calls", "nested_items", "unattributed_items")
 
 
 def codex_call_name(payload: dict) -> str:
@@ -1273,7 +1286,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                    if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
                    and isinstance(r.get("payload", {}).get("item"), dict)}
     model_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
-                      if r.get("type") == "response_item" and r.get("payload", {}).get("type") in CALL_PAYLOAD_TYPES}
+                      if r.get("type") == "response_item" and r.get("payload", {}).get("type") in MODEL_CALL_TYPES}
     shell_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
                       if r.get("type") == "response_item" and (
                           r.get("payload", {}).get("type") == "local_shell_call"
@@ -1326,12 +1339,25 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         emit(r, {"type": "tool_use", "id": key, "name": name, "input": inputs,
                  "sandbox": sandbox, "code_mode": code_mode, "native_status": item_states.get(key)}, "assistant")
 
-    # openai/codex rust-v0.157.1 models.rs:1060-1165,1938-1949;
-    # core/tests/suite/code_mode.rs:721-760,3436-3752: nested returns go to JS;
-    # only the outer custom output is model-visible. UI item IDs can differ.
-    # With no explicit parent field, bound the sandbox span by the exec return
-    # or the next direct model call/turn boundary; direct response IDs win.
-    active_exec = set()
+    # PR-A 10e (U3 design section 7 with its review): openai/codex rust-v0.157.1 models.rs:1060-1165,1938-1949 and
+    # core/tests/suite/code_mode.rs:721-760,3436-3752: nested returns go to JS and only the outer custom output is
+    # model-visible; UI item IDs can differ. A cell keeps running after its exec returns (yield_control, and the wait tool
+    # that resumes it: code-mode-protocol/src/description.rs:19-51, lib.rs:51-52), so with no explicit parent field an
+    # emitted item (a model-called CommandExecution, an McpToolCall or a web.search Extension) is nested when its id is no
+    # model call id and an own exec call came earlier in its turn (TURN_EVENTS end a turn); otherwise it is direct, and one
+    # with no model call id counts in code_mode.unattributed_items. A wait call without a namespace after an exec of its turn
+    # is code mode, since its output is the cell's. Direct response IDs win. code_mode counts a call or an item once, at its
+    # first record inside [since, until), as codex_commands does, so adjacent windows add up.
+    code_mode_counts = dict.fromkeys(CODE_MODE_COUNTERS, 0)
+    code_mode_seen = set()
+
+    def count_code_mode(at, key, counter):
+        if key not in code_mode_seen:
+            code_mode_seen.add(key)
+            if since is None or at >= since:
+                code_mode_counts[counter] += 1
+
+    turn_exec = False  # an own exec call came earlier in the current turn
     for index, r in enumerate(visible):
         p = r.get("payload") or {}
         at = visible_at[index]
@@ -1339,26 +1365,29 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             kind, key = p.get("type"), p.get("call_id") or p.get("id") or f"missing-{index}"
             if kind in ("function_call", "custom_tool_call"):
                 name = codex_call_name(p)
-                code_mode = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
-                if code_mode:
-                    active_exec.add(key)
-                else:
-                    active_exec.clear()
+                exec_call = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
+                wait_call = (kind == "function_call" and turn_exec and p.get("name") == CODE_MODE_WAIT
+                             and not p.get("namespace"))
+                if exec_call:
+                    turn_exec = True
+                if exec_call or wait_call:
+                    count_code_mode(at, ("call", key), "exec_calls" if exec_call else "wait_calls")
                 inputs = arguments(p.get("arguments")) if kind == "function_call" else {"code": p.get("input", "")}
-                use(r, at, key, name, inputs, code_mode=code_mode)
+                use(r, at, key, name, inputs, code_mode=exec_call or wait_call)
             elif kind == "local_shell_call":
-                active_exec.clear()
                 use(r, at, key, "Bash", {}, command=resolve_command((p.get("action") or {}).get("command")))
             elif kind in ("function_call_output", "custom_tool_call_output"):
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": p.get("output"),
                          **result_state(key, p.get("output"))}, "user")
-                active_exec.discard(key)
         elif r.get("type") == "event_msg" and p.get("type") == "item_completed":
             item = p.get("item") or {}
             key = item.get("id", f"missing-{index}")
             kind = item.get("type")
-            sandbox = bool(active_exec) and key not in model_call_ids
-            output, has_output = None, False
+            direct = key in model_call_ids
+            sandbox = turn_exec and not direct
+            # Only an emitted item (a tool_use below) without a model call id is nested or unattributed (the review's item kinds).
+            attributed = None if direct else "nested_items" if sandbox else "unattributed_items"
+            output, has_output, used = None, False, False
             if kind == "CommandExecution":
                 source = item.get("source")
                 skip = SKIPPED_COMMAND_SOURCES.get(source) if isinstance(source, str) else None
@@ -1371,23 +1400,28 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                     skipped.add(key)
                     continue
                 use(r, at, key, "Bash", {}, sandbox=sandbox, command=resolve_command(item.get("command")))
+                used = True
                 output = item.get("aggregated_output")
                 has_output = output is not None
             elif kind == "McpToolCall":
                 use(r, at, key, "mcp__" + str(item.get("server", "unknown")) + "__" + str(item.get("tool", "unknown")), arguments(item.get("arguments")), sandbox=sandbox)
+                used = True
                 value = item.get("result")
                 output = value.get("content", value) if isinstance(value, dict) else value
                 has_output = output is not None
             elif kind == "Extension" and item.get("kind") == "web.search":
                 action = item.get("action") or {}
                 use(r, at, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
+                used = True
+            if used and attributed:
+                count_code_mode(at, ("item", key), attributed)
             if has_output and key not in output_ids:
                 status = item.get("status")
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": output,
                          "is_error": status in ("failed", "declined"),
                          **({"native_state": "declined"} if status == "declined" else {})}, "user")
-        elif r.get("type") == "event_msg" and p.get("type") in ("task_started", "task_complete", "turn_aborted"):
-            active_exec.clear()
+        elif r.get("type") == "event_msg" and p.get("type") in TURN_EVENTS:
+            turn_exec = False
     window = {"since": since.timestamp() * 1000 if since else -8640000000000000,
               "until": until.timestamp() * 1000 if until else 8640000000000000}
     measured = _measurement_bridge({"rows": normalized, "options": {
@@ -1403,6 +1437,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             measured["rtk_parts"]["unknown_calls"] += unresolved
             measured["rtk_parts"]["status"] = "incomplete"
     measured["codex_commands"] = commands
+    measured["code_mode"] = code_mode_counts
     if first_own_at is None or (since is not None and first_own_at < since):
         hooks["inherited"] = hooks["inherited_with_marker"] = 0  # copied items count in the window of the first own record
     measured["codex_hook_context"] = hooks
@@ -1716,6 +1751,7 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
                                                     for key in HOOK_CONTEXT_COUNTERS}
         commands = {key: sum(m["codex_commands"][key] for m in measurements) for key in CODEX_COMMAND_STATES}
         out["measurement"]["codex_commands"] = commands
+        out["measurement"]["code_mode"] = {key: sum(m["code_mode"][key] for m in measurements) for key in CODE_MODE_COUNTERS}
         if commands["non_posix_shell"] + commands["unknown_shell"]:
             out["measurement"]["m4"]["status"] = "incomplete"  # aggregateMeasurements recomputes it from the counts
     return out
@@ -1914,6 +1950,10 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
             " (measurement.codex_commands non_posix_shell, unknown_shell): a Bash call with no text, an unknown rtk replay call,"
             " and M4 incomplete. user_shell and unified_exec_interaction CommandExecution items are no model tool calls"
             " (codex_commands user_shell, exec_interactions); the legacy lane counters keep counting every CommandExecution."
+            + " Code-mode attribution is positional, since no parent field is persisted: an emitted item whose id is no model"
+            " call id (a hosted web_search_call included) is nested when an own exec call came earlier in its turn, else direct"
+            " and counted in measurement.code_mode.unattributed_items; a wait call without a namespace after an exec of its"
+            " turn is code mode; concurrent cells are not told apart."
             + " actors[].spawn and subagent_spawns publish sub-agent spawn states only: the join of a child to its parent's"
             " SubAgentActivity started item and spawn_agent call runs in memory, the route is client-side (turn contexts and"
             " ThreadSettingsApplied), and provider reroutes are not persisted in rollouts."}
