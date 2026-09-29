@@ -820,6 +820,40 @@ afterward. A real Mac run should specifically try to reproduce that window
 (e.g. a service with a slow `KeepAlive` shutdown path) rather than assume
 the bounded poll alone is proof it behaves correctly there.
 
+### Keys under launchd (drafted 2026-09-29, not run on a Mac)
+
+A LaunchAgent whose program needs a provider key may start it through the
+key runner, as a systemd unit may; the runner is available and not yet the
+default path
+([Using a key](../../docs/secret-storage.md#using-a-key-available-2026-09-29)). Its
+`ProgramArguments` are the Homebrew `python3`, `-I`,
+`<repository>/tools/credentials/credential_run.py`, the inventory id, `--`
+and the program with its arguments, and its `EnvironmentVariables` hold
+`PATH` only. No value goes into a plist or `launchctl setenv`. The runner
+and the two modules it imports are standard-library Python that parses in
+the 3.9 grammar (a test checks the runner), so the Command Line Tools
+`python3` should run it too. A uv-managed CPython 3.9.25 on Linux passed the
+runner's 60 tests once on 2026-09-29 (no committed receipt); no Mac has run
+it. macOS sets
+no `XDG_*` variable, so the store is
+`~/.config/native-agent-stack`, created by `set_credential.py` at the first
+key. `scripts/kernel_keyring.py` refuses macOS, so Tavily is a stored file
+here as on Linux: type it once with
+`bash tools/credentials/open_credential_terminal.sh tavily`. The design's
+boot receipt is to run as a `RunAtLoad` LaunchAgent rendered by
+`adoption/launchd/launchd-agents.sh`; it lands in a later change. Before
+any Mac acceptance, the guard hook must also count a capital `E` in a `ps`
+option (`ps -E`, `ps auxE`) as an environment dump, because macOS ps(1)
+shows the environment with `-E`, and its `-e` means `-A` outside legacy
+mode (apple-oss-distributions/adv_cmds `ps/ps.1`). The runner's refusal of a
+core pattern that pipes crash dumps to a collector reads
+`/proc/sys/kernel/core_pattern`, which macOS lacks, so that check is skipped
+there; what a Mac's crash reporter keeps of a crashed command's environment
+has not been checked. Key acceptance on a Mac is
+the runner, guard and status test suites on the macOS CI job, then a new Mac
+host receipt that separates the steps run from those not run. WSL receipts
+do not certify the Mac.
+
 ## Qdrant collections
 
 Qdrant collections are **re-indexed on the new host, never copied** — the same
