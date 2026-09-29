@@ -283,7 +283,7 @@ name in the `undeclared_store_file` warning, and so in the receipt.
 **Evidence class.**
 
 - *Local integration*, synthetic stores in temporary directories:
-  `tests/test_credential_boot_receipt.py` (14 tests: the key allowlist;
+  `tests/test_credential_boot_receipt.py` (21 tests: the key allowlist;
   canaries absent in raw, base64, hex, percent-encoded and hashed forms from
   the receipt, the printed line, stderr and `compare`; modes; no replacement;
   the ok-to-missing, ok-to-unsafe and vanished-row regressions; a restart
@@ -435,6 +435,8 @@ limits, and `recipes/tavily.md` keeps the keyring commands as its default.
   and v3.12.0, and under `HAVE_WAITID` from v3.13.0; the 3.13
   `Doc/library/os.rst` adds "This function is now available on macOS as
   well".
+
+**Candidates measured or read, with pins (2026-09-29):**
 
 - **mise v2026.9.16** (commit `2184db81`). *Measured* in a scratch home
   with synthetic canaries (the coordinator's session notes
