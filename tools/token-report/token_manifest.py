@@ -509,6 +509,10 @@ def capture_jcodemunch(config,ledger,run,commands,issues):
     ledger.snapshot("jcodemunch","Linux / upstream default index",metrics,success,r["completed_at"],r)
 
 REPORT_KINDS=("usage report","status report","cache report","savings report")
+# Report snapshots own this scope prefix; counter and Context Mode scopes are rejected when they start with it.
+REPORT_SCOPE_PREFIX="Report / "
+# Each report name becomes a capture folder; a folder name past the file system limit fails mkdir (ENAMETOOLONG).
+REPORT_LABEL_LIMIT=100
 
 def report_label(name):
     return "report-"+re.sub(r"[^A-Za-z0-9._-]+","-",name).strip("-")
@@ -527,22 +531,66 @@ def validate_report_sources(entries):
             raise ValueError("report_sources kind must be one of "+", ".join(REPORT_KINDS))
         if not isinstance(entry.get("argv"),list) or not entry["argv"] or any(not isinstance(a,str) or not a for a in entry["argv"]):
             raise ValueError("report_sources argv must be a nonempty list of strings")
+        # subprocess raises ValueError ("embedded null byte") for such an argument; reject it before any refresh.
+        if any("\0" in a for a in entry["argv"]):
+            raise ValueError("report_sources argv elements must not contain a NUL character")
         if entry.get("format","json") not in ("json","text"):
             raise ValueError("report_sources format must be json or text")
         if "timeout" in entry and (type(entry["timeout"]) is not int or not 1<=entry["timeout"]<=600):
             raise ValueError("report_sources timeout must be an integer from 1 to 600 seconds")
+        label=report_label(entry["name"])
+        if len(label)>REPORT_LABEL_LIMIT:
+            raise ValueError("report_sources name folds to a "+str(len(label))+"-character capture folder label; at most "+
+                             str(REPORT_LABEL_LIMIT)+" characters are allowed")
         # Names map to capture folders; two names that differ only in punctuation would share one folder.
         if entry["name"] in names or report_label(entry["name"]) in labels:
             raise ValueError("report_sources names must be unique, also after punctuation is folded into '-'")
         names.add(entry["name"]);labels.add(report_label(entry["name"]))
     return entries
 
+def validate_reserved_report_scopes(config):
+    """A counter or Context Mode scope that started with REPORT_SCOPE_PREFIX could share a report's (tool, scope)
+    group, where a successful report (saved null) would hide the counter's last good value."""
+    scopes=config.get("counter_scopes")
+    for key,value in (scopes.items() if isinstance(scopes,dict) else ()):
+        if isinstance(value,str) and value.startswith(REPORT_SCOPE_PREFIX):
+            raise ValueError("counter_scopes "+str(key)+" must not start with "+repr(REPORT_SCOPE_PREFIX)+
+                             ", the scope prefix reserved for report_sources")
+    roots=config.get("context_roots")
+    for entry in (roots if isinstance(roots,list) else ()):
+        name=entry.get("name") if isinstance(entry,dict) else None
+        if isinstance(name,str) and name.startswith(REPORT_SCOPE_PREFIX):
+            raise ValueError("context_roots name "+repr(name)+" must not start with "+repr(REPORT_SCOPE_PREFIX)+
+                             ", the scope prefix reserved for report_sources")
+
+def stack_component_ids(config):
+    """Component ids in the stack manifest, or None when it is missing or unreadable, so the caller skips its check."""
+    try:
+        return {c["id"] for c in json.loads(Path(config["stack_manifest"]).read_text())["components"]}
+    except (KeyError,TypeError,OSError,ValueError):
+        return None
+
 def capture_report_sources(config,ledger,run,commands,issues):
     """Retain each selected upstream report; a report is evidence, never a counter to add."""
+    components=stack_component_ids(config)
     for entry in config.get("report_sources",[]):
-        r=capture(entry["argv"],config["project"],run,report_label(entry["name"]),timeout=entry.get("timeout",60))
-        commands.append(r)
+        # Entries name stack component ids (jcodemunch-mcp, not its native identity jcodemunch); any other tool is
+        # flagged, and its report is still captured and recorded.
+        if components is not None and entry["tool"] not in components:
+            issues.append(entry["name"]+": report tool "+entry["tool"]+" is not a component id in the stack manifest")
+        # Validation keeps counter and Context Mode scopes off this prefix, so a report cannot replace a counter's last good value.
+        tool,scope=native_tool_identity(entry["tool"]),REPORT_SCOPE_PREFIX+entry["name"]
         metrics={"saved":None,"kind":entry["kind"],"boundary":entry["boundary"]}
+        try:
+            r=capture(entry["argv"],config["project"],run,report_label(entry["name"]),timeout=entry.get("timeout",60))
+        except (OSError,ValueError) as exc:
+            # One entry that cannot be captured (an argv NUL, an overlong folder name) must not abort the refresh.
+            # capture() returned no receipt, so the evidence holds the command and the error, never output.
+            metrics["error"]="Report capture failed: "+str(exc)
+            issues.append(entry["name"]+": upstream report failed; last successful report remains separate")
+            ledger.snapshot(tool,scope,metrics,False,now(),dict(argv=entry["argv"],cwd=str(config["project"]),error=str(exc)))
+            continue
+        commands.append(r)
         success=r["exit_code"]==0
         if success and entry.get("format","json")=="json":
             try:
@@ -551,8 +599,7 @@ def capture_report_sources(config,ledger,run,commands,issues):
                 success=False;metrics["error"]="Report is not JSON: "+str(exc)
         if not success:
             issues.append(entry["name"]+": upstream report failed; last successful report remains separate")
-        # A "Report / " scope never equals a counter's scope, so a report cannot replace a counter's last good value.
-        ledger.snapshot(native_tool_identity(entry["tool"]),"Report / "+entry["name"],metrics,success,r["completed_at"],r)
+        ledger.snapshot(tool,scope,metrics,success,r["completed_at"],r)
 
 def native_tool_identity(component_id):
     return {"jcodemunch-mcp":"jcodemunch"}.get(component_id,component_id)
@@ -647,6 +694,7 @@ def load_config(path):
     config.setdefault("context_roots",[])
     config.setdefault("supporting_inventory",[])
     validate_report_sources(config.setdefault("report_sources",[]))
+    validate_reserved_report_scopes(config)
     fields=("state_dir","project","publication","catalog_index","stack_manifest","practice_guide",
             "output_html","output_json","tokenizer_module","rtk_database","headroom_events",
             "context_capture","audit_json","gap_summary","hook_evidence","fresh_e2e","native_study",
@@ -720,6 +768,8 @@ def refresh(config,context_file=None):
     if not isinstance(scopes,dict) or set(scopes)-{"rtk_global","rtk_project","headroom"} or any(
             not isinstance(value,str) or not value.strip() for value in scopes.values()):
         raise ValueError("counter_scopes must map selected counter keys to nonempty scope strings")
+    # Configurations built as dicts skip load_config, so refresh enforces the reserved report prefix itself.
+    validate_reserved_report_scopes(config)
     root=Path(config["state_dir"])
     root.mkdir(parents=True,exist_ok=True,mode=0o700)
     run=root/"captures"/(datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")+"-"+uuid.uuid4().hex[:8])

@@ -266,6 +266,105 @@ class LedgerContract(unittest.TestCase):
         row=next(r for r in json.loads(Path(config["output_json"]).read_text())["coverage_matrix"] if r["id"]=="jcodemunch-mcp")
         self.assertEqual([r["scope"] for r in row["native_reports"]],["Report / jcodemunch receipt"])
 
+    def test_report_source_argv_with_a_nul_is_rejected_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(argv=["upstream","da\0ily"])]}))
+        with self.assertRaisesRegex(ValueError,"NUL"):
+            m.load_config(path)
+
+    def test_report_source_name_with_an_overlong_capture_label_is_rejected_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        fits="x"*(100-len("report-"))
+        self.assertEqual(len(m.report_label(fits)),100)
+        # The limit applies to the folded label, so punctuation that folds away does not count.
+        for name in (fits,"a"+"!"*200+"b"):
+            path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(name=name)]}))
+            self.assertEqual(m.load_config(path)["report_sources"][0]["name"],name)
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(name=fits+"x")]}))
+        with self.assertRaisesRegex(ValueError,"at most 100 characters"):
+            m.load_config(path)
+
+    def test_a_report_that_cannot_be_captured_does_not_abort_the_refresh(self):
+        from unittest.mock import patch
+        config=self.portable_config();stats=self.root/"stats";stats.mkdir()
+        (stats/"stats-one.json").write_text(json.dumps({"schemaVersion":1,"tokens_saved_lifetime":512,"tokens_saved":20}))
+        # A dict configuration skips load validation, so both entries reach the real capture(): subprocess raises
+        # ValueError for an argv NUL, and mkdir raises OSError (ENAMETOOLONG) for an overlong capture folder name.
+        long_name="long "+"x"*300
+        config.update(context_roots=[{"name":"Explicit scope","path":str(stats)}],report_sources=[
+            self.report_source(name="nul report",argv=["upstream","da\0ily"]),self.report_source(name=long_name),
+            self.report_source(name="later report")])
+        real=m.capture
+        def selective(argv,cwd,root,label,timeout=60):
+            if label==m.report_label("later report"):
+                return {"argv":argv,"exit_code":0,"stdout_text":'{"ok":true}',"stderr_text":"","completed_at":m.now()}
+            return real(argv,cwd,root,label,timeout=timeout)
+        with patch.object(m,"capture",side_effect=selective):
+            result=m.refresh(config)
+        self.assertEqual(result["issues"],[name+": upstream report failed; last successful report remains separate" for name in ("nul report",long_name)])
+        data=json.loads(Path(config["output_json"]).read_text())
+        rows={r["scope"]:r for r in data["native"]}
+        for scope,expected in [("Report / nul report","embedded null byte"),("Report / "+long_name,"too long")]:
+            with self.subTest(scope=scope[:20]):
+                latest=rows[scope]["latest"]
+                self.assertFalse(latest["success"])
+                self.assertIsNone(rows[scope]["latest_success"])
+                self.assertEqual({k:latest["metrics"].get(k) for k in ("saved","kind","boundary")},
+                                 {"saved":None,"kind":"usage report","boundary":"Consumed tokens, not avoided tokens"})
+                self.assertIn(expected,latest["metrics"]["error"])
+                self.assertEqual([k for k in ("stdout","stderr","stdout_text","stderr_text") if k in latest["evidence"]],[])
+        self.assertTrue(rows["Report / later report"]["latest"]["success"])
+        self.assertEqual(rows["Explicit scope"]["latest_success"]["metrics"]["saved"],512)
+        self.assertNotIn("__DATA__",Path(config["output_html"]).read_text())
+
+    def test_counter_and_context_scopes_cannot_take_the_report_prefix_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        for extra in [{"counter_scopes":{"rtk_global":"Report / all retained projects"}},
+                      {"context_roots":[{"name":"Report / Chosen","path":"stats"}]}]:
+            path.write_text(json.dumps({"state_dir":"state","project":".",**extra}))
+            with self.subTest(extra=extra),self.assertRaisesRegex(ValueError,"Report / "):
+                m.load_config(path)
+        path.write_text(json.dumps({"state_dir":"state","project":".","counter_scopes":{"rtk_global":"Linux / Report / all"},
+                                    "context_roots":[{"name":"Chosen Report / scope","path":"stats"}]}))
+        self.assertEqual(m.load_config(path)["counter_scopes"],{"rtk_global":"Linux / Report / all"})
+
+    def test_counter_and_context_scopes_cannot_take_the_report_prefix_in_refresh(self):
+        from unittest.mock import patch
+        base=self.portable_config()
+        for extra in [{"rtk":"selected-rtk","counter_scopes":{"rtk_global":"Report / all retained projects"}},
+                      {"context_roots":[{"name":"Report / Chosen","path":str(self.root)}]}]:
+            config=copy.deepcopy(base);config.update(extra)
+            with self.subTest(extra=extra):
+                with patch.object(m,"capture",side_effect=AssertionError("Command ran before the scope check")), \
+                     self.assertRaisesRegex(ValueError,"Report / "):
+                    m.refresh(config)
+                self.assertFalse(Path(config["state_dir"]).exists())
+
+    def test_report_tool_that_is_not_a_component_id_is_flagged_and_still_recorded(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config["report_sources"]=[self.report_source(name="unknown tool report",tool="not-a-component"),
+                                  self.report_source(name="jcodemunch receipt",tool="jcodemunch-mcp",argv=["jcodemunch-mcp","receipt"])]
+        def returned(argv,cwd,root,label,timeout=60):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"ok":true}',"stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            issues=m.refresh(config)["issues"]
+        self.assertEqual(len(issues),1,issues)
+        self.assertIn("unknown tool report",issues[0])
+        self.assertIn("not-a-component",issues[0])
+        row=next(r for r in json.loads(Path(config["output_json"]).read_text())["native"] if r["tool"]=="not-a-component")
+        self.assertEqual(row["scope"],"Report / unknown tool report")
+        self.assertTrue(row["latest"]["success"])
+        # A missing or unreadable manifest skips the check; it never fails the capture.
+        (self.root/"not-json.json").write_text("not json")
+        (self.root/"no-components.json").write_text('{"schema_version":1}')
+        for manifest in ("missing.json","not-json.json","no-components.json"):
+            issues=[]
+            with self.subTest(manifest=manifest),patch.object(m,"capture",side_effect=returned):
+                m.capture_report_sources({"report_sources":config["report_sources"],"project":str(self.root),
+                                          "stack_manifest":str(self.root/manifest)},self.db,self.root,[],issues)
+                self.assertEqual(issues,[])
+
     def test_narrative_dollar_line_does_not_invent_session_or_lifetime_footer(self):
         line="$1.18 of Opus 4.7 tokens your team didn't burn."
         d=m.dollar_explanation({'runtime':'Unresolved storage root','result':{'content':[{'type':'text','text':line}]}})

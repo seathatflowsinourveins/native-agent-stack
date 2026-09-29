@@ -243,6 +243,17 @@ error exits nonzero while its body is still retained. `timeout` defaults to 60
 seconds (1–600). Select only aggregate routes: OmniRoute's `/api/usage/analytics`
 and call-log routes carry per-account rows with account emails.
 
+`argv` is stored literally: in each capture's `receipt.json`, in the ledger
+snapshots and in `manifest.json` and `manifest.html`. Keep credentials out of it; a
+command that needs one should read it from the environment, which the reporter
+passes to every command unchanged. Give `argv[0]` as an absolute path: commands run
+in the configured `project` directory, so a relative path resolves against it (a
+bare name such as `curl` is searched on `PATH`). A command runs with the reporter's
+standard input until it exits or its `timeout` expires. Its whole output is held in
+memory, and a successful JSON report is stored twice in its snapshot, as
+`stdout_text` and as the parsed `raw`, so use bounded queries for full-history
+reports.
+
 ## Exact artifact comparisons
 
 Install the pinned tokenizer only if you need retained-text comparisons:
