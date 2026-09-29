@@ -1266,6 +1266,23 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli["parse_errors"], 0)
 
     @NEEDS_PARSER
+    def test_a_shell_builtin_after_a_real_wrapper_runs_nothing(self):
+        # env, nice, nohup, stdbuf, timeout, xargs and sudo are executables, and the builtin exec replaces the shell with one: they run
+        # their command with execvp, which finds no shell builtin (`env eval x`: "No such file or directory"), so a lane after such a
+        # builtin is not run. `command` and `time` are the shell's own and pass a builtin on. Expected lanes are the runs of real bash
+        # 5.2 under stub executables; the same inputs are probes of the oracle. After `rtk proxy` the same rule already held (GPT-6 7).
+        cases = {"env eval 'qmd status'": {}, "env command qmd status": {}, "env exec qmd status": {}, "nohup eval qmd status": {},
+                 "timeout 5 command qmd status": {}, "nice -n 5 exec qmd status": {}, "stdbuf -oL eval qmd status": {},
+                 "echo a | xargs command qmd get": {}, "exec eval qmd status": {}, "env -u X timeout 5 nice eval qmd status": {},
+                 "command eval 'qmd status'": {"qmd": 1}, "command command qmd status": {"qmd": 1}, "time eval 'qmd status'": {"qmd": 1},
+                 "env bash -c 'eval qmd status'": {"qmd": 1}, "env timeout 5 nice qmd status": {"qmd": 1}, "env qmd status": {"qmd": 1},
+                 "exec qmd status": {"qmd": 1}}
+        for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+                self.assertEqual(cli["parse_errors"], 0)
+
+    @NEEDS_PARSER
     def test_a_word_the_grammar_cut_after_an_assignment_is_one_word(self):
         # tree-sitter-bash 0.25.1 cuts the value of an assignment at the second `$` of `a=$x/$y-$z` and reads the tail, glued to the
         # assignment with no blank, as the command's name (its arguments become the name's arguments), so `a=$x/$y-$z qmd get` lost the

@@ -209,6 +209,24 @@ PROBES = [
     ("word cut in a wrapped env assignment", "nohup env A=$HOME/$X-$Y toon f"),
     ("word cut before a help flag", "qmd get --out=$HOME/$X-$Y --help"),
     ("word cut in a proxied word", "rtk proxy env A=$HOME/$X.$Y qmd get"),
+    # 5. A wrapper that is a real executable (env, nice, nohup, stdbuf, timeout, xargs, sudo) and the builtin exec run their command with
+    # execvp, which finds no shell builtin: `env eval x` fails with "No such file or directory" and runs nothing (bash(1) SIMPLE COMMAND
+    # EXPANSION, env(1), execvp(3)). `command` and `time` are the shell's own, so a builtin after them still runs.
+    ("d5 env eval", "env eval 'qmd status'"),
+    ("d5 env command", "env command qmd status"),
+    ("d5 env exec", "env exec qmd status"),
+    ("d5 nohup eval", "nohup eval qmd status"),
+    ("d5 timeout command", "timeout 5 command qmd status"),
+    ("d5 nice exec", "nice -n 5 exec qmd status"),
+    ("d5 stdbuf eval", "stdbuf -oL eval qmd status"),
+    ("d5 xargs command", "echo a | xargs command qmd get"),
+    ("d5 exec eval", "exec eval qmd status"),
+    ("d5 nested wrappers", "env -u X timeout 5 nice eval qmd status"),
+    ("d5 command eval", "command eval 'qmd status'"),
+    ("d5 command command", "command command qmd status"),
+    ("d5 time eval", "time eval 'qmd status'"),
+    ("d5 env shell string", "env bash -c 'eval qmd status'"),
+    ("d5 env real wrappers", "env timeout 5 nice qmd status"),
     ("mcporter bare", "mcporter"),
     ("mcporter bare in a shell string", "sh -c mcporter list"),
     ("substitution", "x=$(qmd get a); echo \"$(toon b)\" `repomix`"),
@@ -373,7 +391,8 @@ class Generator:
     def data(self, posix=False):
         delimiter = self.delimiter()
         shapes = ["echo qmd", "echo 'toon status'", 'echo "repomix"', ": qmd", "cat <<'" + delimiter + "' > /dev/null\nqmd status\n" + delimiter,
-                  "case x in qmd) : ;; esac", "echo bash -c 'qmd x'", "bash -n -c 'qmd x'", "bash -c ':' qmd x"]
+                  "case x in qmd) : ;; esac", "echo bash -c 'qmd x'", "bash -n -c 'qmd x'", "bash -c ':' qmd x",
+                  "env eval 'qmd x' || :", "timeout 5 command qmd x || :", "nohup exec qmd x || :"]
         return self.pick(*(shapes if posix else shapes + ["a=( qmd toon )"]))
 
     def statement(self, depth, posix=False):
