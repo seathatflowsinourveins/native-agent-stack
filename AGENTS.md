@@ -28,7 +28,7 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 - Keep client accounts, model routes, native caching, tool discovery and compaction intact. Do not rerun the full audit or model trials at startup.
 - Count once: never sum cumulative snapshots, overlapping artifact reductions or provider/cache subset counters, and keep native counter snapshots, exact artifact comparisons, cache reuse and complete provider usage separate.
 - Read `docs/token-session-handbook.md` on demand for Codex session environment, MCP reload or another PC. Use `tools/token-report/README.md` for a new host's lifetime JSON/HTML manifest, and keep its private state outside the checkout.
-- For catalog lookup on a host that adopted the named QMD index, refresh changed files with `qmd --index native-agent-stack-catalog update`, then use scoped `search` and `get` from `us-equities-catalog` or `us-equities-foundation`; `catalogs/us-equities/native-workflows.md` documents explicit setup for other checkouts. Do not index unrelated folders.
+- For catalog lookup on a host that adopted the named QMD index, refresh changed files with `qmd --index native-agent-stack-catalog update`, followed by `qmd --index native-agent-stack-catalog embed` where that index carries embeddings, then use scoped `query`, `search` and `get` from `us-equities-catalog`, `us-equities-foundation`, `foundation-adoption` or `foundation-docs`; `catalogs/us-equities/native-workflows.md` documents explicit setup for other checkouts. Do not index unrelated folders.
 
 ## Workers, effort and lanes
 

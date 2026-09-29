@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "tool": "gpt-tokenizer",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.842Z",
+  "upstream_repository": "https://github.com/niieani/gpt-tokenizer",
+  "pin": {
+    "version": "3.4.0",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "tools/token-report/token_manifest.py:161",
+      "tools/token-report/token_manifest.py:162",
+      "scripts/recount-tokens.cjs:14"
+    ],
+    "scope": "Repository metadata; not an installed-client observation"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/gpt-tokenizer/gpt6.md",
+      "full-save/cur/gpt-tokenizer/record-draft.json"
+    ],
+    "latest_release": {
+      "version": "4.0.0",
+      "published_at": "2026-08-16T02:29:41Z",
+      "source_url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0",
+      "package_channels": {
+        "verification_status": "Retained scratch package-channel facts; not reverified live in this handoff",
+        "records": [
+          {
+            "channel": "npm latest",
+            "version": "4.0.0",
+            "published_at": "2026-08-16T02:34:51.039Z",
+            "source_url": "https://registry.npmjs.org/gpt-tokenizer"
+          },
+          {
+            "channel": "npm pin",
+            "version": "3.4.0",
+            "published_at": "2025-11-07T20:15:06.227Z",
+            "source_url": "https://registry.npmjs.org/gpt-tokenizer"
+          }
+        ]
+      }
+    },
+    "behind_by": {
+      "stable_release_count": 1,
+      "main_commits_after_latest": null,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "4.0.0",
+    "published_at": "2026-08-16T02:29:41Z",
+    "html_url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/niieani/gpt-tokenizer/releases/latest",
+    "resolved_tag_commit": "fb04ebca53f662200e737caefe9a5ef372a5e41a"
+  },
+  "behind_by": {
+    "count": 1,
+    "unit": "stable GitHub releases",
+    "reference_pin": "3.4.0",
+    "latest": "4.0.0",
+    "method": "Filtered the GitHub releases list to published, non-draft, non-prerelease entries and counted releases between the pin and latest; both endpoints were present.",
+    "source_url": "https://api.github.com/repos/niieani/gpt-tokenizer/releases?per_page=100",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "Version 4.0.0 removes UMD bundles and the unpkg global entry point; its README directs browser delivery through ES modules.",
+      "source_urls": [
+        "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0"
+      ],
+      "revision": "4.0.0",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "additional_source_url": "https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The 4.0.0 release migrates the build toolchain to Vite+.",
+      "source_urls": [
+        "https://github.com/niieani/gpt-tokenizer/commit/158658082a35a7b73163c0dd60a4e1b170c04740"
+      ],
+      "revision": "158658082a35a7b73163c0dd60a4e1b170c04740",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "fb04ebca53f662200e737caefe9a5ef372a5e41a",
+    "head_commit": "9182f2e567355e0a8f81022b6c52bdc688250ac8",
+    "commits_after_latest_release": 1,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/niieani/gpt-tokenizer/compare/4.0.0...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The scratch tokenizer parity result, package export-map comparison, and byte-size measurements were not rerun and are not promoted into fresh native acceptance.",
+    "The scratch behind_by summary did not provide a main-after-4.0.0 count; the live observation is one commit."
+  ]
+}

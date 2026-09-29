@@ -1,0 +1,30 @@
+calls 59041 classified 59041 unclassified 0
+NO_ROW  parts=   432 supported=   151 unsupported=    98 explicit_rtk=     0 calls_with_supported=119
+ask     parts= 60961 supported= 25954 unsupported= 11543 explicit_rtk=    20 calls_with_supported=18138
+defer   parts= 87854 supported= 15327 unsupported= 26629 explicit_rtk=    96 calls_with_supported=11639
+deny    parts=  1035 supported=   145 unsupported=   484 explicit_rtk=     0 calls_with_supported=106
+
+bucket  missed(defer+deny+norow)  covered(ask)  coverage%
+rtk gh               3683    682  15.6
+rtk git              3291   5038  60.5
+rtk grep             3229   8944  73.5
+rtk read             2238   4224  65.4
+rtk ls                841   4267  83.5
+rtk wc                681    935  57.9
+rtk uv                411    140  25.4
+rtk curl              386    387  50.1
+rtk find              324    748  69.8
+rtk diff              230    107  31.8
+rtk ps                163    213  56.6
+rtk rg                 64    129  66.8
+rtk shellcheck         31     24  43.6
+rtk du                 27     67  71.3
+rtk df                  5     18  78.3
+rtk rsync               5     10  66.7
+rtk ruff                5      1  16.7
+rtk make                3      0   0.0
+rtk pytest              2      3  60.0
+rtk pre-commit          2      0   0.0
+rtk cargo               1      0   0.0
+rtk pip                 1     10  90.9
+TOTAL 15623 25954

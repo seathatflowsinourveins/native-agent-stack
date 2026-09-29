@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "tool": "repomix",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:10.076Z",
+  "upstream_repository": "https://github.com/yamadashy/repomix/",
+  "pin": {
+    "version": "1.18.1",
+    "source_pin": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:791",
+      "adoption/pins-linux-x86_64.json:234"
+    ],
+    "verified_against_worktree_on": "2026-09-27"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/repomix/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "1.18.1",
+      "tag": "v1.18.1",
+      "published_at": "2026-09-21T08:34:49Z"
+    },
+    "behind_by": {
+      "stable_releases": 0,
+      "main_commits_ahead": 28,
+      "main_head": "75f9f860548c10f955e4730f7961947780104443"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v1.18.1",
+    "published_at": "2026-09-21T08:34:49Z",
+    "html_url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/yamadashy/repomix/releases/latest"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable releases",
+    "basis": "GitHub latest and npm latest equal the pin.",
+    "source_url": "https://api.github.com/repos/yamadashy/repomix/releases/latest"
+  },
+  "changes_since_scratch": [
+    {
+      "field": "latest_stable_and_main_distance",
+      "status": "unchanged",
+      "source_url": "https://api.github.com/repos/yamadashy/repomix/compare/v1.18.1...main"
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The v1.18.1 release notes disable executable repository Git settings in Git invocations and identify GHSA-4p5g-gh74-q524. The notes scope the affected path to a crafted local .git configuration; normal cloned repositories do not inherit remote .git/config.",
+      "source_urls": [
+        "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+      ],
+      "revision": "v1.18.1 / 80b4280a9196feace092fc672dfe2b5fac62ef08",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The v1.18.1 release notes replace the Perl comment-removal profile for shell and YAML with handling that preserves their hash syntax, heredocs and block scalars.",
+      "source_urls": [
+        "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+      ],
+      "revision": "v1.18.1 / PR #1752",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "package_channels": [
+    {
+      "package": "repomix",
+      "latest": "1.18.1",
+      "published_at": "2026-09-21T08:27:33.352Z",
+      "source_url": "https://registry.npmjs.org/repomix",
+      "channel": "npm dist-tags.latest",
+      "retrieved_on": "2026-09-27"
+    }
+  ],
+  "limitations": [
+    "Source/documentation review only; this record does not establish installed behavior, native tests, model execution, savings or upgrade acceptance.",
+    "Scratch host measurements and executable probes were not rerun or promoted into this evidence class."
+  ]
+}
