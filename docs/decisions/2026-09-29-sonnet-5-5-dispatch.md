@@ -202,13 +202,15 @@ depend on the shared accounts' usage windows, which are read live before a run a
 **Resolved since this record's first merge.** The GPT-6 lane effort default: #505 (`7a95cf4c`, `native-agent-stack-76`, decision record
 [2026-09-29-codex-lane-default-effort.md](2026-09-29-codex-lane-default-effort.md)) set `tools/sota-convergence/codex_lane.py`'s default and
 `adjudicate.py codex --effort` to `max`, with the recipe step, the README example, five test fixtures and append-only provenance entries.
-An earlier version of this section said that the flip fails 49 of the 76 tests in `tests/test_codex_lane.py`. That count was wrong: it came
-from one scratch run with no unmodified control and did not reproduce. Two clean runs on the tree before #505 (`59cbfc41`), with the
-constant alone flipped, fail 5 tests (with `TMPDIR` under `/tmp` and outside it), and the unmodified tree passes 76 of 76. The session
-that owns the tool reports that its own unmodified control, run in a clean worktree with the default `TMPDIR` while an empty
-`/tmp/.git` existed on the host (present then, gone since), failed the same 49 tests, each with the error `--export ... is inside the git
-repository /tmp`. The equal count suggests that the earlier scratch run measured that environment, not the flip; this record did not
-reproduce it and did not keep the error text of its own run.
+An earlier version of this section said that the flip fails 49 of the 76 tests in `tests/test_codex_lane.py`. That reading was wrong.
+The owner's decision record (linked above) shows that 49 tests fail on unmodified `origin/main` with the default `TMPDIR` while an empty
+`/tmp/.git` exists on the host (each refuses a temporary directory inside a git work tree: `--export ... is inside the git repository /tmp`),
+that the unmodified suite passes 76 of 76 with `TMPDIR` outside `/tmp`, and that 5 tests fail after the flip alone. This section's 49
+matched that figure, from one scratch run that flipped the constant and had no unmodified control, so it most likely charged the
+environment's failures to the flip; the error text of that run was not kept. When this correction was checked, `/tmp/.git` no longer
+existed, and clean runs on the tree before #505 (`59cbfc41`) failed 5 tests with the constant alone flipped (`TMPDIR` under `/tmp` and
+outside it) and passed 76 of 76 unmodified. A run from a worktree under `/tmp` therefore fails those 49 tests whenever an empty
+`/tmp/.git` is on the host: check `ls /tmp/.git` or set `TMPDIR` outside `/tmp` before trusting a test count from such a tree.
 
 ## Limitations
 

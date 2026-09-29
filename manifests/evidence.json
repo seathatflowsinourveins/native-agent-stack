@@ -14627,8 +14627,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "0f4c77feb477a0618905bc4d865a07a1c12a70f497e1380386f7dc633f613465",
-      "bytes": 27834
+      "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
+      "bytes": 28168
     },
     {
       "path": "docs/direct-results.md",
