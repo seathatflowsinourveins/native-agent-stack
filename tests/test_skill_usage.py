@@ -2282,6 +2282,36 @@ class CodexSpawnJoin(unittest.TestCase):
         self.assertEqual(spawns.get("fork_consistent"), {"false": 1, "null": 6, "true": 16})
         self.assertEqual(sum(spawns.get("reroute_evidence", {}).values()), len(self.CASES))
 
+    def test_frozen_launch_matrix_forms_join(self):
+        # Control for the U3 binding correction: the five child cases of the frozen launch matrix (preregistration.json tasks
+        # 64-68: fork_turns none, 2 and all with agent_type stack-researcher, all with agent_type null, and resume) joined end
+        # to end, not only through requested_fork_turns. "resume" is no spawn argument (c08 reads it invalid, and upstream
+        # fails such a call), so the resumed finished researcher child is its own spawn plus a followup_task to its thread and
+        # a second own turn (multi_agents_spec.rs:217-241).
+        researcher = "stack-researcher"
+        cases = {"m01": {"args": {"fork_turns": "none", "agent_type": researcher}, "role": researcher, "start": False},
+                 "m02": {"args": {"fork_turns": 2, "agent_type": researcher}, "role": researcher},
+                 "m03": {"args": {"fork_turns": "all", "agent_type": researcher}, "role": researcher},
+                 "m04": {"args": {"fork_turns": "all", "agent_type": None}},
+                 "m05": {"args": {"agent_type": researcher}, "role": researcher, "followups": ("thread",),
+                         "child_routes": (SPAWN_ROUTE, SPAWN_ROUTE)}}
+        rollouts = {}
+        for case, options in cases.items():
+            rollouts.update(spawn_case(case, **options))
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())) / "frozen", rollouts)
+        scan = S.scan_codex_lanes([root], load_fixture_manifest(), since=self.since, until=self.until, marker=MARKER)
+        assert_id_free_report(self, scan, [str(root)] + [value for case in cases for value in spawn_ids(case).values()])
+        spawns = [actor.get("spawn") or {} for actor in scan["actors"] if actor["kind"] == "subagent"]
+        got = [(spawn.get("join"), spawn.get("requested", {}).get("fork_turns"), spawn.get("requested", {}).get("fork_n"),
+                spawn.get("requested", {}).get("role"), spawn.get("effective", {}).get("history"),
+                spawn.get("effective", {}).get("turns"), spawn.get("fork_consistent"), spawn.get("role_state"),
+                spawn.get("followups")) for spawn in spawns]
+        self.assertEqual(got, [("joined", "none", None, researcher, "fresh", 1, True, "match", 0),
+                               ("joined", "last_n", 2, researcher, "forked", 1, True, "match", 0),
+                               ("joined", "all", None, researcher, "forked", 1, True, "match", 0),
+                               ("joined", "all", None, None, "forked", 1, True, "not_requested", 0),
+                               ("joined", "default_all", None, researcher, "forked", 2, True, "match", 1)])
+
     def test_fork_turns_follow_the_spawn_handler(self):
         # SpawnAgentArgs.fork_turns (spawn.rs:265-299): trimmed with str::trim (Unicode White_Space, not Python's strip), absent,
         # null or empty is all, none and all match ASCII case-insensitively, else usize::from_str (an optional '+' and ASCII
