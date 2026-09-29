@@ -142,6 +142,25 @@ EXPECTED_BEHAVIOUR = {  # (user, project) by id suffix; a boolean is compared by
     "switch_models_on_flag": (False, True), "model": ("sonnet", "opus[1m]"), "effort_level": ("xhigh", "high")}
 
 
+PARSER_PACKAGES = {  # the two packages shell-parser.pin.json pins; the integrity strings are synthetic, not npm's
+    "web-tree-sitter": {"version": "0.27.0", "integrity": "sha512-fixture-web-tree-sitter"},
+    "tree-sitter-bash": {"version": "0.25.1", "integrity": "sha512-fixture-tree-sitter-bash"}}
+PARSER_ENV = "CHILD_USAGE_SHELL_PARSER"
+
+
+def parser_lock(packages: dict | None = None, extra: dict | None = None) -> str:
+    """A package-lock.json in the shape npm 11 writes (lockfileVersion 3, `packages` keyed by node_modules/<name>, read on
+    2026-09-29 from the real install's keys); `extra` adds unrelated entries."""
+    chosen = packages if packages is not None else PARSER_PACKAGES
+    entries: dict = {"": {"name": "parser-install", "version": "1.0.0", "dependencies": {n: e["version"] for n, e in chosen.items()}}}
+    for name, entry in chosen.items():
+        entries[f"node_modules/{name}"] = {"version": entry["version"], "resolved": f"https://registry.example.invalid/{name}.tgz",
+                                           "integrity": entry["integrity"], "license": "MIT"}
+    entries.update(extra or {})
+    return json.dumps({"name": "parser-install", "version": "1.0.0", "lockfileVersion": 3, "requires": True, "packages": entries},
+                      indent=2) + "\n"
+
+
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -392,6 +411,7 @@ class FakeHost:
                              "node_modules/web-tree-sitter/web-tree-sitter.wasm": "web wasm v1\n"}
         for relative, text in self.parser_files.items():
             self.write(self.parser_dir / relative, text)
+        self.write(self.parser_dir / "package-lock.json", parser_lock())
         (home / ".claude.json").write_text(json.dumps({"credential": self.credential_marker}), encoding="utf-8")
         (home / ".claude" / ".credentials.json").write_text(self.credential_marker, encoding="utf-8")
         (home / ".codex" / "auth.json").write_text(self.credential_marker, encoding="utf-8")
@@ -412,8 +432,10 @@ class FakeHost:
             self.write(repo / "tools" / "capability-gate" / name, f"gate {name} v1\n")
         for name in ("child-usage.mjs", "SHA256SUMS"):
             self.write(repo / "examples" / "claude-native" / "workflows" / name, f"workflow {name} v1\n")
-        pin = {"schema_version": 1, "files": {k: sha256_bytes(v.encode()) for k, v in self.parser_files.items()},
-               "install": {"default_directory": ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1"}}
+        pin = {"schema_version": 1, "packages": PARSER_PACKAGES,
+               "files": {k: sha256_bytes(v.encode()) for k, v in self.parser_files.items()},
+               "install": {"default_directory": ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1",
+                           "lockfile": "package-lock.json"}}
         self.write(repo / "examples" / "claude-native" / "workflows" / "shell-parser.pin.json", json.dumps(pin, indent=2))
         self.write(repo / "tools" / "skill-usage" / "skill_usage.py", "skill usage v1\n")
         for name in ("token_manifest.py", "test_token_manifest.py", "token_manifest.html.in", "token_manifest.full.html.in"):
@@ -1156,6 +1178,40 @@ class ConfigTests(HostCase):
             self.assertEqual(proc.returncode, 0, f"{path}: {proc.stdout}{proc.stderr}")
             self.assertIn("extra.x", proc.stdout)
 
+    @staticmethod
+    def extra_hows(proc: subprocess.CompletedProcess, as_json: bool) -> dict[str, str]:
+        """{id: how-to-check} of the `extra.*` rows of a list-frozen answer, in the text or the JSON form."""
+        if as_json:
+            return {row["id"]: row["how"] for row in json.loads(proc.stdout) if row["id"].startswith("extra.")}
+        rows = [line.split("\t", 1) for line in proc.stdout.splitlines() if line.startswith("extra.")]
+        return {row[0]: row[1] for row in rows}
+
+    def test_list_frozen_prints_no_configured_path_home_path_or_user_name(self):
+        """The path of a configured file is read from freeze.json and shown only in the private capture: list-frozen names the
+        file by its id and a path-free how-to-check line, so a home path or a user name never reaches stdout, in any spelling."""
+        host = self.host
+        host.write(host.home / "notes" / "y.txt", "y\n")
+        spellings = {"absolute in the home directory": (str(host.home / "notes" / "y.txt"), ()),
+                     "tilde": ("~/notes/y.txt", ()), "dotted tilde": ("~/notes/../notes/y.txt", ()),
+                     "relative": ("scratch-notes/unique-y.txt", ()),
+                     "absolute in the checkout": (str(host.repo / "scratch-notes" / "unique-y.txt"), ("--repo", str(host.repo)))}
+        identities = {"real user": pwd.getpwuid(os.getuid()).pw_name, "hostname": socket.gethostname().split(".")[0]}
+        for label, (path, repo_args) in spellings.items():
+            config = self.config({"files": [{"id": "x", "path": path}, {"id": "z", "path": path, "class": "informational"}]})
+            for style in ((), ("--all",), ("--all", "--json")):
+                with self.subTest(spelling=label, style=" ".join(style)):
+                    proc = host.run(self.tool, "list-frozen", "--config", str(config), *repo_args, *style)
+                    self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+                    forbidden = {"configured text": path, "home path": str(host.home), "test root": str(host.root),
+                                 "checkout path": str(host.repo), "fake user": host.user}
+                    self.assertEqual(find_leaks({"stdout": proc.stdout, "stderr": proc.stderr}, forbidden, {}), [])
+                    hows = self.extra_hows(proc, "--json" in style)
+                    self.assertIn("extra.x", hows, "the configured file is still listed")
+                    self.assertEqual("extra.z" in hows, "--all" in style, "an informational extra is listed with --all only")
+                    for how in hows.values():
+                        self.assertEqual([char for char in how if char in "/\\~"], [], f"a path character in {how!r}")
+                        self.assertEqual(find_leaks({"row": how}, {}, identities), [])
+
     def test_extra_files_units_and_overrides_are_captured(self):
         self.host.write(self.host.home / ".local" / "state" / "report" / "config.json", "{}\n")
         self.host.set_unit("extra-unit", main_pid=9, exec_start="/usr/bin/x --port 1")
@@ -1238,6 +1294,173 @@ class ConfigTests(HostCase):
         cap = self.capture("k-b", "--config", str(self.config({"tokenizer_prefix": "~/moved-tokenizer"})))
         self.assertEqual(cap.value("tools.tokenizer.version"), "3.4.0")
         self.assertEqual(cap.status("tools.tokenizer.o200k_base.sha256"), "ok")
+
+
+class ParserPinTests(HostCase):
+    """tools.parser.* follows what child-usage.mjs verifiedShellParser() accepts (branch claude/pra-u1d-parser-ci-2d-20260929 at
+    967561cc, examples/claude-native/workflows/child-usage.mjs lines 656-669): the directory order (the --shell-parser flag,
+    then CHILD_USAGE_SHELL_PARSER, then the pin's default directory under the home directory), every pinned file hashed, and a
+    lockfile that lists both pinned packages with the pinned version and integrity. The pin fixture has the real U1 shape."""
+
+    ALL = "tools.parser.all_match_pin"
+    LOCK = "tools.parser.file.package-lock.json"
+    WASM = "tools.parser.file.tree-sitter-bash:tree-sitter-bash.wasm"
+
+    def config(self, body: dict) -> Path:
+        return self.host.write(self.host.root / "freeze.json", json.dumps(body))
+
+    def pin_path(self) -> Path:
+        return self.host.repo / "examples" / "claude-native" / "workflows" / "shell-parser.pin.json"
+
+    def lock_path(self) -> Path:
+        return self.host.parser_dir / "package-lock.json"
+
+    def copy_install(self, name: str) -> Path:
+        target = self.host.home / name
+        shutil.copytree(self.host.parser_dir, target)
+        return target
+
+    def tamper(self, folder: Path) -> None:
+        self.host.append_byte(folder / "node_modules" / "tree-sitter-bash" / "tree-sitter-bash.wasm")
+
+    def state(self, label: str, *extra: str, **kwargs) -> Capture:
+        return self.capture(label, *extra, probe=False, **kwargs)
+
+    def with_env(self, value: str) -> dict[str, str]:
+        return self.host.env(**{PARSER_ENV: value})
+
+    def test_the_installed_pin_matches_when_the_files_and_the_lockfile_agree(self):
+        cap = self.state("ok")
+        self.assertIs(cap.value(self.ALL), True)
+        self.assertEqual(cap.value(self.LOCK), sha256_path(self.lock_path()), "the lockfile the pin names is hashed like every pinned file")
+        self.assertEqual(cap.item(self.LOCK)["class"], "frozen")
+
+    def test_a_missing_or_edited_lockfile_breaks_the_pin_the_way_the_kernel_refuses_it(self):
+        """The kernel reads the lockfile and needs the pinned version and integrity of both packages, or it refuses to load
+        (not_installed, hash_mismatch); pinned files that hash right are not enough."""
+        good = self.state("good")
+        cases = {
+            "integrity edited": lambda d: d["packages"]["node_modules/tree-sitter-bash"].update(integrity="sha512-edited"),
+            "version edited": lambda d: d["packages"]["node_modules/web-tree-sitter"].update(version="0.27.1"),
+            "one package absent": lambda d: d["packages"].pop("node_modules/web-tree-sitter"),
+            "packages is not an object": lambda d: d.update(packages=[]),
+            "entry without an integrity": lambda d: d["packages"]["node_modules/tree-sitter-bash"].pop("integrity"),
+        }
+        for index, (label, mutate) in enumerate(cases.items()):
+            with self.subTest(lock=label):
+                document = json.loads(parser_lock())
+                mutate(document)
+                self.host.write(self.lock_path(), json.dumps(document, indent=2))
+                cap = self.state(f"lock-{index}")
+                self.assertIs(cap.value(self.ALL), False)
+                self.assert_drift(good, cap, sorted([self.ALL, self.LOCK]))
+                self.assertEqual(sorted(self.kinds(self.check(cap, good.sanitized))["FAIL"]), sorted([self.ALL, self.LOCK]))
+        with self.subTest(lock="not JSON"):
+            self.host.write(self.lock_path(), "{ not json")
+            self.assertIs(self.state("lock-text").value(self.ALL), False)
+        with self.subTest(lock="absent"):
+            self.lock_path().unlink()
+            cap = self.state("lock-absent")
+            self.assertEqual(cap.status(self.LOCK), "missing")
+            self.assertIs(cap.value(self.ALL), False)
+            self.assert_drift(good, cap, sorted([self.ALL, self.LOCK]))
+        with self.subTest(lock="an unrelated entry added"):
+            self.host.write(self.lock_path(), parser_lock(extra={"node_modules/unrelated": {"version": "1.0.0"}}))
+            cap = self.state("lock-extra")
+            self.assertIs(cap.value(self.ALL), True, "the kernel accepts a lockfile that still lists both pinned packages")
+            self.assert_drift(good, cap, [self.LOCK])
+
+    def test_the_environment_variable_selects_the_directory_the_kernel_loads(self):
+        """With CHILD_USAGE_SHELL_PARSER set the kernel executes the bytes of that directory, so those are the bytes to hash."""
+        good = self.state("default")
+        moved = self.copy_install("env-parser")
+        self.tamper(moved)
+        cap = self.state("env", env=self.with_env(str(moved)))
+        self.assertEqual(cap.value(self.WASM), sha256_path(moved / "node_modules" / "tree-sitter-bash" / "tree-sitter-bash.wasm"),
+                         "the directory the variable names is hashed, not the default one")
+        self.assertIs(cap.value(self.ALL), False)
+        self.assert_drift(good, cap, sorted([self.ALL, self.WASM]))
+        texts = {"stdout": cap.proc.stdout, "stderr": cap.proc.stderr, "sanitized": cap.sanitized.read_text(encoding="utf-8"),
+                 "full": cap.full.read_text(encoding="utf-8")}
+        forbidden = {"the variable's value": str(moved), "home path": str(self.host.home), "test root": str(self.host.root)}
+        self.assertEqual(find_leaks(texts, forbidden, {}), [])
+        for item_id in (self.WASM, self.LOCK, "tools.parser.file.tree-sitter-bash:package.json"):
+            self.assertNotIn("path", cap.item(item_id, "full"), "a location that came from the environment is not stored")
+        clean = self.copy_install("env-parser-clean")
+        self.assertIs(self.state("env-ok", env=self.with_env(str(clean))).value(self.ALL), True)
+        inside = self.host.repo / "vendored-parser"
+        shutil.copytree(self.host.parser_dir, inside)
+        self.assertIs(self.state("env-repo", env=self.with_env(str(inside))).value(self.ALL), True, "the checkout is a permitted root")
+        same = self.state("env-same", env=self.with_env(str(self.host.parser_dir)))
+        self.assertEqual(self.compare(good, same).returncode, 0, "naming the default directory changes nothing")
+
+    def test_the_configured_directory_outranks_the_variable_and_an_empty_variable_is_ignored(self):
+        self.copy_install("clean-parser")
+        bad = self.copy_install("bad-parser")
+        self.tamper(bad)
+        config = self.config({"parser_dir": "~/clean-parser"})
+        self.assertIs(self.state("cfg", "--config", str(config), env=self.with_env(str(bad))).value(self.ALL), True,
+                      "the configured directory plays the --shell-parser flag, which the kernel tries first")
+        self.assertIs(self.state("env-bad", env=self.with_env(str(bad))).value(self.ALL), False)
+        self.assertIs(self.state("env-empty", env=self.with_env("")).value(self.ALL), True,
+                      "an empty variable falls through to the default directory, as `a || b` does in the kernel")
+
+    def test_an_environment_directory_the_path_policy_refuses_is_a_parser_error_and_nothing_else_is_lost(self):
+        """The variable is a path the kernel would read, so it meets the policy of every other path: absolute, inside the checkout
+        or the home directory, never a credential store; a relative value has no known base and `~` is not expanded."""
+        self.copy_install("clean-parser")
+        refused = {"outside the roots": "/etc", "relative": "relative/parser", "a credential store": str(self.host.home / ".codex" / "auth.json"),
+                   "another user's home": "~other/parser", "an unexpanded tilde": "~/clean-parser"}
+        for index, (label, value) in enumerate(refused.items()):
+            with self.subTest(value=label):
+                cap = self.state(f"refused-{index}", env=self.with_env(value))
+                self.assertEqual((cap.status(self.ALL), cap.item(self.ALL)["reason"]), ("error", "refused_path"))
+                self.assertFalse([item for item in cap.items() if item.startswith("tools.parser.file.")])
+                self.assertEqual((cap.status("tools.rtk.version"), cap.status("tools.qmd.documents")), ("ok", "ok"),
+                                 "the rest of the tools collector survives the refusal")
+                everything = cap.proc.stdout + cap.proc.stderr + cap.sanitized.read_text(encoding="utf-8") + cap.full.read_text(encoding="utf-8")
+                self.assertNotIn(self.host.credential_marker, everything, "a credential store is never opened")
+
+    def test_a_pin_the_kernel_would_refuse_is_unrecognized_and_the_valid_variants_are_read(self):
+        """readShellParserPin() needs both package names with a version and an integrity, a files map and a default directory;
+        the lockfile name defaults to package-lock.json and must stay inside the installed directory."""
+        original = self.pin_path().read_text(encoding="utf-8")
+        broken = {
+            "no packages": lambda p: p.pop("packages"),
+            "one package absent": lambda p: p["packages"].pop("tree-sitter-bash"),
+            "package without an integrity": lambda p: p["packages"]["web-tree-sitter"].pop("integrity"),
+            "package version is not a string": lambda p: p["packages"]["web-tree-sitter"].update(version=27),
+            "lockfile is not a string": lambda p: p["install"].update(lockfile=7),
+            "lockfile climbs out of the directory": lambda p: p["install"].update(lockfile="../package-lock.json"),
+            "lockfile is absolute": lambda p: p["install"].update(lockfile="/package-lock.json"),
+            "lockfile name has a space": lambda p: p["install"].update(lockfile="package lock.json"),
+        }
+        for index, (label, mutate) in enumerate(broken.items()):
+            with self.subTest(pin=label):
+                pin = json.loads(original)
+                mutate(pin)
+                self.host.write(self.pin_path(), json.dumps(pin, indent=2))
+                cap = self.state(f"pin-{index}")
+                self.assertEqual((cap.status(self.ALL), cap.item(self.ALL)["reason"]), ("error", "unrecognized_pin"))
+                self.assertFalse([item for item in cap.items() if item.startswith("tools.parser.file.")])
+        for index, (label, mutate) in enumerate((("lockfile key absent", lambda p: p["install"].pop("lockfile")),
+                                                 ("lockfile key empty", lambda p: p["install"].update(lockfile="")))):
+            with self.subTest(pin=label):
+                pin = json.loads(original)
+                mutate(pin)
+                self.host.write(self.pin_path(), json.dumps(pin, indent=2))
+                cap = self.state(f"pin-default-{index}")
+                self.assertIs(cap.value(self.ALL), True, "the name defaults to package-lock.json, as in the kernel")
+                self.assertEqual(cap.value(self.LOCK), sha256_path(self.lock_path()))
+        with self.subTest(pin="another lockfile name"):
+            pin = json.loads(original)
+            pin["install"]["lockfile"] = "npm-lock.json"
+            self.host.write(self.pin_path(), json.dumps(pin, indent=2))
+            self.lock_path().rename(self.host.parser_dir / "npm-lock.json")
+            cap = self.state("pin-named")
+            self.assertIs(cap.value(self.ALL), True)
+            self.assertEqual(cap.value("tools.parser.file.npm-lock.json"), sha256_path(self.host.parser_dir / "npm-lock.json"))
+            self.assertNotIn(self.LOCK, cap.items(), "only the lockfile the pin names is read")
 
 
 class GatewayTests(HostCase):
@@ -1845,6 +2068,21 @@ class ParserTests(unittest.TestCase):
         self.assertIsNone(parse(CLAUDE_P_PLAIN))
         self.assertIsNone(parse([{"type": "rate_limit_event", "rate_limit_info": {"status": "allowed"}}]))
         self.assertIsNone(parse([{"type": "rate_limit_event", "rate_limit_info": {"unifiedWindows": {"five_hour": {"utilization": "x"}}}}]))
+
+    def test_lock_matches_pin_needs_both_packages_with_the_pinned_version_and_integrity(self):
+        """The lockfile half of child-usage.mjs verifiedShellParser() (lines 665-668): `packages['node_modules/<name>']` of each
+        of the two pinned packages must carry the pinned version and integrity; anything unreadable is no match."""
+        matches = self.api("lock_matches_pin")
+        self.assertIs(matches(parser_lock().encode(), PARSER_PACKAGES), True)
+        self.assertIs(matches(parser_lock(extra={"node_modules/other": {"version": "9"}}).encode(), PARSER_PACKAGES), True)
+        unreadable = {"not JSON": b"{", "not an object": b"[]", "no packages": b"{}", "packages is a list": b'{"packages": []}',
+                      "entries are strings": json.dumps({"packages": {"node_modules/web-tree-sitter": "x",
+                                                                      "node_modules/tree-sitter-bash": "y"}}).encode(),
+                      "not UTF-8": b"\xff\xfe", "empty": b""}
+        for label, data in unreadable.items():
+            self.assertIs(matches(data, PARSER_PACKAGES), False, label)
+        swapped = {"web-tree-sitter": PARSER_PACKAGES["tree-sitter-bash"], "tree-sitter-bash": PARSER_PACKAGES["web-tree-sitter"]}
+        self.assertIs(matches(parser_lock().encode(), swapped), False, "each package is compared with its own pin")
 
     def test_classify_setting_covers_every_rule(self):
         classify, modes = self.api("classify_setting"), self.api("PERMISSION_MODES")
