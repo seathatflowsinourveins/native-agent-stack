@@ -1602,19 +1602,62 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   every open pull request whose branch predates the job until it is rebased, so the
   owner of #294 applies it when those branches are rebased or merged. Close it with
   the section-10 PUT of the committed file and a dated after-GET here.
-- **Drift closed (2026-09-27).** Before-GET at 21:00:04Z: the same seven checks,
-  without `sota-sources` (`updated_at` 2026-09-24T23:02:29-04:00). At 21:00:13Z,
+- **Drift closed (2026-09-27).** Historical, recorded by the PR author, output not
+  retained: a before-GET at 21:00:04Z listed the same seven checks, without
+  `sota-sources` (`updated_at` 2026-09-24T23:02:29-04:00). At 21:00:13Z,
   `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input .github/main-ruleset.json`
-  ran with the file as committed on `main` at `e82e6be7`. The after-GET, the same
-  minute, lists all eight required checks and differs from the committed file in no
-  rule, target, condition or bypass actor (`updated_at` 2026-09-27T17:00:13-04:00).
-  Open pull requests at the time:
+  ran with the file as committed on `main` at `e82e6be7`. An after-GET the same
+  minute listed all eight required checks and matched the committed file in every
+  rule, target, condition and bypass actor (`updated_at` 2026-09-27T17:00:13-04:00).
+  Historical corroboration: read-only calls on 2026-09-28 found the eight checks
+  required on `main` (`rules/branches/main`) and #410's `sota-sources` check
+  failing (`evidence/artifacts/prompt-audit-20260927/lane-a/round1/packet.md`
+  L90-92).
+
+  Measured today (2026-09-29T03:18:04Z), read-only, in bash, with `origin/main` at
+  `b0fb65b4`, which was then the tip of `main` on GitHub:
+  ```sh
+  diff <(gh api repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 \
+           | jq -S 'del(._links, .created_at, .current_user_can_bypass, .id, .node_id, .source, .source_type, .updated_at) | .rules |= sort_by(.type)') \
+       <(git show origin/main:.github/main-ruleset.json | jq -S '.rules |= sort_by(.type)')
+  ```
+  It exited 0: the live ruleset equals the committed file in `name`, `target`,
+  `enforcement` (`active`), `bypass_actors` (none), `conditions` and every rule.
+  The required contexts are `validate`, `token-report`, `secret-scan`,
+  `dependency-review`, `osv-scanner`, `verdict-review-gate`, `validate-macos` and
+  `sota-sources`, with `strict_required_status_checks_policy: false`. Two
+  differences are normalized away, and nothing else differs:
+  - The eight deleted top-level keys are response metadata that the file does not
+    carry. The file has no key the live ruleset lacks.
+  - `rules` differs in order only: the API lists `required_status_checks` first
+    and the file lists it fifth. Without either `sort_by`, the same `diff` exits 1.
+
+  With `57fb6d89` in place of `origin/main` (the negative control) the command
+  exits 1 and reports only the `sota-sources` context. The live `updated_at` is
+  2026-09-27T17:00:13.533-04:00, the second of the recorded PUT, so the ruleset
+  has not been updated since.
+
+  Open pull requests at the PUT (historical, recorded by the PR author, output not
+  retained):
   - #410 fails `sota-sources` and cannot merge until its sources are fixed.
-  - #205 and #216 predate the job, so they need a rebase before they can report it.
+  - #205 and #216 had no `sota-sources` run: their last runs predate the job. A
+    new `pull_request` run can report it, and a rebase is not the only way to
+    start one: `validate.yml` also runs on `reopened` and `edited`
+    (`.github/workflows/validate.yml` L6-9), and `docs/lanes.md` ("Hot-file
+    protocol") makes a pushed merge of `main` as valid as a rebase. GitHub starts
+    no `pull_request` run while a pull request has a merge conflict
+    ([events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
+    Reporting the check is not passing it: the job reads only the pull request's
+    description (`.github/workflows/validate.yml` L517-521). Measured today
+    (2026-09-29T03:18:04Z, `gh pr view <N> --json mergeable,statusCheckRollup`):
+    both are `CONFLICTING`, with no `sota-sources` run.
   - #415 and #417 pass it.
 
-  **Rollback:** PUT the before-GET body with `sota-sources` removed from
-  `required_status_checks`.
+  **Rollback:** PUT the committed file from before #294, `57fb6d89`. The only
+  change `git diff 57fb6d89 7bbb021e -- .github/main-ruleset.json` makes is
+  adding the `sota-sources` context, and `main` (`b0fb65b4`) still carries
+  `7bbb021e`'s file, so the command holds while that stays true:
+  `git show 57fb6d89:.github/main-ruleset.json | gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input -`.
 - **Fork-approval after-GET (closes the pending step above).** "GitHub
   hardening follow-up (2026-09-25)" decided `all_external_contributors` and
   left "record the dated after-GET here" open. A live, read-only GET of
