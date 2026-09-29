@@ -44,8 +44,9 @@ codex-rs/model-provider-info/src/lib.rs, codex-api/src/api_bridge.rs and protoco
 job ends with exit 3 and writes <work-dir>/LIMIT. A pooled gateway answers 429 when its accounts are exhausted, as it
 did for nine jobs on 2026-09-29 while the workflow went on spending Claude stages; the report cannot tell that from a
 brief rate limit, so the marker holds a reason and no reset time. While that file exists no job starts and jobs still
-waiting for a slot end with exit 3, so the coordinator can stop and notify. Only Codex's own error reports count: the `error` / `turn.failed` events that `codex exec --json` prints on
-stdout (openai/codex rust-v0.155.1, codex-rs/exec/src/exec_events.rs and event_processor_with_jsonl_output.rs), and,
+waiting for a slot end with exit 3, so the coordinator can stop and notify. Only Codex's own error reports count: the
+`error` / `turn.failed` events that `codex exec --json` prints on stdout (openai/codex rust-v0.155.1,
+codex-rs/exec/src/exec_events.rs and event_processor_with_jsonl_output.rs), and,
 only when no turn completed, an ERROR/Error line on stderr. Model content (item.* events: messages, web results,
 cited pages) never counts: on 2026-09-26 a grep of the whole event stream matched a cited README's "Usage
 limitation" and set the marker falsely.
@@ -98,11 +99,11 @@ QUOTA_SCRIPT = "codex_quota.py"
 QUOTA_BACKSTOP_S = 30.0  # beyond the probe's own deadline, for a probe that itself hangs
 LIMIT_PHRASE = re.compile(r"hit your usage limit", re.IGNORECASE)
 # Codex's report of an HTTP 429 whose body is not a usage-limit body: RetryLimitReachedError's Display ("exceeded retry
-# limit, last status: {status}, request id: {id}", codex-rs/protocol/src/error.rs at rust-v0.157.1). Codex retries no 429
-# (retry_429 is false for every provider, codex-rs/model-provider-info/src/lib.rs) and codex-api/src/api_bridge.rs builds
-# this error in its 429 arm, so the report appears at the first 429, whether the route is exhausted or briefly rate
-# limited. A gateway that answers 429 carries no usage-limit body, so this is the report a pooled route gives when its
-# accounts are exhausted. The pattern names the status, so a report for any other status stays a fault.
+# limit, last status: {status}, request id: {id}", codex-rs/protocol/src/error.rs at rust-v0.157.1). Codex retries no
+# 429 (retry_429 is false for every provider, codex-rs/model-provider-info/src/lib.rs) and codex-api/src/api_bridge.rs
+# builds this error in its 429 arm, so the report appears at the first 429, whether the route is exhausted or briefly
+# rate limited. A gateway that answers 429 carries no usage-limit body, so this is the report a pooled route gives when
+# its accounts are exhausted. The pattern names the status, so a report for any other status stays a fault.
 RETRY_LIMIT_429 = re.compile(r"exceeded retry limit, last status: 429\b", re.IGNORECASE)
 LIMIT_PATTERNS = (("usage", LIMIT_PHRASE), ("http_429", RETRY_LIMIT_429))
 # Codex's own error lines: "ERROR: ...", "Error: ..." (eprintln) or a tracing record "<timestamp> ERROR <target>: ...".

@@ -148,6 +148,7 @@
  "ok_job_seconds": {
   "min": 65,
   "median": 677,
-  "max": 977
+  "max": 977,
+  "population": "the 44 jobs with a completed turn: 43 of the 52 sweep jobs and the one probe (gpt6-probe) that passed"
  }
 }

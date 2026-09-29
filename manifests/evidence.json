@@ -31167,8 +31167,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260929-attempts/gpt6-job-outcomes.json",
-      "sha256": "0fc5a1a639ed5b865c87b818a1f2a352f389952ba30b337ab04c10f7daff905a",
-      "bytes": 4017
+      "sha256": "5b51b69cc372e71bb316768b9733ef067051f1db8a97c438b24e0d9d366b8973",
+      "bytes": 4138
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260929-attempts/spend-scan-wf_08a5b367-311.json",
@@ -43547,8 +43547,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "04ae1faceda6df602a3a7ecc942971b4906329edcc709327fda024272e0c0b0f",
-      "bytes": 191789
+      "sha256": "2faaced0dec9e563861191b7f2cc90a2c8ebca6097df2d3b22c1b803f8fbd595",
+      "bytes": 191791
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -44187,7 +44187,7 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "26b43c919498b4655645b6e89b1749bd76820591c1b2c41bd8c93939e3e6a8f6",
+      "sha256": "be17e859001d85cd426225d58f59f9866fed786c8b410b8dd6b6ebbd79713b4a",
       "bytes": 44130
     },
     {

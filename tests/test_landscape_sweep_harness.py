@@ -53,8 +53,9 @@ PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b21158006
 REQ, PLAT = "a" * 64, "b" * 64
 LIMIT_TEXT = ("You’ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more "
               "credits or try again at Sep 30th, 2026 11:50 PM.")
-# Codex's report of an HTTP 429 without a usage-limit body (RetryLimitReachedError's Display, codex-rs/protocol/src/error.rs
-# at rust-v0.157.1): the text of the ten jobs that ended so on 2026-09-29 (gpt6-job-outcomes.json), with a fixture id.
+# Codex's report of an HTTP 429 without a usage-limit body (RetryLimitReachedError's Display,
+# codex-rs/protocol/src/error.rs at rust-v0.157.1): the text of the ten jobs that ended so on 2026-09-29
+# (gpt6-job-outcomes.json), with a fixture id.
 RETRY_429_TEXT = "exceeded retry limit, last status: 429 Too Many Requests, request id: req_fixture0001"
 
 
