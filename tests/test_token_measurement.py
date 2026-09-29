@@ -1984,6 +1984,22 @@ class TokenMeasurement(unittest.TestCase):
         got = self.measure([row("m", unnamed, content=self.advisor_blocks("srvm"))])["usage"]
         self.assertEqual((got["complete"], [a["model"] for a in got.get("advisor_iterations", [])]), (False, ["(unresolved)"]))
 
+    def test_usage_iterations_output_is_id_free(self):
+        """Must-stay control, added after the implementation (not failing-first): the sweep's stdout carries the advisor iteration it read
+        but neither the message id nor the advisor call id (server tool ids) of the transcript."""
+        rows = [self.usage_row("msg_private_adv", self.advisor_usage(), content=self.advisor_blocks("srvtoolu_private_1"))]
+        with tempfile.TemporaryDirectory() as directory:
+            child = Path(directory) / "session/subagents/agent-child.jsonl"
+            child.parent.mkdir(parents=True)
+            child.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", directory], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+        got = json.loads(p.stdout)
+        self.assertEqual(len(got["actors"][0]["measurement"]["usage"]["advisor_iterations"]), 1)
+        self.assertEqual(got["groups"]["all"]["measurement"]["usage"]["advisor_iteration_count"], 1)
+        for secret in ["msg_private_adv", "srvtoolu_private_1", directory]:
+            self.assertNotIn(secret, p.stdout)
+
     def test_usage_aggregate_sums_advisor_totals_and_iteration_issues(self):
         it, row = self.iteration, self.usage_row
         ok = [row("m5", self.advisor_usage(), content=self.advisor_blocks("srv1"))]
