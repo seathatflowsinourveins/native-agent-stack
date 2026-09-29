@@ -16,7 +16,7 @@ Static checks (no model call):
                 RTK_TELEMETRY_DISABLED, no forwarded variables; `codex mcp list --json` names context-mode once
   profile       `codex -p stack-worker debug prompt-input` carries max effort's "do not spawn sub-agents unless
                 asked" and the markers; `codex -p stack-worker mcp get` shows the template's tool lists
-  roles         the two role carriers under $CODEX_HOME/agents equal their pinned rows (lane.ROLE_ROWS), the
+  roles         the two role carriers under $CODEX_HOME/agents equal their rows in adoption/agents/codex/SHA256SUMS, the
                 agents folder holds exactly two *.toml files, and the live config.toml, the worker profile and the
                 system layer (/etc/codex) declare no other role: counts and booleans only, no model call. There is no
                 live role check here: the --live workers below run with --ephemeral, which persists no rollout, and
@@ -66,6 +66,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import apply_codex_lane as lane  # noqa: E402
+import codex_roles  # noqa: E402
 from scripts import adoption_status  # noqa: E402
 from scripts.codex_quota import group_alive  # noqa: E402
 
@@ -141,26 +142,31 @@ def make_repo(path: Path) -> bytes:
 # static checks
 
 def roles_row(codex_home: Path, system_dir: Path | None = None) -> tuple[bool, str]:
-    """The `roles` row: how many of the two installed role carriers equal their pinned rows (lane.ROLE_ROWS), the
-    *.toml files under $CODEX_HOME/agents, the [agents.<name>] tables of the live config.toml and worker profile,
-    and the roles of the system layer (/etc/codex). It passes only with 2/2, 2, 0 and 0: exactly the two carriers,
-    installed by discovery, with nothing else that Codex would load as a role in any arm. Counts and booleans only;
-    no name, path or content."""
-    pins, agents = lane.role_pins(), codex_home / "agents"
+    """The `roles` row: how many of the two installed role carriers equal their rows in adoption/agents/codex/
+    SHA256SUMS, the *.toml files under $CODEX_HOME/agents, the [agents.<name>] tables of the live config.toml and
+    worker profile, and the roles of the system layer (/etc/codex). It passes only with 2/2, 2, 0 and 0: exactly
+    the two carriers, installed by discovery, with nothing else that Codex would load as a role in any arm. Counts
+    and booleans only; no name, path or content."""
+    try:
+        pins = codex_roles.sha256sums(lane.ROLES_SOURCE / codex_roles.SHA256SUMS_NAME)
+    except (OSError, ValueError):
+        pins = {}
+    agents = codex_home / "agents"
     equal = 0
-    if lane.path_kind(agents) == "dir":
-        for name in lane.ROLE_FILES:
+    if codex_roles.path_kind(agents) == "dir":
+        for name in codex_roles.ROLE_FILES:
             try:
-                equal += lane.path_kind(agents / name) == "file" and lane.sha256_file(agents / name) == pins[name]
+                equal += (codex_roles.path_kind(agents / name) == "file"
+                          and lane.sha256_file(agents / name) == pins.get(name))
             except OSError:
                 pass
-    count = lane.agents_toml_count(agents)
-    tables = lane.live_role_tables(codex_home)
-    system = lane.system_role_count(system_dir)
-    expected = len(lane.ROLE_FILES)
+    count = codex_roles.agents_toml_count(agents)
+    tables = codex_roles.live_role_tables(codex_home)
+    system = codex_roles.system_role_count(lane.SYSTEM_CODEX_DIR if system_dir is None else system_dir)
+    expected = len(codex_roles.ROLE_FILES)
     shown = ["unreadable" if value is None else value for value in (count, tables, system)]
     ok = equal == expected and count == expected and tables == 0 and system == 0
-    return ok, (f"installed {equal}/{expected} equal to the pinned rows; *.toml under agents {shown[0]}; "
+    return ok, (f"installed {equal}/{expected} equal to SHA256SUMS; *.toml under agents {shown[0]}; "
                 f"role tables {shown[1]}; system roles {shown[2]}")
 
 
