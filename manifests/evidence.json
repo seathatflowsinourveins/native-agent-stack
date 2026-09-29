@@ -34487,8 +34487,8 @@
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/README.md",
-      "sha256": "ce8d6379f412746a311e681616526f12ad508a364783ce8bcddef575c1c802f3",
-      "bytes": 22797
+      "sha256": "48a1760f276c42d4d4b74dad240bbaa899068e197237697db8b29a18f0863a0b",
+      "bytes": 36809
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/capture-covering.py",
@@ -34502,8 +34502,8 @@
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/counts.json",
-      "sha256": "2faf6b110132cff10623c2ec95350c4068b63394578de69e22f13f14b46a5755",
-      "bytes": 18112
+      "sha256": "aeb9384bd5025726cbbb971dc72a12fa216704a8168350c14caa08931e832735",
+      "bytes": 37306
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/differential.mjs",
@@ -34512,8 +34512,13 @@
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/m4-identity.mjs",
-      "sha256": "a8902037800e922bc63aac29a7b6950f49c213bac08c314b964d70c45ff712d9",
-      "bytes": 1960
+      "sha256": "28a600d8e2f574a7f6086c0056faa9c30a80708586591301540d97343aa1dc0c",
+      "bytes": 2731
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/m4-real-shells.py",
+      "sha256": "b421d80c779d1bbcf14d51f32b60ce81fed8b82586b3d26808ecff9e24cd47a6",
+      "bytes": 5440
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/make-inputs.mjs",
@@ -34527,8 +34532,8 @@
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/real-commands.mjs",
-      "sha256": "1cdcd669792b01227dd40d6ccadde867d30faed065c57e739f990b60c45f9ba4",
-      "bytes": 2746
+      "sha256": "15189f90ec8164795635362af475487eec9547b4dfe02f786bb8fdeb5e0c4a8f",
+      "bytes": 4022
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/repeat-oracle.sh",
@@ -34537,13 +34542,18 @@
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/run-differential.py",
-      "sha256": "5b270e794de35dfc5ddeb1c1d05e5fa6139d34bdf0b9bfd86d28005563e38aa8",
-      "bytes": 10305
+      "sha256": "e907a42586ad112fdbc71761270130ed0b08b79c4603a703ac95a8bb7025f704",
+      "bytes": 10745
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/scaling.mjs",
+      "sha256": "bbac3e8b3c7beaaca9f377cd43489741311928076eb762a8e1ca6ad17df39ffe",
+      "bytes": 4400
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/shape-counts.mjs",
-      "sha256": "fa1d6d197693f005b6e533d081134487353a7209a40f90eb437a23f6a7fa9930",
-      "bytes": 5744
+      "sha256": "6f256ca1a2c1bb64e499c4094515d9d7468e4268324f208ad98260d7bcbacceb",
+      "bytes": 15038
     },
     {
       "path": "evidence/artifacts/pra-u1-differential-20260929/states-count.mjs",
@@ -34554,6 +34564,11 @@
       "path": "evidence/artifacts/pra-u1-differential-20260929/timing.mjs",
       "sha256": "066e3320afcda8c0503ca0ea8b845edf38685af4050ce41165baa27eb7e15dd7",
       "bytes": 2227
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/update-round2.py",
+      "sha256": "109c8c38be6f9f4e435511bc605587fc49c499698ebc9fcd63bc8eda4c72d984",
+      "bytes": 6032
     },
     {
       "path": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json",
@@ -42027,12 +42042,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "13228806f0276ced242cfbd055db54adae8bef1b5d255bc0534eb1ebb7dd07b9",
-      "bytes": 87317
+      "sha256": "6f74f33f909ecd0f9e4c01789bb2da7038bd21dcd6e8015badf3a0eeaf971ce2",
+      "bytes": 89176
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "02d76ef2d151e492b2b39bc0a65da4193938a7a442e40692ed0c2c15a5f96cbd",
+      "sha256": "6192d920087017995809c50ba7a44cbae3dbf03bb4dad4468d7a7a2c162971ef",
       "bytes": 1217
     },
     {
@@ -42042,8 +42057,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "a9126a77fd7f2908570d680bb79784905eab4876ade4b3ff794befc893542716",
-      "bytes": 191676
+      "sha256": "119ce9764447ea0f7c7b53622d3cac14b73b34e3b657bd65833f062fb534f6bb",
+      "bytes": 192984
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -42072,8 +42087,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "caecee21c535a2d51e193b45c6dc3937bb9880c701205593a31b887380b20efe",
-      "bytes": 93665
+      "sha256": "61db9bde4b3d5e586cf83b840bbd7425c6c91b39b8629b40cc1b66b4f8d3c008",
+      "bytes": 98150
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -43092,8 +43107,8 @@
     },
     {
       "path": "tests/test_child_usage_suite.py",
-      "sha256": "4ac190f8b6e5b1a962e39db2dce51f9b073542d6f00992ce9447d07339a21150",
-      "bytes": 1235
+      "sha256": "3dd89d6cf98887f9a6ff672eeaf9b84f879910de8a8a0697a784081b9efe8f67",
+      "bytes": 21883
     },
     {
       "path": "tests/test_claude_recovery.py",
@@ -43872,8 +43887,8 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "61eb6d379a6c6220c402c5406b9d729ce8cce1a8d928a81c34aad5af8d0809a1",
-      "bytes": 25576
+      "sha256": "fc25ee1850359c69c4700ec1d1888fdacbff43d019d0ec036e704c633bfc58c9",
+      "bytes": 26121
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
