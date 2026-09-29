@@ -3159,14 +3159,6 @@ class F13_Denominators(GraderCase):
         self.assertEqual(got["claude"]["A0"], {"lower": None, "upper": None, "matched_lower": None, "matched_upper": None})
         self.assertEqual(got["codex"]["B"], {"lower": None, "upper": None, "matched_lower": None, "matched_upper": None})
 
-    def test_M20_zero_instead_of_null_flips_the_zero_case(self):
-        ev = evm()
-        tasks, outcomes = self.data()
-        with mock.patch.object(ev, "or_null", lambda number: number):
-            got = ev.g_c_denominators(tasks, outcomes)
-        self.assertEqual(got["claude"]["A0"]["lower"], 0, "the mutant keeps zero, so test_a_zero_denominator... must fail")
-
-
 class F14_M8(GraderCase):
     """R15: per lane, arm B: O opportunities (not_launched included), R recorded attempts, bounds and status."""
 
@@ -3980,6 +3972,806 @@ class H2_StageOneGaps(GraderCase):
                                               "M12": sealed["thresholds"]["M12"]["criteria"],
                                               "G-Q": sealed["thresholds"]["G-Q"]["criteria"]})
         self.assertEqual(spec["thresholds"]["M8"]["correct_lane_use_rate_gte"], 0.8)
+
+
+def blind_transcript(cwd, answer_text, *, evidence=(), attachments=("hook_success", "environment", "prompt_snapshot"),
+                     read_hook=False, prompt=None, packet=PACKET):
+    """A clean blind child: allowlisted attachments, one Read of the packet, StructuredOutput, a closing text."""
+    rows = [r_attach(kind, ts(0, number)) for number, kind in enumerate(attachments)]
+    rows.append(r_user(prompt or f"Read {packet} as the entire packet.", ts(0, 30), cwd=str(cwd)))
+    rows.append(r_use("Read", {"file_path": str(Path(cwd) / packet)}, "toolu-fx-b1", ts(1), "msg-b1"))
+    if read_hook:
+        rows.append(r_attach("hook_additional_context", ts(1, 1), hookName="PreToolUse:Read", hookEvent="PreToolUse",
+                             content="advisory"))
+    rows.append(r_result("toolu-fx-b1", "packet text", ts(1, 5)))
+    rows.append(r_use("StructuredOutput", {"answer": answer_text, "evidence": list(evidence)}, "toolu-fx-so", ts(2), "msg-so"))
+    rows.append(r_result("toolu-fx-so", "ok", ts(2, 1)))
+    rows.append(r_text("done", ts(3)))
+    return rows
+
+
+def write_ledger(path, records):
+    Path(path).write_text("".join(json.dumps(record) + "\n" for record in records), encoding="utf-8")
+
+
+class MiniRun:
+    """A complete synthetic run behind the `identity`, `grade` and `regrade` commands: the real spec, bindings and
+    keys commands over a tiny repository, a Claude projects tree (one Workflow run, a main session, an Agent-tool
+    harness, a strict process), Codex events, launch records, and the sibling ledgers in their stated shapes."""
+
+    def __init__(self, case, *, token=RUN_TOKEN):
+        self.case, self.tmp, self.token = case, case.tmp, token
+        files = {f"{E2E}/fixtures/table.json": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/table.json"),
+                 f"{E2E}/fixtures/events.jsonl": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/events.jsonl")}
+        self.repo, self.commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(), files=files)
+        self.spec = self.tmp / "spec.json"
+        self.ok(["spec", "--repo", self.repo, "--preregistration-commit", self.commit, "--out", self.spec])
+        self.bindings = make_bindings(self.tmp, exec_rev=self.commit, exec_checkout=self.repo, run_token=token)
+        self.keys = self.tmp / "keys.json"
+        self.ok(["keys", "--spec", self.spec, "--bindings", self.bindings, "--repo", self.repo, "--out", self.keys])
+        self.world = ClaudeWorld(self.tmp)
+        self.root = self.world.root
+        self.e2e = self.tmp / "e2e"
+        self.e2e.mkdir(exist_ok=True)
+        self.captures = self.tmp / "captures"
+        self.captures.mkdir()
+        self.launches, self.codex_rows, self.join_rows, self.run_children, self.ledger = [], [], [], [], []
+        self.identity_table = self.tmp / "identity-table.json"
+
+    def ok(self, args, **kw):
+        proc = run_grade(args, **kw)
+        assert proc.returncode == 0, f"{args[0]} failed: {sanitize(proc.first_line())}"
+        return proc
+
+    def ident(self, arm, task, attempt=1):
+        return f"{self.token}.{arm}.{task}.{attempt}"
+
+    def workflow(self, arm, task, rows, response, *, agent_id, attempt=1, hooks=0, read_rows=0, logs=True):
+        label = self.ident(arm, task, attempt)
+        self.world.child(label, agent_id, result=response, rows=rows)
+        if logs:
+            self.world.log_response(label, response)
+        self.ledger += ledger_for(rows, owner=agent_id)
+        self.run_children.append({"agent_id": agent_id, "label": label, "lanes": {"measurement": {"hook_context": {
+            "inserted": hooks, "by_hook": {"PreToolUse:Read": read_rows} if read_rows else {}}}}})
+        self.join_rows.append({"schema": "token-e2e-adoption-join/1", "identity": label, "actor": "workflow_child",
+                               "arm": arm, "task": task, "attempt": attempt, "source": "row", "agent_id": agent_id,
+                               "join": "joined", "reason": None, "complete": True, "incomplete_cause": None,
+                               "lanes": {}, "excluded_kind": None})
+        return label
+
+    def blind(self, task, answer_text, *, agent_id, strict=True, read_hook=False, hooks=0, **kw):
+        rows = blind_transcript(self.repo, answer_text, read_hook=read_hook, **kw)
+        label = self.workflow("B", task, rows, {"answer": answer_text, "evidence": []}, agent_id=agent_id, hooks=hooks,
+                              read_rows=1 if read_hook else 0)
+        if strict:
+            session = f"sess-strict-{task.rsplit('-', 1)[-1]}"
+            write_jsonl(self.root / "proj-fixture" / f"{session}.jsonl", blind_transcript(self.repo, answer_text))
+            (self.e2e / f"{label}.strict.out").write_text(answer_text + "\n", encoding="utf-8")
+            self.launches.append({"identity": label, "actor": "strict_process", "session_id": session, "exit": 0})
+        return label
+
+    def main(self, answer_text="10", *, session="sess-main-1", task="seed-main-output", shared_with=None):
+        label = self.ident("B", task)
+        rows = [r_user("Count ERROR records", ts(0)), r_text(answer_text, ts(2), "msg-main")]
+        write_jsonl(self.root / "proj-fixture" / f"{session}.jsonl", rows)
+        (self.e2e / f"{label}.main.out").write_text(answer_text + "\n", encoding="utf-8")
+        self.launches.append({"identity": label, "actor": "main", "session_id": session})
+        return label
+
+    def agent_path(self, text="First 64 and last 640.", *, session="sess-harness-1", calls=1):
+        label = self.ident("B", "seed-agent-path")
+        session_dir = self.root / "proj-fixture" / session
+        rows = [r_user("harness", ts(0, 1))]
+        for number in range(calls):
+            tid = f"toolu-fx-agent{number + 1}"
+            rows.append(r_use("Agent", {"description": "d", "prompt": "p", "subagent_type": "stack-researcher"}, tid,
+                              ts(0, 2 + number), f"msg-h{number + 1}"))
+            if number == 0:
+                rows.append(r_result(tid, [{"type": "text", "text": framed(text)}], ts(4)))
+        write_jsonl(self.root / "proj-fixture" / f"{session}.jsonl", rows)
+        child_rows = [r_user("p", ts(1)), r_text(text, ts(3), "msg-c1")]
+        write_jsonl(session_dir / "subagents" / "agent-fx9.jsonl", child_rows)
+        write_json(session_dir / "subagents" / "agent-fx9.meta.json",
+                   {"agentType": "stack-researcher", "toolUseId": "toolu-fx-agent1", "description": "d"})
+        self.ledger += ledger_for(child_rows, owner="fx9")
+        self.launches.append({"identity": label, "actor": "agent_child", "session_id": session})
+        return label
+
+    def codex_exec(self, task, text, *, arm="B", attempt=1, fetch=()):
+        label = self.ident(arm, task, attempt)
+        path = self.e2e / f"{label}.events.jsonl"
+        records = [{"type": "thread.started", "thread_id": "thread-fx1"}]
+        for number, url in enumerate(fetch):
+            records.append({"type": "item.completed", "item": {"id": f"item_w{number}", "type": "web_search", "query": "q",
+                                                              "action": {"type": "open_page", "url": url}, "status": "completed"}})
+        records += [{"type": "item.completed", "item": {"id": "item_0", "type": "agent_message", "text": text}},
+                    {"type": "turn.completed", "usage": {"input_tokens": 1, "output_tokens": 1}}]
+        write_jsonl(path, records)
+        self.codex_rows.append({"identity": label, "actor": "codex_exec", "events_file": str(path)})
+        return label
+
+    def t0(self, *, discarded=False):
+        label = self.workflow("B", "reuse-296-00", answer_rows(T0_ANSWER), {"answer": T0_ANSWER, "evidence": []},
+                              agent_id="fx5")
+        pre = t0_captures()["pre"]
+        for name, record in (("pre-arm", {"t0": {"reuse-296-00": pre}, "trees": {}, "exec_checkout": {"tree": {}, "entries": []}}),
+                             ("post-arm", {"t0": {"reuse-296-00": {"discarded": "tree_changed"} if discarded
+                                                  else t0_captures()["post"]}, "builders": {}, "processes": [], "clones": {}})):
+            write_json(self.captures / f"arm-claude-B-{name}.json",
+                       dict({"schema": "token-e2e-capture/1", "phase": name, "family": "claude", "arm": "B",
+                             "completed_at": "2026-10-01T00:59:00Z"}, **record))
+        return label
+
+    # -- files for the commands ------------------------------------------------------------------------------------
+
+    def write_inputs(self):
+        write_json(self.tmp / "launch-records.json", {"schema": "token-e2e-launch-records/1", "records": self.launches})
+        write_json(self.tmp / "codex-rows.json", {"schema": "token-e2e-identity/1", "run": self.token, "rows": self.codex_rows})
+        write_json(self.tmp / "run-mode-B.json", {"children": self.run_children})
+        write_ledger(self.tmp / "call-ledger.jsonl", self.ledger)
+        write_ledger(self.tmp / "join-claude.jsonl", self.join_rows)
+        write_ledger(self.tmp / "join-codex.jsonl", [])
+        write_json(self.tmp / "adoption-claude.json", {"m12_inputs": self.m12_inputs()})
+
+    def m12_inputs(self):
+        blind = [row for row in self.join_rows if "seed-blind-1" in row["identity"]]
+        strict = [item for item in self.launches if item["actor"] == "strict_process"]
+        return {"blind_workflow": {"rows": len(blind), "joined": len(blind), "children_with_hook_rows": 0, "hook_rows": 0,
+                                   "children_with_mcp_skill_bash": 0, "mcp_skill_bash_calls": 0},
+                "positive_control": {"rows": 1, "joined": 1, "pretooluse_read_rows": 1},
+                "strict_process": {"rows": len(strict), "joined": 0, "children_with_hook_rows": 0, "hook_rows": 0,
+                                   "children_with_mcp_skill_bash": 0, "mcp_skill_bash_calls": 0}}
+
+    def identity(self, out=None, extra=(), env=None):
+        self.write_inputs()
+        self.world.write()
+        out = out or self.identity_table
+        return run_grade(["identity", "--spec", self.spec, "--bindings", self.bindings, "--launch-records",
+                          self.tmp / "launch-records.json", "--codex-rows", self.tmp / "codex-rows.json", "--out", out,
+                          *extra], env=dict({"RUN_TOKEN": self.token}, **(env or {})))
+
+    def grade_args(self, private, out, extra=()):
+        return ["grade", "--spec", self.spec, "--repo", self.repo, "--bindings", self.bindings, "--identity-table",
+                self.identity_table, "--keys", self.keys, "--captures", self.captures, "--join-ledger",
+                f"claude={self.tmp / 'join-claude.jsonl'}", "--join-ledger", f"codex={self.tmp / 'join-codex.jsonl'}",
+                "--adoption-report", f"claude={self.tmp / 'adoption-claude.json'}", "--run-mode",
+                f"B={self.tmp / 'run-mode-B.json'}", "--call-ledger", self.tmp / "call-ledger.jsonl",
+                "--codex-events-dir", self.e2e, "--out-private", private, "--out", out, *extra]
+
+    def grade(self, name="one", extra=(), env=None):
+        private, out = self.tmp / f"private-{name}", self.tmp / f"aggregate-{name}.json"
+        proc = run_grade(self.grade_args(private, out, extra), env=env)
+        return proc, private, out
+
+    def web_answer(self):
+        return ("```json\n" + json.dumps(web_key()["records"]) + "\n```\nLatency sum: 124\nSource: "
+                f"pathlib.Path.read_text(encoding=...) at {PATHLIB_URL} and the json module at {JSON_URL}")
+
+    def default_run(self):
+        self.blind("seed-blind-1", "Verdict: yes. id 1, latency 17 ms.", agent_id="fx1")
+        self.blind("seed-blind-positive", "Events [1, 2, 3, 4, 5], all INFO.", agent_id="fx2", strict=True, read_hook=True,
+                   hooks=1)
+        self.main()
+        self.agent_path()
+        self.codex_exec("seed-codex-web-table-1", self.web_answer(), fetch=(JSON_URL, PATHLIB_URL))
+        self.t0()
+        return self
+
+
+class F27_Identity(GraderCase):
+    """R19 identity: the table is built from the recorded launches, merged with U10's Codex rows and validated; a row
+    that would need guesswork is refused with its kind."""
+
+    def rows(self, path=None):
+        document = json.loads((path or self.tmp / "identity-table.json").read_text(encoding="utf-8"))
+        return document, {(row["identity"], row["actor"]): row for row in document["rows"]}
+
+    def test_rows_come_from_started_labels_launch_records_and_the_codex_rows(self):
+        run = MiniRun(self).default_run()
+        proc = run.identity()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        document, rows = self.rows()
+        self.assertEqual((document["schema"], document["run"]), ("token-e2e-identity/1", RUN_TOKEN))
+        ident = run.ident
+        self.assertEqual(rows[(ident("B", "seed-blind-1"), "workflow_child")]["workflow_dir"], str(run.world.wf))
+        self.assertEqual(rows[(ident("B", "seed-blind-1"), "strict_process")]["transcript"],
+                         str(run.root / "proj-fixture" / "sess-strict-1.jsonl"))
+        self.assertEqual(rows[(ident("B", "seed-main-output"), "main")]["transcript"],
+                         str(run.root / "proj-fixture" / "sess-main-1.jsonl"))
+        agent = rows[(ident("B", "seed-agent-path"), "agent_child")]
+        self.assertEqual((agent["session_dir"], agent["tool_use_id"]),
+                         (str(run.root / "proj-fixture" / "sess-harness-1"), "toolu-fx-agent1"))
+        codex = rows[(ident("B", "seed-codex-web-table-1"), "codex_exec")]
+        self.assertTrue(codex["events_file"].endswith(".events.jsonl"))
+        self.assertEqual(json.loads(proc.stdout)["rows"], len(document["rows"]))
+
+    def test_the_output_is_private_create_only_and_sorted(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        self.assertEqual(stat.S_IMODE(run.identity_table.stat().st_mode), 0o600)
+        document, _ = self.rows()
+        keys = [(row["identity"], row["actor"]) for row in document["rows"]]
+        self.assertEqual(keys, sorted(keys))
+        self.assertRefusal(run.identity(), "E_PATH", reason="exists")
+        tree = self.tmp / "as-work-tree"
+        tree.mkdir()
+        (tree / ".git").write_text("gitdir: elsewhere\n", encoding="utf-8")
+        self.assertRefusal(run.identity(out=tree / "sub" / "t.json"), "E_PATH", reason="work_tree")
+
+    def test_foreign_labels_are_counted_never_listed(self):
+        run = MiniRun(self).default_run()
+        run.world.child("other-run.B.seed-main-output.1", "fx7", result={"answer": "x", "evidence": []}, rows=answer_rows("x"))
+        proc = run.identity()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(json.loads(proc.stdout)["foreign_labels"], 1)
+        self.assertNotIn("other-run", (run.tmp / "identity-table.json").read_text(encoding="utf-8"))
+
+    def test_a_shared_main_session_is_refused(self):
+        run = MiniRun(self).default_run()
+        run.main(session=SESSION_ID)  # the coordinator's own Workflow session holds children: not a dedicated session
+        run.launches = [item for item in run.launches if not (item["actor"] == "main" and item["session_id"] != SESSION_ID)]
+        self.assertRefusal(run.identity(), "E_IDENTITY_SOURCE", kind="main")
+
+    def test_two_launch_records_on_one_main_session_are_refused(self):
+        run = MiniRun(self).default_run()
+        run.launches.append({"identity": run.ident("B", "seed-main-output", 2), "actor": "main", "session_id": "sess-main-1"})
+        self.assertRefusal(run.identity(), "E_IDENTITY_SOURCE", kind="main")
+
+    def test_two_agent_calls_in_the_harness_session_are_refused(self):
+        run = MiniRun(self)
+        run.default_run()
+        run.launches = [item for item in run.launches if item["actor"] != "agent_child"]
+        run.agent_path(session="sess-harness-2", calls=2)
+        self.assertRefusal(run.identity(), "E_IDENTITY_SOURCE", kind="agent")
+
+    def test_a_teammate_transcript_claimed_by_two_rows_is_refused(self):
+        run = MiniRun(self).default_run()
+        session_dir = run.root / "proj-fixture" / SESSION_ID / "subagents"
+        write_jsonl(session_dir / "agent-fx8.jsonl", [r_user("t", ts(0))])
+        write_json(session_dir / "agent-fx8.meta.json", {"agentType": "stack-researcher", "taskKind": "in_process_teammate",
+                                                        "teamName": "team-fx"})
+        for task in ("reuse-296-01", "reuse-296-03"):
+            run.launches.append({"identity": run.ident("T", task), "actor": "team_teammate", "session_id": SESSION_ID,
+                                 "agent_id": "fx8"})
+        self.assertRefusal(run.identity(), "E_IDENTITY_SOURCE", kind="team")
+
+    def test_a_teammate_row_validates_as_a_reported_only_row(self):
+        run = MiniRun(self).default_run()
+        session_dir = run.root / "proj-fixture" / SESSION_ID / "subagents"
+        write_jsonl(session_dir / "agent-fx8.jsonl", [r_user("t", ts(0))])
+        write_json(session_dir / "agent-fx8.meta.json", {"agentType": "stack-researcher", "taskKind": "in_process_teammate"})
+        run.launches.append({"identity": run.ident("T", "reuse-296-01"), "actor": "team_teammate", "session_id": SESSION_ID,
+                             "agent_id": "fx8"})
+        proc = run.identity()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        _, rows = self.rows()
+        self.assertIn((run.ident("T", "reuse-296-01"), "team_teammate"), rows)
+
+    def test_an_invalid_arm_surfaces_the_validators_code(self):
+        run = MiniRun(self).default_run()
+        run.codex_rows.append({"identity": run.ident("C", "seed-codex-web-table-1"), "actor": "codex_exec",
+                               "events_file": str(run.e2e / "x.events.jsonl")})
+        proc = run.identity()
+        self.assertEqual(proc.returncode, 2)
+        self.assertEqual(sanitize(proc.first_line()).split(" row=")[0], "E_IDENTITY_INVALID code=E_ROW")
+
+    def test_a_label_in_two_workflow_directories_is_refused(self):
+        run = MiniRun(self).default_run()
+        second = ClaudeWorld(run.tmp, run="wf_fixture2", session="sess-fixture-2")
+        second.child(run.ident("B", "seed-blind-1"), "fx3", result={"answer": "x", "evidence": []}, rows=answer_rows("x"))
+        second.write()
+        self.assertRefusal(run.identity(), "E_IDENTITY_SOURCE", kind="workflow")
+
+    def test_the_run_token_must_match_the_bind(self):
+        run = MiniRun(self).default_run()
+        self.assertRefusal(run.identity(env={"RUN_TOKEN": "not-the-token"}), "E_IDENTITY_SOURCE", kind="run_token")
+
+    def test_codex_rows_of_another_run_are_refused(self):
+        run = MiniRun(self).default_run()
+        run.write_inputs()
+        write_json(run.tmp / "codex-rows.json", {"schema": "token-e2e-identity/1", "run": "another-run-token", "rows": []})
+        proc = run_grade(["identity", "--spec", run.spec, "--bindings", run.bindings, "--launch-records",
+                          run.tmp / "launch-records.json", "--codex-rows", run.tmp / "codex-rows.json", "--out",
+                          run.tmp / "t2.json"], env={"RUN_TOKEN": run.token})
+        self.assertRefusal(proc, "E_IDENTITY_SOURCE", kind="codex_rows")
+
+
+def sha256_file(path):
+    return sha256(Path(path).read_bytes())
+
+
+def all_strings(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from all_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from all_strings(item)
+
+
+class F16_GradeCommand(GraderCase):
+    """`grade`: the private table and the ID-free aggregate; deterministic bytes; `regrade` from the private
+    directory alone (no model, no sibling tool); exit 0 only when G-Q, M7, M8 and M12 pass."""
+
+    def graded(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        return run, proc, private, out
+
+    def test_grade_writes_a_private_table_and_an_id_free_aggregate(self):
+        run, proc, private, out = self.graded()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        self.assertEqual(stat.S_IMODE(private.stat().st_mode), 0o700)
+        for name in ("grades.jsonl", "evidence.jsonl"):
+            self.assertEqual(stat.S_IMODE((private / name).stat().st_mode), 0o600)
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["schema"], "token-e2e-grades/1")
+        text = out.read_text(encoding="utf-8")
+        for private_value in (RUN_TOKEN, SESSION_ID, RUN_ID, "fx1", "thread-fx1", str(self.tmp)):
+            self.assertNotIn(private_value, text)
+        for value in all_strings(aggregate):
+            self.assertFalse(value.startswith("/") or " /" in value, "no path shape in the aggregate")
+        summary = json.loads(proc.stdout)
+        self.assertEqual(sorted(summary), ["exit", "g_q", "m12", "m7", "m8"])
+
+    def test_the_aggregate_counts_attempts_and_tasks_by_family_and_arm(self):
+        run, proc, private, out = self.graded()
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        claude_b = aggregate["attempts"]["claude"]["B"]
+        self.assertEqual((claude_b["recorded"], claude_b["completed"], claude_b["inadmissible"]),
+                         (7, 7, {"usage_limit": 0, "interrupted_driver": 0, "startup_error": 0}))
+        tasks_b = aggregate["tasks"]["claude"]["B"]
+        self.assertEqual(tasks_b["planned"], 50)
+        self.assertEqual(tasks_b["planned"], sum(tasks_b[name] for name in
+                                                 ("pass", "fail", "unknown", "not_launched", "incomplete_control")))
+        self.assertEqual(aggregate["tasks"]["codex"]["B"]["planned"], 25)
+        self.assertEqual(aggregate["g_q"]["clause1"]["population"], 75)
+        self.assertEqual(aggregate["g_q"]["status"], "fail", "most planned tasks were never launched")
+        self.assertEqual(proc.returncode, 1)
+
+    def test_a_blind_task_passes_on_a_clean_attempt_and_the_positive_control_needs_its_read_row(self):
+        run, proc, private, out = self.graded()
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["m12"]["blind"]["seed-blind-1"], {"clean": 2, "contaminated": 0, "unknown": 0,
+                                                                     "strict_replacement": True})
+        self.assertEqual(aggregate["m12"]["positive_read_rows"], 1)
+        self.assertNotEqual(aggregate["m12"]["status"], "incomplete")
+
+    def test_a_grades_row_exists_per_identity_and_actor_with_its_components(self):
+        run, proc, private, out = self.graded()
+        rows = [json.loads(line) for line in (private / "grades.jsonl").read_text(encoding="utf-8").splitlines()]
+        by_key = {(row["identity"], row["actor"]): row for row in rows}
+        blind = by_key[(run.ident("B", "seed-blind-1"), "workflow_child")]
+        self.assertEqual((blind["template"], blind["class"], blind["status"]), ("T32", "completed", "pass"))
+        self.assertEqual(blind["cleanliness"], "clean")
+        self.assertEqual({component["id"]: component["status"] for component in blind["components"]}, {"A": "pass", "C": "pass"})
+        main = by_key[(run.ident("B", "seed-main-output"), "main")]
+        self.assertEqual(main["status"], "pass")
+        agent = by_key[(run.ident("B", "seed-agent-path"), "agent_child")]
+        self.assertEqual(agent["status"], "pass")
+        codex = by_key[(run.ident("B", "seed-codex-web-table-1"), "codex_exec")]
+        self.assertEqual(codex["status"], "unknown", "every deterministic component passes; the D clause is not judged yet")
+        self.assertIn("judge_pending", codex["reasons"])
+        self.assertEqual({component["id"]: component["status"] for component in codex["components"]},
+                         {"C": "pass", "A": "pass", "R": "pass", "D": "pending"})
+        t0 = by_key[(run.ident("B", "reuse-296-00"), "workflow_child")]
+        self.assertEqual(t0["status"], "pass")
+
+    def test_a_discarded_post_arm_t0_capture_is_counted_and_published(self):
+        run = MiniRun(self)
+        run.blind("seed-blind-1", "Verdict: yes. id 1, latency 17 ms.", agent_id="fx1", strict=False)
+        run.t0(discarded=True)
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["t0_post_discarded"], 1)
+
+    def test_grade_twice_then_regrade_gives_identical_bytes_and_calls_no_model(self):
+        run, proc1, private1, out1 = self.graded()
+        proc2, private2, out2 = run.grade("two")
+        self.assertEqual(proc1.returncode, proc2.returncode)
+        bin_dir = self.tmp / "fake-bin"
+        bin_dir.mkdir()
+        log = self.tmp / "model-calls.log"
+        for name in ("codex", "claude"):
+            script = bin_dir / name
+            script.write_text(f"#!/bin/sh\necho called >> '{log}'\nexit 9\n", encoding="utf-8")
+            script.chmod(0o755)
+        env = {"PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+        private3, out3 = self.tmp / "private-three", self.tmp / "aggregate-three.json"
+        proc3 = run_grade(["regrade", "--from", private1, "--out-private", private3, "--out", out3], env=env)
+        self.assertEqual(proc3.returncode, proc1.returncode, sanitize(proc3.stderr))
+        private4, out4 = self.tmp / "private-four", self.tmp / "aggregate-four.json"
+        self.assertIn(run_grade(run.grade_args(private4, out4), env=env).returncode, (0, 1))
+        for one, other in ((out1, out2), (out1, out3), (out1, out4)):
+            self.assertEqual(sha256_file(one), sha256_file(other), "the aggregate bytes must not vary")
+        for other in (private2, private3, private4):
+            self.assertEqual(sha256_file(private1 / "grades.jsonl"), sha256_file(other / "grades.jsonl"))
+        self.assertFalse(log.exists(), "no model or sibling launcher may run while grading or regrading")
+
+    def test_regrade_reads_only_the_private_directory(self):
+        run, proc, private, out = self.graded()
+        for path in (run.world.root, run.e2e, run.captures, run.spec, run.keys, run.bindings, run.identity_table):
+            shutil.move(str(path), str(path) + ".gone")
+        private2, out2 = self.tmp / "private-two", self.tmp / "aggregate-two.json"
+        proc2 = run_grade(["regrade", "--from", private, "--out-private", private2, "--out", out2])
+        self.assertEqual(proc2.returncode, proc.returncode, sanitize(proc2.stderr))
+        self.assertEqual(sha256_file(out), sha256_file(out2))
+
+    def test_the_m12_cross_check_against_u4s_inputs_stops_the_grade(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        report = json.loads((run.tmp / "adoption-claude.json").read_text(encoding="utf-8"))
+        report["m12_inputs"]["blind_workflow"]["hook_rows"] = 3
+        write_json(run.tmp / "adoption-claude.json", report)
+        private, out = run.tmp / "private-x", run.tmp / "aggregate-x.json"
+        proc = run_grade(run.grade_args(private, out))
+        self.assertRefusal(proc, "E_M12_INPUTS", kind="blind_workflow", field="hook_rows")
+        self.assertFalse(private.exists() or out.exists(), "nothing is written when a refusal stops the grade")
+
+    def test_the_grade_needs_its_inputs_after_the_spec_check(self):
+        run = MiniRun(self).default_run()
+        proc = run_grade(["grade", "--spec", run.spec, "--repo", run.repo])
+        self.assertRefusal(proc, "E_ARGS", field="bindings")
+
+    def test_a_keys_file_for_other_bindings_is_refused(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        document = json.loads(run.keys.read_text(encoding="utf-8"))
+        document["bindings_sha256"] = "0" * 64
+        other = run.tmp / "keys-other.json"
+        other.write_text(json.dumps(document), encoding="utf-8")
+        private, out = run.tmp / "private-y", run.tmp / "aggregate-y.json"
+        args = [other if item == run.keys else item for item in run.grade_args(private, out)]
+        self.assertRefusal(run_grade(args), "E_KEYS_MISMATCH")
+
+
+class F17_GradePrivacy(GraderCase):
+    """R22 for `grade`: the canary over the aggregate, create-only private writes, no work-tree output."""
+
+    def ready(self, **kw):
+        run = MiniRun(self, **kw).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        return run
+
+    def test_a_run_token_that_appears_in_the_aggregate_vocabulary_stops_the_grade(self):
+        run = self.ready(token="completed_attempts")  # a reading value the aggregate publishes
+        proc, private, out = run.grade()
+        self.assertRefusal(proc, "E_PRIVACY")
+        self.assertEqual(proc.stderr.strip(), "E_PRIVACY")
+        self.assertFalse(private.exists() or out.exists(), "nothing is created when the canary fires")
+
+    def test_an_existing_output_path_is_refused_and_left_untouched(self):
+        run = self.ready()
+        out = self.tmp / "existing-aggregate.json"
+        out.write_text("keep", encoding="utf-8")
+        os.chmod(out, 0o644)
+        proc = run_grade(run.grade_args(self.tmp / "private-e", out))
+        self.assertRefusal(proc, "E_PATH", reason="exists")
+        self.assertEqual((out.read_text(encoding="utf-8"), stat.S_IMODE(out.stat().st_mode)), ("keep", 0o644))
+        self.assertFalse((self.tmp / "private-e").exists())
+
+    def test_an_existing_private_directory_is_refused(self):
+        run = self.ready()
+        private = self.tmp / "existing-private"
+        private.mkdir()
+        proc = run_grade(run.grade_args(private, self.tmp / "aggregate-f.json"))
+        self.assertRefusal(proc, "E_PATH", reason="exists")
+        self.assertEqual(list(private.iterdir()), [])
+
+    def test_a_symlink_output_counts_as_existing(self):
+        run = self.ready()
+        target = self.tmp / "target.json"
+        link = self.tmp / "link.json"
+        link.symlink_to(target)
+        proc = run_grade(run.grade_args(self.tmp / "private-g", link))
+        self.assertRefusal(proc, "E_PATH", reason="exists")
+        self.assertFalse(target.exists())
+
+    def test_outputs_inside_a_work_tree_are_refused_before_anything_is_created(self):
+        run = self.ready()
+        tree = self.tmp / "as-work-tree"
+        tree.mkdir()
+        (tree / ".git").write_text("gitdir: elsewhere\n", encoding="utf-8")
+        for private, out in ((tree / "p", self.tmp / "aggregate-h.json"), (self.tmp / "private-h", tree / "a.json")):
+            with self.subTest(str(private.name)):
+                proc = run_grade(run.grade_args(private, out))
+                self.assertRefusal(proc, "E_PATH", reason="work_tree")
+                self.assertFalse(private.exists() or out.exists())
+
+    def test_the_canary_scans_keys_shapes_and_gathered_values(self):
+        ev = evm()
+        values = ["tok7fixture", "sess-fixture-1", "/home/example/project"]
+        for document in ({"a": "tok7fixture"}, {"tok7fixture": 1}, {"a": ["x", {"b": "see sess-fixture-1 here"}]},
+                         {"a": "/etc/hosts"}, {"a": "see /tmp/x"}, {"a": "toolu_0123456789"}, {"a": "call_abcdef123456"},
+                         {"a": "3f2c8a10-1b2c-4d5e-8f90-a1b2c3d4e5f6"}, {"a": "C:\\Users\\name"},
+                         {"a": "-home-example-project-x"}):
+            with self.subTest(str(document)):
+                self.assertRefused(lambda: ev.assert_no_private(document, values), "E_PRIVACY")
+        ev.assert_no_private({"a": "PreToolUse:Read", "tool": {"path": "tools/token-e2e"}, "n": 3, "short": "abc"}, values)
+
+    def test_short_values_are_skipped_and_the_count_of_checked_values_is_published(self):
+        ev = evm()
+        self.assertEqual(ev.assert_no_private({"a": "ab"}, ["ab", "tok7fixture"]), 1, "values under 8 characters are skipped")
+
+
+ROLE = {"name": "stack-researcher", "model": "gpt-6-astra", "effort": "max",
+        "developer_instructions": "You are the stack researcher. Use the memory server first and cite paths."}
+ROLE_TOML = ("name = \"stack-researcher\"\ndescription = \"researcher\"\nmodel = \"gpt-6-astra\"\n"
+             "model_reasoning_effort = \"max\"\ndeveloper_instructions = '''" + ROLE["developer_instructions"] + "'''\n")
+SANDBOX = {"type": "read-only"}
+
+
+def rollout(*records):
+    return [dict({"timestamp": ts(1, number), "ordinal": number}, **record) for number, record in enumerate(records)]
+
+
+def dev_message(text):
+    return {"type": "response_item", "payload": {"type": "message", "role": "developer",
+                                                 "content": [{"type": "input_text", "text": text}]}}
+
+
+def turn_context(model="gpt-6-astra", effort="max", sandbox=SANDBOX, cwd="/trees/a"):
+    return {"type": "turn_context", "payload": {"model": model, "effort": effort, "sandbox_policy": sandbox, "cwd": cwd}}
+
+
+def mcp_call(server, number=0):
+    return {"type": "response_item", "payload": {"type": "function_call", "name": f"mcp__{server}__memory_query",
+                                                 "call_id": f"call_{number}", "arguments": "{}"}}
+
+
+def child_rollout(*, agent_role="stack-researcher", texts=(ROLE["developer_instructions"],), context=None, servers=("ai-memory",),
+                  inherited=()):
+    records = [{"type": "session_meta", "payload": {"id": "thread-fx2", "agent_role": agent_role, "parent_thread_id": "thread-fx1",
+                                                     "source": {"subagent": {}},
+                                                     "subagent_history_start_ordinal": len(inherited) + 1}}]
+    records += list(inherited)
+    records += [dev_message(text) for text in texts]
+    records += [context or turn_context()]
+    records += [mcp_call(server, number) for number, server in enumerate(servers)]
+    return rollout(*records)
+
+
+class F36_RoleChildState(GraderCase):
+    """Correction 9 (M11 for Codex role children, U13-D6): the four checks of U13's reference specification. The
+    planted rollouts here are U9's own; U13's fixtures in tests/test_codex_agents.py are the reference to reconcile
+    with when that unit merges."""
+
+    def parent(self, **kw):
+        return rollout({"type": "session_meta", "payload": {"id": "thread-fx1"}}, turn_context(**kw))
+
+    def state(self, child=None, parent=None, servers=("ai-memory", "qmd"), role=None):
+        return evm().role_child_state(child or child_rollout(), parent or self.parent(), role or ROLE, list(servers))
+
+    def test_a_conforming_child_passes_all_four_checks(self):
+        got = self.state()
+        self.assertEqual({key: got[key] for key in ("developer_text_contains_role_once", "model_equals_pin",
+                                                    "effort_equals_pin", "tools_equal_parent_set")},
+                         {"developer_text_contains_role_once": True, "model_equals_pin": True, "effort_equals_pin": True,
+                          "tools_equal_parent_set": True})
+        self.assertEqual((got["status"], got["reasons"]), ("pass", []))
+
+    def test_the_developer_text_must_appear_exactly_once(self):
+        twice = self.state(child_rollout(texts=(ROLE["developer_instructions"], ROLE["developer_instructions"])))
+        self.assertEqual((twice["developer_text_contains_role_once"], twice["status"], twice["reasons"]),
+                         (False, "fail", ["developer_text"]))
+        absent = self.state(child_rollout(texts=("some other developer message",)))
+        self.assertEqual((absent["developer_text_contains_role_once"], absent["status"]), (False, "fail"))
+        inside_a_longer_message = self.state(child_rollout(texts=("preamble. " + ROLE["developer_instructions"] + " tail",)))
+        self.assertTrue(inside_a_longer_message["developer_text_contains_role_once"])
+
+    def test_model_and_effort_must_equal_the_role_pins(self):
+        model = self.state(child_rollout(context=turn_context(model="gpt-6-sol")))
+        self.assertEqual((model["model_equals_pin"], model["effort_equals_pin"], model["reasons"]), (False, True, ["model"]))
+        effort = self.state(child_rollout(context=turn_context(effort="medium")))
+        self.assertEqual((effort["model_equals_pin"], effort["effort_equals_pin"], effort["reasons"]), (True, False, ["effort"]))
+
+    def test_an_mcp_server_outside_the_parents_effective_set_fails_the_bindings(self):
+        got = self.state(child_rollout(servers=("ai-memory", "jcodemunch")))
+        self.assertEqual((got["tools_equal_parent_set"], got["status"], got["reasons"]), (False, "fail", ["bindings"]))
+
+    def test_a_sandbox_or_working_directory_that_differs_from_the_parent_fails_the_bindings(self):
+        for name, context in (("sandbox", turn_context(sandbox={"type": "workspace-write"})), ("cwd", turn_context(cwd="/trees/b"))):
+            with self.subTest(name):
+                got = self.state(child_rollout(context=context))
+                self.assertEqual((got["tools_equal_parent_set"], got["reasons"]), (False, ["bindings"]))
+
+    def test_records_inherited_from_the_parent_are_not_the_childs_turns(self):
+        inherited = [turn_context(model="gpt-6-sol", effort="low")]
+        got = self.state(child_rollout(inherited=inherited))
+        self.assertEqual((got["model_equals_pin"], got["effort_equals_pin"], got["status"]), (True, True, "pass"))
+
+    def test_a_child_with_no_own_turn_context_or_another_role_is_not_a_pass(self):
+        no_turn = child_rollout()
+        no_turn = [record for record in no_turn if record["type"] != "turn_context"]
+        got = self.state(no_turn)
+        self.assertEqual((got["status"], got["model_equals_pin"]), ("unknown", None))
+        other = self.state(child_rollout(agent_role="stack-verifier"))
+        self.assertEqual((other["status"], other["reasons"]), ("fail", ["agent_role"]))
+
+    def test_the_role_file_is_parsed_from_its_toml(self):
+        got = evm().parse_role_toml(ROLE_TOML.encode())
+        self.assertEqual({key: got[key] for key in ("name", "model", "effort", "developer_instructions")}, ROLE)
+
+    def test_the_arm_counts_are_published(self):
+        got = evm().m11_summary([{"arm": "B", "status": "pass"}, {"arm": "B", "status": "fail"},
+                                 {"arm": "B", "status": "unknown"}, {"arm": "A", "status": "pass"}])
+        self.assertEqual(got, {"A": {"children": 1, "pass": 1, "fail": 0, "unknown": 0},
+                               "B": {"children": 3, "pass": 1, "fail": 1, "unknown": 1}})
+
+
+class F37_CodexSubagent(GraderCase):
+    """R2 codex_subagent (U10-D12): the child rollout copy's final assistant message is the answer; seed-binding-5
+    grades the final message after the followup_task turn starts."""
+
+    IDENT = f"{RUN_TOKEN}.B.seed-binding-1.1"
+
+    def driver(self, records, name="rollout-2026-10-05T01-00-00-thread-fx2.jsonl"):
+        directory = self.tmp / "codex-driver" / "attempts" / self.IDENT
+        write_jsonl(directory / name, records)
+        return self.tmp / "codex-driver"
+
+    @staticmethod
+    def said(text):
+        return {"type": "response_item", "payload": {"type": "message", "role": "assistant",
+                                                     "content": [{"type": "output_text", "text": text}]}}
+
+    STARTED = {"type": "event_msg", "payload": {"type": "task_started"}}
+
+    def attempt(self, driver, **kw):
+        row = {"parent_thread_id": "thread-fx1", "thread_id": "thread-fx2"}
+        return evm().codex_subagent_attempt(driver, self.IDENT, row, **kw)
+
+    def test_the_last_assistant_message_of_the_child_rollout_is_the_answer(self):
+        driver = self.driver(rollout({"type": "session_meta", "payload": {"id": "thread-fx2"}}, self.STARTED,
+                                     self.said("first"), self.said("sentinel-a-1 and the tree listing")))
+        attempt = self.attempt(driver)
+        self.assertEqual((attempt["class"], attempt["cause"]), ("completed", None))
+        self.assertEqual(attempt["answer"], {"text": "sentinel-a-1 and the tree listing", "evidence": []})
+
+    def test_the_followup_boundary_grades_only_the_message_after_the_last_turn_start(self):
+        records = rollout({"type": "session_meta", "payload": {"id": "thread-fx2"}}, self.STARTED, self.said("ready"),
+                          self.STARTED)
+        driver = self.driver(records)
+        cut = self.attempt(driver, boundary="last_turn")
+        self.assertEqual((cut["class"], cut["cause"]), ("completed", "empty"))
+        self.assertEqual(self.attempt(driver)["answer"]["text"], "ready")
+        again = rollout({"type": "session_meta", "payload": {"id": "thread-fx2"}}, self.STARTED, self.said("ready"),
+                        self.STARTED, self.said("the followup answer"))
+        self.assertEqual(self.attempt(self.driver(again, "rollout-x-thread-fx2.jsonl"), boundary="last_turn")["answer"]["text"],
+                         "the followup answer")
+
+    def test_a_missing_or_compressed_rollout_is_not_guessed(self):
+        self.assertEqual(self.attempt(self.tmp / "codex-driver")["class"], "unresolved")
+        directory = self.tmp / "codex-driver" / "attempts" / self.IDENT
+        directory.mkdir(parents=True)
+        (directory / "rollout-x-thread-fx2.jsonl.zst").write_bytes(b"\x28\xb5\x2f\xfd")
+        attempt = self.attempt(self.tmp / "codex-driver")
+        self.assertEqual(attempt["carrier"], {"status": "unknown", "reasons": ["parse"]})
+
+
+# ---- F19 (stage-2 subset): disarmed-guard mutants --------------------------------------------------------------------
+# Each patches one guard of evidence.py or grade.py and asserts the exact set of tests that then fail; the base
+# tests named beside the flipped ones stay green (so the mutant is minimal). MUT-A..E, M8, M9, M11, M12 and M13 of the
+# design table are the F12 mutant tests; the two review-driven controls (correction 1 and 4) are M32 and M33.
+
+def stage2_mutant(case, patches, candidates, expected):
+    failing = failing_with(patches, candidates)
+    case.assertEqual(failing, {full(name) for name in expected})
+
+
+class F19b_Stage2Mutants(GraderCase):
+    def test_M4_any_attempt_passing_passes_the_task(self):
+        ev = evm()
+
+        def any_pass(attempts, reading, kind="plain", read_rows=None):
+            status = "pass" if any(item["status"] == "pass" for item in attempts) else "fail"
+            return {"status": status, "reason": None, "last_attempt": attempts[-1]["status"], "inadmissible": 0}
+        base = ["F12_AttemptMatrix.test_every_case_matches_its_decided_outcome_and_clauses",
+                "F12_AttemptMatrix.test_the_last_attempt_is_reported_beside_the_decided_outcome",
+                "F12_AttemptMatrix.test_the_organic_only_reading_is_published_beside_the_decided_one"]
+        stage2_mutant(self, [mock.patch.object(ev, "decide_task", any_pass)], base,
+                      ["F12_AttemptMatrix.test_every_case_matches_its_decided_outcome_and_clauses",
+                       "F12_AttemptMatrix.test_the_last_attempt_is_reported_beside_the_decided_outcome"])
+
+    def test_M5_unknown_counted_as_a_pass_on_the_lower_bound(self):
+        ev = evm()
+        base = ["F12_AttemptMatrix.test_every_case_matches_its_decided_outcome_and_clauses",
+                "F13_Denominators.test_bounds_and_the_matched_breakdown", "F14_M8.test_lower_upper_status_and_sensitivity",
+                "F14_M8.test_four_fifths_of_the_opportunities_correct_and_adopted_passes"]
+        stage2_mutant(self, [mock.patch.object(ev, "counts_as_lower_pass", lambda status: status in ("pass", "unknown"))],
+                      base, base[:3])
+
+    def test_M14_first_prompt_test_off(self):
+        ev = evm()
+        base = ["F22_M12.test_a_clean_attempt_passes_all_five_tests", "F22_M12.test_the_routing_marker_in_the_first_prompt_fails_two_tests",
+                "F22_M12.test_an_instruction_file_anchor_line_in_the_first_prompt_contaminates",
+                "F22_M12.test_a_server_instructions_header_in_the_first_prompt_contaminates",
+                "F22_M12.test_an_unlisted_attachment_contaminates_only_the_decided_reading"]
+        stage2_mutant(self, [mock.patch.object(ev, "first_prompt_ok", lambda *args, **kwargs: True)], base, base[1:])
+
+    def test_M15_url_presence_counted_as_retrieval(self):
+        ev = evm()
+        base = ["F24_Retrieval.test_a_ctx_fetch_and_a_web_fetch_of_both_urls_pass", "F24_Retrieval.test_one_url_only_fails_with_missing_source",
+                "F24_Retrieval.test_urls_that_are_cited_but_never_retrieved_fail",
+                "F24_Retrieval.test_a_fetch_before_since_is_not_counted"]
+        stage2_mutant(self, [mock.patch.object(ev, "call_retrieves_url", lambda call, url, reading: "yes")], base, base[1:])
+
+    def test_M16_any_memory_hit_counts(self):
+        ev = evm()
+        base = ["F25b_MemoryHits.test_a_result_that_names_a_frozen_record_is_a_hit",
+                "F25b_MemoryHits.test_only_a_later_session_page_is_not_a_hit"]
+        stage2_mutant(self, [mock.patch.object(ev, "resolves_to_record", lambda text, record: True)], base, base[1:])
+
+    def test_M17_canary_off(self):
+        ev = evm()
+        base = ["F17_GradePrivacy.test_a_run_token_that_appears_in_the_aggregate_vocabulary_stops_the_grade",
+                "F17_GradePrivacy.test_the_canary_scans_keys_shapes_and_gathered_values",
+                "F16_GradeCommand.test_grade_writes_a_private_table_and_an_id_free_aggregate"]
+        stage2_mutant(self, [mock.patch.object(ev, "assert_no_private", lambda document, values: 0)], base, base[:2])
+
+    def test_M18b_create_only_off_for_the_grade_outputs(self):
+        fc = load("frozen_checks")
+
+        def overwriting(path):
+            return os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        base = ["F17_GradePrivacy.test_an_existing_output_path_is_refused_and_left_untouched",
+                "F16_GradeCommand.test_grade_writes_a_private_table_and_an_id_free_aggregate"]
+        stage2_mutant(self, [mock.patch.object(fc, "path_exists", lambda path: False), mock.patch.object(fc, "open_new", overwriting)],
+                      base, base[:1])
+
+    def test_M19b_work_tree_refusal_off_for_the_grade_outputs(self):
+        fc = load("frozen_checks")
+        base = ["F17_GradePrivacy.test_outputs_inside_a_work_tree_are_refused_before_anything_is_created",
+                "F16_GradeCommand.test_grade_writes_a_private_table_and_an_id_free_aggregate"]
+        stage2_mutant(self, [mock.patch.object(fc, "inside_git_work_tree", lambda path: False)], base, base[:1])
+
+    def test_M20_zero_instead_of_null(self):
+        ev = evm()
+        base = ["F13_Denominators.test_a_zero_denominator_is_null_never_zero", "F13_Denominators.test_bounds_and_the_matched_breakdown"]
+        stage2_mutant(self, [mock.patch.object(ev, "or_null", lambda number: number)], base, base[:1])
+
+    def test_M32_a_superseded_run_treated_as_inadmissible_whatever_it_ended_with(self):
+        ev = evm()
+        base = ["F11_WorkflowCarrier.test_a_journal_key_that_started_again_after_a_pause_gives_every_run_its_own_class",
+                "F11_WorkflowCarrier.test_a_valid_result_object_is_the_answer_and_the_log_agrees"]
+        stage2_mutant(self, [mock.patch.object(ev, "classify_superseded_run", lambda rows: {
+            "class": "inadmissible", "reason": "interrupted_driver", "cause": None})], base, base[:1])
+
+    def test_M33_the_agent_tool_frame_and_trailer_are_not_removed(self):
+        ev = evm()
+        base = ["F11_AgentToolCarrier.test_the_real_frame_and_trailer_are_removed_before_the_comparison",
+                "F11_AgentToolCarrier.test_the_unframed_trailer_is_removed_too",
+                "F11_AgentToolCarrier.test_a_bare_result_that_equals_the_final_text_passes"]
+        stage2_mutant(self, [mock.patch.object(ev, "strip_agent_result", lambda text: {"status": "unrecognized", "text": text})],
+                      base, base[:2])
+
+    def test_M34_the_whole_merged_toon_result_is_decoded_without_isolating_the_document(self):
+        """The defect correction 5 names: decoding stdout and stderr together fails on the status lines."""
+        ev = evm()
+        require_toon()
+        fc = load("frozen_checks")
+
+        def whole(text):
+            try:
+                return {"status": "decoded", "document": text, "value": fc.decode_candidate(text)}
+            except fc.DecodeError:
+                return {"status": "strict_decode", "document": None, "value": None}
+        base = ["F28_M7.test_status_lines_before_or_after_the_document_and_colours_are_dropped",
+                "F28_M7.test_a_seeded_cli_encode_that_decodes_to_the_records_is_encoded",
+                "F28_M7.test_an_output_file_encode_is_unknown_not_a_failure"]
+        stage2_mutant(self, [mock.patch.object(ev, "isolate_toon_document", whole)], base, base[:2])
+
+    def test_M36_tree_drift_ignored(self):
+        ev = evm()
+        base = ["F34_TreeDrift.test_an_untracked_file_in_scope_turns_a_failure_into_unknown",
+                "F34_TreeDrift.test_entries_outside_the_key_scope_and_bytecode_caches_do_not_count"]
+        stage2_mutant(self, [mock.patch.object(ev, "drift_entries", lambda entries: [])], base, base[:1])
 
 
 # ---- F19 (stage-1 subset): disarmed-guard mutants -------------------------------------------------------------------
