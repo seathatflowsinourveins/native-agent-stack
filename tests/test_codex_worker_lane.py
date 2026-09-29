@@ -1651,6 +1651,59 @@ class ProveVerdictTests(unittest.TestCase):
             self.assertEqual(run["usage"], {"input_tokens": 7})
             self.assertNotIn("events", run)
 
+    def test_prove_json_names_no_codex_home_path_beside_its_rows(self):
+        # corrections item 5 (recheck L4): the JSON keeps its rows but no longer says where the Codex home is. A
+        # boolean says whether the home was the default one, and a hash-labelled identifier lets two reports of one
+        # home be compared without publishing the path. Scanned outside the rows, which keep their own privacy note.
+        def worker_runs(specs, timeout):
+            return [{"name": spec["name"], "exit": 0, "timed_out": False, "seconds": 1, "cleanup_error": None,
+                     "events": [{"type": "turn.completed", "usage": {"input_tokens": 7}}]} for spec in specs]
+
+        def strings(value):
+            if isinstance(value, str):
+                yield value
+            elif isinstance(value, dict):
+                for key, item in value.items():
+                    yield key
+                    yield from strings(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from strings(item)
+
+        def absolute_paths(value):
+            """Whitespace-separated tokens that start with a slash and name something (a linear scan)."""
+            return [token for text in strings(value) for token in text.split()
+                    if token.startswith("/") and len(token) > 1]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            report_path = Path(tmp) / "report.json"
+            skill_path = Path(tmp) / "SKILL.md"
+            skill_path.write_text("# Synthetic installed skill\n", encoding="utf-8")
+            with mock.patch.object(prove, "make_repo", return_value=b"synthetic blob"), \
+                 mock.patch.object(prove, "static_checks"), \
+                 mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic open gate")), \
+                 mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp, "--live", "--skill-file",
+                            str(skill_path), "--json", str(report_path)])
+                default_path = Path(tmp) / "default.json"
+                with mock.patch.dict(os.environ, {"CODEX_HOME": tmp}):
+                    prove.main(["--codex", "/synthetic/codex", "--json", str(default_path)])
+            report = json.loads(report_path.read_text())
+            default = json.loads(default_path.read_text())
+            planted = dict(report, elsewhere={"note": f"see {tmp}"})
+        self.assertNotIn("codex_home", report)
+        self.assertIs(report.get("codex_home_is_default"), False)  # the home came from --codex-home
+        self.assertIs(default.get("codex_home_is_default"), True)  # the home came from $CODEX_HOME
+        identifier = report.get("codex_home_id", "")
+        self.assertEqual(len(identifier), len("sha256:") + 16)
+        self.assertTrue(identifier.startswith("sha256:") and set(identifier[len("sha256:"):]) <= set("0123456789abcdef"))
+        self.assertEqual(default.get("codex_home_id"), identifier)  # the same home, the same identifier
+        self.assertNotIn(tmp, json.dumps({key: value for key, value in report.items() if key != "checks"}))
+        self.assertEqual(absolute_paths({key: value for key, value in report.items() if key != "checks"}), [])
+        self.assertEqual(absolute_paths({key: value for key, value in planted.items() if key != "checks"}), [tmp])  # control
+        self.assertIn("checks", report)  # the rows are kept
+
     def test_rtk_verdict_rejects_a_synthetic_failed_status_command(self):
         # Synthetic fault injected into the captured item shape; no command is executed here.
         fixture = json.loads((FIXTURES / "rtk-worker-items.json").read_text())
