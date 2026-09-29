@@ -359,11 +359,13 @@ Code-mode attribution (U3 design section 7, commit 7, with the review's position
   is not emitted, as the Claude kernel counts no server tool; this host's store holds none.
 
 Before commit 7 an item was nested only until the exec return, the next direct model call or a turn
-boundary. On this host's store 271 items moved from direct to nested and 352 `wait` outputs from
-`other` to `code_mode` (the differential in
-[pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md)),
-which changes `sandbox_operations`, M3 `by_carrier`, the M4 `shell_fetch`/`ctx_sandbox_fetch` split and
-U1's `proxy.nested` and `cli_lanes` carrier `nested`.
+boundary. The rule can move `sandbox_operations`, M3 `by_carrier`, M5, the M4
+`shell_fetch`/`ctx_sandbox_fetch` split and U1's `proxy.nested` and `cli_lanes` carrier `nested`. On
+this host's store 271 items moved from direct to nested and 352 `wait` outputs from `other` to
+`code_mode`. M3 lost 265 results, and M5 lost all 153 of its results: each came from a ctx item the
+new rule nests, after an exec of its turn. `proxy.nested` gained 5, and the M4 split did not move,
+since none of the moved items ran `curl` or `wget` (the differential in
+[pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md)).
 
 Legacy history mode persists no nested tool item
 ([policy.rs:94-112](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L94-L112)),
@@ -413,9 +415,9 @@ unknown, applied to the JavaScript of a code-mode `exec` call itself (the U3 rev
   - (b) The design's plan: scan nothing and record nothing. Rejected, because it hides the residual and
     is not limited to the versions that were read.
 - **Residual on this host.** A count-only census up to 2026-09-29T00:00Z found 1,532 mentions in 1,091
-  of 16,410 exec calls. Of these, 51 mentions in 33 calls have no nested Context Mode code item after
-  them; most mentions are the code string handed to a nested ctx tool, which the kernel scans itself.
-  All 1,620 rollouts name 0.155.1 (277) or 0.157.1 (1,343).
+  of 16,410 exec calls. 1,481 of them are in exec calls with a nested Context Mode code item after them,
+  whose code the kernel scans itself. The other 51, in 33 calls, have no such item. All 1,620 rollouts
+  name 0.155.1 (277) or 0.157.1 (1,343).
 - **Overturn.** Any of these reopens the decision:
   - a pinned client whose description drops "no network access", or whose globals gain a
     network-capable function;
