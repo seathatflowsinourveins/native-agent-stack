@@ -3649,8 +3649,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "d8265d44a2191c9b614a004649ab3827420291611203da5c45ef366b85222bd2",
-      "bytes": 3502
+      "sha256": "0fa15cb11872242abf543d15a496d78b022a9db0179d6a96572bfd27afe4220c",
+      "bytes": 7718
     },
     {
       "path": ".github/pull_request_template.md",
@@ -14515,8 +14515,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "5c95aa878a8132cfa5c1a4b097e00653324bfddef7e06e407b719b1ee01db715",
-      "bytes": 132498
+      "sha256": "500dbe0030599db6cff4b76596595c581881aef8f585662fa77a9e98290ab026",
+      "bytes": 135338
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -42079,6 +42079,11 @@
       "bytes": 867
     },
     {
+      "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+      "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
+      "bytes": 21768
+    },
+    {
       "path": "evidence/receipts/pit-availability.json",
       "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
       "bytes": 107713
@@ -43800,8 +43805,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "16c28c3e8ce639349a6a1f0cf8ef2dc167b85ffa299320bc86b9895f1a103df6",
-      "bytes": 37014
+      "sha256": "2024dd95dbaa0ea4e029379768af834380cce22ac1338aec303007febdf91bdc",
+      "bytes": 38050
     },
     {
       "path": "tests/test_path_safety.py",
