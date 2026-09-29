@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "claude-project-effort-flag-20260929",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "Three native headless probes on Claude Code 2.1.284, run on 2026-09-29 in a scratch directory whose only project file was a settings file holding a top-level effortLevel of xhigh (the shape of this repository's committed .claude/settings.json) and each read from the model and effort recorded in the session's own transcript, found that an explicit --effort max ran a Sonnet 5.5 session and an Opus 5.5 session at max, so the flag defeats the project file's xhigh and the host's saved xhigh, with the Ultracode reminder present in both; the same project file without the flag ran Sonnet 5.5 at xhigh.",
+  "limitations": [
+    "Local observation of one workstation and one client version (2.1.284); the recorded effort field is the client's own per-message record, not an API-side confirmation.",
+    "The three sessions are headless one-turn runs in fresh scratch directories that also read the host's user settings (ultracode true, a top-level effortLevel of xhigh and saved per-model xhigh levels for claude-sonnet-5-5 and claude-opus-5-5, after the host change of 2026-09-29). The no-flag baseline P3 therefore does not isolate the project file, since a saved xhigh applies from the user settings too; cases A13 and A14 of receipt claude-model-effort-probes-20260929 isolated a project file before that change.",
+    "The launcher that adds --effort max, an interactive session and this repository's own committed settings file were not exercised here; the project file in each case had one key. Each case was run once.",
+    "The Ultracode reminder is an indicator, not proof of workflow orchestration.",
+    "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every row given the results file run6.sh writes."
+  ],
+  "evidence_class": "independent observation: native Claude Code 2.1.284 headless sessions on this host, with the model and effort recorded per assistant message in each transcript and a paired no-flag control",
+  "recorded_at_utc": "2026-09-29T02:09:55Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the running user's Claude Code user settings (shape only)"
+  },
+  "data": {
+    "client_version": "2.1.284 (Claude Code), recorded in every transcript read",
+    "counting": "each assistant message id is counted once",
+    "project_effort_flag": [
+      {
+        "case": "P1",
+        "probe": "projxhigh-flagmax-sonnet",
+        "project_settings_file": "{\"effortLevel\":\"xhigh\"}",
+        "arguments": "--model sonnet --effort max",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T02:09Z"
+      },
+      {
+        "case": "P2",
+        "probe": "projxhigh-flagmax-opus",
+        "project_settings_file": "{\"effortLevel\":\"xhigh\"}",
+        "arguments": "--model opus --effort max",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "max",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T02:09Z"
+      },
+      {
+        "case": "P3",
+        "probe": "projxhigh-noflag-sonnet",
+        "project_settings_file": "{\"effortLevel\":\"xhigh\"}",
+        "arguments": "--model sonnet",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T02:09Z"
+      }
+    ]
+  },
+  "provenance": {
+    "command": "bash run6.sh (writes results6.tsv, one line per case); python3 extract_all.py results6.tsv",
+    "script_sha256": {
+      "extract_all.py": "9535f190af3c0a5f5d7a6b05e25835b56079bc693ae6cba5f36b774d44e5e7a6",
+      "run6.sh": "651b66169cc9be093f08ebc4a9af8fef891b788c0476ebaa1e6b275d273ea50c"
+    },
+    "scripts": {
+      "run6.sh": "#!/usr/bin/env bash\n# Sixth probe set on Claude Code 2.1.284: does an explicit --effort max flag beat a committed project effortLevel of xhigh (the\n# shape of this repository's .claude/settings.json)? One headless one-turn session per case, each in a fresh scratch directory.\nset -u\nBASE=<scratch>\n: > \"$BASE/results6.tsv\"\nmk_case() {  # name, project settings json, then claude args\n  local name=\"$1\"; local proj=\"$2\"; shift 2\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir/.claude\"\n  printf '%s' \"$proj\" > \"$dir/.claude/settings.json\"\n  ( cd \"$dir\" && timeout 240 claude -p \"Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.\" --max-turns 2 --output-format json \"$@\" < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" > \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results6.tsv\"\n}\nmk_case projxhigh-flagmax-sonnet '{\"effortLevel\":\"xhigh\"}' --model sonnet --effort max\nmk_case projxhigh-flagmax-opus '{\"effortLevel\":\"xhigh\"}' --model opus --effort max\nmk_case projxhigh-noflag-sonnet '{\"effortLevel\":\"xhigh\"}' --model sonnet\necho done > \"$BASE/DONE6\"\n",
+      "extract_all.py": "#!/usr/bin/env python3\n\"\"\"Read the native transcripts of headless probe cases: python3 extract_all.py results.tsv [results2.tsv ...].\n\nEach line of a results file is \"<case name> <case directory>\". For every case this prints the resolved model, the recorded effort\nand the client version of the main session and of every subagent transcript below it, counting each assistant message id once (a\nmessage spans several transcript rows, one per content block), plus the number of transcript lines holding the Ultracode reminder text.\n\"\"\"\nimport collections\nimport glob\nimport json\nimport os\nimport sys\n\nPROJECTS = os.path.expanduser(\"~/.claude/projects\")\n\n\ndef summarize(path, cutoff=None):\n    \"\"\"Unique assistant messages of one transcript, up to an optional UTC ISO cutoff (rows carry ISO timestamps).\"\"\"\n    seen, versions, stamps, reminder = {}, set(), [], 0\n    for line in open(path, errors=\"replace\"):\n        try:\n            row = json.loads(line)\n        except ValueError:\n            continue\n        stamp = str(row.get(\"timestamp\", \"\"))\n        if cutoff and stamp > cutoff:\n            continue\n        if row.get(\"version\"):\n            versions.add(row[\"version\"])\n        if stamp:\n            stamps.append(stamp)\n        message = row.get(\"message\") or {}\n        if message.get(\"role\") == \"assistant\" and message.get(\"model\") and message[\"model\"] != \"<synthetic>\":\n            seen.setdefault(message.get(\"id\"), (message[\"model\"], str(row.get(\"effort\"))))\n        if \"Ultracode is on: optimize\" in line:\n            reminder += 1\n    return {\"messages\": len(seen),\n            \"models\": dict(collections.Counter(v[0] for v in seen.values())),\n            \"efforts\": dict(collections.Counter(v[1] for v in seen.values())),\n            \"versions\": sorted(versions),\n            \"utc\": [min(stamps), max(stamps)] if stamps else None,\n            \"reminder_lines\": reminder}\n\n\ndef case_paths(name, case_dir):\n    \"\"\"The main transcript and the subagent transcripts of one headless case, or None when the client kept none.\"\"\"\n    encoded = case_dir.replace(\"/\", \"-\").replace(\"_\", \"-\")\n    projects = [d for d in glob.glob(os.path.join(PROJECTS, \"*\")) if os.path.basename(d) == encoded] or \\\n               [d for d in glob.glob(os.path.join(PROJECTS, \"*\")) if os.path.basename(d).endswith(\"case-\" + name)]\n    if not projects:\n        return None\n    mains = sorted(glob.glob(os.path.join(projects[0], \"*.jsonl\")), key=os.path.getmtime)\n    return (mains[-1] if mains else None), sorted(glob.glob(os.path.join(projects[0], \"*\", \"subagents\", \"agent-*.jsonl\")))\n\n\ndef main(results_files):\n    for results in results_files:\n        for entry in open(results):\n            name, case_dir = entry.split()\n            paths = case_paths(name, case_dir)\n            if not paths:\n                print(name, \"| no transcript directory\")\n                continue\n            main_path, sub_paths = paths\n            print(name, \"| main:\", summarize(main_path) if main_path else None, \"| subagents:\", [summarize(p) for p in sub_paths])\n\n\nif __name__ == \"__main__\":\n    main(sys.argv[1:])\n"
+    }
+  }
+}
