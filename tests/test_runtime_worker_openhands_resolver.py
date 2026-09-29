@@ -3626,11 +3626,20 @@ class ResolverRunTests(unittest.TestCase):
                 "--lane", "lane:foundation", "--arm", "control", "--prefix", str(self.prefix), "--state", str(self.state),
                 "--gh", self.fake.gh, "--git", REAL_GIT, "--gitleaks", str(self.gitleaks), *extra]
 
-    def run_cli(self, github, *, edits=None, message=FINAL_MESSAGE, gates=None, dry_run=False, plant=False):
-        """resolver.main(["run", ...]) with Docker, the agent-server, gh and network git replaced."""
+    def run_cli(self, github, *, edits=None, message=FINAL_MESSAGE, gates=None, dry_run=False, plant=False,
+                api_answers=None, dispatch_time=None):
+        """resolver.main(["run", ...]) with Docker, the agent-server, gh and network git replaced.
+
+        `api_answers` maps (method, path) to an answer or an exception to raise; `dispatch_time`
+        replaces dispatch.py's `time` module (its deadline clock)."""
         host, dispatch, state = self.host, self.dispatch, self.state
 
         def api(method, path, *, headers, body=None, port):
+            if (method, path) in (api_answers or {}):
+                answer = api_answers[(method, path)]
+                if isinstance(answer, BaseException):
+                    raise answer
+                return answer
             if (method, path) == ("POST", "/api/conversations"):
                 workspace = next(state.glob("runs/*/control/workspace"))
                 for relative, data in (edits or {}).items():
@@ -3695,6 +3704,8 @@ class ResolverRunTests(unittest.TestCase):
                     (dispatch, "create_receipt", mock.Mock(side_effect=absent_gateway)),
                     (self.r, "CLONE_URL", str(self.bare))):
                 mocks[name] = enter(mock.patch.object(module, name, replacement))
+            if dispatch_time is not None:
+                mocks["time"] = enter(mock.patch.object(dispatch, "time", dispatch_time))
             enter(contextlib.redirect_stdout(out))
             extra = ["--dry-run"] if dry_run else ["--reviewer-command", self.reviewer]
             code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep)
@@ -3813,6 +3824,50 @@ class ResolverRunTests(unittest.TestCase):
         self.assertEqual([write["op"] for write in section["writes"]], ["push", "pr_create"])
         self.assertEqual((github.reviews, github.comments), ([], []))
         self.assertEqual((printed["pr"], printed["exit"]), (34, 5))
+
+    def test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt(self):
+        # Review item D5: dispatch.execute's failure path writes {arm, failure_stage, failure_type, ...}
+        # only. host.run rebuilds a resolver attempt's receipt with create_receipt, so it names the
+        # issue, base, lane, instruction and gate hashes, keeps dispatch's stage and type, and the
+        # review is recorded as not run.
+        class Deadline:
+            """dispatch's `time`: the first read starts the attempt, every later one is past its deadline."""
+
+            def __init__(self):
+                self.reads = 0
+
+            def time(self):
+                self.reads += 1
+                return 1000.0 if self.reads == 1 else 9000.0
+
+            @staticmethod
+            def sleep(seconds):
+                pass
+
+        conversation = f"/api/conversations/{CONVERSATION}"
+        cases = (("deadline", {"dispatch_time": Deadline(), "api_answers": {("POST", conversation + "/interrupt"): {}}},
+                  "TimeoutError"),
+                 ("wait", {"api_answers": {("GET", conversation): subprocess.CalledProcessError(22, ["curl"])}},
+                  "CalledProcessError"),
+                 ("result", {"api_answers": {("GET", conversation + "/agent_final_response"): {"response": None}}},
+                  "ValueError"))
+        for stage, options, failure_type in cases:
+            with self.subTest(stage=stage):
+                shutil.rmtree(self.state / "runs", ignore_errors=True)  # one attempt per UTC day
+                github = ResolverGitHub(base=self.base)
+                code, printed, _ = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"}, **options)
+                self.assertEqual(code, 3, printed)
+                receipt = self.receipt(printed)
+                self.assertEqual((receipt["failure_stage"], receipt.get("failure_type")), (stage, failure_type))
+                section = receipt.get("resolver")
+                self.assertIsInstance(section, dict, receipt)
+                self.assertEqual({key: section[key] for key in ("issue", "base_sha", "lane", "status", "pr")},
+                                 {"issue": 12, "base_sha": self.base, "lane": "lane:foundation", "status": None,
+                                  "pr": None})
+                self.assertRegex(section["instruction_sha256"], r"^[0-9a-f]{64}$")
+                self.assertEqual(set(section["gates"]), {"stage_gates_sha256", "isolation_probe_sha256"})
+                self.assertEqual(section["review"]["status"], "not_run")
+                self.assertEqual((github.pushes, printed["failure_stage"]), ([], stage))
 
     def test_end_to_end_gate_refusal_starts_no_container(self):
         github = ResolverGitHub(base=self.base)

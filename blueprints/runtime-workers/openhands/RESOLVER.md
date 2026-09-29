@@ -383,6 +383,11 @@ That section is built from host-written files only, and each field has a fixed s
 - the review loop's outcome: status, stop reason, review id, reviewed commit, the
   checks summary and the final draft state.
 
+Every receipt of a resolver attempt has this section. After a dispatch failure (the
+start POST, the 1200-second deadline, a wait or result GET, or the final-response
+contract), `host.resolver_failure_receipt` rebuilds dispatch's minimal failure receipt
+with `create_receipt`. It keeps dispatch's failure stage and exception type name.
+
 `evidence_complete` stays false and `task_passed` stays false, and neither sets the
 exit status (`resolver_exit`):
 

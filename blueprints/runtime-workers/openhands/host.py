@@ -33,7 +33,7 @@ from recipe import (COMPRESSION_COMBOS, HERE, arm_config, digest, environment_se
                     render_mcp)
 from e2e import netprobe
 from e2e.task import load_task, worker_instruction
-from receipt import PROBE_MECHANISM, create_receipt, gateway_database, read_bounded, time_value
+from receipt import FAILURE_STAGES, PROBE_MECHANISM, create_receipt, gateway_database, read_bounded, time_value
 
 
 DOCKER = ["docker", "--context", "rootless"]
@@ -1621,6 +1621,32 @@ def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, 
                                         "receipt": str(result / "receipt.json")})
 
 
+FAILURE_TYPE = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,63}")
+
+
+def resolver_failure_receipt(result, failed):
+    """Review item D5: a resolver attempt's receipt after dispatch.execute failed.
+
+    That failure path (a start POST, the 1200 s deadline, a wait or result GET, the final
+    response contract) writes only {arm, failure_stage, failure_type, ...}. This rebuilds the
+    receipt with create_receipt from the window dispatch last wrote, keeping dispatch's stage
+    and exception type name, so that its resolver section names the issue, base, lane,
+    instruction hash and gate hashes like every other receipt of the attempt.
+    """
+    window = json.loads(read_bounded(result / "window.json"))
+    stage, failure_type = failed.get("failure_stage"), failed.get("failure_type")
+    window["failure_stage"] = stage if stage in FAILURE_STAGES else "start"
+    window["failure_type"] = failure_type if isinstance(failure_type, str) and FAILURE_TYPE.fullmatch(failure_type) \
+        else None
+    window["finished_at"] = window.get("finished_at") or utc_now()
+    write_json(result / "window.json", window)
+    write_json(result / "check.json", {"upstream_resolved": None, "grader_exit_code": None})
+    receipt = create_receipt(result)
+    receipt["failure_type"] = window["failure_type"]
+    write_json(result / "receipt.json", receipt)
+    return receipt
+
+
 def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAULT_PORT, resolver=None):
     """One attempt: SWE-bench mode, or resolver mode when `resolver` is a resolver.ResolverAttempt.
 
@@ -1779,6 +1805,8 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
                     if execute(action, state, run_id, arm, resolver=resolver):
                         break
             native_receipt = read_json(result / "receipt.json")
+            if resolver is not None and not isinstance(native_receipt.get("resolver"), dict):
+                native_receipt = resolver_failure_receipt(result, native_receipt)
     except (Exception, KeyboardInterrupt) as exc:
         window["failure_stage"] = stage
         window["failure_type"] = type(exc).__name__
