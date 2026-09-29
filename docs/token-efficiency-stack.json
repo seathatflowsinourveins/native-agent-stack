@@ -2901,7 +2901,7 @@
       "purpose": "Automatically refreshed semantic code retrieval and native code graph",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0"
+          "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.15.0\" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0"
         ],
         "use": [
           "codebase_search({\"projectPath\":\"/absolute/project\",\"query\":\"parse native Codex usage counters\",\"limit\":1,\"includeLinked\":false})",
@@ -2912,7 +2912,7 @@
           "codebase_status({\"projectPath\":\"/absolute/project\"})"
         ],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0`",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.15.0\" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0`, as recipes/README.md; `--before` reproduces the qualified dependency tree. The macOS pin stays 1.14.0 until a Mac qualifies 1.15.0 (`socraticode@1.14.0` in `tools/socraticode-1.14.0`).",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
       "returned_result_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171\u2013195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2\u201339, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
@@ -6035,7 +6035,7 @@
       "purpose": "Read existing native provider usage logs",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.24\" ccusage@20.0.24"
+          "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.26\" ccusage@20.0.26"
         ],
         "use": [
           "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
@@ -6045,7 +6045,7 @@
           "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
           "ccusage codex daily --offline --no-cost --since 2026-09-19 --until 2026-09-20 --timezone UTC --json"
         ],
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.24\" ccusage@20.0.24`",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.26\" ccusage@20.0.26`",
         "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
       },
       "returned_result_summary": "2026-09-20 scoped offline two-date report returned 2, 573, 385 total usage tokens across selected native homes; Codex subset 819, 530 already included. These are native parser consumption categories, not saved tokens or an invoice. CLI available on demand; no continuous observer established.",

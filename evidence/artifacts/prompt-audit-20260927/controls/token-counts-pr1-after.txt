@@ -1,0 +1,2 @@
+PR-1 after (templates.json: F3X7); tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+tools/sota-convergence/landscape-sweep/templates.json bytes 10389 tokens 2305 words 1466 lines 8 sha256 69bd43abeefd48a85fa828c13e4fd9e2db67b7ecf69cb877619dc33c61267a49

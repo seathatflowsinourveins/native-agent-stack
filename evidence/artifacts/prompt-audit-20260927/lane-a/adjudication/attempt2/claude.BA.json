@@ -1,0 +1,134 @@
+{
+ "usage": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 21,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 44,
+   "cache_creation_input_tokens": 186687,
+   "cache_read_input_tokens": 2510679,
+   "output_tokens": 99638
+  }
+ },
+ "return": {
+  "leak": false,
+  "leak_text": "",
+  "items": [
+   {
+    "id": "X5a",
+    "choice": "A",
+    "reasons": "Both amendments fix the proposal's defect. Its capitalised 'Never' fails the case-sensitive phrase check (tests/test_install_claude_profile.py:935, :967), and no other copy of that phrase sits between the bold rule and '## Core rule' (template lines 5-9). Both keep the operator's bold heading byte-identical and the compounds sentence verbatim. Both keep the tested phrase lowercase and add no slash path. Both stay under the word ceiling. I counted the current template at 1,205 words, which equals BASELINE_WORDS (:931). A's line 3 has 51 words against the current 21, so the file becomes 1,235 words. B's has 43, so 1,227. The ceiling is int(1205*1.05) = 1,265 (:962). Each mutant at :980-983 still gives exactly one error; A's path mutant reaches 1,236 words. The tests therefore do not separate the two. The deciding fact belongs to this file only. The test docstring (:925-926) names docs/harness-defaults.md#upstream-verification-and-compounding-learning as holding the long form. That section (docs/harness-defaults.md:58) calls itself the long form of this template's top rule and says the installed client is part of the source of truth. A keeps that statement from the current line 3 ('The installed client is also a source of truth'), so the template and its declared long form still name the same sources of truth. The packet also asks each text to keep the file's existing meaning. B drops the clause, so the top rule would name only current upstream SOTA while its long form still names the installed client. A does not change the operator's rule: its bold heading is byte-identical, and the added clause restates text already on line 3. Counterweight: the test annotation (:932) groups 'source of truth' with upstream and 'installed client' with the check order, and step 2 (line 6) still lists the installed client first. So B loses no tested obligation or step, and B's 'So' reads cleanly. A's edge is narrow. The manifest pin (manifests/evidence.json:38815) does not separate them: the repository's hot-file protocol re-registers every changed registered file (docs/lanes.md:97-98), whether or not a return names it.",
+    "sources": [
+     {
+      "locator": "docs/harness-defaults.md:58",
+      "quote": "This is the long form of the top rule's five steps in the portable instructions"
+     },
+     {
+      "locator": "docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:925",
+      "quote": "docs/harness-defaults.md#upstream-verification-and-compounding-learning"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:926",
+      "quote": "holds the long form."
+     },
+     {
+      "locator": "examples/claude-native/CLAUDE.md:3",
+      "quote": "Upstream and the installed client are the source of truth."
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:935",
+      "quote": "\"never self-write without a SOTA source\","
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:967",
+      "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:931",
+      "quote": "BASELINE_WORDS = 1205"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:962",
+      "quote": "return int(cls.BASELINE_WORDS * 1.05)"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:932",
+      "quote": "# Upstream as the source of truth and reuse, the check order and the absence wording, worker"
+     },
+     {
+      "locator": "examples/claude-native/CLAUDE.md:6",
+      "quote": "2. Check capability claims in order: installed client (commands, `--help`, settings)"
+     },
+     {
+      "locator": "docs/lanes.md:98",
+      "quote": "and re-register your own files."
+     }
+    ],
+    "confidence": 0.55
+   },
+   {
+    "id": "X5c",
+    "choice": "B",
+    "reasons": "A's only objection holds for the proposed text alone. That text changes the pinned top-rule block, so tests/test_codex_worker_lane.py:209-210 fail. The block is 120 words now (3+18+29+37+13+6+14), and the new line 3 has 42 words against 18, giving 144. B's effective resolution includes the co-changes it names as required: TOP_RULE_SHA256 at :47, 120 to 144 at :210 and in the :45 comment, and the template's manifest entry. Re-pinning does what the pin is for; it does not weaken the test. The pin reproduces the 2026-09-26 staged block, and the script that assembled it is marked 'a record, not a maintained tool' (evidence/artifacts/codex-worker-lane-20260926/scripts/assemble_agents.py.txt:1, :4). Any decided wording change must therefore re-pin it, and the re-pinned test still fixes the new text byte for byte. A itself says adopting the wording 'requires a coordinated update', and B supplies that update. Nothing else pins this wording. The one-block test's marker, agents_block and no-@ checks still hold. The file grows from 3,151 bytes (manifests/evidence.json:3751) by 172, because line 3 goes from 108 to 280 characters. That gives 3,323 bytes, under 8,192 (:205). BlockTests needs 'Top rule:' (:404), which stays. tests/test_codex_agents.py:25 compares only the RTK and exceptions part. The lane-home test compares the staged bytes with the template it reads at run time (tests/test_landscape_sweep_harness.py:1026). tools/adoption/apply_codex_lane.py:598 and prove_codex_lane.py:140 and :154 count markers only. On meaning, line 5 still checks the installed client first. Unlike X5a, no file declares itself this template's long form: docs/harness-defaults.md:58 names examples/claude-native/CLAUDE.md. Dropping the clause therefore contradicts no companion file. B carries the operator's heading clauses and compounds sentence into the Codex copy, which is the item's purpose; A's keep-current leaves that copy on the old rule. Caveat: I reproduced B's 144 words and 3,323 bytes, which come from the same string as its hash, but I could not recompute sha256 71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f with the tools available, so that value is unverified here. The re-edited test file also needs re-registration (manifests/evidence.json:39930), which B does not name. As in X5a, the hot-file protocol re-registers every changed registered file (docs/lanes.md:97-98). The '120 words' at docs/decisions/2026-09-26-codex-worker-lane.md:59 is a dated decision record.",
+    "sources": [
+     {
+      "locator": "tests/test_codex_worker_lane.py:209",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)"
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:210",
+      "quote": "self.assertEqual(len(top.split()), 120)"
+     },
+     {
+      "locator": "evidence/artifacts/codex-worker-lane-20260926/scripts/assemble_agents.py.txt:1",
+      "quote": "# As run on 2026-09-26 (paths masked); a record, not a maintained tool."
+     },
+     {
+      "locator": "evidence/artifacts/codex-worker-lane-20260926/scripts/assemble_agents.py.txt:4",
+      "quote": "1. the staged top-rule block (120 words by wc -w, marker line included), byte for byte;"
+     },
+     {
+      "locator": "adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:205",
+      "quote": "self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes"
+     },
+     {
+      "locator": "manifests/evidence.json:3751",
+      "quote": "\"bytes\": 3151"
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:404",
+      "quote": "old = block.replace(\"Top rule:\", \"Old rule:\")"
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:1026",
+      "quote": "self.assertEqual(staged, template)"
+     },
+     {
+      "locator": "tools/adoption/prove_codex_lane.py:140",
+      "quote": "top, exceptions = grep_count(got.stdout, lane.TOP_RULE_MARKER), grep_count(got.stdout, lane.EXCEPTIONS_MARKER)"
+     },
+     {
+      "locator": "docs/harness-defaults.md:58",
+      "quote": "This is the long form of the top rule's five steps in the portable instructions ([`examples/claude-native/CLAUDE.md`](../examples/claude-native/CLAUDE.md))."
+     },
+     {
+      "locator": "docs/lanes.md:98",
+      "quote": "and re-register your own files."
+     }
+    ],
+    "confidence": 0.6
+   }
+  ]
+ }
+}

@@ -1,0 +1,55 @@
+{
+ "round": 3,
+ "votes": {
+  "gpt6-AB": "g",
+  "gpt6-BA": "g",
+  "claude-AB": "g",
+  "claude-BA": "g"
+ },
+ "labels": {
+  "gpt6-AB": {
+   "choice_label": "B",
+   "confidence": 0.91
+  },
+  "gpt6-BA": {
+   "choice_label": "A",
+   "confidence": 0.9
+  },
+  "claude-AB": {
+   "choice_label": "B",
+   "confidence": 0.6
+  },
+  "claude-BA": {
+   "choice_label": "A",
+   "confidence": 0.6
+  }
+ },
+ "void": {},
+ "counted": [
+  "claude-AB",
+  "claude-BA",
+  "gpt6-AB",
+  "gpt6-BA"
+ ],
+ "adjudication": "unanimous",
+ "decision_rule_step": 1,
+ "outcome": "apply g (unanimous)",
+ "metric_order": {
+  "steps": [
+   {
+    "metric": "wrong_status",
+    "g": 0,
+    "c": 0,
+    "better": "fewer"
+   },
+   {
+    "metric": "correct_status",
+    "g": 10,
+    "c": 8,
+    "better": "more"
+   }
+  ],
+  "winner": "g",
+  "decided_by": "correct_status"
+ }
+}

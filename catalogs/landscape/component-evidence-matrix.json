@@ -524,7 +524,7 @@
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "measured_comparison",
           "name": "jCodeMunch",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp"
@@ -1323,12 +1323,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T14:37:15Z",
-                "pass": 2
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-27T23:28:12Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -5330,7 +5330,7 @@
       "alternatives": [
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "measured_comparison",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"

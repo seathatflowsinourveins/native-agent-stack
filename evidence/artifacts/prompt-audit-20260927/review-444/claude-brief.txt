@@ -1,0 +1,209 @@
+Objective: review one unpushed pull-request head against original source and its retained evidence, and return
+source-cited defects and gaps. You are read-only; the coordinator ran the commands and supplies their results below.
+
+Worktree (read files here by absolute path): <worktree>
+Base: origin/main at `fb14dedf`. The branch has six commits: F1/F4 in `AGENTS.md` and X9's second round (both
+reviewed before), then round 3, the post-rebase edits, the dashboard bound and the evidence-manifest registration. Review the new
+material: the changes after commit `9e036e7d` (files listed below), plus the rebase's conflict resolutions in
+`CLAUDE.md` (X9's lines followed by main's `## Compact Instructions` section) and `docs/harness-defaults.md` (main's
+two newest log rows, then this branch's rows).
+
+What the change claims:
+- `CLAUDE.md` lines 3-8 (X9) carry the GPT-6 lane's text, chosen by all four blind adjudications of round 3. Evidence:
+  `evidence/artifacts/prompt-audit-20260927/x9-round3/` (README first); the decision record
+  `docs/decisions/2026-09-27-prompt-audit-resolution.md`, section "Addendum (2026-09-28): round 3".
+- `AGENTS.md:3` (X5b) is the operator's 2026-09-28 top-rule paragraph byte for byte
+  (`evidence/artifacts/prompt-audit-20260927/lane-a/round1/user-level-top-rule.txt`, already on main), and
+  `AGENTS.md:37` (S1) tells sessions to build a PR description from `.github/pull_request_template.md`. Both converged
+  in lane A (the record's "Lane A" subsection; lane A's evidence is on main under `lane-a/`).
+- AN-13: `evidence/artifacts/prompt-audit-20260927/an13/` holds the facts of two headless `/doctor prompt-audit` runs
+  (the report text is not published) and each finding's disposition; the record's "AN-13" subsection; a dated
+  anti-pattern row at the end of the log in `docs/harness-defaults.md`.
+- `docs/harness-defaults.md:7` now restates the new top-rule heading (a co-change with X5b).
+- Token counts: `evidence/artifacts/prompt-audit-20260927/controls/token-counts-r3-{f508ffba,base,after}.txt`, cited
+  in the record's Measured results and X9 decision.
+- `observability/grand-dashboard/progress.py`: this branch's registrations take `manifests/evidence.json` past the
+  2,000,000-byte bound the dashboard applied to every source, so the manifest gets its own bound (8,000,000;
+  `SOURCE_MAX_BYTES`) and every other source keeps 2,000,000. `tests/test_grand_dashboard.py` adds a test; receipts
+  `controls/dashboard-bound-{before,after}.txt`; the record's last subsection.
+
+Changed files after `9e036e7d`:
+AGENTS.md
+CLAUDE.md
+docs/decisions/2026-09-27-prompt-audit-resolution.md
+docs/harness-defaults.md
+evidence/artifacts/prompt-audit-20260927/an13/README.md
+evidence/artifacts/prompt-audit-20260927/an13/an13-runs.json
+evidence/artifacts/prompt-audit-20260927/an13/extract_an13.py
+evidence/artifacts/prompt-audit-20260927/controls/dashboard-bound-after.txt
+evidence/artifacts/prompt-audit-20260927/controls/dashboard-bound-before.txt
+evidence/artifacts/prompt-audit-20260927/controls/token-counts-r3-after.txt
+evidence/artifacts/prompt-audit-20260927/controls/token-counts-r3-base.txt
+evidence/artifacts/prompt-audit-20260927/controls/token-counts-r3-f508ffba.txt
+evidence/artifacts/prompt-audit-20260927/x9-round3/README.md
+evidence/artifacts/prompt-audit-20260927/x9-round3/analysis-r3.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/analyze_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/audit_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/check_orders_r3.frozen.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/check_orders_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/eval-r3.log
+evidence/artifacts/prompt-audit-20260927/x9-round3/exposure_scan_dir.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/fixtures/ticket-tracker/server.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/fixtures/workspace-guard/.claude-plugin/plugin.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/fixtures/workspace-guard/hooks/hooks.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/fixtures/workspace-guard/hooks/mark.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/freeze_prereg_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/grader_selftest.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/isolate_r3.sh
+evidence/artifacts/prompt-audit-20260927/x9-round3/isolation-receipt.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/isolation_receipt_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/adjudication-inputs/x9.AB.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/adjudication-inputs/x9.BA.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/audit.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/claude.AB.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/claude.BA.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/claude_usage_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/gpt6.AB.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/gpt6.BA.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/judge-actions.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/judge_actions_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/mapping.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/packets/x9.AB.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/packets/x9.BA.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/prompts/claude-task-AB.txt
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/prompts/claude-task-BA.txt
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/prompts/judge-AB.txt
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/prompts/judge-BA.txt
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/schemas/judge.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/sent-sha256.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/judges/tally.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/make_x9_round3.frozen.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/make_x9_round3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/metrics.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/metrics_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/package_x9_round3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/prereg-check.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/prereg-r3.draft.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/prereg-r3.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/prereg-r3.sha256
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe/facts.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe/p1-ok.mcplog
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe/p2-k6-view.mcplog
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe/p3-k5-view.mcplog
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe/p4-k6-refused.mcplog
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe_facts.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/probe_r3.sh
+evidence/artifacts/prompt-audit-20260927/x9-round3/promptfooconfig-r3.yaml
+evidence/artifacts/prompt-audit-20260927/x9-round3/results-r3-compact.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/run-window.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/run_arm_r3.sh
+evidence/artifacts/prompt-audit-20260927/x9-round3/sources-r3.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/summarize.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/summarize_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/tally_r3.py
+evidence/artifacts/prompt-audit-20260927/x9-round3/usage.json
+evidence/artifacts/prompt-audit-20260927/x9-round3/void_patterns_r3.py
+manifests/evidence.json
+observability/grand-dashboard/progress.py
+tests/test_grand_dashboard.py
+
+Check, citing file:line for every finding:
+1. Each factual claim in the round-3 addendum, the Lane A subsection and the AN-13 subsection against the retained
+   files: verdicts, confidences, tallies, counts, usage and cost figures, times, exit codes, event counts, dates, and
+   which agent type ran which lane or judgment (usage files name `agent_type`). Recompute round 3's X9 tally from the
+   judges' returns, mapping and audit under `x9-round3/judges/`. Report any claim the evidence does not support.
+2. Whether each changed instruction line keeps its file's tested obligations (`tests/test_adoption_docs_consistency.py`
+   for `AGENTS.md`, `CLAUDE.md` and the log) and existing meaning, and whether `docs/harness-defaults.md:7` stays
+   accurate. Do not propose changing the operator's wording.
+3. The new anti-pattern row against the log's column rules and against `an13/an13-runs.json` and `an13/README.md`.
+4. Private content in the record and the new evidence: host paths, a user name, session or thread ids, UUIDs, email
+   addresses, tokens, an installed plugin or skill inventory, quotations of client configuration or settings values.
+   Placeholders such as `<user>`, `<tmp-root>`, `<session-id>`, `<uuid>` and `~/` are intended; names of settings keys
+   are not values.
+5. Whether the record follows `docs/acceptance-evidence-policy.md`: evidence classes kept distinct, no local check
+   presented as upstream acceptance, no behavior claim beyond what was measured.
+6. The dashboard change: whether it keeps every other source's bound, the `read(root, relative)` signature the
+   tests patch and the snapshot's output, and whether the new test is discriminating.
+
+Command results supplied by the coordinator (run in the worktree on 0779e91aebd476d8f1c53b3cac705357c66aa657):
+The 13 quick checks on 0779e91a (each command, the last lines of its output, its exit code):
+```
+$ (cd examples/claude-native/workflows && sha256sum --check --strict SHA256SUMS)
+review-changes.js: OK
+contract.config.json: OK
+vendored-lanes.json: OK
+exit 0
+$ node examples/claude-native/workflows/test-envelope.mjs
+PASS agents: stack-researcher fetches pages through Context Mode and returns findings inline
+PASS agents: stack-verifier runs named commands through rtk proxy and never fixes
+SUMMARY passed=254 failed=0 total=254
+exit 0
+$ node examples/claude-native/workflows/test-contract-mutations.mjs
+PASS suite newly fails on its SUMMARY line when a binding names a file the tree does not hold
+PASS no new failure when a harmless comment mentions agent(
+SUMMARY passed=74 failed=0 total=74
+exit 0
+$ python3 -B scripts/validate.py
+{"components": 69, "hashed_files": 7806, "profiles": 4, "receipts": 161, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.
+exit 0
+$ python3 -B scripts/host_receipts.py validate
+{"receipts": 182, "status": "passed"}
+exit 0
+$ python3 -B scripts/validate_catalogs.py
+{"beyond_star_catalog_repositories": 102, "models": 20, "public_stars": 357, "repository_entries": 154, "starred_catalog_repositories": 46, "unique_catalog_repositories": 148}
+Catalog structure and evidence classes validated; source claims and native executions were not rerun.
+exit 0
+$ python3 -B scripts/validate_foundation.py --root . --json
+  },
+  "errors": []
+}
+exit 0
+$ python3 -B scripts/validate_convergence.py --all-recorded --root . --json
+{"records": [{"errors": [], "observations": 3, "path": "blueprints/blind-catalog-convergence/experiment.json", "valid": true}, {"errors": [], "observations": 3, "path": "blueprints/blind-catalog-convergence/memory-experiment.json", "valid": true}, {"errors": [], "observations": 4, "path": "blueprints/catalog-runtime-review/experiment.json", "valid": true}, {"errors": [], "observations": 15, "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json", "valid": true}, {"errors": [], "observations": 3, "path": "blueprints/convergence-practice/application-delivery/experiment.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/ci-security/experiment.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/document-ingestion/experiment.json", "valid": true}, {"errors": [], "observations": 0, "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/gpu-inference/experiment.json", "valid": true}, {"errors": [], "observations": 3, "path": "blueprints/convergence-practice/job-recovery/experiment-macos.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/job-recovery/experiment-wsl.json", "valid": true}, {"errors": [], "observations": 7, "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json", "valid": true}, {"errors": [], "observations": 2, "path": "blueprints/convergence-practice/mac-memory-patch/experiment.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/native-recovery/claude/experiment.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/native-recovery/experiment.json", "valid": true}, {"errors": [], "observations": 2, "path": "blueprints/convergence-practice/native-worker/experiment.json", "valid": true}, {"errors": [], "observations": 20, "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json", "valid": true}, {"errors": [], "observations": 2, "path": "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json", "valid": true}, {"errors": [], "observations": 1, "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json", "valid": true}, {"errors": [], "observations": 3, "path": "blueprints/convergence-practice/wsl-transport-recovery/experiment.json", "valid": true}, {"errors": [], "observations": 8, "path": "blueprints/us-equities/sim-capacity/experiment.json", "valid": true}, {"errors": [], "observations": 6, "path": "evidence/artifacts/local-model-workloads-20260924/experiment.json", "valid": true}, {"errors": [], "observations": 24, "path": "evidence/artifacts/memory-stack-20260925/experiment.json", "valid": true}, {"errors": [], "observations": 3, "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json", "valid": true}], "valid": true}
+exit 0
+$ python3 -B scripts/component_matrix.py --check
+{"rows": 32, "status": "checked"}
+exit 0
+$ python3 -B scripts/new_host_grand_list.py --check
+{"status": "passed", "layers": 32, "winners": 66}
+exit 0
+$ python3 -B scripts/build_ecosystem.py --check
+{"bytes": 13653210, "input_sha256": "2ed5d0c02222f87224f944ad7154448157d1c295319c97c52e22c15f0e4b2661", "output_sha256": "0a40d7d8da7e1ac17a0a9ef21c7d7df09d1e737a2b16d57b6b1304db3b0378b0", "status": "passed"}
+exit 0
+$ node --test blueprints/native-skill-practice/test-contract.cjs
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64.908255
+exit 0
+$ python3 -B evidence/artifacts/prompt-audit-20260927/lane-a/verify_lane_a.py
+X5c adjudication: {'gpt6-AB': 'c', 'gpt6-BA': 'c', 'claude-AB': 'c', 'claude-BA': 'c'} -> apply the amendment (c)
+repository: CLAUDE.md:3 and template:3 checked; top-rule block ce957fd8 153 words
+all checks passed
+exit 0
+```
+Full unit suite, `TMPDIR=<tmp> python3 -B -m unittest`, on the previous head 14c91f02. Its tree differs from
+0779e91a only in three files under `x9-round3/` (`exposure_scan_dir.py`, `package_x9_round3.py`, `README.md`: the
+host user name written as `<user>`, found by the coordinator's pre-push scan) and their manifest hashes; no test reads
+them:
+```
+Ran 6882 tests in 726.656s
+FAILED (failures=1, errors=1, skipped=765)
+ERROR: test_cli_refuses_live_base_url_from_env_file_without_network (tests.test_order_throughput...)
+safety.SafetyError: credential_file_permissions:worktree
+FAIL: test_sigterm_records_the_running_call_as_interrupted_without_counting_it (tests.test_gpt6_family_tiering_20260926...)
+AssertionError: 2 != 5 : run_arm: the temporary directory /tmp must lie outside the state directory and every repository
+```
+The same two fail alone on a clean worktree of main (`evidence/artifacts/prompt-audit-20260927/lane-a/review/main-host-failures.txt`,
+on main). The suite before the dashboard commit: `Ran 6881 tests`, `FAILED (failures=2, errors=8, skipped=765)`, the
+8 in `tests.test_grand_dashboard` (`ValueError: source exceeds size limit`) plus the same two.
+Dashboard controls: `controls/dashboard-bound-before.txt` (main's reader, 9 of 17 fail, exit 1) and
+`controls/dashboard-bound-after.txt` (17 OK, exit 0), both on a 2,017,827-byte manifest; the manifest on
+0779e91a is 2,018,247 bytes (1,987,653 on fb14dedf).
+Pre-push scan of `git diff origin/main...HEAD` (manifest excluded) and the commit messages: 0 UUIDs, home paths,
+host user names, e-mail addresses, session scratch paths, secret-shaped strings or subagent ids; the same scan on
+14c91f02 finds the one user-name hit at `x9-round3/exposure_scan_dir.py:17`.
+
+Output format: first line `VERDICT: agree` or `VERDICT: changes-needed`, then numbered findings, each with severity
+(blocker / should-fix / nit), file:line, the evidence (quoted lines) and the fix. Then list anything you could not
+check. Keep it under 900 words.

@@ -1,0 +1,41 @@
+Review one unpushed pull-request head, read-only, in the current directory (a git worktree). Do not edit, commit,
+install or push anything; the sandbox is read-only. Base: origin/main (`git merge-base HEAD origin/main`); the change
+is `git diff origin/main...HEAD` (two commits: the change, then the evidence-manifest registration).
+
+What the change claims: line 3 of `examples/claude-native/CLAUDE.md` (X5a) and of
+`adoption/templates/codex.AGENTS.template.md` (X5c) now carry the operator's 2026-09-28 top rule, as decided by two
+independent model lanes and, for X5c, a blind adjudication in both presentation orders by both model families. The
+Codex template's pin (`TOP_RULE_SHA256`, word count 153) in `tests/test_codex_worker_lane.py` is recomputed. Three
+anti-pattern rows are added to `docs/harness-defaults.md`. The decision record is
+`docs/decisions/2026-09-28-top-rule-templates.md`; the retained evidence is
+`evidence/artifacts/prompt-audit-20260927/lane-a/` (121 files); `manifests/evidence.json` registers them.
+
+Test behavior, do not only read. Where the sandbox blocks a command (for example a test that needs a writable temp
+directory), say so and use an equivalent read-only computation instead (such as hashing with python3 -B -c).
+
+1. Pin and texts. Recompute the Codex template's top-rule block hash and word count with the test module's own
+   `template_segments()` (python3 -B, `sys.dont_write_bytecode = True`) and compare with `TOP_RULE_SHA256` and the
+   pinned count. Run `python3 -B evidence/artifacts/prompt-audit-20260927/lane-a/verify_lane_a.py` and report its
+   output and exit code. Check that the portable template still meets `PortableTopRuleTests` in
+   `tests/test_install_claude_profile.py` (phrases, word ceiling, no repository-relative path in the top rule).
+2. Meaning. Does each new line keep the file's tested obligations and existing meaning, carry the operator's wording
+   (quoted in the decision record and in `lane-a/round1/user-level-top-rule.txt`) correctly, and stay consistent with
+   `docs/harness-defaults.md#upstream-verification-and-compounding-learning`? Would any sentence mislead a Claude or
+   Codex session that loads it?
+3. Record against evidence. For each factual claim in `docs/decisions/2026-09-28-top-rule-templates.md` and in
+   `lane-a/README.md` (tallies, confidences, counts, usage figures, byte/word/token numbers, test counts, exit codes,
+   which agent type ran which lane, dates), find the retained file that supports it and report any claim the evidence
+   does not support or contradicts. Recompute the tallies from the returns, mapping and audit files.
+4. Private content. Search the 121 evidence files and the record for host paths, a user name, session or thread ids,
+   UUIDs, email addresses, tokens or keys, installed plugin or skill names, and quotations of client configuration
+   or settings files. Placeholders such as `<user>`, `<tmp-root>`, `<session-id>`, `<uuid>` and `~/` are intended.
+5. Registration. Run `python3 -B scripts/validate.py` if the sandbox allows it, and check that every new or changed
+   file the diff adds under `evidence/` or `docs/decisions/` is registered, and that no unrelated manifest entry
+   changed.
+6. Anti-pattern rows. Check the three new rows against the log's column rules at the top of that table and against
+   what the evidence shows happened.
+
+Return Markdown: first line `VERDICT: agree` or `VERDICT: changes-needed`. Then numbered findings, each with
+severity (blocker / should-fix / nit), file:line, the evidence (command and output, or quoted lines), and the fix.
+Then a short list of the commands you ran with their exit codes. Report only what you verified; mark anything you
+could not check as unchecked.

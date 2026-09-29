@@ -24,6 +24,7 @@
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
     "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
     "BASH_MAX_TIMEOUT_MS": "1800000",
     "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
   },
@@ -78,6 +79,8 @@
       "Read(**/mnt/*/Users/*/AppData/Roaming/omniroute/**)",
       "Read(//mnt/*/Users/*/.omniroute/**)",
       "Read(**/mnt/*/Users/*/.omniroute/**)",
+      "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+      "Read(**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
       "Edit(~/.bashrc)",
       "Edit(~/.profile)",
       "Edit(~/.zshrc)",
@@ -119,6 +122,7 @@
     "defaultMode": "bypassPermissions"
   },
   "model": "opus[1m]",
+  "advisorModel": "fable",
   "hooks": {
     "PreToolUse": [
       {
@@ -297,6 +301,9 @@
   "modelSettings": {
     "claude-opus-5-5": {
       "effortLevel": "xhigh"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "xhigh"
     }
   },
   "autoUpdatesChannel": "latest",
@@ -322,7 +329,6 @@
     "resolving-merge-conflicts": "on",
     "grill-me": "user-invocable-only",
     "improve-codebase-architecture": "user-invocable-only",
-    "verification-before-completion": "on",
     "security-threat-model": "on",
     "gh-address-comments": "on",
     "semgrep": "on",
@@ -338,6 +344,7 @@
     "agent-browser": "name-only",
     "find-skills": "user-invocable-only",
     "variant-analysis": "on",
-    "writing-for-agents": "on"
+    "writing-for-agents": "on",
+    "security-audit": "name-only"
   }
 }

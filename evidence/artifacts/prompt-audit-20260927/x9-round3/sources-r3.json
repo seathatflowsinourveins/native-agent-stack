@@ -1,0 +1,106 @@
+{
+ "note": "Round-3 primary sources, gathered by one stack-researcher agent on 2026-09-28 between 07:46 and 07:58 UTC. Quotes are verbatim except that Markdown link syntax is reduced to its link text and '…' marks a cut. 'L' numbers point into the .md source of each code.claude.com page as fetched that day; those pages carry no page date and cite versions up to v2.1.283, the installed client. Tags: [doc] documented, [obs] observed through gh api or --help, [nv] not verified. The researcher ran no claude -p session: the fixture behavior observed in the probes is recorded in x9-round3/prereg-r3.json, not here.",
+ "pins": {
+  "claude_code_changelog": "anthropics/claude-code@7779afb12e3635f46f56ec823979d68350ae000b (main HEAD, 2026-09-25T21:49:55Z, top entry 2.1.283)",
+  "mcp_python_sdk": "modelcontextprotocol/python-sdk v2.2.0 (2026-09-07) @9972c21aa42054fb1450c5fc614761ed11847ec6",
+  "gh_cli": "cli/cli v2.101.0 @0cf1092493af067646fc5f3db9421c6a6ec9c938"
+ },
+ "questions": [
+  {
+   "id": "Q1",
+   "title": "K5: a hooks-only plugin loaded with --plugin-dir under claude -p",
+   "findings": [
+    {"source": "https://code.claude.com/docs/en/plugins-reference.md L30", "date": "2026-09-28", "quote": "The manifest is optional. Without it, Claude Code loads the components it finds in the standard layout. The plugin name then comes from the marketplace entry, or from the directory name when you load the plugin with `--plugin-dir`.", "claim": ".claude-plugin/plugin.json is not required [doc]"},
+    {"source": "https://code.claude.com/docs/en/plugins-reference.md L120, L127", "date": "2026-09-28", "quote": "`name` is the only required key. | `name` | String | Plugin identifier, required. Use kebab-case. Every component is namespaced under it |", "claim": "a manifest needs only name [doc]"},
+    {"source": "https://code.claude.com/docs/en/plugins-reference.md L568, L572", "date": "2026-09-28", "quote": "| Manifest | `.claude-plugin/plugin.json` | Plugin metadata and configuration. Optional | ... | Hooks | `hooks/hooks.json` | Hook configuration |", "claim": "hooks/hooks.json is the default hooks location [doc]"},
+    {"source": "https://code.claude.com/docs/en/plugins/components.md L746", "date": "2026-09-28", "quote": "Save the plugin's hooks in `hooks/hooks.json` at the plugin root, under a top-level `\"hooks\"` key, in the same shape as the `hooks` object in `settings.json`.", "claim": "the hooks.json schema [doc]"},
+    {"source": "https://code.claude.com/docs/en/hooks.md L641, L1110, L1116", "date": "2026-09-28", "quote": "Define plugin hooks in `hooks/hooks.json` with an optional top-level `description` field. ... Only `type: \"command\"` and `type: \"mcp_tool\"` hooks are supported. ... | `startup` | New session |", "claim": "the SessionStart shape (event, matcher group, handlers; L237-241) and its allowed handler types [doc]"},
+    {"source": "https://code.claude.com/docs/en/plugins-reference.md L523; https://code.claude.com/docs/en/plugins/components.md L785", "date": "2026-09-28", "quote": "| Hook commands | Anywhere in `command` and `args` | `CLAUDE_PLUGIN_ROOT`, `CLAUDE_PLUGIN_DATA`, `CLAUDE_PROJECT_DIR`, and `CLAUDE_PLUGIN_OPTION_<KEY>` | ... when `command` has no `args`, it runs through a shell, so wrap the `${CLAUDE_PLUGIN_ROOT}` path in double quotes", "claim": "${CLAUDE_PLUGIN_ROOT} is substituted in a hook command; quote it in shell form [doc]"},
+    {"source": "https://code.claude.com/docs/en/hooks.md L1176, L1260", "date": "2026-09-28", "quote": "Applies in non-interactive mode with the `-p` flag, where it becomes the first turn even if no prompt is provided. ... You can skip the prompt when a `SessionStart` hook supplies `initialUserMessage`", "claim": "SessionStart hooks run under -p [doc]"},
+    {"source": "https://code.claude.com/docs/en/headless.md L225; https://code.claude.com/docs/en/cli-reference.md L97", "date": "2026-09-28", "quote": "`hook_started`, `hook_progress`, and `hook_response` events, while a configured `SessionStart` or `Setup` hook runs. These stream as the hook produces them. ... `SessionStart` and `Setup` hook events are always included and don't need this flag.", "claim": "SessionStart hook activity appears in stream-json [doc]"},
+    {"source": "https://code.claude.com/docs/en/hooks.md L792, L1171", "date": "2026-09-28", "quote": "The exceptions are `UserPromptSubmit`, `UserPromptExpansion`, `SessionStart`, and `PostModelSwitch`, where Claude Code adds plain-text stdout as context that Claude can see and act on. ... Claude Code adds stdout it treats as plain text to Claude's context.", "claim": "SessionStart stdout reaches the model, so the fixture prints nothing [doc]"},
+    {"source": "https://code.claude.com/docs/en/features-overview.md L233, L312-314", "date": "2026-09-28", "quote": "| **Hooks** | On trigger | Nothing (runs externally) | Zero, unless hook returns additional context | ... What loads: Nothing by default. Hooks execute outside the main conversation.", "claim": "a hook that exits 0 with empty stdout adds nothing to the model's context [doc + nv]"},
+    {"source": "https://code.claude.com/docs/en/hooks.md L790, L839", "date": "2026-09-28", "quote": "Exit 0 means success ... or with empty stdout, it's a non-blocking error for most hook events: the action proceeds, and the transcript shows a `<hook name> hook error` notice followed by the first line of stderr", "claim": "the hook must exit 0, or the transcript shows an error notice [doc]"},
+    {"source": "https://code.claude.com/docs/en/headless.md L222, L235", "date": "2026-09-28", "quote": "The `system/init` event reports session metadata including the model, tools, MCP servers, and loaded plugins. ... | `plugins` | array | plugins that loaded successfully, each with `name` and `path` |", "claim": "the plugin is reported in init as session metadata [doc]"},
+    {"source": "claude --help (2.1.283) L166-169", "date": "2026-09-28", "quote": "--plugin-dir <path>  Load a plugin from a directory or .zip for this session only; a folder of plugins loads each child (repeatable: --plugin-dir A --plugin-dir B.zip)", "claim": "--plugin-dir loads a plugin for one session [obs]"},
+    {"source": "anthropics/claude-code@7779afb1 plugins/explanatory-output-style/hooks/hooks.json L4-9", "date": "2026-09-28", "quote": "\"SessionStart\": [ { \"hooks\": [ { \"type\": \"command\", \"command\": \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/session-start.sh\"", "claim": "an upstream plugin's SessionStart hook layout (that hook injects context; the fixture's does not) [obs]"}
+   ],
+   "not_found": [
+    "a doc saying loaded plugins are named anywhere the model sees (checked plugins-reference, plugins/components, hooks, headless, features-overview)",
+    "whether --bare skips hooks of a --plugin-dir plugin",
+    "an explicit sentence on empty SessionStart stdout with exit 0"
+   ]
+  },
+  {
+   "id": "Q2",
+   "title": "K6: an MCP server whose tools are listed but which is not usable",
+   "findings": [
+    {"source": "https://code.claude.com/docs/en/mcp.md L363", "date": "2026-09-28", "quote": "Claude Code reconnects a remote server that drops mid-session and retries an HTTP or SSE server's first connection after a transient error. Stdio servers are local processes, and Claude Code doesn't reconnect them automatically.", "claim": "a stdio server is not reconnected automatically [doc]; probe p2 saw Claude Code 2.1.283 start the fixture again for a tool call (prereg-r3.json)"},
+    {"source": "https://code.claude.com/docs/en/mcp.md L389-390", "date": "2026-09-28", "quote": "With tool search, Claude Code tells Claude which server failed and its connection error… Claude Code includes the same information in `ToolSearch` results that find no matching tool. ... In any configuration without tool search… Claude Code doesn't report failed server connections to Claude.", "claim": "what the model is told about a failed server [doc]"},
+    {"source": "https://code.claude.com/docs/en/headless.md L240", "date": "2026-09-28", "quote": "When you pass `--mcp-config` with `-p`, Claude Code waits for still-pending servers before running the first turn, up to the `MCP_TIMEOUT` startup timeout, 30 seconds by default.", "claim": "a -p session waits for servers before its first turn [doc]"},
+    {"source": "https://code.claude.com/docs/en/agent-sdk/mcp.md L227", "date": "2026-09-28", "quote": "the `tools` array lists the `mcp__` tools of each server that has connected by then, plus those of servers with a cached tool list… Tools of any other server that hasn't connected are absent", "claim": "what init lists depends on timing and a cached tool list [doc]"},
+    {"source": "https://code.claude.com/docs/en/agent-sdk/mcp.md L719", "date": "2026-09-28", "quote": "This message includes the connection status for each MCP server. The `status` field can be `\"pending\"`, `\"connected\"`, `\"failed\"`, `\"needs-auth\"`, or `\"disabled\"`.", "claim": "the init status values [doc]"},
+    {"source": "anthropics/claude-code@7779afb1 CHANGELOG.md L1445 (v2.1.259)", "date": "2026-09-28", "quote": "Fixed MCP servers that disconnect while their tools are being listed at startup showing as connected with no tools instead of reporting the error", "claim": "a server that disconnects during listing is reported as an error [doc]"},
+    {"source": "anthropics/claude-code@7779afb1 CHANGELOG.md L1191 (v2.1.267)", "date": "2026-09-28", "quote": "Fixed a tool that disappears mid-conversation, from a disconnected MCP server or an upgrade, rewriting the tool list and discarding earlier thinking", "claim": "a disconnected server's tools can leave the tool list (inference) [doc + nv]; probes p2 and p4 saw the fixture's tools stay in the deferred list after it ended"},
+    {"source": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools.md L753, L759, L779", "date": "2026-09-28", "quote": "**Tool Execution Errors** contain actionable feedback that language models can use to self-correct… They are reported in tool results with `isError: true` ... Clients **SHOULD** provide tool execution errors to language models to enable self-correction.", "claim": "a failing tool call reaches the model as an error result [doc]"},
+    {"source": "modelcontextprotocol/python-sdk v2.2.0 README L49-70; src/mcp/server/fastmcp.py L1", "date": "2026-09-28", "quote": "from mcp.server import MCPServer / mcp = MCPServer(\"Demo\") / @mcp.tool() ... Removed in mcp 2: `FastMCP` is now `mcp.server.mcpserver.MCPServer`.", "claim": "the v2 high-level server API the fixture uses [obs]"},
+    {"source": "modelcontextprotocol/python-sdk v2.2.0 src/mcp/server/mcpserver/server.py L402, L447", "date": "2026-09-28", "quote": "transport: Literal[\"stdio\", \"sse\", \"streamable-http\"] = \"stdio\", ... return CallToolResult(content=[TextContent(type=\"text\", text=str(exc))], is_error=True)", "claim": "run() defaults to stdio; an exception other than MCPError becomes an is_error result [obs]"}
+   ],
+   "not_found": [
+    "the status a stdio server takes after it exits mid-session, and whether its tools leave the model's tool list (checked mcp.md, agent-sdk/mcp.md, errors.md, the CHANGELOG)",
+    "CLI documentation of how an external server's isError result reaches the model"
+   ]
+  },
+  {
+   "id": "Q3",
+   "title": "S1: PR-description and PR-check rules in AGENTS.md",
+   "findings": [
+    {"source": "https://agents.md/ (sample file)", "date": "2026-09-28", "quote": "## PR instructions- Title format: [<project_name>] <Title>- Always run `pnpm lint` and `pnpm test` before committing. ... Commit messages or pull request guidelines, security gotchas, large datasets, deployment steps: anything you'd tell a new teammate belongs here too.", "claim": "the AGENTS.md format puts PR instructions in the file [doc]"},
+    {"source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md L58-60, L140-141 (redirect from https://developers.openai.com/codex/guides/agents-md)", "date": "2026-09-28", "quote": "## Repository expectations … - Run `npm run lint` before opening a pull request. ... Keep rules concise, explain the behavior to flag and any safe path or exception, and reserve formatting and lint checks for CI.", "claim": "Codex's AGENTS.md guidance includes pre-PR expectations and concise rules [doc]"},
+    {"source": "https://code.claude.com/docs/en/best-practices.md L181", "date": "2026-09-28", "quote": "| Repository etiquette (branch naming, PR conventions) |", "claim": "Claude Code's CLAUDE.md guidance lists PR conventions under what to include [doc]"},
+    {"source": "https://code.claude.com/docs/en/memory.md L11", "date": "2026-09-28", "quote": "Claude can also read a repository's `AGENTS.md` files, on their own or alongside CLAUDE.md", "claim": "AGENTS.md reaches Claude sessions [doc]"},
+    {"source": "https://code.claude.com/docs/en/github-actions.md L287", "date": "2026-09-28", "quote": "Create a `CLAUDE.md` file in your repository root to define code style guidelines, review criteria, project-specific rules, and preferred patterns. Claude follows these guidelines when creating PRs and responding to requests.", "claim": "instruction files govern PR creation by agents [doc]"},
+    {"source": "NVIDIA/warp@e477c3ba2d84a5aa843f029821e071f06b7dea72 AGENTS.md L26-28 (pushed 2026-09-28T07:42:00Z)", "date": "2026-09-28", "quote": "## PR Instructions … If opening a pull request on GitHub, use the template in `.github/PULL_REQUEST_TEMPLATE.md`.", "claim": "a maintained repository tells agents to build PRs from the template [obs]"},
+    {"source": "newton-physics/newton@3b7c3c848b9ff012ab28273d09dc00523dcd961b AGENTS.md L32-34 (pushed 2026-09-25T13:07:29Z)", "date": "2026-09-28", "quote": "If opening a pull request on GitHub, use the template in `.github/PULL_REQUEST_TEMPLATE.md`.", "claim": "the same template rule in a second maintained repository [obs]"},
+    {"source": "WordPress/gutenberg@ff0659d6eb3e76207aeb63fc97c0c6cdd1fe5e20 AGENTS.md L99-102 (pushed 2026-09-28T07:45:41Z)", "date": "2026-09-28", "quote": "## PR instructions … Fix all formatting/linting issues; these are enforced through CI in PRs.", "claim": "a maintained repository names CI enforcement in its PR instructions [obs]"},
+    {"source": "terramate-io/terramate@dc22e8df3365a6558d01e4c03e3e26652b0a3ee5 AGENTS.md L444-469 (pushed 2026-09-08T12:20:05Z)", "date": "2026-09-28", "quote": "## PR Instructions … ### PR Description Should Include - **What** … **Why** … **Testing**", "claim": "a maintained repository states required PR-description content [obs]"},
+    {"source": "gh pr create --help (gh 2.101.0) L14-15; https://cli.github.com/manual/gh_pr_create", "date": "2026-09-28", "quote": "A prompt will also ask for the title and the body of the pull request. Use `--title` and `--body` to skip this, or use `--fill` to autofill these values from git commits.", "claim": "a non-interactive gh run supplies the body itself [obs/doc]"},
+    {"source": "cli/cli v2.101.0 pkg/cmd/pr/create/create.go L345-346, L350, L619-641", "date": "2026-09-28", "quote": "`--template` is not supported when using `--body` or `--body-file` ... must provide `--title` and `--body` (or `--fill`…) when not running interactively ... [a template is loaded only] if !opts.BodyProvided", "claim": "gh pr create --body, --body-file and --fill skip the repository's PR template [obs]"},
+    {"source": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/about-issue-and-pull-request-templates", "date": "2026-09-28", "quote": "When you add a pull request template to your repository, project contributors will automatically see the template's contents in the pull request body.", "claim": "the template reaches the body in the web flow [doc]"}
+   ],
+   "not_found": [
+    "a sampled AGENTS.md that documents a CI check on PR-description content (sample: gh search code \"PR instructions\" --filename AGENTS.md; eight maintained repositories)",
+    "a docs.github.com statement about templates for PRs created through the CLI or API"
+   ]
+  },
+  {
+   "id": "Q4",
+   "title": "AN-13: /doctor in -p mode or through the Skill tool",
+   "findings": [
+    {"source": "https://code.claude.com/docs/en/commands.md L83", "date": "2026-09-28", "quote": "| `/doctor [prompt-audit [path]]` | **Skill.** Run a setup checkup that diagnoses issues and can fix them. … From the terminal, `claude doctor` prints read-only installation diagnostics without starting a session. Alias: `/checkup`.", "claim": "/doctor is a bundled skill [doc]"},
+    {"source": "https://code.claude.com/docs/en/skills.md L32", "date": "2026-09-28", "quote": "Before v2.1.205, `/doctor` was a built-in command rather than a bundled skill.", "claim": "it became a skill in v2.1.205 [doc]"},
+    {"source": "https://code.claude.com/docs/en/headless.md L318-321", "date": "2026-09-28", "quote": "Command support differs in `-p` mode: … User-invoked skills and custom commands work. Include `/skill-name` in the prompt string and Claude Code expands it before running. … Built-in commands that only run in the terminal interface, such as `/login`, aren't available.", "claim": "a bundled skill can be run from a -p prompt [doc]"},
+    {"source": "anthropics/claude-code@7779afb1 CHANGELOG.md L9 (v2.1.283)", "date": "2026-09-28", "quote": "Added `/doctor prompt-audit` (also `/checkup prompt-audit`) to audit your CLAUDE.md files, skills, agents and commands…", "claim": "the prompt audit ships in the installed version [doc]"},
+    {"source": "https://code.claude.com/docs/en/skills.md L766", "date": "2026-09-28", "quote": "By default, Claude can invoke any skill that doesn't have `disable-model-invocation: true` set. … A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not.", "claim": "model invocation of /doctor is not documented either way [doc]"}
+   ],
+   "not_found": [
+    "a doc or CHANGELOG entry marking /doctor interactive-only",
+    "how its confirm-before-change step behaves under -p"
+   ]
+  },
+  {
+   "id": "Q5",
+   "title": "Force-pushed PR commits that still hold low-sensitivity text",
+   "findings": [
+    {"source": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository", "date": "2026-09-28", "quote": "If you only rewrite your history and force push it, the commits with sensitive data may still be accessible elsewhere: In any clones or forks of your repository; Directly via their SHA-1 hashes in cached views on GitHub; Through any pull requests that reference them", "claim": "old commits stay reachable by SHA and through PRs [doc]"},
+    {"source": "same page", "date": "2026-09-28", "quote": "However, you can permanently remove cached views and references to the sensitive data in pull requests on GitHub by contacting us through the GitHub Support portal.", "claim": "only Support can purge them [doc]"},
+    {"source": "same page", "date": "2026-09-28", "quote": "GitHub Support won't remove non-sensitive data, and will only assist in the removal of sensitive data in cases where we determine that the risk can't be mitigated by rotating affected credentials.", "claim": "Support will likely decline low-sensitivity text [doc]"},
+    {"source": "same page", "date": "2026-09-28", "quote": "Broken diff view for closed pull requests: Removing the sensitive data will require removing the internal references used for displaying the diff view in pull requests, so you will no longer be able to see these diffs.", "claim": "a purge would break diffs on the affected pull requests [doc]"}
+   ],
+   "not_found": [
+    "a self-service way to delete refs/pull/*/head",
+    "GitHub's timing for garbage-collecting unreferenced commits"
+   ]
+  }
+ ]
+}

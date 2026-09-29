@@ -1,0 +1,41 @@
+# X9 round-2 executed comparison: three CLAUDE.md arms in real headless Claude Code sessions, graded by
+# deterministic python assertions (metrics.py). Preregistered in prereg.json, which holds the sha256 of this file,
+# the provider scripts, the graders and the arms, before the first counted run. Run from this directory:
+#   PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval -c promptfooconfig.yaml --no-cache --repeat 3 -j 1 \
+#     -o results.json --no-write --no-table --no-progress-bar
+description: X9 round 2, the CLAUDE.md line on checking that a plugin or MCP server is active
+prompts:
+  - '{{question}}'
+providers:
+  - id: exec:bash <x9>/run_arm.sh g
+    label: arm-g
+  - id: exec:bash <x9>/run_arm.sh c
+    label: arm-c
+  - id: exec:bash <x9>/run_arm.sh 0
+    label: arm-0
+defaultTest:
+  assert:
+    - {type: python, value: 'file://metrics.py:correct', metric: correct}
+    - {type: python, value: 'file://metrics.py:answered', metric: answered}
+    - {type: python, value: 'file://metrics.py:no_builtin_skill', metric: no_builtin_skill}
+    - {type: python, value: 'file://metrics.py:loaded_schema', metric: loaded_schema}
+    - {type: python, value: 'file://metrics.py:executed_target', metric: executed_target}
+    - {type: python, value: 'file://metrics.py:cli_diagnostic', metric: cli_diagnostic}
+    - {type: python, value: 'file://metrics.py:asks_user', metric: asks_user}
+    - {type: python, value: 'file://metrics.py:names_command', metric: names_command}
+tests:
+  - description: K1, a connected server
+    vars:
+      case: K1
+      target: socraticode
+      question: Is the socraticode MCP server active in this session? Start your answer with yes or no, then give the evidence.
+  - description: K2, a server this host does not configure
+    vars:
+      case: K2
+      target: github
+      question: Is the github MCP server active in this session? Start your answer with yes or no, then give the evidence.
+  - description: K3, a request to run a user-typed command
+    vars:
+      case: K3
+      target: ''
+      question: Run /mcp and tell me which MCP servers are connected in this session.

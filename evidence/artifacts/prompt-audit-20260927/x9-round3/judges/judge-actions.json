@@ -1,0 +1,494 @@
+{
+ "gpt6-AB": [
+  {
+   "command": "/bin/bash -lc \"rtk rg --files -g '\"'!**/.git/**'\"' -g '\"'!**/node_modules/**'\"' .\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -c \"rtk rg -n '\"'^'\"' CLAUDE.md AGENTS.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/mcp.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/mcp.md"
+   }
+  },
+  {
+   "command": "/bin/bash -c \"rtk awk '{ printf \\\"%s:%d:%s\\\\n\\\", FILENAME, FNR, \"'$0 }'\"' CLAUDE.md AGENTS.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/mcp",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/mcp"
+   }
+  },
+  {
+   "command": "/bin/bash -c \"rtk rg -n -m 12 'license|incumben|headless|interactive|claude -p|CLAUDE.md|Upstream verification|capability|Stop only|ask' docs/harness-defaults.md examples/claude-native/workflows/README.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "'/plugin'",
+   "action": {
+    "type": "find_in_page",
+    "pattern": "/plugin"
+   }
+  },
+  {
+   "command": "/bin/bash -c \"rtk awk 'FILENAME == \\\"docs/harness-defaults.md\\\" && (FNR <= 25 || /Check a capability claim in order|upstream changelog|installed client|License|license|incumben/) { printf \\\"%s:%d:%s\\\\n\\\", FILENAME, FNR, \"'$0 } FILENAME == \"examples/claude-native/workflows/README.md\" && FNR >= 45 && FNR <= 61 { printf \"%s:%d:%s'\"\\\\n\\\", FILENAME, FNR, \"'$0 }'\"' docs/harness-defaults.md examples/claude-native/workflows/README.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/plugins/troubleshooting",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/plugins/troubleshooting"
+   }
+  },
+  {
+   "web_search": "'What loads'",
+   "action": {
+    "type": "find_in_page",
+    "pattern": "What loads"
+   }
+  }
+ ],
+ "gpt6-BA": [
+  {
+   "command": "/bin/bash -c 'rtk cat CLAUDE.md AGENTS.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -c \"rtk rg --files --hidden -g '\"'!**/.git/**'\"' -g '\"'!**/node_modules/**'\"'\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -c \"rtk rg -n -C 2 'Upstream verification|installed client|changelog|headless|licenses|incumbency|read-only|unconfirmed|synthetic|workflow|plugin' docs/harness-defaults.md docs/current-session-observation.md docs/acceptance-evidence-policy.md examples/claude-native/workflows/README.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/commands.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/commands.md"
+   }
+  },
+  {
+   "command": "/bin/bash -c \"rtk rg -n -F -e 'installed client' -e 'changelog' -e 'source of truth' -e 'licens' -e 'incumben' -e 'Stop only' -e 'distinguish unchanged' -e 'Keep historical' -e 'Inspect native' -e 'claiming a plugin' CLAUDE.md AGENTS.md docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/commands",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/commands"
+   }
+  },
+  {
+   "command": "/bin/bash -c \"rtk sed -n '58,71p' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/features-overview",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/features-overview"
+   }
+  },
+  {
+   "web_search": "'Nothing (runs externally)'",
+   "action": {
+    "type": "find_in_page",
+    "pattern": "Nothing (runs externally)"
+   }
+  }
+ ],
+ "claude-AB": [
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/adjudication-inputs/x9.AB.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.AB.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.AB.json",
+    "offset": 489,
+    "limit": 330
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.AB.json",
+    "offset": 819,
+    "limit": 292
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Glob",
+   "input": {
+    "pattern": "*.md",
+    "path": "<root>"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/AGENTS.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "Upstream verification and compounding learning",
+    "path": "<root>/docs/harness-defaults.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "`/plugin|`/mcp`|`/context`|/reload-plugins",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 60
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/harness-defaults.md",
+    "offset": 56,
+    "limit": 30
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/recipes/claude-native-profile.md",
+    "offset": 262,
+    "limit": 80
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Glob",
+   "input": {
+    "pattern": "examples/claude-native/*.md",
+    "path": "<root>"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)unconfirmed|plugin is active|plugin or MCP server|listed availability|successful execution|does not prove that this task",
+    "path": "<root>",
+    "glob": "*.md",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/examples/claude-native/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/token-session-handbook.md",
+    "offset": 55,
+    "limit": 25
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)word budget|CLAUDE\\.md|every session|headless|workflow child|ask the user",
+    "path": "<root>/docs/decisions/2026-09-27-claude-harness-settings.md",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/decisions/2026-09-27-claude-harness-settings.md",
+    "offset": 186,
+    "limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)word budget|words? per (rule|line)|one statement per rule",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)AskUserQuestion|unattended|no user (is|can)|nobody (can|to) answer|human-in-the-loop",
+    "path": "<root>",
+    "glob": "*.md",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  }
+ ],
+ "claude-BA": [
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/adjudication-inputs/x9.BA.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.BA.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(gpt-|o3|o4|astra|sol\\b|luna|terra|opus|sonnet|haiku|fable|mythos|claude|codex|lane|model|provenance|refutation|/home|/tmp|/Users|~/)",
+    "path": "<judges>/adjudication-inputs/x9.BA.json",
+    "output_mode": "content",
+    "-o": true
+   },
+   "outside_paths": [
+    "/Users",
+    "/home",
+    "/tmp"
+   ]
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.BA.json",
+    "offset": 489,
+    "limit": 622
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.BA.json",
+    "offset": 489,
+    "limit": 300
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x9.BA.json",
+    "offset": 789,
+    "limit": 322
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Glob",
+   "input": {
+    "pattern": "*",
+    "path": "<root>"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/AGENTS.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(upstream verification and compounding learning|capability claim)",
+    "path": "<root>/docs/harness-defaults.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(`/mcp`|`/context`|`/plugin`|ToolSearch|unconfirmed|plugin is active|plugin or MCP server)",
+    "path": "<root>",
+    "output_mode": "files_with_matches"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/harness-defaults.md",
+    "offset": 56,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(plugin|/mcp|/context|toolsearch|deferred|unconfirmed|ask the user|user-typed|headless)",
+    "path": "<root>/examples/claude-native/CLAUDE.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(workflow child\\w*|children).{0,80}(CLAUDE\\.md|AGENTS\\.md|instructions)|(CLAUDE\\.md|AGENTS\\.md).{0,80}(workflow child\\w*|children|headless|claude -p)",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "*.md",
+    "head_limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)CLAUDE\\.md",
+    "path": "<root>/examples/claude-native/workflows/README.md",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(AskUserQuestion|no user (can|may|to) answer|nobody (can )?answer|unattended|non-interactive)",
+    "path": "<root>/examples/claude-native/workflows/README.md",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/examples/claude-native/workflows/README.md",
+    "offset": 460,
+    "limit": 16
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(one statement per rule|one rule per|statement per rule|each rule (is )?stated once)",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 10
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)(listed availability|successful execution|report it as unconfirmed|name the command that would|read-only diagnostics)",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "head_limit": 10
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/catalogs/foundation/manifest.json",
+    "offset": 1,
+    "limit": 12
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  }
+ ]
+}

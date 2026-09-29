@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "id": "ccusage-20026-qualification-20260927",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-28T03:32:15Z",
+  "component_ids": [
+    "ccusage"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, ccusage 20.0.26 (tag v20.0.26, commit d9821088b98aa536c7a385aa1a4579d6fa02269b, released 2026-09-27T16:26:00Z) was qualified and switched in, reopening qualification as the 2026-09-26 publication trigger requires. The npm tarball https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz (24,216 bytes) had sha256 b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2, and its sha512 and sha1 matched the registry integrity and shasum. At that commit the upstream Rust suite (cargo test --workspace, Rust 1.97.1, in an environment mirroring nix/tests.nix) exited 0 with 944 passed, 0 failed and 3 ignored, and the Node tests passed 34 of 34. On the native_token_ci synthetic fixture the installed 20.0.24 and 20.0.26 executables returned byte-identical output: 2 rows, 1,900 input, 380 output and 2,430 total tokens, and a totalCost within 1e-9 of 0.0328. On the host's native histories, daily, weekly and monthly token totals were identical between the two versions; 20.0.24 left claude-opus-5-5 and gpt-6-luna unpriced there, and 20.0.26 left no model unpriced. A synthetic pricing probe gave claude-opus-5-5 a cost of 0.0 on 20.0.24 and 4.0 on 20.0.26 for 1,000,000 input tokens, with a claude-opus-5 control at 5.0 on both. The coordinator repointed the production launcher to 20.0.26 at 2026-09-27T22:01:01Z; the read-back resolves it to the 20.0.26 prefix, which prints 'ccusage 20.0.26', and the 20.0.24 prefix is retained for rollback.",
+  "limitations": [
+    "macOS is registry-only: the macOS pin carries the same tarball digests, but no Mac installed or ran 20.0.26, and @ccusage/ccusage-darwin-arm64@20.0.26 stays unpinned (its registry integrity is recorded in data only).",
+    "The pinned sha256 covers only the npm launcher tarball (5 files). The Rust executable comes from the optional dependency @ccusage/ccusage-linux-x64@20.0.26, which npm resolves at install time outside that hash; this receipt records its registry integrity but did not compare it with the installed copy.",
+    "npm dist.gitHead is null, so the tarball binds to commit d9821088 only through the git tag. The registry lists an SLSA provenance attestation for 20.0.26, which was not fetched or verified here.",
+    "Upstream CI was not reproduced: nix flake check, nix build .#ccusage-tests, just test-node under pnpm 12.5.1, the Nushell contribution-gate test and the Babashka compare-pr-performance test did not run (Nix, just and pnpm are absent). The Rust suite ran under an isolated rustup 1.97.1 toolchain with a script mirroring the nix/tests.nix environment, not inside the Nix derivation, and the Node tests ran on Node 24.21.0.",
+    "The Node tests do not discriminate this bump: the two test files are identical between v20.0.24 and v20.0.26.",
+    "The native-history comparison covers one range (2026-09-20 to 2026-09-26, with rows only for 2026-09-24 to 2026-09-26, Claude and Codex together). It shows token parity between the versions, not agreement with provider billing, and session and blocks reports were not compared.",
+    "20.0.26's cost figures use upstream snapshot prices. On the same tokens the range's totalCost rose from 3423.92 (two models unpriced) to 9894.33; neither is a qualified contract price, and the recorded use commands keep --no-cost.",
+    "The landscape winner pin in catalogs/landscape/foundation.json stays 20.0.24 (manifest-20260922), so a 20.0.26 host receipt needs scripts/host_receipts.py record --allow-unbound-version and stays unbound until a new verdict wave. No host receipt is recorded here.",
+    "The launcher repoint is the coordinator's operation; this receipt records its time and a later read-back, not the operation's own output.",
+    "The daily native-history comparison is a coordinator record from 2026-09-27T21:50Z whose argument vector was not retained (data.native_checks.native_histories.daily.retained_output); only its JSON outputs are. The weekly and monthly comparisons and the pricing probe record their commands.",
+    "New hosts receive this pin only after the next release tag."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-28T02:04:35Z",
+    "previous_version": "20.0.24",
+    "version": "20.0.26",
+    "trigger": "docs/decisions/2026-09-26-token-practice-f1-f9.md, ccusage publication trigger: any version newer than 20.0.24 reopens qualification; keep 20.0.24 until it passes.",
+    "release": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26",
+    "tag_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "tag_object": "lightweight tag: refs/tags/v20.0.26 points at the commit directly",
+    "commit_message": "chore: release v20.0.26 (#1778)",
+    "committed_at_utc": "2026-09-27T16:18:33Z",
+    "released_at_utc": "2026-09-27T16:26:00Z",
+    "npm_published_at_utc": "2026-09-27T16:27:28.175Z",
+    "npm_dist_tag_latest": "20.0.26",
+    "unpublished_intermediate": "v20.0.25 (release commit a7d5e839) exists only as a git tag: npm lists 20.0.23, 20.0.24 and 20.0.26, and no GitHub release exists for it.",
+    "tarball": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz",
+    "tarball_bytes": 24216,
+    "tarball_sha256": "b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2",
+    "tarball_integrity": "sha512-46TTmFKcuNyWbtqj8HZqWTmVQIsApvGO4xP+E2VL5NC/oMjdtHOv9svVTsHX1WQgetbNOV4GdvQGHLG22vXZgg==",
+    "tarball_shasum": "a0d190787b26183dd78797283c59db3ec9ee7817",
+    "tarball_file_count": 5,
+    "tarball_unpacked_size": 529314,
+    "npm_git_head": null,
+    "npm_attestations_url": "https://registry.npmjs.org/-/npm/v1/attestations/ccusage@20.0.26",
+    "registry_check": "npm view ccusage@20.0.26 --json read at 2026-09-28T01:26Z; the tarball was downloaded fresh and its sha256, sha512 and sha1 computed; sha512 and sha1 equal dist.integrity and dist.shasum.",
+    "native_optional_dependencies": {
+      "resolved_by": "npm at install time, outside the pinned tarball hash",
+      "packages": [
+        "@ccusage/ccusage-darwin-arm64@20.0.26",
+        "@ccusage/ccusage-darwin-x64@20.0.26",
+        "@ccusage/ccusage-linux-arm64@20.0.26",
+        "@ccusage/ccusage-linux-x64@20.0.26",
+        "@ccusage/ccusage-win32-arm64@20.0.26",
+        "@ccusage/ccusage-win32-x64@20.0.26"
+      ],
+      "linux_x64_integrity": "sha512-46wa7ImMzejMUuo5pSI2uYml7jgE58TID2/QQS9YJO3BwI6woyti6cy3xtZk+TyG1HiyzeH8P+3r8hSVDaAvsg==",
+      "darwin_arm64_integrity": "sha512-wc2Ed0elPARpRyfQkSrSXuX136yDEGOLkMqxQA/3gdNm+/hxgAN4fKeZsawFKelofLoCvWIy+QkUbSJ71BwNxw==",
+      "installed_on_host": "npm ls --global --depth=1 on the 20.0.26 prefix: ccusage 20.0.26 with @ccusage/ccusage-linux-x64 20.0.26; the other five are not installed"
+    },
+    "upstream_state": {
+      "checked_at_utc": "2026-09-28T01:26:10Z",
+      "repository": "https://github.com/ccusage/ccusage",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "pushed_at_utc": "2026-09-28T00:55:23Z",
+      "latest_release": "v20.0.26 (not a prerelease or draft)",
+      "commits_v20_0_24_to_v20_0_26": "199 commits over 42 files; 184 are chore(pricing) snapshot updates. The others include #1774, #1777, #1782, #1794, #1796 and #1799, plus CI and dependency updates."
+    },
+    "source_review": {
+      "cli_flags": "No flag was removed; `codex session` gained codex_session_options (rust/crates/ccusage-cli-parser/src/cli-commands.json).",
+      "json_keys": "No key this repository reads was removed or renamed; the costUSD to totalCost rename is only in the new `codex session --id` detail output, which nothing here calls.",
+      "consumers": "scripts/native_token_ci.py ccusage_fixture is the only maintained ccusage JSON parser here; tools/token-report/token_manifest.py only copies the manifest version. The dated blueprint script blueprints/gap-resolution-20260922/ccusage-real-log-coverage/run.sh also reads session-report keys (sessionId, inputTokens, outputTokens, cacheReadTokens, cacheCreationTokens) and was not rechecked on 20.0.26."
+    },
+    "upstream_suite": {
+      "evidence_class": "unchanged upstream test",
+      "clone": "git clone of v20.0.26; HEAD d9821088b98aa536c7a385aa1a4579d6fa02269b; tree clean",
+      "runs": [
+        {
+          "command": "cargo test --workspace (in rust/)",
+          "environment": "Rust 1.97.1 installed by rustup into a scratch RUSTUP_HOME and CARGO_HOME; CCUSAGE_PRICING_JSON_PATH set to model_prices_and_context_window.json from BerriAI/litellm@e73abe6c72785ad91d4927da26de3a5d1b54300b (the flake.lock pin; file sha256 fbb16319dc9b1e1ced94cd532ee7a8cb8edbdb22e311b12514872633067f7537), CCUSAGE_VERSION=20.0.26, TZ=UTC, and a scratch HOME seeded with .claude/projects and .config/claude/projects as nix/tests.nix does; the host's system zoneinfo stood in for that file's TZDIR (nixpkgs tzdata)",
+          "exit_code": 0,
+          "result": "58 test result lines: 944 passed, 0 failed, 3 ignored; the test profile compiled in 27.98s"
+        },
+        {
+          "command": "TZ=UTC node --test apps/ccusage/src/cli.test.ts nix/tools/models-dev-gen/compact.test.ts",
+          "environment": "Node v24.21.0",
+          "result": "tests 34, pass 34, fail 0",
+          "discriminating": false,
+          "why": "git diff between v20.0.24 and v20.0.26 is empty for both test files"
+        }
+      ],
+      "not_run": [
+        "nix flake check and nix build .#ccusage-tests (Nix absent)",
+        "just test-node with pnpm 12.5.1 (just and pnpm absent)",
+        ".github/scripts/contribution-gate.test.nu (Nushell) and apps/ccusage/scripts/compare-pr-performance_test.clj (Babashka), CI-only"
+      ]
+    },
+    "native_checks": {
+      "evidence_class": "native execution of the installed 20.0.24 and 20.0.26 executables against scratch data or the host's own logs; totals only",
+      "synthetic_fixture": {
+        "command": "ccusage claude daily --json --offline --timezone UTC, with a scratch HOME and CLAUDE_CONFIG_DIR set to a copy of fixtures/ccusage-synthetic-claude",
+        "20.0.24": "rc 0; rows 2026-01-05 and 2026-01-06; inputTokens 1900, outputTokens 380, cacheCreationTokens 100, cacheReadTokens 50, totalTokens 2430, totalCost 0.032799999999999996",
+        "20.0.26": "rc 0; identical output bytes",
+        "harness_expectation": "scripts/native_token_ci.py ccusage_fixture: 2 rows, 1900/380/2430 tokens, totalCost within 1e-9 of 0.0328"
+      },
+      "pricing_probe": {
+        "observed_at_utc": "2026-09-28T02:01:40Z",
+        "input": "scratch CLAUDE_CONFIG_DIR with two synthetic assistant entries, each with a requestId and no costUSD: claude-opus-5-5 with 1,000,000 input tokens on 2026-01-05, and a claude-opus-5 control with 1,000,000 input tokens on 2026-01-06",
+        "command": "ccusage claude daily --json --offline --mode calculate --timezone UTC",
+        "20.0.24": "rc 0, empty stderr; claude-opus-5-5 cost 0.0, claude-opus-5 cost 5.0; totals.totalCost 5.0, totals.unpricedModels [\"claude-opus-5-5\"]",
+        "20.0.26": "rc 0, empty stderr; claude-opus-5-5 cost 4.0, claude-opus-5 cost 5.0; totals.totalCost 9.0, no totals.unpricedModels"
+      },
+      "native_histories": {
+        "daily": {
+          "recorded_by": "coordinator, 2026-09-27T21:50Z",
+          "retained_output": "the command line was not retained; the outputs are daily JSON without cost fields, one pair per range (20260919-20260920 and 20260920-20260926)",
+          "range_20260919_20260920": "0 rows and all-zero totals on both versions; empty stderr",
+          "range_20260920_20260926": "3 rows (2026-09-24, 2026-09-25, 2026-09-26; agents listed: claude and codex) on both versions; every row's token counts and model list identical; empty stderr",
+          "totals": {
+            "inputTokens": 95682697,
+            "outputTokens": 131416148,
+            "cacheCreationTokens": 467046164,
+            "cacheReadTokens": 19832503122,
+            "totalTokens": 20526648131
+          },
+          "unpriced_models_20.0.24": [
+            "claude-opus-5-5",
+            "gpt-6-luna"
+          ],
+          "unpriced_models_20.0.26": []
+        },
+        "cost_mode": {
+          "recorded_by": "coordinator, 2026-09-27T21:50Z",
+          "range": "20260920-20260926, same rows and token totals as daily",
+          "totalCost_20.0.24": 3423.9198265000014,
+          "totalCost_20.0.26": 9894.33179097998
+        },
+        "weekly_and_monthly": {
+          "observed_at_utc": "2026-09-28T02:04:35Z",
+          "command": "ccusage weekly|monthly --json --offline --no-cost --since 20260920 --until 20260926 --timezone UTC",
+          "result": "rc 0 and empty stderr for all four runs; one row each; totals on both versions equal the daily totals above",
+          "why": "#1799 ('scope requestless dedupe by timestamp so daily matches weekly/monthly') can change these totals where Claude entries lack a requestId; no difference appeared on this range"
+        }
+      }
+    },
+    "cutover": {
+      "evidence_class": "native operation (coordinator)",
+      "cutover_utc": "2026-09-27T22:01:01Z",
+      "operation": "the production launcher symlink ~/.local/share/codex-ecosystem/bin/ccusage was repointed to tools/ccusage-20.0.26/bin/ccusage",
+      "install_layout": "the 20.0.26 prefix has bin/ccusage and lib/node_modules/ccusage, the layout of npm install --global --prefix, the pins and bootstrap form"
+    },
+    "post_cutover_readback": {
+      "observed_at_utc": "2026-09-28T02:03Z",
+      "symlink_target": "~/.local/share/codex-ecosystem/tools/ccusage-20.0.26/bin/ccusage",
+      "resolved": "~/.local/share/codex-ecosystem/tools/ccusage-20.0.26/lib/node_modules/ccusage/src/cli.js",
+      "symlink_mtime_utc": "2026-09-27T22:01:01Z",
+      "command_v": "~/.local/share/codex-ecosystem/bin/ccusage",
+      "version_output": "ccusage 20.0.26"
+    },
+    "host_receipt_binding": "The landscape winner pin stays 20.0.24, so record a 20.0.26 host receipt with scripts/host_receipts.py record --allow-unbound-version; it stays unbound until a new verdict wave.",
+    "rollback": "Repoint ~/.local/share/codex-ecosystem/bin/ccusage to the retained tools/ccusage-20.0.24/bin/ccusage and revert the pin files; no state migration is involved, since ccusage only reads existing logs."
+  }
+}

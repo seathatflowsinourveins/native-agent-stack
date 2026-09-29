@@ -1,0 +1,8 @@
+head=ea6e1d0f28b1ae0402b068012cac08a02bf8e1c9 tree_drift_check.py sha256=17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b
+tree-drift-check exit=0 args=--allow scripts/uv.lock
+control-no-allowance exit=1 args=
+control-planted-blob exit=1 args=--allow scripts/uv.lock --folder /var/tmp/tdc-controls.wfFZOC/planted/supply-chain-risk-auditor
+control-symlink exit=2 args=--allow scripts/uv.lock --folder /var/tmp/tdc-controls.wfFZOC/symlink/supply-chain-risk-auditor
+control-symlink outside/uv.lock sha256 before=164f21496b3fe539bcbfddf0d71f3a2e3baa426e00d8a65e27f692c064a93b25 after=164f21496b3fe539bcbfddf0d71f3a2e3baa426e00d8a65e27f692c064a93b25
+control-special-entries exit=2 args=--allow scripts/uv.lock --folder /var/tmp/tdc-controls.wfFZOC/special/supply-chain-risk-auditor
+control-upstream-gitlink exit=2 args=--allow scripts/uv.lock --gh evidence/artifacts/skills-listing-restore-20260928/fixture_gh_gitlink.py

@@ -1,0 +1,178 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "verdicts",
+  "maintenance",
+  "missed_practices",
+  "calls",
+  "notes",
+  "skills_used"
+ ],
+ "properties": {
+  "verdicts": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "verdict",
+     "reason",
+     "source"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "verdict": {
+      "type": "string",
+      "enum": [
+       "confirm",
+       "refute",
+       "amend",
+       "not_checked"
+      ]
+     },
+     "reason": {
+      "type": "string"
+     },
+     "source": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "maintenance": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "key",
+     "repository",
+     "pin_tag",
+     "pin_commit_confirmed",
+     "default_branch",
+     "last_default_branch_commit_date",
+     "commit_since_cutoff",
+     "archived",
+     "status",
+     "source"
+    ],
+    "properties": {
+     "key": {
+      "type": "string"
+     },
+     "repository": {
+      "type": "string"
+     },
+     "pin_tag": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "pin_commit_confirmed": {
+      "type": [
+       "boolean",
+       "null"
+      ]
+     },
+     "default_branch": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "last_default_branch_commit_date": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "commit_since_cutoff": {
+      "type": [
+       "boolean",
+       "null"
+      ]
+     },
+     "archived": {
+      "type": [
+       "boolean",
+       "null"
+      ]
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "maintained",
+       "stale",
+       "unknown",
+       "too_new"
+      ]
+     },
+     "source": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "missed_practices": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "practice",
+     "reason",
+     "upstream",
+     "source"
+    ],
+    "properties": {
+     "practice": {
+      "type": "string"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "upstream": {
+      "type": "string"
+     },
+     "source": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "calls": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "web_search",
+    "web_fetch",
+    "gh_api"
+   ],
+   "properties": {
+    "web_search": {
+     "type": "integer"
+    },
+    "web_fetch": {
+     "type": "integer"
+    },
+    "gh_api": {
+     "type": "integer"
+    }
+   }
+  },
+  "notes": {
+   "type": "string"
+  },
+  "skills_used": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ }
+}

@@ -12,12 +12,13 @@ variable, tracing a process, printing a native token (`gh auth token`,
 `hf auth token`, or through a git credential helper), reading or searching
 credential files or secret variable names, reading or copying the whole
 Hugging Face home or a home or tool credential store (anything in the SSH,
-GnuPG, AWS, Azure, kube, OmniRoute and Codex shell-snapshot directories, the
-Docker home as a whole, the Docker, git-credential, netrc, npm and PyPI files,
-and nativestack key files: every path the settings template's Read denies
-cover, which on a host running RTK's hook is how `cat` of them stays blocked
-after RTK rewrites it to `rtk read`), tracing a shell while it sources a
-credential file, and dumping the environment after sourcing one. Every rule
+GnuPG, AWS, Azure, kube, OmniRoute, Codex shell-snapshot and OpenHands
+runtime-worker secrets directories, the Docker home as a whole, the Docker,
+git-credential, netrc, npm and PyPI files, and nativestack key files: every
+path the settings template's Read denies cover, which on a host running RTK's
+hook is how `cat` of them stays blocked after RTK rewrites it to `rtk read`),
+tracing a shell while it sources a credential file, and dumping the
+environment after sourcing one. Every rule
 also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
 `rtk read F`, `rtk run -c '...'`). For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
@@ -96,22 +97,24 @@ POINTER_VARIABLE = re.compile(
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
 # Home and tool credential stores as a reader's operand (2026-09-27): every path the settings template's
 # credential-store Read denies cover. That is anything in an SSH, GnuPG, AWS, Azure or kube directory, an OmniRoute
-# data directory (~/.omniroute, ~/.config/omniroute, and Windows' AppData/Roaming/omniroute reached from WSL2) or a
+# data directory (~/.omniroute, ~/.config/omniroute, and Windows' AppData/Roaming/omniroute reached from WSL2), a
 # Codex `shell_snapshots` directory, whose files record every exported value (`declare -xp`, codex-rs
-# shell-command/src/shell_snapshot_exports.rs at rust-v0.157.1), each directory itself and a glob in it; the Docker,
-# git-credential, netrc, npm and PyPI files, also as an option's `=` value; any key file in a `nativestack` directory
-# (Read(~/.config/nativestack/*.key); STORE_PATHS blocks every mention of generation.key); and the Docker home itself
-# or a glob over its top level, which reaches config.json (as HF_HOME_ROOT does for the Hugging Face home). On a
-# host that runs RTK's Claude hook this rule is what stops `cat`, `head` and `tail -n` of those paths: rtk 0.50.0
-# rewrites them to `rtk read` (src/discover/rules.rs), Claude Code evaluates its permission rules against the
-# rewritten command, and RTK's own deny gate loads only Bash(...) rules (src/hooks/permissions.rs, append_bash_rules).
-# Only a reader, copy or search is blocked, never a mention, so `ssh -i`, `ssh-add`, `kubectl --kubeconfig`, `chmod`,
-# `stat` and `ls` on the same paths still pass in every session, and a search's own pattern is not taken for a file
-# it reads (search_paths). tests/test_secret_path_guard.py derives a reader of every template Read deny and expects a
-# block.
+# shell-command/src/shell_snapshot_exports.rs at rust-v0.157.1), or the OpenHands runtime-worker secrets directory
+# (2026-09-28: `runtime-workers/openhands/secrets` in the stack's state directory, where the host driver of PR #425
+# writes each attempt's agent-server session key to <run-id>-<arm>.server.env and <run-id>-<arm>.headers), each
+# directory itself and a glob in it; the Docker, git-credential, netrc, npm and PyPI files, also as an option's `=`
+# value; any key file in a `nativestack` directory (Read(~/.config/nativestack/*.key); STORE_PATHS blocks every
+# mention of generation.key); and the Docker home itself or a glob over its top level, which reaches config.json (as
+# HF_HOME_ROOT does for the Hugging Face home). On a host that runs RTK's Claude hook this rule is what stops `cat`,
+# `head` and `tail -n` of those paths: rtk 0.50.0 rewrites them to `rtk read` (src/discover/rules.rs), Claude Code
+# evaluates its permission rules against the rewritten command, and RTK's own deny gate loads only Bash(...) rules
+# (src/hooks/permissions.rs, append_bash_rules). Only a reader, copy or search is blocked, never a mention, so
+# `ssh -i`, `ssh-add`, `kubectl --kubeconfig`, `chmod`, `stat` and `ls` on the same paths still pass in every session,
+# and a search's own pattern is not taken for a file it reads (search_paths). tests/test_secret_path_guard.py derives
+# a reader of every template Read deny and expects a block.
 HOME_CREDENTIAL_STORE = re.compile(
     r"(?:^|[/=])(?:\.ssh|\.gnupg|\.aws|\.azure|\.kube|\.omniroute|\.config/omniroute|AppData/Roaming/omniroute"
-    r"|shell_snapshots)(?:/|$)"
+    r"|shell_snapshots|runtime-workers/openhands/secrets)(?:/|$)"
     r"|(?:^|[/=])(?:\.docker/config\.json|\.git-credentials|\.netrc|\.npmrc|\.pypirc|nativestack/[^/]*\.key)$"
     r"|(?:^|[/=])\.docker(?:/\**)?$")
 # A .env-style credential file: `.env`, `.env.local`, `.envrc`, `alpaca-paper.env`, `*.env`,

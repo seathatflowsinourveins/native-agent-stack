@@ -1,0 +1,27 @@
+# the base's prompt-hash pin fails on the converged templates (expect FAILED)
+# base (origin/main): b26add90becaed49cfd74f3cf48126b7fa9b5c86; tests/test_landscape_sweep_harness.py from the base, every other file from the PR branch
+# blobs as run (git hash-object):
+#   366e9ad50aada106fce09d962b8e73d9d8d796d6  tests/test_adoption_docs_consistency.py
+#   70a00a1e13e3c35fdb783d60863e8f553f86679e  tests/test_landscape_sweep_harness.py
+#   2705d4707837ea74223e851c0e355212c983aaba  docs/harness-defaults.md
+#   ad76cedb630e23398933d37b0c03ee7ec008dfbf  tools/sota-convergence/landscape-sweep/templates.json
+# Python 3.13.15
+$ python3 -m unittest tests.test_landscape_sweep_harness.TemplateTests.test_filled_templates_match_the_current_prompts_sha256
+F
+======================================================================
+FAIL: test_filled_templates_match_the_current_prompts_sha256 (tests.test_landscape_sweep_harness.TemplateTests.test_filled_templates_match_the_current_prompts_sha256)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pr1>/tests/test_landscape_sweep_harness.py", line 247, in test_filled_templates_match_the_current_prompts_sha256
+    self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_CURRENT)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '11fcd52312b96845a23d14ff739322bb9827eae33fd8760dff241585453b0107' != 'f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d'
+- 11fcd52312b96845a23d14ff739322bb9827eae33fd8760dff241585453b0107
++ f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+# exit 1
