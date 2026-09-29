@@ -996,7 +996,8 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   A backquote inside a single-quoted string is text for the shell that string is handed to, so
   `bash -c 'echo "`printenv`"'` and `eval '...'` read it (the tokenizer used to turn every backquote into `;`).
 - **Here-documents inside such a substitution.** One with a quoted delimiter (`<<'EOF'`, `<<"EOF"`, `<<\EOF`, also
-  partly quoted such as `<<'E'OF`) holds data, so the body a scan returns loses it and
+  partly quoted such as `<<'E'OF`) holds data, so, where the command that receives the substitution takes data (the next
+  item), the body a scan returns loses it and
   `git commit -m "$(cat <<'EOF' ... EOF)"` passes whatever its prose says: five real commit messages of this
   repository, that mention `set`, `ps -E`, a `cat` of a credential file or a keyring name in prose and had made the
   pattern fail, are ALLOWED rows in the tests. The tokenizer does not read that data either, once its substitution
@@ -1008,6 +1009,28 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   with `printenv`, or `(ps -E, ...)`) trips the guard, and a `$(...)` or backquote in it, which the shell runs, is read as a
   substitution of its own (`cat <<EOF` followed by `value: "$(printenv)"` and `EOF` is an `environment_dump`, as is the
   same body behind `"$(cat <<EOF ...)"`). How here-document bodies are read as commands stays as it was.
+- **A quoted here-document is data only for a command that takes data (2026-09-29).** Bash runs what a substitution
+  prints when the command that receives it is a shell with `-c`, `eval`, `source`, `xargs` or an interpreter, so
+  `eval "$(cat <<'EOF' ... printenv ... EOF)"` and `bash -c "$(cat <<'EOF' ... EOF)"` (also `sh`, `zsh`, and behind `env`,
+  `timeout`, `nohup`, `xargs`, `sudo`, `rtk proxy` or a keyring exec) dump the environment. The base guard refused them;
+  the first version of the rule above, which hid the body from every consumer, let them through. The body is now data
+  only when the command that receives the substitution as an argument, after the reserved words, assignments, wrappers and
+  launchers the guard models, is `git`, `gh`, `echo`, `printf`, `cat` or `tee`, so `git commit -m`, `gh pr create --body`
+  and `echo` keep passing. `cat` and `tee` count only for a here-string word (`cat <<< "$(...)"`), because a reader's
+  operand is a file name: `cat "$(cat <<'EOF' ... a credential path ... EOF)"` stays a `credential_file_read`. Every other
+  consumer (a shell, `eval`, an interpreter, `source` and `.`, `xargs`, `watch`, `ssh`, `curl`, `awk`, any program the guard
+  does not know), an assignment, the command position, a substitution nested in another, and any text the guard cannot
+  tell (the private-use characters U+E001 or U+E002 in it, more than 100,000 characters left after the comments, top-level
+  here-document bodies and substitutions are cut, keyring execs nested more than 16 deep) keep the stricter reading, so
+  prose in a quoted here-document inside them can still be refused (a bare `printenv` line in
+  `python3 tools/x.py --message "$(cat <<'EOF' ... EOF)"` is an `environment_dump`; put such text in a file with the Write
+  tool and pass the path). Measured that day against the base
+  guard (c26800f3): a matrix of 39 consumers, 18 launcher prefixes, 5 here-document forms, 8 payloads and 4 substitution
+  forms (112,320 commands) loosens no row for any consumer that is not on the list, where the first version loosened up
+  to 2,040 per consumer. Not read, as before: what an allowed consumer's output is used for afterwards (`echo "$(cat
+  <<'EOF' ... EOF)" | sh`, an echo written into a script that is then run, a git option that runs its value such as
+  `git -c core.pager=...`), and a shell that reads the quoted here-document itself inside the substitution
+  (`echo "$(bash <<'EOF' ... EOF)"`).
 - **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
   with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
   rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
@@ -1063,9 +1086,12 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the substitution scan took 10 s on 12,000
   here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
   walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
-  takes under a second (the test bounds it at 3 s). Not fixed: tokenizing is shlex's, about 9 microseconds a character
-  inside quotes, so a single command of about a megabyte of quoted text still takes most of the 10 s (the same before
-  this work), and a substitution nested beyond the caps above is not read.
+  takes under a second (the test bounds it at 3 s). Tokenizing is shlex's, about 9 microseconds a character inside quotes,
+  so from 2026-09-29 `main()` also refuses a command of more than 600,000 characters as `command_too_large` (exit 2, one
+  line that names no command text, with the hint to put the content in a file with the Write tool and pass the path):
+  measured that day, one quoted word of 1,000,000 characters took 10.2 to 13.0 s in `check()` (the base guard too),
+  600,000 took 3.8 to 4.4 s and 500,000 took 2.9 to 3.3 s, and a hook that times out blocks nothing. `check()` itself has
+  no size limit. A substitution nested beyond the caps above is still not read.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)

@@ -26,8 +26,11 @@ getopt reads them, and a secret variable set through `systemd-run`'s
 `-E`/`--setenv` or `-p Environment=` is blocked: the manager logs its command
 line in the journal and its properties travel over the user bus), and the body
 of a command substitution inside double quotes (`echo "$(printenv)"` runs
-printenv; single quotes, an ANSI-C string, a quoted here-document and a `#`
-comment stay data). `ps -E` (macOS) and `systemctl show-environment` or a bare
+printenv; single quotes, an ANSI-C string and a `#` comment stay data, and so
+does a quoted here-document inside a substitution whose command is git, gh,
+echo, printf, cat or tee: `git commit -m "$(cat <<'EOF' ... EOF)"`; behind a
+shell with `-c`, eval, an interpreter or any other program it is read as
+command lines). `ps -E` (macOS) and `systemctl show-environment` or a bare
 `systemctl show` (a service manager's whole environment block) dump the
 environment like `ps e` and `env`. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
@@ -41,8 +44,9 @@ A backslash-newline is joined first and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
-blocks; a hook that outlasts its timeout does not, so every scan reads a text once (see docs/secret-storage.md,
-"An internal error blocks; a timeout does not"). It is not a security boundary. A process
+blocks; a hook that outlasts its timeout does not, so every scan reads a text once and a command of more than
+600,000 characters is refused (`command_too_large`; see docs/secret-storage.md, "An internal error blocks; a
+timeout does not"). It is not a security boundary. A process
 that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
@@ -304,8 +308,9 @@ FILE_OPERAND_CONSUMERS = {"cat", "tee"}
 RESERVED_STARTERS = {"!", "{", "}", "if", "then", "elif", "else", "while", "until", "do"}
 # What data_consumers() puts in place of each substitution: private-use characters around the substitution's number.
 SUBSTITUTION_MARKER = re.compile("\ue001([0-9]+)\ue002")
-# The longest text data_consumers() reads, and the launcher hops it follows (`rtk run`, a keyring exec): beyond them the answer is no,
-# which is the old, stricter reading. The text is the command without its comments and without the substitutions it is looking up.
+# The longest text data_consumers() reads, and the keyring execs nested in one another that receiving_command() follows: beyond them the
+# answer is no, which is the old, stricter reading. The text is the command without its comments, its top-level here-document bodies and
+# the substitutions it is looking up.
 DATA_CONSUMER_TEXT_LIMIT = 100_000
 MAX_LAUNCH_HOPS = 16
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
