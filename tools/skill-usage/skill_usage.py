@@ -726,6 +726,26 @@ def safe_key(value) -> str:
     return str(value) if SAFE_KEY.match(str(value)) else "(other)"
 
 
+def model_key(value) -> str | None:
+    """PR-A 10g: a model as a report key. TurnContextItem.model is a String (openai/codex rust-v0.157.1
+    protocol/src/protocol.rs:3328): a name-shaped model is kept, with at most one provider segment in front (a gateway route
+    such as cx/gpt-6-astra); any other string (a path, '..', more segments, an empty segment) is (other), and a value that is
+    not a non-empty string is None. Comparisons of routes use the raw strings, never these keys."""
+    if not isinstance(value, str) or not value:
+        return None
+    parts = value.split("/")
+    return value if len(parts) <= 2 and all(SAFE_KEY.fullmatch(part) for part in parts) else "(other)"
+
+
+def effort_key(value) -> str | None:
+    """PR-A 10g: a reasoning effort as a report key. ReasoningEffort at rust-v0.157.1 is none, minimal, low, medium, high,
+    xhigh, max, ultra, persistent or a model-defined custom string (protocol/src/openai_models.rs:59-72), so every name-shaped
+    effort is kept, any other string is (other), and a value that is not a non-empty string is None."""
+    if not isinstance(value, str) or not value:
+        return None
+    return value if SAFE_KEY.fullmatch(value) else "(other)"
+
+
 # Rust's str::trim removes the Unicode White_Space characters (Unicode PropList.txt White_Space), not Python's str.strip
 # set, which also removes U+001C to U+001F.
 RUST_WHITE_SPACE = ("\t\n\x0b\x0c\r \x85\xa0            "
@@ -905,8 +925,11 @@ def catalog_texts(record: dict) -> list[str]:
 # PR-A reuses child-usage.mjs's measurement kernel rather than maintaining a second
 # M3/M4/M5/M-R1 implementation. Native formats: openai/codex rust-v0.157.1,
 # codex-rs/protocol/src/protocol.rs:2234-2310 and rollout/src/policy.rs.
-CODEX_COUNTERS = ("input_tokens", "cached_input_tokens", "output_tokens",
+CODEX_COUNTERS = ("input_tokens", "cached_input_tokens", "cache_write_input_tokens", "output_tokens",
                   "reasoning_output_tokens", "total_tokens")
+# TokenUsage.cache_write_input_tokens is serde(default) at rust-v0.157.1 (protocol.rs:2239-2241), so a rollout of an older client
+# can lack it (binding correction 4 of the U3 build): its value is then null, never 0, and its absence is no usage gap.
+OPTIONAL_CODEX_COUNTERS = ("cache_write_input_tokens",)
 MEASUREMENT_MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 # Codex tools whose command the bridge reads as a Bash call (a local_shell_call is one as well).
 CODEX_SHELL_TOOLS = ("exec_command", "shell_command", "shell")
@@ -1020,7 +1043,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         nonlocal active
         if active is None:
             active = {"ordinal": len(attempts) + 1, "state": "unfinished", "snapshots": 0,
-                      "configured_model": model, "effort": effort,
+                      "configured_model": model, "effort": effort, "max_request_input_tokens": None,
                       "usage": dict.fromkeys(CODEX_COUNTERS, 0)}
             attempts.append(active)
         return active
@@ -1047,9 +1070,8 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                     hooks["inherited" if inherited else "inserted"] += 1
                     hooks["inherited_with_marker" if inherited else "with_marker"] += marker in text
         if record.get("type") == "turn_context":
-            model = safe_key(p.get("model")) if p.get("model") else None
-            effort = p.get("effort", p.get("reasoning_effort"))
-            effort = effort if effort in ("low", "medium", "high", "xhigh", "max") else None
+            model = model_key(p.get("model"))
+            effort = effort_key(p.get("effort", p.get("reasoning_effort")))
             if counted and active is not None and not active["snapshots"]:
                 active["configured_model"], active["effort"] = model, effort
         if record.get("type") != "event_msg":
@@ -1062,7 +1084,8 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             attempt()["state"] = "failed" if event == "turn_failed" or p.get("error") is not None else "interrupted" if event == "turn_aborted" else "completed"
             active = None
         elif event == "token_count":
-            current = (p.get("info") or {}).get("total_token_usage")
+            info = p.get("info") if isinstance(p.get("info"), dict) else {}
+            current = info.get("total_token_usage")
             if not isinstance(current, dict):
                 if counted:
                     gaps += 1
@@ -1080,8 +1103,14 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                     delta = (n - before if type(n) is int and type(before) is int and n >= before else None)
                     for target in (totals, a["usage"]):
                         target[key] = target[key] + delta if target[key] is not None and delta is not None else None
-                if any(v is None for v in a["usage"].values()):
+                if any(v is None for k, v in a["usage"].items() if k not in OPTIONAL_CODEX_COUNTERS):
                     gaps += 1
+                # The request's own input tokens (TokenUsageInfo.last_token_usage, protocol.rs:2268-2275), for the
+                # long-context tier: the attempt's largest over its counted snapshots (binding correction 4).
+                last = info.get("last_token_usage")
+                request = last.get("input_tokens") if isinstance(last, dict) else None
+                if type(request) is int and (a["max_request_input_tokens"] is None or request > a["max_request_input_tokens"]):
+                    a["max_request_input_tokens"] = request
             previous = current
 
     # Prefer returned response_item bytes over the UI item's aggregate if both persist.

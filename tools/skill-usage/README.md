@@ -312,13 +312,27 @@ bound/unbound digest counts across measured rollouts without publishing records.
 
 `measurement.provider_usage` differences cumulative `token_count` counters
 per rollout and attempt, using inherited/pre-window snapshots only as a
-baseline. Repeated totals contribute nothing. Input, cached input, output,
-reasoning output and total tokens remain separate; cached/reasoning values
-are subsets, never additive cost buckets. Missing baselines, absent counters,
-counter regression and missing terminal evidence leave accounting incomplete.
+baseline. Repeated totals contribute nothing. Input, cached input, cache-write
+input, output, reasoning output and total tokens remain separate; cached and
+cache-write input and reasoning values are subsets, never additive cost buckets.
+Missing baselines, absent counters, counter regression and missing terminal
+evidence leave accounting incomplete. The one exception is
+`cache_write_input_tokens`: it is `serde(default)` at rust-v0.157.1
+([protocol.rs:2239-2241](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2239-L2241)),
+so a rollout of an older client can lack it. Its value is then `null`, never 0, and
+its absence leaves `complete` unchanged. A group total of any counter is `null` when an
+actor's is. Each attempt also keeps `max_request_input_tokens`, the largest
+`last_token_usage.input_tokens` of its counted snapshots (a request's own input,
+for the long-context tier), or `null` without one.
 Known usage remains counted for failed/interrupted turns. A native
-`task_complete` with `error` is failed. Each attempt reports a configured
-model/effort when available; it does not claim provider-resolved routing.
+`task_complete` with `error` is failed. Each attempt reports the configured
+model and effort of its turn context when available; it does not claim
+provider-resolved routing. The effort is kept whatever its name, since
+`ReasoningEffort` includes `none`, `minimal`, `ultra`, `persistent` and model-defined
+strings ([openai_models.rs:59-72](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/openai_models.rs#L59-L72)).
+The model keeps at most one provider segment in front of its name (a gateway
+route such as `cx/gpt-6-astra`). Any other shape (a path, `..`, more segments)
+reads `(other)`, and a value that is not a string reads `null`.
 Supply one rollout per thread; this tool does not reconcile copied files of
 the same thread from multiple archives. Interrupted terminal usage that the
 client never persisted cannot be reconstructed. Codex actor and group

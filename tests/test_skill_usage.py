@@ -1929,7 +1929,6 @@ class CodexRouteValues(unittest.TestCase):
                                  {"model": "gpt-6-sol", "effort": "low"}])
         self.assertEqual(routes, [("gpt-6-astra", "max"), ("gpt-6-astra", "high"), ("gpt-6-sol", "low")])
 
-    @pending("commit 4: route value fixes")
     def test_route_values_keep_provider_models_and_every_effort(self):
         # C and its controls.
         routes, got = self.routes([{"model": "cx/gpt-6-astra", "effort": "ultra"}, {"model": "gpt-6-sol", "effort": "none"},
