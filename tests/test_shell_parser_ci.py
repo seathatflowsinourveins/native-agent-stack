@@ -19,7 +19,8 @@ Rules and their sources (read 2026-09-29):
 - GITHUB_ACTIONS is always "true" in Actions, GITHUB_JOB is the job id and GITHUB_WORKFLOW_REF is
   owner/repo/.github/workflows/<file>@<ref>: github/docs@f4e8afc6979acd8de6b5da035066281b9a5f4025,
   content/actions/reference/workflows-and-actions/variables.md lines 36, 50 and 70 (line 70 names
-  data/reusables/actions/workflow-ref-description.md).
+  data/reusables/actions/workflow-ref-description.md). Line 36 also says to use GITHUB_ACTIONS to tell a local test
+  run from a run by Actions, which is what the tripwire does.
 - A variable written to the GITHUB_ENV file reaches the later steps of the job, not the writing step: the same
   commit, content/actions/reference/workflows-and-actions/workflow-commands.md line 652.
 - `npm install --ignore-scripts` runs no package script and `--prefix` makes a non-global command run in that
@@ -29,8 +30,8 @@ Rules and their sources (read 2026-09-29):
   lines 11, 26, 28 and 37 (image 20260920.314.1: Node.js 22.23.2, Python 3.12.3, npm 10.9.8).
 - The sibling contract for a provisioned venv: tests/test_promotion_gate.py, WorkflowProvisioningContract.
 
-Failure messages are fixed strings and reason codes: no assertion here prints a child process's output, a path or the
-text of a command.
+Failure messages are fixed strings, reason codes and the workflow file and job ids of this repository: no assertion
+here prints a child process's output, a host path or the text of a command.
 """
 
 from __future__ import annotations
@@ -464,7 +465,7 @@ class ProvisioningStepTests(unittest.TestCase):
     def test_the_provisioning_job_is_the_job_that_runs_the_suite(self):
         # The structure checks inspect this job by name: renaming it must not leave them with nothing to inspect.
         job = jobs(self.text).get(PROVISIONING_JOB)
-        self.assertTrue(job is not None, "validate.yml has no job named as the tripwire expects")
+        self.assertTrue(job is not None, "validate.yml has no job named as this module expects")
         self.assertTrue(any(runs_suite(step) for step in step_blocks(job)), "that job does not run the whole suite")
 
     def test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap(self):
