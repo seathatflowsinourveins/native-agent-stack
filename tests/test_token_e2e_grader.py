@@ -5963,6 +5963,9 @@ def judgment(script, packet):
     if pid in (script.get("bad_quote") or []):
         for clause in clauses:
             clause["answer_quote"] = "THIS TEXT IS NOT IN THE PACKET"
+    if default == "substring":  # a judge that reads the packet: no clause holds when the answer holds a marked contradiction
+        for clause in clauses:
+            clause["holds"] = not any(marker in (packet.get("answer") or "") for marker in script.get("false_when", []))
     extractions = (script.get("extract") or {}).get(pid) or expect.get("extractions") or []
     leak = pid in (script.get("leak") or [])
     return {"clauses": clauses, "extractions": extractions, "leak": leak,
@@ -5971,8 +5974,8 @@ def judgment(script, packet):
 
 def main():
     args = sys.argv[1:]
-    if args[:1] == ["app-server"]:
-        return 2  # the quota probe finds no snapshot: a reading that never gates
+    if "app-server" in args:
+        return 2  # scripts/codex_quota.py starts `codex -c ... app-server`: no snapshot, a reading that never gates
     script = load(os.environ.get("CODEX_FAKE_SCRIPT"))
     state_path = os.environ.get("CODEX_FAKE_STATE")
     state = load(state_path)
@@ -6406,9 +6409,11 @@ class F30_JudgeBuilders(GraderCase):
         proc = self.refused_result(lambda result: result["items"][0].__setitem__("name", "p9999"))
         self.assertRefusal(proc, "E_JUDGE_RESULT", reason="items")
 
-    def test_collect_refuses_a_result_that_consumed_another_prompt_or_packet_hash(self):
+    def test_collect_refuses_a_result_that_consumed_another_prompt(self):
         proc = self.refused_result(lambda result: result.__setitem__("prompt", result["prompt"] + " edited"))
         self.assertRefusal(proc, "E_JUDGE_RESULT", reason="prompt")
+
+    def test_collect_refuses_a_result_that_judged_another_packet_hash(self):
         proc = self.refused_result(lambda result: result["items"][0].__setitem__("packet_sha256", "0" * 64))
         self.assertRefusal(proc, "E_JUDGE_RESULT", reason="items")
 
@@ -6982,6 +6987,93 @@ class F15_JudgeContract(GraderCase):
         self.assertIn("T20", route["calibration_failed_templates"])
 
 
+# ---- rehearse: the real-route acceptance step (design e8), run here only against the scripted fake --------------------------
+
+class F35b_Rehearse(GraderCase):
+    """Two planted controls (one known pass, one known fail) through a route, before Amendment 4 and before any window: no
+    bindings, no index from `packets`. The real routes need Codex capacity and a Workflow run, so acceptance e8 stays open;
+    what is checked here is the command around them."""
+
+    def fake(self):
+        return FakeCodex(self.tmp)
+
+    def rehearse(self, fake, args, *, now="2020-01-01T00:00:00Z", env=None, blind_issue=None):
+        with judge_context(now=now, blind_issue=blind_issue):
+            return run_grade(["judge", "rehearse", *[str(a) for a in args]], env=dict(fake.env(), **(env or {})))
+
+    def test_the_codex_route_judges_two_planted_controls_and_prints_counts_and_booleans(self):
+        fake = self.fake()
+        fake.write_script(default="substring", false_when=["defaults to False"])
+        out = self.tmp / "rehearsal"
+        proc = self.rehearse(fake, ["--route", "codex", "--out-dir", out])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        receipt = json.loads(proc.stdout)
+        self.assertEqual(sorted(receipt), ["effort", "judgments", "known_fail_holds", "known_pass_holds", "model", "route",
+                                           "schema_valid", "tool_items", "usage_recorded"])
+        self.assertEqual((receipt["route"], receipt["model"], receipt["effort"], receipt["judgments"]),
+                         ("codex", "gpt-6-astra", "max", 2))
+        self.assertEqual((receipt["known_pass_holds"], receipt["known_fail_holds"], receipt["schema_valid"],
+                          receipt["tool_items"], receipt["usage_recorded"]), (True, False, True, 0, True))
+        calls = fake.calls()
+        self.assertEqual(len([c for c in calls if c["stage"] == "judge"]), 2)
+        self.assertEqual(len([c for c in calls if c["stage"] == "refute"]), 1, "only the pass is refuted")
+        self.assertEqual(stat.S_IMODE(out.stat().st_mode), 0o700)
+        self.assertEqual(stat.S_IMODE((out / "rehearsal-codex.json").stat().st_mode), 0o600)
+        self.assertNotIn(str(self.tmp), proc.stdout)
+
+    def test_a_judge_that_holds_the_known_fail_exits_1_with_the_unmet_expectation_in_the_receipt(self):
+        fake = self.fake()
+        fake.write_script(default="true")
+        proc = self.rehearse(fake, ["--route", "codex", "--out-dir", self.tmp / "rehearsal"])
+        self.assertEqual(proc.returncode, 1, sanitize(proc.stderr))
+        receipt = json.loads(proc.stdout)
+        self.assertEqual((receipt["known_pass_holds"], receipt["known_fail_holds"]), (True, True))
+
+    def test_a_missing_native_credential_is_an_isolation_refusal_before_any_call(self):
+        fake = self.fake()
+        (fake.native / "auth.json").unlink()
+        proc = self.rehearse(fake, ["--route", "codex", "--out-dir", self.tmp / "rehearsal"])
+        self.assertRefusal(proc, "E_JUDGE_ISOLATION", check="codex_home")
+        self.assertEqual(fake.calls(), [])
+        self.assertFalse((self.tmp / "rehearsal").exists())
+
+    def test_an_existing_rehearsal_directory_is_refused(self):
+        fake = self.fake()
+        (self.tmp / "rehearsal").mkdir()
+        proc = self.rehearse(fake, ["--route", "codex", "--out-dir", self.tmp / "rehearsal"])
+        self.assertRefusal(proc, "E_PATH", reason="exists")
+
+    def test_the_claude_route_prepares_two_items_and_collects_a_clean_run(self):
+        fake = self.fake()
+        home = self.tmp / "role-home"
+        target = home / ".claude" / "agents"
+        target.mkdir(parents=True)
+        (target / "blind-lane-reviewer.md").write_bytes((ROOT / ".claude" / "agents" / "blind-lane-reviewer.md").read_bytes())
+        out, export = self.tmp / "rehearsal", self.tmp / "rehearsal-export"
+        proc = self.rehearse(fake, ["--route", "claude", "--out-dir", out, "--export-dir", export], env={"HOME": str(home)})
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(json.loads(proc.stdout), {"items": 2})
+        args = json.loads((out / "claude" / "args.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(args["args"]["items"]), 2)
+        self.assertEqual(args["args"]["repo"], str(export))
+        index = json.loads((out / "index.json").read_text(encoding="utf-8"))
+        by_id = {item["id"]: item for item in index["packets"]}
+        # F30's fabricated Workflow run needs only a tmp directory and the index; the two stand-ins keep this a plain call.
+        shim = type("Shim", (), {"tmp": self.tmp})()
+        stand_in = type("World", (), {"out": out, "export": export, "tmp": self.tmp, "index": lambda self_: index})()
+        result_path, directory = F30_JudgeBuilders.claude_run(shim, stand_in)
+        proc = self.rehearse(fake, ["--route", "claude", "--out-dir", out, "--result", result_path, "--transcripts", directory],
+                             env={"HOME": str(home)})
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        receipt = json.loads(proc.stdout)
+        self.assertEqual(sorted(receipt), ["audit_clean", "effort", "hook_rows", "judgments", "known_fail_holds",
+                                           "known_pass_holds", "model", "route"])
+        self.assertEqual((receipt["route"], receipt["model"], receipt["effort"], receipt["judgments"], receipt["hook_rows"]),
+                         ("claude", "opus", "max", 2, 0))
+        self.assertEqual((receipt["known_pass_holds"], receipt["known_fail_holds"], receipt["audit_clean"]), (True, False, True))
+        self.assertEqual(len(by_id), 2)
+
+
 # ---- F29: export and check-html (U9-D17, R22; recheck RV-14 and its low findings) --------------------------------------
 
 def load_token_manifest():
@@ -7345,22 +7437,30 @@ def stage3_mutant(case, patches, candidates, expected):
 
 class F19c_Stage3Mutants(GraderCase):
     def test_M7_quote_verification_off(self):
+        """The clause and refutation quotes rest on `verbatim` alone. An extraction quote has a second guard, the mapping
+        back to the raw answer text, so it stays refused with `verbatim` disarmed: those two tests are the base here."""
         jd = jdm()
-        base = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments"]
+        held = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments",
+                "F15_JudgeContract.test_an_extraction_quote_that_is_not_in_the_answer_is_judge_quote",
+                "F15_JudgeContract.test_an_extracted_value_that_is_not_inside_its_quotes_is_judge_quote"]
         flipped = ["F15_JudgeContract.test_a_quote_that_is_not_in_the_packet_is_judge_quote",
-                   "F15_JudgeContract.test_a_refutation_whose_quote_is_not_in_the_packet_is_judge_quote",
-                   "F15_JudgeContract.test_an_extraction_quote_that_is_not_in_the_answer_is_judge_quote",
-                   "F15_JudgeContract.test_an_extracted_value_that_is_not_inside_its_quotes_is_judge_quote"]
-        stage3_mutant(self, [mock.patch.object(jd, "verbatim", lambda needle, haystack: True)], base + flipped, flipped)
+                   "F15_JudgeContract.test_a_refutation_whose_quote_is_not_in_the_packet_is_judge_quote"]
+        stage3_mutant(self, [mock.patch.object(jd, "verbatim", lambda needle, haystack: True)], held + flipped, flipped)
 
     def test_M40_calibration_off(self):
         jd = jdm()
         base = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments"]
         flipped = ["F15_JudgeContract.test_a_stub_judge_that_holds_every_clause_makes_every_template_unknown_on_that_route",
                    "F15_JudgeContract.test_a_misjudged_paraphrased_control_fails_calibration_for_that_template_only",
-                   "F15_JudgeContract.test_a_misjudged_extraction_control_drops_the_extraction_and_keeps_the_clause_verdict",
                    "F23_WebTableJudges.test_calibration_verdicts_flag_the_misjudged_controls"]
         stage3_mutant(self, [mock.patch.object(jd, "calibration_failures", lambda calibration, verdicts: [])],
+                      base + flipped, flipped)
+
+    def test_M40b_extraction_calibration_off(self):
+        jd = jdm()
+        base = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments"]
+        flipped = ["F15_JudgeContract.test_a_misjudged_extraction_control_drops_the_extraction_and_keeps_the_clause_verdict"]
+        stage3_mutant(self, [mock.patch.object(jd, "extraction_failures", lambda calibration, verdicts, present: [])],
                       base + flipped, flipped)
 
     def test_M41_leak_ignored(self):
