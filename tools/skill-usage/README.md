@@ -295,6 +295,20 @@ the shared per-part `rtk_log_find` sidecar review described in the kernel docs.
 Proxy parts stay outside the coverage denominator. `sidecar_records` reports
 bound/unbound digest counts across measured rollouts without publishing records.
 
+The U2 kernel fields of 2026-09-29 ([U2 measurement fields](../../examples/claude-native/workflows/README.md#u2-measurement-fields-2026-09-29))
+appear on Codex actors too, read from the bridge's normalized rows. `call_states` (M14) and `m15` come from the
+same call states (a `declined` item is a rejected call with source `declined`). `rtk_parts` splits commands
+with binding decision B8's parts and adds the M1 fields `eligible_call_states` and
+`observed_covered_succeeded_calls`, which M1's rtk-codex lane reads with `--rtk-check`. `final_return` is
+`not_applicable` on every Codex actor: the bridge emits tool calls and results only, with no provider message
+id or assistant text, so a Codex final return cannot be read here and is never reported as a zero.
+`cli_lanes.lanes.*.failed` keeps U1's meaning (M14's failed is `failed - not_executed`). Three parts belong to
+the Codex adapter, not the shared kernel: the Codex half of the private call ledger (`conversation.id` and
+`call_id`; the kernel's `callLedger` gives a bridge row `session_id` and `owner` null), the `root_mismatch`
+flag that makes a context-mode boundary refusal an M15 `binding` error, and how the approval denial
+(`ReviewDecision::denied`) text reaches a rollout; the kernel classifies that text as `approval` even when the
+call did not run.
+
 `measurement.provider_usage` differences cumulative `token_count` counters
 per rollout and attempt, using inherited/pre-window snapshots only as a
 baseline. Repeated totals contribute nothing. Input, cached input, output,
