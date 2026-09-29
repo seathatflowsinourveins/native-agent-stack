@@ -44,6 +44,13 @@ WINDOW_NAMES = ("W_C", "W_X")
 
 
 class Parser(argparse.ArgumentParser):
+    """Every parser and sub-parser refuses an abbreviated long option (allow_abbrev off): a frozen instrument takes the flags
+    as written, so the command it records can be read against the sanitizer's flag table below."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
     def error(self, message):
         raise fc.Refusal("E_ARGS", field="usage")
 
@@ -761,23 +768,43 @@ PATH_FLAGS = {"--spec": "spec", "--repo": "exec-checkout", "--bindings": "run-bi
               "--out-private": "private-dir", "--out": "aggregate", "--from": "private-dir", "--controls": "controls-report"}
 
 
+def _placeholder(value, name):
+    head, sep, _ = value.partition("=")
+    return f"{head}=<{name}>" if sep and "/" not in head else f"<{name}>"
+
+
 def sanitize_argv(argv):
     """The command as a manifest may record it: `python3 tools/token-e2e/grade.py`, the subcommand, every flag, and a
-    placeholder for each private path (`FAMILY=FILE` values keep their family), never a path or a name of this host."""
+    placeholder for each private path (`FAMILY=FILE` values keep their family), never a path or a name of this host. A flag
+    is read in both spellings argparse accepts, `--flag value` and `--flag=value` (abbreviations are refused by the parser)."""
     tokens, clean, index = [str(item) for item in argv], ["python3", "tools/token-e2e/grade.py"], 0
     while index < len(tokens):
         token = tokens[index]
+        flag, equals, inline = token.partition("=") if token.startswith("--") else (token, "", "")
+        name = PATH_FLAGS.get(flag)
+        if name and equals:
+            clean.append(f"{flag}={_placeholder(inline, name)}")
+            index += 1
+            continue
         clean.append(token)
-        if token.startswith("--") and index + 1 < len(tokens):
-            value = tokens[index + 1]
-            name = PATH_FLAGS.get(token)
-            if name:
-                head, sep, _ = value.partition("=")
-                clean.append(f"{head}=<{name}>" if sep and "/" not in head else f"<{name}>")
-                index += 2
-                continue
+        if name and index + 1 < len(tokens):
+            clean.append(_placeholder(tokens[index + 1], name))
+            index += 2
+            continue
         index += 1
     return clean
+
+
+def argv_issue(argv):
+    """Why a recorded command may not enter a manifest, else None: it is not a list of strings, or an element after the script
+    path has a path shape ('/', '\\', a home shorthand or a drive prefix). A recorded command holds flags and placeholders
+    only, so this is the fail-closed backstop behind `sanitize_argv` for a context.json written by any other means."""
+    if not isinstance(argv, list) or not all(isinstance(item, str) for item in argv):
+        return "argv"
+    for item in argv[2:]:
+        if "/" in item or "\\" in item or item.startswith("~") or ev.has_drive_prefix(item):
+            return "argv"
+    return None
 
 
 def _finish(spec, keys, bindings, table, records, captures, judgments, meta, out_private, out, copies, join=None,
@@ -1107,6 +1134,9 @@ def cmd_export(args):
     context = ev.read_json(os.path.join(args.private, "context.json"))
     if not isinstance(context, dict) or context.get("schema") != CONTEXT_SCHEMA:
         raise fc.Refusal("E_EXPORT_INPUT", reason="private")
+    command = context.get("command") or sanitize_argv(["grade"])
+    if argv_issue(command):
+        raise fc.Refusal("E_EXPORT_INPUT", reason="argv")
     bindings, table, records = _private_inputs(args.private, "E_EXPORT_INPUT")
     data = read_file(args.aggregate, "aggregate", "E_EXPORT_INPUT")
     try:
@@ -1125,7 +1155,7 @@ def cmd_export(args):
     stamp = fc.utc_now()
     record = {"id": "token-e2e-frozen-check-grades", "runtime": "python3", "kind": "frozen_check_grading", "status": status,
               "boundary": MANIFEST_BOUNDARY, "component_ids": [],
-              "command": {"argv": list(context.get("command") or sanitize_argv(["grade"]))},
+              "command": {"argv": list(command)},
               "started_at": None, "completed_at": stamp,
               "observation": {"g_q": aggregate["g_q"]["status"], "m7": aggregate["m7"]["status"],
                               "m8": {lane: item["status"] for lane, item in sorted(aggregate["m8"].items())},

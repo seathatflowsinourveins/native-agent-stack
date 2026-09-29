@@ -2036,7 +2036,7 @@ def _has_uuid(text):
     return False
 
 
-def _has_drive_prefix(text):
+def has_drive_prefix(text):
     for index in range(1, len(text) - 1):
         if text[index] == ":" and text[index + 1] in "\\/" and text[index - 1].isalpha() \
                 and (index == 1 or not text[index - 2].isalnum()):
@@ -2048,7 +2048,7 @@ def has_private_shape(text):
     """A UUID, a tool_use or call id prefix, a leading '/' or ' /', a drive prefix, or the project-slug shape of a home path."""
     if text.startswith("/") or " /" in text or "toolu_" in text or "call_" in text:
         return True
-    if _has_uuid(text) or _has_drive_prefix(text):
+    if _has_uuid(text) or has_drive_prefix(text):
         return True
     for marker in ("-home-", "-Users-"):
         index = text.find(marker)
