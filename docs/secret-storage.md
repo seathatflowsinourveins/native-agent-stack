@@ -1027,23 +1027,26 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `xargs`, `watch`, `ssh`, `cat`, `tee`, an assignment, the command position) or inside the text of any command
   substitution, quoted or not (`eval $(echo "$(cat <<'EOF' ... EOF)")` runs what the substitution prints, and the tokenizer
   splits an unquoted `$(echo ...)` into a segment of its own whose command is `echo`; a subshell `( ... )` or a brace group is
-  no substitution), and a text the guard cannot read (an unbalanced quote, for instance an apostrophe in an earlier here-document's prose; the
-  private-use characters U+E001 and U+E002): its words are a guess, and a guess is no reason to hide a body. The cost is
+  no substitution), and a text the guard cannot read (an unbalanced quote, for instance an apostrophe in an earlier
+  here-document's prose; the private-use characters U+E001 and U+E002): its words are a guess, and a guess is no reason
+  to hide a body. The cost is
   friction, in the strict direction: a body line that starts with `printenv` or `env`, or holds `$(printenv)`, is refused
   outside the idiom, and an unquoted here-document in a substitution (`echo "$(cat <<EOF`, `printenv`, `EOF`) is an
   `environment_dump` as it is at the top level. Write such text with the Write tool and pass the path (`git commit -F
   FILE`). Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: a git or gh option that runs its value
   (`git rebase --exec "$(cat <<'EOF' ... EOF)"`, `gh alias set`), an echo whose output is piped into a shell or written
   into a script that runs later, and an unquoted here-document that expands `$(...)` between single quotes
-  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29: of the 1,956 commit
-  messages of this repository, in the `git commit -m` and `gh pr create --body` patterns, the guard refuses 10 (each names
-  a secret variable, a store path or a token command in prose, which the raw-text rules read) and the base guard 13, and 4
-  messages that the base guard refused (its quote parity read prose as commands) pass; a matrix of 40 consumers, 18
-  launcher prefixes, 5 here-document forms, 8 payloads and 4 substitution forms (115,200 commands) loosens no row against
-  the base guard; a differential over 60,493 derived commands loosens 102, every one a `ps -fu steve` or `ps -fu eve` (the
-  second loosening, below); and mutation fuzz of 24,840 mutants of 414 blocked strings loosens 38 to 44 per seed, 36 to 41
-  of them variants of those two `ps` rows and 2 or 3 of them mutants whose broken terminator leaves a real quoted body that
-  bash prints and does not run (`echo "$(cat <<'EOF'`, `text\`, `E`, `# c`, `OF`, `echo "$(printenv)"` ... `EOF`).
+  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29 at commit
+  660e6812: of the 1,960 commit messages reachable there, in the `git commit -m` and `gh pr create --body` patterns, the
+  guard refuses 10 (each names a secret variable, a store path or a token command in prose, which the raw-text rules
+  read) and the base guard 14, and 5 messages that the base guard refused (its quote parity read prose as commands)
+  pass; a matrix of 40 consumers, 18 launcher prefixes, 5 here-document forms, 8 payloads and 4 substitution forms
+  (115,200 commands) loosens no row against the base guard; a differential over 62,365 derived commands loosens 102,
+  every one a `ps -fu steve` or `ps -fu eve` (the second loosening, below); a grammar fuzz of launcher chains with
+  redirections and idiom placements (10 seeds of 60,000 commands) loosens none; and mutation fuzz of 25,140 mutants of
+  419 blocked strings loosens 33 to 44 per seed, 29 to 38 of them variants of those two `ps` rows and 4 to 6 of them
+  mutants whose broken terminator leaves a real quoted body that bash prints and does not run (`echo "$(cat <<'EOF'`,
+  `text\`, `E`, `# c`, `OF`, `echo "$(printenv)"` ... `EOF`).
 - **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
   with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
   rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
@@ -1138,8 +1141,8 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   length. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
 - **Loosenings against the base guard (c26800f3), 2026-09-29: two.** Everything else this work changes tightens. (1) The
   canonical idiom (see the here-document item) passes behind `git`, `gh`, `echo` and `printf`, where the base guard refused
-  a commit message whose quote parity it misread or whose lines it read as commands (4 of this repository's commit
-  messages). (2) `ps -fu steve` and `ps -fu eve` pass, since `-u` takes a value (`ps -u steve` and `ps -fu Eve` passed
+  a commit message whose quote parity it misread or whose lines it read as commands (5 of this repository's commit
+  messages at 660e6812). (2) `ps -fu steve` and `ps -fu eve` pass, since `-u` takes a value (`ps -u steve` and `ps -fu Eve` passed
   before). Each has rows in `tests/test_secret_path_guard.py` (ALLOWED), and the probe of the review, base guard against
   this one, reports `loosened rows: 0` apart from them.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
