@@ -514,6 +514,11 @@ def source_sections(template, key, exec_src=None, captures=None, recorded=None):
     elif template in ("T12", "T13"):
         facts = captures.get("stripe" if template == "T12" else "mcp") or {}
         add("canonical page facts (frozen captures)", "; ".join(f"{name}: {value}" for name, value in sorted(facts.items())))
+        conversion = recorded.get("conversion") if template == "T13" else None
+        if isinstance(conversion, dict):  # the recorded state of the child's own conversion call (never its tool name)
+            missing = ", ".join(conversion.get("missing_scopes") or []) or "none"
+            add("recorded conversion facts", f"conversion call state: {conversion.get('state')}; converted bytes: "
+                                             f"{conversion.get('bytes')}; scope terms missing from the conversion output: {missing}")
     elif template == "T14":
         if recorded.get("t14"):
             detail = recorded["t14"]

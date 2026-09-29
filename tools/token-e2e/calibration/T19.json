@@ -6,15 +6,15 @@
  ],
  "sources": [
   {
-   "label": "json documentation",
-   "text": "Raises JSONDecodeError if the data being deserialized is not a valid JSON document."
+   "label": "documentation facts (frozen captures)",
+   "text": "allow_nan_false_valueerror: True; ensure_ascii_default_true: True; ensure_ascii_escapes_non_ascii: True; jsondecodeerror_invalid_document: True; loads_bytes_bytearray: True; read_text_signature: encoding=None, errors=None, newline=None; sort_keys_sorts_dicts: True"
   }
  ],
  "controls": [
   {
    "id": "ref",
    "kind": "reference",
-   "answer": "According to the documentation: Raises JSONDecodeError if the data being deserialized is not a valid JSON document.",
+   "answer": "According to the documentation: Raises JSONDecodeError if the data being deserialized is not a valid JSON document.\n\nSource excerpt: allow_nan_false_valueerror: True; ensure_ascii_default_true: True; ensure_ascii_escapes_non_ascii: True; jsondecodeerror_invalid_document: True; loads_bytes_bytearray: True; read_text_signature: encoding=None, errors=None, newline=None; sort_keys_sorts_dicts: True",
    "evidence": [],
    "expected": {
     "c1": true

@@ -7,7 +7,7 @@
  ],
  "sources": [
   {
-   "label": "catalogs/us-equities/agents-operations.md",
+   "label": "catalogs/us-equities/agents-operations.md lines naming the facts",
    "text": "`default` means the preferred design or adoption lane; it does **not** mean installed."
   },
   {

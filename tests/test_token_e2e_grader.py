@@ -7195,13 +7195,35 @@ class F29b_CheckHtml(GraderCase):
         self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
         return run, private, out
 
-    def rendered(self, data):
-        template = self.tmp / "template.html.in"
-        template.write_text(self.TEMPLATE, encoding="utf-8")
-        config = {"html_template": str(template), "output_json": str(self.tmp / "report.json"),
-                  "output_html": str(self.tmp / "report.html")}
+    def rendered(self, data, template=None):
+        """The report for `data`: the minimal fixture template, or a real token-report template (with its sidecar script)."""
+        if template is None:
+            template = self.tmp / "template.html.in"
+            template.write_text(self.TEMPLATE, encoding="utf-8")
+        name = Path(template).name
+        config = {"html_template": str(template), "output_json": str(self.tmp / f"{name}.json"),
+                  "output_html": str(self.tmp / f"{name}.html")}
         load_token_manifest().render_reports(config, data)
         return Path(config["output_html"])
+
+    def test_the_real_report_templates_and_their_script_pass_the_canary(self):
+        """U11 renders `token_manifest.html.in` or the full view with `returned_results.js` inlined: neither text may itself
+        look like an identifier, or every real report would be refused."""
+        run, private, out = self.graded()
+        target = self.tmp / "neutral-export"
+        self.assertEqual(run_grade(["export", "--from", private, "--aggregate", out, "--export-dir", target]).returncode, 0)
+        run_dir = self.tmp / "tm-run"
+        run_dir.mkdir()
+        captured = load_token_manifest().capture_returned_results(target / "returned-results.json", run_dir, "returned-results")
+        captured["origin"], captured["artifact"]["path"] = "<export>/returned-results.json", "<run>/returned-results.json"
+        for item in captured["result"]["records"][0]["attachments"]:
+            item["origin"], item["path"] = "<export>/" + item["label"], "<run>/" + item["label"]
+        for template in ("token_manifest.html.in", "token_manifest.full.html.in"):
+            with self.subTest(template):
+                html = self.rendered({"additional_evidence": {"returned_results": captured}},
+                                     template=ROOT / "tools" / "token-report" / template)
+                proc = run_grade(["check-html", html, "--from", private])
+                self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
 
     def test_check_html_accepts_the_render_reports_output_of_a_relativized_capture(self):
         run, private, out = self.graded()

@@ -6,15 +6,15 @@
  ],
  "sources": [
   {
-   "label": "json.dumps documentation",
-   "text": "If allow_nan is false (default: True), then it will be a ValueError to serialize out of range float values (nan, inf, -inf) in strict compliance of the JSON specification. If allow_nan is true, their JavaScript equivalents (NaN, Infinity, -Infinity) will be used."
+   "label": "documentation facts (frozen captures)",
+   "text": "allow_nan_false_valueerror: True; ensure_ascii_default_true: True; ensure_ascii_escapes_non_ascii: True; jsondecodeerror_invalid_document: True; loads_bytes_bytearray: True; read_text_signature: encoding=None, errors=None, newline=None; sort_keys_sorts_dicts: True"
   }
  ],
  "controls": [
   {
    "id": "ref",
    "kind": "reference",
-   "answer": "According to the documentation: If allow_nan is false (default: True), then it will be a ValueError to serialize out of range float values (nan, inf, -inf) in strict compliance of the JSON specification. If allow_nan is true, their JavaScript equivalents (NaN, Infinity, -Infinity) will be used.",
+   "answer": "According to the documentation: If allow_nan is false (default: True), then it will be a ValueError to serialize out of range float values (nan, inf, -inf) in strict compliance of the JSON specification. If allow_nan is true, their JavaScript equivalents (NaN, Infinity, -Infinity) will be used.\n\nSource excerpt: allow_nan_false_valueerror: True; ensure_ascii_default_true: True; ensure_ascii_escapes_non_ascii: True; jsondecodeerror_invalid_document: True; loads_bytes_bytearray: True; read_text_signature: encoding=None, errors=None, newline=None; sort_keys_sorts_dicts: True",
    "evidence": [],
    "expected": {
     "c1": true

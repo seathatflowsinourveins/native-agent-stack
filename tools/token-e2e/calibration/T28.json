@@ -8,6 +8,10 @@
   {
    "label": "opening hunk of the patch",
    "text": "@@ -16,10 +16,8 @@\n 0. Refuses to start if any output of this run already exists\n    (``results-<run-id>.json``, ``native-<run-id>.json``,\n    ``report-<run-id>.md``), then reserves ``results-<run-id>.json``\n-   exclusively. No historical result or failed attempt is ever overwritten.\n-   SIGINT, SIGTERM and SIGHUP stop a run cleanly (see \"Interrupts\" below);\n-   only a signal the runner cannot handle, such as SIGKILL, leaves the\n-   reserved receipt at status ``started``.\n+   exclusively. No historical result or failed attempt is ever overwritten,\n+   and an interrupted run still leaves its reserved receipt behind."
+  },
+  {
+   "label": "diff facts",
+   "text": "bytes: 52631; files: ['run.py']; hunks: 31; added: 166; deleted: 581"
   }
  ],
  "controls": [

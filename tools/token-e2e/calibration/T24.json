@@ -7,7 +7,7 @@
  ],
  "sources": [
   {
-   "label": "catalogs/us-equities/native-workflows.md",
+   "label": "catalogs/us-equities/native-workflows.md lines naming the facts",
    "text": "\"$STACK_REPO/catalogs/us-equities\" --name us-equities-catalog --mask '**/*.md'\n\"$STACK_REPO/blueprints/us-equities\" --name us-equities-foundation --mask '**/*.md'"
   },
   {

@@ -7,15 +7,19 @@
  ],
  "sources": [
   {
-   "label": "original page and conversion record",
-   "text": "scopes on the original page: local, project, user; the conversion exited 0 and its output omitted the scope table"
+   "label": "canonical page facts (frozen captures)",
+   "text": "scopes: ['local', 'project', 'user']"
+  },
+  {
+   "label": "recorded conversion facts",
+   "text": "conversion call state: succeeded; converted bytes: 4210; scope terms missing from the conversion output: user"
   }
  ],
  "controls": [
   {
    "id": "ref",
    "kind": "reference",
-   "answer": "The page defines three scopes: local, project and user. The conversion exited 0, but its output omitted the scope table, so the scope names come from the original HTML.\n\nSource excerpt: scopes on the original page: local, project, user; the conversion exited 0 and its output omitted the scope table",
+   "answer": "The original page lists three scopes: local, project and user. The conversion call succeeded, but its output lacked the word user, so the scope names come from the original HTML and I am reporting that omission.\n\nSource excerpt: scopes: ['local', 'project', 'user']",
    "evidence": [],
    "expected": {
     "c1": true,
@@ -25,7 +29,7 @@
   {
    "id": "para",
    "kind": "paraphrased",
-   "answer": "Servers can live in the local, project or user scope according to the original page. The converter reported success (exit 0) yet dropped the scope table from its text, and I am reporting that gap.",
+   "answer": "Servers can be configured at the local, project or user level according to the original page. The converter call itself succeeded yet returned text without the term user, and I am noting that gap.",
    "evidence": [],
    "expected": {
     "c1": true,
@@ -35,7 +39,7 @@
   {
    "id": "wrong-1",
    "kind": "wrong",
-   "answer": "The scopes are local, project and global. The conversion exited 0 and omitted the scope table.",
+   "answer": "The scopes are local, project and global. The conversion call succeeded and dropped the word user.",
    "evidence": [],
    "expected": {
     "c1": false,
@@ -45,7 +49,7 @@
   {
    "id": "wrong-2",
    "kind": "wrong",
-   "answer": "The scopes are local, project and user. The conversion succeeded and nothing was missing from its output.",
+   "answer": "The scopes are local, project and user. The conversion call succeeded and its output held every scope term.",
    "evidence": [],
    "expected": {
     "c1": true,

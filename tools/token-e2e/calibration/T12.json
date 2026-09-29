@@ -7,15 +7,15 @@
  ],
  "sources": [
   {
-   "label": "canonical page facts",
-   "text": "header: Idempotency-Key; keys may be removed from the system automatically after they are at least 24 hours old"
+   "label": "canonical page facts (frozen captures)",
+   "text": "idempotency_key_header: True; retention_hours: 24"
   }
  ],
  "controls": [
   {
    "id": "ref",
    "kind": "reference",
-   "answer": "The canonical page names the Idempotency-Key header and says keys may be removed from the system automatically after they are at least 24 hours old. The curated documentation lacked the retention rule, so it cannot establish that capability by itself.\n\nSource excerpt: header: Idempotency-Key; keys may be removed from the system automatically after they are at least 24 hours old",
+   "answer": "The canonical page names the Idempotency-Key header and says keys may be removed from the system automatically after they are at least 24 hours old. The curated documentation lacked the retention rule, so it cannot establish that capability by itself.\n\nSource excerpt: idempotency_key_header: True; retention_hours: 24",
    "evidence": [],
    "expected": {
     "c1": true,

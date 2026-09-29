@@ -7,7 +7,7 @@
  ],
  "sources": [
   {
-   "label": "catalogs/us-equities/foundation-memory.md",
+   "label": "catalogs/us-equities/foundation-memory.md lines naming the facts",
    "text": "Keep one primary memory store, one retrieval lane per artifact and the existing compatible local embedding service."
   },
   {
