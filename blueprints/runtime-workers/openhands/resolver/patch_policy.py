@@ -678,7 +678,7 @@ def _extended_header(text, line):
     raise PatchParseError("unexpected_line", line)
 
 
-def _skip_hunk(lines, index):
+def _skip_hunk(lines, index, added=None):
     match = _HUNK.fullmatch(lines[index])
     if not match:
         raise PatchParseError("bad_hunk_header", index + 1)
@@ -698,6 +698,8 @@ def _skip_hunk(lines, index):
             old -= 1
         elif tag == "+":
             new -= 1
+            if added is not None:
+                added.append(line[1:])
         else:
             raise PatchParseError("bad_hunk_line", index + 1)
         if old < 0 or new < 0:
@@ -753,13 +755,14 @@ def _change(header, info, old_side, new_side, binary, line):
     return FileChange(status, old_path, new_path, old_mode, new_mode, binary)
 
 
-def parse_patch(text):
+def parse_patch(text, *, added=None):
     """Parse `git diff` output into file changes; anything else fails closed.
 
     Grammar: git Documentation/diff-generate-patch.txt:34-44 (extended headers) and
     :62-63 (quoted names) at v2.43.0; "Binary files ... differ" and "GIT binary
     patch" as git apply.c:2167,2186 recognise them. Hunk lengths are counted from
-    each @@ header, so no line can pass for a header it is not.
+    each @@ header, so no line can pass for a header it is not. When `added` is a
+    list, every added hunk line is appended to it without its "+", in patch order.
     """
     if not text:
         return []
@@ -802,11 +805,26 @@ def parse_patch(text):
             if index >= len(lines) or not lines[index].startswith("@@"):
                 raise PatchParseError("missing_hunk", index + 1)
             while index < len(lines) and lines[index].startswith("@@"):
-                index = _skip_hunk(lines, index)
+                index = _skip_hunk(lines, index, added)
         elif index < len(lines) and not lines[index].startswith("diff --git "):
             raise PatchParseError("unexpected_line", index + 1)
         changes.append(_change(header, info, old_side, new_side, binary, start))
     return changes
+
+
+def added_content(patch_text):
+    """What a patch introduces, as one text: the paths it adds (added, renamed or copied
+    targets), then every added hunk line without its "+", in patch order.
+
+    Review items F1 and D4: the pushed commit equals the patch, so this is the text the
+    outgoing guard checks. Context and removed lines come from the base commit and are not
+    included. The hunk walk is parse_patch's, so an added line that begins "++ " (a "+++ "
+    line inside a hunk) is content, never taken for a header. Local composition.
+    """
+    added = []
+    changes = parse_patch(patch_text, added=added)
+    paths = sorted({change.new_path for change in changes if change.status in ("added", "renamed", "copied")})
+    return "\n".join([*paths, *added]) + "\n"
 
 
 # -- The validator (plan section 2 step 6)

@@ -3396,6 +3396,45 @@ class ResolverAttemptTests(unittest.TestCase):
         self.assertEqual((empty["status"], empty["writes"], attempt.clone), ("patch_empty", [], None))
         self.assertEqual(github.seen, [])
 
+    def test_what_the_patch_adds_passes_the_guard_before_any_write(self):
+        # Review items F1 and D4: the pushed commit equals the patch byte for byte, so the lines and
+        # paths the patch adds pass the outgoing guard in plain mode (session key, validate.py's
+        # PRIVATE_CONTENT, host paths, the user name, gitleaks) and validate.py's file scan runs on
+        # the exact patch bytes, before git apply. Plants are built at runtime, so no scanner that
+        # reads this file sees a token shape or a host value.
+        host_path = str(self.tmp / "state" / "runs" / "x")
+        home_like = re.search(r"/(?:home|Users)/", host_path) is not None
+        token = "gh" + "p_" + "A1b2C3d4" * 5  # validate.py PRIVATE_CONTENT "GitHub token" shape
+        cases = {
+            "session key": ({"docs/notes.md": f"key {self.key}\n"}, "content_session_key"),
+            "host path": ({"docs/notes.md": f"see {host_path}\n"},
+                          "content_private_content" if home_like else "content_host_path"),
+            "user name": ({"docs/notes.md": "written by fixtureuser\n"}, "content_host_user_name"),
+            "gitleaks finding": ({"docs/notes.md": "LEAK\n"}, "content_scanner_finding"),
+            "token shape": ({"docs/notes.md": token + "\n"}, "content_private_content"),
+            "user name as a new path": ({"docs/fixtureuser.md": "plain\n"}, "content_host_user_name"),
+            # An added line that begins "++ " is "+++ ..." in the hunk: content, not a header.
+            "added line shaped like a header": ({"docs/notes.md": f"++ {self.key}\n"}, "content_session_key"),
+        }
+        for name, (edits, reason) in cases.items():
+            with self.subTest(case=name):
+                github = ResolverGitHub(base=self.base)
+                attempt = self.attempt(github)
+                outcome = attempt.finish(self.result_for(name.replace(" ", "-")), patch_text=self.patch_for(edits),
+                                         final_message=FINAL_MESSAGE)
+                self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+                                 ("patch_refused", [reason], None))
+                self.assertEqual((outcome["writes"], github.pushes, attempt.clone), ([], [], None))
+                self.assertFalse(any(argv[:2] == ["pr", "create"] for argv in github.seen))
+                self.assertNotIn(self.key, json.dumps(outcome))
+        # Negative control: plain mode, so code and docs may hold closing keywords and @-names.
+        github = ResolverGitHub(base=self.base)
+        outcome = self.attempt(github).finish(
+            self.result_for("clean"), patch_text=self.patch_for({"docs/notes.md": "This fixes #3; thanks @someone.\n"}),
+            final_message=FINAL_MESSAGE)
+        self.assertEqual((outcome["status"], outcome["reasons"]), ("pr_opened", []), outcome)
+        self.assertEqual(len(github.pushes), 1)
+
     def test_a_commit_that_differs_from_the_validated_patch_is_never_pushed(self):
         # git apply takes a hunk at an offset (it matched "a" one line below its header), so the
         # commit's diff differs from the validated text; the byte comparison stops the push.

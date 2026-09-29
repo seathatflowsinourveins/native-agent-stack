@@ -1193,6 +1193,26 @@ def _git_env(home):
     return _recipe("host").resolver_git_env(home)
 
 
+def patch_content_refusal(patch_text, patch_path, guard):
+    """Review items F1 and D4: the reason code that refuses what a patch adds, or None.
+
+    The pushed commit equals the patch byte for byte (ResolverAttempt._apply_and_commit), so
+    the paths and lines the patch adds (patch_policy.added_content) pass the outgoing guard
+    before git apply. The guard runs in plain mode, because code and documentation may hold
+    closing keywords and @-names, and with its gitleaks scanner. validate.py's
+    scan_file_for_private_content then reads the exact patch bytes that git applies; every
+    tracked file of the base already passes that scan, so context lines add no finding.
+    Local composition of the outgoing guard's checks (resolver plan section 3).
+    """
+    try:
+        guard.check(patch_policy.added_content(patch_text))
+    except outgoing_guard.GuardRefused as refused:
+        return "content_" + refused.reason
+    if outgoing_guard.scan_file_for_private_content(Path(patch_path)):
+        return "content_private_content"
+    return None
+
+
 class ResolverAttempt:
     """The resolver side of one attempt, in memory only.
 
@@ -1294,10 +1314,11 @@ class ResolverAttempt:
     def finish(self, result, *, patch_text, final_message):
         """Plan section 2 steps 6-9 after the export; nothing the model wrote runs on the host.
 
-        Order: validate the patch at the base (GitTree); guard every text GitHub would
-        receive (commit message, title, PR body) before any write; fresh clone; apply;
-        commit; branch; push; draft PR and its read-back. Each outcome is host-written;
-        a refusal means no GitHub write, only a receipt.
+        Order: fresh clone; validate the patch at the base (GitTree); guard what the patch
+        adds (patch_content_refusal); guard every other text GitHub would receive (commit
+        message, title, PR body) before any write; apply; commit; branch; push; draft PR
+        and its read-back. Each outcome is host-written; a refusal means no GitHub write,
+        only a receipt.
         """
         outcome = {"status": None, "failure_stage": None, "reasons": [], "writes": []}
         if not patch_text.strip():
@@ -1321,6 +1342,14 @@ class ResolverAttempt:
                 outcome.update(status="patch_empty" if verdict["status"] == "empty" else "patch_refused",
                                reasons=sorted({item["reason"] for item in verdict["reasons"]}))
                 return outcome
+            patch_path = private / "patch.diff"
+            patch_path.write_bytes(patch_text.encode("utf-8", "surrogateescape"))
+            refusal = patch_content_refusal(patch_text, patch_path, self.guard)
+            if refusal:
+                self.clone = None
+                shutil.rmtree(clone, ignore_errors=True)
+                outcome.update(status="patch_refused", reasons=[refusal])
+                return outcome
             sources = select_sota_sources(final_message, git_citation_resolver(clone, self.base_sha, git=self.git))
             outcome["sota_sources"] = {"kept": len(sources["kept"]), "dropped": sources["dropped"]}
             receipt = {"issue": {"number": self.number, "title": self.title}, "run_id": self.run_id,
@@ -1342,8 +1371,6 @@ class ResolverAttempt:
                                                                else "pr_body_invalid"])
                 return outcome
             stage = "apply"
-            patch_path = private / "patch.diff"
-            patch_path.write_bytes(patch_text.encode("utf-8", "surrogateescape"))
             head = self._apply_and_commit(clone, patch_text, patch_path)
             stage = "push"
             branch = next_branch(self.harness, self.number)
