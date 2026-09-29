@@ -7106,8 +7106,8 @@
     },
     {
       "path": "blueprints/gate-b-gpt6-route/preregistration.json",
-      "sha256": "0b14714158ffe85720c554879df1909d12419da9f56683c6b952328bc2e97739",
-      "bytes": 142567
+      "sha256": "2f2800d6979ba65b3326c4d77a526c08717b91c2757394b6e8cc3f866aca6819",
+      "bytes": 142945
     },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",

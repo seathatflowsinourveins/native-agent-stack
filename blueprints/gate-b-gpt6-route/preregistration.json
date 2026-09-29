@@ -1715,18 +1715,21 @@
       ],
       "fail_first": [
         {
-          "when": "2026-09-29T03:07:14Z",
-          "state": "before either file existed",
+          "when": "2026-09-29T03:28:47Z",
+          "state": "blueprint directory absent (moved aside)",
           "rc": 1,
-          "summary": "Ran 10 tests, FAILED (failures=1, errors=9)"
+          "summary": "Ran 10 tests, FAILED (failures=1, errors=9)",
+          "test_sha256": "eca1663c45f7dde6addb797834d431d99a0788f90d29ea9cda5da98c1b6e38d3"
         },
         {
-          "when": "2026-09-29T03:07:24Z",
-          "state": "against the unrepaired draft",
+          "when": "2026-09-29T03:28:47Z",
+          "state": "the unrepaired draft in place (a4187edb, 35270235)",
           "rc": 1,
-          "summary": "Ran 10 tests, FAILED (failures=2, errors=8)"
+          "summary": "Ran 10 tests, FAILED (failures=2, errors=8)",
+          "test_sha256": "eca1663c45f7dde6addb797834d431d99a0788f90d29ea9cda5da98c1b6e38d3"
         }
       ],
+      "fail_first_earlier_revision": "the same two conditions at 03:07:14Z and 03:07:24Z, with an earlier revision of the test file, gave the same counts",
       "fail_first_precedents": [
         "#416 PR body: 'Fail-first: 10 failures of 21 for the amendment, then 2 of 23'",
         "#431 PR body line 35"
