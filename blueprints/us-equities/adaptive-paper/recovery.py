@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_DOWN
+import inspect
 import re
 import time
 
@@ -54,6 +55,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     stale = set()
     last_snapshot = None
     proof = None
+    whole_exit = 2 * float(config["order_timeout_seconds"])
+    held = []
+    budget_error = None
+    before_request = getattr(port, "before_request", None)
 
     def quote(row):
         controller.quote(row)
@@ -122,6 +127,29 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                       "snapshot_incomplete", "replay_unresolved"}:
             raise SafetyError("recovery_observation_integrity_lost")
 
+    def guard_exit_budget():
+        nonlocal budget_error
+        if deadline - time.monotonic() < whole_exit:
+            unquoted = [s for s in held if not fresh(s)]
+            stale.difference_update(held)
+            stale.update(unquoted)
+            budget_error = "recovery_quote_not_fresh" if unquoted else "recovery_deadline_reached"
+            raise SafetyError(budget_error)
+
+    async def recovery_request(kind, *args, **kwargs):
+        # The native transport invokes this hook immediately before its HTTP
+        # guard. Authorization (including durable budget writes) can take time.
+        if kind == "submit":
+            guard_exit_budget()
+        result = before_request(kind, *args, **kwargs)
+        if inspect.isawaitable(result):
+            result = await result
+        if kind == "submit":
+            guard_exit_budget()
+        return result
+
+    if before_request is not None:
+        port.before_request = recovery_request
     try:
         ledger.begin_recovery(controller.clock())
         for intent in ledger.intents():
@@ -153,7 +181,6 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         # (its fill wait and a cancel's wait) still fits before the deadline. Every failed
         # exit still ends recovery, including the transport's pre-wire refusal (not_sent) of
         # a quote that went stale before the POST.
-        whole_exit = 2 * float(config["order_timeout_seconds"])
         while ledger.positions():
             guard_observation_integrity()
             if len(submitted) >= 100:
@@ -174,8 +201,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             # cut an exit started with less than a whole exit left after its POST. With a held
             # symbol still unquoted this ends recovery as recovery_quote_not_fresh (named in
             # stale_symbols), and otherwise as recovery_deadline_reached.
-            if deadline - time.monotonic() < whole_exit:
-                raise SafetyError("recovery_quote_not_fresh" if unquoted else "recovery_deadline_reached")
+            guard_exit_budget()
             if not quoted:
                 continue
             symbol = quoted[0]
@@ -201,9 +227,12 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                        "qty": format(quantity, "f"), "limit_price": format(price, "f"),
                        "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
                        "strategy": "recovery", "reason": "owned_residual_exit"}
-            submitted.append(client_id)
             try:
                 guard_observation_integrity()
+                # Position reads and payload preparation may consume the budget
+                # checked above. Recheck at the submission boundary.
+                guard_exit_budget()
+                submitted.append(client_id)
                 confirmation = await bounded(port.submit(payload))
                 order(confirmation)
             except Exception as exc:
@@ -214,6 +243,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                     intent = next((i for i in ledger.intents() if i.client_id == client_id), None)
                     if intent and intent.status == "reserved" and not intent.filled_qty and intent.broker_id is None:
                         ledger.mark_not_sent(client_id, "recovery_definitive_refusal")
+                    # The transport sanitizes hook failures into SubmissionNotSent.
+                    # Retain the recovery decision after its pre-wire guarantee.
+                    if budget_error is not None:
+                        raise SafetyError(budget_error) from None
                 raise
             if not await wait_for(lambda: terminal({client_id}), float(config["order_timeout_seconds"])):
                 await cancel(client_id)
@@ -236,6 +269,9 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             await asyncio.wait_for(port.stop(), 10)
         except Exception as exc:
             errors.append("stop_" + _code(exc))
+        finally:
+            if before_request is not None:
+                port.before_request = before_request
     positions = [{"symbol": p.symbol, "qty": format(p.qty, "f")} for p in ledger.positions().values()]
     unresolved = [{"client_id": i.client_id, "symbol": i.symbol, "side": i.side,
                    "status": i.status, "qty": format(i.qty, "f"), "filled_qty": format(i.filled_qty, "f"),
