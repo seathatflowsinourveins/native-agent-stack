@@ -396,7 +396,7 @@
         "statsmodels": "0.15.0",
         "command": "uv run --no-project",
         "precedent": "bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json key analysis_environment",
-        "resolved_here": "python 3.14.7 [obs 2026-09-29]"
+        "resolved_here": "python 3.14.7 [obs 2026-09-29T03:25:21Z]"
       }
     }
   },
@@ -523,7 +523,7 @@
           "source": "blueprints/runtime-workers/openhands/README.md:788-790"
         },
         {
-          "fact": "#14904 reported HTTP 500 on /v1/responses at release/v3.8.51; closed unmerged upstream; whether 81c9b6da holds an equivalent fix is [nv]",
+          "fact": "#14904 reported HTTP 500 on /v1/responses at release/v3.8.51; closed unmerged upstream at 2026-09-28T23:49:37Z [doc: gh pr view at 2026-09-29T03:25:20Z]; whether 81c9b6da holds an equivalent fix is [nv]",
           "source": "adoption/templates/codex.omniroute.config.toml:18-20"
         }
       ],
@@ -688,6 +688,7 @@
           ],
           "passes_when": "client side matches the arm; every B nonce appears in a 20128 /v1/responses row and no A nonce appears in any",
           "control": "two planted relabels are flagged (no model call)",
+          "nonce_in_payloads": "[nv] until the pilot",
           "fallback": "without decision 6, time windows in an exclusive window (decision 7); without either, untested (INCOMPLETE)"
         }
       ],
@@ -751,7 +752,8 @@
         "results on web_search items",
         "the CODEX_HOME placeholder",
         "providerRequest effort",
-        "correlation-ID behaviour on the running build"
+        "correlation-ID behaviour on the running build",
+        "whether 20128's logged payloads carry the attempt nonce"
       ],
       "calibration_band": [
         0.2,
@@ -2881,7 +2883,7 @@
       },
       {
         "id": "DT-3",
-        "choice": "identity by attempt nonce in 20128's logged bodies; Stage 0 serialized",
+        "choice": "identity by attempt nonce in 20128's logged request payloads; Stage 0 serialized",
         "findings": [
           "F-IDENT"
         ]
@@ -4132,6 +4134,10 @@
     {
       "utc": "2026-09-29T03:04:26Z",
       "what": "no openhands tool directory; harbor not on PATH; git ls-remote main b0fb65b4"
+    },
+    {
+      "utc": "2026-09-29T03:25:20Z",
+      "what": "gh pr view 14904 -R diegosouzapw/OmniRoute: CLOSED at 2026-09-28T23:49:37Z, not merged; uv resolved python 3.14.7, numpy 2.5.3, scipy 1.18.1, statsmodels 0.15.0"
     }
   ]
 }

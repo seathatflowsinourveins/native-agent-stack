@@ -111,7 +111,7 @@ Each Stage 0 control changes exactly one setting, listed with the control: `--co
 **Pins shared by A and B.**
 - **Codex:** codex-cli 0.157.1 [obs 2026-09-29T02:27:37Z, `codex --version`], pinned by path and sha256 at the seal. Upstream published `rust-v0.158.0` at 2026-09-28T05:07:23Z [doc: `gh api repos/openai/codex/releases/latest`]. Moving to it changes both arms and needs a new cohort.
 - **promptfoo:** 0.123.1 [obs 2026-09-29T02:27:37Z], with `@openai/codex-sdk` 0.153.4 in its `node_modules` [obs, `package.json`].
-- **Analysis environment:** python 3.14, numpy 2.5.3, scipy 1.18.1 and statsmodels 0.15.0 through `uv run --no-project` (`bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json`, key `analysis_environment`). On this host uv resolved python 3.14.7 with those versions [obs 2026-09-29T02:2xZ].
+- **Analysis environment:** python 3.14, numpy 2.5.3, scipy 1.18.1 and statsmodels 0.15.0 through `uv run --no-project` (`bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json`, key `analysis_environment`). On this host uv resolved python 3.14.7 with those versions [obs 2026-09-29T03:25:21Z].
 
 ### Local integration code (ours; sealed; tested)
 
@@ -161,7 +161,7 @@ These five components decide outcomes. All five are our integration code: the po
   - What the gateway sent upstream is `pipelinePayloads.providerRequest`, recorded only while detailed logging is on (`tools/sota-convergence/landscape-sweep/README.md:209`).
   - The two gateway request rewrites above, read at `a58000c7` (`docs/decisions/2026-09-27-omniroute-account-pool.md:434-439`).
   - The no-auth and anonymous-fallback provider lists used by G5, copied from `045aa81f3` and `dd6e9607e`: "A gateway upgrade must re-read them" (`blueprints/runtime-workers/openhands/README.md:788-790`).
-  - PR #14904 reported HTTP 500 for every `/v1/responses` request on `release/v3.8.51` (`adoption/templates/codex.omniroute.config.toml:18-20`). Upstream closed it unmerged on 2026-09-28 [doc, `gh pr view 14904 -R diegosouzapw/OmniRoute`, as the citation refuter read it], and the running install name carries only `pr13788` [obs]. Whether `81c9b6da` contains an equivalent fix is [nv]; the pilot answers it directly.
+  - PR #14904 reported HTTP 500 for every `/v1/responses` request on `release/v3.8.51` (`adoption/templates/codex.omniroute.config.toml:18-20`). Upstream closed it unmerged at 2026-09-28T23:49:37Z [doc: `gh pr view 14904 -R diegosouzapw/OmniRoute` at 2026-09-29T03:25:20Z], and the running install name carries only `pr13788` [obs]. Whether `81c9b6da` contains an equivalent fix is [nv]; the pilot answers it directly.
 - **Effort evidence.** 20128's `pipelinePayloads.providerRequest` for the attempt's nonce row, which needs detailed logging (decision 6), or a non-null `reasoning_effort_upstream`. Never `requestBody` (`tools/sota-convergence/landscape-sweep/README.md:208-209`).
 - **Excluded.** 20129 engines-on and `sharedgw/` aliases.
 - **What it can run today.** The routes are listed [obs], but the arm cannot be measured yet. It still needs the build receipt, a fingerprint read-back with logging on (decision 6), the re-derived facts, the local code and the packets.
@@ -202,7 +202,7 @@ Each check counts only after a run with its condition absent has failed (`docs/a
 - Item 6 reads the `results` field of each `web_search` item. The SDK's TypeScript type lists only `id`, `type` and `query` (`@openai/codex-sdk@0.153.4:dist/index.d.ts:78-82`), but the SDK passes each parsed item through whole (`@openai/codex-sdk@0.153.4:dist/index.js:79-92,104-110`). A retained fixture shows codex-cli 0.157.1 emitting `results` on `web_search` items against a fake search server (`evidence/artifacts/sota-refresh-20260926/codex/accept_codex_ws.py:82-95`; `evidence/artifacts/sota-refresh-20260926/codex/results/websearch-0.157.1.json`) [hist, fixture, not live].
 - If a live pilot attempt's items carry no `results`, item 6 reads the Codex rollout named by the attempt's `sessionId`. If neither carries results, item 6 is untested, which is INCOMPLETE. The pilot settles this before the seal, so the owner can amend while no Stage 0 data exists.
 - Only `web.run` counts for item 6. B's MCP fetches in P2 are flagged and reported.
-- Item 7's gateway side reads 20128's detailed call logs for the sealed window. The gateway operator searches the logged request bodies for the attempts' nonces and hands the observer only the matches, never bodies or IDs. If decision 6 is "no", this leg falls back to time windows, which then requires Stage 0 to run in an exclusive window (decision 7). Without either, the gateway leg is untested and Stage 0 is INCOMPLETE.
+- Item 7's gateway side reads 20128's detailed call logs for the sealed window. The gateway operator searches the logged request payloads for the attempts' nonces and hands the observer only the matches, never bodies or IDs. That the logged payloads carry the prompt's last line is [nv] until the pilot. If decision 6 is "no", this leg falls back to time windows, which then requires Stage 0 to run in an exclusive window (decision 7). Without either, the gateway leg is untested and Stage 0 is INCOMPLETE.
 
 **Probes.**
 - P1 covers items 2-5 and 7. One prompt asks for the file token through the shell, and for B also through `ctx_execute`, answered in the frozen schema.
@@ -227,7 +227,7 @@ Each check counts only after a run with its condition absent has failed (`docs/a
 ### Exploratory pilot (never acceptance)
 
 - **Size.** 12 packets built like F1 and kept apart from it, with one run per arm (24 runs), all before the freeze. The pilot also runs the read-back checks with logging on.
-- **What it measures:** the per-packet differences h (defined under "Statistics"), arm A's mean score, usage and wall time per run, and the pre-seal facts: the argv and environment read-backs, rollout presence and fields, whether `web_search` items carry `results`, the `CODEX_HOME` placeholder, `providerRequest` effort, and correlation-ID behaviour on the running build.
+- **What it measures:** the per-packet differences h (defined under "Statistics"), arm A's mean score, usage and wall time per run, and the pre-seal facts: the argv and environment read-backs, rollout presence and fields, whether `web_search` items carry `results`, whether 20128's logged payloads carry the attempt nonce, the `CODEX_HOME` placeholder, `providerRequest` effort, and correlation-ID behaviour on the running build.
 - **Calibration gate.** Arm A's pilot mean must lie within [0.20, 0.80]. Otherwise the packet construction is revised and the pilot repeats on new packets. Pilot packets never enter Stage 1.
 - **Status of its outputs.** They never count, the rule the roadmap applies to an exploratory #425 run (`docs/decisions/2026-09-28-ecosystem-roadmap.md:43,176`). The pilot law feeds the sizing amendment.
 
@@ -409,7 +409,7 @@ Every outcome maps to exactly one row, and every row to exactly one consumer col
 | `ni` | Stage 1 non-inferior | the NI test passes on a complete, valid run | omniroute | passed | adopt_within_scope |
 | `inferior` | Stage 1 inferior | rule 3 holds on a complete, valid run | native | passed | reject |
 | `inconclusive` | Stage 1 inconclusive | neither NI nor inferior on a complete, valid run | native | passed | retain |
-| `unpowered` | Stage 1 unpowered | before the seal, the sizing rule finds no n up to n_max (decision 12), or no calibrated α' | native (untested) | passed (decision 15) | retain, no qualification run |
+| `unpowered` | Stage 1 unpowered | before the seal, the sizing rule finds no n up to n_max (decision 12), or no calibrated α′ | native (untested) | passed (decision 15) | retain, no qualification run |
 | `time_box` | Time box | 14 days after the seal, no decided row has been reached | native (untested) | passed (decision 15) | retain, no qualification run |
 
 The `ni` row carries the label "gateway lane non-inferior within δ; max-quality-qualified for the landscape-sweep lane within scope" when δ ≤ 0.05, and "non-inferior within 0.10; not max-quality-qualified" when δ = 0.10. Its scope names this host, the sealed fingerprint, the Codex binary, the sealed inputs of both arms, the curated environment, the landscape-sweep lane and the E1b result. The other rows carry no label.
@@ -516,7 +516,7 @@ p_ni = (1 + np.sum(res.bootstrap_distribution >= delta)) / (99_999 + 1)
   - the F-WK-3 receipt;
   - the fingerprint read-back, including the hooks registry, before and after each block. Gateway reads are an owner precondition, following #445's precedent (`bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json`, key `gateway_fingerprint`);
   - detailed logging (decision 6), any exclusive window (decision 7) and G5 (decision 8), each only where decided;
-  - the nonce search in 20128's logged bodies, returning matches only;
+  - the nonce search in 20128's logged payloads, returning matches only;
   - the #425 steps (F-2W-1, which it accepted, `docs/decisions/2026-09-28-ecosystem-roadmap.md:201`).
 - **A/B operator (runner).** A session on this host with the native Codex login. It runs promptfoo from the curated environment and never reads auth state.
 - **Seal author.** A session other than the runner. It records the sha256 table and the as-of fact checks.
@@ -728,6 +728,7 @@ Every `path:line` in this file is listed with its needle in the JSON's `citation
 - **2026-09-29T02:28:20Z:** `GET /api/usage/provider-limits` on 20128, reduced to plan counts, used and remaining points, window lengths and reset times.
 - **2026-09-29T02:38:20Z:** `gh pr list --state open` found no Gate B or rebuild-receipt PR among 30 open PRs; `gh pr view` read #416, #426, #427, #428 and #431.
 - **2026-09-29T03:04:26Z:** no openhands tool directory; `harbor` not on PATH; `git ls-remote origin refs/heads/main` returned `b0fb65b4`.
+- **2026-09-29T03:25:20Z:** `gh pr view 14904 -R diegosouzapw/OmniRoute` returned CLOSED, closed 2026-09-28T23:49:37Z, not merged; the pinned uv environment resolved python 3.14.7, numpy 2.5.3, scipy 1.18.1 and statsmodels 0.15.0.
 
 ## Decisions taken in the repair
 
@@ -735,7 +736,7 @@ Every `path:line` in this file is listed with its needle in the JSON's `citation
 
 **DT-2.** The test is #431's procedure: a paired percentile bootstrap with p-inversion at the margin, and the harmful-minus-beneficial exact fallback below 20 discordant packets. The beneficial side is scaled by the 1/4 step, which is the only change needed for bounded, non-binary differences. n comes from simulating the whole rule. The one declared deviation is that α′ is calibrated before any data instead of leaving the gate open, which keeps it decidable with the simulated false-NI rate held to #431's bar. (CLAIM-4, F-GUARD, R-CALIB)
 
-**DT-3.** Identity uses an attempt nonce found in 20128's logged request bodies, which works under concurrency. Stage 0 is also serialized. An exclusive window is not needed while logging is on. (F-IDENT)
+**DT-3.** Identity uses an attempt nonce found in 20128's logged request payloads, which works under concurrency. Stage 0 is also serialized. An exclusive window is not needed while logging is on. (F-IDENT)
 
 **DT-4.** Detailed logging is sealed as on for the whole sealed window and read back at each block boundary. It is excluded from D1's lapse set, with the reason stated. G5 is not applied in this cohort, and applying it later is a stated lapse. (F-FPRINT)
 
@@ -757,7 +758,7 @@ Every `path:line` in this file is listed with its needle in the JSON's `citation
 
 **DT-13.** The planned convergence record is added at confirmation, not in this draft PR, which carries only the three new files and their registrations. (R-CONV-RECORD)
 
-**DT-14.** The owner stays a proposal: decision 2, the user's. The roadmap's lines on who confirms are quoted both ways. (brief item 5)
+**DT-14.** The owner stays a proposal: decision 2, the user's. The roadmap's lines on who confirms are quoted both ways. (the owner question)
 
 ## Repair-round dispositions
 
