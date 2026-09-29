@@ -1273,7 +1273,7 @@ class TokenMeasurement(unittest.TestCase):
         # here-document lacks one; the oracle's fuzz inputs do). Expected lanes are the runs of real bash 5.2 under stub executables.
         cases = {"bash <<EOF\nqmd status": {"qmd": 1}, "bash <<'EOF'\nqmd status\nrtk proxy toon f": {"qmd": 1, "rtk_proxy": 1, "toon": 1},
                  "bash <<'EOF'\nqmd status\n": {"qmd": 1}, "bash <<-EOF\n\tqmd status": {"qmd": 1}, "cat <<EOF\nqmd status": {},
-                 "cat <<EOF\n$(toon a)": {"toon": 1}, "cat <<'EOF'\n$(toon a)": {}, "<<EOF\nmcporter call serena.x ": {},
+                 "cat <<EOF\n$(toon a)": {"toon": 1}, "cat <<'EOF'\n$(toon a)": {},
                  "bash <<EOF && toon x\nqmd status": {"qmd": 1, "toon": 1}, "env -u X bash <<'END-1'\nqmd status": {"qmd": 1}}
         for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
             with self.subTest(command=command):

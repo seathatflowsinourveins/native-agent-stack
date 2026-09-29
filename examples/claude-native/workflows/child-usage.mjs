@@ -1442,14 +1442,45 @@ function heredocRaw(r, start, end, src) {
   return line < 0 || line + 1 > end.startIndex ? '' : src.slice(line + 1, end.startIndex)
 }
 const quotedDelimiter = (text) => { for (const ch of text) if (ch === "'" || ch === '"' || ch === '\\') return true; return false }
+// A here-document with no delimiter line is closed by the end of the text: bash warns ("here-document delimited by end-of-file") and runs
+// it, its body being everything after the operator's line (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4 leaves the case undefined).
+// tree-sitter-bash 0.25.1 reads that body as an ERROR (its words as commands of the operator's line), or drops it when the text ends with a
+// newline, so the missing delimiter lines are appended before the text is read. The delimiter is the operator's word with its quotes removed.
+function heredocWord(text) {
+  let out = ''
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (c === '\\') out += text[++i] ?? ''
+    else if (c === "'") { const k = text.indexOf("'", i + 1), end = k < 0 ? text.length : k; out += text.slice(i + 1, end); i = end }
+    else if (c === '"') { for (i++; i < text.length && text[i] !== '"'; i++) { if (text[i] === '\\' && '$`"\\'.includes(text[i + 1] ?? '')) i++; out += text[i] ?? '' } }
+    else out += c
+  }
+  return out
+}
+function missingDelimiters(root) {
+  const missing = [], stack = [root]
+  while (stack.length) {
+    const node = stack.pop()
+    if (node.type === 'heredoc_start' && !node.parent?.children.some((c) => c.type === 'heredoc_end' && c.endIndex > c.startIndex && c.startIndex > node.startIndex)) missing.push(heredocWord(node.text))
+    for (let i = node.childCount - 1; i >= 0; i--) stack.push(node.child(i))
+  }
+  return missing
+}
 // Every command of a script, as { records, readers } (readers: how many of its commands would run their standard input as a script).
 function readScript(text, remote, depth, acc) {
   const records = []
   if (depth > NESTING_LIMIT) { records.push(unresolvedRecord(remote)); return { records, readers: 0 } }
-  const tree = parseShell(text)
+  let tree = parseShell(text)
   if (!tree) { acc.errors = true; return { records, readers: 0 } }
   openShellTreeCount++
-  try { return { records, readers: walkTree(tree.rootNode, text, { remote, depth, acc, records }) } } finally { tree.delete(); openShellTreeCount-- }
+  try {
+    const missing = tree.rootNode.hasError ? missingDelimiters(tree.rootNode) : []
+    if (missing.length) {
+      const closed = text + (text.endsWith('\n') ? '' : '\n') + missing.join('\n') + '\n', again = parseShell(closed)
+      if (again) { tree.delete(); tree = again; text = closed }
+    }
+    return { records, readers: walkTree(tree.rootNode, text, { remote, depth, acc, records }) }
+  } finally { tree.delete(); openShellTreeCount-- }
 }
 const STATEMENT_PARENTS = new Set(['program', 'list', 'pipeline', 'compound_statement', 'subshell', 'do_group', 'if_statement', 'elif_clause', 'else_clause',
   'while_statement', 'case_item', 'command_substitution', 'process_substitution', 'negated_command', 'redirected_statement', 'function_definition', 'heredoc_redirect'])

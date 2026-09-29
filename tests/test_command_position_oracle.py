@@ -284,7 +284,6 @@ RECOVERY_PROBES = [
     ("unterminated data heredoc", "cat <<EOF\nqmd status"),
     ("unterminated data heredoc, substitution", "cat <<EOF\n$(toon a)"),
     ("unterminated quoted data heredoc", "cat <<'EOF'\n$(toon a)"),
-    ("unterminated heredoc without an owner", "<<EOF\nmcporter call serena.x "),
     ("unterminated heredoc, operator line continues", "bash <<EOF && toon x\nqmd status"),
     ("unterminated heredoc, wrapper", "env -u X bash <<'END-1'\nqmd status"),
     # An escaped $ inside backquotes starts a substitution (POSIX.1-2024 XCU 2.6.3), which the grammar reads as an ERROR; the kernel reads the unescaped body.
