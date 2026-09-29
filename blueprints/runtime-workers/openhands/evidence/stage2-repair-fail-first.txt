@@ -1,0 +1,589 @@
+Resolver stage 2, repair round: fail-first runs and negative controls. Local synthetic integration checks,
+not upstream or live acceptance (docs/acceptance-evidence-policy.md).
+Each section is one returned run before its implementing commit, in execution order.
+Only private filesystem prefixes are replaced: <worktree>, <red-tree>, <tmp>, <red-logs>, <scratch> and
+<private-home>. Environment of every run: TMPDIR=<tmp> PYTHONDONTWRITEBYTECODE=1, from <worktree> unless a
+section says otherwise.
+
+=== f1-d4-patch-content: before aae8449f: guard what the patch adds before git apply ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write
+Exit code: 1
+
+FFFFFFF
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='session key')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pr_opened', [], None) != ('patch_refused', ['content_session_key'], None)
+
+First differing element 0:
+'pr_opened'
+'patch_refused'
+
+- ('pr_opened', [], None)
++ ('patch_refused', ['content_session_key'], None)
+
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='host path')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pr_opened', [], None) != ('patch_refused', ['content_host_path'], None)
+
+First differing element 0:
+'pr_opened'
+'patch_refused'
+
+- ('pr_opened', [], None)
++ ('patch_refused', ['content_host_path'], None)
+
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='user name')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pr_opened', [], None) != ('patch_refused', ['content_host_user_name'], None)
+
+First differing element 0:
+'pr_opened'
+'patch_refused'
+
+- ('pr_opened', [], None)
++ ('patch_refused', ['content_host_user_name'], None)
+
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='gitleaks finding')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pr_opened', [], None) != ('patch_refused', ['content_scanner_finding'], None)
+
+First differing element 0:
+'pr_opened'
+'patch_refused'
+
+- ('pr_opened', [], None)
++ ('patch_refused', ['content_scanner_finding'], None)
+
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='token shape')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pr_opened', [], None) != ('patch_refused', ['content_private_content'], None)
+
+First differing element 0:
+'pr_opened'
+'patch_refused'
+
+- ('pr_opened', [], None)
++ ('patch_refused', ['content_private_content'], None)
+
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='user name as a new path')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('text_refused', ['host_user_name'], None) != ('patch_refused', ['content_host_user_name'], None)
+
+First differing element 0:
+'text_refused'
+'patch_refused'
+
+- ('text_refused', ['host_user_name'], None)
+?    ^^^
+
++ ('patch_refused', ['content_host_user_name'], None)
+?   ++ ^^             ++++++++
+
+
+======================================================================
+FAIL: test_what_the_patch_adds_passes_the_guard_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_what_the_patch_adds_passes_the_guard_before_any_write) (case='added line shaped like a header')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3425, in test_what_the_patch_adds_passes_the_guard_before_any_write
+    self.assertEqual((outcome["status"], outcome["reasons"], outcome["failure_stage"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("patch_refused", [reason], None))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: ('pr_opened', [], None) != ('patch_refused', ['content_session_key'], None)
+
+First differing element 0:
+'pr_opened'
+'patch_refused'
+
+- ('pr_opened', [], None)
++ ('patch_refused', ['content_session_key'], None)
+
+----------------------------------------------------------------------
+Ran 1 test in 2.466s
+
+FAILED (failures=7)
+
+=== d1-pr-open-unrecorded: before 23c74a32: record a PR GitHub holds, and never exit 3 once it exists ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_exit_status_comes_from_host_observed_github_results_only tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_end_to_end_a_failed_read_back_as_the_pr_opens_records_the_pr_and_exits_5
+Exit code: 1
+Note: The first and third tests are 848fac7d's and 7d77f35d's, with their expectations changed for D1.
+
+FFFFFF
+======================================================================
+FAIL: test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3474, in test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops
+    self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"], outcome["pr"]),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ("pr_opened", "pr", ["pr_head_moved"], 34))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (None, 'pr', ['pr_head_moved'], 34) != ('pr_opened', 'pr', ['pr_head_moved'], 34)
+
+First differing element 0:
+None
+'pr_opened'
+
+- (None, 'pr', ['pr_head_moved'], 34)
+?  ^
+
++ ('pr_opened', 'pr', ['pr_head_moved'], 34)
+?  ^^^^ ++  ++
+
+
+======================================================================
+FAIL: test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create) (reason='pr_view_failed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3499, in test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create
+    self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"], outcome.get("pr")),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     (status, "pr", [reason], pr))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (None, 'pr', ['pr_view_failed'], None) != ('pr_opened', 'pr', ['pr_view_failed'], 34)
+
+First differing element 0:
+None
+'pr_opened'
+
+- (None, 'pr', ['pr_view_failed'], None)
+?  ^                               ^^^^
+
++ ('pr_opened', 'pr', ['pr_view_failed'], 34)
+?  ^^^^ ++  ++                            ^^
+
+
+======================================================================
+FAIL: test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create) (reason='pr_not_draft')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3499, in test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create
+    self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"], outcome.get("pr")),
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     (status, "pr", [reason], pr))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (None, 'pr', ['pr_not_draft'], None) != ('pr_opened', 'pr', ['pr_not_draft'], 34)
+
+First differing element 0:
+None
+'pr_opened'
+
+- (None, 'pr', ['pr_not_draft'], None)
+?  ^                             ^^^^
+
++ ('pr_opened', 'pr', ['pr_not_draft'], 34)
+?  ^^^^ ++  ++                          ^^
+
+
+======================================================================
+FAIL: test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create) (reason='pr_create_unparseable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3504, in test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create
+    self.assertEqual(self.r.resolver_exit({"failure_stage": "pr", "resolver": section}), 5)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 5
+
+======================================================================
+FAIL: test_exit_status_comes_from_host_observed_github_results_only (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_exit_status_comes_from_host_observed_github_results_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3544, in test_exit_status_comes_from_host_observed_github_results_only
+    self.assertEqual(exit_code({**receipt(status="pr_opened", review=completed_review), "failure_stage": "pr"}), 5)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 5
+
+======================================================================
+FAIL: test_end_to_end_a_failed_read_back_as_the_pr_opens_records_the_pr_and_exits_5 (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_end_to_end_a_failed_read_back_as_the_pr_opens_records_the_pr_and_exits_5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3768, in test_end_to_end_a_failed_read_back_as_the_pr_opens_records_the_pr_and_exits_5
+    self.assertEqual(code, 5, printed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 5 : {'exit': 3, 'failure_stage': 'pr', 'pr': None, 'receipt': '<tmp>/resolver-s2-run-hbc4dgid/state/runs/rw-openhands-res-12-20260929/control/receipt.json', 'review': 'not_run', 'run_id': 'rw-openhands-res-12-20260929', 'status': None}
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.107s
+
+FAILED (failures=6)
+
+=== d2-residuals-findings: before 85218883: the residuals comment lists the findings ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.PullRequestLoopTests.test_the_residuals_comment_lists_the_findings_and_says_in_host_words_why_they_stay_open tests.test_runtime_worker_openhands_resolver.PullRequestLoopTests.test_without_a_repair_push_the_residuals_still_close_the_loop tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops
+Exit code: 1
+Note: An earlier run of this test failed first on its repair-status assertion. The comment assertions were moved ahead of it and the run repeated, so this output shows the comment as the driver posted it.
+
+F.F
+======================================================================
+FAIL: test_the_residuals_comment_lists_the_findings_and_says_in_host_words_why_they_stay_open (tests.test_runtime_worker_openhands_resolver.PullRequestLoopTests.test_the_residuals_comment_lists_the_findings_and_says_in_host_words_why_they_stay_open)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2205, in test_the_residuals_comment_lists_the_findings_and_says_in_host_words_why_they_stay_open
+    self.assertIn("Findings from the review (model output, shown as text):\n\n```text\n" + findings + "\n```",
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  comment)
+                  ^^^^^^^^
+AssertionError: 'Findings from the review (model output, shown as text):\n\n```text\nhigh docs/a.md:1 the new line lacks a source; add one\nlow docs/a.md:2 wording\n```' not found in 'Residual findings after the one repair round.\n\nNo repair was pushed.\n\nReport from the repair attempt (model output, shown as text):\n\n```text\nNo repair attempt ran: stage 2 wires the review and residuals only.\n```\n\nFinal required checks:\n\n| Check | Result |\n| --- | --- |\n| `check-0` | `pass` |\n\nThe pull request stays a draft: the driver never marks it ready, merges it or enables auto-merge. The owner decides.\n\n_This comment was posted by an AI agent (OpenHands)._\n'
+
+======================================================================
+FAIL: test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3747, in test_end_to_end_fake_run_opens_one_draft_pr_reviews_it_once_and_stops
+    self.assertEqual(section["review"]["repair"], "not_attempted")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'not_pushed' != 'not_attempted'
+- not_pushed
++ not_attempted
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.818s
+
+FAILED (failures=2)
+
+=== d5-receipt-resolver-section: before 9a8c0874: keep the resolver section after a dispatch failure ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt
+Exit code: 1
+
+FFF
+======================================================================
+FAIL: test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt) (stage='deadline')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3863, in test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt
+    self.assertIsInstance(section, dict, receipt)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None is not an instance of <class 'dict'> : {'arm': 'control', 'failure_stage': 'deadline', 'failure_type': 'TimeoutError', 'task_passed': False, 'evidence_complete': False}
+
+======================================================================
+FAIL: test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt) (stage='wait')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3863, in test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt
+    self.assertIsInstance(section, dict, receipt)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None is not an instance of <class 'dict'> : {'arm': 'control', 'failure_stage': 'wait', 'failure_type': 'CalledProcessError', 'task_passed': False, 'evidence_complete': False}
+
+======================================================================
+FAIL: test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt) (stage='result')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3863, in test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt
+    self.assertIsInstance(section, dict, receipt)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None is not an instance of <class 'dict'> : {'arm': 'control', 'failure_stage': 'result', 'failure_type': 'ValueError', 'task_passed': False, 'evidence_complete': False}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.868s
+
+FAILED (failures=3)
+
+=== f3-g4-reviewer-gate: before 0acef578: bind the reviewer command to gate G4's recorded argv ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver
+Exit code: 1
+Note: Run from <red-tree>, a `git archive` of 9a8c0874 with the final test module copied in, because the test's no-g4 case changed after the first red run from <worktree>.
+
+FFFFFEF
+======================================================================
+ERROR: test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3924, in test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+    self.assertEqual(self.receipt(printed)["resolver"]["gates"]["reviewer_argv_sha256"], self.record_g4())
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'reviewer_argv_sha256'
+
+======================================================================
+FAIL: test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify) [no g4 record]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3912, in test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+    self.assertEqual(code, 3, printed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 3 : {'exit': 0, 'failure_stage': None, 'pr': 34, 'receipt': '<tmp>/resolver-s2-run-iln49tjz/state/runs/rw-openhands-res-12-20260929/control/receipt.json', 'review': 'completed', 'run_id': 'rw-openhands-res-12-20260929', 'status': 'pr_opened'}
+
+======================================================================
+FAIL: test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify) [g4 not passed]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3912, in test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+    self.assertEqual(code, 3, printed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 3 : {'exit': 0, 'failure_stage': None, 'pr': 34, 'receipt': '<tmp>/resolver-s2-run-iln49tjz/state/runs/rw-openhands-res-12-20260929/control/receipt.json', 'review': 'completed', 'run_id': 'rw-openhands-res-12-20260929', 'status': 'pr_opened'}
+
+======================================================================
+FAIL: test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify) [g4 recorded later]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3912, in test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+    self.assertEqual(code, 3, printed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 3 : {'exit': 0, 'failure_stage': None, 'pr': 34, 'receipt': '<tmp>/resolver-s2-run-iln49tjz/state/runs/rw-openhands-res-12-20260929/control/receipt.json', 'review': 'completed', 'run_id': 'rw-openhands-res-12-20260929', 'status': 'pr_opened'}
+
+======================================================================
+FAIL: test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify) [another argv]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3912, in test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+    self.assertEqual(code, 3, printed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 3 : {'exit': 0, 'failure_stage': None, 'pr': 34, 'receipt': '<tmp>/resolver-s2-run-iln49tjz/state/runs/rw-openhands-res-12-20260929/control/receipt.json', 'review': 'completed', 'run_id': 'rw-openhands-res-12-20260929', 'status': 'pr_opened'}
+
+======================================================================
+FAIL: test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify) [a relative executable]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3912, in test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+    self.assertEqual(code, 3, printed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+AssertionError: 5 != 3 : {'exit': 5, 'failure_stage': None, 'pr': 34, 'receipt': '<tmp>/resolver-s2-run-iln49tjz/state/runs/rw-openhands-res-12-20260929/control/receipt.json', 'review': 'stopped', 'run_id': 'rw-openhands-res-12-20260929', 'status': 'pr_opened'}
+
+======================================================================
+FAIL: test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<red-tree>/tests/test_runtime_worker_openhands_resolver.py", line 3225, in test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver
+    self.assertEqual(section["gates"], {
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+        "stage_gates_sha256": "9" * 64,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "isolation_probe_sha256": hashlib.sha256((self.result / "isolation-probe.json").read_bytes()).hexdigest(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "reviewer_argv_sha256": "7" * 64})
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'sta[173 chars]71ba'} != {'sta[173 chars]71ba', 'reviewer_argv_sha256': '77777777777777[47 chars]777'}
+  {'isolation_probe_sha256': '7f12441365decd19b4cd15cf2ea31ed30fc9698e336ffa19d8f5cd4b4a2f71ba',
++  'reviewer_argv_sha256': '7777777777777777777777777777777777777777777777777777777777777777',
+   'stage_gates_sha256': '9999999999999999999999999999999999999999999999999999999999999999'}
+
+----------------------------------------------------------------------
+Ran 2 tests in 3.485s
+
+FAILED (failures=6, errors=1)
+
+=== d6-swebench-instruction: before d4c213f5: the SWE-bench instruction names only installed skills ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_the_swebench_instruction_asks_only_for_skills_the_contract_installs
+Exit code: 1
+
+F
+======================================================================
+FAIL: test_the_swebench_instruction_asks_only_for_skills_the_contract_installs (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_the_swebench_instruction_asks_only_for_skills_the_contract_installs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3055, in test_the_swebench_instruction_asks_only_for_skills_the_contract_installs
+    self.assertEqual(named & excluded, set(), prompt)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the first set but not the second:
+'verification-before-completion' : Repair the repository at /workspace for the following issue.
+Repository: django/django
+Base commit: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+Fix the selected issue.
+
+Invoke the tdd skill using invoke_skill before editing and the verification-before-completion skill before finishing. The existing code/test interfaces and test-first work are authorized. Inspect the repository's native test instructions; reproduce the issue and retain test results in the trace. This is a bare checkout, not the upstream Conda testbed. Do not claim an unavailable dependency or test passed. Keep changes scoped to the issue. Git metadata and installed skills are read-only; do not commit or alter them. The independent official SWE-bench grader will apply and test your patch.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.029s
+
+FAILED (failures=1)
+
+=== d7-a7-evidence: before 7273df7e: collect plan acceptance A7's containment evidence ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_teardown_lists_the_server_environment_names_before_removing_it tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_the_receipt_carries_the_containment_evidence_as_names_and_counts_only tests.test_runtime_worker_openhands.OpenHandsIsolationTests.test_teardown_removes_proxy_then_server_then_networks_by_exact_name
+Exit code: 1
+Note: The third test is the SWE-bench suite's teardown sequence, with the names-only read added to it.
+
+FFFEEE
+======================================================================
+ERROR: test_teardown_lists_the_server_environment_names_before_removing_it (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_teardown_lists_the_server_environment_names_before_removing_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3074, in test_teardown_lists_the_server_environment_names_before_removing_it
+    self.assertEqual(self.host.ENV_NAMES_FORMAT,
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_s2_host' has no attribute 'ENV_NAMES_FORMAT'
+
+======================================================================
+ERROR: test_the_receipt_carries_the_containment_evidence_as_names_and_counts_only (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_the_receipt_carries_the_containment_evidence_as_names_and_counts_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3324, in test_the_receipt_carries_the_containment_evidence_as_names_and_counts_only
+    containment = receipt["resolver"]["containment"]
+                  ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'containment'
+
+======================================================================
+ERROR: test_teardown_removes_proxy_then_server_then_networks_by_exact_name (tests.test_runtime_worker_openhands.OpenHandsIsolationTests.test_teardown_removes_proxy_then_server_then_networks_by_exact_name)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands.py", line 1489, in test_teardown_removes_proxy_then_server_then_networks_by_exact_name
+    ["inspect", "--format", host.ENV_NAMES_FORMAT, self.stem + "-server"],
+                            ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_recipe_test_host' has no attribute 'ENV_NAMES_FORMAT'
+
+======================================================================
+FAIL: test_teardown_lists_the_server_environment_names_before_removing_it (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_teardown_lists_the_server_environment_names_before_removing_it) (answer='["PATH","OH_SESSION_API_KEYS_0","HOME","PATH"]\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3068, in test_teardown_lists_the_server_environment_names_before_removing_it
+    self.assertEqual([call[0] for call in calls[:5]], ["logs", "rm", "inspect", "logs", "rm"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['logs', 'rm', 'logs', 'rm', 'network'] != ['logs', 'rm', 'inspect', 'logs', 'rm']
+
+First differing element 2:
+'logs'
+'inspect'
+
+- ['logs', 'rm', 'logs', 'rm', 'network']
++ ['logs', 'rm', 'inspect', 'logs', 'rm']
+
+======================================================================
+FAIL: test_teardown_lists_the_server_environment_names_before_removing_it (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_teardown_lists_the_server_environment_names_before_removing_it) (answer='["PATH=/usr/bin"]\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3068, in test_teardown_lists_the_server_environment_names_before_removing_it
+    self.assertEqual([call[0] for call in calls[:5]], ["logs", "rm", "inspect", "logs", "rm"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['logs', 'rm', 'logs', 'rm', 'network'] != ['logs', 'rm', 'inspect', 'logs', 'rm']
+
+First differing element 2:
+'logs'
+'inspect'
+
+- ['logs', 'rm', 'logs', 'rm', 'network']
++ ['logs', 'rm', 'inspect', 'logs', 'rm']
+
+======================================================================
+FAIL: test_teardown_lists_the_server_environment_names_before_removing_it (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_teardown_lists_the_server_environment_names_before_removing_it) (answer='not json\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3068, in test_teardown_lists_the_server_environment_names_before_removing_it
+    self.assertEqual([call[0] for call in calls[:5]], ["logs", "rm", "inspect", "logs", "rm"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['logs', 'rm', 'logs', 'rm', 'network'] != ['logs', 'rm', 'inspect', 'logs', 'rm']
+
+First differing element 2:
+'logs'
+'inspect'
+
+- ['logs', 'rm', 'logs', 'rm', 'network']
++ ['logs', 'rm', 'inspect', 'logs', 'rm']
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.108s
+
+FAILED (failures=3, errors=3)
+
+=== f2-d3-docs: documentation check before and after c7edc527 (F2 and D3 are a text-only fix) ===
+Command: sh <red-logs>/f2-d3-docs-check.sh, whose text follows; each probe prints its own exit status.
+
+#!/bin/sh
+# Documentation check for review items F2 and D3 (a text-only fix): prints each probe and its exit status.
+R=blueprints/runtime-workers/openhands/RESOLVER.md
+D=docs/decisions/2026-09-28-openhands-resolver-isolation.md
+echo "1. The host-only claim, whitespace-normalised (the fix removes it: expect exit 1 after):"
+tr -s '\n ' '  ' < $R | grep -o "satisfies the same rule by executing nothing at all"; echo "exit $?"
+echo "2. CI execution with open egress stated in RESOLVER.md (expect exit 0 after):"
+grep -c "egress-policy: audit" $R; echo "exit $?"
+echo "3. The published final message stated in RESOLVER.md (expect exit 0 after):"
+grep -c "6000 characters of the agent's final message" $R; echo "exit $?"
+echo "4. Check results on openhands/* named model-controlled in RESOLVER.md (expect exit 0 after):"
+tr -s '\n ' '  ' < $R | grep -c "results on \`openhands/\*\` are model-controlled"; echo "exit $?"
+echo "5. The decision record's proposed resolver-mode amendment (expect exit 0 after):"
+grep -n "Resolver-mode amendment (proposed" $D; echo "exit $?"
+echo "6. The live runbook waits for the owner's decision (expect exit 0 after):"
+grep -n "Precondition: the owner" $R; echo "exit $?"
+
+--- before (on 7273df7e) ---
+1. The host-only claim, whitespace-normalised (the fix removes it: expect exit 1 after):
+satisfies the same rule by executing nothing at all
+exit 0
+2. CI execution with open egress stated in RESOLVER.md (expect exit 0 after):
+0
+exit 1
+3. The published final message stated in RESOLVER.md (expect exit 0 after):
+0
+exit 1
+4. Check results on openhands/* named model-controlled in RESOLVER.md (expect exit 0 after):
+0
+exit 1
+5. The decision record's proposed resolver-mode amendment (expect exit 0 after):
+exit 1
+6. The live runbook waits for the owner's decision (expect exit 0 after):
+exit 1
+
+--- after (on c7edc527) ---
+1. The host-only claim, whitespace-normalised (the fix removes it: expect exit 1 after):
+exit 1
+2. CI execution with open egress stated in RESOLVER.md (expect exit 0 after):
+1
+exit 0
+3. The published final message stated in RESOLVER.md (expect exit 0 after):
+1
+exit 0
+4. Check results on openhands/* named model-controlled in RESOLVER.md (expect exit 0 after):
+1
+exit 0
+5. The decision record's proposed resolver-mode amendment (expect exit 0 after):
+208:### Resolver-mode amendment (proposed 2026-09-28, pending the owner's decision)
+exit 0
+6. The live runbook waits for the owner's decision (expect exit 0 after):
+513:# Precondition: the owner has accepted one option of the decision record's resolver-mode amendment
+exit 0
+
+=== negative controls on c7edc527 ===
+Command: python3 <red-logs>/repair_mutation_check.py
+Method: each mutation replaces one attribute of the module under test (unittest.mock) while the named test runs; 'detected' means that test failed. The script then runs every target unmutated.
+Exit code: 0
+
+detected: F1/D4: patch content check disabled -> test_what_the_patch_adds_passes_the_guard_before_any_write
+detected: F1/D4: added lines taken by prefix, so a '+++ ' hunk line is skipped -> test_what_the_patch_adds_passes_the_guard_before_any_write
+detected: D1: a PR is read from the outcome status only, not the journal -> test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create
+detected: D2: the residuals comment gets no findings -> test_the_residuals_comment_lists_the_findings_and_says_in_host_words_why_they_stay_open
+detected: D5: dispatch's minimal failure receipt kept -> test_a_dispatch_failure_after_start_keeps_the_resolver_section_in_the_receipt
+detected: F3: the reviewer gate accepts any argv -> test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify
+detected: D6: the instruction names verification-before-completion again -> test_the_swebench_instruction_asks_only_for_skills_the_contract_installs
+detected: D7: teardown takes no environment listing -> test_teardown_lists_the_server_environment_names_before_removing_it
+detected: D7: the receipt drops the proxy log counts -> test_the_receipt_carries_the_containment_evidence_as_names_and_counts_only
+unmutated targets pass: True

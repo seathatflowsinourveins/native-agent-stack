@@ -56,6 +56,10 @@ on `PATH`. None of this is upstream acceptance
 [evidence/stage2-fail-first.txt](evidence/stage2-fail-first.txt) keeps each stage-2
 test's failing run from before its implementing commit. It also keeps the negative
 controls: eight mutations of the code under test, each of which fails its test.
+[evidence/stage2-repair-fail-first.txt](evidence/stage2-repair-fail-first.txt) does
+the same for the repair round after the independent reviews. It holds one failing run
+per review item, the documentation check for the text-only items F2 and D3, and nine
+mutations, each of which fails its test.
 
 ## Issue selection
 
