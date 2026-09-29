@@ -739,6 +739,11 @@ verifier is qualified as capability evidence only.
   ([`README.md:155-158`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)), which is
   the user-wide reading. Detail and the digest rows: the
   [examples README](../../examples/codex-native/README.md#2026-09-29-stack-role-carriers).
+  `tools/adoption/apply_codex_lane.py` is that installation step: it checks each source against its
+  pinned digest, creates the files create-only (mode 0600, in a 0700 folder it makes), reads them back,
+  journals the run so that rollback removes only what it created, and its dry run reads a scratch copy
+  back through `codex doctor --json`. `tools/adoption/prove_codex_lane.py` has a static `roles` row.
+  Both report other role files, role tables and doctor warnings as counts, never as a name, path or text.
 - **Role text.** Adapted sentence by sentence from the Claude carriers (17 sentences of the researcher
   and 16 of the verifier are kept byte for byte and pinned by a test), with a one-agent rule, a
   working-directory rule and `jq` output among the exact command shapes added. The working-directory

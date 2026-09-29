@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Put the Codex worker lane on one Codex home, through Codex's own config writer. Dry run by default.
 
-The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes, four with --omniroute-profile:
+The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is four changes, five with --omniroute-profile:
 
   config.toml   written only through `codex app-server` `config/batchWrite` with `expectedVersion`, the writer
                 Codex's own clients use: [mcp_servers.context-mode] exactly as adoption/templates/
@@ -16,6 +16,13 @@ The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes, four
   stack-worker.config.toml
                 the worker profile, adoption/templates/codex.stack-worker.config.toml, for `codex exec -p
                 stack-worker`. Created only when absent (or already identical).
+  agents/stack-researcher.toml, agents/stack-verifier.toml
+                the two Codex role carriers of adoption/agents/codex/ (the E2E's `agent_type` roles), checked
+                against the SHA-256 rows pinned here (ROLE_ROWS) before anything is copied, and created only when
+                absent (or already identical) under $CODEX_HOME/agents: create-only, mode 0600, in a 0700 folder
+                this run makes. Codex discovers them there, so no [agents.<name>] table is written and config.toml
+                and the profile do not move. A linked or non-directory agents folder, or a differing role file,
+                is refused.
   omniroute.config.toml
                 only with --omniroute-profile: the gateway profile, adoption/templates/codex.omniroute.config.toml,
                 for `codex -p omniroute` through a local OmniRoute. Created only when absent (or already identical).
@@ -27,7 +34,10 @@ Modes:
   (default)   dry run. Checks the preconditions, prints each planned change against the live files, then
               rehearses the same batchWrite, AGENTS.md block and profiles on private copies in a scratch Codex
               home (network namespace off where bwrap works) and prints Codex's own read-back of the result:
-              `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker` (and `-p omniroute`).
+              `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker` (and `-p omniroute`),
+              and `codex doctor --json` before and after the role files are copied in: its exit code is ignored
+              (it is 1 in a scratch home, where auth.credentials fails) and startup warnings that rise with the
+              role files fail the rehearsal, while an unreadable config.load is only a warning.
               Nothing under the target Codex home is written; the scratch home is removed afterwards.
   --apply     refuses while a `codex` process runs or when a file differs from the --expect-* hash the dry run
               printed. Writes a run record and 0600 backups of config.toml and AGENTS.md first (never auth.json

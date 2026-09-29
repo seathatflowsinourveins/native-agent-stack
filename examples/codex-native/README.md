@@ -108,6 +108,9 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   tables, and [`config.agents.toml.example`](config.agents.toml.example) still registers only the two older roles. Do not copy these two into
   a project `.codex/agents/`: a project copy would load in every trusted session of that checkout, not only in the E2E's. On a host the files
   belong at `$CODEX_HOME/agents/<name>.toml`, mode 0600 in a 0700 directory.
+  [`tools/adoption/apply_codex_lane.py`](../../tools/adoption/apply_codex_lane.py) installs them there: create-only, never over a differing
+  file, its dry run copies them into a scratch home and reads the result back through `codex doctor --json`, and rollback removes only what
+  that run created. The `roles` row of [`prove_codex_lane.py`](../../tools/adoption/prove_codex_lane.py) checks the installed state.
 - **Registration modes considered.** A per-launch `-c agents.<role>.config_file=<absolute path>` also works by source reading:
   `load_agent_roles` reads `[agents.<name>]` tables from every enabled layer, session flags included, and a declared `config_file` must be an
   absolute path ([`loader.rs:35-73,192-206`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs#L35-L206);
