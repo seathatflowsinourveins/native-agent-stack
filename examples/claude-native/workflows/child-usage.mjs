@@ -1357,6 +1357,9 @@ function resolveWords(words, out, cx, exec) {
       if (next === null) return null
       if (next === -1) { push({ unresolved: true }); return null }
       if (name === 'xargs') stdin = false // xargs reads its standard input for arguments, so a here-document is its data
+      // env, nice, nohup, stdbuf, timeout, xargs, sudo and the builtin exec run their command with execvp, which finds no shell builtin
+      // (`env eval x`: "No such file or directory"; env(1), execvp(3)); command and time are the shell's own and pass a builtin on.
+      if (name !== 'command' && name !== 'time') exec = true
       ;[words, i] = next
       continue
     }
