@@ -227,6 +227,15 @@ exec return contributes M3 bytes (`code_mode` carrier). Nested ctx returns do
 not contribute M5 bytes unless represented by a direct model-visible ctx call.
 `sandbox_operations` counts the normalized nested operations.
 
+`measurement.cli_lanes` and `measurement.proxy` come from the same kernel
+([CLI lanes by command position](../../examples/claude-native/workflows/README.md#cli-lanes-by-command-position-2026-09-28)).
+Shell commands of `exec_command`, `shell` and local-shell calls and of
+`CommandExecution` items are read in command position; those nested in a
+code-mode `exec` count under carrier `nested`. A call's state comes from this adapter's result
+mapping, which marks only a `failed` item as an error. A declined item still
+reads as succeeded, and so does a legacy exec output whose only failure signal
+is its `Process exited with code N` header, until the adapter maps them.
+
 Nested Codex code-mode shell curl/wget commands share M4's existing
 `ctx_sandbox_fetch` bucket with context-mode sandbox curl/wget commands. Both
 are remote-denominator operations; this bucket does not identify exclusive

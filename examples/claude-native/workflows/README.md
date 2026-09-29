@@ -177,7 +177,168 @@ node examples/claude-native/workflows/child-usage.mjs --lanes-sweep \
   --rtk-check --rtk-db "${RTK_DB_PATH}" --exceptions "${PRIVATE_EXCEPTIONS}"
 ```
 
-`m3` covers every result carrier, including `rtk proxy`, with `results`, `bytes`,
+#### CLI lanes by command position (2026-09-28)
+
+`measurement.cli_lanes` counts the CLI lanes of the #381 Gate A plan (PR-A item 3):
+`toon`, `repomix`, `markitdown`, `qmd`, `headroom`, `jcodemunch-mcp`,
+`codebase-memory-mcp`, `ai-memory`, `serena`, `context-mode`, `mcporter` and
+`rtk_proxy`. A lane is the exact basename of its executable at the
+`manifests/stack.json` pin (`serena` or `serena-agent` for Serena; `rtk`
+followed by `proxy` for `rtk_proxy`), from each package's own bin or script
+declaration (cited in `child-usage.mjs` at `LANE_EXECUTABLES`). Two
+lane-membership decisions (2026-09-28): `gcm`, the separate Groq CLI that the
+jcodemunch-mcp package also installs, and `serena-hooks`, Serena's hook entry
+point, are **not** lane executables. Server starts such as
+`headroom mcp serve` or `npx -y repomix --mcp` are lane calls.
+
+The exported `commandInvocations(command)` reads every simple command of the
+text a shell runs, the executed text of the `m4` rule below, so a heredoc
+inside `"$( )"`, a heredoc body and a quoted string that a shell runs follow
+the N1 reading there. Commands split at `;`, `&`, `&&`, `|`, `||`, `|&`,
+newlines, parentheses and around each command substitution
+([POSIX.1-2024 XCU 2.9](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_09)),
+never inside quotes, and redirections with their targets are dropped. Each
+command is resolved past reserved words and `NAME=value` assignments, then
+through:
+
+- wrappers: `timeout`, `env` (including `-S`), `nice`, `stdbuf`, `command`,
+  `exec`, `time`, `nohup`, `sudo` and `xargs`, with the options their POSIX,
+  GNU coreutils 9.4 and sudo 1.9.15p5 synopses list. `command -v`/`-V` and
+  sudo's list, edit and validate modes run nothing;
+- package runners: `npx`, `bunx`, `bun x`, `pnpm dlx` and `yarn dlx` map an npm
+  package to its lane; `uvx`, `uv tool run` and `pipx run` map a PyPI project;
+  `--package`, `--from` and `--spec` name the executable itself; and
+  `python -m markitdown` counts for markitdown. `npx markitdown` names a
+  different npm package and has no lane;
+- `rtk proxy`, as in
+  [rtk v0.50.0 src/main.rs](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L68-L90)
+  and its [proxy dispatch](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L3008-L3042).
+  `-v`, `--verbose`, `--ultra-compact` and `--skip-env` may precede `proxy`.
+  After it, `--ultra-compact`, `--skip-env`, `-h` and one `--` still bind. The
+  installed rtk 0.50.0 runs a `-v` there as the program. rtk runs the proxied
+  command with no shell, and one quoted argument is shell-split, so
+  `rtk proxy 'qmd search x'` counts for both `rtk_proxy` and `qmd`.
+
+A program word with an expansion (`$QMD`, `"$(which qmd)"`), or one behind an
+option the reading does not know (bash's `exec -a`, GNU `xargs -P`, an unlisted
+runner option), is counted in `unresolved_programs` and never becomes a lane.
+Lookups (`command -v qmd`, `type`, `which`, `hash`), data (`grep -n qmd`,
+`git commit -m "use toon"`, `echo 'rtk proxy ls'`, a heredoc that writes a
+script), registrations (`claude mcp add context-mode -- npx -y context-mode`)
+and `rtk` filters (`rtk git status`) invoke no lane.
+
+Fields per actor, summed in each group, which also adds `actors_with_success`
+per lane (actors with at least one succeeded call of the lane):
+
+- `lanes.<lane>`: `calls` are calls with at least one local, non-excluded
+  invocation of the lane, and `invocations` count those invocations. The call
+  states `succeeded`, `failed`, `unfinished` and `unknown` partition `calls`.
+  `not_executed` counts the failed calls that never ran, and `background` the
+  succeeded calls that only started. `ambiguous` counts calls with more than
+  one simple command or a background `&`, whose one state covers every
+  command: `qmd search x || true` reads succeeded and ambiguous.
+  `via_mcporter` counts calls that reached the lane through an mcporter alias.
+  `by_carrier` splits calls into `bash`, `rtk_proxy`, `ctx` and `nested`
+  (sandbox-nested Codex commands).
+- `mcporter_downstream.<server>`: `calls` and the same states for mcporter
+  calls, keyed by the configured server name. The other keys are `(http)` for
+  an HTTP selector or `--http-url`, `(stdio)` for an ad-hoc stdio command, and
+  `(unresolved)` when no server can be read. A name that is not name-shaped or
+  that holds `.`, `:`, `/` or `@` is `(other)`, so no host or URL is emitted.
+- `excluded_version_help.<lane>`: invocations whose own words (up to `--`; for
+  `rtk proxy`, rtk's words before the proxied program) include `--version` or
+  `--help`. The pinned aliases are mcporter's `-h`, `help`, `-v` and `-V`, and
+  rtk's clap `-V` and `-h`. A bare `mcporter` prints help and counts here. So
+  does `rtk --version`, under `rtk_proxy`. Other tools' `-h` or `-V` count as
+  calls.
+- `calls_with_lane_invocation`, `unresolved_programs` and `remote_invocations`.
+  The last counts lane invocations in a string or heredoc that `ssh` runs on
+  another host; these count in no lane.
+
+mcporter follows the [v0.14.1 CLI](https://github.com/openclaw/mcporter/tree/v0.14.1/src/cli)
+(`cli.ts`, `command-inference.ts`, `call-arguments.ts`, `call-command.ts`).
+`lanes.mcporter` counts only operations other than a call: list (including a
+bare server name or a URL), auth, vault, resource, serve, daemon and the
+generators. A call counts for its downstream server, never for mcporter. It
+reaches a lane only through the alias map seeded from `manifests/stack.json`
+(`codebase-memory` to `codebase-memory-mcp` at :280, `context-mode` to
+`context-mode` at :407), and then counts in both places.
+
+The server follows mcporter's own precedence:
+
+- `--http-url`, `--sse` and `--stdio` win, because an ad-hoc server turns
+  `--server` into a name hint;
+- then `--server`/`--mcp`, or the server of a leading `server.tool(...)`
+  expression;
+- then the first positional, promoted to stdio when it holds a blank or starts
+  as a path, and split at its first dot;
+- a later `server=` or `server:` argument sets a server not yet set.
+
+The first positional is the selector even when it holds `=`, so
+`mcporter call server=linear tool=x` names a server `server=linear`, which
+reads `(other)`. Ad-hoc flags without `--http-url` or `--stdio` fail upstream
+and read `(unresolved)`. Tool and server auto-correction ([call-heuristic.md](https://github.com/openclaw/mcporter/blob/v0.14.1/docs/call-heuristic.md))
+means the typed selector may not be the server called. A configured server
+whose URL matches an HTTP selector is reused upstream, but still reads `(http)`
+here.
+
+Call states follow the call's result, since the #381 Gate A plan defines
+"successful" as a tool_result that is not an error. With no result, a persisted native
+status decides (a Codex item's completed, failed or declined); otherwise the
+call is unfinished. `is_error` true is failed. The call is also not_executed
+when:
+
+- its content opens with `<tool_use_error>` (a validation or blocked call);
+- the transcript row's `toolUseResult`, less an `Error: ` prefix, opens with
+  `PreToolUse:`, `Permission for`, `User rejected tool use` or `The user doesn't
+  want to proceed`;
+- an adapter marks the call declined.
+
+These strings were observed on Claude Code 2.1.282 and 2.1.283 transcripts. No
+documented schema covers them. `is_error` false is succeeded, or unknown when
+an adapter sets `native_state: "unknown"` on the result. Neither client records
+a separate exit status for each command in a call, and `is_error` false does
+not mean exit 0. It also covers a nonzero exit that Claude Code interprets
+(`returnCodeInterpretation`, such as grep's "No matches found") and
+context-mode's soft fail
+([exit 1 with output](https://github.com/mksglu/context-mode/blob/v1.0.169/src/exit-classify.ts#L15-L33)).
+
+Against #381 M14 the states map as follows:
+
+- `calls` are attempted calls;
+- `not_executed` are decided and rejected, or cancelled, before execution;
+- `succeeded` plus `failed` less `not_executed` are executed calls;
+- `unfinished` are calls without a result.
+
+The static reading cannot see:
+
+- aliases;
+- shell functions called by name (a function body counts where it is defined);
+- programs a variable names, or `eval` of one;
+- scripts and Makefile or npm targets that call a lane;
+- `find -exec`, `parallel`, `watch` and other unknown wrappers;
+- subprocesses of non-shell code (ctx_execute in Python or JavaScript, Codex
+  code-mode JavaScript);
+- how often `xargs` runs its utility.
+
+It also has these reading limits:
+
+- a `case` pattern at a line start reads as a command;
+- an unquoted remote command (`ssh host qmd ...`) and `eval` arguments are not
+  re-parsed;
+- a `$( )` inside a double-quoted ssh string runs locally but reads as remote;
+- `coproc` and non-POSIX shells are not read.
+
+**Changed meanings.** `measurement.proxy.calls`, M3 `by_carrier.rtk_proxy` and
+`m4.by_carrier` now use this command-position rule, where a prefix rule
+(`^\s*rtk\s+proxy`) applied before. `cd repo && rtk proxy pytest` and
+`FOO=1 rtk proxy pytest` are now rtk proxy calls, and `echo 'rtk proxy ls'`
+never was one. Receipts from before this change (the #369 era) are not
+directly comparable; `proxy.prefix_rule_calls` keeps the old count for that
+comparison.
+
+`m3` covers every result carrier, including `rtk proxy` (a Bash call that runs
+`rtk proxy` in command position, as defined under CLI lanes), with `results`, `bytes`,
 `large_results`, `large_bytes`, `large_result_share`, `large_byte_share` and
 `max_bytes`. Large means strictly greater than 5,120 UTF-8 bytes. This tool's
 content-byte rule measures strings directly and sums the UTF-8 bytes of `text`
@@ -272,7 +433,7 @@ runs past its closing backquote; a `case` pattern's `)` inside a double-quoted
 `"$( )"` ends the substitution early; analyses nested more than 32 levels deep
 read as data; and text that bash rejects as incomplete (an unterminated quote,
 backquote or `$(`) is read to the end of the command as that construct, so its
-counts can move in either direction.
+counts can move in either direction. The CLI lanes read the same executed text.
 Python or Node read stdin with no script operand or with `-`; the retained
 explicit stdin forms apply to other interpreters. A shell reads its script from
 stdin unless `-c` supplies a command string or an operand names a script file:
@@ -305,7 +466,9 @@ traces back to that raw offset; matches the analysis creates (backslash-newline
 joins, unescaping, quoted strings a shell runs) confirm nothing. These are
 possible fetches, including data-only mentions such as a heredoc that writes a
 script, not confirmed operations.
-The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`:
+The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`,
+where a Bash call's carrier is `rtk_proxy` when it runs `rtk proxy` in command
+position (CLI lanes), and `bash` otherwise:
 
 - `routed_share = ctx_fetch_and_index / remote_fetches` uses confirmed fetches.
 - `routed_share_lower_bound = ctx_fetch_and_index / (remote_fetches + fetch_mentions_unconfirmed)`
@@ -369,13 +532,34 @@ These semantic adjudications never change the fixed-config eligible denominator.
 
 Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's
 eligible population, including an otherwise eligible `git diff --stat`.
+`rtk_parts` and `proxy_parts` keep their prefix rule (a part that starts with
+`rtk proxy`), because they model rtk's own per-part rewrite. The legacy
+`rtk.model_typed` lane keeps its own prefix rule too (a command that starts with `rtk`).
 This follows #381's separate acceptance/raw-proxy population. M6 still requires
 acceptance/exception justification; excluding a proxy from coverage does not
 justify it or remove its output from M3.
 A different self-reported version, a non-Linux platform or a failed exclusion
 probe reports `unavailable`; omitted replay is `not_measured`.
-`rtk.not_logged_share` needs the read-only DB join. `measurement.proxy` reports
-acceptance/exception adjudications and unclassified calls for M6.
+`rtk.not_logged_share` needs the read-only DB join.
+
+`measurement.proxy` is M6's population: the Bash calls carried by rtk proxy
+under the command-position rule of the CLI lanes, with sandbox-nested Codex
+calls included as before. It reports acceptance/exception adjudications and
+unclassified calls, and adds four fields:
+
+- `invocations`: the rtk proxy invocations in those calls;
+- `nested`: the sandbox-nested calls among them;
+- `in_ctx_code`: ctx_execute or ctx_batch_execute calls whose shell code runs
+  rtk proxy;
+- `prefix_rule_calls`: the Bash calls whose command starts with `rtk proxy`,
+  the rule used before, kept for comparison.
+
+`in_ctx_code` is reported but left out of M6. That is a decision (2026-09-28)
+against the Gate A plan's M6 row: its population is the Bash children, and
+RTK's hook does not rewrite commands run inside ctx (the plan's rtk row), so
+the one-lane RTK rule does not reach ctx code. Newly counted calls such as
+`cd repo && rtk proxy pytest` arrive without a review. They read unclassified
+until a digest-bound sidecar classifies them, so M6 can fall below 100%.
 
 `usage.messages` deduplicates Claude messages and reports model, effort and
 ordinary input, cache creation, cache read and output separately, with ordinals
