@@ -299,7 +299,8 @@ def require(entry: dict, values: dict) -> None:
 
 
 def child_environment(inventory: dict, entry: dict, injected: dict, env) -> dict:
-    """The caller's environment minus every inventory variable, must_not_be_set name and pointer variable, plus injected.
+    """The caller's environment minus every inventory variable, must_not_be_set name and pointer variable, and plus
+    injected.
 
     A pointer variable holds the path of an entry's store file (PAPER_ENV_FILE, SEC_CONTACT_ENV, ...), which a command
     could load. Only the selected entry's own pointers stay, as the paper units' `--env-file` pointer does."""
@@ -753,7 +754,7 @@ def end_group(child) -> None:
         child.wait(timeout=KILL_WAIT_SECONDS)
 
 
-WATCHDOG = True  # tests switch it off in a launcher, to see the parent-death signal alone; there is no environment switch
+WATCHDOG = True  # a test launcher switches it off, to see the parent-death signal alone; there is no environment switch
 # The watchdog is a second interpreter, started right after the command, that holds a pipe and the number of the
 # command's process group and nothing else (an empty environment: no key). The runner keeps the pipe's write end open
 # for as long as it lives, so when it dies by any signal (SIGKILL, the OOM killer) the kernel closes it and the watchdog
