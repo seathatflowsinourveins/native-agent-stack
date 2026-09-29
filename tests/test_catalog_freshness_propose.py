@@ -35,6 +35,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts import freshness_propose as fp
 from scripts.validate import validate
@@ -45,6 +46,9 @@ WORKFLOW = ROOT / ".github/workflows/catalog-freshness.yml"
 FORBIDDEN_CATALOG_PREFIXES = (
     "catalogs/sota-convergence/", "catalogs/landscape/", "manifests/stack.json", "layer-verdicts",
 )
+# The one generated catalog file the propose path rewrites (docs/decisions/2026-09-23-bot-pr-dispatch.md,
+# addendum 2026-09-29): the ranked catalog index joins every receipts[] entry.
+GENERATED_CATALOG_INDEX = "catalogs/landscape/catalog-index.json"
 EXPECTED_PROPOSE_IF = (
     "github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' && "
     "(inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' && "
@@ -491,6 +495,9 @@ class BuildReceiptTests(unittest.TestCase):
         self.assertIn("report-only", receipt["claim"])
         self.assertIn("was selected, evaluated, or changed", receipt["claim"])
         self.assertIn("pin bump requires its own separately qualified receipt", receipt["claim"])
+        # The one generated catalog file the run rewrites is named as the only catalogs/landscape exception.
+        self.assertIn("no catalogs/landscape/*.json file other than the generated " + GENERATED_CATALOG_INDEX,
+                      receipt["claim"])
         self.assertTrue(receipt["limitations"])
         self.assertNotIn("fallback", " ".join(receipt["limitations"]).lower())
         self.assertEqual(receipt["component_ids"], ["gitleaks"])
@@ -569,9 +576,47 @@ class ApplyIntegrationTests(unittest.TestCase):
         self.assertEqual(result["component_ids"], ["gitleaks", "zizmor"])
         self.assertEqual(result["drifted_component_count"], 2)
         self.assertFalse(result["rehashed_explorer"])  # explorer path was never created/tracked
+        self.assertFalse(result["regenerated_catalog_index"])  # nor is the catalog index in this fixture
 
         summary = validate(self.root)
         self.assertEqual(summary["receipts"], 1)
+
+    def _track_catalog_index(self):
+        (self.root / GENERATED_CATALOG_INDEX).write_text("{}\n", encoding="utf-8")
+        subprocess.run(["git", "add", GENERATED_CATALOG_INDEX], cwd=self.root, check=True)
+
+    def _intercept_catalog_index(self, returncode=0, stderr=""):
+        """Patch subprocess.run so the scripts/catalog_index.py call is recorded, with the receipt ids
+        manifests/evidence.json holds at that moment, instead of run; every other command runs."""
+        calls, real_run = [], subprocess.run
+
+        def run(command, *args, **kwargs):
+            if list(command[:2]) == ["python3", "scripts/catalog_index.py"]:
+                evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+                calls.append({"command": list(command), "cwd": kwargs.get("cwd"),
+                              "capture_output": kwargs.get("capture_output"),
+                              "receipts": [receipt["id"] for receipt in evidence["receipts"]]})
+                return subprocess.CompletedProcess(command, returncode, '{"status": "written"}\n', stderr)
+            return real_run(command, *args, **kwargs)
+
+        return calls, mock.patch.object(fp.subprocess, "run", run)
+
+    def test_apply_regenerates_a_tracked_catalog_index_after_registering_the_receipt(self):
+        """The ranked catalog index joins every receipts[] entry, so the propose path rewrites it after
+        register_receipt (addendum 2026-09-29 of docs/decisions/2026-09-23-bot-pr-dispatch.md)."""
+        self._track_catalog_index()
+        calls, patch = self._intercept_catalog_index()
+        with patch:
+            result = fp.apply(self.root, self.artifact_dir, "https://example.invalid/run/1", "2026-09-23T00:00:00Z")
+        self.assertEqual(calls, [{"command": ["python3", "scripts/catalog_index.py", "--write"], "cwd": self.root,
+                                  "capture_output": True, "receipts": [self.receipt_id]}])
+        self.assertTrue(result["regenerated_catalog_index"])
+
+    def test_apply_raises_when_the_catalog_index_regeneration_fails(self):
+        self._track_catalog_index()
+        _calls, patch = self._intercept_catalog_index(returncode=1, stderr="catalog_index: F2: stale matrix")
+        with patch, self.assertRaisesRegex(fp.FreshnessProposeError, "(?s)catalog_index.py --write failed.*F2"):
+            fp.apply(self.root, self.artifact_dir, "https://example.invalid/run/1", "2026-09-23T00:00:00Z")
 
     def test_apply_never_touches_catalog_selection_files(self):
         before = {relative: (self.root / relative).read_text(encoding="utf-8") for relative in self.sentinel_paths}
@@ -738,6 +783,19 @@ class RebuildExplorerSubprocessTests(unittest.TestCase):
         self.assertFalse(parsed["rehashed_explorer"])  # the default, untracked-explorer path
         self.assertEqual(parsed["component_ids"], ["gitleaks"])
 
+    def test_catalog_index_check_passes_after_the_run(self):
+        """The committed ranked catalog index joins every receipts[] entry; the evidence branch the CLI
+        builds must still pass the index's CI --check (addendum 2026-09-29 of the decision record)."""
+        artifact_dir = _make_artifact(self.scratch, "artifact-catalog-index")
+        result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T05:00:00Z")
+        self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+        check = subprocess.run(
+            ["python3", "scripts/catalog_index.py", "--check"], cwd=self.scratch, capture_output=True, text=True,
+            timeout=180,
+        )
+        self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+        self.assertTrue(json.loads(result.stdout)["regenerated_catalog_index"])
+
     def test_general_publication_validator_passes_after_the_run(self):
         artifact_dir = _make_artifact(self.scratch, "artifact-validate")
         result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T02:00:00Z")
@@ -896,10 +954,24 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn("permissions:\n  contents: read", top_level)
 
     def test_propose_job_never_references_forbidden_catalog_paths_for_writing(self):
-        body = self._job_body("propose")
+        # The generated ranked catalog index is the one exempt path (its own test below); every other
+        # catalogs/landscape/ path, and the other prefixes, stay unreferenced.
+        body = self._job_body("propose").replace(GENERATED_CATALOG_INDEX, "")
         for forbidden in FORBIDDEN_CATALOG_PREFIXES:
             self.assertNotIn(forbidden, body,
                               f"propose job must not reference {forbidden!r} (owned by the SOTA-convergence lane)")
+
+    def test_propose_job_checks_and_commits_the_regenerated_catalog_index_only_when_tracked(self):
+        body = self._job_body("propose")
+        tracked = f"if git ls-files --error-unmatch {GENERATED_CATALOG_INDEX} >/dev/null 2>&1; then"
+        validate_step = body[body.index("- name: Validate the new evidence"):body.index("- name: Check the ecosystem")]
+        self.assertIn(tracked + "\n            python3 scripts/catalog_index.py --check\n", validate_step)
+        commit_step = body[body.index("- name: Commit the evidence branch"):body.index("- name: Push the evidence")]
+        self.assertIn(tracked + f"\n            git add {GENERATED_CATALOG_INDEX}\n", commit_step)
+        # Outside comments, the path appears only in those guards and that add.
+        mentions = [line.strip() for line in body.splitlines() if GENERATED_CATALOG_INDEX in line]
+        self.assertEqual({line for line in mentions if not line.startswith("#")},
+                         {tracked, f"git add {GENERATED_CATALOG_INDEX}"})
 
     def test_propose_job_does_not_dispatch_other_workflows(self):
         # Removed per the Codex cross-family review (P1): a workflow_dispatch run's

@@ -935,9 +935,10 @@ runs [`scripts/freshness_propose.py`](../scripts/freshness_propose.py) to:
    2026-09-22 manifest; not drift, and not "unfetched" either, since it was
    reliably observed). Only the first bucket counts toward drift or appears
    in `component_ids`. Its claim states plainly that the drift is
-   report-only, that no `catalogs/sota-convergence/*`,
-   `catalogs/landscape/*.json`, `manifests/stack.json`, or `layer-verdicts*`
-   file was selected or changed, and that a pin bump needs its own
+   report-only, that no `catalogs/sota-convergence/*`, `manifests/stack.json`
+   or `layer-verdicts*` file, and no `catalogs/landscape/*.json` file other
+   than the generated `catalogs/landscape/catalog-index.json` (step 4), was
+   selected or changed, and that a pin bump needs its own
    separately qualified receipt under `evidence/artifacts/*/` from the
    existing SOTA-convergence lane review -- this job never runs that review
    itself;
@@ -945,8 +946,15 @@ runs [`scripts/freshness_propose.py`](../scripts/freshness_propose.py) to:
    `files[]` (via `scripts/host_receipts.py`'s `register_file`, imported
    directly rather than reimplemented) and upsert the receipt's manifest
    entry into `receipts[]`, both matched by `path`/`id` rather than list
-   position, since neither list's order is assumed stable; and
-4. only when `git ls-files` still tracks `docs/ecosystem/index.html`,
+   position, since neither list's order is assumed stable;
+4. only when `git ls-files` tracks `catalogs/landscape/catalog-index.json`,
+   **rewrite** it with `python3 scripts/catalog_index.py --write`, which
+   re-registers its hash. The ranked catalog index joins every `receipts[]`
+   entry, so the new receipt would otherwise leave it stale and the PR's
+   `validate` run would fail at `catalog_index.py --check`. It runs after
+   step 3 and before step 5, which embeds the index in the explorer (2026-09-29
+   addendum of [the decision record](decisions/2026-09-23-bot-pr-dispatch.md)); and
+5. only when `git ls-files` still tracks `docs/ecosystem/index.html`,
    **rewrite** it from the updated evidence (`scripts/build_ecosystem.py
    --write` -- this regenerates the file's actual content, not only its
    registered hash), rehash it, and loop until `--check` passes. As of
@@ -959,13 +967,15 @@ runs [`scripts/freshness_propose.py`](../scripts/freshness_propose.py) to:
    [the decision record](decisions/2026-09-23-bot-pr-dispatch.md)) this step
    guards against.
 
-`propose`'s remaining steps then re-run `scripts/validate.py` and
-`scripts/host_receipts.py validate` on the result (its checkout uses
+`propose`'s remaining steps then re-run `scripts/validate.py`,
+`scripts/host_receipts.py validate` and, when the index is tracked,
+`scripts/catalog_index.py --check` on the result (its checkout uses
 `fetch-depth: 0`, matching `validate.yml`'s own full-history checkout,
 because `host_receipts.py validate` resolves every existing receipt's
 pinned `catalog_revision` commit and a shallow clone would make historical
 commits unresolvable), commit (`evidence/artifacts/`, `evidence/receipts/`,
-`manifests/evidence.json`, and `docs/ecosystem/index.html` only if tracked)
+`manifests/evidence.json`, and `catalogs/landscape/catalog-index.json` and
+`docs/ecosystem/index.html` each only if tracked)
 as `github-actions[bot]`, and push with the job's own `GITHUB_TOKEN`
 supplied through `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0`
 (`http.https://github.com/.extraheader`, a Basic-auth header built at
