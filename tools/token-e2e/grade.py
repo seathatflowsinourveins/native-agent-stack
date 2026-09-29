@@ -358,6 +358,11 @@ def _codex_bindings(document, exec_rev):
     record = {"trees": trees}
     if isinstance(document.get("conditions"), dict):
         record["conditions"] = document["conditions"]
+    if "parent_servers" in document:  # the parent's `codex mcp list` names at the freeze (M11 for role children)
+        servers = document["parent_servers"]
+        if not isinstance(servers, list) or not all(isinstance(item, str) and item for item in servers):
+            raise fc.Refusal("E_BIND", field="codex_bindings")
+        record["parent_servers"] = list(servers)
     return record, sentinels
 
 
