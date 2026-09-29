@@ -1081,6 +1081,20 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `systemctl` and the systemd launchers are read like the shells and `env` already are.
 - **Launchers named by their path are the same launchers** (`/usr/bin/sudo systemctl show-environment`,
   `/usr/bin/timeout 5 printenv`): the wrapper walk compared the whole word.
+- **A redirection between a launcher's hops is read wherever it stands (2026-09-29).** Bash removes a redirection from the
+  argument list wherever it stands, so `env -u < "$PAPER_ENV_FILE" UNUSED cat` is `env -u UNUSED cat < "$PAPER_ENV_FILE"`.
+  The launcher walk took the operator for the value of `-u`, `--unit`, `-n` and the like, dropped the segment that held the
+  operand and let that string and `systemd-run --pipe --unit < "$PAPER_ENV_FILE" demo cat` through, both refused by the
+  base guard (found by the independent verification review of 172596ed). Now each raw segment is read as written beside
+  any walk; the walkers (`env`, `systemd-run` and its siblings, `sudo`, `nice`, `timeout`, `rtk`, a keyring exec) step
+  over a redirection operator and its target wherever they look for an option, a value or the started command, so they
+  never take one for a value; and an input redirection they stepped over is read with the command that gets it. For every
+  launcher, every position between its hops and each of `<`, `<<<`, `2>`, `>`, `>>` and `&>`, the verdict is the one the
+  same command gets with the redirection written last (684 combinations in the tests, none looser than the base guard; 166
+  stricter, the operand of a `cat` that the base guard missed because it stood before the command, as in
+  `env -u UNUSED < .env cat`). A number before an operator still ends the options of `sudo` and `nice`
+  (`sudo 2>/dev/null -u root printenv`): shlex splits `2>` and `2 >` alike, so a descriptor and a value look the same, a
+  recorded gap.
 - **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
   exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
   `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is

@@ -668,8 +668,11 @@ def input_redirection_segments(words: list[str]) -> list[list[str]]:
     `cmd args < FILE` does, so the rules read it that way."""
     width = redirection_width(words, 0) if words else 0
     found = []
-    if width and words[width - 2] in {"<", "<>"}:
-        found.append(["cat", words[-1]] if width == len(words) else words[width:] + words[:width])
+    if width and words[width - 2] in {"<", "<>", "<<<"}:
+        if width < len(words):
+            found.append(words[width:] + words[:width])
+        elif words[width - 2] != "<<<":  # a here-string with no command reads nothing
+            found.append(["cat", words[-1]])
     found += [["cat", words[at + 1]] for at, word in enumerate(words[:-1]) if PAREN_INPUT.fullmatch(word)]
     return found
 
@@ -702,12 +705,29 @@ def command_arguments(words: list[str]) -> list[str]:
     return result
 
 
-def wrapper_options(words: list[str], index: int, wrapper: str) -> tuple[list[tuple[str, str | None]], int]:
+def skip_redirections(words: list[str], index: int, moved: list[str] | None = None) -> int:
+    """Index of the first word at or after `index` that is no redirection operator or its target. Bash takes a redirection out of the
+    argument list wherever it stands, so the value of an option, the duration of timeout and the command that a launcher starts are the next
+    words that are none: `env -u < FILE UNUSED cat` is `env -u UNUSED cat < FILE`. The launcher walk took the operator for the value of
+    `-u`, dropped the segment that held the operand and let a credential file through (found by the verification review of 172596ed).
+    Only an operator token starts a redirection here (a bare number may be a value: `nice -n 5 > out cmd`). An input redirection that is
+    skipped is appended to `moved`, for the caller to read with the command that gets it, as if it stood after that command."""
+    while index < len(words) and REDIRECTION.match(words[index]):
+        width = 3 if words[index] == "<<" and words[index + 1:index + 2] == ["-"] else 2
+        if moved is not None and words[index].lstrip("0123456789").startswith("<"):
+            moved.extend(words[index:index + width])
+        index += width
+    return index
+
+
+def wrapper_options(words: list[str], index: int, wrapper: str,
+                    moved: list[str] | None = None) -> tuple[list[tuple[str, str | None]], int]:
     """A launcher's own options from words[index:], as getopt reads them, and the index of the first word after
     them: `--` ends them; in a cluster of short options (`-iu`) the first that takes a value takes the rest of the
     cluster (`-o0`) or, when it ends the cluster, the next word (`-o 0`, `nice -n 10`, `sudo -u root`). Each option
     comes back as (name, value): `--unit=x` and `--unit x` are ("--unit", "x"), `-EFOO` and `-E FOO` are ("-E", "FOO"),
-    a boolean option has the value None, and so does a value option with no word left."""
+    a boolean option has the value None, and so does a value option with no word left. A redirection is no option and no
+    value, wherever it stands (skip_redirections); an input redirection skipped goes to `moved`."""
     value_flags = WRAPPER_VALUE_FLAGS.get(wrapper, set())
     options: list[tuple[str, str | None]] = []
     while index < len(words):
@@ -715,7 +735,14 @@ def wrapper_options(words: list[str], index: int, wrapper: str) -> tuple[list[tu
         if word == "--":
             return options, index + 1
         if wrapper in SYSTEMD_LAUNCHERS and (width := redirection_width(words, index)):
-            index += width  # a redirection is no option, and options may follow it (not for timeout: its duration `5` reads as `5>`)
+            # a redirection is no option, and options may follow it; here a number before the operator is its descriptor (for the other
+            # launchers it may be a value: timeout's duration `5` reads as `5>`, so only the operator itself is skipped)
+            if moved is not None and words[index + width - 2].startswith("<"):
+                moved.extend(words[index + width - 2:index + width])
+            index += width
+            continue
+        if REDIRECTION.match(word):
+            index = skip_redirections(words, index, moved)
             continue
         if not word.startswith("-") or word == "-":
             return options, index
@@ -725,6 +752,7 @@ def wrapper_options(words: list[str], index: int, wrapper: str) -> tuple[list[tu
             if glued:
                 options.append((name, value))
             elif word in value_flags:
+                index = skip_redirections(words, index, moved)
                 options.append((word, words[index] if index < len(words) else None))
                 index += 1
             else:
@@ -738,14 +766,15 @@ def wrapper_options(words: list[str], index: int, wrapper: str) -> tuple[list[tu
                 if glued:
                     options.append((f"-{letters[first]}", glued))
                 else:
+                    index = skip_redirections(words, index, moved)
                     options.append((f"-{letters[first]}", words[index] if index < len(words) else None))
                     index += 1
     return options, index
 
 
-def skip_wrapper_options(words: list[str], index: int, wrapper: str) -> int:
+def skip_wrapper_options(words: list[str], index: int, wrapper: str, moved: list[str] | None = None) -> int:
     """Index of the first word after a launcher's own options (wrapper_options)."""
-    return wrapper_options(words, index, wrapper)[1]
+    return wrapper_options(words, index, wrapper, moved)[1]
 
 
 def strip_prefix(words: list[str]) -> list[str]:
@@ -755,9 +784,10 @@ def strip_prefix(words: list[str]) -> list[str]:
     return words[prefix_end(words):]
 
 
-def prefix_end(words: list[str], index: int = 0) -> int:
+def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None) -> int:
     """Index of the command in words[index:], past what strip_prefix drops. It returns an index and copies
-    nothing, so a chain of launchers is walked once, not once per hop."""
+    nothing, so a chain of launchers is walked once, not once per hop. Input redirections that a launcher's options
+    stand around go to `moved` (skip_redirections)."""
     while index < len(words):
         word = words[index]
         width = redirection_width(words, index)
@@ -766,7 +796,7 @@ def prefix_end(words: list[str], index: int = 0) -> int:
         elif width and REDIRECT_OUT.match(words[index + width - 2]):
             index += width
         elif (name := word.rsplit("/", 1)[-1]) in WRAPPERS or name == "timeout":
-            index = skip_wrapper_options(words, index + 1, name)
+            index = skip_wrapper_options(words, index + 1, name, moved)
             if name == "timeout":
                 index += 1  # timeout's mandatory duration comes before the command
         else:
@@ -778,13 +808,17 @@ def program_of(words: list[str]) -> str:
     return words[0].rsplit("/", 1)[-1] if words else ""
 
 
-def env_command_start(words: list[str], at: int = 0) -> int | None:
-    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump."""
+def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = None) -> int | None:
+    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump. A redirection
+    among its words is no option and no value (skip_redirections); an input redirection skipped goes to `moved`."""
     index = at + 1
     while index < len(words):
+        index = skip_redirections(words, index, moved)
+        if index >= len(words):
+            break
         word = words[index]
         if word in ENV_ARG_OPTIONS:
-            index += 2
+            index = skip_redirections(words, index + 1, moved) + 1
         elif word.startswith("-") or re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
             index += 1
         else:
@@ -911,7 +945,12 @@ def keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
                 return None  # kernel_keyring.py refuses to start anything without the separator
             separator = arguments.index("--")
             variable = arguments[separator - 1] if separator else None
-            return variable if variable and ENV_NAME.fullmatch(variable) else None, arguments[separator + 1:]
+            moved: list[str] = []  # an input redirection among the script's own arguments is read with the command it starts
+            index = 0
+            while index < separator:
+                after = skip_redirections(arguments, index, moved)
+                index = after if after != index else index + 1
+            return variable if variable and ENV_NAME.fullmatch(variable) else None, arguments[separator + 1:] + moved
         if name in KEYRING_WRAPPERS and (position == 0 or program_of(words) in SHELLS):
             variable, target = KEYRING_WRAPPERS[name]
             return variable, [target, *words[position + 1:]]
@@ -946,50 +985,53 @@ def rtk_command(words: list[str]) -> list[str]:
     return [subcommand, *rest]
 
 
-def rtk_command_start(words: list[str], at: int) -> int | None:
+def rtk_command_start(words: list[str], at: int, moved: list[str] | None = None) -> int | None:
     """Index in words of the command that the rtk at words[at] starts, when that command is a tail of words: after a
     runner's flags (see RTK_RUNNERS) or, for the other subcommands, the subcommand itself (`rtk grep x` runs `grep x`).
     None when it names none, or for `rtk run` and the file readers, whose command rtk_command builds."""
-    index = at + 1
+    index = skip_redirections(words, at + 1, moved)
     while index < len(words) and words[index].startswith("-"):
-        index += 1
+        index = skip_redirections(words, index + 1, moved)
     if index >= len(words):
         return None
     subcommand = words[index]
     if subcommand in RTK_RUNNERS:
-        start = index + 1
+        start = skip_redirections(words, index + 1, moved)
         while start < len(words) and words[start].startswith("-") and words[start] != "--":
-            start += 1
-        return start + 1 if words[start:start + 1] == ["--"] else start
+            start = skip_redirections(words, start + 1, moved)
+        return skip_redirections(words, start + 1, moved) if words[start:start + 1] == ["--"] else start
     if subcommand == "run" or subcommand in RTK_FILE_READERS:
         return None
     return index
 
 
-def launcher_chain(words: list[str]) -> tuple[list[list[str]], int]:
-    """The env, rtk and systemd-run launchers that start words, and the index of the command they start. A
-    systemd-run comes back as its own words (the rule on its options reads them); an env or rtk that starts a command
-    needs no segment of its own, because that command is the next one. It walks the chain with an index: copying the
-    rest of the words at every hop made a chain of n launchers cost n squared, 29 s for 20,000 `env`."""
+def launcher_chain(words: list[str]) -> tuple[list[list[str]], int, list[str]]:
+    """The env, rtk and systemd-run launchers that start words, the index of the command they start, and the input
+    redirections that stood among the launchers' options (a redirection is no option and no value, so the walk steps over it;
+    the caller reads it with the command that gets it). A systemd-run comes back as its own words (the rule on its options
+    reads them); an env or rtk that starts a command needs no segment of its own, because that command is the next one. It
+    walks the chain with an index: copying the rest of the words at every hop made a chain of n launchers cost n squared,
+    29 s for 20,000 `env`."""
     entries: list[list[str]] = []
+    moved: list[str] = []
     at = 0
     while at < len(words):
         program = program_of(words[at:at + 1])
         if program == "env":
-            start = env_command_start(words, at)
+            start = env_command_start(words, at, moved)
             if start is None:
                 break
         elif program in SYSTEMD_LAUNCHERS:
-            start = skip_wrapper_options(words, at + 1, program)
+            start = skip_wrapper_options(words, at + 1, program, moved)
             entries.append(words[at:start])
         elif program == "rtk":
-            start = rtk_command_start(words, at)
+            start = rtk_command_start(words, at, moved)
             if start is None:
                 break
         else:
             break
-        at = prefix_end(words, start)
-    return entries, at
+        at = prefix_end(words, start, moved)
+    return entries, at, moved
 
 
 def receiving_command(words: list[str]) -> tuple[str, int] | None:
@@ -1102,12 +1144,20 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     continue
             else:
                 seen.add(tuple(raw))
-            words = raw[prefix_end(raw):]
+            result.append(raw)  # as written, before any launcher walk: a redirection is checked wherever the walk would put it
+            skipped: list[str] = []
+            words = raw[prefix_end(raw, 0, skipped):]
             while words:
-                entries, start = launcher_chain(words)
+                entries, start, moved = launcher_chain(words)
                 result.extend(entries)
                 if start:
                     words = words[start:]
+                    if words:
+                        words = words + skipped + moved  # the input redirections stepped over are read with the command that gets them
+                        skipped = []
+                elif skipped:
+                    words = words + skipped
+                    skipped = []
                 if not words:
                     break
                 result.append(words)

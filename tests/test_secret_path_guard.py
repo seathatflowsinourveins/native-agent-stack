@@ -586,6 +586,7 @@ BLOCKED = {
     "cat <<< \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",  # cat and tee are no data consumers: a here-string, a file name
     "tee note.md <<< \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
     "cat <<'EOF' > note.md\nvalue: \"$(printenv)\"\nEOF": "environment_dump",  # a top-level here-document's lines are command lines
+    "nice > /tmp/out -n 5 cat .env": "dotenv_read",  # a redirection operator between the options no longer ends them (172596ed passed it)
     "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" && x=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",  # the second idiom is an assignment
     "echo \"a $(git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\")\"": "environment_dump",  # inside another substitution's body
     # The raw-text rules read the whole command as they always did, the exempt body included: a store path, a secret name or expansion and
@@ -1181,10 +1182,10 @@ EXPECTED_PASS_THROUGH = [
     "systemd-run --user /bin/true APCA_API_SECRET_KEY=abc",
     "echo \"${ printenv; }\"",
     "bash -c \"echo \\\"\\`printenv\\`\\\"\"",
-    # A redirection between the options of sudo, nice and the older wrappers still ends them (`timeout 5 > out cmd` reads its duration
-    # `5` as a descriptor, so the walk is left as it was for all of them): the next option is taken for the command.
+    # A redirection operator between the options of a launcher is stepped over (skip_redirections), but a NUMBER before it still ends them for
+    # sudo, nice and the older wrappers (`timeout 5 > out cmd` reads its duration `5` as a descriptor, and shlex splits `2>` and `2 >`
+    # alike, so the walk cannot tell a descriptor from a value): the number is taken for the command.
     "sudo 2>/dev/null -u root printenv",
-    "nice > /tmp/out -n 5 cat .env",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
@@ -1926,6 +1927,65 @@ class SecretPathGuardTests(unittest.TestCase):
         for text in rejected:
             with self.subTest(text=text):
                 self.assertEqual(guard.idiom_spans(text), [])
+
+    def test_a_redirection_between_launcher_hops_is_read_wherever_it_stands(self):
+        # bash takes a redirection out of the argument list wherever it stands, so `env -u < FILE UNUSED cat` is `env -u UNUSED cat < FILE`.
+        # The launcher walk took the redirection operator for the value of `-u` (and of `--unit`, `-n`, the duration of timeout ...), dropped
+        # the segment that held the operand, and let a credential file through that the base guard refused (found by the verification review
+        # of 172596ed). The raw segment is now read beside every walk, the walkers step over a redirection and its target wherever they
+        # look for an option, a value or the command, and an input redirection they skipped is read with the command that gets it.
+        # For every launcher, every position between its hops and every redirection operator, the verdict must be the one the same command
+        # gets with the redirection written last: a credential pointer or file read through `<` is refused, and nothing else changes.
+        pointer, files = '"$PAPER_ENV_FILE"', {".env": "dotenv_read", "~/.aws/credentials": "credential_file_read"}
+        launchers = {
+            "env": ["env", None, "-u", None, "UNUSED", None, "FOO=1", None, "cat"],
+            "env -i": ["env", None, "-i", None, "FOO=1", None, "cat"],
+            "systemd-run": ["systemd-run", None, "--pipe", None, "--unit", None, "demo", None, "cat"],
+            "sudo": ["sudo", None, "-u", None, "root", None, "cat"],
+            "timeout": ["timeout", None, "5", None, "cat"],
+            "timeout -s": ["timeout", None, "-s", None, "KILL", None, "5", None, "cat"],
+            "nice": ["nice", None, "-n", None, "5", None, "cat"],
+            "rtk proxy": ["rtk", None, "proxy", None, "cat"],
+            "keyring exec": ["python3", "scripts/kernel_keyring.py", "exec", "tavily_api_key", "TAVILY_API_KEY", None, "--", None, "cat"],
+            "sudo env": ["sudo", None, "env", None, "-u", None, "UNUSED", None, "cat"],
+            "env sudo": ["env", None, "sudo", None, "-u", None, "root", None, "cat"],
+            "nohup timeout": ["nohup", None, "timeout", None, "5", None, "cat"],
+        }
+        rows = 0
+        for name, template in launchers.items():
+            slots = [at for at, word in enumerate(template) if word is None]
+            for slot, operator, target in itertools.product(slots, ("<", "<<<", "2>", ">", ">>", "&>"), (pointer, *files)):
+                redirect = f"{operator} {target}"
+                command = " ".join(redirect if at == slot else word for at, word in enumerate(template) if word is not None or at == slot)
+                last = " ".join(word for word in template if word is not None) + " " + redirect
+                if target == pointer and operator in ("<", "<<<"):
+                    expected = "credential_file_read"
+                elif operator in ("<", "<<<") and target in files:
+                    expected = files[target]  # the guard reads the word after `<<<` as an operand of a reader, as the base guard does
+                else:
+                    expected = None
+                rows += 1
+                with self.subTest(launcher=name, position=slot, command=command):
+                    self.assertEqual(guard.check(last), expected)
+                    self.assertEqual(guard.check(command), expected)
+        self.assertGreaterEqual(rows, 600)
+
+    def test_the_reviewer_strings_for_launcher_redirections_are_refused(self):
+        for command in ('env -u < "$PAPER_ENV_FILE" UNUSED cat', 'systemd-run --pipe --unit < "$PAPER_ENV_FILE" demo cat',
+                        'sudo env -u < "$PAPER_ENV_FILE" UNUSED cat', 'env sudo -u <<< "$PAPER_ENV_FILE" root cat',
+                        'nice -n < "$PAPER_ENV_FILE" 5 cat', 'timeout < "$PAPER_ENV_FILE" 5 cat', 'rtk < "$PAPER_ENV_FILE" proxy cat',
+                        f'{EXEC} < "$PAPER_ENV_FILE" cat', 'sudo < "$PAPER_ENV_FILE"', 'nice < "$PAPER_ENV_FILE"',
+                        'timeout 5 < "$PAPER_ENV_FILE"', 'nohup <<< "$PAPER_ENV_FILE"', 'env < "$PAPER_ENV_FILE"',
+                        'systemd-run --pipe < "$PAPER_ENV_FILE"', 'env -u < /dev/null UNUSED printenv', 'systemd-run --unit < /dev/null demo printenv',
+                        'sudo -u < /dev/null root printenv', 'nice -n < /dev/null 5 printenv', 'timeout < /dev/null 5 printenv',
+                        'rtk < /dev/null proxy printenv', 'nice > /tmp/out -n 5 cat .env'):
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+        # an option's value that is a real word is still taken as the value: nothing the guard let through changes
+        for command in ('env -u FOO ls', 'systemd-run --user --unit demo /bin/true', 'sudo -u root ls', 'nice -n 5 ls', 'timeout 5 ls',
+                        'timeout -s KILL 5 ls > /tmp/out', 'nice -n 5 ls 2> /tmp/err', 'env FOO=1 ls < input.txt', 'sudo -u root sort < input.txt'):
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
 
     def test_a_here_document_terminated_by_a_joined_line_is_not_an_idiom(self):
         # The guard joins backslash-newline pairs, which in a quoted here-document are text: joining `text\` and `EOF` made one line
