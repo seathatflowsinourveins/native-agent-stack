@@ -35,8 +35,8 @@
 // most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls (default 200), counted across the main
 // conversation and every subagent, and a capped call returns a notice instead of results (tools-reference,
 // "Session search limit"). A capped call changes no usage and no exit code; callers decide what it means.
-import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, openSync, closeSync, fchmodSync, lstatSync, realpathSync } from 'node:fs'
+import { join, resolve, dirname, basename as pathBasename } from 'node:path'
 import { homedir, tmpdir } from 'node:os'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawnSync } from 'node:child_process'
@@ -2537,6 +2537,59 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     calls_without_result: unfinished }
 }
 
+// The private per-call ledger (AA:319, the per-child list of tool_use_ids with each call's state; U2 design 4.5): one record per call
+// attempted in the window (tool_use blocks deduplicated by id, counted in the window of their row, as measureTranscript counts them), in
+// the order of their rows, keyed by (session_id, tool_use_id) as the E2E README M14 row requires, with the call's M14 state and cause and,
+// for an MCP call, its M15 class. session_id and owner come from the call's row: owner is its agentId, 'main' for a row with a sessionId
+// and no agentId, and null for a row with neither, such as a Codex bridge row, whose conversation.id and owner the Codex adapter supplies.
+// Nothing here is published: the CLI writes the records only behind --call-ledger (writeLedger).
+export function callLedger(transcript, { window = null } = {}) {
+  const calls = new Map(), results = new Map()
+  const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
+  for (const row of transcript) {
+    if (window && (timeOf(row) === null || timeOf(row) >= window.until)) continue
+    for (const b of blocksOf(row)) {
+      if (row.type === 'assistant' && b.type === 'tool_use' && !calls.has(b.id)) calls.set(b.id, { ...b, row })
+      if (row.type === 'user' && b.type === 'tool_result' && !results.has(b.tool_use_id)) results.set(b.tool_use_id, { ...b, row })
+    }
+  }
+  const named = (v) => typeof v === 'string' && v ? v : null
+  const records = []
+  for (const c of calls.values()) {
+    if (!inside(c.row)) continue
+    const r = results.get(c.id), s = callState(c, r), m = m14Of(s), server = mcpServer(c.name)
+    const session = named(c.row?.sessionId), agent = named(c.row?.agentId)
+    records.push({ session_id: session, owner: agent ?? (session ? 'main' : null), tool_use_id: c.id, tool: String(c.name ?? ''), server,
+      state: m.state, cause: m.cause, native_status: named(c.native_status), background: m.background, sandbox: Boolean(c.sandbox),
+      code_mode: Boolean(c.code_mode), m15_class: server ? mcpErrorClass(c, r, s) : null })
+  }
+  return records
+}
+// --call-ledger: the ledger holds call, session and agent ids, so it is only created, never written over an existing file (whose mode could
+// be wider than 0600: the review's finding on the mkdtemp precedent), in an existing directory outside every git work tree (a directory that
+// holds .git, or one below it; skill_usage.py write_out refuses its own checkout, and this refuses any). { path } or { error }.
+export function ledgerTarget(path) {
+  const target = resolve(String(path))
+  let dir
+  try { dir = realpathSync(dirname(target)) } catch { return { error: 'the directory for the ledger does not exist' } }
+  try { if (!statSync(dir).isDirectory()) return { error: 'the ledger path must name a file in a directory' } } catch { return { error: 'the directory for the ledger cannot be read' } }
+  for (let d = dir; ; d = dirname(d)) {
+    if (existsSync(join(d, '.git'))) return { error: 'refusing a path inside a git work tree: the ledger holds call and session ids' }
+    if (dirname(d) === d) break
+  }
+  const file = join(dir, pathBasename(target))
+  try { lstatSync(file); return { error: 'refusing an existing file: the ledger is created, never written over' } } catch { /* absent, as required */ }
+  return { path: file }
+}
+// JSONL, created exclusively ('wx') with mode 0600, then set to 0600 against a umask.
+export function writeLedger(path, records) {
+  const fd = openSync(path, 'wx', 0o600)
+  try {
+    fchmodSync(fd, 0o600)
+    writeFileSync(fd, records.map((r) => JSON.stringify(r) + '\n').join(''))
+  } finally { closeSync(fd) }
+}
+
 const HOOK_SCALARS = ['inserted', 'inserted_blocks', 'claimed', 'with_marker', 'hook_names_folded']
 const HOOK_MAPS = ['by_hook', 'by_event', 'blocks_by_event', 'claimed_by_event', 'claimed_plain_stdout', 'other_hook_rows']
 // The carriers of the AA §1 per-child shell/web figure: Bash, rtk proxy and WebFetch results (WebSearch results stay in 'other').
@@ -2841,8 +2894,9 @@ const LANES_LIMITS = 'Counts come from native transcript rows inside [since, unt
 
 const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs, read with the pinned tree-sitter-bash install that loadShellParser verified (its versions and wasm sha256 values are in cli_lanes.parser; without it cli_lanes is only { status: parser_unavailable, reason } and measurement.proxy uses the prefix rule, rule prefix_fallback) (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names (an eval of literal words is read), scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility; text the grammar reports as an error is skipped and its calls are counted in parse_errors. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
 
-// Lane use of every child transcript under the roots that has a row inside [since, until).
-export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [] } = {}) {
+// Lane use of every child transcript under the roots that has a row inside [since, until). onLedger, when given, receives each actor's
+// private call ledger (callLedger) with the ordinal the actor has in the published actors list; nothing of it enters the returned report.
+export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [], onLedger = null } = {}) {
   const window = { since: since ?? -Infinity, until: until ?? Infinity }
   const unreadable = { count: 0 }
   const files = findChildTranscripts(roots, unreadable, true)
@@ -2878,6 +2932,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     }
     actor.lanes.measurement.parse_errors = errors
     if (errors) { actor.lanes.measurement.bytes_complete = false; actor.lanes.measurement.usage.complete = false }
+    if (onLedger) actor.ledger = callLedger(rows, { window })
     ;(file.spawn === 'main' ? main : children).push(actor)
   }
   // Sessions are reported as session-01, session-02 ... in order of their earliest child row, never by id.
@@ -2893,6 +2948,8 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
   const blind = (c) => c.agent_type.startsWith('blind-')
   const iso = (t) => Number.isFinite(t) ? new Date(t).toISOString() : null
   const bound = exceptionRecords.filter((r) => measuredDigests.has(r.transcript_sha256)).length
+  // The actors list below numbers children, then main sessions, from 1; each ledger record carries its actor's number.
+  if (onLedger) [...children, ...main].forEach((c, i) => { onLedger(c.ledger.map((r) => ({ ...r, actor_ordinal: i + 1 }))); delete c.ledger })
   return {
     kind: 'claude_child_lane_usage', schema_version: 1,
     window: { since: iso(window.since), until: iso(window.until) }, marker,
@@ -3011,6 +3068,8 @@ export function summarizeRun(dir, lanesOptions = {}) {
     const data = found ? readRows(logPath) : { rows: [], errors: 0, digest: '' }
     const child = summarizeChild(s, results.get(s.agentId) || null, meta, data.rows, found,
       { ...lanesOptions, exceptions: exceptionsFor(lanesOptions.exceptionRecords || [], data.digest) })
+    // lanesOptions.onLedger receives the attempt's private call ledger with its journal label and whether a later attempt superseded it.
+    if (lanesOptions.onLedger) lanesOptions.onLedger(callLedger(data.rows).map((r) => ({ ...r, label: s.label ?? null, superseded: supersededBy.has(s.agentId) })))
     return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
   const children = attempts.filter((c) => !c.superseded_by)
@@ -3069,11 +3128,12 @@ export function latestRunDir(cwd, configDir) {
 
 const USAGE = 'usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>] [--rtk-db <history.db>] [--marker <text>]\n' +
   '       child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] [--since <ISO>] [--until <ISO>] [--rtk-db <history.db>] [--marker <text>]\n' +
-  '       both modes: [--rtk-check] [--exceptions <private-json>] [--shell-parser <tree-sitter-bash install dir>]'
+  '       both modes: [--rtk-check] [--exceptions <private-json>] [--shell-parser <tree-sitter-bash install dir>]\n' +
+  '                   [--call-ledger <new private JSONL file outside every git work tree>]'
 // { error } or the parsed options. An option value may not start with "--"; each option but --root is given once.
 export function parseArgs(argv) {
   const o = { positional: [], roots: [], sweep: false }
-  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath', '--shell-parser': 'shellParser' }
+  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath', '--shell-parser': 'shellParser', '--call-ledger': 'callLedger' }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--root' || Object.hasOwn(valued, a)) {
@@ -3119,6 +3179,19 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   if (o.exceptionsPath) {
     try { exceptionRecords = loadExceptions(o.exceptionsPath) } catch { console.error('--exceptions: invalid or unreadable sidecar'); process.exit(2) }
   }
+  // --call-ledger: checked before any work and written before stdout, so a refusal or a failed write exits 2 with no report and no file.
+  let ledgerPath = null
+  if (o.callLedger !== undefined) {
+    const target = ledgerTarget(o.callLedger)
+    if (target.error) { console.error('--call-ledger: ' + target.error); process.exit(2) }
+    ledgerPath = target.path
+  }
+  const ledger = []
+  const onLedger = ledgerPath ? (records) => { for (const r of records) ledger.push(r) } : null
+  const saveLedger = () => {
+    if (!ledgerPath) return
+    try { writeLedger(ledgerPath, ledger) } catch (e) { console.error('--call-ledger: cannot create the file (' + (e.code || e.message) + ')'); process.exit(2) }
+  }
   // The verified tree-sitter-bash install that cli_lanes needs (loadShellParser: --shell-parser, CHILD_USAGE_SHELL_PARSER, then the
   // default directory). An install named on the command line that cannot be honored is an error, like --rtk-db; one that is missing
   // by default or by the environment leaves cli_lanes as parser_unavailable, and the rest of the report is unchanged.
@@ -3129,16 +3202,19 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   if (o.sweep) {
     const notDirs = o.roots.filter((r) => { try { return !statSync(r).isDirectory() } catch { return true } })
     if (notDirs.length) { console.error('--root is not a readable directory: ' + notDirs.join(', ')); process.exit(2) }
-    process.stdout.write(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk, rtkCheck: o.rtkCheck, exceptionRecords })) + '\n')
+    const report = sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk, rtkCheck: o.rtkCheck, exceptionRecords, onLedger })
+    saveLedger()
+    process.stdout.write(sortedJson(report) + '\n')
     process.exitCode = 0
   } else {
     const target = o.positional[0]
     const required = o.required ?? null
     const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
     if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
-    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null, rtkCheck: o.rtkCheck, exceptionRecords }) }
+    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null, rtkCheck: o.rtkCheck, exceptionRecords, onLedger }) }
     if (rtk) out.rtk_db = { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates }
     if (required) out.effort_mismatches = effortMismatches(out, required)
+    saveLedger()
     process.stdout.write(JSON.stringify(out, null, 2) + '\n')
     process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
   }
