@@ -38,18 +38,31 @@ native scope and refreshes usage on return. That host launcher is a local
 integration, not an upstream Claude executable and not installed by this recipe.
 On another PC, native `claude` is sufficient; retain any accepted local launcher.
 
-For Windows Terminal, add a named profile with paths resolved on that PC:
+For Windows Terminal, add a named profile with the distro, WSL user and project resolved on that PC. The
+[fragment example](../examples/claude-native/windows-terminal.fragment.example.json) carries the Shell, Codex and
+Claude set; its install steps, the login-shell check and the Claude Code notification overlay are in
+[the Linux/WSL2 page](../adoption/platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell). The
+Claude entry, with its settings explained below:
 
 ```json
 {
   "name": "Claude Code (Ubuntu)",
-  "commandline": "wsl.exe -d Ubuntu-24.04 --cd /absolute/project --exec /absolute/native/claude",
-  "hidden": false
+  "commandline": "wsl.exe -d Ubuntu-24.04 -u <wsl-user> --cd /absolute/project --exec /bin/bash -lc \"exec claude\"",
+  "startingDirectory": "%USERPROFILE%",
+  "hidden": false,
+  "environment": { "COLORTERM": "truecolor" },
+  "tabTitle": "Claude Code (Ubuntu)",
+  "bellStyle": ["audible", "taskbar"],
+  "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+  "closeOnExit": "graceful"
 }
 ```
 
-Use the actual distro, project and native executable. If the accepted local
-launcher is selected instead, append its `--project /absolute/project` option.
+Use the actual distro, WSL user and project (`startingDirectory` is only the Windows-side working directory of `wsl.exe`; `--cd` sets the Linux one). If the accepted local launcher is selected instead, run it in place of
+`claude` and append its `--project /absolute/project` option. `closeOnExit: graceful` closes the tab on a normal
+exit and keeps a failed start open with its exit code visible (the default `automatic` behaves the same for a process
+Terminal launches itself,
+[profile termination behavior](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-advanced#profile-termination-behavior)).
 Preserve other profiles and the user's terminal default. Windows Terminal
 already supports Shift+Enter; use the official
 [terminal configuration](https://code.claude.com/docs/en/terminal-config) only
@@ -87,8 +100,7 @@ limits in [the 2026-09-28 terminal decision](../docs/decisions/2026-09-28-termin
   `[tui] notifications = ["approval-requested", "plan-mode-prompt", "async-question"]`.
 - Claude Code draws in 256 colours under WSL because `COLORTERM` is unset, although Windows
   Terminal renders 24-bit. Add `"environment": { "COLORTERM": "truecolor" }` to its profile:
-  Windows Terminal sets the key on the launched process and adds it to `WSLENV`, so the
-  `--exec` command line above stays unchanged. Codex promotes truecolor itself when
+  Windows Terminal sets the key on the launched process and adds it to `WSLENV`, so the `--exec` command line above stays unchanged. A profile's own `environment` replaces `profiles.defaults.environment` instead of merging with it, so copy any variables the defaults set into it. Codex promotes truecolor itself when
   `WT_SESSION` is set.
 - If the profile starts a login shell (`bash -lc`), bash reads only the first of `~/.bash_profile`, `~/.bash_login` and
   `~/.profile` (`bash(1)` INVOCATION), so a file created at one of the first two names hides the PATH and `~/.bashrc` that
