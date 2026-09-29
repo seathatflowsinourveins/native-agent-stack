@@ -411,6 +411,9 @@ class ProvisioningStepRuns(unittest.TestCase):
     stand-in npm that records its arguments, so nothing is installed and nothing leaves the machine."""
 
     text = VALIDATE_YML.read_text(encoding="utf-8")
+    # What the promotion gate step wrote to GITHUB_ENV before this one: the file is appended to by every step of the
+    # job, so a step that rewrote it would drop these variables.
+    PRIOR = "PROMOTION_GATE_PYTHON=stub\nREQUIRE_PROMOTION_GATE_VENV=1\n"
 
     def run_step(self, pin=None, npm_exit=0):
         lines = self.text.split("\n")
@@ -425,15 +428,16 @@ class ProvisioningStepRuns(unittest.TestCase):
             stub.mkdir()
             (stub / "npm").write_text('#!/bin/sh\nprintf \'%s\\n\' "$@" > "$NPM_ARGV_FILE"\nexit "$NPM_EXIT"\n', encoding="utf-8")
             (stub / "npm").chmod(0o755)
-            (scratch / "github-env").write_text("", encoding="utf-8")
+            (scratch / "github-env").write_text(self.PRIOR, encoding="utf-8")
             (scratch / "step.sh").write_text(script, encoding="utf-8")
             env = {"PATH": f"{stub}{os.pathsep}{os.environ['PATH']}", "HOME": str(scratch), "RUNNER_TEMP": str(temp),
                    "GITHUB_ENV": str(scratch / "github-env"), "NPM_ARGV_FILE": str(scratch / "argv"), "NPM_EXIT": str(npm_exit)}
             done = subprocess.run(["bash", "--noprofile", "--norc", "-e", str(scratch / "step.sh")], cwd=workspace, env=env,
                                   capture_output=True, text=True, timeout=60, check=False)
             argv = (scratch / "argv").read_text(encoding="utf-8").splitlines() if (scratch / "argv").exists() else None
+            name = os.path.basename((pin if pin is not None else load_pin())["install"]["default_directory"])
             return SimpleNamespace(code=done.returncode, argv=argv, exported=(scratch / "github-env").read_text(encoding="utf-8"),
-                                   temp=str(temp))
+                                   temp=str(temp), made=(temp / name).is_dir())
 
     def test_it_runs_the_pin_command_into_runner_temp_and_exports_the_directory(self):
         pin = load_pin()
@@ -442,7 +446,8 @@ class ProvisioningStepRuns(unittest.TestCase):
         directory = os.path.join(result.temp, os.path.basename(pin["install"]["default_directory"]))
         self.assertEqual(result.code, 0)
         self.assertEqual(result.argv, [directory if word == "<directory>" else word for word in words[1:]])
-        self.assertEqual(result.exported, f"{ENV_NAME}={directory}\n")
+        self.assertTrue(result.made, "the step creates the directory before npm runs")
+        self.assertEqual(result.exported, self.PRIOR + f"{ENV_NAME}={directory}\n", "appended to the file, one line")
 
     def test_it_refuses_a_command_without_exactly_one_directory_placeholder(self):
         for label, command in (("none", "npm install --ignore-scripts pkg@1"), ("two", "npm install --prefix <directory> <directory> pkg@1")):
@@ -452,15 +457,16 @@ class ProvisioningStepRuns(unittest.TestCase):
                 result = self.run_step(pin)
                 self.assertNotEqual(result.code, 0)
                 self.assertIsNone(result.argv, "npm must not run")
-                self.assertEqual(result.exported, "")
+                self.assertEqual(result.exported, self.PRIOR)
 
     def test_it_refuses_a_command_that_is_not_an_npm_install(self):
+        # `true` succeeds whatever it is given, so only the check can make this step fail.
         pin = load_pin()
-        pin["install"]["command"] = "sh -c evil --prefix <directory>"
+        pin["install"]["command"] = "true --prefix <directory>"
         result = self.run_step(pin)
         self.assertNotEqual(result.code, 0)
         self.assertIsNone(result.argv, "nothing may run")
-        self.assertEqual(result.exported, "")
+        self.assertEqual(result.exported, self.PRIOR)
 
     def test_it_refuses_an_install_directory_name_that_could_inject_a_variable_or_leave_runner_temp(self):
         for label, name in (("newline", "tools/x\nNODE_OPTIONS=--require=evil"), ("dot dot", "tools/.."), ("space", "tools/a b"),
@@ -471,12 +477,12 @@ class ProvisioningStepRuns(unittest.TestCase):
                 result = self.run_step(pin)
                 self.assertNotEqual(result.code, 0)
                 self.assertIsNone(result.argv, "npm must not run")
-                self.assertEqual(result.exported, "")
+                self.assertEqual(result.exported, self.PRIOR)
 
     def test_a_failing_npm_fails_the_step_and_exports_nothing(self):
         result = self.run_step(npm_exit=1)
         self.assertNotEqual(result.code, 0)
-        self.assertEqual(result.exported, "")
+        self.assertEqual(result.exported, self.PRIOR)
 
 
 class HostInstallLineTests(unittest.TestCase):
