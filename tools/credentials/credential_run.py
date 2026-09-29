@@ -21,11 +21,14 @@ descriptors and a bounded queue, so a consumer that stops reading cannot hold th
 the drain deadline. The command leads its own session and process group. SIGINT, SIGTERM, SIGHUP, SIGQUIT, SIGUSR1,
 SIGUSR2 and SIGALRM sent to the runner are forwarded to that group; once the command has exited and its output is
 drained, and on every way out of the runner, the group gets SIGTERM and, after TERM_GRACE_SECONDS, SIGKILL, so no
-descendant that stayed in it is left running with a key in its environment. On Linux the command also asks the kernel
-for SIGTERM when the runner dies (PR_SET_PDEATHSIG). Exit status: the command's own; 128+N when it died of signal N;
-2 for a usage error; 1 for a refusal; 126 or 127 when it cannot start. Messages carry the id, variable names, line
-numbers and reason codes, never a value, a store line or a path (docs/secret-storage.md#using-a-key). The runner is
-available, not yet the default path: the command guard does not read its command (phase 2 of the same change series).
+descendant that stayed in it is left running with a key in its environment. If the runner itself dies without a chance
+to do that (SIGKILL, the OOM killer), the command asks the kernel for SIGTERM (Linux PR_SET_PDEATHSIG, which reaches
+the command alone) and a watchdog process started with it ends its whole group. Both are best effort: a SIGKILL
+before the fork, a descendant that left the group with setsid, and a same-user debugger are out of reach. Exit status:
+the command's own; 128+N when it died of signal N; 2 for a usage error; 1 for a refusal; 126 or 127 when it cannot
+start. Messages carry the id, variable names, line numbers and reason codes, never a value, a store line or a path
+(docs/secret-storage.md#using-a-key). The runner is available, not yet the default path: the command guard does not
+read its command (phase 2 of the same change series).
 
 Built from these references (observed 2026-09-29): the env-only exec discipline of scripts/kernel_keyring.py; the
 load_env_file grammar of blueprints/us-equities/pit-availability/measure.py:51-67 with set_credential.py's value
@@ -37,8 +40,9 @@ internal/replacer/replacer.go (buffer, merge, never spill a partial match, L99-1
 packages/varlock/src/runtime/lib/redact-stream.ts (100 ms idle flush, L8 and L34-46); Generalized-Labs/ironrun@b611c7ce
 internal/redact/encodings.go (hex and upper- and lower-case percent forms, L13-21); torvalds/linux@v6.16
 fs/coredump.c and systemd/systemd@v257 src/coredump/coredump.c (check_core_pattern below); the man-pages
-PR_SET_PDEATHSIG(2const) page of man7.org (parent_death_hook) and bazelbuild/bazel@d2545923
-src/main/tools/process-tools.cc KillEverything L94-110 (end_group).
+PR_SET_PDEATHSIG(2const) page of man7.org (parent_death_hook), bazelbuild/bazel@d2545923
+src/main/tools/process-tools.cc KillEverything L94-110 (end_group) and python/cpython@v3.13.15
+Lib/multiprocessing/resource_tracker.py L8, L246-267 and L425-429 (the pipe-and-end-of-file helper of the watchdog).
 """
 from __future__ import annotations
 
@@ -742,6 +746,89 @@ def end_group(child) -> None:
         child.wait(timeout=KILL_WAIT_SECONDS)
 
 
+WATCHDOG = True  # tests switch it off in a launcher, to see the parent-death signal alone; there is no environment switch
+# The watchdog is a second interpreter, started right after the command, that holds a pipe and the number of the
+# command's process group and nothing else (an empty environment: no key). The runner keeps the pipe's write end open
+# for as long as it lives, so when it dies by any signal (SIGKILL, the OOM killer) the kernel closes it and the watchdog
+# reads end of file: it ends the group, SIGTERM first and SIGKILL after the grace. A runner that ends in order writes
+# one byte first, and the watchdog leaves the group alone. It ignores the signals a harness sends a group or a terminal
+# and lives in its own session, so a group-wide kill of the runner does not reach it. Exit status: 0 when told, 1 after
+# acting on end of file. It follows CPython's multiprocessing resource tracker, a helper that waits for the end of a
+# pipe and ignores SIGINT and SIGTERM (python/cpython@v3.13.15 Lib/multiprocessing/resource_tracker.py L8, L246-267
+# and L425-429).
+WATCHDOG_CODE = """\
+import os, signal, sys, time
+pgid, grace = int(sys.argv[1]), float(sys.argv[2])
+for name in ("SIGINT", "SIGTERM", "SIGHUP", "SIGQUIT", "SIGUSR1", "SIGUSR2", "SIGALRM"):
+    signal.signal(getattr(signal, name), signal.SIG_IGN)
+try:
+    told = os.read(0, 1)
+except OSError:
+    told = b""
+if told:
+    sys.exit(0)
+for sig, seconds in ((signal.SIGTERM, grace), (signal.SIGKILL, 1.0)):
+    try:
+        os.killpg(pgid, sig)
+    except OSError:
+        break
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        try:
+            os.killpg(pgid, 0)
+        except OSError:
+            sys.exit(1)
+        time.sleep(0.02)
+sys.exit(1)
+"""
+
+
+class Watchdog:
+    """The runner's end of the watchdog: started after the command, told when the runner ends in order.
+
+    It cannot fail the run. A watchdog that cannot start leaves the parent-death signal and the group kill at the end of
+    run_command. Its pipe is made after the command starts, and is not inheritable, so nothing the command starts can
+    hold the write end open and keep the watchdog from seeing the runner die."""
+
+    def __init__(self, pgid: int):
+        self.process, self.pipe = None, -1
+        if not WATCHDOG or not sys.executable:
+            return
+        try:
+            read, self.pipe = os.pipe()
+        except OSError:
+            return
+        try:
+            self.process = subprocess.Popen(
+                [sys.executable, "-I", "-S", "-c", WATCHDOG_CODE, str(pgid), str(TERM_GRACE_SECONDS)],
+                stdin=read, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env={}, close_fds=True,
+                start_new_session=True)
+        except (OSError, ValueError):
+            self.close_pipe()
+        finally:
+            os.close(read)
+
+    def close_pipe(self) -> None:
+        if self.pipe >= 0:
+            with contextlib.suppress(OSError):
+                os.close(self.pipe)
+            self.pipe = -1
+
+    def release(self) -> None:
+        """The runner ends in order: tell the watchdog, and wait for it, so that none is left behind."""
+        if self.pipe >= 0:
+            with contextlib.suppress(OSError):
+                os.write(self.pipe, b".")
+            self.close_pipe()
+        if self.process is not None:
+            try:
+                self.process.wait(timeout=KILL_WAIT_SECONDS)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                with contextlib.suppress(subprocess.TimeoutExpired):
+                    self.process.wait(timeout=KILL_WAIT_SECONDS)
+
+
 def run_command(command: list, environment: dict, needles: list) -> int:
     started, pending, shutdown = [], [], []
 
@@ -774,13 +861,19 @@ def run_command(command: list, environment: dict, needles: list) -> int:
     except OSError:
         raise SpawnError(126, "cannot_execute") from None
     started.append(child)
-    for signum in pending:
-        forward(signum, None)
+    watchdog = None
     try:
+        watchdog = Watchdog(child.pid)
+        for signum in pending:
+            forward(signum, None)
         relay(child, needles, shutdown)
         code = child.wait()
     finally:
-        end_group(child)  # on every way out: no descendant is left running with the key in its environment
+        try:
+            end_group(child)  # on every way out: no descendant is left running with the key in its environment
+        finally:
+            if watchdog is not None:
+                watchdog.release()
     return code if code >= 0 else 128 - code
 
 

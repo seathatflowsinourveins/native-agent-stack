@@ -975,6 +975,124 @@ class ProcessTests(RunnerCase):
             time.sleep(0.05)
         self.assertTrue(noted.exists(), "the command was not sent SIGTERM when its runner was killed")
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "checked on Linux only (with PR_SET_PDEATHSIG beside it)")
+    def test_a_killed_runner_takes_the_whole_command_tree_with_it(self):
+        # The parent-death signal reaches the command only (the kernel clears it for the command's children:
+        # PR_SET_PDEATHSIG(2const)), so a descendant outlived a SIGKILLed runner. The watchdog ends the process group.
+        # The command and two descendants each write a marker after a delay unless they are ended first; one of the
+        # descendants ignores SIGTERM and needs the watchdog's SIGKILL, which follows TERM_GRACE_SECONDS (2 s) later.
+        self.tavily()
+        own, plain, stubborn = self.base / "command-survived", self.base / "plain-survived", self.base / "stubborn-survived"
+        code = (spawn_marker_writers((plain, 1.5, False), (stubborn, 4.5, True))
+                + "time.sleep(2.5)\nopen(sys.argv[1], 'w').close()\n")
+        runner = subprocess.Popen(self.command("tavily", *py(code, str(own))), stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.tool_environment())
+        self.addCleanup(lambda: (runner.kill(), runner.communicate(timeout=30)))
+        spawned = self.read_until(runner.stdout, b"\n").split()
+        self.addCleanup(lambda: [kill_quietly(int(pid)) for pid in spawned[1:]])
+        self.assertEqual(spawned[0], b"spawned")
+        runner.kill()
+        runner.wait(timeout=30)
+        time.sleep(5.0)  # past every marker's delay, and the 2 s grace plus the SIGKILL that follows it
+        self.assertFalse(own.exists(), "the command outlived its killed runner")
+        self.assertFalse(plain.exists(), "a descendant outlived the killed runner")
+        self.assertFalse(stubborn.exists(), "a descendant that ignores SIGTERM outlived the killed runner")
+
+    def test_a_runner_that_ends_in_order_tells_the_watchdog_and_leaves_none_behind(self):
+        made, real = [], run_mod.Watchdog
+
+        def make(pgid):
+            made.append(real(pgid))
+            return made[-1]
+
+        def quiet_relay(child, needles, shutdown=()):
+            child.stdout.close()
+            child.stderr.close()
+
+        with mock.patch.object(run_mod, "Watchdog", side_effect=make):
+            code = self.run_in_process([sys.executable, "-I", "-c", "pass"], quiet_relay)
+        self.assertEqual(code, 0)
+        # Told that the runner ended in order (exit 0), and gone by the time run_command returned: not one that ended a
+        # group it had no reason to touch (exit 1, which is what a runner that dies without telling it gets).
+        self.assertEqual(made[0].process.returncode, 0)
+
+
+class WatchdogTests(unittest.TestCase):
+    """The watchdog process on its own: a pipe, the number of a process group and a grace period. It ends the group
+    when the pipe closes without a byte (the runner died), and leaves it alone when it reads one (the runner ended in
+    order). Its parts follow CPython's multiprocessing resource tracker, a helper that waits for the end of a pipe and
+    ignores SIGINT and SIGTERM (python/cpython@v3.13.15 Lib/multiprocessing/resource_tracker.py L8, L246-267, L425-429)."""
+
+    def setUp(self):
+        self.reads, self.processes = [], []
+        self.addCleanup(self.cleanup)
+
+    def cleanup(self):
+        for process in self.processes:
+            with contextlib.suppress(OSError):
+                os.killpg(process.pid, signal.SIGKILL)
+            with contextlib.suppress(Exception):
+                process.wait(timeout=10)
+
+    def group(self, code: str = "import time\ntime.sleep(60)\n") -> subprocess.Popen:
+        """A process that leads its own group, as the command does."""
+        member = subprocess.Popen([sys.executable, "-I", "-c", code], stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        self.processes.append(member)
+        return member
+
+    def watch(self, pgid: int, grace: float = 0.5):
+        """(the watchdog, the write end of its pipe as a file object), started as the runner starts it."""
+        read, write = os.pipe()
+        watchdog = subprocess.Popen([sys.executable, "-I", "-S", "-c", run_mod.WATCHDOG_CODE, str(pgid), str(grace)],
+                                    stdin=read, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env={},
+                                    close_fds=True, start_new_session=True)
+        os.close(read)
+        self.processes.append(watchdog)
+        pipe = os.fdopen(write, "wb", buffering=0)
+        self.addCleanup(pipe.close)  # closing twice is harmless for a file object
+        return watchdog, pipe
+
+    def test_a_pipe_that_closes_without_a_byte_ends_the_group(self):
+        member = self.group()
+        watchdog, pipe = self.watch(member.pid)
+        time.sleep(0.3)
+        self.assertIsNone(member.poll())  # nothing happens while the pipe is open
+        pipe.close()
+        self.assertEqual(member.wait(timeout=10), -signal.SIGTERM)
+        self.assertEqual(watchdog.wait(timeout=10), 1)
+
+    def test_a_byte_before_the_close_means_the_runner_ended_in_order_and_nothing_is_touched(self):
+        member = self.group()
+        watchdog, pipe = self.watch(member.pid)
+        pipe.write(b".")
+        pipe.close()
+        self.assertEqual(watchdog.wait(timeout=10), 0)
+        self.assertIsNone(member.poll())
+
+    def test_a_member_that_ignores_sigterm_is_killed_after_the_grace(self):
+        member = self.group("import signal, time\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\ntime.sleep(60)\n")
+        watchdog, pipe = self.watch(member.pid, grace=0.6)
+        time.sleep(0.5)  # the member has installed its handler
+        started = time.monotonic()
+        pipe.close()
+        self.assertEqual(member.wait(timeout=10), -signal.SIGKILL)
+        self.assertGreaterEqual(time.monotonic() - started, 0.5)  # after the grace, not at once
+        self.assertEqual(watchdog.wait(timeout=10), 1)
+
+    def test_the_watchdog_ignores_the_signals_a_harness_sends_a_group_or_a_terminal(self):
+        member = self.group()
+        watchdog, pipe = self.watch(member.pid)
+        time.sleep(1.0)  # its handlers are in place
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT, signal.SIGUSR1, signal.SIGUSR2,
+                       signal.SIGALRM):
+            watchdog.send_signal(signum)
+        time.sleep(0.3)
+        self.assertIsNone(watchdog.poll())
+        self.assertIsNone(member.poll())
+        pipe.close()  # and it still acts
+        self.assertEqual(member.wait(timeout=10), -signal.SIGTERM)
+
 
 class ConsumerTests(RunnerCase):
     """Review of 2026-09-29, finding 5: blocking writes let a consumer that stopped reading hold the runner, and its
