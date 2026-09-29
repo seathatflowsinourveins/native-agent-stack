@@ -3536,8 +3536,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "ce7e7b16e3ef36c2880d59d17950fa77cefa1c71bc48146100d65779acd6f0ce",
-      "bytes": 21136
+      "sha256": "1b40c567365c23214847f7eab052dca9dc1925cf7bc65714de291a799586c382",
+      "bytes": 21269
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -3591,8 +3591,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "44486711225483ec7ca0ab904c36697a0d53249c2d5439eb40d728f5604bd697",
-      "bytes": 33869
+      "sha256": "a3f160fa747ba093e8d1b3f3e80fe9cbfdcb394e71293a3ee2532b2a446dbf31",
+      "bytes": 32590
     },
     {
       "path": ".gitignore",
@@ -13622,8 +13622,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "fed211eeaac99fc58f328fa8a86bb911f6f285552aac3352122011dedd0f58a6",
-      "bytes": 32788
+      "sha256": "395ed048db1394e89258ed3019a0ee57329c686ae54782675200d684bfdeeec8",
+      "bytes": 33464
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -14497,8 +14497,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "a186902f149b723de3f707e10b5635cb0fd831e5e6b84fbe2e053b5230c5c7f4",
-      "bytes": 90132
+      "sha256": "acd0455565ff29d9044fe656526256504b6c316009fd04d5dacaab05cc78c4bf",
+      "bytes": 90463
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14839,6 +14839,16 @@
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
       "sha256": "43546a8ab52b3453920b5c2c35aa6bce996cdfed5d0fc959c22cf83687619c99",
       "bytes": 39050
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/README.md",
+      "sha256": "ccebf6dbaaef4494b1e2b2d0d4fb17c8cbcdadd22786f41f9607e579ec89ee8a",
+      "bytes": 13637
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/receipt.json",
+      "sha256": "f7480eb280330a427d34c3352edc2a694762f90e4416dc6387e0f4d0cae88334",
+      "bytes": 38178
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",
@@ -42412,8 +42422,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "f8b2828f3024757b3320f11e946b9e6fbd11db76280b90394e1668cbc394a60a",
-      "bytes": 55311
+      "sha256": "241697711e74fa15c1763c2650e0a9ee8316ab442fb69003312a9aa4a923da58",
+      "bytes": 55352
     },
     {
       "path": "tests/test_catalogs.py",
