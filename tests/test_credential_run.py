@@ -41,6 +41,27 @@ MARK = b"[REDACTED:TAVILY_API_KEY]"
 PARTIAL = b"[REDACTED-PARTIAL:TAVILY_API_KEY]"
 STORE_LINE = re.compile(rb"export +[A-Za-z_]")
 
+
+def _host_hands_cores_to_a_collector() -> bool:
+    """This host's own core_pattern, read here without the tool: a `|` (systemd-coredump, apport) or `@` (a core socket)."""
+    try:
+        with open("/proc/sys/kernel/core_pattern", "rb") as handle:
+            return handle.read(1) in (b"|", b"@")
+    except OSError:
+        return False
+
+
+# The runner refuses to start on such a host (review of 2026-09-29, finding 2), and CI runners commonly are one. There
+# the tests start it through this launcher, which points CORE_PATTERN_FILE at a temporary file that holds "core"; the
+# two tests of the real re-execution skip. The refusal itself is tested in process with its own pattern files.
+# CREDENTIAL_RUN_TEST_LAUNCHER=1 forces the launcher on any host, to exercise this path.
+HOST_PIPES_CORES = os.environ.get("CREDENTIAL_RUN_TEST_LAUNCHER") == "1" or _host_hands_cores_to_a_collector()
+LAUNCHER = ("import os, sys\n"
+            f"sys.path[:0] = [{str(TOOLS)!r}, {str(ROOT / 'scripts')!r}]\n"
+            "import credential_run\n"
+            "credential_run.CORE_PATTERN_FILE = os.environ.pop('CORE_PATTERN_TEST_FILE')\n"
+            "sys.exit(credential_run.main(sys.argv[1:]))\n")
+
 # A child that reports what reached its environment by sha256 only, so no test output holds a value.
 REPORT = ("import hashlib, json, os, sys\n"
           "names = json.loads(sys.argv[1])\n"
@@ -94,7 +115,21 @@ class RunnerCase(unittest.TestCase):
         self.store = self.config / "native-agent-stack"
         self.env = {"PATH": os.environ.get("PATH", ""), "HOME": str(self.base / "home"),
                     "XDG_CONFIG_HOME": str(self.config)}
+        self.core_pattern = self.base / "core_pattern"  # read only through the launcher (HOST_PIPES_CORES)
+        self.core_pattern.write_text("core\n")
         self.values: list[str] = []  # every planted value, for the never-echoed checks
+
+    def command(self, *args: str) -> list[str]:
+        """The argv that starts the runner: the tool itself, or the launcher on a host that pipes crash dumps."""
+        if HOST_PIPES_CORES:
+            return [sys.executable, "-I", "-S", "-c", LAUNCHER, *args]
+        return [sys.executable, str(TOOL), *args]
+
+    def tool_environment(self, extra: dict | None = None) -> dict:
+        environment = {**self.env, **(extra or {})}
+        if HOST_PIPES_CORES:
+            environment["CORE_PATTERN_TEST_FILE"] = str(self.core_pattern)
+        return environment
 
     def plant(self, entry_id: str, text: str | bytes, mode: int = 0o600, store: Path | None = None) -> Path:
         store = self.store if store is None else store
@@ -122,14 +157,13 @@ class RunnerCase(unittest.TestCase):
 
     def run_tool(self, *args: str, input: bytes | None = None, env: dict | None = None,
                  timeout: float = 60) -> subprocess.CompletedProcess:
-        environment = {**self.env, **(env or {})}
         stdin = subprocess.DEVNULL if input is None else None
-        return subprocess.run([sys.executable, str(TOOL), *args], input=input, stdin=stdin, capture_output=True,
-                              env=environment, timeout=timeout)
+        return subprocess.run(self.command(*args), input=input, stdin=stdin, capture_output=True,
+                              env=self.tool_environment(env), timeout=timeout)
 
     def start_tool(self, *args: str) -> subprocess.Popen:
-        process = subprocess.Popen([sys.executable, str(TOOL), *args], stdin=subprocess.DEVNULL,
-                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.env)
+        process = subprocess.Popen(self.command(*args), stdin=subprocess.DEVNULL,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.tool_environment())
 
         def reap():  # a failed assertion must not leave the runner or its pipes behind
             if process.poll() is None:
@@ -666,6 +700,7 @@ class CheckAndIsolationTests(RunnerCase):
             self.assertNotIn(b"native-agent-stack/", text)
         self.assertTrue(any(b"<store>/alpaca-paper.env" in text for text in outputs))
 
+    @unittest.skipIf(HOST_PIPES_CORES, "the real re-execution is refused on a host that pipes crash dumps")
     def test_isolated_before_reading(self):
         # The first, non-isolated start runs a poisoned sitecustomize; it records every *.env open through an audit
         # hook. The runner must re-execute under -I -S before it opens the store, and the isolated run imports none
@@ -688,6 +723,7 @@ class CheckAndIsolationTests(RunnerCase):
         self.assertEqual(json.loads(result.stdout), {"TAVILY_API_KEY": sha(value)})
         self.assertEqual(log.read_text(), "start isolated=0\n")
 
+    @unittest.skipIf(HOST_PIPES_CORES, "the real re-execution is refused on a host that pipes crash dumps")
     def test_site_packages_code_never_runs_in_the_reading_interpreter(self):
         # A .pth line of the interpreter's own site-packages runs even under -I; -S skips it. In a throwaway venv whose
         # site-packages this test may write (as tests/test_credential_tools.py does for set_credential.py), the line
@@ -711,6 +747,129 @@ class CheckAndIsolationTests(RunnerCase):
         # A set of start kinds: a Linux venv reaches its site-packages twice (lib and the lib64 link), so one start
         # can run the line twice. Only the first, non-isolated start ran it; the -I -S interpreter never did.
         self.assertEqual({start for start in record.read_text().split(";") if start}, {"site ran, isolated=0"})
+
+
+class CoreDumpTests(RunnerCase):
+    """Review of 2026-09-29, finding 2: RLIMIT_CORE 0 stops a core file, not a collector. The kernel ignores the limit
+    for a `|` pattern and for an `@` core socket (torvalds/linux@v6.16 fs/coredump.c L795-820, L242-243 and L919), and
+    systemd-coredump then journals the crashing process's environment (systemd@v257 src/coredump/coredump.c L472-479
+    and L1458-1459), so the runner refuses such a host. Patterns are files of these tests, never this host's."""
+
+    PIPE = b"|/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h\n"
+
+    def pattern(self, text: bytes | None) -> Path:
+        path = self.base / "pattern-under-test"
+        if text is not None:
+            path.write_bytes(text)
+        return path
+
+    def refusal(self, text: bytes | None) -> str:
+        with self.assertRaises(run_mod.Refused) as caught:
+            run_mod.check_core_pattern(str(self.pattern(text)))
+        return str(caught.exception)
+
+    def test_a_piped_or_socket_pattern_is_refused_without_naming_it(self):
+        for text, reason in ((self.PIPE, "core_pattern_pipe"), (b"|/bin/true", "core_pattern_pipe"),
+                             (b"|", "core_pattern_pipe"), (b"@/run/systemd/coredump.socket\n", "core_pattern_socket"),
+                             (b"@@/run/systemd/coredump\n", "core_pattern_socket")):
+            with self.subTest(pattern=text[:12]):
+                message = self.refusal(text)
+                self.assertTrue(message.startswith(reason + ": "), message)
+                self.assertIn("inspect /proc/sys/kernel/core_pattern", message)
+                self.assertNotIn("systemd", message)  # never a value of the file
+
+    def test_file_patterns_and_a_missing_file_are_accepted(self):
+        for text in (b"core", b"core\n", b"core.%p", b"/var/crash/core.%e.%p.%t\n", b"", b"core|not-a-pipe",
+                     b" |only the first byte counts"):
+            with self.subTest(pattern=text[:12]):
+                run_mod.check_core_pattern(str(self.pattern(text)))
+        run_mod.check_core_pattern(str(self.base / "no" / "such" / "core_pattern"))  # macOS: no /proc at all
+        run_mod.check_core_pattern(str(self.pattern(b"core") / "not-a-directory"))
+
+    def test_an_unreadable_pattern_file_is_refused(self):
+        directory = self.base / "a-directory"  # exists, but cannot be read as a file (also refused when run as root)
+        directory.mkdir()
+        with self.assertRaises(run_mod.Refused) as caught:
+            run_mod.check_core_pattern(str(directory))
+        self.assertTrue(str(caught.exception).startswith("core_pattern_unreadable: "))
+        self.assertIn("inspect that file", str(caught.exception))
+        self.assertIn("/proc/sys/kernel/core_pattern", str(caught.exception))
+
+    def main_in_process(self, *args: str, pattern: bytes = b"core\n"):
+        """run_mod.main(args) with the store and the core_pattern path of this test: (code, stdout, stderr)."""
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(run_mod, "CORE_PATTERN_FILE", str(self.pattern(pattern))), \
+                contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = run_mod.main(list(args))
+        return code, out.getvalue(), err.getvalue()
+
+    def test_a_refused_host_never_reads_the_store_or_starts_the_command(self):
+        self.tavily()
+        marker = self.base / "child-ran"
+        child = py(f"open({str(marker)!r}, 'w').close()")
+        secret_path = self.store / "tavily.env"
+        with mock.patch.object(run_mod, "read_store", side_effect=AssertionError("the store was read")):
+            for text, reason in ((self.PIPE, "core_pattern_pipe"), (b"@/run/x.socket", "core_pattern_socket")):
+                code, out, err = self.main_in_process("tavily", *child, pattern=text)
+                self.assertEqual(code, 1, err)
+                self.assertIn(f"credential_run: tavily: refused: {reason}: ", err)
+                self.assertNotIn("systemd", out + err)
+                self.assertNotIn(str(secret_path), out + err)
+                code, out, err = self.main_in_process("tavily", "--check", pattern=text)
+                self.assertEqual((code, err), (1, ""))
+                self.assertTrue(out.startswith(f"tavily: refused ({reason}: "), out)
+        self.assertFalse(marker.exists(), "a refused run started its command")
+
+    def test_a_limit_that_cannot_be_set_is_refused(self):
+        self.tavily()
+        marker = self.base / "child-ran"
+        for failure in (OSError(1, "Operation not permitted"), ValueError("current limit exceeds maximum limit")):
+            with self.subTest(failure=type(failure).__name__), \
+                    mock.patch.object(run_mod.resource, "setrlimit", side_effect=failure):
+                code, out, err = self.main_in_process("tavily", *py(f"open({str(marker)!r}, 'w').close()"))
+                self.assertEqual(code, 1, err)
+                self.assertIn("credential_run: tavily: refused: core_limit_not_set: ", err)
+                self.assertNotIn("Operation not permitted", out + err)
+        self.assertFalse(marker.exists(), "a refused run started its command")
+
+    def test_the_real_tool_follows_this_hosts_own_pattern(self):
+        # The real /proc file through the real tool, no launcher: a collector host is refused with the file named,
+        # any other host starts (--check reads the pattern before the store, as a run does).
+        self.tavily()
+        real = subprocess.run([sys.executable, str(TOOL), "tavily", "--check"], stdin=subprocess.DEVNULL,
+                              capture_output=True, env=self.env, timeout=60)
+        self.assertEqual(real.stderr, b"")
+        if _host_hands_cores_to_a_collector():
+            self.assertEqual(real.returncode, 1)
+            self.assertRegex(real.stdout, rb"^tavily: refused \(core_pattern_(pipe|socket): ")
+            self.assertIn(b"inspect /proc/sys/kernel/core_pattern", real.stdout)
+        else:
+            self.assertEqual((real.returncode, real.stdout), (0, b"tavily: ok; would inject TAVILY_API_KEY (masked)\n"))
+
+
+class StandardDescriptorTests(RunnerCase):
+    """Review of 2026-09-29, finding 7: a standard descriptor closed at start is reopened on /dev/null, and the command
+    must inherit it (os.open's descriptor is close-on-exec, which the exec would close again: EBADF, not EOF)."""
+
+    def start_with_closed(self, redirect: str, code: str) -> subprocess.CompletedProcess:
+        command = ["/bin/sh", "-c", f'exec "$@" {redirect}', "sh", *self.command("tavily", *py(code))]
+        return subprocess.run(command, capture_output=True, env=self.tool_environment(), timeout=60)
+
+    def test_a_closed_stdin_reads_end_of_file_in_the_command(self):
+        self.tavily()
+        result = self.start_with_closed("<&-", (
+            "import os\ntry:\n    print('eof' if os.read(0, 8) == b'' else 'data')\n"
+            "except OSError as error:\n    print('errno', error.errno)\n"))
+        self.assertEqual((result.returncode, result.stdout), (0, b"eof\n"), result.stderr)
+
+    def test_a_closed_stdout_or_stderr_leaves_the_other_stream_relayed(self):
+        self.tavily()
+        both = "import sys\nsys.stdout.write('out\\n')\nsys.stderr.write('err\\n')\n"
+        closed_out = self.start_with_closed(">&-", both)
+        self.assertEqual((closed_out.returncode, closed_out.stdout, closed_out.stderr), (0, b"", b"err\n"))
+        closed_err = self.start_with_closed("2>&-", both)
+        self.assertEqual((closed_err.returncode, closed_err.stdout, closed_err.stderr), (0, b"out\n", b""))
 
 
 class InventoryAndGrammarTests(unittest.TestCase):
