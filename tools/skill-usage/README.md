@@ -188,7 +188,10 @@ as zero. The legacy `ctx_fetch_and_index_share` compares three lanes only (hoste
 `until`, `!` and `{` and behind `rtk`, `sudo`, `env`, `command`, `exec`, `time`, `nice`, `nohup`
 or `timeout N`. Escaped characters and comments are data, and `$(...)` or backticks inside double
 quotes or in the body of a heredoc with an unquoted delimiter still run (bash(1) QUOTING, COMMENTS
-and Here Documents).
+and Here Documents). This legacy counter keeps its own Python rule (`executed_text`), which predates
+the kernel's reading of heredocs inside `"$( )"` and of strings a shell runs, so on those shapes it
+can disagree with `measurement.m4` and with the Claude lane's `bash_curl_wget`: a `curl` line in the
+heredoc of `bash -c 'cat <<EOF > x.sh ...'` counts here as a fetch and there as data.
 
 PR-A adds `actors[].measurement` and group `measurement` fields. They reuse
 the existing [child-usage.mjs measurement kernel](../../examples/claude-native/workflows/README.md#pr-a-measurement-fields-2026-09-27)

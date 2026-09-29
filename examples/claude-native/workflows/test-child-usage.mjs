@@ -259,6 +259,17 @@ expect('fetch: an escaped character or a comment is data, and an unquoted heredo
   "cat <<'EOF'\n$(curl -s https://x.org)\nEOF", 'cat <<"EOF"\n$(curl -s https://x.org)\nEOF',
   'cat <<EOF\n\\$(curl https://x.org) and; curl https://x.org\nEOF', 'cat <<-EOF\n\t$(wget -q https://x.org)\n\tEOF',
 ].map(fetchKind)) === JSON.stringify([null, null, null, null, null, null, null, null, null, 'fetch', 'fetch', 'fetch', 'fetch', 'fetch', 'fetch', 'loopback', 'fetch', null, null, null, 'fetch']))
+// N1, the #432 residual (POSIX.1-2024 XCU 2.6.3 and 2.2.3): a heredoc inside "$( )" in double quotes, or inside a string a
+// shell runs, resolves like any other; quotes inside "$( )" do not end the string; a run string is that shell's input.
+{
+  const n1 = ["git commit -m \"$(cat <<'EOF'\nfix: don't \"break\" (it)\n\ncurl -s https://x.org\nEOF\n)\"", "bash -c 'cat <<EOF > x.sh\ncurl https://x.org\nEOF'",
+    'echo "$(echo "a" && curl https://x.org)"', 'bash -c "echo \\"a; curl https://x.org\\""', "ssh host 'bash -c \"curl https://x.org\"'"]
+  expect('fetch: a heredoc inside "$( )" or a run string is data, quotes inside "$( )" do not end it, and a run string is its shell\'s input',
+    JSON.stringify(n1.map(fetchKind)) === JSON.stringify([null, null, 'fetch', null, 'fetch']))
+  expect('executed text: a "$( )" body is shell text with its heredoc resolved, and a run string is analyzed after the outer escapes go',
+    JSON.stringify(n1.map((c) => executedText(c))) === JSON.stringify(["git commit -m \"$(cat <<'EOF'\n\n\n\n)\"", 'bash -c ;cat <<EOF > x.sh\n;',
+      'echo "$(echo "a" && curl https://x.org)"', 'bash -c ;echo "a  curl https://x.org";', 'ssh host ;bash -c ;curl https://x.org;;']))
+}
 expect('mcp: the server is the segment between mcp__ and the next __', mcpServer('mcp__plugin_context-mode_context-mode__ctx_execute') === 'plugin_context-mode_context-mode' && mcpServer('mcp__qmd__query') === 'qmd' && mcpServer('Bash') === null && mcpServer('mcp__') === null)
 {
   const odd = childLanes([ask('packet', 0), call('p1', 'mcp__constructor__query', {}, 1), call('p2', 'Skill', { skill: '/home/example/private/SKILL.md' }, 2), call('p3', 'Skill', { skill: 'tdd' }, 3), attach({ type: 'hook_success', hookName: 'SubagentStart:has space', hookEvent: 'SubagentStart', toolUseID: 's', command: 'x', stdout: '', stderr: '', exitCode: 0 }, 0)])
@@ -383,6 +394,9 @@ const gitRun = timed(() => [logFindPart(gitWitness), sensitivePart(gitWitness)])
 expect('redos: repeated --git-dir option words are read in linear time', gitRun.ms < 1000 && gitRun.r.join() === 'false,false')
 const codeRun = timed(() => ['node -', 'bun -', 'deno eval -'].map((p) => executedText(p + '-- -'.repeat(28) + " 'fetch(u)'", { inlineHttp: true })))
 expect('redos: repeated interpreter option words are matched in linear time', codeRun.ms < 1000)
+// Nesting witnesses (2026-09-28): without NESTING_LIMIT both threw RangeError (maximum call stack size), aborting a sweep.
+const deepRun = timed(() => { try { return ['"$('.repeat(3000), Array.from({ length: 3000 }, (_, i) => 'bash <<E' + i).join('\n')].map((c) => executedText(c).length + executedText(c, { inlineHttp: true }).length) } catch (e) { return e } })
+expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read without exhausting the stack', Array.isArray(deepRun.r) && deepRun.ms < 1000)
 expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
   logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
   && !logFindPart('git status') && sensitivePart('git -C repo branch -a') && sensitivePart('git --git-dir=.g show HEAD:a') && !sensitivePart('git -C repo status'))

@@ -245,14 +245,29 @@ between the nearest control operators around the operator, with quotes removed
 and redirection words and their targets dropped, so a pipe, list or redirection
 after the heredoc (`bash <<'EOF' 2>&1 | tail -n 5`, `> log.txt`, `&& ...`) does
 not replace it. A `<<` inside quotes, a comment or `$(( ))` opens no heredoc.
-Two known limits err toward counting a fetch: `$(` is not tracked inside
-double quotes, and a quoted string that a shell runs (`bash -c '...'`) is added
-as executed text without its own heredoc resolution. A heredoc body inside
-`"$( ... )"` (the usual `git commit -m "$(cat <<'EOF' ... EOF)"` form) or inside
-such a string therefore counts as executed even when it is the inner command's
-data: a line-start `curl`/`wget` in it counts as a confirmed fetch (inside
-`"$( ... )"` only when the body has no parentheses) and a `gh api` line as
-unclassifiable. This can lower the routed shares, never raise them.
+Inside double quotes the text from `$(` to the matching `)` is a command whose
+tokens are read recursively
+([POSIX.1-2024 XCU 2.6.3](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_06_03)):
+quotes inside it do not end the string, and a heredoc inside it resolves like
+any other, so the body of the usual `git commit -m "$(cat <<'EOF' ... EOF)"` is
+data whatever quotes or parentheses it holds. A quoted string that a shell runs
+(`bash -c '...'`, `sh -c "..."`, `eval`, `ssh host '...'`) is analyzed as that
+shell's input, with its own heredocs, quotes, comments and nested run strings.
+A double-quoted one first loses the backslashes the outer shell removes before
+`$`, `` ` ``, `"`, `\` and newline
+([XCU 2.2.3](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_02_03)),
+and a heredoc the outer shell already resolved inside its `"$( )"` is not read
+twice. Reading text as data never drops a raw detector match: the match moves
+from the confirmed count to `fetch_mentions_unconfirmed`, so `routed_share` can
+rise while the denominator of `routed_share_lower_bound` stays the same. A
+nested run string can add a confirmed fetch that no raw detector sees
+(`ssh host 'bash -c "curl ..."'`). Remaining limits: a backquoted span inside
+double quotes is kept as it is, so a heredoc or quoted separator in it is not
+resolved; a `case` pattern's `)` inside a double-quoted `"$( )"` ends the
+substitution early; analyses nested more than 32 levels deep read as data; and
+text that bash rejects as incomplete (an unterminated quote, backquote or `$(`)
+is read to the end of the command as that construct, so its counts can move in
+either direction.
 Python or Node read stdin with no script operand or with `-`; the retained
 explicit stdin forms apply to other interpreters. A shell reads its script from
 stdin unless `-c` supplies a command string or an operand names a script file:
