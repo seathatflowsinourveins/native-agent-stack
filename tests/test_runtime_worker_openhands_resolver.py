@@ -2758,7 +2758,7 @@ class FakeAttempt:
 
     def identity(self):
         return {"issue": 12, "base_sha": self.base_sha, "owned_paths": ["docs"], "lane": "lane:foundation",
-                "run_id": RUN_ID, "instruction_sha256": "0" * 64}
+                "run_id": RUN_ID, "instruction_sha256": "0" * 64, "reviewer_argv_sha256": "7" * 64}
 
     def session_sink(self, value):
         self.keys.append(value)
@@ -3224,7 +3224,8 @@ class ResolverResultTests(unittest.TestCase):
                           "sota_sources": {"kept": 1, "dropped": 0}})
         self.assertEqual(section["gates"], {
             "stage_gates_sha256": "9" * 64,
-            "isolation_probe_sha256": hashlib.sha256((self.result / "isolation-probe.json").read_bytes()).hexdigest()})
+            "isolation_probe_sha256": hashlib.sha256((self.result / "isolation-probe.json").read_bytes()).hexdigest(),
+            "reviewer_argv_sha256": "7" * 64})
         self.assertIsNone(section["review"])
 
     def test_the_cli_result_without_the_driver_refuses_before_any_github_step(self):
@@ -3626,13 +3627,28 @@ class ResolverRunTests(unittest.TestCase):
                 "--lane", "lane:foundation", "--arm", "control", "--prefix", str(self.prefix), "--state", str(self.state),
                 "--gh", self.fake.gh, "--git", REAL_GIT, "--gitleaks", str(self.gitleaks), *extra]
 
+    def record_g4(self, reviewer=None, **changes):
+        """<state>/stage-gates.json holding gate G4 for `reviewer` (default self.reviewer): the SHA-256
+        of its argv with each element NUL-terminated, the /proc/<pid>/cmdline form of proc(5).
+        verify_stage_gates stays mocked, so the file holds no other gate."""
+        argv = shlex.split(reviewer or self.reviewer)
+        entry = {"passed": True, "recorded_at": "2026-09-28T12:00:00+00:00",
+                 "reviewer_argv_sha256": hashlib.sha256(b"".join(arg.encode() + b"\0" for arg in argv)).hexdigest(),
+                 **changes}
+        self.host.write_private_json(self.state / "stage-gates.json",
+                                     {"schema": "openhands-stage-gates-v1", "g4": entry})
+        return entry["reviewer_argv_sha256"]
+
     def run_cli(self, github, *, edits=None, message=FINAL_MESSAGE, gates=None, dry_run=False, plant=False,
-                api_answers=None, dispatch_time=None):
+                api_answers=None, dispatch_time=None, g4=True):
         """resolver.main(["run", ...]) with Docker, the agent-server, gh and network git replaced.
 
         `api_answers` maps (method, path) to an answer or an exception to raise; `dispatch_time`
-        replaces dispatch.py's `time` module (its deadline clock)."""
+        replaces dispatch.py's `time` module (its deadline clock); `g4` records gate G4 for
+        self.reviewer first (record_g4)."""
         host, dispatch, state = self.host, self.dispatch, self.state
+        if g4:
+            self.record_g4()
 
         def api(method, path, *, headers, body=None, port):
             if (method, path) in (api_answers or {}):
@@ -3865,9 +3881,51 @@ class ResolverRunTests(unittest.TestCase):
                                  {"issue": 12, "base_sha": self.base, "lane": "lane:foundation", "status": None,
                                   "pr": None})
                 self.assertRegex(section["instruction_sha256"], r"^[0-9a-f]{64}$")
-                self.assertEqual(set(section["gates"]), {"stage_gates_sha256", "isolation_probe_sha256"})
+                self.assertEqual(set(section["gates"]), {"stage_gates_sha256", "isolation_probe_sha256",
+                                                         "reviewer_argv_sha256"})
                 self.assertEqual(section["review"]["status"], "not_run")
                 self.assertEqual((github.pushes, printed["failure_stage"]), ([], stage))
+
+    def test_run_refuses_a_reviewer_command_that_gate_g4_did_not_qualify(self):
+        # Review item F3: the reviewer is the one host-side model that reads the agent's diff, so plan
+        # gate G4 qualifies its exact argv. stage-gates.json records that argv's SHA-256, and `run`
+        # refuses before any container unless --reviewer-command splits to the same argv, whose
+        # executable is an absolute path. The receipt then carries the qualified argv's hash.
+        qualified = self.reviewer
+        cases = (("no g4 record", None, {}, qualified, "gates", "stage_gate_g4_not_recorded"),
+                 ("g4 not passed", qualified, {"passed": False}, qualified, "gates", "stage_gate_g4_not_recorded"),
+                 ("g4 recorded later", qualified, {"recorded_at": "2999-01-01T00:00:00+00:00"}, qualified, "gates",
+                  "stage_gate_g4_not_recorded"),
+                 ("another argv", qualified, {}, qualified + " --add-dir /", "gates", "reviewer_argv_not_qualified"),
+                 ("a relative executable", "claude -p", {}, "claude -p", "preflight", "reviewer_path_required"))
+        for label, recorded, changes, command, stage, reason in cases:
+            with self.subTest(label):
+                shutil.rmtree(self.state / "runs", ignore_errors=True)  # one attempt per UTC day
+                if recorded:
+                    self.record_g4(recorded, **changes)
+                else:  # the other gates' records, without g4
+                    self.host.write_private_json(self.state / "stage-gates.json",
+                                                 {"schema": "openhands-stage-gates-v1"})
+                self.reviewer = command
+                github = ResolverGitHub(base=self.base)
+                code, printed, mocks = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"}, g4=False)
+                self.assertEqual(code, 3, printed)
+                self.assertEqual({key: printed.get(key) for key in ("status", "stage", "reason")},
+                                 {"status": "refused", "stage": stage, "reason": reason})
+                for name in ("run", "prepare_native_dispatch", "execute_container", "api_request"):
+                    mocks[name].assert_not_called()
+                self.assertFalse((self.state / "runs").exists())
+                self.assertEqual(github.pushes, [])
+        self.reviewer = qualified
+        shutil.rmtree(self.state / "runs", ignore_errors=True)
+        github = ResolverGitHub(base=self.base, checks=[(0, check_list("pass"), "")] * 2)
+        code, printed, _ = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"})
+        self.assertEqual(code, 0, printed)
+        self.assertEqual(self.receipt(printed)["resolver"]["gates"]["reviewer_argv_sha256"], self.record_g4())
+        # The hash is over the split argv, each element NUL-terminated, so word boundaries count.
+        sha = self.host.reviewer_argv_sha256
+        self.assertEqual(sha(["a", "b c"]), hashlib.sha256(b"a\0b c\0").hexdigest())
+        self.assertNotEqual(sha(["a b"]), sha(["a", "b"]))
 
     def test_end_to_end_gate_refusal_starts_no_container(self):
         github = ResolverGitHub(base=self.base)

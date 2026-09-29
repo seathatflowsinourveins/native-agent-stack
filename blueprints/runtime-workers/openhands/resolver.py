@@ -1260,7 +1260,8 @@ class ResolverAttempt:
     """
 
     def __init__(self, *, number, title, base_sha, branch, owned_paths, lane, instruction, run_id, gh, git, gitleaks,
-                 gitleaks_config, host_paths, user_name, base_env, runner=subprocess.run, clone_url=None):
+                 gitleaks_config, host_paths, user_name, base_env, runner=subprocess.run, clone_url=None,
+                 reviewer_argv=None, reviewer_argv_sha256=None):
         if not isinstance(base_sha, str) or not SHA.fullmatch(base_sha):
             raise ValueError("base_sha_required")
         self.number, self.title, self.base_sha, self.branch = number, title, base_sha, branch
@@ -1269,13 +1270,16 @@ class ResolverAttempt:
         self.gh, self.git, self.gitleaks, self.gitleaks_config = gh, git, gitleaks, gitleaks_config
         self.host_paths, self.user_name, self.base_env, self.runner = list(host_paths), user_name, base_env, runner
         self.clone_url = clone_url or CLONE_URL
+        # The G4-qualified reviewer argv (host.verify_reviewer_gate), in memory; only its hash is written.
+        self.reviewer_argv, self.reviewer_argv_sha256 = reviewer_argv, reviewer_argv_sha256
         self._key = None
         self.harness = self.guard = self.clone = self.pr = self.clone_home = None
 
     def identity(self):
         return {"issue": self.number, "base_sha": self.base_sha, "owned_paths": self.owned_paths, "lane": self.lane,
                 "run_id": self.run_id,
-                "instruction_sha256": hashlib.sha256(self.instruction.encode("utf-8")).hexdigest()}
+                "instruction_sha256": hashlib.sha256(self.instruction.encode("utf-8")).hexdigest(),
+                "reviewer_argv_sha256": self.reviewer_argv_sha256}
 
     def session_sink(self, value):
         self._key = outgoing_guard.SessionKey(value)
@@ -1445,9 +1449,11 @@ def command_reviewer(argv, *, workdir, env, timeout=REVIEWER_TIMEOUT):
     """The injected reviewer (plan section 2 step 10): the coordinator's command, run with the
     reviewed diff on stdin from an empty private directory, with an allowlisted environment.
 
-    The plan's invocation is `claude -p` with flags that gate G4 qualifies, so the
-    command comes from the coordinator; its output is model text, which post_review
-    guards. A non-zero exit, a timeout or oversized output raises (reviewer_failed).
+    The plan's invocation is `claude -p` with flags that gate G4 qualifies. The command
+    comes from the coordinator, and `run` refuses it before any container unless its argv
+    matches G4's record (host.verify_reviewer_gate, review item F3). Its output is model
+    text, which post_review guards. A non-zero exit, a timeout or oversized output raises
+    (reviewer_failed).
     """
     def review(diff):
         if len(diff) > MAX_REVIEW_INPUT:
@@ -1559,6 +1565,16 @@ def plan_run(args, *, runner, now):
     gh = _absolute_executable(args.gh, "gh_path_required")
     git = _absolute_executable(args.git, "git_path_required")
     gitleaks = _absolute_executable(args.gitleaks, "gitleaks_path_required")
+    reviewer = None
+    if args.reviewer_command:
+        # Review item F3: the reviewer's argv as it will run; gate G4 below binds it by hash.
+        try:
+            reviewer = shlex.split(args.reviewer_command)
+        except ValueError:
+            raise RunRefused("preflight", "reviewer_command_unparseable") from None
+        if not reviewer:
+            raise RunRefused("preflight", "reviewer_command_required")
+        _absolute_executable(reviewer[0], "reviewer_path_required")
     run_id = run_id_for(args.issue, now)
     if os.path.lexists(Path(args.state) / "runs" / run_id / args.arm):
         # One attempt per issue, arm and UTC day (host.begin_attempt refuses the same way);
@@ -1572,6 +1588,7 @@ def plan_run(args, *, runner, now):
     try:
         host.verify_stage_gates(args.state, args.arm, now=now)
         host.verify_gateway_providers(args.arm, host.gateway_allowlists(host_file))
+        reviewer_sha256 = host.verify_reviewer_gate(args.state, reviewer, now=now) if reviewer else None
     except (OSError, ValueError, KeyError, TypeError) as error:
         raise RunRefused("gates", str(error) if isinstance(error, ValueError) else type(error).__name__.lower())
     workroot = Path(tempfile.mkdtemp(prefix="resolver-run-", dir=args.state))
@@ -1619,13 +1636,14 @@ def plan_run(args, *, runner, now):
             "kept_comments": selected["kept_comments"], "dropped_comments": selected["dropped_comments"],
             "dropped_reasons": selected["dropped_reasons"], "preflight": identity, "repository": repository,
             "gates": "passed", "resolver_skill": skill, "resolver_skills": skill_check,
-            "instruction_chars": len(instruction),
+            "reviewer_argv_sha256": reviewer_sha256, "instruction_chars": len(instruction),
             "instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest()}
     attempt = ResolverAttempt(
         number=args.issue, title=selected["title"], base_sha=base, branch=branch, owned_paths=owned, lane=args.lane,
         instruction=instruction, run_id=run_id, gh=gh, git=git, gitleaks=gitleaks,
         gitleaks_config=str(HERE.parents[2] / ".gitleaks.toml"), host_paths=_host_paths(args.state, args.prefix),
-        user_name=pwd.getpwuid(os.getuid()).pw_name, base_env=base_env, runner=runner)
+        user_name=pwd.getpwuid(os.getuid()).pw_name, base_env=base_env, runner=runner, reviewer_argv=reviewer,
+        reviewer_argv_sha256=reviewer_sha256)
     return plan, attempt
 
 
@@ -1680,7 +1698,7 @@ def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sl
         env = {"PATH": "/usr/bin:/bin", "HOME": os.environ.get("HOME", pwd.getpwuid(os.getuid()).pw_dir),
                "LANG": "C.UTF-8"}
         loop = ReviewLoop(attempt.harness, attempt.guard, pr=attempt.pr, clone=str(attempt.clone), git=attempt.git,
-                          reviewer=command_reviewer(shlex.split(args.reviewer_command), workdir=workdir, env=env),
+                          reviewer=command_reviewer(attempt.reviewer_argv, workdir=workdir, env=env),
                           repairer=_no_repair, clock=clock, sleep=sleep)
         try:
             review = review_summary(loop.run(), status="completed")
@@ -1768,7 +1786,9 @@ def build_parser():
     run.add_argument("--gitleaks", default=shutil.which("gitleaks"),
                      help="absolute path of gitleaks, the outgoing guard's scanner")
     run.add_argument("--reviewer-command",
-                     help="the reviewer, shell-split and run with the diff on stdin (required unless --dry-run)")
+                     help="the reviewer, shell-split and run with the diff on stdin (required unless --dry-run); its "
+                     "executable must be an absolute path, and the SHA-256 of its argv (each element NUL-terminated) "
+                     "must equal gate G4's reviewer_argv_sha256 in <state>/stage-gates.json")
     run.add_argument("--dry-run", action="store_true",
                      help="print the plan as JSON after the read-only steps; no container, no GitHub write")
     run.set_defaults(handler=_cmd_run)

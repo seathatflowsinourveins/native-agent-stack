@@ -1325,6 +1325,45 @@ def recorded(entry, now, **fields):
         return False
 
 
+def read_stage_gates(state):
+    """<state>/stage-gates.json: an owner-only regular file with the recorded schema."""
+    path = Path(state) / STAGE_GATES
+    if not path.exists():
+        raise ValueError("stage_gates_not_recorded")
+    gates = json.loads(read_bounded(private_file(path), limit=1024 * 1024))
+    if not isinstance(gates, dict) or gates.get("schema") != STAGE_GATES_SCHEMA:
+        raise ValueError("stage_gates_schema")
+    return gates
+
+
+def reviewer_argv_sha256(argv):
+    """SHA-256 of an argv in the /proc/<pid>/cmdline form: each element followed by a NUL byte
+    (proc(5)), so ["a b"] and ["a", "b"] differ."""
+    if (not isinstance(argv, (list, tuple)) or not argv
+            or not all(isinstance(arg, str) and "\0" not in arg for arg in argv)):
+        raise ValueError("reviewer_argv_invalid")
+    return hashlib.sha256(b"".join(arg.encode("utf-8") + b"\0" for arg in argv)).hexdigest()
+
+
+def verify_reviewer_gate(state, argv, *, now):
+    """Plan gate G4 for the resolver's reviewer command (review item F3).
+
+    The reviewer is the one host-side model that reads the agent's diff, so G4 qualifies
+    its exact argv (resolver plan section 2 step 10 and gate G4: no project or user hook,
+    MCP server, skill or tool). <state>/stage-gates.json must hold a passed "g4" record,
+    recorded no later than now, whose reviewer_argv_sha256 equals reviewer_argv_sha256 of
+    `argv`. Resolver mode only: SWE-bench mode runs no reviewer, so verify_stage_gates does
+    not require it. Returns the digest for the receipt.
+    """
+    entry = read_stage_gates(state).get("g4")
+    if not recorded(entry, now) or not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("reviewer_argv_sha256"))):
+        raise ValueError("stage_gate_g4_not_recorded")
+    qualified = reviewer_argv_sha256(argv)
+    if entry["reviewer_argv_sha256"] != qualified:
+        raise ValueError("reviewer_argv_not_qualified")
+    return qualified
+
+
 def verify_stage_gates(state, arm, *, now):
     """The coordinator's live records that code cannot observe (repair R6).
 
@@ -1337,12 +1376,7 @@ def verify_stage_gates(state, arm, *, now):
     until the gates are observed, so dispatch start refuses until then.
     """
     arm_config(arm)
-    path = Path(state) / STAGE_GATES
-    if not path.exists():
-        raise ValueError("stage_gates_not_recorded")
-    gates = json.loads(read_bounded(private_file(path), limit=1024 * 1024))
-    if not isinstance(gates, dict) or gates.get("schema") != STAGE_GATES_SCHEMA:
-        raise ValueError("stage_gates_schema")
+    gates = read_stage_gates(state)
     pins = read_json(HERE / "pins.json")
     scans = gates.get("g2") if isinstance(gates.get("g2"), dict) else {}
     if not all(recorded(scans.get(ref), now) for ref in (pins["image"]["ref"], pins["gateway_proxy"]["ref"])):

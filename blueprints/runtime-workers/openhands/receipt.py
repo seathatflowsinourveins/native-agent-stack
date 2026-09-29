@@ -287,7 +287,9 @@ def resolver_summary(result, window):
                    if isinstance(write, dict) and write.get("op") in RESOLVER_WRITES]
         if isinstance(outcome.get("writes"), list) else [],
         "gates": {"stage_gates_sha256": _matching(window.get("stage_gates_sha256"), HEX64),
-                  "isolation_probe_sha256": probe},
+                  "isolation_probe_sha256": probe,
+                  # Gate G4's qualified reviewer argv (host.verify_reviewer_gate), by hash only.
+                  "reviewer_argv_sha256": _matching(identity.get("reviewer_argv_sha256"), HEX64)},
         "review": None,
     }
 
