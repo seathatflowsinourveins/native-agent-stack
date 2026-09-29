@@ -6524,7 +6524,7 @@ class F35_JudgeRoutes(GraderCase):
         uuid = "-".join(["3f2b8c1e", "0000", "4000", "8000", "000000000000"])
         toolu = "toolu" + "_" + "01ABCDEFGHIJKLMN"
         scrubber = jd.Scrubber(values=["tok7fixture", "sess-fixture-1"], denylist=["rtk", "ctx_execute", "ai-memory"])
-        raw = (f"Ran rtk on /home/someone/work/file.py with tok7fixture; sess-fixture-1 used ctx_execute and ai-memory in "
+        raw = (f"Ran rtk on /home/example/work/file.py with tok7fixture; sess-fixture-1 used ctx_execute and ai-memory in "
                f"arm B by Claude (opus) at {uuid} ({toolu}). Keep scripts/host_requests.py:227 and "
                "https://docs.python.org/3/library/json.html.")
         scrubbed = scrubber.scrub(raw)
@@ -6533,7 +6533,7 @@ class F35_JudgeRoutes(GraderCase):
                                         "https://docs.python.org/3/library/json.html.")
         quote = "Keep scripts/host_requests.py:227"
         self.assertEqual(scrubbed.to_raw(quote), quote)
-        self.assertEqual(scrubbed.to_raw("on <path> with"), "on /home/someone/work/file.py with")
+        self.assertEqual(scrubbed.to_raw("on <path> with"), "on /home/example/work/file.py with")
         self.assertIsNone(scrubbed.to_raw("<pa"), "a quote that cuts through a replaced span has no raw text")
         self.assertIsNone(scrubbed.to_raw("text that is not there"))
 
