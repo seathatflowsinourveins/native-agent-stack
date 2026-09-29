@@ -41,9 +41,13 @@ install_skills.py is run as a real subprocess (like tests/test_render_config.py'
 does across process boundaries with a real (fake) CLI. $XDG_STATE_HOME is
 stripped from the child environment by default so a variable already set on
 the host running these tests can never redirect a lock-file write outside the
-test's own temporary directory; only the dedicated XDG test re-adds it,
-pointed at a second temporary directory. $CLAUDE_CONFIG_DIR is stripped the
-same way, and only the tests that name it set it.
+test's own temporary directory. Only the tests that name it set it again, each
+inside its own temporary directory: the XDG tests (XdgStateHomeLockPathTests)
+and the ".." cases built by dotdot_paths. The path unit test
+test_global_paths_join_as_node_does_and_project_paths_are_unchanged also sets
+it, in this process under mock.patch.dict, for paths it computes and never
+writes. $CLAUDE_CONFIG_DIR is stripped the same way, and only the tests that
+name it set it.
 """
 
 import hashlib
@@ -362,6 +366,11 @@ class InstallSkillsTestCase(unittest.TestCase):
         state = f"state-{label}"
         return ({"XDG_STATE_HOME": str(missing / ".." / state)}, str(self.tmp_path / label),
                 self.tmp_path / state / "skills" / ".skill-lock.json")
+
+    def assert_fake_cli_made_no_missing_folder(self) -> None:
+        """A fake-CLI fidelity check, not a check of install_skills.py, which makes no path itself: like skills
+        1.7.0, whose path.join collapses a ".." before any mkdir, the fake CLI never makes tmp/missing."""
+        self.assertFalse((self.tmp_path / "missing").exists())
 
 
 class DryRunTests(InstallSkillsTestCase):
@@ -738,6 +747,39 @@ sys.exit(code)
                 self.assertEqual(json.loads(global_lock.read_text()), {"lockfileVersion": 3, "skills": {}})
                 self.assertFalse((self.home / "skills-lock.json").exists())
 
+    def test_project_dir_is_compared_with_the_home_the_cli_joins(self):
+        # The CLI's global home is path.join(HOME) (dist/cli.mjs L2208-2210), so --home tmp/link/../h is tmp/h, the
+        # project. pathlib keeps the "..": through the symlink link -> x/y it names tmp/x/h. A ".." after a real
+        # directory (the control) names tmp/h either way. Each is refused before any skills or gh call.
+        (self.tmp_path / "x" / "y").mkdir(parents=True)
+        (self.tmp_path / "link").symlink_to("x/y", target_is_directory=True)
+        (self.tmp_path / "real").mkdir()
+        path_env = {"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]}
+        gh_log = self.bin_dir / "gh_calls.log"
+        self.project = self.tmp_path / "h"
+        self.project.mkdir()
+        for via in ("real", "link"):
+            with self.subTest(home=f"{via}/../h"):
+                calls_before = calls_log(self.fake_bin)
+                gh_before = gh_log.read_text() if gh_log.exists() else ""
+                result = self.run_install(self.manifest, "--project-dir", str(self.project), "--agent", "universal",
+                                          fake_bin=self.fake_bin, env=path_env,
+                                          home_arg=str(self.tmp_path / via / ".." / "h"))
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn("project containment: --project-dir is --home", result.stderr)
+                self.assertEqual(calls_log(self.fake_bin), calls_before)  # not even --version ran
+                self.assertEqual(gh_log.read_text() if gh_log.exists() else "", gh_before)
+                self.assertFalse((self.project / ".agents").exists())
+        # tmp/x/h, which pathlib names for link/../h, is not the CLI's global home: an ordinary project.
+        self.project = self.tmp_path / "x" / "h"
+        self.project.mkdir()
+        result = self.run_install(self.manifest, "--project-dir", str(self.project), "--agent", "universal",
+                                  "--dry-run", fake_bin=self.fake_bin, env=path_env,
+                                  home_arg=str(self.tmp_path / "link" / ".." / "h"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("project containment", result.stderr)
+        self.assertIn("would run", result.stdout)
+
     def test_adding_claude_target_to_existing_universal_install_creates_its_link(self):
         first = self.install()
         self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
@@ -862,7 +904,7 @@ class AddAndVerifyTests(InstallSkillsTestCase):
                 self.assertEqual(skill_md.read_text(), content)
                 self.assertEqual(json.loads(lock.read_text())["skills"]["new-skill"]["skillFolderHash"],
                                  tree_sha("new"))
-                self.assertFalse((self.tmp_path / "missing").exists())
+                self.assert_fake_cli_made_no_missing_folder()
 
     def test_global_paths_join_as_node_does_and_project_paths_are_unchanged(self):
         installer = load_installer_module()
@@ -1051,7 +1093,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
                 link = (link_dir or self.home / ".claude" / "skills") / self.NAME
                 self.assertTrue(link.is_symlink())
                 self.assertIn(f"left: {link}", result.stderr)
-                self.assertFalse((self.tmp_path / "missing").exists())
+                self.assert_fake_cli_made_no_missing_folder()
 
     @unittest.skipUnless(shutil.which("node"), "node is not on PATH")
     def test_js_trim_chars_match_node(self):
@@ -1111,7 +1153,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
                 self.assertIn(f"canonical={kept['canonical']}, lock={kept['lock']}, claude-link=False", result.stderr)
                 self.assertIn(f"left: {canonical}" if kept["canonical"] else f"left: its entry in {lock}",
                               result.stderr)
-                self.assertFalse((self.tmp_path / "missing").exists())
+                self.assert_fake_cli_made_no_missing_folder()
 
     def test_dotdot_control_remove_that_deletes_everything_is_rolled_back(self):
         for label, via in (("home-dotdot-control", "home"), ("xdg-dotdot-control", "xdg")):
@@ -1126,7 +1168,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
                 self.assertFalse((self.home / ".agents" / "skills" / self.NAME).exists())
                 link = self.home / ".claude" / "skills" / self.NAME
                 self.assertFalse(link.exists() or link.is_symlink())
-                self.assertFalse((self.tmp_path / "missing").exists())
+                self.assert_fake_cli_made_no_missing_folder()
 
 
 class LocalModifiedTests(InstallSkillsTestCase):
