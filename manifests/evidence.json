@@ -7100,6 +7100,16 @@
       "bytes": 16076
     },
     {
+      "path": "blueprints/gate-b-gpt6-route/PREREGISTRATION.md",
+      "sha256": "705ccf2f4f343819406ebe8db99bf159f4eea08803ab36babd100345de1f37a0",
+      "bytes": 124839
+    },
+    {
+      "path": "blueprints/gate-b-gpt6-route/preregistration.json",
+      "sha256": "4eb263c4b33368a17e4490726a780289a96e3ca6b01812d8de3b34cd423f3240",
+      "bytes": 142132
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -42638,6 +42648,11 @@
       "path": "tests/test_gap_wave_ledger.py",
       "sha256": "7857d26cddfa114483dff44b8813afbd937de044fa2a28c3c71cda8b1cac0db3",
       "bytes": 9965
+    },
+    {
+      "path": "tests/test_gate_b_gpt6_route_preregistration.py",
+      "sha256": "eca1663c45f7dde6addb797834d431d99a0788f90d29ea9cda5da98c1b6e38d3",
+      "bytes": 16517
     },
     {
       "path": "tests/test_gitleaks_config.py",
