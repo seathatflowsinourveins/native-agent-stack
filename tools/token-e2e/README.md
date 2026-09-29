@@ -78,6 +78,7 @@ a slash. `<unit>` is one of `ecosystem-otelcol`, `ecosystem-loki`, `ecosystem-pr
 | `claude.version`; `claude.launcher.{sha256,size}`; `claude.binary.{version_name,size,sha256}` | frozen | First line of `claude --version`; the launcher `~/.local/share/codex-ecosystem/bin/claude`; the file `~/.local/bin/claude` resolves to and its `versions/<name>` name. |
 | `claude.user_claude_md.sha256`, `claude.user_rtk_md.sha256` | frozen | sha256 of `~/.claude/CLAUDE.md` and `~/.claude/RTK.md`. |
 | `claude.settings.{user,project,local}.sha256` and `claude.settings.{user,project,local}.{effort_level_env_unset, agent_teams_env, subagent_model_env, has_model_settings, has_effort_level, advisor_model}` | frozen | sha256 of `~/.claude/settings.json`, the checkout's `.claude/settings.json` and `.claude/settings.local.json`, and values derived from the whole parsed file: no `CLAUDE_CODE_EFFORT_LEVEL` key in its `env` block; class of `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` (`1`, `other`, `unset`); `CLAUDE_CODE_SUBAGENT_MODEL` and `advisorModel` as a model alias, `other` or `unset`; `modelSettings` and `effortLevel` present. An unparsable file keeps its hash and reports `error` for the derived items. |
+| `claude.settings.{user,project,local}.{permissions_default_mode, permissions_allow_count, permissions_deny_count, permissions_ask_count, skip_dangerous_mode_permission_prompt, cross_session_inbound, auto_continue_at_usage_limit, auto_updates_channel, ultracode, enable_workflows, workflow_size_guideline, switch_models_on_flag, model, effort_level}` | frozen | The behaviour-affecting keys, read from the same three parsed files ([settings reference](https://code.claude.com/docs/en/settings-reference), fetched 2026-09-29). `permissions.defaultMode` (`default`, `acceptEdits`, `plan`, `auto`, `dontAsk`, `bypassPermissions`, `manual`); the number of rules in `permissions.allow`, `permissions.deny` and `permissions.ask` (a count, never a rule; `0` when the key is absent); `crossSessionInbound` (`accept`, `hold`, `refuse`); `autoUpdatesChannel` (`latest`, `stable`); `workflowSizeGuideline` (`unrestricted`, `small`, `medium`, `large`); `effortLevel` (`low`, `medium`, `high`, `xhigh`); the booleans `skipDangerousModePermissionPrompt`, `autoContinueAtUsageLimit`, `ultracode`, `enableWorkflows` and `switchModelsOnFlag`; and the top-level `model` as a model alias (`advisorModel` is the `advisor_model` item above). An absent key is `unset`; a value outside the documented set or of another type is `other`; a rule list that is not a list is `error`. The sealed `claude -p` arms pass no permission flags, so these settings define each arm's permissions (`auto` and `bypassPermissions` take effect only from the user file), and a peer session can message a run's lead unless `crossSessionInbound` says otherwise. |
 | `claude.process.{effort_level_unset, agent_teams_env, subagent_model_env}` | frozen | The same three, read from the environment of the process running the capture. |
 | `claude.mcp.*`, `claude.mcp_count` | frozen | From `claude mcp list` run in the checkout: one item per server name, true when it reports `Connected`, and the number of servers. |
 | `codex.version`; `codex.config.sha256`; `codex.stack_worker_profile.{sha256,present}`; `codex.agents_md.sha256`; `codex.rtk_md.sha256` | frozen | `codex --version`; sha256 of `~/.codex/config.toml`, `~/.codex/stack-worker.config.toml` (present: the file exists), `AGENTS.md` and `RTK.md` in `~/.codex`. |
@@ -146,15 +147,18 @@ four items as `missing` with reason `skipped`.
 
 ## Privacy
 
-- Collectors derive booleans, counts, hashes, versions and model aliases. A model alias prints only when it is a short
-  lower-case token; anything else is the class `other`. Settings and unit files are read whole and in process; their values
-  are never copied.
+- Collectors derive booleans, counts, hashes, versions, model aliases and documented setting values. A model alias prints
+  only when it is a short lower-case token, and a setting with a closed value set prints only a member of that set;
+  anything else is the class `other`. Settings and unit files are read whole and in process; their other values are never
+  copied. A permission rule is counted and never kept, and its text is also on the guard's list below.
 - The private capture stores paths as `~/...` or `<repo>/...`, never as an absolute path. The sanitized capture has no path
   field, no path character and no user name.
 - A last guard refuses the whole capture (exit 3, nothing written) if any string carries an environment value of eight
-  characters or more (except the model alias of `CLAUDE_CODE_SUBAGENT_MODEL`), the home or checkout path, or the user or
-  host name. A value or name that the tool's own catalogue text already contains is not listed, so a host whose user is
-  called `claude` can still capture. The refusal names the items (a host-derived family member by its family) and the
+  characters or more (except the model alias of `CLAUDE_CODE_SUBAGENT_MODEL`), a permission rule of eight characters or more,
+  the home or checkout path, or the user or host name. A value or name that the tool's own catalogue text already contains
+  (item ids, methods, the documented setting values) is not listed, so a host whose user is called `claude` can still
+  capture, and neither is a model alias that a settings file states and the tool prints, so an environment variable that
+  holds the same alias does not stop the capture. The refusal names the items (a host-derived family member by its family) and the
   environment variable names involved, never a value.
 - Every scanner is a linear character scan; no regular expression is used.
 
@@ -199,7 +203,9 @@ The suite builds a temporary host (a git checkout, a home directory, fake `claud
 copy the shapes read from the real commands on 2026-09-29. `MutationControlTests` writes a mutant of the tool for each
 property (an environment leak with and without the guard, a variant that prints `os.environ`, a collector blind to each
 item class, informational drift that fails, a check that always passes, credential refusal off, a missing tool that
-raises) and requires the test for that property to fail on it. `FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps
+raises, a collector blind to `permissions.defaultMode` or to `crossSessionInbound`, and permission rules printed with and
+without the guard) and requires the test for that property to fail on it; the last four also require the failing assertion
+to name the item or the refusal, so a mutant cannot fail for another reason. `FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps
 the mutants and each one's exit code and failing assertion.
 
 ## Sources

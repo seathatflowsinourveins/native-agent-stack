@@ -14,9 +14,10 @@ a class (frozen or informational), a status (ok, missing, error, not_applicable)
 Frozen items must not change between W-open and W-close; informational items (time, capacity) are listed and never fail.
 
 The tool never prints or stores an environment value, a token, a host name or a user name, and reads no credential store.
-Two layers keep that true: collectors derive only booleans, counts, hashes, versions and model aliases, and a final guard
-refuses (exit 3, nothing written) any output string that carries an environment value of eight characters or more
-(except the model alias in CLAUDE_CODE_SUBAGENT_MODEL), the home or checkout path, or the user or host name. Paths named
+Two layers keep that true: collectors derive only booleans, counts, hashes, versions, model aliases and documented setting
+values (a permission rule is counted, never kept), and a final guard refuses (exit 3, nothing written) any output string
+that carries an environment value of eight characters or more (except the model alias in CLAUDE_CODE_SUBAGENT_MODEL), a
+permission rule, the home or checkout path, or the user or host name. Paths named
 in the configuration or read from a unit file must lie inside the checkout or the home directory, and the three
 credential stores (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) are refused by name, by symlink and
 by inode. Scanners are linear character scans; no regular expression is used.
@@ -29,6 +30,8 @@ Sources for the rules implemented here (no upstream implementation of this glue 
   token-adoption-e2e-20260926): the frozen list and the no-change-inside-a-run-window rule;
   systemctl(1) "show" (systemd 255): `systemctl --user show UNIT -p PROPERTY` is the computer-parsable form;
   git(1) `--no-optional-locks` and git-status(1) `--porcelain --untracked-files=no`: a status read that writes nothing;
+  https://code.claude.com/docs/en/settings-reference (fetched 2026-09-29): the behaviour settings this tool reads from each
+  settings file and their documented values (permissions.defaultMode, permissions.allow|deny|ask, crossSessionInbound, ...);
   the tools' own --version outputs and the command outputs observed on 2026-09-29 (claude 2.1.284 mcp list and
   -p --output-format json, qmd 2.8.3 status, adoption_status.py and codex_quota.py --json), recorded in tests/.
 """
@@ -84,6 +87,35 @@ LAUNCHER = "~/.local/share/codex-ecosystem/bin/claude"
 CLAUDE_BINARY = "~/.local/bin/claude"
 SETTINGS_DERIVED = ("effort_level_env_unset", "agent_teams_env", "subagent_model_env", "has_model_settings",
                     "has_effort_level", "advisor_model")
+UNSET, OTHER = "unset", "other"
+# Behaviour-affecting settings keys, read from each parsed settings file. The value sets are the documented ones
+# (https://code.claude.com/docs/en/settings-reference, fetched 2026-09-29); a value outside its set is the class `other`, an
+# absent key is `unset`, and nothing else about the value is kept.
+PERMISSION_MODES = ("default", "acceptEdits", "plan", "auto", "dontAsk", "bypassPermissions", "manual")
+CROSS_SESSION_VALUES = ("accept", "hold", "refuse")
+UPDATE_CHANNELS = ("latest", "stable")
+WORKFLOW_SIZES = ("unrestricted", "small", "medium", "large")
+EFFORT_LEVELS = ("low", "medium", "high", "xhigh")
+ENUM, FLAG, COUNT, ALIAS = "enum", "flag", "count", "alias"
+BEHAVIOUR_SETTINGS = (  # (id suffix, key path in the settings document, rule, documented values)
+    ("permissions_default_mode", ("permissions", "defaultMode"), ENUM, PERMISSION_MODES),
+    ("permissions_allow_count", ("permissions", "allow"), COUNT, ()),
+    ("permissions_deny_count", ("permissions", "deny"), COUNT, ()),
+    ("permissions_ask_count", ("permissions", "ask"), COUNT, ()),
+    ("skip_dangerous_mode_permission_prompt", ("skipDangerousModePermissionPrompt",), FLAG, ()),
+    ("cross_session_inbound", ("crossSessionInbound",), ENUM, CROSS_SESSION_VALUES),
+    ("auto_continue_at_usage_limit", ("autoContinueAtUsageLimit",), FLAG, ()),
+    ("auto_updates_channel", ("autoUpdatesChannel",), ENUM, UPDATE_CHANNELS),
+    ("ultracode", ("ultracode",), FLAG, ()),
+    ("enable_workflows", ("enableWorkflows",), FLAG, ()),
+    ("workflow_size_guideline", ("workflowSizeGuideline",), ENUM, WORKFLOW_SIZES),
+    ("switch_models_on_flag", ("switchModelsOnFlag",), FLAG, ()),
+    ("model", ("model",), ALIAS, ()),
+    ("effort_level", ("effortLevel",), ENUM, EFFORT_LEVELS),
+)
+BEHAVIOUR_SUFFIXES = tuple(row[0] for row in BEHAVIOUR_SETTINGS)
+BEHAVIOUR_METHODS = {ENUM: "documented value of a settings key", FLAG: "boolean of a settings key",
+                     COUNT: "number of permission rules", ALIAS: "model alias of a settings key"}
 CONFIG_FLAGS = ("--config", "-config.file", "--config.file")
 ALIAS_EXEMPT_VARIABLE = "CLAUDE_CODE_SUBAGENT_MODEL"
 MIN_SECRET_LENGTH = 8
@@ -480,6 +512,8 @@ class Ctx:
         self.config = config
         self.probe = probe
         self.start = utc_now()
+        self.public_values: set[str] = set()  # printed on purpose from a settings file (a model alias): may equal an env value
+        self.private_values: set[str] = set()  # read and never printed (permission rules): the guard keeps them out
 
     @classmethod
     def for_tests(cls, home: Path, repo: Path, env: dict[str, str]) -> "Ctx":
@@ -615,6 +649,17 @@ class Ctx:
 # ------------------------------------------------------------------------------------------------ catalogue
 
 
+def behaviour_how(where: str, key_path: tuple, rule: str, allowed: tuple) -> str:
+    key = ".".join(key_path)
+    if rule == ENUM:
+        return f"{key} in {where}: {', '.join(allowed)}, other (any other value, never printed) or unset"
+    if rule == FLAG:
+        return f"{key} in {where}: true, false, other (not a boolean) or unset"
+    if rule == COUNT:
+        return f"number of rules in {key} of {where} (a count, never a rule; 0 when the key is absent)"
+    return f"{key} in {where}: a model alias, other or unset"
+
+
 def build_specs(config: dict) -> list[Spec]:
     specs: list[Spec] = []
 
@@ -671,6 +716,8 @@ def build_specs(config: dict) -> list[Spec]:
             f"true when {where} has an effortLevel key")
         add(prefix + "advisor_model", "claude", "value class from the settings file",
             f"advisorModel in {where}: a model alias, other or unset")
+        for suffix, key_path, rule, allowed in BEHAVIOUR_SETTINGS:
+            add(prefix + suffix, "claude", BEHAVIOUR_METHODS[rule], behaviour_how(where, key_path, rule, allowed))
     add("claude.process.effort_level_unset", "claude", "process environment", "true when CLAUDE_CODE_EFFORT_LEVEL is not set "
         "in the environment of the process running the capture")
     add("claude.process.agent_teams_env", "claude", "process environment class",
@@ -862,6 +909,60 @@ def collect_hooks(ctx: Ctx) -> list[dict]:
     return items
 
 
+def walk_settings(document: dict, key_path: tuple) -> tuple[str, Any]:
+    """("set", value), ("unset", None) when the key is absent, or ("malformed", None) when a parent is not an object."""
+    node: Any = document
+    for key in key_path:
+        if not isinstance(node, dict):
+            return "malformed", None
+        if key not in node:
+            return "unset", None
+        node = node[key]
+    return "set", node
+
+
+def classify_setting(document: dict, key_path: tuple, rule: str, allowed: tuple) -> tuple[str, Any, Optional[str]]:
+    """(status, value, reason) of one behaviour key: a documented value, a boolean, a count or a model alias, else the class
+    `other` or `unset`. A rule list that is not a list is an error. Never a rule and never any other value."""
+    state, value = walk_settings(document, key_path)
+    if rule == COUNT:
+        if state == "unset":
+            return OK, 0, None
+        if state == "set" and isinstance(value, list):
+            return OK, len(value), None
+        return ERROR, None, "unrecognized_value"
+    if state == "unset":
+        return OK, UNSET, None
+    if state == "malformed":
+        return OK, OTHER, None
+    if rule == FLAG:
+        return OK, value if isinstance(value, bool) else OTHER, None
+    if rule == ENUM:
+        return OK, value if isinstance(value, str) and value in allowed else OTHER, None
+    return OK, alias_or_other(value), None
+
+
+def permission_rules(document: dict) -> list[str]:
+    """The string rules of permissions.allow, .deny and .ask that are long enough to be a value the guard lists."""
+    block = document.get("permissions")
+    if not isinstance(block, dict):
+        return []
+    return [rule for kind in ("allow", "deny", "ask") if isinstance(block.get(kind), list)
+            for rule in block[kind] if isinstance(rule, str) and len(rule) >= MIN_SECRET_LENGTH]
+
+
+def behaviour_items(ctx: Ctx, prefix: str, document: dict, path: Path) -> list[dict]:
+    """The behaviour keys of one parsed settings file as classes and counts; the rules are only handed to the guard."""
+    items = []
+    for suffix, key_path, rule, allowed in BEHAVIOUR_SETTINGS:
+        status, value, reason = classify_setting(document, key_path, rule, allowed)
+        if rule == ALIAS and value not in (UNSET, OTHER):
+            ctx.public_values.add(value)
+        items.append(ctx.item(prefix + suffix, status, value, reason, path))
+    ctx.private_values.update(permission_rules(document))
+    return items
+
+
 def teams_class(block: dict) -> str:
     if "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS" not in block:
         return "unset"
@@ -877,14 +978,15 @@ def settings_items(ctx: Ctx, kind: str, path: Path) -> list[dict]:
     status, data, reason = ctx.read(path)
     digest = hashlib.sha256(data).hexdigest() if data is not None else None
     items = [ctx.item(prefix + "sha256", status, digest, reason, path)]
+    every_derived = SETTINGS_DERIVED + BEHAVIOUR_SUFFIXES
     if status != OK:
-        return items + [ctx.item(prefix + name, status, None, reason, path) for name in SETTINGS_DERIVED]
+        return items + [ctx.item(prefix + name, status, None, reason, path) for name in every_derived]
     try:
         document = json.loads(data.decode("utf-8"))
         if not isinstance(document, dict):
             raise ValueError("not an object")
     except (ValueError, UnicodeDecodeError, RecursionError):
-        return items + [ctx.item(prefix + name, ERROR, None, "unparsable_json", path) for name in SETTINGS_DERIVED]
+        return items + [ctx.item(prefix + name, ERROR, None, "unparsable_json", path) for name in every_derived]
     block = document.get("env") if isinstance(document.get("env"), dict) else {}
     values = {"effort_level_env_unset": "CLAUDE_CODE_EFFORT_LEVEL" not in block,
               "agent_teams_env": teams_class(block),
@@ -892,7 +994,11 @@ def settings_items(ctx: Ctx, kind: str, path: Path) -> list[dict]:
               "has_model_settings": "modelSettings" in document,
               "has_effort_level": "effortLevel" in document,
               "advisor_model": model_class(document, "advisorModel")}
-    return items + [ctx.item(prefix + name, OK, value, None, path) for name, value in values.items()]
+    for name in ("subagent_model_env", "advisor_model"):
+        if values[name] not in (UNSET, OTHER):
+            ctx.public_values.add(values[name])
+    return items + [ctx.item(prefix + name, OK, value, None, path) for name, value in values.items()] + \
+        behaviour_items(ctx, prefix, document, path)
 
 
 def collect_claude(ctx: Ctx) -> list[dict]:
@@ -1413,7 +1519,8 @@ WORD_MARK = "\x00word:"  # a NUL cannot occur in an environment value, so this p
 def catalogue_tokens(ctx: Ctx) -> tuple[str, set[str]]:
     """The tool's own static text (item ids and methods) and its lower-case alphanumeric words."""
     structure = [SCHEMA, FROZEN, INFORMATIONAL, *STATUSES, "sanitized", "label", "platform", "items", "id", "class", "status",
-                 "value", "method", "reason", "path"]
+                 "value", "method", "reason", "path", UNSET, OTHER, *PERMISSION_MODES, *CROSS_SESSION_VALUES,
+                 *UPDATE_CHANNELS, *WORKFLOW_SIZES, *EFFORT_LEVELS]
     text = "\n".join([f"{spec.id}\n{spec.method}" for spec in ctx.specs] + structure)
     words: set[str] = set()
     current: list[str] = []
@@ -1428,12 +1535,16 @@ def catalogue_tokens(ctx: Ctx) -> tuple[str, set[str]]:
 
 def forbidden_values(ctx: Ctx) -> list[str]:
     """What the output must not carry: environment values of eight characters or more (except the model alias), the home
-    and checkout paths, and the user and host names (entries with WORD_MARK, matched as whole words). A value or name that
-    the tool's own catalogue text already contains cannot be a leak of it, and refusing it would stop every capture on a
-    host whose user or variable happens to equal a catalogue word, so it is not listed."""
+    and checkout paths, the permission rules read from the settings files, and the user and host names (entries with
+    WORD_MARK, matched as whole words). A value or name that the tool's own catalogue text already contains (item ids,
+    methods, the documented setting values) cannot be a leak of it, and refusing it would stop every capture on a host
+    whose user or variable happens to equal a catalogue word, so it is not listed. Nor is a model alias that a settings
+    file states and the tool prints on purpose."""
     text, words = catalogue_tokens(ctx)
     values = {value for key, value in os.environ.items()
               if len(value) >= MIN_SECRET_LENGTH and key != ALIAS_EXEMPT_VARIABLE and value not in text}
+    values.update(rule for rule in ctx.private_values if len(rule) >= MIN_SECRET_LENGTH and rule not in text)
+    values -= ctx.public_values  # a model alias that a settings file states and the tool prints is not a leak of an env value
     values.update({str(ctx.home), str(ctx.repo), os.path.realpath(ctx.home), os.path.realpath(ctx.repo),
                    os.path.expanduser("~")})
     listed = sorted(value for value in values if value and value != "/")
