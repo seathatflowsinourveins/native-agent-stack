@@ -10,7 +10,9 @@ receipt holds the boot id, uptime, systemd version, whether the user lingers and
 scripts/credential_status.py reduced to ids, statuses, store kinds, path templates, states, findings and warnings;
 each file row's fingerprint (mode, size and mtime_ns from lstat); the checker's coverage names; the names of this
 uid's live native-agent-stack:* kernel keys; and whether the installed user-scope guard matches its pin. No store
-file is opened, read, followed or hashed, and no value, content hash or expanded host path is recorded.
+file is opened, read, followed or hashed, and no value, content hash or expanded host path is recorded. Each file is
+observed with lstat just before and just after the checker's scan; a file whose device, inode, mode, size, mtime or
+ctime differs between the two changed while the checker looked, so its row is changed_during_record, never ok.
 
 `compare` prints the states of the latest two receipts and the names of changed fingerprint fields, never their
 values: the size a local receipt keeps gives a one-variable file's value length, so no printed or published form
@@ -50,7 +52,8 @@ UPTIME = Path("/proc/uptime")
 UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 SYSTEMD_VERSION = re.compile(r"systemd \d+(?: \([\w.~+-]+\))?")  # `systemctl --version`, first line
 REVISION = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")
-STATES = ("ok", "missing", "unsafe", "unchecked", "not_local")  # credential_status.py's row states
+CHANGED = "changed_during_record"  # a file that changed between the two observations of one record
+STATES = ("ok", "missing", "unsafe", "unchecked", "not_local", CHANGED)  # credential_status.py's row states, and ours
 GATED_STATUSES = {"required", "optional"}  # compare exits 1 when such a file row leaves ok
 FINGERPRINT_FIELDS = ("mode", "size", "mtime_ns")
 
@@ -99,11 +102,25 @@ def checkout_revision(root: Path) -> str | None:
     return revision if revision and REVISION.fullmatch(revision) else None
 
 
-def fingerprint(path: Path) -> dict | None:
-    """mode, size and mtime_ns from lstat: the file is not opened, read, followed or hashed. None when absent."""
+def observe(path: Path) -> os.stat_result | None:
+    """One lstat: the file is not opened, read, followed or hashed. None when absent."""
     try:
-        info = os.lstat(path)
+        return os.lstat(path)
     except OSError:
+        return None
+
+
+def identity(info: os.stat_result | None) -> tuple | None:
+    """What a removal, replacement, rewrite or mode change alters (a replacement gets another inode; any change moves
+    the ctime, which no user call can set). Compared within one record, never stored."""
+    if info is None:
+        return None
+    return info.st_dev, info.st_ino, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns
+
+
+def fingerprint(info: os.stat_result | None) -> dict | None:
+    """The three fields a receipt keeps: mode, size and mtime_ns. None when the file is absent."""
+    if info is None:
         return None
     return {"mode": format(stat.S_IMODE(info.st_mode), "04o"), "size": info.st_size, "mtime_ns": info.st_mtime_ns}
 
@@ -120,15 +137,24 @@ def load_inventory(root: Path) -> dict:
 
 
 def build_receipt(root: Path, inventory: dict, env, *, proc_keys: Path | None, facts: dict, now: datetime) -> dict:
+    # The checker observes each file itself. One lstat just before its scan and one just after bracket that
+    # observation: when the two agree, the checker saw the same file whose fingerprint is recorded.
+    files = {entry["id"]: cs.expand_template(entry["store"]["path_template"], env)
+             for entry in inventory["entries"] if entry["store"]["kind"] in cs.LOCAL_KINDS}
+    before = {identifier: observe(path) for identifier, path in files.items()}
     report = cs.inspect(root, inventory, env, proc_keys=proc_keys)
+    after = {identifier: observe(path) for identifier, path in files.items()}
     rows = []
     for entry in report["entries"]:
         row = {"id": entry["id"], "status": entry["status"], "store_kind": entry["store_kind"],
                "template": entry["path"], "state": entry["state"],
                "findings": list(entry["findings"]), "warnings": list(entry["warnings"])}
-        if entry["store_kind"] in cs.LOCAL_KINDS:
-            row["fingerprint"] = fingerprint(cs.expand_template(entry["path"], env))
+        if entry["id"] in files:
+            if identity(before[entry["id"]]) != identity(after[entry["id"]]):
+                row["state"] = CHANGED
+            row["fingerprint"] = fingerprint(after[entry["id"]])
         rows.append(row)
+    changed = any(row["state"] == CHANGED for row in rows)
     return {
         "schema_version": SCHEMA_VERSION,
         "kind": KIND,
@@ -141,7 +167,7 @@ def build_receipt(root: Path, inventory: dict, env, *, proc_keys: Path | None, f
         # Every live native-agent-stack:<name> key of this uid, claimed by a row or not: no entry is passed as a claim.
         "keyring_names": cs.undeclared_keyring_keys([], os.getuid(), proc_keys),
         "claude_user_guard_matches_pin": cs.guard_matches_pin(cs.claude_config_dir(env), root),
-        "result": report["result"],
+        "result": CHANGED if changed and report["result"] == "ok" else report["result"],
     }
 
 

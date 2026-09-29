@@ -218,7 +218,14 @@ The second restart safeguard of the same design (D1 PR-3), built on branch
    checker's rows reduced to ids, statuses, store kinds, path templates,
    states, findings and warnings, each file row's `lstat` mode, size and
    `mtime_ns`, the coverage names, the names of this uid's live
-   `native-agent-stack:*` keys, and `claude_user_guard_matches_pin`.
+   `native-agent-stack:*` keys, and `claude_user_guard_matches_pin`. The
+   checker observes each file itself, so the tool brackets that scan with
+   one `lstat` just before and one just after it. A file whose device,
+   inode, mode, size, mtime or ctime differs between the two changed while
+   the checker looked; its row is `changed_during_record`, never `ok`, and
+   `compare` counts it as not ok (review finding, 2026-09-29: a file
+   removed between two separate observations had read as
+   `ok -> ok, fingerprint gone`).
 2. `compare` diffs the latest two receipts by state and by the names of
    changed fingerprint fields. It exits 1 when a required or optional file
    row that was `ok` is no longer `ok` or has no row, 2 without a readable

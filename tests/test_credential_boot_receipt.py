@@ -48,11 +48,12 @@ ALLOWED_KEYS = {
 }
 FINGERPRINT_KEYS = {"mode", "size", "mtime_ns"}
 FILE_KINDS = {"private_env_file", "private_file", "native_store"}
-STATES = {"ok", "missing", "unsafe", "unchecked", "not_local"}
+STATES = {"ok", "missing", "unsafe", "unchecked", "not_local", "changed_during_record"}
 REASON_CODE = re.compile(r"[a-z0-9_]+")
 LINE = re.compile(r"credential boot receipt: rows=\d+ ok=\d+ missing=\d+ unsafe=\d+ unchecked=\d+ not_local=\d+ "
-                  r"fingerprints=\d+ undeclared_store_files=(?:\d+|unknown) keyring_names=(?:\d+|unknown) "
-                  r"guard_matches_pin=(?:true|false) result=(?:ok|unsafe) "
+                  r"changed_during_record=\d+ fingerprints=\d+ undeclared_store_files=(?:\d+|unknown) "
+                  r"keyring_names=(?:\d+|unknown) guard_matches_pin=(?:true|false) "
+                  r"result=(?:ok|unsafe|changed_during_record) "
                   r"receipt=\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
 # Two boot ids in the kernel's UUID form, joined at run time: scripts/validate.py flags a UUID written out in a
 # tracked file as a possible local session identifier.
@@ -201,6 +202,21 @@ class BootReceiptTests(unittest.TestCase):
         """An in-process record at a fixed clock with fixed boot facts."""
         return cbr.record(ROOT, self.env, proc_keys=self.proc_keys, facts=self.facts(boot_id, uptime),
                           now=self.clock + timedelta(seconds=seconds))
+
+    def change_during_inspect(self, change, before_the_checker: bool = False):
+        """Patch the checker's inspect, as the tool calls it, to run `change` just before or just after the checker's
+        own observation of the store: the window between two observations of one record."""
+        real = cbr.cs.inspect
+
+        def inspect(*args, **kwargs):
+            if before_the_checker:
+                change()
+            report = real(*args, **kwargs)
+            if not before_the_checker:
+                change()
+            return report
+
+        return patch.object(cbr.cs, "inspect", inspect)
 
     def run_cli(self, *args: str, isolated: bool = True, extra_env: dict | None = None):
         environment = {"PATH": os.environ.get("PATH", ""), **self.env, **(extra_env or {})}
@@ -397,6 +413,56 @@ class BootReceiptTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertRegex(result.stdout, r"(?m)^  tavily \(optional, private_env_file\): ok -> \(no row\)  "
                                         r"<- regression$")
+
+    def test_a_file_changed_during_record_is_never_ok(self):
+        # The checker's observation and the fingerprint must describe one file. A file removed or replaced between
+        # two observations of one record makes its row changed_during_record, which compare counts as not ok.
+        tavily = self.plant("tavily.env", "TAVILY_API_KEY")
+        self.plant("alpaca-paper.env", "APCA_API_KEY_ID")
+        self.record(BOOT_A, 0)
+        with self.change_during_inspect(tavily.unlink):  # removed right after the checker saw it
+            _, receipt, line = self.record(BOOT_B, 60)
+        row = next(row for row in receipt["rows"] if row["id"] == "tavily")
+        self.assertEqual((row["state"], row["fingerprint"]), ("changed_during_record", None))
+        self.assertEqual(next(row for row in receipt["rows"] if row["id"] == "alpaca-paper")["state"], "ok")
+        self.assertEqual(receipt["result"], "changed_during_record")
+        self.assertIn(" changed_during_record=1 ", line)
+        self.assertIn(" result=changed_during_record ", line)
+        result = self.run_cli("compare")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertRegex(result.stdout, r"(?m)^  tavily \(optional, private_env_file\): ok -> changed_during_record, "
+                                        r"fingerprint gone  <- regression$")
+        # Removed just before the checker looked: the same.
+        self.plant(tavily, "TAVILY_API_KEY")
+        self.record(BOOT_B, 120)
+        with self.change_during_inspect(tavily.unlink, before_the_checker=True):
+            _, receipt, _ = self.record(BOOT_B, 180)
+        self.assertEqual(next(row for row in receipt["rows"] if row["id"] == "tavily")["state"], "changed_during_record")
+        # Replaced by a file with the same bytes, mode and mtime: only its inode and ctime differ, so the three
+        # recorded fields cannot tell, and the row is still not ok.
+        self.plant(tavily, "TAVILY_API_KEY")
+        self.record(BOOT_B, 240)
+        seen = os.lstat(tavily)
+
+        def replace():
+            twin = tavily.with_name(".tavily.env.twin")
+            twin.write_bytes(tavily.read_bytes())
+            twin.chmod(0o600)
+            os.utime(twin, ns=(seen.st_atime_ns, seen.st_mtime_ns))
+            os.replace(twin, tavily)
+
+        with self.change_during_inspect(replace):
+            _, receipt, _ = self.record(BOOT_B, 300)
+        row = next(row for row in receipt["rows"] if row["id"] == "tavily")
+        self.assertEqual(row["state"], "changed_during_record")
+        self.assertEqual(row["fingerprint"], {"mode": "0600", "size": seen.st_size, "mtime_ns": seen.st_mtime_ns})
+        self.assertEqual(self.run_cli("compare").returncode, 1)
+        # Nothing changes during a record: the row is ok, with no false alarm.
+        with self.change_during_inspect(lambda: None):
+            _, receipt, line = self.record(BOOT_B, 360)
+        self.assertEqual(next(row for row in receipt["rows"] if row["id"] == "tavily")["state"], "ok")
+        self.assertEqual(receipt["result"], "ok")
+        self.assertIn(" changed_during_record=0 ", line)
 
     def test_compare_after_a_restart_names_changes_and_never_values(self):
         alpaca = self.plant("alpaca-paper.env", "APCA_API_KEY_ID")
