@@ -595,7 +595,12 @@ the real one, so nothing is ever committed from this step), then re-runs
 recording path works under macOS Python, BSD userland and the system `git`,
 never that this ONE receipt establishes any platform-status change (it does
 not carry `second_physical_machine: true`, and it is discarded with the
-throwaway copy at the end of the job).
+throwaway copy at the end of the job). Because that copy commits nothing,
+the smoke does not run `scripts/catalog_index.py`
+(added after `v2026.09.26.2`); a branch that commits a matrix change runs
+`python3 scripts/catalog_index.py --write` after the grand list's `--write`
+([hot-file protocol](../../docs/lanes.md#hot-file-protocol)), and CI's
+validate job checks the result.
 
 **Minimum Python version: 3.9**, declared in
 [`adoption/bootstrap.md`](../bootstrap.md) and tested directly, not merely

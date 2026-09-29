@@ -208,6 +208,7 @@ python3 scripts/component_matrix.py --write
 python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "${WAVE_DATE//-/}" \
   --checked-at "$WAVE_DATE" --manifest "$WAVE_MANIFEST"
 python3 scripts/new_host_grand_list.py --write   # its check runs in CI (round 6, OPR6-1)
+python3 scripts/catalog_index.py --write   # the ranked index joins the matrix and ledgers; its check runs in CI
 python3 - <<'EOF'
 import hashlib, json, pathlib, subprocess
 status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], capture_output=True, text=True,

@@ -177,9 +177,20 @@ Read 2026-09-29 during the design review; the quotations are the review's.
 
 ## Residuals
 
-- The PR edits `docs/lanes.md`, so it is `lane:shared` and needs the trading lane's acknowledgement: any PR that adds a
-  `receipts[]` or `convergence_records[]` entry, edits a ledger, the decision index or `manifests/stack.json`, or adds or
-  removes a catalog JSON file now also runs `python3 scripts/catalog_index.py --write`, and CI enforces it.
+- The PR edits `docs/lanes.md`, so it is `lane:shared` and needs the trading lane's acknowledgement. The cost to state in
+  that request, in the review's words: "any change that rewrites the component evidence matrix, plus receipts[],
+  convergence_records[], decision index, stack, aliases, landscape manifest and catalog JSON additions or removals" now
+  also runs `python3 scripts/catalog_index.py --write`, and CI enforces it. Since the repair round the index also reads
+  the host receipts under `evidence/hosts/` (a new receipt already rewrites the matrix, and a receipt of an alternative's
+  stack component can move that alternative's K3 even when the matrix does not change), `adoption/host-receipt.schema.json`
+  and the platform profiles in `adoption/manifest.json`, so a change to those runs it too.
+- The procedures that refresh the matrix name the index write after the grand list's: `docs/lanes.md`,
+  `docs/contributing-evidence.md` (steps 4 and 5, and the review step), `docs/next-host-stages.md`, `adoption/update.md`,
+  `recipes/sota-convergence-practice.md`, `recipes/saturation-sweep.md` (after its matrix write) and
+  `adoption/platforms/macos-arm64.md` (whose CI recording smoke commits nothing and so skips it), and
+  `scripts/new_host_grand_list.py`'s stale message. `.github/workflows/adoption-bootstrap.yml`'s macOS recording smoke is
+  unchanged. The catalog-freshness propose path regenerates the index itself (2026-09-29 addendum of
+  `docs/decisions/2026-09-23-bot-pr-dispatch.md`).
 - This record is a new `docs/**/*.md` file, which the QMD `foundation-docs` collection indexes; merge it outside the Gate A
   window W or hold it until the window closes.
 - `domain-card/default-never-winner` counts 8, a figure the review had not verified: the reuse-first design reported 5

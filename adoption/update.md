@@ -149,6 +149,7 @@ onto `origin/main` and rerun
 ```sh
 python3 scripts/component_matrix.py --write
 python3 scripts/new_host_grand_list.py --write
+python3 scripts/catalog_index.py --write
 python3 scripts/host_receipts.py validate
 python3 scripts/validate.py
 ```

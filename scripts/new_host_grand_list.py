@@ -516,7 +516,8 @@ def main(argv=None) -> int:
     stale = [rel for rel, text in outputs.items() if not (ROOT / rel).is_file() or (ROOT / rel).read_text(encoding="utf-8") != text]
     if stale:
         print("stale or missing: " + ", ".join(stale) + "; run python3 scripts/component_matrix.py --write, then "
-              "python3 scripts/new_host_grand_list.py --write", file=sys.stderr)
+              "python3 scripts/new_host_grand_list.py --write, then python3 scripts/catalog_index.py --write (the "
+              "ranked catalog index joins the matrix)", file=sys.stderr)
         return 1
     print(json.dumps({"status": "passed", "layers": len(data["layers"]), "winners": data["summary"]["winners"]}))
     return 0
