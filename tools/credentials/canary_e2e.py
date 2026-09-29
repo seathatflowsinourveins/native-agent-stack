@@ -5,7 +5,7 @@
     python3 tools/credentials/canary_e2e.py controls --run <id>
     python3 tools/credentials/canary_e2e.py baseline --run <id>
     python3 tools/credentials/canary_e2e.py consume <consumer> --run <id> [--timeout S] [--model M] [--after-restart]
-    python3 tools/credentials/canary_e2e.py decoy --run <id> --consumer <consumer>
+    python3 tools/credentials/canary_e2e.py decoy --run <id> --consumer <consumer> [--rtk <decoy>]
     python3 tools/credentials/canary_e2e.py verify --run <id> [--consumer <consumer>]
     python3 tools/credentials/canary_e2e.py settle --run <id> [--max-wait S] [--interval S]
     python3 tools/credentials/canary_e2e.py scan --pass 1|2 --run <id> [--with-sudo]
@@ -23,30 +23,39 @@ canary exists in two places only: the canary-e2e store file, written with set_cr
 create-only writer (imported) while its consumer runs, and a 0600 pattern file in a 0700 run directory on the runtime
 tmpfs. A canary's patterns are the forms credential_run.py masks (its encoded_forms: raw, base64 and base64url
 interiors at three byte alignments, percent, JSON and hex). No canary, pattern or tag is printed, logged or put in an
-argv: scanners read a pattern file (rg -f) or get patterns bound as SQL parameters, the one Loki query holds labels
-and a time range only, and every output line is a sink id, a count and a path class.
+argv: scanners read a pattern file (rg -f) or get patterns bound as SQL parameters, no discovered path name is ever
+handed to a scanner's argv, the one Loki query holds labels and a time range only, and every output line is a sink id,
+a count and a path class.
 
 `consume` runs one consumer at a time: write that consumer's canary to the store file, run the consumer, remove the
-file. The probe prints only an HMAC tag bound to the run, the consumer and a fresh nonce, which `verify` checks, so a
-stale or copied tag fails. Each Claude and Codex run carries its own decoy, echoed by a command that fails on purpose
-(RTK keeps output only for failed commands), so each sink's positive control comes from the same run. While a consumer
-runs, /proc/<pid>/cmdline of this user's processes and the transient unit files are sampled for the canaries (counts
-only); /proc/<pid>/environ is never read. `settle` times the arrival of the decoys in the asynchronous sinks and sets
-when scan passes 1 and 2 are due. A sink whose control decoy was planted and is not found is reported as "not a sink,
-or scanned wrongly", never as clean, and the scan exits 1. Guard-denied stores (the OmniRoute data directories, Codex
-shell_snapshots, ~/.docker/config.json) are scanned only by `scan --sink omniroute`, from the user's own terminal.
+file; a lock and a record in the run's own directory say which run armed the store. The probe prints only an HMAC tag
+bound to the run, the consumer and a fresh nonce, which `verify` checks, so a stale or copied tag fails, and every
+consumption gets a sequence number that invalidates the verification and scans made before it. Each Claude and Codex
+run carries its own decoy, echoed by a command that fails on purpose; the Claude run also runs `rtk err` with over 500
+bytes of decoy lines, which RTK keeps in its recall store. Every capture of a client's streams is itself scanned for
+every canary, with a control line the harness plants in it. While a consumer runs, /proc/<pid>/cmdline of this user's
+processes and the transient unit files are sampled (counts only); /proc/<pid>/environ is never read. `settle` times the
+decoys' arrival in the asynchronous sinks and sets when scan passes 1 and 2 are due.
+
+A sink whose control decoy was planted and is not found is "not a sink, or scanned wrongly"; an unreadable path, a
+failed scanner, an undecodable or over-limit compressed value, an unfinished Loki dump or an expired deadline makes it
+INCOMPLETE; either fails the scan, never reads as clean. Stores that the guard denies to agents, and every scan that
+would pass a real value through this process (the user manager's environment, container configurations), are scanned
+only by `scan --sink omniroute`, in the user's own terminal.
 
 What a zero proves: no raw or listed-encoded copy of this run's canaries is in the scanned sinks whose positive control
 passed, at the two scan times, for the cooperative, id-only path of the six consumers. Five consumers print only a
 tag, so end-to-end masking is shown only by the systemd unit's --leak-check arm, whose output returns through a pipe to
-this process and never to a client sink. Not covered: remote sinks (provider retention; GitHub beyond gh api reads),
-Windows-side stores, transformed forms, process memory and swap, adversarial or careless agents, unscanned sinks,
-OmniRoute unless the user ran its scan, and future client versions.
+this process and never to a client sink. The receipt names every check that did not run. Not covered: remote sinks
+(provider retention; GitHub beyond gh api reads), Windows-side stores, transformed forms, process memory and swap,
+adversarial or careless agents, unscanned sinks, user-run sinks unless their scan ran, and future client versions.
 
 Exit status: 0 when the step passed; 1 for a failed check or a refusal; 2 for a usage error, a scan pass that is not
-due yet, or a user-run scan without a terminal. Built from the research_sinks scan plan and verify_sinks of the D1
-key-management design (2026-09-29; no upstream harness was found), set_credential.py's writer, credential_run.py's
-encoded forms and scripts/credential_boot_receipt.py's receipt writer.
+due yet, or a user-run scan without a terminal; 130 or 128+N after SIGINT, SIGTERM or SIGHUP. Built from the
+research_sinks scan plan and verify_sinks of the D1 key-management design (2026-09-29; no upstream harness was found),
+set_credential.py's writer, credential_run.py's encoded forms, core-pattern check, group kill and watchdog, and
+scripts/credential_boot_receipt.py's receipt writer; RTK's recall gate from rtk-ai/rtk@v0.50.0 src/core/retriever.rs:18
+(MIN_FAILURE_BYTES 500) and src/core/tee.rs:61-66.
 """
 from __future__ import annotations
 
@@ -59,7 +68,10 @@ if __name__ == "__main__" and not sys.flags.isolated:
     os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
 
 import argparse  # noqa: E402
+import base64  # noqa: E402
 import bz2  # noqa: E402
+import contextlib  # noqa: E402
+import fcntl  # noqa: E402
 import functools  # noqa: E402
 import glob  # noqa: E402
 import hashlib  # noqa: E402
@@ -90,7 +102,7 @@ for _directory in (ROOT / "tools" / "credentials", ROOT / "scripts"):
         sys.path.insert(0, str(_directory))
 import canary_probe as probe  # noqa: E402  (tag, run directories, leak forms)
 import credential_boot_receipt as receipts  # noqa: E402  (private_directory, write_receipt: dot-file and os.link)
-import credential_run as runner  # noqa: E402  (encoded_forms, child_environment, injectable)
+import credential_run as runner  # noqa: E402  (encoded_forms, child_environment, check_core_pattern, end_group)
 import credential_status as cs  # noqa: E402  (inventory schema and store paths)
 import set_credential as writer  # noqa: E402  (value grammar, store checks and the create-only writer)
 
@@ -102,12 +114,16 @@ CONSUMERS = probe.CONSUMERS
 UNIT = "systemd-user-unit"
 DECOY_OF = {"fresh-claude-session": "claude", "subagent": "subagent", "workflow-child": "wf", "codex-exec": "codex",
             "omniroute-lane": "omni"}
-PLANTED = ("claude", "subagent", "wf", "codex", "omni", "journal", "loki")
-DECOYS = PLANTED + ("text", "gz", "sqlite", "git")
+# The decoys a consumption plants: the Claude session also plants the RTK decoy through `rtk err`.
+PLANTED_BY = {"fresh-claude-session": ("claude", "rtk"), "subagent": ("subagent",), "workflow-child": ("wf",),
+              "codex-exec": ("codex",), "omniroute-lane": ("omni",)}
+PLANTED = ("claude", "subagent", "wf", "codex", "omni", "journal", "loki", "rtk")
+DECOYS = PLANTED + ("text", "gz", "sqlite", "git", "capture")
 # What finding a control decoy in a sink shows: a consumer's own decoy covers that consumer's path; the journal and Loki
 # decoys are planted by the harness itself and show only that the sink is read correctly, for any consumer.
 CONTROL_PROVES = {"claude": ("fresh-claude-session",), "subagent": ("subagent",), "wf": ("workflow-child",),
-                  "codex": ("codex-exec",), "omni": ("omniroute-lane",), "journal": CONSUMERS, "loki": CONSUMERS}
+                  "codex": ("codex-exec",), "omni": ("omniroute-lane",), "rtk": ("fresh-claude-session",),
+                  "journal": CONSUMERS, "loki": CONSUMERS}
 CLASS_OF_KIND = {"files": ("text", "gz"), "sqlite": ("text", "gz", "sqlite"), "git": ("git",), "journal": ("journal",)}
 KINDS = {"files", "sqlite", "git", "journal", "loki", "github", "manager_environment", "covered", "not_scanned",
          "during_consume"}
@@ -118,9 +134,11 @@ SET_NAME = re.compile(r"[cd]-[a-z-]+")
 SINK_ID = re.compile(r"[A-Z][A-Za-z0-9-]{1,63}")
 MODEL_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/\[\]-]{0,99}")
 VERSION = re.compile(r"[\w .()+~:/,-]{1,80}")
+TAG_FORMAT = re.compile(rb"[0-9a-f]{64}\n?")
 RUN_ID_SAMPLE = "canary-00000000t000000z-000000"
 MARKER = f"[REDACTED:{VARIABLE}]".encode("ascii")
 PARTIAL = f"[REDACTED-PARTIAL:{VARIABLE}]".encode("ascii")
+CAPTURE_CONTROL = b"# canary-e2e capture control "
 SINKS_FILE = Path(__file__).resolve().with_name("canary_sinks.json")
 HARNESS_REL, PROBE_REL, RUNNER_REL = ("tools/credentials/canary_e2e.py", "tools/credentials/canary_probe.py",
                                       "tools/credentials/credential_run.py")
@@ -136,19 +154,25 @@ CONSUME_TIMEOUT, WORKFLOW_TIMEOUT = 900.0, 1800.0
 SAMPLE_SECONDS = 0.05
 SETTLE_MAX_WAIT, SETTLE_INTERVAL = 1800.0, 30.0
 MARGIN_MIN, MARGIN_MAX, PASS2_EXTRA, RETENTION_SAFETY = 30.0, 600.0, 600.0, 3600.0
+DEFAULT_DEADLINE = 3600.0  # seconds per sink unless the table sets deadline_seconds
 WINDOW_SLACK = 3600  # a WSL clock can step back: time-bounded reads start an hour before the run
 LOKI_QUERY, LOKI_LIMIT, LOKI_PAGES = '{service_name=~".+"}', 5000, 200
+RTK_LINES = 12  # 12 decoy lines of about 70 bytes: over rtk-ai/rtk@v0.50.0 MIN_FAILURE_BYTES (500)
 GH_READS = ("repos/{owner}/{repo}/pulls?state=all&sort=updated&direction=desc&per_page=50",
             "repos/{owner}/{repo}/issues/comments?since={since}&per_page=100",
             "repos/{owner}/{repo}/pulls/comments?since={since}&per_page=100",
             "repos/{owner}/{repo}/commits?since={since}&per_page=100")
 DB_SUFFIXES = (".db", ".sqlite", ".sqlite3")
 SQLITE_MAGIC = b"SQLite format 3\x00"
-MAGIC = ((b"\x1f\x8b", "gzip"), (b"\x28\xb5\x2f\xfd", "zstd"), (b"\xfd7zXZ\x00", "xz"), (b"BZh", "bz2"),
-         (b"\x78\x01", "zlib"), (b"\x78\x5e", "zlib"), (b"\x78\x9c", "zlib"), (b"\x78\xda", "zlib"))
+# Strong magics: a decoding error is an unreadable value. Weak ones (zlib's two bytes, "BZh") can open plain text: an
+# error before any output means the value was not compressed, and it is scanned raw.
+MAGIC = ((b"\x1f\x8b", "gzip", True), (b"\x28\xb5\x2f\xfd", "zstd", True), (b"\xfd7zXZ\x00", "xz", True),
+         (b"BZh", "bz2", False), (b"\x78\x01", "zlib", False), (b"\x78\x5e", "zlib", False),
+         (b"\x78\x9c", "zlib", False), (b"\x78\xda", "zlib", False))
 MAX_DECOMPRESSED = 64 << 20
 SQL_COPY_LIMIT = 256 << 20
 SQL_TERMS = 400  # OR terms per query, under SQLite's 1000 expression depth and 999 host parameters of old builds
+CAPTURE_CHUNK = 1 << 20
 ZERO_CLAIM = ("A zero means that no raw or listed-encoded copy (the forms credential_run.py masks) of a canary of this "
               "run was found in the scanned sinks whose positive control passed, at the two scan times, for the "
               "cooperative, id-only path of the six consumers. Five consumers print only a tag, so it does not show "
@@ -174,6 +198,14 @@ class UsageError(Exception):
     """Bad arguments (exit 2)."""
 
 
+class Interrupted(BaseException):
+    """SIGTERM or SIGHUP: raised in the main thread so that every finally block runs (end the client, disarm)."""
+
+    def __init__(self, signum: int):
+        super().__init__(signum)
+        self.signum = signum
+
+
 # -- context ---------------------------------------------------------------------------------------------------------
 
 class Context:
@@ -192,6 +224,7 @@ class Context:
         self.tty = (lambda: sys.stdin.isatty() and sys.stdout.isatty()) if tty is None else tty
         self.uid = os.getuid() if uid is None else uid
         self.secrets: list = []  # canary material loaded in this process: no printed line may hold any of it
+        self.run_dir = None  # the run a consume step works on, for the interrupted record
         self._entry = None
         self._table = None
 
@@ -242,7 +275,7 @@ def iso_or_none(epoch):
     return iso(epoch) if isinstance(epoch, (int, float)) else None
 
 
-# -- inventory, store and run directory ------------------------------------------------------------------------------
+# -- inventory, store, ownership and run directory -------------------------------------------------------------------
 
 def canary_entry(root: Path = ROOT) -> tuple:
     """(entry, inventory): the canary-e2e row, validated by scripts/credential_status.py's schema."""
@@ -273,50 +306,89 @@ STORE_EXISTS = ("a canary store file exists already: an earlier consumer or run 
                 "(run cleanup for that run)")
 
 
-def arm(ctx: Context, run_dir: Path, consumer: str) -> None:
-    """Write the consumer's canary to the store file through set_credential.py's checked, create-only writer."""
-    path = store_file(ctx)
-    line = writer.encode(VARIABLE, set_value(read_set(run_dir, f"c-{consumer}")))
+@contextlib.contextmanager
+def store_lock(ctx: Context):
+    """An exclusive flock of the store directory, opened through set_credential.py's checked, no-follow handle."""
     try:
-        dfd = writer.open_store(path.parent, ctx.uid)
+        dfd = writer.open_store(store_file(ctx).parent, ctx.uid)
     except writer.Refused as refusal:
         raise Refused(str(refusal)) from None
     try:
-        if writer.existing(dfd, path.name, ctx.uid):
-            raise Refused(STORE_EXISTS)
+        fcntl.flock(dfd, fcntl.LOCK_EX)
+        yield dfd
+    finally:
+        os.close(dfd)
+
+
+def armed_runs(ctx: Context) -> list:
+    """The runs whose own directory records that they armed the store: [(run id, consumer)]."""
+    found = []
+    runtime_dir, keep_dir = probe.run_directories(RUN_ID_SAMPLE, ctx.env)
+    for parent in (runtime_dir.parent, keep_dir.parent):
         try:
+            names = sorted(os.listdir(parent))
+        except OSError:
+            continue
+        for name in names:
+            if probe.RUN_ID.fullmatch(name):
+                try:
+                    record = json.loads((parent / name / "armed.json").read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                found.append((name, record.get("consumer") if isinstance(record, dict) else None))
+    return found
+
+
+def refuse_if_armed_elsewhere(ctx: Context, run) -> None:
+    others = [name for name, _consumer in armed_runs(ctx) if name != run]
+    if others:
+        raise Refused(f"the canary store is armed by run {others[0]}; finish that run or clean it up first")
+
+
+def arm(ctx: Context, run_dir: Path, consumer: str) -> None:
+    """Write the consumer's canary to the store file through set_credential.py's checked, create-only writer, under
+    the store lock, and record in this run's directory that it armed the store."""
+    path = store_file(ctx)
+    line = writer.encode(VARIABLE, set_value(read_set(run_dir, f"c-{consumer}")))
+    with store_lock(ctx) as dfd:
+        refuse_if_armed_elsewhere(ctx, run_dir.name)
+        try:
+            if writer.existing(dfd, path.name, ctx.uid):
+                raise Refused(STORE_EXISTS)
             writer.create_exclusively(dfd, path.name, line)
         except writer.Refused:
             raise Refused(STORE_EXISTS) from None
-    except writer.Refused as refusal:
-        raise Refused(str(refusal)) from None
-    finally:
-        os.close(dfd)
+        write_json(run_dir / "armed.json", {"consumer": consumer, "epoch": ctx.clock()})
 
 
-def disarm(ctx: Context) -> bool:
-    """Unlink the canary file, and only it, through a no-follow handle on the store directory. True when removed."""
+def disarm(ctx: Context, run_dir) -> bool:
+    """Unlink the canary file, and only it, through a no-follow handle on the store directory, under the store lock,
+    and only for the run that armed it (or for none, when no run claims a leftover). True when removed."""
     path = store_file(ctx)
-    try:
-        dfd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    except FileNotFoundError:
+    run = run_dir.name if run_dir is not None else None
+    if not os.path.lexists(path.parent):
+        if run_dir is not None:
+            with contextlib.suppress(FileNotFoundError):
+                os.unlink(run_dir / "armed.json")
         return False
-    except OSError:
-        raise Refused("the store is not a real directory; nothing removed") from None
-    try:
-        if os.fstat(dfd).st_uid != ctx.uid:
-            raise Refused("the store directory is not yours; nothing removed")
+    with store_lock(ctx) as dfd:
+        owners = [name for name, _consumer in armed_runs(ctx)]
+        if owners and run not in owners:
+            raise Refused(f"the canary store is armed by run {owners[0]}; clean up that run instead")
         try:
             info = os.stat(path.name, dir_fd=dfd, follow_symlinks=False)
         except FileNotFoundError:
-            return False
-        if not stat.S_ISREG(info.st_mode) or info.st_uid != ctx.uid:
-            raise Refused("the canary store path is not a regular file of yours; left in place")
-        os.unlink(path.name, dir_fd=dfd)
-        os.fsync(dfd)
-        return True
-    finally:
-        os.close(dfd)
+            removed = False
+        else:
+            if not stat.S_ISREG(info.st_mode) or info.st_uid != ctx.uid:
+                raise Refused("the canary store path is not a regular file of yours; left in place")
+            os.unlink(path.name, dir_fd=dfd)
+            os.fsync(dfd)
+            removed = True
+        if run_dir is not None:
+            with contextlib.suppress(FileNotFoundError):
+                os.unlink(run_dir / "armed.json")
+        return removed
 
 
 def store_present(ctx: Context) -> bool:
@@ -406,6 +478,38 @@ def rotate_nonce(run_dir: Path, consumer: str) -> None:
         os.unlink(run_dir / "tags" / f"{consumer}.tag")
     except FileNotFoundError:
         pass
+
+
+STALE_RESULTS = ("scan-pass-1", "scan-pass-2", "settle", "scan-user-run", "verify")
+
+
+def begin_consumption(ctx: Context, run_dir: Path, consumers) -> int:
+    """A new sequence number for these consumers. The verification, the settle measurement and every scan made before
+    it no longer describe the latest consumption, so they move to results/stale/, and so do the consumers' earlier
+    captures (they are still scanned); report accepts only evidence of the latest consumption of every consumer."""
+    state = load_state(run_dir)
+    sequence = int(state.get("sequence", 0)) + 1
+    state["sequence"] = sequence
+    latest = state.setdefault("latest", {})
+    for consumer in consumers:
+        latest[consumer] = sequence
+    write_json(run_dir / "state.json", state)
+    stale = run_dir / "results" / "stale"
+    stale.mkdir(mode=0o700, exist_ok=True)
+    for name in STALE_RESULTS:
+        path = result_path(run_dir, name)
+        if path.exists():
+            os.replace(path, stale / f"{name}.before-{sequence}.json")
+    old = run_dir / "captured" / "stale"
+    for capture in sorted((run_dir / "captured").iterdir()):
+        if capture.is_file() and any(capture.name.startswith(consumer + ".") for consumer in consumers):
+            old.mkdir(mode=0o700, exist_ok=True)
+            os.replace(capture, old / f"{capture.name}.before-{sequence}")
+    return sequence
+
+
+def latest_sequences(state: dict) -> dict:
+    return dict(state.get("latest") or {})
 
 
 # -- canaries, decoys and patterns -----------------------------------------------------------------------------------
@@ -508,11 +612,20 @@ class Matcher:
         everything = [pattern for patterns in self.sets.values() for pattern in patterns]
         self.anchors = list(dict.fromkeys(anchors)) if anchors and all(
             any(anchor in pattern for anchor in anchors) for pattern in everything) else []
+        self.lookup = {}
+        for name, patterns in self.sets.items():
+            for pattern in patterns:
+                self.lookup.setdefault(pattern, set()).add(name)
+        self.longest = max((len(p) for p in everything), default=1)
 
     def hits(self, data: bytes) -> set:
         if self.anchors and not any(anchor in data for anchor in self.anchors):
             return set()
         return {name for name, patterns in self.sets.items() if any(pattern in data for pattern in patterns)}
+
+    def of_match(self, text: bytes) -> set:
+        """The sets a matched text (one pattern, as rg reports it) belongs to."""
+        return set(self.lookup.get(text, ())) or self.hits(text)
 
 
 # -- sink table and paths --------------------------------------------------------------------------------------------
@@ -536,6 +649,8 @@ def table_errors(table) -> list:
             errors.append(f"{label}: a loki sink needs a url")
         elif sink["kind"] == "journal" and sink.get("scope") not in ("user", "system"):
             errors.append(f"{label}: a journal sink needs scope user or system")
+        elif sink["kind"] == "manager_environment" and sink.get("access") != "user_run":
+            errors.append(f"{label}: the user manager's environment holds real values: user-run only")
         if sink.get("access") not in ACCESS:
             errors.append(f"{label}: unknown access")
         if not (isinstance(sink.get("paths"), list) and all(isinstance(p, str) for p in sink["paths"])):
@@ -545,60 +660,124 @@ def table_errors(table) -> list:
             errors.append(f"{label}: controls must name planted decoys ({', '.join(PLANTED)})")
         if not isinstance(sink.get("async"), bool) or not isinstance(sink.get("persisted"), bool):
             errors.append(f"{label}: async and persisted must be booleans")
+        if sink.get("control_in", "any") not in ("any", "decoded_blobs"):
+            errors.append(f"{label}: control_in must be any or decoded_blobs")
+        deadline = sink.get("deadline_seconds", DEFAULT_DEADLINE)
+        if isinstance(deadline, bool) or not isinstance(deadline, (int, float)) or deadline < 0:
+            errors.append(f"{label}: deadline_seconds must be a non-negative number")
     for key in ("exclude", "exclude_names"):
         if not (isinstance(table.get(key, []), list) and all(isinstance(p, str) for p in table.get(key, []))):
             errors.append(f"{key}: expected strings")
     return errors
 
 
-def expand(ctx: Context, template: str) -> list:
-    """Paths of a table template: credential_status.py's ${NAME:-default} and $HOME, $CHECKOUT, $UID and globs."""
+GLOB_CHARACTERS = set("*?[")
+
+
+def glob_regex(pattern: str):
+    """The regular expression of a gitignore-style glob over a relative path: ** any number of components, * and ?
+    within one, [...] a class."""
+    out, index = [], 0
+    while index < len(pattern):
+        if pattern.startswith("**/", index):
+            out.append("(?:.*/)?")
+            index += 3
+        elif pattern.startswith("**", index):
+            out.append(".*")
+            index += 2
+        elif pattern[index] == "*":
+            out.append("[^/]*")
+            index += 1
+        elif pattern[index] == "?":
+            out.append("[^/]")
+            index += 1
+        elif pattern[index] == "[" and "]" in pattern[index + 2:]:
+            end = pattern.index("]", index + 2)
+            body = pattern[index + 1:end]
+            out.append("[" + ("^" + body[1:] if body.startswith("!") else body) + "]")
+            index = end + 1
+        else:
+            out.append(re.escape(pattern[index]))
+            index += 1
+    return re.compile("".join(out), re.S)
+
+
+def glob_escape(text: str) -> str:
+    return re.sub(r"([*?\[\]{}!\\])", r"\\\1", text)
+
+
+def split_template(ctx: Context, template: str) -> tuple:
+    """(static root, the glob part below it or None) of a table template, after $CHECKOUT, $UID and credential_status's
+    ${NAME:-default} and $HOME. The root is a configured path; the glob is handed to the scanner as a pattern, so a
+    name it would match never passes through an argv."""
     text = template.replace("$CHECKOUT", str(ctx.root)).replace("$UID", str(ctx.uid))
-    path = str(cs.expand_template(text, ctx.env))
-    if any(character in path for character in "*?["):
-        return [Path(match) for match in sorted(glob.glob(path, recursive=True))]
-    return [Path(path)]
+    expanded = str(cs.expand_template(text, ctx.env))
+    parts = expanded.split("/")
+    for index, part in enumerate(parts):
+        if GLOB_CHARACTERS & set(part):
+            return Path("/".join(parts[:index]) or "/"), "/".join(parts[index:])
+    return Path(expanded), None
 
 
-def real(path) -> Path:
-    return Path(os.path.realpath(path))
+def expand(ctx: Context, template: str) -> list:
+    """The paths a template matches (for this process only: git repositories and the settle's own bookkeeping)."""
+    root, pattern = split_template(ctx, template)
+    if pattern is None:
+        return [root]
+    return [Path(match) for match in sorted(glob.glob(str(root / pattern), recursive=True))]
 
 
-def split_roots(path: Path, excluded: list) -> list:
-    """path, or the parts of it that hold no excluded path, so that a scanner is never handed an excluded file.
-
-    A path inside an excluded one gives nothing; a directory that contains one is replaced by its children, the
-    excluded ones left out. Symbolic links among those children are skipped, as rg skips them while it walks."""
-    resolved = real(path)
-    if any(resolved == item or item in resolved.parents for item in excluded):
-        return []
-    if not any(resolved in item.parents for item in excluded):
-        return [resolved]
-    try:
-        children = sorted(os.scandir(resolved), key=lambda child: child.name)
-    except OSError:
-        return []  # a directory holding an excluded path is never handed over whole
-    parts = []
-    for child in children:
-        if not child.is_symlink():
-            parts += split_roots(Path(child.path), excluded)
-    return parts
+def real(path) -> str:
+    return os.path.realpath(path)
 
 
-def exclusions(ctx: Context, agent_pass: bool) -> list:
-    """The table's excluded paths, the store, this harness's run and receipt directories and, for an agent-run pass,
-    every user-run sink's paths."""
+def exclusion_patterns(ctx: Context, sink: dict, agent_pass: bool) -> list:
+    """Absolute exclusion patterns: the table's, the sink's own, the store, this harness's run and receipt directories
+    and, for an agent-run pass, every user-run sink's paths. A static prefix is resolved; a glob part stays a glob."""
     table = ctx.table
-    paths = [p for template in table.get("exclude", []) for p in expand(ctx, template)]
-    paths.append(cs.expand_template(cs.STORE_ROOT, ctx.env))
-    runtime_dir, keep_dir = probe.run_directories(RUN_ID_SAMPLE, ctx.env)
-    paths += [runtime_dir.parent, keep_dir.parent.parent]
+    templates = list(table.get("exclude", [])) + list(sink.get("exclude", []))
     if agent_pass:
-        for sink in table["sinks"]:
-            if sink.get("access") == "user_run":
-                paths += [p for template in sink.get("paths", []) if "**" not in template
-                          for p in expand(ctx, template)]
-    return [real(p) for p in paths]
+        templates += [t for s in table["sinks"] if s.get("access") == "user_run" for t in s.get("paths", [])]
+    runtime_dir, keep_dir = probe.run_directories(RUN_ID_SAMPLE, ctx.env)
+    patterns = [real(cs.expand_template(cs.STORE_ROOT, ctx.env)), real(runtime_dir.parent),
+                real(keep_dir.parent.parent)]
+    for template in templates:
+        root, pattern = split_template(ctx, template)
+        patterns.append(real(root) if pattern is None else real(root).rstrip("/") + "/" + pattern)
+    return patterns
+
+
+def static_part(pattern: str) -> str:
+    parts = pattern.split("/")
+    for index, part in enumerate(parts):
+        if GLOB_CHARACTERS & set(part):
+            return "/".join(parts[:index]) or "/"
+    return pattern
+
+
+def under(path: str, parent: str) -> bool:
+    return path == parent or path.startswith(parent.rstrip("/") + "/")
+
+
+def relative_exclusions(root: str, patterns: list) -> tuple:
+    """(whether the root itself is excluded, the exclusions below it as root-relative glob patterns)."""
+    relative = []
+    for pattern in patterns:
+        static = static_part(pattern)
+        if static == pattern:  # an exact path
+            if under(root, pattern):
+                return True, []
+            if under(pattern, root):
+                relative.append(glob_escape(pattern[len(root.rstrip("/")) + 1:]))
+            continue
+        if under(static, root):
+            relative.append(pattern[len(root.rstrip("/")) + 1:])
+        elif under(root, static):
+            remainder, regex = root[len(static.rstrip("/")) + 1:], glob_regex(pattern[len(static.rstrip("/")) + 1:])
+            components = remainder.split("/")
+            if any(regex.fullmatch("/".join(components[:count])) for count in range(1, len(components) + 1)):
+                return True, []
+    return False, relative
 
 
 def launch_environment(ctx: Context, extra=None) -> dict:
@@ -617,9 +796,44 @@ def scanner_environment(ctx: Context) -> dict:
     return environment
 
 
-# -- scanners --------------------------------------------------------------------------------------------------------
+# -- scan results ----------------------------------------------------------------------------------------------------
 
-def rg_command(ctx: Context, globs=(), sudo: bool = False) -> list:
+class Tally:
+    """What a sink's scan found: per set the distinct places with a hit (and the decoded ones), and every reason it is
+    incomplete. Places are kept in this process only; nothing but counts leaves it."""
+
+    def __init__(self, names):
+        self.names = sorted(names)
+        self.places = {name: set() for name in self.names}
+        self.decoded = {name: set() for name in self.names}
+        self.unreadable = self.special = 0
+        self.reasons: list = []
+        self.present = False
+
+    def add(self, name, place, decoded=False):
+        if name in self.places:
+            self.places[name].add(place)
+            if decoded:
+                self.decoded[name].add(place)
+
+    def incomplete(self, reason: str) -> None:
+        if reason not in self.reasons:
+            self.reasons.append(reason)
+
+    def result(self) -> dict:
+        if self.unreadable:
+            self.incomplete(f"{self.unreadable} unreadable")
+        status = "incomplete" if self.reasons else ("scanned" if self.present else "absent")
+        return {"status": status, "counts": {n: len(p) for n, p in self.places.items()},
+                "decoded_counts": {n: len(p) for n, p in self.decoded.items()}, "unreadable": self.unreadable,
+                "special": self.special, "reasons": list(self.reasons)}
+
+
+def remaining(deadline: float) -> float:
+    return deadline - time.monotonic()
+
+
+def rg_command(ctx: Context, sudo: bool = False) -> list:
     rg = ctx.which("rg")
     if rg is None:
         raise Refused("rg (ripgrep) is not on PATH; the scanners need it")
@@ -633,93 +847,202 @@ def rg_command(ctx: Context, globs=(), sudo: bool = False) -> list:
         found = ctx.which(tool)
         if found:
             argv += [found, *options]
-    argv += [rg, "--no-config", "-uuu", "-a", "-z"]
-    for name in globs:
+    return argv + [rg, "--no-config", "-uuu", "-a", "-z"]
+
+
+def json_bytes(field) -> bytes:
+    if not isinstance(field, dict):
+        return b""
+    if "text" in field:
+        return field["text"].encode("utf-8", "surrogatepass")
+    return base64.b64decode(field.get("bytes", ""))
+
+
+def rg_content(ctx: Context, run_dir: Path, tally: Tally, matcher: Matcher, root: str, include, excluded_rel,
+               names_to_skip, sudo: bool, deadline: float) -> None:
+    """One rg pass with the union of the sets over a configured root (rg --json -o): matched texts give the sets, and
+    the paths stay here. Discovered names never enter the argv: includes, exclusions and names are patterns."""
+    info = os.lstat(root)
+    cwd, target = (root, ".") if stat.S_ISDIR(info.st_mode) else (os.path.dirname(root), os.path.basename(root))
+    argv = rg_command(ctx, sudo) + ["--json", "-o", "-F", "-f", str(pattern_file(run_dir, tally.names))]
+    if include:
+        argv += ["-g", f"/{include}", "-g", f"/{include}/**"]
+    for relative in excluded_rel:
+        argv += ["-g", f"!/{relative}"]
+    for name in names_to_skip:
         argv += ["-g", f"!{name}"]
-    return argv
-
-
-def files_holding(ctx: Context, patterns: Path, paths: list, globs=(), sudo: bool = False) -> tuple:
-    """(files under paths that hold a pattern of the file, unreadable paths). The paths are for this process only."""
-    found, errors = [], 0
-    for start in range(0, len(paths), 256):
-        chunk = [str(p) for p in paths[start:start + 256]]
-        result = subprocess.run(rg_command(ctx, globs, sudo) + ["-l", "-F", "-f", str(patterns), "--", *chunk],
-                                stdin=subprocess.DEVNULL, capture_output=True, env=scanner_environment(ctx))
-        found += [line for line in result.stdout.decode("utf-8", "surrogateescape").split("\n") if line]
-        errors += sum(1 for line in result.stderr.splitlines() if line.strip())
-    return found, errors
-
-
-def filescan(ctx: Context, run_dir: Path, names, paths: list, globs=(), sudo: bool = False) -> tuple:
-    """({set: [files]}, unreadable): one rg pass with the union of the sets, then one per set over the files it found."""
-    hits = {name: [] for name in names}
-    if not paths:
-        return hits, 0
-    candidates, errors = files_holding(ctx, pattern_file(run_dir, names), paths, globs, sudo)
-    if candidates:
-        for name in names:
-            hits[name] = files_holding(ctx, pattern_file(run_dir, [name]), candidates, (), sudo)[0]
-    return hits, errors
-
-
-def stream_count(ctx: Context, producer: list, patterns: Path, cwd=None) -> tuple:
-    """(lines of the producer's output that hold a pattern, 1 when the producer or rg failed)."""
-    rg = ctx.which("rg")
-    if rg is None:
-        raise Refused("rg (ripgrep) is not on PATH; the scanners need it")
-    environment = scanner_environment(ctx)
-    with subprocess.Popen(producer, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                          env=environment, cwd=cwd) as source:
-        result = subprocess.run([rg, "--no-config", "-a", "-c", "-F", "-f", str(patterns), "-"], stdin=source.stdout,
-                                capture_output=True, env=environment)
-        source.stdout.close()
-        source.wait()
-    text = result.stdout.strip()
-    return (int(text) if text.isdigit() else 0), int(source.returncode != 0 or result.returncode not in (0, 1))
-
-
-def count_lines(ctx: Context, run_dir: Path, names, producer: list, cwd=None) -> tuple:
-    """({set: lines}, error): one pass with the union, then one pass per set only when the union found a line."""
-    total, error = stream_count(ctx, producer, pattern_file(run_dir, names), cwd)
-    counts = {name: 0 for name in names}
-    if total:
-        for name in names:
-            counts[name] = stream_count(ctx, producer, pattern_file(run_dir, [name]), cwd)[0]
-    return counts, error
-
-
-def decompressed(data: bytes) -> tuple:
-    """(plain bytes or None, undecodable) for a value that starts with a compression format's magic bytes."""
-    for magic, codec in MAGIC:
-        if not data.startswith(magic):
-            continue
+    argv += ["--", target]
+    left = remaining(deadline)
+    if left <= 0:
+        tally.incomplete("deadline expired")
+        return
+    try:
+        result = subprocess.run(argv, cwd=cwd, stdin=subprocess.DEVNULL, capture_output=True,
+                                env=scanner_environment(ctx), timeout=left)
+    except subprocess.TimeoutExpired:
+        tally.incomplete("deadline expired")
+        return
+    for line in result.stdout.splitlines():
         try:
-            if codec == "gzip":
-                return zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(data, MAX_DECOMPRESSED), False
-            if codec == "zlib":
-                return zlib.decompressobj().decompress(data, MAX_DECOMPRESSED), False
-            if codec == "xz":
-                return lzma.LZMADecompressor().decompress(data, MAX_DECOMPRESSED), False
-            if codec == "bz2":
-                return bz2.BZ2Decompressor().decompress(data, MAX_DECOMPRESSED), False
-            return zstd_decompressed(data)
-        except (zlib.error, lzma.LZMAError, OSError, EOFError, ValueError):
-            return None, codec == "zstd"
-    return None, False
+            event = json.loads(line)
+        except ValueError:
+            tally.incomplete("unreadable scanner output")
+            continue
+        if event.get("type") != "match":
+            continue
+        data = event.get("data") or {}
+        place = json_bytes(data.get("path")).decode("utf-8", "surrogateescape")
+        place = os.path.normpath(os.path.join(cwd, place))
+        for submatch in data.get("submatches") or []:
+            for name in matcher.of_match(json_bytes(submatch.get("match"))):
+                tally.add(name, place)
+    errors = sum(1 for line in result.stderr.splitlines() if line.strip())
+    tally.unreadable += errors
+    if result.returncode not in (0, 1) and not errors:
+        tally.incomplete(f"scanner exit {result.returncode}")
 
 
-def zstd_decompressed(data: bytes) -> tuple:
+def walk(tally: Tally, matcher: Matcher, root: str, include, excluded_rel, names_to_skip, deadline: float) -> list:
+    """Every entry below a configured root, without following links: its path name is matched here, special files are
+    counted and never opened, unreadable directories count, and SQLite files in scope are returned."""
+    include_regex = glob_regex(include) if include else None
+    excluded = [glob_regex(pattern) for pattern in excluded_rel]
+    databases = []
+    info = os.lstat(root)
+    if not stat.S_ISDIR(info.st_mode):
+        if stat.S_ISREG(info.st_mode) and root.endswith(DB_SUFFIXES) and is_sqlite(root):
+            databases.append(root)
+        return databases
+    stack = [(root, "", include_regex is None)]
+    while stack:
+        if remaining(deadline) <= 0:
+            tally.incomplete("deadline expired")
+            break
+        directory, prefix, inside = stack.pop()
+        try:
+            listing = os.scandir(directory)
+        except OSError:
+            tally.unreadable += 1
+            continue
+        with listing:
+            for entry in listing:
+                relative = prefix + entry.name
+                if entry.name in names_to_skip or any(regex.fullmatch(relative) for regex in excluded):
+                    continue
+                try:
+                    link = entry.is_symlink()
+                    is_dir = not link and entry.is_dir(follow_symlinks=False)
+                    is_file = not link and entry.is_file(follow_symlinks=False)
+                except OSError:
+                    tally.unreadable += 1
+                    continue
+                in_scope = inside or bool(include_regex and include_regex.fullmatch(relative))
+                if in_scope:
+                    place = os.path.join(root, relative)
+                    for name in matcher.hits(relative.encode("utf-8", "surrogateescape")):
+                        tally.add(name, place)  # a name that holds a canary is a copy of it
+                if is_dir:
+                    stack.append((entry.path, relative + "/", in_scope))
+                elif is_file:
+                    if in_scope and entry.name.endswith(DB_SUFFIXES) and is_sqlite(entry.path):
+                        databases.append(entry.path)
+                elif not link and in_scope:
+                    tally.special += 1  # a FIFO, socket or device: never opened, never handed to a scanner
+    return databases
+
+
+def scan_scopes(ctx: Context, run_dir: Path, tally: Tally, matcher: Matcher, sink: dict, agent_pass: bool,
+                deadline: float, sudo: bool) -> list:
+    """The files kinds' common pass over every configured scope of a sink; returns the SQLite files in scope."""
+    patterns = exclusion_patterns(ctx, sink, agent_pass)
+    names_to_skip = list(ctx.table.get("exclude_names", [])) if agent_pass else []
+    databases = []
+    for template in sink.get("paths", []):
+        static, include = split_template(ctx, template)
+        try:
+            info = os.lstat(static)
+        except FileNotFoundError:
+            continue
+        except OSError:
+            tally.unreadable += 1
+            continue
+        root = real(static)
+        if stat.S_ISLNK(info.st_mode):
+            try:
+                info = os.lstat(root)
+            except OSError:
+                continue
+        if not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)):
+            tally.special += 1  # a configured path that is a FIFO, socket or device is never opened
+            continue
+        if include and not stat.S_ISDIR(info.st_mode):
+            continue
+        skip, excluded_rel = relative_exclusions(root, patterns)
+        if skip:
+            continue
+        tally.present = True
+        rg_content(ctx, run_dir, tally, matcher, root, include, excluded_rel, names_to_skip, sudo, deadline)
+        if not sudo:
+            databases += walk(tally, matcher, root, include, excluded_rel, names_to_skip, deadline)
+    return databases
+
+
+def decode_member(codec: str, data: bytes, limit: int) -> tuple:
+    """(plain, the bytes after this member, complete). plain is None when no decoder exists (zstd without one)."""
+    if codec in ("gzip", "zlib"):
+        decoder = zlib.decompressobj(16 + zlib.MAX_WBITS if codec == "gzip" else zlib.MAX_WBITS)
+        plain = decoder.decompress(data, limit + 1)
+        return plain, decoder.unused_data, decoder.eof and not decoder.unconsumed_tail
+    if codec in ("xz", "bz2"):
+        decoder = lzma.LZMADecompressor() if codec == "xz" else bz2.BZ2Decompressor()
+        plain = decoder.decompress(data, limit + 1)
+        return plain, decoder.unused_data if decoder.eof else b"", decoder.eof
     try:
         from compression import zstd  # Python 3.14
-        return zstd.ZstdDecompressor().decompress(data, MAX_DECOMPRESSED), False
+        decoder = zstd.ZstdDecompressor()
+        plain = decoder.decompress(data, limit + 1)
+        return plain, decoder.unused_data if decoder.eof else b"", decoder.eof
     except ImportError:
         pass
     try:
         import zstandard  # an optional third-party module
-        return zstandard.ZstdDecompressor().decompressobj().decompress(data)[:MAX_DECOMPRESSED], False
+        decoder = zstandard.ZstdDecompressor().decompressobj()
+        plain = decoder.decompress(data)
+        return plain, getattr(decoder, "unused_data", b""), bool(getattr(decoder, "eof", True))
     except ImportError:
-        return None, True  # counted as undecodable, never as clean
+        return None, b"", False
+
+
+def decode_blob(data: bytes) -> tuple:
+    """(bytes to scan, status) for a value that may be compressed: "raw" when it is not, "decoded" when every member
+    (multi-member gzip, concatenated xz, bz2 or zstd frames) decoded completely within MAX_DECOMPRESSED, with any
+    bytes after the last member kept raw, and "unreadable" when a limit was hit or a stream is incomplete or has no
+    decoder. A suffix is never dropped quietly."""
+    first = next(((codec, strong) for magic, codec, strong in MAGIC if data.startswith(magic)), None)
+    if first is None:
+        return data, "raw"
+    pieces, total, rest = [], 0, data
+    while rest:
+        found = next(((codec, strong) for magic, codec, strong in MAGIC if rest.startswith(magic)), None)
+        if found is None:
+            pieces.append(rest)  # trailing bytes that are not another member are scanned as they are
+            break
+        codec, strong = found
+        try:
+            plain, rest, complete = decode_member(codec, rest, MAX_DECOMPRESSED - total)
+        except (zlib.error, lzma.LZMAError, OSError, EOFError, ValueError):
+            if not pieces and not strong:
+                return data, "raw"  # a weak magic that opened plain text
+            return None, "unreadable"
+        if plain is None:
+            return None, "unreadable"
+        total += len(plain)
+        if total > MAX_DECOMPRESSED or not complete:
+            if not pieces and not strong and not plain:
+                return data, "raw"
+            return None, "unreadable"
+        pieces.append(plain)
+    return b"".join(pieces), "decoded"
 
 
 def as_bytes(cell):
@@ -734,7 +1057,7 @@ def quoted(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
 
 
-def is_sqlite(path: Path) -> bool:
+def is_sqlite(path) -> bool:
     try:
         with open(path, "rb") as handle:
             return handle.read(16) == SQLITE_MAGIC
@@ -742,30 +1065,36 @@ def is_sqlite(path: Path) -> bool:
         return False
 
 
-def sql_scan_file(ctx: Context, path: Path, matcher: Matcher, run_dir: Path) -> dict:
-    """Cells of one database that hold a pattern, per set. Opened read-only (not immutable, so committed WAL frames
-    are read); the anchors and compression magics are bound parameters of a prefilter, and a candidate cell is matched
-    here, decompressed first when it starts with gzip, zlib, xz, bz2 or zstd magic. A database that cannot be opened
-    read-only and is small enough is read from a copy in the run directory, which is then deleted."""
-    info = {"counts": {name: 0 for name in matcher.sets}, "errors": 0, "undecodable": 0}
+def sql_scan_file(ctx: Context, path, matcher: Matcher, run_dir: Path, deadline: float = None) -> dict:
+    """Cells of one database that hold a pattern, per set, and the cells whose decoded content holds it. Opened
+    read-only (not immutable, so committed WAL frames are read); the anchors and compression magics are bound
+    parameters of a prefilter, and a candidate cell is matched here, every compressed member decoded first. A database
+    that cannot be opened read-only and is small enough is read from a copy in the run directory, then deleted."""
+    deadline = time.monotonic() + DEFAULT_DEADLINE if deadline is None else deadline
+    info = {"counts": {name: 0 for name in matcher.sets}, "decoded": {name: 0 for name in matcher.sets},
+            "errors": 0, "unreadable": 0, "expired": False}
+    path = str(path)
     try:
-        connection = sqlite3.connect(f"file:{urllib.parse.quote(str(path))}?mode=ro", uri=True, timeout=5)
+        connection = sqlite3.connect(f"file:{urllib.parse.quote(path)}?mode=ro", uri=True, timeout=5)
         connection.execute("SELECT count(*) FROM sqlite_master").fetchone()
         copy = None
     except sqlite3.Error:
-        copy = copied_database(path, run_dir)
+        copy = copied_database(Path(path), run_dir)
         if copy is None:
             info["errors"] += 1
             return info
-        connection = sqlite3.connect(str(copy / path.name), timeout=5)
+        connection = sqlite3.connect(str(copy / os.path.basename(path)), timeout=5)
     try:
         connection.execute("PRAGMA query_only = 1")
         tables = connection.execute("SELECT name, sql FROM sqlite_master WHERE type = 'table'").fetchall()
         virtual = [name for name, sql in tables if (sql or "").upper().startswith("CREATE VIRTUAL TABLE")]
-        tests = [("instr", anchor) for anchor in matcher.anchors] + [("magic", magic) for magic, _ in MAGIC]
+        tests = [("instr", anchor) for anchor in matcher.anchors] + [("magic", magic) for magic, _, _ in MAGIC]
         for name, _sql in tables:
             if name.startswith("sqlite_") or any(name.startswith(v + "_") for v in virtual):
                 continue  # internal and shadow tables: a virtual table is read through itself
+            if remaining(deadline) <= 0:
+                info["expired"] = True
+                break
             try:
                 columns = [row[1] for row in connection.execute(f"PRAGMA table_info({quoted(name)})")]
                 per_query = max(1, SQL_TERMS // max(1, len(tests))) if matcher.anchors else len(columns) or 1
@@ -780,16 +1109,24 @@ def sql_scan_file(ctx: Context, path: Path, matcher: Matcher, run_dir: Path) -> 
                             parameters.append(needle)
                     where = " OR ".join(clauses) if matcher.anchors else "1"
                     select = ", ".join(quoted(column) for column in group)
-                    for row in connection.execute(f"SELECT {select} FROM {quoted(name)} WHERE {where}", parameters):
+                    for number, row in enumerate(connection.execute(
+                            f"SELECT {select} FROM {quoted(name)} WHERE {where}", parameters)):
+                        if number % 1000 == 999 and remaining(deadline) <= 0:
+                            info["expired"] = True
+                            break
                         for cell in row:
                             data = as_bytes(cell)
                             if data is None:
                                 continue
                             found = matcher.hits(data)
-                            plain, undecodable = decompressed(data)
-                            if plain is not None:
-                                found |= matcher.hits(plain)
-                            info["undecodable"] += int(undecodable)
+                            plain, status = decode_blob(data)
+                            if status == "decoded":
+                                in_plain = matcher.hits(plain)
+                                found |= in_plain
+                                for set_name in in_plain:
+                                    info["decoded"][set_name] += 1
+                            elif status == "unreadable":
+                                info["unreadable"] += 1
                             for set_name in found:
                                 info["counts"][set_name] += 1
             except sqlite3.Error:
@@ -819,94 +1156,138 @@ def copied_database(path: Path, run_dir: Path):
         return None
 
 
-def database_files(parts: list, globs=()) -> list:
-    found = []
-    for part in parts:
-        if part.is_file():
-            if part.name.endswith(DB_SUFFIXES) and is_sqlite(part):
-                found.append(part)
-            continue
-        for directory, directories, files in os.walk(part):
-            directories[:] = [d for d in directories if d not in globs]
-            for name in files:
-                path = Path(directory, name)
-                if name.endswith(DB_SUFFIXES) and not path.is_symlink() and is_sqlite(path):
-                    found.append(path)
-    return found
+def files_sink(ctx, run_dir, sink, sets, agent_pass, deadline) -> dict:
+    tally, matcher = Tally(sets), Matcher(sets)
+    scan_scopes(ctx, run_dir, tally, matcher, sink, agent_pass, deadline, sink.get("access") == "sudo")
+    return tally.result()
 
 
-def sqlite_sink(ctx: Context, run_dir: Path, names, sets: dict, parts: list, globs, sudo: bool) -> dict:
-    """SQL cells, plus a raw pass over every file of the sink (databases and their WAL included) as a second net; a
-    raw hit in a database file whose SQL scan already counted that set is not counted twice."""
-    matcher = Matcher({name: sets[name] for name in names})
-    cells = {name: 0 for name in names}
-    counted = {name: set() for name in names}
-    errors = undecodable = 0
-    for database in database_files(parts, globs):
-        result = sql_scan_file(ctx, database, matcher, run_dir)
-        errors += result["errors"]
-        undecodable += result["undecodable"]
+def sqlite_sink(ctx, run_dir, sink, sets, agent_pass, deadline) -> dict:
+    """SQL cells of every database in scope (decoded members counted apart), plus the raw pass over every file of the
+    sink (databases and their WAL included) as a second net."""
+    tally, matcher = Tally(sets), Matcher(sets)
+    databases = scan_scopes(ctx, run_dir, tally, matcher, sink, agent_pass, deadline, False)
+    for database in databases:
+        result = sql_scan_file(ctx, database, matcher, run_dir, deadline)
+        tally.unreadable += result["unreadable"]
+        if result["errors"]:
+            tally.incomplete(f"{result['errors']} database read errors")
+        if result["unreadable"]:
+            tally.incomplete(f"{result['unreadable']} undecodable or over-limit compressed values")
+        if result["expired"]:
+            tally.incomplete("deadline expired")
         for name, count in result["counts"].items():
-            cells[name] += count
-            if count:
-                counted[name].update(f"{database}{suffix}" for suffix in ("", "-wal", "-shm", "-journal"))
-    raw, raw_errors = filescan(ctx, run_dir, names, parts, globs, sudo)
-    counts = {name: cells[name] + sum(1 for f in raw[name] if f not in counted[name]) for name in names}
-    return {"status": "scanned", "counts": counts, "unreadable": errors + raw_errors + undecodable}
+            for number in range(count):
+                tally.add(name, f"{database}#cell{number}", decoded=number < result["decoded"][name])
+    return tally.result()
 
 
-def git_common_dir(ctx: Context, part: Path):
+def stream_count(ctx: Context, producer: list, patterns: Path, deadline: float, cwd=None, extra_env=None) -> tuple:
+    """(lines of the producer's output that hold a pattern, the reason it is incomplete or None)."""
+    rg = ctx.which("rg")
+    if rg is None:
+        raise Refused("rg (ripgrep) is not on PATH; the scanners need it")
+    environment = scanner_environment(ctx)
+    environment.update(extra_env or {})
+    left = remaining(deadline)
+    if left <= 0:
+        return 0, "deadline expired"
+    source = subprocess.Popen(producer, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                              env=environment, cwd=cwd, start_new_session=True)
+    counter = None
+    try:
+        counter = subprocess.Popen([rg, "--no-config", "-a", "-c", "-F", "-f", str(patterns), "-"],
+                                   stdin=source.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   env=environment, start_new_session=True)
+        source.stdout.close()
+        try:
+            out, _err = counter.communicate(timeout=left)
+            source.wait(timeout=max(1.0, remaining(deadline)))
+        except subprocess.TimeoutExpired:
+            return 0, "deadline expired"
+    finally:
+        for process in (counter, source):
+            if process is not None and process.poll() is None:
+                runner.end_group(process)
+    text = out.strip()
+    if source.returncode != 0:
+        return (int(text) if text.isdigit() else 0), f"producer exit {source.returncode}"
+    if counter.returncode not in (0, 1):
+        return 0, f"scanner exit {counter.returncode}"
+    return (int(text) if text.isdigit() else 0), None
+
+
+def count_lines(ctx, run_dir, tally: Tally, producer, deadline, place, cwd=None, extra_env=None) -> None:
+    """Lines of a producer's output per set: one pass with the union, one per set only when the union found a line."""
+    total, reason = stream_count(ctx, producer, pattern_file(run_dir, tally.names), deadline, cwd, extra_env)
+    if reason:
+        tally.incomplete(reason)
+    if total:
+        for name in tally.names:
+            count, reason = stream_count(ctx, producer, pattern_file(run_dir, [name]), deadline, cwd, extra_env)
+            if reason:
+                tally.incomplete(reason)
+            for number in range(count):
+                tally.add(name, f"{place}#line{number}")
+
+
+def git_common_dir(ctx: Context, part: str):
     git = ctx.which("git")
-    if git is None or not part.is_dir():
+    if git is None or not os.path.isdir(part):
         return None
-    result = subprocess.run([git, "-C", str(part), "rev-parse", "--git-common-dir"], stdin=subprocess.DEVNULL,
+    result = subprocess.run([git, "rev-parse", "--git-common-dir"], cwd=part, stdin=subprocess.DEVNULL,
                             capture_output=True, env=scanner_environment(ctx), timeout=60)
     if result.returncode != 0:
         return None
-    common = Path(result.stdout.decode("utf-8", "surrogateescape").strip())
-    return real(common if common.is_absolute() else part / common)
+    common = result.stdout.decode("utf-8", "surrogateescape").strip()
+    return real(common if os.path.isabs(common) else os.path.join(part, common))
 
 
-def git_sink(ctx: Context, run_dir: Path, names, parts: list, seen_git: set) -> dict:
-    """Every object of each repository (cat-file --batch-all-objects: loose, packed, unreachable), and its reflogs."""
-    counts = {name: 0 for name in names}
-    errors, repositories = 0, 0
+GIT_LOG_INCLUDES = ("logs", "COMMIT_EDITMSG", "packed-refs", "worktrees/*/logs", "worktrees/*/COMMIT_EDITMSG")
+
+
+def git_sink(ctx, run_dir, sink, sets, seen_git: set, deadline) -> dict:
+    """Every object of each repository (cat-file --batch-all-objects: loose, packed, unreachable) and its reflogs.
+    Repositories are named to git by working directory and GIT_DIR, never in an argv."""
+    tally, matcher = Tally(sets), Matcher(sets)
     git = ctx.which("git")
-    for part in parts:
-        common = git_common_dir(ctx, part)
-        if common is None:
-            continue
-        repositories += 1
-        if common in seen_git:
-            continue
-        seen_git.add(common)
-        objects, error = count_lines(ctx, run_dir, names,
-                                     [git, "--git-dir", str(common), "cat-file", "--batch-all-objects", "--batch"])
-        errors += error
-        logs = [p for p in [common / "logs", common / "COMMIT_EDITMSG", common / "packed-refs",
-                            *common.glob("worktrees/*/logs"), *common.glob("worktrees/*/COMMIT_EDITMSG")] if p.exists()]
-        hits, unreadable = filescan(ctx, run_dir, names, logs)
-        errors += unreadable
-        for name in names:
-            counts[name] += objects[name] + len(hits[name])
-    return {"status": "scanned" if repositories else "absent", "counts": counts, "unreadable": errors}
+    for template in sink.get("paths", []):
+        for part in expand(ctx, template):
+            for name in matcher.hits(str(part).encode("utf-8", "surrogateescape")):
+                tally.add(name, str(part))
+            common = git_common_dir(ctx, str(part))
+            if common is None:
+                continue
+            tally.present = True
+            if common in seen_git:
+                continue
+            seen_git.add(common)
+            count_lines(ctx, run_dir, tally, [git, "cat-file", "--batch-all-objects", "--batch"], deadline,
+                        f"{common}#objects", cwd=common, extra_env={"GIT_DIR": common})
+            for include in GIT_LOG_INCLUDES:
+                if glob.glob(os.path.join(common, include)):
+                    rg_content(ctx, run_dir, tally, matcher, common, include, [], [], False, deadline)
+    return tally.result()
 
 
-def journal_sink(ctx: Context, run_dir: Path, names, system: bool, since_epoch: float) -> dict:
+def journal_sink(ctx, run_dir, sink, sets, since_epoch, deadline) -> dict:
+    tally = Tally(sets)
     journalctl = ctx.which("journalctl")
-    zero = {name: 0 for name in names}
     if journalctl is None:
-        return {"status": "error", "counts": zero, "unreadable": 0}
+        tally.incomplete("journalctl is not on PATH")
+        return tally.result()
+    tally.present = True
     since = f"@{int(since_epoch) - WINDOW_SLACK}"
-    if system:
+    if sink.get("scope") == "system":
         elevate = ctx.which("sudo")
         if elevate is None:
-            return {"status": "error", "counts": zero, "unreadable": 0}
+            tally.incomplete("sudo is not on PATH")
+            return tally.result()
         producer = [elevate, "-n", journalctl, "-o", "export", "--no-pager", "--since", since]
     else:
         producer = [journalctl, "--user", "-o", "export", "--no-pager", "--since", since]
-    counts, error = count_lines(ctx, run_dir, names, producer)
-    return {"status": "error" if error else "scanned", "counts": counts, "unreadable": 0}
+    count_lines(ctx, run_dir, tally, producer, deadline, "journal")
+    return tally.result()
 
 
 def loopback(url: str) -> str:
@@ -930,111 +1311,136 @@ def loki_push(ctx: Context, sink: dict, decoy: str) -> bool:
         return False
 
 
-def loki_sink(ctx: Context, sink: dict, sets: dict, since_epoch: float) -> dict:
-    """Dump by labels and time range only (the query holds no value), match here, write nothing."""
+def loki_sink(ctx: Context, sink: dict, sets: dict, since_epoch: float, deadline: float) -> dict:
+    """Dump by labels and time range only (the query holds no value), match here, write nothing. Pages continue from
+    the last timestamp itself, and entries seen before are skipped, so an entry that shares a page's last timestamp is
+    never lost; a full page on one timestamp, a page that adds nothing, a spent page budget or a read error leaves the
+    dump INCOMPLETE."""
+    tally, matcher = Tally(sets), Matcher(sets)
     base = loopback(sink["url"])
-    matcher = Matcher(sets)
-    counts = {name: 0 for name in sets}
     start, end = (int(since_epoch) - WINDOW_SLACK) * 10 ** 9, int(ctx.clock() + 60) * 10 ** 9
+    seen = set()
     try:
-        for _ in range(LOKI_PAGES):
+        for page in range(LOKI_PAGES + 1):
+            if page == LOKI_PAGES:
+                tally.incomplete("page budget spent")
+                break
+            if remaining(deadline) <= 0:
+                tally.incomplete("deadline expired")
+                break
             query = urllib.parse.urlencode({"query": LOKI_QUERY, "start": str(start), "end": str(end),
                                             "limit": str(LOKI_LIMIT), "direction": "forward"})
             request = urllib.request.Request(f"{base}/loki/api/v1/query_range?{query}",
                                              headers={"X-Loki-Response-Encoding-Flags": "categorize-labels"})
-            with urllib.request.urlopen(request, timeout=60) as response:
+            with urllib.request.urlopen(request, timeout=max(1.0, min(60.0, remaining(deadline)))) as response:
                 body = json.loads(response.read())
-            entries, last = 0, start
+            tally.present = True
+            entries, fresh = [], 0
             for stream in body.get("data", {}).get("result", []):
-                labels = json.dumps(stream.get("stream", {}), sort_keys=True).encode("utf-8")
+                labels = json.dumps(stream.get("stream", {}), sort_keys=True)
                 for value in stream.get("values", []):
-                    entries += 1
-                    last = max(last, int(value[0]))
                     parts = [v if isinstance(v, str) else json.dumps(v, sort_keys=True) for v in value[1:]]
-                    for name in matcher.hits("\n".join(parts).encode("utf-8") + b"\n" + labels):
-                        counts[name] += 1
-            if entries < LOKI_LIMIT:
+                    record = ("\n".join(parts) + "\n" + labels).encode("utf-8")
+                    entries.append(int(value[0]))
+                    key = hashlib.sha256(value[0].encode("ascii") + b"\0" + record).digest()
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    fresh += 1
+                    for name in matcher.hits(record):
+                        tally.add(name, f"loki#{value[0]}#{len(seen)}")
+            if len(entries) < LOKI_LIMIT:
                 break
-            start = last + 1
+            last = max(entries)
+            if all(ts == last for ts in entries):
+                tally.incomplete("a full Loki page on one timestamp cannot be paged past")
+                break
+            if not fresh:
+                tally.incomplete("a Loki page added nothing new")
+                break
+            start = last  # the boundary timestamp again: its other entries come back, and seen ones are skipped
     except (OSError, ValueError, KeyError, TypeError):
-        return {"status": "error", "counts": counts, "unreadable": 0}
-    return {"status": "scanned", "counts": counts, "unreadable": 0}
+        tally.incomplete("Loki read error")
+    return tally.result()
 
 
-def github_sink(ctx: Context, run_dir: Path, names, since_epoch: float) -> dict:
+def github_sink(ctx, run_dir, sets, since_epoch, deadline) -> dict:
+    tally = Tally(sets)
     gh = ctx.which("gh")
-    counts = {name: 0 for name in names}
     if gh is None:
-        return {"status": "error", "counts": counts, "unreadable": 0}
-    since, failed = iso(since_epoch - WINDOW_SLACK), 0
+        tally.incomplete("gh is not on PATH")
+        return tally.result()
+    tally.present = True
+    since = iso(since_epoch - WINDOW_SLACK)
     for read in GH_READS:
-        found, error = count_lines(ctx, run_dir, names, [gh, "api", read.replace("{since}", since)], cwd=str(ctx.root))
-        failed += error
-        for name in names:
-            counts[name] += found[name]
-    return {"status": "error" if failed == len(GH_READS) else "scanned", "counts": counts, "unreadable": failed}
+        count_lines(ctx, run_dir, tally, [gh, "api", read.replace("{since}", since)], deadline, f"github#{read}",
+                    cwd=str(ctx.root))
+    return tally.result()
 
 
-def manager_sink(ctx: Context) -> dict:
+def manager_sink(ctx: Context, sets: dict) -> dict:
     """Names only: whether CANARY_E2E_KEY or another inventory name is set in the user manager's environment. Each
-    line is cut at its first '=' here, and no value goes further than this function."""
+    line is cut at its first '=' here, and no value goes further than this function; user-run only."""
+    tally = Tally(sets)
     systemctl = ctx.which("systemctl")
     if systemctl is None:
-        return {"status": "error", "counts": {}, "unreadable": 0}
+        tally.incomplete("systemctl is not on PATH")
+        return tally.result()
     result = subprocess.run([systemctl, "--user", "show-environment"], stdin=subprocess.DEVNULL, capture_output=True,
                             env=scanner_environment(ctx), timeout=30)
     names = {line.split(b"=", 1)[0].decode("ascii", "replace") for line in result.stdout.splitlines() if b"=" in line}
     failed = result.returncode != 0
     del result
+    tally.present = True
+    if failed:
+        tally.incomplete("systemctl failed")
     inventory = ctx.entry[1]
     declared = {n for e in inventory["entries"] for n in e["variables"] + e["optional_variables"]}
     declared |= set(inventory["must_not_be_set"])
-    return {"status": "error" if failed else "scanned", "counts": {}, "unreadable": 0, "names_only": True,
-            "canary_name_present": VARIABLE in names, "inventory_names_present": len(names & declared)}
+    record = tally.result()
+    record.update({"names_only": True, "canary_name_present": VARIABLE in names,
+                   "inventory_names_present": len(names & declared)})
+    return record
 
 
 def scan_sink(ctx: Context, run_dir: Path, sink: dict, sets: dict, *, agent_pass: bool, seen_git: set,
               since_epoch: float) -> dict:
-    """One sink: {"status": scanned|absent|error|not_scanned, "counts": {set: n}, "unreadable": n, ...}."""
-    names = sorted(sets)
-    zero = {name: 0 for name in names}
+    """One sink: {"status": scanned|absent|incomplete|not_scanned, "counts": {set: n}, "decoded_counts",
+    "unreadable", "special", "reasons"}; a sink runs under its own deadline."""
+    deadline = time.monotonic() + float(sink.get("deadline_seconds", DEFAULT_DEADLINE))
     kind = sink["kind"]
     try:
-        if kind in ("files", "sqlite", "git"):
-            roots = [p for template in sink.get("paths", []) for p in expand(ctx, template) if os.path.lexists(p)]
-            if not roots:
-                return {"status": "absent", "counts": zero, "unreadable": 0}
-            excluded = exclusions(ctx, agent_pass)
-            excluded += [real(p) for template in sink.get("exclude", []) for p in expand(ctx, template)]
-            globs = list(ctx.table.get("exclude_names", [])) if agent_pass else []
-            parts = [part for root in roots for part in split_roots(root, excluded)]
-            sudo = sink.get("access") == "sudo"
-            if kind == "files":
-                hits, unreadable = filescan(ctx, run_dir, names, parts, globs, sudo)
-                return {"status": "scanned", "counts": {n: len(h) for n, h in hits.items()}, "unreadable": unreadable}
-            if kind == "sqlite":
-                return sqlite_sink(ctx, run_dir, names, sets, parts, globs, sudo)
-            return git_sink(ctx, run_dir, names, parts, seen_git)
+        if kind == "files":
+            return files_sink(ctx, run_dir, sink, sets, agent_pass, deadline)
+        if kind == "sqlite":
+            return sqlite_sink(ctx, run_dir, sink, sets, agent_pass, deadline)
+        if kind == "git":
+            return git_sink(ctx, run_dir, sink, sets, seen_git, deadline)
         if kind == "journal":
-            return journal_sink(ctx, run_dir, names, sink.get("scope") == "system", since_epoch)
+            return journal_sink(ctx, run_dir, sink, sets, since_epoch, deadline)
         if kind == "loki":
-            return loki_sink(ctx, sink, sets, since_epoch)
+            return loki_sink(ctx, sink, sets, since_epoch, deadline)
         if kind == "github":
-            return github_sink(ctx, run_dir, names, since_epoch)
+            return github_sink(ctx, run_dir, sets, since_epoch, deadline)
         if kind == "manager_environment":
-            return manager_sink(ctx)
-    except (OSError, subprocess.SubprocessError, sqlite3.Error, ValueError):
-        return {"status": "error", "counts": zero, "unreadable": 0}
-    return {"status": "not_scanned", "counts": zero, "unreadable": 0}
+            return manager_sink(ctx, sets)
+    except (OSError, subprocess.SubprocessError, sqlite3.Error, ValueError) as error:
+        tally = Tally(sets)
+        tally.incomplete(f"scanner error ({type(error).__name__})")
+        return tally.result()
+    return {"status": "not_scanned", "counts": {n: 0 for n in sets}, "decoded_counts": {}, "unreadable": 0,
+            "special": 0, "reasons": []}
 
 
 def judge(sink: dict, result: dict, planted, class_ok: dict) -> dict:
-    """The verdict of one scanned sink. A planted control decoy that is not found makes it "not a sink, or scanned
-    wrongly", never clean; any canary hit is a LEAK; both fail the scan."""
+    """The verdict of one scanned sink. Any canary hit is a LEAK; an incomplete scan is INCOMPLETE; a planted control
+    decoy that is not found is "not a sink, or scanned wrongly"; each fails the scan, and none reads as clean. A sink
+    with control_in decoded_blobs counts its control only in decoded compressed values (RTK's recall blobs)."""
     counts = result.get("counts", {})
+    control_counts = result.get("decoded_counts", {}) if sink.get("control_in") == "decoded_blobs" else counts
     canary = {consumer: int(counts.get(f"c-{consumer}", 0)) for consumer in CONSUMERS}
     controls = {decoy: ("not_planted" if decoy not in planted else
-                        "found" if counts.get(f"d-{decoy}", 0) > 0 else "missing")
+                        "found" if control_counts.get(f"d-{decoy}", 0) > 0 else "missing")
                 for decoy in sink.get("controls", [])}
     proven = sorted({c for d, s in controls.items() if s == "found" for c in CONTROL_PROVES.get(d, ())},
                     key=CONSUMERS.index)
@@ -1043,8 +1449,8 @@ def judge(sink: dict, result: dict, planted, class_ok: dict) -> dict:
         verdict, fails = "LEAK", True
     elif not class_ok.get(sink.get("kind"), True):
         verdict, fails = "scanned wrongly: its scanner class control failed", True
-    elif status == "error":
-        verdict, fails = "not scanned: scanner error", bool(controls)
+    elif status in ("incomplete", "error"):
+        verdict, fails = "INCOMPLETE: " + ", ".join(result.get("reasons") or ["scanner error"]), True
     elif "missing" in controls.values():
         verdict, fails = "not a sink, or scanned wrongly", True
     elif status == "absent":
@@ -1072,15 +1478,17 @@ def sink_line(sink: dict, judged: dict, result: dict) -> str:
         line += f"; inventory names in the manager environment {result['inventory_names_present']} (names only)"
     if result.get("unreadable"):
         line += f"; unreadable {result['unreadable']}"
+    if result.get("special"):
+        line += f"; special files skipped {result['special']}"
     return line
 
 
 def planted_decoys(run_dir: Path) -> set:
     planted = set()
-    for consumer, decoy in DECOY_OF.items():
+    for consumer, decoys in PLANTED_BY.items():
         consumed = read_json(result_path(run_dir, f"consume-{consumer}"))
         if consumed and consumed.get("ran"):
-            planted.add(decoy)
+            planted.update(decoys)
     controls = read_json(result_path(run_dir, "controls")) or {}
     if (controls.get("journal") or {}).get("found"):
         planted.add("journal")
@@ -1095,6 +1503,58 @@ def class_status(run_dir: Path) -> dict:
         raise Refused("run controls first: a sink's zero means nothing until its scanner has found a planted decoy")
     return {kind: all((controls.get(name) or {}).get("ok") for name in classes)
             for kind, classes in CLASS_OF_KIND.items()}
+
+
+# -- captures --------------------------------------------------------------------------------------------------------
+
+def open_capture(run_dir: Path, name: str, sets: dict):
+    """A capture file in the run directory (0600), which starts with the harness's own control line."""
+    handle = os.fdopen(os.open(run_dir / "captured" / name, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW,
+                               0o600), "wb")
+    handle.write(CAPTURE_CONTROL + sets["d-capture"][0] + b"\n")
+    handle.flush()
+    return handle
+
+
+def write_capture(run_dir: Path, name: str, sets: dict, *parts: bytes) -> None:
+    with open_capture(run_dir, name, sets) as handle:
+        for part in parts:
+            handle.write(part)
+
+
+def scan_capture(path: Path, matcher: Matcher) -> set:
+    """The sets a file holds, read in chunks with an overlap of the longest pattern."""
+    found, tail = set(), b""
+    with open(path, "rb") as handle:
+        while True:
+            chunk = handle.read(CAPTURE_CHUNK)
+            if not chunk:
+                break
+            data = tail + chunk
+            found |= matcher.hits(data)
+            tail = data[-(matcher.longest - 1):] if matcher.longest > 1 else b""
+    return found
+
+
+def capture_check(ctx: Context, run_dir: Path, sets: dict) -> dict:
+    """Every capture of every consumer (stdout, stderr, stream-json, the unit's outputs, earlier consumptions' too)
+    and every tag file, scanned for every canary of the run. A capture's control is the line the harness planted in
+    it; a tag file's is its format. {name: {"canary": sets hit, "by_consumer": {...}, "control": found|missing}}."""
+    matcher = Matcher({**canary_sets(sets), "d-capture": sets["d-capture"]})
+    checked = {}
+    places = [(path, str(path.relative_to(run_dir / "captured"))) for path in sorted((run_dir / "captured").rglob("*"))
+              if path.is_file() and not path.is_symlink()]
+    places += [(path, f"tags/{path.name}") for path in sorted((run_dir / "tags").glob("*.tag"))]
+    for path, name in places:
+        found = scan_capture(path, matcher)
+        hit = sorted(n[2:] for n in found if n.startswith("c-"))
+        if name.startswith("tags/"):
+            control = "found" if TAG_FORMAT.fullmatch(path.read_bytes()) else "missing"
+        else:
+            control = "found" if "d-capture" in found else "missing"
+        checked[name] = {"canary": len(hit), "by_consumer": {c: 1 for c in hit}, "control": control}
+    write_json(result_path(run_dir, "captures"), checked)
+    return checked
 
 
 # -- the /proc sampler -----------------------------------------------------------------------------------------------
@@ -1179,6 +1639,12 @@ def decoy_command(run: str, consumer: str) -> str:
     return f"python3 {HARNESS_REL} decoy --run {run} --consumer {consumer}"
 
 
+def rtk_decoy_command(run: str, value: str) -> str:
+    """A failing command with over 500 bytes of decoy lines, run through `rtk err`, whose raw output RTK v0.50.0 keeps
+    in recall.db (src/core/runner.rs run_err_cmd with_tee; src/core/tee.rs tee_and_hint)."""
+    return f"rtk err python3 {HARNESS_REL} decoy --run {run} --consumer fresh-claude-session --rtk {value}"
+
+
 def user_run_command(run: str) -> str:
     return f"python3 {HARNESS_REL} scan --sink {USER_RUN_GROUP} --run {run}"
 
@@ -1188,22 +1654,25 @@ def workflow_invocation(run: str) -> str:
 
 
 CLAUDE_ALLOWED = (f"Bash(python3 -I {RUNNER_REL} {ENTRY_ID} -- python3 -I {PROBE_REL}:*)",
-                  f"Bash(python3 {HARNESS_REL} decoy:*)", "Bash(echo:*)", "Bash(false)", "Agent")
+                  f"Bash(python3 {HARNESS_REL} decoy:*)", f"Bash(rtk err python3 {HARNESS_REL} decoy:*)",
+                  "Bash(echo:*)", "Bash(false)", "Agent")
 
 
-def claude_prompt(run: str, decoy: str) -> str:
+def claude_prompt(run: str, decoy: str, rtk_value: str) -> str:
     return ("This is an automated canary probe of the key-management proof (run " + run + "). It checks that a "
             "synthetic key reaches a command by inventory id without being printed. Do exactly these steps, in "
             "order, and nothing else.\n"
             f"1. Run this Bash command exactly. It prints a decoy value and fails on purpose: echo {decoy} && false\n"
-            f"2. Run this Bash command exactly: {probe_command(run, 'fresh-claude-session')}\n"
-            f"3. After step 2 has printed its canary-probe line, use the Agent tool once, with subagent_type "
+            "2. Run this Bash command exactly. It prints decoy lines and fails on purpose, so that RTK keeps its "
+            f"output: {rtk_decoy_command(run, rtk_value)}\n"
+            f"3. Run this Bash command exactly: {probe_command(run, 'fresh-claude-session')}\n"
+            f"4. After step 3 has printed its canary-probe line, use the Agent tool once, with subagent_type "
             f"\"{SUBAGENT_TYPE}\", model \"{CLAUDE_MODEL}\", description \"canary probe\" and this prompt, copied "
             "exactly: \"Run these Bash commands exactly, one at a time, and then reply with only the line that "
             f"starts with canary-probe. First: {decoy_command(run, 'subagent')} (it prints a decoy line and fails on "
             "purpose). Second: echo, then the decoy value that the first command printed after the colon, then "
             f"&& false (this fails on purpose too). Third: {probe_command(run, 'subagent')}\"\n"
-            "4. Reply with only the two canary-probe lines.\n")
+            "5. Reply with only the two canary-probe lines.\n")
 
 
 def codex_prompt(run: str, consumer: str, decoy: str) -> str:
@@ -1216,29 +1685,16 @@ def codex_prompt(run: str, consumer: str, decoy: str) -> str:
 
 # -- consumers -------------------------------------------------------------------------------------------------------
 
-def open_append(path: Path):
-    return os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_NOFOLLOW, 0o600), "ab")
-
-
-def stop_group(process) -> None:
-    for signum, grace in ((signal.SIGTERM, 5), (signal.SIGKILL, 5)):
-        try:
-            os.killpg(process.pid, signum)
-        except (ProcessLookupError, PermissionError):
-            return
-        try:
-            process.wait(timeout=grace)
-            return
-        except subprocess.TimeoutExpired:
-            continue
-
-
-def run_streaming(ctx: Context, argv: list, environment: dict, stdin_data, capture: Path, on_line, timeout: float):
-    """Run a client, feed it stdin_data, keep its stdout lines in capture (run directory, 0600) as they come and hand
-    each to on_line; stderr goes to capture's .stderr file. Returns the exit status, or None after a timeout."""
+def run_streaming(ctx: Context, argv: list, environment: dict, stdin_data, run_dir: Path, name: str, sets: dict,
+                  on_line, timeout: float):
+    """Run a client in its own session, feed it stdin_data, keep its stdout lines in captured/<name>.jsonl as they come
+    and hand each to on_line; stderr goes to captured/<name>.stderr. Both captures start with the harness's control
+    line. On every way out the client's process group is ended and reaped (credential_run.py's end_group), and the
+    runner's watchdog ends it even when this process is killed. Returns the exit status, or None after a timeout."""
     process = subprocess.Popen(argv, stdin=subprocess.PIPE if stdin_data is not None else subprocess.DEVNULL,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(ctx.root), env=environment,
                                start_new_session=True)
+    watchdog = runner.Watchdog(process.pid)
     lines: queue.Queue = queue.Queue()
 
     def pump_out() -> None:
@@ -1247,7 +1703,7 @@ def run_streaming(ctx: Context, argv: list, environment: dict, stdin_data, captu
         lines.put(None)
 
     def pump_err() -> None:
-        with open_append(capture.with_suffix(".stderr")) as sink:
+        with open_capture(run_dir, f"{name}.stderr", sets) as sink:
             for chunk in iter(lambda: process.stderr.read(65536), b""):
                 sink.write(chunk)
 
@@ -1257,41 +1713,57 @@ def run_streaming(ctx: Context, argv: list, environment: dict, stdin_data, captu
         except OSError:
             pass
         finally:
-            try:
+            with contextlib.suppress(OSError):
                 process.stdin.close()
-            except OSError:
-                pass
 
     workers = [threading.Thread(target=pump_out, daemon=True), threading.Thread(target=pump_err, daemon=True)]
     if stdin_data is not None:
         workers.append(threading.Thread(target=feed, daemon=True))
     for worker in workers:
         worker.start()
-    deadline, timed_out = time.monotonic() + timeout, False
-    with open_append(capture) as sink:
-        while True:
-            remaining = deadline - time.monotonic()
-            if remaining <= 0:
-                timed_out = True
-                stop_group(process)
-                break
-            try:
-                line = lines.get(timeout=min(remaining, 1.0))
-            except queue.Empty:
-                continue
-            if line is None:
-                break
-            sink.write(line)
-            sink.flush()
-            on_line(line)
+    deadline, timed_out, code = time.monotonic() + timeout, False, None
     try:
-        code = process.wait(timeout=30)
-    except subprocess.TimeoutExpired:
-        stop_group(process)
-        code = None
-    for worker in workers:
-        worker.join(timeout=10)
+        with open_capture(run_dir, f"{name}.jsonl", sets) as sink:
+            while True:
+                left = deadline - time.monotonic()
+                if left <= 0:
+                    timed_out = True
+                    break
+                try:
+                    line = lines.get(timeout=min(left, 1.0))
+                except queue.Empty:
+                    continue
+                if line is None:
+                    break
+                sink.write(line)
+                sink.flush()
+                on_line(line)
+        if not timed_out:
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                code = process.wait(timeout=30)
+    finally:
+        if process.poll() is None:
+            runner.end_group(process)
+        watchdog.release()
+        for worker in workers:
+            worker.join(timeout=10)
     return None if timed_out else code
+
+
+def run_owned(argv: list, environment: dict, timeout: float) -> tuple:
+    """(exit status, stdout, stderr) of a command in its own session, ended and reaped on every way out."""
+    process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               env=environment, start_new_session=True)
+    watchdog = runner.Watchdog(process.pid)
+    try:
+        out, err = process.communicate(timeout=timeout)
+        return process.returncode, out, err
+    except subprocess.TimeoutExpired:
+        return None, b"", b""
+    finally:
+        if process.poll() is None:
+            runner.end_group(process)
+        watchdog.release()
 
 
 def model_id(value):
@@ -1302,22 +1774,28 @@ def stream_hits(data: bytes, sets: dict) -> dict:
     return {name[2:]: 1 for name in Matcher(canary_sets(sets)).hits(data)}
 
 
-def consume_record(ctx, started: float, code, summary: dict, consumer: str, **extra) -> dict:
+def consume_record(ctx, started: float, code, summary: dict, consumer: str, sequence: int, **extra) -> dict:
     record = {"ran": True, "started_epoch": started, "ended_epoch": ctx.clock(), "exit_code": code,
-              "cmdline_hits": summary["cmdline_hits"].get(consumer, 0),
+              "sequence": sequence, "cmdline_hits": summary["cmdline_hits"].get(consumer, 0),
               "transient_unit_hits": summary["transient_unit_hits"].get(consumer, 0)}
     record.update(extra)
     return record
 
 
-def consume_claude(ctx: Context, run_dir: Path, run: str, sets: dict, timeout: float) -> int:
+def captures_of(ctx: Context, run_dir: Path, sets: dict, consumers) -> int:
+    """Canaries found in the captures of these consumers (every capture is checked, each against every canary)."""
+    checked = capture_check(ctx, run_dir, sets)
+    return sum(row["canary"] for name, row in checked.items()
+               if any(name.startswith(c + ".") or name == f"tags/{c}.tag" for c in consumers))
+
+
+def consume_claude(ctx: Context, run_dir: Path, run: str, sets: dict, timeout: float, sequence: int) -> int:
     claude = ctx.which("claude")
     if claude is None:
         raise Refused("claude is not on PATH")
     decoys = {"fresh-claude-session": set_value(sets["d-claude"]), "subagent": set_value(sets["d-subagent"])}
     argv = [claude, "-p", "--model", CLAUDE_MODEL, "--output-format", "stream-json", "--verbose", "--allowedTools",
             *CLAUDE_ALLOWED]
-    capture = run_dir / "captured" / "fresh-claude-session.jsonl"
     observed, models, swapped = {}, {}, []
     for consumer in decoys:
         rotate_nonce(run_dir, consumer)
@@ -1327,7 +1805,7 @@ def consume_claude(ctx: Context, run_dir: Path, run: str, sets: dict, timeout: f
         for match in probe.TAG_LINE.finditer(text):
             observed.setdefault(match["consumer"], match["prefix"])
         if not swapped and "fresh-claude-session" in observed:
-            disarm(ctx)  # the subagent gets its own canary: swap before its probe can run
+            disarm(ctx, run_dir)  # the subagent gets its own canary: swap before its probe can run
             arm(ctx, run_dir, "subagent")
             swapped.append(ctx.clock())
         try:
@@ -1343,28 +1821,30 @@ def consume_claude(ctx: Context, run_dir: Path, run: str, sets: dict, timeout: f
             models.setdefault("subagent", model_id(message.get("model")))
 
     started = ctx.clock()
+    prompt = claude_prompt(run, decoys["fresh-claude-session"], set_value(sets["d-rtk"])).encode("utf-8")
     arm(ctx, run_dir, "fresh-claude-session")
     try:
         with ProcSampler(ctx, sets) as sampler:
-            code = run_streaming(ctx, argv, launch_environment(ctx), claude_prompt(run, decoys["fresh-claude-session"])
-                                 .encode("utf-8"), capture, on_line, timeout)
+            code = run_streaming(ctx, argv, launch_environment(ctx), prompt, run_dir, "fresh-claude-session", sets,
+                                 on_line, timeout)
     finally:
-        disarm(ctx)
-    stream = capture.read_bytes()
+        disarm(ctx, run_dir)
+    stream = (run_dir / "captured" / "fresh-claude-session.jsonl").read_bytes()
     hits, summary = stream_hits(stream, sets), sampler.summary()
-    status = 0 if code == 0 else 1
+    in_captures = captures_of(ctx, run_dir, sets, ("fresh-claude-session", "subagent"))
+    status = 0 if code == 0 and not in_captures else 1
     for consumer, source in (("fresh-claude-session", "init_record"), ("subagent", "stream_message")):
-        record = consume_record(ctx, started, code, summary, consumer,
+        record = consume_record(ctx, started, code, summary, consumer, sequence,
                                 stream_tag_prefix=observed.get(consumer), model_id=models.get(consumer),
                                 model_id_source=source if models.get(consumer) else "none",
-                                stream_canary_hits=hits.get(consumer, 0),
+                                stream_canary_hits=hits.get(consumer, 0), capture_canary_hits=in_captures,
                                 decoy_echoed=decoys[consumer].encode("ascii") in stream)
         record["ran"] = consumer == "fresh-claude-session" or bool(swapped)
         write_json(result_path(run_dir, f"consume-{consumer}"), record)
         seen = "tag line seen" if observed.get(consumer) else "no tag line"
         ctx.say(f"consume {consumer}: exit {code}; {seen}; model {models.get(consumer) or 'unknown'}; "
-                f"canary in the stream {record['stream_canary_hits']}; canary in process arguments "
-                f"{record['cmdline_hits']}")
+                f"canary in the stream {record['stream_canary_hits']}; canary in the captures {in_captures}; canary "
+                f"in process arguments {record['cmdline_hits']}")
         if not observed.get(consumer) or record["stream_canary_hits"] or record["cmdline_hits"]:
             status = 1
     return status
@@ -1409,7 +1889,8 @@ def codex_home(ctx: Context) -> Path:
     return Path(ctx.env.get("CODEX_HOME") or Path(ctx.env.get("HOME") or str(Path.home())) / ".codex")
 
 
-def consume_codex(ctx: Context, run_dir: Path, run: str, sets: dict, consumer: str, timeout: float, model: str) -> int:
+def consume_codex(ctx: Context, run_dir: Path, run: str, sets: dict, consumer: str, timeout: float, model: str,
+                  sequence: int) -> int:
     codex = ctx.which("codex")
     if codex is None:
         raise Refused("codex is not on PATH")
@@ -1418,7 +1899,6 @@ def consume_codex(ctx: Context, run_dir: Path, run: str, sets: dict, consumer: s
     argv = [codex, "exec", "--json", "-s", "read-only", "-C", str(ctx.root)]
     argv += ["-p", profile] if profile else ["-m", model]
     argv.append("-")  # the prompt comes on stdin, which is then closed: no decoy in argv, no stdin hang
-    capture = run_dir / "captured" / f"{consumer}.jsonl"
     observed, models = {}, []
 
     def on_line(line: bytes) -> None:
@@ -1438,22 +1918,25 @@ def consume_codex(ctx: Context, run_dir: Path, run: str, sets: dict, consumer: s
     try:
         with ProcSampler(ctx, sets) as sampler:
             code = run_streaming(ctx, argv, launch_environment(ctx, OMNIROUTE_PLACEHOLDER if profile else None),
-                                 codex_prompt(run, consumer, decoy).encode("utf-8"), capture, on_line, timeout)
+                                 codex_prompt(run, consumer, decoy).encode("utf-8"), run_dir, consumer, sets, on_line,
+                                 timeout)
     finally:
-        disarm(ctx)
-    stream = capture.read_bytes()
+        disarm(ctx, run_dir)
+    stream = (run_dir / "captured" / f"{consumer}.jsonl").read_bytes()
+    in_captures = captures_of(ctx, run_dir, sets, (consumer,))
     reported = models[0] if models else None
     source = "event_stream" if reported else ("profile" if profile else "requested")
-    record = consume_record(ctx, started, code, sampler.summary(), consumer,
+    record = consume_record(ctx, started, code, sampler.summary(), consumer, sequence,
                             stream_tag_prefix=observed.get(consumer),
                             model_id=reported or (None if profile else model_id(model)), model_id_source=source,
                             stream_canary_hits=stream_hits(stream, sets).get(consumer, 0),
-                            decoy_echoed=decoy.encode("ascii") in stream)
+                            capture_canary_hits=in_captures, decoy_echoed=decoy.encode("ascii") in stream)
     write_json(result_path(run_dir, f"consume-{consumer}"), record)
     ctx.say(f"consume {consumer}: exit {code}; {'tag line seen' if observed.get(consumer) else 'no tag line'}; "
             f"model {record['model_id'] or 'from the profile'}; canary in the stream {record['stream_canary_hits']}; "
-            f"canary in process arguments {record['cmdline_hits']}")
-    ok = code == 0 and observed.get(consumer) and not record["stream_canary_hits"] and not record["cmdline_hits"]
+            f"canary in the captures {in_captures}; canary in process arguments {record['cmdline_hits']}")
+    ok = (code == 0 and observed.get(consumer) and not record["stream_canary_hits"] and not in_captures
+          and not record["cmdline_hits"])
     return 0 if ok else 1
 
 
@@ -1466,8 +1949,8 @@ def leak_counts(output: bytes, canary: str, patterns: list) -> dict:
             "forms_printed": len(printed) + 3}  # plus the raw form on stderr, the split write and the last line
 
 
-def consume_unit(ctx: Context, run_dir: Path, run: str, sets: dict, state: dict, timeout: float,
-                 after_restart: bool) -> int:
+def consume_unit(ctx: Context, run_dir: Path, run: str, sets: dict, state: dict, timeout: float, after_restart: bool,
+                 sequence: int) -> int:
     systemd_run = ctx.which("systemd-run")
     if systemd_run is None:
         raise Refused("systemd-run is not on PATH")
@@ -1477,54 +1960,52 @@ def consume_unit(ctx: Context, run_dir: Path, run: str, sets: dict, state: dict,
     unit = [systemd_run, "--user", "--wait", "--collect", "--pipe", "--quiet", "-p", "Type=oneshot",
             python, "-I", str(ctx.root / RUNNER_REL), ENTRY_ID, "--",
             python, "-I", str(ctx.root / PROBE_REL), "--run", run, "--consumer", UNIT]
-    if after_restart:
-        if not keep:
-            raise UsageError("--after-restart is for a run prepared with --keep-across-restart")
-        if not store_present(ctx):
-            raise Refused("the kept canary file is not in the store; it did not survive the restart")
-    else:
+    if not after_restart:
         rotate_nonce(run_dir, UNIT)
         arm(ctx, run_dir, UNIT)
     started = ctx.clock()
     environment = launch_environment(ctx)
     try:
         with ProcSampler(ctx, sets) as sampler:
-            plain = subprocess.run(unit, stdin=subprocess.DEVNULL, capture_output=True, env=environment,
-                                   timeout=timeout)
-            leak = subprocess.run(unit + ["--leak-check"], stdin=subprocess.DEVNULL, capture_output=True,
-                                  env=environment, timeout=timeout)
+            plain = run_owned(unit, environment, timeout)
+            leak = run_owned(unit + ["--leak-check"], environment, timeout)
     finally:
         if not keep or after_restart:
-            disarm(ctx)
+            disarm(ctx, run_dir)
+    label = f"{UNIT}{'.after-restart' if after_restart else ''}"
+    write_capture(run_dir, f"{label}.plain.out", sets, plain[1], b"\n--stderr--\n", plain[2])
+    write_capture(run_dir, f"{label}.leak.out", sets, leak[1], b"\n--stderr--\n", leak[2])
     patterns = sets[f"c-{UNIT}"]
-    prefixes = [m["prefix"] for m in probe.TAG_LINE.finditer(plain.stdout.decode("utf-8", "replace"))
+    prefixes = [m["prefix"] for m in probe.TAG_LINE.finditer(plain[1].decode("utf-8", "replace"))
                 if m["consumer"] == UNIT]
-    plain_hits = sum((plain.stdout + plain.stderr).count(p) for p in patterns)
-    counts = leak_counts(leak.stdout + b"\n" + leak.stderr, set_value(patterns), patterns)
-    counts["masked"] = (leak.returncode == 0 and counts["pattern_hits"] == 0 and counts["printed_form_hits"] == 0
+    plain_hits = sum((plain[1] + plain[2]).count(p) for p in patterns)
+    counts = leak_counts(leak[1] + b"\n" + leak[2], set_value(patterns), patterns)
+    counts["masked"] = (leak[0] == 0 and counts["pattern_hits"] == 0 and counts["printed_form_hits"] == 0
                         and counts["markers"] + counts["partial_markers"] >= counts["forms_printed"])
+    in_captures = captures_of(ctx, run_dir, sets, (UNIT,))
     boot = receipts.small_text(receipts.BOOT_ID)
-    record = consume_record(ctx, started, plain.returncode, sampler.summary(), UNIT,
+    record = consume_record(ctx, started, plain[0], sampler.summary(), UNIT, sequence,
                             stream_tag_prefix=prefixes[0] if prefixes else None, model_id=None,
-                            model_id_source="none", stream_canary_hits=plain_hits, leak_exit_code=leak.returncode,
-                            leak_check=counts, decoy_echoed=None,
+                            model_id_source="none", stream_canary_hits=plain_hits, leak_exit_code=leak[0],
+                            leak_check=counts, decoy_echoed=None, capture_canary_hits=in_captures,
                             boot_changed=(boot != state.get("boot_id")) if after_restart else None)
     write_json(result_path(run_dir, name), record)
-    ctx.say(f"consume {UNIT}{' after the restart' if after_restart else ''}: exit {plain.returncode}; "
-            f"{'tag line seen' if prefixes else 'no tag line'}; canary in the output {plain_hits}; canary in process "
-            f"arguments {record['cmdline_hits']}; canary in transient unit files {record['transient_unit_hits']}")
+    ctx.say(f"consume {UNIT}{' after the restart' if after_restart else ''}: exit {plain[0]}; "
+            f"{'tag line seen' if prefixes else 'no tag line'}; canary in the output {plain_hits}; canary in the "
+            f"captures {in_captures}; canary in process arguments {record['cmdline_hits']}; canary in transient unit "
+            f"files {record['transient_unit_hits']}")
     ctx.say(f"consume {UNIT} --leak-check: listed forms returned {counts['pattern_hits']}, printed lines returned "
             f"whole {counts['printed_form_hits']}, markers {counts['markers']} and partial markers "
             f"{counts['partial_markers']} for {counts['forms_printed']} forms printed; masked {counts['masked']}")
     if keep and not after_restart:
         ctx.say(f"consume {UNIT}: the canary file stays in the store for the restart check; after the restart run: "
                 f"python3 {HARNESS_REL} consume {UNIT} --after-restart --run {run}")
-    ok = (plain.returncode == 0 and prefixes and plain_hits == 0 and counts["masked"]
+    ok = (plain[0] == 0 and prefixes and plain_hits == 0 and counts["masked"] and not in_captures
           and not record["cmdline_hits"] and not record["transient_unit_hits"])
     return 0 if ok else 1
 
 
-def consume_workflow(ctx: Context, run_dir: Path, run: str, sets: dict, timeout: float) -> int:
+def consume_workflow(ctx: Context, run_dir: Path, run: str, sets: dict, timeout: float, sequence: int) -> int:
     """Arm, let the coordinator run the Workflow tool, wait for the probe's tag file, disarm."""
     consumer = "workflow-child"
     rotate_nonce(run_dir, consumer)
@@ -1543,20 +2024,24 @@ def consume_workflow(ctx: Context, run_dir: Path, run: str, sets: dict, timeout:
                     break
                 time.sleep(0.2)
     finally:
-        disarm(ctx)
-    record = consume_record(ctx, started, 0 if seen else None, sampler.summary(), consumer, stream_tag_prefix=None,
-                            model_id=None, model_id_source="none", stream_canary_hits=0, decoy_echoed=None)
+        disarm(ctx, run_dir)
+    in_captures = captures_of(ctx, run_dir, sets, (consumer,))
+    record = consume_record(ctx, started, 0 if seen else None, sampler.summary(), consumer, sequence,
+                            stream_tag_prefix=None, model_id=None, model_id_source="none", stream_canary_hits=0,
+                            capture_canary_hits=in_captures, decoy_echoed=None)
     record["ran"] = seen
     write_json(result_path(run_dir, f"consume-{consumer}"), record)
     ctx.say(f"consume {consumer}: {'probe tag file seen' if seen else 'no probe tag file before the timeout'}; "
-            f"store file removed; canary in process arguments {record['cmdline_hits']}")
-    return 0 if seen and not record["cmdline_hits"] else 1
+            f"store file removed; canary in the captures {in_captures}; canary in process arguments "
+            f"{record['cmdline_hits']}")
+    return 0 if seen and not record["cmdline_hits"] and not in_captures else 1
 
 
 # -- subcommands -----------------------------------------------------------------------------------------------------
 
 def cmd_prepare(ctx: Context, args) -> int:
     ctx.entry  # the inventory row, validated
+    refuse_if_armed_elsewhere(ctx, None)
     if store_present(ctx):
         raise Refused(STORE_EXISTS)
     stamp = datetime.fromtimestamp(ctx.clock(), timezone.utc).strftime("%Y%m%dt%H%M%Sz")
@@ -1575,8 +2060,8 @@ def cmd_prepare(ctx: Context, args) -> int:
         write_set(run_dir, f"d-{decoy}", new_decoy())
     boot = receipts.small_text(receipts.BOOT_ID)
     write_json(run_dir / "state.json", {"schema_version": 1, "run": run, "created_epoch": ctx.clock(),
-                                        "keep_across_restart": bool(args.keep_across_restart),
-                                        "boot_id": boot if receipts.UUID.fullmatch(boot) else None})
+                                        "keep_across_restart": bool(args.keep_across_restart), "sequence": 0,
+                                        "latest": {}, "boot_id": boot if receipts.UUID.fullmatch(boot) else None})
     ctx.say(run)
     return 0
 
@@ -1593,7 +2078,14 @@ def cmd_controls(ctx: Context, args) -> int:
     results = {}
 
     def files_count(name: str, directory: Path) -> int:
-        return len(filescan(ctx, run_dir, [f"d-{name}"], [directory])[0][f"d-{name}"])
+        sink = {"id": "CONTROL", "kind": "files", "paths": [str(directory)]}
+        tally, matcher = Tally({f"d-{name}": sets[f"d-{name}"]}), Matcher({f"d-{name}": sets[f"d-{name}"]})
+        deadline = time.monotonic() + DEFAULT_DEADLINE
+        root = real(directory)
+        rg_content(ctx, run_dir, tally, matcher, root, None, [], [], False, deadline)
+        walk(tally, matcher, root, None, [], [], deadline)
+        del sink
+        return tally.result()["counts"][f"d-{name}"]
 
     for name in ("text", "gz"):
         directory = scratch / name
@@ -1643,13 +2135,28 @@ def sqlite_control(ctx: Context, run_dir: Path, sets: dict, directory: Path) -> 
     finally:
         connection.close()
     for suffix in ("", "-wal", "-shm"):
-        try:
+        with contextlib.suppress(FileNotFoundError):
             os.unlink(f"{database}{suffix}")
-        except FileNotFoundError:
-            pass
-    after = sqlite_sink(ctx, run_dir, ["d-sqlite"], sets, [directory], (), False)["counts"]["d-sqlite"]
+    sink = {"id": "CONTROL", "kind": "sqlite", "paths": [str(directory)]}
+    after = sqlite_sink_at(ctx, run_dir, sink, {"d-sqlite": sets["d-sqlite"]})["counts"]["d-sqlite"]
     return {"found": found, "after_removal": after, "in_main_file": in_main, "in_wal": in_wal,
             "ok": found >= 2 and after == 0 and in_wal and not in_main}
+
+
+def sqlite_sink_at(ctx: Context, run_dir: Path, sink: dict, sets: dict) -> dict:
+    """The SQLite scanner over a scratch directory, outside the sink table's exclusions (the controls' own check)."""
+    tally, matcher = Tally(sets), Matcher(sets)
+    deadline = time.monotonic() + DEFAULT_DEADLINE
+    for template in sink["paths"]:
+        root = real(template)
+        tally.present = True
+        rg_content(ctx, run_dir, tally, matcher, root, None, [], [], False, deadline)
+        for database in walk(tally, matcher, root, None, [], [], deadline):
+            result = sql_scan_file(ctx, database, matcher, run_dir, deadline)
+            for name, count in result["counts"].items():
+                for number in range(count):
+                    tally.add(name, f"{database}#cell{number}")
+    return tally.result()
 
 
 def git_control(ctx: Context, run_dir: Path, sets: dict, directory: Path) -> dict:
@@ -1663,10 +2170,12 @@ def git_control(ctx: Context, run_dir: Path, sets: dict, directory: Path) -> dic
     subprocess.run([git, "-C", str(directory), "hash-object", "-w", "--stdin"], capture_output=True,
                    input=f"control {set_value(sets['d-git'])}\n".encode("ascii"), env=environment, check=True,
                    timeout=60)
-    found = git_sink(ctx, run_dir, ["d-git"], [real(directory)], set())["counts"]["d-git"]
+    sink = {"id": "CONTROL", "kind": "git", "paths": [str(directory)]}
+    names = {"d-git": sets["d-git"]}
+    found = git_sink(ctx, run_dir, sink, names, set(), time.monotonic() + DEFAULT_DEADLINE)["counts"]["d-git"]
     subprocess.run([git, "-C", str(directory), "prune", "--expire=now"], stdin=subprocess.DEVNULL,
                    capture_output=True, env=environment, check=True, timeout=60)
-    after = git_sink(ctx, run_dir, ["d-git"], [real(directory)], set())["counts"]["d-git"]
+    after = git_sink(ctx, run_dir, sink, names, set(), time.monotonic() + DEFAULT_DEADLINE)["counts"]["d-git"]
     return {"found": found, "after_removal": after, "ok": found >= 1 and after == 0}
 
 
@@ -1677,13 +2186,16 @@ def journal_control(ctx: Context, run_dir: Path, sets: dict) -> dict:
         return {"found": 0, "after_removal": None, "ok": False}
     subprocess.run([cat, "-t", "canary-e2e-decoy"], input=f"canary decoy {set_value(sets['d-journal'])}\n"
                    .encode("ascii"), capture_output=True, env=scanner_environment(ctx), timeout=60)
+    sink = {"id": "CONTROL", "kind": "journal", "scope": "user"}
+    names = {"d-journal": sets["d-journal"]}
     found, deadline = 0, time.monotonic() + 10
     while True:
-        found = journal_sink(ctx, run_dir, ["d-journal"], False, ctx.clock())["counts"]["d-journal"]
+        result = journal_sink(ctx, run_dir, sink, names, ctx.clock(), time.monotonic() + 60)
+        found = result["counts"]["d-journal"]
         if found or time.monotonic() > deadline:
             break
         time.sleep(0.5)
-    return {"found": found, "after_removal": None, "ok": found >= 1}
+    return {"found": found, "after_removal": None, "ok": found >= 1 and result["status"] == "scanned"}
 
 
 def scannable_sinks(ctx: Context, with_sudo: bool) -> list:
@@ -1691,8 +2203,12 @@ def scannable_sinks(ctx: Context, with_sudo: bool) -> list:
             and (s["access"] == "agent" or (with_sudo and s["access"] == "sudo"))]
 
 
+def user_run_sinks(ctx: Context) -> list:
+    return [s for s in ctx.table["sinks"] if s["access"] == "user_run" and s["kind"] in SCANNABLE]
+
+
 def cmd_baseline(ctx: Context, args) -> int:
-    """The full scan before any consumer: every canary count must be 0."""
+    """The full scan before any consumer: every canary count must be 0 and every sink complete."""
     run_dir = run_directory(ctx, args.run)
     state, sets = load_state(run_dir), load_sets(run_dir)
     ctx.hold(p for patterns in canary_sets(sets).values() for p in patterns)
@@ -1701,19 +2217,22 @@ def cmd_baseline(ctx: Context, args) -> int:
         raise Refused("a scanner class control failed: fix it before the baseline")
     if any(read_json(result_path(run_dir, f"consume-{c}")) for c in CONSUMERS):
         raise Refused("the baseline runs before any consumer; this run has consumed already")
-    sinks, total, seen_git = scannable_sinks(ctx, False), 0, set()
+    sinks, total, incomplete, seen_git = scannable_sinks(ctx, False), 0, 0, set()
+    planted = {"journal"} & planted_decoys(run_dir)
     for sink in sinks:
         result = scan_sink(ctx, run_dir, sink, sets, agent_pass=True, seen_git=seen_git,
                            since_epoch=state["created_epoch"])
         hits = sum(result["counts"].get(f"c-{c}", 0) for c in CONSUMERS) + int(bool(result.get("canary_name_present")))
         total += hits
-        if hits or result["status"] == "error":
-            ctx.say(sink_line(sink, judge(sink, result, set(), class_ok), result))
-    record = {"ok": total == 0, "canary_hits": total, "sinks": len(sinks), "ran_epoch": ctx.clock()}
-    write_json(result_path(run_dir, "baseline"), record)
-    ctx.say(f"baseline: {len(sinks)} sinks scanned before any consumer, canary hits {total}; "
-            f"result {'ok' if total == 0 else 'FAILED'}")
-    return 0 if total == 0 else 1
+        incomplete += result["status"] in ("incomplete", "error")
+        if hits or result["status"] in ("incomplete", "error"):
+            ctx.say(sink_line(sink, judge(sink, result, planted, class_ok), result))
+    ok = total == 0 and incomplete == 0
+    write_json(result_path(run_dir, "baseline"), {"ok": ok, "canary_hits": total, "incomplete": incomplete,
+                                                  "sinks": len(sinks), "ran_epoch": ctx.clock()})
+    ctx.say(f"baseline: {len(sinks)} sinks scanned before any consumer, canary hits {total}, incomplete "
+            f"{incomplete}; result {'ok' if ok else 'FAILED'}")
+    return 0 if ok else 1
 
 
 def cmd_consume(ctx: Context, args) -> int:
@@ -1723,29 +2242,50 @@ def cmd_consume(ctx: Context, args) -> int:
     if args.after_restart and consumer != UNIT:
         raise UsageError(f"--after-restart is for {UNIT} only")
     run_dir = run_directory(ctx, args.run)
+    ctx.run_dir = run_dir
     state, sets = load_state(run_dir), load_sets(run_dir)
     ctx.hold(p for patterns in canary_sets(sets).values() for p in patterns)
+    refuse_if_armed_elsewhere(ctx, args.run)
     if consumer in ("codex-exec", "omniroute-lane"):
         profile = OMNIROUTE_PROFILE if consumer == "omniroute-lane" else None
         if codex_shell_snapshot_off(codex_home(ctx), profile) is not True:
             raise Refused(f"{consumer}: features.shell_snapshot is not false in the effective Codex configuration of "
                           f"this CODEX_HOME{' and profile ' + profile if profile else ''}; set it first (Codex 0.157.1 "
                           "enables shell snapshots by default, and they record the launcher's environment)")
-    if read_json(result_path(run_dir, "baseline")) is None:
-        raise Refused("run controls and baseline first")
+    baseline = read_json(result_path(run_dir, "baseline"))
+    if not baseline or not baseline.get("ok"):
+        raise Refused("run controls and a complete, clean baseline first: this run's baseline did not pass")
+    if args.after_restart:
+        if not state.get("keep_across_restart"):
+            raise UsageError("--after-restart is for a run prepared with --keep-across-restart")
+        if not store_present(ctx) or (args.run, UNIT) not in armed_runs(ctx):
+            raise Refused("the kept canary file of this run is not in the store; it did not survive the restart")
+    elif store_present(ctx):
+        raise Refused(STORE_EXISTS)
     timeout = args.timeout or (WORKFLOW_TIMEOUT if consumer == "workflow-child" else CONSUME_TIMEOUT)
+    consumers = ("fresh-claude-session", "subagent") if consumer == "fresh-claude-session" else (consumer,)
+    sequence = begin_consumption(ctx, run_dir, consumers)
     if consumer == "fresh-claude-session":
-        return consume_claude(ctx, run_dir, args.run, sets, timeout)
+        return consume_claude(ctx, run_dir, args.run, sets, timeout, sequence)
     if consumer == "workflow-child":
-        return consume_workflow(ctx, run_dir, args.run, sets, timeout)
+        return consume_workflow(ctx, run_dir, args.run, sets, timeout, sequence)
     if consumer == UNIT:
-        return consume_unit(ctx, run_dir, args.run, sets, state, timeout, args.after_restart)
-    return consume_codex(ctx, run_dir, args.run, sets, consumer, timeout, args.model)
+        return consume_unit(ctx, run_dir, args.run, sets, state, timeout, args.after_restart, sequence)
+    return consume_codex(ctx, run_dir, args.run, sets, consumer, timeout, args.model, sequence)
 
 
 def cmd_decoy(ctx: Context, args) -> int:
-    """Print the consumer's decoy and exit 1 on purpose (a failed command, for sinks that keep only those)."""
+    """Print the consumer's decoy and exit 1 on purpose (a failed command, for sinks that keep only those). With
+    --rtk, print over 500 bytes of RTK decoy lines, which RTK keeps for a failed command run through `rtk err`."""
     run_dir = run_directory(ctx, args.run)
+    if args.rtk is not None:
+        if args.consumer != "fresh-claude-session":
+            raise UsageError("--rtk is for fresh-claude-session, whose prompt carries the RTK decoy")
+        expected = set_value(read_set(run_dir, "d-rtk"))
+        if not hmac.compare_digest(args.rtk.encode("ascii", "replace"), expected.encode("ascii")):
+            raise UsageError("--rtk takes this run's RTK decoy, exactly as the prompt gives it")
+        ctx.say("\n".join(f"canary decoy for RTK recall {expected} line {number:02d}" for number in range(RTK_LINES)))
+        return 1
     ctx.say(f"decoy {args.consumer}: {set_value(read_set(run_dir, 'd-' + DECOY_OF[args.consumer]))}")
     return 1
 
@@ -1776,17 +2316,19 @@ def verify_one(ctx: Context, run_dir: Path, run: str, sets: dict, consumer: str)
 
 
 def cmd_verify(ctx: Context, args) -> int:
-    """Recompute HMAC-SHA256(canary, run|consumer|nonce) and compare it with the tag file and the captured prefix."""
+    """Recompute HMAC-SHA256(canary, run|consumer|nonce) and compare it with the tag file and the captured prefix;
+    each result names the consumption it verified."""
     run_dir = run_directory(ctx, args.run)
-    sets = load_sets(run_dir)
+    state, sets = load_state(run_dir), load_sets(run_dir)
     ctx.hold(p for patterns in canary_sets(sets).values() for p in patterns)
+    latest = latest_sequences(state)
     results = read_json(result_path(run_dir, "verify")) or {}
     valid = True
     for consumer in ([args.consumer] if args.consumer else list(CONSUMERS)):
-        state, channel = verify_one(ctx, run_dir, args.run, sets, consumer)
-        results[consumer] = {"tag": state, "channel": channel}
-        valid = valid and state == "valid"
-        ctx.say(f"verify {consumer}: tag {state}" + (f" ({channel})" if channel else ""))
+        tag_state, channel = verify_one(ctx, run_dir, args.run, sets, consumer)
+        results[consumer] = {"tag": tag_state, "channel": channel, "sequence": latest.get(consumer)}
+        valid = valid and tag_state == "valid"
+        ctx.say(f"verify {consumer}: tag {tag_state}" + (f" ({channel})" if channel else ""))
     write_json(result_path(run_dir, "verify"), results)
     return 0 if valid else 1
 
@@ -1804,10 +2346,10 @@ def cmd_settle(ctx: Context, args) -> int:
     if not ended:
         raise Refused("no consumer has run yet: settle times the arrival of their decoys")
     last_end = max(ended.values())
-    planted_at = {DECOY_OF[c]: t for c, t in ended.items() if c in DECOY_OF}
+    planted_at = {decoy: t for c, t in ended.items() for decoy in PLANTED_BY.get(c, ())}
     async_sinks = [s for s in ctx.table["sinks"] if s.get("async") and s["access"] == "agent"
                    and s["kind"] in SCANNABLE]
-    record = read_json(result_path(run_dir, "settle")) or {}
+    record = {"sequences": latest_sequences(state)}
     for sink in async_sinks:
         if sink["kind"] == "loki" and "loki" in sink.get("controls", []):
             if loki_push(ctx, sink, set_value(sets["d-loki"])):
@@ -1826,7 +2368,9 @@ def cmd_settle(ctx: Context, args) -> int:
         for identifier, (sink, decoys) in list(pending.items()):
             result = scan_sink(ctx, run_dir, sink, {f"d-{d}": sets[f"d-{d}"] for d in decoys}, agent_pass=True,
                                seen_git=set(), since_epoch=state["created_epoch"])
-            if all(result["counts"].get(f"d-{d}", 0) > 0 for d in decoys):
+            counts = (result.get("decoded_counts", {}) if sink.get("control_in") == "decoded_blobs"
+                      else result["counts"])
+            if all(counts.get(f"d-{d}", 0) > 0 for d in decoys):
                 now = ctx.clock()
                 arrivals[identifier] = round(max(now - planted_at[d] for d in decoys), 1)
                 del pending[identifier]
@@ -1860,13 +2404,13 @@ def cmd_scan(ctx: Context, args) -> int:
     run_dir = run_directory(ctx, args.run)
     state = load_state(run_dir)
     if args.sink:
-        wanted = [s for s in ctx.table["sinks"] if s["access"] == "user_run"] if args.sink == USER_RUN_GROUP else \
+        wanted = user_run_sinks(ctx) if args.sink == USER_RUN_GROUP else \
             [s for s in ctx.table["sinks"] if s["id"] == args.sink]
         if not wanted:
             raise UsageError(f"no sink {args.sink} in the table")
         user_run = any(s["access"] == "user_run" for s in wanted)
         if user_run and not ctx.tty():
-            raise Refused("user-run only: these sinks hold upstream account tokens or exported values and are "
+            raise Refused("user-run only: these sinks hold upstream account tokens or real values and are "
                           "Read-denied to agents. Run it in your own terminal: " + user_run_command(args.run), code=2)
         label = "user-run" if args.sink == USER_RUN_GROUP else f"sink-{args.sink}"
         agent_pass = not user_run
@@ -1884,7 +2428,8 @@ def cmd_scan(ctx: Context, args) -> int:
     ctx.hold(p for patterns in canary_sets(sets).values() for p in patterns)
     class_ok, planted = class_status(run_dir), planted_decoys(run_dir)
     sinks = [s for s in wanted if s["kind"] in SCANNABLE]
-    results, seen_git, tally = {}, set(), {"LEAK": 0, "failing": 0, "clean": 0, "uncontrolled": 0, "absent": 0}
+    results, seen_git = {}, set()
+    tally = {"LEAK": 0, "failing": 0, "clean": 0, "uncontrolled": 0, "absent": 0, "incomplete": 0}
     for sink in sinks:
         result = scan_sink(ctx, run_dir, sink, sets, agent_pass=agent_pass, seen_git=seen_git,
                            since_epoch=state["created_epoch"])
@@ -1902,16 +2447,18 @@ def cmd_scan(ctx: Context, args) -> int:
         tally["clean"] += judged["verdict"].startswith("clean")
         tally["uncontrolled"] += judged["verdict"].startswith("uncontrolled")
         tally["absent"] += judged["verdict"].startswith("absent")
+        tally["incomplete"] += judged["verdict"].startswith("INCOMPLETE")
         ctx.say(sink_line(sink, judged, result))
     ok = tally["failing"] == 0
-    write_json(result_path(run_dir, f"scan-{label}"), {"ran_epoch": ctx.clock(), "ok": ok, "sinks": results})
-    ctx.say(f"scan {label}: {len(sinks)} sinks, {tally['LEAK']} with canary hits, {tally['failing']} failing, "
-            f"{tally['clean']} clean with a passed control, {tally['uncontrolled']} uncontrolled, {tally['absent']} "
-            f"absent; result {'ok' if ok else 'FAILED'}")
+    write_json(result_path(run_dir, f"scan-{label}"), {"ran_epoch": ctx.clock(), "ok": ok, "sinks": results,
+                                                       "sequences": latest_sequences(state)})
+    ctx.say(f"scan {label}: {len(sinks)} sinks, {tally['LEAK']} with canary hits, {tally['incomplete']} incomplete, "
+            f"{tally['failing']} failing, {tally['clean']} clean with a passed control, {tally['uncontrolled']} "
+            f"uncontrolled, {tally['absent']} absent; result {'ok' if ok else 'FAILED'}")
     if not args.sink:
-        user_sinks = [s["id"] for s in ctx.table["sinks"] if s["access"] == "user_run"]
-        if user_sinks and read_json(result_path(run_dir, "scan-user-run")) is None:
-            ctx.say(f"user-run sinks not scanned yet ({len(user_sinks)}); in your own terminal run: "
+        waiting = user_run_sinks(ctx)
+        if waiting and read_json(result_path(run_dir, "scan-user-run")) is None:
+            ctx.say(f"user-run sinks not scanned yet ({len(waiting)}); in your own terminal run: "
                     f"{user_run_command(args.run)}")
     return 0 if ok else 1
 
@@ -1922,7 +2469,7 @@ PASS_SINK_KEYS = ("canary", "canary_by_consumer", "controls", "verdict", "proven
 def versions(ctx: Context) -> dict:
     found = {"python": platform.python_version()}
     for name, command in (("claude", "claude"), ("codex", "codex"), ("systemd", "systemctl"), ("rg", "rg"),
-                          ("git", "git")):
+                          ("git", "git"), ("rtk", "rtk")):
         executable, line = ctx.which(command), None
         if executable:
             try:
@@ -1936,9 +2483,13 @@ def versions(ctx: Context) -> dict:
     return found
 
 
-def classify(consumers: dict, leak, controls: dict, baseline, passes: dict) -> tuple:
+def classify(evidence: dict) -> tuple:
+    """(result, reasons): "leak" when any check found a canary, "zero" when every required check ran on the latest
+    consumption of every consumer and passed, "incomplete" otherwise. A user-run scan is not required, but one that
+    ran enters the verdict, and one that did not is listed in the receipt and the claim."""
     reasons, leaked = [], False
-    for consumer, row in consumers.items():
+    latest = evidence["latest"]
+    for consumer, row in evidence["consumers"].items():
         if row["stream_canary_hits"] or row["cmdline_hits"] or row["transient_unit_hits"]:
             leaked = True
             reasons.append(f"canary_outside_the_probe:{consumer}")
@@ -1946,6 +2497,9 @@ def classify(consumers: dict, leak, controls: dict, baseline, passes: dict) -> t
             reasons.append(f"consumer_not_run:{consumer}")
         elif row["tag"] != "valid":
             reasons.append(f"tag_not_valid:{consumer}")
+        elif evidence["verified_sequences"].get(consumer) != latest.get(consumer):
+            reasons.append(f"tag_not_verified_for_the_latest_consumption:{consumer}")
+    leak = evidence["leak_check"]
     if leak is None:
         reasons.append("leak_check_missing")
     elif leak["pattern_hits"] or leak["printed_form_hits"]:
@@ -1953,15 +2507,38 @@ def classify(consumers: dict, leak, controls: dict, baseline, passes: dict) -> t
         reasons.append("leak_check_returned_canary_forms")
     elif not leak["masked"]:
         reasons.append("leak_check_not_masked")
+    after = evidence["after_restart"]
+    if evidence["keep"]:
+        if after is None:
+            reasons.append("after_restart_missing")
+        else:
+            if after.get("pattern_hits"):
+                leaked = True
+                reasons.append("after_restart_returned_canary_forms")
+            if not after.get("masked"):
+                reasons.append("after_restart_not_masked")
+            if after.get("exit_code") != 0:
+                reasons.append("after_restart_failed")
+    for name, row in evidence["captures"].items():
+        if row["canary"]:
+            leaked = True
+            reasons.append(f"capture_leak:{name}")
+        if row["control"] != "found":
+            reasons.append(f"capture_control_missing:{name}")
+    controls = evidence["controls"]
     if not controls or not all(row.get("ok") for row in controls.values()):
         reasons.append("scanner_controls_failed_or_missing")
+    baseline = evidence["baseline"]
     if baseline is None:
         reasons.append("baseline_missing")
-    elif baseline["canary_hits"]:
-        leaked = True
-        reasons.append("baseline_canary_hits")
+    else:
+        if baseline["canary_hits"]:
+            leaked = True
+            reasons.append("baseline_canary_hits")
+        if not baseline["ok"]:
+            reasons.append("baseline_failed")
     for number in ("1", "2"):
-        scanned = passes.get(number)
+        scanned = evidence["passes"].get(number)
         if scanned is None:
             reasons.append(f"pass{number}_missing")
             continue
@@ -1970,14 +2547,24 @@ def classify(consumers: dict, leak, controls: dict, baseline, passes: dict) -> t
             reasons.append(f"pass{number}_leak")
         if not scanned["ok"]:
             reasons.append(f"pass{number}_failed")
+        if scanned["sequences"] != latest:
+            reasons.append(f"pass{number}_predates_the_latest_consumption")
+    user = evidence["user_run"]
+    if user is not None:
+        if any(row["verdict"] == "LEAK" for row in user["sinks"].values()):
+            leaked = True
+            reasons.append("user_run_leak")
+        if not user["ok"]:
+            reasons.append("user_run_failed")
     return ("leak" if leaked else "zero" if not reasons else "incomplete"), reasons
 
 
-def build_receipt(ctx: Context, run_dir: Path, state: dict, models: dict) -> dict:
+def build_receipt(ctx: Context, run_dir: Path, state: dict, models: dict, sets: dict) -> dict:
     """Counts, ids, versions, model ids and times only (tests/test_canary_e2e.py holds the key allowlist)."""
     def read(name):
         return read_json(result_path(run_dir, name))
 
+    latest = latest_sequences(state)
     verified = read("verify") or {}
     consumers = {}
     for consumer in CONSUMERS:
@@ -1986,12 +2573,13 @@ def build_receipt(ctx: Context, run_dir: Path, state: dict, models: dict) -> dic
         consumers[consumer] = {
             "ran": bool(row.get("ran")), "started_at": iso_or_none(row.get("started_epoch")),
             "ended_at": iso_or_none(row.get("ended_epoch")), "exit_code": row.get("exit_code"),
-            "tag": tag.get("tag", "not_verified"), "tag_channel": tag.get("channel", ""),
-            "model_id": models.get(consumer) or model_id(row.get("model_id")),
+            "sequence": latest.get(consumer), "tag": tag.get("tag", "not_verified"),
+            "tag_channel": tag.get("channel", ""), "model_id": models.get(consumer) or model_id(row.get("model_id")),
             "model_id_source": "coordinator" if consumer in models else row.get("model_id_source", "none"),
             "stream_canary_hits": int(row.get("stream_canary_hits") or 0),
             "cmdline_hits": int(row.get("cmdline_hits") or 0),
             "transient_unit_hits": int(row.get("transient_unit_hits") or 0), "decoy_echoed": row.get("decoy_echoed")}
+    verified_sequences = {c: (verified.get(c) or {}).get("sequence") for c in CONSUMERS}
     unit = read("consume-systemd-user-unit") or {}
     leak = unit.get("leak_check")
     leak_out = None if leak is None else {k: leak[k] for k in ("pattern_hits", "printed_form_hits", "markers",
@@ -2000,11 +2588,15 @@ def build_receipt(ctx: Context, run_dir: Path, state: dict, models: dict) -> dic
     after_out = None if after is None else {
         "ran": bool(after.get("ran")), "exit_code": after.get("exit_code"), "boot_changed": after.get("boot_changed"),
         "masked": (after.get("leak_check") or {}).get("masked"),
-        "pattern_hits": (after.get("leak_check") or {}).get("pattern_hits")}
+        "pattern_hits": (after.get("leak_check") or {}).get("pattern_hits"),
+        "tag": consumers[UNIT]["tag"] if after.get("sequence") == verified_sequences.get(UNIT) else "not_verified"}
+    captures = {name: {"canary": row["canary"], "control": row["control"]}
+                for name, row in capture_check(ctx, run_dir, sets).items()}
     controls = {name: {k: row[k] for k in ("found", "after_removal", "ok", "in_main_file", "in_wal") if k in row}
                 for name, row in (read("controls") or {}).items()}
     baseline = read("baseline")
-    baseline_out = None if baseline is None else {k: baseline[k] for k in ("canary_hits", "sinks", "ok")}
+    baseline_out = None if baseline is None else {"canary_hits": baseline["canary_hits"], "sinks": baseline["sinks"],
+                                                  "incomplete": baseline.get("incomplete", 0), "ok": baseline["ok"]}
     settle = read("settle")
     settle_out = None if not settle or "arrival_seconds" not in settle else {
         k: settle[k] for k in ("arrival_seconds", "pass1_delay_seconds", "pass2_delay_seconds", "max_wait_seconds")}
@@ -2014,22 +2606,35 @@ def build_receipt(ctx: Context, run_dir: Path, state: dict, models: dict) -> dic
         if scanned is None:
             continue
         passes[number] = {"ran_at": iso(scanned["ran_epoch"]), "ok": scanned["ok"],
+                          "sequences": scanned.get("sequences") or {},
                           "sinks": {i: {k: row[k] for k in PASS_SINK_KEYS} for i, row in scanned["sinks"].items()}}
-        for row in scanned["sinks"].values():
-            if "canary_name_present" in row:
-                manager = {"canary_name_present": row["canary_name_present"],
-                           "inventory_names_present": row["inventory_names_present"]}
     user = read("scan-user-run")
+    if user is not None and (user.get("sequences") or {}) != latest:
+        user = None  # a user-run scan of an earlier consumption does not describe the latest one
+    user_ids = [s["id"] for s in user_run_sinks(ctx)]
+    not_run = sorted(user_ids) if user is None else []
     user_out = {"ran": False} if user is None else {
         "ran": True, "ran_at": iso(user["ran_epoch"]), "ok": user["ok"],
         "sinks": {i: {k: row[k] for k in PASS_SINK_KEYS} for i, row in user["sinks"].items()}}
-    result, reasons = classify(consumers, leak_out, controls, baseline_out, passes)
+    if user is not None:
+        for row in user["sinks"].values():
+            if "canary_name_present" in row:
+                manager = {"canary_name_present": row["canary_name_present"],
+                           "inventory_names_present": row["inventory_names_present"]}
+    evidence = {"latest": latest, "consumers": consumers, "verified_sequences": verified_sequences,
+                "leak_check": leak_out, "after_restart": after_out, "keep": bool(state.get("keep_across_restart")),
+                "captures": captures, "controls": controls, "baseline": baseline_out, "passes": passes,
+                "user_run": None if user is None else {"ok": user["ok"], "sinks": user["sinks"]}}
+    result, reasons = classify(evidence)
+    claim = ZERO_CLAIM + (f" Not run, so not covered: {', '.join(not_run)}." if not_run else "")
     receipt = {"schema_version": 1, "kind": "canary_e2e_receipt", "run": state["run"],
                "recorded_at": iso(ctx.clock()), "keep_across_restart": bool(state.get("keep_across_restart")),
                "checkout_revision": receipts.checkout_revision(ctx.root), "versions": versions(ctx),
-               "consumers": consumers, "after_restart": after_out, "leak_check": leak_out, "controls": controls,
-               "baseline": baseline_out, "settle": settle_out, "passes": passes, "user_run": user_out,
-               "result": result, "reasons": reasons, "claim": ZERO_CLAIM, "not_covered": list(NOT_COVERED)}
+               "consumers": consumers, "after_restart": after_out, "leak_check": leak_out, "captures": captures,
+               "controls": controls, "baseline": baseline_out, "settle": settle_out,
+               "passes": {n: {k: v for k, v in p.items() if k != "sequences"} for n, p in passes.items()},
+               "user_run": user_out, "checks_not_run": not_run, "result": result, "reasons": reasons, "claim": claim,
+               "not_covered": list(NOT_COVERED)}
     if manager is not None:
         receipt["manager_environment"] = manager
     return receipt
@@ -2039,13 +2644,15 @@ def cmd_report(ctx: Context, args) -> int:
     run_dir = run_directory(ctx, args.run)
     state, sets = load_state(run_dir), load_sets(run_dir)
     ctx.hold(p for patterns in canary_sets(sets).values() for p in patterns)
+    if result_path(run_dir, "interrupted").exists():
+        raise Refused("this run was interrupted while a consumer ran; its evidence is incomplete: prepare a new run")
     models = {}
     for item in args.model:
         consumer, _, value = item.partition("=")
         if consumer not in CONSUMERS or model_id(value) is None:
             raise UsageError("--model takes <consumer>=<model id>, for example workflow-child=claude-sonnet-5-5")
         models[consumer] = value
-    receipt = build_receipt(ctx, run_dir, state, models)
+    receipt = build_receipt(ctx, run_dir, state, models, sets)
     directory = receipts.private_directory(probe.run_directories(RUN_ID_SAMPLE, ctx.env)[1].parent.parent)
     boot = receipts.small_text(receipts.BOOT_ID)
     label = receipts.receipt_label(datetime.fromtimestamp(ctx.clock(), timezone.utc),
@@ -2053,18 +2660,20 @@ def cmd_report(ctx: Context, args) -> int:
     path = receipts.write_receipt(directory, receipt, label)
     valid = sum(row["tag"] == "valid" for row in receipt["consumers"].values())
     ctx.say(f"canary receipt: result {receipt['result']}; tags valid {valid}/{len(CONSUMERS)}; passes "
-            f"{len(receipt['passes'])}/2; user-run scan {'ran' if receipt['user_run']['ran'] else 'not run'}; "
-            f"reasons {','.join(receipt['reasons']) or 'none'}; receipt {path.name}")
+            f"{len(receipt['passes'])}/2; user-run scan {'ran' if receipt['user_run']['ran'] else 'not run'}; checks "
+            f"not run {len(receipt['checks_not_run'])}; reasons {','.join(receipt['reasons']) or 'none'}; receipt "
+            f"{path.name}")
     return 0 if receipt["result"] == "zero" else 1
 
 
 def cmd_cleanup(ctx: Context, args) -> int:
-    """Unlink only canary-e2e.env and remove this run's directory; the receipts stay."""
+    """Unlink only canary-e2e.env, and only for the run that armed it, and remove this run's directory; the receipts
+    stay."""
     try:
         run_dir = run_directory(ctx, args.run)
     except Refused:
         run_dir = None  # already removed: the store file may still need removing
-    removed = disarm(ctx)
+    removed = disarm(ctx, run_dir)
     if run_dir is not None:
         shutil.rmtree(run_dir)
     ctx.say(f"cleanup: canary store file {'removed' if removed else 'absent'}; run directory "
@@ -2090,6 +2699,7 @@ def build_parser() -> argparse.ArgumentParser:
     decoy = commands.add_parser("decoy")
     decoy.add_argument("--run", required=True)
     decoy.add_argument("--consumer", required=True, choices=tuple(DECOY_OF))
+    decoy.add_argument("--rtk", help="the RTK decoy of the prompt, for `rtk err` (fresh-claude-session)")
     verify = commands.add_parser("verify")
     verify.add_argument("--run", required=True)
     verify.add_argument("--consumer", choices=CONSUMERS)
@@ -2112,6 +2722,22 @@ def build_parser() -> argparse.ArgumentParser:
 COMMANDS = {"prepare": cmd_prepare, "controls": cmd_controls, "baseline": cmd_baseline, "consume": cmd_consume,
             "decoy": cmd_decoy, "verify": cmd_verify, "settle": cmd_settle, "scan": cmd_scan, "report": cmd_report,
             "cleanup": cmd_cleanup}
+HANDLED_SIGNALS = (signal.SIGTERM, signal.SIGHUP)
+
+
+def interrupt(signum, _frame) -> None:
+    for handled in HANDLED_SIGNALS:  # a second signal must not cut the cleanup short
+        signal.signal(handled, signal.SIG_IGN)
+    raise Interrupted(signum)
+
+
+def mark_interrupted(ctx: Context, args, signum: int) -> None:
+    """Record, in the run's own results, that a consume step was interrupted; report then refuses the run."""
+    if args.command != "consume" or ctx.run_dir is None:
+        return
+    with contextlib.suppress(OSError, Refused):
+        write_json(result_path(ctx.run_dir, "interrupted"), {"step": args.command, "consumer": args.consumer,
+                                                             "signal": int(signum), "epoch": ctx.clock()})
 
 
 def main(argv=None, ctx=None) -> int:
@@ -2120,12 +2746,21 @@ def main(argv=None, ctx=None) -> int:
         args = build_parser().parse_args(argv)
     except SystemExit as stop:
         return stop.code if isinstance(stop.code, int) else 2
+    previous = {}
+    if threading.current_thread() is threading.main_thread():
+        for signum in HANDLED_SIGNALS:
+            previous[signum] = signal.signal(signum, interrupt)
     try:
-        resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
-    except (ValueError, OSError):
-        ctx.warn("canary_e2e: refused: could not set RLIMIT_CORE to 0")
-        return 1
-    try:
+        if args.command != "cleanup":  # cleanup only unlinks; it must work on any host
+            try:
+                runner.check_core_pattern()
+            except runner.Refused as refusal:
+                raise Refused(str(refusal)) from None
+        try:
+            resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+        except (ValueError, OSError):
+            ctx.warn("canary_e2e: refused: could not set RLIMIT_CORE to 0")
+            return 1
         return COMMANDS[args.command](ctx, args)
     except UsageError as error:
         ctx.warn(f"canary_e2e: usage error: {error}")
@@ -2134,11 +2769,19 @@ def main(argv=None, ctx=None) -> int:
         ctx.warn(f"canary_e2e: refused: {refusal}")
         return refusal.code
     except KeyboardInterrupt:
-        ctx.warn("canary_e2e: cancelled")
+        mark_interrupted(ctx, args, signal.SIGINT)
+        ctx.warn("canary_e2e: interrupted (SIGINT); the client was ended and the store disarmed")
         return 130
+    except Interrupted as stop:
+        mark_interrupted(ctx, args, stop.signum)
+        ctx.warn(f"canary_e2e: interrupted (signal {stop.signum}); the client was ended and the store disarmed")
+        return 128 + stop.signum
     except Exception as error:  # no traceback: it could quote whatever was being handled
         ctx.warn(f"canary_e2e: unexpected {type(error).__name__}; no value was printed")
         return 1
+    finally:
+        for signum, handler in previous.items():
+            signal.signal(signum, handler)
 
 
 if __name__ == "__main__":

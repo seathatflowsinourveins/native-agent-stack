@@ -1,11 +1,13 @@
 """Tests for the canary proof: tools/credentials/canary_e2e.py, canary_probe.py, canary_sinks.json and canary_workflow.js.
 
-Local integration checks, not upstream acceptance (docs/acceptance-evidence-policy.md). Every canary, decoy and key is a
-synthetic value made at test time. The store, the run directory, the receipts and every sink live in temporary
-directories named through XDG overrides inside the test process only. The consumers (claude, codex, systemd-run) and
-journalctl, systemd-cat, systemctl and gh are stub executables first on PATH, and /proc is a fixture directory. No test
-starts a Claude, Codex or OmniRoute session, calls the keyring, or reads a real store, journal, Loki, RTK or ai-memory
-database; the stubs run the real key runner and the real probe against the temporary store.
+Local integration checks, not upstream acceptance (docs/acceptance-evidence-policy.md). Every canary, decoy, key and
+sentinel is a synthetic value made at test time. The store, the run directory, the receipts and every sink live in
+temporary directories named through XDG overrides inside the test process only. The consumers (claude, codex,
+systemd-run) and journalctl, systemd-cat, systemctl and gh are stub executables first on PATH, and /proc is a fixture
+directory. No test starts a Claude, Codex or OmniRoute session, calls the keyring, or reads a real store, journal, Loki,
+RTK or ai-memory database; the stubs run the real key runner and the real probe against the temporary store. The
+repair tests (review of 2026-09-29) each hold a synthetic false-zero fixture that passed before its fix and must now
+make the scan or the report fail.
 """
 from __future__ import annotations
 
@@ -21,6 +23,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import sqlite3
 import stat
 import subprocess
@@ -31,6 +34,7 @@ import time
 import unittest
 import urllib.parse
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools" / "credentials"
@@ -61,42 +65,66 @@ def _host_hands_cores_to_a_collector() -> bool:
         return False
 
 
-# As in tests/test_credential_run.py: the runner refuses a host that pipes crash dumps, so there the stubs start it
-# through a launcher that points CORE_PATTERN_FILE at a temporary file holding "core".
+# As in tests/test_credential_run.py: the runner, and now the harness, refuse a host that pipes crash dumps, so there the
+# stubs start them through launchers that point CORE_PATTERN_FILE at a temporary file holding "core".
 HOST_PIPES_CORES = os.environ.get("CREDENTIAL_RUN_TEST_LAUNCHER") == "1" or _host_hands_cores_to_a_collector()
 LAUNCHER = ("import os, sys\n"
             f"sys.path[:0] = [{str(TOOLS)!r}, {str(ROOT / 'scripts')!r}]\n"
             "import credential_run\n"
             "credential_run.CORE_PATTERN_FILE = os.environ.pop('CORE_PATTERN_TEST_FILE')\n"
             "sys.exit(credential_run.main(sys.argv[1:]))\n")
+# The harness in a subprocess, with the test's sink table and /proc fixture (named by two variables that only this
+# launcher reads; the harness has no such switch).
+HARNESS_LAUNCHER = ("import os, sys\n"
+                    f"sys.path[:0] = [{str(TOOLS)!r}, {str(ROOT / 'scripts')!r}]\n"
+                    "import credential_run, canary_e2e\n"
+                    "if os.environ.get('CORE_PATTERN_TEST_FILE'):\n"
+                    "    credential_run.CORE_PATTERN_FILE = os.environ['CORE_PATTERN_TEST_FILE']\n"
+                    "sys.exit(canary_e2e.main(sys.argv[1:], canary_e2e.Context(\n"
+                    "    sinks_path=os.environ['CANARY_TEST_SINKS'], proc_root=os.environ['CANARY_TEST_PROC'])))\n")
+# A command for the runner that records its environment by name and sha256 only: the probe's environment, observed.
+RECORD_ENV = ("import hashlib, json, os, sys\n"
+              "open(sys.argv[1], 'w').write(json.dumps({n: hashlib.sha256(v.encode()).hexdigest()\n"
+              "                                          for n, v in os.environ.items()}))\n")
 
 STUB_HELPER = r'''
-import hashlib, json, os, re, subprocess, sys, time
+import gzip, hashlib, json, os, re, sqlite3, subprocess, sys, time
 TOOLS = @TOOLS@
 LAUNCHER = @LAUNCHER@
+HARNESS_LAUNCHER = @HARNESS_LAUNCHER@
+RECORD_ENV = @RECORD_ENV@
 RUN = re.compile(r"--run (canary-[0-9]{8}t[0-9]{6}z-[0-9a-f]{6})")
 ECHO = re.compile(r"echo (DCOYE2E[0-9a-f]{32}) && false")
+RTK = re.compile(r"--rtk (DCOYE2E[0-9a-f]{32})")
 
-def runner_argv(consumer, run, leak=False):
-    command = [sys.executable, "-I", TOOLS + "/canary_probe.py", "--run", run, "--consumer", consumer]
-    command += ["--leak-check"] if leak else []
+def runner_argv(*command):
     if os.environ.get("CORE_PATTERN_TEST_FILE"):
         return [sys.executable, "-I", "-S", "-c", LAUNCHER, "canary-e2e", "--", *command]
     return [sys.executable, "-I", TOOLS + "/credential_run.py", "canary-e2e", "--", *command]
 
 def run_probe(consumer, run):
-    result = subprocess.run(runner_argv(consumer, run), capture_output=True, text=True, timeout=60)
+    command = [sys.executable, "-I", TOOLS + "/canary_probe.py", "--run", run, "--consumer", consumer]
+    result = subprocess.run(runner_argv(*command), capture_output=True, text=True, timeout=60)
     return result.stdout + result.stderr
 
+def probe_environment(label):
+    path = os.path.join(os.environ["HOME"], "stub-env", label + ".json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    subprocess.run(runner_argv(sys.executable, "-I", "-c", RECORD_ENV, path), capture_output=True, timeout=60)
+
+def harness(*args):
+    return subprocess.run([sys.executable, "-I", "-c", HARNESS_LAUNCHER, *args], capture_output=True, text=True,
+                          timeout=60)
+
 def harness_decoy(consumer, run):
-    result = subprocess.run([sys.executable, TOOLS + "/canary_e2e.py", "decoy", "--run", run, "--consumer", consumer],
-                            capture_output=True, text=True, timeout=60)
-    return result.stdout.strip().split(": ", 1)[1]
+    return harness("decoy", "--run", run, "--consumer", consumer).stdout.strip().split(": ", 1)[1]
+
+def store_path():
+    return os.path.join(os.environ["XDG_CONFIG_HOME"], "native-agent-stack", "canary-e2e.env")
 
 def store_digest():
-    path = os.path.join(os.environ["XDG_CONFIG_HOME"], "native-agent-stack", "canary-e2e.env")
     try:
-        with open(path, "rb") as handle:
+        with open(store_path(), "rb") as handle:
             return hashlib.sha256(handle.read()).hexdigest()
     except OSError:
         return None
@@ -121,21 +149,39 @@ def later(name, text, delay):
     subprocess.Popen([sys.executable, "-c", code, os.path.join(os.environ["HOME"], name), text, str(delay)],
                      start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-def names_seen(consumer):
-    record("stub-env/" + consumer + ".json", json.dumps(sorted(os.environ)))
+def record_env(label):
+    path = os.path.join(os.environ["HOME"], "stub-env", label + ".json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as handle:
+        handle.write(json.dumps({n: hashlib.sha256(v.encode()).hexdigest() for n, v in os.environ.items()}))
+
+def write_recall(command, output):
+    path = os.path.join(os.environ["HOME"], "rtk", "recall.db")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with sqlite3.connect(path) as connection:
+        connection.execute("CREATE TABLE IF NOT EXISTS recall (hash TEXT, command TEXT, codec TEXT, blob BLOB)")
+        connection.execute("INSERT INTO recall VALUES (?, ?, ?, ?)", ("h", command, "gzip", gzip.compress(output.encode())))
+    connection.close()
+
+def flag(name):
+    return os.path.exists(os.path.join(os.environ["HOME"], name))
 '''
 
 STUB_CLAUDE = r'''
-import json, sys
+import json, os, sys, time
 sys.path.insert(0, @BIN@)
 from _stubs import *
 if sys.argv[1:2] == ["--version"]:
     print("2.1.284 (Claude Code)")
     raise SystemExit(0)
+record_env("fresh-claude-session")
+if flag("slow-claude"):
+    record("claude.pid", str(os.getpid()))
+    time.sleep(120)
 prompt = sys.stdin.read()
 run = RUN.search(prompt).group(1)
 decoy = ECHO.search(prompt).group(1)
-names_seen("fresh-claude-session")
+rtk_decoy = RTK.search(prompt)
 lines = []
 def emit(obj):
     text = json.dumps(obj)
@@ -143,8 +189,13 @@ def emit(obj):
     print(text, flush=True)
 emit({"type": "system", "subtype": "init", "model": "claude-sonnet-5-5-stub", "session_id": "s1"})
 emit({"type": "user", "message": {"content": [{"type": "tool_result", "content": decoy, "is_error": True}]}})
+if rtk_decoy:  # the `rtk err ... decoy --rtk` step, as RTK would record it
+    rtk = harness("decoy", "--run", run, "--consumer", "fresh-claude-session", "--rtk", rtk_decoy.group(1))
+    write_recall("python3 tools/credentials/canary_e2e.py decoy --rtk " + rtk_decoy.group(1), rtk.stdout)
+    emit({"type": "user", "message": {"content": [{"type": "tool_result", "content": rtk.stdout[-200:], "is_error": True}]}})
 before = store_digest()
 emit({"type": "user", "message": {"content": [{"type": "tool_result", "content": run_probe("fresh-claude-session", run)}]}})
+probe_environment("probe-environment")
 if not wait_for_change(before):
     raise SystemExit(9)
 sub_decoy = harness_decoy("subagent", run)
@@ -169,7 +220,10 @@ prompt = sys.stdin.read() if args[-1] == "-" else args[-1]
 run = RUN.search(prompt).group(1)
 consumer = "omniroute-lane" if "-p" in args else "codex-exec"
 decoy = ECHO.search(prompt).group(1)
-names_seen(consumer)
+record_env(consumer)
+if flag("careless-codex"):  # a client that logs the key it can see on its own stderr
+    with open(store_path()) as handle:
+        sys.stderr.write("debug: " + handle.read())
 lines = [json.dumps({"type": "thread.started", "thread_id": "t"}),
          json.dumps({"type": "item.completed", "item": {"type": "command_execution", "aggregated_output": decoy + "\n", "exit_code": 1}}),
          json.dumps({"type": "item.completed", "item": {"type": "command_execution", "aggregated_output": run_probe(consumer, run), "exit_code": 0}}),
@@ -185,6 +239,7 @@ STUB_SYSTEMD_RUN = r'''
 import os, sys
 sys.path.insert(0, @BIN@)
 from _stubs import *
+record_env("systemd-run")
 args = sys.argv[1:]
 index = 0
 while index < len(args) and args[index].startswith("-"):
@@ -197,9 +252,14 @@ os.execv(command[0], command)
 
 STUB_JOURNALCTL = r'''
 import os, sys
+sys.path.insert(0, @BIN@)
+from _stubs import *
 if "--version" in sys.argv:
     print("systemd 255 (255.4-1ubuntu8.17)")
     raise SystemExit(0)
+record_env("journalctl")
+if flag("journal-fails"):
+    raise SystemExit(1)
 try:
     with open(os.environ["CANARY_TEST_JOURNAL"], "rb") as handle:
         sys.stdout.buffer.write(handle.read())
@@ -217,15 +277,22 @@ with open(os.environ["CANARY_TEST_JOURNAL"], "a") as handle:
 
 STUB_SYSTEMCTL = r'''
 import os, sys
+sys.path.insert(0, @BIN@)
+from _stubs import *
 if "--version" in sys.argv:
     print("systemd 255 (255.4-1ubuntu8.17)")
 elif "show-environment" in sys.argv:
+    record_env("systemctl")
     print("HOME=/home/example\nPATH=/usr/bin\nLANG=C.UTF-8")
-    if os.path.exists(os.environ["HOME"] + "/manager-has-canary-name"):
+    if flag("manager-has-canary-name"):
         print("CANARY_E2E_KEY=not-a-value-the-scanner-reads")
 '''
 
 STUB_GH = r'''
+import sys
+sys.path.insert(0, @BIN@)
+from _stubs import *
+record_env("gh")
 print("[]")
 '''
 
@@ -249,8 +316,19 @@ def secret_forms(value: str) -> list:
     return forms + stable_interiors(raw)
 
 
+def inventory_sentinels() -> dict:
+    """A synthetic value under every inventory variable, every must_not_be_set name and every pointer variable."""
+    inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
+    names = set(inventory["must_not_be_set"])
+    for entry in inventory["entries"]:
+        names.update(entry["variables"], entry["optional_variables"], entry["pointer_variables"])
+    return {name: f"SENTINEL-{name}-" + os.urandom(6).hex() for name in sorted(names)}
+
+
 class CanaryCase(unittest.TestCase):
-    """A temporary host: home, XDG directories, a 0700 runtime directory, stub executables and a fixture /proc."""
+    """A temporary host: home, XDG directories, a 0700 runtime directory, stub executables and a fixture /proc. Its
+    environment carries a sentinel under every inventory, must_not_be_set and pointer name, which no environment the
+    harness builds may keep."""
 
     maxDiff = None
 
@@ -271,23 +349,29 @@ class CanaryCase(unittest.TestCase):
         self.journal = self.base / "journal.export"
         self.core_pattern = self.base / "core_pattern"
         self.core_pattern.write_text("core\n")
+        self.sinks_file = self.base / "sinks.json"
+        self.sentinels = inventory_sentinels()
         self.env = {"PATH": f"{self.bin}{os.pathsep}{os.environ.get('PATH', '')}", "HOME": str(self.home),
                     "XDG_CONFIG_HOME": str(self.config), "XDG_STATE_HOME": str(self.state),
                     "XDG_RUNTIME_DIR": str(self.runtime), "XDG_DATA_HOME": str(self.home / ".local" / "share"),
                     "XDG_CACHE_HOME": str(self.home / ".cache"), "CODEX_HOME": str(self.codex_home),
-                    "CANARY_TEST_JOURNAL": str(self.journal), "LANG": "C.UTF-8"}
+                    "CANARY_TEST_JOURNAL": str(self.journal), "CANARY_TEST_SINKS": str(self.sinks_file),
+                    "CANARY_TEST_PROC": str(self.proc), "LANG": "C.UTF-8", **self.sentinels}
         if HOST_PIPES_CORES:
             self.env["CORE_PATTERN_TEST_FILE"] = str(self.core_pattern)
+            patcher = mock.patch.object(run_mod, "CORE_PATTERN_FILE", str(self.core_pattern))
+            patcher.start()
+            self.addCleanup(patcher.stop)
         self.outputs: list = []
         self.write_stubs()
-        self.sinks_file = self.base / "sinks.json"
         self.write_sinks(self.default_sinks())
         self.clock_offset = 0.0
 
     # -- fixtures ------------------------------------------------------------------------------------------------------
 
     def write_stubs(self):
-        helper = STUB_HELPER.replace("@TOOLS@", repr(str(TOOLS))).replace("@LAUNCHER@", repr(LAUNCHER))
+        helper = (STUB_HELPER.replace("@TOOLS@", repr(str(TOOLS))).replace("@LAUNCHER@", repr(LAUNCHER))
+                  .replace("@HARNESS_LAUNCHER@", repr(HARNESS_LAUNCHER)).replace("@RECORD_ENV@", repr(RECORD_ENV)))
         (self.bin / "_stubs.py").write_text(helper)
         for name, body in (("claude", STUB_CLAUDE), ("codex", STUB_CODEX), ("systemd-run", STUB_SYSTEMD_RUN),
                            ("journalctl", STUB_JOURNALCTL), ("systemd-cat", STUB_SYSTEMD_CAT),
@@ -310,18 +394,19 @@ class CanaryCase(unittest.TestCase):
                 self.sink("T05-databases", "sqlite", ["$HOME/dbs"]),
                 self.sink("T06-repository", "git", ["$HOME/repo"]),
                 self.sink("T07-call-logs", "files", ["$HOME/omni-data"], ["omni"], access="user_run"),
-                self.sink("T08-manager", "manager_environment", persisted=False),
+                self.sink("T08-manager", "manager_environment", access="user_run", persisted=False),
                 self.sink("T09-github", "github"),
                 self.sink("T10-remote", "not_scanned", access="not_scanned"),
                 self.sink("T11-covered", "covered"),
                 self.sink("T12-proc", "during_consume", persisted=False),
                 self.sink("T13-absent", "files", ["$HOME/no-such-directory"]),
-                self.sink("T14-sudo-only", "files", ["$HOME/sudo-only"], access="sudo")]
+                self.sink("T14-sudo-only", "files", ["$HOME/sudo-only"], access="sudo"),
+                self.sink("T15-rtk-recall", "sqlite", ["$HOME/rtk/recall.db*"], ["rtk"], control_in="decoded_blobs")]
 
-    def write_sinks(self, sinks):
+    def write_sinks(self, sinks, exclude=()):
         table = {"schema_version": 1, "kind": "canary_sink_table",
-                 "exclude": ["${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack", "$HOME/.ssh"],
-                 "exclude_names": ["shell_snapshots"], "sinks": sinks}
+                 "exclude": ["${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack", "$HOME/.ssh", *exclude],
+                 "exclude_names": ["shell_snapshots", "config.v2.json"], "sinks": sinks}
         self.sinks_file.write_text(json.dumps(table))
 
     def context(self, tty=False):
@@ -335,6 +420,19 @@ class CanaryCase(unittest.TestCase):
         context = self.context(tty=tty)
         code = harness.main(list(argv), context)
         return code, context.out.getvalue(), context.err.getvalue()
+
+    def launch(self, *argv) -> subprocess.Popen:
+        """The harness in a subprocess, with this test's table and /proc fixture."""
+        process = subprocess.Popen([sys.executable, "-I", "-c", HARNESS_LAUNCHER, *argv], env=self.env,
+                                   stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        def reap():
+            if process.poll() is None:
+                process.kill()
+            process.communicate(timeout=30)
+
+        self.addCleanup(reap)
+        return process
 
     def prepare(self, *extra):
         code, out, err = self.harness("prepare", *extra)
@@ -361,6 +459,12 @@ class CanaryCase(unittest.TestCase):
     def codex_config(self, base=False, profile=False):
         (self.codex_home / "config.toml").write_text(f"[features]\nshell_snapshot = {str(base).lower()}\n")
         (self.codex_home / "omniroute.config.toml").write_text(f"[features]\nshell_snapshot = {str(profile).lower()}\n")
+
+    def ran(self, run, consumer, **extra):
+        """A consume record for a consumer that ran (planting its decoy), as a scan-only test needs."""
+        record = {"ran": True, "started_epoch": time.time() - 10, "ended_epoch": time.time() - 5, "sequence": 1}
+        record.update(extra)
+        harness.write_json(self.run_dir(run) / "results" / f"consume-{consumer}.json", record)
 
     def all_output(self) -> str:
         return "".join(out.getvalue() + err.getvalue() for out, err in self.outputs)
@@ -504,7 +608,9 @@ class PatternAndTagTests(CanaryCase):
         self.assertEqual(stat.S_IMODE(tag_file.stat().st_mode), 0o600)
         for text in (result.stdout, tag_file.read_text()):
             self.assert_value_free(secret_forms(canary) + [v.encode() for v in sentinels.values()], text)
-        absent = self.run_probe(run, "fresh-claude-session", sentinels)
+        absent = subprocess.run([sys.executable, "-I", str(TOOLS / "canary_probe.py"), "--run", run, "--consumer",
+                                 "fresh-claude-session"], capture_output=True, text=True, timeout=60,
+                                env={**{k: v for k, v in self.env.items() if k != "CANARY_E2E_KEY"}, **sentinels})
         self.assertEqual(absent.returncode, 3)
         self.assertNotIn("SENTINEL", absent.stdout + absent.stderr)
         # The source reads the process environment in two places only: os.environ.get(VARIABLE), the one secret by its
@@ -582,8 +688,7 @@ class ScannerTests(CanaryCase):
         (self.home / "transcripts").mkdir()
         self.write_sinks([self.sink("X01-empty", "files", ["$HOME/transcripts"], ["claude"])])
         self.assertEqual(self.harness("baseline", "--run", run)[0], 0)
-        harness.write_json(self.run_dir(run) / "results" / "consume-fresh-claude-session.json",
-                           {"ran": True, "ended_epoch": time.time() - 5, "started_epoch": time.time() - 10})
+        self.ran(run, "fresh-claude-session")
         code, out, _ = self.harness("scan", "--sink", "X01-empty", "--run", run)
         self.assertEqual(code, 1, out)
         self.assertIn("X01-empty [test/X01-empty]: not a sink, or scanned wrongly", out)
@@ -601,31 +706,45 @@ class ScannerTests(CanaryCase):
         with sqlite3.connect(self.home / "dbs" / "tool.db") as connection:
             connection.execute("CREATE TABLE t (v BLOB)")
             connection.execute("INSERT INTO t VALUES (?)", (gzip.compress(f"x {canary} y".encode()),))
-        # excluded places hold the canary too and must never be read: the store, the run directory, shell_snapshots
-        (self.home / "transcripts" / "shell_snapshots").mkdir()
-        (self.home / "transcripts" / "shell_snapshots" / "s.sh").write_text(f"declare -x K={canary}\n")
-        store = self.config / "native-agent-stack"
-        store.mkdir(mode=0o700)
-        (store / "other.env").write_text(f"export K={canary}\n")
+        connection.close()
         self.write_sinks([self.sink("L01-transcripts", "files", ["$HOME/transcripts"]),
-                          self.sink("L02-databases", "sqlite", ["$HOME/dbs"]),
-                          self.sink("L03-config", "files", ["$HOME/.config"]),
-                          self.sink("L04-runtime", "files", [str(self.runtime)])])
+                          self.sink("L02-databases", "sqlite", ["$HOME/dbs"])])
         code, out, err = self.harness("scan", "--sink", "L01-transcripts", "--run", run)
         self.assertEqual(code, 1, out + err)
         self.assertIn("L01-transcripts [test/L01-transcripts]: LEAK; canary 1 (codex-exec=1)", out)
         code, out, err = self.harness("scan", "--sink", "L02-databases", "--run", run)
         self.assertEqual(code, 1)
         self.assertIn("LEAK; canary 1 (codex-exec=1)", out)  # found only after decompressing the cell
-        for excluded in ("L03-config", "L04-runtime"):
-            code, out, err = self.harness("scan", "--sink", excluded, "--run", run)
-            self.assertEqual(code, 0, out + err)
-            self.assertIn("canary 0", out)
         text = self.all_output()
         self.assertNotIn(str(leaked), text)
         self.assertNotIn("careless", text)
         self.assertNotIn(str(self.home), text)
         self.assert_value_free(self.forbidden(run), text)
+
+    @unittest.skipUnless(HAS_RG, "the file scanner needs rg")
+    def test_scanners_never_read_an_excluded_path(self):
+        # The store, the run directory, a shell_snapshots directory and a container config.v2.json hold the canary, and
+        # the scans that cover them count nothing: excluded paths are pruned by the scanner itself.
+        run = self.prepare()
+        harness.write_json(self.run_dir(run) / "results" / "controls.json",
+                           {k: {"ok": True} for k in ("text", "gz", "sqlite", "git", "journal")})
+        canary = self.canary(run, "codex-exec")
+        store = self.config / "native-agent-stack"
+        store.mkdir(mode=0o700)
+        (store / "other.env").write_text(f"export K={canary}\n")
+        for relative in ("transcripts/shell_snapshots/s.sh", "docker/containers/abc/config.v2.json"):
+            path = self.home / relative
+            path.parent.mkdir(parents=True)
+            path.write_text(f"declare -x K={canary}\n")
+        (self.home / "transcripts" / "ok.txt").write_text("nothing\n")
+        self.write_sinks([self.sink("E01-config", "files", ["$HOME/.config"]),
+                          self.sink("E02-runtime", "files", [str(self.runtime)]),
+                          self.sink("E03-transcripts", "files", ["$HOME/transcripts"]),
+                          self.sink("E04-docker", "files", ["$HOME/docker"])])
+        for sink in ("E01-config", "E02-runtime", "E03-transcripts", "E04-docker"):
+            code, out, err = self.harness("scan", "--sink", sink, "--run", run)
+            self.assertEqual(code, 0, out + err)
+            self.assertIn("canary 0", out)
 
     def test_omniroute_scan_refuses_without_tty(self):
         run = self.prepare()
@@ -633,7 +752,7 @@ class ScannerTests(CanaryCase):
         self.assertEqual(code, 2)
         self.assertIn("user-run only", out + err)
         self.assertFalse((self.run_dir(run) / "results" / "scan-user-run.json").exists())
-        cli = subprocess.run([sys.executable, str(TOOLS / "canary_e2e.py"), "scan", "--sink", "omniroute", "--run", run],
+        cli = subprocess.run([sys.executable, "-I", "-c", HARNESS_LAUNCHER, "scan", "--sink", "omniroute", "--run", run],
                              env=self.env, capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(cli.returncode, 2, cli.stdout + cli.stderr)
         self.assertIn(harness.user_run_command(run), cli.stdout + cli.stderr)
@@ -645,11 +764,11 @@ class ScannerTests(CanaryCase):
         (self.home / "omni-data" / "call_logs.txt").write_text(self.decoy(run, "omni") + "\n")
         harness.write_json(self.run_dir(run) / "results" / "controls.json",
                            {k: {"ok": True} for k in ("text", "gz", "sqlite", "git", "journal")})
-        harness.write_json(self.run_dir(run) / "results" / "consume-omniroute-lane.json",
-                           {"ran": True, "ended_epoch": time.time(), "started_epoch": time.time()})
+        self.ran(run, "omniroute-lane")
         code, out, err = self.harness("scan", "--sink", "omniroute", "--run", run, tty=True)
         self.assertEqual(code, 0, out + err)
         self.assertIn("T07-call-logs [test/T07-call-logs]: clean (control passed); canary 0; controls omni=found", out)
+        self.assertIn("T08-manager [test/T08-manager]:", out)  # the manager's environment is user-run now, names only
         self.assertTrue((self.run_dir(run) / "results" / "scan-user-run.json").exists())
 
     def test_cleanup_removes_only_the_canary_file(self):
@@ -686,15 +805,16 @@ class ScannerTests(CanaryCase):
 
     def test_arming_is_create_only(self):
         run = self.prepare()
-        harness.arm(self.context(), self.run_dir(run), "codex-exec")
+        directory = self.run_dir(run)
+        harness.arm(self.context(), directory, "codex-exec")
         first = self.store_file().read_bytes()
         with self.assertRaises(harness.Refused):
-            harness.arm(self.context(), self.run_dir(run), "omniroute-lane")
+            harness.arm(self.context(), directory, "omniroute-lane")
         self.assertEqual(self.store_file().read_bytes(), first)
         code, out, err = self.harness("prepare")
         self.assertEqual(code, 1)  # a new run refuses while a canary file is in the store
-        self.assertTrue(harness.disarm(self.context()))
-        self.assertFalse(harness.disarm(self.context()))
+        self.assertTrue(harness.disarm(self.context(), directory))
+        self.assertFalse(harness.disarm(self.context(), directory))
 
     def test_proc_cmdline_sampler_counts_only(self):
         run = self.prepare()
@@ -751,17 +871,23 @@ class ScannerTests(CanaryCase):
             self.assertIn(missed, ids)
         self.assertEqual(harness.table_errors(table), [])
         rows = {row["id"]: row for row in table["sinks"]}
-        # stores that the guard denies to agents are scanned only by the user, in a terminal
+        # Stores that the guard denies to agents, and every scan that would pass a real value through the harness's
+        # memory (the user manager's environment, container configurations), run only in the user's terminal.
         self.assertEqual({i for i, r in rows.items() if r["access"] == "user_run"},
-                         {"S14-codex-shell-snapshots", "S25-omniroute-main", "S26-omniroute-fw", "M01-docker-config"})
+                         {"S14-codex-shell-snapshots", "S25-omniroute-main", "S26-omniroute-fw", "M01-docker-config",
+                          "M03-user-manager-environment", "S37-docker-container-configs"})
+        self.assertIn("config.v2.json", table["exclude_names"])
+        self.assertIn("hostconfig.json", table["exclude_names"])
         for identifier, row in rows.items():
             if row["access"] in ("agent", "sudo"):
                 for template in row["paths"]:
                     self.assertIsNone(guard.check(f"cat {template}"), (identifier, template))
         self.assertEqual({i for i, r in rows.items() if r["async"]}, {"S17-ai-memory", "S21-agentsview", "S28-loki"})
         self.assertIn("never swept", rows["S02-claude-prompt-history"]["retention"])
-        self.assertIn("90 days", rows["S18-rtk"]["retention"])
-        self.assertIn("30 days", rows["S18-rtk"]["retention"])
+        self.assertIn("90 days", rows["S18-rtk-history"]["retention"])
+        self.assertIn("30 days", rows["S18-rtk-recall"]["retention"])
+        self.assertEqual((rows["S18-rtk-recall"]["controls"], rows["S18-rtk-recall"]["control_in"]),
+                         (["rtk"], "decoded_blobs"))
         for template in ("$HOME/.ssh", "$HOME/.gnupg", "${XDG_CONFIG_HOME:-$HOME/.config}/gh",
                          "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack",
                          "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.credentials.json", "${CODEX_HOME:-$HOME/.codex}/auth.json"):
@@ -770,35 +896,26 @@ class ScannerTests(CanaryCase):
         broken["sinks"][0]["controls"] = ["nonexistent"]
         broken["sinks"][1]["kind"] = "telepathy"
         self.assertEqual(len(harness.table_errors(broken)), 2)
-
-    def test_split_roots_never_hand_an_excluded_path_to_a_scanner(self):
-        tree = self.base / "tree"
-        for part in ("a/keep.txt", "b/secret/x.env", "b/ok/y.txt", "c.txt"):
-            (tree / part).parent.mkdir(parents=True, exist_ok=True)
-            (tree / part).write_text("x")
-        (tree / "link").symlink_to(tree / "b" / "secret")
-        parts = harness.split_roots(tree, [Path(os.path.realpath(tree / "b" / "secret"))])
-        self.assertEqual(sorted(str(p.relative_to(os.path.realpath(tree))) for p in parts), ["a", "b/ok", "c.txt"])
-        self.assertEqual(harness.split_roots(tree / "b" / "secret" / "x.env", [Path(os.path.realpath(tree / "b"))]), [])
+        agent_manager = copy.deepcopy(table)
+        next(r for r in agent_manager["sinks"] if r["kind"] == "manager_environment")["access"] = "agent"
+        self.assertEqual(len(harness.table_errors(agent_manager)), 1)  # names or not, it reads real values
 
 
 class LokiTests(CanaryCase):
-    def test_loki_dump_matches_locally_and_the_push_carries_only_the_decoy(self):
-        run = self.prepare()
-        sets = harness.load_sets(self.run_dir(run))
-        decoy = self.decoy(run, "loki")
-        canary = self.canary(run, "codex-exec")
-        seen = {"queries": [], "pushes": []}
+    def serve(self, entries, seen):
+        """A Loki stub: query_range honours start (inclusive), end and limit, forward; push is recorded."""
 
         class Handler(http.server.BaseHTTPRequestHandler):
             def log_message(self, *args):
                 pass
 
             def do_GET(self):
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
                 seen["queries"].append(self.path)
-                body = {"status": "success", "data": {"result": [{"stream": {"service_name": "x"},
-                        "values": [["1", f"line {decoy}"], ["2", f"leaked {canary}"], ["3", "ordinary"]]}]}}
-                data = json.dumps(body).encode()
+                start, end, limit = int(query["start"][0]), int(query["end"][0]), int(query["limit"][0])
+                page = [[str(ts), line] for ts, line in entries if start <= ts <= end][:limit]
+                data = json.dumps({"status": "success", "data": {"result": [{"stream": {"service_name": "x"},
+                                                                              "values": page}]}}).encode()
                 self.send_response(200)
                 self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
@@ -812,12 +929,22 @@ class LokiTests(CanaryCase):
         server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         threading.Thread(target=server.serve_forever, daemon=True).start()
         self.addCleanup(server.shutdown)
-        url = f"http://127.0.0.1:{server.server_address[1]}"
+        return f"http://127.0.0.1:{server.server_address[1]}"
+
+    def test_loki_dump_matches_locally_and_the_push_carries_only_the_decoy(self):
+        run = self.prepare()
+        sets = harness.load_sets(self.run_dir(run))
+        decoy = self.decoy(run, "loki")
+        canary = self.canary(run, "codex-exec")
+        seen = {"queries": [], "pushes": []}
+        now = int(time.time() * 1e9)
+        url = self.serve([(now - 3, f"line {decoy}"), (now - 2, f"leaked {canary}"), (now - 1, "ordinary")], seen)
         sink = self.sink("T-loki", "loki", controls=["loki"], url=url)
         self.assertTrue(harness.loki_push(self.context(), sink, decoy))
         result = harness.scan_sink(self.context(), self.run_dir(run), sink, sets, agent_pass=True, seen_git=set(),
                                    since_epoch=time.time() - 60)
-        self.assertEqual((result["counts"]["d-loki"], result["counts"]["c-codex-exec"]), (1, 1))
+        self.assertEqual((result["counts"]["d-loki"], result["counts"]["c-codex-exec"], result["status"]),
+                         (1, 1, "scanned"))
         for query in seen["queries"]:
             self.assert_value_free(secret_forms(canary) + secret_forms(decoy), urllib.parse.unquote(query))
         self.assertEqual(len(seen["pushes"]), 1)
@@ -826,105 +953,382 @@ class LokiTests(CanaryCase):
         with self.assertRaises(harness.Refused):  # decoys go to a loopback Loki only
             harness.loki_push(self.context(), {**sink, "url": "http://example.com"}, decoy)
 
+    def test_loki_pages_keep_boundary_entries_and_an_unfinished_dump_is_incomplete(self):
+        # Review finding 8: paging from the last timestamp plus one skipped entries that shared it, and a spent page
+        # budget still read as scanned. Boundary entries are kept and deduplicated; what cannot be paged is INCOMPLETE.
+        run = self.prepare()
+        sets = harness.load_sets(self.run_dir(run))
+        canary = self.canary(run, "codex-exec")
+        base = int((time.time() - 30) * 1e9)
+        sink = lambda url: self.sink("T-loki", "loki", controls=[], url=url)  # noqa: E731
+        with mock.patch.object(harness, "LOKI_LIMIT", 2):
+            url = self.serve([(base, "a"), (base + 1, "b"), (base + 1, f"leaked {canary}"), (base + 2, "d")],
+                             {"queries": [], "pushes": []})
+            result = harness.scan_sink(self.context(), self.run_dir(run), sink(url), sets, agent_pass=True,
+                                       seen_git=set(), since_epoch=time.time() - 60)
+            self.assertEqual(result["counts"]["c-codex-exec"], 1)  # the entry that shares the page's last timestamp
+            url = self.serve([(base, "a"), (base, "b"), (base, f"leaked {canary}")], {"queries": [], "pushes": []})
+            result = harness.scan_sink(self.context(), self.run_dir(run), sink(url), sets, agent_pass=True,
+                                       seen_git=set(), since_epoch=time.time() - 60)
+            self.assertEqual(result["status"], "incomplete")  # a full page on one timestamp cannot be paged past
+            judged = harness.judge(sink(url), result, set(), {})
+            self.assertTrue(judged["fails"])
+        with mock.patch.object(harness, "LOKI_LIMIT", 1), mock.patch.object(harness, "LOKI_PAGES", 1):
+            url = self.serve([(base, "a"), (base + 1, "b")], {"queries": [], "pushes": []})
+            result = harness.scan_sink(self.context(), self.run_dir(run), sink(url), sets, agent_pass=True,
+                                       seen_git=set(), since_epoch=time.time() - 60)
+            self.assertEqual(result["status"], "incomplete")  # the page budget ran out
+
 
 @unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
-class EndToEndStubTests(CanaryCase):
+class IncompleteScanTests(CanaryCase):
+    """Review findings 4 and 11: an unreadable path, a failed scanner or an expired deadline is INCOMPLETE and fails."""
+
+    def ready(self):
+        run = self.prepare()
+        self.assertEqual(self.harness("controls", "--run", run)[0], 0)
+        return run
+
+    @unittest.skipIf(os.geteuid() == 0, "root reads a 000 file")
+    def test_an_unreadable_file_makes_the_sink_incomplete(self):
+        run = self.ready()
+        directory = self.home / "mixed"
+        directory.mkdir()
+        (directory / "readable.txt").write_text(self.decoy(run, "claude") + "\n")
+        hidden = directory / "hidden.txt"
+        hidden.write_text(self.canary(run, "codex-exec") + "\n")
+        hidden.chmod(0)
+        self.addCleanup(hidden.chmod, 0o600)
+        self.write_sinks([self.sink("I01-mixed", "files", ["$HOME/mixed"], ["claude"])])
+        self.ran(run, "fresh-claude-session")
+        code, out, err = self.harness("scan", "--sink", "I01-mixed", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("I01-mixed [test/I01-mixed]: INCOMPLETE", out)
+
+    def test_a_failed_scanner_fails_the_baseline_and_consume_refuses_without_a_clean_one(self):
+        run = self.ready()
+        (self.home / "journal-fails").write_text("")
+        code, out, err = self.harness("baseline", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("T04-journal [test/T04-journal]: INCOMPLETE", out)
+        self.assertFalse(json.loads((self.run_dir(run) / "results" / "baseline.json").read_text())["ok"])
+        self.codex_config()
+        code, out, err = self.harness("consume", "codex-exec", "--run", run)
+        self.assertEqual(code, 1)
+        self.assertIn("baseline", out + err)
+        self.assertFalse(self.store_file().exists())
+
+    def test_a_fifo_is_never_handed_to_a_scanner_and_a_deadline_makes_a_sink_incomplete(self):
+        run = self.ready()
+        root = self.home / "fifo-root"
+        (root / "excluded").mkdir(parents=True)
+        (root / "note.txt").write_text("nothing\n")
+        os.mkfifo(root / "pipe")
+        self.write_sinks([self.sink("F01-fifo", "files", ["$HOME/fifo-root"]),
+                          self.sink("F02-late", "files", ["$HOME/fifo-root"], deadline_seconds=0)],
+                         exclude=["$HOME/fifo-root/excluded"])
+        process = self.launch("scan", "--sink", "F01-fifo", "--run", run)
+        try:
+            out, err = process.communicate(timeout=30)
+        except subprocess.TimeoutExpired:
+            self.fail("the scan blocked on a FIFO")
+        self.assertEqual(process.returncode, 0, out + err)
+        self.assertIn(b"special files skipped 1", out)
+        code, out, err = self.harness("scan", "--sink", "F02-late", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("F02-late [test/F02-late]: INCOMPLETE", out)
+        self.assertIn("deadline", out)
+
+
+@unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
+class CompressionAndNameTests(CanaryCase):
+    """Review findings 5, 6 and 7: every compressed member is decoded or the cell is unreadable; names are matched
+    locally, never copied into a scanner's argv, and a newline in a name hides nothing."""
+
+    def ready(self):
+        run = self.prepare()
+        harness.write_json(self.run_dir(run) / "results" / "controls.json",
+                           {k: {"ok": True} for k in ("text", "gz", "sqlite", "git", "journal")})
+        return run
+
+    def database(self, name, *values):
+        directory = self.home / "blobs"
+        directory.mkdir(exist_ok=True)
+        with sqlite3.connect(directory / name) as connection:
+            connection.execute("CREATE TABLE t (v BLOB)")
+            for value in values:
+                connection.execute("INSERT INTO t VALUES (?)", (value,))
+        connection.close()
+
+    def test_every_gzip_member_is_decoded_and_a_limit_makes_the_cell_unreadable(self):
+        run = self.ready()
+        canary = self.canary(run, "codex-exec").encode()
+        self.database("members.db", gzip.compress(b"harmless") + gzip.compress(b"x " + canary + b" y"))
+        self.write_sinks([self.sink("Z01-blobs", "sqlite", ["$HOME/blobs"])])
+        code, out, err = self.harness("scan", "--sink", "Z01-blobs", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("LEAK; canary 1 (codex-exec=1)", out)  # found in the second member
+        (self.home / "blobs" / "members.db").unlink()
+        self.database("big.db", gzip.compress(b"0" * 5000 + canary))
+        with mock.patch.object(harness, "MAX_DECOMPRESSED", 1024):
+            code, out, err = self.harness("scan", "--sink", "Z01-blobs", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("INCOMPLETE", out)  # never a quiet drop of the suffix
+        (self.home / "blobs" / "big.db").unlink()
+        self.database("cut.db", gzip.compress(b"1" * 4000 + canary)[:-12])
+        code, out, err = self.harness("scan", "--sink", "Z01-blobs", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("INCOMPLETE", out)  # a truncated stream is unreadable, not empty
+
+    def test_a_name_is_matched_locally_and_never_reaches_a_scanner_argv(self):
+        run = self.ready()
+        real_rg = shutil.which("rg")
+        (self.bin / "rg").write_text(f"#!{sys.executable}\nimport json, os, sys\n"
+                                     f"open({str(self.base / 'rg-argv.jsonl')!r}, 'a').write(json.dumps(sys.argv) + '\\n')\n"
+                                     f"os.execv({real_rg!r}, [{real_rg!r}] + sys.argv[1:])\n")
+        (self.bin / "rg").chmod(0o755)
+        canary = self.canary(run, "codex-exec")
+        directory = self.home / "names"
+        directory.mkdir()
+        (directory / canary.encode().hex()).write_text(self.decoy(run, "codex") + "\n")  # a name holds the canary
+        (directory / f"new\nline-{os.urandom(4).hex()}.txt").write_text(f"x {self.canary(run, 'subagent')} y\n")
+        self.write_sinks([self.sink("N01-names", "files", ["$HOME/names"])])
+        code, out, err = self.harness("scan", "--sink", "N01-names", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("LEAK; canary 2 (subagent=1, codex-exec=1)", out)
+        argv = (self.base / "rg-argv.jsonl").read_text()
+        self.assertTrue(argv)
+        self.assert_value_free(secret_forms(canary) + secret_forms(self.canary(run, "subagent")), argv)
+        self.assertNotIn("names/", argv.replace(str(self.home / "names"), ""))  # only the configured root, never a name
+
+
+class RtkControlTests(CanaryCase):
+    """Review finding 9: RTK keeps the output of a failed command of 500 bytes or more; the recall control must be
+    found in the decoded recall blobs, never in the command column."""
+
+    def recall(self, command: str, output: bytes):
+        path = self.home / "rtk" / "recall.db"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(path) as connection:
+            connection.execute("CREATE TABLE recall (hash TEXT, command TEXT, codec TEXT, blob BLOB)")
+            connection.execute("INSERT INTO recall VALUES ('h', ?, 'gzip', ?)", (command, gzip.compress(output)))
+        connection.close()
+
+    def test_the_decoy_command_fails_with_enough_output_for_rtk(self):
+        run = self.prepare()
+        value = self.decoy(run, "rtk")
+        code, out, err = self.harness("decoy", "--run", run, "--consumer", "fresh-claude-session", "--rtk", value)
+        self.assertEqual(code, 1)
+        self.assertGreaterEqual(len(out.encode()), 600)  # rtk-ai/rtk@v0.50.0 MIN_FAILURE_BYTES = 500
+        self.assertGreaterEqual(out.count(value), 8)
+        self.assertEqual(self.harness("decoy", "--run", run, "--consumer", "fresh-claude-session", "--rtk",
+                                      harness.new_decoy())[0], 2)  # a mistyped value is refused, never printed
+        command = harness.rtk_decoy_command(run, value)
+        self.assertTrue(command.startswith("rtk err python3 tools/credentials/canary_e2e.py decoy "))
+        self.assertIsNone(guard.check(command))
+        self.assertIn(command, harness.claude_prompt(run, self.decoy(run, "claude"), value))
+
+    @unittest.skipUnless(HAS_RG, "the file scanner needs rg")
+    def test_the_recall_control_counts_only_decoded_blobs(self):
+        run = self.prepare()
+        harness.write_json(self.run_dir(run) / "results" / "controls.json",
+                           {k: {"ok": True} for k in ("text", "gz", "sqlite", "git", "journal")})
+        self.ran(run, "fresh-claude-session")
+        value = self.decoy(run, "rtk")
+        self.write_sinks([self.sink("R01-recall", "sqlite", ["$HOME/rtk/recall.db*"], ["rtk"],
+                                    control_in="decoded_blobs")])
+        self.recall(f"python3 decoy --rtk {value}", b"x" * 600)  # the command column alone: no recall control
+        code, out, err = self.harness("scan", "--sink", "R01-recall", "--run", run)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn("R01-recall [test/R01-recall]: not a sink, or scanned wrongly", out)
+        shutil.rmtree(self.home / "rtk")
+        self.recall("python3 decoy --rtk <elided>", (f"line {value}\n" * 12).encode())
+        code, out, err = self.harness("scan", "--sink", "R01-recall", "--run", run)
+        self.assertEqual(code, 0, out + err)
+        self.assertIn("R01-recall [test/R01-recall]: clean (control passed)", out)
+
+
+class SafetyTests(CanaryCase):
+    """Review findings 10, 12 and 13: the crash-collector refusal, interruption, and which run owns the store file."""
+
+    def test_a_host_that_pipes_crash_dumps_is_refused_before_any_canary_exists(self):
+        pattern = self.base / "pipe_pattern"
+        pattern.write_text("|/usr/lib/systemd/systemd-coredump %P\n")
+        with mock.patch.object(run_mod, "CORE_PATTERN_FILE", str(pattern)):
+            code, out, err = self.harness("prepare")
+        self.assertEqual(code, 1)
+        self.assertIn("core_pattern_pipe", err)
+        self.assertFalse((self.runtime / "native-agent-stack").exists())
+
+    def test_cleanup_and_prepare_respect_the_run_that_armed_the_store(self):
+        first, second = self.prepare(), self.prepare()
+        harness.arm(self.context(), self.run_dir(first), "codex-exec")
+        code, out, err = self.harness("cleanup", "--run", second)
+        self.assertEqual(code, 1, out + err)
+        self.assertIn(f"armed by run {first}", err)
+        self.assertTrue(self.store_file().exists())
+        self.assertTrue(self.run_dir(second).exists())
+        self.assertEqual(self.harness("prepare")[0], 1)
+        self.codex_config()
+        code, out, err = self.harness("consume", "codex-exec", "--run", second)
+        self.assertEqual(code, 1)
+        self.assertIn(f"armed by run {first}", err)
+        self.assertEqual(self.harness("cleanup", "--run", first)[0], 0)
+        self.assertFalse(self.store_file().exists())
+
+    @unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
+    def test_a_terminated_consume_ends_its_client_disarms_and_marks_the_run(self):
+        run = self.prepare()
+        for step in (("controls", "--run", run), ("baseline", "--run", run)):
+            self.assertEqual(self.harness(*step)[0], 0)
+        (self.home / "slow-claude").write_text("")
+        process = self.launch("consume", "fresh-claude-session", "--run", run)
+        pid_file, deadline = self.home / "claude.pid", time.time() + 30
+        while not pid_file.exists() and time.time() < deadline:
+            time.sleep(0.05)
+        self.assertTrue(self.store_file().exists())
+        process.send_signal(signal.SIGTERM)
+        process.communicate(timeout=30)
+        self.assertEqual(process.returncode, 128 + signal.SIGTERM)
+        pid = int(pid_file.read_text().split()[0])
+        deadline = time.time() + 10
+        while time.time() < deadline:
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(0.05)
+        else:
+            self.fail("the client was left running")
+        self.assertFalse(self.store_file().exists())
+        self.assertTrue((self.run_dir(run) / "results" / "interrupted.json").exists())
+        code, out, err = self.harness("report", "--run", run)
+        self.assertEqual(code, 1)
+        self.assertIn("interrupted", err)
+
+    @unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
+    def test_an_interrupted_workflow_wait_disarms(self):
+        run = self.prepare()
+        for step in (("controls", "--run", run), ("baseline", "--run", run)):
+            self.assertEqual(self.harness(*step)[0], 0)
+        process = self.launch("consume", "workflow-child", "--run", run, "--timeout", "60")
+        deadline = time.time() + 30
+        while not self.store_file().exists() and time.time() < deadline:
+            time.sleep(0.05)
+        self.assertTrue(self.store_file().exists())
+        process.send_signal(signal.SIGINT)
+        process.communicate(timeout=30)
+        self.assertEqual(process.returncode, 130)
+        self.assertFalse(self.store_file().exists())
+        self.assertTrue((self.run_dir(run) / "results" / "interrupted.json").exists())
+
+
+@unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
+class FullRun(CanaryCase):
     """The whole proof with stub consumers that run the real runner and the real probe against a temporary store."""
 
     ALLOWED = {
         "schema_version", "kind", "run", "recorded_at", "keep_across_restart", "checkout_revision", "versions",
         "versions.*", "consumers", "consumers.*", "consumers.*.ran", "consumers.*.started_at", "consumers.*.ended_at",
-        "consumers.*.exit_code", "consumers.*.tag", "consumers.*.tag_channel", "consumers.*.model_id",
-        "consumers.*.model_id_source", "consumers.*.stream_canary_hits", "consumers.*.cmdline_hits",
-        "consumers.*.transient_unit_hits", "consumers.*.decoy_echoed", "after_restart", "leak_check",
-        "leak_check.pattern_hits", "leak_check.printed_form_hits", "leak_check.markers", "leak_check.partial_markers",
-        "leak_check.forms_printed", "leak_check.masked", "controls", "controls.*", "controls.*.found",
-        "controls.*.after_removal", "controls.*.ok", "controls.*.in_main_file", "controls.*.in_wal", "baseline",
-        "baseline.canary_hits", "baseline.sinks", "baseline.ok", "settle", "settle.arrival_seconds",
-        "settle.arrival_seconds.*", "settle.pass1_delay_seconds", "settle.pass2_delay_seconds",
-        "settle.max_wait_seconds", "passes", "passes.*", "passes.*.ran_at", "passes.*.ok", "passes.*.sinks",
-        "passes.*.sinks.*", "passes.*.sinks.*.canary", "passes.*.sinks.*.canary_by_consumer",
+        "consumers.*.exit_code", "consumers.*.sequence", "consumers.*.tag", "consumers.*.tag_channel",
+        "consumers.*.model_id", "consumers.*.model_id_source", "consumers.*.stream_canary_hits",
+        "consumers.*.cmdline_hits", "consumers.*.transient_unit_hits", "consumers.*.decoy_echoed", "after_restart",
+        "after_restart.ran", "after_restart.exit_code", "after_restart.boot_changed", "after_restart.masked",
+        "after_restart.pattern_hits", "after_restart.tag", "leak_check", "leak_check.pattern_hits",
+        "leak_check.printed_form_hits", "leak_check.markers", "leak_check.partial_markers", "leak_check.forms_printed",
+        "leak_check.masked", "captures", "captures.*", "captures.*.canary", "captures.*.control", "controls",
+        "controls.*", "controls.*.found", "controls.*.after_removal", "controls.*.ok", "controls.*.in_main_file",
+        "controls.*.in_wal", "baseline", "baseline.canary_hits", "baseline.sinks", "baseline.incomplete", "baseline.ok",
+        "settle", "settle.arrival_seconds", "settle.arrival_seconds.*", "settle.pass1_delay_seconds",
+        "settle.pass2_delay_seconds", "settle.max_wait_seconds", "passes", "passes.*", "passes.*.ran_at", "passes.*.ok",
+        "passes.*.sinks", "passes.*.sinks.*", "passes.*.sinks.*.canary", "passes.*.sinks.*.canary_by_consumer",
         "passes.*.sinks.*.canary_by_consumer.*", "passes.*.sinks.*.controls", "passes.*.sinks.*.controls.*",
         "passes.*.sinks.*.verdict", "passes.*.sinks.*.proven_for", "passes.*.sinks.*.unreadable", "user_run",
         "user_run.ran", "user_run.ran_at", "user_run.ok", "user_run.sinks", "user_run.sinks.*",
         "user_run.sinks.*.canary", "user_run.sinks.*.canary_by_consumer", "user_run.sinks.*.canary_by_consumer.*",
         "user_run.sinks.*.controls", "user_run.sinks.*.controls.*", "user_run.sinks.*.verdict",
-        "user_run.sinks.*.proven_for", "user_run.sinks.*.unreadable", "after_restart.ran", "after_restart.exit_code",
-        "after_restart.boot_changed", "after_restart.masked", "after_restart.pattern_hits",
-        "result", "reasons", "claim", "not_covered", "manager_environment",
-        "manager_environment.canary_name_present", "manager_environment.inventory_names_present",
+        "user_run.sinks.*.proven_for", "user_run.sinks.*.unreadable", "checks_not_run", "result", "reasons", "claim",
+        "not_covered", "manager_environment", "manager_environment.canary_name_present",
+        "manager_environment.inventory_names_present",
     }
 
     def key_paths(self, value, prefix=""):
         if isinstance(value, dict):
             for key, item in value.items():
-                dynamic = (prefix in ("versions", "consumers", "controls", "passes", "settle.arrival_seconds")
+                dynamic = (prefix in ("versions", "consumers", "controls", "passes", "captures",
+                                      "settle.arrival_seconds")
                            or re.fullmatch(r"(passes\.\*|user_run)\.sinks"
                                            r"|(passes\.\*|user_run)\.sinks\.\*\.(canary_by_consumer|controls)", prefix))
                 path = f"{prefix}.*" if dynamic else (f"{prefix}.{key}" if prefix else key)
                 yield path
                 yield from self.key_paths(item, path)
 
-    def full_run(self):
+    def full_run(self, keep=False):
+        """Every step of the window through stubs; returns (run, {step: (code, out, err)})."""
         self.codex_config()
         (self.home / "dbs").mkdir()
         with sqlite3.connect(self.home / "dbs" / "notes.db") as connection:
             connection.execute("CREATE TABLE notes (body TEXT)")
             connection.execute("INSERT INTO notes VALUES ('nothing to see')")
+        connection.close()
         subprocess.run(["git", "init", "-q", str(self.home / "repo")], check=True)
-        run = self.prepare()
-        tags = {}
-        steps = [("controls", "--run", run), ("baseline", "--run", run),
-                 ("consume", "fresh-claude-session", "--run", run, "--timeout", "120")]
-        for step in steps:
-            code, out, err = self.harness(*step)
-            self.assertEqual(code, 0, f"{step}: {out}{err}")
+        run = self.prepare(*(["--keep-across-restart"] if keep else []))
+        steps = {}
+
+        def step(name, *argv):
+            steps[name] = self.harness(*argv)
+            return steps[name]
+
+        step("controls", "controls", "--run", run)
+        step("baseline", "baseline", "--run", run)
+        step("claude", "consume", "fresh-claude-session", "--run", run, "--timeout", "120")
 
         def workflow_child():  # the Workflow tool's probe stage, emulated once the store holds this consumer's canary
             deadline = time.time() + 30
             while time.time() < deadline and not self.store_file().exists():
                 time.sleep(0.02)
-            env = {**self.env}
             command = [sys.executable, "-I", str(TOOLS / "canary_probe.py"), "--run", run, "--consumer", "workflow-child"]
             runner = ([sys.executable, "-I", "-S", "-c", LAUNCHER] if HOST_PIPES_CORES
                       else [sys.executable, "-I", str(TOOLS / "credential_run.py")])
-            subprocess.run(runner + ["canary-e2e", "--", *command], env=env, capture_output=True, timeout=60)
+            subprocess.run(runner + ["canary-e2e", "--", *command], env=self.env, capture_output=True, timeout=60)
 
         helper = threading.Thread(target=workflow_child)
         helper.start()
-        code, out, err = self.harness("consume", "workflow-child", "--run", run, "--timeout", "60")
+        step("workflow", "consume", "workflow-child", "--run", run, "--timeout", "60")
         helper.join()
-        self.assertEqual(code, 0, out + err)
-        for step in (("consume", "codex-exec", "--run", run), ("consume", "omniroute-lane", "--run", run),
-                     ("consume", "systemd-user-unit", "--run", run)):
-            code, out, err = self.harness(*step)
-            self.assertEqual(code, 0, f"{step}: {out}{err}")
-        for tag_file in (self.run_dir(run) / "tags").glob("*.tag"):
-            tags[tag_file.stem] = tag_file.read_text().strip()
-        forbidden = self.forbidden(run)
-        code, out, err = self.harness("verify", "--run", run)
-        self.assertEqual(code, 0, out + err)
-        code, out, err = self.harness("settle", "--run", run, "--max-wait", "20", "--interval", "0.2")
-        self.assertEqual(code, 0, out + err)
-        early = self.harness("scan", "--pass", "1", "--run", run)
+        step("codex", "consume", "codex-exec", "--run", run)
+        step("omniroute", "consume", "omniroute-lane", "--run", run)
+        step("unit", "consume", "systemd-user-unit", "--run", run)
+        step("verify", "verify", "--run", run)
+        step("settle", "settle", "--run", run, "--max-wait", "20", "--interval", "0.2")
+        step("early", "scan", "--pass", "1", "--run", run)
         self.clock_offset = 10 ** 6  # after both passes are due
-        results = [early]
-        for step in (("scan", "--pass", "1", "--run", run), ("scan", "--pass", "2", "--run", run),
-                     ("report", "--run", run, "--model", "workflow-child=claude-sonnet-5-5")):
-            results.append(self.harness(*step))
-        return run, forbidden, tags, results
+        step("pass1", "scan", "--pass", "1", "--run", run)
+        step("pass2", "scan", "--pass", "2", "--run", run)
+        step("report", "report", "--run", run, "--model", "workflow-child=claude-sonnet-5-5")
+        return run, steps
 
+    def receipts(self):
+        directory = self.state / "native-agent-stack" / "canary"
+        return sorted(p for p in directory.iterdir() if p.suffix == ".json")
+
+    def last_receipt(self) -> dict:
+        return json.loads(self.receipts()[-1].read_text())
+
+
+class EndToEndStubTests(FullRun):
     def test_six_consumers_through_stubs_to_a_value_free_receipt(self):
-        run, forbidden, tags, results = self.full_run()
-        early, pass1, pass2, report = results
+        run, steps = self.full_run()
+        for name in ("controls", "baseline", "claude", "workflow", "codex", "omniroute", "unit", "verify", "settle",
+                     "pass1", "pass2", "report"):
+            self.assertEqual(steps[name][0], 0, f"{name}: {steps[name][1]}{steps[name][2]}")
+        early = steps["early"]
         self.assertEqual(early[0], 2, early[1] + early[2])  # a pass does not run before its measured due time
         self.assertIn("is due at", early[1] + early[2])
-        self.assertEqual(pass1[0], 0, pass1[1] + pass1[2])
-        self.assertEqual(pass2[0], 0, pass2[1] + pass2[2])
-        self.assertEqual(report[0], 0, report[1] + report[2])
+        tags = {p.stem: p.read_text().strip() for p in (self.run_dir(run) / "tags").glob("*.tag")}
         self.assertEqual(set(tags), set(probe.CONSUMERS))
-        directory = self.state / "native-agent-stack" / "canary"
-        [receipt_path] = [p for p in directory.iterdir() if p.suffix == ".json"]
+        forbidden = self.forbidden(run)
+        [receipt_path] = self.receipts()
         self.assertEqual(stat.S_IMODE(receipt_path.stat().st_mode), 0o600)
         receipt = json.loads(receipt_path.read_text())
         self.assertEqual(receipt["result"], "zero", receipt.get("reasons"))
@@ -942,32 +1346,89 @@ class EndToEndStubTests(CanaryCase):
         self.assertEqual(pass1["T01-transcripts"]["controls"], {"claude": "found", "subagent": "found"})
         self.assertEqual(pass1["T02-rollouts"]["controls"], {"codex": "found", "omni": "found"})
         self.assertEqual(pass1["T04-journal"]["verdict"], "clean (control passed)")
+        self.assertEqual(pass1["T15-rtk-recall"]["controls"], {"rtk": "found"})
         self.assertIsNotNone(receipt["settle"]["arrival_seconds"]["T03-archive"])
         self.assertNotIn("T07-call-logs", pass1)  # user-run only
         self.assertNotIn("T14-sudo-only", pass1)  # only with --with-sudo
+        # every capture of every consumer was scanned, each with its positive control, and none holds a canary
+        self.assertTrue(receipt["captures"])
+        for name, row in receipt["captures"].items():
+            self.assertEqual((row["canary"], row["control"]), (0, "found"), name)
+        self.assertIn("codex-exec.stderr", receipt["captures"])
+        # the user-run scan did not run: the receipt and the claim say so, by sink id
         self.assertFalse(receipt["user_run"]["ran"])
+        self.assertEqual(receipt["checks_not_run"], ["T07-call-logs", "T08-manager"])
         self.assertIn("cooperative", receipt["claim"])
+        self.assertIn("T07-call-logs", receipt["claim"])
         self.assertIn("W03-wsl-swap-and-pagefile", receipt["not_covered"])
-        # the receipt holds only allowlisted keys, and no canary, tag or pattern in any form
         for path in self.key_paths(receipt):
             self.assertIn(path, self.ALLOWED)
-        self.assert_value_free(forbidden + [t.encode() for t in tags.values()] + [t[:16].encode() for t in tags.values()],
-                               receipt_path.read_bytes())
-        # nor any printed line or stderr of any subcommand
-        self.assert_value_free(forbidden + [t.encode() for t in tags.values()] + [t[:16].encode() for t in tags.values()],
-                               self.all_output())
-        # the launch environments held no inventory name; the OmniRoute lane got only the loopback placeholder
-        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
-        names = {n for e in inventory["entries"] for n in e["variables"] + e["optional_variables"]}
-        for consumer in ("fresh-claude-session", "codex-exec", "omniroute-lane"):
-            seen = set(json.loads((self.home / "stub-env" / f"{consumer}.json").read_text().splitlines()[-1]))
-            expected = {"OMNIROUTE_API_KEY"} if consumer == "omniroute-lane" else set()
-            self.assertEqual(seen & names, expected, consumer)
+        extra = [t.encode() for t in tags.values()] + [t[:16].encode() for t in tags.values()]
+        self.assert_value_free(forbidden + extra, receipt_path.read_bytes())
+        self.assert_value_free(forbidden + extra, self.all_output())
+        # Review finding 14: no environment the harness built kept a sentinel, by name or by value; the OmniRoute lane
+        # got only the loopback placeholder, and the probe got CANARY_E2E_KEY from the runner and nothing else of them.
+        hashes = {hashlib.sha256(v.encode()).hexdigest() for v in self.sentinels.values()}
+        labels = ("fresh-claude-session", "codex-exec", "omniroute-lane", "systemd-run", "journalctl", "gh",
+                  "probe-environment")
+        for label in labels:
+            seen = json.loads((self.home / "stub-env" / f"{label}.json").read_text())
+            allowed = {"OMNIROUTE_API_KEY"} if label == "omniroute-lane" else set()
+            allowed |= {"CANARY_E2E_KEY"} if label == "probe-environment" else set()
+            self.assertEqual(set(seen) & set(self.sentinels), allowed, label)
+            self.assertEqual(set(seen.values()) & hashes, set(), label)
             self.assertNotIn("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB", seen)
         self.assertFalse(self.store_file().exists())
         code, out, err = self.harness("cleanup", "--run", run)
         self.assertEqual(code, 0, out + err)
-        self.assertEqual(sorted(p.name for p in directory.iterdir() if p.suffix == ".json"), [receipt_path.name])
+        self.assertEqual(self.receipts(), [receipt_path])
+
+
+class EvidenceIntegrityTests(FullRun):
+    """Review findings 1, 2 and 3: captures are scanned, every executed check enters the verdict, and re-runs
+    invalidate the evidence that predates them."""
+
+    def test_a_canary_in_a_client_stderr_capture_fails_consume_and_the_report(self):
+        (self.home / "careless-codex").write_text("")
+        run, steps = self.full_run()
+        self.assertEqual(steps["codex"][0], 1, steps["codex"][1] + steps["codex"][2])
+        receipt = self.last_receipt()
+        self.assertEqual(receipt["result"], "leak", receipt["reasons"])
+        self.assertEqual(receipt["captures"]["codex-exec.stderr"]["canary"], 1)
+        self.assert_value_free(self.forbidden(run), self.all_output())
+
+    def test_a_user_run_scan_that_finds_a_canary_makes_the_report_a_leak(self):
+        run, steps = self.full_run()
+        self.assertEqual(self.last_receipt()["result"], "zero")
+        with open(self.home / "omni-data" / "call_logs.txt", "a") as handle:
+            handle.write(f"echoed back {self.canary(run, 'omniroute-lane')}\n")
+        code, out, err = self.harness("scan", "--sink", "omniroute", "--run", run, tty=True)
+        self.assertEqual(code, 1, out + err)
+        self.assertEqual(self.harness("report", "--run", run)[0], 1)
+        receipt = self.last_receipt()
+        self.assertEqual(receipt["result"], "leak", receipt["reasons"])
+        self.assertTrue(receipt["user_run"]["ran"])
+        self.assertEqual(receipt["checks_not_run"], [])
+
+    def test_a_kept_run_without_its_after_restart_check_is_not_zero(self):
+        run, steps = self.full_run(keep=True)
+        self.assertEqual(steps["report"][0], 1)
+        receipt = self.last_receipt()
+        self.assertEqual(receipt["result"], "incomplete")
+        self.assertIn("after_restart_missing", receipt["reasons"])
+        self.assertEqual(self.harness("cleanup", "--run", run)[0], 0)
+
+    def test_a_re_consumed_consumer_invalidates_the_verification_and_scans_before_it(self):
+        run, steps = self.full_run()
+        self.assertEqual(self.last_receipt()["result"], "zero")
+        code, out, err = self.harness("consume", "codex-exec", "--run", run)
+        self.assertEqual(code, 0, out + err)
+        self.assertEqual(self.harness("verify", "--run", run)[0], 0)  # a fresh verify alone is not enough
+        self.assertEqual(self.harness("report", "--run", run)[0], 1)
+        receipt = self.last_receipt()
+        self.assertEqual(receipt["result"], "incomplete")
+        self.assertIn("pass1_missing", receipt["reasons"])
+        self.assertTrue((self.run_dir(run) / "results" / "stale").is_dir())
 
 
 @unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
@@ -1021,10 +1482,11 @@ class DocumentedCommandTests(unittest.TestCase):
     def test_documented_commands_pass_the_guard(self):
         commands = self.documented()
         self.assertGreaterEqual(len(commands), 10)
+        decoy = harness.new_decoy()
         harness_commands = [harness.probe_command(SAMPLE_RUN, c) for c in probe.CONSUMERS]
         harness_commands += [harness.probe_command(SAMPLE_RUN, "systemd-user-unit", leak=True),
                              harness.decoy_command(SAMPLE_RUN, "subagent"), harness.user_run_command(SAMPLE_RUN),
-                             f"echo {harness.new_decoy()} && false"]
+                             harness.rtk_decoy_command(SAMPLE_RUN, decoy), f"echo {decoy} && false"]
         workflow = self.workflow_commands()
         self.assertEqual(len(workflow), 3)
         for command in commands + harness_commands + workflow:
@@ -1040,7 +1502,8 @@ class DocumentedCommandTests(unittest.TestCase):
         for consumer in probe.CONSUMERS:
             if consumer != "subagent":
                 self.assertIn(f"consume {consumer} --run <id>", section)
-        for phrase in ("cooperative", "not covered", "--leak-check", "scan --sink omniroute", "shell_snapshot"):
+        for phrase in ("cooperative", "not covered", "--leak-check", "scan --sink omniroute", "shell_snapshot",
+                       "INCOMPLETE", "user manager", "container configurations", "rtk err"):
             self.assertIn(phrase, section)
 
     def test_workflow_script_dispatch_and_syntax(self):
