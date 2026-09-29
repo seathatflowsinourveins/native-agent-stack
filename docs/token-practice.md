@@ -306,21 +306,21 @@ E1 and E2 subagent receipts.
 ## Run shape and accounting (2026-09-29)
 
 The [spend attribution receipt](../evidence/receipts/claude-spend-attribution-20260929.json)
-counts this host's Claude Code transcripts for 2026-09-24 to 2026-09-29 (UTC dates, written by Claude Code
-2.1.280 to 2.1.284) and matches ccusage 20.0.26 on input, output, cache-read and cache-creation
+counts this host's Claude Code transcripts for 2026-09-24 to 2026-09-29 (UTC dates; the files that record a version
+were written by Claude Code 2.1.280 to 2.1.284) and matches ccusage 20.0.26 on input, output, cache-read and cache-creation
 (5m plus 1h split) totals within 0.001%. At API list prices (a proxy for the plan meter,
 which weights tokens differently), spend concentrates in how runs are shaped:
 
 - **Children.** Agent-tool and workflow children are 81.3% of dollars, workflow
-  stages alone 66.0%, and 4 of 579 session trees cover half. A child of more than
-  60 calls is 24.0% of children and 53.4% of dollars (median 25 calls,
-  p90 100, maximum 1,489). ccusage lists each workflow run as a session: the 296 runs
-  are 67.9% of its dollars, the median run $22 and the largest $448.
+  stages alone 66.1%, and 4 of 710 session trees cover half. A child of more than
+  60 calls is 23.8% of children and 53.2% of dollars (median 25 calls,
+  p90 100, maximum 1,489). ccusage lists each workflow run as a session: the 303 runs
+  are 68.1% of its dollars, the median run $22 and the largest $448.
 - **Default-typed children.** A child with no role definition (`workflow-subagent`,
-  `general-purpose`, `claude`, `Explore`) is 63.9% of children and 41.7% of dollars,
+  `general-purpose`, `claude`, `Explore`) is 63.4% of children and 41.1% of dollars,
   with a median first call of 39.5K tokens; among the named role types in the receipt the
-  median first call runs from 8.3K (`blind-adjudicator`) to 47.9K (`landscape-sweep-worker`).
-- **Effort and thinking.** Effort `max` covers 82.3% of calls, and thinking is 60.8%
+  median first call runs from 8.2K (`source-scout`) to 47.9K (`landscape-sweep-worker`).
+- **Effort and thinking.** Effort `max` covers 82.2% of calls, and thinking is 61.0%
   of output tokens. Earlier thinking blocks stay in context by default on Opus 4.5+
   and Sonnet 4.6+ (the `keep` default of `clear_thinking_20251015` in
   [context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing)),
@@ -331,32 +331,32 @@ which weights tokens differently), spend concentrates in how runs are shaped:
   ([model configuration](https://code.claude.com/docs/en/model-config)); the M7 arms
   in the [max-default decision](decisions/2026-09-29-max-default-effort.md) are that
   test and have no result yet.
-- **Advisor.** 1,839 iterations are 14.0% of dollars (750 on `claude-fable-5-1`,
-  all but 17 before 2026-09-28; 1,089 on `claude-opus-5-5`). Each call reads the
+- **Advisor.** 1,872 iterations are 14.0% of dollars (750 on `claude-fable-5-1`,
+  all but 17 before 2026-09-28; 1,122 on `claude-opus-5-5`). Each call reads the
   transcript uncached, and top-level `usage` leaves it out
   ([advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing)).
   ccusage counts it since v20.0.17; `child-usage.mjs` does not (see
   [claude-advisor-usage-scan-20260928](../evidence/receipts/claude-advisor-usage-scan-20260928.json)).
-- **Long contexts.** Calls above 400K tokens of context are 13.3% of calls, 23.1% of
-  dollars and 35.2% of cache-read tokens; above 200K they are 42.9% of calls and
-  59.8% of dollars. Claude Code's guidance is to `/clear` when switching to
+- **Long contexts.** Calls above 400K tokens of context are 13.4% of calls, 23.3% of
+  dollars and 35.5% of cache-read tokens; above 200K they are 42.8% of calls and
+  59.9% of dollars. Claude Code's guidance is to `/clear` when switching to
   unrelated work, since stale context "wastes tokens on every subsequent message"
   ([costs](https://code.claude.com/docs/en/costs)). At a task boundary, record the
   progress and git state in a file or commit, then start a fresh context; an
   incomplete handoff costs re-reads, so compare session spans and peak context
   before and after.
-- **Cache.** Children wrote 833.6M tokens to the 5-minute class (the unsplit remainder priced
-  as 5-minute) and none to the 1-hour class; main sessions wrote 138.5M to it. Misses after
-  5-minute to 1-hour gaps rewrote 166.5M of the children's tokens in 774 events, 20.0% of
+- **Cache.** Children wrote 844.6M tokens to the 5-minute class (their unsplit remainder priced
+  as 5-minute) and show none in the 1-hour split field; main sessions show 142.7M there. Misses after
+  5-minute to 1-hour gaps rewrote 168.2M of the children's tokens in 789 events, 19.9% of
   their writes (the gap includes the next call's response time, so the bin is approximate). At the
   generic price ratios (write 1.25x, 1-hour write 2x, read 0.1x the input price), a 1-hour class
-  would price every remaining write at 2x (+500.3M input-equivalents) and turn the rewrites into
-  reads (-191.5M), a net +308.8M; it pays only when rewrites exceed 0.39 of the 5-minute writes
+  would price every remaining write at 2x (+507.3M input-equivalents) and turn the rewrites into
+  reads (-193.4M), a net +313.9M; it pays only when rewrites exceed 0.39 of the 5-minute writes
   (`data.derived` in the receipt). The 5-minute default stays
   ([prompt caching](https://code.claude.com/docs/en/prompt-caching)).
-- **Tools.** MCP calls are 15.1% of 207,742 tool calls and 98.6% of them are Context
-  Mode. ToolSearch loads exceed later calls for serena (686 loads, 28 calls), QMD
-  (517, 58), ai-memory (237, 136), SocratiCode (132, 68), Headroom (119, 26) and
+- **Tools.** MCP calls are 15.1% of 210,900 tool calls and 98.6% of them are Context
+  Mode. ToolSearch loads exceed later calls for serena (694 loads, 28 calls), QMD
+  (519, 58), ai-memory (238, 137), SocratiCode (132, 68), Headroom (119, 26) and
   jCodeMunch (102, 81). These are attempt counts with separate denominators, not
   success rates.
 

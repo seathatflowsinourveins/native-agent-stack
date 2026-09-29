@@ -20,12 +20,12 @@ are; the levers that touch them are listed for their owners.
 At API list prices (a proxy; the plan meter weights tokens differently), spend concentrates in how runs are shaped. The receipt does not
 size the always-loaded files (decision 5):
 
-- Agent-tool and workflow children are 81.3% of dollars, workflow stages 66.0%; 4 of 579 session trees cover half.
-- A child of more than 60 calls is 24.0% of children and 53.4% of dollars. A child with no role definition is 63.9% of
-  children and 41.7% of dollars, at a median first call of 39.5K tokens.
-- Effort `max` covers 82.3% of calls and thinking is 60.8% of output tokens, which stays in later context by default on Opus 4.5+.
-- The advisor is 14.0% of dollars (1,839 iterations) and its transcript read is uncached; `child-usage.mjs` leaves it out.
-- Calls above 400K tokens of context are 23.1% of dollars. Children's rewrites after 5-minute to 1-hour gaps are 20.0% of their
+- Agent-tool and workflow children are 81.3% of dollars, workflow stages 66.1%; 4 of 710 session trees cover half.
+- A child of more than 60 calls is 23.8% of children and 53.2% of dollars. A child with no role definition is 63.4% of
+  children and 41.1% of dollars, at a median first call of 39.5K tokens.
+- Effort `max` covers 82.2% of calls and thinking is 61.0% of output tokens, which stays in later context by default on Opus 4.5+.
+- The advisor is 14.0% of dollars (1,872 iterations) and its transcript read is uncached; `child-usage.mjs` leaves it out.
+- Calls above 400K tokens of context are 23.3% of dollars. Children's rewrites after 5-minute to 1-hour gaps are 19.9% of their
   5-minute writes.
 - Context Mode is 98.6% of MCP calls; the other code-index servers are small but their ToolSearch loads exceed their calls.
 
@@ -34,22 +34,22 @@ size the always-loaded files (decision 5):
 1. **Effort stays `max` for every role (the user's answer: "Keep max").** The docs advise testing `max` before broad adoption, so the M7
    arms of the [max-default record](2026-09-29-max-default-effort.md) stay the overturn path.
 2. **The advisor stays on (the user's answer: "the limit should not be restrict our quality").** `advisorModel` has been opus since
-   2026-09-28; 750 of the 1,839 iterations ran on `claude-fable-5-1`, all but 17 before that date. As a documented fact, not part of the user's
-   reasoning: `CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` is a global switch with no cap or per-agent opt-out, so any cheaper advisor policy
-   needs its own quality-per-cost result.
+   2026-09-28; 750 of the 1,872 iterations ran on `claude-fable-5-1`, all but 17 before that date. Separately from the user's
+   reasoning: the advisor docs describe a global off switch (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` or `/advisor off`), and no cap or per-agent
+   opt-out was found in them on 2026-09-29, so any cheaper advisor policy needs its own quality-per-cost result.
 3. **Savings are sought in architecture (the user's request: "max token save via architectectural optimization with harm only minimal
    quality").** In practice: dispatch by role, bounded fresh-context units, packets that carry excerpts instead of re-reads, tool-output
    discipline, session boundaries, campaign budgets and complete accounting. No model, effort or advisor change is made to save
    tokens without a paired quality result.
-4. **The subagent cache TTL stays at the 5-minute default (derived from the receipt).** Children wrote 833.6M tokens to the 5-minute class
-   and rewrote 166.5M of them after 5-minute to 1-hour gaps (20.0%). At the generic price ratios a 1-hour class costs a net +308.8M
-   input-equivalents (+500.3M for every remaining write at 2x instead of 1.25x, less 191.5M for turning the rewrites into 0.1x reads),
+4. **The subagent cache TTL stays at the 5-minute default (derived from the receipt).** Children wrote 844.6M tokens to the 5-minute class
+   and rewrote 168.2M of them after 5-minute to 1-hour gaps (19.9%). At the generic price ratios a 1-hour class costs a net +313.9M
+   input-equivalents (+507.3M for every remaining write at 2x instead of 1.25x, less 193.4M for turning the rewrites into 0.1x reads),
    and pays only above a rewrite share of 0.39. Overturn: misses attributed to agent types show a type whose rewrite share exceeds
    0.39.
 5. **The always-loaded files are not treated as a lever here.** The receipt does not size them. They are inside their documented size
    limits ([memory](https://code.claude.com/docs/en/memory): 200 lines / 25KB for `MEMORY.md`, under 200 lines per `CLAUDE.md`), the
-   skill listing follows `adoption/skills/manifest.json`, and the one change made is #499, which moves the trading-lane block out of the root
-   `AGENTS.md`.
+   skill listing follows `adoption/skills/manifest.json`, and the one change made is #499 (merged as `bbc34ace`), which moved the trading-lane block
+   out of the root `AGENTS.md`.
 
 ## Practice status
 
@@ -75,7 +75,7 @@ Code docs (CC), API docs (API) and the [multi-agent research post](https://www.a
 | Advisor-aware metering, run caps, spend alarm | API advisor tool; CC `--max-budget-usd` | partly (ccusage counts the advisor; `child-usage.mjs` does not; integrity alerts exist, no rate alert) | see levers |
 | Cache-stable headless prompts | CC `--exclude-dynamic-system-prompt-sections` | no | paired probe (M36) |
 
-Three refuted rows changed the plan: the trading block already had an experiment (M2/KC-09), so #499 runs it under the hot-file
+Three refuted rows changed the plan: the trading block already had an experiment (M2/KC-09), so #499 (merged as `bbc34ace`) ran it under the hot-file
 protocol; alerts on the Claude token and cost counters already exist in
 `observability/backends/templates/ecosystem-prometheus-rules.yml.example`, so only a rate or budget rule is missing; and the
 compaction window belongs to #416, not to a repository-safe change.
