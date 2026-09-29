@@ -1614,7 +1614,7 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   failing (`evidence/artifacts/prompt-audit-20260927/lane-a/round1/packet.md`
   L90-92).
 
-  Measured today (2026-09-29T03:18:04Z), read-only, in bash, with `origin/main` at
+  Measured 2026-09-29T03:18:04Z, read-only, in bash, with `origin/main` at
   `b0fb65b4`, which was then the tip of `main` on GitHub:
   ```sh
   diff <(gh api repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 \
@@ -1648,10 +1648,25 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
     no `pull_request` run while a pull request has a merge conflict
     ([events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
     Reporting the check is not passing it: the job reads only the pull request's
-    description (`.github/workflows/validate.yml` L517-521). Measured today
-    (2026-09-29T03:18:04Z, `gh pr view <N> --json mergeable,statusCheckRollup`):
+    description (`.github/workflows/validate.yml` L517-521). Measured
+    2026-09-29T03:18:04Z (`gh pr view <N> --json mergeable,statusCheckRollup`):
     both are `CONFLICTING`, with no `sota-sources` run.
   - #415 and #417 pass it.
+
+  **Merge-guard mechanics** (moved here from `docs/lanes.md`; each measured or read
+  on 2026-09-29): `gh pr merge --match-head-commit` becomes the `expectedHeadOid` of
+  the `mergePullRequest` mutation (cli/cli v2.101.0
+  [`http.go` L77-80](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/merge/http.go#L77-L80)
+  and `merge.go` L294). GitHub's GraphQL schema describes it as "OID that the pull
+  request head ref must match to allow merge; if omitted, no check is performed"
+  ([`MergePullRequestInput`](https://docs.github.com/en/graphql/reference/pulls#input-object-mergepullrequestinput)).
+  `gh pr view --json statusCheckRollup` keeps superseded runs of the same head:
+  merged #389, #411 and #413 each show an earlier `sota-sources` failure and a later
+  success, which is why `docs/lanes.md` reads the head with `gh pr checks --required`
+  instead. That command lists the required checks with the latest run of each
+  (`gh pr checks 389 --required` printed the eight required checks, all passing,
+  exit 0; #436 exit 1 with `validate-macos` failing; #409 exit 8 while checks were
+  pending; `gh pr checks --help` names exit 8 for pending checks).
 
   **Rollback:** PUT the committed file from before #294, `57fb6d89`. The only
   change `git diff 57fb6d89 7bbb021e -- .github/main-ruleset.json` makes is
