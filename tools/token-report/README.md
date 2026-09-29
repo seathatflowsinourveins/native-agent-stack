@@ -211,9 +211,12 @@ added to a counter. `kind` is one of `usage report` (tokens consumed), `status r
 
 ```json
 "report_sources": [
-  {"name": "ccusage daily", "tool": "ccusage", "kind": "usage report",
-   "argv": ["/abs/ccusage", "daily", "--offline", "--no-cost", "--json"],
-   "boundary": "Claude Code token consumption from local transcripts; consumption, not avoided tokens"},
+  {"name": "ccusage claude daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "claude", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Claude Code sessions only; consumption, not avoided tokens"},
+  {"name": "ccusage codex daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "codex", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Codex sessions only; consumption, not avoided tokens"},
   {"name": "ai-memory status", "tool": "ai-memory", "kind": "status report",
    "argv": ["/abs/ai-memory", "status", "--json"], "boundary": "Store and index state; no token counter"},
   {"name": "qmd catalog status", "tool": "qmd", "kind": "status report", "format": "text",
@@ -223,13 +226,18 @@ added to a counter. `kind` is one of `usage report` (tokens consumed), `status r
    "argv": ["/abs/agentsview", "usage", "daily", "--no-sync", "--offline", "--json"],
    "boundary": "Archived sessions only; --no-sync reads without syncing new history"},
   {"name": "OmniRoute prompt cache", "tool": "omniroute", "kind": "cache report",
-   "argv": ["curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
-   "boundary": "Gateway-lifetime cached input tokens as the provider reported them; not provider billing"},
+   "argv": ["/usr/bin/curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
+   "boundary": "Cached input tokens over the gateway's retained usage history (30 days by upstream default); the response also carries upstream savings estimates, retained as evidence and never counted"},
   {"name": "OmniRoute compression", "tool": "omniroute", "kind": "savings report",
-   "argv": ["curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
-   "boundary": "Upstream compression estimate with skip reasons; retained, never counted"}
+   "argv": ["/usr/bin/curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
+   "boundary": "Upstream compression estimate with skip reasons; since=all spans the gateway's retained analytics (30 days by upstream default), not its lifetime; retained, never counted"}
 ]
 ```
+
+Each ccusage entry selects one source, as upstream's `ccusage claude daily` and
+`ccusage codex daily` do; the bare `ccusage daily` covers every detected source and
+mixes agents in one report. The OmniRoute entries give curl as `/usr/bin/curl`;
+adjust that absolute path per host.
 
 `tool` must be the component id in `manifests/stack.json` (for example
 `jcodemunch-mcp`), so the report lands on that component's row. Its command and
@@ -253,6 +261,38 @@ standard input until it exits or its `timeout` expires. Its whole output is held
 memory, and a successful JSON report is stored twice in its snapshot, as
 `stdout_text` and as the parsed `raw`, so use bounded queries for full-history
 reports.
+
+The OmniRoute entries send no credential. OmniRoute 3.8.51 answers both routes
+without one only while its login is off (`requireLogin` false; the upstream default
+is true) or during first-run setup from loopback (`src/shared/utils/apiAuth.ts`).
+Otherwise they require a dashboard session or a manage-scope API key in an
+`Authorization: Bearer` header, never in the URL. A host that keeps the dashboard
+login therefore gets 401: `curl --fail-with-body` exits 22, and the refresh records
+a failed report and an issue and exits nonzero. Do not add the key to `argv`, which
+is retained verbatim (see above). Use curl's header-file form instead,
+`-H @/absolute/path/omniroute.header`, which `curl --manual` describes as adding "a
+header for each line in the input file" (added in curl 7.55.0). The file holds the
+one line `Authorization: Bearer <key>`, with mode `0600`, outside every worktree like
+the [secret store](../../docs/secret-storage.md#storage-rules); only its path is
+retained.
+
+Loading the configuration rejects a report entry whose `argv` element contains a NUL
+character, whose name or `argv` element cannot be encoded as UTF-8 (a lone surrogate
+such as `\ud800` in the JSON), or whose name folds to a capture folder label over 100
+characters (`report-` plus the folded name, so the folded name keeps at most 93). It
+also rejects a
+`counter_scopes` value or `context_roots` name that starts with `Report / `, the
+prefix reserved for reports. A report whose `tool` is not a component id is still
+captured and recorded, but it adds an issue, so every refresh exits nonzero until
+the id is corrected; a stack manifest that is missing, unreadable or lists no
+component skips this check.
+
+The [scheduled unit](../../adoption/templates/systemd/token-report-refresh.service)
+is a oneshot with `TimeoutStartSec=900`, and a refresh runs its captures one after
+another. The sum of the report `timeout`s and the counter captures' own 60-second
+limits must therefore stay within those 900 seconds, or systemd marks the run
+failed and stops it. A steady-state refresh with a 106,000-row RTK history took about 35
+seconds (measured once on one host, 2026-09-29 UTC).
 
 ## Exact artifact comparisons
 
