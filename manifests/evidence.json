@@ -3479,6 +3479,27 @@
         "The 2026-09-23 record's probes on 2.1.281 found that ultracode took precedence over a saved per-model level and that a max session removed the reminder; that record stays as history for 2.1.281 and this receipt does not re-test 2.1.281."
       ],
       "path": "evidence/receipts/claude-model-effort-probes-20260929.json"
+    },
+    {
+      "id": "claude-max-default-effort-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Seventeen headless probes, four interactive terminal cases run through a login shell after the host launcher was replaced by the repository-generated one, the launcher's repository tests and the installed binary's settings schema, all on Claude Code 2.1.284 and each read from the model and effort the client recorded in its own transcript, found that: (1) with the host's saved xhigh per-model levels and ultracode true, a Sonnet 5.5 and an Opus 5.5 session ran at xhigh, and --effort max ran both at max with the Ultracode reminder present; (2) in a --effort max session a Workflow stage naming no effort and an unnamed subagent ran at max, a stage naming effort low ran at low and a subagent whose definition says medium ran at medium, whereas with CLAUDE_CODE_EFFORT_LEVEL=max supplied through the --settings env layer the low stage and the medium subagent both ran at max and the variable also overrode an explicit --effort low; (3) --effort max with ultracode false ran at max with the reminder absent and its Workflow stages kept their own efforts; (4) the binary's settings schema lists only low, medium, high and xhigh for effortLevel and modelSettings.<model>.effortLevel, so a saved max is dropped, and its Ultracode gate reads the ultracode setting or an ultracode effort choice, with no effort term; (5) an interactive Sonnet 5.5 session started through a login shell with the installed launcher ran at max, ran at xhigh after /effort xhigh, ran at xhigh when launched with an explicit --effort xhigh, and claude -p inside a terminal ran at xhigh (the launcher went from 165 bytes to 1,810 bytes, through a first 911-byte version that a cross-family review sent back for repair); and (6) --effort max on Haiku 4.5 completed with exit 0 and empty stderr and no effort field was recorded for either Haiku run.",
+      "limitations": [
+        "Local observation of one workstation and one client version (2.1.284); not a provider ledger, and the recorded effort field is the client's own per-message record, not an API-side confirmation.",
+        "The headless probes are one-turn sessions in fresh scratch directories that read the host's user settings (shape only: ultracode true, a top-level effortLevel of xhigh, and per-model levels of xhigh for Sonnet 5.5 and Opus 5.5); other settings would change the baselines.",
+        "The environment-variable route was supplied through the --settings flag's env block (cases E1 to E4), not through a shell export or the user settings file, and the documented reapplication of settings env values to running sessions was not probed.",
+        "For the three Workflow cases the Workflow tool result is only a launch receipt; execution is shown by the two child transcripts (attributed by the stage token in each child's first message, never by session id or file order), the workflow journal and the completion notification. The Ultracode reminder is matched as the full phrase 'Ultracode is on: optimize' and is an indicator, not proof of orchestration; orchestration was exercised only where the prompt ordered a Workflow launch.",
+        "Haiku 4.5 rows carry no effort field at all (the client marks per-turn effort inactive), so the transcript cannot show what became of --effort max on that model.",
+        "Each interactive case is one Sonnet 5.5 session driven through tmux with the workspace-trust dialog answered yes for a scratch directory (one entry added to the client's trust state); the /effort xhigh command re-saved the user settings file with identical bytes (its mtime moved, its sha256 did not). A first 911-byte version of the launcher went through the same four cases before a cross-family review sent it back for repair; those runs are not part of this receipt, and a later pre-flight of the repaired launcher lost two of its rows to a harness defect (a leftover transcript satisfied a reply check) and is not used either.",
+        "Not covered: the VS Code extension, the desktop app and the web client, which do not go through the launcher; a host whose bin directory is ~/.local/bin, where no launcher is written; macOS (not run); and the Windows Terminal profile itself (the login-shell route it takes was exercised through tmux).",
+        "An independent stack-verifier re-derived all seventeen headless rows from the raw transcripts with its own extraction code (17 of 17 matched); that verdict is recorded by the coordinator, not by a script in this receipt.",
+        "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every row given the results files they write, and scratch paths and session identifiers are replaced in them.",
+        "Nothing here compares answer quality across effort levels; the vendor and third-party effort comparisons are cited in docs/decisions/2026-09-29-max-default-effort.md, not measured here."
+      ],
+      "path": "evidence/receipts/claude-max-default-effort-20260929.json"
     }
   ],
   "files": [
@@ -3699,23 +3720,23 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "11c74fb8738e560ede5065ae3df0b4bf6f3aa62c323b1b1930616cab1abfd6cc",
-      "bytes": 39077
+      "sha256": "94e3daf91408b4ed71c969f91e553d7887055a590aa5bf242262360c503aeffc",
+      "bytes": 41075
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "d33068939ea2c95cab3a14781c54e289a9d46a86d38ecc93b938c475f786151a",
-      "bytes": 79792
+      "sha256": "6de83675793823b2f0fc046c123c1082f2b7cbe622daa492ffa01c4c5b9dbb59",
+      "bytes": 81790
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "19ecc5ca1a8ea6504037705daf8cde3c7c26c97c86867f7bc9154089f7b7c788",
-      "bytes": 45426
+      "sha256": "b255c1f62275d1632913cf67b09ce8b8141c1eb4ead9a53c503981f4ba5ec577",
+      "bytes": 46441
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "5e20ce0d08dd203b5b9d86ee2375cd03131a4c1f3c18b096bb48f66371bb6e1a",
-      "bytes": 17862
+      "sha256": "2404df6c8d17b8dea544f162d439ddf8a03a5f12f0c2799a63707c9f88e98e35",
+      "bytes": 20076
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -3724,7 +3745,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "b611e824165ab4465bed6729054a1c1eaed75a7c0044506f508e4c6adacd62d4",
+      "sha256": "06385c800b70072e9163096f06e73874cfed63040cd9db87ae221d1cbd2aed62",
       "bytes": 861
     },
     {
@@ -3859,8 +3880,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "77603033445bd6d685cc60e240e25bc16eeca893fa40f19f977b8d89df63b46f",
-      "bytes": 57843
+      "sha256": "17346322600c5b169fa3be449336c053ecfc5a556feda746e9fd3ea290ec8ba8",
+      "bytes": 58408
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -13655,8 +13676,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1091fc250065d7756a0a27174ee44d2884ea56cbfb79a7bafdcab0d180f8f8aa",
-      "bytes": 25179
+      "sha256": "69df9b7a431a119ec95e94ff20d8703d7795dd6eca496238fcdbc884e47d81d5",
+      "bytes": 25269
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14265,8 +14286,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "677c0609d88043e0f7ab8510bfca3d57ad3f6de608dabf721d520a093752a812",
-      "bytes": 129876
+      "sha256": "830049dd742c5715403070b833bf5631abd979d236eec7ff38b06901dc4637d7",
+      "bytes": 131021
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -14585,8 +14606,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "c5f8e434ef7bfb8c6aeec6733f3f39c0408fe66fc8348cdbd7a23d344dbb39e7",
-      "bytes": 12756
+      "sha256": "821fb700919417eb6697a3757e7dad5d4a32aee26344378bd95fe5f00cb2bc46",
+      "bytes": 12551
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -14700,8 +14721,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "6d7a9d5e33efc186c2876daa5990713be7cc8e3f7491190de2022b4d952624f2",
-      "bytes": 82026
+      "sha256": "b02073ef9f01bd52a51886e2cac24ef555b23d7e7b4279a467199f91bd138ec7",
+      "bytes": 82401
     },
     {
       "path": "docs/stack.md",
@@ -36485,8 +36506,8 @@
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
-      "sha256": "598a2a4598c9bef43fbc08ad59c505d552fb8fbf2048075a8c9adcc0d1428b5b",
-      "bytes": 10827
+      "sha256": "13dc826b75e8160c11b31a2d7afef22754b6f5660fe6db9a1af721dff9cd3fd0",
+      "bytes": 12541
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/control-no-allowance.json",
@@ -40804,6 +40825,11 @@
       "bytes": 20645
     },
     {
+      "path": "evidence/receipts/claude-max-default-effort-20260929.json",
+      "sha256": "d6b3ee54f8620e28b029fe0a45f4139a57b5ae03a49c3620121ba420e49bac12",
+      "bytes": 66356
+    },
+    {
       "path": "evidence/receipts/claude-model-effort-probes-20260929.json",
       "sha256": "89ff70e2f8388d3fc424bf879eb8fd7753e9be851ddc58344d9dd29d484b2dca",
       "bytes": 27658
@@ -42035,8 +42061,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "abf269ba41a126400e084b4f03828eb4f0e6fc2375633c0e788136158a3054b1",
-      "bytes": 43178
+      "sha256": "f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244",
+      "bytes": 43564
     },
     {
       "path": "scripts/host_receipts.py",
@@ -42090,8 +42116,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "adf89cd8d0846c273164201f06bb7a6ea4b80b6bea6158048a060b28eb559246",
-      "bytes": 25989
+      "sha256": "cf4661668c5299a3160fe6369c1365534466bb726a5dc1d490c9031f8e98639a",
+      "bytes": 30559
     },
     {
       "path": "scripts/trading_gates.py",
@@ -42365,8 +42391,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "880ba1e218738bc8f7dc26dc5f7a4d81b95231f290175605c15f652974b617c8",
-      "bytes": 94981
+      "sha256": "b99fddfa4d116fc4591286780873a2f0f52d47cbbd7030e411c06135720d8ebc",
+      "bytes": 105447
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
@@ -42545,8 +42571,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "f1f3a7e431ebf092db8ed1ca121b80462aac950ec4280fb71c1b9a7ea0ccfca5",
-      "bytes": 27639
+      "sha256": "a2b96d0c75ffc67950544632562ff83f23d3d248c2800c34efd64f928e51b426",
+      "bytes": 28598
     },
     {
       "path": "tests/test_credential_tools.py",
@@ -42680,8 +42706,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "4b11b20693ec7f2d4ee03ffe76dff4a1418df1fcd52b41890fda41899054e5df",
-      "bytes": 76944
+      "sha256": "92bdc33349f868dcc49f8f5d0c0c27212632e1fa6e4107c566617bab442a383e",
+      "bytes": 88411
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -42975,8 +43001,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "a46943e13beaf956f6c96c4623451f6d398e4d9f416d41be6d50507260b63ff8",
-      "bytes": 62922
+      "sha256": "767d26f16a70a9eb20a907fbe762126b9e2c132c8256e2ba19a6373cdb585e6c",
+      "bytes": 65660
     },
     {
       "path": "tests/test_security_identity.py",
@@ -43010,8 +43036,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "9b57474988bb213ec212504524599bd90865f071501ecb94ba1c0facf16f01d0",
-      "bytes": 76186
+      "sha256": "fbc0e085ed8867b187c2b22d9a251732e492270b10cb3c94ac49e0f5400b88e6",
+      "bytes": 78579
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -43020,8 +43046,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "8fae4657d770bdf6788025d3c8078372209d329e7791c57ce31409c12cb86585",
-      "bytes": 39455
+      "sha256": "fe4b919e0756ba6b3f7fc93200804a6522765c6b50e0a7d31175d5fbde9bbcc8",
+      "bytes": 50494
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -43155,8 +43181,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "aa6827ec0b7c16d8539ed204f7e47fe70371d7eb4ae675e30054575a769069d5",
-      "bytes": 36401
+      "sha256": "ecbe9fc92cae18922f87f617fb075fdfb7620fce39180e4fb905dbb9d1235121",
+      "bytes": 37886
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -43250,13 +43276,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "08c549f84a852ebb19987f36a8c69aa677cfc8ab635eac635b8ef7263c21de5c",
-      "bytes": 22119
+      "sha256": "c48c4cd8dd860a448927cef7ece87688cc9b9c2980e3da9f6858b82842429fbb",
+      "bytes": 22215
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "1a787dbb70892a9194ddf058533d11d7ad7d488b1358a17382ffbd0e1272b84c",
-      "bytes": 81906
+      "sha256": "78db8b063d193fdd7077af44bc9f25f1c1ea1543f6725b9789d6032cf459c613",
+      "bytes": 82602
     },
     {
       "path": "tools/sota-convergence/README.md",
