@@ -1,0 +1,120 @@
+{
+ "claude": {
+  "claude-lane": {
+   "agent_type": "evidence-reviewer",
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "api_calls": 32,
+   "advisor_calls": 1,
+   "provider_usage": {
+    "input_tokens": 66,
+    "cache_creation_input_tokens": 169427,
+    "cache_read_input_tokens": 3291766,
+    "output_tokens": 66047
+   }
+  },
+  "claude-judge-AB": {
+   "agent_type": "blind-adjudicator",
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "api_calls": 15,
+   "advisor_calls": 1,
+   "provider_usage": {
+    "input_tokens": 32,
+    "cache_creation_input_tokens": 89839,
+    "cache_read_input_tokens": 892825,
+    "output_tokens": 36730
+   }
+  },
+  "claude-judge-BA": {
+   "agent_type": "blind-adjudicator",
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "api_calls": 18,
+   "advisor_calls": 1,
+   "provider_usage": {
+    "input_tokens": 38,
+    "cache_creation_input_tokens": 87014,
+    "cache_read_input_tokens": 924507,
+    "output_tokens": 45549
+   }
+  }
+ },
+ "gpt6": {
+  "gpt6-probe": {
+   "model": "gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "status": "done",
+   "exit": 0,
+   "limit": false,
+   "started": "2026-09-28T14:02:02Z",
+   "finished": "2026-09-28T14:03:03Z",
+   "usage": {
+    "input_tokens": 94275,
+    "cached_input_tokens": 49664,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1613,
+    "reasoning_output_tokens": 1235
+   },
+   "usage_status": "reported"
+  },
+  "gpt6-lane": {
+   "model": "gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "status": "done",
+   "exit": 0,
+   "limit": false,
+   "started": "2026-09-28T14:03:18Z",
+   "finished": "2026-09-28T14:11:04Z",
+   "usage": {
+    "input_tokens": 530496,
+    "cached_input_tokens": 443008,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 14689,
+    "reasoning_output_tokens": 9240
+   },
+   "usage_status": "reported"
+  },
+  "gpt6-judge-AB": {
+   "model": "gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "status": "done",
+   "exit": 0,
+   "limit": false,
+   "started": "2026-09-28T14:21:39Z",
+   "finished": "2026-09-28T14:23:50Z",
+   "usage": {
+    "input_tokens": 214851,
+    "cached_input_tokens": 157440,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 3843,
+    "reasoning_output_tokens": 1904
+   },
+   "usage_status": "reported"
+  },
+  "gpt6-judge-BA": {
+   "model": "gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "status": "done",
+   "exit": 0,
+   "limit": false,
+   "started": "2026-09-28T14:21:39Z",
+   "finished": "2026-09-28T14:24:00Z",
+   "usage": {
+    "input_tokens": 190953,
+    "cached_input_tokens": 116352,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 4171,
+    "reasoning_output_tokens": 2778
+   },
+   "usage_status": "reported"
+  }
+ }
+}

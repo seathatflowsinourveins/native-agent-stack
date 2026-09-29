@@ -1,0 +1,31 @@
+{
+ "retrieved": "2026-09-27",
+ "method": "curl of the published page; quotes copied verbatim",
+ "sources": [
+  {
+   "id": "T1",
+   "publisher": "Anthropic",
+   "title": "Claude Code docs: plugins",
+   "url": "https://code.claude.com/docs/en/plugins.md",
+   "locator": "line 9",
+   "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit."
+  },
+  {
+   "id": "T2",
+   "publisher": "Anthropic",
+   "title": "Claude Code docs: MCP",
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "locator": "line 1445",
+   "quote": "Tool search is enabled by default: MCP tools are deferred and discovered on demand."
+  },
+  {
+   "id": "T3",
+   "publisher": "GitHub",
+   "title": "GitHub Flavored Markdown Spec, Version 0.29-gfm (2019-04-06)",
+   "url": "https://github.github.com/gfm/",
+   "locator": "4.10 Tables (extension), text before Example 200",
+   "quote": "Include a pipe in a cell’s content by escaping it, including inside other inline spans:",
+   "example": "| b `\\|` az |  renders as  <td>b <code>|</code> az</td>"
+  }
+ ]
+}

@@ -1,0 +1,652 @@
+{
+ "evidence_class": "Offline unit checks of the recipe with Docker mocked (our integration checks, not upstream tests), plus read-only host observations: registry byte hashes of the pinned proxy image, one pull by digest, image identity checks, one selected-field inspect of the default bridge network, the credential inventory tests and the value-free credential status. No attempt network or container was created and no gateway or model request was made. Entries 21-24 were added after review at commit 34d43059: the validate workflow's read-only check commands and the full unit suite, run inside an unprivileged user and network namespace whose only interface was loopback with nothing listening, so no TCP or UDP traffic could leave it. The namespace does not isolate path-based unix sockets, such as the rootless Docker daemon's or the user bus; the Docker CLI was not on PATH, and owned containers and networks were 0 afterwards. A base-versus-head control covers every check that failed.",
+ "sanitization": "The worktree prefix is shown as <worktree>, the scratch directory as <scratch>, the unit TMPDIR as <tmpdir> inside outputs, and the home directory as ~ or $HOME. The module prefix `tests.test_runtime_worker_openhands.` is dropped from test names. Red and failed-attempt outputs are excerpts: the summary lines, each non-ok test with its count of non-ok lines (subtests) when above one, and each distinct first exception line with its count, cut at 220 characters; tracebacks are omitted, and rerunning the command on the named tree reproduces them. Green outputs keep the summary lines. Host outputs keep only the lines this record cites; the network ID is truncated and other credential rows are omitted.",
+ "base": "efa73f40453911d3ac9583218530273677983053",
+ "commits": {
+  "slice_1": "90bd4a5ae953f91dfb089ff478dfb165d5cf88cb",
+  "slice_2": "0fbe40eed51f4d5b1f1e29bf8e8e75039a9b32f8",
+  "slice_3": "a144708b2f47034f11c9696579fd391f52a31ef1",
+  "slice_4a": "6cd13aa344870bab07ff8818a4f064cf9095c0ce",
+  "slice_4b": "4f6a6741ff4fa0fd352d2dc345eff2bfda295cc4",
+  "review_fix": "34d4305933180d9160d6477dc0b942d67aaccede",
+  "record_addendum": "the commit that adds entries 21-24"
+ },
+ "decisions": "Coordinator amendment of 2026-09-28: build the phase-2 plan's section 1 (isolation design) and items E1, E2, E3 and E5; E4 (resolver mode) goes to a follow-up PR. Fail closed if network create rejects gateway mode isolated. P3-P5 are documented steps and a skeleton, not run. No push, rebase, manifests/evidence.json change, container, network or gateway request.",
+ "item_tests": {
+  "arm_contract_and_mcp": [
+   "OpenHandsRecipeTests.test_gateway_model_and_container_topology",
+   "OpenHandsRecipeTests.test_explicit_arms_keep_one_slash_routes_and_compression_separate",
+   "OpenHandsRecipeTests.test_environment_selection_maps_empty_compression_to_unset",
+   "OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter",
+   "OpenHandsRecipeTests.test_worker_arm_headers_and_response_correlation_capture",
+   "OpenHandsRecipeTests.test_mcp_limits",
+   "OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo",
+   "OpenHandsReceiptTests.test_skills_and_mcp_require_observations"
+  ],
+  "E1_topology_and_proxy": [
+   "OpenHandsRecipeTests.test_model_container_is_nonroot_and_network_is_per_attempt",
+   "OpenHandsRecipeTests.test_host_template_has_no_firewall_receipt_contract",
+   "OpenHandsRecipeTests.test_immutable_artifacts",
+   "OpenHandsIsolationTests.test_topology_creates_an_isolated_internal_network_and_a_gateway_network",
+   "OpenHandsIsolationTests.test_topology_fails_closed_when_the_isolated_gateway_mode_is_rejected",
+   "OpenHandsIsolationTests.test_topology_refuses_networks_whose_inspect_differs",
+   "OpenHandsIsolationTests.test_proxy_template_is_the_three_route_v1_allowlist",
+   "OpenHandsIsolationTests.test_proxy_render_fills_each_placeholder_from_the_arm_selection",
+   "OpenHandsIsolationTests.test_proxy_render_refuses_values_outside_their_patterns",
+   "OpenHandsIsolationTests.test_rendered_proxy_config_is_host_owned_0644_outside_model_mounts",
+   "OpenHandsIsolationTests.test_proxy_launch_is_create_connect_start_with_loopback_ingress_only",
+   "OpenHandsIsolationTests.test_teardown_removes_proxy_then_server_then_networks_by_exact_name",
+   "OpenHandsReceiptTests.test_receipt_counts_network_removal_separately_from_containers",
+   "OpenHandsDispatchTests.test_prepare_serializes_body_offline_then_launches_native_server",
+   "OpenHandsDispatchTests.test_selected_port_flows_from_prepare_to_dispatch",
+   "OpenHandsUpstreamAdapterTests.test_install_accepts_the_pinned_image_on_containerd_and_classic_stores",
+   "OpenHandsUpstreamAdapterTests.test_install_refuses_each_image_identity_mismatch_before_any_container"
+  ],
+  "E1_probe_and_gate": [
+   "OpenHandsProbeTests.test_netprobe_lists_are_the_plan_lists_and_import_does_no_work",
+   "OpenHandsProbeTests.test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies",
+   "OpenHandsProbeTests.test_netprobe_connects_resolves_and_reads_ipv6_without_defaults",
+   "OpenHandsProbeTests.test_netprobe_stops_at_the_first_unexpected_result",
+   "OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused",
+   "OpenHandsProbeTests.test_probe_targets_come_from_ss_ip_and_the_attempt_networks",
+   "OpenHandsProbeTests.test_probe_containers_use_the_agent_image_hardening_and_only_their_mounts",
+   "OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate",
+   "OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts",
+   "OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate",
+   "OpenHandsProbeTests.test_probe_refuses_targets_that_are_its_own_attempt_containers",
+   "OpenHandsProbeTests.test_probe_requires_each_attempt_container_on_its_own_networks",
+   "OpenHandsProbeTests.test_probe_action_needs_an_explicit_prepared_attempt",
+   "OpenHandsProbeTests.test_probe_action_failure_tears_down_and_records_the_probe_stage",
+   "OpenHandsReceiptTests.test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses",
+   "OpenHandsDispatchTests.test_start_requires_a_fresh_owner_only_probe_receipt",
+   "OpenHandsUpstreamAdapterTests.test_probe_failure_in_run_tears_down_once_and_exits_3",
+   "OpenHandsUpstreamAdapterTests.test_probe_pass_in_run_leaves_the_attempt_prepared"
+  ],
+  "E1_teardown_action": [
+   "OpenHandsProbeTests.test_teardown_action_refuses_while_a_conversation_may_be_live",
+   "OpenHandsProbeTests.test_teardown_action_removes_the_attempt_once_and_retires_a_prepared_status"
+  ],
+  "E2_session_key": [
+   "OpenHandsUpstreamAdapterTests.test_session_key_is_generated_per_attempt_and_never_returned",
+   "OpenHandsUpstreamAdapterTests.test_session_key_preflight_checks_the_variable_name_only",
+   "OpenHandsIsolationTests.test_teardown_keeps_key_files_while_removal_is_unconfirmed"
+  ],
+  "E3_method_pairing": [
+   "OpenHandsDispatchTests.test_native_routes_pair_each_path_with_its_one_method",
+   "OpenHandsDispatchTests.test_start_wait_result_use_native_routes_and_deterministic_host_files"
+  ],
+  "E5_decision_record": [],
+  "evidence_record": [
+   "OpenHandsRecipeTests.test_proxy_image_evidence_matches_the_pin_and_is_publishable"
+  ]
+ },
+ "item_notes": {
+  "arm_contract_and_mcp": "Slice 1 (commands 01-02).",
+  "E1_topology_and_proxy": "Slice 2 (commands 03-05). The slice-2 red run stashed the new proxy template, the pins.json gateway_proxy entry and the host-template change, so part of its red comes from missing data (KeyError 'gateway_proxy') rather than missing code.",
+  "E1_probe_and_gate": "Slice 3 (commands 08-10).",
+  "E1_teardown_action": "Slice 4a (commands 11-12). Not a plan item: it removes a prepared attempt after a probe-only acceptance run without starting a conversation.",
+  "E2_session_key": "Slice 2. The inventory row is checked by commands 06-07; credential_status reports it missing because no attempt exists.",
+  "E3_method_pairing": "Slice 3.",
+  "E5_decision_record": "Documentation only: docs/decisions/2026-09-28-openhands-resolver-isolation.md, README.md and research.md.",
+  "evidence_record": "Slice 4b (commands 13-14): ties this record's registry and identity outputs to pins.json gateway_proxy and scans it with the repository's private-content patterns.",
+  "host_observations": "Commands 15-17 are read-only host observations on this machine on 2026-09-28. They are not a live probe of the topology, which has not run."
+ },
+ "commands": [
+  {
+   "id": "01-slice1-red",
+   "tree": "efa73f40 with the slice-1 test edits only; recipe files unchanged.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": [
+    "Ran 75 tests in 0.875s",
+    "FAILED (failures=5, errors=7)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsDispatchTests.test_prepare_serializes_body_offline_then_launches_native_server",
+    "OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo x3",
+    "OpenHandsReceiptTests.test_skills_and_mcp_require_observations",
+    "OpenHandsRecipeTests.test_environment_selection_maps_empty_compression_to_unset",
+    "OpenHandsRecipeTests.test_explicit_arms_keep_one_slash_routes_and_compression_separate",
+    "OpenHandsRecipeTests.test_gateway_model_and_container_topology",
+    "OpenHandsRecipeTests.test_mcp_limits x2",
+    "OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter",
+    "OpenHandsRecipeTests.test_worker_arm_headers_and_response_correlation_capture"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo => ValueError: base_url_must_match_arm (x3)",
+    "ERROR OpenHandsRecipeTests.test_environment_selection_maps_empty_compression_to_unset => AttributeError: module 'openhands_recipe_test_recipe' has no attribute 'environment_selection'",
+    "ERROR OpenHandsRecipeTests.test_explicit_arms_keep_one_slash_routes_and_compression_separate => AttributeError: module 'openhands_recipe_test_recipe' has no attribute 'COMPRESSION_COMBOS'",
+    "ERROR OpenHandsRecipeTests.test_mcp_limits => KeyError: 'enabled' (x2)",
+    "FAIL OpenHandsDispatchTests.test_prepare_serializes_body_offline_then_launches_native_server => AssertionError: 'OPENHANDS_BASE_URL=http://gw:8081/v1' not found in ['docker', '--context', 'rootless', 'run', '--rm', '--pull=never', '--name', 'rw-openhands-fixture-engines-on-request', '--platform', 'linux/amd64', '--",
+    "FAIL OpenHandsReceiptTests.test_skills_and_mcp_require_observations => AssertionError: {'jcodemunch_order': 1, 'ai-memory_memory_query': 1} != {'jcodemunch_order': 1}",
+    "FAIL OpenHandsRecipeTests.test_gateway_model_and_container_topology => AssertionError: 'http://127.0.0.1:20128/v1' != 'http://gw:8081/v1'",
+    "FAIL OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter => AssertionError: 'http://10.0.2.2:20128/v1' != 'http://gw:8081/v1'",
+    "FAIL OpenHandsRecipeTests.test_worker_arm_headers_and_response_correlation_capture => AssertionError: 'http://10.0.2.2:20128/v1' != 'http://gw:8081/v1'"
+   ]
+  },
+  {
+   "id": "02-slice1-green",
+   "tree": "Commit 90bd4a5a.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 0,
+   "summary": [
+    "Ran 75 tests in 0.877s",
+    "OK"
+   ]
+  },
+  {
+   "id": "03-slice2-red",
+   "tree": "90bd4a5a with the slice-2 test edits only; the new proxy template, pins.json entry and host-template change were stashed for this run and no code edits existed yet.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": [
+    "Ran 85 tests in 0.870s",
+    "FAILED (failures=2, errors=90)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsDispatchTests.test_prepare_serializes_body_offline_then_launches_native_server",
+    "OpenHandsDispatchTests.test_request_serialization_failure_cannot_leave_prepared_receipt",
+    "OpenHandsDispatchTests.test_selected_port_flows_from_prepare_to_dispatch",
+    "OpenHandsDispatchTests.test_server_preserves_native_entrypoint_and_uses_supported_preload",
+    "OpenHandsIsolationTests.test_proxy_launch_is_create_connect_start_with_loopback_ingress_only",
+    "OpenHandsIsolationTests.test_proxy_render_fills_each_placeholder_from_the_arm_selection x3",
+    "OpenHandsIsolationTests.test_proxy_render_refuses_values_outside_their_patterns x17",
+    "OpenHandsIsolationTests.test_proxy_template_is_the_three_route_v1_allowlist",
+    "OpenHandsIsolationTests.test_rendered_proxy_config_is_host_owned_0644_outside_model_mounts",
+    "OpenHandsIsolationTests.test_teardown_keeps_key_files_while_removal_is_unconfirmed",
+    "OpenHandsIsolationTests.test_teardown_removes_proxy_then_server_then_networks_by_exact_name",
+    "OpenHandsIsolationTests.test_topology_creates_an_isolated_internal_network_and_a_gateway_network",
+    "OpenHandsIsolationTests.test_topology_fails_closed_when_the_isolated_gateway_mode_is_rejected",
+    "OpenHandsIsolationTests.test_topology_refuses_networks_whose_inspect_differs x11",
+    "OpenHandsReceiptTests.test_receipt_counts_network_removal_separately_from_containers",
+    "OpenHandsRecipeTests.test_host_template_has_no_firewall_receipt_contract",
+    "OpenHandsRecipeTests.test_immutable_artifacts",
+    "OpenHandsRecipeTests.test_model_container_is_nonroot_and_network_is_per_attempt x4",
+    "OpenHandsUpstreamAdapterTests.test_install_accepts_the_pinned_image_on_containerd_and_classic_stores",
+    "OpenHandsUpstreamAdapterTests.test_install_actually_uses_narrow_mounts_and_grader_lock",
+    "OpenHandsUpstreamAdapterTests.test_install_refuses_each_image_identity_mismatch_before_any_container x30",
+    "OpenHandsUpstreamAdapterTests.test_session_key_is_generated_per_attempt_and_never_returned",
+    "OpenHandsUpstreamAdapterTests.test_session_key_preflight_checks_the_variable_name_only x10"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsDispatchTests.test_prepare_serializes_body_offline_then_launches_native_server => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'create_topology'",
+    "ERROR OpenHandsDispatchTests.test_request_serialization_failure_cannot_leave_prepared_receipt => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'create_topology'",
+    "ERROR OpenHandsDispatchTests.test_selected_port_flows_from_prepare_to_dispatch => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'create_topology'",
+    "ERROR OpenHandsDispatchTests.test_server_preserves_native_entrypoint_and_uses_supported_preload => ValueError: explicit_scoped_model_network_required",
+    "ERROR OpenHandsIsolationTests.test_proxy_launch_is_create_connect_start_with_loopback_ingress_only => AttributeError: module 'openhands_recipe_test_host' has no attribute 'proxy_commands'. Did you mean: 'clone_command'?",
+    "ERROR OpenHandsIsolationTests.test_proxy_render_fills_each_placeholder_from_the_arm_selection => AttributeError: module 'openhands_recipe_test_host' has no attribute 'render_proxy_config' (x3)",
+    "ERROR OpenHandsIsolationTests.test_proxy_render_refuses_values_outside_their_patterns => AttributeError: module 'openhands_recipe_test_host' has no attribute 'render_proxy_config' (x16)",
+    "ERROR OpenHandsIsolationTests.test_proxy_render_refuses_values_outside_their_patterns => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/config/proxy-nginx.conf'",
+    "ERROR OpenHandsIsolationTests.test_proxy_template_is_the_three_route_v1_allowlist => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/config/proxy-nginx.conf'",
+    "ERROR OpenHandsIsolationTests.test_rendered_proxy_config_is_host_owned_0644_outside_model_mounts => AttributeError: module 'openhands_recipe_test_host' has no attribute 'write_proxy_config'",
+    "ERROR OpenHandsIsolationTests.test_teardown_keeps_key_files_while_removal_is_unconfirmed => AttributeError: module 'openhands_recipe_test_host' has no attribute 'generate_session_files'",
+    "ERROR OpenHandsIsolationTests.test_teardown_removes_proxy_then_server_then_networks_by_exact_name => AttributeError: module 'openhands_recipe_test_host' has no attribute 'generate_session_files'",
+    "ERROR OpenHandsIsolationTests.test_topology_creates_an_isolated_internal_network_and_a_gateway_network => AttributeError: module 'openhands_recipe_test_host' has no attribute 'create_topology'",
+    "ERROR OpenHandsIsolationTests.test_topology_fails_closed_when_the_isolated_gateway_mode_is_rejected => AttributeError: module 'openhands_recipe_test_host' has no attribute 'create_topology'",
+    "ERROR OpenHandsIsolationTests.test_topology_refuses_networks_whose_inspect_differs => AttributeError: module 'openhands_recipe_test_host' has no attribute 'create_topology' (x11)",
+    "ERROR OpenHandsReceiptTests.test_receipt_counts_network_removal_separately_from_containers => KeyError: 'network_cleanup'",
+    "ERROR OpenHandsRecipeTests.test_immutable_artifacts => KeyError: 'gateway_proxy'",
+    "ERROR OpenHandsRecipeTests.test_model_container_is_nonroot_and_network_is_per_attempt => ValueError: explicit_scoped_model_network_required (x3)",
+    "ERROR OpenHandsUpstreamAdapterTests.test_install_accepts_the_pinned_image_on_containerd_and_classic_stores => KeyError: 'gateway_proxy'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_install_actually_uses_narrow_mounts_and_grader_lock => KeyError: 'gateway_proxy'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_install_refuses_each_image_identity_mismatch_before_any_container => KeyError: 'gateway_proxy' (x30)",
+    "ERROR OpenHandsUpstreamAdapterTests.test_session_key_is_generated_per_attempt_and_never_returned => AttributeError: module 'openhands_recipe_test_host' has no attribute 'generate_session_files'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_session_key_preflight_checks_the_variable_name_only => TypeError: check_server_env() takes 0 positional arguments but 1 was given (x10)",
+    "FAIL OpenHandsRecipeTests.test_host_template_has_no_firewall_receipt_contract => AssertionError: 'egress' unexpectedly found in {'variables': {'ECO_ROOT': '<private installed ecosystem prefix>', 'HOST_PATH': '<container-compatible PATH for the existing MCP executables>', 'AI_MEMORY_URL': '10.0.2.2:49",
+    "FAIL OpenHandsRecipeTests.test_model_container_is_nonroot_and_network_is_per_attempt => AssertionError: ValueError not raised"
+   ]
+  },
+  {
+   "id": "04-slice2-failed-attempt",
+   "tree": "Slice-2 code before one error string was renamed.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 1,
+   "summary": [
+    "Ran 85 tests in 0.997s",
+    "FAILED (failures=1)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsRecipeTests.test_host_template_has_no_firewall_receipt_contract"
+   ],
+   "first_exception_lines": [
+    "FAIL OpenHandsRecipeTests.test_host_template_has_no_firewall_receipt_contract => AssertionError: 'model_network' unexpectedly found in '\"\"\"Owned lifecycle for the upstream SDK-in-image recipe; no work on import.\\n\\nHost actions: frozen task checkout/patch transport, supported upstream grader\\ninstall"
+   ],
+   "note": "The phase-1 error string explicit_scoped_model_network_required contained the retired name model_network, which a new test forbids in host.py; it became attempt_scoped_network_required."
+  },
+  {
+   "id": "05-slice2-green",
+   "tree": "Slice-2 recipe and tests as committed in 0fbe40ee; the two inventory files were edited afterwards and are checked by command 06.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 0,
+   "summary": [
+    "Ran 85 tests in 0.983s",
+    "OK"
+   ]
+  },
+  {
+   "id": "06-inventory-tests",
+   "tree": "Commit 0fbe40ee.",
+   "command": "python3 -m json.tool adoption/credential-inventory.json > /dev/null && echo json-ok && TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_secret_path_guard tests.test_credential_status tests.test_host_requests tests.test_codex_worker_lane",
+   "exit_code": 0,
+   "summary": [
+    "json-ok",
+    "Ran 153 tests in 27.969s",
+    "OK (skipped=9)"
+   ],
+   "note": "The unittest output also carried one ResourceWarning from a still-running subprocess; omitted."
+  },
+  {
+   "id": "07-credential-status",
+   "tree": "Commit 0fbe40ee.",
+   "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/credential_status.py --root .",
+   "exit_code": 0,
+   "output_excerpt": [
+    "missing   openhands-session           generated_local  $HOME/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env findings=-"
+   ],
+   "note": "Value-free. Only this recipe's row is kept; missing is expected while no attempt exists."
+  },
+  {
+   "id": "08-slice3-red",
+   "tree": "0fbe40ee with the slice-3 test edits only; e2e/netprobe.py and the code changes did not exist yet.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": [
+    "Ran 104 tests in 1.200s",
+    "FAILED (failures=16, errors=43)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsDispatchTests.test_native_routes_pair_each_path_with_its_one_method x11",
+    "OpenHandsDispatchTests.test_selected_port_flows_from_prepare_to_dispatch",
+    "OpenHandsDispatchTests.test_start_requires_a_fresh_owner_only_probe_receipt x3",
+    "OpenHandsDispatchTests.test_start_wait_result_use_native_routes_and_deterministic_host_files",
+    "OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate x10",
+    "OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts",
+    "OpenHandsProbeTests.test_netprobe_connects_resolves_and_reads_ipv6_without_defaults",
+    "OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused",
+    "OpenHandsProbeTests.test_netprobe_lists_are_the_plan_lists_and_import_does_no_work",
+    "OpenHandsProbeTests.test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies",
+    "OpenHandsProbeTests.test_netprobe_stops_at_the_first_unexpected_result",
+    "OpenHandsProbeTests.test_probe_action_failure_tears_down_and_records_the_probe_stage x3",
+    "OpenHandsProbeTests.test_probe_action_needs_an_explicit_prepared_attempt",
+    "OpenHandsProbeTests.test_probe_containers_use_the_agent_image_hardening_and_only_their_mounts x5",
+    "OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate",
+    "OpenHandsProbeTests.test_probe_refuses_targets_that_are_its_own_attempt_containers",
+    "OpenHandsProbeTests.test_probe_requires_each_attempt_container_on_its_own_networks x9",
+    "OpenHandsProbeTests.test_probe_targets_come_from_ss_ip_and_the_attempt_networks",
+    "OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo x3",
+    "OpenHandsReceiptTests.test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses",
+    "OpenHandsUpstreamAdapterTests.test_probe_failure_in_run_tears_down_once_and_exits_3",
+    "OpenHandsUpstreamAdapterTests.test_probe_pass_in_run_leaves_the_attempt_prepared"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsDispatchTests.test_selected_port_flows_from_prepare_to_dispatch => AttributeError: <module 'openhands_recipe_test_dispatch' from '<worktree>/blueprints/runtime-workers/openhands/dispatch.py'> does not have the attribute 'verify_isolation'",
+    "ERROR OpenHandsDispatchTests.test_start_requires_a_fresh_owner_only_probe_receipt => AttributeError: module 'openhands_recipe_test_host' has no attribute 'write_private_json' (x2)",
+    "ERROR OpenHandsDispatchTests.test_start_wait_result_use_native_routes_and_deterministic_host_files => AttributeError: <module 'openhands_recipe_test_dispatch' from '<worktree>/blueprints/runtime-workers/openhands/dispatch.py'> does not have the attribute 'verify_isolation'",
+    "ERROR OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py' (x10)",
+    "ERROR OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_netprobe_connects_resolves_and_reads_ipv6_without_defaults => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_netprobe_lists_are_the_plan_lists_and_import_does_no_work => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_netprobe_stops_at_the_first_unexpected_result => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_probe_action_failure_tears_down_and_records_the_probe_stage => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'run_probe' (x3)",
+    "ERROR OpenHandsProbeTests.test_probe_action_needs_an_explicit_prepared_attempt => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'run_probe'",
+    "ERROR OpenHandsProbeTests.test_probe_containers_use_the_agent_image_hardening_and_only_their_mounts => AttributeError: module 'openhands_recipe_test_host' has no attribute 'probe_command'. Did you mean: 'clone_command'? (x5)",
+    "ERROR OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_probe_refuses_targets_that_are_its_own_attempt_containers => AttributeError: module 'openhands_recipe_test_host' has no attribute 'run_probe'",
+    "ERROR OpenHandsProbeTests.test_probe_requires_each_attempt_container_on_its_own_networks => AttributeError: module 'openhands_recipe_test_host' has no attribute 'run_probe' (x8)",
+    "ERROR OpenHandsProbeTests.test_probe_requires_each_attempt_container_on_its_own_networks => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'",
+    "ERROR OpenHandsProbeTests.test_probe_targets_come_from_ss_ip_and_the_attempt_networks => AttributeError: module 'openhands_recipe_test_host' has no attribute 'listener_ports'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_probe_failure_in_run_tears_down_once_and_exits_3 => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'run_probe'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_probe_pass_in_run_leaves_the_attempt_prepared => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'run_probe'",
+    "FAIL OpenHandsDispatchTests.test_native_routes_pair_each_path_with_its_one_method => AssertionError: ValueError not raised (x10)",
+    "FAIL OpenHandsDispatchTests.test_native_routes_pair_each_path_with_its_one_method => Calls: [call('http://127.0.0.1:3740/api/conversations', method='GET', headers=PosixPath('<tmpdir>/tmpznbir4t6/runs/rw-openhands-fixture/engines-on/headers'), body=None),",
+    "FAIL OpenHandsDispatchTests.test_start_requires_a_fresh_owner_only_probe_receipt => Calls: [call('POST', '/api/conversations', body=PosixPath('<tmpdir>/tmp9z8wte10/runs/rw-openhands-fixture/engines-on/start.json'), port=3740, headers=PosixPath('<tmpdir>/tmp9z8wte10/secrets/rw-openhands-fixture-engines-o",
+    "FAIL OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo => AssertionError: 5 != 6 (x3)",
+    "FAIL OpenHandsReceiptTests.test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses => AssertionError: None != 'probe'"
+   ]
+  },
+  {
+   "id": "09-slice3-failed-attempt",
+   "tree": "Slice-3 code with a fixture bug in a new test.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": [
+    "Ran 104 tests in 1.977s",
+    "FAILED (failures=1)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsProbeTests.test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies"
+   ],
+   "first_exception_lines": [
+    "FAIL OpenHandsProbeTests.test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies => AssertionError: False is not true"
+   ],
+   "note": "Test bug, not a code defect: the fixture's reply map answered GET /api/settings, which the same test also sends as a denied target, with 200 and route class MANAGEMENT. The MANAGEMENT case moved to its own target, /management-class."
+  },
+  {
+   "id": "10-slice3-green",
+   "tree": "Commit a144708b.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 0,
+   "summary": [
+    "Ran 104 tests in 1.940s",
+    "OK"
+   ]
+  },
+  {
+   "id": "11-slice4a-red",
+   "tree": "a144708b with the two teardown-action tests only.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 1,
+   "summary": [
+    "Ran 106 tests in 2.082s",
+    "FAILED (errors=17)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsProbeTests.test_teardown_action_refuses_while_a_conversation_may_be_live x10",
+    "OpenHandsProbeTests.test_teardown_action_removes_the_attempt_once_and_retires_a_prepared_status x7"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsProbeTests.test_teardown_action_refuses_while_a_conversation_may_be_live => AttributeError: module 'openhands_recipe_test_host' has no attribute 'teardown_action'. Did you mean: 'teardown_attempt'? (x10)",
+    "ERROR OpenHandsProbeTests.test_teardown_action_removes_the_attempt_once_and_retires_a_prepared_status => AttributeError: module 'openhands_recipe_test_host' has no attribute 'teardown_action'. Did you mean: 'teardown_attempt'? (x6)",
+    "ERROR OpenHandsProbeTests.test_teardown_action_removes_the_attempt_once_and_retires_a_prepared_status => SystemExit: 2"
+   ]
+  },
+  {
+   "id": "12-slice4a-green",
+   "tree": "Commit 6cd13aa3 (host.py teardown_action; README not yet rewritten).",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 0,
+   "summary": [
+    "Ran 106 tests in 2.081s",
+    "OK"
+   ]
+  },
+  {
+   "id": "13-slice4b-red",
+   "tree": "6cd13aa3 with the evidence-record test only; this record did not exist yet.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 1,
+   "summary": [
+    "Ran 107 tests in 2.030s",
+    "FAILED (errors=1)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsRecipeTests.test_proxy_image_evidence_matches_the_pin_and_is_publishable"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsRecipeTests.test_proxy_image_evidence_matches_the_pin_and_is_publishable => FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/openhands/evidence/phase2-commands.json'"
+   ]
+  },
+  {
+   "id": "13b-slice4b-failed-attempt",
+   "tree": "Slice-4b files with this record present, before one misplaced line was moved back.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": [
+    "Ran 107 tests in 2.054s",
+    "FAILED (errors=1)"
+   ],
+   "non_ok_tests": [
+    "OpenHandsRecipeTests.test_proxy_image_evidence_matches_the_pin_and_is_publishable"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsRecipeTests.test_proxy_image_evidence_matches_the_pin_and_is_publishable => NameError: name 'name' is not defined"
+   ],
+   "note": "Insertion error: the new test was inserted one line too early, so it inherited the grype receipt test's last line (a README check on that test's own variable). The line went back to the grype test, and the new test gained its own README and research.md link check. Command 13 ran with the same misplacement, so the grype test ran without that one assertion there."
+  },
+  {
+   "id": "14-final-green",
+   "tree": "Final tree: 6cd13aa3 plus the slice-4b changes (research.md section, the decision record, this record and its test), before this entry and entries 19-20 were filled in.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 0,
+   "summary": [
+    "Ran 107 tests in 2.077s",
+    "OK"
+   ],
+   "note": "107 lines ending in ok. After this entry and entries 13b, 19 and 20 were filled in, the same command ran again on the committed tree before the commit; its summary is in the coordinator report, because recording it here would change the file it checks."
+  },
+  {
+   "id": "15-registry-bytes",
+   "tree": "Not applicable (registry read).",
+   "command": "python3 -B <scratch>/registry_verify.py ghcr.io nginx/nginx-unprivileged sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e --layers",
+   "exit_code": 0,
+   "output_excerpt": {
+    "top_media_type": "application/vnd.oci.image.index.v1+json",
+    "top_sha256_of_bytes": "sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e",
+    "top_docker_content_digest": "sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e",
+    "top_bytes_match_reference": true,
+    "amd64_manifest": {
+     "digest": "sha256:f4522a5f23f9caebcae9be6e3940ea0599a2b9eb05222c7118d01fc887e848d6",
+     "sha256_of_bytes": "sha256:f4522a5f23f9caebcae9be6e3940ea0599a2b9eb05222c7118d01fc887e848d6",
+     "bytes_match": true,
+     "media_type": "application/vnd.oci.image.manifest.v1+json"
+    },
+    "config": {
+     "digest": "sha256:61640a44f99dcfd7f1af9f144f023195e82fdefd2f5aba7f917548867d4f3a6f",
+     "sha256_of_bytes": "sha256:61640a44f99dcfd7f1af9f144f023195e82fdefd2f5aba7f917548867d4f3a6f",
+     "bytes_match": true,
+     "os_arch": "linux/amd64",
+     "User": "101",
+     "Entrypoint": [
+      "/docker-entrypoint.sh"
+     ],
+     "Cmd": [
+      "nginx",
+      "-g",
+      "daemon off;"
+     ],
+     "ExposedPorts": [
+      "8080/tcp"
+     ],
+     "version_env": [
+      "NGINX_VERSION=1.30.5"
+     ],
+     "labels": {
+      "org.opencontainers.image.created": "2026-09-28T01:38:21.026Z",
+      "org.opencontainers.image.revision": "588b4cbc88065a313909f47a02510639e01cc508",
+      "org.opencontainers.image.source": "https://github.com/nginx/docker-nginx-unprivileged",
+      "org.opencontainers.image.version": "1.30.5-alpine"
+     }
+    },
+    "files_present": {
+     "bin/busybox": "file",
+     "bin/sh": "symlink->/bin/busybox",
+     "usr/bin/getent": "file",
+     "usr/sbin/nginx": "file",
+     "usr/bin/curl": "file"
+    }
+   },
+   "note": "registry_verify.py is a local standard-library helper, not committed, written because no skopeo, crane or buildx was installed. It takes an anonymous pull token, fetches the index, the linux/amd64 manifest and the config, and compares the SHA-256 of the returned bytes with each digest (the OCI content-addressing rule); --layers lists a few files from the layers. Commands 16-17 are the native evidence."
+  },
+  {
+   "id": "16-bridge-template",
+   "tree": "host.py NETWORK_FORMAT as committed in 0fbe40ee.",
+   "command": "D=\"$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin/docker\"; \"$D\" --context rootless version --format '{{.Server.Version}} {{.Client.Version}}'; \"$D\" --context rootless network inspect --format '<host.py NETWORK_FORMAT>' bridge | <truncate the id>; echo \"rc=$?\"; \"$D\" --context rootless network ls --format '{{.Name}}' | wc -l",
+   "exit_code": 0,
+   "output": [
+    "29.8.1 29.8.1",
+    "{\"id\": \"fedad086b6d4…\", \"name\": \"bridge\", \"driver\": \"bridge\", \"internal\": false, \"ipv6\": false, \"options\": {\"com.docker.network.bridge.default_bridge\": \"true\", \"com.docker.network.bridge.enable_icc\": \"true\", \"com.docker.network.bridge.enable_ip_masquerade\": \"true\", \"com.docker.network.bridge.host_binding_ipv4\": \"127.0.0.1\", \"com.docker.network.bridge.name\": \"docker0\", \"com.docker.network.driver.mtu\": \"1500\"}, \"labels\": {}, \"ipam\": [{\"Gateway\": \"172.17.0.1\", \"Subnet\": \"172.17.0.0/16\"}]}",
+    "rc=0",
+    "3"
+   ],
+   "note": "Read-only: shows the selected-field template renders on this daemon. CONTAINER_FORMAT has no live check yet."
+  },
+  {
+   "id": "17-pull-and-identity",
+   "tree": "host.py pinned_image_identity as committed in 0fbe40ee.",
+   "command": "export PATH=\"$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$PATH\"; docker --context rootless pull --platform linux/amd64 <pins.json gateway_proxy ref>; python3 -c '<print host.pinned_image_identity(pins[key]) for gateway_proxy and image>'; docker --context rootless ps -aq | wc -l",
+   "exit_code": 0,
+   "output": [
+    "pull rc=0",
+    "Digest: sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e",
+    "Status: Image is up to date for ghcr.io/nginx/nginx-unprivileged@sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e",
+    "gateway_proxy store=containerd",
+    "image store=containerd",
+    "1"
+   ],
+   "note": "The container count of 1 is a container this work did not create. The pull ran no container and created no network."
+  },
+  {
+   "id": "18-diff-check",
+   "command": "git diff --check",
+   "exit_code": 0,
+   "output": "",
+   "note": "Run before each slice commit."
+  },
+  {
+   "id": "19-validate",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+   "exit_code": 1,
+   "output_excerpt": {
+    "first_line": "Publication validation failed:",
+    "sha256_and_byte_count_mismatch": [
+     "adoption/credential-inventory.json",
+     "blueprints/runtime-workers/openhands/README.md",
+     "blueprints/runtime-workers/openhands/config/host.example.json",
+     "blueprints/runtime-workers/openhands/config/mcp-policy.json",
+     "blueprints/runtime-workers/openhands/config/worker.json",
+     "blueprints/runtime-workers/openhands/dispatch.py",
+     "blueprints/runtime-workers/openhands/host.py",
+     "blueprints/runtime-workers/openhands/pins.json",
+     "blueprints/runtime-workers/openhands/receipt.py",
+     "blueprints/runtime-workers/openhands/recipe.py",
+     "blueprints/runtime-workers/openhands/research.md",
+     "blueprints/runtime-workers/openhands/worker.py",
+     "docs/secret-storage.md",
+     "tests/test_runtime_worker_openhands.py"
+    ],
+    "file_missing_by_index": [
+     "files[1024]",
+     "files[1029]",
+     "files[1030]",
+     "files[1031]",
+     "files[1032]",
+     "files[1034]"
+    ],
+    "file_missing_by_path": [
+     "blueprints/runtime-workers/openhands/config/skills.lock.json",
+     "blueprints/runtime-workers/openhands/e2e/fixture-repo/README.md",
+     "blueprints/runtime-workers/openhands/e2e/fixture-repo/range_utils.py",
+     "blueprints/runtime-workers/openhands/e2e/fixture-repo/tests/test_ranges.py",
+     "blueprints/runtime-workers/openhands/e2e/frozen.json",
+     "blueprints/runtime-workers/openhands/e2e/task.txt"
+    ],
+    "other_lines": 0
+   },
+   "note": "Expected until the coordinator re-registers manifests/evidence.json, which this worker must not touch. validate() collects every error, including the credential-inventory check and the publication scan of registered files, before it fails. The only errors are the SHA-256 and byte-count pairs for the 14 registered files this takeover changed, and the index and path entries for the six phase-1 orphans deleted in phase 1. New unregistered files are outside that scan; command 20 scans them."
+  },
+  {
+   "id": "20-private-content-scan",
+   "command": "python3 scripts/validate.py --scan-file <each file added or modified since efa73f40, 18 files>; then the same scan of a planted file containing a home-directory path",
+   "exit_code": 0,
+   "output": "{\"scanned_files\": 18, \"status\": \"passed\"}",
+   "note": "The planted negative control exited 1 with a personal-home-path finding, so the scan detects what it claims to. The changed files were also checked for the host user name: no matches."
+  },
+  {
+   "id": "21-post-fix-green",
+   "tree": "Commit 34d43059.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 0,
+   "summary": [
+    "Ran 107 tests in 2.091s",
+    "OK"
+   ],
+   "note": "Rerun after the review fix, which corrects two sentences: the decision record now says the proxy also joins $S-int as gw, and the README says the host reaches the proxy's 8080 through loopback while the agent can also reach it as gw:8080. git diff --check exited 0 and the private-content scan of both edited files passed."
+  },
+  {
+   "id": "22-validate-job-offline",
+   "tree": "Commit 34d43059.",
+   "command": "unshare --user --map-current-user --net --keep-caps sh -c 'ip link set lo up && exec setpriv --inh-caps=-all --ambient-caps=-all -- sh \"$0\" \"$1\" \"$2\"' <scratch>/p2/ci_local.sh <worktree> <scratch>/p2/runs/ci-local-head",
+   "script": "ci_local.sh sets TMPDIR=/var/tmp/claude-425-p2 and PYTHONDONTWRITEBYTECODE=1, then runs the validate job's read-only check commands from .github/workflows/validate.yml:80-121 in order and prints each exit code. The earlier steps (example workflow identity, zizmor, actionlint) and the node step at lines 142-143 check paths this build does not touch and were not run.",
+   "output": [
+    "01 rc=1 | python3 scripts/validate.py",
+    "02 rc=0 | python3 scripts/host_receipts.py validate",
+    "03 rc=0 | python3 scripts/release_due.py --strict-if-repinned origin/main",
+    "04 rc=0 | python3 scripts/validate_catalogs.py",
+    "05 rc=0 | python3 scripts/validate_foundation.py --root . --json",
+    "06 rc=0 | python3 scripts/landscape.py --root .",
+    "07 rc=0 | python3 blueprints/blind-catalog-convergence/audit_reports.py --check",
+    "08 rc=1 | python3 scripts/validate_convergence.py --all-recorded --root . --json",
+    "09 rc=0 | python3 tools/sota-convergence/build_verdicts.py --check",
+    "10 rc=0 | python3 scripts/component_matrix.py --check",
+    "11 rc=0 | python3 scripts/new_host_grand_list.py --check",
+    "12 rc=0 | python3 tools/sota-convergence/gap_crosswalk.py build --check",
+    "13 rc=0 | python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 --owner gap-resolution --check",
+    "14 rc=0 | python3 scripts/build_ecosystem.py --check"
+   ],
+   "failed_checks": {
+    "01": "After the first line, the 40 lines are the 14 SHA-256 and byte-count pairs and the 12 file-missing lines listed under entry 19, and nothing else.",
+    "08": "{\"records\": [{\"errors\": [\"record discovery: invalid, changed or empty evidence manifest\"], \"observations\": 0, \"valid\": false}], \"valid\": false}"
+   },
+   "base_control": {
+    "command": "git archive efa73f40453911d3ac9583218530273677983053 | tar -x -C <scratch>/p2/base-tree; then, in that tree, TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 unshare --user --map-current-user --net python3 scripts/validate.py, and the same for python3 scripts/validate_convergence.py --all-recorded --root . --json",
+    "exit_codes": {
+     "validate.py": 1,
+     "validate_convergence.py": 1
+    },
+    "validate_excerpt": "24 lines after the first: the same 12 file-missing lines, and the SHA-256 and byte-count pairs of README.md, dispatch.py, host.py, receipt.py and research.md under blueprints/runtime-workers/openhands/ and of tests/test_runtime_worker_openhands.py. Every base line also appears at head; the 16 head-only lines are the pairs of the eight registered files this build changed that the manifest still matched at base.",
+    "validate_convergence_output": "Identical to check 08 at head."
+   },
+   "note": "Both failures come from manifests/evidence.json, which the coordinator re-registers after #429 lands, and the base already fails both checks the same way. The other twelve checks exit 0."
+  },
+  {
+   "id": "23-full-suite-offline",
+   "tree": "Commit 34d43059.",
+   "command": "TMPDIR=/var/tmp/claude-425-p2 PYTHONDONTWRITEBYTECODE=1 unshare --user --map-current-user --net --keep-caps sh -c 'ip link set lo up && exec setpriv --inh-caps=-all --ambient-caps=-all -- python3 -m unittest'",
+   "exit_code": 1,
+   "summary": [
+    "Ran 6881 tests in 658.496s",
+    "FAILED (failures=29, errors=45, skipped=765)"
+   ],
+   "non_ok_lines_per_module": {
+    "test_adaptive_market_research": 7,
+    "test_adaptive_paper_credential_race": 22,
+    "test_adaptive_paper_credential_source": 19,
+    "test_adaptive_paper_runner": 6,
+    "test_catalog_freshness_propose": 1,
+    "test_gpt6_family_tiering_20260926": 1,
+    "test_native_faults_min": 16,
+    "test_order_throughput": 1,
+    "test_path_safety": 1
+   },
+   "distinct_first_exception_lines": [
+    "safety.SafetyError: credential_file_permissions:ancestor (x28)",
+    "credential_guard.CredentialGuardError: credential_file_permissions:ancestor (x17)",
+    "market_research.ResearchError: credential_file_permissions:ancestor (x11)",
+    "AssertionError: 'credential_file_permissions:ancestor' != 'alpaca_paper_only:live_host' (x4)",
+    "AssertionError: 'credential_file_permissions:ancestor' != 'alpaca_paper_only:not_paper_host' (x4)",
+    "AssertionError: Regex didn't match: 'credential_file_permissions:missing' not found in 'credential_file_permissions:ancestor' (x2)",
+    "market_research_bound_check.ResearchError: credential_file_permissions:ancestor (x1)",
+    "ValueError: refused (x1)",
+    "AssertionError: {'disable_hardlink_check': {'mutation': 'd[21452 chars]\\n'}} != {} (x1)",
+    "AssertionError: 'credential_file_permissions:ancestor' != 'duplicate_credential_variable' (x1)",
+    "AssertionError: Tuples differ: (1, 'credential_file_permissions:ancestor') != (1, 'alpaca_paper_only:not_paper_host') (x1)",
+    "AssertionError: SafetyError('credential_file_permissions:ancestor') is not None (x1)",
+    "AssertionError: 1 != 0 : Publication validation failed: (x1)",
+    "AssertionError: 2 != 5 : run_arm: the temporary directory /tmp must lie outside the state directory and every repository (x1)"
+   ],
+   "note": "This is the validate job's `python3 -m unittest` step (.github/workflows/validate.yml:140-141), run offline and without the promotion-gate venv that the job provisions first. tests.test_runtime_worker_openhands and every module not listed had no failure or error. Entry 24 finds each of the 74 non-ok lines at the base as well; that control, not the reading that follows, is the attribution. The exception lines name three conditions of this run: the user namespace maps only the invoking user, so root-owned ancestors such as / and /var appear with the overflow owner and the credential-file ancestor checks refuse them (most lines); the publication validator fails on the stale evidence manifest of entry 22; and the tiering runner refuses /tmp as its temporary directory because this worktree lies under /tmp."
+  },
+  {
+   "id": "24-suite-failure-attribution",
+   "command": "git clone -q --shared --no-checkout <worktree> <scratch>/p2/base-clone && git -C <scratch>/p2/base-clone checkout -q efa73f40453911d3ac9583218530273677983053; then, in the same namespace as entry 23, <scratch>/p2/attrib.sh runs `python3 -m unittest` over the nine modules of entry 23 in the base clone and in <worktree> at commit 34d43059",
+   "exit_codes": {
+    "base": 1,
+    "head": 1
+   },
+   "summary": {
+    "base": [
+     "Ran 541 tests in 100.811s",
+     "FAILED (failures=29, errors=45, skipped=71)"
+    ],
+    "head": [
+     "Ran 541 tests in 101.273s",
+     "FAILED (failures=29, errors=45, skipped=71)"
+    ]
+   },
+   "non_ok_lines_per_module": "Identical at base and head, and equal to entry 23's counts.",
+   "comparison": "The sorted FAIL and ERROR header lines are identical at base and head (74 each, empty difference both ways), and so are the distinct first exception lines. None of the 74 is introduced by this build. The control does not show that these tests pass at head: most stop at the ancestor check, so their later assertions never ran. Neither the nine modules nor the sources they exercise read a path this build changed, with one exception. test_catalog_freshness_propose's publication-validator test runs scripts/validate.py over a copy of the repository, which reads the registered files this build changed; it fails on the stale manifest at base and head, and its first real run comes after the manifest is re-registered."
+  }
+ ]
+}

@@ -1,0 +1,108 @@
+{
+ "items": [
+  {
+   "id": "S1",
+   "verdict": "agree",
+   "resolution_text": "",
+   "reasons": "The sentence accurately describes the workflow and checked-in required-check configuration. Executing the workflow script confirmed that both headings pass with content, while wrong capitalization, blank sections and comment-only sections fail. Explicitly directing agents to the template addresses gh's handling of supplied bodies. The live ruleset API could not be independently refreshed.",
+   "sources": [
+    {
+     "locator": ".github/workflows/validate.yml:335-338",
+     "quote": "const match = body.match(/^#{2,3}[ \\t]+SOTA sources[ \\t]*$([\\s\\S]*?)(?=^#{2,3}[ \\t]|(?![\\s\\S]))/m);\n            const content = match ? match[1].replace(/<!--[\\s\\S]*?-->/g, '').trim() : '';"
+    },
+    {
+     "locator": ".github/main-ruleset.json:42",
+     "quote": "{\"context\": \"sota-sources\", \"integration_id\": 15368}"
+    },
+    {
+     "locator": ".github/pull_request_template.md:11-13",
+     "quote": "### SOTA sources\n\n<!-- Required (AGENTS.md top rule; the sota-sources check fails without it)."
+    },
+    {
+     "locator": "https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/create/create.go",
+     "quote": "`--template` is not supported when using `--body` or `--body-file`"
+    },
+    {
+     "locator": "https://github.com/NVIDIA/warp/blob/e477c3ba2d84a5aa843f029821e071f06b7dea72/AGENTS.md",
+     "quote": "If opening a pull request on GitHub, use the template in `.github/PULL_REQUEST_TEMPLATE.md`."
+    },
+    {
+     "locator": "https://code.claude.com/docs/en/best-practices",
+     "quote": "Repository etiquette (branch naming, PR conventions)"
+    }
+   ],
+   "confidence": 0.97
+  },
+  {
+   "id": "X5a",
+   "verdict": "amend",
+   "resolution_text": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+   "reasons": "The proposal's capitalized 'Never' breaks the case-sensitive procedure check at tests/test_install_claude_profile.py:967 and consequently both PortableTopRuleTests. The amendment preserves the operator's headline and compounding sentence, the existing installed-client authority, and the required lowercase phrase. Both tests pass against the amendment in memory; the complete template contains 1,235 words, below the 1,265-word ceiling.",
+   "sources": [
+    {
+     "locator": "examples/claude-native/CLAUDE.md:3",
+     "quote": "Upstream and the installed client are the source of truth."
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:935",
+     "quote": "\"never self-write without a SOTA source\","
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:967",
+     "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:931",
+     "quote": "BASELINE_WORDS = 1205"
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:962",
+     "quote": "return int(cls.BASELINE_WORDS * 1.05)"
+    }
+   ],
+   "confidence": 0.99
+  },
+  {
+   "id": "X5b",
+   "verdict": "agree",
+   "resolution_text": "",
+   "reasons": "The proposal matches the supplied operator paragraph verbatim. It retains research, source attribution, the no-source stop rule and the distinction between popularity and evidence. The unchanged verification pointer preserves the installed-client-first procedure. The relevant root-instruction reference test passes with this replacement in memory.",
+   "sources": [
+    {
+     "locator": "AGENTS.md:3",
+     "quote": "With no SOTA source, stop and report instead of writing one."
+    },
+    {
+     "locator": "AGENTS.md:5",
+     "quote": "Check capability claims in the order given in [Upstream verification and compounding learning](docs/harness-defaults.md#upstream-verification-and-compounding-learning), and record each proven mistake in its anti-pattern log."
+    },
+    {
+     "locator": "docs/harness-defaults.md:7",
+     "quote": "Decide by evidence and research convergence: a choice stands when current primary sources (native help, official docs, maintained upstream) and reproduced results on the actual change agree"
+    },
+    {
+     "locator": "tests/test_adoption_docs_consistency.py:848",
+     "quote": "self.assertTrue(link in (ROOT / \"AGENTS.md\").read_text(encoding=\"utf-8\"), f\"AGENTS.md does not link {link}\")"
+    }
+   ],
+   "confidence": 0.99
+  },
+  {
+   "id": "X5c",
+   "verdict": "reject",
+   "resolution_text": "",
+   "reasons": "The proposed line breaks an additional tested obligation omitted from the packet's excerpt: test_top_rule_and_upstream_text_are_verbatim pins the entire top-rule block's SHA-256 and requires exactly 120 words. In-memory substitution changes the block to 144 words and fails that test; the original passes. Adopting the wording requires a coordinated update outside this single-text replacement.",
+   "sources": [
+    {
+     "locator": "tests/test_codex_worker_lane.py:45-47",
+     "quote": "# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0\n# hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.\nTOP_RULE_SHA256 = \"476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311\""
+    },
+    {
+     "locator": "tests/test_codex_worker_lane.py:209-210",
+     "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 120)"
+    }
+   ],
+   "confidence": 1.0
+  }
+ ]
+}

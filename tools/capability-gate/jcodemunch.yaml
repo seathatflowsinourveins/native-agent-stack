@@ -1,0 +1,112 @@
+# Capability gate: jcodemunch under `codex exec --profile stack-worker` in the main checkout, driven by promptfoo 0.123.1's
+# openai:codex-sdk (site/docs/providers/openai-codex-sdk.md) through codex-profile-exec. Run it with run_gate.py, which
+# sets the env templates below (promptfoo renders `{{ env.X }}` at config load, site/docs/configuration/guide.md) and
+# reconciles every row with the native Codex OTel tool_result records in Loki. The profile decides model and effort.
+# Gate rows must pass; each control must fail: `prompt` approval (Codex refuses the call under approval policy never,
+# decision F7 in docs/decisions/2026-09-26-token-practice-f1-f9.md) and a disabled server (no tool to call).
+description: capability gate, jcodemunch
+tracing:
+  enabled: true
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+prompts:
+  - '{{ instruction }}'
+providers:
+  - id: openai:codex-sdk
+    label: gate
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_MAIN_CHECKOUT }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+  - id: openai:codex-sdk
+    label: ctrl-prompt
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_MAIN_CHECKOUT }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          jcodemunch:
+            default_tools_approval_mode: prompt
+  - id: openai:codex-sdk
+    label: ctrl-disabled
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_MAIN_CHECKOUT }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          jcodemunch:
+            enabled: false
+defaultTest:
+  assert:
+    # Exactly one call to the server: trajectory spans (site/docs/configuration/expected-outputs/deterministic.md).
+    - type: trajectory:tool-used
+      value:
+        pattern: 'mcp jcodemunch/*'
+        min: 1
+        max: 1
+    # That call was the prescribed one (order, action search_symbols, with the brief's repo and query), completed
+    # without error and returned the function's symbol id and full signature, neither of which the task contains.
+    - type: javascript
+      value: file://assertions.js:completedResult
+      config:
+        server: jcodemunch
+        tool: order
+tests:
+  - description: gate a
+    providers: [gate]
+    options:
+      repeat: 3
+    vars:
+      instruction: file://briefs/jcodemunch-a.md
+      detail: '^(?=[\s\S]*"id"\s*:\s*"scripts/host_receipts\.py::register_file#function")(?=[\s\S]*"signature"\s*:\s*"def register_file\(root: Path, relative_path: str\) -> None")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"register_file"}}'
+  - description: gate b
+    providers: [gate]
+    options:
+      repeat: 3
+    vars:
+      instruction: file://briefs/jcodemunch-b.md
+      detail: '^(?=[\s\S]*"id"\s*:\s*"tools/sota-convergence/landscape-sweep/build_args\.py::profile_servers_without_base#function")(?=[\s\S]*"signature"\s*:\s*"def profile_servers_without_base\(profile_bytes: bytes, base_servers: list\) -> list")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"profile_servers_without_base"}}'
+  - description: ctrl-prompt a
+    providers: [ctrl-prompt]
+    vars:
+      instruction: file://briefs/jcodemunch-a.md
+      detail: '^(?=[\s\S]*"id"\s*:\s*"scripts/host_receipts\.py::register_file#function")(?=[\s\S]*"signature"\s*:\s*"def register_file\(root: Path, relative_path: str\) -> None")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"register_file"}}'
+  - description: ctrl-prompt b
+    providers: [ctrl-prompt]
+    vars:
+      instruction: file://briefs/jcodemunch-b.md
+      detail: '^(?=[\s\S]*"id"\s*:\s*"tools/sota-convergence/landscape-sweep/build_args\.py::profile_servers_without_base#function")(?=[\s\S]*"signature"\s*:\s*"def profile_servers_without_base\(profile_bytes: bytes, base_servers: list\) -> list")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"profile_servers_without_base"}}'
+  - description: ctrl-disabled a
+    providers: [ctrl-disabled]
+    vars:
+      instruction: file://briefs/jcodemunch-a.md
+      detail: '^(?=[\s\S]*"id"\s*:\s*"scripts/host_receipts\.py::register_file#function")(?=[\s\S]*"signature"\s*:\s*"def register_file\(root: Path, relative_path: str\) -> None")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"register_file"}}'
+  - description: ctrl-disabled b
+    providers: [ctrl-disabled]
+    vars:
+      instruction: file://briefs/jcodemunch-b.md
+      detail: '^(?=[\s\S]*"id"\s*:\s*"tools/sota-convergence/landscape-sweep/build_args\.py::profile_servers_without_base#function")(?=[\s\S]*"signature"\s*:\s*"def profile_servers_without_base\(profile_bytes: bytes, base_servers: list\) -> list")'
+      call: '{"action":"search_symbols","args":{"repo":"native-agent-stack","query":"profile_servers_without_base"}}'

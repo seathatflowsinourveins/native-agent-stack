@@ -1,0 +1,473 @@
+{
+  "findings": [
+    {
+      "id": "P1:action",
+      "verdict": "amend",
+      "reason": "Approval can remain pending, but the proposed flag location does not distinguish reused from fresh pins: affinityConnection is truthy for both. Replace the implementation requirement with: 'Explicitly distinguish eligible-pin reuse from cold selection; finalize the cold account and its binding under the existing selection lock before dispatch.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/services/auth.ts:891-917,1185-1190,1965-1987; src/sse/services/sessionAffinityPin.ts:280-319"
+    },
+    {
+      "id": "P1:adopted_rule",
+      "verdict": "amend",
+      "reason": "Binding to the served account is a defensible lane requirement, but not the claimed common invariant. LiteLLM's losing concurrent claimant logs the different winning pin without changing its selected deployment. Replace the attribution with: 'This lane requires binding to the dispatched account; reference implementations have different race and escape semantics.'",
+      "source": "BerriAI/litellm@d09bbae1:litellm/router_utils/pre_call_checks/deployment_affinity_check.py:344-362,655-683"
+    },
+    {
+      "id": "P1:upstream_sources",
+      "verdict": "amend",
+      "reason": "sub2api lines 1327-1330 describe weighted-sticky fallback, not ordinary cold selection. Replace the cold-binding citation with lines 1237-1238 and retain its !PreserveStickyBinding exception.",
+      "source": "Wei-Shaw/sub2api@fd80b08c:backend/internal/service/openai_account_scheduler.go:1237-1244,1269-1274,1327-1335"
+    },
+    {
+      "id": "P1:overturn_condition",
+      "verdict": "refute",
+      "reason": "Residual off-pin traffic or failure to exceed the unmatched 73.76% baseline does not establish that the override did not cause cache loss. Replace with: 'Any unexplained eligible-pin violation fails routing correctness; evaluate cache benefit separately using matched workload, account availability, quota and concurrency strata.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/0/overturn_condition; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md"
+    },
+    {
+      "id": "P7:adopted_rule",
+      "verdict": "confirm",
+      "reason": "The billing correction is supported: API cache-write pricing establishes no subscription quota penalty. Official Codex credit documentation separately disclaims a cache-write charge and says credit prices do not determine included subscription usage.",
+      "source": "[OpenAI pricing — Token rates](https://learn.chatgpt.com/docs/pricing#token-rates)"
+    },
+    {
+      "id": "P7:overturn_condition",
+      "verdict": "amend",
+      "reason": "'Sustained queueing' and 'a stated threshold' supply no actual window or threshold. Replace with: 'Before testing, declare the observation window, minimum sample, concurrency/quota strata, numerical latency/error margins and the admission change triggered by each failure.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/6/overturn_condition"
+    },
+    {
+      "id": "P18:adopted_rule",
+      "verdict": "refute",
+      "reason": "'Never a reason to move' conflicts with P7, ADD-P1P7 and P18's own overturn condition, which permit occupancy-bound escapes. Replace them with one rule: 'Initially wait or reject on the pinned account; introduce an occupancy escape only after a separately approved, continuation-safe comparison.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/1; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/6/adopted_rule"
+    },
+    {
+      "id": "P18:upstream_sources",
+      "verdict": "confirm",
+      "reason": "The CPA qualification is accurate: Home owns the concurrency policy; its busy error is a typed 429, positive Retry-After is rounded upward, and that error stops credential retry. This establishes gateway admission behavior, not a provider-enforced cap.",
+      "source": "router-for-me/CLIProxyAPI@4a2c8186:config.example.yaml:92-118; sdk/cliproxy/auth/home_concurrency.go:23-40,315-326; sdk/cliproxy/auth/conductor_selection.go:1337-1344"
+    },
+    {
+      "id": "P18:verify_metric",
+      "verdict": "amend",
+      "reason": "A 429/in-flight correlation cannot distinguish concurrency admission from quota exhaustion or request-rate limits. Replace with: 'Classify provider error reasons and quota windows; compare per-account concurrency bins at matched quota headroom and workload, using predeclared sample sizes and regression margins.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/1/verify_metric; router-for-me/CLIProxyAPI@4a2c8186:sdk/cliproxy/auth/home_concurrency.go:23-40"
+    },
+    {
+      "id": "P19:adopted_rule",
+      "verdict": "amend",
+      "reason": "Token lifetime/reset rules are supported, but dropping the token alone does not reproduce Codex's ownership transition. Replace the exception with: 'On an account change, reset account-bound transport and incremental response state as well as turn-state, then establish a verified safe continuation.'",
+      "source": "openai/codex@rust-v0.157.1:codex-rs/core/src/client.rs:11-15,278-297,1537-1548"
+    },
+    {
+      "id": "P19:overturn_condition",
+      "verdict": "refute",
+      "reason": "Documentation permitting cross-account turn-state would not establish that migration costs only cache; other continuation state remains independent. Replace with: 'Relax ownership only when every affected continuation mechanism is documented or independently verified compatible and answer-fidelity criteria pass.'",
+      "source": "openai/codex@rust-v0.157.1:codex-rs/core/src/client.rs:11-18,273-297,1537-1548"
+    },
+    {
+      "id": "ADD-LIVE:converged",
+      "verdict": "confirm",
+      "reason": "Convergence holds for the explicitly limited code claim: both recorded positions agree, and the deployed source selects affinity before an unguarded occupancy replacement. The private numerical measurements remain single-family evidence.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/services/auth.ts:1974-1987,2159-2177; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/8"
+    },
+    {
+      "id": "ADD-LIVE:overturn_condition",
+      "verdict": "amend",
+      "reason": "'Throughput or 429 avoidance by more than measured cache loss' compares different units without a decision function. Replace with: 'Predeclare separate fidelity, completion, latency, quota-burn and cache criteria, numerical regression margins, and the rollback or admission action each criterion triggers.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/8/overturn_condition"
+    },
+    {
+      "id": "ADD-P1P7:adopted_rule",
+      "verdict": "refute",
+      "reason": "sub2api can weight stickiness against relative load and preserve the old binding during temporary escape. The adopted TTFT/error escape also conflicts with P7's rejection of those escapes for this lane. Replace with a conservative lane policy that explicitly acknowledges these upstream exceptions.",
+      "source": "Wei-Shaw/sub2api@fd80b08c:backend/internal/service/openai_account_scheduler.go:455-472,565-610,1023-1038,1066-1086; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/6/adopted_rule"
+    },
+    {
+      "id": "P17:action",
+      "verdict": "confirm",
+      "reason": "Applied is supported for the explicitly scoped limiter sub-action: the retained before/after receipt changes only autoEnableApiKeyProviders and records the sharedgw limiter becoming disabled. It does not establish implementation of P17's retry, identifier or deadline requirements.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/limiter-apply-20129.json; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/0/action_detail"
+    },
+    {
+      "id": "P17:overturn_condition",
+      "verdict": "amend",
+      "reason": "The rollback condition requires attribution to the removed throttle, but supplies neither a matched baseline nor usable cross-hop attempt accounting. Replace with: 'Compare fixed-load windows with joined attempts, queue waits and terminal completions; predeclare numerical regression limits that restore the limiter.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/0; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md"
+    },
+    {
+      "id": "P2:adopted_rule",
+      "verdict": "confirm",
+      "reason": "The checked references support explicit identity before heuristics, ordinary selection when identity is absent, and caller-scoped keys with an unscoped namespace when no authenticated caller exists. This confirms the rule, not complete OmniRoute implementation.",
+      "source": "router-for-me/CLIProxyAPI@4a2c8186:sdk/cliproxy/auth/selector.go:981-1028; BerriAI/litellm@d09bbae1:litellm/router_utils/pre_call_checks/deployment_affinity_check.py:248-255"
+    },
+    {
+      "id": "P6:omniroute_state",
+      "verdict": "amend",
+      "reason": "Within-request pk/session/thread equality does not measure parent-child inheritance. Codex also constructs source:parent_thread_id keys for Internal sessions. Replace with: 'Inheritance occurs when actual parent and child affinity keys match; measure parent-child key/account pairs separately for subagent, fork, compaction and review sessions.'",
+      "source": "openai/codex@36650394:codex-rs/core/src/client.rs:571-593; diegosouzapw/OmniRoute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:197-221"
+    },
+    {
+      "id": "P9:verify_metric",
+      "verdict": "refute",
+      "reason": "Not every 429 produces a rotation audit entry. The pipeline records one only when attempts remain and an eligible replacement is found. Replace with: 'Every executed rotation has one audit entry; classify non-rotated 429s by disabled rotation, exhausted budget or unavailable alternatives.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/handlers/chatCore/providerExecutionPipeline.ts:373-405"
+    },
+    {
+      "id": "P10:omniroute_state",
+      "verdict": "amend",
+      "reason": "The no-GPT-family-fallback conclusion holds, but 'empty family' is inaccurate. Replace with: 'getNextFamilyFallback returns null; getModelFamily returns [model], providing no alternate larger-context candidate.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/services/modelFamilyFallback.ts:30-101,252-283"
+    },
+    {
+      "id": "P11:verify_metric",
+      "verdict": "amend",
+      "reason": "An excluded credential whose next request 'would have succeeded' is counterfactual and cannot be counted from breaker snapshots. Replace with: 'Record exclusion reasons and bounded recovery-probe outcomes; distinguish successful probes from proven misclassification of quota or cancellation events.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/1/items/2/verify_metric"
+    },
+    {
+      "id": "P13:omniroute_state",
+      "verdict": "amend",
+      "reason": "chat.ts:405 rejects unsupported managed-combo configurations; it is not hedge execution. Replace the citation with comboAttemptLoop.ts:318-330, whose execution gate additionally requires a successor target and excludes protected-priority targets.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/handlers/chat.ts:392-408; open-sse/services/combo/comboAttemptLoop.ts:318-330"
+    },
+    {
+      "id": "P14:omniroute_state",
+      "verdict": "refute",
+      "reason": "x-client-request-id is not limited to WebSocket handshakes. HTTP Responses requests also set it to thread_id. Replace with: 'Both transports carry the thread-scoped header; it remains unsuitable as a per-operation idempotency key.'",
+      "source": "openai/codex@36650394:codex-rs/codex-api/src/endpoint/responses.rs:60-95; codex-rs/core/src/client.rs:1294-1309"
+    },
+    {
+      "id": "P15:adopted_rule",
+      "verdict": "confirm",
+      "reason": "The cited projects support heterogeneous model selection and candidate-model fallback. Rejecting configurations that substitute the requested model, while permitting constrained account selection, matches their behavior and the lane's exact-model contract.",
+      "source": "vllm-project/semantic-router@65731237:README.md:32-43; katanemo/plano@003c36ae:docs/routing-api.md:3-11"
+    },
+    {
+      "id": "P16:adopted_rule",
+      "verdict": "amend",
+      "reason": "OTel does not prohibit genuine conversation IDs merely because they are UUIDs. Replace with: 'Record a real application conversation/session/thread ID when available; otherwise leave the attribute unset rather than inventing a UUID, trace ID or content hash.'",
+      "source": "open-telemetry/semantic-conventions-genai@e57c543b4889619eb2a05702471937db5119165d:docs/registry/attributes/gen-ai.md:94-109"
+    },
+    {
+      "id": "P16:verify_metric",
+      "verdict": "amend",
+      "reason": "The retained state already fails its correlation targets and lacks routing reasons. Replace with: 'Complete operation/attempt correlation and outbound model/effort coverage are prerequisites for retry and hop comparisons; missing coverage makes those comparisons inconclusive.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/1/items/7"
+    },
+    {
+      "id": "P21:adopted_rule",
+      "verdict": "confirm",
+      "reason": "LiteLLM's checked guard declines transparent fallback after content generation or when failure was not before the first chunk. The record correctly separates transparent retry from a separately specified continuation protocol.",
+      "source": "BerriAI/litellm@d09bbae1:litellm/router.py:490-498"
+    },
+    {
+      "id": "P22:action",
+      "verdict": "amend",
+      "reason": "Retaining configuration does not satisfy the required fidelity gate. Replace with: 'Retained for evaluation only; prevent unqualified rewriting of Codex continuation traffic until deterministic fidelity and task-quality gates pass.' The receipt explicitly lists corruption probes still required.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/5; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/ab-requirements.md"
+    },
+    {
+      "id": "P23:verify_metric",
+      "verdict": "amend",
+      "reason": "'~0' seconds after cancellation has no grace interval or observation boundary. Replace with: 'Measure disconnect-to-abort and slot-release against a declared grace; separately count post-cancellation retries, leaked slots and health mutations. Gateway cancellation does not prove hosted computation stopped.'",
+      "source": "BerriAI/litellm@d09bbae1:litellm/proxy/common_request_processing.py:781-829; smg-project/smg@3be823a7:model_gateway/src/middleware/concurrency.rs:455-476"
+    },
+    {
+      "id": "R1:adopted_rule",
+      "verdict": "confirm",
+      "reason": "LiteLLM strips encrypted reasoning when the origin lies outside the resolved group and no compatible encryption-boundary peer exists; an unavailable same-group origin instead fails. The record correctly identifies the stripping path as a distinct continuation risk.",
+      "source": "BerriAI/litellm@d09bbae1:litellm/router_utils/pre_call_checks/encrypted_content_affinity_check.py:335-380"
+    },
+    {
+      "id": "R2:adopted_rule",
+      "verdict": "confirm",
+      "reason": "Bifrost's cited routines clear encrypted/signature fields or drop reasoning details. Retained readable narrative is therefore not preservation of the removed verifiable state, as the record states.",
+      "source": "maximhq/bifrost@8e99cf83:core/encryptedreasoning.go:220-235,275-295"
+    },
+    {
+      "id": "R3:overturn_condition",
+      "verdict": "refute",
+      "reason": "A substitute passing a task suite still violates the exact-requested-model contract and R3's own rule. Replace with: 'Only the exact requested model and effort qualify; authorizing a different model requires a separate explicit contract change.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/11; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/1/items/1/adopted_rule"
+    },
+    {
+      "id": "R4:adopted_rule",
+      "verdict": "refute",
+      "reason": "The 'verified equivalent' exception permits substitutions that contradict P10/P15 and zero-mismatch acceptance. Replace with: 'Fallback groups may differ, but resolved upstream model, effective effort and continuation contract must remain identical; benchmark equivalence does not authorize substitution.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/12; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/1/items/1/adopted_rule"
+    },
+    {
+      "id": "R5:adopted_rule",
+      "verdict": "confirm",
+      "reason": "OpenRouter documents best-effort Auto/Pareto model stickiness: a previous model leaving the candidate set invalidates the hint, allowing a different model on a later turn.",
+      "source": "[OpenRouter — Using session_id for sticky sessions](https://openrouter.ai/docs/guides/best-practices/prompt-caching#using-session_id-for-sticky-sessions)"
+    },
+    {
+      "id": "R6:adopted_rule",
+      "verdict": "amend",
+      "reason": "An appended configuration_update can change effective effort while preserving the prefix; it is not necessarily value-preserving normalization. Replace with: 'Unauthorized effort changes violate quality requirements. Preserve authorized append-only updates and the original request-level baseline; evaluate cache effects from actual prefix changes.'",
+      "source": "[OpenAI prompt caching — Change reasoning effort without rewriting the prefix](https://developers.openai.com/api/docs/guides/prompt-caching#how-to-optimize-prompt-caching)"
+    },
+    {
+      "id": "R7:overturn_condition",
+      "verdict": "amend",
+      "reason": "A configuration constrained to the same model is itself same-model routing, so the proposed comparator cannot distinguish it. Replace with: 'Require exact model/effort preservation and a preregistered benefit over the current account-selection baseline.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/15/overturn_condition"
+    },
+    {
+      "id": "R8:verify_metric",
+      "verdict": "amend",
+      "reason": "Non-inferiority lacks a margin, frozen task set, statistic and exposure window. Task success can also miss the receipt's numerical and tool-output corruption. Replace with: 'Predeclare those quantities and require exact-number, tool-output and multi-turn fidelity probes before authorizing rewrites.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/16/verify_metric; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/ab-requirements.md"
+    },
+    {
+      "id": "P4:verify_metric",
+      "verdict": "amend",
+      "reason": "The path-wide chat cache baseline is not a measured keyless cohort, and any positive difference can pass despite noise. Replace with: 'Use matched requests lacking explicit identity; predeclare sample size, load strata, minimum cache improvement and task non-inferiority, with zero model/effort mismatches.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/3; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-mapper-final.json:/live_metrics/20128/cache_by_path"
+    },
+    {
+      "id": "P12:adopted_rule",
+      "verdict": "amend",
+      "reason": "SRE assigns overload retries immediately above the rejecting layer, not one fixed owner for every failure. Replace with: '20128 owns provider-overload retries; separately bound recovery for gateway and transport failures, propagating terminal overload disposition to prevent retry multiplication.'",
+      "source": "[Google SRE — Deciding to Retry](https://sre.google/sre-book/handling-overload/#deciding-to-retry)"
+    },
+    {
+      "id": "P12:verify_metric",
+      "verdict": "amend",
+      "reason": "The named join cannot currently measure attempts: resilience_actions is empty and zero of ten downstream correlation IDs reach 20128. Replace with: 'Demonstrate complete operation/attempt correlation across both hops before admitting the retry-owner A/B.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/1/items/3"
+    },
+    {
+      "id": "P3:omniroute_state",
+      "verdict": "refute",
+      "reason": "The claimed body-derived upstream session_id omits a later overwrite. Default OAuth session fingerprinting derives an account-based identity and replaces session-id/session_id. Body prompt_cache_key can survive while the cache-affinity header changes. K01 retains this behavior; its cache effect remains unmeasured.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/config/codexIdentity.ts:171-183,211-220,295-300,453-480; open-sse/executors/codex.ts:1176-1184; openai/codex@36650394:codex-rs/core/src/client.rs:585-593"
+    },
+    {
+      "id": "P3:verify_metric",
+      "verdict": "amend",
+      "reason": "An affinity key kind proves neither key equality nor outbound header preservation. Replace with: 'Compare actual inbound/outbound prompt_cache_key, session-id/session_id, thread-id and conversation identity across both hops, explicitly accounting for K01 transformations; key kind is auxiliary evidence.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:197-221; open-sse/config/codexIdentity.ts:453-480"
+    },
+    {
+      "id": "P5:adopted_rule",
+      "verdict": "refute",
+      "reason": "Long exhaustion does not make unverified migration unavoidable. The cited LiteLLM path permits compatible encryption-boundary peers, otherwise fails an unavailable same-group origin without a duration exception. Replace with: 'Migration requires demonstrated compatibility or faithful reconstruction; otherwise return an explicit unavailable/quota error.'",
+      "source": "BerriAI/litellm@d09bbae1:litellm/router_utils/pre_call_checks/encrypted_content_affinity_check.py:323-348,374-410"
+    },
+    {
+      "id": "P5:omniroute_state",
+      "verdict": "refute",
+      "reason": "'Only Grok items are dropped' and unrestricted 'no strip' are false. The common reasoning policy drops item_reference/string entries and sanitizes other reasoning representations. Replace with: 'Valid opaque Codex reasoning is retained on the checked native path, subject to sanitizer rules; other continuation representations can be removed.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/services/reasoningInputPolicy.ts:257-305; open-sse/executors/codex.ts:1529-1537"
+    },
+    {
+      "id": "P5:overturn_condition",
+      "verdict": "refute",
+      "reason": "Equal answers cannot establish that foreign encrypted reasoning was honored; visible history may suffice. Replace with: 'Use repeated state-sensitive tasks, same-origin positive controls, visible-history-only negative controls and a predefined fidelity margin. Equality alone cannot retire origin compatibility.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/4/verify_metric; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/0/items/4/overturn_condition"
+    },
+    {
+      "id": "U1:verify_metric",
+      "verdict": "amend",
+      "reason": "Cached/uncached-input regression omits output, reasoning and other account activity; 'stable weight' is undefined. Replace with: 'Use complete account traffic and identified quota windows, control output/reasoning consumption, and predeclare uncertainty and held-out stability criteria; report association rather than a provider accounting guarantee.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/26; openai/codex@36650394:codex-rs/codex-api/src/rate_limits.rs:53-102"
+    },
+    {
+      "id": "U2:verify_metric",
+      "verdict": "refute",
+      "reason": "The API documents a minimum lifetime of 30 minutes after reuse, not expiry at 30 minutes. Replace with: 'Measure a controlled retention curve across idle gaps with identical prefix, account, model and routing identity; do not infer subscription guarantees from the API minimum.'",
+      "source": "[OpenAI prompt caching — Cache lifetime](https://developers.openai.com/api/docs/guides/prompt-caching#cache-lifetime)"
+    },
+    {
+      "id": "U4:verify_metric",
+      "verdict": "amend",
+      "reason": "Concurrency-binned 429s alone cannot identify a concurrency cap. Replace with: 'Separate typed concurrency errors from quota/rate errors; match model, account, quota headroom and load, and predeclare the error-rate increase that activates P18 admission.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/29; openai/codex@36650394:codex-rs/codex-api/src/rate_limits.rs:53-102"
+    },
+    {
+      "id": "M1:omniroute_state",
+      "verdict": "amend",
+      "reason": "Earlier native continuation handling was missed. Replace with: 'Outside preserve mode, chat.ts reconstructs stored input/output plus the delta or returns previous_response_not_found. The store requires a matching non-null API-key ID, so the recorded keyless lane fails closed on this path; exposure remains unmeasured.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/handlers/chat.ts:747-779; src/lib/db/responsesContinuationStore.ts:196-208,222-248"
+    },
+    {
+      "id": "M2:omniroute_state",
+      "verdict": "amend",
+      "reason": "The late strip helper does not describe the complete native path. Replace with: 'Native non-preserve handling expands stored history before deleting previous_response_id and errors when reconstruction fails. Preserve mode skips reconstruction; evaluate other ingress paths separately.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/handlers/chat.ts:720-779; src/lib/db/responsesContinuationStore.ts:75-149; open-sse/utils/responsesStatePolicy.ts:35-89"
+    },
+    {
+      "id": "M3:adopted_rule",
+      "verdict": "confirm",
+      "reason": "The documented and implemented mechanism preserves the request-level baseline while appending ordered effort updates. The client gates emission on provider/model support, supporting the record's unresolved lane-exposure qualification.",
+      "source": "openai/codex@36650394:codex-rs/core/src/session/reasoning_effort.rs:26-91; codex-rs/core/src/client.rs:548-552; [OpenAI reasoning — Change reasoning mid-conversation](https://developers.openai.com/api/docs/guides/reasoning#change-reasoning-mid-conversation)"
+    },
+    {
+      "id": "M4:omniroute_state",
+      "verdict": "refute",
+      "reason": "Native passthrough is not unchanged apart from reasoning sanitation. Processing can repair tool history, normalize roles/tools, rewrite metadata and strip parameters before returning. Replace that claim with an explicit transformation inventory and per-field fidelity checks; effective heartbeat overrides also remain unverified.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1342-1417,1490-1537; open-sse/config/codexIdentity.ts:483-501; open-sse/utils/sseHeartbeat.ts:14-24,38-48"
+    },
+    {
+      "id": "M5:overturn_condition",
+      "verdict": "refute",
+      "reason": "Observing only the default limit family does not eliminate separate windows, missing durations or model-specific cooldowns. Replace with: 'Only additional-family handling can become dormant; retain account/window/model scope and measured window durations.'",
+      "source": "openai/codex@36650394:codex-rs/codex-api/src/rate_limits.rs:53-102; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/34/overturn_condition"
+    },
+    {
+      "id": "P8:action",
+      "verdict": "confirm",
+      "reason": "Rejecting lever (d) as a cold-binding optimization is supported for the checked lane: fresh pins use LRU, while inner Codex 429 rotation requests credentials without a session key. The record retains the broader quota-aware practice while declining this setting.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/sse/services/sessionAffinityPin.ts:280-319; open-sse/handlers/chatCore/providerExecutionPipeline.ts:373-405"
+    },
+    {
+      "id": "E1:action",
+      "verdict": "confirm",
+      "reason": "The repository's primary archive metadata states that its owner archived it on June 12, 2026. This supports exclusion under the record's archive rule, without independently establishing the separate last-push date.",
+      "source": "[tensorzero/tensorzero — repository archive banner](https://github.com/tensorzero/tensorzero)"
+    },
+    {
+      "id": "E2:converged",
+      "verdict": "confirm",
+      "reason": "not_checked accurately preserves JOB 2's explicit omission of the required maintenance checks. This confirms the historical review label, not RouteLLM's alleged stale status.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-job2.last.json:/verdicts; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/18"
+    },
+    {
+      "id": "E3:adopted_rule",
+      "verdict": "amend",
+      "reason": "unverified: the record relies on pushed_at despite requiring a default-branch last-commit check; GitHub REST and read-only gh retrieval did not establish it. Replace with: 'Helicone remains provisionally unreviewed; stale status awaits the stipulated maintenance check.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/19"
+    },
+    {
+      "id": "E5:adopted_rule",
+      "verdict": "amend",
+      "reason": "unverified: the retained TSV reports the May 25 default-branch date, but independent GitHub commit retrieval failed. The January release pin cannot prove that later tip. Replace with: 'Stale according to the retained maintenance receipt; not independently reverified here.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/maintenance-gh-20260928.tsv:17; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/21"
+    },
+    {
+      "id": "E6:action",
+      "verdict": "refute",
+      "reason": "The pinned README explicitly supports Codex, Responses, credential pools and key rotation; model-switch routing is optional. 'This lane is Codex' cannot justify product-wide rejection. Reopen review of constrained same-model pooling, without automatically adopting it.",
+      "source": "musistudio/claude-code-router@471e715c20cfa855c681f6d31dc652164d4fa654:README.md:39,60-72,206-211"
+    },
+    {
+      "id": "E9:overturn_condition",
+      "verdict": "amend",
+      "reason": "A qualifying candidate that never changes model or effort is itself same-model routing, making the stated comparator self-defeating. Replace with: 'A constrained exact-model/exact-effort configuration must demonstrate benefit over the existing account-routing policy.'",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/25/overturn_condition"
+    },
+    {
+      "id": "P20:adopted_rule",
+      "verdict": "amend",
+      "reason": "The guide does not require forwarding every unknown header. Replace that bullet with: 'For Anthropic-format upstreams, forward anthropic-* request headers and request-body fields as open lists; apply the documented bridging rules for other dialects.' Other headers may be consumed or ignored.",
+      "source": "[Claude Code gateway guide — Forward as open lists](https://code.claude.com/docs/en/llm-gateway-protocol#forward-as-open-lists)"
+    },
+    {
+      "id": "U3:action",
+      "verdict": "confirm",
+      "reason": "The recorded inventory has Codex accounts and sharedgw, with no Claude connection. Not applicable follows for this recorded lane; Claude OAuth cache isolation itself remains unsettled.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-mapper-final.json:627-631"
+    },
+    {
+      "id": "E4:converged",
+      "verdict": "confirm",
+      "reason": "not_checked matches JOB 2's explicit omission of the vllm-project/router release and maintenance checks. It must not be interpreted as verification of the catalog's no-release claim.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-job2.last.json:/verdicts; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/20"
+    },
+    {
+      "id": "E7:action",
+      "verdict": "confirm",
+      "reason": "The pinned README concerns self-hosted generative-model endpoints on Kubernetes. That supports deployment inapplicability to this hosted subscription pool. Its EPP relocation statement does not independently establish complete scorer equivalence.",
+      "source": "kubernetes-sigs/gateway-api-inference-extension@50872e0605d89e73a50d0dd6d4137d80440f623d:README.md:8-23,29-44"
+    },
+    {
+      "id": "E8:converged",
+      "verdict": "confirm",
+      "reason": "not_checked correctly records that JOB 2 opened SMG but did not verify the SGLang release or relocation history. Reviewing SMG does not close that separate historical claim.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-job2.last.json:/verdicts; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json:/groups/2/items/24"
+    },
+    {
+      "id": "record:/status",
+      "verdict": "confirm",
+      "reason": "observed is supportable as a historical research/decision record, not runtime qualification. The commit contains 51 unique adjudicated items; all 35 checked artifact-hash references match, and the limitations explicitly withhold runtime acceptance.",
+      "source": "native-agent-stack@6145a1fd:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:/observations; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/adjudication.json"
+    },
+    {
+      "id": "record:/decision_and_scope/decision",
+      "verdict": "confirm",
+      "reason": "trial matches the retained decisions: limiter application with unmeasured effect, an approved but unapplied occupancy patch, and no qualification runs. It does not justify treating the adopted rules as verified deployed behavior.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/decisions.json:/decisions; native-agent-stack@6145a1fd:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:/decision_and_scope"
+    },
+    {
+      "id": "record:README#The failure",
+      "verdict": "refute",
+      "reason": "The blanket four-gateway assertion is false. Replace with: 'The checked strict-affinity paths preserve eligible bindings; LiteLLM ordered fallback and sub2api weighted-sticky/temporary-escape paths are exceptions.' These exceptions do not negate OmniRoute's independently demonstrated ordering defect.",
+      "source": "BerriAI/litellm@d09bbae1:litellm/router_utils/pre_call_checks/deployment_affinity_check.py:432-433; Wei-Shaw/sub2api@fd80b08c:backend/internal/service/openai_account_scheduler.go:455-472,565-610,1023-1038"
+    },
+    {
+      "id": "record:/observations",
+      "verdict": "amend",
+      "reason": "unverified: relayed runs and private readbacks do not expose their original execution evidence. Preserve the failed/withdrawn statuses; describe other passed statuses as reported completion or schema/readback checks. Replace unretained process exit codes with null, and identify native_cli_execution evidence and private contract results as historical, coordinator-reported observations.",
+      "source": "native-agent-stack@6145a1fd:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:/observations; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/decisions.json"
+    },
+    {
+      "id": "record:/usage_assessment",
+      "verdict": "confirm",
+      "reason": "none/partial accurately describes coverage. The two recorded GPT job totals reconcile with their disjoint input/output categories; reasoning is not added twice, other model usage remains unknown, and no savings claim is made.",
+      "source": "native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json:/jobs; native-agent-stack@6145a1fd:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:/usage_assessment"
+    },
+    {
+      "id": "record:/next_decision_changing_test",
+      "verdict": "amend",
+      "reason": "Peak >=10 or roughly 300 turns/hour selects loaded windows but does not match load. Replace with: 'Freeze sample/window and regression margins; match concurrency distributions, account availability, quota and workload. Require zero unexplained eligible-pin violations and model/effort mismatches. Verify payload, identifier and continuation fidelity before admitting the changed lane.'",
+      "source": "native-agent-stack@6145a1fd:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:/next_decision_changing_test; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/ab-requirements.md"
+    },
+    {
+      "id": "record:/observations/15/scope",
+      "verdict": "amend",
+      "reason": "Missing quota snapshot rows do not prove unchanged upstream usage: persistence skips unchanged observations and can also fail. Replace the absolute cutoff conclusion with: 'No cutoff was observed in retained snapshots/logs through 03:29Z; establish poll freshness and persistence success before inferring continuous quota state.'",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/domain/quotaCache.ts:569-588; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/route-mapper-part1-final.md"
+    },
+    {
+      "id": "harm:1",
+      "verdict": "amend",
+      "reason": "The approved patch and retained four-hour TTL do not preserve continuation ownership after expiry. Expiry deletes the pin and fresh selection uses LRU even when the original account is healthy. Add idle-gap continuation cases around four hours and require compatible origin or explicit failure; stickyRoundRobinLimit=1 does not protect this path.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:src/lib/db/sessionAccountAffinity.ts:63-83; src/sse/services/sessionAffinityPin.ts:280-319; src/sse/services/auth.ts:1995-2007"
+    },
+    {
+      "id": "harm:2",
+      "verdict": "amend",
+      "reason": "The P17 limiter lift leaves the retained hop's identifier gaps unchanged. DefaultExecutor forwards x-session-id but omits Codex session-id, thread-id and x-codex-turn-state. Require bidirectional header/state continuity before Codex CLI admission; body-key survival and probe-only HTTP successes cannot establish it.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/executors/default.ts:682-702; open-sse/utils/opencodeHeaders.ts:109-116,153-182; openai/codex@36650394:codex-rs/codex-api/src/requests/headers.rs:5-14"
+    },
+    {
+      "id": "harm:3",
+      "verdict": "amend",
+      "reason": "Retained 20129 defaultMode=off does not disable context compaction. sharedgw lacks the native-Codex bypass, so threshold-triggered compaction can rewrite earlier input. Require a pre-admission fidelity gate or exclusion, checking instructions, tools, input items and opaque state. This is a reachable source-derived risk, not observed corruption in this review.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/handlers/chatCore.ts:1443-1449,2134-2162,2210-2231; open-sse/handlers/chatCore/passthroughHelpers.ts:47-66"
+    },
+    {
+      "id": "harm:4",
+      "verdict": "amend",
+      "reason": "unverified: end-to-end model/tier/max preservation across both hops is not established by incomplete effort columns. For the patch, limiter lift and any expiry-first test, require per-attempt exact-model/tier/effective-max checks including configuration_update, with no ultra. The checked executor preserves ordinary explicit max, maps ultra to max, and has no GPT-family fallback candidate.",
+      "source": "diegosouzapw/OmniRoute@dd6e9607e:open-sse/executors/codex.ts:1424-1464; open-sse/services/modelFamilyFallback.ts:30-101,181-191; native-agent-stack@6145a1fd:evidence/artifacts/omniroute-routing-20260928/ab-requirements.md"
+    },
+    {
+      "id": "missing:1",
+      "verdict": "amend",
+      "reason": "Add an explicit OAuth-refresh concurrency practice and verification. sub2api serializes refresh per credential, rereads credentials under the lock and handles another worker owning refresh. Review equivalent protection before concentrated pinned-account traffic; this finding does not assert OmniRoute lacks it.",
+      "source": "Wei-Shaw/sub2api@fd80b08c:backend/internal/service/oauth_refresh_api.go:159-212; backend/internal/service/openai_token_provider.go:172-240"
+    },
+    {
+      "id": "missing:2",
+      "verdict": "amend",
+      "reason": "Add terminal stream validation. Codex treats response.failed, response.incomplete and EOF before response.completed as failures even after HTTP 200. Record terminal SSE events and final client outcomes; do not use all-200 counts as completion or continuation-fidelity evidence.",
+      "source": "openai/codex@36650394:codex-rs/codex-api/src/sse/responses.rs:417-511,609-620"
+    }
+  ],
+  "overall": "The trial and approved occupancy-patch objective stand conditionally; implementation and runtime acceptance remain unproven and require these amendments. Counts: 21 confirm, 17 refute, 40 amend. Coverage is limited to the fields reported. checked: P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, R1, R2, R3, R4, R5, R6, R7, R8, E1, E2, E3, E4, E5, E6, E7, E8, E9, U1, U2, U3, U4, M1, M2, M3, M4, M5, ADD-LIVE, ADD-P1P7; not checked: none."
+}

@@ -30,6 +30,14 @@ max_concurrent_threads_per_session = 3
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
 startup_timeout_sec = 60
+# Approve auto-approves even under approval_policy = "never":
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L98
+# RawMcpServerConfig / McpServerToolConfig: codex-rs/core/config.schema.json at the same tag.
+# Read front door: jcodemunch-mcp 1.108.319, counter.py FRONT_DOOR and server.py:5500-5577:
+# https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py
+# `order` defaults allow_state_change=false but accepts true; this list is not a read-only sandbox.
+default_tools_approval_mode = "approve"
+enabled_tools = ["route", "menu", "order"]
 
 [mcp_servers.jcodemunch.env]
 RTK_TELEMETRY_DISABLED = "1"

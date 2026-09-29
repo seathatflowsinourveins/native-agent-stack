@@ -1,0 +1,38 @@
+{
+ "rule": "apply a text only when all four valid judgments choose it",
+ "judgments": {
+  "gpt6-AB": {
+   "choice": "B",
+   "text_of": "gpt6",
+   "void": false,
+   "leak": false,
+   "confidence": 0.91
+  },
+  "gpt6-BA": {
+   "choice": "B",
+   "text_of": "claude",
+   "void": false,
+   "leak": false,
+   "confidence": 0.87
+  },
+  "claude-AB": {
+   "choice": "A",
+   "text_of": "claude",
+   "void": true,
+   "leak": false,
+   "confidence": 0.65
+  },
+  "claude-BA": {
+   "choice": "B",
+   "text_of": "claude",
+   "void": true,
+   "leak": false,
+   "confidence": 0.65
+  }
+ },
+ "valid_judgments": 2,
+ "outcome": {
+  "decision": "split: lines 15-18 unchanged, both texts recorded",
+  "text_of": null
+ }
+}

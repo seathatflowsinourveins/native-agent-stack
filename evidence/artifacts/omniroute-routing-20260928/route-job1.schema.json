@@ -1,0 +1,211 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "practices",
+  "rejected_practices",
+  "calls",
+  "notes",
+  "skills_used"
+ ],
+ "properties": {
+  "practices": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "practice",
+     "upstreams",
+     "no_maintained_upstream",
+     "applicability",
+     "quality_risk",
+     "verification_metric",
+     "evidence"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "practice": {
+      "type": "string"
+     },
+     "upstreams": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "repository",
+        "tag",
+        "commit",
+        "tag_resolves_to_commit_confirmed",
+        "file_lines",
+        "line_verified",
+        "maintenance"
+       ],
+       "properties": {
+        "repository": {
+         "type": "string"
+        },
+        "tag": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "commit": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "tag_resolves_to_commit_confirmed": {
+         "type": [
+          "boolean",
+          "null"
+         ]
+        },
+        "file_lines": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        },
+        "line_verified": {
+         "type": "boolean"
+        },
+        "maintenance": {
+         "type": "object",
+         "additionalProperties": false,
+         "required": [
+          "status",
+          "last_default_branch_commit",
+          "archived",
+          "checked_via"
+         ],
+         "properties": {
+          "status": {
+           "type": "string",
+           "enum": [
+            "maintained",
+            "stale",
+            "unknown",
+            "too_new"
+           ]
+          },
+          "last_default_branch_commit": {
+           "type": [
+            "string",
+            "null"
+           ]
+          },
+          "archived": {
+           "type": [
+            "boolean",
+            "null"
+           ]
+          },
+          "checked_via": {
+           "type": "string"
+          }
+         }
+        }
+       }
+      }
+     },
+     "no_maintained_upstream": {
+      "type": "boolean"
+     },
+     "applicability": {
+      "type": "string"
+     },
+     "quality_risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "level",
+       "description"
+      ],
+      "properties": {
+       "level": {
+        "type": "string",
+        "enum": [
+         "none",
+         "low",
+         "medium",
+         "high"
+        ]
+       },
+       "description": {
+        "type": "string"
+       }
+      }
+     },
+     "verification_metric": {
+      "type": "string"
+     },
+     "evidence": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  },
+  "rejected_practices": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "practice",
+     "reason",
+     "source"
+    ],
+    "properties": {
+     "practice": {
+      "type": "string"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "source": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "calls": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "web_search",
+    "web_fetch",
+    "gh_api"
+   ],
+   "properties": {
+    "web_search": {
+     "type": "integer"
+    },
+    "web_fetch": {
+     "type": "integer"
+    },
+    "gh_api": {
+     "type": "integer"
+    }
+   }
+  },
+  "notes": {
+   "type": "string"
+  },
+  "skills_used": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ }
+}

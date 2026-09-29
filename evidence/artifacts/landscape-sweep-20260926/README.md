@@ -15,8 +15,9 @@ coordinator owns and will run from this manifest.
 The run used the 2026-09-26 scratchpad prototype of the lane. The same lane is now packaged as
 [`tools/sota-convergence/landscape-sweep/`](../../../tools/sota-convergence/landscape-sweep/README.md) (#324). The
 run's `prompts_sha256` is `3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4`, the sha256 of the
-prototype's staged templates. The packaged templates, filled with this run's values, give the same hash (a local check
-in `tests/test_landscape_sweep_harness.py`). The packaged tools produced the returns, lanes, layers, usage records,
+prototype's staged templates. The packaged templates, filled with this run's values, gave the same hash until the
+2026-09-27 template edits (#385), a local check whose value `tests/test_landscape_sweep_harness.py` keeps as
+`PROMPTS_SHA256_20260926`. The packaged tools produced the returns, lanes, layers, usage records,
 manifest and source reviews. `tavily-leads.json`, the lead-vetting addendum `tavily-leads-vetting.json` and the
 attempts' compact records were written for this record, and each states its method.
 

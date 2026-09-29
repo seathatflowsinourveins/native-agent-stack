@@ -54,7 +54,7 @@ url = "http://${AI_MEMORY_URL}/mcp"
 
 [mcp_servers.socraticode]
 command = "${ECO_ROOT}/bin/node"
-args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+args = ["${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js"]
 startup_timeout_sec = 120
 
 [mcp_servers.socraticode.env]

@@ -190,6 +190,8 @@ processors:
     log_statements:
       - context: resource
         statements:
+          # Claude Code custom resource attributes (including the RUNBOOK's run key):
+          # https://code.claude.com/docs/en/monitoring-usage#multi-team-organization-support
           - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "ecosystem.task.id", "ecosystem.client.scope"])
       - context: scope
         statements:
@@ -203,7 +205,16 @@ processors:
           - set(severity_text, "")
           - set(event_name, "")
           - set(body, "[content omitted]")
-          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id"])
+          # Codex logs full arguments; max_bytes limits only output: openai/codex rust-v0.157.1,
+          # codex-rs/otel/src/tool_result.rs:55-79,94. Keep namespace even when mcp_server is absent.
+          # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/processor/transformprocessor/README.md
+          # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/pkg/ottl/ottlfuncs/README.md#delete_key
+          - delete_key(attributes, "arguments")
+          # Claude API estimated cost and tool correlation: https://code.claude.com/docs/en/monitoring-usage
+          # OTTL retention: open-telemetry/opentelemetry-collector-contrib v0.161.0, pkg/ottl/ottlfuncs/func_keep_keys.go.
+          # Loki stores these as structured metadata; only service.name is indexed by the backend template.
+          # Codex size fields (tool_result.rs:64,74-76) are retained when supplied; lengths are trace-only upstream.
+          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "tool_use_id", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "cost_usd", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "arguments_length", "output_length", "output_line_count", "output_truncated", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope", "tool_family", "actor", "shell_rtk", "tool_details", "client", "mcp_server.name", "mcp_tool.name", "skill.name", "invocation_trigger", "subagent_type", "agent.name", "agent_type", "total_tool_uses", "workflow.run_id", "originator", "kind", "state", "sender_thread_id", "receiver_thread_id"])
     metric_statements:
       - context: resource
         statements:

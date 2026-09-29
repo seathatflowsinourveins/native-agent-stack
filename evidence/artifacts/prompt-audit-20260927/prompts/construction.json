@@ -1,0 +1,59 @@
+{
+ "note": "The prompts as sent named host paths and quoted one session URL, so they are not retained verbatim. The retained headers, briefs, packet and inputs replace host paths with placeholders and redact the URL. Each recorded_prompt_sha256 is the runner's hash of the prompt as sent; on 2026-09-27, before sanitizing, it was compared with the sent file on the host (matches_sent_file).",
+ "packet_sha256_as_frozen": "0e6b6430a06f1de9f92d7c5a3316e698e7f365aac85515db7d2d32645da27877",
+ "gpt6_runner_jobs": {
+  "audit-judge": {
+   "bytes": 100682,
+   "recorded_prompt_sha256": "b3dab6763de087b12d61e0014625fd5c61a4d074cd26fc44bbd63d9de15db04b",
+   "matches_sent_file": true,
+   "parts": [
+    "prompts/gpt6-round1-header.txt",
+    "packet.md as frozen (before the redaction)",
+    "\\n\\n# Shared primary sources (sources.json)\\n\\n```json\\n",
+    "sources.json as json.dumps(indent=1, ensure_ascii=False)",
+    "\\n```\\n"
+   ]
+  },
+  "adjudicate-AB": {
+   "bytes": 105265,
+   "recorded_prompt_sha256": "c51ccd65f784a816897c2f341f881526f36dd63899fcbcd2d029a812a51da0ba",
+   "matches_sent_file": true,
+   "parts": [
+    "prompts/gpt6-adjudicate-header.txt",
+    "adjudication/input.AB.md (before the redaction)",
+    "\\n\\n# sources.json and sources-supplement.json\\n\\n```json\\n",
+    "sources.json",
+    "\\n",
+    "sources-supplement.json",
+    "```\\n"
+   ]
+  },
+  "adjudicate-BA": {
+   "bytes": 105265,
+   "recorded_prompt_sha256": "8c0047d1013773af01ef608453c1a1e143a24dd76569ec468ff381f4a1c07b3f",
+   "matches_sent_file": true,
+   "parts": [
+    "prompts/gpt6-adjudicate-header.txt",
+    "adjudication/input.BA.md (before the redaction)",
+    "\\n\\n# sources.json and sources-supplement.json\\n\\n```json\\n",
+    "sources.json",
+    "\\n",
+    "sources-supplement.json",
+    "```\\n"
+   ]
+  },
+  "probe": {
+   "bytes": 170,
+   "recorded_prompt_sha256": "2a4fe3fb11d52e82037bc6d5fd29028d84ea8efe94368a0d39d8d47a0af641e9",
+   "matches_sent_file": true,
+   "parts": [
+    "build_args.PROBE_PROMPT (tools/sota-convergence/landscape-sweep/build_args.py)"
+   ]
+  }
+ },
+ "claude_briefs": [
+  "prompts/claude-round1-brief.txt",
+  "prompts/claude-adjudicate-brief.AB.txt",
+  "prompts/claude-adjudicate-brief.BA.txt"
+ ]
+}

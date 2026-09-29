@@ -1,0 +1,312 @@
+{
+ "schema": "tree_drift_check/2",
+ "argv": [
+  "evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py",
+  "--checkout",
+  ".",
+  "--skill",
+  "supply-chain-risk-auditor",
+  "--allow",
+  "scripts/uv.lock",
+  "--folder",
+  "/var/tmp/tdc-controls.wfFZOC/planted/supply-chain-risk-auditor"
+ ],
+ "started_utc": "2026-09-28T16:46:26Z",
+ "runs": [
+  {
+   "argv": [
+    "gh",
+    "--version"
+   ],
+   "started_utc": "2026-09-28T16:46:26Z",
+   "exit": 0,
+   "finished_utc": "2026-09-28T16:46:26Z",
+   "stdout_bytes": 81,
+   "stdout_sha256": "67fa67f4744161d2a5e279ae6395705c1bc33d44ce3130e9330b0165f3607bec",
+   "stderr_bytes": 0
+  },
+  {
+   "argv": [
+    "gh",
+    "api",
+    "repos/trailofbits/skills/git/trees/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae?recursive=1"
+   ],
+   "started_utc": "2026-09-28T16:46:26Z",
+   "exit": 0,
+   "finished_utc": "2026-09-28T16:46:27Z",
+   "stdout_bytes": 566463,
+   "stdout_sha256": "1b533474133a0b86c16b286e16fcff5928e2de1dee9700cda11bd7079b686134",
+   "stderr_bytes": 0
+  }
+ ],
+ "method": {
+  "script": "tree_drift_check.py",
+  "script_sha256": "17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b",
+  "module": "scripts/skills_status.py",
+  "module_sha256": "adf89cd8d0846c273164201f06bb7a6ea4b80b6bea6158048a060b28eb559246",
+  "functions": [
+   "_git_blob_sha",
+   "git_tree_sha",
+   "load_manifest",
+   "check_folder_tree",
+   "check_canonical",
+   "check_lock_entry"
+  ],
+  "runtime_artifact_dirs": [
+   ".mypy_cache",
+   ".pytest_cache",
+   ".ruff_cache",
+   ".venv",
+   "__pycache__",
+   "node_modules"
+  ],
+  "python": "3.13.15",
+  "gh_version": "gh version 2.101.0 (2026-09-15)"
+ },
+ "local": {
+  "folder": "/var/tmp/tdc-controls.wfFZOC/planted/supply-chain-risk-auditor",
+  "left_out_runtime_artifacts": [
+   {
+    "path": "scripts/.venv",
+    "type": "directory"
+   },
+   {
+    "path": "scripts/__pycache__",
+    "type": "directory"
+   }
+  ],
+  "tree_sha_as_on_disk": "4003b4ddc8e390ac14fce7ac5780516e80780e24",
+  "tree_sha_without_runtime_artifacts": "afc61d236cc06895d2a09cec30317fd12bc14a12",
+  "tree_sha_from_rows": "afc61d236cc06895d2a09cec30317fd12bc14a12",
+  "skills_status_folder_tree_state": "drift",
+  "skill_md_sha256_state": "ok",
+  "lock_entry_state": "ok",
+  "blobs": 13,
+  "rows": [
+   {
+    "path": "SKILL.md",
+    "mode": "100644",
+    "blob": "83affaaf2841182c5eb610338256f7f540b270aa"
+   },
+   {
+    "path": "agents/openai.yaml",
+    "mode": "100644",
+    "blob": "e5b0835efdd8b2fb3b9b5ba6d586656e259e7a05"
+   },
+   {
+    "path": "assets/trail-of-bits-mark.svg",
+    "mode": "100644",
+    "blob": "7cd6e7ca7348897984f2498f301a888bb2f3ca71"
+   },
+   {
+    "path": "scripts/collect.py",
+    "mode": "100644",
+    "blob": "d3238e3fdfb700c6e239f6f41d359be2bad4fca8"
+   },
+   {
+    "path": "scripts/model.py",
+    "mode": "100644",
+    "blob": "e948adfcfe124905de4f29618f3a1efd20923f82"
+   },
+   {
+    "path": "scripts/pyproject.toml",
+    "mode": "100644",
+    "blob": "e435affcc1cc64171dcd449fa61fd6afb588785e"
+   },
+   {
+    "path": "scripts/render.py",
+    "mode": "100644",
+    "blob": "b4aa9ca5f40ea76bc7b7f56cf6cb59a77d0487af"
+   },
+   {
+    "path": "scripts/sources.py",
+    "mode": "100644",
+    "blob": "0d65664fa3bc18f1fad72e01704eed0d9e4b32c5"
+   },
+   {
+    "path": "scripts/test_collect.py",
+    "mode": "100644",
+    "blob": "12dd8e6200a760002450c9e348220ec1685d5549"
+   },
+   {
+    "path": "scripts/test_model.py",
+    "mode": "100644",
+    "blob": "efbe08366de7b78bf333a51769f4a420d1bec9a4"
+   },
+   {
+    "path": "scripts/test_render.py",
+    "mode": "100644",
+    "blob": "54b1a5fef092855ee99be92be6393108609f8738"
+   },
+   {
+    "path": "scripts/test_sources.py",
+    "mode": "100644",
+    "blob": "42d9772a0320b28aaf44a94c8776cc2a92700345"
+   },
+   {
+    "path": "scripts/uv.lock",
+    "mode": "100644",
+    "blob": "ab864a16ac3b38bf469205ee65831b6737b4c867"
+   }
+  ],
+  "subtrees": {
+   "agents": "c1d1a4abef046ea0d98453c1933007c7459b71d7",
+   "assets": "b1735ba734fcf7e7898e1e79941fde53ccfa651c",
+   "scripts": "7ea3331a02b2bb1d8e1b1be101da0eaff3f44733"
+  }
+ },
+ "manifest": {
+  "skill": "supply-chain-risk-auditor",
+  "source": "trailofbits/skills",
+  "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+  "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+  "tree_sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b"
+ },
+ "allowed_differences": [
+  "scripts/uv.lock"
+ ],
+ "upstream": {
+  "response_sha": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+  "truncated": false,
+  "folder_row": {
+   "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+   "mode": "040000",
+   "type": "tree",
+   "sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b"
+  },
+  "rows_under_path": 16,
+  "rows": [
+   {
+    "path": "SKILL.md",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "83affaaf2841182c5eb610338256f7f540b270aa"
+   },
+   {
+    "path": "agents",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "c1d1a4abef046ea0d98453c1933007c7459b71d7"
+   },
+   {
+    "path": "agents/openai.yaml",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "e5b0835efdd8b2fb3b9b5ba6d586656e259e7a05"
+   },
+   {
+    "path": "assets",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "b1735ba734fcf7e7898e1e79941fde53ccfa651c"
+   },
+   {
+    "path": "assets/trail-of-bits-mark.svg",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "7cd6e7ca7348897984f2498f301a888bb2f3ca71"
+   },
+   {
+    "path": "scripts",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "eaedb5d0840e7b155657478dd547e66abec537d1"
+   },
+   {
+    "path": "scripts/collect.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "d3238e3fdfb700c6e239f6f41d359be2bad4fca8"
+   },
+   {
+    "path": "scripts/model.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "81407c29544a2a84ca19a286f01c25d76ab927e9"
+   },
+   {
+    "path": "scripts/pyproject.toml",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "e435affcc1cc64171dcd449fa61fd6afb588785e"
+   },
+   {
+    "path": "scripts/render.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "b4aa9ca5f40ea76bc7b7f56cf6cb59a77d0487af"
+   },
+   {
+    "path": "scripts/sources.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "0d65664fa3bc18f1fad72e01704eed0d9e4b32c5"
+   },
+   {
+    "path": "scripts/test_collect.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "12dd8e6200a760002450c9e348220ec1685d5549"
+   },
+   {
+    "path": "scripts/test_model.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "efbe08366de7b78bf333a51769f4a420d1bec9a4"
+   },
+   {
+    "path": "scripts/test_render.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "54b1a5fef092855ee99be92be6393108609f8738"
+   },
+   {
+    "path": "scripts/test_sources.py",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "42d9772a0320b28aaf44a94c8776cc2a92700345"
+   },
+   {
+    "path": "scripts/uv.lock",
+    "mode": "100644",
+    "type": "blob",
+    "sha": "2fb44882a94a99013d613493e38bb372dfbbdd84"
+   }
+  ],
+  "self_check": {
+   "tree_sha_from_rows": "954cc68e05e24a2a14447b60d1e8946b53323b1b",
+   "equals_folder_row": true,
+   "subtrees_equal_tree_rows": true
+  }
+ },
+ "comparison": {
+  "upstream_blobs": 13,
+  "local_blobs": 13,
+  "matching": 11,
+  "differing": [
+   {
+    "path": "scripts/model.py",
+    "local_mode": "100644",
+    "local_blob": "e948adfcfe124905de4f29618f3a1efd20923f82",
+    "upstream_mode": "100644",
+    "upstream_blob": "81407c29544a2a84ca19a286f01c25d76ab927e9"
+   },
+   {
+    "path": "scripts/uv.lock",
+    "local_mode": "100644",
+    "local_blob": "ab864a16ac3b38bf469205ee65831b6737b4c867",
+    "upstream_mode": "100644",
+    "upstream_blob": "2fb44882a94a99013d613493e38bb372dfbbdd84"
+   }
+  ],
+  "missing": [],
+  "extra": [],
+  "outside_allowed_set": [
+   "scripts/model.py"
+  ]
+ },
+ "substitution": null,
+ "result": "fail",
+ "finished_utc": "2026-09-28T16:46:27Z",
+ "exit": 1
+}

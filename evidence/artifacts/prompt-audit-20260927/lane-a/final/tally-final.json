@@ -1,0 +1,36 @@
+{
+ "rule": "both agree: apply; both reject: keep; same amendment: apply; otherwise adjudicate",
+ "void": {},
+ "items": {
+  "X5a": {
+   "lanes": {
+    "gpt6": {
+     "verdict": "agree",
+     "confidence": 0.98,
+     "resolution_text": ""
+    },
+    "claude": {
+     "verdict": "agree",
+     "confidence": 0.85,
+     "resolution_text": ""
+    }
+   },
+   "outcome": "apply the proposed change"
+  },
+  "X5c": {
+   "lanes": {
+    "gpt6": {
+     "verdict": "agree",
+     "confidence": 0.94,
+     "resolution_text": ""
+    },
+    "claude": {
+     "verdict": "amend",
+     "confidence": 0.6,
+     "resolution_text": "Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+    }
+   },
+   "outcome": "adjudicate (one blind round, both orders, both families; applied only when all four choose it)"
+  }
+ }
+}

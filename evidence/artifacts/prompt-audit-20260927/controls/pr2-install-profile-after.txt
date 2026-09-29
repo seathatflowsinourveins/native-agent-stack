@@ -1,0 +1,126 @@
+# the profile installer's tests, which pin AGENTS.md's dispatch line, on the PR-2 head, verbose (expect OK)
+# commit as run: 62b104d1d8c334a1bb36c49e6c3631657c4d4ab8 (base origin/main: b26add90becaed49cfd74f3cf48126b7fa9b5c86)
+# blobs as run (git hash-object):
+#   d7a4b908078357bebc9fd7389db7cb5aa6790ec8  AGENTS.md
+#   999304fba44f4c89bbfc8cc19d2b116172575633  tests/test_install_claude_profile.py
+# Python 3.13.15; TMPDIR set to a directory outside /tmp
+$ python3 -m unittest -v tests.test_install_claude_profile
+test_installs_every_adoption_agent (tests.test_install_claude_profile.AgentsInstallTests.test_installs_every_adoption_agent) ... ok
+test_second_run_skips_unchanged_files (tests.test_install_claude_profile.AgentsInstallTests.test_second_run_skips_unchanged_files) ... ok
+test_dry_run_writes_nothing (tests.test_install_claude_profile.GuardInstallTests.test_dry_run_writes_nothing) ... ok
+test_installs_when_absent (tests.test_install_claude_profile.GuardInstallTests.test_installs_when_absent) ... ok
+test_skips_when_already_matching (tests.test_install_claude_profile.GuardInstallTests.test_skips_when_already_matching) ... ok
+test_token_lanes_assets_cli_dry_run_and_temp_home_install (tests.test_install_claude_profile.GuardInstallTests.test_token_lanes_assets_cli_dry_run_and_temp_home_install) ... ok
+test_a_non_user_scope_server_is_left_alone (tests.test_install_claude_profile.McpGetOutputTests.test_a_non_user_scope_server_is_left_alone) ... mcp: ai-memory is registered at another scope (Managed config); left unchanged
+mcp: serena is registered at another scope (Managed config); left unchanged
+ok
+test_default_eco_root_follows_home (tests.test_install_claude_profile.McpGetOutputTests.test_default_eco_root_follows_home) ... ok
+test_dry_run_with_replace_shows_the_remove (tests.test_install_claude_profile.McpGetOutputTests.test_dry_run_with_replace_shows_the_remove) ... ok
+test_get_runs_outside_any_project (tests.test_install_claude_profile.McpGetOutputTests.test_get_runs_outside_any_project) ... ok
+test_header_lines_do_not_override_fields (tests.test_install_claude_profile.McpGetOutputTests.test_header_lines_do_not_override_fields) ... ok
+test_missing_claude_binary_is_a_clean_failure (tests.test_install_claude_profile.McpGetOutputTests.test_missing_claude_binary_is_a_clean_failure) ... ok
+test_recorded_env_output_matches_on_env_names (tests.test_install_claude_profile.McpGetOutputTests.test_recorded_env_output_matches_on_env_names) ... ok
+test_recorded_outputs_match_the_rendered_template (tests.test_install_claude_profile.McpGetOutputTests.test_recorded_outputs_match_the_rendered_template) ... ok
+test_reordered_or_extra_args_do_not_match (tests.test_install_claude_profile.McpGetOutputTests.test_reordered_or_extra_args_do_not_match) ... ok
+test_the_earlier_wrapper_registration_differs (tests.test_install_claude_profile.McpGetOutputTests.test_the_earlier_wrapper_registration_differs) ... ok
+test_http_server_does_not_match_a_different_url (tests.test_install_claude_profile.McpMatchTests.test_http_server_does_not_match_a_different_url) ... ok
+test_http_server_matches_on_url_and_type (tests.test_install_claude_profile.McpMatchTests.test_http_server_matches_on_url_and_type) ... ok
+test_stdio_server_checks_env_var_names_present (tests.test_install_claude_profile.McpMatchTests.test_stdio_server_checks_env_var_names_present) ... ok
+test_stdio_server_does_not_match_missing_env_var (tests.test_install_claude_profile.McpMatchTests.test_stdio_server_does_not_match_missing_env_var) ... ok
+test_stdio_server_matches_command_args_and_env_names (tests.test_install_claude_profile.McpMatchTests.test_stdio_server_matches_command_args_and_env_names) ... ok
+test_stdio_type_mismatch_against_http_entry (tests.test_install_claude_profile.McpMatchTests.test_stdio_type_mismatch_against_http_entry) ... ok
+test_differing_registration_is_left_unchanged_without_replace (tests.test_install_claude_profile.McpRenderAndCommandTests.test_differing_registration_is_left_unchanged_without_replace) ... mcp: ai-memory is already registered with a different config; left unchanged (re-run with --replace-mcp to re-register it at user scope)
+mcp: serena is already registered with a different config; left unchanged (re-run with --replace-mcp to re-register it at user scope)
+ok
+test_home_and_eco_root_are_rendered_in_command_and_env_values (tests.test_install_claude_profile.McpRenderAndCommandTests.test_home_and_eco_root_are_rendered_in_command_and_env_values) ... ok
+test_http_command (tests.test_install_claude_profile.McpRenderAndCommandTests.test_http_command) ... ok
+test_name_precedes_env_and_command_follows_double_dash (tests.test_install_claude_profile.McpRenderAndCommandTests.test_name_precedes_env_and_command_follows_double_dash) ... ok
+test_placeholders_are_rendered_for_the_target_host (tests.test_install_claude_profile.McpRenderAndCommandTests.test_placeholders_are_rendered_for_the_target_host) ... ok
+test_registers_only_the_servers_the_template_names (tests.test_install_claude_profile.McpRenderAndCommandTests.test_registers_only_the_servers_the_template_names) ... ok
+test_unknown_placeholder_fails (tests.test_install_claude_profile.McpRenderAndCommandTests.test_unknown_placeholder_fails) ... ok
+test_template_names_the_two_expected_servers (tests.test_install_claude_profile.McpTemplateShapeTests.test_template_names_the_two_expected_servers) ... ok
+test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off (tests.test_install_claude_profile.McpTemplateShapeTests.test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off) ... ok
+test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template (tests.test_install_claude_profile.PortableTopRuleTests.test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template) ... ok
+test_the_template_states_the_procedure_within_the_word_budget (tests.test_install_claude_profile.PortableTopRuleTests.test_the_template_states_the_procedure_within_the_word_budget) ... ok
+test_home_credential_stores_are_denied_with_their_context_mode_twins (tests.test_install_claude_profile.ProfileTemplateSettingsTests.test_home_credential_stores_are_denied_with_their_context_mode_twins) ... ok
+test_the_bash_ceiling_and_the_status_line_refresh (tests.test_install_claude_profile.ProfileTemplateSettingsTests.test_the_bash_ceiling_and_the_status_line_refresh) ... ok
+test_the_haiku_docs_agent_and_destructive_git_forms_are_denied (tests.test_install_claude_profile.ProfileTemplateSettingsTests.test_the_haiku_docs_agent_and_destructive_git_forms_are_denied) ... ok
+test_the_model_fallback_guards_stay (tests.test_install_claude_profile.ProfileTemplateSettingsTests.test_the_model_fallback_guards_stay) ... ok
+test_the_push_denies_also_match_the_rtk_rewrite (tests.test_install_claude_profile.ProfileTemplateSettingsTests.test_the_push_denies_also_match_the_rtk_rewrite) ... ok
+test_apply_merge_keeps_host_rules_and_adds_the_guard (tests.test_install_claude_profile.SecretGuardProfileTests.test_apply_merge_keeps_host_rules_and_adds_the_guard) ... ok
+test_install_guards_installs_all_hooks_pinned_by_sha256sums (tests.test_install_claude_profile.SecretGuardProfileTests.test_install_guards_installs_all_hooks_pinned_by_sha256sums) ... ok
+test_modified_hook_is_refused (tests.test_install_claude_profile.SecretGuardProfileTests.test_modified_hook_is_refused) ... ok
+test_rendered_hook_blocks_after_install_and_is_inert_before (tests.test_install_claude_profile.SecretGuardProfileTests.test_rendered_hook_blocks_after_install_and_is_inert_before) ... ok
+test_sha256sums_verifies_like_sha256sum_c (tests.test_install_claude_profile.SecretGuardProfileTests.test_sha256sums_verifies_like_sha256sum_c) ... ok
+test_template_carries_project_deny_rules_and_the_guard_hook (tests.test_install_claude_profile.SecretGuardProfileTests.test_template_carries_project_deny_rules_and_the_guard_hook) ... ok
+test_token_lanes_template_merges_once_alongside_existing_ai_memory (tests.test_install_claude_profile.SecretGuardProfileTests.test_token_lanes_template_merges_once_alongside_existing_ai_memory) ... ok
+test_agents_md_points_at_a_role_table_of_shipped_agents (tests.test_install_claude_profile.ShippedAgentCopiesAndDispatchTests.test_agents_md_points_at_a_role_table_of_shipped_agents) ... ok
+test_every_example_agent_is_byte_identical_to_its_installed_source (tests.test_install_claude_profile.ShippedAgentCopiesAndDispatchTests.test_every_example_agent_is_byte_identical_to_its_installed_source) ... ok
+test_every_preload_is_listing_eligible_and_targeted_roles_have_exact_skills (tests.test_install_claude_profile.ShippedAgentCopiesAndDispatchTests.test_every_preload_is_listing_eligible_and_targeted_roles_have_exact_skills) ... skipped 'PyYAML is not installed'
+test_project_scope_agents_are_the_installed_definitions (tests.test_install_claude_profile.ShippedAgentCopiesAndDispatchTests.test_project_scope_agents_are_the_installed_definitions) ... ok
+test_the_role_table_reader_needs_the_role_header (tests.test_install_claude_profile.ShippedAgentCopiesAndDispatchTests.test_the_role_table_reader_needs_the_role_header) ... ok
+test_each_shipped_agent_has_exactly_one_effort_max_line (tests.test_install_claude_profile.ShippedAgentEffortTests.test_each_shipped_agent_has_exactly_one_effort_max_line) ... ok
+test_the_check_rejects_a_lower_or_repeated_effort (tests.test_install_claude_profile.ShippedAgentEffortTests.test_the_check_rejects_a_lower_or_repeated_effort) ... ok
+test_each_shipped_agent_parses_as_a_yaml_mapping_with_documented_types (tests.test_install_claude_profile.ShippedAgentFrontmatterTests.test_each_shipped_agent_parses_as_a_yaml_mapping_with_documented_types) ... skipped 'PyYAML not installed; the text reader alone checked the frontmatter'
+test_each_shipped_agent_uses_documented_fields_and_an_explicit_model (tests.test_install_claude_profile.ShippedAgentFrontmatterTests.test_each_shipped_agent_uses_documented_fields_and_an_explicit_model) ... ok
+test_no_read_only_role_declares_memory (tests.test_install_claude_profile.ShippedAgentFrontmatterTests.test_no_read_only_role_declares_memory) ... ok
+test_the_check_rejects_a_misspelled_field_an_inherited_model_and_a_bad_value (tests.test_install_claude_profile.ShippedAgentFrontmatterTests.test_the_check_rejects_a_misspelled_field_an_inherited_model_and_a_bad_value) ... ok
+test_the_memory_check_rejects_memory_on_a_read_only_role_only (tests.test_install_claude_profile.ShippedAgentFrontmatterTests.test_the_memory_check_rejects_memory_on_a_read_only_role_only) ... ok
+test_the_yaml_check_rejects_unparseable_yaml_a_non_mapping_and_wrong_types (tests.test_install_claude_profile.ShippedAgentFrontmatterTests.test_the_yaml_check_rejects_unparseable_yaml_a_non_mapping_and_wrong_types) ... skipped 'PyYAML not installed; the text reader alone checked the frontmatter'
+
+----------------------------------------------------------------------
+Ran 58 tests in 0.202s
+
+OK (skipped=3)
+agents: installed <tmpdir>/.claude/agents/blind-adjudicator.md
+agents: installed <tmpdir>/.claude/agents/blind-judge.md
+agents: installed <tmpdir>/.claude/agents/blind-lane-reviewer.md
+agents: installed <tmpdir>/.claude/agents/evidence-reviewer.md
+agents: installed <tmpdir>/.claude/agents/isolated-builder.md
+agents: installed <tmpdir>/.claude/agents/landscape-sweep-worker.md
+agents: installed <tmpdir>/.claude/agents/security-reviewer.md
+agents: installed <tmpdir>/.claude/agents/semantic-evidence-reviewer.md
+agents: installed <tmpdir>/.claude/agents/source-scout.md
+agents: installed <tmpdir>/.claude/agents/stack-researcher.md
+agents: installed <tmpdir>/.claude/agents/stack-verifier.md
+agents: installed <tmpdir>/.claude/agents/blind-adjudicator.md
+agents: installed <tmpdir>/.claude/agents/blind-judge.md
+agents: installed <tmpdir>/.claude/agents/blind-lane-reviewer.md
+agents: installed <tmpdir>/.claude/agents/evidence-reviewer.md
+agents: installed <tmpdir>/.claude/agents/isolated-builder.md
+agents: installed <tmpdir>/.claude/agents/landscape-sweep-worker.md
+agents: installed <tmpdir>/.claude/agents/security-reviewer.md
+agents: installed <tmpdir>/.claude/agents/semantic-evidence-reviewer.md
+agents: installed <tmpdir>/.claude/agents/source-scout.md
+agents: installed <tmpdir>/.claude/agents/stack-researcher.md
+agents: installed <tmpdir>/.claude/agents/stack-verifier.md
+agents: <tmpdir>/.claude/agents/blind-adjudicator.md already matches; skipped
+agents: <tmpdir>/.claude/agents/blind-judge.md already matches; skipped
+agents: <tmpdir>/.claude/agents/blind-lane-reviewer.md already matches; skipped
+agents: <tmpdir>/.claude/agents/evidence-reviewer.md already matches; skipped
+agents: <tmpdir>/.claude/agents/isolated-builder.md already matches; skipped
+agents: <tmpdir>/.claude/agents/landscape-sweep-worker.md already matches; skipped
+agents: <tmpdir>/.claude/agents/security-reviewer.md already matches; skipped
+agents: <tmpdir>/.claude/agents/semantic-evidence-reviewer.md already matches; skipped
+agents: <tmpdir>/.claude/agents/source-scout.md already matches; skipped
+agents: <tmpdir>/.claude/agents/stack-researcher.md already matches; skipped
+agents: <tmpdir>/.claude/agents/stack-verifier.md already matches; skipped
+guard: would install <tmpdir>/.claude/hooks/effort-default-guard.py (sha256 df3248659c19...)
+guard: installed <tmpdir>/.claude/hooks/effort-default-guard.py
+guard: installed <tmpdir>/.claude/hooks/effort-default-guard.py
+guard: <tmpdir>/.claude/hooks/effort-default-guard.py already matches (sha256 df3248659c19...); skipped
+mcp: registered ai-memory
+mcp: registered serena
+guard: installed <tmpdir>/.claude/hooks/effort-default-guard.py
+guard: installed <tmpdir>/.claude/hooks/secret_path_guard.py
+guard: installed <tmpdir>/.claude/hooks/token-lanes-block.md
+guard: installed <tmpdir>/.claude/hooks/token-lanes-subagent-start.py
+guard: <tmpdir>/.claude/hooks/effort-default-guard.py already matches (sha256 df3248659c19...); skipped
+guard: <tmpdir>/.claude/hooks/secret_path_guard.py already matches (sha256 f2ae894eddee...); skipped
+guard: <tmpdir>/.claude/hooks/token-lanes-block.md already matches (sha256 12e01ab910a9...); skipped
+guard: <tmpdir>/.claude/hooks/token-lanes-subagent-start.py already matches (sha256 7a9228e41235...); skipped
+guard: installed <tmpdir>/.claude/hooks/effort-default-guard.py
+guard: installed <tmpdir>/.claude/hooks/secret_path_guard.py
+guard: installed <tmpdir>/.claude/hooks/token-lanes-block.md
+guard: installed <tmpdir>/.claude/hooks/token-lanes-subagent-start.py
+# exit 0

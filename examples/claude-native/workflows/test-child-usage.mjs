@@ -2,7 +2,7 @@
 // OFFLINE check of child-usage.mjs against SYNTHETIC transcript rows (no provider
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
-import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER } from './child-usage.mjs'
+import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER, executedText, logFindPart, sensitivePart } from './child-usage.mjs'
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync, readFileSync, chmodSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -21,7 +21,7 @@ expect('first request prompt size is input plus cache read plus cache creation',
 expect('null result is incomplete', !summarizeChild(started, { ...done, result: null }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 expect('missing journal result is incomplete', !summarizeChild(started, null, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 const inherited = summarizeChild(started, done, { agentType: 'workflow' }, [msg('m1', 'claude-fable-5-1', 5)])
-expect('omitted model is flagged as coordinator inheritance', !inherited.complete && inherited.requested_model === null && inherited.issues.some((i) => i.includes('inherits')))
+expect('an omitted model is flagged as not requested explicitly, without claiming coordinator inheritance', !inherited.complete && inherited.requested_model === null && inherited.issues.some((i) => i.includes('not requested explicitly')) && !inherited.issues.some((i) => i.includes('inherits')))
 const swapped = summarizeChild(started, done, { model: 'haiku' }, [msg('m1', 'claude-haiku-4-5-20251001', 5), msg('m2', 'claude-sonnet-5', 7)])
 expect('model substitution is incomplete and usage stays split per resolved model', !swapped.complete && swapped.usage_by_model['claude-sonnet-5'].output_tokens === 7 && swapped.usage_by_model['claude-haiku-4-5-20251001'].output_tokens === 5)
 const noUsageMsg = { type: 'assistant', message: { id: 'm9', model: 'claude-sonnet-5' } }
@@ -47,10 +47,20 @@ expect('fallback: a cybersecurity fallback to claude-opus-4-8 under 2.1.278 is o
 const withError = summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-5-5', '2.1.281'), synthetic('s1', '2.1.281'), vmsg('m2', 'claude-opus-5-5', '2.1.281')])
 expect('fallback: a <synthetic> API-error row is not a model change or an older model; the family check still reports it', !has(withError, 'changed within') && !has(withError, 'older than') && has(withError, 'outside requested family: claude-opus-5-5,<synthetic>'))
 expect('fallback: an entry older than the first documented row has no expectation', summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-opus-4-8', '2.1.100')]).complete)
-expect('fallback: an alias without documented rows (sonnet) is checked for changes only', summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5', '2.1.281')]).complete && !summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5', '2.1.281'), vmsg('m2', 'claude-haiku-4-5-20251001', '2.1.281')]).complete)
+expect('fallback: an alias without documented rows (haiku) is checked for changes only', summarizeChild(started, done, { model: 'haiku' }, [vmsg('m1', 'claude-haiku-4-5-20251001', '2.1.281')]).complete && !summarizeChild(started, done, { model: 'haiku' }, [vmsg('m1', 'claude-haiku-4-5-20251001', '2.1.281'), vmsg('m2', 'claude-sonnet-5', '2.1.281')]).complete)
 expect('fallback: an opus model name that cannot be compared fails closed', has(summarizeChild(started, done, { model: 'opus' }, [vmsg('m1', 'claude-3-opus-20240229', '2.1.281')]), 'older than the documented alias resolution'))
 expect('fallback: model names parse to family and version, ignoring date and [1m] suffixes', JSON.stringify([modelGeneration('claude-opus-5-5'), modelGeneration('claude-opus-5'), modelGeneration('claude-haiku-4-5-20251001'), modelGeneration('claude-opus-5-5[1m]'), modelGeneration('claude-3-opus-20240229')]) === JSON.stringify([{ family: 'opus', version: [5, 5] }, { family: 'opus', version: [5] }, { family: 'haiku', version: [4, 5] }, { family: 'opus', version: [5, 5] }, null]))
-expect('fallback: the opus version table matches the documented boundaries', JSON.stringify(['2.1.153', '2.1.154', '2.1.218', '2.1.219', '2.1.279', '2.1.280', '2.1.281'].map((v) => expectedModel('opus', v))) === JSON.stringify([null, 'claude-opus-4-8', 'claude-opus-4-8', 'claude-opus-5', 'claude-opus-5', 'claude-opus-5-5', 'claude-opus-5-5']) && expectedModel('sonnet', '2.1.281') === null && expectedModel('opus', undefined) === null)
+expect('fallback: the opus version table matches the documented boundaries', JSON.stringify(['2.1.153', '2.1.154', '2.1.218', '2.1.219', '2.1.279', '2.1.280', '2.1.281'].map((v) => expectedModel('opus', v))) === JSON.stringify([null, 'claude-opus-4-8', 'claude-opus-4-8', 'claude-opus-5', 'claude-opus-5', 'claude-opus-5-5', 'claude-opus-5-5']) && expectedModel('sonnet', '2.1.281') === 'claude-sonnet-5' && expectedModel('haiku', '2.1.281') === null && expectedModel('opus', undefined) === null)
+// The same guards for the sonnet and fable rows (model-config doc, "version history" table, fetched 2026-09-29):
+// sonnet is Sonnet 5.5 from v2.1.284 and Sonnet 5 from v2.1.197; fable is Fable 5.1 from v2.1.257.
+expect('fallback: the sonnet version table matches the documented boundaries', JSON.stringify(['2.1.196', '2.1.197', '2.1.283', '2.1.284', '2.1.285'].map((v) => expectedModel('sonnet', v))) === JSON.stringify([null, 'claude-sonnet-5', 'claude-sonnet-5', 'claude-sonnet-5-5', 'claude-sonnet-5-5']))
+expect('fallback: the fable version table matches the documented boundaries', JSON.stringify(['2.1.256', '2.1.257', '2.1.258', '2.1.284', '2.1.285'].map((v) => expectedModel('fable', v))) === JSON.stringify([null, 'claude-fable-5-1', 'claude-fable-5-1', 'claude-fable-5-1', 'claude-fable-5-1']))
+const sonnetWhole = summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5', '2.1.284'), vmsg('m2', 'claude-sonnet-5', '2.1.284')])
+expect('fallback: a sonnet child that ran entirely on claude-sonnet-5 under 2.1.284 is incomplete though the family check accepts it', !sonnetWhole.complete && !has(sonnetWhole, 'changed within') && !has(sonnetWhole, 'outside requested family') && has(sonnetWhole, 'older than the documented alias resolution') && has(sonnetWhole, 'claude-sonnet-5 on 2.1.284 (documented sonnet: claude-sonnet-5-5)'))
+expect('fallback: sonnet on claude-sonnet-5-5 under 2.1.284 is complete', summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5-5', '2.1.284'), vmsg('m2', 'claude-sonnet-5-5', '2.1.284')]).complete)
+expect('fallback: sonnet on claude-sonnet-5 under 2.1.283 is the documented resolution, not a fallback', summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5', '2.1.283'), vmsg('m2', 'claude-sonnet-5', '2.1.283')]).complete)
+const sonnetSwitched = summarizeChild(started, done, { model: 'sonnet' }, [vmsg('m1', 'claude-sonnet-5-5', '2.1.284'), vmsg('m2', 'claude-sonnet-5', '2.1.284'), vmsg('m3', 'claude-sonnet-5', '2.1.284')])
+expect('fallback: a sonnet child that changes from claude-sonnet-5-5 to claude-sonnet-5 is incomplete and names the change once', !sonnetSwitched.complete && !has(sonnetSwitched, 'outside requested family') && sonnetSwitched.issues.filter((i) => i.includes('changed within the child')).length === 1 && sonnetSwitched.issues.some((i) => i.endsWith('changed within the child: claude-sonnet-5-5 -> claude-sonnet-5')))
 
 // WebSearch session cap (tools-reference, "Session search limit"): a capped call returns a notice right after the
 // result header instead of results; page text that quotes the notice is not a capped call.
@@ -216,7 +226,7 @@ expect('lanes: an unknown decision value is kept as other', childLanes(agentTool
 const injected = childLanes([ask('plain workflow packet', 0), attach({ type: 'hook_additional_context', hookName: 'SubagentStart:workflow-subagent', hookEvent: 'SubagentStart', toolUseID: 'start', content: ['lanes\n' + DEFAULT_MARKER] }, 0), call('b1', 'Read', { file_path: 'a' }, 1, tokens(5, 0, 100))])
 expect('lanes: SubagentStart hook_additional_context carrying the marker is an injected block', !injected.injected_block.in_first_prompt && injected.injected_block.in_subagent_start_context && injected.subagent_start.additional_context && injected.subagent_start.types.join() === 'workflow-subagent')
 const viaStdout = childLanes([ask('packet', 0), attach({ type: 'hook_success', hookName: 'SubagentStart:general-purpose', hookEvent: 'SubagentStart', toolUseID: 'start', command: 'lanes-hook', stdout: JSON.stringify({ hookSpecificOutput: { hookEventName: 'SubagentStart', additionalContext: 'block ' + DEFAULT_MARKER } }), stderr: '', exitCode: 0 }, 0)])
-expect('lanes: SubagentStart additionalContext in hook stdout is an injected block too', viaStdout.injected_block.in_subagent_start_context && viaStdout.subagent_start.additional_context)
+expect('lanes: stdout-only context is a claim, never proof of insertion', !viaStdout.injected_block.in_subagent_start_context && !viaStdout.subagent_start.additional_context && viaStdout.measurement.hook_context.claimed === 1)
 const quoted = childLanes([ask('no block here', 0), call('d1', 'Bash', { command: 'grep -c "' + DEFAULT_MARKER + '" hooks.mjs' }, 1), toolResult('d1', 'match ' + DEFAULT_MARKER, 1)])
 expect('lanes: the marker in tool input or output is never an injected block', !quoted.injected_block.in_first_prompt && !quoted.injected_block.in_subagent_start_context)
 expect('lanes: another marker is looked for when given', childLanes([ask('nonce-7f3', 0)], { marker: 'nonce-7f3' }).injected_block.in_first_prompt && !childLanes([ask('nonce-7f3', 0)]).injected_block.in_first_prompt)
@@ -366,5 +376,15 @@ try {
     expect('rtk-db: the sweep joins every Bash call in the window, and the database is unchanged', all && JSON.stringify(all.rtk.decisions) === JSON.stringify({ allow: 1, ask: 1, defer: 1, deny: 1, not_logged: 3, other: 0 }) && all.rtk.covered_share_of_bash === 0.2857 && readFileSync(db).equals(before))
   }
 } finally { rmSync(sweepRoot, { recursive: true, force: true }) }
+// CodeQL js/redos witnesses (2026-09-27): before the repair each took seconds at 28 repetitions, doubling with each one.
+const timed = (f) => { const t = process.hrtime.bigint(), r = f(); return { r, ms: Number(process.hrtime.bigint() - t) / 1e6 } }
+const gitWitness = 'git ' + '--git-dir --! '.repeat(28) + 'status'
+const gitRun = timed(() => [logFindPart(gitWitness), sensitivePart(gitWitness)])
+expect('redos: repeated --git-dir option words are read in linear time', gitRun.ms < 1000 && gitRun.r.join() === 'false,false')
+const codeRun = timed(() => ['node -', 'bun -', 'deno eval -'].map((p) => executedText(p + '-- -'.repeat(28) + " 'fetch(u)'", { inlineHttp: true })))
+expect('redos: repeated interpreter option words are matched in linear time', codeRun.ms < 1000)
+expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
+  logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
+  && !logFindPart('git status') && sensitivePart('git -C repo branch -a') && sensitivePart('git --git-dir=.g show HEAD:a') && !sensitivePart('git -C repo status'))
 console.log('SUMMARY passed=' + passed + ' failed=' + failed + ' total=' + (passed + failed))
 process.exit(failed ? 1 : 0)

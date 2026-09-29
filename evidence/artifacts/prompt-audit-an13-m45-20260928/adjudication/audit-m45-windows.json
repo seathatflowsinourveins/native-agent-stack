@@ -1,0 +1,57 @@
+{
+ "note": "Each hit of audit-m45.json with its window (80 characters either side of the match), host details replaced as the docstring of publish_windows_m45.py says.",
+ "judgments": {
+  "claude-AB": [
+   {
+    "pattern": "MAPPING",
+    "scope": "attachment prompt_snapshot",
+    "match": "Codex lane",
+    "window": "us`;\\n  - a phrase that attributes a return to a reviewer family, such as \\\"the Codex lane\\\" or \\\"Claude's proposal\\\";\\n  - an absolute host path outside the repository r"
+   },
+   {
+    "pattern": "MAPPING",
+    "scope": "attachment prompt_snapshot",
+    "match": "Codex lane",
+    "window": "us`;\\n  - a phrase that attributes a return to a reviewer family, such as \\\"the Codex lane\\\" or \\\"Claude's proposal\\\";\\n  - an absolute host path outside the repository r"
+   },
+   {
+    "pattern": "MAPPING",
+    "scope": "tool_result",
+    "match": "evidence-reviewer",
+    "window": "<adj>/root/.claude/agents/evidence-reviewer.md\n<scratch>"
+   },
+   {
+    "pattern": "MAPPING",
+    "scope": "tool result (structured)",
+    "match": "evidence-reviewer",
+    "window": "<adj>/root/.claude/agents/evidence-reviewer.md\", \"<scratch>"
+   }
+  ],
+  "claude-BA": [
+   {
+    "pattern": "MAPPING",
+    "scope": "attachment prompt_snapshot",
+    "match": "Codex lane",
+    "window": "us`;\\n  - a phrase that attributes a return to a reviewer family, such as \\\"the Codex lane\\\" or \\\"Claude's proposal\\\";\\n  - an absolute host path outside the repository r"
+   },
+   {
+    "pattern": "MAPPING",
+    "scope": "attachment prompt_snapshot",
+    "match": "Codex lane",
+    "window": "us`;\\n  - a phrase that attributes a return to a reviewer family, such as \\\"the Codex lane\\\" or \\\"Claude's proposal\\\";\\n  - an absolute host path outside the repository r"
+   },
+   {
+    "pattern": "MAPPING",
+    "scope": "tool_result",
+    "match": "evidence-reviewer",
+    "window": "<adj>/root/.claude/agents/evidence-reviewer.md\n<scratch>"
+   },
+   {
+    "pattern": "MAPPING",
+    "scope": "tool result (structured)",
+    "match": "evidence-reviewer",
+    "window": "<adj>/root/.claude/agents/evidence-reviewer.md\", \"<scratch>"
+   }
+  ]
+ }
+}

@@ -1,0 +1,89 @@
+{
+ "patterns_sha256": "e638e7ab554736806040451009bc3966d7b227291d467fd7ec2911f59194e273",
+ "judgments": {
+  "gpt6-AB": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 6,
+    "command_execution": 40,
+    "web_search": 2
+   }
+  },
+  "gpt6-BA": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 6,
+    "command_execution": 36,
+    "web_search": 3
+   }
+  },
+  "claude-AB": {
+   "void": false,
+   "hits": [],
+   "info": [
+    {
+     "pattern": "INJECTED",
+     "scope": "attachment session_context",
+     "match": "GPT-6 lane",
+     "window": "lags; sandbox-profile open gate (#448)\\n4f31ef46 OmniRoute routing convergence: GPT-6 lane account-routing adjudication (51 items), frozen off-pin control and receipts (2"
+    }
+   ],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 93,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 21,
+    "tool_use": 43,
+    "tool_result": 43,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 19,
+    "attachment hook_additional_context": 5,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  },
+  "claude-BA": {
+   "void": false,
+   "hits": [],
+   "info": [
+    {
+     "pattern": "INJECTED",
+     "scope": "attachment session_context",
+     "match": "GPT-6 lane",
+     "window": "lags; sandbox-profile open gate (#448)\\n4f31ef46 OmniRoute routing convergence: GPT-6 lane account-routing adjudication (51 items), frozen off-pin control and receipts (2"
+    }
+   ],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 91,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 19,
+    "tool_use": 41,
+    "tool_result": 41,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 17,
+    "attachment hook_additional_context": 7,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  }
+ }
+}

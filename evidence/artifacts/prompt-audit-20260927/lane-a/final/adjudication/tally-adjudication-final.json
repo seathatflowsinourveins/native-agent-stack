@@ -1,0 +1,27 @@
+{
+ "rule": "applied only when all four valid judgments choose the same resolution",
+ "judgments": {
+  "gpt6-AB": {
+   "choice": "A",
+   "resolution": "c",
+   "confidence": 0.94
+  },
+  "gpt6-BA": {
+   "choice": "B",
+   "resolution": "c",
+   "confidence": 0.91
+  },
+  "claude-AB": {
+   "choice": "A",
+   "resolution": "c",
+   "confidence": 0.75
+  },
+  "claude-BA": {
+   "choice": "B",
+   "resolution": "c",
+   "confidence": 0.78
+  }
+ },
+ "invalid": {},
+ "outcome": "apply the amendment (c)"
+}

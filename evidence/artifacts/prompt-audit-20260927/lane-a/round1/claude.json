@@ -1,0 +1,208 @@
+{
+ "items": [
+  {
+   "id": "S1",
+   "verdict": "agree",
+   "resolution_text": "",
+   "reasons": "Every factual claim in the added sentence matches the original check. validate.yml:335 matches only a line of two or three '#', then spaces or tabs, then exactly 'SOTA sources' (no i flag, only trailing spaces or tabs allowed), and :336 strips HTML comments before the emptiness test. A local Node replication of lines 335-336 (synthetic, not a CI run) gave: the template unchanged, with only its comment, fails; the template with its section filled passes, also with CRLF line endings; '## SOTA Sources', '#### SOTA sources', '### SOTA sources:' and a bold line fail; a body with PR #410's four headings fails. 'Non-empty ... section (exact, case-sensitive heading)' is therefore accurate, and the template's own comment (pull_request_template.md:13) tells the author to fill it, so the comment-stripping detail needs no amendment. sota-sources is a required check in the committed ruleset target (main-ruleset.json:42). The need is concrete: per the packet, gh pr create with --body, --body-file or --fill never loads the template, and PR #410, whose description uses its own headings, fails the check. AGENTS.md reaches both Codex and Claude sessions, since CLAUDE.md imports it. The sentence matches the maintained practice quoted in the packet (NVIDIA/warp and newton-physics AGENTS.md: use the PR template) and Claude Code's guidance to put PR conventions in instruction files. Placing it beside the per-PR lane-label rule is coherent: docs/lanes.md:151 already says the template asks for the lane. The hand-off sentence is unchanged, and the edit is compatible with X5b, which edits line 3. Non-blocking co-changes: AGENTS.md is a shared hot file (docs/lanes.md:26), so the PR is lane:shared, and its manifest entry (manifests/evidence.json:3474-3476) must be re-registered, because scripts/validate.py:384-387 fails on any SHA-256 or byte mismatch. Verification gaps: the live ruleset, the PR #410 and #430 facts, the cli/cli source and the upstream AGENTS.md quotes come from the packet and were not re-fetched here (no web access).",
+   "sources": [
+    {
+     "locator": ".github/workflows/validate.yml:335",
+     "quote": "const match = body.match(/^#{2,3}[ \\t]+SOTA sources[ \\t]*$([\\s\\S]*?)(?=^#{2,3}[ \\t]|(?![\\s\\S]))/m);"
+    },
+    {
+     "locator": ".github/workflows/validate.yml:336",
+     "quote": "const content = match ? match[1].replace(/<!--[\\s\\S]*?-->/g, '').trim() : '';"
+    },
+    {
+     "locator": ".github/main-ruleset.json:42",
+     "quote": "{\"context\": \"sota-sources\", \"integration_id\": 15368}"
+    },
+    {
+     "locator": ".github/pull_request_template.md:13",
+     "quote": "<!-- Required (AGENTS.md top rule; the sota-sources check fails without it). For every change: the maintained repository or published reference it installs or follows"
+    },
+    {
+     "locator": "docs/lanes.md:151",
+     "quote": "[PR template](../.github/pull_request_template.md) asks for the lane."
+    },
+    {
+     "locator": "docs/lanes.md:26",
+     "quote": "| Shared hot files | `manifests/evidence.json`, `manifests/stack.json`, `observability/grand-dashboard/state.json`, `AGENTS.md`,"
+    },
+    {
+     "locator": "scripts/validate.py:385",
+     "quote": "self.error(f\"{path_value}: SHA-256 mismatch\")"
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:98 (packet fact from the live GitHub API; not re-checked here)",
+     "quote": "Open PR #410's description has the headings '## The answer the request asks for', '## Steps', '## Not claimed' and '## Checks at head', and no SOTA sources heading; its sota-sources check fails"
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:296 (packet quote of https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/create/create.go; not re-fetched)",
+     "quote": "must provide `--title` and `--body` (or `--fill`…) when not running interactively"
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:291 (packet quote of https://github.com/NVIDIA/warp/blob/e477c3ba2d84a5aa843f029821e071f06b7dea72/AGENTS.md L26-28; not re-fetched)",
+     "quote": "If opening a pull request on GitHub, use the template in `.github/PULL_REQUEST_TEMPLATE.md`."
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:288 (packet quote of https://code.claude.com/docs/en/best-practices.md L181; not re-fetched)",
+     "quote": "| Repository etiquette (branch naming, PR conventions) |"
+    }
+   ],
+   "confidence": 0.8
+  },
+  {
+   "id": "X5a",
+   "verdict": "amend",
+   "resolution_text": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** So never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+   "reasons": "The intent is right, but the exact text fails two required tests. It writes 'Never self-write without a SOTA source.' with a capital N. PortableTopRuleTests requires the lowercase phrase 'never self-write without a SOTA source' inside the top rule (tests/test_install_claude_profile.py:935) and checks it with a case-sensitive 'in' (:967). No other occurrence lies between the bold rule and '## Core rule' (template lines 3-10). A local replication of the test's errors() logic on the proposed file (not a test run) returns one error, the missing phrase. So test_the_template_states_the_procedure_within_the_word_budget (:975-976) fails. test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template (:978-983) fails too, because each mutant then yields 2 errors instead of 1. The amendment changes only the opening of that sentence ('So never self-write without a SOTA source.'), which keeps the tested phrase lowercase. The operator's bold heading stays byte-exact (the operator's bold ends at 'truth.', brief line 198), and the operator's compounds sentence stays verbatim. The same replication on the amendment returns 0 errors at 1,227 words against the 1,265 ceiling (int(1205*1.05), :962), exactly 1 error per mutant and no repository path. Removing 'Upstream and the installed client are the source of truth' loses no step: step 2 (line 6) still checks the installed client first and supplies the tested 'installed client' phrase, and steps 1-5 are unchanged. I preferred this to putting the clause inside the bold, which would alter the operator's heading. Non-blocking co-change: re-register examples/claude-native/CLAUDE.md in manifests/evidence.json (:38815), which scripts/validate.py:384-387 checks. Hosts replace an earlier merged copy as a whole (recipes/claude-native-profile.md:84-86).",
+   "sources": [
+    {
+     "locator": "tests/test_install_claude_profile.py:935",
+     "quote": "\"never self-write without a SOTA source\","
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:967",
+     "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:976",
+     "quote": "self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding=\"utf-8\")), [])"
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:980",
+     "quote": "self.assertEqual(len(self.errors(text.replace(\"upstream citation\", \"citation\"))), 1)"
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:931",
+     "quote": "BASELINE_WORDS = 1205"
+    },
+    {
+     "locator": "examples/claude-native/CLAUDE.md:6",
+     "quote": "2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs."
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:198 (the operator's user-level top rule as quoted in the packet)",
+     "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action,"
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:198",
+     "quote": "The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+    },
+    {
+     "locator": "manifests/evidence.json:38815",
+     "quote": "\"path\": \"examples/claude-native/CLAUDE.md\","
+    }
+   ],
+   "confidence": 0.8
+  },
+  {
+   "id": "X5b",
+   "verdict": "agree",
+   "resolution_text": "",
+   "reasons": "The proposed line is byte-identical to the operator's rule quoted in the packet (string comparison of brief line 215 with line 198). Against the current line, it replaces the bold heading, adds the compounds sentence and moves 'Stars, installs and popularity...' to the end. Every current obligation stays verbatim: research before any action with the installed research and skill-discovery skills and record the findings; install directly or build only from a cited reference implementation; name the source for every action; with no SOTA source, stop and report instead of writing one. Removing 'never self-write without a SOTA source' from the heading therefore loses no force. No test reads line 3. The AGENTS.md content tests read the harness-defaults link on line 5 (tests/test_adoption_docs_consistency.py:848) and the dispatch pointer on line 36 (tests/test_install_claude_profile.py:660). The check comment at validate.yml:317 and the template comment at pull_request_template.md:13 remain accurate. Carrying the operator's decided wording verbatim follows docs/decisions/2026-09-26-harness-rules-cleanup.md:15. Round 1's no-edit X5 verdict concerned scope, not this wording (docs/decisions/2026-09-27-prompt-audit-resolution.md:30). With X5c, Codex sessions in this repository read the operator's opening clauses and compounds sentence in both files. Compatible with S1, which edits line 37. Non-blocking co-changes: AGENTS.md is a shared hot file (docs/lanes.md:26), so the PR is lane:shared, and its manifest entry (manifests/evidence.json:3474-3476) must be re-registered (scripts/validate.py:384-387). docs/harness-defaults.md:7 would still paraphrase the old heading; it stays true in substance, so updating it is an optional follow-up. Gap: I compared against the packet's quote; the operator's file itself was out of scope to read.",
+   "sources": [
+    {
+     "locator": "<lane-a>/claude-brief.txt:198",
+     "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found."
+    },
+    {
+     "locator": "AGENTS.md:3",
+     "quote": "Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one."
+    },
+    {
+     "locator": "tests/test_adoption_docs_consistency.py:848",
+     "quote": "self.assertTrue(link in (ROOT / \"AGENTS.md\").read_text(encoding=\"utf-8\"), f\"AGENTS.md does not link {link}\")"
+    },
+    {
+     "locator": "tests/test_install_claude_profile.py:660",
+     "quote": "pointer = [line for line in (ROOT / \"AGENTS.md\").read_text(encoding=\"utf-8\").splitlines()"
+    },
+    {
+     "locator": ".github/workflows/validate.yml:317",
+     "quote": "# Top rule (AGENTS.md): every change names the maintained repository or published reference it"
+    },
+    {
+     "locator": "docs/decisions/2026-09-26-harness-rules-cleanup.md:15",
+     "quote": "- Decided wording stays verbatim wherever it appears: the top rule"
+    },
+    {
+     "locator": "docs/decisions/2026-09-27-prompt-audit-resolution.md:30",
+     "quote": "| X5 | `AGENTS.md:3` and `examples/claude-native/CLAUDE.md:5` | agree / agree | not needed | Recorded, not edited. The broader rule covers the narrower one. |"
+    },
+    {
+     "locator": "docs/harness-defaults.md:7",
+     "quote": "The defaults below apply this rule under the top rule in [`AGENTS.md`](../AGENTS.md): research first, and never self-write without a SOTA source."
+    },
+    {
+     "locator": "manifests/evidence.json:3474",
+     "quote": "\"path\": \"AGENTS.md\","
+    }
+   ],
+   "confidence": 0.85
+  },
+  {
+   "id": "X5c",
+   "verdict": "agree",
+   "resolution_text": "",
+   "reasons": "The text is right. It carries the operator's heading clauses and compounds sentence verbatim, keeps the 'Top rule:' prefix and the 'never self-write without a SOTA source' clause, and keeps the file's meaning: line 5 still checks the installed client first, so removing 'upstream and the installed client are the source of truth' loses no step. Markers and the RTK text are untouched, so the following are unaffected: apply_codex_lane.py's block replacement between markers; prove_codex_lane.py's marker counts (:140, :154); tests/test_codex_agents.py, which compares only the RTK and exceptions part; and the lane-home staging test (tests/test_landscape_sweep_harness.py:1024-1029), which compares staged bytes with the template. The file grows to 3,323 bytes, under the 8,192 limit at tests/test_codex_worker_lane.py:205. Required in the same commit: applying line 3 alone fails the validate job's unittest step (validate.yml:141) at tests/test_codex_worker_lane.py:209-210, which pins the top-rule block byte for byte and at 120 words. A local replication of template_segments on the proposed file (not a test run) gives 144 words and sha256 71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f. Set TOP_RULE_SHA256 (:47) to that value, change 120 to 144 at :210 and in the :45 comment, and re-register the template in manifests/evidence.json (:3749). That test is a pin of reviewed wording that any decided change re-pins, as #385 did with its templates (docs/harness-defaults.md:98). The manifest hash pin (scripts/validate.py:384-387) applies to every item in this packet in the same way, so reading 'breaks a test' literally would reject every possible edit. It is not a contradiction of the text, and applied with the re-pin nothing blocks. Host step, not a repository defect: ~/.codex/AGENTS.md keeps the old block until apply_codex_lane.py replaces it (dry run, then --apply). The '120 words' in docs/decisions/2026-09-26-codex-worker-lane.md:59 is a dated record.",
+   "sources": [
+    {
+     "locator": "tests/test_codex_worker_lane.py:45",
+     "quote": "# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0"
+    },
+    {
+     "locator": "tests/test_codex_worker_lane.py:47",
+     "quote": "TOP_RULE_SHA256 = \"476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311\""
+    },
+    {
+     "locator": "tests/test_codex_worker_lane.py:209",
+     "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)"
+    },
+    {
+     "locator": "tests/test_codex_worker_lane.py:210",
+     "quote": "self.assertEqual(len(top.split()), 120)"
+    },
+    {
+     "locator": ".github/workflows/validate.yml:141",
+     "quote": "run: python3 -m unittest"
+    },
+    {
+     "locator": "docs/harness-defaults.md:98",
+     "quote": "after #385 changed the templates and the test's pin"
+    },
+    {
+     "locator": "adoption/templates/codex.AGENTS.template.md:5",
+     "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+    },
+    {
+     "locator": "tests/test_codex_worker_lane.py:205",
+     "quote": "self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes"
+    },
+    {
+     "locator": "tests/test_codex_agents.py:25",
+     "quote": "expected = UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split("
+    },
+    {
+     "locator": "tools/adoption/apply_codex_lane.py:15",
+     "quote": "begin and end markers; every other line is kept. Hash-guarded atomic write."
+    },
+    {
+     "locator": "scripts/validate.py:385",
+     "quote": "self.error(f\"{path_value}: SHA-256 mismatch\")"
+    },
+    {
+     "locator": "manifests/evidence.json:3749",
+     "quote": "\"path\": \"adoption/templates/codex.AGENTS.template.md\","
+    },
+    {
+     "locator": "<lane-a>/claude-brief.txt:198",
+     "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.**"
+    }
+   ],
+   "confidence": 0.65
+  }
+ ]
+}
